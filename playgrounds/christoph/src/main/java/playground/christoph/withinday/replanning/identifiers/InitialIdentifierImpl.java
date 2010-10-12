@@ -23,6 +23,7 @@ package playground.christoph.withinday.replanning.identifiers;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PersonAgent;
 
 import playground.christoph.withinday.mobsim.WithinDayPersonAgent;
@@ -41,11 +42,13 @@ public class InitialIdentifierImpl extends InitialIdentifier {
 	public List<PersonAgent> getAgentsToReplan(double time, WithinDayReplanner withinDayReplanner) {
 		List<PersonAgent> agentsToReplan = new ArrayList<PersonAgent>();
 		
-		for (PersonAgent personAgent : this.simulation.getPersonAgents().values()) {
-			WithinDayPersonAgent withinDayPersonAgent = (WithinDayPersonAgent) personAgent;
-			
-			if (withinDayPersonAgent.getWithinDayReplanners().contains(withinDayReplanner)) {
-				agentsToReplan.add(personAgent);
+		for (MobsimAgent mobsimAgent : this.simulation.getAgents()) {
+			if (mobsimAgent instanceof WithinDayPersonAgent) {
+				WithinDayPersonAgent withinDayPersonAgent = (WithinDayPersonAgent) mobsimAgent;
+				
+				if (withinDayPersonAgent.getWithinDayReplanners().contains(withinDayReplanner)) {
+					agentsToReplan.add(withinDayPersonAgent);
+				}
 			}
 		}
 		

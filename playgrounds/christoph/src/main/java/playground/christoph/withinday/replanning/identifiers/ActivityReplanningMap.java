@@ -17,6 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
 package playground.christoph.withinday.replanning.identifiers;
 
 import java.util.ArrayList;
@@ -37,6 +38,7 @@ import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
 import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.mobsim.framework.events.SimulationAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
@@ -45,8 +47,6 @@ import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.interfaces.QSimI;
 import org.matsim.ptproject.qsim.netsimengine.QNetwork;
-
-import playground.christoph.withinday.mobsim.WithinDayQSim;
 
 /*
  * This Module is used by a NextLegReplanner. It calculates the time
@@ -121,14 +121,16 @@ public class ActivityReplanningMap implements AgentStuckEventHandler,
 		// Update Reference to QNetwork
 		this.qNetwork = (QNetwork) sim.getQNetwork();
 
-		personAgentMapping = null;
+		personAgentMapping = new HashMap<Id, PersonAgent>();
 
-		if (sim instanceof WithinDayQSim) {
-			personAgentMapping = ((WithinDayQSim) sim).getPersonAgents();
-
-			replanningSet.addAll(personAgentMapping.keySet());
+		if (sim instanceof QSim) {
+			for (MobsimAgent mobsimAgent : ((QSim)sim).getAgents()) {
+				if (mobsimAgent instanceof PersonAgent) {
+					PersonAgent personAgent = (PersonAgent) mobsimAgent;
+					personAgentMapping.put(personAgent.getPerson().getId(), personAgent);
+				}
+			}
 		}
-		else new HashMap<Id, PersonAgent>();
 	}
 
 	/*

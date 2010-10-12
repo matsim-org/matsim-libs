@@ -37,23 +37,24 @@ import org.matsim.ptproject.qsim.helpers.DefaultPersonDriverAgent;
  */
 public class WithinDayAgentFactory extends AgentFactory {
 
-	protected Map<Id, PersonAgent> personAgents;
+//	protected Map<Id, PersonAgent> personAgents;
 	
 	public WithinDayAgentFactory(final QSim simulation) {
 		super(simulation);
 		
-		personAgents = new HashMap<Id, PersonAgent>();
+//		personAgents = new HashMap<Id, PersonAgent>();
 	}
 
 	@Override
 	public DefaultPersonDriverAgent createPersonAgent(final Person p) {
 		WithinDayPersonAgent agent = new WithinDayPersonAgent(p, this.simulation);
-		personAgents.put(agent.getPerson().getId(), agent);
+//		personAgents.put(agent.getPerson().getId(), agent);
 		return agent;
 	}
 	
-	public Map<Id, PersonAgent> getPersonAgents() {
-		return this.personAgents;
-	}
+	// yyyy instead QSim.getAgents() is used now. christoph, oct'10
+//	public Map<Id, PersonAgent> getPersonAgents() {
+//		return this.personAgents;
+//	}
 	
 }

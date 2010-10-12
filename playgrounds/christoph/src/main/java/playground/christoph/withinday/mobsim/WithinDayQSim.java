@@ -20,15 +20,11 @@
 
 package playground.christoph.withinday.mobsim;
 
-import java.util.Map;
-
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.ptproject.qsim.AgentFactory;
 import org.matsim.ptproject.qsim.QSim;
@@ -92,6 +88,7 @@ public class WithinDayQSim extends QSim {
 			
 			withinDayPersonAgent.calculateDepartureTime(act);
 		} 
+		// yyyy can this situation really occur (Agent is in the ActivityEndsList but not performing an Activity)? christoph, oct'10
 		else log.warn("Cannot reset Activity Departure Time - Agent is currently performing a Leg. " + withinDayPersonAgent.getPerson().getId());
 		
 		/*
@@ -109,7 +106,6 @@ public class WithinDayQSim extends QSim {
 //			this.getActivityEndsList().add(withinDayPersonAgent);
 //		}
 		super.rescheduleActivityEnd(withinDayPersonAgent, oldTime, withinDayPersonAgent.getDepartureTime() ) ;
-		
 	}
 	
 	@Override
@@ -122,7 +118,8 @@ public class WithinDayQSim extends QSim {
 		super.setAgentFactory(factory);
 	}
 	
-	public Map<Id, PersonAgent> getPersonAgents() {
-		return this.agentFactory.getPersonAgents();
-	}
+	// yyyy replaced by calls to QSim.getAgents(). Could the QSim use a Map<Id, MobsimAgent> instead of a Collection? christoph, oct'10
+//	public Map<Id, PersonAgent> getPersonAgents() {
+//		return this.agentFactory.getPersonAgents();
+//	}
 }

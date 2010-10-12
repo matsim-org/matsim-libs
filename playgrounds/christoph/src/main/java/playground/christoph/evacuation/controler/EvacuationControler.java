@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
@@ -446,8 +447,13 @@ public class EvacuationControler extends MultiModalControler {
 		protected void collectAgents(QSim sim) {
 			this.withinDayPersonAgents = new TreeMap<Id, WithinDayPersonAgent>();
 
-			for (PersonAgent personAgent : ((WithinDayQSim) sim).getPersonAgents().values()) {
-				withinDayPersonAgents.put(personAgent.getPerson().getId(), (WithinDayPersonAgent) personAgent);
+			for (MobsimAgent mobsimAgent : ((WithinDayQSim) sim).getAgents()) {
+				if (mobsimAgent instanceof PersonAgent) {
+					PersonAgent personAgent = (PersonAgent) mobsimAgent;
+					withinDayPersonAgents.put(personAgent.getPerson().getId(), (WithinDayPersonAgent) personAgent);
+				} else {
+					log.warn("MobsimAgent was expected to be from type PersonAgent, but was from type " + mobsimAgent.getClass().toString());
+				}
 			}
 		}
 
