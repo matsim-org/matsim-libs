@@ -19,21 +19,11 @@
  * *********************************************************************** */
 package playground.gregor.sims.run;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.geotools.factory.FactoryRegistryException;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.DefaultAttributeTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeFactory;
-import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.SchemaException;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
@@ -43,9 +33,6 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
-import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.evacuation.base.Building;
 import org.matsim.evacuation.base.BuildingsShapeReader;
 import org.matsim.evacuation.base.EvacuationNetFromNetcdfGenerator;
@@ -56,23 +43,15 @@ import org.matsim.evacuation.riskaversion.RiskCostFromFloodingData;
 import org.matsim.evacuation.run.EvacuationQSimControllerII;
 import org.matsim.evacuation.socialcost.SocialCostCalculatorSingleLink;
 import org.matsim.evacuation.travelcosts.PluggableTravelCostCalculator;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.gregor.sims.shelters.assignment.EvacuationShelterNetLoaderForShelterAllocation;
 import playground.gregor.sims.shelters.assignment.GreedyShelterAllocator;
 import playground.gregor.sims.shelters.assignment.RandomShelterAllocator;
-import playground.gregor.sims.shelters.assignment.ShelterAssignmentRePlanner;
-import playground.gregor.sims.shelters.assignment.ShelterAssignmentSimulatedAnnealingRePlanner;
-import playground.gregor.sims.shelters.assignment.ShelterCounter;
-import playground.gregor.sims.shelters.assignment.ShelterLocationRePlannerII;
-
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.MultiPoint;
-import com.vividsolutions.jts.geom.Point;
+import playground.gregor.sims.shelters.assignment.ShelterAssignmentSimulatedAnnealingRePlannerII;
 
 /**
  * @author laemmel
- *
+ * 
  */
 public class ShelterAssignmentSimulatedAnnealingController extends Controler {
 	final private static Logger log = Logger.getLogger(EvacuationQSimControllerII.class);
@@ -87,26 +66,23 @@ public class ShelterAssignmentSimulatedAnnealingController extends Controler {
 
 	PluggableTravelCostCalculator pluggableTravelCost = null;
 
-
-
 	public ShelterAssignmentSimulatedAnnealingController(String[] args) {
 		super(args);
 
-		this.setOverwriteFiles(true);
+		setOverwriteFiles(true);
 
-		//		this.config.scenario().setUseSignalSystems(true);
-		//		this.config.scenario().setUseLanes(true);
+		// this.config.scenario().setUseSignalSystems(true);
+		// this.config.scenario().setUseLanes(true);
 		this.config.setQSimConfigGroup(new QSimConfigGroup());
 	}
 
-
 	@Override
-	protected void setUp(){
+	protected void setUp() {
 		super.setUp();
 
-		//		if (this.scenarioData.getConfig().evacuation().isLoadShelters()) {
-		//			loadShelterSignalSystems();
-		//		}
+		// if (this.scenarioData.getConfig().evacuation().isLoadShelters()) {
+		// loadShelterSignalSystems();
+		// }
 
 		if (this.scenarioData.getConfig().evacuation().isSocialCostOptimization()) {
 			initSocialCostOptimization();
@@ -116,30 +92,27 @@ public class ShelterAssignmentSimulatedAnnealingController extends Controler {
 			initRiskMinimization();
 		}
 
-
-
 		initPluggableTravelCostCalculator();
-		ShelterAssignmentSimulatedAnnealingRePlanner srp = new ShelterAssignmentSimulatedAnnealingRePlanner(this.getScenario(), this.pluggableTravelCost, this.getTravelTimeCalculator(), this.shelterLinkMapping);
-		this.addControlerListener(srp);
-				
+		ShelterAssignmentSimulatedAnnealingRePlannerII srp = new ShelterAssignmentSimulatedAnnealingRePlannerII(getScenario(), this.pluggableTravelCost, getTravelTimeCalculator(), this.shelterLinkMapping);
+		addControlerListener(srp);
+
 		unloadNetcdfReaders();
 	}
 
 	private void initSocialCostOptimization() {
 		initPluggableTravelCostCalculator();
-		SocialCostCalculatorSingleLink sc = new SocialCostCalculatorSingleLink(this.network,this.config.travelTimeCalculator().getTraveltimeBinSize(),getEvents());
+		SocialCostCalculatorSingleLink sc = new SocialCostCalculatorSingleLink(this.network, this.config.travelTimeCalculator().getTraveltimeBinSize(), getEvents());
 		this.pluggableTravelCost.addTravelCost(sc);
 		this.events.addHandler(sc);
 		this.strategyManager = loadStrategyManager();
-		this.addControlerListener(sc);
+		addControlerListener(sc);
 	}
-
 
 	private void initRiskMinimization() {
 		initPluggableTravelCostCalculator();
 		loadNetcdfReaders();
 
-		RiskCostFromFloodingData rc = new RiskCostFromFloodingData(this.network, this.netcdfReaders,getEvents(),this.scenarioData.getConfig().evacuation().getBufferSize());
+		RiskCostFromFloodingData rc = new RiskCostFromFloodingData(this.network, this.netcdfReaders, getEvents(), this.scenarioData.getConfig().evacuation().getBufferSize());
 		this.pluggableTravelCost.addTravelCost(rc);
 		this.events.addHandler(rc);
 	}
@@ -147,40 +120,36 @@ public class ShelterAssignmentSimulatedAnnealingController extends Controler {
 	private void initPluggableTravelCostCalculator() {
 		if (this.pluggableTravelCost == null) {
 			if (this.travelTimeCalculator == null) {
-				this.travelTimeCalculator = this.getTravelTimeCalculatorFactory().createTravelTimeCalculator(this.network, this.config.travelTimeCalculator());
+				this.travelTimeCalculator = getTravelTimeCalculatorFactory().createTravelTimeCalculator(this.network, this.config.travelTimeCalculator());
 			}
-			
 
-			
 			this.pluggableTravelCost = new PluggableTravelCostCalculator(this.travelTimeCalculator);
-			this.setTravelCostCalculatorFactory(new TravelCostCalculatorFactory() {
+			setTravelCostCalculatorFactory(new TravelCostCalculatorFactory() {
 
-
-				// This is thread-safe because pluggableTravelCost is thread-safe.
+				// This is thread-safe because pluggableTravelCost is
+				// thread-safe.
 
 				@Override
-				public PersonalizableTravelCost createTravelCostCalculator(
-						PersonalizableTravelTime timeCalculator,
-						CharyparNagelScoringConfigGroup cnScoringGroup) {
-					return  ShelterAssignmentSimulatedAnnealingController.this.pluggableTravelCost;
-					        
+				public PersonalizableTravelCost createTravelCostCalculator(PersonalizableTravelTime timeCalculator, CharyparNagelScoringConfigGroup cnScoringGroup) {
+					return ShelterAssignmentSimulatedAnnealingController.this.pluggableTravelCost;
+
 				}
 
 			});
 		}
 	}
 
-//	private void loadShelterSignalSystems() {
-//		this.config.network().setLaneDefinitionsFile("nullnull");
-//
-//		ShelterInputCounterSignalSystems sic = new ShelterInputCounterSignalSystems(this.scenarioData,this.shelterLinkMapping);
-//		this.events.addHandler(sic);
-//
-//		this.addControlerListener(new ShelterDoorBlockerSetup());
-//		this.getQueueSimulationListener().add(sic);
-//
-//	}
-
+	// private void loadShelterSignalSystems() {
+	// this.config.network().setLaneDefinitionsFile("nullnull");
+	//
+	// ShelterInputCounterSignalSystems sic = new
+	// ShelterInputCounterSignalSystems(this.scenarioData,this.shelterLinkMapping);
+	// this.events.addHandler(sic);
+	//
+	// this.addControlerListener(new ShelterDoorBlockerSetup());
+	// this.getQueueSimulationListener().add(sic);
+	//
+	// }
 
 	private void unloadNetcdfReaders() {
 		this.netcdfReaders = null;
@@ -196,7 +165,7 @@ public class ShelterAssignmentSimulatedAnnealingController extends Controler {
 		if (count <= 0) {
 			return;
 		}
-		this.netcdfReaders  = new ArrayList<FloodingReader>();
+		this.netcdfReaders = new ArrayList<FloodingReader>();
 		double offsetEast = this.scenarioData.getConfig().evacuation().getSWWOffsetEast();
 		double offsetNorth = this.scenarioData.getConfig().evacuation().getSWWOffsetNorth();
 		for (int i = 0; i < count; i++) {
@@ -218,10 +187,9 @@ public class ShelterAssignmentSimulatedAnnealingController extends Controler {
 		} else if (net.getNetworkChangeEvents() != null) {
 			throw new RuntimeException("Network change events allready loaded!");
 		}
-		List<NetworkChangeEvent> events = new NetworkChangeEventsFromNetcdf(this.netcdfReaders,this.scenarioData).createChangeEvents();
+		List<NetworkChangeEvent> events = new NetworkChangeEventsFromNetcdf(this.netcdfReaders, this.scenarioData).createChangeEvents();
 		net.setNetworkChangeEvents(events);
 	}
-
 
 	@Override
 	protected void loadData() {
@@ -232,12 +200,12 @@ public class ShelterAssignmentSimulatedAnnealingController extends Controler {
 
 		if (this.scenarioData.getConfig().evacuation().isLoadShelters()) {
 			if (this.buildings == null) {
-				this.buildings = BuildingsShapeReader.readDataFile(this.config.evacuation().getBuildingsFile(),this.config.evacuation().getSampleSize());
+				this.buildings = BuildingsShapeReader.readDataFile(this.config.evacuation().getBuildingsFile(), this.config.evacuation().getSampleSize());
 			}
 			if (this.scenarioData.getConfig().evacuation().isGenerateEvacNetFromSWWFile()) {
 				loadNetcdfReaders();
 			}
-			this.esnl = new EvacuationShelterNetLoaderForShelterAllocation(this.buildings,this.scenarioData,this.netcdfReaders);
+			this.esnl = new EvacuationShelterNetLoaderForShelterAllocation(this.buildings, this.scenarioData, this.netcdfReaders);
 			net = this.esnl.getNetwork();
 			this.shelterLinkMapping = this.esnl.getShelterLinkMapping();
 
@@ -250,41 +218,46 @@ public class ShelterAssignmentSimulatedAnnealingController extends Controler {
 			}
 		}
 
-		if (this.scenarioData.getConfig().network().isTimeVariantNetwork() && this.scenarioData.getConfig().evacuation().isGenerateEvacNetFromSWWFile() ) {
+		if (this.scenarioData.getConfig().network().isTimeVariantNetwork() && this.scenarioData.getConfig().evacuation().isGenerateEvacNetFromSWWFile()) {
 			loadNetWorkChangeEvents(net);
 		}
 
-
 		if (this.scenarioData.getConfig().evacuation().isLoadPopulationFromShapeFile()) {
-			if (this.scenarioData.getPopulation().getPersons().size() > 0 ) {
+			if (this.scenarioData.getPopulation().getPersons().size() > 0) {
 				throw new RuntimeException("Population already loaded. In order to load population from shape file, the population input file paramter in the population section of the config.xml must not be set!");
 			}
 			// population
 			if (this.buildings == null) {
-				this.buildings = BuildingsShapeReader.readDataFile(this.config.evacuation().getBuildingsFile(),this.config.evacuation().getSampleSize());
+				this.buildings = BuildingsShapeReader.readDataFile(this.config.evacuation().getBuildingsFile(), this.config.evacuation().getSampleSize());
 			}
 
 			if (this.scenarioData.getConfig().evacuation().isGenerateEvacNetFromSWWFile()) {
-//				new GreedyShelterAllocator(this.scenarioData.getPopulation(),this.buildings,this.scenarioData,this.esnl,this.netcdfReaders).getPopulation();
-				new RandomShelterAllocator(this.buildings,this.scenarioData,this.esnl,this.netcdfReaders).getPopulation();
+				// new
+				// GreedyShelterAllocator(this.scenarioData.getPopulation(),this.buildings,this.scenarioData,this.esnl,this.netcdfReaders).getPopulation();
+				new RandomShelterAllocator(this.buildings, this.scenarioData, this.esnl, this.netcdfReaders).getPopulation();
 			} else {
-				new GreedyShelterAllocator(this.scenarioData.getPopulation(),this.buildings,this.scenarioData,this.esnl,null).getPopulation();
+				new GreedyShelterAllocator(this.scenarioData.getPopulation(), this.buildings, this.scenarioData, this.esnl, null).getPopulation();
 			}
 		} else {
-//			throw new RuntimeException("This does not work!");
-			//			if (this.scenarioData.getConfig().evacuation().getEvacuationScanrio() != EvacuationScenario.night) {
-			//				throw new RuntimeException("Evacuation simulation from plans file so far only works for the night scenario.");
-			//			}
-			//			new EvacuationPlansGenerator(this.population,this.network,this.network.getLinks().get(new IdImpl("el1"))).run();
+			// throw new RuntimeException("This does not work!");
+			// if
+			// (this.scenarioData.getConfig().evacuation().getEvacuationScanrio()
+			// != EvacuationScenario.night) {
+			// throw new
+			// RuntimeException("Evacuation simulation from plans file so far only works for the night scenario.");
+			// }
+			// new
+			// EvacuationPlansGenerator(this.population,this.network,this.network.getLinks().get(new
+			// IdImpl("el1"))).run();
 		}
 
-//		this.scenarioData.getPopulation().getPersons().clear();
-//		new PopulationReaderMatsimV4(getScenario()).readFile(this.plans);
-//		this.population = this.scenarioData.getPopulation();
+		// this.scenarioData.getPopulation().getPersons().clear();
+		// new PopulationReaderMatsimV4(getScenario()).readFile(this.plans);
+		// this.population = this.scenarioData.getPopulation();
 
-		//		if (this.scenarioData.getConfig().evacuation().isLoadShelters()) {
-		//			this.esnl.generateShelterLinks();
-		//		}
+		// if (this.scenarioData.getConfig().evacuation().isLoadShelters()) {
+		// this.esnl.generateShelterLinks();
+		// }
 	}
 
 	public static void main(final String[] args) {
@@ -292,7 +265,5 @@ public class ShelterAssignmentSimulatedAnnealingController extends Controler {
 		controler.run();
 		System.exit(0);
 	}
-
-
 
 }
