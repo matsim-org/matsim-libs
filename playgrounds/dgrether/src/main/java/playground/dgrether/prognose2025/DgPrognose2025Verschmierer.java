@@ -61,9 +61,9 @@ public class DgPrognose2025Verschmierer {
 
 	public static final String LANDKREISE = DgPaths.REPOS + "shared-svn/studies/countries/de/prognose_2025/osm_zellen/landkreise.shp"; 
 	
-	public static final String GV_POPULATION = DgPaths.REPOS + "shared-svn/studies/countries/de/prognose_2025/demand/population_gv_10pct_raw.xml";
+	public static final String GV_POPULATION = DgPaths.REPOS + "shared-svn/studies/countries/de/prognose_2025/demand/population_gv_1pct_raw.xml";
 	
-	public static final String GV_POPULATION_VERSCHMIERT = DgPaths.REPOS + "shared-svn/studies/countries/de/prognose_2025/demand/population_gv_10pct_verschmiert.xml";
+	public static final String GV_POPULATION_VERSCHMIERT = DgPaths.REPOS + "shared-svn/studies/countries/de/prognose_2025/demand/population_gv_1pct_verschmiert.xml";
 
 	private static final Logger log = Logger.getLogger(DgPrognose2025Verschmierer.class);
 	
@@ -106,7 +106,8 @@ public class DgPrognose2025Verschmierer {
 					Coord newWgs84Coord = verschmierer.shootIntoSameZoneOrLeaveInPlace(projectedCoord);
 					newWgs84Coord = dhdnGk4ToWgs84.transform(newWgs84Coord);
 //					log.info("Old coord: " + wgs84Coord + " new coord:  " + newWgs84Coord);
-					Activity newAct = popFac.createActivityFromCoord(act.getType(), newWgs84Coord);
+					Activity newAct = popFac.createActivityFromCoord(act.getType(), newWgs84Coord); 
+					newAct.setEndTime(act.getEndTime());
 					newPlan.addActivity(newAct);
 				}
 				else if (pe instanceof Leg){
