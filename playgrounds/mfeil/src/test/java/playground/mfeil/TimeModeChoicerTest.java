@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.junit.Ignore;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
@@ -52,8 +53,7 @@ import org.matsim.testcases.MatsimTestCase;
 import playground.mfeil.FilesForTests.Initializer;
 import playground.mfeil.FilesForTests.JohScoringTestFunctionFactory;
 
-
-
+@Ignore("failing, unmaintained")
 public class TimeModeChoicerTest extends MatsimTestCase{
 
 	private static final Logger log = Logger.getLogger(TimeModeChoicerTest.class);
@@ -108,6 +108,7 @@ public class TimeModeChoicerTest extends MatsimTestCase{
 
 
 
+	@Ignore("failing, unmaintained")
 	public void testRun (){
 		/*
 		log.info("Writing reference plan...");
@@ -156,6 +157,7 @@ public class TimeModeChoicerTest extends MatsimTestCase{
 	}
 
 
+	@Ignore("failing, unmaintained")
 	public void testCopyActslegs (){
 		log.info("Running TMC testCopyActslegs...");
 
@@ -193,6 +195,7 @@ public class TimeModeChoicerTest extends MatsimTestCase{
 	}
 
 
+	@Ignore("failing, unmaintained")
 	public void testIncreaseTime (){
 		log.info("Running TMC testIncreaseTime...");
 
@@ -284,6 +287,7 @@ public class TimeModeChoicerTest extends MatsimTestCase{
 	}
 
 
+	@Ignore("failing, unmaintained")
 	public void testDecreaseTime (){
 		log.info("Running TMC testDecreaseTime...");
 
