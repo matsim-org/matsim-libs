@@ -26,6 +26,10 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.SignalGroupStateChangedEventImpl;
+import org.matsim.core.mobsim.framework.events.SimulationBeforeSimStepEvent;
+import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
+import org.matsim.core.mobsim.framework.listeners.SimulationBeforeSimStepListener;
+import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
 import org.matsim.signalsystems.config.PlanBasedSignalSystemControlInfo;
 import org.matsim.signalsystems.config.SignalGroupSettings;
 import org.matsim.signalsystems.config.SignalSystemConfiguration;
@@ -46,18 +50,18 @@ import org.matsim.signalsystems.systems.SignalGroupDefinition;
  * @author dgrether
  *
  */
-public class JbSignalController extends AbstractSignalSystemController implements SignalController {
+public class JbSignalController  implements SignalController {
 
 	private static final Logger log = Logger.getLogger(JbSignalController.class);
 	private SignalSystemConfiguration config;
-	private PlanBasedSignalSystemControlInfo plans;
+//	private PlanBasedSignalSystemControlInfo plans;
 	private Id id1 = new IdImpl(1);
 	private SignalSystem system;
 	private AdaptiveControllHead adaptiveControllHead;
-	private Map<Id,SignalPlan> spd;
+	private Map<Id,SignalPlan> plans;
 	
 	public JbSignalController() {
-		spd = new HashMap<Id,SignalPlan>();
+		plans = new HashMap<Id,SignalPlan>();
 		
 	/*	if (!(config.getControlInfo() instanceof PlanBasedSignalSystemControlInfo)) {
 			String message = "Cannot create a PlanBasedSignalSystemControler without a PlanBasedLightSignalSystemControlInfo instance!";
@@ -65,13 +69,13 @@ public class JbSignalController extends AbstractSignalSystemController implement
 			throw new IllegalArgumentException(message);
 		}*/
 		this.config = config;
-		this.plans = (PlanBasedSignalSystemControlInfo)config.getControlInfo();
+	//	this.plans = (PlanBasedSignalSystemControlInfo)config.getControlInfo();
 		
 	
 	}
 	@Override
 	public void addPlan(SignalPlan plan) {
-		this.spd.put(plan.getId(), plan);
+	//	this.plans.put(plan.getId(), plan);
 	}
 
 	@Override
@@ -84,18 +88,10 @@ public class JbSignalController extends AbstractSignalSystemController implement
 	@Override
 	public void updateState(double timeSeconds){
 	SignalsData signalData = this.system.getSignalSystemsManager().getSignalsData();
-	SignalPlan activePlan = this.spd.get(this.getCurrentPlanId(timeSeconds));
+	//SignalPlan activePlan = this.plans.get(this.getCurrentPlanId(timeSeconds));
 	double cycleTime;
-	if (signalData.getSignalControlData().getSignalSystemControllerDataBySystemId().get(this.system.getId()).getSignalPlanData().get(activePlan.getId()).getCycleTime() != null){
-		cycleTime = signalData.getSignalControlData().getSignalSystemControllerDataBySystemId().get(this.system.getId()).getSignalPlanData().get(activePlan.getId()).getCycleTime();
-	}
-	else if (this.getDefaultCycleTime() != null){
-		cycleTime = this.getDefaultCycleTime();
-	}
-	else {
-		throw new IllegalStateException("CycleTime is not set for SignalSystemConfiguration of SignalSystem Id:  " + this.config.getSignalSystemId());
-	}
-	int currentSecondInPlan = ((int) (timeSeconds % cycleTime));
+	
+	int currentSecondInPlan = ((int) (timeSeconds % 3));
 	int roughcast, dropping, endIntergreenRc, endIntergreenDrop;
 	SignalGroupState currentState, newState;
 	
@@ -114,11 +110,8 @@ public class JbSignalController extends AbstractSignalSystemController implement
 		// TODO Auto-generated method stub
 		
 	}
-	//@Override
-	public SignalGroupState getSignalGroupState(double seconds,
-			SignalGroupDefinition signalGroup) {
-	    return this.getSignalGroupStates().get(signalGroup);
 
-	}
+
+
 
 }

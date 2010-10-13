@@ -69,7 +69,6 @@ public Map<Id, SignalSystemControllerData> getSignalSystemController() {
 
 public void sizeDownPlans(int seconds){
 	
-	System.err.println("blabla");
 	for  (SignalSystemControllerData sscd : this.sscmap.values()){
 		for (SignalPlanData spd : sscd.getSignalPlanData().values()){
 			double ratio = (double) seconds / (double) spd.getCycleTime();
@@ -80,7 +79,7 @@ public void sizeDownPlans(int seconds){
 				Long ndr = Math.round(sgsd.getDropping()*ratio);
 				sgsd.setDropping(ndr.intValue());
 				System.out.println(sgsd.getSignalGroupId()+" new onset "+sgsd.getOnset()+" new dropping "+sgsd.getDropping());
-
+				
 				
 			}
 		
