@@ -150,11 +150,11 @@ public class JBSpnCbPopCreator implements Runnable {
 				}
 				System.out.println("h-w-h-Plans created: "+pnr);
 				int fans = 0;
-				for (int i=0; i<1000; i++){
+				for (int i=0; i<700; i++){
 					generateFootBallNerd(fans, Zone.SPN);
 					fans++;
 				}
-				for (int i=0; i<500; i++){
+				for (int i=0; i<100; i++){
 					generateFootBallNerd(fans, Zone.CB);
 					fans++;
 				}

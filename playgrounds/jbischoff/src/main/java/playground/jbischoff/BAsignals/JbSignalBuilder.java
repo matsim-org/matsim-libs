@@ -24,25 +24,29 @@ import org.matsim.signalsystems.builder.SignalSystemsModelBuilder;
 import org.matsim.signalsystems.data.SignalsData;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalPlanData;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalSystemControllerData;
+import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsReader20;
 import org.matsim.signalsystems.model.DatabasedSignalPlan;
 import org.matsim.signalsystems.model.SignalController;
 import org.matsim.signalsystems.model.SignalPlan;
 import org.matsim.signalsystems.model.SignalSystem;
 import org.matsim.signalsystems.model.SignalSystemsManager;
-
+import org.apache.log4j.Logger;
 
 /**
  * @author dgrether
  *
  */
 public class JbSignalBuilder implements SignalSystemsModelBuilder {
+	private static final Logger log = Logger.getLogger(JbSignalBuilder.class);
 
 	private FromDataBuilder dataBuilder;
 	private SignalsData signalsData;
+	private AdaptiveControllHead adaptiveControllHead;
 	
 	public JbSignalBuilder(SignalsData signalsData, FromDataBuilder dataBuilder){
 		this.dataBuilder = dataBuilder;
 		this.signalsData = signalsData;
+		this.adaptiveControllHead = new AdaptiveControllHead();
 	}
 	
 	@Override
@@ -57,21 +61,33 @@ public class JbSignalBuilder implements SignalSystemsModelBuilder {
 			dataBuilder.createAndAddSignalGroupsFromData(system);
 			this.createAndAddSignalSystemControllerFromData(system);
 		}
+		adaptiveControllHead.sizeDownPlans(45);
 		//4.) AmberLogic
 		dataBuilder.createAndAddAmberLogic(manager);
+		CarsOnLaneHandler collh = new CarsOnLaneHandler(this.adaptiveControllHead);
+		manager.getEventsManager().addHandler(collh);
 		return manager;
 	}
 	
+
 	public void createAndAddSignalSystemControllerFromData(SignalSystem system){
 		//process information of SignalControlData
 		SignalSystemControllerData systemControlData = signalsData.getSignalControlData().getSignalSystemControllerDataBySystemId().get(system.getId());
+		if (systemControlData.getControllerIdentifier().equals("JBSignalController")){
+			
+			this.adaptiveControllHead.addAdaptiveSignalSystem(system, systemControlData);
+			log.info("Treating sigsy: "+system.getId() +" as adaptive");
+			
+		}
 		SignalController controller = new JbSignalController();
 		controller.setSignalSystem(system);
 		system.setSignalSystemController(controller);
 		for (SignalPlanData planData : systemControlData.getSignalPlanData().values()){
 			SignalPlan plan = new DatabasedSignalPlan(planData);
 			controller.addPlan(plan);
+			
 		}
+		
 	}
 
 

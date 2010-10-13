@@ -1,4 +1,3 @@
-package playground.jbischoff.BAsignalsDemand;
 
 /* *********************************************************************** *
  * project: org.matsim.*
@@ -19,8 +18,8 @@ package playground.jbischoff.BAsignalsDemand;
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-/*
-package playground.jbischoff.BAsignals;
+
+package playground.jbischoff.BAsignalsDemand;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -54,7 +53,7 @@ import java.util.Map;
 public class SignalSystemsLinkConverter {
 	
 	static final String INPUTFILE = "/Users/JB/Documents/Work/cottbus/signalSystemsCottbusByNodes_v2.0.xml";
-	static final String OUTPUTFILE = "/Users/JB/Documents/Work/cottbus/jbscenario/signalSystemsCottbusByNodes_v2.0_conv.xml";
+	static final String OUTPUTFILE = "/Users/JB/Documents/Work/cottbus/cottbus_20_jb/signalSystemsCottbusByNodes_v2.0_conv.xml";
 	
 public static void main (String args0[]) throws JAXBException, SAXException, ParserConfigurationException, IOException{
 	SignalSystemsData ssdata = new SignalSystemsDataImpl();
@@ -73,9 +72,9 @@ public static void main (String args0[]) throws JAXBException, SAXException, Par
 			SignalData nsd = new SignalDataImpl(sd.getId());
 			nsd.setLinkId(convmap.get(ssd.getId()).getConv(sd.getLinkId()));
 			System.out.println(nsd.getLinkId());
-			for (Id tmr : sd.getTurningMoveRestrictions()){
+			/*for (Id tmr : sd.getTurningMoveRestrictions()){
 				nsd.addTurningMoveRestriction(convmap.get(ssd.getId()).getConv(tmr));
-				}
+				}*/
 			for (Id lid : sd.getLaneIds()){
 				nsd.addLaneId(lid);
 			}
@@ -136,4 +135,4 @@ public static  Map<Id,LinkConversionsData> readConv(String filename){
 }
 	
 }
-*/
+

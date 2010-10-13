@@ -20,30 +20,18 @@
 package playground.jbischoff.BAsignals;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.experimental.ScenarioLoader;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.config.groups.SignalSystemsConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.events.EventsManagerImpl;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.router.PlansCalcRoute;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
-import org.matsim.population.algorithms.PersonPrepareForSim;
-import org.matsim.population.algorithms.XY2Links;
-import org.matsim.ptproject.qsim.QSim;
 import org.matsim.signalsystems.builder.FromDataBuilder;
 import org.matsim.signalsystems.data.SignalsData;
 import org.matsim.signalsystems.data.SignalsScenarioLoader;
 import org.matsim.signalsystems.model.QSimSignalEngine;
 import org.matsim.signalsystems.model.SignalEngine;
 import org.matsim.signalsystems.model.SignalSystemsManager;
-import org.matsim.signalsystems.model.SignalSystemsManagerImpl;
 
 
 /**
@@ -52,7 +40,7 @@ import org.matsim.signalsystems.model.SignalSystemsManagerImpl;
  */
 public class CottbusMain implements StartupListener, IterationStartsListener{
 
-	private String config = JbBaPaths.BASIMW+"scenario-lsa/cottbusConfig.xml";
+	private String config = JbBaPaths.BASIMH+"scenario-slv/cottbusConfig.xml";
 	private SignalSystemsManager manager;
 	
 	public void runCottbus(){
@@ -80,6 +68,9 @@ public class CottbusMain implements StartupListener, IterationStartsListener{
 		this.manager = jbBuilder.createAndInitializeSignalSystemsManager();
 		SignalEngine engine = new QSimSignalEngine(manager);
 		c.getQueueSimulationListener().add(engine);
+		
+
+		
 	}
 
 	
