@@ -107,8 +107,8 @@ public class TimeScatterChart extends ChartUtil {
 	 * only as many items are shown as the shorter array contains.
 	 * 
 	 * @param title
-	 * @param xs
-	 *            The x values.
+	 * @param times
+	 *            The time axle.
 	 * @param ys
 	 *            The y values.
 	 */
