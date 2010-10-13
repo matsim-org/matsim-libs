@@ -52,7 +52,9 @@ public interface DriverAgent extends MobsimAgent {
 
 	/**
 	 * notifies the agent that it was moved over the node
+	 * @deprecated the argument list of this method should be sort out, suggestion add node id as parameter dg/kn jf oct. 2010
 	 */
+	@Deprecated
 	public void notifyMoveOverNode();
 	
 }
