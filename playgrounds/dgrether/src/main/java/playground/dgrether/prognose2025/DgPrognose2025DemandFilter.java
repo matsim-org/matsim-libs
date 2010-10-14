@@ -63,9 +63,9 @@ import com.vividsolutions.jts.geom.GeometryFactory;
  * @author dgrether
  *
  */
-public abstract class BavariaDemandCreator {
+public abstract class DgPrognose2025DemandFilter {
 
-	private static final Logger log = Logger.getLogger(BavariaGvCreator.class);
+	private static final Logger log = Logger.getLogger(DgPrognose2025GvDemandFilter.class);
 
 	public static final String shapeFile = DgPaths.REPOS + "shared-svn/projects/detailedEval/Net/shapeFromVISUM/Verkehrszellen_Umrisse_area.SHP";
 	

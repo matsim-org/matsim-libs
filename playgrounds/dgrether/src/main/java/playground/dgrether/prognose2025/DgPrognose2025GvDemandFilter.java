@@ -38,7 +38,7 @@ import playground.dgrether.DgPaths;
  * @author dgrether
  *
  */
-public class BavariaGvCreator extends BavariaDemandCreator {
+public class DgPrognose2025GvDemandFilter extends DgPrognose2025DemandFilter {
 	
 	private static final String popPrognose2025_2004 = DgPaths.REPOS  + "runs-svn/run1060/1060.output_plans.xml.gz";
 
@@ -48,7 +48,7 @@ public class BavariaGvCreator extends BavariaDemandCreator {
 
 	
 	
-	public BavariaGvCreator(){
+	public DgPrognose2025GvDemandFilter(){
 		this.popFile = popPrognose2025_2004;
 		this.eventsFile = events2004;
 		this.popOutFile = popOutFileGv;
@@ -84,7 +84,7 @@ public class BavariaGvCreator extends BavariaDemandCreator {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		new BavariaGvCreator().createBavariaPop();
+		new DgPrognose2025GvDemandFilter().createBavariaPop();
 	}
 
 
