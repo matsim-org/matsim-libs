@@ -20,6 +20,7 @@
 
 package playground.mmoyo.utils;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -41,10 +42,15 @@ public class NonSelectedPlansRemover {
 			person.getPlans().retainAll(selectedPlanList);
 		}
 		
-		String outputFile = scenario.getConfig().controler().getOutputDirectory() + "/onlySelPlans.xml";
+		File popFile = new File(scenario.getConfig().findParam("plans", "inputPlansFile"));
+		String outputFile = scenario.getConfig().controler().getOutputDirectory()+ popFile.getName();
 		System.out.println("writing output plan file..." + outputFile);
 		PopulationWriter popwriter = new PopulationWriter(scenario.getPopulation(), scenario.getNetwork());
 		popwriter.write(outputFile) ;
+		
+		//compress
+		new FileCompressor().run(outputFile);
+		
 		System.out.println("done");
 	}
 	

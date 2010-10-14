@@ -31,6 +31,7 @@ import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.utils.collections.Tuple;
+//import org.matsim.core.utils.collections.Tuple;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.router.PlansCalcTransitRoute;
 import org.matsim.transitSchedule.api.TransitSchedule;
@@ -43,9 +44,9 @@ import playground.mmoyo.ptRouterAdapted.MyTransitRouterConfig;
  * @author manuel
  */
 public class PrecalPlansCalcTransitRoute extends PlansCalcTransitRoute {
-	private static final Logger log = Logger.getLogger(PrecalPlansCalcTransitRoute.class);
 	private final AdaptedTransitRouter adaptedTransitRouter;
-
+	final String PT = "pt";
+	
 	public PrecalPlansCalcTransitRoute(final PlansCalcRouteConfigGroup config, final Network network,
 			final PersonalizableTravelCost costCalculator, final PersonalizableTravelTime timeCalculator,
 			final LeastCostPathCalculatorFactory factory, final TransitSchedule schedule,
@@ -60,20 +61,18 @@ public class PrecalPlansCalcTransitRoute extends PlansCalcTransitRoute {
 		StaticConnection lessTransConnection= null;
 
 		double travelTime = 0.0;
-
 		double vdTime = depTime;
-		//Set<StaticConnection> conections = new HashSet();
-		System.out.println("starting");
-		//String space = " ";
-		for (vdTime = depTime+1800; vdTime>depTime-1800 ; vdTime-=180){   //find all possible connections in the last 30 mins and in the next 30 mins
-			//System.out.println("vdtime + conections size: " + vdTime + space + conections.size());
-			List<Leg> legs= this.adaptedTransitRouter.calcRoute(fromAct.getCoord(), toAct.getCoord(), vdTime);
 
+		//matsim router
+		//List<Leg> legs= super.getTransitRouter().calcRoute(fromAct.getCoord(), toAct.getCoord(), depTime);  
+
+		for (vdTime = depTime+1800; vdTime>depTime-1800 ; vdTime-=180){   //find all possible connections in the last 30 mins and in the next 30 mins
+			List<Leg> legs= this.adaptedTransitRouter.calcRoute(fromAct.getCoord(), toAct.getCoord(), vdTime);
+			
 			//calculate travelTime and distance
 			travelTime = 0.0;
 			double travelDistance = 0.0;
 			int ptLegsNum = 0;
-			String PT = "pt";
 			if (legs != null) {
 				for (Leg leg2 : legs) {
 					travelTime += leg2.getTravelTime(); //calculate travel time
@@ -84,54 +83,26 @@ public class PrecalPlansCalcTransitRoute extends PlansCalcTransitRoute {
 				}
 			}
 
-
 			StaticConnection staticConnection = new StaticConnection(legs, travelTime, travelDistance, ptLegsNum);
-
-			//connection with less transfers
-			if (lessTransConnection == null || (ptLegsNum < lessTransConnection.getPtTripNum() && !lessTransConnection.equals(fastestConnection)) ){
-				lessTransConnection = staticConnection;
-			}
 
 			//fastest connection
 			if (fastestConnection==null || travelTime< fastestConnection.getTravelTime()){
 				fastestConnection= staticConnection;
 			}
 
-
-			/*
-			boolean contained = false;
-			for (StaticConnection conection : conections){
-				if (conection.compareTo(staticConnection)==0){
-					contained= true;
-					break;
-				}
+			//connection with less transfers
+			if (lessTransConnection == null || (ptLegsNum < lessTransConnection.getPtTripNum() && !lessTransConnection.equals(fastestConnection)) ){
+				lessTransConnection = staticConnection;
 			}
 
-			ExperimentalTransitRoute expRoute = (ExperimentalTransitRoute)staticConnection.getLegs().get(1).getRoute();
-			if (contained==false){
-				conections.add(staticConnection);
-			}
-			*/
 		}
 
-		/*
-		for (StaticConnection connection : conections ){
-			System.out.println(connection.toString());
-		}
-		*/
-
-		//super.getLegReplacements().add(new Tuple<Leg, List<Leg>>(leg, legs));
-		/*
-		double travelTime = 0.0;
-		if (legs != null) {
-			for (Leg leg2 : legs) {
-				travelTime += leg2.getTravelTime();
-			}
-		}
-		*/
-
+		
 		super.getLegReplacements().add(new Tuple<Leg, List<Leg>>(leg, lessTransConnection.getLegs() ));
 		//super.getLegReplacements().add(new Tuple<Leg, List<Leg>>(leg, fastestConnection.getLegs() ));
+		
+		//matsim router
+		//super.getLegReplacements().add(new Tuple<Leg, List<Leg>>(leg, legs));  
 		return travelTime;
 	}
 }

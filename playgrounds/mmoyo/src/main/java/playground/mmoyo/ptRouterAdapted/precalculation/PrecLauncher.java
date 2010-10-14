@@ -25,18 +25,16 @@ public class PrecLauncher {
 
 	public String run(final String configFile){
 		//load scenario
-		ScenarioImpl scenarioImpl = new DataLoader ().loadScenarioWithTrSchedule(configFile); 
+		ScenarioImpl scenarioImpl = new DataLoader().loadScenarioWithTrSchedule(configFile); 
 		
 		//create output directory if does not exist
-		if (!new File(scenarioImpl.getConfig().controler().getOutputDirectory()).exists()){
-			try {
-				throw new FileNotFoundException("Can not find output directory: " + scenarioImpl.getConfig().controler().getOutputDirectory());
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			}
+		File outDir = new File(scenarioImpl.getConfig().controler().getOutputDirectory());
+		if (!outDir.exists()){
+			outDir.mkdirs();
 		}
 		
-		String routedPlansFile = scenarioImpl.getConfig().controler().getOutputDirectory()+ "/lessTransRoutedPlan_" + this.myTransitRouterConfig.scenarioName + ".xml";
+		File popFile = new File(scenarioImpl.getConfig().findParam("plans", "inputPlansFile"));
+		String routedPlansFile = scenarioImpl.getConfig().controler().getOutputDirectory()+ "minTransferRouted" + popFile.getName();
 		
 		//Get rid of only car plans
 		if (this.myTransitRouterConfig.noCarPlans){
@@ -48,12 +46,10 @@ public class PrecLauncher {
 		DijkstraFactory dijkstraFactory = new DijkstraFactory();
 		FreespeedTravelTimeCost freespeedTravelTimeCost = new FreespeedTravelTimeCost(scenarioImpl.getConfig().charyparNagelScoring());
 		TransitConfigGroup transitConfig = new TransitConfigGroup();
-
 		PrecalPlansCalcTransitRoute precPlansCalcTransitRoute = new PrecalPlansCalcTransitRoute(scenarioImpl.getConfig().plansCalcRoute(), scenarioImpl.getNetwork(), 
 				freespeedTravelTimeCost, freespeedTravelTimeCost, dijkstraFactory, scenarioImpl.getTransitSchedule(), transitConfig, this.myTransitRouterConfig);
-
 		precPlansCalcTransitRoute.run(scenarioImpl.getPopulation());
-
+		
 		//write 
 		System.out.println("writing output plan file..." + routedPlansFile);
 		PopulationWriter popwriter = new PopulationWriter(scenarioImpl.getPopulation(), scenarioImpl.getNetwork()) ;
@@ -98,8 +94,8 @@ public class PrecLauncher {
 		
 		myTransitRouterConfig.scenarioName = varName;
 		System.out.println(myTransitRouterConfig.scenarioName) ;
-		PrecLauncher adaptedLauncher	= new PrecLauncher(myTransitRouterConfig);
-		String routedPlan = adaptedLauncher.run(configFilePath);
+		PrecLauncher adaptedLauncher = new PrecLauncher(myTransitRouterConfig);
+		adaptedLauncher.run(configFilePath);
 	}
 }
 

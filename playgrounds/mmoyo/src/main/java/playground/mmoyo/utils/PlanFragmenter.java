@@ -2,6 +2,7 @@ package playground.mmoyo.utils;
 
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -13,7 +14,6 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.pt.PtConstants;
 
 /**reads a pt routed population and convert each pt-connection into a plan, each new plan has a index suffix*/
@@ -72,19 +72,18 @@ public class PlanFragmenter {
 
 	public static void main(String[] args) {
 		//String configFile = args[0];
-		String configFile = "../playgrounds/mmoyo/output/best/configs/config_best.xml";
-
-		ScenarioLoaderImpl scenarioLoader = new ScenarioLoaderImpl(configFile);
-		ScenarioImpl scenario = scenarioLoader.getScenario();
-		scenarioLoader.loadScenario();
-		scenario.setPopulation(new PlanFragmenter().run(scenario.getPopulation()));
-
-		String outputFile = "../playgrounds/mmoyo/output/best/fragmented.xml";
+		String populationFile = "../playgrounds/mmoyo/output/best/configs/config_best.xml";
+		String networkFile = "../shared-svn/studies/countries/de/berlin-bvg09/pt/nullfall_berlin_brandenburg/input/network_multimodal.xml.gz";
+		String outputFile = "../playgrounds/mmoyo/output/fragmented.xml";
+		
+		DataLoader dataLoader = new DataLoader(); 
+		Network network = dataLoader.readNetwork(networkFile);
+		Population population = dataLoader.readPopulation(populationFile);
+		
+		Population fragmPopulation = new PlanFragmenter().run(population);
 		System.out.println("writing output plan file..." + outputFile);
-		PopulationWriter popwriter = new PopulationWriter(scenario.getPopulation(), scenario.getNetwork());
-		popwriter.write(outputFile) ;
+		new PopulationWriter(fragmPopulation, network).write(outputFile);
 		System.out.println("done");
-
 	}
 
 }

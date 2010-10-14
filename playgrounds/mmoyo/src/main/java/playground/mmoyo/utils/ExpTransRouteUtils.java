@@ -69,9 +69,9 @@ public class ExpTransRouteUtils {
 		int egressStopIndex = this.getEgressStopIndex();
 		
 		////////////////////////////////////////////////////////
-		if (accessStopIndex > egressStopIndex){ 
+		if (accessStopIndex > egressStopIndex){
 			//this may happen in case that the route has a repeated stop (for example when they make a circle)
-			//look up again now after the AccessStopIndex 
+			//look up again now after the AccessStopIndex
 			boolean found = false; 
 			for (int i=accessStopIndex+1; i< this.transitRoute.getStops().size(); i++){
 				if (this.transitRoute.getStops().get(i).getStopFacility().getId() == this.getEgressStop().getStopFacility().getId()){
@@ -88,7 +88,7 @@ public class ExpTransRouteUtils {
 		}
 		////////////////////////////////////////////////////////
 
-		return transitRoute.getStops().subList(accessStopIndex, egressStopIndex + 1); //"sublist" excludes the last index, so itis necesse		
+		return transitRoute.getStops().subList(accessStopIndex, egressStopIndex + 1); //"sublist" excludes the last index, so this is necessary		
 	}
 
 	public List<Link> getLinks(){

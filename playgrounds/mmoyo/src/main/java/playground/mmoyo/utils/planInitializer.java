@@ -71,7 +71,7 @@ public class planInitializer {
 		}else{
 			configFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/calibration/100plans_bestValues_config.xml";	
 		}
-		ScenarioImpl scenario = new DataLoader().loadScenario(configFile);
+		ScenarioImpl scenario = new DataLoader().loadTransitScenario(configFile);
 		new planInitializer(scenario).run();
 	}
 
