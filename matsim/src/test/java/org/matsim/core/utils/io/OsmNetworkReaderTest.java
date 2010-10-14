@@ -19,6 +19,7 @@
 
 package org.matsim.core.utils.io;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -32,6 +33,7 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.testcases.MatsimTestUtils;
 import org.xml.sax.SAXException;
@@ -122,5 +124,37 @@ public class OsmNetworkReaderTest {
 		new NetworkCleaner().run(net);
 		Assert.assertEquals("number of nodes is wrong.", 441, net.getNodes().size());
 		Assert.assertEquals("number of links is wrong.", 841, net.getLinks().size());
+	}
+
+	@Test
+	public void testConversion_MissingNodeRef() throws SAXException, ParserConfigurationException, IOException {
+		Scenario sc = new ScenarioImpl();
+		Network net = sc.getNetwork();
+		CoordinateTransformation ct = new IdentityTransformation();
+
+		OsmNetworkReader reader = new OsmNetworkReader(net, ct);
+		reader.setKeepPaths(true);
+
+		String str = "<?xml version='1.0' encoding='UTF-8'?>\n" +
+				"<osm version=\"0.6\" generator=\"Osmosis 0.36\">\n" +
+				"  <bound box=\"0,0,90,180\" origin=\"0.37-SNAPSHOT\"/>\n" +
+				"  <node id=\"1\" lat=\"10.0\" lon=\"60.0\"/>\n" +
+				"  <node id=\"2\" lat=\"15.0\" lon=\"90.0\"/>\n" +
+				"  <node id=\"3\" lat=\"20.0\" lon=\"120.0\"/>\n" +
+				"  <node id=\"5\" lat=\"30.0\" lon=\"170.0\"/>\n" +
+				"  <way id=\"1234\" version=\"6\" timestamp=\"2010-10-14T12:34:56Z\" uid=\"9876\" user=\"MATSim\" changeset=\"123456789\">\n" +
+				"    <nd ref=\"0\"/>\n" +
+				"    <nd ref=\"1\"/>\n" +
+				"    <nd ref=\"2\"/>\n" +
+				"    <nd ref=\"3\"/>\n" +
+				"    <nd ref=\"4\"/>\n" +
+				"    <nd ref=\"5\"/>\n" +
+				"    <tag k=\"highway\" v=\"motorway\"/>\n" +
+				"  </way>\n" +
+				"</osm>";
+		reader.parse(new ByteArrayInputStream(str.getBytes()));
+		Assert.assertEquals("incomplete ways should not be converted.", 0, net.getNodes().size());
+		Assert.assertEquals("incomplete ways should not be converted.", 0, net.getLinks().size());
+
 	}
 }

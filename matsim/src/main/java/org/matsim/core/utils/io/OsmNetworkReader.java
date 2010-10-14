@@ -21,6 +21,7 @@
 package org.matsim.core.utils.io;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -46,6 +47,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.misc.Counter;
 import org.xml.sax.Attributes;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 /**
@@ -139,13 +141,33 @@ public class OsmNetworkReader {
 	 * @throws IOException
 	 */
 	public void parse(final String osmFilename) throws SAXException, ParserConfigurationException, IOException {
+		parse(osmFilename, null);
+	}
 
+	/*package*/ void parse(final InputStream stream) throws SAXException, ParserConfigurationException, IOException {
+		parse(null, stream);
+	}
+
+	/**
+	 * Either osmFilename or stream must be <code>null</code>, but not both.
+	 *
+	 * @param osmFilename
+	 * @param stream
+	 * @throws SAXException
+	 * @throws ParserConfigurationException
+	 * @throws IOException
+	 */
+	private void parse(final String osmFilename, final InputStream stream) throws SAXException, ParserConfigurationException, IOException {
 		if(this.hierarchyLayers.isEmpty()){
 			log.warn("No hierarchy layer specified. Will convert every highway specified by setHighwayDefaults.");
 		}
 
 		OsmXmlParser parser = new OsmXmlParser(this.nodes, this.ways, this.transform);
-		parser.parse(osmFilename);
+		if (stream != null) {
+			parser.parse(new InputSource(stream));
+		} else {
+			parser.parse(osmFilename);
+		}
 		convert();
 		log.info("= conversion statistics: ==========================");
 		log.info("osm: # nodes read:       " + parser.nodeCounter.getCounter());
