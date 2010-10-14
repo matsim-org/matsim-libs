@@ -31,29 +31,16 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 
-import playground.dgrether.DgPaths;
-
 
 /**
+ * Extension of DgPrognose2025DemandFilter for freight transport demands.
  * @author dgrether
  *
  */
 public class DgPrognose2025GvDemandFilter extends DgPrognose2025DemandFilter {
 	
-	private static final String popPrognose2025_2004 = DgPaths.REPOS  + "runs-svn/run1060/1060.output_plans.xml.gz";
-
-	private static final String events2004 = DgPaths.REPOS  + "runs-svn/run1060/ITERS/it.0/1060.0.events.xml.gz";
-	
-	private static final String popOutFileGv = DgPaths.REPOS + "shared-svn/projects/detailedEval/pop/gueterVerkehr/population_gv_bavaria_10pct_wgs84.xml.gz";
-
-	
-	
 	public DgPrognose2025GvDemandFilter(){
-		this.popFile = popPrognose2025_2004;
-		this.eventsFile = events2004;
-		this.popOutFile = popOutFileGv;
 	}
-	
 
 	@Override
 	protected void addNewPerson(Link startLink, Person person, Population newPop, Route route) {
@@ -75,16 +62,15 @@ public class DgPrognose2025GvDemandFilter extends DgPrognose2025DemandFilter {
 		newPlan.addActivity(newAct);
 	} 
 
-	
-	
-
-	
-	/**
-	 * @param args
-	 * @throws IOException 
-	 */
 	public static void main(String[] args) throws IOException {
-		new DgPrognose2025GvDemandFilter().createBavariaPop();
+		if (args == null || args.length == 0){
+			new DgPrognose2025GvDemandFilter().filterAndWriteDemand(DgDetailedEvalFiles.PROGNOSE_2025_2004_NETWORK, 
+					DgDetailedEvalFiles.GV_POPULATION_INPUT_FILE, DgDetailedEvalFiles.GV_EVENTS_FILE, DgDetailedEvalFiles.BAVARIA_SHAPE_FILE,
+					DgDetailedEvalFiles.GV_POPULATION_OUTPUT_FILE);
+		}
+		else if (args.length == 5){
+			new DgPrognose2025GvDemandFilter().filterAndWriteDemand(args[0], args[1], args[2], args[3], args[4]);
+		}
 	}
 
 

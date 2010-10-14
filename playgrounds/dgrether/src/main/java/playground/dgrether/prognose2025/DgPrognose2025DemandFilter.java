@@ -52,14 +52,14 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileReader;
 
-import playground.dgrether.DgPaths;
-
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 
 
 /**
+ * Abstract class to reduce a population created from prognose 2025 data 
+ * to a population in a certain area given as shape file. 
  * @author dgrether
  *
  */
@@ -67,17 +67,7 @@ public abstract class DgPrognose2025DemandFilter {
 
 	private static final Logger log = Logger.getLogger(DgPrognose2025GvDemandFilter.class);
 
-	public static final String shapeFile = DgPaths.REPOS + "shared-svn/projects/detailedEval/Net/shapeFromVISUM/Verkehrszellen_Umrisse_area.SHP";
-	
-	public static final String netPrognose2025_2004 = DgPaths.REPOS + "shared-svn/studies/countries/de/prognose_2025/demand/network_cleaned_wgs84.xml.gz";
-
 	protected CoordinateTransformation wgs84ToDhdnGk4 = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.DHDN_GK4); 
-
-	protected String popFile = null;
-	
-	protected String eventsFile = null; 
-	
-	protected String popOutFile = null;
 	
 	protected Scenario scenario;
 
@@ -85,44 +75,41 @@ public abstract class DgPrognose2025DemandFilter {
 
 	protected Population pop;
 
-
 	private GeometryFactory factory;
 
 	protected EventsByLinkIdCollector collector;
 
-	private Set<Id> blauweissLinkIds;
+	private Set<Id> linkIdsInShapefile;
 
-	private Set<Feature> bayernFeatures;
-	
+	private Set<Feature> featuesInShape;
 	
 		
-	private void readData() throws IOException{
+	private void readData(String networkFilename, String populationFilename, String eventsFilename, String filterShapeFileName) throws IOException{
 		this.factory = new GeometryFactory();
 		//read shape file
-//		this.bayernFeatures = new ShapeFileReader().readDataFileToMemory(shapeFile);
-		this.bayernFeatures = new ShapeFileReader().readFileAndInitialize(shapeFile);
-		
+		this.featuesInShape = new ShapeFileReader().readFileAndInitialize(filterShapeFileName);
+		//read scenario
 		this.scenario = new ScenarioImpl();
 		MatsimNetworkReader netReader	= new MatsimNetworkReader(scenario);
-		netReader.readFile(netPrognose2025_2004);
+		netReader.readFile(networkFilename);
 		this.net = scenario.getNetwork();
-		this.blauweissLinkIds = this.detectBlauweissLinkIds(this.net);
+		this.linkIdsInShapefile = this.detectLinkIdsInShape(this.net);
 		MatsimPopulationReader popReader = new MatsimPopulationReader(scenario); 
-		popReader.readFile(popFile);
+		popReader.readFile(populationFilename);
 		this.pop = scenario.getPopulation();
-		
+		//read event file
 		EventsManager manager = new EventsManagerFactoryImpl().createEventsManager();
-		this.collector = new EventsByLinkIdCollector(this.blauweissLinkIds);
+		this.collector = new EventsByLinkIdCollector(this.linkIdsInShapefile);
 		manager.addHandler(this.collector);
 		MatsimEventsReader eventsReader = new MatsimEventsReader(manager);
-		eventsReader.readFile(eventsFile);
+		eventsReader.readFile(eventsFilename);
 	}
 	
 	
-	private Set<Id> detectBlauweissLinkIds(Network network){
+	private Set<Id> detectLinkIdsInShape(Network network){
 		Set<Id> linkIds = new HashSet<Id>();
 		for (Link link : network.getLinks().values()){
-			if (this.isLinkBlauWeiss(link)){
+			if (this.isLinkInShape(link)){
 				linkIds.add(link.getId());
 			}
 		}
@@ -130,12 +117,12 @@ public abstract class DgPrognose2025DemandFilter {
 	}
 	
 	
-	private boolean isLinkBlauWeiss(Link link) {
+	private boolean isLinkInShape(Link link) {
 		boolean found = false;
 		Coord linkCoord = link.getCoord();
 		Coord dhdnCoord = this.wgs84ToDhdnGk4.transform(linkCoord);
 		Geometry geo = factory.createPoint(new Coordinate(dhdnCoord.getX(), dhdnCoord.getY()));
-		for (Feature ft : bayernFeatures){
+		for (Feature ft : featuesInShape){
 			if (ft.getDefaultGeometry().contains(geo)){
 				found = true;
 				break;
@@ -147,17 +134,14 @@ public abstract class DgPrognose2025DemandFilter {
 
 	protected abstract void addNewPerson(Link startLink, Person person, Population newPop, Route route); 
 	
-	public void createBavariaPop() throws IOException{
+	public void filterAndWriteDemand(final String networkFilename, final String populationFilename, final String eventsFilename, final String populationOutputFilename, final String filterShapeFileName) throws IOException{
 		log.info("start to create blauweiss demand...");
-		this.readData();
+		this.readData(networkFilename, populationFilename, eventsFilename, filterShapeFileName);
 		log.info("data loaded...");
 		Scenario newScenario = new ScenarioImpl();
 		Population newPop = newScenario.getPopulation();
 		
-		int i = 0;
-		for (Person person : pop.getPersons().values()){
-			i++;
-			log.info("processing person: " + i);
+		for (Person person : this.pop.getPersons().values()){
 			List<PlanElement> planElements = person.getPlans().get(0).getPlanElements();
 			PlanElement pe = planElements.get(1);
 			Route route = ((Leg)pe).getRoute();
@@ -166,16 +150,16 @@ public abstract class DgPrognose2025DemandFilter {
 			if (startLink.getId().equals(netRoute.getEndLinkId())){
 				continue;
 			}
-			if (isLinkBlauWeiss(startLink)){
-				log.info("Person: " + person.getId() + " starts route in bavaria...");
+			if (this.linkIdsInShapefile.contains(startLink.getId())){
+//				log.info("Person: " + person.getId() + " starts route in area of interest...");
 				this.addNewPerson(startLink, person, newPop, route);
 			}
 			else {
 				for (Id linkId : netRoute.getLinkIds()){
-					Link link = net.getLinks().get(linkId);
-					if (this.isLinkBlauWeiss(link)){
-						log.info("Person: " + person.getId() + " drives through/into bavaria...");
-						//this route goes through bavaria, god bless us
+					if (this.linkIdsInShapefile.contains(linkId)){
+						Link link = net.getLinks().get(linkId);
+//						log.info("Person: " + person.getId() + " drives through/into area of interest...");
+						//this route goes through the area of interest
 						this.addNewPerson(link, person, newPop, netRoute);
 						break;
 					}
@@ -184,8 +168,8 @@ public abstract class DgPrognose2025DemandFilter {
 		}
 		log.info("writing population...");
 		PopulationWriter popWriter = new PopulationWriter(newPop, this.net);
-		popWriter.write(popOutFile);
-		log.info("blauweiss demand completed.");
+		popWriter.write(populationOutputFilename);
+		log.info("demand filtered and written. done.");
 	}
 	
 	class EventsByLinkIdCollector implements LinkLeaveEventHandler {

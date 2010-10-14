@@ -31,26 +31,15 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 
-import playground.dgrether.DgPaths;
-
 
 /**
+ * Extension of DgPrognose2025DemandFilter for private transport demands.
  * @author dgrether
  *
  */
 public class DgPrognose2025PvDemandFilter extends DgPrognose2025DemandFilter {
 
-	private static final String popPrognose2025_2004 = DgPaths.REPOS  + "runs-svn/run1063/1063.output_plans.xml.gz";
-
-	private static final String events2004 = DgPaths.REPOS  + "runs-svn/run1063/ITERS/it.0/1063.0.events.xml.gz";
-	
-	private static final String popOutFilePv = DgPaths.REPOS + "shared-svn/projects/detailedEval/pop/personenVerkehr/population_pv_bavaria_1pct_wgs84.xml.gz";
-
-	
 	public DgPrognose2025PvDemandFilter(){
-		this.popFile = popPrognose2025_2004;
-		this.eventsFile = events2004;
-		this.popOutFile = popOutFilePv;
 	}
 
 	
@@ -83,7 +72,14 @@ public class DgPrognose2025PvDemandFilter extends DgPrognose2025DemandFilter {
 	}
 	
 	public static void main(String[] args) throws IOException {
-		new DgPrognose2025PvDemandFilter().createBavariaPop();
+		if (args == null || args.length == 0){
+			new DgPrognose2025GvDemandFilter().filterAndWriteDemand(DgDetailedEvalFiles.PROGNOSE_2025_2004_NETWORK, 
+					DgDetailedEvalFiles.PV_POPULATION_INPUT_FILE, DgDetailedEvalFiles.PV_EVENTS_FILE, DgDetailedEvalFiles.BAVARIA_SHAPE_FILE,
+					DgDetailedEvalFiles.PV_POPULATION_OUTPUT_FILE);
+		}
+		else if (args.length == 5){
+			new DgPrognose2025GvDemandFilter().filterAndWriteDemand(args[0], args[1], args[2], args[3], args[4]);
+		}
 	}
 
 
