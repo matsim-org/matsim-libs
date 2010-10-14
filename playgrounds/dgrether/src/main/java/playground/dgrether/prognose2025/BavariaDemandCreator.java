@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.detailedEval;
+package playground.dgrether.prognose2025;
 
 import java.io.IOException;
 import java.util.HashMap;
