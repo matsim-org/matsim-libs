@@ -84,7 +84,7 @@ public class BavariaGvCreator extends BavariaDemandCreator {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		new BavariaGvCreator().createBavariaGvPop();
+		new BavariaGvCreator().createBavariaPop();
 	}
 
 

@@ -40,17 +40,17 @@ import playground.dgrether.DgPaths;
  */
 public class BavariaPvCreator extends BavariaDemandCreator {
 
-	private static final String popPrognose2025_2004 = DgPaths.REPOS  + "runs-svn/run1062/1062.output_plans.xml.gz";
+	private static final String popPrognose2025_2004 = DgPaths.REPOS  + "runs-svn/run1063/1063.output_plans.xml.gz";
 
-	private static final String events2004 = DgPaths.REPOS  + "runs-svn/run1062/ITERS/it.0/1062.0.events.xml.gz";
+	private static final String events2004 = DgPaths.REPOS  + "runs-svn/run1063/ITERS/it.0/1063.0.events.xml.gz";
 	
-	private static final String popOutFileGv = DgPaths.REPOS + "shared-svn/projects/detailedEval/pop/personenVerkehr/population_pv_bavaria_10pct_wgs84.xml.gz";
+	private static final String popOutFilePv = DgPaths.REPOS + "shared-svn/projects/detailedEval/pop/personenVerkehr/population_pv_bavaria_1pct_wgs84.xml.gz";
 
 	
 	public BavariaPvCreator(){
 		this.popFile = popPrognose2025_2004;
 		this.eventsFile = events2004;
-		this.popOutFile = popOutFileGv;
+		this.popOutFile = popOutFilePv;
 	}
 
 	
@@ -61,7 +61,7 @@ public class BavariaPvCreator extends BavariaDemandCreator {
 		newPop.addPerson(newPerson);
 		Plan newPlan = popFactory.createPlan();
 		newPerson.addPlan(newPlan);
-		Activity oldWorkAct = ((Activity)((Plan)person.getPlans().get(2)).getPlanElements().get(0));
+		Activity oldWorkAct = ((Activity)((Plan)person.getPlans().get(0)).getPlanElements().get(2));
 		//home activity
 		Activity newAct = popFactory.createActivityFromCoord("pvHome", startLink.getCoord());
 		LinkLeaveEvent leaveEvent = this.collector.getLinkLeaveEvent(person.getId(), startLink.getId());
@@ -83,7 +83,7 @@ public class BavariaPvCreator extends BavariaDemandCreator {
 	}
 	
 	public static void main(String[] args) throws IOException {
-		new BavariaPvCreator().createBavariaGvPop();
+		new BavariaPvCreator().createBavariaPop();
 	}
 
 

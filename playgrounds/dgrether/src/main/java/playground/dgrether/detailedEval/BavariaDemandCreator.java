@@ -147,29 +147,34 @@ public abstract class BavariaDemandCreator {
 
 	protected abstract void addNewPerson(Link startLink, Person person, Population newPop, Route route); 
 	
-	public void createBavariaGvPop() throws IOException{
+	public void createBavariaPop() throws IOException{
 		log.info("start to create blauweiss demand...");
 		this.readData();
 		log.info("data loaded...");
 		Scenario newScenario = new ScenarioImpl();
 		Population newPop = newScenario.getPopulation();
 		
+		int i = 0;
 		for (Person person : pop.getPersons().values()){
+			i++;
+			log.info("processing person: " + i);
 			List<PlanElement> planElements = person.getPlans().get(0).getPlanElements();
 			PlanElement pe = planElements.get(1);
 			Route route = ((Leg)pe).getRoute();
 			NetworkRoute netRoute = (NetworkRoute) route;
 			Link startLink = net.getLinks().get(route.getStartLinkId());
 			if (startLink.getId().equals(netRoute.getEndLinkId())){
-				break;
+				continue;
 			}
 			if (isLinkBlauWeiss(startLink)){
+				log.info("Person: " + person.getId() + " starts route in bavaria...");
 				this.addNewPerson(startLink, person, newPop, route);
 			}
 			else {
 				for (Id linkId : netRoute.getLinkIds()){
 					Link link = net.getLinks().get(linkId);
 					if (this.isLinkBlauWeiss(link)){
+						log.info("Person: " + person.getId() + " drives through/into bavaria...");
 						//this route goes through bavaria, god bless us
 						this.addNewPerson(link, person, newPop, netRoute);
 						break;
