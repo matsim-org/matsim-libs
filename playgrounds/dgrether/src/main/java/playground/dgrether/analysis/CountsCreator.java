@@ -102,7 +102,7 @@ public class CountsCreator {
 		Counts counts = new Counts();
 //		Count c;
 		counts.setDescription("");
-		counts.setName("noname china counts");
+		counts.setName("noname counts");
 		counts.setYear(2005);
 //		QueueLink ql;
 //		for (LinkImpl l : links) {
