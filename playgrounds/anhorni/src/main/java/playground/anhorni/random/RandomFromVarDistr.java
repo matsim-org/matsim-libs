@@ -17,6 +17,10 @@ public class RandomFromVarDistr {
 		this.rnd = new Random(this.seed);
 	}
 	
+	public double getUniform(double h) {
+		return this.rnd.nextDouble() * h;	
+	}
+	
 	public double getNegLinear(double h) {
 		double u = this.rnd.nextDouble();
 		return h * (1 - Math.sqrt(1 - u));
