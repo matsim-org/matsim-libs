@@ -19,11 +19,6 @@
  * *********************************************************************** */
 package playground.dgrether.prognose2025;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
@@ -42,15 +37,8 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
 import playground.dgrether.DgPaths;
-import playground.dgrether.matsimkml.DgColoredIconStyleBuilder;
 import playground.gregor.gis.coordinatetransform.ApproximatelyCoordianteTransformation;
 import playground.mzilske.prognose2025.Verschmierer;
-import de.micromata.opengis.kml.v_2_2_0.Coordinate;
-import de.micromata.opengis.kml.v_2_2_0.Document;
-import de.micromata.opengis.kml.v_2_2_0.Kml;
-import de.micromata.opengis.kml.v_2_2_0.Placemark;
-import de.micromata.opengis.kml.v_2_2_0.Point;
-import de.micromata.opengis.kml.v_2_2_0.Style;
 
 
 /**
@@ -119,50 +107,12 @@ public class DgPrognose2025Verschmierer {
 		PopulationWriter popWriter = new PopulationWriter(newPopulation, null);
 		popWriter.write(GV_POPULATION_VERSCHMIERT);
 		
-		this.writeKml(GV_POPULATION + ".kml", scenario.getPopulation());
-		this.writeKml(GV_POPULATION_VERSCHMIERT + ".kml", newPopulation);
+		DgActivities2KmlWriter kmlWriter = new DgActivities2KmlWriter();
+		kmlWriter.writeKml(GV_POPULATION + ".kml", scenario.getPopulation());
+		kmlWriter.writeKml(GV_POPULATION_VERSCHMIERT + ".kml", newPopulation);
 		
 	}
 	
-	private void writeKml(String outfile, Population pop){
-		final Kml kml = new Kml();
-		final Document document = new Document();
-		kml.setFeature(document);
-		
-		DgColoredIconStyleBuilder iconStyleBuilder = new DgColoredIconStyleBuilder(pop.getPersons().size());
-		int i = 0;
-		for (Person person : pop.getPersons().values()){
-			i++;
-			
-			Style style = iconStyleBuilder.getNextStyle();
-			document.getStyleSelector().add(style);
-
-			Plan plan = person.getPlans().get(0);
-			int j = 0;
-			for (PlanElement pe : plan.getPlanElements()){
-				if (pe instanceof Activity){
-					j++;
-					Activity act = (Activity)pe;
-					final Placemark placemark = new Placemark();
-					document.getFeature().add(placemark);
-					placemark.setName(Integer.toString(i) + "-" + Integer.toString(j));
-					placemark.setDescription(person.getId().toString());
-					placemark.setStyleUrl("#randomColorIcon" + i);
-					final Point point = new Point();
-					placemark.setGeometry(point);
-					List<Coordinate> coord  = new ArrayList<Coordinate>();
-					point.setCoordinates(coord);
-//					Coord nodeCoord = coordtransform.transform(node.getCoord());
-					coord.add(new Coordinate(act.getCoord().getX(), act.getCoord().getY()));
-				}
-			}
-		}
-		try {
-			kml.marshal(new File(outfile));
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-	}
 	
 	
 	/**
