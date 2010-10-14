@@ -1,6 +1,22 @@
-/**
- * 
- */
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.yu.counts;
 
 import java.util.ArrayList;
@@ -24,7 +40,6 @@ import org.matsim.counts.Volume;
 
 /**
  * @author yu
- * 
  */
 public class CountsCutter {
 	private static int fragmentsNo;
@@ -43,7 +58,7 @@ public class CountsCutter {
 
 	/**
 	 * with this class, a countsfiles fragements into N small countsfiles.
-	 * 
+	 *
 	 * @param args
 	 */
 	public static void main(String[] args) {
@@ -66,7 +81,6 @@ public class CountsCutter {
 
 		int year = originalCounts.getYear();
 		String name = originalCounts.getName();
-		String layer = originalCounts.getLayer();
 		String description = originalCounts.getDescription();
 		// ---------------PREPARE COUNTS------------
 		Counts[] countsArray = new Counts[fragmentsNo];
@@ -75,7 +89,6 @@ public class CountsCutter {
 			Counts counts = new Counts();
 			counts.setYear(year);
 			counts.setName(name);
-			counts.setLayer(layer);
 			counts.setDescription(description + "||" + i + ". 10%-sample!");
 			countsArray[i] = counts;
 			countsCounter[i] = 0;

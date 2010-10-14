@@ -36,9 +36,6 @@ public class CountsWriterHandlerImplV1 implements CountsWriterHandler {
 			out.write(" desc=\"" + counts.getDescription() + "\"");
 		}
 		out.write(" year=\"" + counts.getYear() + "\" ");
-		if (counts.getLayer() != null) {
-			out.write(" layer=\"" + counts.getLayer() + "\" \n");
-		}
 		out.write(" > \n");
 	}
 

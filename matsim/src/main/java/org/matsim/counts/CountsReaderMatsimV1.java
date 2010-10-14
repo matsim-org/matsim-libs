@@ -68,7 +68,6 @@ public class CountsReaderMatsimV1 extends MatsimXmlParser {
 		this.counts.setName(meta.getValue("name"));
 		this.counts.setDescription(meta.getValue("desc"));
 		this.counts.setYear(Integer.parseInt(meta.getValue("year")));
-		this.counts.setLayer(meta.getValue("layer"));
 	}
 
 	private void startCount(final Attributes meta) {

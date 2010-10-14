@@ -27,16 +27,16 @@ import org.matsim.api.core.v01.Id;
 
 public class Count {
 
-	private final Id locId;
-	private String csId;
+	private final Id linkId;
+	private String stationName;
 
 	private final HashMap<Integer,Volume> volumes = new HashMap<Integer, Volume>();
 	private Coord coord;
 
 
-	protected Count(final Id locId, final String csId) {
-		this.locId = locId;
-		this.csId = csId;
+	protected Count(final Id linkId, final String stationName) {
+		this.linkId = linkId;
+		this.stationName = stationName;
 	}
 
 	public final Volume createVolume(final int h, final double val) {
@@ -47,15 +47,15 @@ public class Count {
 	}
 
 	public final void setCsId(final String cs_id) {
-		this.csId = cs_id;
+		this.stationName = cs_id;
 	}
 
 	public final Id getLocId() {
-		return this.locId;
+		return this.linkId;
 	}
 
 	public final String getCsId() {
-		return this.csId;
+		return this.stationName;
 	}
 
 	public final Volume getMaxVolume() {
@@ -88,8 +88,8 @@ public class Count {
 
 	@Override
 	public final String toString() {
-		return "[Loc_id=" + this.locId + "]" +
-		"[cs_id=" + this.csId + "]" +
+		return "[Loc_id=" + this.linkId + "]" +
+		"[cs_id=" + this.stationName + "]" +
 		"[nof_volumes=" + this.volumes.size() + "]";
 	}
 

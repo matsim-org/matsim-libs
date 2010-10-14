@@ -1,6 +1,22 @@
-/**
- *
- */
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.yu.counts;
 
 import java.util.ArrayList;
@@ -24,9 +40,6 @@ import playground.yu.utils.io.SimpleReader;
  */
 public class CountsConverter {
 
-	/**
-	 * @param args
-	 */
 	public static void main(String[] args) {
 		// ------------READ MATSIM NETWORK-----------------
 		ScenarioImpl scenario = new ScenarioImpl();
@@ -62,9 +75,7 @@ public class CountsConverter {
 		Counts counts = new Counts();
 		counts.setYear(2000);
 		counts.setName("berlin counts");
-		counts.setLayer("0");
-		counts
-				.setDescription("extracted from vsp-cvs/studies/berlin-wip/external-data/counts/senstadt-hand/link_counts_PKW_hrs0-24.att");
+		counts.setDescription("extracted from vsp-cvs/studies/berlin-wip/external-data/counts/senstadt-hand/link_counts_PKW_hrs0-24.att");
 		for (Link link : network.getLinks().values()) {
 			String origLinkId = ((LinkImpl) link).getOrigId();
 			for (int i = 0; i < NO_TONODENOs.size(); i++) {

@@ -37,7 +37,6 @@ public class CountsParserTest extends MatsimTestCase {
 		assertEquals("Counts attribute setting failed", "testName", counts.getName());
 		assertEquals("Counts attribute setting failed", "testDesc", counts.getDescription());
 		assertEquals("Counts attribute setting failed", 2000, counts.getYear());
-		assertEquals("Counts attribute setting failed", "testLayer", counts.getLayer());
 		try {
 			reader.endElement("", "counts", "counts");
 		} catch (SAXException e) {

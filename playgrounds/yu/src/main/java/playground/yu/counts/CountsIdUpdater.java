@@ -62,7 +62,6 @@ public class CountsIdUpdater {
 		Counts newCounts = new Counts();
 		newCounts.setYear(2000);
 		newCounts.setName("berlin counts");
-		newCounts.setLayer("0");
 		newCounts
 				.setDescription("extracted from vsp-cvs/studies/berlin-wip/external-data/counts/senstadt-hand/link_counts_PKW_hrs0-24.att, countIds also were changed according to the new OSM-network https://svn.vsp.tu-berlin.de/repos/shared-svn/studies/countries/de/berlin/network/bb_5_hermannstr.xml.gz");
 		for (Id oldCountId : oldCounts.getCounts().keySet()) {

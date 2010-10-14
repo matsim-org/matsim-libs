@@ -41,7 +41,6 @@ public class CountsParserWriterTest extends MatsimTestCase {
 		// Counts:
 		assertNotNull(fixture.counts.getCounts());
 		assertTrue(fixture.counts.getYear()>2000);
-		assertNotNull(fixture.counts.getLayer());
 		assertNotNull(fixture.counts.getName());
 
 		// Count & Volume

@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.andreas.osmBB;
 
 import java.io.IOException;
@@ -57,7 +76,7 @@ public class PTCountsNetworkSimplifier {
 	private boolean mergeLinkStats = false;
 	private TransitSchedule transitSchedule;
 	private Network network;
-	
+
 	private String netInFile;
 	private String scheduleInFile;
 	private String netOutFile;
@@ -67,9 +86,9 @@ public class PTCountsNetworkSimplifier {
 	private Counts inCounts;
 	private Counts outCounts = new Counts();
 	private String countsOutFile;
-	
+
 	private TreeSet<String> linksBlockedByFacility = new TreeSet<String>();
-	
+
 	public PTCountsNetworkSimplifier(String netInFile, String scheduleInFile, String netOutFile, String scheduleOutFile, HashMap<String,String> shortNameMap, Counts counts, String countsOutFile){
 		this.netInFile = netInFile;
 		this.scheduleInFile = scheduleInFile;
@@ -78,12 +97,11 @@ public class PTCountsNetworkSimplifier {
 		this.shortNameMap = shortNameMap;
 		this.inCounts = counts;
 		this.countsOutFile = countsOutFile;
-		
+
 		// set some nonsense, cause writer allows for empty fields, but reader complains
 		this.outCounts.setYear(2009);
 		this.outCounts.setName("hab ich nicht");
-		this.outCounts.setLayer("hab ich keinen");
-	}	
+	}
 
 	public static void main(String[] args) {
 		PTCountsNetworkSimplifier simplifier = new PTCountsNetworkSimplifier("e:/_out/osm/transit-network_bb_subway.xml", "e:/_out/osm/osm_transitSchedule_subway.xml", "e:/_out/osm/transit-network_bb_subway_simplified_merged.xml", "e:/_out/osm/osm_transitSchedule_subway_merged.xml", null, null, null);
@@ -96,21 +114,21 @@ public class PTCountsNetworkSimplifier {
 	}
 
 	public void simplifyPTNetwork(){
-	
+
 		log.info("Start...");
 		Scenario scenario = new ScenarioImpl();
 		this.network = scenario.getNetwork();
 		log.info("Reading " + this.netInFile);
 		new MatsimNetworkReader(scenario).readFile(this.netInFile);
-					
+
 		ScenarioImpl osmScenario = new ScenarioImpl();
-		Config osmConfig = osmScenario.getConfig();		
+		Config osmConfig = osmScenario.getConfig();
 		osmConfig.scenario().setUseTransit(true);
 		osmConfig.scenario().setUseVehicles(true);
-		osmConfig.network().setInputFile(this.netInFile);		
+		osmConfig.network().setInputFile(this.netInFile);
 		ScenarioLoaderImpl osmLoader = new ScenarioLoaderImpl(osmScenario);
 		osmLoader.loadScenario();
-	
+
 		log.info("Reading " + this.scheduleInFile);
 		try {
 			new TransitScheduleReaderV1(osmScenario.getTransitSchedule(), osmScenario.getNetwork()).readFile(this.scheduleInFile);
@@ -123,7 +141,7 @@ public class PTCountsNetworkSimplifier {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}		
+		}
 
 		log.info("Running cleaner first...");
 		TransitScheduleCleaner.removeAllRoutesWithMissingLinksFromSchedule(osmScenario.getTransitSchedule(), this.network);
@@ -138,7 +156,7 @@ public class PTCountsNetworkSimplifier {
 		TransitScheduleCleaner.removeAllRoutesWithMissingLinksFromSchedule(osmScenario.getTransitSchedule(), this.network);
 		TransitScheduleCleaner.removeEmptyLines(osmScenario.getTransitSchedule());
 		TransitScheduleCleaner.removeStopsNotUsed(osmScenario.getTransitSchedule());
-		
+
 		log.info("Writing network to " + this.netOutFile);
 		new NetworkWriter(this.network).write(this.netOutFile);
 		try {
@@ -152,16 +170,16 @@ public class PTCountsNetworkSimplifier {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	
+
 	}
 
 	public void run(final Network net, final TransitSchedule tranSched) {
-		
+
 		this.network = net;
 		this.transitSchedule = tranSched;
 		int nodesProcessed = 0;
 		int nextMessageAt = 2;
-		
+
 		if(this.nodeTypesToMerge.size() == 0){
 			Gbl.errorMsg("No types of node specified. Please use setNodesToMerge to specify which nodes should be merged");
 		}
@@ -170,14 +188,14 @@ public class PTCountsNetworkSimplifier {
 		log.info("  checking " + this.network.getNodes().size() + " nodes and " + this.network.getLinks().size() + " links for dead-ends...");
 
 		NetworkCalcTopoType nodeTopo = new NetworkCalcTopoType();
-		nodeTopo.run(this.network);		
-		registerLinksBlockedByTransitStopFacility();	
+		nodeTopo.run(this.network);
+		registerLinksBlockedByTransitStopFacility();
 
 		for (Node node : this.network.getNodes().values()) {
-			
+
 			// check, if node is marked as count station, if so add it and move counts data to outCounts
-			checkNodeIsMarkedAsCountStation(node);			
-			
+			checkNodeIsMarkedAsCountStation(node);
+
 			nodesProcessed++;
 			if(nextMessageAt == nodesProcessed){
 				log.info(nodesProcessed + " nodes processed so far");
@@ -197,7 +215,7 @@ public class PTCountsNetworkSimplifier {
 						LinkImpl outLink = (LinkImpl) oL;
 
 						if(inLink != null && outLink != null){
-							
+
 							if(!outLink.getToNode().equals(inLink.getFromNode())){
 
 								if(!this.linksBlockedByFacility.contains(inLink.getId().toString()) && !this.linksBlockedByFacility.contains(outLink.getId().toString())){
@@ -248,7 +266,7 @@ public class PTCountsNetworkSimplifier {
 											link.setFreespeed(inLink.getFreespeed());
 											link.setCapacity(inLink.getCapacity());
 											link.setNumberOfLanes(inLink.getNumberOfLanes());
-											link.setAllowedModes(inLink.getAllowedModes());											
+											link.setAllowedModes(inLink.getAllowedModes());
 										}
 
 									}
@@ -302,7 +320,7 @@ public class PTCountsNetworkSimplifier {
 	 * @param node The node to be checked
 	 */
 	private void checkNodeIsMarkedAsCountStation(Node node) {
-		Link linkToBlock = null;		
+		Link linkToBlock = null;
 		if(this.shortNameMap.keySet().contains(node.getId().toString())){
 			// node is marked as count station
 			if(node.getInLinks().size() == 1 && node.getOutLinks().size() == 1){
@@ -319,7 +337,7 @@ public class PTCountsNetworkSimplifier {
 					}
 					break;
 				}
-				
+
 				// check, if count data is present
 				Id shortNameId = new IdImpl(this.shortNameMap.get(node.getId().toString()));
 				if(this.outCounts.getCount(shortNameId) == null){
@@ -344,18 +362,18 @@ public class PTCountsNetworkSimplifier {
 				}
 			}
 		}
-		
+
 		// everything worked fine, check if a link was blocked
 		if(linkToBlock != null){
 			this.linksBlockedByFacility.add(linkToBlock.getId().toString());
-		}		
-	}	
+		}
+	}
 
 	private boolean removeLinksFromTransitSchedule(Link link, LinkImpl inLink, LinkImpl outLink) {
 		// Link can only be merged, if all routes contain a) both links in direct following order and b) no route contain only one of those links
 		for (TransitLine transitLine : this.transitSchedule.getTransitLines().values()) {
 			for (TransitRoute transitRoute : transitLine.getRoutes().values()) {
-				
+
 				// a) check if both links are part of the route and in correct order
 				if(transitRoute.getRoute().getLinkIds().contains(inLink.getId()) && transitRoute.getRoute().getLinkIds().contains(outLink.getId())){
 
@@ -389,21 +407,21 @@ public class PTCountsNetworkSimplifier {
 						// Route contains one of the links, so abort here
 						return false;
 					}
-					
+
 //					if(!transitRoute.getRoute().getLinkIds().contains(inLink.getId()) && !transitRoute.getRoute().getLinkIds().contains(outLink.getId())){
 //						// Links are not part of that route, so process - only for debugging
 //						log.debug("Links are not part of that route.");
-//					}					
-				}				
+//					}
+				}
 			}
 		}
-		
+
 		// None of the criteria so far, prevented from merging, so merge
-		
+
 		for (TransitLine transitLine : this.transitSchedule.getTransitLines().values()) {
 			for (TransitRoute transitRoute : transitLine.getRoutes().values()) {
-				
-				// Only merge if both links are part of the route. Cases were one link is part of it, should already be filtered 
+
+				// Only merge if both links are part of the route. Cases were one link is part of it, should already be filtered
 				if(transitRoute.getRoute().getLinkIds().contains(inLink.getId()) && transitRoute.getRoute().getLinkIds().contains(outLink.getId())){
 
 					// Get all link ids of the route

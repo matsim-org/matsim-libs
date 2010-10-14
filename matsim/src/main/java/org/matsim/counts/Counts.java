@@ -29,21 +29,20 @@ public class Counts {
 	private String name = null;
 	private String desc = null;
 	private int year = 0;
-	private String layer = null;
 	private final TreeMap<Id, Count> counts = new TreeMap<Id, Count>();
 
 	/**
-	 * @param locId
-	 * @param csId
+	 * @param linkId the link to which the counting station is assigned, must be unique
+	 * @param stationName some additional identifier for humans, e.g. the original name/id of the counting station
 	 * @return the created Count object, or null if it could not be created (maybe because it already exists)
 	 */
-	public final Count createCount(final Id locId, final String csId) {
+	public final Count createCount(final Id linkId, final String stationName) {
 		// check id string for uniqueness
-		if (this.counts.containsKey(locId)) {
+		if (this.counts.containsKey(linkId)) {
 			return null;
 		}
-		Count c = new Count(locId, csId);
-		this.counts.put(locId, c);
+		Count c = new Count(linkId, stationName);
+		this.counts.put(linkId, c);
 		return c;
 	}
 
@@ -59,10 +58,6 @@ public class Counts {
 		this.year = year;
 	}
 
-	public final void setLayer(final String layer) {
-		this.layer = layer;
-	}
-
 	public final String getName() {
 		return this.name;
 	}
@@ -73,10 +68,6 @@ public class Counts {
 
 	public final int getYear() {
 		return this.year;
-	}
-
-	public final String getLayer() {
-		return this.layer;
 	}
 
 	public final TreeMap<Id, Count> getCounts() {

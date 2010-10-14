@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.mzilske.postgres;
 
 import java.io.IOException;
@@ -30,13 +49,13 @@ public class ImportCounts {
 			Connection connection;
 			connection = DriverManager.getConnection("jdbc:postgresql:munich", "postgres", "postgres");
 
-			DatabaseMetaData dbmd = connection.getMetaData(); 
+			DatabaseMetaData dbmd = connection.getMetaData();
 			System.out.println("Connection to " + dbmd.getDatabaseProductName() + " " + dbmd.getDatabaseProductVersion() + " successful.\n");
 			final Statement statement = connection.createStatement();
 			final PreparedStatement statement2 = connection.prepareStatement("select messstellen.messstelle, messstellen.richtung, h, sum, links.link_id from counts_by_hour, messstellen, links " +
 					"where counts_by_hour.messstelle = messstellen.messstelle and counts_by_hour.richtung = messstellen.richtung and messstellen.link_id = links.link_id and counts_by_hour.date = ? ");
-			
-			ResultSet rs = statement.executeQuery("select distinct date from counts_by_hour"); 
+
+			ResultSet rs = statement.executeQuery("select distinct date from counts_by_hour");
 			while (rs.next()) {
 				Counts counts = new Counts();
 				Counts rereadCounts = new Counts();
@@ -59,8 +78,7 @@ public class ImportCounts {
 				}
 				counts.setYear(666);
 				counts.setName("Uwe");
-				counts.setLayer("7");
-				
+
 				String filename = COUNTS_FILE_PREFIX + "-" + date + ".xml";
 				countsWriter.write(filename);
 				CountsReaderMatsimV1 countsReader = new CountsReaderMatsimV1(rereadCounts);
@@ -73,7 +91,7 @@ public class ImportCounts {
 		} catch (ParserConfigurationException e) {
 			throw new RuntimeException(e);
 		}
-		
+
 	}
 
 	public static void main(String[] args) throws IOException, SAXException, ParserConfigurationException {

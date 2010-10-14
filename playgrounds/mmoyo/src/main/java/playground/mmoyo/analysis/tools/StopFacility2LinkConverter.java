@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.mmoyo.analysis.tools;
 
 import java.io.File;
@@ -19,7 +38,7 @@ public class StopFacility2LinkConverter {
 	private ScenarioImpl scenario;
 	private Counts counts;
 	private String countFileName;
-	
+
 	public StopFacility2LinkConverter(ScenarioImpl scenario){
 		this.scenario = scenario;
 		init();
@@ -36,40 +55,39 @@ public class StopFacility2LinkConverter {
 			log.warn(" counts file not found" + countFile.getPath());
 		}
 	}
-	
+
 	/**creates a new counts file with links id's instead of stopfacilities Id's */
 	private void write(){
 			Counts newCounts = new Counts();
 
 			newCounts.setDescription(this.counts.getDescription());
-			newCounts.setLayer(this.counts.getLayer());
 			newCounts.setName(this.counts.getName());
 			newCounts.setYear(this.counts.getYear());
-			
+
 			for(Entry<Id, Count> entry: this.counts.getCounts().entrySet()){
 				Id key = entry.getKey();
 				Count count = entry.getValue();
-				
+
 				Id linkId = this.scenario.getTransitSchedule().getFacilities().get(key).getLinkId();
 				System.out.println(linkId.toString());
 				//count.setLocId(linkId);  <--because of this does not work!
 				newCounts.getCounts().put(linkId, count);
 			}
-			
+
 			CountsWriter countsWriter = new CountsWriter(newCounts);
 			String filteredCountsFile = scenario.getConfig().controler().getOutputDirectory() + "/linkBased_"  +  this.countFileName;
 			countsWriter.write(filteredCountsFile);
 			System.out.println("Filtered counts written in:" + filteredCountsFile);
 	}
-	
+
 	/**shows in console the relation stopFacility-link*/
 	private void println(){
-		for(Id stopFacilityId : this.counts.getCounts().keySet()){		
+		for(Id stopFacilityId : this.counts.getCounts().keySet()){
 			Id linkId = this.scenario.getTransitSchedule().getFacilities().get(stopFacilityId).getLinkId();
 			System.out.println(stopFacilityId + " == "+ linkId.toString());
 		}
 	}
-	
+
 	public static void main(String[] args) {
 		String configFile = "../playgrounds/mmoyo/output/best/1/config.xml";
 		StopFacility2LinkConverter stopFacility2LinkConverter = new StopFacility2LinkConverter(new TransScenarioLoader().loadScenario(configFile));

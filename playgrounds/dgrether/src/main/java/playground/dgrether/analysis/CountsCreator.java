@@ -101,7 +101,6 @@ public class CountsCreator {
 	public void createCounts(Set<Id> linkIds) {
 		Counts counts = new Counts();
 //		Count c;
-		counts.setLayer("superLayer");
 		counts.setDescription("");
 		counts.setName("noname china counts");
 		counts.setYear(2005);
