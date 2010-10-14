@@ -50,11 +50,11 @@ public class NonCarRouteDropper extends AbstractPersonAlgorithm implements PlanA
 			return;
 		}
 		
-		String simulatedModes = multiModalConfigGroup.getSimulatedModes();
-		if (simulatedModes.contains("walk")) modesToDrop.add(TransportMode.walk);
-		if (simulatedModes.contains("bike")) modesToDrop.add(TransportMode.bike);
-		if (simulatedModes.contains("pt")) modesToDrop.add(TransportMode.pt);
-		if (simulatedModes.contains("ride")) modesToDrop.add(TransportMode.ride);
+		String simulatedModes = multiModalConfigGroup.getSimulatedModes().toLowerCase();
+		if (simulatedModes.contains(TransportMode.walk)) modesToDrop.add(TransportMode.walk);
+		if (simulatedModes.contains(TransportMode.bike)) modesToDrop.add(TransportMode.bike);
+		if (simulatedModes.contains(TransportMode.pt)) modesToDrop.add(TransportMode.pt);
+		if (simulatedModes.contains(TransportMode.ride)) modesToDrop.add(TransportMode.ride);
 	}
 	
 	@Override

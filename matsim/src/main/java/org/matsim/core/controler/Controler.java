@@ -134,7 +134,7 @@ import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.ptproject.qsim.ParallelQSimFactory;
 import org.matsim.ptproject.qsim.QSimFactory;
 import org.matsim.ptproject.qsim.multimodalsimengine.MultiModalMobsimFactory;
-import org.matsim.ptproject.qsim.multimodalsimengine.router.MultiModalPlansCalcRoute;
+import org.matsim.ptproject.qsim.multimodalsimengine.router.MultiModalLegHandler;
 import org.matsim.ptproject.qsim.multimodalsimengine.router.costcalculator.TravelTimeCalculatorWithBufferFactory;
 import org.matsim.ptproject.qsim.multimodalsimengine.tools.EnsureActivityReachability;
 import org.matsim.ptproject.qsim.multimodalsimengine.tools.MultiModalNetworkCreator;
@@ -377,13 +377,12 @@ public class Controler {
 //		return new MultiModalMobsimFactory(super.getMobsimFactory(), this.getTravelTimeCalculator());
 //		setMobsimFactory(mobsimFactory)
 
-
 		// set Route Factories
-		String simulatedModes = config.multiModal().getSimulatedModes();
-		if (simulatedModes.contains("bike")) this.getNetwork().getFactory().setRouteFactory(TransportMode.bike, new LinkNetworkRouteFactory());
-		if (simulatedModes.contains("walk")) this.getNetwork().getFactory().setRouteFactory(TransportMode.walk, new LinkNetworkRouteFactory());
-		if (simulatedModes.contains("ride")) this.getNetwork().getFactory().setRouteFactory(TransportMode.ride, new LinkNetworkRouteFactory());
-		if (simulatedModes.contains("pt")) this.getNetwork().getFactory().setRouteFactory(TransportMode.pt, new LinkNetworkRouteFactory());
+		String simulatedModes = config.multiModal().getSimulatedModes().toLowerCase();
+		if (simulatedModes.contains(TransportMode.bike)) this.getNetwork().getFactory().setRouteFactory(TransportMode.bike, new LinkNetworkRouteFactory());
+		if (simulatedModes.contains(TransportMode.walk)) this.getNetwork().getFactory().setRouteFactory(TransportMode.walk, new LinkNetworkRouteFactory());
+		if (simulatedModes.contains(TransportMode.ride)) this.getNetwork().getFactory().setRouteFactory(TransportMode.ride, new LinkNetworkRouteFactory());
+		if (simulatedModes.contains(TransportMode.pt)) this.getNetwork().getFactory().setRouteFactory(TransportMode.pt, new LinkNetworkRouteFactory());
 	}
 
 	private final void setupTransitSimulation() {
@@ -1080,8 +1079,19 @@ public class Controler {
 			return new PlansCalcTransitRoute(this.config.plansCalcRoute(), this.network, travelCosts, travelTimes,
 					this.getLeastCostPathCalculatorFactory(), this.scenarioData.getTransitSchedule(), this.config.transit());
 		} else if (this.config.multiModal().isMultiModalSimulationEnabled()) {
-			return new MultiModalPlansCalcRoute(this.config.plansCalcRoute(), this.config.multiModal(), this.network,
-					travelCosts, travelTimes, this.getLeastCostPathCalculatorFactory());
+			PlansCalcRoute plansCalcRoute = new PlansCalcRoute(this.config.plansCalcRoute(), this.network, travelCosts, 
+					travelTimes, this.getLeastCostPathCalculatorFactory());
+			
+			MultiModalLegHandler multiModalLegHandler = new MultiModalLegHandler(this.config.multiModal(), this.network,
+					travelTimes, this.getLeastCostPathCalculatorFactory());
+			
+			String simulatedModes = this.config.multiModal().getSimulatedModes().toLowerCase();
+			if (simulatedModes.contains(TransportMode.walk)) plansCalcRoute.addLegHandler(multiModalLegHandler, TransportMode.walk);
+			if (simulatedModes.contains(TransportMode.bike)) plansCalcRoute.addLegHandler(multiModalLegHandler, TransportMode.bike);
+			if (simulatedModes.contains(TransportMode.ride)) plansCalcRoute.addLegHandler(multiModalLegHandler, TransportMode.ride);
+			if (simulatedModes.contains(TransportMode.pt)) plansCalcRoute.addLegHandler(multiModalLegHandler, TransportMode.pt);
+			
+			return plansCalcRoute;
 		} else {
 			return new PlansCalcRoute(this.config.plansCalcRoute(), this.network, travelCosts, travelTimes, this
 					.getLeastCostPathCalculatorFactory());

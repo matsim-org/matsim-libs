@@ -20,11 +20,12 @@
 
 package org.matsim.core.router;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -32,21 +33,16 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
-import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.core.utils.misc.NetworkUtils;
-import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -93,6 +89,8 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 	
 	private final PersonalizableTravelTime timeCalculator;
 
+	private Map<String, LegHandler> legHandlers;
+	
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
@@ -120,6 +118,8 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 		else {
 			log.warn(NO_CONFIGGROUP_SET_WARNING);
 		}
+		
+		initDefaultLegHandlers();
 	}
 
 	/**
@@ -140,7 +140,24 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 	public final LeastCostPathCalculator getPtFreeflowLeastCostPathCalculator(){
 		return this.routeAlgoPtFreeflow;
 	}
-
+	
+	private void initDefaultLegHandlers() {
+		legHandlers = new HashMap<String, LegHandler>();
+		
+		DefaultLegHandler legHandler = new DefaultLegHandler(configGroup, network, routeAlgo, routeAlgoPtFreeflow);
+		this.addLegHandler(legHandler, TransportMode.pt);
+		this.addLegHandler(legHandler, TransportMode.car);
+		this.addLegHandler(legHandler, TransportMode.bike);
+		this.addLegHandler(legHandler, TransportMode.ride);
+		this.addLegHandler(legHandler, TransportMode.walk);
+	}
+		
+	public final void addLegHandler(LegHandler legHandler, String transportMode) {
+		if (legHandlers.get(transportMode) != null) {
+			log.warn("A LegHandler for " + transportMode + " legs is already registered - it is replaced!"); 
+		}
+		legHandlers.put(transportMode, legHandler);
+	}
 	//////////////////////////////////////////////////////////////////////
 	// run methods
 	//////////////////////////////////////////////////////////////////////
@@ -218,16 +235,9 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 	public double handleLeg(Person person, final Leg leg, final Activity fromAct, final Activity toAct, final double depTime) {
 		String legmode = leg.getMode();
 
-		if (TransportMode.car.equals(legmode)) {
-			return handleCarLeg(leg, fromAct, toAct, depTime);
-		} else if (TransportMode.ride.equals(legmode)) {
-			return handleRideLeg(leg, fromAct, toAct, depTime);
-		} else if (TransportMode.pt.equals(legmode)) {
-			return handlePtLeg(leg, fromAct, toAct, depTime);
-		} else if (TransportMode.walk.equals(legmode)) {
-			return handleWalkLeg(leg, fromAct, toAct, depTime);
-		} else if (TransportMode.bike.equals(legmode)) {
-			return handleBikeLeg(leg, fromAct, toAct, depTime);
+		LegHandler legHandler = legHandlers.get(legmode);
+		if (legHandler != null) {
+			return legHandler.handleLeg(person, leg, fromAct, toAct, depTime);
 		} else if ("undefined".equals(legmode)) {
 			/* balmermi: No clue how to handle legs with 'undef' mode
 			 *                Therefore, handle it similar like bike mode with 50 km/h
@@ -240,125 +250,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 		}
 	}
 
-	protected double handleCarLeg(final Leg leg, final Activity fromAct, final Activity toAct, final double depTime) {
-		double travTime = 0;
-		Link fromLink = this.network.getLinks().get(fromAct.getLinkId());
-		Link toLink = this.network.getLinks().get(toAct.getLinkId());
-		if (fromLink == null) throw new RuntimeException("fromLink missing.");
-		if (toLink == null) throw new RuntimeException("toLink missing.");
-
-		Node startNode = fromLink.getToNode();	// start at the end of the "current" link
-		Node endNode = toLink.getFromNode(); // the target is the start of the link
-
-//		CarRoute route = null;
-		Path path = null;
-		if (toLink != fromLink) {
-			// do not drive/walk around, if we stay on the same link
-			path = this.routeAlgo.calcLeastCostPath(startNode, endNode, depTime);
-			if (path == null) throw new RuntimeException("No route found from node " + startNode.getId() + " to node " + endNode.getId() + ".");
-			NetworkRoute route = (NetworkRoute) this.routeFactory.createRoute(TransportMode.car, fromLink.getId(), toLink.getId());
-			route.setLinkIds(fromLink.getId(), NetworkUtils.getLinkIds(path.links), toLink.getId());
-			route.setTravelTime((int) path.travelTime);
-			route.setTravelCost(path.travelCost);
-			route.setDistance(RouteUtils.calcDistance(route, this.network));
-			leg.setRoute(route);
-			travTime = (int) path.travelTime;
-		} else {
-			// create an empty route == staying on place if toLink == endLink
-			NetworkRoute route = (NetworkRoute) this.routeFactory.createRoute(TransportMode.car, fromLink.getId(), toLink.getId());
-			route.setTravelTime(0);
-			route.setDistance(0.0);
-			leg.setRoute(route);
-			travTime = 0;
-		}
-
-		leg.setDepartureTime(depTime);
-		leg.setTravelTime(travTime);
-		((LegImpl) leg).setArrivalTime(depTime + travTime); // yy something needs to be done once there are alternative implementations of the interface.  kai, apr'10
-		return travTime;
-	}
-
-	protected double handleRideLeg(final Leg leg, final Activity fromAct, final Activity toAct, final double depTime) {
-		// handle a ride exactly the same was as a car
-		// the simulation has to take care that this leg is not really simulated as a stand-alone driver
-		return handleCarLeg(leg, fromAct, toAct, depTime);
-	}
-
-	protected double handlePtLeg(final Leg leg, final Activity fromAct, final Activity toAct, final double depTime) {
-
-		int travTime = 0;
-		final Link fromLink = this.network.getLinks().get(fromAct.getLinkId());
-		final Link toLink = this.network.getLinks().get(toAct.getLinkId());
-		if (fromLink == null) throw new RuntimeException("fromLink missing.");
-		if (toLink == null) throw new RuntimeException("toLink missing.");
-
-		Path path = null;
-//		CarRoute route = null;
-		if (toLink != fromLink) {
-			Node startNode = fromLink.getToNode();	// start at the end of the "current" link
-			Node endNode = toLink.getFromNode(); // the target is the start of the link
-			// do not drive/walk around, if we stay on the same link
-			path = this.routeAlgoPtFreeflow.calcLeastCostPath(startNode, endNode, depTime);
-			if (path == null) throw new RuntimeException("No route found from node " + startNode.getId() + " to node " + endNode.getId() + ".");
-			// we're still missing the time on the final link, which the agent has to drive on in the java mobsim
-			// so let's calculate the final part.
-			double travelTimeLastLink = ((LinkImpl) toLink).getFreespeedTravelTime(depTime + path.travelTime);
-			travTime = (int) (((int) path.travelTime + travelTimeLastLink) * this.configGroup.getPtSpeedFactor());
-			Route route = this.routeFactory.createRoute(TransportMode.pt, fromLink.getId(), toLink.getId());
-			route.setTravelTime(travTime);
-			double dist = 0;
-			if ((fromAct.getCoord() != null) && (toAct.getCoord() != null)) {
-				dist = CoordUtils.calcDistance(fromAct.getCoord(), toAct.getCoord());
-			} else {
-				dist = CoordUtils.calcDistance(fromLink.getCoord(), toLink.getCoord());
-			}
-			route.setDistance(dist * 1.5);
-//			route.setTravelCost(path.travelCost);
-			leg.setRoute(route);
-		} else {
-			// create an empty route == staying on place if toLink == endLink
-			Route route = this.routeFactory.createRoute(TransportMode.pt, fromLink.getId(), toLink.getId());
-			route.setTravelTime(0);
-			route.setDistance(0.0);
-			leg.setRoute(route);
-			travTime = 0;
-		}
-		leg.setDepartureTime(depTime);
-		leg.setTravelTime(travTime);
-		((LegImpl) leg).setArrivalTime(depTime + travTime); // yy something needs to be done once there are alternative implementations of the interface.  kai, apr'10
-		return travTime;
-	}
-
-	protected double handleWalkLeg(final Leg leg, final Activity fromAct, final Activity toAct, final double depTime) {
-		// make simple assumption about distance and walking speed
-		double dist = CoordUtils.calcDistance(fromAct.getCoord(), toAct.getCoord());
-		// create an empty route, but with realistic traveltime
-		Route route = this.routeFactory.createRoute(TransportMode.walk, fromAct.getLinkId(), toAct.getLinkId());
-		int travTime = (int)(dist / this.configGroup.getWalkSpeed());
-		route.setTravelTime(travTime);
-		route.setDistance(dist * 1.5);
-		leg.setRoute(route);
-		leg.setDepartureTime(depTime);
-		leg.setTravelTime(travTime);
-		((LegImpl) leg).setArrivalTime(depTime + travTime); // yy something needs to be done once there are alternative implementations of the interface.  kai, apr'10
-		return travTime;
-	}
-
-	protected double handleBikeLeg(final Leg leg, final Activity fromAct, final Activity toAct, final double depTime) {
-		// make simple assumption about distance and cycling speed
-		double dist = CoordUtils.calcDistance(fromAct.getCoord(), toAct.getCoord());
-		// create an empty route, but with realistic traveltime
-		Route route = this.routeFactory.createRoute(TransportMode.bike, fromAct.getLinkId(), toAct.getLinkId());
-		int travTime = (int)(dist / this.configGroup.getBikeSpeed());
-		route.setTravelTime(travTime);
-		route.setDistance(dist * 1.5);
-		leg.setRoute(route);
-		leg.setDepartureTime(depTime);
-		leg.setTravelTime(travTime);
-		((LegImpl) leg).setArrivalTime(depTime + travTime); // yy something needs to be done once there are alternative implementations of the interface.  kai, apr'10
-		return travTime;
-	}
-
+	// yyyy should this also be moved to DefaultLegHandler? cdobler, okt'10
 	protected double handleUndefLeg(final Leg leg, final Activity fromAct, final Activity toAct, final double depTime) {
 		// make simple assumption about distance and a dummy speed (50 km/h)
 		double dist = CoordUtils.calcDistance(fromAct.getCoord(), toAct.getCoord());
@@ -377,5 +269,4 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 	public NetworkFactoryImpl getRouteFactory() {
 		return routeFactory;
 	}
-
 }

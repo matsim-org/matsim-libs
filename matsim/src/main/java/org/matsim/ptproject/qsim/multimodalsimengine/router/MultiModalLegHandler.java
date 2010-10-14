@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * MultiModalPlansCalcRoute.java
+ * MultiModalLegHandler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -30,7 +30,6 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.MultiModalConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.population.LegImpl;
@@ -38,11 +37,9 @@ import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteFactory;
 import org.matsim.core.router.IntermodalLeastCostPathCalculator;
-import org.matsim.core.router.PlansCalcRoute;
+import org.matsim.core.router.LegHandler;
 import org.matsim.core.router.util.DijkstraFactory;
-import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.misc.NetworkUtils;
@@ -51,8 +48,13 @@ import org.matsim.ptproject.qsim.multimodalsimengine.router.costcalculator.Buffe
 import org.matsim.ptproject.qsim.multimodalsimengine.router.costcalculator.MultiModalTravelTimeCost;
 import org.matsim.ptproject.qsim.multimodalsimengine.router.costcalculator.TravelTimeCalculatorWithBuffer;
 
-public class MultiModalPlansCalcRoute extends PlansCalcRoute {
+public class MultiModalLegHandler implements LegHandler {
 
+	/**
+	 * if not set via constructor use the default values
+	 */
+	private PlansCalcRouteConfigGroup configGroup = new PlansCalcRouteConfigGroup();
+		
 	private RouteFactory walkRouteFactory = new LinkNetworkRouteFactory();
 	private RouteFactory bikeRouteFactory = new LinkNetworkRouteFactory();
 	private RouteFactory ptRouteFactory = new LinkNetworkRouteFactory();
@@ -65,37 +67,41 @@ public class MultiModalPlansCalcRoute extends PlansCalcRoute {
 	
 	private MultiModalConfigGroup multiModalGroup;
 	private LeastCostPathCalculatorFactory factory;
-	private PersonalizableTravelTime travelTime;
-	
-	public MultiModalPlansCalcRoute(final PlansCalcRouteConfigGroup group, final MultiModalConfigGroup multiModalGroup, 
-			final Network network, final PersonalizableTravelCost costCalculator,
-			final PersonalizableTravelTime timeCalculator, LeastCostPathCalculatorFactory factory){
-		super(group, network, costCalculator, timeCalculator, factory);
+	private Network network;
+
+	public MultiModalLegHandler(final MultiModalConfigGroup multiModalGroup, final Network network,
+			final PersonalizableTravelTime timeCalculator, LeastCostPathCalculatorFactory factory) {
 		
 		this.multiModalGroup = multiModalGroup;
+		this.network = network;
 		this.factory = factory;
-		this.travelTime = timeCalculator;
 		initRouteAlgos(network, timeCalculator);
 	}
 
-	public MultiModalPlansCalcRoute(final PlansCalcRouteConfigGroup group, final MultiModalConfigGroup multiModalGroup,
-			final Network network, final PersonalizableTravelCost costCalculator, final PersonalizableTravelTime timeCalculator) {
-		this(group, multiModalGroup, network, costCalculator, timeCalculator, new DijkstraFactory());
+	public MultiModalLegHandler(final MultiModalConfigGroup multiModalGroup,
+			final Network network, final PersonalizableTravelTime timeCalculator) {
+		this(multiModalGroup, network, timeCalculator, new DijkstraFactory());
+	}
+	
+	@Override
+	public double handleLeg(Person person, Leg leg, Activity fromAct, Activity toAct, double depTime) {
+		String legMode = leg.getMode();
+		
+		if (TransportMode.ride.equals(legMode)) {
+			return handleRideLeg(leg, fromAct, toAct, depTime);
+		} else if (TransportMode.pt.equals(legMode)) {
+			return handlePtLeg(leg, fromAct, toAct, depTime);
+		} else if (TransportMode.walk.equals(legMode)) {
+			return handleWalkLeg(leg, fromAct, toAct, depTime);
+		} else if (TransportMode.bike.equals(legMode)) {
+			return handleBikeLeg(leg, fromAct, toAct, depTime);
+		} else {
+			throw new RuntimeException("cannot handle legmode '" + legMode + "'.");
+		}
 	}
 
-	private void initRouteAlgos(Network network, PersonalizableTravelTime travelTime) {	
-		/*
-		 * Car
-		 * Add mode restriction because now the network is multi-modal and not car-only.
-		 */
-		LeastCostPathCalculator carRouteAlgo = this.getLeastCostPathCalculator();
-		if (carRouteAlgo instanceof IntermodalLeastCostPathCalculator) {
-			Set<String> carModeRestrictions = new TreeSet<String>();
-			carModeRestrictions.add(TransportMode.car);
-			((IntermodalLeastCostPathCalculator)carRouteAlgo).setModeRestriction(carModeRestrictions);
-		}
-		
-		
+
+	private void initRouteAlgos(Network network, PersonalizableTravelTime travelTime) {		
 		/*
 		 * Walk
 		 */
@@ -174,42 +180,25 @@ public class MultiModalPlansCalcRoute extends PlansCalcRoute {
 		rideModeRestrictions.add(TransportMode.car);
 		rideRouteAlgo.setModeRestriction(rideModeRestrictions);
 	}
-	
-	/*
-	 * As long as the core does not use PersonalizableTravelTime we set the
-	 * person in the TimeCalculator here and then let the superclass do the
-	 * remaining work.
-	 */
-	@Override
-	protected void handlePlan(Person person, final Plan plan) {
-		if (travelTime != null) {
-			travelTime.setPerson(person);
-		}
-		super.handlePlan(person, plan);
-	}
-	
-	@Override
-	protected double handleWalkLeg(final Leg leg, final Activity fromAct, final Activity toAct, final double depTime) {
+		
+	private double handleWalkLeg(final Leg leg, final Activity fromAct, final Activity toAct, final double depTime) {
 		return handleMultiModalLeg(leg, fromAct, toAct, depTime, walkRouteAlgo, walkRouteFactory);
 	}
 	
-	@Override
-	protected double handleBikeLeg(final Leg leg, final Activity fromAct, final Activity toAct, final double depTime) {
+	private double handleBikeLeg(final Leg leg, final Activity fromAct, final Activity toAct, final double depTime) {
 		return handleMultiModalLeg(leg, fromAct, toAct, depTime, bikeRouteAlgo, bikeRouteFactory);
 	}
 	
-	@Override
-	protected double handlePtLeg(final Leg leg, final Activity fromAct, final Activity toAct, final double depTime) {
+	private double handlePtLeg(final Leg leg, final Activity fromAct, final Activity toAct, final double depTime) {
 		return handleMultiModalLeg(leg, fromAct, toAct, depTime, ptRouteAlgo, ptRouteFactory);
 	}
 	
-	@Override
-	protected double handleRideLeg(final Leg leg, final Activity fromAct, final Activity toAct, final double depTime) {
+	private double handleRideLeg(final Leg leg, final Activity fromAct, final Activity toAct, final double depTime) {
 		return handleMultiModalLeg(leg, fromAct, toAct, depTime, rideRouteAlgo, rideRouteFactory);
 	}
 	
 	/*
-	 * Adapted from PlansCalcRoute.handleCarLeg(...) - exchanged only the routeAlgo and the routeFactory.
+	 * Adapted from DefaultLegHandler.handleCarLeg(...) - exchanged only the routeAlgo and the routeFactory.
 	 */
 	private double handleMultiModalLeg(Leg leg, Activity fromAct, Activity toAct, double depTime, 
 			IntermodalLeastCostPathCalculator routeAlgo, RouteFactory routeFactory) {

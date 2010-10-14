@@ -20,6 +20,7 @@
 
 package playground.christoph.withinday.replanning.modules;
 
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
@@ -28,7 +29,7 @@ import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.ptproject.qsim.multimodalsimengine.router.MultiModalPlansCalcRoute;
+import org.matsim.ptproject.qsim.multimodalsimengine.router.MultiModalLegHandler;
 
 public class ReplanningModule extends AbstractMultithreadedModule {
 
@@ -52,9 +53,19 @@ public class ReplanningModule extends AbstractMultithreadedModule {
 	
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
-		if (config.multiModal().isMultiModalSimulationEnabled()) {
-			return new MultiModalPlansCalcRoute(config.plansCalcRoute(), config.multiModal(), 
-					network, costCalculator, timeCalculator, factory);				
-		} else return new PlansCalcRoute(config.plansCalcRoute(), network, costCalculator, timeCalculator, factory);
+		
+		PlansCalcRoute plansCalcRoute = new PlansCalcRoute(config.plansCalcRoute(), network, costCalculator, timeCalculator, factory);
+				
+		if (config.multiModal().isMultiModalSimulationEnabled()) {			
+			MultiModalLegHandler multiModalLegHandler = new MultiModalLegHandler(this.config.multiModal(), this.network, timeCalculator, factory);
+			
+			String simulatedModes = this.config.multiModal().getSimulatedModes().toLowerCase();
+			if (simulatedModes.contains(TransportMode.walk)) plansCalcRoute.addLegHandler(multiModalLegHandler, TransportMode.walk);
+			if (simulatedModes.contains(TransportMode.bike)) plansCalcRoute.addLegHandler(multiModalLegHandler, TransportMode.bike);
+			if (simulatedModes.contains(TransportMode.ride)) plansCalcRoute.addLegHandler(multiModalLegHandler, TransportMode.ride);
+			if (simulatedModes.contains(TransportMode.pt)) plansCalcRoute.addLegHandler(multiModalLegHandler, TransportMode.pt);
+		}
+		
+		return plansCalcRoute;
 	}
 }
