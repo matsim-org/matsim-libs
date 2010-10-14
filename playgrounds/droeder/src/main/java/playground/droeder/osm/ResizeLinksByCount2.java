@@ -20,23 +20,18 @@
 package playground.droeder.osm;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkWriter;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.CountsReaderMatsimV1;
@@ -44,16 +39,14 @@ import org.xml.sax.SAXException;
 
 import playground.andreas.osmBB.osm2counts.Osm2Counts;
 
-
 /**
  * @author droeder
  *
  */
-public class ResizeLinksByCount extends AbstractResizeLinksByCount{
-	private static final Logger log = Logger.getLogger(ResizeLinksByCount.class);
+public class ResizeLinksByCount2 extends AbstractResizeLinksByCount{
 	
-	private Map<String, Double> origId2MaxCount = new HashMap<String, Double>();
-		
+	private static final Logger log = Logger.getLogger(ResizeLinksByCount2.class);
+	
 	public static void main(String[] args){
 		String countsFile = "d:/VSP/output/osm_bb/Di-Do_counts.xml";
 		String filteredOsmFile = "d:/VSP/output/osm_bb/counts.osm";
@@ -77,66 +70,43 @@ public class ResizeLinksByCount extends AbstractResizeLinksByCount{
 			e.printStackTrace();
 		}
 		
-		ResizeLinksByCount r = new ResizeLinksByCount(networkFile, counts, shortNameMap);
+		ResizeLinksByCount2 r = new ResizeLinksByCount2(networkFile, counts, shortNameMap);
 		r.run("d:/VSP/output/osm_bb/counts_network_resized.xml");
 	}
 	
-	public ResizeLinksByCount(String networkFile, Counts counts, Map<String, String> shortNameMap){
+	public ResizeLinksByCount2(String networkFile, Counts counts, Map<String, String> shortNameMap){
 		super(networkFile, counts, shortNameMap);
 	}
 	
-	protected void resize() {
-		String origId = null;
-		Double maxCount = null;
-		Double capPerLane = null;
-		Integer nrOfNewLanes = null;
 
-		
-		for(Link l : net.getLinks().values()){
-			
-			checkIfOrigIdIsRegistered((LinkImpl) l);
-			
-			origId = ((LinkImpl) l).getOrigId();
-			if(this.origId2MaxCount.containsKey(origId)){
-				maxCount = origId2MaxCount.get(origId);
-				capPerLane = l.getCapacity() / l.getNumberOfLanes();
-				
-				// if maxCount < capPerLane set cap to maxCount and keep nrOfLanes
-				if(maxCount < capPerLane){
-					log.warn("link " + l.getId() + " oldCap= " + l.getCapacity() + " oldNrOfLanes= " + l.getNumberOfLanes() + ": maxCount < capPerLane. Set Capacity to maxcount="+ maxCount + " and numberOfLanes to 1...");
-					l.setCapacity(maxCount);
-				}
-				// else set nrOfNewLanes to int(maxCount/capPerLane) and cap to maxCount
-				else{
-					nrOfNewLanes = (int) (maxCount/capPerLane);
-					log.info("link " + l.getId() + " oldCap= " + l.getCapacity() + " oldNrOfLanes= " + l.getNumberOfLanes() + " : set nr of lanes to " + nrOfNewLanes + " and capacity to " + maxCount);
-					l.setNumberOfLanes(nrOfNewLanes);
-					l.setCapacity(maxCount);
-				}				
-			}
-		}
+	protected void resize() {
+		this.listCountsOnOrigId();
 	}
-	
-	
-	/*
-	 * checks and registers the origId and maxcount of a link if there is a countingstation
-	 */
-	private void checkIfOrigIdIsRegistered(LinkImpl l) {
+
+	private void listCountsOnOrigId(){
+		Map<String, List<String>> origId2Cs = new HashMap<String, List<String>>();
+		String origId = null;
+		List<String> counters = null;
 		Node node = null;
-		Count count = null;
-		Double maxCount = null;
 		
-		node = l.getFromNode();
-		if( (!this.origId2MaxCount.containsKey( ((LinkImpl) l).getOrigId()))  && this.shortNameMap.containsKey(node.getId().toString())){
-			count = counts.getCount(new IdImpl(shortNameMap.get(node.getId().toString())));
-			if(!(count == null)){
-				maxCount = count.getMaxVolume().getValue();
-				this.origId2MaxCount.put(((LinkImpl) l).getOrigId(), maxCount);
-				log.info("count " + count.getCsId() + " registered to originLink " + l.getOrigId());
-			}else{
-				log.warn("No count found for Node " + node.getId() + " but there should be one!!!");
-			}
+		for(Entry<String, String> e:  shortNameMap.entrySet()){
+			node = this.net.getNodes().get(new IdImpl(e.getValue()));
 		}
 		
+//		for(Count c : counts.getCounts().values()){
+//			log.info(c.getLocId());
+//			origId = ((LinkImpl)net.getLinks().get(c.getLocId())).getOrigId();
+//			
+//			if (!origId2Cs.containsKey(origId)){
+//				counters = new ArrayList<String>();
+//			}else{
+//				counters = origId2Cs.get(origId);
+//				log.warn("There is more than one countingStation on origId " + origId);
+//			}
+//			
+//			counters.add(c.getCsId());
+//			origId2Cs.put(origId, counters);
+//		}
 	}
+	
 }
