@@ -30,11 +30,17 @@ import playground.gregor.sim2_v2.simulation.floor.Floor;
 public class Sim2DEngine {
 
 	private List<Floor> floors;
+	private PhantomManager phantomMgr;
 
 	/**
 	 * @param time
 	 */
 	public void move(double time) {
+
+		if (this.phantomMgr != null) {
+			this.phantomMgr.update(time);
+		}
+
 		for (Floor floor : this.floors) {
 			floor.move(time);
 		}

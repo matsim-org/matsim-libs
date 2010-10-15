@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PathForceModule.java
+ * Force.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,27 +17,15 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.gregor.sim2_v2.simulation.floor;
-
-import playground.gregor.sim2_v2.simulation.Agent2D;
+package playground.gregor.sim2_v2.simulation;
 
 /**
  * @author laemmel
  * 
  */
-public class PathForceModule implements ForceModule {
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * playground.gregor.sim2_v2.simulation.floor.ForceModule#run(playground
-	 * .gregor.sim2_v2.simulation.Agent2D)
-	 */
-	@Override
-	public void run(Agent2D agent) {
-		// TODO Auto-generated method stub
-
-	}
+public class Force {
+	double fx;
+	double fy;
+	// double fz;
 
 }

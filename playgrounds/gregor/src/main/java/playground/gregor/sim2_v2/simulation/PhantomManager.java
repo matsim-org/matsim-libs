@@ -19,10 +19,31 @@
  * *********************************************************************** */
 package playground.gregor.sim2_v2.simulation;
 
+import java.util.List;
+
+import com.vividsolutions.jts.geom.Coordinate;
+
 /**
  * @author laemmel
- *
+ * 
  */
 public class PhantomManager {
+
+	/**
+	 * @param time
+	 */
+	public void update(double time) {
+		// TODO QuadTree;
+
+	}
+
+	/**
+	 * @param position
+	 * @return
+	 */
+	public List<Coordinate> getPhatomsNear(Coordinate position) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 }

@@ -21,6 +21,8 @@ package playground.gregor.sim2_v2.simulation.floor;
 
 import java.util.List;
 
+import playground.gregor.sim2_v2.simulation.Agent2D;
+
 /**
  * @author laemmel
  * 
@@ -28,13 +30,36 @@ import java.util.List;
 public class Floor {
 
 	private List<ForceModule> forceModules;
+	private List<Agent2D> agents;
 
 	/**
 	 * @param time
 	 */
 	public void move(double time) {
-		// TODO Auto-generated method stub
+		updateForces();
+		moveAgents();
 
+	}
+
+	/**
+	 * 
+	 */
+	private void moveAgents() {
+		for (Agent2D agent : this.agents) {
+
+		}
+
+	}
+
+	/**
+	 * 
+	 */
+	private void updateForces() {
+		for (Agent2D agent : this.agents) {
+			for (ForceModule m : this.forceModules) {
+				m.run(agent);
+			}
+		}
 	}
 
 	/**

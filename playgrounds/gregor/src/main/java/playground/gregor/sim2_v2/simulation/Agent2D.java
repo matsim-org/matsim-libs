@@ -19,10 +19,22 @@
  * *********************************************************************** */
 package playground.gregor.sim2_v2.simulation;
 
+import com.vividsolutions.jts.geom.Coordinate;
+
 /**
  * @author laemmel
  * 
  */
 public class Agent2D {
+
+	private Coordinate currentPosition;
+	private Force force;
+
+	/**
+	 * @return
+	 */
+	public Coordinate getPosition() {
+		return this.currentPosition;
+	}
 
 }
