@@ -20,6 +20,7 @@
 
 package org.matsim.core.router.costcalculators;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
@@ -42,7 +43,7 @@ import org.matsim.core.router.util.TravelMinCost;
  * @author dgrether
  */
 public class FreespeedTravelTimeCost implements PersonalizableTravelCost, TravelMinCost, PersonalizableTravelTime {
-
+	private static final Logger log = Logger.getLogger("noname");
 	private final double travelCostFactor;
 	private final double marginalUtlOfDistance;
 	/**
@@ -58,7 +59,7 @@ public class FreespeedTravelTimeCost implements PersonalizableTravelCost, Travel
 		this.travelCostFactor = -scaledMarginalUtilityOfTraveling + scaledMarginalUtilityOfPerforming;
 
 		if (this.travelCostFactor <= 0) {
-			Gbl.errorMsg("The travel cost in " + this.getClass().getName() + " must be >= 0. " +
+			log.warn("The travel cost in " + this.getClass().getName() + " under normal circumstances should be >= 0. " +
 					"Currently, it is " + this.travelCostFactor + "." +
 					"That is the sum of the costs for traveling and the opportunity costs." +
 							" Please adjust the parameters" +
