@@ -33,7 +33,7 @@ public class SignalSystemDataImpl implements SignalSystemData {
 	
 	private Map<Id, SignalData> signalDataMap = null;
 
-	public SignalSystemDataImpl(Id id) {
+	SignalSystemDataImpl(Id id) {
 		this.id = id;
 	}
 

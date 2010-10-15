@@ -37,5 +37,6 @@ public interface SignalSystemsData extends MatsimToplevelContainer {
 
 	public void addSignalSystemData(SignalSystemData signalSystemData);
 
-	
+	public void setFactory(SignalSystemsDataFactory factory);
+
 }

@@ -50,5 +50,9 @@ public class SignalSystemsDataImpl implements SignalSystemsData {
 	public void addSignalSystemData(SignalSystemData signalSystemData) {
 		this.signalSystemData.put(signalSystemData.getId(), signalSystemData);
 	}
-
+	
+	@Override
+	public void setFactory(SignalSystemsDataFactory factory) {
+		this.factory = factory;
+	}
 }

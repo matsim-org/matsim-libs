@@ -39,7 +39,7 @@ public class SignalDataImpl implements SignalData {
 	
 	private Set<Id> turningMoveRestrictions = null;
 
-	public SignalDataImpl(Id id) {
+	SignalDataImpl(Id id) {
 		this.id = id;
 	}
 
