@@ -24,7 +24,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.TravelMinCost;
@@ -43,7 +42,9 @@ import org.matsim.core.router.util.TravelMinCost;
  * @author dgrether
  */
 public class FreespeedTravelTimeCost implements PersonalizableTravelCost, TravelMinCost, PersonalizableTravelTime {
-	private static final Logger log = Logger.getLogger("noname");
+	
+	private static final Logger log = Logger.getLogger(FreespeedTravelTimeCost.class);
+
 	private final double travelCostFactor;
 	private final double marginalUtlOfDistance;
 	/**
