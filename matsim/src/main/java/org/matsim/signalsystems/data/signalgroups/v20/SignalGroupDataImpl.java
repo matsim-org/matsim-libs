@@ -33,9 +33,9 @@ public class SignalGroupDataImpl implements SignalGroupData {
 	Id signalGroupId;
 	Id signalSystemId;
 
-	public SignalGroupDataImpl(Id signalSystemId) {
+	SignalGroupDataImpl(Id signalSystemId, Id signalGroupId) {
 		this.signalSystemId = signalSystemId;
-
+		this.signalGroupId = signalGroupId;
 	}
 
 	@Override
@@ -57,10 +57,4 @@ public class SignalGroupDataImpl implements SignalGroupData {
 	public Id getSignalSystemId() {
 		return this.signalSystemId;
 	}
-
-	@Override
-	public void setId(Id sgid) {
-		this.signalGroupId = sgid;
-	}
-
 }

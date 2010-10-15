@@ -85,9 +85,8 @@ public class SignalGroupsReader20 extends MatsimJaxbXmlParser {
 		for (XMLSignalSystemSignalGroupType xsssgt : xmlsgdefs.getSignalSystem()) {
 			// SigSys
 			for (XMLSignalGroupType xsgt : xsssgt.getSignalGroup()) {
-				SignalGroupData sgd = factory.createSignalGroupData(new IdImpl(xsssgt.getRefId()));
+				SignalGroupData sgd = factory.createSignalGroupData(new IdImpl(xsssgt.getRefId()), new IdImpl(xsgt.getId()));
 
-				sgd.setId(new IdImpl(xsgt.getId()));
 				for (XMLIdRefType id : xsgt.getSignal()) {
 					sgd.addSignalId(new IdImpl(id.getRefId()));
 				}

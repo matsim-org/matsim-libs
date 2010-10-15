@@ -29,5 +29,5 @@ import org.matsim.core.api.internal.MatsimFactory;
  */
 public interface SignalGroupsDataFactory extends MatsimFactory {
 
-	public SignalGroupData createSignalGroupData(Id id);
+	public SignalGroupData createSignalGroupData(Id signalSystemId, Id signalGroupId);
 }

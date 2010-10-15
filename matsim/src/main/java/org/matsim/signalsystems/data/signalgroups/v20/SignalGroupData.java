@@ -35,8 +35,6 @@ public interface SignalGroupData extends Identifiable{
 	
 	public Id getId();
 	
-	public void setId(Id sgid);
-
 	public void addSignalId(Id signalId);
 	
 	public Set<Id> getSignalIds();

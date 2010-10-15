@@ -63,5 +63,10 @@ public class SignalGroupsDataImpl implements SignalGroupsData {
 		return signalGroupsDataBySystemId;
 	}
 
+	@Override
+	public void setFactory(SignalGroupsDataFactory factory) {
+		this.factory = factory;
+	}
+
 	
 }

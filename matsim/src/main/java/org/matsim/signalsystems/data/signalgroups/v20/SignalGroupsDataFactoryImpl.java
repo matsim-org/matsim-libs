@@ -27,8 +27,8 @@ import org.matsim.api.core.v01.Id;
 public class SignalGroupsDataFactoryImpl implements SignalGroupsDataFactory {
 
 	@Override
-	public SignalGroupData createSignalGroupData(Id id) {
-		return new SignalGroupDataImpl(id);
+	public SignalGroupData createSignalGroupData(Id signalSystemId, Id signalGroupId) {
+		return new SignalGroupDataImpl(signalSystemId, signalGroupId);
 	}
 
 }
