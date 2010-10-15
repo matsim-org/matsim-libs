@@ -45,14 +45,13 @@ public class DefaultSignalsControllerListener implements StartupListener, Shutdo
 	private SignalSystemsModelBuilder modelBuilder;
 	private SignalSystemsManager signalManager;
 	private SignalsData signalsData;
-	private Scenario scenario;
 	private QSimSignalEngine signalEngie;
+	
+	
 	
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		this.scenario = event.getControler().getScenario();
-		this.loadData(event.getControler().getConfig().signalSystems());
-		
+		this.loadData(event.getControler().getConfig().signalSystems(), event.getControler().getScenario());
 		this.modelBuilder = new FromDataBuilder(signalsData, event.getControler().getEvents());
 		
 		this.createModel();
@@ -70,10 +69,11 @@ public class DefaultSignalsControllerListener implements StartupListener, Shutdo
 		new SignalsScenarioWriter(event.getControler().getControlerIO().getOutputPath()).writeSignalsData(this.signalsData);
 	}
 
-	private void loadData(SignalSystemsConfigGroup config) {
+	private SignalsData loadData(SignalSystemsConfigGroup config, Scenario scenario) {
 		SignalsScenarioLoader loader = new SignalsScenarioLoader(config);
 		this.signalsData = loader.loadSignalsData();
-		this.scenario.addScenarioElement(this.signalsData);
+		scenario.addScenarioElement(this.signalsData);
+		return signalsData;
 	}
 
 	private void createModel() {
