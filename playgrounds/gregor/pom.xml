@@ -9,4 +9,13 @@
   <artifactId>gregor</artifactId>
   <name>gregor</name>
   <version>0.2.0-SNAPSHOT</version>
+  <dependencies>
+  	<dependency>
+  		<groupId>com.jmatio</groupId>
+  		<artifactId>jamtio</artifactId>
+  		<version>0.2</version>
+  		<scope>system</scope>
+  		<systemPath>${basedir}/lib/jmatio/jamtio.jar</systemPath>
+  	</dependency>
+  </dependencies>
 </project>
