@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package playground.gregor.sim2d.simulation;
 
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -41,9 +40,11 @@ import org.matsim.core.utils.misc.Time;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
-public class Agent2D  {
+public class Agent2D {
 
-	public enum AgentState {MOVING,ACTING, ARRIVING};
+	public enum AgentState {
+		MOVING, ACTING, ARRIVING
+	};
 
 	private static final Logger log = Logger.getLogger(Agent2D.class);
 
@@ -65,9 +66,11 @@ public class Agent2D  {
 
 	private AgentState state;
 
-//	private final double disieredVelocity = 1 + MatsimRandom.getRandom().nextDouble()-0.25;
-	private final double disieredVelocity = 1.35 + MatsimRandom.getRandom().nextDouble()/2-0.25;
-	private final double weight = 80*1000;//1000*(90 + 40*MatsimRandom.getRandom().nextDouble()-20);
+	// private final double disieredVelocity = 1 +
+	// MatsimRandom.getRandom().nextDouble()-0.25;
+	private final double disieredVelocity = 1.35 + MatsimRandom.getRandom().nextDouble() / 2 - 0.25;
+	private final double weight = 80 * 1000;// 1000*(90 +
+											// 40*MatsimRandom.getRandom().nextDouble()-20);
 
 	private Activity currentAct;
 
@@ -93,15 +96,14 @@ public class Agent2D  {
 
 	public void depart() {
 		this.actLegPointer++;
-		this.currentLeg = (LegImpl)this.currentPlan.getPlanElements().get(this.actLegPointer);
+		this.currentLeg = (LegImpl) this.currentPlan.getPlanElements().get(this.actLegPointer);
 		this.oldAct = this.currentAct;
 		this.currentAct = null;
-		this.currentNodeIndex  = 0;
+		this.currentNodeIndex = 0;
 		this.cacheRouteNodes = null;
 		this.state = AgentState.MOVING;
-		this.departed  = true;
+		this.departed = true;
 	}
-
 
 	public Link getCurrentLink() {
 		return this.currentLink;
@@ -124,19 +126,18 @@ public class Agent2D  {
 		return this.state;
 	}
 
-
 	public Link chooseNextLink() {
 		if (this.cacheRouteNodes == null) {
 			this.cacheRouteNodes = RouteUtils.getNodes((NetworkRoute) this.currentLeg.getRoute(), this.simulation.getNetwork());
 			this.currentNodeIndex = 1;
 		}
-		if (this.currentNodeIndex >= this.cacheRouteNodes.size() ) {
+		if (this.currentNodeIndex >= this.cacheRouteNodes.size()) {
 			this.actLegPointer++;
 			this.state = AgentState.ARRIVING;
 			this.currentLeg = null;
 			this.currentAct = (Activity) this.currentPlan.getPlanElements().get(this.actLegPointer);
 
-			for (Link link :  this.currentLink.getToNode().getOutLinks().values()) {
+			for (Link link : this.currentLink.getToNode().getOutLinks().values()) {
 				if (link.getId().equals(this.currentAct.getLinkId())) {
 					this.currentLink = link;
 				}
@@ -146,7 +147,7 @@ public class Agent2D  {
 
 		Node destNode = this.cacheRouteNodes.get(this.currentNodeIndex);
 
-		for (Link link :  this.currentLink.getToNode().getOutLinks().values()) {
+		for (Link link : this.currentLink.getToNode().getOutLinks().values()) {
 			if (link.getToNode() == destNode) {
 				this.currentNodeIndex++;
 				this.currentLink = link;
@@ -158,9 +159,9 @@ public class Agent2D  {
 	}
 
 	public boolean checkForActivityReached() {
-		if (this.position.distance(MGC.coord2Coordinate(this.currentAct.getCoord())) < ACTIVITY_DIST){
+		if (this.position.distance(MGC.coord2Coordinate(this.currentAct.getCoord())) < ACTIVITY_DIST) {
 			this.state = AgentState.ACTING;
-			if (this.actLegPointer < this.currentPlan.getPlanElements().size()-1) {
+			if (this.actLegPointer < this.currentPlan.getPlanElements().size() - 1) {
 				this.simulation.scheduleActivityEnd(this);
 			} else {
 				this.simulation.scheduleAgentRemove(this);
@@ -175,11 +176,13 @@ public class Agent2D  {
 	}
 
 	public boolean initialize() {
-		ActivityImpl firstAct = ((ActivityImpl)this.currentPlan.getPlanElements().get(this.actLegPointer));
+		ActivityImpl firstAct = ((ActivityImpl) this.currentPlan.getPlanElements().get(this.actLegPointer));
 		double departureTime = firstAct.getEndTime();
 		this.currentLink = this.simulation.getNetwork().getLinks().get(firstAct.getLinkId());
-//		this.position = new Coordinate(this.currentLink.getToNode().getCoord().getX(),this.currentLink.getToNode().getCoord().getY());
+		// this.position = new
+		// Coordinate(this.currentLink.getToNode().getCoord().getX(),this.currentLink.getToNode().getCoord().getY());
 		this.position = MGC.coord2Coordinate(firstAct.getCoord());
+		this.position.z = 0;
 		if ((departureTime != Time.UNDEFINED_TIME) && (this.currentPlan.getPlanElements().size() > 1)) {
 			this.currentAct = (Activity) this.currentPlan.getPlanElements().get(this.actLegPointer);
 			this.simulation.scheduleActivityEnd(this);
@@ -194,7 +197,7 @@ public class Agent2D  {
 	}
 
 	public double getWeight() {
-		return weight;
+		return this.weight;
 	}
 
 	public boolean departed() {
@@ -204,11 +207,11 @@ public class Agent2D  {
 		}
 		return false;
 	}
-	
+
 	public ArrayList<Agent2D> getNeighbors() {
 		return this.neighbors;
 	}
-	
+
 	public void setNeighbors(ArrayList<Agent2D> neighbors) {
 		this.neighbors = neighbors;
 	}

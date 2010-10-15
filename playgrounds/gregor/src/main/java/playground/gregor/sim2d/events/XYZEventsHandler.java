@@ -19,12 +19,10 @@
  * *********************************************************************** */
 package playground.gregor.sim2d.events;
 
-public interface XYZEventsHandler {
-	
-	
-	public void handleXYZEvent(XYZEvent e);
-	
-	
-	public void reset();
+import org.matsim.core.events.handler.EventHandler;
+
+public interface XYZEventsHandler extends EventHandler {
+
+	public void handleEvent(XYZAzimuthEvent event);
 
 }

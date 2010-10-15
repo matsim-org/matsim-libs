@@ -19,27 +19,32 @@
  * *********************************************************************** */
 package playground.gregor.snapshots.writers;
 
-import playground.gregor.sim2d.events.XYZEvent;
+import playground.gregor.sim2d.events.XYZAzimuthEvent;
 import playground.gregor.sim2d.events.XYZEventsHandler;
 
 public class XYZAzimuthSnapshotGenerator implements XYZEventsHandler {
 
-	private MVISnapshotWriter writer;
+	private final MVISnapshotWriter writer;
 
 	public XYZAzimuthSnapshotGenerator(MVISnapshotWriter writer) {
 		this.writer = writer;
 	}
 
 	@Override
-	public void handleXYZEvent(XYZEvent e) {
-		XYZAzimuthPositionInfo pos = new XYZAzimuthPositionInfo(e.getId(), e.getC(), e.getAzimuth(), e.getTime());
+	public void handleEvent(XYZAzimuthEvent e) {
+		XYZAzimuthPositionInfo pos = new XYZAzimuthPositionInfo(e.getPersonId(), e.getCoordinate(), e.getAzimuth(), e.getTime());
 		this.writer.addVehicle(e.getTime(), pos);
-		
+
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.matsim.core.events.handler.EventHandler#reset(int)
+	 */
 	@Override
-	public void reset() {
+	public void reset(int iteration) {
 		// TODO Auto-generated method stub
-		
+
 	}
 }

@@ -19,15 +19,16 @@
  * *********************************************************************** */
 package playground.gregor.sim2d.controller;
 
-
 import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.algorithms.EventWriterXML;
 
-import playground.gregor.sim2d.events.XYZEventsFileWriter;
 import playground.gregor.sim2d.events.XYZEventsGenerator;
 import playground.gregor.sim2d.events.XYZEventsManager;
 import playground.gregor.sim2d.peekabot.PeekABotClient;
@@ -44,39 +45,30 @@ import com.vividsolutions.jts.geom.MultiPolygon;
 
 public class Controller2D extends Controler {
 
-	private Map<MultiPolygon,List<Link>> mps;
-
+	private Map<MultiPolygon, List<Link>> mps;
 
 	private SegmentedStaticForceField sff;
 
-	
-	private boolean vis = false;
+	private final boolean vis = false;
 
 	private Sim2DVis sim2DVis = null;
 
-
 	private Map<Id, LineString> lsmp;
-
-
 
 	public Controller2D(String[] args) {
 		super(args);
-		this.setOverwriteFiles(true);
-
+		setOverwriteFiles(true);
 
 	}
-
-
-
 
 	@Override
 	protected void loadData() {
 		if (!this.scenarioLoaded) {
 			this.loader = new ScenarioLoader2DImpl(this.scenarioData);
 			this.loader.loadScenario();
-			this.mps = ((ScenarioLoader2DImpl)this.loader).getFloorLinkMapping();
-			this.sff = ((ScenarioLoader2DImpl)this.loader).getSegmentedStaticForceField();
-			this.lsmp = ((ScenarioLoader2DImpl)this.loader).getLsMap();
+			this.mps = ((ScenarioLoader2DImpl) this.loader).getFloorLinkMapping();
+			this.sff = ((ScenarioLoader2DImpl) this.loader).getSegmentedStaticForceField();
+			this.lsmp = ((ScenarioLoader2DImpl) this.loader).getLsMap();
 			this.network = this.loader.getScenario().getNetwork();
 			this.population = this.loader.getScenario().getPopulation();
 			this.scenarioLoaded = true;
@@ -99,35 +91,33 @@ public class Controller2D extends Controler {
 				if (coords[i].y < minY) {
 					minY = coords[i].y;
 				}
-				
+
 			}
-			
+
 		}
 		this.sim2DVis = new Sim2DVis(minX, minY);
 		this.sim2DVis.drawFloorPlans(this.mps);
-		
+
 	}
-
-
-
 
 	@Override
 	protected void runMobSim() {
-		
-		XYZEventsManager manager = new XYZEventsManager();
-		manager.addHandler(new XYZEventsFileWriter(getConfig().controler().getOutputDirectory()+ "/ITERS/it." + getIterationNumber() +"/" + getIterationNumber() +".xyzAzimuthEvents.xml.gz"));
+
+		EventsManager manager = new EventsManagerImpl();
+		EventWriterXML writer = new EventWriterXML(getConfig().controler().getOutputDirectory() + "/ITERS/it." + getIterationNumber() + "/" + getIterationNumber() + ".xyzAzimuthEvents.xml.gz");
+		manager.addHandler(writer);
 		XYZEventsGenerator gen = new XYZEventsGenerator(manager);
-		Sim2D sim = new Sim2D(this.network,this.mps,this.lsmp,this.population,this.events,this.sff, this.config);
+		Sim2D sim = new Sim2D(this.network, this.mps, this.lsmp, this.population, this.events, this.sff, this.config);
 		if (this.vis) {
-			sim.setSim2DVis(this.sim2DVis );
+			sim.setSim2DVis(this.sim2DVis);
 		}
 		sim.setXYZEventsManager(gen);
-//		}
+		// }
 		sim.run();
-		manager.reset();
+		writer.closeFile();
 	}
 
-	public static void main(String [] args){
+	public static void main(String[] args) {
 		Controler controller = new Controller2D(args);
 		controller.run();
 

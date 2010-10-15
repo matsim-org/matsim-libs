@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package playground.gregor.sim2d.events;
 
+import org.matsim.core.api.experimental.events.EventsManager;
+
 import playground.gregor.sim2d.simulation.Agent2D;
 import playground.gregor.sim2d.simulation.Floor;
 import playground.gregor.sim2d.simulation.Force;
@@ -26,32 +28,31 @@ import playground.gregor.sim2d.simulation.Network2D;
 
 public class XYZEventsGenerator {
 	private static final double TWO_PI = 2 * Math.PI;
-	private static final double PI_HALF =  Math.PI / 2;
-	private XYZEventsManager xyzEventsManager;
+	private static final double PI_HALF = Math.PI / 2;
 	private Network2D network2d;
-	
-	private final double interval = 1;    
-	private double oldtime = 0;
 
-	public XYZEventsGenerator(XYZEventsManager xyzEventsManager){
-		this.xyzEventsManager = xyzEventsManager;
-		
+	private final double interval = 1;
+	private double oldtime = 0;
+	private final EventsManager manager;
+
+	public XYZEventsGenerator(EventsManager manager) {
+		this.manager = manager;
+
 	}
-	
+
 	public void setNetwork2D(Network2D network2d) {
 		this.network2d = network2d;
 	}
-	
-	public void generateEvents(double time){
-		if (time < this.oldtime + interval) {
+
+	public void generateEvents(double time) {
+		if (time < this.oldtime + this.interval) {
 			return;
 		}
 		this.oldtime = time;
 		for (Floor floor : this.network2d.getFloors()) {
-			draw(floor,time);
-		}		
+			draw(floor, time);
+		}
 	}
-
 
 	private void draw(Floor floor, double time) {
 		for (Agent2D agent : floor.getAgents()) {
@@ -59,17 +60,17 @@ public class XYZEventsGenerator {
 			double alpha = getPhaseAngle(f);
 			alpha /= TWO_PI;
 			alpha *= 360;
-			XYZEvent e = new XYZEvent(agent.getId(),agent.getPosition(),alpha,time);
-			this.xyzEventsManager.processXYZEvent(e);
+			XYZAzimuthEvent e = new XYZAzimuthEventImpl(agent.getId(), agent.getPosition(), alpha, time);
+			this.manager.processEvent(e);
 		}
 	}
-	
+
 	private double getPhaseAngle(Force f) {
 		double alpha = 0.0;
 		if (f.getFx() > 0) {
-			alpha = Math.atan(f.getFy()/f.getFx());
+			alpha = Math.atan(f.getFy() / f.getFx());
 		} else if (f.getFx() < 0) {
-			alpha = Math.PI + Math.atan(f.getFy()/f.getFx());
+			alpha = Math.PI + Math.atan(f.getFy() / f.getFx());
 		} else { // i.e. DX==0
 			if (f.getFy() > 0) {
 				alpha = PI_HALF;
@@ -77,7 +78,8 @@ public class XYZEventsGenerator {
 				alpha = -PI_HALF;
 			}
 		}
-		if (alpha < 0.0) alpha += TWO_PI;
+		if (alpha < 0.0)
+			alpha += TWO_PI;
 		return alpha;
 	}
 

@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * XYZEvent.java
+ * XYZAzimuthEvent.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -19,39 +19,24 @@
  * *********************************************************************** */
 package playground.gregor.sim2d.events;
 
-import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.events.PersonEvent;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
-public class XYZEvent {
-	
-	private final Coordinate c;
-	final double time;
-	private final double azimuth;
-	private Id id;
+/**
+ * @author laemmel
+ * 
+ */
+public interface XYZAzimuthEvent extends PersonEvent {
 
-	public XYZEvent(Id id, Coordinate c, double azimuth, double time) {
-		this.id = id;
-		this.c = c;
-		this.azimuth = azimuth;
-		this.time = time;
-	}
+	public double getX();
 
-	public Coordinate getC() {
-		return c;
-	}
+	public double getY();
 
-	public double getAzimuth() {
-		return azimuth;
-	}
-	
-	public double getTime() {
-		return this.time;
-	}
+	public double getZ();
 
-	public Id getId() {
-		return this.id;
-	}
-	
+	public double getAzimuth();
 
+	// convenience method
+	public Coordinate getCoordinate();
 }
