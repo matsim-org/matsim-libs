@@ -60,8 +60,8 @@ public class QSimSignalEngine implements SignalEngine {
 				QLink link = net.getLinks().get(signal.getLinkId());
 				if (signal.getLaneIds() == null || signal.getLaneIds().isEmpty()){
 					QLinkImpl l = (QLinkImpl) link;
-					//TODO l.setSignalized()
-					signal.addSignalizeableItem((SignalizeableItem)l);
+					l.setSignalized(true);
+					signal.addSignalizeableItem(l);
 				}
 				else {
 					QLinkLanesImpl l = (QLinkLanesImpl) link;

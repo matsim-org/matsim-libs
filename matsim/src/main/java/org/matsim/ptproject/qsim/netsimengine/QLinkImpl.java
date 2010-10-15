@@ -45,6 +45,9 @@ import org.matsim.pt.qsim.TransitQLaneFeature;
 import org.matsim.ptproject.qsim.helpers.AgentSnapshotInfoBuilder;
 import org.matsim.ptproject.qsim.interfaces.QSimI;
 import org.matsim.ptproject.qsim.interfaces.QVehicle;
+import org.matsim.signalsystems.control.SignalGroupState;
+import org.matsim.signalsystems.mobsim.QSignalizedItem;
+import org.matsim.signalsystems.model.SignalizeableItem;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 import org.matsim.vis.snapshots.writers.VisData;
 
@@ -53,7 +56,7 @@ import org.matsim.vis.snapshots.writers.VisData;
  * @author dgrether
  * @author mrieser
  */
-public class QLinkImpl extends QLinkInternalI {
+public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 
 	// static variables (no problem with memory)
 	final private static Logger log = Logger.getLogger(QLinkImpl.class);
@@ -137,6 +140,14 @@ public class QLinkImpl extends QLinkInternalI {
 
 	private final TransitQLaneFeature transitQueueLaneFeature = new TransitQLaneFeature(this);
 	private double remainingInputFlowCap;
+	/**
+	 * null if the link is not signalized
+	 */
+	private QSignalizedItem qSignalizedItem = null;
+	/**
+	 * true, i.e. green, if the link is not signalized
+	 */
+	private boolean thisTimeStepGreen = true;
 
 	/**
 	 * Initializes a QueueLink with one QueueLane.
@@ -296,7 +307,7 @@ public class QLinkImpl extends QLinkInternalI {
 			this.remainingInputFlowCap = Math.ceil( 2.*this.flowCapacityPerTimeStep ); // make sure this is at least one
 			//			log.warn( " inputFlowCap: " + this.inputFlowCap ) ;
 		}
-		if (this.buffercap_accumulate < 1.0) {
+		if (this.thisTimeStepGreen && this.buffercap_accumulate < 1.0) {
 			this.buffercap_accumulate += this.flowCapFractionCache;
 		}
 	}
@@ -688,10 +699,32 @@ public class QLinkImpl extends QLinkInternalI {
 	}
 
 	@Override
-	public boolean hasGreenForToLink(@SuppressWarnings("unused") Id toLinkId){
-		return true;
+	public boolean hasGreenForToLink(Id toLinkId){
+		if (this.qSignalizedItem != null){
+			return this.qSignalizedItem.isLinkGreenForToLink(toLinkId);
+		}
+		return true; //the lane is not signalized and thus always green
 	}
 
+	@Override
+	public void setSignalStateAllTurningMoves(SignalGroupState state) {
+		this.qSignalizedItem.setSignalStateAllTurningMoves(state);
+		this.thisTimeStepGreen  = this.qSignalizedItem.isLinkGreen();
+	}
+
+	@Override
+	public void setSignalStateForTurningMove(SignalGroupState state, Id toLinkId) {
+		if (!this.getToQueueNode().getNode().getOutLinks().containsKey(toLinkId)){
+			throw new IllegalArgumentException("ToLink " + toLinkId + " is not reachable from QLink Id " + this.getLink().getId());
+		}
+		this.qSignalizedItem.setSignalStateForTurningMove(state, toLinkId);
+		this.thisTimeStepGreen = this.qSignalizedItem.isLinkGreen();
+	}
+
+	@Override
+	public void setSignalized(boolean isSignalized) {
+		this.qSignalizedItem  = new QSignalizedItem(this.getLink().getToNode().getOutLinks().keySet());
+	}
 
 
 	/**
@@ -741,4 +774,5 @@ public class QLinkImpl extends QLinkInternalI {
 			this.earliestLinkEndTime = earliestLinkEndTime;
 		}
 	}
+
 }
