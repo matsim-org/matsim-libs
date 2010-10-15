@@ -26,28 +26,24 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.matsim.signalsystems.MatsimSignalSystemsReader;
-import org.matsim.signalsystems.data.signalsystems.v20.SignalData;
-import org.matsim.signalsystems.data.signalsystems.v20.SignalDataImpl;
-import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemDataImpl;
-import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsData;
-import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemData;
-import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsWriter20;
-
-import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsDataImpl;
-import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsReader20;
-import org.xml.sax.SAXException;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.signalsystems.MatsimSignalSystemsReader;
+import org.matsim.signalsystems.data.signalsystems.v20.SignalData;
+import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemData;
+import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsData;
+import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsDataImpl;
+import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsReader20;
+import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsWriter20;
+import org.xml.sax.SAXException;
 
 import playground.joschka.lsacvs2kml.LinkConversionsData;
-
-import java.util.HashMap;
-import java.util.Map;
 
 
 public class SignalSystemsLinkConverter {
@@ -66,10 +62,10 @@ public static void main (String args0[]) throws JAXBException, SAXException, Par
 	for (SignalSystemData ssd : ssdata.getSignalSystemData().values()){
 		//if (convmap.get(ssd.getId())!=null){
 		try {
-		SignalSystemData nssd = new SignalSystemDataImpl(ssd.getId());
+		SignalSystemData nssd = newssdata.getFactory().createSignalSystemData(ssd.getId());
 		for (SignalData sd : ssd.getSignalData().values()){
 			
-			SignalData nsd = new SignalDataImpl(sd.getId());
+			SignalData nsd = newssdata.getFactory().createSignalData(sd.getId());
 			nsd.setLinkId(convmap.get(ssd.getId()).getConv(sd.getLinkId()));
 			System.out.println(nsd.getLinkId());
 			/*for (Id tmr : sd.getTurningMoveRestrictions()){
