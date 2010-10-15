@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AmberTimes
+ * AmberTimesDataFactory
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,37 +19,16 @@
  * *********************************************************************** */
 package org.matsim.signalsystems.data.ambertimes.v10;
 
-import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.internal.MatsimToplevelContainer;
+import org.matsim.core.api.internal.MatsimFactory;
 
 
 /**
  * @author dgrether
  *
  */
-public interface AmberTimesData extends MatsimToplevelContainer {
-	
-	public AmberTimesDataFactory getFactory();
-	
-	public Double getDefaultAmberTimeGreen();
-	
-	public Integer getDefaultRedAmber();
-	
-	public Integer getDefaultAmber();
-	
-	
-	public Map<Id, AmberTimeData> getAmberTimeDataBySystemId();
-	
-	public void addAmberTimeData(AmberTimeData amberTimeData);
-	
-	public void setDefaultRedAmber(Integer seconds);
-	
-	public void setDefaultAmber(Integer seconds);
-	
-	public void setDefaultAmberTimeGreen(Double proportion);
-	
-	public void setFactory(AmberTimesDataFactory factory);
-}
+public interface AmberTimesDataFactory extends MatsimFactory {
 
+	public AmberTimeData createAmberTimeData(Id signalSystemId);
+	
+}

@@ -33,6 +33,7 @@ public class AmberTimesDataImpl implements AmberTimesData {
 	private Double defaultAmberTimeGreen;
 	private Integer globalDefaultAmberTime;
 	private Integer globalDefaultRedAmberTime;
+	private AmberTimesDataFactory factory = new AmberTimesDataFactoryImpl();
 
 	
 	
@@ -74,6 +75,16 @@ public class AmberTimesDataImpl implements AmberTimesData {
 	@Override
 	public void setDefaultRedAmber(Integer seconds) {
 		this.globalDefaultRedAmberTime=seconds;
+	}
+
+	@Override
+	public AmberTimesDataFactory getFactory() {
+		return this.factory ;
+	}
+
+	@Override
+	public void setFactory(AmberTimesDataFactory factory) {
+		this.factory = factory;
 	}
 
 }

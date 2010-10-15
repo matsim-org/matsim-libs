@@ -37,7 +37,7 @@ public class AmberTimeDataImpl implements AmberTimeData {
 	private Map<Id, Integer> signalRedAmberMap;
 	private Id signalSystemId;
 
-	public AmberTimeDataImpl(Id signalSystemId) {
+	AmberTimeDataImpl(Id signalSystemId) {
 		this.signalSystemId = signalSystemId;
 		signalAmberMap = new HashMap<Id, Integer>();
 		signalRedAmberMap = new HashMap<Id, Integer>();
