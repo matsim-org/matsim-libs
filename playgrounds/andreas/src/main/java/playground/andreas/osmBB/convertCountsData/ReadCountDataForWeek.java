@@ -47,7 +47,7 @@ private static final Logger log = Logger.getLogger(ReadCountDataForWeek.class);
 				tempBuffer.append(string);
 				tempBuffer.append(", ");
 			}
-			log.info("Ignoring: " + tempBuffer);
+//			log.info("Ignoring: " + tempBuffer);
 		} else if(row.length == 11){
 			if(row[0].equalsIgnoreCase(this.startTag)){
 				if(row[1].contains("Tages") || row[1].contains("spitze")){
@@ -56,7 +56,7 @@ private static final Logger log = Logger.getLogger(ReadCountDataForWeek.class);
 						tempBuffer.append(string);
 						tempBuffer.append(", ");
 					}
-					log.info("Reading data for: " + tempBuffer);
+//					log.info("Reading data for: " + tempBuffer);
 				} else {
 					this.count.createVolume(Integer.parseInt(row[1]) + 1, Double.parseDouble(row[2]));
 				}

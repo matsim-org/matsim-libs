@@ -36,7 +36,7 @@ public class ConvertTSV2Counts {
 
 	public static void main(String[] args) {
 
-		String workingDir = "F:\\vkrz_counts_convert\\";
+		String workingDir = "F:\\bln_counts\\";
 		String startTag = "Di-Do";
 		String countStationsFileName = workingDir + "DZS-Koordinaten_AN.csv";
 		String countsOutFile = workingDir + startTag + "_counts.xml";
