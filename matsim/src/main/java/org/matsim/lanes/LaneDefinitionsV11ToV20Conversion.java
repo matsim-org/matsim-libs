@@ -56,6 +56,8 @@ import org.matsim.signalsystems.CalculateAngle;
  */
 public class LaneDefinitionsV11ToV20Conversion {
 	
+//	private static final Logger log = Logger.getLogger(LaneDefinitionsV11ToV20Conversion.class);
+	
 	public LaneDefinitions convertTo20(LaneDefinitions lanedefs11, Network network) {
 		LaneDefinitions lanedefs20 = new LaneDefinitionsImpl();
 		LaneDefinitionsFactory lanedefs20fac = lanedefs20.getFactory();
@@ -130,7 +132,7 @@ public class LaneDefinitionsV11ToV20Conversion {
 			for (Link outlink : outLinksByAngle.values()){
 //				log.info("Outlink: " + outlink.getId());
 				for (Lane oldLane : l2l.getLanes().values()){
-//					log.info("lane: " + l.getId());
+//					log.info("lane: " + oldLane.getId());
 					if (assignedLanes.contains(oldLane)){
 						continue;
 					}
@@ -160,6 +162,7 @@ public class LaneDefinitionsV11ToV20Conversion {
 	private void addUTurn(Link link, Lane newLane) {
 		for (Link outLink : link.getToNode().getOutLinks().values()) {
 			if ((outLink.getToNode().equals(link.getFromNode()))) {
+//				log.info("Added uturn, i.e. turning move from link " + link.getId() + " lane " + newLane.getId() + " to link " + outLink.getId());
 				newLane.addToLinkId(outLink.getId());
 			}
 		}
