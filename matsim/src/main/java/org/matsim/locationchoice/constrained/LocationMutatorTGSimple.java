@@ -23,6 +23,7 @@ package org.matsim.locationchoice.constrained;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Coord;
@@ -35,7 +36,6 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -51,11 +51,23 @@ public class LocationMutatorTGSimple extends LocationMutator {
 	protected int unsuccessfullLC = 0;
 	private final DefineFlexibleActivities defineFlexibleActivities;
 
+	/**
+	 * @deprecated  Please use RandomLocationMutator(..., Random random) for deterministic results in multithreated replanning
+	 */
+	@Deprecated
 	public LocationMutatorTGSimple(final Network network, Controler controler, Knowledges knowledges,
 			TreeMap<String, QuadTreeRing<ActivityFacility>> quad_trees,
 			TreeMap<String, ActivityFacilityImpl []> facilities_of_type) {
 
 		super(network, controler, knowledges, quad_trees, facilities_of_type);
+		this.defineFlexibleActivities = new DefineFlexibleActivities(this.knowledges, controler.getConfig().locationchoice());
+	}
+	
+	public LocationMutatorTGSimple(final Network network, Controler controler, Knowledges knowledges,
+			TreeMap<String, QuadTreeRing<ActivityFacility>> quad_trees,
+			TreeMap<String, ActivityFacilityImpl []> facilities_of_type, Random random) {
+
+		super(network, controler, knowledges, quad_trees, facilities_of_type, random);
 		this.defineFlexibleActivities = new DefineFlexibleActivities(this.knowledges, controler.getConfig().locationchoice());
 	}
 
@@ -135,7 +147,7 @@ public class LocationMutatorTGSimple extends LocationMutator {
 
 		ActivityFacility facility = null;
 		if (facilitySet.size() > 1) {
-			facility = facilitySet.get(MatsimRandom.getRandom().nextInt(facilitySet.size()));
+			facility = facilitySet.get(super.random.nextInt(facilitySet.size()));
 		}
 		else {
 			return false;

@@ -33,6 +33,7 @@ import org.matsim.core.config.groups.LocationChoiceConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.knowledges.Knowledges;
@@ -143,18 +144,18 @@ public class LocationChoice extends AbstractMultithreadedModule {
 	public PlanAlgorithm getPlanAlgoInstance() {
 		if (!this.constrained) {
 			this.planAlgoInstances.add(new RandomLocationMutator(this.network, this.controler, this.knowledges,
-					this.quadTreesOfType, this.facilitiesOfType));
+					this.quadTreesOfType, this.facilitiesOfType, MatsimRandom.getLocalInstance()));
 		}
 		else {
 			// only moving one flexible activity
 			if (this.controler.getConfig().locationchoice().getSimpleTG().equals("true")) {
 				this.planAlgoInstances.add(new LocationMutatorTGSimple(this.network, this.controler, this.knowledges,
-					this.quadTreesOfType, this.facilitiesOfType));
+					this.quadTreesOfType, this.facilitiesOfType, MatsimRandom.getLocalInstance()));
 			}
 			else {
 				// computing new chain of flexible activity
 				this.planAlgoInstances.add(new LocationMutatorwChoiceSet(this.network, this.controler,  this.knowledges,
-				this.quadTreesOfType, this.facilitiesOfType));
+				this.quadTreesOfType, this.facilitiesOfType, MatsimRandom.getLocalInstance()));
 			}
 		}
 		return this.planAlgoInstances.get(this.planAlgoInstances.size()-1);

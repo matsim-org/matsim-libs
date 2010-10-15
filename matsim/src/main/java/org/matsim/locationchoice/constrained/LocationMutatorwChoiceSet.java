@@ -23,6 +23,7 @@ package org.matsim.locationchoice.constrained;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Coord;
@@ -34,7 +35,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -51,6 +51,10 @@ public class LocationMutatorwChoiceSet extends LocationMutator {
 	private double recursionTravelSpeed = 30.0;
 	protected int maxRecursions = 10;
 
+	/**
+	 * @deprecated  Please use LocationMutatorwChoiceSet(..., Random random) for deterministic results in multithreated replanning
+	 */
+	@Deprecated
 	public LocationMutatorwChoiceSet(final Network network, Controler controler, Knowledges kn,
 			TreeMap<String, QuadTreeRing<ActivityFacility>> quad_trees,
 			TreeMap<String, ActivityFacilityImpl []> facilities_of_type) {
@@ -60,8 +64,28 @@ public class LocationMutatorwChoiceSet extends LocationMutator {
 		this.recursionTravelSpeed = Double.parseDouble(this.config.getRecursionTravelSpeed());
 	}
 
+	/**
+	 * @deprecated  Please use LocationMutatorwChoiceSet(..., Random random) for deterministic results in multithreated replanning
+	 */
+	@Deprecated
 	public LocationMutatorwChoiceSet(final Network network, Controler controler, Knowledges kn) {
 		super(network, controler, kn);
+		this.recursionTravelSpeedChange = Double.parseDouble(this.config.getRecursionTravelSpeedChange());
+		this.maxRecursions = Integer.parseInt(this.config.getMaxRecursions());
+		this.recursionTravelSpeed = Double.parseDouble(this.config.getRecursionTravelSpeed());
+	}
+	
+	public LocationMutatorwChoiceSet(final Network network, Controler controler, Knowledges kn,
+			TreeMap<String, QuadTreeRing<ActivityFacility>> quad_trees,
+			TreeMap<String, ActivityFacilityImpl []> facilities_of_type, Random random) {
+		super(network, controler, kn, quad_trees, facilities_of_type, random);
+		this.recursionTravelSpeedChange = Double.parseDouble(this.config.getRecursionTravelSpeedChange());
+		this.maxRecursions = Integer.parseInt(this.config.getMaxRecursions());
+		this.recursionTravelSpeed = Double.parseDouble(this.config.getRecursionTravelSpeed());
+	}
+
+	public LocationMutatorwChoiceSet(final Network network, Controler controler, Knowledges kn, Random random) {
+		super(network, controler, kn, random);
 		this.recursionTravelSpeedChange = Double.parseDouble(this.config.getRecursionTravelSpeedChange());
 		this.maxRecursions = Integer.parseInt(this.config.getMaxRecursions());
 		this.recursionTravelSpeed = Double.parseDouble(this.config.getRecursionTravelSpeed());
@@ -167,7 +191,7 @@ public class LocationMutatorwChoiceSet extends LocationMutator {
 		if (choiceSet.size()>1) {
 			//final Facility facility=(Facility)choiceSet.toArray()[
            	//		           MatsimRandom.random.nextInt(choiceSet.size())];
-			final ActivityFacility facility = choiceSet.get(MatsimRandom.getRandom().nextInt(choiceSet.size()));
+			final ActivityFacility facility = choiceSet.get(super.random.nextInt(choiceSet.size()));
 
 			act.setFacilityId(facility.getId());
        		act.setLinkId(((NetworkImpl) this.network).getNearestLink(facility.getCoord()).getId());

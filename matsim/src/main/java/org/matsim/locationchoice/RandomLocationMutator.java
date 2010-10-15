@@ -21,6 +21,7 @@
 package org.matsim.locationchoice;
 
 import java.util.List;
+import java.util.Random;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.network.Network;
@@ -29,7 +30,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.knowledges.Knowledges;
@@ -40,15 +40,34 @@ import org.matsim.locationchoice.utils.QuadTreeRing;
  */
 public class RandomLocationMutator extends LocationMutator {
 
+	/**
+	 * @deprecated  Please use RandomLocationMutator(..., Random random) for deterministic results in multithreated replanning
+	 */
+	@Deprecated
 	public RandomLocationMutator(final Network network, Controler controler, Knowledges kn) {
 		super(network, controler, kn);
 	}
-
+	
+	/**
+	 * @deprecated  Please use RandomLocationMutator(..., Random random) for deterministic results in multithreated replanning
+	 */
+	@Deprecated
 	public RandomLocationMutator(final Network network, Controler controler, Knowledges kn,
 			TreeMap<String, QuadTreeRing<ActivityFacility>> quad_trees,
 			TreeMap<String, ActivityFacilityImpl []> facilities_of_type) {
 		super(network, controler, kn, quad_trees, facilities_of_type);
 	}
+	
+	public RandomLocationMutator(final Network network, Controler controler, Knowledges kn, Random random) {
+		super(network, controler, kn, random);
+	}
+	
+	public RandomLocationMutator(final Network network, Controler controler, Knowledges kn,
+			TreeMap<String, QuadTreeRing<ActivityFacility>> quad_trees,
+			TreeMap<String, ActivityFacilityImpl []> facilities_of_type, Random random) {
+		super(network, controler, kn, quad_trees, facilities_of_type, random);
+	}
+	
 
 	/*
 	 * For all secondary activities of the plan chose randomly a new facility which provides
@@ -108,7 +127,7 @@ public class RandomLocationMutator extends LocationMutator {
 	}
 
 	private void setNewLocationForAct(ActivityImpl act, int length) {
-		ActivityFacilityImpl facility = this.facilitiesOfType.get(act.getType())[MatsimRandom.getRandom().nextInt(length)];
+		ActivityFacilityImpl facility = this.facilitiesOfType.get(act.getType())[super.random.nextInt(length)];
 		act.setFacilityId(facility.getId());
 		act.setLinkId(((NetworkImpl) this.network).getNearestLink(facility.getCoord()).getId());
 		act.setCoord(facility.getCoord());

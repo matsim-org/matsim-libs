@@ -21,6 +21,7 @@
 package org.matsim.locationchoice;
 
 import java.util.List;
+import java.util.Random;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.network.Network;
@@ -55,9 +56,14 @@ public abstract class LocationMutator extends AbstractPersonAlgorithm implements
 	protected DefineFlexibleActivities defineFlexibleActivities;
 	protected boolean locationChoiceBasedOnKnowledge = true;
 	protected Knowledges knowledges = null;
+	protected Random random = new Random(4711);
 
 	// ----------------------------------------------------------
-
+	
+	/**
+	 * @deprecated  Please use LocationMutator(..., Random random) for deterministic results in multithreated replanning
+	 */
+	@Deprecated
 	public LocationMutator(final Network network, final Controler controler, final Knowledges kn) {
 		this.knowledges = kn;
 		this.defineFlexibleActivities = new DefineFlexibleActivities(this.knowledges, controler.getConfig().locationchoice());
@@ -66,8 +72,11 @@ public abstract class LocationMutator extends AbstractPersonAlgorithm implements
 		this.config = controler.getConfig().locationchoice();
 		this.initLocal(network, controler);
 	}
-
-
+	
+	/**
+	 * @deprecated  Please use LocationMutator(..., Random random) for deterministic results in multithreated replanning
+	 */
+	@Deprecated
 	public LocationMutator(final Network network, final Controler controler, final Knowledges kn,
 			TreeMap<String, QuadTreeRing<ActivityFacility>> quad_trees,
 			TreeMap<String, ActivityFacilityImpl []> facilities_of_type) {
@@ -82,6 +91,20 @@ public abstract class LocationMutator extends AbstractPersonAlgorithm implements
 			locationChoiceBasedOnKnowledge = false;
 		}
 	}
+	
+	public LocationMutator(final Network network, final Controler controler, final Knowledges kn, Random random) {
+		this(network, controler, kn);
+		this.random = random;
+	}
+	
+	public LocationMutator(final Network network, final Controler controler, final Knowledges kn,
+			TreeMap<String, QuadTreeRing<ActivityFacility>> quad_trees,
+			TreeMap<String, ActivityFacilityImpl []> facilities_of_type, Random random) {
+		
+		this(network, controler, kn, quad_trees, facilities_of_type);
+		this.random = random;
+	}
+	
 
 	private void initLocal(final Network network, Controler controler) {
 
