@@ -64,49 +64,6 @@ public class WithinDayQSim extends QSim {
 //		return super.activityEndsList;
 //	}
 	
-	/*
-	 * - Remove Agent from the ActivityEndsList.
-	 * - Recalculate the DepartureTime from the currently performed Activity
-	 *   (>= now). The EndTime of the Activity must have been already adapted.
-	 * - Add Agent to the ActivityEndsList. This will ensure that the Agent
-	 *   is placed at the correct place because the List is a PriorityQueue ordered
-	 *   by the DepartureTimes.
-	 */
-	public void rescheduleActivityEnd(double now, WithinDayPersonAgent withinDayPersonAgent) {
-//		boolean removed = this.getActivityEndsList().remove(withinDayPersonAgent);
-		boolean found = this.getActivityEndsList().contains( withinDayPersonAgent ) ;
-
-		// If the agent is not in the activityEndsList return without doing anything else.
-//		if (!removed) return;
-		if ( !found ) return ;
-		
-		double oldTime = withinDayPersonAgent.getDepartureTime() ;
-		
-		PlanElement planElement = withinDayPersonAgent.getCurrentPlanElement();
-		if (planElement instanceof Activity) {
-			ActivityImpl act = (ActivityImpl) planElement;
-			
-			withinDayPersonAgent.calculateDepartureTime(act);
-		} 
-		// yyyy can this situation really occur (Agent is in the ActivityEndsList but not performing an Activity)? christoph, oct'10
-		else log.warn("Cannot reset Activity Departure Time - Agent is currently performing a Leg. " + withinDayPersonAgent.getPerson().getId());
-		
-		/*
-		 * Check whether it is the last Activity. If true, only remove it 
-		 * from the ActivityEndsList and decrease the living counter.
-		 * Otherwise reschedule the Activity by adding it again to the ActivityEndsList.
-		 */
-//		Activity currentActivity = withinDayPersonAgent.getCurrentActivity();		
-//		List<PlanElement> planElements = withinDayPersonAgent.getPerson().getSelectedPlan().getPlanElements();
-//		if (planElements.size() - 1 == planElements.indexOf(currentActivity)) {
-//			// This is the last activity, therefore remove the agent from the simulation
-//			this.getAgentCounter().decLiving();
-//		}
-//		else {
-//			this.getActivityEndsList().add(withinDayPersonAgent);
-//		}
-		super.rescheduleActivityEnd(withinDayPersonAgent, oldTime, withinDayPersonAgent.getDepartureTime() ) ;
-	}
 	
 	@Override
 	public void setAgentFactory(AgentFactory factory) {

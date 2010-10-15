@@ -24,15 +24,18 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.ptproject.qsim.helpers.DefaultPersonDriverAgent;
 import org.matsim.ptproject.qsim.interfaces.QSimI;
 
 import playground.christoph.withinday.replanning.WithinDayReplanner;
 
 public class WithinDayPersonAgent extends DefaultPersonDriverAgent {
+	private static final Logger log = Logger.getLogger("dummy");
 
 	private List<WithinDayReplanner> withinDayReplanner = new ArrayList<WithinDayReplanner>();
 	private WithinDayQSim simulation;
@@ -55,9 +58,52 @@ public class WithinDayPersonAgent extends DefaultPersonDriverAgent {
 //		super.cachedNextLinkId = null;
 //	}
 	
-	public void rescheduleCurrentActivity(double now) {
-		this.simulation.rescheduleActivityEnd(now, this);
+	public void rescheduleCurrentActivity() {
+//		this.simulation.rescheduleActivityEnd(this);
 		
+		/*
+		 * - Remove Agent from the ActivityEndsList.
+		 * - Recalculate the DepartureTime from the currently performed Activity
+		 *   (>= now). The EndTime of the Activity must have been already adapted.
+		 * - Add Agent to the ActivityEndsList. This will ensure that the Agent
+		 *   is placed at the correct place because the List is a PriorityQueue ordered
+		 *   by the DepartureTimes.
+		 */
+//		public void rescheduleActivityEnd(WithinDayPersonAgent withinDayPersonAgent) {
+//			boolean removed = this.getActivityEndsList().remove(withinDayPersonAgent);
+			boolean found = this.simulation.getActivityEndsList().contains( this ) ;
+
+			// If the agent is not in the activityEndsList return without doing anything else.
+//			if (!removed) return;
+			if ( !found ) return ;
+			
+			double oldTime = this.getDepartureTime() ;
+			
+			PlanElement planElement = this.getCurrentPlanElement();
+			if (planElement instanceof Activity) {
+				ActivityImpl act = (ActivityImpl) planElement;
+				
+				this.calculateDepartureTime(act);
+			} 
+			// yyyy can this situation really occur (Agent is in the ActivityEndsList but not performing an Activity)? christoph, oct'10
+			else log.warn("Cannot reset Activity Departure Time - Agent is currently performing a Leg. " + this.getPerson().getId());
+			
+			/*
+			 * Check whether it is the last Activity. If true, only remove it 
+			 * from the ActivityEndsList and decrease the living counter.
+			 * Otherwise reschedule the Activity by adding it again to the ActivityEndsList.
+			 */
+//			Activity currentActivity = withinDayPersonAgent.getCurrentActivity();		
+//			List<PlanElement> planElements = withinDayPersonAgent.getPerson().getSelectedPlan().getPlanElements();
+//			if (planElements.size() - 1 == planElements.indexOf(currentActivity)) {
+//				// This is the last activity, therefore remove the agent from the simulation
+//				this.getAgentCounter().decLiving();
+//			}
+//			else {
+//				this.getActivityEndsList().add(withinDayPersonAgent);
+//			}
+			this.simulation.rescheduleActivityEnd(this, oldTime, this.getDepartureTime() ) ;
+
 //		resetActivityDepartureTime(time);
 //
 //		simulation.getActivityEndsList().remove(this);

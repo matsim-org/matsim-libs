@@ -119,7 +119,7 @@ public class EndActivityAndEvacuateReplanner extends WithinDayDuringActivityRepl
 		 * Reschedule the currently performed Activity in the QSim - there
 		 * the activityEndsList has to be updated.
 		 */
-		withinDayPersonAgent.rescheduleCurrentActivity(time);
+		withinDayPersonAgent.rescheduleCurrentActivity();
 		
 		return true;
 	}

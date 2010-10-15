@@ -90,7 +90,7 @@ public class ExtendCurrentActivityReplanner extends WithinDayDuringActivityRepla
 		 * Reschedule the currently performed Activity in the QSim - there
 		 * the activityEndsList has to be updated.
 		 */
-		withinDayPersonAgent.rescheduleCurrentActivity(time);
+		withinDayPersonAgent.rescheduleCurrentActivity();
 		
 //		PopulationFactory factory = scenario.getPopulation().getFactory();
 //		
