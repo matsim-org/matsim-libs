@@ -39,6 +39,15 @@ public class Count {
 		this.stationName = stationName;
 	}
 
+	/**
+	 * Creates and adds a {@link Volume} to the {@link Count}ing station.
+	 * @param h indicating the hour-of-day. <b><i>Note: the hours for a counting 
+	 * 		station must be from 1-24, and <b><i>not</i></b> from 0-23, 
+	 * 		otherwise the {@link MatsimCountsReader} will throw an error.
+	 * 		</i></b>
+	 * @param val the total number of vehicles counted during hour <code>h</code>.
+	 * @return the {@link Count}ing station's {@link Volume}.
+	 */
 	public final Volume createVolume(final int h, final double val) {
 		// overkill?
 		Volume v = new Volume(h,val);
