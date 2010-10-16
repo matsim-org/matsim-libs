@@ -22,13 +22,17 @@ package playground.gregor.sim2d_v2.simulation;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Queue;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.ControlerIO;
 import org.matsim.core.events.EventsManagerImpl;
@@ -44,6 +48,7 @@ import org.matsim.ptproject.qsim.helpers.AgentCounter;
 import org.matsim.ptproject.qsim.helpers.DefaultPersonDriverAgent;
 import org.matsim.ptproject.qsim.helpers.QSimTimer;
 import org.matsim.ptproject.qsim.interfaces.AgentCounterI;
+import org.matsim.ptproject.qsim.interfaces.DepartureHandler;
 import org.matsim.ptproject.qsim.interfaces.QNetworkI;
 import org.matsim.ptproject.qsim.interfaces.QSimI;
 import org.matsim.ptproject.qsim.interfaces.SimTimerI;
@@ -89,6 +94,8 @@ public class Sim2D implements QSimI {
 
 	private Integer iterationNumber = null;
 
+	private final List<DepartureHandler> departureHandlers = new ArrayList<DepartureHandler>();
+
 	public Sim2D(EventsManagerImpl events, Scenario2DImpl scenario2DData) {
 		this(events, scenario2DData, new DefaultSim2DEngineFactory());
 	}
@@ -115,9 +122,11 @@ public class Sim2D implements QSimI {
 
 		// create Sim2DEngine
 		this.sim2DEngine = factory.createSim2DEngine(this, MatsimRandom.getRandom());
-		this.agentFactory = new Agent2DFactory();
+		this.agentFactory = new Agent2DFactory(this);
 
-		// TODO may be we have to create a departure handler somewhere here
+		// TODO may be we have to create a departure handler somewhere here? --
+		// yes we do!
+		this.departureHandlers.add(new Sim2DDepartureHandler(this));
 
 	}
 
@@ -167,14 +176,13 @@ public class Sim2D implements QSimI {
 			if (doContinue) {
 				time = this.simTimer.incrementTime();
 			}
-			this.listenerManager.fireQueueSimulationBeforeCleanupEvent();
-			cleanupSim(time);
-
-			// delete reference to clear memory
-			this.listenerManager = null;
 
 		}
 
+		this.listenerManager.fireQueueSimulationBeforeCleanupEvent();
+		cleanupSim(time);
+		// delete reference to clear memory
+		this.listenerManager = null;
 	}
 
 	/**
@@ -326,9 +334,41 @@ public class Sim2D implements QSimI {
 	 * .mobsim.framework.PersonAgent, org.matsim.api.core.v01.Id)
 	 */
 	@Override
-	public void agentDeparts(PersonAgent personAgent, Id startLinkId) {
-		throw new RuntimeException("not (yet) implemented!");
+	public void agentDeparts(PersonAgent agent, Id linkId) {
+		double now = getSimTimer().getTimeOfDay();
+		Leg leg = agent.getCurrentLeg();
+		// Route route = leg.getRoute();
+		String mode = leg.getMode();
+		this.events.processEvent(this.events.getFactory().createAgentDepartureEvent(now, agent.getPerson().getId(), linkId, mode));
+		if (handleKnownLegModeDeparture(now, agent, linkId, leg)) {
+			return;
+		} else {
+			throw new RuntimeException("not (yet) implemented!");
+		}
 
+	}
+
+	/**
+	 * @param now
+	 * @param agent
+	 * @param linkId
+	 * @param leg
+	 * @return
+	 */
+	private boolean handleKnownLegModeDeparture(double now, PersonAgent agent, Id linkId, Leg leg) {
+		for (DepartureHandler departureHandler : this.departureHandlers) {
+			if (departureHandler.handleDeparture(now, agent, linkId, leg)) {
+				return true;
+			}
+			// The code is not (yet?) very
+			// beautiful. But structurally, this goes through all departure
+			// handlers and tries to
+			// find one that feels responsible. If it feels responsible, it
+			// returns true, and so this method returns true.
+			// Otherwise, this method will return false, and then teleportation
+			// will be called. kai, jun'10
+		}
+		return false;
 	}
 
 	/*
@@ -338,7 +378,7 @@ public class Sim2D implements QSimI {
 	 */
 	@Override
 	public AgentCounterI getAgentCounter() {
-		throw new RuntimeException("not (yet) implemented!");
+		return this.agentCounter;
 	}
 
 	/*
@@ -379,8 +419,34 @@ public class Sim2D implements QSimI {
 	 * .core.mobsim.framework.PersonAgent)
 	 */
 	@Override
-	public void scheduleActivityEnd(PersonAgent personAgent) {
-		throw new RuntimeException("not (yet) implemented!");
+	public void scheduleActivityEnd(PersonAgent agent) {
+		// yy can't make this final since it is overwritten by christoph. kai,
+		// oct'10
+		this.activityEndsList.add(agent);
+		registerAgentAtActivityLocation(agent);
+
+	}
+
+	/**
+	 * @param agent
+	 */
+	private void registerAgentAtActivityLocation(PersonAgent agent) {
+		// if the "activities" engine were separate, this would need to be
+		// public. kai, aug'10
+		if (agent instanceof DefaultPersonDriverAgent) { // yyyyyy is this
+			// necessary?
+			// DefaultPersonDriverAgent pa = (DefaultPersonDriverAgent) agent;
+			PlanElement pe = agent.getCurrentPlanElement();
+			if (pe instanceof Leg) {
+				throw new RuntimeException();
+			} else {
+				Activity act = (Activity) pe;
+				Id linkId = act.getLinkId();
+				Floor f = this.sim2DEngine.getFloor(linkId);
+				f.addAgent((Agent2D) agent);
+
+			}
+		}
 
 	}
 
@@ -445,5 +511,13 @@ public class Sim2D implements QSimI {
 	@Override
 	public QNetworkI getQNetwork() {
 		throw new RuntimeException("not implemented");
+	}
+
+	/**
+	 * 
+	 */
+	public Sim2DEngine getSim2DEngine() {
+		return this.sim2DEngine;
+
 	}
 }

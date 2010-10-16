@@ -22,6 +22,7 @@ package playground.gregor.sim2d_v2.simulation;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.internal.MatsimFactory;
 import org.matsim.ptproject.qsim.helpers.DefaultPersonDriverAgent;
+import org.matsim.ptproject.qsim.interfaces.QSimI;
 
 /**
  * @author laemmel
@@ -29,12 +30,18 @@ import org.matsim.ptproject.qsim.helpers.DefaultPersonDriverAgent;
  */
 public class Agent2DFactory implements MatsimFactory {
 
+	private final QSimI sim;
+
+	public Agent2DFactory(QSimI sim) {
+		this.sim = sim;
+	}
+
 	/**
 	 * @param p
 	 * @return
 	 */
 	public DefaultPersonDriverAgent createPersonAgent(Person p) {
-		throw new RuntimeException("Not (yet) implemented");
+		return new Agent2D(p, this.sim);
 	}
 
 }

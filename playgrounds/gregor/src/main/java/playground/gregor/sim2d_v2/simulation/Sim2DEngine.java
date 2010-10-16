@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package playground.gregor.sim2d_v2.simulation;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,7 +43,7 @@ import playground.gregor.sim2d_v2.simulation.floor.Floor;
  */
 public class Sim2DEngine implements SimEngine, Steppable {
 
-	private List<Floor> floors;
+	private final List<Floor> floors = new ArrayList<Floor>();
 	private PhantomManager phantomMgr;
 	private final Scenario2DImpl scenario;
 	private final Random random;
@@ -84,7 +85,7 @@ public class Sim2DEngine implements SimEngine, Steppable {
 	 */
 	@Override
 	public void afterSim() {
-		throw new RuntimeException("not (yet) implemented!");
+		// throw new RuntimeException("not (yet) implemented!");
 
 	}
 
@@ -96,7 +97,7 @@ public class Sim2DEngine implements SimEngine, Steppable {
 	@Override
 	public void onPrepareSim() {
 		for (Entry<MultiPolygon, List<Link>> e : this.scenario.getFloorLinkMapping().entrySet()) {
-			Floor f = new Floor(this.scenario, e.getValue());
+			Floor f = new Floor(this.scenario, e.getValue(), this.sim);
 			this.floors.add(f);
 			for (Link l : e.getValue()) {
 				if (this.linkIdFloorMapping.get(l.getId()) != null) {

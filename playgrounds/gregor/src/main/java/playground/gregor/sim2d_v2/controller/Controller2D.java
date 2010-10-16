@@ -37,6 +37,7 @@ public class Controller2D extends Controler {
 		super(args);
 		setOverwriteFiles(true);
 		this.config.setQSimConfigGroup(new QSimConfigGroup());
+		this.config.getQSimConfigGroup().setEndTime(24 * 3600);
 
 	}
 
@@ -55,9 +56,9 @@ public class Controller2D extends Controler {
 	@Override
 	protected void runMobSim() {
 
-		EventsManager manager = new EventsManagerImpl();
+		// EventsManager manager = new EventsManagerImpl();
 		EventWriterXML writer = new EventWriterXML(getConfig().controler().getOutputDirectory() + "/ITERS/it." + getIterationNumber() + "/" + getIterationNumber() + ".xyzAzimuthEvents.xml.gz");
-		manager.addHandler(writer);
+		this.events.addHandler(writer);
 		Sim2D sim = new Sim2D(this.events, this.scenario2DData);
 
 		// }
