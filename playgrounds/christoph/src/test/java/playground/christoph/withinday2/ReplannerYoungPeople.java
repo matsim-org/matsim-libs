@@ -37,9 +37,9 @@ public class ReplannerYoungPeople extends WithinDayDuringLegReplanner {
 		if (personAgent == null) return false;
 
 		WithinDayPersonAgent withinDayPersonAgent = null;
-		if (!(personAgent instanceof WithinDayPersonAgent)) return false;
-		else
-		{
+		if (!(personAgent instanceof WithinDayPersonAgent)) {
+			throw new RuntimeException("wrong type of agent") ;
+		} else {
 			withinDayPersonAgent = (WithinDayPersonAgent) personAgent;
 		}
 

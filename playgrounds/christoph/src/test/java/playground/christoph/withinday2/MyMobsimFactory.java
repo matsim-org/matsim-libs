@@ -1,5 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * MyMobsimFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -16,22 +17,31 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
 package playground.christoph.withinday2;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.log4j.Logger;
-import org.matsim.core.config.Config;
-import org.matsim.core.controler.Controler;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.mobsim.framework.MobsimFactory;
+import org.matsim.core.mobsim.framework.Simulation;
+import org.matsim.core.mobsim.framework.listeners.SimulationListener;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.util.DijkstraFactory;
+import org.matsim.core.router.util.PersonalizableTravelCost;
+import org.matsim.core.router.util.PersonalizableTravelTime;
+import org.matsim.ptproject.qsim.AgentFactory;
+import org.matsim.ptproject.qsim.QSim;
+import org.matsim.ptproject.qsim.interfaces.QSimI;
 
-import playground.christoph.controler.WithinDayControler;
 import playground.christoph.events.algorithms.FixedOrderQueueSimulationListener;
 import playground.christoph.withinday.mobsim.DuringActivityReplanningModule;
 import playground.christoph.withinday.mobsim.DuringLegReplanningModule;
 import playground.christoph.withinday.mobsim.InitialReplanningModule;
 import playground.christoph.withinday.mobsim.ReplanningManager;
-import playground.christoph.withinday.mobsim.WithinDayQSim;
+import playground.christoph.withinday.mobsim.WithinDayAgentFactory;
 import playground.christoph.withinday.replanning.ReplanningIdGenerator;
 import playground.christoph.withinday.replanning.WithinDayReplanner;
 import playground.christoph.withinday.replanning.modules.ReplanningModule;
@@ -39,69 +49,57 @@ import playground.christoph.withinday.replanning.parallel.ParallelDuringActivity
 import playground.christoph.withinday.replanning.parallel.ParallelDuringLegReplanner;
 import playground.christoph.withinday.replanning.parallel.ParallelInitialReplanner;
 
-class MyWithinDayControler extends Controler {
-
-	static void start(Config config) {
-		final MyWithinDayControler controler = new MyWithinDayControler(config);
-		controler.setOverwriteFiles(true);
-		controler.run();
-	}
-
-	static void start(String configFilePath) {
-		final MyWithinDayControler controler = new MyWithinDayControler(configFilePath);
-		controler.setOverwriteFiles(true);
-		controler.run();
-	}
-
-	/*
-	 * How many parallel Threads shall do the Replanning.
-	 */
-	protected int numReplanningThreads = 1;
-
-	protected ParallelInitialReplanner parallelInitialReplanner;
-
-
-	protected ParallelDuringActivityReplanner parallelActEndReplanner;
-
-	protected ParallelDuringLegReplanner parallelLeaveLinkReplanner;
-	protected ReplanningManager replanningManager;
-	protected WithinDayQSim sim;
-
-	private static final Logger log = Logger.getLogger(WithinDayControler.class);
-	MyWithinDayControler(Config config) {
-		super(config);
-	}
-
-	MyWithinDayControler(String configFileName) {
-		super(configFileName);
+/**
+ * @author nagel
+ *
+ */
+public class MyMobsimFactory implements MobsimFactory {
+	private static final Logger log = Logger.getLogger("dummy");
+	private ParallelInitialReplanner parallelInitialReplanner;
+	private ParallelDuringActivityReplanner parallelActEndReplanner;
+	private ParallelDuringLegReplanner parallelLeaveLinkReplanner;
+	private PersonalizableTravelCost travCostCalc;
+	private PersonalizableTravelTime travTimeCalc;
+	
+	MyMobsimFactory( PersonalizableTravelCost travelCostCalculator, PersonalizableTravelTime travelTimeCalculator ) {
+		this.travCostCalc = travelCostCalculator ;
+		this.travTimeCalc = travelTimeCalculator ;
 	}
 
 	@Override
-	protected void runMobSim()
-	{
-		createHandlersAndListeners();
-		// initializes "replanningManager"
+	public Simulation createMobsim(Scenario sc, EventsManager eventsManager) {
+		int numReplanningThreads = 1;
 
-		sim = new WithinDayQSim(this.scenarioData, this.events);
-		// a QSim with two differences:
-		// (1) uses WithinDayAgentFactory instead of the regular agent factory
-		// (2) offers "rescheduleActivityEnd" although I am not sure that this is still needed (after some modifications
-		//     that happened in the meantime)
-
+		
+		QSimI qsim = new QSim( sc, eventsManager ) ;
+		
+		AgentFactory agentFactory = new WithinDayAgentFactory( qsim ) ;
+		qsim.setAgentFactory(agentFactory) ;
+		
+		ReplanningManager replanningManager = new ReplanningManager();
+		
 		// Use a FixedOrderQueueSimulationListener to bundle the Listeners and
 		// ensure that they are started in the needed order.
 		FixedOrderQueueSimulationListener foqsl = new FixedOrderQueueSimulationListener();
 		foqsl.addQueueSimulationInitializedListener(replanningManager);
 		foqsl.addQueueSimulationBeforeSimStepListener(replanningManager);
-		sim.addQueueSimulationListeners(foqsl);
-		// essentially, can just imagine the replanningManager as a regular MobsimListener
+		qsim.addQueueSimulationListeners(foqsl);
+		// (essentially, can just imagine the replanningManager as a regular MobsimListener)
+		
+		List<SimulationListener> simulationListenerList = new ArrayList<SimulationListener>() ;
 
 		log.info("Initialize Parallel Replanning Modules");
-		initParallelReplanningModules();
+		this.parallelInitialReplanner = new ParallelInitialReplanner(numReplanningThreads, simulationListenerList );
+		this.parallelActEndReplanner = new ParallelDuringActivityReplanner(numReplanningThreads, simulationListenerList );
+		this.parallelLeaveLinkReplanner = new ParallelDuringLegReplanner(numReplanningThreads, simulationListenerList );
 		// these are containers, but they don't do anything by themselves
+		
+		for ( SimulationListener siml : simulationListenerList ) {
+			qsim.addQueueSimulationListeners( siml ) ;
+		}
 
 		log.info("Initialize Replanning Routers");
-		initReplanningRouter();
+		initReplanningRouter(sc, qsim);
 
 		InitialReplanningModule initialReplanningModule = new InitialReplanningModule(parallelInitialReplanner);
 		DuringActivityReplanningModule actEndReplanning = new DuringActivityReplanningModule(parallelActEndReplanner);
@@ -115,62 +113,33 @@ class MyWithinDayControler extends Controler {
 		replanningManager.doActEndReplanning(true);
 		replanningManager.doInitialReplanning(false);
 		replanningManager.doLeaveLinkReplanning(true);
-
-		sim.run();
+		
+		return qsim ;
 	}
 	
-	// ============================================================================================================================
-	// private method only below here
-
-	/*
-	 * Creates the Handler and Listener Object so that they can be handed over to the Within Day
-	 * Replanning Modules (TravelCostWrapper, etc).
-	 *
-	 * The full initialization of them is done later (we don't have all necessary Objects yet).
-	 */
-	private void createHandlersAndListeners()
-	{
-		replanningManager = new ReplanningManager();
-	}
-
-	/*
-	 * Initializes the ParallelReplannerModules
-	 */
-	private void initParallelReplanningModules()
-	{
-		this.parallelInitialReplanner = new ParallelInitialReplanner(numReplanningThreads, this);
-		this.parallelActEndReplanner = new ParallelDuringActivityReplanner(numReplanningThreads, this);
-		this.parallelLeaveLinkReplanner = new ParallelDuringLegReplanner(numReplanningThreads, this);
-	}
-
 	/*
 	 * New Routers for the Replanning are used instead of using the controler's.
 	 * By doing this every person can use a personalised Router.
 	 */
-	private void initReplanningRouter() {
+	private void initReplanningRouter(Scenario sc, QSimI mobsim ) {
 
 		//		PlansCalcRoute dijkstraRouter = new PlansCalcRoute(new PlansCalcRouteConfigGroup(), network, this.createTravelCostCalculator(), travelTime, new DijkstraFactory());
-		AbstractMultithreadedModule router = 
-			new ReplanningModule(config, network, this.createTravelCostCalculator(), this.getTravelTimeCalculator(), new DijkstraFactory());
-		// ReplanningModule is a wrapper that either returns PlansCalcRoute or MultiModalPlansCalcRoute
+		AbstractMultithreadedModule routerModule = 
+			new ReplanningModule(sc.getConfig(), sc.getNetwork(), this.travCostCalc, this.travTimeCalc, new DijkstraFactory());
+		// (ReplanningModule is a wrapper that either returns PlansCalcRoute or MultiModalPlansCalcRoute)
 
-//		this.initialIdentifier = new InitialIdentifierImpl(this.sim);
-//		this.initialReplanner = new InitialReplanner(ReplanningIdGenerator.getNextId());
-//		this.initialReplanner.setReplanner(dijkstraRouter);
-//		this.initialReplanner.addAgentsToReplanIdentifier(this.initialIdentifier);
-//		this.parallelInitialReplanner.addWithinDayReplanner(this.initialReplanner);
 
 
 		// replanning while at activity:
 
-		WithinDayReplanner duringActivityReplanner = new ReplannerOldPeople(ReplanningIdGenerator.getNextId(), this.scenarioData);
+		WithinDayReplanner duringActivityReplanner = new ReplannerOldPeople(ReplanningIdGenerator.getNextId(), sc);
 		// defines a "doReplanning" method which contains the core of the work
 		// as a piece, it re-routes a _future_ leg.  
 		
-		duringActivityReplanner.setAbstractMultithreadedModule(router);
+		duringActivityReplanner.setAbstractMultithreadedModule(routerModule);
 		// this pretends being a general Plan Algorithm, but I wonder if it can reasonably be anything else but a router?
 
-		duringActivityReplanner.addAgentsToReplanIdentifier(new OldPeopleIdentifier(this.sim));
+		duringActivityReplanner.addAgentsToReplanIdentifier(new OldPeopleIdentifier(mobsim));
 		// which persons to replan
 		
 		this.parallelActEndReplanner.addWithinDayReplanner(duringActivityReplanner);
@@ -178,25 +147,24 @@ class MyWithinDayControler extends Controler {
 		// module).  kai, oct'10
 
 		
+
 		// replanning while on leg:
 		
-		WithinDayReplanner duringLegReplanner = new ReplannerYoungPeople(ReplanningIdGenerator.getNextId(), this.scenarioData);
+		WithinDayReplanner duringLegReplanner = new ReplannerYoungPeople(ReplanningIdGenerator.getNextId(), sc);
 		// defines a "doReplanning" method which contains the core of the work
 		// it replaces the next activity
 		// in order to get there, it re-routes the current route
 		
-		duringLegReplanner.setAbstractMultithreadedModule(router);
+		duringLegReplanner.setAbstractMultithreadedModule(routerModule);
 		// this pretends being a general Plan Algorithm, but I wonder if it can reasonably be anything else but a router?
 
-		duringLegReplanner.addAgentsToReplanIdentifier(new YoungPeopleIdentifier(this.sim));
+		duringLegReplanner.addAgentsToReplanIdentifier(new YoungPeopleIdentifier(mobsim));
 		// persons identifier added to replanner
 
 		this.parallelLeaveLinkReplanner.addWithinDayReplanner(duringLegReplanner);
 		// I think this just adds the stuff to the threads mechanics (can't say why it is not enough to use the multithreaded
 		// module).  kai, oct'10
 	}
-
-
 
 
 

@@ -9,16 +9,16 @@ import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.ptproject.qsim.interfaces.QLink;
+import org.matsim.ptproject.qsim.interfaces.QSimI;
 import org.matsim.ptproject.qsim.interfaces.QVehicle;
 
-import playground.christoph.withinday.mobsim.WithinDayQSim;
 import playground.christoph.withinday.replanning.WithinDayReplanner;
 import playground.christoph.withinday.replanning.identifiers.interfaces.AgentsToReplanIdentifier;
 import playground.christoph.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
 
 public class YoungPeopleIdentifier extends DuringLegIdentifier {
 
-	private WithinDayQSim queueSim;
+	private QSimI queueSim;
 
 	@Override
 	public AgentsToReplanIdentifier clone() {
@@ -56,7 +56,7 @@ public class YoungPeopleIdentifier extends DuringLegIdentifier {
 		return list;
 	}
 	
-	public YoungPeopleIdentifier(WithinDayQSim queueSim) {
+	YoungPeopleIdentifier(QSimI queueSim) {
 		this.queueSim = queueSim;
 	}
 
