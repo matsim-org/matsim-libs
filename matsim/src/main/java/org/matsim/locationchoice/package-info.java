@@ -6,9 +6,9 @@
  *   <li>Andreas Horni</li>
  * </ul>
  * 
- * <h2>Parameters:</h2>
+ * <h2>Parameters:<a name="locationchoice_parameters"></a></h2>
  * <ul>
- *   <li>boolean <strong>constrained</strong> = false : Random location choice ("<i>false</i>") or constrained location choice ("<i>true</i>") based on travel time budgets (time geography).</li>
+ *   <li>boolean(true/false) <strong>constrained</strong> = false : Random location choice ("<i>false</i>") or constrained location choice ("<i>true</i>") based on travel time budgets (time geography).</li>
  * </ul>
  * 
  * 
