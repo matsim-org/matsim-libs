@@ -8,7 +8,7 @@
  * 
  * <h2>Parameters:</h2>
  * <ul>
- *   <li><i>constrained</i> value:boolean default:false <br> Random location choice ("false") or constrained location choice ("true") based on travel time budgets (time geography).</li>
+ *   <li>boolean <strong>constrained</strong> = false : Random location choice ("<i>false</i>") or constrained location choice ("<i>true</i>") based on travel time budgets (time geography).</li>
  * </ul>
  * 
  * 
