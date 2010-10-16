@@ -24,7 +24,7 @@ package playground.gregor.sim2d.simulation;
 //should be removed in future
 
 public class SimulationTimer {
-	static private double simStartTime = 24*3600;
+	static private double simStartTime = 24 * 3600;
 	static private double time = 0;
 	static private double SIM_TICK_TIME_S = 1;
 
@@ -36,7 +36,8 @@ public class SimulationTimer {
 	}
 
 	/**
-	 * @param time The time to set.
+	 * @param time
+	 *            The time to set.
 	 */
 	public static final void setTime(final double time) {
 		SimulationTimer.time = time;
@@ -44,7 +45,7 @@ public class SimulationTimer {
 
 	/**
 	 * Increases the simulation time.
-	 *
+	 * 
 	 * @see #getSimTickTime()
 	 */
 	public static final void incTime() {
@@ -52,15 +53,17 @@ public class SimulationTimer {
 	}
 
 	/**
-	 * @return Returns the simStartTime. That is the lowest found start time of a leg
+	 * @return Returns the simStartTime. That is the lowest found start time of
+	 *         a leg
 	 */
 	public static final double getSimStartTime() {
 		return simStartTime;
 	}
 
 	/**
-	 * Returns the number of seconds (time steps) the simulation advances when increasing the simulation time.
-	 *
+	 * Returns the number of seconds (time steps) the simulation advances when
+	 * increasing the simulation time.
+	 * 
 	 * @return The number of time steps.
 	 * @see #incTime()
 	 */
@@ -79,12 +82,14 @@ public class SimulationTimer {
 	}
 
 	/**
-	 * Resets the SimulationTimer and sets the step-size (<code>stepSize</code>) for the simulation.
-	 *
-	 * @param stepSize The step-size the simulation uses to advance time.
+	 * Resets the SimulationTimer and sets the step-size (<code>stepSize</code>)
+	 * for the simulation.
+	 * 
+	 * @param stepSize
+	 *            The step-size the simulation uses to advance time.
 	 */
-	/*package*/ static final void reset(final double stepSize) {
-		SimulationTimer.simStartTime = 24*3600;
+	public static final void reset(final double stepSize) {
+		SimulationTimer.simStartTime = 24 * 3600;
 		SimulationTimer.time = 0;
 		SimulationTimer.SIM_TICK_TIME_S = stepSize;
 	}

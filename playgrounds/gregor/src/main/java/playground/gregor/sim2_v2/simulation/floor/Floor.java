@@ -21,6 +21,12 @@ package playground.gregor.sim2_v2.simulation.floor;
 
 import java.util.List;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+
+import com.vividsolutions.jts.geom.Coordinate;
+
+import playground.gregor.sim2_v2.scenario.Scenario2DImpl;
 import playground.gregor.sim2_v2.simulation.Agent2D;
 
 /**
@@ -31,6 +37,26 @@ public class Floor {
 
 	private List<ForceModule> forceModules;
 	private List<Agent2D> agents;
+	private final Scenario2DImpl scenario;
+	private final List<Link> links;
+
+	public Floor(Scenario2DImpl scenario, List<Link> list) {
+		this.scenario = scenario;
+		this.links = list;
+	}
+
+	/**
+	 * 
+	 */
+	public void init() {
+		this.forceModules.add(new AgentInteractionModule(this, this.scenario));
+		this.forceModules.add(new DrivingForceModule(this, this.scenario));
+		this.forceModules.add(new EnvironmentForceModule(this, this.scenario));
+		this.forceModules.add(new PathForceModule(this, this.scenario));
+
+		// TODO phantom force module
+
+	}
 
 	/**
 	 * @param time
@@ -46,7 +72,10 @@ public class Floor {
 	 */
 	private void moveAgents() {
 		for (Agent2D agent : this.agents) {
-
+			Force f = agent.getForce();
+			Coordinate oldPos = agent.getPosition();
+			Coordinate newPos = new Coordinate(oldPos.x + f.getXComponent(), oldPos.y + f.getYComponent(), 0);
+			agent.moveTotPostion(newPos);
 		}
 
 	}
@@ -69,4 +98,21 @@ public class Floor {
 	public void addForceModule(ForceModule module) {
 		this.forceModules.add(module);
 	}
+
+	/**
+	 * @param agent
+	 */
+	public void addAgent(Agent2D agent) {
+		throw new RuntimeException("not (yet) implemented!");
+
+	}
+
+	/**
+	 * 
+	 * @return list of agents
+	 */
+	public List<Agent2D> getAgents() {
+		throw new RuntimeException("not (yet) implemented!");
+	}
+
 }

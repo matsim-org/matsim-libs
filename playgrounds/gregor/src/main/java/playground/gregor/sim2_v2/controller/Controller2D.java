@@ -20,13 +20,14 @@
 package playground.gregor.sim2_v2.controller;
 
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.algorithms.EventWriterXML;
 
 import playground.gregor.sim2_v2.scenario.Scenario2DImpl;
+import playground.gregor.sim2_v2.scenario.ScenarioLoader2DImpl;
 import playground.gregor.sim2_v2.simulation.Sim2D;
-import playground.gregor.sim2d.scenario.ScenarioLoader2DImpl;
 
 public class Controller2D extends Controler {
 
@@ -35,6 +36,7 @@ public class Controller2D extends Controler {
 	public Controller2D(String[] args) {
 		super(args);
 		setOverwriteFiles(true);
+		this.config.setQSimConfigGroup(new QSimConfigGroup());
 
 	}
 
@@ -56,7 +58,6 @@ public class Controller2D extends Controler {
 		EventsManager manager = new EventsManagerImpl();
 		EventWriterXML writer = new EventWriterXML(getConfig().controler().getOutputDirectory() + "/ITERS/it." + getIterationNumber() + "/" + getIterationNumber() + ".xyzAzimuthEvents.xml.gz");
 		manager.addHandler(writer);
-
 		Sim2D sim = new Sim2D(this.events, this.scenario2DData);
 
 		// }

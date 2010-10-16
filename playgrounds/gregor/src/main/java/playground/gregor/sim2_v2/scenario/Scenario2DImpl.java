@@ -19,14 +19,31 @@
  * *********************************************************************** */
 package playground.gregor.sim2_v2.scenario;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.Config;
+
+import playground.gregor.sim2d.simulation.SegmentedStaticForceField;
+import playground.gregor.sim2d.simulation.StaticForceField;
+
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.MultiPolygon;
 
 /**
  * @author laemmel
  * 
  */
 public class Scenario2DImpl extends ScenarioImpl {
+
+	private Map<MultiPolygon, List<Link>> mps;
+	private SegmentedStaticForceField ssff;
+	private StaticForceField sff;
+	private HashMap<Id, LineString> lsmp;
 
 	/**
 	 * @param config
@@ -37,6 +54,58 @@ public class Scenario2DImpl extends ScenarioImpl {
 
 	public Scenario2DImpl() {
 		throw new RuntimeException("Do not try to call this constructor!!");
+	}
+
+	/**
+	 * @param ssff
+	 */
+	public void setSegmentedStaticForceField(SegmentedStaticForceField ssff) {
+		this.ssff = ssff;
+
+	}
+
+	/**
+	 * @return
+	 */
+	public SegmentedStaticForceField getSegmentedStaticForceField() {
+		return this.ssff;
+	}
+
+	/**
+	 * @param sff
+	 */
+	public void setStaticForceField(StaticForceField sff) {
+		this.sff = sff;
+
+	}
+
+	/**
+	 * @param lsmp
+	 */
+	public void setLineStringMap(HashMap<Id, LineString> lsmp) {
+		this.lsmp = lsmp;
+
+	}
+
+	/**
+	 * @return
+	 */
+	public Map<Id, LineString> getLineStringMap() {
+		return this.lsmp;
+	}
+
+	/**
+	 * @param mps
+	 */
+	/* package */void setFloorLinkMapping(Map<MultiPolygon, List<Link>> mps) {
+		this.mps = mps;
+	}
+
+	/**
+	 * @return
+	 */
+	public Map<MultiPolygon, List<Link>> getFloorLinkMapping() {
+		return this.mps;
 	}
 
 }

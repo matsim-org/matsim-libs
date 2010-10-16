@@ -23,6 +23,7 @@ import java.util.List;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
+import playground.gregor.sim2_v2.scenario.Scenario2DImpl;
 import playground.gregor.sim2_v2.simulation.Agent2D;
 import playground.gregor.sim2_v2.simulation.PhantomManager;
 
@@ -31,6 +32,14 @@ import playground.gregor.sim2_v2.simulation.PhantomManager;
  * 
  */
 public class PhantomForceModule extends AgentInteractionModule implements ForceModule {
+
+	/**
+	 * @param floor
+	 * @param scenario
+	 */
+	public PhantomForceModule(Floor floor, Scenario2DImpl scenario) {
+		super(floor, scenario);
+	}
 
 	private PhantomManager phantomMgr;
 

@@ -23,6 +23,7 @@ import java.util.List;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
+import playground.gregor.sim2_v2.scenario.Scenario2DImpl;
 import playground.gregor.sim2_v2.simulation.Agent2D;
 
 /**
@@ -30,6 +31,18 @@ import playground.gregor.sim2_v2.simulation.Agent2D;
  * 
  */
 public class AgentInteractionModule implements ForceModule {
+
+	private final Floor floor;
+	private final Scenario2DImpl sceanrio;
+
+	/**
+	 * @param floor
+	 * @param sceanrio
+	 */
+	public AgentInteractionModule(Floor floor, Scenario2DImpl scenario) {
+		this.floor = floor;
+		this.sceanrio = scenario;
+	}
 
 	/*
 	 * (non-Javadoc)

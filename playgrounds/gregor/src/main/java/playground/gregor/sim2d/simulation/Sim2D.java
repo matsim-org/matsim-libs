@@ -46,7 +46,6 @@ import com.vividsolutions.jts.geom.MultiPolygon;
 
 public class Sim2D {
 
-
 	private final Config config;
 	private final Population population;
 	private final Network network;
@@ -54,30 +53,28 @@ public class Sim2D {
 	private double stopTime;
 	private final Network2D network2D;
 	private double startTime;
+	private final double endTime;
 
 	protected final PriorityBlockingQueue<Agent2D> activityEndsList = new PriorityBlockingQueue<Agent2D>(500, new Agent2DDepartureTimeComparator());
-	private final double endTime;
-	protected final PriorityBlockingQueue<Agent2D>  agentsToRemoveList  = new PriorityBlockingQueue<Agent2D>(500, new Agent2DDepartureTimeComparator());
+	protected final PriorityBlockingQueue<Agent2D> agentsToRemoveList = new PriorityBlockingQueue<Agent2D>(500, new Agent2DDepartureTimeComparator());
 
 	private Sim2DVis sim2DVis;
 	private XYZEventsGenerator xyzEventsGen = null;
 
-
-	public Sim2D(final Network network, final Map<MultiPolygon,List<Link>> floors, final Map<Id,LineString> ls, final Population plans, final EventsManager events, final SegmentedStaticForceField sff, final Config config){
+	public Sim2D(final Network network, final Map<MultiPolygon, List<Link>> floors, final Map<Id, LineString> ls, final Population plans, final EventsManager events, final SegmentedStaticForceField sff, final Config config) {
 		this.config = config;
-		this.endTime = 9*3600+30*60;
+		this.endTime = 9 * 3600 + 30 * 60;
 		this.network = network;
-		Map<MultiPolygon,Network> f = new HashMap<MultiPolygon, Network>();
-		for (Entry<MultiPolygon,List<Link>> e : floors.entrySet()) {
-			f.put(e.getKey(),this.network);
+		Map<MultiPolygon, Network> f = new HashMap<MultiPolygon, Network>();
+		for (Entry<MultiPolygon, List<Link>> e : floors.entrySet()) {
+			f.put(e.getKey(), this.network);
 		}
-		this.network2D = new Network2D(this.network,f,sff,ls);
+		this.network2D = new Network2D(this.network, f, sff, ls);
 
 		this.population = plans;
 		setEvents(events);
 		SimulationTimer.reset(Sim2DConfig.TIME_STEP_SIZE);
 	}
-
 
 	public void run() {
 		prepareSim();
@@ -90,11 +87,10 @@ public class Sim2D {
 				SimulationTimer.incTime();
 			}
 		}
-		if (this.sim2DVis != null){
+		if (this.sim2DVis != null) {
 			this.sim2DVis.reset();
 		}
 	}
-
 
 	private boolean doSimStep(double time) {
 		handleActivityEnds(time);
@@ -109,12 +105,11 @@ public class Sim2D {
 	private void handleAgentRemoves(double time) {
 		while (this.agentsToRemoveList.peek() != null) {
 			Agent2D agent = this.agentsToRemoveList.poll();
-			//TODO works only as long as there is only one floor!!
+			// TODO works only as long as there is only one floor!!
 			this.network2D.removeAgent(agent);
-//			this.peekABotVis.removeBot(Integer.parseInt(agent.getId().toString()));
+			// this.peekABotVis.removeBot(Integer.parseInt(agent.getId().toString()));
 		}
 	}
-
 
 	public void scheduleAgentRemove(Agent2D agent2d) {
 		this.agentsToRemoveList.add(agent2d);
@@ -137,14 +132,14 @@ public class Sim2D {
 		}
 	}
 
-
 	private void prepareSim() {
 		this.startTime = this.config.simulation().getStartTime();
 		this.stopTime = this.config.simulation().getEndTime();
 
-		if (this.startTime == Time.UNDEFINED_TIME) this.startTime = 0.0;
-		if ((this.stopTime == Time.UNDEFINED_TIME) || (this.stopTime == 0)) this.stopTime = Double.MAX_VALUE;
-
+		if (this.startTime == Time.UNDEFINED_TIME)
+			this.startTime = 0.0;
+		if ((this.stopTime == Time.UNDEFINED_TIME) || (this.stopTime == 0))
+			this.stopTime = Double.MAX_VALUE;
 
 		createAgents();
 
@@ -156,31 +151,23 @@ public class Sim2D {
 
 		SimulationTimer.setSimStartTime(simStartTime);
 		SimulationTimer.setTime(SimulationTimer.getSimStartTime());
-
-
-
-
 	}
-
 
 	private void createAgents() {
 		if (this.population == null) {
 			throw new RuntimeException("No valid Population found (plans == null)");
 		}
-		VehicleType defaultVehicleType = new VehicleTypeImpl(new IdImpl("defaultVehicleType"));
 
 		for (Person p : this.population.getPersons().values()) {
-			Agent2D agent = new Agent2D(p,this);
-
+			Agent2D agent = new Agent2D(p, this);
 			if (agent.initialize()) {
+
 				this.network2D.addAgent(agent);
 
 			}
-
 		}
 
 	}
-
 
 	protected void afterSimStep(final double time) {
 		if (this.sim2DVis != null) {
@@ -191,28 +178,20 @@ public class Sim2D {
 		}
 	}
 
-
-
-
-
-//	//DEBUG
-//	private List<double []> updateForceInfos() {
-//		List<double []> ret = new ArrayList<double[]>();
-//		for (Floor floor : this.network2D.getFloors()) {
-//			ret.addAll(floor.getForceInfos());
-//		}
-//		return ret;
-//	}
-
-
-
-
+	// //DEBUG
+	// private List<double []> updateForceInfos() {
+	// List<double []> ret = new ArrayList<double[]>();
+	// for (Floor floor : this.network2D.getFloors()) {
+	// ret.addAll(floor.getForceInfos());
+	// }
+	// return ret;
+	// }
 
 	public static final EventsManager getEvents() {
 		return events;
 	}
 
-	/*package*/ Network getNetwork() {
+	/* package */Network getNetwork() {
 		return this.network;
 	}
 
@@ -220,19 +199,14 @@ public class Sim2D {
 		Sim2D.events = events;
 	}
 
-
-
 	public void setXYZEventsManager(XYZEventsGenerator xyzEvents) {
-		this.xyzEventsGen  = xyzEvents;
+		this.xyzEventsGen = xyzEvents;
 		this.xyzEventsGen.setNetwork2D(this.network2D);
 	}
-
 
 	public void setSim2DVis(Sim2DVis sim2DVis) {
 		this.sim2DVis = sim2DVis;
 		this.sim2DVis.setNetwork2D(this.network2D);
 	}
-
-
 
 }

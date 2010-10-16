@@ -17,15 +17,40 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.gregor.sim2_v2.simulation;
+package playground.gregor.sim2_v2.simulation.floor;
 
 /**
  * @author laemmel
  * 
  */
 public class Force {
-	double fx;
-	double fy;
+	private double fx;
+	private double fy;
+
 	// double fz;
+
+	/* package */double getXComponent() {
+		return this.fx;
+	}
+
+	/* package */double getYComponent() {
+		return this.fy;
+	}
+
+	/* package */void setXComponent(double fx) {
+		this.fx = fx;
+	}
+
+	/* package */void setYComponent(double fy) {
+		this.fy = fy;
+	}
+
+	/* package */void incrementX(double incrfx) {
+		this.fx += incrfx;
+	}
+
+	/* package */void incrementY(double incrfy) {
+		this.fy += incrfy;
+	}
 
 }

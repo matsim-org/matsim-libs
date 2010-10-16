@@ -29,11 +29,12 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.algorithms.EventWriterXML;
 
+import playground.gregor.sim2_v2.scenario.Scenario2DImpl;
+import playground.gregor.sim2_v2.scenario.ScenarioLoader2DImpl;
 import playground.gregor.sim2d.events.XYZEventsGenerator;
 import playground.gregor.sim2d.events.XYZEventsManager;
 import playground.gregor.sim2d.peekabot.PeekABotClient;
 import playground.gregor.sim2d.peekabot.Sim2DVis;
-import playground.gregor.sim2d.scenario.ScenarioLoader2DImpl;
 import playground.gregor.sim2d.simulation.SegmentedStaticForceField;
 import playground.gregor.sim2d.simulation.Sim2D;
 import playground.gregor.sim2d.simulation.StaticForceField;
@@ -55,6 +56,8 @@ public class Controller2D extends Controler {
 
 	private Map<Id, LineString> lsmp;
 
+	private Scenario2DImpl scenario2DData;
+
 	public Controller2D(String[] args) {
 		super(args);
 		setOverwriteFiles(true);
@@ -64,11 +67,12 @@ public class Controller2D extends Controler {
 	@Override
 	protected void loadData() {
 		if (!this.scenarioLoaded) {
-			this.loader = new ScenarioLoader2DImpl(this.scenarioData);
+			this.scenario2DData = new Scenario2DImpl(this.config);
+			this.loader = new ScenarioLoader2DImpl(this.scenario2DData);
 			this.loader.loadScenario();
-			this.mps = ((ScenarioLoader2DImpl) this.loader).getFloorLinkMapping();
-			this.sff = ((ScenarioLoader2DImpl) this.loader).getSegmentedStaticForceField();
-			this.lsmp = ((ScenarioLoader2DImpl) this.loader).getLsMap();
+			this.mps = this.scenario2DData.getFloorLinkMapping();
+			this.sff = this.scenario2DData.getSegmentedStaticForceField();
+			this.lsmp = this.scenario2DData.getLineStringMap();
 			this.network = this.loader.getScenario().getNetwork();
 			this.population = this.loader.getScenario().getPopulation();
 			this.scenarioLoaded = true;

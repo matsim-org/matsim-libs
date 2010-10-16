@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.gregor.sim2d.scenario;
+package playground.gregor.sim2_v2.scenario;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -55,6 +55,7 @@ import playground.gregor.sim2d.network.NetworkFromLsFile;
 import playground.gregor.sim2d.network.NetworkLoader;
 import playground.gregor.sim2d.network.NetworkLoaderImpl;
 import playground.gregor.sim2d.network.NetworkLoaderImplII;
+import playground.gregor.sim2d.scenario.StaticForceFieldGeneratorIII;
 import playground.gregor.sim2d.simulation.SegmentedStaticForceField;
 import playground.gregor.sim2d.simulation.StaticForceField;
 import playground.gregor.sim2d.simulation.StaticForceFieldGenerator;
@@ -71,28 +72,29 @@ public class ScenarioLoader2DImpl extends ScenarioLoaderImpl {
 	private Map<MultiPolygon, List<Link>> mps;
 
 	private StaticForceField sff;
-	
+
 	private SegmentedStaticForceField ssff;
 
 	private HashMap<Id, LineString> lsmp;
 
-	public ScenarioLoader2DImpl(ScenarioImpl scenarioData) {
+	private final Scenario2DImpl scenarioData;
+
+	public ScenarioLoader2DImpl(Scenario2DImpl scenarioData) {
 		super(scenarioData);
+		this.scenarioData = scenarioData;
 	}
 
 	@Override
 	public void loadNetwork() {
 		if (Sim2DConfig.NETWORK_LOADER_LS) {
 			loadLsMp();
-			NetworkFromLsFile loader = new NetworkFromLsFile(getScenario(),this.lsmp);
+			NetworkFromLsFile loader = new NetworkFromLsFile(getScenario(), this.lsmp);
 			loader.loadNetwork();
 			loadMps();
 			loadStaticForceFieldII(loader.getLinkSubLinkMapping());
 			return;
 		}
-		
-		
-		
+
 		if (Sim2DConfig.LOAD_NETWORK_FROM_XML_FILE) {
 			super.loadNetwork();
 			loadMps();
@@ -108,7 +110,7 @@ public class ScenarioLoader2DImpl extends ScenarioLoaderImpl {
 			int num = 0;
 			for (MultiPolygon mp : this.mps.keySet()) {
 				try {
-					fts.add(ft.create(new Object[]{mp,num++}));
+					fts.add(ft.create(new Object[] { mp, num++ }));
 				} catch (IllegalAttributeException e) {
 					throw new RuntimeException(e);
 				}
@@ -129,8 +131,6 @@ public class ScenarioLoader2DImpl extends ScenarioLoaderImpl {
 		loadStaticForceField();
 	}
 
-
-
 	private void loadLsMp() {
 		FeatureSource fs = null;
 		try {
@@ -145,16 +145,18 @@ public class ScenarioLoader2DImpl extends ScenarioLoaderImpl {
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
-		
+
 		this.lsmp = new HashMap<Id, LineString>();
-		
+
 		while (it.hasNext()) {
 			Feature ft = (Feature) it.next();
 			Id id = new IdImpl((Long) ft.getAttribute("ID"));
 			this.lsmp.put(id, (LineString) ft.getDefaultGeometry().getGeometryN(0));
-			
+
 		}
-		
+
+		this.scenarioData.setLineStringMap(this.lsmp);
+
 	}
 
 	private void loadMps() {
@@ -171,7 +173,7 @@ public class ScenarioLoader2DImpl extends ScenarioLoaderImpl {
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
-		Feature ft = (Feature)it.next();
+		Feature ft = (Feature) it.next();
 		if (it.hasNext()) {
 			throw new RuntimeException("multiple floors are not supported yet");
 		}
@@ -181,19 +183,19 @@ public class ScenarioLoader2DImpl extends ScenarioLoaderImpl {
 		}
 		List<Link> links = new ArrayList<Link>(super.getScenario().getNetwork().getLinks().values());
 		this.mps = new HashMap<MultiPolygon, List<Link>>();
-		this.mps.put((MultiPolygon)geo, links);
+		this.mps.put((MultiPolygon) geo, links);
+		this.scenarioData.setFloorLinkMapping(this.mps);
 
 	}
 
 	private FeatureType initFeatureType() {
 		CoordinateReferenceSystem targetCRS = MGC.getCRS(TransformationFactory.WGS84_UTM33N);
-		AttributeType p = DefaultAttributeTypeFactory.newAttributeType(
-				"MultiPolygon", MultiPolygon.class, true, null, null, targetCRS);
+		AttributeType p = DefaultAttributeTypeFactory.newAttributeType("MultiPolygon", MultiPolygon.class, true, null, null, targetCRS);
 		AttributeType num = AttributeTypeFactory.newAttributeType("floor_nr", Integer.class);
 
 		Exception ex;
 		try {
-			return  FeatureTypeFactory.newFeatureType(new AttributeType[] { p, num }, "MultiPolygon");
+			return FeatureTypeFactory.newFeatureType(new AttributeType[] { p, num }, "MultiPolygon");
 		} catch (FactoryRegistryException e) {
 			ex = e;
 		} catch (SchemaException e) {
@@ -205,36 +207,21 @@ public class ScenarioLoader2DImpl extends ScenarioLoaderImpl {
 
 	private void loadStaticForceFieldII(Map<Id, List<Id>> linkSubLinkMapping) {
 		this.ssff = new StaticForceFieldGeneratorIII(linkSubLinkMapping).getStaticForceField();
-		
-		
+		this.scenarioData.setSegmentedStaticForceField(this.ssff);
+
 	}
 
-	
 	private void loadStaticForceField() {
 		if (Sim2DConfig.LOAD_STATIC_FORCE_FIELD_FROM_FILE) {
 			this.sff = new StaticForceFieldReader(Sim2DConfig.STATIC_FORCE_FIELD_FILE).getStaticForceField();
 		} else {
-//			this.sff = new StaticForceFieldGenerator(this.mps.keySet().iterator().next()).loadStaticForceField();
+			// this.sff = new
+			// StaticForceFieldGenerator(this.mps.keySet().iterator().next()).loadStaticForceField();
 			this.sff = new StaticForceFieldGeneratorII(this.mps.keySet().iterator().next()).loadStaticForceField();
 			new StaticForceFieldWriter().write(Sim2DConfig.STATIC_FORCE_FIELD_FILE, this.sff);
 		}
-//		new StaticForceFieldToShape(this.sff).createShp();
-	}
-
-	public Map<MultiPolygon,List<Link>> getFloorLinkMapping() {
-		return this.mps;
-	}
-
-	public StaticForceField getStaticForceField() {
-		return this.sff;
-	}
-
-	public Map<Id,LineString> getLsMap() {
-		return this.lsmp;
-	}
-
-	public SegmentedStaticForceField getSegmentedStaticForceField() {
-		return this.ssff;
+		this.scenarioData.setStaticForceField(this.sff);
+		// new StaticForceFieldToShape(this.sff).createShp();
 	}
 
 }
