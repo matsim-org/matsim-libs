@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PathForceModule.java
+ * PhantomManager.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,36 +17,33 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.gregor.sim2_v2.simulation.floor;
+package playground.gregor.sim2d_v2.simulation;
 
-import playground.gregor.sim2_v2.scenario.Scenario2DImpl;
-import playground.gregor.sim2_v2.simulation.Agent2D;
+import java.util.List;
+
+import com.vividsolutions.jts.geom.Coordinate;
 
 /**
  * @author laemmel
  * 
  */
-public class PathForceModule implements ForceModule {
+public class PhantomManager {
 
 	/**
-	 * @param floor
-	 * @param scenario
+	 * @param time
 	 */
-	public PathForceModule(Floor floor, Scenario2DImpl scenario) {
-		// TODO Auto-generated constructor stub
+	public void update(double time) {
+		// TODO QuadTree;
+
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * playground.gregor.sim2_v2.simulation.floor.ForceModule#run(playground
-	 * .gregor.sim2_v2.simulation.Agent2D)
+	/**
+	 * @param position
+	 * @return
 	 */
-	@Override
-	public void run(Agent2D agent) {
+	public List<Coordinate> getPhatomsNear(Coordinate position) {
 		// TODO Auto-generated method stub
-
+		return null;
 	}
 
 }

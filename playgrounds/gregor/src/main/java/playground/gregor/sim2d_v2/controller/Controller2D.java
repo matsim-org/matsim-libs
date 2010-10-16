@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.gregor.sim2_v2.controller;
+package playground.gregor.sim2d_v2.controller;
 
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
@@ -25,9 +25,9 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.algorithms.EventWriterXML;
 
-import playground.gregor.sim2_v2.scenario.Scenario2DImpl;
-import playground.gregor.sim2_v2.scenario.ScenarioLoader2DImpl;
-import playground.gregor.sim2_v2.simulation.Sim2D;
+import playground.gregor.sim2d_v2.scenario.Scenario2DImpl;
+import playground.gregor.sim2d_v2.scenario.ScenarioLoader2DImpl;
+import playground.gregor.sim2d_v2.simulation.Sim2D;
 
 public class Controller2D extends Controler {
 

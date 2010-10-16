@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Agent2D.java
+ * Sim2DEngineFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,52 +17,18 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.gregor.sim2_v2.simulation;
+package playground.gregor.sim2d_v2.simulation;
 
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.ptproject.qsim.helpers.DefaultPersonDriverAgent;
-
-import playground.gregor.sim2_v2.simulation.floor.Force;
-import com.vividsolutions.jts.geom.Coordinate;
+import java.util.Random;
 
 /**
  * @author laemmel
  * 
  */
-public class Agent2D extends DefaultPersonDriverAgent {
+public class DefaultSim2DEngineFactory {
 
-	private Coordinate currentPosition;
-	private Force force;
+	public Sim2DEngine createSim2DEngine(final Sim2D sim, final Random random) {
+		return new Sim2DEngine(sim, random);
 
-	/**
-	 * @param p
-	 * @param sim2d
-	 */
-	public Agent2D(Person p, Sim2D sim2d) {
-		super(p, sim2d);
 	}
-
-	/**
-	 * @return
-	 */
-	public Coordinate getPosition() {
-		return this.currentPosition;
-	}
-
-	public void setPostion(Coordinate pos) {
-		this.currentPosition = pos;
-	}
-
-	public Force getForce() {
-		return this.force;
-	}
-
-	/**
-	 * @param newPos
-	 */
-	public void moveTotPostion(Coordinate newPos) {
-		// TODO check for choose next link and so on ...
-		throw new RuntimeException("not yet implemented!!");
-	}
-
 }

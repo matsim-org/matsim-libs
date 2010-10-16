@@ -29,8 +29,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.algorithms.EventWriterXML;
 
-import playground.gregor.sim2_v2.scenario.Scenario2DImpl;
-import playground.gregor.sim2_v2.scenario.ScenarioLoader2DImpl;
 import playground.gregor.sim2d.events.XYZEventsGenerator;
 import playground.gregor.sim2d.events.XYZEventsManager;
 import playground.gregor.sim2d.peekabot.PeekABotClient;
@@ -38,6 +36,8 @@ import playground.gregor.sim2d.peekabot.Sim2DVis;
 import playground.gregor.sim2d.simulation.SegmentedStaticForceField;
 import playground.gregor.sim2d.simulation.Sim2D;
 import playground.gregor.sim2d.simulation.StaticForceField;
+import playground.gregor.sim2d_v2.scenario.Scenario2DImpl;
+import playground.gregor.sim2d_v2.scenario.ScenarioLoader2DImpl;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ForceModule.java
+ * Force.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,15 +17,40 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.gregor.sim2_v2.simulation.floor;
-
-import playground.gregor.sim2_v2.simulation.Agent2D;
+package playground.gregor.sim2d_v2.simulation.floor;
 
 /**
  * @author laemmel
  * 
  */
-public interface ForceModule {
+public class Force {
+	private double fx;
+	private double fy;
 
-	public void run(Agent2D agent);
+	// double fz;
+
+	/* package */double getXComponent() {
+		return this.fx;
+	}
+
+	/* package */double getYComponent() {
+		return this.fy;
+	}
+
+	/* package */void setXComponent(double fx) {
+		this.fx = fx;
+	}
+
+	/* package */void setYComponent(double fy) {
+		this.fy = fy;
+	}
+
+	/* package */void incrementX(double incrfx) {
+		this.fx += incrfx;
+	}
+
+	/* package */void incrementY(double incrfy) {
+		this.fy += incrfy;
+	}
+
 }

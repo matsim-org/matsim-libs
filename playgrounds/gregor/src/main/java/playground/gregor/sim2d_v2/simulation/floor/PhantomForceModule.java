@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Sim2DEngineFactory.java
+ * PhantomForceModule.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,18 +17,43 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.gregor.sim2_v2.simulation;
+package playground.gregor.sim2d_v2.simulation.floor;
 
-import java.util.Random;
+import java.util.List;
+
+import com.vividsolutions.jts.geom.Coordinate;
+
+import playground.gregor.sim2d_v2.scenario.Scenario2DImpl;
+import playground.gregor.sim2d_v2.simulation.Agent2D;
+import playground.gregor.sim2d_v2.simulation.PhantomManager;
 
 /**
  * @author laemmel
  * 
  */
-public class DefaultSim2DEngineFactory {
+public class PhantomForceModule extends AgentInteractionModule implements ForceModule {
 
-	public Sim2DEngine createSim2DEngine(final Sim2D sim, final Random random) {
-		return new Sim2DEngine(sim, random);
-
+	/**
+	 * @param floor
+	 * @param scenario
+	 */
+	public PhantomForceModule(Floor floor, Scenario2DImpl scenario) {
+		super(floor, scenario);
 	}
+
+	private PhantomManager phantomMgr;
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * playground.gregor.sim2_v2.simulation.floor.ForceModule#run(playground
+	 * .gregor.sim2_v2.simulation.Agent2D)
+	 */
+	@Override
+	public void run(Agent2D agent) {
+		List<Coordinate> phantomCoords = this.phantomMgr.getPhatomsNear(agent.getPosition());
+		updateForces(agent, phantomCoords);
+	}
+
 }

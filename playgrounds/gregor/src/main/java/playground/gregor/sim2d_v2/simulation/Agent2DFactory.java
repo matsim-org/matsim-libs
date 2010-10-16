@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Force.java
+ * Agent2DFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,40 +17,24 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.gregor.sim2_v2.simulation.floor;
+package playground.gregor.sim2d_v2.simulation;
+
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.api.internal.MatsimFactory;
+import org.matsim.ptproject.qsim.helpers.DefaultPersonDriverAgent;
 
 /**
  * @author laemmel
  * 
  */
-public class Force {
-	private double fx;
-	private double fy;
+public class Agent2DFactory implements MatsimFactory {
 
-	// double fz;
-
-	/* package */double getXComponent() {
-		return this.fx;
-	}
-
-	/* package */double getYComponent() {
-		return this.fy;
-	}
-
-	/* package */void setXComponent(double fx) {
-		this.fx = fx;
-	}
-
-	/* package */void setYComponent(double fy) {
-		this.fy = fy;
-	}
-
-	/* package */void incrementX(double incrfx) {
-		this.fx += incrfx;
-	}
-
-	/* package */void incrementY(double incrfy) {
-		this.fy += incrfy;
+	/**
+	 * @param p
+	 * @return
+	 */
+	public DefaultPersonDriverAgent createPersonAgent(Person p) {
+		throw new RuntimeException("Not (yet) implemented");
 	}
 
 }

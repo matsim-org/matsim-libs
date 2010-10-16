@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PhantomManager.java
+ * ForceModule.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,33 +17,15 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.gregor.sim2_v2.simulation;
+package playground.gregor.sim2d_v2.simulation.floor;
 
-import java.util.List;
-
-import com.vividsolutions.jts.geom.Coordinate;
+import playground.gregor.sim2d_v2.simulation.Agent2D;
 
 /**
  * @author laemmel
  * 
  */
-public class PhantomManager {
+public interface ForceModule {
 
-	/**
-	 * @param time
-	 */
-	public void update(double time) {
-		// TODO QuadTree;
-
-	}
-
-	/**
-	 * @param position
-	 * @return
-	 */
-	public List<Coordinate> getPhatomsNear(Coordinate position) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
+	public void run(Agent2D agent);
 }

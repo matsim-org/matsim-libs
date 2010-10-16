@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DrivingForceModule.java
+ * Agent2D.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,40 +17,53 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.gregor.sim2_v2.simulation.floor;
+package playground.gregor.sim2d_v2.simulation;
 
-import playground.gregor.sim2_v2.scenario.Scenario2DImpl;
-import playground.gregor.sim2_v2.simulation.Agent2D;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.ptproject.qsim.helpers.DefaultPersonDriverAgent;
+
+import playground.gregor.sim2d_v2.simulation.floor.Force;
+
+import com.vividsolutions.jts.geom.Coordinate;
 
 /**
  * @author laemmel
  * 
  */
-public class DrivingForceModule implements ForceModule {
+public class Agent2D extends DefaultPersonDriverAgent {
 
-	private final Scenario2DImpl scenario;
-	private final Floor floor;
+	private Coordinate currentPosition;
+	private Force force;
 
 	/**
-	 * @param floor
-	 * @param scenario
+	 * @param p
+	 * @param sim2d
 	 */
-	public DrivingForceModule(Floor floor, Scenario2DImpl scenario) {
-		this.floor = floor;
-		this.scenario = scenario;
+	public Agent2D(Person p, Sim2D sim2d) {
+		super(p, sim2d);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * playground.gregor.sim2_v2.simulation.floor.ForceModule#run(playground
-	 * .gregor.sim2_v2.simulation.Agent2D)
+	/**
+	 * @return
 	 */
-	@Override
-	public void run(Agent2D agent) {
-		// TODO Auto-generated method stub
+	public Coordinate getPosition() {
+		return this.currentPosition;
+	}
 
+	public void setPostion(Coordinate pos) {
+		this.currentPosition = pos;
+	}
+
+	public Force getForce() {
+		return this.force;
+	}
+
+	/**
+	 * @param newPos
+	 */
+	public void moveTotPostion(Coordinate newPos) {
+		// TODO check for choose next link and so on ...
+		throw new RuntimeException("not yet implemented!!");
 	}
 
 }

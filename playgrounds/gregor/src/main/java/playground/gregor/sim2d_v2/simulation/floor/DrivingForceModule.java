@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PhantomForceModule.java
+ * DrivingForceModule.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,31 +17,28 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.gregor.sim2_v2.simulation.floor;
+package playground.gregor.sim2d_v2.simulation.floor;
 
-import java.util.List;
-
-import com.vividsolutions.jts.geom.Coordinate;
-
-import playground.gregor.sim2_v2.scenario.Scenario2DImpl;
-import playground.gregor.sim2_v2.simulation.Agent2D;
-import playground.gregor.sim2_v2.simulation.PhantomManager;
+import playground.gregor.sim2d_v2.scenario.Scenario2DImpl;
+import playground.gregor.sim2d_v2.simulation.Agent2D;
 
 /**
  * @author laemmel
  * 
  */
-public class PhantomForceModule extends AgentInteractionModule implements ForceModule {
+public class DrivingForceModule implements ForceModule {
+
+	private final Scenario2DImpl scenario;
+	private final Floor floor;
 
 	/**
 	 * @param floor
 	 * @param scenario
 	 */
-	public PhantomForceModule(Floor floor, Scenario2DImpl scenario) {
-		super(floor, scenario);
+	public DrivingForceModule(Floor floor, Scenario2DImpl scenario) {
+		this.floor = floor;
+		this.scenario = scenario;
 	}
-
-	private PhantomManager phantomMgr;
 
 	/*
 	 * (non-Javadoc)
@@ -52,8 +49,8 @@ public class PhantomForceModule extends AgentInteractionModule implements ForceM
 	 */
 	@Override
 	public void run(Agent2D agent) {
-		List<Coordinate> phantomCoords = this.phantomMgr.getPhatomsNear(agent.getPosition());
-		updateForces(agent, phantomCoords);
+		// TODO Auto-generated method stub
+
 	}
 
 }

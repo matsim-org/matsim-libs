@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.gregor.sim2_v2.simulation;
+package playground.gregor.sim2d_v2.simulation;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -48,8 +48,8 @@ import org.matsim.ptproject.qsim.interfaces.QNetworkI;
 import org.matsim.ptproject.qsim.interfaces.QSimI;
 import org.matsim.ptproject.qsim.interfaces.SimTimerI;
 
-import playground.gregor.sim2_v2.scenario.Scenario2DImpl;
-import playground.gregor.sim2_v2.simulation.floor.Floor;
+import playground.gregor.sim2d_v2.scenario.Scenario2DImpl;
+import playground.gregor.sim2d_v2.simulation.floor.Floor;
 
 /**
  * implementation of a 2d pedestrian transport simulation some day 2d

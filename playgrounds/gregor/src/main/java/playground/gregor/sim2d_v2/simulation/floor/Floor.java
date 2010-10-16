@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.gregor.sim2_v2.simulation.floor;
+package playground.gregor.sim2d_v2.simulation.floor;
 
 import java.util.List;
 
@@ -26,8 +26,8 @@ import org.matsim.api.core.v01.network.Link;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
-import playground.gregor.sim2_v2.scenario.Scenario2DImpl;
-import playground.gregor.sim2_v2.simulation.Agent2D;
+import playground.gregor.sim2d_v2.scenario.Scenario2DImpl;
+import playground.gregor.sim2d_v2.simulation.Agent2D;
 
 /**
  * @author laemmel

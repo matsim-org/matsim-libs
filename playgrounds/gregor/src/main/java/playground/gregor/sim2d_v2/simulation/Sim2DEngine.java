@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.gregor.sim2_v2.simulation;
+package playground.gregor.sim2d_v2.simulation;
 
 import java.util.HashMap;
 import java.util.List;
@@ -33,8 +33,8 @@ import org.matsim.ptproject.qsim.interfaces.SimEngine;
 
 import com.vividsolutions.jts.geom.MultiPolygon;
 
-import playground.gregor.sim2_v2.scenario.Scenario2DImpl;
-import playground.gregor.sim2_v2.simulation.floor.Floor;
+import playground.gregor.sim2d_v2.scenario.Scenario2DImpl;
+import playground.gregor.sim2d_v2.simulation.floor.Floor;
 
 /**
  * @author laemmel
