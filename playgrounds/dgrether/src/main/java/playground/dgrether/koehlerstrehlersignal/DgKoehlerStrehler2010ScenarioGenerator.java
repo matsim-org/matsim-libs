@@ -19,6 +19,9 @@
  * *********************************************************************** */
 package playground.dgrether.koehlerstrehlersignal;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -47,6 +50,7 @@ import org.matsim.signalsystems.data.signalgroups.v20.SignalGroupsData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsData;
+import org.matsim.signalsystems.model.DefaultPlanbasedSignalSystemController;
 
 import playground.dgrether.DgPaths;
 
@@ -89,7 +93,11 @@ public class DgKoehlerStrehler2010ScenarioGenerator {
 		
 		createSignalControl(signalsData);
 		
-		SignalsScenarioWriter signalsWriter = new SignalsScenarioWriter(baseDir);
+		SignalsScenarioWriter signalsWriter = new SignalsScenarioWriter();
+		signalsWriter.setSignalSystemsOutputFilename(baseDir+ "signal_systems.xml");
+		signalsWriter.setSignalGroupsOutputFilename(baseDir + "signal_groups.xml");
+		signalsWriter.setAmberTimesOutputFilename(baseDir + "amber_times.xml");
+		signalsWriter.setSignalControlOutputFilename(baseDir + "signal_control.xml");
 		signalsWriter.writeSignalsData(signalsData);
 	}
 	
@@ -101,16 +109,72 @@ public class DgKoehlerStrehler2010ScenarioGenerator {
 		// signal system 2 control
 		SignalSystemControllerData controller = control.getFactory().createSignalSystemControllerData(id2);
 		control.addSignalSystemControllerData(controller);
+		controller.setControllerIdentifier(DefaultPlanbasedSignalSystemController.IDENTIFIER);
 		SignalPlanData plan = control.getFactory().createSignalPlanData(id1);
 		controller.addSignalPlanData(plan);
+		plan.setCycleTime(60);
 		SignalGroupSettingsData settings1 =  control.getFactory().createSignalGroupSettingsData(id1);
 		plan.addSignalGroupSettings(settings1);
+		settings1.setOnset(0);
+		settings1.setDropping(27);
 		SignalGroupSettingsData settings2 = control.getFactory().createSignalGroupSettingsData(id2);
 		plan.addSignalGroupSettings(settings2);
+		settings2.setOnset(0);
+		settings2.setDropping(27);
 		
+		// signal system 5 control
+		controller = control.getFactory().createSignalSystemControllerData(id5);
+		control.addSignalSystemControllerData(controller);
+		controller.setControllerIdentifier(DefaultPlanbasedSignalSystemController.IDENTIFIER);
+		plan = control.getFactory().createSignalPlanData(id1);
+		controller.addSignalPlanData(plan);
+		plan.setCycleTime(60);
+		settings1 =  control.getFactory().createSignalGroupSettingsData(id1);
+		plan.addSignalGroupSettings(settings1);
+		settings1.setOnset(0);
+		settings1.setDropping(27);
+		settings2 = control.getFactory().createSignalGroupSettingsData(id2);
+		plan.addSignalGroupSettings(settings2);
+		settings2.setOnset(0);
+		settings2.setDropping(27);
+
+		
+		//signal system 3, 4, 7, 8 control
+		List<Id> ids = new LinkedList<Id>();
+		ids.add(id3);
+		ids.add(id4);
+		ids.add(id7);
+		ids.add(id8);
+		for (Id id : ids){
+			controller = control.getFactory().createSignalSystemControllerData(id);
+			control.addSignalSystemControllerData(controller);
+			controller.setControllerIdentifier(DefaultPlanbasedSignalSystemController.IDENTIFIER);
+			plan = control.getFactory().createSignalPlanData(id1);
+			controller.addSignalPlanData(plan);
+			plan.setCycleTime(60);
+			settings1 =  control.getFactory().createSignalGroupSettingsData(id1);
+			plan.addSignalGroupSettings(settings1);
+			settings1.setOnset(0);
+			settings1.setDropping(27);
+			settings2 = control.getFactory().createSignalGroupSettingsData(id2);
+			plan.addSignalGroupSettings(settings2);
+			settings2.setOnset(30);
+			settings2.setDropping(57);
+		}
+
 		return control;
 	}
 
+	
+	private void createAndAddSignalGroups(Id signalSystemId, SignalGroupsData groups){
+		SignalGroupData group4signal = groups.getFactory().createSignalGroupData(signalSystemId, id1);
+		groups.addSignalGroupData(group4signal);
+		group4signal.addSignalId(id1);
+		
+		group4signal = groups.getFactory().createSignalGroupData(signalSystemId, id2);
+		groups.addSignalGroupData(group4signal);
+		group4signal.addSignalId(id2);
+	}
 
 
 	private SignalSystemsData createSignalSystemsAndGroups(SignalsData sd) {
@@ -127,15 +191,7 @@ public class DgKoehlerStrehler2010ScenarioGenerator {
 		sys.addSignalData(signal);
 		signal.setLinkId(id12);
 		signal.addLaneId(id2);
-		
-		SignalGroupData group4signal = groups.getFactory().createSignalGroupData(id2);
-		groups.addSignalGroupData(group4signal);
-		group4signal.setId(id1);
-		group4signal.addSignalId(id1);
-		
-		group4signal = groups.getFactory().createSignalGroupData(id2);
-		group4signal.setId(id2);
-		group4signal.addSignalId(id2);
+		this.createAndAddSignalGroups(id2, groups);
 		
 		//signal system 5
 		sys = systems.getFactory().createSignalSystemData(id5);
@@ -148,6 +204,7 @@ public class DgKoehlerStrehler2010ScenarioGenerator {
 		sys.addSignalData(signal);
 		signal.setLinkId(id65);
 		signal.addLaneId(id2);
+		this.createAndAddSignalGroups(id5, groups);
 		
 		//signal system 3
 		sys = systems.getFactory().createSignalSystemData(id3);
@@ -158,6 +215,7 @@ public class DgKoehlerStrehler2010ScenarioGenerator {
 		signal = systems.getFactory().createSignalData(id2);
 		sys.addSignalData(signal);
 		signal.setLinkId(id43);
+		this.createAndAddSignalGroups(id3, groups);
 		
 		//signal system 4
 		sys = systems.getFactory().createSignalSystemData(id4);
@@ -168,6 +226,7 @@ public class DgKoehlerStrehler2010ScenarioGenerator {
 		signal = systems.getFactory().createSignalData(id2);
 		sys.addSignalData(signal);
 		signal.setLinkId(id54);
+		this.createAndAddSignalGroups(id4, groups);
 
 		//signal system 7
 		sys = systems.getFactory().createSignalSystemData(id7);
@@ -178,6 +237,7 @@ public class DgKoehlerStrehler2010ScenarioGenerator {
 		signal = systems.getFactory().createSignalData(id2);
 		sys.addSignalData(signal);
 		signal.setLinkId(id87);
+		this.createAndAddSignalGroups(id7, groups);
 		
 		//signal system 8
 		sys = systems.getFactory().createSignalSystemData(id8);
@@ -188,7 +248,8 @@ public class DgKoehlerStrehler2010ScenarioGenerator {
 		signal = systems.getFactory().createSignalData(id2);
 		sys.addSignalData(signal);
 		signal.setLinkId(id85);
-		
+		this.createAndAddSignalGroups(id8, groups);
+
 		return systems;
 	}
 
@@ -218,9 +279,9 @@ public class DgKoehlerStrehler2010ScenarioGenerator {
 
 		Lane link65lane2 = factory.createLane(id2);
 		lanesForLink65.addLane(link65lane2);
-		link65lane2.addToLinkId(id85);
+		link65lane2.addToLinkId(id58);
 		link65lane2.setStartsAtMeterFromLinkEnd(50.0);
-
+		
 		//convert to 2.0 format and return
 		LaneDefinitionsV11ToV20Conversion conversion = new LaneDefinitionsV11ToV20Conversion();
 		lanes = conversion.convertTo20(lanes, scenario.getNetwork());

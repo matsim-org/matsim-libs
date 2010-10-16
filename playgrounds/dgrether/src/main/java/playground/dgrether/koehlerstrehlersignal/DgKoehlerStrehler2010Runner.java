@@ -32,7 +32,11 @@ public class DgKoehlerStrehler2010Runner {
 
 	public static final String defaultConfigFile = DgPaths.STUDIESDG + "koehlerStrehler2010/config.xml";
 	
-	private String configFile = defaultConfigFile;
+	public static final String lanesConfigFile = DgPaths.STUDIESDG + "koehlerStrehler2010/config_lanes.xml";
+	
+	public static final String signalsConfigFile = DgPaths.STUDIESDG + "koehlerStrehler2010/config_signals.xml";
+	
+	private String configFile = signalsConfigFile;
 	
 	
 	private void runFromConfig() {
