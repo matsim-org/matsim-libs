@@ -16,14 +16,9 @@ import playground.christoph.withinday.replanning.WithinDayReplanner;
 import playground.christoph.withinday.replanning.identifiers.interfaces.AgentsToReplanIdentifier;
 import playground.christoph.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
 
-public class YoungPeopleIdentifier extends DuringLegIdentifier {
+public class YoungPeopleIdentifier extends AgentsToReplanIdentifier {
 
 	private QSimI queueSim;
-
-	@Override
-	public AgentsToReplanIdentifier clone() {
-		return this;
-	}
 
 	@Override
 	public List<PersonAgent> getAgentsToReplan(double time,
@@ -36,9 +31,7 @@ public class YoungPeopleIdentifier extends DuringLegIdentifier {
 			return list;
 		}
 		
-		QLink tmpLink = queueSim.getQNetwork().getLinks().get(new IdImpl("6"));
-//		Collection<QVehicle> tmpList=queueSim.getQNetwork().getLinks().get(new IdImpl("6")).getVehQueue();
-		Collection<QVehicle> tmpList=queueSim.getQNetwork().getLinks().get(new IdImpl("6")).getAllNonParkedVehicles();
+//		Collection<QVehicle> tmpList=queueSim.getQNetwork().getLinks().get(new IdImpl("6")).getAllNonParkedVehicles();
 
 		// select agents, which should be replanned within this time step
 		for (QLink link:queueSim.getQNetwork().getLinks().values()){
@@ -58,6 +51,11 @@ public class YoungPeopleIdentifier extends DuringLegIdentifier {
 	
 	YoungPeopleIdentifier(QSimI queueSim) {
 		this.queueSim = queueSim;
+	}
+
+	@Override
+	public AgentsToReplanIdentifier clone() {
+		throw new UnsupportedOperationException() ;
 	}
 
 

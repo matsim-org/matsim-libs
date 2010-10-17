@@ -11,15 +11,9 @@ import playground.christoph.withinday.replanning.WithinDayReplanner;
 import playground.christoph.withinday.replanning.identifiers.interfaces.AgentsToReplanIdentifier;
 import playground.christoph.withinday.replanning.identifiers.interfaces.DuringActivityIdentifier;
 
-public class OldPeopleIdentifier extends DuringActivityIdentifier {
+public class OldPeopleIdentifier extends AgentsToReplanIdentifier {
 
 	private QSimI queueSim;
-
-	@Override
-	public AgentsToReplanIdentifier clone() {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 	@Override
 	public List<PersonAgent> getAgentsToReplan(double time, WithinDayReplanner withinDayReplanner) {
@@ -44,6 +38,11 @@ public class OldPeopleIdentifier extends DuringActivityIdentifier {
 
 	public OldPeopleIdentifier( QSimI queueSim) {
 		this.queueSim = queueSim;
+	}
+
+	@Override
+	public AgentsToReplanIdentifier clone() {
+		throw new UnsupportedOperationException() ;
 	}
 
 }

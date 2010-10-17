@@ -71,10 +71,10 @@ public class MyMobsimFactory implements MobsimFactory {
 		int numReplanningThreads = 1;
 
 		
-		QSimI qsim = new QSim( sc, eventsManager ) ;
+		QSimI mobsim = new QSim( sc, eventsManager ) ;
 		
-		AgentFactory agentFactory = new WithinDayAgentFactory( qsim ) ;
-		qsim.setAgentFactory(agentFactory) ;
+		AgentFactory agentFactory = new WithinDayAgentFactory( mobsim ) ;
+		mobsim.setAgentFactory(agentFactory) ;
 		
 		ReplanningManager replanningManager = new ReplanningManager();
 		
@@ -83,7 +83,7 @@ public class MyMobsimFactory implements MobsimFactory {
 		FixedOrderQueueSimulationListener foqsl = new FixedOrderQueueSimulationListener();
 		foqsl.addQueueSimulationInitializedListener(replanningManager);
 		foqsl.addQueueSimulationBeforeSimStepListener(replanningManager);
-		qsim.addQueueSimulationListeners(foqsl);
+		mobsim.addQueueSimulationListeners(foqsl);
 		// (essentially, can just imagine the replanningManager as a regular MobsimListener)
 		
 		List<SimulationListener> simulationListenerList = new ArrayList<SimulationListener>() ;
@@ -95,11 +95,11 @@ public class MyMobsimFactory implements MobsimFactory {
 		// these are containers, but they don't do anything by themselves
 		
 		for ( SimulationListener siml : simulationListenerList ) {
-			qsim.addQueueSimulationListeners( siml ) ;
+			mobsim.addQueueSimulationListeners( siml ) ;
 		}
 
 		log.info("Initialize Replanning Routers");
-		initReplanningRouter(sc, qsim);
+		initReplanningRouter(sc, mobsim);
 
 		InitialReplanningModule initialReplanningModule = new InitialReplanningModule(parallelInitialReplanner);
 		DuringActivityReplanningModule actEndReplanning = new DuringActivityReplanningModule(parallelActEndReplanner);
@@ -114,7 +114,7 @@ public class MyMobsimFactory implements MobsimFactory {
 		replanningManager.doInitialReplanning(false);
 		replanningManager.doLeaveLinkReplanning(true);
 		
-		return qsim ;
+		return mobsim ;
 	}
 	
 	/*
@@ -132,7 +132,7 @@ public class MyMobsimFactory implements MobsimFactory {
 
 		// replanning while at activity:
 
-		WithinDayReplanner duringActivityReplanner = new ReplannerOldPeople(ReplanningIdGenerator.getNextId(), sc);
+		WithinDayReplanner duringActivityReplanner = new OldPeopleReplanner(ReplanningIdGenerator.getNextId(), sc);
 		// defines a "doReplanning" method which contains the core of the work
 		// as a piece, it re-routes a _future_ leg.  
 		
@@ -150,7 +150,7 @@ public class MyMobsimFactory implements MobsimFactory {
 
 		// replanning while on leg:
 		
-		WithinDayReplanner duringLegReplanner = new ReplannerYoungPeople(ReplanningIdGenerator.getNextId(), sc);
+		WithinDayReplanner duringLegReplanner = new YoungPeopleReplanner(ReplanningIdGenerator.getNextId(), sc);
 		// defines a "doReplanning" method which contains the core of the work
 		// it replaces the next activity
 		// in order to get there, it re-routes the current route
