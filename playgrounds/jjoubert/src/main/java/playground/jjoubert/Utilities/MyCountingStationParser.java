@@ -65,7 +65,7 @@ public class MyCountingStationParser {
 	 * 		the file that contains dates that should be considered <i>abnormal</i>
 	 * 		when parsing the raw traffic count data. Traffic counts on these 
 	 * 		dates are associated not with the logical {@link Calendar#DAY_OF_WEEK},
-	 * 		but rather day `8', considered a seprate type of day, and resulting
+	 * 		but rather day `8', considered a seperate type of day, and resulting
 	 * 		in separate {@link Counts} objects.   
 	 */
 	public static void main(String[] args) {
@@ -216,7 +216,11 @@ public class MyCountingStationParser {
 					// Determine the time of day.
 					Integer hour = Integer.parseInt(entry[3].split(":")[0]);
 					if(hour == 24){
-						hour = 0;
+						/*
+						 * TODO Check: I've gotten errors in reading the counts 
+						 * files. It may be because I change the hours to zero. 
+						 */
+//						hour = 0;
 					}
 					
 					// Determine the duration (and hence if it is a complete record).
@@ -269,7 +273,7 @@ public class MyCountingStationParser {
 //							int wasLightA = countsMap.get(countsIdLightA).get(new IdImpl(hour)).get(0);
 //							System.out.println("Counter: " + ++counter);
 							if(counter == 24){
-								log.warn("WARNING");
+//								log.warn("WARNING");
 							}
 							cMap.get(countsIdLightA).get(new IdImpl(hour)).set(0, cMap.get(countsIdLightA).get(new IdImpl(hour)).get(0) + lvA);
 							cMap.get(countsIdLightA).get(new IdImpl(hour)).set(1, cMap.get(countsIdLightA).get(new IdImpl(hour)).get(1) + 1);
@@ -487,7 +491,7 @@ public class MyCountingStationParser {
 		for(int i = 0; i < 24; i++ ){
 			List<Integer> l = new ArrayList<Integer>(2);
 			l.add(0); l.add(0);
-			obs.put(new IdImpl(i), l);
+			obs.put(new IdImpl(i+1), l);
 		}
 		return obs;	
 	}
