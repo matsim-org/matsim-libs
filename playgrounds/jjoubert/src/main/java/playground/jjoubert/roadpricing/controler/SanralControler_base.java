@@ -43,6 +43,8 @@ public class SanralControler_base {
 		 * Add the multi-thread queue simulation.
 		 */
 		config.getQSimConfigGroup().setNumberOfThreads(10);
+		config.getQSimConfigGroup().setFlowCapFactor(0.1);
+		config.getQSimConfigGroup().setStorageCapFactor(0.28);
 
 		Controler c = new Controler(config);
 		c.setCreateGraphs(true);
