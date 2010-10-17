@@ -109,11 +109,11 @@ public class MyBasicConfig {
 
 		
 		// Parallel QSim
-		QSimConfigGroup qsim = new QSimConfigGroup();
-		qsim.setNumberOfThreads(2);
-		qsim.setSnapshotFormat("googleearth");
-		qsim.setSnapshotPeriod(900);
-		config.setQSimConfigGroup(qsim);
+//		QSimConfigGroup qsim = new QSimConfigGroup();
+//		qsim.setNumberOfThreads(2);
+//		qsim.setSnapshotFormat("googleearth");
+//		qsim.setSnapshotPeriod(900);
+//		config.setQSimConfigGroup(qsim);
 	}
 	
 	public Config getConfig(){
