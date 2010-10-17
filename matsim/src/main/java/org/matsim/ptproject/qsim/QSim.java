@@ -98,7 +98,7 @@ import org.matsim.vis.snapshots.writers.VisNetwork;
  * @author dgrether
  * @author knagel
  */
-public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, AcceptsVisMobsimFeatures, QSimI {
+public class QSim implements IOSimulation, VisMobsim, AcceptsVisMobsimFeatures, QSimI {
 
 	final private static Logger log = Logger.getLogger(QSim.class);
 
@@ -158,7 +158,8 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 	
 	// everything above this line is private and should remain private.  pls contact me if this is in your way.  kai, oct'10 
 	// ============================================================================================================================
-
+	// initialization:
+	
 	public QSim(final Scenario scenario, final EventsManager events) {
 		this(scenario, events, new DefaultQSimEngineFactory());
 	}
@@ -169,90 +170,8 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 		init(simEngineFac);
 	}
 
-	public void setMultiModalSimEngine(MultiModalSimEngine multiModalEngine) {
-		this.multiModalEngine = multiModalEngine;
-	}
-
-	/**
-	 * extended constructor method that can also be after assignments of another constructor
-	 * <p/>
-	 * Definitely needs to be strongly protected since c'tor should not call non-protected methods. kai, aug'10
-	 * @param simEngineFac
-	 */
-	private void init(QSimEngineFactory simEngineFac){
-		log.info("Using QSim...");
-		Scenario sc = this.getScenario() ;
-		this.listenerManager = new SimulationListenerManager(this);
-		this.agentCounter = new AgentCounter();
-		this.simTimer = new QSimTimer(sc.getConfig().getQSimConfigGroup().getTimeStepSize());
-
-		// create the NetworkEngine ...
-		this.netEngine = (QSimEngineImpl) simEngineFac.createQSimEngine(this, MatsimRandom.getRandom());
-
-		// create the QNetwork ...
-		QNetworkI network = null ;
-		if (sc.getConfig().scenario().isUseLanes()) {
-			if (((ScenarioImpl)sc).getLaneDefinitions() == null) {
-				throw new IllegalStateException("Lane definitions have to be set if feature is enabled!");
-			}
-			log.info("Lanes enabled...");
-			network = DefaultQNetworkFactory.createQNetwork(this, new QLanesNetworkFactory(new DefaultQNetworkFactory(),
-					((ScenarioImpl)sc).getLaneDefinitions()));
-		}
-		else {
-			network = DefaultQNetworkFactory.createQNetwork(this);
-		}
-
-		// then tell the QNetwork to use the simEngine (this also creates qlinks and qnodes)
-		network.initialize(this.netEngine);
-
-		if (sc.getConfig().scenario().isUseSignalSystems()) {
-			log.info("Signals enabled...");
-		}
-
-		if (sc.getConfig().multiModal().isMultiModalSimulationEnabled()) {
-
-			/*
-			 * Create a MultiModalTravelTime Calculator. It is passed over the the MultiModalQNetwork which
-			 * needs it to estimate the TravelTimes of the NonCarModes.
-			 * If the Controller uses a TravelTimeCalculatorWithBuffer (which is strongly recommended), a
-			 * BufferedTravelTime Object is created and set as TravelTimeCalculator in the MultiModalTravelTimeCost
-			 * Object.
-			 */
-//			MultiModalTravelTimeCost multiModalTravelTime = new MultiModalTravelTimeCost(sc.getConfig().plansCalcRoute(), sc.getConfig().multiModal());
-
-//			TravelTime travelTime = ((MultiModalMobsimFactory)simEngineFac).getTravelTime();
-//
-//			if (travelTime instanceof TravelTimeCalculatorWithBuffer) {
-//				BufferedTravelTime bufferedTravelTime = new BufferedTravelTime((TravelTimeCalculatorWithBuffer) travelTime);
-//				bufferedTravelTime.setScaleFactor(1.25);
-//				multiModalTravelTime.setTravelTime(bufferedTravelTime);
-//			} else {
-//				log.warn("TravelTime is not instance of TravelTimeCalculatorWithBuffer!");
-//				log.warn("No BufferedTravelTime Object could be created. Using FreeSpeedTravelTimes instead.");
-//			}
-
-			// create MultiModalSimEngine
-			multiModalEngine = new MultiModalSimEngineFactory().createMultiModalSimEngine(this);
-
-			// add MultiModalDepartureHandler
-			this.addDepartureHandler(new MultiModalDepartureHandler(this, multiModalEngine, scenario.getConfig().multiModal()));
-		}
-
-		this.agentFactory = new AgentFactory(this);
-
-		this.carDepartureHandler = new CarDepartureHandler(this);
-		addDepartureHandler(this.carDepartureHandler);
-
-		if (sc.getConfig().scenario().isUseTransit()){
-			this.transitEngine = new TransitQSimEngine(this);
-			this.addDepartureHandler(this.transitEngine);
-			// why is there not addition of pt to non teleported modes here?  kai, jun'10
-			// done in TransitQSimEngine.  kai, jun'10
-		}
-
-	}
-
+	// ============================================================================================================================
+	// "run" method:
 
 	@Override
 	public final void run() {
@@ -277,46 +196,37 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 		//delete reference to clear memory
 		this.listenerManager = null;
 	}
+	
+	// ============================================================================================================================
+	// "prepareSim":
+	
+	// setters that should reasonably be called between constructor and "prepareSim" (triggered by "run"):
 
-	protected void createAgents() {
-		if (this.scenario.getPopulation() == null) {
-			throw new RuntimeException("No valid Population found (plans == null)");
-		}
-		VehicleType defaultVehicleType = new VehicleTypeImpl(new IdImpl("defaultVehicleType"));
-		for (Person p : this.scenario.getPopulation().getPersons().values()) {
-			DefaultPersonDriverAgent agent = this.agentFactory.createPersonAgent(p);
-			QVehicle veh = new QVehicleImpl(new VehicleImpl(agent.getPerson().getId(), defaultVehicleType));
-			//not needed in new agent class
-			veh.setDriver(agent); // this line is currently only needed for OTFVis to show parked vehicles
-			agent.setVehicle(veh);
-			agents.add(agent);
-			if (agent.initializeAndCheckIfAlive()) {
-				QLink qlink = this.netEngine.getQNetwork().getQLink(agent.getCurrentLinkId());
-				qlink.addParkedVehicle(veh);
-			}
-		}
-
-		if (this.transitEngine != null){
-			Collection<PersonAgent> a = this.transitEngine.createAgents();
-			this.transitAgents = a;
-			agents.addAll(a);
-		}
-
-//		for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) {
-//			for (PersonAgent agent : agents) {
-//				queueSimulationFeature.agentCreated(agent);
-//			}
-//		}
-//		for (PersonAgent agent : agents) {
-//			this.events.processEvent( new AgentCreationEventImpl( Time.UNDEFINED_TIME, agent.getPerson().getId(), null, null )) ;
-//		}
+	public void setMultiModalSimEngine(MultiModalSimEngine multiModalEngine) {
+		this.multiModalEngine = multiModalEngine;
+	}
+	
+	@Override
+	public void setAgentFactory(final AgentFactory fac) {
+		this.agentFactory = fac;
 	}
 
+	@Override
+	public void setControlerIO(final ControlerIO controlerIO) {
+		this.controlerIO = controlerIO;
+	}
+	
+	@Override
+	public void setIterationNumber(final Integer iterationNumber) {
+		this.iterationNumber = iterationNumber;
+	}
+
+	// prepareSim and related:
 
 	/**
 	 * Prepare the simulation and get all the settings from the configuration.
 	 */
-	protected void prepareSim() {
+	protected final void prepareSim() {
 		if (events == null) {
 			throw new RuntimeException("No valid Events Object (events == null)");
 		}
@@ -350,11 +260,34 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 		if ( this.changeEventsEngine != null ) { //yyyy do earlier
 			this.changeEventsEngine.onPrepareSim();
 		}
-
-//		for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) { // yyyy features should be replaced by listeners
-//			queueSimulationFeature.afterPrepareSim();
-//		}
 	}
+
+	protected void createAgents() {
+		if (this.scenario.getPopulation() == null) {
+			throw new RuntimeException("No valid Population found (plans == null)");
+		}
+		VehicleType defaultVehicleType = new VehicleTypeImpl(new IdImpl("defaultVehicleType"));
+		for (Person p : this.scenario.getPopulation().getPersons().values()) {
+			DefaultPersonDriverAgent agent = this.agentFactory.createPersonAgent(p);
+			QVehicle veh = new QVehicleImpl(new VehicleImpl(agent.getPerson().getId(), defaultVehicleType));
+			//not needed in new agent class
+			veh.setDriver(agent); // this line is currently only needed for OTFVis to show parked vehicles
+			agent.setVehicle(veh);
+			agents.add(agent);
+			if (agent.initializeAndCheckIfAlive()) {
+				QLink qlink = this.netEngine.getQNetwork().getQLink(agent.getCurrentLinkId());
+				qlink.addParkedVehicle(veh);
+			}
+		}
+
+		if (this.transitEngine != null){
+			Collection<PersonAgent> a = this.transitEngine.createAgents();
+			this.transitAgents = a;
+			agents.addAll(a);
+		}
+
+	}
+
 
 	/**
 	 * Close any files, etc.
@@ -367,10 +300,6 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 		if (this.signalEngine != null) {
 			this.signalEngine.afterSim();
 		}
-
-//		for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) { // yyyy features should be replaced by listeners
-//			queueSimulationFeature.beforeCleanupSim();
-//		}
 
 		if ( this.netEngine != null ) {
 			this.netEngine.afterSim();
@@ -629,6 +558,87 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 	// private methods
 	// ############################################################################################################################
 
+	/**
+	 * extended constructor method that can also be after assignments of another constructor
+	 * <p/>
+	 * Definitely needs to be strongly protected (e.g. private) since c'tor should not call non-protected methods. kai, aug'10
+	 * @param simEngineFac
+	 */
+	private void init(QSimEngineFactory simEngineFac){
+		log.info("Using QSim...");
+		Scenario sc = this.getScenario() ;
+		this.listenerManager = new SimulationListenerManager(this);
+		this.agentCounter = new AgentCounter();
+		this.simTimer = new QSimTimer(sc.getConfig().getQSimConfigGroup().getTimeStepSize());
+
+		// create the NetworkEngine ...
+		this.netEngine = (QSimEngineImpl) simEngineFac.createQSimEngine(this, MatsimRandom.getRandom());
+
+		// create the QNetwork ...
+		QNetworkI network = null ;
+		if (sc.getConfig().scenario().isUseLanes()) {
+			if (((ScenarioImpl)sc).getLaneDefinitions() == null) {
+				throw new IllegalStateException("Lane definitions have to be set if feature is enabled!");
+			}
+			log.info("Lanes enabled...");
+			network = DefaultQNetworkFactory.createQNetwork(this, new QLanesNetworkFactory(new DefaultQNetworkFactory(),
+					((ScenarioImpl)sc).getLaneDefinitions()));
+		}
+		else {
+			network = DefaultQNetworkFactory.createQNetwork(this);
+		}
+
+		// then tell the QNetwork to use the simEngine (this also creates qlinks and qnodes)
+		network.initialize(this.netEngine);
+
+		if (sc.getConfig().scenario().isUseSignalSystems()) {
+			log.info("Signals enabled...");
+		}
+
+		if (sc.getConfig().multiModal().isMultiModalSimulationEnabled()) {
+
+			/*
+			 * Create a MultiModalTravelTime Calculator. It is passed over the the MultiModalQNetwork which
+			 * needs it to estimate the TravelTimes of the NonCarModes.
+			 * If the Controller uses a TravelTimeCalculatorWithBuffer (which is strongly recommended), a
+			 * BufferedTravelTime Object is created and set as TravelTimeCalculator in the MultiModalTravelTimeCost
+			 * Object.
+			 */
+//			MultiModalTravelTimeCost multiModalTravelTime = new MultiModalTravelTimeCost(sc.getConfig().plansCalcRoute(), sc.getConfig().multiModal());
+
+//			TravelTime travelTime = ((MultiModalMobsimFactory)simEngineFac).getTravelTime();
+//
+//			if (travelTime instanceof TravelTimeCalculatorWithBuffer) {
+//				BufferedTravelTime bufferedTravelTime = new BufferedTravelTime((TravelTimeCalculatorWithBuffer) travelTime);
+//				bufferedTravelTime.setScaleFactor(1.25);
+//				multiModalTravelTime.setTravelTime(bufferedTravelTime);
+//			} else {
+//				log.warn("TravelTime is not instance of TravelTimeCalculatorWithBuffer!");
+//				log.warn("No BufferedTravelTime Object could be created. Using FreeSpeedTravelTimes instead.");
+//			}
+
+			// create MultiModalSimEngine
+			multiModalEngine = new MultiModalSimEngineFactory().createMultiModalSimEngine(this);
+
+			// add MultiModalDepartureHandler
+			this.addDepartureHandler(new MultiModalDepartureHandler(this, multiModalEngine, scenario.getConfig().multiModal()));
+		}
+
+		this.agentFactory = new AgentFactory(this);
+
+		this.carDepartureHandler = new CarDepartureHandler(this);
+		addDepartureHandler(this.carDepartureHandler);
+
+		if (sc.getConfig().scenario().isUseTransit()){
+			this.transitEngine = new TransitQSimEngine(this);
+			this.addDepartureHandler(this.transitEngine);
+			// why is there not addition of pt to non teleported modes here?  kai, jun'10
+			// done in TransitQSimEngine.  kai, jun'10
+		}
+
+	}
+
+
 	private void initSimTimer() {
 		double startTime = this.scenario.getConfig().getQSimConfigGroup().getStartTime();
 		this.stopTime = this.scenario.getConfig().getQSimConfigGroup().getEndTime();
@@ -698,11 +708,6 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 		  return events;
 		}
 
-	@Override
-	public void setAgentFactory(final AgentFactory fac) {
-		this.agentFactory = fac;
-	}
-
 	/** Specifies whether the simulation should track vehicle usage and throw an Exception
 	 * if an agent tries to use a car on a link where the car is not available, or not.
 	 * Set <code>teleportVehicles</code> to <code>true</code> if agents always have a
@@ -763,16 +768,6 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 		return this.iterationNumber;
 	}
 
-
-	@Override
-	public void setIterationNumber(final Integer iterationNumber) {
-		this.iterationNumber = iterationNumber;
-	}
-
-	@Override
-	public void setControlerIO(final ControlerIO controlerIO) {
-		this.controlerIO = controlerIO;
-	}
 
 	@Override
 	public final SimTimerI getSimTimer() {

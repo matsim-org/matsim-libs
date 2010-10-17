@@ -19,10 +19,13 @@
 
 package org.matsim.ptproject.qsim.interfaces;
 
+import java.util.Collection;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.IOSimulation;
+import org.matsim.core.mobsim.framework.ObservableSimulation;
 import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.ptproject.qsim.AgentFactory;
 
@@ -34,7 +37,7 @@ import org.matsim.ptproject.qsim.AgentFactory;
  * @author nagel
  *
  */
-public interface QSimI extends IOSimulation {
+public interface QSimI extends IOSimulation, ObservableSimulation {
 
 	void agentDeparts(PersonAgent personAgent, Id startLinkId);
 
@@ -43,6 +46,8 @@ public interface QSimI extends IOSimulation {
 	AgentCounterI getAgentCounter();
 
 	void scheduleActivityEnd(PersonAgent personAgent);
+	void rescheduleActivityEnd(final PersonAgent agent, final double oldTime, final double newTime ) ;
+
 
 	Scenario getScenario();
 
@@ -51,6 +56,8 @@ public interface QSimI extends IOSimulation {
 	SimTimerI getSimTimer();
 
 	QNetworkI getQNetwork();
+	
+	Collection<PersonAgent> getActivityEndsList() ;
 	
 	/**Registering and unregistering agents on links for visualization.  
 	 * 

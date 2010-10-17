@@ -723,4 +723,16 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 	}
 
 
+	@Override
+	public Collection<PersonAgent> getActivityEndsList() {
+		throw new UnsupportedOperationException() ;
+	}
+
+
+	@Override
+	public void rescheduleActivityEnd(PersonAgent agent, double oldTime, double newTime) {
+		throw new UnsupportedOperationException() ;
+	}
+
+
 }
