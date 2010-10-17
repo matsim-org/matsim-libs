@@ -35,7 +35,7 @@ public class ReplannerOldPeople extends WithinDayDuringActivityReplanner {
 		
 		// If we don't have a valid Replanner.
 		// (only extra security)
-		if (this.planAlgorithm == null) return false;
+		if (this.routeAlgo == null) return false;
 		
 		// If we don't have a valid WithinDayPersonAgent
 		// (only extra security)
@@ -74,8 +74,8 @@ public class ReplannerOldPeople extends WithinDayDuringActivityReplanner {
 		selectedPlan.insertLegAct(selectedPlan.getActLegIndex(currentActivity) + 1, legToNewWork, newWorkAct);
 		
 		// replan the new Legs
-		new EditRoutes().replanFutureLegRoute(selectedPlan, legToNewWork, planAlgorithm);
-		new EditRoutes().replanFutureLegRoute(selectedPlan, homeLeg, planAlgorithm);
+		new EditRoutes().replanFutureLegRoute(selectedPlan, legToNewWork, routeAlgo);
+		new EditRoutes().replanFutureLegRoute(selectedPlan, homeLeg, routeAlgo);
 				
 		return true;
 	}

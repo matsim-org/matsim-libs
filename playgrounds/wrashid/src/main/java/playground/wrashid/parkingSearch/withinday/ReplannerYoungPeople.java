@@ -32,7 +32,7 @@ public class ReplannerYoungPeople extends WithinDayDuringLegReplanner {
 	public boolean doReplanning(PersonAgent driverAgent) {
 		
 		// If we don't have a valid Replanner.
-		if (this.planAlgorithm == null) return false;
+		if (this.routeAlgo == null) return false;
 
 		// If we don't have a valid WithinDayPersonAgent
 		if (driverAgent == null) return false;
@@ -66,11 +66,11 @@ public class ReplannerYoungPeople extends WithinDayDuringLegReplanner {
 		 *  Replan Routes
 		 */
 		// new Route for current Leg
-		new EditRoutes().replanCurrentLegRoute(selectedPlan, currentLeg, ((WithinDayPersonAgent)driverAgent).getCurrentNodeIndex(), planAlgorithm, this.scenario.getNetwork(), time);
+		new EditRoutes().replanCurrentLegRoute(selectedPlan, currentLeg, ((WithinDayPersonAgent)driverAgent).getCurrentNodeIndex(), routeAlgo, this.scenario.getNetwork(), time);
 		
 		// new Route for next Leg
 		Leg homeLeg = selectedPlan.getNextLeg(newWorkAct);
-		new EditRoutes().replanFutureLegRoute(selectedPlan, homeLeg, planAlgorithm);
+		new EditRoutes().replanFutureLegRoute(selectedPlan, homeLeg, routeAlgo);
 		
 		// finally reset the cached Values of the PersonAgent - they may have changed!
 		withinDayPersonAgent.resetCaches();
