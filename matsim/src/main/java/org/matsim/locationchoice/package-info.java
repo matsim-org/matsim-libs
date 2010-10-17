@@ -28,7 +28,7 @@
  * 
  * <h3>Diluted Scenarios</h3>
  * <ul>
- * 	<li><strong><font color="blue">centerNode</font></strong>
+ * 	<li><strong><font color="blue">centerNode</font></strong><br>
  * 		Type and range: String <br> 
  * 		Default: null<br>
  * 		Description: If the locations have to be chosen from an additionally restrained region a center node and a radius can be set. This is only useful for diluted scenarios
