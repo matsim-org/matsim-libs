@@ -25,6 +25,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
+import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 
 public class MyBasicConfig {
@@ -48,7 +49,8 @@ public class MyBasicConfig {
 		config.plans().setInputFile("./input/Generated_plans_100.xml.gz");
 
 		// Controler.
-		config.controler().setLinkToLinkRoutingEnabled(true);
+		config.controler().setRoutingAlgorithmType(RoutingAlgorithmType.Dijkstra);
+		config.controler().setLinkToLinkRoutingEnabled(false);
 		config.controler().setWriteEventsInterval(20);
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(100);

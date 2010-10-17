@@ -51,6 +51,7 @@ public class SanralControler_base {
 		c.setWriteEventsInterval(20);
 		c.setOverwriteFiles(false);
 		
+		config.checkConsistency();
 		c.run();
 	}
 
