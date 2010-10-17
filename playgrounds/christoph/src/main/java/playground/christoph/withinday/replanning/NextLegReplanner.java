@@ -69,7 +69,7 @@ public class NextLegReplanner extends WithinDayDuringActivityReplanner {
 	@Override
 	public boolean doReplanning(PersonAgent personAgent) {		
 		// If we don't have a valid Replanner.
-		if (this.planAlgorithm == null) return false;
+		if (this.routeAlgo == null) return false;
 		
 		// If we don't have a valid WithinDayPersonAgent
 		if (personAgent == null) return false;
@@ -99,7 +99,7 @@ public class NextLegReplanner extends WithinDayDuringActivityReplanner {
 //		if (!nextLeg.getMode().equals(TransportMode.car)) return false;
 		
 		// new Route for next Leg
-		new EditRoutes().replanFutureLegRoute(selectedPlan, nextLeg, planAlgorithm);
+		new EditRoutes().replanFutureLegRoute(selectedPlan, nextLeg, routeAlgo);
 
 //		// create ReplanningEvent
 //		QSim.getEvents().processEvent(new ExtendedAgentReplanEventImpl(time, person.getId(), (NetworkRouteWRefs)alternativeRoute, (NetworkRouteWRefs)originalRoute));

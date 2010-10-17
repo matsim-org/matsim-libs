@@ -51,7 +51,7 @@ public abstract class WithinDayReplanner implements Cloneable {
 	protected Id id;
 	protected double time;
 	protected AbstractMultithreadedModule abstractMultithreadedModule;
-	protected PlanAlgorithm planAlgorithm;
+	protected PlanAlgorithm routeAlgo;
 	protected List<AgentsToReplanIdentifier> identifiers = new ArrayList<AgentsToReplanIdentifier>();
 	protected double replanningProbability = 1.0;
 	protected Random random;
@@ -100,7 +100,7 @@ public abstract class WithinDayReplanner implements Cloneable {
 	
 	public void setAbstractMultithreadedModule(AbstractMultithreadedModule module) {
 		this.abstractMultithreadedModule = module;
-		this.planAlgorithm = module.getPlanAlgoInstance();
+		this.routeAlgo = module.getPlanAlgoInstance();
 	}
 	
 //	public void setReplanner(PlanAlgorithm planAlgorithm) {

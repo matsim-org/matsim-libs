@@ -38,11 +38,11 @@ public class WithinDayPersonAgent extends DefaultPersonDriverAgent {
 	private static final Logger log = Logger.getLogger("dummy");
 
 	private List<WithinDayReplanner> withinDayReplanner = new ArrayList<WithinDayReplanner>();
-	private WithinDayQSim simulation;
+	private QSimI simulation;
 	
 	public WithinDayPersonAgent(Person p, QSimI simulation) {
 		super(p, simulation);
-		this.simulation = (WithinDayQSim) simulation;
+		this.simulation = simulation;
 	}
 
 	/*

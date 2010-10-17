@@ -113,7 +113,7 @@ public class EndActivityAndEvacuateReplanner extends WithinDayDuringActivityRepl
 		selectedPlan.insertLegAct(selectedPlan.getActLegIndex(currentActivity) + 1, legToRescue, rescueActivity);
 			
 		// calculate route for the leg to the rescue facility
-		new EditRoutes().replanFutureLegRoute(selectedPlan, legToRescue, planAlgorithm);
+		new EditRoutes().replanFutureLegRoute(selectedPlan, legToRescue, routeAlgo);
 
 		/*
 		 * Reschedule the currently performed Activity in the QSim - there

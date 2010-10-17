@@ -20,15 +20,10 @@
 
 package playground.christoph.withinday.mobsim;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.ptproject.qsim.AgentFactory;
-import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.helpers.DefaultPersonDriverAgent;
+import org.matsim.ptproject.qsim.interfaces.QSimI;
 
 /*
  * Creates WithinDayPersonAgents instead of PersonAgents.
@@ -39,7 +34,7 @@ public class WithinDayAgentFactory extends AgentFactory {
 
 //	protected Map<Id, PersonAgent> personAgents;
 	
-	public WithinDayAgentFactory(final QSim simulation) {
+	public WithinDayAgentFactory(final QSimI simulation) {
 		super(simulation);
 		
 //		personAgents = new HashMap<Id, PersonAgent>();

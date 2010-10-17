@@ -71,7 +71,7 @@ public class CurrentLegReplanner extends WithinDayDuringLegReplanner {
 	public boolean doReplanning(PersonAgent personAgent) {
 		
 		// If we don't have a valid Replanner.
-		if (this.planAlgorithm == null) return false;
+		if (this.routeAlgo == null) return false;
 
 		// If we don't have a valid WithinDayPersonAgent
 		if (personAgent == null) return false;
@@ -94,7 +94,7 @@ public class CurrentLegReplanner extends WithinDayDuringLegReplanner {
 //		if (!currentLeg.getMode().equals(TransportMode.car)) return false;
 
 		// new Route for current Leg
-		new EditRoutes().replanCurrentLegRoute(selectedPlan, currentLeg, withinDayPersonAgent.getCurrentNodeIndex(), planAlgorithm, scenario.getNetwork(), time);
+		new EditRoutes().replanCurrentLegRoute(selectedPlan, currentLeg, withinDayPersonAgent.getCurrentNodeIndex(), routeAlgo, scenario.getNetwork(), time);
 
 //		// Finally reset the cached next Link of the PersonAgent - it may have changed!
 //		withinDayPersonAgent.resetCachedNextLink();

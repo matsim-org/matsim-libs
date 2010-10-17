@@ -41,14 +41,14 @@ public class InitialReplanner extends WithinDayInitialReplanner {
 	
 	public boolean doReplanning(PersonAgent personAgent) {	
 		// If we don't have a valid Replanner.
-		if (this.planAlgorithm == null) return false;
+		if (this.routeAlgo == null) return false;
 		
 		// If we don't have a valid WithinDayPersonAgent
 		if (personAgent == null) return false;
 		
 		Person person = personAgent.getPerson();
 		
-		planAlgorithm.run(person.getSelectedPlan());
+		routeAlgo.run(person.getSelectedPlan());
 		
 		return true;
 	}

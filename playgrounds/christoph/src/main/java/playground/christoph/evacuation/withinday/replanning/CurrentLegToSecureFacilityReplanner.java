@@ -76,7 +76,7 @@ public class CurrentLegToSecureFacilityReplanner extends WithinDayDuringLegRepla
 		if (this.time > EvacuationConfig.evacuationTime) return true;
 		
 		// If we don't have a valid Replanner.
-		if (this.planAlgorithm == null) return false;
+		if (this.routeAlgo == null) return false;
 
 		// If we don't have a valid WithinDayPersonAgent
 		if (personAgent == null) return false;
@@ -131,7 +131,7 @@ public class CurrentLegToSecureFacilityReplanner extends WithinDayDuringLegRepla
 			new ReplacePlanElements().replaceActivity(selectedPlan, nextActivity, rescueActivity);
 			
 			// new Route for current Leg
-			new EditRoutes().replanCurrentLegRoute(selectedPlan, currentLeg, withinDayPersonAgent.getCurrentNodeIndex(), planAlgorithm, scenario.getNetwork(), time);
+			new EditRoutes().replanCurrentLegRoute(selectedPlan, currentLeg, withinDayPersonAgent.getCurrentNodeIndex(), routeAlgo, scenario.getNetwork(), time);
 		}
 		
 		// Remove all legs and activities after the next activity.
