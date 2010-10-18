@@ -44,7 +44,8 @@ import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
  */
 public class TrialDemandFromCountsMunich {
 	static String netFile = "";
-	static String countsPath = "../../detailedEval/teststrecke/";
+	static String countsPath = "../../detailedEval/teststrecke/zaehlstellen_einfluss/";
+	static String outPath = "../../detailedEval/teststrecke/sim/input/";
 	static String day1 = "20090707";
 	static String day2 = "20090708";
 	static String day3 = "20090709";
@@ -73,12 +74,12 @@ public class TrialDemandFromCountsMunich {
 		String lane1 = dayPath + "4006013.txt";
 		String lane2 = dayPath + "4006014.txt";
 
-		SortedMap<Double, Double> endTime2NoOfVehiclesLane1 = getEndTime2NoOfVehicles(lane1);
-		SortedMap<Double, Double> endTime2NoOfVehiclesLane2 = getEndTime2NoOfVehicles(lane2);
-		SortedMap<Double, Double> aggregatedEndTime2NoOfVehicles = aggregateVehicles(endTime2NoOfVehiclesLane1, endTime2NoOfVehiclesLane2);
+		SortedMap<Integer, Double> endTime2NoOfVehiclesLane1 = getEndTime2NoOfVehicles(lane1);
+		SortedMap<Integer, Double> endTime2NoOfVehiclesLane2 = getEndTime2NoOfVehicles(lane2);
+		SortedMap<Integer, Double> aggregatedEndTime2NoOfVehicles = aggregateVehicles(endTime2NoOfVehiclesLane1, endTime2NoOfVehiclesLane2);
 
-		for(Entry<Double, Double> entry : aggregatedEndTime2NoOfVehicles.entrySet()){
-			Double endTimeInSeconds = entry.getKey();
+		for(Entry<Integer, Double> entry : aggregatedEndTime2NoOfVehicles.entrySet()){
+			Integer endTimeInSeconds = entry.getKey();
 			Double vehicelesTotal = entry.getValue();
 			for(int i=0; i < vehicelesTotal; i++){
 				
@@ -114,11 +115,11 @@ public class TrialDemandFromCountsMunich {
 	 * @param endTime2NoOfVehiclesLane2
 	 * @return
 	 */
-	private static SortedMap<Double, Double> aggregateVehicles(Map<Double, Double> endTime2NoOfVehiclesLane1, Map<Double, Double> endTime2NoOfVehiclesLane2) {
-		SortedMap<Double, Double> aggregatedEndTime2NoOfVehicles = new TreeMap<Double, Double>();
+	private static SortedMap<Integer, Double> aggregateVehicles(Map<Integer, Double> endTime2NoOfVehiclesLane1, Map<Integer, Double> endTime2NoOfVehiclesLane2) {
+		SortedMap<Integer, Double> aggregatedEndTime2NoOfVehicles = new TreeMap<Integer, Double>();
 		
-		for(Entry<Double, Double> entry : endTime2NoOfVehiclesLane1.entrySet()){
-			Double endTime = entry.getKey();
+		for(Entry<Integer, Double> entry : endTime2NoOfVehiclesLane1.entrySet()){
+			Integer endTime = entry.getKey();
 			Double vehiclesLane1 = entry.getValue();
 			//find the value for the same key in other map
 			Double vehiclesLane2 = endTime2NoOfVehiclesLane2.get(endTime);
@@ -139,8 +140,8 @@ public class TrialDemandFromCountsMunich {
 	 * @param lane
 	 * @return
 	 */
-	private static SortedMap<Double, Double> getEndTime2NoOfVehicles(String lane) {
-		final SortedMap<Double, Double> EndTime2NoOfVehicles = new TreeMap<Double, Double>();
+	private static SortedMap<Integer, Double> getEndTime2NoOfVehicles(String lane) {
+		final SortedMap<Integer, Double> EndTime2NoOfVehicles = new TreeMap<Integer, Double>();
 
 		TabularFileParserConfig tabFileParserConfig = new TabularFileParserConfig();
 		tabFileParserConfig.setFileName(lane);
@@ -162,7 +163,7 @@ public class TrialDemandFromCountsMunich {
 				}
 
 				private void addEndTimeNoOfVehicles(String[] row) {
-					Double endTime = new Double(row[ENDTIME]);
+					Integer endTime = new Integer(row[ENDTIME]);
 					Double NoOfVehicles = new Double(row[NUMBER]);
 					EndTime2NoOfVehicles.put(endTime, NoOfVehicles);
 				}
@@ -176,6 +177,6 @@ public class TrialDemandFromCountsMunich {
 
 	private static void writePlans(Population pop, String day) {
 		PopulationWriter populationWriter = new PopulationWriter(pop, null);
-		populationWriter.write(countsPath + day + "/" + day + "_plans.xml");
+		populationWriter.write(outPath + day + "_plans.xml");
 	}
 }
