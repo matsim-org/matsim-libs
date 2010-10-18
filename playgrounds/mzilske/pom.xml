@@ -61,12 +61,12 @@
 		<!--			<version>0.2.0-SNAPSHOT</version>-->
 		<!--			<scope>compile</scope>-->
 		<!--		</dependency>-->
-		<!--		<dependency>-->
-		<!--			<groupId>playground</groupId>-->
-		<!--			<artifactId>mrieser</artifactId>-->
-		<!--			<version>0.2.0-SNAPSHOT</version>-->
-		<!--			<scope>compile</scope>-->
-		<!--		</dependency>-->
+				<dependency>
+					<groupId>playground</groupId>
+					<artifactId>mrieser</artifactId>
+					<version>0.2.0-SNAPSHOT</version>
+					<scope>compile</scope>
+				</dependency>
 		<dependency>
 			<groupId>com.sleepycat</groupId>
 			<artifactId>je</artifactId>

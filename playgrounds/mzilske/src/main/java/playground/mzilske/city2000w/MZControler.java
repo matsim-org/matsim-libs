@@ -23,6 +23,8 @@ package playground.mzilske.city2000w;
 import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -32,7 +34,11 @@ import org.matsim.analysis.CalcLinkStats;
 import org.matsim.analysis.IterationStopWatch;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.api.experimental.network.NetworkWriter;
@@ -59,6 +65,7 @@ import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.replanning.modules.ChangeLegMode;
+import org.matsim.core.replanning.modules.SubtourModeChoice;
 import org.matsim.core.replanning.modules.ReRouteDijkstra;
 import org.matsim.core.replanning.modules.ReRouteLandmarks;
 import org.matsim.core.replanning.modules.TimeAllocationMutator;
@@ -83,22 +90,17 @@ import org.matsim.core.scoring.charyparNagel.CharyparNagelScoringFunctionFactory
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactory;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
-import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
+import org.matsim.population.algorithms.PermissibleModesCalculator;
 import org.matsim.population.algorithms.PersonPrepareForSim;
 import org.matsim.population.algorithms.PlanAlgorithm;
+import org.matsim.vehicles.Vehicle;
+
+import playground.mzilske.deteval.VehicleWatchingEventHandler;
 
 
-
-/**
- * The Controler is responsible for complete simulation runs, including the
- * initialization of all required data, running the iterations and the
- * replanning, analyses, etc.
- *
- * @author mrieser
- */
 public final class MZControler {
 
 	public static final String DIRECTORY_ITERS = "ITERS";
@@ -122,9 +124,9 @@ public final class MZControler {
 	private ControlerState state = ControlerState.Init;
 
 	private String outputPath = null;
-	
-	private boolean overwriteFiles = false;
-	
+
+	private boolean overwriteFiles = true;
+
 	private Integer iteration = null;
 
 	/** The Config instance the Controler uses. */
@@ -136,15 +138,6 @@ public final class MZControler {
 	private TravelTimeCalculator travelTimeCalculator = null;
 	private PersonalizableTravelCost travelCostCalculator = null;
 	private ScoringFunctionFactory scoringFunctionFactory = null;
-	private StrategyManager strategyManager = null;
-
-	/**
-	 * Defines in which iterations the events should be written. <tt>1</tt> is
-	 * in every iteration, <tt>2</tt> in every second, <tt>10</tt> in every
-	 * 10th, and so forth. <tt>0</tt> disables the writing of events
-	 * completely.
-	 */
-	private int writeEventsInterval = -1;
 
 	/* default analyses */
 	private CalcLinkStats linkStats = null;
@@ -174,6 +167,7 @@ public final class MZControler {
 	private MobsimFactory mobsimFactory = new QueueSimulationFactory();
 
 	private EventsToScore planScorer;
+	private StrategyManager strategyManager;
 
 	private static final Logger log = Logger.getLogger(StrategyManagerConfigLoader.class);
 	private static int externalCounter = 0;
@@ -231,6 +225,10 @@ public final class MZControler {
 		} else {
 			this.events = new EventsManagerImpl();
 		}
+		
+		vehicleWatcher = new VehicleWatchingEventHandler();
+		this.events.addHandler(vehicleWatcher);
+		
 	}
 
 	private void doIterations() {
@@ -311,7 +309,6 @@ public final class MZControler {
 				log.info("Cannot remove shutdown hook. " + e.getMessage());
 			}
 			this.shutdownHook = null; // important for test cases to free the memory
-			IOUtils.closeOutputDirLogging();
 		}
 	}
 
@@ -357,12 +354,11 @@ public final class MZControler {
 		this.events.addHandler(this.legTimes);
 
 		this.scoringFunctionFactory = loadScoringFunctionFactory();
-
-
 		this.strategyManager = loadStrategyManager();
 	}
 
 	private final List<EventWriter> eventWriters = new LinkedList<EventWriter>();
+	private VehicleWatchingEventHandler vehicleWatcher;
 
 	private final void setUpOutputDir() {
 		outputPath = this.config.controler().getOutputDirectory();
@@ -484,23 +480,21 @@ public final class MZControler {
 	private void coreBeforeMobsim(int iteration) {
 		events.resetHandlers(iteration);
 		events.resetCounter();
-
-		if ((writeEventsInterval > 0) && (iteration % writeEventsInterval == 0)) {
-			for (EventsFileFormat format : config.controler().getEventsFileFormats()) {
-				switch (format) {
-				case txt:
-					this.eventWriters.add(new EventWriterTXT(this.controlerIO.getIterationFilename(iteration,FILENAME_EVENTS_TXT)));
-					break;
-				case xml:
-					this.eventWriters.add(new EventWriterXML(this.controlerIO.getIterationFilename(iteration, FILENAME_EVENTS_XML)));
-					break;
-				default:
-					log.warn("Unknown events file format specified: " + format.toString() + ".");
-				}
+		
+		for (EventsFileFormat format : config.controler().getEventsFileFormats()) {
+			switch (format) {
+			case txt:
+				this.eventWriters.add(new EventWriterTXT(this.controlerIO.getIterationFilename(iteration,FILENAME_EVENTS_TXT)));
+				break;
+			case xml:
+				this.eventWriters.add(new EventWriterXML(this.controlerIO.getIterationFilename(iteration, FILENAME_EVENTS_XML)));
+				break;
+			default:
+				log.warn("Unknown events file format specified: " + format.toString() + ".");
 			}
-			for (EventWriter writer : this.eventWriters) {
-				events.addHandler(writer);
-			}
+		}
+		for (EventWriter writer : this.eventWriters) {
+			events.addHandler(writer);
 		}
 
 		if (iteration % 10 == 6) {
@@ -544,6 +538,8 @@ public final class MZControler {
 		for (EventWriter writer : eventWriters) {
 			writer.closeFile();
 		}
+		vehicleWatcher.dump();
+		
 	}
 
 	public void setMobsimFactory(MobsimFactory mobsimFactory) {
@@ -626,7 +622,7 @@ public final class MZControler {
 		} else if (name.equals("TimeAllocationMutator") || name.equals("threaded.TimeAllocationMutator")) {
 			strategy = new PlanStrategyImpl(new RandomPlanSelector());
 			TimeAllocationMutator tam = new TimeAllocationMutator(config);
-//			tam.setUseActivityDurations(config.vspExperimental().isUseActivityDurations());
+			//			tam.setUseActivityDurations(config.vspExperimental().isUseActivityDurations());
 			// functionality moved into TimeAllocationMutator.  kai, aug'10
 			strategy.addStrategyModule(tam);
 		} else if (name.equals("TimeAllocationMutator7200_ReRouteLandmarks")) {
@@ -651,6 +647,27 @@ public final class MZControler {
 		} else if (name.equals("ChangeLegMode")) {
 			strategy = new PlanStrategyImpl(new RandomPlanSelector());
 			strategy.addStrategyModule(new ChangeLegMode(config));
+			strategy.addStrategyModule(new ReRoute(this));
+		} else if (name.equals("SubtourChangeLegMode")) {
+			strategy = new PlanStrategyImpl(new RandomPlanSelector());
+			SubtourModeChoice changeLegMode = new SubtourModeChoice(config);
+			changeLegMode.setPermissibleModesCalculator(new PermissibleModesCalculator() {
+
+				@Override
+				public Collection<String> getPermissibleModes(Plan plan) {
+					Person person = plan.getPerson();
+					Vehicle vehicle = ((ScenarioImpl) scenarioData).getVehicles().getVehicles().get(person.getId());
+					if (vehicle != null) {
+						log.info(person.getId() + " has a car.");
+						return Arrays.asList(TransportMode.car, TransportMode.pt);
+					} else {
+						log.info(person.getId() + " has no car.");
+						return Arrays.asList(TransportMode.pt);
+					}
+				}
+				
+			});
+			strategy.addStrategyModule(changeLegMode);
 			strategy.addStrategyModule(new ReRoute(this));
 		} else {
 			//classes loaded by name must not be part of the matsim core

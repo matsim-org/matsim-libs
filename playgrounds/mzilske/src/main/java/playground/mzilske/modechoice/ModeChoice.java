@@ -2,10 +2,12 @@ package playground.mzilske.modechoice;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.core.config.Config;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.replanning.modules.SubtourModeChoice;
 
 public class ModeChoice {
 	
@@ -19,7 +21,7 @@ public class ModeChoice {
 		PopulationImpl populationImpl = (PopulationImpl) scenario.getPopulation();
 		
 		populationImpl.setIsStreaming(true);
-		populationImpl.addAlgorithm(new ApplyToSelectedPlan(new ChangeLegModeOfOneSubtour()));
+		populationImpl.addAlgorithm(new ApplyToSelectedPlan(new SubtourModeChoice(new Config())));
 		PopulationWriter algo = new PopulationWriter(populationImpl, scenario.getNetwork());
 		populationImpl.addAlgorithm(algo);
 		

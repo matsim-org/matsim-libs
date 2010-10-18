@@ -34,7 +34,7 @@ public class Verschmierer {
 			Collection<Feature> landkreise = landkreisSource.getFeatures();
 			for (Feature landkreis : landkreise) {
 				Integer gemeindeschluessel = Integer.parseInt((String) landkreis.getAttribute("gemeindesc"));
-				populationBuilder.addZone(gemeindeschluessel, 1, 1, landkreis.getDefaultGeometry());
+				populationBuilder.addZone(gemeindeschluessel, landkreis.getDefaultGeometry());
 			}
 		} catch (IOException e) {
 			throw new RuntimeException(e);

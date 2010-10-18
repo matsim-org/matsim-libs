@@ -2,13 +2,14 @@ package playground.mzilske.modechoice;
 
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.replanning.modules.SubtourModeChoice;
 import org.matsim.population.algorithms.PersonAlgorithm;
 
 public class ApplyToSelectedPlan implements PersonAlgorithm {
 
-	private ChangeLegModeOfOneSubtour algorithm;
+	private SubtourModeChoice algorithm;
 
-	public ApplyToSelectedPlan(ChangeLegModeOfOneSubtour changeLegModeOfOneSubtour) {
+	public ApplyToSelectedPlan(SubtourModeChoice changeLegModeOfOneSubtour) {
 		this.algorithm = changeLegModeOfOneSubtour;
 	}
 
