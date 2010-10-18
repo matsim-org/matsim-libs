@@ -94,22 +94,26 @@ public class ResizeLinksByCount extends AbstractResizeLinksByCount{
 		
 		for(Link l : net.getLinks().values()){
 			
-			checkIfOrigIdIsRegistered((LinkImpl) l);
+			checkAndRegisterOrigId((LinkImpl) l);
 			
 			origId = ((LinkImpl) l).getOrigId();
 			if(this.origId2MaxCount.containsKey(origId)){
 				maxCount = origId2MaxCount.get(origId);
 				capPerLane = l.getCapacity() / l.getNumberOfLanes();
 				
-				// if maxCount < capPerLane set cap to maxCount and keep nrOfLanes
-				if(maxCount < capPerLane){
-					log.warn("link " + l.getId() + " oldCap= " + l.getCapacity() + " oldNrOfLanes= " + l.getNumberOfLanes() + ": maxCount < capPerLane. Set Capacity to maxcount="+ maxCount + " and numberOfLanes to 1...");
+				// if maxCount < cap set cap to maxCount and keep nrOfLanes
+				if(maxCount < l.getCapacity()){
+					log.warn("link " + l.getId() + " oldCap= " + l.getCapacity() + " oldNrOfLanes= " + 
+							l.getNumberOfLanes() + ": maxCount < oldCap. Set Capacity to maxcount="+ 
+							maxCount + " and keep numberOfLanes...");
 					l.setCapacity(maxCount);
 				}
 				// else set nrOfNewLanes to int(maxCount/capPerLane) and cap to maxCount
 				else{
 					nrOfNewLanes = (int) (maxCount/capPerLane);
-					log.info("link " + l.getId() + " oldCap= " + l.getCapacity() + " oldNrOfLanes= " + l.getNumberOfLanes() + " : set nr of lanes to " + nrOfNewLanes + " and capacity to " + maxCount);
+					log.info("link " + l.getId() + " oldCap= " + l.getCapacity() + " oldNrOfLanes= " + 
+							l.getNumberOfLanes() + " : set nr of lanes to " + 
+							nrOfNewLanes + " and capacity to " + maxCount);
 					l.setNumberOfLanes(nrOfNewLanes);
 					l.setCapacity(maxCount);
 				}				
@@ -121,14 +125,14 @@ public class ResizeLinksByCount extends AbstractResizeLinksByCount{
 	/*
 	 * checks and registers the origId and maxcount of a link if there is a countingstation
 	 */
-	private void checkIfOrigIdIsRegistered(LinkImpl l) {
+	private void checkAndRegisterOrigId(LinkImpl l) {
 		Node node = null;
 		Count count = null;
 		Double maxCount = null;
 		
 		node = l.getFromNode();
 		if( (!this.origId2MaxCount.containsKey( ((LinkImpl) l).getOrigId()))  && this.shortNameMap.containsKey(node.getId().toString())){
-			count = counts.getCount(new IdImpl(shortNameMap.get(node.getId().toString())));
+			count = oldCounts.getCount(new IdImpl(shortNameMap.get(node.getId().toString())));
 			if(!(count == null)){
 				maxCount = count.getMaxVolume().getValue();
 				this.origId2MaxCount.put(((LinkImpl) l).getOrigId(), maxCount);

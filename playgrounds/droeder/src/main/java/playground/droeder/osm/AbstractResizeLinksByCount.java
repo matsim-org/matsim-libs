@@ -41,7 +41,7 @@ public abstract class AbstractResizeLinksByCount {
 	//givens
 	private String netFile;
 	private String outFile;
-	protected Counts counts;
+	protected Counts oldCounts;
 	protected Map<String, String> shortNameMap;
 	
 	//interns
@@ -49,13 +49,13 @@ public abstract class AbstractResizeLinksByCount {
 		
 	public AbstractResizeLinksByCount(String networkFile, Counts counts, Map<String, String> shortNameMap){
 		this.netFile = networkFile;
-		this.counts = counts;
+		this.oldCounts = counts;
 		this.shortNameMap = shortNameMap;
+		this.prepareNetwork(netFile);
 	}
 	
 	public void run (String outFile){
 		this.outFile = outFile;
-		this.prepareNetwork(netFile);
 		this.resize();
 		this.writeNewNetwork();
 	}
