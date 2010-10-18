@@ -34,6 +34,7 @@ import org.matsim.ptproject.qsim.interfaces.SimEngine;
 
 import com.vividsolutions.jts.geom.MultiPolygon;
 
+import playground.gregor.sim2d_v2.controller.Sim2DConfig;
 import playground.gregor.sim2d_v2.scenario.Scenario2DImpl;
 import playground.gregor.sim2d_v2.simulation.floor.Floor;
 
@@ -59,6 +60,12 @@ public class Sim2DEngine implements SimEngine, Steppable {
 		this.scenario = (Scenario2DImpl) sim.getScenario();
 		this.random = random;
 		this.sim = sim;
+		double sim2DStepSize = Sim2DConfig.TIME_STEP_SIZE;
+		double factor = this.scenario.getConfig().getQSimConfigGroup().getTimeStepSize() / sim2DStepSize;
+		if (factor != Math.round(factor)) {
+			throw new RuntimeException("QSim time step size has to be a multiple of sim2d time step size");
+		}
+
 	}
 
 	/*
@@ -68,14 +75,18 @@ public class Sim2DEngine implements SimEngine, Steppable {
 	 */
 	@Override
 	public void doSimStep(double time) {
-		if (this.phantomMgr != null) {
-			this.phantomMgr.update(time);
-		}
+		double sim2DTime = time;
+		while (sim2DTime < time + this.scenario.getConfig().getQSimConfigGroup().getTimeStepSize()) {
+			if (this.phantomMgr != null) {
+				this.phantomMgr.update(sim2DTime);
+			}
 
-		for (Floor floor : this.floors) {
-			floor.move(time);
-		}
+			for (Floor floor : this.floors) {
+				floor.move(sim2DTime);
+			}
 
+			sim2DTime += Sim2DConfig.TIME_STEP_SIZE;
+		}
 	}
 
 	/*
@@ -86,7 +97,6 @@ public class Sim2DEngine implements SimEngine, Steppable {
 	@Override
 	public void afterSim() {
 		// throw new RuntimeException("not (yet) implemented!");
-
 	}
 
 	/*

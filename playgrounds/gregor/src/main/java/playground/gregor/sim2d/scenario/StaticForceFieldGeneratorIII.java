@@ -45,10 +45,10 @@ import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.operation.distance.DistanceOp;
 
-import playground.gregor.sim2d.controller.Sim2DConfig;
 import playground.gregor.sim2d.gisdebug.GisDebugger;
 import playground.gregor.sim2d.simulation.Force;
 import playground.gregor.sim2d.simulation.SegmentedStaticForceField;
+import playground.gregor.sim2d_v2.controller.Sim2DConfig;
 
 
 public class StaticForceFieldGeneratorIII {

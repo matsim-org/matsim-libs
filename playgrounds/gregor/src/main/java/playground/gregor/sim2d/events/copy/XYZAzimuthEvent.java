@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AgentInteractionModule.java
+ * XYZAzimuthEvent.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,73 +17,26 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.gregor.sim2d_v2.simulation.floor;
+package playground.gregor.sim2d.events.copy;
 
-import java.util.List;
+import org.matsim.core.api.experimental.events.PersonEvent;
 
 import com.vividsolutions.jts.geom.Coordinate;
-
-import playground.gregor.sim2d_v2.scenario.Scenario2DImpl;
-import playground.gregor.sim2d_v2.simulation.Agent2D;
 
 /**
  * @author laemmel
  * 
  */
-public class AgentInteractionModule implements ForceModule {
+public interface XYZAzimuthEvent extends PersonEvent {
 
-	private final Floor floor;
-	private final Scenario2DImpl sceanrio;
+	public double getX();
 
-	/**
-	 * @param floor
-	 * @param sceanrio
-	 */
-	public AgentInteractionModule(Floor floor, Scenario2DImpl scenario) {
-		this.floor = floor;
-		this.sceanrio = scenario;
-	}
+	public double getY();
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * playground.gregor.sim2_v2.simulation.floor.ForceModule#run(playground
-	 * .gregor.sim2_v2.simulation.Agent2D)
-	 */
-	@Override
-	public void run(Agent2D agent) {
-		List<Coordinate> neighbors = getNeighbors(agent.getPosition());
-		updateForces(agent, neighbors);
-	}
+	public double getZ();
 
-	/**
-	 * @param agent
-	 * @param neighbors
-	 */
-	/* package */void updateForces(Agent2D agent, List<Coordinate> neighbors) {
-		// TODO Auto-generated method stub
+	public double getAzimuth();
 
-	}
-
-	/**
-	 * @param position
-	 * @return
-	 */
-	private List<Coordinate> getNeighbors(Coordinate position) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see playground.gregor.sim2d_v2.simulation.floor.ForceModule#init()
-	 */
-	@Override
-	public void init() {
-		// TODO Auto-generated method stub
-
-	}
-
+	// convenience method
+	public Coordinate getCoordinate();
 }

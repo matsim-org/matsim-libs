@@ -38,7 +38,7 @@ import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.gregor.sim2d.simulation.Force;
-import playground.gregor.sim2d.simulation.StaticForceField;
+import playground.gregor.sim2d_v2.simulation.floor.StaticForceField;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;

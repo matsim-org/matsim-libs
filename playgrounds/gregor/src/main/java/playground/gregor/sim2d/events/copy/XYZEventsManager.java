@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Force.java
+ * XYZEventsManager.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,58 +17,25 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.gregor.sim2d_v2.simulation.floor;
+package playground.gregor.sim2d.events.copy;
 
-/**
- * @author laemmel
- * 
- */
-public class Force {
-	private double fx;
-	private double fy;
+import java.util.ArrayList;
+import java.util.List;
 
-	private double oldFx;
-	private double oldFy;
+import org.matsim.core.api.experimental.events.Event;
 
-	// double fz;
+public class XYZEventsManager {
 
-	/* package */double getXComponent() {
-		return this.fx;
+	private final List<XYZEventsHandler> handler = new ArrayList<XYZEventsHandler>();
+
+	public void processXYZEvent(XYZAzimuthEvent e) {
+		for (XYZEventsHandler h : this.handler) {
+			h.handleEvent(e);
+		}
 	}
 
-	/* package */double getYComponent() {
-		return this.fy;
-	}
-
-	/* package */void setXComponent(double fx) {
-		this.fx = fx;
-	}
-
-	/* package */void setYComponent(double fy) {
-		this.fy = fy;
-	}
-
-	/* package */void incrementX(double incrfx) {
-		this.fx += incrfx;
-	}
-
-	/* package */void incrementY(double incrfy) {
-		this.fy += incrfy;
-	}
-
-	/* package */double getOldXComponent() {
-		return this.oldFx;
-	}
-
-	/* package */double getOldYComponent() {
-		return this.oldFy;
-	}
-
-	/* package */void reset() {
-		this.oldFx = this.fx;
-		// this.fx = 0.;
-		this.oldFy = this.fy;
-		// this.fy = 0.;
+	public void addHandler(XYZEventsHandler h) {
+		this.handler.add(h);
 	}
 
 }

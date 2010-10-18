@@ -49,4 +49,15 @@ public class EnvironmentForceModule implements ForceModule {
 
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see playground.gregor.sim2d_v2.simulation.floor.ForceModule#init()
+	 */
+	@Override
+	public void init() {
+		// TODO Auto-generated method stub
+
+	}
+
 }

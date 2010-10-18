@@ -38,41 +38,41 @@ import com.vividsolutions.jts.geom.LineString;
 
 public class NetworkFromLsFile {
 
-	private ScenarioImpl sc;
-	private HashMap<Id, LineString> lsmp;
-	private Map<Id,List<Id>> linkSubLinkMapping = new HashMap<Id, List<Id>>();
+	private final ScenarioImpl sc;
+	private final HashMap<Id, LineString> lsmp;
+	private final Map<Id, List<Id>> linkSubLinkMapping = new HashMap<Id, List<Id>>();
 
 	public NetworkFromLsFile(ScenarioImpl scenario, HashMap<Id, LineString> lsmp) {
 		this.sc = scenario;
 		this.lsmp = lsmp;
-		
+
 	}
 
 	public void loadNetwork() {
-		
+
 		createNodes();
 		createLinks();
-		
+
 	}
 
-	public Map<Id,List<Id>> getLinkSubLinkMapping(){
+	public Map<Id, List<Id>> getLinkSubLinkMapping() {
 		return this.linkSubLinkMapping;
 	}
-	
+
 	private void createLinks() {
-		NetworkImpl net = (NetworkImpl)this.sc.getNetwork();
+		NetworkImpl net = this.sc.getNetwork();
 		int count = 0;
-		
+
 		for (Entry<Id, LineString> e : this.lsmp.entrySet()) {
 			LineString ls = e.getValue();
 			List<Id> subLinks = new ArrayList<Id>();
 			this.linkSubLinkMapping.put(e.getKey(), subLinks);
-			for (int i = 1; i < ls.getNumPoints(); i ++) {
-				double length = ls.getCoordinateN(i-1).distance(ls.getCoordinateN(i));
-				Coord c1 = MGC.coordinate2Coord(ls.getCoordinateN(i-1));
+			for (int i = 1; i < ls.getNumPoints(); i++) {
+				double length = ls.getCoordinateN(i - 1).distance(ls.getCoordinateN(i));
+				Coord c1 = MGC.coordinate2Coord(ls.getCoordinateN(i - 1));
 				Coord c2 = MGC.coordinate2Coord(ls.getCoordinateN(i));
-				Collection<Node> froms = net.getNearestNodes(c1, 1);
-				Collection<Node> tos = net.getNearestNodes(c2, 1);
+				Collection<Node> froms = net.getNearestNodes(c1, 0.8);
+				Collection<Node> tos = net.getNearestNodes(c2, 0.8);
 				if (froms.size() != 1 || tos.size() != 1) {
 					throw new RuntimeException();
 				}
@@ -81,17 +81,17 @@ public class NetworkFromLsFile {
 				subLinks.add(id1);
 				subLinks.add(id2);
 				net.createAndAddLink(id1, froms.iterator().next(), tos.iterator().next(), length, 1.66, 1, 1);
-				net.createAndAddLink(id2, tos.iterator().next(),froms.iterator().next(), length, 1.66, 1, 1);
+				net.createAndAddLink(id2, tos.iterator().next(), froms.iterator().next(), length, 1.66, 1, 1);
 			}
 		}
-		
+
 	}
 
 	private void createNodes() {
-		NetworkImpl net = (NetworkImpl)this.sc.getNetwork();
+		NetworkImpl net = this.sc.getNetwork();
 		int count = 0;
 		for (LineString ls : this.lsmp.values()) {
-			for (int i = 0; i < ls.getNumPoints(); i ++) {
+			for (int i = 0; i < ls.getNumPoints(); i++) {
 				Coord c = MGC.coordinate2Coord(ls.getCoordinateN(i));
 				Collection<Node> cs = net.getNearestNodes(c, 1);
 				if (cs.size() == 0) {
@@ -99,7 +99,7 @@ public class NetworkFromLsFile {
 				}
 			}
 		}
-		
+
 	}
 
 }

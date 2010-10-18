@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.gregor.sim2d.simulation;
+package playground.gregor.sim2d_v2.simulation.floor;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -31,6 +31,8 @@ import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
+
+import playground.gregor.sim2d.simulation.Force;
 
 public class StaticForceFieldReader extends MatsimXmlParser {
 	

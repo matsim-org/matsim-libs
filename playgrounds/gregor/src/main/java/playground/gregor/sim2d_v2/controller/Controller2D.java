@@ -19,12 +19,11 @@
  * *********************************************************************** */
 package playground.gregor.sim2d_v2.controller;
 
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.algorithms.EventWriterXML;
 
+import playground.gregor.pedvis.PedVisPeekABot;
 import playground.gregor.sim2d_v2.scenario.Scenario2DImpl;
 import playground.gregor.sim2d_v2.scenario.ScenarioLoader2DImpl;
 import playground.gregor.sim2d_v2.simulation.Sim2D;
@@ -37,7 +36,7 @@ public class Controller2D extends Controler {
 		super(args);
 		setOverwriteFiles(true);
 		this.config.setQSimConfigGroup(new QSimConfigGroup());
-		this.config.getQSimConfigGroup().setEndTime(24 * 3600);
+		this.config.getQSimConfigGroup().setEndTime(2 * 60);
 
 	}
 
@@ -58,7 +57,9 @@ public class Controller2D extends Controler {
 
 		// EventsManager manager = new EventsManagerImpl();
 		EventWriterXML writer = new EventWriterXML(getConfig().controler().getOutputDirectory() + "/ITERS/it." + getIterationNumber() + "/" + getIterationNumber() + ".xyzAzimuthEvents.xml.gz");
+		PedVisPeekABot vis = new PedVisPeekABot(1);
 		this.events.addHandler(writer);
+		this.events.addHandler(vis);
 		Sim2D sim = new Sim2D(this.events, this.scenario2DData);
 
 		// }

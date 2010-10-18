@@ -27,11 +27,11 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.gbl.MatsimRandom;
 
-import playground.gregor.sim2d.controller.Sim2DConfig;
 import playground.gregor.sim2d.simulation.Agent2D;
 import playground.gregor.sim2d.simulation.Floor;
 import playground.gregor.sim2d.simulation.Force;
 import playground.gregor.sim2d.simulation.Network2D;
+import playground.gregor.sim2d_v2.controller.Sim2DConfig;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;

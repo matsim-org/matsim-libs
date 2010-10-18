@@ -17,12 +17,14 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.gregor.sim2d.simulation;
+package playground.gregor.sim2d_v2.simulation.floor;
 
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.io.MatsimXmlWriter;
+
+import playground.gregor.sim2d.simulation.Force;
 
 public class StaticForceFieldWriter extends MatsimXmlWriter {
 	

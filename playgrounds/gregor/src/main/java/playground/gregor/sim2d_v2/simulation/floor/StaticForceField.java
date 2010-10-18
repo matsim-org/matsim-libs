@@ -17,38 +17,40 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.gregor.sim2d.simulation;
+package playground.gregor.sim2d_v2.simulation.floor;
 
 import java.util.Collection;
 
 import org.matsim.core.utils.collections.QuadTree;
 
+import playground.gregor.sim2d.simulation.Force;
+
 import com.vividsolutions.jts.geom.Coordinate;
 
 public class StaticForceField {
-	
+
 	private final QuadTree<Force> forceQuad;
 
-	protected StaticForceField(QuadTree<Force> forceQuad) {
+	public StaticForceField(QuadTree<Force> forceQuad) {
 		this.forceQuad = forceQuad;
 	}
 
 	public Force getForceWithin(Coordinate location, double range) {
-		if (this.forceQuad.get(location.x, location.y,range).size() > 0) {
+		if (this.forceQuad.get(location.x, location.y, range).size() > 0) {
 			return this.forceQuad.get(location.x, location.y);
 		}
 		return null;
 	}
 
 	public Collection<Force> getForcesWithin(Coordinate location, double range) {
-		return this.forceQuad.get(location.x, location.y,range);
+		return this.forceQuad.get(location.x, location.y, range);
 	}
-	
+
 	public Collection<Force> getForces() {
 		return this.forceQuad.values();
 	}
 
 	public void addForce(Force force) {
-		this.forceQuad.put(force.getXCoord(),force.getYCoord(), force);		
+		this.forceQuad.put(force.getXCoord(), force.getYCoord(), force);
 	}
 }

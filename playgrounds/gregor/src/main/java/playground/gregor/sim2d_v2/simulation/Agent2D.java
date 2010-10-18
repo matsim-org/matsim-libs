@@ -35,6 +35,8 @@ public class Agent2D extends DefaultPersonDriverAgent {
 
 	private Coordinate currentPosition;
 	private final Force force = new Force();
+	private final double desiredVelocity;
+	private final double agentWeight;
 
 	/**
 	 * @param p
@@ -42,6 +44,10 @@ public class Agent2D extends DefaultPersonDriverAgent {
 	 */
 	public Agent2D(Person p, QSimI sim2d) {
 		super(p, sim2d);
+
+		// TODO think about this
+		this.desiredVelocity = 1.34;
+		this.agentWeight = 75 * 1000;
 	}
 
 	/**
@@ -65,6 +71,20 @@ public class Agent2D extends DefaultPersonDriverAgent {
 	public void moveToPostion(Coordinate newPos) {
 		// TODO check for choose next link and so on ...
 		this.currentPosition = newPos;
+	}
+
+	/**
+	 * @return
+	 */
+	public double getDesiredVelocity() {
+		return this.desiredVelocity;
+	}
+
+	/**
+	 * @return
+	 */
+	public double getWeight() {
+		return this.agentWeight;
 	}
 
 }

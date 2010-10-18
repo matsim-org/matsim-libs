@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.Config;
 
 import playground.gregor.sim2d.simulation.SegmentedStaticForceField;
-import playground.gregor.sim2d.simulation.StaticForceField;
+import playground.gregor.sim2d_v2.simulation.floor.StaticForceField;
 
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiPolygon;

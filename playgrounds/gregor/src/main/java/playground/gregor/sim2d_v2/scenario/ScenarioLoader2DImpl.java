@@ -49,7 +49,6 @@ import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import playground.gregor.sim2d.controller.Sim2DConfig;
 import playground.gregor.sim2d.gisdebug.StaticForceFieldToShape;
 import playground.gregor.sim2d.network.NetworkFromLsFile;
 import playground.gregor.sim2d.network.NetworkLoader;
@@ -57,11 +56,12 @@ import playground.gregor.sim2d.network.NetworkLoaderImpl;
 import playground.gregor.sim2d.network.NetworkLoaderImplII;
 import playground.gregor.sim2d.scenario.StaticForceFieldGeneratorIII;
 import playground.gregor.sim2d.simulation.SegmentedStaticForceField;
-import playground.gregor.sim2d.simulation.StaticForceField;
-import playground.gregor.sim2d.simulation.StaticForceFieldGenerator;
 import playground.gregor.sim2d.simulation.StaticForceFieldGeneratorII;
-import playground.gregor.sim2d.simulation.StaticForceFieldReader;
-import playground.gregor.sim2d.simulation.StaticForceFieldWriter;
+import playground.gregor.sim2d_v2.controller.Sim2DConfig;
+import playground.gregor.sim2d_v2.simulation.floor.StaticForceField;
+import playground.gregor.sim2d_v2.simulation.floor.StaticForceFieldGenerator;
+import playground.gregor.sim2d_v2.simulation.floor.StaticForceFieldReader;
+import playground.gregor.sim2d_v2.simulation.floor.StaticForceFieldWriter;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
@@ -91,7 +91,7 @@ public class ScenarioLoader2DImpl extends ScenarioLoaderImpl {
 			NetworkFromLsFile loader = new NetworkFromLsFile(getScenario(), this.lsmp);
 			loader.loadNetwork();
 			loadMps();
-			loadStaticForceFieldII(loader.getLinkSubLinkMapping());
+			loadStaticForceField();
 			return;
 		}
 
@@ -217,7 +217,7 @@ public class ScenarioLoader2DImpl extends ScenarioLoaderImpl {
 		} else {
 			// this.sff = new
 			// StaticForceFieldGenerator(this.mps.keySet().iterator().next()).loadStaticForceField();
-			this.sff = new StaticForceFieldGeneratorII(this.mps.keySet().iterator().next()).loadStaticForceField();
+			this.sff = new StaticForceFieldGenerator(this.mps.keySet().iterator().next()).loadStaticForceField();
 			new StaticForceFieldWriter().write(Sim2DConfig.STATIC_FORCE_FIELD_FILE, this.sff);
 		}
 		this.scenarioData.setStaticForceField(this.sff);

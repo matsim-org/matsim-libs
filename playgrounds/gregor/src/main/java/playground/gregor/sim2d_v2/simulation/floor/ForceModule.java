@@ -28,4 +28,6 @@ import playground.gregor.sim2d_v2.simulation.Agent2D;
 public interface ForceModule {
 
 	public void run(Agent2D agent);
+
+	abstract void init();
 }

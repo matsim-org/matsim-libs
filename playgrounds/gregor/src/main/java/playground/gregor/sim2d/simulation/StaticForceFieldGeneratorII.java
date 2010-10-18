@@ -32,8 +32,9 @@ import org.geotools.feature.Feature;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.gis.ShapeFileReader;
 
-import playground.gregor.sim2d.controller.Sim2DConfig;
 import playground.gregor.sim2d.gisdebug.GisDebugger;
+import playground.gregor.sim2d_v2.controller.Sim2DConfig;
+import playground.gregor.sim2d_v2.simulation.floor.StaticForceField;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;

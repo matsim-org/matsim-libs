@@ -38,11 +38,17 @@ import playground.gregor.sim2d.peekabot.PeekABotClient;
 public class PedVisPeekABot implements XYZEventsHandler, AgentDepartureEventHandler, AgentArrivalEventHandler {
 
 	private final PeekABotClient pc;
-	private final String file;
+	private String file;
 	private final double speedUp;
 
 	private long lastTime = 0;
 	double lastEventsTime = 0;
+
+	public PedVisPeekABot(double speedUp) {
+		this.speedUp = speedUp;
+		this.pc = new PeekABotClient();
+		this.pc.init();
+	}
 
 	public PedVisPeekABot(String eventsFile, boolean loop, double speedUp) {
 		this.speedUp = speedUp;
@@ -102,7 +108,7 @@ public class PedVisPeekABot implements XYZEventsHandler, AgentDepartureEventHand
 	}
 
 	public static void main(String[] args) {
-		PedVisPeekABot vis = new PedVisPeekABot("/home/laemmel/devel/dfg/events.xml", true, 0.1);
+		PedVisPeekABot vis = new PedVisPeekABot("/home/laemmel/devel/dfg/output/ITERS/it.0/0.xyzAzimuthEvents.xml.gz", true, 1);
 	}
 
 	/*

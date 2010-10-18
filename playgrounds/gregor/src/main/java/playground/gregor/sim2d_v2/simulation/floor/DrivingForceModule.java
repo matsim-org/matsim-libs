@@ -19,6 +19,14 @@
  * *********************************************************************** */
 package playground.gregor.sim2d_v2.simulation.floor;
 
+import java.util.HashMap;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+
+import com.vividsolutions.jts.geom.Coordinate;
+
+import playground.gregor.sim2d_v2.controller.Sim2DConfig;
 import playground.gregor.sim2d_v2.scenario.Scenario2DImpl;
 import playground.gregor.sim2d_v2.simulation.Agent2D;
 
@@ -30,6 +38,7 @@ public class DrivingForceModule implements ForceModule {
 
 	private final Scenario2DImpl scenario;
 	private final Floor floor;
+	private HashMap<Id, Coordinate> drivingDirections;
 
 	/**
 	 * @param floor
@@ -43,13 +52,40 @@ public class DrivingForceModule implements ForceModule {
 	/*
 	 * (non-Javadoc)
 	 * 
+	 * @see playground.gregor.sim2d_v2.simulation.floor.ForceModule#init()
+	 */
+	@Override
+	public void init() {
+
+		this.drivingDirections = new HashMap<Id, Coordinate>();
+		for (Link link : this.floor.getLinks()) {
+			Coordinate c = new Coordinate(link.getToNode().getCoord().getX() - link.getFromNode().getCoord().getX(), link.getToNode().getCoord().getY() - link.getFromNode().getCoord().getY());
+			double length = Math.sqrt(Math.pow(c.x, 2) + Math.pow(c.y, 2));
+			c.x /= length;
+			c.y /= length;
+			this.drivingDirections.put(link.getId(), c);
+		}
+
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see
 	 * playground.gregor.sim2_v2.simulation.floor.ForceModule#run(playground
 	 * .gregor.sim2_v2.simulation.Agent2D)
 	 */
 	@Override
 	public void run(Agent2D agent) {
-		// TODO Auto-generated method stub
+		Coordinate d = this.drivingDirections.get(agent.getCurrentLinkId());
+		double driveX = d.x;
+		double driveY = d.y;
+
+		driveX *= (Sim2DConfig.TIME_STEP_SIZE * agent.getDesiredVelocity() - agent.getForce().getOldXComponent()) / Sim2DConfig.tau;
+		driveY *= (Sim2DConfig.TIME_STEP_SIZE * agent.getDesiredVelocity() - agent.getForce().getOldYComponent()) / Sim2DConfig.tau;
+
+		agent.getForce().incrementX(driveX);
+		agent.getForce().incrementY(driveY);
 
 	}
 

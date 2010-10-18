@@ -40,6 +40,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PersonAgent;
+import org.matsim.core.mobsim.framework.listeners.SimulationListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationListenerManager;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.ptproject.qsim.AgentFactory;
@@ -519,5 +520,40 @@ public class Sim2D implements QSimI {
 	public Sim2DEngine getSim2DEngine() {
 		return this.sim2DEngine;
 
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.matsim.ptproject.qsim.interfaces.QSimI#getActivityEndsList()
+	 */
+	@Override
+	public Collection<PersonAgent> getActivityEndsList() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.matsim.ptproject.qsim.interfaces.QSimI#rescheduleActivityEnd(org.
+	 * matsim.core.mobsim.framework.PersonAgent, double, double)
+	 */
+	@Override
+	public void rescheduleActivityEnd(PersonAgent agent, double oldTime, double newTime) {
+		throw new RuntimeException("not implemented");
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @seeorg.matsim.core.mobsim.framework.ObservableSimulation#
+	 * addQueueSimulationListeners
+	 * (org.matsim.core.mobsim.framework.listeners.SimulationListener)
+	 */
+	@Override
+	public void addQueueSimulationListeners(SimulationListener listener) {
+		throw new RuntimeException("not implemented");
 	}
 }

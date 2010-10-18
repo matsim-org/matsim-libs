@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AgentInteractionModule.java
+ * XYZEventsFactoryImpl.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,73 +17,40 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.gregor.sim2d_v2.simulation.floor;
+package playground.gregor.sim2d.events.copy;
 
-import java.util.List;
-
-import com.vividsolutions.jts.geom.Coordinate;
-
-import playground.gregor.sim2d_v2.scenario.Scenario2DImpl;
-import playground.gregor.sim2d_v2.simulation.Agent2D;
+import org.matsim.core.api.experimental.events.Event;
+import org.matsim.core.api.experimental.events.EventsFactory;
+import org.matsim.core.basic.v01.IdImpl;
 
 /**
  * @author laemmel
  * 
  */
-public class AgentInteractionModule implements ForceModule {
+public class XYZAzimuthEventsFactoryImpl {
 
-	private final Floor floor;
-	private final Scenario2DImpl sceanrio;
+	private final EventsFactory factory;
 
-	/**
-	 * @param floor
-	 * @param sceanrio
-	 */
-	public AgentInteractionModule(Floor floor, Scenario2DImpl scenario) {
-		this.floor = floor;
-		this.sceanrio = scenario;
+	public XYZAzimuthEventsFactoryImpl(EventsFactory factory) {
+		this.factory = factory;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * playground.gregor.sim2_v2.simulation.floor.ForceModule#run(playground
-	 * .gregor.sim2_v2.simulation.Agent2D)
-	 */
-	@Override
-	public void run(Agent2D agent) {
-		List<Coordinate> neighbors = getNeighbors(agent.getPosition());
-		updateForces(agent, neighbors);
+	public EventsFactory getFactory() {
+		return this.factory;
 	}
 
 	/**
-	 * @param agent
-	 * @param neighbors
-	 */
-	/* package */void updateForces(Agent2D agent, List<Coordinate> neighbors) {
-		// TODO Auto-generated method stub
-
-	}
-
-	/**
-	 * @param position
+	 * @param x
+	 * @param y
+	 * @param z
+	 * @param azimuth
+	 * @param id
+	 * @param time
 	 * @return
 	 */
-	private List<Coordinate> getNeighbors(Coordinate position) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see playground.gregor.sim2d_v2.simulation.floor.ForceModule#init()
-	 */
-	@Override
-	public void init() {
-		// TODO Auto-generated method stub
-
+	public Event createXYZAzimuthEvent(String x, String y, String z, String azimuth, String id, double time) {
+		XYZAzimuthEventImpl e = new XYZAzimuthEventImpl(new IdImpl(id), Double.parseDouble(x), Double.parseDouble(y), Double.parseDouble(z), Double.parseDouble(azimuth), time);
+		return e;
 	}
 
 }

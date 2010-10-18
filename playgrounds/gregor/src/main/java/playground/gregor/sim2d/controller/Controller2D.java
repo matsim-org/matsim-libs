@@ -35,9 +35,9 @@ import playground.gregor.sim2d.peekabot.PeekABotClient;
 import playground.gregor.sim2d.peekabot.Sim2DVis;
 import playground.gregor.sim2d.simulation.SegmentedStaticForceField;
 import playground.gregor.sim2d.simulation.Sim2D;
-import playground.gregor.sim2d.simulation.StaticForceField;
 import playground.gregor.sim2d_v2.scenario.Scenario2DImpl;
 import playground.gregor.sim2d_v2.scenario.ScenarioLoader2DImpl;
+import playground.gregor.sim2d_v2.simulation.floor.StaticForceField;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
