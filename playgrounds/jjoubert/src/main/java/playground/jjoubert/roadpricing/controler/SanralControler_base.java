@@ -11,7 +11,7 @@ public class SanralControler_base {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String root = "/home/jwjoubert/runs/sanral_10pct/data/";
+		String root = "/home/jwjoubert/runs/sanral_10pctFreight/data/";
 		// Parse the necessary arguments.
 		
 		// Set up the basic config.
@@ -23,7 +23,7 @@ public class SanralControler_base {
 		 */
 		// Global.
 		config.global().setCoordinateSystem("WGS84_UTM35S");
-		config.global().setNumberOfThreads(10);
+		config.global().setNumberOfThreads(15);
 		// Simulation.
 		config.simulation().setFlowCapFactor(0.1);
 		config.simulation().setStorageCapFactor(0.28);
@@ -32,9 +32,9 @@ public class SanralControler_base {
 		config.network().setInputFile(root + "network/gautengNetwork_CleanV0.xml.gz");
 		config.network();
 		// Plans.
-		config.plans().setInputFile(root + "plans/car_plans_2009_10pct.xml.gz");
+		config.plans().setInputFile(root + "plans/car-commercial_plans_2009_10pct.xml.gz");
 		// Counts.
-		config.counts().setCountsFileName(root + "counts/2007/Counts_Wednesday_Light.xml.gz");
+		config.counts().setCountsFileName(root + "counts/2007/Counts_Wednesday_Total.xml.gz");
 		config.counts().setCountsScaleFactor(10);
 		config.counts().setOutputFormat("kml");
 		
@@ -42,9 +42,9 @@ public class SanralControler_base {
 		/*
 		 * Add the multi-thread queue simulation.
 		 */
-//		config.getQSimConfigGroup().setNumberOfThreads(10);
-//		config.getQSimConfigGroup().setFlowCapFactor(0.1);
-//		config.getQSimConfigGroup().setStorageCapFactor(0.28);
+		config.getQSimConfigGroup().setNumberOfThreads(5);
+		config.getQSimConfigGroup().setFlowCapFactor(0.1);
+		config.getQSimConfigGroup().setStorageCapFactor(0.28);
 
 		Controler c = new Controler(config);
 		c.setCreateGraphs(true);

@@ -24,7 +24,6 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
-import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 
@@ -39,14 +38,12 @@ public class MyBasicConfig {
 		config.global().setCoordinateSystem("WGS84");
 		config.global().setRandomSeed(1234);
 		config.global().setNumberOfThreads(2);
-		
-		
 
 		// Network.
-		config.network().setInputFile("./input/output_network_100_Emme.xml.gz");
+		config.network().setInputFile("./input/network.xml.gz");
 
 		// Plans.
-		config.plans().setInputFile("./input/Generated_plans_100.xml.gz");
+		config.plans().setInputFile("./input/plans.xml.gz");
 
 		// Controler.
 		config.controler().setRoutingAlgorithmType(RoutingAlgorithmType.Dijkstra);
@@ -109,11 +106,11 @@ public class MyBasicConfig {
 
 		
 		// Parallel QSim
-//		QSimConfigGroup qsim = new QSimConfigGroup();
-//		qsim.setNumberOfThreads(2);
-//		qsim.setSnapshotFormat("googleearth");
-//		qsim.setSnapshotPeriod(900);
-//		config.setQSimConfigGroup(qsim);
+		QSimConfigGroup qsim = new QSimConfigGroup();
+		qsim.setNumberOfThreads(2);
+		qsim.setSnapshotFormat("googleearth");
+		qsim.setSnapshotPeriod(900);
+		config.setQSimConfigGroup(qsim);
 	}
 	
 	public Config getConfig(){
