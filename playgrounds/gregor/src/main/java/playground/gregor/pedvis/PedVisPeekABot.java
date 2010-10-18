@@ -45,13 +45,15 @@ import com.vividsolutions.jts.geom.Polygon;
 import playground.gregor.sim2d.events.XYZAzimuthEvent;
 import playground.gregor.sim2d.events.XYZEventsFileReader;
 import playground.gregor.sim2d.events.XYZEventsHandler;
+import playground.gregor.sim2d.events.debug.ArrowEvent;
+import playground.gregor.sim2d.events.debug.ArrowEventHandler;
 import playground.gregor.sim2d.peekabot.PeekABotClient;
 
 /**
  * @author laemmel
  * 
  */
-public class PedVisPeekABot implements XYZEventsHandler, AgentDepartureEventHandler, AgentArrivalEventHandler {
+public class PedVisPeekABot implements XYZEventsHandler, AgentDepartureEventHandler, AgentArrivalEventHandler, ArrowEventHandler {
 
 	private final PeekABotClient pc;
 	private String file;
@@ -254,4 +256,27 @@ public class PedVisPeekABot implements XYZEventsHandler, AgentDepartureEventHand
 		// this.pc.removeBot(Integer.parseInt(e.getPersonId().toString()));
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * playground.gregor.sim2d.events.debug.ArrowEventHandler#handleEvent(playground
+	 * .gregor.sim2d.events.debug.ArrowEvent)
+	 */
+	@Override
+	public void handleEvent(ArrowEvent event) {
+		int arrowId = event.getType();
+		int agentId = Integer.parseInt(event.getPersId().toString());
+		float r = event.getR();
+		float g = event.getG();
+		float b = event.getB();
+		float fromX = (float) event.getFrom().x;
+		float fromY = (float) event.getFrom().y;
+		float fromZ = (float) event.getFrom().z;
+		float toX = (float) event.getTo().x;
+		float toY = (float) event.getTo().y;
+		float toZ = (float) event.getTo().z;
+
+		this.pc.addArrow(arrowId, agentId, r, g, b, fromX, fromY, fromZ, toX, toY, toZ);
+	}
 }

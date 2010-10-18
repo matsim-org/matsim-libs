@@ -32,7 +32,7 @@ public class Sim2DConfig {
 
 	public static final double Bp = .45;
 	public static final double Bw = .75;// wall
-	public static final double App = 5.;
+	public static final double App = 500.;
 	public static final double Apath = 5.;
 	public static final double Apw = 10.;
 	public static final double tau = 1 / TIME_STEP_SIZE;

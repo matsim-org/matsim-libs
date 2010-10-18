@@ -29,6 +29,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 
+import playground.gregor.sim2d.events.debug.ArrowEvent;
 import playground.gregor.sim2d_v2.controller.Sim2DConfig;
 import playground.gregor.sim2d_v2.scenario.Scenario2DImpl;
 import playground.gregor.sim2d_v2.simulation.Agent2D;
@@ -104,8 +105,14 @@ public class PathForceModule implements ForceModule {
 		deltaX *= f / pathDist;
 		deltaY *= f / pathDist;
 
-		agent.getForce().incrementX(Sim2DConfig.Apath * deltaX / agent.getWeight());
-		agent.getForce().incrementY(Sim2DConfig.Apath * deltaY / agent.getWeight());
+		deltaX = Sim2DConfig.Apath * deltaX / agent.getWeight();
+		deltaY = Sim2DConfig.Apath * deltaY / agent.getWeight();
+		// DEBUG
+		ArrowEvent arrow = new ArrowEvent(agent.getPerson().getId(), new Coordinate(0, 0, 0), new Coordinate(-50 * deltaX, -50 * deltaY, 0), 1.f, 0.f, 0.f, 0);
+		this.floor.getSim2D().getEventsManager().processEvent(arrow);
+
+		agent.getForce().incrementX(deltaX);
+		agent.getForce().incrementY(deltaY);
 
 	}
 }

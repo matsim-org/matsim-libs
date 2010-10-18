@@ -21,7 +21,6 @@ package playground.gregor.sim2d_v2.controller;
 
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.events.algorithms.EventWriterXML;
 
 import playground.gregor.pedvis.PedVisPeekABot;
 import playground.gregor.sim2d_v2.scenario.Scenario2DImpl;
@@ -51,7 +50,7 @@ public class Controller2D extends Controler {
 			((ScenarioLoader2DImpl) this.loader).setPhantomPopulationEventsFile("/home/laemmel/devel/dfg/events.xml");
 			this.scenarioLoaded = true;
 
-			this.vis = new PedVisPeekABot(1);
+			this.vis = new PedVisPeekABot(0.2);
 			this.vis.setFloorShapeFile(Sim2DConfig.FLOOR_SHAPE_FILE);
 			this.events.addHandler(this.vis);
 		}

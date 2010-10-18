@@ -19,6 +19,9 @@
  * *********************************************************************** */
 package playground.gregor.sim2d_v2.simulation.floor;
 
+import com.vividsolutions.jts.geom.Coordinate;
+
+import playground.gregor.sim2d.events.debug.ArrowEvent;
 import playground.gregor.sim2d.simulation.Force;
 import playground.gregor.sim2d_v2.controller.Sim2DConfig;
 import playground.gregor.sim2d_v2.scenario.Scenario2DImpl;
@@ -64,8 +67,16 @@ public class EnvironmentForceModule implements ForceModule {
 			fy = f.getFy();
 		}
 
-		agent.getForce().incrementX((Sim2DConfig.Apw * fx / agent.getWeight()));
-		agent.getForce().incrementY((Sim2DConfig.Apw * fy / agent.getWeight()));
+		fx = (Sim2DConfig.Apw * fx / agent.getWeight());
+		fy = (Sim2DConfig.Apw * fy / agent.getWeight());
+
+		// DEBUG
+		ArrowEvent arrow = new ArrowEvent(agent.getPerson().getId(), new Coordinate(0, 0, 0), new Coordinate(-50 * fx, -50 * fy, 0), 1.f, 0.f, 1.f, 2);
+		this.floor.getSim2D().getEventsManager().processEvent(arrow);
+
+		agent.getForce().incrementX(fx);
+		agent.getForce().incrementY(fy);
+
 	}
 
 	/*

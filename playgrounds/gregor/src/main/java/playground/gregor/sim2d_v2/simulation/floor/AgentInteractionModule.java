@@ -28,6 +28,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.index.quadtree.Quadtree;
 
+import playground.gregor.sim2d.events.debug.ArrowEvent;
 import playground.gregor.sim2d_v2.controller.Sim2DConfig;
 import playground.gregor.sim2d_v2.scenario.Scenario2DImpl;
 import playground.gregor.sim2d_v2.simulation.Agent2D;
@@ -105,6 +106,14 @@ public class AgentInteractionModule implements DynamicForceModule {
 
 		fx = Sim2DConfig.App * fx / agent.getWeight();
 		fy = Sim2DConfig.App * fy / agent.getWeight();
+
+		// if (fx != 0 || fy != 0) {
+		// // DEBUG
+		// ArrowEvent arrow = new ArrowEvent(agent.getPerson().getId(), new
+		// Coordinate(0, 0, 0), new Coordinate(50 * fx, 50 * fy, 0), 0.f, 0.f,
+		// 0.f, 3);
+		// this.floor.getSim2D().getEventsManager().processEvent(arrow);
+		// }
 
 		agent.getForce().incrementX(fx);
 		agent.getForce().incrementY(fy);

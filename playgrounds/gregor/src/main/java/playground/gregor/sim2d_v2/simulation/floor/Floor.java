@@ -39,6 +39,7 @@ import com.vividsolutions.jts.index.quadtree.Quadtree;
 
 import playground.gregor.sim2d.events.XYZAzimuthEvent;
 import playground.gregor.sim2d.events.XYZAzimuthEventImpl;
+import playground.gregor.sim2d.events.debug.ArrowEvent;
 import playground.gregor.sim2d_v2.controller.Sim2DConfig;
 import playground.gregor.sim2d_v2.scenario.Scenario2DImpl;
 import playground.gregor.sim2d_v2.simulation.Agent2D;
@@ -160,7 +161,8 @@ public class Floor {
 			agent.moveToPostion(newPos);
 			double azimuth = getAzimuth(oldPos, newPos);
 			XYZAzimuthEvent e = new XYZAzimuthEventImpl(agent.getPerson().getId(), agent.getPosition(), azimuth, time);
-			this.sim2D.getEventsManager().processEvent(e);
+			this.getSim2D().getEventsManager().processEvent(e);
+
 			f.reset();
 
 		}
@@ -296,6 +298,13 @@ public class Floor {
 	public void addPhantomManager(PhantomManager phantomMgr) {
 		this.phantomMgr = phantomMgr;
 
+	}
+
+	/**
+	 * @return the sim2D
+	 */
+	public Sim2D getSim2D() {
+		return sim2D;
 	}
 
 }

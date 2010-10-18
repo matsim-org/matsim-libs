@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * XYZEventsFactoryImpl.java
+ * ArrowEventHandler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,40 +17,16 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.gregor.sim2d.events.copy;
+package playground.gregor.sim2d.events.debug;
 
-import org.matsim.core.api.experimental.events.Event;
-import org.matsim.core.api.experimental.events.EventsFactory;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.events.handler.EventHandler;
 
 /**
  * @author laemmel
  * 
  */
-public class XYZAzimuthEventsFactoryImpl {
+public interface ArrowEventHandler extends EventHandler {
 
-	private final EventsFactory factory;
-
-	public XYZAzimuthEventsFactoryImpl(EventsFactory factory) {
-		this.factory = factory;
-	}
-
-	public EventsFactory getFactory() {
-		return this.factory;
-	}
-
-	/**
-	 * @param x
-	 * @param y
-	 * @param z
-	 * @param azimuth
-	 * @param id
-	 * @param time
-	 * @return
-	 */
-	public Event createXYZAzimuthEvent(String x, String y, String z, String azimuth, String id, double time) {
-		XYZAzimuthEventImpl e = new XYZAzimuthEventImpl(new IdImpl(id), Double.parseDouble(x), Double.parseDouble(y), Double.parseDouble(z), Double.parseDouble(azimuth), time);
-		return e;
-	}
+	public void handleEvent(ArrowEvent event);
 
 }
