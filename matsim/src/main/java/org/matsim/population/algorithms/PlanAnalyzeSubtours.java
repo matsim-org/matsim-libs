@@ -102,7 +102,7 @@ public class PlanAnalyzeSubtours implements PlanAlgorithm {
 				}
 				int firstIndexOfSubtour = 2 * lastLinkIndex;
 				int lastIndexOfSubtour = 2 * ii;
-				List<PlanElement> subTour = actsLegs.subList(firstIndexOfSubtour, lastIndexOfSubtour);
+				List<PlanElement> subTour = actsLegs.subList(firstIndexOfSubtour, lastIndexOfSubtour + 1);
 				this.firstIndexOfSubtours.add(firstIndexOfSubtour);
 				this.lastIndexOfSubtours.add(lastIndexOfSubtour);
 				this.parentTourIndices.add(null);

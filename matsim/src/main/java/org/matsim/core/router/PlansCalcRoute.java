@@ -31,18 +31,15 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
-import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -150,6 +147,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 		this.addLegHandler(legHandler, TransportMode.bike);
 		this.addLegHandler(legHandler, TransportMode.ride);
 		this.addLegHandler(legHandler, TransportMode.walk);
+		this.addLegHandler(legHandler, TransportMode.undefined);
 	}
 		
 	public final void addLegHandler(LegHandler legHandler, String transportMode) {
@@ -234,39 +232,16 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 	 */
 	public double handleLeg(Person person, final Leg leg, final Activity fromAct, final Activity toAct, final double depTime) {
 		String legmode = leg.getMode();
-
 		LegHandler legHandler = legHandlers.get(legmode);
 		if (legHandler != null) {
 			return legHandler.handleLeg(person, leg, fromAct, toAct, depTime);
-		} else if ("undefined".equals(legmode)) {
-			/* balmermi: No clue how to handle legs with 'undef' mode
-			 *                Therefore, handle it similar like bike mode with 50 km/h
-			 *                and no route assigned  */
-			// "undef" means teleportation.  As usual, the final answer is defined in the mobsim; the router
-			// can do nothing but try to approximate.  kai, apr'10
-			return handleUndefLeg(leg, fromAct, toAct, depTime);
 		} else {
 			throw new RuntimeException("cannot handle legmode '" + legmode + "'.");
 		}
-	}
-
-	// yyyy should this also be moved to DefaultLegHandler? cdobler, okt'10
-	protected double handleUndefLeg(final Leg leg, final Activity fromAct, final Activity toAct, final double depTime) {
-		// make simple assumption about distance and a dummy speed (50 km/h)
-		double dist = CoordUtils.calcDistance(fromAct.getCoord(), toAct.getCoord());
-		// create an empty route, but with realistic traveltime
-		Route route = this.routeFactory.createRoute("undefined", fromAct.getLinkId(), toAct.getLinkId());
-		int travTime = (int)(dist / this.configGroup.getUndefinedModeSpeed());
-		route.setTravelTime(travTime);
-		route.setDistance(dist * 1.5);
-		leg.setRoute(route);
-		leg.setDepartureTime(depTime);
-		leg.setTravelTime(travTime);
-		((LegImpl) leg).setArrivalTime(depTime + travTime); // yy something needs to be done once there are alternative implementations of the interface.  kai, apr'10
-		return travTime;
-	}
+	}	
 
 	public NetworkFactoryImpl getRouteFactory() {
 		return routeFactory;
 	}
+	
 }

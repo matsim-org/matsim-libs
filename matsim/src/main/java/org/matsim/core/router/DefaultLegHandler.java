@@ -72,7 +72,6 @@ public class DefaultLegHandler implements LegHandler {
 	@Override
 	public double handleLeg(Person person, Leg leg, Activity fromAct, Activity toAct, double depTime) {
 		String legMode = leg.getMode();
-		
 		if (TransportMode.car.equals(legMode)) {
 			return handleCarLeg(leg, fromAct, toAct, depTime);
 		} else if (TransportMode.ride.equals(legMode)) {
@@ -83,6 +82,8 @@ public class DefaultLegHandler implements LegHandler {
 			return handleWalkLeg(leg, fromAct, toAct, depTime);
 		} else if (TransportMode.bike.equals(legMode)) {
 			return handleBikeLeg(leg, fromAct, toAct, depTime);
+		} else if (TransportMode.undefined.equals(legMode)) {
+			return handleUndefinedLeg(leg, fromAct, toAct, depTime);
 		} else {
 			throw new RuntimeException("cannot handle legmode '" + legMode + "'.");
 		}
@@ -198,6 +199,21 @@ public class DefaultLegHandler implements LegHandler {
 		// create an empty route, but with realistic traveltime
 		Route route = this.routeFactory.createRoute(TransportMode.bike, fromAct.getLinkId(), toAct.getLinkId());
 		int travTime = (int)(dist / this.configGroup.getBikeSpeed());
+		route.setTravelTime(travTime);
+		route.setDistance(dist * 1.5);
+		leg.setRoute(route);
+		leg.setDepartureTime(depTime);
+		leg.setTravelTime(travTime);
+		((LegImpl) leg).setArrivalTime(depTime + travTime); // yy something needs to be done once there are alternative implementations of the interface.  kai, apr'10
+		return travTime;
+	}
+	
+	private double handleUndefinedLeg(final Leg leg, final Activity fromAct, final Activity toAct, final double depTime) {
+		// make simple assumption about distance and a dummy speed (50 km/h)
+		double dist = CoordUtils.calcDistance(fromAct.getCoord(), toAct.getCoord());
+		// create an empty route, but with realistic traveltime
+		Route route = this.routeFactory.createRoute("undefined", fromAct.getLinkId(), toAct.getLinkId());
+		int travTime = (int)(dist / this.configGroup.getUndefinedModeSpeed());
 		route.setTravelTime(travTime);
 		route.setDistance(dist * 1.5);
 		leg.setRoute(route);

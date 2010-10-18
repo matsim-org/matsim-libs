@@ -32,6 +32,7 @@ import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.replanning.modules.ChangeLegMode;
+import org.matsim.core.replanning.modules.SubtourModeChoice;
 import org.matsim.core.replanning.modules.ExternalModule;
 import org.matsim.core.replanning.modules.PlanomatModule;
 import org.matsim.core.replanning.modules.ReRoute;
@@ -111,118 +112,125 @@ public final class StrategyManagerConfigLoader {
 		Network network = controler.getNetwork();
 		PersonalizableTravelCost travelCostCalc = controler.createTravelCostCalculator();
 		PersonalizableTravelTime travelTimeCalc = controler.getTravelTimeCalculator();
-		Config config = controler.getConfig();
-
 		PlanStrategy strategy = null;
 		if (name.equals("KeepLastSelected")) {
 			strategy = new PlanStrategyImpl(new KeepSelected());
 		} else if (name.equals("ReRoute") || name.equals("threaded.ReRoute")) {
 			strategy = new PlanStrategyImpl(new RandomPlanSelector());
 			strategy.addStrategyModule(new ReRoute(controler));
-		} else if (name.equals("ReRoute_Dijkstra")) {
-			strategy = new PlanStrategyImpl(new RandomPlanSelector());
-			strategy.addStrategyModule(new ReRouteDijkstra(config, network, travelCostCalc, travelTimeCalc));
-		} else if (name.equals("ReRoute_Landmarks")) {
-			strategy = new PlanStrategyImpl(new RandomPlanSelector());
-			strategy.addStrategyModule(new ReRouteLandmarks(config, network, travelCostCalc, travelTimeCalc, new FreespeedTravelTimeCost(config.charyparNagelScoring())));
-		} else if (name.equals("TimeAllocationMutator") || name.equals("threaded.TimeAllocationMutator")) {
-			strategy = new PlanStrategyImpl(new RandomPlanSelector());
-			TimeAllocationMutator tam = new TimeAllocationMutator(config);
-//			tam.setUseActivityDurations(config.vspExperimental().isUseActivityDurations());
-			// moved into TimeAllocationMutator.  kai, aug'10
-			strategy.addStrategyModule(tam);
-		} else if (name.equals("TimeAllocationMutator7200_ReRouteLandmarks")) {
-			strategy = new PlanStrategyImpl(new RandomPlanSelector());
-			strategy.addStrategyModule(new TimeAllocationMutator(config, 7200));
-			strategy.addStrategyModule(new ReRouteLandmarks(config, network, travelCostCalc, travelTimeCalc, new FreespeedTravelTimeCost(config.charyparNagelScoring())));
-		} else if (name.equals("ExternalModule")) {
-			externalCounter++;
-			strategy = new PlanStrategyImpl(new RandomPlanSelector());
-			String exePath = settings.getExePath();
-			ExternalModule em = new ExternalModule(exePath, "ext" + externalCounter, controler, controler.getScenario());
-			em.setIterationNumber(controler.getIterationNumber());
-			strategy.addStrategyModule(em);
-		} else if (name.equals("Planomat")) {
-			strategy = new PlanStrategyImpl(new RandomPlanSelector());
-			PlanStrategyModule planomatStrategyModule = new PlanomatModule(controler, controler.getEvents(), controler.getNetwork(), controler.getScoringFunctionFactory(), controler.createTravelCostCalculator(), controler.getTravelTimeCalculator());
-			strategy.addStrategyModule(planomatStrategyModule);
-		} else if (name.equals("PlanomatReRoute")) {
-			strategy = new PlanStrategyImpl(new RandomPlanSelector());
-			PlanStrategyModule planomatStrategyModule = new PlanomatModule(controler, controler.getEvents(), controler.getNetwork(), controler.getScoringFunctionFactory(), controler.createTravelCostCalculator(), controler.getTravelTimeCalculator());
-			strategy.addStrategyModule(planomatStrategyModule);
-			strategy.addStrategyModule(new ReRoute(controler));
-		} else if (name.equals("BestScore")) {
-			strategy = new PlanStrategyImpl(new BestPlanSelector());
-		} else if (name.equals("SelectExpBeta")) {
-			strategy = new PlanStrategyImpl(new ExpBetaPlanSelector(config.charyparNagelScoring()));
-		} else if (name.equals("ChangeExpBeta")) {
-			strategy = new PlanStrategyImpl(new ExpBetaPlanChanger(config.charyparNagelScoring().getBrainExpBeta()));
-		} else if (name.equals("SelectRandom")) {
-			strategy = new PlanStrategyImpl(new RandomPlanSelector());
-		} else if (name.equals("ChangeLegMode")) {
-			strategy = new PlanStrategyImpl(new RandomPlanSelector());
-			strategy.addStrategyModule(new ChangeLegMode(config));
-			strategy.addStrategyModule(new ReRoute(controler));
-		} else if (name.equals("TransitChangeLegMode")) {
-			strategy = new PlanStrategyImpl(new RandomPlanSelector());
-			strategy.addStrategyModule(new TransitActsRemoverStrategy(controler.getConfig()));
-			strategy.addStrategyModule(new ChangeLegMode(controler.getConfig()));
-			strategy.addStrategyModule(new ReRoute(controler));
-		} else if (name.equals("TransitTimeAllocationMutator")) {
-			strategy = new PlanStrategyImpl(new RandomPlanSelector());
-			TransitTimeAllocationMutator tam = new TransitTimeAllocationMutator(controler.getConfig());
-			strategy.addStrategyModule(tam);
-		} else if (name.equals("SelectPathSizeLogit")) {
-			strategy = new PlanStrategyImpl(new PathSizeLogitSelector(controler.getNetwork(), config.charyparNagelScoring()));
-		} else if (name.equals("LocationChoice")) {
-			strategy = new PlanStrategyImpl(new ExpBetaPlanSelector(config.charyparNagelScoring()));
-			strategy.addStrategyModule(new LocationChoice(controler.getNetwork(), controler, (controler.getScenario()).getKnowledges()));
-			strategy.addStrategyModule(new ReRoute(controler));
-			strategy.addStrategyModule(new TimeAllocationMutator(config));
-		}
-		//if none of the strategies above could be selected we try to load the class by name
-		else {
-			//classes loaded by name must not be part of the matsim core
-			if (name.startsWith("org.matsim")) {
-				log.error("Strategies in the org.matsim package must not be loaded by name!");
+		} else {
+			Config config = controler.getConfig();
+			if (name.equals("ReRoute_Dijkstra")) {
+				strategy = new PlanStrategyImpl(new RandomPlanSelector());
+				strategy.addStrategyModule(new ReRouteDijkstra(config, network, travelCostCalc, travelTimeCalc));
+			} else if (name.equals("ReRoute_Landmarks")) {
+				strategy = new PlanStrategyImpl(new RandomPlanSelector());
+				strategy.addStrategyModule(new ReRouteLandmarks(config, network, travelCostCalc, travelTimeCalc, new FreespeedTravelTimeCost(config.charyparNagelScoring())));
+			} else if (name.equals("TimeAllocationMutator") || name.equals("threaded.TimeAllocationMutator")) {
+				strategy = new PlanStrategyImpl(new RandomPlanSelector());
+				TimeAllocationMutator tam = new TimeAllocationMutator(config);
+				strategy.addStrategyModule(tam);
+			} else if (name.equals("TimeAllocationMutator7200_ReRouteLandmarks")) {
+				strategy = new PlanStrategyImpl(new RandomPlanSelector());
+				strategy.addStrategyModule(new TimeAllocationMutator(config, 7200));
+				strategy.addStrategyModule(new ReRouteLandmarks(config, network, travelCostCalc, travelTimeCalc, new FreespeedTravelTimeCost(config.charyparNagelScoring())));
+			} else if (name.equals("ExternalModule")) {
+				externalCounter++;
+				strategy = new PlanStrategyImpl(new RandomPlanSelector());
+				String exePath = settings.getExePath();
+				ExternalModule em = new ExternalModule(exePath, "ext" + externalCounter, controler, controler.getScenario());
+				em.setIterationNumber(controler.getIterationNumber());
+				strategy.addStrategyModule(em);
+			} else if (name.equals("Planomat")) {
+				strategy = new PlanStrategyImpl(new RandomPlanSelector());
+				PlanStrategyModule planomatStrategyModule = new PlanomatModule(controler, controler.getEvents(), controler.getNetwork(), controler.getScoringFunctionFactory(), controler.createTravelCostCalculator(), controler.getTravelTimeCalculator());
+				strategy.addStrategyModule(planomatStrategyModule);
+			} else if (name.equals("PlanomatReRoute")) {
+				strategy = new PlanStrategyImpl(new RandomPlanSelector());
+				PlanStrategyModule planomatStrategyModule = new PlanomatModule(controler, controler.getEvents(), controler.getNetwork(), controler.getScoringFunctionFactory(), controler.createTravelCostCalculator(), controler.getTravelTimeCalculator());
+				strategy.addStrategyModule(planomatStrategyModule);
+				strategy.addStrategyModule(new ReRoute(controler));
+			} else if (name.equals("BestScore")) {
+				strategy = new PlanStrategyImpl(new BestPlanSelector());
+			} else if (name.equals("SelectExpBeta")) {
+				strategy = new PlanStrategyImpl(new ExpBetaPlanSelector(config.charyparNagelScoring()));
+			} else if (name.equals("ChangeExpBeta")) {
+				strategy = new PlanStrategyImpl(new ExpBetaPlanChanger(config.charyparNagelScoring().getBrainExpBeta()));
+			} else if (name.equals("SelectRandom")) {
+				strategy = new PlanStrategyImpl(new RandomPlanSelector());
+			} else if (name.equals("ChangeLegMode")) {
+				strategy = new PlanStrategyImpl(new RandomPlanSelector());
+				strategy.addStrategyModule(new ChangeLegMode(config));
+				strategy.addStrategyModule(new ReRoute(controler));
+			} else if (name.equals("SubtourModeChoice")) {
+				strategy = new PlanStrategyImpl(new RandomPlanSelector());
+				strategy.addStrategyModule(new SubtourModeChoice(config));
+				strategy.addStrategyModule(new ReRoute(controler));
+			} else if (name.equals("TransitChangeLegMode")) {
+				strategy = new PlanStrategyImpl(new RandomPlanSelector());
+				strategy.addStrategyModule(new TransitActsRemoverStrategy(config));
+				strategy.addStrategyModule(new ChangeLegMode(config));
+				strategy.addStrategyModule(new ReRoute(controler));
+			} else if (name.equals("TransitTimeAllocationMutator")) {
+				strategy = new PlanStrategyImpl(new RandomPlanSelector());
+				TransitTimeAllocationMutator tam = new TransitTimeAllocationMutator(config);
+				strategy.addStrategyModule(tam);
+			} else if (name.equals("SelectPathSizeLogit")) {
+				strategy = new PlanStrategyImpl(new PathSizeLogitSelector(controler.getNetwork(), config.charyparNagelScoring()));
+			} else if (name.equals("LocationChoice")) {
+				strategy = new PlanStrategyImpl(new ExpBetaPlanSelector(config.charyparNagelScoring()));
+				strategy.addStrategyModule(new LocationChoice(controler.getNetwork(), controler, (controler.getScenario()).getKnowledges()));
+				strategy.addStrategyModule(new ReRoute(controler));
+				strategy.addStrategyModule(new TimeAllocationMutator(config));
+			} else {
+				strategy = tryToLoadClassByName(controler, name);
 			}
-			else {
-				try {
-					Class<? extends PlanStrategy> klas = (Class<? extends PlanStrategy>) Class.forName(name);
-					Class[] args = new Class[1];
-					args[0] = Scenario.class;
-					Constructor<? extends PlanStrategy> c = null;
-					try{
-						c = klas.getConstructor(args);
-						strategy = c.newInstance(controler.getScenario());
-					} catch(NoSuchMethodException e){
-						log.info("Cannot find Constructor in PlanStrategy " + name + " with single argument of type Scenario. " +
-								"This is not fatal, trying to find other constructor, however a constructor expecting Scenario as " +
-								"single argument is recommended!" );
-						log.info("(People who need access to events should ignore this warning.)") ;
-						// I think that one needs events fairly often. kai, sep'10
-					}
-					if (c == null){
-						args[0] = Controler.class;
-						c = klas.getConstructor(args);
-						strategy = c.newInstance(controler);
-					}
-					log.info("Loaded PlanStrategy (known as `module' in the config) from class " + name);
-				} catch (ClassNotFoundException e) {
-					e.printStackTrace();
-				} catch (InstantiationException e) {
-					e.printStackTrace();
-				} catch (IllegalAccessException e) {
-					e.printStackTrace();
-				} catch (SecurityException e) {
-					e.printStackTrace();
-				} catch (NoSuchMethodException e) {
-					e.printStackTrace();
-				} catch (IllegalArgumentException e) {
-					e.printStackTrace();
-				} catch (InvocationTargetException e) {
-					e.printStackTrace();
+		}
+		return strategy;
+	}
+
+	private static PlanStrategy tryToLoadClassByName(final Controler controler, final String name) {
+		PlanStrategy strategy = null;
+		//classes loaded by name must not be part of the matsim core
+		if (name.startsWith("org.matsim")) {
+			log.error("Strategies in the org.matsim package must not be loaded by name!");
+		}
+		else {
+			try {
+				Class<? extends PlanStrategy> klas = (Class<? extends PlanStrategy>) Class.forName(name);
+				Class[] args = new Class[1];
+				args[0] = Scenario.class;
+				Constructor<? extends PlanStrategy> c = null;
+				try{
+					c = klas.getConstructor(args);
+					strategy = c.newInstance(controler.getScenario());
+				} catch(NoSuchMethodException e){
+					log.info("Cannot find Constructor in PlanStrategy " + name + " with single argument of type Scenario. " +
+							"This is not fatal, trying to find other constructor, however a constructor expecting Scenario as " +
+					"single argument is recommended!" );
+					log.info("(People who need access to events should ignore this warning.)") ;
+					// I think that one needs events fairly often. kai, sep'10
 				}
+				if (c == null){
+					args[0] = Controler.class;
+					c = klas.getConstructor(args);
+					strategy = c.newInstance(controler);
+				}
+				log.info("Loaded PlanStrategy (known as `module' in the config) from class " + name);
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			} catch (InstantiationException e) {
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				e.printStackTrace();
+			} catch (SecurityException e) {
+				e.printStackTrace();
+			} catch (NoSuchMethodException e) {
+				e.printStackTrace();
+			} catch (IllegalArgumentException e) {
+				e.printStackTrace();
+			} catch (InvocationTargetException e) {
+				e.printStackTrace();
 			}
 		}
 		return strategy;

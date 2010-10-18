@@ -142,7 +142,7 @@ public class PlanAnalyzeSubtoursTest extends MatsimTestCase {
 		assertEquals("failure testing " + facString, expectedNumSubtoursForThis, actualNumSubtours);
 		for (int i = 0; i < actualNumSubtours; i++) {
 			int leftPlanIndex = 2 * actualSubtourIndexation.indexOf(i);
-			int rightPlanIndex = 2 * (1 + actualSubtourIndexation.lastIndexOf(i));
+			int rightPlanIndex = 2 * (1 + actualSubtourIndexation.lastIndexOf(i)) + 1;
 			List<? extends PlanElement> expectedSubTour = plan.getPlanElements().subList(leftPlanIndex, rightPlanIndex);
 			List<? extends PlanElement> actualSubTour = testee.getSubtours().get(i);
 			assertEquals(expectedSubTour, actualSubTour);
