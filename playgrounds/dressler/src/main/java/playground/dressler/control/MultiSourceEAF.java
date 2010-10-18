@@ -507,11 +507,11 @@ public class MultiSourceEAF {
 					tempstr2 = path.toString() + "\n";
 
 					int augment = fluss.augment(path);
-
+					
 					if (augment > 0) {
 						tempstr += tempstr2;
 						tempstr += "augmented " + augment + "\n";
-
+						//System.out.println("augmented " + augment + "\n");
 						// remember this path for the next timelayer
 						newSP.addLast(path); // keep the order!
 						goodaugment += 1;
@@ -1065,7 +1065,7 @@ public class MultiSourceEAF {
 
 		// set additional parameters
 		//settings.TimeHorizon = 2700;
-		//settings.MaxRounds = 150;
+		settings.MaxRounds = 300;
 		//settings.checkConsistency = 1;
 		//settings.doGarbageCollection = 10; // > 0 generally not such a good idea.
 		//settings.minTravelTime = 1;
@@ -1076,7 +1076,7 @@ public class MultiSourceEAF {
 		settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_FORWARD;
 		//settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_MIXED;
 		//settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_REVERSE;
-		settings.useRepeatedPaths = true; // not compatible with costs!
+		settings.useRepeatedPaths = false; // not compatible with costs!
 		// track unreachable vertices only works in REVERSE (with forward in between), and wastes time otherwise
 		//settings.trackUnreachableVertices = true  && (settings.searchAlgo == FlowCalculationSettings.SEARCHALGO_REVERSE);
 		//settings.sortPathsBeforeAugmenting = true;

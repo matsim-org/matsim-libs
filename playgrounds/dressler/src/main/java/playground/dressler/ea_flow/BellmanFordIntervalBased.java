@@ -437,7 +437,10 @@ public class BellmanFordIntervalBased {
 							toLabel = this._labels.get(toNode).getIntervalAt(toTime);
 							//TODO holdover done construct Routes
 							
-						}	
+						}else{
+							toLabel = this._labels.get(toNode).getIntervalAt(toTime);
+							toLabel = this._labels.get(toNode).getIntervalAt(toLabel.getHighBound());
+						}
 					} else {
 						throw new RuntimeException("Unknown instance of PathStep in ConstructRoutes()");
 					}
@@ -818,7 +821,7 @@ public class BellmanFordIntervalBased {
 					//queue.add(new BFTask(new VirtualNormalNode(v, 0), changedinterval, false));
 				}
 			}
-			/*changed = relabelHoldover(v, inter,false,false, this._settings.TimeHorizon);
+			changed = relabelHoldover(v, inter,false,false, this._settings.TimeHorizon);
 			if(changed!=null){
 				for(VertexInterval changedinterval : changed){
 					if(changedinterval.getLowBound()<min){
@@ -826,7 +829,7 @@ public class BellmanFordIntervalBased {
 					}
 					//queue.add(new BFTask(new VirtualNormalNode(v, 0), changedinterval, false));
 				}
-			}*/
+			}
 			if(inter.getLowBound()!=min||inter.getHighBound()!=max){
 				Interval tempinter = new Interval(min,max);
 				System.out.println(inter+" replaced by "+ tempinter);
@@ -904,7 +907,7 @@ public class BellmanFordIntervalBased {
 			if (original) {
 				pred = new StepHold(v, inter.getHighBound()-1, inter.getHighBound(), original);
 			}else{
-				pred = new StepHold(v, inter.getLowBound(), inter.getLowBound()+1, original);
+				pred = new StepHold(v, inter.getLowBound(), inter.getLowBound()-1, original);
 			}
 			//FIXME holdover may be incorrect build correct preds
 			arriveProperties.setPredecessor(pred);
@@ -930,7 +933,7 @@ public class BellmanFordIntervalBased {
 
 		if(arrive != null && !arrive.isEmpty()){
 			System.out.println("setti arrive ho"+arrive.size());
-			//FIXME holdover  a causes loops
+			//FIXME holdover a causes loops
 			changed = labelto.setTrueList(arrive, arriveProperties);
 			System.out.println("done setti arrive ho");
 			return changed;
