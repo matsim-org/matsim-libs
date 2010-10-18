@@ -31,13 +31,13 @@ import playground.gregor.sim2d_v2.simulation.Sim2D;
 public class Controller2D extends Controler {
 
 	private Scenario2DImpl scenario2DData;
+	private PedVisPeekABot vis;
 
 	public Controller2D(String[] args) {
 		super(args);
 		setOverwriteFiles(true);
 		this.config.setQSimConfigGroup(new QSimConfigGroup());
 		this.config.getQSimConfigGroup().setEndTime(2 * 60);
-
 	}
 
 	@Override
@@ -48,23 +48,33 @@ public class Controller2D extends Controler {
 			this.loader.loadScenario();
 			this.network = this.loader.getScenario().getNetwork();
 			this.population = this.loader.getScenario().getPopulation();
+			((ScenarioLoader2DImpl) this.loader).setPhantomPopulationEventsFile("/home/laemmel/devel/dfg/events.xml");
 			this.scenarioLoaded = true;
+
+			this.vis = new PedVisPeekABot(1);
+			this.vis.setFloorShapeFile(Sim2DConfig.FLOOR_SHAPE_FILE);
+			this.events.addHandler(this.vis);
 		}
+
 	}
 
 	@Override
 	protected void runMobSim() {
 
 		// EventsManager manager = new EventsManagerImpl();
-		EventWriterXML writer = new EventWriterXML(getConfig().controler().getOutputDirectory() + "/ITERS/it." + getIterationNumber() + "/" + getIterationNumber() + ".xyzAzimuthEvents.xml.gz");
-		PedVisPeekABot vis = new PedVisPeekABot(1);
-		this.events.addHandler(writer);
-		this.events.addHandler(vis);
+		// EventWriterXML writer = new
+		// EventWriterXML(getConfig().controler().getOutputDirectory() +
+		// "/ITERS/it." + getIterationNumber() + "/" + getIterationNumber() +
+		// ".xyzAzimuthEvents.xml.gz");
+
+		// this.events.addHandler(writer);
+
 		Sim2D sim = new Sim2D(this.events, this.scenario2DData);
 
 		// }
 		sim.run();
-		writer.closeFile();
+		// writer.closeFile();
+		this.vis.reset(getIterationNumber());
 	}
 
 	public static void main(String[] args) {

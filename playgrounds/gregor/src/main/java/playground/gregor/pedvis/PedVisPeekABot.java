@@ -19,12 +19,28 @@
  * *********************************************************************** */
 package playground.gregor.pedvis;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+
+import org.geotools.data.FeatureSource;
+import org.geotools.feature.Feature;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.utils.gis.ShapeFileReader;
+
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
 
 import playground.gregor.sim2d.events.XYZAzimuthEvent;
 import playground.gregor.sim2d.events.XYZEventsFileReader;
@@ -43,11 +59,80 @@ public class PedVisPeekABot implements XYZEventsHandler, AgentDepartureEventHand
 
 	private long lastTime = 0;
 	double lastEventsTime = 0;
+	private String floorShape = null;
+	private int segmentCount = 0;
+	private static final float FLOOR_HEIGHT = 3.5f;
+	float ofX = 0;
+	float ofY = 0;
 
 	public PedVisPeekABot(double speedUp) {
 		this.speedUp = speedUp;
 		this.pc = new PeekABotClient();
+	}
+
+	/**
+	 * 
+	 */
+	private void init() {
+		if (this.floorShape != null) {
+			try {
+				drawFloor();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 		this.pc.init();
+	}
+
+	/**
+	 * @throws IOException
+	 * 
+	 */
+	private void drawFloor() throws IOException {
+		FeatureSource fs = ShapeFileReader.readDataFile(this.floorShape);
+		Iterator it = fs.getFeatures().iterator();
+		while (it.hasNext()) {
+			Feature ft = (Feature) it.next();
+			MultiPolygon mp = (MultiPolygon) ft.getDefaultGeometry();
+			for (int i = 0; i < mp.getNumGeometries(); i++) {
+				Geometry geo = mp.getGeometryN(i);
+				if (geo instanceof Polygon) {
+					drawPolygon((Polygon) geo);
+				}
+
+			}
+
+		}
+	}
+
+	private void drawPolygon(Polygon p) {
+		LineString lr = p.getExteriorRing();
+
+		for (int i = 0; i < lr.getNumPoints() - 1; i++) {
+			drawSegment(lr.getPointN(i), lr.getPointN(i + 1));
+		}
+		for (int i = 0; i < p.getNumInteriorRing(); i++) {
+			lr = p.getInteriorRingN(i);
+			for (int j = 0; j < lr.getNumPoints() - 1; j++) {
+				drawSegment(lr.getPointN(j), lr.getPointN(j + 1));
+			}
+		}
+
+		// drawSegment(lr.getPointN(lr.getNumPoints()-1), lr.getPointN(0));
+	}
+
+	private void drawSegment(Point pointN1, Point pointN2) {
+		this.pc.initPolygon(this.segmentCount, 5, .75f, .75f, .75f, 3);
+		float x1 = (float) (pointN1.getX() - this.ofX);
+		float y1 = (float) (pointN1.getY() - this.ofY);
+		float x2 = (float) (pointN2.getX() - this.ofX);
+		float y2 = (float) (pointN2.getY() - this.ofY);
+		this.pc.addPolygonCoord(this.segmentCount, x1, y1, 0);
+		this.pc.addPolygonCoord(this.segmentCount, x2, y2, 0);
+		this.pc.addPolygonCoord(this.segmentCount, x2, y2, FLOOR_HEIGHT);
+		this.pc.addPolygonCoord(this.segmentCount, x1, y1, FLOOR_HEIGHT);
+		this.pc.addPolygonCoord(this.segmentCount++, x1, y1, 0);
+
 	}
 
 	public PedVisPeekABot(String eventsFile, boolean loop, double speedUp) {
@@ -62,6 +147,11 @@ public class PedVisPeekABot implements XYZEventsHandler, AgentDepartureEventHand
 				run();
 			}
 		}
+	}
+
+	public void setFloorShapeFile(String floorShapeFile) {
+		this.floorShape = floorShapeFile;
+		init();
 	}
 
 	/**
@@ -118,8 +208,7 @@ public class PedVisPeekABot implements XYZEventsHandler, AgentDepartureEventHand
 	 */
 	@Override
 	public void reset(int iteration) {
-		// TODO Auto-generated method stub
-
+		this.pc.restAgents();
 	}
 
 	/*
@@ -141,13 +230,15 @@ public class PedVisPeekABot implements XYZEventsHandler, AgentDepartureEventHand
 		MatsimRandom.getRandom().nextDouble();
 		MatsimRandom.getRandom().nextDouble();
 		b = MatsimRandom.getRandom().nextFloat();
-		if (Integer.parseInt(e.getLinkId().toString()) % 2 == 0) {
+		if (Integer.parseInt(e.getPersonId().toString()) < 0) {
 			r = 1.f;
+		} else if (Integer.parseInt(e.getPersonId().toString()) == 0) {
+			b = 1.f;
 		} else {
 			g = 1.f;
 		}
-		this.pc.setBotColor(Integer.parseInt(e.getPersonId().toString()), r, g, b);
 
+		this.pc.setBotColor(Integer.parseInt(e.getPersonId().toString()), r, g, b);
 	}
 
 	/*
@@ -159,8 +250,8 @@ public class PedVisPeekABot implements XYZEventsHandler, AgentDepartureEventHand
 	 */
 	@Override
 	public void handleEvent(AgentArrivalEvent e) {
-		this.pc.setBotPosition(Integer.parseInt(e.getPersonId().toString()), -10, -10, -10, -10);
-
+		this.pc.setBotPosition(Integer.parseInt(e.getPersonId().toString()), -100, -100, -10, -10);
+		// this.pc.removeBot(Integer.parseInt(e.getPersonId().toString()));
 	}
 
 }

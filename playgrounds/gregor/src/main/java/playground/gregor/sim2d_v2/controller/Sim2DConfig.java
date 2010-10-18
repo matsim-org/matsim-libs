@@ -24,16 +24,18 @@ package playground.gregor.sim2d_v2.controller;
 public class Sim2DConfig {
 
 	public static double STATIC_FORCE_RESOLUTION = 0.1;
-	public static final double TIME_STEP_SIZE = 0.25;
+	public static final double TIME_STEP_SIZE = 0.2; // 1. / 25;
 
-	public static final double Bpath = 0.5;
+	public static final double Bpath = 1.5;
 	public static final double PSqrSensingRange = 12.25;
-	public static final double Bp = 1.5;
-	public static final double Bw = 1.5;// wall
-	public static final double App = 500.;
-	public static final double Apath = 20.;
-	public static final double Apw = 2000.;
-	public static final double tau = 1;
+	public static final double PNeighborhoddRange = 1.5;
+
+	public static final double Bp = .45;
+	public static final double Bw = .75;// wall
+	public static final double App = 5.;
+	public static final double Apath = 5.;
+	public static final double Apw = 10.;
+	public static final double tau = 1 / TIME_STEP_SIZE;
 	public static final double B_PATH = 3;
 
 	public static final String STATIC_FORCE_FIELD_FILE = "/home/laemmel/devel/dfg/data/staticForceField.xml.gz";
@@ -44,6 +46,7 @@ public class Sim2DConfig {
 	public static final boolean NETWORK_LOADERII = true;
 	public static final boolean NETWORK_LOADER_LS = false;
 	public static final String LS_SHAPE_FILE = "/home/laemmel/devel/dfg/data/90gradNetwork.shp";
+
 	public static final double NEIGHBORHOOD_UPDATE = 1;
 
 }

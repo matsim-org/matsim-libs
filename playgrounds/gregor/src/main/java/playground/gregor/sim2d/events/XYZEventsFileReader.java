@@ -101,45 +101,4 @@ public class XYZEventsFileReader extends MatsimXmlParser {
 	public void endTag(String name, String content, Stack<String> context) {
 
 	}
-
-	// @Override
-	// public void startTag(String name, Attributes atts, Stack<String> context)
-	// {
-	// if (name.equals(XYZEventsFileWriter.XYZ_EVENT_TAG)) {
-	// String id = atts.getValue(XYZEventsFileWriter.ID_TAG);
-	// String x = atts.getValue(XYZEventsFileWriter.X_COORD_TAG);
-	// String y = atts.getValue(XYZEventsFileWriter.Y_COORD_TAG);
-	// String z = atts.getValue(XYZEventsFileWriter.Z_COORD_TAG);
-	// String azimuth = atts.getValue(XYZEventsFileWriter.AZIMUTH_TAG);
-	// String time = atts.getValue(XYZEventsFileWriter.TIME_TAG);
-	//
-	// createEvent(id, x, y, z, azimuth, time);
-	// }
-	//
-	// }
-	//
-	// private void createEvent(String id, String x, String y, String z, String
-	// azimuth, String time) {
-	// double xc = Double.parseDouble(x);
-	// double yc = Double.parseDouble(y);
-	// double zc = Double.parseDouble(z);
-	// double az = Double.parseDouble(azimuth);
-	// double t = Double.parseDouble(time);
-	// this.currentEvent = new XYZAzimuthEventImpl(new IdImpl(id), new
-	// Coordinate(xc, yc, zc), az, t);
-	//
-	// }
-	//
-	// public void readFile(String file) {
-	// try {
-	// super.parse(file);
-	// } catch (SAXException e) {
-	// throw new RuntimeException("Error during parsing.", e);
-	// } catch (ParserConfigurationException e) {
-	// throw new RuntimeException("Error during parsing.", e);
-	// } catch (IOException e) {
-	// throw new RuntimeException("Error during parsing.", e);
-	// }
-	//
-	// }
 }

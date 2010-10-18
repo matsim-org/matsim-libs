@@ -22,15 +22,20 @@ package playground.gregor.sim2d_v2.scenario;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
+import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.config.Config;
 
+import playground.gregor.sim2d.events.XYZAzimuthEvent;
 import playground.gregor.sim2d.simulation.SegmentedStaticForceField;
 import playground.gregor.sim2d_v2.simulation.floor.StaticForceField;
 
+import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiPolygon;
 
@@ -44,6 +49,7 @@ public class Scenario2DImpl extends ScenarioImpl {
 	private SegmentedStaticForceField ssff;
 	private StaticForceField sff;
 	private HashMap<Id, LineString> lsmp;
+	private Queue<Event> phantomPopulation = null;
 
 	/**
 	 * @param config
@@ -80,6 +86,14 @@ public class Scenario2DImpl extends ScenarioImpl {
 	}
 
 	/**
+	 * 
+	 * @return
+	 */
+	public StaticForceField getStaticForceField() {
+		return this.sff;
+	}
+
+	/**
 	 * @param lsmp
 	 */
 	public void setLineStringMap(HashMap<Id, LineString> lsmp) {
@@ -106,6 +120,21 @@ public class Scenario2DImpl extends ScenarioImpl {
 	 */
 	public Map<MultiPolygon, List<Link>> getFloorLinkMapping() {
 		return this.mps;
+	}
+
+	/**
+	 * @param phantomPopulation2
+	 */
+	public void setPhantomPopulation(Queue<Event> phantomPopulation2) {
+		this.phantomPopulation = phantomPopulation2;
+
+	}
+
+	/**
+	 * @return the phantomPopulation
+	 */
+	public Queue<Event> getPhantomPopulation() {
+		return this.phantomPopulation;
 	}
 
 }

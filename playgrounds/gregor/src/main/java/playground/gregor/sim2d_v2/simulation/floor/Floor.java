@@ -21,7 +21,10 @@ package playground.gregor.sim2d_v2.simulation.floor;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -29,14 +32,17 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.utils.geometry.geotools.MGC;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.index.quadtree.Quadtree;
 
 import playground.gregor.sim2d.events.XYZAzimuthEvent;
 import playground.gregor.sim2d.events.XYZAzimuthEventImpl;
 import playground.gregor.sim2d_v2.controller.Sim2DConfig;
 import playground.gregor.sim2d_v2.scenario.Scenario2DImpl;
 import playground.gregor.sim2d_v2.simulation.Agent2D;
+import playground.gregor.sim2d_v2.simulation.PhantomManager;
 import playground.gregor.sim2d_v2.simulation.Sim2D;
 
 /**
@@ -57,15 +63,16 @@ public class Floor {
 	private static final double SIN_RIGHT = Math.sin(-Math.PI / 2);
 
 	private final List<ForceModule> forceModules = new ArrayList<ForceModule>();
-	private final List<ForceModule> drivingForceModules = new ArrayList<ForceModule>();
-	private final List<Agent2D> agents = new ArrayList<Agent2D>();
-	private final List<Agent2D> departedAgents = new ArrayList<Agent2D>();
+	private final List<DynamicForceModule> dynamicForceModules = new ArrayList<DynamicForceModule>();
+
+	private final Set<Agent2D> agents = new LinkedHashSet<Agent2D>();
 	private final Scenario2DImpl scenario;
 	private final List<Link> links;
 	private final Sim2D sim2D;
 	private HashMap<Id, LineString> finishLines;
 
 	private final GeometryFactory geofac = new GeometryFactory();
+	private PhantomManager phantomMgr = null;
 
 	public Floor(Scenario2DImpl scenario, List<Link> list, Sim2D sim) {
 		this.scenario = scenario;
@@ -78,16 +85,20 @@ public class Floor {
 	 * 
 	 */
 	public void init() {
-		this.forceModules.add(new AgentInteractionModule(this, this.scenario));
-		this.drivingForceModules.add(new DrivingForceModule(this, this.scenario));
+		this.dynamicForceModules.add(new AgentInteractionModule(this, this.scenario));
+		if (this.phantomMgr != null) {
+			this.dynamicForceModules.add(new PhantomForceModule(this, this.scenario, this.phantomMgr));
+		}
+
+		this.forceModules.add(new DrivingForceModule(this, this.scenario));
 		this.forceModules.add(new EnvironmentForceModule(this, this.scenario));
-		this.drivingForceModules.add(new PathForceModule(this, this.scenario));
+		this.forceModules.add(new PathForceModule(this, this.scenario));
 
 		for (ForceModule m : this.forceModules) {
 			m.init();
 		}
 
-		for (ForceModule m : this.drivingForceModules) {
+		for (ForceModule m : this.dynamicForceModules) {
 			m.init();
 		}
 
@@ -124,7 +135,8 @@ public class Floor {
 	 * @param time
 	 */
 	public void move(double time) {
-		updateForces();
+
+		updateForces(time);
 		moveAgents(time);
 
 	}
@@ -133,17 +145,24 @@ public class Floor {
 	 * 
 	 */
 	private void moveAgents(double time) {
-		for (Agent2D agent : this.departedAgents) {
+		Iterator<Agent2D> it = this.agents.iterator();
+
+		for (; it.hasNext();) {
+			Agent2D agent = it.next();
 			Force f = agent.getForce();
 			Coordinate oldPos = agent.getPosition();
 			Coordinate newPos = new Coordinate(oldPos.x + f.getXComponent(), oldPos.y + f.getYComponent(), 0);
-			checkForEndOfLinkReached(agent, oldPos, newPos, time);
-
+			boolean endOfLeg = checkForEndOfLinkReached(agent, oldPos, newPos, time);
+			if (endOfLeg) {
+				it.remove();
+				continue;
+			}
 			agent.moveToPostion(newPos);
 			double azimuth = getAzimuth(oldPos, newPos);
 			XYZAzimuthEvent e = new XYZAzimuthEventImpl(agent.getPerson().getId(), agent.getPosition(), azimuth, time);
 			this.sim2D.getEventsManager().processEvent(e);
 			f.reset();
+
 		}
 
 	}
@@ -153,7 +172,7 @@ public class Floor {
 	 * @param oldPos
 	 * 
 	 */
-	private void checkForEndOfLinkReached(Agent2D agent, Coordinate oldPos, Coordinate newPos, double time) {
+	private boolean checkForEndOfLinkReached(Agent2D agent, Coordinate oldPos, Coordinate newPos, double time) {
 		LineString finishLine = this.finishLines.get(agent.getCurrentLinkId());
 		LineString trajectory = this.geofac.createLineString(new Coordinate[] { oldPos, newPos });
 		if (trajectory.crosses(finishLine)) {
@@ -162,10 +181,14 @@ public class Floor {
 			// end of route
 			if (id == null) {
 				agent.endLegAndAssumeControl(time);
+				return true;
+
 			} else {
 				agent.notifyMoveOverNode();
 			}
 		}
+
+		return false;
 	}
 
 	/**
@@ -196,19 +219,21 @@ public class Floor {
 	/**
 	 * 
 	 */
-	private void updateForces() {
+	private void updateForces(double time) {
+		for (DynamicForceModule m : this.dynamicForceModules) {
+			m.update(time);
+		}
+
 		for (Agent2D agent : this.agents) {
+			for (ForceModule m : this.dynamicForceModules) {
+				m.run(agent);
+			}
 			for (ForceModule m : this.forceModules) {
 				m.run(agent);
 			}
 		}
-		for (Agent2D agent : this.departedAgents) {
-			for (ForceModule m : this.drivingForceModules) {
-				m.run(agent);
-			}
-		}
 
-		for (Agent2D agent : this.departedAgents) {
+		for (Agent2D agent : this.agents) {
 			validateForce(agent);
 		}
 	}
@@ -217,8 +242,8 @@ public class Floor {
 		Force force = agent.getForce();
 		double norm = Math.sqrt(Math.pow(force.getXComponent(), 2) + Math.pow(force.getYComponent(), 2));
 		if (norm > agent.getDesiredVelocity() * Sim2DConfig.TIME_STEP_SIZE) {
-			force.setXComponent(force.getXComponent() * ((agent.getDesiredVelocity() * Sim2DConfig.TIME_STEP_SIZE) / norm));
-			force.setYComponent(force.getYComponent() * ((agent.getDesiredVelocity() * Sim2DConfig.TIME_STEP_SIZE) / norm));
+			force.setXComponent(force.getXComponent() * ((2 * agent.getDesiredVelocity() * Sim2DConfig.TIME_STEP_SIZE) / norm));
+			force.setYComponent(force.getYComponent() * ((2 * agent.getDesiredVelocity() * Sim2DConfig.TIME_STEP_SIZE) / norm));
 		}
 	}
 
@@ -234,7 +259,6 @@ public class Floor {
 	 * @param agent
 	 */
 	public void addAgent(Agent2D agent) {
-		this.agents.add(agent);
 		Activity act = (Activity) agent.getCurrentPlanElement();
 		agent.setPostion(MGC.coord2Coordinate(act.getCoord()));
 
@@ -244,15 +268,18 @@ public class Floor {
 	 * 
 	 * @return list of agents
 	 */
-	public List<Agent2D> getAgents() {
-		throw new RuntimeException("not (yet) implemented!");
+	public Set<Agent2D> getAgents() {
+		return this.agents;
 	}
 
 	/**
 	 * @param agent
 	 */
 	public void agentDepart(Agent2D agent) {
-		this.departedAgents.add(agent);
+		this.agents.add(agent);
+		for (DynamicForceModule m : this.dynamicForceModules) {
+			m.forceUpdate();
+		}
 
 	}
 
@@ -261,6 +288,14 @@ public class Floor {
 	 */
 	public List<Link> getLinks() {
 		return this.links;
+	}
+
+	/**
+	 * @param phantomMgr
+	 */
+	public void addPhantomManager(PhantomManager phantomMgr) {
+		this.phantomMgr = phantomMgr;
+
 	}
 
 }

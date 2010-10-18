@@ -26,6 +26,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
+import java.util.TreeMap;
 
 import org.geotools.data.FeatureSource;
 import org.geotools.factory.FactoryRegistryException;
@@ -40,6 +42,7 @@ import org.geotools.feature.SchemaException;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
@@ -49,6 +52,7 @@ import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
+import playground.gregor.sim2d.events.XYZAzimuthEvent;
 import playground.gregor.sim2d.gisdebug.StaticForceFieldToShape;
 import playground.gregor.sim2d.network.NetworkFromLsFile;
 import playground.gregor.sim2d.network.NetworkLoader;
@@ -63,6 +67,7 @@ import playground.gregor.sim2d_v2.simulation.floor.StaticForceFieldGenerator;
 import playground.gregor.sim2d_v2.simulation.floor.StaticForceFieldReader;
 import playground.gregor.sim2d_v2.simulation.floor.StaticForceFieldWriter;
 
+import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiPolygon;
@@ -78,6 +83,8 @@ public class ScenarioLoader2DImpl extends ScenarioLoaderImpl {
 	private HashMap<Id, LineString> lsmp;
 
 	private final Scenario2DImpl scenarioData;
+
+	private Queue<Event> phantomPopulation;
 
 	public ScenarioLoader2DImpl(Scenario2DImpl scenarioData) {
 		super(scenarioData);
@@ -222,6 +229,11 @@ public class ScenarioLoader2DImpl extends ScenarioLoaderImpl {
 		}
 		this.scenarioData.setStaticForceField(this.sff);
 		// new StaticForceFieldToShape(this.sff).createShp();
+	}
+
+	public void setPhantomPopulationEventsFile(String file) {
+		this.phantomPopulation = new PhantomPopulationLoader(file).getPhantomPopulation();
+		this.scenarioData.setPhantomPopulation(this.phantomPopulation);
 	}
 
 }
