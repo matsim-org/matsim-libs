@@ -74,11 +74,11 @@ public class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 		this.chainBasedModes = Arrays.asList(chainBasedModes);
 		this.rng = rng;
 		this.planAnalyzeSubtours = new PlanAnalyzeSubtours();
+		logger.info("Chain based modes: " + this.chainBasedModes.toString());
 	}
 
 	@Override
 	public void run(final Plan plan) {
-		logger.info("Chain based modes: " + chainBasedModes.toString());
 		this.plan = plan;
 		if (plan.getPlanElements().size() > 1) {
 			if (tripStructureAnalysisLayer == TripStructureAnalysisLayerOption.link) {
