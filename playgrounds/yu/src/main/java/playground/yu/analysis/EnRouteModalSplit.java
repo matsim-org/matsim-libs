@@ -49,8 +49,8 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.roadpricing.RoadPricingScheme;
 
-import playground.yu.utils.CollectionSum;
 import playground.yu.utils.TollTools;
+import playground.yu.utils.container.CollectionSum;
 
 /**
  * @author mrieser

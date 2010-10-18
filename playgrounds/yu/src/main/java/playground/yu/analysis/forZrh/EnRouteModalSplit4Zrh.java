@@ -22,8 +22,8 @@ import org.matsim.roadpricing.RoadPricingScheme;
 
 import playground.yu.analysis.EnRouteModalSplit;
 import playground.yu.analysis.PlanModeJudger;
-import playground.yu.utils.CollectionSum;
 import playground.yu.utils.TollTools;
+import playground.yu.utils.container.CollectionSum;
 
 /**
  * compute daily En Route/ departures/ arrivals of Zurich and Kanton Zurich

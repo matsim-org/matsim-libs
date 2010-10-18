@@ -49,8 +49,8 @@ import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.xml.sax.SAXException;
 
-import playground.yu.utils.CollectionSum;
 import playground.yu.utils.TollTools;
+import playground.yu.utils.container.CollectionSum;
 import playground.yu.utils.io.SimpleWriter;
 
 /**

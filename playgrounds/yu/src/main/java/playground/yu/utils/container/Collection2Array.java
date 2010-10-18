@@ -18,9 +18,9 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.yu.utils;
+package playground.yu.utils.container;
 
-import static playground.yu.utils.Collection2Array.toArray;
+import static playground.yu.utils.container.Collection2Array.toArray;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -31,36 +31,6 @@ import java.util.Random;
 import java.util.Set;
 
 public class Collection2Array {
-	public static int[] toArray(Collection<Integer> collection) {
-		int size = collection.size();
-		int[] array = new int[size];
-		Iterator<Integer> it = collection.iterator();
-		for (int i = 0; it.hasNext(); i++) {
-			array[i] = it.next();
-		}
-		return array;
-	}
-
-	public static double[] toArray(Collection<Double> collection) {
-		int size = collection.size();
-		double[] array = new double[size];
-		Iterator<Double> it = collection.iterator();
-		for (int i = 0; it.hasNext(); i++) {
-			array[i] = it.next();
-		}
-		return array;
-	}
-
-	public static double[] toDoubleArray(Collection<Integer> collection) {
-		int size = collection.size();
-		double[] array = new double[size];
-		Iterator<Integer> it = collection.iterator();
-		for (int i = 0; it.hasNext(); i++) {
-			array[i] = it.next();
-		}
-		return array;
-	}
-
 	public static void main(String[] args) {
 		List<Integer> list = new ArrayList<Integer>();
 		Random r = new Random();
@@ -100,5 +70,35 @@ public class Collection2Array {
 			System.out.println("intArray[\t" + i + "] :\t" + doubleArray2[i]);
 		}
 		System.out.println("----------------------");
+	}
+
+	public static double[] toArray(Collection<Double> collection) {
+		int size = collection.size();
+		double[] array = new double[size];
+		Iterator<Double> it = collection.iterator();
+		for (int i = 0; it.hasNext(); i++) {
+			array[i] = it.next();
+		}
+		return array;
+	}
+
+	public static int[] toArray(Collection<Integer> collection) {
+		int size = collection.size();
+		int[] array = new int[size];
+		Iterator<Integer> it = collection.iterator();
+		for (int i = 0; it.hasNext(); i++) {
+			array[i] = it.next();
+		}
+		return array;
+	}
+
+	public static double[] toDoubleArray(Collection<Integer> collection) {
+		int size = collection.size();
+		double[] array = new double[size];
+		Iterator<Integer> it = collection.iterator();
+		for (int i = 0; it.hasNext(); i++) {
+			array[i] = it.next();
+		}
+		return array;
 	}
 }

@@ -33,8 +33,8 @@ import org.matsim.core.scoring.charyparNagel.LegScoringFunction;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Counter;
 
-import playground.yu.utils.Collection2Array;
 import playground.yu.utils.charts.TimeScatterChart;
+import playground.yu.utils.container.Collection2Array;
 import playground.yu.utils.io.SimpleWriter;
 
 public class LegScoringFunctionWithDetailedRecord extends LegScoringFunction {

@@ -47,8 +47,8 @@ import org.matsim.roadpricing.RoadPricingScheme;
 import org.xml.sax.SAXException;
 
 import playground.yu.analysis.DailyDistance;
-import playground.yu.utils.CollectionSum;
 import playground.yu.utils.charts.PieChart;
+import playground.yu.utils.container.CollectionSum;
 import playground.yu.utils.io.SimpleWriter;
 
 /**

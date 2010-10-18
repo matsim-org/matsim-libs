@@ -21,7 +21,7 @@
 /**
  * 
  */
-package playground.yu.utils;
+package playground.yu.utils.container;
 
 import java.util.Collection;
 import java.util.HashSet;

@@ -33,8 +33,8 @@ import org.matsim.roadpricing.RoadPricingScheme;
 import org.xml.sax.SAXException;
 
 import playground.yu.analysis.EnRouteModalSplit;
-import playground.yu.utils.CollectionSum;
 import playground.yu.utils.TollTools;
+import playground.yu.utils.container.CollectionSum;
 
 /**
  * compute daily En Route/ departures/ arrivals of Munich Network and Munich

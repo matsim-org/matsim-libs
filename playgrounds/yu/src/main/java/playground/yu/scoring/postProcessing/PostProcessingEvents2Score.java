@@ -38,11 +38,16 @@ import org.matsim.core.utils.misc.ConfigUtils;
 public class PostProcessingEvents2Score {
 
 	public static void main(String[] args) {
-		String configFilename = "../integration-demandCalibration/test/DestinationUtilOffset/analysis.xml";
-		String popFilename = "../integration-demandCalibration/test/DestinationUtilOffset/1000.plans.xml.gz";
-		String netFilename = "../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml";
-		String eventsFilename = "../integration-demandCalibration/test/DestinationUtilOffset/1000.events.txt.gz";
-		String chartFilenameBase = "../integration-demandCalibration/test/DestinationUtilOffset/1000.departTime_travelTime.";
+//		String configFilename = "../integration-demandCalibration/test/DestinationUtilOffset/analysis.xml";
+//		String popFilename = "../integration-demandCalibration/test/DestinationUtilOffset/1000.plans.xml.gz";
+//		String netFilename = "../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml";
+//		String eventsFilename = "../integration-demandCalibration/test/DestinationUtilOffset/1000.events.txt.gz";
+//		String chartFilenameBase = "../integration-demandCalibration/test/DestinationUtilOffset/1000.departTime_travelTime.";
+		String configFilename = "/net/ils/chen/utilityOffsets/analysis.xml";
+		String popFilename = "/net/ils/chen/matsim-bse/outputs/4SE_DC/raiseTRB/ITERS/it.1000/1000.plans.xml.gz";
+		String netFilename = "/net/work/chen/data/ivtch/input/ivtch-osm.xml";
+		String eventsFilename = "/net/ils/chen/matsim-bse/outputs/4SE_DC/raiseTRB/ITERS/it.1000/1000.events.txt.gz";
+		String chartFilenameBase = "/net/ils/chen/matsim-bse/outputs/4SE_DC/raiseTRB/ITERS/it.1000/1000.departTime_travelTime.";
 
 		try {
 			Config config = ConfigUtils.loadConfig(configFilename);

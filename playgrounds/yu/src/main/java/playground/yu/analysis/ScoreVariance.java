@@ -40,7 +40,7 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
-import playground.yu.utils.CollectionSum;
+import playground.yu.utils.container.CollectionSum;
 
 /**
  * @author yu

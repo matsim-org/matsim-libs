@@ -8,7 +8,7 @@ import java.util.List;
 
 import org.matsim.core.utils.charts.XYLineChart;
 
-import playground.yu.utils.CollectionSum;
+import playground.yu.utils.container.CollectionSum;
 import playground.yu.utils.io.SimpleReader;
 import playground.yu.utils.io.SimpleWriter;
 

@@ -11,8 +11,8 @@ import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 
-import playground.yu.utils.CollectionSum;
 import playground.yu.utils.charts.PieChart;
+import playground.yu.utils.container.CollectionSum;
 
 /**
  * @author yu

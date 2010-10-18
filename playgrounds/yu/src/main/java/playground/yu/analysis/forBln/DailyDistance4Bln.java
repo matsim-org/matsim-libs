@@ -36,9 +36,9 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.roadpricing.RoadPricingScheme;
 
 import playground.yu.analysis.DailyDistance;
-import playground.yu.utils.CollectionSum;
 import playground.yu.utils.charts.PieChart;
 import playground.yu.utils.charts.StackedBarChart;
+import playground.yu.utils.container.CollectionSum;
 import playground.yu.utils.io.SimpleWriter;
 
 /**
