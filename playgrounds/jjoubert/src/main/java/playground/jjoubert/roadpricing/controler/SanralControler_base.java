@@ -29,7 +29,7 @@ public class SanralControler_base {
 		config.simulation().setStorageCapFactor(0.28);
 		config.simulation().setSnapshotPeriod(900);
 		// Network.
-		config.network().setInputFile(root + "network/gautengNetwork_Clean.xml.gz");
+		config.network().setInputFile(root + "network/gautengNetwork_CleanV0.xml.gz");
 		config.network();
 		// Plans.
 		config.plans().setInputFile(root + "plans/car_plans_2009_10pct.xml.gz");
