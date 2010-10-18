@@ -48,10 +48,12 @@ public class EventsFactoryImpl implements EventsFactory {
 		return new ActivityStartEventImpl(time, agentId, linkId, facilityId, acttype);
 	}
 
+	@Override
 	public AgentArrivalEvent createAgentArrivalEvent(double time, Id agentId, Id linkId, final String legMode) {
 		return new AgentArrivalEventImpl(time, agentId, linkId, legMode);
 	}
 
+	@Override
 	public AgentDepartureEvent createAgentDepartureEvent(double time, Id agentId, Id linkId, final String legMode) {
 		return new AgentDepartureEventImpl(time, agentId, linkId, legMode);
 	}
@@ -61,6 +63,7 @@ public class EventsFactoryImpl implements EventsFactory {
 		return new AgentMoneyEventImpl(time, agentId, amountMoney);
 	}
 
+	@Override
 	public AgentStuckEvent createAgentStuckEvent(double time, Id agentId, Id linkId, final String legMode) {
 		return new AgentStuckEventImpl(time, agentId, linkId, legMode);
 	}
@@ -98,5 +101,8 @@ public class EventsFactoryImpl implements EventsFactory {
 		return new VehicleDepartsAtFacilityEventImpl(time, vehicleId, facilityId, delay);
 	}
 
+	public TransitDriverStartsEvent createTransitDriverStartsEvent(final double time, final Id driverId, final Id vehicleId, final Id transitLineId, final Id transitRouteId, final Id departureId) {
+		return new TransitDriverStartsEvent(time, driverId, vehicleId, transitLineId, transitRouteId, departureId);
+	}
 
 }

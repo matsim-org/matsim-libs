@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsFactoryImpl;
 import org.matsim.core.events.PersonLeavesVehicleEventImpl;
+import org.matsim.core.events.TransitDriverStartsEvent;
 import org.matsim.core.events.VehicleArrivesAtFacilityEventImpl;
 import org.matsim.core.events.VehicleDepartsAtFacilityEventImpl;
 import org.matsim.core.mobsim.framework.PersonAgent;
@@ -58,11 +59,13 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 	protected TransitRouteStop nextStop;
 	private ListIterator<TransitRouteStop> stopIterator;
 
+	@Override
 	public abstract void endLegAndAssumeControl(final double now);
 	public abstract NetworkRoute getCarRoute();
 	public abstract TransitLine getTransitLine();
 	public abstract TransitRoute getTransitRoute();
 	public abstract Departure getDeparture();
+	@Override
 	public abstract double getDepartureTime();
 
 	public AbstractTransitDriver(QSimI sim, TransitStopAgentTracker agentTracker2) {
@@ -80,10 +83,12 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 		}
 		this.nextLinkIndex = 0;
 	}
+
 	protected void setDriver(Person personImpl) {
 		this.dummyPerson = personImpl;
 	}
-	
+
+	@Override
 	public boolean initializeAndCheckIfAlive() {
 		throw new UnsupportedOperationException("not sure what this means here because I don't know if a AbstractTransitDriver can be `beyond' life") ;
 	}
@@ -98,7 +103,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 		}
 		return null;
 	}
-	
+
 	@Override
 	public Id getCurrentLinkId() {
 		if ( this.nextLinkIndex<1 ) {
@@ -140,6 +145,8 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 
 	@Override
 	public void endActivityAndAssumeControl(final double now) {
+		this.sim.getEventsManager().processEvent(new TransitDriverStartsEvent(now, this.dummyPerson.getId(),
+				this.vehicle.getId(), getTransitLine().getId(), getTransitRoute().getId(), getDeparture().getId()));
 		this.sim.agentDeparts(this, this.getCurrentLeg().getRoute().getStartLinkId());
 	}
 
@@ -156,10 +163,12 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 		return this.dummyPerson;
 	}
 
+	@Override
 	public TransitVehicle getVehicle() {
 		return this.vehicle;
 	}
 
+	@Override
 	public void setVehicle(final QVehicle vehicle) {
 		// QVehicle to fulfill the interface; should be a TransitVehicle at runtime!
 		this.vehicle = (TransitVehicle) vehicle;
@@ -214,6 +223,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 		}
 	}
 
+	@Override
 	public boolean handlePassengerEntering(final PassengerAgent passenger, final double time) {
 		boolean handled = this.vehicle.addPassenger(passenger);
 		if(handled){
@@ -226,6 +236,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 		return handled;
 	}
 
+	@Override
 	public boolean handlePassengerLeaving(final PassengerAgent passenger, final double time) {
 		boolean handled = this.vehicle.removePassenger(passenger);
 		if(handled){

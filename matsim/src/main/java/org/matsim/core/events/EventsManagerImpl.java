@@ -56,6 +56,7 @@ import org.matsim.core.api.experimental.events.handler.PersonEventHandler;
 import org.matsim.core.events.handler.AgentReplanEventHandler;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.events.handler.EventHandler;
+import org.matsim.core.events.handler.TransitDriverStartsEventHandler;
 
 /**
  * EventHandling
@@ -68,7 +69,7 @@ import org.matsim.core.events.handler.EventHandler;
  * <li>(optional) add an appropriate line in callHandlerFast() for speeding
  * up execution!</li>
  * </ol>
- * 
+ *
  * @author dstrippgen
  * @author mrieser
  */
@@ -110,7 +111,7 @@ public class EventsManagerImpl implements EventsManager {
 	public long nextCounterMsg = 1;
 
 	private EventsFactory builder;
-	
+
 	public EventsManagerImpl() {
 		this.builder = new EventsFactoryImpl();
 	}
@@ -124,6 +125,7 @@ public class EventsManagerImpl implements EventsManager {
 		return null;
 	}
 
+	@Override
 	public void processEvent(final Event event) {
 		this.counter++;
 		if (this.counter == this.nextCounterMsg) {
@@ -137,6 +139,7 @@ public class EventsManagerImpl implements EventsManager {
 		log.info(" event # " + this.counter);
 	}
 
+	@Override
 	public void addHandler (final EventHandler handler) {
 		Map<Class<?>, Object> addedHandlers = new HashMap<Class<?>, Object>();
 		Class<?> test = handler.getClass();
@@ -155,6 +158,7 @@ public class EventsManagerImpl implements EventsManager {
 		log.info("");
 	}
 
+	@Override
 	public void removeHandler(final EventHandler handler) {
 		log.info("removing Event-Handler: " + handler.getClass().getName());
 		for (HandlerData handlerList : this.handlerData) {
@@ -279,7 +283,7 @@ public class EventsManagerImpl implements EventsManager {
 		this.cacheHandlers.put(eventClass, cache);
 		return cache;
 	}
-	
+
 	private Set<Class<?>> getAllInterfaces(final Class<?> klass) {
 		Set<Class<?>> intfs = new HashSet<Class<?>>();
 		for (Class<?> intf : klass.getInterfaces()) {
@@ -320,6 +324,9 @@ public class EventsManagerImpl implements EventsManager {
 		} else if (klass == ActivityStartEvent.class) {
 			((ActivityStartEventHandler)handler).handleEvent((ActivityStartEvent)ev);
 			return true;
+		} else if (klass == TransitDriverStartsEvent.class) {
+			((TransitDriverStartsEventHandler) handler).handleEvent((TransitDriverStartsEvent) ev);
+			return true;
 		} else if (klass == AgentStuckEvent.class) {
 			((AgentStuckEventHandler)handler).handleEvent((AgentStuckEvent)ev);
 			return true;
@@ -348,7 +355,8 @@ public class EventsManagerImpl implements EventsManager {
 			}
 		}
 	}
-	
+
+	@Override
 	public EventsFactory getFactory(){
 		return this.builder;
 	}
