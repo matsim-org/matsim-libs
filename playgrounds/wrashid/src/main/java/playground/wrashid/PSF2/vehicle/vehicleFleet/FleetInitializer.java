@@ -26,9 +26,16 @@ import java.util.Set;
 import org.matsim.api.core.v01.Id;
 
 import playground.wrashid.PSF2.vehicle.energyStateMaintainance.EnergyStateMaintainer;
+import playground.wrashid.lib.obj.LinkedListValueHashMap;
 
 public interface FleetInitializer {
 
-	public HashMap<Id, Vehicle> getVehicles(Set<Id> personIds, EnergyStateMaintainer energyStateMaintainer);
+	/**
+	 * return value: personId, vehicle
+	 * @param personIds
+	 * @param energyStateMaintainer
+	 * @return
+	 */
+	public LinkedListValueHashMap<Id, Vehicle> getVehicles(Set<Id> personIds, EnergyStateMaintainer energyStateMaintainer);
 	
 }

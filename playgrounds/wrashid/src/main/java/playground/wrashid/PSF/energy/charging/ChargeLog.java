@@ -14,6 +14,17 @@ public class ChargeLog implements Comparable<ChargeLog> {
 	private double startChargingTime;
 	private double endChargingTime;
 	private double startSOC;
+	
+	public ChargeLog(Id linkId, double startChargingTime, double endChargingTime, double startSOC, double endSOC, Id facilityId) {
+		super();
+		this.linkId = linkId;
+		this.startChargingTime = startChargingTime;
+		this.endChargingTime = endChargingTime;
+		this.startSOC = startSOC;
+		this.endSOC = endSOC;
+		this.facilityId = facilityId;
+	}
+
 	private double endSOC;
 
 	private Id facilityId;
@@ -49,6 +60,9 @@ public class ChargeLog implements Comparable<ChargeLog> {
 		this.startChargingTime = startChargingTime;
 		this.endChargingTime = endChargingTime;
 	}
+	
+	
+	
 
 	/**
 	 * This method takes the start state of charge and uses the delta between

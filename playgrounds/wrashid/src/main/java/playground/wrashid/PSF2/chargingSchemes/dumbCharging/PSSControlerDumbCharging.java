@@ -20,10 +20,15 @@
 
 package playground.wrashid.PSF2.chargingSchemes.dumbCharging;
 
+import java.util.HashMap;
+
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.StartupListener;
 
 import playground.wrashid.PSF.ParametersPSF;
@@ -33,6 +38,7 @@ import playground.wrashid.PSF.PSS.PSSControler;
 import playground.wrashid.PSF.energy.AddEnergyScoreListener;
 import playground.wrashid.PSF.energy.AfterSimulationListener;
 import playground.wrashid.PSF.energy.SimulationStartupListener;
+import playground.wrashid.PSF.energy.charging.ChargingTimes;
 import playground.wrashid.PSF.energy.consumption.LogEnergyConsumption;
 import playground.wrashid.PSF.parking.LogParkingTimes;
 import playground.wrashid.PSF2.ParametersPSF2;
@@ -53,49 +59,72 @@ public class PSSControlerDumbCharging extends PSSControler {
 		reader.readFile(configFilePath);
 		String tempStringValue = config.findParam(ParametersPSF.getPSFModule(), "main.inputEventsForSimulationPath");
 		if (tempStringValue != null) {
-			// ATTENTION, this does not work at the moment, because the read link from the
-			// event file is null and this causes some probelems in my handlers...
-			controler = new EventReadControler(configFilePath,tempStringValue);
+			// ATTENTION, this does not work at the moment, because the read
+			// link from the
+			// event file is null and this causes some probelems in my
+			// handlers...
+			controler = new EventReadControler(configFilePath, tempStringValue);
 		} else {
 			controler = new Controler(configFilePath);
 		}
 
 		
-		
-		ParametersPSF2.fleetInitializer=new DumbScenarioFleetInitializer();
-		ParametersPSF2.energyConsumptionTable=new EnergyConsumptionTable(ParametersPSF2.pathToEnergyConsumptionTable);
-		
-		ParametersPSF2.energyStateMaintainer=new ARTEMISEnergyStateMaintainer_StartChargingUponArrival(ParametersPSF2.energyConsumptionTable);
-		
-		controler.addControlerListener(new AddEnergyScoreListener());
+
 		controler.setOverwriteFiles(true);
 
-		LogEnergyConsumption logEnergyConsumption = new LogEnergyConsumption(controler);
-		LogParkingTimes logParkingTimes = new LogParkingTimes(controler);
-		
-		
-		
-		SimulationStartupListener simulationStartupListener = new SimulationStartupListener(controler);
-		controler.addControlerListener(simulationStartupListener);
-		
-		controler.addControlerListener(new StartupListener() {
-			
-			@Override
-			public void notifyStartup(StartupEvent event) {
-				ParametersPSF2.initVehicleFleet(event.getControler());
-			}
-		});
-		
+		initializeParametersPSF2(controler);
 
-		simulationStartupListener.addEventHandler(logEnergyConsumption);
-		simulationStartupListener.addEventHandler(logParkingTimes);
-		simulationStartupListener.addParameterPSFMutator(parameterPSFMutator);
+		addSimulationStartupListener(controler, parameterPSFMutator);
 		
-		AfterSimulationListener afterSimulationListener = new AfterSimulationListener(logEnergyConsumption, logParkingTimes);
-		controler.addControlerListener(afterSimulationListener);
+		addAfterSimulationListener(controler);
 
 		controler.run();
 
 	}
 	
+	
+	
+	private void addAfterSimulationListener(Controler controler) {
+		controler.addControlerListener(new AfterMobsimListener() {
+			
+			@Override
+			public void notifyAfterMobsim(AfterMobsimEvent event) {
+				ChargingTimes.writeChargingTimes(ParametersPSF2.chargingTimes, event.getControler().getControlerIO().getIterationFilename(event.getControler().getIterationNumber(), "chargingLog.txt"));
+				ChargingTimes.writeChargingTimes(ParametersPSF2.chargingTimes, event.getControler().getControlerIO().getOutputFilename("chargingLog.txt"));
+			
+				double[][] energyUsageStatistics = ChargingTimes.getEnergyUsageStatistics(ParametersPSF2.chargingTimes,ParametersPSF.getHubLinkMapping());
+
+				ChargingTimes.writeEnergyUsageStatisticsData(event.getControler().getControlerIO().getIterationFilename(event.getControler().getIterationNumber(), "vehicleEnergyConsumption.txt"), energyUsageStatistics);
+				ChargingTimes.writeVehicleEnergyConsumptionStatisticsGraphic(event.getControler().getControlerIO().getIterationFilename(event.getControler().getIterationNumber(), "vehicleEnergyConsumption.png"),energyUsageStatistics);
+			}
+		});
+		
+	}
+
+	private static void addSimulationStartupListener(Controler controler, ParametersPSFMutator parameterPSFMutator){
+		SimulationStartupListener simulationStartupListener = new SimulationStartupListener(controler);
+		controler.addControlerListener(simulationStartupListener);
+		simulationStartupListener.addParameterPSFMutator(parameterPSFMutator);
+		simulationStartupListener.addEventHandler(new LinkEnergyConsumptionTracker());
+		simulationStartupListener.addEventHandler(new ActivityIntervalTracker());
+	}
+
+	private static void initializeParametersPSF2(Controler controler) {
+		ParametersPSF2.fleetInitializer = new DumbScenarioFleetInitializer();
+		ParametersPSF2.energyConsumptionTable = new EnergyConsumptionTable(ParametersPSF2.pathToEnergyConsumptionTable);
+		ParametersPSF2.energyStateMaintainer = new ARTEMISEnergyStateMaintainer_StartChargingUponArrival(
+				ParametersPSF2.energyConsumptionTable);
+		ParametersPSF2.chargingTimes=new HashMap<Id, ChargingTimes>();
+		
+		ParametersPSF2.controler = controler;
+		
+		controler.addControlerListener(new StartupListener() {
+
+			@Override
+			public void notifyStartup(StartupEvent event) {
+				ParametersPSF2.initVehicleFleet(event.getControler());
+			}
+		});
+	}
+
 }

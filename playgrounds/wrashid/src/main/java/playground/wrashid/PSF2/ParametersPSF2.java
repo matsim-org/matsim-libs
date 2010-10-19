@@ -25,10 +25,12 @@ import java.util.HashMap;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.controler.Controler;
 
+import playground.wrashid.PSF.energy.charging.ChargingTimes;
 import playground.wrashid.PSF2.vehicle.energyConsumption.EnergyConsumptionTable;
 import playground.wrashid.PSF2.vehicle.energyStateMaintainance.EnergyStateMaintainer;
 import playground.wrashid.PSF2.vehicle.vehicleFleet.FleetInitializer;
 import playground.wrashid.PSF2.vehicle.vehicleFleet.Vehicle;
+import playground.wrashid.lib.obj.LinkedListValueHashMap;
 
 public class ParametersPSF2 {
 
@@ -37,7 +39,9 @@ public class ParametersPSF2 {
 	
 	
 	public static FleetInitializer fleetInitializer;
-	public static HashMap<Id, Vehicle> vehicles;
+	public static LinkedListValueHashMap<Id, Vehicle> vehicles;
+	
+	public static HashMap<Id, ChargingTimes> chargingTimes;
 
 
 
@@ -46,6 +50,10 @@ public class ParametersPSF2 {
 
 
 	public static EnergyStateMaintainer energyStateMaintainer;
+
+
+
+	public static Controler controler;
 	
 	
 	public static void initVehicleFleet(Controler controler){

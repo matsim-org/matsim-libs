@@ -7,7 +7,7 @@ public class LocalHost implements ParametersPSFMutator {
 
 	public static void main(String[] args) {		
 		// for starting one the local computer
-		PSSControler pssControler=new PSSControlerDumbCharging("a:/data/matsim/input/runRW1002/config.xml", null);
+		PSSControler pssControler=new PSSControlerDumbCharging("a:/data/matsim/input/runRW1004/config.xml", null);
 		pssControler.runMATSimIterations();
 		
 	} 

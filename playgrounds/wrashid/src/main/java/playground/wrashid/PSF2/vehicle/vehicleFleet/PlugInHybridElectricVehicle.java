@@ -21,17 +21,22 @@
 package playground.wrashid.PSF2.vehicle.vehicleFleet;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.events.ActivityEndEvent;
+import org.matsim.core.api.experimental.events.ActivityEvent;
 
 import playground.wrashid.PSF.ParametersPSF;
+import playground.wrashid.PSF.energy.charging.ChargeLog;
 import playground.wrashid.PSF.lib.PSFGeneralLib;
+import playground.wrashid.PSF2.ParametersPSF2;
 import playground.wrashid.PSF2.vehicle.energyStateMaintainance.EnergyStateMaintainer;
 import playground.wrashid.lib.DebugLib;
+import playground.wrashid.lib.GeneralLib;
 
 public class PlugInHybridElectricVehicle extends Vehicle {
 
-	double batterySizeInJoule;
-	double batteryMinThresholdInJoule;
-	double currentBatteryChargeInJoule;
+	private double batterySizeInJoule;
+	private double batteryMinThresholdInJoule;
+	private double currentBatteryChargeInJoule;
 	
 	double electricEnergyUseInJouleDuringDayForDriving;
 	
@@ -52,41 +57,66 @@ public class PlugInHybridElectricVehicle extends Vehicle {
 	
 	private void processElectricityUsage(double energyConsumptionInJoule){
 		electricEnergyUseInJouleDuringDayForDriving+=energyConsumptionInJoule;
-		currentBatteryChargeInJoule-=energyConsumptionInJoule;
+		setCurrentBatteryChargeInJoule(getCurrentBatteryChargeInJoule() - energyConsumptionInJoule);
 		
-		if (currentBatteryChargeInJoule<0){
+		if (getCurrentBatteryChargeInJoule()<0){
 			DebugLib.stopSystemAndReportInconsistency();
 		}
 	}
 	
 	private double getAvailbleBatteryCharge(){
-		return currentBatteryChargeInJoule-batteryMinThresholdInJoule;
+		return getCurrentBatteryChargeInJoule()-getBatteryMinThresholdInJoule();
 	}
 
 	public double getRequiredBatteryCharge(){
-		return batterySizeInJoule - currentBatteryChargeInJoule;
+		return getBatterySizeInJoule() - getCurrentBatteryChargeInJoule();
 	}
 
 	
 	private void chargeVehicle(double energyConsumptionInJoule){
-		currentBatteryChargeInJoule+=energyConsumptionInJoule;
+		setCurrentBatteryChargeInJoule(getCurrentBatteryChargeInJoule() + energyConsumptionInJoule);
 		
-		if (currentBatteryChargeInJoule>batterySizeInJoule){
+		if (getCurrentBatteryChargeInJoule()>getBatterySizeInJoule()){
 			DebugLib.stopSystemAndReportInconsistency();
 		}
 	}
 	
-	public void centralizedCharging(double arrivalTime, double chargingDuration, double plugSizeInWatt) {
+	public void centralizedCharging(double arrivalTime, double chargingDuration, double plugSizeInWatt, ActivityEndEvent event) {
 		double chargeInJoule=chargingDuration*plugSizeInWatt;
 		
+		logChargingTime(arrivalTime, chargingDuration, chargeInJoule, event);
+		
 		chargeVehicle(chargeInJoule);
-		
-		
-		// write out the charging pattern
-			// we need a handle to the charge output file here...
-		
-		
-		// if needed, also log graph...
+	}
+
+	private void logChargingTime(double arrivalTime, double chargingDuration, double chargeInJoule, ActivityEndEvent event) {
+		Id personId=ParametersPSF2.vehicles.getKey(this);
+		double endChargingTime=GeneralLib.projectTimeWithin24Hours(arrivalTime+chargingDuration);
+		ParametersPSF2.chargingTimes.get(personId).addChargeLog(new ChargeLog(event.getLinkId(), arrivalTime, endChargingTime, getAvailbleBatteryCharge(), chargeInJoule, event.getFacilityId()));
+	}
+
+	public void setBatterySizeInJoule(double batterySizeInJoule) {
+		this.batterySizeInJoule = batterySizeInJoule;
+	}
+
+	public double getBatterySizeInJoule() {
+		return batterySizeInJoule;
+	}
+
+	public void setBatteryMinThresholdInJoule(double batteryMinThresholdInJoule) {
+		this.batteryMinThresholdInJoule = batteryMinThresholdInJoule;
+	}
+
+	public double getBatteryMinThresholdInJoule() {
+		return batteryMinThresholdInJoule;
+	}
+
+	public void setCurrentBatteryChargeInJoule(double currentBatteryChargeInJoule) {
+		this.currentBatteryChargeInJoule = currentBatteryChargeInJoule;
+	}
+
+	public double getCurrentBatteryChargeInJoule() {
+		return currentBatteryChargeInJoule;
 	}
 	
 }

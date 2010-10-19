@@ -31,22 +31,34 @@ import playground.wrashid.PSF2.vehicle.energyStateMaintainance.EnergyStateMainta
 import playground.wrashid.PSF2.vehicle.vehicleFleet.FleetInitializer;
 import playground.wrashid.PSF2.vehicle.vehicleFleet.PlugInHybridElectricVehicle;
 import playground.wrashid.PSF2.vehicle.vehicleFleet.Vehicle;
+import playground.wrashid.lib.obj.LinkedListValueHashMap;
 
 public class DumbScenarioFleetInitializer implements FleetInitializer {
 
 	@Override
-	public HashMap<Id, Vehicle> getVehicles(Set<Id> personIds, EnergyStateMaintainer energyStateMaintainer) {
-		HashMap<Id, Vehicle> result=new HashMap<Id, Vehicle>();
-		
-		Iterator<Id> iter=personIds.iterator();
-		
-		while (iter.hasNext()){
-			Id personId=iter.next();
-			
-			result.put(personId, new PlugInHybridElectricVehicle(energyStateMaintainer, new IdImpl(1)));
+	public LinkedListValueHashMap<Id, Vehicle> getVehicles(Set<Id> personIds, EnergyStateMaintainer energyStateMaintainer) {
+		LinkedListValueHashMap<Id, Vehicle> result = new LinkedListValueHashMap<Id, Vehicle>();
+
+		Iterator<Id> iter = personIds.iterator();
+
+		while (iter.hasNext()) {
+			Id personId = iter.next();
+
+			PlugInHybridElectricVehicle phev = getInitializedPHEV(energyStateMaintainer);
+
+			result.putAndSetBackPointer(personId, phev);
 		}
-		
+
 		return result;
+	}
+
+	private PlugInHybridElectricVehicle getInitializedPHEV(EnergyStateMaintainer energyStateMaintainer) {
+		PlugInHybridElectricVehicle phev = new PlugInHybridElectricVehicle(energyStateMaintainer, new IdImpl(1));
+		double oneKWH = 1000 / 3600;
+		phev.setBatterySizeInJoule(10 * oneKWH);
+		phev.setBatteryMinThresholdInJoule(phev.getBatterySizeInJoule() * 0.035);
+		phev.setCurrentBatteryChargeInJoule(phev.getBatterySizeInJoule());
+		return phev;
 	}
 
 }

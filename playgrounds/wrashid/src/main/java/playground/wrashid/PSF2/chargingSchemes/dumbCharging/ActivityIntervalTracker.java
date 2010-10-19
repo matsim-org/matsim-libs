@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * LinkEnergyConsumptionTracker.java
+ * ActivityIntervalTracker.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -22,48 +22,42 @@ package playground.wrashid.PSF2.chargingSchemes.dumbCharging;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.LinkLeaveEvent;
-import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
+import org.matsim.core.api.experimental.events.ActivityEndEvent;
+import org.matsim.core.api.experimental.events.ActivityStartEvent;
+import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
+import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
 
+import playground.wrashid.PSF.ParametersPSF;
 import playground.wrashid.PSF2.ParametersPSF2;
 import playground.wrashid.PSF2.vehicle.vehicleFleet.Vehicle;
 import playground.wrashid.lib.GeneralLib;
 import playground.wrashid.lib.obj.TwoHashMapsConcatenated;
 
-public class LinkEnergyConsumptionTracker implements LinkEnterEventHandler, LinkLeaveEventHandler, AgentWait2LinkEventHandler {
+public class ActivityIntervalTracker implements ActivityStartEventHandler, ActivityEndEventHandler{
 
-	// personId,linkId,timeOfLinkEnterance
-	TwoHashMapsConcatenated<Id,Id,Double> linkEntranceTime=new TwoHashMapsConcatenated<Id, Id, Double>(); 
+	
+	// personId,linkId,activityStartTime
+	TwoHashMapsConcatenated<Id,Id,Double> activityStartTime=new TwoHashMapsConcatenated<Id, Id, Double>();
 	
 	@Override
 	public void reset(int iteration) {
-		linkEntranceTime=new TwoHashMapsConcatenated<Id, Id, Double>();
+		activityStartTime=new TwoHashMapsConcatenated<Id, Id, Double>();
 	}
 
 	@Override
-	public void handleEvent(AgentWait2LinkEvent event) {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public void handleEvent(LinkLeaveEvent event) {
+	public void handleEvent(ActivityEndEvent event) {
 		Link link=ParametersPSF2.controler.getNetwork().getLinks().get(event.getLinkId());
 		Vehicle vehicle=ParametersPSF2.vehicles.get(event.getPersonId()).get(0);
 		
-		Double linkEnteranceTime=linkEntranceTime.get(event.getPersonId(), event.getLinkId());
-		if (linkEnteranceTime!=null){
-			double timeSpendOnLink=GeneralLib.getIntervalDuration(linkEnteranceTime, event.getTime());
-			ParametersPSF2.energyStateMaintainer.processVehicleEnergyState(vehicle, timeSpendOnLink, link);
+		Double actStartTime=activityStartTime.get(event.getPersonId(), event.getLinkId());
+		if (actStartTime!=null){
+			ParametersPSF2.energyStateMaintainer.chargeVehicle(vehicle, actStartTime, ParametersPSF.getFacilityChargingPowerMapper().getChargingPower(event.getFacilityId()), event);
 		}
 	}
 
 	@Override
-	public void handleEvent(LinkEnterEvent event) {
-		linkEntranceTime.put(event.getPersonId(), event.getLinkId(), event.getTime());
+	public void handleEvent(ActivityStartEvent event) {
+		activityStartTime.put(event.getPersonId(), event.getLinkId(), event.getTime());
 	}
 
 }
