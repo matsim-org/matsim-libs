@@ -46,8 +46,9 @@ import playground.andreas.osmBB.osm2counts.Osm2Counts;
 
 /**
  * @author droeder
- *
+ *doesn't work
  */
+@Deprecated
 public class ResizeLinksByCount2 extends AbstractResizeLinksByCount{
 	
 	private static final Logger log = Logger.getLogger(ResizeLinksByCount2.class);
@@ -164,17 +165,23 @@ public class ResizeLinksByCount2 extends AbstractResizeLinksByCount{
 
 	protected void resize() {
 		
+		log.info(this.origin2counts.size());
 		for(Entry<String, List<Id>> e : this.origin2counts.entrySet()){
+			if(e.getKey().equals("30962289")){
+				log.info("");
+			}
 			
 			if(e.getValue().size() == 1){
 				this.processOneCountOnOrigLink(sortLinks(e.getKey(), e.getValue().get(0)), e.getValue().get(0));
-			}else if(e.getValue().size() > 1){
+//			}else if(e.getValue().size() > 1){
 				//to sort the links it is unimportant how many counts are one the originLink
 //				this.processMultipleCountsOnOrigLink(sortLinks(e.getKey(), e.getValue().get(0)), (ArrayList<Id>) e.getValue());
 			}else{
 				log.error("no count registered for origId " + e.getKey());
 			}
+			log.info(e.getKey());
 		}
+		log.error("resizing finished!!!");
 	}
 	
 	private List<Id> sortLinks(String origId, Id countLoc){
@@ -184,7 +191,7 @@ public class ResizeLinksByCount2 extends AbstractResizeLinksByCount{
 		List<Id> sortedLinks = new ArrayList<Id>();
 		
 		//walk backwards
-		while(origId.equals(cursorOrigId)){
+		while(origId.equals(cursorOrigId) ){
 			sortedLinks.add(0, cursor.getId());
 			
 			for(Link link : cursor.getFromNode().getInLinks().values()){
@@ -195,7 +202,14 @@ public class ResizeLinksByCount2 extends AbstractResizeLinksByCount{
 				}else{
 					cursor = null;
 					cursorOrigId = null;
+					
 				}
+			}
+			if(sortedLinks.size()%20 == 0){
+				for(Id id : sortedLinks){
+					System.out.print(id + " ");
+				}
+				System.out.println();
 			}
 		}
 		
@@ -218,16 +232,6 @@ public class ResizeLinksByCount2 extends AbstractResizeLinksByCount{
 			}
 		}
 		
-//		LinkImpl l;
-//		for(Id id : sortedLinks){
-//			l = (LinkImpl) this.net.getLinks().get(id);
-//			if(id.equals(countLocation.getId())){
-//				System.out.print("!!!");
-//			}
-//			System.out.print(l.getFromNode().getId() + " " + l.getOrigId() + " " + newCounts.getCount(countLoc).getCsId() + " " + l.getToNode().getId() + "\t\t");
-//		}
-//		System.out.println();
-		
 		return sortedLinks;
 	}
 	
@@ -247,11 +251,11 @@ public class ResizeLinksByCount2 extends AbstractResizeLinksByCount{
 				temp++;
 				previousCount = id;
 				this.constantChanges(sortedLinks.subList(0, sortedLinks.indexOf(id) + 1), id);
-			}else if(counts.contains(id) && (temp < counts.size())){
+			}else if(counts.contains(id) && (temp < (counts.size() - 1))){
 				temp++;
-				this.proportionateChanges(sortedLinks.subList(sortedLinks.indexOf(previousCount) + 1, sortedLinks.indexOf(id) + 1), previousCount, id);
+				this.proportionalChanges(sortedLinks.subList(sortedLinks.indexOf(previousCount) + 1, sortedLinks.indexOf(id) + 1), previousCount, id);
 				previousCount = id;
-			}else if(counts.contains(id) && (temp == counts.size())){
+			}else if(counts.contains(id) && (temp == (counts.size() - 1))){
 				temp++;
 				this.constantChanges(sortedLinks.subList(sortedLinks.indexOf(id), sortedLinks.size() + 1), id);
 			}
@@ -265,7 +269,7 @@ public class ResizeLinksByCount2 extends AbstractResizeLinksByCount{
 		
 	}
 	
-	private void proportionateChanges(List<Id> sortedLinks, Id previousCount, Id actualCount) {
+	private void proportionalChanges(List<Id> sortedLinks, Id previousCount, Id actualCount) {
 		
 		if(sortedLinks.size() > 0){
 			Double prevCountVal = this.newCounts.getCount(previousCount).getMaxVolume().getValue();
