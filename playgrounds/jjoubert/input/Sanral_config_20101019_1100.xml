@@ -212,7 +212,7 @@ Simulation: JDEQSim with parallel events handling (10 threads).
 <!-- ====================================================================== -->
 
 	<module name="JDEQSim">
-		<param name="endTime" value="00:00:00"   />
+		<param name="endTime" value="24:00:00"   />
 		<param name="flowCapacityFactor" value="0.1"   />
 		<param name="storageCapacityFactor" value="0.28"   />
 		<param name="minimumInFlowCapacity" value="1800"   />
