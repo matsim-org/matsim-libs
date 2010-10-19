@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * QueueSimulation.java
+ * QSim.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -27,6 +27,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Queue;
+import java.util.concurrent.PriorityBlockingQueue;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -44,7 +45,6 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.IOSimulation;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.framework.ObservableSimulation;
 import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.core.mobsim.framework.listeners.SimulationListener;
@@ -131,8 +131,11 @@ public class QSim implements IOSimulation, VisMobsim, AcceptsVisMobsimFeatures, 
 	private final Queue<Tuple<Double, PersonAgent>> teleportationList =
 		new PriorityQueue<Tuple<Double, PersonAgent>>(30, new TeleportationArrivalTimeComparator());
 
+	/**
+	 * This list needs to be a "blocking" queue since this is needed for thread-safety in the parallel qsim. cdobler, oct'10
+	 */
 	private final Queue<PersonAgent> activityEndsList =
-		new PriorityQueue<PersonAgent>(500, new PersonAgentDepartureTimeComparator());
+		new PriorityBlockingQueue<PersonAgent>(500, new PersonAgentDepartureTimeComparator());
 	// can't use the "Tuple" trick from teleportation list, since we need to be able to "find" agents for replanning. kai, oct'10
 	// yy On second thought, this does also not work for the teleportationList since we have the same problem there ... kai, oct'10
 
