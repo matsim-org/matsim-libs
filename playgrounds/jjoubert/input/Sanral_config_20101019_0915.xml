@@ -2,6 +2,13 @@
 <!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd">
 <config>
 
+<!-- 
+SANRAL project.
+Sample size: 10% sample;
+Population: both private cars and commercial vehicles;
+Simulation: JDEQSim with parallel events handling (10 threads).
+ -->
+
 <!-- ====================================================================== -->
 
 	<module name="controler" >
