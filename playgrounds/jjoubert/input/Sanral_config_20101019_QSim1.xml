@@ -44,7 +44,7 @@ Simulation: Single CPU QSim.
 		<param name="distanceFilterCenterNode" value="null" />
 
 		<!-- input file name to counts package -->
-		<param name="inputCountsFile" value="/home/jwjoubert/runs/sanral_10pctFreight/data/counts/2007/Counts_Wednesday_Total.xml.gz" />
+		<param name="inputCountsFile" value="../../data/counts/2007/Counts_Wednesday_Total.xml.gz" />
 
 		<!-- possible values: `html', `kml', `txt', `all' -->
 		<param name="outputformat" value="all" />
@@ -62,7 +62,7 @@ Simulation: Single CPU QSim.
 
 	<module name="network" >
 		<param name="inputChangeEventsFile" value="null" />
-		<param name="inputNetworkFile" value="/home/jwjoubert/runs/sanral_10pctFreight/data/network/gautengNetwork_CleanV0.xml.gz" />
+		<param name="inputNetworkFile" value="../../data/network/gautengNetwork_CleanV0.xml.gz" />
 		<param name="laneDefinitionsFile" value="null" />
 		<param name="timeVariantNetwork" value="false" />
 	</module>
@@ -171,7 +171,7 @@ Simulation: Single CPU QSim.
 <!-- ====================================================================== -->
 
 	<module name="plans" >
-		<param name="inputPlansFile" value="/home/jwjoubert/runs/sanral_10pctFreight/data/plans/car-commercial_plans_2009_10pct.xml.gz" />
+		<param name="inputPlansFile" value="../../data/plans/car-commercial_plans_2009_10pct.xml.gz" />
 	</module>
 
 <!-- ====================================================================== -->
