@@ -23,6 +23,10 @@
  */
 package playground.yu.utils;
 
+import java.util.Collection;
+
+import playground.yu.utils.container.Collection2Array;
+
 /**
  * offers a few simple statistics function
  * 
@@ -30,21 +34,49 @@ package playground.yu.utils;
  * 
  */
 public class SimpleStatistics {
-	public static double getAverage(double[] array, int firstIdx, int lastIdx) {
+	// average
+	public static double average(double[] array, int firstIdx, int lastIdx) {
 		double sum = 0.0;
-		for (int i = firstIdx; i <= lastIdx; i++)
+		for (int i = firstIdx; i <= lastIdx; i++) {
 			sum += array[i];
+		}
 
-		return sum / (double) (lastIdx - firstIdx + 1);
+		return sum / (lastIdx - firstIdx + 1);
 	}
 
-	public static double getVariance(double[] array, int firstIdx, int lastIdx) {
-		double N = lastIdx - firstIdx + 1, avg = getAverage(array, firstIdx,
+	public static double average(double[] array) {
+		return average(array, 0, array.length - 1);
+	}
+
+	public static double average(Collection<Double> collection) {
+		return average(Collection2Array.toArray(collection));
+	}
+
+	public static double doubleAverage(Collection<Integer> collection) {
+		return average(Collection2Array.toDoubleArray(collection));
+	}
+
+	// variance
+	public static double variance(double[] array, int firstIdx, int lastIdx) {
+		double N = lastIdx - firstIdx + 1, avg = average(array, firstIdx,
 				lastIdx);
 		double sum = 0.0;
-		for (int i = firstIdx; i <= lastIdx; i++)
+		for (int i = firstIdx; i <= lastIdx; i++) {
 			sum += array[i] * array[i];
+		}
 
-		return sum / N - avg * avg;
+		return sum / N - avg * avg;// var(x)=E(x^2)-E(x)^2
+	}
+
+	public static double variance(double[] array) {
+		return variance(array, 0, array.length - 1);
+	}
+
+	public static double variance(Collection<Double> collection) {
+		return variance(Collection2Array.toArray(collection));
+	}
+
+	public static double doubleVariance(Collection<Integer> collection) {
+		return variance(Collection2Array.toDoubleArray(collection));
 	}
 }

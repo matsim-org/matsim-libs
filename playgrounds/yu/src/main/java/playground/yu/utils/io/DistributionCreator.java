@@ -32,8 +32,10 @@ import java.util.Random;
 import java.util.Map.Entry;
 
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.utils.charts.ChartUtil;
 import org.matsim.core.utils.charts.XYScatterChart;
 
+import playground.yu.utils.charts.TimeScatterChart;
 import playground.yu.utils.container.Collection2Array;
 import playground.yu.utils.container.CollectionSum;
 
@@ -128,7 +130,8 @@ public class DistributionCreator {
 	}
 
 	/**
-	 * (more data series version)
+	 * version 2, should only call methode xxxx2(...) e.g. write2(...) (more
+	 * data series version)
 	 * 
 	 * @param dataList
 	 * @param interval
@@ -180,8 +183,9 @@ public class DistributionCreator {
 	 * @param yAxisLabel
 	 */
 	public void createChart2percent(String filename, String title,
-			String xAxisLabel, String yAxisLabel) {
-		XYScatterChart chart = new XYScatterChart(title, xAxisLabel, yAxisLabel);
+			String xAxisLabel, String yAxisLabel, final boolean timeXAxis) {
+		ChartUtil chart = timeXAxis ? new TimeScatterChart(title, xAxisLabel,
+				yAxisLabel) : new XYScatterChart(title, xAxisLabel, yAxisLabel);
 
 		for (String series : this.dataMaps.keySet()) {
 			Map<Double, Integer> aDataMap = this.dataMaps.get(series);
@@ -193,22 +197,31 @@ public class DistributionCreator {
 			for (int i = 0; it.hasNext(); i++) {
 				ys[i] = (double) it.next() / sum * 100d;
 			}
-			chart.addSeries(series, xs, ys);
+			if (timeXAxis) {
+				((TimeScatterChart) chart).addSeries(series, xs, ys);
+			} else {
+				((XYScatterChart) chart).addSeries(series, xs, ys);
+			}
 		}
 
 		chart.saveAsPng(filename, 1024, 768);
 	}
 
 	public void createChart2(String filename, String title, String xAxisLabel,
-			String yAxisLabel) {
-		XYScatterChart chart = new XYScatterChart(title, xAxisLabel, yAxisLabel);
+			String yAxisLabel, final boolean timeXAxis) {
+		ChartUtil chart = timeXAxis ? new TimeScatterChart(title, xAxisLabel,
+				yAxisLabel) : new XYScatterChart(title, xAxisLabel, yAxisLabel);
 
 		for (String series : this.dataMaps.keySet()) {
 			Map<Double, Integer> aDataMap = this.dataMaps.get(series);
 			double xs[] = Collection2Array.toArray(aDataMap.keySet());
 
 			double ys[] = Collection2Array.toDoubleArray(aDataMap.values());
-			chart.addSeries(series, xs, ys);
+			if (timeXAxis) {
+				((TimeScatterChart) chart).addSeries(series, xs, ys);
+			} else {
+				((XYScatterChart) chart).addSeries(series, xs, ys);
+			}
 		}
 
 		chart.saveAsPng(filename, 1024, 768);
@@ -311,6 +324,7 @@ public class DistributionCreator {
 					.entrySet()) {
 				writer.writeln(entry.getKey() + "\t" + entry.getValue());
 			}
+			writer.writeln("-------------------------");
 		}
 
 		writer.close();
