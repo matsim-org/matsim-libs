@@ -20,6 +20,7 @@
 package playground.droeder.osm;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -52,8 +53,7 @@ public class ResizeLinksByCount2 extends AbstractResizeLinksByCount{
 	private static final Logger log = Logger.getLogger(ResizeLinksByCount2.class);
 	private boolean countsMatched = false;
 	private Counts newCounts;
-	private boolean multipleCountsOnOrigLink = false;
-	private Map<Id, List<Id>> origin2counts;
+	private Map<String, List<Id>> origin2counts;
 	
 	public static void main(String[] args){
 		String countsFile = "d:/VSP/output/osm_bb/Di-Do_counts.xml";
@@ -149,32 +149,180 @@ public class ResizeLinksByCount2 extends AbstractResizeLinksByCount{
 	}
 
 	private void checkNumberOfCountsOnOrigLink() {
-		this.origin2counts = new HashMap<Id, List<Id>>();
-		Id origId;
+		this.origin2counts = new HashMap<String, List<Id>>();
+		String origId;
 		for(Id id : newCounts.getCounts().keySet()){
-			origId = new IdImpl(((LinkImpl) this.net.getLinks().get(id)).getOrigId());
+			origId = ((LinkImpl) this.net.getLinks().get(id)).getOrigId();
 			if(this.origin2counts.containsKey(origId)){
 				this.origin2counts.get(origId).add(id);
-				this.multipleCountsOnOrigLink = true;
 			}else{
-				this.origin2counts.put(origId, new LinkedList<Id>());
+				this.origin2counts.put(origId, new ArrayList<Id>());
 				this.origin2counts.get(origId).add(id);
 			}
 		}
 	}
 
 	protected void resize() {
-		for(Entry<Id, List<Id>> e : origin2counts.entrySet()){
-			System.out.print(e.getKey() +" ");
-			for(Id id: e.getValue()){
-				System.out.print(id + " ");
-			}
-			System.out.println();
-		}
 		
-		System.out.println(this.newCounts.getCounts().size() + " " + multipleCountsOnOrigLink);
+		for(Entry<String, List<Id>> e : this.origin2counts.entrySet()){
+			
+			if(e.getValue().size() == 1){
+				this.processOneCountOnOrigLink(sortLinks(e.getKey(), e.getValue().get(0)), e.getValue().get(0));
+			}else if(e.getValue().size() > 1){
+				//to sort the links it is unimportant how many counts are one the originLink
+//				this.processMultipleCountsOnOrigLink(sortLinks(e.getKey(), e.getValue().get(0)), (ArrayList<Id>) e.getValue());
+			}else{
+				log.error("no count registered for origId " + e.getKey());
+			}
+		}
 	}
 	
+	private List<Id> sortLinks(String origId, Id countLoc){
+		LinkImpl countLocation = (LinkImpl) this.net.getLinks().get(countLoc);
+		LinkImpl cursor = countLocation;
+		String cursorOrigId = origId;
+		List<Id> sortedLinks = new ArrayList<Id>();
+		
+		//walk backwards
+		while(origId.equals(cursorOrigId)){
+			sortedLinks.add(0, cursor.getId());
+			
+			for(Link link : cursor.getFromNode().getInLinks().values()){
+				if(((LinkImpl) link).getOrigId().equals(origId) ){
+					cursor = (LinkImpl) link;
+					cursorOrigId = cursor.getOrigId();
+					break;
+				}else{
+					cursor = null;
+					cursorOrigId = null;
+				}
+			}
+		}
+		
+		cursor = countLocation;
+		cursorOrigId = origId;
+		
+		//walk forward
+		while(origId.equals(cursorOrigId)){
+			
+			for(Link link : cursor.getToNode().getOutLinks().values()){
+				if(((LinkImpl) link).getOrigId().equals(origId) ){
+					cursor = (LinkImpl) link;
+					cursorOrigId = cursor.getOrigId();
+					sortedLinks.add(sortedLinks.size(), cursor.getId());
+					break;
+				}else{
+					cursor = null;
+					cursorOrigId = null;
+				}
+			}
+		}
+		
+//		LinkImpl l;
+//		for(Id id : sortedLinks){
+//			l = (LinkImpl) this.net.getLinks().get(id);
+//			if(id.equals(countLocation.getId())){
+//				System.out.print("!!!");
+//			}
+//			System.out.print(l.getFromNode().getId() + " " + l.getOrigId() + " " + newCounts.getCount(countLoc).getCsId() + " " + l.getToNode().getId() + "\t\t");
+//		}
+//		System.out.println();
+		
+		return sortedLinks;
+	}
+	
+	private void processOneCountOnOrigLink(List<Id> sortedLinks, Id countLoc) {
+		this.constantChanges(sortedLinks, countLoc);
+	}
+	
+	
+	
+	// doesn't work yet
+	private void processMultipleCountsOnOrigLink(List<Id> sortedLinks, ArrayList<Id> counts) {
+		int temp = 0;
+		Id previousCount = null;
+		
+		for(Id id : sortedLinks){
+			if(counts.contains(id) && (temp == 0) ){
+				temp++;
+				previousCount = id;
+				this.constantChanges(sortedLinks.subList(0, sortedLinks.indexOf(id) + 1), id);
+			}else if(counts.contains(id) && (temp < counts.size())){
+				temp++;
+				this.proportionateChanges(sortedLinks.subList(sortedLinks.indexOf(previousCount) + 1, sortedLinks.indexOf(id) + 1), previousCount, id);
+				previousCount = id;
+			}else if(counts.contains(id) && (temp == counts.size())){
+				temp++;
+				this.constantChanges(sortedLinks.subList(sortedLinks.indexOf(id), sortedLinks.size() + 1), id);
+			}
+		}
+		
+		for(Id id : sortedLinks){
+			System.out.print(this.net.getLinks().get(id).getCapacity() + " " + this.net.getLinks().get(id).getNumberOfLanes() + "\t");
+		}
+		System.out.println();
+		
+		
+	}
+	
+	private void proportionateChanges(List<Id> sortedLinks, Id previousCount, Id actualCount) {
+		
+		if(sortedLinks.size() > 0){
+			Double prevCountVal = this.newCounts.getCount(previousCount).getMaxVolume().getValue();
+			Double countDifference = (newCounts.getCount(previousCount).getMaxVolume().getValue() - 
+					newCounts.getCount(actualCount).getMaxVolume().getValue())/
+					(sortedLinks.size() + 1);
+			
+			
+			for(Id id : sortedLinks){
+				prevCountVal = prevCountVal + countDifference;
+				Link l = this.net.getLinks().get(id);
+				Double capPerLane = l.getCapacity() / l.getNumberOfLanes();
+				Integer nrOfNewLanes = null;
+
+				
+				// if maxCount < cap set cap to maxCount and keep nrOfLanes
+				if(prevCountVal < l.getCapacity()){
+					nrOfNewLanes = (int) l.getNumberOfLanes();
+				}
+				// else set nrOfNewLanes to int(maxCount/capPerLane) and cap to maxCount
+				else{
+					nrOfNewLanes = (int) (prevCountVal/capPerLane);
+				}
+				this.net.getLinks().get(id).setCapacity(prevCountVal);
+				this.net.getLinks().get(id).setNumberOfLanes(nrOfNewLanes);
+			}
+			
+		}
+		
+	}
+
+
+
+	private void constantChanges(List<Id> sortedLinks, Id count){
+		Double maxCount = this.newCounts.getCount(count).getMaxVolume().getValue();
+		Link l = this.net.getLinks().get(count);
+		Double capPerLane = l.getCapacity() / l.getNumberOfLanes();
+		Integer nrOfNewLanes = null;
+
+		
+		// if maxCount < cap set cap to maxCount and keep nrOfLanes
+		if(maxCount < l.getCapacity()){
+			nrOfNewLanes = (int) l.getNumberOfLanes();
+		}
+		// else set nrOfNewLanes to int(maxCount/capPerLane) and cap to maxCount
+		else{
+			nrOfNewLanes = (int) (maxCount/capPerLane);
+		}
+		
+		for(Id id : sortedLinks){
+			this.net.getLinks().get(id).setCapacity(maxCount);
+			this.net.getLinks().get(id).setNumberOfLanes(nrOfNewLanes);
+		}
+	}
+	
+	
+
 	private void writePreprocessedCounts(String outFile) {
 		log.info("writing counts to " + outFile + "_counts.xml...");
 		new CountsWriter(newCounts).write(outFile + "_counts.xml");
