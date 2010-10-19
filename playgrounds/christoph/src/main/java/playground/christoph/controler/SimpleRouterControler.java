@@ -54,7 +54,6 @@ import playground.christoph.router.costcalculators.OnlyTimeDependentTravelCostCa
 import playground.christoph.router.util.SimpleRouterFactory;
 import playground.christoph.scoring.OnlyTimeDependentScoringFunctionFactory;
 import playground.christoph.withinday.mobsim.InitialReplanningModule;
-import playground.christoph.withinday.mobsim.KnowledgeWithinDayQSim;
 import playground.christoph.withinday.mobsim.ReplanningManager;
 import playground.christoph.withinday.mobsim.WithinDayPersonAgent;
 import playground.christoph.withinday.mobsim.WithinDayQSim;
@@ -153,7 +152,7 @@ public class SimpleRouterControler extends Controler {
 
 	protected ParallelInitialReplanner parallelInitialReplanner;
 	protected ReplanningManager replanningManager = new ReplanningManager();
-	protected KnowledgeWithinDayQSim sim;
+	protected WithinDayQSim sim;
 
 	public SimpleRouterControler(String[] args) {
 		super(args);
@@ -241,7 +240,7 @@ public class SimpleRouterControler extends Controler {
 
 	@Override
 	protected void runMobSim() {
-		sim = new KnowledgeWithinDayQSim(this.scenarioData, this.events);
+		sim = new WithinDayQSim(this.scenarioData, this.events);
 //		sim.addQueueSimulationListeners(replanningManager);
 		sim.addQueueSimulationListeners(foqsl);
 

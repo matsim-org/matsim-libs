@@ -22,31 +22,15 @@ package playground.christoph.scoring;
 
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.events.AgentMoneyEventImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.scoring.ScoringFunction;
 
 public class OnlyTimeDependentScoringFunction implements ScoringFunction {
-
 	
-	public static double lateTime;
-	public static double lateCount;
-	public static double earlyTime;
-	public static double earlyCount;
-	
-	public static final double beta_travel = -6;
-	public static final double beta_late = -18;
-	
-	private LegImpl currentLeg;
-	private Plan plan;
 	private double score;
 	private double startTime;
 	
-
-	public OnlyTimeDependentScoringFunction(Plan plan)
-	{
-		this.plan = plan;
+	public OnlyTimeDependentScoringFunction() {
 	}
 	
 	/**
@@ -56,8 +40,7 @@ public class OnlyTimeDependentScoringFunction implements ScoringFunction {
 	 * @param act The activity the agent starts. Can be used to get the activity
 	 * type, exact location, facility, opening times and other information.
 	 */
-	public void startActivity(final double time, final Activity activity)
-	{
+	public void startActivity(final double time, final Activity activity) {
 		
 	}
 
@@ -67,8 +50,7 @@ public class OnlyTimeDependentScoringFunction implements ScoringFunction {
 	 * @param time The time at which the agent stops performing the current
 	 * activity.
 	 */
-	public void endActivity(final double time)
-	{
+	public void endActivity(final double time) {
 		
 	}
 
@@ -79,9 +61,7 @@ public class OnlyTimeDependentScoringFunction implements ScoringFunction {
 	 * @param leg The leg the agent starts. Can be used to get leg mode and other
 	 * information about the leg.
 	 */
-	public void startLeg(double time, Leg leg)
-	{
-//		currentLeg = leg;
+	public void startLeg(double time, Leg leg) {
 		startTime = time;
 	}
 
@@ -92,11 +72,8 @@ public class OnlyTimeDependentScoringFunction implements ScoringFunction {
 	 * 
 	 * @param time The time at which the current leg ends.
 	 */
-	public void endLeg(double time) 
-	{
+	public void endLeg(double time) {
 		score = score - (time - startTime);
-
-//		currentLeg = null;
 		startTime = Double.NaN;
 	}
 
@@ -109,8 +86,7 @@ public class OnlyTimeDependentScoringFunction implements ScoringFunction {
 	 * @param time The time at which the agent got stuck and was removed from the
 	 * simulation.
 	 */
-	public void agentStuck(final double time)
-	{
+	public void agentStuck(final double time) {
 		
 	}
 
@@ -121,9 +97,8 @@ public class OnlyTimeDependentScoringFunction implements ScoringFunction {
 	 *
 	 * @param amount amount to be added to the agent's score
 	 */
-	public void addMoney(final double amount)
-	{
-		
+	public void addMoney(final double amount) {
+		this.score += amount;
 	}
 
 	/**
@@ -131,8 +106,7 @@ public class OnlyTimeDependentScoringFunction implements ScoringFunction {
 	 * and that the final score should be calculated.  But the score must <b>not</b>
 	 * be written to the plan!
 	 */
-	public void finish()
-	{
+	public void finish() {
 		
 	}
 
@@ -141,8 +115,7 @@ public class OnlyTimeDependentScoringFunction implements ScoringFunction {
 
 	 * @return the score
 	 */
-	public double getScore()
-	{
+	public double getScore() {
 		return score;
 	}
 
@@ -151,9 +124,8 @@ public class OnlyTimeDependentScoringFunction implements ScoringFunction {
 	 * functions in order to re-score the same plan object with different
 	 * time information.
 	 */
-	public void reset() 
-	{		
-		score = 0;
+	public void reset() {		
+		score = 0.0;
 	}
 	
 }

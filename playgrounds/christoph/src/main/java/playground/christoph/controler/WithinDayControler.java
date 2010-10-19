@@ -48,11 +48,10 @@ import playground.christoph.scoring.OnlyTimeDependentScoringFunctionFactory;
 import playground.christoph.withinday.mobsim.DuringActivityReplanningModule;
 import playground.christoph.withinday.mobsim.DuringLegReplanningModule;
 import playground.christoph.withinday.mobsim.InitialReplanningModule;
-import playground.christoph.withinday.mobsim.KnowledgeWithinDayQSim;
-import playground.christoph.withinday.mobsim.KnowledgeWithinDayQSimFactory;
 import playground.christoph.withinday.mobsim.ReplanningManager;
 import playground.christoph.withinday.mobsim.WithinDayPersonAgent;
 import playground.christoph.withinday.mobsim.WithinDayQSim;
+import playground.christoph.withinday.mobsim.WithinDayQSimFactory;
 import playground.christoph.withinday.network.WithinDayLinkFactoryImpl;
 import playground.christoph.withinday.replanning.CurrentLegReplanner;
 import playground.christoph.withinday.replanning.InitialReplanner;
@@ -114,7 +113,7 @@ public class WithinDayControler extends Controler {
 	protected WithinDayDuringLegReplanner duringLegReplanner;
 
 	protected ReplanningManager replanningManager;
-	protected KnowledgeWithinDayQSim sim;
+	protected WithinDayQSim sim;
 	protected FixedOrderQueueSimulationListener foqsl = new FixedOrderQueueSimulationListener();
 
 	private static final Logger log = Logger.getLogger(WithinDayControler.class);
@@ -207,7 +206,7 @@ public class WithinDayControler extends Controler {
 	protected void runMobSim() {
 		createHandlersAndListeners();
 
-		sim = new KnowledgeWithinDayQSimFactory().createMobsim(this.scenarioData, this.events);
+		sim = new WithinDayQSimFactory().createMobsim(this.scenarioData, this.events);
 
 		ReplanningFlagInitializer rfi = new ReplanningFlagInitializer(this);
 		foqsl.addQueueSimulationInitializedListener(rfi);
