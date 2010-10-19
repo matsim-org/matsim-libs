@@ -118,6 +118,8 @@ public class PopulationGenerator implements Runnable {
 			createFromToPt(source, sink, quantity);
 			log.info(++i + " / " + entries.size());
 		}
+		
+		populationWriter.closeStreaming();
 	}
 
 	public int countPersons() {
