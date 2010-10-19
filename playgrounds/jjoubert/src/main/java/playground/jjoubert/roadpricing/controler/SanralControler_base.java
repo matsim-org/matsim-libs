@@ -1,6 +1,7 @@
 package playground.jjoubert.roadpricing.controler;
 
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
 import org.matsim.core.controler.Controler;
 
 import playground.jjoubert.Utilities.matsim2urbansim.controler.MyBasicConfig;
@@ -37,6 +38,22 @@ public class SanralControler_base {
 		config.counts().setCountsFileName(root + "counts/2007/Counts_Wednesday_Total.xml.gz");
 		config.counts().setCountsScaleFactor(10);
 		config.counts().setOutputFormat("kml");
+		
+		// Add minor and major activity types.
+		ActivityParams minor = new ActivityParams("minor");
+		minor.setPriority(1.0);
+		minor.setMinimalDuration(600.0);	// 00:10:00
+		minor.setTypicalDuration(1800.0);	// 00:30:00
+		minor.setOpeningTime(0.0);			// 00:00:00
+		minor.setLatestStartTime(86399.0);	// 23:59:59
+		minor.setClosingTime(86399.0);		// 23:59:59
+		config.charyparNagelScoring().addActivityParams(minor);
+		
+		ActivityParams major = new ActivityParams("major");
+		major.setPriority(1.0);
+		major.setMinimalDuration(0.0);		// 00:00:00
+		major.setTypicalDuration(10800.0);  // 03:00:00
+		config.charyparNagelScoring().addActivityParams(major);	
 		
 
 		/*
