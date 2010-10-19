@@ -22,24 +22,33 @@ package playground.jjoubert.TemporaryCode;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
+import java.util.Map.Entry;
 
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkReaderMatsimV1;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReaderMatsimV4;
+import org.matsim.population.algorithms.XY2Links;
 import org.xml.sax.SAXException;
 
-public class MergeCommercialPlans {
-	private static Logger log = Logger.getLogger(MergeCommercialPlans.class);
+public class SampleFromCommercialPlans {
+	private static Logger log = Logger.getLogger(SampleFromCommercialPlans.class);
 
 	/**
 	 * Class to read previously generated commercial vehicle plans files, and
@@ -60,18 +69,42 @@ public class MergeCommercialPlans {
 		String firstId = null;
 		String networkFile = null;
 		String output = null;
-		if(args.length != 5){
-			throw new IllegalArgumentException("Incorrect number of arguments.");
-		} else{
+		String carFile = null;
+		String finalFile = null;
+		if(args.length == 5){
 			root = args[0];
 			number = args[1];
 			firstId = args[2];
 			networkFile = args[3];
 			output = args[4];
+		} else if(args.length == 7){
+			root = args[0];
+			number = args[1];
+			firstId = args[2];
+			networkFile = args[3];
+			output = args[4];
+			carFile = args[5];
+			finalFile = args[6];
+		} else{
+			throw new IllegalArgumentException("Incorrect number of arguments.");
 		}
 		
 		Scenario sNew = new ScenarioImpl();
-		long id = Long.parseLong(firstId);
+		PopulationFactory pf = sNew.getPopulation().getFactory();
+		// Network.
+		NetworkReaderMatsimV1 nr = new NetworkReaderMatsimV1(sNew);
+		try {
+			nr.parse(networkFile);
+		} catch (SAXException e) {
+			e.printStackTrace();
+		} catch (ParserConfigurationException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		XY2Links xy = new XY2Links((NetworkImpl) sNew.getNetwork());
+
+		int id = Integer.parseInt(firstId);
 		
 		log.info("Reading commercial vehicle plans files from " + root);
 		List<Scenario> listSc = new ArrayList<Scenario>(10);
@@ -97,34 +130,63 @@ public class MergeCommercialPlans {
 		int counter = 0;
 		while(counter < Integer.parseInt(number)){
 			// Pick
-			long rList = (int) Math.round(r.nextDouble()*9);
-			long rId = 100000 + (int) Math.round(r.nextDouble()*4999);
+			int rList = (int) Math.round(r.nextDouble()*9);
 			
-			Person p = listSc.get((int) rList).getPopulation().getPersons().get(new IdImpl(rId));
-			if(p == null){
-				log.warn("No person returned from list " + rList + " with Id " + rId);				
+			List<Id> agentIds = new ArrayList<Id>();
+			Set<Id> Ids = listSc.get((int) rList).getPopulation().getPersons().keySet();
+			for (Id id2 : Ids) {
+				agentIds.add(id2);
 			}
-			p.setId(new IdImpl(id++));
+			int rId = (int) Math.floor(r.nextDouble()*agentIds.size());
+			
+			Person p = pf.createPerson(new IdImpl(id));
+			Plan plan = listSc.get((int) rList).getPopulation().getPersons().get(agentIds.get(rId)).getSelectedPlan();
+			xy.run(plan);
+			p.addPlan(plan);
 			sNew.getPopulation().addPerson(p);
 			counter++;
+			id++;
 		}
-		log.info("   ... created " + counter + " (Done)");
+		log.info("Created " + counter + " commercial vehicles (Done)");
+		
+		// Check that no Ids are duplicated.
+		List<Id> listIds = new ArrayList<Id>();
+		for(Id i : sNew.getPopulation().getPersons().keySet()){
+			if(listIds.contains(i)){
+				log.error("The Id " + i.toString() + " already exists!");
+			} else{
+				listIds.add(i);
+			}
+		}
 		
 		
 		// Now write the final population.
-		NetworkReaderMatsimV1 nr = new NetworkReaderMatsimV1(sNew);
-		try {
-			nr.parse(networkFile);
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 		
 		PopulationWriter pw = new PopulationWriter(sNew.getPopulation(), sNew.getNetwork());
 		pw.write(output);
+		
+		if(carFile != null){
+			log.info("Combining car and commercial vehicles.");
+			Scenario car = new ScenarioImpl();
+			PopulationReaderMatsimV4 pr = new PopulationReaderMatsimV4(car);
+			try {
+				pr.parse(carFile);
+			} catch (SAXException e) {
+				e.printStackTrace();
+			} catch (ParserConfigurationException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			
+			for(Id idCar : car.getPopulation().getPersons().keySet()){
+				Person carPerson = car.getPopulation().getPersons().get(idCar);
+				xy.run(carPerson);
+				sNew.getPopulation().addPerson(carPerson);
+			}
+			PopulationWriter pw2 = new PopulationWriter(sNew.getPopulation(), sNew.getNetwork());
+			pw2.write(finalFile);
+		}
 		
 		log.info("---------------------------------------");
 		log.info("              COMPLETED");

@@ -55,16 +55,16 @@ import com.vividsolutions.jts.geom.Point;
 
 public class MyCommercialDemandGeneratorOld {
 	// String value that must be set
-	final static String PROVINCE = "Temp";
+	final static String PROVINCE = "Gauteng";
 	// Mac
 	final static String ROOT = "/Users/johanwjoubert/MATSim/workspace/MATSimData/";
 	// IVT-Sim0
 //	final static String ROOT = "~/";
 
-	private static final int populationSize = 5000;
-	private static final int firstIndex = 100000;
-	private static double WITHIN_THRESHOLD = 0.90;
-	private static final int numberOfSamples = 2;
+	private static final int populationSize = 15000;
+	private static final int firstIndex = 1000000;
+	private static double WITHIN_THRESHOLD = 0.60;
+	private static final int numberOfSamples = 1;
 
 	private final static int dimensionStart = 24; 		// vales 00h00m00 - 23h59m59
 	private final static int dimensionActivities = 21; 	// index '0' should never be used
@@ -80,7 +80,7 @@ public class MyCommercialDemandGeneratorOld {
 		log.info("");
 
 		// Analyze vehicle chains, but only if the matrix does NOT exist
-		String matrixFileName = ROOT + "Commercial/Input/matrixFile.txt";
+		String matrixFileName = ROOT + "Gauteng/2008/20091202131951/0300/Sample01/Activities/Gauteng_WithinChainMatrix.txt";
 		File matrixFile = new File(matrixFileName);
 		MyXmlConverter xmlConverter = new MyXmlConverter();
 		ArrayList<ArrayList<ArrayList<Integer>>> matrix = null;

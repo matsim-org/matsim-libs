@@ -1,6 +1,7 @@
 package playground.jjoubert.roadpricing.controler;
 
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
 import org.matsim.core.controler.Controler;
 
@@ -59,17 +60,19 @@ public class SanralControler_base {
 		/*
 		 * Add the multi-thread queue simulation.
 		 */
-		config.getQSimConfigGroup().setNumberOfThreads(5);
-		config.getQSimConfigGroup().setFlowCapFactor(0.1);
-		config.getQSimConfigGroup().setStorageCapFactor(0.28);
+//		config.getQSimConfigGroup().setNumberOfThreads(5);
+//		config.getQSimConfigGroup().setFlowCapFactor(0.1);
+//		config.getQSimConfigGroup().setStorageCapFactor(0.28);
 
 		Controler c = new Controler(config);
 		c.setCreateGraphs(true);
 		c.setWriteEventsInterval(20);
 		c.setOverwriteFiles(false);
 		
+		
 		config.checkConsistency();
-		c.run();
+		new ConfigWriter(config).write("./output/Sanral_config.xml");
+		
 	}
 
 }

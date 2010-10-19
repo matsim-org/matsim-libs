@@ -28,6 +28,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import playground.jjoubert.CommercialTraffic.ActivityLocations;
 import playground.jjoubert.CommercialTraffic.Chain;
 import playground.jjoubert.CommercialTraffic.Vehicle;
 import playground.jjoubert.Utilities.MyVehicleIdentifier;
@@ -79,13 +80,12 @@ public class MyCommercialDemandGenerator01 {
 	}
 	
 	/**
-	 * This method creates two <code>ArrayList</code>s, one for <i>within</i> vehicles 
+	 * This method creates two {@link ArrayList}s, one for <i>within</i> vehicles 
 	 * and one for <i>through</i> vehicles. They are both <i>required</i> before plans 
 	 * can be generated.
 	 * @param vehicleStatistics the filename of the vehicle statistics generated for the
-	 * 		study area. This file was generated from running the 
-	 * 		<tt>playground.jjoubert.CommercialTraffic.ActivityLocations</tt> class. For 
-	 * 		details of the file format, see <tt>playground.jjoubert.Utilities.MyVehicleIdentifier</tt>. 
+	 * 		study area. This file was generated from running {@link ActivityLocations}. 
+	 * 		For details of the file format, see {@link MyVehicleIdentifier}. 
 	 */
 	public void buildVehicleLists(){
 		String vehicleStatistics = root + studyArea + "/Activities/" + studyArea + "VehicleStats.txt";
@@ -212,7 +212,7 @@ public class MyCommercialDemandGenerator01 {
 				}
 				// Update progress
 				if(++fileCounter == fileMultiplier){
-					log.info("... Files processed: " + fileCounter);
+					log.info("  ... files processed: " + fileCounter);
 					fileMultiplier *= 2;
 				}
 			}
