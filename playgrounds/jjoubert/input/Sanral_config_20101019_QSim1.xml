@@ -6,7 +6,7 @@
 SANRAL project.
 Sample size: 10% sample;
 Population: both private cars and commercial vehicles;
-Simulation: JDEQSim with parallel events handling (10 threads).
+Simulation: Single CPU QSim.
  -->
 
 <!-- ====================================================================== -->
@@ -186,43 +186,27 @@ Simulation: JDEQSim with parallel events handling (10 threads).
 <!-- ====================================================================== -->
 
 	<module name="qsim" >
-		<param name="endTime" value="undefined" />
-		<param name="flowCapacityFactor" value="1.0" />
+		<param name="startTime" value="00:00:00" />
+		<param name="endTime" value="24:00:00" />
+		<param name="flowCapacityFactor" value="0.1" />
+		<param name="storageCapacityFactor" value="0.28" />
 
 		<!-- Use number of threads > 1 for parallel version using the specified number of threads -->
-		<param name="numberOfThreads" value="2" />
+		<param name="numberOfThreads" value="1" />
 
 		<!-- Boolean. `true': stuck vehicles are removed, aborting the plan; `false': stuck vehicles are forced into the next link. `false' is probably the better choice. -->
 		<param name="removeStuckVehicles" value="true" />
 
 		<!-- Comma-separated list of visualizer output file formats.  'plansfile', `transims', `googleearth', and `otfvis'.  'netvis' is, I think, no longer possible. -->
-		<param name="snapshotFormat" value="googleearth" />
+		<param name="snapshotFormat" value="googleearth,otfvis" />
 
 		<!-- snapshotStyle: `equiDist' (vehicles equidistant on link) or `queue' (vehicles queued at end of link) -->
 		<param name="snapshotStyle" value="equiDist" />
-		<param name="snapshotperiod" value="00:15:00" />
-		<param name="startTime" value="undefined" />
-		<param name="storageCapacityFactor" value="1.0" />
+		<param name="snapshotperiod" value="00:05:00" />
 
 		<!-- time in seconds.  Time after which the frontmost vehicle on a link is called `stuck' if it does not move. -->
 		<param name="stuckTime" value="100.0" />
 		<param name="timeStepSize" value="00:00:01" />
-	</module>
-
-<!-- ====================================================================== -->
-
-	<module name="JDEQSim">
-		<param name="endTime" value="24:00:00"   />
-		<param name="flowCapacityFactor" value="0.1"   />
-		<param name="storageCapacityFactor" value="0.28"   />
-		<param name="minimumInFlowCapacity" value="1800"   />
-		<param name="carSize" value="7.5"   />
-		<param name="gapTravelSpeed" value="15.0"   />
-		<param name="squeezeTime" value="1800"   />
-	</module>
-	
-	<module name="parallelEventHandling">
-		<param name="numberOfThreads" value="10" />
 	</module>
 
 <!-- ====================================================================== -->
@@ -259,20 +243,20 @@ Simulation: JDEQSim with parallel events handling (10 threads).
 <!-- ====================================================================== -->
 
 	<module name="simulation" >
+		<param name="startTime" value="00:00:00" />
 		<param name="endTime" value="24:00:00" />
 		<param name="flowCapacityFactor" value="0.1" />
+		<param name="storageCapacityFactor" value="0.28" />
 
 		<!-- Boolean. `true': stuck vehicles are removed, aborting the plan; `false': stuck vehicles are forced into the next link. `false' is probably the better choice. -->
 		<param name="removeStuckVehicles" value="true" />
 
 		<!-- Comma-separated list of visualizer output file formats.  'plansfile', `transims', `googleearth', and `otfvis'.  'netvis' is, I think, no longer possible. -->
-		<param name="snapshotFormat" value="googleearth" />
+		<param name="snapshotFormat" value="googleearth,otfvis" />
 
 		<!-- snapshotStyle: `equiDist' (vehicles equidistant on link) or `queue' (vehicles queued at end of link) -->
 		<param name="snapshotStyle" value="equiDist" />
-		<param name="snapshotperiod" value="00:15:00" />
-		<param name="startTime" value="00:00:00" />
-		<param name="storageCapacityFactor" value="0.28" />
+		<param name="snapshotperiod" value="00:05:00" />
 
 		<!-- time in seconds.  Time after which the frontmost vehicle on a link is called `stuck' if it does not move. -->
 		<param name="stuckTime" value="100.0" />
