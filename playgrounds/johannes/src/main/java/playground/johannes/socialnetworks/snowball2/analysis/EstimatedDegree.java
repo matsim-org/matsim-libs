@@ -45,7 +45,7 @@ public class EstimatedDegree extends Degree {
 
 	private static final Logger logger = Logger.getLogger(EstimatedDegree.class);
 	
-	private ProbabilityEstimator biasedDistribution;
+	protected ProbabilityEstimator biasedDistribution;
 	
 	private PopulationEstimator vertexEstimator;
 	

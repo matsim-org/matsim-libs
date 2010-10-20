@@ -29,6 +29,7 @@ import java.util.Arrays;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.matsim.contrib.sna.graph.Edge;
 import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.graph.analysis.AnalyzerTask;
@@ -59,24 +60,41 @@ public class WaveSizeTask extends AnalyzerTask {
 				detected.adjustOrPutValue(((SampledVertex)v).getIterationDetected(), 1, 1);
 		}
 		
+		TIntIntHashMap sampledEdges = new TIntIntHashMap();
+		for(Edge e : graph.getEdges()) {
+			SampledVertex v_i = (SampledVertex)e.getVertices().getFirst();
+			SampledVertex v_j = (SampledVertex)e.getVertices().getSecond();
+			if(v_i.isSampled() && v_j.isSampled()) {
+				int it = Math.max(v_i.getIterationSampled(), v_j.getIterationSampled());
+				sampledEdges.adjustOrPutValue(it, 1, 1);
+			}
+		}
+		
 		int detectedTotal = 0;
 		TIntIntIterator it = detected.iterator();
 		for(int i = 0; i < detected.size(); i++) {
 			it.advance();
-//			if(it.key() > -1)
-				detectedTotal += it.value();
+			detectedTotal += it.value();
 		}
 		
 		int sampledTotal = 0;
 		it = sampled.iterator();
 		for(int i = 0; i < sampled.size(); i++) {
 			it.advance();
-//			if(it.key() > -1)
-				sampledTotal += it.value();
+			sampledTotal += it.value();
+		}
+
+		int sampledEdgesTotal = 0;
+		it = sampledEdges.iterator();
+		for(int i = 0; i < sampledEdges.size(); i++) {
+			it.advance();
+			sampledEdgesTotal += it.value();
 		}
 		
 		stats.put(NUM_DETECTED, new Double(detectedTotal));
 		stats.put(NUM_SAMPLED, new Double(sampledTotal));
+		stats.put("sampledEdges", new Double(sampledEdgesTotal));
+		
 		
 		logger.info(String.format("%1$s vertices sampled, %2$s vertices detected.", sampledTotal, detectedTotal));
 		

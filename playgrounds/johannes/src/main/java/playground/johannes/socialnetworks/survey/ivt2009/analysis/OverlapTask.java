@@ -92,12 +92,12 @@ public class OverlapTask extends AnalyzerTask {
 	}
 
 	public static void main(String args[]) {
-		SocialSampledGraphProjection<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge> graph = GraphReaderFacade.read("/Users/jillenberger/Work/work/socialnets/data/ivt2009/raw/05-2010/graph/graph.graphml");
+		SocialSampledGraphProjection<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge> graph = GraphReaderFacade.read("/Users/jillenberger/Work/work/socialnets/data/ivt2009/raw/09-2010/graph/graph.graphml");
 		
 		ApplySeedsFilter seedsFilder = new ApplySeedsFilter();
 		seedsFilder.apply(graph);
 		OverlapTask task = new OverlapTask();
-		task.setOutputDirectoy("/Users/jillenberger/Work/work/socialnets/data/ivt2009/raw/05-2010/analysis");
+		task.setOutputDirectoy("/Users/jillenberger/Work/work/socialnets/data/ivt2009/raw/09-2010/analysis");
 		task.analyze(graph, null);
 	}
 }

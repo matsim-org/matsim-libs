@@ -77,6 +77,7 @@ public class AlterTableReader {
 				if(!ignoreLine(line)) {
 				String[] tokens = line.split("\t");
 				String egoSQLId = tokens[0];
+				if(!tokens[1].startsWith("H")) {
 				String egoId = tokens[1].substring(tokens[1].lastIndexOf(" ") + 1);
 								
 				String alterKey = tokens[2];
@@ -139,6 +140,7 @@ public class AlterTableReader {
 				Tuple<VertexRecord, VertexRecord> edge = new Tuple<VertexRecord, VertexRecord>(ego, alter);
 				edgeList.add(edge);
 			}
+				}
 			}
 		}
 		

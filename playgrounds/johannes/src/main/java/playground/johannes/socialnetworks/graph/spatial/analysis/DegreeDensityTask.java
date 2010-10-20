@@ -65,12 +65,14 @@ public class DegreeDensityTask extends ModuleAnalyzerTask<Degree> {
 			for (int i = 0; i < kMap.size(); i++) {
 				it.advance();
 				SpatialVertex v = (SpatialVertex) it.key();
+				if(v.getPoint() != null) {
 				Zone zone = zones.getZone(v.getPoint());
 				if (zone != null) {
 					rhoValues[i] = zone.getPopulationDensity();
 					kValues[i] = it.value();
 				} else {
 					noZone++;
+				}
 				}
 			}
 		

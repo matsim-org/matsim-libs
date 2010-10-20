@@ -51,7 +51,7 @@ public class Correlations {
 	 *         <tt>values1</tt> with same index are equal.
 	 */
 	public static TDoubleDoubleHashMap correlationMean(double[] values1, double[] values2) {
-		return correlationMean(values1, values2, 0.0);
+		return correlationMean(values1, values2, 1.0);
 	}
 	
 	/**
@@ -69,6 +69,10 @@ public class Correlations {
 	 *         <tt>values1</tt> are discretized with <tt>binsize</tt>.
 	 */
 	public static TDoubleDoubleHashMap correlationMean(double[] values1, double[] values2, double binsize) {
+		return correlationMean(values1, values2, new LinearDiscretizer(binsize));
+	}
+	
+	public static TDoubleDoubleHashMap correlationMean(double[] values1, double[] values2, Discretizer discretizer) {
 		if(values1.length != values2.length)
 			throw new IllegalArgumentException("Both arrays must not differ in size!");
 		
@@ -77,8 +81,9 @@ public class Correlations {
 		
 		for(int i = 0; i < values1.length; i++) {
 			double key = values1[i];
-			if(binsize > 0.0)
-				key = Math.floor(key/binsize) * binsize;
+//			if(binsize > 0.0)
+//				key = Math.floor(key/binsize) * binsize;
+			key = discretizer.discretize(key);
 			sums.adjustOrPutValue(key, values2[i], values2[i]);
 			counts.adjustOrPutValue(key, 1, 1);
 		}

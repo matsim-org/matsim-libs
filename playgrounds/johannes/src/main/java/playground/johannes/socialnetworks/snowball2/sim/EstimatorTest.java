@@ -24,6 +24,7 @@ import gnu.trove.TDoubleDoubleHashMap;
 import gnu.trove.TDoubleDoubleIterator;
 import gnu.trove.TIntIntHashMap;
 import gnu.trove.TIntObjectHashMap;
+import gnu.trove.TIntObjectIterator;
 
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
@@ -34,7 +35,10 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
+import org.apache.commons.math.stat.StatUtils;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.sna.graph.Edge;
@@ -45,6 +49,7 @@ import org.matsim.contrib.sna.graph.analysis.FixedSizeRandomPartition;
 import org.matsim.contrib.sna.graph.analysis.RandomPartition;
 import org.matsim.contrib.sna.graph.io.SparseGraphMLReader;
 import org.matsim.contrib.sna.math.Distribution;
+import org.matsim.contrib.sna.snowball.SampledEdgeDecorator;
 import org.matsim.contrib.sna.snowball.SampledVertexDecorator;
 import org.matsim.contrib.sna.snowball.sim.ProbabilityEstimator;
 import org.matsim.contrib.sna.snowball.sim.Sampler;
@@ -64,7 +69,11 @@ public class EstimatorTest implements SamplerListener {
 	
 	private Map<Vertex, int[]> vertexCounts;
 	
+	private Map<Edge, int[]> edgeCounts;
+	
 	private Map<Vertex, double[]> vertexProbas;
+	
+	private Map<Edge, double[]> edgeProbas;
 	
 	private Map<Vertex, double[]> vertexWeights;
 	
@@ -74,6 +83,8 @@ public class EstimatorTest implements SamplerListener {
 	
 	private TDoubleArrayList[] N_estim = new TDoubleArrayList[INIT_CAPACITY];
 	
+	private TDoubleArrayList[] M_estim = new TDoubleArrayList[INIT_CAPACITY];
+	
 	private ProbabilityEstimator estimator;
 	
 	private static final int INIT_CAPACITY = 100;
@@ -82,14 +93,21 @@ public class EstimatorTest implements SamplerListener {
 	
 	public EstimatorTest(Graph graph) {
 		vertexCounts = new HashMap<Vertex, int[]>();
+		edgeCounts = new HashMap<Edge, int[]>();
 		vertexProbas = new HashMap<Vertex, double[]>();
+		edgeProbas = new HashMap<Edge, double[]>();
 		vertexWeights = new HashMap<Vertex, double[]>();
+		
 		for(Vertex v : graph.getVertices()) {
 			vertexCounts.put(v, new int[INIT_CAPACITY]);
 			vertexProbas.put(v, new double[INIT_CAPACITY]);
 			vertexWeights.put(v, new double[INIT_CAPACITY]);
 		}
 		
+		for(Edge e : graph.getEdges()) {
+			edgeCounts.put(e, new int[INIT_CAPACITY]);
+			edgeProbas.put(e, new double[INIT_CAPACITY]);
+		}
 	}
 	
 	public void reset(Graph graph, String estimtype) {
@@ -141,6 +159,36 @@ public class EstimatorTest implements SamplerListener {
 			}
 			
 			N_estim[it-1].add(wsum);
+			/*
+			 * edges
+			 */
+			if(M_estim[it - 1] == null)
+				M_estim[it - 1] = new TDoubleArrayList();
+			
+			wsum = 0;
+			for(SampledEdgeDecorator<?> edge : sampler.getSampledGraph().getEdges()) {
+				SampledVertexDecorator<?> v_i = edge.getVertices().getFirst();
+				SampledVertexDecorator<?> v_j = edge.getVertices().getSecond();
+				if(v_i.isSampled() && v_j.isSampled()) {
+					Edge delegate = edge.getDelegate();
+					
+					edgeCounts.get(delegate)[it - 1]++;
+					
+					double p_i = estimator.getProbability(v_i);
+					double p_j = estimator.getProbability(v_j);
+
+//					double p_e = p_i * p_j;
+					double p_e = (p_i + p_j) - (p_i * p_j);
+
+					double[] probas = edgeProbas.get(delegate);
+					probas[it - 1] += p_e;
+
+					wsum += 1 / p_e;
+
+				}
+			}
+			
+			M_estim[it - 1].add(wsum);
 		}
 		
 		return true;
@@ -153,20 +201,26 @@ public class EstimatorTest implements SamplerListener {
 
 	private void analyze(Graph graph, String output) throws IOException {
 		final int N = graph.getVertices().size();
+		Distribution k_distr = new Degree().distribution(graph.getVertices());
+		final int k_max = (int) k_distr.max(); 
 		/*
 		 * initialize arrays
 		 */
-		TDoubleDoubleHashMap kHist = new Degree().distribution(graph.getVertices()).absoluteDistribution();
+		TDoubleDoubleHashMap kHist = k_distr.absoluteDistribution();
 		TDoubleDoubleHashMap[] pObs_k = new TDoubleDoubleHashMap[maxIteration + 1];
 		TDoubleDoubleHashMap[] wObs_k = new TDoubleDoubleHashMap[maxIteration + 1];
 		TDoubleDoubleHashMap[] pEstim_k = new TDoubleDoubleHashMap[maxIteration + 1];
 		TDoubleDoubleHashMap[] wEstim_k = new TDoubleDoubleHashMap[maxIteration + 1];
+		TDoubleDoubleHashMap[] N_estim_hist = new TDoubleDoubleHashMap[maxIteration + 1];
+		TDoubleDoubleHashMap[] M_estim_hist = new TDoubleDoubleHashMap[maxIteration + 1];
 		double[] mse_p = new double[maxIteration + 1];
 		double[] mse_w = new double[maxIteration + 1];
 		double[] bias_p = new double[maxIteration + 1];
 		double[] bias_w = new double[maxIteration + 1];
 		Distribution[] p_ratio = new Distribution[maxIteration + 1];
 		Distribution[] w_ratio = new Distribution[maxIteration + 1];
+		double[] N_estim_mean = new double[maxIteration + 1];
+		double[] M_estim_mean = new double[maxIteration + 1];
 
 		int[] samples = new int[maxIteration + 1];
 		TIntIntHashMap[] samples_k = new TIntIntHashMap[maxIteration + 1];
@@ -252,6 +306,74 @@ public class EstimatorTest implements SamplerListener {
 			}
 		}
 		/*
+		 * iterate over all edges
+		 */
+		TIntObjectHashMap<double[][]> p_edge_estim_it = new TIntObjectHashMap<double[][]>();
+		TIntObjectHashMap<double[][]> p_edge_obs_it = new TIntObjectHashMap<double[][]>();
+		TIntObjectHashMap<double[][]> p_edge_it = new TIntObjectHashMap<double[][]>();
+		for(int it = 0; it <= maxIteration; it++) {
+			double[][] p_edge_estim_k = new double[k_max+1][k_max+1];
+			p_edge_estim_it.put(it, p_edge_estim_k);
+			
+			double[][] p_edge_obs_k = new double[k_max+1][k_max+1];
+			p_edge_obs_it.put(it, p_edge_obs_k);
+			
+			double[][] p_edge_k = new double[k_max+1][k_max+1];
+			p_edge_it.put(it, p_edge_k);
+			
+			int[][] n_edge_k = new int[k_max+1][k_max+1];
+			
+			for(Edge e : graph.getEdges()) {
+				int cnt = edgeCounts.get(e)[it];
+				if(cnt > 0) {
+				double p_estim = edgeProbas.get(e)[it]/(double)cnt;
+				double p_obs = cnt/(double)nSimulations[it];
+			
+				int k_i = e.getVertices().getFirst().getNeighbours().size();
+				int k_j = e.getVertices().getSecond().getNeighbours().size();
+				
+				p_edge_estim_k[k_i][k_j] += p_estim;
+				p_edge_estim_k[k_j][k_i] += p_estim;
+				
+				p_edge_obs_k[k_i][k_j] += p_obs;
+				p_edge_obs_k[k_j][k_i] += p_obs;
+				
+				
+				n_edge_k[k_i][k_j]++;
+				n_edge_k[k_j][k_i]++;
+				}
+			}
+			
+			for (int i = 0; i < p_edge_estim_k.length; i++) {
+				for (int j = i; j < p_edge_estim_k.length; j++) {
+					if (i == j) {
+						p_edge_estim_k[i][j] = p_edge_estim_k[i][j] / (double) n_edge_k[i][j];
+						p_edge_obs_k[j][i] = p_edge_obs_k[j][i] / (double) n_edge_k[j][i];
+					} else {
+
+						p_edge_estim_k[i][j] = p_edge_estim_k[i][j] / (double) n_edge_k[i][j];
+						p_edge_estim_k[j][i] = p_edge_estim_k[j][i] / (double) n_edge_k[j][i];
+
+						p_edge_obs_k[i][j] = p_edge_obs_k[i][j] / (double) n_edge_k[i][j];
+						p_edge_obs_k[j][i] = p_edge_obs_k[j][i] / (double) n_edge_k[j][i];
+					}
+				}
+			}
+			/*
+			 * shared plot
+			 */
+			for (int i = 0; i < p_edge_estim_k.length; i++) {
+				for (int j = 0; j < p_edge_estim_k.length; j++) {
+					if(i < j) {
+						p_edge_k[i][j] = p_edge_estim_k[i][j];
+					} else {
+						p_edge_k[i][j] = p_edge_obs_k[i][j];
+					}
+				}
+			}
+		}
+		
+		/*
 		 * calculate averages
 		 */
 		for(int i = 0; i <= maxIteration; i++) {
@@ -260,6 +382,14 @@ public class EstimatorTest implements SamplerListener {
 			mse_w[i] = mse_w[i] / (double)samples[i];
 			bias_p[i] = bias_p[i] / (double)samples[i];
 			bias_w[i] = bias_w[i] / (double)samples[i];
+			
+			double[] values = N_estim[i].toNativeArray();
+			N_estim_mean[i] = StatUtils.mean(values);
+			N_estim_hist[i] = new Distribution(values).absoluteDistribution((StatUtils.max(values) - StatUtils.min(values))/100.0);
+			
+			values = M_estim[i].toNativeArray();
+			M_estim_mean[i] = StatUtils.mean(values);
+			M_estim_hist[i] = new Distribution(values).absoluteDistribution((StatUtils.max(values) - StatUtils.min(values))/100.0);
 			
 			if(pObs_k[i] != null) {
 				TDoubleDoubleIterator it = pObs_k[i].iterator();
@@ -301,15 +431,23 @@ public class EstimatorTest implements SamplerListener {
 		writeDoubleArray(mse_w, String.format("%1$s/mse_w.txt", output), "it\tmse");
 		writeDoubleArray(bias_p, String.format("%1$s/bias_p.txt", output), "it\tbias");
 		writeDoubleArray(bias_w, String.format("%1$s/bias_w.txt", output), "it\tbias");
+		writeDoubleArray(N_estim_mean, String.format("%1$s/N_estim.txt", output), "it\tN_estim");
+		writeDoubleArray(M_estim_mean, String.format("%1$s/M_estim.txt", output), "it\tM_estim");
 		writeHistogramArray(pObs_k, output, "pobs");
 		writeHistogramArray(wObs_k, output, "wobs");
 		writeHistogramArray(pEstim_k, output, "pestim");
 		writeHistogramArray(wEstim_k, output, "westim");
+		writeHistogramArray(N_estim_hist, output, "N_estim");
+		writeHistogramArray(M_estim_hist, output, "M_estim");
 		
 		writeDistributionArray(p_ratio, output, "p_ratio");
 		writeDistributionBoxplot(p_ratio, output, "p_ratio_boxplot");
 		writeDistributionArray(w_ratio, output, "w_ratio");
 		writeDistributionBoxplot(w_ratio, output, "w_ratio_boxplot");
+		
+		writeMatrix(p_edge_obs_it, output, "pEdgeObs");
+		writeMatrix(p_edge_estim_it, output, "pEdgeEstim");
+		writeMatrix(p_edge_it, output, "pEdge");
 		/*
 		 * boxplot
 		 */
@@ -397,7 +535,7 @@ public class EstimatorTest implements SamplerListener {
 	
 	private void writeDistributionArray(Distribution[] distrs, String basedir, String filename) throws FileNotFoundException, IOException {
 		for(int i = 0; i< distrs.length; i++) {
-			double binsize = (distrs[i].max() - distrs[i].min())/50.0;
+			double binsize = (distrs[i].max() - distrs[i].min())/100.0;
 			Distribution.writeHistogram(distrs[i].absoluteDistribution(binsize), String.format("%1$s/%2$s.%3$s.txt", basedir, i, filename));
 		}
 	}
@@ -434,6 +572,41 @@ public class EstimatorTest implements SamplerListener {
 		writer.close();
 	}
 	
+	private void writeMatrix(TIntObjectHashMap<double[][]> matrices, String basedir, String filename) {
+		TIntObjectIterator<double[][]> it = matrices.iterator();
+		for(int k = 0; k < matrices.size(); k++) {
+			it.advance();
+			double[][] matrix = it.value();
+			SortedSet<Integer> seq = new TreeSet<Integer>();
+			for(int i = 0; i < matrix.length; i++) {
+				for(int j = 0; j < matrix.length; j++) {
+					if(!Double.isNaN(matrix[i][j])) {
+						seq.add(i);
+						seq.add(j);
+					}
+				}
+			}
+			try {
+				BufferedWriter writer = new BufferedWriter(new FileWriter(String.format("%1$s/%2$s.%3$s.txt", basedir, it.key(), filename)));
+				for(Integer i : seq) {
+					writer.write("\t");
+					writer.write(String.valueOf(i));
+				}
+				writer.newLine();
+				for(Integer i : seq) {
+					writer.write(String.valueOf(i));
+					for(Integer j : seq) {
+						writer.write("\t");
+						writer.write(String.valueOf(matrix[i][j]));
+					}
+					writer.newLine();
+				}
+				writer.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
 	public static void main(String args[]) throws IOException {
 		final String MODULE_NAME = "estimatortest";
 		

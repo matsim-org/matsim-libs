@@ -38,28 +38,46 @@ public class SnowballAttributesValidator implements GraphValidator<SampledGraph>
 	public boolean validate(SampledGraph graph) {
 		for(SampledVertex vertex : graph.getVertices()) {
 			if(vertex.isSampled()) {
+				boolean foundRecrutor = false;
 				int it_i = vertex.getIterationSampled();
 				for(SampledVertex neighbor : vertex.getNeighbours()) {
 					if(neighbor.isSampled()) {
 						int it_j = neighbor.getIterationSampled();
-//						if(it_j + 1 != it_i && it_j - 1 != it_i && it_i != it_j)
+						if(it_j + 1 != it_i && it_j - 1 != it_i && it_i != it_j)
 //							return false;
+							System.out.println(String.format("Sampling error! vertex: %1$s -- neighbor: %2$s", vertex.toString(), neighbor.toString()));
+						
+						if(neighbor.getIterationSampled().equals(vertex.getIterationDetected())) {
+							foundRecrutor = true;
+						}
+						
 					}
 				}
 				
+				if(!foundRecrutor && it_i > 0) {
+					System.out.println(String.format("Recrution error! vertex: %1$s", vertex.toString()));
+				}
+				
 				if(it_i != vertex.getIterationDetected() + 1)
-					return false;
+//					return false;
+					System.out.println(String.format("Sampled <-> Detected: vertex: %1$s", vertex.toString()));
+				/*
+				 * check recrutor
+				 */
+				
 			} else {
 				int it_i = vertex.getIterationDetected();
 				boolean found = false;
 				for(SampledVertex neighbor : vertex.getNeighbours()) {
 					if(it_i > neighbor.getIterationSampled())
-						return false;
+//						return false;
+						System.out.println(String.format("Detection error! vertex: %1$s -- neighbor: %2$s", vertex.toString(), neighbor.toString()));
 					if(it_i == neighbor.getIterationSampled())
 						found = true;
 				}
 				if(!found)
-					return false;
+//					return false;
+					System.out.println(String.format("Recrution error! vertex: %1$s", vertex.toString()));
 			}
 		}
 		
@@ -67,21 +85,21 @@ public class SnowballAttributesValidator implements GraphValidator<SampledGraph>
 	}
 
 	public static void main(String args[]) {
-		SocialSampledGraphProjection<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge> graph = GraphReaderFacade.read("/Users/jillenberger/Work/work/socialnets/data/ivt2009/raw/06-2010/graph/graph.graphml");
+		SocialSampledGraphProjection<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge> graph = GraphReaderFacade.read("/Users/jillenberger/Work/work/socialnets/data/ivt2009/raw/09-2010/graph/graph.graphml");
 		
-//		SnowballAttributesValidator validator = new SnowballAttributesValidator();
-//		if(validator.validate(graph)) {
-//			System.out.println("ok");
-//		} else {
-//			System.out.println("error");
-//		}
-		
-		ComponentValidator validator = new ComponentValidator();
-		if (validator.validate(graph)) {
+		SnowballAttributesValidator validator = new SnowballAttributesValidator();
+		if(validator.validate(graph)) {
 			System.out.println("ok");
 		} else {
 			System.out.println("error");
 		}
+		
+//		ComponentValidator validator = new ComponentValidator();
+//		if (validator.validate(graph)) {
+//			System.out.println("ok");
+//		} else {
+//			System.out.println("error");
+//		}
 	}
 			
 	

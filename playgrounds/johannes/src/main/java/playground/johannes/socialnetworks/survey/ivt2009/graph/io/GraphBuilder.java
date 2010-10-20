@@ -19,11 +19,14 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.survey.ivt2009.graph.io;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
@@ -34,6 +37,7 @@ import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
 import org.matsim.contrib.sna.graph.spatial.io.KMLIconVertexStyle;
 import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphKMLWriter;
 import org.matsim.contrib.sna.graph.spatial.io.VertexDegreeColorizer;
+import org.matsim.contrib.sna.math.Distribution;
 import org.matsim.contrib.sna.snowball.SampledGraphProjection;
 import org.matsim.contrib.sna.snowball.SampledVertexDecorator;
 import org.matsim.core.population.PersonImpl;
@@ -73,6 +77,14 @@ public class GraphBuilder {
 
 	private ErrorLogger errLogger;
 	
+	private SocialSparseGraph graph;
+	
+	private Map<SocialSparseVertex, SampledVertexDecorator<SocialSparseVertex>> projMap;
+	
+	private SampledGraphProjection<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge> proj;
+	
+	private Map<String, SocialSparseVertex> idMap;
+	
 	public SampledGraphProjection<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge> buildGraph(
 			List<String> alterTables, List<String> egoTables, List<String> sqlDumps) throws IOException {
 		errLogger = new ErrorLogger();
@@ -85,15 +97,13 @@ public class GraphBuilder {
 		/*
 		 * Build the raw graph and a sampled projection.
 		 */
-		SocialSparseGraph graph = builder.createGraph();
-		SampledGraphProjection<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge> proj = projBuilder.createGraph(graph);
+		graph = builder.createGraph();
+		proj = projBuilder.createGraph(graph);
 		/*
 		 * Create the vertices.
 		 */
-		Map<SocialSparseVertex, SampledVertexDecorator<SocialSparseVertex>> projMap =
-			new HashMap<SocialSparseVertex, SampledVertexDecorator<SocialSparseVertex>>();
-		Map<String, SocialSparseVertex> idMap = new HashMap<String, SocialSparseVertex>();
-//		Map<String, VertexRecord> recordMap = new HashMap<String, VertexRecord>();
+		projMap = new HashMap<SocialSparseVertex, SampledVertexDecorator<SocialSparseVertex>>();
+		idMap = new HashMap<String, SocialSparseVertex>();
 		
 		for(Entry<String, VertexRecord> entry : alterReader.getVertices().entrySet()) {
 			VertexRecord vRecord = entry.getValue();
@@ -115,7 +125,7 @@ public class GraphBuilder {
 			}
 			if(point == null) {
 				errLogger.logNoCoordinate(vRecord.isEgo);
-				point = geoFacotry.createPoint(new Coordinate(0, 0));
+//				point = geoFacotry.createPoint(new Coordinate(0, 0));
 			}
 			/*
 			 * Create a vertex and its projection.
@@ -184,10 +194,17 @@ public class GraphBuilder {
 				}
 				socialEdge.setFrequency(freq);
 				
+				socialEdge.setType(sqlReader.getEdgeType(rec1, rec2));
+				
 			} else {
 				errLogger.logDoubleEdge();
 			}
 		}
+		/*
+		 * Sociogram
+		 */
+//		loadSociogramData(alterReader.getVertices().values(), sqlReader);
+		
 		logger.info(errLogger.toString());
 		return proj;
 	}
@@ -220,21 +237,93 @@ public class GraphBuilder {
 			matsimPerson.setCarAvail(sqlData.getCarAvail(record));
 		
 		person.setCitizenship(sqlData.getCitizenship(record));
-		
+		person.setEducation(sqlData.getEducation(record));
+		person.setIncome(sqlData.getIncome(record));
+		person.setCivilStatus(sqlData.getCivilStatus(record));
 		return person;
 	}
 	
 	private Integer infereIterationSampled(Integer id) {
-		if(id >= 0 && id < 1000)
+		if(id >= 0 && id <= 1000)
 			return 0;
-		else if(id >= 1000 && id < 10000)
+		else if(id > 1000 && id <= 10000)
 			return 1;
-		else if(id >= 10000)
+		else if(id > 10000 && id <= 100000)
 			return 2;
+		else if(id > 100000)
+			return 3;
 		else {
 			logger.warn(String.format("Cannot infere sampling iteration (%1$s)", id));
 			return null;
 		}
+	}
+	
+	private void loadSociogramData(Collection<VertexRecord> records, SQLDumpReader sqlData) {
+		logger.info("Loading sociogram data...");
+		Map<String, VertexRecord> map = sqlData.getFullAlterKeyMappping(records);
+		
+		int edgecnt = 0;
+		int doublecnt = 0;
+		
+		Distribution numDistr = new Distribution();
+		Distribution numDistrNoZero = new Distribution();
+		Distribution sizeDistr = new Distribution();
+		
+		for(VertexRecord record : records) {
+			if(record.isEgo) {
+			List<Set<String>> cliques = sqlData.getCliques(record);
+			numDistr.add(cliques.size());
+			if(!cliques.isEmpty())
+				numDistrNoZero.add(cliques.size());
+			
+			for(Set<String> clique : cliques) {
+				sizeDistr.add(clique.size());
+				List<SocialSparseVertex> vertices = new ArrayList<SocialSparseVertex>(clique.size());
+				for(String alter : clique) {
+					VertexRecord r = map.get(record.egoSQLId+alter);
+					if(r!=null) {
+					SocialSparseVertex vertex = idMap.get(r.id);
+					if(vertex != null) {
+					vertices.add(vertex);
+					} else {
+						logger.warn("Vertex not found.");
+					}
+					} else {
+						logger.warn("Record not found.");
+					}
+				}
+				
+				for(int i = 0; i < vertices.size(); i++) {
+					for(int j = i+1; j < vertices.size(); j++) {
+						SocialSparseEdge socialEdge = builder.addEdge(graph, vertices.get(i), vertices.get(j));
+						if(socialEdge != null) {
+							SampledVertexDecorator<SocialSparseVertex> vProj1 = projMap.get(vertices.get(i));
+							SampledVertexDecorator<SocialSparseVertex> vProj2 = projMap.get(vertices.get(j));
+						
+							projBuilder.addEdge(proj, vProj1, vProj2, socialEdge);
+							edgecnt++;
+						} else {
+							doublecnt++;
+						}
+					}
+				}
+			}
+		}
+		}
+		
+		try {
+			logger.info("Mean num of cliques: " + numDistrNoZero.mean());
+			logger.info("Mean size: " + sizeDistr.mean());
+			Distribution.writeHistogram(numDistr.absoluteDistribution(), "/Users/jillenberger/Work/work/socialnets/data/ivt2009/raw/09-2010/graph/sociogram/numCliques.txt");
+			Distribution.writeHistogram(sizeDistr.absoluteDistribution(), "/Users/jillenberger/Work/work/socialnets/data/ivt2009/raw/09-2010/graph/sociogram/numPersons.txt");
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		logger.info(String.format("Inserted %1$s edges, %2$s edges already present.", edgecnt, doublecnt));
 	}
 	
 	private class ErrorLogger {
@@ -303,18 +392,18 @@ public class GraphBuilder {
 		GraphBuilder builder = new GraphBuilder();
 		
 		ArrayList<String> alterTables = new ArrayList<String>();
-		alterTables.add("/Users/jillenberger/Work/work/socialnets/data/ivt2009/raw/09-2010/alters1.test.txt");
-		alterTables.add("/Users/jillenberger/Work/work/socialnets/data/ivt2009/raw/09-2010/alters2.txt");
+		alterTables.add("/Users/jillenberger/Work/socialnets/data/ivt2009/09-2010/alters1.txt");
+		alterTables.add("/Users/jillenberger/Work/socialnets/data/ivt2009/09-2010/alters2.txt");
 		
 		ArrayList<String> egoTables = new ArrayList<String>();
-		egoTables.add("/Users/jillenberger/Work/work/socialnets/data/ivt2009/raw/09-2010/egos1.txt");
-		egoTables.add("/Users/jillenberger/Work/work/socialnets/data/ivt2009/raw/09-2010/egos2.txt");
+		egoTables.add("/Users/jillenberger/Work/socialnets/data/ivt2009/09-2010/egos1.txt");
+		egoTables.add("/Users/jillenberger/Work/socialnets/data/ivt2009/09-2010/egos2.txt");
 		
 		ArrayList<String> sqlDumps = new ArrayList<String>();
-		sqlDumps.add("/Users/jillenberger/Work/work/socialnets/data/ivt2009/raw/09-2010/snowball.filter.csv");
+		sqlDumps.add("/Users/jillenberger/Work/socialnets/data/ivt2009/09-2010/snowball.filter.csv");
 		
 		SampledGraphProjection<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge> graph = builder.buildGraph(alterTables, egoTables, sqlDumps);
 		SampledGraphProjMLWriter writer = new SampledGraphProjMLWriter(new SocialSparseGraphMLWriter());
-		writer.write(graph, "/Users/jillenberger/Work/work/socialnets/data/ivt2009/raw/09-2010/graph/graph.graphml");
+		writer.write(graph, "/Users/jillenberger/Work/socialnets/data/ivt2009/09-2010/graph/noH/graph.graphml");
 	}
 }

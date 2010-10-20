@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.snowball2.spatial.analysis;
 
+import gnu.trove.TObjectDoubleHashMap;
+
 import java.util.Set;
 
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
@@ -45,6 +47,21 @@ public class ObservedDistance extends Distance {
 	@Override
 	public Distribution vertexAccumulatedDistribution(Set<? extends SpatialVertex> vertices) {
 		Set<SpatialSampledVertexDecorator<SpatialVertex>> spatialVertices = (Set<SpatialSampledVertexDecorator<SpatialVertex>>)vertices;
-		return super.vertexAccumulatedDistribution(spatialVertices);
+		return super.vertexAccumulatedDistribution(SnowballPartitions.createSampledPartition(spatialVertices));
+	}
+	
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public Distribution vertexMeanDistribution(Set<? extends SpatialVertex> vertices) {
+		Set<SpatialSampledVertexDecorator<SpatialVertex>> spatialVertices = (Set<SpatialSampledVertexDecorator<SpatialVertex>>)vertices;
+		return super.vertexMeanDistribution(SnowballPartitions.createSampledPartition(spatialVertices));
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public TObjectDoubleHashMap<SpatialVertex> vertexMeanValues(Set<? extends SpatialVertex> vertices) {
+		Set<SpatialSampledVertexDecorator<SpatialVertex>> spatialVertices = (Set<SpatialSampledVertexDecorator<SpatialVertex>>)vertices;
+		return super.vertexMeanValues(SnowballPartitions.createSampledPartition(spatialVertices));
 	}
 }

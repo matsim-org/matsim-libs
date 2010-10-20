@@ -36,8 +36,7 @@ import org.matsim.contrib.sna.graph.analysis.RandomPartition;
 import org.matsim.contrib.sna.graph.analysis.TransitivityTask;
 import org.matsim.contrib.sna.graph.analysis.VertexFilter;
 import org.matsim.contrib.sna.graph.io.SparseGraphMLReader;
-import org.matsim.contrib.sna.snowball.sim.FinalSampleAnalyzer;
-import org.matsim.contrib.sna.snowball.sim.IterationSampleAnalyzer;
+import org.matsim.contrib.sna.snowball.sim.IntervalSampleAnalyzer;
 import org.matsim.contrib.sna.snowball.sim.ProbabilityEstimator;
 import org.matsim.contrib.sna.snowball.sim.Sampler;
 import org.matsim.contrib.sna.snowball.sim.SamplerListenerComposite;
@@ -45,10 +44,11 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 
 import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
-import playground.johannes.socialnetworks.snowball2.analysis.EstimatedDegree;
+import playground.johannes.socialnetworks.snowball2.analysis.EstimatedDegree2;
 import playground.johannes.socialnetworks.snowball2.analysis.EstimatedTransitivity;
 import playground.johannes.socialnetworks.snowball2.analysis.ObservedDegree;
 import playground.johannes.socialnetworks.snowball2.analysis.ObservedTransitivity;
+import playground.johannes.socialnetworks.snowball2.analysis.ResponseRateTask;
 import playground.johannes.socialnetworks.snowball2.analysis.WaveSizeTask;
 import playground.johannes.socialnetworks.snowball2.sim.deprecated.HTEstimator;
 import playground.johannes.socialnetworks.snowball2.sim.deprecated.PopulationEstimator;
@@ -109,7 +109,7 @@ public class Loader {
 		estimatorSet.add(estim1Norm);
 		
 		estimators.put("estim1a", new EstimatorSet(estim1Norm, new HTEstimator(N), new HTEstimator(M)));
-		estimators.put("estim1b", new EstimatorSet(estim1, new HTEstimator(N), new HTEstimator(M)));
+//		estimators.put("estim1b", new EstimatorSet(estim1, new HTEstimator(N), new HTEstimator(M)));
 		/*
 		 * Load analyzers.
 		 */
@@ -121,9 +121,9 @@ public class Loader {
 		/*
 		 * Init sample analyzers.
 		 */
-//		IntervalSampleAnalyzer intervalAnalyzer = new IntervalSampleAnalyzer(analyzers, estimatorSet, output);
-		IterationSampleAnalyzer iterationAnalyzer = new IterationSampleAnalyzer(analyzers, estimatorSet, output);
-		FinalSampleAnalyzer completeAnalyzer = new FinalSampleAnalyzer(analyzers, estimatorSet, output);
+		IntervalSampleAnalyzer intervalAnalyzer = new IntervalSampleAnalyzer(analyzers, estimatorSet, output);
+//		IterationSampleAnalyzer iterationAnalyzer = new IterationSampleAnalyzer(analyzers, estimatorSet, output);
+//		FinalSampleAnalyzer completeAnalyzer = new FinalSampleAnalyzer(analyzers, estimatorSet, output);
 //		ConnectionSampleAnalyzer connectionAnalyzer = new ConnectionSampleAnalyzer(numSeeds, analyzers, output);
 		/*
 		 * Init sampler listener.
@@ -140,9 +140,9 @@ public class Loader {
 		/*
 		 * Add analyzers to listener.
 		 */
-//		listeners.addComponent(intervalAnalyzer);
-		listeners.addComponent(iterationAnalyzer);
-		listeners.addComponent(completeAnalyzer);
+		listeners.addComponent(intervalAnalyzer);
+//		listeners.addComponent(iterationAnalyzer);
+//		listeners.addComponent(completeAnalyzer);
 //		listeners.addComponent(connectionAnalyzer);
 		/*
 		 * Init and run sampler.
@@ -185,6 +185,7 @@ public class Loader {
 		obsTransitivity.setModule(new ObservedTransitivity());
 		tasks.addTask(obsTransitivity);
 		
+		tasks.addTask(new ResponseRateTask());
 //		tasks.addTask(new DegreeCorrelationTask());
 //		tasks.addTask(new ComponentsTask());
 		analyzers.put("obs", tasks);
@@ -199,7 +200,7 @@ public class Loader {
 			PopulationEstimator edgeEstimator = entry.getValue().edgeEstimator;
 			
 			DegreeTask estimDegree = new DegreeTask();
-			estimDegree.setModule(new EstimatedDegree(biasdDistr, estimator, edgeEstimator));
+			estimDegree.setModule(new EstimatedDegree2(biasdDistr, estimator, edgeEstimator));
 			tasks.addTask(estimDegree);
 			
 			TransitivityTask estimTransitivity = new TransitivityTask();

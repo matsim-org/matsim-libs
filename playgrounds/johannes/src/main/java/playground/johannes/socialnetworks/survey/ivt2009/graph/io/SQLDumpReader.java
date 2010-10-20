@@ -22,14 +22,17 @@ package playground.johannes.socialnetworks.survey.ivt2009.graph.io;
 import geo.google.datamodel.GeoCoordinate;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.Map.Entry;
@@ -63,6 +66,8 @@ public class SQLDumpReader {
 	
 	private static final int NUM_HOMELOCS = 20;
 	
+	private static final int NUM_CLIQUES = 40;
+	
 	private static final String HOME_LOC_KEY = "84967X53X128Loc";
 	
 	private static final String HOME_LOC_YEAR_KEY = "84967X53X128von";
@@ -88,6 +93,18 @@ public class SQLDumpReader {
 	private static final String CITZEN_KEY = "84967X53X110";
 	
 	private static final String ALTER_CITIZEN_KEY = "84967X54X138";
+	
+	private static final String CLIQUE_KEY = "84967X59X249N";
+	
+	private static final String CIVIL_STATUS_KEY = "84967X53X118";
+	
+	private static final String EDUCATION_KEY = "84967X53X116";
+	
+	private static final String ALTER_EDU_KEY = "84967X54X131";
+	
+	private static final String EDGE_TYPE_KEY = "84967X54X140";
+	
+	private static final String INCOME_KEY = "84967X53X130";
 	
 	private static final int SURVEY_YEAR = 2010;
 	
@@ -307,6 +324,56 @@ public class SQLDumpReader {
 		return null;
 	}
 	
+	public String getCivilStatus(VertexRecord record) {
+		String val = null;
+		
+		if(record.isEgo) {
+			val = getValue(record.egoSQLId, CIVIL_STATUS_KEY);
+		}
+		
+		return val;
+	}
+	
+	
+	public String getEducation(VertexRecord record) {
+		String val = null;
+		
+		if(record.isEgo)
+			val = getValue(record.egoSQLId, EDUCATION_KEY);
+		else {
+			for(Entry<String, String> entry : record.alterKeys.entrySet()) {
+				val = getValue(entry.getKey(), makeKey(entry.getValue(), ALTER_EDU_KEY));
+				if(val != null)
+					break;
+			}
+		}
+		
+		return val;
+	}
+	
+	public String getEdgeType(VertexRecord v1, VertexRecord v2) {
+		VertexRecord ego = null;
+		VertexRecord alter = null;
+		
+		if(v1.isEgo) {
+			ego = v1;
+			alter = v2;
+		} else if(v2.isEgo) {
+			ego = v2;
+			alter = v1;
+		} else {
+			logger.error("Either one vertex must be an ego.");
+		}
+		
+		String alterKey = alter.alterKeys.get(ego.egoSQLId);
+		if(alterKey == null) {
+			logger.info("Alter key not found!");
+		}
+		String val = getValue(ego.egoSQLId, makeKey(alterKey, EDGE_TYPE_KEY));
+		
+		return val;
+	}
+	
 	public double getF2FFrequencey(String egoId, String alterKey) {
 		String freq = getValue(egoId, makeKey(alterKey, ALTER_F2F_FREQ_KEY));
 		String unit = getValue(egoId, makeKey(alterKey, ALTER_F2F_UNIT_KEY));
@@ -343,6 +410,50 @@ public class SQLDumpReader {
 		}
 		
 		return 0;
+	}
+	
+	public int getIncome(VertexRecord record) {
+		if(record.isEgo) {
+			String val = getValue(record.egoSQLId, INCOME_KEY);
+			if(val != null)
+				return Integer.parseInt(val);
+		}
+		
+		return -1;
+	}
+	
+	public List<Set<String>> getCliques(VertexRecord record) {
+		List<Set<String>> list = new ArrayList<Set<String>>();
+		for(int i = 1; i <= NUM_CLIQUES; i++) {
+			String val = getValue(record.egoSQLId, CLIQUE_KEY + i);
+			if(val != null) {
+				String[] tokens = val.split(",");
+				if(tokens.length > 0) {
+					Set<String> alters = new HashSet<String>();
+					for(String token : tokens) {
+						int num = Integer.parseInt(token);
+						if(num >= 1 && num <= 29) {
+							alters.add("84967X55X143A" + num);
+						} else if(num >= 30 && num <= 40) {
+							alters.add("84967X55X144B" + (num - 29));
+						}
+					}
+					list.add(alters);
+				}
+			}
+		}
+		
+		return list;
+	}
+	
+	public Map<String, VertexRecord> getFullAlterKeyMappping(Collection<VertexRecord> records) {
+		Map<String, VertexRecord> map = new HashMap<String, VertexRecord>();
+		for(VertexRecord record : records) {
+			for(Entry<String, String> alterKey : record.alterKeys.entrySet()) {
+				map.put(alterKey.getKey()+alterKey.getValue(), record);
+			}
+		}
+		return map;
 	}
 	
 	private Map<String, String> loadCountries() {

@@ -25,8 +25,8 @@ import org.matsim.contrib.sna.snowball.SampledGraph;
 import org.matsim.contrib.sna.snowball.sim.ProbabilityEstimator;
 
 import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
-import playground.johannes.socialnetworks.snowball2.analysis.EstimatedDegree;
-import playground.johannes.socialnetworks.snowball2.analysis.EstimatedTransitivity;
+import playground.johannes.socialnetworks.snowball2.analysis.EstimatedDegree2;
+import playground.johannes.socialnetworks.snowball2.analysis.EstimatedTransitivity2;
 import playground.johannes.socialnetworks.snowball2.sim.Estimator1;
 import playground.johannes.socialnetworks.snowball2.sim.EstimatorTask;
 import playground.johannes.socialnetworks.snowball2.sim.NormalizedEstimator;
@@ -41,16 +41,17 @@ public class EstimatedAnalyzerTask extends AnalyzerTaskComposite {
 	private final static int N = 5200000;
 	
 	public EstimatedAnalyzerTask(SampledGraph graph) {
-//		ProbabilityEstimator estim = new Estimator1(N);
-		ProbabilityEstimator estim = new NormalizedEstimator(new Estimator1(N), N);
+		ProbabilityEstimator estim = new Estimator1(N);
+//		ProbabilityEstimator estim = new NormalizedEstimator(new Estimator1(N), N);
 		estim.update(graph);
 		
 		DegreeTask kTask = new DegreeTask();
-		kTask.setModule(new EstimatedDegree(estim, new HTEstimator(N), new HTEstimator(N)));
+//		kTask.setModule(new EstimatedDegree2(estim, new HTEstimator(N), new HTEstimator(N)));
+		kTask.setModule(new EstimatedDegree2(estim, null, null));
 		addTask(kTask);
 		
 		TransitivityTask tTask = new TransitivityTask();
-		tTask.setModule(new EstimatedTransitivity(estim, new HTEstimator(N)));
+		tTask.setModule(new EstimatedTransitivity2(estim, new HTEstimator(N)));
 		addTask(tTask);
 		
 		addTask(new EstimatorTask(estim));

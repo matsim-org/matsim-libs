@@ -87,4 +87,13 @@ public class SimSocialEdge extends SpatialSparseEdge implements SocialEdge {
 		// TODO Auto-generated method stub
 		return 0;
 	}
+
+	/* (non-Javadoc)
+	 * @see playground.johannes.socialnetworks.graph.social.SocialEdge#getType()
+	 */
+	@Override
+	public String getType() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

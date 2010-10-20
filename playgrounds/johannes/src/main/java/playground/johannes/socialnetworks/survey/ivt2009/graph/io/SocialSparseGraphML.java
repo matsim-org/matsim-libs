@@ -27,6 +27,14 @@ public interface SocialSparseGraphML {
 
 	public static final String CITIZENSHIP_ATTR = "citizen";
 	
+	public static final String EDUCATION_ATTR = "edu";
+	
 	public static final String FREQUENCY_ATTR = "frequency";
+	
+	public static final String EDGE_TYPE_ATTR = "type";
+	
+	public static final String INCOME_ATTR = "incomce";
+	
+	public static final String CIVI_STATUS_ATTR = "civilstatus";
 	
 }

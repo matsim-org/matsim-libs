@@ -61,7 +61,8 @@ public class SocialSparseGraphFactory implements GraphFactory<SocialSparseGraph,
 	}
 	
 	public SocialSparseVertex createVertex(SocialPerson person, Point point) {
-		point.setSRID(SRID);
+		if(point != null)
+			point.setSRID(SRID);
 		return new SocialSparseVertex(person, point);
 	}
 

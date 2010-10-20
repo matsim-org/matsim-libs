@@ -79,13 +79,14 @@ public class Analyzer {
 		MatsimNetworkReader netReader = new MatsimNetworkReader(scenario);
 //		netReader.readFile("/Users/jillenberger/Work/shared-svn/studies/countries/ch/data/network/osm20100831/network.xml.gz");
 		
-		ZoneLayer zones = ZoneLayerSHP.read("/Users/jillenberger/Work/work/socialnets/data/schweiz/complete/zones/Zones.shp");
+		ZoneLayer zones = ZoneLayerSHP.read("/Users/jillenberger/Work/socialnets/data/schweiz/complete/zones/Zones.shp");
 		zones.overwriteCRS(CRSUtils.getCRS(21781));
 		
 		Set<Point> choiceSet = new HashSet<Point>();
-		SpatialSparseGraph graph2 = new Population2SpatialGraph(CRSUtils.getCRS(21781)).read("/Users/jillenberger/Work/work/socialnets/data/schweiz/complete/plans/plans.0.001.xml");
+		SpatialSparseGraph graph2 = new Population2SpatialGraph(CRSUtils.getCRS(21781)).read("/Users/jillenberger/Work/socialnets/data/schweiz/complete/plans/plans.0.001.xml");
 		
-		graph2.transformToCRS(CRSUtils.getCRS(4326));
+		graph.getDelegate().transformToCRS(CRSUtils.getCRS(21781));
+//		graph2.transformToCRS(CRSUtils.getCRS(4326));
 		for(SpatialVertex v : graph2.getVertices()) {	
 			choiceSet.add(v.getPoint());
 		}
@@ -97,17 +98,18 @@ public class Analyzer {
 		/*
 		 * analyze the swiss clipping
 		 */
-		Feature feature = FeatureSHP.readFeatures("/Users/jillenberger/Work/work/socialnets/data/schweiz/complete/zones/G1L08.shp").iterator().next();
-		Geometry geometry = feature.getDefaultGeometry();
-		geometry.setSRID(21781);
-		GraphFilter<SpatialGraph> filter = new GraphClippingFilter(new SocialSparseGraphBuilder(graph.getDelegate().getCoordinateReferenceSysten()), geometry);
-		filter.apply(graph.getDelegate());
-//		SampledGraphProjectionBuilder<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge> builder = new SampledGraphProjectionBuilder<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge>();
-		builder.synchronize(graph);
-		
-		output = output+"/clip/";
-		new File(output).mkdirs();
-		analyze(graph, zones, choiceSet, scenario.getNetwork(), output);
+//		graph.getDelegate().transformToCRS(CRSUtils.getCRS(21781));
+//		Feature feature = FeatureSHP.readFeatures("/Users/jillenberger/Work/socialnets/data/schweiz/complete/zones/G1L08.shp").iterator().next();
+//		Geometry geometry = feature.getDefaultGeometry();
+//		geometry.setSRID(21781);
+//		GraphFilter<SpatialGraph> filter = new GraphClippingFilter(new SocialSparseGraphBuilder(graph.getDelegate().getCoordinateReferenceSysten()), geometry);
+//		filter.apply(graph.getDelegate());
+////		SampledGraphProjectionBuilder<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge> builder = new SampledGraphProjectionBuilder<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge>();
+//		builder.synchronize(graph);
+//		
+//		output = output+"/clip/";
+//		new File(output).mkdirs();
+//		analyze(graph, zones, choiceSet, scenario.getNetwork(), output);
 		
 //		FrequencyFilter fFilter = new FrequencyFilter((GraphBuilder<? extends SocialGraph, ? extends SocialVertex, ? extends SocialEdge>) builder, 11.0);
 //		fFilter.apply(graph);
@@ -117,14 +119,14 @@ public class Analyzer {
 //		new File(output).mkdirs();
 //		analyze(graph, zones, choiceSet, scenario.getNetwork(), output);
 		
-		RemoveOrpahnedComponents rm = new RemoveOrpahnedComponents();
-		rm.setBuilder(builder);
-		rm.apply(graph);
-		builder.synchronize(graph);
-		
-		output = args[1] + "/cleaned/";
-		new File(output).mkdirs();
-		analyze(graph, zones, choiceSet, scenario.getNetwork(), output);
+//		RemoveOrpahnedComponents rm = new RemoveOrpahnedComponents();
+//		rm.setBuilder(builder);
+//		rm.apply(graph);
+//		builder.synchronize(graph);
+//		
+//		output = args[1] + "/cleaned/";
+//		new File(output).mkdirs();
+//		analyze(graph, zones, choiceSet, scenario.getNetwork(), output);
 		
 	}
 

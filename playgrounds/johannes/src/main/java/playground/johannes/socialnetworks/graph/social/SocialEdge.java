@@ -38,4 +38,5 @@ public interface SocialEdge extends SpatialEdge {
 	 */
 	public double getFrequency();
 	
+	public String getType();
 }

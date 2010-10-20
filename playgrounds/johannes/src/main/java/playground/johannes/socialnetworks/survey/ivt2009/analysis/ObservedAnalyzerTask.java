@@ -29,25 +29,24 @@ import org.matsim.contrib.sna.graph.analysis.GraphSizeTask;
 import org.matsim.contrib.sna.graph.analysis.TransitivityTask;
 
 import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
+import playground.johannes.socialnetworks.graph.analysis.TransitivityDegreeTask;
 import playground.johannes.socialnetworks.graph.social.analysis.AgeTask;
 import playground.johannes.socialnetworks.graph.social.analysis.DegreeAgeTask;
 import playground.johannes.socialnetworks.graph.social.analysis.DegreeGenderTask;
+import playground.johannes.socialnetworks.graph.social.analysis.EducationTask;
 import playground.johannes.socialnetworks.graph.social.analysis.GenderTask;
+import playground.johannes.socialnetworks.graph.spatial.analysis.AcceptanceProbabilityTask;
 import playground.johannes.socialnetworks.graph.spatial.analysis.DegreeDensityTask;
 import playground.johannes.socialnetworks.graph.spatial.analysis.DegreeEdgeLengthTask;
-import playground.johannes.socialnetworks.graph.spatial.analysis.DegreeGridTask;
 import playground.johannes.socialnetworks.graph.spatial.analysis.DistanceTask;
-import playground.johannes.socialnetworks.graph.spatial.analysis.EdgeCostsTask;
-import playground.johannes.socialnetworks.graph.spatial.analysis.TravelTimeTask;
-import playground.johannes.socialnetworks.graph.spatial.generators.GravityEdgeCostFunction;
 import playground.johannes.socialnetworks.snowball2.analysis.DegreeIterationTask;
 import playground.johannes.socialnetworks.snowball2.analysis.ObservedDegree;
 import playground.johannes.socialnetworks.snowball2.analysis.ObservedTransitivity;
+import playground.johannes.socialnetworks.snowball2.analysis.ResponseRateTask;
 import playground.johannes.socialnetworks.snowball2.analysis.SeedConnectionTask;
 import playground.johannes.socialnetworks.snowball2.analysis.WaveSizeTask;
 import playground.johannes.socialnetworks.snowball2.social.analysis.ObservedAge;
 import playground.johannes.socialnetworks.snowball2.spatial.analysis.ObservedDistance;
-import playground.johannes.socialnetworks.snowball2.spatial.analysis.ObservedEdgeCosts;
 
 import com.vividsolutions.jts.geom.Point;
 
@@ -72,6 +71,10 @@ public class ObservedAnalyzerTask extends AnalyzerTaskComposite {
 		TransitivityTask transitivity = new TransitivityTask();
 		transitivity.setModule(new ObservedTransitivity());
 		addTask(transitivity);
+		
+		TransitivityDegreeTask transDegree = new TransitivityDegreeTask();
+		transDegree.setModule(new ObservedTransitivity());
+		addTask(transDegree);
 		
 		DistanceTask distance = new DistanceTask();
 		distance.setModule(new ObservedDistance());
@@ -116,6 +119,17 @@ public class ObservedAnalyzerTask extends AnalyzerTaskComposite {
 		DegreeGenderTask kgTask = new DegreeGenderTask();
 		kgTask.setModule(new ObservedDegree());
 		addTask(kgTask);
+		
+		addTask(new ResponseRateTask());
+		
+		addTask(new FrequencyDistanceTask());
+		
+		addTask(new EducationTask());
+//		addTask(new EdgeTypeTask(choiceSet));
+//		addTask(new DistanceSocioAttribute(choiceSet));
+//		addTask(new IncomeTask());
+//		addTask(new CivilStatusTask());
+		addTask(new playground.johannes.socialnetworks.survey.ivt2009.analysis.DegreeGenderTask());
 	}
 
 }

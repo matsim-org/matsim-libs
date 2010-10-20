@@ -69,7 +69,10 @@ public class SocialSparseGraphMLReader
 	@Override
 	protected SocialSparseEdge addEdge(SocialSparseVertex v1, SocialSparseVertex v2, Attributes attrs) {
 		SocialSparseEdge edge = builder.addEdge(getGraph(), v1, v2);
+		
 		edge.setFrequency(Double.parseDouble(attrs.getValue(SocialSparseGraphML.FREQUENCY_ATTR)));
+		edge.setType(attrs.getValue(SocialSparseGraphML.EDGE_TYPE_ATTR));
+		
 		return edge;
 	}
 
@@ -97,6 +100,12 @@ public class SocialSparseGraphMLReader
 		 * add citizenship attribute
 		 */
 		sPerson.setCitizenship(attrs.getValue(SocialSparseGraphML.CITIZENSHIP_ATTR));
+		sPerson.setEducation(attrs.getValue(SocialSparseGraphML.EDUCATION_ATTR));
+		String val = attrs.getValue(SocialSparseGraphML.INCOME_ATTR);
+		if(val != null)
+			sPerson.setIncome(Integer.parseInt(val));
+		
+		sPerson.setCivilStatus(attrs.getValue(SocialSparseGraphML.CIVI_STATUS_ATTR));
 		
 		return vertex;
 	}

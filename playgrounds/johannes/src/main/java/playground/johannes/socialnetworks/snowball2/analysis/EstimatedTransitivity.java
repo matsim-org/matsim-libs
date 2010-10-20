@@ -89,8 +89,12 @@ public class EstimatedTransitivity extends Transitivity {
 				if(N_edge > 0)
 					p_edge = n_edge/N_edge;
 				
+				
 				double n_edge_estim = n_edge + n_notsampled * (n_notsampled - 1) * 0.5 * p_edge;
 				double c = 2 * n_edge_estim / (double) (k * (k - 1));
+				
+				if(c > 1)
+					System.err.println();
 				
 				coefficients.put(vertex, c);
 			}
@@ -114,11 +118,6 @@ public class EstimatedTransitivity extends Transitivity {
 				distr.add(it.value(), 1/p);
 		}
 		return distr;
-	}
-
-	@Override
-	public double globalClusteringCoefficient(Graph graph) {
-		return 0.0;
 	}
 
 }

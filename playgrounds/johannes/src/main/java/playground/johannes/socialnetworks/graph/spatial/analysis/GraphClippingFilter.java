@@ -78,8 +78,18 @@ public class GraphClippingFilter implements GraphFilter<SpatialGraph> {
 			MathTransform transform = CRS.findMathTransform(sourceCRS, targetCRS);
 
 			for (SpatialVertex vertex : graph.getVertices()) {
-				Point p = CRSUtils.transformPoint(vertex.getPoint(), transform);
-				if (!geometry.contains(p)) {
+				boolean remove = false;
+				
+				if(vertex.getPoint() == null)
+					remove = true;
+				else {
+					Point p = CRSUtils.transformPoint(vertex.getPoint(), transform);
+					if (!geometry.contains(p)) {
+						remove = true;
+					}
+				}
+				
+				if(remove) {
 					vertices.add(vertex);
 					edges.addAll(vertex.getEdges());
 				}

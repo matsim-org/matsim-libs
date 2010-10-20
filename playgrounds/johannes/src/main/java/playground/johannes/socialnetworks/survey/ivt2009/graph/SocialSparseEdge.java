@@ -33,6 +33,8 @@ public class SocialSparseEdge extends SpatialSparseEdge implements SocialEdge {/
 
 	private double frequency;
 	
+	private String type;
+	
 	@Override
 	public SocialSparseVertex getOpposite(Vertex v) {
 		return (SocialSparseVertex) super.getOpposite(v);
@@ -50,5 +52,13 @@ public class SocialSparseEdge extends SpatialSparseEdge implements SocialEdge {/
 	
 	public double getFrequency() {
 		return frequency;
+	}
+	
+	public void setType(String type) {
+		this.type = type;
+	}
+	
+	public String getType() {
+		return type;
 	}
 }

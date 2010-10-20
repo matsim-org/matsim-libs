@@ -124,25 +124,30 @@ public class StatsMerge {
 				 * Open the stats.txt file.
 				 */
 				String path = String.format("%1$s/%2$s/stats.txt", dumpDir.getAbsolutePath(), analyzerKey);
-				BufferedReader reader = new BufferedReader(new FileReader(new File(path)));
-				String line;
-				while((line = reader.readLine()) != null) {
-					String[] tokens = line.split("\t");
-					if(tokens[0].equalsIgnoreCase(propertyKey)) {
-						/*
-						 * Retrieve the value for the property key and then
-						 * break.
-						 */
-						double value = Double.parseDouble(tokens[1]);
-						String dumpName = dumpDir.getName().split("\\.")[1];
-						double[] values = dataTable.get(dumpName);
-						if(values == null)
-							logger.warn(String.format("Null object for run %1$s. This should not happen!", i));
-						else
-							values[i] = value;
-						break;
+				File file = new File(path);
+				if (file.exists()) {
+					BufferedReader reader = new BufferedReader(new FileReader(file));
+					String line;
+					while ((line = reader.readLine()) != null) {
+						String[] tokens = line.split("\t");
+						if (tokens[0].equalsIgnoreCase(propertyKey)) {
+							/*
+							 * Retrieve the value for the property key and then
+							 * break.
+							 */
+							double value = Double.parseDouble(tokens[1]);
+							String dumpName = dumpDir.getName().split("\\.")[1];
+							double[] values = dataTable.get(dumpName);
+							if (values == null)
+								logger.warn(String.format("Null object for run %1$s. This should not happen!", i));
+							else
+								values[i] = value;
+							break;
+						}
 					}
-				}	
+				} else {
+					logger.warn(String.format("No stats file found: %1$s.", path));
+				}
 			}
 		}
 		/*

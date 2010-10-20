@@ -34,6 +34,12 @@ public class SocialPerson {
 	
 	private String citizenship;
 	
+	private String education;
+	
+	private int income;
+	
+	private String civilStatus;
+	
 	public SocialPerson(PersonImpl person) {
 		this.person = person;
 	}
@@ -60,6 +66,30 @@ public class SocialPerson {
 	
 	public void setCitizenship(String citizenship) {
 		this.citizenship = citizenship;
+	}
+	
+	public String getEducation() {
+		return education;
+	}
+	
+	public void setEducation(String edu) {
+		this.education = edu;
+	}
+
+	public int getIncome() {
+		return income;
+	}
+	
+	public void setIncome(int income) {
+		this.income = income;
+	}
+
+	public String getCiviStatus() {
+		return civilStatus;
+	}
+	
+	public void setCivilStatus(String civilStatus) {
+		this.civilStatus = civilStatus;
 	}
 	
 	public PersonImpl getPerson() {

@@ -22,7 +22,10 @@ package playground.johannes.socialnetworks.survey.ivt2009.analysis;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.matsim.contrib.sna.graph.Edge;
+import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.GraphBuilder;
+import org.matsim.contrib.sna.graph.Vertex;
 
 import playground.johannes.socialnetworks.graph.analysis.GraphFilter;
 import playground.johannes.socialnetworks.graph.social.SocialEdge;
@@ -39,7 +42,7 @@ public class FrequencyFilter implements GraphFilter<SocialGraph> {
 	
 	private double threshold;
 	
-	public FrequencyFilter(GraphBuilder<? extends SocialGraph, ? extends SocialVertex, ? extends SocialEdge> builder, double threshold) {
+	public FrequencyFilter(GraphBuilder<? extends Graph, ? extends Vertex, ? extends Edge> builder, double threshold) {
 		this.builder = (GraphBuilder<SocialGraph, SocialVertex, SocialEdge>) builder;
 		this.threshold = threshold;
 	}
@@ -49,7 +52,7 @@ public class FrequencyFilter implements GraphFilter<SocialGraph> {
 		Set<SocialEdge> remove = new HashSet<SocialEdge>();
 		
 		for(SocialEdge edge : graph.getEdges()) {
-			if(edge.getFrequency() < threshold) {
+			if(edge.getFrequency() > threshold) {
 				remove.add(edge);
 			}
 		}

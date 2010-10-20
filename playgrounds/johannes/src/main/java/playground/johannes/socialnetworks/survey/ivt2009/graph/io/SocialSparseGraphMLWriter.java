@@ -38,11 +38,31 @@ public class SocialSparseGraphMLWriter extends SocialGraphMLWriter {
 	@Override
 	protected List<Tuple<String, String>> getVertexAttributes(Vertex v) {
 		List<Tuple<String, String>> attrs = super.getVertexAttributes(v);
+		
 		String val = ((SocialSparseVertex) v).getPerson().getCitizenship();
 		if (val != null) {
 			Tuple<String, String> attr = new Tuple<String, String>(SocialSparseGraphML.CITIZENSHIP_ATTR, val);
 			attrs.add(attr);
 		}
+		
+		val = ((SocialSparseVertex) v).getPerson().getEducation();
+		if (val != null) {
+			Tuple<String, String> attr = new Tuple<String, String>(SocialSparseGraphML.EDUCATION_ATTR, val);
+			attrs.add(attr);
+		}
+		
+		val = String.valueOf(((SocialSparseVertex) v).getPerson().getIncome());
+		if (val != null) {
+			Tuple<String, String> attr = new Tuple<String, String>(SocialSparseGraphML.INCOME_ATTR, val);
+			attrs.add(attr);
+		}
+		
+		val = ((SocialSparseVertex) v).getPerson().getCiviStatus();
+		if (val != null) {
+			Tuple<String, String> attr = new Tuple<String, String>(SocialSparseGraphML.CIVI_STATUS_ATTR, val);
+			attrs.add(attr);
+		}
+		
 		return attrs;
 	}
 
@@ -52,6 +72,12 @@ public class SocialSparseGraphMLWriter extends SocialGraphMLWriter {
 		Tuple<String, String> tuple = new Tuple<String, String>(SocialSparseGraphML.FREQUENCY_ATTR, String
 				.valueOf(((SocialSparseEdge) e).getFrequency()));
 		attrs.add(tuple);
+		
+		String val = ((SocialSparseEdge) e).getType();
+		if(val != null) {
+			tuple = new Tuple<String, String>(SocialSparseGraphML.EDGE_TYPE_ATTR, ((SocialSparseEdge) e).getType());
+			attrs.add(tuple);
+		}
 		return attrs;
 	}
 

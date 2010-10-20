@@ -24,6 +24,8 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.math.stat.StatUtils;
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.analysis.ModuleAnalyzerTask;
@@ -41,11 +43,23 @@ public class DistanceTask extends ModuleAnalyzerTask<Distance> {
 	
 	public static final String MEAN_EDGE_LENGTH = "d_mean";
 	
+	public static final String MEDIAN_EDGE_LENGTH = "d_median";
+	
 	public static final String MIN_EDGE_LENGTH = "d_min";
 	
 	public static final String MAX_EDGE_LENGTH = "d_max";
 	
+	public static final String MEAN_EDGE_LENGTH_I_SUM = "d_i_sum_mean";
+	
+	public static final String MEDIAN_EDGE_LENGTH_I_SUM = "d_i_sum_median";
+	
+	public static final String MIN_EDGE_LENGTH_I_SUM = "d_i_sum_min";
+	
+	public static final String MAX_EDGE_LENGTH_I_SUM = "d_i_sum_max";
+	
 	public static final String MEAN_EDGE_LENGTH_I = "d_i_mean";
+	
+	public static final String MEDIAN_EDGE_LENGTH_I = "d_i_median";
 	
 	public static final String MIN_EDGE_LENGTH_I = "d_i_min";
 	
@@ -65,7 +79,8 @@ public class DistanceTask extends ModuleAnalyzerTask<Distance> {
 			stats.put(MEAN_EDGE_LENGTH, d_mean);
 			stats.put(MAX_EDGE_LENGTH, d_max);
 			stats.put(MIN_EDGE_LENGTH, d_min);
-			
+			stats.put(MEDIAN_EDGE_LENGTH, StatUtils.percentile(distr.getValues(), 50));
+
 			logger.info(String.format("d_mean = %1$.4f, d_max = %2$.4f, d_min = %3$.4f", d_mean, d_max, d_min));
 			
 			if(getOutputDirectory() != null) {
@@ -78,19 +93,41 @@ public class DistanceTask extends ModuleAnalyzerTask<Distance> {
 				}
 			}
 			
-			distr = module.vertexAccumulatedDistribution((Set<? extends SpatialVertex>) graph.getVertices());
+			distr = module.vertexMeanDistribution((Set<? extends SpatialVertex>) graph.getVertices());
 			double d_i_mean = distr.mean();
 			double d_i_max = distr.max();
 			double d_i_min = distr.min();
 			stats.put(MEAN_EDGE_LENGTH_I, d_i_mean);
 			stats.put(MAX_EDGE_LENGTH_I, d_i_max);
 			stats.put(MIN_EDGE_LENGTH_I, d_i_min);
+			stats.put(MEDIAN_EDGE_LENGTH_I, StatUtils.percentile(distr.getValues(), 50));
 			
 			logger.info(String.format("d_i_mean = %1$.4f, d_i_max = %2$.4f, d_i_min = %3$.4f", d_i_mean, d_i_max, d_i_min));
 			
 			if(getOutputDirectory() != null) {
 				try {
-					writeHistograms(distr, 1000.0, true, "d_i");
+					writeHistograms(distr, 5000.0, true, "d_i");
+				} catch (FileNotFoundException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+
+			distr = module.vertexAccumulatedDistribution((Set<? extends SpatialVertex>) graph.getVertices());
+			double d_i_sum_mean = distr.mean();
+			double d_i_sum_max = distr.max();
+			double d_i_sum_min = distr.min();
+			stats.put(MEAN_EDGE_LENGTH_I_SUM, d_i_sum_mean);
+			stats.put(MAX_EDGE_LENGTH_I_SUM, d_i_sum_max);
+			stats.put(MIN_EDGE_LENGTH_I_SUM, d_i_sum_min);
+			stats.put(MEDIAN_EDGE_LENGTH_I_SUM, StatUtils.percentile(distr.getValues(), 50));
+			
+			logger.info(String.format("d_i_sum_mean = %1$.4f, d_i_sum_max = %2$.4f, d_i_sum_min = %3$.4f", d_i_sum_mean, d_i_sum_max, d_i_sum_min));
+			
+			if(getOutputDirectory() != null) {
+				try {
+					writeHistograms(distr, 1000.0, true, "d_i_sum");
 				} catch (FileNotFoundException e) {
 					e.printStackTrace();
 				} catch (IOException e) {

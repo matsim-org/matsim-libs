@@ -56,4 +56,9 @@ public class SocialSampledEdgeDecorator<E extends SocialEdge> extends SampledEdg
 		return getDelegate().getFrequency();
 	}
 
+	@Override
+	public String getType() {
+		return getDelegate().getType();
+	}
+
 }

@@ -66,6 +66,8 @@ public class ApplySeedsFilter implements GraphFilter<SampledGraph> {
 					neighbor.setSeed(ego.getSeed());
 				if(neighbor.isSampled())
 					neighbors.add(neighbor);
+			} else {
+				System.out.println(String.format("it=%1$s, neighbor=%2$s, vertex=%3$s", it, neighbor.toString(), ego.toString()));
 			}
 		}
 	}

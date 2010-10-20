@@ -41,8 +41,11 @@ public class Distance {
 		Set<SpatialEdge> touched = new HashSet<SpatialEdge>();
 		for(SpatialVertex v : vertices) {
 			for(int i = 0; i < v.getEdges().size(); i++) {
-				if(touched.add(v.getEdges().get(i)))
-					distribution.add(v.getEdges().get(i).length());
+				if(touched.add(v.getEdges().get(i))) {
+					double d = v.getEdges().get(i).length();
+					if(!Double.isNaN(d))
+						distribution.add(d);
+				}
 			}
 		}
 		
@@ -55,7 +58,9 @@ public class Distance {
 		for(SpatialVertex v_i : vertices) {
 			double sum = 0;
 			for(SpatialEdge e : v_i.getEdges()) {
-				sum += e.length();
+				double d = e.length();
+				if(!Double.isNaN(d))
+					sum += e.length();
 			}
 			distribution.add(sum);
 		}
@@ -68,12 +73,23 @@ public class Distance {
 		
 		for(SpatialVertex vertex : vertices) {
 			double sum = 0;
-			for(SpatialEdge e : vertex.getEdges())
-				sum+= e.length();
-			
-			values.put(vertex, sum/(double)vertex.getEdges().size());
+			int cnt = 0;
+			for(SpatialEdge e : vertex.getEdges()) {
+				double d = e.length();
+				if(!Double.isNaN(d)) {
+					sum += e.length();
+					cnt++;
+				}
+			}
+			if(cnt > 0)
+				values.put(vertex, sum/(double)cnt);
 		}
 		
 		return values;
+	}
+	
+	public Distribution vertexMeanDistribution(Set<? extends SpatialVertex> vertices) {
+		TObjectDoubleHashMap<SpatialVertex> values = vertexMeanValues(vertices);
+		return new Distribution(values.getValues());
 	}
 }
