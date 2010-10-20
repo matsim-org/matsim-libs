@@ -26,6 +26,7 @@ import org.matsim.core.api.experimental.events.ActivityEvent;
 
 import playground.wrashid.PSF.ParametersPSF;
 import playground.wrashid.PSF.energy.charging.ChargeLog;
+import playground.wrashid.PSF.energy.charging.ChargingTimes;
 import playground.wrashid.PSF.lib.PSFGeneralLib;
 import playground.wrashid.PSF2.ParametersPSF2;
 import playground.wrashid.PSF2.vehicle.energyStateMaintainance.EnergyStateMaintainer;
@@ -92,6 +93,14 @@ public class PlugInHybridElectricVehicle extends Vehicle {
 	private void logChargingTime(double arrivalTime, double chargingDuration, double chargeInJoule, ActivityEndEvent event) {
 		Id personId=ParametersPSF2.vehicles.getKey(this);
 		double endChargingTime=GeneralLib.projectTimeWithin24Hours(arrivalTime+chargingDuration);
+		if (event==null){
+			System.out.println();
+		}
+		
+		if (ParametersPSF2.chargingTimes.get(personId)==null){
+			ParametersPSF2.chargingTimes.put(personId, new ChargingTimes());
+		}
+		
 		ParametersPSF2.chargingTimes.get(personId).addChargeLog(new ChargeLog(event.getLinkId(), arrivalTime, endChargingTime, getAvailbleBatteryCharge(), chargeInJoule, event.getFacilityId()));
 	}
 

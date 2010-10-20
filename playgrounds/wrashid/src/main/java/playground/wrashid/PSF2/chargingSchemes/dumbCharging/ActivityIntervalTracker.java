@@ -20,6 +20,8 @@
 
 package playground.wrashid.PSF2.chargingSchemes.dumbCharging;
 
+import java.util.HashMap;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
@@ -28,6 +30,7 @@ import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
 import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
 
 import playground.wrashid.PSF.ParametersPSF;
+import playground.wrashid.PSF.energy.charging.ChargingTimes;
 import playground.wrashid.PSF2.ParametersPSF2;
 import playground.wrashid.PSF2.vehicle.vehicleFleet.Vehicle;
 import playground.wrashid.lib.GeneralLib;
@@ -42,6 +45,8 @@ public class ActivityIntervalTracker implements ActivityStartEventHandler, Activ
 	@Override
 	public void reset(int iteration) {
 		activityStartTime=new TwoHashMapsConcatenated<Id, Id, Double>();
+		
+		ParametersPSF2.chargingTimes=new HashMap<Id, ChargingTimes>();
 	}
 
 	@Override

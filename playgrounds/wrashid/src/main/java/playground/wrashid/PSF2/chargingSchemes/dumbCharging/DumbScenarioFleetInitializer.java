@@ -54,7 +54,7 @@ public class DumbScenarioFleetInitializer implements FleetInitializer {
 
 	private PlugInHybridElectricVehicle getInitializedPHEV(EnergyStateMaintainer energyStateMaintainer) {
 		PlugInHybridElectricVehicle phev = new PlugInHybridElectricVehicle(energyStateMaintainer, new IdImpl(1));
-		double oneKWH = 1000 / 3600;
+		double oneKWH = 1000.0 / 3600.0;
 		phev.setBatterySizeInJoule(10 * oneKWH);
 		phev.setBatteryMinThresholdInJoule(phev.getBatterySizeInJoule() * 0.035);
 		phev.setCurrentBatteryChargeInJoule(phev.getBatterySizeInJoule());
