@@ -34,37 +34,34 @@ public class BkVis {
 
 //===========================================================================================================		
 //		Für den mvi-modus:
-			String otffile = "../detailedEval/Net/network.xml";
+//			String otffile = "../detailedEval/teststrecke/sim/output/20090707/ITERS/it.0/0.otfvis.mvi";
 //			String otffile = "../matsim/output/singleIteration/ITERS/it.0/0.otfvis.mvi";
 //			String otffile = BkPaths.RUNSSVN + "run749/it.2000/749.2000.Zurich.otfvis.mvi";
 //			String otffile = BkPaths.RUNSSVN + "run950/it.1000/950.1000.events.mvi";
 
 //===========================================================================================================		
-//	Für den interactiven Modus:
-//		Entweder DgOTFVisReplayLastIteration.java ausführen oder manuell unten die config übergeben und vorher dort folgendes ändern:
-//		
-//		1. QSim-Modul einschalten ("qsim" statt "simulation"):
-//			<module name="qsim">
-//			<param name="startTime" value="00:00:00" />
-//			<param name="endTime" value="24:00:00" />
-//	
-//			<param name="flowCapacityFactor" value="0.1" />
-//			<param name="storageCapacityFactor" value="0.30" />
-//	
-//			<param name="stuckTime" value="10" />
-//			<param name="removeStuckVehicles" value="no" />
-//		</module>
-			
-//		2. Snapshot-Period auf 0 setzen!
+/*	Für den interactiven Modus:
+		Entweder DgOTFVisReplayLastIteration.java ausführen oder manuell unten die config übergeben und vorher dort folgendes ändern:
 		
-//	output-config kann benutzt werden. Dafür:
-//		1. obiges tun!
-//		2. Pfade zu output_network und zu den output_plans anpassen!
-//		3. in "simulation" noch "evacuationTime" und "timeout" auskommentieren!
+		1. QSim-Modul einschalten ("qsim" statt "simulation"):
+			<module name="qsim">
+			<param name="startTime" value="00:00:00" />
+			<param name="endTime" value="24:00:00" />
+	
+			<param name="flowCapacityFactor" value="0.1" />
+			<param name="storageCapacityFactor" value="0.30" />
+	
+			<param name="stuckTime" value="10" />
+			<param name="removeStuckVehicles" value="no" />
+		</module>
+		
+		2. Pfade zu output_network und zu den output_plans anpassen!*/
+			
 		
 //		String otffile = "../matsim/examples/tutorial/singleIteration.xml";
 //		String otffile = BkPaths.RUNSSVN + "run749/TestOTFVis_interactive/749.output_config.xml";
 //		String otffile = "../detailedEval/pop/140k-synthetische-personen/config-for-visualisation.xml";
+		String otffile = "../detailedEval/teststrecke/sim/output/20090707/output_config.xml";
 //		String otffile = BkPaths.RUNSSVN + "run950/950.output_config.xml";
 
 		

@@ -89,8 +89,8 @@ public class TrialDemandFromCountsMunich {
 				Plan plan = population.getFactory().createPlan();
 				person.addPlan(plan);
 				
-				String actTypeHome = "home";
-				String actTypeWork = "work";
+				String actTypeHome = "h";
+				String actTypeWork = "h";
 				Id linkIdHome = sc.createId("576273431");
 				Id linkIdWork = sc.createId("52799758");
 				
@@ -130,7 +130,7 @@ public class TrialDemandFromCountsMunich {
 			else{
 				Double vehicelesTotal = vehiclesLane1 + vehiclesLane2;
 				aggregatedEndTime2NoOfVehicles.put(endTime, vehicelesTotal);
-				System.out.println("End of time interval: " + endTime + "\t" + "Sum of cars: " + vehicelesTotal);
+				System.out.println(/*"End of time interval: " +*/ endTime + "\t" + /*"Sum of cars: " +*/ vehicelesTotal);
 			}
 		}
 		return aggregatedEndTime2NoOfVehicles;
@@ -146,6 +146,8 @@ public class TrialDemandFromCountsMunich {
 		TabularFileParserConfig tabFileParserConfig = new TabularFileParserConfig();
 		tabFileParserConfig.setFileName(lane);
 		tabFileParserConfig.setDelimiterTags(new String[] {";"});
+		tabFileParserConfig.setCommentTags(new String[] {"#"});
+		
 		try {
 			new TabularFileParser().parse(tabFileParserConfig, new CheckingTabularFileHandler() {
 
@@ -153,13 +155,14 @@ public class TrialDemandFromCountsMunich {
 				private static final int NUMBER = 20;
 
 				public void startRow(String[] row) {
+					first = false;
+					numColumns = row.length;
 					check(row);
-					if(!row[0].startsWith("#")) {
+//					if(!row[0].startsWith("#")) {
 						addEndTimeNoOfVehicles(row);
-					} else {
-						//first = true;
+//					} else {
 						// This is the header. Nothing to do.
-					}
+//					}
 				}
 
 				private void addEndTimeNoOfVehicles(String[] row) {
