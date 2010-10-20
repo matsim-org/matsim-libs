@@ -22,7 +22,6 @@ package playground.droeder.osm;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -48,7 +47,6 @@ import playground.andreas.osmBB.osm2counts.Osm2Counts;
  * @author droeder
  *doesn't work
  */
-@Deprecated
 public class ResizeLinksByCount2 extends AbstractResizeLinksByCount{
 	
 	private static final Logger log = Logger.getLogger(ResizeLinksByCount2.class);
@@ -173,9 +171,9 @@ public class ResizeLinksByCount2 extends AbstractResizeLinksByCount{
 			
 			if(e.getValue().size() == 1){
 				this.processOneCountOnOrigLink(sortLinks(e.getKey(), e.getValue().get(0)), e.getValue().get(0));
-//			}else if(e.getValue().size() > 1){
-				//to sort the links it is unimportant how many counts are one the originLink
-//				this.processMultipleCountsOnOrigLink(sortLinks(e.getKey(), e.getValue().get(0)), (ArrayList<Id>) e.getValue());
+			}else if(e.getValue().size() > 1){
+//				to sort the links it is unimportant how many counts are one the originLink
+				this.processMultipleCountsOnOrigLink(sortLinks(e.getKey(), e.getValue().get(0)), (ArrayList<Id>) e.getValue());
 			}else{
 				log.error("no count registered for origId " + e.getKey());
 			}
@@ -192,24 +190,20 @@ public class ResizeLinksByCount2 extends AbstractResizeLinksByCount{
 		
 		//walk backwards
 		while(origId.equals(cursorOrigId) ){
+			if(sortedLinks.contains(cursor.getId())) break;
+			
 			sortedLinks.add(0, cursor.getId());
 			
-			for(Link link : cursor.getFromNode().getInLinks().values()){
-				if(((LinkImpl) link).getOrigId().equals(origId) ){
-					cursor = (LinkImpl) link;
-					cursorOrigId = cursor.getOrigId();
-					break;
-				}else{
-					cursor = null;
-					cursorOrigId = null;
+			for(Link l : cursor.getFromNode().getInLinks().values()){
+				if(((LinkImpl) l).getOrigId().equals(origId) &&
+						(!(cursor.getToNode().getId().equals(l.getFromNode().getId())))){
 					
+					cursor = (LinkImpl) l;
+					cursorOrigId = cursor.getOrigId();
+					
+					break;
 				}
-			}
-			if(sortedLinks.size()%20 == 0){
-				for(Id id : sortedLinks){
-					System.out.print(id + " ");
-				}
-				System.out.println();
+
 			}
 		}
 		
@@ -219,16 +213,20 @@ public class ResizeLinksByCount2 extends AbstractResizeLinksByCount{
 		//walk forward
 		while(origId.equals(cursorOrigId)){
 			
-			for(Link link : cursor.getToNode().getOutLinks().values()){
-				if(((LinkImpl) link).getOrigId().equals(origId) ){
-					cursor = (LinkImpl) link;
+			for(Link l : cursor.getToNode().getOutLinks().values()){
+				if ( (!l.getToNode().getId().equals(cursor.getFromNode().getId())) && 
+						((LinkImpl) l).getOrigId().equals(origId)){
+					
+					cursor = (LinkImpl) l;
 					cursorOrigId = cursor.getOrigId();
-					sortedLinks.add(sortedLinks.size(), cursor.getId());
 					break;
-				}else{
-					cursor = null;
-					cursorOrigId = null;
 				}
+			}
+			
+			if(sortedLinks.contains(cursor.getId())){
+				break;
+			}else{
+				sortedLinks.add(sortedLinks.size(), cursor.getId());
 			}
 		}
 		
@@ -257,7 +255,7 @@ public class ResizeLinksByCount2 extends AbstractResizeLinksByCount{
 				previousCount = id;
 			}else if(counts.contains(id) && (temp == (counts.size() - 1))){
 				temp++;
-				this.constantChanges(sortedLinks.subList(sortedLinks.indexOf(id), sortedLinks.size() + 1), id);
+				this.constantChanges(sortedLinks.subList(sortedLinks.indexOf(id), sortedLinks.size() ), id);
 			}
 		}
 		
