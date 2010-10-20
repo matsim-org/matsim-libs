@@ -43,13 +43,33 @@ public class GraphAnalyzer {
 	 * @param graph
 	 *            a graph.
 	 * @param task
-	 *            a analyzer task.
+	 *            an analyzer task.
 	 * @return the results of the analyzer.
 	 */
 	public static Map<String, Double> analyze(Graph graph, AnalyzerTask task) {
 		Map<String, Double> stats = new LinkedHashMap<String, Double>();
 		task.analyze(graph, stats);
 		return stats;
+	}
+
+	/**
+	 * Applies the analyzer task on a graph and writes the results into
+	 * <tt>output/summary.txt</tt>.
+	 * 
+	 * @see {@link AnalyzerTask}
+	 * @param graph
+	 *            a graph.
+	 * @param task
+	 *            an analyzer task.
+	 * @param output
+	 *            the output directory.
+	 * @throws IOException
+	 *             if the output directory does not exists.
+	 */
+	public static void analyze(Graph graph, AnalyzerTask task, String output) throws IOException {
+		task.setOutputDirectoy(output);
+		Map<String, Double> stats = analyze(graph, task);
+		writeStats(stats, String.format("%1$s/summary.txt", output));
 	}
 
 	/**

@@ -60,4 +60,14 @@ public class SampledGraphProjection<G extends Graph, V extends Vertex, E extends
 	public Set<? extends SampledVertexDecorator<V>> getVertices() {
 		return (Set<? extends SampledVertexDecorator<V>>) super.getVertices();
 	}
+
+	@Override
+	public SampledEdgeDecorator<E> getEdge(E e) {
+		return (SampledEdgeDecorator<E>) super.getEdge(e);
+	}
+
+	@Override
+	public SampledVertexDecorator<V> getVertex(V v) {
+		return (SampledVertexDecorator<V>) super.getVertex(v);
+	}
 }

@@ -52,6 +52,9 @@ public class SpatialSparseEdge extends SparseEdge implements SpatialEdge {
 		Point p1 = getVertices().getFirst().getPoint();
 		Point p2 = getVertices().getSecond().getPoint();
 
+		if(p1 == null || p2 == null)
+			return Double.NaN;
+		
 		if(p1.getSRID() == p2.getSRID()) {
 			try {
 				return JTS.orthodromicDistance(p1.getCoordinate(), p2.getCoordinate(), CRSUtils.getCRS(p1.getSRID()));

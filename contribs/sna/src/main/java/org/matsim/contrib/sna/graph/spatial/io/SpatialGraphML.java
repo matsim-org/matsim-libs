@@ -60,10 +60,17 @@ public class SpatialGraphML {
 	 * @return a new point.
 	 */
 	public static Point newPoint(Attributes attrs) {
-		double x = Double.parseDouble(attrs.getValue(COORD_X_ATTR));
-		double y = Double.parseDouble(attrs.getValue(COORD_Y_ATTR));
+		String xstr = attrs.getValue(COORD_X_ATTR);
+		String ystr = attrs.getValue(COORD_Y_ATTR);
 		
-		return geometryFactory.createPoint(new Coordinate(x, y));
+		if(xstr != null && ystr != null) {
+			double x = Double.parseDouble(xstr);
+			double y = Double.parseDouble(ystr);
+		
+			return geometryFactory.createPoint(new Coordinate(x, y));
+		} else {
+			return null;
+		}
 	}
 	
 	/**
@@ -86,7 +93,9 @@ public class SpatialGraphML {
 	}
 	
 	public static void addPointData(SpatialVertex v, List<Tuple<String, String>> attrs) {
-		attrs.add(new Tuple<String, String>(SpatialGraphML.COORD_X_ATTR, String.valueOf(v.getPoint().getCoordinate().x)));
-		attrs.add(new Tuple<String, String>(SpatialGraphML.COORD_Y_ATTR, String.valueOf(v.getPoint().getCoordinate().y)));
+		if(v.getPoint() != null) {
+			attrs.add(new Tuple<String, String>(SpatialGraphML.COORD_X_ATTR, String.valueOf(v.getPoint().getX())));
+			attrs.add(new Tuple<String, String>(SpatialGraphML.COORD_Y_ATTR, String.valueOf(v.getPoint().getY())));
+		}
 	}
 }

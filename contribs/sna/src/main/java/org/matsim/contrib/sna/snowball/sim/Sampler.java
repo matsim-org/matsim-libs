@@ -96,6 +96,10 @@ public class Sampler<G extends Graph, V extends Vertex, E extends Edge> {
 		this.listener = listener;
 	}
 
+	public void setBuilder(SampledGraphProjectionBuilder<G, V, E> builder) {
+		this.builder = builder;
+	}
+	
 	/**
 	 * Returns the current snowball iteration.
 	 * 
@@ -184,7 +188,8 @@ public class Sampler<G extends Graph, V extends Vertex, E extends Edge> {
 		/*
 		 * create a sampled graph
 		 */
-		builder = new SampledGraphProjectionBuilder<G, V, E>();
+		if(builder == null)
+			builder = new SampledGraphProjectionBuilder<G, V, E>();
 		sampledGraph = builder.createGraph(graph);
 		/*
 		 * tag the responsive vertices

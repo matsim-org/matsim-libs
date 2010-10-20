@@ -129,12 +129,14 @@ public class SpatialSparseGraph extends SparseGraph implements SpatialGraph {
 			}
 			
 			for (SpatialVertex vertex : getVertices()) {
+				if(vertex.getPoint() != null) {
 				double[] points = new double[] { vertex.getPoint().getCoordinate().x,
 						vertex.getPoint().getCoordinate().y };
 				transform.transform(points, 0, points, 0, 1);
 				vertex.getPoint().getCoordinate().x = points[0];
 				vertex.getPoint().getCoordinate().y = points[1];
 				vertex.getPoint().setSRID(srid);
+			}
 			}
 			
 			crs = newCRS;

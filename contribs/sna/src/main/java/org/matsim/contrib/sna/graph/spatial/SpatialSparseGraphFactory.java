@@ -86,7 +86,8 @@ public class SpatialSparseGraphFactory implements GraphFactory<SpatialSparseGrap
 	 * @return a new spatial vertex.
 	 */
 	public SpatialSparseVertex createVertex(Point point) {
-		point.setSRID(SRID);
+		if(point != null)
+			point.setSRID(SRID);
 		return new SpatialSparseVertex(point);
 	}
 
