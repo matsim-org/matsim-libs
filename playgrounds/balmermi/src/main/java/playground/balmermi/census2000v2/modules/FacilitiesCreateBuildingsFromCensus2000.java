@@ -25,6 +25,7 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
@@ -34,7 +35,6 @@ import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.world.Layer;
-import org.matsim.world.Location;
 
 import playground.balmermi.census2000v2.data.CAtts;
 
@@ -104,7 +104,7 @@ public class FacilitiesCreateBuildingsFromCensus2000 {
 
 				// check for existing municipality
 				Id zone_id = new IdImpl(entries[CAtts.I_ZGDE]);
-				Location zone = this.municipalities.getLocation(zone_id);
+				BasicLocation zone = this.municipalities.getLocation(zone_id);
 				if (zone == null) { Gbl.errorMsg("Line "+line_cnt+": Zone id="+zone_id+" does not exist!"); }
 
 				// check for facility id

@@ -25,13 +25,13 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.world.Layer;
-import org.matsim.world.Location;
 
 import playground.balmermi.census2000.data.Municipalities;
 import playground.balmermi.census2000.data.Municipality;
@@ -74,7 +74,7 @@ public class HouseholdsCreateFromCensus2000 {
 		int hhtpw = Integer.parseInt(entries[CAtts.I_HHTPW]);
 		if (!hh.setHHTPW(hhtpw)) { Gbl.errorMsg("Line "+line_cnt+": Household id="+hh.getId()+" something is wrong!");  }
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// run method
 	//////////////////////////////////////////////////////////////////////
@@ -99,19 +99,19 @@ public class HouseholdsCreateFromCensus2000 {
 
 				// check for existing zone
 				Id zone_id = new IdImpl(entries[CAtts.I_ZGDE]);
-				Location zone = municipalityLayer.getLocation(zone_id);
+				BasicLocation zone = municipalityLayer.getLocation(zone_id);
 				if (zone == null) { throw new RuntimeException("Line "+line_cnt+": Zone id="+zone_id+" does not exist!"); }
-				
+
 				// check for existing facility
 				Id f_id = new IdImpl(entries[CAtts.I_GEBAEUDE_ID]);
 				ActivityFacilityImpl f = (ActivityFacilityImpl) this.facilities.getFacilities().get(f_id);
 				if (f == null) { throw new RuntimeException("Line "+line_cnt+": Facility id="+f_id+" does not exist!"); }
 				if (f.getActivityOptions().get(CAtts.ACT_HOME) == null) { Gbl.errorMsg("Line "+line_cnt+": Facility id="+f_id+" exists but does not have 'home' activity type assigned!"); }
-				
+
 				// check for existing municipality
 				Municipality muni = this.municipalities.getMunicipality(Integer.parseInt(zone_id.toString()));
 				if (muni == null) { throw new RuntimeException("Line "+line_cnt+": Municipality id="+zone_id+" does not exist!"); }
-				
+
 				// household creation
 				Id hh_id = new IdImpl(entries[CAtts.I_HHNR]);
 				Household hh = households.getHousehold(hh_id);
@@ -119,7 +119,7 @@ public class HouseholdsCreateFromCensus2000 {
 					// create new household
 					hh = new Household(hh_id,muni,f);
 					households.addHH(hh);
-					
+
 					// set attributes
 					this.setAttributes(hh,entries,line_cnt);
 
@@ -136,7 +136,7 @@ public class HouseholdsCreateFromCensus2000 {
 					// set attributes
 					this.setAttributes(hh,entries,line_cnt);
 				}
-				
+
 				// progress report
 				if (line_cnt % 100000 == 0) {
 					log.info("    Line " + line_cnt + ": # households = " + households.getHouseholds().size());

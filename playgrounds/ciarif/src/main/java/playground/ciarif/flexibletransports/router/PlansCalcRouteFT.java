@@ -1,8 +1,28 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.ciarif.flexibletransports.router;
 
 import java.util.EnumSet;
 import java.util.List;
 
+import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -17,8 +37,6 @@ import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.world.Layer;
-import org.matsim.world.Location;
-import org.matsim.world.MappedLocation;
 
 import playground.ciarif.flexibletransports.data.MyTransportMode;
 import playground.meisterk.kti.router.KtiPtRoute;
@@ -111,10 +129,10 @@ public class PlansCalcRouteFT extends PlansCalcRoute{
 		SwissHaltestelle toStop = this.plansCalcRouteKtiInfo.getHaltestellen().getClosestLocation(toAct.getCoord());
 
 		Layer municipalities = this.plansCalcRouteKtiInfo.getLocalWorld().getLayer("municipality");
-		final List<MappedLocation> froms = municipalities.getNearestLocations(fromStop.getCoord());
-		final List<MappedLocation> tos = municipalities.getNearestLocations(toStop.getCoord());
-		Location fromMunicipality = froms.get(0);
-		Location toMunicipality = tos.get(0);
+		final List<? extends BasicLocation> froms = municipalities.getNearestLocations(fromStop.getCoord());
+		final List<? extends BasicLocation> tos = municipalities.getNearestLocations(toStop.getCoord());
+		BasicLocation fromMunicipality = froms.get(0);
+		BasicLocation toMunicipality = tos.get(0);
 
 		KtiPtRoute newRoute = new KtiPtRoute(fromAct.getLinkId(), toAct.getLinkId(), plansCalcRouteKtiInfo, fromStop, fromMunicipality, toMunicipality, toStop);
 		leg.setRoute(newRoute);

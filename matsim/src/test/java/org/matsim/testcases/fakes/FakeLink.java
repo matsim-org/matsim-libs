@@ -29,7 +29,6 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.world.Layer;
 
 /**
  * A very simple Mock for {@link Link} to be used in tests.

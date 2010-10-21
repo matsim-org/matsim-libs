@@ -35,10 +35,9 @@ import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.facilities.OpeningTime;
-import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.facilities.OpeningTime.DayType;
+import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.facilities.algorithms.AbstractFacilityAlgorithm;
-import org.matsim.world.MappedLocation;
 
 /**
  * Assign every shop an opening time based on shopsOf2005 survey.
@@ -67,6 +66,7 @@ public class AddOpentimes extends AbstractFacilityAlgorithm {
 		log.info("Reading shops Of 2005 xml file...done.");
 	}
 
+	@Override
 	public void run(final ActivityFacility facility) {
 
 		DayType[] days = new DayType[] { DayType.mon, DayType.tue, DayType.wed, DayType.thu, DayType.fri, DayType.sat, DayType.sun };

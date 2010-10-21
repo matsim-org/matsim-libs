@@ -38,7 +38,6 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.world.Layer;
-import org.matsim.world.Location;
 
 import playground.kai.urbansim.ids.HHId;
 import playground.kai.urbansim.ids.JobIdFactory;

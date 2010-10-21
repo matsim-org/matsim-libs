@@ -20,10 +20,19 @@
 package org.matsim.world;
 
 import java.util.ArrayList;
+import java.util.Map;
 
+import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.BasicLocations;
 
-public interface Layer extends Locations {
+public interface Layer extends BasicLocations {
+
+	@Override
+	public abstract BasicLocation getLocation(final Id location_id);
+
+	public abstract Map<Id, BasicLocation> getLocations();
 
 	/**
 	 * Note: this is method is, I think, <em> not </em> quad-tree based, and therefore is rather slow in
@@ -34,7 +43,7 @@ public interface Layer extends Locations {
 	 * @return the Location with the smallest distance to the given coordinate. If multiple locations have
 	 * the same minimal distance, all of them are returned.
 	 */
-	public ArrayList<MappedLocation> getNearestLocations(final Coord coord);
+	public ArrayList<BasicLocation> getNearestLocations(final Coord coord);
 
 	/**
 	 * Note: this is method is, I think, <em> not </em> quad-tree based, and therefore is rather slow in
@@ -48,6 +57,6 @@ public interface Layer extends Locations {
 	 * the same minimal distance, all of them are returned.
 	 *
 	 */
-	public ArrayList<MappedLocation> getNearestLocations(final Coord coord, final Location excludeLocation);
+	public ArrayList<BasicLocation> getNearestLocations(final Coord coord, final BasicLocation excludeLocation);
 
 }

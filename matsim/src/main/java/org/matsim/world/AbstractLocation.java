@@ -20,6 +20,7 @@
 
 package org.matsim.world;
 
+import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.facilities.ActivityFacilityImpl;
@@ -33,17 +34,13 @@ import org.matsim.core.network.LinkImpl;
  * @see Zone
  * @author Michael Balmer
  */
-public abstract class AbstractLocation implements MappedLocation {
+public abstract class AbstractLocation implements BasicLocation {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
-	// TODO [balmermi] The id should be unchangeable ('final'), but there
-	// are modules which actually want to change ids of locations (see NetworkCleaner).
-	// I'm not that happy the Ids can change (otherwise it would not be an id)!
-	protected Id id;
-	protected final Layer layer;
+	protected final Id id;
 	protected final Coord center;
 
 	//////////////////////////////////////////////////////////////////////
@@ -52,36 +49,15 @@ public abstract class AbstractLocation implements MappedLocation {
 
 	/**
 	 * A unique location for a given layer.
-	 * @param layer The layer the location belongs to.
 	 * @param id The unique id of that location.
 	 * @param center The center of that location. Does not have to be the middle of the location object.
 	 */
-	protected AbstractLocation(final Layer layer, final Id id, final Coord center) {
-		this.layer = layer;
+	protected AbstractLocation(final Id id, final Coord center) {
 		this.id = id;
 		this.center = center;
 		if (this.center == null) {
 			Gbl.errorMsg("Location id=" + id + " instanciate without coordinate!");
 		}
-		if (this.layer == null) {
-			Gbl.errorMsg("Location id=" + id + " instanciate without layer!");
-		}
-	}
-
-	//////////////////////////////////////////////////////////////////////
-	// calc methods
-	//////////////////////////////////////////////////////////////////////
-
-	@Override
-	public abstract double calcDistance(final Coord coord);
-
-
-	//////////////////////////////////////////////////////////////////////
-	// set methods
-	//////////////////////////////////////////////////////////////////////
-
-	public void setCoord(Coord coord) {
-		throw new UnsupportedOperationException( " derived classes need to implement their own setCoord methods if desired " ) ;
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -105,7 +81,6 @@ public abstract class AbstractLocation implements MappedLocation {
 	@Override
 	public String toString() {
 		return "[id=" + this.getId() + "]" +
-		       "[layer=" + this.layer + "]" +
 		       "[center=" + this.center + "]";
 	}
 }

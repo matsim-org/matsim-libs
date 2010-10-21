@@ -53,10 +53,9 @@ public class Zone extends AbstractLocation {
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	@Deprecated // use of current matsim zone object is discouraged; use geotools instead
-	public Zone(final ZoneLayer layer, final Id id, final Coord center,
-	               final Coord min, final Coord max) {
-		super(layer,id,center);
+	@Deprecated // use of current matsim zone object is discouraged
+	public Zone(final Id id, final Coord center, final Coord min, final Coord max) {
+		super(id,center);
 		this.setMin(min);
 		this.setMax(max);
 	}
@@ -89,7 +88,6 @@ public class Zone extends AbstractLocation {
 	 * @see org.matsim.world.AbstractLocation#calcDistance(org.matsim.api.core.v01.Coord)
 	 * @return distance to that zone
 	 */
-	@Override
 	public final double calcDistance(final Coord coord) {
 		double x = coord.getX();
 		double y = coord.getY();

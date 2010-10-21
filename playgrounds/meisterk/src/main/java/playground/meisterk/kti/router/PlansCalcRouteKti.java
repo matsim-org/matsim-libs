@@ -23,6 +23,7 @@ package playground.meisterk.kti.router;
 import java.util.HashSet;
 import java.util.List;
 
+import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -36,8 +37,6 @@ import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.world.Layer;
-import org.matsim.world.Location;
-import org.matsim.world.MappedLocation;
 
 
 /**
@@ -137,10 +136,10 @@ public class PlansCalcRouteKti extends PlansCalcRoute {
 		SwissHaltestelle toStop = this.plansCalcRouteKtiInfo.getHaltestellen().getClosestLocation(toAct.getCoord());
 
 		Layer municipalities = this.plansCalcRouteKtiInfo.getLocalWorld().getLayer("municipality");
-		final List<MappedLocation> froms = municipalities.getNearestLocations(fromStop.getCoord());
-		final List<MappedLocation> tos = municipalities.getNearestLocations(toStop.getCoord());
-		Location fromMunicipality = froms.get(0);
-		Location toMunicipality = tos.get(0);
+		final List<? extends BasicLocation> froms = municipalities.getNearestLocations(fromStop.getCoord());
+		final List<? extends BasicLocation> tos = municipalities.getNearestLocations(toStop.getCoord());
+		BasicLocation fromMunicipality = froms.get(0);
+		BasicLocation toMunicipality = tos.get(0);
 
 		KtiPtRoute newRoute = new KtiPtRoute(fromAct.getLinkId(), toAct.getLinkId(), plansCalcRouteKtiInfo, fromStop, fromMunicipality, toMunicipality, toStop);
 		leg.setRoute(newRoute);

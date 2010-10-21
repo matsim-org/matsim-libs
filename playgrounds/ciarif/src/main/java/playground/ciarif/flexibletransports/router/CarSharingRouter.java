@@ -1,11 +1,30 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.ciarif.flexibletransports.router;
 
+import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.matrices.Entry;
-import org.matsim.world.Location;
 
 import playground.meisterk.kti.router.PlansCalcRouteKtiInfo;
 
@@ -17,8 +36,8 @@ public class CarSharingRouter extends GenericRouteImpl {
 
 	private final PlansCalcRouteKtiInfo plansCalcRouteKtiInfo;
 	private CarSharingStation fromStop = null;
-	private Location fromMunicipality = null;
-	private Location toMunicipality = null;
+	private BasicLocation fromMunicipality = null;
+	private BasicLocation toMunicipality = null;
 	private CarSharingStation toStop = null;
 	private Double inVehicleTime = null;
 
@@ -32,8 +51,8 @@ public class CarSharingRouter extends GenericRouteImpl {
 			Id endLinkId,
 			PlansCalcRouteKtiInfo plansCalcRouteKtiInfo,
 			CarSharingStation fromStop,
-			Location fromMunicipality,
-			Location toMunicipality,
+			BasicLocation fromMunicipality,
+			BasicLocation toMunicipality,
 			CarSharingStation toStop) {
 		this(startLinkId, endLinkId, plansCalcRouteKtiInfo);
 		this.fromStop = fromStop;
@@ -122,11 +141,11 @@ public class CarSharingRouter extends GenericRouteImpl {
 		return fromStop;
 	}
 
-	public Location getFromMunicipality() {
+	public BasicLocation getFromMunicipality() {
 		return fromMunicipality;
 	}
 
-	public Location getToMunicipality() {
+	public BasicLocation getToMunicipality() {
 		return toMunicipality;
 	}
 

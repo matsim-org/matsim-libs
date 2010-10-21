@@ -20,6 +20,7 @@
 
 package playground.meisterk.kti.router;
 
+import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.basic.v01.IdImpl;
@@ -27,7 +28,6 @@ import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.StringUtils;
 import org.matsim.matrices.Entry;
-import org.matsim.world.Location;
 
 public class KtiPtRoute extends GenericRouteImpl {
 
@@ -38,8 +38,8 @@ public class KtiPtRoute extends GenericRouteImpl {
 
 	private final PlansCalcRouteKtiInfo plansCalcRouteKtiInfo;
 	private SwissHaltestelle fromStop = null;
-	private Location fromMunicipality = null;
-	private Location toMunicipality = null;
+	private BasicLocation fromMunicipality = null;
+	private BasicLocation toMunicipality = null;
 	private SwissHaltestelle toStop = null;
 	private Double inVehicleTime = null;
 
@@ -53,8 +53,8 @@ public class KtiPtRoute extends GenericRouteImpl {
 			Id endLinkId,
 			PlansCalcRouteKtiInfo plansCalcRouteKtiInfo,
 			SwissHaltestelle fromStop,
-			Location fromMunicipality,
-			Location toMunicipality,
+			BasicLocation fromMunicipality,
+			BasicLocation toMunicipality,
 			SwissHaltestelle toStop) {
 		this(startLinkId, endLinkId, plansCalcRouteKtiInfo);
 		this.fromStop = fromStop;
@@ -142,11 +142,11 @@ public class KtiPtRoute extends GenericRouteImpl {
 		return fromStop;
 	}
 
-	public Location getFromMunicipality() {
+	public BasicLocation getFromMunicipality() {
 		return fromMunicipality;
 	}
 
-	public Location getToMunicipality() {
+	public BasicLocation getToMunicipality() {
 		return toMunicipality;
 	}
 

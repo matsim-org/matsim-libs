@@ -59,6 +59,7 @@ import java.util.HashMap;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -76,7 +77,6 @@ import org.matsim.knowledges.KnowledgeImpl;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.world.Layer;
-import org.matsim.world.MappedLocation;
 import org.matsim.world.World;
 import org.matsim.world.Zone;
 import org.matsim.world.ZoneLayer;
@@ -248,7 +248,7 @@ public class PrimlocModule extends AbstractPersonAlgorithm {
 
 		// We store the zones in a given way so that
 		// we do not rely on the order in the collection
-		Collection<? extends MappedLocation> listloc = zoneLayer.getLocations().values();
+		Collection<? extends BasicLocation> listloc = zoneLayer.getLocations().values();
 		int internalID=0;
 		core.numZ = listloc.size();
 		zones = new Zone[ core.numZ ];
@@ -297,7 +297,7 @@ public class PrimlocModule extends AbstractPersonAlgorithm {
 		for (Person guy : population.getPersons().values())
 			if( agentHasPrimaryActivityInPlan( guy ) ){
 				ActivityFacilityImpl homeOfGuy = this.knowledges.getKnowledgesByPersonId().get(guy.getId()).getActivities("home").get(0).getFacility();
-				ArrayList<MappedLocation> list = zoneLayer.getNearestLocations(homeOfGuy.getCoord(), null);
+				ArrayList<? extends BasicLocation> list = zoneLayer.getNearestLocations(homeOfGuy.getCoord(), null);
 				Zone homezone = (Zone) list.get(0);
 				if( homezone == null )
 					log.warn("Homeless employed person (poor guy)" );
@@ -325,7 +325,7 @@ public class PrimlocModule extends AbstractPersonAlgorithm {
 		for( ActivityFacility facility : facilities.getFacilities().values() ){
 			ActivityOptionImpl act = (ActivityOptionImpl) facility.getActivityOptions().get(primaryActivityName);
 			if( act != null ){
-				ArrayList<MappedLocation> list = zoneLayer.getNearestLocations( facility.getCoord(), null);
+				ArrayList<? extends BasicLocation> list = zoneLayer.getNearestLocations( facility.getCoord(), null);
 				Zone zone = (Zone) list.get(0);
 				core.J[ zoneids.get(zone) ] += act.getCapacity();
 				primActFacilitiesPerZone.get( zone ).add( (ActivityFacilityImpl) facility );

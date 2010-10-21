@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -37,7 +38,6 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.world.MappedLocation;
 import org.matsim.world.Zone;
 import org.matsim.world.ZoneLayer;
 
@@ -111,7 +111,7 @@ public class PersonZoneSummary extends AbstractPersonAlgorithm implements PlanAl
 	private final void initHash() {
 		int z_cnt = this.layer.getLocations().size();
 		int att_cnt = this.heads.length-1; // Note: muni_id is not part of the array
-		Iterator<? extends MappedLocation> z_it = this.layer.getLocations().values().iterator();
+		Iterator<? extends BasicLocation> z_it = this.layer.getLocations().values().iterator();
 		while (z_it.hasNext()) {
 			Zone z = (Zone)z_it.next();
 			int[] atts = new int[att_cnt];

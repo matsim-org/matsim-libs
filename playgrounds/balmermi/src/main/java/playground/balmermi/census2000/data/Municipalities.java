@@ -27,11 +27,11 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Random;
 
+import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.world.Layer;
-import org.matsim.world.Location;
 import org.matsim.world.Zone;
 
 public class Municipalities {
@@ -91,7 +91,7 @@ public class Municipalities {
 				// 0        1       2       3           4           5           6       7
 
 				int m_id = Integer.parseInt(entries[2].trim());
-				Location l = municipalityLayer.getLocation(new IdImpl(m_id));
+				BasicLocation l = municipalityLayer.getLocation(new IdImpl(m_id));
 				if (l == null) {
 					System.out.println("    Municipality id=" + m_id + " ignored. (Does not exist in the world layer.)");
 				} else {

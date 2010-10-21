@@ -22,6 +22,7 @@ package org.matsim.world;
 
 import java.util.Map;
 
+import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.gbl.Gbl;
@@ -44,8 +45,8 @@ public class ZoneLayer extends LayerImpl {
 		if ((center_x != null) && (center_y != null)) { center = new CoordImpl(center_x, center_y); }
 		if ((min_x != null) && (min_y != null)) { min = new CoordImpl(min_x, min_y); }
 		if ((max_x != null) && (max_y != null)) { max = new CoordImpl(max_x, max_y); }
-		Zone z = new Zone(this, id, center, min, max);
-		Map<Id,MappedLocation> locations = this.getLocations() ;
+		Zone z = new Zone(id, center, min, max);
+		Map<Id,BasicLocation> locations = this.getLocations();
 		locations.put(i,z);
 		return z;
 	}

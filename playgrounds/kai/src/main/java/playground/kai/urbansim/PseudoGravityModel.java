@@ -36,7 +36,6 @@ import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.world.Location;
 
 import playground.kai.urbansim.ids.LocationId;
 
