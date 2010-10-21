@@ -24,7 +24,9 @@ import java.util.TreeMap;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.events.TransitDriverStartsEvent;
 import org.matsim.core.events.VehicleDepartsAtFacilityEvent;
+import org.matsim.core.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.core.events.handler.VehicleDepartsAtFacilityEventHandler;
 
 /**
@@ -34,12 +36,13 @@ import org.matsim.core.events.handler.VehicleDepartsAtFacilityEventHandler;
  * @author aneumann
  *
  */
-public class VehDelayHandler implements VehicleDepartsAtFacilityEventHandler{
+public class VehDelayHandler implements VehicleDepartsAtFacilityEventHandler, TransitDriverStartsEventHandler{
 	
 	private final Logger log = Logger.getLogger(VehDelayHandler.class);
 	private final Level logLevel = Level.DEBUG;
 	
-	private TreeMap<Id, VehDelayAtStopContainer> stopId2DelayAtStopMap = new TreeMap<Id, VehDelayAtStopContainer>();
+	private TreeMap<Id, TransitDriverStartsEvent> veh2LastStartsEvent = new TreeMap<Id, TransitDriverStartsEvent>();
+	private TreeMap<Id, TreeMap<Id, VehDelayAtStopContainer>> stopId2Route2DelayAtStopMap = new TreeMap<Id, TreeMap<Id, VehDelayAtStopContainer>>();
 	
 	public VehDelayHandler(){
 		this.log.setLevel(this.logLevel);
@@ -48,26 +51,48 @@ public class VehDelayHandler implements VehicleDepartsAtFacilityEventHandler{
 	@Override
 	public void handleEvent(VehicleDepartsAtFacilityEvent event) {
 		
-		if(this.stopId2DelayAtStopMap.get(event.getFacilityId()) == null){
-			this.log.debug("Adding new VehDelayAtStopContainer for stop " + event.getFacilityId() + " to map.");
-			this.stopId2DelayAtStopMap.put(event.getFacilityId(), new VehDelayAtStopContainer(event.getFacilityId(), null, null));
-			this.log.debug("Had to set lineId and routeId to null, due to missing information");
+		if(this.stopId2Route2DelayAtStopMap.get(event.getFacilityId()) == null){
+			this.log.debug("Adding new TreeMap for stop " + event.getFacilityId() + " to map.");
+			this.stopId2Route2DelayAtStopMap.put(event.getFacilityId(), new TreeMap<Id, VehDelayAtStopContainer>());
 		}
 		
-		this.stopId2DelayAtStopMap.get(event.getFacilityId()).addDepartureEvent(event);		
+		TreeMap<Id, VehDelayAtStopContainer> route2DelayMap = this.stopId2Route2DelayAtStopMap.get(event.getFacilityId());
+		TransitDriverStartsEvent correspondingRouteServed = this.veh2LastStartsEvent.get(event.getVehicleId());
+		
+		if(correspondingRouteServed == null){
+			this.log.warn("This should never happen");
+		} else {
+		
+		if(route2DelayMap.get(correspondingRouteServed.getTransitRouteId()) == null){		
+			this.log.debug("Adding new VehDelayAtStopContainer for stop " + event.getFacilityId() + " and route " + correspondingRouteServed.getTransitRouteId() + " to map.");
+			route2DelayMap.put(correspondingRouteServed.getTransitRouteId(), new VehDelayAtStopContainer(event.getFacilityId(), correspondingRouteServed.getTransitLineId(), correspondingRouteServed.getTransitRouteId()));
+		}
+		
+		route2DelayMap.get(correspondingRouteServed.getTransitRouteId()).addDepartureEvent(event);		
+		}
+	}
+	
+	@Override
+	public void handleEvent(TransitDriverStartsEvent event) {
+		if(this.veh2LastStartsEvent.get(event.getVehicleId()) != null){
+			this.log.debug(event.getVehicleId() + " served route " + this.veh2LastStartsEvent.get(event.getVehicleId()).getTransitRouteId());
+		} else {
+			this.log.debug(event.getVehicleId() + " served no route");
+		}
+		this.veh2LastStartsEvent.put(event.getVehicleId(), event);
+		this.log.debug(event.getVehicleId() + " now serves route " + this.veh2LastStartsEvent.get(event.getVehicleId()).getTransitRouteId());		
 	}
 	
 	/**
 	 * Returns the data collected
-	 * @return A map containing a <code>VehDelayAtStopContainer</code> for each stop id.
+	 * @return A map containing a <code>VehDelayAtStopContainer</code> for each stop id and route id.
 	 */
-	public TreeMap<Id, VehDelayAtStopContainer> getStopId2DelayAtStopMap(){
-		return this.stopId2DelayAtStopMap;
+	public TreeMap<Id, TreeMap<Id, VehDelayAtStopContainer>> getStopId2Route2DelayAtStopMap(){
+		return this.stopId2Route2DelayAtStopMap;
 	}
 
 	@Override
 	public void reset(int iteration) {
 		this.log.debug("reset method in iteration " + iteration + " not implemented, yet");		
 	}
-
 }

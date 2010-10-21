@@ -17,59 +17,44 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.andreas.bvgAna.vehDelayHandler;
-
-import java.util.ArrayList;
+package playground.andreas.bvgAna.plan2DepartureTime;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.events.VehicleDepartsAtFacilityEvent;
 
 /**
- * Collects planned and realized departures at one stop.
- * List of planned and realized departures is not guaranteed to be synchronized.
+ * Stores a couple of departure related information, when leaving a pt interaction activity
  * 
  * @author aneumann
+ *
  */
-public class VehDelayAtStopContainer {
+public class AgentPlannedDepartureContainer {
 	
 	private final Id stopId;
+	private final double plannedDepartureTime;
 	private final Id lineId;
 	private final Id routeId;
 	
-	// Could be double[] ???
-	private ArrayList<Double> plannedDepartures = new ArrayList<Double>();
-	private ArrayList<Double> realizedDepartures = new ArrayList<Double>();
-	
-	public VehDelayAtStopContainer(Id stopId, Id lineId, Id routeId){
+	public AgentPlannedDepartureContainer(Id stopId, double plannedDepartureTime, Id lineId, Id routeId){
 		this.stopId = stopId;
+		this.plannedDepartureTime = plannedDepartureTime;
 		this.lineId = lineId;
 		this.routeId = routeId;
 	}
-	
-	public void addDepartureEvent(VehicleDepartsAtFacilityEvent departureEvent){
-		this.plannedDepartures.add(new Double(departureEvent.getTime() - departureEvent.getDelay()));
-		this.realizedDepartures.add(new Double(departureEvent.getTime()));
-	}
-	
-	protected ArrayList<Double> getPlannedDepartures() {
-		return this.plannedDepartures;
+
+	public Id getStopId() {
+		return this.stopId;
 	}
 
-	protected ArrayList<Double> getRealizedDepartures() {
-		return this.realizedDepartures;
+	public double getPlannedDepartureTime() {
+		return this.plannedDepartureTime;
 	}
-	
-	protected Id getLineId() {
+
+	public Id getLineId() {
 		return this.lineId;
 	}
 
-	protected Id getRouteId() {
+	public Id getRouteId() {
 		return this.routeId;
-	}
-
-	@Override
-	public String toString() {
-		return "Stop: " + this.stopId + ", Line: " + this.lineId + ", Route: " + this.routeId + ", # planned Departures: " + this.plannedDepartures.size() + ", # realized Departures: " + this.realizedDepartures.size();
 	}
 
 }

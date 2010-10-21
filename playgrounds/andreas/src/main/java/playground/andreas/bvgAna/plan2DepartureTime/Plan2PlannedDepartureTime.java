@@ -54,17 +54,17 @@ public class Plan2PlannedDepartureTime {
 	 * @param agentIds The Set of agents to be analyzed
 	 * @return A map sorted first by agentId, second by StopId-Time tuples
 	 */
-	public static TreeMap<Id,ArrayList<Tuple<Id,Double>>> getPlannedDepartureTimeForPlan(Population pop, Set<Id> agentIds){
+	public static TreeMap<Id,ArrayList<Tuple<Id,AgentPlannedDepartureContainer>>> getPlannedDepartureTimeForPlan(Population pop, Set<Id> agentIds){
 		
 		Plan2PlannedDepartureTime.log.setLevel(Plan2PlannedDepartureTime.logLevel);
-		TreeMap<Id, ArrayList<Tuple<Id, Double>>> agentId2PlannedDepartureMap = new TreeMap<Id, ArrayList<Tuple<Id,Double>>>();
+		TreeMap<Id, ArrayList<Tuple<Id, AgentPlannedDepartureContainer>>> agentId2PlannedDepartureMap = new TreeMap<Id, ArrayList<Tuple<Id, AgentPlannedDepartureContainer>>>();
 		
 		for (Person person : pop.getPersons().values()) {
 			if(agentIds.contains(person.getId())){
 				
 				// person in set, so do something
 				
-				ArrayList<Tuple<Id, Double>> plannedDepartureList = new ArrayList<Tuple<Id,Double>>();
+				ArrayList<Tuple<Id, AgentPlannedDepartureContainer>> plannedDepartureList = new ArrayList<Tuple<Id, AgentPlannedDepartureContainer>>();
 				agentId2PlannedDepartureMap.put(person.getId(), plannedDepartureList);
 				
 				Plan plan = person.getSelectedPlan();
@@ -95,9 +95,9 @@ public class Plan2PlannedDepartureTime {
 							// it's the start of a new pt leg, report it
 							if (leg.getRoute() instanceof ExperimentalTransitRoute){
 								ExperimentalTransitRoute route = (ExperimentalTransitRoute) leg.getRoute();
-								plannedDepartureList.add(new Tuple<Id, Double>(route.getAccessStopId(), new Double(runningTime)));
+								plannedDepartureList.add(new Tuple<Id, AgentPlannedDepartureContainer>(route.getAccessStopId(), new AgentPlannedDepartureContainer(route.getAccessStopId(), runningTime, route.getLineId(), route.getRouteId())));
 							} else {
-								log.warn("unknown route descriton found - only know to handle GenericRouteImpl");
+								log.warn("unknown route descriton found - only know to handle ExperimentalTransitRoute");
 							}
 						}
 						

@@ -30,32 +30,38 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.events.PersonEntersVehicleEvent;
+import org.matsim.core.events.TransitDriverStartsEvent;
 import org.matsim.core.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
+import org.matsim.core.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.core.events.handler.VehicleDepartsAtFacilityEventHandler;
 import org.matsim.core.utils.collections.Tuple;
 
 import playground.andreas.bvgAna.agentDelayAnalyzer.AgentDelayHandler;
+import playground.andreas.bvgAna.plan2DepartureTime.AgentPlannedDepartureContainer;
 import playground.andreas.bvgAna.plan2DepartureTime.Plan2PlannedDepartureTime;
 import playground.andreas.bvgAna.vehDelayHandler.VehDelayAnalyzer;
 import playground.andreas.bvgAna.vehDelayHandler.VehDelayHandler;
 
 /**
- * Calculates the difference between realized time and planned time spent waiting at a stop for a given set of agent ids.
- * Returns negative values for agents being faster than planned.
- * Returns positive values for agents being slower than planned.
+ * Calculates the difference between realized time and planned time spent waiting at a stop for a given set of agent ids.<br>
+ * Returns negative values for agents being faster than planned.<br>
+ * Returns positive values for agents being slower than planned.<br>
+ * <br>
+ * Realized time: PersonEntersVehicleEvent minus AgentDepartureEvent "pt interaction"<br>
+ * Planned time: vehicle departs as scheduled minus "pt interaction" activity ends
  * 
  * @author aneumann
  *
  */
-public class AgentDelayAtStopComparator implements VehicleDepartsAtFacilityEventHandler, AgentDepartureEventHandler, PersonEntersVehicleEventHandler{
+public class AgentDelayAtStopComparator implements TransitDriverStartsEventHandler, VehicleDepartsAtFacilityEventHandler, AgentDepartureEventHandler, PersonEntersVehicleEventHandler {
 
 	private final Logger log = Logger.getLogger(AgentDelayAtStopComparator.class);
 	private final Level logLevel = Level.DEBUG;
 	
 	private Population pop;
 	private Set<Id> agentIds;	
-	private TreeMap<Id, ArrayList<Tuple<Id, Double>>> plannedDepartureTimeMap;
+	private TreeMap<Id, ArrayList<Tuple<Id, AgentPlannedDepartureContainer>>> plannedDepartureTimeMap;
 	private VehDelayHandler vehDelayHandler;
 	private VehDelayAnalyzer vehDelayAnalyzer;
 	private AgentDelayHandler agentDelayHandler;	
@@ -84,15 +90,16 @@ public class AgentDelayAtStopComparator implements VehicleDepartsAtFacilityEvent
 			}
 
 			ArrayList<Tuple<Id,Double>> agentsDiffs = this.agentIds2StopDifferenceMap.get(agentId);				
-			ArrayList<Tuple<Id, Double>> plannedDepartures = this.plannedDepartureTimeMap.get(agentId);
+			ArrayList<Tuple<Id, AgentPlannedDepartureContainer>> plannedDepartures = this.plannedDepartureTimeMap.get(agentId);
 
 			for (int i = 0; i < plannedDepartures.size(); i++) {
 
-				Id stopId = plannedDepartures.get(i).getFirst();				
-				double plannedDepartureTime = plannedDepartures.get(i).getSecond().doubleValue();
+				Id stopId = plannedDepartures.get(i).getFirst();
+				AgentPlannedDepartureContainer depContainer = plannedDepartures.get(i).getSecond();
+				double plannedDepartureTime = depContainer.getPlannedDepartureTime();
 
 				// get next possible departure as scheduled
-				double nextPlannedVehDeparture = this.vehDelayAnalyzer.getNextPlannedDepartureTime(stopId, plannedDepartureTime);
+				double nextPlannedVehDeparture = this.vehDelayAnalyzer.getNextPlannedDepartureTime(stopId, plannedDepartureTime, depContainer.getLineId(), depContainer.getRouteId());
 
 				// calculate resulting time spent waiting
 				double plannedTimeWaiting = nextPlannedVehDeparture - plannedDepartureTime;
@@ -131,6 +138,11 @@ public class AgentDelayAtStopComparator implements VehicleDepartsAtFacilityEvent
 	public void handleEvent(VehicleDepartsAtFacilityEvent event) {
 		this.vehDelayHandler.handleEvent(event);		
 	}
+	
+	@Override
+	public void handleEvent(TransitDriverStartsEvent event) {
+		this.vehDelayHandler.handleEvent(event);		
+	}
 
 	@Override
 	public void reset(int iteration) {
@@ -145,6 +157,5 @@ public class AgentDelayAtStopComparator implements VehicleDepartsAtFacilityEvent
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
 		this.agentDelayHandler.handleEvent(event);		
-	}
-	
+	}	
 }
