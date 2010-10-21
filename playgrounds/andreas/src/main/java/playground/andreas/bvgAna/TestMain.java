@@ -28,6 +28,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderXMLv1;
@@ -35,6 +36,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReaderMatsimV4;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.xml.sax.SAXException;
 
 import playground.andreas.bvgAna.agentDelayAtStopComparator.AgentDelayAtStopComparator;
@@ -60,6 +62,8 @@ public class TestMain {
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(eventsManager);		
 		
 		ScenarioImpl sc = new ScenarioImpl();
+		sc.getNetwork().getFactory().setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
+
 		new MatsimNetworkReader(sc).readFile(netFile);		
 		final PopulationImpl plans = (PopulationImpl) sc.getPopulation();		
 		PopulationReaderMatsimV4 popReader = new PopulationReaderMatsimV4(sc);

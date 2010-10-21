@@ -32,11 +32,10 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.pt.routes.ExperimentalTransitRoute;
 
 /**
  * 
@@ -57,12 +56,7 @@ public class Plan2PlannedDepartureTime {
 	 */
 	public static TreeMap<Id,ArrayList<Tuple<Id,Double>>> getPlannedDepartureTimeForPlan(Population pop, Set<Id> agentIds){
 		
-		// copied from ExperimentalTransitRoute
-		final String SEPARATOR = "===";
-		final String IDENTIFIER_1 = "PT1" + SEPARATOR;
-		
 		Plan2PlannedDepartureTime.log.setLevel(Plan2PlannedDepartureTime.logLevel);
-		
 		TreeMap<Id, ArrayList<Tuple<Id, Double>>> agentId2PlannedDepartureMap = new TreeMap<Id, ArrayList<Tuple<Id,Double>>>();
 		
 		for (Person person : pop.getPersons().values()) {
@@ -99,23 +93,12 @@ public class Plan2PlannedDepartureTime {
 						
 						if(leg.getMode() == TransportMode.pt){
 							// it's the start of a new pt leg, report it
-							if (leg.getRoute() instanceof GenericRouteImpl){
-
-								String routeDescription = ((GenericRouteImpl) leg.getRoute()).getRouteDescription();
-								if (routeDescription.startsWith(IDENTIFIER_1)) {
-									String[] parts = routeDescription.split(SEPARATOR, 6);//StringUtils.explode(routeDescription, '\t', 6);
-									Id accessStopId = new IdImpl(parts[1]);
-//									Id lineId = new IdImpl(parts[2]);
-//									Id routeId = new IdImpl(parts[3]);
-//									Id egressStopId = new IdImpl(parts[4]);
-									
-									plannedDepartureList.add(new Tuple<Id, Double>(accessStopId, new Double(runningTime)));
-								}
-								
+							if (leg.getRoute() instanceof ExperimentalTransitRoute){
+								ExperimentalTransitRoute route = (ExperimentalTransitRoute) leg.getRoute();
+								plannedDepartureList.add(new Tuple<Id, Double>(route.getAccessStopId(), new Double(runningTime)));
 							} else {
 								log.warn("unknown route descriton found - only know to handle GenericRouteImpl");
 							}
-							
 						}
 						
 						// add the legs travel time
