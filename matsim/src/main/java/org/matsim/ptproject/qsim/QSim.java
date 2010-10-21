@@ -64,6 +64,7 @@ import org.matsim.ptproject.qsim.interfaces.AgentCounterI;
 import org.matsim.ptproject.qsim.interfaces.DepartureHandler;
 import org.matsim.ptproject.qsim.interfaces.QLink;
 import org.matsim.ptproject.qsim.interfaces.QNetworkI;
+import org.matsim.ptproject.qsim.interfaces.QSimEngine;
 import org.matsim.ptproject.qsim.interfaces.QSimEngineFactory;
 import org.matsim.ptproject.qsim.interfaces.QSimI;
 import org.matsim.ptproject.qsim.interfaces.QVehicle;
@@ -76,7 +77,6 @@ import org.matsim.ptproject.qsim.netsimengine.DefaultQNetworkFactory;
 import org.matsim.ptproject.qsim.netsimengine.DefaultQSimEngineFactory;
 import org.matsim.ptproject.qsim.netsimengine.QLanesNetworkFactory;
 import org.matsim.ptproject.qsim.netsimengine.QNetwork;
-import org.matsim.ptproject.qsim.netsimengine.QSimEngine;
 import org.matsim.ptproject.qsim.netsimengine.QSimEngineImpl;
 import org.matsim.ptproject.qsim.signalengine.QSimSignalEngine;
 import org.matsim.signalsystems.mobsim.SignalEngine;
@@ -98,7 +98,7 @@ import org.matsim.vis.snapshots.writers.VisNetwork;
  * @author dgrether
  * @author knagel
  */
-public class QSim implements IOSimulation, VisMobsim, AcceptsVisMobsimFeatures, QSimI {
+public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, QSimI {
 
 	final private static Logger log = Logger.getLogger(QSim.class);
 
@@ -114,7 +114,7 @@ public class QSim implements IOSimulation, VisMobsim, AcceptsVisMobsimFeatures, 
 //	private QNetwork network;
 	private EventsManager events = null;
 
-	private QSimEngineImpl netEngine = null;
+	private QSimEngine netEngine = null;
 	private NetworkChangeEventsEngine changeEventsEngine = null;
 	private MultiModalSimEngine multiModalEngine = null;
 
@@ -185,9 +185,9 @@ public class QSim implements IOSimulation, VisMobsim, AcceptsVisMobsimFeatures, 
 		double time = this.simTimer.getTimeOfDay();
 		while (doContinue) {
 			this.listenerManager.fireQueueSimulationBeforeSimStepEvent(time);
-			beforeSimStep(time);
+			beforeSimStep();
 			doContinue = doSimStep(time);
-			afterSimStep(time);
+			afterSimStep();
 			this.listenerManager.fireQueueSimulationAfterSimStepEvent(time);
 			if (doContinue) {
 				time = this.simTimer.incrementTime();
@@ -337,8 +337,8 @@ public class QSim implements IOSimulation, VisMobsim, AcceptsVisMobsimFeatures, 
 		this.events = null; // delete events object to free events handlers, if they are nowhere else referenced
 	}
 
-	protected void beforeSimStep(final double time) {
-		// left empty for inheritance
+	protected void beforeSimStep() {
+		// left empty for inheritance; for experimentation only (for production use MobsimListeners, or become a regular SimEngine).  kai, oct'10
 	}
 
 
@@ -358,7 +358,7 @@ public class QSim implements IOSimulation, VisMobsim, AcceptsVisMobsimFeatures, 
 			this.signalEngine.doSimStep(time);
 		}
 		// teleportation "engine":
-		this.handleTeleportationArrivals(time);
+		this.handleTeleportationArrivals();
 
 		// "facilities" "engine":
 		this.handleActivityEnds(time);
@@ -385,11 +385,12 @@ public class QSim implements IOSimulation, VisMobsim, AcceptsVisMobsimFeatures, 
 		return (this.agentCounter.isLiving() && (this.stopTime > time));
 	}
 
-	protected void afterSimStep(final double time) {
-		// left empty for inheritance
+	protected void afterSimStep() {
+		// left empty for inheritance; for experimentation only (for production use MobsimListeners, or become a regular SimEngine).  kai, oct'10
 	}
 
-	protected void handleTeleportationArrivals(final double now) {
+	protected final void handleTeleportationArrivals() {
+		double now = this.getSimTimer().getTimeOfDay() ;
 		while (this.teleportationList.peek() != null ) {
 			Tuple<Double, PersonAgent> entry = this.teleportationList.peek();
 			if (entry.getFirst().doubleValue() <= now) {
@@ -403,20 +404,6 @@ public class QSim implements IOSimulation, VisMobsim, AcceptsVisMobsimFeatures, 
 			}
 		}
 	}
-
-//	/**
-//	 * Should be a PersonAgentI as argument, but is needed because the old events form is still used also for tests
-//	 * @param now
-//	 * @param agent
-//	 */
-//	@Override
-//	public void handleAgentArrival(final double now, final PersonDriverAgent agent) {
-////		for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) {
-////			queueSimulationFeature.beforeHandleAgentArrival(agent);
-////		}
-//		getEventsManager().processEvent(getEventsManager().getFactory().createAgentArrivalEvent(now, agent.getPerson().getId(),
-//				agent.getDestinationLinkId(), agent.getCurrentLeg().getMode()));
-//	}
 
 
 	/**
@@ -575,7 +562,7 @@ public class QSim implements IOSimulation, VisMobsim, AcceptsVisMobsimFeatures, 
 		this.simTimer = new QSimTimer(sc.getConfig().getQSimConfigGroup().getTimeStepSize());
 
 		// create the NetworkEngine ...
-		this.netEngine = (QSimEngineImpl) simEngineFac.createQSimEngine(this, MatsimRandom.getRandom());
+		this.netEngine = simEngineFac.createQSimEngine(this, MatsimRandom.getRandom());
 
 		// create the QNetwork ...
 		QNetworkI network = null ;

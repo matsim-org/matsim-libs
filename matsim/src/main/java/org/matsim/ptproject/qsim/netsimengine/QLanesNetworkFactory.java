@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.lanes.LaneDefinitions;
 import org.matsim.ptproject.qsim.interfaces.QNetworkFactory;
+import org.matsim.ptproject.qsim.interfaces.QSimEngine;
 
 
 public class QLanesNetworkFactory implements QNetworkFactory<QNode, QLinkInternalI> {

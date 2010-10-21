@@ -43,6 +43,7 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.qsim.TransitQLaneFeature;
 import org.matsim.ptproject.qsim.helpers.AgentSnapshotInfoBuilder;
+import org.matsim.ptproject.qsim.interfaces.QSimEngine;
 import org.matsim.ptproject.qsim.interfaces.QSimI;
 import org.matsim.ptproject.qsim.interfaces.QVehicle;
 import org.matsim.signalsystems.control.SignalGroupState;
@@ -91,7 +92,7 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 
 	/*package*/ VisData visdata = null ;
 
-	private QSimEngine qsimEngine = null;
+	private QSimEngineInternalI qsimEngine = null;
 
 	private double length = Double.NaN;
 
@@ -160,7 +161,7 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 		this.toQueueNode = toNode;
 		this.length = this.getLink().getLength();
 		this.freespeedTravelTime = this.length / this.getLink().getFreespeed();
-		this.qsimEngine = engine;
+		this.qsimEngine = (QSimEngineImpl) engine;
 
 		this.calculateCapacities();
 
@@ -574,7 +575,7 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 	}
 
 	@Override
-	protected QSimEngine getQSimEngine(){
+	protected QSimEngineInternalI getQSimEngine(){
 		return this.qsimEngine;
 	}
 
@@ -584,8 +585,8 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 	}
 
 	@Override
-	void setQSimEngine(QSimEngine qsimEngine) {
-		this.qsimEngine = qsimEngine;
+	void setQSimEngine(QSimEngine qsimEngine) { // yyyy this methods feels a bit non-sensical.  kai, oct'10
+		this.qsimEngine = (QSimEngineInternalI) qsimEngine;
 	}
 
 	/**

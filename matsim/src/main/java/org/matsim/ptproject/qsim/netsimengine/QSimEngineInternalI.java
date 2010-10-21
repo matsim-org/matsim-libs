@@ -1,10 +1,10 @@
 /* *********************************************************************** *
- * project: org.matsim.*
- * QSimEngine.java
+ * project: matsim
+ * QSimEngineInternalI.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -20,20 +20,16 @@
 
 package org.matsim.ptproject.qsim.netsimengine;
 
-import org.matsim.core.mobsim.framework.Steppable;
 import org.matsim.ptproject.qsim.helpers.AgentSnapshotInfoBuilder;
-import org.matsim.ptproject.qsim.interfaces.SimEngine;
-
+import org.matsim.ptproject.qsim.interfaces.QSimEngine;
 
 /**
- * Coordinates the movement of vehicles on the links and the nodes.
+ * @author nagel
  *
- * @author cdobler
- * @author dgrether
  */
-
-public abstract class QSimEngine extends LinkActivator implements SimEngine, Steppable {
-
-	abstract AgentSnapshotInfoBuilder getAgentSnapshotInfoBuilder();
+abstract class QSimEngineInternalI extends LinkActivator implements QSimEngine {
 	
+	abstract AgentSnapshotInfoBuilder getAgentSnapshotInfoBuilder() ;
+
+
 }

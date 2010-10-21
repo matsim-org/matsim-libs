@@ -31,7 +31,7 @@ import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.helpers.AgentSnapshotInfoBuilder;
 import org.matsim.ptproject.qsim.netsimengine.ParallelQSimEngine.ExtendedQueueNode;
 
-public class QSimEngineRunner extends QSimEngine implements Runnable {
+public class QSimEngineRunner extends QSimEngineInternalI implements Runnable {
 
 	private double time = 0.0;
 	private boolean simulateAllNodes = false;
@@ -232,6 +232,12 @@ public class QSimEngineRunner extends QSimEngine implements Runnable {
 	@Override
 	public AgentSnapshotInfoBuilder getAgentSnapshotInfoBuilder() {
 		return this.positionInfoBuilder;
+	}
+
+	@Override
+	public QNetwork getQNetwork() {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("should never be called this way since this is just the runner") ;
 	}
 
 }

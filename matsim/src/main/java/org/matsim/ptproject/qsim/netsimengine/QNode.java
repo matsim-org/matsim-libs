@@ -33,6 +33,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.events.AgentStuckEventImpl;
 import org.matsim.ptproject.qsim.interfaces.QLink;
+import org.matsim.ptproject.qsim.interfaces.QNodeI;
+import org.matsim.ptproject.qsim.interfaces.QSimEngine;
 import org.matsim.ptproject.qsim.interfaces.QVehicle;
 import org.matsim.utils.customize.Customizable;
 import org.matsim.vis.snapshots.writers.VisData;
@@ -41,7 +43,7 @@ import org.matsim.vis.snapshots.writers.VisNode;
 /**
  * Represents a node in the QueueSimulation.
  */
-public class QNode implements VisNode, Customizable {
+public class QNode implements QNodeI {
 
 	private static final Logger log = Logger.getLogger(QNode.class);
 

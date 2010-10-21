@@ -38,7 +38,7 @@ import org.matsim.ptproject.qsim.helpers.AgentSnapshotInfoBuilder;
  * @author dgrether
  * @author dstrippgen
  */
-public class QSimEngineImpl extends QSimEngine {
+public class QSimEngineImpl extends QSimEngineInternalI {
 
 	/* If simulateAllLinks is set to true, then the method "moveLink" will be called for every link in every timestep.
 	 * If simulateAllLinks is set to false, the method "moveLink" will only be called for "active" links (links where at least one
@@ -146,7 +146,7 @@ private final double stucktimeCache;
 		}
 	}
 
-	@Override
+//	@Override
 	protected void activateLink(final QLinkInternalI link) {
 		if (!simulateAllLinks) {
 			this.simActivateThis.add(link);

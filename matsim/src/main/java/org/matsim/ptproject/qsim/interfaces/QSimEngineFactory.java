@@ -22,7 +22,6 @@ package org.matsim.ptproject.qsim.interfaces;
 import java.util.Random;
 
 import org.matsim.ptproject.qsim.QSim;
-import org.matsim.ptproject.qsim.netsimengine.QSimEngine;
 
 
 /**

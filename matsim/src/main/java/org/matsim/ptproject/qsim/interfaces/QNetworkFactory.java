@@ -21,14 +21,12 @@ package org.matsim.ptproject.qsim.interfaces;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.ptproject.qsim.netsimengine.QNode;
-import org.matsim.ptproject.qsim.netsimengine.QSimEngine;
 
 
 /**
  * @author dgrether
  */
-public interface QNetworkFactory<QN extends QNode, QL extends QLink> {
+public interface QNetworkFactory<QN extends QNodeI, QL extends QLink> {
 
 	public QN createQueueNode(Node node, QSimEngine simEngine);
 

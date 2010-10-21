@@ -5,7 +5,9 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.ptproject.qsim.interfaces.QLink;
+import org.matsim.ptproject.qsim.interfaces.QSimEngine;
 import org.matsim.ptproject.qsim.interfaces.QVehicle;
+import org.matsim.vis.snapshots.writers.VisLink;
 
 public abstract class QLinkInternalI extends QBufferItem implements QLink {
 	// yyyy this class needs to be public with some of the traffic signal code, but I do not understand why.  kai, aug'10
@@ -28,7 +30,7 @@ public abstract class QLinkInternalI extends QBufferItem implements QLink {
 
 	abstract void addFromIntersection(final QVehicle veh);
 
-	abstract QSimEngine getQSimEngine() ;
+	abstract QSimEngineInternalI getQSimEngine() ;
 	
 //	@Deprecated // not needed here (I think)
 //	public abstract LinkedList<QVehicle> getVehQueue() ;

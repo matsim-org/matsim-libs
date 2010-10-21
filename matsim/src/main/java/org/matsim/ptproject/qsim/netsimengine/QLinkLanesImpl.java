@@ -41,6 +41,7 @@ import org.matsim.lanes.Lane;
 import org.matsim.lanes.LaneMeterFromLinkEndComparator;
 import org.matsim.ptproject.qsim.helpers.AgentSnapshotInfoBuilder;
 import org.matsim.ptproject.qsim.interfaces.QLink;
+import org.matsim.ptproject.qsim.interfaces.QSimEngine;
 import org.matsim.ptproject.qsim.interfaces.QSimI;
 import org.matsim.ptproject.qsim.interfaces.QVehicle;
 import org.matsim.signalsystems.systems.SignalGroupDefinition;
@@ -458,7 +459,7 @@ public class QLinkLanesImpl extends QLinkInternalI {
 	}
 
 	@Override
-	QSimEngine getQSimEngine(){
+	QSimEngineImpl getQSimEngine(){
 		return this.qsimEngine;
 	}
 	
