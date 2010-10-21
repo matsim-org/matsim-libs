@@ -118,7 +118,7 @@ BeforeMobsimListener, AfterMobsimListener  {
 					log.warn("yyyy This may not work when the pt counts interval is different from 10 because I think I changed things at two "
 							+ "places but I can't find the other one any more :-(.  (May just be inefficient.)  kai, oct'10" ) ;
 
-				controler.stopwatch.beginOperation("compare with counts");
+				controler.stopwatch.beginOperation("compare with pt counts");
 
 				double countsScaleFactor = Double.parseDouble(this.config.getParam(MODULE_NAME, "countsScaleFactor"));
 				NetworkImpl network = controler.getNetwork();
@@ -144,13 +144,11 @@ BeforeMobsimListener, AfterMobsimListener  {
 				ccaAlight.run();
 				ccaOccupancy.run();
 
-				String outputFormat = this.config.findParam(MODULE_NAME,
-						"outputformat");
-				if (outputFormat.contains("kml")
-						|| outputFormat.contains("all")) {
+				String outputFormat = this.config.findParam(MODULE_NAME, "outputformat");
+				if (outputFormat.contains("kml") || outputFormat.contains("all")) {
 					ControlerIO ctlIO=controler.getControlerIO();
 
-					String filename = ctlIO.getIterationFilename(iter, "countscompare.kmz");
+					String filename = ctlIO.getIterationFilename(iter, "ptcountscompare.kmz");
 					PtCountSimComparisonKMLWriter kmlWriter = new PtCountSimComparisonKMLWriter(ccaBoard.getComparison(), ccaAlight.getComparison(), ccaOccupancy.getComparison(),
 							TransformationFactory.getCoordinateTransformation(this.config.global().getCoordinateSystem(),TransformationFactory.WGS84),
 							this.boardCounts, this.alightCounts,occupancyCounts);
@@ -168,7 +166,7 @@ BeforeMobsimListener, AfterMobsimListener  {
 					}
 				}
 
-				controler.stopwatch.endOperation("compare with counts");
+				controler.stopwatch.endOperation("compare with pt counts");
 			}
 		}
 	}
