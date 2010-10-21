@@ -45,7 +45,6 @@ import playground.andreas.osmBB.osm2counts.Osm2Counts;
 
 /**
  * @author droeder
- *doesn't work
  */
 public class ResizeLinksByCount2 extends AbstractResizeLinksByCount{
 	
@@ -67,21 +66,16 @@ public class ResizeLinksByCount2 extends AbstractResizeLinksByCount{
 		try {
 			countsReader.parse(countsFile);
 		} catch (SAXException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (ParserConfigurationException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
 		ResizeLinksByCount2 r = new ResizeLinksByCount2(networkFile, counts, shortNameMap);
 		r.run("d:/VSP/output/osm_bb/network_resized");
 	}
-
-
 	
 	/**
 	 * use this contructor if the counts loc_Ids are NOT matched to the linkIds. The shortNameMap 
@@ -111,7 +105,7 @@ public class ResizeLinksByCount2 extends AbstractResizeLinksByCount{
 		}else{
 			this.newCounts = super.oldCounts;
 		}
-		this.checkNumberOfCountsOnOrigLink();
+		this.getCountsOnOrigLink();
 		super.run(outFile + ".xml");
 		
 	}
@@ -147,7 +141,7 @@ public class ResizeLinksByCount2 extends AbstractResizeLinksByCount{
 		}
 	}
 
-	private void checkNumberOfCountsOnOrigLink() {
+	private void getCountsOnOrigLink() {
 		this.origin2counts = new HashMap<String, List<Id>>();
 		String origId;
 		for(Id id : newCounts.getCounts().keySet()){
@@ -162,12 +156,8 @@ public class ResizeLinksByCount2 extends AbstractResizeLinksByCount{
 	}
 
 	protected void resize() {
-		
-		log.info(this.origin2counts.size());
+		log.info("Start resizing...");
 		for(Entry<String, List<Id>> e : this.origin2counts.entrySet()){
-			if(e.getKey().equals("30962289")){
-				log.info("");
-			}
 			
 			if(e.getValue().size() == 1){
 				this.processOneCountOnOrigLink(sortLinks(e.getKey(), e.getValue().get(0)), e.getValue().get(0));
@@ -177,9 +167,8 @@ public class ResizeLinksByCount2 extends AbstractResizeLinksByCount{
 			}else{
 				log.error("no count registered for origId " + e.getKey());
 			}
-			log.info(e.getKey());
 		}
-		log.error("resizing finished!!!");
+		log.info("resizing finished...");
 	}
 	
 	private List<Id> sortLinks(String origId, Id countLoc){
@@ -237,32 +226,50 @@ public class ResizeLinksByCount2 extends AbstractResizeLinksByCount{
 		this.constantChanges(sortedLinks, countLoc);
 	}
 	
-	
-	
-	// doesn't work yet
 	private void processMultipleCountsOnOrigLink(List<Id> sortedLinks, ArrayList<Id> counts) {
+//		int index = 0;
 		int temp = 0;
 		Id previousCount = null;
 		
+//		for(Id count : counts){
+//			System.out.print(this.newCounts.getCount(count).getMaxVolume().getValue() + " " + count + "\t");
+//		}
+//		System.out.println();
+//		for(Id id : sortedLinks){
+//			System.out.print("#" +index + " " + id + "\t");
+//			index++;
+//		}
+//		System.out.println();
+//		
+//		System.out.print("111 \t");
+//		index = 0;
+//		for(Id id : sortedLinks){
+//			System.out.print("#" +index + " " +this.net.getLinks().get(id).getCapacity() + " " + this.net.getLinks().get(id).getNumberOfLanes() + "\t");
+//			index++;
+//		}
+//		System.out.println();
 		for(Id id : sortedLinks){
 			if(counts.contains(id) && (temp == 0) ){
 				temp++;
 				previousCount = id;
 				this.constantChanges(sortedLinks.subList(0, sortedLinks.indexOf(id) + 1), id);
-			}else if(counts.contains(id) && (temp < (counts.size() - 1))){
+			}else if(counts.contains(id) && (temp < counts.size())){
 				temp++;
-				this.proportionalChanges(sortedLinks.subList(sortedLinks.indexOf(previousCount) + 1, sortedLinks.indexOf(id) + 1), previousCount, id);
+				this.proportionalChanges(sortedLinks.subList(sortedLinks.indexOf(previousCount) + 1, sortedLinks.indexOf(id) ), previousCount, id);
 				previousCount = id;
-			}else if(counts.contains(id) && (temp == (counts.size() - 1))){
+			}else if(temp == counts.size()){
 				temp++;
-				this.constantChanges(sortedLinks.subList(sortedLinks.indexOf(id), sortedLinks.size() ), id);
+				this.constantChanges(sortedLinks.subList(sortedLinks.indexOf(previousCount), sortedLinks.size() ), previousCount);
 			}
 		}
 		
-		for(Id id : sortedLinks){
-			System.out.print(this.net.getLinks().get(id).getCapacity() + " " + this.net.getLinks().get(id).getNumberOfLanes() + "\t");
-		}
-		System.out.println();
+//		System.out.print("222 \t");
+//		index = 0;
+//		for(Id id : sortedLinks){
+//			System.out.print("#" +index + " " +this.net.getLinks().get(id).getCapacity() + " " + this.net.getLinks().get(id).getNumberOfLanes() + "\t");
+//			index++;
+//		}
+//		System.out.println();
 		
 		
 	}
@@ -271,8 +278,8 @@ public class ResizeLinksByCount2 extends AbstractResizeLinksByCount{
 		
 		if(sortedLinks.size() > 0){
 			Double prevCountVal = this.newCounts.getCount(previousCount).getMaxVolume().getValue();
-			Double countDifference = (newCounts.getCount(previousCount).getMaxVolume().getValue() - 
-					newCounts.getCount(actualCount).getMaxVolume().getValue())/
+			Double countDifference = (newCounts.getCount(actualCount).getMaxVolume().getValue() - 
+					newCounts.getCount(previousCount).getMaxVolume().getValue())/
 					(sortedLinks.size() + 1);
 			
 			
@@ -291,15 +298,13 @@ public class ResizeLinksByCount2 extends AbstractResizeLinksByCount{
 				else{
 					nrOfNewLanes = (int) (prevCountVal/capPerLane);
 				}
-				this.net.getLinks().get(id).setCapacity(prevCountVal);
+				this.net.getLinks().get(id).setCapacity(prevCountVal*1.0);
 				this.net.getLinks().get(id).setNumberOfLanes(nrOfNewLanes);
 			}
 			
 		}
 		
 	}
-
-
 
 	private void constantChanges(List<Id> sortedLinks, Id count){
 		Double maxCount = this.newCounts.getCount(count).getMaxVolume().getValue();
@@ -322,13 +327,11 @@ public class ResizeLinksByCount2 extends AbstractResizeLinksByCount{
 			this.net.getLinks().get(id).setNumberOfLanes(nrOfNewLanes);
 		}
 	}
-	
-	
 
 	private void writePreprocessedCounts(String outFile) {
 		log.info("writing counts to " + outFile + "_counts.xml...");
 		new CountsWriter(newCounts).write(outFile + "_counts.xml");
-		log.info("done...");
+		log.info("wrting counts finished...");
 	}
 
 	
