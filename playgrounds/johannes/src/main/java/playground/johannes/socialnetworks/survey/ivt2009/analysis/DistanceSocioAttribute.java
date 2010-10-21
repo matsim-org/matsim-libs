@@ -71,7 +71,7 @@ public class DistanceSocioAttribute extends AnalyzerTask {
 					vertices.add(vertex);
 			}
 
-			stats.put("alpha_male", ResponseRate.responseRate((Set<? extends SampledVertex>) vertices));
+			stats.put("alpha_male", ResponseRate.responseRate((Set) vertices));
 			
 			Distribution distr = dist.distribution(vertices);
 			Distribution.writeHistogram(distr.absoluteDistributionLog2(1000), getOutputDirectory() + "/d_male_txt");
@@ -93,7 +93,7 @@ public class DistanceSocioAttribute extends AnalyzerTask {
 					vertices.add(vertex);
 			}
 
-			stats.put("alpha_female", ResponseRate.responseRate((Set<? extends SampledVertex>) vertices));
+			stats.put("alpha_female", ResponseRate.responseRate((Set) vertices));
 			
 			distr = dist.distribution(vertices);
 			Distribution.writeHistogram(distr.absoluteDistributionLog2(1000), getOutputDirectory() + "/d_female_txt");
@@ -118,7 +118,7 @@ public class DistanceSocioAttribute extends AnalyzerTask {
 						vertices.add(vertex);
 				}
 
-				stats.put("alpha_edu"+att, ResponseRate.responseRate((Set<? extends SampledVertex>) vertices));
+				stats.put("alpha_edu"+att, ResponseRate.responseRate((Set) vertices));
 				
 				distr = dist.distribution(vertices);
 				Distribution.writeHistogram(distr.absoluteDistributionLog2(1000), getOutputDirectory() + "/d_edu"+att+".txt");
