@@ -24,39 +24,37 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.groups.MultiModalConfigGroup;
+import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
-/*
+/**
  * Drops all non car routes which are specified in the multiModalConfigGroup
  * ("simulatedModes").
  */
 public class NonCarRouteDropper extends AbstractPersonAlgorithm implements PlanAlgorithm {
 
 	private static final Logger log = Logger.getLogger(NonCarRouteDropper.class);
-	
+
 	private Set<String> modesToDrop = new HashSet<String>();
-	
+
 	public NonCarRouteDropper(MultiModalConfigGroup multiModalConfigGroup) {
 
 		if (!multiModalConfigGroup.isDropNonCarRoutes()) {
 			log.warn("Dropping of non car routes is not enabled in the config group - routes will not be dropped!");
 			return;
 		}
-		
-		String simulatedModes = multiModalConfigGroup.getSimulatedModes().toLowerCase();
-		if (simulatedModes.contains(TransportMode.walk)) modesToDrop.add(TransportMode.walk);
-		if (simulatedModes.contains(TransportMode.bike)) modesToDrop.add(TransportMode.bike);
-		if (simulatedModes.contains(TransportMode.pt)) modesToDrop.add(TransportMode.pt);
-		if (simulatedModes.contains(TransportMode.ride)) modesToDrop.add(TransportMode.ride);
+
+		for (String mode : CollectionUtils.stringToArray(multiModalConfigGroup.getSimulatedModes())) {
+			this.modesToDrop.add(mode);
+		}
 	}
-	
+
 	@Override
 	public void run(Plan plan) {
 		for (PlanElement planElement : plan.getPlanElements()) {

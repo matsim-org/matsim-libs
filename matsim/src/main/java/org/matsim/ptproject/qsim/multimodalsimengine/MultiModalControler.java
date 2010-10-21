@@ -26,11 +26,6 @@ import org.matsim.core.config.groups.MultiModalConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
-import org.matsim.core.router.PlansCalcRoute;
-import org.matsim.core.router.util.PersonalizableTravelCost;
-import org.matsim.core.router.util.PersonalizableTravelTime;
-import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.ptproject.qsim.multimodalsimengine.router.MultiModalLegHandler;
 import org.matsim.ptproject.qsim.multimodalsimengine.router.costcalculator.TravelTimeCalculatorWithBufferFactory;
 import org.matsim.ptproject.qsim.multimodalsimengine.tools.EnsureActivityReachability;
 import org.matsim.ptproject.qsim.multimodalsimengine.tools.MultiModalNetworkCreator;
@@ -39,12 +34,12 @@ import org.matsim.ptproject.qsim.multimodalsimengine.tools.NonCarRouteDropper;
 public class MultiModalControler extends Controler {
 
 	private static final Logger log = Logger.getLogger(MultiModalControler.class);
-	
+
 	protected boolean checkActivityReachability = false;
-	
+
 	public MultiModalControler(String[] args) {
 		super(args);
-		
+
 		/*
 		 * Use a TravelTimeCalculator that buffers the TravelTimes form the
 		 * previous Iteration.
@@ -60,57 +55,40 @@ public class MultiModalControler extends Controler {
 	public MobsimFactory getMobsimFactory() {
 		return new MultiModalMobsimFactory(super.getMobsimFactory(), this.getTravelTimeCalculator());
 	}
-	
-	@Override
-	public PlanAlgorithm createRoutingAlgorithm(final PersonalizableTravelCost travelCosts, final PersonalizableTravelTime travelTimes) {
-		PlansCalcRoute plansCalcRoute = new PlansCalcRoute(this.config.plansCalcRoute(), this.network, travelCosts, 
-				travelTimes, this.getLeastCostPathCalculatorFactory());
-		
-		MultiModalLegHandler multiModalLegHandler = new MultiModalLegHandler(this.config.multiModal(), this.network,
-				travelTimes, this.getLeastCostPathCalculatorFactory());
-		
-		String simulatedModes = this.config.multiModal().getSimulatedModes().toLowerCase();
-		if (simulatedModes.contains(TransportMode.walk)) plansCalcRoute.addLegHandler(multiModalLegHandler, TransportMode.walk);
-		if (simulatedModes.contains(TransportMode.bike)) plansCalcRoute.addLegHandler(multiModalLegHandler, TransportMode.bike);
-		if (simulatedModes.contains(TransportMode.ride)) plansCalcRoute.addLegHandler(multiModalLegHandler, TransportMode.ride);
-		if (simulatedModes.contains(TransportMode.pt)) plansCalcRoute.addLegHandler(multiModalLegHandler, TransportMode.pt);
-		
-		return plansCalcRoute;
-	}
-	
+
 	@Override
 	protected void loadData() {
-		
+
 		MultiModalConfigGroup configGroup = scenarioData.getConfig().multiModal();
-		
+
 		log.info("replacing RouteFactories for non car modes...");
 		super.scenarioData.getNetwork().getFactory().setRouteFactory(TransportMode.bike, new LinkNetworkRouteFactory());
 		super.scenarioData.getNetwork().getFactory().setRouteFactory(TransportMode.walk, new LinkNetworkRouteFactory());
 		super.scenarioData.getNetwork().getFactory().setRouteFactory(TransportMode.pt, new LinkNetworkRouteFactory());
 		super.scenarioData.getNetwork().getFactory().setRouteFactory(TransportMode.ride, new LinkNetworkRouteFactory());
 		log.info("done.");
-		
+
 		super.loadData();
 
 		if (configGroup.isCreateMultiModalNetwork()) {
 			log.info("creating multi modal network...");
 			new MultiModalNetworkCreator(configGroup).run(scenarioData.getNetwork());
-			log.info("done.");			
+			log.info("done.");
 		}
-		
+
 		if (checkActivityReachability) {
 			log.info("moving activities that cannot be reached by the transport modes of the from- and/or to-legs...");
 			new EnsureActivityReachability(this.scenarioData).run(scenarioData.getPopulation());
 			log.info("done.");
 		}
-		
+
 		if (configGroup.isDropNonCarRoutes()) {
 			log.info("dropping existing walk and bike routes...");
 			new NonCarRouteDropper(configGroup).run(scenarioData.getPopulation());
-			log.info("done.");			
+			log.info("done.");
 		}
 	}
-	
+
 	public static void main(final String[] args) {
 		if ((args == null) || (args.length == 0)) {
 			System.out.println("No argument given!");
@@ -118,7 +96,7 @@ public class MultiModalControler extends Controler {
 			System.out.println();
 		} else {
 			final Controler controler = new MultiModalControler(args);
-			controler.setOverwriteFiles(true);		
+			controler.setOverwriteFiles(true);
 			controler.run();
 		}
 		System.exit(0);

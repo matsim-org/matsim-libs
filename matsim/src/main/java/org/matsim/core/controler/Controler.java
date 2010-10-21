@@ -114,6 +114,7 @@ import org.matsim.core.scoring.charyparNagel.CharyparNagelScoringFunctionFactory
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactory;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
+import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.io.CollectLogMessagesAppender;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
@@ -378,11 +379,10 @@ public class Controler {
 //		setMobsimFactory(mobsimFactory)
 
 		// set Route Factories
-		String simulatedModes = config.multiModal().getSimulatedModes().toLowerCase();
-		if (simulatedModes.contains(TransportMode.bike)) this.getNetwork().getFactory().setRouteFactory(TransportMode.bike, new LinkNetworkRouteFactory());
-		if (simulatedModes.contains(TransportMode.walk)) this.getNetwork().getFactory().setRouteFactory(TransportMode.walk, new LinkNetworkRouteFactory());
-		if (simulatedModes.contains(TransportMode.ride)) this.getNetwork().getFactory().setRouteFactory(TransportMode.ride, new LinkNetworkRouteFactory());
-		if (simulatedModes.contains(TransportMode.pt)) this.getNetwork().getFactory().setRouteFactory(TransportMode.pt, new LinkNetworkRouteFactory());
+		LinkNetworkRouteFactory factory = new LinkNetworkRouteFactory();
+		for (String mode : CollectionUtils.stringToArray(config.multiModal().getSimulatedModes())) {
+			this.getNetwork().getFactory().setRouteFactory(mode, factory);
+		}
 	}
 
 	private final void setupTransitSimulation() {
@@ -1079,18 +1079,16 @@ public class Controler {
 			return new PlansCalcTransitRoute(this.config.plansCalcRoute(), this.network, travelCosts, travelTimes,
 					this.getLeastCostPathCalculatorFactory(), this.scenarioData.getTransitSchedule(), this.config.transit());
 		} else if (this.config.multiModal().isMultiModalSimulationEnabled()) {
-			PlansCalcRoute plansCalcRoute = new PlansCalcRoute(this.config.plansCalcRoute(), this.network, travelCosts, 
+			PlansCalcRoute plansCalcRoute = new PlansCalcRoute(this.config.plansCalcRoute(), this.network, travelCosts,
 					travelTimes, this.getLeastCostPathCalculatorFactory());
-			
+
 			MultiModalLegHandler multiModalLegHandler = new MultiModalLegHandler(this.config.multiModal(), this.network,
 					travelTimes, this.getLeastCostPathCalculatorFactory());
-			
-			String simulatedModes = this.config.multiModal().getSimulatedModes().toLowerCase();
-			if (simulatedModes.contains(TransportMode.walk)) plansCalcRoute.addLegHandler(multiModalLegHandler, TransportMode.walk);
-			if (simulatedModes.contains(TransportMode.bike)) plansCalcRoute.addLegHandler(multiModalLegHandler, TransportMode.bike);
-			if (simulatedModes.contains(TransportMode.ride)) plansCalcRoute.addLegHandler(multiModalLegHandler, TransportMode.ride);
-			if (simulatedModes.contains(TransportMode.pt)) plansCalcRoute.addLegHandler(multiModalLegHandler, TransportMode.pt);
-			
+
+			for (String mode : CollectionUtils.stringToArray(this.config.multiModal().getSimulatedModes())) {
+				plansCalcRoute.addLegHandler(multiModalLegHandler, mode);
+			}
+
 			return plansCalcRoute;
 		} else {
 			return new PlansCalcRoute(this.config.plansCalcRoute(), this.network, travelCosts, travelTimes, this
