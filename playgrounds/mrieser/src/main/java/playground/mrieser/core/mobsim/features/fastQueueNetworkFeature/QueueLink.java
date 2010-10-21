@@ -89,7 +89,7 @@ import playground.mrieser.core.mobsim.network.api.MobSimLink;
 		this.operator = operator;
 	}
 
-	private void recalculateAttributes() {
+	/*package*/ void recalculateAttributes() {
 		double now = this.network.simEngine.getCurrentTime();
 		double length = this.link.getLength();
 

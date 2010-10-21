@@ -40,6 +40,7 @@ import playground.mrieser.core.mobsim.network.api.MobSimNetwork;
 	private boolean removeStuckVehicles = true;
 	private double stuckTime = 100;
 	private final Operator operator;
+	private boolean simStarted = false;
 
 	public QueueNetwork(final TimestepSimEngine simEngine, final Operator operator) {
 		this.simEngine = simEngine;
@@ -50,6 +51,11 @@ import playground.mrieser.core.mobsim.network.api.MobSimNetwork;
 
 	@Override
 	public void beforeMobSim() {
+		this.simStarted = true;
+		for (QueueLink link : this.links.values()) {
+			// storageCapFactor could have changed since construction
+			link.recalculateAttributes();
+		}
 		this.operator.beforeMobSim();
 	}
 
@@ -82,6 +88,9 @@ import playground.mrieser.core.mobsim.network.api.MobSimNetwork;
 	}
 
 	public void setStorageCapFactor(final double storageCapFactor) {
+		if (this.simStarted) {
+			throw new IllegalStateException("Mobility Simulation already started. Storage Capacity Factor must be set before simulation is started.");
+		}
 		this.storageCapFactor = storageCapFactor;
 	}
 
