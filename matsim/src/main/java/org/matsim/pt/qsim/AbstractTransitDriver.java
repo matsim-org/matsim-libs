@@ -27,6 +27,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsFactoryImpl;
 import org.matsim.core.events.PersonLeavesVehicleEventImpl;
 import org.matsim.core.events.TransitDriverStartsEvent;
@@ -145,8 +146,14 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 
 	@Override
 	public void endActivityAndAssumeControl(final double now) {
-		this.sim.getEventsManager().processEvent(new TransitDriverStartsEvent(now, this.dummyPerson.getId(),
-				this.vehicle.getId(), getTransitLine().getId(), getTransitRoute().getId(), getDeparture().getId()));
+		// check if "Wenden" 
+		if(getTransitLine() == null){
+			this.sim.getEventsManager().processEvent(new TransitDriverStartsEvent(now, this.dummyPerson.getId(),
+					this.vehicle.getId(), new IdImpl("Wenden"), new IdImpl("Wenden"), new IdImpl("Wenden")));
+		} else {
+			this.sim.getEventsManager().processEvent(new TransitDriverStartsEvent(now, this.dummyPerson.getId(),
+					this.vehicle.getId(), getTransitLine().getId(), getTransitRoute().getId(), getDeparture().getId()));
+		}		
 		this.sim.agentDeparts(this, this.getCurrentLeg().getRoute().getStartLinkId());
 	}
 
