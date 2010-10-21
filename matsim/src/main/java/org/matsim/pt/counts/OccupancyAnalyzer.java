@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package org.matsim.pt.counts;
 
@@ -42,14 +42,13 @@ import org.matsim.core.events.handler.VehicleDepartsAtFacilityEventHandler;
 
 /**
  * @author yChen
- * 
  */
 public class OccupancyAnalyzer implements PersonEntersVehicleEventHandler,
 		PersonLeavesVehicleEventHandler, VehicleArrivesAtFacilityEventHandler,
 		VehicleDepartsAtFacilityEventHandler {
-	
-	private static final Logger log = Logger.getLogger("dummy");
-	
+
+	private static final Logger log = Logger.getLogger(OccupancyAnalyzer.class);
+
 	private final int timeBinSize, maxSlotIndex;
 	private final double maxTime;
 	/** Map< stopFacilityId,value[]> */
@@ -63,7 +62,7 @@ public class OccupancyAnalyzer implements PersonEntersVehicleEventHandler,
 
 	public OccupancyAnalyzer(final int timeBinSize, final double maxTime) {
 		log.setLevel( Level.INFO ) ;
-		
+
 		this.timeBinSize = timeBinSize;
 		this.maxTime = maxTime;
 		this.maxSlotIndex = ((int) this.maxTime) / this.timeBinSize + 1;
@@ -156,7 +155,7 @@ public class OccupancyAnalyzer implements PersonEntersVehicleEventHandler,
 		this.veh_stops.put(event.getVehicleId(), stopId);
 		// (constructing a table with vehId as key, and stopId as value; constructed when veh arrives at stop; necessary
 		// since personEnters/LeavesVehicle does not carry stop id)
-		
+
 	}
 
 	@Override
@@ -172,7 +171,7 @@ public class OccupancyAnalyzer implements PersonEntersVehicleEventHandler,
 			occupancyAtStop = new int[this.maxSlotIndex + 1];
 			this.occupancies.put(stopId, occupancyAtStop);
 		}
-		
+
 		Integer noPassengersInVeh = this.veh_passengers.get(vehId);
 
 		if (noPassengersInVeh != null) {
