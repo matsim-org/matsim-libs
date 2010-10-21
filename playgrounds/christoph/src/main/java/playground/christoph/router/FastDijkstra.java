@@ -37,7 +37,6 @@ import org.matsim.core.router.util.PreProcessDijkstra;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.PseudoRemovePriorityQueue;
-import org.matsim.world.Layer;
 
 /**
  * A faster Implementation of org.matsim.core.router.Dijkstra.
