@@ -83,11 +83,11 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 	protected final Network network;
 
 	private final PersonalizableTravelCost costCalculator;
-	
+
 	private final PersonalizableTravelTime timeCalculator;
 
 	private Map<String, LegHandler> legHandlers;
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
@@ -115,7 +115,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 		else {
 			log.warn(NO_CONFIGGROUP_SET_WARNING);
 		}
-		
+
 		initDefaultLegHandlers();
 	}
 
@@ -137,22 +137,22 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 	public final LeastCostPathCalculator getPtFreeflowLeastCostPathCalculator(){
 		return this.routeAlgoPtFreeflow;
 	}
-	
+
 	private void initDefaultLegHandlers() {
 		legHandlers = new HashMap<String, LegHandler>();
-		
+
 		DefaultLegHandler legHandler = new DefaultLegHandler(configGroup, network, routeAlgo, routeAlgoPtFreeflow);
 		this.addLegHandler(legHandler, TransportMode.pt);
 		this.addLegHandler(legHandler, TransportMode.car);
 		this.addLegHandler(legHandler, TransportMode.bike);
 		this.addLegHandler(legHandler, TransportMode.ride);
 		this.addLegHandler(legHandler, TransportMode.walk);
-		this.addLegHandler(legHandler, TransportMode.undefined);
+		this.addLegHandler(legHandler, "undefined");
 	}
-		
+
 	public final void addLegHandler(LegHandler legHandler, String transportMode) {
 		if (legHandlers.get(transportMode) != null) {
-			log.warn("A LegHandler for " + transportMode + " legs is already registered - it is replaced!"); 
+			log.warn("A LegHandler for " + transportMode + " legs is already registered - it is replaced!");
 		}
 		legHandlers.put(transportMode, legHandler);
 	}
@@ -238,10 +238,10 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 		} else {
 			throw new RuntimeException("cannot handle legmode '" + legmode + "'.");
 		}
-	}	
+	}
 
 	public NetworkFactoryImpl getRouteFactory() {
 		return routeFactory;
 	}
-	
+
 }

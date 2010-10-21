@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Mode.java
+ * TransportMode.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -36,7 +36,6 @@ public final class TransportMode {
 	public static final String pt = "pt";
 	public static final String walk = "walk";
 	public static final String transit_walk = "transit_walk";
-	public static final String undefined = "undefined";
 
 	private TransportMode() {
 		// prevent creating instances of this class

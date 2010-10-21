@@ -47,20 +47,20 @@ public class DefaultLegHandler implements LegHandler {
 	private static final String NO_CONFIGGROUP_SET_WARNING = "No PlansCalcRouteConfigGroup"
 		+ " is set in PlansCalcRoute, using the default values. Make sure that those values" +
 				"fit your needs, otherwise set it expclicitly.";
-	
+
 	private PlansCalcRouteConfigGroup configGroup = new PlansCalcRouteConfigGroup();
 	private final Network network;
 	private final LeastCostPathCalculator routeAlgo;
 	private final LeastCostPathCalculator routeAlgoPtFreeflow;
 	private final NetworkFactoryImpl routeFactory;
-	
-	public DefaultLegHandler(final PlansCalcRouteConfigGroup group, final Network network, 
+
+	public DefaultLegHandler(final PlansCalcRouteConfigGroup group, final Network network,
 			final LeastCostPathCalculator routeAlgo, final LeastCostPathCalculator routeAlgoPtFreeflow) {
 		this.network = network;
 		this.routeAlgo = routeAlgo;
 		this.routeAlgoPtFreeflow = routeAlgoPtFreeflow;
 		this.routeFactory = (NetworkFactoryImpl) network.getFactory();
-		
+
 		if (group != null) {
 			this.configGroup = group;
 		}
@@ -82,7 +82,7 @@ public class DefaultLegHandler implements LegHandler {
 			return handleWalkLeg(leg, fromAct, toAct, depTime);
 		} else if (TransportMode.bike.equals(legMode)) {
 			return handleBikeLeg(leg, fromAct, toAct, depTime);
-		} else if (TransportMode.undefined.equals(legMode)) {
+		} else if ("undefined".equals(legMode)) {
 			return handleUndefinedLeg(leg, fromAct, toAct, depTime);
 		} else {
 			throw new RuntimeException("cannot handle legmode '" + legMode + "'.");
@@ -207,7 +207,7 @@ public class DefaultLegHandler implements LegHandler {
 		((LegImpl) leg).setArrivalTime(depTime + travTime); // yy something needs to be done once there are alternative implementations of the interface.  kai, apr'10
 		return travTime;
 	}
-	
+
 	private double handleUndefinedLeg(final Leg leg, final Activity fromAct, final Activity toAct, final double depTime) {
 		// make simple assumption about distance and a dummy speed (50 km/h)
 		double dist = CoordUtils.calcDistance(fromAct.getCoord(), toAct.getCoord());
@@ -222,5 +222,5 @@ public class DefaultLegHandler implements LegHandler {
 		((LegImpl) leg).setArrivalTime(depTime + travTime); // yy something needs to be done once there are alternative implementations of the interface.  kai, apr'10
 		return travTime;
 	}
-	
+
 }
