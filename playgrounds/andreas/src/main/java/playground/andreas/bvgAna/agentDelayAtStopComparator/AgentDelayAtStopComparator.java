@@ -66,6 +66,7 @@ public class AgentDelayAtStopComparator implements TransitDriverStartsEventHandl
 	private VehDelayAnalyzer vehDelayAnalyzer;
 	private AgentDelayHandler agentDelayHandler;	
 	private TreeMap<Id,ArrayList<Tuple<Id,Double>>> agentIds2StopDifferenceMap = null;
+	private TreeMap<Id,ArrayList<Tuple<Id,Integer>>> agentIds2MissedVehMap = null;
 
 	public AgentDelayAtStopComparator(Population pop, Set<Id> agentIds){
 		this.log.setLevel(this.logLevel);
@@ -82,14 +83,20 @@ public class AgentDelayAtStopComparator implements TransitDriverStartsEventHandl
 	
 	private void compare(){		
 		this.agentIds2StopDifferenceMap = new TreeMap<Id,ArrayList<Tuple<Id,Double>>>();
+		this.agentIds2MissedVehMap = new TreeMap<Id, ArrayList<Tuple<Id,Integer>>>();
 
 		for (Id agentId : this.agentIds) {
 
 			if(this.agentIds2StopDifferenceMap.get(agentId) == null){
 				this.agentIds2StopDifferenceMap.put(agentId, new ArrayList<Tuple<Id,Double>>());
 			}
+			
+			if(this.agentIds2MissedVehMap.get(agentId) == null){
+				this.agentIds2MissedVehMap.put(agentId, new ArrayList<Tuple<Id,Integer>>());
+			}
 
-			ArrayList<Tuple<Id,Double>> agentsDiffs = this.agentIds2StopDifferenceMap.get(agentId);				
+			ArrayList<Tuple<Id,Double>> agentsDiffs = this.agentIds2StopDifferenceMap.get(agentId);	
+			ArrayList<Tuple<Id, Integer>> agentsMissedVehicles = this.agentIds2MissedVehMap.get(agentId);
 			ArrayList<Tuple<Id, AgentPlannedDepartureContainer>> plannedDepartures = this.plannedDepartureTimeMap.get(agentId);
 
 			for (int i = 0; i < plannedDepartures.size(); i++) {
@@ -117,7 +124,11 @@ public class AgentDelayAtStopComparator implements TransitDriverStartsEventHandl
 				double difference = realizedTimeWaiting - plannedTimeWaiting;
 
 				// put the resulting difference in the map
-				agentsDiffs.add(new Tuple<Id, Double>(stopId, new Double(difference)));
+				agentsDiffs.add(new Tuple<Id, Double>(stopId, new Double(difference)));				
+				
+				//--------------
+				// Calculate missed vehicle
+				agentsMissedVehicles.add(new Tuple<Id, Integer>(stopId, new Integer(this.vehDelayAnalyzer.getNumberOfMissedVehicles(stopId, plannedDepartureTime, realizedDepartureTime, depContainer.getLineId(), depContainer.getRouteId()))));				
 			}				
 		}		
 	}
@@ -132,6 +143,18 @@ public class AgentDelayAtStopComparator implements TransitDriverStartsEventHandl
 			compare();
 		}
 		return this.agentIds2StopDifferenceMap;
+	}
+	
+	/**
+	 * Returns the number of vehicles the agent missed or took earlier than scheduled for each stop
+	 * 
+	 * @return A map containing a list of the resulting number of stops for each agent
+	 */
+	public TreeMap<Id, ArrayList<Tuple<Id, Integer>>> getNumberOfMissedVehiclesMap(){
+		if(this.agentIds2MissedVehMap == null){
+			compare();
+		}
+		return this.agentIds2MissedVehMap;
 	}
 
 	@Override

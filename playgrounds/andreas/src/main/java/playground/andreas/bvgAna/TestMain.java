@@ -72,7 +72,9 @@ public class TestMain {
 		TreeSet<Id> agentIds = new TreeSet<Id>();
 		agentIds.add(new IdImpl("1000"));
 		agentIds.add(new IdImpl("10001"));	
-		agentIds.add(new IdImpl("10002"));	
+		agentIds.add(new IdImpl("10002"));
+		agentIds.add(new IdImpl("2176"));
+		agentIds.add(new IdImpl("182"));
 		
 		AgentDelayAtStopComparator comp = new AgentDelayAtStopComparator(plans, agentIds);
 		eventsManager.addHandler(comp);
@@ -91,6 +93,8 @@ public class TestMain {
 		}
 		
 		TreeMap<Id, ArrayList<Tuple<Id, Double>>> testMap = comp.getDifferenceMap();
+		
+		TreeMap<Id, ArrayList<Tuple<Id, Integer>>> testMap2 = comp.getNumberOfMissedVehiclesMap();
 
 		System.out.println("Waiting");
 
