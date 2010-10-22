@@ -29,9 +29,9 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.ptproject.qsim.helpers.DefaultPersonDriverAgent;
-import org.matsim.ptproject.qsim.interfaces.QLink;
-import org.matsim.ptproject.qsim.interfaces.QNetworkI;
-import org.matsim.ptproject.qsim.interfaces.QSimI;
+import org.matsim.ptproject.qsim.interfaces.NetsimLink;
+import org.matsim.ptproject.qsim.interfaces.NetsimNetwork;
+import org.matsim.ptproject.qsim.interfaces.Mobsim;
 
 
 /**
@@ -43,7 +43,7 @@ public class DgWithindayQPersonAgent extends DefaultPersonDriverAgent {
 	private static final Logger log = Logger.getLogger(DgWithindayQPersonAgent.class);
 	private Random random;
 
-	public DgWithindayQPersonAgent(Person p, QSimI simulation, Random r) {
+	public DgWithindayQPersonAgent(Person p, Mobsim simulation, Random r) {
 		super(p, simulation);
 		random = r;
 	}
@@ -60,11 +60,11 @@ public class DgWithindayQPersonAgent extends DefaultPersonDriverAgent {
 //			return super.chooseNextLinkId();
 //		}
 		Id destinationLinkId = this.getDestinationLinkId();
-		QNetworkI qnet = this.getQSimulation().getQNetwork();
+		NetsimNetwork qnet = this.getQSimulation().getNetsimNetwork();
 		if (currentLinkId == destinationLinkId){
 				return null;
 		}
-		QLink currentQLink = qnet.getLinks().get(currentLinkId);
+		NetsimLink currentQLink = qnet.getNetsimLinks().get(currentLinkId);
 		Map<Id, ? extends Link> outlinks = currentQLink.getLink().getToNode().getOutLinks();
 		List<Link> outLinksList = new ArrayList<Link>();
 //		log.error("outlinks.size " + outlinks.size());

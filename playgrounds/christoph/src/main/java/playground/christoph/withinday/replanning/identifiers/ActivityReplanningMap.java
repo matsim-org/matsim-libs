@@ -45,7 +45,7 @@ import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationAfterSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
 import org.matsim.ptproject.qsim.QSim;
-import org.matsim.ptproject.qsim.interfaces.QSimI;
+import org.matsim.ptproject.qsim.interfaces.Mobsim;
 import org.matsim.ptproject.qsim.netsimengine.QNetwork;
 
 /*
@@ -116,10 +116,10 @@ public class ActivityReplanningMap implements AgentStuckEventHandler,
 	@Override
 	public void notifySimulationInitialized(SimulationInitializedEvent e) {
 
-		QSimI sim = (QSimI) e.getQueueSimulation();
+		Mobsim sim = (Mobsim) e.getQueueSimulation();
 
 		// Update Reference to QNetwork
-		this.qNetwork = (QNetwork) sim.getQNetwork();
+		this.qNetwork = (QNetwork) sim.getNetsimNetwork();
 
 		personAgentMapping = new HashMap<Id, PersonAgent>();
 

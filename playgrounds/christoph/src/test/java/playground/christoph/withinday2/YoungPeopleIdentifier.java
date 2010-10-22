@@ -8,8 +8,8 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.ptproject.qsim.interfaces.QLink;
-import org.matsim.ptproject.qsim.interfaces.QSimI;
+import org.matsim.ptproject.qsim.interfaces.NetsimLink;
+import org.matsim.ptproject.qsim.interfaces.Mobsim;
 import org.matsim.ptproject.qsim.interfaces.QVehicle;
 
 import playground.christoph.withinday.replanning.WithinDayReplanner;
@@ -18,7 +18,7 @@ import playground.christoph.withinday.replanning.identifiers.interfaces.DuringLe
 
 public class YoungPeopleIdentifier extends AgentsToReplanIdentifier {
 
-	private QSimI queueSim;
+	private Mobsim queueSim;
 
 	@Override
 	public List<PersonAgent> getAgentsToReplan(double time,
@@ -34,7 +34,7 @@ public class YoungPeopleIdentifier extends AgentsToReplanIdentifier {
 //		Collection<QVehicle> tmpList=queueSim.getQNetwork().getLinks().get(new IdImpl("6")).getAllNonParkedVehicles();
 
 		// select agents, which should be replanned within this time step
-		for (QLink link:queueSim.getQNetwork().getLinks().values()){
+		for (NetsimLink link:queueSim.getNetsimNetwork().getNetsimLinks().values()){
 //			for (QVehicle vehicle : link.getVehQueue()) {
 				for (QVehicle vehicle : link.getAllNonParkedVehicles()) {
 				PersonDriverAgent agent=vehicle.getDriver();
@@ -49,7 +49,7 @@ public class YoungPeopleIdentifier extends AgentsToReplanIdentifier {
 		return list;
 	}
 	
-	YoungPeopleIdentifier(QSimI queueSim) {
+	YoungPeopleIdentifier(Mobsim queueSim) {
 		this.queueSim = queueSim;
 	}
 

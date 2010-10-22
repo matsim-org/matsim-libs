@@ -62,11 +62,11 @@ import org.matsim.ptproject.qsim.helpers.QVehicleImpl;
 import org.matsim.ptproject.qsim.interfaces.AcceptsVisMobsimFeatures;
 import org.matsim.ptproject.qsim.interfaces.AgentCounterI;
 import org.matsim.ptproject.qsim.interfaces.DepartureHandler;
-import org.matsim.ptproject.qsim.interfaces.QLink;
-import org.matsim.ptproject.qsim.interfaces.QNetworkI;
-import org.matsim.ptproject.qsim.interfaces.QSimEngine;
-import org.matsim.ptproject.qsim.interfaces.QSimEngineFactory;
-import org.matsim.ptproject.qsim.interfaces.QSimI;
+import org.matsim.ptproject.qsim.interfaces.NetsimLink;
+import org.matsim.ptproject.qsim.interfaces.NetsimNetwork;
+import org.matsim.ptproject.qsim.interfaces.NetsimEngine;
+import org.matsim.ptproject.qsim.interfaces.NetsimEngineFactory;
+import org.matsim.ptproject.qsim.interfaces.Mobsim;
 import org.matsim.ptproject.qsim.interfaces.QVehicle;
 import org.matsim.ptproject.qsim.interfaces.SimTimerI;
 import org.matsim.ptproject.qsim.multimodalsimengine.MultiModalDepartureHandler;
@@ -98,7 +98,7 @@ import org.matsim.vis.snapshots.writers.VisNetwork;
  * @author dgrether
  * @author knagel
  */
-public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, QSimI {
+public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 
 	final private static Logger log = Logger.getLogger(QSim.class);
 
@@ -114,7 +114,7 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, QSimI {
 //	private QNetwork network;
 	private EventsManager events = null;
 
-	private QSimEngine netEngine = null;
+	private NetsimEngine netEngine = null;
 	private NetworkChangeEventsEngine changeEventsEngine = null;
 	private MultiModalSimEngine multiModalEngine = null;
 
@@ -167,7 +167,7 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, QSimI {
 		this(scenario, events, new DefaultQSimEngineFactory());
 	}
 
-	protected QSim(final Scenario sc, final EventsManager events, final QSimEngineFactory simEngineFac){
+	protected QSim(final Scenario sc, final EventsManager events, final NetsimEngineFactory simEngineFac){
 		this.scenario = sc;
 		this.events = events;
 		init(simEngineFac);
@@ -278,7 +278,7 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, QSimI {
 			agent.setVehicle(veh);
 			agents.add(agent);
 			if (agent.initializeAndCheckIfAlive()) {
-				QLink qlink = this.netEngine.getQNetwork().getQLink(agent.getCurrentLinkId());
+				NetsimLink qlink = this.netEngine.getQNetwork().getNetsimLink(agent.getCurrentLinkId());
 				qlink.addParkedVehicle(veh);
 			}
 		}
@@ -445,7 +445,7 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, QSimI {
 			} else {
 				Activity act = (Activity) pe;
 				Id linkId = act.getLinkId();
-				QLink qLink = this.netEngine.getQNetwork().getQLink(linkId);
+				NetsimLink qLink = this.netEngine.getQNetwork().getNetsimLink(linkId);
 				qLink.registerAgentOnLink(agent);
 			}
 		}
@@ -457,7 +457,7 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, QSimI {
 		if (agent instanceof DefaultPersonDriverAgent) { // yyyy but why is this needed?  Does the driver get registered?
 			Leg leg = (Leg) agent.getCurrentPlanElement() ;
 			Id linkId = leg.getRoute().getStartLinkId();
-			QLink qLink = this.netEngine.getQNetwork().getQLink(linkId) ;
+			NetsimLink qLink = this.netEngine.getQNetwork().getNetsimLink(linkId) ;
 			qLink.registerAgentOnLink( agent ) ;
 		}
 	}
@@ -471,7 +471,7 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, QSimI {
 			} else {
 				Activity act = (Activity) pe;
 				Id linkId = act.getLinkId();
-				QLink qLink = this.netEngine.getQNetwork().getQLink(linkId);
+				NetsimLink qLink = this.netEngine.getQNetwork().getNetsimLink(linkId);
 				qLink.unregisterAgentOnLink(agent);
 			}
 		}
@@ -483,7 +483,7 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, QSimI {
 		if (agent instanceof DefaultPersonDriverAgent) { // yyyy but why is this needed?
 			Leg leg = (Leg) agent.getCurrentPlanElement() ;
 			Id linkId = leg.getRoute().getStartLinkId();
-			QLink qLink = this.netEngine.getQNetwork().getQLink(linkId) ;
+			NetsimLink qLink = this.netEngine.getQNetwork().getNetsimLink(linkId) ;
 			qLink.unregisterAgentOnLink( agent ) ;
 		}
 	}
@@ -554,7 +554,7 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, QSimI {
 	 * Definitely needs to be strongly protected (e.g. private) since c'tor should not call non-protected methods. kai, aug'10
 	 * @param simEngineFac
 	 */
-	private void init(QSimEngineFactory simEngineFac){
+	private void init(NetsimEngineFactory simEngineFac){
 		log.info("Using QSim...");
 		Scenario sc = this.getScenario() ;
 		this.listenerManager = new SimulationListenerManager(this);
@@ -565,7 +565,7 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, QSimI {
 		this.netEngine = simEngineFac.createQSimEngine(this, MatsimRandom.getRandom());
 
 		// create the QNetwork ...
-		QNetworkI network = null ;
+		NetsimNetwork network = null ;
 		if (sc.getConfig().scenario().isUseLanes()) {
 			if (((ScenarioImpl)sc).getLaneDefinitions() == null) {
 				throw new IllegalStateException("Lane definitions have to be set if feature is enabled!");
@@ -676,7 +676,7 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, QSimI {
 	private void doSnapshot(final double time) {
 		if (!this.snapshotManager.getSnapshotWriters().isEmpty()) {
 			Collection<AgentSnapshotInfo> positions = new ArrayList<AgentSnapshotInfo>();
-			for (QLink link : this.getQNetwork().getLinks().values()) {
+			for (NetsimLink link : this.getNetsimNetwork().getNetsimLinks().values()) {
 				link.getVisData().getVehiclePositions( positions);
 			}
 			for (SnapshotWriter writer : this.snapshotManager.getSnapshotWriters()) {
@@ -715,7 +715,7 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, QSimI {
 	}
 
 	@Override
-	public final QNetwork getQNetwork() {
+	public final NetsimNetwork getNetsimNetwork() {
 		if ( this.netEngine != null ) {
 			return this.netEngine.getQNetwork() ;
 		} else {
@@ -764,7 +764,7 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, QSimI {
 		return this.simTimer ;
 	}
 
-	public final QSimEngine getQSimEngine() {
+	public final NetsimEngine getQSimEngine() {
 	  return this.netEngine;
 	}
 

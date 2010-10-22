@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * QSimEngine.java
+ * SimEngine
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,33 +17,25 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
 package org.matsim.ptproject.qsim.interfaces;
 
-import org.matsim.core.mobsim.framework.Steppable;
-import org.matsim.ptproject.qsim.helpers.AgentSnapshotInfoBuilder;
-import org.matsim.ptproject.qsim.netsimengine.QNetwork;
-
-
 /**
- * Coordinates the movement of vehicles on the links and the nodes.
- *
- * @author cdobler
  * @author dgrether
+ * @TODO rename QSimEngine to QSimNetworkEngine and this to QSimEngine
  */
+public interface MobsimEngine {
+  /**
+   *
+   * @return the QSim instance
+   */
+  public Mobsim getMobsim();
+  /**
+   * called in a predefined Order when the simulation is started
+   */
+  public void onPrepareSim();
+  /**
+   * Do some clean up.
+   */
+  public void afterSim();
 
-public interface QSimEngine extends SimEngine, Steppable {
-
-//	AgentSnapshotInfoBuilder getAgentSnapshotInfoBuilder();
-	
-	/**
-	 * for logging purposes; otherwise this is not important.  kai, oct'10
-	 */
-	int getNumberOfSimulatedLinks() ;
-	
-	QNetwork getQNetwork() ;
-	
-	QSimI getQSim() ;
-
-	
 }

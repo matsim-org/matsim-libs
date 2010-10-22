@@ -257,11 +257,11 @@ public class GershensonRunner implements AgentStuckEventHandler {
 				for(Entry<Id, Map<Id, SignalGroupDefinition>> ee: signalSystems.entrySet()){
 					DaAdaptiveController adaptiveController = (DaAdaptiveController) qs.getQSimSignalEngine().getSignalSystemControlerBySystemId().get(ee.getKey());
 					adaptiveController.setParameters(n, u, cap, maxRed);
-					adaptiveController.init(newCorrGroups.get(ee.getKey()), newMainOutlinks.get(ee.getKey()), ((QSim) e.getQueueSimulation()).getQNetwork(), handler2);
+					adaptiveController.init(newCorrGroups.get(ee.getKey()), newMainOutlinks.get(ee.getKey()), ((QSim) e.getQueueSimulation()).getNetsimNetwork(), handler2);
 					c.getEvents().addHandler(adaptiveController);
 				}
 
-				handler2.setQNetwork(((QSim) e.getQueueSimulation()).getQNetwork());
+				handler2.setQNetwork(((QSim) e.getQueueSimulation()).getNetsimNetwork());
 
 				qs.getEventsManager().addHandler(handler3);
 

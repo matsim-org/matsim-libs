@@ -29,6 +29,7 @@ import java.util.Random;
 
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.helpers.AgentSnapshotInfoBuilder;
+import org.matsim.ptproject.qsim.interfaces.Mobsim;
 
 
 /**
@@ -59,13 +60,13 @@ public class QSimEngineImpl extends QSimEngineInternalI {
 	/*package*/  ArrayList<QLinkInternalI> simActivateThis = new ArrayList<QLinkInternalI>();
 
 	private final Random random;
-  private final QSim qsim;
+  private final Mobsim qsim;
 
   private final AgentSnapshotInfoBuilder positionInfoBuilder;
 private QNetwork qNetwork;
 private final double stucktimeCache;
 
-	public QSimEngineImpl(final QSim sim, final Random random) {
+	public QSimEngineImpl(final Mobsim sim, final Random random) {
     this.random = random;
     this.qsim = sim;
     this.positionInfoBuilder = new AgentSnapshotInfoBuilder( sim.getScenario() );
@@ -74,8 +75,8 @@ private final double stucktimeCache;
 
   @Override
   public void onPrepareSim() {
-    this.allLinks = new ArrayList<QLinkInternalI>(this.qsim.getQNetwork().getLinks().values());
-    this.simNodesArray = this.qsim.getQNetwork().getNodes().values().toArray(new QNode[this.qsim.getQNetwork().getNodes().values().size()]);
+    this.allLinks = new ArrayList<QLinkInternalI>(this.getQNetwork().getNetsimLinks().values());
+    this.simNodesArray = this.qsim.getNetsimNetwork().getNetsimNodes().values().toArray(new QNode[this.qsim.getNetsimNetwork().getNetsimNodes().values().size()]);
     //dg[april08] as the order of nodes has an influence on the simulation
     //results they are sorted to avoid indeterministic simulations
     Arrays.sort(this.simNodesArray, new Comparator<QNode>() {
@@ -169,7 +170,7 @@ private final double stucktimeCache;
 	}
 
   @Override
-  public QSim getQSim() {
+  public Mobsim getMobsim() {
     return this.qsim;
   }
 

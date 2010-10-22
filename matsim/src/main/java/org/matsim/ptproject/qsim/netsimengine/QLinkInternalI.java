@@ -4,18 +4,18 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.ptproject.qsim.interfaces.QLink;
-import org.matsim.ptproject.qsim.interfaces.QSimEngine;
+import org.matsim.ptproject.qsim.interfaces.NetsimLink;
+import org.matsim.ptproject.qsim.interfaces.NetsimEngine;
 import org.matsim.ptproject.qsim.interfaces.QVehicle;
 import org.matsim.vis.snapshots.writers.VisLink;
 
-public abstract class QLinkInternalI extends QBufferItem implements QLink {
+public abstract class QLinkInternalI extends QBufferItem implements NetsimLink {
 	// yyyy this class needs to be public with some of the traffic signal code, but I do not understand why.  kai, aug'10
 
 	// for Customizable
 	private Map<String, Object> customAttributes = new HashMap<String, Object>();
 
-	abstract void setQSimEngine(QSimEngine qsimEngine);
+	abstract void setQSimEngine(NetsimEngine qsimEngine);
 
 	protected abstract boolean moveLink(double now);
 

@@ -23,36 +23,36 @@ package org.matsim.ptproject.qsim.netsimengine;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.lanes.LaneDefinitions;
-import org.matsim.ptproject.qsim.interfaces.QNetworkFactory;
-import org.matsim.ptproject.qsim.interfaces.QSimEngine;
+import org.matsim.ptproject.qsim.interfaces.NetsimNetworkFactory;
+import org.matsim.ptproject.qsim.interfaces.NetsimEngine;
 
 
-public class QLanesNetworkFactory implements QNetworkFactory<QNode, QLinkInternalI> {
+public class QLanesNetworkFactory implements NetsimNetworkFactory<QNode, QLinkInternalI> {
 
-	private QNetworkFactory<QNode, QLinkInternalI> delegate;
+	private NetsimNetworkFactory<QNode, QLinkInternalI> delegate;
 	private LaneDefinitions laneDefinitions;
 
-	public QLanesNetworkFactory(QNetworkFactory<QNode, QLinkInternalI> delegate, LaneDefinitions laneDefintions){
+	public QLanesNetworkFactory(NetsimNetworkFactory<QNode, QLinkInternalI> delegate, LaneDefinitions laneDefintions){
 		this.delegate = delegate;
 		this.laneDefinitions = laneDefintions;
 	}
 
 	@Override
-	public QLinkInternalI createQueueLink(Link link, QSimEngine engine,
+	public QLinkInternalI createNetsimLink(Link link, NetsimEngine engine,
 			QNode queueNode) {
 		QLinkInternalI ql = null;
 		if (this.laneDefinitions.getLanesToLinkAssignments().containsKey(link.getId())){
 			ql = new QLinkLanesImpl(link, engine, queueNode, this.laneDefinitions.getLanesToLinkAssignments().get(link.getId()).getLanes());
 		}
 		else {
-			ql = this.delegate.createQueueLink(link, engine, queueNode);
+			ql = this.delegate.createNetsimLink(link, engine, queueNode);
 		}
 		return ql;
 	}
 
 	@Override
-	public QNode createQueueNode(Node node, QSimEngine simEngine) {
-		return this.delegate.createQueueNode(node, simEngine);
+	public QNode createNetsimNode(Node node, NetsimEngine simEngine) {
+		return this.delegate.createNetsimNode(node, simEngine);
 	}
 
 }

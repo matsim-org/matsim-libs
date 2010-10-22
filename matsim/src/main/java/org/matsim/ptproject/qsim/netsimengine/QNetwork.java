@@ -29,10 +29,10 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.ptproject.qsim.QSim;
-import org.matsim.ptproject.qsim.interfaces.QNetworkFactory;
-import org.matsim.ptproject.qsim.interfaces.QNetworkI;
-import org.matsim.ptproject.qsim.interfaces.QNodeI;
-import org.matsim.ptproject.qsim.interfaces.QSimEngine;
+import org.matsim.ptproject.qsim.interfaces.NetsimNetworkFactory;
+import org.matsim.ptproject.qsim.interfaces.NetsimNetwork;
+import org.matsim.ptproject.qsim.interfaces.NetsimNode;
+import org.matsim.ptproject.qsim.interfaces.NetsimEngine;
 import org.matsim.vis.snapshots.writers.VisLink;
 import org.matsim.vis.snapshots.writers.VisNetwork;
 import org.matsim.vis.snapshots.writers.VisNode;
@@ -43,7 +43,8 @@ import org.matsim.vis.snapshots.writers.VisNode;
  * @author mrieser
  * @author dgrether
  */
-public final class QNetwork implements VisNetwork, QNetworkI {
+@Deprecated // please try to use the interfaces outside the package.  This will also make your code portable.  kai, oct'10
+public final class QNetwork implements VisNetwork, NetsimNetwork {
 
 	private final Map<Id, QLinkInternalI> links;
 
@@ -51,7 +52,7 @@ public final class QNetwork implements VisNetwork, QNetworkI {
 
 	private final Network networkLayer;
 
-	private final QNetworkFactory<QNode, QLinkInternalI> queueNetworkFactory;
+	private final NetsimNetworkFactory<QNode, QLinkInternalI> queueNetworkFactory;
 
 //	private QSim qSim;
 	private QSimEngineImpl qSimEngine;
@@ -66,7 +67,7 @@ public final class QNetwork implements VisNetwork, QNetworkI {
 	/**
 	 * This is deliberately package-private.  Please use the factory
 	 */
-	QNetwork(final QSim qs, final QNetworkFactory<QNode, QLinkInternalI> factory ) {
+	QNetwork(final QSim qs, final NetsimNetworkFactory<QNode, QLinkInternalI> factory ) {
 //		this.qSim = qs;
 		this.networkLayer = qs.getScenario().getNetwork();
 		this.queueNetworkFactory = factory;
@@ -76,14 +77,14 @@ public final class QNetwork implements VisNetwork, QNetworkI {
 
 
 	@Override
-	public void initialize(QSimEngine simEngine) {
+	public void initialize(NetsimEngine simEngine) {
 		this.qSimEngine = (QSimEngineImpl) simEngine;
 		this.qSimEngine.setQNetwork(this);
 		for (Node n : networkLayer.getNodes().values()) {
-			this.nodes.put(n.getId(), this.queueNetworkFactory.createQueueNode(n, simEngine));
+			this.nodes.put(n.getId(), this.queueNetworkFactory.createNetsimNode(n, simEngine));
 		}
 		for (Link l : networkLayer.getLinks().values()) {
-			this.links.put(l.getId(), this.queueNetworkFactory.createQueueLink(l, simEngine, this.nodes.get(l.getToNode().getId())));
+			this.links.put(l.getId(), this.queueNetworkFactory.createNetsimLink(l, simEngine, this.nodes.get(l.getToNode().getId())));
 		}
 		for (QNode n : this.nodes.values()) {
 			n.init();
@@ -96,7 +97,7 @@ public final class QNetwork implements VisNetwork, QNetworkI {
 	}
 
 	@Override
-	public Map<Id, QLinkInternalI> getLinks() {
+	public Map<Id, QLinkInternalI> getNetsimLinks() {
 		return Collections.unmodifiableMap(this.links);
 	}
 
@@ -106,7 +107,7 @@ public final class QNetwork implements VisNetwork, QNetworkI {
 	}
 
 	@Override
-	public Map<Id, QNode> getNodes() {
+	public Map<Id, QNode> getNetsimNodes() {
 		return Collections.unmodifiableMap(this.nodes);
 	}
 
@@ -116,12 +117,12 @@ public final class QNetwork implements VisNetwork, QNetworkI {
 	}
 
 	@Override
-	public QLinkInternalI getQLink(final Id id) {
+	public QLinkInternalI getNetsimLink(final Id id) {
 		return this.links.get(id);
 	}
 
 	@Override
-	public QNodeI getQNode(final Id id) {
+	public NetsimNode getNetsimNode(final Id id) {
 		return this.nodes.get(id);
 	}
 

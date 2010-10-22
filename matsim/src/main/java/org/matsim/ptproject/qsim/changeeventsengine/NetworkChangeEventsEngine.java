@@ -26,14 +26,14 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.ptproject.qsim.QSim;
-import org.matsim.ptproject.qsim.interfaces.SimEngine;
+import org.matsim.ptproject.qsim.interfaces.MobsimEngine;
 
 
 /**
  * @author dgrether
  *
  */
-public class NetworkChangeEventsEngine implements SimEngine {
+public class NetworkChangeEventsEngine implements MobsimEngine {
 
 	
 	private PriorityQueue<NetworkChangeEvent> networkChangeEventsQueue = null;
@@ -50,7 +50,7 @@ public class NetworkChangeEventsEngine implements SimEngine {
 	}
 
 	@Override
-	public QSim getQSim() {
+	public QSim getMobsim() {
 		return this.qsim;
 	}
 
@@ -73,7 +73,7 @@ public class NetworkChangeEventsEngine implements SimEngine {
 		while ((this.networkChangeEventsQueue.size() > 0) && (this.networkChangeEventsQueue.peek().getStartTime() <= time)){
 			NetworkChangeEvent event = this.networkChangeEventsQueue.poll();
 			for (Link link : event.getLinks()) {
-				this.getQSim().getQNetwork().getQLink(link.getId()).recalcTimeVariantAttributes(time);
+				this.getMobsim().getNetsimNetwork().getNetsimLink(link.getId()).recalcTimeVariantAttributes(time);
 			}
 		}
 	}

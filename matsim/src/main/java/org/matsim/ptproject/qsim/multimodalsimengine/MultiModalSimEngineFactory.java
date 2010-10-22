@@ -21,16 +21,17 @@
 package org.matsim.ptproject.qsim.multimodalsimengine;
 
 import org.apache.log4j.Logger;
-import org.matsim.ptproject.qsim.interfaces.QLink;
-import org.matsim.ptproject.qsim.interfaces.QNetworkI;
-import org.matsim.ptproject.qsim.interfaces.QSimI;
+import org.matsim.ptproject.qsim.interfaces.NetsimLink;
+import org.matsim.ptproject.qsim.interfaces.NetsimNetwork;
+import org.matsim.ptproject.qsim.interfaces.NetsimNode;
+import org.matsim.ptproject.qsim.interfaces.Mobsim;
 import org.matsim.ptproject.qsim.netsimengine.QNode;
 
 public class MultiModalSimEngineFactory {
 
 	final private static Logger log = Logger.getLogger(MultiModalSimEngineFactory.class);
 	
-	public MultiModalSimEngine createMultiModalSimEngine(QSimI sim) {
+	public MultiModalSimEngine createMultiModalSimEngine(Mobsim sim) {
 		
 		MultiModalSimEngine simEngine;
 		
@@ -43,24 +44,24 @@ public class MultiModalSimEngineFactory {
 			simEngine = new MultiModalSimEngine(sim);			
 		}
 		
-		addMultiModalToQNetwork(sim.getQNetwork(), simEngine);
+		addMultiModalToQNetwork(sim.getNetsimNetwork(), simEngine);
 		
 		return simEngine;
 	}
 	
-	private void addMultiModalToQNetwork(QNetworkI network, MultiModalSimEngine simEngine) {
-		for (QNode node : network.getNodes().values()) {
+	private void addMultiModalToQNetwork(NetsimNetwork network, MultiModalSimEngine simEngine) {
+		for (NetsimNode node : network.getNetsimNodes().values()) {
 			MultiModalQNodeExtension extension = new MultiModalQNodeExtension(node.getNode(), simEngine);
 			node.getCustomAttributes().put(MultiModalQNodeExtension.class.getName(), extension);
 		}
 		
-		for (QLink link : network.getLinks().values()) {
+		for (NetsimLink link : network.getNetsimLinks().values()) {
 			QNode toNode = link.getToQueueNode();
 			MultiModalQLinkExtension extension = new MultiModalQLinkExtension(link, simEngine, toNode);
 			link.getCustomAttributes().put(MultiModalQLinkExtension.class.getName(), extension);
 		}
 		
-		for (QNode node : network.getNodes().values()) {
+		for (NetsimNode node : network.getNetsimNodes().values()) {
 			MultiModalQNodeExtension extension = simEngine.getMultiModalQNodeExtension(node);
 			extension.init();
 		}

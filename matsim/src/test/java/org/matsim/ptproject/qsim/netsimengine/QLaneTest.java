@@ -33,10 +33,7 @@ import org.matsim.lanes.LaneDefinitions;
 import org.matsim.lanes.LaneDefinitionsFactory;
 import org.matsim.lanes.LanesToLinkAssignment;
 import org.matsim.ptproject.qsim.QSim;
-import org.matsim.ptproject.qsim.interfaces.QLink;
-import org.matsim.ptproject.qsim.netsimengine.QLane;
-import org.matsim.ptproject.qsim.netsimengine.QLinkLanesImpl;
-import org.matsim.ptproject.qsim.netsimengine.QNetwork;
+import org.matsim.ptproject.qsim.interfaces.NetsimNetwork;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -133,8 +130,8 @@ public class QLaneTest extends MatsimTestCase {
 		this.initNetwork(scenario.getNetwork());
 		
 		QSim queueSim = new QSim(scenario, null);
-		QNetwork queueNetwork = queueSim.getQNetwork();
-		QLinkImpl ql = (QLinkImpl) queueNetwork.getQLink(id1);
+		NetsimNetwork queueNetwork = queueSim.getNetsimNetwork();
+		QLinkImpl ql = (QLinkImpl) queueNetwork.getNetsimLink(id1);
 
 		assertEquals(0.5, ql.getSimulatedFlowCapacity());
 		assertEquals(268.0, ql.getSpaceCap());
@@ -148,8 +145,8 @@ public class QLaneTest extends MatsimTestCase {
 		this.createOneLane(scenario, 1);
 		
 		QSim queueSim = new QSim(scenario, null);
-		QNetwork queueNetwork = queueSim.getQNetwork();
-		QLinkLanesImpl ql = (QLinkLanesImpl) queueNetwork.getQLink(id1);
+		NetsimNetwork queueNetwork = queueSim.getNetsimNetwork();
+		QLinkLanesImpl ql = (QLinkLanesImpl) queueNetwork.getNetsimLink(id1);
 
 		assertEquals(0.5, ql.getSimulatedFlowCapacity());
 		//900 m link, 2 lanes = 240 storage + 105 m lane, 1 lane = 14 storage
@@ -179,8 +176,8 @@ public class QLaneTest extends MatsimTestCase {
 		this.createOneLane(scenario, 2);
 		
 		QSim queueSim = new QSim(scenario, null);
-		QNetwork queueNetwork = queueSim.getQNetwork();
-		QLinkLanesImpl ql = (QLinkLanesImpl) queueNetwork.getQLink(id1);
+		NetsimNetwork queueNetwork = queueSim.getNetsimNetwork();
+		QLinkLanesImpl ql = (QLinkLanesImpl) queueNetwork.getNetsimLink(id1);
 
 		assertEquals(0.5, ql.getSimulatedFlowCapacity());
 		//900 m link, 2 lanes = 240 storage + 105 m lane, 2 lanes = 28 storage
@@ -212,8 +209,8 @@ public class QLaneTest extends MatsimTestCase {
 		this.createLanes(scenario);
 		
 		QSim queueSim = new QSim(scenario, null);
-		QNetwork queueNetwork = queueSim.getQNetwork();
-		QLinkLanesImpl ql = (QLinkLanesImpl) queueNetwork.getQLink(id1);
+		NetsimNetwork queueNetwork = queueSim.getNetsimNetwork();
+		QLinkLanesImpl ql = (QLinkLanesImpl) queueNetwork.getNetsimLink(id1);
 
 		assertEquals(0.5, ql.getSimulatedFlowCapacity());
 		//240 link + 2 * 14 + 1 * 28 = 

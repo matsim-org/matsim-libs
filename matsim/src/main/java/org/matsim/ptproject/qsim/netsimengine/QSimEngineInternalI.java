@@ -21,15 +21,19 @@
 package org.matsim.ptproject.qsim.netsimengine;
 
 import org.matsim.ptproject.qsim.helpers.AgentSnapshotInfoBuilder;
-import org.matsim.ptproject.qsim.interfaces.QSimEngine;
+import org.matsim.ptproject.qsim.interfaces.NetsimEngine;
 
 /**
  * @author nagel
  *
  */
-abstract class QSimEngineInternalI extends LinkActivator implements QSimEngine {
+abstract class QSimEngineInternalI extends LinkActivator implements NetsimEngine {
 	
 	abstract AgentSnapshotInfoBuilder getAgentSnapshotInfoBuilder() ;
+	
+	/** internally, we provide the full QNetwork */
+	@Override
+	abstract public QNetwork getQNetwork() ;
 
 
 }

@@ -23,7 +23,7 @@ import java.util.SortedMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.ptproject.qsim.interfaces.QSimI;
+import org.matsim.ptproject.qsim.interfaces.Mobsim;
 import org.matsim.signalsystems.control.SignalSystemController;
 import org.matsim.signalsystems.systems.SignalSystemDefinition;
 
@@ -35,6 +35,6 @@ public interface SignalEngine {
 
 	public EventsManager getEvents(); 
 	
-	public QSimI getQSim();
+	public Mobsim getMobsim();
 	
 }

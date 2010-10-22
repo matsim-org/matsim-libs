@@ -8,7 +8,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.ptproject.qsim.interfaces.QLink;
+import org.matsim.ptproject.qsim.interfaces.NetsimLink;
 import org.matsim.ptproject.qsim.interfaces.QVehicle;
 
 import playground.christoph.withinday.mobsim.WithinDayQSim;
@@ -36,12 +36,12 @@ public class YoungPeopleIdentifier extends DuringLegIdentifier {
 			return list;
 		}
 		
-		QLink tmpLink = queueSim.getQNetwork().getLinks().get(new IdImpl("6"));
+		NetsimLink tmpLink = queueSim.getNetsimNetwork().getNetsimLinks().get(new IdImpl("6"));
 //		Collection<QVehicle> tmpList=queueSim.getQNetwork().getLinks().get(new IdImpl("6")).getVehQueue();
-		Collection<QVehicle> tmpList=queueSim.getQNetwork().getLinks().get(new IdImpl("6")).getAllNonParkedVehicles();
+		Collection<QVehicle> tmpList=queueSim.getNetsimNetwork().getNetsimLinks().get(new IdImpl("6")).getAllNonParkedVehicles();
 
 		// select agents, which should be replanned within this time step
-		for (QLink link:queueSim.getQNetwork().getLinks().values()){
+		for (NetsimLink link:queueSim.getNetsimNetwork().getNetsimLinks().values()){
 //			for (QVehicle vehicle : link.getVehQueue()) {
 			for (QVehicle vehicle : link.getAllNonParkedVehicles()) {
 				PersonDriverAgent agent=vehicle.getDriver();

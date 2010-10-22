@@ -91,7 +91,7 @@ public class AdaptiveController5 extends
 	}
 	
 	private void initParametersFromConfig(){
-		Config config = this.getSignalEngine().getQSim().getScenario().getConfig();
+		Config config = this.getSignalEngine().getMobsim().getScenario().getConfig();
 	  Module m = config.getModule(DaganzoScenarioGenerator.CONFIG_MODULE);
 	  this.initialRedNormalRoute = Double.parseDouble(m.getValue(DaganzoScenarioGenerator.INTIAL_RED_NORMAL_ROUTE_CONFIG_PARAMETER));
 	  log.info("Using initialRedNormalRoute: " + this.initialRedNormalRoute);

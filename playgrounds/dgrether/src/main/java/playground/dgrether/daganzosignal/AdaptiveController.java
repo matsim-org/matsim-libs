@@ -69,7 +69,7 @@ public class AdaptiveController extends
 	@Override
 	public void setSignalEngine(SignalEngine signalEngine) {
 		super.setSignalEngine(signalEngine);
-		Config config = this.getSignalEngine().getQSim().getScenario().getConfig();
+		Config config = this.getSignalEngine().getMobsim().getScenario().getConfig();
 	  pSignal = Double.parseDouble(config.getModule(DaganzoScenarioGenerator.CONFIG_MODULE).getValue(DaganzoScenarioGenerator.PSIGNAL_CONFIG_PARAMETER));
 	}
 	

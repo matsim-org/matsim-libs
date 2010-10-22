@@ -229,7 +229,7 @@ public class AnalysisTest4Bln implements Analysis4Bln {
 
 			QSim qsim = new QSim(sc, new EventsManagerImpl());
 
-			new OTFEvent2MVI(qsim.getQNetwork(), eventsOutputFilename,
+			new OTFEvent2MVI(qsim.getNetsimNetwork(), eventsOutputFilename,
 					eventsFilename.split("events.txt.gz")[0]
 							+ (scenario.equals("normal") ? "" : scenario + ".")
 							+ "otfvis.mvi", Integer

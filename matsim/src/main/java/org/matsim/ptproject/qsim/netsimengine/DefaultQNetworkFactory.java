@@ -22,32 +22,32 @@ package org.matsim.ptproject.qsim.netsimengine;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.ptproject.qsim.QSim;
-import org.matsim.ptproject.qsim.interfaces.QNetworkFactory;
-import org.matsim.ptproject.qsim.interfaces.QNetworkI;
-import org.matsim.ptproject.qsim.interfaces.QSimEngine;
+import org.matsim.ptproject.qsim.interfaces.NetsimNetworkFactory;
+import org.matsim.ptproject.qsim.interfaces.NetsimNetwork;
+import org.matsim.ptproject.qsim.interfaces.NetsimEngine;
 
 
 /**
  * @author dgrether
  */
-public final class DefaultQNetworkFactory implements QNetworkFactory<QNode, QLinkInternalI> {
+public final class DefaultQNetworkFactory implements NetsimNetworkFactory<QNode, QLinkInternalI> {
 
-	public QLinkInternalI createQueueLink(final Link link, final QSimEngine simEngine, final QNode toQueueNode) {
+	public QLinkInternalI createNetsimLink(final Link link, final NetsimEngine simEngine, final QNode toQueueNode) {
 		return new QLinkImpl(link, simEngine, toQueueNode);
 	}
 
 	/**
-	 * @see org.matsim.core.mobsim.queuesim.QueueNetworkFactory#createQueueNode(org.matsim.core.network.NodeImpl, org.matsim.core.mobsim.queuesim.QueueNetwork)
+	 * @see org.matsim.core.mobsim.queuesim.QueueNetworkFactory#createNetsimNode(org.matsim.core.network.NodeImpl, org.matsim.core.mobsim.queuesim.QueueNetwork)
 	 */
-	public QNode createQueueNode(final Node node, QSimEngine simEngine) {
+	public QNode createNetsimNode(final Node node, NetsimEngine simEngine) {
 		return new QNode(node, simEngine);
 	}
 
-	public static QNetworkI createQNetwork(QSim qs, QNetworkFactory<QNode, QLinkInternalI> factory) {
+	public static NetsimNetwork createQNetwork(QSim qs, NetsimNetworkFactory<QNode, QLinkInternalI> factory) {
 		return new QNetwork(qs, factory);
 	}
 
-	public static QNetworkI createQNetwork(QSim qs) {
+	public static NetsimNetwork createQNetwork(QSim qs) {
 		return new QNetwork(qs);
 	}
 

@@ -26,7 +26,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
-import org.matsim.ptproject.qsim.interfaces.QLink;
+import org.matsim.ptproject.qsim.interfaces.NetsimLink;
 
 public class MultiModalQNodeExtension {
 	
@@ -52,7 +52,7 @@ public class MultiModalQNodeExtension {
 	/*package*/ void init() {
 		int i = 0;
 		for (Link link : node.getInLinks().values()) {
-			QLink qLink = simEngine.getQSim().getQNetwork().getLinks().get(link.getId());
+			NetsimLink qLink = simEngine.getMobsim().getNetsimNetwork().getNetsimLinks().get(link.getId());
 			this.inLinksArrayCache[i] = simEngine.getMultiModalQLinkExtension(qLink);
 			i++;
 		}
@@ -123,11 +123,11 @@ public class MultiModalQNodeExtension {
 		Id currentLinkId = ((PersonDriverAgent)personAgent).getCurrentLinkId();
 		Id nextLinkId = ((PersonDriverAgent)personAgent).chooseNextLinkId();
 		
-		QLink currentQLink = this.simEngine.getQSim().getQNetwork().getLinks().get(currentLinkId);
+		NetsimLink currentQLink = this.simEngine.getMobsim().getNetsimNetwork().getNetsimLinks().get(currentLinkId);
 		Link currentLink = currentQLink.getLink();
 		
 		if (nextLinkId != null) {
-			QLink nextQLink = this.simEngine.getQSim().getQNetwork().getLinks().get(nextLinkId);			
+			NetsimLink nextQLink = this.simEngine.getMobsim().getNetsimNetwork().getNetsimLinks().get(nextLinkId);			
 			Link nextLink = nextQLink.getLink();
 			
 			this.checkNextLinkSemantics(currentLink, nextLink, personAgent);
@@ -139,8 +139,8 @@ public class MultiModalQNodeExtension {
 		// --> nextLink == null
 		else
 		{
-			this.simEngine.getQSim().getAgentCounter().decLiving();
-			this.simEngine.getQSim().getAgentCounter().incLost();
+			this.simEngine.getMobsim().getAgentCounter().decLiving();
+			this.simEngine.getMobsim().getAgentCounter().incLost();
 			log.error(
 					"Agent has no or wrong route! agentId=" + personAgent.getPerson().getId()
 					+ " currentLink=" + currentLink.getId().toString()

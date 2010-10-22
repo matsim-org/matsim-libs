@@ -21,13 +21,13 @@ package org.matsim.pt.qsim;
 
 import org.matsim.core.api.internal.MatsimFactory;
 import org.matsim.pt.Umlauf;
-import org.matsim.ptproject.qsim.interfaces.QSimI;
+import org.matsim.ptproject.qsim.interfaces.Mobsim;
 
 /**
  * @author aneumann
  */
 public interface AbstractTransitDriverFactory extends MatsimFactory {
 
-	public AbstractTransitDriver createTransitDriver(Umlauf umlauf, TransitStopAgentTracker thisAgentTrackerVehicle, QSimI qSim);
+	public AbstractTransitDriver createTransitDriver(Umlauf umlauf, TransitStopAgentTracker thisAgentTrackerVehicle, Mobsim qSim);
 
 }

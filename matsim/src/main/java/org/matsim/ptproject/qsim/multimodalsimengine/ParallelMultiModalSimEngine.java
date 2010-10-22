@@ -24,9 +24,9 @@ import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 
 import org.matsim.core.gbl.Gbl;
-import org.matsim.ptproject.qsim.interfaces.QLink;
-import org.matsim.ptproject.qsim.interfaces.QSimI;
-import org.matsim.ptproject.qsim.netsimengine.QNode;
+import org.matsim.ptproject.qsim.interfaces.NetsimLink;
+import org.matsim.ptproject.qsim.interfaces.NetsimNode;
+import org.matsim.ptproject.qsim.interfaces.Mobsim;
 
 class ParallelMultiModalSimEngine extends MultiModalSimEngine {
 	
@@ -39,9 +39,9 @@ class ParallelMultiModalSimEngine extends MultiModalSimEngine {
 	private CyclicBarrier reactivateLinksBarrier;
 	private CyclicBarrier endBarrier;
 
-	ParallelMultiModalSimEngine(QSimI sim) {
+	ParallelMultiModalSimEngine(Mobsim sim) {
 		super(sim);
-		this.numOfThreads = this.getQSim().getScenario().getConfig().getQSimConfigGroup().getNumberOfThreads();
+		this.numOfThreads = this.getMobsim().getScenario().getConfig().getQSimConfigGroup().getNumberOfThreads();
 	}
 
 	@Override
@@ -171,7 +171,7 @@ class ParallelMultiModalSimEngine extends MultiModalSimEngine {
 		// setup runners
 		for (int i = 0; i < numOfThreads; i++) {
 			MultiModalSimEngineRunner engine = new MultiModalSimEngineRunner(startBarrier, reactivateLinksBarrier, 
-					separationBarrier, reactivateNodesBarrier, endBarrier, this.getQSim(), multiModalTravelTime);
+					separationBarrier, reactivateNodesBarrier, endBarrier, this.getMobsim(), multiModalTravelTime);
 
 			Thread thread = new Thread(engine);
 			thread.setName("MultiModalSimEngineRunner" + i);
@@ -190,12 +190,12 @@ class ParallelMultiModalSimEngine extends MultiModalSimEngine {
 	private void assignSimEngines() {
 		int roundRobin = 0;
 
-		for (QNode node : this.getQSim().getQNetwork().getNodes().values()) {
+		for (NetsimNode node : this.getMobsim().getNetsimNetwork().getNetsimNodes().values()) {
 			super.getMultiModalQNodeExtension(node).setMultiModalSimEngine(engines[roundRobin % this.numOfThreads]);
 			roundRobin++;
 		}
 		
-		for (QLink link : this.getQSim().getQNetwork().getLinks().values()) {
+		for (NetsimLink link : this.getMobsim().getNetsimNetwork().getNetsimLinks().values()) {
 			super.getMultiModalQLinkExtension(link).setMultiModalSimEngine(engines[roundRobin % this.numOfThreads]);
 			roundRobin++;
 		}

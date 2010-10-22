@@ -24,6 +24,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.router.util.PersonalizableTravelTime;
+import org.matsim.ptproject.qsim.interfaces.NetsimNetwork;
 import org.matsim.ptproject.qsim.netsimengine.QNetwork;
 
 import playground.christoph.network.MyLinkImpl;
@@ -35,11 +36,11 @@ public class KnowledgeTravelTimeCalculator implements PersonalizableTravelTime {
 	protected double tbuffer = 35.0;		// time distance ("safety distance") between two vehicles
 	protected double vehicleLength = 7.5;	// length of a vehicle
 	protected boolean calcFreeSpeedTravelTimes = false;
-	protected QNetwork qNetwork;
+	protected NetsimNetwork qNetwork;
 	
 	private static final Logger log = Logger.getLogger(KnowledgeTravelTimeCalculator.class);
 	
-	public KnowledgeTravelTimeCalculator(QNetwork qNetwork) {
+	public KnowledgeTravelTimeCalculator(NetsimNetwork qNetwork) {
 		if (qNetwork == null) log.warn("No QNetwork was commited - FreeSpeedTravelTimes will be calculated and returned!");
 		this.qNetwork = qNetwork;
 	}

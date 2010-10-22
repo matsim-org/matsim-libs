@@ -41,10 +41,9 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.helpers.DefaultPersonDriverAgent;
 import org.matsim.ptproject.qsim.helpers.QVehicleImpl;
-import org.matsim.ptproject.qsim.interfaces.QLink;
+import org.matsim.ptproject.qsim.interfaces.NetsimLink;
+import org.matsim.ptproject.qsim.interfaces.NetsimNetwork;
 import org.matsim.ptproject.qsim.interfaces.QVehicle;
-import org.matsim.ptproject.qsim.netsimengine.QLinkImpl;
-import org.matsim.ptproject.qsim.netsimengine.QNetwork;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleImpl;
@@ -72,7 +71,7 @@ public class QLinkTest extends MatsimTestCase {
 		// Extend the tests by checking the methods initFlowCapacity and
 		// recalcCapacity
 		assertEquals(f.link1, f.qlink1.getLink());
-		assertEquals(f.queueNetwork.getQNode(new IdImpl("2")), f.qlink1.getToQueueNode());
+		assertEquals(f.queueNetwork.getNetsimNode(new IdImpl("2")), f.qlink1.getToQueueNode());
 	}
 
 
@@ -93,8 +92,8 @@ public class QLinkTest extends MatsimTestCase {
 	}
 
 	/**
-	 * Tests that vehicles driving on a link are found with {@link QLink#getVehicle(Id)}
-	 * and {@link QLink#getAllVehicles()}.
+	 * Tests that vehicles driving on a link are found with {@link NetsimLink#getVehicle(Id)}
+	 * and {@link NetsimLink#getAllVehicles()}.
 	 *
 	 * @author mrieser
 	 */
@@ -139,8 +138,8 @@ public class QLinkTest extends MatsimTestCase {
 	}
 
 	/**
-	 * Tests that vehicles parked on a link are found with {@link QLink#getVehicle(Id)}
-	 * and {@link QLink#getAllVehicles()}.
+	 * Tests that vehicles parked on a link are found with {@link NetsimLink#getVehicle(Id)}
+	 * and {@link NetsimLink#getAllVehicles()}.
 	 *
 	 * @author mrieser
 	 */
@@ -174,8 +173,8 @@ public class QLinkTest extends MatsimTestCase {
 	}
 
 	/**
-	 * Tests that vehicles departing on a link are found with {@link QLink#getVehicle(Id)}
-	 * and {@link QLink#getAllVehicles()}.
+	 * Tests that vehicles departing on a link are found with {@link NetsimLink#getVehicle(Id)}
+	 * and {@link NetsimLink#getAllVehicles()}.
 	 *
 	 * @author mrieser
 	 */
@@ -245,8 +244,8 @@ public class QLinkTest extends MatsimTestCase {
 		Link link1 = network.createAndAddLink(new IdImpl("1"), node1, node2, 1.0, 1.0, 1.0, 1.0);
 		Link link2 = network.createAndAddLink(new IdImpl("2"), node2, node3, 1.0, 1.0, 1.0, 1.0);
 		QSim qsim = new QSim(scenario, new EventsManagerImpl());
-		QNetwork queueNetwork = qsim.getQNetwork();
-		QLinkImpl qlink = (QLinkImpl) queueNetwork.getQLink(new IdImpl("1"));
+		NetsimNetwork queueNetwork = qsim.getNetsimNetwork();
+		QLinkImpl qlink = (QLinkImpl) queueNetwork.getNetsimLink(new IdImpl("1"));
 
 		QVehicleImpl v1 = new QVehicleImpl(new VehicleImpl(new IdImpl("1"), new VehicleTypeImpl(new IdImpl("defaultVehicleType"))));
 		PersonImpl p = new PersonImpl(new IdImpl("1"));
@@ -361,7 +360,7 @@ public class QLinkTest extends MatsimTestCase {
 		/*package*/ final ScenarioImpl scenario;
 		/*package*/ final Link link1;
 		/*package*/ final Link link2;
-		/*package*/ final QNetwork queueNetwork;
+		/*package*/ final NetsimNetwork queueNetwork;
 		/*package*/ final QLinkImpl qlink1;
 		/*package*/ final QLinkImpl qlink2;
 		/*package*/ final Vehicle basicVehicle;
@@ -377,9 +376,9 @@ public class QLinkTest extends MatsimTestCase {
 			this.link1 = network.createAndAddLink(new IdImpl("1"), node1, node2, 1.0, 1.0, 3600.0, 1.0);
 			this.link2 = network.createAndAddLink(new IdImpl("2"), node2, node3, 10 * 7.5, 2.0 * 7.5, 3600.0, 1.0);
 			QSim sim = new QSim(scenario, new EventsManagerImpl());
-			this.queueNetwork = sim.getQNetwork();
-			this.qlink1 = (QLinkImpl) this.queueNetwork.getQLink(new IdImpl("1"));
-			this.qlink2 = (QLinkImpl) this.queueNetwork.getQLink(new IdImpl("2"));
+			this.queueNetwork = sim.getNetsimNetwork();
+			this.qlink1 = (QLinkImpl) this.queueNetwork.getNetsimLink(new IdImpl("1"));
+			this.qlink2 = (QLinkImpl) this.queueNetwork.getNetsimLink(new IdImpl("2"));
 
 			this.basicVehicle = new VehicleImpl(new IdImpl("1"), new VehicleTypeImpl(new IdImpl("defaultVehicleType")));
 		}

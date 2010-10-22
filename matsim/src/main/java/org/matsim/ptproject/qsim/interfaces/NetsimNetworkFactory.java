@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * QSimEngineFactory
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,18 +16,20 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
 package org.matsim.ptproject.qsim.interfaces;
 
-import java.util.Random;
-
-import org.matsim.ptproject.qsim.QSim;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 
 
 /**
  * @author dgrether
- *
  */
-public interface QSimEngineFactory {
-	
-	public QSimEngine createQSimEngine(final QSim sim, final Random random);
+public interface NetsimNetworkFactory<QN extends NetsimNode, QL extends NetsimLink> {
+
+	public QN createNetsimNode(Node node, NetsimEngine simEngine);
+
+	public QL createNetsimLink(Link link, NetsimEngine simEngine, QN queueNode);
+
 }

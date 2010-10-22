@@ -28,7 +28,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.ptproject.qsim.AgentFactory;
 import org.matsim.ptproject.qsim.QSim;
-import org.matsim.ptproject.qsim.interfaces.QSimEngineFactory;
+import org.matsim.ptproject.qsim.interfaces.NetsimEngineFactory;
 import org.matsim.ptproject.qsim.netsimengine.DefaultQSimEngineFactory;
 
 /*
@@ -48,7 +48,7 @@ public class WithinDayQSim extends QSim {
 		this(scenario, events, new DefaultQSimEngineFactory());
 	}
 	
-	public WithinDayQSim(final Scenario scenario, final EventsManager events, QSimEngineFactory factory) {
+	public WithinDayQSim(final Scenario scenario, final EventsManager events, NetsimEngineFactory factory) {
 		super(scenario, events, factory);
 		
 		// use WithinDayAgentFactory that creates WithinDayPersonAgents who can reset their chachedNextLink

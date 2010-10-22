@@ -48,10 +48,10 @@ import org.matsim.pt.fakes.FakeAgent;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.helpers.DefaultPersonDriverAgent;
 import org.matsim.ptproject.qsim.helpers.QVehicleImpl;
-import org.matsim.ptproject.qsim.interfaces.QSimEngine;
+import org.matsim.ptproject.qsim.interfaces.NetsimEngine;
+import org.matsim.ptproject.qsim.interfaces.NetsimNetwork;
 import org.matsim.ptproject.qsim.interfaces.QVehicle;
 import org.matsim.ptproject.qsim.netsimengine.QLinkImpl;
-import org.matsim.ptproject.qsim.netsimengine.QNetwork;
 import org.matsim.transitSchedule.api.Departure;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
@@ -948,7 +948,7 @@ public class TransitQueueNetworkTest extends TestCase {
 	}
 
 	protected static class Fixture {
-		public final QSimEngine simEngine;
+		public final NetsimEngine simEngine;
 		public final QLinkImpl qlink1, qlink2, qlink3;
 		public final TransitQVehicle transitVehicle;
 		public final QVehicle normalVehicle, normalVehicle2;
@@ -1029,10 +1029,10 @@ public class TransitQueueNetworkTest extends TestCase {
 
 			// setup: simulation
 			qsim = new QSim(scenario, new EventsManagerImpl());
-			QNetwork qnet = qsim.getQNetwork();
-			this.qlink1 = (QLinkImpl) qnet.getQLink(id1);
-			this.qlink2 = (QLinkImpl) qnet.getQLink(id2);
-			this.qlink3 = (QLinkImpl) qnet.getQLink(id3);
+			NetsimNetwork qnet = qsim.getNetsimNetwork();
+			this.qlink1 = (QLinkImpl) qnet.getNetsimLink(id1);
+			this.qlink2 = (QLinkImpl) qnet.getNetsimLink(id2);
+			this.qlink3 = (QLinkImpl) qnet.getNetsimLink(id3);
 			this.simEngine = qsim.getQSimEngine();
 //			this.simEngine = new TestSimEngine(qsim);
 			this.simEngine.onPrepareSim();

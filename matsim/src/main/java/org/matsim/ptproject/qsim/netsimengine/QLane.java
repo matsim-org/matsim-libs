@@ -46,7 +46,7 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.lanes.Lane;
 import org.matsim.pt.qsim.TransitQLaneFeature;
 import org.matsim.ptproject.qsim.helpers.AgentSnapshotInfoBuilder;
-import org.matsim.ptproject.qsim.interfaces.QLink;
+import org.matsim.ptproject.qsim.interfaces.NetsimLink;
 import org.matsim.ptproject.qsim.interfaces.QVehicle;
 import org.matsim.signalsystems.control.SignalGroupState;
 import org.matsim.signalsystems.mobsim.QSignalizedItem;
@@ -167,7 +167,7 @@ public final class QLane extends QBufferItem implements SignalizeableItem {
 
 	private QSignalizedItem qSignalizedItem;
 
-	/*package*/ QLane(final QLink ql, Lane laneData, boolean isOriginalLane) {
+	/*package*/ QLane(final NetsimLink ql, Lane laneData, boolean isOriginalLane) {
 		this.queueLink = (QLinkInternalI) ql; // yyyy needs to be of correct, but should be made typesafe.  kai, aug'10
 		this.transitQueueLaneFeature = new TransitQLaneFeature(this.getQLink());
 		this.isOriginalLane = isOriginalLane;
@@ -230,7 +230,7 @@ public final class QLane extends QBufferItem implements SignalizeableItem {
 		}
 		// first guess at storageCapacity:
 		this.storageCapacity = (this.length * numberOfLanes)
-		/ ((NetworkImpl) ((QLinkLanesImpl)this.queueLink).getQSimEngine().getQSim().getScenario().getNetwork()).getEffectiveCellSize() * storageCapFactor;
+		/ ((NetworkImpl) ((QLinkLanesImpl)this.queueLink).getQSimEngine().getMobsim().getScenario().getNetwork()).getEffectiveCellSize() * storageCapFactor;
 
 		// storage capacity needs to be at least enough to handle the cap_per_time_step:
 		this.storageCapacity = Math.max(this.storageCapacity, this.bufferStorageCapacity);
@@ -662,7 +662,7 @@ public final class QLane extends QBufferItem implements SignalizeableItem {
 		return this.vehQueue;
 	}
 
-	public QLink getQLink() {
+	public NetsimLink getQLink() {
 		return this.queueLink;
 	}
 

@@ -136,7 +136,7 @@ public class GershensonAdaptiveTrafficLightController extends
 		
 		// calculate outlinkCapacity for the mainOutlink and check if there is a trafficJam
 		if (!(mainOutLinks.get(signalGroup.getLinkRefId()) ==  null)){
-			double outLinkCapacity = net.getLinks().get(mainOutLinks.get(signalGroup.getLinkRefId())).getSpaceCap();
+			double outLinkCapacity = net.getNetsimLinks().get(mainOutLinks.get(signalGroup.getLinkRefId())).getSpaceCap();
 			double actStorage = handler.getVehOnLink(mainOutLinks.get(signalGroup.getLinkRefId()));
 			if((outLinkCapacity*capFactor)< actStorage){
 				outLinkJam = true;
@@ -148,7 +148,7 @@ public class GershensonAdaptiveTrafficLightController extends
 		// check competing links for trafficJam
 		compLinkJam = true;
 		for (Id i : compGroups.get(signalGroup.getId())){
-			double compCap = net.getLinks().get(groups.get(i).getLinkRefId()).getSpaceCap();
+			double compCap = net.getNetsimLinks().get(groups.get(i).getLinkRefId()).getSpaceCap();
 			double compStorage = handler.getVehOnLink(groups.get(i).getLinkRefId());
 			if ((compCap*capFactor)>compStorage){
 				compLinkJam = false;

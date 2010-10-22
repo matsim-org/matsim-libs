@@ -34,7 +34,7 @@ import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.ptproject.qsim.AgentFactory;
 import org.matsim.ptproject.qsim.QSim;
-import org.matsim.ptproject.qsim.interfaces.QSimI;
+import org.matsim.ptproject.qsim.interfaces.Mobsim;
 
 import playground.christoph.events.algorithms.FixedOrderQueueSimulationListener;
 import playground.christoph.withinday.mobsim.DuringActivityReplanningModule;
@@ -71,7 +71,7 @@ public class MyMobsimFactory implements MobsimFactory {
 		int numReplanningThreads = 1;
 
 		
-		QSimI mobsim = new QSim( sc, eventsManager ) ;
+		Mobsim mobsim = new QSim( sc, eventsManager ) ;
 		
 		AgentFactory agentFactory = new WithinDayAgentFactory( mobsim ) ;
 		mobsim.setAgentFactory(agentFactory) ;
@@ -121,7 +121,7 @@ public class MyMobsimFactory implements MobsimFactory {
 	 * New Routers for the Replanning are used instead of using the controler's.
 	 * By doing this every person can use a personalised Router.
 	 */
-	private void initReplanningRouter(Scenario sc, QSimI mobsim ) {
+	private void initReplanningRouter(Scenario sc, Mobsim mobsim ) {
 
 		//		PlansCalcRoute dijkstraRouter = new PlansCalcRoute(new PlansCalcRouteConfigGroup(), network, this.createTravelCostCalculator(), travelTime, new DijkstraFactory());
 		AbstractMultithreadedModule routerModule = 

@@ -29,8 +29,8 @@ import java.util.Map.Entry;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.framework.Steppable;
-import org.matsim.ptproject.qsim.interfaces.QSimI;
-import org.matsim.ptproject.qsim.interfaces.SimEngine;
+import org.matsim.ptproject.qsim.interfaces.Mobsim;
+import org.matsim.ptproject.qsim.interfaces.MobsimEngine;
 
 import com.vividsolutions.jts.geom.MultiPolygon;
 
@@ -42,7 +42,7 @@ import playground.gregor.sim2d_v2.simulation.floor.Floor;
  * @author laemmel
  * 
  */
-public class Sim2DEngine implements SimEngine, Steppable {
+public class Sim2DEngine implements MobsimEngine, Steppable {
 
 	private final List<Floor> floors = new ArrayList<Floor>();
 	private final Scenario2DImpl scenario;
@@ -131,7 +131,7 @@ public class Sim2DEngine implements SimEngine, Steppable {
 	 * @see org.matsim.ptproject.qsim.interfaces.SimEngine#getQSim()
 	 */
 	@Override
-	public QSimI getQSim() {
+	public Mobsim getMobsim() {
 		return this.sim;
 	}
 

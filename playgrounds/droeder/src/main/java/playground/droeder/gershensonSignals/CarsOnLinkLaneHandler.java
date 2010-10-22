@@ -38,7 +38,8 @@ import org.matsim.core.events.LaneEnterEvent;
 import org.matsim.core.events.LaneLeaveEvent;
 import org.matsim.core.events.handler.LaneEnterEventHandler;
 import org.matsim.core.events.handler.LaneLeaveEventHandler;
-import org.matsim.ptproject.qsim.netsimengine.QLinkInternalI;
+import org.matsim.ptproject.qsim.interfaces.NetsimLink;
+import org.matsim.ptproject.qsim.interfaces.NetsimNetwork;
 import org.matsim.ptproject.qsim.netsimengine.QNetwork;
 import org.matsim.signalsystems.systems.SignalGroupDefinition;
 
@@ -57,7 +58,7 @@ public class CarsOnLinkLaneHandler implements LaneEnterEventHandler, LaneLeaveEv
 	private Map<Id, CarLocator> m;
 	private Map<Id, Double> dForLinks;
 	
-	private QNetwork qNet;
+	private NetsimNetwork qNet;
 	private double d;
 	private Map<Id, SignalGroupDefinition> groups;
 
@@ -126,7 +127,7 @@ public class CarsOnLinkLaneHandler implements LaneEnterEventHandler, LaneLeaveEv
 	@Override
 	public void handleEvent(LinkEnterEvent e) {
 		m = locateCars.get(e.getLinkId());
-		m.put(e.getPersonId(), new CarLocator(qNet.getLinks().get(e.getLinkId()), e.getTime(), this.dForLinks.get(e.getLinkId())));
+		m.put(e.getPersonId(), new CarLocator(qNet.getNetsimLinks().get(e.getLinkId()), e.getTime(), this.dForLinks.get(e.getLinkId())));
 	}
 	
 	@Override
@@ -140,7 +141,7 @@ public class CarsOnLinkLaneHandler implements LaneEnterEventHandler, LaneLeaveEv
 	@Override
 	public void handleEvent(AgentWait2LinkEvent e) {
 		m = locateCars.get(e.getLinkId());
-		m.put(e.getPersonId(), new CarLocator(qNet.getLinks().get(e.getLinkId()), e.getTime(), this.dForLinks.get(e.getLinkId())));
+		m.put(e.getPersonId(), new CarLocator(qNet.getNetsimLinks().get(e.getLinkId()), e.getTime(), this.dForLinks.get(e.getLinkId())));
 		m.get(e.getPersonId()).setEarliestD(e.getTime());
 		
 	}
@@ -192,9 +193,9 @@ public class CarsOnLinkLaneHandler implements LaneEnterEventHandler, LaneLeaveEv
 		return i;
 	}
 	
-	public void setQNetwork(QNetwork net){
+	public void setQNetwork(NetsimNetwork net){
 		this.qNet = net;
-		for(Entry<Id, QLinkInternalI> e: net.getLinks().entrySet()){
+		for(Entry<Id, ? extends NetsimLink> e: net.getNetsimLinks().entrySet()){
 			locateCars.put(e.getKey(), new HashMap<Id, CarLocator>());
 		}
 	}

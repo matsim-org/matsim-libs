@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.ptproject.qsim.helpers.DefaultPersonDriverAgent;
-import org.matsim.ptproject.qsim.interfaces.QSimI;
+import org.matsim.ptproject.qsim.interfaces.Mobsim;
 
 import playground.christoph.withinday.replanning.WithinDayReplanner;
 
@@ -38,9 +38,9 @@ public class WithinDayPersonAgent extends DefaultPersonDriverAgent {
 	private static final Logger log = Logger.getLogger("dummy");
 
 	private List<WithinDayReplanner> withinDayReplanner = new ArrayList<WithinDayReplanner>();
-	private QSimI simulation;
+	private Mobsim simulation;
 	
-	public WithinDayPersonAgent(Person p, QSimI simulation) {
+	public WithinDayPersonAgent(Person p, Mobsim simulation) {
 		super(p, simulation);
 		this.simulation = simulation;
 	}

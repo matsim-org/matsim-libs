@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * QSimEngine.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -19,37 +20,27 @@
 
 package org.matsim.ptproject.qsim.interfaces;
 
-import java.util.Map;
+import org.matsim.core.mobsim.framework.Steppable;
+import org.matsim.ptproject.qsim.netsimengine.QNetwork;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.ptproject.qsim.netsimengine.QNode;
 
 /**
- * @author nagel
+ * Coordinates the movement of vehicles on the links and the nodes.
  *
+ * @author cdobler
+ * @author dgrether
  */
-public interface QNetworkI {
 
-	Network getNetwork();
+public interface NetsimEngine extends MobsimEngine, Steppable {
 
-	Map<Id, ? extends QLink> getLinks();
-	// yyyy this should arguable be getQLinks() or getMobsimLinks().  Esthetically less pleasing, but imho easier to use.  kai, may'10
-
-	Map<Id,QNode> getNodes() ;
-
+//	AgentSnapshotInfoBuilder getAgentSnapshotInfoBuilder();
+	
 	/**
-	 * Convenience method for getLinks().get( id ).  May be renamed
+	 * for logging purposes; otherwise this is not important.  kai, oct'10
 	 */
-	public QLink getQLink(final Id id) ;
-
-	/**
-	 * Convenience method for getNodes().get( id ).  May be renamed
-	 */
-	public QNodeI getQNode(final Id id) ;
-
-
-	void initialize(QSimEngine netEngine);
-	// yyyy not sure if this should/needs to be exposed.  kai, aug'10
-
+	int getNumberOfSimulatedLinks() ;
+	
+	NetsimNetwork getQNetwork() ;
+	
+	
 }

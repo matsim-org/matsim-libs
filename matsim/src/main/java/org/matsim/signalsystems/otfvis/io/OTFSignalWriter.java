@@ -24,7 +24,7 @@ import java.nio.ByteBuffer;
 
 import org.matsim.core.utils.misc.ByteBufferUtils;
 import org.matsim.lanes.otfvis.io.OTFLaneWriter;
-import org.matsim.ptproject.qsim.interfaces.QLink;
+import org.matsim.ptproject.qsim.interfaces.NetsimLink;
 import org.matsim.ptproject.qsim.netsimengine.QLane;
 import org.matsim.ptproject.qsim.netsimengine.QLinkLanesImpl;
 import org.matsim.signalsystems.control.SignalGroupState;
@@ -67,7 +67,7 @@ public class OTFSignalWriter extends OTFLaneWriter {
 	}
 
 	@Override
-	public OTFDataWriter<QLink> getWriter() {
+	public OTFDataWriter<NetsimLink> getWriter() {
 		return new OTFSignalWriter();
 	}
 

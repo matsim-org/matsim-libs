@@ -32,6 +32,7 @@ import org.matsim.core.events.SignalGroupStateChangedEventImpl;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.mobsim.framework.events.SimulationBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationBeforeSimStepListener;
+import org.matsim.ptproject.qsim.interfaces.NetsimNetwork;
 import org.matsim.ptproject.qsim.netsimengine.QNetwork;
 import org.matsim.signalsystems.config.AdaptiveSignalSystemControlInfo;
 import org.matsim.signalsystems.control.AdaptiveSignalSystemControlerImpl;
@@ -81,7 +82,7 @@ public class DaAdaptiveController extends
 		protected Map<Id, List<SignalGroupDefinition>> corrGroups;
 		protected Map<Id, Id> mainOutLinks;
 
-		protected QNetwork net;
+		protected NetsimNetwork net;
 
 
 		public DaAdaptiveController(AdaptiveSignalSystemControlInfo controlInfo) {
@@ -99,7 +100,7 @@ public class DaAdaptiveController extends
 		 * @param net
 		 * @param handler
 		 */
-		public void init(Map<Id, List<SignalGroupDefinition>> corrGroups, Map<Id, Id> mainOutLinks, QNetwork net, CarsOnLinkLaneHandler handler){
+		public void init(Map<Id, List<SignalGroupDefinition>> corrGroups, Map<Id, Id> mainOutLinks, NetsimNetwork net, CarsOnLinkLaneHandler handler){
 			SortedMap<Double, Double> temp;
 			for(SignalGroupDefinition sd : this.getSignalGroups().values()){
 				this.getSignalGroupStates().put(sd, SignalGroupState.RED);
@@ -149,7 +150,7 @@ public class DaAdaptiveController extends
 					if(e.getValue().contains(signalGroup)){
 						for (SignalGroupDefinition sd : e.getValue()){
 							for (Id id : sd.getToLinkIds()){
-								outLinkCapacity += net.getLinks().get(id).getSpaceCap();
+								outLinkCapacity += net.getNetsimLinks().get(id).getSpaceCap();
 								actStorage += handler.getVehOnLink(id);
 							}
 						}

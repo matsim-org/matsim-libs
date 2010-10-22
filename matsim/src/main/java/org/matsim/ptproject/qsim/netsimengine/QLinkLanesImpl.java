@@ -40,9 +40,9 @@ import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.lanes.Lane;
 import org.matsim.lanes.LaneMeterFromLinkEndComparator;
 import org.matsim.ptproject.qsim.helpers.AgentSnapshotInfoBuilder;
-import org.matsim.ptproject.qsim.interfaces.QLink;
-import org.matsim.ptproject.qsim.interfaces.QSimEngine;
-import org.matsim.ptproject.qsim.interfaces.QSimI;
+import org.matsim.ptproject.qsim.interfaces.NetsimLink;
+import org.matsim.ptproject.qsim.interfaces.NetsimEngine;
+import org.matsim.ptproject.qsim.interfaces.Mobsim;
 import org.matsim.ptproject.qsim.interfaces.QVehicle;
 import org.matsim.signalsystems.systems.SignalGroupDefinition;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
@@ -158,9 +158,9 @@ public class QLinkLanesImpl extends QLinkInternalI {
 	 * @param link2
 	 * @param queueNetwork
 	 * @param toNode
-	 * @see QLink#createLanes(List)
+	 * @see NetsimLink#createLanes(List)
 	 */
-	 QLinkLanesImpl(final Link link2, QSimEngine engine, 
+	 QLinkLanesImpl(final Link link2, NetsimEngine engine, 
 			final QNode toNode, Map<Id, Lane> laneMap) {
 		this.link = link2;
 		this.toQueueNode = toNode;
@@ -272,25 +272,25 @@ public class QLinkLanesImpl extends QLinkInternalI {
 	 */
 	@Override
 	void addFromIntersection(final QVehicle veh) {
-		double now = this.getQSimEngine().getQSim().getSimTimer().getTimeOfDay();
+		double now = this.getQSimEngine().getMobsim().getSimTimer().getTimeOfDay();
 		activateLink();
 		this.originalLane.addToVehicleQueue(veh, now);
 		veh.setCurrentLink(this.getLink());
-		this.getQSimEngine().getQSim().getEventsManager().processEvent(
+		this.getQSimEngine().getMobsim().getEventsManager().processEvent(
 				new LinkEnterEventImpl(now, veh.getDriver().getPerson().getId(),
 						this.getLink().getId()));
 	}
 
 	@Override
 	void clearVehicles() {
-		double now = this.getQSimEngine().getQSim().getSimTimer().getTimeOfDay();
+		double now = this.getQSimEngine().getMobsim().getSimTimer().getTimeOfDay();
 		this.parkedVehicles.clear();
 		for (QVehicle veh : this.waitingList) {
-			this.getQSimEngine().getQSim().getEventsManager().processEvent(
+			this.getQSimEngine().getMobsim().getEventsManager().processEvent(
 					new AgentStuckEventImpl(now, veh.getDriver().getPerson().getId(), veh.getCurrentLink().getId(), veh.getDriver().getCurrentLeg().getMode()));
 		}
-		this.getQSimEngine().getQSim().getAgentCounter().decLiving(this.waitingList.size());
-		this.getQSimEngine().getQSim().getAgentCounter().incLost(this.waitingList.size());
+		this.getQSimEngine().getMobsim().getAgentCounter().decLiving(this.waitingList.size());
+		this.getQSimEngine().getMobsim().getAgentCounter().incLost(this.waitingList.size());
 		this.waitingList.clear();
 
 		for (QLane lane : this.queueLanes){
@@ -343,7 +343,7 @@ public class QLinkLanesImpl extends QLinkInternalI {
 				return;
 			}
 
-			this.getQSimEngine().getQSim().getEventsManager().processEvent(
+			this.getQSimEngine().getMobsim().getEventsManager().processEvent(
 					new AgentWait2LinkEventImpl(now, veh.getDriver().getPerson().getId(), this.getLink().getId()));
 			boolean handled = this.originalLane.transitQueueLaneFeature.handleMoveWaitToBuffer(now, veh);
 			if (!handled) {
@@ -464,12 +464,12 @@ public class QLinkLanesImpl extends QLinkInternalI {
 	}
 	
 	@Override
-	public QSimI getQSim() {
-		return this.qsimEngine.getQSim();
+	public Mobsim getQSim() {
+		return this.qsimEngine.getMobsim();
 	}
 
 	@Override
-	void setQSimEngine(QSimEngine qsimEngine) {
+	void setQSimEngine(NetsimEngine qsimEngine) {
 		// yyyy does it make sense to have this setter?  Seems that this should be immutable after construction. kai, aug'10
 		this.qsimEngine = (QSimEngineImpl) qsimEngine;
 		// yyyy this cast is not so bad because this is not meant to be pluggable (QLinkImpl together with some other engine).

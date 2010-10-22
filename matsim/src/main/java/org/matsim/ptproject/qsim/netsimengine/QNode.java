@@ -32,9 +32,9 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.events.AgentStuckEventImpl;
-import org.matsim.ptproject.qsim.interfaces.QLink;
-import org.matsim.ptproject.qsim.interfaces.QNodeI;
-import org.matsim.ptproject.qsim.interfaces.QSimEngine;
+import org.matsim.ptproject.qsim.interfaces.NetsimLink;
+import org.matsim.ptproject.qsim.interfaces.NetsimNode;
+import org.matsim.ptproject.qsim.interfaces.NetsimEngine;
 import org.matsim.ptproject.qsim.interfaces.QVehicle;
 import org.matsim.utils.customize.Customizable;
 import org.matsim.vis.snapshots.writers.VisData;
@@ -43,7 +43,7 @@ import org.matsim.vis.snapshots.writers.VisNode;
 /**
  * Represents a node in the QueueSimulation.
  */
-public class QNode implements QNodeI {
+public class QNode implements NetsimNode {
 
 	private static final Logger log = Logger.getLogger(QNode.class);
 
@@ -64,7 +64,7 @@ public class QNode implements QNodeI {
 	 */
   private QSimEngineImpl simEngine;
 
-	protected QNode(final Node n, final QSimEngine simEngine) {
+	protected QNode(final Node n, final NetsimEngine simEngine) {
 		this.node = n;
 		this.simEngine = (QSimEngineImpl) simEngine; // needs to be of correct impl type when it arrives here.  kai, jun'10
 		int nofInLinks = this.node.getInLinks().size();
@@ -81,7 +81,9 @@ public class QNode implements QNodeI {
 	/*package*/ void init() {
 		int i = 0;
 		for (Link l : this.node.getInLinks().values()) {
-			this.inLinksArrayCache[i] = this.simEngine.getQSim().getQNetwork().getLinks().get(l.getId());
+			this.inLinksArrayCache[i] = this.simEngine.getQNetwork().getNetsimLinks().get(l.getId());
+			// yyyy changed simEngine.getQSim.getQNetwork to simEngine.getQNetwork.  Not sure if this is the same in parallel
+			// implementations.  kai, oct'10
 			i++;
 		}
 		/* As the order of nodes has an influence on the simulation results,
@@ -208,7 +210,7 @@ public class QNode implements QNodeI {
     }
     // veh has to move over node
     if (nextLinkId != null) {
-      QLinkInternalI nextQueueLink = this.simEngine.getQSim().getQNetwork().getLinks().get(nextLinkId);
+      QLinkInternalI nextQueueLink = this.simEngine.getQNetwork().getNetsimLinks().get(nextLinkId);
       Link nextLink = nextQueueLink.getLink();
       this.checkNextLinkSemantics(currentLink, nextLink, veh);
       if (nextQueueLink.hasSpace()) {
@@ -225,11 +227,11 @@ public class QNode implements QNodeI {
          * of if there is space on the next link or not.. optionally we let them
          * die here, we have a config setting for that!
          */
-        if (this.simEngine.getQSim().getScenario().getConfig().getQSimConfigGroup().isRemoveStuckVehicles()) {
+        if (this.simEngine.getMobsim().getScenario().getConfig().getQSimConfigGroup().isRemoveStuckVehicles()) {
           qbufferedItem.popFirstFromBuffer();
-          this.simEngine.getQSim().getAgentCounter().decLiving();
-          this.simEngine.getQSim().getAgentCounter().incLost();
-          this.simEngine.getQSim().getEventsManager().processEvent(
+          this.simEngine.getMobsim().getAgentCounter().decLiving();
+          this.simEngine.getMobsim().getAgentCounter().incLost();
+          this.simEngine.getMobsim().getEventsManager().processEvent(
               new AgentStuckEventImpl(now, veh.getDriver().getPerson().getId(), currentLink.getId(), veh.getDriver().getCurrentLeg().getMode()));
         } else {
           qbufferedItem.popFirstFromBuffer();
@@ -243,8 +245,8 @@ public class QNode implements QNodeI {
 
     // --> nextLink == null
     qbufferedItem.popFirstFromBuffer();
-    this.simEngine.getQSim().getAgentCounter().decLiving();
-    this.simEngine.getQSim().getAgentCounter().incLost();
+    this.simEngine.getMobsim().getAgentCounter().decLiving();
+    this.simEngine.getMobsim().getAgentCounter().incLost();
     log.error(
         "Agent has no or wrong route! agentId=" + veh.getDriver().getPerson().getId()
             + " currentLink=" + currentLink.getId().toString()
@@ -253,9 +255,9 @@ public class QNode implements QNodeI {
   }
 
 
-	protected static class QueueLinkIdComparator implements Comparator<QLink>, Serializable {
+	protected static class QueueLinkIdComparator implements Comparator<NetsimLink>, Serializable {
 		private static final long serialVersionUID = 1L;
-		public int compare(final QLink o1, final QLink o2) {
+		public int compare(final NetsimLink o1, final NetsimLink o2) {
 			return o1.getLink().getId().compareTo(o2.getLink().getId());
 		}
 	}

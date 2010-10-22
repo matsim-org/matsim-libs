@@ -20,7 +20,7 @@
 package org.matsim.pt.qsim;
 
 import org.matsim.pt.Umlauf;
-import org.matsim.ptproject.qsim.interfaces.QSimI;
+import org.matsim.ptproject.qsim.interfaces.Mobsim;
 
 /**
  * @author aneumann
@@ -28,7 +28,7 @@ import org.matsim.ptproject.qsim.interfaces.QSimI;
 public class UmlaufDriverFactory implements AbstractTransitDriverFactory {
 
 	@Override
-	public AbstractTransitDriver createTransitDriver(Umlauf umlauf, TransitStopAgentTracker thisAgentTrackerVehicle, QSimI qSim) {
+	public AbstractTransitDriver createTransitDriver(Umlauf umlauf, TransitStopAgentTracker thisAgentTrackerVehicle, Mobsim qSim) {
 		return new UmlaufDriver(umlauf, thisAgentTrackerVehicle, qSim);
 	}
 

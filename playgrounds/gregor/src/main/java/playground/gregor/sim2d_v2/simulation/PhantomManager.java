@@ -31,7 +31,7 @@ import org.matsim.core.api.experimental.events.PersonEvent;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.AgentArrivalEventImpl;
 import org.matsim.core.events.AgentDepartureEventImpl;
-import org.matsim.ptproject.qsim.interfaces.QSimI;
+import org.matsim.ptproject.qsim.interfaces.Mobsim;
 
 import playground.gregor.sim2d.events.XYZAzimuthEventImpl;
 import playground.gregor.sim2d_v2.controller.Sim2DConfig;
@@ -47,11 +47,11 @@ public class PhantomManager {
 
 	private final Scenario2DImpl scenario;
 	private final Queue<Event> phantomQueue;
-	private final QSimI sim;
+	private final Mobsim sim;
 
 	private final Map<Id, Coordinate> phantomPositions = new LinkedHashMap<Id, Coordinate>();
 
-	public PhantomManager(Scenario2DImpl scenario, QSimI sim) {
+	public PhantomManager(Scenario2DImpl scenario, Mobsim sim) {
 		this.scenario = scenario;
 		this.phantomQueue = new ConcurrentLinkedQueue<Event>(scenario.getPhantomPopulation());
 		this.sim = sim;

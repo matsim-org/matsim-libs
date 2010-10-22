@@ -40,9 +40,9 @@ import org.matsim.pt.ReconstructingUmlaufBuilder;
 import org.matsim.pt.Umlauf;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.ptproject.qsim.interfaces.DepartureHandler;
-import org.matsim.ptproject.qsim.interfaces.QLink;
-import org.matsim.ptproject.qsim.interfaces.QSimI;
-import org.matsim.ptproject.qsim.interfaces.SimEngine;
+import org.matsim.ptproject.qsim.interfaces.NetsimLink;
+import org.matsim.ptproject.qsim.interfaces.Mobsim;
+import org.matsim.ptproject.qsim.interfaces.MobsimEngine;
 import org.matsim.transitSchedule.api.Departure;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
@@ -55,7 +55,7 @@ import org.matsim.vehicles.Vehicles;
  * @author mrieser
  * @author mzilske
  */
-public class TransitQSimEngine implements  DepartureHandler, SimEngine {
+public class TransitQSimEngine implements  DepartureHandler, MobsimEngine {
 
 
 	public static class TransitAgentTriesToTeleportException extends RuntimeException {
@@ -70,7 +70,7 @@ public class TransitQSimEngine implements  DepartureHandler, SimEngine {
 
 	private static Logger log = Logger.getLogger(TransitQSimEngine.class);
 
-	private QSimI qSim;
+	private Mobsim qSim;
 
 	private TransitSchedule schedule = null;
 
@@ -84,7 +84,7 @@ public class TransitQSimEngine implements  DepartureHandler, SimEngine {
 
 	private AbstractTransitDriverFactory abstractTransitDriverFactory = new UmlaufDriverFactory();
 
-	public TransitQSimEngine(QSimI queueSimulation) {
+	public TransitQSimEngine(Mobsim queueSimulation) {
 		this.qSim = queueSimulation;
 		this.schedule = ((ScenarioImpl) queueSimulation.getScenario()).getTransitSchedule();
 		this.agentTracker = new TransitStopAgentTracker();
@@ -98,7 +98,7 @@ public class TransitQSimEngine implements  DepartureHandler, SimEngine {
 
 
 	@Override
-	public QSimI getQSim() {
+	public Mobsim getMobsim() {
 		return this.qSim;
 	}
 
@@ -158,7 +158,7 @@ public class TransitQSimEngine implements  DepartureHandler, SimEngine {
 		veh.setDriver(driver);
 		veh.setStopHandler(this.stopHandlerFactory.createTransitStopHandler(veh.getVehicle()));
 		driver.setVehicle(veh);
-		QLink qlink = this.qSim.getQNetwork().getLinks().get(driver
+		NetsimLink qlink = this.qSim.getNetsimNetwork().getNetsimLinks().get(driver
 				.getCurrentLeg().getRoute().getStartLinkId());
 		qlink.addParkedVehicle(veh);
 		// yyyyyy this could, in principle, also be a method mobsim.addVehicle( ..., linkId), and then the qnetwork
@@ -184,7 +184,7 @@ public class TransitQSimEngine implements  DepartureHandler, SimEngine {
 					veh.setDriver(driver);
 					veh.setStopHandler(this.stopHandlerFactory.createTransitStopHandler(veh.getVehicle()));
 					driver.setVehicle(veh);
-					QLink qlink = this.qSim.getQNetwork().getLinks().get(driver.getCurrentLeg().getRoute().getStartLinkId());
+					NetsimLink qlink = this.qSim.getNetsimNetwork().getNetsimLinks().get(driver.getCurrentLeg().getRoute().getStartLinkId());
 					// yyyyyy this could, in principle, also be a method mobsim.addVehicle( ..., linkId), and then the qnetwork
 					// would not need to be exposed at all.  kai, may'10
 					qlink.addParkedVehicle(veh);
@@ -226,7 +226,7 @@ public class TransitQSimEngine implements  DepartureHandler, SimEngine {
 				TransitStopFacility stop = this.schedule.getFacilities().get(route.getAccessStopId());
 				if (stop.getLinkId() == null || stop.getLinkId().equals(linkId)) {
 					this.agentTracker.addAgentToStop((PassengerAgent) agent, stop);
-					this.getQSim().registerAgentAtPtWaitLocation(agent) ;
+					this.getMobsim().registerAgentAtPtWaitLocation(agent) ;
 				} else {
 					throw new TransitAgentTriesToTeleportException("Agent "+agent.getPerson().getId() + " tries to enter a transit stop at link "+stop.getLinkId()+" but really is at "+linkId+"!");
 				}

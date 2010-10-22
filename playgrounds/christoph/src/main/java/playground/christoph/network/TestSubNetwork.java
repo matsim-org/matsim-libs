@@ -37,7 +37,7 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.ptproject.qsim.QSim;
-import org.matsim.ptproject.qsim.netsimengine.QNetwork;
+import org.matsim.ptproject.qsim.interfaces.NetsimNetwork;
 
 import playground.christoph.knowledge.container.MapKnowledgeDB;
 import playground.christoph.knowledge.container.NodeKnowledge;
@@ -64,7 +64,7 @@ public class TestSubNetwork {
 	private KnowledgeTravelCostWrapper travelCostWrapper;
 
 	private PlansCalcRoute dijkstraRouter;
-	private QNetwork qNetwork;
+	private NetsimNetwork qNetwork;
 
 	private final String configFileName = "../matsim/mysimulations/kt-zurich/config.xml";
 	private final String dtdFileName = null;
@@ -125,7 +125,7 @@ public class TestSubNetwork {
 
 	private void initReplanner() {
 	  QSim sim = new QSim(this.scenario, new EventsManagerImpl());
-		qNetwork = sim.getQNetwork();
+		qNetwork = sim.getNetsimNetwork();
 
 		travelTime = new KnowledgeTravelTimeCalculator(qNetwork);
 		travelTimeWrapper = new KnowledgeTravelTimeWrapper(travelTime);

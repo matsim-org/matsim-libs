@@ -29,7 +29,7 @@ import org.matsim.ptproject.qsim.netsimengine.QNode;
 import org.matsim.utils.customize.Customizable;
 import org.matsim.vis.snapshots.writers.VisLink;
 
-public interface QLink extends Customizable, VisLink {
+public interface NetsimLink extends Customizable, VisLink {
 
 	// ######################
 	// to clarify:
@@ -63,7 +63,7 @@ public interface QLink extends Customizable, VisLink {
 	//	######################
 	// ok:
 	
-	public QSimI getQSim() ;
+	public Mobsim getQSim() ;
 
 
 	/**

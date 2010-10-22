@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.ByteBufferUtils;
-import org.matsim.ptproject.qsim.interfaces.QLink;
+import org.matsim.ptproject.qsim.interfaces.NetsimLink;
 import org.matsim.ptproject.qsim.netsimengine.QLane;
 import org.matsim.ptproject.qsim.netsimengine.QLinkLanesImpl;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
@@ -44,7 +44,7 @@ import org.matsim.vis.vecmathutils.VectorUtils;
  * @author dgrether
  *
  */
-public class OTFLaneWriter extends OTFDataWriter<QLink> implements OTFWriterFactory<QLink>{
+public class OTFLaneWriter extends OTFDataWriter<NetsimLink> implements OTFWriterFactory<NetsimLink>{
 	
 	private static final Logger log = Logger.getLogger(OTFLaneWriter.class);
 	
@@ -174,7 +174,7 @@ public class OTFLaneWriter extends OTFDataWriter<QLink> implements OTFWriterFact
 	}
 
 	@Override
-	public OTFDataWriter<QLink> getWriter() {
+	public OTFDataWriter<NetsimLink> getWriter() {
 		return new OTFLaneWriter();
 	}
 

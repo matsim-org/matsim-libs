@@ -32,7 +32,7 @@ import java.util.Queue;
 import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.ptproject.qsim.comparators.QVehicleEarliestLinkExitTimeComparator;
-import org.matsim.ptproject.qsim.interfaces.QLink;
+import org.matsim.ptproject.qsim.interfaces.NetsimLink;
 import org.matsim.ptproject.qsim.interfaces.QVehicle;
 import org.matsim.transitSchedule.api.TransitStopFacility;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
@@ -49,9 +49,9 @@ public class TransitQLaneFeature {
 	 */
 	private final Queue<QVehicle> transitVehicleStopQueue = new PriorityQueue<QVehicle>(5, VEHICLE_EXIT_COMPARATOR);
 
-	private final QLink queueLane;
+	private final NetsimLink queueLane;
 
-	public TransitQLaneFeature(QLink queueLane) {
+	public TransitQLaneFeature(NetsimLink queueLane) {
 		this.queueLane = queueLane;
 	}
 

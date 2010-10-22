@@ -50,8 +50,8 @@ import org.matsim.ptproject.qsim.helpers.DefaultPersonDriverAgent;
 import org.matsim.ptproject.qsim.helpers.QSimTimer;
 import org.matsim.ptproject.qsim.interfaces.AgentCounterI;
 import org.matsim.ptproject.qsim.interfaces.DepartureHandler;
-import org.matsim.ptproject.qsim.interfaces.QNetworkI;
-import org.matsim.ptproject.qsim.interfaces.QSimI;
+import org.matsim.ptproject.qsim.interfaces.NetsimNetwork;
+import org.matsim.ptproject.qsim.interfaces.Mobsim;
 import org.matsim.ptproject.qsim.interfaces.SimTimerI;
 
 import playground.gregor.sim2d_v2.scenario.Scenario2DImpl;
@@ -65,7 +65,7 @@ import playground.gregor.sim2d_v2.simulation.floor.Floor;
  * @author laemmel
  * 
  */
-public class Sim2D implements QSimI {
+public class Sim2D implements Mobsim {
 
 	private static final Logger log = Logger.getLogger(Sim2D.class);
 
@@ -510,7 +510,7 @@ public class Sim2D implements QSimI {
 	 * @see org.matsim.ptproject.qsim.interfaces.QSimI#getQNetwork()
 	 */
 	@Override
-	public QNetworkI getQNetwork() {
+	public NetsimNetwork getNetsimNetwork() {
 		throw new RuntimeException("not implemented");
 	}
 

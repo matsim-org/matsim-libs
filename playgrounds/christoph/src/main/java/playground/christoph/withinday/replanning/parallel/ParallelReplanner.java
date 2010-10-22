@@ -32,7 +32,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationListener;
-import org.matsim.ptproject.qsim.interfaces.QSimI;
+import org.matsim.ptproject.qsim.interfaces.Mobsim;
 
 import playground.christoph.withinday.replanning.ReplanningTask;
 import playground.christoph.withinday.replanning.WithinDayReplanner;
@@ -159,7 +159,7 @@ public abstract class ParallelReplanner implements SimulationInitializedListener
 	public void notifySimulationInitialized(SimulationInitializedEvent e) {
 
 		for (ReplanningThread replanningThread : this.replanningThreads) {
-			replanningThread.setAgentCounter(((QSimI) e.getQueueSimulation()).getAgentCounter());
+			replanningThread.setAgentCounter(((Mobsim) e.getQueueSimulation()).getAgentCounter());
 		}
 	}
 }

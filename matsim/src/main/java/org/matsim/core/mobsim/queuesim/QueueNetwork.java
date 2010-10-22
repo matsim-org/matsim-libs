@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.ptproject.qsim.interfaces.QSimI;
+import org.matsim.ptproject.qsim.interfaces.Mobsim;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 import org.matsim.vis.snapshots.writers.VisLink;
 import org.matsim.vis.snapshots.writers.VisNetwork;
@@ -44,7 +44,7 @@ import org.matsim.vis.snapshots.writers.VisNode;
  * @author dgrether
  */
  class QueueNetwork implements VisNetwork {
-	private QSimI qSim = null ; // QueueNetwork can exist without qSim, so this is not enforced.
+	private Mobsim qSim = null ; // QueueNetwork can exist without qSim, so this is not enforced.
 
 	private final Map<Id, QueueLink> queuelinks;
 
@@ -58,11 +58,11 @@ import org.matsim.vis.snapshots.writers.VisNode;
 	 * @param networkLayer2
 	 * @param qSim2 -- may be null, in particular for tests
 	 */
-	/*package*/ QueueNetwork(final Network networkLayer2, QSimI qSim2) {
+	/*package*/ QueueNetwork(final Network networkLayer2, Mobsim qSim2) {
 		this(networkLayer2, new DefaultQueueNetworkFactory(), qSim2);
 	}
 
-	/*package*/ QueueNetwork(final Network networkLayer, final QueueNetworkFactory<QueueNode, QueueLink> factory, QSimI qSim2) {
+	/*package*/ QueueNetwork(final Network networkLayer, final QueueNetworkFactory<QueueNode, QueueLink> factory, Mobsim qSim2) {
 		this.networkLayer = networkLayer;
 		this.queueNetworkFactory = factory;
 		this.qSim = qSim2 ;
@@ -125,7 +125,7 @@ import org.matsim.vis.snapshots.writers.VisNode;
 		return this.queuenodes.get(id);
 	}
 
-	public QSimI getQSim() {
+	public Mobsim getQSim() {
 		return qSim;
 	}
 }

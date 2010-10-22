@@ -37,7 +37,7 @@ import org.matsim.ptproject.qsim.AgentFactory;
  * @author nagel
  *
  */
-public interface QSimI extends IOSimulation, ObservableSimulation {
+public interface Mobsim extends IOSimulation, ObservableSimulation {
 
 	void agentDeparts(PersonAgent personAgent, Id startLinkId);
 
@@ -55,7 +55,7 @@ public interface QSimI extends IOSimulation, ObservableSimulation {
 
 	SimTimerI getSimTimer();
 
-	QNetworkI getQNetwork();
+	NetsimNetwork getNetsimNetwork();
 	
 	Collection<PersonAgent> getActivityEndsList() ;
 	

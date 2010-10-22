@@ -40,7 +40,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.ptproject.qsim.QSim;
-import org.matsim.ptproject.qsim.interfaces.QSimI;
+import org.matsim.ptproject.qsim.interfaces.Mobsim;
 import org.matsim.ptproject.qsim.interfaces.QVehicle;
 
 /**
@@ -57,7 +57,7 @@ public class DefaultPersonDriverAgent implements PersonDriverAgent {
 	private QVehicle vehicle;
 	protected Id cachedNextLinkId = null;
 
-	private final QSimI simulation;
+	private final Mobsim simulation;
 
 	private double activityDepartureTime = Time.UNDEFINED_TIME;
 
@@ -75,7 +75,7 @@ public class DefaultPersonDriverAgent implements PersonDriverAgent {
 	// ============================================================================================================================
 	// c'tor
 
-	public DefaultPersonDriverAgent(final Person p, final QSimI simulation) {
+	public DefaultPersonDriverAgent(final Person p, final Mobsim simulation) {
 		this.person = p;
 		this.simulation = simulation;
 	}
@@ -353,7 +353,7 @@ public class DefaultPersonDriverAgent implements PersonDriverAgent {
 	// ============================================================================================================================
 	// below here only setters/getters
 
-	public final QSimI getQSimulation(){
+	public final Mobsim getQSimulation(){
 		return this.simulation;
 	}
 

@@ -22,9 +22,9 @@ package org.matsim.signalsystems.model;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.framework.events.SimulationBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
-import org.matsim.ptproject.qsim.interfaces.QLink;
-import org.matsim.ptproject.qsim.interfaces.QNetworkI;
-import org.matsim.ptproject.qsim.interfaces.QSimI;
+import org.matsim.ptproject.qsim.interfaces.NetsimLink;
+import org.matsim.ptproject.qsim.interfaces.NetsimNetwork;
+import org.matsim.ptproject.qsim.interfaces.Mobsim;
 import org.matsim.ptproject.qsim.netsimengine.QLane;
 import org.matsim.ptproject.qsim.netsimengine.QLinkImpl;
 import org.matsim.ptproject.qsim.netsimengine.QLinkLanesImpl;
@@ -44,7 +44,7 @@ public class QSimSignalEngine implements SignalEngine {
 
 	@Override
 	public void notifySimulationInitialized(SimulationInitializedEvent e) {
-		this.initializeSignalizedItems(((QSimI)e.getQueueSimulation()));
+		this.initializeSignalizedItems(((Mobsim)e.getQueueSimulation()));
 	}
 
 
@@ -53,11 +53,11 @@ public class QSimSignalEngine implements SignalEngine {
 		this.signalManager.requestControlUpdate(e.getSimulationTime());
 	}
 	
-	private void initializeSignalizedItems(QSimI qSim) {
-		QNetworkI net = qSim.getQNetwork();
+	private void initializeSignalizedItems(Mobsim qSim) {
+		NetsimNetwork net = qSim.getNetsimNetwork();
 		for (SignalSystem system : this.signalManager.getSignalSystems().values()){
 			for (Signal signal : system.getSignals().values()){
-				QLink link = net.getLinks().get(signal.getLinkId());
+				NetsimLink link = net.getNetsimLinks().get(signal.getLinkId());
 				if (signal.getLaneIds() == null || signal.getLaneIds().isEmpty()){
 					QLinkImpl l = (QLinkImpl) link;
 					l.setSignalized(true);

@@ -117,12 +117,12 @@ public class MVISnapshotWriter extends OTFFileWriter{
 
 	public MVISnapshotWriter(ScenarioImpl sc) {
 //		super(sc.getConfig().simulation().getSnapshotPeriod(),new OTFQSimServerQuadBuilder(new QNetwork(new QSim(sc,new EventsManagerFactoryImpl().createEventsManager()))),OTFSnapshotGenerator.MVI_FILE, new OTFFileWriterConnectionManagerFactory());
-		super(sc.getConfig().simulation().getSnapshotPeriod(),new OTFQSimServerQuadBuilder(new QSim(sc,new EventsManagerFactoryImpl().createEventsManager()).getQNetwork()),OTFSnapshotGenerator.MVI_FILE, new OTFFileWriterConnectionManagerFactory());
+		super(sc.getConfig().simulation().getSnapshotPeriod(),new OTFQSimServerQuadBuilder(new QSim(sc,new EventsManagerFactoryImpl().createEventsManager()).getNetsimNetwork()),OTFSnapshotGenerator.MVI_FILE, new OTFFileWriterConnectionManagerFactory());
 	}
 
 
 	public MVISnapshotWriter(ScenarioImpl sc, String mVIFILE) {
-		super(sc.getConfig().simulation().getSnapshotPeriod(),new OTFQSimServerQuadBuilder(new QSim(sc,new EventsManagerFactoryImpl().createEventsManager()).getQNetwork()),mVIFILE, new OTFFileWriterConnectionManagerFactory());
+		super(sc.getConfig().simulation().getSnapshotPeriod(),new OTFQSimServerQuadBuilder(new QSim(sc,new EventsManagerFactoryImpl().createEventsManager()).getNetsimNetwork()),mVIFILE, new OTFFileWriterConnectionManagerFactory());
 	}
 
 

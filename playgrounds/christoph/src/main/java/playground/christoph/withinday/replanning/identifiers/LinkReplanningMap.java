@@ -49,8 +49,8 @@ import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.ptproject.qsim.QSim;
-import org.matsim.ptproject.qsim.interfaces.QLink;
-import org.matsim.ptproject.qsim.interfaces.QSimI;
+import org.matsim.ptproject.qsim.interfaces.NetsimLink;
+import org.matsim.ptproject.qsim.interfaces.Mobsim;
 import org.matsim.ptproject.qsim.netsimengine.QNetwork;
 
 /**
@@ -116,10 +116,10 @@ public class LinkReplanningMap implements LinkEnterEventHandler,
 	@Override
 	public void notifySimulationInitialized(SimulationInitializedEvent e) {
 
-		QSimI sim = (QSimI) e.getQueueSimulation();
+		Mobsim sim = (Mobsim) e.getQueueSimulation();
 
 		// Update Reference to QNetwork
-		this.qNetwork = (QNetwork) sim.getQNetwork();
+		this.qNetwork = (QNetwork) sim.getNetsimNetwork();
 
 		personAgentMapping = new HashMap<Id, PersonAgent>();
 
@@ -137,7 +137,7 @@ public class LinkReplanningMap implements LinkEnterEventHandler,
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
 		double now = event.getTime();
-		QLink qLink = qNetwork.getQLink(event.getLinkId());
+		NetsimLink qLink = qNetwork.getNetsimLink(event.getLinkId());
 		double departureTime = (now + ((LinkImpl)qLink.getLink()).getFreespeedTravelTime(now));
 
 		replanningMap.put(event.getPersonId(), new Tuple<Id, Double>(event.getLinkId(), departureTime));

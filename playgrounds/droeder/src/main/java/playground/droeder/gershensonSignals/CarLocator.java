@@ -21,7 +21,7 @@ package playground.droeder.gershensonSignals;
 
 
 import org.apache.log4j.Logger;
-import org.matsim.ptproject.qsim.interfaces.QLink;
+import org.matsim.ptproject.qsim.interfaces.NetsimLink;
 import org.matsim.ptproject.qsim.netsimengine.QLane;
 import org.matsim.ptproject.qsim.netsimengine.QLinkLanesImpl;
 
@@ -32,14 +32,14 @@ import org.matsim.ptproject.qsim.netsimengine.QLinkLanesImpl;
  *
  */
 public class CarLocator {
-	private QLink link;
+	private NetsimLink link;
 	private double enterTime;
 	private double earliestInD;
 	private double d;
 	
 	private static final Logger log = Logger.getLogger(CarLocator.class);
 
-	public CarLocator(QLink link, double enterTime, double d){
+	public CarLocator(NetsimLink link, double enterTime, double d){
 		this.link = link;
 		this.enterTime = enterTime;
 		this.d = d;

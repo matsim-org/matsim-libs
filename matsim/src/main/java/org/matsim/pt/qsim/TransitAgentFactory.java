@@ -26,14 +26,14 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.ptproject.qsim.AgentFactory;
 import org.matsim.ptproject.qsim.helpers.DefaultPersonDriverAgent;
-import org.matsim.ptproject.qsim.interfaces.QSimI;
+import org.matsim.ptproject.qsim.interfaces.Mobsim;
 
 
 public class TransitAgentFactory extends AgentFactory {
 
 	private final Map<Person, PersonDriverAgent> agentsMap;
 
-	public TransitAgentFactory(final QSimI simulation, final Map<Person, PersonDriverAgent> agents) {
+	public TransitAgentFactory(final Mobsim simulation, final Map<Person, PersonDriverAgent> agents) {
 		super(simulation);
 		this.agentsMap = agents;
 	}

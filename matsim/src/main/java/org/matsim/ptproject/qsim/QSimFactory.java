@@ -23,7 +23,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.pt.qsim.ComplexTransitStopHandlerFactory;
-import org.matsim.ptproject.qsim.interfaces.QSimI;
+import org.matsim.ptproject.qsim.interfaces.Mobsim;
 
 
 /**The MobsimFactory is necessary so that something can be passed to the controler which instantiates this.
@@ -35,7 +35,7 @@ import org.matsim.ptproject.qsim.interfaces.QSimI;
 public class QSimFactory implements MobsimFactory {
 
 	@Override
-	public QSimI createMobsim(Scenario sc, EventsManager eventsManager) {
+	public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
 		QSim sim = new QSim(sc, eventsManager);
 		if (sc.getConfig().scenario().isUseTransit()) {
 			sim.getQSimTransitEngine().setUseUmlaeufe(true);

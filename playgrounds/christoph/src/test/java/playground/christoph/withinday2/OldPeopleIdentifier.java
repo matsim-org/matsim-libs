@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.ptproject.qsim.interfaces.QSimI;
+import org.matsim.ptproject.qsim.interfaces.Mobsim;
 
 import playground.christoph.withinday.replanning.WithinDayReplanner;
 import playground.christoph.withinday.replanning.identifiers.interfaces.AgentsToReplanIdentifier;
@@ -13,7 +13,7 @@ import playground.christoph.withinday.replanning.identifiers.interfaces.DuringAc
 
 public class OldPeopleIdentifier extends AgentsToReplanIdentifier {
 
-	private QSimI queueSim;
+	private Mobsim queueSim;
 
 	@Override
 	public List<PersonAgent> getAgentsToReplan(double time, WithinDayReplanner withinDayReplanner) {
@@ -36,7 +36,7 @@ public class OldPeopleIdentifier extends AgentsToReplanIdentifier {
 		return list;
 	}
 
-	public OldPeopleIdentifier( QSimI queueSim) {
+	public OldPeopleIdentifier( Mobsim queueSim) {
 		this.queueSim = queueSim;
 	}
 

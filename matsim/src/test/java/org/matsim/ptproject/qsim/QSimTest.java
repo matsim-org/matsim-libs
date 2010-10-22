@@ -59,7 +59,6 @@ import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.events.handler.BasicEventHandler;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
@@ -76,9 +75,9 @@ import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.ptproject.qsim.helpers.DefaultPersonDriverAgent;
 import org.matsim.ptproject.qsim.helpers.QVehicleImpl;
-import org.matsim.ptproject.qsim.interfaces.QLink;
+import org.matsim.ptproject.qsim.interfaces.NetsimLink;
+import org.matsim.ptproject.qsim.interfaces.NetsimNetwork;
 import org.matsim.ptproject.qsim.interfaces.QVehicle;
-import org.matsim.ptproject.qsim.netsimengine.QNetwork;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.utils.EventsCollector;
 import org.matsim.testcases.utils.LogCounter;
@@ -682,10 +681,10 @@ public class QSimTest {
 
 		/* prepare sim */
 		QSim sim = new QSim(f.scenario, events);
-		QNetwork qnet = sim.getQNetwork();
+		NetsimNetwork qnet = sim.getNetsimNetwork();
 		sim.prepareSim();
-		QLink qlink2 = qnet.getQLink(id2);
-		QLink qlink3 = qnet.getQLink(new IdImpl(3));
+		NetsimLink qlink2 = qnet.getNetsimLink(id2);
+		NetsimLink qlink3 = qnet.getNetsimLink(new IdImpl(3));
 
 		VehicleType defaultVehicleType = new VehicleTypeImpl(new IdImpl("defaultVehicleType"));
 		QVehicle vehicle1 = new QVehicleImpl(new VehicleImpl(id1, defaultVehicleType));

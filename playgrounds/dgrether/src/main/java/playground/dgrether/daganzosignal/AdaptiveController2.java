@@ -79,7 +79,7 @@ public class AdaptiveController2 extends
 	}
 	
 	private void initParametersFromConfig(){
-		Config config = this.getSignalEngine().getQSim().getScenario().getConfig();
+		Config config = this.getSignalEngine().getMobsim().getScenario().getConfig();
 	  Module m = config.getModule(DaganzoScenarioGenerator.CONFIG_MODULE);
 //		String pSignalString = m.getValue(DaganzoScenarioGenerator.PSIGNAL_CONFIG_PARAMETER);
 //		if (pSignalString != null) {

@@ -29,6 +29,7 @@ import java.util.concurrent.CyclicBarrier;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.helpers.AgentSnapshotInfoBuilder;
+import org.matsim.ptproject.qsim.interfaces.Mobsim;
 import org.matsim.ptproject.qsim.netsimengine.ParallelQSimEngine.ExtendedQueueNode;
 
 public class QSimEngineRunner extends QSimEngineInternalI implements Runnable {
@@ -48,11 +49,11 @@ public class QSimEngineRunner extends QSimEngineInternalI implements Runnable {
 
 	/** This is the collection of links that have to be activated in the current time step */
 	private final ArrayList<QLinkInternalI> linksToActivate = new ArrayList<QLinkInternalI>();
-	private final QSim qsim;
+	private final Mobsim qsim;
 	private final AgentSnapshotInfoBuilder positionInfoBuilder;
 
 	/*package*/ QSimEngineRunner(boolean simulateAllNodes, boolean simulateAllLinks, CyclicBarrier startBarrier, CyclicBarrier separationBarrier, CyclicBarrier endBarrier,
-			QSim sim, AgentSnapshotInfoBuilder positionInfoBuilder)
+			Mobsim sim, AgentSnapshotInfoBuilder positionInfoBuilder)
 	{
 		this.simulateAllNodes = simulateAllNodes;
 		this.simulateAllLinks = simulateAllLinks;
@@ -220,7 +221,7 @@ public class QSimEngineRunner extends QSimEngineInternalI implements Runnable {
 	}
 
   @Override
-  public QSim getQSim() {
+  public Mobsim getMobsim() {
     return this.qsim;
   }
 

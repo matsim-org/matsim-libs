@@ -24,7 +24,7 @@ import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 
 import org.matsim.core.gbl.Gbl;
-import org.matsim.ptproject.qsim.interfaces.QSimI;
+import org.matsim.ptproject.qsim.interfaces.Mobsim;
 import org.matsim.ptproject.qsim.multimodalsimengine.router.costcalculator.MultiModalTravelTime;
 
 public class MultiModalSimEngineRunner extends MultiModalSimEngine implements Runnable {
@@ -40,7 +40,7 @@ public class MultiModalSimEngineRunner extends MultiModalSimEngine implements Ru
 		
 	/*package*/ MultiModalSimEngineRunner(CyclicBarrier startBarrier, CyclicBarrier reactivateNodesBarrier,
 			CyclicBarrier separationBarrier, CyclicBarrier reactivateLinksBarrier, CyclicBarrier endBarrier,
-			QSimI sim, MultiModalTravelTime multiModalTravelTime) {
+			Mobsim sim, MultiModalTravelTime multiModalTravelTime) {
 		super(sim);
 		this.startBarrier = startBarrier;
 		this.reactivateNodesBarrier = reactivateNodesBarrier;

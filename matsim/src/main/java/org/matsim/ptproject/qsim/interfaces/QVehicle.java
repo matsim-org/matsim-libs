@@ -26,6 +26,7 @@ import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vis.snapshots.writers.VisVehicle;
 
+@Deprecated // only makes sense for "queue" mobsims.  Should go somewhere else (I think).  kai, oct'10
 public interface QVehicle extends Identifiable, VisVehicle {
 
 	public PersonDriverAgent getDriver();

@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.ptproject.qsim.QSim;
+import org.matsim.ptproject.qsim.interfaces.Mobsim;
 
 /**
  * An extended version of the QSimEngine that uses an array of
@@ -61,10 +61,10 @@ class ParallelQSimEngine extends QSimEngineImpl{
 	private CyclicBarrier endBarrier;
 
 
-	ParallelQSimEngine(final QSim sim, final Random random)
+	ParallelQSimEngine(final Mobsim sim, final Random random)
 	{
 		super(sim, random);
-		this.numOfThreads = this.getQSim().getScenario().getConfig().getQSimConfigGroup().getNumberOfThreads();
+		this.numOfThreads = this.getMobsim().getScenario().getConfig().getQSimConfigGroup().getNumberOfThreads();
 	}
 
 	  @Override
@@ -198,7 +198,7 @@ class ParallelQSimEngine extends QSimEngineImpl{
 		for (int i = 0; i < numOfThreads; i++)
 		{
 			QSimEngineRunner engine = new QSimEngineRunner(simulateAllNodes, simulateAllLinks, this.startBarrier, this.separationBarrier, 
-					this.endBarrier, this.getQSim(), this.getAgentSnapshotInfoBuilder());
+					this.endBarrier, this.getMobsim(), this.getAgentSnapshotInfoBuilder());
 			engine.setExtendedQueueNodeArray(this.parallelNodesArrays[i]);
 			engine.setLinks(this.parallelSimLinksLists.get(i));
 			Thread thread = new Thread( engine ) ;
@@ -293,7 +293,8 @@ class ParallelQSimEngine extends QSimEngineImpl{
 
 				for (Link outLink : n.getOutLinks().values())
 				{
-					QLinkInternalI qLink = this.getQSim().getQNetwork().getQLink(outLink.getId());
+					QLinkInternalI qLink = this.getQNetwork().getNetsimLink(outLink.getId());
+					// removing qsim as "person in the middle".  not fully sure if this is the same in the parallel impl.  kai, oct'10
 					qLink.setQSimEngine(this.engines[thread]);
 				}
 			}

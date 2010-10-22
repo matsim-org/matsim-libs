@@ -37,7 +37,7 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.Umlauf;
 import org.matsim.pt.UmlaufStueckI;
-import org.matsim.ptproject.qsim.interfaces.QSimI;
+import org.matsim.ptproject.qsim.interfaces.Mobsim;
 import org.matsim.transitSchedule.api.Departure;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
@@ -112,7 +112,7 @@ public class UmlaufDriver extends AbstractTransitDriver {
 	private Iterator<Leg> iLeg;
 	private NetworkRoute carRoute;
 	private double departureTime;
-	private final QSimI sim;
+	private final Mobsim sim;
 	private Leg currentLeg;
 	private TransitLine transitLine;
 	private TransitRoute transitRoute;
@@ -120,7 +120,7 @@ public class UmlaufDriver extends AbstractTransitDriver {
 
 	public UmlaufDriver(Umlauf umlauf,
 			TransitStopAgentTracker thisAgentTracker,
-			QSimI transitQueueSimulation) {
+			Mobsim transitQueueSimulation) {
 		super(transitQueueSimulation, thisAgentTracker);
 		this.umlauf = umlauf;
 		this.sim = transitQueueSimulation;

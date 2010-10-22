@@ -221,7 +221,7 @@ public class AnalysisTest {
 			sw2.close();
 
 			QSim qsim = new QSim(scenario2, new EventsManagerImpl());
-			new OTFEvent2MVI(qsim.getQNetwork(), eventsOutputFilename,
+			new OTFEvent2MVI(qsim.getNetsimNetwork(), eventsOutputFilename,
 					args[2] + "../" + args[args.length - 1] + "."
 							+ (scenario.equals("normal") ? "" : scenario + ".")
 							+ "vis.mvi", Integer

@@ -27,16 +27,16 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.matsim.core.mobsim.framework.Steppable;
-import org.matsim.ptproject.qsim.interfaces.QLink;
-import org.matsim.ptproject.qsim.interfaces.QSimI;
-import org.matsim.ptproject.qsim.interfaces.SimEngine;
+import org.matsim.ptproject.qsim.interfaces.MobsimEngine;
+import org.matsim.ptproject.qsim.interfaces.NetsimLink;
+import org.matsim.ptproject.qsim.interfaces.NetsimNode;
+import org.matsim.ptproject.qsim.interfaces.Mobsim;
 import org.matsim.ptproject.qsim.multimodalsimengine.router.costcalculator.MultiModalTravelTime;
 import org.matsim.ptproject.qsim.multimodalsimengine.router.costcalculator.MultiModalTravelTimeCost;
-import org.matsim.ptproject.qsim.netsimengine.QNode;
 
-public class MultiModalSimEngine implements SimEngine, NetworkElementActivator, Steppable {
+public class MultiModalSimEngine implements MobsimEngine, NetworkElementActivator, Steppable {
 
-	/*package*/ QSimI qSim;
+	/*package*/ Mobsim qSim;
 	/*package*/ MultiModalTravelTime multiModalTravelTime;
 	/*package*/ List<MultiModalQLinkExtension> allLinks = null;
 	/*package*/ List<MultiModalQLinkExtension> activeLinks;
@@ -46,7 +46,7 @@ public class MultiModalSimEngine implements SimEngine, NetworkElementActivator, 
 //	/*package*/ List<MultiModalQLinkExtension> linksToActivate;
 //	/*package*/ List<MultiModalQNodeExtension> nodesToActivate;
 
-	/*package*/ MultiModalSimEngine(QSimI qSim) {
+	/*package*/ MultiModalSimEngine(Mobsim qSim) {
 		this.qSim = qSim;
 		
 		activeLinks = new ArrayList<MultiModalQLinkExtension>();
@@ -61,14 +61,14 @@ public class MultiModalSimEngine implements SimEngine, NetworkElementActivator, 
 	}
 	
 	@Override
-	public QSimI getQSim() {
+	public Mobsim getMobsim() {
 		return qSim;
 	}
 
 	@Override
 	public void onPrepareSim() {
 		allLinks = new ArrayList<MultiModalQLinkExtension>();
-		for (QLink qLink : this.qSim.getQNetwork().getLinks().values()) {
+		for (NetsimLink qLink : this.qSim.getNetsimNetwork().getNetsimLinks().values()) {
 			allLinks.add(this.getMultiModalQLinkExtension(qLink));
 		}
 	}
@@ -161,11 +161,11 @@ public class MultiModalSimEngine implements SimEngine, NetworkElementActivator, 
 		return this.multiModalTravelTime;
 	}
 	
-	/*package*/ MultiModalQNodeExtension getMultiModalQNodeExtension(QNode qNode) {
+	/*package*/ MultiModalQNodeExtension getMultiModalQNodeExtension(NetsimNode qNode) {
 		return (MultiModalQNodeExtension) qNode.getCustomAttributes().get(MultiModalQNodeExtension.class.getName());
 	}
 
-	/*package*/ MultiModalQLinkExtension getMultiModalQLinkExtension(QLink qLink) {
+	/*package*/ MultiModalQLinkExtension getMultiModalQLinkExtension(NetsimLink qLink) {
 		return (MultiModalQLinkExtension) qLink.getCustomAttributes().get(MultiModalQLinkExtension.class.getName());
 	}
 }

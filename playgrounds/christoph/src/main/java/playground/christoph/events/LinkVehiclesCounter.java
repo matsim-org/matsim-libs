@@ -27,7 +27,7 @@ import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.interfaces.AgentCounterI;
-import org.matsim.ptproject.qsim.interfaces.QLink;
+import org.matsim.ptproject.qsim.interfaces.NetsimLink;
 import org.matsim.ptproject.qsim.netsimengine.QNetwork;
 
 import playground.christoph.network.MyLinkImpl;
@@ -104,7 +104,7 @@ public class LinkVehiclesCounter implements LinkEnterEventHandler,
 		lostVehicles = 0;
 
 		// collect the Counts
-		for (QLink qLink : qNetwork.getLinks().values()) {
+		for (NetsimLink qLink : qNetwork.getNetsimLinks().values()) {
 			int vehCount = qLink.getAllVehicles().size();
 
 			initialVehicleCount = initialVehicleCount + vehCount;
@@ -270,7 +270,7 @@ public class LinkVehiclesCounter implements LinkEnterEventHandler,
 //			log.info("SIMULATION AT " + Time.writeTime(e.getSimulationTime()) + " checking parking Vehicles Counts");
 //		}
 
-		for (QLink qLink : qNetwork.getLinks().values())
+		for (NetsimLink qLink : qNetwork.getNetsimLinks().values())
 		{
 			Id id = qLink.getLink().getId();
 

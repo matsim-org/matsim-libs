@@ -21,19 +21,19 @@ package org.matsim.ptproject.qsim.netsimengine;
 
 import java.util.Random;
 
-import org.matsim.ptproject.qsim.QSim;
-import org.matsim.ptproject.qsim.interfaces.QSimEngine;
-import org.matsim.ptproject.qsim.interfaces.QSimEngineFactory;
+import org.matsim.ptproject.qsim.interfaces.Mobsim;
+import org.matsim.ptproject.qsim.interfaces.NetsimEngine;
+import org.matsim.ptproject.qsim.interfaces.NetsimEngineFactory;
 
 
 /**
  * @author dgrether
  *
  */
-public final class DefaultQSimEngineFactory implements QSimEngineFactory {
+public final class DefaultQSimEngineFactory implements NetsimEngineFactory {
 
 	@Override
-	public QSimEngine createQSimEngine(QSim sim, Random random) {
+	public NetsimEngine createQSimEngine(Mobsim sim, Random random) {
 		return new QSimEngineImpl(sim, random);
 	}
 

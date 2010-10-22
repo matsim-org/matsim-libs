@@ -33,9 +33,9 @@ import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.mobsim.framework.Steppable;
 import org.matsim.core.mobsim.framework.listeners.SimulationListener;
 import org.matsim.ptproject.qsim.QSim;
-import org.matsim.ptproject.qsim.interfaces.QLink;
-import org.matsim.ptproject.qsim.interfaces.QNetworkI;
-import org.matsim.ptproject.qsim.interfaces.SimEngine;
+import org.matsim.ptproject.qsim.interfaces.NetsimLink;
+import org.matsim.ptproject.qsim.interfaces.NetsimNetwork;
+import org.matsim.ptproject.qsim.interfaces.MobsimEngine;
 import org.matsim.ptproject.qsim.netsimengine.QLane;
 import org.matsim.ptproject.qsim.netsimengine.QLinkLanesImpl;
 import org.matsim.signalsystems.config.AdaptivePlanBasedSignalSystemControlInfo;
@@ -54,7 +54,7 @@ import org.matsim.signalsystems.systems.SignalSystemDefinition;
 import org.matsim.signalsystems.systems.SignalSystems;
 
 
-public class QSimSignalEngine implements SignalEngine, SimEngine, Steppable {
+public class QSimSignalEngine implements SignalEngine, MobsimEngine, Steppable {
 
 
 	private static final Logger log = Logger.getLogger(QSimSignalEngine.class);
@@ -78,7 +78,7 @@ public class QSimSignalEngine implements SignalEngine, SimEngine, Steppable {
 
 	private SignalSystemConfigurations signalSystemsConfig;
 
-	private QNetworkI qNetwork;
+	private NetsimNetwork qNetwork;
 
 	private QSim qSimulation;
 
@@ -86,7 +86,7 @@ public class QSimSignalEngine implements SignalEngine, SimEngine, Steppable {
 
 	public QSimSignalEngine(QSim sim) {
 		this.qSimulation = sim;
-		this.qNetwork = sim.getQNetwork();
+		this.qNetwork = sim.getNetsimNetwork();
 		this.events = sim.getEventsManager();
 	}
 
@@ -111,7 +111,7 @@ public class QSimSignalEngine implements SignalEngine, SimEngine, Steppable {
   public void doSimStep(double time) {
     for (SignalGroupDefinition signalGroup : this.signalSystems.getSignalGroupDefinitions().values()) {
       Id linkId = signalGroup.getLinkRefId();
-      QLinkLanesImpl qlink = (QLinkLanesImpl) this.qNetwork.getQLink(linkId);
+      QLinkLanesImpl qlink = (QLinkLanesImpl) this.qNetwork.getNetsimLink(linkId);
       for (QLane qlane : qlink.getToNodeQueueLanes()){
 //        qlane.updateGreenState(time);
       }
@@ -142,7 +142,7 @@ public class QSimSignalEngine implements SignalEngine, SimEngine, Steppable {
 		//init the signalGroupDefinitions
 		this.signalGroupDefinitionsBySystemId= new TreeMap<Id, List<SignalGroupDefinition>>();
 		for (SignalGroupDefinition signalGroupDefinition : signalSystems.getSignalGroupDefinitions().values()) {
-			QLink queueLink = this.qNetwork.getQLink(signalGroupDefinition.getLinkRefId());
+			NetsimLink queueLink = this.qNetwork.getNetsimLink(signalGroupDefinition.getLinkRefId());
 			if (queueLink == null) {
 				throw new IllegalStateException("SignalGroupDefinition Id: " + signalGroupDefinition.getId() + " of SignalSystem Id:  " + signalGroupDefinition.getSignalSystemDefinitionId() + " is set to non existing Link with Id: " + signalGroupDefinition.getLinkRefId());
 			}
@@ -289,7 +289,7 @@ public class QSimSignalEngine implements SignalEngine, SimEngine, Steppable {
   }
 
   @Override
-  public QSim getQSim() {
+  public QSim getMobsim() {
     return this.qSimulation;
   }
 
