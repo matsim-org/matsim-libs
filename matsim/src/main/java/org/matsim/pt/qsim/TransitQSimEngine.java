@@ -139,7 +139,16 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine {
 	private Collection<PersonAgent> createVehiclesAndDriversWithUmlaeufe(TransitStopAgentTracker thisAgentTracker) {
 		Vehicles vehicles = ((ScenarioImpl) this.qSim.getScenario()).getVehicles();
 		Collection<PersonAgent> drivers = new ArrayList<PersonAgent>();
-		ReconstructingUmlaufBuilder reconstructingUmlaufBuilder = new ReconstructingUmlaufBuilder(this.qSim.getScenario().getNetwork(),((ScenarioImpl) this.qSim.getScenario()).getTransitSchedule().getTransitLines().values(), ((ScenarioImpl) this.qSim.getScenario()).getVehicles(), this.qSim.getScenario().getConfig().charyparNagelScoring());
+		ReconstructingUmlaufBuilder reconstructingUmlaufBuilder = this.qSim.getScenario().getScenarioElement( ReconstructingUmlaufBuilder.class ) ;
+		if (reconstructingUmlaufBuilder != null) {
+			log.warn("found pre-existing ReconstructingUmlaufBuilder in scenario, thus using that one. This should be ok but it is not systematically tested.") ;
+			log.warn("(A possible problem is that it will use the parameters from the original UmlaufBuilder, not the ones defined here.)") ;
+		} else {
+			reconstructingUmlaufBuilder = new ReconstructingUmlaufBuilder(this.qSim.getScenario().getNetwork(),
+					((ScenarioImpl) this.qSim.getScenario()).getTransitSchedule().getTransitLines().values(),
+					((ScenarioImpl) this.qSim.getScenario()).getVehicles(), this.qSim.getScenario().getConfig()
+							.charyparNagelScoring());
+		}
 		Collection<Umlauf> umlaeufe = reconstructingUmlaufBuilder.build();
 		for (Umlauf umlauf : umlaeufe) {
 			Vehicle basicVehicle = vehicles.getVehicles().get(umlauf.getVehicleId());

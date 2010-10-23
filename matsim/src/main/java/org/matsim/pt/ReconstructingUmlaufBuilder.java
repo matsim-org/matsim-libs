@@ -51,7 +51,7 @@ public class ReconstructingUmlaufBuilder implements UmlaufBuilder {
 
 	private Collection<TransitLine> transitLines;
 	private Vehicles basicVehicles;
-	private Map<Id,Umlauf> umlaeufe = new HashMap<Id,Umlauf>();
+	private Map<Id,Umlauf> umlaeufe = null ;
 	private ArrayList<UmlaufStueck> umlaufStuecke;
 
 	private UmlaufInterpolator umlaufInterpolator;
@@ -67,20 +67,25 @@ public class ReconstructingUmlaufBuilder implements UmlaufBuilder {
 
 	@Override
 	public Collection<Umlauf> build() {
-		createEmptyUmlaeufe();
-		createUmlaufStuecke();
-		log.info("Generating Umlaeufe; if this is extremely slow, try more memory:") ;
-		System.out.flush() ;
-		int cnt = 0 ;
-		for (UmlaufStueck umlaufStueck : umlaufStuecke) {
-			Umlauf umlauf = umlaeufe.get(umlaufStueck.getDeparture().getVehicleId());
-			umlaufInterpolator.addUmlaufStueckToUmlauf(umlaufStueck, umlauf);
-			cnt++ ;
-			if ( cnt%100==0 ) System.out.print('.') ;
-			if ( cnt%10000==0 ) System.out.println();
+		if ( umlaeufe != null ) {
+			log.warn("Found `umlaeufe != null' thus re-using existing umlaufe.  This should be ok but it is not systematically tested." ) ;
+		} else {
+			umlaeufe = new HashMap<Id,Umlauf>();
+			createEmptyUmlaeufe();
+			createUmlaufStuecke();
+			log.info("Generating Umlaeufe; if this is extremely slow, try more memory:") ;
+			System.out.flush() ;
+			int cnt = 0 ;
+			for (UmlaufStueck umlaufStueck : umlaufStuecke) {
+				Umlauf umlauf = umlaeufe.get(umlaufStueck.getDeparture().getVehicleId());
+				umlaufInterpolator.addUmlaufStueckToUmlauf(umlaufStueck, umlauf);
+				cnt++ ;
+				if ( cnt%100==0 ) System.out.print('.') ;
+				if ( cnt%10000==0 ) System.out.println();
+			}
+			System.out.println() ;
+			System.out.flush() ;
 		}
-		System.out.println() ;
-		System.out.flush() ;
 		return umlaeufe.values();
 	}
 

@@ -67,6 +67,7 @@ public class TransitControlerListener implements StartupListener {
 				event.getControler().getScenario().getVehicles(),
 				event.getControler().getScenario().getConfig().charyparNagelScoring());
 		reconstructingUmlaufBuilder.build();
+		event.getControler().getScenario().addScenarioElement( reconstructingUmlaufBuilder ) ;
 	}
 
 }
