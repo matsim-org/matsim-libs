@@ -72,7 +72,7 @@ public class Bins {
 			categories[i] = Integer.toString(i);
 		}		
 		
-		DecimalFormat formatter = new DecimalFormat("0.00");
+		DecimalFormat formatter = new DecimalFormat("0.0000");
 		String s = xLabel + " " + 
 		"[interval = " + formatter.format(this.interval) + xUnit + "]" +
 		"[mean = " + formatter.format(Utils.mean(values)) + xUnit + "]" +
