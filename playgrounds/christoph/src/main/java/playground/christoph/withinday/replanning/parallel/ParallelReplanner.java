@@ -34,8 +34,8 @@ import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationListener;
 import org.matsim.ptproject.qsim.interfaces.Mobsim;
 
-import playground.christoph.withinday.replanning.ReplanningTask;
-import playground.christoph.withinday.replanning.WithinDayReplanner;
+import playground.christoph.withinday.replanning.replanners.interfaces.WithinDayReplanner;
+import playground.christoph.withinday.replanning.replanners.tools.ReplanningTask;
 
 /*
  * Abstract class that contains the basic elements that are needed
@@ -127,8 +127,8 @@ public abstract class ParallelReplanner implements SimulationInitializedListener
 		this.originalReplanners.add(replanner);
 
 		for (ReplanningThread replanningThread : this.replanningThreads) {
-			WithinDayReplanner clone = replanner.clone();
-			replanningThread.addWithinDayReplanner(clone);
+			WithinDayReplanner newInstance = replanner.getReplannerFactory().createReplanner();
+			replanningThread.addWithinDayReplanner(newInstance);
 		}
 	}
 

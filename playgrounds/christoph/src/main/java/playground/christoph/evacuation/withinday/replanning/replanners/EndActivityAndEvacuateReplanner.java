@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.christoph.evacuation.withinday.replanning;
+package playground.christoph.evacuation.withinday.replanning.replanners;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -35,16 +35,14 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.misc.Time;
 
+import playground.christoph.evacuation.withinday.replanning.replanners.EndActivityAndEvacuateReplanner;
 import playground.christoph.withinday.mobsim.WithinDayPersonAgent;
-import playground.christoph.withinday.replanning.WithinDayDuringActivityReplanner;
+import playground.christoph.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
 import playground.christoph.withinday.utils.EditRoutes;
 
-/*
- * Needs to be registered as SimulationListener!!! 
- */
 public class EndActivityAndEvacuateReplanner extends WithinDayDuringActivityReplanner {
 	
-	public EndActivityAndEvacuateReplanner(Id id, Scenario scenario) {
+	/*package*/ EndActivityAndEvacuateReplanner(Id id, Scenario scenario) {
 		super(id, scenario);
 	}
 	
@@ -160,15 +158,5 @@ public class EndActivityAndEvacuateReplanner extends WithinDayDuringActivityRepl
 		else if (hasPt) return TransportMode.pt;
 		else if (hasBike) return TransportMode.bike;
 		else return TransportMode.walk;
-	}
-	
-	@Override
-	public EndActivityAndEvacuateReplanner clone() {
-		EndActivityAndEvacuateReplanner clone = new EndActivityAndEvacuateReplanner(this.id, this.scenario);
-		
-		super.cloneBasicData(clone);
-		
-		return clone;
-	}
-	
+	}	
 }

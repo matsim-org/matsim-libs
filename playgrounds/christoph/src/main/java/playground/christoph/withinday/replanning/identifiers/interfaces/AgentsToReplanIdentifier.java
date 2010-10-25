@@ -24,35 +24,22 @@ import java.util.List;
 
 import org.matsim.core.mobsim.framework.PersonAgent;
 
-import playground.christoph.withinday.replanning.WithinDayReplanner;
+import playground.christoph.withinday.replanning.replanners.interfaces.WithinDayReplanner;
 
 /*
- * Identify Agents that need a Replanning of their scheduled
- * plan.
+ * Identify Agents that need a replanning of their scheduled plan.
  */
-public abstract class AgentsToReplanIdentifier implements Cloneable{
+public abstract class AgentsToReplanIdentifier {
 	
-	protected boolean checkAllAgents = true;
-	
-	
+	private IdentifierFactory identifierFactory;
+		
 	public abstract List<PersonAgent> getAgentsToReplan(double time, WithinDayReplanner withinDayReplanner);
 	
-	
-	public boolean checkAllAgents()
-	{
-		return this.checkAllAgents;
+	public final void setIdentifierFactory(IdentifierFactory factory) {
+		this.identifierFactory = factory;
 	}
 	
-	public void checkAllAgents(boolean checkAllAgents)
-	{
-		this.checkAllAgents = checkAllAgents;
-	}
-	
-	@Override
-	public abstract AgentsToReplanIdentifier clone();
-	
-	protected void cloneBasicData(AgentsToReplanIdentifier clone)
-	{
-		clone.checkAllAgents = this.checkAllAgents;
+	public final IdentifierFactory getIdentifierFactory() {
+		return identifierFactory;
 	}
 }

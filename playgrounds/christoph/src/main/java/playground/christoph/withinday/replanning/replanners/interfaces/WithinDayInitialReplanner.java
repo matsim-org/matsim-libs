@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ReplanningIdGenerator.java
+ * WithinDayInitialReplanner.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,19 +18,19 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.christoph.withinday.replanning;
+package playground.christoph.withinday.replanning.replanners.interfaces;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.Scenario;
 
-public class ReplanningIdGenerator {
-	
-	private static int idCount = 0;
-	
-	public static Id getNextId() {
-		Id id = new IdImpl(idCount);
-		idCount++;
-		
-		return id;
+/*
+ * Replans Agents initially after the Simulation has
+ * been initialized.
+ */
+public abstract class WithinDayInitialReplanner extends WithinDayReplanner {
+
+	public WithinDayInitialReplanner(Id id, Scenario scenario) {
+		super(id, scenario);
 	}
+	
 }

@@ -32,7 +32,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.ptproject.qsim.helpers.DefaultPersonDriverAgent;
 import org.matsim.ptproject.qsim.interfaces.Mobsim;
 
-import playground.christoph.withinday.replanning.WithinDayReplanner;
+import playground.christoph.withinday.replanning.replanners.interfaces.WithinDayReplanner;
 
 public class WithinDayPersonAgent extends DefaultPersonDriverAgent {
 	private static final Logger log = Logger.getLogger("dummy");

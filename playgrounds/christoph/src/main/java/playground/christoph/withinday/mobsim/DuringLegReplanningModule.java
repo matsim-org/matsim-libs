@@ -24,11 +24,11 @@ import java.util.List;
 
 import org.matsim.core.mobsim.framework.PersonAgent;
 
-import playground.christoph.withinday.replanning.ReplanningTask;
-import playground.christoph.withinday.replanning.WithinDayDuringLegReplanner;
-import playground.christoph.withinday.replanning.WithinDayReplanner;
 import playground.christoph.withinday.replanning.identifiers.interfaces.AgentsToReplanIdentifier;
 import playground.christoph.withinday.replanning.parallel.ParallelDuringLegReplanner;
+import playground.christoph.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
+import playground.christoph.withinday.replanning.replanners.interfaces.WithinDayReplanner;
+import playground.christoph.withinday.replanning.replanners.tools.ReplanningTask;
 
 public class DuringLegReplanningModule extends WithinDayReplanningModule {
 		

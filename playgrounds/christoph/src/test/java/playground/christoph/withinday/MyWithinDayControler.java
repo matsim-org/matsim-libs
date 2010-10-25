@@ -32,12 +32,11 @@ import playground.christoph.withinday.mobsim.DuringLegReplanningModule;
 import playground.christoph.withinday.mobsim.InitialReplanningModule;
 import playground.christoph.withinday.mobsim.ReplanningManager;
 import playground.christoph.withinday.mobsim.WithinDayQSim;
-import playground.christoph.withinday.replanning.ReplanningIdGenerator;
-import playground.christoph.withinday.replanning.WithinDayReplanner;
 import playground.christoph.withinday.replanning.modules.ReplanningModule;
 import playground.christoph.withinday.replanning.parallel.ParallelDuringActivityReplanner;
 import playground.christoph.withinday.replanning.parallel.ParallelDuringLegReplanner;
 import playground.christoph.withinday.replanning.parallel.ParallelInitialReplanner;
+import playground.christoph.withinday.replanning.replanners.interfaces.WithinDayReplanner;
 
 class MyWithinDayControler extends Controler {
 
@@ -86,6 +85,7 @@ class MyWithinDayControler extends Controler {
 		AbstractMultithreadedModule router = 
 			new ReplanningModule(config, network, this.createTravelCostCalculator(), this.getTravelTimeCalculator(), new DijkstraFactory());
 		// ReplanningModule is a wrapper that either returns PlansCalcRoute or MultiModalPlansCalcRoute
+		// this pretends being a general Plan Algorithm, but I wonder if it can reasonably be anything else but a router?
 
 //		this.initialIdentifier = new InitialIdentifierImpl(this.sim);
 //		this.initialReplanner = new InitialReplanner(ReplanningIdGenerator.getNextId());
@@ -96,14 +96,11 @@ class MyWithinDayControler extends Controler {
 
 		// replanning while at activity:
 
-		WithinDayReplanner duringActivityReplanner = new ReplannerOldPeople(ReplanningIdGenerator.getNextId(), this.scenarioData);
+		WithinDayReplanner duringActivityReplanner = new ReplannerOldPeopleFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner(); 
 		// defines a "doReplanning" method which contains the core of the work
 		// as a piece, it re-routes a _future_ leg.  
 		
-		duringActivityReplanner.setAbstractMultithreadedModule(router);
-		// this pretends being a general Plan Algorithm, but I wonder if it can reasonably be anything else but a router?
-
-		duringActivityReplanner.addAgentsToReplanIdentifier(new OldPeopleIdentifier(this.sim));
+		duringActivityReplanner.addAgentsToReplanIdentifier(new OldPeopleIdentifierFactory(this.sim).createIdentifier());
 		// which persons to replan
 		
 		this.parallelActEndReplanner.addWithinDayReplanner(duringActivityReplanner);
@@ -113,15 +110,12 @@ class MyWithinDayControler extends Controler {
 		
 		// replanning while on leg:
 		
-		WithinDayReplanner duringLegReplanner = new ReplannerYoungPeople(ReplanningIdGenerator.getNextId(), this.scenarioData);
+		WithinDayReplanner duringLegReplanner = new ReplannerYoungPeopleFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
 		// defines a "doReplanning" method which contains the core of the work
 		// it replaces the next activity
 		// in order to get there, it re-routes the current route
 		
-		duringLegReplanner.setAbstractMultithreadedModule(router);
-		// this pretends being a general Plan Algorithm, but I wonder if it can reasonably be anything else but a router?
-
-		duringLegReplanner.addAgentsToReplanIdentifier(new YoungPeopleIdentifier(this.sim));
+		duringLegReplanner.addAgentsToReplanIdentifier(new YoungPeopleIdentifierFactory(this.sim).createIdentifier());
 		// persons identifier added to replanner
 
 		this.parallelLeaveLinkReplanner.addWithinDayReplanner(duringLegReplanner);
@@ -132,8 +126,7 @@ class MyWithinDayControler extends Controler {
 	/*
 	 * Initializes the ParallelReplannerModules
 	 */
-	private void initParallelReplanningModules()
-	{
+	private void initParallelReplanningModules() {
 		this.parallelInitialReplanner = new ParallelInitialReplanner(numReplanningThreads, this);
 		this.parallelActEndReplanner = new ParallelDuringActivityReplanner(numReplanningThreads, this);
 		this.parallelLeaveLinkReplanner = new ParallelDuringLegReplanner(numReplanningThreads, this);
@@ -151,8 +144,7 @@ class MyWithinDayControler extends Controler {
 	}
 
 	@Override
-	protected void runMobSim()
-	{
+	protected void runMobSim() {
 		createHandlersAndListeners();
 		// initializes "replanningManager"
 
@@ -192,9 +184,5 @@ class MyWithinDayControler extends Controler {
 
 		sim.run();
 	}
-
-
-
-
 
 }

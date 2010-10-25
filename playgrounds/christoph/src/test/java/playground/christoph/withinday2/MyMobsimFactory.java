@@ -42,12 +42,11 @@ import playground.christoph.withinday.mobsim.DuringLegReplanningModule;
 import playground.christoph.withinday.mobsim.InitialReplanningModule;
 import playground.christoph.withinday.mobsim.ReplanningManager;
 import playground.christoph.withinday.mobsim.WithinDayAgentFactory;
-import playground.christoph.withinday.replanning.ReplanningIdGenerator;
-import playground.christoph.withinday.replanning.WithinDayReplanner;
 import playground.christoph.withinday.replanning.modules.ReplanningModule;
 import playground.christoph.withinday.replanning.parallel.ParallelDuringActivityReplanner;
 import playground.christoph.withinday.replanning.parallel.ParallelDuringLegReplanner;
 import playground.christoph.withinday.replanning.parallel.ParallelInitialReplanner;
+import playground.christoph.withinday.replanning.replanners.interfaces.WithinDayReplanner;
 
 /**
  * @author nagel
@@ -127,19 +126,17 @@ public class MyMobsimFactory implements MobsimFactory {
 		AbstractMultithreadedModule routerModule = 
 			new ReplanningModule(sc.getConfig(), sc.getNetwork(), this.travCostCalc, this.travTimeCalc, new DijkstraFactory());
 		// (ReplanningModule is a wrapper that either returns PlansCalcRoute or MultiModalPlansCalcRoute)
+		// this pretends being a general Plan Algorithm, but I wonder if it can reasonably be anything else but a router?
 
 
 
 		// replanning while at activity:
 
-		WithinDayReplanner duringActivityReplanner = new OldPeopleReplanner(ReplanningIdGenerator.getNextId(), sc);
+		WithinDayReplanner duringActivityReplanner = new OldPeopleReplannerFactory(sc, mobsim.getAgentCounter(), routerModule, 1.0).createReplanner();
 		// defines a "doReplanning" method which contains the core of the work
 		// as a piece, it re-routes a _future_ leg.  
 		
-		duringActivityReplanner.setAbstractMultithreadedModule(routerModule);
-		// this pretends being a general Plan Algorithm, but I wonder if it can reasonably be anything else but a router?
-
-		duringActivityReplanner.addAgentsToReplanIdentifier(new OldPeopleIdentifier(mobsim));
+		duringActivityReplanner.addAgentsToReplanIdentifier(new OldPeopleIdentifierFactory(mobsim).createIdentifier());
 		// which persons to replan
 		
 		this.parallelActEndReplanner.addWithinDayReplanner(duringActivityReplanner);
@@ -150,15 +147,12 @@ public class MyMobsimFactory implements MobsimFactory {
 
 		// replanning while on leg:
 		
-		WithinDayReplanner duringLegReplanner = new YoungPeopleReplanner(ReplanningIdGenerator.getNextId(), sc);
+		WithinDayReplanner duringLegReplanner = new YoungPeopleReplannerFactory(sc, mobsim.getAgentCounter(), routerModule, 1.0).createReplanner();
 		// defines a "doReplanning" method which contains the core of the work
 		// it replaces the next activity
 		// in order to get there, it re-routes the current route
-		
-		duringLegReplanner.setAbstractMultithreadedModule(routerModule);
-		// this pretends being a general Plan Algorithm, but I wonder if it can reasonably be anything else but a router?
 
-		duringLegReplanner.addAgentsToReplanIdentifier(new YoungPeopleIdentifier(mobsim));
+		duringLegReplanner.addAgentsToReplanIdentifier(new YoungPeopleIdentifierFactory(mobsim).createIdentifier());
 		// persons identifier added to replanner
 
 		this.parallelLeaveLinkReplanner.addWithinDayReplanner(duringLegReplanner);

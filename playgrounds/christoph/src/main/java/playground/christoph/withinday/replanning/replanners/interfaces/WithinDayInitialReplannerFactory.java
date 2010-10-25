@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * WithinDayInitialReplanner.java
+ * WithinDayInitialReplannerFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,20 +18,16 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.christoph.withinday.replanning;
+package playground.christoph.withinday.replanning.replanners.interfaces;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
+import org.matsim.ptproject.qsim.interfaces.AgentCounterI;
 
-/*
- * Replans Agents initially after the Simulation has
- * been initialized.
- */
-public abstract class WithinDayInitialReplanner extends WithinDayReplanner {
-
-	public WithinDayInitialReplanner(Id id, Scenario scenario) {
-		super(id, scenario);
+public abstract class WithinDayInitialReplannerFactory extends WithinDayReplannerFactory {
+	
+	public WithinDayInitialReplannerFactory(AgentCounterI agentCounter, AbstractMultithreadedModule abstractMultithreadedModule, double replanningProbability) {
+		super(agentCounter, abstractMultithreadedModule, replanningProbability);
 	}
 	
-	public abstract WithinDayInitialReplanner clone();
+	public abstract WithinDayInitialReplanner createReplanner();
 }

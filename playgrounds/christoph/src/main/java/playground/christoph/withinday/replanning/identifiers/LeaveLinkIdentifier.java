@@ -23,23 +23,19 @@ package playground.christoph.withinday.replanning.identifiers;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.PersonAgent;
 
 import playground.christoph.withinday.mobsim.WithinDayPersonAgent;
-import playground.christoph.withinday.replanning.WithinDayReplanner;
 import playground.christoph.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
+import playground.christoph.withinday.replanning.identifiers.tools.LinkReplanningMap;
+import playground.christoph.withinday.replanning.replanners.interfaces.WithinDayReplanner;
 
 public class LeaveLinkIdentifier extends DuringLegIdentifier {
 
 	protected LinkReplanningMap linkReplanningMap;
 	
-	public LeaveLinkIdentifier(Controler controler) {
-		linkReplanningMap = new LinkReplanningMap(controler);
-	}
-	
-	// Only for Cloning.
-	public LeaveLinkIdentifier(LinkReplanningMap linkReplanningMap) {
+	// use the Factory!
+	/*package*/ LeaveLinkIdentifier(LinkReplanningMap linkReplanningMap) {
 		this.linkReplanningMap = linkReplanningMap;
 	}
 	
@@ -58,15 +54,4 @@ public class LeaveLinkIdentifier extends DuringLegIdentifier {
 		return agentsToReplan;
 	}
 
-	public LeaveLinkIdentifier clone() {
-		/*
-		 *  We don't want to clone the linkReplanningMap. Instead we
-		 *  reuse the existing one.
-		 */
-		LeaveLinkIdentifier clone = new LeaveLinkIdentifier(this.linkReplanningMap);
-		
-		super.cloneBasicData(clone);
-		
-		return clone;
-	}
 }

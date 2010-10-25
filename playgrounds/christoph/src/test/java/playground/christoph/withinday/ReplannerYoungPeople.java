@@ -11,19 +11,13 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 
 import playground.christoph.withinday.mobsim.WithinDayPersonAgent;
-import playground.christoph.withinday.replanning.WithinDayDuringLegReplanner;
+import playground.christoph.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
 import playground.christoph.withinday.utils.EditRoutes;
 import playground.christoph.withinday.utils.ReplacePlanElements;
 
 public class ReplannerYoungPeople extends WithinDayDuringLegReplanner {
 
-	@Override
-	public WithinDayDuringLegReplanner clone() {
-		return this;
-	}
-
-	public ReplannerYoungPeople(Id id, Scenario scenario)
-	{
+	/*package*/ ReplannerYoungPeople(Id id, Scenario scenario) {
 		super(id, scenario);
 	}
 

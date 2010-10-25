@@ -1,10 +1,8 @@
 package playground.christoph.withinday2;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.core.population.PersonImpl;
@@ -12,17 +10,15 @@ import org.matsim.ptproject.qsim.interfaces.NetsimLink;
 import org.matsim.ptproject.qsim.interfaces.Mobsim;
 import org.matsim.ptproject.qsim.interfaces.QVehicle;
 
-import playground.christoph.withinday.replanning.WithinDayReplanner;
-import playground.christoph.withinday.replanning.identifiers.interfaces.AgentsToReplanIdentifier;
 import playground.christoph.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
+import playground.christoph.withinday.replanning.replanners.interfaces.WithinDayReplanner;
 
-public class YoungPeopleIdentifier extends AgentsToReplanIdentifier {
+public class YoungPeopleIdentifier extends DuringLegIdentifier {
 
 	private Mobsim queueSim;
 
 	@Override
-	public List<PersonAgent> getAgentsToReplan(double time,
-			WithinDayReplanner withinDayReplanner) {
+	public List<PersonAgent> getAgentsToReplan(double time, WithinDayReplanner withinDayReplanner) {
 		
 		ArrayList<PersonAgent> list = new ArrayList<PersonAgent>();
 
@@ -52,11 +48,4 @@ public class YoungPeopleIdentifier extends AgentsToReplanIdentifier {
 	YoungPeopleIdentifier(Mobsim queueSim) {
 		this.queueSim = queueSim;
 	}
-
-	@Override
-	public AgentsToReplanIdentifier clone() {
-		throw new UnsupportedOperationException() ;
-	}
-
-
 }

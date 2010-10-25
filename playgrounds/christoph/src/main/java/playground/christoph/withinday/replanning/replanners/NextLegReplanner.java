@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,19 +18,19 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.christoph.withinday.replanning;
+package playground.christoph.withinday.replanning.replanners;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 
 import playground.christoph.withinday.mobsim.WithinDayPersonAgent;
+import playground.christoph.withinday.replanning.replanners.NextLegReplanner;
+import playground.christoph.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
 import playground.christoph.withinday.utils.EditRoutes;
 
 /*
@@ -41,12 +41,8 @@ import playground.christoph.withinday.utils.EditRoutes;
 
 public class NextLegReplanner extends WithinDayDuringActivityReplanner {
 		
-	private static final Logger log = Logger.getLogger(NextLegReplanner.class);
-	private EventsManager events;
-
-	public NextLegReplanner(Id id, Scenario scenario, EventsManager events) {
+	/*package*/ NextLegReplanner(Id id, Scenario scenario) {
 		super(id, scenario);
-		this.events = events;
 	}
 	
 	/*
@@ -106,13 +102,5 @@ public class NextLegReplanner extends WithinDayDuringActivityReplanner {
 				
 		return true;
 	}
-	
-	@Override
-	public NextLegReplanner clone() {
-		NextLegReplanner clone = new NextLegReplanner(this.id, this.scenario, this.events);
-		
-		super.cloneBasicData(clone);
-		
-		return clone;
-	}
+
 }

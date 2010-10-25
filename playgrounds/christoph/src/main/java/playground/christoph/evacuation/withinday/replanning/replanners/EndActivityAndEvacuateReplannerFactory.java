@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * WithinDayDuringActivityReplanner.java
+ * EndActivityAndEvacuateReplannerFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,20 +18,29 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.christoph.withinday.replanning;
+package playground.christoph.evacuation.withinday.replanning.replanners;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
+import org.matsim.ptproject.qsim.interfaces.AgentCounterI;
 
-/*
- * Replans only Agents that are currently performing
- * an Activity.
- */
-public abstract class WithinDayDuringActivityReplanner extends WithinDayReplanner {
+import playground.christoph.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
+import playground.christoph.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplannerFactory;
 
-	public WithinDayDuringActivityReplanner(Id id, Scenario scenario) {
-		super(id, scenario);
-	}
+public class EndActivityAndEvacuateReplannerFactory extends WithinDayDuringActivityReplannerFactory {
+
+	private Scenario scenario;
 	
-	public abstract WithinDayDuringActivityReplanner clone();
+	public EndActivityAndEvacuateReplannerFactory(Scenario scenario, AgentCounterI agentCounter, AbstractMultithreadedModule abstractMultithreadedModule, double replanningProbability) {
+		super(agentCounter, abstractMultithreadedModule, replanningProbability);
+		this.scenario = scenario;
+	}
+
+	@Override
+	public WithinDayDuringActivityReplanner createReplanner() {
+		WithinDayDuringActivityReplanner replanner = new EndActivityAndEvacuateReplanner(super.getId(), scenario);
+		super.initNewInstance(replanner);
+		return replanner;
+	}
+
 }

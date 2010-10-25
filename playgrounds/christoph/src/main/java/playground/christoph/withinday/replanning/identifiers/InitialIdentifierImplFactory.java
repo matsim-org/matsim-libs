@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * WithinDayDuringLegReplanner.java
+ * InitialIdentifierImplFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,20 +18,26 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.christoph.withinday.replanning;
+package playground.christoph.withinday.replanning.identifiers;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
+import org.matsim.ptproject.qsim.QSim;
 
-/*
- * Replans only Agents that are currently performing
- * a Leg.
- */
-public abstract class WithinDayDuringLegReplanner extends WithinDayReplanner {
+import playground.christoph.withinday.replanning.identifiers.interfaces.InitialIdentifier;
+import playground.christoph.withinday.replanning.identifiers.interfaces.InitialIdentifierFactory;
 
-	public WithinDayDuringLegReplanner(Id id, Scenario scenario) {
-		super(id, scenario);
+public class InitialIdentifierImplFactory implements InitialIdentifierFactory {
+
+	private QSim qsim;
+	
+	public InitialIdentifierImplFactory(QSim qsim) {
+		this.qsim = qsim;
 	}
 	
-	public abstract WithinDayDuringLegReplanner clone();
+	@Override
+	public InitialIdentifier createIdentifier() {
+		InitialIdentifier identifier = new InitialIdentifierImpl(qsim);
+		identifier.setIdentifierFactory(this);
+		return identifier;
+	}
+
 }

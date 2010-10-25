@@ -25,24 +25,25 @@ import java.util.List;
 
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PersonAgent;
+import org.matsim.ptproject.qsim.QSim;
 
 import playground.christoph.withinday.mobsim.WithinDayPersonAgent;
-import playground.christoph.withinday.mobsim.WithinDayQSim;
-import playground.christoph.withinday.replanning.WithinDayReplanner;
+import playground.christoph.withinday.replanning.replanners.interfaces.WithinDayReplanner;
 import playground.christoph.withinday.replanning.identifiers.interfaces.InitialIdentifier;
 
 public class InitialIdentifierImpl extends InitialIdentifier {
 
-	protected WithinDayQSim simulation;
-		
-	public InitialIdentifierImpl(WithinDayQSim simulation) {
-		this.simulation = simulation;
+	protected QSim qsim;
+
+	// use the Factory!
+	/*package*/ InitialIdentifierImpl(QSim qsim) {
+		this.qsim = qsim;
 	}
 		
 	public List<PersonAgent> getAgentsToReplan(double time, WithinDayReplanner withinDayReplanner) {
 		List<PersonAgent> agentsToReplan = new ArrayList<PersonAgent>();
 		
-		for (MobsimAgent mobsimAgent : this.simulation.getAgents()) {
+		for (MobsimAgent mobsimAgent : this.qsim.getAgents()) {
 			if (mobsimAgent instanceof WithinDayPersonAgent) {
 				WithinDayPersonAgent withinDayPersonAgent = (WithinDayPersonAgent) mobsimAgent;
 				
@@ -55,11 +56,4 @@ public class InitialIdentifierImpl extends InitialIdentifier {
 		return agentsToReplan;
 	}
 
-	public InitialIdentifierImpl clone() {
-		InitialIdentifierImpl clone = new InitialIdentifierImpl(this.simulation);
-		
-		super.cloneBasicData(clone);
-		
-		return clone;
-	}
 }

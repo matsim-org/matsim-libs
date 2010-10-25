@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.christoph.withinday.replanning;
+package playground.christoph.withinday.replanning.replanners.tools;
 
 import java.util.ArrayList;
 import java.util.HashMap;

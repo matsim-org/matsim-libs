@@ -18,9 +18,8 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.christoph.evacuation.withinday.replanning;
+package playground.christoph.evacuation.withinday.replanning.replanners;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -36,15 +35,13 @@ import org.matsim.core.utils.misc.Time;
 
 import playground.christoph.evacuation.config.EvacuationConfig;
 import playground.christoph.withinday.mobsim.WithinDayPersonAgent;
-import playground.christoph.withinday.replanning.WithinDayDuringLegReplanner;
+import playground.christoph.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
 import playground.christoph.withinday.utils.EditRoutes;
 import playground.christoph.withinday.utils.ReplacePlanElements;
 
 public class CurrentLegToRescueFacilityReplanner extends WithinDayDuringLegReplanner {
 
-	private static final Logger log = Logger.getLogger(CurrentLegToRescueFacilityReplanner.class);
-
-	public CurrentLegToRescueFacilityReplanner(Id id, Scenario scenario) {
+	/*package*/ CurrentLegToRescueFacilityReplanner(Id id, Scenario scenario) {
 		super(id, scenario);
 	}
 
@@ -137,14 +134,5 @@ public class CurrentLegToRescueFacilityReplanner extends WithinDayDuringLegRepla
 		}
 		
 		return true;
-	}
-
-	@Override
-	public CurrentLegToRescueFacilityReplanner clone() {
-		CurrentLegToRescueFacilityReplanner clone = new CurrentLegToRescueFacilityReplanner(this.id, this.scenario);
-
-		super.cloneBasicData(clone);
-
-		return clone;
 	}
 }

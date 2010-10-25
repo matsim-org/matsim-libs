@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.christoph.withinday.replanning.identifiers;
+package playground.christoph.withinday.replanning.identifiers.tools;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,19 +34,22 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.AgentStuckEvent;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
 import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.mobsim.framework.events.SimulationAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationAfterSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
+import org.matsim.core.mobsim.framework.listeners.SimulationListener;
+import org.matsim.core.mobsim.framework.listeners.SimulationListenerManager;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.interfaces.Mobsim;
-import org.matsim.ptproject.qsim.netsimengine.QNetwork;
+
+import playground.christoph.withinday.replanning.identifiers.tools.ActivityReplanningMap;
 
 /*
  * This Module is used by a NextLegReplanner. It calculates the time
@@ -58,8 +61,6 @@ import org.matsim.ptproject.qsim.netsimengine.QNetwork;
 public class ActivityReplanningMap implements AgentStuckEventHandler,
 		ActivityStartEventHandler, ActivityEndEventHandler,
 		SimulationInitializedListener, SimulationAfterSimStepListener {
-
-	private QNetwork qNetwork;
 
 	private static final Logger log = Logger.getLogger(ActivityReplanningMap.class);
 
@@ -79,25 +80,32 @@ public class ActivityReplanningMap implements AgentStuckEventHandler,
 	 */
 	private Map<Id, PersonAgent> personAgentMapping;	// PersonId, PersonDriverAgent
 
-	public ActivityReplanningMap(Controler controler) {
-		// add ActivityReplanningMap to the QueueSimulation's EventsManager
-		controler.getEvents().addHandler(this);
+//	public ActivityReplanningMap(Controler controler) {
+//		// add ActivityReplanningMap to the QueueSimulation's EventsManager
+//		controler.getEvents().addHandler(this);
+//
+//		// add ActivityReplanningMap to the QueueSimulation's SimulationListeners
+//		controler.getQueueSimulationListener().add(this);
+//
+//		init();
+//	}
 
-		// add ActivityReplanningMap to the QueueSimulation's SimulationListeners
-		controler.getQueueSimulationListener().add(this);
-
+	// simulationListeners... the List used in the Controller!
+	public ActivityReplanningMap(EventsManager eventsManager, List<SimulationListener> simulationListeners) {
+		eventsManager.addHandler(this);
+		simulationListeners.add(this);
 		init();
 	}
-
-	public ActivityReplanningMap(QSim qSim) {
-		//Add LinkReplanningMap to the QueueSimulation's EventsManager
-		qSim.getEventsManager().addHandler(this);
-
-		// add ActivityReplanningMap to the QueueSimulation's SimulationListeners
-		qSim.addQueueSimulationListeners(this);
-
-		init();
-	}
+	
+//	public ActivityReplanningMap(QSim qSim) {
+//		//Add LinkReplanningMap to the QueueSimulation's EventsManager
+//		qSim.getEventsManager().addHandler(this);
+//
+//		// add ActivityReplanningMap to the QueueSimulation's SimulationListeners
+//		qSim.addQueueSimulationListeners(this);
+//
+//		init();
+//	}
 
 	private void init() {
 		this.personAgentMapping = new TreeMap<Id, PersonAgent>();
@@ -117,9 +125,6 @@ public class ActivityReplanningMap implements AgentStuckEventHandler,
 	public void notifySimulationInitialized(SimulationInitializedEvent e) {
 
 		Mobsim sim = (Mobsim) e.getQueueSimulation();
-
-		// Update Reference to QNetwork
-		this.qNetwork = (QNetwork) sim.getNetsimNetwork();
 
 		personAgentMapping = new HashMap<Id, PersonAgent>();
 

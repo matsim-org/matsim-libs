@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ReplanningTask.java
+ * WithinDayDuringLegReplanner.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,26 +18,18 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.christoph.withinday.replanning;
+package playground.christoph.withinday.replanning.replanners.interfaces;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.mobsim.framework.PersonAgent;
+import org.matsim.api.core.v01.Scenario;
 
-public class ReplanningTask {
+/*
+ * Replans only Agents that are currently performing a Leg.
+ */
+public abstract class WithinDayDuringLegReplanner extends WithinDayReplanner {
 
-	protected PersonAgent agentToReplan;
-	protected Id withinDayReplannerId;
-	
-	public ReplanningTask(PersonAgent agentToReplan, Id withinDayReplannerId) {
-		this.agentToReplan = agentToReplan;
-		this.withinDayReplannerId = withinDayReplannerId;
+	public WithinDayDuringLegReplanner(Id id, Scenario scenario) {
+		super(id, scenario);
 	}
 	
-	public PersonAgent getAgentToReplan() {
-		return this.agentToReplan;
-	}
-	
-	public Id getWithinDayReplannerId() {
-		return this.withinDayReplannerId;
-	}
 }

@@ -7,11 +7,10 @@ import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.ptproject.qsim.interfaces.Mobsim;
 
-import playground.christoph.withinday.replanning.WithinDayReplanner;
-import playground.christoph.withinday.replanning.identifiers.interfaces.AgentsToReplanIdentifier;
 import playground.christoph.withinday.replanning.identifiers.interfaces.DuringActivityIdentifier;
+import playground.christoph.withinday.replanning.replanners.interfaces.WithinDayReplanner;
 
-public class OldPeopleIdentifier extends AgentsToReplanIdentifier {
+public class OldPeopleIdentifier extends DuringActivityIdentifier {
 
 	private Mobsim queueSim;
 
@@ -36,13 +35,8 @@ public class OldPeopleIdentifier extends AgentsToReplanIdentifier {
 		return list;
 	}
 
-	public OldPeopleIdentifier( Mobsim queueSim) {
+	public OldPeopleIdentifier(Mobsim queueSim) {
 		this.queueSim = queueSim;
-	}
-
-	@Override
-	public AgentsToReplanIdentifier clone() {
-		throw new UnsupportedOperationException() ;
 	}
 
 }

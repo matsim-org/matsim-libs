@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.christoph.evacuation.withinday.replanning;
+package playground.christoph.evacuation.withinday.replanning.replanners;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -28,8 +28,10 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.misc.Time;
 
+import playground.christoph.evacuation.withinday.replanning.replanners.ExtendCurrentActivityReplanner;
 import playground.christoph.withinday.mobsim.WithinDayPersonAgent;
-import playground.christoph.withinday.replanning.WithinDayDuringActivityReplanner;
+import playground.christoph.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
+
 
 /*
  * Persons who use this replanner perform an activity at a "save" place
@@ -39,7 +41,7 @@ import playground.christoph.withinday.replanning.WithinDayDuringActivityReplanne
  */
 public class ExtendCurrentActivityReplanner extends WithinDayDuringActivityReplanner {
 
-	public ExtendCurrentActivityReplanner(Id id, Scenario scenario) {
+	/*package*/ ExtendCurrentActivityReplanner(Id id, Scenario scenario) {
 		super(id, scenario);
 	}
 	
@@ -114,15 +116,5 @@ public class ExtendCurrentActivityReplanner extends WithinDayDuringActivityRepla
 //		new EditRoutes().replanFutureLegRoute(selectedPlan, legToRescueWait, planAlgorithm);
 		
 		return true;
-	}
-
-	@Override
-	public ExtendCurrentActivityReplanner clone() {
-		ExtendCurrentActivityReplanner clone = new ExtendCurrentActivityReplanner(this.id, this.scenario);
-		
-		super.cloneBasicData(clone);
-		
-		return clone;
-	}
-	
+	}	
 }

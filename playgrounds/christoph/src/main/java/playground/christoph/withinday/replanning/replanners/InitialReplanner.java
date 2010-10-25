@@ -18,13 +18,15 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.christoph.withinday.replanning;
+package playground.christoph.withinday.replanning.replanners;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.mobsim.framework.PersonAgent;
+
+import playground.christoph.withinday.replanning.replanners.InitialReplanner;
+import playground.christoph.withinday.replanning.replanners.interfaces.WithinDayInitialReplanner;
 
 /*
  * The InitialReplanner can be used when the Simulations is initialized but
@@ -32,10 +34,8 @@ import org.matsim.core.mobsim.framework.PersonAgent;
  */
 
 public class InitialReplanner extends WithinDayInitialReplanner {
-		
-	private static final Logger log = Logger.getLogger(InitialReplanner.class);
-	
-	public InitialReplanner(Id id, Scenario scenario) {
+			
+	/*package*/ InitialReplanner(Id id, Scenario scenario) {
 		super(id, scenario);
 	}
 	
@@ -52,13 +52,5 @@ public class InitialReplanner extends WithinDayInitialReplanner {
 		
 		return true;
 	}
-	
-	public InitialReplanner clone() {
-		InitialReplanner clone = new InitialReplanner(this.id, this.scenario);
 		
-		super.cloneBasicData(clone);
-		
-		return clone;
-	}
-	
 }

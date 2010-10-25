@@ -12,18 +12,13 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 
 import playground.christoph.withinday.mobsim.WithinDayPersonAgent;
-import playground.christoph.withinday.replanning.WithinDayDuringActivityReplanner;
+import playground.christoph.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
 import playground.christoph.withinday.utils.EditRoutes;
 
 class OldPeopleReplanner extends WithinDayDuringActivityReplanner {
 
 	public OldPeopleReplanner(Id id, Scenario scenario) {
 		super(id, scenario);
-	}
-
-	@Override
-	public WithinDayDuringActivityReplanner clone() {
-		return this;
 	}
 
 	@Override

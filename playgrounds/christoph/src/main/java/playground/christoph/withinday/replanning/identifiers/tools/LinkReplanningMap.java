@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.christoph.withinday.replanning.identifiers;
+package playground.christoph.withinday.replanning.identifiers.tools;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,6 +33,7 @@ import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.AgentStuckEvent;
 import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
@@ -41,17 +42,19 @@ import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
+import org.matsim.core.mobsim.framework.listeners.SimulationListener;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.interfaces.NetsimLink;
 import org.matsim.ptproject.qsim.interfaces.Mobsim;
-import org.matsim.ptproject.qsim.netsimengine.QNetwork;
+import org.matsim.ptproject.qsim.interfaces.NetsimNetwork;
+
+import playground.christoph.withinday.replanning.identifiers.tools.LinkReplanningMap;
 
 /**
  * This Module is used by a CurrentLegReplanner. It calculates the time
@@ -78,7 +81,7 @@ public class LinkReplanningMap implements LinkEnterEventHandler,
 	private boolean repeatedReplanning = true;
 	private double replanningInterval = 300.0;
 
-	private QNetwork qNetwork;
+	private NetsimNetwork netsimNetwork;
 
 	/*
 	 * Mapping between the PersonDriverAgents and the PersonIds.
@@ -88,25 +91,32 @@ public class LinkReplanningMap implements LinkEnterEventHandler,
 
 	private Map<Id, Tuple<Id, Double>> replanningMap;	// PersonId, Tuple<LinkId, ReplanningTime>
 
-	public LinkReplanningMap(Controler controler) {
-		//Add LinkReplanningMap to the QueueSimulation's EventsManager
-		controler.getEvents().addHandler(this);
-
-		// add ActivityReplanningMap to the QueueSimulation's SimulationListeners
-		controler.getQueueSimulationListener().add(this);
-
+	// simulationListeners... the List used in the Controller!
+	public LinkReplanningMap(EventsManager eventsManager, List<SimulationListener> simulationListeners) {
+		eventsManager.addHandler(this);
+		simulationListeners.add(this);
 		init();
 	}
+	
+//	public LinkReplanningMap(Controler controler) {
+//		//Add LinkReplanningMap to the QueueSimulation's EventsManager
+//		controler.getEvents().addHandler(this);
+//
+//		// add ActivityReplanningMap to the QueueSimulation's SimulationListeners
+//		controler.getQueueSimulationListener().add(this);
+//
+//		init();
+//	}
 
-	public LinkReplanningMap(QSim qSim) {
-		//Add LinkReplanningMap to the QueueSimulation's EventsManager
-		qSim.getEventsManager().addHandler(this);
-
-		// add ActivityReplanningMap to the QueueSimulation's SimulationListeners
-		qSim.addQueueSimulationListeners(this);
-
-		init();
-	}
+//	public LinkReplanningMap(QSim qSim) {
+//		//Add LinkReplanningMap to the QueueSimulation's EventsManager
+//		qSim.getEventsManager().addHandler(this);
+//
+//		// add ActivityReplanningMap to the QueueSimulation's SimulationListeners
+//		qSim.addQueueSimulationListeners(this);
+//
+//		init();
+//	}
 
 	private void init() {
 		this.replanningMap = new HashMap<Id, Tuple<Id, Double>>();
@@ -119,7 +129,7 @@ public class LinkReplanningMap implements LinkEnterEventHandler,
 		Mobsim sim = (Mobsim) e.getQueueSimulation();
 
 		// Update Reference to QNetwork
-		this.qNetwork = (QNetwork) sim.getNetsimNetwork();
+		this.netsimNetwork = sim.getNetsimNetwork();
 
 		personAgentMapping = new HashMap<Id, PersonAgent>();
 
@@ -137,7 +147,7 @@ public class LinkReplanningMap implements LinkEnterEventHandler,
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
 		double now = event.getTime();
-		NetsimLink qLink = qNetwork.getNetsimLink(event.getLinkId());
+		NetsimLink qLink = netsimNetwork.getNetsimLink(event.getLinkId());
 		double departureTime = (now + ((LinkImpl)qLink.getLink()).getFreespeedTravelTime(now));
 
 		replanningMap.put(event.getPersonId(), new Tuple<Id, Double>(event.getLinkId(), departureTime));

@@ -18,18 +18,15 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.christoph.withinday.replanning;
+package playground.christoph.withinday.replanning.replanners.interfaces;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
@@ -37,15 +34,14 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.ptproject.qsim.interfaces.AgentCounterI;
 
 import playground.christoph.withinday.replanning.identifiers.interfaces.AgentsToReplanIdentifier;
+import playground.christoph.withinday.replanning.replanners.interfaces.WithinDayReplanner;
 
 /*
  *	Each WithinDayReplanner needs one or more AgentsToReplanIdentifier
  *	which identifies Agents that need a Replanning of their scheduled
  * 	Plans.
  */
-public abstract class WithinDayReplanner implements Cloneable {
-	
-	private static final Logger log = Logger.getLogger(WithinDayReplanner.class);
+public abstract class WithinDayReplanner {
 	
 	protected Scenario scenario;
 	protected Id id;
@@ -56,6 +52,8 @@ public abstract class WithinDayReplanner implements Cloneable {
 	protected double replanningProbability = 1.0;
 	protected Random random;
 	protected AgentCounterI agentCounter;
+	
+	private WithinDayReplannerFactory replannerFactory;
 	
 	public WithinDayReplanner(Id id, Scenario scenario) {
 		this.id = id;
@@ -103,10 +101,6 @@ public abstract class WithinDayReplanner implements Cloneable {
 		this.routeAlgo = module.getPlanAlgoInstance();
 	}
 	
-//	public void setReplanner(PlanAlgorithm planAlgorithm) {
-//		this.planAlgorithm = planAlgorithm;
-//	}
-	
 	public void setAgentCounter(AgentCounterI agentCounter) {
 		this.agentCounter = agentCounter;
 	}
@@ -122,45 +116,12 @@ public abstract class WithinDayReplanner implements Cloneable {
 	public List<AgentsToReplanIdentifier> getAgentsToReplanIdentifers() {
 		return Collections.unmodifiableList(identifiers);
 	}
-	
-	
-	@Override
-	public abstract WithinDayReplanner clone();
-	
-	protected void cloneBasicData(WithinDayReplanner clone) {
-		clone.setTime(this.time);
-		clone.setAgentCounter(agentCounter);
-		clone.setReplanningProbability(this.replanningProbability);
-		clone.setAbstractMultithreadedModule(this.abstractMultithreadedModule);
 		
-//		if (this.planAlgorithm instanceof Cloneable) {
-//			try {
-//				Method method;
-//				method = planAlgorithm.getClass().getMethod("clone", new Class[]{});
-//				clone.setReplanner(planAlgorithm.getClass().cast(method.invoke(planAlgorithm, new Object[]{})));
-//			} catch (Exception e) {
-//				Gbl.errorMsg(e);
-//			} 
-//		}
-//		else {
-//			log.warn("Could not clone the PlanAlgorithm - use reference to existing one!");
-//			clone.setReplanner(planAlgorithm);
-//		}
-		
-		for (AgentsToReplanIdentifier identifier : this.identifiers) {
-			if (identifier instanceof Cloneable) {
-				try {
-					Method method;
-					method = identifier.getClass().getMethod("clone", new Class[]{});
-					clone.addAgentsToReplanIdentifier(identifier.getClass().cast(method.invoke(identifier, new Object[]{})));
-				} catch (Exception e) {
-					Gbl.errorMsg(e);
-				} 
-			}
-			else {
-				log.warn("Could not clone the AgentsToReplanIdentifier - use reference to existing one!");
-				clone.addAgentsToReplanIdentifier(identifier);
-			}
-		}
+	public final void setReplannerFactory(WithinDayReplannerFactory factory) {
+		this.replannerFactory = factory;
+	}
+	
+	public final WithinDayReplannerFactory getReplannerFactory() {
+		return replannerFactory;
 	}
 }

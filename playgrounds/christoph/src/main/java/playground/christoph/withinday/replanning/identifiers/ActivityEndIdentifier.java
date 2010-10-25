@@ -25,25 +25,21 @@ import java.util.List;
 
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 
 import playground.christoph.withinday.mobsim.WithinDayPersonAgent;
-import playground.christoph.withinday.replanning.WithinDayReplanner;
 import playground.christoph.withinday.replanning.identifiers.interfaces.DuringActivityIdentifier;
+import playground.christoph.withinday.replanning.identifiers.tools.ActivityReplanningMap;
+import playground.christoph.withinday.replanning.replanners.interfaces.WithinDayReplanner;
 
-public class ActivityEndIdentifier extends DuringActivityIdentifier{
+public class ActivityEndIdentifier extends DuringActivityIdentifier {
 	
 	protected ActivityReplanningMap activityReplanningMap;
 	
-	public ActivityEndIdentifier(Controler controler) {
-		this.activityReplanningMap = new ActivityReplanningMap(controler);
-	}
-	
-	// Only for Cloning.
-	private ActivityEndIdentifier(ActivityReplanningMap activityReplanningMap) {
+	// use the Factory!
+	/*package*/ ActivityEndIdentifier(ActivityReplanningMap activityReplanningMap) {
 		this.activityReplanningMap = activityReplanningMap;
 	}
 	
@@ -138,15 +134,4 @@ public class ActivityEndIdentifier extends DuringActivityIdentifier{
 		return agentsToReplan;
 	}
 
-	public ActivityEndIdentifier clone() {
-		/*
-		 *  We don't want to clone the ActivityReplanningMap. Instead we
-		 *  reuse the existing one.
-		 */
-		ActivityEndIdentifier clone = new ActivityEndIdentifier(this.activityReplanningMap);
-		
-		super.cloneBasicData(clone);
-		
-		return clone;
-	}
 }

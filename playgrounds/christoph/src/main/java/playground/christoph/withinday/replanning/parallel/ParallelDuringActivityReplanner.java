@@ -26,7 +26,7 @@ import org.apache.log4j.Logger;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.listeners.SimulationListener;
 
-import playground.christoph.withinday.replanning.WithinDayDuringActivityReplanner;
+import playground.christoph.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
 
 /**
  * A class for running {@link WithinDayDuringActivityReplanner} in parallel using threads.

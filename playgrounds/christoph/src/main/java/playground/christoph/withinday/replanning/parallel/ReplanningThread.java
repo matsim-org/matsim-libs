@@ -33,8 +33,8 @@ import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.ptproject.qsim.interfaces.AgentCounterI;
 
-import playground.christoph.withinday.replanning.ReplanningTask;
-import playground.christoph.withinday.replanning.WithinDayReplanner;
+import playground.christoph.withinday.replanning.replanners.interfaces.WithinDayReplanner;
+import playground.christoph.withinday.replanning.replanners.tools.ReplanningTask;
 
 /*
  * Typical Replanner Implementations should be able to use this 
@@ -49,8 +49,6 @@ public abstract class ReplanningThread extends Thread{
 	protected double time = 0.0;
 	protected AgentCounterI agentCounter;
 	protected boolean simulationRunning = true;
-	
-	
 	
 	/*
 	 *  The original WithinDayReplanners are initialized and assigned
@@ -127,7 +125,6 @@ public abstract class ReplanningThread extends Thread{
 				 */
 				if (!withinDayReplanner.replanAgent()) continue;
 				
-				withinDayReplanner.setAgentCounter(agentCounter);
 				withinDayReplanner.setTime(time);
 				boolean replanningSuccessful = withinDayReplanner.doReplanning(personAgent);
 				

@@ -53,37 +53,40 @@ import playground.christoph.withinday.mobsim.WithinDayPersonAgent;
 import playground.christoph.withinday.mobsim.WithinDayQSim;
 import playground.christoph.withinday.mobsim.WithinDayQSimFactory;
 import playground.christoph.withinday.network.WithinDayLinkFactoryImpl;
-import playground.christoph.withinday.replanning.CurrentLegReplanner;
-import playground.christoph.withinday.replanning.InitialReplanner;
-import playground.christoph.withinday.replanning.NextLegReplanner;
-import playground.christoph.withinday.replanning.ReplanningIdGenerator;
-import playground.christoph.withinday.replanning.TravelTimeCollector;
-import playground.christoph.withinday.replanning.WithinDayDuringActivityReplanner;
-import playground.christoph.withinday.replanning.WithinDayDuringLegReplanner;
-import playground.christoph.withinday.replanning.WithinDayInitialReplanner;
-import playground.christoph.withinday.replanning.identifiers.ActivityEndIdentifier;
-import playground.christoph.withinday.replanning.identifiers.InitialIdentifierImpl;
-import playground.christoph.withinday.replanning.identifiers.LeaveLinkIdentifier;
+import playground.christoph.withinday.replanning.identifiers.ActivityEndIdentifierFactory;
+import playground.christoph.withinday.replanning.identifiers.InitialIdentifierImplFactory;
+import playground.christoph.withinday.replanning.identifiers.LeaveLinkIdentifierFactory;
 import playground.christoph.withinday.replanning.identifiers.interfaces.DuringActivityIdentifier;
 import playground.christoph.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
 import playground.christoph.withinday.replanning.identifiers.interfaces.InitialIdentifier;
+import playground.christoph.withinday.replanning.identifiers.tools.ActivityReplanningMap;
+import playground.christoph.withinday.replanning.identifiers.tools.LinkReplanningMap;
 import playground.christoph.withinday.replanning.modules.ReplanningModule;
 import playground.christoph.withinday.replanning.parallel.ParallelDuringActivityReplanner;
 import playground.christoph.withinday.replanning.parallel.ParallelDuringLegReplanner;
 import playground.christoph.withinday.replanning.parallel.ParallelInitialReplanner;
+import playground.christoph.withinday.replanning.replanners.CurrentLegReplannerFactory;
+import playground.christoph.withinday.replanning.replanners.InitialReplannerFactory;
+import playground.christoph.withinday.replanning.replanners.NextLegReplannerFactory;
+import playground.christoph.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
+import playground.christoph.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
+import playground.christoph.withinday.replanning.replanners.interfaces.WithinDayInitialReplanner;
+import playground.christoph.withinday.replanning.replanners.tools.TravelTimeCollector;
 
 /**
  * This Controler should give an Example what is needed to run
  * Simulations with WithinDayReplanning.
- *
+ * 
  * The Path to a Config File is needed as Argument to run the
  * Simulation.
- *
- * By default "../matsim/test/scenarios/berlin/config.xml" should work.
- *
+ * 
+ * Additional Parameters have to be set in the WithinDayControler
+ * Class. Here we just add the Knowledge Component.
+ * 
+ * By default "test/scenarios/berlin/config.xml" should work.
+ * 
  * @author Christoph Dobler
  */
-
 public class WithinDayControler extends Controler {
 
 	/*
@@ -164,21 +167,20 @@ public class WithinDayControler extends Controler {
 		LeastCostPathCalculatorFactory factory = new AStarLandmarksFactory(this.network, new FreespeedTravelTimeCost(this.config.charyparNagelScoring()));
 		AbstractMultithreadedModule router = new ReplanningModule(config, network, travelCost, travelTime, factory);
 
-		this.initialIdentifier = new InitialIdentifierImpl(this.sim);
-		this.initialReplanner = new InitialReplanner(ReplanningIdGenerator.getNextId(), this.scenarioData);
-		this.initialReplanner.setAbstractMultithreadedModule(router);
+		this.initialIdentifier = new InitialIdentifierImplFactory(this.sim).createIdentifier();
+		this.initialReplanner = new InitialReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
 		this.initialReplanner.addAgentsToReplanIdentifier(this.initialIdentifier);
 		this.parallelInitialReplanner.addWithinDayReplanner(this.initialReplanner);
 
-		this.duringActivityIdentifier = new ActivityEndIdentifier(this);
-		this.duringActivityReplanner = new NextLegReplanner(ReplanningIdGenerator.getNextId(), this.scenarioData, this.events);
-		this.duringActivityReplanner.setAbstractMultithreadedModule(router);
+		ActivityReplanningMap activityReplanningMap = new ActivityReplanningMap(this.getEvents(), this.getQueueSimulationListener());
+		this.duringActivityIdentifier = new ActivityEndIdentifierFactory(activityReplanningMap).createIdentifier();
+		this.duringActivityReplanner = new NextLegReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
 		this.duringActivityReplanner.addAgentsToReplanIdentifier(this.duringActivityIdentifier);
 		this.parallelActEndReplanner.addWithinDayReplanner(this.duringActivityReplanner);
 
-		this.duringLegIdentifier = new LeaveLinkIdentifier(this);
-		this.duringLegReplanner = new CurrentLegReplanner(ReplanningIdGenerator.getNextId(), this.scenarioData, this.getEvents());
-		this.duringLegReplanner.setAbstractMultithreadedModule(router);
+		LinkReplanningMap linkReplanningMap = new LinkReplanningMap(this.getEvents(), this.getQueueSimulationListener());
+		this.duringLegIdentifier = new LeaveLinkIdentifierFactory(linkReplanningMap).createIdentifier();
+		this.duringLegReplanner = new CurrentLegReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
 		this.duringLegReplanner.addAgentsToReplanIdentifier(this.duringLegIdentifier);
 		this.parallelLeaveLinkReplanner.addWithinDayReplanner(this.duringLegReplanner);
 	}

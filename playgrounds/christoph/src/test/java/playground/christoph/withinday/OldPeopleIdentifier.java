@@ -4,23 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.core.mobsim.framework.PersonAgent;
-import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.ptproject.qsim.interfaces.Mobsim;
 
-import playground.christoph.withinday.mobsim.WithinDayQSim;
-import playground.christoph.withinday.replanning.WithinDayReplanner;
-import playground.christoph.withinday.replanning.identifiers.interfaces.AgentsToReplanIdentifier;
 import playground.christoph.withinday.replanning.identifiers.interfaces.DuringActivityIdentifier;
+import playground.christoph.withinday.replanning.replanners.interfaces.WithinDayReplanner;
 
 public class OldPeopleIdentifier extends DuringActivityIdentifier {
 
-	private WithinDayQSim queueSim;
-
-	@Override
-	public AgentsToReplanIdentifier clone() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	private Mobsim mobsim;
 
 	@Override
 	public List<PersonAgent> getAgentsToReplan(double time, WithinDayReplanner withinDayReplanner) {
@@ -33,7 +25,7 @@ public class OldPeopleIdentifier extends DuringActivityIdentifier {
 		}
 
 		// select agents, which should be replanned within this time step
-		for (PersonAgent agent : queueSim.getActivityEndsList()) {
+		for (PersonAgent agent : mobsim.getActivityEndsList()) {
 			if (((PersonImpl) agent.getPerson()).getAge() == 56) {
 				System.out.println("found agent");
 				list.add(agent);
@@ -43,8 +35,8 @@ public class OldPeopleIdentifier extends DuringActivityIdentifier {
 		return list;
 	}
 
-	public OldPeopleIdentifier(WithinDayQSim queueSim) {
-		this.queueSim = queueSim;
+	/*package*/ OldPeopleIdentifier(Mobsim mobsim) {
+		this.mobsim = mobsim;
 	}
 
 }

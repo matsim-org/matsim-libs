@@ -23,28 +23,23 @@ package playground.christoph.withinday.replanning.identifiers;
 import java.util.Iterator;
 import java.util.List;
 
-import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.PersonAgent;
 
 import playground.christoph.withinday.mobsim.WithinDayPersonAgent;
-import playground.christoph.withinday.replanning.WithinDayReplanner;
 import playground.christoph.withinday.replanning.identifiers.interfaces.DuringActivityIdentifier;
+import playground.christoph.withinday.replanning.identifiers.tools.ActivityReplanningMap;
+import playground.christoph.withinday.replanning.replanners.interfaces.WithinDayReplanner;
 
-public class ActivityPerformingIdentifier extends DuringActivityIdentifier{
+public class ActivityPerformingIdentifier extends DuringActivityIdentifier {
 	
 	protected ActivityReplanningMap activityReplanningMap;
 	
-	public ActivityPerformingIdentifier(Controler controler) {
-		this.activityReplanningMap = new ActivityReplanningMap(controler);
-	}
-	
-	// Only for Cloning.
-	private ActivityPerformingIdentifier(ActivityReplanningMap activityReplanningMap) {
+	// use the Factory!
+	/*package*/ ActivityPerformingIdentifier(ActivityReplanningMap activityReplanningMap) {
 		this.activityReplanningMap = activityReplanningMap;
 	}
 	
-	public List<PersonAgent> getAgentsToReplan(double time, WithinDayReplanner withinDayReplanner)
-	{
+	public List<PersonAgent> getAgentsToReplan(double time, WithinDayReplanner withinDayReplanner) {
 		List<PersonAgent> agentsToReplan = activityReplanningMap.getActivityPerformingAgents();
 		
 		Iterator<PersonAgent> iter = agentsToReplan.iterator();
@@ -64,15 +59,4 @@ public class ActivityPerformingIdentifier extends DuringActivityIdentifier{
 		return agentsToReplan;
 	}
 
-	public ActivityPerformingIdentifier clone() {
-		/*
-		 *  We don't want to clone the ActivityReplanningMap. Instead we
-		 *  reuse the existing one.
-		 */
-		ActivityPerformingIdentifier clone = new ActivityPerformingIdentifier(this.activityReplanningMap);
-		
-		super.cloneBasicData(clone);
-		
-		return clone;
-	}
 }

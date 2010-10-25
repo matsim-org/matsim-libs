@@ -57,13 +57,12 @@ import playground.christoph.withinday.mobsim.InitialReplanningModule;
 import playground.christoph.withinday.mobsim.ReplanningManager;
 import playground.christoph.withinday.mobsim.WithinDayPersonAgent;
 import playground.christoph.withinday.mobsim.WithinDayQSim;
-import playground.christoph.withinday.replanning.InitialReplanner;
-import playground.christoph.withinday.replanning.ReplanningIdGenerator;
-import playground.christoph.withinday.replanning.WithinDayInitialReplanner;
-import playground.christoph.withinday.replanning.identifiers.InitialIdentifierImpl;
+import playground.christoph.withinday.replanning.identifiers.InitialIdentifierImplFactory;
 import playground.christoph.withinday.replanning.identifiers.interfaces.InitialIdentifier;
 import playground.christoph.withinday.replanning.modules.ReplanningModule;
 import playground.christoph.withinday.replanning.parallel.ParallelInitialReplanner;
+import playground.christoph.withinday.replanning.replanners.InitialReplannerFactory;
+import playground.christoph.withinday.replanning.replanners.interfaces.WithinDayInitialReplanner;
 
 /**
  * This Controler should give an Example what is needed to run
@@ -187,43 +186,38 @@ public class SimpleRouterControler extends Controler {
 
 		AbstractMultithreadedModule router;
 
-		this.initialIdentifier = new InitialIdentifierImpl(this.sim);
+		this.initialIdentifier = new InitialIdentifierImplFactory(this.sim).createIdentifier();
 
 		// BasicReplanners (Random, Tabu, Compass, ...)
 		// each replanner can handle an arbitrary number of persons
 		RandomRoute randomRoute = new RandomRoute(this.network);
 		router = new ReplanningModule(config, network, randomRoute, null, new SimpleRouterFactory());
-		this.randomReplanner = new InitialReplanner(ReplanningIdGenerator.getNextId(), this.scenarioData);
-		this.randomReplanner.setAbstractMultithreadedModule(router);
+		this.randomReplanner = new InitialReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
 		this.randomReplanner.addAgentsToReplanIdentifier(this.initialIdentifier);
 		this.parallelInitialReplanner.addWithinDayReplanner(this.randomReplanner);
 
 		TabuRoute tabuRoute = new TabuRoute(this.network);
 		router = new ReplanningModule(config, network, tabuRoute, null, new SimpleRouterFactory());
-		this.tabuReplanner = new InitialReplanner(ReplanningIdGenerator.getNextId(), this.scenarioData);
-		this.tabuReplanner.setAbstractMultithreadedModule(router);
+		this.tabuReplanner = new InitialReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
 		this.tabuReplanner.addAgentsToReplanIdentifier(this.initialIdentifier);
 		this.parallelInitialReplanner.addWithinDayReplanner(this.tabuReplanner);
 
 		CompassRoute compassRoute = new CompassRoute(this.network);
 		router = new ReplanningModule(config, network, compassRoute, null, new SimpleRouterFactory());
-		this.compassReplanner = new InitialReplanner(ReplanningIdGenerator.getNextId(), this.scenarioData);
-		this.compassReplanner.setAbstractMultithreadedModule(router);
+		this.compassReplanner = new InitialReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
 		this.compassReplanner.addAgentsToReplanIdentifier(this.initialIdentifier);
 		this.parallelInitialReplanner.addWithinDayReplanner(this.compassReplanner);
 
 		RandomCompassRoute randomCompassRoute = new RandomCompassRoute(this.network);
 		router = new ReplanningModule(config, network, randomCompassRoute, null, new SimpleRouterFactory());
-		this.randomCompassReplanner = new InitialReplanner(ReplanningIdGenerator.getNextId(), this.scenarioData);
-		this.randomCompassReplanner.setAbstractMultithreadedModule(router);
+		this.randomCompassReplanner = new InitialReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
 		this.randomCompassReplanner.addAgentsToReplanIdentifier(this.initialIdentifier);
 		this.parallelInitialReplanner.addWithinDayReplanner(this.randomCompassReplanner);
 
 		RandomDijkstraRoute randomDijkstraRoute = new RandomDijkstraRoute(this.network, dijkstraTravelCost, dijkstraTravelTime);
 		randomDijkstraRoute.setDijsktraWeightFactor(randomDijsktraWeightFactor);
 		router = new ReplanningModule(config, network, randomDijkstraRoute, null, new SimpleRouterFactory());
-		this.randomDijkstraReplanner = new InitialReplanner(ReplanningIdGenerator.getNextId(), this.scenarioData);
-		this.randomDijkstraReplanner.setAbstractMultithreadedModule(router);
+		this.randomDijkstraReplanner = new InitialReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
 		this.randomDijkstraReplanner.addAgentsToReplanIdentifier(this.initialIdentifier);
 		this.parallelInitialReplanner.addWithinDayReplanner(this.randomDijkstraReplanner);
 	}
