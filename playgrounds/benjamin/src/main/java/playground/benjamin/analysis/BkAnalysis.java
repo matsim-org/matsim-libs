@@ -19,6 +19,7 @@
 
 package playground.benjamin.analysis;
 
+import java.io.IOException;
 import java.util.Comparator;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -37,10 +38,6 @@ import org.matsim.households.Households;
 import org.matsim.households.HouseholdsImpl;
 import org.matsim.households.HouseholdsReaderV10;
 
-import playground.benjamin.charts.BkChartWriter;
-import playground.benjamin.charts.types.BkDeltaUtilsChart;
-import playground.benjamin.charts.types.BkDeltaUtilsQuantilesChart;
-
 /**
  * @author bkickhoefer after kn and dgrether
  */
@@ -53,17 +50,17 @@ public class BkAnalysis {
 	String plansfile1 = "../runs-svn/run860/run860.output_plans.xml.gz";
 	String plansfile2 = "../runs-svn/run864/run864.output_plans.xml.gz";
 	String householdsfile = "../shared-svn/studies/bkick/oneRouteTwoModeIncomeTest/households.xml";
-	String outputfiles = "../runs-svn/run864/analysis/deltaUtilsPerPersons";
+	String outputPath = "../runs-svn/run864/postprocess/";
 	
 	//main class
-	public static void main(final String[] args) {
+	public static void main(final String[] args) throws IOException {
 		BkAnalysis app = new BkAnalysis();
 		app.run(args);
 	}
 
 //============================================================================================================	
 	
-	public void run(final String[] args) {
+	public void run(final String[] args) throws IOException {
 		//instancing scenario1 with a config (path to network and plans)
 		Scenario sc1 = new ScenarioFactoryImpl().createScenario();
 		Config c1 = sc1.getConfig();
@@ -97,7 +94,7 @@ public class BkAnalysis {
 		
 //============================================================================================================		
 
-		//get all needed information from the populations (one map for each attribute)
+		//get all needed information from populations (one map for each attribute)
 		SortedMap<Id, Double> scores1 = getScoresFromPlans(population1);
 		SortedMap<Id, Double> scores2 = getScoresFromPlans(population2);
 		
@@ -112,22 +109,18 @@ public class BkAnalysis {
 		//if desired, add additional maps (see maps above, eg: homeX, homeY, isCarAvail, isSelectedPlanCar)
 		SortedMap<Id, Row> populationInformation = putAllNeededPopulationInfoInOneMap(scores1, scores2, personalIncome);
 
-	//=== Defining and writing data and charts (for creation of series and dataset)
-		
-		//BkDeltaUtilsChartGeneral - plots individual utility differences over income (linear axis)
-		BkDeltaUtilsChart deltaUtilsChart = new BkDeltaUtilsChart(populationInformation);
-		
-		//
-		BkDeltaUtilsQuantilesChart deltaUtilsQuantilesChart = new BkDeltaUtilsQuantilesChart(populationInformation);
-		
-		//===
-		
-		//BkChartWriter gets an jchart object from the defined charts above to write the chart:
-		BkChartWriter.writeChart(outputfiles, deltaUtilsChart.createChart());
-		
-		log.info( "\n" + "******************************" + "\n"
-				       + "Chart(s) and table(s) written." + "\n"
-				       + "******************************");
+//======================================================================================================================================================
+
+		// apply filters and output to text files
+		BkAnalysisFilter filter = new BkAnalysisFilter(outputPath);
+
+		filter.createIncomeRanking(populationInformation);
+		filter.getHigherScorePopulation(populationInformation);
+		filter.getLowerScorePopulation(populationInformation);
+
+		log.info( "\n" + "************************************************************" + "\n"
+				       + "Data written to " + outputPath + "\n"
+				       + "************************************************************");
 	}
 
 //============================================================================================================	
@@ -140,6 +133,7 @@ public class BkAnalysis {
 			
 			//Row can be extended to all the needed information
 			Row row = new Row();
+			row.setId(id);
 			row.setScore1(scores1.get(id));
 			row.setScore2(scores2.get(id));
 			
@@ -157,22 +151,22 @@ public class BkAnalysis {
 	
 	//===
 	
-	private SortedMap<Id, Double> getIsSelectedPlanCarFromPlans(Population population1) {
+	private SortedMap<Id, Double> getHomeXFromPlans(Population population) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	private SortedMap<Id, Double> getHomeYFromPlans(Population population) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	private SortedMap<Id, Double> getIsSelectedPlanCarFromPlans(Population population) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	private SortedMap<Id, Double> getIsCarAvailFromPlans(Population population1) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	private SortedMap<Id, Double> getHomeYFromPlans(Population population1) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	private SortedMap<Id, Double> getHomeXFromPlans(Population population1) {
+	private SortedMap<Id, Double> getIsCarAvailFromPlans(Population population) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -210,7 +204,7 @@ public class BkAnalysis {
 //============================================================================================================		
 
 	//comparator to compare Ids not as Strings but as Integers (see above)
-	private final class ComparatorImplementation implements Comparator<Id> {
+	protected final class ComparatorImplementation implements Comparator<Id> {
 		@Override
 		public int compare(Id id1, Id id2) {
 			Integer i1 = Integer.parseInt(id1.toString());
