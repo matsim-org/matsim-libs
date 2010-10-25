@@ -8,22 +8,16 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.ptproject.qsim.interfaces.Mobsim;
 import org.matsim.ptproject.qsim.interfaces.NetsimLink;
 import org.matsim.ptproject.qsim.interfaces.QVehicle;
 
-import playground.christoph.withinday.mobsim.WithinDayQSim;
-import playground.christoph.withinday.replanning.WithinDayReplanner;
-import playground.christoph.withinday.replanning.identifiers.interfaces.AgentsToReplanIdentifier;
 import playground.christoph.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
+import playground.christoph.withinday.replanning.replanners.interfaces.WithinDayReplanner;
 
 public class YoungPeopleIdentifier extends DuringLegIdentifier {
 
-	private WithinDayQSim queueSim;
-
-	@Override
-	public AgentsToReplanIdentifier clone() {
-		return this;
-	}
+	private Mobsim mobsim;
 
 	@Override
 	public List<PersonAgent> getAgentsToReplan(double time,
@@ -36,12 +30,12 @@ public class YoungPeopleIdentifier extends DuringLegIdentifier {
 			return list;
 		}
 		
-		NetsimLink tmpLink = queueSim.getNetsimNetwork().getNetsimLinks().get(new IdImpl("6"));
+		NetsimLink tmpLink = mobsim.getNetsimNetwork().getNetsimLinks().get(new IdImpl("6"));
 //		Collection<QVehicle> tmpList=queueSim.getQNetwork().getLinks().get(new IdImpl("6")).getVehQueue();
-		Collection<QVehicle> tmpList=queueSim.getNetsimNetwork().getNetsimLinks().get(new IdImpl("6")).getAllNonParkedVehicles();
+		Collection<QVehicle> tmpList=mobsim.getNetsimNetwork().getNetsimLinks().get(new IdImpl("6")).getAllNonParkedVehicles();
 
 		// select agents, which should be replanned within this time step
-		for (NetsimLink link:queueSim.getNetsimNetwork().getNetsimLinks().values()){
+		for (NetsimLink link:mobsim.getNetsimNetwork().getNetsimLinks().values()){
 //			for (QVehicle vehicle : link.getVehQueue()) {
 			for (QVehicle vehicle : link.getAllNonParkedVehicles()) {
 				PersonDriverAgent agent=vehicle.getDriver();
@@ -56,9 +50,7 @@ public class YoungPeopleIdentifier extends DuringLegIdentifier {
 		return list;
 	}
 	
-	public YoungPeopleIdentifier(WithinDayQSim queueSim) {
-		this.queueSim = queueSim;
+	public YoungPeopleIdentifier(Mobsim mobsim) {
+		this.mobsim = mobsim;
 	}
-
-
 }

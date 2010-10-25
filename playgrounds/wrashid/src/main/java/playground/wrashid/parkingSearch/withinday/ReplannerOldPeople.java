@@ -13,7 +13,7 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 
 import playground.christoph.withinday.mobsim.WithinDayPersonAgent;
-import playground.christoph.withinday.replanning.WithinDayDuringActivityReplanner;
+import playground.christoph.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
 import playground.christoph.withinday.utils.EditRoutes;
 
 public class ReplannerOldPeople extends WithinDayDuringActivityReplanner {

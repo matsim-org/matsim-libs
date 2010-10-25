@@ -32,10 +32,6 @@ import playground.christoph.withinday.mobsim.DuringLegReplanningModule;
 import playground.christoph.withinday.mobsim.InitialReplanningModule;
 import playground.christoph.withinday.mobsim.ReplanningManager;
 import playground.christoph.withinday.mobsim.WithinDayQSim;
-import playground.christoph.withinday.replanning.ReplanningIdGenerator;
-import playground.christoph.withinday.replanning.WithinDayDuringActivityReplanner;
-import playground.christoph.withinday.replanning.WithinDayDuringLegReplanner;
-import playground.christoph.withinday.replanning.WithinDayInitialReplanner;
 import playground.christoph.withinday.replanning.identifiers.interfaces.DuringActivityIdentifier;
 import playground.christoph.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
 import playground.christoph.withinday.replanning.identifiers.interfaces.InitialIdentifier;
@@ -43,6 +39,9 @@ import playground.christoph.withinday.replanning.modules.ReplanningModule;
 import playground.christoph.withinday.replanning.parallel.ParallelDuringActivityReplanner;
 import playground.christoph.withinday.replanning.parallel.ParallelDuringLegReplanner;
 import playground.christoph.withinday.replanning.parallel.ParallelInitialReplanner;
+import playground.christoph.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
+import playground.christoph.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
+import playground.christoph.withinday.replanning.replanners.interfaces.WithinDayInitialReplanner;
 
 public class MyWithinDayControler extends Controler {
 
@@ -91,8 +90,6 @@ public class MyWithinDayControler extends Controler {
 		travelTime=this.getTravelTimeCalculator();
 		AbstractMultithreadedModule dijkstraRouter = new ReplanningModule(config, network, this.createTravelCostCalculator(), travelTime, new DijkstraFactory());
 
-
-
 //		this.initialIdentifier = new InitialIdentifierImpl(this.sim);
 //		this.initialReplanner = new InitialReplanner(ReplanningIdGenerator.getNextId());
 //		this.initialReplanner.setReplanner(dijkstraRouter);
@@ -101,15 +98,13 @@ public class MyWithinDayControler extends Controler {
 //
 
 		// use replanning during activity
-		this.duringActivityIdentifier = new OldPeopleIdentifier(this.sim);
-		this.duringActivityReplanner = new ReplannerOldPeople(ReplanningIdGenerator.getNextId(), this.scenarioData);
-		this.duringActivityReplanner.setAbstractMultithreadedModule(dijkstraRouter);
+		this.duringActivityIdentifier = new OldPeopleIdentifierFactory(this.sim).createIdentifier();
+		this.duringActivityReplanner = new ReplannerOldPeopleFactory(this.scenarioData, sim.getAgentCounter(), dijkstraRouter, 1.0).createReplanner();
 		this.duringActivityReplanner.addAgentsToReplanIdentifier(this.duringActivityIdentifier);
 		this.parallelActEndReplanner.addWithinDayReplanner(this.duringActivityReplanner);
 
-		this.duringLegIdentifier = new YoungPeopleIdentifier(this.sim);
-		this.duringLegReplanner = new ReplannerYoungPeople(ReplanningIdGenerator.getNextId(), this.scenarioData);
-		this.duringLegReplanner.setAbstractMultithreadedModule(dijkstraRouter);
+		this.duringLegIdentifier = new YoungPeopleIdentifierFactory(this.sim).createIdentifier();
+		this.duringLegReplanner = new ReplannerYoungPeopleFactory(this.scenarioData, sim.getAgentCounter(), dijkstraRouter, 1.0).createReplanner();
 		this.duringLegReplanner.addAgentsToReplanIdentifier(this.duringLegIdentifier);
 		this.parallelLeaveLinkReplanner.addWithinDayReplanner(this.duringLegReplanner);
 	}
@@ -136,8 +131,7 @@ public class MyWithinDayControler extends Controler {
 	}
 
 	@Override
-	protected void runMobSim()
-	{
+	protected void runMobSim() {
 		createHandlersAndListeners();
 
 		sim = new WithinDayQSim(this.scenarioData, this.events);
@@ -172,9 +166,5 @@ public class MyWithinDayControler extends Controler {
 
 		sim.run();
 	}
-
-
-
-
 
 }
