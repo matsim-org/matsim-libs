@@ -34,17 +34,16 @@ public class Constants {
 	private static final Logger log = Logger.getLogger(Constants.class);
 	
 	/** important system environments */
-	public static String OPUS_HOME = System.getenv("OPUS_HOME");			// TODO: schould be provided by UrbanSim via the configuration file
-//	public static String PYTHONPATH = System.getenv("PYTHONPATH");			// TODO: schould be provided by UrbanSim via the configuration file
+	public static String OPUS_HOME = System.getenv("OPUS_HOME");			// provided by UrbanSim via the configuration file; this is 
 	
 	/** subdirectories in OPUS_HOME */
-	public static String OPUS_MATSIM_DIRECTORY = System.getenv("OPUS_HOME")+'/'+"opus_matsim/";
-	public static String MATSIM_CONFIG_DIRECTORY = System.getenv("OPUS_HOME")+'/'+"opus_matsim/matsim_config/";
+	public static String OPUS_MATSIM_DIRECTORY = System.getenv("OPUS_HOME")+'/'+"opus_matsim/";						// TODO: these paths should be provided by UrbanSim only -> extend MATSim4UrbanSim config
+	public static String MATSIM_CONFIG_DIRECTORY = System.getenv("OPUS_HOME")+'/'+"opus_matsim/matsim_config/";		// 		 a method to set those paths is already been implemented (setOpusHomeDirectory)
 	public static String OPUS_MATSIM_OUTPUT_DIRECTORY = System.getenv("OPUS_HOME")+'/'+"opus_matsim/output/";
 	public static String OPUS_MATSIM_TEMPORARY_DIRECTORY = System.getenv("OPUS_HOME")+'/'+"opus_matsim/tmp/";
 	
 	/**
-	 * applay a new root path for the OPUS_HOME directory
+	 * Apply a new root path for the OPUS_HOME directory
 	 * @param opusHome path to the new OPUS_HOME Directory
 	 */
 	public static void setOpusHomeDirectory(String opusHome){

@@ -45,8 +45,8 @@ public class MyControlerListener implements /*IterationEndsListener,*/ ShutdownL
 		SpanningTree st = new SpanningTree(ttc,new TravelTimeDistanceCostCalculator(ttc, controler.getConfig().charyparNagelScoring()));
 
 		NetworkImpl network = controler.getNetwork() ;
-		double dpTime = 8.*3600 ;
-		st.setDepartureTime(dpTime);
+		double depatureTime = 8.*3600 ;
+		st.setDepartureTime(depatureTime);
 
 		try {
 			String travelDataPath = Constants.OPUS_HOME + MATSimConfigObject.getTempDirectory() + "travel_data.csv";
@@ -75,8 +75,8 @@ public class MyControlerListener implements /*IterationEndsListener,*/ ShutdownL
 				for ( ActivityFacility toZone : zones.getFacilities().values() ) {
 					Coord toCoord = toZone.getCoord() ;
 					Node toNode = network.getNearestNode( toCoord ) ;
-					double arrTime = st.getTree().get(toNode.getId()).getTime();
-					double ttime = arrTime - dpTime ;
+					double arrivalTime = st.getTree().get(toNode.getId()).getTime();
+					double ttime = arrivalTime - depatureTime ;
 					writer.write ( fromZone.getId().toString()
 							+ "," + toZone.getId().toString()
 							+ "," + ttime ) ;

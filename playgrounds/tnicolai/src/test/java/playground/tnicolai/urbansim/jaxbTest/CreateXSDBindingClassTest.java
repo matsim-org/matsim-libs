@@ -33,18 +33,19 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
 import org.apache.log4j.Logger;
-import org.junit.Ignore;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.matsim.testcases.MatsimTestCase;
 
 import playground.tnicolai.urbansim.MATSim4Urbansim;
-import playground.tnicolai.urbansim.com.matsim.config.MatsimConfigType;
+import playground.tnicolai.urbansim.UpdateXMLBindingClasses;
 import playground.tnicolai.urbansim.constants.Constants;
 import playground.tnicolai.urbansim.utils.CommonUtilities;
-import playground.tnicolai.urbansim.utils.MATSimConfigObject;
 import playground.tnicolai.urbansim.utils.io.LoadFile;
 import playground.tnicolai.urbansim.utils.io.TempDirectoryUtil;
-
+import playground.tnicolai.urbansim.utils.securityManager.NoExitSecurityManager;
 
 
 /**
@@ -54,45 +55,62 @@ import playground.tnicolai.urbansim.utils.io.TempDirectoryUtil;
 public class CreateXSDBindingClassTest extends MatsimTestCase {
 	
 	private static final Logger log = Logger.getLogger(CreateXSDBindingClassTest.class);
+	private SecurityManager securityManagerSwap = null;
 	
-	@Ignore
-	//@Rule public MatsimTestUtils utils = new MatsimTestUtils();
+	@Before
+	/**
+	 * replaces the security manager in order to catch a System.exit() call from 
+	 * external XJCFacade package used in "UpdateXMLBindingClasses".
+	 */
+	public void setUp() {
+	    securityManagerSwap = System.getSecurityManager();
+	    System.setSecurityManager(new NoExitSecurityManager());
+	}
+ 
+	
 	@Test
 	public void testCreateBindingClass(){
-		
 		prepareTest();
-		
 	}
 	
-	
+	@After
+	/**
+	 * restores the security manager again.
+	 */
+	public void tearDown() {
+	    System.setSecurityManager(securityManagerSwap);
+	}
+
 	
 	/**
 	 * preparing creation of binding classes test run
 	 */
 	private void prepareTest(){
 		
-		String destination = createDestinationDirectory();
-		String packageName = "org.test.bindingClasses";
+		String destination = Constants.MATSIM_WORKING_DIRECTORY + "/tnicolai/src/test/java/";
+		String packageName = "playground.tnicolai.urbansim.jaxbTest.org.bindingClassesTest";
 		
 		String[] args = {"--destination="+destination, 
 						 "--package="+packageName};
 		log.info("Strating UpdateXMLBindingClasses with following arguments: ");
+		log.info("");
 		log.info("Destination : " + destination);
 		log.info("Package name : " + packageName);
+		log.info("");
 		
-		// UpdateXMLBindingClasses.main(args); // XJC exit with system.exit -> ends all Java threads (not possible to test)
+		 UpdateXMLBindingClasses.main(args);
 		
-		// TODO test Binding classes
-		// testBindingClassesViaJAXB();
+		// test creation of binding classes
+		 Assert.assertTrue(testBindingClassesViaJAXB());
 		
 		// remove all created temp directories
-		TempDirectoryUtil.deleteDirectory(destination);
+		TempDirectoryUtil.cleaningUpCustomTempDirectories();
 	}
 	
 	
-	private void testBindingClassesViaJAXB(){
-		try{ // TODO adopt path to generated binding classes
-			JAXBContext jaxbContext = JAXBContext.newInstance(playground.tnicolai.urbansim.com.matsim.config.ObjectFactory.class);
+	private boolean testBindingClassesViaJAXB(){
+		try{
+			JAXBContext jaxbContext = JAXBContext.newInstance(playground.tnicolai.urbansim.jaxbTest.org.bindingClassesTest.ObjectFactory.class);
 			// create an unmaschaller (write xml file)
 			Unmarshaller unmarschaller = jaxbContext.createUnmarshaller();
 	
@@ -100,7 +118,7 @@ public class CreateXSDBindingClassTest extends MatsimTestCase {
 			SchemaFactory schemaFactory = SchemaFactory.newInstance( XMLConstants.W3C_XML_SCHEMA_NS_URI );
 			// ... and initialize it with an xsd (xsd lies in the urbansim project)
 			
-			LoadFile loadFile = new LoadFile(Constants.MATSim_4_UrbanSim_XSD, CommonUtilities.getCurrentPath(MATSim4Urbansim.class) + "tmp/", "MATSim4UrbanSimConfigSchema.xsd");
+			LoadFile loadFile = new LoadFile(Constants.MATSim_4_UrbanSim_XSD, TempDirectoryUtil.createCustomTempDirectory("xsd"), "MATSim4UrbanSimConfigSchema.xsd");
 			File file2XSD = loadFile.loadMATSim4UrbanSimXSD();
 			
 			// for debugging
@@ -110,10 +128,7 @@ public class CreateXSDBindingClassTest extends MatsimTestCase {
 				log.warn(file2XSD.getCanonicalPath() + " is not available. Loading compensatory xsd instead (this may be is an older version).");
 				log.warn("Compensatory xsd file: " + CommonUtilities.getCurrentPath(MATSim4Urbansim.class) + "tmp/MATSim4UrbanSimConfigSchema.xsd");
 				
-				file2XSD = new File(CommonUtilities.getCurrentPath(MATSim4Urbansim.class) + "tmp/MATSim4UrbanSimConfigSchema.xsd");
-				if(!file2XSD.exists())
-					log.error(file2XSD.getCanonicalPath() + " not found!!!");
-
+				return false;
 			}
 			log.info("Using following xsd schema: " + file2XSD.getCanonicalPath());
 			// create a schema object via the given xsd to validate the MATSim xml config.
@@ -121,58 +136,29 @@ public class CreateXSDBindingClassTest extends MatsimTestCase {
 			// set the schema for validation while reading/importing the MATSim xml config.
 			unmarschaller.setSchema(schema);
 			
-			File inputFile = new File( "" );// TODO MATSim config location
+			File inputFile = new File( CommonUtilities.getTestMATSimConfigDir( CreateXSDBindingClassTest.class ) + "matsim_config_test_run.xml" );
 			if(!inputFile.exists())
 				log.error(inputFile.getCanonicalPath() + " not found!!!");
 			// contains the content of the MATSim config.
 			Object object = unmarschaller.unmarshal(inputFile);
 			
 			// Java representation of the schema file.
-			MatsimConfigType matsimConfig;
+			playground.tnicolai.urbansim.jaxbTest.org.bindingClassesTest.MatsimConfigType matsimConfig;
 			
 			// The structure of both objects must match.
-			if(object.getClass() == MatsimConfigType.class)
-				matsimConfig = (MatsimConfigType) object;
+			if(object.getClass() == playground.tnicolai.urbansim.jaxbTest.org.bindingClassesTest.MatsimConfigType.class)
+				matsimConfig = (playground.tnicolai.urbansim.jaxbTest.org.bindingClassesTest.MatsimConfigType) object;
 			else
-				matsimConfig = (( JAXBElement<MatsimConfigType>) object).getValue();
+				matsimConfig = (( JAXBElement<playground.tnicolai.urbansim.jaxbTest.org.bindingClassesTest.MatsimConfigType>) object).getValue();
 			
-			// creatin MASim config object that contains the values from the xml config file.
-			if(matsimConfig != null){
-				log.info("Creating new MATSim config object to store the values from the xml configuration.");
-				MATSimConfigObject.initMATSimConfigObject(matsimConfig);
-			}
+			if(matsimConfig != null)
+				return true;
 		}
 		catch(Exception e){
 			e.printStackTrace();
+			return false;
 		}
-	}
-	
-//	/**
-//	 * gets the location of JAXB library
-//	 * @return path of JAXB library
-//	 */
-//	private String findJAXBLibLocation(){
-//		
-//		String path = CommonUtilities.getCurrentPath(CreateXSDBindingClassTest.class);
-//		String subPath = "lib/jaxb-2.1.7/lib/jaxb-xjc.jar";
-//		
-//		return CommonUtilities.replaceSubPath(1, path, subPath);
-//	}
-	
-	/**
-	 * returns the path to the temp destination directory for generated 
-	 * binding classes
-	 * @return path to the temp destination directory for generated 
-	 * binding classes
-	 */
-	private String createDestinationDirectory(){
-		
-		String path = CommonUtilities.getCurrentPath(CreateXSDBindingClassTest.class);
-		path = CommonUtilities.replaceSubPath(1, path, "tmp/jaxbBindingClasses");
-		
-		if (TempDirectoryUtil.createDirectory(path))
-			return path;
-		return null;
+		return false;
 	}
 
 }

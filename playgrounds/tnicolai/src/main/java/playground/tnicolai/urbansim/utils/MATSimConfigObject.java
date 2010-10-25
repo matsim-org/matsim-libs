@@ -209,6 +209,7 @@ public class MATSimConfigObject {
 		
 		controlerCG.setFirstIteration( firstIteration );	// controller (first, last iteration)
 		controlerCG.setLastIteration( lastIteration);
+		controlerCG.setOutputDirectory( Constants.OPUS_MATSIM_OUTPUT_DIRECTORY ); 
 		log.info("Setting controler to config...");
 		
 		ActivityParams actType0 = new ActivityParams(activityType_0);
@@ -232,7 +233,7 @@ public class MATSimConfigObject {
 		loader.loadScenario();
 		
 		// output dir
-//		config.controler().setOutputDirectory( Constants.OPUS_MATSIM_OUTPUT_DIRECTORY );
+		config.controler().setOutputDirectory( Constants.OPUS_MATSIM_OUTPUT_DIRECTORY );
 	}
 }
 

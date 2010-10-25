@@ -151,8 +151,6 @@ public class TempDirectoryUtil {
 	public static void createOPUSDirectories(){
 		log.info("Creating temp directories");
 		
-		// TODO for loop
-		
 		// set temp directory as opus_home
 		Constants.setOpusHomeDirectory(System.getProperty("java.io.tmpdir"));
 
@@ -179,8 +177,6 @@ public class TempDirectoryUtil {
 	 */
 	public static void cleaningUpOPUSDirectories(){
 		log.info("Removing temp directories");
-		
-		// TODO for loop
 
 		File tempFile = new File(Constants.OPUS_HOME);
 		if(tempFile.exists())

@@ -25,6 +25,8 @@ package playground.tnicolai.urbansim.utils;
 
 import java.net.URL;
 
+import playground.tnicolai.urbansim.matsimTest.MATSim4UrbanSimTest;
+
 /**
  * @author thomas
  *
@@ -105,5 +107,35 @@ public class CommonUtilities {
 		return null;
 	}
 	
+	/**
+	 * returns the directory to the MATSim config file
+	 * @return path to MATSim config
+	 */
+	@SuppressWarnings("all")
+	public static String getTestMATSimConfigDir(Class classObj){
+		
+		String path = CommonUtilities.getCurrentPath( classObj );
+		String subPath = "matsimTestData/xmlMATSimConfig/";
+		
+		return CommonUtilities.replaceSubPath(1, path, subPath) + "/";
+	}
+	
+	/**
+	 * returns the directory to the UrbanSim input data for MATSim
+	 * @return directory to the UrbanSim input data
+	 */
+	@SuppressWarnings("all")
+	public static String getTestUrbanSimInputDataDir(Class classObj){
+		
+		// old version
+		// String currentDir = CommonUtilities.getCurrentPath(MATSim4UrbanSimTest.class);;
+		// int index = currentDir.lastIndexOf("matsimTest");
+		// return currentDir.substring(0, index) + "matsimTestData/urbanSimOutput/";
+		
+		String path = CommonUtilities.getCurrentPath( classObj );
+		String subPath = "matsimTestData/urbanSimOutput/";
+		
+		return CommonUtilities.replaceSubPath(1, path, subPath) + "/";
+	}
 }
 

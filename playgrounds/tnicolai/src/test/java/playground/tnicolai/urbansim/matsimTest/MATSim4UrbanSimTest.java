@@ -79,9 +79,9 @@ public class MATSim4UrbanSimTest extends MatsimTestCase{
 	 */
 	private void prepareTest(String configName){
 
-		String matsimConfigDir = getMATSimConfigDir();
+		String matsimConfigDir = CommonUtilities.getTestMATSimConfigDir(MATSim4UrbanSimTest.class);
 		String matsimConfigName = configName;
-		String urbanSimDataDir = getUrbanSimInputDataDir();
+		String urbanSimDataDir = CommonUtilities.getTestUrbanSimInputDataDir(MATSim4UrbanSimTest.class);
 		
 		log.info("Set path to MATSim config: " + matsimConfigDir);
 		log.info("Set MATSim config to: " + matsimConfigName);
@@ -148,39 +148,39 @@ public class MATSim4UrbanSimTest extends MatsimTestCase{
 		}
 	}
 	
-	/**
-	 * returns the directory to the MATSim config file
-	 * @return path to MATSim config
-	 */
-	private String getMATSimConfigDir(){
-		
-		// old version
-		// String currentDir = CommonUtilities.getCurrentPath(MATSim4UrbanSimTest.class);
-		// int index = currentDir.lastIndexOf("/");
-		// return currentDir.substring(0, index) + "Data/xmlMATSimConfig/";
-		
-		String path = CommonUtilities.getCurrentPath(MATSim4UrbanSimTest.class);
-		String subPath = "matsimTestData/xmlMATSimConfig/";
-		
-		return CommonUtilities.replaceSubPath(1, path, subPath) + "/";
-	}
+//	/**
+//	 * returns the directory to the MATSim config file
+//	 * @return path to MATSim config
+//	 */
+//	public String getMATSimConfigDir(){
+//		
+//		// old version
+//		// String currentDir = CommonUtilities.getCurrentPath(MATSim4UrbanSimTest.class);
+//		// int index = currentDir.lastIndexOf("/");
+//		// return currentDir.substring(0, index) + "Data/xmlMATSimConfig/";
+//		
+//		String path = CommonUtilities.getCurrentPath(MATSim4UrbanSimTest.class);
+//		String subPath = "matsimTestData/xmlMATSimConfig/";
+//		
+//		return CommonUtilities.replaceSubPath(1, path, subPath) + "/";
+//	}
 	
-	/**
-	 * returns the directory to the UrbanSim input data for MATSim
-	 * @return directory to the UrbanSim input data
-	 */
-	private String getUrbanSimInputDataDir(){
-		
-		// old version
-		// String currentDir = CommonUtilities.getCurrentPath(MATSim4UrbanSimTest.class);;
-		// int index = currentDir.lastIndexOf("matsimTest");
-		// return currentDir.substring(0, index) + "matsimTestData/urbanSimOutput/";
-		
-		String path = CommonUtilities.getCurrentPath(MATSim4UrbanSimTest.class);
-		String subPath = "matsimTestData/urbanSimOutput/";
-		
-		return CommonUtilities.replaceSubPath(1, path, subPath) + "/";
-	}
+//	/**
+//	 * returns the directory to the UrbanSim input data for MATSim
+//	 * @return directory to the UrbanSim input data
+//	 */
+//	private String getUrbanSimInputDataDir(){
+//		
+//		// old version
+//		// String currentDir = CommonUtilities.getCurrentPath(MATSim4UrbanSimTest.class);;
+//		// int index = currentDir.lastIndexOf("matsimTest");
+//		// return currentDir.substring(0, index) + "matsimTestData/urbanSimOutput/";
+//		
+//		String path = CommonUtilities.getCurrentPath(MATSim4UrbanSimTest.class);
+//		String subPath = "matsimTestData/urbanSimOutput/";
+//		
+//		return CommonUtilities.replaceSubPath(1, path, subPath) + "/";
+//	}
 
 }
 

@@ -33,6 +33,8 @@ import com.sun.tools.xjc.XJCFacade;
 import playground.tnicolai.urbansim.constants.Constants;
 import playground.tnicolai.urbansim.utils.io.LoadFile;
 import playground.tnicolai.urbansim.utils.io.TempDirectoryUtil;
+import playground.tnicolai.urbansim.utils.securityManager.ExitException;
+import playground.tnicolai.urbansim.utils.securityManager.NoExitSecurityManager;
 
 /**
  * @author thomas
@@ -44,6 +46,8 @@ import playground.tnicolai.urbansim.utils.io.TempDirectoryUtil;
 public class UpdateXMLBindingClasses {
 	
 	private static final Logger log = Logger.getLogger(UpdateXMLBindingClasses.class);
+	
+	private static SecurityManager securityManager;
 	
 	private static String helpMessage = null;
 	
@@ -81,40 +85,23 @@ public class UpdateXMLBindingClasses {
 		String[] arg = new String[] { "-p", targetPackage, "-d", outputDirectory, xsdLocation };
 		
 		try {
+			// backup security manager
+			securityManager = System.getSecurityManager();
+			System.setSecurityManager( new NoExitSecurityManager() );
+			
+			// generate java binding classes
+			// info: XJCFacade exits with a System.exit() 
 			XJCFacade.main(arg);
-		} catch (Throwable e) {
-			e.printStackTrace();
+			
+			// restore previous security manager
+			System.setSecurityManager( securityManager );
+		} catch (ExitException ee) {
+			log.warn( ee.getMessage() );
+		}
+		catch(Throwable te){
+			te.printStackTrace();
 		}
 		
-		
-		// old version
-//		String cmd = "java -jar " + jaxBLocation + " -p " + targetPackage + " -d " + tmpDirectory + " " + xsdLocation;
-//		try{
-//			log.info("Running command: " + cmd );
-//
-//			// executing JAXB ...
-//			Runtime rt = Runtime.getRuntime();
-//            Process proc = rt.exec( cmd );
-//            proc.waitFor();
-//            int exitVal = proc.exitValue();
-//            // ... and here the execution ends
-//            
-//            if( exitVal == 0){
-//            	log.info("Runnung command successful!");
-//				// copy generated files into destination directory
-//				String source = tmpDirectory + outputPackage.replace(".", File.separator);
-//				log.info("Copying generated files from " + source + " to " + outputDirectory);
-//				FileCopy.copyTree(source, outputDirectory);
-//            }
-//			TempDirectoryUtil.deleteDirectory( tmpDirectory );
-//		}
-//		catch (IOException e) {
-//			log.error("Error occoured executing command: " + cmd );
-//			e.printStackTrace();
-//		}
-//		catch (InterruptedException ie) {
-//			ie.printStackTrace();
-//		}
 		log.info("Successful finished creating xml bindings ...");
 	}
 	
@@ -173,7 +160,7 @@ public class UpdateXMLBindingClasses {
 	}
 	
 	/**
-	 * determines if a path wether exists or not
+	 * determines if a path whether exists or not
 	 * @return true if path exists otherwise false
 	 */
 	private static boolean isValidLocataion(String parameter){

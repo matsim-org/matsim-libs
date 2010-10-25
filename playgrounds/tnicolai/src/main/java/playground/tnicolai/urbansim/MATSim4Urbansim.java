@@ -143,7 +143,7 @@ public class MATSim4Urbansim {
 		// set population in scenario
 		scenario.setPopulation(newPopulation);
 		Controler controler = new Controler(scenario);
-		controler.setOverwriteFiles(true);	// sets, whether Outputfiles are overwritten
+		controler.setOverwriteFiles(true);	// sets, whether output files are overwritten
 		controler.setCreateGraphs(false);	// sets, whether output Graphs are created
 		
 		// The following lines register what should be done _after_ the iterations were run:
@@ -204,7 +204,6 @@ public class MATSim4Urbansim {
 			
 			LoadFile loadFile = new LoadFile(Constants.MATSim_4_UrbanSim_XSD, CommonUtilities.getCurrentPath(MATSim4Urbansim.class) + "tmp/", "MATSim4UrbanSimConfigSchema.xsd");
 			File file2XSD = loadFile.loadMATSim4UrbanSimXSD();
-//			File file2XSD = new File("/Users/thomas/Development/workspace/playgrounds/tnicolai/src/main/resources/MATSim4UrbanSimXSD/MATSim4UrbanSimConfigSchema.xsd");
 			
 			// for debugging
 			// File file2XSD = new File( "/Users/thomas/Development/workspace/urbansim_trunk/opus_matsim/sustain_city/models/pyxb_xml_parser/MATSim4UrbanSimConfigSchema.xsd" ); 
