@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mzilske.city2000w;
+package playground.mzilske.controler;
 
 import java.io.BufferedWriter;
 import java.io.IOException;

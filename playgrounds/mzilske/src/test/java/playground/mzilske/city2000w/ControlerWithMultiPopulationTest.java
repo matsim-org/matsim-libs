@@ -53,6 +53,8 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;
 
+import playground.mzilske.controler.MultiPopulationScenario;
+
 public class ControlerWithMultiPopulationTest extends MatsimTestCase {
 
 

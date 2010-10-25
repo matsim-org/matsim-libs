@@ -1,4 +1,4 @@
-package playground.mzilske.city2000w;
+package playground.mzilske.controler;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;

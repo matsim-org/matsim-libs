@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.mzilske.city2000w;
+package playground.mzilske.controler;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;

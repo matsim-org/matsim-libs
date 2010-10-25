@@ -7,9 +7,9 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -26,8 +26,6 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
 import org.matsim.population.algorithms.PersonPrepareForSim;
-
-import playground.mzilske.city2000w.MZControler;
 
 public class RunDetailedEvaluation {
 
@@ -88,19 +86,19 @@ public class RunDetailedEvaluation {
 			}
 		});
 		
-		new PopulationWriter(backgroundScenario.getPopulation(), backgroundScenario.getNetwork()).write("./output/detailedEval/hintergrund-pop.xml");
+		// new PopulationWriter(backgroundScenario.getPopulation(), backgroundScenario.getNetwork()).write("./output/detailedEval/hintergrund-pop.xml");
 		
 		
 		new CarAssigner(scenario.getPopulation(), scenario.getVehicles()).run();
 		new CarAssigner(backgroundScenario.getPopulation(), scenario.getVehicles()).run();
 		
 		
-		MZControler controler = new MZControler(scenario);
-		// controler.setOverwriteFiles(true);
+		Controler controler = new Controler(scenario);
+		controler.setOverwriteFiles(true);
 		DetailedEvaluationMobsimFactory mobsimFactory = new DetailedEvaluationMobsimFactory(0);
 		mobsimFactory.addBackgroundPopulation(backgroundScenario.getPopulation());
 		mobsimFactory.setTeleportedModes(new String[] {TransportMode.bike, TransportMode.pt, TransportMode.ride, TransportMode.transit_walk, TransportMode.walk, "undefined"});
-		mobsimFactory.setUseOTFVis(false);
+		mobsimFactory.setUseOTFVis(true);
 		controler.setMobsimFactory(mobsimFactory);
 		
 		controler.run();
