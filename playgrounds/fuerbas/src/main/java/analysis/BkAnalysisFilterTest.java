@@ -18,7 +18,7 @@
  * *********************************************************************** */
 
 
-package analysisTest;
+package analysis;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -36,11 +36,11 @@ import org.matsim.api.core.v01.population.Population;
  * @author fuerbas
  */
 
-public class BkAnalysisFilter extends BkAnalysisTest {
+public class BkAnalysisFilterTest extends BkAnalysisTest {
 
 	protected String output;
 
-	BkAnalysisFilter() {
+	BkAnalysisFilterTest() {
 		this.output=output;
 	}
 

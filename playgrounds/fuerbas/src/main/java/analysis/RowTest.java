@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package analysisTest;
+package analysis;
 
 import org.matsim.api.core.v01.Id;
 

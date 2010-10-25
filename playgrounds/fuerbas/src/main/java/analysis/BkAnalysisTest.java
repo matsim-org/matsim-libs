@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package analysisTest;
+package analysis;
 
 import java.io.IOException;
 import java.util.Comparator;
@@ -37,6 +37,9 @@ import org.matsim.households.Household;
 import org.matsim.households.Households;
 import org.matsim.households.HouseholdsImpl;
 import org.matsim.households.HouseholdsReaderV10;
+
+import analysis.BkAnalysisFilterTest;
+import analysis.RowTest;
 
 /**
  * @author fuerbas after bkickhoefer after kn and dgrether
@@ -122,7 +125,7 @@ public class BkAnalysisTest {
 
 		// APPLY FILTERS AND OUTPUT TO TXT FILE
 
-		BkAnalysisFilter filter = new BkAnalysisFilter();
+		BkAnalysisFilterTest filter = new BkAnalysisFilterTest();
 
 		filter.createIncomeRanking(populationInformation);
 		filter.getHigherScorePopulation(populationInformation);
