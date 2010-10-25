@@ -29,4 +29,9 @@ public class RandomFromVarDistr {
 	public double getGaussian(double mean, double sigma) {
 		return mean + sigma  * rnd.nextGaussian();
 	}
+	
+	public double getGumbel(double mu, double beta) {
+		double r = mu - beta * Math.log((Math.log(-1.0 * this.getUniform(1.0))));
+		return r;
+	}
 }
