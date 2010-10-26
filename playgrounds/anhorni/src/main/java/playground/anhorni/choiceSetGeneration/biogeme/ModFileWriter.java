@@ -48,7 +48,7 @@ public class ModFileWriter {
 			"//Name\tValue\tLower Bound\tUpperBound\tstatus (0=variable, 1=fixed)\n";
 	
 		for (int i = 0; i < variables.length; i++) {
-			openingBlock += "B_" + variables[i] + "\t0\t-10\t10\t0\n";
+			openingBlock += "B_" + variables[i] + "\t0\t-10.0\t10.0\t0\n";
 		}	
 		openingBlock += "\n";
 		
