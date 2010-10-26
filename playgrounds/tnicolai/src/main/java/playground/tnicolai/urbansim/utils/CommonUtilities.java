@@ -25,8 +25,6 @@ package playground.tnicolai.urbansim.utils;
 
 import java.net.URL;
 
-import playground.tnicolai.urbansim.matsimTest.MATSim4UrbanSimTest;
-
 /**
  * @author thomas
  *
