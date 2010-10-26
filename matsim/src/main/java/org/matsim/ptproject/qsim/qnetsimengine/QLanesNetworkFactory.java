@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * QSimFunctionalInterface
+ * QLanesNetworkFactory
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,14 +17,42 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.ptproject.qsim.netsimengine;
+
+package org.matsim.ptproject.qsim.qnetsimengine;
+
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
+import org.matsim.lanes.LaneDefinitions;
+import org.matsim.ptproject.qsim.interfaces.NetsimNetworkFactory;
+import org.matsim.ptproject.qsim.interfaces.NetsimEngine;
 
 
-/**
- * Marker interface for other interfaces that are not related with
- * design decisions and are written solely to make QSim work.
- * @author dgrether
- */
-public interface QSimFunctionalInterface {
+public class QLanesNetworkFactory implements NetsimNetworkFactory<QNode, QLinkInternalI> {
+
+	private NetsimNetworkFactory<QNode, QLinkInternalI> delegate;
+	private LaneDefinitions laneDefinitions;
+
+	public QLanesNetworkFactory(NetsimNetworkFactory<QNode, QLinkInternalI> delegate, LaneDefinitions laneDefintions){
+		this.delegate = delegate;
+		this.laneDefinitions = laneDefintions;
+	}
+
+	@Override
+	public QLinkInternalI createNetsimLink(Link link, NetsimEngine engine,
+			QNode queueNode) {
+		QLinkInternalI ql = null;
+		if (this.laneDefinitions.getLanesToLinkAssignments().containsKey(link.getId())){
+			ql = new QLinkLanesImpl(link, engine, queueNode, this.laneDefinitions.getLanesToLinkAssignments().get(link.getId()).getLanes());
+		}
+		else {
+			ql = this.delegate.createNetsimLink(link, engine, queueNode);
+		}
+		return ql;
+	}
+
+	@Override
+	public QNode createNetsimNode(Node node, NetsimEngine simEngine) {
+		return this.delegate.createNetsimNode(node, simEngine);
+	}
 
 }

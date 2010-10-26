@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.ptproject.qsim.netsimengine;
+package org.matsim.ptproject.qsim.qnetsimengine;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +30,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.helpers.AgentSnapshotInfoBuilder;
 import org.matsim.ptproject.qsim.interfaces.Mobsim;
-import org.matsim.ptproject.qsim.netsimengine.ParallelQSimEngine.ExtendedQueueNode;
+import org.matsim.ptproject.qsim.qnetsimengine.ParallelQSimEngine.ExtendedQueueNode;
 
 public class QSimEngineRunner extends QSimEngineInternalI implements Runnable {
 

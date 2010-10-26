@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ParallelQSimEngineFactory
+ * QSimFunctionalInterface
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,24 +17,14 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.ptproject.qsim.netsimengine;
-
-import java.util.Random;
-
-import org.matsim.ptproject.qsim.interfaces.Mobsim;
-import org.matsim.ptproject.qsim.interfaces.NetsimEngine;
-import org.matsim.ptproject.qsim.interfaces.NetsimEngineFactory;
+package org.matsim.ptproject.qsim.qnetsimengine;
 
 
 /**
+ * Marker interface for other interfaces that are not related with
+ * design decisions and are written solely to make QSim work.
  * @author dgrether
- *
  */
-public class ParallelQSimEngineFactory implements NetsimEngineFactory {
-
-	@Override
-	public NetsimEngine createQSimEngine(Mobsim sim, Random random) {
-		return new ParallelQSimEngine(sim, random);
-	}
+public interface QSimFunctionalInterface {
 
 }

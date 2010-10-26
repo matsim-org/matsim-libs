@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * LinkActivator.java
+ * QBufferItem
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,14 +17,36 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package org.matsim.ptproject.qsim.qnetsimengine;
 
-package org.matsim.ptproject.qsim.netsimengine;
+import org.matsim.api.core.v01.Id;
 
 
 
-public abstract class LinkActivator {
+/**
+ * Interface representing the buffer functionality common for all Queue-Logic Links and Lanes, i.e.
+ * providing selected, decorated methods for Buffer access and additional methods needed for
+ * the buffer logic implemented.
+ * @author dgrether
+ *
+ */
+abstract class QBufferItem implements QSimFunctionalInterface {
+	/**
+	 * equivalent to a Buffer.isEmpty() operation 
+	 */
+	abstract boolean bufferIsEmpty();
 
-	protected abstract void activateLink(final QLinkInternalI link);
+	/**
+	 * equivalent to a Buffer.pop() operation 
+	 */
+	abstract QVehicle popFirstFromBuffer();
+	/**
+	 * equivalent to a Buffer.peek() operation 
+	 */
+	abstract QVehicle getFirstFromBuffer();
 
-	abstract int getNumberOfSimulatedLinks();
-} 
+	abstract double getBufferLastMovedTime();
+
+	abstract boolean hasGreenForToLink(Id toLinkId);
+
+}

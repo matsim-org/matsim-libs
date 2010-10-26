@@ -21,7 +21,7 @@
 package org.matsim.ptproject.qsim.interfaces;
 
 import org.matsim.core.mobsim.framework.Steppable;
-import org.matsim.ptproject.qsim.netsimengine.QNetwork;
+import org.matsim.ptproject.qsim.qnetsimengine.QNetwork;
 
 
 /**

@@ -35,7 +35,7 @@ import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.ptproject.qsim.interfaces.NetsimLink;
-import org.matsim.ptproject.qsim.netsimengine.QNode;
+import org.matsim.ptproject.qsim.qnetsimengine.QNode;
 
 public class MultiModalQLinkExtension {
 

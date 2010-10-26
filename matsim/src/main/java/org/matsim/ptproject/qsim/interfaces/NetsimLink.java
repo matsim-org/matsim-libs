@@ -25,7 +25,8 @@ import java.util.LinkedList;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.framework.PersonAgent;
-import org.matsim.ptproject.qsim.netsimengine.QNode;
+import org.matsim.ptproject.qsim.qnetsimengine.QNode;
+import org.matsim.ptproject.qsim.qnetsimengine.QVehicle;
 import org.matsim.utils.customize.Customizable;
 import org.matsim.vis.snapshots.writers.VisLink;
 

@@ -25,9 +25,9 @@ import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.ptproject.qsim.interfaces.NetsimLink;
 import org.matsim.ptproject.qsim.interfaces.NetsimNetwork;
 import org.matsim.ptproject.qsim.interfaces.Mobsim;
-import org.matsim.ptproject.qsim.netsimengine.QLane;
-import org.matsim.ptproject.qsim.netsimengine.QLinkImpl;
-import org.matsim.ptproject.qsim.netsimengine.QLinkLanesImpl;
+import org.matsim.ptproject.qsim.qnetsimengine.QLane;
+import org.matsim.ptproject.qsim.qnetsimengine.QLinkImpl;
+import org.matsim.ptproject.qsim.qnetsimengine.QLinkLanesImpl;
 
 
 /**

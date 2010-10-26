@@ -1,9 +1,10 @@
 /* *********************************************************************** *
- * project: org.matsim.*
+ * project: matsim
+ * QSimEngineInternalI.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,38 +18,22 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.ptproject.qsim.netsimengine;
+package org.matsim.ptproject.qsim.qnetsimengine;
 
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Node;
-import org.matsim.ptproject.qsim.QSim;
-import org.matsim.ptproject.qsim.interfaces.NetsimNetworkFactory;
-import org.matsim.ptproject.qsim.interfaces.NetsimNetwork;
+import org.matsim.ptproject.qsim.helpers.AgentSnapshotInfoBuilder;
 import org.matsim.ptproject.qsim.interfaces.NetsimEngine;
 
-
 /**
- * @author dgrether
+ * @author nagel
+ *
  */
-public final class DefaultQNetworkFactory implements NetsimNetworkFactory<QNode, QLinkInternalI> {
+abstract class QSimEngineInternalI extends LinkActivator implements NetsimEngine {
+	
+	abstract AgentSnapshotInfoBuilder getAgentSnapshotInfoBuilder() ;
+	
+	/** internally, we provide the full QNetwork */
+	@Override
+	abstract public QNetwork getQNetwork() ;
 
-	public QLinkInternalI createNetsimLink(final Link link, final NetsimEngine simEngine, final QNode toQueueNode) {
-		return new QLinkImpl(link, simEngine, toQueueNode);
-	}
-
-	/**
-	 * @see org.matsim.core.mobsim.queuesim.QueueNetworkFactory#createNetsimNode(org.matsim.core.network.NodeImpl, org.matsim.core.mobsim.queuesim.QueueNetwork)
-	 */
-	public QNode createNetsimNode(final Node node, NetsimEngine simEngine) {
-		return new QNode(node, simEngine);
-	}
-
-	public static NetsimNetwork createQNetwork(QSim qs, NetsimNetworkFactory<QNode, QLinkInternalI> factory) {
-		return new QNetwork(qs, factory);
-	}
-
-	public static NetsimNetwork createQNetwork(QSim qs) {
-		return new QNetwork(qs);
-	}
 
 }

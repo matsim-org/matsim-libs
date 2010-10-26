@@ -4,9 +4,9 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.ptproject.qsim.helpers.DefaultPersonDriverAgent;
 import org.matsim.ptproject.qsim.helpers.QSimTimer;
-import org.matsim.ptproject.qsim.helpers.QVehicleImpl;
-import org.matsim.ptproject.qsim.interfaces.QVehicle;
 import org.matsim.ptproject.qsim.interfaces.SimTimerI;
+import org.matsim.ptproject.qsim.qnetsimengine.QVehicle;
+import org.matsim.ptproject.qsim.qnetsimengine.QVehicleImpl;
 import org.matsim.vehicles.Vehicle;
 
 public class StaticFactoriesContainer {

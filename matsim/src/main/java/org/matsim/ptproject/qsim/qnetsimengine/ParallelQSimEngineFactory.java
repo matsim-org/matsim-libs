@@ -1,6 +1,6 @@
 /* *********************************************************************** *
- * project: matsim
- * QSimEngineInternalI.java
+ * project: org.matsim.*
+ * ParallelQSimEngineFactory
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,23 +17,24 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package org.matsim.ptproject.qsim.qnetsimengine;
 
-package org.matsim.ptproject.qsim.netsimengine;
+import java.util.Random;
 
-import org.matsim.ptproject.qsim.helpers.AgentSnapshotInfoBuilder;
+import org.matsim.ptproject.qsim.interfaces.Mobsim;
 import org.matsim.ptproject.qsim.interfaces.NetsimEngine;
+import org.matsim.ptproject.qsim.interfaces.NetsimEngineFactory;
+
 
 /**
- * @author nagel
+ * @author dgrether
  *
  */
-abstract class QSimEngineInternalI extends LinkActivator implements NetsimEngine {
-	
-	abstract AgentSnapshotInfoBuilder getAgentSnapshotInfoBuilder() ;
-	
-	/** internally, we provide the full QNetwork */
-	@Override
-	abstract public QNetwork getQNetwork() ;
+public class ParallelQSimEngineFactory implements NetsimEngineFactory {
 
+	@Override
+	public NetsimEngine createQSimEngine(Mobsim sim, Random random) {
+		return new ParallelQSimEngine(sim, random);
+	}
 
 }

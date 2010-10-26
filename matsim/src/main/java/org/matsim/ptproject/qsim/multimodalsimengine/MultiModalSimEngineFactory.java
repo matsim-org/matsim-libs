@@ -25,7 +25,7 @@ import org.matsim.ptproject.qsim.interfaces.NetsimLink;
 import org.matsim.ptproject.qsim.interfaces.NetsimNetwork;
 import org.matsim.ptproject.qsim.interfaces.NetsimNode;
 import org.matsim.ptproject.qsim.interfaces.Mobsim;
-import org.matsim.ptproject.qsim.netsimengine.QNode;
+import org.matsim.ptproject.qsim.qnetsimengine.QNode;
 
 public class MultiModalSimEngineFactory {
 
