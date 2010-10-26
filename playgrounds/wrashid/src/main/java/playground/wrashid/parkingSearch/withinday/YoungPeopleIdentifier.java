@@ -1,9 +1,10 @@
 package playground.wrashid.parkingSearch.withinday;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
@@ -13,21 +14,19 @@ import org.matsim.ptproject.qsim.interfaces.NetsimLink;
 import org.matsim.ptproject.qsim.interfaces.QVehicle;
 
 import playground.christoph.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
-import playground.christoph.withinday.replanning.replanners.interfaces.WithinDayReplanner;
 
 public class YoungPeopleIdentifier extends DuringLegIdentifier {
 
 	private Mobsim mobsim;
 
 	@Override
-	public List<PersonAgent> getAgentsToReplan(double time,
-			WithinDayReplanner withinDayReplanner) {
+	public Set<PersonAgent> getAgentsToReplan(double time, Id withinDayReplannerId) {
 		
-		ArrayList<PersonAgent> list = new ArrayList<PersonAgent>();
+		Set<PersonAgent> set = new HashSet<PersonAgent>();
 
 		// don't handle the agent, if time != 12 o'clock
 		if (Math.floor(time) !=  22000.0) {
-			return list;
+			return set;
 		}
 		
 		NetsimLink tmpLink = mobsim.getNetsimNetwork().getNetsimLinks().get(new IdImpl("6"));
@@ -42,12 +41,12 @@ public class YoungPeopleIdentifier extends DuringLegIdentifier {
 				System.out.println(agent.getPerson().getId());
 				if (((PersonImpl) agent.getPerson()).getAge() == 18) {
 					System.out.println("found agent");
-					list.add(agent);
+					set.add(agent);
 				}
 			}
 		}
 
-		return list;
+		return set;
 	}
 	
 	public YoungPeopleIdentifier(Mobsim mobsim) {
