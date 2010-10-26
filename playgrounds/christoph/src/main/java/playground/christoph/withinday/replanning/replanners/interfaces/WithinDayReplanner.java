@@ -20,10 +20,10 @@
 
 package playground.christoph.withinday.replanning.replanners.interfaces;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Random;
+import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -41,17 +41,17 @@ import playground.christoph.withinday.replanning.replanners.interfaces.WithinDay
  *	which identifies Agents that need a Replanning of their scheduled
  * 	Plans.
  */
-public abstract class WithinDayReplanner {
+public abstract class WithinDayReplanner<T extends AgentsToReplanIdentifier> {
 	
-	protected Scenario scenario;
 	protected Id id;
-	protected double time;
+	protected Scenario scenario;
+	protected AgentCounterI agentCounter;
 	protected AbstractMultithreadedModule abstractMultithreadedModule;
 	protected PlanAlgorithm routeAlgo;
-	protected List<AgentsToReplanIdentifier> identifiers = new ArrayList<AgentsToReplanIdentifier>();
-	protected double replanningProbability = 1.0;
-	protected Random random;
-	protected AgentCounterI agentCounter;
+	protected double time;
+	private Set<T> identifiers = new HashSet<T>();
+	private double replanningProbability = 1.0;
+	private Random random;
 	
 	private WithinDayReplannerFactory replannerFactory;
 	
@@ -70,51 +70,51 @@ public abstract class WithinDayReplanner {
 	 * number <= replanningProbability: do replanning 
 	 * else: no replanning
 	 */
-	public boolean replanAgent() {
+	public final boolean replanAgent() {
 		double rand = random.nextDouble();
 		if (rand <= replanningProbability) return true;
 		else return false;
 	}
 	
-	public Id getId() {
+	public final Id getId() {
 		return this.id;
 	}
 	
-	public double getReplanningProbability() {
+	public final double getReplanningProbability() {
 		return this.replanningProbability;
 	}
 	
-	public void setReplanningProbability(double probability) {
+	public final void setReplanningProbability(double probability) {
 		this.replanningProbability = probability;
 	}
 	
-	public double getTime() {
+	public final double getTime() {
 		return this.time;
 	}
 	
-	public void setTime(double time) {
+	public final void setTime(double time) {
 		this.time = time;
 	}
 	
-	public void setAbstractMultithreadedModule(AbstractMultithreadedModule module) {
+	public final void setAbstractMultithreadedModule(AbstractMultithreadedModule module) {
 		this.abstractMultithreadedModule = module;
 		this.routeAlgo = module.getPlanAlgoInstance();
 	}
 	
-	public void setAgentCounter(AgentCounterI agentCounter) {
+	public final void setAgentCounter(AgentCounterI agentCounter) {
 		this.agentCounter = agentCounter;
 	}
 	
-	public boolean addAgentsToReplanIdentifier(AgentsToReplanIdentifier identifier) {
+	public final boolean addAgentsToReplanIdentifier(T identifier) {
 		return this.identifiers.add(identifier);
 	}
 	
-	public boolean removeAgentsToReplanIdentifier(AgentsToReplanIdentifier identifier) {
+	public final boolean removeAgentsToReplanIdentifier(T identifier) {
 		return this.identifiers.remove(identifier);
 	}
 	
-	public List<AgentsToReplanIdentifier> getAgentsToReplanIdentifers() {
-		return Collections.unmodifiableList(identifiers);
+	public final Set<T> getAgentsToReplanIdentifers() {
+		return Collections.unmodifiableSet(identifiers);
 	}
 		
 	public final void setReplannerFactory(WithinDayReplannerFactory factory) {

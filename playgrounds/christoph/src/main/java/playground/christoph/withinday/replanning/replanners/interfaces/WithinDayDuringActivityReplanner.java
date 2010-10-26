@@ -23,10 +23,12 @@ package playground.christoph.withinday.replanning.replanners.interfaces;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 
+import playground.christoph.withinday.replanning.identifiers.interfaces.DuringActivityIdentifier;
+
 /*
  * Replans only Agents that are currently performing an Activity.
  */
-public abstract class WithinDayDuringActivityReplanner extends WithinDayReplanner {
+public abstract class WithinDayDuringActivityReplanner extends WithinDayReplanner<DuringActivityIdentifier> {
 
 	public WithinDayDuringActivityReplanner(Id id, Scenario scenario) {
 		super(id, scenario);

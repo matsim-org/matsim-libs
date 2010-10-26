@@ -20,7 +20,7 @@
 
 package playground.christoph.withinday.mobsim;
 
-import java.util.List;
+import java.util.Set;
 
 import org.matsim.core.mobsim.framework.PersonAgent;
 
@@ -39,7 +39,7 @@ public class DuringActivityReplanningModule extends WithinDayReplanningModule {
 	public void doReplanning(double time) {
 		for (WithinDayReplanner replanner : this.parallelReplanner.getWithinDayReplanners()) {
 			if(replanner instanceof WithinDayDuringActivityReplanner) {
-				List<AgentsToReplanIdentifier> identifiers = replanner.getAgentsToReplanIdentifers(); 
+				Set<AgentsToReplanIdentifier> identifiers = replanner.getAgentsToReplanIdentifers(); 
 				
 				for (AgentsToReplanIdentifier identifier : identifiers) {
 					for (PersonAgent personAgent : identifier.getAgentsToReplan(time, replanner)) {

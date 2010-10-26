@@ -44,19 +44,6 @@ public class WithinDayPersonAgent extends DefaultPersonDriverAgent {
 		super(p, simulation);
 		this.simulation = simulation;
 	}
-
-	/*
-	 * Resets cached next Link. If a Person is in the Waiting Queue to leave a
-	 * Link he/she may replan his/her Route so the cached Link would be wrong.
-	 * 
-	 * This should be more efficient that resetting it in chooseNextLink()
-	 * because it can be called from the Replanning Module and isn't done for
-	 * every Agent even it is not necessary.
-	 */
-	// yyyy never used. Instead resetCaches() could be used. christoph, oct'10
-//	public void resetCachedNextLink() {
-//		super.cachedNextLinkId = null;
-//	}
 	
 	public void rescheduleCurrentActivity() {
 //		this.simulation.rescheduleActivityEnd(this);

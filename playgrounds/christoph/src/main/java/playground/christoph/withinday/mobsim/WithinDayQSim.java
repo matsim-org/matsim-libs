@@ -20,12 +20,8 @@
 
 package playground.christoph.withinday.mobsim;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.ptproject.qsim.AgentFactory;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.interfaces.NetsimEngineFactory;
@@ -41,7 +37,6 @@ import org.matsim.ptproject.qsim.netsimengine.DefaultQSimEngineFactory;
  */
 public class WithinDayQSim extends QSim {
 
-	private final static Logger log = Logger.getLogger(WithinDayQSim.class);
 	private WithinDayAgentFactory agentFactory;
 	
 	public WithinDayQSim(final Scenario scenario, final EventsManager events) {
@@ -56,15 +51,6 @@ public class WithinDayQSim extends QSim {
 		super.setAgentFactory(agentFactory);
 	}
 	
-//	/*
-//	 * Used by the Activity End Replanning Module.
-//	 * This contains all Agents that are going to end their Activities.
-//	 */
-//	public PriorityBlockingQueue<PersonAgent> getActivityEndsList() {
-//		return super.activityEndsList;
-//	}
-	
-	
 	@Override
 	public void setAgentFactory(AgentFactory factory) {
 		throw new RuntimeException("Please use a WithinDayAgentFactory!");
@@ -74,9 +60,5 @@ public class WithinDayQSim extends QSim {
 		this.agentFactory = factory;
 		super.setAgentFactory(factory);
 	}
-	
-	// yyyy replaced by calls to QSim.getAgents(). Could the QSim use a Map<Id, MobsimAgent> instead of a Collection? christoph, oct'10
-//	public Map<Id, PersonAgent> getPersonAgents() {
-//		return this.agentFactory.getPersonAgents();
-//	}
+
 }
