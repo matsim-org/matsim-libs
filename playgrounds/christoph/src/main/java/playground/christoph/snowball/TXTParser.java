@@ -33,6 +33,8 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
+import playground.christoph.tools.Geocoder;
+
 /*
  * Vorgehensweise:
  * Das Excel File via OpenOffice in ein CSV File konvertieren
@@ -40,7 +42,7 @@ import java.util.List;
  * 
  * Format:
  * ID,	Name,					Adresse1,				Adresse2,		Adresse3,		Adresse4
- * 213,	Dr.phil. Tildy Hanhart,	Limmatstrasse 181/10,	8005 Zürich, 	Switzerland,	044/272 26 17
+ * 200,	Dr. D. Duck,	Zuhause,	0900 Entenhausen, 	USA,	077/111 222 333
  */
 public class TXTParser {
 

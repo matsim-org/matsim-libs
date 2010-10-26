@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.christoph.snowball;
+package playground.christoph.tools;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -33,42 +33,34 @@ public class Geocoder {
 	private final static String KEY = "ABQIAAAAnfs7bKE82qgb3Zc2YyS-oBT2yXp_ZAY8_ufC3CFXhHIE1NvwkxSySz_REpPq-4WZA27OwgbtyR3VcA";
 
 	
-	public static class Location
-	{
+	public static class Location {
 		public String lon, lat;
 
-		private Location (String lat, String lon)
-		{
+		private Location (String lat, String lon) {
 			this.lon = lon;
 			this.lat = lat;
 		}
 
 		@Override
-		public String toString () 
-		{ 
+		public String toString () { 
 			return "Lat: "+lat+", Lon: "+lon; 
 		}
 	}
 	
-
-	public static Location getLocation (String address) throws IOException 
-	{
+	public static Location getLocation (String address) throws IOException {
 		BufferedReader in = new BufferedReader (new InputStreamReader (new URL ("http://maps.google.com/maps/geo?q="+URLEncoder.encode (address, ENCODING)+"&output=csv&key="+KEY).openStream ()));
 		String line;
 		Location location = null;
 		int statusCode = -1;
 		
-		while ((line = in.readLine ()) != null)
-		{
+		while ((line = in.readLine ()) != null) {
 			// Format: 200,6,42.730070,-73.690570
 			statusCode = Integer.parseInt (line.substring (0, 3));
 			if (statusCode == 200) location = new Location (line.substring ("200,6,".length (), line.indexOf (',', "200,6,".length ())), line.substring (line.indexOf (',', "200,6,".length ())+1, line.length ()));
 		}
 		
-		if (location == null)
-		{
-			switch (statusCode)
-			{
+		if (location == null) {
+			switch (statusCode) {
 				case 400: throw new IOException ("Bad Request");
 				case 500: throw new IOException ("Unknown error from Google Encoder");
 				case 601: throw new IOException ("Missing query");
@@ -82,8 +74,7 @@ public class Geocoder {
 		return location;
 	}
 
-	public static void main (String[] argv) throws Exception
-	{
+	public static void main (String[] argv) throws Exception {
 		System.out.println (Geocoder.getLocation ("Zürich"));
 	}
 }

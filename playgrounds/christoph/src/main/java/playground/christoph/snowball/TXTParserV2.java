@@ -33,6 +33,8 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
+import playground.christoph.tools.Geocoder;
+
 /*
  * Vorgehensweise:
  * Das Excel File via OpenOffice in ein CSV File konvertieren
@@ -43,11 +45,11 @@ import java.util.List;
  * Subsample	/	J
  * Excel_IDEgo	/	20031
  * Position_NG	/	84967X55X143A1
- * NameAlter	/	Georg Naegeli
- * Adresszeile3	/	Weinbergstrasse 56/58
- * Adresszeile4	/	8053 Zürich
+ * NameAlter	/	Max Mustermann
+ * Adresszeile3	/	Musterstrasse 99
+ * Adresszeile4	/	8050 Zürich
  * Adresszeile5	/	Schweiz
- * Adresse_angegeben	/	"Wiesliacher 47, 8053 Zürich, Schweiz"
+ * Adresse_angegeben	/	"Musterstrasse 12, 8050 Zürich, Schweiz"
  * Lebensalter	/	54	
  * Sprache	/	deutsch
  * Auswahl	/	1
