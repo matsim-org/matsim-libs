@@ -14,24 +14,26 @@ public class ModFileWriter {
 	/**
 	 * @param args	0: input file containing the variables to be included in the modfile
 	 * 				1: output file
+	 * 				2: number of alternatives
 	 */
 	public static void main(String[] args) {
 		
-		if (args.length != 2) {
+		if (args.length != 3) {
 			System.out.println("Too few or too many arguments. Exit");
 			System.exit(1);
 		}
 		String inputFile = args[0];
 		String outputFile = args[1];
+		int numberOfAlternatives = Integer.parseInt(args[2]);
 		Gbl.startMeasurement();
 
 		ModFileWriter writer = new ModFileWriter();
-		writer.writeModFile(inputFile, outputFile);
+		writer.writeModFile(inputFile, outputFile, numberOfAlternatives);
 		Gbl.printElapsedTime();
 	}
 	
 	
-	public void writeModFile(String inputFile, String outputFile) {
+	public void writeModFile(String inputFile, String outputFile, int numberOfAlternatives) {
 		String [] variables = this.getVariables(inputFile);
 		
 		String openingBlock="[Choice]\n" +
@@ -68,7 +70,7 @@ public class ModFileWriter {
 			final BufferedWriter out = IOUtils.getBufferedWriter(outputFile);
 			out.write(openingBlock);
 			
-			for (int j = 0; j < 1250; j++) {
+			for (int j = 0; j < numberOfAlternatives; j++) {
 				String line = j + "\t" + "SH" + j + "\t" + "SH" + j + "_AV\t";
 				
 				for (int i = 0; i < variables.length; i++) {
