@@ -28,7 +28,7 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.interfaces.AgentCounterI;
 import org.matsim.ptproject.qsim.interfaces.NetsimLink;
-import org.matsim.ptproject.qsim.netsimengine.QNetwork;
+import org.matsim.ptproject.qsim.qnetsimengine.QNetwork;
 
 import playground.christoph.network.MyLinkImpl;
 

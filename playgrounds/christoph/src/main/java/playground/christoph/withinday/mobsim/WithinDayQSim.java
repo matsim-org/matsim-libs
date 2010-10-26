@@ -25,7 +25,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.ptproject.qsim.AgentFactory;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.interfaces.NetsimEngineFactory;
-import org.matsim.ptproject.qsim.netsimengine.DefaultQSimEngineFactory;
+import org.matsim.ptproject.qsim.qnetsimengine.DefaultQSimEngineFactory;
 
 /*
  * This extended QSim contains some methods that

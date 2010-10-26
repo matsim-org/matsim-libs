@@ -40,7 +40,7 @@ import org.matsim.core.events.handler.LaneEnterEventHandler;
 import org.matsim.core.events.handler.LaneLeaveEventHandler;
 import org.matsim.ptproject.qsim.interfaces.NetsimLink;
 import org.matsim.ptproject.qsim.interfaces.NetsimNetwork;
-import org.matsim.ptproject.qsim.netsimengine.QNetwork;
+import org.matsim.ptproject.qsim.qnetsimengine.QNetwork;
 import org.matsim.signalsystems.systems.SignalGroupDefinition;
 
 /**

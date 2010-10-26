@@ -22,8 +22,8 @@ package playground.droeder.gershensonSignals;
 
 import org.apache.log4j.Logger;
 import org.matsim.ptproject.qsim.interfaces.NetsimLink;
-import org.matsim.ptproject.qsim.netsimengine.QLane;
-import org.matsim.ptproject.qsim.netsimengine.QLinkLanesImpl;
+import org.matsim.ptproject.qsim.qnetsimengine.QLane;
+import org.matsim.ptproject.qsim.qnetsimengine.QLinkLanesImpl;
 
 /**
  * This class provides methods to check, if a car is in distance d.

@@ -56,7 +56,7 @@ import org.matsim.evacuation.otfvis.readerwriter.TextutreDataReader;
 import org.matsim.evacuation.otfvis.readerwriter.TileDrawerDataReader;
 import org.matsim.evacuation.otfvis.readerwriter.TileDrawerDataWriter;
 import org.matsim.ptproject.qsim.QSim;
-import org.matsim.ptproject.qsim.netsimengine.QNetwork;
+import org.matsim.ptproject.qsim.qnetsimengine.QNetwork;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.OTFServerQuad2;
 import org.matsim.vis.otfvis.data.fileio.OTFFileWriter;

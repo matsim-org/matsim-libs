@@ -26,7 +26,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.SynchronizedEventsManagerImpl;
 import org.matsim.core.mobsim.framework.MobsimFactory;
-import org.matsim.ptproject.qsim.netsimengine.ParallelQSimEngineFactory;
+import org.matsim.ptproject.qsim.qnetsimengine.ParallelQSimEngineFactory;
 
 /*
  * Depending on the number of threads in the config file a

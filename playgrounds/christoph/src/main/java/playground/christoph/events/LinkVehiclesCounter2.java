@@ -25,7 +25,7 @@ import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationAfterSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
 import org.matsim.ptproject.qsim.interfaces.NetsimLink;
-import org.matsim.ptproject.qsim.netsimengine.QNetwork;
+import org.matsim.ptproject.qsim.qnetsimengine.QNetwork;
 
 import playground.christoph.network.MyLinkImpl;
 

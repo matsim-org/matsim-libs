@@ -11,7 +11,7 @@ import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.ptproject.qsim.interfaces.Mobsim;
 import org.matsim.ptproject.qsim.interfaces.NetsimLink;
-import org.matsim.ptproject.qsim.interfaces.QVehicle;
+import org.matsim.ptproject.qsim.qnetsimengine.QVehicle;
 
 import playground.christoph.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
 
