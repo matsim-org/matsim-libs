@@ -5,12 +5,15 @@ import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.IOException;
 
+import org.apache.log4j.Logger;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.IOUtils;
 
 
 public class ModFileWriter {
 
+	
+	private final static Logger log = Logger.getLogger(ModFileWriter.class);
 	/**
 	 * @param args	0: input file containing the variables to be included in the modfile
 	 * 				1: output file
@@ -89,6 +92,8 @@ public class ModFileWriter {
 			out.write(closingBlock);
 			out.flush();				
 			out.close();
+			
+			log.info("Output file writen to :" + outputFile);
 						
 		} catch (final IOException e) {
 				Gbl.errorMsg(e);
