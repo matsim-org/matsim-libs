@@ -27,12 +27,13 @@ import org.matsim.api.core.v01.Id;
 
 public class Row {
 	private Id id;
+	private Double personalIncome;
+	private Double incomeRank;
 	private Double score1;
 	private Double score2;
-	private double scoreDiff;
-	private double personalIncome;
-	private double homeX;
-	private double homeY;
+	private Double scoreDiff;
+	private Double homeX;
+	private Double homeY;
 
 	private boolean isCarAvail;
 	private boolean isSelectedPlanCar;
@@ -40,9 +41,10 @@ public class Row {
 	//constructor: set all variables to null or 0.0
 	public Row() {
 		this.setId(null);
+		this.setPersonalIncome(0.0);
+		this.setIncomeRank(0.0);
 		this.setScore1(0.0);
 		this.setScore2(0.0);
-		this.setPersonalIncome(0.0);
 		this.setHomeX(0.0);
 		this.setHomeY(0.0);
 
@@ -52,6 +54,14 @@ public class Row {
 	}
 
 //===
+
+	public Double getIncomeRank() {
+		return incomeRank;
+	}
+
+	public void setIncomeRank(Double incomeRank) {
+		this.incomeRank = incomeRank;
+	}
 
 	public Id getId() {
 		return id;
@@ -116,7 +126,6 @@ public class Row {
 	public boolean isSelectedPlanCar() {
 		return isSelectedPlanCar;
 	}
-
 
 	public double getScoreDiff() {
 		this.scoreDiff = this.score2 - this.score1;

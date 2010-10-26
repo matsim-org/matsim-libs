@@ -95,11 +95,10 @@ public class BkAnalysis {
 //============================================================================================================		
 
 		//get all needed information from populations (one map for each attribute)
+		SortedMap<Id, Double> personalIncome = getPersonalIncomeFromHouseholds(households);
+		SortedMap<Id, Double> incomeRank = createIncomeRank(personalIncome);
 		SortedMap<Id, Double> scores1 = getScoresFromPlans(population1);
 		SortedMap<Id, Double> scores2 = getScoresFromPlans(population2);
-		
-		//SortedMap<Id, Double> householdIncome = getHouseholdIncomeFromFile(households);
-		SortedMap<Id, Double> personalIncome = getPersonalIncomeFromHouseholds(households);
 		SortedMap<Id, Double> homeX = getHomeXFromPlans(population1);
 		SortedMap<Id, Double> homeY = getHomeYFromPlans(population1);
 		
@@ -107,16 +106,19 @@ public class BkAnalysis {
 		SortedMap<Id, Double> isSelectedPlanCar = getIsSelectedPlanCarFromPlans(population1);
 		
 		//if desired, add additional maps (see maps above, eg: homeX, homeY, isCarAvail, isSelectedPlanCar)
-		SortedMap<Id, Row> populationInformation = putAllNeededPopulationInfoInOneMap(scores1, scores2, personalIncome);
+		SortedMap<Id, Row> populationInformation = putAllNeededPopulationInfoInOneMap(personalIncome, incomeRank, scores1, scores2);
 
 //======================================================================================================================================================
 
 		// apply filters and output to text files
-		BkAnalysisFilter filter = new BkAnalysisFilter(outputPath);
-
-		filter.createIncomeRanking(populationInformation);
-		filter.getHigherScorePopulation(populationInformation);
-		filter.getLowerScorePopulation(populationInformation);
+		BkAnalysisFilter filter = new BkAnalysisFilter();
+		SortedMap<Id, Row> winner = filter.getWinner(populationInformation);
+		SortedMap<Id, Row> loser = filter.getLoser(populationInformation);
+		
+		BkAnalysisWriter writer = new BkAnalysisWriter(outputPath);
+		writer.writeFile(winner, "winner");
+		writer.writeFile(loser, "loser");
+		writer.writeFile(populationInformation, "wholePopulation");
 
 		log.info( "\n" + "************************************************************" + "\n"
 				       + "Data written to " + outputPath + "\n"
@@ -125,8 +127,8 @@ public class BkAnalysis {
 
 //============================================================================================================	
 
-	//additional maps can be inserted here, e.g., SortedMap<Id, Double> homeX, SortedMap<Id, Double> homeY, SortedMap<Id, Double> isCarAvail, SortedMap<Id, Double> isSelectedPlanCar: 
-	private SortedMap<Id, Row> putAllNeededPopulationInfoInOneMap(SortedMap<Id, Double> scores1, SortedMap<Id, Double> scores2,SortedMap<Id, Double> personalIncome) {
+	private SortedMap<Id, Row> putAllNeededPopulationInfoInOneMap(SortedMap<Id, Double> personalIncome, SortedMap<Id, Double> incomeRank,
+			SortedMap<Id, Double> scores1, SortedMap<Id, Double> scores2) {
 		
 		SortedMap<Id, Row> result = new TreeMap<Id, Row>(new ComparatorImplementation());
 		for(Id id : scores1.keySet()){						
@@ -134,10 +136,11 @@ public class BkAnalysis {
 			//Row can be extended to all the needed information
 			Row row = new Row();
 			row.setId(id);
+			row.setPersonalIncome(personalIncome.get(id));
+			row.setIncomeRank(incomeRank.get(id));
 			row.setScore1(scores1.get(id));
 			row.setScore2(scores2.get(id));
 			
-			row.setPersonalIncome(personalIncome.get(id));
 //			row.setHomeX(homeX.get(id));
 //			row.setHomeY(homeY.get(id));
 //			
@@ -150,7 +153,6 @@ public class BkAnalysis {
 	}
 	
 	//===
-	
 	private SortedMap<Id, Double> getHomeXFromPlans(Population population) {
 		// TODO Auto-generated method stub
 		return null;
@@ -171,6 +173,20 @@ public class BkAnalysis {
 		return null;
 	}
 
+	private SortedMap<Id, Double> getScoresFromPlans(Population population) {
+		//instancing the sorted map (comparator - see below - is needed to compare Ids not as Strings but as Integers)
+		SortedMap<Id,Double> result = new TreeMap<Id, Double>(new ComparatorImplementation());
+		
+		//adding the ids and the scores to the map 
+		for(Person person : population.getPersons().values()) {
+			Id id = person.getId();
+			Double score = person.getSelectedPlan().getScore();
+			result.put(id, score);
+		}
+		return result;
+	}
+	
+	//income related methods
 	private SortedMap<Id, Double> getPersonalIncomeFromHouseholds(Households households) {
 		SortedMap<Id,Double> personId2PersonalIncome = new TreeMap<Id, Double>(new ComparatorImplementation());
 		
@@ -188,18 +204,52 @@ public class BkAnalysis {
 				return personalIncome;
 			}
 
-	private SortedMap<Id, Double> getScoresFromPlans(Population population) {
-		//instancing the sorted map (comparator - see below - is needed to compare Ids not as Strings but as Integers)
-		SortedMap<Id,Double> result = new TreeMap<Id, Double>(new ComparatorImplementation());
+	private SortedMap<Id, Double> createIncomeRank(SortedMap<Id, Double> personalIncome) {
+		SortedMap<Id, Double> incomeRank = new TreeMap<Id, Double>(new ComparatorImplementation());
+		SortedMap<Double, Id> sortedIncome = new TreeMap<Double, Id>();
 		
-		//adding the ids and the scores to the map 
-		for(Person person : population.getPersons().values()) {
-			Id id = person.getId();
-			Double score = person.getSelectedPlan().getScore();
-			result.put(id, score);
+		for (Id id: personalIncome.keySet()){
+			sortedIncome.put(personalIncome.get(id), id);
 		}
-		return result;
+		Double ii = 0.0;
+		for(Double dd : sortedIncome.keySet()){
+			ii++;
+			Id id = sortedIncome.get(dd);
+			Double rank = ii / sortedIncome.size();
+			incomeRank.put(id, rank);
+		}
+		return incomeRank;
 	}
+	
+//	protected Double getTotalIncome(final SortedMap<Id, Double> personalIncome) {
+//		Double totalIncome = .0;
+//		for (Double income : personalIncome.values()) {
+//			totalIncome += income;
+//		}
+//		return totalIncome;
+//	}
+//
+//	protected Double calculateAverageIncome(final Population population1, final SortedMap<Id, Double> personalIncome) {
+//		Double totalIncome = .0;
+//		for (Double income : personalIncome.values()) {
+//			totalIncome += income;
+//		}
+//		return totalIncome/population1.getPersons().size();
+//	}
+//
+//	protected Double getMaximumIncome (final SortedMap<Id, Double> personalIncome) {
+//		Double maximumIncome = .0;
+//		for (Double income : personalIncome.values()) {
+//			if (income > maximumIncome){
+//				maximumIncome = income;
+//			}
+//		}
+//		return maximumIncome;
+//	}
+//
+//	protected Double getIncomeShare (Row row, final SortedMap<Id, Double> personalIncome) {
+//		return row.getPersonalIncome() / getMaximumIncome(personalIncome);
+//	}
 	
 //============================================================================================================		
 
@@ -212,5 +262,5 @@ public class BkAnalysis {
 			return i1.compareTo(i2);
 		}
 	}
-
+	
 }
