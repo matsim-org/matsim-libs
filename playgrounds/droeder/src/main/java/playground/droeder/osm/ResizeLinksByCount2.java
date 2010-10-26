@@ -157,16 +157,20 @@ public class ResizeLinksByCount2 extends AbstractResizeLinksByCount{
 
 	protected void resize() {
 		log.info("Start resizing...");
+		List<Id> sortedLinks = null;
 		for(Entry<String, List<Id>> e : this.origin2counts.entrySet()){
-			
+			sortedLinks = sortLinks(e.getKey(), e.getValue().get(0));
 			if(e.getValue().size() == 1){
-				this.processOneCountOnOrigLink(sortLinks(e.getKey(), e.getValue().get(0)), e.getValue().get(0));
+				this.processOneCountOnOrigLink(sortedLinks, e.getValue().get(0));
 			}else if(e.getValue().size() > 1){
 //				to sort the links it is unimportant how many counts are one the originLink
-				this.processMultipleCountsOnOrigLink(sortLinks(e.getKey(), e.getValue().get(0)), (ArrayList<Id>) e.getValue());
+				this.processMultipleCountsOnOrigLink(sortedLinks, (ArrayList<Id>) e.getValue());
 			}else{
 				log.error("no count registered for origId " + e.getKey());
 			}
+			
+//			this.addLineString(sortedLinks);
+			sortedLinks = null;
 		}
 		log.info("resizing finished...");
 	}
@@ -227,27 +231,9 @@ public class ResizeLinksByCount2 extends AbstractResizeLinksByCount{
 	}
 	
 	private void processMultipleCountsOnOrigLink(List<Id> sortedLinks, ArrayList<Id> counts) {
-//		int index = 0;
 		int temp = 0;
 		Id previousCount = null;
 		
-//		for(Id count : counts){
-//			System.out.print(this.newCounts.getCount(count).getMaxVolume().getValue() + " " + count + "\t");
-//		}
-//		System.out.println();
-//		for(Id id : sortedLinks){
-//			System.out.print("#" +index + " " + id + "\t");
-//			index++;
-//		}
-//		System.out.println();
-//		
-//		System.out.print("111 \t");
-//		index = 0;
-//		for(Id id : sortedLinks){
-//			System.out.print("#" +index + " " +this.net.getLinks().get(id).getCapacity() + " " + this.net.getLinks().get(id).getNumberOfLanes() + "\t");
-//			index++;
-//		}
-//		System.out.println();
 		for(Id id : sortedLinks){
 			if(counts.contains(id) && (temp == 0) ){
 				temp++;
@@ -262,15 +248,6 @@ public class ResizeLinksByCount2 extends AbstractResizeLinksByCount{
 				this.constantChanges(sortedLinks.subList(sortedLinks.indexOf(previousCount), sortedLinks.size() ), previousCount);
 			}
 		}
-		
-//		System.out.print("222 \t");
-//		index = 0;
-//		for(Id id : sortedLinks){
-//			System.out.print("#" +index + " " +this.net.getLinks().get(id).getCapacity() + " " + this.net.getLinks().get(id).getNumberOfLanes() + "\t");
-//			index++;
-//		}
-//		System.out.println();
-		
 		
 	}
 	

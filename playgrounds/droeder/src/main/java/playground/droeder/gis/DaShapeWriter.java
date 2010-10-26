@@ -39,8 +39,7 @@ import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
 
 public class DaShapeWriter {
 
-	private static final Logger log = Logger
-	.getLogger(DaShapeWriter.class);
+	private static final Logger log = Logger.getLogger(DaShapeWriter.class);
 	private static FeatureType featureType;
 	
 	private static GeometryFactory geometryFactory = new GeometryFactory();
@@ -264,7 +263,9 @@ public class DaShapeWriter {
 				if(attributes == null){
 					feature = getLineStringFeature(new CoordinateArraySequence(coord), points.getKey(), null);
 				}else{
-					feature = getLineStringFeature(new CoordinateArraySequence(coord), points.getKey(), attributes.get(points.getKey()));
+					feature = getLineStringFeature(new CoordinateArraySequence(coord), 
+							points.getKey(), 
+							attributes.get(points.getKey()));
 				}
 				features.add(feature);
 				
@@ -298,6 +299,17 @@ public class DaShapeWriter {
 		try {
 			return featureType.create(attribs);
 		} catch (IllegalAttributeException e) {
+			System.out.println(c.toString());
+			System.out.println(name);
+			System.out.println(attributes.size());
+			for(Entry<String, String> ee :attributes.entrySet()){
+				System.out.println(ee.getKey() + " " + ee.getValue());
+			}
+			System.out.println(s.toString());
+			System.out.println(attribs.length);
+			for(Object o : attribs){
+				System.out.println(o.toString());
+			}
 			throw new RuntimeException(e);
 		}
 	}
