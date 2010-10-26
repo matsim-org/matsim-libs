@@ -573,7 +573,9 @@ INPUT                  = ../../../../playgrounds/mrieser/src/main/java/playgroun
                          org/matsim/run \
                          org/matsim/transitschedule \
                          org/matsim/vehicles \
-                         org/matsim/vis
+                         org/matsim/vis \
+                         ../../../../playgrounds/christoph/src/main/java/playground/christoph \
+                         ../../../../playgrounds/christoph/src/test/java/playground/christoph
 
 # This tag can be used to specify the character encoding of the source files 
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding, which is 
