@@ -1,0 +1,129 @@
+<?xml version="1.0" ?>
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd"
+	[
+		<!ENTITY INBASE  "test/scenarios/chessboard">
+		<!ENTITY OUTBASE "test/output/playground/wrashid/PSF2/chargingSchemes/dumbCharging">
+		<!ENTITY TESTBASE  "test/input/playground/wrashid/PSF2/chargingSchemes/dumbCharging">
+	]
+>
+
+
+<config>
+
+	<module name="global">
+		<param name="randomSeed" value="4711" />
+		<param name="coordinateSystem" value="Atlantis" />
+		<param name="numberOfThreads" value="6" />
+	</module>
+
+	<module name="network">
+		<param name="inputNetworkFile" value="&INBASE;/network.xml" />
+	</module>
+
+	<module name="facilities">
+		<param name="inputFacilitiesFile" value="&INBASE;/facilities.xml" />
+	</module>
+
+	<module name="plans">
+		<param name="inputPlansFile" value="&INBASE;/plans.xml" />
+	</module>
+
+	<module name="controler">
+		<param name="outputDirectory" value="&OUTBASE;" />
+		<param name="firstIteration" value="0" />
+		<param name="lastIteration" value="0" />
+		<param name= "writeEventsInterval" value="4" />
+	</module>
+
+	<module name="simulation">
+		<!-- "start/endTime" of MobSim (00:00:00 == take earliest activity time/ run as long as active vehicles exist) -->
+		<param name="startTime" value="00:00:00" />
+		<param name="endTime" value="00:00:00" />
+	
+		<param name = "snapshotperiod"	value = "00:00:00"/> <!-- 00:00:00 means NO snapshot writing -->
+		<param name = "snapshotFormat"	value = "netvis"/> <!-- netvis, googleearth, transims -->
+	</module>
+
+	<module name="planCalcScore">
+		<param name="learningRate" value="1.0" />
+		<param name="BrainExpBeta" value="2.0" />
+
+		<param name="lateArrival" value="-18" />
+		<param name="earlyDeparture" value="-0" />
+		<param name="performing" value="+6" />
+		<param name="traveling" value="-6" />
+		<param name="waiting" value="-0" />
+		
+		<param name="activityType_0"            value="home" /> <!-- home -->
+		<param name="activityPriority_0"        value="1" />
+		<param name="activityTypicalDuration_0" value="12:00:00" />
+		<param name="activityMinimalDuration_0" value="08:00:00" />
+	
+		<param name="activityType_1"            value="work" /> <!-- work -->
+		<param name="activityPriority_1"        value="1" />
+		<param name="activityTypicalDuration_1" value="08:00:00" />
+		<param name="activityMinimalDuration_1" value="06:00:00" />
+		<param name="activityOpeningTime_1"     value="07:00:00" />
+		<param name="activityLatestStartTime_1" value="09:00:00" />
+		<param name="activityEarliestEndTime_1" value="" />
+		<param name="activityClosingTime_1"     value="18:00:00" />
+		
+		<param name="activityType_2"            value="shopping" /> <!-- depart from parking -->
+		<param name="activityPriority_2"        value="1" />
+		<param name="activityTypicalDuration_2" value="00:01:00" />
+		<param name="activityMinimalDuration_2" value="00:01:00" />
+		
+		<param name="activityType_3"            value="leisure" /> <!-- arrival in parking -->
+		<param name="activityPriority_3"        value="1" />
+		<param name="activityTypicalDuration_3" value="00:01:00" />
+		<param name="activityMinimalDuration_3" value="00:01:00" />
+		
+		<param name="activityType_4"            value="edu" />
+		<param name="activityPriority_4"        value="1" />
+		<param name="activityTypicalDuration_4" value="08:00:00" />
+	</module>
+	
+	<module name="strategy">
+		<param name="maxAgentPlanMemorySize" value="5" /> <!-- 0 means unlimited -->
+
+		<param name="ModuleProbability_1" value="0.8" />
+		<param name="Module_1" value="BestScore" />
+
+		<param name="ModuleProbability_2" value="0.1" />
+		<param name="Module_2" value="ReRoute" />
+	
+		<param name="ModuleProbability_3" value="0.1" />
+		<param name="Module_3" value="TimeAllocationMutator" />
+		
+		<param name="ModuleProbability_4" value="0.0" />
+		<param name="Module_4" value="playground.wrashid.PSF.replanning.TemplatePlanStrategy" />
+	</module>
+	
+	<module name="JDEQSim">
+	</module>
+	
+	
+	<module name="parallelEventHandling">
+    <param name="numberOfThreads" value="2" />
+	</module>
+	
+	<module name="PSF">
+		<param name="default.maxBatteryCapacity" value="36000000" /> <!-- in [J]  -->
+		<param name="default.chargingPowerAtParking" value="3500" /> <!-- in [W]  -->
+		<param name="main.chargingTimesOutputFilePath" value="&OUTBASE;/chargingLog.txt" />
+		<param name="main.energyUsageStatistics" value="&OUTBASE;/vehicleEnergyConsumption" />
+	
+		<param name="testingModeOn" value="false" /> <!-- this is the main switch for all testing values -->
+		
+		<param name="main.numberOfHubs" value="4" />
+		<param name="main.hubLinkMappingPath" value="&TESTBASE;/hubLinkMapping.txt" />
+		<param name="main.hubPricesPath" value="&TESTBASE;/hubPriceInfo.txt" />
+		<param name="main.baseLoadPath" value="&TESTBASE;/hubPriceInfo.txt" />
+		<param name="main.chargingMode" value="moderateCharging" />
+		<param name="main.chargingPriceScalingFactor" value="0.1" />
+		 <param name="main.chargingPriceBlurFactor" value="-3.0" /> 
+		
+		
+	</module>
+
+</config>
