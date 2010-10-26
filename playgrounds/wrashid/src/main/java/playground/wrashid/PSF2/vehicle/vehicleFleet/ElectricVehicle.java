@@ -24,7 +24,10 @@ import org.matsim.api.core.v01.Id;
 
 import playground.wrashid.PSF2.vehicle.energyStateMaintainance.EnergyStateMaintainer;
 
-public class ElectricVehicle extends Vehicle {
+/*
+ * 
+ */
+public class ElectricVehicle extends PlugInHybridElectricVehicle {
 
 	public ElectricVehicle(EnergyStateMaintainer energyStateMaintainer, Id vehicleClassId) {
 		super(energyStateMaintainer, vehicleClassId);

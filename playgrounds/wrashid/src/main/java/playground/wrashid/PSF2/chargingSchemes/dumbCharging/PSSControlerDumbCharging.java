@@ -27,8 +27,10 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
+import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
+import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.StartupListener;
 
 import playground.wrashid.PSF.ParametersPSF;
@@ -85,10 +87,10 @@ public class PSSControlerDumbCharging extends PSSControler {
 	
 	
 	private void addAfterSimulationListener(Controler controler) {
-		controler.addControlerListener(new AfterMobsimListener() {
+		controler.addControlerListener(new IterationEndsListener() {
 			
 			@Override
-			public void notifyAfterMobsim(AfterMobsimEvent event) {
+			public void notifyIterationEnds(IterationEndsEvent event) {
 				ChargingTimes.writeChargingTimes(ParametersPSF2.chargingTimes, event.getControler().getControlerIO().getIterationFilename(event.getControler().getIterationNumber(), "chargingLog.txt"));
 				ChargingTimes.writeChargingTimes(ParametersPSF2.chargingTimes, event.getControler().getControlerIO().getOutputFilename("chargingLog.txt"));
 			
@@ -106,17 +108,19 @@ public class PSSControlerDumbCharging extends PSSControler {
 		controler.addControlerListener(simulationStartupListener);
 		simulationStartupListener.addParameterPSFMutator(parameterPSFMutator);
 		simulationStartupListener.addEventHandler(new LinkEnergyConsumptionTracker());
-		simulationStartupListener.addEventHandler(new ActivityIntervalTracker());
+		simulationStartupListener.addEventHandler(ParametersPSF2.activityIntervalTracker);
+		controler.addControlerListener(new DumbChargingAfterSim());
 	}
 
 	private static void initializeParametersPSF2(Controler controler) {
-		ParametersPSF2.fleetInitializer = new DumbScenarioFleetInitializer();
+		ParametersPSF2.fleetInitializer = new DumbChargingFleetInitializer();
 		ParametersPSF2.energyConsumptionTable = new EnergyConsumptionTable(ParametersPSF2.pathToEnergyConsumptionTable);
 		ParametersPSF2.energyStateMaintainer = new ARTEMISEnergyStateMaintainer_StartChargingUponArrival(
 				ParametersPSF2.energyConsumptionTable);
 		ParametersPSF2.chargingTimes=new HashMap<Id, ChargingTimes>();
 		
 		ParametersPSF2.controler = controler;
+		ParametersPSF2.activityIntervalTracker=new ActivityIntervalTracker();
 		
 		controler.addControlerListener(new StartupListener() {
 

@@ -52,7 +52,7 @@ public class LinkEnergyConsumptionTracker implements LinkEnterEventHandler, Link
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
 		Link link=ParametersPSF2.controler.getNetwork().getLinks().get(event.getLinkId());
-		Vehicle vehicle=ParametersPSF2.vehicles.get(event.getPersonId()).get(0);
+		Vehicle vehicle=ParametersPSF2.vehicles.getValue(event.getPersonId());
 		
 		Double linkEnteranceTime=linkEntranceTime.get(event.getPersonId(), event.getLinkId());
 		if (linkEnteranceTime!=null){

@@ -38,25 +38,40 @@ import playground.wrashid.lib.obj.TwoHashMapsConcatenated;
 
 public class ActivityIntervalTracker implements ActivityStartEventHandler, ActivityEndEventHandler{
 
+	// personId, activityStartTime
+	HashMap<Id,ActivityEndEvent> endTimeOfFirstActivity=new HashMap<Id, ActivityEndEvent>();
 	
 	// personId,linkId,activityStartTime
 	TwoHashMapsConcatenated<Id,Id,Double> activityStartTime=new TwoHashMapsConcatenated<Id, Id, Double>();
 	
 	@Override
 	public void reset(int iteration) {
+		endTimeOfFirstActivity=new HashMap<Id, ActivityEndEvent>();
+		
 		activityStartTime=new TwoHashMapsConcatenated<Id, Id, Double>();
 		
 		ParametersPSF2.chargingTimes=new HashMap<Id, ChargingTimes>();
 	}
 
+	public void handleLastActivity(){
+		for (ActivityEndEvent event:endTimeOfFirstActivity.values()){
+			Vehicle vehicle=ParametersPSF2.vehicles.getValue(event.getPersonId());
+			
+			Double actStartTime=activityStartTime.get(event.getPersonId(), event.getLinkId());
+			ParametersPSF2.energyStateMaintainer.chargeVehicle(vehicle, actStartTime, ParametersPSF.getFacilityChargingPowerMapper().getChargingPower(event.getFacilityId()), event);
+		}
+	}
+	
+	
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
-		Link link=ParametersPSF2.controler.getNetwork().getLinks().get(event.getLinkId());
-		Vehicle vehicle=ParametersPSF2.vehicles.get(event.getPersonId()).get(0);
+		Vehicle vehicle=ParametersPSF2.vehicles.getValue(event.getPersonId());
 		
 		Double actStartTime=activityStartTime.get(event.getPersonId(), event.getLinkId());
 		if (actStartTime!=null){
 			ParametersPSF2.energyStateMaintainer.chargeVehicle(vehicle, actStartTime, ParametersPSF.getFacilityChargingPowerMapper().getChargingPower(event.getFacilityId()), event);
+		} else {
+			endTimeOfFirstActivity.put(event.getPersonId(), event);
 		}
 	}
 

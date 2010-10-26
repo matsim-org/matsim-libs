@@ -33,7 +33,7 @@ import playground.wrashid.PSF2.vehicle.vehicleFleet.PlugInHybridElectricVehicle;
 import playground.wrashid.PSF2.vehicle.vehicleFleet.Vehicle;
 import playground.wrashid.lib.obj.LinkedListValueHashMap;
 
-public class DumbScenarioFleetInitializer implements FleetInitializer {
+public class DumbChargingFleetInitializer implements FleetInitializer {
 
 	@Override
 	public LinkedListValueHashMap<Id, Vehicle> getVehicles(Set<Id> personIds, EnergyStateMaintainer energyStateMaintainer) {
@@ -54,8 +54,8 @@ public class DumbScenarioFleetInitializer implements FleetInitializer {
 
 	private PlugInHybridElectricVehicle getInitializedPHEV(EnergyStateMaintainer energyStateMaintainer) {
 		PlugInHybridElectricVehicle phev = new PlugInHybridElectricVehicle(energyStateMaintainer, new IdImpl(1));
-		double oneKWH = 1000.0 / 3600.0;
-		phev.setBatterySizeInJoule(10 * oneKWH);
+		double joulesInOneKWH = 3600*1000;
+		phev.setBatterySizeInJoule(10 * joulesInOneKWH);
 		phev.setBatteryMinThresholdInJoule(phev.getBatterySizeInJoule() * 0.035);
 		phev.setCurrentBatteryChargeInJoule(phev.getBatterySizeInJoule());
 		return phev;

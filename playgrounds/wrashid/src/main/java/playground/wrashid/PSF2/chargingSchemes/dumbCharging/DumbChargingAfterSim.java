@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SimulationStartupListenerV2.java
+ * DumbChargingAfterSim.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,13 +20,16 @@
 
 package playground.wrashid.PSF2.chargingSchemes.dumbCharging;
 
-import org.matsim.core.controler.events.StartupEvent;
-import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.controler.events.AfterMobsimEvent;
+import org.matsim.core.controler.listener.AfterMobsimListener;
 
-public class SimulationStartupListenerV2 implements StartupListener {
+import playground.wrashid.PSF2.ParametersPSF2;
+
+public class DumbChargingAfterSim implements AfterMobsimListener {
 
 	@Override
-	public void notifyStartup(StartupEvent event) {
-		// TODO Auto-generated method stub
+	public void notifyAfterMobsim(AfterMobsimEvent event) {
+		ParametersPSF2.activityIntervalTracker.handleLastActivity();		
 	}
+
 }

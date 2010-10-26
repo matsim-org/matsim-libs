@@ -101,7 +101,7 @@ public class PlugInHybridElectricVehicle extends Vehicle {
 			ParametersPSF2.chargingTimes.put(personId, new ChargingTimes());
 		}
 		
-		ParametersPSF2.chargingTimes.get(personId).addChargeLog(new ChargeLog(event.getLinkId(), arrivalTime, endChargingTime, getAvailbleBatteryCharge(), chargeInJoule, event.getFacilityId()));
+		ParametersPSF2.chargingTimes.get(personId).addChargeLog(new ChargeLog(event.getLinkId(), GeneralLib.projectTimeWithin24Hours(arrivalTime), endChargingTime, getCurrentBatteryChargeInJoule(), getCurrentBatteryChargeInJoule()+chargeInJoule, event.getFacilityId()));
 	}
 
 	public void setBatterySizeInJoule(double batterySizeInJoule) {

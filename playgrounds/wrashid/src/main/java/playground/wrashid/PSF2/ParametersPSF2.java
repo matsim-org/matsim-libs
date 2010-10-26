@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.controler.Controler;
 
 import playground.wrashid.PSF.energy.charging.ChargingTimes;
+import playground.wrashid.PSF2.chargingSchemes.dumbCharging.ActivityIntervalTracker;
 import playground.wrashid.PSF2.vehicle.energyConsumption.EnergyConsumptionTable;
 import playground.wrashid.PSF2.vehicle.energyStateMaintainance.EnergyStateMaintainer;
 import playground.wrashid.PSF2.vehicle.vehicleFleet.FleetInitializer;
@@ -54,6 +55,10 @@ public class ParametersPSF2 {
 
 
 	public static Controler controler;
+
+
+
+	public static ActivityIntervalTracker activityIntervalTracker;
 	
 	
 	public static void initVehicleFleet(Controler controler){
