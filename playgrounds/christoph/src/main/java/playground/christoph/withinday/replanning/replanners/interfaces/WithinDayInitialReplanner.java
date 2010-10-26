@@ -26,8 +26,7 @@ import org.matsim.api.core.v01.Scenario;
 import playground.christoph.withinday.replanning.identifiers.interfaces.InitialIdentifier;
 
 /*
- * Replans Agents initially after the Simulation has
- * been initialized.
+ * Replans Agents initially after the Simulation has been initialized.
  */
 public abstract class WithinDayInitialReplanner extends WithinDayReplanner<InitialIdentifier> {
 

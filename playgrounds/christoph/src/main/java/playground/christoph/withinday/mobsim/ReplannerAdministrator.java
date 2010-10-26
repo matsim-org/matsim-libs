@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * InitialIdentifierImpl.java
+ * ReplannerAdministrator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,42 +18,35 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.christoph.withinday.replanning.identifiers;
+package playground.christoph.withinday.mobsim;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.framework.PersonAgent;
-import org.matsim.ptproject.qsim.QSim;
 
-import playground.christoph.withinday.mobsim.WithinDayPersonAgent;
-import playground.christoph.withinday.replanning.identifiers.interfaces.InitialIdentifier;
+public class ReplannerAdministrator {
+	
+	// If I am understanding this correctly, the replanners that are added in the following are not actively used as instances,
+	// but they are used in order to identify those agents that possess those replanners.  And only those are submitted to 
+	// the replanning process. Kai
+	
+	private Set<Id> withinDayReplannerIds;
 
-public class InitialIdentifierImpl extends InitialIdentifier {
-
-	protected QSim qsim;
-
-	// use the Factory!
-	/*package*/ InitialIdentifierImpl(QSim qsim) {
-		this.qsim = qsim;
+	public ReplannerAdministrator() {
+		withinDayReplannerIds = new HashSet<Id>();
 	}
-		
-	public Set<PersonAgent> getAgentsToReplan(double time, Id withinDayReplannerId) {
-		Set<PersonAgent> agentsToReplan = new HashSet<PersonAgent>();
-		
-		for (MobsimAgent mobsimAgent : this.qsim.getAgents()) {
-			if (mobsimAgent instanceof WithinDayPersonAgent) {
-				WithinDayPersonAgent withinDayPersonAgent = (WithinDayPersonAgent) mobsimAgent;
-				
-				if (withinDayPersonAgent.getReplannerAdministrator().getWithinDayReplannerIds().contains(withinDayReplannerId)) {
-					agentsToReplan.add(withinDayPersonAgent);
-				}
-			}
-		}
-		
-		return agentsToReplan;
+	
+	public boolean addWithinDayReplanner(Id replannerId) {
+		return this.withinDayReplannerIds.add(replannerId);
 	}
-
+	
+	public boolean removeWithinDayReplanner(Id replannerId) {
+		return this.withinDayReplannerIds.remove(replannerId);
+	}
+	
+	public Set<Id> getWithinDayReplannerIds() {
+		return Collections.unmodifiableSet(withinDayReplannerIds);
+	}
 }

@@ -47,7 +47,6 @@ import playground.christoph.withinday.utils.EditRoutes;
  * This Plan is handed over to the Router and finally the new route is merged with the
  * Links that already have been passed by the Person.
  */
-
 public class CurrentLegReplanner extends WithinDayDuringLegReplanner {
 
 	/*package*/ CurrentLegReplanner(Id id, Scenario scenario) {

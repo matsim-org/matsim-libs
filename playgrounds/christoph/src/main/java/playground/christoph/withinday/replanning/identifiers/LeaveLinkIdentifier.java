@@ -20,15 +20,16 @@
 
 package playground.christoph.withinday.replanning.identifiers;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.framework.PersonAgent;
 
 import playground.christoph.withinday.mobsim.WithinDayPersonAgent;
 import playground.christoph.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
 import playground.christoph.withinday.replanning.identifiers.tools.LinkReplanningMap;
-import playground.christoph.withinday.replanning.replanners.interfaces.WithinDayReplanner;
 
 public class LeaveLinkIdentifier extends DuringLegIdentifier {
 
@@ -40,13 +41,13 @@ public class LeaveLinkIdentifier extends DuringLegIdentifier {
 	}
 	
 	@Override
-	public List<PersonAgent> getAgentsToReplan(double time, WithinDayReplanner withinDayReplanner) {
+	public Set<PersonAgent> getAgentsToReplan(double time, Id withinDayReplannerId) {
 		List<PersonAgent> agentsToReplanLeaveLink = linkReplanningMap.getReplanningAgents(time);
-		List<PersonAgent> agentsToReplan = new ArrayList<PersonAgent>(); 
+		Set<PersonAgent> agentsToReplan = new HashSet<PersonAgent>(); 
 
 		for (PersonAgent personAgent : agentsToReplanLeaveLink) {
 			WithinDayPersonAgent withinDayPersonAgent = (WithinDayPersonAgent) personAgent;
-			if (withinDayPersonAgent.getWithinDayReplanners().contains(withinDayReplanner)) {
+			if (withinDayPersonAgent.getReplannerAdministrator().getWithinDayReplannerIds().contains(withinDayReplannerId)) {
 				agentsToReplan.add(withinDayPersonAgent);
 			}
 		}

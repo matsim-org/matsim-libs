@@ -54,8 +54,6 @@ import org.matsim.ptproject.qsim.interfaces.NetsimLink;
 import org.matsim.ptproject.qsim.interfaces.Mobsim;
 import org.matsim.ptproject.qsim.interfaces.NetsimNetwork;
 
-import playground.christoph.withinday.replanning.identifiers.tools.LinkReplanningMap;
-
 /**
  * This Module is used by a CurrentLegReplanner. It calculates the time
  * when an agent should do CurrentLegReplanning.
@@ -98,26 +96,6 @@ public class LinkReplanningMap implements LinkEnterEventHandler,
 		init();
 	}
 	
-//	public LinkReplanningMap(Controler controler) {
-//		//Add LinkReplanningMap to the QueueSimulation's EventsManager
-//		controler.getEvents().addHandler(this);
-//
-//		// add ActivityReplanningMap to the QueueSimulation's SimulationListeners
-//		controler.getQueueSimulationListener().add(this);
-//
-//		init();
-//	}
-
-//	public LinkReplanningMap(QSim qSim) {
-//		//Add LinkReplanningMap to the QueueSimulation's EventsManager
-//		qSim.getEventsManager().addHandler(this);
-//
-//		// add ActivityReplanningMap to the QueueSimulation's SimulationListeners
-//		qSim.addQueueSimulationListeners(this);
-//
-//		init();
-//	}
-
 	private void init() {
 		this.replanningMap = new HashMap<Id, Tuple<Id, Double>>();
 	}

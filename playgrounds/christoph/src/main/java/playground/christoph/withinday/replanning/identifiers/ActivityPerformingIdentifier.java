@@ -20,15 +20,17 @@
 
 package playground.christoph.withinday.replanning.identifiers;
 
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.framework.PersonAgent;
 
 import playground.christoph.withinday.mobsim.WithinDayPersonAgent;
 import playground.christoph.withinday.replanning.identifiers.interfaces.DuringActivityIdentifier;
 import playground.christoph.withinday.replanning.identifiers.tools.ActivityReplanningMap;
-import playground.christoph.withinday.replanning.replanners.interfaces.WithinDayReplanner;
 
 public class ActivityPerformingIdentifier extends DuringActivityIdentifier {
 	
@@ -39,19 +41,20 @@ public class ActivityPerformingIdentifier extends DuringActivityIdentifier {
 		this.activityReplanningMap = activityReplanningMap;
 	}
 	
-	public List<PersonAgent> getAgentsToReplan(double time, WithinDayReplanner withinDayReplanner) {
-		List<PersonAgent> agentsToReplan = activityReplanningMap.getActivityPerformingAgents();
+	public Set<PersonAgent> getAgentsToReplan(double time, Id withinDayReplannerId) {
+		List<PersonAgent> activityPerformingAgents = activityReplanningMap.getActivityPerformingAgents();
 		
-		Iterator<PersonAgent> iter = agentsToReplan.iterator();
+		Set<PersonAgent> agentsToReplan = new HashSet<PersonAgent>();
+		
+		Iterator<PersonAgent> iter = activityPerformingAgents.iterator();
 		while(iter.hasNext()) {
 			WithinDayPersonAgent withinDayPersonAgent = (WithinDayPersonAgent) iter.next();
 			
 			/*
-			 * Remove the Agent from the list, if the replanning flag is not set.
+			 * Add the Agent to the list, if the replanning flag is set.
 			 */
-			if (!withinDayPersonAgent.getWithinDayReplanners().contains(withinDayReplanner)) {
-				iter.remove();
-				continue;
+			if (withinDayPersonAgent.getReplannerAdministrator().getWithinDayReplannerIds().contains(withinDayReplannerId)) {
+				agentsToReplan.add(withinDayPersonAgent);
 			}
 		}
 		

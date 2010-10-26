@@ -20,10 +20,6 @@
 
 package playground.christoph.withinday.mobsim;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
@@ -32,17 +28,16 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.ptproject.qsim.helpers.DefaultPersonDriverAgent;
 import org.matsim.ptproject.qsim.interfaces.Mobsim;
 
-import playground.christoph.withinday.replanning.replanners.interfaces.WithinDayReplanner;
-
 public class WithinDayPersonAgent extends DefaultPersonDriverAgent {
 	private static final Logger log = Logger.getLogger("dummy");
 
-	private List<WithinDayReplanner> withinDayReplanner = new ArrayList<WithinDayReplanner>();
+	private ReplannerAdministrator replannerAdministrator;
 	private Mobsim simulation;
 	
 	public WithinDayPersonAgent(Person p, Mobsim simulation) {
 		super(p, simulation);
 		this.simulation = simulation;
+		this.replannerAdministrator = new ReplannerAdministrator();
 	}
 	
 	public void rescheduleCurrentActivity() {
@@ -161,15 +156,9 @@ public class WithinDayPersonAgent extends DefaultPersonDriverAgent {
 	// but they are used in order to identify those agents that possess those replanners.  And only those are submitted to 
 	// the replanning process.
 	
-	public boolean addWithinDayReplanner(WithinDayReplanner replanner) {
-		return this.withinDayReplanner.add(replanner);
+	// yyyy add this to a Interface WithinDayReplanable? add it via Customizable? cdobler, Oct'10
+	public final ReplannerAdministrator getReplannerAdministrator() {
+		return this.replannerAdministrator;
 	}
 	
-	public boolean removeWithinDayReplanner(WithinDayReplanner replanner) {
-		return this.withinDayReplanner.remove(replanner);
-	}
-	
-	public List<WithinDayReplanner> getWithinDayReplanners() {
-		return Collections.unmodifiableList(withinDayReplanner);
-	}
 }

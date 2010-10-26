@@ -45,11 +45,8 @@ import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationAfterSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationListener;
-import org.matsim.core.mobsim.framework.listeners.SimulationListenerManager;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.interfaces.Mobsim;
-
-import playground.christoph.withinday.replanning.identifiers.tools.ActivityReplanningMap;
 
 /*
  * This Module is used by a NextLegReplanner. It calculates the time
@@ -80,32 +77,19 @@ public class ActivityReplanningMap implements AgentStuckEventHandler,
 	 */
 	private Map<Id, PersonAgent> personAgentMapping;	// PersonId, PersonDriverAgent
 
-//	public ActivityReplanningMap(Controler controler) {
-//		// add ActivityReplanningMap to the QueueSimulation's EventsManager
-//		controler.getEvents().addHandler(this);
-//
-//		// add ActivityReplanningMap to the QueueSimulation's SimulationListeners
-//		controler.getQueueSimulationListener().add(this);
-//
-//		init();
-//	}
-
+	public ActivityReplanningMap() {
+		log.warn("ActivityReplanningMap is initialized with empty constructor. " +
+				"Please ensure that it is added as Handler to an EventsManager and as Listener to " +
+				"a ObserableSimulation!");
+		init();
+	}
+	
 	// simulationListeners... the List used in the Controller!
 	public ActivityReplanningMap(EventsManager eventsManager, List<SimulationListener> simulationListeners) {
 		eventsManager.addHandler(this);
 		simulationListeners.add(this);
 		init();
 	}
-	
-//	public ActivityReplanningMap(QSim qSim) {
-//		//Add LinkReplanningMap to the QueueSimulation's EventsManager
-//		qSim.getEventsManager().addHandler(this);
-//
-//		// add ActivityReplanningMap to the QueueSimulation's SimulationListeners
-//		qSim.addQueueSimulationListeners(this);
-//
-//		init();
-//	}
 
 	private void init() {
 		this.personAgentMapping = new TreeMap<Id, PersonAgent>();

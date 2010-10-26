@@ -33,7 +33,7 @@ import playground.christoph.withinday.replanning.replanners.interfaces.WithinDay
  *
  * @author Christoph Dobler
  */
-public class ParallelDuringActivityReplanner extends ParallelReplanner {
+public class ParallelDuringActivityReplanner extends ParallelReplanner<WithinDayDuringActivityReplanner> {
 	
 	private final static Logger log = Logger.getLogger(ParallelDuringActivityReplanner.class);
 	
@@ -54,7 +54,7 @@ public class ParallelDuringActivityReplanner extends ParallelReplanner {
 		// Do initial Setup of the Threads
 		for (int i = 0; i < numOfThreads; i++) {
 			ReplanningThread replanningThread = new InternalReplanningThread("ParallelDuringActivityReplanner Thread" + i + " replanned plans: ");
-			replanningThread.setName("" + i);
+			replanningThread.setName("ParallelDuringActivityReplanner" + i);
 			replanningThreads[i] = replanningThread;
 		}
 

@@ -20,37 +20,13 @@
 
 package playground.christoph.withinday.mobsim;
 
-import java.util.Set;
-
-import org.matsim.core.mobsim.framework.PersonAgent;
-
-import playground.christoph.withinday.replanning.identifiers.interfaces.AgentsToReplanIdentifier;
 import playground.christoph.withinday.replanning.parallel.ParallelDuringLegReplanner;
 import playground.christoph.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
-import playground.christoph.withinday.replanning.replanners.interfaces.WithinDayReplanner;
-import playground.christoph.withinday.replanning.replanners.tools.ReplanningTask;
 
-public class DuringLegReplanningModule extends WithinDayReplanningModule {
+public class DuringLegReplanningModule extends WithinDayReplanningModule<WithinDayDuringLegReplanner> {
 		
 	public DuringLegReplanningModule(ParallelDuringLegReplanner parallelDuringLegReplanner) {
 		this.parallelReplanner = parallelDuringLegReplanner;
 	}
 	
-	@Override
-	public void doReplanning(double time) {
-		for (WithinDayReplanner replanner : this.parallelReplanner.getWithinDayReplanners()) {
-			if(replanner instanceof WithinDayDuringLegReplanner) {
-				Set<AgentsToReplanIdentifier> identifiers = replanner.getAgentsToReplanIdentifers();
-				
-				for (AgentsToReplanIdentifier identifier : identifiers) {
-					for (PersonAgent personAgent : identifier.getAgentsToReplan(time, replanner)) {
-						ReplanningTask replanningTask = new ReplanningTask(personAgent, replanner.getId());
-						this.parallelReplanner.addReplanningTask(replanningTask);
-					}
-				}
-			}
-		}
-		
-		this.parallelReplanner.run(time);
-	}
 }

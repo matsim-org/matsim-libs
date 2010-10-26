@@ -33,7 +33,7 @@ import playground.christoph.withinday.replanning.replanners.interfaces.WithinDay
  *
  * @author Christoph Dobler
  */
-public class ParallelDuringLegReplanner extends ParallelReplanner {
+public class ParallelDuringLegReplanner extends ParallelReplanner<WithinDayDuringLegReplanner> {
 
 	private final static Logger log = Logger.getLogger(ParallelDuringLegReplanner.class);
 

@@ -274,7 +274,7 @@ public class WithinDayControler extends Controler {
 				probability = random.nextDouble();
 				if (probability > withinDayControler.pInitialReplanning) ;
 				else {
-					withinDayPersonAgent.addWithinDayReplanner(withinDayControler.initialReplanner);
+					withinDayPersonAgent.getReplannerAdministrator().addWithinDayReplanner(withinDayControler.initialReplanner.getId());
 					noReplanning = false;
 					initialReplanningCounter++;
 				}
@@ -283,7 +283,7 @@ public class WithinDayControler extends Controler {
 				probability = random.nextDouble();
 				if (probability > withinDayControler.pActEndReplanning);
 				else {
-					withinDayPersonAgent.addWithinDayReplanner(withinDayControler.duringActivityReplanner);
+					withinDayPersonAgent.getReplannerAdministrator().addWithinDayReplanner(withinDayControler.duringActivityReplanner.getId());
 					noReplanning = false;
 					actEndReplanningCounter++;
 				}
@@ -292,7 +292,7 @@ public class WithinDayControler extends Controler {
 				probability = random.nextDouble();
 				if (probability > withinDayControler.pLeaveLinkReplanning) ;
 				else {
-					withinDayPersonAgent.addWithinDayReplanner(withinDayControler.duringLegReplanner);
+					withinDayPersonAgent.getReplannerAdministrator().addWithinDayReplanner(withinDayControler.duringLegReplanner.getId());
 					noReplanning = false;
 					leaveLinkReplanningCounter++;
 				}

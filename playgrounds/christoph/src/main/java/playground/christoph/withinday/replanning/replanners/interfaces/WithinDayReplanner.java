@@ -21,6 +21,7 @@
 package playground.christoph.withinday.replanning.replanners.interfaces;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
@@ -41,7 +42,8 @@ import playground.christoph.withinday.replanning.replanners.interfaces.WithinDay
  *	which identifies Agents that need a Replanning of their scheduled
  * 	Plans.
  */
-public abstract class WithinDayReplanner<T extends AgentsToReplanIdentifier> {
+public abstract class WithinDayReplanner<T extends AgentsToReplanIdentifier> 
+	implements Comparator<WithinDayReplanner<T>>, Comparable<WithinDayReplanner<T>> {
 	
 	protected Id id;
 	protected Scenario scenario;
@@ -123,5 +125,25 @@ public abstract class WithinDayReplanner<T extends AgentsToReplanIdentifier> {
 	
 	public final WithinDayReplannerFactory getReplannerFactory() {
 		return replannerFactory;
+	}
+	
+	@Override
+	public int compareTo(WithinDayReplanner<T> r) {
+		return this.id.compareTo(r.getId());
+	}
+	
+	@Override
+	public int compare(WithinDayReplanner<T> r1, WithinDayReplanner<T> r2)  {
+		return r1.getId().compareTo(r2.getId());
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override	
+	public boolean equals(Object o) {
+		if (o instanceof WithinDayReplanner) {
+			WithinDayReplanner<AgentsToReplanIdentifier> replanner = (WithinDayReplanner<AgentsToReplanIdentifier>) o;
+			return replanner.getId().equals(this.getId());
+		}
+		return false;
 	}
 }

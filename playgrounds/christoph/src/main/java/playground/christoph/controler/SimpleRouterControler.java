@@ -334,31 +334,31 @@ public class SimpleRouterControler extends Controler {
 
 				// Random Router
 				if (pRandomRouterLow <= probability && probability < pRandomRouterHigh) {
-					withinDayPersonAgent.addWithinDayReplanner(simpleRouterControler.randomReplanner);
+					withinDayPersonAgent.getReplannerAdministrator().addWithinDayReplanner(simpleRouterControler.randomReplanner.getId());
 					initialReplanningCounter++;
 					simpleRouterControler.randomRouterCounter++;
 				}
 				// Tabu Router
 				else if (pTabuRouterLow <= probability && probability < pTabuRouterHigh) {
-					withinDayPersonAgent.addWithinDayReplanner(simpleRouterControler.tabuReplanner);
+					withinDayPersonAgent.getReplannerAdministrator().addWithinDayReplanner(simpleRouterControler.tabuReplanner.getId());
 					initialReplanningCounter++;
 					simpleRouterControler.tabuRouterCounter++;
 				}
 				// Compass Router
 				else if (pCompassRouterLow <= probability && probability < pCompassRouterHigh) {
-					withinDayPersonAgent.addWithinDayReplanner(simpleRouterControler.compassReplanner);
+					withinDayPersonAgent.getReplannerAdministrator().addWithinDayReplanner(simpleRouterControler.compassReplanner.getId());
 					initialReplanningCounter++;
 					simpleRouterControler.compassRouterCounter++;
 				}
 				// Random Compass Router
 				else if (pRandomCompassRouterLow <= probability && probability < pRandomCompassRouterHigh) {
-					withinDayPersonAgent.addWithinDayReplanner(simpleRouterControler.randomCompassReplanner);
+					withinDayPersonAgent.getReplannerAdministrator().addWithinDayReplanner(simpleRouterControler.randomCompassReplanner.getId());
 					initialReplanningCounter++;
 					simpleRouterControler.randomCompassRouterCounter++;
 				}
 				// Random Dijkstra Router
 				else if (pRandomDijkstraRouterLow <= probability && probability <= pRandomDijkstraRouterHigh) {
-					withinDayPersonAgent.addWithinDayReplanner(simpleRouterControler.randomDijkstraReplanner);
+					withinDayPersonAgent.getReplannerAdministrator().addWithinDayReplanner(simpleRouterControler.randomDijkstraReplanner.getId());
 					initialReplanningCounter++;
 					simpleRouterControler.randomDijkstraRouterCounter++;
 				}

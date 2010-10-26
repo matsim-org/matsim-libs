@@ -36,7 +36,8 @@ import playground.christoph.withinday.replanning.modules.ReplanningModule;
 import playground.christoph.withinday.replanning.parallel.ParallelDuringActivityReplanner;
 import playground.christoph.withinday.replanning.parallel.ParallelDuringLegReplanner;
 import playground.christoph.withinday.replanning.parallel.ParallelInitialReplanner;
-import playground.christoph.withinday.replanning.replanners.interfaces.WithinDayReplanner;
+import playground.christoph.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
+import playground.christoph.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
 
 class MyWithinDayControler extends Controler {
 
@@ -64,7 +65,7 @@ class MyWithinDayControler extends Controler {
 	/*
 	 * How many parallel Threads shall do the Replanning.
 	 */
-	protected int numReplanningThreads = 1;
+	protected int numReplanningThreads = 5;
 
 	protected ParallelInitialReplanner parallelInitialReplanner;
 	protected ParallelDuringActivityReplanner parallelActEndReplanner;
@@ -96,7 +97,7 @@ class MyWithinDayControler extends Controler {
 
 		// replanning while at activity:
 
-		WithinDayReplanner duringActivityReplanner = new ReplannerOldPeopleFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner(); 
+		WithinDayDuringActivityReplanner duringActivityReplanner = new ReplannerOldPeopleFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner(); 
 		// defines a "doReplanning" method which contains the core of the work
 		// as a piece, it re-routes a _future_ leg.  
 		
@@ -110,7 +111,7 @@ class MyWithinDayControler extends Controler {
 		
 		// replanning while on leg:
 		
-		WithinDayReplanner duringLegReplanner = new ReplannerYoungPeopleFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
+		WithinDayDuringLegReplanner duringLegReplanner = new ReplannerYoungPeopleFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
 		// defines a "doReplanning" method which contains the core of the work
 		// it replaces the next activity
 		// in order to get there, it re-routes the current route
@@ -138,8 +139,7 @@ class MyWithinDayControler extends Controler {
 	 *
 	 * The full initialization of them is done later (we don't have all necessary Objects yet).
 	 */
-	private void createHandlersAndListeners()
-	{
+	private void createHandlersAndListeners() {
 		replanningManager = new ReplanningManager();
 	}
 

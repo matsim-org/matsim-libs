@@ -34,6 +34,7 @@ import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationListener;
 import org.matsim.ptproject.qsim.interfaces.Mobsim;
 
+import playground.christoph.withinday.replanning.identifiers.interfaces.AgentsToReplanIdentifier;
 import playground.christoph.withinday.replanning.replanners.interfaces.WithinDayReplanner;
 import playground.christoph.withinday.replanning.replanners.tools.ReplanningTask;
 
@@ -45,12 +46,12 @@ import playground.christoph.withinday.replanning.replanners.tools.ReplanningTask
  * split up of the replanning actions have to be implemented in
  * the subclasses.
  */
-public abstract class ParallelReplanner implements SimulationInitializedListener {
+public abstract class ParallelReplanner<T extends WithinDayReplanner<? extends AgentsToReplanIdentifier>> implements SimulationInitializedListener {
 
 	private final static Logger log = Logger.getLogger(ParallelReplanner.class);
 
 	protected int numOfThreads = 1;	// use by default only one thread
-	protected List<WithinDayReplanner> originalReplanners = new ArrayList<WithinDayReplanner>();
+	protected List<T> originalReplanners = new ArrayList<T>();
 	protected ReplanningThread[] replanningThreads;
 	protected int roundRobin = 0;
 	private int lastRoundRobin = 0;
@@ -123,16 +124,16 @@ public abstract class ParallelReplanner implements SimulationInitializedListener
 		}
 	}
 
-	public void addWithinDayReplanner(WithinDayReplanner replanner) {
+	public void addWithinDayReplanner(T replanner) {
 		this.originalReplanners.add(replanner);
 
 		for (ReplanningThread replanningThread : this.replanningThreads) {
-			WithinDayReplanner newInstance = replanner.getReplannerFactory().createReplanner();
+			WithinDayReplanner<? extends AgentsToReplanIdentifier> newInstance = replanner.getReplannerFactory().createReplanner();
 			replanningThread.addWithinDayReplanner(newInstance);
 		}
 	}
 
-	public List<WithinDayReplanner> getWithinDayReplanners() {
+	public List<T> getWithinDayReplanners() {
 		return Collections.unmodifiableList(this.originalReplanners);
 	}
 

@@ -1,8 +1,11 @@
 package playground.christoph.withinday2;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.core.population.PersonImpl;
@@ -18,13 +21,13 @@ public class YoungPeopleIdentifier extends DuringLegIdentifier {
 	private Mobsim queueSim;
 
 	@Override
-	public List<PersonAgent> getAgentsToReplan(double time, WithinDayReplanner withinDayReplanner) {
+	public Set<PersonAgent> getAgentsToReplan(double time, Id withinDayReplannerId) {
 		
-		ArrayList<PersonAgent> list = new ArrayList<PersonAgent>();
+		Set<PersonAgent> set = new HashSet<PersonAgent>();
 
 		// don't handle the agent, if time != 12 o'clock
 		if (Math.floor(time) !=  22000.0) {
-			return list;
+			return set;
 		}
 		
 //		Collection<QVehicle> tmpList=queueSim.getQNetwork().getLinks().get(new IdImpl("6")).getAllNonParkedVehicles();
@@ -37,12 +40,12 @@ public class YoungPeopleIdentifier extends DuringLegIdentifier {
 				System.out.println(agent.getPerson().getId());
 				if (((PersonImpl) agent.getPerson()).getAge() == 18) {
 					System.out.println("found agent");
-					list.add(agent);
+					set.add(agent);
 				}
 			}
 		}
 
-		return list;
+		return set;
 	}
 	
 	YoungPeopleIdentifier(Mobsim queueSim) {

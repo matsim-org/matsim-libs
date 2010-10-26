@@ -20,11 +20,14 @@
 
 package playground.christoph.evacuation.withinday.replanning.identifiers;
 
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.utils.geometry.CoordUtils;
 
@@ -32,7 +35,6 @@ import playground.christoph.evacuation.config.EvacuationConfig;
 import playground.christoph.withinday.mobsim.WithinDayPersonAgent;
 import playground.christoph.withinday.replanning.identifiers.interfaces.DuringActivityIdentifier;
 import playground.christoph.withinday.replanning.identifiers.tools.ActivityReplanningMap;
-import playground.christoph.withinday.replanning.replanners.interfaces.WithinDayReplanner;
 
 public class InsecureActivityPerformingIdentifier extends DuringActivityIdentifier {
 
@@ -48,19 +50,19 @@ public class InsecureActivityPerformingIdentifier extends DuringActivityIdentifi
 		this.secureDistance = secureDistance;
 	}
 	
-	public List<PersonAgent> getAgentsToReplan(double time, WithinDayReplanner withinDayReplanner) {
+	public Set<PersonAgent> getAgentsToReplan(double time, Id withinDayReplannerId) {
 		
-		List<PersonAgent> agentsToReplan = activityReplanningMap.getActivityPerformingAgents();
+		List<PersonAgent> activityPerformingAgents = activityReplanningMap.getActivityPerformingAgents();
+		Set<PersonAgent> agentsToReplan = new HashSet<PersonAgent>();
 		
-		Iterator<PersonAgent> iter = agentsToReplan.iterator();
+		Iterator<PersonAgent> iter = activityPerformingAgents.iterator();
 		while(iter.hasNext()) {
 			WithinDayPersonAgent withinDayPersonAgent = (WithinDayPersonAgent) iter.next();
 			
 			/*
 			 * Remove the Agent from the list, if the replanning flag is not set.
 			 */
-			if (!withinDayPersonAgent.getWithinDayReplanners().contains(withinDayReplanner)) {
-				iter.remove();
+			if (!withinDayPersonAgent.getReplannerAdministrator().getWithinDayReplannerIds().contains(withinDayReplannerId)) {
 				continue;
 			}
 			
@@ -69,11 +71,13 @@ public class InsecureActivityPerformingIdentifier extends DuringActivityIdentifi
 			 */
 			double distance = CoordUtils.calcDistance(withinDayPersonAgent.getCurrentActivity().getCoord(), centerCoord);
 			if (distance > secureDistance) {
-				iter.remove();
 				continue;
 			}
+			
+			// If we reach this point, the agent can be replanned.
+			agentsToReplan.add(withinDayPersonAgent);
 		}
-		if (time == EvacuationConfig.evacuationTime) log.info("Found " + agentsToReplan.size() + " Agents performing an Activity in an insecure area.");
+		if (time == EvacuationConfig.evacuationTime) log.info("Found " + activityPerformingAgents.size() + " Agents performing an Activity in an insecure area.");
 		
 		return agentsToReplan;
 	}

@@ -383,7 +383,7 @@ public class EvacuationControler extends MultiModalControler {
 				probability = random.nextDouble();
 				if (probability > withinDayControler.pInitialReplanning) ;
 				else {
-					withinDayPersonAgent.addWithinDayReplanner(withinDayControler.initialReplanner);
+					withinDayPersonAgent.getReplannerAdministrator().addWithinDayReplanner(withinDayControler.initialReplanner.getId());
 					noReplanning = false;
 					initialReplanningCounter++;
 				}
@@ -392,8 +392,8 @@ public class EvacuationControler extends MultiModalControler {
 				probability = random.nextDouble();
 				if (probability > withinDayControler.pDuringActivityReplanning) ;
 				else {
-					withinDayPersonAgent.addWithinDayReplanner(withinDayControler.duringSecureActivityReplanner);
-					withinDayPersonAgent.addWithinDayReplanner(withinDayControler.duringInsecureActivityReplanner);
+					withinDayPersonAgent.getReplannerAdministrator().addWithinDayReplanner(withinDayControler.duringSecureActivityReplanner.getId());
+					withinDayPersonAgent.getReplannerAdministrator().addWithinDayReplanner(withinDayControler.duringInsecureActivityReplanner.getId());
 					noReplanning = false;
 					actEndReplanningCounter++;
 				}
@@ -402,9 +402,9 @@ public class EvacuationControler extends MultiModalControler {
 				probability = random.nextDouble();
 				if (probability > withinDayControler.pDuringLegReplanning) ;
 				else {
-					withinDayPersonAgent.addWithinDayReplanner(withinDayControler.duringSecureLegReplanner);
-					withinDayPersonAgent.addWithinDayReplanner(withinDayControler.duringInsecureLegReplanner);
-					withinDayPersonAgent.addWithinDayReplanner(withinDayControler.currentInsecureLegReplanner);
+					withinDayPersonAgent.getReplannerAdministrator().addWithinDayReplanner(withinDayControler.duringSecureLegReplanner.getId());
+					withinDayPersonAgent.getReplannerAdministrator().addWithinDayReplanner(withinDayControler.duringInsecureLegReplanner.getId());
+					withinDayPersonAgent.getReplannerAdministrator().addWithinDayReplanner(withinDayControler.currentInsecureLegReplanner.getId());
 					noReplanning = false;
 					leaveLinkReplanningCounter++;
 				}

@@ -20,11 +20,13 @@
 
 package playground.christoph.evacuation.withinday.replanning.identifiers;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.mobsim.framework.PersonAgent;
@@ -34,7 +36,6 @@ import playground.christoph.evacuation.config.EvacuationConfig;
 import playground.christoph.withinday.mobsim.WithinDayPersonAgent;
 import playground.christoph.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
 import playground.christoph.withinday.replanning.identifiers.tools.LinkReplanningMap;
-import playground.christoph.withinday.replanning.replanners.interfaces.WithinDayReplanner;
 
 public class InsecureLegPerformingIdentifier extends DuringLegIdentifier {
 	
@@ -53,10 +54,10 @@ public class InsecureLegPerformingIdentifier extends DuringLegIdentifier {
 		this.secureDistance = secureDistance;
 	}
 	
-	public List<PersonAgent> getAgentsToReplan(double time, WithinDayReplanner withinDayReplanner) {
+	public Set<PersonAgent> getAgentsToReplan(double time, Id withinDayReplannerId) {
 		
 		List<PersonAgent> legPerformingAgents = linkReplanningMap.getLegPerformingAgents();
-		List<PersonAgent> agentsToReplan = new ArrayList<PersonAgent>();
+		Set<PersonAgent> agentsToReplan = new HashSet<PersonAgent>();
 		
 		for (PersonAgent personAgent : legPerformingAgents) {
 			WithinDayPersonAgent withinDayPersonAgent = (WithinDayPersonAgent) personAgent;
@@ -64,7 +65,7 @@ public class InsecureLegPerformingIdentifier extends DuringLegIdentifier {
 			/*
 			 * Remove the Agent from the list, if the replanning flag is not set.
 			 */
-			if (!withinDayPersonAgent.getWithinDayReplanners().contains(withinDayReplanner)) {
+			if (!withinDayPersonAgent.getReplannerAdministrator().getWithinDayReplannerIds().contains(withinDayReplannerId)) {
 				continue;
 			}
 			

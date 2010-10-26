@@ -26,7 +26,9 @@ import org.apache.log4j.Logger;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.listeners.SimulationListener;
 
-public class ParallelInitialReplanner extends ParallelReplanner {
+import playground.christoph.withinday.replanning.replanners.interfaces.WithinDayInitialReplanner;
+
+public class ParallelInitialReplanner extends ParallelReplanner<WithinDayInitialReplanner> {
 	
 	private final static Logger log = Logger.getLogger(ParallelInitialReplanner.class);
 	
