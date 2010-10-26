@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.benjamin.plans;
+package playground.benjamin.old.plans;
 
 import java.util.Comparator;
 import java.util.SortedMap;
@@ -33,6 +33,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 
 import playground.benjamin.old.BkPopulationScoreDifferenceWriter;
+import playground.benjamin.old.plans.BkPlansLoaderFor2Populations;
 
 /**
  * @author bkickhoefer after kn
