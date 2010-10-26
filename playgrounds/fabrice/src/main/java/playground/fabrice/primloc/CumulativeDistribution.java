@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.demandmodeling.primloc;
+package playground.fabrice.primloc;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;

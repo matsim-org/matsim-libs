@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.demandmodeling.primloc;
+package playground.fabrice.primloc;
 
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Population;
@@ -30,6 +30,9 @@ import org.matsim.knowledges.Knowledges;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.World;
+
+import playground.fabrice.primloc.CumulativeDistribution;
+import playground.fabrice.primloc.PrimlocModule;
 
 /**
  * Test case that uses the "primloc" module in a matsim setting.

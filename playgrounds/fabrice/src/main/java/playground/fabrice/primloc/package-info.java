@@ -5,4 +5,4 @@
  * 
  * 
  */
-package org.matsim.demandmodeling.primloc;
+package playground.fabrice.primloc;

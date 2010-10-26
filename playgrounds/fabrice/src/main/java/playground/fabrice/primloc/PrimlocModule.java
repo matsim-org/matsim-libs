@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.demandmodeling.primloc;
+package playground.fabrice.primloc;
 
 /**
  * This Module adapts the MATSIM-independent Primary Location Choice Model (PrimlocEngine),

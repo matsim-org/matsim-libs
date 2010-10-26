@@ -27,8 +27,9 @@ import nl.knaw.dans.common.dbflib.CorruptedTableException;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.demandmodeling.primloc.CumulativeDistribution;
 import org.matsim.testcases.MatsimTestCase;
+
+import playground.fabrice.primloc.CumulativeDistribution;
 
 
 public class MyCdfMapperTest extends MatsimTestCase{

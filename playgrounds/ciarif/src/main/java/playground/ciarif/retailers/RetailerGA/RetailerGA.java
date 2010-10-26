@@ -23,7 +23,7 @@ package playground.ciarif.retailers.RetailerGA;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import org.matsim.demandmodeling.primloc.CumulativeDistribution;
+import playground.fabrice.primloc.CumulativeDistribution;
 
 public class RetailerGA {
 	private final int populationSize;

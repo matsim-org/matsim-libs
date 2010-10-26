@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.demandmodeling.primloc;
+package playground.fabrice.primloc;
 
 import java.text.DecimalFormat;
 

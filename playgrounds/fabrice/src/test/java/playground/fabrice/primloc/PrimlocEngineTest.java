@@ -1,4 +1,4 @@
-package org.matsim.demandmodeling.primloc;
+package playground.fabrice.primloc;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -11,6 +11,8 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.testcases.MatsimTestCase;
+
+import playground.fabrice.primloc.PrimlocCore;
 
 import Jama.Matrix;
 
