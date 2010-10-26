@@ -43,6 +43,10 @@ public class LinkedListValueHashMap<KeyClass,ValueClass> {
 		return hashMap.get(key);
 	}
 	
+	public ValueClass getValue(KeyClass key){		
+		return get(key).get(0);
+	}
+	
 	private void initKey(KeyClass key){
 		if (!hashMap.containsKey(key)){
 			hashMap.put(key, new LinkedList<ValueClass>());
