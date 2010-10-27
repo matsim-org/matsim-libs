@@ -25,8 +25,15 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 
 
-/**
- * Provides methods of an agent that is not driving.
+/**Towards a concept for status pointers:<ul>
+ * <li> Let us start with the PlanElements Iterator.
+ * </li><li> Re-using standard iterators does not make sense since those are always <i>between</i> elements,
+ * but we need a "current" here.
+ * </li><li> So we could say getPrev and getNext.
+ * </li><li> How do we insert and remove?  In ArrayList, the Iterator fails if there is insert/remove
+ * outside of the iterator.  But here, we cannot move the iterator away from its current position.  
+ * </ul>
+ * 
  * 
  * @author dgrether
  *
