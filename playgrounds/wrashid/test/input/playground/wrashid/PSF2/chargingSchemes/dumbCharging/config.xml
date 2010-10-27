@@ -104,7 +104,7 @@
 	
 	
 	<module name="parallelEventHandling">
-    <param name="numberOfThreads" value="2" />
+    <param name="numberOfThreads" value="1" />
 	</module>
 	
 	<module name="PSF">
