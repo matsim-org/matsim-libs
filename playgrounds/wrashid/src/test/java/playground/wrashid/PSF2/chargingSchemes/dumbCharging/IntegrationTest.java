@@ -35,14 +35,31 @@ import playground.wrashid.PSF2.chargingSchemes.dumbCharging.PSSControlerDumbChar
 public class IntegrationTest extends MatsimTestCase {
 
 	public void testBasic(){
+		
+		
+		
+		LinkedList<String> allowedChargingLocations=new LinkedList<String>();
+		
+		allowedChargingLocations.add("home");
+		allowedChargingLocations.add("work");
+		
+		
+		ParametersPSF2.setChargingLocationFilter(null);
+		
+		ParametersPSF2.setChargingLocationFilter(allowedChargingLocations);
+		
 		PSSControler pssControler=new PSSControlerDumbCharging("test/input/playground/wrashid/PSF2/chargingSchemes/dumbCharging/config.xml", null);
 		pssControler.runMATSimIterations();
 		
 		LinkedList<ChargeLog> chargingTimesForAgent255 = ParametersPSF2.chargingTimes.get(new IdImpl(255)).getChargingTimes();
+		assertEquals(2, chargingTimesForAgent255.size());
 		assertEquals(10*3600*1000.0, chargingTimesForAgent255.getLast().getEndSOC());
 		
 		LinkedList<ChargeLog> chargingTimesForAgent253 = ParametersPSF2.chargingTimes.get(new IdImpl(253)).getChargingTimes();
+		assertEquals(2, chargingTimesForAgent255.size());
 		assertEquals(10*3600*1000.0, chargingTimesForAgent253.getFirst() .getEndSOC());
+		
+		ParametersPSF2.setChargingLocationFilter(null);
 		
 	} 
 	
