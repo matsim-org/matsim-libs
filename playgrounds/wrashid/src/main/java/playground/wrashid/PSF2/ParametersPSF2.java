@@ -32,6 +32,7 @@ import playground.wrashid.PSF2.vehicle.energyConsumption.EnergyConsumptionTable;
 import playground.wrashid.PSF2.vehicle.energyStateMaintainance.EnergyStateMaintainer;
 import playground.wrashid.PSF2.vehicle.vehicleFleet.FleetInitializer;
 import playground.wrashid.PSF2.vehicle.vehicleFleet.Vehicle;
+import playground.wrashid.lib.obj.GeneralLogObject;
 import playground.wrashid.lib.obj.LinkedListValueHashMap;
 
 public class ParametersPSF2 {
@@ -60,7 +61,9 @@ public class ParametersPSF2 {
 
 
 	public static ActivityIntervalTracker_NonParallelizableHandler activityIntervalTracker;
-	
+
+	private static GeneralLogObject generalLogObject;
+	private static GeneralLogObject iterationLogObject;
 	
 	public static void initVehicleFleet(Controler controler){
 		ParametersPSF2.vehicles=ParametersPSF2.fleetInitializer.getVehicles(controler.getPopulation().getPersons().keySet(), ParametersPSF2.energyStateMaintainer);
@@ -80,5 +83,21 @@ public class ParametersPSF2 {
 	
 	private static boolean chargingAtAllActivityLocationsAllowed(){
 		return allowedChargingLocations==null;
+	}
+
+	public static void setPSFGeneralLog(GeneralLogObject generalLog) {
+		ParametersPSF2.generalLogObject=generalLog;
+	}
+	
+	public static GeneralLogObject getPSFGeneralLog() {
+		return ParametersPSF2.generalLogObject;
+	}
+
+	public static GeneralLogObject getPSFIterationLog() {
+		return ParametersPSF2.iterationLogObject;
+	}
+	
+	public static void setPSFIterationLog(GeneralLogObject iterationLog) {
+		iterationLogObject=iterationLog;
 	}
 }

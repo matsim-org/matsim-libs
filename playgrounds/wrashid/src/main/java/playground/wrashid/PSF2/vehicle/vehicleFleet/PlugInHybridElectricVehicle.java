@@ -39,7 +39,7 @@ public class PlugInHybridElectricVehicle extends Vehicle {
 	private double batteryMinThresholdInJoule;
 	private double currentBatteryChargeInJoule;
 	
-	double electricEnergyUseInJouleDuringDayForDriving;
+	protected double electricEnergyUseInJouleDuringDayForDriving;
 	
 	public PlugInHybridElectricVehicle(EnergyStateMaintainer energyStateMaintainer, Id vehicleClassId) {
 		super(energyStateMaintainer, vehicleClassId);

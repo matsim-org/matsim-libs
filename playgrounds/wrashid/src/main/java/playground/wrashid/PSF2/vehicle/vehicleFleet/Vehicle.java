@@ -30,7 +30,7 @@ public abstract class Vehicle {
 	private final EnergyStateMaintainer energyStateMaintainer;
 	private Id vehicleClassId;
 	
-	private double energyConcumptionForWholeDayInJoule;
+	protected double energyConcumptionForWholeDayInJoule;
 
 	public Vehicle(EnergyStateMaintainer energyStateMaintainer, Id vehicleClassId){
 		this.energyStateMaintainer = energyStateMaintainer;

@@ -25,6 +25,7 @@ import org.matsim.core.api.experimental.events.ActivityEndEvent;
 
 import playground.wrashid.PSF2.vehicle.energyConsumption.EnergyConsumptionTable;
 import playground.wrashid.PSF2.vehicle.vehicleFleet.ConventionalVehicle;
+import playground.wrashid.PSF2.vehicle.vehicleFleet.ElectricVehicle;
 import playground.wrashid.PSF2.vehicle.vehicleFleet.PlugInHybridElectricVehicle;
 import playground.wrashid.PSF2.vehicle.vehicleFleet.Vehicle;
 import playground.wrashid.lib.GeneralLib;
@@ -45,7 +46,7 @@ public class ARTEMISEnergyStateMaintainer_StartChargingUponArrival extends Energ
 	}
 
 	public void chargeVehicle(Vehicle vehicle, double arrivalTime, double plugSizeInWatt, ActivityEndEvent event) {
-			if (vehicle instanceof PlugInHybridElectricVehicle) {
+			if (vehicle instanceof PlugInHybridElectricVehicle || vehicle instanceof ElectricVehicle) {
 				PlugInHybridElectricVehicle phev = (PlugInHybridElectricVehicle) vehicle;
 				double departureTime = event.getTime();
 				double chargingDuration;
@@ -61,6 +62,5 @@ public class ARTEMISEnergyStateMaintainer_StartChargingUponArrival extends Energ
 					phev.centralizedCharging(arrivalTime, chargingDuration, plugSizeInWatt, event);
 				}
 			}
-		
 	}
 }

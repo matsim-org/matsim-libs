@@ -27,11 +27,16 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
+import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
+import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.mobsim.framework.events.SimulationBeforeCleanupEvent;
 
 import playground.wrashid.PSF.ParametersPSF;
 import playground.wrashid.PSF.ParametersPSFMutator;
@@ -42,10 +47,12 @@ import playground.wrashid.PSF.energy.AfterSimulationListener;
 import playground.wrashid.PSF.energy.SimulationStartupListener;
 import playground.wrashid.PSF.energy.charging.ChargingTimes;
 import playground.wrashid.PSF.energy.consumption.LogEnergyConsumption;
+import playground.wrashid.PSF.lib.PSFGeneralLib;
 import playground.wrashid.PSF.parking.LogParkingTimes;
 import playground.wrashid.PSF2.ParametersPSF2;
 import playground.wrashid.PSF2.vehicle.energyConsumption.EnergyConsumptionTable;
 import playground.wrashid.PSF2.vehicle.energyStateMaintainance.ARTEMISEnergyStateMaintainer_StartChargingUponArrival;
+import playground.wrashid.lib.obj.GeneralLogObject;
 
 public class PSSControlerDumbCharging extends PSSControler {
 
@@ -70,40 +77,50 @@ public class PSSControlerDumbCharging extends PSSControler {
 			controler = new Controler(configFilePath);
 		}
 
-		
-
 		controler.setOverwriteFiles(true);
 
 		initializeParametersPSF2(controler);
 
 		addSimulationStartupListener(controler, parameterPSFMutator);
-		
+
 		addAfterSimulationListener(controler);
+
+		controler.addControlerListener(new ShutdownListener() {
+			public void notifyShutdown(ShutdownEvent event) {
+				ParametersPSF2.getPSFGeneralLog().writeFileAndCloseStream();
+			}
+		});
 
 		controler.run();
 
 	}
-	
-	
-	
+
 	private void addAfterSimulationListener(Controler controler) {
 		controler.addControlerListener(new IterationEndsListener() {
-			
+
 			@Override
 			public void notifyIterationEnds(IterationEndsEvent event) {
-				ChargingTimes.writeChargingTimes(ParametersPSF2.chargingTimes, event.getControler().getControlerIO().getIterationFilename(event.getControler().getIterationNumber(), "chargingLog.txt"));
-				ChargingTimes.writeChargingTimes(ParametersPSF2.chargingTimes, event.getControler().getControlerIO().getOutputFilename("chargingLog.txt"));
-			
-				double[][] energyUsageStatistics = ChargingTimes.getEnergyUsageStatistics(ParametersPSF2.chargingTimes,ParametersPSF.getHubLinkMapping());
+				ChargingTimes.writeChargingTimes(ParametersPSF2.chargingTimes, event.getControler().getControlerIO()
+						.getIterationFilename(event.getControler().getIterationNumber(), "chargingLog.txt"));
+				ChargingTimes.writeChargingTimes(ParametersPSF2.chargingTimes, event.getControler().getControlerIO()
+						.getOutputFilename("chargingLog.txt"));
 
-				ChargingTimes.writeEnergyUsageStatisticsData(event.getControler().getControlerIO().getIterationFilename(event.getControler().getIterationNumber(), "vehicleEnergyConsumption.txt"), energyUsageStatistics);
-				ChargingTimes.writeVehicleEnergyConsumptionStatisticsGraphic(event.getControler().getControlerIO().getIterationFilename(event.getControler().getIterationNumber(), "vehicleEnergyConsumption.png"),energyUsageStatistics);
+				double[][] energyUsageStatistics = ChargingTimes.getEnergyUsageStatistics(ParametersPSF2.chargingTimes,
+						ParametersPSF.getHubLinkMapping());
+
+				ChargingTimes.writeEnergyUsageStatisticsData(
+						event.getControler().getControlerIO()
+								.getIterationFilename(event.getControler().getIterationNumber(), "vehicleEnergyConsumption.txt"),
+						energyUsageStatistics);
+				ChargingTimes.writeVehicleEnergyConsumptionStatisticsGraphic(event.getControler().getControlerIO()
+						.getIterationFilename(event.getControler().getIterationNumber(), "vehicleEnergyConsumption.png"),
+						energyUsageStatistics);
 			}
 		});
-		
+
 	}
 
-	private static void addSimulationStartupListener(Controler controler, ParametersPSFMutator parameterPSFMutator){
+	private static void addSimulationStartupListener(Controler controler, ParametersPSFMutator parameterPSFMutator) {
 		SimulationStartupListener simulationStartupListener = new SimulationStartupListener(controler);
 		controler.addControlerListener(simulationStartupListener);
 		simulationStartupListener.addParameterPSFMutator(parameterPSFMutator);
@@ -117,18 +134,32 @@ public class PSSControlerDumbCharging extends PSSControler {
 		ParametersPSF2.energyConsumptionTable = new EnergyConsumptionTable(ParametersPSF2.pathToEnergyConsumptionTable);
 		ParametersPSF2.energyStateMaintainer = new ARTEMISEnergyStateMaintainer_StartChargingUponArrival(
 				ParametersPSF2.energyConsumptionTable);
-		ParametersPSF2.chargingTimes=new HashMap<Id, ChargingTimes>();
-		
-		ParametersPSF2.controler = controler;
-		ParametersPSF2.activityIntervalTracker=new ActivityIntervalTracker_NonParallelizableHandler();
-		
-		controler.addControlerListener(new StartupListener() {
+		ParametersPSF2.chargingTimes = new HashMap<Id, ChargingTimes>();
 
-			@Override
+		ParametersPSF2.controler = controler;
+		ParametersPSF2.activityIntervalTracker = new ActivityIntervalTracker_NonParallelizableHandler();
+
+		controler.addControlerListener(new StartupListener() {
 			public void notifyStartup(StartupEvent event) {
 				ParametersPSF2.initVehicleFleet(event.getControler());
+				ParametersPSF2.setPSFGeneralLog(new GeneralLogObject(event.getControler().getControlerIO()
+						.getOutputFilename("PSFGeneralLog.txt")));
 			}
 		});
+
+		controler.addControlerListener(new BeforeMobsimListener() {
+			public void notifyBeforeMobsim(BeforeMobsimEvent event) {
+				ParametersPSF2.setPSFIterationLog(new GeneralLogObject(event.getControler().getControlerIO()
+						.getIterationFilename(event.getControler().getIterationNumber(), "PSFIterationLog.txt")));
+			}
+		});
+
+		controler.addControlerListener(new AfterMobsimListener() {
+			public void notifyAfterMobsim(AfterMobsimEvent event) {
+				ParametersPSF2.getPSFIterationLog().writeFileAndCloseStream();
+			}
+		});
+
 	}
 
 }

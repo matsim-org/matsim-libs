@@ -16,6 +16,10 @@ public class DebugLib {
 		}
 	}
 	
+	public static void stopSystemAndReportInconsistency(String errorString){
+		throw new Error("system is in inconsistent state: " + errorString);
+	}
+	
 	public static void stopSystemAndReportInconsistency(){
 		throw new Error("system is in inconsistent state");
 	}

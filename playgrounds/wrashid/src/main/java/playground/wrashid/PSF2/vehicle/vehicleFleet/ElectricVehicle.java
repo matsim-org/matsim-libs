@@ -24,24 +24,15 @@ import org.matsim.api.core.v01.Id;
 
 import playground.wrashid.PSF2.vehicle.energyStateMaintainance.EnergyStateMaintainer;
 
-/*
- * 
- */
+
 public class ElectricVehicle extends PlugInHybridElectricVehicle {
 
 	public ElectricVehicle(EnergyStateMaintainer energyStateMaintainer, Id vehicleClassId) {
 		super(energyStateMaintainer, vehicleClassId);
 	}
 
-	// we can track here, how much the battery was over used (the vehicle ran out of fuel).
-	double batteryOverUsageInkWh;
-
-	@Override
-	public void updateEnergyState(double energyConsumptionOnLinkInJoule) {
-		logEnergyConsumption(energyConsumptionOnLinkInJoule);
-		
-		// TODO: cont here furthe...
-		
+	public double getBatteryOverForWholeDayUsageInJoules(){
+		return energyConcumptionForWholeDayInJoule-electricEnergyUseInJouleDuringDayForDriving;
 	}
 	
 	
