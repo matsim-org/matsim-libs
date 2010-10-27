@@ -50,10 +50,15 @@ public class MATSim4UrbanSimTest extends MatsimTestCase{
 	
 	private static String destinationDir = null;
 	
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
+	@Rule 
+	public MatsimTestUtils utils = new MatsimTestUtils();
 	
 	@Test
 	public void testMATSimConfig(){
+		
+//		utils.starting(method)
+//		System.out.println( utils.getInputDirectory() );
+		
 		log.info("Starting testMATSimConfig run: Testing if MATSim config is valid.");
 		prepareTest("matsim_config_test_run.xml");
 		// remove temp directories
