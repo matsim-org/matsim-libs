@@ -20,17 +20,21 @@
 
 package playground.jjoubert.roadpricing.network;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.run.NetworkCleaner;
 import org.matsim.utils.gis.matsim2esri.network.CapacityBasedWidthCalculator;
 import org.matsim.utils.gis.matsim2esri.network.FeatureGeneratorBuilderImpl;
@@ -53,16 +57,25 @@ public class cleanGautengNetwork {
 	private String inputNetwork;
 	private String outputNetwork;
 	private String outputShapefile;
+	private String laneDefinitionFolder;
 	
-	private String tempFile = "/Users/johanwjoubert/Desktop/Temp/tempMap.xml.gz";
+	private String tempFile1 = "/Users/johanwjoubert/Desktop/Temp/tempMap1.xml.gz";
+	private String tempFile2 = "/Users/johanwjoubert/Desktop/Temp/tempNetwork.xml.gz";
 
 	/**
 	 * Class to instantiate a Gauteng network cleaner for the SANRAL project.
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		if(args.length == 3){
-			File f = new File(args[0]);
+		cleanGautengNetwork cn = new cleanGautengNetwork();
+		cn.log.info("Number of arguments: " + args.length);
+		if(args.length == 4){
+			cn.inputNetwork = args[0];
+			cn.laneDefinitionFolder = args[1];
+			cn.outputNetwork = args[2];
+			cn.outputShapefile = args[3];
+
+			File f = new File(cn.inputNetwork);
 			if(!f.exists() || !f.canRead()){
 				throw new RuntimeException("Network file " + args[0] + "does not exist.");
 			}
@@ -70,10 +83,7 @@ public class cleanGautengNetwork {
 			throw new RuntimeException("Need an input and output network file path specified.");
 		}
 		
-		cleanGautengNetwork cn = new cleanGautengNetwork();
-		cn.inputNetwork = args[0];
-		cn.outputNetwork = args[1];
-		cn.outputShapefile = args[2];
+		                              
 		cn.log.info("Gauteng network cleaner created.");
 		
 		/*
@@ -81,16 +91,21 @@ public class cleanGautengNetwork {
 		 * make sure that all the necessary files you require ARE in place, and
 		 * that you use the RIGHT files. 
 		 */
-		cn.removeIdentifiedLinks(cn.inputNetwork, cn.tempFile);
-		cn.cleanNetwork(cn.tempFile, cn.outputNetwork);
+//		cn.removeIdentifiedLinks(cn.inputNetwork, cn.tempFile1);
+//		cn.cleanNetwork(cn.tempFile1, cn.tempFile2);
+		cn.updateLaneDefinitions(cn.inputNetwork, cn.outputNetwork);		
+		
 		cn.writeNetworkToShapefile(cn.outputNetwork);
 		
 		
-		
-		File tempFile = new File(cn.tempFile);
-		boolean deleted = tempFile.delete();
-		if(!deleted && tempFile.exists()){
-			cn.log.warn("Could not delete the file " + cn.tempFile);
+		boolean deleted1 = new File(cn.tempFile1).delete();
+		boolean deleted2 = new File(cn.tempFile2).delete(); 
+		if(!deleted1 || !deleted2){
+			cn.log.warn("Could not delete one or both of the temporary files:");
+			cn.log.warn("   " + cn.tempFile1);
+			cn.log.warn("   " + cn.tempFile2);
+		} else{
+			cn.log.info("Cleaned temporary files.");
 		}
 		
 		cn.log.info("----------------------------");
@@ -107,34 +122,78 @@ public class cleanGautengNetwork {
 	}
 	
 	/**
-	 * Method to correct capacities on the SANRAL network. 
+	 * Method to correct lane definitions on the SANRAL network.
 	 */
-	private void updateCapacities(String fileToRead){
-		this.log.info("Updating capacities...");
+	private void updateLaneDefinitions(String networkToRead, String networkToWrite){
+		this.log.info("Updating lane definitions...");
 		sc = new ScenarioImpl();
 		NetworkReaderMatsimV1 nwr = new NetworkReaderMatsimV1(sc);
 		try {
-			nwr.parse(fileToRead);
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
+			nwr.parse(networkToRead);
+		} catch (SAXException e1) {
+			e1.printStackTrace();
+		} catch (ParserConfigurationException e1) {
+			e1.printStackTrace();
+		} catch (IOException e1) {
+			e1.printStackTrace();
 		}
-		
-		// N1
-		
-		
-		
+
+		File folder = new File(this.laneDefinitionFolder);
+		if(folder.isDirectory()){
+			for(int i = 1; i <= 6; i++){
+				File f = new File(this.laneDefinitionFolder + "/Lanes" + i +".txt");
+				if(f.exists() && f.canRead()){
+					/*
+					 * Read all the link Ids and set their number of lanes.
+					 */
+					String line = null;
+					try {
+						BufferedReader br = IOUtils.getBufferedReader(f.getAbsolutePath());
+						try{
+							while((line = br.readLine()) != null){
+								if(!line.startsWith("%")){
+									Integer id = Integer.parseInt(line);
+									Link l = this.sc.getNetwork().getLinks().get(new IdImpl(id));
+									if(l != null){
+										double oldLanes = l.getNumberOfLanes();
+										double oldCap = l.getCapacity();
+										l.setNumberOfLanes(i);
+										l.setCapacity(i*(oldCap / oldLanes));
+									} else{
+										this.log.warn("Could not find link " + line);
+									}
+								}else{
+									// Skip the line, it is a comment.						
+								}
+							}
+						}finally{
+							br.close();
+						}
+					} catch (FileNotFoundException e) {
+						e.printStackTrace();
+					} catch (IOException e) {
+						e.printStackTrace();
+					} catch (NumberFormatException e){
+						this.log.error("The line " + line + " is not a parsable integer.");
+						e.printStackTrace();
+					}
+				}
+			}
+		} else{
+			this.log.warn(this.laneDefinitionFolder + " is not a folder!");
+		}
 		this.log.info("Done.");
+		
+		NetworkWriter nww = new NetworkWriter(sc.getNetwork());
+		nww.write(networkToWrite);
 	}
+	
 	
 	/**
 	 * Reading in the uncleaned network.
 	 */
 	private void readNetwork(String networkToRead){
-		this.log.info("Reading cleaned network from " + this.inputNetwork);
+		this.log.info("Reading cleaned network from " + networkToRead);
 		sc = new ScenarioImpl();
 		
 		try {

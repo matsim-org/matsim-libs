@@ -43,8 +43,8 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.demandmodeling.primloc.CumulativeDistribution;
 
-import playground.fabrice.primloc.CumulativeDistribution;
 import playground.jjoubert.CommercialTraffic.Chain;
 import playground.jjoubert.CommercialTraffic.Vehicle;
 import playground.jjoubert.Utilities.MyVehicleIdentifier;

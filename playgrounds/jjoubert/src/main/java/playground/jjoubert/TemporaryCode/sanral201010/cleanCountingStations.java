@@ -34,9 +34,12 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.counts.Count;
@@ -46,6 +49,7 @@ import org.matsim.counts.MatsimCountsReader;
 import org.xml.sax.SAXException;
 
 import playground.jjoubert.Utilities.FileSampler.MyFileFilter;
+import ucar.nc2.iosp.mcidas.McGridDefRecord;
 
 /**
  * Class to remove {@link Count} stations from {@link Counts} files.
@@ -65,7 +69,19 @@ public class cleanCountingStations {
 	 * <li> <b>root</b> the absolute path of the folder in which the {@link Counts} 
 	 * 		files are located.
 	 * <li> <b>listFile</b> the absolute path of the flat file indicating which
-	 * 		{@link Count} stations to remove.  
+	 * 		{@link Count} stations to remove.
+	 * 
+	 * 		<br><br>The following arguments are required, but may be "null":<br><br>
+	 *   
+	 * <li> <b>positionFile</b> the absolute path of the flat file indicating the
+	 * 		counting station number and its coordinates, typically in decimal 
+	 * 		degrees using {@link TransformationFactory#WGS84}. For each station 
+	 * 		a {@link String} description of the direction(s) serviced by the
+	 * 		counting station. This is used to establish the coordinates for the
+	 * 		{@link Count} to try and position the two directions on opposite
+	 * 		sides of the road in the <code>kmz</code> counts comparison file. 
+	 * <li> <b>linkFile</b> the absolute path of the file that has, for each
+	 * 		{@link Count} (CsId) a link Id (LocId). 
 	 * </ol>
 	 */
 	public static void main(String[] args) {
@@ -275,12 +291,12 @@ public class cleanCountingStations {
 						}		
 					}
 				}
-				CountsWriter cw = new CountsWriter(csNew);
-				cw.write(file.getAbsolutePath());				
-				
 				/*
 				 * Write the cleaned counting stations.
 				 */
+				CountsWriter cw = new CountsWriter(csNew);
+				cw.write(file.getAbsolutePath());				
+				
 			} catch (SAXException e) {
 				e.printStackTrace();
 			} catch (ParserConfigurationException e) {
