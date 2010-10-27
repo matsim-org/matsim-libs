@@ -45,7 +45,21 @@ public interface Mobsim extends IOSimulation, ObservableSimulation {
 
 	AgentCounterI getAgentCounter();
 
+	/**Method that inserts the agent (back) into the mobsim, where the agent will be at an activity until its scheduled end
+	 * (coming from the plan).
+	 * 
+	 * @param personAgent
+	 */
 	void scheduleActivityEnd(PersonAgent personAgent);
+
+	/**Method that reschedules the activity end for an agent that is already at an activity.  Necessary for within-day replanning.
+	 * 
+	 * @param agent
+	 * @param oldTime - time when activity end was scheduled previously.  Sometimes necessary so that our book-keeping about
+	 * alive agents remains correct. 
+	 * @param newTime - time when the activity end is now scheduled.  This is here so that "oldTime" and "newTime" do not get
+	 * confused.
+	 */
 	void rescheduleActivityEnd(final PersonAgent agent, final double oldTime, final double newTime ) ;
 
 
