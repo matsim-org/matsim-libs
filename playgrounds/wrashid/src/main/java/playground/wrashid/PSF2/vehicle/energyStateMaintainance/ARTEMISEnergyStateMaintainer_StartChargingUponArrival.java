@@ -31,39 +31,36 @@ import playground.wrashid.lib.GeneralLib;
 
 public class ARTEMISEnergyStateMaintainer_StartChargingUponArrival extends EnergyStateMaintainer {
 
-	
-	
 	public ARTEMISEnergyStateMaintainer_StartChargingUponArrival(EnergyConsumptionTable energyConsumptionTable) {
 		super(energyConsumptionTable);
 	}
 
 	@Override
 	public void processVehicleEnergyState(Vehicle vehicle, double timeSpendOnLink, Link link) {
-		double energyConsumptionOnLinkInJoule=energyConsumptionTable.getEnergyConsumptionInJoule(vehicle.getVehicleClassId(),vehicle.getAverageSpeedOfVehicleOnLink(timeSpendOnLink, link),link.getFreespeed(),link.getLength());
+			double energyConsumptionOnLinkInJoule = energyConsumptionTable.getEnergyConsumptionInJoule(vehicle.getVehicleClassId(),
+					vehicle.getAverageSpeedOfVehicleOnLink(timeSpendOnLink, link), link.getFreespeed(), link.getLength());
+
+			vehicle.updateEnergyState(energyConsumptionOnLinkInJoule);
 		
-		vehicle.updateEnergyState(energyConsumptionOnLinkInJoule);
 	}
-	
-	
-	
-	public void chargeVehicle(Vehicle vehicle,double arrivalTime, double plugSizeInWatt, ActivityEndEvent event){
-		if (vehicle instanceof PlugInHybridElectricVehicle){
-			PlugInHybridElectricVehicle phev=(PlugInHybridElectricVehicle) vehicle;
-			double departureTime=event.getTime();
-			double chargingDuration;
-			
-			double maxChargingAvailableInJoule=GeneralLib.getIntervalDuration(arrivalTime, departureTime)*plugSizeInWatt;
-			
-			if (phev.getRequiredBatteryCharge()>0){
-				if (phev.getRequiredBatteryCharge()<maxChargingAvailableInJoule){
-					chargingDuration=phev.getRequiredBatteryCharge()/plugSizeInWatt;
-				} else {
-					chargingDuration=maxChargingAvailableInJoule/plugSizeInWatt;
+
+	public void chargeVehicle(Vehicle vehicle, double arrivalTime, double plugSizeInWatt, ActivityEndEvent event) {
+			if (vehicle instanceof PlugInHybridElectricVehicle) {
+				PlugInHybridElectricVehicle phev = (PlugInHybridElectricVehicle) vehicle;
+				double departureTime = event.getTime();
+				double chargingDuration;
+
+				double maxChargingAvailableInJoule = GeneralLib.getIntervalDuration(arrivalTime, departureTime) * plugSizeInWatt;
+
+				if (phev.getRequiredBatteryCharge() > 0) {
+					if (phev.getRequiredBatteryCharge() < maxChargingAvailableInJoule) {
+						chargingDuration = phev.getRequiredBatteryCharge() / plugSizeInWatt;
+					} else {
+						chargingDuration = maxChargingAvailableInJoule / plugSizeInWatt;
+					}
+					phev.centralizedCharging(arrivalTime, chargingDuration, plugSizeInWatt, event);
 				}
-				phev.centralizedCharging(arrivalTime,chargingDuration, plugSizeInWatt, event);
 			}
-		}
+		
 	}
-	
-	
 }

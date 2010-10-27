@@ -107,7 +107,7 @@ public class PSSControlerDumbCharging extends PSSControler {
 		SimulationStartupListener simulationStartupListener = new SimulationStartupListener(controler);
 		controler.addControlerListener(simulationStartupListener);
 		simulationStartupListener.addParameterPSFMutator(parameterPSFMutator);
-		simulationStartupListener.addEventHandler(new LinkEnergyConsumptionTracker());
+		simulationStartupListener.addEventHandler(new LinkEnergyConsumptionTracker_NonParallelizableHandler());
 		simulationStartupListener.addEventHandler(ParametersPSF2.activityIntervalTracker);
 		controler.addControlerListener(new DumbChargingAfterSim());
 	}
@@ -120,7 +120,7 @@ public class PSSControlerDumbCharging extends PSSControler {
 		ParametersPSF2.chargingTimes=new HashMap<Id, ChargingTimes>();
 		
 		ParametersPSF2.controler = controler;
-		ParametersPSF2.activityIntervalTracker=new ActivityIntervalTracker();
+		ParametersPSF2.activityIntervalTracker=new ActivityIntervalTracker_NonParallelizableHandler();
 		
 		controler.addControlerListener(new StartupListener() {
 

@@ -31,17 +31,26 @@ import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 
 import playground.wrashid.PSF2.ParametersPSF2;
 import playground.wrashid.PSF2.vehicle.vehicleFleet.Vehicle;
+import playground.wrashid.lib.DebugLib;
 import playground.wrashid.lib.GeneralLib;
 import playground.wrashid.lib.obj.TwoHashMapsConcatenated;
 
-public class LinkEnergyConsumptionTracker implements LinkEnterEventHandler, LinkLeaveEventHandler, AgentWait2LinkEventHandler {
+/**
+ * There is a race condition between two handlers: LinkEnergyConsumptionTracker
+ * and ActivityIntervalTracker. Therefore use just one thread when using parallelEventHandling
+ * 
+ * @author wrashid
+ * 
+ */
+public class LinkEnergyConsumptionTracker_NonParallelizableHandler implements LinkEnterEventHandler, LinkLeaveEventHandler,
+		AgentWait2LinkEventHandler {
 
 	// personId,linkId,timeOfLinkEnterance
-	TwoHashMapsConcatenated<Id,Id,Double> linkEntranceTime=new TwoHashMapsConcatenated<Id, Id, Double>(); 
-	
+	TwoHashMapsConcatenated<Id, Id, Double> linkEntranceTime = new TwoHashMapsConcatenated<Id, Id, Double>();
+
 	@Override
 	public void reset(int iteration) {
-		linkEntranceTime=new TwoHashMapsConcatenated<Id, Id, Double>();
+		linkEntranceTime = new TwoHashMapsConcatenated<Id, Id, Double>();
 	}
 
 	@Override
@@ -51,12 +60,13 @@ public class LinkEnergyConsumptionTracker implements LinkEnterEventHandler, Link
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		Link link=ParametersPSF2.controler.getNetwork().getLinks().get(event.getLinkId());
-		Vehicle vehicle=ParametersPSF2.vehicles.getValue(event.getPersonId());
-		
-		Double linkEnteranceTime=linkEntranceTime.get(event.getPersonId(), event.getLinkId());
-		if (linkEnteranceTime!=null){
-			double timeSpendOnLink=GeneralLib.getIntervalDuration(linkEnteranceTime, event.getTime());
+
+		Link link = ParametersPSF2.controler.getNetwork().getLinks().get(event.getLinkId());
+		Vehicle vehicle = ParametersPSF2.vehicles.getValue(event.getPersonId());
+
+		Double linkEnteranceTime = linkEntranceTime.get(event.getPersonId(), event.getLinkId());
+		if (linkEnteranceTime != null) {
+			double timeSpendOnLink = GeneralLib.getIntervalDuration(linkEnteranceTime, event.getTime());
 			ParametersPSF2.energyStateMaintainer.processVehicleEnergyState(vehicle, timeSpendOnLink, link);
 		}
 	}

@@ -33,10 +33,18 @@ import playground.wrashid.PSF.ParametersPSF;
 import playground.wrashid.PSF.energy.charging.ChargingTimes;
 import playground.wrashid.PSF2.ParametersPSF2;
 import playground.wrashid.PSF2.vehicle.vehicleFleet.Vehicle;
+import playground.wrashid.lib.DebugLib;
 import playground.wrashid.lib.GeneralLib;
 import playground.wrashid.lib.obj.TwoHashMapsConcatenated;
-
-public class ActivityIntervalTracker implements ActivityStartEventHandler, ActivityEndEventHandler{
+/**
+ * 
+ * There is a race condition between two handlers: LinkEnergyConsumptionTracker
+ * and ActivityIntervalTracker. Therefore use just one thread when using parallelEventHandling.
+ * 
+ * @author wrashid
+ *
+ */
+public class ActivityIntervalTracker_NonParallelizableHandler implements ActivityStartEventHandler, ActivityEndEventHandler{
 
 	// personId, activityStartTime
 	HashMap<Id,ActivityEndEvent> endTimeOfFirstActivity=new HashMap<Id, ActivityEndEvent>();
@@ -52,9 +60,17 @@ public class ActivityIntervalTracker implements ActivityStartEventHandler, Activ
 		
 		ParametersPSF2.chargingTimes=new HashMap<Id, ChargingTimes>();
 	}
+	
+	
+	
 
 	public void handleLastActivity(){
 		for (ActivityEndEvent event:endTimeOfFirstActivity.values()){
+			
+			if (!ParametersPSF2.isChargingPossibleAtActivityLocation(event.getActType())){
+				return;
+			}
+			
 			Vehicle vehicle=ParametersPSF2.vehicles.getValue(event.getPersonId());
 			
 			Double actStartTime=activityStartTime.get(event.getPersonId(), event.getLinkId());
@@ -65,6 +81,12 @@ public class ActivityIntervalTracker implements ActivityStartEventHandler, Activ
 	
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
+		
+		if (!ParametersPSF2.isChargingPossibleAtActivityLocation(event.getActType())){
+			return;
+		}
+		
+		
 		Vehicle vehicle=ParametersPSF2.vehicles.getValue(event.getPersonId());
 		
 		Double actStartTime=activityStartTime.get(event.getPersonId(), event.getLinkId());

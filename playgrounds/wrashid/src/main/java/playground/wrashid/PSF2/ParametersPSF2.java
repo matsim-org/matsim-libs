@@ -21,12 +21,13 @@
 package playground.wrashid.PSF2;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.controler.Controler;
 
 import playground.wrashid.PSF.energy.charging.ChargingTimes;
-import playground.wrashid.PSF2.chargingSchemes.dumbCharging.ActivityIntervalTracker;
+import playground.wrashid.PSF2.chargingSchemes.dumbCharging.ActivityIntervalTracker_NonParallelizableHandler;
 import playground.wrashid.PSF2.vehicle.energyConsumption.EnergyConsumptionTable;
 import playground.wrashid.PSF2.vehicle.energyStateMaintainance.EnergyStateMaintainer;
 import playground.wrashid.PSF2.vehicle.vehicleFleet.FleetInitializer;
@@ -37,7 +38,7 @@ public class ParametersPSF2 {
 
 	public static String pathToEnergyConsumptionTable="c:\\data\\My Dropbox\\ETH\\Projekte\\IATBR2009\\old\\matsim\\input\\runRW1002\\VehicleEnergyConsumptionRegressionTable.txt";
 	
-	
+	private static LinkedList<String> allowedChargingLocations=null; 
 	
 	public static FleetInitializer fleetInitializer;
 	public static LinkedListValueHashMap<Id, Vehicle> vehicles;
@@ -58,10 +59,26 @@ public class ParametersPSF2 {
 
 
 
-	public static ActivityIntervalTracker activityIntervalTracker;
+	public static ActivityIntervalTracker_NonParallelizableHandler activityIntervalTracker;
 	
 	
 	public static void initVehicleFleet(Controler controler){
 		ParametersPSF2.vehicles=ParametersPSF2.fleetInitializer.getVehicles(controler.getPopulation().getPersons().keySet(), ParametersPSF2.energyStateMaintainer);
 	};
+	
+	public static void setChargingLocationFilter(LinkedList<String> allowedChargingLocations){
+		ParametersPSF2.allowedChargingLocations=allowedChargingLocations;
+	}
+	
+	public static boolean isChargingPossibleAtActivityLocation(String actType){
+		if (chargingAtAllActivityLocationsAllowed()){
+			return true;
+		}
+		
+		return allowedChargingLocations.contains(actType);
+	}
+	
+	private static boolean chargingAtAllActivityLocationsAllowed(){
+		return allowedChargingLocations==null;
+	}
 }
