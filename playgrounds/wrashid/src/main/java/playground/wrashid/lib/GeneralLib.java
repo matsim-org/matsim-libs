@@ -647,7 +647,7 @@ public class GeneralLib {
 		} catch (Exception e){
 			e.printStackTrace();
 			
-			throw new Error("Error reading the file");
+			throw new Error("Error reading the file: " + fileName);
 		}		
 				
 		
