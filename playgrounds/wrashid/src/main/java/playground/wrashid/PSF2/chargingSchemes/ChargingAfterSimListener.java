@@ -18,14 +18,14 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.wrashid.PSF2.chargingSchemes.dumbCharging;
+package playground.wrashid.PSF2.chargingSchemes;
 
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 
 import playground.wrashid.PSF2.ParametersPSF2;
 
-public class DumbChargingAfterSim implements AfterMobsimListener {
+public class ChargingAfterSimListener implements AfterMobsimListener {
 
 	@Override
 	public void notifyAfterMobsim(AfterMobsimEvent event) {

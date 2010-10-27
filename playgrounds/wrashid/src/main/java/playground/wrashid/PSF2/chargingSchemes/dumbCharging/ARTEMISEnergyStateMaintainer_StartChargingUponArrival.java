@@ -18,12 +18,13 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.wrashid.PSF2.vehicle.energyStateMaintainance;
+package playground.wrashid.PSF2.chargingSchemes.dumbCharging;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
 
 import playground.wrashid.PSF2.vehicle.energyConsumption.EnergyConsumptionTable;
+import playground.wrashid.PSF2.vehicle.energyStateMaintainance.EnergyStateMaintainer;
 import playground.wrashid.PSF2.vehicle.vehicleFleet.ConventionalVehicle;
 import playground.wrashid.PSF2.vehicle.vehicleFleet.ElectricVehicle;
 import playground.wrashid.PSF2.vehicle.vehicleFleet.PlugInHybridElectricVehicle;

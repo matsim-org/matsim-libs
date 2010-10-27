@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.wrashid.PSF2.chargingSchemes.dumbCharging;
+package playground.wrashid.PSF2.chargingSchemes;
 
 import java.util.HashMap;
 

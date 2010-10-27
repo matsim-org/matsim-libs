@@ -50,8 +50,11 @@ import playground.wrashid.PSF.energy.consumption.LogEnergyConsumption;
 import playground.wrashid.PSF.lib.PSFGeneralLib;
 import playground.wrashid.PSF.parking.LogParkingTimes;
 import playground.wrashid.PSF2.ParametersPSF2;
+import playground.wrashid.PSF2.chargingSchemes.ActivityIntervalTracker_NonParallelizableHandler;
+import playground.wrashid.PSF2.chargingSchemes.ChargingAfterSimListener;
+import playground.wrashid.PSF2.chargingSchemes.ChargingFleetInitializer;
+import playground.wrashid.PSF2.chargingSchemes.LinkEnergyConsumptionTracker_NonParallelizableHandler;
 import playground.wrashid.PSF2.vehicle.energyConsumption.EnergyConsumptionTable;
-import playground.wrashid.PSF2.vehicle.energyStateMaintainance.ARTEMISEnergyStateMaintainer_StartChargingUponArrival;
 import playground.wrashid.lib.obj.GeneralLogObject;
 
 public class PSSControlerDumbCharging extends PSSControler {
@@ -126,11 +129,11 @@ public class PSSControlerDumbCharging extends PSSControler {
 		simulationStartupListener.addParameterPSFMutator(parameterPSFMutator);
 		simulationStartupListener.addEventHandler(new LinkEnergyConsumptionTracker_NonParallelizableHandler());
 		simulationStartupListener.addEventHandler(ParametersPSF2.activityIntervalTracker);
-		controler.addControlerListener(new DumbChargingAfterSim());
+		controler.addControlerListener(new ChargingAfterSimListener());
 	}
 
 	private static void initializeParametersPSF2(Controler controler) {
-		ParametersPSF2.fleetInitializer = new DumbChargingFleetInitializer();
+		ParametersPSF2.fleetInitializer = new ChargingFleetInitializer();
 		ParametersPSF2.energyConsumptionTable = new EnergyConsumptionTable(ParametersPSF2.pathToEnergyConsumptionTable);
 		ParametersPSF2.energyStateMaintainer = new ARTEMISEnergyStateMaintainer_StartChargingUponArrival(
 				ParametersPSF2.energyConsumptionTable);
