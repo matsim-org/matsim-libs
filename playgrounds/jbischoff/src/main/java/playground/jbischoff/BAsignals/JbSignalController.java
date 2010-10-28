@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package playground.jbischoff.BAsignals;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -27,9 +26,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
-import org.jfree.util.Log;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.signalsystems.control.SignalGroupState;
 import org.matsim.signalsystems.model.SignalController;
 import org.matsim.signalsystems.model.SignalGroup;
@@ -39,13 +36,13 @@ import org.matsim.signalsystems.model.SignalSystem;
 
 /**
  * @author dgrether
- *
+ * @author jbischoff
  */
 
 
 public class JbSignalController  implements SignalController {
 	public static final String IDENTIFIER = "JBSignalController";
-	private static final int PHASESTEPPROLONGER = 4;
+	private static final int PHASESTEPPROLONGER = 5;
 	private static final Logger log = Logger.getLogger(JbSignalController.class);
 
 	private SignalSystem system;
@@ -63,7 +60,6 @@ public class JbSignalController  implements SignalController {
 
 	
 	public JbSignalController(AdaptiveControllHead ach) {
-		
 		this.adaptiveDroppings=new HashMap<Id,Integer>();
 		this.adaptiveOnsets= new HashMap<Id,Integer>();
 		this.maxDrop= new HashMap<Id,Integer>();
@@ -71,8 +67,6 @@ public class JbSignalController  implements SignalController {
 		this.minOn = new HashMap<Id,Integer>();
 		this.adaptiveControllHead=ach;
 		this.gapsAtSecond = new HashMap<Double,List<Id>>();
-		
-		
 		
 	}
 	

@@ -57,14 +57,14 @@ public class JbSignalBuilder implements SignalSystemsModelBuilder {
 		SignalSystemsManager manager = dataBuilder.createSignalSystemManager();
 		//2.) SignalSystems
 		dataBuilder.createAndAddSignalSystemsFromData(manager);
-		//3.) Signals then SignalGroups then SignalController
 		manager.getEventsManager().addHandler(collh);
+		//3.) Signals then SignalGroups then SignalController
 		for (SignalSystem system : manager.getSignalSystems().values()){
 			dataBuilder.createAndAddSignals(system);
 			dataBuilder.createAndAddSignalGroupsFromData(system);
 			this.createAndAddSignalSystemControllerFromData(system);
 		}
-		adaptiveControllHead.sizeDownPlans(45);
+//		adaptiveControllHead.sizeDownPlans(45);
 		//4.) AmberLogic
 		dataBuilder.createAndAddAmberLogic(manager);
 		return manager;

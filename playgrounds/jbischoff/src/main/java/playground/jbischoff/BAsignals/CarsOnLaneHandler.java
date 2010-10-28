@@ -27,7 +27,6 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.events.LaneEnterEvent;
 import org.matsim.core.events.handler.LaneEnterEventHandler;
 import org.matsim.signalsystems.model.SignalSystem;

@@ -37,7 +37,6 @@ import org.matsim.signalsystems.data.signalcontrol.v20.SignalSystemControllerDat
 public class AdaptiveControllHead {
 private Map<Id,SignalSystemControllerData> sscmap;
 private Map<Id,SignalSystem> signalSystemsMap;
-private Map<Double,List<Id>> timeGapLanes;
 private Map<Id,Integer> minOnset;
 private Map<Id,Integer> maxOnset;
 private Map<Id,Integer> minDropping;
@@ -48,7 +47,6 @@ public AdaptiveControllHead() {
 sscmap = new HashMap<Id,SignalSystemControllerData>();
 this.adaptiveSignalGroups = new LinkedList<Id>();
 this.signalSystemsMap = new HashMap<Id,SignalSystem>();
-this.timeGapLanes = new HashMap<Double,List<Id>>();
 this.maxDropping= new  HashMap<Id, Integer>();
 this.maxOnset= new  HashMap<Id, Integer>();
 this.minDropping= new  HashMap<Id, Integer>();
@@ -136,17 +134,7 @@ public void sizeDownPlans(int seconds){
 	}
 }
 
-public void addGapSignalGroupatSecond(Double timeSeconds, Id gapLane){
-	if (this.timeGapLanes.get(timeSeconds)==null){
-		this.timeGapLanes.put(timeSeconds, new LinkedList<Id>());
-	}
-	this.timeGapLanes.get(timeSeconds).add(gapLane);
-	 
-	
-}
-public Map<Double, List<Id>> getTimeGapSignalGroups() {
-	return timeGapLanes;
-}
+
 
 public List<Id> getAdaptiveSignalGroups() {
 	return adaptiveSignalGroups;
