@@ -6,13 +6,13 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 
-import playground.christoph.withinday.mobsim.WithinDayPersonAgent;
 import playground.christoph.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
 import playground.christoph.withinday.utils.EditRoutes;
 
@@ -31,35 +31,30 @@ public class ReplannerOldPeople extends WithinDayDuringActivityReplanner {
 	/**
 	 * return value (in future it might be true, when successful call)
 	 */
-	public boolean doReplanning(PersonAgent driverAgent) {
+	public boolean doReplanning(PersonAgent personAgent) {
 		
 		// If we don't have a valid Replanner.
 		// (only extra security)
 		if (this.routeAlgo == null) return false;
 		
-		// If we don't have a valid WithinDayPersonAgent
-		// (only extra security)
-		if (driverAgent == null) return false;
-		
-		WithinDayPersonAgent withinDayPersonAgent = null;
-		if (!(driverAgent instanceof WithinDayPersonAgent)) return false;
-		else
-		{
-			withinDayPersonAgent = (WithinDayPersonAgent) driverAgent;
-		}
-		
-		PersonImpl person = (PersonImpl)withinDayPersonAgent.getPerson();
+		// If we don't have a valid personAgent (only extra security)
+		if (personAgent == null) return false;
+				
+		Person person = personAgent.getPerson();
 		PlanImpl selectedPlan = (PlanImpl)person.getSelectedPlan(); 
 		
 		// If we don't have a selected plan
 		// (only extra security)
 		if (selectedPlan == null) return false;
 		
-		Activity currentActivity = withinDayPersonAgent.getCurrentActivity();
-		
-		// If we don't have a current Activity
-		// (only extra security)
-		if (currentActivity == null) return false;
+		Activity currentActivity;		
+		/*
+		 *  Get the current PlanElement and check if it is an Activity
+		 */
+		PlanElement currentPlanElement = personAgent.getCurrentPlanElement();
+		if (currentPlanElement instanceof Activity) {
+			currentActivity = (Activity) currentPlanElement;
+		} else return false;
 		
 		// modify plan (the agent wants to perform an additional work activity at link 22 before going home
 		// therefore the agent needs to create new route and re-routing for the rest of the plan.
