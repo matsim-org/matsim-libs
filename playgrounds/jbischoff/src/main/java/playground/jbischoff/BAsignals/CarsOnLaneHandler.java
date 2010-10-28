@@ -21,6 +21,8 @@
 package playground.jbischoff.BAsignals;
 
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -34,26 +36,37 @@ public class CarsOnLaneHandler implements LaneEnterEventHandler {
 	private AdaptiveControllHead adaptiveControllHead;
 	private Map<Id,Double> timeStamp;
 	private static final Logger log = Logger.getLogger(CarsOnLaneHandler.class);
+	private Map<Double,List<Id>> gapsAtSecond;	
+	private Map<Id,SignalSystem> signalSystemMap; 
 
 //	Scenario scenario;
 	
 public CarsOnLaneHandler(AdaptiveControllHead ach){
 this.adaptiveControllHead=ach;
 this.timeStamp = new HashMap<Id,Double>();
+this.gapsAtSecond = new HashMap<Double,List<Id>>();
+this.signalSystemMap = new HashMap<Id,SignalSystem>();
+}
+public  void addSystem(SignalSystem system){
+	this.signalSystemMap.put(system.getId(),system);
 }
 	@Override
 	public void handleEvent(LaneEnterEvent event) {
-		if (this.laneIsAdaptive(event.getLaneId())){
+		
+		if (this.laneIsAdaptive(event.getLaneId())&(!event.getLaneId().toString().endsWith(".ol"))){
+			//log.info(event.getTime()+" time in l");
 			if (!timeStamp.containsKey(event.getLaneId()))
 			{
 			timeStamp.put(event.getLaneId(),event.getTime());	
 			}
 			double timeGap = calcTimeGap(event);
-			if ((timeGap!=0)&&(timeGap<20)){
-				log.info(event.getTime()+": Time Gap on Lane" +event.getLaneId()+ " is "+timeGap);
+			if ((timeGap!=0)&&(timeGap<10)){
+				//log.info(event.getTime()+": Time Gap on Lane " +event.getLaneId()+ " , sg: "+this.adaptiveControllHead.getSignalGroupforLaneId(event.getLaneId()) +" is "+timeGap);
+				Id sysid = this.adaptiveControllHead.getSignalSystemforLaneId(event.getLaneId());
+				JbSignalController jbs =  (JbSignalController) this.signalSystemMap.get(sysid).getSignalController();
+				jbs.addGapAtSecond(event.getTime()+1.0, this.adaptiveControllHead.getSignalGroupforLaneId(event.getLaneId()));
 			}
 			timeStamp.put(event.getLaneId(),event.getTime());	
-			
 			
 		} 
 		
@@ -63,6 +76,14 @@ this.timeStamp = new HashMap<Id,Double>();
 		double timeGap = event.getTime() - this.timeStamp.get(event.getLaneId()); 
 		return timeGap;
 }
+	
+public List<Id> getGapListatSecond(double second){
+	if (!this.gapsAtSecond.containsKey(second)){
+	this.gapsAtSecond.put(second,new LinkedList<Id>());
+	}
+	return this.gapsAtSecond.get(second);
+	
+} 
 	
 private boolean laneIsAdaptive(Id laneid)
 	{
@@ -80,6 +101,9 @@ private boolean laneIsAdaptive(Id laneid)
 	public void reset(int iteration) {
 		// TODO Auto-generated method stub
 
+	}
+	public AdaptiveControllHead getAdaptiveControllHead() {
+		return adaptiveControllHead;
 	}
 
 }

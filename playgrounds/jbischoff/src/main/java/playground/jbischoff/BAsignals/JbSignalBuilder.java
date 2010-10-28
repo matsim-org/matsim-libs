@@ -42,6 +42,7 @@ public class JbSignalBuilder implements SignalSystemsModelBuilder {
 	private FromDataBuilder dataBuilder;
 	private SignalsData signalsData;
 	private AdaptiveControllHead adaptiveControllHead;
+	private CarsOnLaneHandler collh;
 	
 	public JbSignalBuilder(SignalsData signalsData, FromDataBuilder dataBuilder){
 		this.dataBuilder = dataBuilder;
@@ -51,11 +52,13 @@ public class JbSignalBuilder implements SignalSystemsModelBuilder {
 	
 	@Override
 	public SignalSystemsManager createAndInitializeSignalSystemsManager() {
+		collh = new CarsOnLaneHandler(this.adaptiveControllHead);
 		//1.) SignalSystemsManager
 		SignalSystemsManager manager = dataBuilder.createSignalSystemManager();
 		//2.) SignalSystems
 		dataBuilder.createAndAddSignalSystemsFromData(manager);
 		//3.) Signals then SignalGroups then SignalController
+		manager.getEventsManager().addHandler(collh);
 		for (SignalSystem system : manager.getSignalSystems().values()){
 			dataBuilder.createAndAddSignals(system);
 			dataBuilder.createAndAddSignalGroupsFromData(system);
@@ -64,8 +67,6 @@ public class JbSignalBuilder implements SignalSystemsModelBuilder {
 		adaptiveControllHead.sizeDownPlans(45);
 		//4.) AmberLogic
 		dataBuilder.createAndAddAmberLogic(manager);
-		CarsOnLaneHandler collh = new CarsOnLaneHandler(this.adaptiveControllHead);
-		manager.getEventsManager().addHandler(collh);
 		return manager;
 	}
 	
@@ -77,18 +78,23 @@ public class JbSignalBuilder implements SignalSystemsModelBuilder {
 			
 			this.adaptiveControllHead.addAdaptiveSignalSystem(system, systemControlData);
 			log.info("Treating sigsy: "+system.getId() +" as adaptive");
+			this.collh.addSystem(system);
 			
 		}
-		SignalController controller = new JbSignalController();
+		SignalController controller = new JbSignalController(this.adaptiveControllHead);
 		controller.setSignalSystem(system);
 		system.setSignalSystemController(controller);
 		for (SignalPlanData planData : systemControlData.getSignalPlanData().values()){
-			SignalPlan plan = new DatabasedSignalPlan(planData);
+			
+			SignalPlan plan = new JbSignalPlan(planData,this.adaptiveControllHead);
 			controller.addPlan(plan);
+			
 			
 		}
 		
 	}
+
+
 
 
 }
