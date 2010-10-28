@@ -102,8 +102,8 @@ public class ResizeLinksByCount3 extends AbstractResizeLinksByCount{
 		this.newCounts.setYear(2009);
 		
 		for(Entry<String, String> e : this.shortNameMap.entrySet()){
-			if(this.net.getNodes().containsKey(new IdImpl(e.getKey())) && this.oldCounts.getCounts().containsKey(new IdImpl(e.getValue()))){
-				node =  this.net.getNodes().get(new IdImpl(e.getKey()));
+			if(this.newNet.getNodes().containsKey(new IdImpl(e.getKey())) && this.oldCounts.getCounts().containsKey(new IdImpl(e.getValue()))){
+				node =  this.newNet.getNodes().get(new IdImpl(e.getKey()));
 				oldCount = this.oldCounts.getCounts().get(new IdImpl(e.getValue()));
 				
 				//nodes with countingStations on it contain only one outlink
@@ -130,11 +130,11 @@ public class ResizeLinksByCount3 extends AbstractResizeLinksByCount{
 		Double capPerLane;
 		
 		for(Count c : this.newCounts.getCounts().values()){
-			countLink = (LinkImpl) this.net.getLinks().get(c.getLocId());
+			countLink = (LinkImpl) this.newNet.getLinks().get(c.getLocId());
 			origId = countLink.getOrigId();
 			maxCount = c.getMaxVolume().getValue();
 			
-			for(Link l : this.net.getLinks().values()){
+			for(Link l : this.newNet.getLinks().values()){
 				if(((LinkImpl)l).getOrigId().equals(origId)){
 					capPerLane = l.getCapacity() / l.getNumberOfLanes();
 					// if maxCount < cap set cap to maxCount and keep nrOfLanes

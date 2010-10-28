@@ -20,16 +20,15 @@
 package playground.droeder.osm;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -53,10 +52,13 @@ public abstract class AbstractResizeLinksByCount {
 	protected Map<String, String> shortNameMap;
 	
 	//interns
-	protected Network net;
+	protected Network newNet;
 	private Network oldNet;
-	private Map<String, SortedMap<Integer, Coord>> lineStrings = null;
-	private Map<String, SortedMap<String, String>> attributes = null;
+
+	private Map<Id, Link> modifiedLinks2shp = null;
+	private Map<Id, SortedMap<String, String>> modAttributes = null;
+	private Map<Id, Link> unmodifiedLinks2shp = null;
+	private Map<Id, SortedMap<String, String>> unmodAttributes = null;
 		
 	public AbstractResizeLinksByCount(String networkFile, Counts counts, Map<String, String> shortNameMap){
 		this.netFile = networkFile;
@@ -70,10 +72,8 @@ public abstract class AbstractResizeLinksByCount {
 		this.resize();
 		this.writeNewNetwork();
 
-		//null-pointer
-//		if(!(lineStrings == null)){
-//			writeResizedLinks2Shape();
-//		}
+		writeModifiedLinks2Shape();
+		writeUnmodifiedLinks2Shape();
 	}
 
 	private void prepareNetwork(String netFile2) {
@@ -83,7 +83,7 @@ public abstract class AbstractResizeLinksByCount {
 		log.info("Reading " + this.netFile);
 		new MatsimNetworkReader(oldScenario).readFile(this.netFile);
 		new MatsimNetworkReader(newScenario).readFile(this.netFile);
-		this.net= newScenario.getNetwork();
+		this.newNet= newScenario.getNetwork();
 		this.oldNet = oldScenario.getNetwork();
 	}
 
@@ -93,47 +93,52 @@ public abstract class AbstractResizeLinksByCount {
 
 	private void writeNewNetwork() {
 		log.info("Writing resized network to " + this.outFile + "!");
-		new NetworkWriter(this.net).write(this.outFile);
+		new NetworkWriter(this.newNet).write(this.outFile + ".xml");
 	}
 	
-	protected void addLineString(List<Id> links){
-		if(links == null) return;
-		
-		if(lineStrings == null){
-			this.lineStrings = new HashMap<String, SortedMap<Integer,Coord>>();
-			this.attributes = new HashMap<String, SortedMap<String,String>>();
+	
+	protected void addLink2shp(Id link){
+		if(modifiedLinks2shp == null){
+			this.modifiedLinks2shp = new HashMap<Id, Link>();
+			this.modAttributes = new HashMap<Id, SortedMap<String,String>>();
 		}
+		this.modifiedLinks2shp .put(link, this.newNet.getLinks().get(link));
 		
-		Integer count = 0;
-		String origId = null;
-		LinkImpl l = null;
-		SortedMap<Integer, Coord> lineString = new TreeMap<Integer, Coord>();
-		SortedMap<String, String> attributes = new TreeMap<String, String>();
+		SortedMap<String, String> attrib = new TreeMap<String, String>();
+		attrib.put("oldCap", String.valueOf(this.oldNet.getLinks().get(link).getCapacity()));
+		attrib.put("newCap", String.valueOf(this.newNet.getLinks().get(link).getCapacity()));
+		attrib.put("origId", ((LinkImpl)this.oldNet.getLinks().get(link)).getOrigId());
 		
-		for(Id link : links){
-			l = (LinkImpl) this.net.getLinks().get(link);
-			origId = l.getOrigId();
-			lineString.put(count, l.getFromNode().getCoord());
-			attributes.put(l.getId().toString() + "_new", String.valueOf(l.getCapacity()));
-			attributes.put(l.getId() + "_old", String.valueOf(this.oldNet.getLinks().get(link).getCapacity()));
-			
-			count++;
-			if(count == links.size()){
-				lineString.put(count, l.getToNode().getCoord());
-			}
-			
-		}
-		if(lineString.size() > 1){
-			this.lineStrings.put(origId, lineString);
-			this.attributes.put(origId, attributes);
-		}
-		
+		this.modAttributes.put(link, attrib);
 	}
 	
-	private void writeResizedLinks2Shape(){
-		log.info("Writing shape with resized links...");
-		DaShapeWriter.writeDefaultLineString2Shape(this.outFile + "reszized.shp", "resizedLinks", lineStrings, attributes);
+	private void writeModifiedLinks2Shape(){
+		log.info("Writing modified links to *.shp...");
+		DaShapeWriter.writeLinks2Shape(this.outFile + "_modified.shp", modifiedLinks2shp, modAttributes);
 		log.info("done...");
-		
+	}
+	
+	private void writeUnmodifiedLinks2Shape(){
+		//preprocess
+		if(!(modifiedLinks2shp==null)){
+			this.unmodifiedLinks2shp = new HashMap<Id, Link>();
+			this.unmodAttributes = new HashMap<Id, SortedMap<String,String>>();
+			
+			for(Link l : this.newNet.getLinks().values()){
+				if(!modifiedLinks2shp.containsKey(l.getId())){
+					this.unmodifiedLinks2shp .put(l.getId(), l);
+					
+					SortedMap<String, String> attrib = new TreeMap<String, String>();
+					attrib.put("Cap", String.valueOf(l.getCapacity()));
+					
+					this.unmodAttributes.put(l.getId(), attrib);
+				}
+			}
+		}else{
+			unmodifiedLinks2shp =(Map<Id, Link>) this.oldNet.getLinks();
+		}
+		log.info("Writing unmodified links to *.shp...");
+		DaShapeWriter.writeLinks2Shape(this.outFile + "_unmodified.shp", unmodifiedLinks2shp, unmodAttributes);
+		log.info("done...");
 	}
 }

@@ -98,7 +98,14 @@ public class DaShapeWriter {
 		
 		write(createPointDistanceFeatures(points,attributes), fileName);
 	}
-	
+	/**
+	 * doesn't work!
+	 * @param fileName
+	 * @param name
+	 * @param lineStrings
+	 * @param attributes
+	 */
+	@Deprecated
 	public static void writeDefaultLineString2Shape(String fileName, String name,  Map<String, SortedMap<Integer, Coord>> lineStrings, Map<String, SortedMap<String, String>> attributes){
 		
 		if(attributes == null){

@@ -121,8 +121,8 @@ public class ResizeLinksByCount2 extends AbstractResizeLinksByCount{
 		this.newCounts.setYear(2009);
 		
 		for(Entry<String, String> e : this.shortNameMap.entrySet()){
-			if(this.net.getNodes().containsKey(new IdImpl(e.getKey())) && this.oldCounts.getCounts().containsKey(new IdImpl(e.getValue()))){
-				node =  this.net.getNodes().get(new IdImpl(e.getKey()));
+			if(this.newNet.getNodes().containsKey(new IdImpl(e.getKey())) && this.oldCounts.getCounts().containsKey(new IdImpl(e.getValue()))){
+				node =  this.newNet.getNodes().get(new IdImpl(e.getKey()));
 				oldCount = this.oldCounts.getCounts().get(new IdImpl(e.getValue()));
 				
 				//nodes with countingStations on it contain only one outlink
@@ -145,7 +145,7 @@ public class ResizeLinksByCount2 extends AbstractResizeLinksByCount{
 		this.origin2counts = new HashMap<String, List<Id>>();
 		String origId;
 		for(Id id : newCounts.getCounts().keySet()){
-			origId = ((LinkImpl) this.net.getLinks().get(id)).getOrigId();
+			origId = ((LinkImpl) this.newNet.getLinks().get(id)).getOrigId();
 			if(this.origin2counts.containsKey(origId)){
 				this.origin2counts.get(origId).add(id);
 			}else{
@@ -169,14 +169,13 @@ public class ResizeLinksByCount2 extends AbstractResizeLinksByCount{
 				log.error("no count registered for origId " + e.getKey());
 			}
 			
-//			this.addLineString(sortedLinks);
 			sortedLinks = null;
 		}
 		log.info("resizing finished...");
 	}
 	
 	private List<Id> sortLinks(String origId, Id countLoc){
-		LinkImpl countLocation = (LinkImpl) this.net.getLinks().get(countLoc);
+		LinkImpl countLocation = (LinkImpl) this.newNet.getLinks().get(countLoc);
 		LinkImpl cursor = countLocation;
 		String cursorOrigId = origId;
 		List<Id> sortedLinks = new ArrayList<Id>();
@@ -262,7 +261,7 @@ public class ResizeLinksByCount2 extends AbstractResizeLinksByCount{
 			
 			for(Id id : sortedLinks){
 				prevCountVal = prevCountVal + countDifference;
-				Link l = this.net.getLinks().get(id);
+				Link l = this.newNet.getLinks().get(id);
 				Double capPerLane = l.getCapacity() / l.getNumberOfLanes();
 				Integer nrOfNewLanes = null;
 
@@ -275,8 +274,9 @@ public class ResizeLinksByCount2 extends AbstractResizeLinksByCount{
 				else{
 					nrOfNewLanes = (int) (prevCountVal/capPerLane);
 				}
-				this.net.getLinks().get(id).setCapacity(prevCountVal*1.0);
-				this.net.getLinks().get(id).setNumberOfLanes(nrOfNewLanes);
+				this.newNet.getLinks().get(id).setCapacity(prevCountVal*1.0);
+				this.newNet.getLinks().get(id).setNumberOfLanes(nrOfNewLanes);
+				this.addLink2shp(id);
 			}
 			
 		}
@@ -285,7 +285,7 @@ public class ResizeLinksByCount2 extends AbstractResizeLinksByCount{
 
 	private void constantChanges(List<Id> sortedLinks, Id count){
 		Double maxCount = this.newCounts.getCount(count).getMaxVolume().getValue();
-		Link l = this.net.getLinks().get(count);
+		Link l = this.newNet.getLinks().get(count);
 		Double capPerLane = l.getCapacity() / l.getNumberOfLanes();
 		Integer nrOfNewLanes = null;
 
@@ -300,8 +300,9 @@ public class ResizeLinksByCount2 extends AbstractResizeLinksByCount{
 		}
 		
 		for(Id id : sortedLinks){
-			this.net.getLinks().get(id).setCapacity(maxCount);
-			this.net.getLinks().get(id).setNumberOfLanes(nrOfNewLanes);
+			this.newNet.getLinks().get(id).setCapacity(maxCount);
+			this.newNet.getLinks().get(id).setNumberOfLanes(nrOfNewLanes);
+			this.addLink2shp(id);
 		}
 	}
 

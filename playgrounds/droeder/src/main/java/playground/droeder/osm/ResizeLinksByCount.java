@@ -78,7 +78,7 @@ public class ResizeLinksByCount extends AbstractResizeLinksByCount{
 		}
 		
 		ResizeLinksByCount r = new ResizeLinksByCount(networkFile, counts, shortNameMap);
-		r.run("d:/VSP/output/osm_bb/counts_network_resized.xml");
+		r.run("d:/VSP/output/osm_bb/counts_network_resized");
 	}
 	
 	public ResizeLinksByCount(String networkFile, Counts counts, Map<String, String> shortNameMap){
@@ -92,7 +92,7 @@ public class ResizeLinksByCount extends AbstractResizeLinksByCount{
 		Integer nrOfNewLanes = null;
 
 		
-		for(Link l : net.getLinks().values()){
+		for(Link l : newNet.getLinks().values()){
 			
 			checkAndRegisterOrigId((LinkImpl) l);
 			
