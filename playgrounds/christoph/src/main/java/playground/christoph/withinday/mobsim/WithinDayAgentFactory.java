@@ -31,25 +31,15 @@ import org.matsim.ptproject.qsim.interfaces.Mobsim;
  * necessary when doing LeaveLinkReplanning.
  */
 public class WithinDayAgentFactory extends AgentFactory {
-
-//	protected Map<Id, PersonAgent> personAgents;
 	
 	public WithinDayAgentFactory(final Mobsim simulation) {
 		super(simulation);
-		
-//		personAgents = new HashMap<Id, PersonAgent>();
 	}
 
 	@Override
 	public DefaultPersonDriverAgent createPersonAgent(final Person p) {
 		WithinDayPersonAgent agent = new WithinDayPersonAgent(p, this.simulation);
-//		personAgents.put(agent.getPerson().getId(), agent);
 		return agent;
 	}
-	
-	// yyyy instead QSim.getAgents() is used now. christoph, oct'10
-//	public Map<Id, PersonAgent> getPersonAgents() {
-//		return this.personAgents;
-//	}
 	
 }

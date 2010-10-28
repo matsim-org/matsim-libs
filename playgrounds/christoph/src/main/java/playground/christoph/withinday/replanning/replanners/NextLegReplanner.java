@@ -24,11 +24,11 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.mobsim.framework.PersonAgent;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 
-import playground.christoph.withinday.mobsim.WithinDayPersonAgent;
 import playground.christoph.withinday.replanning.replanners.NextLegReplanner;
 import playground.christoph.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
 import playground.christoph.withinday.utils.EditRoutes;
@@ -67,29 +67,25 @@ public class NextLegReplanner extends WithinDayDuringActivityReplanner {
 		// If we don't have a valid Replanner.
 		if (this.routeAlgo == null) return false;
 		
-		// If we don't have a valid WithinDayPersonAgent
+		// If we don't have a valid personAgent
 		if (personAgent == null) return false;
-		
-		WithinDayPersonAgent withinDayPersonAgent = null;
-		if (!(personAgent instanceof WithinDayPersonAgent)) return false;
-		else
-		{
-			withinDayPersonAgent = (WithinDayPersonAgent) personAgent;
-		}
-		
-		PersonImpl person = (PersonImpl)withinDayPersonAgent.getPerson();
+				
+		Person person = personAgent.getPerson();
 		PlanImpl selectedPlan = (PlanImpl)person.getSelectedPlan(); 
 		
 		// If we don't have a selected plan
 		if (selectedPlan == null) return false;
 		
-		Activity currentActivity = withinDayPersonAgent.getCurrentActivity();
-		
-		// If we don't have a current Activity
-		if (currentActivity == null) return false;
+		Activity currentActivity;
+		/*
+		 *  Get the current PlanElement and check if it is an Activity
+		 */
+		PlanElement currentPlanElement = personAgent.getCurrentPlanElement();
+		if (currentPlanElement instanceof Activity) {
+			currentActivity = (Activity) currentPlanElement;
+		} else return false;
 		
 		Leg nextLeg = selectedPlan.getNextLeg(currentActivity);
-//		Activity nextActivity = selectedPlan.getNextActivity(nextLeg);	
 				
 		// If it is not a car Leg we don't replan it.
 //		if (!nextLeg.getMode().equals(TransportMode.car)) return false;

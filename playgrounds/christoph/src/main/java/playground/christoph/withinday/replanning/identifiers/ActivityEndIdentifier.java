@@ -28,6 +28,7 @@ import java.util.Set;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -79,13 +80,14 @@ public class ActivityEndIdentifier extends DuringActivityIdentifier {
 			Activity currentActivity;
 			Leg nextLeg;
 			Activity nextActivity;
-			
-			currentActivity = withinDayPersonAgent.getCurrentActivity();
-			
-			// If we don't have a current Activity
-			if (currentActivity == null) {
-				continue;
-			}
+
+			/*
+			 *  Get the current PlanElement and check if it is an Activity
+			 */
+			PlanElement currentPlanElement = withinDayPersonAgent.getCurrentPlanElement();
+			if (currentPlanElement instanceof Activity) {
+				currentActivity = (Activity) currentPlanElement;
+			} else continue;
 			
 			nextLeg = selectedPlan.getNextLeg(currentActivity);
 			if (nextLeg == null) {

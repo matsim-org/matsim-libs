@@ -34,16 +34,15 @@ import org.matsim.core.mobsim.framework.events.SimulationBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationBeforeSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationListener;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
+import org.matsim.ptproject.qsim.helpers.DefaultPersonDriverAgent;
 import org.matsim.ptproject.qsim.interfaces.Mobsim;
 
-import playground.christoph.withinday.mobsim.WithinDayPersonAgent;
 import playground.christoph.withinday.utils.EditRoutes;
 import playground.christoph.withinday.utils.ReplacePlanElements;
 
@@ -120,8 +119,9 @@ public class MyMobsimListener implements SimulationListener, SimulationBeforeSim
 		 *  Replan Routes
 		 */
 		// new Route for current Leg
-//		new EditRoutes().replanCurrentLegRoute(selectedPlan, currentLeg, ((WithinDayPersonAgent) personAgent).getCurrentNodeIndex(), routeAlgo, scenario.getNetwork(), now);
+		new EditRoutes().replanCurrentLegRoute(selectedPlan, currentLeg, ((DefaultPersonDriverAgent)personAgent).getCurrentNodeIndex(), routeAlgo, scenario.getNetwork(), now);
 		// ( compiles, but does not run, since agents are (deliberately) not instantiated as withindayreplanningagents.  kai, oct'10 )
+		// Adapted code, WithinDayPersonAgents are now only needed if they have to handle WithinDayReplanners. cdobler, oct'10
 		
 		// new Route for next Leg
 		Leg homeLeg = ((PlanImpl) selectedPlan).getNextLeg(newWorkAct);
@@ -130,7 +130,7 @@ public class MyMobsimListener implements SimulationListener, SimulationBeforeSim
 		// finally reset the cached Values of the PersonAgent - they may have changed!
 		personAgent.resetCaches();
 		
-		return true ;
+		return true;
 	}
 
 

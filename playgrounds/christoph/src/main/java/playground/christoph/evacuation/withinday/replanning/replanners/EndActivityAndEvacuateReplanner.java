@@ -20,6 +20,7 @@
 
 package playground.christoph.evacuation.withinday.replanning.replanners;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -27,20 +28,23 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.ptproject.qsim.helpers.DefaultPersonDriverAgent;
 
 import playground.christoph.evacuation.withinday.replanning.replanners.EndActivityAndEvacuateReplanner;
-import playground.christoph.withinday.mobsim.WithinDayPersonAgent;
 import playground.christoph.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
 import playground.christoph.withinday.utils.EditRoutes;
 
 public class EndActivityAndEvacuateReplanner extends WithinDayDuringActivityReplanner {
+	
+	private static final Logger log = Logger.getLogger(EndActivityAndEvacuateReplanner.class);
 	
 	/*package*/ EndActivityAndEvacuateReplanner(Id id, Scenario scenario) {
 		super(id, scenario);
@@ -49,25 +53,24 @@ public class EndActivityAndEvacuateReplanner extends WithinDayDuringActivityRepl
 	@Override
 	public boolean doReplanning(PersonAgent personAgent) {		
 		
-		// If we don't have a valid WithinDayPersonAgent
+		// If we don't have a valid PersonAgent
 		if (personAgent == null) return false;
-		
-		WithinDayPersonAgent withinDayPersonAgent = null;
-		if (!(personAgent instanceof WithinDayPersonAgent)) return false;
-		else {
-			withinDayPersonAgent = (WithinDayPersonAgent) personAgent;
-		}
 	
-		PersonImpl person = (PersonImpl)withinDayPersonAgent.getPerson();
+		Person person = personAgent.getPerson();
 		PlanImpl selectedPlan = (PlanImpl)person.getSelectedPlan(); 
 		
 		// If we don't have a selected plan
 		if (selectedPlan == null) return false;
 		
-		Activity currentActivity = withinDayPersonAgent.getCurrentActivity();
+		Activity currentActivity;
 		
-		// If we don't have a current Activity.
-		if (currentActivity == null) return false;
+		/*
+		 *  Get the current PlanElement and check if it is an Activity
+		 */
+		PlanElement currentPlanElement = personAgent.getCurrentPlanElement();
+		if (currentPlanElement instanceof Activity) {
+			currentActivity = (Activity) currentPlanElement;
+		} else return false;
 				
 		/*
 		 * If the agent is already at the end of his scheduled plan then
@@ -114,12 +117,28 @@ public class EndActivityAndEvacuateReplanner extends WithinDayDuringActivityRepl
 		new EditRoutes().replanFutureLegRoute(selectedPlan, legToRescue, routeAlgo);
 
 		/*
-		 * Reschedule the currently performed Activity in the QSim - there
+		 * Reschedule the currently performed Activity in the Mobsim - there
 		 * the activityEndsList has to be updated.
 		 */
-		withinDayPersonAgent.rescheduleCurrentActivity();
+		// yyyy a method getMobsim in MobimAgent would be useful here. cdobler, Oct'10
+		if (personAgent instanceof DefaultPersonDriverAgent) {
+			// yyyy do we have to check that? We have a currentActivity... cdobler, Oct'10
+			boolean found = ((DefaultPersonDriverAgent) personAgent).getQSimulation().getActivityEndsList().contains(this);
+			
+			// If the agent is not in the activityEndsList return without doing anything else.
+			if (!found) return false;
+			
+			double oldDepartureTime = personAgent.getDepartureTime();
 		
-		return true;
+			((DefaultPersonDriverAgent) personAgent).calculateDepartureTime(currentActivity);
+			double newDepartureTime = personAgent.getDepartureTime();
+			((DefaultPersonDriverAgent) personAgent).getQSimulation().rescheduleActivityEnd(personAgent, oldDepartureTime, newDepartureTime);
+			return true;
+		}
+		else {
+			log.warn("PersonAgent is no DefaultPersonDriverAgent - the new departure time cannot be calcualted!");
+			return false;
+		}		
 	}
 
 	/*

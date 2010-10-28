@@ -28,6 +28,8 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.utils.geometry.CoordUtils;
 
@@ -67,9 +69,17 @@ public class InsecureActivityPerformingIdentifier extends DuringActivityIdentifi
 			}
 			
 			/*
+			 *  Get the current PlanElement and check if it is an Activity
+			 */
+			Activity currentActivity;
+			PlanElement currentPlanElement = withinDayPersonAgent.getCurrentPlanElement();
+			if (currentPlanElement instanceof Activity) {
+				currentActivity = (Activity) currentPlanElement;
+			} else continue;
+			/*
 			 * Remove the Agent from the list, if the performed Activity is in a secure Area.
 			 */
-			double distance = CoordUtils.calcDistance(withinDayPersonAgent.getCurrentActivity().getCoord(), centerCoord);
+			double distance = CoordUtils.calcDistance(currentActivity.getCoord(), centerCoord);
 			if (distance > secureDistance) {
 				continue;
 			}
