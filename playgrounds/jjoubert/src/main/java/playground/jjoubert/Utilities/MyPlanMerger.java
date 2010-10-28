@@ -29,8 +29,12 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.basic.v01.IdImpl;
@@ -40,8 +44,8 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.population.algorithms.XY2Links;
 import org.xml.sax.SAXException;
 
-public class MyPlanJoiner {
-	private static final Logger log = Logger.getLogger(MyPlanJoiner.class);
+public class MyPlanMerger {
+	private static final Logger log = Logger.getLogger(MyPlanMerger.class);
 	private String baseFile;
 	private String addFile;
 	private String addNumber;
@@ -50,10 +54,25 @@ public class MyPlanJoiner {
 	private Scenario sc;
 	
 	/**
-	 * @param args
+	 * Class to merge one {@link Population} file with another. The first is referred 
+	 * to as the <i>base file</i>, and the second {@link Population} file is added 
+	 * to the first.
+	 * @param args {@link String}[] of arguments are all required, and in the 
+	 * 		following order:
+	 * <ol>
+	 *   <li> the absolute path of the base {@link Population} file;
+	 *   <li> the absolute path of the {@link Population} file to be added to the 
+	 *   		base file;
+	 *   <li> the first number to be used as {@link Id} for {@link Person}s when
+	 *   		added to the base file;
+	 *   <li> the absolute path of the merged {@link Population} file; and
+	 *   <li> the {@link Network} file to use when assigning a {@link Link} 
+	 *   		{@link Id} to each {@link Activity} of each {@link Person}
+	 *   		from both {@link Population} files.
+	 * </ol>
 	 */
 	public static void main(String[] args) {
-		MyPlanJoiner mpj = new MyPlanJoiner();
+		MyPlanMerger mpj = new MyPlanMerger();
 		if(args.length == 5){
 			mpj.baseFile = args[0];
 			mpj.addFile = args[1];
@@ -72,8 +91,8 @@ public class MyPlanJoiner {
 		log.info("        Writing to: " + mpj.outputFile);
 		log.info("");
 
-		mpj.preparePlanJoiner();
-		mpj.joinPlans();
+		mpj.preparePlanMerger();
+		mpj.mergePlans();
 		
 		log.info("------------------------------");
 		log.info("          Completed");
@@ -81,12 +100,16 @@ public class MyPlanJoiner {
 	}
 	
 	
-	public MyPlanJoiner() {
+	public MyPlanMerger() {
 		log.info("Successfully created the PlanJoiner.");
 	}
 	
-	
-	public void preparePlanJoiner(){
+	/**
+	 * The <i>base</i> {@link Population} and the {@link Network} is read, and
+	 * each {@link Activity} of each {@link Person} is assigned a {@link Link}{@link Id}
+	 * using {@link XY2Links#run(Plan)}.
+	 */
+	public void preparePlanMerger(){
 		sc = new ScenarioImpl();
 		MatsimPopulationReader mpr = new MatsimPopulationReader(sc);
 		NetworkReaderMatsimV1 nr = new NetworkReaderMatsimV1(sc);
@@ -108,8 +131,14 @@ public class MyPlanJoiner {
 		}
 	}
 	
-	
-	public void joinPlans(){
+	/**
+	 * Add each person from the additional file to the <i>base</i> file, assigning
+	 * each {@link Activity} to the {@link Network} using {@link XY2Links#run(Plan)}.
+	 * <b><i>Note:</i></b> A new person is created with an {@link Id} based on the
+	 * given initial number. Only the {@link Person}'s selected plan is used. In the 
+	 * end, the merged {@link Population} is written to the given output file.
+	 */
+	public void mergePlans(){
 		PopulationFactory pf = sc.getPopulation().getFactory();
 		int nextId = Integer.parseInt(addNumber);
 		XY2Links xy = new XY2Links((NetworkImpl) sc.getNetwork());

@@ -33,7 +33,8 @@ import nl.knaw.dans.common.dbflib.Record;
 import nl.knaw.dans.common.dbflib.Table;
 
 import org.apache.log4j.Logger;
-import org.matsim.demandmodeling.primloc.CumulativeDistribution;
+
+import playground.fabrice.primloc.CumulativeDistribution;
 
 
 public class MyCdfMapper {

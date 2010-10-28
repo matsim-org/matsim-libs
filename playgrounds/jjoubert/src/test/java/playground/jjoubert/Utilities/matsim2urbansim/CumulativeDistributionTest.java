@@ -24,8 +24,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.demandmodeling.primloc.CumulativeDistribution;
 import org.matsim.testcases.MatsimTestCase;
+
+import playground.fabrice.primloc.CumulativeDistribution;
 
 public class CumulativeDistributionTest extends MatsimTestCase{
 	private final Logger log = Logger.getLogger(CumulativeDistributionTest.class);

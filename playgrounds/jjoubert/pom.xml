@@ -32,6 +32,11 @@
     	<artifactId>dans-dbf-lib</artifactId>
     	<version>1.0.0-beta-07</version>
     </dependency>
+    <dependency>
+    	<groupId>playground</groupId>
+    	<artifactId>fabrice</artifactId>
+    	<version>0.2.0-SNAPSHOT</version>
+    </dependency>
   </dependencies>
   <build>
 	<plugins>
