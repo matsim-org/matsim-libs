@@ -28,11 +28,9 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.world.MatsimWorldReader;
-import org.matsim.world.World;
 
-import playground.fabrice.primloc.CumulativeDistribution;
-import playground.fabrice.primloc.PrimlocModule;
+import playground.balmermi.world.MatsimWorldReader;
+import playground.balmermi.world.World;
 
 /**
  * Test case that uses the "primloc" module in a matsim setting.

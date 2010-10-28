@@ -21,7 +21,8 @@ package playground.kai.urbansim;
 
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
-import org.matsim.world.Layer;
+
+import playground.balmermi.world.Layer;
 
 /**
  * Simple interface so that ReadFromUrbansimCellModel and ReadFromUrbansimParcelModel can be called via the same syntax.

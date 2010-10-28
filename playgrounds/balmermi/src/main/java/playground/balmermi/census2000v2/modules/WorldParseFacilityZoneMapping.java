@@ -21,7 +21,8 @@
 package playground.balmermi.census2000v2.modules;
 
 import org.apache.log4j.Logger;
-import org.matsim.world.World;
+
+import playground.balmermi.world.World;
 
 public class WorldParseFacilityZoneMapping {
 

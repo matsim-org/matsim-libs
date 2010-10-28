@@ -42,10 +42,10 @@ import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrices;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.world.Zone;
-import org.matsim.world.ZoneLayer;
 
 import playground.balmermi.census2000.data.Persons;
+import playground.balmermi.world.Zone;
+import playground.balmermi.world.ZoneLayer;
 
 public class PersonSetPrimLoc extends AbstractPersonAlgorithm implements PlanAlgorithm {
 

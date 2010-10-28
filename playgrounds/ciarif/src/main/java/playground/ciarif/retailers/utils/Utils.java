@@ -26,7 +26,8 @@ import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.world.World;
+
+import playground.balmermi.world.World;
 
 public abstract class Utils {
 

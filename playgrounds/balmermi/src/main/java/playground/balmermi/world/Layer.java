@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.world;
+package playground.balmermi.world;
 
 import java.util.ArrayList;
 import java.util.Map;

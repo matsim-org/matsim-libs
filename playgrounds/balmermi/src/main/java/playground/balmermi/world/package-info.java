@@ -8,4 +8,4 @@
  * 
  * Should be considered as deprecated.
  */
-package org.matsim.world;
+package playground.balmermi.world;

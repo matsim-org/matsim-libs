@@ -33,7 +33,6 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.knowledges.Knowledges;
-import org.matsim.world.World;
 
 import playground.balmermi.census2000.data.Municipalities;
 import playground.balmermi.census2000v2.data.Households;
@@ -47,6 +46,7 @@ import playground.balmermi.census2000v2.modules.PlansWriteCustomAttributes;
 import playground.balmermi.census2000v2.modules.PopulationAddCustomAttributes;
 import playground.balmermi.census2000v2.modules.WorldParseFacilityZoneMapping;
 import playground.balmermi.census2000v2.modules.WorldWriteFacilityZoneMapping;
+import playground.balmermi.world.World;
 
 public class IIDMGeneration {
 

@@ -54,8 +54,8 @@ import org.matsim.population.filters.PersonFilter;
 import org.matsim.population.filters.PersonIdFilter;
 import org.matsim.population.filters.RouteLinkFilter;
 import org.matsim.population.filters.SelectedPlanFilter;
-import org.matsim.world.World;
 
+import playground.balmermi.world.World;
 import playground.meisterk.org.matsim.run.facilities.ShopsOf2005ToFacilities;
 
 

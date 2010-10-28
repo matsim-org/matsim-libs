@@ -44,7 +44,8 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.population.filters.PersonIntersectAreaFilter;
-import org.matsim.world.World;
+
+import playground.balmermi.world.World;
 
 public class DilutedZurichFilter {
 

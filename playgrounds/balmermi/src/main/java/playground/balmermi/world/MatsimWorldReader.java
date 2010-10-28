@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.world;
+package playground.balmermi.world;
 
 import java.io.IOException;
 import java.util.Stack;

@@ -218,8 +218,8 @@ public class PopulationGenerator implements Runnable {
 
 		//Box-Muller-Method in order to get a normally distributed variable
 		double normal = Math.cos(2 * Math.PI * r1) * Math.sqrt(-2 * Math.log(r2));
-		//linear transformation in order to optain N[i,3600²]
-		double endTimeInSec = 60 * 60 * normal + i;
+		//linear transformation in order to optain N[i,7200²]
+		double endTimeInSec = 120 * 60 * normal + i;
 		return endTimeInSec;
 	}
 

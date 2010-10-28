@@ -35,12 +35,12 @@ import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.matrices.Matrices;
 import org.matsim.matrices.MatricesWriter;
 import org.matsim.matrices.MatsimMatricesReader;
-import org.matsim.world.World;
 
 import playground.balmermi.census2000.data.Households;
 import playground.balmermi.census2000.data.Municipalities;
 import playground.balmermi.census2000.data.Persons;
 import playground.balmermi.census2000.modules.PlansCreatePopulation;
+import playground.balmermi.world.World;
 
 public class PopulationCreation {
 

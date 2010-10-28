@@ -34,8 +34,6 @@ import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.matrices.Matrices;
 import org.matsim.matrices.MatricesWriter;
 import org.matsim.matrices.MatsimMatricesReader;
-import org.matsim.world.World;
-import org.matsim.world.ZoneLayer;
 
 import playground.balmermi.census2000.data.ActChains;
 import playground.balmermi.census2000.data.Households;
@@ -54,6 +52,8 @@ import playground.balmermi.census2000.modules.PersonSetSecLoc;
 import playground.balmermi.census2000.modules.PersonSummary;
 import playground.balmermi.census2000.modules.PersonZoneSummary;
 import playground.balmermi.census2000.modules.PersonsSummaryTable;
+import playground.balmermi.world.World;
+import playground.balmermi.world.ZoneLayer;
 
 public class InitDemandCreation {
 

@@ -31,8 +31,9 @@ import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.world.Layer;
-import org.matsim.world.Zone;
+
+import playground.balmermi.world.Layer;
+import playground.balmermi.world.Zone;
 
 public class Municipalities {
 

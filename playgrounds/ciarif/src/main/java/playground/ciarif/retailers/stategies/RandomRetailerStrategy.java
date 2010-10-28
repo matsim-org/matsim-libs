@@ -9,8 +9,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.world.World;
 
+import playground.balmermi.world.World;
 import playground.ciarif.retailers.data.FacilityRetailersImpl;
 import playground.ciarif.retailers.data.LinkRetailersImpl;
 import playground.ciarif.retailers.utils.Utils;

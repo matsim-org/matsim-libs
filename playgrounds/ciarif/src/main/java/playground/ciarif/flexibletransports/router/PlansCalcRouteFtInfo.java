@@ -8,10 +8,10 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.world.MatsimWorldReader;
-import org.matsim.world.World;
 import org.xml.sax.SAXException;
 
+import playground.balmermi.world.MatsimWorldReader;
+import playground.balmermi.world.World;
 import playground.ciarif.flexibletransports.config.FtConfigGroup;
 
 

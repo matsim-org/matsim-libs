@@ -38,10 +38,10 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.world.Zone;
-import org.matsim.world.ZoneLayer;
 
 import playground.balmermi.census2000.data.Persons;
+import playground.balmermi.world.Zone;
+import playground.balmermi.world.ZoneLayer;
 
 public class PersonZoneSummary extends AbstractPersonAlgorithm implements PlanAlgorithm {
 

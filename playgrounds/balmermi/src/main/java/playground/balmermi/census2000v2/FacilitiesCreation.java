@@ -30,13 +30,13 @@ import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.facilities.algorithms.FacilitiesCombine;
-import org.matsim.world.MatsimWorldReader;
-import org.matsim.world.World;
 
 import playground.balmermi.census2000.data.Municipalities;
 import playground.balmermi.census2000v2.modules.FacilitiesCreateBuildingsFromCensus2000;
 import playground.balmermi.census2000v2.modules.FacilitiesDistributeCenter;
 import playground.balmermi.census2000v2.modules.FacilitiesRenameAndRemoveNOGAActTypes;
+import playground.balmermi.world.MatsimWorldReader;
+import playground.balmermi.world.World;
 
 public class FacilitiesCreation {
 

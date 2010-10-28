@@ -38,9 +38,9 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.utils.misc.ConfigUtils;
-import org.matsim.world.World;
 
 import playground.balmermi.census2000v2.modules.PersonAssignToNetwork;
+import playground.balmermi.world.World;
 
 public class IIDMAssign2Network {
 

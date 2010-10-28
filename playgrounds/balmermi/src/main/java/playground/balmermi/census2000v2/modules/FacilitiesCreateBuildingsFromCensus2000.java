@@ -34,9 +34,9 @@ import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.world.Layer;
 
 import playground.balmermi.census2000v2.data.CAtts;
+import playground.balmermi.world.Layer;
 
 public class FacilitiesCreateBuildingsFromCensus2000 {
 

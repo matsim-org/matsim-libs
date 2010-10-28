@@ -12,8 +12,6 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.testcases.MatsimTestCase;
 
-import playground.fabrice.primloc.PrimlocCore;
-
 import Jama.Matrix;
 
 // FIXME this test-case has no Assert-statement, so it will always succeed!

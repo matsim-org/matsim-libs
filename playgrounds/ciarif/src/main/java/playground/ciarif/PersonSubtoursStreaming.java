@@ -31,12 +31,12 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.utils.misc.ConfigUtils;
-import org.matsim.world.MatsimWorldReader;
-import org.matsim.world.World;
 
 import playground.balmermi.census2000.data.Households;
 import playground.balmermi.census2000.data.Municipalities;
 import playground.balmermi.census2000.data.Persons;
+import playground.balmermi.world.MatsimWorldReader;
+import playground.balmermi.world.World;
 import playground.ciarif.models.subtours.PersonInitDemandSummaryTable;
 import playground.ciarif.models.subtours.PersonModeChoiceModel;
 

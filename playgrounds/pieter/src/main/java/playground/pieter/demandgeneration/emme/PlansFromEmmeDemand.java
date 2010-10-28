@@ -27,11 +27,12 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.world.World;
-import org.matsim.world.WorldUtils;
-import org.matsim.world.Zone;
-import org.matsim.world.ZoneLayer;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+
+import playground.balmermi.world.World;
+import playground.balmermi.world.WorldUtils;
+import playground.balmermi.world.Zone;
+import playground.balmermi.world.ZoneLayer;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;

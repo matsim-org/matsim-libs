@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.world;
+package playground.balmermi.world;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.basic.v01.IdImpl;

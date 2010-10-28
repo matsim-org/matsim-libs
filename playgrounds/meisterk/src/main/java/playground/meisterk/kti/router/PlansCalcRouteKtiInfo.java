@@ -30,10 +30,10 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.matrices.Matrices;
 import org.matsim.matrices.Matrix;
 import org.matsim.visum.VisumMatrixReader;
-import org.matsim.world.MatsimWorldReader;
-import org.matsim.world.World;
 import org.xml.sax.SAXException;
 
+import playground.balmermi.world.MatsimWorldReader;
+import playground.balmermi.world.World;
 import playground.meisterk.kti.config.KtiConfigGroup;
 
 

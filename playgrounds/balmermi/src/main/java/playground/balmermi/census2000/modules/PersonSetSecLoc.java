@@ -38,9 +38,9 @@ import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.world.Zone;
 
 import playground.balmermi.census2000.data.Persons;
+import playground.balmermi.world.Zone;
 
 public class PersonSetSecLoc extends AbstractPersonAlgorithm implements PlanAlgorithm {
 

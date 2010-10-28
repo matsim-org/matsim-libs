@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.world;
+package playground.balmermi.world;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -85,7 +85,7 @@ public class Zone extends AbstractLocation {
 	 * </p>
 	 *
 	 * @param coord
-	 * @see org.matsim.world.AbstractLocation#calcDistance(org.matsim.api.core.v01.Coord)
+	 * @see playground.balmermi.world.AbstractLocation#calcDistance(org.matsim.api.core.v01.Coord)
 	 * @return distance to that zone
 	 */
 	public final double calcDistance(final Coord coord) {

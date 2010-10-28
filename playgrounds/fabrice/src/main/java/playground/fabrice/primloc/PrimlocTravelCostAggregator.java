@@ -19,7 +19,8 @@
 
 package playground.fabrice.primloc;
 
-import org.matsim.world.Zone;
+import playground.balmermi.world.Zone;
+
 
 public interface PrimlocTravelCostAggregator {
 	double travelCost( Zone i, Zone j);

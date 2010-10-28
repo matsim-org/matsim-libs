@@ -1,7 +1,6 @@
 package playground.fabrice.primloc;
 
 
-import playground.fabrice.primloc.PrimlocCalibrationError;
 import Jama.Matrix;
 
 public class PrimlocCalibrationErrorMatrix implements PrimlocCalibrationError {

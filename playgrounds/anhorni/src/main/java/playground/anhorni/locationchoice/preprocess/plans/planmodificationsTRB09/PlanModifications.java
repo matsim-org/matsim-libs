@@ -29,8 +29,6 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.facilities.algorithms.WorldConnectLocations;
-import org.matsim.world.World;
 
 public class PlanModifications {
 

@@ -37,8 +37,9 @@ import org.matsim.knowledges.KnowledgesImpl;
 import org.matsim.population.algorithms.PersonCreatePlanFromKnowledge;
 import org.matsim.population.algorithms.PlansCreateFromNetwork;
 import org.matsim.population.algorithms.PlansDefineKnowledge;
-import org.matsim.world.MatsimWorldReader;
-import org.matsim.world.World;
+
+import playground.balmermi.world.MatsimWorldReader;
+import playground.balmermi.world.World;
 
 public class Mode_choice_main {
 

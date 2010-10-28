@@ -15,10 +15,11 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkReaderMatsimV1;
-import org.matsim.world.Layer;
-import org.matsim.world.MatsimWorldReader;
-import org.matsim.world.World;
-import org.matsim.world.Zone;
+
+import playground.balmermi.world.Layer;
+import playground.balmermi.world.MatsimWorldReader;
+import playground.balmermi.world.World;
+import playground.balmermi.world.Zone;
 
 
 /*

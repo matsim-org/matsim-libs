@@ -45,7 +45,7 @@ public class OTFVisFeature implements MobSimFeature {
 
 	@Override
 	public void doSimStep(double time) {
-		if (time > 8*3600) {
+		if (time > 0) {
 			Collection<AgentSnapshotInfo> positions = new ArrayList<AgentSnapshotInfo>(10000);
 			for (VisLink link : visNetwork.getLinks().values()) {
 				link.getVehiclePositions(positions);

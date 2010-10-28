@@ -57,7 +57,7 @@ public class PVMatrixReader {
 		System.out.println("Creating " + populationBuilder.countPersons() + " people.");
 		populationBuilder.setFilename(FILENAME);
 		populationBuilder.run();
-		
+
 	}
 
 	private void readShape() {
@@ -118,11 +118,12 @@ public class PVMatrixReader {
 					int ziel = Integer.parseInt(row[1]);
 					seenCellsInMatrix.add(quelle);
 					seenCellsInMatrix.add(ziel);
-//					if (seenCellsInShape.contains(quelle) && seenCellsInShape.contains(ziel)) {
 					if (seenCellsInNodes.contains(quelle) && seenCellsInNodes.contains(ziel)) {
-//						if (populationBuilder.getZones().get(quelle).geometry.getEnvelope().union(populationBuilder.getZones().get(ziel).geometry.getEnvelope()).intersects(filterShape)) {
-							populationBuilder.addEntry(quelle, ziel, Integer.parseInt(row[10]), Integer.parseInt(row[4]));
-//						}
+						int workPt = Integer.parseInt(row[2]);
+						int educationPt = Integer.parseInt(row[3]);
+						int workCar = Integer.parseInt(row[8]);
+						int educationCar = Integer.parseInt(row[9]);
+						populationBuilder.addEntry(quelle, ziel, workCar + educationCar, workPt + educationPt);
 					} else {
 						System.out.println("Strange: " + quelle + " or " + ziel + " not found.");
 					}

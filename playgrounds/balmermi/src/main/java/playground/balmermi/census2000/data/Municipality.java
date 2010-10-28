@@ -22,7 +22,8 @@ package playground.balmermi.census2000.data;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.world.Zone;
+
+import playground.balmermi.world.Zone;
 
 
 public class Municipality implements Comparable<Municipality> {

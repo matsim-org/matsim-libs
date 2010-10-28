@@ -76,10 +76,11 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.knowledges.KnowledgeImpl;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
-import org.matsim.world.Layer;
-import org.matsim.world.World;
-import org.matsim.world.Zone;
-import org.matsim.world.ZoneLayer;
+
+import playground.balmermi.world.Layer;
+import playground.balmermi.world.World;
+import playground.balmermi.world.Zone;
+import playground.balmermi.world.ZoneLayer;
 
 import Jama.Matrix;
 

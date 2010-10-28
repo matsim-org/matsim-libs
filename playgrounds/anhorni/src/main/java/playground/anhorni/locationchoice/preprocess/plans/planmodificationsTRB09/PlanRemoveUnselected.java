@@ -13,8 +13,6 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.utils.misc.Counter;
-import org.matsim.facilities.algorithms.WorldConnectLocations;
-import org.matsim.world.World;
 
 public class PlanRemoveUnselected {
 
