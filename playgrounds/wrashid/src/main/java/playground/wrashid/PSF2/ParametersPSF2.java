@@ -37,7 +37,7 @@ import playground.wrashid.lib.obj.LinkedListValueHashMap;
 
 public class ParametersPSF2 {
 
-	public static String pathToEnergyConsumptionTable="c:\\data\\My Dropbox\\ETH\\Projekte\\IATBR2009\\old\\matsim\\input\\runRW1002\\VehicleEnergyConsumptionRegressionTable.txt";
+	public static String pathToEnergyConsumptionTable="test/input/playground/wrashid/PSF2/vehicle/energyConsumption/VehicleEnergyConsumptionRegressionTable.txt";
 	
 	private static LinkedList<String> allowedChargingLocations=null; 
 	
