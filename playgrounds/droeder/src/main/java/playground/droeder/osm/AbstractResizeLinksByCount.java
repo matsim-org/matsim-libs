@@ -114,7 +114,7 @@ public abstract class AbstractResizeLinksByCount {
 	
 	private void writeModifiedLinks2Shape(){
 		log.info("Writing modified links to *.shp...");
-		DaShapeWriter.writeLinks2Shape(this.outFile + "_modified.shp", modifiedLinks2shp, modAttributes);
+		DaShapeWriter.writeLinks2Shape(this.outFile + "_modifiedLinks.shp", modifiedLinks2shp, modAttributes);
 		log.info("done...");
 	}
 	
@@ -138,7 +138,7 @@ public abstract class AbstractResizeLinksByCount {
 			unmodifiedLinks2shp =(Map<Id, Link>) this.oldNet.getLinks();
 		}
 		log.info("Writing unmodified links to *.shp...");
-		DaShapeWriter.writeLinks2Shape(this.outFile + "_unmodified.shp", unmodifiedLinks2shp, unmodAttributes);
+		DaShapeWriter.writeLinks2Shape(this.outFile + "_unmodifiedLinks.shp", unmodifiedLinks2shp, unmodAttributes);
 		log.info("done...");
 	}
 }
