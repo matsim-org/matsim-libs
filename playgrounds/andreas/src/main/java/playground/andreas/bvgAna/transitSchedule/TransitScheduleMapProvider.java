@@ -28,6 +28,12 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitSchedule;
 
+/**
+ * Builds a map containing the line id for each route id
+ * 
+ * @author aneumann
+ *
+ */
 public class TransitScheduleMapProvider {
 	
 	private final Logger log = Logger.getLogger(TransitScheduleMapProvider.class);
@@ -41,6 +47,9 @@ public class TransitScheduleMapProvider {
 		this.transitSchedule = transitSchedule;
 	}
 	
+	/**
+	 * @return Returns a map containing the line id for each route id
+	 */
 	public TreeMap<Id, Id> getRouteId2lineIdMap(){
 		if(this.routeId2lineIdMap == null){
 			createRouteId2lineIdMap();
