@@ -116,7 +116,8 @@ public class ResizeLinksByCount extends AbstractResizeLinksByCount{
 							nrOfNewLanes + " and capacity to " + maxCount);
 					l.setNumberOfLanes(nrOfNewLanes);
 					l.setCapacity(maxCount);
-				}				
+				}		
+				this.addLink2shp(l.getId());
 			}
 		}
 	}

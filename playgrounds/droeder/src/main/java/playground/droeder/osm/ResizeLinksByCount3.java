@@ -149,6 +149,7 @@ public class ResizeLinksByCount3 extends AbstractResizeLinksByCount{
 					System.out.println();
 					l.setCapacity(maxCount);
 					l.setNumberOfLanes(nrOfNewLanes);
+					this.addLink2shp(l.getId());
 				}
 			}
 		}
