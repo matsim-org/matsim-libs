@@ -107,6 +107,7 @@ public abstract class AbstractResizeLinksByCount {
 		SortedMap<String, String> attrib = new TreeMap<String, String>();
 		attrib.put("oldCap", String.valueOf(this.oldNet.getLinks().get(link).getCapacity()));
 		attrib.put("newCap", String.valueOf(this.newNet.getLinks().get(link).getCapacity()));
+		attrib.put("diffCap", String.valueOf(this.newNet.getLinks().get(link).getCapacity() - this.oldNet.getLinks().get(link).getCapacity()));		
 		attrib.put("origId", ((LinkImpl)this.oldNet.getLinks().get(link)).getOrigId());
 		
 		this.modAttributes.put(link, attrib);
