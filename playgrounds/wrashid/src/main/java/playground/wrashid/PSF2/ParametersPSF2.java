@@ -43,6 +43,7 @@ public class ParametersPSF2 {
 	private static LinkedList<String> allowedChargingLocations=null; 
 	
 	public static FleetInitializer fleetInitializer;
+	//key: personId, value: vehicle
 	public static LinkedListValueHashMap<Id, Vehicle> vehicles;
 	
 	public static HashMap<Id, ChargingTimes> chargingTimes;

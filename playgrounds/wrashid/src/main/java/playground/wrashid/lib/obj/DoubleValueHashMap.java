@@ -46,5 +46,9 @@ public class DoubleValueHashMap<KeyClass> {
 	public void decrementBy(KeyClass id, Double decValue) {
 		incrementBy(id,-1.0*decValue);
 	}
+	
+	public void remove(KeyClass id){
+		hm.remove(id);
+	}
 
 }
