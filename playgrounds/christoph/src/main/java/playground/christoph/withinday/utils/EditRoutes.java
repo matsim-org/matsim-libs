@@ -34,6 +34,9 @@ public class EditRoutes {
 		if (planAlgorithm == null) return false; 
 		
 		int index = plan.getPlanElements().indexOf(leg);
+		// yyyy I can't say how safe this is.  There is no guarantee that the same entry is not used twice in the plan.  This will in
+		// particular be a problem if we override the "equals" contract, in the sense that two activities are equal if
+		// certain (or all) elements are equal.  kai, oct'10
 		
 		if (index == -1) return false;
 		
@@ -114,6 +117,9 @@ public class EditRoutes {
 		if (planAlgorithm == null) return false; 
 		
 		int index = plan.getPlanElements().indexOf(leg);
+		// yyyy I can't say how safe this is.  There is no guarantee that the same entry is not used twice in the plan.  This will in
+		// particular be a problem if we override the "equals" contract, in the sense that two activities are equal if
+		// certain (or all) elements are equal.  kai, oct'10
 		
 		if (index == -1) return false;
 		
