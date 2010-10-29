@@ -38,6 +38,7 @@ import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.PersonEntersVehicleEvent;
 import org.matsim.core.events.PersonLeavesVehicleEvent;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReaderMatsimV4;
 import org.matsim.core.utils.collections.Tuple;
@@ -47,6 +48,7 @@ import org.xml.sax.SAXException;
 
 import playground.andreas.bvgAna.agentDelayAtStopComparator.AgentDelayAtStopComparator;
 import playground.andreas.bvgAna.agentId2EnterLeaveEvent.AgentId2EnterLeaveEventHandler;
+import playground.andreas.bvgAna.agentId2PersonMap.AgentId2PersonMap;
 import playground.andreas.bvgAna.personEnterLeave2Act.PersonEnterLeave2ActHandler;
 import playground.andreas.bvgAna.stopId2VehEnterLeave.StopId2PersonEnterLeaveHandler;
 import playground.andreas.bvgAna.transitSchedule.TransitScheduleMapProvider;
@@ -145,6 +147,10 @@ public class TestMain {
 		HashMap<PersonLeavesVehicleEvent, ActivityStartEvent> map7 = enterLeaveHandler.getPersonLeavesVehicleEvent2ActivityStartEvent();
 		TreeMap<Id, ArrayList<PersonEntersVehicleEvent>> map8 = aid2elhandler.getAgentId2EnterEventMap();
 		TreeMap<Id, ArrayList<PersonLeavesVehicleEvent>> map9 = aid2elhandler.getAgentId2LeaveEventMap();
+		
+		String name = new TransitScheduleMapProvider(sc.getTransitSchedule()).getStopName(stopIds.first());
+		
+		TreeMap<Id, PersonImpl> map10 = AgentId2PersonMap.getAgentId2PersonMap(plans, agentIds);
 
 		System.out.println("Waiting");
 
