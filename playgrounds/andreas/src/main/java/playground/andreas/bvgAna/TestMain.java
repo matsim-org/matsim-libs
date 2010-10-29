@@ -44,6 +44,8 @@ import org.matsim.core.population.PopulationReaderMatsimV4;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.transitSchedule.api.TransitScheduleReader;
+import org.matsim.vehicles.VehicleReaderV1;
+import org.matsim.vehicles.Vehicles;
 import org.xml.sax.SAXException;
 
 import playground.andreas.bvgAna.level0.AgentId2PersonMap;
@@ -51,6 +53,8 @@ import playground.andreas.bvgAna.level0.TransitScheduleDataProvider;
 import playground.andreas.bvgAna.level1.AgentId2EnterLeaveVehicleEventHandler;
 import playground.andreas.bvgAna.level1.PersonEnterLeaveVehicle2ActivityHandler;
 import playground.andreas.bvgAna.level1.StopId2PersonEnterLeaveVehicleHandler;
+import playground.andreas.bvgAna.level1.VehId2OccupancyHandler;
+import playground.andreas.bvgAna.level2.VehId2LoadMap;
 import playground.andreas.bvgAna.level3.AgentId2StopDifferenceMap;
 
 /**
@@ -70,6 +74,7 @@ public class TestMain {
 		String plansFile = "F:/bvgAna/output/ITERS/it.0/bvgAna.0.plans.xml.gz";
 		String netFile = "F:/bvgAna/input/network.xml";
 		String transitScheduleFile = "F:/bvgAna/input/transitSchedule.xml";
+		String vehDefinitionFile = "F:/bvgAna/input/vehicles.xml";
 		
 		EventsManagerImpl eventsManager = new EventsManagerImpl();		
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(eventsManager);		
@@ -97,6 +102,8 @@ public class TestMain {
 			e1.printStackTrace();
 		}
 		
+		new VehicleReaderV1(sc.getVehicles()).readFile(vehDefinitionFile);
+		
 		TreeSet<Id> agentIds = new TreeSet<Id>();
 		agentIds.add(new IdImpl("1000"));
 		agentIds.add(new IdImpl("10001"));	
@@ -120,6 +127,12 @@ public class TestMain {
 		eventsManager.addHandler(enterLeaveHandler);
 		AgentId2EnterLeaveVehicleEventHandler aid2elhandler = new AgentId2EnterLeaveVehicleEventHandler(agentIds);
 		eventsManager.addHandler(aid2elhandler);
+		
+		VehId2OccupancyHandler veh2occu = new VehId2OccupancyHandler();
+		eventsManager.addHandler(veh2occu);
+		
+		VehId2LoadMap veh2load = new VehId2LoadMap(sc.getVehicles());
+		eventsManager.addHandler(veh2load);
 		
 		try {
 			reader.parse(eventsFile);
@@ -151,6 +164,9 @@ public class TestMain {
 		String name = new TransitScheduleDataProvider(sc.getTransitSchedule()).getStopName(stopIds.first());
 		
 		TreeMap<Id, PersonImpl> map10 = AgentId2PersonMap.getAgentId2PersonMap(plans, agentIds);
+		
+		int occu = veh2occu.getVehicleLoad(new IdImpl("veh_8"), 46127.0);
+		double load = veh2load.getVehLoadByTime(new IdImpl("veh_8"), 46129.0);
 
 		System.out.println("Waiting");
 
