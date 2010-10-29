@@ -22,7 +22,7 @@ package playground.dgrether.tests.satellic;
 import java.util.Random;
 
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.ptproject.qsim.AgentFactory;
+import org.matsim.ptproject.qsim.DefaultAgentFactory;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.helpers.DefaultPersonDriverAgent;
 
@@ -31,7 +31,7 @@ import org.matsim.ptproject.qsim.helpers.DefaultPersonDriverAgent;
  * @author dgrether
  *
  */
-public class DgWithindayAgentFactory extends AgentFactory {
+public class DgWithindayAgentFactory extends DefaultAgentFactory {
 
 	private Random random;
 
