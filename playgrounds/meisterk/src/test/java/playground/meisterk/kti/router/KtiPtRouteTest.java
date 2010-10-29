@@ -29,10 +29,10 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.fakes.FakeLink;
-import org.matsim.world.World;
-import org.matsim.world.Zone;
-import org.matsim.world.ZoneLayer;
 
+import playground.balmermi.world.World;
+import playground.balmermi.world.Zone;
+import playground.balmermi.world.ZoneLayer;
 import playground.meisterk.kti.config.KtiConfigGroup;
 
 public class KtiPtRouteTest extends MatsimTestCase {
