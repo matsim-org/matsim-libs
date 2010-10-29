@@ -46,12 +46,12 @@ import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.transitSchedule.api.TransitScheduleReader;
 import org.xml.sax.SAXException;
 
-import playground.andreas.bvgAna.agentDelayAtStopComparator.AgentDelayAtStopComparator;
 import playground.andreas.bvgAna.level0.AgentId2PersonMap;
 import playground.andreas.bvgAna.level0.TransitScheduleDataProvider;
 import playground.andreas.bvgAna.level1.AgentId2EnterLeaveVehicleEventHandler;
 import playground.andreas.bvgAna.level1.PersonEnterLeaveVehicle2ActivityHandler;
 import playground.andreas.bvgAna.level1.StopId2PersonEnterLeaveVehicleHandler;
+import playground.andreas.bvgAna.level3.AgentId2StopDifferenceMap;
 
 /**
  * Simple test class
@@ -104,7 +104,7 @@ public class TestMain {
 		agentIds.add(new IdImpl("2176"));
 		agentIds.add(new IdImpl("182"));
 		
-		AgentDelayAtStopComparator comp = new AgentDelayAtStopComparator(plans, agentIds);
+		AgentId2StopDifferenceMap comp = new AgentId2StopDifferenceMap(plans, agentIds);
 		eventsManager.addHandler(comp);
 		
 		TreeSet<Id> stopIds = new TreeSet<Id>();
@@ -134,7 +134,7 @@ public class TestMain {
 			e.printStackTrace();
 		}
 		
-		TreeMap<Id, ArrayList<Tuple<Id, Double>>> testMap = comp.getDifferenceMap();
+		TreeMap<Id, ArrayList<Tuple<Id, Double>>> testMap = comp.getAgentId2StopDifferenceMap();
 		
 		TreeMap<Id, ArrayList<Tuple<Id, Integer>>> testMap2 = comp.getNumberOfMissedVehiclesMap();
 		
