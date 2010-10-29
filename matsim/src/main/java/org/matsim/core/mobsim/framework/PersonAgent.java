@@ -32,6 +32,15 @@ import org.matsim.api.core.v01.population.PlanElement;
  * </li><li> So we could say getPrev and getNext.
  * </li><li> How do we insert and remove?  In ArrayList, the Iterator fails if there is insert/remove
  * outside of the iterator.  But here, we cannot move the iterator away from its current position.  
+ * </li><li>In terms of design, the assumption is that the plan remains unchanged in the mobsim, at least from the 
+ * perspective of the iterations: plan = genotype, execution = phenotype.  Therefore, <i>already Christoph's implementation
+ * violates the specification</i>.
+ * </li><li>That is, we need to copy the plan, or at least copy it before modification ("getModifiablePlan").  This, however,
+ * would immensely simplify the design, since we could, at this point, also shorten the plan to where the agent currently is,
+ * meaning that all replanning algos should also work much better.
+ * </li><li>Memory considerations could be addressed by lazily delaying this plans copying to the point where the modifiable 
+ * plan is needed.
+ * </li>
  * </ul>
  * 
  * 
