@@ -13,6 +13,8 @@ import org.matsim.counts.CountsReaderMatsimV1;
 import org.xml.sax.SAXException;
 
 import playground.andreas.osmBB.osm2counts.Osm2Counts;
+import playground.droeder.osm.ResizeLinksByCount2;
+import playground.droeder.osm.ResizeLinksByCount3;
 import playground.mzilske.osm.OsmPrepare;
 import playground.mzilske.osm.OsmTransitMain;
 
@@ -22,10 +24,10 @@ public class PTCountsOsm2Matsim {
 	public static void main(String[] args) {
 		String osmRepository = "e:/osm_berlinbrandenburg/workingset/";
 		String osmFile = "berlinbrandenburg_filtered.osm";
-		String countsFile = "f:/vkrz_counts_convert/Di-Do_counts.xml";
-		String countsOutFile = "f:/vkrz_counts_convert/Di-Do_counts_out.xml";
+		String countsFile = "f:/bln_counts/Di-Do_counts.xml";
+		String countsOutFile = "f:/bln_counts/Di-Do_counts_out.xml";
 		
-		String outDir = "f:/vkrz_counts_convert/";
+		String outDir = "f:/bln_counts/";
 		String outName = "counts";
 		
 		String filteredOsmFile = outDir + outName + ".osm";
@@ -60,13 +62,21 @@ public class PTCountsOsm2Matsim {
 		OsmTransitMain osmTransitMain = new OsmTransitMain(filteredOsmFile, TransformationFactory.WGS84, TransformationFactory.DHDN_GK4, outDir + outName + "_network.xml", outDir + outName + "_schedule.xml");
 		osmTransitMain.convertOsm2Matsim(transitFilter);
 		
-		PTCountsNetworkSimplifier ptCountNetSimplifier = new PTCountsNetworkSimplifier(outDir + outName + "_network.xml", outDir + outName + "_schedule.xml", outDir + outName + "_network_merged.xml", outDir + outName + "_schedule_merged.xml", shortNameMap, counts, countsOutFile);
+//		ResizeLinksByCount2 r = new ResizeLinksByCount2(outDir + outName + "_network.xml", counts, shortNameMap);
+//		r.run(outDir + outName + "_network_resized.xml");
+		
+		ResizeLinksByCount3 r = new ResizeLinksByCount3(outDir + outName + "_network.xml", counts, shortNameMap);
+		r.run(outDir + outName + "_network_resized.xml");
+		
+		PTCountsNetworkSimplifier ptCountNetSimplifier = new PTCountsNetworkSimplifier(outDir + outName + "_network_resized.xml.xml", outDir + outName + "_schedule.xml", outDir + outName + "_network_merged.xml", outDir + outName + "_schedule_merged.xml", shortNameMap, counts, countsOutFile);
 		Set<Integer> nodeTypesToMerge = new TreeSet<Integer>();
 		nodeTypesToMerge.add(new Integer(4));
 		nodeTypesToMerge.add(new Integer(5));
 		ptCountNetSimplifier.setNodesToMerge(nodeTypesToMerge);
 		ptCountNetSimplifier.setMergeLinkStats(false);
 		ptCountNetSimplifier.simplifyPTNetwork();
+		
+
 		
 	}
 
