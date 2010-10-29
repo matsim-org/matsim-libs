@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * MyMobsimFactory.java
+ * MyAgentFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,45 +17,28 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.christoph.withinday3;
+package playground.christoph.withinday3.unused;
 
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.mobsim.framework.MobsimFactory;
-import org.matsim.core.mobsim.framework.Simulation;
-import org.matsim.core.router.util.PersonalizableTravelCost;
-import org.matsim.core.router.util.PersonalizableTravelTime;
-import org.matsim.ptproject.qsim.QSim;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.mobsim.framework.PersonDriverAgent;
+import org.matsim.ptproject.qsim.AgentFactory;
 import org.matsim.ptproject.qsim.interfaces.Mobsim;
-
-import playground.christoph.withinday3.unused.MyAgentFactory;
 
 /**
  * @author nagel
  *
  */
-public class MyMobsimFactory implements MobsimFactory {
-	private static final Logger log = Logger.getLogger("dummy");
-
-	private PersonalizableTravelCost travCostCalc;
-	private PersonalizableTravelTime travTimeCalc;
+public class MyAgentFactory implements AgentFactory {
 	
-	MyMobsimFactory( PersonalizableTravelCost travelCostCalculator, PersonalizableTravelTime travelTimeCalculator ) {
-		this.travCostCalc = travelCostCalculator ;
-		this.travTimeCalc = travelTimeCalculator ;
+	private Mobsim mobsim ;
+	
+	MyAgentFactory( Mobsim mobsim ) {
+		this.mobsim = mobsim ;
 	}
 
 	@Override
-	public Simulation createMobsim(Scenario sc, EventsManager events) {
-		
-		Mobsim mobsim = new QSim( sc, events ) ;
-		
-		mobsim.addQueueSimulationListeners(new MyMobsimListener(this.travCostCalc,this.travTimeCalc)) ;
-		
-//		mobsim.setAgentFactory( new MyAgentFactory(mobsim) ) ;
-		
-		return mobsim ;
+	public PersonDriverAgent createPersonAgent(Person p) {
+		return new MyAgent( p, mobsim ) ;
 	}
-	
+
 }

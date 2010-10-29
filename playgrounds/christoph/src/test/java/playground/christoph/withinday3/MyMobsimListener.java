@@ -23,25 +23,29 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.mobsim.framework.PersonAgent;
+import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.core.mobsim.framework.events.SimulationBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationBeforeSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationListener;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.ptproject.qsim.helpers.DefaultPersonDriverAgent;
 import org.matsim.ptproject.qsim.interfaces.Mobsim;
+import org.matsim.ptproject.qsim.interfaces.NetsimLink;
+import org.matsim.ptproject.qsim.qnetsimengine.QVehicle;
 
 import playground.christoph.withinday.utils.EditRoutes;
 import playground.christoph.withinday.utils.ReplacePlanElements;
@@ -51,6 +55,8 @@ import playground.christoph.withinday.utils.ReplacePlanElements;
  *
  */
 public class MyMobsimListener implements SimulationListener, SimulationBeforeSimStepListener {
+    private static final Logger log = Logger.getLogger("dummy");
+
 	
 	private PersonalizableTravelCost travCostCalc;
 	private PersonalizableTravelTime travTimeCalc;
@@ -80,51 +86,83 @@ public class MyMobsimListener implements SimulationListener, SimulationBeforeSim
 	
 	private List<PersonAgent> getAgentsToReplan(Mobsim mobsim ) {
 
-		ArrayList<PersonAgent> list = new ArrayList<PersonAgent>();
+		List<PersonAgent> set = new ArrayList<PersonAgent>();
 
 		// don't handle the agent, if time != 12 o'clock
-		if (mobsim.getSimTimer().getTimeOfDay() != 12 * 3600) {
-			return list;
+		if (Math.floor(mobsim.getSimTimer().getTimeOfDay()) !=  22000.0) {
+			return set;
 		}
-
-		// select agents, which should be replanned within this time step
-		for (PersonAgent agent : mobsim.getActivityEndsList()) {
-			if (((PersonImpl) agent.getPerson()).getAge() == 56) {
-				System.out.println("found agent");
-				list.add(agent);
+		
+		// find agents that are en-route (more interesting case)
+		for (NetsimLink link:mobsim.getNetsimNetwork().getNetsimLinks().values()){
+			for (QVehicle vehicle : link.getAllNonParkedVehicles()) {
+				PersonDriverAgent agent=vehicle.getDriver();
+				System.out.println(agent.getPerson().getId());
+				if (((PersonImpl) agent.getPerson()).getAge() == 18) {
+					System.out.println("found agent");
+					set.add(agent);
+				}
 			}
 		}
 
-		return list;
+		return set;
+
 	}
 
 	private boolean doReplanning(PersonAgent personAgent, double now ) {
 		
+		// preconditions:
+
 		Person person = personAgent.getPerson();
 		Plan selectedPlan = person.getSelectedPlan();
 
-		Leg currentLeg = personAgent.getCurrentLeg();
-		Activity nextActivity = ((PlanImpl) selectedPlan).getNextActivity(currentLeg);
-
-		// If it is not a car Leg we don't replan it.
-		if (!currentLeg.getMode().equals(TransportMode.car)) return false;
+		if (selectedPlan == null) {
+			log.info( " we don't have a selected plan; returning ... ") ;
+			return false;
+		}
+		if ( !(personAgent.getCurrentPlanElement() instanceof Leg) ) {
+			log.info( "agent not on leg; returning ... ") ;
+			return false ;
+		}
+		if (!((Leg)personAgent.getCurrentPlanElement()).getMode().equals(TransportMode.car)) {
+			log.info( "not a car leg; can only replan car legs; returning ... ") ;
+			return false;
+		}
 		
-		ActivityImpl newWorkAct = new ActivityImpl("w", this.scenario.createId("22"));
-		newWorkAct.setDuration(3600);
-
-		// Replace Activity
-		new ReplacePlanElements().replaceActivity(selectedPlan, nextActivity, newWorkAct);
+		List<PlanElement> planElements = ((DefaultPersonDriverAgent)personAgent).getModifiablePlanElements() ;
+		final Integer planElementsIndex = ((DefaultPersonDriverAgent)personAgent).getCurrentPlanElementIndex() ;
 		
+		if ( !(planElements.get(planElementsIndex+1) instanceof Activity || !(planElements.get(planElementsIndex+2) instanceof Leg)) ) {
+			log.error( "this version of withinday replanning cannot deal with plans where legs and acts to not alternate; returning ...") ;
+			return false ;
+		}
+		Activity nextActivity = (Activity) planElements.get(planElementsIndex+1) ;
+		Leg legAfterNextActivity = (Leg) planElements.get(planElementsIndex+2) ;
+		
+		// now the real work begins:
+
+		ActivityImpl newAct = new ActivityImpl("w", this.scenario.createId("22"));
+		newAct.setDuration(3600);
+		
+		planElements.set( planElementsIndex+1, newAct ) ;
+		
+
+		// yyyyyy the following still needs to be improved.  For starters, it is not clear what "currentNodeIndex" is.  kai, oct'10
+
 		/*
 		 *  Replan Routes
 		 */
 		// new Route for current Leg
-		new EditRoutes().replanCurrentLegRoute(selectedPlan, currentLeg, ((DefaultPersonDriverAgent)personAgent).getCurrentNodeIndex(), routeAlgo, scenario.getNetwork(), now);
+		EditRoutesKai.replanCurrentLegRoute(person, planElements, planElementsIndex, 
+				((DefaultPersonDriverAgent)personAgent).getCurrentRouteLinkIdIndex(), routeAlgo, now ) ;
+
+//		new EditRoutes().replanCurrentLegRoute(selectedPlan, currentLeg, ((DefaultPersonDriverAgent)personAgent).getCurrentNodeIndex(), routeAlgo, scenario.getNetwork(), now);
 		// ( compiles, but does not run, since agents are (deliberately) not instantiated as withindayreplanningagents.  kai, oct'10 )
 		// Adapted code, WithinDayPersonAgents are now only needed if they have to handle WithinDayReplanners. cdobler, oct'10
 		
-		// new Route for next Leg
-		Leg homeLeg = ((PlanImpl) selectedPlan).getNextLeg(newWorkAct);
+		
+		// new Route for next Leg. yyyy should be static and based on the index, but this is not the real problem 
+		Leg homeLeg = (Leg) planElements.get( planElementsIndex+2 ) ;
 		new EditRoutes().replanFutureLegRoute(selectedPlan, homeLeg, routeAlgo);
 		
 		// finally reset the cached Values of the PersonAgent - they may have changed!
