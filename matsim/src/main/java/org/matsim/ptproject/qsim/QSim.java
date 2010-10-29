@@ -43,7 +43,6 @@ import org.matsim.core.controler.ControlerIO;
 import org.matsim.core.events.AdditionalTeleportationDepartureEvent;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.mobsim.framework.IOSimulation;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
@@ -61,11 +60,11 @@ import org.matsim.ptproject.qsim.helpers.QSimTimer;
 import org.matsim.ptproject.qsim.interfaces.AcceptsVisMobsimFeatures;
 import org.matsim.ptproject.qsim.interfaces.AgentCounterI;
 import org.matsim.ptproject.qsim.interfaces.DepartureHandler;
-import org.matsim.ptproject.qsim.interfaces.NetsimLink;
-import org.matsim.ptproject.qsim.interfaces.NetsimNetwork;
+import org.matsim.ptproject.qsim.interfaces.Mobsim;
 import org.matsim.ptproject.qsim.interfaces.NetsimEngine;
 import org.matsim.ptproject.qsim.interfaces.NetsimEngineFactory;
-import org.matsim.ptproject.qsim.interfaces.Mobsim;
+import org.matsim.ptproject.qsim.interfaces.NetsimLink;
+import org.matsim.ptproject.qsim.interfaces.NetsimNetwork;
 import org.matsim.ptproject.qsim.interfaces.SimTimerI;
 import org.matsim.ptproject.qsim.multimodalsimengine.MultiModalDepartureHandler;
 import org.matsim.ptproject.qsim.multimodalsimengine.MultiModalSimEngine;
@@ -74,8 +73,6 @@ import org.matsim.ptproject.qsim.qnetsimengine.CarDepartureHandler;
 import org.matsim.ptproject.qsim.qnetsimengine.DefaultQNetworkFactory;
 import org.matsim.ptproject.qsim.qnetsimengine.DefaultQSimEngineFactory;
 import org.matsim.ptproject.qsim.qnetsimengine.QLanesNetworkFactory;
-import org.matsim.ptproject.qsim.qnetsimengine.QNetwork;
-import org.matsim.ptproject.qsim.qnetsimengine.QSimEngineImpl;
 import org.matsim.ptproject.qsim.qnetsimengine.QVehicle;
 import org.matsim.ptproject.qsim.qnetsimengine.QVehicleImpl;
 import org.matsim.ptproject.qsim.signalengine.QSimSignalEngine;
@@ -271,7 +268,7 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 		}
 		VehicleType defaultVehicleType = new VehicleTypeImpl(new IdImpl("defaultVehicleType"));
 		for (Person p : this.scenario.getPopulation().getPersons().values()) {
-			DefaultPersonDriverAgent agent = this.agentFactory.createPersonAgent(p);
+			PersonDriverAgent agent = this.agentFactory.createPersonAgent(p);
 			QVehicle veh = new QVehicleImpl(new VehicleImpl(agent.getPerson().getId(), defaultVehicleType));
 			//not needed in new agent class
 			veh.setDriver(agent); // this line is currently only needed for OTFVis to show parked vehicles
@@ -614,7 +611,7 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 			this.addDepartureHandler(new MultiModalDepartureHandler(this, multiModalEngine, scenario.getConfig().multiModal()));
 		}
 
-		this.agentFactory = new AgentFactory(this);
+		this.agentFactory = new DefaultAgentFactory(this);
 
 		this.carDepartureHandler = new CarDepartureHandler(this);
 		addDepartureHandler(this.carDepartureHandler);

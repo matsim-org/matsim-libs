@@ -21,23 +21,10 @@ package org.matsim.ptproject.qsim;
 
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.internal.MatsimFactory;
-import org.matsim.ptproject.qsim.helpers.DefaultPersonDriverAgent;
-import org.matsim.ptproject.qsim.interfaces.Mobsim;
+import org.matsim.core.mobsim.framework.PersonDriverAgent;
 
-/**
- * @author dgrether
- */
-public class AgentFactory implements MatsimFactory {
+public interface AgentFactory extends MatsimFactory {
 
-	protected final Mobsim simulation;
-
-	public AgentFactory(final Mobsim simulation) {
-		this.simulation = simulation;
-	}
-
-	public DefaultPersonDriverAgent createPersonAgent(final Person p) {
-		DefaultPersonDriverAgent agent = new DefaultPersonDriverAgent(p, this.simulation);
-		return agent;
-	}
+	public PersonDriverAgent createPersonAgent(final Person p);
 
 }

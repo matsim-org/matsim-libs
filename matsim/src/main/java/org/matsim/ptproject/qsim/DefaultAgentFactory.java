@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TransitAgentFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,30 +17,26 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.pt.qsim;
-
-import java.util.Map;
+package org.matsim.ptproject.qsim;
 
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.mobsim.framework.PersonDriverAgent;
-import org.matsim.ptproject.qsim.DefaultAgentFactory;
 import org.matsim.ptproject.qsim.helpers.DefaultPersonDriverAgent;
 import org.matsim.ptproject.qsim.interfaces.Mobsim;
 
+/**
+ * @author dgrether
+ */
+@Deprecated // inheritence from this class is deprecated.  Please use the interface.  kai, oct'10
+public class DefaultAgentFactory implements AgentFactory {
 
-public class TransitAgentFactory extends DefaultAgentFactory {
+	protected final Mobsim simulation;
 
-	private final Map<Person, PersonDriverAgent> agentsMap;
-
-	public TransitAgentFactory(final Mobsim simulation, final Map<Person, PersonDriverAgent> agents) {
-		super(simulation);
-		this.agentsMap = agents;
+	public DefaultAgentFactory(final Mobsim simulation) {
+		this.simulation = simulation;
 	}
 
-	@Override
 	public DefaultPersonDriverAgent createPersonAgent(final Person p) {
-		DefaultPersonDriverAgent agent = new TransitAgent(p, this.simulation);
-		this.agentsMap.put(p, agent);
+		DefaultPersonDriverAgent agent = new DefaultPersonDriverAgent(p, this.simulation);
 		return agent;
 	}
 
