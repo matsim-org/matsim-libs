@@ -29,7 +29,7 @@ import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitSchedule;
 
 /**
- * Builds a map containing the line id for each route id
+ * Helper class providing access to transit schedule related information. Convenience only.
  * 
  * @author aneumann
  *
@@ -45,6 +45,13 @@ public class TransitScheduleMapProvider {
 	public TransitScheduleMapProvider(TransitSchedule transitSchedule){
 		this.log.setLevel(this.logLevel);
 		this.transitSchedule = transitSchedule;
+	}
+	
+	/**
+	 * @return Returns the name of a given stop id. Should be <code>null</code> if none is set.
+	 */
+	public String getStopName(Id stopId){
+		return this.transitSchedule.getFacilities().get(stopId).getName();
 	}
 	
 	/**
