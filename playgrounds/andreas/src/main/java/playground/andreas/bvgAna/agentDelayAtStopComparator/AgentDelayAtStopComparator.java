@@ -37,9 +37,9 @@ import org.matsim.core.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.core.events.handler.VehicleDepartsAtFacilityEventHandler;
 import org.matsim.core.utils.collections.Tuple;
 
-import playground.andreas.bvgAna.agentDelayAnalyzer.AgentDelayHandler;
 import playground.andreas.bvgAna.level0.AgentId2PlannedDepartureTimeMap;
 import playground.andreas.bvgAna.level0.AgentId2PlannedDepartureTimeMapData;
+import playground.andreas.bvgAna.level1.AgentId2DepartureDelayAtStopMap;
 import playground.andreas.bvgAna.vehDelayHandler.VehDelayAnalyzer;
 import playground.andreas.bvgAna.vehDelayHandler.VehDelayHandler;
 
@@ -64,7 +64,7 @@ public class AgentDelayAtStopComparator implements TransitDriverStartsEventHandl
 	private TreeMap<Id, ArrayList<Tuple<Id, AgentId2PlannedDepartureTimeMapData>>> plannedDepartureTimeMap;
 	private VehDelayHandler vehDelayHandler;
 	private VehDelayAnalyzer vehDelayAnalyzer;
-	private AgentDelayHandler agentDelayHandler;	
+	private AgentId2DepartureDelayAtStopMap agentDelayHandler;	
 	private TreeMap<Id,ArrayList<Tuple<Id,Double>>> agentIds2StopDifferenceMap = null;
 	private TreeMap<Id,ArrayList<Tuple<Id,Integer>>> agentIds2MissedVehMap = null;
 
@@ -75,7 +75,7 @@ public class AgentDelayAtStopComparator implements TransitDriverStartsEventHandl
 		
 		this.vehDelayHandler = new VehDelayHandler();
 		this.vehDelayAnalyzer = new VehDelayAnalyzer(this.vehDelayHandler);
-		this.agentDelayHandler = new AgentDelayHandler(agentIds);
+		this.agentDelayHandler = new AgentId2DepartureDelayAtStopMap(agentIds);
 		
 		this.log.info("Reading planned departure time...");
 		this.plannedDepartureTimeMap = AgentId2PlannedDepartureTimeMap.getAgentId2PlannedPTDepartureTimeMap(this.pop, this.agentIds);
