@@ -41,7 +41,7 @@ import playground.andreas.bvgAna.level0.AgentId2PlannedDepartureTimeMap;
 import playground.andreas.bvgAna.level0.AgentId2PlannedDepartureTimeMapData;
 import playground.andreas.bvgAna.level1.AgentId2DepartureDelayAtStopMap;
 import playground.andreas.bvgAna.level1.StopId2RouteId2DelayAtStopMap;
-import playground.andreas.bvgAna.vehDelayHandler.VehDelayAnalyzer;
+import playground.andreas.bvgAna.level2.VehiclePlannedRealizedDeparturesMissedDepartures;
 
 /**
  * Calculates the difference between realized time and planned time spent waiting at a stop for a given set of agent ids.<br>
@@ -63,7 +63,7 @@ public class AgentDelayAtStopComparator implements TransitDriverStartsEventHandl
 	private Set<Id> agentIds;	
 	private TreeMap<Id, ArrayList<Tuple<Id, AgentId2PlannedDepartureTimeMapData>>> plannedDepartureTimeMap;
 	private StopId2RouteId2DelayAtStopMap vehDelayHandler;
-	private VehDelayAnalyzer vehDelayAnalyzer;
+	private VehiclePlannedRealizedDeparturesMissedDepartures vehDelayAnalyzer;
 	private AgentId2DepartureDelayAtStopMap agentDelayHandler;	
 	private TreeMap<Id,ArrayList<Tuple<Id,Double>>> agentIds2StopDifferenceMap = null;
 	private TreeMap<Id,ArrayList<Tuple<Id,Integer>>> agentIds2MissedVehMap = null;
@@ -74,7 +74,7 @@ public class AgentDelayAtStopComparator implements TransitDriverStartsEventHandl
 		this.agentIds = agentIds;
 		
 		this.vehDelayHandler = new StopId2RouteId2DelayAtStopMap();
-		this.vehDelayAnalyzer = new VehDelayAnalyzer(this.vehDelayHandler);
+		this.vehDelayAnalyzer = new VehiclePlannedRealizedDeparturesMissedDepartures(this.vehDelayHandler);
 		this.agentDelayHandler = new AgentId2DepartureDelayAtStopMap(agentIds);
 		
 		this.log.info("Reading planned departure time...");
