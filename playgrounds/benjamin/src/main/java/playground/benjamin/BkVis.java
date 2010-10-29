@@ -61,7 +61,7 @@ public class BkVis {
 //		String otffile = "../matsim/examples/tutorial/singleIteration.xml";
 //		String otffile = BkPaths.RUNSSVN + "run749/TestOTFVis_interactive/749.output_config.xml";
 //		String otffile = "../detailedEval/pop/140k-synthetische-personen/config-for-visualisation.xml";
-		String otffile = "../detailedEval/teststrecke/sim/output/20090707/output_config.xml";
+		String otffile = "../detailedEval/teststrecke/sim/input/liveConfig_benjamin.xml";
 //		String otffile = BkPaths.RUNSSVN + "run950/950.output_config.xml";
 
 		

@@ -20,7 +20,10 @@
 package playground.benjamin.dataprepare;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.Map.Entry;
@@ -37,6 +40,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
+import org.matsim.population.algorithms.PlanMutateTimeAllocation;
 
 /**
  * @author benjamin
@@ -45,6 +49,7 @@ import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 public class TrialDemandFromCountsMunich {
 	static String netFile = "";
 	static String countsPath = "../../detailedEval/teststrecke/zaehlstellen_einfluss/";
+	static String testVehiclePath = "../../detailedEval/teststrecke/testVehicle/";
 	static String outPath = "../../detailedEval/teststrecke/sim/input/";
 	static String day1 = "20090707";
 	static String day2 = "20090708";
@@ -57,10 +62,103 @@ public class TrialDemandFromCountsMunich {
 		Population pop1 = generatePopulation(countsPath + day1 + "/");
 		Population pop2 = generatePopulation(countsPath + day2 + "/");
 		Population pop3 = generatePopulation(countsPath + day3 + "/");
-
+		
+		fuzzifyTimes(pop1);
+		fuzzifyTimes(pop1);
+		fuzzifyTimes(pop1);
+		
+		addTestVehicle(pop1, testVehiclePath + day1 + "_departureTimes.txt");
+//		addTestVehicle(pop2, testVehiclePath + day2 + "_departureTimes.txt");
+//		addTestVehicle(pop3, testVehiclePath + day3 + "_departureTimes.txt");		
+		
 		writePlans(pop1, day1);
 		writePlans(pop2, day2);
 		writePlans(pop3, day3);
+	}
+
+	/**
+	 * @param population
+	 * @param dayFile 
+	 */
+	private static void addTestVehicle(Population population, String dayFile) {
+		Scenario sc = new ScenarioImpl();
+
+		List<Integer> departureTimes = getTestVehicleDepartureTimes(dayFile);
+		for(int time : departureTimes){
+			Id personId = sc.createId(time + "_TW");
+			Person person = population.getFactory().createPerson(personId);
+			Plan plan = population.getFactory().createPlan();
+			person.addPlan(plan);
+
+			String actTypeHome = "h";
+			String actTypeWork = "h";
+			Id linkIdHome = sc.createId("52902684");
+			Id linkIdWork = sc.createId("52799758");
+
+			Activity home = population.getFactory().createActivityFromLinkId(actTypeHome, linkIdHome);
+			home.setEndTime(time);
+			plan.addActivity(home);
+
+			Leg leg = population.getFactory().createLeg(TransportMode.car);
+			plan.addLeg(leg);
+
+			Activity work = population.getFactory().createActivityFromLinkId(actTypeWork, linkIdWork);
+			plan.addActivity(work);
+
+			population.addPerson(person);
+		}
+	}
+
+	/**
+	 * @param dayFile
+	 * @return
+	 */
+	private static List<Integer> getTestVehicleDepartureTimes(String dayFile) {
+		final List<Integer> departureTimes = new ArrayList<Integer>();
+		
+		TabularFileParserConfig tabFileParserConfig = new TabularFileParserConfig();
+		tabFileParserConfig.setFileName(dayFile);
+		tabFileParserConfig.setDelimiterTags(new String[] {":"});
+		
+		try {
+			new TabularFileParser().parse(tabFileParserConfig, new CheckingTabularFileHandler() {
+
+				private static final int HOURS = 0;
+				private static final int MINUTES = 1;
+				private static final int SECONDS = 2;
+				
+				public void startRow(String[] row) {
+					first = false;
+					numColumns = row.length;
+					check(row);
+					addDepartureTime(row);
+				}
+
+				private void addDepartureTime(String[] row) {
+					Integer hours = new Integer(row[HOURS]);
+					Integer minutes = new Integer(row[MINUTES]);
+					Integer seconds = new Integer(row[SECONDS]);
+					Integer departureTimeInSeconds = 60 * 60 * hours + 60 * minutes + seconds;
+					departureTimes.add(departureTimeInSeconds);
+				}
+			});
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return departureTimes;
+	}
+
+	/**
+	 * @param population
+	 */
+	private static void fuzzifyTimes(Population population) {
+		PlanMutateTimeAllocation planMutateTimeAllocation = new PlanMutateTimeAllocation(1 * 60, new Random());
+		planMutateTimeAllocation.setUseActivityDurations(false);
+		for (Person person : population.getPersons().values()) {
+			Plan plan = person.getPlans().iterator().next();
+			planMutateTimeAllocation.run(plan);
+		}
 	}
 
 	/**
@@ -159,7 +257,7 @@ public class TrialDemandFromCountsMunich {
 					numColumns = row.length;
 					check(row);
 //					if(!row[0].startsWith("#")) {
-						addEndTimeNoOfVehicles(row);
+					addEndTimeNoOfVehicles(row);
 //					} else {
 						// This is the header. Nothing to do.
 //					}
@@ -180,6 +278,6 @@ public class TrialDemandFromCountsMunich {
 
 	private static void writePlans(Population pop, String day) {
 		PopulationWriter populationWriter = new PopulationWriter(pop, null);
-		populationWriter.write(outPath + day + "_plans.xml");
+		populationWriter.write(outPath + day + "_plans.xml.gz");
 	}
 }
