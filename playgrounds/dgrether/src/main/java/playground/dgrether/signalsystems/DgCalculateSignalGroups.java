@@ -45,7 +45,6 @@ import org.matsim.signalsystems.data.signalgroups.v20.SignalGroupsDataImpl;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsData;
-import org.matsim.signalsystems.systems.SignalGroupDefinition;
 
 
 /**
@@ -84,14 +83,13 @@ public class DgCalculateSignalGroups {
 	
 	private static final Logger log = Logger.getLogger(DgCalculateSignalGroups.class);
 
-	private Map<Id, SignalGroupDefinition> groups;
 	private Network net;
+	private LaneDefinitions lanes;
+	private SignalSystemsData signalSystems;
 	
 	private double right = -Math.PI/4;
 	private double left = Math.PI/4;
-	private SignalSystemsData signalSystems;
 
-	private LaneDefinitions lanes;
 	
 	
 	public DgCalculateSignalGroups(SignalSystemsData signalSystems, Network net){
@@ -172,23 +170,21 @@ public class DgCalculateSignalGroups {
 		
 		//search all links that have a signal attached
 		//and do some further preprocessing / indexing
-		Map<Id, Link> signalIdLinkMap = new HashMap<Id, Link>();
 		Set<Link> signalizedLinkSet = new HashSet<Link>();
-		Map<Id, SignalMetaData> signalIdMetadataMap = new HashMap<Id, SignalMetaData>();
 		Map<Link, Set<SignalData>> link2SignalMap = new HashMap<Link, Set<SignalData>>();
+		Map<Id, SignalMetaData> signalIdMetadataMap = new HashMap<Id, SignalMetaData>();
 		for (SignalData signal : ssd.getSignalData().values()){
 			log.error("preprocessing signal : " + signal.getId());
 			Link link = this.net.getLinks().get(signal.getLinkId());
 			if (link == null) {
 				throw new IllegalStateException("link id " + signal.getLinkId() + " not found in network");
 			}
-			signalIdLinkMap.put(signal.getId(), link);
 			signalizedLinkSet.add(link);
+
 			if (!link2SignalMap.containsKey(link)){
 				link2SignalMap.put(link, new HashSet<SignalData>());
 			}
 			link2SignalMap.get(link).add(signal);
-			
 			
 			SignalMetaData md = this.createMetaData4Signal(signal, link);
 			signalIdMetadataMap.put(signal.getId(), md);
@@ -254,7 +250,6 @@ public class DgCalculateSignalGroups {
 				}
 			}
 	}
-
 	
 	
 	private double calculateAngle(Coord vec1, Coord vec2){
@@ -270,7 +265,6 @@ public class DgCalculateSignalGroups {
 		return thetaDiff;
 	}
 	
-
 	
 	/**
 	 * Berechnet für den gegebenen link den geradeauslink bzw. dessen rückrichtung
@@ -311,27 +305,5 @@ public class DgCalculateSignalGroups {
 		double y = link.getToNode().getCoord().getY() - link.getFromNode().getCoord().getY();		
 		return new CoordImpl(x, y);
 	}
-
-	public static void main(String[] args){
-		System.out.println("atan2: " + Math.atan2(0.0, 1.0)/Math.PI * 180.0 + " degrees or " + Math.atan2(0.0, 1.0));
-		System.out.println("atan2: " + Math.atan2(1.0, 0.0)/Math.PI * 180.0  + " degrees or " + Math.atan2(1.0, 0.0));
-		System.out.println("atan2: " + Math.atan2(0.0, -1.0)/Math.PI * 180.0  + " degrees or " + Math.atan2(0.0, -1.0));
-		
-		System.out.println();
-		
-		System.out.println("atan2: " + Math.atan2(-0.0, 1.0)/Math.PI * 180.0 + " degrees or " + Math.atan2(-0.0, 1.0));
-		System.out.println("atan2: " + Math.atan2(-1.0, 0.0)/Math.PI * 180.0 + " degrees or " + Math.atan2(-1.0, 0.0));
-		System.out.println("atan2: " + Math.atan2(-0.0, -1.0)/Math.PI * 180.0 + " degrees or " + Math.atan2(-0.0, -1.0));
-		
-		System.out.println("atan2: " + Math.atan2(-0.0, -0.0)/Math.PI * 180.0 + " degrees or " + Math.atan2(-0.0, -0.0));
-
-		System.out.println();
-		System.out.println("atan2: " + Math.atan2(1.0, 1.0)/Math.PI * 180.0 + " degrees or " + Math.atan2(1.0, 1.0));
-		System.out.println("atan2: " + Math.atan2(1.0, -1.0)/Math.PI * 180.0  + " degrees or " + Math.atan2(1.0, -1.0));
-
-	}
-	
-
-	
 
 }
