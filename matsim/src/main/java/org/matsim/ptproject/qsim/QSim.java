@@ -410,8 +410,7 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 	 * @see PersonDriverAgent#getDepartureTime()
 	 */
 	@Override
-	public void scheduleActivityEnd(final PersonAgent agent) {
-		// yy can't make this final since it is overwritten by christoph.  kai, oct'10 
+	public final void scheduleActivityEnd(final PersonAgent agent) {
 		this.activityEndsList.add(agent);
 		registerAgentAtActivityLocation(agent);
 	}
