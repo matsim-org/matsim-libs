@@ -62,13 +62,14 @@ public class ReadFromUrbansimParcelModel {
 	 * @param parcels ActivityFacilitiesImpl
 	 * @param zones ActivityFacilitiesImpl
 	 */
+	@SuppressWarnings("deprecation")
 	public void readFacilities(final ActivityFacilitiesImpl parcels, final ActivityFacilitiesImpl zones) {
 		// (these are simply defined as those entities that have x/y coordinates in urbansim)
 		String filename = Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + Constants.URBANSIM_PARCEL_DATASET_TABLE + this.year + Constants.FILE_TYPE_TAB;
 		log.info( "Starting to read urbansim parcels from " + filename );
 
 		// temporary data structure in order to get coordinates for zones:
-		Map<Id,Id> zoneFromParcel = new HashMap<Id,Id>();
+		// Map<Id,Id> zoneFromParcel = new HashMap<Id,Id>();
 		Map<Id,PseudoZone> pseudoZones = new HashMap<Id,PseudoZone>();
 
 		try {

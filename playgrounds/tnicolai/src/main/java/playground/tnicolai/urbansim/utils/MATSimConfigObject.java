@@ -130,11 +130,20 @@ public class MATSimConfigObject {
 	}
 	
 	/**
+	 * 
+	 * @param matsimConfig
+	 * @return
+	 */
+	public static boolean initMATSimConfigObject(MatsimConfigType matsimConfig){
+		return initMATSimConfigObject( matsimConfig, false );
+	}
+	
+	/**
 	 * extracting the values (from the MATSim xml config) into global variables.
 	 * creating and initializing a scenario and config.
 	 * @return true if init process successful
 	 */
-	public static boolean initMATSimConfigObject(MatsimConfigType matsimConfig){
+	public static boolean initMATSimConfigObject(MatsimConfigType matsimConfig, boolean setOpusHomeDirectory){
 		
 		try{
 			ConfigType matsimParameter = matsimConfig.getConfig();
@@ -156,16 +165,16 @@ public class MATSimConfigObject {
 			tempDirectory = matsim4UrbanSimParameter.getUrbansimParameter().getTempDirectory();
 			opusHomeDirectory = matsim4UrbanSimParameter.getUrbansimParameter().getOpusHOME();
 			isTestRun = matsim4UrbanSimParameter.getUrbansimParameter().isIsTestRun();
-			
-			// only for debugging and testing reasons
-			// sets a new OPUS_HOME directory
-			// isModifyingOpusHomeDirectory();
 	
 			log.info("Network: " + networkFile);
 			log.info("Controler FirstIteration: " + firstIteration + " LastIteration: " + lastIteration );
 			log.info("PlanCalcScore Activity_Type_0: " + activityType_0 + " Activity_Type_1: " + activityType_1);
 			log.info("UrbansimParameter SamplingRate: " + samplingRate + " Year: " + year + " TempDir: " + tempDirectory + " OPUS_HOME: " + opusHomeDirectory + " TestRun: " + isTestRun);
 			
+			// set opus (sub-)directories
+			if(setOpusHomeDirectory)
+				setOpusHomeDirectory();
+			// init build-in MATSim config
 			createAndInitializeConfigObject();
 		}catch(Exception e){
 			e.printStackTrace();
@@ -174,23 +183,19 @@ public class MATSimConfigObject {
 		return true;
 	}
 	
-//	/**
-//	 * only for debugging and testing reasons.
-//	 * cecks if xml config contains the key word "TEST_DIRECTORY"
-//	 * to set OPUS_HOME to that directory.
-//	 */
-//	private static void isModifyingOpusHomeDirectory(){
-//		
-//		if(opusHomeDirectory.equalsIgnoreCase("TEST_DIRECTORY")){
-//			log.info("Indicated to set OPUS_HOME to a temp directory (for debugging or testing reasons)...");
-//			Constants.setOpusHomeDirectory( System.getProperty("java.io.tmpdir") );
-//		}
-//		// update opus home path if needed
-//		else if( Constants.OPUS_HOME == null || !Constants.OPUS_HOME.equalsIgnoreCase(opusHomeDirectory)){
-//			log.info("Indicated new OPUS_HOME path. Setting new path...");
-//			Constants.setOpusHomeDirectory(opusHomeDirectory);
-//		}
-//	}
+	/**
+	 * only for debugging and testing reasons.
+	 * cecks if xml config contains the key word "TEST_DIRECTORY"
+	 * to set OPUS_HOME to that directory.
+	 */
+	private static void setOpusHomeDirectory(){
+		
+		// update opus home path if needed
+		if( Constants.OPUS_HOME == null || !Constants.OPUS_HOME.equalsIgnoreCase(opusHomeDirectory)){
+			log.info("Indicated new OPUS_HOME path. Setting new path...");
+			Constants.setOpusHomeDirectory(opusHomeDirectory);
+		}
+	}
 	
 	/**
 	 * creates a MATSim config object with the parameter from the JaxB data structure
@@ -231,9 +236,6 @@ public class MATSimConfigObject {
 		// init loader
 		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(scenario);
 		loader.loadScenario();
-		
-		// output dir
-		config.controler().setOutputDirectory( Constants.OPUS_MATSIM_OUTPUT_DIRECTORY );
 	}
 }
 

@@ -28,10 +28,12 @@ import playground.toronto.ttimematrix.SpanningTree;
 public class MyControlerListener implements /*IterationEndsListener,*/ ShutdownListener {
 	private static final Logger log = Logger.getLogger(MyControlerListener.class);
 
-	ActivityFacilitiesImpl zones ;
+	private ActivityFacilitiesImpl zones;
+	private String travelDataPath;
 
 	public MyControlerListener( ActivityFacilitiesImpl zones ) {
-		this.zones = zones ;
+		this.zones = zones;
+		this.travelDataPath = Constants.OPUS_HOME + MATSimConfigObject.getTempDirectory() + "travel_data.csv";
 	}
 
 	public void notifyShutdown(ShutdownEvent event) {
@@ -49,8 +51,6 @@ public class MyControlerListener implements /*IterationEndsListener,*/ ShutdownL
 		st.setDepartureTime(depatureTime);
 
 		try {
-			String travelDataPath = Constants.OPUS_HOME + MATSimConfigObject.getTempDirectory() + "travel_data.csv";
-
 			BufferedWriter writer = IOUtils.getBufferedWriter( travelDataPath );
 
 			log.info("Computing and writing travel_data" ) ;
@@ -95,6 +95,10 @@ public class MyControlerListener implements /*IterationEndsListener,*/ ShutdownL
 		}
 
 		log.info("... ... done with notifyShutdown.") ;
+	}
+	
+	public String getTravelDataPath(){
+		return travelDataPath;
 	}
 
 }

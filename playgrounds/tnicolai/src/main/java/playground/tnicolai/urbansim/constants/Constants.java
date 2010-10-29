@@ -34,13 +34,13 @@ public class Constants {
 	private static final Logger log = Logger.getLogger(Constants.class);
 	
 	/** important system environments */
-	public static String OPUS_HOME = System.getenv("OPUS_HOME");			// provided by UrbanSim via the configuration file; this is 
+	public static String OPUS_HOME;// = System.getenv("OPUS_HOME");			// provided by UrbanSim via the configuration file; this is 
 	
 	/** subdirectories in OPUS_HOME */
-	public static String OPUS_MATSIM_DIRECTORY = System.getenv("OPUS_HOME")+'/'+"opus_matsim/";						// TODO: these paths should be provided by UrbanSim only -> extend MATSim4UrbanSim config
-	public static String MATSIM_CONFIG_DIRECTORY = System.getenv("OPUS_HOME")+'/'+"opus_matsim/matsim_config/";		// 		 a method to set those paths is already been implemented (setOpusHomeDirectory)
-	public static String OPUS_MATSIM_OUTPUT_DIRECTORY = System.getenv("OPUS_HOME")+'/'+"opus_matsim/output/";
-	public static String OPUS_MATSIM_TEMPORARY_DIRECTORY = System.getenv("OPUS_HOME")+'/'+"opus_matsim/tmp/";
+	public static String OPUS_MATSIM_DIRECTORY;// = System.getenv("OPUS_HOME")+'/'+"opus_matsim/";						// TODO: these paths should be provided by UrbanSim only -> extend MATSim4UrbanSim config
+	public static String MATSIM_CONFIG_DIRECTORY;// = System.getenv("OPUS_HOME")+'/'+"opus_matsim/matsim_config/";		// 		 a method to set those paths is already been implemented (setOpusHomeDirectory)
+	public static String OPUS_MATSIM_OUTPUT_DIRECTORY;// = System.getenv("OPUS_HOME")+'/'+"opus_matsim/output/";
+	public static String OPUS_MATSIM_TEMPORARY_DIRECTORY;// = System.getenv("OPUS_HOME")+'/'+"opus_matsim/tmp/";
 	
 	/**
 	 * Apply a new root path for the OPUS_HOME directory
@@ -103,6 +103,9 @@ public class Constants {
 	/** test run */
 	public static final int TEST_RUN_SUCCESSFUL = 0;
 	public static final int TEST_RUN_FAILD = -1;
+	
+	/** measurements */
+	public static final String MEASUREMENT_LOGFILE = "psrc_log.txt";
 	
 	/** xsd on matsim.org */
 	public static final String MATSim_4_UrbanSim_XSD = "http://www.matsim.org/files/dtd/MATSim4UrbanSimConfigSchema.xsd";
