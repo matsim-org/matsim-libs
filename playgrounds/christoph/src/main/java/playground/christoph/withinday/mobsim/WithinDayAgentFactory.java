@@ -21,7 +21,7 @@
 package playground.christoph.withinday.mobsim;
 
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.ptproject.qsim.AgentFactory;
+import org.matsim.ptproject.qsim.DefaultAgentFactory;
 import org.matsim.ptproject.qsim.helpers.DefaultPersonDriverAgent;
 import org.matsim.ptproject.qsim.interfaces.Mobsim;
 
@@ -30,7 +30,7 @@ import org.matsim.ptproject.qsim.interfaces.Mobsim;
  * They are able to reset their cachedNextLink what is
  * necessary when doing LeaveLinkReplanning.
  */
-public class WithinDayAgentFactory extends AgentFactory {
+public class WithinDayAgentFactory extends DefaultAgentFactory {
 	
 	public WithinDayAgentFactory(final Mobsim simulation) {
 		super(simulation);
