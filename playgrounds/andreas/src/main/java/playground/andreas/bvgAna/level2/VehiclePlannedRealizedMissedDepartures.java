@@ -36,9 +36,9 @@ import playground.andreas.bvgAna.level1.StopId2RouteId2DelayAtStopMapData;
  * @author aneumann
  *
  */
-public class VehiclePlannedRealizedDeparturesMissedDepartures {
+public class VehiclePlannedRealizedMissedDepartures {
 	
-	private final Logger log = Logger.getLogger(VehiclePlannedRealizedDeparturesMissedDepartures.class);
+	private final Logger log = Logger.getLogger(VehiclePlannedRealizedMissedDepartures.class);
 	private final Level logLevel = Level.DEBUG;
 	
 	private final String planned = "planned";
@@ -47,7 +47,7 @@ public class VehiclePlannedRealizedDeparturesMissedDepartures {
 	private TreeMap<Id, TreeMap<Id, StopId2RouteId2DelayAtStopMapData>> stopId2Route2DelayAtStopMap;
 	
 	
-	public VehiclePlannedRealizedDeparturesMissedDepartures(StopId2RouteId2DelayAtStopMap vehicleDelayHandler){
+	public VehiclePlannedRealizedMissedDepartures(StopId2RouteId2DelayAtStopMap vehicleDelayHandler){
 		this.log.setLevel(this.logLevel);
 		this.stopId2Route2DelayAtStopMap = vehicleDelayHandler.getStopId2RouteId2DelayAtStopMap();
 	}
