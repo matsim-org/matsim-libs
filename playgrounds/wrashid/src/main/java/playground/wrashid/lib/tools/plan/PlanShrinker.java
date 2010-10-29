@@ -16,6 +16,7 @@ public class PlanShrinker {
 		
 		String outputPlansFile="H:/data/experiments/ARTEMIS/input/plans_census2000v2_zrhCutC_1pct.xml.gz";		
 		
+		// NOTE: if no facilities file is available for the scenario, just specify any valid facilities file
 		Scenario scenario= GeneralLib.readScenario(inputPlansFile, inputNetworkFile,inputFacilities);
 		new PopulationWriter(scenario.getPopulation(),scenario.getNetwork(),populationFraction).write(outputPlansFile);
 	}
