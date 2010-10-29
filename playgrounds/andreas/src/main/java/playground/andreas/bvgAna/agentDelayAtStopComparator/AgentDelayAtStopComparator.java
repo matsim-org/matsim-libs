@@ -38,8 +38,8 @@ import org.matsim.core.events.handler.VehicleDepartsAtFacilityEventHandler;
 import org.matsim.core.utils.collections.Tuple;
 
 import playground.andreas.bvgAna.agentDelayAnalyzer.AgentDelayHandler;
-import playground.andreas.bvgAna.plan2DepartureTime.AgentPlannedDepartureContainer;
-import playground.andreas.bvgAna.plan2DepartureTime.Plan2PlannedDepartureTime;
+import playground.andreas.bvgAna.level0.AgentId2PlannedDepartureTimeMap;
+import playground.andreas.bvgAna.level0.AgentId2PlannedDepartureTimeMapData;
 import playground.andreas.bvgAna.vehDelayHandler.VehDelayAnalyzer;
 import playground.andreas.bvgAna.vehDelayHandler.VehDelayHandler;
 
@@ -61,7 +61,7 @@ public class AgentDelayAtStopComparator implements TransitDriverStartsEventHandl
 	
 	private Population pop;
 	private Set<Id> agentIds;	
-	private TreeMap<Id, ArrayList<Tuple<Id, AgentPlannedDepartureContainer>>> plannedDepartureTimeMap;
+	private TreeMap<Id, ArrayList<Tuple<Id, AgentId2PlannedDepartureTimeMapData>>> plannedDepartureTimeMap;
 	private VehDelayHandler vehDelayHandler;
 	private VehDelayAnalyzer vehDelayAnalyzer;
 	private AgentDelayHandler agentDelayHandler;	
@@ -78,7 +78,7 @@ public class AgentDelayAtStopComparator implements TransitDriverStartsEventHandl
 		this.agentDelayHandler = new AgentDelayHandler(agentIds);
 		
 		this.log.info("Reading planned departure time...");
-		this.plannedDepartureTimeMap = Plan2PlannedDepartureTime.getPlannedDepartureTimeForPlan(this.pop, this.agentIds);
+		this.plannedDepartureTimeMap = AgentId2PlannedDepartureTimeMap.getAgentId2PlannedPTDepartureTimeMap(this.pop, this.agentIds);
 	}	
 	
 	private void compare(){		
@@ -97,12 +97,12 @@ public class AgentDelayAtStopComparator implements TransitDriverStartsEventHandl
 
 			ArrayList<Tuple<Id,Double>> agentsDiffs = this.agentIds2StopDifferenceMap.get(agentId);	
 			ArrayList<Tuple<Id, Integer>> agentsMissedVehicles = this.agentIds2MissedVehMap.get(agentId);
-			ArrayList<Tuple<Id, AgentPlannedDepartureContainer>> plannedDepartures = this.plannedDepartureTimeMap.get(agentId);
+			ArrayList<Tuple<Id, AgentId2PlannedDepartureTimeMapData>> plannedDepartures = this.plannedDepartureTimeMap.get(agentId);
 
 			for (int i = 0; i < plannedDepartures.size(); i++) {
 
 				Id stopId = plannedDepartures.get(i).getFirst();
-				AgentPlannedDepartureContainer depContainer = plannedDepartures.get(i).getSecond();
+				AgentId2PlannedDepartureTimeMapData depContainer = plannedDepartures.get(i).getSecond();
 				double plannedDepartureTime = depContainer.getPlannedDepartureTime();
 
 				// get next possible departure as scheduled

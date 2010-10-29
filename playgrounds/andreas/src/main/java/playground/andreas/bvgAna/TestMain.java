@@ -48,10 +48,10 @@ import org.xml.sax.SAXException;
 
 import playground.andreas.bvgAna.agentDelayAtStopComparator.AgentDelayAtStopComparator;
 import playground.andreas.bvgAna.agentId2EnterLeaveEvent.AgentId2EnterLeaveEventHandler;
-import playground.andreas.bvgAna.agentId2PersonMap.AgentId2PersonMap;
+import playground.andreas.bvgAna.level0.AgentId2PersonMap;
+import playground.andreas.bvgAna.level0.TransitScheduleDataProvider;
 import playground.andreas.bvgAna.personEnterLeave2Act.PersonEnterLeave2ActHandler;
 import playground.andreas.bvgAna.stopId2VehEnterLeave.StopId2PersonEnterLeaveHandler;
-import playground.andreas.bvgAna.transitSchedule.TransitScheduleMapProvider;
 
 /**
  * Simple test class
@@ -138,7 +138,7 @@ public class TestMain {
 		
 		TreeMap<Id, ArrayList<Tuple<Id, Integer>>> testMap2 = comp.getNumberOfMissedVehiclesMap();
 		
-		TreeMap<Id, Id> map3 = new TransitScheduleMapProvider(sc.getTransitSchedule()).getRouteId2lineIdMap();
+		TreeMap<Id, Id> map3 = new TransitScheduleDataProvider(sc.getTransitSchedule()).getRouteId2lineIdMap();
 		
 		TreeMap<Id, ArrayList<PersonEntersVehicleEvent>> map4 = stophandler.getStopId2PersonEnterEventMap();
 		TreeMap<Id, ArrayList<PersonLeavesVehicleEvent>> map5 = stophandler.getStopId2PersonLeaveEventMap();
@@ -148,7 +148,7 @@ public class TestMain {
 		TreeMap<Id, ArrayList<PersonEntersVehicleEvent>> map8 = aid2elhandler.getAgentId2EnterEventMap();
 		TreeMap<Id, ArrayList<PersonLeavesVehicleEvent>> map9 = aid2elhandler.getAgentId2LeaveEventMap();
 		
-		String name = new TransitScheduleMapProvider(sc.getTransitSchedule()).getStopName(stopIds.first());
+		String name = new TransitScheduleDataProvider(sc.getTransitSchedule()).getStopName(stopIds.first());
 		
 		TreeMap<Id, PersonImpl> map10 = AgentId2PersonMap.getAgentId2PersonMap(plans, agentIds);
 
