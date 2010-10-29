@@ -27,6 +27,9 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.collections.Tuple;
 
+import playground.andreas.bvgAna.level1.StopId2RouteId2DelayAtStopMap;
+import playground.andreas.bvgAna.level1.StopId2RouteId2DelayAtStopMapData;
+
 /**
  * Searches the next planned and next realized departures for a given stop and time. Calculates the number of missed vehicles.
  * 
@@ -41,12 +44,12 @@ public class VehDelayAnalyzer {
 	private final String planned = "planned";
 	private final String realized = "realized";
 	
-	private TreeMap<Id, TreeMap<Id, VehDelayAtStopContainer>> stopId2Route2DelayAtStopMap;
+	private TreeMap<Id, TreeMap<Id, StopId2RouteId2DelayAtStopMapData>> stopId2Route2DelayAtStopMap;
 	
 	
-	public VehDelayAnalyzer(VehDelayHandler vehicleDelayHandler){
+	public VehDelayAnalyzer(StopId2RouteId2DelayAtStopMap vehicleDelayHandler){
 		this.log.setLevel(this.logLevel);
-		this.stopId2Route2DelayAtStopMap = vehicleDelayHandler.getStopId2Route2DelayAtStopMap();
+		this.stopId2Route2DelayAtStopMap = vehicleDelayHandler.getStopId2RouteId2DelayAtStopMap();
 	}
 	
 	/**
@@ -106,10 +109,10 @@ public class VehDelayAnalyzer {
 
 	private Tuple<Double, Integer> getNextDepartureTime(Id stopId, double time, Id lineId, Id routeId, String type){
 		this.log.debug("TransitAgent.getEnterTransitRoute only checks for line id and stops to come ignoring route id. Agent probably too fast in simulation compared to plan.");
-		TreeMap<Id, VehDelayAtStopContainer> possibleRoutes = this.stopId2Route2DelayAtStopMap.get(stopId);		
+		TreeMap<Id, StopId2RouteId2DelayAtStopMapData> possibleRoutes = this.stopId2Route2DelayAtStopMap.get(stopId);		
 		Tuple<Double, Integer> closestDepartureTimeAndSlot = new Tuple<Double, Integer>(new Double(Double.POSITIVE_INFINITY), new Integer(Integer.MIN_VALUE));
 		
-		for (VehDelayAtStopContainer delayContainer : possibleRoutes.values()) {
+		for (StopId2RouteId2DelayAtStopMapData delayContainer : possibleRoutes.values()) {
 			
 			if(delayContainer.getLineId().toString().equalsIgnoreCase(lineId.toString()) && delayContainer.getRouteId().toString().equalsIgnoreCase(routeId.toString())){
 				ArrayList<Double> departures;

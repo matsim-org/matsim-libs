@@ -40,8 +40,8 @@ import org.matsim.core.utils.collections.Tuple;
 import playground.andreas.bvgAna.level0.AgentId2PlannedDepartureTimeMap;
 import playground.andreas.bvgAna.level0.AgentId2PlannedDepartureTimeMapData;
 import playground.andreas.bvgAna.level1.AgentId2DepartureDelayAtStopMap;
+import playground.andreas.bvgAna.level1.StopId2RouteId2DelayAtStopMap;
 import playground.andreas.bvgAna.vehDelayHandler.VehDelayAnalyzer;
-import playground.andreas.bvgAna.vehDelayHandler.VehDelayHandler;
 
 /**
  * Calculates the difference between realized time and planned time spent waiting at a stop for a given set of agent ids.<br>
@@ -62,7 +62,7 @@ public class AgentDelayAtStopComparator implements TransitDriverStartsEventHandl
 	private Population pop;
 	private Set<Id> agentIds;	
 	private TreeMap<Id, ArrayList<Tuple<Id, AgentId2PlannedDepartureTimeMapData>>> plannedDepartureTimeMap;
-	private VehDelayHandler vehDelayHandler;
+	private StopId2RouteId2DelayAtStopMap vehDelayHandler;
 	private VehDelayAnalyzer vehDelayAnalyzer;
 	private AgentId2DepartureDelayAtStopMap agentDelayHandler;	
 	private TreeMap<Id,ArrayList<Tuple<Id,Double>>> agentIds2StopDifferenceMap = null;
@@ -73,7 +73,7 @@ public class AgentDelayAtStopComparator implements TransitDriverStartsEventHandl
 		this.pop = pop;
 		this.agentIds = agentIds;
 		
-		this.vehDelayHandler = new VehDelayHandler();
+		this.vehDelayHandler = new StopId2RouteId2DelayAtStopMap();
 		this.vehDelayAnalyzer = new VehDelayAnalyzer(this.vehDelayHandler);
 		this.agentDelayHandler = new AgentId2DepartureDelayAtStopMap(agentIds);
 		
