@@ -20,6 +20,7 @@
 
 package org.matsim.ptproject.qsim.helpers;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -182,7 +183,7 @@ public class DefaultPersonDriverAgent implements PersonDriverAgent {
 		}
 
 		if (this.currentLinkIdIndex >= this.cachedRouteLinkIds.size() ) {
-			// we have no more information for the route, so we should have arrived at the destination link
+			// we have no more information for the route, so the next link should be the destination link
 			Link currentLink = this.simulation.getScenario().getNetwork().getLinks().get(this.currentLinkId);
 			Link destinationLink = this.simulation.getScenario().getNetwork().getLinks().get(this.cachedDestinationLinkId);
 			if (currentLink.getToNode().equals(destinationLink.getFromNode())) {
@@ -215,10 +216,11 @@ public class DefaultPersonDriverAgent implements PersonDriverAgent {
 	 * If this method is called to update a changed ActivityEndTime please
 	 * ensure, that the ActivityEndsList in the {@link QSim} is also updated.
 	 * <p/>
-	 * yyyy Public since christoph uses it outside inheritance.  This is, however, not so bad except maybe (!) for the
+	 * Public since christoph uses it outside inheritance.  This is, however, not so bad except maybe (!) for the
 	 * "activityEndsList" see comment above.  kai, aug'10
+	 * No longer used outside inheritance so I am making this protected.  kai, oct'10
 	 */
-	public final void calculateDepartureTime(Activity tmpAct) {
+	protected final void calculateDepartureTime(Activity tmpAct) {
 		double now = this.getQSimulation().getSimTimer().getTimeOfDay() ;
 		ActivityImpl act = (ActivityImpl) tmpAct ; // since we need the duration.  kai, aug'10
 
@@ -346,8 +348,21 @@ public class DefaultPersonDriverAgent implements PersonDriverAgent {
 	 * Convenience method delegating to person's selected plan
 	 * @return list of {@link ActivityImpl}s and {@link LegImpl}s of this agent's plan
 	 */
-	private final List<? extends PlanElement> getPlanElements() {
-		return this.person.getSelectedPlan().getPlanElements();
+	public final List<PlanElement> getPlanElements() {
+		return Collections.unmodifiableList( this.person.getSelectedPlan().getPlanElements() );
+	}
+	
+	@Deprecated // experimental function, do not use.  kai, oct'10
+	public final List<PlanElement> getModifiablePlanElements() {
+		return this.person.getSelectedPlan().getPlanElements() ;
+	}
+	@Deprecated // experimental function, do not use.  kai, oct'10
+	public final Integer getCurrentPlanElementIndex() {
+		return this.currentPlanElementIndex ;
+	}
+	@Deprecated // experimental function, do not use.  kai, oct'10
+	public final Integer getCurrentRouteLinkIdIndex() {
+		return this.currentLinkIdIndex ;
 	}
 
 	// ============================================================================================================================
@@ -396,6 +411,8 @@ public class DefaultPersonDriverAgent implements PersonDriverAgent {
 		this.cachedRouteLinkIds = null;
 	}
 
+	@Deprecated // yyyyyy where does this method come from?  it returns "currentLinkIdIndex+1".  But this is not a node, but
+	// the next link in the sequence!?!?!?  kai, oct'10
 	public final int getCurrentNodeIndex() {
 		return this.currentLinkIdIndex + 1;
 	}
@@ -409,6 +426,5 @@ public class DefaultPersonDriverAgent implements PersonDriverAgent {
 	public final Person getPerson() {
 		return this.person;
 	}
-
-
+	
 }
