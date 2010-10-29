@@ -47,11 +47,11 @@ import org.matsim.transitSchedule.api.TransitScheduleReader;
 import org.xml.sax.SAXException;
 
 import playground.andreas.bvgAna.agentDelayAtStopComparator.AgentDelayAtStopComparator;
-import playground.andreas.bvgAna.agentId2EnterLeaveEvent.AgentId2EnterLeaveEventHandler;
 import playground.andreas.bvgAna.level0.AgentId2PersonMap;
 import playground.andreas.bvgAna.level0.TransitScheduleDataProvider;
-import playground.andreas.bvgAna.personEnterLeave2Act.PersonEnterLeave2ActHandler;
-import playground.andreas.bvgAna.stopId2VehEnterLeave.StopId2PersonEnterLeaveHandler;
+import playground.andreas.bvgAna.level1.AgentId2EnterLeaveVehicleEventHandler;
+import playground.andreas.bvgAna.level1.PersonEnterLeaveVehicle2ActivityHandler;
+import playground.andreas.bvgAna.level1.StopId2PersonEnterLeaveVehicleHandler;
 
 /**
  * Simple test class
@@ -114,11 +114,11 @@ public class TestMain {
 		stopIds.add(new IdImpl("801040.1"));
 		stopIds.add(new IdImpl("804070.2"));
 		
-		StopId2PersonEnterLeaveHandler stophandler = new StopId2PersonEnterLeaveHandler(stopIds);
+		StopId2PersonEnterLeaveVehicleHandler stophandler = new StopId2PersonEnterLeaveVehicleHandler(stopIds);
 		eventsManager.addHandler(stophandler);
-		PersonEnterLeave2ActHandler enterLeaveHandler = new PersonEnterLeave2ActHandler(agentIds);
+		PersonEnterLeaveVehicle2ActivityHandler enterLeaveHandler = new PersonEnterLeaveVehicle2ActivityHandler(agentIds);
 		eventsManager.addHandler(enterLeaveHandler);
-		AgentId2EnterLeaveEventHandler aid2elhandler = new AgentId2EnterLeaveEventHandler(agentIds);
+		AgentId2EnterLeaveVehicleEventHandler aid2elhandler = new AgentId2EnterLeaveVehicleEventHandler(agentIds);
 		eventsManager.addHandler(aid2elhandler);
 		
 		try {
