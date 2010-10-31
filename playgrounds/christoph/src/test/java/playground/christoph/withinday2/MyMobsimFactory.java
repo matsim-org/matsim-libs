@@ -32,8 +32,8 @@ import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
-import org.matsim.ptproject.qsim.AgentFactory;
 import org.matsim.ptproject.qsim.QSim;
+import org.matsim.ptproject.qsim.agents.AgentFactory;
 import org.matsim.ptproject.qsim.interfaces.Mobsim;
 
 import playground.christoph.events.algorithms.FixedOrderQueueSimulationListener;

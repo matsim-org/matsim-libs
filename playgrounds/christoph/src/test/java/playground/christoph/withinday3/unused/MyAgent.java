@@ -24,7 +24,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
-import org.matsim.ptproject.qsim.helpers.DefaultPersonDriverAgent;
+import org.matsim.ptproject.qsim.agents.DefaultAgentFactory;
 import org.matsim.ptproject.qsim.interfaces.Mobsim;
 import org.matsim.ptproject.qsim.qnetsimengine.QVehicle;
 
@@ -39,7 +39,7 @@ class MyAgent implements PersonDriverAgent {
 	
 	MyAgent( Person person, Mobsim mobsim ) {
 		this.mobsim = mobsim ;
-		delegate = new DefaultPersonDriverAgent( person, mobsim ) ;
+		delegate = new DefaultAgentFactory(mobsim).createPersonAgent( person ) ;
 	}
 
 	public Id chooseNextLinkId() {

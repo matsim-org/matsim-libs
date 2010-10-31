@@ -28,7 +28,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.ptproject.qsim.helpers.DefaultPersonDriverAgent;
+import org.matsim.ptproject.qsim.agents.DefaultPersonDriverAgent;
+import org.matsim.ptproject.qsim.agents.ExperimentalBasicWithindayAgent;
 import org.matsim.ptproject.qsim.interfaces.NetsimLink;
 import org.matsim.ptproject.qsim.interfaces.NetsimNetwork;
 import org.matsim.ptproject.qsim.interfaces.Mobsim;
@@ -38,7 +39,7 @@ import org.matsim.ptproject.qsim.interfaces.Mobsim;
  * @author dgrether
  *
  */
-public class DgWithindayQPersonAgent extends DefaultPersonDriverAgent {
+public class DgWithindayQPersonAgent extends ExperimentalBasicWithindayAgent {
 
 	private static final Logger log = Logger.getLogger(DgWithindayQPersonAgent.class);
 	private Random random;
@@ -72,8 +73,8 @@ public class DgWithindayQPersonAgent extends DefaultPersonDriverAgent {
 		double outLinksCapacitySum = 0.0;
 		if (outlinks.values().size() == 1){
 			Link outLink = outlinks.values().iterator().next();
-			this.cachedNextLinkId = outLink.getId();
-			return this.cachedNextLinkId;
+			this.setCachedNextLinkId(outLink.getId());
+			return this.getCachedNextLinkId();
 		}
 		else {
 			for (Link outLink : outlinks.values()){
@@ -90,8 +91,8 @@ public class DgWithindayQPersonAgent extends DefaultPersonDriverAgent {
 			selectedCapacity += outLink.getCapacity(this.getQSimulation().getSimTimer().getTimeOfDay());
 //			log.error("selectedCap: " + selectedCapacity + " randomNumber: " + randomNumber);
 			if (selectedCapacity >= randomNumber){
-				this.cachedNextLinkId = outLink.getId();
-				return this.cachedNextLinkId;
+				this.setCachedNextLinkId(outLink.getId());
+				return this.getCachedNextLinkId();
 			}
 		}
 		throw new IllegalStateException("selectedCapacity: " + selectedCapacity + " randomNumber: " + randomNumber

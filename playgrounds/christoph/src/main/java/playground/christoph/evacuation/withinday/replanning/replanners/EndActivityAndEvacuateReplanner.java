@@ -37,7 +37,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.ptproject.qsim.agents.DefaultPersonDriverAgent;
-import org.matsim.ptproject.qsim.agents.ExperimentalBasicWithindayPersonDriverAgent;
+import org.matsim.ptproject.qsim.agents.ExperimentalBasicWithindayAgent;
 
 import playground.christoph.evacuation.withinday.replanning.replanners.EndActivityAndEvacuateReplanner;
 import playground.christoph.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
@@ -133,7 +133,7 @@ public class EndActivityAndEvacuateReplanner extends WithinDayDuringActivityRepl
 			
 			double oldDepartureTime = personAgent.getDepartureTime();
 		
-			((ExperimentalBasicWithindayPersonDriverAgent) personAgent).calculateDepartureTime(currentActivity);
+			((ExperimentalBasicWithindayAgent) personAgent).calculateDepartureTime(currentActivity);
 			double newDepartureTime = personAgent.getDepartureTime();
 			((DefaultPersonDriverAgent) personAgent).getQSimulation().rescheduleActivityEnd(personAgent, oldDepartureTime, newDepartureTime);
 			return true;

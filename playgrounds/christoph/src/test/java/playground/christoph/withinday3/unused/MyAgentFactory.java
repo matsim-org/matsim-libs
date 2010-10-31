@@ -21,7 +21,7 @@ package playground.christoph.withinday3.unused;
 
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
-import org.matsim.ptproject.qsim.AgentFactory;
+import org.matsim.ptproject.qsim.agents.AgentFactory;
 import org.matsim.ptproject.qsim.interfaces.Mobsim;
 
 /**

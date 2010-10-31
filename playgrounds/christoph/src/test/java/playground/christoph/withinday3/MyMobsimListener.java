@@ -42,7 +42,8 @@ import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
-import org.matsim.ptproject.qsim.helpers.DefaultPersonDriverAgent;
+import org.matsim.ptproject.qsim.agents.DefaultPersonDriverAgent;
+import org.matsim.ptproject.qsim.agents.ExperimentalBasicWithindayAgent;
 import org.matsim.ptproject.qsim.interfaces.Mobsim;
 import org.matsim.ptproject.qsim.interfaces.NetsimLink;
 import org.matsim.ptproject.qsim.qnetsimengine.QVehicle;
@@ -113,24 +114,29 @@ public class MyMobsimListener implements SimulationListener, SimulationBeforeSim
 		
 		// preconditions:
 
-		Person person = personAgent.getPerson();
+		if ( !(personAgent instanceof ExperimentalBasicWithindayAgent) ) {
+			log.error("agent of wrong type; returning ... " ) ;
+		}
+		ExperimentalBasicWithindayAgent withindayAgent = (ExperimentalBasicWithindayAgent) personAgent ;
+		
+		Person person = withindayAgent.getPerson();
 		Plan selectedPlan = person.getSelectedPlan();
 
 		if (selectedPlan == null) {
 			log.info( " we don't have a selected plan; returning ... ") ;
 			return false;
 		}
-		if ( !(personAgent.getCurrentPlanElement() instanceof Leg) ) {
+		if ( !(withindayAgent.getCurrentPlanElement() instanceof Leg) ) {
 			log.info( "agent not on leg; returning ... ") ;
 			return false ;
 		}
-		if (!((Leg)personAgent.getCurrentPlanElement()).getMode().equals(TransportMode.car)) {
+		if (!((Leg)withindayAgent.getCurrentPlanElement()).getMode().equals(TransportMode.car)) {
 			log.info( "not a car leg; can only replan car legs; returning ... ") ;
 			return false;
 		}
 		
-		List<PlanElement> planElements = ((DefaultPersonDriverAgent)personAgent).getModifiablePlanElements() ;
-		final Integer planElementsIndex = ((DefaultPersonDriverAgent)personAgent).getCurrentPlanElementIndex() ;
+		List<PlanElement> planElements = withindayAgent.getModifiablePlanElements() ;
+		final Integer planElementsIndex = withindayAgent.getCurrentPlanElementIndex() ;
 		
 		if ( !(planElements.get(planElementsIndex+1) instanceof Activity || !(planElements.get(planElementsIndex+2) instanceof Leg)) ) {
 			log.error( "this version of withinday replanning cannot deal with plans where legs and acts to not alternate; returning ...") ;
@@ -154,7 +160,7 @@ public class MyMobsimListener implements SimulationListener, SimulationBeforeSim
 		 */
 		// new Route for current Leg
 		EditRoutesKai.replanCurrentLegRoute(person, planElements, planElementsIndex, 
-				((DefaultPersonDriverAgent)personAgent).getCurrentRouteLinkIdIndex(), routeAlgo, now ) ;
+				withindayAgent.getCurrentRouteLinkIdIndex(), routeAlgo, now ) ;
 
 //		new EditRoutes().replanCurrentLegRoute(selectedPlan, currentLeg, ((DefaultPersonDriverAgent)personAgent).getCurrentNodeIndex(), routeAlgo, scenario.getNetwork(), now);
 		// ( compiles, but does not run, since agents are (deliberately) not instantiated as withindayreplanningagents.  kai, oct'10 )
@@ -166,7 +172,7 @@ public class MyMobsimListener implements SimulationListener, SimulationBeforeSim
 		new EditRoutes().replanFutureLegRoute(selectedPlan, homeLeg, routeAlgo);
 		
 		// finally reset the cached Values of the PersonAgent - they may have changed!
-		personAgent.resetCaches();
+		withindayAgent.resetCaches();
 		
 		return true;
 	}
