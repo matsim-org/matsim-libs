@@ -38,9 +38,9 @@ public class QVehicleDepartureTimeComparator implements Comparator<QVehicle>,
 	private static final long serialVersionUID = 1L;
 
 	public int compare(final QVehicle veh1, final QVehicle veh2) {
-		if (veh1.getDriver().getDepartureTime() > veh2.getDriver().getDepartureTime())
+		if (veh1.getDriver().getDepartureTimeForLeg() > veh2.getDriver().getDepartureTimeForLeg())
 			return 1;
-		if (veh1.getDriver().getDepartureTime() < veh2.getDriver().getDepartureTime())
+		if (veh1.getDriver().getDepartureTimeForLeg() < veh2.getDriver().getDepartureTimeForLeg())
 			return -1;
 
 		// Both depart at the same time -> let the one with the larger id be first

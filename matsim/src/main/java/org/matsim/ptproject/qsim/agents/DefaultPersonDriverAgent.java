@@ -61,7 +61,7 @@ public class DefaultPersonDriverAgent implements PersonDriverAgent {
 
 	private final Mobsim simulation;
 
-	private double activityDepartureTime = Time.UNDEFINED_TIME;
+	private double activityEndTime = Time.UNDEFINED_TIME;
 
 	private Id currentLinkId = null;
 
@@ -126,11 +126,11 @@ public class DefaultPersonDriverAgent implements PersonDriverAgent {
 		List<? extends PlanElement> planElements = this.getPlanElements();
 		this.currentPlanElementIndex = 0;
 		Activity firstAct = (Activity) planElements.get(0);
-		double departureTime = firstAct.getEndTime();
+		double actEndTime = firstAct.getEndTime();
 
 		this.currentLinkId = firstAct.getLinkId();
-		if ((departureTime != Time.UNDEFINED_TIME) && (planElements.size() > 1)) {
-			this.activityDepartureTime = departureTime ;
+		if ((actEndTime != Time.UNDEFINED_TIME) && (planElements.size() > 1)) {
+			this.activityEndTime = actEndTime ;
 			this.simulation.scheduleActivityEnd(this);
 			this.simulation.getAgentCounter().incLiving();
 			return true;
@@ -221,9 +221,6 @@ public class DefaultPersonDriverAgent implements PersonDriverAgent {
 	/**
 	 * If this method is called to update a changed ActivityEndTime please
 	 * ensure, that the ActivityEndsList in the {@link QSim} is also updated.
-	 * <p/>
-	 * Public since christoph uses it outside inheritance.  This is, however, not so bad except maybe (!) for the
-	 * "activityEndsList" see comment above.  kai, aug'10
 	 */
 	void calculateDepartureTime(Activity tmpAct) {
 		double now = this.getMobsim().getSimTimer().getTimeOfDay() ;
@@ -231,7 +228,7 @@ public class DefaultPersonDriverAgent implements PersonDriverAgent {
 
 		if ( act.getDuration() == Time.UNDEFINED_TIME && (act.getEndTime() == Time.UNDEFINED_TIME)) {
 			// yyyy does this make sense?  below there is at least one execution path where this should lead to an exception.  kai, oct'10
-			this.activityDepartureTime = Double.POSITIVE_INFINITY ;
+			this.activityEndTime = Double.POSITIVE_INFINITY ;
 			return ;
 		}
 		
@@ -286,7 +283,7 @@ public class DefaultPersonDriverAgent implements PersonDriverAgent {
 			
 
 		
-		this.activityDepartureTime = departure ;
+		this.activityEndTime = departure ;
 	}
 		
 	// ============================================================================================================================
@@ -368,17 +365,20 @@ public class DefaultPersonDriverAgent implements PersonDriverAgent {
 	
 	@Override
 	public final void setVehicle(final QVehicle veh) {
+		// yyyy something like this makes sense but does it need to be "Q"Vehicle?  kai, oct'10
 		this.vehicle = veh;
 	}
 
 	@Override
 	public final QVehicle getVehicle() {
+		// yyyy something like this makes sense but does it need to be "Q"Vehicle?  kai, oct'10
 		return this.vehicle;
 	}
 
 	@Override
-	public final double getDepartureTime() {
-		return this.activityDepartureTime;
+	public final double getDepartureTimeForLeg() {
+		// yyyyyy I don't think there is any guarantee that this entry is correct after an activity end re-scheduling.  kai, oct'10
+		return this.activityEndTime;
 	}
 
 //	private void setDepartureTime(final double seconds) {
@@ -387,23 +387,25 @@ public class DefaultPersonDriverAgent implements PersonDriverAgent {
 
 	@Override
 	public final Id getCurrentLinkId() {
+		// note: the method is really only defined for DriverAgent!  kai, oct'10
 		return this.currentLinkId;
 	}
 
 	@Override
+	@Deprecated // yyyyyy replace as indicated below
 	public final Leg getCurrentLeg() {
 		return this.currentLeg;
+
+//		replace by:
+//		if ( !(this.getCurrentPlanElement() instanceof Leg) ) {
+//			return null ;
+//		}
+//		return (Leg) this.getCurrentPlanElement() ;
 	}
 
 	private final void setCurrentLegAndResetRouteCache(final Leg leg) {
 		this.currentLeg  = leg;
 		this.cachedRouteLinkIds = null;
-	}
-
-	@Deprecated // yyyyyy where does this method come from?  it returns "currentLinkIdIndex+1".  But this is not a node, but
-	// the next link in the sequence!?!?!?  kai, oct'10
-	public final int getCurrentNodeIndex() {
-		return this.currentLinkIdIndex + 1;
 	}
 
 	@Override
@@ -414,6 +416,13 @@ public class DefaultPersonDriverAgent implements PersonDriverAgent {
 	@Override
 	public final Person getPerson() {
 		return this.person;
+	}
+	
+	@Deprecated // yyyyyy where does this method come from?  it returns "currentLinkIdIndex+1".  But this is not a node, but
+	// the next link in the sequence!?!?!?  kai, oct'10
+	// yyyyyy move this to ExperimentalBasicWithindayAgent.  kai, oct'10
+	public final int getCurrentNodeIndex() {
+		return this.currentLinkIdIndex + 1;
 	}
 
 }

@@ -331,7 +331,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 		double simStartTime = 0;
 		PersonAgent firstAgent = this.activityEndsList.peek();
 		if (firstAgent != null) {
-			simStartTime = Math.floor(Math.max(startTime, firstAgent.getDepartureTime()));
+			simStartTime = Math.floor(Math.max(startTime, firstAgent.getDepartureTimeForLeg()));
 		}
 		this.infoTime = Math.floor(simStartTime / INFO_PERIOD) * INFO_PERIOD; // infoTime may be < simStartTime, this ensures to print out the info at the very first timestep already
 		this.snapshotTime = Math.floor(simStartTime / this.snapshotPeriod) * this.snapshotPeriod;
@@ -496,7 +496,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 	 *
 	 * @param agent
 	 *
-	 * @see PersonDriverAgent#getDepartureTime()
+	 * @see PersonDriverAgent#getDepartureTimeForLeg()
 	 */
 	@Override
 	public void scheduleActivityEnd(final PersonAgent agent) {
@@ -506,7 +506,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 	private void handleActivityEnds(final double time) {
 		while (this.activityEndsList.peek() != null) {
 			PersonAgent agent = this.activityEndsList.peek();
-			if (agent.getDepartureTime() <= time) {
+			if (agent.getDepartureTimeForLeg() <= time) {
 				this.activityEndsList.poll();
 				agent.endActivityAndAssumeControl(time);
 			} else {

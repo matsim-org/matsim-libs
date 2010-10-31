@@ -102,7 +102,7 @@ public class TransitDriver extends AbstractTransitDriver {
 	}
 
 	@Override
-	public double getDepartureTime() {
+	public double getDepartureTimeForLeg() {
 		return this.departureTime;
 	}
 

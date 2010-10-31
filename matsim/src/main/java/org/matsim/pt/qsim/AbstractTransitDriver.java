@@ -67,7 +67,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 	public abstract TransitRoute getTransitRoute();
 	public abstract Departure getDeparture();
 	@Override
-	public abstract double getDepartureTime();
+	public abstract double getDepartureTimeForLeg();
 
 	public AbstractTransitDriver(Mobsim sim, TransitStopAgentTracker agentTracker2) {
 		super();
@@ -199,7 +199,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 	protected double longerStopTimeIfWeAreAheadOfSchedule(final double now,
 			final double stopTime) {
 		if ((this.nextStop.isAwaitDepartureTime()) && (this.nextStop.getDepartureOffset() != Time.UNDEFINED_TIME)) {
-			double earliestDepTime = getDepartureTime() + this.nextStop.getDepartureOffset();
+			double earliestDepTime = getDepartureTimeForLeg() + this.nextStop.getDepartureOffset();
 			if (now + stopTime < earliestDepTime) {
 				return earliestDepTime - now;
 			}

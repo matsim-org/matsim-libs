@@ -58,13 +58,15 @@ public interface PersonAgent extends MobsimAgent {
 	 *
 	 * @return the time when the agent wants to depart from an activity.
 	 */
-	public double getDepartureTime();
+	public double getDepartureTimeForLeg();
 	/* there is no corresponding setter, as the implementation should set the the corresponding time
 	 * internally, e.g. in legEnds().
 	 */
 	// yyyy getDepartureTimeFromActivity()  [[since there is also a linkDepartureTime of the 
 	// queue sim, and possibly a departure time of a leg]].  kai, jan'10
 	// But the transit driver does not have an activity (?!). kai, apr'10
+	// Re-named this into this weird method name since I got confused once more.  Would have been a lot easier if
+	// bus drivers either would have activities, or would not be PersonAgents.  kai, oct'10
 
 	/**
 	 * Informs the agent that the activity has ended.  The agent is responsible for what comes next.

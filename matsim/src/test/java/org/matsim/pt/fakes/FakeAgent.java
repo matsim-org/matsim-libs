@@ -93,7 +93,7 @@ public class FakeAgent implements PersonDriverAgent, PassengerAgent {
 	}
 
 	@Override
-	public double getDepartureTime() {
+	public double getDepartureTimeForLeg() {
 		return 0;
 	}
 

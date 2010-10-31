@@ -165,7 +165,7 @@ public class UmlaufDriver extends AbstractTransitDriver {
 	}
 
 	@Override
-	public double getDepartureTime() {
+	public double getDepartureTimeForLeg() {
 		return this.departureTime;
 	}
 

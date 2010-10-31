@@ -129,7 +129,7 @@ public class TransitDriverTest extends MatsimTestCase {
 		TransitStopAgentTracker tracker = null;
 		QSim tqsim = null;
 		AbstractTransitDriver driver = new TransitDriver(tLine, tRoute, dep, tracker, tqsim);
-		assertEquals(depTime, driver.getDepartureTime(), MatsimTestCase.EPSILON);
+		assertEquals(depTime, driver.getDepartureTimeForLeg(), MatsimTestCase.EPSILON);
 	}
 
 	public void testInitializationStops() {

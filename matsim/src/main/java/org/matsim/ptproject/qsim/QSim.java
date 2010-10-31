@@ -409,7 +409,7 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 	 * Registers this agent as performing an activity and makes sure that the agent will be informed once his departure time has come.
 	 * @param agent
 	 *
-	 * @see PersonDriverAgent#getDepartureTime()
+	 * @see PersonDriverAgent#getDepartureTimeForLeg()
 	 */
 	@Override
 	public final void scheduleActivityEnd(final PersonAgent agent) {
@@ -489,7 +489,7 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 	private void handleActivityEnds(final double time) {
 		while (this.activityEndsList.peek() != null) {
 			PersonAgent agent = this.activityEndsList.peek();
-			if (agent.getDepartureTime() <= time) {
+			if (agent.getDepartureTimeForLeg() <= time) {
 				this.activityEndsList.poll();
 				unregisterAgentAtActivityLocation(agent);
 				agent.endActivityAndAssumeControl(time);
@@ -638,7 +638,7 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 		double simStartTime = 0;
 		PersonAgent firstAgent = this.activityEndsList.peek();
 		if (firstAgent != null) {
-			simStartTime = Math.floor(Math.max(startTime, firstAgent.getDepartureTime()));
+			simStartTime = Math.floor(Math.max(startTime, firstAgent.getDepartureTimeForLeg()));
 		}
 		this.simTimer.setSimStartTime(simStartTime);
 		this.simTimer.setTime(simStartTime);
