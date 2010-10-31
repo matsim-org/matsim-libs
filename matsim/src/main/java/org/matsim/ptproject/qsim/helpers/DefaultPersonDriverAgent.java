@@ -218,9 +218,8 @@ public class DefaultPersonDriverAgent implements PersonDriverAgent {
 	 * <p/>
 	 * Public since christoph uses it outside inheritance.  This is, however, not so bad except maybe (!) for the
 	 * "activityEndsList" see comment above.  kai, aug'10
-	 * No longer used outside inheritance so I am making this protected.  kai, oct'10
 	 */
-	protected final void calculateDepartureTime(Activity tmpAct) {
+	public final void calculateDepartureTime(Activity tmpAct) {
 		double now = this.getQSimulation().getSimTimer().getTimeOfDay() ;
 		ActivityImpl act = (ActivityImpl) tmpAct ; // since we need the duration.  kai, aug'10
 
