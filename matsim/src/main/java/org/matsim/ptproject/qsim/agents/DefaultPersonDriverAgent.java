@@ -226,7 +226,7 @@ public class DefaultPersonDriverAgent implements PersonDriverAgent {
 	 * "activityEndsList" see comment above.  kai, aug'10
 	 */
 	void calculateDepartureTime(Activity tmpAct) {
-		double now = this.getQSimulation().getSimTimer().getTimeOfDay() ;
+		double now = this.getMobsim().getSimTimer().getTimeOfDay() ;
 		ActivityImpl act = (ActivityImpl) tmpAct ; // since we need the duration.  kai, aug'10
 
 		if ( act.getDuration() == Time.UNDEFINED_TIME && (act.getEndTime() == Time.UNDEFINED_TIME)) {
@@ -341,7 +341,7 @@ public class DefaultPersonDriverAgent implements PersonDriverAgent {
 	}
 
 	private void initNextActivity(final Activity act) {
-		double now = this.getQSimulation().getSimTimer().getTimeOfDay() ;
+		double now = this.getMobsim().getSimTimer().getTimeOfDay() ;
 		this.simulation.getEventsManager().processEvent(new ActivityStartEventImpl(now, this.getPerson().getId(),  this.currentLinkId, act.getFacilityId(), act.getType()));
 		/* schedule a departure if either duration or endtime is set of the activity.
 		 * Otherwise, the agent will just stay at this activity for ever...
@@ -357,7 +357,7 @@ public class DefaultPersonDriverAgent implements PersonDriverAgent {
 		return Collections.unmodifiableList( this.person.getSelectedPlan().getPlanElements() );
 	}
 	
-	public final Mobsim getQSimulation(){
+	public final Mobsim getMobsim(){
 		return this.simulation;
 	}
 
