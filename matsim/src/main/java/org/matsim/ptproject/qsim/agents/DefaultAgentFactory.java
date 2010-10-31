@@ -17,14 +17,27 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.ptproject.qsim;
+package org.matsim.ptproject.qsim.agents;
 
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.api.internal.MatsimFactory;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
+import org.matsim.ptproject.qsim.interfaces.Mobsim;
 
-public interface AgentFactory extends MatsimFactory {
+/**
+ * @author dgrether
+ */
+@Deprecated // should be final, i.e. inheritance from this class is deprecated.  Please use the interface directly.  kai, oct'10
+public class DefaultAgentFactory implements AgentFactory {
 
-	public PersonDriverAgent createPersonAgent(final Person p);
+	protected final Mobsim simulation;
+
+	public DefaultAgentFactory(final Mobsim simulation) {
+		this.simulation = simulation;
+	}
+
+	public PersonDriverAgent createPersonAgent(final Person p) {
+		PersonDriverAgent agent = new DefaultPersonDriverAgent(p, this.simulation);
+		return agent;
+	}
 
 }

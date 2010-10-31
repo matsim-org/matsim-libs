@@ -697,7 +697,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 
 
 	@Override
-	public void setAgentFactory( org.matsim.ptproject.qsim.AgentFactory agentFactory) {
+	public void setAgentFactory( org.matsim.ptproject.qsim.agents.AgentFactory agentFactory) {
 		throw new UnsupportedOperationException() ;
 	}
 

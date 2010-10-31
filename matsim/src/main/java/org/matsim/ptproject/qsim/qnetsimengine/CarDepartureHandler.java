@@ -27,7 +27,7 @@ import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.ptproject.qsim.QSim;
-import org.matsim.ptproject.qsim.helpers.DefaultPersonDriverAgent;
+import org.matsim.ptproject.qsim.agents.DefaultPersonDriverAgent;
 import org.matsim.ptproject.qsim.interfaces.DepartureHandler;
 
 public class CarDepartureHandler implements DepartureHandler {

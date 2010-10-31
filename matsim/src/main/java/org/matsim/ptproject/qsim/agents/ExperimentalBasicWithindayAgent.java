@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TransitAgent.java
+ * ExperimentalBasicWithindayPersonDriverAgent.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,53 +17,53 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
-package org.matsim.pt.qsim;
+package org.matsim.ptproject.qsim.agents;
 
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.pt.routes.ExperimentalTransitRoute;
-import org.matsim.ptproject.qsim.agents.DefaultPersonDriverAgent;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.ptproject.qsim.interfaces.Mobsim;
-import org.matsim.transitSchedule.api.TransitLine;
-import org.matsim.transitSchedule.api.TransitRoute;
-import org.matsim.transitSchedule.api.TransitRouteStop;
-import org.matsim.transitSchedule.api.TransitStopFacility;
-
 
 /**
- * @author mrieser
+ * @author nagel
+ *
  */
-public class TransitAgent extends DefaultPersonDriverAgent implements PassengerAgent {
+public class ExperimentalBasicWithindayAgent extends DefaultPersonDriverAgent {
 
-	public TransitAgent(final Person p, final Mobsim simulation) {
+	public ExperimentalBasicWithindayAgent(Person p, Mobsim simulation) {
 		super(p, simulation);
 	}
 
-	public boolean getExitAtStop(final TransitStopFacility stop) {
-		ExperimentalTransitRoute route = (ExperimentalTransitRoute) getCurrentLeg().getRoute();
-		return route.getEgressStopId().equals(stop.getId());
+	public final List<PlanElement> getModifiablePlanElements() {
+		return this.person.getSelectedPlan().getPlanElements() ;
 	}
 
-	public boolean getEnterTransitRoute(final TransitLine line, final TransitRoute transitRoute, final List<TransitRouteStop> stopsToCome) {
-		ExperimentalTransitRoute route = (ExperimentalTransitRoute) getCurrentLeg().getRoute();
-		if (line.getId().equals(route.getLineId())) {
-			return containsId(stopsToCome, route.getEgressStopId());
-		} else {
-			return false;
-		}
+	public final Integer getCurrentPlanElementIndex() {
+		return this.currentPlanElementIndex ;
 	}
 
-	private boolean containsId(List<TransitRouteStop> stopsToCome,
-			Id egressStopId) {
-		for (TransitRouteStop stop : stopsToCome) {
-			if (egressStopId.equals(stop.getStopFacility().getId())) {
-				return true;
-			}
-		}
-		return false;
+	public final Integer getCurrentRouteLinkIdIndex() {
+		return this.currentLinkIdIndex ;
 	}
+	
+	protected void setCachedNextLinkId(Id cachedNextLinkId) {
+		// yyyy I am not convinced that this method really makes sense.  Needed for DgWithinday...  .  kai, oct'10
+		
+		this.cachedNextLinkId = cachedNextLinkId;
+	}
+
+	protected Id getCachedNextLinkId() {
+		return this.cachedNextLinkId;
+	}
+	
+	@Override
+	public final void calculateDepartureTime( Activity act ) {
+		super.calculateDepartureTime( act ) ;
+	}
+
+
 
 }

@@ -27,7 +27,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.IOSimulation;
 import org.matsim.core.mobsim.framework.ObservableSimulation;
 import org.matsim.core.mobsim.framework.PersonAgent;
-import org.matsim.ptproject.qsim.AgentFactory;
+import org.matsim.ptproject.qsim.agents.AgentFactory;
 
 /**The logic is as follows:<ul>
  * <li>When the agent starts something (an activity, a leg), the agent requests this from the central simulation.</li>

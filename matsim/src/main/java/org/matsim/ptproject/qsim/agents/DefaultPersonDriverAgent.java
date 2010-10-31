@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.ptproject.qsim.helpers;
+package org.matsim.ptproject.qsim.agents;
 
 import java.util.Collections;
 import java.util.List;
@@ -54,9 +54,10 @@ public class DefaultPersonDriverAgent implements PersonDriverAgent {
 
 	private static final Logger log = Logger.getLogger(DefaultPersonDriverAgent.class);
 
-	private final Person person;
+	final Person person;
 	private QVehicle vehicle;
-	protected Id cachedNextLinkId = null;
+
+	Id cachedNextLinkId = null;
 
 	private final Mobsim simulation;
 
@@ -64,19 +65,21 @@ public class DefaultPersonDriverAgent implements PersonDriverAgent {
 
 	private Id currentLinkId = null;
 
-	private int currentPlanElementIndex = 0;
+	int currentPlanElementIndex = 0;
 
 	private transient Id cachedDestinationLinkId;
 
 	private Leg currentLeg;
 	private List<Id> cachedRouteLinkIds = null;
 
-	private int currentLinkIdIndex;
+	int currentLinkIdIndex;
 	
 	// ============================================================================================================================
 	// c'tor
 
 	public DefaultPersonDriverAgent(final Person p, final Mobsim simulation) {
+		// yyyy this should, in my opinion, be protected since there is an interface.  kai, oct'10
+		
 		this.person = p;
 		this.simulation = simulation;
 	}
@@ -89,10 +92,13 @@ public class DefaultPersonDriverAgent implements PersonDriverAgent {
 	 * the simulation. If the Leg changes (for example the Route or
 	 * the Destination Link), those cached data has to be reseted.
 	 *
-	 * If the Leg has not changed, calling this method has no effect
+	 * If the Leg has not changed, calling this method should have no effect
 	 * on the Results of the Simulation!
 	 */
 	public final void resetCaches() {
+		// moving this method not to WithinDay for the time being since it seems to make some sense to keep this where the internal are
+		// known best.  kai, oct'10
+		
 		this.cachedNextLinkId = null;
 		this.cachedRouteLinkIds = null;
 		this.cachedDestinationLinkId = null;
@@ -103,7 +109,7 @@ public class DefaultPersonDriverAgent implements PersonDriverAgent {
 		 */
 		PlanElement currentPlanElement = this.getPlanElements().get(this.currentPlanElementIndex);
 		if (currentPlanElement instanceof Leg) {
-			this.setCurrentLeg((Leg) currentPlanElement);
+			this.setCurrentLegAndResetRouteCache((Leg) currentPlanElement);
 		}
 
 		Route route = currentLeg.getRoute();
@@ -219,7 +225,7 @@ public class DefaultPersonDriverAgent implements PersonDriverAgent {
 	 * Public since christoph uses it outside inheritance.  This is, however, not so bad except maybe (!) for the
 	 * "activityEndsList" see comment above.  kai, aug'10
 	 */
-	public final void calculateDepartureTime(Activity tmpAct) {
+	void calculateDepartureTime(Activity tmpAct) {
 		double now = this.getQSimulation().getSimTimer().getTimeOfDay() ;
 		ActivityImpl act = (ActivityImpl) tmpAct ; // since we need the duration.  kai, aug'10
 
@@ -351,22 +357,6 @@ public class DefaultPersonDriverAgent implements PersonDriverAgent {
 		return Collections.unmodifiableList( this.person.getSelectedPlan().getPlanElements() );
 	}
 	
-	@Deprecated // experimental function, do not use.  kai, oct'10
-	public final List<PlanElement> getModifiablePlanElements() {
-		return this.person.getSelectedPlan().getPlanElements() ;
-	}
-	@Deprecated // experimental function, do not use.  kai, oct'10
-	public final Integer getCurrentPlanElementIndex() {
-		return this.currentPlanElementIndex ;
-	}
-	@Deprecated // experimental function, do not use.  kai, oct'10
-	public final Integer getCurrentRouteLinkIdIndex() {
-		return this.currentLinkIdIndex ;
-	}
-
-	// ============================================================================================================================
-	// below here only setters/getters
-
 	public final Mobsim getQSimulation(){
 		return this.simulation;
 	}
@@ -405,7 +395,7 @@ public class DefaultPersonDriverAgent implements PersonDriverAgent {
 		return this.currentLeg;
 	}
 
-	protected final void setCurrentLeg(final Leg leg) {
+	private final void setCurrentLegAndResetRouteCache(final Leg leg) {
 		this.currentLeg  = leg;
 		this.cachedRouteLinkIds = null;
 	}
@@ -425,5 +415,5 @@ public class DefaultPersonDriverAgent implements PersonDriverAgent {
 	public final Person getPerson() {
 		return this.person;
 	}
-	
+
 }
