@@ -27,9 +27,8 @@ import org.matsim.core.mobsim.framework.Simulation;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.ptproject.qsim.QSim;
+import org.matsim.ptproject.qsim.agents.ExperimentalBasicWithindayAgentFactory;
 import org.matsim.ptproject.qsim.interfaces.Mobsim;
-
-import playground.christoph.withinday3.unused.MyAgentFactory;
 
 /**
  * @author nagel
@@ -53,7 +52,7 @@ public class MyMobsimFactory implements MobsimFactory {
 		
 		mobsim.addQueueSimulationListeners(new MyMobsimListener(this.travCostCalc,this.travTimeCalc)) ;
 		
-//		mobsim.setAgentFactory( new MyAgentFactory(mobsim) ) ;
+		mobsim.setAgentFactory( new ExperimentalBasicWithindayAgentFactory(mobsim) ) ;
 		
 		return mobsim ;
 	}

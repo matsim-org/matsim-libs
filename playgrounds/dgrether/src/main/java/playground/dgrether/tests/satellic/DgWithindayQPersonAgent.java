@@ -61,7 +61,7 @@ public class DgWithindayQPersonAgent extends ExperimentalBasicWithindayAgent {
 //			return super.chooseNextLinkId();
 //		}
 		Id destinationLinkId = this.getDestinationLinkId();
-		NetsimNetwork qnet = this.getQSimulation().getNetsimNetwork();
+		NetsimNetwork qnet = this.getMobsim().getNetsimNetwork();
 		if (currentLinkId == destinationLinkId){
 				return null;
 		}
@@ -80,7 +80,7 @@ public class DgWithindayQPersonAgent extends ExperimentalBasicWithindayAgent {
 			for (Link outLink : outlinks.values()){
 				if (!outLink.getToNode().getId().equals(currentQLink.getLink().getFromNode().getId())){
 					outLinksList.add(outLink);
-					outLinksCapacitySum += outLink.getCapacity(this.getQSimulation().getSimTimer().getTimeOfDay());
+					outLinksCapacitySum += outLink.getCapacity(this.getMobsim().getSimTimer().getTimeOfDay());
 				}
 			}
 		}
@@ -88,7 +88,7 @@ public class DgWithindayQPersonAgent extends ExperimentalBasicWithindayAgent {
 		double selectedCapacity = 0.0;
 //		log.error("outlinkslist.size " + outLinksList.size());
 		for (Link outLink : outLinksList){
-			selectedCapacity += outLink.getCapacity(this.getQSimulation().getSimTimer().getTimeOfDay());
+			selectedCapacity += outLink.getCapacity(this.getMobsim().getSimTimer().getTimeOfDay());
 //			log.error("selectedCap: " + selectedCapacity + " randomNumber: " + randomNumber);
 			if (selectedCapacity >= randomNumber){
 				this.setCachedNextLinkId(outLink.getId());

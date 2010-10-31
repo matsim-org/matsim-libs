@@ -106,7 +106,7 @@ public class ExtendCurrentActivityReplanner extends WithinDayDuringActivityRepla
 		// yyyy a method getMobsim in MobimAgent would be useful here. cdobler, Oct'10
 		if (withinDayPersonAgent instanceof DefaultPersonDriverAgent) {
 			// yyyy do we have to check that? We have a currentActivity... cdobler, Oct'10
-			boolean found = ((DefaultPersonDriverAgent) personAgent).getQSimulation().getActivityEndsList().contains(this);
+			boolean found = ((DefaultPersonDriverAgent) personAgent).getMobsim().getActivityEndsList().contains(this);
 			
 			// If the agent is not in the activityEndsList return without doing anything else.
 			if (!found) return false;
@@ -115,7 +115,7 @@ public class ExtendCurrentActivityReplanner extends WithinDayDuringActivityRepla
 			
 			withinDayPersonAgent.calculateDepartureTime(currentActivity);
 			double newDepartureTime = personAgent.getDepartureTime();
-			withinDayPersonAgent.getQSimulation().rescheduleActivityEnd(personAgent, oldDepartureTime, newDepartureTime);
+			withinDayPersonAgent.getMobsim().rescheduleActivityEnd(personAgent, oldDepartureTime, newDepartureTime);
 			return true;
 		}
 		else {
