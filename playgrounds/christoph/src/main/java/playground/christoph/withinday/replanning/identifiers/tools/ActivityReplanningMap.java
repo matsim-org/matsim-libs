@@ -135,7 +135,7 @@ public class ActivityReplanningMap implements AgentStuckEventHandler,
 			PersonAgent personAgent = personAgentMapping.get(id);
 
 			double now = e.getSimulationTime();
-			double departureTime = personAgent.getDepartureTime();
+			double departureTime = personAgent.getDepartureTimeForLeg();
 
 			/*
 			 * If it is the last scheduled Activity the departureTime is -infinity.
@@ -202,7 +202,7 @@ public class ActivityReplanningMap implements AgentStuckEventHandler,
 
 			PersonAgent personAgent = personAgentMapping.get(id);
 
-			double replanningTime = personAgent.getDepartureTime();
+			double replanningTime = personAgent.getDepartureTimeForLeg();
 
 			if (time >= replanningTime) {
 				ids.remove();

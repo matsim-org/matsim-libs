@@ -62,7 +62,7 @@ public class MobsimFacility implements Updateable {
 
 	public void update() {
 		PersonAgent person = agentsAtActivities.peek();
-		if ( person.getDepartureTime() <= now() ) {
+		if ( person.getDepartureTimeForLeg() <= now() ) {
 			agentsAtActivities.remove();
 			person.endActivityAndAssumeControl( now() ) ;
 			// call departure handler

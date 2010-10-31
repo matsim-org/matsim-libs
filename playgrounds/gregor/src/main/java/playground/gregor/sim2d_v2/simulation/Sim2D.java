@@ -236,7 +236,7 @@ public class Sim2D implements Mobsim {
 	private void handleActivityEnds(double time) {
 		while (this.activityEndsList.peek() != null) {
 			PersonAgent agent = this.activityEndsList.peek();
-			if (agent.getDepartureTime() <= time) {
+			if (agent.getDepartureTimeForLeg() <= time) {
 				this.activityEndsList.poll();
 				unregisterAgentAtActivityLocation(agent); // TODO do wie need
 				// this??
@@ -302,7 +302,7 @@ public class Sim2D implements Mobsim {
 		double simStartTime = 0;
 		PersonAgent firstAgent = this.activityEndsList.peek();
 		if (firstAgent != null) {
-			simStartTime = Math.floor(Math.max(startTime, firstAgent.getDepartureTime()));
+			simStartTime = Math.floor(Math.max(startTime, firstAgent.getDepartureTimeForLeg()));
 		}
 		this.simTimer.setSimStartTime(simStartTime);
 		this.simTimer.setTime(simStartTime);

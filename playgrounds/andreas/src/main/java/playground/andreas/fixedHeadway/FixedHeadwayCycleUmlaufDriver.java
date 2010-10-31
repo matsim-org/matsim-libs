@@ -34,7 +34,7 @@ public class FixedHeadwayCycleUmlaufDriver extends UmlaufDriver {
 	@Override
 	protected double longerStopTimeIfWeAreAheadOfSchedule(final double now,	final double stopTime) {
 		if ((this.nextStop.isAwaitDepartureTime()) && (this.nextStop.getDepartureOffset() != Time.UNDEFINED_TIME)) {
-			double earliestDepTime = getDepartureTime() + this.nextStop.getDepartureOffset() + this.additionalDelayAtNextStop;
+			double earliestDepTime = getDepartureTimeForLeg() + this.nextStop.getDepartureOffset() + this.additionalDelayAtNextStop;
 			this.additionalDelayAtNextStop = 0.0;
 			if (now + stopTime < earliestDepTime) {
 				return earliestDepTime - now;

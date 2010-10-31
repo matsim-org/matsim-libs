@@ -131,10 +131,10 @@ public class EndActivityAndEvacuateReplanner extends WithinDayDuringActivityRepl
 			// If the agent is not in the activityEndsList return without doing anything else.
 			if (!found) return false;
 			
-			double oldDepartureTime = personAgent.getDepartureTime();
+			double oldDepartureTime = personAgent.getDepartureTimeForLeg();
 		
 			((ExperimentalBasicWithindayAgent) personAgent).calculateDepartureTime(currentActivity);
-			double newDepartureTime = personAgent.getDepartureTime();
+			double newDepartureTime = personAgent.getDepartureTimeForLeg();
 			((DefaultPersonDriverAgent) personAgent).getMobsim().rescheduleActivityEnd(personAgent, oldDepartureTime, newDepartureTime);
 			return true;
 		}
