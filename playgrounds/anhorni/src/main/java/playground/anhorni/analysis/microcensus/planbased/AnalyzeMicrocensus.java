@@ -41,11 +41,12 @@ public class AnalyzeMicrocensus {
 
 	private final static Logger log = Logger.getLogger(AnalyzeMicrocensus.class);
 	private String outputFolder="src/main/java/playground/anhorni/output/microcensus/";
-	private String plansFilePath="src/main/java/playground/anhorni/input/microcensus/plansMOSO.xml";
 	
 	private Bins shoppingDistanceDistribution;
 	private Bins shoppingDistanceDistributionHomeBased;
 	private Bins shoppingDistanceDistributionRoundTrip;
+	private Bins shoppingDistanceDistributionRoundTripGrocery;
+	private Bins shoppingDistanceDistributionRoundTripNonGrocery;
 	
 	private ScenarioImpl scenario = new ScenarioImpl();
 	private String mode = null;
@@ -53,23 +54,27 @@ public class AnalyzeMicrocensus {
 	public static void main(final String[] args) {
 		AnalyzeMicrocensus analyzer = new AnalyzeMicrocensus();
 		String mode = args[0];
-		analyzer.run(mode);	
+		analyzer.run(mode, args[1]);	
 		log.info("Analysis finished -----------------------------------------");
 	}
 	
-	private void run(String  mode) {
-		this.init(mode);
+	public void run(String mode, String plansFilePath) {
+		this.init(mode, plansFilePath);
 		this.runAnalysis();
 		this.write();		
 	}
 	
-	private void init(String mode) {
+	private void init(String mode, String plansFilePath) {
 		this.mode = mode;
 		this.shoppingDistanceDistribution = new Bins(500.0, 50000.0, "shopping_trips_mc_" + this.mode);
 		this.shoppingDistanceDistributionHomeBased = new Bins(500.0, 50000.0, "shopping_trips_mc_home-based_" + this.mode);
-		this.shoppingDistanceDistributionRoundTrip = new Bins(500.0, 50000.0, "shopping_trips_mc_round-trip_" + this.mode);
+		this.shoppingDistanceDistributionRoundTrip = new Bins(500.0, 30000.0, "shopping_trips_mc_round-trip_" + this.mode);
+		
+		this.shoppingDistanceDistributionRoundTripGrocery = new Bins(500.0, 50000.0, "shopping_trips_mc_round-trip_grocery_" + this.mode);
+		this.shoppingDistanceDistributionRoundTripNonGrocery = new Bins(500.0, 100000.0, "shopping_trips_mc_round-trip_nongrocery_" + this.mode);
+		
 		MatsimPopulationReader populationReader = new MatsimPopulationReader(this.scenario);
-		populationReader.readFile(this.plansFilePath);	
+		populationReader.readFile(plansFilePath);	
 	}
 	
 	private void runAnalysis() {
@@ -78,25 +83,31 @@ public class AnalyzeMicrocensus {
 			for (PlanElement pe : plan.getPlanElements()) {
 				if (pe instanceof Activity) {
 					ActivityImpl act = (ActivityImpl)pe;
-					if (act.getType().equals("s")) {
+					if (act.getType().startsWith("s")) {
 						if (plan.getPreviousLeg(act).getMode().equals(this.mode)) {
 							ActivityImpl previousAct = (ActivityImpl) (plan.getPlanElements().get(plan.getPlanElements().indexOf(act) - 2));
 							double distance = ((CoordImpl)previousAct.getCoord()).calcDistance(act.getCoord());
-							shoppingDistanceDistribution.addVal(distance);
+							shoppingDistanceDistribution.addVal(distance, p.getSelectedPlan().getScore());
 						
 							if (previousAct.getType().equals("h")) {
-								shoppingDistanceDistributionHomeBased.addVal(distance);	
+								shoppingDistanceDistributionHomeBased.addVal(distance, p.getSelectedPlan().getScore());	
 								
-								//check the following activities
-								String nextType = plan.getNextActivity(plan.getNextLeg(act)).getType();
-								if (nextType.equals("s")) { 
-									continue;
+								//check the subsequent activities
+								Activity actTmp = act;
+								String nextType = plan.getNextActivity(plan.getNextLeg(actTmp)).getType();
+								while (nextType.startsWith("s")) {
+									actTmp = plan.getNextActivity(plan.getNextLeg(actTmp));
+									nextType = actTmp.getType();
 								}
-								else {
-									if (nextType.equals("h")) {
-										this.shoppingDistanceDistributionRoundTrip.addVal(distance);
+								if (nextType.equals("h")) {
+									this.shoppingDistanceDistributionRoundTrip.addVal(distance, p.getSelectedPlan().getScore());
+									
+									if (act.getType().equals("sg")) {
+										this.shoppingDistanceDistributionRoundTripGrocery.addVal(distance, p.getSelectedPlan().getScore());
 									}
-									break;
+									else {
+										this.shoppingDistanceDistributionRoundTripNonGrocery.addVal(distance, p.getSelectedPlan().getScore());
+									}
 								}
 							}
 						}
@@ -107,8 +118,10 @@ public class AnalyzeMicrocensus {
 	}
 			
 	private void write() {
-		shoppingDistanceDistribution.plotBinnedDistribution(this.outputFolder, "m", "m");
-		shoppingDistanceDistributionHomeBased.plotBinnedDistribution(this.outputFolder, "m", "m");
+		this.shoppingDistanceDistribution.plotBinnedDistribution(this.outputFolder, "m", "m");
+		this.shoppingDistanceDistributionHomeBased.plotBinnedDistribution(this.outputFolder, "m", "m");
 		this.shoppingDistanceDistributionRoundTrip.plotBinnedDistribution(this.outputFolder, "m", "m");
+		this.shoppingDistanceDistributionRoundTripGrocery.plotBinnedDistribution(this.outputFolder, "m", "m");
+		this.shoppingDistanceDistributionRoundTripNonGrocery.plotBinnedDistribution(this.outputFolder, "m", "m");
 	}
 }

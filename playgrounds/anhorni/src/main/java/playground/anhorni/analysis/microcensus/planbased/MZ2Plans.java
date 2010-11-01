@@ -49,7 +49,7 @@ public class MZ2Plans {
 		System.out.println("  done.");
 
 		System.out.println("  running plans modules... ");
-		new PlansCreateFromMZ(indir+"/wegeketten_new.dat",outdir+"/output_wegeketten_new.dat",1,7).run(plans);
+		new PlansCreateFromMZ(indir+"/Wege_merged01112010.dat",outdir+"/Wege_merged01112010.dat",1,7).run(plans);
 //		new PlansCreateFromMZ(indir+"/wegeketten_new.dat",outdir+"/output_wegeketten_new.dat",1,5).run(plans);
 //		new PlansCreateFromMZ(indir+"/wegeketten_new.dat",outdir+"/output_wegeketten_new.dat",6,6).run(plans);
 //		new PlansCreateFromMZ(indir+"/wegeketten_new.dat",outdir+"/output_wegeketten_new.dat",6,7).run(plans);
@@ -61,9 +61,13 @@ public class MZ2Plans {
 		System.out.println("  writing plans xml file... ");
 		new PopulationWriter(plans, NetworkImpl.createNetwork()).write(outdir + "plansMOSO.xml.gz");
 		System.out.println("  done.");
+		
+		System.out.println("-------------------------------------------------------------");
+		System.out.println("Analyzing MC: ... ");
+		AnalyzeMicrocensus analyzer = new AnalyzeMicrocensus();
+		analyzer.run("car", outdir + "plansMOSO.xml.gz");
 
-		System.out.println("done.");
-		System.out.println();
+		System.out.println("-------------------------------------------------------------");
 	}
 
 	//////////////////////////////////////////////////////////////////////

@@ -14,7 +14,8 @@ public abstract class Utils {
 
 	private final static Logger log = Logger.getLogger(Utils.class);
 
-	public static double median(double [] values) {
+	// -------------------------------------------------------------
+	public static double median(Double [] values) {
 		List<Double> list = new Vector<Double>();
 
 		for (int i = 0; i < values.length; i++) {
@@ -22,48 +23,7 @@ public abstract class Utils {
 		}
 		return median(list);
 	}
-
-	public static double getVariance(List<Double> values) {
-		double mean = Utils.mean(values);
-
-		double sum = 0.0;
-		for (Double v : values) {
-			sum += (v-mean) * (v-mean);
-		}
-		return sum / values.size();
-	}
 	
-	public static double getStdDev(List<Double> values) {
-		double mean = Utils.mean(values);
-
-		double sum = 0.0;
-		for (Double v : values) {
-			sum += (v-mean) * (v-mean);
-		}
-		return Math.sqrt(sum / values.size());
-	}
-
-	public static double getMin(List<Double> values) {
-		double minVal = 9999999999999999999.0;
-		for (Double v : values) {
-			if (v < minVal) {
-				minVal = v;
-			}
-		}
-		return minVal;
-	}
-
-	public static double getMax(List<Double> values) {
-		double maxVal = 0.0;
-		for (Double v : values) {
-			if (v > maxVal) {
-				maxVal = v;
-			}
-		}
-		return maxVal;
-	}
-
-
 	public static double median(List<Double> values) {
 
 		if (values.size() == 0) return 0.0;
@@ -78,7 +38,8 @@ public abstract class Utils {
 	    	return (lower + upper) / 2.0;
 	    }
 	}
-
+	
+	// -------------------------------------------------------------
 	public static double mean(List<Double> values) {
 		double sum = 0.0;
 		int cnt = 0;
@@ -89,6 +50,81 @@ public abstract class Utils {
 		}
 		return sum / cnt;
 	}
+	
+	public static double weightedMean(List<Double> values, List<Double> weights) {
+		return weightedMean((Double[])values.toArray(new Double[values.size()]), (Double[])weights.toArray(new Double[weights.size()]));
+	}
+	
+	public static double weightedMean(Double[] values, Double[] weights) {
+		double sumValues = 0.0;
+		double sumWeights = 0.0;
+		
+		if (values.length == 0) return 0.0;
+		
+		if (values.length  != weights.length ) {
+			log.info("size of weights and values not identical");
+			return -1;
+		}
+		for (int index = 0; index < values.length; index++) {
+			sumValues += (values[index] * weights[index]);
+			sumWeights += weights[index];
+		}
+		return sumValues / sumWeights;
+	}
+	
+	// -------------------------------------------------------------
+	
+	public static double getStdDev(List<Double> values) {
+		double mean = Utils.mean(values);
+
+		double sum = 0.0;
+		for (Double v : values) {
+			sum += (v-mean) * (v-mean);
+		}
+		return Math.sqrt(sum / values.size());
+	}
+	
+	
+	// -------------------------------------------------------------
+	
+	public static double getVariance(List<Double> values) {
+		double mean = Utils.mean(values);
+
+		double sum = 0.0;
+		for (Double v : values) {
+			sum += (v-mean) * (v-mean);
+		}
+		return sum / values.size();
+	}
+
+	public static double getMin(List<Double> values) {
+		double minVal = Double.MAX_VALUE;
+		for (Double v : values) {
+			if (v < minVal) {
+				minVal = v;
+			}
+		}
+		return minVal;
+	}
+
+	public static double getMax(List<Double> values) {
+		return getMax((Double[])values.toArray(new Double[values.size()]));
+	}
+	
+	public static double getMax(Double[] values) {
+		double maxVal = Double.MIN_VALUE;
+		for (Double v : values) {
+			if (v > maxVal) {
+				maxVal = v;
+			}
+		}
+		return maxVal;
+	}
+
+
+// =============================================================================================================	
+
+	
 	
 	// -----------------
 	// dirty hack in a weak minute. Cast problems.

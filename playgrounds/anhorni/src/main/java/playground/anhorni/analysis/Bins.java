@@ -14,85 +14,91 @@ import playground.anhorni.utils.Utils;
 
 
 public class Bins {
-	
+
 	protected double interval;
 	protected int numberOfBins;
-	protected int [] bins;
 	protected double maxVal;
 	protected String desc;
-	protected List<Double> values = new Vector<Double>();
-	
+	protected List<BinEntry> entries = new Vector<BinEntry>();
+	protected double [] bins;
+
 	private final static Logger log = Logger.getLogger(Bins.class);
-	
+
 	public Bins(double interval, double maxVal, String desc) {
 		this.interval = interval;
 		this.maxVal = maxVal;
 		this.numberOfBins = (int)Math.ceil(maxVal / interval);
 		this.desc = desc;
-		
-		bins = new int[numberOfBins];		
-		for (int i = 0; i < numberOfBins; i++) {
-			bins[i] = 0;
-		}
-	}	
-	public void addValues(double[] values) {
-		for (double value : values) {
-			this.addVal(value);
+		this.bins = new double[this.numberOfBins];
+	}
+	public void addValues(double[] values, double[] weights) {
+		for (int index = 0; index < values.length; index++) {
+			this.addVal(values[index], weights[index]);
 		}
 	}
-	
-	public void addVal(double value) {
+
+	public void addVal(double value, double weight) {
+		int index = (int)Math.floor(value / interval);
 		// values > maximum value are assigned to the last bin
-		if (value >= maxVal) value = maxVal - 0.00000000001; 
-		
+		if (value >= maxVal) {
+			index = this.numberOfBins -1; 
+		}
+
 		// values < 0.0 value are assigned to the first bin
 		if (value < 0.0) {
 			log.error("Value < 0.0 received");
-			value = 0.0;
-		}	
-		int index = (int)Math.floor(value / interval);
-		this.bins[index]++;
+			index = 0;
+		}
 		
-		this.values.add(value);
+		this.bins[index] += weight;
+		this.entries.add(new BinEntry(value, weight));
 	}
-	
-	
-	public int [] getBins() {	
-		return this.bins;
-	}
-	
+
 	public void clear() {
-		this.bins = new int[numberOfBins];
+		this.entries.clear();
 	}
-	
-	
-	public void plotBinnedDistribution(String path, String xLabel, String xUnit) {				
+
+	public void plotBinnedDistribution(String path, String xLabel, String xUnit) {
 		String [] categories  = new String[this.numberOfBins];
 		for (int i = 0; i < this.numberOfBins; i++) {
 			categories[i] = Integer.toString(i);
-		}		
-		
+		}
+		Double[] values = new Double[this.entries.size()];
+		Double[] weights = new Double[this.entries.size()];
+
+		for (int index = 0; index < this.entries.size(); index++) {
+			values[index] = this.entries.get(index).getValue();
+			weights[index] = this.entries.get(index).getWeight();
+		}
+
 		DecimalFormat formatter = new DecimalFormat("0.0000");
-		String s = xLabel + " " + 
+		String s = xLabel + " " +
 		"[interval = " + formatter.format(this.interval) + xUnit + "]" +
-		"[mean = " + formatter.format(Utils.mean(values)) + xUnit + "]" +
-		"[sigma = " + formatter.format(Utils.getStdDev(values)) + xUnit + "]";
-		
-		BarChart chart = 
+		"[mean = " + formatter.format(Utils.weightedMean(values, weights)) + xUnit + "]" +
+		"[median = " + formatter.format(Utils.median(values)) + xUnit + "]" +
+		"[max = " + formatter.format(Utils.getMax(values)) + xUnit + "]";
+
+		BarChart chart =
 			new BarChart(desc, s , "#", categories);
-		chart.addSeries("Bin size", Utils.convert2double(this.bins));
+		chart.addSeries("Bin size", this.bins);
 		chart.saveAsPng(path + desc + ".png", 1600, 800);
-				
-		try {			
+
+		try {
 			BufferedWriter out = IOUtils.getBufferedWriter(path + desc + ".txt");
 			out.write("Bin [interval = " + this.interval + " " + xUnit  + "]\t" + "#" + "\n");
 			for (int j = 0; j < bins.length;  j++) {
 				out.write(j + "\t" + bins[j] + "\n");
-			}					
-			out.flush();			
-			out.close();			
+			}
+			out.flush();
+			out.close();
 		} catch (IOException e) {
 			e.printStackTrace();
-		}	
+		}
+	}
+	public double[] getBins() {
+		return bins;
+	}
+	public void setBins(double[] bins) {
+		this.bins = bins;
 	}
 }

@@ -52,6 +52,9 @@ public class PlansCreateFromMZ {
 	private static final String WORK = "w";
 	private static final String LEIS = "l";
 	private static final String SHOP = "s";
+	private static final String SHOP_GROCERY = "sg";
+	private static final String SHOP_NONGROCERY = "sng";
+	
 	private static final String EDUC = "e";
 	private static final String OTHR = "o";
 
@@ -102,6 +105,9 @@ public class PlansCreateFromMZ {
 				// PURPOSE  TRIP_MODE  HHNR  ZIELPNR  WEGNR  WP                AGE  GENDER  LICENSE  DAY  TRIP_DISTANCE
 				// 1        3          575   1        1      .422854535571358  30   0       1        5    21.9
 				// 11       12         13    14       15     16                17   18      19       20   21
+				
+				// (newly added)
+				// F521 (Einkaeufe)
 
 				// pid check
 				if (!pid.toString().equals(entries[0].trim())) { Gbl.errorMsg("That must not happen!"); }
@@ -179,8 +185,19 @@ public class PlansCreateFromMZ {
 				// distance (km => m)
 				double distance = Double.parseDouble(entries[21].trim())*1000.0;
 				entries[21] = Double.toString(distance);
+				
+				// shopping purpose ----------------------------------------------
+				double shoppingPurpose = Integer.parseInt(entries[22].trim());
+				if (purpose == 3) {
+					if (shoppingPurpose == 1) {
+						acttype = SHOP_GROCERY;
+					}
+					else {
+						acttype = SHOP_NONGROCERY;
+					}
+				}
 
-				// creating the line with the changed data
+				// creating the line with the changed data ------------------------
 				String str = entries[0];
 				for (int i=1; i<entries.length; i++) { str = str + "\t" + entries[i];  }
 				str = str + "\n";
@@ -208,7 +225,7 @@ public class PlansCreateFromMZ {
 				if (plan.getPlanElements().size() != 0) { // already lines parsed and added
 					ActivityImpl from_act = (ActivityImpl)plan.getPlanElements().get(plan.getPlanElements().size()-1);
 					from_act.setEndTime(departure);
-					from_act.setDuration(from_act.getEndTime()-from_act.getStartTime());
+					//from_act.setDuration(from_act.getEndTime()-from_act.getStartTime());
 					LegImpl leg = ((PlanImpl) plan).createAndAddLeg(mode);
 					leg.setDepartureTime(departure);
 					leg.setTravelTime(arrival-departure);
@@ -373,7 +390,7 @@ public class PlansCreateFromMZ {
 				if ((currc.getX()==prevc.getX())&&(currc.getY()==prevc.getY())) {
 					ActivityImpl act2 = (ActivityImpl)plan2.getPlanElements().get(plan2.getPlanElements().size()-1);
 					act2.setEndTime(curr_act.getEndTime());
-					act2.setDuration(act2.getEndTime()-act2.getStartTime());
+					//act2.setDuration(act2.getEndTime()-act2.getStartTime());
 //					System.out.println("        pid=" + p.getId() + ": merging act_nr="+((i-2)/2)+" with act_nr=" + (i/2) + ".");
 					if (!curr_act.getType().equals(prev_act.getType())) {
 						if (curr_act.getType().equals(HOME)) { act2.setType(HOME); }
@@ -383,7 +400,7 @@ public class PlansCreateFromMZ {
 						else if (curr_act.getType().equals(EDUC)) {
 							if (!act2.getType().equals(HOME) && !act2.getType().equals(WORK)) { act2.setType(EDUC); }
 						}
-						else if (curr_act.getType().equals(SHOP)) {
+						else if (curr_act.getType().equals(SHOP) || curr_act.getType().equals(SHOP_GROCERY) || curr_act.getType().equals(SHOP_NONGROCERY)) {
 							if (!act2.getType().equals(HOME) && !act2.getType().equals(WORK) && !act2.getType().equals(EDUC)) { act2.setType(SHOP); }
 						}
 						else if (curr_act.getType().equals(LEIS)) {
@@ -413,7 +430,8 @@ public class PlansCreateFromMZ {
 			// complete the last act with time info
 			if (p.getSelectedPlan().getPlanElements().size() == 1) {
 				ActivityImpl act = (ActivityImpl)p.getSelectedPlan().getPlanElements().get(0);
-				act.setStartTime(0); act.setDuration(24*3600); act.setEndTime(24*3600);
+				act.setStartTime(0); //act.setDuration(24*3600); 
+				act.setEndTime(24*3600);
 			}
 		}
 		System.out.println("        # round trips removed (with same act types) = " + cnt_sametypes);

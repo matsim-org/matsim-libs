@@ -31,7 +31,7 @@ public class TripAnalyzer {
 		if (binnedDistributions.get(key) == null) {
 			binnedDistributions.put(key, new Bins(5000, 100000, key));
 		}
-		binnedDistributions.get(key).addVal(trip.getDistance());
+		binnedDistributions.get(key).addVal(trip.getDistance(), 1.0);
 	}
 
 	public void analyze(String outfile) {
