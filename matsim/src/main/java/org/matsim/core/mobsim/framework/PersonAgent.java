@@ -86,7 +86,7 @@ public interface PersonAgent extends MobsimAgent {
 	// if this does not make sense for a class, then the class is maybe not a "Person"Agent.  kai, may'10
 
 	/**
-	 * @return "(Leg) getCurrentPlanElement()"
+	 * @return "(Leg) getCurrentPlanElement()" -- despite this entry in the javadoc, this is only approximately what the method really does.  kai, oct'10
 	 */
 	public Leg getCurrentLeg();
 
