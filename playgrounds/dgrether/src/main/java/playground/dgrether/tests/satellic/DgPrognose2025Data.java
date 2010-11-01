@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DgSatellicMviGenerator
+ * DgSatellicData
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,15 +19,6 @@
  * *********************************************************************** */
 package playground.dgrether.tests.satellic;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.core.api.experimental.ScenarioLoader;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
-import org.matsim.run.OTFVis;
-
 import playground.dgrether.DgPaths;
 
 
@@ -35,31 +26,10 @@ import playground.dgrether.DgPaths;
  * @author dgrether
  *
  */
-public class DgSatellicMviGenerator {
-  
-  public static void main(String[] args){
-    
-    Scenario sc = new ScenarioImpl();
-    Config c = sc.getConfig();
-    c.network().setInputFile(DgSatellicData.NETWORK);
-    c.plans().setInputFile(DgSatellicData.EMPTY_POPULATION);
-    c.controler().setLastIteration(0);
-    c.setQSimConfigGroup(new QSimConfigGroup());
-    c.getQSimConfigGroup().setSnapshotFormat("otfvis");
-    c.getQSimConfigGroup().setSnapshotPeriod(60.0);
-    
-    c.controler().setOutputDirectory(DgPaths.OUTDIR + "satellic");
-    
-    ScenarioLoader scl = new ScenarioLoaderImpl(sc);
-    scl.loadScenario();
-    
-    Controler controler = new Controler((ScenarioImpl)sc);
-    controler.setOverwriteFiles(true);
-    controler.run();
-    
-    String[] a = {controler.getControlerIO().getIterationFilename(0, "otfvis.mvi")};
-    
-    OTFVis.playMVI(a);
-  }
+public interface DgPrognose2025Data {
 
+  public final String BASEDIR = DgPaths.SHAREDSVN + "studies/countries/de/prognose_2025/";
+  
+  public final String NETWORK = BASEDIR + "demand/network_cleaned.xml.gz";
+  
 }

@@ -40,7 +40,7 @@ import playground.dgrether.visualization.KmlNetworkVisualizer;
 import playground.gregor.gis.coordinatetransform.ApproximatelyCoordianteTransformation;
 
 
-public class DgSatellicNetwork2WGS84Converter {
+public class DgPrognose2025Network2WGS84Converter {
 	
 	public static void main(String[] args) {
 		

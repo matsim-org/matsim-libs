@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DgSatellicData
+ * DgSatellicNetworkVisualizer
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package playground.dgrether.tests.satellic;
 
+import org.matsim.run.OTFVis;
+
 import playground.dgrether.DgPaths;
 
 
@@ -26,12 +28,21 @@ import playground.dgrether.DgPaths;
  * @author dgrether
  *
  */
-public interface DgSatellicData {
+public class DgPrognose2025NetworkVisualizer {
 
-  public final String BASEDIR = DgPaths.SHAREDSVN + "studies/countries/de/prognose_2025/";
-  
-  public final String NETWORK = BASEDIR + "demand/network_cleaned.xml.gz";
-  
-  public final String EMPTY_POPULATION = BASEDIR + "demand/plans1.xml";
-  
+  /**
+   * @param args
+   */
+  public static void main(String[] args) {
+//    String net = DgPaths.SHAREDSVN + "studies/countries/de/prognose_2025/demand/network_ab.xml";
+//    String net = DgPaths.SHAREDSVN + "studies/countries/de/prognose_2025/demand/network_ab_wgs84.xml";
+    //    String net = DgPaths.SHAREDSVN + "studies/countries/de/prognose_2025/demand/network_bs.xml";
+//    String net = DgPaths.SHAREDSVN + "studies/countries/de/prognose_2025/demand/network_ab_bs.xml";
+//    String net = DgPaths.SHAREDSVN + "studies/countries/de/prognose_2025/demand/network_cleaned.xml.gz";
+  String net = DgPaths.SHAREDSVN + "studies/countries/de/prognose_2025/demand/network_cleaned_wgs84.xml.gz";
+  	String[] a = {net};
+    OTFVis.playNetwork(a);
+    
+  }
+
 }

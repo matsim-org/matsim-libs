@@ -33,7 +33,7 @@ import playground.dgrether.DgPaths;
  * @author dgrether
  *
  */
-public class DgSatellicNetworkPostProcessing {
+public class DgPrognose2025NetworkPostProcessing {
 
   
   /**
