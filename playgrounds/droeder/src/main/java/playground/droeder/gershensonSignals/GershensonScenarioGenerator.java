@@ -56,7 +56,7 @@ import org.matsim.signalsystems.systems.SignalSystems;
 import org.matsim.signalsystems.systems.SignalSystemsFactory;
 
 import playground.dgrether.lanes.LanesConsistencyChecker;
-import playground.dgrether.signalsystems.SignalSystemsConsistencyChecker;
+import playground.dgrether.signalsystems.data.consistency.SignalSystemsConsistencyChecker;
 import playground.droeder.DaPaths;
 
 
