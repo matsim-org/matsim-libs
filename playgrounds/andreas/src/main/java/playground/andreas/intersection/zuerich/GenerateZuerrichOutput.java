@@ -22,7 +22,7 @@ import org.matsim.signalsystems.systems.SignalSystemsImpl;
 
 import playground.dgrether.DgPaths;
 import playground.dgrether.lanes.LanesConsistencyChecker;
-import playground.dgrether.signalsystems.SignalSystemsConsistencyChecker;
+import playground.dgrether.signalsystems.data.consistency.SignalSystemsConsistencyChecker;
 
 public class GenerateZuerrichOutput {
 
