@@ -22,9 +22,9 @@ package org.matsim.signalsystems.model;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.framework.events.SimulationBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
+import org.matsim.ptproject.qsim.interfaces.Mobsim;
 import org.matsim.ptproject.qsim.interfaces.NetsimLink;
 import org.matsim.ptproject.qsim.interfaces.NetsimNetwork;
-import org.matsim.ptproject.qsim.interfaces.Mobsim;
 import org.matsim.ptproject.qsim.qnetsimengine.QLane;
 import org.matsim.ptproject.qsim.qnetsimengine.QLinkImpl;
 import org.matsim.ptproject.qsim.qnetsimengine.QLinkLanesImpl;
@@ -75,13 +75,13 @@ public class QSimSignalEngine implements SignalEngine {
 		}
 	}
 
-	public QLane getQLane(Id laneId, QLinkLanesImpl link){
+	private QLane getQLane(Id laneId, QLinkLanesImpl link){
 		for (QLane lane : link.getQueueLanes()){
 			if (lane.getId().equals(laneId)){
 				return lane;
 			}
 		}
-		throw new IllegalArgumentException("QLane not found");
+		throw new IllegalArgumentException("QLane Id " + laneId + "on link Id" + link.getLink().getId() + "  not found. Check configuration!");
 	}
 
 	
