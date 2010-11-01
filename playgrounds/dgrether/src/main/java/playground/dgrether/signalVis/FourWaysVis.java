@@ -25,7 +25,14 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.ptproject.qsim.QSim;
-import org.matsim.vis.otfvis.OTFVisMobsimFeature;
+import org.matsim.signalsystems.builder.FromDataBuilder;
+import org.matsim.signalsystems.data.SignalsData;
+import org.matsim.signalsystems.data.SignalsScenarioLoader;
+import org.matsim.signalsystems.model.QSimSignalEngine;
+import org.matsim.signalsystems.model.SignalEngine;
+import org.matsim.signalsystems.model.SignalSystemsManager;
+
+import playground.dgrether.signalsystems.OTFVisSignalsMobsimFeature;
 
 
 public class FourWaysVis {
@@ -40,8 +47,9 @@ public class FourWaysVis {
 		String netFile = TESTINPUTDIR + "network.xml.gz";
 		String lanesFile  = TESTINPUTDIR + "testLaneDefinitions_v1.1.xml";
 		String popFile = TESTINPUTDIR + "plans.xml.gz";
-		String signalFile = TESTINPUTDIR + "testSignalSystems_v1.1.xml";
-		String signalConfigFile = TESTINPUTDIR + "testSignalSystemConfigurations_v1.1.xml";
+		String signalFile = TESTINPUTDIR + "testSignalSystems_v2.0.xml";
+		String signalGroupsFile = TESTINPUTDIR + "testSignalGroups_v2.0.xml";
+		String signalControlFile = TESTINPUTDIR + "testSignalControl_v2.0.xml";
 		
 		
 		ScenarioImpl scenario = new ScenarioImpl();
@@ -55,17 +63,29 @@ public class FourWaysVis {
 		scenario.getConfig().scenario().setUseLanes(true);
 		
 		scenario.getConfig().signalSystems().setSignalSystemFile(signalFile);
-		scenario.getConfig().signalSystems().setSignalSystemConfigFile(signalConfigFile);
+		scenario.getConfig().signalSystems().setSignalGroupsFile(signalGroupsFile);
+		scenario.getConfig().signalSystems().setSignalControlFile(signalControlFile);
 		scenario.getConfig().scenario().setUseSignalSystems(true);
 		
 		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(scenario);
 		loader.loadScenario();
 		
 		EventsManager events = new EventsManagerImpl();
+		
+		SignalsScenarioLoader signalsLoader = new SignalsScenarioLoader(scenario.getConfig().signalSystems());
+		SignalsData signalsData = signalsLoader.loadSignalsData();
+		FromDataBuilder builder = new FromDataBuilder(signalsData, events);
+		SignalSystemsManager manager = builder.createAndInitializeSignalSystemsManager();
+		SignalEngine engine = new QSimSignalEngine(manager);
+
+		//TODO remove
+		scenario.getConfig().scenario().setUseSignalSystems(false);
+		
 		QSim otfVisQSim = new QSim(scenario, events);
-		OTFVisMobsimFeature queueSimulationFeature = new OTFVisMobsimFeature(otfVisQSim);
-		otfVisQSim.addFeature(queueSimulationFeature);
-		queueSimulationFeature.setVisualizeTeleportedAgents(scenario.getConfig().otfVis().isShowTeleportedAgents());
+		otfVisQSim.addQueueSimulationListeners(engine);
+		OTFVisSignalsMobsimFeature qSimFeature = new OTFVisSignalsMobsimFeature(otfVisQSim);
+		otfVisQSim.addFeature(qSimFeature);
+		qSimFeature.setVisualizeTeleportedAgents(scenario.getConfig().otfVis().isShowTeleportedAgents());
 		
 		QSim client = otfVisQSim;
 //		client.setConnectionManager(new DgConnectionManagerFactory().createConnectionManager());

@@ -38,7 +38,7 @@ public class FourWaysVisNetworkOnly {
 	public static void main(String[] args) {
 
 		String netFile = FourWaysVis.TESTINPUTDIR+ "network.xml.gz";
-		String lanesFile  = FourWaysVis.TESTINPUTDIR + "testLaneDefinitions_v1.1.xml";
+		String lanesFile  = FourWaysVis.TESTINPUTDIR + "testLaneDefinitions_v2.0.xml";
 		
 		
 		String[] netArray = {netFile};

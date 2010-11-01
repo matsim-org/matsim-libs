@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DgOsmBBPaths
+ * DgAtan2Illustrations
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,21 +19,26 @@
  * *********************************************************************** */
 package playground.dgrether.signalsystems;
 
-import playground.dgrether.DgPaths;
 
+public class DgAtan2Illustrations {
+	
+	
+	public static void main(String[] args){
+		System.out.println("atan2: " + Math.atan2(0.0, 1.0)/Math.PI * 180.0 + " degrees or " + Math.atan2(0.0, 1.0));
+		System.out.println("atan2: " + Math.atan2(1.0, 0.0)/Math.PI * 180.0  + " degrees or " + Math.atan2(1.0, 0.0));
+		System.out.println("atan2: " + Math.atan2(0.0, -1.0)/Math.PI * 180.0  + " degrees or " + Math.atan2(0.0, -1.0));
+		
+		System.out.println();
+		
+		System.out.println("atan2: " + Math.atan2(-0.0, 1.0)/Math.PI * 180.0 + " degrees or " + Math.atan2(-0.0, 1.0));
+		System.out.println("atan2: " + Math.atan2(-1.0, 0.0)/Math.PI * 180.0 + " degrees or " + Math.atan2(-1.0, 0.0));
+		System.out.println("atan2: " + Math.atan2(-0.0, -1.0)/Math.PI * 180.0 + " degrees or " + Math.atan2(-0.0, -1.0));
+		
+		System.out.println("atan2: " + Math.atan2(-0.0, -0.0)/Math.PI * 180.0 + " degrees or " + Math.atan2(-0.0, -0.0));
 
-/**
- * @author dgrether
- *
- */
-public interface DgOsmBBPaths {
-	
-	public static final String BASE_IN_DIR = DgPaths.SHAREDSVN + "studies/countries/de/osm_berlinbrandenburg/workingset/";
+		System.out.println();
+		System.out.println("atan2: " + Math.atan2(1.0, 1.0)/Math.PI * 180.0 + " degrees or " + Math.atan2(1.0, 1.0));
+		System.out.println("atan2: " + Math.atan2(1.0, -1.0)/Math.PI * 180.0  + " degrees or " + Math.atan2(1.0, -1.0));
 
-	public static final String BASE_OUT_DIR = DgPaths.STUDIESDG + "osmBerlinSzenario/";
-	
-	public static final String NETWORK_GENERATED = BASE_OUT_DIR + "osm_bb_network.xml";
-	
-	
-	
+	}
 }

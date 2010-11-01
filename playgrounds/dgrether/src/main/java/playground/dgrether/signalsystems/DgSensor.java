@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DgSatellicNetworkPostProcessing
+ * DgSensor
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,44 +17,19 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.tests.satellic;
-
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.core.api.experimental.ScenarioLoader;
-import org.matsim.core.api.experimental.network.NetworkWriter;
-import org.matsim.core.network.algorithms.NetworkCleaner;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
-
-import playground.dgrether.DgPaths;
+package playground.dgrether.signalsystems;
 
 
 /**
  * @author dgrether
  *
  */
-public class DgSatellicNetworkPostProcessing {
+public class DgSensor {
+	
+	
+	
+	public void getNumberOfCarsInD(){
+		
+	}
 
-  
-  /**
-   * @param args
-   */
-  public static void main(String[] args) {
-    String netbase = DgPaths.SHAREDSVN + "studies/countries/de/prognose_2025/demand/network_pv";
-    String net = netbase + ".xml";
-    String netout = netbase + "_cleaned.xml.gz";
-    
-    Scenario sc = new ScenarioImpl();
-    sc.getConfig().network().setInputFile(net);
-    ScenarioLoader loader = new ScenarioLoaderImpl(sc);
-    loader.loadScenario();
-    
-    NetworkCleaner cleaner = new NetworkCleaner();
-    cleaner.run(sc.getNetwork());
-    
-    NetworkWriter writer = new NetworkWriter(sc.getNetwork());
-    writer.write(netout);
-    
-  }
-  
 }

@@ -45,7 +45,7 @@ public class DgSatellicNetwork2WGS84Converter {
 	public static void main(String[] args) {
 		
 //		String netbase = DgPaths.SHAREDSVN + "studies/countries/de/prognose_2025/demand/network_ab";
-		String netbase = DgPaths.SHAREDSVN + "studies/countries/de/prognose_2025/demand/network_cleaned";
+		String netbase = DgPaths.SHAREDSVN + "studies/countries/de/prognose_2025/demand/network_pv_cleaned";
 		String net = netbase + ".xml.gz";
 		String f = DgPaths.REPOS + "shared-svn/studies/countries/de/prognose_2025/orig/netze/coordinateTransformationLookupTable.csv";
 		ApproximatelyCoordianteTransformation transform = new ApproximatelyCoordianteTransformation(f);
