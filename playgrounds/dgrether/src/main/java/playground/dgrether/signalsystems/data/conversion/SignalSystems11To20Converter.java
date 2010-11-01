@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.signalsystems.data;
+package playground.dgrether.signalsystems.data.conversion;
 
 import java.io.IOException;
 import java.util.HashSet;

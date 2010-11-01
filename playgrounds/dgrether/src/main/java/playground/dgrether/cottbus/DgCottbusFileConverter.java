@@ -22,8 +22,8 @@ package playground.dgrether.cottbus;
 import org.matsim.lanes.run.LaneDefinitonsV11ToV20Converter;
 
 import playground.dgrether.DgPaths;
-import playground.dgrether.signalsystems.data.SignalConfig11ToControl20Converter;
-import playground.dgrether.signalsystems.data.SignalSystems11To20Converter;
+import playground.dgrether.signalsystems.data.conversion.SignalConfig11ToControl20Converter;
+import playground.dgrether.signalsystems.data.conversion.SignalSystems11To20Converter;
 
 
 /**

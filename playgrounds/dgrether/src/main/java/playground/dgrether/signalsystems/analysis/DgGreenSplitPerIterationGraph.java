@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.signalsystems;
+package playground.dgrether.signalsystems.analysis;
 
 import java.awt.BasicStroke;
 import java.util.HashMap;

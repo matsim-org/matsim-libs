@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * FourWaysVis
+ * ZurichVisNetworkOnly
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,10 +17,9 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.signalVis;
+package playground.dgrether.signalsystems.otfvis;
 
 import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
@@ -29,17 +28,22 @@ import org.matsim.lanes.MatsimLaneDefinitionsReader;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.vis.otfvis.OTFVisMobsimFeature;
 
+import playground.dgrether.DgPaths;
 
-public class FourWaysVisNetworkOnly {
+
+/**
+ * @author dgrether
+ *
+ */
+public class ZurichVisNetworkOnly {
 
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-
-		String netFile = FourWaysVis.TESTINPUTDIR+ "network.xml.gz";
-		String lanesFile  = FourWaysVis.TESTINPUTDIR + "testLaneDefinitions_v2.0.xml";
-		
+		String netFile = DgPaths.IVTCHNET;
+		String lanesFile  = DgPaths.STUDIESDG + "signalSystemsZh/laneDefinitions.xml";
+//		String lanesFile  = DgPaths.STUDIESDG + "lsaZurich/laneDefinitions_v1.1.xml";
 		
 		String[] netArray = {netFile};
 		
@@ -47,7 +51,6 @@ public class FourWaysVisNetworkOnly {
 //		OTFVis.playNetwork(netArray);
 		//this is hack
 		ScenarioImpl scenario = new ScenarioImpl();
-    scenario.getConfig().setQSimConfigGroup(new QSimConfigGroup());
 		NetworkImpl network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFile);
 //		PopulationImpl population = scenario.getPopulation();
@@ -65,8 +68,6 @@ public class FourWaysVisNetworkOnly {
 		
 		QSim client = otfVisQSim;
 		client.run();
-		
-		
 	}
 
 }

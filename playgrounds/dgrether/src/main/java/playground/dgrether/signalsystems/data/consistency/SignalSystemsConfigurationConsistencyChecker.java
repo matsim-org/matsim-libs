@@ -17,23 +17,27 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.signalsystems.data;
+package playground.dgrether.signalsystems.data.consistency;
 
 import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.lanes.LaneDefinitions;
 import org.matsim.lanes.LaneDefinitionsImpl;
-import org.matsim.lanes.LanesToLinkAssignment;
 import org.matsim.lanes.MatsimLaneDefinitionsReader;
+import org.matsim.signalsystems.MatsimSignalSystemConfigurationsReader;
 import org.matsim.signalsystems.MatsimSignalSystemsReader;
-import org.matsim.signalsystems.systems.SignalGroupDefinition;
+import org.matsim.signalsystems.config.PlanBasedSignalSystemControlInfo;
+import org.matsim.signalsystems.config.SignalGroupSettings;
+import org.matsim.signalsystems.config.SignalSystemConfiguration;
+import org.matsim.signalsystems.config.SignalSystemConfigurations;
+import org.matsim.signalsystems.config.SignalSystemConfigurationsImpl;
+import org.matsim.signalsystems.config.SignalSystemPlan;
 import org.matsim.signalsystems.systems.SignalSystems;
 import org.matsim.signalsystems.systems.SignalSystemsImpl;
 
@@ -43,65 +47,56 @@ import playground.dgrether.consistency.ConsistencyChecker;
 
 /**
  * @author dgrether
- *
+ * @deprecated is only valid for the  1.1 model
  */
-public class SignalSystemsConsistencyChecker implements ConsistencyChecker {
+@Deprecated
+public class SignalSystemsConfigurationConsistencyChecker implements ConsistencyChecker {
 	
-	private static final Logger log = Logger.getLogger(SignalSystemsConsistencyChecker.class);
+	private static final Logger log = Logger.getLogger(SignalSystemsConfigurationConsistencyChecker.class);
 	
 	private Network network;
 	private LaneDefinitions lanes;
 	private boolean removeMalformed = false;
 
 	private SignalSystems signals;
+
+	private SignalSystemConfigurations signalConfig;
 	
-	public SignalSystemsConsistencyChecker(Network net, LaneDefinitions laneDefs, SignalSystems signals) {
+	public SignalSystemsConfigurationConsistencyChecker(Network net, LaneDefinitions laneDefs, SignalSystems signals, SignalSystemConfigurations signalConfig) {
 		this.network = net;
 		this.lanes = laneDefs;
 		this.signals = signals;
+		this.signalConfig = signalConfig;
 	}
 	
 	public void checkConsistency() {
 		log.info("checking consistency...");
-		Set<SignalGroupDefinition> malformedGroups = new HashSet<SignalGroupDefinition>();
-		//check link
-		for (SignalGroupDefinition sg : this.signals.getSignalGroupDefinitions().values()){
-			if (!this.network.getLinks().containsKey(sg.getLinkRefId())){
-				log.error("No link in network with id " + sg.getLinkRefId() + " for attached signalGroup id " + sg.getId());
-				malformedGroups.add(sg);
-			}
-			// check toLinks
-			for (Id id : sg.getToLinkIds()){
-				if (!this.network.getLinks().containsKey(id)){
-					log.error("No link in network with id " + id + " set as toLink of signalGroup id " + sg.getId());
-					malformedGroups.add(sg);
-				}
-			}
-			//check signalsystem
-			if (!this.signals.getSignalSystemDefinitions().containsKey(sg.getSignalSystemDefinitionId())){
-				log.error("No signalSystemDefinition with Id " + sg.getSignalSystemDefinitionId() + " set as system of signalGroup id " + sg.getId());
-				malformedGroups.add(sg);
-			}
-			//check lanes
-			if (!this.lanes.getLanesToLinkAssignments().containsKey(sg.getLinkRefId())){
-				log.error("No LanesToLinkAssignment found in lane definitions for referenced link id " + sg.getLinkRefId() + " set as Link of signalGroup id " + sg.getId());
-				malformedGroups.add(sg);
-			} 
-			else {
-				LanesToLinkAssignment l2l = this.lanes.getLanesToLinkAssignments().get(sg.getLinkRefId());
-				for (Id id : sg.getLaneIds()){
-					if (!l2l.getLanes().containsKey(id)){
-						log.error("No lane defined in laneDefinitions with id " + id + " set in signalGroup id " + sg.getId());
-						malformedGroups.add(sg);
-					}
+		Set<SignalSystemConfiguration> malformedGroups = new HashSet<SignalSystemConfiguration>();
 
+		for (SignalSystemConfiguration ssc : this.signalConfig.getSignalSystemConfigurations().values()){
+			//check signal system reference
+			if (!this.signals.getSignalSystemDefinitions().containsKey(ssc.getSignalSystemId())){
+				log.error("No signal system found with id " + ssc.getSignalSystemId() + " signal system configuration not valid");
+				malformedGroups.add(ssc);
+			}
+			//check signal groups of plan based control
+			if (ssc.getControlInfo() instanceof PlanBasedSignalSystemControlInfo){
+				PlanBasedSignalSystemControlInfo pbci = (PlanBasedSignalSystemControlInfo) ssc.getControlInfo();
+				for (SignalSystemPlan plan : pbci.getPlans().values()){
+					for (SignalGroupSettings settings : plan.getGroupConfigs().values()){
+						if (!this.signals.getSignalGroupDefinitions().containsKey(settings.getReferencedSignalGroupId())){
+							log.error("Plan id " + plan.getId() + " of signalSystemConfiguration for signal system id " + ssc.getSignalSystemId() +
+									" references signalGroup id " + settings.getReferencedSignalGroupId() + " that is not defined.");
+							malformedGroups.add(ssc);
+						}
+					}
 				}
 			}
-		}
+		} //end for
 		
 		if (this.removeMalformed){
-			for (SignalGroupDefinition id : malformedGroups) {
-				this.lanes.getLanesToLinkAssignments().remove(id);
+			for (SignalSystemConfiguration id : malformedGroups) {
+				this.signalConfig.getSignalSystemConfigurations().remove(id.getSignalSystemId());
 			}
 		}
 		log.info("checked consistency.");
@@ -126,6 +121,7 @@ public class SignalSystemsConsistencyChecker implements ConsistencyChecker {
 		String netFile = DgPaths.IVTCHBASE + "baseCase/network/ivtch-osm.xml";
 		String lanesFile = DgPaths.STUDIESDG + "signalSystemsZh/laneDefinitions.xml";
 		String signalSystemsFile = DgPaths.STUDIESDG + "signalSystemsZh/signalSystems.xml";
+		String signalSystemsConfigFile = DgPaths.STUDIESDG + "signalSystemsZh/signalSystemsConfig.xml";
 		ScenarioImpl scenario = new ScenarioImpl();
 		NetworkImpl net = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFile);
@@ -140,7 +136,11 @@ public class SignalSystemsConsistencyChecker implements ConsistencyChecker {
 	  MatsimSignalSystemsReader signalReader = new MatsimSignalSystemsReader(signals);
 	  signalReader.readFile(signalSystemsFile);
 	  
-	  SignalSystemsConsistencyChecker sscc = new SignalSystemsConsistencyChecker(net, laneDefs, signals);
+	  SignalSystemConfigurations signalConfig = new SignalSystemConfigurationsImpl();
+	  MatsimSignalSystemConfigurationsReader signalConfigReader = new MatsimSignalSystemConfigurationsReader(signalConfig);
+	  signalConfigReader.readFile(signalSystemsConfigFile);
+	  
+	  SignalSystemsConfigurationConsistencyChecker sscc = new SignalSystemsConfigurationConsistencyChecker(net, laneDefs, signals, signalConfig);
 		sscc.setRemoveMalformed(true);
 		sscc.checkConsistency();
 

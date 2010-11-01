@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DenverStarter
+ * FourWaysVis
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,39 +17,54 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.signalVis;
+package playground.dgrether.signalsystems.otfvis;
 
-import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkImpl;
+import org.matsim.lanes.LaneDefinitions;
+import org.matsim.lanes.MatsimLaneDefinitionsReader;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.vis.otfvis.OTFVisMobsimFeature;
 
-import playground.dgrether.DgPaths;
 
-
-/**
- * @author dgrether
- *
- */
-public class DenverStarter {
+public class FourWaysVisNetworkOnly {
 
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String configFile = DgPaths.STUDIESDG + "denver/dgConfig.xml";
+
+		String netFile = FourWaysVis.TESTINPUTDIR+ "network.xml.gz";
+		String lanesFile  = FourWaysVis.TESTINPUTDIR + "testLaneDefinitions_v2.0.xml";
 		
-		ScenarioLoaderImpl scl = new ScenarioLoaderImpl(configFile);
-		Scenario sc = scl.loadScenario();
-		EventsManagerImpl e = new EventsManagerImpl();
-		QSim otfVisQSim = new QSim(sc, e);
+		
+		String[] netArray = {netFile};
+		
+		//this is run
+//		OTFVis.playNetwork(netArray);
+		//this is hack
+		ScenarioImpl scenario = new ScenarioImpl();
+    scenario.getConfig().setQSimConfigGroup(new QSimConfigGroup());
+		NetworkImpl network = scenario.getNetwork();
+		new MatsimNetworkReader(scenario).readFile(netFile);
+//		PopulationImpl population = scenario.getPopulation();
+		EventsManagerImpl events = new EventsManagerImpl();
+		
+		scenario.getConfig().scenario().setUseLanes(true);
+		LaneDefinitions laneDefs = scenario.getLaneDefinitions();
+		
+		MatsimLaneDefinitionsReader lanesReader = new MatsimLaneDefinitionsReader(laneDefs);
+		lanesReader.readFile(lanesFile);
+		QSim otfVisQSim = new QSim(scenario, events);
 		OTFVisMobsimFeature queueSimulationFeature = new OTFVisMobsimFeature(otfVisQSim);
 		otfVisQSim.addFeature(queueSimulationFeature);
-		queueSimulationFeature.setVisualizeTeleportedAgents(sc.getConfig().otfVis().isShowTeleportedAgents());
+		queueSimulationFeature.setVisualizeTeleportedAgents(scenario.getConfig().otfVis().isShowTeleportedAgents());
 		
-		QSim sim = otfVisQSim;
-		sim.run();
+		QSim client = otfVisQSim;
+		client.run();
 		
 		
 	}

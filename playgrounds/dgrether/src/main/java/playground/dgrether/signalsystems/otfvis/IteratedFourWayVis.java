@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.signalVis;
+package playground.dgrether.signalsystems.otfvis;
 
 import org.matsim.run.OTFVis;
 

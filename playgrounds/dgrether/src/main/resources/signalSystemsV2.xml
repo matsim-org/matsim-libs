@@ -1,61 +1,50 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<!--<signalSystems xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/signalSystems_v2.0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.matsim.org/files/dtd">-->
-<signalSystems>
-    <signalSystemDefinition id="1">
-        <defaultCycleTime seconds="57.0"/>
+<signalSystems xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/signalSystems_v2.0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.matsim.org/files/dtd">
+    <signalSystem id="1">
         <signals>
 <!--No Lanes are used but may be used-->
         <!-- Definiert die Signalgruppe für den Link 6  (alle Richtungen)     -->
-	      <signalDefinition linkIdRef="6" id="1" />
+	      <signal linkIdRef="6" id="1" />
 
 <!--NO LANES are used this is a must-->
         <!-- Definiert die Signalgruppe für den Link 6, nur in Richtung Link 3       -->
-        <signalDefinition linkIdRef="6" id="1">
+        <signal linkIdRef="6" id="1">
         
             <turningMoveRestrictions>
               <toLink refId="3"/>
             </turningMoveRestrictions>
-         </signalDefinition>
+         </signal>
 
 <!--Lanes used -->
 	      <!-- Definiert die Signalgruppe für die Spur 1 (alle Richtungen) auf Link 6       -->
-        <signalDefinition linkIdRef="6" id="1">
+        <signal linkIdRef="6" id="1">
            <lane refId="1" />
-         </signalDefinition>
+         </signal>
 
         <!-- Definiert die Signalgruppe für die Spuren 1 und 2 (alle Richtungen) auf Link 7       -->
-        <signalDefinition linkIdRef="7" id="1">
+        <signal linkIdRef="7" id="1">
            <lane refId="1" />
            <lane refId="2" />
-         </signalDefinition>
+         </signal>
          
         <!-- Definiert die Signalgruppe für die Spur 1 auf Link 6, nur in Richtung Link 3 und für die Spur 2  -->
-        <signalDefinition linkIdRef="6" id="1">
+        <signal linkIdRef="6" id="1">
            <lane refId="1" />
            <lane refId="2"/>
             <turningMoveRestrictions>
              <toLink refId="3" />
             </turningMoveRestrictions>           
-         </signalDefinition>
+         </signal>
          
         <!-- Definiert die Signalgruppe für die Spur 1 auf Link 6, aber nur in Richtung Link 5  -->
-        <signalDefinition linkIdRef="6" id="2">
+        <signal linkIdRef="6" id="2">
            <lane refId="1" />
             <turningMoveRestrictions>
              <toLink refId="5"/>
             </turningMoveRestrictions>
-         </signalDefinition>
+         </signal>
         </signals>
-        
-        
-        <signalGroups>
-          <signalGroupDefinition id="1">
-            <signal refId="1" />
-            <signal refId="2" />  
-          </signalGroupDefinition>
-        </signalGroups>
-         
-    </signalSystemDefinition>
+    </signalSystem>
     
 </signalSystems>   
  

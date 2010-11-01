@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DgZhSignalsStarter
+ * SignalGroupData
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,31 +17,48 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.signalsystems;
+package playground.dgrether.signalsystems.analysis;
 
-import org.matsim.core.controler.Controler;
+import java.util.HashMap;
+import java.util.Map;
 
-import playground.dgrether.DgPaths;
+import org.matsim.core.events.SignalGroupStateChangedEvent;
+import org.matsim.signalsystems.control.SignalGroupState;
 
 
 /**
  * @author dgrether
  *
  */
-public class DgZhSignalsStarter {
+public class DgSignalGroupData {
+  
+  private SignalGroupState oldState = null;
+  
+  private double oldStateOnTime = 0.0;
 
-	/**
-	 * @param args
-	 */
-	public static void main(String[] a) {
-		String config = null;
-		config = DgPaths.STUDIESDG + "lsaZurich/config.xml";
-		String[] args = {config};
-		
-		Controler c = new Controler(config);
-		c.setOverwriteFiles(true);
-		c.run();
-		
-	}
+  private double [] stateTimeArray = new double[SignalGroupState.values().length];
+  
+  
+  public DgSignalGroupData(){
+  }
+  
+  public void processStateChange(SignalGroupStateChangedEvent e) {
+  	double time = e.getTime();
+  	SignalGroupState newState = e.getNewState();
+  	if (oldState != null){
+  		stateTimeArray[oldState.ordinal()] += (time - oldStateOnTime);
+    }
+  	oldStateOnTime = time;
+    oldState = newState;
+  }
 
+  
+
+	public Map<SignalGroupState, Double> getStateTimeMap() {
+		Map<SignalGroupState, Double> map = new HashMap<SignalGroupState, Double>();
+		for (SignalGroupState state : SignalGroupState.values()){
+			map.put(state, this.stateTimeArray[state.ordinal()]);
+		}
+    return map;
+  }
 }

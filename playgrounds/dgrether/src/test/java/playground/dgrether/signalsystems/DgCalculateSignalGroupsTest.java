@@ -60,6 +60,8 @@ import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsReader20;
 import org.matsim.testcases.MatsimTestUtils;
 import org.xml.sax.SAXException;
 
+import playground.dgrether.signalsystems.data.preprocessing.DgCalculateSignalGroups;
+
 
 /**
  * Tests if the signal grouping algorithm works correctly for several crossing types.

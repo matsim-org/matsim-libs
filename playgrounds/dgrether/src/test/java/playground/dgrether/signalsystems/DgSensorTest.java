@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DgSignalGreenSplitHandler
+ * DgSensorTest
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,50 +19,17 @@
  * *********************************************************************** */
 package playground.dgrether.signalsystems;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.events.SignalGroupStateChangedEvent;
-import org.matsim.core.events.handler.SignalGroupStateChangedEventHandler;
+import org.junit.Rule;
 
 
 /**
  * @author dgrether
  *
  */
-public class DgSignalGreenSplitHandler implements SignalGroupStateChangedEventHandler{
+public class DgSensorTest {
 
-  private static final Logger log = Logger
-      .getLogger(DgSignalGreenSplitHandler.class);
-  
-  private Map<Id, DgSignalSystemData> systemIdDataMap = new HashMap<Id, DgSignalSystemData>();
-  
-  public void addSignalSystem(Id systemId){
-    this.systemIdDataMap.put(systemId, new DgSignalSystemData());
-  }
-  
-  @Override
-  public void handleEvent(SignalGroupStateChangedEvent event) {
-    DgSignalSystemData data = this.systemIdDataMap.get(event.getSignalSystemId());
-    if (data != null){
-      data.processStateChange(event);
-    }
-  }
-
-  @Override
-  public void reset(int iteration) {
-    Set<Id> systemSet = this.systemIdDataMap.keySet();
-    for (Id id : systemSet){
-      this.systemIdDataMap.put(id, new DgSignalSystemData());
-    }
-  }
-  
-  public Map<Id, DgSignalSystemData> getSystemIdDataMap() {
-    return systemIdDataMap;
-  }
-
-  
-} 
+	@Rule
+	public void testSensor(){
+		
+	}
+}

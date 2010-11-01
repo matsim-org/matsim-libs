@@ -42,8 +42,8 @@ import playground.dgrether.analysis.charts.utils.DgChartWriter;
 import playground.dgrether.linkanalysis.DgCountPerIterationGraph;
 import playground.dgrether.linkanalysis.TTGraphWriter;
 import playground.dgrether.linkanalysis.TTInOutflowEventHandler;
-import playground.dgrether.signalsystems.DgGreenSplitPerIterationGraph;
-import playground.dgrether.signalsystems.DgSignalGreenSplitHandler;
+import playground.dgrether.signalsystems.analysis.DgGreenSplitPerIterationGraph;
+import playground.dgrether.signalsystems.analysis.DgSignalGreenSplitHandler;
 
 
 /**
