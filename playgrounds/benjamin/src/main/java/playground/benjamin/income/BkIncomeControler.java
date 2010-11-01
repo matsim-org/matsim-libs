@@ -19,22 +19,26 @@
  * *********************************************************************** */
 package playground.benjamin.income;
 
+import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.listener.ControlerListener;
 
 import playground.benjamin.income.BkIncomeControlerListener;
 
 /**
- * @author bkick
- * @author michaz
- *
+ * @author kai
+ * @author benjamin
  */
-public class BkIncomeControler {
+public class BkIncomeControler extends Controler{
 
 	
-	public static void main(String[] args) {
+	private static Config config;
 
-		String config = "../../shared-svn/studies/bkick/oneRouteTwoModeIncomeTest/config.xml"; 
+	public BkIncomeControler(Config config) {
+		super(config);
+	}
+
+	public static void main(String[] args) {
 
 		final Controler controler = new Controler(config);
 

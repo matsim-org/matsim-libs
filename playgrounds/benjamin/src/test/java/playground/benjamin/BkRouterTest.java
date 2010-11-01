@@ -29,10 +29,10 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.testcases.MatsimTestCase;
 
-import playground.benjamin.income.BkControlerIncome;
+import playground.benjamin.income.BkIncomeControler;
 
 /**
- * Tests the routing of the BkControlerIncome
+ * Tests the routing of the BkIncomeControler
  *
  * @author dgrether
  */
@@ -54,7 +54,7 @@ public class BkRouterTest extends MatsimTestCase {
 		config.scenario().setUseHouseholds(true);
 		config.households().setInputFile(this.getClassInputDirectory() + "households.xml");
 
-		BkControlerIncome controler = new BkControlerIncome(config);
+		BkIncomeControler controler = new BkIncomeControler(config);
 		controler.setCreateGraphs(false);
 		final EventHandler1 handler = new EventHandler1();
 
@@ -107,7 +107,7 @@ public class BkRouterTest extends MatsimTestCase {
 		config.scenario().setUseRoadpricing(true);
 		config.roadpricing().setTollLinksFile(this.getClassInputDirectory() + "tollLinksFile.xml");
 
-		BkControlerIncome controler = new BkControlerIncome(config);
+		BkIncomeControler controler = new BkIncomeControler(config);
 		controler.setCreateGraphs(false);
 		final EventHandler2 handler = new EventHandler2();
 

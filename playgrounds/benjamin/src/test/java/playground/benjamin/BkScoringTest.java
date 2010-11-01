@@ -27,11 +27,11 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.scoring.EventsToScore;
 import org.matsim.testcases.MatsimTestCase;
 
-import playground.benjamin.income.BkControlerIncome;
+import playground.benjamin.income.BkIncomeControler;
 
 
 /**
- * Tests the scoring of the BkControlerIncome
+ * Tests the scoring of the BkIncomeControler
  * @author dgrether
  *
  */
@@ -53,7 +53,7 @@ public class BkScoringTest extends MatsimTestCase {
 
 
 		// controler with new scoring function
-		final BkControlerIncome controler = new BkControlerIncome(config);
+		final BkIncomeControler controler = new BkIncomeControler(config);
 		controler.setCreateGraphs(false);
 		controler.setWriteEventsInterval(0);
 
