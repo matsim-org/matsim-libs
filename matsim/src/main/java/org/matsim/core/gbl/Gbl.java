@@ -29,23 +29,18 @@ import java.net.URL;
 
 import org.apache.log4j.Logger;
 
-/* The usage of Gbl.getConfig() all throughout the code makes it very hard
- * to debug. We would thus prefer if Gbl.getConfig() could be removed in
- * the longer term and the config-object, or single params from the config,
- * could be handed as parameters where needed. // VSP/mrieser, 11sep2007
- * The same holds true for Gbl.getConfig(). // VSP/mrieser, 06jun2008 // ???  kai, apr09
+/**
+ * Some utility functions for dumping time and memory usage, and for logging.
+ *
  */
 public abstract class Gbl {
-	public final static String ONLYONCE=" This message given only once.";
-	public final static String FUTURE_SUPPRESSED=" Future occurences of this warning are suppressed." ;
-	// (if warnings may be given more than once)
-
+	
 	private static final Logger log = Logger.getLogger(Gbl.class);
-
-	//////////////////////////////////////////////////////////////////////
-	// reset scenario
-	//////////////////////////////////////////////////////////////////////
-
+	
+	public final static String ONLYONCE = " This message given only once.";
+	
+	public final static String FUTURE_SUPPRESSED = " Future occurences of this warning are suppressed." ;
+	
 	public static final void printMemoryUsage() {
 		long totalMem = Runtime.getRuntime().totalMemory();
 		long freeMem = Runtime.getRuntime().freeMemory();
@@ -66,7 +61,8 @@ public abstract class Gbl {
 		log.info("max. Memory: " + Runtime.getRuntime().maxMemory() / 1024.0 / 1024.0 + "MB (" + Runtime.getRuntime().maxMemory() + "B)");
 	}
 
-	/** Prints some information about the current build/revision of this code.
+	/** 
+	 * Prints some information about the current build/revision of this code.
 	 * Currently, this will only work with the Nightly-Build-Jars.
 	 */
 	public static final void printBuildInfo() {
@@ -128,10 +124,10 @@ public abstract class Gbl {
 		float elapsedTimeDay = elapsedTimeMillis/(24*60*60*1000F);
 
 		return elapsedTimeMillis + " msecs; " +
-				elapsedTimeSec    + " secs; " +
-				elapsedTimeMin    + " mins; " +
-				elapsedTimeHour   + " hours; " +
-				elapsedTimeDay    + " days ###";
+			elapsedTimeSec    + " secs; " +
+			elapsedTimeMin    + " mins; " +
+			elapsedTimeHour   + " hours; " +
+			elapsedTimeDay    + " days ###";
 	}
 
 	public static final void startMeasurement() {
@@ -147,8 +143,11 @@ public abstract class Gbl {
 		Gbl.startMeasurement();
 	}
 
-	/* Thread performance measurement */
-	private final static ThreadMXBean tbe  =  ManagementFactory.getThreadMXBean();
+	//////////////////////////////////////////////////////////////////////
+	// thread performance
+	//////////////////////////////////////////////////////////////////////
+
+	private final static ThreadMXBean tbe = ManagementFactory.getThreadMXBean();
 
 	/**
 	 * Tries to enable CPU time measurement for threads. Not all JVMs support this feature.
@@ -158,8 +157,8 @@ public abstract class Gbl {
 	 */
 	public static final boolean enableThreadCpuTimeMeasurement() {
 		if (tbe.isThreadCpuTimeSupported()) {
-      tbe.setThreadCpuTimeEnabled(true);
-      return true;
+			tbe.setThreadCpuTimeEnabled(true);
+			return true;
 		}
 		return false;
 	}
@@ -176,7 +175,7 @@ public abstract class Gbl {
 	}
 
 	/**
-	 * Prints the cpu time for the given time, i.e. the time the thread was effectively active on the CPU.
+	 * Prints the cpu time for the given thread, i.e. the time the thread was effectively active on the CPU.
 	 *
 	 * @param thread
 	 */
@@ -187,9 +186,10 @@ public abstract class Gbl {
 	}
 
 	/**
-	 * Prints the cpu time for the current time, i.e. the time the current thread was effectively active on the CPU.
+	 * Prints the cpu time for the current thread, i.e. the time the current thread was effectively active on the CPU.
 	 */
 	public static final void printCurrentThreadCpuTime() {
 		printThreadCpuTime(Thread.currentThread());
 	}
+	
 }
