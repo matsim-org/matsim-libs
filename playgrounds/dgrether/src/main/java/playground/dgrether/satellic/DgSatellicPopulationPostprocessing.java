@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.tests.satellic;
+package playground.dgrether.satellic;
 
 import java.util.Random;
 

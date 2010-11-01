@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DgSatellicData
+ * DgSatellicWithindayStarter
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,19 +17,32 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.tests.satellic;
+package playground.dgrether.satellic;
 
-import playground.dgrether.DgPaths;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.events.BeforeMobsimEvent;
+import org.matsim.core.controler.listener.BeforeMobsimListener;
 
 
 /**
  * @author dgrether
  *
  */
-public interface DgPrognose2025Data {
+public class DgSatellicWithindayStarter {
 
-  public final String BASEDIR = DgPaths.SHAREDSVN + "studies/countries/de/prognose_2025/";
-  
-  public final String NETWORK = BASEDIR + "demand/network_cleaned.xml.gz";
-  
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		Controler controler = new Controler(args);
+		controler.addControlerListener(new BeforeMobsimListener() {
+			
+			@Override
+			public void notifyBeforeMobsim(BeforeMobsimEvent event) {
+				event.getControler().setMobsimFactory(new DgWithindayMobsimFactory());
+			}
+		});
+		controler.run();
+	}
+
 }

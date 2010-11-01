@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DgWithindayAgentFactory
+ * DgSatellicData
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,33 +17,19 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.tests.satellic;
+package playground.dgrether.prognose2025;
 
-import java.util.Random;
-
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.ptproject.qsim.QSim;
-import org.matsim.ptproject.qsim.agents.DefaultAgentFactory;
-import org.matsim.ptproject.qsim.agents.DefaultPersonDriverAgent;
+import playground.dgrether.DgPaths;
 
 
 /**
  * @author dgrether
  *
  */
-public class DgWithindayAgentFactory extends DefaultAgentFactory {
+public interface DgPrognose2025Data {
 
-	private Random random;
-
-	public DgWithindayAgentFactory(QSim simulation, Random random) {
-		super(simulation);
-		this.random = random;
-	}
-
-	@Override
-	public DefaultPersonDriverAgent createPersonAgent(final Person p) {
-		DefaultPersonDriverAgent agent = new DgWithindayQPersonAgent(p, this.simulation, this.random);
-		return agent;
-	}
-	
+  public final String BASEDIR = DgPaths.SHAREDSVN + "studies/countries/de/prognose_2025/";
+  
+  public final String NETWORK = BASEDIR + "demand/network_cleaned.xml.gz";
+  
 }

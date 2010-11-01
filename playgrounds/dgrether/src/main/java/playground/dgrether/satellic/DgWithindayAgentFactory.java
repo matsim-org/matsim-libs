@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DgSatellicWithindayStarter
+ * DgWithindayAgentFactory
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,32 +17,33 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.tests.satellic;
+package playground.dgrether.satellic;
 
-import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.events.BeforeMobsimEvent;
-import org.matsim.core.controler.listener.BeforeMobsimListener;
+import java.util.Random;
+
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.ptproject.qsim.QSim;
+import org.matsim.ptproject.qsim.agents.DefaultAgentFactory;
+import org.matsim.ptproject.qsim.agents.DefaultPersonDriverAgent;
 
 
 /**
  * @author dgrether
  *
  */
-public class DgSatellicWithindayStarter {
+public class DgWithindayAgentFactory extends DefaultAgentFactory {
 
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		Controler controler = new Controler(args);
-		controler.addControlerListener(new BeforeMobsimListener() {
-			
-			@Override
-			public void notifyBeforeMobsim(BeforeMobsimEvent event) {
-				event.getControler().setMobsimFactory(new DgWithindayMobsimFactory());
-			}
-		});
-		controler.run();
+	private Random random;
+
+	public DgWithindayAgentFactory(QSim simulation, Random random) {
+		super(simulation);
+		this.random = random;
 	}
 
+	@Override
+	public DefaultPersonDriverAgent createPersonAgent(final Person p) {
+		DefaultPersonDriverAgent agent = new DgWithindayQPersonAgent(p, this.simulation, this.random);
+		return agent;
+	}
+	
 }
