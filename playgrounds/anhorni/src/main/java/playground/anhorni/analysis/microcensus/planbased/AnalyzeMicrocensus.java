@@ -66,12 +66,12 @@ public class AnalyzeMicrocensus {
 	
 	private void init(String mode, String plansFilePath) {
 		this.mode = mode;
-		this.shoppingDistanceDistribution = new Bins(500.0, 50000.0, "shopping_trips_mc_" + this.mode);
-		this.shoppingDistanceDistributionHomeBased = new Bins(500.0, 50000.0, "shopping_trips_mc_home-based_" + this.mode);
-		this.shoppingDistanceDistributionRoundTrip = new Bins(500.0, 30000.0, "shopping_trips_mc_round-trip_" + this.mode);
+		this.shoppingDistanceDistribution = new Bins(500.0, 40000.0, "shopping_trips_mc_" + this.mode);
+		this.shoppingDistanceDistributionHomeBased = new Bins(500.0, 40000.0, "shopping_trips_mc_home-based_" + this.mode);
+		this.shoppingDistanceDistributionRoundTrip = new Bins(500.0, 40000.0, "shopping_trips_mc_round-trip_" + this.mode);
 		
-		this.shoppingDistanceDistributionRoundTripGrocery = new Bins(500.0, 50000.0, "shopping_trips_mc_round-trip_grocery_" + this.mode);
-		this.shoppingDistanceDistributionRoundTripNonGrocery = new Bins(500.0, 100000.0, "shopping_trips_mc_round-trip_nongrocery_" + this.mode);
+		this.shoppingDistanceDistributionRoundTripGrocery = new Bins(500.0, 40000.0, "shopping_trips_mc_round-trip_grocery_" + this.mode);
+		this.shoppingDistanceDistributionRoundTripNonGrocery = new Bins(500.0, 40000.0, "shopping_trips_mc_round-trip_nongrocery_" + this.mode);
 		
 		MatsimPopulationReader populationReader = new MatsimPopulationReader(this.scenario);
 		populationReader.readFile(plansFilePath);	
