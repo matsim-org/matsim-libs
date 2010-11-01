@@ -18,12 +18,14 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.benjamin.income2;
+package playground.benjamin.income;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.interfaces.BasicScoring;
 import org.matsim.core.scoring.interfaces.MoneyScoring;
+
+import playground.benjamin.income.ScoringFromToll;
 
 /**
  * This is a re-implementation of the original CharyparNagel function, based on a

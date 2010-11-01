@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin.income2;
+package playground.benjamin.income;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
@@ -30,6 +30,10 @@ import org.matsim.households.Households;
 import org.matsim.households.PersonHouseholdMapping;
 import org.matsim.population.algorithms.PlanCalcType;
 import org.matsim.roadpricing.RoadPricingScheme;
+
+import playground.benjamin.income.IncomeScoringFunctionFactory;
+import playground.benjamin.income.IncomeTollTravelCostCalculatorFactory;
+import playground.benjamin.income.IncomeTravelCostCalculatorFactory;
 
 /**
  * @author nagel

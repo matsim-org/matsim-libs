@@ -17,10 +17,12 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin.income2;
+package playground.benjamin.income;
 
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.listener.ControlerListener;
+
+import playground.benjamin.income.BkIncomeControlerListener;
 
 /**
  * @author bkick
