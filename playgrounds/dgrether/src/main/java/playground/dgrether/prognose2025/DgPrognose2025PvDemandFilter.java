@@ -20,7 +20,9 @@
 package playground.dgrether.prognose2025;
 
 import java.io.IOException;
+import java.util.Random;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -30,6 +32,8 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
+import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.utils.misc.Time;
 
 
 /**
@@ -39,12 +43,15 @@ import org.matsim.core.api.experimental.events.LinkLeaveEvent;
  */
 public class DgPrognose2025PvDemandFilter extends DgPrognose2025DemandFilter {
 
+	private static final Logger log = Logger.getLogger(DgPrognose2025PvDemandFilter.class);
+	
+	private Random random;
+	
 	public DgPrognose2025PvDemandFilter(){
+		random = MatsimRandom.getLocalInstance();
 	}
 
-	
-	@Override
-	protected void addNewPerson(Link startLink, Person person, Population newPop, Route route) {
+	private void addNewPerson(Link startLink, Person person, Population newPop, Route route, double endTime){
 		PopulationFactory popFactory = newPop.getFactory();
 		Person newPerson = popFactory.createPerson(person.getId());
 		newPop.addPerson(newPerson);
@@ -53,8 +60,8 @@ public class DgPrognose2025PvDemandFilter extends DgPrognose2025DemandFilter {
 		Activity oldWorkAct = ((Activity)((Plan)person.getPlans().get(0)).getPlanElements().get(2));
 		//home activity
 		Activity newAct = popFactory.createActivityFromCoord("pvHome", startLink.getCoord());
-		LinkLeaveEvent leaveEvent = this.collector.getLinkLeaveEvent(person.getId(), startLink.getId());
-		newAct.setEndTime(leaveEvent.getTime());
+		
+		newAct.setEndTime(endTime);
 		newPlan.addActivity(newAct);
 		//leg
 		Leg leg = popFactory.createLeg("car");
@@ -69,6 +76,22 @@ public class DgPrognose2025PvDemandFilter extends DgPrognose2025DemandFilter {
 		newPlan.addLeg(leg);
 		newAct = popFactory.createActivityFromCoord("pvHome", startLink.getCoord());
 		newPlan.addActivity(newAct);
+	}
+	
+	@Override
+	protected void addNewPerson(Link startLink, Person person, Population newPop, Route route) {
+		LinkLeaveEvent leaveEvent = this.collector.getLinkLeaveEvent(person.getId(), startLink.getId());		
+		double filterAreaEnterTime = leaveEvent.getTime();
+		if (filterAreaEnterTime > 24.0 *3600.0){
+			if (random.nextDouble() < 0.33){
+				double endTime = filterAreaEnterTime % (24.0 * 3600.0);
+				log.info("Old end time: " + Time.writeTime(filterAreaEnterTime) + " new end time: " + Time.writeTime(endTime));
+				this.addNewPerson(startLink, person, newPop, route, leaveEvent.getTime());
+			}
+		}
+		else {
+			this.addNewPerson(startLink, person, newPop, route, leaveEvent.getTime());
+		}
 	}
 	
 	public static void main(String[] args) throws IOException {
