@@ -19,16 +19,17 @@
  * *********************************************************************** */
 package playground.dgrether.signalsystems;
 
-import org.junit.Rule;
+import org.junit.Ignore;
 
 
 /**
  * @author dgrether
  *
  */
+@Ignore
 public class DgSensorTest {
 
-	@Rule
+	@Ignore
 	public void testSensor(){
 		
 	}
