@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.benjamin.income;
+package playground.benjamin.old.income;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;

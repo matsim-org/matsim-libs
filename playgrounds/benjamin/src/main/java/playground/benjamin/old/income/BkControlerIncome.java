@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin.income;
+package playground.benjamin.old.income;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.events.StartupEvent;
