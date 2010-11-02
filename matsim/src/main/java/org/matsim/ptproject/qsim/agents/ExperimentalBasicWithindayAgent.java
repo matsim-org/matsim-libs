@@ -27,9 +27,12 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.ptproject.qsim.interfaces.Mobsim;
 
-/**
+/**This class is an attempt to provide access to the internals of DefaultPersonDriverAgent
+ * in a way that it can be used for within-day replanning. 
+ * <p/>
+ * <i>The class is, as its name states, experimental.  Use at your own risk, and expect even less support than with other pieces 
+ * of matsim. </i>
  * @author nagel
- *
  */
 public class ExperimentalBasicWithindayAgent extends DefaultPersonDriverAgent {
 
