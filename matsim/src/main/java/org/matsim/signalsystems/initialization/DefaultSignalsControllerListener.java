@@ -28,7 +28,6 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.signalsystems.builder.FromDataBuilder;
-import org.matsim.signalsystems.builder.SignalSystemsModelBuilder;
 import org.matsim.signalsystems.data.SignalsData;
 import org.matsim.signalsystems.data.SignalsScenarioLoader;
 import org.matsim.signalsystems.data.SignalsScenarioWriter;
@@ -40,50 +39,44 @@ import org.matsim.signalsystems.model.SignalSystemsManager;
  * @author dgrether
  *
  */
-public class DefaultSignalsControllerListener implements StartupListener, ShutdownListener, IterationStartsListener {
+public class DefaultSignalsControllerListener implements SignalsControllerListener, StartupListener, ShutdownListener, IterationStartsListener {
 
-	private SignalSystemsModelBuilder modelBuilder;
 	private SignalSystemsManager signalManager;
-	private SignalsData signalsData;
-	private QSimSignalEngine signalEngie;
-	
-	
 	
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		this.loadData(event.getControler().getConfig().signalSystems(), event.getControler().getScenario());
-		this.modelBuilder = new FromDataBuilder(signalsData, event.getControler().getEvents());
-		
-		this.createModel();
-		event.getControler().getQueueSimulationListener().add(this.signalEngie);
+		//load data
+		SignalsData signalsData = this.loadData(event.getControler().getConfig().signalSystems(), event.getControler().getScenario());
+		//build model
+		FromDataBuilder modelBuilder = new FromDataBuilder(signalsData, event.getControler().getEvents());
+		this.signalManager = modelBuilder.createAndInitializeSignalSystemsManager();
+		//init mobility simulation
+		QSimSignalEngine signalEngie = new QSimSignalEngine(this.signalManager);
+		event.getControler().getQueueSimulationListener().add(signalEngie);
 	}
 	
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
 		this.signalManager.resetModel(event.getIteration());
 	}
-
 	
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {
-		new SignalsScenarioWriter(event.getControler().getControlerIO().getOutputPath()).writeSignalsData(this.signalsData);
+		this.writeData(event.getControler().getScenario(), event.getControler().getControlerIO().getOutputPath());
 	}
-
-	private SignalsData loadData(SignalSystemsConfigGroup config, Scenario scenario) {
+	
+	@Override
+	public void writeData(Scenario sc, String outputPath){
+		SignalsData data = sc.getScenarioElement(SignalsData.class);
+		new SignalsScenarioWriter(outputPath).writeSignalsData(data);
+	}
+	
+	@Override
+	public  SignalsData loadData(SignalSystemsConfigGroup config, Scenario scenario) {
 		SignalsScenarioLoader loader = new SignalsScenarioLoader(config);
-		this.signalsData = loader.loadSignalsData();
-		scenario.addScenarioElement(this.signalsData);
+		SignalsData signalsData = loader.loadSignalsData();
+		scenario.addScenarioElement(signalsData);
 		return signalsData;
 	}
-
-	private void createModel() {
-		this.signalManager = modelBuilder.createAndInitializeSignalSystemsManager();
-		this.signalEngie = new QSimSignalEngine(this.signalManager);
-	}
-
-
-
-
-	
 
 }

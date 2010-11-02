@@ -20,7 +20,6 @@
 package org.matsim.signalsystems.initialization;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.controler.listener.ControlerListener;
 
 
 /**
@@ -32,7 +31,7 @@ public class DefaultSignalsControllerListenerFactory implements SignalsControlle
 	private static final Logger log = Logger.getLogger(DefaultSignalsControllerListenerFactory.class);
 	
 	@Override
-	public ControlerListener createSignalsControllerListener() {
+	public SignalsControllerListener createSignalsControllerListener() {
 		log.info("using MATSim default signal model...");
 		return new DefaultSignalsControllerListener();
 	}

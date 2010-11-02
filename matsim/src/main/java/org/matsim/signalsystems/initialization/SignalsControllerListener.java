@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SignalsControllerListenerFactory
+ * SignalsControllerListener
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,14 +19,20 @@
  * *********************************************************************** */
 package org.matsim.signalsystems.initialization;
 
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.config.groups.SignalSystemsConfigGroup;
+import org.matsim.core.controler.listener.ControlerListener;
+import org.matsim.signalsystems.data.SignalsData;
 
 
 /**
  * @author dgrether
  *
  */
-public interface SignalsControllerListenerFactory {
-
-	public SignalsControllerListener createSignalsControllerListener();
+public interface SignalsControllerListener extends ControlerListener {
 	
+	public void writeData(Scenario sc, String outputPath);
+	
+	public SignalsData loadData(SignalSystemsConfigGroup config, Scenario scenario);
+
 }
