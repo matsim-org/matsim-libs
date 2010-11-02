@@ -27,10 +27,12 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 public class Main {
 
 	public static void main(String[] args) {
-		String configPath="test/scenarios/equil/config.xml";
+		String configPath="test/input/playground/wrashid/sschieffer/config.xml";
 		
 		
 		Controler controler=new Controler(configPath);
+		
+		controler.setOverwriteFiles(true);
 		
 		controler.addControlerListener(new AfterMobsimListener() {
 			

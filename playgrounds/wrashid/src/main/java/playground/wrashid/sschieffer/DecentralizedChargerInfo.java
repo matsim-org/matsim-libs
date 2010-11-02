@@ -27,12 +27,36 @@ import playground.wrashid.lib.obj.LinkedListValueHashMap;
 
 public class DecentralizedChargerInfo {
 
-	public void getLowTariffIntervals(double parkingStartTime, double parkingEndTime){
+	public void getLowTariffIntervals(){
 		// TODO: think about this (what should be return type, or should this be solved differently?)
+		
+		// e.g. return double[]
 	}
 	
+	
+	// TODO: add methods for low and high tariff prices...
+	
+	
+	
+	
+	/*
+	 * in first iteration the result is same as getBaseLoadCurve.
+	 * 
+	 */
+	public void getTotalLoadInPreviousIteration(){
+		// TODO: think about this (what should be return type, or should this be solved differently?)
+		
+		// e.g. 15min bins (double[])
+	}
+	
+	/*
+	 * remains constant during simulation.
+	 */
 	public void getBaseLoadCurve(){
 		// TODO: think about return type, e.g. double array
+		
+		
+		// E.g. get one from A:\data\matsim\input\runRW1005\base load (e.g. home)
 	}
 	
 	public void getAdaptedProbabilityCurve(Id agentId){
@@ -40,14 +64,23 @@ public class DecentralizedChargerInfo {
 	}
 	
 	public  LinkedListValueHashMap<Id, Double> getEnergyConsumptionOfLegs(){
+		// TODO: rw
 		return null;
 	}
 	
 	public LinkedListValueHashMap<Id, ParkingInterval> getParkingTimeIntervals(){
+		// TODO: rw
+		
+		
+		
+		
 		return null;
 	}
 	
 	public double getSOCOfAgent(Id agentId, double time){
+		
+		// TODO: will find out...
+		
 		return -1.0;
 	}
 	
