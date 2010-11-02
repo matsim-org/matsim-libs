@@ -77,7 +77,7 @@ public class EnergyConsumptionTable {
 	 * @param linkFreeSpeedInKmPerHour
 	 * @return
 	 */
-	public double mapFreeSpeedToClosestChoice(double linkFreeSpeedInKmPerHour){
+	private double mapFreeSpeedToClosestChoice(double linkFreeSpeedInKmPerHour){
 		double[] freeSpeedChoiceSetInKmPerHour= {30.0,50.0,60.0,90.0,120};
 		
 		double minimumSpeedDelta=Double.MAX_VALUE;

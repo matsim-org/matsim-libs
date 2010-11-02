@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * EnergyConsumptionModel.java
+ * DecentralizedChargerV1.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,14 +18,24 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.wrashid.PSF2.pluggable.energyConsumption;
+package playground.wrashid.sschieffer;
 
-import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.controler.events.AfterMobsimEvent;
+import org.matsim.core.controler.listener.AfterMobsimListener;
 
-import playground.wrashid.PSF2.vehicle.vehicleFleet.Vehicle;
+public class DecentralizedChargerV1 {
 
-public interface EnergyConsumptionModel {
-
-	public double getEnergyConsumptionForLinkInJoule(Vehicle vehicle, double timeSpentOnLink, Link link);
 	
+	
+	public void performChargingAlgorithm(DecentralizedChargerInfo chargerInfo){
+		// TODO: implement method.
+	}
+	
+	
+	
+	public void getElectricityFromGrid(double startChargingTime, double endChargingTime, Id agentId){
+		//TODO: adopt (e.g. use default plug power at location)
+	}
+
 }

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * EnergyConsumptionModel.java
+ * ParkingTimesPlugin.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,14 +18,8 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.wrashid.PSF2.pluggable.energyConsumption;
+package playground.wrashid.PSF2.pluggable.parkingTimes;
 
-import org.matsim.api.core.v01.network.Link;
+public class ParkingTimesPlugin {
 
-import playground.wrashid.PSF2.vehicle.vehicleFleet.Vehicle;
-
-public interface EnergyConsumptionModel {
-
-	public double getEnergyConsumptionForLinkInJoule(Vehicle vehicle, double timeSpentOnLink, Link link);
-	
 }

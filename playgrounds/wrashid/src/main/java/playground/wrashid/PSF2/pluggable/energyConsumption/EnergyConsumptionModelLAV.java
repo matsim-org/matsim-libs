@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * EnergyConsumptionModel.java
+ * EnergyConsumptionModelLAV.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -22,10 +22,19 @@ package playground.wrashid.PSF2.pluggable.energyConsumption;
 
 import org.matsim.api.core.v01.network.Link;
 
+import playground.wrashid.PSF2.vehicle.energyConsumption.EnergyConsumptionTable;
 import playground.wrashid.PSF2.vehicle.vehicleFleet.Vehicle;
 
-public interface EnergyConsumptionModel {
+public class EnergyConsumptionModelLAV implements EnergyConsumptionModel {
 
-	public double getEnergyConsumptionForLinkInJoule(Vehicle vehicle, double timeSpentOnLink, Link link);
+	EnergyConsumptionTable energyConsumptionTable;
 	
+	public EnergyConsumptionModelLAV(String fileWithModelData){
+		energyConsumptionTable=new EnergyConsumptionTable(fileWithModelData);
+	}
+	
+	public double getEnergyConsumptionForLinkInJoule(Vehicle vehicle, double timeSpentOnLink, Link link) {
+		return energyConsumptionTable.getEnergyConsumptionInJoule(vehicle.getVehicleClassId(), Vehicle.getAverageSpeedOfVehicleOnLink(timeSpentOnLink, link), link.getFreespeed(), link.getLength());
+	}
+
 }

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * EnergyConsumptionModel.java
+ * Main.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,14 +18,30 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.wrashid.PSF2.pluggable.energyConsumption;
+package playground.wrashid.sschieffer;
 
-import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.events.AfterMobsimEvent;
+import org.matsim.core.controler.listener.AfterMobsimListener;
 
-import playground.wrashid.PSF2.vehicle.vehicleFleet.Vehicle;
+public class Main {
 
-public interface EnergyConsumptionModel {
-
-	public double getEnergyConsumptionForLinkInJoule(Vehicle vehicle, double timeSpentOnLink, Link link);
+	public static void main(String[] args) {
+		String configPath="test/scenarios/equil/config.xml";
+		
+		
+		Controler controler=new Controler(configPath);
+		
+		controler.addControlerListener(new AfterMobsimListener() {
+			
+			@Override
+			public void notifyAfterMobsim(AfterMobsimEvent event) {
+				DecentralizedChargerV1 decentralizedChargerV1=new DecentralizedChargerV1();
+				decentralizedChargerV1.performChargingAlgorithm(new DecentralizedChargerInfo());				
+			}
+		});
+		
+		controler.run();		
+	}
 	
 }

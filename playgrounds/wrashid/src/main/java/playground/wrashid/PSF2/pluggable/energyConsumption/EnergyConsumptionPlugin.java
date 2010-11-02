@@ -59,6 +59,10 @@ public class EnergyConsumptionPlugin implements LinkEnterEventHandler, LinkLeave
 	LinkedListValueHashMap<Id,Double> energyConsumptionOfLegs;
 	
 	
+	public LinkedListValueHashMap<Id, Double> getEnergyConsumptionOfLegs() {
+		return energyConsumptionOfLegs;
+	}
+
 	private LinkedListValueHashMap<Id, Vehicle> vehicles;
 
 	private Controler controler;
@@ -109,7 +113,7 @@ public class EnergyConsumptionPlugin implements LinkEnterEventHandler, LinkLeave
 		double timeSpendOnLink= GeneralLib.getIntervalDuration(linkEnteranceTime, linkLeaveTime);
 		Link link = controler.getNetwork().getLinks().get(linkId);
 		Vehicle vehicle=vehicles.getValue(personId);
-		Double energyConsumptionOnLink=energyConsumptionModel.getEnergyConsumptionForLink(vehicle, timeSpendOnLink, link);
+		Double energyConsumptionOnLink=energyConsumptionModel.getEnergyConsumptionForLinkInJoule(vehicle, timeSpendOnLink, link);
 		
 		energyConsumptionOfCurrentLeg.incrementBy(personId, energyConsumptionOnLink);
 		

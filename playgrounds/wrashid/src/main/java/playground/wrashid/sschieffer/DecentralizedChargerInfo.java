@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * EnergyConsumptionModel.java
+ * DecentralizedChargerInfo.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,14 +18,40 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.wrashid.PSF2.pluggable.energyConsumption;
+package playground.wrashid.sschieffer;
 
-import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.Id;
 
-import playground.wrashid.PSF2.vehicle.vehicleFleet.Vehicle;
+import playground.wrashid.PSF2.pluggable.parkingTimes.ParkingInterval;
+import playground.wrashid.lib.obj.LinkedListValueHashMap;
 
-public interface EnergyConsumptionModel {
+public class DecentralizedChargerInfo {
 
-	public double getEnergyConsumptionForLinkInJoule(Vehicle vehicle, double timeSpentOnLink, Link link);
+	public void getLowTariffIntervals(double parkingStartTime, double parkingEndTime){
+		// TODO: think about this (what should be return type, or should this be solved differently?)
+	}
+	
+	public void getBaseLoadCurve(){
+		// TODO: think about return type, e.g. double array
+	}
+	
+	public void getAdaptedProbabilityCurve(Id agentId){
+		// TODO: implement method.
+	}
+	
+	public  LinkedListValueHashMap<Id, Double> getEnergyConsumptionOfLegs(){
+		return null;
+	}
+	
+	public LinkedListValueHashMap<Id, ParkingInterval> getParkingTimeIntervals(){
+		return null;
+	}
+	
+	public double getSOCOfAgent(Id agentId, double time){
+		return -1.0;
+	}
+	
+	
+	
 	
 }
