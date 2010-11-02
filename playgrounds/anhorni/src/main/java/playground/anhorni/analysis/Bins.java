@@ -56,6 +56,7 @@ public class Bins {
 
 	public void clear() {
 		this.entries.clear();
+		this.bins = new double[this.numberOfBins];
 	}
 
 	public void plotBinnedDistribution(String path, String xLabel, String xUnit) {
