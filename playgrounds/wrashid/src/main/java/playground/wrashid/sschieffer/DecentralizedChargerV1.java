@@ -29,7 +29,7 @@ public class DecentralizedChargerV1 {
 	
 	
 	public void performChargingAlgorithm(DecentralizedChargerInfo chargerInfo){
-		// TODO: implement method.
+		// TODO: implement method (main starting point of whole programming exercise...)
 	}
 	
 	
