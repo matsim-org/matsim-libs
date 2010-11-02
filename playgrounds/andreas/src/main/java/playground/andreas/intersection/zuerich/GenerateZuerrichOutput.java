@@ -1,5 +1,6 @@
 package playground.andreas.intersection.zuerich;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -12,17 +13,16 @@ import org.matsim.lanes.LaneDefinitions;
 import org.matsim.lanes.LaneDefinitionsImpl;
 import org.matsim.lanes.MatsimLaneDefinitionsReader;
 import org.matsim.lanes.MatsimLaneDefinitionsWriter;
-import org.matsim.signalsystems.MatsimSignalSystemConfigurationsWriter;
-import org.matsim.signalsystems.MatsimSignalSystemsWriter;
-import org.matsim.signalsystems.config.SignalSystemConfiguration;
-import org.matsim.signalsystems.config.SignalSystemConfigurations;
-import org.matsim.signalsystems.config.SignalSystemConfigurationsImpl;
-import org.matsim.signalsystems.systems.SignalSystems;
-import org.matsim.signalsystems.systems.SignalSystemsImpl;
+import org.matsim.signalsystems.data.SignalsData;
+import org.matsim.signalsystems.data.SignalsDataImpl;
+import org.matsim.signalsystems.data.SignalsScenarioWriter;
+import org.matsim.signalsystems.data.signalcontrol.v20.SignalControlData;
+import org.matsim.signalsystems.data.signalcontrol.v20.SignalControlDataImpl;
+import org.matsim.signalsystems.data.signalcontrol.v20.SignalSystemControllerData;
+import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsData;
 
 import playground.dgrether.DgPaths;
 import playground.dgrether.lanes.LanesConsistencyChecker;
-import playground.dgrether.signalsystems.data.consistency.SignalSystemsConsistencyChecker;
 
 public class GenerateZuerrichOutput {
 
@@ -61,6 +61,8 @@ public class GenerateZuerrichOutput {
 		Map<Integer, Map<Integer,  List<Integer>>> knotenVonSpurNachSpurMap = null;
 		Map<Integer, Map<Integer, String>> knotenSpurLinkMap = null;
 		LaneDefinitions laneDefs = null;
+		SignalsScenarioWriter writer = new SignalsScenarioWriter();
+
 		
 		//lane generation
 		if (generateLanes){
@@ -86,8 +88,9 @@ public class GenerateZuerrichOutput {
 		}
 
 		if (generateSignalSystems){
+			SignalsData signalsData = new SignalsDataImpl();
 			//first generate the signal systems itself 
-			SignalSystems signalSystems = new SignalSystemsImpl();
+			SignalSystemsData signalSystems = signalsData.getSignalSystemsData();
 			//read the mappings
 			//read the system id <-> cycle time mapping
 			new LSASystemsReader(signalSystems).readBasicLightSignalSystemDefinition(lsaTu);
@@ -102,19 +105,18 @@ public class GenerateZuerrichOutput {
 			SignalSystemsGenerator signalsGenerator = new SignalSystemsGenerator(net, laneDefs, signalSystems);
 			signalsGenerator.processSignalSystems(knotenLsaSpurMap, knotenSpurLinkMap);
 			
-			new SignalSystemsConsistencyChecker(net, laneDefs, signalSystems).checkConsistency();
+			//TODO refactor consistency checker
+//			new SignalSystemsConsistencyChecker(net, laneDefs, signalSystems).checkConsistency();
 			
-			MatsimSignalSystemsWriter signalSytemswriter = new MatsimSignalSystemsWriter(signalSystems);
-			signalSytemswriter.writeFile(signalSystemsOutputFile );
-
+			writer.setSignalSystemsOutputFilename(signalSystemsOutputFile);
+			writer.writeSignalSystemsData(signalSystems);
 		}
 
 		if (generateSignalSystemsConfig){
 			// signal system configs
-			SignalSystemConfigurations signalSystemConfig = processSignalSystemConfigurations(sgGreentime);
-			MatsimSignalSystemConfigurationsWriter matsimLightSignalSystemConfigurationWriter 
-			= new MatsimSignalSystemConfigurationsWriter(signalSystemConfig);
-			matsimLightSignalSystemConfigurationWriter.writeFile(signalConfigOutputFile);
+			SignalControlData signalSystemConfig = processSignalSystemConfigurations(sgGreentime);
+			writer.setSignalControlOutputFilename(signalConfigOutputFile);
+			writer.writeSignalControlData(signalSystemConfig);
 		}
 
 		if (removeDuplicates){
@@ -128,11 +130,11 @@ public class GenerateZuerrichOutput {
 	
 
 	
-	private SignalSystemConfigurations processSignalSystemConfigurations(String sgGreentime) {
-		Map<Integer, SignalSystemConfiguration> basicLightSignalSystemConfiguration = GreenTimeReader.readBasicLightSignalSystemDefinition(sgGreentime);
-		SignalSystemConfigurations bssc = new SignalSystemConfigurationsImpl();
-		for (SignalSystemConfiguration ssc : basicLightSignalSystemConfiguration.values()){
-			bssc.getSignalSystemConfigurations().put(ssc.getSignalSystemId(), ssc);
+	private SignalControlData processSignalSystemConfigurations(String sgGreentime) {
+		HashMap<Integer, SignalSystemControllerData> basicLightSignalSystemConfiguration = GreenTimeReader.readBasicLightSignalSystemDefinition(sgGreentime);
+		SignalControlData bssc = new SignalControlDataImpl();
+		for (SignalSystemControllerData ssc : basicLightSignalSystemConfiguration.values()){
+			bssc.addSignalSystemControllerData(ssc);
 		}
 		return bssc;
 	}

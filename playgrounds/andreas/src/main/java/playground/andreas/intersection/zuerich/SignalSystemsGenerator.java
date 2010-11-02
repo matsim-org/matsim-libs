@@ -29,8 +29,9 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.lanes.LaneDefinitions;
 import org.matsim.lanes.LanesToLinkAssignment;
-import org.matsim.signalsystems.systems.SignalGroupDefinition;
-import org.matsim.signalsystems.systems.SignalSystems;
+import org.matsim.signalsystems.data.signalsystems.v20.SignalData;
+import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemData;
+import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsData;
 
 
 /**
@@ -43,12 +44,12 @@ public class SignalSystemsGenerator {
 
 	private Network network;
 	private LaneDefinitions laneDefinitions;
-	private SignalSystems signalSystems;
+	private SignalSystemsData signalSystems;
 
-	public SignalSystemsGenerator(Network net, LaneDefinitions laneDefs, SignalSystems signalSystems) {
+	public SignalSystemsGenerator(Network net, LaneDefinitions laneDefs, SignalSystemsData signalSystems2) {
 		this.network = net;
 		this.laneDefinitions = laneDefs;
-		this.signalSystems = signalSystems;
+		this.signalSystems = signalSystems2;
 	}
 	
 	private void preprocessKnotenLsaSpurMap(Map<Integer, Map<Integer, List<Integer>>> knotenLsaSpurMap, 
@@ -81,7 +82,7 @@ public class SignalSystemsGenerator {
 	private void preprocessSystemDefinitions(Map<Integer, Map<Integer, List<Integer>>> knotenLsaSpurMap) {
 		List<Id> malformedSignalSystems = new ArrayList<Id>();
 		//check if for each created signal system a knotenLsaSpur mapping exists
-		for (Id signalSystemId : this.signalSystems.getSignalSystemDefinitions().keySet()) {
+		for (Id signalSystemId : this.signalSystems.getSignalSystemData().keySet()) {
 			Integer id = Integer.valueOf(signalSystemId.toString());
 			if (!knotenLsaSpurMap.containsKey(id)) {
 				malformedSignalSystems.add(signalSystemId);
@@ -90,7 +91,7 @@ public class SignalSystemsGenerator {
 		// remove malformed
 		for (Id signalSystemId : malformedSignalSystems){
 			log.warn("removed signal system id " + signalSystemId + " from signalSystemDefinitions because no knotenLsaSpurMapping can be found");
-			this.signalSystems.getSignalSystemDefinitions().remove(signalSystemId);
+			this.signalSystems.getSignalSystemData().remove(signalSystemId);
 		}
 		
 		
@@ -124,7 +125,7 @@ public class SignalSystemsGenerator {
 		
 		
 		//create the signal groups
-		for (Id signalSystemId : this.signalSystems.getSignalSystemDefinitions().keySet()){
+		for (Id signalSystemId : this.signalSystems.getSignalSystemData().keySet()){
 			System.out.println();
 			log.info("##########################################################");
 			log.info("processing signalSystemDefinition " + signalSystemId);
@@ -133,6 +134,7 @@ public class SignalSystemsGenerator {
 			Map<Integer,  List<Integer>> lsaSpurMap = knotenLsaSpurMap.get(nodeId);
 			Map<Integer, String> spurLinkMap = knotenSpurLinkMap.get(nodeId);
 
+			SignalSystemData signalSystem = this.signalSystems.getSignalSystemData().get(signalSystemId);
 			
 			for (Integer signalGroupNr : lsaSpurMap.keySet()) {				
 				Id signalGroupId = new IdImpl(signalGroupNr);
@@ -143,9 +145,10 @@ public class SignalSystemsGenerator {
 					//if this is valid....
 					Id linkId = new IdImpl(linkIdString);
 					//check if there is already a SignalGroupDefinition
-					if (!this.signalSystems.getSignalGroupDefinitions().containsKey(signalGroupId)){
-						SignalGroupDefinition sg	= signalSystems.getFactory().createSignalGroupDefinition(linkId, signalGroupId);
-						sg.setSignalSystemDefinitionId(signalSystemId);
+					
+					SignalData signal = signalSystems.getFactory().createSignalData(signalGroupId);
+					signal.setLinkId(linkId);
+					signalSystem.addSignalData(signal);
 						
 						//add lanes and toLinks
 						List<Integer> spuren = lsaSpurMap.get(signalGroupNr);
@@ -155,20 +158,14 @@ public class SignalSystemsGenerator {
 							LanesToLinkAssignment l2lAssignment = this.laneDefinitions.getLanesToLinkAssignments().get(linkId);
 							if ((l2lAssignment != null) 
 									&& l2lAssignment.getLanes().containsKey(spurId)){
-								if((sg.getLaneIds() == null) || !sg.getLaneIds().contains(spurId)){
-									sg.addLaneId(spurId);
-								}
+								signal.addLaneId(spurId);
 								
-								//toLinks
-								for (Id toLinkId : l2lAssignment.getLanes().get(spurId).getToLinkIds()){
-									sg.addToLinkId(toLinkId);
-								}
+								//toLinks no longer have to be added as they are stored in the lane anyway
+//								for (Id toLinkId : l2lAssignment.getLanes().get(spurId).getToLinkIds()){
+//									sg.addToLinkId(toLinkId);
+//								}
 							}
 						}
-					}
-					else {
-						log.error("cannot create signalGroup twice for signal system id " + signalSystemId + " and signalGroupId " + signalGroupId);
-					}
 				}
 				else {
 					log.error("Cannot create signalGroupDefinition for node/signalSystem Id " + nodeId + " and signalGroupNr " + signalGroupNr + " cause the " +

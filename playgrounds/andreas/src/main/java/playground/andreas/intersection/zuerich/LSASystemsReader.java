@@ -9,8 +9,9 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
+import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemData;
+import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsData;
 import org.matsim.signalsystems.systems.SignalSystemDefinition;
-import org.matsim.signalsystems.systems.SignalSystems;
 
 public class LSASystemsReader implements TabularFileHandler {
 
@@ -19,10 +20,10 @@ public class LSASystemsReader implements TabularFileHandler {
 	private TabularFileParserConfig tabFileParserConfig;
 	private HashMap<Integer, SignalSystemDefinition> lsaMap = new HashMap<Integer, SignalSystemDefinition>();
 
-	private SignalSystems signals;
+	private SignalSystemsData signals;
 
-	public LSASystemsReader(SignalSystems lightSignalSystems) {
-		this.signals = lightSignalSystems;
+	public LSASystemsReader(SignalSystemsData signalSystems) {
+		this.signals = signalSystems;
 	}
 
 	public void startRow(String[] row) throws IllegalArgumentException {
@@ -34,14 +35,13 @@ public class LSASystemsReader implements TabularFileHandler {
 			// log.info("Added: " + row.toString());
 			Id signalSystemId = new IdImpl(row[0]);
 
-			if (this.signals.getSignalSystemDefinitions().containsKey(signalSystemId)) {
+			if (this.signals.getSignalSystemData().containsKey(signalSystemId)) {
 				log.error("Cannot create signal system definition id " + signalSystemId + " twice!");
 			}
-			SignalSystemDefinition lsa = this.signals.getFactory().createSignalSystemDefinition(signalSystemId);
-			lsa.setDefaultCycleTime(Double.parseDouble(row[1]));
-			lsa.setDefaultInterGreenTime(3.0);
-			lsa.setDefaultSynchronizationOffset(0.0);
-			this.signals.addSignalSystemDefinition(lsa);
+			SignalSystemData lsa = this.signals.getFactory().createSignalSystemData(signalSystemId);
+			//TODO add to the right place if the code is ever needed again
+			//			lsa.setDefaultCycleTime(Double.parseDouble(row[1]));
+			this.signals.addSignalSystemData(lsa);
 			log.info("created signalSystemDefinition id " + signalSystemId);
 		}
 
