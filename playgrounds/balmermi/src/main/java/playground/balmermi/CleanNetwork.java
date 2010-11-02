@@ -49,23 +49,26 @@ public class CleanNetwork {
 		ScenarioImpl scenario = new ScenarioImpl();
 		new MatsimNetworkReader(scenario).readFile(args[0]);
 		
-		NetworkImpl subNetwork = new ScenarioImpl().getNetwork();
-		Set<String> modes = new HashSet<String>();
-		modes.add(TransportMode.car);
-		new TransportModeNetworkFilter(scenario.getNetwork()).filter(subNetwork,modes);
-		new NetworkCleaner().run(subNetwork);
-		for (Link l : scenario.getNetwork().getLinks().values()) {
-			LinkImpl l2 = (LinkImpl)subNetwork.getLinks().get(l.getId());
-			if (l2 != null) {
-				l2.setOrigId(((LinkImpl) l).getOrigId());
-				l2.setType(((LinkImpl) l).getType());
-			}
-		}
-		new NetworkDoubleLinks("-dl").run(subNetwork);
-		new NetworkAdaptLength().run(subNetwork);
+//		NetworkImpl subNetwork = new ScenarioImpl().getNetwork();
+//		Set<String> modes = new HashSet<String>();
+//		modes.add(TransportMode.car);
+//		new TransportModeNetworkFilter(scenario.getNetwork()).filter(subNetwork,modes);
+//		new NetworkCleaner().run(subNetwork);
+//		for (Link l : scenario.getNetwork().getLinks().values()) {
+//			LinkImpl l2 = (LinkImpl)subNetwork.getLinks().get(l.getId());
+//			if (l2 != null) {
+//				l2.setOrigId(((LinkImpl) l).getOrigId());
+//				l2.setType(((LinkImpl) l).getType());
+//			}
+//		}
+//		new NetworkDoubleLinks("-dl").run(subNetwork);
+//		new NetworkAdaptLength().run(subNetwork);
 
-		new NetworkWriteAsTable(args[1]).run(subNetwork);
-		new NetworkWriter(subNetwork).write(args[1]+"/network.xml.gz");
+//		new NetworkWriteAsTable(args[1]).run(subNetwork);
+//		new NetworkWriter(subNetwork).write(args[1]+"/network.xml.gz");
+
+		new NetworkWriteAsTable(args[1]).run(scenario.getNetwork());
+		new NetworkWriter(scenario.getNetwork()).write(args[1]+"/network.xml.gz");
 	}
 
 	//////////////////////////////////////////////////////////////////////

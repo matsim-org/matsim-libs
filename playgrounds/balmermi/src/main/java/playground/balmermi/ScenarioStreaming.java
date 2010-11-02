@@ -76,7 +76,6 @@ public class ScenarioStreaming {
 
 		System.out.println("loading facilities...");
 		sl.loadActivityFacilities();
-		new FacilitiesRandomizeHectareCoordinates().run(sl.getScenario().getActivityFacilities());
 		Gbl.printMemoryUsage();
 		System.out.println("done. (loading facilities)");
 
@@ -93,6 +92,7 @@ public class ScenarioStreaming {
 		Set<String> exTxpes = new TreeSet<String>();
 		// teleatlas new
 		exTxpes.add("0");  // motorway
+		exTxpes.add("-0"); // motorway
 		exTxpes.add("-1"); // not defined
 		exTxpes.add("-2"); // ferry
 		exTxpes.add("-3");

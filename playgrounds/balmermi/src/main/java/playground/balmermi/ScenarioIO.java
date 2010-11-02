@@ -90,15 +90,28 @@ public class ScenarioIO {
 
 		System.out.println("complete world...");
 		Set<String> exTxpes = new TreeSet<String>();
+		// teleatlas new
+		exTxpes.add("0");  // motorway
+		exTxpes.add("-0"); // motorway
+		exTxpes.add("-1"); // not defined
+		exTxpes.add("-2"); // ferry
+		exTxpes.add("-3");
+		exTxpes.add("-4");
+		exTxpes.add("-5");
+		exTxpes.add("-6");
+		exTxpes.add("-7");
+		exTxpes.add("-8");
+		exTxpes.add("-9");
+
 		// teleatlas
-		exTxpes.add("0-4110-0"); // motorway
-		exTxpes.add("1-4110-0"); // motorway
-		exTxpes.add("2-4130-1"); // ferry
-		exTxpes.add("2-4130-2"); // train
-		exTxpes.add("3-4130-2"); // train
-		exTxpes.add("4-4130-1"); // ferry
-		exTxpes.add("4-4130-2"); // train
-		exTxpes.add("7-4130-1"); // ferry
+//		exTxpes.add("0-4110-0"); // motorway
+//		exTxpes.add("1-4110-0"); // motorway
+//		exTxpes.add("2-4130-1"); // ferry
+//		exTxpes.add("2-4130-2"); // train
+//		exTxpes.add("3-4130-2"); // train
+//		exTxpes.add("4-4130-1"); // ferry
+//		exTxpes.add("4-4130-2"); // train
+//		exTxpes.add("7-4130-1"); // ferry
 		// ivtch
 //		exTxpes.add("0"); exTxpes.add("1"); exTxpes.add("2"); exTxpes.add("3");
 //		exTxpes.add("4"); exTxpes.add("5"); exTxpes.add("6"); exTxpes.add("7");
@@ -131,16 +144,16 @@ public class ScenarioIO {
 		System.out.println("running algorithms...");
 		new PersonFacility2Link(af).run(population);
 		Gbl.printMemoryUsage();
-		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(config.charyparNagelScoring());
-		ReRouteLandmarks router = new ReRouteLandmarks(config, network,timeCostCalc,timeCostCalc,timeCostCalc);
-		router.prepareReplanning();
-		for (Person person : population.getPersons().values()) {
-			for (Plan plan : person.getPlans()) {
-				router.handlePlan(plan);
-			}
-		}
-		router.finishReplanning();
-		Gbl.printMemoryUsage();
+//		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(config.charyparNagelScoring());
+//		ReRouteLandmarks router = new ReRouteLandmarks(config, network,timeCostCalc,timeCostCalc,timeCostCalc);
+//		router.prepareReplanning();
+//		for (Person person : population.getPersons().values()) {
+//			for (Plan plan : person.getPlans()) {
+//				router.handlePlan(plan);
+//			}
+//		}
+//		router.finishReplanning();
+//		Gbl.printMemoryUsage();
 		System.out.println("done. (running algorithms)");
 
 		System.out.println("writing population...");
