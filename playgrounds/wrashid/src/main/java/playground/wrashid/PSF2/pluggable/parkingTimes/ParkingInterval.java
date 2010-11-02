@@ -24,9 +24,7 @@ public class ParkingInterval {
 
 	private double arrivalTime;
 	private double departureTime;
-	public void setArrivalTime(double arrivalTime) {
-		this.arrivalTime = arrivalTime;
-	}
+	
 	public double getArrivalTime() {
 		return arrivalTime;
 	}
