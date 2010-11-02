@@ -44,7 +44,7 @@ public class BkVis {
 		Entweder DgOTFVisReplayLastIteration.java ausführen oder manuell unten die config übergeben und vorher dort folgendes ändern:
 		
 		1. QSim-Modul einschalten ("qsim" statt "simulation"):
-			<module name="qsim">
+		<module name="qsim">
 			<param name="startTime" value="00:00:00" />
 			<param name="endTime" value="24:00:00" />
 	
