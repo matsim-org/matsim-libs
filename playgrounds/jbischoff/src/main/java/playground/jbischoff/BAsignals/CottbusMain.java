@@ -28,7 +28,7 @@ import org.matsim.core.controler.Controler;
  */
 public class CottbusMain {
 
-	private String config = JbBaPaths.BASIMW+"scenario-slv/cottbusConfig.xml";
+	private String config = JbBaPaths.BASIMH+"scenario-slv/cottbusConfig.xml";
 	
 	public void runCottbus(){
 		System.err.println("here");

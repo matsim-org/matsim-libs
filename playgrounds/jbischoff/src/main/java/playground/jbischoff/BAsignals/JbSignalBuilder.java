@@ -19,18 +19,16 @@
  * *********************************************************************** */
 package playground.jbischoff.BAsignals;
 
+import org.apache.log4j.Logger;
 import org.matsim.signalsystems.builder.FromDataBuilder;
 import org.matsim.signalsystems.builder.SignalSystemsModelBuilder;
 import org.matsim.signalsystems.data.SignalsData;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalPlanData;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalSystemControllerData;
-import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsReader20;
-import org.matsim.signalsystems.model.DatabasedSignalPlan;
 import org.matsim.signalsystems.model.SignalController;
 import org.matsim.signalsystems.model.SignalPlan;
 import org.matsim.signalsystems.model.SignalSystem;
 import org.matsim.signalsystems.model.SignalSystemsManager;
-import org.apache.log4j.Logger;
 
 /**
  * @author dgrether

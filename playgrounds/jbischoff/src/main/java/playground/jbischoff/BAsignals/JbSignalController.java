@@ -33,222 +33,239 @@ import org.matsim.signalsystems.model.SignalGroup;
 import org.matsim.signalsystems.model.SignalPlan;
 import org.matsim.signalsystems.model.SignalSystem;
 
-
 /**
  * @author dgrether
  * @author jbischoff
  */
 
-
-public class JbSignalController  implements SignalController {
+public class JbSignalController implements SignalController {
 	public static final String IDENTIFIER = "JBSignalController";
-	private static final int PHASESTEPPROLONGER = 5;
-	private static final Logger log = Logger.getLogger(JbSignalController.class);
+	
+	private static final Logger log = Logger
+			.getLogger(JbSignalController.class);
 
 	private SignalSystem system;
-	private Map<Id,SignalPlan> plans;
+	private Map<Id, SignalPlan> plans;
 	private JbSignalPlan activePlan;
-	private Map<Id,Integer> adaptiveOnsets;
-	private Map<Id,Integer> adaptiveDroppings;
+	private Map<Id, Integer> adaptiveOnsets;
+	private Map<Id, Integer> adaptiveDroppings;
 	private AdaptiveControllHead adaptiveControllHead;
-	private Map<Double,List<Id>> gapsAtSecond;	
+	private Map<Double, List<Id>> gapsAtSecond;
 	private int availableStretchTime;
-	private Map<Id,Integer> maxDrop;
-	private Map<Id,Integer> minDrop;
-	private Map<Id,Integer> minOn;
+	private Map<Id, Integer> maxDrop;
+	private Map<Id, Integer> minDrop;
+	private Map<Id, Integer> minOn;
+	private Map<Id, Integer> originalGreenTimes;
 
-
-	
 	public JbSignalController(AdaptiveControllHead ach) {
-		this.adaptiveDroppings=new HashMap<Id,Integer>();
-		this.adaptiveOnsets= new HashMap<Id,Integer>();
-		this.maxDrop= new HashMap<Id,Integer>();
-		this.minDrop=new HashMap<Id,Integer>();
-		this.minOn = new HashMap<Id,Integer>();
-		this.adaptiveControllHead=ach;
-		this.gapsAtSecond = new HashMap<Double,List<Id>>();
-		
+		this.adaptiveDroppings = new HashMap<Id, Integer>();
+		this.adaptiveOnsets = new HashMap<Id, Integer>();
+		this.maxDrop = new HashMap<Id, Integer>();
+		this.minDrop = new HashMap<Id, Integer>();
+		this.minOn = new HashMap<Id, Integer>();
+		this.adaptiveControllHead = ach;
+		this.gapsAtSecond = new HashMap<Double, List<Id>>();
+
 	}
-	
+
+	private void fillOriginalGreenTimes(){
+		for (Entry<Id,Integer> e : this.maxDrop.entrySet()){
+			int ogt = e.getValue() - this.adaptiveControllHead.getMaxOnset().get(e.getKey());
+			this.originalGreenTimes.put(e.getKey(),ogt);
+			
+		}
+	}
 	
 	@Override
 	public void addPlan(SignalPlan plan) {
-		if (this.plans == null){
+		if (this.plans == null) {
 			this.plans = new HashMap<Id, SignalPlan>();
-			//TODO remove when checkActive is implemented
-			this.activePlan = (JbSignalPlan)plan;
+			// TODO remove when checkActive is implemented
+			this.activePlan = (JbSignalPlan) plan;
 		}
 		this.plans.put(plan.getId(), plan);
 	}
-	
-	private void checkActivePlan(){
-		//TODO implement active plan logic
+
+	private void checkActivePlan() {
+		// TODO implement active plan logic
 	}
-	
+
 	@Override
 	public void setSignalSystem(SignalSystem system) {
 		this.system = system;
-		if (this.adaptiveControllHead.signalSystemIsAdaptive(this.system)){
-			for (Id sgid : this.system.getSignalGroups().keySet()){
-				this.maxDrop.put(sgid, this.adaptiveControllHead.getMaxDropping().get(sgid));
-				this.minDrop.put(sgid, this.adaptiveControllHead.getMinDropping().get(sgid));
-				this.minOn.put(sgid, this.adaptiveControllHead.getMinOnset().get(sgid));
-				//log.info("m add "+sgid+" ; "+this.maxDrop.get(sgid));
+		if (this.adaptiveControllHead.signalSystemIsAdaptive(this.system)) {
+			for (Id sgid : this.system.getSignalGroups().keySet()) {
+				this.maxDrop.put(sgid, this.adaptiveControllHead
+						.getMaxDropping().get(sgid));
+				this.minDrop.put(sgid, this.adaptiveControllHead
+						.getMinDropping().get(sgid));
+				this.minOn.put(sgid, this.adaptiveControllHead.getMinOnset()
+						.get(sgid));
+				// log.info("m add "+sgid+" ; "+this.maxDrop.get(sgid));
 			}
 		}
-		
-		
+
 	}
 
 	@Override
-	public void updateState(double timeSeconds){
+	public void updateState(double timeSeconds) {
 		this.checkActivePlan();
-		int currentSecondinPlan = ((int) (timeSeconds) % this.activePlan.getCylce());
-		if (currentSecondinPlan == 0)	this.resetAdaptiveSignals();
+		int currentSecondinPlan = ((int) (timeSeconds) % this.activePlan
+				.getCylce());
+		if (currentSecondinPlan == 0)
+			this.resetAdaptiveSignals();
 		boolean artlong = true;
-		for (Id sgId : this.getGapListatSecond(timeSeconds)){
-		//	log.info("got it "+this.adaptiveDroppings.get(sgId)+" "+this.maxDrop.get(sgId));
-			if (this.adaptiveDroppings.get(sgId)<this.maxDrop.get(sgId)){
-			//	log.info("got it twice");
+		for (Id sgId : this.getGapListatSecond(timeSeconds)) {
+			if (this.adaptiveDroppings.get(sgId) < this.maxDrop.get(sgId)) {
 				this.postPoneAdaptiveOffSet(sgId);
 				artlong = false;
-				}			
 			}
-		
-		
-		if (this.adaptiveControllHead.signalSystemIsAdaptive(this.system)){
-			for (Id gId : this.system.getSignalGroups().keySet()){
-				if (artlong && this.availableStretchTime>0 && this.system.getSignalGroups().get(gId).getState() == SignalGroupState.GREEN) {
+		}
+
+		if (this.adaptiveControllHead.signalSystemIsAdaptive(this.system)) {
+			for (Id gId : this.system.getSignalGroups().keySet()) {
+				if (artlong
+						&& this.availableStretchTime > 0
+						&& this.system.getSignalGroups().get(gId).getState() == SignalGroupState.GREEN
+						&& this.originalGreenTimes.get(gId)>(this.adaptiveDroppings.get(gId)-this.adaptiveOnsets.get(gId))
+							) {
 					this.postPoneOffSet(gId, 1);
 					artlong = false;
 				}
-				try {
-				if 	(this.adaptiveOnsets.get(gId)==currentSecondinPlan) this.system.scheduleOnset(timeSeconds,gId);
-				if (this.adaptiveDroppings.get(gId)==currentSecondinPlan) this.system.scheduleDropping(timeSeconds, gId);}
-				catch (NullPointerException e){
-					log.info("caught NPE");
+				
+//				log.error(currentSecondinPlan+" on "+this.adaptiveOnsets.get(gId)+"for gid"+gId);
+				if (this.adaptiveOnsets.get(gId) == currentSecondinPlan) {
+					this.system.scheduleOnset(timeSeconds, gId);
+//					log.info("scheduling onset at " + currentSecondinPlan	+  ", sg " + gId);
 				}
-			}
+				if (this.adaptiveDroppings.get(gId) == currentSecondinPlan)
+					{this.system.scheduleDropping(timeSeconds, gId);
+//					log.info("scheduling drop at " + currentSecondinPlan	+  ", sg " + gId);
+			}}
+
+		} else
+			this.updateNonAdaptiveStates(timeSeconds);
+
+		if (artlong && this.availableStretchTime > 0)
+			this.availableStretchTime--;
+
+	}
+
+	private void postPoneAdaptiveOffSet(Id sgId) {
+		if ((this.adaptiveDroppings.get(sgId) - this.adaptiveOnsets.get(sgId)) <= JBBaParams.MAXPHASELENGTH) {
+			int oldmd = this.maxDrop.get(sgId);
+			oldmd = oldmd + 2;
+			this.maxDrop.put(sgId, oldmd);
 			
 		}
-		else
-		this.updateNonAdaptiveStates(timeSeconds);
-
-		if (artlong&&this.availableStretchTime>0) this.availableStretchTime--;
-	
-		}
-	
-	private void postPoneAdaptiveOffSet(Id sgId) {
-		if ((this.adaptiveDroppings.get(sgId)-this.adaptiveOnsets.get(sgId))<=45){
-			int oldmd = this.maxDrop.get(sgId);
-			oldmd = oldmd+2;
-			this.maxDrop.put(sgId, oldmd);
-			//log.info("maxdrop of sg "+sgId+" prolonged to a max dur. of " + (this.adaptiveDroppings.get(sgId)-this.adaptiveOnsets.get(sgId)));
-		}
 		int ps;
-		if (this.adaptiveDroppings.get(sgId)+PHASESTEPPROLONGER<this.maxDrop.get(sgId)){
-			//log.info("got it 3 ast" + this.availableStretchTime);
-			ps = PHASESTEPPROLONGER;
-		}
-		else {
-			ps = this.maxDrop.get(sgId)-this.adaptiveDroppings.get(sgId);
-			//log.info("got it 4 ast" + this.availableStretchTime);
+		if (this.adaptiveDroppings.get(sgId) + JBBaParams.PHASESTEPPROLONGER < this.maxDrop
+				.get(sgId)) {
+			// log.info("got it 3 ast" + this.availableStretchTime);
+			ps = JBBaParams.PHASESTEPPROLONGER;
+		} else {
+			ps = this.maxDrop.get(sgId) - this.adaptiveDroppings.get(sgId);
+			// log.info("got it 4 ast" + this.availableStretchTime);
 
 		}
 		this.postPoneOffSet(sgId, ps);
 	}
 
-
 	private void postPoneOffSet(Id sgId, int step) {
-		if (this.availableStretchTime>0){
-		int currentdrop = this.adaptiveDroppings.get(sgId);
-		int newdrop = currentdrop+step;
-		this.adaptiveDroppings.put(sgId, newdrop);
-		//if (step>1) log.info("Drop of Sg "+sgId+" shifted from "+currentdrop+" to "+newdrop);
-		this.updateOtherSignalGroups(sgId,step);}
-	}
-	
-	private void updateOtherSignalGroups(Id sgId, int step){
-		for (SignalGroup otherSg : this.system.getSignalGroups().values()){
-			if (!otherSg.getId().equals(sgId)){
-			if (otherSg.getState()==SignalGroupState.GREEN|otherSg.getState()==SignalGroupState.REDYELLOW) 
-			{
-				int currentdrop = this.adaptiveDroppings.get(otherSg.getId());
-				int newdrop = currentdrop+step;
-				this.adaptiveDroppings.put(otherSg.getId(),newdrop);
-				//if (step>1) log.info("Drop of Sg "+otherSg.getId()+" shifted from "+currentdrop+" to "+newdrop);
-			}
-			else {
-				int currentonset = this.adaptiveOnsets.get(otherSg.getId());
-				int currentdrop = this.adaptiveDroppings.get(otherSg.getId());
-				int newdrop = currentdrop+step;
-				if  (newdrop > this.activePlan.getCylce()) newdrop = this.activePlan.getCylce()-1;
-				this.adaptiveDroppings.put(otherSg.getId(),newdrop);
-				int newonset = currentonset + step;
-				this.adaptiveOnsets.put(otherSg.getId(),newonset);
-				//if (step>1) log.info("Onset of Sg "+otherSg.getId()+" shifted from "+currentonset+" to "+newonset);
-			}
-		}}
+		if (this.availableStretchTime > 0) {
+			int currentdrop = this.adaptiveDroppings.get(sgId);
+			int newdrop = currentdrop + step;
+			this.adaptiveDroppings.put(sgId, newdrop);
+			// if (step>1)
+			// log.info("Drop of Sg "+sgId+" shifted from "+currentdrop+" to "+newdrop);
+			this.updateOtherSignalGroups(sgId, step);
 		}
-		
-	
+	}
+
+	private void updateOtherSignalGroups(Id sgId, int step) {
+		for (SignalGroup otherSg : this.system.getSignalGroups().values()) {
+			if (!otherSg.getId().equals(sgId)) {
+				if (otherSg.getState() == SignalGroupState.GREEN
+						| otherSg.getState() == SignalGroupState.REDYELLOW) {
+					int currentdrop = this.adaptiveDroppings.get(otherSg
+							.getId());
+					int newdrop = currentdrop + step;
+					this.adaptiveDroppings.put(otherSg.getId(), newdrop);
+					// if (step>1)
+					// log.info("Drop of Sg "+otherSg.getId()+" shifted from "+currentdrop+" to "+newdrop);
+				} else {
+					int currentonset = this.adaptiveOnsets.get(otherSg.getId());
+					int currentdrop = this.adaptiveDroppings.get(otherSg
+							.getId());
+					int newdrop = currentdrop + step;
+					if (newdrop > this.activePlan.getCylce())
+						newdrop = this.activePlan.getCylce() - 1;
+					this.adaptiveDroppings.put(otherSg.getId(), newdrop);
+					int newonset = currentonset + step;
+					this.adaptiveOnsets.put(otherSg.getId(), newonset);
+					// if (step>1)
+					// log.info("Onset of Sg "+otherSg.getId()+" shifted from "+currentonset+" to "+newonset);
+				}
+			}
+		}
+	}
 
 	private void resetAdaptiveSignals() {
-		
+
 		this.adaptiveDroppings.clear();
-		for (Entry<Id,Integer> e: this.minDrop.entrySet()){
-			this.adaptiveDroppings.put(e.getKey(),e.getValue());
+		this.adaptiveOnsets.clear();
+		for (Entry<Id, Integer> e : this.minDrop.entrySet()) {
+			this.adaptiveDroppings.put(e.getKey(), e.getValue());
 		}
-		for (Entry<Id,Integer> e: this.minOn.entrySet()){
-			this.adaptiveOnsets.put(e.getKey(),e.getValue());
+		for (Entry<Id, Integer> e : this.minOn.entrySet()) {
+			this.adaptiveOnsets.put(e.getKey(), e.getValue());
 		}
-		
-		this.availableStretchTime =  45;
-		
+
+		if (this.originalGreenTimes == null){
+			this.originalGreenTimes = new HashMap<Id, Integer>();
+			this.fillOriginalGreenTimes();
+			log.info("prepared Original Green Times");
+		}
+
+		this.availableStretchTime = JBBaParams.STRETCHTIME;
 	}
 
-
-	private void updateNonAdaptiveStates(double timeSeconds){
+	private void updateNonAdaptiveStates(double timeSeconds) {
 		List<Id> droppingGroupIds = this.activePlan.getDroppings(timeSeconds);
-		if (droppingGroupIds != null){
-			for (Id id : droppingGroupIds){
+		if (droppingGroupIds != null) {
+			for (Id id : droppingGroupIds) {
 				this.system.scheduleDropping(timeSeconds, id);
 			}
 		}
-		
+
 		List<Id> onsetGroupIds = this.activePlan.getOnsets(timeSeconds);
-		if (onsetGroupIds != null){
-			for (Id id : onsetGroupIds){
+		if (onsetGroupIds != null) {
+			for (Id id : onsetGroupIds) {
 				this.system.scheduleOnset(timeSeconds, id);
 			}
 		}
-		
-	}
-	
-	
 
-	public void addGapAtSecond(double second, Id sgId){
-		if (!this.gapsAtSecond.containsKey(second)){
+	}
+
+	public void addGapAtSecond(double second, Id sgId) {
+		if (!this.gapsAtSecond.containsKey(second)) {
 			this.gapsAtSecond.put(second, new LinkedList<Id>());
 		}
 		this.gapsAtSecond.get(second).add(sgId);
 	}
 
-	public List<Id> getGapListatSecond(double second){
-		if (!this.gapsAtSecond.containsKey(second)){
-		this.gapsAtSecond.put(second,new LinkedList<Id>());
+	public List<Id> getGapListatSecond(double second) {
+		if (!this.gapsAtSecond.containsKey(second)) {
+			this.gapsAtSecond.put(second, new LinkedList<Id>());
 		}
 		return this.gapsAtSecond.get(second);
-		
-	} 
+
+	}
 
 	@Override
 	public void reset(Integer iterationNumber) {
 		// TODO Auto-generated method stub
-		
+
 	}
-
-
-
 
 }

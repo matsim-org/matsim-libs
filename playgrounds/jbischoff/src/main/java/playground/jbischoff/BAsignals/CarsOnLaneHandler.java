@@ -21,9 +21,11 @@
 package playground.jbischoff.BAsignals;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -37,6 +39,7 @@ public class CarsOnLaneHandler implements LaneEnterEventHandler {
 	private static final Logger log = Logger.getLogger(CarsOnLaneHandler.class);
 	private Map<Double,List<Id>> gapsAtSecond;	
 	private Map<Id,SignalSystem> signalSystemMap; 
+	private Set<Id> carsPassed;
 
 //	Scenario scenario;
 	
@@ -45,6 +48,7 @@ this.adaptiveControllHead=ach;
 this.timeStamp = new HashMap<Id,Double>();
 this.gapsAtSecond = new HashMap<Double,List<Id>>();
 this.signalSystemMap = new HashMap<Id,SignalSystem>();
+this.carsPassed = new HashSet<Id>();
 }
 public  void addSystem(SignalSystem system){
 	this.signalSystemMap.put(system.getId(),system);
@@ -54,12 +58,13 @@ public  void addSystem(SignalSystem system){
 		
 		if (this.laneIsAdaptive(event.getLaneId())&(!event.getLaneId().toString().endsWith(".ol"))){
 			//log.info(event.getTime()+" time in l");
+			this.carsPassed.add(event.getPersonId());
 			if (!timeStamp.containsKey(event.getLaneId()))
 			{
 			timeStamp.put(event.getLaneId(),event.getTime());	
 			}
 			double timeGap = calcTimeGap(event);
-			if ((timeGap!=0)&&(timeGap<10)){
+			if ((timeGap!=0)&&(timeGap<JBBaParams.DETECTORACCURACY)){
 				//log.info(event.getTime()+": Time Gap on Lane " +event.getLaneId()+ " , sg: "+this.adaptiveControllHead.getSignalGroupforLaneId(event.getLaneId()) +" is "+timeGap);
 				Id sysid = this.adaptiveControllHead.getSignalSystemforLaneId(event.getLaneId());
 				JbSignalController jbs =  (JbSignalController) this.signalSystemMap.get(sysid).getSignalController();
@@ -105,5 +110,9 @@ private boolean laneIsAdaptive(Id laneid)
 		return adaptiveControllHead;
 	}
 
+public long getPassedAgents(){
+	return this.carsPassed.size();
+}
+	
 }
 

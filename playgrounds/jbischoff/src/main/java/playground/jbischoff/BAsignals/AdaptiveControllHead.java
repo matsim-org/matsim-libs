@@ -62,7 +62,7 @@ public void addAdaptiveSignalSystem(SignalSystem system, SignalSystemControllerD
 	for (Id sgroupId : system.getSignalGroups().keySet()){
 		this.adaptiveSignalGroups.add(sgroupId);
 	}
-	this.sizeDownPlans(45);
+	this.sizeDownPlans();
 	
 }
 
@@ -114,9 +114,10 @@ public Map<Id, SignalSystemControllerData> getSignalSystemController() {
 	return sscmap;
 }
 
-public void sizeDownPlans(int seconds){
-	
+public void sizeDownPlans(){
+	int seconds = JBBaParams.PLANSDOWNSIZER;
 	for  (SignalSystemControllerData sscd : this.sscmap.values()){
+		
 		for (SignalPlanData spd : sscd.getSignalPlanData().values()){
 			double ratio = (double) seconds / (double) spd.getCycleTime();
 			for (SignalGroupSettingsData sgsd : spd.getSignalGroupSettingsDataByGroupId().values()){
