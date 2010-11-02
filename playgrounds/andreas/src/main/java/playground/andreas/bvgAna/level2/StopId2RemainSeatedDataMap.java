@@ -35,7 +35,7 @@ import org.matsim.core.events.handler.VehicleArrivesAtFacilityEventHandler;
 import playground.andreas.bvgAna.level1.VehId2OccupancyHandler;
 
 /**
- * Calculates the number of agents which remain the vehicles and do not leave the vehicle at the stop.
+ * Calculates the number of agents which remain in the vehicles and do not leave the vehicle at the stop.
  * 
  * @author aneumann
  *
@@ -76,6 +76,7 @@ public class StopId2RemainSeatedDataMap implements VehicleArrivesAtFacilityEvent
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
 		this.vehId2OccupancyHandler.handleEvent(event);
+		this.vehId2PersonsLeavingMap.get(event.getVehicleId()).addAgentEntering();
 	}
 
 	@Override
