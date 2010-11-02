@@ -27,6 +27,7 @@ import java.util.TreeSet;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.jgap.event.EventManager;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
@@ -51,6 +52,7 @@ import org.xml.sax.SAXException;
 import playground.andreas.bvgAna.level0.AgentId2PersonMap;
 import playground.andreas.bvgAna.level0.TransitScheduleDataProvider;
 import playground.andreas.bvgAna.level1.AgentId2EnterLeaveVehicleEventHandler;
+import playground.andreas.bvgAna.level1.AgentId2PtTripTravelTimeMap;
 import playground.andreas.bvgAna.level1.PersonEnterLeaveVehicle2ActivityHandler;
 import playground.andreas.bvgAna.level1.StopId2PersonEnterLeaveVehicleHandler;
 import playground.andreas.bvgAna.level1.VehId2OccupancyHandler;
@@ -138,6 +140,9 @@ public class TestMain {
 		
 		StopId2RemainSeatedDataMap remainSeated = new StopId2RemainSeatedDataMap();
 		eventsManager.addHandler(remainSeated);
+		
+		AgentId2PtTripTravelTimeMap a2ptleg = new AgentId2PtTripTravelTimeMap(agentIds);
+		eventsManager.addHandler(a2ptleg);
 		
 		try {
 			reader.parse(eventsFile);
