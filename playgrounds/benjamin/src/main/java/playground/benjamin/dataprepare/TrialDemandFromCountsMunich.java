@@ -68,8 +68,8 @@ public class TrialDemandFromCountsMunich {
 		fuzzifyTimes(pop1);
 		
 		addTestVehicle(pop1, testVehiclePath + day1 + "_departureTimes.txt");
-//		addTestVehicle(pop2, testVehiclePath + day2 + "_departureTimes.txt");
-//		addTestVehicle(pop3, testVehiclePath + day3 + "_departureTimes.txt");		
+		addTestVehicle(pop2, testVehiclePath + day2 + "_departureTimes.txt");
+		addTestVehicle(pop3, testVehiclePath + day3 + "_departureTimes.txt");		
 		
 		writePlans(pop1, day1);
 		writePlans(pop2, day2);
@@ -85,7 +85,7 @@ public class TrialDemandFromCountsMunich {
 
 		List<Integer> departureTimes = getTestVehicleDepartureTimes(dayFile);
 		for(int time : departureTimes){
-			Id personId = sc.createId(time + "_TW");
+			Id personId = sc.createId(time + "testVehicle");
 			Person person = population.getFactory().createPerson(personId);
 			Plan plan = population.getFactory().createPlan();
 			person.addPlan(plan);
