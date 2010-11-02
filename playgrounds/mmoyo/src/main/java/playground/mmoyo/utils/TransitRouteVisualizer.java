@@ -60,7 +60,7 @@ public class TransitRouteVisualizer {
 		
 		String newNetFile = scenario.getConfig().controler().getOutputDirectory() + "/Net_" + strTrRouteId + ".xml";
 		new NetworkWriter(newNetwork).write(newNetFile );
-		new OTFVis().playNetwork(new String[]{newNetFile});
+		OTFVis.playNetwork(newNetFile);
 	}
 	
 	public static void main(String[] args) {

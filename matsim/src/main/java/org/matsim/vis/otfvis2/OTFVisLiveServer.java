@@ -140,6 +140,7 @@ public final class OTFVisLiveServer implements OTFLiveServerRemote {
 		this.quadTree.initQuadTree();
 		SimulationViewForQueries queueModel = new CurrentTimeStepView();
 		this.queryServer = new QueryServer(scenario, eventsManager, queueModel);
+		this.nextTimeStep = new TimeStep();
 	}
 
 	@Override

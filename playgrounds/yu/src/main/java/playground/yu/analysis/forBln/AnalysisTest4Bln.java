@@ -38,7 +38,7 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
-import org.matsim.vis.otfvis.executables.OTFEvent2MVI;
+import org.matsim.vis.otfvis.OTFEvent2MVI;
 import org.xml.sax.SAXException;
 
 import playground.yu.analysis.CalcLinksAvgSpeed;

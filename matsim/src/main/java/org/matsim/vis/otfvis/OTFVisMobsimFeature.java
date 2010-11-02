@@ -56,7 +56,6 @@ import org.matsim.vis.otfvis.data.teleportation.OTFTeleportAgentsDataWriter;
 import org.matsim.vis.otfvis.data.teleportation.OTFTeleportAgentsDrawer;
 import org.matsim.vis.otfvis.data.teleportation.OTFTeleportAgentsLayer;
 import org.matsim.vis.otfvis.data.teleportation.TeleportationVisData;
-import org.matsim.vis.otfvis.server.OnTheFlyServer;
 import org.matsim.vis.snapshots.writers.VisMobsim;
 import org.matsim.vis.snapshots.writers.VisMobsimFeature;
 

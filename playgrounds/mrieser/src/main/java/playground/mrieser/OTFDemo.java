@@ -93,7 +93,7 @@ public class OTFDemo {
 //		org.matsim.vis.otfvis.OTFClientSwing.main(new String[] {"../../MATSim/output/example2/output_network.xml.gz"});
 //		org.matsim.vis.otfvis.OTFClientFile.main(new String[] {"output/equil/ITERS/it.0/0.otfvis.mvi"});
 //		org.matsim.vis.otfvis.OTFClientSwing.main(new String[] {"/data/coding/eclipse35/MATSim/output/equil/ITERS/it.0/0.otfvis.mvi"});
-		org.matsim.vis.otfvis.OTFClientSwing.main(new String[] {"/data/coding/eclipse35/MATSim/output/equil/output_network.xml.gz"});
+//		org.matsim.vis.otfvis.OTFClientSwing.main(new String[] {"/data/coding/eclipse35/MATSim/output/equil/output_network.xml.gz"});
 
 //		org.matsim.run.OTFVis.main(new String[] {"test/scenarios/berlin/config.xml"});
 //		org.matsim.run.OTFVis.main(new String[] {"/data/dissVis/network.filtered.falsified.xml.gz"});

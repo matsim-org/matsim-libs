@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.vis.otfvis.executables;
+package org.matsim.vis.otfvis;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,13 +34,14 @@ import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 import org.matsim.vis.snapshots.writers.VisNetwork;
 
 /**
- * This is a standalone executable class for converting a event-file to a .mvi file.
+ * 
  * This is called by org.matsim.run.otfvis.
  *
  * @author dstrippgen
  *
  */
 public class OTFEvent2MVI extends OTFFileWriter {
+	
 	private final String eventFileName;
 
 	private final OTFAgentsListHandler.Writer writer = new OTFAgentsListHandler.Writer();
@@ -62,14 +63,11 @@ public class OTFEvent2MVI extends OTFFileWriter {
 
 	public void convert(final Config config) {
 		open();
-
-		// create SnapshotGenerator
 		config.simulation().setSnapshotFormat("none");
 		config.simulation().setSnapshotPeriod(this.interval_s);
 		Events2Snapshot app = new Events2Snapshot();
 		app.addExternalSnapshotWriter(this);
 		app.run(new File(this.eventFileName), config, this.network.getNetwork());
-
 		close();
 	}
 
@@ -77,8 +75,6 @@ public class OTFEvent2MVI extends OTFFileWriter {
 	public void addAgent(AgentSnapshotInfo position) {
 		//drop all parking vehicles
 		if (position.getAgentState() == AgentSnapshotInfo.AgentState.PERSON_AT_ACTIVITY) return;
-
-//		this.writer.positions.add(new OTFAgentsListHandler.ExtendedPositionInfo(position, 0,0));
 		this.writer.positions.add( position );
 	}
 

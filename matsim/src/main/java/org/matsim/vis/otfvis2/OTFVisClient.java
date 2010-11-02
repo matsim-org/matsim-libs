@@ -37,12 +37,12 @@ public final class OTFVisClient extends OTFClient {
 
 	private void prepareConnectionManager() {
 		this.connect.connectWriterToReader(LinkHandler.Writer.class, LinkHandler.class);
-		this.connect.connectWriterToReader(OTFAgentsListHandler.Writer.class,  OTFAgentsListHandler.class);
+		this.connect.connectWriterToReader(OTFAgentsListHandler.Writer.class, OTFAgentsListHandler.class);
 		if (swing) {
 			this.connect.connectReaderToReceiver(LinkHandler.class, OTFSwingDrawer.SimpleQuadDrawer.class);
-			this.connect.connectReaderToReceiver(OTFAgentsListHandler.class,  OTFSwingDrawer.AgentDrawer.class);
+			this.connect.connectReaderToReceiver(OTFAgentsListHandler.class, OTFSwingDrawer.AgentDrawer.class);
 		} else {
-			this.connect.connectReaderToReceiver(OTFAgentsListHandler.class,  OGLAgentPointLayer.AgentPointDrawer.class);
+			this.connect.connectReaderToReceiver(OTFAgentsListHandler.class, OGLAgentPointLayer.AgentPointDrawer.class);
 			this.connect.connectReaderToReceiver(LinkHandler.class,  SimpleStaticNetLayer.SimpleQuadDrawer.class);
 			this.connect.connectReceiverToLayer(SimpleStaticNetLayer.SimpleQuadDrawer.class, SimpleStaticNetLayer.class);		
 			this.connect.connectReceiverToLayer(AgentPointDrawer.class, OGLAgentPointLayer.class);

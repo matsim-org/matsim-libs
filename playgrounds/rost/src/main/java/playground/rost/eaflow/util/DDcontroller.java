@@ -37,7 +37,7 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.interfaces.NetsimNetwork;
 import org.matsim.run.OTFVis;
-import org.matsim.vis.otfvis.executables.OTFEvent2MVI;
+import org.matsim.vis.otfvis.OTFEvent2MVI;
 
 
 public class DDcontroller {

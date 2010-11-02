@@ -40,7 +40,7 @@ public class DgPrognose2025NetworkVisualizer {
 //    String net = DgPaths.SHAREDSVN + "studies/countries/de/prognose_2025/demand/network_ab_bs.xml";
 //    String net = DgPaths.SHAREDSVN + "studies/countries/de/prognose_2025/demand/network_cleaned.xml.gz";
   String net = DgPaths.SHAREDSVN + "studies/countries/de/prognose_2025/demand/network_cleaned_wgs84.xml.gz";
-  	String[] a = {net};
+  	String a = net;
     OTFVis.playNetwork(a);
     
   }

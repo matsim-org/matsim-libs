@@ -46,17 +46,15 @@ import org.matsim.core.utils.io.MatsimFileTypeGuesser.FileType;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.vis.otfvis.OTFClientFile;
 import org.matsim.vis.otfvis.OTFClientSwing;
+import org.matsim.vis.otfvis.OTFEvent2MVI;
 import org.matsim.vis.otfvis.OTFVisMobsimFeature;
-import org.matsim.vis.otfvis.executables.OTFEvent2MVI;
 import org.matsim.vis.otfvis.gui.OTFHostConnectionManager;
 import org.matsim.vis.otfvis2.OTFVisClient;
 import org.matsim.vis.otfvis2.OTFVisLiveServer;
-import org.matsim.vis.snapshots.writers.VisMobsim;
 
 /**
  * A generic starter for the OnTheFly Visualizer that supports
- * MATSim Visualizer Files (MVI), TRANSIMS vehicle Files (VEH),
- * and MATSim Config Files for the live simulation and visualization.
+ * MATSim Visualizer Files (MVI) and MATSim Config Files for the live simulation and visualization.
  *
  * @author mrieser
  */
@@ -70,17 +68,15 @@ public class OTFVis {
 		System.out.println();
 		System.out.println("usage 1: OTFVis [-swing] mvi-file");
 		System.out.println("usage 2: OTFVis mvi-file1 mvi-file2");
-		System.out.println("usage 3: OTFVis veh-file network-file");
-		System.out.println("usage 4: OTFVis config-file");
-		System.out.println("usage 5: OTFVis [-swing] network-file");
-		System.out.println("usage 6: OTFVis -convert event-file network-file mvi-file [snapshot-period]");
+		System.out.println("usage 3: OTFVis config-file");
+		System.out.println("usage 4: OTFVis [-swing] network-file");
+		System.out.println("usage 5: OTFVis -convert event-file network-file mvi-file [snapshot-period]");
 		System.out.println();
-		System.out.println("Usages 1-5: Starts the Visualizer");
+		System.out.println("Usages 1-4: Starts the Visualizer");
 		System.out.println("mvi-file:      A MATSim visualizer file that contains a pre-recorder state");
 		System.out.println("               to be visualized (*.mvi).");
 		System.out.println("mvi-file1,2:   Loads two mvi-files in parallel and shows them next to each");
 		System.out.println("               other. Good way to compare results from similar scenarios.");
-		System.out.println("veh-file:      A TRANSIMS vehicle file to be visualized (*.veh).");
 		System.out.println("network-file:  A MATSim network file (*.xml).");
 		System.out.println("config-file:   A complete MATSim config file to run a simulation. In that case,");
 		System.out.println("               a QueueSimulation will be started and visualized in real-time, ");
@@ -99,113 +95,98 @@ public class OTFVis {
 	}
 
 	public static void main(final String[] args) {
+		boolean useSwing = false;
 		String [] args2 = args;
 
-		if (args.length == 0) {
-			args2 = chooseFile(args2);
-		}
-		if (args2.length == 0) {
-			printUsage();
-			return;
-		}
-		String arg0l = args2[0].toLowerCase(Locale.ROOT);
-
-		boolean useSwing = false;
-		if ("-swing".equals(arg0l)) {
+		if (args2.length != 0 && "-swing".equalsIgnoreCase(args2[0])) {
 			useSwing = true;
 			// pop that argument from the list
 			String[] tmp = new String[args2.length - 1];
 			System.arraycopy(args, 1, tmp, 0, tmp.length);
 			args2 = tmp;
-			// start over, kind of
-			arg0l = args2[0].toLowerCase(Locale.ROOT);
 		}
 
-		if (arg0l.endsWith(".mvi")) {
-			if (args2.length > 1) {
-				String arg1l = args2[1].toLowerCase(Locale.ROOT);
-				if (arg1l.endsWith(".mvi")) {
-					playDoubleMVI(args2[0], args2[1]);
-				} else {
-					System.out.println("unrecognized input: " + args2[1]);
-					printUsage();
-				}
+		if (args2.length == 0) {
+			String filename = chooseFile();
+			play(filename, useSwing);
+		} else if (args2[0].equalsIgnoreCase("-convert")) {
+			convert(args2);
+		} else if (args2.length == 1) {
+			String filename = args2[0].toLowerCase(Locale.ROOT);
+			play(filename, useSwing);
+		} else {
+			printUsage();
+		}
+
+	}
+
+	private static final void play(String filename, boolean useSwing) {
+		if (filename.endsWith(".mvi")) {
+			if (useSwing) {
+				playMVI_Swing(filename);
 			} else {
-				if (useSwing) {
-					playMVI_Swing(args2[0]);
-				} else {
-					playMVI(args2);
-				}
+				playMVI(filename);
 			}
-		} else if ((arg0l.endsWith(".xml") || arg0l.endsWith(".xml.gz"))) {
+		} else if ((filename.endsWith(".xml") || filename.endsWith(".xml.gz"))) {
 			FileType type;
 			try {
-				type = new MatsimFileTypeGuesser(args2[0]).getGuessedFileType();
+				type = new MatsimFileTypeGuesser(filename).getGuessedFileType();
 			} catch (IOException e) {
 				e.printStackTrace();
 				return;
 			}
 			if (FileType.Config.equals(type)) {
 				if (useSwing) {
-					playConfig_Swing(args2[0]);
+					playConfig_Swing(filename);
 				} else {
-					playConfig(args2);
+					playConfig(filename);
 				}
 			} else if (FileType.Network.equals(type)) {
 				if (useSwing) {
-					playNetwork_Swing(args2[0]);
+					playNetwork_Swing(filename);
 				} else {
-					playNetwork(args2);
+					playNetwork(filename);
 				}
 			} else {
 				printUsage();
 			}
-		} else if (arg0l.equals("-convert")) {
-			convert(args2);
-		} else {
-			printUsage();
 		}
 	}
 
-	public static final String[] chooseFile(final String[] args) {
+	private static final String chooseFile() {
 		JFileChooser fc = new JFileChooser();
+		fc.setFileFilter( new FileFilter() {
+			@Override public boolean accept( File f ) {
+				return f.isDirectory() || f.getName().toLowerCase(Locale.ROOT).endsWith( ".xml" );
+			}
+			@Override public String getDescription() { return "MATSim net or config file (*.xml)"; }
+		} );
 
-	    fc.setFileFilter( new FileFilter() {
-	      @Override public boolean accept( File f ) {
-	        return f.isDirectory() || f.getName().toLowerCase(Locale.ROOT).endsWith( ".xml" );
-	      }
-	      @Override public String getDescription() { return "MATSim net or config file (*.xml)"; }
-	    } );
+		fc.setFileFilter( new FileFilter() {
+			@Override public boolean accept( File f ) {
+				return f.isDirectory() || f.getName().toLowerCase(Locale.ROOT).endsWith( ".mvi" );
+			}
+			@Override public String getDescription() { return "OTFVis movie file (*.mvi)"; }
+		} );
 
-	    fc.setFileFilter( new FileFilter() {
-	      @Override public boolean accept( File f ) {
-	        return f.isDirectory() || f.getName().toLowerCase(Locale.ROOT).endsWith( ".mvi" );
-	      }
-	      @Override public String getDescription() { return "OTFVis movie file (*.mvi)"; }
-	    } );
-
-	    int state = fc.showOpenDialog( null );
-	    if ( state == JFileChooser.APPROVE_OPTION ) {
-	    	String [] args_new = {fc.getSelectedFile().getAbsolutePath()};
-	    	return args_new;
-	    }
-      System.out.println( "No file selected." );
-      return args;
+		int state = fc.showOpenDialog( null );
+		if ( state == JFileChooser.APPROVE_OPTION ) {
+			String filename = fc.getSelectedFile().getAbsolutePath();
+			return filename;
+		}
+		System.out.println( "No file selected." );
+		return null;
 	}
 
 	public static final void playMVI(final String[] args) {
 		playMVI(args[0]);
 	}
 
-	public static void playMVI(String file) {
+	public static final void playMVI(String file) {
 		new OTFClientFile(file).run();
 	}
 
-	public static void playDoubleMVI(final String file1, final String file2) {
-		throw new RuntimeException("The double movie mode is no more.");
-	}
-
-	public static void playMVI_Swing(String file) {
+	public static final void playMVI_Swing(String file) {
 		new OTFClientSwing("file:" + file).run();
 	}
 
@@ -237,35 +218,26 @@ public class OTFVis {
 		log.info("\n\n" + writer.getBuffer().toString());
 		log.info("Complete config dump done.");
 		if (loader.getScenario().getConfig().getQSimConfigGroup() == null){
-		  log.error("Cannot play live config without config module for QSim (in Java QSimConfigGroup). " +
-		  		"Fixing this by adding default config module for QSim. " +
-		  		"Please check if default values fit your needs, otherwise correct them in " +
-		  		"the config given as parameter to get a valid visualization!");
-		  loader.getScenario().getConfig().setQSimConfigGroup(new QSimConfigGroup());
+			log.error("Cannot play live config without config module for QSim (in Java QSimConfigGroup). " +
+					"Fixing this by adding default config module for QSim. " +
+					"Please check if default values fit your needs, otherwise correct them in " +
+			"the config given as parameter to get a valid visualization!");
+			loader.getScenario().getConfig().setQSimConfigGroup(new QSimConfigGroup());
 		}
 		loader.loadScenario();
 		ScenarioImpl scenario = loader.getScenario();
 		EventsManagerImpl events = new EventsManagerImpl();
 		ControlerIO controlerIO = new ControlerIO(scenario.getConfig().controler().getOutputDirectory());
-		QSim otfVisQSim = new QSim(scenario, events);
-		OTFVisMobsimFeature queueSimulationFeature = new OTFVisMobsimFeature(otfVisQSim);
-		otfVisQSim.addFeature(queueSimulationFeature);
+		QSim qSim = new QSim(scenario, events);
+		OTFVisMobsimFeature queueSimulationFeature = new OTFVisMobsimFeature(qSim);
+		qSim.addFeature(queueSimulationFeature);
 		queueSimulationFeature.setVisualizeTeleportedAgents(scenario.getConfig().otfVis().isShowTeleportedAgents());
-		VisMobsim queueSimulation = otfVisQSim;
-
-		// replacing above line by following line runs this with core.mobsim.queuesimulation instead of QSim.
-		// There are, however, things that don't work, for example:
-		// - parked vehicles are not shown (I would assume that they are simply not included into the core.mobsim.queuesim.QLink.Visdata)
-		// - it "catches" the wrong vehicles when you click on the vehicles (one time step forward seems to fix this)
-//		VisMobsim queueSimulation = new OTFVisQueueSimulation( scenario, events ) ;
-
-		queueSimulation.setControlerIO(controlerIO);
-		queueSimulation.setIterationNumber(scenario.getConfig().controler().getLastIteration());
-		queueSimulation.run();
+		qSim.setControlerIO(controlerIO);
+		qSim.setIterationNumber(scenario.getConfig().controler().getLastIteration());
+		qSim.run();
 	}
 
-	public static final void playNetwork(final String[] args) {
-		String filename = args[0];
+	public static final void playNetwork(final String filename) {
 		ScenarioImpl scenario = new ScenarioImpl();
 		new MatsimNetworkReader(scenario).readFile(filename);
 		EventsManager events = new EventsManagerImpl();

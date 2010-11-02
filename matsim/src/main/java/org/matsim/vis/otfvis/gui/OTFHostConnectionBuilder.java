@@ -31,8 +31,6 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.vis.otfvis.data.fileio.OTFFileReader;
 import org.matsim.vis.otfvis.interfaces.OTFLiveServerRemote;
 import org.matsim.vis.otfvis.interfaces.OTFServerRemote;
-import org.matsim.vis.otfvis.server.OTFNetworkServer;
-import org.matsim.vis.otfvis.server.OTFTVehServer;
 
 
 /**
@@ -53,7 +51,6 @@ public class OTFHostConnectionBuilder {
 		// connection type (rmi or file or tveh)
 		// rmi:ip  [: port]
 		// file:mvi-filename
-		// tveh:T.veh-filename @ netfilename
 		// e.g. "file:../MatsimJ/otfvis.mvi" or "rmi:127.0.0.1:4019" or "tveh:../MatsimJ/output/T.veh@../../studies/wip/network.xml"
 		if (address == null) {
 			this.address = "rmi:127.0.0.1:4019";
@@ -70,7 +67,6 @@ public class OTFHostConnectionBuilder {
 			if (connparse.length > 1 ) port = Integer.parseInt(connparse[1]);
 			if (connparse.length > 2 ) name = connparse[2];
 			this.host = openRMI(connparse[0], port, name);
-
 		} else if (type.equals("ssl")) {
 			int port = 4019;
 			String name = null;
@@ -78,16 +74,8 @@ public class OTFHostConnectionBuilder {
 			if (connparse.length > 1 ) port = Integer.parseInt(connparse[1]);
 			if (connparse.length > 2 ) name = connparse[2];
 			this.host = openSSL(connparse[0], port, name);
-
 		} else if (type.equals("file")) {
 			this.host = openFile(connection);
-
-		} else if (type.equals("tveh")) {
-			String [] connparse = connection.split("@");
-			this.host = openTVehFile(connparse[1], connparse[0]);
-
-		} else if (type.equals("net")) {
-			this.host = openNetworkFile(connection);
 
 		} else {
 			throw new UnsupportedOperationException("Connctiontype " + type + " not known");
@@ -136,14 +124,6 @@ public class OTFHostConnectionBuilder {
 		OTFServerRemote host = new OTFFileReader(fileName);
 		Gbl.printMemoryUsage();
 		return host;
-	}
-
-	private OTFServerRemote openTVehFile(String netname, String vehname) {
-		return new OTFTVehServer(netname,vehname);
-	}
-
-	private OTFServerRemote openNetworkFile(String netname) {
-		return new OTFNetworkServer(netname);
 	}
 
 }

@@ -32,7 +32,7 @@ public class LaneLayoutTestShowNetwork {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String[] a = {LaneLayoutTestFileNames.NETWORK};
+		String a = LaneLayoutTestFileNames.NETWORK;
 		OTFVis.playNetwork(a);
 	}
 

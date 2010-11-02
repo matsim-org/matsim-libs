@@ -21,6 +21,7 @@
 package org.matsim.vis.otfvis.checklists;
 
 import org.matsim.run.OTFVis;
+
 /**
  * @author florian ostermann
  */
@@ -29,9 +30,7 @@ public class T1_ZeigeNetwork {
 	private static String network = "./test/scenarios/equil/network.xml";
 	
 	public static void main(String[] args) {
-		String[] net = new String[1];
-		net[0] = network;
-		OTFVis.playNetwork(net);
+		OTFVis.playNetwork(network);
 	}
 
 }

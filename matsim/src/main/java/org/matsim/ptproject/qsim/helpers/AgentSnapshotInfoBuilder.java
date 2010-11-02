@@ -43,7 +43,7 @@ import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
  * A builder for AgentSnapshotInfo objects that can be used by links with queue logic
  * @author dgrether
  */
-public class AgentSnapshotInfoBuilder {
+public final class AgentSnapshotInfoBuilder {
 
 	private static final Logger log = Logger.getLogger(AgentSnapshotInfoBuilder.class);
 
@@ -115,7 +115,7 @@ public class AgentSnapshotInfoBuilder {
 	 * @param transitQueueLaneFeature
 	 * @param link2
 	 */
-	protected void addVehiclePositionsAsQueue(final Collection<AgentSnapshotInfo> positions, double now,
+	private void addVehiclePositionsAsQueue(final Collection<AgentSnapshotInfo> positions, double now,
 			Link link, Collection<QVehicle> buffer, Collection<QVehicle> vehQueue, double inverseSimulatedFlowCapacity,
 			double storageCapacity, int bufferStorageCapacity, double linkLength, double offset, Integer laneNumber, TransitQLaneFeature transitQueueLaneFeature) {
 

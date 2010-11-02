@@ -22,12 +22,8 @@ package org.matsim.vis.otfvis;
 
 
 import java.awt.BorderLayout;
-import java.io.IOException;
 import java.rmi.RemoteException;
-import java.util.Locale;
 
-import org.matsim.core.utils.io.MatsimFileTypeGuesser;
-import org.matsim.core.utils.io.MatsimFileTypeGuesser.FileType;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.fileio.queuesim.OTFQueueSimLinkAgentsWriter;
 import org.matsim.vis.otfvis.gui.OTFSwingDrawer;
@@ -72,7 +68,7 @@ public class OTFClientSwing extends OTFClient {
 
 		this.connectionManager.connectWriterToReader(OTFQueueSimLinkAgentsWriter.class, OTFLinkLanesAgentsNoParkingHandler.class);
 		this.connectionManager.connectWriterToReader(OTFLinkLanesAgentsNoParkingHandler.Writer.class, OTFLinkLanesAgentsNoParkingHandler.class);
-		this.connectionManager.connectWriterToReader(OTFAgentsListHandler.Writer.class,  OTFAgentsListHandler.class);
+		this.connectionManager.connectWriterToReader(OTFAgentsListHandler.Writer.class, OTFAgentsListHandler.class);
 
 		/*
 		 * Only needed for backward compatibility, see comment above (dg, nov 09)
@@ -85,8 +81,8 @@ public class OTFClientSwing extends OTFClient {
 		 * The next two connections is triggering the swing drawing code
 		 */
 		this.connectionManager.connectReaderToReceiver(OTFLinkLanesAgentsNoParkingHandler.class, OTFSwingDrawer.SimpleQuadDrawer.class);
-		this.connectionManager.connectReaderToReceiver(OTFLinkLanesAgentsNoParkingHandler.class,  OTFSwingDrawer.AgentDrawer.class);
-		this.connectionManager.connectReaderToReceiver(OTFAgentsListHandler.class,  OTFSwingDrawer.AgentDrawer.class);
+		this.connectionManager.connectReaderToReceiver(OTFLinkLanesAgentsNoParkingHandler.class, OTFSwingDrawer.AgentDrawer.class);
+		this.connectionManager.connectReaderToReceiver(OTFAgentsListHandler.class, OTFSwingDrawer.AgentDrawer.class);
 
 	}
 
@@ -114,21 +110,4 @@ public class OTFClientSwing extends OTFClient {
 	    return visconf;
 	}
 
-	public static void main(String[] args) {
-		String lcArg0 = args[0].toLowerCase(Locale.ROOT);
-		if (lcArg0.endsWith(".mvi")) {
-			new OTFClientSwing("file:" + args[0]).run();
-		} else if (lcArg0.endsWith(".xml") || lcArg0.endsWith(".xml.gz")) {
-			try {
-				FileType fType = new MatsimFileTypeGuesser(args[0]).getGuessedFileType();
-				if (FileType.Network.equals(fType)) {
-					new OTFClientSwing("net:" + args[0]).run();
-				} else {
-					throw new RuntimeException("The provided file cannot be visualized.");
-				}
-			} catch (IOException e) {
-				throw new RuntimeException("Could not guess type of file " + args[0]);
-			}
-		}
-	}
 }
