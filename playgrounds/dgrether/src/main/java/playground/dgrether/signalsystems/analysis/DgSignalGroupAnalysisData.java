@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DgSignalGreenSplitHandler
+ * SignalGroupData
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -21,49 +21,44 @@ package playground.dgrether.signalsystems.analysis;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
 import org.matsim.core.events.SignalGroupStateChangedEvent;
-import org.matsim.core.events.handler.SignalGroupStateChangedEventHandler;
-
+import org.matsim.signalsystems.control.SignalGroupState;
 
 
 /**
  * @author dgrether
  *
  */
-public class DgSignalGreenSplitHandler implements SignalGroupStateChangedEventHandler{
+public class DgSignalGroupAnalysisData {
+  
+  private SignalGroupState oldState = null;
+  
+  private double oldStateOnTime = 0.0;
 
-  private static final Logger log = Logger
-      .getLogger(DgSignalGreenSplitHandler.class);
+  private final double [] stateTimeArray = new double[SignalGroupState.values().length];
   
-  private Map<Id, DgSignalSystemAnalysisData> systemIdDataMap = new HashMap<Id, DgSignalSystemAnalysisData>();
   
-  public void addSignalSystem(Id systemId){
-    this.systemIdDataMap.put(systemId, new DgSignalSystemAnalysisData());
+  public DgSignalGroupAnalysisData(){
   }
   
-  @Override
-  public void handleEvent(SignalGroupStateChangedEvent event) {
-    DgSignalSystemAnalysisData data = this.systemIdDataMap.get(event.getSignalSystemId());
-    if (data != null){
-      data.processStateChange(event);
+  public void processStateChange(final SignalGroupStateChangedEvent e) {
+  	final double time = e.getTime();
+  	final SignalGroupState newState = e.getNewState();
+  	if (this.oldState != null){
+  		this.stateTimeArray[this.oldState.ordinal()] += (time - this.oldStateOnTime);
     }
-  }
-
-  @Override
-  public void reset(int iteration) {
-    Set<Id> systemSet = this.systemIdDataMap.keySet();
-    for (Id id : systemSet){
-      this.systemIdDataMap.put(id, new DgSignalSystemAnalysisData());
-    }
-  }
-  
-  public Map<Id, DgSignalSystemAnalysisData> getSystemIdAnalysisDataMap() {
-    return systemIdDataMap;
+  	this.oldStateOnTime = time;
+    this.oldState = newState;
   }
 
   
-} 
+
+	public Map<SignalGroupState, Double> getStateTimeMap() {
+		final Map<SignalGroupState, Double> map = new HashMap<SignalGroupState, Double>();
+		for (final SignalGroupState state : SignalGroupState.values()){
+			map.put(state, this.stateTimeArray[state.ordinal()]);
+		}
+    return map;
+  }
+}

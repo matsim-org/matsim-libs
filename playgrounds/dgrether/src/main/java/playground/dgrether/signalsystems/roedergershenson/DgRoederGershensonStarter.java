@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DgSignalGreenSplitHandler
+ * DgRoederGershensonStarter
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,53 +17,25 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.signalsystems.analysis;
+package playground.dgrether.signalsystems.roedergershenson;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.events.SignalGroupStateChangedEvent;
-import org.matsim.core.events.handler.SignalGroupStateChangedEventHandler;
-
+import org.matsim.core.controler.Controler;
 
 
 /**
  * @author dgrether
  *
  */
-public class DgSignalGreenSplitHandler implements SignalGroupStateChangedEventHandler{
+public class DgRoederGershensonStarter {
 
-  private static final Logger log = Logger
-      .getLogger(DgSignalGreenSplitHandler.class);
-  
-  private Map<Id, DgSignalSystemAnalysisData> systemIdDataMap = new HashMap<Id, DgSignalSystemAnalysisData>();
-  
-  public void addSignalSystem(Id systemId){
-    this.systemIdDataMap.put(systemId, new DgSignalSystemAnalysisData());
-  }
-  
-  @Override
-  public void handleEvent(SignalGroupStateChangedEvent event) {
-    DgSignalSystemAnalysisData data = this.systemIdDataMap.get(event.getSignalSystemId());
-    if (data != null){
-      data.processStateChange(event);
-    }
-  }
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		Controler controler = new Controler(args);
+		DgRoederGershensonSignalsControllerListenerFactory signalsFactory = new DgRoederGershensonSignalsControllerListenerFactory(controler.getSignalsControllerListenerFactory());
+		controler.setSignalsControllerListenerFactory(signalsFactory);
+		controler.run();
+	}
 
-  @Override
-  public void reset(int iteration) {
-    Set<Id> systemSet = this.systemIdDataMap.keySet();
-    for (Id id : systemSet){
-      this.systemIdDataMap.put(id, new DgSignalSystemAnalysisData());
-    }
-  }
-  
-  public Map<Id, DgSignalSystemAnalysisData> getSystemIdAnalysisDataMap() {
-    return systemIdDataMap;
-  }
-
-  
-} 
+}

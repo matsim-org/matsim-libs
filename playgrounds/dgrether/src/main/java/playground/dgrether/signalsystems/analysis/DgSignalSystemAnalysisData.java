@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SignalGroupData
+ * SignalSystemData
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -22,43 +22,29 @@ package playground.dgrether.signalsystems.analysis;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.events.SignalGroupStateChangedEvent;
-import org.matsim.signalsystems.control.SignalGroupState;
 
 
 /**
  * @author dgrether
  *
  */
-public class DgSignalGroupData {
-  
-  private SignalGroupState oldState = null;
-  
-  private double oldStateOnTime = 0.0;
+public class DgSignalSystemAnalysisData {
 
-  private double [] stateTimeArray = new double[SignalGroupState.values().length];
-  
-  
-  public DgSignalGroupData(){
-  }
+  private Map<Id, DgSignalGroupAnalysisData> systemGroupDataMap = new HashMap<Id, DgSignalGroupAnalysisData>();
   
   public void processStateChange(SignalGroupStateChangedEvent e) {
-  	double time = e.getTime();
-  	SignalGroupState newState = e.getNewState();
-  	if (oldState != null){
-  		stateTimeArray[oldState.ordinal()] += (time - oldStateOnTime);
+    DgSignalGroupAnalysisData groupData = this.systemGroupDataMap.get(e.getSignalGroupId());
+    if (groupData == null) {
+      groupData = new DgSignalGroupAnalysisData();
+      this.systemGroupDataMap.put(e.getSignalGroupId(), groupData);
     }
-  	oldStateOnTime = time;
-    oldState = newState;
+    groupData.processStateChange(e);
   }
 
   
-
-	public Map<SignalGroupState, Double> getStateTimeMap() {
-		Map<SignalGroupState, Double> map = new HashMap<SignalGroupState, Double>();
-		for (SignalGroupState state : SignalGroupState.values()){
-			map.put(state, this.stateTimeArray[state.ordinal()]);
-		}
-    return map;
+  public Map<Id, DgSignalGroupAnalysisData> getSystemGroupAnalysisDataMap() {
+    return systemGroupDataMap;
   }
 }

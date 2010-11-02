@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SignalSystemData
+ * DgRoederGershensonControllerListenerFactory
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,34 +17,34 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.signalsystems.analysis;
+package playground.dgrether.signalsystems.roedergershenson;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.events.SignalGroupStateChangedEvent;
+import org.apache.log4j.Logger;
+import org.matsim.signalsystems.initialization.SignalsControllerListener;
+import org.matsim.signalsystems.initialization.SignalsControllerListenerFactory;
 
 
 /**
  * @author dgrether
  *
  */
-public class DgSignalSystemData {
+public class DgRoederGershensonSignalsControllerListenerFactory implements
+		SignalsControllerListenerFactory {
+	
+	private static final Logger log = Logger
+			.getLogger(DgRoederGershensonSignalsControllerListenerFactory.class);
+	
+	private SignalsControllerListenerFactory delegate;
 
-  private Map<Id, DgSignalGroupData> systemGroupDataMap = new HashMap<Id, DgSignalGroupData>();
-  
-  public void processStateChange(SignalGroupStateChangedEvent e) {
-    DgSignalGroupData groupData = this.systemGroupDataMap.get(e.getSignalGroupId());
-    if (groupData == null) {
-      groupData = new DgSignalGroupData();
-      this.systemGroupDataMap.put(e.getSignalGroupId(), groupData);
-    }
-    groupData.processStateChange(e);
-  }
+	public DgRoederGershensonSignalsControllerListenerFactory(
+			SignalsControllerListenerFactory delegate) {
+		this.delegate = delegate;
+	}
 
-  
-  public Map<Id, DgSignalGroupData> getSystemGroupDataMap() {
-    return systemGroupDataMap;
-  }
+	@Override
+	public SignalsControllerListener createSignalsControllerListener() {
+		log.info("Using DgRoederGershenson signal model if configured for specific signals in xml data...");
+		return new DgRoederGershensonControllerListener(this.delegate.createSignalsControllerListener());
+	}
+
 }

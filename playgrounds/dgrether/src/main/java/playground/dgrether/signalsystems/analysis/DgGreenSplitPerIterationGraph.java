@@ -55,16 +55,16 @@ public class DgGreenSplitPerIterationGraph {
 
   private Id signalSystemId;
 
-  private SortedMap<Integer, DgSignalSystemData> iterationSystemDataMap;
+  private SortedMap<Integer, DgSignalSystemAnalysisData> iterationSystemDataMap;
   
   public DgGreenSplitPerIterationGraph(ControlerConfigGroup controlerConfigGroup, Id signalSystemId){
     this.controllerConfig =  controlerConfigGroup;
     this.signalSystemId = signalSystemId;
-    this.iterationSystemDataMap = new TreeMap<Integer, DgSignalSystemData>();
+    this.iterationSystemDataMap = new TreeMap<Integer, DgSignalSystemAnalysisData>();
   }
   
   public void addIterationData(DgSignalGreenSplitHandler h, Integer iteration) {
-    DgSignalSystemData systemData = h.getSystemIdDataMap().get(this.signalSystemId);
+    DgSignalSystemAnalysisData systemData = h.getSystemIdAnalysisDataMap().get(this.signalSystemId);
     if (systemData == null) {
       throw new RuntimeException("null in iteration " + iteration);
     }
@@ -76,15 +76,15 @@ public class DgGreenSplitPerIterationGraph {
     Map<Id, XYSeries> signalGroupGreenXYSeries = new HashMap<Id, XYSeries>();
 //    Map<Id, XYSeries> signalGroupRedXYSeries = new HashMap<Id, XYSeries>();
     for (Integer it : this.iterationSystemDataMap.keySet()) {
-      DgSignalSystemData sd = this.iterationSystemDataMap.get(it);
-      for (Id groupId : sd.getSystemGroupDataMap().keySet()) {
+      DgSignalSystemAnalysisData sd = this.iterationSystemDataMap.get(it);
+      for (Id groupId : sd.getSystemGroupAnalysisDataMap().keySet()) {
         XYSeries series = signalGroupGreenXYSeries.get(groupId);
         if (series == null) {
           series = new XYSeries("group id green" + groupId, false, true);
           signalGroupGreenXYSeries.put(groupId, series);
           this.dataset.addSeries(series);
         }
-        Map<SignalGroupState, Double> stateTimeMap = sd.getSystemGroupDataMap().get(groupId).getStateTimeMap();
+        Map<SignalGroupState, Double> stateTimeMap = sd.getSystemGroupAnalysisDataMap().get(groupId).getStateTimeMap();
         Double green = stateTimeMap.get(SignalGroupState.GREEN);
         Double red = stateTimeMap.get(SignalGroupState.RED);
         Double greenSplit = null;
