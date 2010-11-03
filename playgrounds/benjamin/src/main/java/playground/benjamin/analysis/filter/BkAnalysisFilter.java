@@ -18,12 +18,15 @@
  * *********************************************************************** */
 
 
-package playground.benjamin.analysis;
+package playground.benjamin.analysis.filter;
 
 import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
+
+import playground.benjamin.analysis.BkAnalysis;
+import playground.benjamin.analysis.Row;
 
 
 /**
@@ -32,7 +35,7 @@ import org.matsim.api.core.v01.Id;
 
 public class BkAnalysisFilter extends BkAnalysis {
 
-	BkAnalysisFilter() {
+	public BkAnalysisFilter() {
 	}
 
 	public SortedMap<Id, Row> getWinner(SortedMap<Id, Row> populationInformation) {

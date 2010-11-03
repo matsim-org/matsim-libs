@@ -38,6 +38,8 @@ import org.matsim.households.Households;
 import org.matsim.households.HouseholdsImpl;
 import org.matsim.households.HouseholdsReaderV10;
 
+import playground.benjamin.analysis.filter.BkAnalysisFilter;
+
 /**
  * @author bkickhoefer after kn and dgrether
  */
@@ -254,7 +256,7 @@ public class BkAnalysis {
 //============================================================================================================		
 
 	//comparator to compare Ids not as Strings but as Integers (see above)
-	protected final class ComparatorImplementation implements Comparator<Id> {
+	public final class ComparatorImplementation implements Comparator<Id> {
 		@Override
 		public int compare(Id id1, Id id2) {
 			Integer i1 = Integer.parseInt(id1.toString());

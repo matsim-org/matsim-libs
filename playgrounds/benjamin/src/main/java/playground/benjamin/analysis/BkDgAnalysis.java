@@ -39,8 +39,8 @@ import org.matsim.roadpricing.RoadPricingScheme;
 import org.xml.sax.SAXException;
 
 import playground.benjamin.BkPaths;
-import playground.benjamin.charts.types.BkAvgTollPaidQuantilesChart;
 import playground.benjamin.events.MoneyEventHandler;
+import playground.benjamin.old.charts.BkAvgTollPaidQuantilesChart;
 import playground.dgrether.analysis.charts.DgAvgDeltaMoneyQuantilesChart;
 import playground.dgrether.analysis.charts.DgAvgDeltaUtilsModeQuantilesChart;
 import playground.dgrether.analysis.charts.DgAvgDeltaUtilsQuantilesChart;
