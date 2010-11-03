@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin.charts.types;
+package playground.benjamin.old.charts;
 
 import java.awt.BasicStroke;
 import java.util.ArrayList;
