@@ -25,6 +25,7 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.basic.v01.IdImpl;
@@ -87,6 +88,12 @@ public class FakeAgent implements PersonDriverAgent, PassengerAgent {
 		return this.dummyLeg;
 	}
 
+	@Override
+	public Activity getCurrentActivity() {
+		// As far as I can see, there is never a current Activity. cdobler, nov'10
+		return null;
+	}
+		
 	@Override
 	public PlanElement getCurrentPlanElement() {
 		return this.dummyLeg ;

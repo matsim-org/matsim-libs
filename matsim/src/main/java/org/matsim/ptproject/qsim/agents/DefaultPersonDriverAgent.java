@@ -360,7 +360,7 @@ public class DefaultPersonDriverAgent implements PersonDriverAgent {
 
 	@Override
 	public final PlanElement getCurrentPlanElement() {
-		return this.getPlanElements().get( this.currentPlanElementIndex ) ;
+		return this.getPlanElements().get(this.currentPlanElementIndex);
 	}
 	
 	@Override
@@ -392,17 +392,22 @@ public class DefaultPersonDriverAgent implements PersonDriverAgent {
 	}
 
 	@Override
-	@Deprecated // yyyyyy replace as indicated below
 	public final Leg getCurrentLeg() {
-		return this.currentLeg;
-
-//		replace by:
-//		if ( !(this.getCurrentPlanElement() instanceof Leg) ) {
-//			return null ;
-//		}
-//		return (Leg) this.getCurrentPlanElement() ;
+		PlanElement currentPlanElement = this.getCurrentPlanElement(); 
+		if (!(currentPlanElement instanceof Leg)) {
+			return null;
+		}
+		return (Leg) currentPlanElement;
 	}
 
+	public final Activity getCurrentActivity() {
+		PlanElement currentPlanElement = this.getCurrentPlanElement(); 
+		if (!(currentPlanElement instanceof Activity)) {
+			return null;
+		}
+		return (Activity) currentPlanElement;
+	}
+	
 	private final void setCurrentLegAndResetRouteCache(final Leg leg) {
 		this.currentLeg  = leg;
 		this.cachedRouteLinkIds = null;

@@ -175,6 +175,12 @@ public class UmlaufDriver extends AbstractTransitDriver {
 	}
 
 	@Override
+	public Activity getCurrentActivity() {
+		// As far as I can see, there is never a current Activity. cdobler, nov'10
+		return null;
+	}
+		
+	@Override
 	public PlanElement getCurrentPlanElement() {
 		return this.currentLeg ; // always a leg (?)
 	}

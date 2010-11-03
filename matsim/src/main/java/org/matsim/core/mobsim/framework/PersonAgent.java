@@ -20,6 +20,7 @@
 package org.matsim.core.mobsim.framework;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -86,10 +87,15 @@ public interface PersonAgent extends MobsimAgent {
 	// if this does not make sense for a class, then the class is maybe not a "Person"Agent.  kai, may'10
 
 	/**
-	 * @return "(Leg) getCurrentPlanElement()" -- despite this entry in the javadoc, this is only approximately what the method really does.  kai, oct'10
+	 * @return "(Leg) getCurrentPlanElement()" if the current plan element is a leg, otherwise null.
 	 */
 	public Leg getCurrentLeg();
 
+	/**
+	 * @return "(Activity) getCurrentPlanElement()" if the current plan element is an activity, otherwise null.
+	 */
+	public Activity getCurrentActivity();
+	
 	/**
 	 * @return the underlying person (data class)
 	 */
