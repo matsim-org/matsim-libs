@@ -48,7 +48,7 @@ import playground.benjamin.dataprepare.CheckingTabularFileHandler;
  * @author benjamin
  *
  */
-public class TrialDemandFromCountsMunich {
+public class TestDemandCreatorFromCounts {
 	static String netFile = "";
 	static String countsPath = "../../detailedEval/teststrecke/zaehlstellen_einfluss/";
 	static String testVehiclePath = "../../detailedEval/teststrecke/testVehicle/";

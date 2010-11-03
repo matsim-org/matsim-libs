@@ -36,13 +36,12 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 
-import playground.benjamin.events.TravelTimeEventHandler;
 
 /**
  * @author benjamin
  *
  */
-public class BkControlerListener implements StartupListener, IterationEndsListener, ShutdownListener {
+public class UpdateCapacityControlerListener implements StartupListener, IterationEndsListener, ShutdownListener {
 
 	private TravelTimeEventHandler eventHandler;
 	private SortedMap<Double, Double> departureTimes2travelTimes = new TreeMap<Double, Double>();
@@ -52,7 +51,7 @@ public class BkControlerListener implements StartupListener, IterationEndsListen
 	/**
 	 * @param scenario
 	 */
-	public BkControlerListener(Scenario scenario) {
+	public UpdateCapacityControlerListener(Scenario scenario) {
 		this.scenario = scenario;
 		this.linkid = scenario.createId("590000822");
 	}

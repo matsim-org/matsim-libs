@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin.analysis;
+package playground.benjamin.old.analysis;
 
 import java.io.IOException;
 import java.util.Map;
@@ -39,7 +39,6 @@ import org.matsim.roadpricing.RoadPricingScheme;
 import org.xml.sax.SAXException;
 
 import playground.benjamin.BkPaths;
-import playground.benjamin.events.MoneyEventHandler;
 import playground.benjamin.old.charts.BkAvgTollPaidQuantilesChart;
 import playground.dgrether.analysis.charts.DgAvgDeltaMoneyQuantilesChart;
 import playground.dgrether.analysis.charts.DgAvgDeltaUtilsModeQuantilesChart;

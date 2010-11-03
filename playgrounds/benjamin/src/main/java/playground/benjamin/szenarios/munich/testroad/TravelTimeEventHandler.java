@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Trb09Analysis
+ * TravelTimeEventHandler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,46 +17,59 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin.events;
+package playground.benjamin.szenarios.munich.testroad;
 
-import java.util.Collections;
-import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.AgentMoneyEvent;
-import org.matsim.core.api.experimental.events.handler.AgentMoneyEventHandler;
+import org.matsim.core.api.experimental.events.LinkEnterEvent;
+import org.matsim.core.api.experimental.events.LinkLeaveEvent;
+import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
+import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
+import org.matsim.core.basic.v01.IdImpl;
 
 /**
  * @author benjamin
  *
  */
-public class MoneyEventHandler implements AgentMoneyEventHandler{
-
-	SortedMap<Id, Double> id2Toll = new TreeMap<Id, Double>();
+public class TravelTimeEventHandler implements LinkEnterEventHandler, LinkLeaveEventHandler {
 	
-	@Override
-	public void handleEvent(AgentMoneyEvent event) {
-		
-		Id id = event.getPersonId();
-		Double toll = event.getAmount();
-		
-		if(id2Toll.containsKey(id)){
-			double sumToll = id2Toll.get(id).doubleValue() + toll;
-			id2Toll.put(id, sumToll);
-		}
-		else{
-			id2Toll.put(id, toll);
-		}	
+	private SortedMap<Double, Double> departureTimes2travelTimes = new TreeMap<Double, Double>();
+	
+	private double enterTime;
+	private double leaveTime;
+
+	public TravelTimeEventHandler(SortedMap<Double, Double> departureTimes2travelTimes) {
+		this.departureTimes2travelTimes = departureTimes2travelTimes;
 	}
 
-	public Map<Id, Double> getPersonId2TollMap() {
-		return Collections.unmodifiableMap(id2Toll);
-	}
-	
 	@Override
 	public void reset(int iteration) {
-		// TODO Auto-generated method stub	
+		// TODO Auto-generated method stub
+
 	}
+
+	@Override
+	public void handleEvent(LinkEnterEvent event) {
+		String id = event.getPersonId().toString();
+		if(id.contains("testVehicle")){
+			if(event.getLinkId().equals(new IdImpl("592536888"))){
+				enterTime = event.getTime();
+			}
+		}
+	}
+
+	@Override
+	public void handleEvent(LinkLeaveEvent event) {
+		String id = event.getPersonId().toString();
+		if(id.contains("testVehicle")){
+			if(event.getLinkId().equals(new IdImpl("590000822"))){
+				leaveTime = event.getTime();
+				
+				this.departureTimes2travelTimes.put(enterTime, leaveTime - enterTime);
+			}
+		}
+		
+	}
+
 }
