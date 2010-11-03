@@ -21,19 +21,19 @@
 package playground.christoph.withinday.replanning.replanners.tools;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.mobsim.framework.PersonAgent;
+import org.matsim.ptproject.qsim.agents.WithinDayAgent;
 
 public class ReplanningTask {
 
-	protected PersonAgent agentToReplan;
+	protected WithinDayAgent agentToReplan;
 	protected Id withinDayReplannerId;
 	
-	public ReplanningTask(PersonAgent agentToReplan, Id withinDayReplannerId) {
+	public ReplanningTask(WithinDayAgent agentToReplan, Id withinDayReplannerId) {
 		this.agentToReplan = agentToReplan;
 		this.withinDayReplannerId = withinDayReplannerId;
 	}
 	
-	public PersonAgent getAgentToReplan() {
+	public WithinDayAgent getAgentToReplan() {
 		return this.agentToReplan;
 	}
 	

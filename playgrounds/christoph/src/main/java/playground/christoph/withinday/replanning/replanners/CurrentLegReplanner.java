@@ -22,11 +22,9 @@ package playground.christoph.withinday.replanning.replanners;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.mobsim.framework.PersonAgent;
-import org.matsim.ptproject.qsim.agents.DefaultPersonDriverAgent;
+import org.matsim.ptproject.qsim.agents.WithinDayAgent;
 
 import playground.christoph.withinday.replanning.replanners.CurrentLegReplanner;
 import playground.christoph.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
@@ -62,35 +60,32 @@ public class CurrentLegReplanner extends WithinDayDuringLegReplanner {
 	 * - merge already passed parts of the current Route with the new created Route
 	 */
 	@Override
-	public boolean doReplanning(PersonAgent personAgent) {
+	public boolean doReplanning(WithinDayAgent withinDayAgent) {
 		
 		// If we don't have a valid Replanner.
 		if (this.routeAlgo == null) return false;
 
 		// If we don't have a valid PersonAgent
-		if (personAgent == null) return false;
+		if (withinDayAgent == null) return false;
 
-		Person person = personAgent.getPerson();
+		Person person = withinDayAgent.getPerson();
 		Plan selectedPlan = person.getSelectedPlan();
 
 		// If we don't have a selected plan
 		if (selectedPlan == null) return false;
 
-		Leg currentLeg = personAgent.getCurrentLeg();
 
 		// If it is not a car Leg we don't replan it.
 //		if (!currentLeg.getMode().equals(TransportMode.car)) return false;
 
-		int currentNodeIndex = -1;
-		if (personAgent instanceof DefaultPersonDriverAgent) {
-			currentNodeIndex = ((DefaultPersonDriverAgent) personAgent).getCurrentNodeIndex();
-		} else return false;
+		int currentLegIndex = withinDayAgent.getCurrentPlanElementIndex();
+		int currentLinkIndex = withinDayAgent.getCurrentRouteLinkIdIndex();
 		
 		// new Route for current Leg
-		new EditRoutes().replanCurrentLegRoute(selectedPlan, currentLeg, currentNodeIndex, routeAlgo, scenario.getNetwork(), time);
+		new EditRoutes().replanCurrentLegRoute(selectedPlan, currentLegIndex, currentLinkIndex, routeAlgo, scenario.getNetwork(), time);
 
 		// Finally reset the cached Values of the PersonAgent - they may have changed!
-		personAgent.resetCaches();
+		withinDayAgent.resetCaches();
 		
 //		// create ReplanningEvent
 //		QSim.getEvents().processEvent(new ExtendedAgentReplanEventImpl(time, person.getId(), newRoute, route));

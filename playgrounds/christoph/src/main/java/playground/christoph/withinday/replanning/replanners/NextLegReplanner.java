@@ -22,12 +22,9 @@ package playground.christoph.withinday.replanning.replanners;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.ptproject.qsim.agents.WithinDayAgent;
 
 import playground.christoph.withinday.replanning.replanners.NextLegReplanner;
 import playground.christoph.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
@@ -63,35 +60,27 @@ public class NextLegReplanner extends WithinDayDuringActivityReplanner {
 	 * of such a functionality would be a problem due to the structure of MATSim...
 	 */
 	@Override
-	public boolean doReplanning(PersonAgent personAgent) {		
+	public boolean doReplanning(WithinDayAgent withinDayAgent) {		
 		// If we don't have a valid Replanner.
 		if (this.routeAlgo == null) return false;
 		
 		// If we don't have a valid personAgent
-		if (personAgent == null) return false;
+		if (withinDayAgent == null) return false;
 				
-		Person person = personAgent.getPerson();
+		Person person = withinDayAgent.getPerson();
 		PlanImpl selectedPlan = (PlanImpl)person.getSelectedPlan(); 
 		
 		// If we don't have a selected plan
 		if (selectedPlan == null) return false;
 		
-		Activity currentActivity;
+		
 		/*
-		 *  Get the current PlanElement and check if it is an Activity
+		 *  Get the index of the current PlanElement
 		 */
-		PlanElement currentPlanElement = personAgent.getCurrentPlanElement();
-		if (currentPlanElement instanceof Activity) {
-			currentActivity = (Activity) currentPlanElement;
-		} else return false;
-		
-		Leg nextLeg = selectedPlan.getNextLeg(currentActivity);
+		int currentPlanElementIndex = withinDayAgent.getCurrentPlanElementIndex();
 				
-		// If it is not a car Leg we don't replan it.
-//		if (!nextLeg.getMode().equals(TransportMode.car)) return false;
-		
 		// new Route for next Leg
-		new EditRoutes().replanFutureLegRoute(selectedPlan, nextLeg, routeAlgo);
+		new EditRoutes().replanFutureLegRoute(selectedPlan, currentPlanElementIndex + 1, routeAlgo);
 
 //		// create ReplanningEvent
 //		QSim.getEvents().processEvent(new ExtendedAgentReplanEventImpl(time, person.getId(), (NetworkRouteWRefs)alternativeRoute, (NetworkRouteWRefs)originalRoute));

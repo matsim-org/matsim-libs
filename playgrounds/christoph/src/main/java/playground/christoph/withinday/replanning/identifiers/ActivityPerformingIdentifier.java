@@ -27,6 +27,7 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.framework.PersonAgent;
+import org.matsim.ptproject.qsim.agents.WithinDayAgent;
 
 import playground.christoph.withinday.mobsim.WithinDayPersonAgent;
 import playground.christoph.withinday.replanning.identifiers.interfaces.DuringActivityIdentifier;
@@ -41,10 +42,10 @@ public class ActivityPerformingIdentifier extends DuringActivityIdentifier {
 		this.activityReplanningMap = activityReplanningMap;
 	}
 	
-	public Set<PersonAgent> getAgentsToReplan(double time, Id withinDayReplannerId) {
+	public Set<WithinDayAgent> getAgentsToReplan(double time, Id withinDayReplannerId) {
 		List<PersonAgent> activityPerformingAgents = activityReplanningMap.getActivityPerformingAgents();
 		
-		Set<PersonAgent> agentsToReplan = new HashSet<PersonAgent>();
+		Set<WithinDayAgent> agentsToReplan = new HashSet<WithinDayAgent>();
 		
 		Iterator<PersonAgent> iter = activityPerformingAgents.iterator();
 		while(iter.hasNext()) {

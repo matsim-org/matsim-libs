@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.ptproject.qsim.interfaces.AgentCounterI;
 
+import playground.christoph.withinday.replanning.identifiers.interfaces.AgentsToReplanIdentifier;
 import playground.christoph.withinday.replanning.replanners.tools.ReplanningIdGenerator;
 
 public abstract class WithinDayReplannerFactory {
@@ -40,15 +41,15 @@ public abstract class WithinDayReplannerFactory {
 		this.id = ReplanningIdGenerator.getNextId();
 	}
 	
-	public abstract WithinDayReplanner createReplanner();
+	public abstract WithinDayReplanner<? extends AgentsToReplanIdentifier> createReplanner();
 	
 	/*
 	 * This method should be called after a new Replanner instance
 	 * has been created. Is there any way to force this???
 	 */
-	public final void initNewInstance(WithinDayReplanner replanner) {
+	public final void initNewInstance(WithinDayReplanner<? extends AgentsToReplanIdentifier> replanner) {
 		replanner.setReplannerFactory(this);
-//		replanner.setAgentCounter(agentCounter);
+		replanner.setAgentCounter(agentCounter);
 		replanner.setReplanningProbability(this.replanningProbability);
 		replanner.setAbstractMultithreadedModule(this.abstractMultithreadedModule);
 		additionalParametersForNewInstance(replanner);
@@ -58,7 +59,7 @@ public abstract class WithinDayReplannerFactory {
 	 * Override this method if you want to set additional parameters in 
 	 * a new created WithinDayReplanner instance. 
 	 */
-	public void additionalParametersForNewInstance(WithinDayReplanner replanner) {
+	public void additionalParametersForNewInstance(WithinDayReplanner<? extends AgentsToReplanIdentifier> replanner) {
 	}
 	
 	public final Id getId() {

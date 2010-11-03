@@ -25,8 +25,8 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.ptproject.qsim.QSim;
+import org.matsim.ptproject.qsim.agents.WithinDayAgent;
 
 import playground.christoph.withinday.mobsim.WithinDayPersonAgent;
 import playground.christoph.withinday.replanning.identifiers.interfaces.InitialIdentifier;
@@ -40,8 +40,8 @@ public class InitialIdentifierImpl extends InitialIdentifier {
 		this.qsim = qsim;
 	}
 		
-	public Set<PersonAgent> getAgentsToReplan(double time, Id withinDayReplannerId) {
-		Set<PersonAgent> agentsToReplan = new HashSet<PersonAgent>();
+	public Set<WithinDayAgent> getAgentsToReplan(double time, Id withinDayReplannerId) {
+		Set<WithinDayAgent> agentsToReplan = new HashSet<WithinDayAgent>();
 		
 		for (MobsimAgent mobsimAgent : this.qsim.getAgents()) {
 			if (mobsimAgent instanceof WithinDayPersonAgent) {

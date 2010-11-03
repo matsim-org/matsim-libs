@@ -22,49 +22,21 @@ package playground.christoph.withinday.replanning.parallel;
 
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.listeners.SimulationListener;
 
 import playground.christoph.withinday.replanning.replanners.interfaces.WithinDayInitialReplanner;
 
 public class ParallelInitialReplanner extends ParallelReplanner<WithinDayInitialReplanner> {
-	
-	private final static Logger log = Logger.getLogger(ParallelInitialReplanner.class);
-	
+		
 	public ParallelInitialReplanner(int numOfThreads, Controler controler) {
 		super(numOfThreads, controler);
-		this.init();
+		this.init("ParallelInitialReplanner");
 	}
 	
 	public ParallelInitialReplanner(int numOfThreads, List<SimulationListener> list) {
 		super(numOfThreads, list);
-		this.init();
+		this.init("ParallelInitialReplanner");
 	}
-	
-	@Override
-	protected void init() {
-		replanningThreads = new InternalReplanningThread[numOfThreads];
-
-		// Do initial Setup of the Threads
-		for (int i = 0; i < numOfThreads; i++) {
-			ReplanningThread replanningThread = new InternalReplanningThread("ParallelInitialReplanner Thread" + i + " replanned plans: ");
-			replanningThread.setName("ParallelInitialReplanner" + i);
-			replanningThreads[i] = replanningThread;
-		}
-
-		// Do all other Initialization Operations in the super Class.
-		super.init();
-	}
-
-	/*
-	 * The thread class that really handles the persons.
-	 */
-	private static class InternalReplanningThread extends ReplanningThread {			
 		
-		public InternalReplanningThread(String counterText) {
-			super(counterText);
-		}
-	}
-	
 }

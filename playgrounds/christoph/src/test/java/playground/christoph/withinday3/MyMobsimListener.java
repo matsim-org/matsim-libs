@@ -168,8 +168,9 @@ public class MyMobsimListener implements SimulationListener, SimulationBeforeSim
 		
 		
 		// new Route for next Leg. yyyy should be static and based on the index, but this is not the real problem 
-		Leg homeLeg = (Leg) planElements.get( planElementsIndex+2 ) ;
-		new EditRoutes().replanFutureLegRoute(selectedPlan, homeLeg, routeAlgo);
+		int homeLegindex = planElementsIndex+2;
+//		Leg homeLeg = (Leg) planElements.get( homeLegindex ) ;
+		new EditRoutes().replanFutureLegRoute(selectedPlan, homeLegindex, routeAlgo);
 		
 		// finally reset the cached Values of the PersonAgent - they may have changed!
 		withindayAgent.resetCaches();

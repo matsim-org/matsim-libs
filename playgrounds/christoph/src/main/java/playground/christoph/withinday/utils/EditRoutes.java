@@ -1,3 +1,23 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * EditRoutes.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.christoph.withinday.utils;
 
 import java.util.ArrayList;
@@ -9,6 +29,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -27,21 +48,23 @@ public class EditRoutes {
 	 * Activities. By doing so the PlanAlgorithm will only
 	 * change the Route of that Leg.
 	 */
-	public boolean replanFutureLegRoute(Plan plan, Leg leg, PlanAlgorithm planAlgorithm) {
+	public boolean replanFutureLegRoute(Plan plan, int legPlanElementIndex, PlanAlgorithm planAlgorithm) {
 		
 		if (plan == null) return false;
-		if (leg == null) return false;
 		if (planAlgorithm == null) return false; 
 		
-		int index = plan.getPlanElements().indexOf(leg);
+		Leg leg;
+		PlanElement planElement = plan.getPlanElements().get(legPlanElementIndex);
+		if (planElement instanceof Leg) {
+			leg = (Leg) planElement;
+		} else return false;
+		
 		// yyyy I can't say how safe this is.  There is no guarantee that the same entry is not used twice in the plan.  This will in
 		// particular be a problem if we override the "equals" contract, in the sense that two activities are equal if
 		// certain (or all) elements are equal.  kai, oct'10
 		
-		if (index == -1) return false;
-		
-		Activity fromActivity = (Activity) plan.getPlanElements().get(index - 1);
-		Activity toActivity = (Activity) plan.getPlanElements().get(index + 1);
+		Activity fromActivity = (Activity) plan.getPlanElements().get(legPlanElementIndex - 1);
+		Activity toActivity = (Activity) plan.getPlanElements().get(legPlanElementIndex + 1);
 		
 		Route oldRoute = leg.getRoute();
 		
@@ -111,44 +134,32 @@ public class EditRoutes {
 	 * The currentNodeIndex has to Point to the next Node
 	 * (which is the endNode of the current Link)
 	 */
-	public boolean replanCurrentLegRoute(Plan plan, Leg leg, int currentNodeIndex, PlanAlgorithm planAlgorithm, Network network, double time) {
+	public boolean replanCurrentLegRoute(Plan plan, int legPlanElementIndex, int currentLinkIndex, PlanAlgorithm planAlgorithm, Network network, double time) {
 		if (plan == null) return false;
-		if (leg == null) return false;
 		if (planAlgorithm == null) return false; 
-		
-		int index = plan.getPlanElements().indexOf(leg);
+
+		Leg leg;
+		PlanElement planElement = plan.getPlanElements().get(legPlanElementIndex);
+		if (planElement instanceof Leg) {
+			leg = (Leg) planElement;
+		} else return false;
+
 		// yyyy I can't say how safe this is.  There is no guarantee that the same entry is not used twice in the plan.  This will in
 		// particular be a problem if we override the "equals" contract, in the sense that two activities are equal if
 		// certain (or all) elements are equal.  kai, oct'10
+		// using index now - should be save... cdobler, nov'10
 		
-		if (index == -1) return false;
-		
-		Activity fromActivity = (Activity) plan.getPlanElements().get(index - 1);
-		Activity toActivity = (Activity) plan.getPlanElements().get(index + 1);
+		Activity fromActivity = (Activity) plan.getPlanElements().get(legPlanElementIndex - 1);
+		Activity toActivity = (Activity) plan.getPlanElements().get(legPlanElementIndex + 1);
 
 		Route oldRoute = leg.getRoute();
 		
-		// Get the Id of the current Link.
-		Id currentLinkId = null;
-		if (currentNodeIndex == 1) {
-			currentLinkId = oldRoute.getStartLinkId();
-		}
-		else {
-			if (oldRoute instanceof NetworkRoute) {
-				List<Id> ids = ((NetworkRoute) oldRoute).getLinkIds();
-
-				// If the current Link is the last Link we don't have to replan
-				// our Route.
-				if (ids.size() <= currentNodeIndex - 2) {
-					return true;			
-				}
-				else currentLinkId = ids.get(currentNodeIndex - 2);
-			}
-			else {
-				logger.warn("Could not retrieve the LinkIds of the current Route. Route is not replanned!");
-				return false;
-			}
-		}
+		/*
+		 *  Get the Id of the current Link.
+		 *  Create a List that contains all links of a route, including the Start- and EndLinks.
+		 */
+		List<Id> allLinkIds = getRouteLinkIds(oldRoute);
+		Id currentLinkId = allLinkIds.get(currentLinkIndex);
 
 		/*
 		 *  Create a new Plan with one Leg that leeds from the
@@ -161,19 +172,15 @@ public class EditRoutes {
 		// The linkIds of the new Route
 		List<Id> linkIds = new ArrayList<Id>();
 		
-		// Get those Links which have already been passed.
-		if (oldRoute instanceof NetworkRoute) {
-			List<Id> oldLinkIds = ((NetworkRoute) oldRoute).getLinkIds();
-			//TODO use correct index...
-			linkIds.addAll(oldLinkIds.subList(0, currentNodeIndex - 1));
+		/*
+		 * Get those Links which have already been passed.
+		 * allLinkIds contains also the startLinkId, which should not
+		 * be part of the List - it is set separately. Therefore we start
+		 * at index 1.
+		 */
+		if (currentLinkIndex > 0) {
+			linkIds.addAll(allLinkIds.subList(1, currentLinkIndex + 1));
 		}
-		else {
-			logger.warn("Could not retrieve the LinkIds of the current Route. Route is not replanned!");
-			return false;
-		}
-					
-		// Create a new Route from the current Link to the Destination Link
-//		LinkNetworkRouteImpl subRoute = new LinkNetworkRouteImpl(currentLinkId, toActivity.getLinkId(), network);
 		
 		// Create a new leg and use the subRoute.
 		Leg newLeg = new LegImpl((LegImpl) leg);
@@ -221,5 +228,20 @@ public class EditRoutes {
 		}	
 		
 		return true;
+	}
+	
+	private List<Id> getRouteLinkIds(Route route) {
+		List<Id> linkIds = new ArrayList<Id>();
+		
+		if (route instanceof NetworkRoute) {
+			NetworkRoute networkRoute = (NetworkRoute) route;
+			linkIds.add(networkRoute.getStartLinkId());
+			linkIds.addAll(networkRoute.getLinkIds());
+			linkIds.add(networkRoute.getEndLinkId());
+		} else {
+			throw new RuntimeException("Currently only NetworkRoutes are supported for Within-Day Replanning!");
+		}
+		
+		return linkIds;
 	}
 }

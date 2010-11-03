@@ -22,7 +22,7 @@ package playground.christoph.withinday.mobsim;
 
 import java.util.Set;
 
-import org.matsim.core.mobsim.framework.PersonAgent;
+import org.matsim.ptproject.qsim.agents.WithinDayAgent;
 
 import playground.christoph.withinday.replanning.identifiers.interfaces.AgentsToReplanIdentifier;
 import playground.christoph.withinday.replanning.parallel.ParallelReplanner;
@@ -39,8 +39,8 @@ public abstract class WithinDayReplanningModule<T extends WithinDayReplanner<? e
 			Set<? extends AgentsToReplanIdentifier> identifiers = replanner.getAgentsToReplanIdentifers(); 
 				
 			for (AgentsToReplanIdentifier identifier : identifiers) {
-				for (PersonAgent personAgent : identifier.getAgentsToReplan(time, replanner.getId())) {
-					ReplanningTask replanningTask = new ReplanningTask(personAgent, replanner.getId());
+				for (WithinDayAgent withinDayAgent : identifier.getAgentsToReplan(time, replanner.getId())) {
+					ReplanningTask replanningTask = new ReplanningTask(withinDayAgent, replanner.getId());
 					this.parallelReplanner.addReplanningTask(replanningTask);
 				}
 			}

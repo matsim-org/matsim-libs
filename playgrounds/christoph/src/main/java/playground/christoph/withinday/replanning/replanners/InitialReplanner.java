@@ -23,7 +23,7 @@ package playground.christoph.withinday.replanning.replanners;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.mobsim.framework.PersonAgent;
+import org.matsim.ptproject.qsim.agents.WithinDayAgent;
 
 import playground.christoph.withinday.replanning.replanners.InitialReplanner;
 import playground.christoph.withinday.replanning.replanners.interfaces.WithinDayInitialReplanner;
@@ -39,14 +39,14 @@ public class InitialReplanner extends WithinDayInitialReplanner {
 		super(id, scenario);
 	}
 	
-	public boolean doReplanning(PersonAgent personAgent) {	
+	public boolean doReplanning(WithinDayAgent withinDayAgent) {	
 		// If we don't have a valid Replanner.
 		if (this.routeAlgo == null) return false;
 		
 		// If we don't have a valid personAgent
-		if (personAgent == null) return false;
+		if (withinDayAgent == null) return false;
 		
-		Person person = personAgent.getPerson();
+		Person person = withinDayAgent.getPerson();
 		
 		routeAlgo.run(person.getSelectedPlan());
 		

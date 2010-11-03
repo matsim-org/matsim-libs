@@ -26,6 +26,7 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.framework.PersonAgent;
+import org.matsim.ptproject.qsim.agents.WithinDayAgent;
 
 import playground.christoph.withinday.mobsim.WithinDayPersonAgent;
 import playground.christoph.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
@@ -41,9 +42,9 @@ public class LeaveLinkIdentifier extends DuringLegIdentifier {
 	}
 	
 	@Override
-	public Set<PersonAgent> getAgentsToReplan(double time, Id withinDayReplannerId) {
+	public Set<WithinDayAgent> getAgentsToReplan(double time, Id withinDayReplannerId) {
 		List<PersonAgent> agentsToReplanLeaveLink = linkReplanningMap.getReplanningAgents(time);
-		Set<PersonAgent> agentsToReplan = new HashSet<PersonAgent>(); 
+		Set<WithinDayAgent> agentsToReplan = new HashSet<WithinDayAgent>(); 
 
 		for (PersonAgent personAgent : agentsToReplanLeaveLink) {
 			WithinDayPersonAgent withinDayPersonAgent = (WithinDayPersonAgent) personAgent;

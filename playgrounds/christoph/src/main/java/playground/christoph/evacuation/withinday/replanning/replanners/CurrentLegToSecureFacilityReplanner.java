@@ -20,8 +20,6 @@
 
 package playground.christoph.evacuation.withinday.replanning.replanners;
 
-import java.util.List;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -30,14 +28,13 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.mobsim.framework.PersonAgent;
+import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.ptproject.qsim.agents.WithinDayAgent;
 
 import playground.christoph.evacuation.config.EvacuationConfig;
 import playground.christoph.evacuation.withinday.replanning.replanners.CurrentLegToSecureFacilityReplanner;
@@ -68,7 +65,7 @@ public class CurrentLegToSecureFacilityReplanner extends WithinDayDuringLegRepla
 	}
 
 	@Override
-	public boolean doReplanning(PersonAgent personAgent) {
+	public boolean doReplanning(WithinDayAgent withinDayAgent) {
 		
 		// do Replanning only in the timestep where the Evacuation has started.
 		if (this.time > EvacuationConfig.evacuationTime) return true;
@@ -77,12 +74,12 @@ public class CurrentLegToSecureFacilityReplanner extends WithinDayDuringLegRepla
 		if (this.routeAlgo == null) return false;
 
 		// If we don't have a valid WithinDayPersonAgent
-		if (personAgent == null) return false;
+		if (withinDayAgent == null) return false;
 
 		WithinDayPersonAgent withinDayPersonAgent = null;
-		if (!(personAgent instanceof WithinDayPersonAgent)) return false;
+		if (!(withinDayAgent instanceof WithinDayPersonAgent)) return false;
 		else {
-			withinDayPersonAgent = (WithinDayPersonAgent) personAgent;
+			withinDayPersonAgent = (WithinDayPersonAgent) withinDayAgent;
 		}
 
 		PersonImpl person = (PersonImpl)withinDayPersonAgent.getPerson();
@@ -91,14 +88,15 @@ public class CurrentLegToSecureFacilityReplanner extends WithinDayDuringLegRepla
 		// If we don't have a selected plan
 		if (selectedPlan == null) return false;
 
-		Leg currentLeg = personAgent.getCurrentLeg();
+		int currentLegIndex = withinDayAgent.getCurrentPlanElementIndex();
+		Leg currentLeg = withinDayAgent.getCurrentLeg();
 		Activity nextActivity = selectedPlan.getNextActivity(currentLeg);
 		
 		// If it is not a car Leg we don't replan it.
 //		if (!currentLeg.getMode().equals(TransportMode.car)) return false;
 
 		// Get the current Link
-		Link currentLink = scenario.getNetwork().getLinks().get(getCurrentLinkId(withinDayPersonAgent));
+		Link currentLink = scenario.getNetwork().getLinks().get(((PersonDriverAgent) withinDayAgent).getCurrentLinkId());
 		
 		Activity rescueActivity = null;
 		/*
@@ -128,8 +126,9 @@ public class CurrentLegToSecureFacilityReplanner extends WithinDayDuringLegRepla
 			
 			new ReplacePlanElements().replaceActivity(selectedPlan, nextActivity, rescueActivity);
 			
+			int currentLinkIndex = withinDayAgent.getCurrentRouteLinkIdIndex();
 			// new Route for current Leg
-			new EditRoutes().replanCurrentLegRoute(selectedPlan, currentLeg, withinDayPersonAgent.getCurrentNodeIndex(), routeAlgo, scenario.getNetwork(), time);
+			new EditRoutes().replanCurrentLegRoute(selectedPlan, currentLegIndex, currentLinkIndex, routeAlgo, scenario.getNetwork(), time);
 		}
 		
 		// Remove all legs and activities after the next activity.
@@ -185,30 +184,5 @@ public class CurrentLegToSecureFacilityReplanner extends WithinDayDuringLegRepla
 		new ReplacePlanElements().replaceActivity(selectedPlan, nextActivity, rescueActivity);
 		
 		return rescueActivity;
-	}
-	
-	private Id getCurrentLinkId(WithinDayPersonAgent withinDayPersonAgent) {
-		int currentNodeIndex = withinDayPersonAgent.getCurrentNodeIndex();
-		
-		Route route = withinDayPersonAgent.getCurrentLeg().getRoute();
-		
-		if (currentNodeIndex == 1) {
-			return route.getStartLinkId();
-		}
-		else {
-			if (route instanceof NetworkRoute) {
-				List<Id> ids = ((NetworkRoute) route).getLinkIds();
-
-				// If the current Link is the last Link we don't have to replan
-				// our Route.
-				if (ids.size() <= currentNodeIndex - 2) {
-					return route.getEndLinkId();
-				}
-				else return ids.get(currentNodeIndex - 2);
-			}
-			else {
-				return null;
-			}
-		}
 	}
 }

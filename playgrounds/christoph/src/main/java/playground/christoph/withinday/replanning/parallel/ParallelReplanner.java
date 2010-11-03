@@ -68,7 +68,16 @@ public abstract class ParallelReplanner<T extends WithinDayReplanner<? extends A
 		list.add(this);
 	}
 
-	protected void init() {
+	public final void init(String replannerName) {
+		replanningThreads = new InternalReplanningThread[numOfThreads];
+
+		// Do initial Setup of the Threads
+		for (int i = 0; i < numOfThreads; i++) {
+			ReplanningThread replanningThread = new InternalReplanningThread(replannerName + " Thread" + i + " replanned plans: ");
+			replanningThread.setName(replannerName + i);
+			replanningThreads[i] = replanningThread;
+		}
+		
 		this.timeStepStartBarrier = new CyclicBarrier(numOfThreads + 1);
 		this.timeStepEndBarrier = new CyclicBarrier(numOfThreads + 1);
 
@@ -102,7 +111,7 @@ public abstract class ParallelReplanner<T extends WithinDayReplanner<? extends A
 	 * Typical Implementations should be able to use this Method
 	 * "as it is"...
 	 */
-	public void run(double time) {
+	public final void run(double time) {
 		// no Agents to Replan
 		if (lastRoundRobin == roundRobin) return;
 		else lastRoundRobin = roundRobin;
@@ -124,7 +133,7 @@ public abstract class ParallelReplanner<T extends WithinDayReplanner<? extends A
 		}
 	}
 
-	public void addWithinDayReplanner(T replanner) {
+	public final void addWithinDayReplanner(T replanner) {
 		this.originalReplanners.add(replanner);
 
 		for (ReplanningThread replanningThread : this.replanningThreads) {
@@ -133,16 +142,16 @@ public abstract class ParallelReplanner<T extends WithinDayReplanner<? extends A
 		}
 	}
 
-	public List<T> getWithinDayReplanners() {
+	public final List<T> getWithinDayReplanners() {
 		return Collections.unmodifiableList(this.originalReplanners);
 	}
 
-	public void addReplanningTask(ReplanningTask replanningTask) {
+	public final void addReplanningTask(ReplanningTask replanningTask) {
 		this.replanningThreads[this.roundRobin % this.numOfThreads].addReplanningTask(replanningTask);
 		this.roundRobin++;
 	}
 
-	private void setNumberOfThreads(int numberOfThreads) {
+	private final void setNumberOfThreads(int numberOfThreads) {
 		numOfThreads = Math.max(numberOfThreads, 1); // it should be at least 1 here; we allow 0 in other places for "no threads"
 
 		log.info("Using " + numOfThreads + " parallel threads to replan routes.");
@@ -157,10 +166,22 @@ public abstract class ParallelReplanner<T extends WithinDayReplanner<? extends A
 	}
 
 	@Override
-	public void notifySimulationInitialized(SimulationInitializedEvent e) {
+	public final void notifySimulationInitialized(SimulationInitializedEvent e) {
 
 		for (ReplanningThread replanningThread : this.replanningThreads) {
 			replanningThread.setAgentCounter(((Mobsim) e.getQueueSimulation()).getAgentCounter());
 		}
 	}
+	
+	
+	/*
+	 * The thread class that really handles the replanning.
+	 */
+	/*package*/ static final class InternalReplanningThread extends ReplanningThread {		
+		
+		public InternalReplanningThread(String counterText) {
+			super(counterText);
+		}
+				
+	}	// InternalReplanningThread
 }

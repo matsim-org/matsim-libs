@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.ptproject.qsim.agents.WithinDayAgent;
 
 import playground.christoph.evacuation.config.EvacuationConfig;
 import playground.christoph.withinday.mobsim.WithinDayPersonAgent;
@@ -52,10 +53,10 @@ public class InsecureActivityPerformingIdentifier extends DuringActivityIdentifi
 		this.secureDistance = secureDistance;
 	}
 	
-	public Set<PersonAgent> getAgentsToReplan(double time, Id withinDayReplannerId) {
+	public Set<WithinDayAgent> getAgentsToReplan(double time, Id withinDayReplannerId) {
 		
 		List<PersonAgent> activityPerformingAgents = activityReplanningMap.getActivityPerformingAgents();
-		Set<PersonAgent> agentsToReplan = new HashSet<PersonAgent>();
+		Set<WithinDayAgent> agentsToReplan = new HashSet<WithinDayAgent>();
 		
 		Iterator<PersonAgent> iter = activityPerformingAgents.iterator();
 		while(iter.hasNext()) {

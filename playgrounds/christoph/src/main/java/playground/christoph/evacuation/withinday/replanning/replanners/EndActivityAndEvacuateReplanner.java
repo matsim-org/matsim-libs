@@ -32,12 +32,12 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.ptproject.qsim.agents.DefaultPersonDriverAgent;
 import org.matsim.ptproject.qsim.agents.ExperimentalBasicWithindayAgent;
+import org.matsim.ptproject.qsim.agents.WithinDayAgent;
 
 import playground.christoph.evacuation.withinday.replanning.replanners.EndActivityAndEvacuateReplanner;
 import playground.christoph.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
@@ -52,12 +52,12 @@ public class EndActivityAndEvacuateReplanner extends WithinDayDuringActivityRepl
 	}
 	
 	@Override
-	public boolean doReplanning(PersonAgent personAgent) {		
+	public boolean doReplanning(WithinDayAgent withinDayAgent) {		
 		
 		// If we don't have a valid PersonAgent
-		if (personAgent == null) return false;
+		if (withinDayAgent == null) return false;
 	
-		Person person = personAgent.getPerson();
+		Person person = withinDayAgent.getPerson();
 		PlanImpl selectedPlan = (PlanImpl)person.getSelectedPlan(); 
 		
 		// If we don't have a selected plan
@@ -68,7 +68,7 @@ public class EndActivityAndEvacuateReplanner extends WithinDayDuringActivityRepl
 		/*
 		 *  Get the current PlanElement and check if it is an Activity
 		 */
-		PlanElement currentPlanElement = personAgent.getCurrentPlanElement();
+		PlanElement currentPlanElement = withinDayAgent.getCurrentPlanElement();
 		if (currentPlanElement instanceof Activity) {
 			currentActivity = (Activity) currentPlanElement;
 		} else return false;
@@ -112,10 +112,11 @@ public class EndActivityAndEvacuateReplanner extends WithinDayDuringActivityRepl
 		Leg legToRescue = factory.createLeg(transportMode);
 			
 		// add new activity
-		selectedPlan.insertLegAct(selectedPlan.getActLegIndex(currentActivity) + 1, legToRescue, rescueActivity);
+		int position = selectedPlan.getActLegIndex(currentActivity) + 1;
+		selectedPlan.insertLegAct(position, legToRescue, rescueActivity);
 			
 		// calculate route for the leg to the rescue facility
-		new EditRoutes().replanFutureLegRoute(selectedPlan, legToRescue, routeAlgo);
+		new EditRoutes().replanFutureLegRoute(selectedPlan, position, routeAlgo);
 
 		/*
 		 * Reschedule the currently performed Activity in the Mobsim - there
@@ -124,18 +125,18 @@ public class EndActivityAndEvacuateReplanner extends WithinDayDuringActivityRepl
 		// yyyy a method getMobsim in MobimAgent would be useful here. cdobler, Oct'10
 		// Intuitively I would agree.  We should think about where to set this so that, under normal circumstances,
 		// it can't become null.  kai, oct'10
-		if (personAgent instanceof DefaultPersonDriverAgent) {
+		if (withinDayAgent instanceof DefaultPersonDriverAgent) {
 			// yyyy do we have to check that? We have a currentActivity... cdobler, Oct'10
-			boolean found = ((DefaultPersonDriverAgent) personAgent).getMobsim().getActivityEndsList().contains(this);
+			boolean found = ((DefaultPersonDriverAgent) withinDayAgent).getMobsim().getActivityEndsList().contains(this);
 			
 			// If the agent is not in the activityEndsList return without doing anything else.
 			if (!found) return false;
 			
-			double oldDepartureTime = personAgent.getDepartureTimeForLeg();
+			double oldDepartureTime = withinDayAgent.getDepartureTimeForLeg();
 		
-			((ExperimentalBasicWithindayAgent) personAgent).calculateDepartureTime(currentActivity);
-			double newDepartureTime = personAgent.getDepartureTimeForLeg();
-			((DefaultPersonDriverAgent) personAgent).getMobsim().rescheduleActivityEnd(personAgent, oldDepartureTime, newDepartureTime);
+			((ExperimentalBasicWithindayAgent) withinDayAgent).calculateDepartureTime(currentActivity);
+			double newDepartureTime = withinDayAgent.getDepartureTimeForLeg();
+			((DefaultPersonDriverAgent) withinDayAgent).getMobsim().rescheduleActivityEnd(withinDayAgent, oldDepartureTime, newDepartureTime);
 			return true;
 		}
 		else {

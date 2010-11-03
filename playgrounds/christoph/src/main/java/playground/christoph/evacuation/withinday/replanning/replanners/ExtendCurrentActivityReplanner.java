@@ -25,11 +25,11 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.ptproject.qsim.agents.DefaultPersonDriverAgent;
+import org.matsim.ptproject.qsim.agents.WithinDayAgent;
 
 import playground.christoph.withinday.mobsim.WithinDayPersonAgent;
 import playground.christoph.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
@@ -49,15 +49,15 @@ public class ExtendCurrentActivityReplanner extends WithinDayDuringActivityRepla
 	}
 	
 	@Override
-	public boolean doReplanning(PersonAgent personAgent) {		
+	public boolean doReplanning(WithinDayAgent withinDayAgent) {		
 		
 		// If we don't have a valid WithinDayPersonAgent
-		if (personAgent == null) return false;
+		if (withinDayAgent == null) return false;
 		
 		WithinDayPersonAgent withinDayPersonAgent = null;
-		if (!(personAgent instanceof WithinDayPersonAgent)) return false;
+		if (!(withinDayAgent instanceof WithinDayPersonAgent)) return false;
 		else {
-			withinDayPersonAgent = (WithinDayPersonAgent) personAgent;
+			withinDayPersonAgent = (WithinDayPersonAgent) withinDayAgent;
 		}
 	
 		PersonImpl person = (PersonImpl)withinDayPersonAgent.getPerson();
@@ -106,16 +106,16 @@ public class ExtendCurrentActivityReplanner extends WithinDayDuringActivityRepla
 		// yyyy a method getMobsim in MobimAgent would be useful here. cdobler, Oct'10
 		if (withinDayPersonAgent instanceof DefaultPersonDriverAgent) {
 			// yyyy do we have to check that? We have a currentActivity... cdobler, Oct'10
-			boolean found = ((DefaultPersonDriverAgent) personAgent).getMobsim().getActivityEndsList().contains(this);
+			boolean found = ((DefaultPersonDriverAgent) withinDayAgent).getMobsim().getActivityEndsList().contains(this);
 			
 			// If the agent is not in the activityEndsList return without doing anything else.
 			if (!found) return false;
 			
-			double oldDepartureTime = personAgent.getDepartureTimeForLeg();
+			double oldDepartureTime = withinDayAgent.getDepartureTimeForLeg();
 			
 			withinDayPersonAgent.calculateDepartureTime(currentActivity);
-			double newDepartureTime = personAgent.getDepartureTimeForLeg();
-			withinDayPersonAgent.getMobsim().rescheduleActivityEnd(personAgent, oldDepartureTime, newDepartureTime);
+			double newDepartureTime = withinDayAgent.getDepartureTimeForLeg();
+			withinDayPersonAgent.getMobsim().rescheduleActivityEnd(withinDayAgent, oldDepartureTime, newDepartureTime);
 			return true;
 		}
 		else {

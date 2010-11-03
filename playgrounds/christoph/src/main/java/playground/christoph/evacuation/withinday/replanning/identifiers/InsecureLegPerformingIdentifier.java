@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.ptproject.qsim.agents.WithinDayAgent;
 
 import playground.christoph.evacuation.config.EvacuationConfig;
 import playground.christoph.withinday.mobsim.WithinDayPersonAgent;
@@ -54,10 +55,10 @@ public class InsecureLegPerformingIdentifier extends DuringLegIdentifier {
 		this.secureDistance = secureDistance;
 	}
 	
-	public Set<PersonAgent> getAgentsToReplan(double time, Id withinDayReplannerId) {
+	public Set<WithinDayAgent> getAgentsToReplan(double time, Id withinDayReplannerId) {
 		
 		List<PersonAgent> legPerformingAgents = linkReplanningMap.getLegPerformingAgents();
-		Set<PersonAgent> agentsToReplan = new HashSet<PersonAgent>();
+		Set<WithinDayAgent> agentsToReplan = new HashSet<WithinDayAgent>();
 		
 		for (PersonAgent personAgent : legPerformingAgents) {
 			WithinDayPersonAgent withinDayPersonAgent = (WithinDayPersonAgent) personAgent;
