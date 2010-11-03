@@ -33,7 +33,7 @@ public class CottbusMain {
 	public void runCottbus(){
 		System.err.println("here");
 		Controler controler = new Controler(config);
-		controler.setSignalsControllerListenerFactory(new JBSignalControllerListenerFactory());
+		controler.setSignalsControllerListenerFactory(new JBSignalControllerListenerFactory(controler.getSignalsControllerListenerFactory()));
 		controler.setOverwriteFiles(true);
 		controler.run();
 	}
