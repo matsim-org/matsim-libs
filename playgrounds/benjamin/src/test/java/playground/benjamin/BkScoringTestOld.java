@@ -29,7 +29,7 @@ import org.matsim.core.scoring.EventsToScore;
 import org.matsim.testcases.MatsimTestCase;
 
 import playground.benjamin.distance.BkControlerDistance;
-import playground.benjamin.old.BKickIncomeControler;
+import playground.benjamin.old.income.BKickIncomeControler;
 
 
 /**
