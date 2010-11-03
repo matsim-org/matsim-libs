@@ -7,10 +7,10 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.ptproject.qsim.agents.DefaultPersonDriverAgent;
+import org.matsim.ptproject.qsim.agents.WithinDayAgent;
 
 import playground.christoph.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
 import playground.christoph.withinday.utils.EditRoutes;
@@ -23,21 +23,21 @@ public class ReplannerYoungPeople extends WithinDayDuringLegReplanner {
 	}
 
 	@Override
-	public boolean doReplanning(PersonAgent personAgent) {
+	public boolean doReplanning(WithinDayAgent withinDayAgent) {
 		
 		// If we don't have a valid Replanner.
 		if (this.routeAlgo == null) return false;
 
 		// If we don't have a valid personAgent
-		if (personAgent == null) return false;
+		if (withinDayAgent == null) return false;
 
-		Person person = personAgent.getPerson();
+		Person person = withinDayAgent.getPerson();
 		PlanImpl selectedPlan = (PlanImpl)person.getSelectedPlan();
 
 		// If we don't have a selected plan
 		if (selectedPlan == null) return false;
 
-		Leg currentLeg = personAgent.getCurrentLeg();
+		Leg currentLeg = withinDayAgent.getCurrentLeg();
 		Activity nextActivity = selectedPlan.getNextActivity(currentLeg);
 
 		// If it is not a car Leg we don't replan it.
@@ -53,14 +53,16 @@ public class ReplannerYoungPeople extends WithinDayDuringLegReplanner {
 		 *  Replan Routes
 		 */
 		// new Route for current Leg
-		new EditRoutes().replanCurrentLegRoute(selectedPlan, currentLeg, ((DefaultPersonDriverAgent)personAgent).getCurrentNodeIndex(), routeAlgo, this.scenario.getNetwork(), time);
+		int currentLegIndex = selectedPlan.getActLegIndex(currentLeg);
+		new EditRoutes().replanCurrentLegRoute(selectedPlan, currentLegIndex, withinDayAgent.getCurrentRouteLinkIdIndex(), routeAlgo, this.scenario.getNetwork(), time);
 		
 		// new Route for next Leg
 		Leg homeLeg = selectedPlan.getNextLeg(newWorkAct);
-		new EditRoutes().replanFutureLegRoute(selectedPlan, homeLeg, routeAlgo);
+		int homeLegIndex = selectedPlan.getActLegIndex(homeLeg);
+		new EditRoutes().replanFutureLegRoute(selectedPlan, homeLegIndex, routeAlgo);
 		
 		// finally reset the cached Values of the PersonAgent - they may have changed!
-		personAgent.resetCaches();
+		withinDayAgent.resetCaches();
 		
 		return true;
 	}

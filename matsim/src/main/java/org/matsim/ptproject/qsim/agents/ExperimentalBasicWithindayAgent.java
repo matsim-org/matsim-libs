@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ExperimentalBasicWithindayPersonDriverAgent.java
+ * ExperimentalBasicWithindayAgent.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,6 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
 package org.matsim.ptproject.qsim.agents;
 
 import java.util.List;
@@ -34,7 +35,7 @@ import org.matsim.ptproject.qsim.interfaces.Mobsim;
  * of matsim. </i>
  * @author nagel
  */
-public class ExperimentalBasicWithindayAgent extends DefaultPersonDriverAgent {
+public class ExperimentalBasicWithindayAgent extends DefaultPersonDriverAgent implements WithinDayAgent {
 
 	public ExperimentalBasicWithindayAgent(Person p, Mobsim simulation) {
 		super(p, simulation);
@@ -44,10 +45,12 @@ public class ExperimentalBasicWithindayAgent extends DefaultPersonDriverAgent {
 		return this.person.getSelectedPlan().getPlanElements() ;
 	}
 
+	@Override
 	public final Integer getCurrentPlanElementIndex() {
 		return this.currentPlanElementIndex ;
 	}
 
+	@Override
 	public final Integer getCurrentRouteLinkIdIndex() {
 		return this.currentLinkIdIndex ;
 	}

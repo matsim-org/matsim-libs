@@ -6,6 +6,7 @@ import java.util.Set;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.ptproject.qsim.agents.WithinDayAgent;
 import org.matsim.ptproject.qsim.interfaces.Mobsim;
 
 import playground.christoph.withinday.replanning.identifiers.interfaces.DuringActivityIdentifier;
@@ -15,9 +16,9 @@ public class OldPeopleIdentifier extends DuringActivityIdentifier {
 	private Mobsim mobsim;
 
 	@Override
-	public Set<PersonAgent> getAgentsToReplan(double time, Id withinDayReplannerId) {
+	public Set<WithinDayAgent> getAgentsToReplan(double time, Id withinDayReplannerId) {
 
-		Set<PersonAgent> set = new HashSet<PersonAgent>();
+		Set<WithinDayAgent> set = new HashSet<WithinDayAgent>();
 
 		// don't handle the agent, if time != 12 o'clock
 		if (time != 12 * 3600) {
@@ -28,7 +29,7 @@ public class OldPeopleIdentifier extends DuringActivityIdentifier {
 		for (PersonAgent agent : mobsim.getActivityEndsList()) {
 			if (((PersonImpl) agent.getPerson()).getAge() == 56) {
 				System.out.println("found agent");
-				set.add(agent);
+				set.add((WithinDayAgent)agent);
 			}
 		}
 

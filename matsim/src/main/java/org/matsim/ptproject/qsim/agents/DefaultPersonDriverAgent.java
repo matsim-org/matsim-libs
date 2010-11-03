@@ -417,12 +417,5 @@ public class DefaultPersonDriverAgent implements PersonDriverAgent {
 	public final Person getPerson() {
 		return this.person;
 	}
-	
-	@Deprecated // yyyyyy where does this method come from?  it returns "currentLinkIdIndex+1".  But this is not a node, but
-	// the next link in the sequence!?!?!?  kai, oct'10
-	// yyyyyy move this to ExperimentalBasicWithindayAgent.  kai, oct'10
-	public final int getCurrentNodeIndex() {
-		return this.currentLinkIdIndex + 1;
-	}
 
 }
