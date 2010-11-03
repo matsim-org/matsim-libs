@@ -227,6 +227,20 @@ public final class ControlerListenerManager {
 	 * @param iteration
 	 */
 	protected void fireControlerAfterMobsimEvent(final int iteration) {
+
+		/*
+		 * cdobler, nov'10
+		 * Moved this code here from Controler.CoreControlerListener.notifyAfterMobsim(...).
+		 * It ensures, that if a ParallelEventsManager is used, all events are processed before
+		 * the AfterMobSimListeners are informed. Otherwise e.g. usage of ParallelEventsManager and
+		 * RoadPricing was not possible - MATSim crashed.
+		 * 
+		 * Another possibility might be making the EventsManager a CoreConrolerListener.
+		 * @mrieser: talk about that
+		 */
+		// prepare for finishing iteration
+		controler.events.finishProcessing();
+		
 		AfterMobsimEvent event = new AfterMobsimEvent(controler, iteration);
 		AfterMobsimListener[] listener = this.coreListenerList.getListeners(AfterMobsimListener.class);
 		for (int i = 0; i < listener.length; i++) {

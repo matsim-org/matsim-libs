@@ -1262,9 +1262,6 @@ public class Controler {
 			Controler controler = event.getControler();
 			int iteration = event.getIteration();
 
-			// prepare for finishing iteration
-			controler.events.finishProcessing();
-
 			for (EventWriter writer : this.eventWriters) {
 				writer.closeFile();
 				event.getControler().getEvents().removeHandler(writer);
