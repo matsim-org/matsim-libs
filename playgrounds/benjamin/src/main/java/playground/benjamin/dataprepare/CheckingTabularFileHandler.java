@@ -5,11 +5,11 @@ package playground.benjamin.dataprepare;
 
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 
-abstract class CheckingTabularFileHandler implements TabularFileHandler {
+public abstract class CheckingTabularFileHandler implements TabularFileHandler {
 	
-	boolean first = true;
+	protected boolean first = true;
 	
-	int numColumns = -1;
+	protected int numColumns = -1;
 	
 	protected void check(String[] row) {
 		if (first) {
