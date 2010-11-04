@@ -75,6 +75,7 @@ public class Bins {
 		DecimalFormat formatter = new DecimalFormat("0.0000");
 		String s = xLabel + " " +
 		"[interval = " + formatter.format(this.interval) + xUnit + "]" +
+		"[number of entries = " + this.entries.size() + "]" +
 		"[mean = " + formatter.format(Utils.weightedMean(values, weights)) + xUnit + "]" +
 		"[median = " + formatter.format(Utils.median(values)) + xUnit + "]" +
 		"[max = " + formatter.format(Utils.getMax(values)) + xUnit + "]";
