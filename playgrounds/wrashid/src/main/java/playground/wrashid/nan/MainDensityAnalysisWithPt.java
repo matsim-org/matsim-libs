@@ -15,7 +15,7 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
-public class MainDensityAnalysis {
+public class MainDensityAnalysisWithPt {
 
 	public static void main(String[] args) {
 		String networkFile="H:/data/experiments/Mohit/10pct ZH/output_network.xml.gz";
@@ -35,8 +35,8 @@ public class MainDensityAnalysis {
 		
 		
 		Map<Id, Link> links = NetworkReadExample.getNetworkLinks(networkFile,center,radiusInMeters);// input/set center and radius
-		InFlowInfoCollector inflowHandler=new InFlowInfoCollector(links,isOldEventFile,binSizeInSeconds); 
-		OutFlowInfoCollector outflowHandler=new OutFlowInfoCollector(links,isOldEventFile,binSizeInSeconds);// "links" makes run faster
+		InFlowInfoCollectorWithPt inflowHandler=new InFlowInfoCollectorWithPt(links,isOldEventFile,binSizeInSeconds); 
+		OutFlowInfoCollectorWithPt outflowHandler=new OutFlowInfoCollectorWithPt(links,isOldEventFile,binSizeInSeconds);// "links" makes run faster
 		
 		inflowHandler.reset(0);
 		outflowHandler.reset(0);
