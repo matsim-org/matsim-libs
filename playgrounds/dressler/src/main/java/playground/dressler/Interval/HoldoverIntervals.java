@@ -77,7 +77,7 @@ public class HoldoverIntervals extends Intervals<HoldoverInterval> implements Ed
 
 	
 	/**
-	 * Gives a list of intervals when the other end of the link can be reached.
+	 * Gives a list of intervals which can be reached through holdover.
 	 * This is supposed to work for forward or reverse search.
 	 * @param incoming Interval where we can start
 	 * @param primal indicates whether we use an original or residual edge
@@ -86,23 +86,26 @@ public class HoldoverIntervals extends Intervals<HoldoverInterval> implements Ed
 	 * @return plain old Interval
 	 */
 	public ArrayList<Interval> propagate(final Interval incoming,
-			final boolean primal, final boolean reverse, int timehorizon){
+			final boolean primal, final boolean reverse, int timehorizon) {
+		
 		if(reverse){
 			throw new RuntimeException("no propagating of holdover implemented for reverse search"); 
 		}
+
 		//TODO holdover a look till next labeled intevall
 		ArrayList<Interval> result = new ArrayList<Interval>();
 		HoldoverInterval current;
 		Interval toinsert;
-		//if(true) return result;
 
 		int low = -1;
 		int high = -1;						
 		boolean collecting = false;
-		if(primal){
-			int effectiveStart = incoming.getHighBound() ;
+		
+		if (primal) {
+			int effectiveStart = incoming.getLowBound() ;
 			int effectiveEnd = timehorizon ;
-			if(effectiveStart==effectiveEnd){
+			
+			if (effectiveStart == effectiveEnd) {
 				return result;
 			}
 			current = this.getIntervalAt(effectiveStart);
@@ -117,28 +120,30 @@ public class HoldoverIntervals extends Intervals<HoldoverInterval> implements Ed
 						low = current.getLowBound();					  
 						high = current.getHighBound();
 					}
-
 				} else {
 					if (collecting) { // finish the Interval
 						low = Math.max(low, effectiveStart);
 						high = Math.min(high, effectiveEnd);
 						if (low < high) {
 							toinsert = new Interval(low, high);					  
-							result.add(toinsert);
-							collecting =false;		
-							break;
+							result.add(toinsert);								
 						}
 						collecting = false;
 					}
+					
+					// This interval is blocked. Can we restart with the next one?
+					if (incoming.getHighBound() <= current.getHighBound()) {
+						break; // No, that's it
+					}
 				}
-				//System.out.println("current loww bound"+ current.getLowBound());
+				
 				if (this.isLast(current)) {
 					break;
 				} 
 				current = this.getIntervalAt(current.getHighBound());
 
 			}
-			//System.out.println("done looping");
+			
 			if (collecting) { // finish the Interval
 				low = Math.max(low, effectiveStart);
 				high = Math.min(high, effectiveEnd);
@@ -148,18 +153,20 @@ public class HoldoverIntervals extends Intervals<HoldoverInterval> implements Ed
 				}
 				collecting = false;
 			}
-		}else{  //TODO holdover a implement propagation residual holdover
-			int effectiveStart = incoming.getLowBound() ;
-			boolean stop =false;
+			
+		} else {  // propagate residual holdover
+			
+			int effectiveStart = incoming.getHighBound() ;			
 			int effectiveEnd = 0 ;
-			if(effectiveStart==effectiveEnd){
+			
+			if(effectiveStart == effectiveEnd){
 				return result;
 			}
-			current = this.getIntervalAt(effectiveStart-1);
+			
+			current = this.getIntervalAt(effectiveStart - 1);
+			
 			while (current.getLowBound() >= effectiveEnd) {
-				if (current.getLowBound()< incoming.getLowBound()){
-					stop=true;
-				}
+				
 				int flow = current.getFlow();
 				if (flow > 0) {				
 					if (collecting) {
@@ -171,29 +178,29 @@ public class HoldoverIntervals extends Intervals<HoldoverInterval> implements Ed
 					}
 
 				} else {
-					if(stop){
-						break;
-					}
 					if (collecting) { // finish the Interval
 						low = Math.max(low, effectiveEnd);
 						high = Math.min(high, effectiveStart);
 						if (low < high) {
 							toinsert = new Interval(low, high);					  
 							result.add(toinsert);
-							collecting =false;		
-							//break;
 						}
 						collecting = false;
 					}
+					
+					// This interval is blocked. Can we restart with the next one?
+					if (incoming.getLowBound() >= current.getLowBound()) {
+						break; // No, that's it
+					}
 				}
-				//System.out.println("current loww bound"+ current.getLowBound());
+				
 				if (current.getLowBound()==0) {
 					break;
-				} 
-				current = this.getIntervalAt(current.getLowBound()-1);
+				}				
+				current = this.getIntervalAt(current.getLowBound() - 1);
 
 			}
-			//System.out.println("done looping");
+			
 			if (collecting) { // finish the Interval
 				low = Math.max(low, effectiveEnd);
 				high = Math.min(high, effectiveStart);
@@ -240,13 +247,21 @@ public class HoldoverIntervals extends Intervals<HoldoverInterval> implements Ed
 	
 	@Override
 	public void augment(int tstart, int tstop, int gamma) {
-		if (tstart<0){
+		
+		if (tstart < 0) {
 			throw new IllegalArgumentException("negative time: "+ tstart);
 		}
-		if (tstop>this.getLast()._r){
+		if (tstop > this.getLast()._r) {
 			throw new IllegalArgumentException(" to late end of holdover:"+ tstop );
 		}
-		Pair<LinkedList<HoldoverInterval>,Pair<Integer,Integer>> relevant = getIntersecting(tstart,tstop);
+		
+		if (tstart > tstop) { // just to be safe
+			int swap = tstart;
+			tstart = tstop;
+			tstop = swap;
+		}
+		
+		Pair<LinkedList<HoldoverInterval>,Pair<Integer,Integer>> relevant = getIntersecting(tstart, tstop);
 		int lowest= relevant.second.first;
 		int highest= relevant.second.second;
 		
@@ -258,11 +273,12 @@ public class HoldoverIntervals extends Intervals<HoldoverInterval> implements Ed
 			throw new IllegalArgumentException("negative flow! flow: " + lowest + " + " +
 					gamma + " < 0");
 		}
+		
 		for(HoldoverInterval i : relevant.first){
-			if(i.getLowBound() < tstart){
-				i= splitAt(tstart);
+			if (i.getLowBound() < tstart) {
+				i = splitAt(tstart);
 			}
-			if(i.contains(tstop)){
+			if (i.contains(tstop)) {
 				splitAt(tstop);
 				i = getIntervalAt(tstop-1); // just to be safe
 			}
@@ -273,22 +289,26 @@ public class HoldoverIntervals extends Intervals<HoldoverInterval> implements Ed
 	}
 	
 	
-	private Pair<LinkedList<HoldoverInterval>,Pair<Integer,Integer>> getIntersecting(int tstart,int tstop){
+	private Pair<LinkedList<HoldoverInterval>, Pair<Integer,Integer>> getIntersecting(int tstart, int tstop) {
 		LinkedList<HoldoverInterval> list = new LinkedList<HoldoverInterval>();
 		HoldoverInterval temp = this.getIntervalAt(tstart);
+		
 		list.add(temp);
+		
 		int lowest = temp.getFlow();
-		int highest=temp.getFlow();
-		while(!this.isLast(temp)){
-			temp=this.getNext(temp);
-			if(temp._l>=tstop){
+		int highest = temp.getFlow();
+		
+		while (!this.isLast(temp)) {
+			temp = this.getNext(temp);
+			
+			if (temp._l >= tstop) {
 				break;
 			}
-			if (lowest>temp.getFlow()){
-				lowest=temp.getFlow();
+			if (lowest > temp.getFlow()) {
+				lowest = temp.getFlow();
 			}
-			if (highest<temp.getFlow()){
-				highest=temp.getFlow();
+			if (highest < temp.getFlow()) {
+				highest = temp.getFlow();
 			}
 			list.add(temp);
 		}
@@ -298,13 +318,21 @@ public class HoldoverIntervals extends Intervals<HoldoverInterval> implements Ed
 	}
 	
 	public int bottleneck(int starttime, int stoptime, boolean forward){
-		int cap =0;
+				
+		if (starttime > stoptime) { // happens iff !forward, but safe is safe ... 
+			int swap = starttime;
+			starttime = stoptime;
+			stoptime = swap;
+		}
+		
 		Pair<LinkedList<HoldoverInterval>,Pair<Integer,Integer>> relevant = getIntersecting(starttime,stoptime);
 		int lowest= relevant.second.first;
 		int highest= relevant.second.second;
-		if(forward){
+		
+		int cap = 0;
+		if(forward) {
 			cap = Math.max(0, this._capacity-highest);
-		}else{
+		} else {
 			cap = Math.max(0, lowest);
 		}
 		
@@ -314,12 +342,20 @@ public class HoldoverIntervals extends Intervals<HoldoverInterval> implements Ed
 
 	@Override
 	public void augmentUnsafe(int tstart, int tstop, int gamma) {
-		if (tstart<0){
+		
+		if (tstart < 0) {
 			throw new IllegalArgumentException("negative time: "+ tstart);
 		}
-		if (tstop>this.getLast()._r){
+		if (tstop > this.getLast()._r) {
 			throw new IllegalArgumentException(" to late end of holdover:"+ tstop );
 		}
+		
+		if (tstart > tstop) { // just to be safe
+			int swap = tstart;
+			tstart = tstop;
+			tstop = swap;
+		}
+		
 		Pair<LinkedList<HoldoverInterval>,Pair<Integer,Integer>> relevant = getIntersecting(tstart,tstop);
 		int lowest= relevant.second.first;
 		int highest= relevant.second.second;
@@ -334,7 +370,7 @@ public class HoldoverIntervals extends Intervals<HoldoverInterval> implements Ed
 		}
 		for(HoldoverInterval i : relevant.first){
 			if(i.getLowBound() < tstart){
-				i= splitAt(tstart);
+				i = splitAt(tstart);
 			}
 			if(i.contains(tstop)){
 				splitAt(tstop);

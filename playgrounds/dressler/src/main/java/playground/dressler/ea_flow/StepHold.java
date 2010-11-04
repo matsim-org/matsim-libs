@@ -1,3 +1,23 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * StepHold.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.dressler.ea_flow;
 
 import org.matsim.api.core.v01.network.Node;
@@ -23,10 +43,10 @@ public class StepHold implements PathStep {
 	
 	/**
 	 * default Constructor setting the arguments when using a Link 
-	 * @param edge Link used
+	 * @param node Node where we use holdover
 	 * @param startTime starting time
-	 * @param arrivalTime arrival time (usually < starttime for residual links)
-	 * @param forward flag if edge is forward or backward
+	 * @param arrivalTime arrival time (is < starttime for residual holdover)
+	 * @param forward flag if holdover is forward or backward
 	 */
 	public StepHold(Node node, int startTime, int arrivalTime, boolean forward){
 		if (node == null) {
@@ -49,14 +69,11 @@ public class StepHold implements PathStep {
 	@Override
 	public PathStep copyShiftedToStart(int newStart) {
 	    int shift = newStart - this.startTime;
-	  //TODO holdover z repair shifted to arrival
-		return new StepHold(this.node, newStart, this.arrivalTime + shift, this.forward); 
+		return new StepHold(this.node, newStart, this.arrivalTime, this.forward); 
 	}
 	
 	@Override
 	public PathStep copyShiftedToArrival(int newArrival) {
-		//int shift = newArrival - this.arrivalTime;
-		//TODO holdover done repair shifted to arrival 
 		return new StepHold(this.node, this.startTime , newArrival, this.forward);
 	}
 	
@@ -156,6 +173,25 @@ public class StepHold implements PathStep {
 	public String print() {
 		String str = "hold:"+node.getId().toString()+":"+startTime+":"+arrivalTime+":"+forward;
 		return str;
+	}
+	
+	/**
+	 * Method returning a String representation of the StepEdge
+	 */
+	@Override
+	public String toString(){
+		String s;
+
+		s = this.startTime + " hold @ ";
+		
+		s += node.getId().toString() + " ";
+
+		s +=  this.arrivalTime;
+		
+		if (!this.forward) {
+			s += " backwards";
+		}
+		return s;
 	}
 
 }

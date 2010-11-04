@@ -175,35 +175,6 @@ public class BellmanFordIntervalBased {
 	}
 	
 	
-	// Comparator needs total order!!!
-	class TaskComparator implements Comparator<BFTask> {
-		public int compare(BFTask first, BFTask second) {
-			if (first.time < second.time) return -1; 
-			if (first.time > second.time) return 1;
-
-			// Important! PriorityQueue assumes that compare = 0 implies the same object ...
-			// The following is just to make that work ...
-			if (first.ival == null && second.ival != null) return -1;
-			if (first.ival != null && second.ival == null) return 1;
-
-			if (first.ival.getLowBound() < second.ival.getLowBound()) return -1;
-			if (first.ival.getLowBound() > second.ival.getLowBound()) return 1;
-			
-			if (first.ival.getHighBound() < second.ival.getHighBound()) return -1;
-			if (first.ival.getHighBound() > second.ival.getHighBound()) return 1;
-			
-			if (first.node.priority() < second.node.priority()) return -1;
-			if (first.node.priority() > second.node.priority()) return 1;
-			
-			// false < true
-			if (!first.reverse && second.reverse) return -1;
-			if (first.reverse && !second.reverse) return 1;
-
-			return first.node.getRealNode().getId().compareTo(second.node.getRealNode().getId());
-
-		}
-	}
-		
 	
 	/**
 	 * refreshes all _labels and _sourcelabels before one run of the algorithm
@@ -298,7 +269,7 @@ public class BellmanFordIntervalBased {
 	 * @return shortest TimeExpandedPath from one active source to the sink if it exists
 	 */
 	List<TimeExpandedPath> constructRoutesForward() throws BFException {
-		
+				
 		if (_debug > 0) {
 		  System.out.println("Constructing routes ...");
 		}
@@ -415,35 +386,52 @@ public class BellmanFordIntervalBased {
 				pred = toLabel.getPredecessor();
 
 				while (pred != null) {
-					pred = pred.copyShiftedToArrival(toTime);
+					
+					// sadly, we treat Holdover differently, because it cannot be shifted properly
+					if (pred instanceof StepHold) {
+						// could probably recycle toLabel from last iteration ...
+						VertexInterval tempi = this._labels.get(toNode).getIntervalAt(toTime);
+						
+						if (pred.getForward()) {
+							// set the right arrival time, does not change start time for holdover
+							pred = pred.copyShiftedToArrival(toTime);
 
+							// go back to just before the label that was reached by holdover														
+							toTime = tempi.getLowBound() - 1;
+							
+							// set the right start time, does not change arrival time for holdover
+							pred = pred.copyShiftedToStart(toTime);					
+						} else {
+							pred = pred.copyShiftedToArrival(toTime);
+							
+							// go forward to the next label
+							toTime = tempi.getHighBound();
+							
+							// set the right start time, does not change arrival time for holdover
+							pred = pred.copyShiftedToStart(toTime);						
+						}
+					} else {
+						pred = pred.copyShiftedToArrival(toTime);
+					}
+					
 					TEP.prepend(pred);			
 
 					toNode = pred.getStartNode().getRealNode();
 					toTime = pred.getStartTime();
 					//TEP.setStartTime(toTime); // really startTime
 
-					if (pred instanceof StepEdge) {			  		
+					if (pred instanceof StepEdge || pred instanceof StepHold) {			  		
 						toLabel = this._labels.get(toNode).getIntervalAt(toTime);			 
 					} else if (pred instanceof StepSourceFlow) {
 						if (pred.getForward()) {
 							toLabel = this._sourcelabels.get(toNode);				  
 						} else {
 							toLabel = this._labels.get(toNode).getIntervalAt(toTime);
-						}
-
-					}else if (pred instanceof StepHold) {
-						if (pred.getForward()) {
-							toLabel = this._labels.get(toNode).getIntervalAt(toTime);
-							//TODO holdover done construct Routes
-							
-						}else{
-							toLabel = this._labels.get(toNode).getIntervalAt(toTime);
-							toLabel = this._labels.get(toNode).getIntervalAt(toLabel.getHighBound());
-						}
+						}					
 					} else {
 						throw new RuntimeException("Unknown instance of PathStep in ConstructRoutes()");
 					}
+
 					pred = toLabel.getPredecessor();
 
 				}
@@ -452,7 +440,7 @@ public class BellmanFordIntervalBased {
 				result.add(TEP);
 			}
 		}
-		System.out.println(result.size());
+		
 		return result;
 	}
 	
@@ -809,33 +797,51 @@ public class BellmanFordIntervalBased {
 		}
 			
 		TaskQueue queue = new SimpleTaskQueue();
-		if(this._settings.useHoldover){
-			int max =inter.getHighBound();
+		
+		if (this._settings.useHoldover) {
+			int max = inter.getHighBound();
 			int min = inter.getLowBound();
-			ArrayList<VertexInterval> changed = relabelHoldover(v, inter,true,false, this._settings.TimeHorizon);
-			if(changed!=null){
-				for(VertexInterval changedinterval : changed){
-					if(changedinterval.getHighBound()>max){
-						max=changedinterval.getHighBound();
+			
+			ArrayList<VertexInterval> changed; 
+			
+			// scan holdover forward
+			changed = relabelHoldover(v, inter, true, false, this._settings.TimeHorizon);
+			
+			if (changed != null) {
+				for (VertexInterval changedinterval : changed) {
+					
+					changedinterval.setScanned(true); // we will do this now
+					
+					if (changedinterval.getHighBound() > max) {
+						max = changedinterval.getHighBound();
 					}
 					//queue.add(new BFTask(new VirtualNormalNode(v, 0), changedinterval, false));
 				}
 			}
-			changed = relabelHoldover(v, inter,false,false, this._settings.TimeHorizon);
-			if(changed!=null){
-				for(VertexInterval changedinterval : changed){
-					if(changedinterval.getLowBound()<min){
-						min=changedinterval.getLowBound();
+			
+			// scan holdover backward
+			changed = relabelHoldover(v, inter, false, false, this._settings.TimeHorizon);
+			
+			if (changed != null) {
+				for (VertexInterval changedinterval : changed) {
+					
+					changedinterval.setScanned(true); // we will do this now
+					
+					if (changedinterval.getLowBound() < min) {
+						min = changedinterval.getLowBound();
 					}
 					//queue.add(new BFTask(new VirtualNormalNode(v, 0), changedinterval, false));
 				}
 			}
-			if(inter.getLowBound()!=min||inter.getHighBound()!=max){
+			
+			if (inter.getLowBound() != min || inter.getHighBound() != max) {
 				Interval tempinter = new Interval(min,max);
-				System.out.println(inter+" replaced by "+ tempinter);
+				//System.out.println(inter + " replaced by " + tempinter);
+				//System.out.println(this._labels.get(v));
 				inter = tempinter;
 			}
 		}
+		
 		// visit neighbors
 		// link is outgoing edge of v => forward edge
 		for (Link link : v.getOutLinks().values()) {				
@@ -894,7 +900,6 @@ public class BellmanFordIntervalBased {
 		EdgeFlowI flowover = this._flow.getHoldover(v);
 		ArrayList<VertexInterval> changed;
 
-
 		ArrayList<Interval> arrive;
 
 		VertexInterval arriveProperties = new VertexInterval();
@@ -902,28 +907,20 @@ public class BellmanFordIntervalBased {
 
 		if (!reverse) {
 
-			// Create predecessor. It is not shifted correctly.
+			// Create predecessor. It is not shifted correctly. Just the information holdover (and original) should be enough, though.
 			PathStep pred;
 			if (original) {
 				pred = new StepHold(v, inter.getHighBound()-1, inter.getHighBound(), original);
 			}else{
 				pred = new StepHold(v, inter.getLowBound(), inter.getLowBound()-1, original);
 			}
-			//FIXME holdover may be incorrect build correct preds
+
 			arriveProperties.setPredecessor(pred);
 		} else {
 			if(reverse){
 				throw new RuntimeException("no propagating of holdover implemented for reverse search"); 
 			}
 			//TODO holdover z implement reverse relabel
-			/*// Create successor. It is not shifted correctly.			
-			PathStep succ;
-			if (original) {
-				succ = new StepEdge(over, 0, this._settings.getLength(over), original);
-			} else {
-				succ = new StepEdge(over, this._settings.getLength(over), 0, original);				
-			}
-			arriveProperties.setSuccessor(succ);*/
 		}
 
 
@@ -931,14 +928,10 @@ public class BellmanFordIntervalBased {
 		arrive = flowover.propagate(inter, original, reverse, timeHorizon);
 
 
-		if(arrive != null && !arrive.isEmpty()){
-			System.out.println("setti arrive ho"+arrive.size());
-			//FIXME holdover a causes loops
+		if (arrive != null && !arrive.isEmpty()) {
 			changed = labelto.setTrueList(arrive, arriveProperties);
-			System.out.println("done setti arrive ho");
-			return changed;
-			
-		}else{					
+			return changed;			
+		} else {					
 			return null;
 		}					
 	}
@@ -1197,10 +1190,15 @@ public class BellmanFordIntervalBased {
 		}
 		
 		// queue to save nodes we have to scan
-		//TaskComparator taskcomp = new TaskComparator();
-		//Queue<BFTask> queue = new PriorityQueue<BFTask>((1), taskcomp);
-		// DEBUG! BFS instead of Priority Queue
-		TaskQueue queue = new SimpleTaskQueue();
+		TaskQueue queue;
+		
+		if (this._settings.usePriorityQueue) {
+			// Dijsktra-like Priority Queue
+			queue = new PriorityTaskQueue();			
+		} else {
+			// simple queue for BFS
+			queue = new SimpleTaskQueue();
+		}
 
 		//set fresh labels, initialize queue
 		refreshLabelsForward(queue);
@@ -1215,7 +1213,7 @@ public class BellmanFordIntervalBased {
 		// TODO warmstart
 		
 		BFTask task;
-
+		
 		// main loop
 		int gain = 0;
 		
@@ -1227,12 +1225,9 @@ public class BellmanFordIntervalBased {
 		
 			this._roundpolls++;
 			this._totalpolls++;			
-			System.out.println("polls: " +this._totalpolls);
+			
 			// gets the first task in the queue		
-			if(this._totalpolls==5252){
-				@SuppressWarnings("unused")
-				int ahhhhh=1;
-			}
+			
 			task = queue.poll();
 			if (task == null) {
 				break;
@@ -1246,7 +1241,7 @@ public class BellmanFordIntervalBased {
 			
 			Node v = task.node.getRealNode();
 			
-			if (this._settings.isSink(v)) {
+			if (this._settings.isSink(v)) {				
 				/* keep scanning until strictly later to give more sinks a
 				 chance to be found! */
 				if (this._flow.isActiveSink(v)) {
@@ -1256,7 +1251,7 @@ public class BellmanFordIntervalBased {
 							System.out.println("Setting new cutoff time: " + cutofftime);
 						}
 					}
-				}
+				}				
 			} else if (task.node instanceof VirtualSource) {
 				// send out of source v
 				

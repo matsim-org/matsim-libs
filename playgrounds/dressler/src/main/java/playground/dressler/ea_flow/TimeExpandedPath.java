@@ -502,6 +502,14 @@ public class TimeExpandedPath {
 		this._steps.addFirst(step);
 	}
 	
+	public void removeLast() {
+		this._steps.removeLast();
+	}
+	
+	public void removeFirst() {
+		this._steps.removeFirst();
+	}
+	
 	/* Creates a new, deep copy of a TimeExpandedPath 
 	 * 
 	 */

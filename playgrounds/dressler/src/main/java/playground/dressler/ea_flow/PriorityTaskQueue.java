@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SimpleTaskQueue.java
+ * PriorityTaskQueue.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -22,13 +22,15 @@ package playground.dressler.ea_flow;
 
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.LinkedList;
+import java.util.PriorityQueue;
 
-public class SimpleTaskQueue implements TaskQueue {
-	private LinkedList<BFTask> _list;
+public class PriorityTaskQueue implements TaskQueue {
+	private PriorityQueue<BFTask> _list;
+	private TaskComparator taskcomp;
 	
-	public SimpleTaskQueue(){
-		_list= new LinkedList<BFTask>();
+	public PriorityTaskQueue(){
+		taskcomp = new TaskComparator();
+		_list = new PriorityQueue<BFTask>((1), taskcomp);
 	}
 	
 	@Override
@@ -48,10 +50,11 @@ public class SimpleTaskQueue implements TaskQueue {
 
 	@Override
 	public boolean addAll(TaskQueue tasks) {		
-		boolean result= false;
+		boolean result = false;
+		
 		for(BFTask task: tasks){
-			Boolean test=_list.add(task);
-			if(test)result=test;
+			Boolean test = _list.add(task);
+			if (test) result = test;
 		}
 		return result;
 	}

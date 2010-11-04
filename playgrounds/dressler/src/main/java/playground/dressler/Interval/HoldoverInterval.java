@@ -26,7 +26,7 @@ public class HoldoverInterval extends Interval {
 	 */
 	public HoldoverInterval(final HoldoverInterval old){
 		super(old);
-		this._flow =old._flow;
+		this._flow = old._flow;
 	}
 
 	/**
@@ -155,9 +155,9 @@ public class HoldoverInterval extends Interval {
 	 */
 	@Override
 	public HoldoverInterval splitAt(final int t){
-		Interval j =super.splitAt(t);
+		Interval j = super.splitAt(t);
 		HoldoverInterval k = new HoldoverInterval(j);
-		k._flow=this._flow;
+		k._flow = this._flow;
 		return k;
 	}
 	
@@ -181,9 +181,9 @@ public class HoldoverInterval extends Interval {
 	 */
 	public boolean equals(final HoldoverInterval  other){
 		boolean ret = false;
-		ret= super.equals(other);
-		if(ret){
-			ret= (this._flow == other._flow);
+		ret = super.equals(other);
+		if(ret) {
+			ret = (this._flow == other._flow);
 		}
 		return ret;
 	}

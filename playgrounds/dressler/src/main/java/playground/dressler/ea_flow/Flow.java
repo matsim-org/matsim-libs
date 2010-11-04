@@ -100,7 +100,7 @@ public class Flow {
 	/**
 	 * TimeExpandedTimeExpandedPath representation of flow on the network
 	 */
-	private final LinkedList<TimeExpandedPath> _TimeExpandedPaths;
+	private LinkedList<TimeExpandedPath> _TimeExpandedPaths;
 	
 	/**
 	 * stores which path uses an Edge a a given piont of time
@@ -323,7 +323,7 @@ public class Flow {
 	 * @param TimeExpandedPath
 	 * @return minimum over all unused capacities and the demand in the first node
 	 */
-	private int bottleNeckCapacity(final TimeExpandedPath TimeExpandedPath){
+	public int bottleNeckCapacity(final TimeExpandedPath TimeExpandedPath){
 		//check if first node is a source
 		Node temp;
 		temp = TimeExpandedPath.getSource();
@@ -355,9 +355,9 @@ public class Flow {
 		//go through the path edges
 		//System.out.println("augmenting path: ");
 
-		int cap;
 		for(PathStep step : TimeExpandedPath.getPathSteps()){
-
+			int cap;
+			
 			// FIXME really bad style ...
 			if (step instanceof StepEdge) {
 				StepEdge se = (StepEdge) step;
@@ -424,19 +424,20 @@ public class Flow {
 					}
 					//throw new RuntimeException("BottleNeck for residual StepSinkFlow not supported yet!");
 				} // inflow into sink is uncapped
-			}else if(step instanceof StepHold){
+			} else if (step instanceof StepHold) {
+				
 				StepHold hold = (StepHold) step;
 				Node node = hold.getStartNode().getRealNode();
-				int starttime =hold.getStartTime();
-				int stoptime =hold.getArrivalTime();
-				boolean forw = hold.getForward();
-				HoldoverIntervals intervals = (HoldoverIntervals)this._holdover.get(node);
-				cap = intervals.bottleneck(starttime, stoptime, forw);
+				
+				int starttime = hold.getStartTime();
+				int stoptime = hold.getArrivalTime();
+				
+				HoldoverIntervals intervals = (HoldoverIntervals) this._holdover.get(node);
+				cap = intervals.bottleneck(starttime, stoptime, hold.getForward());
 				if (cap < result) {
 					result = cap;
 				}
-				//TODO holdover done calculate min cap
-			}else {
+			} else {
 				throw new RuntimeException("Unsupported kind of PathStep!");
 			}
 
@@ -446,129 +447,8 @@ public class Flow {
 			}
 
 		}
-		//System.out.println(""+ result);
+		
 		return result;
-	}
-
-	/**
-	 * Simulates the bottleneck computation of the TimeExpandedPath for debugging
-	 * @param TimeExpandedPath
-	 */
-	public void displayBottleNeckCapacity(final TimeExpandedPath TimeExpandedPath){
-		System.out.println("bottleneck simulation for " + TimeExpandedPath);
-		//check if first node is a source
-		Node temp;
-		temp = TimeExpandedPath.getSource();
-		Integer demand = this._demands.get(temp);
-		if(demand == null || demand < 0){
-			throw new IllegalArgumentException("Startnode is no source " + TimeExpandedPath);
-		}
-
-		int result = demand;
-		System.out.println("demand at source " + temp.getId() + ": " + demand);
-
-		if (result == 0) {
-			// this may actually happen now that many paths are constructed that orginate
-			// in the same source (for the forward search).
-			return;
-		}
-
-		// check if the final node is a sink
-		temp = TimeExpandedPath.getSink();
-		demand = this._demands.get(temp);
-		if(demand == null || demand > 0){
-			throw new IllegalArgumentException("Endnode is no sink " + TimeExpandedPath);
-		}
-		result = Math.min(result, -demand);
-		System.out.println("demand at sink " + temp.getId() + ": " + (-demand));
-
-		if(result == 0) {
-			return;
-		}
-
-		//go through the path edges
-		//System.out.println("augmenting path: ");
-
-		int cap;
-		for(PathStep step : TimeExpandedPath.getPathSteps()){
-
-			// FIXME really bad style ...
-			if (step instanceof StepEdge) {
-				StepEdge se = (StepEdge) step;
-				Link edge = se.getEdge();
-
-				if(se.getForward()){
-					cap = this._settings.getCapacity(edge) - this._flow.get(edge).getFlowAt(se.getStartTime());
-				} else {
-					cap = this._flow.get(edge).getFlowAt(se.getArrivalTime());
-				}
-				System.out.println("step " + se + " has cap " + cap);
-				if (cap < result) {
-					result = cap;
-				}
-			} else if (step instanceof StepSourceFlow) {
-				StepSourceFlow ssf = (StepSourceFlow) step;
-				Node node  = ssf.getStartNode().getRealNode();
-
-				if (!ssf.getForward()) {
-					SourceIntervals si = this._sourceoutflow.get(node);
-					if (si == null) {
-						System.out.println("Weird. Source of StepSourceFlow has no sourceoutflow!");
-						return;
-					} else {
-						cap = si.getFlowAt(ssf.getStartTime());
-						if (cap < result) {
-							result = cap;
-						}
-						System.out.println("step " + ssf + " has cap " + cap);
-					}
-				} else {
-					System.out.println("step " + ssf + " has cap infinity");
-				}
-				/* no else, because outflow out of a source has no cap.
-				   (the demand of the original source is accounted for,
-				   demand of sources we pass through does not matter) */
-			} else if (step instanceof StepSinkFlow) {
-				StepSinkFlow ssf = (StepSinkFlow) step;
-				Node sink;
-
-				// the same node anyway ...
-				if (ssf.getForward()) {
-					sink = ssf.getArrivalNode().getRealNode();
-				} else {
-					sink = ssf.getStartNode().getRealNode();
-				}
-
-				// Flow through a sink is not capped by the demand of the sink.
-				// The final destination was already checked in the beginning.
-				if (!step.getForward()) {
-					SinkIntervals si = this._sinkflow.get(sink);
-					if (si == null) {
-						System.out.println("Weird. Sink of StepSinkFlow has no sinkflow!");
-						return;
-					} else {
-						cap = si.getFlowAt(ssf.getArrivalTime());
-						if (cap < result) {
-							result = cap;
-						}
-						System.out.println("step " + ssf + " has cap " + cap);
-					}
-					//throw new RuntimeException("BottleNeck for residual StepSinkFlow not supported yet!");
-				} else {
-					// inflow into sink is uncapped
-					System.out.println("step " + ssf + " has cap inifinity");
-				}
-			} else {
-				throw new RuntimeException("Unsupported kind of PathStep!");
-			}
-
-			// no need for further scanning, if this path is already useless
-			if (result == 0) {
-				return;
-			}
-
-		}
-		System.out.println("result " + result);
 	}
 
 	/**
@@ -599,6 +479,7 @@ public class Flow {
 	  if (TEP.hadToFixSourceLinks()) {
 	    System.out.println("TimeExpandedPath should start with PathEdge of type SourceOutflow! Fixed.");
 	  }
+	  
 	  TEP.setFlow(gamma);
 	  if (gamma == 0) {
 		  if (_debug > 0) {
@@ -717,18 +598,17 @@ public class Flow {
 		} else if (step instanceof StepHold) {
 			StepHold hold = (StepHold) step;
 			Node node = hold.getStartNode().getRealNode();
-			int starttime =hold.getStartTime();
-			int stoptime =hold.getArrivalTime();
-			boolean forw = hold.getForward();
-			HoldoverIntervals intervals = (HoldoverIntervals)this._holdover.get(node);
-			if (step.getForward()) {
+			
+			int starttime = hold.getStartTime();
+			int stoptime = hold.getArrivalTime();
+			
+			HoldoverIntervals intervals = (HoldoverIntervals) this._holdover.get(node);
+			if (hold.getForward()) {
 				intervals.augment(starttime, stoptime , gamma);
+			} else {
+				intervals.augment(stoptime, starttime, -gamma);
 			}
-			if (!step.getForward()) {
-				intervals.augment(stoptime, starttime , -gamma);
-			}
-			//TODO holdover done augment the step
-		}else {
+		} else {
 		
 			throw new RuntimeException("Unsupported kind of PathStep!");
 		}
@@ -2107,23 +1987,28 @@ public class Flow {
 	 */
 	public int[] arrivals(){
 		int maxtime = 0;
-		int[] temp = new int[this._timeHorizon+1];
-				
-		for (TimeExpandedPath TEP : this._TimeExpandedPaths) {			
-			int flow = TEP.getFlow();
-			int time = TEP.getArrival();
-			if (maxtime < time) {
-				maxtime = time;
-			}
-			temp[time] += flow;
-		}	 
 		
-		int[] result = new int[maxtime+1];
-		for (int i = 0; i <= maxtime; i++) {
-			result[i] = temp[i];
+		for (Node sink : this._sinks) {
+		   SinkIntervals si = this._sinkflow.get(sink);
+		   int t = 0;
+		   if (si.getLast().getFlow() > 0) {
+			   t = si.getLast().getHighBound() - 1;
+		   } else {
+			   t = si.getLast().getLowBound() - 1;
+		   }
+		   maxtime = Math.max(maxtime, t);
 		}
-		return result;
+		
+		int[] arrivals = new int[maxtime + 1];
 
+		for (Node sink : this._sinks) {
+			SinkIntervals si = this._sinkflow.get(sink);
+			for (int t = 0; t <= maxtime; t++) {
+			   arrivals[t] += si.getFlowAt(t); 
+			}
+		}
+
+		return arrivals;
 	}
 
 	/**
@@ -2523,4 +2408,16 @@ public class Flow {
 		return result;
 	}
 
+	/** @return newly constructed paths, but completely destroys this flow object
+	*/
+	public LinkedList<TimeExpandedPath> doPathDecomposition() {
+		LinkedList<TimeExpandedPath> paths = new LinkedList<TimeExpandedPath>();
+		
+		// FIXME destroys the flow!
+		Decomposer decomp = new Decomposer(this, _settings);
+				
+		this._TimeExpandedPaths = decomp.decompose(); 
+		return this._TimeExpandedPaths;
+	}
+	
 }

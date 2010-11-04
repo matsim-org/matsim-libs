@@ -53,6 +53,7 @@ public class FlowCalculationSettings {
 	/* default search settings */
 	public boolean useSinkCapacities = true;
 	public int searchAlgo = SEARCHALGO_FORWARD;
+    public boolean usePriorityQueue = false; // use a priority queue instead of simple BFS
 	public boolean useVertexCleanup = false;
 	public boolean useImplicitVertexCleanup = true; // unite vertex intervals before propagating?
 	public boolean useShadowFlow = false; // use arrays and shadow flows for storing the edge flow
@@ -67,8 +68,8 @@ public class FlowCalculationSettings {
 	public boolean useRepeatedPaths = true && !useSinkCapacities; // try to repeat paths
 	public boolean quickCutOff = false; // stop when the first path is found
 	public boolean delaySinkPropagation = false; // propagate sinks (and resulting intervals) only if the search has nothing else to do 
-	public boolean useHoldover=false; //allow  holdover at all nodes
-	public boolean useHoldoverCapacities=false;// limit holdover on each node
+	public boolean useHoldover = false; // allow holdover at all nodes
+	public boolean useHoldoverCapacities = false;// limit holdover on each node
 
 	public boolean trackUnreachableVertices = true && (searchAlgo == FlowCalculationSettings.SEARCHALGO_REVERSE);; // only works in REVERSE, wastes time otherwise
 
@@ -161,11 +162,28 @@ public class FlowCalculationSettings {
 				return false;
 			}
 		}
-		//TODO holdover check for incompatible setting no unwind paths, no backwards/mixed search no no cost
-
+		
+		if (this.useHoldover) {
+			if (this.searchAlgo != this.SEARCHALGO_FORWARD) {
+				System.out.println("Only FORWARD search works with holdover enabled!");
+				return false;
+			}
+			if (this.unfoldPaths) {
+				System.out.println("Paths cannot be unfolded on the fly with holdover enabled!");
+				return false;
+			}
+		}
+		
 		if (this.searchAlgo != this.SEARCHALGO_REVERSE && this.trackUnreachableVertices) {
 			System.out.println("TrackUnreachableVertices does not make sense with anything but REVERSE search! I will disable it now.");
 			this.trackUnreachableVertices = false;
+		}
+		
+		if (this.usePriorityQueue) {
+			if (this.searchAlgo != this.SEARCHALGO_FORWARD) {
+				System.out.println("Only FORWARD search supports the priority queue!");
+				return false;
+			}
 		}
 
 		scaleParameters();
@@ -303,8 +321,11 @@ public class FlowCalculationSettings {
 		System.out.println("Number sources: " + this._numsources + " | sinks: " + this._numsinks);
 		System.out.println("Total demand sources: " + this._totaldemandsources + " | sinks: " + this._totaldemandsinks);
 		System.out.println("Time Horizon: " + this.TimeHorizon);
+		System.out.println("Use holdover: " + this.useHoldover);
+		System.out.println(" finite holdover capacity: " + this.useHoldoverCapacities);
 		System.out.println("Timestep: " + this.timeStep);
-		System.out.println("FlowFactor: " + this.flowFactor);		
+		System.out.println("FlowFactor: " + this.flowFactor);
+		
 		System.out.println("Max Rounds: " + this.MaxRounds);
 		System.out.println("Min Travel Time : " + this.minTravelTime);
 		System.out.println("Added (raw) Travel Time : " + this.addTravelTime);
@@ -326,7 +347,8 @@ public class FlowCalculationSettings {
 		  default:
 			  System.out.println("Algorithm to use: Unkown (" + this.searchAlgo +")");
 		}
-
+		
+		System.out.println("Use PriorityQueue: " + this.usePriorityQueue);
 		System.out.println("Sinks have finite capacity: " + this.useSinkCapacities);
 
 		System.out.println("Track unreachable vertices: " + this.trackUnreachableVertices);
@@ -340,7 +362,7 @@ public class FlowCalculationSettings {
 		System.out.println("Use touched nodes hashmaps: " + this.checkTouchedNodes);
 		System.out.println("Keep paths at all: " + this.keepPaths);
 		System.out.println("Unfold stored paths: " + this.unfoldPaths);
-		System.out.println(" Remeber which Paths use an edge: "+ this.mapLinksToTEP);
+		System.out.println(" Remeber which paths use an edge: "+ this.mapLinksToTEP);
 		System.out.println("Check consistency every: " + this.checkConsistency + " rounds (0 = off)");
 		System.out.println("Garbage collection every: " + this.doGarbageCollection + " rounds (0 = off)");
 
@@ -899,7 +921,9 @@ public class FlowCalculationSettings {
 
         	for (int t = low; t < high; t++) {
         		String tmp = NameEdge(link, t, newNodeNames);
-        		System.out.println(" 0 <= " + tmp + " <= " + this.getCapacity(link));        		        		
+        		if (tmp != null) {
+        	  	  System.out.println(" 0 <= " + tmp + " <= " + this.getCapacity(link));
+        		}
         	}
         }
 

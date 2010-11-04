@@ -270,5 +270,5 @@ public class SourceIntervals extends Intervals<EdgeInterval> {
 		}
 		i.augmentUnsafe(gamma);
 	}
-
+	
 }

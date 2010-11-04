@@ -570,12 +570,9 @@ public class MultiSourceEAF {
 					String tempstr2 = "";
 
 					tempstr2 = path.toString() + "\n";
-
-					// DEBUG
-					//fluss.displayBottleNeckCapacity(path);
 					
 					int augment = fluss.augment(path);
-
+										
 					if (augment > 0) {
 						tempstr += tempstr2;
 						tempstr += "augmented " + augment + "\n";
@@ -707,7 +704,7 @@ public class MultiSourceEAF {
 		int timeStep;
 		double flowFactor;
 
-		int instance = 11;
+		int instance = 6;
 		// 1 = siouxfalls, demand 500
 		// 11 same as above only Manuel and 5s euclid
 		// 2 = swissold, demand 100
@@ -722,6 +719,7 @@ public class MultiSourceEAF {
 		// 49 = padang, v2010, with 100% plans, 10s, change events, no shelters 
 		// 421-441 same as above only Manuel
 		// 5 = probeevakuierung telefunken
+		// 6 = various debug stuff
 		// 1024 = xmas network
 		// else = custom ...
 
@@ -753,8 +751,8 @@ public class MultiSourceEAF {
 		else if (instance == 2) {
 			networkfile = "/homes/combi/Projects/ADVEST/testcases/meine_EA/swissold_network_5s.xml";
 			uniformDemands = 100;
-			timeStep = 10;
-			flowFactor = 1.0;
+			timeStep = 10; 
+			flowFactor = 1.0; 
 			sinkid = "en1";
 		} else if (instance == 3) {
 			networkfile  = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac_v20080618.xml";
@@ -858,6 +856,12 @@ public class MultiSourceEAF {
 			timeStep = 60;
 			flowFactor = 1.0;
 			sinkid = "5_Nordpol";
+		} else if (instance == 6) {
+			networkfile  = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac_v20100317.xml.gz";
+			plansfile = "/homes/combi/Projects/ADVEST/padang/plans/padang_plans_v20100317.xml.gz";
+			timeStep = 50; 
+			flowFactor = 1.0;
+			sinkid = "en1";
 		} else {
 			// custom instance
 
@@ -899,10 +903,12 @@ public class MultiSourceEAF {
 			//simplenetworkfile = "/homes/combi/dressler/V/code/meine_EA/problem.dat";
 			//simplenetworkfile = "/homes/combi/dressler/V/code/meine_EA/demo.zet.dat";
 			//simplenetworkfile = "/homes/combi/dressler/V/code/meine_EA/audimax.zet.dat";
-			//simplenetworkfile = "/homes/combi/dressler/V/code/meine_EA/otto hahn straße 14.zet.dat";
+			simplenetworkfile = "/homes/combi/dressler/V/code/meine_EA/otto hahn straße 14.zet.dat";
 			//simplenetworkfile = "/homes/combi/dressler/V/code/meine_EA/probeevakuierung.zet.dat";
 			//simplenetworkfile = "/homes/combi/dressler/V/code/meine_EA/capsinks.dat";
-			simplenetworkfile = "/homes/combi/dressler/V/code/meine_EA/padang_v2010_3_sources.dat";
+			//simplenetworkfile = "/homes/combi/dressler/V/code/meine_EA/padang_v2010_3_sources.dat";
+			
+			simplenetworkfile  = "/homes/combi/dressler/V/code/meine_EA/padang_5_10s.dat";
 			
 			uniformDemands = 100;
 
@@ -1064,8 +1070,8 @@ public class MultiSourceEAF {
 		settings.flowFactor = flowFactor; // default 1.0
 
 		// set additional parameters
-		//settings.TimeHorizon = 2700;
-		settings.MaxRounds = 300;
+		//settings.TimeHorizon = 15;
+		//settings.MaxRounds = 300;
 		//settings.checkConsistency = 1;
 		//settings.doGarbageCollection = 10; // > 0 generally not such a good idea.
 		//settings.minTravelTime = 1;
@@ -1073,20 +1079,23 @@ public class MultiSourceEAF {
 		//settings.useVertexCleanup = false;
 		settings.useImplicitVertexCleanup = true;
 		//settings.useShadowFlow = false;		
+		
 		settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_FORWARD;
 		//settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_MIXED;
 		//settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_REVERSE;
-		settings.useRepeatedPaths = false; // not compatible with costs!
+		settings.usePriorityQueue = true; // use a PriorityQueue instead of a Queue
+		
+		settings.useRepeatedPaths = true; // not compatible with costs!
 		// track unreachable vertices only works in REVERSE (with forward in between), and wastes time otherwise
 		//settings.trackUnreachableVertices = true  && (settings.searchAlgo == FlowCalculationSettings.SEARCHALGO_REVERSE);
 		//settings.sortPathsBeforeAugmenting = true;
 		settings.checkTouchedNodes = false;
-		settings.keepPaths = true; // store paths at all! This is sadly needed to compute costs & arrival pattern.
+		settings.keepPaths = true; // store paths at all
 		settings.unfoldPaths = false; // unfold stored paths into forward paths
 		settings.delaySinkPropagation = true; // propagate sinks (and resulting intervals) only if the search has nothing else to do 
 		settings.quickCutOff = false; // stop as soon as the first good path is found
 		settings.mapLinksToTEP = true; // remember which path uses an edge at a given time
-		settings.useHoldover=true;//only forward no unwind no cost
+		settings.useHoldover = true; //only forward, no cost, no unwind
 		//settings.whenAvailable = new HashMap<Link, Interval>();
 		//settings.whenAvailable.put(network.getLinks().get(new IdImpl("1")), new Interval(2,3));
 
@@ -1123,7 +1132,7 @@ public class MultiSourceEAF {
 		
 		fluss = MultiSourceEAF.calcEAFlow(settings, flowpaths);
 		
-		fluss.writePathflow(false);
+		//fluss.writePathflow(false);
 
 		/* --------- the actual work is done --------- */
 		
@@ -1148,7 +1157,52 @@ public class MultiSourceEAF {
 			}
 		}
 
+		// decompose the flow
+		Flow reconstructedFlow = new Flow(settings);
+		CPUTimer Tdecompose = new CPUTimer("Path Decomposition");
+		CPUTimer Treconstruct = new CPUTimer("Flow Reconstruction");
+		
+		Tdecompose.onoff();
+		LinkedList<TimeExpandedPath> decomp = fluss.doPathDecomposition(); 
+		Tdecompose.onoff();
+		
+		Treconstruct.onoff();
+		if( decomp !=null) {
+			System.out.println("reconstructing flow");			
+			for (TimeExpandedPath path : decomp) {
+				reconstructedFlow.augment(path,path.getFlow());
+			}
+			reconstructedFlow.cleanUp();
+		}		
+		Treconstruct.onoff();
+		
+		fluss = reconstructedFlow;
+		
+		System.out.println("== After decomposition & reconstruction ==");
+		System.out.println(Tdecompose);
+		System.out.println(Treconstruct);
+		
+		int[] arrivals2 = fluss.arrivals();
+		long totalcost2 = 0;
+		for (int i = 0; i < arrivals2.length; i++) {
+			totalcost2 += i*arrivals2[i];
+		}
 
+		System.out.println("Total cost: " + totalcost2);
+		System.out.println("Collected " + fluss.getPaths().size() + " paths.");
+
+		System.out.println(fluss.arrivalsToString());
+		System.out.println(fluss.arrivalPatternToString());
+		System.out.println("unsatisfied demands:");
+		for (Node node : fluss.getDemands().keySet()){
+			int demand = fluss.getDemands().get(node);
+			if (demand > 0) {
+				// this can be a lot of text				
+				System.out.println("node:" + node.getId().toString()+ " demand:" + demand);
+			}
+		}
+		
+		
 		if (outputplansfile != null) {
 			// fix the final link
 			HashMap<Id,Id> sinkreplacement = new HashMap<Id,Id>();

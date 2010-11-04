@@ -8,7 +8,5 @@ public interface TaskQueue extends Iterable<BFTask>{
 	boolean addAll(TaskQueue tasks);
 	boolean add(BFTask task);
 	BFTask poll();
-	
-	
 
 }
