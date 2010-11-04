@@ -5,7 +5,7 @@ import java.util.Random;
 
 public class RandomFromVarDistr {
 	
-	private long seed = 109876L;
+	private long seed = 109877L;
 	private Random rnd;
 	
 	public RandomFromVarDistr() {
