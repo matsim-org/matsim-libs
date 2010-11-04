@@ -63,7 +63,7 @@ private String config = JbBaPaths.BASIMW+"/scenario-lsa/cottbusConfig.xml";
 		SignalsData signalsData = signalsLoader.loadSignalsData();
 
 		FromDataBuilder builder = new FromDataBuilder(signalsData, events);
-		JbSignalBuilder jbBuilder = new JbSignalBuilder(signalsData, builder);
+		JbSignalBuilder jbBuilder = new JbSignalBuilder(signalsData, builder, null);
 		SignalSystemsManager manager = jbBuilder.createAndInitializeSignalSystemsManager();
 		SignalEngine engine = new QSimSignalEngine(manager);
 		return engine;

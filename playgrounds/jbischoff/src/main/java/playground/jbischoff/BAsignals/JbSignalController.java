@@ -109,6 +109,7 @@ public class JbSignalController implements SignalController {
 
 	@Override
 	public void updateState(double timeSeconds) {
+		
 		this.checkActivePlan();
 		int currentSecondinPlan = ((int) (timeSeconds) % this.activePlan
 				.getCylce());

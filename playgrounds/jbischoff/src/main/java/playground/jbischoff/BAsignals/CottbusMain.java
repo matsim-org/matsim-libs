@@ -19,7 +19,15 @@
  * *********************************************************************** */
 package playground.jbischoff.BAsignals;
 
+import org.jfree.util.Log;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.events.ShutdownEvent;
+import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.controler.listener.ShutdownListener;
+
+import playground.dgrether.signalsystems.DgGreenSplitPerIterationGraph;
 
 
 /**
@@ -32,8 +40,19 @@ public class CottbusMain {
 	
 	public void runCottbus(){
 		System.err.println("here");
+		
 		Controler controler = new Controler(config);
-		controler.setSignalsControllerListenerFactory(new JBSignalControllerListenerFactory(controler.getSignalsControllerListenerFactory()));
+		controler.addControlerListener((new IterationEndsListener() {
+			
+			
+			@Override
+			public void notifyIterationEnds(IterationEndsEvent event) {
+				Log.info("Agents that passed an adaptive signal system at least once: ");
+				
+			}}));
+
+		JBSignalControllerListenerFactory fact = new JBSignalControllerListenerFactory(controler.getSignalsControllerListenerFactory());
+		controler.setSignalsControllerListenerFactory(fact);
 		controler.setOverwriteFiles(true);
 		controler.run();
 	}

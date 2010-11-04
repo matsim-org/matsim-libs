@@ -42,20 +42,23 @@ public class JbSignalBuilder implements SignalSystemsModelBuilder {
 	private AdaptiveControllHead adaptiveControllHead;
 	private CarsOnLaneHandler collh;
 	
-	public JbSignalBuilder(SignalsData signalsData, FromDataBuilder dataBuilder){
+	public JbSignalBuilder(SignalsData signalsData, FromDataBuilder dataBuilder, CarsOnLaneHandler carsOnLaneHandler){
 		this.dataBuilder = dataBuilder;
 		this.signalsData = signalsData;
 		this.adaptiveControllHead = new AdaptiveControllHead();
+		this.collh = carsOnLaneHandler;
 	}
 	
 	@Override
 	public SignalSystemsManager createAndInitializeSignalSystemsManager() {
-		collh = new CarsOnLaneHandler(this.adaptiveControllHead);
+//		collh = new CarsOnLaneHandler();
+		collh.setAdaptiveControllHead(this.adaptiveControllHead);
 		//1.) SignalSystemsManager
 		SignalSystemsManager manager = dataBuilder.createSignalSystemManager();
 		//2.) SignalSystems
 		dataBuilder.createAndAddSignalSystemsFromData(manager);
 		manager.getEventsManager().addHandler(collh);
+		
 		//3.) Signals then SignalGroups then SignalController
 		for (SignalSystem system : manager.getSignalSystems().values()){
 			dataBuilder.createAndAddSignals(system);
@@ -90,6 +93,10 @@ public class JbSignalBuilder implements SignalSystemsModelBuilder {
 			
 		}
 		
+	}
+
+	public CarsOnLaneHandler getCollh() {
+		return collh;
 	}
 
 

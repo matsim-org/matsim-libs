@@ -29,6 +29,8 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.events.LaneEnterEvent;
 import org.matsim.core.events.handler.LaneEnterEventHandler;
 import org.matsim.signalsystems.model.SignalSystem;
@@ -43,19 +45,20 @@ public class CarsOnLaneHandler implements LaneEnterEventHandler {
 
 //	Scenario scenario;
 	
-public CarsOnLaneHandler(AdaptiveControllHead ach){
-this.adaptiveControllHead=ach;
+public CarsOnLaneHandler(){
 this.timeStamp = new HashMap<Id,Double>();
 this.gapsAtSecond = new HashMap<Double,List<Id>>();
 this.signalSystemMap = new HashMap<Id,SignalSystem>();
 this.carsPassed = new HashSet<Id>();
+}
+public void setAdaptiveControllHead(AdaptiveControllHead ach){
+	this.adaptiveControllHead=ach;
 }
 public  void addSystem(SignalSystem system){
 	this.signalSystemMap.put(system.getId(),system);
 }
 	@Override
 	public void handleEvent(LaneEnterEvent event) {
-		
 		if (this.laneIsAdaptive(event.getLaneId())&(!event.getLaneId().toString().endsWith(".ol"))){
 			//log.info(event.getTime()+" time in l");
 			this.carsPassed.add(event.getPersonId());
@@ -113,6 +116,7 @@ private boolean laneIsAdaptive(Id laneid)
 public long getPassedAgents(){
 	return this.carsPassed.size();
 }
-	
+
+
 }
 

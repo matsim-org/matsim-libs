@@ -16,15 +16,23 @@ public class JBSignalControllerListenerFactory implements
 	
 	private static final Logger log = Logger.getLogger(JBSignalControllerListenerFactory.class);
 	private SignalsControllerListenerFactory delegate;
+	private JBSignalControllerListener jbscl;
 	
 	public JBSignalControllerListenerFactory(SignalsControllerListenerFactory signalsControllerListenerFactory){
 		this.delegate = signalsControllerListenerFactory;
+		
 	}
 	
 	@Override
 	public SignalsControllerListener createSignalsControllerListener() {
 		log.info("Using JB SignalControllerListener...");
-		return new JBSignalControllerListener(this.delegate.createSignalsControllerListener());
+		jbscl = new JBSignalControllerListener(this.delegate.createSignalsControllerListener());
+		return jbscl;
 	}
 
+
+
+	
 }
+
+
