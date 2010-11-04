@@ -53,7 +53,7 @@ public class ResizeLinksByCount3 extends AbstractResizeLinksByCount{
 			e.printStackTrace();
 		}
 		
-		ResizeLinksByCount3 r = new ResizeLinksByCount3(networkFile, counts, shortNameMap);
+		ResizeLinksByCount3 r = new ResizeLinksByCount3(networkFile, counts, shortNameMap, 1.0);
 		r.run("d:/VSP/output/osm_bb/network_resized");
 	}
 
@@ -66,8 +66,8 @@ public class ResizeLinksByCount3 extends AbstractResizeLinksByCount{
 	 * @param counts
 	 * @param shortNameMap
 	 */
-	public ResizeLinksByCount3(String networkFile, Counts counts, Map<String, String> shortNameMap){
-		super(networkFile, counts, shortNameMap);
+	public ResizeLinksByCount3(String networkFile, Counts counts, Map<String, String> shortNameMap, Double scaleFactor){
+		super(networkFile, counts, shortNameMap, scaleFactor);
 	}
 	
 	/**
@@ -75,8 +75,8 @@ public class ResizeLinksByCount3 extends AbstractResizeLinksByCount{
 	 * @param networkFile
 	 * @param counts
 	 */
-	public ResizeLinksByCount3(String networkFile, Counts counts){
-		super(networkFile, counts, null);
+	public ResizeLinksByCount3(String networkFile, Counts counts, Double scaleFactor){
+		super(networkFile, counts, null, scaleFactor);
 		this.countsMatched = true;
 	}
 		

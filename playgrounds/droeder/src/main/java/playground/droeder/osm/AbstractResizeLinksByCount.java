@@ -33,7 +33,9 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkWriter;
+import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
+import org.matsim.counts.Volume;
 
 import playground.droeder.gis.DaShapeWriter;
 
@@ -59,22 +61,29 @@ public abstract class AbstractResizeLinksByCount {
 	private Map<Id, SortedMap<String, String>> modAttributes = null;
 	private Map<Id, Link> unmodifiedLinks2shp = null;
 	private Map<Id, SortedMap<String, String>> unmodAttributes = null;
+	private Double scaleFactor = null;
 		
-	public AbstractResizeLinksByCount(String networkFile, Counts counts, Map<String, String> shortNameMap){
+	public AbstractResizeLinksByCount(String networkFile, Counts counts, Map<String, String> shortNameMap, Double scaleFactor){
 		this.netFile = networkFile;
 		this.oldCounts = counts;
+		this.scaleFactor = scaleFactor;
+		this.scaleCounts();
 		this.shortNameMap = shortNameMap;
 		this.prepareNetwork(netFile);
 	}
 	
+	
 	public void run (String outFile){
-		this.outFile = outFile;
+		this.outFile = outFile + "_" + String.valueOf(this.scaleFactor);
+
 		this.resize();
 		this.writeNewNetwork();
 
 		writeModifiedLinks2Shape();
 		writeUnmodifiedLinks2Shape();
 	}
+	
+	
 
 	private void prepareNetwork(String netFile2) {
 		log.info("Start reading network!");
@@ -87,6 +96,16 @@ public abstract class AbstractResizeLinksByCount {
 		this.oldNet = oldScenario.getNetwork();
 	}
 
+		
+	private void scaleCounts(){
+		for(Count c : this.oldCounts.getCounts().values()){
+			for(Volume v : c.getVolumes().values()){
+				v.setValue(v.getValue() * this.scaleFactor);
+			}
+		}
+	}
+	
+	
 	protected abstract void resize();
 
 	
@@ -142,4 +161,5 @@ public abstract class AbstractResizeLinksByCount {
 		DaShapeWriter.writeLinks2Shape(this.outFile + "_unmodifiedLinks.shp", unmodifiedLinks2shp, unmodAttributes);
 		log.info("done...");
 	}
+	
 }

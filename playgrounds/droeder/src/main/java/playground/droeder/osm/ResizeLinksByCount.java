@@ -77,12 +77,12 @@ public class ResizeLinksByCount extends AbstractResizeLinksByCount{
 			e.printStackTrace();
 		}
 		
-		ResizeLinksByCount r = new ResizeLinksByCount(networkFile, counts, shortNameMap);
+		ResizeLinksByCount r = new ResizeLinksByCount(networkFile, counts, shortNameMap, 1.1);
 		r.run("d:/VSP/output/osm_bb/counts_network_resized");
 	}
 	
-	public ResizeLinksByCount(String networkFile, Counts counts, Map<String, String> shortNameMap){
-		super(networkFile, counts, shortNameMap);
+	public ResizeLinksByCount(String networkFile, Counts counts, Map<String, String> shortNameMap, Double scaleFactor){
+		super(networkFile, counts, shortNameMap, scaleFactor);
 	}
 	
 	protected void resize() {
