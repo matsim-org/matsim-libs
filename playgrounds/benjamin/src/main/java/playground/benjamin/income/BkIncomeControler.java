@@ -23,20 +23,13 @@ import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.listener.ControlerListener;
 
-import playground.benjamin.income.BkIncomeControlerListener;
-
 /**
  * @author kai
  * @author benjamin
  */
-public class BkIncomeControler extends Controler{
+public class BkIncomeControler{
 
-	
 	private static Config config;
-
-	public BkIncomeControler(Config config) {
-		super(config);
-	}
 
 	public static void main(String[] args) {
 

@@ -18,18 +18,20 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.benjamin;
+package playground.benjamin.income;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.testcases.MatsimTestCase;
 
 import playground.benjamin.income.BkIncomeControler;
+import playground.benjamin.income.BkIncomeControlerListener;
 
 /**
  * Tests the routing of the BkIncomeControler
@@ -54,16 +56,12 @@ public class BkRouterTest extends MatsimTestCase {
 		config.scenario().setUseHouseholds(true);
 		config.households().setInputFile(this.getClassInputDirectory() + "households.xml");
 
-		BkIncomeControler controler = new BkIncomeControler(config);
+		Controler controler = new Controler(config);
 		controler.setCreateGraphs(false);
-		final EventHandler1 handler = new EventHandler1();
-
-		controler.addControlerListener(new StartupListener() {
-			public void notifyStartup(final StartupEvent event) {
-				event.getControler().getEvents().addHandler(handler);
-//				event.getControler().getEvents().addHandler(new LogOutputEventHandler());
-			}
-		});
+		final TestDataGatherer handler = new TestDataGatherer();
+		
+		controler.addControlerListener(new BkIncomeControlerListener());
+		controler.addControlerListener(new TestDataStartupListener(handler));
 
 		controler.run();
 		assertTrue("Person 2 should be routed on link 3", handler.link3Ok);
@@ -71,7 +69,20 @@ public class BkRouterTest extends MatsimTestCase {
 		assertTrue("Person 3 should be routed on link 10", handler.link10Ok);
 	}
 
-	private static class EventHandler1 implements LinkEnterEventHandler{
+	private final class TestDataStartupListener implements StartupListener {
+		private final TestDataGatherer handler;
+
+		private TestDataStartupListener(TestDataGatherer handler) {
+			this.handler = handler;
+		}
+
+		public void notifyStartup(final StartupEvent event) {
+			event.getControler().getEvents().addHandler(handler);
+//				event.getControler().getEvents().addHandler(new LogOutputEventHandler());
+		}
+	}
+
+	private static class TestDataGatherer implements LinkEnterEventHandler{
 
 		boolean link3Ok = false;
 		boolean link8Ok = false;
@@ -90,7 +101,6 @@ public class BkRouterTest extends MatsimTestCase {
 			}
 		}
 		public void reset(int iteration) {}
-	
 	}
 
 	
@@ -107,9 +117,9 @@ public class BkRouterTest extends MatsimTestCase {
 		config.scenario().setUseRoadpricing(true);
 		config.roadpricing().setTollLinksFile(this.getClassInputDirectory() + "tollLinksFile.xml");
 
-		BkIncomeControler controler = new BkIncomeControler(config);
+		Controler controler = new Controler(config);
 		controler.setCreateGraphs(false);
-		final EventHandler2 handler = new EventHandler2();
+		final TestDataGathererToll handler = new TestDataGathererToll();
 
 		controler.addControlerListener(new StartupListener() {
 			public void notifyStartup(final StartupEvent event) {
@@ -122,7 +132,7 @@ public class BkRouterTest extends MatsimTestCase {
 		assertTrue("Person 1 should be routed on link 10", handler.link10Ok);
 	}
 
-	private static class EventHandler2 implements LinkEnterEventHandler{
+	private static class TestDataGathererToll implements LinkEnterEventHandler{
 
 		boolean link10Ok = false;
 
@@ -133,7 +143,5 @@ public class BkRouterTest extends MatsimTestCase {
 			}
 		}
 		public void reset(int iteration) {}
-	
 	}
-	
 }

@@ -17,11 +17,13 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin;
+package playground.benjamin.income;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.scoring.EventsToScore;
@@ -53,22 +55,24 @@ public class BkScoringTest extends MatsimTestCase {
 
 
 		// controler with new scoring function
-		final BkIncomeControler controler = new BkIncomeControler(config);
+		final Controler controler = new Controler(config);
 		controler.setCreateGraphs(false);
 		controler.setWriteEventsInterval(0);
 
-		controler.addControlerListener(new StartupListener() {
-
-			public void notifyStartup(final StartupEvent event) {
-//				double agent1LeaveHomeTime = controler.getPopulation().getPerson(id1).getPlans().get(0).getFirstActivity().getEndTime();
-//				double agent2LeaveHomeTime = controler.getPopulation().getPerson(id2).getPlans().get(0).getFirstActivity().getEndTime();
-//				controler.getEvents().addHandler(new TestSingleIterationEventHandler(agent1LeaveHomeTime, agent2LeaveHomeTime));
-				planScorer = new EventsToScore(controler.getPopulation(), controler.getScoringFunctionFactory(), controler.getConfig().charyparNagelScoring().getLearningRate());
-				controler.getEvents().addHandler(planScorer);
-			}
-		});
+		/*
+		 * The order how the listeners are added is very important! As
+		 * dependencies between different listeners exist or listeners may read
+		 * and write to common variables, the order is important. Example: The
+		 * RoadPricing-Listener modifies the scoringFunctionFactory, which in
+		 * turn is used by the PlansScoring-Listener. Note that the execution
+		 * order is contrary to the order the listeners are added to the list.
+		 */
+	//	controler.addControlerListener(new TestDataStartupListener(controler));
+		controler.addControlerListener(new BkIncomeControlerListener());
+		
 
 		controler.run();
+		checkThatScoresAreRight(controler.getScenario().getPopulation());
 		this.planScorer.finish();
 
 		//this score is calculated as follows:
@@ -90,5 +94,39 @@ public class BkScoringTest extends MatsimTestCase {
 		// using gnome gcalctool this should be 63.696801174 but it is in java 63.69790888638976 -> should be ok
 		assertEquals("Wrong score for pt agent", 63.69790888638976, this.planScorer.getAgentScore(id2), EPSILON);
 	}
+
+	/**
+	 * @param population
+	 */
+	private void checkThatScoresAreRight(Population population) {
+		assertEquals("Wrong score for car agent", 69.6185091561068, getAgentScore(population, id1), EPSILON);
+		// using gnome gcalctool this should be 63.696801174 but it is in java 63.69790888638976 -> should be ok
+		assertEquals("Wrong score for pt agent", 63.69790888638976, getAgentScore(population, id2), EPSILON);
+	}
+
+	/**
+	 * @param population 
+	 * @param id12
+	 * @return
+	 */
+	private double getAgentScore(Population population, Id id1) {
+		return population.getPersons().get(id1).getSelectedPlan().getScore();
+	}
+
+	private final class TestDataStartupListener implements StartupListener {
+			private final Controler controler;
+	
+			private TestDataStartupListener(Controler controler) {
+				this.controler = controler;
+			}
+	
+			public void notifyStartup(final StartupEvent event) {
+	//				double agent1LeaveHomeTime = controler.getPopulation().getPerson(id1).getPlans().get(0).getFirstActivity().getEndTime();
+	//				double agent2LeaveHomeTime = controler.getPopulation().getPerson(id2).getPlans().get(0).getFirstActivity().getEndTime();
+	//				controler.getEvents().addHandler(new TestSingleIterationEventHandler(agent1LeaveHomeTime, agent2LeaveHomeTime));
+				planScorer = new EventsToScore(controler.getPopulation(), controler.getScoringFunctionFactory(), controler.getConfig().charyparNagelScoring().getLearningRate());
+				controler.getEvents().addHandler(planScorer);
+			}
+		}
 
 }

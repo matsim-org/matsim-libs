@@ -55,9 +55,9 @@ public class BkIncomeControlerListener implements StartupListener {
 		new PlanCalcType().run(scenario.getPopulation());
 		
 		// this does not (yet?) work:
-		Households hh = scenario.getScenarioElement( Households.class ) ;
+		Households hh = scenario.getScenarioElement( Households.class );
 		System.err.println( "hh: " + hh ) ;
-		
+		// would be better than...
 		this.personHouseholdMapping = new PersonHouseholdMapping( ((ScenarioImpl) scenario).getHouseholds() );
 		
 		// Make sure both the scoring function and the travel cost calculator (for the routing) are configured in a consistent way!
