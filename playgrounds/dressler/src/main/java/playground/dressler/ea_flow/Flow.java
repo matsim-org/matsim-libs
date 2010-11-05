@@ -433,6 +433,8 @@ public class Flow {
 				int stoptime = hold.getArrivalTime();
 				
 				HoldoverIntervals intervals = (HoldoverIntervals) this._holdover.get(node);
+				
+				// this also adjusts the indices appropriately
 				cap = intervals.bottleneck(starttime, stoptime, hold.getForward());
 				if (cap < result) {
 					result = cap;

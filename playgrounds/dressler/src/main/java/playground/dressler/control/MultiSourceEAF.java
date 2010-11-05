@@ -428,8 +428,7 @@ public class MultiSourceEAF {
 	            }
 	        }
 			Tsearch.onoff();
-
-			
+		
 			// DEBUG
 			//System.out.println("Returned paths");
 			//System.out.println(result);
@@ -704,7 +703,7 @@ public class MultiSourceEAF {
 		int timeStep;
 		double flowFactor;
 
-		int instance = 6;
+		int instance = 5;
 		// 1 = siouxfalls, demand 500
 		// 11 same as above only Manuel and 5s euclid
 		// 2 = swissold, demand 100
@@ -1070,7 +1069,7 @@ public class MultiSourceEAF {
 		settings.flowFactor = flowFactor; // default 1.0
 
 		// set additional parameters
-		//settings.TimeHorizon = 15;
+		//settings.TimeHorizon = 55;
 		//settings.MaxRounds = 300;
 		//settings.checkConsistency = 1;
 		//settings.doGarbageCollection = 10; // > 0 generally not such a good idea.

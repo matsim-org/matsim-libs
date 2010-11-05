@@ -102,6 +102,8 @@ public class HoldoverIntervals extends Intervals<HoldoverInterval> implements Ed
 		boolean collecting = false;
 		
 		if (primal) {
+			// if t is reachable, so is t+1
+			
 			int effectiveStart = incoming.getLowBound() ;
 			int effectiveEnd = timehorizon ;
 			
@@ -114,11 +116,11 @@ public class HoldoverIntervals extends Intervals<HoldoverInterval> implements Ed
 				int flow = current.getFlow();
 				if (flow < this._capacity) {				
 					if (collecting) {
-						high = current.getHighBound();
+						high = current.getHighBound() + 1;
 					} else {
 						collecting = true;
-						low = current.getLowBound();					  
-						high = current.getHighBound();
+						low = current.getLowBound() + 1;					  
+						high = current.getHighBound() + 1;
 					}
 				} else {
 					if (collecting) { // finish the Interval
@@ -156,60 +158,66 @@ public class HoldoverIntervals extends Intervals<HoldoverInterval> implements Ed
 			
 		} else {  // propagate residual holdover
 			
-			int effectiveStart = incoming.getHighBound() ;			
-			int effectiveEnd = 0 ;
+			// Note: flow > 0 at time t implies that t is reachable from t+1
 			
-			if(effectiveStart == effectiveEnd){
-				return result;
-			}
+			int effectiveStart = incoming.getHighBound() - 1; // latest point that is really reachable			
+			int effectiveEnd = 0;
 			
-			current = this.getIntervalAt(effectiveStart - 1);
-			
-			while (current.getLowBound() >= effectiveEnd) {
+			// we may need to restart scanning within incoming ... (if there are costs etc.)
+			while (effectiveStart >= incoming.getLowBound()) {
 				
-				int flow = current.getFlow();
-				if (flow > 0) {				
-					if (collecting) {
-						low = current.getLowBound();
-					} else {
-						collecting = true;
-						low = current.getLowBound();					  
-						high = current.getHighBound();
-					}
+				if (effectiveStart <= effectiveEnd) break;
+				current = this.getIntervalAt(effectiveStart - 1); // the flow one earlier is interesting
+				
+				collecting = false;
 
-				} else {
-					if (collecting) { // finish the Interval
-						low = Math.max(low, effectiveEnd);
-						high = Math.min(high, effectiveStart);
-						if (low < high) {
-							toinsert = new Interval(low, high);					  
-							result.add(toinsert);
+				while (current.getLowBound() >= effectiveEnd) {
+
+					int flow = current.getFlow();
+					if (flow > 0) {				
+						if (collecting) {
+							low = current.getLowBound();
+						} else {
+							collecting = true;
+							low = current.getLowBound();					  
+							high = current.getHighBound(); // so highBound - 1 is reachable by holdover (capped by effectiveStart later on)
 						}
-						collecting = false;
+
+					} else {
+						if (collecting) { // finish the Interval
+							low = Math.max(low, effectiveEnd);
+							high = Math.min(high, effectiveStart);
+							if (low < high) {
+								toinsert = new Interval(low, high);					  
+								result.add(toinsert);
+							}
+							collecting = false;
+						}
+						break;
+
 					}
 					
-					// This interval is blocked. Can we restart with the next one?
-					if (incoming.getLowBound() >= current.getLowBound()) {
-						break; // No, that's it
-					}
+					if (current.getLowBound()==0) {
+						break;
+					}				
+					current = this.getIntervalAt(current.getLowBound() - 1);
 				}
-				
-				if (current.getLowBound()==0) {
-					break;
-				}				
-				current = this.getIntervalAt(current.getLowBound() - 1);
+
+				if (collecting) { // finish the Interval
+					low = Math.max(low, effectiveEnd);
+					high = Math.min(high, effectiveStart);
+					if (low < high) {
+						toinsert = new Interval(low, high);					  
+						result.add(toinsert);
+					}
+					collecting = false;;
+				}
+
+				// this is the next point where we could try again, if it is reachable
+				effectiveStart = current.getLowBound();
 
 			}
 			
-			if (collecting) { // finish the Interval
-				low = Math.max(low, effectiveEnd);
-				high = Math.min(high, effectiveStart);
-				if (low < high) {
-					toinsert = new Interval(low, high);					  
-					result.add(toinsert);
-				}
-				collecting = false;;
-			}
 		}
 		
 		return result;
@@ -317,6 +325,11 @@ public class HoldoverIntervals extends Intervals<HoldoverInterval> implements Ed
 		return result;
 	}
 	
+	
+	/*
+	 * 
+	 * @return the bottleneck for holdover travelling from starttime to stoptime (or vice versa)
+	 */
 	public int bottleneck(int starttime, int stoptime, boolean forward){
 				
 		if (starttime > stoptime) { // happens iff !forward, but safe is safe ... 
@@ -324,6 +337,13 @@ public class HoldoverIntervals extends Intervals<HoldoverInterval> implements Ed
 			starttime = stoptime;
 			stoptime = swap;
 		}
+		
+		/*if (!forward) {
+			// DEBUG
+			System.out.println("bottleneck holdover backward");
+			System.out.println("start = " + starttime + "  stop = " + stoptime);
+			System.out.println(this);
+		}*/
 		
 		Pair<LinkedList<HoldoverInterval>,Pair<Integer,Integer>> relevant = getIntersecting(starttime,stoptime);
 		int lowest= relevant.second.first;
@@ -335,6 +355,10 @@ public class HoldoverIntervals extends Intervals<HoldoverInterval> implements Ed
 		} else {
 			cap = Math.max(0, lowest);
 		}
+		
+		/*if (!forward) {
+			System.out.println("cap became: " + cap);
+		}*/
 		
 		return cap;
 	}
