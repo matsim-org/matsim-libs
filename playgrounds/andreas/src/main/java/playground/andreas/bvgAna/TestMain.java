@@ -59,6 +59,8 @@ import playground.andreas.bvgAna.level1.StopId2PersonEnterLeaveVehicleHandler;
 import playground.andreas.bvgAna.level1.VehId2DelayAtStopMap;
 import playground.andreas.bvgAna.level1.VehId2DelayAtStopMapData;
 import playground.andreas.bvgAna.level1.VehId2OccupancyHandler;
+import playground.andreas.bvgAna.level2.StopId2DelayOfLine24hMap;
+import playground.andreas.bvgAna.level2.StopId2DelayOfLine24hMapData;
 import playground.andreas.bvgAna.level2.StopId2RemainSeatedDataMap;
 import playground.andreas.bvgAna.level2.StopId2RemainSeatedDataMapData;
 import playground.andreas.bvgAna.level2.VehId2LoadMap;
@@ -150,6 +152,9 @@ public class TestMain {
 		VehId2DelayAtStopMap v2delay = new VehId2DelayAtStopMap();
 		eventsManager.addHandler(v2delay);
 		
+		StopId2DelayOfLine24hMap s224h = new StopId2DelayOfLine24hMap();
+		eventsManager.addHandler(s224h);
+		
 		try {
 			reader.parse(eventsFile);
 		} catch (SAXException e) {
@@ -189,6 +194,8 @@ public class TestMain {
 		double fS = remSeat.get(new IdImpl("812013.1")).get(68).getFractionRemainedSeated();
 		
 		TreeMap<Id, LinkedList<VehId2DelayAtStopMapData>> vdelay = v2delay.getVehId2DelayAtStopMap();
+		
+		TreeMap<Id, StopId2DelayOfLine24hMapData> s22 = s224h.getStopId2DelayOfLine24hMap();
 
 		System.out.println("Waiting");
 
