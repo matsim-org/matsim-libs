@@ -33,8 +33,18 @@ import org.matsim.ptproject.qsim.agents.AgentFactory;
  * <li>When the agent starts something (an activity, a leg), the agent requests this from the central simulation.</li>
  * <li>When something (an activity, a leg) ends, control is directly passed to the agent.</li>
  *</ul>
- *
+ *</p>
+ *<b>Design thoughts for within day replanning:</b>
+ *We assume that agents are always in some data structure (at-activity, in-leg with subdivisions waiting-for-pt-vehicle, 
+ *waiting-for-entry-into-traffic, etc.).  An agent that wants to replan herself thus needs to<ul>
+ *<li>know in which state she is (responsibility of agent implementation)
+ *</li><li>be able to re-schedule herself inside data structure (re-schedule departure; wait for other transit vehicle)
+ *</li><li>be able to remove herself from data structure <i> where that makes sense </i> and schedule something else 
+ *(an activity, a departure).
+ *</li>
+ *</ul>
  * @author nagel
+ * 
  *
  */
 public interface Mobsim extends IOSimulation, ObservableSimulation {
