@@ -873,7 +873,7 @@ class QueueLink implements VisLink {
 				}
 				int cmp = (int) (veh.getEarliestLinkExitTime()
 						+ QueueLink.this.inverseSimulatedFlowCapacity + 2.0);
-				double speed = (now > cmp) ? 0.0 : link.getFreespeed(now);
+				double speedValueBetweenZeroAndOne = (now > cmp) ? 0.0 : 1. ; // was: link.getFreespeed(now);
 				int tmpLane;
 				try {
 					tmpLane = Integer.parseInt(veh.getId().toString());
@@ -882,7 +882,8 @@ class QueueLink implements VisLink {
 				}
 				int lane = 1 + (tmpLane % NetworkUtils.getNumberOfLanesAsInt(
 						Time.UNDEFINED_TIME, link));
-				AgentSnapshotInfo position = AgentSnapshotInfoFactory.staticCreateAgentSnapshotInfo(1.0, veh.getDriver().getPerson().getId(), link, distanceOnLink, lane, speed, AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR);
+				AgentSnapshotInfo position = AgentSnapshotInfoFactory.staticCreateAgentSnapshotInfo(1.0, veh.getDriver().getPerson().getId(), 
+						link, distanceOnLink, lane, speedValueBetweenZeroAndOne, AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR);
 				positions.add(position);
 				lastDistance = distanceOnLink;
 			}
