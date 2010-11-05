@@ -20,10 +20,21 @@
 
 package playground.wrashid.PSF2.pluggable.parkingTimes;
 
-public class ParkingInterval {
+import org.matsim.api.core.v01.Id;
+
+public class ParkingIntervalInfo {
 
 	private double arrivalTime;
 	private double departureTime;
+	private Id linkId;
+	
+	public void setArrivalTime(double arrivalTime) {
+		this.arrivalTime = arrivalTime;
+	}
+
+	public void setDepartureTime(double departureTime) {
+		this.departureTime = departureTime;
+	}
 	
 	public double getArrivalTime() {
 		return arrivalTime;
@@ -31,6 +42,14 @@ public class ParkingInterval {
 	
 	public double getDepartureTime() {
 		return departureTime;
+	}
+
+	public void setLinkId(Id linkId) {
+		this.linkId = linkId;
+	}
+
+	public Id getLinkId() {
+		return linkId;
 	}
 	
 }
