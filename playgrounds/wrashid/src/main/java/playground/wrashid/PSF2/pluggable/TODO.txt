@@ -1,0 +1,3 @@
+- write tests for EnergyConsumptionPlugin and ParkingTimesPlugin
+
+=> perhaps based both on events file and controler (at least one)...

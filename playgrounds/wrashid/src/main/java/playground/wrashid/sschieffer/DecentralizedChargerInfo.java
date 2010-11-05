@@ -22,7 +22,7 @@ package playground.wrashid.sschieffer;
 
 import org.matsim.api.core.v01.Id;
 
-import playground.wrashid.PSF2.pluggable.parkingTimes.ParkingInterval;
+import playground.wrashid.PSF2.pluggable.parkingTimes.ParkingIntervalInfo;
 import playground.wrashid.lib.obj.LinkedListValueHashMap;
 
 public class DecentralizedChargerInfo {
@@ -68,7 +68,7 @@ public class DecentralizedChargerInfo {
 		return null;
 	}
 	
-	public LinkedListValueHashMap<Id, ParkingInterval> getParkingTimeIntervals(){
+	public LinkedListValueHashMap<Id, ParkingIntervalInfo> getParkingTimeIntervals(){
 		// TODO: rw
 		
 		

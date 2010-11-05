@@ -57,6 +57,11 @@ public class LinkedListValueHashMap<KeyClass,ValueClass> {
 		return hashMap.size();
 	}
 	
+	public boolean containsKey(KeyClass key){
+		return hashMap.containsKey(key);
+	}
+	
+	
 	public int getNumberOfEntriesInLongestList(){
 		int maxEntries=Integer.MIN_VALUE;
 		
