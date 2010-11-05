@@ -22,6 +22,7 @@ package playground.andreas.bvgAna;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -55,6 +56,8 @@ import playground.andreas.bvgAna.level1.AgentId2EnterLeaveVehicleEventHandler;
 import playground.andreas.bvgAna.level1.AgentId2PtTripTravelTimeMap;
 import playground.andreas.bvgAna.level1.PersonEnterLeaveVehicle2ActivityHandler;
 import playground.andreas.bvgAna.level1.StopId2PersonEnterLeaveVehicleHandler;
+import playground.andreas.bvgAna.level1.VehId2DelayAtStopMap;
+import playground.andreas.bvgAna.level1.VehId2DelayAtStopMapData;
 import playground.andreas.bvgAna.level1.VehId2OccupancyHandler;
 import playground.andreas.bvgAna.level2.StopId2RemainSeatedDataMap;
 import playground.andreas.bvgAna.level2.StopId2RemainSeatedDataMapData;
@@ -144,6 +147,9 @@ public class TestMain {
 		AgentId2PtTripTravelTimeMap a2ptleg = new AgentId2PtTripTravelTimeMap(agentIds);
 		eventsManager.addHandler(a2ptleg);
 		
+		VehId2DelayAtStopMap v2delay = new VehId2DelayAtStopMap();
+		eventsManager.addHandler(v2delay);
+		
 		try {
 			reader.parse(eventsFile);
 		} catch (SAXException e) {
@@ -181,6 +187,8 @@ public class TestMain {
 		TreeMap<Id, ArrayList<StopId2RemainSeatedDataMapData>> remSeat = remainSeated.getStopId2RemainSeatedDataMap();
 		int rS = remSeat.get(new IdImpl("812013.1")).get(68).getNumberOfAgentsRemainedSeated();
 		double fS = remSeat.get(new IdImpl("812013.1")).get(68).getFractionRemainedSeated();
+		
+		TreeMap<Id, LinkedList<VehId2DelayAtStopMapData>> vdelay = v2delay.getVehId2DelayAtStopMap();
 
 		System.out.println("Waiting");
 
