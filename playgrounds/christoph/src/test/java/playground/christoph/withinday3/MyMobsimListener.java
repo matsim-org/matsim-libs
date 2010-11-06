@@ -42,7 +42,7 @@ import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
-import org.matsim.ptproject.qsim.agents.DefaultPersonDriverAgent;
+import org.matsim.ptproject.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.ptproject.qsim.agents.ExperimentalBasicWithindayAgent;
 import org.matsim.ptproject.qsim.interfaces.Mobsim;
 import org.matsim.ptproject.qsim.interfaces.NetsimLink;

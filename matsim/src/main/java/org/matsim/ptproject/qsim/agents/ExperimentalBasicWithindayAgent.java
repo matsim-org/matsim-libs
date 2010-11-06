@@ -35,7 +35,7 @@ import org.matsim.ptproject.qsim.interfaces.Mobsim;
  * of matsim. </i>
  * @author nagel
  */
-public class ExperimentalBasicWithindayAgent extends DefaultPersonDriverAgent implements WithinDayAgent {
+public class ExperimentalBasicWithindayAgent extends PersonDriverAgentImpl implements WithinDayAgent {
 
 	public ExperimentalBasicWithindayAgent(Person p, Mobsim simulation) {
 		super(p, simulation);

@@ -50,9 +50,11 @@ import org.matsim.ptproject.qsim.qnetsimengine.QVehicle;
  * <p/>
  * Apart from "teleportToLink", I think this class is reasonable in terms of what is public and/or final and what not.
  */
-public class DefaultPersonDriverAgent implements PersonDriverAgent {
+public class PersonDriverAgentImpl implements PersonDriverAgent {
+	// renamed this from DefaultPersonDriverAgent to PersonDriverAgentImpl to mark that people should (in my view) not
+	// use this class directly.  kai, nov'10
 
-	private static final Logger log = Logger.getLogger(DefaultPersonDriverAgent.class);
+	private static final Logger log = Logger.getLogger(PersonDriverAgentImpl.class);
 
 	final Person person;
 	private QVehicle vehicle;
@@ -77,7 +79,7 @@ public class DefaultPersonDriverAgent implements PersonDriverAgent {
 	// ============================================================================================================================
 	// c'tor
 
-	public DefaultPersonDriverAgent(final Person p, final Mobsim simulation) {
+	public PersonDriverAgentImpl(final Person p, final Mobsim simulation) {
 		// yyyy this should, in my opinion, be protected since there is an interface.  kai, oct'10
 		
 		this.person = p;

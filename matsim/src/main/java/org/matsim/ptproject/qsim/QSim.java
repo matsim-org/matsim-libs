@@ -43,6 +43,7 @@ import org.matsim.core.controler.ControlerIO;
 import org.matsim.core.events.AdditionalTeleportationDepartureEvent;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.mobsim.framework.DriverAgent;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
@@ -53,7 +54,7 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.qsim.TransitQSimEngine;
 import org.matsim.ptproject.qsim.agents.AgentFactory;
 import org.matsim.ptproject.qsim.agents.DefaultAgentFactory;
-import org.matsim.ptproject.qsim.agents.DefaultPersonDriverAgent;
+import org.matsim.ptproject.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.ptproject.qsim.changeeventsengine.NetworkChangeEventsEngine;
 import org.matsim.ptproject.qsim.comparators.PersonAgentDepartureTimeComparator;
 import org.matsim.ptproject.qsim.comparators.TeleportationArrivalTimeComparator;
@@ -264,21 +265,32 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 		}
 	}
 
+	private static int vehWrnCnt = 0 ;
 	protected void createAgents() {
 		if (this.scenario.getPopulation() == null) {
 			throw new RuntimeException("No valid Population found (plans == null)");
 		}
 		VehicleType defaultVehicleType = new VehicleTypeImpl(new IdImpl("defaultVehicleType"));
 		for (Person p : this.scenario.getPopulation().getPersons().values()) {
-			PersonDriverAgent agent = this.agentFactory.createPersonAgent(p);
-			QVehicle veh = new QVehicleImpl(new VehicleImpl(agent.getPerson().getId(), defaultVehicleType));
-			//not needed in new agent class
-			veh.setDriver(agent); // this line is currently only needed for OTFVis to show parked vehicles
-			agent.setVehicle(veh);
+			PersonAgent agent = this.agentFactory.createPersonAgent(p);
+			QVehicle veh = null ;
+			if ( agent instanceof PersonDriverAgent ) {
+				if ( vehWrnCnt < 1 ) {
+					log.warn( "QSim generates default vehicles; not sure what that does to vehicle files; needs to be checked.  kai, nov'10" ) ;
+					log.warn( Gbl.ONLYONCE ) ;
+					vehWrnCnt++ ;
+				}
+				veh = new QVehicleImpl(new VehicleImpl(agent.getPerson().getId(), defaultVehicleType));
+				//not needed in new agent class
+				veh.setDriver((PersonDriverAgent)agent); // this line is currently only needed for OTFVis to show parked vehicles
+				((DriverAgent)agent).setVehicle(veh);
+			}
 			agents.add(agent);
 			if (agent.initializeAndCheckIfAlive()) {
-				NetsimLink qlink = this.netEngine.getQNetwork().getNetsimLink(agent.getCurrentLinkId());
-				qlink.addParkedVehicle(veh);
+				if ( agent instanceof PersonDriverAgent ) {
+					NetsimLink qlink = this.netEngine.getQNetwork().getNetsimLink(((PersonDriverAgent)agent).getCurrentLinkId());
+					qlink.addParkedVehicle(veh);
+				}
 			}
 		}
 
@@ -435,7 +447,7 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 
 	private void registerAgentAtActivityLocation(final PersonAgent agent) {
 		// if the "activities" engine were separate, this would need to be public.  kai, aug'10
-		if (agent instanceof DefaultPersonDriverAgent) { // yyyyyy is this necessary?
+		if (agent instanceof PersonDriverAgentImpl) { // yyyyyy is this necessary?
 //			DefaultPersonDriverAgent pa = (DefaultPersonDriverAgent) agent;
 			PlanElement pe = agent.getCurrentPlanElement();
 			if (pe instanceof Leg) {
@@ -452,7 +464,7 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 	@Override
 	public final void registerAgentAtPtWaitLocation(final PersonAgent agent) {
 		// called by TransitEngine
-		if (agent instanceof DefaultPersonDriverAgent) { // yyyy but why is this needed?  Does the driver get registered?
+		if (agent instanceof PersonDriverAgentImpl) { // yyyy but why is this needed?  Does the driver get registered?
 			Leg leg = (Leg) agent.getCurrentPlanElement() ;
 			Id linkId = leg.getRoute().getStartLinkId();
 			NetsimLink qLink = this.netEngine.getQNetwork().getNetsimLink(linkId) ;
@@ -461,7 +473,7 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 	}
 
 	private void unregisterAgentAtActivityLocation(final PersonAgent agent) {
-		if (agent instanceof DefaultPersonDriverAgent) { // yyyy but why is this needed?
+		if (agent instanceof PersonDriverAgentImpl) { // yyyy but why is this needed?
 //			DefaultPersonDriverAgent pa = (DefaultPersonDriverAgent) agent;
 			PlanElement pe = agent.getCurrentPlanElement();
 			if (pe instanceof Leg) {
@@ -478,7 +490,7 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 	@Override
 	public final void unregisterAgentAtPtWaitLocation( final PersonAgent agent ) {
 		// called by TransitDriver
-		if (agent instanceof DefaultPersonDriverAgent) { // yyyy but why is this needed?
+		if (agent instanceof PersonDriverAgentImpl) { // yyyy but why is this needed?
 			Leg leg = (Leg) agent.getCurrentPlanElement() ;
 			Id linkId = leg.getRoute().getStartLinkId();
 			NetsimLink qLink = this.netEngine.getQNetwork().getNetsimLink(linkId) ;

@@ -30,6 +30,4 @@ package org.matsim.core.mobsim.framework;
  */
 public interface MobsimAgent {
 	
-	void resetCaches() ;
-
 }

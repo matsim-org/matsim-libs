@@ -22,6 +22,7 @@ package org.matsim.pt.qsim;
 
 import java.util.List;
 
+import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
 import org.matsim.transitSchedule.api.TransitRouteStop;
@@ -31,7 +32,7 @@ import org.matsim.transitSchedule.api.TransitStopFacility;
 /**
  * @author mrieser
  */
-public interface PassengerAgent {
+public interface PassengerAgent extends MobsimAgent {
 
 	/**
 	 * Informs a passenger waiting at a stop that a transit line

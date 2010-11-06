@@ -1,6 +1,6 @@
 /* *********************************************************************** *
- * project: org.matsim.*
- * DgWithindayAgentFactory
+ * project: matsim
+ * PersonPassengerAgent.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,33 +17,15 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.satellic;
 
-import java.util.Random;
+package org.matsim.pt.qsim;
 
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.ptproject.qsim.QSim;
-import org.matsim.ptproject.qsim.agents.DefaultAgentFactory;
-import org.matsim.ptproject.qsim.agents.PersonDriverAgentImpl;
-
+import org.matsim.core.mobsim.framework.PersonAgent;
 
 /**
- * @author dgrether
+ * @author nagel
  *
  */
-public class DgWithindayAgentFactory extends DefaultAgentFactory {
+public interface PersonPassengerAgent extends PersonAgent, PassengerAgent {
 
-	private Random random;
-
-	public DgWithindayAgentFactory(QSim simulation, Random random) {
-		super(simulation);
-		this.random = random;
-	}
-
-	@Override
-	public PersonDriverAgentImpl createPersonAgent(final Person p) {
-		PersonDriverAgentImpl agent = new DgWithindayQPersonAgent(p, this.simulation, this.random);
-		return agent;
-	}
-	
 }

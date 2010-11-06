@@ -36,7 +36,7 @@ public class DefaultAgentFactory implements AgentFactory {
 	}
 
 	public PersonDriverAgent createPersonAgent(final Person p) {
-		PersonDriverAgent agent = new DefaultPersonDriverAgent(p, this.simulation);
+		PersonDriverAgent agent = new PersonDriverAgentImpl(p, this.simulation);
 		return agent;
 	}
 

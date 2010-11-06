@@ -74,7 +74,7 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.ptproject.qsim.agents.DefaultPersonDriverAgent;
+import org.matsim.ptproject.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.ptproject.qsim.interfaces.NetsimLink;
 import org.matsim.ptproject.qsim.interfaces.NetsimNetwork;
 import org.matsim.ptproject.qsim.qnetsimengine.QVehicle;
@@ -748,7 +748,7 @@ public class ParallelQSimTest extends TestCase {
 		qlink2.addParkedVehicle(vehicle2);
 
 		sim.getSimTimer().setTime(100.0);
-		DefaultPersonDriverAgent agent = new DefaultPersonDriverAgent(person, sim);
+		PersonDriverAgentImpl agent = new PersonDriverAgentImpl(person, sim);
 		agent.initializeAndCheckIfAlive();
 		agent.endActivityAndAssumeControl(100.0);
 

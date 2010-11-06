@@ -27,6 +27,8 @@ import org.matsim.core.mobsim.framework.PersonAgent;
  * further methods like resetCaches(). cdobler, Nov'10
  */
 public interface WithinDayAgent extends PersonAgent {
+	
+	public void resetCaches() ;
 
 	public Integer getCurrentPlanElementIndex();
 

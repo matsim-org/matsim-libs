@@ -35,7 +35,7 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.ptproject.qsim.agents.DefaultPersonDriverAgent;
+import org.matsim.ptproject.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.ptproject.qsim.agents.ExperimentalBasicWithindayAgent;
 import org.matsim.ptproject.qsim.agents.WithinDayAgent;
 
@@ -125,9 +125,9 @@ public class EndActivityAndEvacuateReplanner extends WithinDayDuringActivityRepl
 		// yyyy a method getMobsim in MobimAgent would be useful here. cdobler, Oct'10
 		// Intuitively I would agree.  We should think about where to set this so that, under normal circumstances,
 		// it can't become null.  kai, oct'10
-		if (withinDayAgent instanceof DefaultPersonDriverAgent) {
+		if (withinDayAgent instanceof PersonDriverAgentImpl) {
 			// yyyy do we have to check that? We have a currentActivity... cdobler, Oct'10
-			boolean found = ((DefaultPersonDriverAgent) withinDayAgent).getMobsim().getActivityEndsList().contains(this);
+			boolean found = ((PersonDriverAgentImpl) withinDayAgent).getMobsim().getActivityEndsList().contains(this);
 			
 			// If the agent is not in the activityEndsList return without doing anything else.
 			if (!found) return false;
@@ -136,7 +136,7 @@ public class EndActivityAndEvacuateReplanner extends WithinDayDuringActivityRepl
 		
 			((ExperimentalBasicWithindayAgent) withinDayAgent).calculateDepartureTime(currentActivity);
 			double newDepartureTime = withinDayAgent.getDepartureTimeForLeg();
-			((DefaultPersonDriverAgent) withinDayAgent).getMobsim().rescheduleActivityEnd(withinDayAgent, oldDepartureTime, newDepartureTime);
+			((PersonDriverAgentImpl) withinDayAgent).getMobsim().rescheduleActivityEnd(withinDayAgent, oldDepartureTime, newDepartureTime);
 			return true;
 		}
 		else {

@@ -150,9 +150,4 @@ public class FakeAgent implements PersonDriverAgent, PassengerAgent {
 		return null;
 	}
 
-	@Override
-	public void resetCaches() {
-		// as long as all instance variables are final, there is nothing to do here.  kai, oct'10
-	}
-
 }

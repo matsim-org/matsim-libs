@@ -22,7 +22,7 @@ package playground.christoph.withinday.mobsim;
 
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.ptproject.qsim.agents.DefaultAgentFactory;
-import org.matsim.ptproject.qsim.agents.DefaultPersonDriverAgent;
+import org.matsim.ptproject.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.ptproject.qsim.interfaces.Mobsim;
 
 /*
@@ -37,7 +37,7 @@ public class WithinDayAgentFactory extends DefaultAgentFactory {
 	}
 
 	@Override
-	public DefaultPersonDriverAgent createPersonAgent(final Person p) {
+	public PersonDriverAgentImpl createPersonAgent(final Person p) {
 		WithinDayPersonAgent agent = new WithinDayPersonAgent(p, this.simulation);
 		return agent;
 	}

@@ -44,7 +44,7 @@ import org.matsim.core.mobsim.framework.listeners.SimulationListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationListenerManager;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.ptproject.qsim.agents.AgentFactory;
-import org.matsim.ptproject.qsim.agents.DefaultPersonDriverAgent;
+import org.matsim.ptproject.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.ptproject.qsim.comparators.PersonAgentDepartureTimeComparator;
 import org.matsim.ptproject.qsim.helpers.AgentCounter;
 import org.matsim.ptproject.qsim.helpers.QSimTimer;
@@ -317,7 +317,7 @@ public class Sim2D implements Mobsim {
 			throw new RuntimeException("No valid Population found (plans == null)");
 		}
 		for (Person p : this.scenario.getPopulation().getPersons().values()) {
-			DefaultPersonDriverAgent agent = this.agentFactory.createPersonAgent(p);
+			PersonDriverAgentImpl agent = this.agentFactory.createPersonAgent(p);
 			this.agents.add(agent);
 			if (agent.initializeAndCheckIfAlive()) {
 				Floor floor = this.sim2DEngine.getFloor(agent.getCurrentLinkId());
@@ -434,7 +434,7 @@ public class Sim2D implements Mobsim {
 	private void registerAgentAtActivityLocation(PersonAgent agent) {
 		// if the "activities" engine were separate, this would need to be
 		// public. kai, aug'10
-		if (agent instanceof DefaultPersonDriverAgent) { // yyyyyy is this
+		if (agent instanceof PersonDriverAgentImpl) { // yyyyyy is this
 			// necessary?
 			// DefaultPersonDriverAgent pa = (DefaultPersonDriverAgent) agent;
 			PlanElement pe = agent.getCurrentPlanElement();

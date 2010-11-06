@@ -20,7 +20,7 @@
 package playground.gregor.sim2d_v2.simulation;
 
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.ptproject.qsim.agents.DefaultPersonDriverAgent;
+import org.matsim.ptproject.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.ptproject.qsim.interfaces.Mobsim;
 
 import playground.gregor.sim2d_v2.simulation.floor.Force;
@@ -31,7 +31,7 @@ import com.vividsolutions.jts.geom.Coordinate;
  * @author laemmel
  * 
  */
-public class Agent2D extends DefaultPersonDriverAgent {
+public class Agent2D extends PersonDriverAgentImpl {
 
 	private Coordinate currentPosition;
 	private final Force force = new Force();

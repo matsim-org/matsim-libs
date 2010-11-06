@@ -132,9 +132,4 @@ public class TransitDriver extends AbstractTransitDriver {
 		return this.departure;
 	}
 
-	@Override
-	public void resetCaches() {
-		// since all instance variables are final, it should be ok to leave this empty.  kai, oct'10
-	}
-
 }

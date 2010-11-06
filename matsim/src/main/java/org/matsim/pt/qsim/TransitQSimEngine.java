@@ -76,7 +76,7 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine {
 
 	protected final TransitStopAgentTracker agentTracker;
 
-	private final HashMap<Person, PersonDriverAgent> agents = new HashMap<Person, PersonDriverAgent>(100);
+	private final HashMap<Person, PersonAgent> agents = new HashMap<Person, PersonAgent>(100);
 
 	private boolean useUmlaeufe = false;
 

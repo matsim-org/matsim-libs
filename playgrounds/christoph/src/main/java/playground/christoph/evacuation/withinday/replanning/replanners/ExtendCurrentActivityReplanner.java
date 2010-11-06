@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.ptproject.qsim.agents.DefaultPersonDriverAgent;
+import org.matsim.ptproject.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.ptproject.qsim.agents.WithinDayAgent;
 
 import playground.christoph.withinday.mobsim.WithinDayPersonAgent;
@@ -104,9 +104,9 @@ public class ExtendCurrentActivityReplanner extends WithinDayDuringActivityRepla
 		 * the activityEndsList has to be updated.
 		 */
 		// yyyy a method getMobsim in MobimAgent would be useful here. cdobler, Oct'10
-		if (withinDayPersonAgent instanceof DefaultPersonDriverAgent) {
+		if (withinDayPersonAgent instanceof PersonDriverAgentImpl) {
 			// yyyy do we have to check that? We have a currentActivity... cdobler, Oct'10
-			boolean found = ((DefaultPersonDriverAgent) withinDayAgent).getMobsim().getActivityEndsList().contains(this);
+			boolean found = ((PersonDriverAgentImpl) withinDayAgent).getMobsim().getActivityEndsList().contains(this);
 			
 			// If the agent is not in the activityEndsList return without doing anything else.
 			if (!found) return false;
