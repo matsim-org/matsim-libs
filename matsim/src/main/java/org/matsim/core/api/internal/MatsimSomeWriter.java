@@ -20,7 +20,9 @@
 
 package org.matsim.core.api.internal;
 
-/**Marker interface that marks writers that do not use the syntax defined my MatsimWriter.
+/**Marker interface that attempts to mark <i>all</i> matsim writers, including those that do not use the syntax defined my 
+ * MatsimWriter.  It attempts to refer to the user interface only, which is why it does not mark the handlers, and for that
+ * reason is not marking "AbstractMatsimWriter".
  * 
  * @author nagel
  */
