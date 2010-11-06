@@ -1,10 +1,10 @@
 /* *********************************************************************** *
- * project: org.matsim.*
- * TransitAgentFactory.java
+ * project: matsim
+ * PersonDriverPassengerAgent.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -20,30 +20,16 @@
 
 package org.matsim.pt.qsim;
 
-import java.util.Map;
-
-import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.mobsim.framework.DriverAgent;
 import org.matsim.core.mobsim.framework.PersonAgent;
-import org.matsim.ptproject.qsim.agents.AgentFactory;
-import org.matsim.ptproject.qsim.interfaces.Mobsim;
+import org.matsim.core.mobsim.framework.PersonDriverAgent;
 
-
-public class TransitAgentFactory implements AgentFactory {
-
-	private final Map<Person, PersonAgent> agentsMap;
-	private final Mobsim simulation;
-
-
-	public TransitAgentFactory(final Mobsim simulation, final Map<Person, PersonAgent> agents) {
-		this.simulation = simulation ;
-		this.agentsMap = agents;
-	}
-
-	@Override
-	public PersonDriverPassengerAgent createPersonAgent(final Person p) {
-		PersonDriverPassengerAgent agent = new TransitAgent(p, this.simulation);
-		this.agentsMap.put(p, agent);
-		return agent;
-	}
+/**
+ * @author nagel
+ *
+ */
+public interface PersonDriverPassengerAgent extends PersonAgent, DriverAgent, PassengerAgent, PersonDriverAgent {
+	// note: this needs the combined interfaces (currently: PersonDriverAgent) in addition to the atomistic interfaces
+	// because of "instanceof" conditions.  kai, nov'10
 
 }

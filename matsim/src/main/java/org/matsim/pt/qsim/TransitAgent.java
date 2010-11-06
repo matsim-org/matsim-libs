@@ -36,7 +36,7 @@ import org.matsim.transitSchedule.api.TransitStopFacility;
 /**
  * @author mrieser
  */
-public class TransitAgent extends PersonDriverAgentImpl implements PersonPassengerAgent {
+public class TransitAgent extends PersonDriverAgentImpl implements PersonDriverPassengerAgent {
 
 	public TransitAgent(final Person p, final Mobsim simulation) {
 		super(p, simulation);
