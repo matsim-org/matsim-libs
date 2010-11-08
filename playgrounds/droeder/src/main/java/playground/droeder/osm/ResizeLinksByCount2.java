@@ -84,7 +84,7 @@ public class ResizeLinksByCount2 extends AbstractResizeLinksByCount{
 	 * @param counts
 	 * @param shortNameMap
 	 */
-	public ResizeLinksByCount2(String networkFile, Counts counts, Map<String, String> shortNameMap, Double scaleFactor){
+	public ResizeLinksByCount2(String networkFile, Counts counts, Map<String, String> shortNameMap, double scaleFactor){
 		super(networkFile, counts, shortNameMap, scaleFactor);
 	}
 	
@@ -93,20 +93,21 @@ public class ResizeLinksByCount2 extends AbstractResizeLinksByCount{
 	 * @param networkFile
 	 * @param counts
 	 */
-	public ResizeLinksByCount2(String networkFile, Counts counts, Double scaleFactor){
+	public ResizeLinksByCount2(String networkFile, Counts counts, double scaleFactor){
 		super(networkFile, counts, null, scaleFactor);
 		this.countsMatched = true;
 	}
 		
-	public void run(String outFile){
-		if(!countsMatched){
+	public void run(String outFileName){
+		this.outFile = outFileName;
+		if(!this.countsMatched){
 			this.preProcessCounts();
-			this.writePreprocessedCounts(outFile);
+			this.writePreprocessedCounts(this.outFile);
 		}else{
 			this.newCounts = super.oldCounts;
 		}
 		this.getCountsOnOrigLink();
-		super.run(outFile + ".xml");
+		super.run();
 		
 	}
 	
@@ -134,7 +135,7 @@ public class ResizeLinksByCount2 extends AbstractResizeLinksByCount{
 					newCount = this.newCounts.createCount(outLink, oldCount.getCsId());
 					newCount.setCoord(oldCount.getCoord());
 					for(Entry<Integer, Volume> ee : oldCount.getVolumes().entrySet()){
-						newCount.createVolume(ee.getKey(), ee.getValue().getValue());
+						newCount.createVolume(ee.getKey().intValue(), ee.getValue().getValue());
 					}
 				}
 			}
@@ -144,7 +145,7 @@ public class ResizeLinksByCount2 extends AbstractResizeLinksByCount{
 	private void getCountsOnOrigLink() {
 		this.origin2counts = new HashMap<String, List<Id>>();
 		String origId;
-		for(Id id : newCounts.getCounts().keySet()){
+		for(Id id : this.newCounts.getCounts().keySet()){
 			origId = ((LinkImpl) this.newNet.getLinks().get(id)).getOrigId();
 			if(this.origin2counts.containsKey(origId)){
 				this.origin2counts.get(origId).add(id);
@@ -155,6 +156,7 @@ public class ResizeLinksByCount2 extends AbstractResizeLinksByCount{
 		}
 	}
 
+	@Override
 	protected void resize() {
 		log.info("Start resizing...");
 		List<Id> sortedLinks = null;
@@ -253,17 +255,17 @@ public class ResizeLinksByCount2 extends AbstractResizeLinksByCount{
 	private void proportionalChanges(List<Id> sortedLinks, Id previousCount, Id actualCount) {
 		
 		if(sortedLinks.size() > 0){
-			Double prevCountVal = this.newCounts.getCount(previousCount).getMaxVolume().getValue();
-			Double countDifference = (newCounts.getCount(actualCount).getMaxVolume().getValue() - 
-					newCounts.getCount(previousCount).getMaxVolume().getValue())/
+			double prevCountVal = this.newCounts.getCount(previousCount).getMaxVolume().getValue();
+			double countDifference = (this.newCounts.getCount(actualCount).getMaxVolume().getValue() - 
+					this.newCounts.getCount(previousCount).getMaxVolume().getValue())/
 					(sortedLinks.size() + 1);
 			
 			
 			for(Id id : sortedLinks){
 				prevCountVal = prevCountVal + countDifference;
 				Link l = this.newNet.getLinks().get(id);
-				Double capPerLane = l.getCapacity() / l.getNumberOfLanes();
-				Integer nrOfNewLanes = null;
+				double capPerLane = l.getCapacity() / l.getNumberOfLanes();
+				int nrOfNewLanes;
 
 				
 				// if maxCount < cap set cap to maxCount and keep nrOfLanes
@@ -284,10 +286,10 @@ public class ResizeLinksByCount2 extends AbstractResizeLinksByCount{
 	}
 
 	private void constantChanges(List<Id> sortedLinks, Id count){
-		Double maxCount = this.newCounts.getCount(count).getMaxVolume().getValue();
+		double maxCount = this.newCounts.getCount(count).getMaxVolume().getValue();
 		Link l = this.newNet.getLinks().get(count);
-		Double capPerLane = l.getCapacity() / l.getNumberOfLanes();
-		Integer nrOfNewLanes = null;
+		double capPerLane = l.getCapacity() / l.getNumberOfLanes();
+		int nrOfNewLanes;
 
 		
 		// if maxCount < cap set cap to maxCount and keep nrOfLanes
@@ -306,9 +308,9 @@ public class ResizeLinksByCount2 extends AbstractResizeLinksByCount{
 		}
 	}
 
-	private void writePreprocessedCounts(String outFile) {
-		log.info("writing counts to " + outFile + "_counts.xml...");
-		new CountsWriter(newCounts).write(outFile + "_counts.xml");
+	private void writePreprocessedCounts(String outFileName) {
+		log.info("writing counts to " + outFileName + "_counts.xml...");
+		new CountsWriter(this.newCounts).write(outFileName + "_counts.xml");
 		log.info("wrting counts finished...");
 	}
 

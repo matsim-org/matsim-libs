@@ -49,7 +49,7 @@ public abstract class AbstractResizeLinksByCount {
 	
 	//givens
 	private String netFile;
-	private String outFile;
+	protected String outFile;
 	protected Counts oldCounts;
 	protected Map<String, String> shortNameMap;
 	
@@ -61,20 +61,21 @@ public abstract class AbstractResizeLinksByCount {
 	private Map<Id, SortedMap<String, String>> modAttributes = null;
 	private Map<Id, Link> unmodifiedLinks2shp = null;
 	private Map<Id, SortedMap<String, String>> unmodAttributes = null;
-	private Double scaleFactor = null;
+	protected double scaleFactor = 1.0;
 		
-	public AbstractResizeLinksByCount(String networkFile, Counts counts, Map<String, String> shortNameMap, Double scaleFactor){
+	public AbstractResizeLinksByCount(String networkFile, Counts counts, Map<String, String> shortNameMap, double scaleFactor){
 		this.netFile = networkFile;
 		this.oldCounts = counts;
 		this.scaleFactor = scaleFactor;
-		this.scaleCounts();
+//		this.scaleCounts();
 		this.shortNameMap = shortNameMap;
-		this.prepareNetwork(netFile);
+		this.prepareNetwork();
 	}
 	
 	
-	public void run (String outFile){
-		this.outFile = outFile + "_" + String.valueOf(this.scaleFactor);
+	public void run (){
+//		Never change a given outfile arbitrarily
+//		this.outFile = outFile + "_" + String.valueOf(this.scaleFactor);
 
 		this.resize();
 		this.writeNewNetwork();
@@ -85,7 +86,7 @@ public abstract class AbstractResizeLinksByCount {
 	
 	
 
-	private void prepareNetwork(String netFile2) {
+	private void prepareNetwork() {
 		log.info("Start reading network!");
 		Scenario oldScenario = new ScenarioImpl();
 		Scenario newScenario = new ScenarioImpl();
@@ -112,12 +113,12 @@ public abstract class AbstractResizeLinksByCount {
 
 	private void writeNewNetwork() {
 		log.info("Writing resized network to " + this.outFile + "!");
-		new NetworkWriter(this.newNet).write(this.outFile + ".xml");
+		new NetworkWriter(this.newNet).write(this.outFile);
 	}
 	
 	
 	protected void addLink2shp(Id link){
-		if(modifiedLinks2shp == null){
+		if(this.modifiedLinks2shp == null){
 			this.modifiedLinks2shp = new HashMap<Id, Link>();
 			this.modAttributes = new HashMap<Id, SortedMap<String,String>>();
 		}
@@ -134,18 +135,18 @@ public abstract class AbstractResizeLinksByCount {
 	
 	private void writeModifiedLinks2Shape(){
 		log.info("Writing modified links to *.shp...");
-		DaShapeWriter.writeLinks2Shape(this.outFile + "_modifiedLinks.shp", modifiedLinks2shp, modAttributes);
+		DaShapeWriter.writeLinks2Shape(this.outFile + "_modifiedLinks.shp", this.modifiedLinks2shp, this.modAttributes);
 		log.info("done...");
 	}
 	
 	private void writeUnmodifiedLinks2Shape(){
 		//preprocess
-		if(!(modifiedLinks2shp==null)){
+		if(!(this.modifiedLinks2shp==null)){
 			this.unmodifiedLinks2shp = new HashMap<Id, Link>();
 			this.unmodAttributes = new HashMap<Id, SortedMap<String,String>>();
 			
 			for(Link l : this.newNet.getLinks().values()){
-				if(!modifiedLinks2shp.containsKey(l.getId())){
+				if(!this.modifiedLinks2shp.containsKey(l.getId())){
 					this.unmodifiedLinks2shp .put(l.getId(), l);
 					
 					SortedMap<String, String> attrib = new TreeMap<String, String>();
@@ -155,10 +156,10 @@ public abstract class AbstractResizeLinksByCount {
 				}
 			}
 		}else{
-			unmodifiedLinks2shp =(Map<Id, Link>) this.oldNet.getLinks();
+			this.unmodifiedLinks2shp = (Map<Id, Link>) this.oldNet.getLinks();
 		}
 		log.info("Writing unmodified links to *.shp...");
-		DaShapeWriter.writeLinks2Shape(this.outFile + "_unmodifiedLinks.shp", unmodifiedLinks2shp, unmodAttributes);
+		DaShapeWriter.writeLinks2Shape(this.outFile + "_unmodifiedLinks.shp", this.unmodifiedLinks2shp, this.unmodAttributes);
 		log.info("done...");
 	}
 	

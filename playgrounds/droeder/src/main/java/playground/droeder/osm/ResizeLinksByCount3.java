@@ -1,9 +1,7 @@
 package playground.droeder.osm;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -66,7 +64,7 @@ public class ResizeLinksByCount3 extends AbstractResizeLinksByCount{
 	 * @param counts
 	 * @param shortNameMap
 	 */
-	public ResizeLinksByCount3(String networkFile, Counts counts, Map<String, String> shortNameMap, Double scaleFactor){
+	public ResizeLinksByCount3(String networkFile, Counts counts, Map<String, String> shortNameMap, double scaleFactor){
 		super(networkFile, counts, shortNameMap, scaleFactor);
 	}
 	
@@ -75,20 +73,20 @@ public class ResizeLinksByCount3 extends AbstractResizeLinksByCount{
 	 * @param networkFile
 	 * @param counts
 	 */
-	public ResizeLinksByCount3(String networkFile, Counts counts, Double scaleFactor){
+	public ResizeLinksByCount3(String networkFile, Counts counts, double scaleFactor){
 		super(networkFile, counts, null, scaleFactor);
 		this.countsMatched = true;
 	}
 		
-	public void run(String outFile){
-		if(!countsMatched){
+	public void run(String outFileName){
+		this.outFile = outFileName;
+		if(!this.countsMatched){
 			this.preProcessCounts();
-			this.writePreprocessedCounts(outFile);
+			this.writePreprocessedCounts(this.outFile);
 		}else{
 			this.newCounts = super.oldCounts;
 		}
-		super.run(outFile + ".xml");
-		
+		super.run();
 	}
 	
 	private void preProcessCounts() {
@@ -115,19 +113,20 @@ public class ResizeLinksByCount3 extends AbstractResizeLinksByCount{
 					newCount = this.newCounts.createCount(outLink, oldCount.getCsId());
 					newCount.setCoord(oldCount.getCoord());
 					for(Entry<Integer, Volume> ee : oldCount.getVolumes().entrySet()){
-						newCount.createVolume(ee.getKey(), ee.getValue().getValue());
+						newCount.createVolume(ee.getKey().intValue(), ee.getValue().getValue());
 					}
 				}
 			}
 		}
 	}
 
+	@Override
 	protected void resize() {
-		Double maxCount;
+		double maxCount;
 		String origId;
-		Integer nrOfNewLanes;
+		int nrOfNewLanes;
 		LinkImpl countLink;
-		Double capPerLane;
+		double capPerLane;
 		
 		for(Count c : this.newCounts.getCounts().values()){
 			countLink = (LinkImpl) this.newNet.getLinks().get(c.getLocId());
@@ -147,7 +146,7 @@ public class ResizeLinksByCount3 extends AbstractResizeLinksByCount{
 					}
 					System.out.print(l.getId() + " " + l.getCapacity() + " " + l.getNumberOfLanes() + " " + maxCount + " " + nrOfNewLanes);
 					System.out.println();
-					l.setCapacity(maxCount);
+					l.setCapacity(maxCount * this.scaleFactor);
 					l.setNumberOfLanes(nrOfNewLanes);
 					this.addLink2shp(l.getId());
 				}
@@ -157,9 +156,9 @@ public class ResizeLinksByCount3 extends AbstractResizeLinksByCount{
 	}
 	
 	
-	private void writePreprocessedCounts(String outFile) {
-		log.info("writing counts to " + outFile + "_counts.xml...");
-		new CountsWriter(newCounts).write(outFile + "_counts.xml");
+	private void writePreprocessedCounts(String outFileName) {
+		log.info("writing counts to " + outFileName + "_counts.xml...");
+		new CountsWriter(this.newCounts).write(outFileName + "_counts.xml");
 		log.info("done...");
 	}
 

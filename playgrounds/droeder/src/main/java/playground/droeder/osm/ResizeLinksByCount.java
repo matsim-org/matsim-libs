@@ -22,21 +22,14 @@ package playground.droeder.osm;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkWriter;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.CountsReaderMatsimV1;
@@ -78,27 +71,29 @@ public class ResizeLinksByCount extends AbstractResizeLinksByCount{
 		}
 		
 		ResizeLinksByCount r = new ResizeLinksByCount(networkFile, counts, shortNameMap, 1.1);
-		r.run("d:/VSP/output/osm_bb/counts_network_resized");
+		r.outFile = "d:/VSP/output/osm_bb/counts_network_resized";
+		r.run();
 	}
 	
-	public ResizeLinksByCount(String networkFile, Counts counts, Map<String, String> shortNameMap, Double scaleFactor){
+	public ResizeLinksByCount(String networkFile, Counts counts, Map<String, String> shortNameMap, double scaleFactor){
 		super(networkFile, counts, shortNameMap, scaleFactor);
 	}
 	
+	@Override
 	protected void resize() {
-		String origId = null;
-		Double maxCount = null;
-		Double capPerLane = null;
-		Integer nrOfNewLanes = null;
+		String origId;
+		double maxCount;
+		double capPerLane;
+		int nrOfNewLanes;
 
 		
-		for(Link l : newNet.getLinks().values()){
+		for(Link l : this.newNet.getLinks().values()){
 			
 			checkAndRegisterOrigId((LinkImpl) l);
 			
 			origId = ((LinkImpl) l).getOrigId();
 			if(this.origId2MaxCount.containsKey(origId)){
-				maxCount = origId2MaxCount.get(origId);
+				maxCount = this.origId2MaxCount.get(origId).doubleValue();
 				capPerLane = l.getCapacity() / l.getNumberOfLanes();
 				
 				// if maxCount < cap set cap to maxCount and keep nrOfLanes
@@ -129,14 +124,14 @@ public class ResizeLinksByCount extends AbstractResizeLinksByCount{
 	private void checkAndRegisterOrigId(LinkImpl l) {
 		Node node = null;
 		Count count = null;
-		Double maxCount = null;
+		double maxCount;
 		
 		node = l.getFromNode();
-		if( (!this.origId2MaxCount.containsKey( ((LinkImpl) l).getOrigId()))  && this.shortNameMap.containsKey(node.getId().toString())){
-			count = oldCounts.getCount(new IdImpl(shortNameMap.get(node.getId().toString())));
+		if( (!this.origId2MaxCount.containsKey( (l).getOrigId()))  && this.shortNameMap.containsKey(node.getId().toString())){
+			count = this.oldCounts.getCount(new IdImpl(this.shortNameMap.get(node.getId().toString())));
 			if(!(count == null)){
 				maxCount = count.getMaxVolume().getValue();
-				this.origId2MaxCount.put(((LinkImpl) l).getOrigId(), maxCount);
+				this.origId2MaxCount.put(l.getOrigId(), new Double(maxCount));
 				log.info("count " + count.getCsId() + " registered to originLink " + l.getOrigId());
 			}else{
 				log.warn("No count found for Node " + node.getId() + " but there should be one!!!");
