@@ -61,7 +61,7 @@ public class EnergyConsumptionTest extends MatsimTestCase {
 	
 	public void testLAVModel(){
 		
-		EnergyConsumptionModel energyConsumptionModel = new EnergyConsumptionModelLAV("test/input/playground/wrashid/PSF2/vehicle/energyConsumption/VehicleEnergyConsumptionRegressionTable.txt");
+		EnergyConsumptionModel energyConsumptionModel = new EnergyConsumptionModelLAV("test/input/playground/wrashid/PSF2/vehicle/energyConsumption/VehicleEnergyConsumptionRegressionTable.txt",140);
 		
 		EnergyConsumptionPlugin energyConsumptionPlugin = runWithModel(energyConsumptionModel);
 		
@@ -71,7 +71,7 @@ public class EnergyConsumptionTest extends MatsimTestCase {
 	
 	public void testPSLModel(){
 
-		EnergyConsumptionModel energyConsumptionModel = new EnergyConsumptionModelPSL();
+		EnergyConsumptionModel energyConsumptionModel = new EnergyConsumptionModelPSL(140);
 		
 		EnergyConsumptionPlugin energyConsumptionPlugin = runWithModel(energyConsumptionModel);
 		
