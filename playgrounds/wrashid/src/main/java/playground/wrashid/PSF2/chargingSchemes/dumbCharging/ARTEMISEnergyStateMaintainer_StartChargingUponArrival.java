@@ -40,7 +40,7 @@ public class ARTEMISEnergyStateMaintainer_StartChargingUponArrival extends Energ
 	@Override
 	public void processVehicleEnergyState(Vehicle vehicle, double timeSpendOnLink, Link link) {
 			double energyConsumptionOnLinkInJoule = energyConsumptionTable.getEnergyConsumptionInJoule(vehicle.getVehicleClassId(),
-					vehicle.getAverageSpeedOfVehicleOnLink(timeSpendOnLink, link), link.getFreespeed(), link.getLength());
+					vehicle.getAverageSpeedOfVehicleOnLinkInMetersPerSecond(timeSpendOnLink, link), link.getFreespeed(), link.getLength());
 
 			vehicle.updateEnergyState(energyConsumptionOnLinkInJoule);
 		

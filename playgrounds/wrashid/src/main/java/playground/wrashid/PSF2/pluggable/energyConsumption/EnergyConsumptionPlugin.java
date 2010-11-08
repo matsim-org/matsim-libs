@@ -46,6 +46,15 @@ import playground.wrashid.lib.GeneralLib;
 import playground.wrashid.lib.obj.DoubleValueHashMap;
 import playground.wrashid.lib.obj.LinkedListValueHashMap;
 
+/**
+ * This class assigns one energy consumption value to each trip of a vehicle.
+ * 
+ * note: this module is compatible with both the quesim and jdeqsim model. the maxAllowedSpeedInNetworkInKmPerHour parameter 
+ * to the energyConsumptionModel filters out, if the first or last link have been driven by the vehicle.
+ * 
+ * @author wrashid
+ *
+ */
 public class EnergyConsumptionPlugin implements LinkEnterEventHandler, LinkLeaveEventHandler, AgentWait2LinkEventHandler, AgentArrivalEventHandler {
 	
 	private EnergyConsumptionModel energyConsumptionModel;

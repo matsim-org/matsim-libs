@@ -35,19 +35,27 @@ import playground.wrashid.lib.obj.GeneralLogObject;
 public class EnergyConsumptionModelPSL implements EnergyConsumptionModel {
 
 	AverageEnergyConsumptionGalus phevEnergyConsumptionModel;
-	
-	public EnergyConsumptionModelPSL(){
-		phevEnergyConsumptionModel=new AverageEnergyConsumptionGalus();
+	private double maxAllowedSpeedInNetworkInKmPerHour;
+
+	public EnergyConsumptionModelPSL(double maxAllowedSpeedInNetworkInKmPerHour) {
+		phevEnergyConsumptionModel = new AverageEnergyConsumptionGalus();
+		this.maxAllowedSpeedInNetworkInKmPerHour = maxAllowedSpeedInNetworkInKmPerHour;
 	}
-	
-	
+
 	@Override
 	public double getEnergyConsumptionForLinkInJoule(Vehicle vehicle, double timeSpentOnLink, Link link) {
-		if (vehicle.getVehicleClassId().equals(new IdImpl(1))){
+		double speedOfVehicleOnLinkInKmPerHour = Vehicle.getAverageSpeedOfVehicleOnLinkInMetersPerSecond(timeSpentOnLink, link) / 1000 * 3600;
+
+		if (speedOfVehicleOnLinkInKmPerHour > maxAllowedSpeedInNetworkInKmPerHour) {
+			return 0;
+		}
+
+		if (vehicle.getVehicleClassId().equals(new IdImpl(1))) {
 			// NOTE: phevs must have class Id one in this case
-			return phevEnergyConsumptionModel.getEnergyConsumption(Vehicle.getAverageSpeedOfVehicleOnLink(timeSpentOnLink, link), link.getLength());
+			return phevEnergyConsumptionModel.getEnergyConsumption(speedOfVehicleOnLinkInKmPerHour, link.getLength());
 		} else {
-			DebugLib.stopSystemAndReportInconsistency("must implement energy consumption of this vehicle class, before using this model: vehicleClassId=" + vehicle.getVehicleClassId());
+			DebugLib.stopSystemAndReportInconsistency("must implement energy consumption of this vehicle class, before using this model: vehicleClassId="
+					+ vehicle.getVehicleClassId());
 			return 0;
 		}
 	}

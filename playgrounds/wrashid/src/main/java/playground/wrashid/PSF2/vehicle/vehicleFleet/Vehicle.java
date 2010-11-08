@@ -70,7 +70,7 @@ public abstract class Vehicle {
 		energyConcumptionForWholeDayInJoule=0;
 	}
 	
-	public static double getAverageSpeedOfVehicleOnLink(double timeSpentOnLink, Link link){
+	public static double getAverageSpeedOfVehicleOnLinkInMetersPerSecond(double timeSpentOnLink, Link link){
 		return link.getLength()/timeSpentOnLink;
 	}
 }

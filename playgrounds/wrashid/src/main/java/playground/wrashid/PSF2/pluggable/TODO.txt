@@ -10,5 +10,6 @@ ParkingTimesPlugin =>
 
 
 
-EnergyConsumptionPlugin => it needs to be fixed: use wait2link and arrival in the right way => e.g. make a top interface, from which this class
-inherits...
+EnergyConsumptionPlugin 
+=> test the joule values!
+

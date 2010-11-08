@@ -28,13 +28,22 @@ import playground.wrashid.PSF2.vehicle.vehicleFleet.Vehicle;
 public class EnergyConsumptionModelLAV implements EnergyConsumptionModel {
 
 	EnergyConsumptionTable energyConsumptionTable;
+	private double maxAllowedSpeedInNetworkInKmPerHour;
 	
-	public EnergyConsumptionModelLAV(String fileWithModelData){
+	public EnergyConsumptionModelLAV(String fileWithModelData, double maxAllowedSpeedInNetworkInKmPerHour){
 		energyConsumptionTable=new EnergyConsumptionTable(fileWithModelData);
+		this.maxAllowedSpeedInNetworkInKmPerHour=maxAllowedSpeedInNetworkInKmPerHour;
 	}
 	
 	public double getEnergyConsumptionForLinkInJoule(Vehicle vehicle, double timeSpentOnLink, Link link) {
-		return energyConsumptionTable.getEnergyConsumptionInJoule(vehicle.getVehicleClassId(), Vehicle.getAverageSpeedOfVehicleOnLink(timeSpentOnLink, link), link.getFreespeed(), link.getLength());
+		double speedOfVehicleOnLinkInKmPerHour = Vehicle.getAverageSpeedOfVehicleOnLinkInMetersPerSecond(timeSpentOnLink, link)/1000*3600;
+		
+		
+		if (speedOfVehicleOnLinkInKmPerHour>maxAllowedSpeedInNetworkInKmPerHour){
+			return 0;
+		}
+		
+		return energyConsumptionTable.getEnergyConsumptionInJoule(vehicle.getVehicleClassId(), speedOfVehicleOnLinkInKmPerHour, link.getFreespeed(), link.getLength());
 	}
 
 }
