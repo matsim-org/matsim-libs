@@ -35,22 +35,19 @@ import playground.wrashid.lib.obj.GeneralLogObject;
 public class EnergyConsumptionModelPSL implements EnergyConsumptionModel {
 
 	AverageEnergyConsumptionGalus phevEnergyConsumptionModel;
-	GeneralLogObject generalPSFLog;
 	
-	public EnergyConsumptionModelPSL(GeneralLogObject generalPSFLog){
+	public EnergyConsumptionModelPSL(){
 		phevEnergyConsumptionModel=new AverageEnergyConsumptionGalus();
-		this.generalPSFLog=generalPSFLog;
 	}
 	
 	
 	@Override
 	public double getEnergyConsumptionForLinkInJoule(Vehicle vehicle, double timeSpentOnLink, Link link) {
-		if (vehicle.getVehicleClassId()==new IdImpl("1")){
+		if (vehicle.getVehicleClassId().equals(new IdImpl(1))){
 			// NOTE: phevs must have class Id one in this case
 			return phevEnergyConsumptionModel.getEnergyConsumption(Vehicle.getAverageSpeedOfVehicleOnLink(timeSpentOnLink, link), link.getLength());
 		} else {
-			ArrayList<String> logGroup = generalPSFLog.createArrayListForNewLogGroup(EnergyConsumptionModelPSL.class.getName());
-			logGroup.add("must implement energy consumption of this vehicle class, before using this model: vehicleClassId=" + vehicle.getVehicleClassId());
+			DebugLib.stopSystemAndReportInconsistency("must implement energy consumption of this vehicle class, before using this model: vehicleClassId=" + vehicle.getVehicleClassId());
 			return 0;
 		}
 	}

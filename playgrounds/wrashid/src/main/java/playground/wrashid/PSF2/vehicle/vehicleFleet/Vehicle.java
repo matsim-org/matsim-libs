@@ -37,6 +37,11 @@ public abstract class Vehicle {
 		this.vehicleClassId=vehicleClassId;
 	}
 	
+	public Vehicle(Id vehicleClassId){
+		this.vehicleClassId=vehicleClassId;
+		energyStateMaintainer=null;
+	}
+	
 	public abstract void updateEnergyState(double energyConsumptionOnLinkInJoule);
 	
 	public void updateEnergyState(double timeSpendOnLink, Link link){

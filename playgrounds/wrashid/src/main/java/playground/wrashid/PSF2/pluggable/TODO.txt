@@ -1,3 +1,14 @@
 - write tests for EnergyConsumptionPlugin and ParkingTimesPlugin
 
 => perhaps based both on events file and controler (at least one)...
+
+
+
+ParkingTimesPlugin => 
+ * TODO: add filter for activity type
+ * TODO: add act type to parkingIntervalInfo
+
+
+
+EnergyConsumptionPlugin => it needs to be fixed: use wait2link and arrival in the right way => e.g. make a top interface, from which this class
+inherits...

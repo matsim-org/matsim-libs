@@ -20,13 +20,18 @@
 
 package playground.wrashid.PSF2.pluggable.parkingTimes;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
+import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandler;
+import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
@@ -35,18 +40,26 @@ import playground.wrashid.lib.DebugLib;
 import playground.wrashid.lib.obj.LinkedListValueHashMap;
 
 /**
- * usage: - add this event handler to events - only after end of simulation.
  * 
- * note: call reset method also when reading only from events file (e.g. reset(0)).
+ * 
+ * 
+ * TODO: add filter for activity type
+ * TODO: add act type to parkingIntervalInfo
  * 
  * @author wrashid
  * 
  */
 
-public class ParkingTimesPlugin implements AgentArrivalEventHandler, AgentDepartureEventHandler {
+public class ParkingTimesPlugin implements AgentWait2LinkEventHandler, AgentArrivalEventHandler, LinkEnterEventHandler {
 
 	// agent Id, linked list of parkingInterval
 	LinkedListValueHashMap<Id, ParkingIntervalInfo> parkingTimeIntervals;
+	// agent Id, linkId
+	HashMap<Id,Id> lastLinkEntered;
+
+	public LinkedListValueHashMap<Id, ParkingIntervalInfo> getParkingTimeIntervals() {
+		return parkingTimeIntervals;
+	}
 
 	public ParkingTimesPlugin(Controler controler) {
 		controler.addControlerListener(new AfterMobSimParkingPluginCleaner(this));
@@ -57,20 +70,19 @@ public class ParkingTimesPlugin implements AgentArrivalEventHandler, AgentDepart
 	 * "closeLastAndFirstParkingInterval" after the simulation ends by yourself.
 	 */
 	public ParkingTimesPlugin() {
-
+		reset(0);
 	}
 
 	public void closeLastAndFirstParkingIntervals() {
-		for (Id personId:parkingTimeIntervals.getKeySet()){
+		for (Id personId : parkingTimeIntervals.getKeySet()) {
 			ParkingIntervalInfo firstParkingInterval = parkingTimeIntervals.get(personId).getFirst();
 			ParkingIntervalInfo lastParkingInterval = parkingTimeIntervals.get(personId).getLast();
-			checkFirstLastLinkConsistency(firstParkingInterval.getLinkId(),lastParkingInterval.getLinkId());
+			checkFirstLastLinkConsistency(firstParkingInterval.getLinkId(), lastParkingInterval.getLinkId());
 			firstParkingInterval.setArrivalTime(lastParkingInterval.getArrivalTime());
 			parkingTimeIntervals.get(personId).removeLast();
 		}
 	}
 
-	
 	private void checkFirstLastLinkConsistency(Id firstParkingIntervalLinkId, Id lastParkingIntervalLinkId) {
 		if (!firstParkingIntervalLinkId.equals(lastParkingIntervalLinkId)) {
 			DebugLib.stopSystemAndReportInconsistency();
@@ -78,29 +90,33 @@ public class ParkingTimesPlugin implements AgentArrivalEventHandler, AgentDepart
 	}
 
 	public void reset(int iteration) {
-		parkingTimeIntervals=new LinkedListValueHashMap<Id, ParkingIntervalInfo>();
+		parkingTimeIntervals = new LinkedListValueHashMap<Id, ParkingIntervalInfo>();
+		lastLinkEntered = new HashMap<Id, Id>();
 	}
 
 	@Override
 	public void handleEvent(AgentArrivalEvent event) {
-		ParkingIntervalInfo parkingIntervalInfo = new ParkingIntervalInfo();
-		parkingIntervalInfo.setArrivalTime(event.getTime());
-		parkingIntervalInfo.setLinkId(event.getLinkId());
+		if (isValidArrivalEventWithCar(event.getPersonId(),event.getLinkId())){
+			ParkingIntervalInfo parkingIntervalInfo = new ParkingIntervalInfo();
+			parkingIntervalInfo.setArrivalTime(event.getTime());
+			parkingIntervalInfo.setLinkId(event.getLinkId());
 
-		parkingTimeIntervals.put(event.getPersonId(), parkingIntervalInfo);
-
-	}
-
-	@Override
-	public void handleEvent(AgentDepartureEvent event) {
-		if (leavingFirstParking(event.getPersonId())) {
-			initializeParkingTimeIntervalsForPerson(event.getPersonId(), event.getLinkId());
+			parkingTimeIntervals.put(event.getPersonId(), parkingIntervalInfo);
+			
+			resetLastLinkEntered(event.getPersonId());
 		}
-
-		updateDepartureTimeInfo(event);
 	}
+	
+	private void resetLastLinkEntered(Id personId){
+		lastLinkEntered.put(personId, null);
+	}
+	
+	private boolean isValidArrivalEventWithCar(Id personId, Id linkId){
+		return lastLinkEntered.containsKey(personId) && lastLinkEntered.get(personId)!=null && lastLinkEntered.get(personId).equals(linkId);
+	}
+	
 
-	private void updateDepartureTimeInfo(AgentDepartureEvent event) {
+	private void updateDepartureTimeInfo(AgentWait2LinkEvent event) {
 		ParkingIntervalInfo lastParkingInterval = parkingTimeIntervals.get(event.getPersonId()).getLast();
 		checkLinkConsistency(lastParkingInterval, event.getLinkId());
 		lastParkingInterval.setDepartureTime(event.getTime());
@@ -119,7 +135,21 @@ public class ParkingTimesPlugin implements AgentArrivalEventHandler, AgentDepart
 	}
 
 	private boolean leavingFirstParking(Id personId) {
-		return parkingTimeIntervals.containsKey(personId);
+		return !parkingTimeIntervals.containsKey(personId);
+	}
+
+	@Override
+	public void handleEvent(LinkEnterEvent event) {
+		lastLinkEntered.put(event.getPersonId(), event.getLinkId());
+	}
+
+	@Override
+	public void handleEvent(AgentWait2LinkEvent event) {
+		if (leavingFirstParking(event.getPersonId())) {
+			initializeParkingTimeIntervalsForPerson(event.getPersonId(), event.getLinkId());
+		}
+
+		updateDepartureTimeInfo(event);
 	}
 
 }

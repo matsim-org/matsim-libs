@@ -44,6 +44,10 @@ public class PlugInHybridElectricVehicle extends Vehicle {
 	public PlugInHybridElectricVehicle(EnergyStateMaintainer energyStateMaintainer, Id vehicleClassId) {
 		super(energyStateMaintainer, vehicleClassId);
 	}
+	
+	public PlugInHybridElectricVehicle(Id vehicleClassId) {
+		super(vehicleClassId);
+	}
 
 	@Override
 	public void updateEnergyState(double energyConsumptionOnLinkInJoule) {

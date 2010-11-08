@@ -37,6 +37,7 @@ import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandle
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.network.NetworkImpl;
 
 import playground.wrashid.PSF2.ParametersPSF2;
 import playground.wrashid.PSF2.vehicle.vehicleFleet.Vehicle;
@@ -58,6 +59,9 @@ public class EnergyConsumptionPlugin implements LinkEnterEventHandler, LinkLeave
 	//Id: person
 	LinkedListValueHashMap<Id,Double> energyConsumptionOfLegs;
 	
+	// agent Id, linkId
+	HashMap<Id,Id> lastLinkEntered;
+	
 	
 	public LinkedListValueHashMap<Id, Double> getEnergyConsumptionOfLegs() {
 		return energyConsumptionOfLegs;
@@ -65,23 +69,29 @@ public class EnergyConsumptionPlugin implements LinkEnterEventHandler, LinkLeave
 
 	private LinkedListValueHashMap<Id, Vehicle> vehicles;
 
-	private Controler controler;
+	private NetworkImpl network;
+
 	
 
-	public EnergyConsumptionPlugin(EnergyConsumptionModel energyConsumptionModel, LinkedListValueHashMap<Id, Vehicle> vehicles, Controler controler) {
+	public EnergyConsumptionPlugin(EnergyConsumptionModel energyConsumptionModel, LinkedListValueHashMap<Id, Vehicle> vehicles, NetworkImpl network) {
 		this.energyConsumptionModel=energyConsumptionModel;
 		this.vehicles=vehicles;
-		this.controler=controler;
+		this.network=network;
+		
+		reset(0);
 	}
 	
 	public void reset(int iteration) {
 		timeOfEnteringOrWaitingToEnterCurrentLink=new HashMap<Id, Double>();
 		energyConsumptionOfCurrentLeg=new DoubleValueHashMap<Id>();
 		energyConsumptionOfLegs=new LinkedListValueHashMap<Id, Double>();
+		lastLinkEntered = new HashMap<Id, Id>();
 	}
 
 	public void handleEvent(LinkEnterEvent event) {
 		logLinkEnteranceTime(event.getPersonId(), event.getTime());
+		
+		lastLinkEntered.put(event.getPersonId(), event.getLinkId());
 	}
 
 	public void handleEvent(AgentWait2LinkEvent event) {
@@ -98,9 +108,14 @@ public class EnergyConsumptionPlugin implements LinkEnterEventHandler, LinkLeave
 	}
 	
 	public void handleEvent(AgentArrivalEvent event) {
-		updateEnergyConsumptionOfLeg(event.getPersonId(),event.getTime(),event.getLinkId());
+		if (isValidArrivalEventWithCar(event.getPersonId(),event.getLinkId())){
+			updateEnergyConsumptionOfLeg(event.getPersonId(),event.getTime(),event.getLinkId());
+			
+			handleLegCompletion(event.getPersonId());
+			
+			resetLastLinkEntered(event.getPersonId());
+		}
 		
-		handleLegCompletion(event.getPersonId());
 	}
 
 	private void updateEnergyConsumptionOfLeg(Id personId,double linkLeaveTime, Id linkId){
@@ -111,7 +126,7 @@ public class EnergyConsumptionPlugin implements LinkEnterEventHandler, LinkLeave
 		}
 		
 		double timeSpendOnLink= GeneralLib.getIntervalDuration(linkEnteranceTime, linkLeaveTime);
-		Link link = controler.getNetwork().getLinks().get(linkId);
+		Link link = network.getLinks().get(linkId);
 		Vehicle vehicle=vehicles.getValue(personId);
 		Double energyConsumptionOnLink=energyConsumptionModel.getEnergyConsumptionForLinkInJoule(vehicle, timeSpendOnLink, link);
 		
@@ -127,5 +142,13 @@ public class EnergyConsumptionPlugin implements LinkEnterEventHandler, LinkLeave
 	private void handleLegCompletion(Id personId) {
 		energyConsumptionOfLegs.put(personId, energyConsumptionOfCurrentLeg.get(personId));
 		energyConsumptionOfCurrentLeg.put(personId, 0.0);
+	}
+	
+	private void resetLastLinkEntered(Id personId){
+		lastLinkEntered.put(personId, null);
+	}
+	
+	private boolean isValidArrivalEventWithCar(Id personId, Id linkId){
+		return lastLinkEntered.containsKey(personId) && lastLinkEntered.get(personId)!=null && lastLinkEntered.get(personId).equals(linkId);
 	}
 }
