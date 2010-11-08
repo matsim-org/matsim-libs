@@ -42,8 +42,6 @@ public class NewStrategyModule implements PlanStrategyModule {
 
 	private final static Logger log = Logger.getLogger(NewStrategyModule.class);
 
-	private final PlanMutateTimeAllocation planMutateTimeAllocation;
-
 	private int counterPlanMutator = 0;
 
 	public static Controler controler;
@@ -56,11 +54,6 @@ public class NewStrategyModule implements PlanStrategyModule {
 
 	private RandomPlanSelector randomSelector;
 
-//	private double alphaScale = 0.0; // 0.0
-//	private double alphaOffset = 0.8; // 0.8
-//	private double betaScale = 0.00; // 0.0
-//	private double betaOffset = 0.9; // 0.9
-//	private int nbIteration = 50;
 	private Double routing0;
 	private Double routing1;
 	private Double routing2;
@@ -71,7 +64,6 @@ public class NewStrategyModule implements PlanStrategyModule {
 	private Double secondStrategyChangeAtIteration;
 
 	public NewStrategyModule() {
-		this.planMutateTimeAllocation = new PlanMutateTimeAllocation(7200, new Random());
 		this.timeAllocationMutator = new TimeAllocationMutator(controler.getConfig(), 7200);
 		this.betaExp = new ExpBetaPlanChanger(controler.getConfig().charyparNagelScoring().getBrainExpBeta());
 		this.reRoute = new ReRoute(controler);
@@ -105,120 +97,38 @@ public class NewStrategyModule implements PlanStrategyModule {
 	}
 
 	public void handlePlan(final Plan plan) {
-
-		if (controler.getIterationNumber() < firstStrategyChangeAtIteration) {
-			double rand = new Random().nextDouble();
-			if (rand < (routing0 * (1 - controler.getIterationNumber() / firstStrategyChangeAtIteration) + routing1
-					* controler.getIterationNumber() / firstStrategyChangeAtIteration)) {
-				betaExp.selectPlan(plan.getPerson());
-			} else if (rand < (timeMutator0 * (1 - controler.getIterationNumber() / firstStrategyChangeAtIteration) + timeMutator1
-					* controler.getIterationNumber() / firstStrategyChangeAtIteration)) {
-				this.randomSelector.selectPlan(plan.getPerson());
-				reRoute.getPlanAlgoInstance().run(plan.getPerson().getSelectedPlan());
-			} else {
-				counterPlanMutator++;
-				this.randomSelector.selectPlan(plan.getPerson());
-				timeAllocationMutator.getPlanAlgoInstance().run(plan.getPerson().getSelectedPlan());
-			}
-		} else if (controler.getIterationNumber() < secondStrategyChangeAtIteration) {
-			double rand = new Random().nextDouble();
-			if (rand < (routing1
-					* (1 - controler.getIterationNumber() / (secondStrategyChangeAtIteration - firstStrategyChangeAtIteration)) + routing2
-					* controler.getIterationNumber() / (secondStrategyChangeAtIteration - firstStrategyChangeAtIteration))) {
-				betaExp.selectPlan(plan.getPerson());
-			} else if (rand < (timeMutator1
-					* (1 - controler.getIterationNumber() / (secondStrategyChangeAtIteration - firstStrategyChangeAtIteration)) + timeMutator2
-					* controler.getIterationNumber() / (secondStrategyChangeAtIteration - firstStrategyChangeAtIteration))) {
-				this.randomSelector.selectPlan(plan.getPerson());
-				reRoute.getPlanAlgoInstance().run(plan.getPerson().getSelectedPlan());
-			} else {
-				counterPlanMutator++;
-				this.randomSelector.selectPlan(plan.getPerson());
-				timeAllocationMutator.getPlanAlgoInstance().run(plan.getPerson().getSelectedPlan());
-			}
+		
+		double probabilityOfRouting;
+		double probabilityOfTimeMutator;
+		double lambdaParameter; 
+		if (controler.getIterationNumber() < firstStrategyChangeAtIteration){
+			lambdaParameter = controler.getIterationNumber() / firstStrategyChangeAtIteration;
+			probabilityOfRouting = routing0 * (1 - lambdaParameter) + routing1 * lambdaParameter;
+			probabilityOfTimeMutator = timeMutator0 * (1 - lambdaParameter) + timeMutator1 * lambdaParameter;
+		} else if (controler.getIterationNumber() < secondStrategyChangeAtIteration){
+			lambdaParameter = (controler.getIterationNumber() - firstStrategyChangeAtIteration) / (secondStrategyChangeAtIteration - firstStrategyChangeAtIteration);
+			probabilityOfRouting = routing1	* (1 - lambdaParameter) + routing2 * lambdaParameter;
+			probabilityOfTimeMutator = timeMutator1	* (1 - lambdaParameter) + timeMutator2 * lambdaParameter;
 		} else {
-			double rand = new Random().nextDouble();
-			if (rand < routing2) {
-				betaExp.selectPlan(plan.getPerson());
-			} else if (rand < timeMutator2) {
-				this.randomSelector.selectPlan(plan.getPerson());
-				reRoute.getPlanAlgoInstance().run(plan.getPerson().getSelectedPlan());
-			} else {
-				counterPlanMutator++;
-				this.randomSelector.selectPlan(plan.getPerson());
-				timeAllocationMutator.getPlanAlgoInstance().run(plan.getPerson().getSelectedPlan());
-			}
+			probabilityOfRouting = routing2;
+			probabilityOfTimeMutator = timeMutator2;
 		}
-
-		/*
-		 * if (controler.getIterationNumber() % 10 < 6) {
-		 * betaExp.selectPlan(plan.getPerson()); } else if
-		 * (controler.getIterationNumber() % 10 < 8) {
-		 * reRoute.getPlanAlgoInstance().run(plan);
-		 * 
-		 * } else { counterPlanMutator++;
-		 * timeAllocationMutator.getPlanAlgoInstance().run(plan); }
-		 */
-
-		// this.randomSelector.selectPlan(plan.getPerson());
-		// timeAllocationMutator.getPlanAlgoInstance().run(plan);
-
-		//
-
-//		if (controler.getIterationNumber() < nbIteration) {
-//			if (new Random().nextDouble() < (alphaOffset + alphaScale * controler.getIterationNumber() / nbIteration)) {
-//				betaExp.selectPlan(plan.getPerson());
-//			} else if (new Random().nextDouble() < (betaOffset + betaScale * controler.getIterationNumber() / nbIteration)) { // Problem
-//																																// :
-//																																// random
-//																																// number
-//																																// dependent
-//																																// of
-//																																// the
-//																																// previous
-//																																// number
-//				this.randomSelector.selectPlan(plan.getPerson());
-//				reRoute.getPlanAlgoInstance().run(plan.getPerson().getSelectedPlan());
-//			} else {
-//				counterPlanMutator++;
-//				this.randomSelector.selectPlan(plan.getPerson());
-//				timeAllocationMutator.getPlanAlgoInstance().run(plan.getPerson().getSelectedPlan());
-//			}
-//		} else {
-//			if (new Random().nextDouble() < alphaOffset + alphaScale) {
-//				betaExp.selectPlan(plan.getPerson());
-//			} else if (new Random().nextDouble() < betaOffset + betaScale) {
-//				this.randomSelector.selectPlan(plan.getPerson());
-//				reRoute.getPlanAlgoInstance().run(plan.getPerson().getSelectedPlan());
-//			} else {
-//				counterPlanMutator++;
-//				this.randomSelector.selectPlan(plan.getPerson());
-//				timeAllocationMutator.getPlanAlgoInstance().run(plan.getPerson().getSelectedPlan());
-//			}
-//		}
-
-		/*
-		 * if (lastIterationScore.get(plan.getPerson())>plan.getScore()){
-		 * 
-		 * }
-		 * 
-		 * if
-		 * (lastIterationStrategy.get(plan.getPerson()).equalsIgnoreCase("mutator"
-		 * )){
-		 * 
-		 * }
-		 * 
-		 * 
-		 * lastIterationStrategy.put(plan.getPerson(), "mutator");
-		 * 
-		 * lastIterationScore.put(plan.getPerson(), plan.getScore());
-		 */
-		// timeAllocationMutator.getPlanAlgoInstance().run(plan.getPerson().getSelectedPlan());
-
+		
+		double rand = new Random().nextDouble();
+		if (rand < probabilityOfRouting) {
+			this.randomSelector.selectPlan(plan.getPerson());
+			reRoute.getPlanAlgoInstance().run(plan.getPerson().getSelectedPlan());
+		} else if (rand < probabilityOfTimeMutator + probabilityOfRouting) {
+			counterPlanMutator++;
+			this.randomSelector.selectPlan(plan.getPerson());
+			timeAllocationMutator.getPlanAlgoInstance().run(plan.getPerson().getSelectedPlan());
+		} else {
+			betaExp.selectPlan(plan.getPerson());
+		}
 	}
 
 	public void finishReplanning() {
-//		log.info("number of handled plans (PlanMutateTimeAllocation): " + this.counterPlanMutator);
+
 	}
 
 }
