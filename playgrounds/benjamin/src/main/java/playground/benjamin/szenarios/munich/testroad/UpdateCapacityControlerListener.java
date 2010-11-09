@@ -46,6 +46,7 @@ public class UpdateCapacityControlerListener implements StartupListener, Iterati
 	private TravelTimeEventHandler eventHandler;
 	private SortedMap<Double, Double> departureTimes2travelTimes = new TreeMap<Double, Double>();
 	private Scenario scenario;
+	private int capacity;
 	private Id linkid;
 
 	/**
@@ -54,24 +55,29 @@ public class UpdateCapacityControlerListener implements StartupListener, Iterati
 	public UpdateCapacityControlerListener(Scenario scenario) {
 		this.scenario = scenario;
 		this.linkid = scenario.createId("590000822");
+		this.capacity = 1200;
 	}
 
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		this.eventHandler = new TravelTimeEventHandler(departureTimes2travelTimes);
 		event.getControler().getEvents().addHandler(this.eventHandler);
+		
+		Link link = scenario.getNetwork().getLinks().get(this.linkid);
+		link.setCapacity(this.capacity);
 	}
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
-		int capacity = event.getIteration() * 50 + 1200;
-		writeFile(this.departureTimes2travelTimes, capacity);
+		writeFile(this.departureTimes2travelTimes);
 		this.departureTimes2travelTimes.clear();
+		
+		capacity = this.capacity + 50;
 		Link link = scenario.getNetwork().getLinks().get(this.linkid);
-		link.setCapacity(capacity + 50);
+		link.setCapacity(capacity);
 	}
 
-	private void writeFile(SortedMap<Double, Double> departureTimes2travelTimes, int capacity) {
+	private void writeFile(SortedMap<Double, Double> departureTimes2travelTimes) {
 		String outputPath = this.scenario.getConfig().controler().getOutputDirectory();
 		
 		try {
@@ -92,6 +98,6 @@ public class UpdateCapacityControlerListener implements StartupListener, Iterati
 
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {
-		// TODO Auto-generated method stub
+//		writeFile();
 	}		
 }

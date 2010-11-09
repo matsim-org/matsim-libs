@@ -31,26 +31,18 @@ public class RunTestRoad {
 
 	public static void main(String[] args) {
 
-		String [] configDay1 = {"../../detailedEval/teststrecke/sim/input/20090707_config.xml"};
-		String [] configDay2 = {"../../detailedEval/teststrecke/sim/input/20090708_config.xml"};
-		String [] configDay3 = {"../../detailedEval/teststrecke/sim/input/20090709_config.xml"};
-
-		Controler controlerDay1 = new Controler(configDay1);
-		controlerDay1.setOverwriteFiles(true);
-		Scenario scenarioDay1 = controlerDay1.getScenario();
-		controlerDay1.addControlerListener(new UpdateCapacityControlerListener(scenarioDay1));
-		controlerDay1.run();
+		String inputpath = "../../detailedEval/teststrecke/sim/input/";
+//		String configName = "_config.xml";
+		String configName = "_config_capacityChanges.xml";
+		int [] days = {20090707, 20090708, 20090709};
 		
-		Controler controlerDay2 = new Controler(configDay2);
-		controlerDay2.setOverwriteFiles(true);
-		Scenario scenarioDay2 = controlerDay2.getScenario();
-		controlerDay2.addControlerListener(new UpdateCapacityControlerListener(scenarioDay2));
-		controlerDay2.run();
-		
-		Controler controlerDay3 = new Controler(configDay3);
-		controlerDay3.setOverwriteFiles(true);
-		Scenario scenarioDay3 = controlerDay3.getScenario();
-		controlerDay3.addControlerListener(new UpdateCapacityControlerListener(scenarioDay3));
-		controlerDay3.run();
+		for(int day : days){
+			String config = inputpath + day + configName;
+			Controler controler = new Controler(config);
+			controler.setOverwriteFiles(true);
+			Scenario scenario = controler.getScenario();
+			controler.addControlerListener(new UpdateCapacityControlerListener(scenario));
+			controler.run();
+		}
 	}
 }
