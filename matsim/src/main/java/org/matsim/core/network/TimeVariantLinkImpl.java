@@ -128,6 +128,11 @@ public class TimeVariantLinkImpl extends LinkImpl {
 
 	}
 
+	@Override
+	public void setFreespeed(double freespeed) {
+		super.setFreespeed(freespeed);
+		this.initFreespeedEventsArrays();
+	}
 
 
 	/**
@@ -154,6 +159,12 @@ public class TimeVariantLinkImpl extends LinkImpl {
 		key = key >= 0 ? key : -key - 2;
 		return this.aFlowCapacityValues[key];
 
+	}
+	
+	@Override
+	public final void setCapacity(double capacityPerNetworkCapcityPeriod){
+		super.setCapacity(capacityPerNetworkCapcityPeriod);
+		this.initFlowCapacityEventsArrays();
 	}
 
 
@@ -200,6 +211,13 @@ public class TimeVariantLinkImpl extends LinkImpl {
 		return this.aLanesValues[key];
 	}
 
+	@Override
+	public void setNumberOfLanes(double lanes) {
+		super.setNumberOfLanes(lanes);
+		this.initLanesEventsArrays();
+	}
+
+	
 	private void initFreespeedEventsArrays() {
 
 		this.aFreespeedTimes = new double [this.aFreespeedEvents];

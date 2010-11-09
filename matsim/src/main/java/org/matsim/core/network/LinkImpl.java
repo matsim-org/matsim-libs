@@ -89,9 +89,15 @@ public class LinkImpl implements Link {
 		this.to = to;
 		this.allowedModes.add(TransportMode.car);
 		this.setLength(length);
-		this.setFreespeed(freespeed);
-		this.setCapacity(capacity);
-		this.setNumberOfLanes(lanes);
+		//for the eventual time variant attributes don't call the setter as it must be overwritten in TimeVariantLinkImpl
+		//and thus causes problems during object initialization, dg nov 2010
+		this.freespeed = freespeed;
+		this.checkFreespeedSemantics();
+		this.capacity = capacity;
+		this.calculateFlowCapacity();
+		this.checkCapacitiySemantics();
+		this.nofLanes = lanes;
+		this.checkNumberOfLanesSemantics();
 		this.euklideanDist = CoordUtils.calcDistance(this.from.getCoord(), this.to.getCoord());
 		if (this.from.equals(this.to) && (loopWarnCnt < maxLoopWarnCnt)) {
 			loopWarnCnt++ ;
@@ -248,7 +254,7 @@ public class LinkImpl implements Link {
 	}
 
 	@Override
-	public final void setCapacity(double capacityPerNetworkCapcityPeriod){
+	public void setCapacity(double capacityPerNetworkCapcityPeriod){
 		this.capacity = capacityPerNetworkCapcityPeriod;
 		this.calculateFlowCapacity();
 	}
@@ -270,7 +276,7 @@ public class LinkImpl implements Link {
 	}
 
 	@Override
-	public final void setFreespeed(double freespeed) {
+	public void setFreespeed(double freespeed) {
 		this.freespeed = freespeed;
 		this.checkFreespeedSemantics();
 	}
@@ -297,7 +303,7 @@ public class LinkImpl implements Link {
 	}
 
 	@Override
-	public final void setNumberOfLanes(double lanes) {
+	public void setNumberOfLanes(double lanes) {
 		this.nofLanes = lanes;
 		this.checkNumberOfLanesSemantics();
 	}
