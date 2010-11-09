@@ -46,7 +46,8 @@ public class ResizeLinksByCount extends AbstractResizeLinksByCount{
 	private static final Logger log = Logger.getLogger(ResizeLinksByCount.class);
 	
 	private Map<String, Double> origId2MaxCount = new HashMap<String, Double>();
-		
+	private Map<String, String> shortNameMap;
+ 		
 	public static void main(String[] args){
 		String countsFile = "d:/VSP/output/osm_bb/Di-Do_counts.xml";
 		String filteredOsmFile = "d:/VSP/output/osm_bb/counts.osm";
@@ -70,24 +71,24 @@ public class ResizeLinksByCount extends AbstractResizeLinksByCount{
 			e.printStackTrace();
 		}
 		
-		ResizeLinksByCount r = new ResizeLinksByCount(networkFile, counts, shortNameMap, 1.1);
-		r.outFile = "d:/VSP/output/osm_bb/counts_network_resized";
-		r.run();
+		ResizeLinksByCount r = new ResizeLinksByCount(networkFile, counts, shortNameMap, 1.0);
+		r.run("d:/VSP/output/osm_bb/counts_network_resized.xml");
 	}
 	
 	public ResizeLinksByCount(String networkFile, Counts counts, Map<String, String> shortNameMap, double scaleFactor){
-		super(networkFile, counts, shortNameMap, scaleFactor);
+		super(networkFile, counts, scaleFactor);
+		this.shortNameMap = shortNameMap;
 	}
 	
 	@Override
 	protected void resize() {
 		String origId;
-		double maxCount;
-		double capPerLane;
-		int nrOfNewLanes;
+		Double maxCount;
+		Double capPerLane;
+		Double nrOfNewLanes;
 
 		
-		for(Link l : this.newNet.getLinks().values()){
+		for(Link l : this.getOrigNetwork().getLinks().values()){
 			
 			checkAndRegisterOrigId((LinkImpl) l);
 			
@@ -101,16 +102,16 @@ public class ResizeLinksByCount extends AbstractResizeLinksByCount{
 					log.warn("link " + l.getId() + " oldCap= " + l.getCapacity() + " oldNrOfLanes= " + 
 							l.getNumberOfLanes() + ": maxCount < oldCap. Set Capacity to maxcount="+ 
 							maxCount + " and keep numberOfLanes...");
+					this.setNewLinkData(l.getId(), maxCount, l.getNumberOfLanes());
 					l.setCapacity(maxCount);
 				}
 				// else set nrOfNewLanes to int(maxCount/capPerLane) and cap to maxCount
 				else{
-					nrOfNewLanes = (int) (maxCount/capPerLane);
+					nrOfNewLanes = 1.0 * ((int) (maxCount/capPerLane));
 					log.info("link " + l.getId() + " oldCap= " + l.getCapacity() + " oldNrOfLanes= " + 
 							l.getNumberOfLanes() + " : set nr of lanes to " + 
 							nrOfNewLanes + " and capacity to " + maxCount);
-					l.setNumberOfLanes(nrOfNewLanes);
-					l.setCapacity(maxCount);
+					this.setNewLinkData(l.getId(), maxCount, nrOfNewLanes);
 				}		
 				this.addLink2shp(l.getId());
 			}
@@ -128,7 +129,7 @@ public class ResizeLinksByCount extends AbstractResizeLinksByCount{
 		
 		node = l.getFromNode();
 		if( (!this.origId2MaxCount.containsKey( (l).getOrigId()))  && this.shortNameMap.containsKey(node.getId().toString())){
-			count = this.oldCounts.getCount(new IdImpl(this.shortNameMap.get(node.getId().toString())));
+			count = this.getRescaledCounts().getCount(new IdImpl(this.shortNameMap.get(node.getId().toString())));
 			if(!(count == null)){
 				maxCount = count.getMaxVolume().getValue();
 				this.origId2MaxCount.put(l.getOrigId(), new Double(maxCount));

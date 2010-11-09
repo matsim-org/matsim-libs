@@ -25,8 +25,6 @@ import playground.andreas.osmBB.osm2counts.Osm2Counts;
 public class ResizeLinksByCount3 extends AbstractResizeLinksByCount{
 	
 	private static final Logger log = Logger.getLogger(ResizeLinksByCount3.class);
-	private boolean countsMatched = false;
-	private Counts newCounts;
 	
 	public static void main(String[] args){
 		String countsFile = "d:/VSP/output/osm_bb/Di-Do_counts.xml";
@@ -52,7 +50,7 @@ public class ResizeLinksByCount3 extends AbstractResizeLinksByCount{
 		}
 		
 		ResizeLinksByCount3 r = new ResizeLinksByCount3(networkFile, counts, shortNameMap, 1.0);
-		r.run("d:/VSP/output/osm_bb/network_resized");
+		r.run("d:/VSP/output/osm_bb/network_resized.xml");
 	}
 
 
@@ -64,7 +62,7 @@ public class ResizeLinksByCount3 extends AbstractResizeLinksByCount{
 	 * @param counts
 	 * @param shortNameMap
 	 */
-	public ResizeLinksByCount3(String networkFile, Counts counts, Map<String, String> shortNameMap, double scaleFactor){
+	public ResizeLinksByCount3(String networkFile, Counts counts, Map<String, String> shortNameMap, Double scaleFactor){
 		super(networkFile, counts, shortNameMap, scaleFactor);
 	}
 	
@@ -73,67 +71,28 @@ public class ResizeLinksByCount3 extends AbstractResizeLinksByCount{
 	 * @param networkFile
 	 * @param counts
 	 */
-	public ResizeLinksByCount3(String networkFile, Counts counts, double scaleFactor){
-		super(networkFile, counts, null, scaleFactor);
-		this.countsMatched = true;
+	public ResizeLinksByCount3(String networkFile, Counts counts, Double scaleFactor){
+		super(networkFile, counts, scaleFactor);
 	}
 		
-	public void run(String outFileName){
-		this.outFile = outFileName;
-		if(!this.countsMatched){
-			this.preProcessCounts();
-			this.writePreprocessedCounts(this.outFile);
-		}else{
-			this.newCounts = super.oldCounts;
-		}
-		super.run();
+	public void run(String outFile){
+		super.run(outFile);
 	}
 	
-	private void preProcessCounts() {
-		Node node;
-		Count oldCount;
-		Count newCount;
-		Id outLink = null;
-		this.newCounts = new Counts();
-		this.newCounts.setDescription("none");
-		this.newCounts.setName("counts merged");
-		this.newCounts.setYear(2009);
-		
-		for(Entry<String, String> e : this.shortNameMap.entrySet()){
-			if(this.newNet.getNodes().containsKey(new IdImpl(e.getKey())) && this.oldCounts.getCounts().containsKey(new IdImpl(e.getValue()))){
-				node =  this.newNet.getNodes().get(new IdImpl(e.getKey()));
-				oldCount = this.oldCounts.getCounts().get(new IdImpl(e.getValue()));
-				
-				//nodes with countingStations on it contain only one outlink
-				for(Link l : node.getOutLinks().values()){
-					outLink = l.getId();
-					break;
-				}
-				if(!(outLink == null)){
-					newCount = this.newCounts.createCount(outLink, oldCount.getCsId());
-					newCount.setCoord(oldCount.getCoord());
-					for(Entry<Integer, Volume> ee : oldCount.getVolumes().entrySet()){
-						newCount.createVolume(ee.getKey().intValue(), ee.getValue().getValue());
-					}
-				}
-			}
-		}
-	}
-
 	@Override
 	protected void resize() {
-		double maxCount;
+		Double maxCount;
 		String origId;
-		int nrOfNewLanes;
+		Integer nrOfNewLanes;
 		LinkImpl countLink;
-		double capPerLane;
+		Double capPerLane;
 		
-		for(Count c : this.newCounts.getCounts().values()){
-			countLink = (LinkImpl) this.newNet.getLinks().get(c.getLocId());
+		for(Count c : this.getRescaledCounts().getCounts().values()){
+			countLink = getOriginalLink(c.getLocId());
 			origId = countLink.getOrigId();
 			maxCount = c.getMaxVolume().getValue();
 			
-			for(Link l : this.newNet.getLinks().values()){
+			for(Link l : this.getOrigNetwork().getLinks().values()){
 				if(((LinkImpl)l).getOrigId().equals(origId)){
 					capPerLane = l.getCapacity() / l.getNumberOfLanes();
 					// if maxCount < cap set cap to maxCount and keep nrOfLanes
@@ -146,8 +105,7 @@ public class ResizeLinksByCount3 extends AbstractResizeLinksByCount{
 					}
 					System.out.print(l.getId() + " " + l.getCapacity() + " " + l.getNumberOfLanes() + " " + maxCount + " " + nrOfNewLanes);
 					System.out.println();
-					l.setCapacity(maxCount * this.scaleFactor);
-					l.setNumberOfLanes(nrOfNewLanes);
+					this.setNewLinkData(l.getId(), maxCount, nrOfNewLanes);
 					this.addLink2shp(l.getId());
 				}
 			}
@@ -156,11 +114,5 @@ public class ResizeLinksByCount3 extends AbstractResizeLinksByCount{
 	}
 	
 	
-	private void writePreprocessedCounts(String outFileName) {
-		log.info("writing counts to " + outFileName + "_counts.xml...");
-		new CountsWriter(this.newCounts).write(outFileName + "_counts.xml");
-		log.info("done...");
-	}
-
 	
 }

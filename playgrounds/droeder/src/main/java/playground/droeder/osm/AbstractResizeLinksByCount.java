@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -30,11 +31,14 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
+import org.matsim.counts.CountsWriter;
 import org.matsim.counts.Volume;
 
 import playground.droeder.gis.DaShapeWriter;
@@ -49,33 +53,60 @@ public abstract class AbstractResizeLinksByCount {
 	
 	//givens
 	private String netFile;
-	protected String outFile;
-	protected Counts oldCounts;
-	protected Map<String, String> shortNameMap;
+	private String outFile;
+	private Map<String, String> shortNameMap;
 	
 	//interns
-	protected Network newNet;
 	private Network oldNet;
+	private Network newNet;
 
 	private Map<Id, Link> modifiedLinks2shp = null;
 	private Map<Id, SortedMap<String, String>> modAttributes = null;
 	private Map<Id, Link> unmodifiedLinks2shp = null;
 	private Map<Id, SortedMap<String, String>> unmodAttributes = null;
-	protected double scaleFactor = 1.0;
+	private Double scaleFactor = null;
+	private boolean countsMatched = false;
+	private Counts origCounts;
+	private Counts rescaledCounts = null;
 		
-	public AbstractResizeLinksByCount(String networkFile, Counts counts, Map<String, String> shortNameMap, double scaleFactor){
+	
+	/**
+	 * use this contructor if the counts loc_Ids are NOT matched to the linkIds. The shortNameMap 
+	 * consists of  toNodeIds mapped to counts cs_Ids! 
+	 * @param networkFile
+	 * @param counts
+	 * @param shortNameMap
+	 * @param scaleFactor
+	 */
+	public AbstractResizeLinksByCount(String networkFile, Counts counts, Map<String, String> shortNameMap, Double scaleFactor){
 		this.netFile = networkFile;
-		this.oldCounts = counts;
+		this.origCounts = counts;
 		this.scaleFactor = scaleFactor;
-//		this.scaleCounts();
 		this.shortNameMap = shortNameMap;
 		this.prepareNetwork();
 	}
 	
+	/**
+	 * use this constructor if counts loc_Ids and linkIds are matched!
+	 * @param networkFile
+	 * @param counts
+	 * @param scaleFactor
+	 */
+	public AbstractResizeLinksByCount(String networkFile, Counts counts, Double scaleFactor){
+		this.netFile = networkFile;
+		this.origCounts = counts;
+		this.scaleFactor = scaleFactor;
+		this.prepareNetwork();
+		this.countsMatched = true;
+	}
 	
-	public void run (){
-//		Never change a given outfile arbitrarily
-//		this.outFile = outFile + "_" + String.valueOf(this.scaleFactor);
+	
+	public void run (String outFile){
+		this.outFile = outFile;
+		if(!this.countsMatched){
+			this.origCounts = this.preProcessCounts(this.origCounts);
+			this.writePreprocessedCounts(outFile);
+		}
 
 		this.resize();
 		this.writeNewNetwork();
@@ -84,7 +115,88 @@ public abstract class AbstractResizeLinksByCount {
 		writeUnmodifiedLinks2Shape();
 	}
 	
+	private Counts preProcessCounts(Counts oldCounts) {
+		Counts tempCounts = new Counts();
+		Node node;
+		Count oldCount;
+		Count newCount;
+		Id outLink = null;
+		tempCounts.setDescription("none");
+		tempCounts.setName("counts merged");
+		tempCounts.setYear(2009);
+		
+		for(Entry<String, String> e : this.shortNameMap.entrySet()){
+			if(this.newNet.getNodes().containsKey(new IdImpl(e.getKey())) && this.origCounts.getCounts().containsKey(new IdImpl(e.getValue()))){
+				node =  this.oldNet.getNodes().get(new IdImpl(e.getKey()));
+				oldCount = this.origCounts.getCounts().get(new IdImpl(e.getValue()));
+				
+				//nodes with countingStations on it contain only one outlink
+				for(Link l : node.getOutLinks().values()){
+					outLink = l.getId();
+					break;
+				}
+				if(!(outLink == null)){
+					newCount = tempCounts.createCount(outLink, oldCount.getCsId());
+					newCount.setCoord(oldCount.getCoord());
+					for(Entry<Integer, Volume> ee : oldCount.getVolumes().entrySet()){
+						newCount.createVolume(ee.getKey().intValue(), ee.getValue().getValue());
+					}
+				}
+			}
+		}
+		return tempCounts;
+	}
 	
+	public Counts getOriginalCounts(){
+		return this.origCounts;
+	}
+	
+	public Counts getRescaledCounts(){
+		if(this.rescaledCounts == null){
+			this.rescaleCounts();
+		}
+		return this.rescaledCounts;
+	}
+	
+	public Count getRescaledCount(Id locId){
+		if(this.rescaledCounts == null){
+			this.rescaleCounts();
+		}
+		return this.rescaledCounts.getCount(locId);
+	}
+	
+	public final Network getOrigNetwork(){
+		return this.oldNet;
+	}
+	
+	public LinkImpl getOriginalLink(Id id){
+		return (LinkImpl) this.oldNet.getLinks().get(id);
+	}
+	
+	public Network getNewNetwork(){
+		return this.newNet;
+	}
+	
+	public void setNewLinkData(Id link, Double capacity, double nrOfLanes){
+		this.newNet.getLinks().get(link).setCapacity(capacity);
+		this.newNet.getLinks().get(link).setNumberOfLanes(nrOfLanes);
+	}
+	
+	private void rescaleCounts() {
+		this.rescaledCounts = new Counts();
+		this.rescaledCounts.setDescription("none");
+		this.rescaledCounts.setName("rescaled counts");
+		this.rescaledCounts.setYear(2009);
+		
+		Count temp ;
+		for(Count c : this.origCounts.getCounts().values()){
+			temp = rescaledCounts.createCount(c.getLocId(), c.getCsId());
+			temp.setCoord(c.getCoord());
+			for(Entry<Integer, Volume> ee : c.getVolumes().entrySet()){
+				temp.createVolume(ee.getKey().intValue(), ee.getValue().getValue() * this.scaleFactor);
+			}
+		}
+	}
 
 	private void prepareNetwork() {
 		log.info("Start reading network!");
@@ -93,23 +205,11 @@ public abstract class AbstractResizeLinksByCount {
 		log.info("Reading " + this.netFile);
 		new MatsimNetworkReader(oldScenario).readFile(this.netFile);
 		new MatsimNetworkReader(newScenario).readFile(this.netFile);
-		this.newNet= newScenario.getNetwork();
+		this.newNet = newScenario.getNetwork();
 		this.oldNet = oldScenario.getNetwork();
 	}
-
-		
-	private void scaleCounts(){
-		for(Count c : this.oldCounts.getCounts().values()){
-			for(Volume v : c.getVolumes().values()){
-				v.setValue(v.getValue() * this.scaleFactor);
-			}
-		}
-	}
-	
 	
 	protected abstract void resize();
-
-	
 
 	private void writeNewNetwork() {
 		log.info("Writing resized network to " + this.outFile + "!");
@@ -161,6 +261,12 @@ public abstract class AbstractResizeLinksByCount {
 		log.info("Writing unmodified links to *.shp...");
 		DaShapeWriter.writeLinks2Shape(this.outFile + "_unmodifiedLinks.shp", this.unmodifiedLinks2shp, this.unmodAttributes);
 		log.info("done...");
+	}
+	
+	private void writePreprocessedCounts(String outFileName) {
+		log.info("writing counts to " + outFileName + "_counts.xml...");
+		new CountsWriter(this.origCounts).write(outFileName + "_counts.xml");
+		log.info("wrting counts finished...");
 	}
 	
 }

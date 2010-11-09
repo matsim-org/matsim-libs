@@ -49,8 +49,6 @@ import playground.andreas.osmBB.osm2counts.Osm2Counts;
 public class ResizeLinksByCount2 extends AbstractResizeLinksByCount{
 	
 	private static final Logger log = Logger.getLogger(ResizeLinksByCount2.class);
-	private boolean countsMatched = false;
-	private Counts newCounts;
 	private Map<String, List<Id>> origin2counts;
 	
 	public static void main(String[] args){
@@ -74,7 +72,7 @@ public class ResizeLinksByCount2 extends AbstractResizeLinksByCount{
 		}
 		
 		ResizeLinksByCount2 r = new ResizeLinksByCount2(networkFile, counts, shortNameMap, 1.1);
-		r.run("d:/VSP/output/osm_bb/network_resized");
+		r.run("d:/VSP/output/osm_bb/network_resized.xml");
 	}
 	
 	/**
@@ -93,60 +91,20 @@ public class ResizeLinksByCount2 extends AbstractResizeLinksByCount{
 	 * @param networkFile
 	 * @param counts
 	 */
-	public ResizeLinksByCount2(String networkFile, Counts counts, double scaleFactor){
-		super(networkFile, counts, null, scaleFactor);
-		this.countsMatched = true;
+	public ResizeLinksByCount2(String networkFile, Counts counts, Double scaleFactor){
+		super(networkFile, counts, scaleFactor);
 	}
 		
-	public void run(String outFileName){
-		this.outFile = outFileName;
-		if(!this.countsMatched){
-			this.preProcessCounts();
-			this.writePreprocessedCounts(this.outFile);
-		}else{
-			this.newCounts = super.oldCounts;
-		}
-		this.getCountsOnOrigLink();
-		super.run();
+	public void run(String outFile){
+		super.run(outFile);
 		
 	}
 	
-	private void preProcessCounts() {
-		Node node;
-		Count oldCount;
-		Count newCount;
-		Id outLink = null;
-		this.newCounts = new Counts();
-		this.newCounts.setDescription("none");
-		this.newCounts.setName("counts merged");
-		this.newCounts.setYear(2009);
-		
-		for(Entry<String, String> e : this.shortNameMap.entrySet()){
-			if(this.newNet.getNodes().containsKey(new IdImpl(e.getKey())) && this.oldCounts.getCounts().containsKey(new IdImpl(e.getValue()))){
-				node =  this.newNet.getNodes().get(new IdImpl(e.getKey()));
-				oldCount = this.oldCounts.getCounts().get(new IdImpl(e.getValue()));
-				
-				//nodes with countingStations on it contain only one outlink
-				for(Link l : node.getOutLinks().values()){
-					outLink = l.getId();
-					break;
-				}
-				if(!(outLink == null)){
-					newCount = this.newCounts.createCount(outLink, oldCount.getCsId());
-					newCount.setCoord(oldCount.getCoord());
-					for(Entry<Integer, Volume> ee : oldCount.getVolumes().entrySet()){
-						newCount.createVolume(ee.getKey().intValue(), ee.getValue().getValue());
-					}
-				}
-			}
-		}
-	}
-
 	private void getCountsOnOrigLink() {
 		this.origin2counts = new HashMap<String, List<Id>>();
 		String origId;
-		for(Id id : this.newCounts.getCounts().keySet()){
-			origId = ((LinkImpl) this.newNet.getLinks().get(id)).getOrigId();
+		for(Id id : this.getOriginalCounts().getCounts().keySet()){
+			origId = this.getOriginalLink(id).getOrigId();
 			if(this.origin2counts.containsKey(origId)){
 				this.origin2counts.get(origId).add(id);
 			}else{
@@ -159,6 +117,7 @@ public class ResizeLinksByCount2 extends AbstractResizeLinksByCount{
 	@Override
 	protected void resize() {
 		log.info("Start resizing...");
+		this.getCountsOnOrigLink();
 		List<Id> sortedLinks = null;
 		for(Entry<String, List<Id>> e : this.origin2counts.entrySet()){
 			sortedLinks = sortLinks(e.getKey(), e.getValue().get(0));
@@ -177,7 +136,7 @@ public class ResizeLinksByCount2 extends AbstractResizeLinksByCount{
 	}
 	
 	private List<Id> sortLinks(String origId, Id countLoc){
-		LinkImpl countLocation = (LinkImpl) this.newNet.getLinks().get(countLoc);
+		LinkImpl countLocation = this.getOriginalLink(countLoc);
 		LinkImpl cursor = countLocation;
 		String cursorOrigId = origId;
 		List<Id> sortedLinks = new ArrayList<Id>();
@@ -255,15 +214,15 @@ public class ResizeLinksByCount2 extends AbstractResizeLinksByCount{
 	private void proportionalChanges(List<Id> sortedLinks, Id previousCount, Id actualCount) {
 		
 		if(sortedLinks.size() > 0){
-			double prevCountVal = this.newCounts.getCount(previousCount).getMaxVolume().getValue();
-			double countDifference = (this.newCounts.getCount(actualCount).getMaxVolume().getValue() - 
-					this.newCounts.getCount(previousCount).getMaxVolume().getValue())/
+			double prevCountVal = this.getRescaledCount(previousCount).getMaxVolume().getValue();
+			double countDifference = (this.getRescaledCount(actualCount).getMaxVolume().getValue() - 
+					this.getRescaledCount(previousCount).getMaxVolume().getValue())/
 					(sortedLinks.size() + 1);
 			
 			
 			for(Id id : sortedLinks){
 				prevCountVal = prevCountVal + countDifference;
-				Link l = this.newNet.getLinks().get(id);
+				Link l = getOriginalLink(id);
 				double capPerLane = l.getCapacity() / l.getNumberOfLanes();
 				int nrOfNewLanes;
 
@@ -276,8 +235,7 @@ public class ResizeLinksByCount2 extends AbstractResizeLinksByCount{
 				else{
 					nrOfNewLanes = (int) (prevCountVal/capPerLane);
 				}
-				this.newNet.getLinks().get(id).setCapacity(prevCountVal*1.0);
-				this.newNet.getLinks().get(id).setNumberOfLanes(nrOfNewLanes);
+				this.setNewLinkData(id, prevCountVal, nrOfNewLanes);
 				this.addLink2shp(id);
 			}
 			
@@ -286,8 +244,8 @@ public class ResizeLinksByCount2 extends AbstractResizeLinksByCount{
 	}
 
 	private void constantChanges(List<Id> sortedLinks, Id count){
-		double maxCount = this.newCounts.getCount(count).getMaxVolume().getValue();
-		Link l = this.newNet.getLinks().get(count);
+		double maxCount = this.getRescaledCount(count).getMaxVolume().getValue();
+		Link l = this.getOriginalLink(count);
 		double capPerLane = l.getCapacity() / l.getNumberOfLanes();
 		int nrOfNewLanes;
 
@@ -302,17 +260,8 @@ public class ResizeLinksByCount2 extends AbstractResizeLinksByCount{
 		}
 		
 		for(Id id : sortedLinks){
-			this.newNet.getLinks().get(id).setCapacity(maxCount);
-			this.newNet.getLinks().get(id).setNumberOfLanes(nrOfNewLanes);
+			this.setNewLinkData(id, maxCount, nrOfNewLanes);
 			this.addLink2shp(id);
 		}
 	}
-
-	private void writePreprocessedCounts(String outFileName) {
-		log.info("writing counts to " + outFileName + "_counts.xml...");
-		new CountsWriter(this.newCounts).write(outFileName + "_counts.xml");
-		log.info("wrting counts finished...");
-	}
-
-	
 }
