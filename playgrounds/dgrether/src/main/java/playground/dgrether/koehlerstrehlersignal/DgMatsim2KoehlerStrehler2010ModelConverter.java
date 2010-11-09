@@ -21,12 +21,8 @@ package playground.dgrether.koehlerstrehlersignal;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.Map.Entry;
 
 import javax.xml.transform.TransformerConfigurationException;
 
@@ -53,7 +49,6 @@ import playground.dgrether.koehlerstrehlersignal.data.DgGreen;
 import playground.dgrether.koehlerstrehlersignal.data.DgNetwork;
 import playground.dgrether.koehlerstrehlersignal.data.DgProgram;
 import playground.dgrether.koehlerstrehlersignal.data.DgStreet;
-import playground.dgrether.signalsystems.DgSignalsUtils;
 
 
 /**
@@ -149,28 +144,7 @@ public class DgMatsim2KoehlerStrehler2010ModelConverter {
 				this.createCrossing4SignalizedLink(dgnet, link, laneDefinitions, signalsData.getSignalSystemsData());
 			}
 			else{
-				this.createCrossing4NotSignalizedLink();
-			}
-		}
-		
-		
-		//TODO remove old crap
-		//collect all ids of nodes that are signalized in a map and a set
-		Map<Id, Set<Id>> signalizedNodesBySystemId = DgSignalsUtils.calculateSignalizedNodesPerSystem(signalsData.getSignalSystemsData(), net);
-		Set<Id> signalizedNodes = new HashSet<Id>();
-		for (Set<Id> nodesOfSystem : signalizedNodesBySystemId.values()){
-			signalizedNodes.addAll(nodesOfSystem);
-		}
-		//calculate turning moves for all crossings/nodes
-		for (Node node : net.getNodes().values()){
-			//get the crossing
-			DgCrossing crossing = dgnet.getCrossings().get(node.getId());
-			if (signalizedNodes.contains(node.getId())){
-//				this.createCrossing4NotSignalizedNode(crossing, node);
-			}
-			//not signalized node
-			else {
-//				this.createCrossing4NotSignalizedNode(crossing, node);
+				this.createCrossing4NotSignalizedLink(dgnet, link, laneDefinitions);
 			}
 		}
 		return dgnet;
@@ -188,6 +162,10 @@ public class DgMatsim2KoehlerStrehler2010ModelConverter {
 		
 	}
 
+	
+	private void createLights(){
+		
+	}
 	
 	
 	private void createCrossing4SignalizedLink(DgNetwork dgnet, Link link, LaneDefinitions lanes, SignalSystemsData signalSystems) {
@@ -296,35 +274,6 @@ public class DgMatsim2KoehlerStrehler2010ModelConverter {
 	}
 	
 	
-	
-	private void createCrossing4NotSignalizedNode(DgCrossing crossing, Node node){
-		//TODO check if signalized flag is needed
-		crossing.setSignalized(false);
-		//create a program
-		DgProgram program = new DgProgram(new IdImpl("1"));
-		program.setCycle(this.cycle);
-		crossing.addProgram(program);
-		//calculate and process the turning moves
-		Map<Link, List<Link>> turningMoveMap = this.getTurningMovesForNotSignalizedNode(node);
-		for (Entry<Link, List<Link>> inLinkOutLinks : turningMoveMap.entrySet()){
-			Link inLink = inLinkOutLinks.getKey();
-			DgCrossingNode inLinkToNode = crossing.getNodes().get(this.convertLinkId2ToCrossingNodeId(inLink.getId()));
-			for (Link outLink : inLinkOutLinks.getValue()){
-				DgCrossingNode outLinkFromNode = crossing.getNodes().get(this.convertLinkId2FromCrossingNodeId(outLink.getId()));
-				//create the light TODO check id creation
-				Id lightId = new IdImpl(inLink.getId().toString() + "_" + outLink.getId().toString());
-				DgStreet light = new DgStreet(lightId, inLinkToNode, outLinkFromNode);
-				crossing.addLight(light);
-				//create an all time green for the light
-				DgGreen green = new DgGreen(lightId);
-				green.setLength(this.cycle);
-				green.setOffset(0);
-				program.addGreen(green);
-			}
-		}
-	}
-	
-	
 	private List<Link> getTurningMoves4LinkWoLanes(Link link){
 		List<Link> outLinks = new ArrayList<Link>();
 		for (Link outLink : link.getToNode().getOutLinks().values()){
@@ -335,22 +284,6 @@ public class DgMatsim2KoehlerStrehler2010ModelConverter {
 		return outLinks;
 	}
 	
-
-	private Map<Link, List<Link>> getTurningMovesForNotSignalizedNode(Node node){
-		Map<Link, List<Link>> inLink2OutLinksMap = new HashMap<Link, List<Link>>();
-		for (Link inLink : node.getInLinks().values()){
-			List<Link> outLinks = new ArrayList<Link>();
-			inLink2OutLinksMap.put(inLink, outLinks);
-			for (Link outLink : node.getOutLinks().values()){
-				if (!inLink.getFromNode().equals(outLink.getToNode())){
-					outLinks.add(outLink);
-				}
-			}
-		}
-		return inLink2OutLinksMap;
-	}
-	
-
 	
 	/**
 	 * @param args
