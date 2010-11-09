@@ -101,6 +101,11 @@ public abstract class AbstractResizeLinksByCount {
 	}
 	
 	
+	/**
+	 * Resizes the given network and write it to the outFile. 
+	 * If necessary the given counts are preprocessed. They are written to outFile_counts.xml
+	 * In Addition shapefiles with the refactored and with the remaining links are written.
+	 */
 	public void run (String outFile){
 		this.outFile = outFile;
 		if(!this.countsMatched){
