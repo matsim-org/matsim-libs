@@ -140,35 +140,29 @@ public class DgMatsim2KoehlerStrehler2010ModelConverter {
 		Set<Id> signalizedLinks = null;
 		//loop rather over links so nothing is forgotten
 		for (Link link : net.getLinks().values()){
-			if (signalizedLinks.contains(link.getId())){
-				this.createCrossing4SignalizedLink(dgnet, link, laneDefinitions, signalsData.getSignalSystemsData());
-			}
-			else{
-				this.createCrossing4NotSignalizedLink(dgnet, link, laneDefinitions);
-			}
+			this.createCrossing4SignalizedLink(dgnet, link, laneDefinitions, signalsData.getSignalSystemsData(), signalizedLinks);
 		}
 		return dgnet;
 	}
 
-	private void createCrossing4NotSignalizedLink(DgNetwork dgnet, Link link, LaneDefinitions lanes){
-		SignalSystemData system;
-		List<SignalData> signals4Link = null;
-		DgCrossing crossing = dgnet.getCrossings().get(link.getToNode().getId());
-		DgProgram program = crossing.getPrograms().get(this.programId);
-		Link backLink = this.getBackLink(link);
-		DgCrossingNode inLinkToNode = crossing.getNodes().get(this.convertLinkId2ToCrossingNodeId(link.getId()));
-		LanesToLinkAssignment l2l = lanes.getLanesToLinkAssignments().get(link.getId());
-		
-		
-	}
 
 	
-	private void createLights(){
-		
+	/**
+	 * 
+	 */
+	private Id createLights(Id fromLinkId, Id outLinkId, Id backLinkId, DgCrossingNode inLinkToNode, DgCrossing crossing){
+		if (backLinkId != null && backLinkId.equals(outLinkId)){
+			return null; //do nothing if it is the backlink
+		}
+		Id lightId = new IdImpl(fromLinkId.toString() + "_" + outLinkId.toString());
+		DgCrossingNode outLinkFromNode = crossing.getNodes().get(this.convertLinkId2FromCrossingNodeId(outLinkId));
+		DgStreet light = new DgStreet(lightId, inLinkToNode, outLinkFromNode);
+		crossing.addLight(light);
+		return lightId;
 	}
 	
 	
-	private void createCrossing4SignalizedLink(DgNetwork dgnet, Link link, LaneDefinitions lanes, SignalSystemsData signalSystems) {
+	private void createCrossing4SignalizedLink(DgNetwork dgnet, Link link, LaneDefinitions lanes, SignalSystemsData signalSystems, Set<Id> signalizedLinks) {
 		SignalSystemData system;
 		List<SignalData> signals4Link = null;
 		DgCrossing crossing = dgnet.getCrossings().get(link.getToNode().getId());
@@ -177,15 +171,10 @@ public class DgMatsim2KoehlerStrehler2010ModelConverter {
 		DgCrossingNode inLinkToNode = crossing.getNodes().get(this.convertLinkId2ToCrossingNodeId(link.getId()));
 		LanesToLinkAssignment l2l = lanes.getLanesToLinkAssignments().get(link.getId());
 		if (signals4Link.size() == 1){
-			if (l2l == null){
+			if (l2l == null) {
 				List<Link> toLinks = this.getTurningMoves4LinkWoLanes(link);
-				//TODO the code for outlinks is 4 times nearly the same
 				for (Link outLink : toLinks){
-					DgCrossingNode outLinkFromNode = crossing.getNodes().get(this.convertLinkId2FromCrossingNodeId(outLink.getId()));
-					//create the light TODO check id creation
-					Id lightId = new IdImpl(link.getId().toString() + "_" + outLink.getId().toString());
-					DgStreet light = new DgStreet(lightId, inLinkToNode, outLinkFromNode);
-					crossing.addLight(light);
+					Id lightId = this.createLights(link.getId(), outLink.getId(), backLink.getId(), inLinkToNode, crossing);
 					//create green for the light TODO
 					DgGreen green = new DgGreen(lightId);
 					green.setLength(this.cycle);
@@ -197,13 +186,7 @@ public class DgMatsim2KoehlerStrehler2010ModelConverter {
 				for (Lane lane : l2l.getLanes().values()){
 					if (lane.getToLaneIds() == null || lane.getToLaneIds().isEmpty()){ // check for outlane
 						for (Id outLinkId : lane.getToLinkIds()){
-							if (backLink != null && backLink.getId().equals(outLinkId)){
-								continue; //do nothing if it is the backlink
-							}
-							Id lightId = new IdImpl(link.getId().toString() + "_" + outLinkId.toString());
-							DgCrossingNode outLinkFromNode = crossing.getNodes().get(this.convertLinkId2FromCrossingNodeId(outLinkId));
-							DgStreet light = new DgStreet(lightId, inLinkToNode, outLinkFromNode);
-							crossing.addLight(light);
+							Id lightId = this.createLights(link.getId(), outLinkId, backLink.getId(), inLinkToNode, crossing);
 							//create green for the light TODO
 							DgGreen green = new DgGreen(lightId);
 							green.setLength(this.cycle);
@@ -222,13 +205,7 @@ public class DgMatsim2KoehlerStrehler2010ModelConverter {
 					}
 					else { // we have turning move restrictions
 						for (Id outLinkId : signal.getTurningMoveRestrictions()){
-							if (backLink != null && backLink.getId().equals(outLinkId)){
-								continue; //do nothing if it is the backlink
-							}
-							Id lightId = new IdImpl(link.getId().toString() + "_" + outLinkId.toString());
-							DgCrossingNode outLinkFromNode = crossing.getNodes().get(this.convertLinkId2FromCrossingNodeId(outLinkId));
-							DgStreet light = new DgStreet(lightId, inLinkToNode, outLinkFromNode);
-							crossing.addLight(light);
+							Id lightId = this.createLights(link.getId(), outLinkId, backLink.getId(), inLinkToNode, crossing);
 							//create green for the light TODO
 							DgGreen green = new DgGreen(lightId);
 							green.setLength(this.cycle);
@@ -243,13 +220,7 @@ public class DgMatsim2KoehlerStrehler2010ModelConverter {
 					for (Id laneId : signal.getLaneIds()){
 						Lane lane = l2l.getLanes().get(laneId);
 						for (Id outLinkId : lane.getToLinkIds()){
-							if (backLink != null && backLink.getId().equals(outLinkId)){
-								continue; //do nothing if it is the backlink
-							}
-							Id lightId = new IdImpl(link.getId().toString() + "_" + outLinkId.toString());
-							DgCrossingNode outLinkFromNode = crossing.getNodes().get(this.convertLinkId2FromCrossingNodeId(outLinkId));
-							DgStreet light = new DgStreet(lightId, inLinkToNode, outLinkFromNode);
-							crossing.addLight(light);
+							Id lightId = this.createLights(link.getId(), outLinkId, backLink.getId(), inLinkToNode, crossing);
 							//create green for the light TODO
 							DgGreen green = new DgGreen(lightId);
 							green.setLength(this.cycle);
