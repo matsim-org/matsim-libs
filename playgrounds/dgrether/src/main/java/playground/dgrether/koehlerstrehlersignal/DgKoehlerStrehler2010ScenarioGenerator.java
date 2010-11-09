@@ -29,9 +29,11 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
+import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.api.experimental.network.NetworkWriter;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.lanes.Lane;
 import org.matsim.lanes.LaneDefinitions;
 import org.matsim.lanes.LaneDefinitionsFactory;
@@ -40,6 +42,7 @@ import org.matsim.lanes.LaneDefinitionsWriter20;
 import org.matsim.lanes.LanesToLinkAssignment;
 import org.matsim.signalsystems.data.SignalsData;
 import org.matsim.signalsystems.data.SignalsDataImpl;
+import org.matsim.signalsystems.data.SignalsScenarioLoader;
 import org.matsim.signalsystems.data.SignalsScenarioWriter;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalControlData;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalGroupSettingsData;
@@ -73,6 +76,15 @@ public class DgKoehlerStrehler2010ScenarioGenerator {
 	
 	private Id id1, id2, id3, id4, id5, id6, id7, id8;
 	private Id id12, id21, id23, id32, id34, id43, id45, id54, id56, id65, id27, id72, id78, id87, id85, id58;
+	
+	public ScenarioImpl loadScenario(){
+		ScenarioLoader scl = new ScenarioLoaderImpl(baseDir + "config_signals.xml");
+		ScenarioImpl sc = (ScenarioImpl) scl.loadScenario();
+		SignalsScenarioLoader signalsLoader = new SignalsScenarioLoader(sc.getConfig().signalSystems());
+		SignalsData signals = signalsLoader.loadSignalsData();
+		sc.addScenarioElement(signals);
+		return sc;
+	}
 	
 	private void createScenario() {
 		this.initIds();
