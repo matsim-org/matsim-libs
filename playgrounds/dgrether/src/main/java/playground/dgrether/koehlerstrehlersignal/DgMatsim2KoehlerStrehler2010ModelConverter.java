@@ -35,10 +35,15 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.lanes.Lane;
 import org.matsim.lanes.LaneDefinitions;
 import org.matsim.lanes.LanesToLinkAssignment;
 import org.matsim.signalsystems.data.SignalsData;
+import org.matsim.signalsystems.data.signalcontrol.v20.SignalGroupSettingsData;
+import org.matsim.signalsystems.data.signalcontrol.v20.SignalPlanData;
+import org.matsim.signalsystems.data.signalcontrol.v20.SignalSystemControllerData;
+import org.matsim.signalsystems.data.signalgroups.v20.SignalGroupData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsData;
@@ -68,6 +73,13 @@ public class DgMatsim2KoehlerStrehler2010ModelConverter {
 	private int cycle = 60;
 	private Id programId = new IdImpl("1");
 	
+	private Id convertLinkId2FromCrossingNodeId(Id linkId){
+		return new IdImpl(linkId.toString() + CROSSING_FROM_NODE_SUFFIX);
+	}
+	
+	private Id convertLinkId2ToCrossingNodeId(Id linkId){
+		return new IdImpl(linkId.toString() + CROSSING_TO_NODE_SUFFIX);
+	}
 	
 	
 	public void convertAndWrite(ScenarioImpl sc, String outFile) throws SAXException, IOException, TransformerConfigurationException{
@@ -86,15 +98,6 @@ public class DgMatsim2KoehlerStrehler2010ModelConverter {
 		}
 	}
 	
-	private Id convertLinkId2FromCrossingNodeId(Id linkId){
-		return new IdImpl(linkId.toString() + CROSSING_FROM_NODE_SUFFIX);
-	}
-
-	private Id convertLinkId2ToCrossingNodeId(Id linkId){
-		return new IdImpl(linkId.toString() + CROSSING_TO_NODE_SUFFIX);
-	}
-
-	
 	private void convertLinks2Streets(DgNetwork dgnet, Network net){
 		for (Link link : net.getLinks().values()){
 			DgCrossing fromNodeCrossing = dgnet.getCrossings().get(link.getFromNode().getId());
@@ -107,7 +110,6 @@ public class DgMatsim2KoehlerStrehler2010ModelConverter {
 			dgnet.addStreet(street);
 		}
 	}
-
 	
 	/*
 	 * codierung:
@@ -142,21 +144,31 @@ public class DgMatsim2KoehlerStrehler2010ModelConverter {
 		Set<Id> signalizedLinks = this.getSigalizedLinkIds(signalsData.getSignalSystemsData());
 		//loop over links and create layout of crossing
 		for (Link link : net.getLinks().values()){
+			//prepare some objects/data
 			DgCrossing crossing = dgnet.getCrossings().get(link.getToNode().getId());
 			Link backLink = this.getBackLink(link);
 			DgCrossingNode inLinkToNode = crossing.getNodes().get(this.convertLinkId2ToCrossingNodeId(link.getId()));
 			LanesToLinkAssignment l2l = lanes.getLanesToLinkAssignments().get(link.getId());
+			//create crossing layout
 			if (signalizedLinks.contains(link.getId())){
 				SignalSystemData system = this.getSignalSystem4SignalizedLinkId(signalsData.getSignalSystemsData(), link.getId());
-				this.createCrossing4SignalizedLink(crossing, link, inLinkToNode, backLink, l2l, system);
+				this.createCrossing4SignalizedLink(crossing, link, inLinkToNode, backLink, l2l, system, signalsData);
 			}
 			else {
-				
+				this.createCrossing4NotSignalizedLink(crossing, link, inLinkToNode, backLink, l2l);
 			}
 		}
 		return dgnet;
 	}
 
+	public Tuple<SignalPlanData, SignalGroupSettingsData> getPlanAndSignalGroupSettings4Signal(Id signalSystemId, Id signalId, SignalsData signalsData){
+		SignalSystemControllerData controllData = signalsData.getSignalControlData().getSignalSystemControllerDataBySystemId().get(signalSystemId);
+		SignalPlanData signalPlan = controllData.getSignalPlanData().values().iterator().next();
+		SignalGroupData signalGroup = DgSignalsUtils.getSignalGroup4SignalId(signalSystemId, signalId, signalsData.getSignalGroupsData());
+		return new Tuple<SignalPlanData, SignalGroupSettingsData>(signalPlan, signalPlan.getSignalGroupSettingsDataByGroupId().get(signalGroup.getId()));
+	}
+
+	
 
 	private Set<Id> getSigalizedLinkIds(SignalSystemsData signals){
 		Map<Id, Set<Id>> signalizedLinksPerSystem = DgSignalsUtils.calculateSignalizedLinksPerSystem(signals);
@@ -181,6 +193,131 @@ public class DgMatsim2KoehlerStrehler2010ModelConverter {
 		return lightId;
 	}
 	
+	
+	private void createCrossing4SignalizedLink(DgCrossing crossing, Link link, DgCrossingNode inLinkToNode, Link backLink, LanesToLinkAssignment l2l, SignalSystemData system, SignalsData signalsData) {
+		List<SignalData> signals4Link = this.getSignals4LinkId(system, link.getId());
+		DgProgram program = crossing.getPrograms().get(this.programId);
+		if (signals4Link.size() == 1){
+			SignalData signal = signals4Link.get(0);
+			Tuple<SignalPlanData, SignalGroupSettingsData> planGroupSettings = this.getPlanAndSignalGroupSettings4Signal(system.getId(), signal.getId(), signalsData);
+			SignalPlanData signalPlan = planGroupSettings.getFirst();
+			SignalGroupSettingsData groupSettings = planGroupSettings.getSecond();
+			if (l2l == null) {
+				List<Link> toLinks = this.getTurningMoves4LinkWoLanes(link);
+				for (Link outLink : toLinks){
+					Id lightId = this.createLights(link.getId(), outLink.getId(), backLink.getId(), inLinkToNode, crossing);
+					if (lightId != null){
+						this.createAndAddGreen4Settings(lightId, program, groupSettings, signalPlan);
+					}
+				}
+			}
+			else {
+				for (Lane lane : l2l.getLanes().values()){
+					if (lane.getToLaneIds() == null || lane.getToLaneIds().isEmpty()){ // check for outlane
+						for (Id outLinkId : lane.getToLinkIds()){
+							Id lightId = this.createLights(link.getId(), outLinkId, backLink.getId(), inLinkToNode, crossing);
+							if (lightId != null){
+								this.createAndAddGreen4Settings(lightId, program, groupSettings, signalPlan);
+							}
+						}
+					}
+				}
+			}
+		}
+		else { //more than one signal on this link
+			//TODO can i save half of the code?
+			if (l2l == null){
+				for (SignalData signal : signals4Link){
+					if (signal.getTurningMoveRestrictions() == null || signal.getTurningMoveRestrictions().isEmpty()){
+						throw new IllegalStateException("more than one signal on one link but no lanes and no turning move restrictions is not allowed");
+					}
+					else { // we have turning move restrictions
+						for (Id outLinkId : signal.getTurningMoveRestrictions()){
+							Id lightId = this.createLights(link.getId(), outLinkId, backLink.getId(), inLinkToNode, crossing);
+							if (lightId != null){
+								Tuple<SignalPlanData, SignalGroupSettingsData> planGroupSettings = this.getPlanAndSignalGroupSettings4Signal(system.getId(), signal.getId(), signalsData);
+								SignalPlanData signalPlan = planGroupSettings.getFirst();
+								SignalGroupSettingsData groupSettings = planGroupSettings.getSecond();
+								this.createAndAddGreen4Settings(lightId, program, groupSettings, signalPlan);
+							}
+						}
+					}
+				}
+			}
+			else { //lane with links
+				for (SignalData signal : signals4Link){
+					for (Id laneId : signal.getLaneIds()){
+						Lane lane = l2l.getLanes().get(laneId);
+						for (Id outLinkId : lane.getToLinkIds()){
+							Id lightId = this.createLights(link.getId(), outLinkId, backLink.getId(), inLinkToNode, crossing);
+							if (lightId != null){
+								Tuple<SignalPlanData, SignalGroupSettingsData> planGroupSettings = this.getPlanAndSignalGroupSettings4Signal(system.getId(), signal.getId(), signalsData);
+								SignalPlanData signalPlan = planGroupSettings.getFirst();
+								SignalGroupSettingsData groupSettings = planGroupSettings.getSecond();
+								this.createAndAddGreen4Settings(lightId, program, groupSettings, signalPlan);
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	
+
+	private void createCrossing4NotSignalizedLink(DgCrossing crossing, Link link,
+			DgCrossingNode inLinkToNode, Link backLink, LanesToLinkAssignment l2l) {
+		DgProgram program = crossing.getPrograms().get(this.programId);
+		if (l2l == null){
+			List<Link> toLinks = this.getTurningMoves4LinkWoLanes(link);
+			for (Link outLink : toLinks){
+				Id lightId = this.createLights(link.getId(), outLink.getId(), backLink.getId(), inLinkToNode, crossing);
+				if (lightId != null){
+					this.createAndAddAllTimeGreen(lightId, program);
+				}
+			}
+		}
+		else {
+			for (Lane lane : l2l.getLanes().values()){
+				if (lane.getToLaneIds() == null || lane.getToLaneIds().isEmpty()){ // check for outlanes
+					for (Id outLinkId : lane.getToLinkIds()){
+						Id lightId = this.createLights(link.getId(), outLinkId, backLink.getId(), inLinkToNode, crossing);
+						if (lightId != null){
+							this.createAndAddAllTimeGreen(lightId, program);
+						}
+					}
+				}
+			}
+		}
+	}
+
+	private void createAndAddGreen4Settings(Id lightId, DgProgram program,
+			SignalGroupSettingsData groupSettings, SignalPlanData signalPlan) {
+		DgGreen green = new DgGreen(lightId);
+		green.setOffset(signalPlan.getOffset());
+		green.setLength(this.calculateGreenTimeSeconds(groupSettings, signalPlan.getCycleTime()));
+		program.addGreen(green);
+	}
+	
+	
+	public int calculateGreenTimeSeconds(SignalGroupSettingsData settings, Integer cycle){
+		if (settings.getOnset() <= settings.getDropping()) {
+			return settings.getDropping() - settings.getOnset();
+		}
+		else {
+			return  settings.getDropping() + (cycle - settings.getOnset()); 
+		}
+	}
+
+	
+	
+	private void createAndAddAllTimeGreen(Id lightId, DgProgram program){
+		DgGreen green = new DgGreen(lightId);
+		green.setLength(this.cycle);
+		green.setOffset(0);
+		program.addGreen(green);
+	}
+	
+	
 	private SignalSystemData getSignalSystem4SignalizedLinkId(SignalSystemsData signalSystems, Id linkId){
 		for (SignalSystemData system : signalSystems.getSignalSystemData().values()){
 			for (SignalData signal : system.getSignalData().values()){
@@ -200,73 +337,6 @@ public class DgMatsim2KoehlerStrehler2010ModelConverter {
 			}
 		}
 		return signals4Link;
-	}
-	
-	
-	private void createCrossing4SignalizedLink(DgCrossing crossing, Link link, DgCrossingNode inLinkToNode, Link backLink, LanesToLinkAssignment l2l, SignalSystemData system) {
-		List<SignalData> signals4Link = this.getSignals4LinkId(system, link.getId());
-		DgProgram program = crossing.getPrograms().get(this.programId);
-		if (signals4Link.size() == 1){
-			if (l2l == null) {
-				List<Link> toLinks = this.getTurningMoves4LinkWoLanes(link);
-				for (Link outLink : toLinks){
-					Id lightId = this.createLights(link.getId(), outLink.getId(), backLink.getId(), inLinkToNode, crossing);
-					//create green for the light TODO
-					DgGreen green = new DgGreen(lightId);
-					green.setLength(this.cycle);
-					green.setOffset(0);
-					program.addGreen(green);
-				}
-			}
-			else {
-				for (Lane lane : l2l.getLanes().values()){
-					if (lane.getToLaneIds() == null || lane.getToLaneIds().isEmpty()){ // check for outlane
-						for (Id outLinkId : lane.getToLinkIds()){
-							Id lightId = this.createLights(link.getId(), outLinkId, backLink.getId(), inLinkToNode, crossing);
-							//create green for the light TODO
-							DgGreen green = new DgGreen(lightId);
-							green.setLength(this.cycle);
-							green.setOffset(0);
-							program.addGreen(green);
-						}
-					}
-				}
-			}
-		}
-		else { //more than one signal on this link
-			if (l2l == null){
-				for (SignalData signal : signals4Link){
-					if (signal.getTurningMoveRestrictions() == null || signal.getTurningMoveRestrictions().isEmpty()){
-						throw new IllegalStateException("more than one signal on one link but no lanes and no turning move restrictions is not allowed");
-					}
-					else { // we have turning move restrictions
-						for (Id outLinkId : signal.getTurningMoveRestrictions()){
-							Id lightId = this.createLights(link.getId(), outLinkId, backLink.getId(), inLinkToNode, crossing);
-							//create green for the light TODO
-							DgGreen green = new DgGreen(lightId);
-							green.setLength(this.cycle);
-							green.setOffset(0);
-							program.addGreen(green);
-						}
-					}
-				}
-			}
-			else { //lane with links
-				for (SignalData signal : signals4Link){
-					for (Id laneId : signal.getLaneIds()){
-						Lane lane = l2l.getLanes().get(laneId);
-						for (Id outLinkId : lane.getToLinkIds()){
-							Id lightId = this.createLights(link.getId(), outLinkId, backLink.getId(), inLinkToNode, crossing);
-							//create green for the light TODO
-							DgGreen green = new DgGreen(lightId);
-							green.setLength(this.cycle);
-							green.setOffset(0);
-							program.addGreen(green);
-						}
-					}
-				}
-			}
-		}
 	}
 
 	

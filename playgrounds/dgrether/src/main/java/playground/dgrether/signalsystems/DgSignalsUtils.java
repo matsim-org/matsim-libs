@@ -28,6 +28,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.signalsystems.data.signalgroups.v20.SignalGroupData;
+import org.matsim.signalsystems.data.signalgroups.v20.SignalGroupsData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsData;
@@ -62,6 +64,20 @@ public class DgSignalsUtils {
 		return signalizedNodesPerSystem;
 	}
 
+	/**
+	 * 
+	 * @return null if the signal is not attached to a group
+	 */
+	public static SignalGroupData getSignalGroup4SignalId(Id signalSystemId, Id signalId, SignalGroupsData signalGroups){
+		Map<Id, SignalGroupData> signalGroups4System = signalGroups.getSignalGroupDataBySystemId(signalSystemId);
+		for (SignalGroupData group : signalGroups4System.values()){
+			if (group.getSignalIds().contains(signalId)){
+				return group;
+			}
+		}
+		return null; 
+	}
+	
 	
 	/**
 	 * @param signalSystemsData 
