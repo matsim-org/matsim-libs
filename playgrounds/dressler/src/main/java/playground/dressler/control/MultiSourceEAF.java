@@ -321,6 +321,7 @@ public class MultiSourceEAF {
 		CPUTimer Tgarbage = new CPUTimer("Garbage Collection ");;
 		CPUTimer Tall = new CPUTimer("Total ");
 		CPUTimer Tcheck = new CPUTimer("Checks ");
+		CPUTimer Trepeatedpaths = new CPUTimer("Repeated paths ");
 		Tall.onoff();
 		
 		Flow fluss;
@@ -378,6 +379,7 @@ public class MultiSourceEAF {
 			Tsearch.newiter();
 			Tcheck.newiter();
 			Tgarbage.newiter();
+			Trepeatedpaths.newiter();
 						
 			Tsearch.onoff();
 			// ugly ...
@@ -488,6 +490,7 @@ public class MultiSourceEAF {
 
 			int totalsizeaugmented = 0;
 
+			Trepeatedpaths.onoff();
 			if (trySuccessfulPaths && settings.useRepeatedPaths) {
 				LinkedList<TimeExpandedPath> newSP = new LinkedList<TimeExpandedPath>();
 
@@ -535,7 +538,7 @@ public class MultiSourceEAF {
 					tryReverse = (settings.searchAlgo == FlowCalculationSettings.SEARCHALGO_REVERSE);
 				}
 			}
-
+			Trepeatedpaths.onoff();
 
 
 			/* sort the paths first by the number of steps used!
@@ -639,7 +642,7 @@ public class MultiSourceEAF {
 			if (i % VERBOSITY == 0) {				
 				System.out.println();
 				System.out.println("Iterations: " + i + " flow: " + fluss.getTotalFlow() + " of " + settings.getTotalDemand() + " Time: " + Tall + ", " + Tsearch + ", " + Taugment + ".");
-				System.out.println(Tgarbage + ", " + Tcheck);
+				System.out.println(Tgarbage + ", " + Tcheck + ", " + Trepeatedpaths);				
 				System.out.println("CleanUp got rid of " + EdgeGain + " edge intervalls so far.");
 
 				//System.out.println("removed on the fly:" + VertexIntervalls.rem);
@@ -655,7 +658,7 @@ public class MultiSourceEAF {
 		System.out.println("");
 		System.out.println("");
 		System.out.println("Iterations: " + i + " flow: " + fluss.getTotalFlow() + " of " + settings.getTotalDemand() + " Time: " + Tall + ", " + Tsearch + ", " + Taugment + ".");
-		System.out.println(Tgarbage + ", " + Tcheck);
+		System.out.println(Tgarbage + ", " + Tcheck + ", " + Trepeatedpaths);
 		System.out.println("CleanUp got rid of " + EdgeGain + " edge intervalls so far.");
 		//System.out.println("removed on the fly:" + VertexIntervalls.rem);
 		System.out.println("last path: " + tempstr);
@@ -1131,7 +1134,7 @@ public class MultiSourceEAF {
 		
 		fluss = MultiSourceEAF.calcEAFlow(settings, flowpaths);
 		
-		//fluss.writePathflow(false);
+		//System.out.println(fluss.writePathflow(false));
 
 		/* --------- the actual work is done --------- */
 		

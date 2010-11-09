@@ -41,7 +41,7 @@ public class FlowCalculationSettings {
 	public static final int SEARCHALGO_MIXED = 3;
 
 	/* default scaling parameters */
-	public int timeStep = 1;
+	public double timeStep = 1;
 	public double flowFactor = 1.0;
 	public int minTravelTime = 0; //set to 1 to avoid edges with time 0 after scaling! 
 	public double addTravelTime = 0.0; //this is added to the travel times before conversion!
@@ -1124,4 +1124,114 @@ public class FlowCalculationSettings {
         }
 
 	}
+	
+	
+	
+    public String readConfig(String contents) {
+    	String lines[] = contents.split("\n");
+    	String error = "";
+    	
+    	int i = 0;
+    	while (i < lines.length) {
+    		String s = lines[i++];
+    		s = s.trim().toLowerCase();
+    		
+    		String t = "";
+    		if (i < lines.length) {   
+    			t = lines[i++];
+    			t = t.trim().toLowerCase(); // would be bad for filenames etc
+    		}
+    		
+    	    if (s.equals("--timestep")) {
+    	    	timeStep = Double.parseDouble(t);
+    	    } else if (s.equals("--flowfactor")) {
+    	    	flowFactor = Double.parseDouble(t);
+    	    } else if (s.equals("--mintraveltime")) {
+    	    	minTravelTime  = Integer.parseInt(t);
+    	    } else if (s.equals("--addtraveltime")) {
+    	    	addTravelTime  = Integer.parseInt(t);
+    	    } else if (s.equals("--timehorizon")) {
+    	    	TimeHorizon = Integer.parseInt(t);
+    	    } else if (s.equals("--maxrounds")) {
+    	    	MaxRounds = Integer.parseInt(t);
+    	    } else if (s.equals("--usesinkcapacities")) {
+    	    	useSinkCapacities = Boolean.parseBoolean(t);
+    	    } else if (s.equals("--searchalgo")) {
+    	    	searchAlgo = Integer.parseInt(t);
+    	    } else if (s.equals("--usepriorityqueue")) {
+    	    	usePriorityQueue  = Boolean.parseBoolean(t);    	    	
+    	    } else if (s.equals("--usevertexcleanup")) {
+    	    	useVertexCleanup  = Boolean.parseBoolean(t);
+    	    } else if (s.equals("--useimplicitvertexcleanup")) {
+    	    	useImplicitVertexCleanup  = Boolean.parseBoolean(t);
+    	    } else if (s.equals("--useshadowflow")) {
+    	    	useShadowFlow  = Boolean.parseBoolean(t);
+    	    } else if (s.equals("--checkconsistency")) {
+    	    	checkConsistency  = Integer.parseInt(t);
+    	    } else if (s.equals("--checkTouchedNodes")) {
+    	    	checkTouchedNodes  = Boolean.parseBoolean(t);
+    	    } else if (s.equals("--dogarbagecollection")) {
+    	    	doGarbageCollection  = Integer.parseInt(t);
+    	    } else if (s.equals("--sortpathsbeforeaugmenting")) {
+    	    	sortPathsBeforeAugmenting  = Boolean.parseBoolean(t);
+    	    } else if (s.equals("--keeppaths")) {
+    	    	keepPaths  = Boolean.parseBoolean(t);
+    	    } else if (s.equals("--unfoldpaths")) {
+    	    	unfoldPaths  = Boolean.parseBoolean(t);
+    	    } else if (s.equals("--maplinkstotep")) {
+    	    	mapLinksToTEP  = Boolean.parseBoolean(t);
+    	    } else if (s.equals("--userepeatedpaths")) {
+    	    	useRepeatedPaths  = Boolean.parseBoolean(t);
+    	    } else if (s.equals("--quickcutoff")) {
+    	    	quickCutOff  = Boolean.parseBoolean(t);
+    	    } else if (s.equals("--delaysinkpropagation")) {
+    	    	delaySinkPropagation  = Boolean.parseBoolean(t);
+    	    } else if (s.equals("--useholdover")) {
+    	    	useHoldover  = Boolean.parseBoolean(t);
+    	    } else if (s.equals("--useholdovercapacities")) {
+    	    	useHoldoverCapacities  = Boolean.parseBoolean(t);
+    	    } else if (s.equals("--trackunreachable")) {
+    	    	trackUnreachableVertices  = Boolean.parseBoolean(t);
+    	    } else {
+    	    	error += "Unknown option: " + s + "\n";
+    	    }
+    	}
+    	return error;
+	}
+    
+    public String writeConfig() {
+    	String s = "";
+    	s += "--timestep\n" + timeStep + "\n";
+    	s += "--flowfactor\n" + flowFactor + "\n";
+    	s += "--mintraveltime\n" + minTravelTime + "\n"; 
+    	s += "--addtraveltime\n" + addTravelTime + "\n";
+
+    	s += "--timehorizon\n" + TimeHorizon + "\n";
+    	s += "--maxrounds\n" + MaxRounds + "\n";
+
+    	s += "--useSinkCapacities\n" + useSinkCapacities + "\n";
+    	s += "--searchAlgo\n" + searchAlgo + "\n";
+        s += "--usepriorityqueue\n" + usePriorityQueue + "\n";
+    	s += "--usevertexcleanup\n" + useVertexCleanup + "\n";
+    	
+    	s += "--useimplicitvertexcleanup\n" + useImplicitVertexCleanup + "\n";
+    	s += "--useshadowflow\n" + useShadowFlow + "\n";
+    	s += "--checkconsistency\n" + checkConsistency + "\n";
+    	s += "--checkTouchedNodes\n" + checkTouchedNodes + "\n";
+        s += "--dogarbagecollection\n" + doGarbageCollection + "\n";
+
+    	s += "--sortpathsbeforeaugmenting\n" + sortPathsBeforeAugmenting + "\n";
+    	s += "--keeppaths\n" + keepPaths + "\n";
+    	s += "--unfoldpaths\n" + unfoldPaths + "\n";
+    	s += "--maplinkstotep\n" + mapLinksToTEP + "\n";
+    	s += "--userepeatedpaths\n" + useRepeatedPaths + "\n";
+    	s += "--quickcutoff\n" + quickCutOff + "\n";
+    	s += "--delaysinkpropagation\n" + delaySinkPropagation  + "\n"; 
+    	s += "--useholdover\n" + useHoldover + "\n";
+    	s += "--useholdovercapacities\n" + useHoldoverCapacities + "\n";
+
+    	s += "--trackunreachable\n" + trackUnreachableVertices + "\n";
+    	return s;
+    }
+
 }
