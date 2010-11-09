@@ -3,8 +3,10 @@
  */
 package playground.jbischoff.BAsignals;
 
-import org.jfree.util.Log;
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.SignalSystemsConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -22,6 +24,11 @@ import org.matsim.signalsystems.model.QSimSignalEngine;
 import org.matsim.signalsystems.model.SignalEngine;
 import org.matsim.signalsystems.model.SignalSystemsManager;
 
+import playground.dgrether.analysis.charts.utils.DgChartWriter;
+import playground.dgrether.signalsystems.analysis.DgGreenSplitPerIterationGraph;
+import playground.dgrether.signalsystems.analysis.DgSignalGreenSplitHandler;
+
+
 /**
  * @author jbischoff
  *
@@ -31,6 +38,11 @@ public class JBSignalControllerListener implements StartupListener, IterationSta
 	private SignalSystemsManager manager;
 	private SignalsControllerListener delegate;
 	private CarsOnLaneHandler collh;
+	private DgGreenSplitPerIterationGraph greenSplitPerIterationGraph;
+	private DgGreenSplitPerIterationGraph greenSplitPerIterationGraph1;
+	private DgGreenSplitPerIterationGraph greenSplitPerIterationGraph2;
+
+	private DgSignalGreenSplitHandler signalGreenSplitHandler;
 	
 	public JBSignalControllerListener(SignalsControllerListener delegate){
 		this.collh = new CarsOnLaneHandler();
@@ -45,13 +57,8 @@ public class JBSignalControllerListener implements StartupListener, IterationSta
 	@Override
 	public void notifyStartup(StartupEvent e) {
 		Controler c = e.getControler();
-		c.addControlerListener((new ShutdownListener() {
-	
-
-			public void notifyShutdown(ShutdownEvent e) {
-				Log.info("Agents that passed an adaptive signal system at least once: "+collh.getPassedAgents());
-
-			}}));
+		this.addControlerListeners(c);
+			
 			
 		Scenario scenario = c.getScenario();
 		SignalSystemsConfigGroup signalsConfig = scenario.getConfig().signalSystems();
@@ -61,6 +68,70 @@ public class JBSignalControllerListener implements StartupListener, IterationSta
 		this.manager = jbBuilder.createAndInitializeSignalSystemsManager();
 		SignalEngine engine = new QSimSignalEngine(manager);
 		c.getQueueSimulationListener().add(engine);
+		
+	}
+
+	private void addControlerListeners(Controler c) {
+		// TODO Auto-generated method stub
+		signalGreenSplitHandler = new DgSignalGreenSplitHandler();
+		signalGreenSplitHandler.addSignalSystem(new IdImpl("18"));
+		signalGreenSplitHandler.addSignalSystem(new IdImpl("17"));
+		signalGreenSplitHandler.addSignalSystem(new IdImpl("1"));
+
+		greenSplitPerIterationGraph = new DgGreenSplitPerIterationGraph(c.getConfig().controler(), new IdImpl("18"));
+		greenSplitPerIterationGraph1 = new DgGreenSplitPerIterationGraph(c.getConfig().controler(), new IdImpl("18"));
+		greenSplitPerIterationGraph2 = new DgGreenSplitPerIterationGraph(c.getConfig().controler(), new IdImpl("18"));
+		
+		c.getEvents().addHandler(signalGreenSplitHandler);
+		c.addControlerListener(new StartupListener() {
+
+			public void notifyStartup(StartupEvent e) {
+				e.getControler().getEvents().addHandler(signalGreenSplitHandler);
+			}
+		} );
+		
+		
+		c.addControlerListener((new ShutdownListener() {
+			
+			public void notifyShutdown(ShutdownEvent e) {
+				
+				System.err.println("Agents that passed an adaptive signal system at least once: "+collh.getPassedAgents());
+				
+				
+			}}));
+		
+		c.addControlerListener(new IterationEndsListener() {
+			public void notifyIterationEnds(IterationEndsEvent e) {
+
+				greenSplitPerIterationGraph.addIterationData(signalGreenSplitHandler, e.getIteration());
+				greenSplitPerIterationGraph1.addIterationData(signalGreenSplitHandler, e.getIteration());
+				greenSplitPerIterationGraph2.addIterationData(signalGreenSplitHandler, e.getIteration());
+				}});
+		
+		c.addControlerListener(new ShutdownListener() {
+			  private final Logger logg = Logger
+		      .getLogger(ShutdownListener.class);
+			public void notifyShutdown(ShutdownEvent e) {
+				
+
+				DgChartWriter.writeChart(e.getControler().getControlerIO().getOutputFilename("greensplit"), greenSplitPerIterationGraph.createChart());
+				for (Id ssid : signalGreenSplitHandler.getSystemIdAnalysisDataMap().keySet()){
+					//logg.info("=======Statistic for SignalSystem: "+ssid+" =============");
+			/*	for (Entry<Id, DgSignalGroupAnalysisData> entry : signalGreenSplitHandler.getSystemIdAnalysisDataMap().get(ssid).getSystemGroupAnalysisDataMap().entrySet() ){
+					//logg.info("for signalgroup: "+entry.getKey());
+					for (Entry <SignalGroupState,Double> ee : entry.getValue().getStateTimeMap().entrySet()){
+						//logg.info(ee.getKey()+": "+ee.getValue());
+						logg.info("Š;"+ssid+";"+entry.getKey()+";"+ee.getKey()+";"+ee.getValue());
+						//TravelTimeCalculator ttc = e.getControler().getTravelTimeCalculatorFactory().createTravelTimeCalculator(e.getControler().getNetwork(),e.getControler().getConfig().travelTimeCalculator());
+						
+					}
+				}*/
+				}
+			}
+		});
+		
+		
+		
 		
 	}
 
