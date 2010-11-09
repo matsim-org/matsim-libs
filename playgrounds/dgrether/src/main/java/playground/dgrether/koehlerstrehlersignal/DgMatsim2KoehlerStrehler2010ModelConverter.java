@@ -21,7 +21,9 @@ package playground.dgrether.koehlerstrehlersignal;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.xml.transform.TransformerConfigurationException;
@@ -49,6 +51,7 @@ import playground.dgrether.koehlerstrehlersignal.data.DgGreen;
 import playground.dgrether.koehlerstrehlersignal.data.DgNetwork;
 import playground.dgrether.koehlerstrehlersignal.data.DgProgram;
 import playground.dgrether.koehlerstrehlersignal.data.DgStreet;
+import playground.dgrether.signalsystems.DgSignalsUtils;
 
 
 /**
@@ -57,14 +60,14 @@ import playground.dgrether.koehlerstrehlersignal.data.DgStreet;
  */
 public class DgMatsim2KoehlerStrehler2010ModelConverter {
 	
+	private static final Logger log = Logger.getLogger(DgMatsim2KoehlerStrehler2010ModelConverter.class);
+
 	public static final String CROSSING_TO_NODE_SUFFIX = "_to";
 	public static final String CROSSING_FROM_NODE_SUFFIX = "_from";
 	
 	private int cycle = 60;
 	private Id programId = new IdImpl("1");
 	
-	private static final Logger log = Logger
-			.getLogger(DgMatsim2KoehlerStrehler2010ModelConverter.class);
 	
 	
 	public void convertAndWrite(ScenarioImpl sc, String outFile) throws SAXException, IOException, TransformerConfigurationException{
@@ -121,7 +124,7 @@ public class DgMatsim2KoehlerStrehler2010ModelConverter {
 	 *     create two new nodes per turning move, store the id of the fromLinkNode as new end node of the from link, same with toLink
 	 *     create light (connection) per turning move, connecting the two new nodes
 	 */
-	private DgNetwork createNetwork(Network net, LaneDefinitions laneDefinitions, SignalsData signalsData) {
+	private DgNetwork createNetwork(Network net, LaneDefinitions lanes, SignalsData signalsData) {
 		
 		DgNetwork dgnet = new DgNetwork();
 		
@@ -135,17 +138,34 @@ public class DgMatsim2KoehlerStrehler2010ModelConverter {
 		 */
 		this.convertLinks2Streets(dgnet, net);
 
-
 		//collect all ids of links that are signalized
-		Set<Id> signalizedLinks = null;
-		//loop rather over links so nothing is forgotten
+		Set<Id> signalizedLinks = this.getSigalizedLinkIds(signalsData.getSignalSystemsData());
+		//loop over links and create layout of crossing
 		for (Link link : net.getLinks().values()){
-			this.createCrossing4SignalizedLink(dgnet, link, laneDefinitions, signalsData.getSignalSystemsData(), signalizedLinks);
+			DgCrossing crossing = dgnet.getCrossings().get(link.getToNode().getId());
+			Link backLink = this.getBackLink(link);
+			DgCrossingNode inLinkToNode = crossing.getNodes().get(this.convertLinkId2ToCrossingNodeId(link.getId()));
+			LanesToLinkAssignment l2l = lanes.getLanesToLinkAssignments().get(link.getId());
+			if (signalizedLinks.contains(link.getId())){
+				SignalSystemData system = this.getSignalSystem4SignalizedLinkId(signalsData.getSignalSystemsData(), link.getId());
+				this.createCrossing4SignalizedLink(crossing, link, inLinkToNode, backLink, l2l, system);
+			}
+			else {
+				
+			}
 		}
 		return dgnet;
 	}
 
 
+	private Set<Id> getSigalizedLinkIds(SignalSystemsData signals){
+		Map<Id, Set<Id>> signalizedLinksPerSystem = DgSignalsUtils.calculateSignalizedLinksPerSystem(signals);
+		Set<Id> signalizedLinks = new HashSet<Id>();
+		for (Set<Id> signalizedLinksOfSystem : signalizedLinksPerSystem.values()){
+			signalizedLinks.addAll(signalizedLinksOfSystem);
+		}
+		return signalizedLinks;
+	}
 	
 	/**
 	 * 
@@ -161,15 +181,31 @@ public class DgMatsim2KoehlerStrehler2010ModelConverter {
 		return lightId;
 	}
 	
+	private SignalSystemData getSignalSystem4SignalizedLinkId(SignalSystemsData signalSystems, Id linkId){
+		for (SignalSystemData system : signalSystems.getSignalSystemData().values()){
+			for (SignalData signal : system.getSignalData().values()){
+				if (signal.getLinkId().equals(linkId)){
+					return system;
+				}
+			}
+		}
+		return null;
+	}
 	
-	private void createCrossing4SignalizedLink(DgNetwork dgnet, Link link, LaneDefinitions lanes, SignalSystemsData signalSystems, Set<Id> signalizedLinks) {
-		SignalSystemData system;
-		List<SignalData> signals4Link = null;
-		DgCrossing crossing = dgnet.getCrossings().get(link.getToNode().getId());
+	private List<SignalData> getSignals4LinkId(SignalSystemData system, Id linkId){
+		List<SignalData> signals4Link = new ArrayList<SignalData>();
+		for (SignalData signal : system.getSignalData().values()){
+			if (signal.getLinkId().equals(linkId)){
+				signals4Link.add(signal);
+			}
+		}
+		return signals4Link;
+	}
+	
+	
+	private void createCrossing4SignalizedLink(DgCrossing crossing, Link link, DgCrossingNode inLinkToNode, Link backLink, LanesToLinkAssignment l2l, SignalSystemData system) {
+		List<SignalData> signals4Link = this.getSignals4LinkId(system, link.getId());
 		DgProgram program = crossing.getPrograms().get(this.programId);
-		Link backLink = this.getBackLink(link);
-		DgCrossingNode inLinkToNode = crossing.getNodes().get(this.convertLinkId2ToCrossingNodeId(link.getId()));
-		LanesToLinkAssignment l2l = lanes.getLanesToLinkAssignments().get(link.getId());
 		if (signals4Link.size() == 1){
 			if (l2l == null) {
 				List<Link> toLinks = this.getTurningMoves4LinkWoLanes(link);
@@ -231,7 +267,6 @@ public class DgMatsim2KoehlerStrehler2010ModelConverter {
 				}
 			}
 		}
-		
 	}
 
 	
