@@ -117,12 +117,12 @@ public class JBSignalControllerListener implements StartupListener, IterationSta
 				DgChartWriter.writeChart(e.getControler().getControlerIO().getOutputFilename("greensplit"), greenSplitPerIterationGraph.createChart());
 				for (Id ssid : signalGreenSplitHandler.getSystemIdAnalysisDataMap().keySet()){
 					//logg.info("=======Statistic for SignalSystem: "+ssid+" =============");
-			/*	for (Entry<Id, DgSignalGroupAnalysisData> entry : signalGreenSplitHandler.getSystemIdAnalysisDataMap().get(ssid).getSystemGroupAnalysisDataMap().entrySet() ){
-					//logg.info("for signalgroup: "+entry.getKey());
-					for (Entry <SignalGroupState,Double> ee : entry.getValue().getStateTimeMap().entrySet()){
-						//logg.info(ee.getKey()+": "+ee.getValue());
-						logg.info("Š;"+ssid+";"+entry.getKey()+";"+ee.getKey()+";"+ee.getValue());
-						//TravelTimeCalculator ttc = e.getControler().getTravelTimeCalculatorFactory().createTravelTimeCalculator(e.getControler().getNetwork(),e.getControler().getConfig().travelTimeCalculator());
+					/*	for (Entry<Id, DgSignalGroupAnalysisData> entry : signalGreenSplitHandler.getSystemIdAnalysisDataMap().get(ssid).getSystemGroupAnalysisDataMap().entrySet() ){
+//logg.info("for signalgroup: "+entry.getKey());
+for (Entry <SignalGroupState,Double> ee : entry.getValue().getStateTimeMap().entrySet()){
+//logg.info(ee.getKey()+": "+ee.getValue());
+logg.info("b;"+ssid+";"+entry.getKey()+";"+ee.getKey()+";"+ee.getValue());
+//TravelTimeCalculator ttc = e.getControler().getTravelTimeCalculatorFactory().createTravelTimeCalculator(e.getControler().getNetwork(),e.getControler().getConfig().travelTimeCalculator());
 						
 					}
 				}*/
