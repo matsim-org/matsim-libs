@@ -298,7 +298,8 @@ public class DanielMain {
 		}
 		
 		if (writeflow) {
-			System.out.println(fluss.writePathflow(false));
+			System.out.println();
+			fluss.writePathflow(false);
 		}
 		
 		System.out.println("Done.");
