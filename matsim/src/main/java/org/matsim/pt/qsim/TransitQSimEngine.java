@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
@@ -34,15 +35,14 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.events.AgentStuckEventImpl;
 import org.matsim.core.mobsim.framework.PersonAgent;
-import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.pt.ReconstructingUmlaufBuilder;
 import org.matsim.pt.Umlauf;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.ptproject.qsim.interfaces.DepartureHandler;
-import org.matsim.ptproject.qsim.interfaces.NetsimLink;
 import org.matsim.ptproject.qsim.interfaces.Mobsim;
 import org.matsim.ptproject.qsim.interfaces.MobsimEngine;
+import org.matsim.ptproject.qsim.interfaces.NetsimLink;
 import org.matsim.transitSchedule.api.Departure;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
@@ -76,13 +76,13 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine {
 
 	protected final TransitStopAgentTracker agentTracker;
 
-	private final HashMap<Person, PersonAgent> agents = new HashMap<Person, PersonAgent>(100);
+	private final Map<Person, PersonAgent> agents = new HashMap<Person, PersonAgent>(100);
 
 	private boolean useUmlaeufe = false;
 
 	private TransitStopHandlerFactory stopHandlerFactory = new SimpleTransitStopHandlerFactory();
 
-	private AbstractTransitDriverFactory abstractTransitDriverFactory = new UmlaufDriverFactory();
+	private AbstractTransitDriverFactory transitDriverFactory = new UmlaufDriverFactory();
 
 	public TransitQSimEngine(Mobsim queueSimulation) {
 		this.qSim = queueSimulation;
@@ -109,13 +109,11 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine {
 
 
 	public Collection<PersonAgent> createAgents() {
-		TransitSchedule schedule = this.schedule;
-		TransitStopAgentTracker agentTracker = this.agentTracker;
 		Collection<PersonAgent> ptDrivers;
 		if (useUmlaeufe ) {
-			ptDrivers = createVehiclesAndDriversWithUmlaeufe(agentTracker);
+			ptDrivers = createVehiclesAndDriversWithUmlaeufe(this.agentTracker);
 		} else {
-			ptDrivers = createVehiclesAndDriversWithoutUmlaeufe(schedule, agentTracker);
+			ptDrivers = createVehiclesAndDriversWithoutUmlaeufe(this.schedule, this.agentTracker);
 		}
 		return ptDrivers;
 	}
@@ -163,7 +161,7 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine {
 	private AbstractTransitDriver createAndScheduleVehicleAndDriver(Umlauf umlauf,
 			Vehicle vehicle, TransitStopAgentTracker thisAgentTracker) {
 		TransitQVehicle veh = new TransitQVehicle(vehicle, 5);
-		AbstractTransitDriver driver = this.abstractTransitDriverFactory.createTransitDriver(umlauf, thisAgentTracker, this.qSim);
+		AbstractTransitDriver driver = this.transitDriverFactory.createTransitDriver(umlauf, thisAgentTracker, this.qSim);
 		veh.setDriver(driver);
 		veh.setStopHandler(this.stopHandlerFactory.createTransitStopHandler(veh.getVehicle()));
 		driver.setVehicle(veh);
@@ -266,7 +264,7 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine {
 	}
 
 	public void setAbstractTransitDriverFactory(final AbstractTransitDriverFactory abstractTransitDriverFactory) {
-		this.abstractTransitDriverFactory = abstractTransitDriverFactory;
+		this.transitDriverFactory = abstractTransitDriverFactory;
 	}
 
 
