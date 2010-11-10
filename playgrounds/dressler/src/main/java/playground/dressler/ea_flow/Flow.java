@@ -2272,20 +2272,24 @@ public class Flow {
 
 
 	/**
-	 * writes the path representation of a flow to Standard Out
+	 * returns a path representation of a flow as a String
 	 */
-	public void writePathflow(boolean forward){
+	public String writePathflow(boolean forward) {
+		StringBuilder sb = new StringBuilder();
 		if(forward){
 			for(TimeExpandedPath path :_TimeExpandedPaths){
-				System.out.println(path.print());
+				sb.append(path.print());
+				sb.append("\n");
 			}
 		}else{
 			ListIterator<TimeExpandedPath> iterator = this._TimeExpandedPaths.listIterator(this._TimeExpandedPaths.size());
 			while(iterator.hasPrevious()){
 				TimeExpandedPath path = iterator.previous();
-				System.out.println(path.print());
+				sb.append(path.print());
+				sb.append("\n");
 			}
 		}
+		return sb.toString();
 	}
 
 	/**
