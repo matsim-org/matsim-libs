@@ -209,6 +209,8 @@ public class GreedyShelterAllocator extends EvacuationPopulationFromShapeFileLoa
 
 	private void gatherSinkNodes() {
 		Map<Node, Building> shelterNodeMapping = new HashMap<Node, Building>();
+		Building bb = new Building(new IdImpl("el1"), 0, 0, 0, 1, 1000000, 1000000, 1, null);
+		this.esnl.getShelterLinkMapping().put(new IdImpl("el1"), bb);
 		for (Entry<Id, Building> e : this.esnl.getShelterLinkMapping().entrySet()) {
 			Node n = this.scenario.getNetwork().getLinks().get(e.getKey()).getToNode();
 			shelterNodeMapping.put(n, e.getValue());
