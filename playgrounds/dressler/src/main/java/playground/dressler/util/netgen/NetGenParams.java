@@ -54,4 +54,19 @@ public class NetGenParams {
 		s += "% seed " + randseed + "\n";
 		return s;	
 	}
+	
+	public String defaultName() {
+		String s;
+		s = "grid";
+		s += "_" + xdim + "x" + ydim;
+		s += "_" + totalsupply;
+		if (numbersources > 0) {
+			s += "_at_" + numbersources;
+		} else {
+			s += "_at_all";
+		}
+		s += "_to_" + numbersinks;
+		s += "_R" + randseed; 
+		return s;
+	}
 }

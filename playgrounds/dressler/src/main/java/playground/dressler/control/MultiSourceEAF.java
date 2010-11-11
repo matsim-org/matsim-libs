@@ -706,7 +706,7 @@ public class MultiSourceEAF {
 		int timeStep;
 		double flowFactor;
 
-		int instance = 1024;
+		int instance = -1;
 		// 1 = siouxfalls, demand 500
 		// 11 same as above only Manuel and 5s euclid
 		// 2 = swissold, demand 100
@@ -752,14 +752,14 @@ public class MultiSourceEAF {
 			sinkid = "en1";}
 		else if (instance == 2) {
 			networkfile = "/homes/combi/Projects/ADVEST/testcases/meine_EA/swissold_network_5s.xml";
-			uniformDemands = 100;
+			uniformDemands = 10; // war 100
 			timeStep = 10; 
 			flowFactor = 1.0; 
 			sinkid = "en1";
 		} else if (instance == 3) {
 			networkfile  = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac_v20080618.xml";
-			uniformDemands = 5;
-			timeStep = 10;
+			uniformDemands = 5; // war 5
+			timeStep = 10; // war 10
 			flowFactor = 1.0;
 			sinkid = "en1";
 		} else if (instance == 4) {
@@ -905,12 +905,14 @@ public class MultiSourceEAF {
 			//simplenetworkfile = "/homes/combi/dressler/V/code/meine_EA/problem.dat";
 			//simplenetworkfile = "/homes/combi/dressler/V/code/meine_EA/demo.zet.dat";
 			//simplenetworkfile = "/homes/combi/dressler/V/code/meine_EA/audimax.zet.dat";
-			simplenetworkfile = "/homes/combi/dressler/V/code/meine_EA/otto hahn straße 14.zet.dat";
+			//simplenetworkfile = "/homes/combi/dressler/V/code/meine_EA/otto hahn straße 14.zet.dat";
 			//simplenetworkfile = "/homes/combi/dressler/V/code/meine_EA/probeevakuierung.zet.dat";
 			//simplenetworkfile = "/homes/combi/dressler/V/code/meine_EA/capsinks.dat";
 			//simplenetworkfile = "/homes/combi/dressler/V/code/meine_EA/padang_v2010_3_sources.dat";
 			
-			simplenetworkfile  = "/homes/combi/dressler/V/code/meine_EA/padang_5_10s.dat";
+			//simplenetworkfile  = "/homes/combi/dressler/V/code/meine_EA/padang_5_10s.dat";
+			simplenetworkfile  = "/homes/combi/dressler/V/code/grids/test_small.dat";
+			simplenetworkfile  = "/homes/combi/dressler/V/code/grids/grid_500x50_10000_at_all_to_10_R3.dat";
 			
 			uniformDemands = 100;
 
@@ -923,7 +925,7 @@ public class MultiSourceEAF {
 
 		}
 		
-		outputplansfile = "/homes/combi/dressler/V/code/meine_EA/tempplans.xml";
+		//outputplansfile = "/homes/combi/dressler/V/code/meine_EA/tempplans.xml";
 		//flowfile = "/homes/combi/dressler/V/vnotes/statistik_2010_04_april/bug_shelters_implicit.pathflow";
 		//flowfile = "/homes/combi/dressler/V/code/meine_EA/padang_v2010_250k_10s_shelters.pathflow";
 		
@@ -1217,6 +1219,14 @@ public class MultiSourceEAF {
 		}
 
 
+		// statistics
+		Partitioner partitioner = new Partitioner(settings);
+		partitioner.goBackHowMany = 0;
+		partitioner.determineStatistics(fluss.getPaths());
+		//partitioner.printStatistics();
+		
+		String imageBaseName = "/homes/combi/dressler/V/code/meine_EA/tmpimage/";
+		partitioner.drawStatistics(imageBaseName, 2000, 200);
 
 		if(_debug){
 			System.out.println("done");

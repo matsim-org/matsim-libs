@@ -55,6 +55,7 @@ public class DanielMain {
 		String outplansfile = null;
 		String sinkid = null;
 		String simplenetworkfile = null;		
+		String imageBaseName = null;
 		boolean writeflow = false;
 		int uniformDemands = 0;
 		
@@ -136,6 +137,15 @@ public class DanielMain {
 						argsokay= false;
 						error += "--outputplans requires an argument (filename)\n";
 					}
+				}  else if (s.equals("--imagebasename")) {
+					i++;
+					if (i < args.length) {
+						imageBaseName= args[i];
+					} else {
+						argsokay= false;
+						error += "--imagebasename requires an argument (truncated filename)\n";
+					}
+
 				}  else if (s.equals("--writeflow")) {
 					i++;
 					if (i < args.length) {
@@ -159,6 +169,7 @@ public class DanielMain {
 					error += "--flowfactor double\n";
 					error += "* Output * \n";
 					error += "--outputplans filename\n";
+					error += "--imagebasename truncated filename\n";
 					error += "* Search Settings *\n";
 					error += "--config filenameyet\n";
 					error += "* and many more ... *\n";
@@ -344,6 +355,17 @@ public class DanielMain {
 			new PopulationWriter(output, network).write(outplansfile);
 		}
 
+		// statistics
+		if (imageBaseName != null) {
+			// FIXME needs parameter
+			Partitioner partitioner = new Partitioner(settings);
+			partitioner.goBackHowMany = 0; 
+			partitioner.determineStatistics(fluss.getPaths());
+			//partitioner.printStatistics();
+
+			partitioner.drawStatistics(imageBaseName, 2000, 2000);
+		}
+		
 		
 		System.out.println("Done.");
 		return;

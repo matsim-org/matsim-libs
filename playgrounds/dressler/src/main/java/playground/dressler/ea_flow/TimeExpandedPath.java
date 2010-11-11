@@ -21,6 +21,7 @@
 package playground.dressler.ea_flow;
 
 //java imports
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.ListIterator;
@@ -199,28 +200,30 @@ public class TimeExpandedPath {
 	
 	
 	/**
-	 * returns a subpath of the path from "from" to "to"
-	 * @param fromNode from
-	 * @param toNode to
+	 * returns a copy of the subpath determined by the indices
+	 * @param start index of the first step to be included
+	 * @param end index of the first step to not be included
 	 * @return subpath
-	 *//*
-	public TimeExpandedPath getSubPath(int from, int to){
-		TimeExpandedPath result = null;
-		if(from <= to){
-			if((from < this._edges.size()) && (from >= 0)){
-				if((to < this._edges.size()) && (to >= 0)){
-					result = new TimeExpandedPath();
-					for(int i = from; i <= to; i++){
-						result.append(this._edges.get(i));
-					}
-				}
-			}
+	 */
+	public TimeExpandedPath getSubPath(int start, int end){
+		
+		if (start >= end) return null;
+		
+		TimeExpandedPath result = new TimeExpandedPath();
+		int i = 0;
+		for (PathStep step : this._steps) {
+		   if (i >= start) {
+			   if (i < end) {
+				   result.append(step.copyShifted(0));
+			   } else {
+				   break;
+			   }
+		   }
+		   i++;
 		}
-		if(result == null){
-			System.out.println("Indices don't match");
-		}
+		
 		return result;
-	}*/
+	}
 	
 	/**
 	 * Method to indicate, if link is in a path
@@ -519,7 +522,7 @@ public class TimeExpandedPath {
 		copy.setFlow(original.getFlow());		
 		for(PathStep step : original.getPathSteps())
 		{	
-			// there is no real clone function for the PathSteps, but works.
+			// there is no real clone function for the PathSteps, but this works.
 			copy.append(step.copyShifted(0)); 
 		}
 		return copy;
@@ -602,4 +605,54 @@ public class TimeExpandedPath {
 		return temp.toString();
 	}
 	
+	/**
+	 * Returns a simplified (no loops) copy of this path.
+     * Works regardless of whether the path is forward,
+     * but makes less sense to call for non-forward paths.
+     * 
+     * NB: This does not consider Holdover-Steps properly! Those may still overlap.
+     * @return a fresh path (mostly) without loops, with the same start, end, and flow value 
+	 */
+    public TimeExpandedPath simplify() {
+    	// TODO handle StepHoldover properly!
+    	
+       TimeExpandedPath newTEP = new TimeExpandedPath();
+       newTEP.setFlow(this._flow);              
+              
+       // a hashmap from a VirtualNode to the next step.
+       // using the String representation makes this a lot safer
+       HashMap<String, PathStep> shortcuts = new HashMap<String, PathStep>();
+
+       // go through the list, denoting the next step for each VirtualNode
+       for (PathStep step : this._steps) {
+    	  shortcuts.put(step.getStartNode().toString(), step);   
+       }
+       
+       // go through the hashmap, reconstructing a path
+       
+       VirtualNode node = this._steps.getFirst().getStartNode();
+       while (node != null) {
+    	   PathStep step = shortcuts.get(node.toString());
+    	   if (step != null) {
+    		   // copy the step!
+    		   newTEP.append(step.copyShifted(0));    		  
+    		   node = step.getArrivalNode();
+    	   } else {
+    		  node = null;
+    	   }
+       }
+       
+       // DEBUG
+       /*String before = this.toString();
+       String after = newTEP.toString();
+       
+       if (!after.equals(before)) {
+    	  System.out.println("Simplified path. Before: ");
+    	  System.out.println(before);
+    	  System.out.println("After: ");
+    	  System.out.println(after);
+       }*/
+       
+       return newTEP;
+    }
 }

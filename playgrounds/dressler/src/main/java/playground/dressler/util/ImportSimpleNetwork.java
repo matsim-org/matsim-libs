@@ -118,7 +118,7 @@ public class ImportSimpleNetwork {
 
 				int i = Integer.valueOf(line[1].trim());
 				addNodeIfNecessary(i);
-				if(line.length>3){
+				if(line.length >= 5){
 					double x = Double.valueOf(line[3].trim());
 					double y = Double.valueOf(line[4].trim());
 					((NodeImpl) _newnodes.get(i)).setCoord(new CoordImpl(x, y));
@@ -140,11 +140,7 @@ public class ImportSimpleNetwork {
 				int w = Integer.valueOf(line[2].trim());
 				int u = Integer.valueOf(line[3].trim());
 				int t = Integer.valueOf(line[4].trim());
-//				Link link = new LinkImpl(new IdImpl(count), _newnodes.get(v), _newnodes.get(w), _network, t, 1.0, u, 1);
-
-				// FIXME
-				//System.err.println( "I replaced the (deprecated) LinkImpl constructor by a factory.  Pls check if things are still working. Kai") ;
-				//System.exit(-1) ;
+				
 				Link link = _network.getFactory().createLink( new IdImpl(count), _newnodes.get(v).getId(), _newnodes.get(w).getId() ) ;
 				link.setLength(t);
 				link.setFreespeed(1.0) ;

@@ -130,7 +130,7 @@ public class NetGenMain {
 		
 		// create demands
 		
-		int sinksupply = -78654321; // hopefully infinite
+		int sinksupply = -87654321; // hopefully infinite
 		
 		if (params.numbersinks > params.ydim) {
 			System.out.println("Too many sinks: " + params.numbersinks + " ydim: " + params.ydim);
@@ -173,6 +173,7 @@ public class NetGenMain {
 				    if (already == null || already == false) {
 				      sources.add(gridNodes[x][y]);
 				      isSource.put(gridNodes[x][y], true);
+				      placed = true;
 				    }				    
 				} while (!placed);
 			}
@@ -239,14 +240,18 @@ public class NetGenMain {
             for (Node node : network.getNodes().values()) {
             	if (demands.containsKey(node)) {
             		int d = demands.get(node);
-            		if (d > 0) {
+            		/*if (d > 0) {
             			out.write("S " + newNodeNames.get(node) + " " + d);
             			out.newLine();
             		}
             		if (d < 0) {
             			out.write("T " + newNodeNames.get(node) + " " + (-d));
             			out.newLine();
-            		}
+            		}   */
+            		
+            		// write new format with coordinates for pretty pictures
+            		out.write("V " + newNodeNames.get(node) + " " + d + " "+ node.getCoord().getX() + " " + node.getCoord().getY());
+        			out.newLine();
             	}
             }
 
@@ -271,16 +276,25 @@ public class NetGenMain {
 		String outputfileDAT = null;
 		String outputfileMATSIM = null;
 		
-		outputfileDAT = "/homes/combi/dressler/V/code/grids/test.dat";
+		//outputfileDAT = "/homes/combi/dressler/V/code/grids/test.dat";
+		outputfileDAT = "/homes/combi/dressler/V/code/grids/";
 		
 		NetGenParams params = new NetGenParams();
-				
-//		params.xdim = 5;
-//		params.ydim = 5;
+						
+		params.xdim = 500;
+		params.ydim = 50;
 //		params.capmean = 3;
 //		params.capvariance = params.capmean / 2;
 //		params.lengthmean = 20;
 //		params.lengthvariance = params.lengthmean / 2;
+		params.randseed = 3;
+        params.numbersources = 0;
+		params.totalsupply = 10000;
+		
+		if (outputfileDAT.charAt(outputfileDAT.length() - 1) == '/') {
+			// only a directory, add default name
+			outputfileDAT += params.defaultName() + ".dat";
+		}
 		
 		createGrid(params);
 		

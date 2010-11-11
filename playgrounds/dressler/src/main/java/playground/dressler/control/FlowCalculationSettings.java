@@ -107,8 +107,8 @@ public class FlowCalculationSettings {
 	 * Constructor that prepares the default settings, but no network or anything yet.
 	 */
 	FlowCalculationSettings () {
-
 	}
+	
 
 	/**
 	 * Applies and checks the settings and creates all necessary data structures.

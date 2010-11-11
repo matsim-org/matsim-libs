@@ -22,7 +22,7 @@ package playground.dressler.ea_flow;
 
 import org.matsim.api.core.v01.network.Node;
 
-abstract class VirtualNode {
+public abstract class VirtualNode {
 	
    public abstract int getRealTime();
   

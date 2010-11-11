@@ -139,7 +139,10 @@ public class Decomposer {
 		if (f > 0) {	
 			_flow.getSinkFlow(node).augmentUnsafe(t, -f);
 			_currentHead.append(new StepSinkFlow(node, t, true));
-			TimeExpandedPath copy = TimeExpandedPath.clone(_currentHead);
+			//TimeExpandedPath copy = TimeExpandedPath.clone(_currentHead);
+			
+			// simplify also creates a new copy!
+			TimeExpandedPath copy = _currentHead.simplify();
 			copy.setFlow(f);
 			_paths.add(copy);		
 			_currentHead.removeLast();
