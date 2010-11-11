@@ -156,6 +156,7 @@ public class CreateNetworkFromShape {
 					l = this.netFac.createLink(id, from.getId(), to.getId());
 					this.net.addLink(l);
 				}else{
+					// TODO don't know why some links appear so often
 					log.error("link " + id.toString() + " already exists!");
 				}
 			}
