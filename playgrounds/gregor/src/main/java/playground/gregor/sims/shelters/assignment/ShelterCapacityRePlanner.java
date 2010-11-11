@@ -55,44 +55,47 @@ import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.evacuation.base.Building;
+import org.matsim.evacuation.config.EvacuationConfigGroup;
 
-public class ShelterCapacityRePlanner   implements IterationStartsListener{
+public class ShelterCapacityRePlanner implements IterationStartsListener {
 
 	private static final Logger log = Logger.getLogger(ShelterCapacityRePlanner.class);
-	
-	private ScenarioImpl sc;
-	private Dijkstra router;
 
-	private List<ShelterInfo> shelters = new ArrayList<ShelterInfo>();
+	private final ScenarioImpl sc;
+	private final Dijkstra router;
 
+	private final List<ShelterInfo> shelters = new ArrayList<ShelterInfo>();
 
 	private final Node saveNode;
 	private final Id saveLinkId = new IdImpl("el1");
 
-	private NetworkFactoryImpl routeFactory;
-	private ShelterCounter shc;
-	private TravelTimeTimeMachine timeMachine;
-	private TravelTime tt;
+	private final NetworkFactoryImpl routeFactory;
+	private final ShelterCounter shc;
+	private final TravelTimeTimeMachine timeMachine;
+	private final TravelTime tt;
 
-	private Map<Id,ArrayList<PersonInfo>>  asm = new LinkedHashMap<Id, ArrayList<PersonInfo>>();
+	private final Map<Id, ArrayList<PersonInfo>> asm = new LinkedHashMap<Id, ArrayList<PersonInfo>>();
 
-	//TODO think about making config parameter out of this magic numbers
-	private static final double FULL_RED_BOUNDERY = 600; //seconds
+	// TODO think about making config parameter out of this magic numbers
+	private static final double FULL_RED_BOUNDERY = 600; // seconds
 	private static final double MAX_SHIFT = 0.05;
 	private double reserveCap = 10;
 
-	public ShelterCapacityRePlanner(ScenarioImpl sc, TravelCost tc, TravelTime tt, List<Building> buildings,ShelterCounter shc)  { //, double pshelter) {
+	public ShelterCapacityRePlanner(ScenarioImpl sc, TravelCost tc, TravelTime tt, List<Building> buildings, ShelterCounter shc) { // ,
+																																	// double
+																																	// pshelter)
+																																	// {
 
 		this.timeMachine = new TravelTimeTimeMachine(tt, tc);
 		this.tt = tt;
-		this.router =  new Dijkstra(sc.getNetwork(),this.timeMachine,this.timeMachine);
+		this.router = new Dijkstra(sc.getNetwork(), this.timeMachine, this.timeMachine);
 		this.sc = sc;
 
-		this.routeFactory = (NetworkFactoryImpl) sc.getNetwork().getFactory();
+		this.routeFactory = sc.getNetwork().getFactory();
 		this.shc = shc;//
 		this.saveNode = this.sc.getNetwork().getNodes().get(new IdImpl("en1"));
 		initShelters(buildings);
-		this.reserveCap = (int) (Math.max(1, this.sc.getConfig().evacuation().getSampleSize() * this.reserveCap)+.5);
+		this.reserveCap = (int) (Math.max(1, ((EvacuationConfigGroup) sc.getConfig().getModule("evacuation")).getSampleSize() * this.reserveCap) + .5);
 	}
 
 	private void initShelters(List<Building> buildings) {
@@ -110,7 +113,7 @@ public class ShelterCapacityRePlanner   implements IterationStartsListener{
 
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
-		if (event.getIteration() > 1 ) {
+		if (event.getIteration() > 1) {
 			reset();
 			this.shc.printStats();
 			runIII();
@@ -124,39 +127,35 @@ public class ShelterCapacityRePlanner   implements IterationStartsListener{
 		generateAgentShelterMapping();
 		calculateSheltersOvercapacity();
 		int cap = reduceOvercapacity();
-		log.info("Shifted Agent:" + cap + "  this corresponds to:" + ((int)((0.5+ 100. * (double)cap/this.sc.getPopulation().getPersons().size()))) + "% of the population");
+		log.info("Shifted Agent:" + cap + "  this corresponds to:" + ((int) ((0.5 + 100. * cap / this.sc.getPopulation().getPersons().size()))) + "% of the population");
 		increaseCapactiy();
-		
-		
+
 	}
-	
 
 	private void increaseCapactiy() {
 		for (ShelterInfo si : this.shelters) {
 			if (!si.on) {
 				continue;
 			}
-			int totalOvercap = si.freeSpace+si.overCapacityDeltT;
-			if ( totalOvercap < si.reserveCapacity && si.avgDeltaT < 0) {
+			int totalOvercap = si.freeSpace + si.overCapacityDeltT;
+			if (totalOvercap < si.reserveCapacity && si.avgDeltaT < 0) {
 				int currentCap = this.shc.getShelter(si.id).getShelterSpace();
-				int incr = (int)Math.max((currentCap * MAX_SHIFT),reserveCap);
+				int incr = (int) Math.max((currentCap * MAX_SHIFT), this.reserveCap);
 				increaseShelterCap(incr, si.id);
 			}
-			
-			int free = this.shc.getShelterFreeSpace(si.id); 
+
+			int free = this.shc.getShelterFreeSpace(si.id);
 			if (free < this.reserveCap) {
 				increaseShelterCap((int) (this.reserveCap - free), si.id);
 			}
-			
+
 		}
-		
+
 	}
 
 	private void reset() {
 		this.shc.reset(1, this.sc.getPopulation().getPersons().values());
 	}
-
-
 
 	private void increaseShelterCap(int amount, Id key) {
 		this.shc.changeCapacity(key, amount);
@@ -165,23 +164,24 @@ public class ShelterCapacityRePlanner   implements IterationStartsListener{
 	private int reduceOvercapacity() {
 		int cap = 0;
 		for (ShelterInfo si : this.shelters) {
-			int totalOvercap = si.freeSpace+si.overCapacityDeltT;
-			if (totalOvercap > 0){
-				
-				//shelters capacity is to be reduced at most by a fraction of MAX_SHIFT 
+			int totalOvercap = si.freeSpace + si.overCapacityDeltT;
+			if (totalOvercap > 0) {
+
+				// shelters capacity is to be reduced at most by a fraction of
+				// MAX_SHIFT
 				int currentCap = this.shc.getShelter(si.id).getShelterSpace();
-				int reduction = (int) Math.max(1, Math.min(totalOvercap , currentCap*MAX_SHIFT));
+				int reduction = (int) Math.max(1, Math.min(totalOvercap, currentCap * MAX_SHIFT));
 				if (reduction < this.reserveCap) {
 					si.on = false;
 				}
 				cap += reduction;
-				
-				int freeSpaceRed = Math.min(si.freeSpace,reduction);
+
+				int freeSpaceRed = Math.min(si.freeSpace, reduction);
 				if (freeSpaceRed > 0) {
 					this.shc.changeCapacity(si.id, -freeSpaceRed);
 				}
 				reduction -= freeSpaceRed;
-				
+
 				if (reduction > 0) {
 					reduceShelterCap(reduction, si.id);
 				}
@@ -194,7 +194,7 @@ public class ShelterCapacityRePlanner   implements IterationStartsListener{
 		ArrayList<PersonInfo> l = this.asm.get(key);
 		if (l.size() < amount) {
 			for (PersonInfo pi : l) {
-				reRoute(pi.pers);		
+				reRoute(pi.pers);
 			}
 		} else {
 			Queue<PersonInfo> pers = new PriorityQueue<PersonInfo>(l);
@@ -229,13 +229,13 @@ public class ShelterCapacityRePlanner   implements IterationStartsListener{
 
 	private void calculateDeltaT(PersonInfo pi) {
 		Person p = pi.pers;
-		Activity act = ((Activity)p.getSelectedPlan().getPlanElements().get(0));
+		Activity act = ((Activity) p.getSelectedPlan().getPlanElements().get(0));
 		Id linkId = act.getLinkId();
 		Node from = this.sc.getNetwork().getLinks().get(linkId).getToNode();
-		Path path = this.router.calcLeastCostPath(from,this.saveNode, act.getEndTime());
+		Path path = this.router.calcLeastCostPath(from, this.saveNode, act.getEndTime());
 		double deltaT = this.timeMachine.getTimeOffsetAndReset();
 		if (deltaT == 0) {
-			deltaT = getPositiveDeltaT(act.getEndTime(),path);
+			deltaT = getPositiveDeltaT(act.getEndTime(), path);
 		}
 		pi.deltaT = deltaT;
 
@@ -246,35 +246,34 @@ public class ShelterCapacityRePlanner   implements IterationStartsListener{
 			l.clear();
 		}
 		for (Person p : this.sc.getPopulation().getPersons().values()) {
-			Id id = ((Activity)p.getSelectedPlan().getPlanElements().get(2)).getLinkId();
+			Id id = ((Activity) p.getSelectedPlan().getPlanElements().get(2)).getLinkId();
 			if (id.toString().equals(this.saveLinkId.toString())) {
 				continue;
 			}
-			ArrayList<PersonInfo> list = asm.get(id);
+			ArrayList<PersonInfo> list = this.asm.get(id);
 			if (list == null) {
 				list = new ArrayList<PersonInfo>();
-				asm.put(id, list);
+				this.asm.put(id, list);
 			}
 			PersonInfo pi = new PersonInfo();
 			pi.pers = p;
-			list.add(pi);	
-		}		
+			list.add(pi);
+		}
 	}
 
-
 	private void reRoute(Person pers) {
-		((PersonImpl)pers).removeUnselectedPlans();
+		((PersonImpl) pers).removeUnselectedPlans();
 		Plan plan = pers.getSelectedPlan();
-		Activity actA = ((Activity)plan.getPlanElements().get(0));
-		Leg leg = ((Leg)plan.getPlanElements().get(1));
-		Activity actB = ((Activity)plan.getPlanElements().get(2));
+		Activity actA = ((Activity) plan.getPlanElements().get(0));
+		Leg leg = ((Leg) plan.getPlanElements().get(1));
+		Activity actB = ((Activity) plan.getPlanElements().get(2));
 		Node from = this.sc.getNetwork().getLinks().get(actA.getLinkId()).getToNode();
 		Path path = this.router.calcLeastCostPath(from, this.saveNode, actA.getEndTime());
 
-		//reset time machine
+		// reset time machine
 		double time = this.timeMachine.getTimeOffsetAndReset();
 
-		if (time < 0 || path.travelTime > 120*60) {
+		if (time < 0 || path.travelTime > 120 * 60) {
 			throw new RuntimeException("not a valid path");
 		}
 
@@ -285,32 +284,32 @@ public class ShelterCapacityRePlanner   implements IterationStartsListener{
 		route.setTravelCost(path.travelCost);
 		route.setDistance(RouteUtils.calcDistance(route, this.sc.getNetwork()));
 		leg.setRoute(route);
-		((ActivityImpl)actB).setLinkId(this.saveLinkId);
+		((ActivityImpl) actB).setLinkId(this.saveLinkId);
 		double testScore = path.travelCost / -600.;
 		plan.setScore(testScore);
-		this.shc.testAdd(saveLinkId);
+		this.shc.testAdd(this.saveLinkId);
 	}
 
-	
 	private double getPositiveDeltaT(double startTime, Path path) {
-		double currentTime =  startTime;
+		double currentTime = startTime;
 		double minDelta = FULL_RED_BOUNDERY;
 		for (Link l : path.links) {
-			TreeMap<Double, NetworkChangeEvent> ce = ((TimeVariantLinkImpl)l).getChangeEvents();
+			TreeMap<Double, NetworkChangeEvent> ce = ((TimeVariantLinkImpl) l).getChangeEvents();
 			if (ce == null) {
 				continue;
 			}
-			for (Entry<Double, NetworkChangeEvent>  entr : ce.entrySet()) {
+			for (Entry<Double, NetworkChangeEvent> entr : ce.entrySet()) {
 				ChangeValue v = entr.getValue().getFreespeedChange();
 				if (v != null && v.getValue() == 0.) {
 					double delta = entr.getKey() - currentTime;
-	
-//					//BEGIN DEBUG
-//					if (delta < 0) {
-//						throw new RuntimeException("if and only if delta < 0  then deltaT < 0");
-//					}
-//					//END DEBUG
-					
+
+					// //BEGIN DEBUG
+					// if (delta < 0) {
+					// throw new
+					// RuntimeException("if and only if delta < 0  then deltaT < 0");
+					// }
+					// //END DEBUG
+
 					if (delta < minDelta) {
 						minDelta = delta;
 					}
@@ -319,9 +318,10 @@ public class ShelterCapacityRePlanner   implements IterationStartsListener{
 			}
 			currentTime += this.tt.getLinkTravelTime(l, currentTime);
 		}
-		//The agent does not start inside the inundation area
-		//This means the deltaT would have to be set to Double.POSITIVE_INFINITY however this would have 
-		//unwanted side effects!
+		// The agent does not start inside the inundation area
+		// This means the deltaT would have to be set to
+		// Double.POSITIVE_INFINITY however this would have
+		// unwanted side effects!
 		return minDelta;
 	}
 
@@ -329,8 +329,8 @@ public class ShelterCapacityRePlanner   implements IterationStartsListener{
 
 		double timeOffset = 0;
 
-		private TravelTime tt;
-		private TravelCost tc;
+		private final TravelTime tt;
+		private final TravelCost tc;
 
 		public TravelTimeTimeMachine(TravelTime tt, TravelCost tc) {
 			this.tt = tt;
@@ -339,18 +339,18 @@ public class ShelterCapacityRePlanner   implements IterationStartsListener{
 
 		@Override
 		public double getLinkTravelTime(Link link, double time) {
-			while (Double.isInfinite(this.tt.getLinkTravelTime(link, time + timeOffset))) {
+			while (Double.isInfinite(this.tt.getLinkTravelTime(link, time + this.timeOffset))) {
 				this.timeOffset -= 60;
 			}
-			return this.tt.getLinkTravelTime(link, time + timeOffset);
+			return this.tt.getLinkTravelTime(link, time + this.timeOffset);
 		}
 
 		@Override
 		public double getLinkTravelCost(Link link, double time) {
-			while (Double.isInfinite(this.tc.getLinkTravelCost(link, time + timeOffset))) {
+			while (Double.isInfinite(this.tc.getLinkTravelCost(link, time + this.timeOffset))) {
 				this.timeOffset -= 60;
 			}
-			return this.tc.getLinkTravelCost(link, time + timeOffset);
+			return this.tc.getLinkTravelCost(link, time + this.timeOffset);
 		}
 
 		public double getTimeOffsetAndReset() {
@@ -360,10 +360,10 @@ public class ShelterCapacityRePlanner   implements IterationStartsListener{
 		}
 	}
 
-
 	private static class PersonInfo implements Comparable<PersonInfo> {
 		Person pers;
 		double deltaT;
+
 		@Override
 		public int compareTo(PersonInfo o) {
 			if (this.deltaT > o.deltaT) {
@@ -375,9 +375,10 @@ public class ShelterCapacityRePlanner   implements IterationStartsListener{
 		}
 
 	}
+
 	private static class ShelterInfo {
-	public boolean on;
-	Id id;
+		public boolean on;
+		Id id;
 		double avgDeltaT;
 		int overCapacityDeltT = 0;
 		int freeSpace = 0;
@@ -385,4 +386,3 @@ public class ShelterCapacityRePlanner   implements IterationStartsListener{
 	}
 
 }
-

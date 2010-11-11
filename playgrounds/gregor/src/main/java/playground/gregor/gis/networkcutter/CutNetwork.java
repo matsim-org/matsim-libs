@@ -57,7 +57,6 @@ import org.matsim.evacuation.base.EvacuationAreaFileWriter;
 import org.matsim.evacuation.base.EvacuationAreaLink;
 import org.xml.sax.SAXException;
 
-
 public class CutNetwork {
 
 	private static double max_x = 652088.;
@@ -65,13 +64,12 @@ public class CutNetwork {
 	private final static double MIN_X = 650473.;
 	private final static double MIN_Y = 9892816.;
 
-	private static void cutIt(final Network net,
-			final List<NetworkChangeEvent> events, final Population pop, final HashMap<Id,EvacuationAreaLink> eal) {
+	private static void cutIt(final Network net, final List<NetworkChangeEvent> events, final Population pop, final HashMap<Id, EvacuationAreaLink> eal) {
 
 		max_x = 652000.;
 		max_y = 9894780.;
 		ConcurrentLinkedQueue<Id> ealq = new ConcurrentLinkedQueue<Id>();
-		for (Entry<Id, EvacuationAreaLink> e :  eal.entrySet()) {
+		for (Entry<Id, EvacuationAreaLink> e : eal.entrySet()) {
 			if (!isWithin(net.getLinks().get(e.getKey()).getCoord())) {
 				ealq.add(e.getKey());
 			}
@@ -100,8 +98,7 @@ public class CutNetwork {
 		}
 		System.out.println(pop.getPersons().size());
 
-
-		//CHANGE EVENTS
+		// CHANGE EVENTS
 		ConcurrentLinkedQueue<NetworkChangeEvent> eq = new ConcurrentLinkedQueue<NetworkChangeEvent>();
 		for (NetworkChangeEvent e : events) {
 			ConcurrentLinkedQueue<Link> lq = new ConcurrentLinkedQueue<Link>();
@@ -138,7 +135,7 @@ public class CutNetwork {
 		while (it.hasNext()) {
 			Person pers = it.next();
 
-			Id id = ((Activity)pers.getPlans().get(0).getPlanElements().get(0)).getLinkId();
+			Id id = ((Activity) pers.getPlans().get(0).getPlanElements().get(0)).getLinkId();
 
 			if (net.getLinks().get(id) == null) {
 				it.remove();
@@ -156,7 +153,7 @@ public class CutNetwork {
 		return true;
 	}
 
-	public static void main(final String [] args) throws IOException {
+	public static void main(final String[] args) throws IOException {
 		Config c = ConfigUtils.loadConfig(args[0]);
 		ScenarioImpl scenario = new ScenarioImpl(c);
 
@@ -175,7 +172,6 @@ public class CutNetwork {
 		}
 		net.setNetworkChangeEvents(parser.getEvents());
 
-
 		Population pop = scenario.getPopulation();
 		try {
 			new MatsimPopulationReader(scenario).parse(c.plans().getInputFile());
@@ -188,7 +184,7 @@ public class CutNetwork {
 		}
 
 		HashMap<Id, EvacuationAreaLink> evacuationAreaLinks = new HashMap<Id, EvacuationAreaLink>();
-		String evacuationAreaLinksFile = c.evacuation().getEvacuationAreaFile();
+		String evacuationAreaLinksFile = c.getModules().get("evacuation").getValue("inputEvacuationAreaLinksFile");
 		try {
 			new EvacuationAreaFileReader(evacuationAreaLinks).readFile(evacuationAreaLinksFile);
 		} catch (SAXException e) {
@@ -200,7 +196,7 @@ public class CutNetwork {
 		}
 
 		System.out.println(evacuationAreaLinks.size());
-		cutIt(net,parser.getEvents(),pop,evacuationAreaLinks);
+		cutIt(net, parser.getEvents(), pop, evacuationAreaLinks);
 		System.out.println(evacuationAreaLinks.size());
 
 		new NetworkWriter(net).write("tmp2/network.xml");
@@ -212,6 +208,5 @@ public class CutNetwork {
 			e.printStackTrace();
 		}
 	}
-
 
 }

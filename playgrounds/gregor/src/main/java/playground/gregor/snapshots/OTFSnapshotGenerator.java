@@ -30,14 +30,16 @@ import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.Module;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.config.groups.EvacuationConfigGroup.EvacuationScenario;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.evacuation.config.EvacuationConfigGroup;
+import org.matsim.evacuation.config.EvacuationConfigGroup.EvacuationScenario;
 import org.matsim.evacuation.otfvis.drawer.OTFBackgroundTexturesDrawer;
 import org.xml.sax.SAXException;
 
@@ -73,6 +75,7 @@ public class OTFSnapshotGenerator {
 
 	private final String txtSnapshotFile = null;
 	private double startTime;
+	private final EvacuationConfigGroup ec;
 
 	// private final String txtSnapshotFile =
 	// "../../../outputs/output/snapshots.txt.gz";
@@ -83,19 +86,23 @@ public class OTFSnapshotGenerator {
 		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(RUNS_SVN + "/output_config.xml.gz");
 
 		this.scenario = sl.getScenario();
+		Module m = this.scenario.getConfig().getModule("evacuation");
+		this.ec = new EvacuationConfigGroup(m);
+		this.scenario.getConfig().getModules().put("evacuation", this.ec);
+
 		this.scenario.getConfig().network().setInputFile(RUNS_SVN + "/output_network.xml.gz");
 		this.scenario.getConfig().network().setChangeEventInputFile(RUNS_SVN + "/output_change_events.xml.gz");
 
 		this.scenario.getConfig().simulation().setSnapshotFormat("otfvis");
 		this.scenario.getConfig().simulation().setSnapshotPeriod(60);
 		// this.scenario.getConfig().simulation().setEndTime(4*3600+30*60);
-		if (this.scenario.getConfig().evacuation().getEvacuationScanrio() == EvacuationScenario.night || this.scenario.getConfig().evacuation().getEvacuationScanrio() == EvacuationScenario.from_file) {
+		if (this.ec.getEvacuationScanrio() == EvacuationScenario.night || this.ec.getEvacuationScanrio() == EvacuationScenario.from_file) {
 			this.startTime = 3 * 3600.;
 			this.scenario.getConfig().simulation().setEndTime(5 * 3600);
-		} else if (this.scenario.getConfig().evacuation().getEvacuationScanrio() == EvacuationScenario.day) {
+		} else if (this.ec.getEvacuationScanrio() == EvacuationScenario.day) {
 			this.startTime = 12 * 3600.;
 			this.scenario.getConfig().simulation().setEndTime(14 * 3600);
-		} else if (this.scenario.getConfig().evacuation().getEvacuationScanrio() == EvacuationScenario.afternoon) {
+		} else if (this.ec.getEvacuationScanrio() == EvacuationScenario.afternoon) {
 			this.startTime = 16 * 3600.;
 			this.scenario.getConfig().simulation().setEndTime(18 * 3600);
 		}
@@ -105,7 +112,7 @@ public class OTFSnapshotGenerator {
 
 		// this.scenario.getConfig().evacuation().setBuildingsFile(SHARED_SVN +
 		// "/countries/id/padang/gis/buildings_v20100315/evac_zone_buildings_v20100315.shp");
-		this.scenario.getConfig().evacuation().setBuildingsFile("/home/laemmel/devel/allocation/data/buildings.shp");
+		this.ec.setBuildingsFile("/home/laemmel/devel/allocation/data/buildings.shp");
 
 		// this.scenario.getConfig().evacuation().setSampleSize("0.1");
 		// this.scenario.getConfig().controler().setLastIteration(0);
@@ -133,11 +140,11 @@ public class OTFSnapshotGenerator {
 		// AllAgentsTeleporter aat = new AllAgentsTeleporter();
 
 		double startTime = 0;
-		if (this.scenario.getConfig().evacuation().getEvacuationScanrio() == EvacuationScenario.night) {
+		if (this.ec.getEvacuationScanrio() == EvacuationScenario.night) {
 			startTime = 3 * 3600;
-		} else if (this.scenario.getConfig().evacuation().getEvacuationScanrio() == EvacuationScenario.day) {
+		} else if (this.ec.getEvacuationScanrio() == EvacuationScenario.day) {
 			startTime = 12 * 3600;
-		} else if (this.scenario.getConfig().evacuation().getEvacuationScanrio() == EvacuationScenario.afternoon) {
+		} else if (this.ec.getEvacuationScanrio() == EvacuationScenario.afternoon) {
 			startTime = 16 * 3600;
 		}
 		TimeDependentColorizer t = new TimeDependentColorizer(startTime);
@@ -148,7 +155,7 @@ public class OTFSnapshotGenerator {
 		// new
 		// EventsReaderTXTv1(evII).readFile("/home/laemmel/devel/EAF/output/ITERS/it.0/0.events.txt.gz");
 
-		SheltersColorizer s = new SheltersColorizer(this.scenario.getConfig().evacuation().getBuildingsFile(), this.scenario.getConfig().simulation().getSnapshotPeriod(), this.scenario.getConfig().evacuation().getSampleSize());
+		SheltersColorizer s = new SheltersColorizer(this.ec.getBuildingsFile(), this.scenario.getConfig().simulation().getSnapshotPeriod(), this.ec.getSampleSize());
 		ev.addHandler(s);
 
 		OTFBackgroundTexturesDrawer sbg = new OTFBackgroundTexturesDrawer("arrow.png");
@@ -177,8 +184,8 @@ public class OTFSnapshotGenerator {
 		PositionInfo.lsTree = new LineStringTree(getFeatures(), this.scenario.getNetwork());
 
 		this.scenario.getNetwork().addNode(this.scenario.getNetwork().getFactory().createNode(new IdImpl("minXY"), new CoordImpl(643000, 9870000)));// HACK
-																																					// //
-																																					// the
+		// //
+		// the
 		// bounding
 		// box
 		// big

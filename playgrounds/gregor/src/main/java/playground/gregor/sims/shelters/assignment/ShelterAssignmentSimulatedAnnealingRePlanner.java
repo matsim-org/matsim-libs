@@ -48,6 +48,7 @@ import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.evacuation.base.Building;
+import org.matsim.evacuation.config.EvacuationConfigGroup;
 
 /**
  * @author laemmel
@@ -102,7 +103,7 @@ public class ShelterAssignmentSimulatedAnnealingRePlanner implements IterationSt
 		// this.tt = tt;
 		this.agents = new ArrayList<Person>(sc.getPopulation().getPersons().values());
 		this.routeFactory = sc.getNetwork().getFactory();
-		this.swNash = !sc.getConfig().evacuation().isSocialCostOptimization();
+		this.swNash = !((EvacuationConfigGroup) sc.getConfig().getModule("evacuation")).isSocialCostOptimization();
 		// this.swNash = false;
 		this.shelterLinkMapping = new HashMap<Id, Shelter>();
 		this.popFac = sc.getPopulation().getFactory();

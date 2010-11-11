@@ -26,9 +26,9 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.Module;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.config.groups.EvacuationConfigGroup.EvacuationScenario;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
@@ -43,6 +43,8 @@ import org.matsim.evacuation.base.EvacuationNetFromNetcdfGenerator;
 import org.matsim.evacuation.base.EvacuationNetGenerator;
 import org.matsim.evacuation.base.EvacuationPlansGenerator;
 import org.matsim.evacuation.base.NetworkChangeEventsFromNetcdf;
+import org.matsim.evacuation.config.EvacuationConfigGroup;
+import org.matsim.evacuation.config.EvacuationConfigGroup.EvacuationScenario;
 import org.matsim.evacuation.flooding.FloodingReader;
 import org.matsim.evacuation.riskaversion.RiskCostFromFloodingData;
 import org.matsim.evacuation.run.EvacuationQSimControllerII;
@@ -70,32 +72,31 @@ public class EvacuationDelayController extends Controler {
 
 	PluggableTravelCostCalculator pluggableTravelCost = null;
 
+	private EvacuationConfigGroup ec;
+
 	public EvacuationDelayController(String[] args) {
 		super(args);
-		this.setOverwriteFiles(true);
+		setOverwriteFiles(true);
 		this.config.scenario().setUseSignalSystems(true);
 		this.config.scenario().setUseLanes(true);
 		this.config.setQSimConfigGroup(new QSimConfigGroup());
 	}
 
-
 	@Override
-	protected void setUp(){
+	protected void setUp() {
 		super.setUp();
 
-		if (this.scenarioData.getConfig().evacuation().isLoadShelters()) {
+		if (this.ec.isLoadShelters()) {
 			loadShelterSignalSystems();
 		}
 
-		if (this.scenarioData.getConfig().evacuation().isSocialCostOptimization()) {
+		if (this.ec.isSocialCostOptimization()) {
 			initSocialCostOptimization();
 		}
 
-		if (this.scenarioData.getConfig().evacuation().isRiskMinimization()) {
+		if (this.ec.isRiskMinimization()) {
 			initRiskMinimization();
 		}
-
-
 
 		unloadNetcdfReaders();
 
@@ -103,19 +104,18 @@ public class EvacuationDelayController extends Controler {
 
 	private void initSocialCostOptimization() {
 		initPluggableTravelCostCalculator();
-		SocialCostCalculatorSingleLink sc = new SocialCostCalculatorSingleLink(this.network,this.config.travelTimeCalculator().getTraveltimeBinSize(),getEvents());
+		SocialCostCalculatorSingleLink sc = new SocialCostCalculatorSingleLink(this.network, this.config.travelTimeCalculator().getTraveltimeBinSize(), getEvents());
 		this.pluggableTravelCost.addTravelCost(sc);
 		this.events.addHandler(sc);
 		this.strategyManager = loadStrategyManager();
-		this.addControlerListener(sc);
+		addControlerListener(sc);
 	}
-
 
 	private void initRiskMinimization() {
 		initPluggableTravelCostCalculator();
 		loadNetcdfReaders();
 
-		RiskCostFromFloodingData rc = new RiskCostFromFloodingData(this.network, this.netcdfReaders,getEvents(),this.scenarioData.getConfig().evacuation().getBufferSize());
+		RiskCostFromFloodingData rc = new RiskCostFromFloodingData(this.network, this.netcdfReaders, getEvents(), this.ec.getBufferSize());
 		this.pluggableTravelCost.addTravelCost(rc);
 		this.events.addHandler(rc);
 	}
@@ -123,18 +123,16 @@ public class EvacuationDelayController extends Controler {
 	private void initPluggableTravelCostCalculator() {
 		if (this.pluggableTravelCost == null) {
 			if (this.travelTimeCalculator == null) {
-				this.travelTimeCalculator = this.getTravelTimeCalculatorFactory().createTravelTimeCalculator(this.network, this.config.travelTimeCalculator());
+				this.travelTimeCalculator = getTravelTimeCalculatorFactory().createTravelTimeCalculator(this.network, this.config.travelTimeCalculator());
 			}
 			this.pluggableTravelCost = new PluggableTravelCostCalculator(this.travelTimeCalculator);
-			this.setTravelCostCalculatorFactory(new TravelCostCalculatorFactory() {
+			setTravelCostCalculatorFactory(new TravelCostCalculatorFactory() {
 
-				
-				// This is thread-safe because pluggableTravelCost is thread-safe.
-				
+				// This is thread-safe because pluggableTravelCost is
+				// thread-safe.
+
 				@Override
-				public PersonalizableTravelCost createTravelCostCalculator(
-						PersonalizableTravelTime timeCalculator,
-						CharyparNagelScoringConfigGroup cnScoringGroup) {
+				public PersonalizableTravelCost createTravelCostCalculator(PersonalizableTravelTime timeCalculator, CharyparNagelScoringConfigGroup cnScoringGroup) {
 					return EvacuationDelayController.this.pluggableTravelCost;
 				}
 
@@ -145,22 +143,21 @@ public class EvacuationDelayController extends Controler {
 	private void loadShelterSignalSystems() {
 		this.config.network().setLaneDefinitionsFile("nullnull");
 
-		ShelterInputCounterSignalSystems sic = new ShelterInputCounterSignalSystems(this.scenarioData,this.shelterLinkMapping);
+		ShelterInputCounterSignalSystems sic = new ShelterInputCounterSignalSystems(this.scenarioData, this.shelterLinkMapping);
 		this.events.addHandler(sic);
-		this.getQueueSimulationListener().add(sic);
+		getQueueSimulationListener().add(sic);
 
 		ShelterDoorBlockerSetup shelterSetup = new ShelterDoorBlockerSetup(sic);
 		final SignalSystemsManager signalManager = shelterSetup.createSignalManager(getScenario());
-		signalManager.setEventsManager(events);
-		this.getQueueSimulationListener().add(new QSimSignalEngine(signalManager));
-		this.addControlerListener(new IterationStartsListener(){
+		signalManager.setEventsManager(this.events);
+		getQueueSimulationListener().add(new QSimSignalEngine(signalManager));
+		addControlerListener(new IterationStartsListener() {
 			@Override
 			public void notifyIterationStarts(IterationStartsEvent event) {
 				signalManager.resetModel(event.getIteration());
 			}
 		});
 	}
-
 
 	private void unloadNetcdfReaders() {
 		this.netcdfReaders = null;
@@ -172,15 +169,15 @@ public class EvacuationDelayController extends Controler {
 			return;
 		}
 		log.info("loading netcdf readers");
-		int count = this.scenarioData.getConfig().evacuation().getSWWFileCount();
+		int count = this.ec.getSWWFileCount();
 		if (count <= 0) {
 			return;
 		}
-		this.netcdfReaders  = new ArrayList<FloodingReader>();
-		double offsetEast = this.scenarioData.getConfig().evacuation().getSWWOffsetEast();
-		double offsetNorth = this.scenarioData.getConfig().evacuation().getSWWOffsetNorth();
+		this.netcdfReaders = new ArrayList<FloodingReader>();
+		double offsetEast = this.ec.getSWWOffsetEast();
+		double offsetNorth = this.ec.getSWWOffsetNorth();
 		for (int i = 0; i < count; i++) {
-			String netcdf = this.scenarioData.getConfig().evacuation().getSWWRoot() + "/" + this.scenarioData.getConfig().evacuation().getSWWFilePrefix() + i + this.scenarioData.getConfig().evacuation().getSWWFileSuffix();
+			String netcdf = this.ec.getSWWRoot() + "/" + this.ec.getSWWFilePrefix() + i + this.ec.getSWWFileSuffix();
 			FloodingReader fr = new FloodingReader(netcdf);
 			fr.setReadTriangles(true);
 			fr.setOffset(offsetEast, offsetNorth);
@@ -198,31 +195,33 @@ public class EvacuationDelayController extends Controler {
 		} else if (net.getNetworkChangeEvents() != null) {
 			throw new RuntimeException("Network change events allready loaded!");
 		}
-		List<NetworkChangeEvent> events = new NetworkChangeEventsFromNetcdf(this.netcdfReaders,this.scenarioData).createChangeEvents();
+		List<NetworkChangeEvent> events = new NetworkChangeEventsFromNetcdf(this.netcdfReaders, this.scenarioData).createChangeEvents();
 		net.setNetworkChangeEvents(events);
 	}
-
 
 	@Override
 	protected void loadData() {
 		super.loadData();
 
+		Module m = this.config.getModule("evacuation");
+		this.ec = new EvacuationConfigGroup(m);
+		this.config.getModules().put("evacuation", this.ec);
 		// network
 		NetworkImpl net = this.scenarioData.getNetwork();
 
-		if (this.scenarioData.getConfig().evacuation().isLoadShelters()) {
+		if (this.ec.isLoadShelters()) {
 			if (this.buildings == null) {
-				this.buildings = BuildingsShapeReader.readDataFile(this.config.evacuation().getBuildingsFile(),this.config.evacuation().getSampleSize());
+				this.buildings = BuildingsShapeReader.readDataFile(this.ec.getBuildingsFile(), this.ec.getSampleSize());
 			}
-			if (this.scenarioData.getConfig().evacuation().isGenerateEvacNetFromSWWFile()) {
+			if (this.ec.isGenerateEvacNetFromSWWFile()) {
 				loadNetcdfReaders();
 			}
-			this.esnl = new EvacuationShelterNetLoader(this.buildings,this.scenarioData,this.netcdfReaders);
+			this.esnl = new EvacuationShelterNetLoader(this.buildings, this.scenarioData, this.netcdfReaders);
 			net = this.esnl.getNetwork();
 			this.shelterLinkMapping = this.esnl.getShelterLinkMapping();
 
 		} else {
-			if (this.scenarioData.getConfig().evacuation().isGenerateEvacNetFromSWWFile()) {
+			if (this.ec.isGenerateEvacNetFromSWWFile()) {
 				loadNetcdfReaders();
 				new EvacuationNetFromNetcdfGenerator(net, this.scenarioData.getConfig(), this.netcdfReaders).run();
 			} else {
@@ -230,36 +229,34 @@ public class EvacuationDelayController extends Controler {
 			}
 		}
 
-		if (this.scenarioData.getConfig().network().isTimeVariantNetwork() && this.scenarioData.getConfig().evacuation().isGenerateEvacNetFromSWWFile() ) {
+		if (this.scenarioData.getConfig().network().isTimeVariantNetwork() && this.ec.isGenerateEvacNetFromSWWFile()) {
 			loadNetWorkChangeEvents(net);
 		}
 
-		
-		if (this.scenarioData.getConfig().evacuation().isLoadPopulationFromShapeFile()) {
-			if (this.scenarioData.getPopulation().getPersons().size() > 0 ) {
+		if (this.ec.isLoadPopulationFromShapeFile()) {
+			if (this.scenarioData.getPopulation().getPersons().size() > 0) {
 				throw new RuntimeException("Population already loaded. In order to load population from shape file, the population input file paramter in the population section of the config.xml must not be set!");
 			}
 			// population
 			if (this.buildings == null) {
-				this.buildings = BuildingsShapeReader.readDataFile(this.config.evacuation().getBuildingsFile(),this.config.evacuation().getSampleSize());
+				this.buildings = BuildingsShapeReader.readDataFile(this.ec.getBuildingsFile(), this.ec.getSampleSize());
 			}
-	
-			if (this.scenarioData.getConfig().evacuation().isGenerateEvacNetFromSWWFile()) {
-				new DelayedEvacuationPopulationLoader(this.scenarioData.getPopulation(),this.buildings,this.scenarioData,this.netcdfReaders).getPopulation();
+
+			if (this.ec.isGenerateEvacNetFromSWWFile()) {
+				new DelayedEvacuationPopulationLoader(this.scenarioData.getPopulation(), this.buildings, this.scenarioData, this.netcdfReaders).getPopulation();
 			} else {
-				new DelayedEvacuationPopulationLoader(this.scenarioData.getPopulation(),this.buildings,this.scenarioData, null).getPopulation();
+				new DelayedEvacuationPopulationLoader(this.scenarioData.getPopulation(), this.buildings, this.scenarioData, null).getPopulation();
 			}
 		} else {
-			if (this.scenarioData.getConfig().evacuation().getEvacuationScanrio() != EvacuationScenario.night) {
+			if (this.ec.getEvacuationScanrio() != EvacuationScenario.night) {
 				throw new RuntimeException("Evacuation simulation from plans file so far only works for the night scenario.");
 			}
-			new EvacuationPlansGenerator(this.population,this.network,this.network.getLinks().get(new IdImpl("el1"))).run();
+			new EvacuationPlansGenerator(this.population, this.network, this.network.getLinks().get(new IdImpl("el1"))).run();
 		}
 
-		
 		this.population = this.scenarioData.getPopulation();
 
-		if (this.scenarioData.getConfig().evacuation().isLoadShelters()) {
+		if (this.ec.isLoadShelters()) {
 			this.esnl.generateShelterLinks();
 		}
 	}

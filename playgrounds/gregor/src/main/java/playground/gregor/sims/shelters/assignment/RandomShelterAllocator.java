@@ -44,6 +44,7 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.evacuation.base.Building;
 import org.matsim.evacuation.base.EvacuationPopulationFromShapeFileLoader;
 import org.matsim.evacuation.base.EvacuationStartTimeCalculator;
+import org.matsim.evacuation.config.EvacuationConfigGroup;
 import org.matsim.evacuation.flooding.FloodingInfo;
 import org.matsim.evacuation.flooding.FloodingReader;
 import org.matsim.evacuation.travelcosts.PluggableTravelCostCalculator;
@@ -139,7 +140,7 @@ public class RandomShelterAllocator extends EvacuationPopulationFromShapeFileLoa
 			Coord coord = MGC.point2Coord(building.getGeo().getCentroid());
 			if (this.fis != null) {
 				FloodingInfo fi = this.fis.get(coord.getX(), coord.getY());
-				if (fi.getCoordinate().distance(building.getGeo().getCentroid().getCoordinate()) > this.scenario.getConfig().evacuation().getBufferSize()) {
+				if (fi.getCoordinate().distance(building.getGeo().getCentroid().getCoordinate()) > ((EvacuationConfigGroup) this.scenario.getConfig().getModule("evacuation")).getBufferSize()) {
 					continue;
 				}
 
