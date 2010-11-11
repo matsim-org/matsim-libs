@@ -674,6 +674,7 @@ public class Flow {
 	 * @return true iff 0 <= flow <= capacity at time associated with step
 	 */
 
+	@SuppressWarnings("unused")
 	private boolean checkStep(PathStep step) {
 
 		// FIXME really bad style ...
@@ -1494,6 +1495,7 @@ public class Flow {
 		return !error;
 	}
 	
+	@SuppressWarnings("unused")
 	private void mapAllPaths(){
 		for(TimeExpandedPath path : this._TimeExpandedPaths){
 			mapPath(path);
@@ -2059,174 +2061,6 @@ public class Flow {
 	}
 
 //////////////////////////////////////////////////////////////////////////////////////
-//---------------------------Plans Converter----------------------------------------//
-//////////////////////////////////////////////////////////////////////////////////////
-
-
-	public Population createPopulation() {
-		return createPopulation(null, null);
-	}
-	
-	public Population createPopulation(final Scenario scenario) {
-		return createPopulation(scenario, null);
-	}
-	
-	public Population createPopulation(final Scenario scenario, final HashMap<Id, Id> sinklinks){
-		
-		
-		boolean org = scenario != null && scenario.getPopulation() != null;
-		
-		HashMap<Node, LinkedList<Person>> orgpersons = null;
-		
-		if (org) {
-			orgpersons = new HashMap<Node,LinkedList<Person>>();
-			for (Person person : scenario.getPopulation().getPersons().values()) {
-				Plan plan = person.getPlans().get(0);
-				if(((PlanImpl) plan).getFirstActivity().getLinkId()==null){
-					continue;
-				}
-
-				Link link = scenario.getNetwork().getLinks().get(((PlanImpl) plan).getFirstActivity().getLinkId());
-				if (link == null) {					
-					continue;
-				}
-
-				Node node = link.getToNode();
-				if (!this._network.getNodes().containsValue(node)) {
-					continue;
-				}
-				
-				if (orgpersons.get(node) == null) {
-					LinkedList<Person> list = new LinkedList<Person>();
-					list.add(person);
-					orgpersons.put(node, list);
-				} else {
-					LinkedList<Person> list = orgpersons.get(node);
-					list.add(person);
-				}
-			}
-		}
-		  
-		//construct Population
-		Population result = new ScenarioImpl().getPopulation();
-		int id = 1;
-		for (TimeExpandedPath path : this._TimeExpandedPaths){
-			if (path.isforward()) {
-				//units of flow on the Path
-				int nofpersons = path.getFlow();
-				// list of links in order of the path
-				
-				LinkedList<Id> ids = new LinkedList<Id>();
-				for (PathStep step : path.getPathSteps()){
-					if (step instanceof StepEdge) {
-						ids.add(((StepEdge) step).getEdge().getId());
-					}
-				}
-
-				
-				Node firstnode  = _network.getLinks().get(ids.get(0)).getFromNode();
-
-				// for each unit of flow, construct a person and plan
-				for (int i = 1 ; i <= nofpersons; i++){
-					
-					LinkNetworkRouteImpl route;
-					
-					Id pid = null;
-					Person person = null;
-					
-					Id startLinkId = null;
-					int startindex = 0;
-										
-					boolean orgokay = false;
-
-					// find a suitable original person or create a new one 
-					if (org && orgpersons.get(firstnode) != null) {					
-						LinkedList<Person> list = orgpersons.get(firstnode);
-						person = list.poll();
-						
-						if(list.isEmpty()){
-							orgpersons.remove(firstnode);
-						}
-						
-						pid = person.getId();
-						
-						orgokay = true;
-						//System.out.println("found person #" + i + "/" + nofpersons + " id " + pid + " at " + firstnode.getId());
-						
-						startLinkId = ((PlanImpl) person.getPlans().get(0)).getFirstActivity().getLinkId();
-						startindex = 0;
-												
-						// now delete all plans so that only our new plan will be in there
-						// FIXME
-						// Is this the MATSim way to do it? 
-						
-						person.getPlans().clear();
-					} 
-
-					if (!orgokay) {
-						pid = new IdImpl("new" + String.valueOf(id));
-						person = new PersonImpl(pid);
-						id++;
-						//System.out.println("created person #" + i + "/" + nofpersons + " id " + pid + " at " + firstnode.getId());
-
-						startLinkId = ids.get(0);
-						startindex = 1;
-					}
-					
-					
-					//System.out.println("starts on link " + startLinkId + " from " + this._network.getLinks().get(startLinkId).getFromNode().getId() + " --> " + this._network.getLinks().get(startLinkId).getToNode().getId());
-					
-					// add "sink flow"
-					Id endLinkId = ids.getLast();
-					int endindex = ids.size() - 1;
-					
-					// should we add another step into the true sink?
-					// e.g. from "1234->en1" to the true "en1->en2" link
-					if (sinklinks != null && sinklinks.containsKey(this._network.getLinks().get(endLinkId).getToNode().getId())) {
-						endLinkId = sinklinks.get(this._network.getLinks().get(endLinkId).getToNode().getId());
-						endindex = ids.size();
-					}
-									
-					route = new LinkNetworkRouteImpl(startLinkId, endLinkId);
-
-					List<Id> routeLinkIds = new ArrayList<Id>();					
-					for (int j = startindex; j < endindex ; j++) {
-							routeLinkIds.add(ids.get(j));
-					}
-					route.setLinkIds(startLinkId, routeLinkIds, endLinkId);
-
-
-					LegImpl leg = new LegImpl(TransportMode.car);					
-					leg.setRoute(route);
-					
-					ActivityImpl home = new ActivityImpl("h", startLinkId);
-					
-					ActivityImpl work = new ActivityImpl("w", endLinkId);
-
-					home.setEndTime(0);
-					work.setEndTime(0);
-					
-					Plan plan = new PlanImpl(person);
-					plan.addActivity(home);
-					plan.addLeg(leg);
-					plan.addActivity(work);
-					person.addPlan(plan);
-					result.addPerson(person);
-				}
-			} else { // residual edges
-				// this should not happen!
-				System.out.println("createPopulation encountered a residual step in");
-				System.out.println(path);
-				System.out.println("This should not happen!");
-			}
-
-
-		}
-
-		return result;
-	}
-
-//////////////////////////////////////////////////////////////////////////////////////
 //------------------- Clean Up---------------------------------------//
 //////////////////////////////////////////////////////////////////////////////////////
 
@@ -2414,11 +2248,9 @@ public class Flow {
 		return result;
 	}
 
-	/** @return newly constructed paths, but completely destroys this flow object
+	/** @return newly constructed paths, but completely destroys this flow object!
 	*/
 	public LinkedList<TimeExpandedPath> doPathDecomposition() {
-		LinkedList<TimeExpandedPath> paths = new LinkedList<TimeExpandedPath>();
-		
 		// FIXME destroys the flow!
 		Decomposer decomp = new Decomposer(this, _settings);
 				

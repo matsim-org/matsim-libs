@@ -1,3 +1,23 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * DanielMain.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.dressler.control;
 
 import java.io.BufferedReader;
@@ -8,9 +28,11 @@ import java.util.LinkedList;
 
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.population.PopulationWriter;
 
 import playground.dressler.ea_flow.Flow;
 import playground.dressler.ea_flow.TimeExpandedPath;
@@ -30,6 +52,7 @@ public class DanielMain {
 		
 		String networkfile = null;
 		String plansfile = null;
+		String outplansfile = null;
 		String sinkid = null;
 		String simplenetworkfile = null;		
 		boolean writeflow = false;
@@ -105,6 +128,14 @@ public class DanielMain {
 						argsokay= false;
 						error += "--plans requires an argument (filename)\n";
 					}
+				}  else if (s.equals("--outputplans")) {
+					i++;
+					if (i < args.length) {
+						outplansfile = args[i];
+					} else {
+						argsokay= false;
+						error += "--outputplans requires an argument (filename)\n";
+					}
 				}  else if (s.equals("--writeflow")) {
 					i++;
 					if (i < args.length) {
@@ -126,6 +157,8 @@ public class DanielMain {
 					error += "--timehorizon int\n";
 					error += "--timestep double\n";
 					error += "--flowfactor double\n";
+					error += "* Output * \n";
+					error += "--outputplans filename\n";
 					error += "* Search Settings *\n";
 					error += "--config filenameyet\n";
 					error += "* and many more ... *\n";
@@ -300,6 +333,17 @@ public class DanielMain {
 		if (writeflow) {			
 			System.out.println(fluss.writePathflow(false));
 		}
+		
+		if (outplansfile != null) {
+			PopulationCreator popcreator = new PopulationCreator(settings);
+			
+			// fix the final link
+			popcreator.autoFixSink(new IdImpl("en2"));			
+			
+			Population output = popcreator.createPopulation(fluss.getPaths(), scenario);
+			new PopulationWriter(output, network).write(outplansfile);
+		}
+
 		
 		System.out.println("Done.");
 		return;

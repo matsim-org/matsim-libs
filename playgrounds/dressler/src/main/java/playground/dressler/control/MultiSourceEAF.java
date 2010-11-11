@@ -706,7 +706,7 @@ public class MultiSourceEAF {
 		int timeStep;
 		double flowFactor;
 
-		int instance = 5;
+		int instance = 1024;
 		// 1 = siouxfalls, demand 500
 		// 11 same as above only Manuel and 5s euclid
 		// 2 = swissold, demand 100
@@ -923,7 +923,7 @@ public class MultiSourceEAF {
 
 		}
 		
-		//outputplansfile = "/homes/combi/dressler/V/code/meine_EA/tempplans.xml";
+		outputplansfile = "/homes/combi/dressler/V/code/meine_EA/tempplans.xml";
 		//flowfile = "/homes/combi/dressler/V/vnotes/statistik_2010_04_april/bug_shelters_implicit.pathflow";
 		//flowfile = "/homes/combi/dressler/V/code/meine_EA/padang_v2010_250k_10s_shelters.pathflow";
 		
@@ -1097,7 +1097,7 @@ public class MultiSourceEAF {
 		settings.delaySinkPropagation = true; // propagate sinks (and resulting intervals) only if the search has nothing else to do 
 		settings.quickCutOff = false; // stop as soon as the first good path is found
 		settings.mapLinksToTEP = true; // remember which path uses an edge at a given time
-		settings.useHoldover = true; //only forward, no cost, no unwind
+		settings.useHoldover = false; //only forward, no cost, no unwind
 		//settings.whenAvailable = new HashMap<Link, Interval>();
 		//settings.whenAvailable.put(network.getLinks().get(new IdImpl("1")), new Interval(2,3));
 
@@ -1206,10 +1206,13 @@ public class MultiSourceEAF {
 		
 		
 		if (outputplansfile != null) {
+			PopulationCreator popcreator = new PopulationCreator(settings);
+			
 			// fix the final link
-			HashMap<Id,Id> sinkreplacement = new HashMap<Id,Id>();
-			sinkreplacement.put(new IdImpl("en1"), new IdImpl("el1"));
-			Population output = fluss.createPopulation(scenario, sinkreplacement);
+			//popcreator.pathSuffix.put(new IdImpl("en1"), new IdImpl("el1"));
+			popcreator.autoFixSink(new IdImpl("en2"));			
+			
+			Population output = popcreator.createPopulation(fluss.getPaths(), scenario);
 			new PopulationWriter(output, network).write(outputplansfile);
 		}
 

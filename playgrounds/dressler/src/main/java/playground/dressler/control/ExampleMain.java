@@ -2,9 +2,12 @@ package playground.dressler.control;
 
 import java.util.HashMap;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.population.PopulationWriter;
 
 import playground.dressler.ea_flow.Flow;
 //
@@ -105,8 +108,10 @@ public class ExampleMain {
 		/* The following will (hopefully) create a population out of the flow units
 		 */
 
-		Population output = fluss.createPopulation(null);
-
+		
+		PopulationCreator popcreator = new PopulationCreator(settings);
+			
+		Population output = popcreator.createPopulation(fluss.getPaths());
 	}
 
 }

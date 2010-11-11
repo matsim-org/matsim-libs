@@ -76,7 +76,7 @@ public class Decomposer {
 	private int continuePath(Node node, int t, int targetFlow) {
 		int sum = 0;
 		
-		//System.out.println("Decompose at node " + node.getId() + " @ " + t);
+		//System.out.println("Decompose at node " + node.getId() + " @ " + t + " target " + targetFlow);
 
 		if (_settings.isSink(node)) {
 			int f = finishPath(node, t, targetFlow);
