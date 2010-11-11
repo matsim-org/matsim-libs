@@ -29,7 +29,6 @@ import org.matsim.core.config.consistency.ConfigConsistencyChecker;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.CountsConfigGroup;
-import org.matsim.core.config.groups.EvacuationConfigGroup;
 import org.matsim.core.config.groups.FacilitiesConfigGroup;
 import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.config.groups.HouseholdsConfigGroup;
@@ -47,32 +46,35 @@ import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorConfigGroup;
+import org.matsim.evacuation.config.EvacuationConfigGroup;
 import org.matsim.pt.config.PtCountsConfigGroup;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.vis.otfvis.gui.OTFVisConfigGroup;
 
 /**
- * Stores all configuration settings specified in a configuration file
- * and provides access to the settings at runtime.
- *
+ * Stores all configuration settings specified in a configuration file and
+ * provides access to the settings at runtime.
+ * 
  * @author mrieser
  */
 public class Config {
 
-	//////////////////////////////////////////////////////////////////////
+	// ////////////////////////////////////////////////////////////////////
 	// member variables
-	//////////////////////////////////////////////////////////////////////
+	// ////////////////////////////////////////////////////////////////////
 
 	/** Map of all config-groups known to this instance. */
-	private final TreeMap<String, Module> modules = new TreeMap<String,Module>();
+	private final TreeMap<String, Module> modules = new TreeMap<String, Module>();
 
-	/* the following members are for the direct access to the core config groups. */
+	/*
+	 * the following members are for the direct access to the core config
+	 * groups.
+	 */
 
 	// config groups that are in org.matsim.core.config.groups:
 	private CharyparNagelScoringConfigGroup charyparNagelScoring = null;
 	private ControlerConfigGroup controler = null;
 	private CountsConfigGroup counts = null;
-	private EvacuationConfigGroup evacuation = null;
 	private FacilitiesConfigGroup facilities = null;
 	private GlobalConfigGroup global = null;
 	private HouseholdsConfigGroup households;
@@ -92,18 +94,18 @@ public class Config {
 	private VspExperimentalConfigGroup vspExperimentalGroup = null;
 
 	// config groups that are elsewhere:
-	private OTFVisConfigGroup otfVis = null ;
-	private PtCountsConfigGroup ptCounts = null ;
-	private TravelTimeCalculatorConfigGroup travelTimeCalculatorConfigGroup = null ;
+	private OTFVisConfigGroup otfVis = null;
+	private PtCountsConfigGroup ptCounts = null;
+	private TravelTimeCalculatorConfigGroup travelTimeCalculatorConfigGroup = null;
 
 	private final List<ConfigConsistencyChecker> consistencyCheckers = new ArrayList<ConfigConsistencyChecker>();
 
 	/** static Logger-instance. */
 	private static final Logger log = Logger.getLogger(Config.class);
 
-	//////////////////////////////////////////////////////////////////////
+	// ////////////////////////////////////////////////////////////////////
 	// constructor
-	//////////////////////////////////////////////////////////////////////
+	// ////////////////////////////////////////////////////////////////////
 
 	public Config() {
 		// nothing to do
@@ -151,9 +153,6 @@ public class Config {
 		this.roadpricing = new RoadPricingConfigGroup();
 		this.modules.put(RoadPricingConfigGroup.GROUP_NAME, this.roadpricing);
 
-		this.evacuation = new EvacuationConfigGroup();
-		this.modules.put(EvacuationConfigGroup.GROUP_NAME, this.evacuation);
-
 		this.locationchoice = new LocationChoiceConfigGroup();
 		this.modules.put(LocationChoiceConfigGroup.GROUP_NAME, this.locationchoice);
 
@@ -173,7 +172,7 @@ public class Config {
 		this.modules.put(VspExperimentalConfigGroup.GROUP_NAME, this.vspExperimentalGroup);
 
 		this.otfVis = new OTFVisConfigGroup();
-		this.modules.put( OTFVisConfigGroup.GROUP_NAME, this.otfVis);
+		this.modules.put(OTFVisConfigGroup.GROUP_NAME, this.otfVis);
 
 		this.multiModal = new MultiModalConfigGroup();
 		this.modules.put(MultiModalConfigGroup.GROUP_NAME, this.multiModal);
@@ -185,27 +184,33 @@ public class Config {
 		this.modules.put(TransitConfigGroup.GROUP_NAME, this.transit);
 	}
 
-	/** Checks each module for consistency, e.g. if the parameters that are currently set make sense
-	 * in their combination. */
+	/**
+	 * Checks each module for consistency, e.g. if the parameters that are
+	 * currently set make sense in their combination.
+	 */
 	public void checkConsistency() {
 		for (Module m : this.modules.values()) {
 			m.checkConsistency();
 		}
-		for (ConfigConsistencyChecker c : this.consistencyCheckers){
+		for (ConfigConsistencyChecker c : this.consistencyCheckers) {
 			c.checkConsistency(this);
 		}
 
 	}
 
-	//////////////////////////////////////////////////////////////////////
+	// ////////////////////////////////////////////////////////////////////
 	// add / set methods
-	//////////////////////////////////////////////////////////////////////
+	// ////////////////////////////////////////////////////////////////////
 
-	/** Creates a new module / config-group with the specified name.
-	 * @param name The name of the config-group to be created.
-	 *
+	/**
+	 * Creates a new module / config-group with the specified name.
+	 * 
+	 * @param name
+	 *            The name of the config-group to be created.
+	 * 
 	 * @return the newly created config group
-	 * @throws IllegalArgumentException if a config-group with the specified name already exists.
+	 * @throws IllegalArgumentException
+	 *             if a config-group with the specified name already exists.
 	 */
 	public final Module createModule(final String name) {
 		if (this.modules.containsKey(name)) {
@@ -217,12 +222,14 @@ public class Config {
 	}
 
 	/**
-	 * Adds the specified module / config-group with the specified name to the configuration.
-	 *
+	 * Adds the specified module / config-group with the specified name to the
+	 * configuration.
+	 * 
 	 * @param name
 	 * @param module
-	 *
-	 * @throws IllegalArgumentException if a config-group with the specified name already exists.
+	 * 
+	 * @throws IllegalArgumentException
+	 *             if a config-group with the specified name already exists.
 	 */
 	public final void addModule(final String name, final Module module) {
 		if (this.modules.containsKey(name)) {
@@ -232,12 +239,12 @@ public class Config {
 	}
 
 	/**
-	 * Removes the specified module / config-group with the specified name from the configuration.
-	 * Does nothing if this module was not existing.
-	 *
+	 * Removes the specified module / config-group with the specified name from
+	 * the configuration. Does nothing if this module was not existing.
+	 * 
 	 * @param name
 	 * @param module
-	 *
+	 * 
 	 */
 	public final void removeModule(final String name) {
 		if (this.modules.containsKey(name)) {
@@ -247,32 +254,36 @@ public class Config {
 		}
 	}
 
-	//////////////////////////////////////////////////////////////////////
+	// ////////////////////////////////////////////////////////////////////
 	// get methods
-	//////////////////////////////////////////////////////////////////////
+	// ////////////////////////////////////////////////////////////////////
 
 	public final TreeMap<String, Module> getModules() {
 		return this.modules;
 	}
 
 	/**
-	 * Returns the requested module, or <code>null</code> if the module does not exist.
-	 *
-	 * @param moduleName name of the requested module
+	 * Returns the requested module, or <code>null</code> if the module does not
+	 * exist.
+	 * 
+	 * @param moduleName
+	 *            name of the requested module
 	 * @return requested module
 	 */
 	public final Module getModule(final String moduleName) {
 		return this.modules.get(moduleName);
 	}
 
-	/** Returns the requested parameter. If the module or parameter is not known, an
-	 * error is logged and an IllegalArgumentException is thrown.
-	 *
+	/**
+	 * Returns the requested parameter. If the module or parameter is not known,
+	 * an error is logged and an IllegalArgumentException is thrown.
+	 * 
 	 * @param moduleName
 	 * @param paramName
 	 * @return the requested parameter
-	 *
-	 * @throws IllegalArgumentException if the module or parameter does not exist
+	 * 
+	 * @throws IllegalArgumentException
+	 *             if the module or parameter does not exist
 	 * @see #findParam(String, String)
 	 */
 	public final String getParam(final String moduleName, final String paramName) {
@@ -290,12 +301,15 @@ public class Config {
 	}
 
 	/**
-	 * Returns the value of the specified parameter if it exists, or <code>null</code> otherwise.
-	 *
-	 * @param moduleName name of the config-module
-	 * @param paramName name of parameter in the specified module
+	 * Returns the value of the specified parameter if it exists, or
+	 * <code>null</code> otherwise.
+	 * 
+	 * @param moduleName
+	 *            name of the config-module
+	 * @param paramName
+	 *            name of parameter in the specified module
 	 * @return value of the parameter if it exists, <code>null</code> otherwise
-	 *
+	 * 
 	 * @see #getParam(String, String)
 	 */
 	public final String findParam(final String moduleName, final String paramName) {
@@ -309,30 +323,28 @@ public class Config {
 				return null;
 			}
 			return str;
-		}
-		catch (IllegalArgumentException e) {
+		} catch (IllegalArgumentException e) {
 			return null;
 		}
 	}
 
-	//////////////////////////////////////////////////////////////////////
+	// ////////////////////////////////////////////////////////////////////
 	// print methods
-	//////////////////////////////////////////////////////////////////////
+	// ////////////////////////////////////////////////////////////////////
 
 	@Override
 	public final String toString() {
 		return "[nof_modules=" + this.modules.size() + "]";
 	}
 
-	//////////////////////////////////////////////////////////////////////
+	// ////////////////////////////////////////////////////////////////////
 	// is used for using Config without a config-file given
-	//////////////////////////////////////////////////////////////////////
+	// ////////////////////////////////////////////////////////////////////
 	/**
 	 * Sets the parameter <code>paramName</code> in the module/config-group
-	 * <code>moduleName</code> to the specified value.
-	 * If there is no config-group with the specified name, a new group will
-	 * be created.
-	 *
+	 * <code>moduleName</code> to the specified value. If there is no
+	 * config-group with the specified name, a new group will be created.
+	 * 
 	 * @param moduleName
 	 * @param paramName
 	 * @param value
@@ -348,9 +360,9 @@ public class Config {
 		}
 	}
 
-	//////////////////////////////////////////////////////////////////////
+	// ////////////////////////////////////////////////////////////////////
 	// direct access to modules / groups
-	//////////////////////////////////////////////////////////////////////
+	// ////////////////////////////////////////////////////////////////////
 
 	public final GlobalConfigGroup global() {
 		return this.global;
@@ -390,10 +402,6 @@ public class Config {
 
 	public final RoadPricingConfigGroup roadpricing() {
 		return this.roadpricing;
-	}
-
-	public final EvacuationConfigGroup evacuation() {
-		return this.evacuation;
 	}
 
 	public final StrategyConfigGroup strategy() {
@@ -451,16 +459,14 @@ public class Config {
 	// methods that are somehow out of the "regular" system:
 
 	public void setQSimConfigGroup(final QSimConfigGroup qSimConfigGroup) {
-		log.warn("setting QSimConfigGroup in Config.  This will silently overwrite any pre-existing entry." ) ;
-		log.warn("Might be better to modify the code to use the existing create/add/removeModule mechanics. kai, oct'10") ;
+		log.warn("setting QSimConfigGroup in Config.  This will silently overwrite any pre-existing entry.");
+		log.warn("Might be better to modify the code to use the existing create/add/removeModule mechanics. kai, oct'10");
 		this.qSimConfigGroup = qSimConfigGroup;
 		this.modules.put(QSimConfigGroup.GROUP_NAME, qSimConfigGroup);
 	}
 
-	public void addConfigConsistencyChecker(
-			final ConfigConsistencyChecker checker) {
+	public void addConfigConsistencyChecker(final ConfigConsistencyChecker checker) {
 		this.consistencyCheckers.add(checker);
 	}
-
 
 }
