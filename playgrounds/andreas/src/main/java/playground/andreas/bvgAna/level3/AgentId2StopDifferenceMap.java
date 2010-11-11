@@ -75,7 +75,7 @@ public class AgentId2StopDifferenceMap implements TransitDriverStartsEventHandle
 		
 		this.vehDelayHandler = new StopId2RouteId2DelayAtStopMap();
 		this.vehDelayAnalyzer = new VehiclePlannedRealizedMissedDepartures(this.vehDelayHandler);
-		this.agentDelayHandler = new AgentId2DepartureDelayAtStopMap(agentIds);
+		this.agentDelayHandler = new AgentId2DepartureDelayAtStopMap(this.agentIds);
 		
 		this.log.info("Reading planned departure time...");
 		this.plannedDepartureTimeMap = AgentId2PlannedDepartureTimeMap.getAgentId2PlannedPTDepartureTimeMap(this.pop, this.agentIds);
@@ -112,6 +112,12 @@ public class AgentId2StopDifferenceMap implements TransitDriverStartsEventHandle
 				double plannedTimeWaiting = nextPlannedVehDeparture - plannedDepartureTime;
 
 				// get realized values
+				if(this.agentDelayHandler.getStopId2DelayAtStopMap().get(agentId) == null){
+					continue;
+				}
+				if(this.agentDelayHandler.getStopId2DelayAtStopMap().get(agentId).getAgentDepartsPTInteraction().size() == 0 || this.agentDelayHandler.getStopId2DelayAtStopMap().get(agentId).getAgentEntersVehicle().size() == 0){
+					break;
+				}
 				double realizedDepartureTime = this.agentDelayHandler.getStopId2DelayAtStopMap().get(agentId).getAgentDepartsPTInteraction().get(i).doubleValue();
 				double realizedVehEntersTime = this.agentDelayHandler.getStopId2DelayAtStopMap().get(agentId).getAgentEntersVehicle().get(i).doubleValue();
 

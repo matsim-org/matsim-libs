@@ -71,6 +71,8 @@ import playground.andreas.bvgAna.level2.StopId2RemainSeatedDataMapData;
 import playground.andreas.bvgAna.level2.VehId2AgentIds;
 import playground.andreas.bvgAna.level2.VehId2LoadMap;
 import playground.andreas.bvgAna.level3.AgentId2StopDifferenceMap;
+import playground.andreas.bvgAna.level4.StopId2MissedVehMap;
+import playground.andreas.bvgAna.level4.StopId2MissedVehMapData;
 
 /**
  * Simple test class
@@ -170,6 +172,9 @@ public class TestMain {
 		StopId2LineId2Pulk s2pulk = new StopId2LineId2Pulk();
 		eventsManager.addHandler(s2pulk);
 		
+		StopId2MissedVehMap s2mv = new StopId2MissedVehMap(plans);
+		eventsManager.addHandler(s2mv);
+		
 		try {
 			reader.parse(eventsFile);
 		} catch (SAXException e) {
@@ -219,6 +224,8 @@ public class TestMain {
 		Set<Id> v2agidr = v2agid.getAgentIdsInVehicle(new IdImpl("veh_8"), 46127.0);
 		
 		TreeMap<Id, TreeMap<Id, List<StopId2LineId2PulkData>>> s2pulkR = s2pulk.getStopId2LineId2PulkDataList();
+		
+		TreeMap<Id, StopId2MissedVehMapData> s2mvR = s2mv.getStopId2StopId2MissedVehMapDataMap();
 		
 		System.out.println("Waiting");
 
