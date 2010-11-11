@@ -23,6 +23,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -55,14 +57,18 @@ import playground.andreas.bvgAna.level0.TransitScheduleDataProvider;
 import playground.andreas.bvgAna.level1.AgentId2EnterLeaveVehicleEventHandler;
 import playground.andreas.bvgAna.level1.AgentId2PtTripTravelTimeMap;
 import playground.andreas.bvgAna.level1.PersonEnterLeaveVehicle2ActivityHandler;
+import playground.andreas.bvgAna.level1.StopId2LineId2Pulk;
+import playground.andreas.bvgAna.level1.StopId2LineId2PulkData;
 import playground.andreas.bvgAna.level1.StopId2PersonEnterLeaveVehicleHandler;
 import playground.andreas.bvgAna.level1.VehId2DelayAtStopMap;
 import playground.andreas.bvgAna.level1.VehId2DelayAtStopMapData;
 import playground.andreas.bvgAna.level1.VehId2OccupancyHandler;
+import playground.andreas.bvgAna.level1.VehId2PersonEnterLeaveVehicleMap;
 import playground.andreas.bvgAna.level2.StopId2DelayOfLine24hMap;
 import playground.andreas.bvgAna.level2.StopId2DelayOfLine24hMapData;
 import playground.andreas.bvgAna.level2.StopId2RemainSeatedDataMap;
 import playground.andreas.bvgAna.level2.StopId2RemainSeatedDataMapData;
+import playground.andreas.bvgAna.level2.VehId2AgentIds;
 import playground.andreas.bvgAna.level2.VehId2LoadMap;
 import playground.andreas.bvgAna.level3.AgentId2StopDifferenceMap;
 
@@ -155,6 +161,15 @@ public class TestMain {
 		StopId2DelayOfLine24hMap s224h = new StopId2DelayOfLine24hMap();
 		eventsManager.addHandler(s224h);
 		
+		VehId2PersonEnterLeaveVehicleMap v2ELM = new VehId2PersonEnterLeaveVehicleMap();
+		eventsManager.addHandler(v2ELM);
+		
+		VehId2AgentIds v2agid = new VehId2AgentIds();
+		eventsManager.addHandler(v2agid);
+		
+		StopId2LineId2Pulk s2pulk = new StopId2LineId2Pulk();
+		eventsManager.addHandler(s2pulk);
+		
 		try {
 			reader.parse(eventsFile);
 		} catch (SAXException e) {
@@ -196,7 +211,15 @@ public class TestMain {
 		TreeMap<Id, LinkedList<VehId2DelayAtStopMapData>> vdelay = v2delay.getVehId2DelayAtStopMap();
 		
 		TreeMap<Id, StopId2DelayOfLine24hMapData> s22 = s224h.getStopId2DelayOfLine24hMap();
-
+		
+		TreeMap<Id, ArrayList<PersonEntersVehicleEvent>> v2em = v2ELM.getVehId2PersonEnterEventMap();
+		TreeMap<Id, ArrayList<PersonLeavesVehicleEvent>> v2lm = v2ELM.getVehId2PersonLeaveEventMap();
+		
+		@SuppressWarnings("unused")
+		Set<Id> v2agidr = v2agid.getAgentIdsInVehicle(new IdImpl("veh_8"), 46127.0);
+		
+		TreeMap<Id, TreeMap<Id, List<StopId2LineId2PulkData>>> s2pulkR = s2pulk.getStopId2LineId2PulkDataList();
+		
 		System.out.println("Waiting");
 
 	}
