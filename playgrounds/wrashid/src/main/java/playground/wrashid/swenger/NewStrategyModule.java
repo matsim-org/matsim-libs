@@ -62,6 +62,10 @@ public class NewStrategyModule implements PlanStrategyModule {
 	private Double timeMutator2;
 	private Double firstStrategyChangeAtIteration;
 	private Double secondStrategyChangeAtIteration;
+	
+	private int betaExpCount=0;
+	private int timeMutatorCount=0;
+	private int reRouteCount=0;
 
 	public NewStrategyModule() {
 		this.timeAllocationMutator = new TimeAllocationMutator(controler.getConfig(), 7200);
@@ -94,6 +98,10 @@ public class NewStrategyModule implements PlanStrategyModule {
 
 	public void prepareReplanning() {
 		this.counterPlanMutator = 0;
+		
+		betaExpCount=0;
+		timeMutatorCount=0;
+		reRouteCount=0;
 	}
 
 	public void handlePlan(final Plan plan) {
@@ -112,23 +120,32 @@ public class NewStrategyModule implements PlanStrategyModule {
 		} else {
 			probabilityOfRouting = routing2;
 			probabilityOfTimeMutator = timeMutator2;
+			
 		}
 		
 		double rand = new Random().nextDouble();
 		if (rand < probabilityOfRouting) {
 			this.randomSelector.selectPlan(plan.getPerson());
 			reRoute.getPlanAlgoInstance().run(plan.getPerson().getSelectedPlan());
+			reRouteCount++;
 		} else if (rand < probabilityOfTimeMutator + probabilityOfRouting) {
 			counterPlanMutator++;
 			this.randomSelector.selectPlan(plan.getPerson());
 			timeAllocationMutator.getPlanAlgoInstance().run(plan.getPerson().getSelectedPlan());
+			timeMutatorCount++;
 		} else {
 			betaExp.selectPlan(plan.getPerson());
+			betaExpCount++;
 		}
 	}
 
 	public void finishReplanning() {
-
+		double populationSize=controler.getPopulation().getPersons().size();
+		log.info("number of betaExpCount: " + this.betaExpCount + " - " + this.betaExpCount/populationSize);
+		log.info("number of timeMutatorCount: " + this.timeMutatorCount  + " - " + this.timeMutatorCount/populationSize);
+		log.info("number of reRouteCount: " + this.reRouteCount  + " - " + this.reRouteCount/populationSize);
+		
+		
 	}
 
 }
