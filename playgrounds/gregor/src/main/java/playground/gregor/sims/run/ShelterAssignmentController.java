@@ -63,6 +63,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import playground.gregor.sims.shelters.assignment.EvacuationShelterNetLoaderForShelterAllocation;
 import playground.gregor.sims.shelters.assignment.GreedyShelterAllocator;
 import playground.gregor.sims.shelters.assignment.ShelterAssignmentRePlanner;
+import playground.gregor.sims.shelters.assignment.ShelterCapacityRePlanner;
 import playground.gregor.sims.shelters.assignment.ShelterCounter;
 import playground.gregor.sims.shelters.assignment.ShelterLocationRePlannerII;
 
@@ -124,8 +125,14 @@ public class ShelterAssignmentController extends Controler {
 
 			ShelterCounter sc = new ShelterCounter(this.scenarioData.getNetwork(), this.shelterLinkMapping);
 			if (this.shift == 2) {
-				ShelterLocationRePlannerII sLRP = new ShelterLocationRePlannerII(getScenario(), this.pluggableTravelCost, getTravelTimeCalculator(), this.buildings, sc);
-				addControlerListener(sLRP);
+				ShelterCapacityRePlanner scap = new ShelterCapacityRePlanner(getScenario(), this.pluggableTravelCost, getTravelTimeCalculator(), this.buildings, sc);
+				addControlerListener(scap);
+
+				// ShelterLocationRePlannerII sLRP = new
+				// ShelterLocationRePlannerII(getScenario(),
+				// this.pluggableTravelCost, getTravelTimeCalculator(),
+				// this.buildings, sc);
+				// addControlerListener(sLRP);
 				// this.events.addHandler(sc);
 			}
 
