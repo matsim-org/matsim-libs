@@ -17,30 +17,31 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.gregor.sims.run;
+package playground.gregor.sims.run.deprecated;
 
 import org.matsim.core.controler.Controler;
 import org.matsim.evacuation.run.EvacuationQSimControllerII;
 
 import playground.gregor.sims.msa.MSATravelTimeCalculatorFactory;
 
+@Deprecated
 public class MSATravelCostContoller extends EvacuationQSimControllerII {
 
 	public MSATravelCostContoller(String[] args) {
 		super(args);
 		// TODO Auto-generated constructor stub
 	}
+
 	@Override
-	protected void setUp(){
+	protected void setUp() {
 		setTravelTimeCalculatorFactory(new MSATravelTimeCalculatorFactory());
 		super.setUp();
-		
+
 	}
-	
 
 	public static void main(final String[] args) {
 		final Controler controler = new MSATravelCostContoller(args);
 		controler.run();
 		System.exit(0);
-	}	
+	}
 }

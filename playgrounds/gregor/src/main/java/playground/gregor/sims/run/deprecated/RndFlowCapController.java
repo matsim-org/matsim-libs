@@ -17,34 +17,30 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.gregor.sims.run;
+package playground.gregor.sims.run.deprecated;
 
 import org.matsim.core.controler.Controler;
 
 import playground.gregor.sims.socialcostII.LinkFlowCapRandomizer;
 
-
+@Deprecated
 public class RndFlowCapController extends Controler {
 
-	private double c;
+	private final double c;
 
 	public RndFlowCapController(String[] args, double c) {
 		super(args);
 		this.c = c;
 	}
-	
-	
 
 	@Override
 	protected void setUp() {
 		super.setUp();
-		LinkFlowCapRandomizer lr = new LinkFlowCapRandomizer(this.network,c,0.1);
-		this.addControlerListener(lr);
+		LinkFlowCapRandomizer lr = new LinkFlowCapRandomizer(this.network, this.c, 0.1);
+		addControlerListener(lr);
 	}
 
-
-
-	public static void main(String [] args ) {
+	public static void main(String[] args) {
 		double c = Double.parseDouble(args[1]);
 		Controler controller = new RndFlowCapController(args, c);
 		controller.setOverwriteFiles(true);

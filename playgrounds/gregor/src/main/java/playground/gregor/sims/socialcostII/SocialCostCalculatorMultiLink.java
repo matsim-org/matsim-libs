@@ -51,7 +51,7 @@ import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.misc.IntegerCache;
 
-import playground.gregor.sims.run.MarginalCostControlerMultiLink;
+import playground.gregor.sims.run.deprecated.MarginalCostControlerMultiLink;
 
 public class SocialCostCalculatorMultiLink implements TravelCost,BeforeMobsimListener, SimulationBeforeCleanupListener, LinkEnterEventHandler, LinkLeaveEventHandler, AgentStuckEventHandler{
 

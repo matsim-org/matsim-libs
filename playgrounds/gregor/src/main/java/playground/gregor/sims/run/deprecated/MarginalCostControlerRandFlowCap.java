@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.sims.run;
+package playground.gregor.sims.run.deprecated;
 
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.controler.Controler;
@@ -28,52 +28,49 @@ import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.evacuation.socialcost.MarginalTravelCostCalculatorII;
 import org.matsim.evacuation.socialcost.SocialCostCalculatorSingleLink;
 
-
-
-public class MarginalCostControlerRandFlowCap extends Controler{
-
-
+@Deprecated
+public class MarginalCostControlerRandFlowCap extends Controler {
 
 	private final double c;
 
 	public MarginalCostControlerRandFlowCap(final String[] args, double c) {
 		super(args);
 		this.c = c;
-		
+
 	}
 
 	@Override
 	protected void setUp() {
 		super.setUp();
-		
-		
-//		LinkFlowCapRandomizer lr = new LinkFlowCapRandomizer(this.network, this.c, 0.);
-		
-//		TravelTimeAggregatorFactory factory = new TravelTimeAggregatorFactory();
-//		factory.setTravelTimeDataPrototype(TravelTimeDataHashMap.class);
-//		factory.setTravelTimeAggregatorPrototype(PessimisticTravelTimeAggregator.class);
-		final SocialCostCalculatorSingleLink sc = new SocialCostCalculatorSingleLink(this.network,this.config.travelTimeCalculator().getTraveltimeBinSize(), getEvents());
-		
+
+		// LinkFlowCapRandomizer lr = new LinkFlowCapRandomizer(this.network,
+		// this.c, 0.);
+
+		// TravelTimeAggregatorFactory factory = new
+		// TravelTimeAggregatorFactory();
+		// factory.setTravelTimeDataPrototype(TravelTimeDataHashMap.class);
+		// factory.setTravelTimeAggregatorPrototype(PessimisticTravelTimeAggregator.class);
+		final SocialCostCalculatorSingleLink sc = new SocialCostCalculatorSingleLink(this.network, this.config.travelTimeCalculator().getTraveltimeBinSize(), getEvents());
+
 		this.events.addHandler(sc);
-		// this.setTravelCostCalculator(new MarginalTravelCostCalculatorII(this.travelTimeCalculator,sc));
-		this.setTravelCostCalculatorFactory(new TravelCostCalculatorFactory() {
+		// this.setTravelCostCalculator(new
+		// MarginalTravelCostCalculatorII(this.travelTimeCalculator,sc));
+		setTravelCostCalculatorFactory(new TravelCostCalculatorFactory() {
 
 			@Override
-			public PersonalizableTravelCost createTravelCostCalculator(
-					PersonalizableTravelTime timeCalculator,
-					CharyparNagelScoringConfigGroup cnScoringGroup) {
-				return new MarginalTravelCostCalculatorII(MarginalCostControlerRandFlowCap.this.getTravelTimeCalculator(),sc);
+			public PersonalizableTravelCost createTravelCostCalculator(PersonalizableTravelTime timeCalculator, CharyparNagelScoringConfigGroup cnScoringGroup) {
+				return new MarginalTravelCostCalculatorII(MarginalCostControlerRandFlowCap.this.getTravelTimeCalculator(), sc);
 			}
-			
+
 		});
 		this.strategyManager = loadStrategyManager();
-		this.addControlerListener(sc);
-//		this.addControlerListener(lr);
+		addControlerListener(sc);
+		// this.addControlerListener(lr);
 	}
 
 	public static void main(final String[] args) {
 		double c = Double.parseDouble(args[1]);
-		final Controler controler = new MarginalCostControlerRandFlowCap(new String [] {args[0]}, c);
+		final Controler controler = new MarginalCostControlerRandFlowCap(new String[] { args[0] }, c);
 		controler.setOverwriteFiles(true);
 		controler.run();
 		System.exit(0);

@@ -65,8 +65,6 @@ public class RandomShelterAllocator extends EvacuationPopulationFromShapeFileLoa
 	private final Population pop;
 	private final List<FloodingReader> readers;
 
-	private Dijkstra router;
-
 	private QuadTree<FloodingInfo> fis;
 
 	private PopulationFactory popB;
@@ -96,7 +94,6 @@ public class RandomShelterAllocator extends EvacuationPopulationFromShapeFileLoa
 		if (this.readers != null) {
 			buildFiQuadTree();
 		}
-		initRouter();
 		createShelterLinks();
 
 		log.info("creating plans");
@@ -213,12 +210,6 @@ public class RandomShelterAllocator extends EvacuationPopulationFromShapeFileLoa
 		pers.addPlan(plan);
 		this.pop.addPerson(pers);
 
-	}
-
-	private void initRouter() {
-		FreespeedTravelTimeCost tt = new FreespeedTravelTimeCost(-6, 0, 0);
-		PluggableTravelCostCalculator tc = new PluggableTravelCostCalculator(tt);
-		this.router = new Dijkstra(this.scenario.getNetwork(), tc, tt);
 	}
 
 	private static class Shelter {

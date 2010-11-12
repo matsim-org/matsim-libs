@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.gregor.sims.run;
+package playground.gregor.sims.run.deprecated;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -71,6 +71,7 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.MultiPoint;
 import com.vividsolutions.jts.geom.Point;
 
+@Deprecated
 public class ShelterAssignmentController extends Controler {
 
 	final private static Logger log = Logger.getLogger(EvacuationQSimControllerII.class);

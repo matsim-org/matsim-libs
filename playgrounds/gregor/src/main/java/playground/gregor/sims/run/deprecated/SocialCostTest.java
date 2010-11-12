@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.gregor.sims.run;
+package playground.gregor.sims.run.deprecated;
 
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -40,6 +40,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.evacuation.socialcost.MarginalTravelCostCalculatorII;
 import org.matsim.evacuation.socialcost.SocialCostCalculatorSingleLink;
 
+@Deprecated
 public class SocialCostTest extends Controler {
 
 	private Link l0;
@@ -47,41 +48,41 @@ public class SocialCostTest extends Controler {
 
 	public SocialCostTest(String[] args) {
 		super(args);
-		this.setOverwriteFiles(true);
+		setOverwriteFiles(true);
 	}
 
 	@Override
 	protected void setUp() {
 		super.setUp();
-//		this.scenarioData.getConfig().travelTimeCalculator().setCalculateLinkToLinkTravelTimes(true);
+		// this.scenarioData.getConfig().travelTimeCalculator().setCalculateLinkToLinkTravelTimes(true);
 		this.scenarioData.getConfig().simulation().setFlowCapFactor(10.);
 		this.scenarioData.getConfig().simulation().setStorageCapFactor(10.);
 		this.scenarioData.getConfig().controler().setLastIteration(400);
 		this.scenarioData.getConfig().travelTimeCalculator().setTraveltimeBinSize(1);
-//		this.scenarioData.getConfig().evacuation().setSampleSize("1.");
-//		this.scenarioData.getConfig().simulation().setSnapshotFormat("otfvis");
-//		this.scenarioData.getConfig().simulation().setSnapshotPeriod(1);
-//
-//		TravelTimeAggregatorFactory factory = new TravelTimeAggregatorFactory();
-//		factory.setTravelTimeDataPrototype(TravelTimeDataHashMap.class);
-//		factory.setTravelTimeAggregatorPrototype(PessimisticTravelTimeAggregator.class);
-		final SocialCostCalculatorSingleLink sc = new SocialCostCalculatorSingleLink(this.network,this.config.travelTimeCalculator().getTraveltimeBinSize(), getEvents());
+		// this.scenarioData.getConfig().evacuation().setSampleSize("1.");
+		// this.scenarioData.getConfig().simulation().setSnapshotFormat("otfvis");
+		// this.scenarioData.getConfig().simulation().setSnapshotPeriod(1);
+		//
+		// TravelTimeAggregatorFactory factory = new
+		// TravelTimeAggregatorFactory();
+		// factory.setTravelTimeDataPrototype(TravelTimeDataHashMap.class);
+		// factory.setTravelTimeAggregatorPrototype(PessimisticTravelTimeAggregator.class);
+		final SocialCostCalculatorSingleLink sc = new SocialCostCalculatorSingleLink(this.network, this.config.travelTimeCalculator().getTraveltimeBinSize(), getEvents());
 
 		this.events.addHandler(sc);
-		// this.setTravelCostCalculator(new MarginalTravelCostCalculatorII(this.travelTimeCalculator,sc));
-		this.setTravelCostCalculatorFactory(new TravelCostCalculatorFactory() {
+		// this.setTravelCostCalculator(new
+		// MarginalTravelCostCalculatorII(this.travelTimeCalculator,sc));
+		setTravelCostCalculatorFactory(new TravelCostCalculatorFactory() {
 
 			@Override
-			public PersonalizableTravelCost createTravelCostCalculator(
-					PersonalizableTravelTime timeCalculator,
-					CharyparNagelScoringConfigGroup cnScoringGroup) {
-				return new MarginalTravelCostCalculatorII(SocialCostTest.this.getTravelTimeCalculator(),sc);
+			public PersonalizableTravelCost createTravelCostCalculator(PersonalizableTravelTime timeCalculator, CharyparNagelScoringConfigGroup cnScoringGroup) {
+				return new MarginalTravelCostCalculatorII(SocialCostTest.this.getTravelTimeCalculator(), sc);
 			}
-			
+
 		});
-		
+
 		this.strategyManager = loadStrategyManager();
-		this.addControlerListener(sc);
+		addControlerListener(sc);
 	}
 
 	@Override
@@ -94,28 +95,28 @@ public class SocialCostTest extends Controler {
 		net.setEffectiveCellSize(0.26);
 		net.setEffectiveLaneWidth(0.71);
 
-		Node ns0 = net.createAndAddNode(new IdImpl(0),new CoordImpl(-1,0));
-		Node ns1 = net.createAndAddNode(new IdImpl("s"),new CoordImpl(0,0));
-		Node n0 = net.createAndAddNode(new IdImpl(1),new CoordImpl(4,0));
-		Node n1 = net.createAndAddNode(new IdImpl(2),new CoordImpl(10,0));
-		Node n2 = net.createAndAddNode(new IdImpl(3),new CoordImpl(10,-4));
-		Node nt0 = net.createAndAddNode(new IdImpl("t"),new CoordImpl(14,0));
-		Node nt1 = net.createAndAddNode(new IdImpl(6),new CoordImpl(15,0));
+		Node ns0 = net.createAndAddNode(new IdImpl(0), new CoordImpl(-1, 0));
+		Node ns1 = net.createAndAddNode(new IdImpl("s"), new CoordImpl(0, 0));
+		Node n0 = net.createAndAddNode(new IdImpl(1), new CoordImpl(4, 0));
+		Node n1 = net.createAndAddNode(new IdImpl(2), new CoordImpl(10, 0));
+		Node n2 = net.createAndAddNode(new IdImpl(3), new CoordImpl(10, -4));
+		Node nt0 = net.createAndAddNode(new IdImpl("t"), new CoordImpl(14, 0));
+		Node nt1 = net.createAndAddNode(new IdImpl(6), new CoordImpl(15, 0));
 
 		this.l0 = net.createAndAddLink(new IdImpl(0), ns0, ns1, 1, 1, 100, 1);
-		net.createAndAddLink(new IdImpl(0+100000), ns1, ns0, 1, 1, 100, 1);
+		net.createAndAddLink(new IdImpl(0 + 100000), ns1, ns0, 1, 1, 100, 1);
 		net.createAndAddLink(new IdImpl(1), ns1, n0, 4, 1, 1, 1);
-		net.createAndAddLink(new IdImpl(1+100000), n0, ns1, 4, 1, 1, 1);
-		net.createAndAddLink(new IdImpl(2), n0, n1, 10, 1, 1./3., 1);
-		net.createAndAddLink(new IdImpl(2+100000), n1, n0, 10, 1./3., 1, 1);
+		net.createAndAddLink(new IdImpl(1 + 100000), n0, ns1, 4, 1, 1, 1);
+		net.createAndAddLink(new IdImpl(2), n0, n1, 10, 1, 1. / 3., 1);
+		net.createAndAddLink(new IdImpl(2 + 100000), n1, n0, 10, 1. / 3., 1, 1);
 		net.createAndAddLink(new IdImpl(3), n0, n2, 8, 1, 1, 1);
-		net.createAndAddLink(new IdImpl(3+100000), n2, n0, 8, 1, 1, 1);
+		net.createAndAddLink(new IdImpl(3 + 100000), n2, n0, 8, 1, 1, 1);
 		net.createAndAddLink(new IdImpl(4), n2, n1, 4, 1, 1, 1);
-		net.createAndAddLink(new IdImpl(4+100000), n1, n2, 4, 1, 1, 1);
+		net.createAndAddLink(new IdImpl(4 + 100000), n1, n2, 4, 1, 1, 1);
 		net.createAndAddLink(new IdImpl(5), n1, nt0, 4, 1, 4, 1);
-		net.createAndAddLink(new IdImpl(5+100000), nt0, n1, 4, 1, 4, 1);
+		net.createAndAddLink(new IdImpl(5 + 100000), nt0, n1, 4, 1, 4, 1);
 		this.l5 = net.createAndAddLink(new IdImpl(6), nt0, nt1, 1, 1, 4, 1);
-		net.createAndAddLink(new IdImpl(6+100000), nt1, nt0, 1 , 1, 4, 1);
+		net.createAndAddLink(new IdImpl(6 + 100000), nt1, nt0, 1, 1, 4, 1);
 
 		// generate Population
 		Population pop = this.scenarioData.getPopulation();
@@ -123,7 +124,7 @@ public class SocialCostTest extends Controler {
 		PopulationFactory pb = new PopulationFactoryImpl(this.scenarioData);
 		int id = 0;
 		for (int i = 0; i < 3; i++) {
-			for (int j = 0; j <10 ; j++) {
+			for (int j = 0; j < 10; j++) {
 				Person p = pb.createPerson(new IdImpl(id++));
 				Plan plan = pb.createPlan();
 				Activity act1 = pb.createActivityFromLinkId("h", this.l0.getId());

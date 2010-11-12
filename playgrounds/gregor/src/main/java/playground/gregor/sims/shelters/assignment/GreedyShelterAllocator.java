@@ -32,6 +32,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Leg;
@@ -54,6 +55,7 @@ import org.matsim.evacuation.base.EvacuationStartTimeCalculator;
 import org.matsim.evacuation.config.EvacuationConfigGroup;
 import org.matsim.evacuation.flooding.FloodingInfo;
 import org.matsim.evacuation.flooding.FloodingReader;
+import org.matsim.evacuation.shelters.EvacuationShelterNetLoader;
 import org.matsim.evacuation.travelcosts.PluggableTravelCostCalculator;
 
 import com.vividsolutions.jts.geom.Envelope;
