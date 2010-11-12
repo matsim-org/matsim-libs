@@ -31,68 +31,65 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.evacuation.base.Building;
 
-
-
 public class ShelterCounter {// implements LinkEnterEventHandler {
 
 	private static final Logger log = Logger.getLogger(ShelterCounter.class);
 
-	private final HashMap<Id,LinkInfo> linkInfos = new HashMap<Id, LinkInfo>();
-	private HashMap<Building,Id> reversMapping = new HashMap<Building, Id>();
+	private final HashMap<Id, LinkInfo> linkInfos = new HashMap<Id, LinkInfo>();
+	private final HashMap<Building, Id> reversMapping = new HashMap<Building, Id>();
 	private int totalCapacity = 0;
-	private HashMap<Id, Building> mapping;
+	private final HashMap<Id, Building> mapping;
 
-	private int refCap;
+	private final int refCap;
 
 	private int it = -1;
 
-	public ShelterCounter(NetworkImpl network, HashMap<Id,Building> shelterLinkMapping) {
+	public ShelterCounter(NetworkImpl network, HashMap<Id, Building> shelterLinkMapping) {
 		this.mapping = shelterLinkMapping;
 		for (Link link : network.getLinks().values()) {
 			if ((link.getId().toString().contains("sl") && link.getId().toString().contains("b"))) {
 				Building b = shelterLinkMapping.get(link.getId());
-				this.getReversMapping().put(b, link.getId());
-				this.linkInfos.put(link.getId(), new LinkInfo(b.getShelterSpace(),link.getId()));
+				getReversMapping().put(b, link.getId());
+				this.linkInfos.put(link.getId(), new LinkInfo(b.getShelterSpace(), link.getId()));
 				this.totalCapacity += b.getShelterSpace();
 			} else if (link.getId().toString().equals("el1")) {
 				Building b = shelterLinkMapping.get(link.getId());
 				if (b == null) {
-					b = new Building(link.getId(), 0, 0, 0, 4, 1000000, 10000, 1, null);
-					shelterLinkMapping.put(link.getId(),b);
-					
+					throw new RuntimeException("This should not happen!");
 				}
-				this.getReversMapping().put(b, link.getId());
-				this.linkInfos.put(link.getId(), new LinkInfo(b.getShelterSpace(),link.getId()));
-				
+				getReversMapping().put(b, link.getId());
+				this.linkInfos.put(link.getId(), new LinkInfo(b.getShelterSpace(), link.getId()));
+
 			}
 		}
 		this.refCap = this.totalCapacity;
 	}
 
-	//	@Override
-	//	public void handleEvent(LinkEnterEvent event) {
-	//		LinkInfo li = this.linkInfos.get(event.getLinkId());
-	//		if (li != null) {
-	//			if (!event.getLinkId().equals("el1")) {
-	//				this.inShelter ++;
-	//			}
-	//			li.count++;
-	//			if (li.count > li.space) {
-	//				throw new RuntimeException("Shelter space capacity exceeded:" + li.id + " li.space:" + li.space + " event.getPersonId()" + event.getPersonId());
-	//			}
-	//		}
+	// @Override
+	// public void handleEvent(LinkEnterEvent event) {
+	// LinkInfo li = this.linkInfos.get(event.getLinkId());
+	// if (li != null) {
+	// if (!event.getLinkId().equals("el1")) {
+	// this.inShelter ++;
+	// }
+	// li.count++;
+	// if (li.count > li.space) {
+	// throw new RuntimeException("Shelter space capacity exceeded:" + li.id +
+	// " li.space:" + li.space + " event.getPersonId()" + event.getPersonId());
+	// }
+	// }
 	//		
-	//	}
+	// }
 
 	public double getTotalCapacity() {
 		return this.refCap;
 	}
 
 	public void changeCapacity(Id id, int amount) {
-//		if (id.toString().equals("el1")) {
-//			int ii = 0;
-//			ii++;
-//		}
+		// if (id.toString().equals("el1")) {
+		// int ii = 0;
+		// ii++;
+		// }
 		this.totalCapacity += amount;
 		LinkInfo li = this.linkInfos.get(id);
 		li.space += amount;
@@ -106,20 +103,24 @@ public class ShelterCounter {// implements LinkEnterEventHandler {
 	public Building getShelter(Id id) {
 		return this.mapping.get(id);
 	}
+
 	public void testAdd(Id linkId) {
 		LinkInfo li = this.linkInfos.get(linkId);
 		if (li != null) {
-						if (!linkId.toString().equals("el1")) {
-							int ii = 0;
-							ii++;
-						}
+			if (!linkId.toString().equals("el1")) {
+				int ii = 0;
+				ii++;
+			}
 			li.count++;
 			if (this.it <= 0 && li.count > li.space) {
 				li.space++;
 			}
-			
+
 			if (li.count > li.space) {
-				throw new RuntimeException("Shelter space capacity exceeded:" + li.id + " li.space:" + li.space);// + " event.getPersonId()" + event.getPersonId());
+				throw new RuntimeException("Shelter space capacity exceeded:" + li.id + " li.space:" + li.space);// +
+																													// " event.getPersonId()"
+																													// +
+																													// event.getPersonId());
 			}
 		}
 	}
@@ -129,7 +130,7 @@ public class ShelterCounter {// implements LinkEnterEventHandler {
 	}
 
 	public Id tryToAddAgent(Building b) {
-		Id linkId = this.getReversMapping().get(b);
+		Id linkId = getReversMapping().get(b);
 		LinkInfo li = this.linkInfos.get(linkId);
 		if (li.count < li.space) {
 			li.count++;
@@ -141,20 +142,20 @@ public class ShelterCounter {// implements LinkEnterEventHandler {
 	public void reset(int iteration, Collection<? extends Person> agents) {
 
 		this.it++;
-//		if (this.totalCapacity > this.refCap) {
-//			throw new RuntimeException("totalCapacity:" + this.totalCapacity + "  but should be:" + this.refCap);
-//		}
-//		this.refCap = this.totalCapacity;
+		// if (this.totalCapacity > this.refCap) {
+		// throw new RuntimeException("totalCapacity:" + this.totalCapacity +
+		// "  but should be:" + this.refCap);
+		// }
+		// this.refCap = this.totalCapacity;
 
-		
 		for (LinkInfo li : this.linkInfos.values()) {
 			li.count = 0;
 		}
-		
-		//		this.inShelter = 0;
+
+		// this.inShelter = 0;
 		for (Person pers : agents) {
-			((PersonImpl)pers).removeUnselectedPlans();	
-			testAdd(((ActivityImpl)pers.getSelectedPlan().getPlanElements().get(2)).getLinkId());
+			((PersonImpl) pers).removeUnselectedPlans();
+			testAdd(((ActivityImpl) pers.getSelectedPlan().getPlanElements().get(2)).getLinkId());
 		}
 	}
 
@@ -166,7 +167,7 @@ public class ShelterCounter {// implements LinkEnterEventHandler {
 			printShelterStats(li);
 			count += li.space;
 		}
-//		log.info("total Shelters capacity: " + (count-2055));
+		// log.info("total Shelters capacity: " + (count-2055));
 		log.info("======================================");
 	}
 
@@ -175,19 +176,19 @@ public class ShelterCounter {// implements LinkEnterEventHandler {
 		log.info("Shelter: " + li.id + "  cappacity:" + li.space + "  occupancy:" + li.count);
 	}
 
-	//	public int getNumAgentsInShelter(){
-	//		return this.inShelter;
-	//	}
+	// public int getNumAgentsInShelter(){
+	// return this.inShelter;
+	// }
 
-
-	public HashMap<Building,Id> getReversMapping() {
-		return reversMapping;
+	public HashMap<Building, Id> getReversMapping() {
+		return this.reversMapping;
 	}
 
 	private static class LinkInfo {
 		int count = 0;
 		int space;
 		final Id id;
+
 		public LinkInfo(int shelterSpace, Id id) {
 			this.id = id;
 			this.space = shelterSpace;

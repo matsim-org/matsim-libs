@@ -36,6 +36,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.gbl.MatsimRandom;
@@ -54,6 +55,8 @@ import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.evacuation.base.Building;
 import org.matsim.evacuation.config.EvacuationConfigGroup;
+
+import playground.gregor.sims.config.ShelterConfigGroup;
 
 public class ShelterAssignmentRePlanner implements IterationStartsListener {
 
@@ -75,11 +78,7 @@ public class ShelterAssignmentRePlanner implements IterationStartsListener {
 
 	private final boolean swNash;
 
-	public ShelterAssignmentRePlanner(ScenarioImpl sc, TravelCost tc, TravelTime tt, List<Building> buildings) {
-		this(sc, tc, tt, buildings, null, 0);
-	}
-
-	public ShelterAssignmentRePlanner(ScenarioImpl sc, TravelCost tc, TravelTime tt, List<Building> buildings, ShelterCounter shc, double pshelter) {
+	public ShelterAssignmentRePlanner(ScenarioImpl sc, TravelCost tc, TravelTime tt, List<Building> buildings, ShelterCounter shc) {
 		this.router = new Dijkstra(sc.getNetwork(), tc, tt);
 		this.tt = tt;
 		this.scenario = sc;
@@ -89,10 +88,12 @@ public class ShelterAssignmentRePlanner implements IterationStartsListener {
 				this.buildings.add(b);
 			}
 		}
+
 		this.agents = new ArrayList<Person>(sc.getPopulation().getPersons().values());
 		this.routeFactory = sc.getNetwork().getFactory();
 		this.shc = shc;//
-		this.PSHELTER = pshelter;
+		ShelterConfigGroup sconf = (ShelterConfigGroup) sc.getConfig().getModule("shelters");
+		this.PSHELTER = sconf.getShiftProbability() + sconf.getSwitchProbability();
 		this.swNash = !((EvacuationConfigGroup) sc.getConfig().getModule("evacuation")).isSocialCostOptimization();
 
 	}

@@ -137,7 +137,7 @@ public class ShelterAssignmentController extends Controler {
 				// this.events.addHandler(sc);
 			}
 
-			ShelterAssignmentRePlanner sARP = new ShelterAssignmentRePlanner(getScenario(), this.pluggableTravelCost, getTravelTimeCalculator(), this.buildings, sc, this.pshelter);
+			ShelterAssignmentRePlanner sARP = new ShelterAssignmentRePlanner(getScenario(), this.pluggableTravelCost, getTravelTimeCalculator(), this.buildings, sc);
 			addControlerListener(sARP);
 		}
 

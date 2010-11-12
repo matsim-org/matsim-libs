@@ -39,6 +39,10 @@ public class ShelterConfigGroup extends Module {
 		greedy, random
 	}
 
+	public enum Version {
+		ICEC2010
+	}
+
 	public static final String GROUP_NAME = "shelters";
 
 	private static final String PROB_SHIFT = "shiftProbability";
@@ -47,11 +51,19 @@ public class ShelterConfigGroup extends Module {
 
 	private static final String INITAL_ASSIGNMENT = "initialAssignment";
 
+	private static final String ASSIGNMENT_VERION = "version";
+
+	private static final String CAPACITY_ADAPTION = "capacityAdaption";
+
 	private double switchProbability = 0.;
 
 	private double shiftProbability = 0.;
 
+	private boolean capacityAdaption = false;
+
 	private InitialAssignment assignment = InitialAssignment.random;
+
+	private Version version = Version.ICEC2010;
 
 	/**
 	 * @param name
@@ -71,9 +83,45 @@ public class ShelterConfigGroup extends Module {
 			setSwitchProbability(value);
 		} else if (INITAL_ASSIGNMENT.equals(key)) {
 			setInitialAssignment(value);
+		} else if (ASSIGNMENT_VERION.equals(key)) {
+			setAssignmentVersion(value);
+		} else if (CAPACITY_ADAPTION.equals(key)) {
+			setCapacityAdaption(value);
 		} else {
+
 			throw new IllegalArgumentException(key);
 		}
+	}
+
+	/**
+	 * @param value
+	 */
+	private void setCapacityAdaption(String value) {
+		this.capacityAdaption = Boolean.parseBoolean(value);
+	}
+
+	public boolean isCapacityAdaption() {
+		return this.capacityAdaption;
+	}
+
+	/**
+	 * @param value
+	 */
+	private void setAssignmentVersion(String value) {
+		if (value.equals("ICEC2010")) {
+			this.version = Version.ICEC2010;
+		} else {
+			throw new RuntimeException("unknown assignment version:" + value);
+		}
+
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public Version getAssignmentVersion() {
+		return this.version;
 	}
 
 	/**
@@ -106,6 +154,10 @@ public class ShelterConfigGroup extends Module {
 			return Double.toString(getSwitchProbability());
 		} else if (INITAL_ASSIGNMENT.equals(key)) {
 			return getInitialAssignment().toString();
+		} else if (ASSIGNMENT_VERION.equals(key)) {
+			return getAssignmentVersion().toString();
+		} else if (CAPACITY_ADAPTION.equals(key)) {
+			return Boolean.toString(isCapacityAdaption());
 		}
 		throw new IllegalArgumentException(key);
 	}
@@ -116,6 +168,8 @@ public class ShelterConfigGroup extends Module {
 		map.put(PROB_SHIFT, getValue(PROB_SHIFT));
 		map.put(PROB_SWITCH, getValue(PROB_SWITCH));
 		map.put(INITAL_ASSIGNMENT, getValue(INITAL_ASSIGNMENT));
+		map.put(ASSIGNMENT_VERION, getValue(ASSIGNMENT_VERION));
+		map.put(CAPACITY_ADAPTION, getValue(CAPACITY_ADAPTION));
 		return map;
 	}
 

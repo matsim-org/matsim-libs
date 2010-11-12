@@ -58,9 +58,13 @@ import org.matsim.signalsystems.model.SignalSystemsManager;
 
 import playground.gregor.sims.config.ShelterConfigGroup;
 import playground.gregor.sims.config.ShelterConfigGroup.InitialAssignment;
+import playground.gregor.sims.config.ShelterConfigGroup.Version;
 import playground.gregor.sims.shelters.assignment.EvacuationShelterNetLoaderForShelterAllocation;
 import playground.gregor.sims.shelters.assignment.GreedyShelterAllocator;
 import playground.gregor.sims.shelters.assignment.RandomShelterAllocator;
+import playground.gregor.sims.shelters.assignment.ShelterAssignmentRePlanner;
+import playground.gregor.sims.shelters.assignment.ShelterCapacityRePlanner;
+import playground.gregor.sims.shelters.assignment.ShelterCounter;
 
 public class EvacuationController extends Controler {
 
@@ -76,7 +80,7 @@ public class EvacuationController extends Controler {
 
 	private EvacuationConfigGroup ec;
 
-	private ShelterConfigGroup sc;
+	private ShelterConfigGroup sc = null;
 
 	private EvacuationShelterNetLoaderForShelterAllocation esnl;
 
@@ -93,7 +97,7 @@ public class EvacuationController extends Controler {
 
 		super.setUp();
 
-		if (this.ec.isLoadShelters()) {
+		if (this.ec.isLoadShelters() && this.sc == null) {
 			loadShelterSignalSystems();
 		}
 
@@ -105,8 +109,29 @@ public class EvacuationController extends Controler {
 			initRiskMinimization();
 		}
 
+		if (this.sc != null) {
+			initShelterAssignment();
+		}
 		unloadNetcdfReaders();
 
+	}
+
+	/**
+	 * 
+	 */
+	private void initShelterAssignment() {
+		Building b = new Building(new IdImpl("el1"), 0, 0, 0, 1, 1000000, 10000, 1, null);
+		this.shelterLinkMapping.put(new IdImpl("el1"), b);
+		this.buildings.add(b);
+		if (this.sc.getAssignmentVersion() == Version.ICEC2010) {
+			ShelterCounter sc = new ShelterCounter(this.scenarioData.getNetwork(), this.shelterLinkMapping);
+			if (this.sc.isCapacityAdaption()) {
+				ShelterCapacityRePlanner scap = new ShelterCapacityRePlanner(getScenario(), this.pluggableTravelCost, getTravelTimeCalculator(), this.buildings, sc);
+				addControlerListener(scap);
+			}
+			ShelterAssignmentRePlanner sARP = new ShelterAssignmentRePlanner(getScenario(), this.pluggableTravelCost, getTravelTimeCalculator(), this.buildings, sc);
+			addControlerListener(sARP);
+		}
 	}
 
 	/**
@@ -301,6 +326,7 @@ public class EvacuationController extends Controler {
 	 * 
 	 */
 	private void loadShelterPopulation() {
+		initSheltersConfigGroup();
 		if (this.ec.isLoadPopulationFromShapeFile()) {
 			if (this.scenarioData.getPopulation().getPersons().size() > 0) {
 				throw new RuntimeException("Population already loaded. In order to load population from shape file, the population input file paramter in the population section of the config.xml must not be set!");
