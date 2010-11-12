@@ -120,6 +120,7 @@ public class EvacuationController extends Controler {
 	 * 
 	 */
 	private void initShelterAssignment() {
+		initPluggableTravelCostCalculator();
 		Building b = new Building(new IdImpl("el1"), 0, 0, 0, 1, 1000000, 10000, 1, null);
 		this.shelterLinkMapping.put(new IdImpl("el1"), b);
 		this.buildings.add(b);
