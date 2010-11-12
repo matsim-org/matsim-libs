@@ -122,11 +122,11 @@ public class UpdateCapacityControlerListener implements StartupListener, Iterati
 			//header
 			bw.write("activityEndTime" + "\t");
 			for(int iteration : tableTotal.keySet()){
-				if(iteration != tableTotal.size()){
-					bw.write("cap" + iteration + "\t");
+				if(iteration == tableTotal.lastKey()){
+					bw.write("cap" + iteration);
 				}
 				else{
-					bw.write("cap" + iteration);
+					bw.write("cap" + iteration + "\t");
 				}
 			}
 			bw.newLine();
@@ -137,11 +137,11 @@ public class UpdateCapacityControlerListener implements StartupListener, Iterati
 				bw.write(activityEndTime + "\t");
 				for(int iteration : tableTotal.keySet()){
 					Double travelTime = tableTotal.get(iteration).get(activityEndTime);
-					if(iteration != tableTotal.size()){
-						bw.write(travelTime + "\t");
+					if(iteration == tableTotal.lastKey()){
+						bw.write(travelTime.toString());
 					}
 					else{
-						bw.write((int) + travelTime);
+						bw.write(travelTime + "\t");
 					}
 				}
 				bw.newLine();
