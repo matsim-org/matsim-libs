@@ -22,25 +22,29 @@ package playground.benjamin.szenarios.munich.testroad;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
-import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
+import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
-import org.matsim.core.basic.v01.IdImpl;
 
 /**
  * @author benjamin
  *
  */
-public class TravelTimeEventHandler implements LinkEnterEventHandler, LinkLeaveEventHandler {
+public class TravelTimeEventHandler implements ActivityEndEventHandler, LinkLeaveEventHandler {
 	
-	private SortedMap<Double, Double> departureTimes2travelTimes = new TreeMap<Double, Double>();
+	private SortedMap<Double, Double> activityEndTimes2travelTimesPerIteration = new TreeMap<Double, Double>();
 	
-	private double enterTime;
+	private double activityEndTime;
 	private double leaveTime;
+	private Id linkId;
+	private Id testVehicleActivityLinkId;
 
-	public TravelTimeEventHandler(SortedMap<Double, Double> departureTimes2travelTimes) {
-		this.departureTimes2travelTimes = departureTimes2travelTimes;
+	public TravelTimeEventHandler(SortedMap<Double, Double> activityEndTimes2travelTimesPerIteration, Id linkId, Id testVehicleActivityLinkId) {
+		this.activityEndTimes2travelTimesPerIteration = activityEndTimes2travelTimesPerIteration;
+		this.linkId = linkId;
+		this.testVehicleActivityLinkId = testVehicleActivityLinkId;
 	}
 
 	@Override
@@ -50,11 +54,11 @@ public class TravelTimeEventHandler implements LinkEnterEventHandler, LinkLeaveE
 	}
 
 	@Override
-	public void handleEvent(LinkEnterEvent event) {
+	public void handleEvent(ActivityEndEvent event) {
 		String id = event.getPersonId().toString();
 		if(id.contains("testVehicle")){
-			if(event.getLinkId().equals(new IdImpl("592536888"))){
-				enterTime = event.getTime();
+			if(event.getLinkId().equals(this.testVehicleActivityLinkId)){
+				activityEndTime = event.getTime();
 			}
 		}
 	}
@@ -63,10 +67,10 @@ public class TravelTimeEventHandler implements LinkEnterEventHandler, LinkLeaveE
 	public void handleEvent(LinkLeaveEvent event) {
 		String id = event.getPersonId().toString();
 		if(id.contains("testVehicle")){
-			if(event.getLinkId().equals(new IdImpl("590000822"))){
+			if(event.getLinkId().equals(this.linkId)){
 				leaveTime = event.getTime();
 				
-				this.departureTimes2travelTimes.put(enterTime, leaveTime - enterTime);
+				this.activityEndTimes2travelTimesPerIteration.put(activityEndTime, leaveTime - activityEndTime);
 			}
 		}
 		

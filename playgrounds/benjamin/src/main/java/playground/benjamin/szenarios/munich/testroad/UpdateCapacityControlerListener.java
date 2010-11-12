@@ -44,48 +44,66 @@ import org.matsim.core.controler.listener.StartupListener;
 public class UpdateCapacityControlerListener implements StartupListener, IterationEndsListener, ShutdownListener {
 
 	private TravelTimeEventHandler eventHandler;
-	private SortedMap<Double, Double> departureTimes2travelTimes = new TreeMap<Double, Double>();
+	private SortedMap<Double, Double> activityEndTimes2travelTimesPerIteration = new TreeMap<Double, Double>();
+	private SortedMap<Integer, SortedMap<Double, Double>> tableTotal = new TreeMap<Integer, SortedMap<Double, Double>>();
 	private Scenario scenario;
-	private int capacity;
-	private Id linkid;
+	private Integer capacity;
+	private Id linkId;
+	private Id testVehicleActivityLinkId;
+	private Integer stepSize;
 
-	/**
-	 * @param scenario
-	 */
-	public UpdateCapacityControlerListener(Scenario scenario) {
+	public UpdateCapacityControlerListener(Scenario scenario, String linkId, String testVehicleActivityLinkId, int startCapacity, int stepSize) {
 		this.scenario = scenario;
-		this.linkid = scenario.createId("590000822");
-		this.capacity = 1200;
+		this.linkId = scenario.createId(linkId);
+		this.testVehicleActivityLinkId = scenario.createId(testVehicleActivityLinkId);
+		this.capacity = startCapacity;
+		this.stepSize = stepSize;
 	}
 
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		this.eventHandler = new TravelTimeEventHandler(departureTimes2travelTimes);
+		this.eventHandler = new TravelTimeEventHandler(activityEndTimes2travelTimesPerIteration, linkId, testVehicleActivityLinkId);
 		event.getControler().getEvents().addHandler(this.eventHandler);
 		
-		Link link = scenario.getNetwork().getLinks().get(this.linkid);
+		Link link = scenario.getNetwork().getLinks().get(this.linkId);
 		link.setCapacity(this.capacity);
 	}
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
-		writeFile(this.departureTimes2travelTimes);
-		this.departureTimes2travelTimes.clear();
+		writeTravelTimes(this.activityEndTimes2travelTimesPerIteration);
+		addTravelTimesToTableTotal(this.activityEndTimes2travelTimesPerIteration);
+		this.activityEndTimes2travelTimesPerIteration.clear();
 		
-		capacity = this.capacity + 50;
-		Link link = scenario.getNetwork().getLinks().get(this.linkid);
+		capacity = this.capacity + this.stepSize;
+		Link link = scenario.getNetwork().getLinks().get(this.linkId);
 		link.setCapacity(capacity);
 	}
 
-	private void writeFile(SortedMap<Double, Double> departureTimes2travelTimes) {
+	@Override
+	public void notifyShutdown(ShutdownEvent event) {
+		writeAllTravelTimes(this.tableTotal);
+	}
+
+	private void addTravelTimesToTableTotal(SortedMap<Double, Double> activityEndTimes2travelTimesPerIteration) {
+		SortedMap<Double, Double> temp = new TreeMap<Double, Double>();
+			for(Double activityEndTime : activityEndTimes2travelTimesPerIteration.keySet()){
+				Double travelTime = activityEndTimes2travelTimesPerIteration.get(activityEndTime);
+				
+				temp.put(activityEndTime , travelTime);
+			}
+			tableTotal.put(capacity, temp);
+	}
+
+	private void writeTravelTimes(SortedMap<Double, Double> activityEndTimes2travelTimes) {
 		String outputPath = this.scenario.getConfig().controler().getOutputDirectory();
 		
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(new File(outputPath + "/travelTimes_cap_" + capacity + ".txt")));
-			bw.write("departureTime \t travelTime");
+			bw.write("activityEndTime \t travelTime");
 			bw.newLine();
-			for(Double dd : departureTimes2travelTimes.keySet()) {
-				bw.write(dd + "\t" + departureTimes2travelTimes.get(dd));
+			for(Double dd : activityEndTimes2travelTimes.keySet()) {
+				bw.write(dd + "\t" + activityEndTimes2travelTimes.get(dd));
 				bw.newLine();
 			}
 			bw.close();
@@ -96,8 +114,44 @@ public class UpdateCapacityControlerListener implements StartupListener, Iterati
 		}
 	}
 
-	@Override
-	public void notifyShutdown(ShutdownEvent event) {
-//		writeFile();
+	private void writeAllTravelTimes(SortedMap<Integer, SortedMap<Double, Double>> tableTotal) {
+		String outputPath = this.scenario.getConfig().controler().getOutputDirectory();
+
+		try {
+			BufferedWriter bw = new BufferedWriter(new FileWriter(new File(outputPath + "/travelTimes" + ".txt")));
+			//header
+			bw.write("activityEndTime" + "\t");
+			for(int iteration : tableTotal.keySet()){
+				if(iteration != tableTotal.size()){
+					bw.write("cap" + iteration + "\t");
+				}
+				else{
+					bw.write("cap" + iteration);
+				}
+			}
+			bw.newLine();
+			
+			//fill with values
+			SortedMap<Double, Double> firstCapacity = tableTotal.get(tableTotal.firstKey());
+			for(Double activityEndTime : firstCapacity.keySet()){
+				bw.write(activityEndTime + "\t");
+				for(int iteration : tableTotal.keySet()){
+					Double travelTime = tableTotal.get(iteration).get(activityEndTime);
+					if(iteration != tableTotal.size()){
+						bw.write(travelTime + "\t");
+					}
+					else{
+						bw.write((int) + travelTime);
+					}
+				}
+				bw.newLine();
+			}
+			bw.close();
+
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 	}		
 }

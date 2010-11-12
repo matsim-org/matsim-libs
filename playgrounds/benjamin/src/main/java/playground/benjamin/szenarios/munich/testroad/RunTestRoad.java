@@ -31,17 +31,31 @@ public class RunTestRoad {
 
 	public static void main(String[] args) {
 
+		int day1 = 20090707;
+		int day2 = 20090708;
+		int day3 = 20090709;
+		String linkId = "590000822";
+		String testVehicleActivityLinkId = "52902684";
+		int startCapacity = 1200;
+		int stepSize = 50;
+		
 		String inputpath = "../../detailedEval/teststrecke/sim/input/";
-//		String configName = "_config.xml";
 		String configName = "_config_capacityChanges.xml";
-		int [] days = {20090707, 20090708, 20090709};
+//		String configName = "_config.xml";
+		
+		
+		int [] days = {
+					   day1,
+					   day2,
+					   day3
+					   };
 		
 		for(int day : days){
 			String config = inputpath + day + configName;
 			Controler controler = new Controler(config);
 			controler.setOverwriteFiles(true);
 			Scenario scenario = controler.getScenario();
-			controler.addControlerListener(new UpdateCapacityControlerListener(scenario));
+			controler.addControlerListener(new UpdateCapacityControlerListener(scenario, linkId, testVehicleActivityLinkId, startCapacity, stepSize));
 			controler.run();
 		}
 	}
