@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DgCrossing
+ * DgCommodities
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -30,55 +30,24 @@ import org.matsim.api.core.v01.Id;
  * @author dgrether
  *
  */
-public class DgCrossing {
-
-	private static final Logger log = Logger.getLogger(DgCrossing.class);
+public class DgCommodities {
 	
-	private Id id;
-	private boolean signalized;
-	private Map<Id, DgCrossingNode> nodes = new HashMap<Id, DgCrossingNode>();
-	private Map<Id, DgStreet> lights = new HashMap<Id, DgStreet>();
-	private Map<Id, DgProgram> programs = new HashMap<Id, DgProgram>();
-
-	public DgCrossing(Id id) {
-		this.id = id;
+	private static final Logger log = Logger.getLogger(DgCommodities.class);
+	
+	private Map<Id, DgCommodity> commodities = new HashMap<Id, DgCommodity>();
+	
+	public DgCommodities(){
 	}
-
-	public Id getId() {
-		return this.id;
-	}
-
-	public void addNode(DgCrossingNode crossingNode) {
-		if (this.nodes.containsKey(crossingNode.getId())){
-			log.warn("CrossingNode " + crossingNode.getId() +" already exists.");
+	
+	public void addCommodity(DgCommodity co){
+		if (this.commodities.containsKey(co.getId())){
+			log.warn("commodity " + co.getId() + " already exists.");
 		}
-		this.nodes.put(crossingNode.getId(), crossingNode);
+		this.commodities.put(co.getId(), co);
 	}
 	
-	public Map<Id, DgCrossingNode> getNodes(){
-		return this.nodes;
-	}
-	
-	public Map<Id, DgStreet> getLights(){
-		return this.lights;
+	public Map<Id, DgCommodity> getCommodities(){
+		return this.commodities;
 	}
 
-	public void addLight(DgStreet light) {
-		this.lights.put(light.getId(), light);
-	}
-
-	public void setSignalized(boolean signalized) {
-		this.signalized = signalized;
-	}
-	
-	public void addProgram(DgProgram p){
-		if (this.programs.containsKey(p.getId())){
-			log.warn("Program " + p.getId() + " already exists!");
-		}
-		this.programs.put(p.getId(), p);
-	}
-	
-	public Map<Id, DgProgram> getPrograms(){
-		return this.programs;
-	}
 }

@@ -125,6 +125,7 @@ public class DgKoehlerStrehler2010ScenarioGenerator {
 		SignalPlanData plan = control.getFactory().createSignalPlanData(id1);
 		controller.addSignalPlanData(plan);
 		plan.setCycleTime(60);
+		plan.setOffset(0);
 		SignalGroupSettingsData settings1 =  control.getFactory().createSignalGroupSettingsData(id1);
 		plan.addSignalGroupSettings(settings1);
 		settings1.setOnset(0);
@@ -133,6 +134,15 @@ public class DgKoehlerStrehler2010ScenarioGenerator {
 		plan.addSignalGroupSettings(settings2);
 		settings2.setOnset(0);
 		settings2.setDropping(27);
+		SignalGroupSettingsData settings3 = control.getFactory().createSignalGroupSettingsData(id3);
+		plan.addSignalGroupSettings(settings3);
+		settings3.setOnset(0);
+		settings3.setDropping(27);
+		SignalGroupSettingsData settings4 = control.getFactory().createSignalGroupSettingsData(id4);
+		plan.addSignalGroupSettings(settings4);
+		settings4.setOnset(0);
+		settings4.setDropping(27);
+		
 		
 		// signal system 5 control
 		controller = control.getFactory().createSignalSystemControllerData(id5);
@@ -141,6 +151,7 @@ public class DgKoehlerStrehler2010ScenarioGenerator {
 		plan = control.getFactory().createSignalPlanData(id1);
 		controller.addSignalPlanData(plan);
 		plan.setCycleTime(60);
+		plan.setOffset(0);
 		settings1 =  control.getFactory().createSignalGroupSettingsData(id1);
 		plan.addSignalGroupSettings(settings1);
 		settings1.setOnset(0);
@@ -149,6 +160,14 @@ public class DgKoehlerStrehler2010ScenarioGenerator {
 		plan.addSignalGroupSettings(settings2);
 		settings2.setOnset(0);
 		settings2.setDropping(27);
+		settings3 = control.getFactory().createSignalGroupSettingsData(id3);
+		plan.addSignalGroupSettings(settings3);
+		settings3.setOnset(0);
+		settings3.setDropping(27);
+		settings4 = control.getFactory().createSignalGroupSettingsData(id4);
+		plan.addSignalGroupSettings(settings4);
+		settings4.setOnset(0);
+		settings4.setDropping(27);
 
 		
 		//signal system 3, 4, 7, 8 control
@@ -164,6 +183,7 @@ public class DgKoehlerStrehler2010ScenarioGenerator {
 			plan = control.getFactory().createSignalPlanData(id1);
 			controller.addSignalPlanData(plan);
 			plan.setCycleTime(60);
+			plan.setOffset(0);
 			settings1 =  control.getFactory().createSignalGroupSettingsData(id1);
 			plan.addSignalGroupSettings(settings1);
 			settings1.setOnset(0);
@@ -188,7 +208,9 @@ public class DgKoehlerStrehler2010ScenarioGenerator {
 		group4signal.addSignalId(id2);
 	}
 
-
+	/**
+	 * Node Id == SignalSystem Id
+	 */
 	private SignalSystemsData createSignalSystemsAndGroups(SignalsData sd) {
 		SignalSystemsData systems = sd.getSignalSystemsData();
 		SignalGroupsData groups = sd.getSignalGroupsData();
@@ -204,6 +226,18 @@ public class DgKoehlerStrehler2010ScenarioGenerator {
 		signal.setLinkId(id12);
 		signal.addLaneId(id2);
 		this.createAndAddSignalGroups(id2, groups);
+		signal = systems.getFactory().createSignalData(id3);
+		sys.addSignalData(signal);
+		signal.setLinkId(id32);
+		SignalGroupData group4signal = groups.getFactory().createSignalGroupData(id2, id3);
+		groups.addSignalGroupData(group4signal);
+		group4signal.addSignalId(id3);
+		signal = systems.getFactory().createSignalData(id4);
+		sys.addSignalData(signal);
+		signal.setLinkId(id72);
+		group4signal = groups.getFactory().createSignalGroupData(id2, id4);
+		groups.addSignalGroupData(group4signal);
+		group4signal.addSignalId(id4);
 		
 		//signal system 5
 		sys = systems.getFactory().createSignalSystemData(id5);
@@ -217,6 +251,20 @@ public class DgKoehlerStrehler2010ScenarioGenerator {
 		signal.setLinkId(id65);
 		signal.addLaneId(id2);
 		this.createAndAddSignalGroups(id5, groups);
+		signal = systems.getFactory().createSignalData(id3);
+		sys.addSignalData(signal);
+		signal.setLinkId(id45);
+		group4signal = groups.getFactory().createSignalGroupData(id5, id3);
+		groups.addSignalGroupData(group4signal);
+		group4signal.addSignalId(id3);
+		signal = systems.getFactory().createSignalData(id4);
+		sys.addSignalData(signal);
+		signal.setLinkId(id85);
+		group4signal = groups.getFactory().createSignalGroupData(id5, id4);
+		groups.addSignalGroupData(group4signal);
+		group4signal.addSignalId(id4);
+
+		
 		
 		//signal system 3
 		sys = systems.getFactory().createSignalSystemData(id3);
@@ -259,13 +307,14 @@ public class DgKoehlerStrehler2010ScenarioGenerator {
 		signal.setLinkId(id78);
 		signal = systems.getFactory().createSignalData(id2);
 		sys.addSignalData(signal);
-		signal.setLinkId(id85);
+		signal.setLinkId(id58);
 		this.createAndAddSignalGroups(id8, groups);
 
 		return systems;
 	}
 
 	private LaneDefinitions createLanes(ScenarioImpl scenario) {
+		double laneLenght = 50.0;
 		LaneDefinitions lanes = scenario.getLaneDefinitions();
 		LaneDefinitionsFactory factory = lanes.getFactory();
 		//lanes for link 12
@@ -274,12 +323,12 @@ public class DgKoehlerStrehler2010ScenarioGenerator {
 		Lane link12lane1 = factory.createLane(id1);
 		lanesForLink12.addLane(link12lane1);
 		link12lane1.addToLinkId(id23);
-		link12lane1.setStartsAtMeterFromLinkEnd(50.0);
+		link12lane1.setStartsAtMeterFromLinkEnd(laneLenght);
 
 		Lane link12lane2 = factory.createLane(id2);
 		lanesForLink12.addLane(link12lane2);
 		link12lane2.addToLinkId(id27);
-		link12lane2.setStartsAtMeterFromLinkEnd(50.0);
+		link12lane2.setStartsAtMeterFromLinkEnd(laneLenght);
 		
 		//lanes for link 65
 		LanesToLinkAssignment lanesForLink65 = factory.createLanesToLinkAssignment(id65);
@@ -287,12 +336,12 @@ public class DgKoehlerStrehler2010ScenarioGenerator {
 		Lane link65lane1 = factory.createLane(id1);
 		lanesForLink65.addLane(link65lane1);
 		link65lane1.addToLinkId(id54);
-		link65lane1.setStartsAtMeterFromLinkEnd(50.0);
+		link65lane1.setStartsAtMeterFromLinkEnd(laneLenght);
 
 		Lane link65lane2 = factory.createLane(id2);
 		lanesForLink65.addLane(link65lane2);
 		link65lane2.addToLinkId(id58);
-		link65lane2.setStartsAtMeterFromLinkEnd(50.0);
+		link65lane2.setStartsAtMeterFromLinkEnd(laneLenght);
 		
 		//convert to 2.0 format and return
 		LaneDefinitionsV11ToV20Conversion conversion = new LaneDefinitionsV11ToV20Conversion();
@@ -304,100 +353,104 @@ public class DgKoehlerStrehler2010ScenarioGenerator {
 	
 	private Network createNetwork(Scenario sc) {
 		Network net = sc.getNetwork();
+		double linkLength = 300.0;
+		double fs = 15.0;
+		double capacity = 1800.0;
 		if (net.getCapacityPeriod() != 3600.0){
 			throw new IllegalStateException();
 		}
 		((NetworkImpl)net).setEffectiveLaneWidth(1.0);
 		NetworkFactory fac = net.getFactory();
+		double scale = 300.0;
 		net.addNode(fac.createNode(id1, sc.createCoord(0, 0)));
-		net.addNode(fac.createNode(id2, sc.createCoord(10, 0)));
-		net.addNode(fac.createNode(id3, sc.createCoord(20, 10)));
-		net.addNode(fac.createNode(id4, sc.createCoord(30, 10)));
-		net.addNode(fac.createNode(id5, sc.createCoord(40, 0)));
-		net.addNode(fac.createNode(id6, sc.createCoord(50, 0)));
-		net.addNode(fac.createNode(id7, sc.createCoord(20, -10)));
-		net.addNode(fac.createNode(id8, sc.createCoord(30, -10)));
+		net.addNode(fac.createNode(id2, sc.createCoord(1.0*scale, 0)));
+		net.addNode(fac.createNode(id3, sc.createCoord(2.0*scale, 1.0*scale)));
+		net.addNode(fac.createNode(id4, sc.createCoord(3.0*scale, 1.0*scale)));
+		net.addNode(fac.createNode(id5, sc.createCoord(4.0*scale, 0)));
+		net.addNode(fac.createNode(id6, sc.createCoord(5.0*scale, 0)));
+		net.addNode(fac.createNode(id7, sc.createCoord(2.0*scale, -1.0*scale)));
+		net.addNode(fac.createNode(id8, sc.createCoord(3.0*scale, -1.0*scale)));
 		Link l = fac.createLink(id12, id1, id2);
-		l.setCapacity(3600.0);
-		l.setFreespeed(5.0);
-		l.setLength(100.0);
+		l.setCapacity(capacity);
+		l.setFreespeed(fs);
+		l.setLength(linkLength);
 		net.addLink(l);
 		l = fac.createLink(id21, id2, id1);
-		l.setCapacity(3600.0);
-		l.setFreespeed(5.0);
-		l.setLength(100.0);
+		l.setCapacity(capacity);
+		l.setFreespeed(fs);
+		l.setLength(linkLength);
 		l.setNumberOfLanes(2.0);
 		net.addLink(l);
 		l = fac.createLink(id23, id2, id3);
-		l.setCapacity(3600.0);
-		l.setFreespeed(5.0);
-		l.setLength(100.0);
+		l.setCapacity(capacity);
+		l.setFreespeed(fs);
+		l.setLength(linkLength);
 		net.addLink(l);
 		l = fac.createLink(id32, id3, id2);
-		l.setCapacity(3600.0);
-		l.setFreespeed(5.0);
-		l.setLength(100.0);
+		l.setCapacity(capacity);
+		l.setFreespeed(fs);
+		l.setLength(linkLength);
 		net.addLink(l);
 		l = fac.createLink(id34, id3, id4);
-		l.setCapacity(3600.0);
-		l.setFreespeed(5.0);
-		l.setLength(100.0);
+		l.setCapacity(capacity);
+		l.setFreespeed(fs);
+		l.setLength(linkLength);
 		net.addLink(l);
 		l = fac.createLink(id43, id4, id3);
-		l.setCapacity(3600.0);
-		l.setFreespeed(5.0);
-		l.setLength(100.0);
+		l.setCapacity(capacity);
+		l.setFreespeed(fs);
+		l.setLength(linkLength);
 		net.addLink(l);
 		l = fac.createLink(id45, id4, id5);
-		l.setCapacity(3600.0);
-		l.setFreespeed(5.0);
-		l.setLength(100.0);
+		l.setCapacity(capacity);
+		l.setFreespeed(fs);
+		l.setLength(linkLength);
 		net.addLink(l);
 		l = fac.createLink(id54, id5, id4);
-		l.setCapacity(3600.0);
-		l.setFreespeed(5.0);
-		l.setLength(100.0);
+		l.setCapacity(capacity);
+		l.setFreespeed(fs);
+		l.setLength(linkLength);
 		net.addLink(l);
 		l = fac.createLink(id56, id5, id6);
-		l.setCapacity(3600.0);
-		l.setFreespeed(5.0);
-		l.setLength(100.0);
+		l.setCapacity(capacity);
+		l.setFreespeed(fs);
+		l.setLength(linkLength);
 		l.setNumberOfLanes(2.0);
 		net.addLink(l);
 		l = fac.createLink(id65, id6, id5);
-		l.setCapacity(3600.0);
-		l.setFreespeed(5.0);
-		l.setLength(100.0);
+		l.setCapacity(capacity);
+		l.setFreespeed(fs);
+		l.setLength(linkLength);
 		net.addLink(l);
 		l = fac.createLink(id27, id2, id7);
-		l.setCapacity(3600.0);
-		l.setFreespeed(5.0);
-		l.setLength(100.0);
+		l.setCapacity(capacity);
+		l.setFreespeed(fs);
+		l.setLength(linkLength);
 		net.addLink(l);
 		l = fac.createLink(id72, id7, id2);
-		l.setCapacity(3600.0);
-		l.setFreespeed(5.0);
-		l.setLength(100.0);
+		l.setCapacity(capacity);
+		l.setFreespeed(fs);
+		l.setLength(linkLength);
 		net.addLink(l);
 		l = fac.createLink(id78, id7, id8);
-		l.setCapacity(3600.0);
-		l.setFreespeed(5.0);
-		l.setLength(100.0);
+		l.setCapacity(capacity);
+		l.setFreespeed(fs);
+		l.setLength(linkLength);
 		net.addLink(l);
 		l = fac.createLink(id87, id8, id7);
-		l.setCapacity(3600.0);
-		l.setFreespeed(5.0);
-		l.setLength(100.0);
+		l.setCapacity(capacity);
+		l.setFreespeed(fs);
+		l.setLength(linkLength);
 		net.addLink(l);
 		l = fac.createLink(id85, id8, id5);
-		l.setCapacity(3600.0);
-		l.setFreespeed(5.0);
-		l.setLength(100.0);
+		l.setCapacity(capacity);
+		l.setFreespeed(fs);
+		l.setLength(linkLength);
 		net.addLink(l);
 		l = fac.createLink(id58, id5, id8);
-		l.setCapacity(3600.0);
-		l.setFreespeed(5.0);
-		l.setLength(100.0);
+		l.setCapacity(capacity);
+		l.setFreespeed(fs);
+		l.setLength(linkLength);
 		net.addLink(l);
 		return net;
 	}

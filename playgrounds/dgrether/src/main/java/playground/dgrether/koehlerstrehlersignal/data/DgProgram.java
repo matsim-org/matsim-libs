@@ -22,11 +22,14 @@ package playground.dgrether.koehlerstrehlersignal.data;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 
 
 public class DgProgram {
-
+	
+	private static final Logger log = Logger.getLogger(DgProgram.class);
+	
 	private Id id;
 	private int cycle = 0;
 	private Map<Id, DgGreen> green = new HashMap<Id, DgGreen>();
@@ -37,6 +40,9 @@ public class DgProgram {
 	}
 	
 	public void addGreen(DgGreen g){
+		if (this.green.containsKey(g.getLightId())){
+			log.warn("Green for light " + g.getLightId() + " already exists!");
+		}
 		this.green.put(g.getLightId(), g);
 	}
 	
