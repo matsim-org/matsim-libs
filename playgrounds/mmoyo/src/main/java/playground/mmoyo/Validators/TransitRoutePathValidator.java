@@ -23,9 +23,9 @@ import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.transitSchedule.api.Departure;
-import org.matsim.transitSchedule.api.TransitLine;
-import org.matsim.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.Departure;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.xml.sax.SAXException;
 
 import playground.mmoyo.utils.DataLoader;

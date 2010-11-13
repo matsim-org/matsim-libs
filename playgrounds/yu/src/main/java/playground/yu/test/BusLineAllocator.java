@@ -62,12 +62,12 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.transitSchedule.api.TransitLine;
-import org.matsim.transitSchedule.api.TransitRoute;
-import org.matsim.transitSchedule.api.TransitSchedule;
-import org.matsim.transitSchedule.api.TransitScheduleReader;
-import org.matsim.transitSchedule.api.TransitScheduleWriter;
-import org.matsim.transitSchedule.api.TransitStopFacility;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
+import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.xml.sax.SAXException;
 
 import playground.yu.utils.io.SimpleWriter;

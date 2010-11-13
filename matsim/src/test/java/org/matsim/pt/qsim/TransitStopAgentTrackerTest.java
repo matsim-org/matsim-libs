@@ -28,9 +28,9 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.pt.fakes.FakeAgent;
 import org.matsim.pt.qsim.PassengerAgent;
 import org.matsim.pt.qsim.TransitStopAgentTracker;
-import org.matsim.transitSchedule.TransitScheduleFactoryImpl;
-import org.matsim.transitSchedule.api.TransitScheduleFactory;
-import org.matsim.transitSchedule.api.TransitStopFacility;
+import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
+import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 
 /**

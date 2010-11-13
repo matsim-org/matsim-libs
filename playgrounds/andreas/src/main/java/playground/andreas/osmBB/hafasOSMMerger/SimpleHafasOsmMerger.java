@@ -10,11 +10,11 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
-import org.matsim.transitSchedule.TransitScheduleReaderV1;
-import org.matsim.transitSchedule.api.TransitLine;
-import org.matsim.transitSchedule.api.TransitRoute;
-import org.matsim.transitSchedule.api.TransitRouteStop;
-import org.matsim.transitSchedule.api.TransitScheduleWriter;
+import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
 import org.xml.sax.SAXException;
 
 public class SimpleHafasOsmMerger {

@@ -34,9 +34,9 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.transitSchedule.api.TransitScheduleReader;
-import org.matsim.transitSchedule.api.TransitScheduleWriter;
-import org.matsim.transitSchedule.api.TransitStopFacility;
+import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
+import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.xml.sax.SAXException;
 
 import playground.droeder.DaPaths;

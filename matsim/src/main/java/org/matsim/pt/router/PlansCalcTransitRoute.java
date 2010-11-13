@@ -47,7 +47,7 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
-import org.matsim.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 /**
  * @author mrieser

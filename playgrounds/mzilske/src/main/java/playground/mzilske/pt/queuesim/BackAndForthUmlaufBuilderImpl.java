@@ -26,9 +26,9 @@ import org.matsim.pt.UmlaufImpl;
 import org.matsim.pt.UmlaufStueck;
 import org.matsim.pt.UmlaufStueckI;
 import org.matsim.pt.Wenden;
-import org.matsim.transitSchedule.api.Departure;
-import org.matsim.transitSchedule.api.TransitLine;
-import org.matsim.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.Departure;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
 
 public class BackAndForthUmlaufBuilderImpl implements UmlaufBuilder {
 

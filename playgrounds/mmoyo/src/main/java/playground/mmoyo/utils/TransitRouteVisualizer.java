@@ -7,8 +7,8 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.run.OTFVis;
-import org.matsim.transitSchedule.api.TransitRoute;
 
 /**created a visual track of the transit route*/
 public class TransitRouteVisualizer {

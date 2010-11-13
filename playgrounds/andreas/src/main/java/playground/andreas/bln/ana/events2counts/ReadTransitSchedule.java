@@ -8,9 +8,9 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.transitSchedule.TransitScheduleFactoryImpl;
-import org.matsim.transitSchedule.TransitScheduleReaderV1;
-import org.matsim.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
+import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.xml.sax.SAXException;
 
 

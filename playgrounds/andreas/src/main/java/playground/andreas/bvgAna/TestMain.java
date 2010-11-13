@@ -47,7 +47,7 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReaderMatsimV4;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
-import org.matsim.transitSchedule.api.TransitScheduleReader;
+import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.vehicles.VehicleReaderV1;
 import org.matsim.vehicles.Vehicles;
 import org.xml.sax.SAXException;

@@ -21,7 +21,9 @@
 package playground.mrieser;
 
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
@@ -54,7 +56,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkFalsifier;
@@ -632,6 +633,97 @@ public class MyRuns {
 
 	}
 
+	static void writeReadBinaryStuff() throws IOException {
+		DataOutputStream stream = new DataOutputStream(new FileOutputStream("test.bin"));
+		stream.writeByte(1);
+		stream.writeByte(16);
+		stream.writeByte(64);
+		stream.writeByte(128);
+		stream.writeByte(129);
+		stream.writeByte(255);
+		stream.close();
+
+		DataInputStream in = new DataInputStream(new FileInputStream("test.bin"));
+		int b1 = in.readUnsignedByte();
+		int b2 = in.readUnsignedByte();
+		int b3 = in.readUnsignedByte();
+		int b4 = in.readUnsignedByte();
+		int b5 = in.readUnsignedByte();
+		int b6 = in.readUnsignedByte();
+		in.close();
+		System.out.println(b1);
+		System.out.println(b2);
+		System.out.println(b3);
+		System.out.println(b4);
+		System.out.println(b5);
+		System.out.println(b6);
+
+		in = new DataInputStream(new FileInputStream("test.bin"));
+		byte bb1 = in.readByte();
+		byte bb2 = in.readByte();
+		byte bb3 = in.readByte();
+		byte bb4 = in.readByte();
+		byte bb5 = in.readByte();
+		byte bb6 = in.readByte();
+		in.close();
+		System.out.println(unsig(bb1));
+		System.out.println(unsig(bb2));
+		System.out.println(unsig(bb3));
+		System.out.println(unsig(bb4));
+		System.out.println(unsig(bb5));
+		System.out.println(unsig(bb6));
+
+		DataInputStream in2 = new DataInputStream(new FileInputStream("gps.bin"));
+		byte[] bytes = new byte[48];
+		int readBytes = in2.read(bytes, 0, 48);
+		int cnt = 0;
+		while (readBytes == 48) {
+			cnt++;
+			if (isValid(bytes)) {
+				if (bytes[0] == 0x10) {
+					// accelormeter data
+
+				} else if (bytes[0] == 0x00) {
+					// gps data
+					int millis = (unsig(bytes[4]) * 0x1000000) + (unsig(bytes[3]) * 0x10000) + (unsig(bytes[2]) * 0x100) + unsig(bytes[1]);
+					int tenths = millis % 1000;
+
+					int longI = (unsig(bytes[8]) << 24) + (unsig(bytes[7]) << 16) + (unsig(bytes[6]) << 8) + unsig(bytes[5]);
+					double longitude = longI * 1e-7;
+					System.out.println("long = " + longitude);
+
+					int height = (unsig(bytes[16]) * 0x1000000) + (unsig(bytes[15]) * 0x10000) + (unsig(bytes[14]) * 0x100) + unsig(bytes[13]);
+					System.out.println("alt = " + height/1000);
+				} else if (bytes[0] == 0x20) {
+					//
+				}
+			} else {
+				System.out.println("not valid record found");
+			}
+			readBytes = in2.read(bytes, 0, 48);
+			System.out.println("# " + cnt + "   bytes[0] = " + Integer.toHexString(bytes[0]));
+		}
+		in2.close();
+		System.out.println("# blocks read: " + cnt);
+	}
+
+	static int unsig(byte b) {
+		if (b < 0) {
+			return b + 256;
+		}
+		return b;
+	}
+
+	static boolean isValid(byte[] bytes) {
+		byte check = 0;
+		byte check2 = (byte) 0xAA;
+		for (int i = 0; i <= 0x2D; i++) {
+			check = (byte) (check + bytes[i]);
+			check2 = (byte) (check2 + check);
+		}
+		return ((check == bytes[0x2E]) && (check2 == bytes[0x2F]));
+	}
+
 	//////////////////////////////////////////////////////////////////////
 	// main
 	//////////////////////////////////////////////////////////////////////
@@ -721,15 +813,33 @@ public class MyRuns {
 //		writeKml();
 //		runSimulation();
 //		someTest(args);
+		try {
+			writeReadBinaryStuff();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
-		Gbl.printSystemInfo();
-		long maxMem = Runtime.getRuntime().maxMemory();
-		long totalMem = Runtime.getRuntime().totalMemory();
-		long freeMem = Runtime.getRuntime().freeMemory();
-		long usedMem = totalMem - freeMem;
-		System.out.println("used RAM: " + usedMem + "B = " + (usedMem/1024) + "kB = " + (usedMem/1024/1024) + "MB" +
-				"  free: " + freeMem + "B = " + (freeMem/1024/1024) + "MB  total: " + totalMem + "B = " + (totalMem/1024/1024) + "MB" +
-				"  max: " + maxMem + "B = " + (maxMem/1024/1024) + "MB");
+		System.out.println("-----");
+
+		int i = 1;
+		System.out.println(Integer.toBinaryString(i));
+		System.out.println(Integer.toBinaryString(i << 1));
+		System.out.println(Integer.toBinaryString(i << 2));
+		System.out.println(Integer.toBinaryString(i << 8));
+		System.out.println(Integer.toBinaryString(i << 16));
+		System.out.println(Integer.toBinaryString(i << 24));
+
+		Date d = new Date((long)(14852.5723 * 86400 * 1000));
+		System.out.println(d);
+
+//		Gbl.printSystemInfo();
+//		long maxMem = Runtime.getRuntime().maxMemory();
+//		long totalMem = Runtime.getRuntime().totalMemory();
+//		long freeMem = Runtime.getRuntime().freeMemory();
+//		long usedMem = totalMem - freeMem;
+//		System.out.println("used RAM: " + usedMem + "B = " + (usedMem/1024) + "kB = " + (usedMem/1024/1024) + "MB" +
+//				"  free: " + freeMem + "B = " + (freeMem/1024/1024) + "MB  total: " + totalMem + "B = " + (totalMem/1024/1024) + "MB" +
+//				"  max: " + maxMem + "B = " + (maxMem/1024/1024) + "MB");
 
 		//		Scenario scenario = new ScenarioImpl();
 //		OsmNetworkReader osmReader = new OsmNetworkReader(scenario.getNetwork(), new WGS84toCH1903LV03());

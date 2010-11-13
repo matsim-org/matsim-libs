@@ -25,7 +25,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.transitSchedule.TransitScheduleReaderV1;
+import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.vehicles.VehicleReaderV1;
 import org.xml.sax.SAXException;
 

@@ -21,7 +21,7 @@ package org.matsim.pt.qsim;
 
 import java.util.List;
 
-import org.matsim.transitSchedule.api.TransitStopFacility;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 /**
  * @author mrieser

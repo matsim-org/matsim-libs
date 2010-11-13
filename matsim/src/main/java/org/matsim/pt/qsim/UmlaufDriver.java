@@ -37,10 +37,10 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.Umlauf;
 import org.matsim.pt.UmlaufStueckI;
+import org.matsim.pt.transitSchedule.api.Departure;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.ptproject.qsim.interfaces.Mobsim;
-import org.matsim.transitSchedule.api.Departure;
-import org.matsim.transitSchedule.api.TransitLine;
-import org.matsim.transitSchedule.api.TransitRoute;
 
 
 /**

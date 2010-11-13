@@ -21,7 +21,7 @@
 package org.matsim.pt.qsim;
 
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
-import org.matsim.transitSchedule.api.TransitStopFacility;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 /**
  * Additional methods for drivers of public transport vehicles.

@@ -22,7 +22,7 @@ package org.matsim.pt.qsim;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.transitSchedule.api.TransitStopFacility;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 

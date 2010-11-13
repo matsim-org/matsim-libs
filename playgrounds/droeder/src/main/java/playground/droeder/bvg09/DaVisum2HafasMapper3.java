@@ -5,9 +5,9 @@ import java.util.ListIterator;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.transitSchedule.api.TransitRoute;
-import org.matsim.transitSchedule.api.TransitRouteStop;
-import org.matsim.transitSchedule.api.TransitStopFacility;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 public class DaVisum2HafasMapper3 extends AbstractDaVisum2HafasMapper {
 	

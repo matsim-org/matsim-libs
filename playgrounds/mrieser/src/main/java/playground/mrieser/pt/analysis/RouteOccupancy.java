@@ -30,8 +30,8 @@ import org.matsim.core.events.PersonEntersVehicleEvent;
 import org.matsim.core.events.PersonLeavesVehicleEvent;
 import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
-import org.matsim.transitSchedule.api.Departure;
-import org.matsim.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.Departure;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
 
 /**
  * Keeps track of the total number of passengers entering and leaving a transit

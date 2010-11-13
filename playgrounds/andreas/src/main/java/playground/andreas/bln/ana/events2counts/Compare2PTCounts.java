@@ -17,7 +17,7 @@ import org.matsim.counts.CountSimComparison;
 import org.matsim.counts.CountSimComparisonImpl;
 import org.matsim.counts.Counts;
 import org.matsim.pt.counts.PtCountSimComparisonKMLWriter;
-import org.matsim.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 
 /**

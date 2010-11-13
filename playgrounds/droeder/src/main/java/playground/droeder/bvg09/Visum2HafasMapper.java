@@ -40,11 +40,11 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.transitSchedule.api.TransitLine;
-import org.matsim.transitSchedule.api.TransitRoute;
-import org.matsim.transitSchedule.api.TransitRouteStop;
-import org.matsim.transitSchedule.api.TransitScheduleReader;
-import org.matsim.transitSchedule.api.TransitStopFacility;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.xml.sax.SAXException;
 
 import playground.droeder.DaPaths;
@@ -417,7 +417,7 @@ public class Visum2HafasMapper{
 		String[] idToChar;
 		StringBuffer createdHafasId;
 		String hafasId;
-		for(org.matsim.transitSchedule.api.TransitLine line : visumSc.getTransitSchedule().getTransitLines().values()){
+		for(org.matsim.pt.transitSchedule.api.TransitLine line : visumSc.getTransitSchedule().getTransitLines().values()){
 			createdHafasId = new StringBuffer();
 			idToChar = line.getId().toString().split("");
 			

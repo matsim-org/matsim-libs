@@ -6,9 +6,9 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.utils.CreateVehiclesForSchedule;
-import org.matsim.transitSchedule.TransitScheduleReaderV1;
-import org.matsim.transitSchedule.api.TransitSchedule;
 import org.xml.sax.SAXException;
 
 public class TransScenarioLoader {

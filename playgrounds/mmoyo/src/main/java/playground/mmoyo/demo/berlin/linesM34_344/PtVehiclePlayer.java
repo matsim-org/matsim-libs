@@ -10,9 +10,9 @@ import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
+import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.pt.utils.CreateVehiclesForSchedule;
 import org.matsim.ptproject.qsim.QSim;
-import org.matsim.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.vis.otfvis.OTFVisMobsimFeature;
 import org.xml.sax.SAXException;
 

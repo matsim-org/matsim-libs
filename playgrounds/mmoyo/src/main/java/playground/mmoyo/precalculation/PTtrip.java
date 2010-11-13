@@ -3,7 +3,7 @@ package playground.mmoyo.precalculation;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
 
 /**Describes simply a trip in a pt-vechicle*/
 public class PTtrip {

@@ -1,9 +1,9 @@
 package playground.mmoyo.analysis.tools;
 
 import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.transitSchedule.api.TransitLine;
-import org.matsim.transitSchedule.api.TransitRoute;
-import org.matsim.transitSchedule.api.TransitRouteStop;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 
 import playground.mmoyo.utils.TransScenarioLoader;
 

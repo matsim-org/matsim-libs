@@ -33,7 +33,7 @@ import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.router.PlansCalcTransitRoute;
-import org.matsim.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 public class AdaptedPlansCalcTransitRoute extends PlansCalcTransitRoute {
 	private static final Logger log = Logger.getLogger(AdaptedPlansCalcTransitRoute.class);

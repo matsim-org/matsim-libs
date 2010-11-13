@@ -8,9 +8,9 @@ import org.matsim.pt.Umlauf;
 import org.matsim.pt.UmlaufBuilder;
 import org.matsim.pt.UmlaufImpl;
 import org.matsim.pt.UmlaufStueck;
-import org.matsim.transitSchedule.api.Departure;
-import org.matsim.transitSchedule.api.TransitLine;
-import org.matsim.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.Departure;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
 
 public class SingletonUmlaufBuilderImpl implements UmlaufBuilder {
 	

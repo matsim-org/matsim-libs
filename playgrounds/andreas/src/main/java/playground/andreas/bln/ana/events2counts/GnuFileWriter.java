@@ -6,8 +6,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.transitSchedule.api.TransitRoute;
-import org.matsim.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 
 public class GnuFileWriter {

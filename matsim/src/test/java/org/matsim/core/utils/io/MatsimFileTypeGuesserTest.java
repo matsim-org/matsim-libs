@@ -125,7 +125,7 @@ public class MatsimFileTypeGuesserTest {
 
 	@Test
 	public void testTransitScheduleV1XML() throws IOException {
-		MatsimFileTypeGuesser g = new MatsimFileTypeGuesser("test/input/org/matsim/transitSchedule/TransitScheduleReaderTest/transitSchedule.xml");
+		MatsimFileTypeGuesser g = new MatsimFileTypeGuesser("test/input/org/matsim/pt/transitSchedule/TransitScheduleReaderTest/transitSchedule.xml");
 		assertEquals(MatsimFileTypeGuesser.FileType.TransitSchedule, g.getGuessedFileType());
 		assertNull(g.getPublicId());
 		assertNotNull(g.getSystemId());

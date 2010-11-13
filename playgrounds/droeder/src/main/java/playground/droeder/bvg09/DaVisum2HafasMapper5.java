@@ -8,8 +8,8 @@ import java.util.TreeMap;
 import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.transitSchedule.api.TransitRoute;
-import org.matsim.transitSchedule.api.TransitRouteStop;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 
 public class DaVisum2HafasMapper5 extends AbstractDaVisum2HafasMapper {
 

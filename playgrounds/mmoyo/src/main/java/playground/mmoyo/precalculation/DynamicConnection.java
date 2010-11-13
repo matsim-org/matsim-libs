@@ -9,7 +9,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 import playground.mmoyo.PTRouter.PTValues;
 

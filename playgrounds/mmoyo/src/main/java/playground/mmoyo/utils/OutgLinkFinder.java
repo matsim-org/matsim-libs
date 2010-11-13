@@ -19,12 +19,12 @@
  * *********************************************************************** */
 package playground.mmoyo.utils;
 
-import org.matsim.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.transitSchedule.api.TransitStopFacility;
-import org.matsim.transitSchedule.api.TransitLine;
-import org.matsim.transitSchedule.api.TransitRoute;
 /**
  * Finds the outgoing link of each stopFacility
  */
