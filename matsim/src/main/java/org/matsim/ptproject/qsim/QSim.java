@@ -158,11 +158,11 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 	private AgentCounterI agentCounter;
 
 	private Collection<MobsimAgent> agents = new ArrayList<MobsimAgent>();
-	
-	// everything above this line is private and should remain private.  pls contact me if this is in your way.  kai, oct'10 
+
+	// everything above this line is private and should remain private.  pls contact me if this is in your way.  kai, oct'10
 	// ============================================================================================================================
 	// initialization:
-	
+
 	public QSim(final Scenario scenario, final EventsManager events) {
 		this(scenario, events, new DefaultQSimEngineFactory());
 	}
@@ -199,16 +199,16 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 		//delete reference to clear memory
 		this.listenerManager = null;
 	}
-	
+
 	// ============================================================================================================================
 	// "prepareSim":
-	
+
 	// setters that should reasonably be called between constructor and "prepareSim" (triggered by "run"):
 
 	public void setMultiModalSimEngine(MultiModalSimEngine multiModalEngine) {
 		this.multiModalEngine = multiModalEngine;
 	}
-	
+
 	@Override
 	public void setAgentFactory(final AgentFactory fac) {
 		this.agentFactory = fac;
@@ -218,7 +218,7 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 	public void setControlerIO(final ControlerIO controlerIO) {
 		this.controlerIO = controlerIO;
 	}
-	
+
 	@Override
 	public void setIterationNumber(final Integer iterationNumber) {
 		this.iterationNumber = iterationNumber;
@@ -428,15 +428,16 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 		this.activityEndsList.add(agent);
 		registerAgentAtActivityLocation(agent);
 	}
-	
+
+	@Override
 	public final void rescheduleActivityEnd(final PersonAgent agent, final double oldTime, final double newTime ) {
 		// yyyy quite possibly, this should be "notifyChangedPlan".  kai, oct'10
 		// yy the "newTime" is strictly speaking not necessary.  kai, oct'10
-		
+
 		// change the position in the queue:
 		this.activityEndsList.remove( agent ) ;
 		this.activityEndsList.add( agent ) ;
-		
+
 		if ( oldTime==Double.POSITIVE_INFINITY && newTime!=Double.POSITIVE_INFINITY) {
 			this.getAgentCounter().incLiving() ;
 		} else if ( oldTime!=Double.POSITIVE_INFINITY && newTime==Double.POSITIVE_INFINITY ) {
@@ -528,24 +529,23 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 //		Route route = leg.getRoute();
 		String mode = leg.getMode();
 		events.processEvent(events.getFactory().createAgentDepartureEvent(now, agent.getPerson().getId(), linkId, mode ));
-		if ( handleKnownLegModeDeparture(now, agent, linkId, leg) ) {
-			return ;
+		if (handleKnownLegModeDeparture(now, agent, linkId, leg)) {
+			return;
 		} else {
-			handleUnknownLegMode( now, agent, linkId, leg ) ;
+			handleUnknownLegMode(now, agent);
 			events.processEvent(new AdditionalTeleportationDepartureEvent( now, agent.getPerson().getId(), linkId, mode, agent.getDestinationLinkId(), leg.getTravelTime() )) ;
 		}
 	}
 
-	private void handleUnknownLegMode(final double now, final PersonAgent personAgent, final Id linkId, final Leg leg) {
+	private void handleUnknownLegMode(final double now, final PersonAgent personAgent) {
 		double arrivalTime = now + personAgent.getCurrentLeg().getTravelTime();
 		this.teleportationList.add(new Tuple<Double, PersonAgent>(arrivalTime, personAgent));
 	}
 
-	private boolean handleKnownLegModeDeparture(final double now, final PersonAgent personAgent, final Id linkId, final Leg leg)
-	{
+	private boolean handleKnownLegModeDeparture(final double now, final PersonAgent personAgent, final Id linkId, final Leg leg) {
 		for (DepartureHandler departureHandler : this.departureHandlers) {
-			if ( departureHandler.handleDeparture(now, personAgent, linkId, leg) ) {
-				return true ;
+			if (departureHandler.handleDeparture(now, personAgent, linkId, leg)) {
+				return true;
 			}
 			// The code is not (yet?) very beautiful.  But structurally, this goes through all departure handlers and tries to
 			// find one that feels responsible.  If it feels responsible, it returns true, and so this method returns true.
@@ -718,7 +718,7 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 	 *
 	 * @param teleportVehicles
 	 */
-	@Deprecated // I don't think that something that has so obvious access to config (via scenario) should also be separately 
+	@Deprecated // I don't think that something that has so obvious access to config (via scenario) should also be separately
 	// configurable.  (But we do not all agree on this.)  kai, oct'10
 	/*package*/ void setTeleportVehicles(final boolean teleportVehicles) {
 		this.carDepartureHandler.setTeleportVehicles(teleportVehicles);
@@ -811,18 +811,19 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 	}
 
 	// different agent sublists:
-	
+
 	@Override
 	public final Collection<MobsimAgent> getAgents() {
 		return Collections.unmodifiableCollection( this.agents ) ;
 		// changed this to unmodifiable in oct'10.  kai
 	}
 
+	@Override
 	public final Collection<PersonAgent> getActivityEndsList() {
 		return Collections.unmodifiableCollection( activityEndsList ) ;
 		// changed this to unmodifiable in oct'10.  kai
 	}
-	
+
 	public final Collection<PersonAgent> getTransitAgents(){
 		return Collections.unmodifiableCollection( this.transitAgents ) ;
 		// changed this to unmodifiable in oct'10.  kai

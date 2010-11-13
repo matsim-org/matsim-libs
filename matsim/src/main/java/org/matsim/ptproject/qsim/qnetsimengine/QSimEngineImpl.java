@@ -27,10 +27,8 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Random;
 
-import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.helpers.AgentSnapshotInfoBuilder;
 import org.matsim.ptproject.qsim.interfaces.Mobsim;
-
 
 /**
  * Coordinates the movement of vehicles on the links and the nodes.
@@ -148,6 +146,7 @@ private final double stucktimeCache;
 	}
 
 //	@Override
+	@Override
 	protected void activateLink(final QLinkInternalI link) {
 		if (!simulateAllLinks) {
 			this.simActivateThis.add(link);
@@ -183,6 +182,7 @@ public void setQNetwork(QNetwork qNetwork2) {
 	this.qNetwork = qNetwork2 ;
 }
 
+@Override
 public QNetwork getQNetwork() {
 	return this.qNetwork ;
 }

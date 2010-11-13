@@ -46,7 +46,6 @@ import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorConfigGroup;
-import org.matsim.evacuation.config.EvacuationConfigGroup;
 import org.matsim.pt.config.PtCountsConfigGroup;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.vis.otfvis.gui.OTFVisConfigGroup;
@@ -54,7 +53,7 @@ import org.matsim.vis.otfvis.gui.OTFVisConfigGroup;
 /**
  * Stores all configuration settings specified in a configuration file and
  * provides access to the settings at runtime.
- * 
+ *
  * @author mrieser
  */
 public class Config {
@@ -204,10 +203,10 @@ public class Config {
 
 	/**
 	 * Creates a new module / config-group with the specified name.
-	 * 
+	 *
 	 * @param name
 	 *            The name of the config-group to be created.
-	 * 
+	 *
 	 * @return the newly created config group
 	 * @throws IllegalArgumentException
 	 *             if a config-group with the specified name already exists.
@@ -224,10 +223,10 @@ public class Config {
 	/**
 	 * Adds the specified module / config-group with the specified name to the
 	 * configuration.
-	 * 
+	 *
 	 * @param name
 	 * @param module
-	 * 
+	 *
 	 * @throws IllegalArgumentException
 	 *             if a config-group with the specified name already exists.
 	 */
@@ -241,10 +240,10 @@ public class Config {
 	/**
 	 * Removes the specified module / config-group with the specified name from
 	 * the configuration. Does nothing if this module was not existing.
-	 * 
+	 *
 	 * @param name
 	 * @param module
-	 * 
+	 *
 	 */
 	public final void removeModule(final String name) {
 		if (this.modules.containsKey(name)) {
@@ -265,7 +264,7 @@ public class Config {
 	/**
 	 * Returns the requested module, or <code>null</code> if the module does not
 	 * exist.
-	 * 
+	 *
 	 * @param moduleName
 	 *            name of the requested module
 	 * @return requested module
@@ -277,11 +276,11 @@ public class Config {
 	/**
 	 * Returns the requested parameter. If the module or parameter is not known,
 	 * an error is logged and an IllegalArgumentException is thrown.
-	 * 
+	 *
 	 * @param moduleName
 	 * @param paramName
 	 * @return the requested parameter
-	 * 
+	 *
 	 * @throws IllegalArgumentException
 	 *             if the module or parameter does not exist
 	 * @see #findParam(String, String)
@@ -303,13 +302,13 @@ public class Config {
 	/**
 	 * Returns the value of the specified parameter if it exists, or
 	 * <code>null</code> otherwise.
-	 * 
+	 *
 	 * @param moduleName
 	 *            name of the config-module
 	 * @param paramName
 	 *            name of parameter in the specified module
 	 * @return value of the parameter if it exists, <code>null</code> otherwise
-	 * 
+	 *
 	 * @see #getParam(String, String)
 	 */
 	public final String findParam(final String moduleName, final String paramName) {
@@ -344,7 +343,7 @@ public class Config {
 	 * Sets the parameter <code>paramName</code> in the module/config-group
 	 * <code>moduleName</code> to the specified value. If there is no
 	 * config-group with the specified name, a new group will be created.
-	 * 
+	 *
 	 * @param moduleName
 	 * @param paramName
 	 * @param value

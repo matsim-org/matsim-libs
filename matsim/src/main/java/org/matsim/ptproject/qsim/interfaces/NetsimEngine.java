@@ -21,7 +21,6 @@
 package org.matsim.ptproject.qsim.interfaces;
 
 import org.matsim.core.mobsim.framework.Steppable;
-import org.matsim.ptproject.qsim.qnetsimengine.QNetwork;
 
 
 /**
@@ -30,17 +29,15 @@ import org.matsim.ptproject.qsim.qnetsimengine.QNetwork;
  * @author cdobler
  * @author dgrether
  */
-
 public interface NetsimEngine extends MobsimEngine, Steppable {
 
 //	AgentSnapshotInfoBuilder getAgentSnapshotInfoBuilder();
-	
+
 	/**
 	 * for logging purposes; otherwise this is not important.  kai, oct'10
 	 */
-	int getNumberOfSimulatedLinks() ;
-	
-	NetsimNetwork getQNetwork() ;
-	
-	
+	int getNumberOfSimulatedLinks();
+
+	NetsimNetwork getQNetwork();
+
 }

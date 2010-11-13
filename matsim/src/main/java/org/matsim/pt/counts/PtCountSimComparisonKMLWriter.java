@@ -216,7 +216,7 @@ public class PtCountSimComparisonKMLWriter extends PtCountSimComparisonWriter {
 					colors.get(styleType)[1], colors.get(styleType)[2],
 					colors.get(styleType)[3] });
 			icon.setScale(ICONSCALE);
-			
+
 			if ( styleType==this.redCrossStyle || styleType==this.redMinusStyle ) {
 				icon.setScale(ICONSCALE) ; // yyyy kai: make configurable!
 			}
@@ -438,11 +438,11 @@ public class PtCountSimComparisonKMLWriter extends PtCountSimComparisonWriter {
 			switch (type) {
 			case Boarding:
 				count = this.boardCounts.getCount(stopid);
-//				continue ; // kai: this is where these icons can be disabled.  
+//				continue ; // kai: this is where these icons can be disabled.
 				break;
 			case Alighting:
 				count = this.alightCounts.getCount(stopid);
-//				continue ; // kai: this is where these icons can be disabled.  
+//				continue ; // kai: this is where these icons can be disabled.
 				break;
 			default:
 				count = this.occupancyCounts.getCount(stopid);
@@ -586,7 +586,7 @@ public class PtCountSimComparisonKMLWriter extends PtCountSimComparisonWriter {
 
 	private String getSimRealGraphName(PtCountsType type, int timestep) {
 		StringBuffer filename = new StringBuffer(type.toString());
-		filename.append("-");
+		filename.append('-');
 		filename.append(SIMREALGRAPHNAME);
 		filename.append(timestep);
 		filename.append(PNG);
@@ -772,17 +772,15 @@ public class PtCountSimComparisonKMLWriter extends PtCountSimComparisonWriter {
 
 	private ScreenOverlayType createBiasErrorGraph(PtCountsType type,
 			String kmlFilename) {
-		int index = kmlFilename.lastIndexOf(System
-				.getProperty("file.separator"));
+		int index = kmlFilename.lastIndexOf(System.getProperty("file.separator"));
 		if (index == -1) {
-			index = kmlFilename.lastIndexOf("/");
+			index = kmlFilename.lastIndexOf('/');
 		}
 		String outdir;
 		if (index == -1) {
 			outdir = "";
 		} else {
-			outdir = kmlFilename.substring(0, index)
-					+ System.getProperty("file.separator");
+			outdir = kmlFilename.substring(0, index) + System.getProperty("file.separator");
 		}
 		// ------------------------------------------------------------------------------
 
@@ -811,16 +809,16 @@ public class PtCountSimComparisonKMLWriter extends PtCountSimComparisonWriter {
 		log.info("writing chart data to " + new File(file).getAbsolutePath());
 		try {
 			BufferedWriter bwriter = IOUtils.getBufferedWriter(file);
-			StringBuffer buffer = new StringBuffer();
+			StringBuffer buffer = new StringBuffer(100);
 			buffer.append("hour \t mean relative error \t mean absolute bias");
 			bwriter.write(buffer.toString());
 			bwriter.newLine();
 			for (int i = 0; i < meanError.length; i++) {
 				buffer.delete(0, buffer.length());
 				buffer.append(i + 1);
-				buffer.append("\t");
+				buffer.append('\t');
 				buffer.append(meanError[i]);
-				buffer.append("\t");
+				buffer.append('\t');
 				buffer.append(meanBias[i]);
 				bwriter.write(buffer.toString());
 				bwriter.newLine();

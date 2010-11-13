@@ -32,12 +32,10 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.events.AgentStuckEventImpl;
+import org.matsim.ptproject.qsim.interfaces.NetsimEngine;
 import org.matsim.ptproject.qsim.interfaces.NetsimLink;
 import org.matsim.ptproject.qsim.interfaces.NetsimNode;
-import org.matsim.ptproject.qsim.interfaces.NetsimEngine;
-import org.matsim.utils.customize.Customizable;
 import org.matsim.vis.snapshots.writers.VisData;
-import org.matsim.vis.snapshots.writers.VisNode;
 
 /**
  * Represents a node in the QueueSimulation.
@@ -57,7 +55,7 @@ public class QNode implements NetsimNode {
 
 	// for Customizable
 	private Map<String, Object> customAttributes = new HashMap<String, Object>();
-	
+
 	/**
 	 * Indicates whether this node is signalized or not
 	 */
@@ -91,6 +89,7 @@ public class QNode implements NetsimNode {
 		Arrays.sort(this.inLinksArrayCache, QNode.qlinkIdComparator);
 	}
 
+	@Override
 	public Node getNode() {
 		return this.node;
 	}
@@ -157,7 +156,7 @@ public class QNode implements NetsimNode {
 			}
 		}
 	}
-	
+
   protected void clearLinkBuffer(final QLinkInternalI link, final double now){
   	if (link instanceof QLinkImpl){
       while (!link.bufferIsEmpty()) {
@@ -180,15 +179,15 @@ public class QNode implements NetsimNode {
       }
     }
   }
-	
-	
+
+
 	protected void checkNextLinkSemantics(Link currentLink, Link nextLink, QVehicle veh){
     if (currentLink.getToNode() != nextLink.getFromNode()) {
       throw new RuntimeException("Cannot move vehicle " + veh.getId() +
           " from link " + currentLink.getId() + " to link " + nextLink.getId());
     }
 	}
-	
+
   // ////////////////////////////////////////////////////////////////////
   // Queue related movement code
   // ////////////////////////////////////////////////////////////////////
@@ -256,6 +255,7 @@ public class QNode implements NetsimNode {
 
 	protected static class QueueLinkIdComparator implements Comparator<NetsimLink>, Serializable {
 		private static final long serialVersionUID = 1L;
+		@Override
 		public int compare(final NetsimLink o1, final NetsimLink o2) {
 			return o1.getLink().getId().compareTo(o2.getLink().getId());
 		}
@@ -265,7 +265,7 @@ public class QNode implements NetsimNode {
 	public VisData getVisData() {
 		return null;
 	}
-	
+
 	@Override
 	public Map<String, Object> getCustomAttributes() {
 		return customAttributes;

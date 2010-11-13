@@ -27,7 +27,6 @@ import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 
 import org.matsim.core.gbl.Gbl;
-import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.helpers.AgentSnapshotInfoBuilder;
 import org.matsim.ptproject.qsim.interfaces.Mobsim;
 import org.matsim.ptproject.qsim.qnetsimengine.ParallelQSimEngine.ExtendedQueueNode;
@@ -84,10 +83,12 @@ public class QSimEngineRunner extends QSimEngineInternalI implements Runnable {
 		time = t;
 	}
 
+	@Override
 	public void afterSim() {
 		this.simulationRunning = false;
 	}
 
+	@Override
 	public void doSimStep(double time) {
 		// nothing to do here
 	}

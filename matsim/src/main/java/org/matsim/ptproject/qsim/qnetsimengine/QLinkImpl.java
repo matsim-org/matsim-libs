@@ -43,8 +43,8 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.qsim.TransitQLaneFeature;
 import org.matsim.ptproject.qsim.helpers.AgentSnapshotInfoBuilder;
-import org.matsim.ptproject.qsim.interfaces.NetsimEngine;
 import org.matsim.ptproject.qsim.interfaces.Mobsim;
+import org.matsim.ptproject.qsim.interfaces.NetsimEngine;
 import org.matsim.signalsystems.control.SignalGroupState;
 import org.matsim.signalsystems.mobsim.QSignalizedItem;
 import org.matsim.signalsystems.model.SignalizeableItem;
@@ -139,7 +139,6 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 	private double buffercap_accumulate = 1.0;
 
 	private final TransitQLaneFeature transitQueueLaneFeature = new TransitQLaneFeature(this);
-	private double remainingInputFlowCap;
 	/**
 	 * null if the link is not signalized
 	 */
@@ -263,7 +262,7 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 	final QVehicle removeParkedVehicle(Id vehicleId) {
 		return this.parkedVehicles.remove(vehicleId);
 	}
-	
+
 //	@Override
 //	public void reinsertBus( QVehicle vehicle ) {
 //		this.vehQueue.addFirst(vehicle);
@@ -303,10 +302,6 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 
 	private void updateBufferCapacity() {
 		this.remainingBufferCap = this.flowCapacityPerTimeStep;
-		if ( HOLES ) {
-			this.remainingInputFlowCap = Math.ceil( 2.*this.flowCapacityPerTimeStep ); // make sure this is at least one
-			//			log.warn( " inputFlowCap: " + this.inputFlowCap ) ;
-		}
 		if (this.thisTimeStepGreen && this.buffercap_accumulate < 1.0) {
 			this.buffercap_accumulate += this.flowCapFractionCache;
 		}
@@ -413,10 +408,6 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 			//			log.warn( " !hasSpace since all hole arrival times lie in future ") ;
 			return false ;
 		}
-		//		if ( this.inputFlowCap < 1. ) {
-		//			return false ;
-		//		}
-		this.remainingInputFlowCap -- ;
 		return true ;
 	}
 
