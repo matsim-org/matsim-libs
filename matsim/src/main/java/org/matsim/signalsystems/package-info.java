@@ -8,7 +8,7 @@
  *  <ol>
  *    <li>Set the parameter <pre><code>useSignalsystems</code></pre> to <pre><code>true</code></pre> in the 
  *    config module <pre><code>scenario</code></pre></li>
- *    <li>Set at least three input file names in the config module <pre><code>signalsystems</code></pre>:
+ *    <li>Set at least three input file names in the config module <code>signalsystems</code>:
  *    <ol>
  *    	<li> parameter name: <pre><code>signalsystems</code></pre> value: path to a file in the <pre><code>signalSystems_v2.0.xsd</code></pre> file format </li>
  *    	<li> parameter name: <pre><code>signalgroups</code></pre> value: path to a file in the <pre><code>signalGroups_v2.0.xsd</code></pre> file format </li>
@@ -58,6 +58,7 @@
  * the factories/builders of the default implementation by your instances to get your extension or customization into the model. 
  *  
  * TODO pointer to example
+ * 
  *  
  * <h2>Usage restrictions:</h2>
  * <ul>
