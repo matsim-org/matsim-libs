@@ -23,7 +23,9 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import org.matsim.core.utils.misc.ByteBufferUtils;
+import org.matsim.lanes.otfvis.io.OTFLane;
 import org.matsim.lanes.otfvis.io.OTFLaneReader;
+import org.matsim.lanes.otfvis.io.OTFLinkWLanes;
 import org.matsim.signalsystems.control.SignalGroupState;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 
@@ -32,34 +34,82 @@ import org.matsim.vis.otfvis.caching.SceneGraph;
  */
 public class OTFSignalReader extends OTFLaneReader {
 
-  public OTFSignalReader() {
+	public OTFSignalReader() {
+		super();
 	}
 
 	@Override
-	public void readDynData(ByteBuffer in, SceneGraph graph) throws IOException {
-		if (this.isQLinkLanesReader){
-			int numberOfLanes = in.getInt();
-//			if (numberOfLanes > 1) {
-				String id;
-				for (int i = 0; i < numberOfLanes; i++) {
-					id = ByteBufferUtils.getString(in);
-					int stateInt = in.getInt();
-					SignalGroupState state = null;
-					if (stateInt == 1){
-						state = SignalGroupState.GREEN;
+	public void readConstData(ByteBuffer in) throws IOException {
+		super.readConstData(in);
+		this.readSignalSystems(in);
+	}
+
+	private void readSignalSystems(ByteBuffer in){
+		int noSignalSystems = in.getInt();
+		for (int i = 0; i < noSignalSystems; i++){
+			String systemId = ByteBufferUtils.getString(in);
+			OTFSignalSystem otfsystem = new OTFSignalSystem(systemId);
+			this.drawer.addOTFSignalSystem(otfsystem);
+			
+			int noGroups = in.getInt();
+			for (int j = 0; j < noGroups; j++){
+				String groupId = ByteBufferUtils.getString(in);
+				OTFSignalGroup otfgroup = new OTFSignalGroup(groupId);
+				otfsystem.addOTFSignalGroup(otfgroup);
+				int noSignals = in.getInt();
+				for (int k = 0; k < noSignals; k++){
+					String signalId = ByteBufferUtils.getString(in);
+					String linkId = ByteBufferUtils.getString(in);
+					OTFLinkWLanes link = this.drawer.getLanesLinkData().get(linkId);
+					OTFSignal signal = new OTFSignal(signalId);
+					otfgroup.addSignal(signal);
+					int noLanes = in.getInt();
+					if (noLanes == 0){
+						link.addSignal(signal);
 					}
-					else if (stateInt == 0){
-						state = SignalGroupState.RED;
+					else {
+						for (int l = 0; l < noLanes; l++){
+							String laneId = ByteBufferUtils.getString(in);
+							OTFLane laneData = link.getLaneData().get(laneId);
+							laneData.addSignal(signal);
+						}
 					}
-					else if (stateInt == 2){
-						state = SignalGroupState.REDYELLOW;
+					int noTurningMoveRestrictions = in.getInt();
+					for (int l = 0; l < noTurningMoveRestrictions; l++){
+						String toLinkId = ByteBufferUtils.getString(in);
+						OTFLinkWLanes toLink = this.drawer.getLanesLinkData().get(toLinkId);
+						signal.addTurningMoveRestriction(toLink);
 					}
-					else if (stateInt == 3){
-						state = SignalGroupState.YELLOW;
-					}
-					this.drawer.updateGreenState(id, state);
 				}
-//			}
+			}
+		}
+	}
+	
+
+	@Override
+	public void readDynData(ByteBuffer in, SceneGraph graph) throws IOException {
+		int noEvents = in.getInt();
+		for (int i = 0; i < noEvents; i++){
+			String systemId = ByteBufferUtils.getString(in);
+			String groupId = ByteBufferUtils.getString(in);
+			int stateInt = in.getInt();
+			SignalGroupState state = null;
+			if (stateInt == 1){
+				state = SignalGroupState.GREEN;
+			}
+			else if (stateInt == 0){
+				state = SignalGroupState.RED;
+			}
+			else if (stateInt == 2){
+				state = SignalGroupState.REDYELLOW;
+			}
+			else if (stateInt == 3){
+				state = SignalGroupState.YELLOW;
+			}
+			else if (stateInt == 4){
+				state = SignalGroupState.OFF;
+			}
+			this.drawer.updateGreenState(systemId, groupId, state);
 		}
 	}
 }

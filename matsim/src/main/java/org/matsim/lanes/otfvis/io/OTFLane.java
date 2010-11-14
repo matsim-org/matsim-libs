@@ -24,22 +24,27 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.signalsystems.control.SignalGroupState;
+import org.matsim.signalsystems.otfvis.io.OTFSignal;
 
 
 /**
  * @author dgrether
  */
-public class OTFLaneData {
-	private String id;
-	private double endPoint;
-	private double startPoint;
+public class OTFLane {
+	private String id = null;
+	private double endPosition;
+	private double startPosition;
 	private int alignment;
 	private double numberOfLanes;
-	private List<OTFLaneToLinkData> toLinksData;
+	private List<OTFLinkWLanes> toLinksData = null;
+	private List<OTFLane> toLanes = null;
 	private SignalGroupState state = null;
-
+	private Point2D.Double startPoint = null;
+	private Point2D.Double endPoint = null;
+	private List<OTFSignal> signals = null;
 	
-	public OTFLaneData() {
+	public OTFLane(String id) {
+		this.id = id;
 	}
 	
 	public void setId(String id){
@@ -50,22 +55,22 @@ public class OTFLaneData {
 		return id;
 	}
 
-	public void setEndPoint(double pos) {
-		this.endPoint = pos;
+	public void setEndPosition(double pos) {
+		this.endPosition = pos;
 	}
 	
-	public double getEndPoint() {
-		return endPoint;
-	}
-
-	
-	public double getStartPoint() {
-		return startPoint;
+	public double getEndPosition() {
+		return endPosition;
 	}
 
 	
-	public void setStartPoint(double startPoint) {
-		this.startPoint = startPoint;
+	public double getStartPosition() {
+		return startPosition;
+	}
+
+	
+	public void setStartPosition(double pos) {
+		this.startPosition = pos;
 	}
 
 	public void setAlignment(int alignment) {
@@ -76,10 +81,6 @@ public class OTFLaneData {
 		return this.alignment;
 	}
 	
-	public List<OTFLaneToLinkData> getLaneToLinkData(){
-		return this.toLinksData;
-	}
-
 	public double getNumberOfLanes() {
 		return this.numberOfLanes;
 	}
@@ -88,20 +89,67 @@ public class OTFLaneData {
 		this.numberOfLanes = noLanes;
 	}
 
-	public void addToLinkData(double toLinkStartX, double toLinkStartY, double normalX, double normalY, double toLinkNumberOfLanes) {
-		if (this.toLinksData == null) {
-			this.toLinksData = new ArrayList<OTFLaneToLinkData>();
-		}
-		this.toLinksData.add(new OTFLaneToLinkData(new Point2D.Double(toLinkStartX, toLinkStartY), 
-				new Point2D.Double(normalX, normalY), toLinkNumberOfLanes));
-	}
-	
 	public void setSignalGroupState(SignalGroupState state) {
 		this.state = state;
 	}
 	
 	public SignalGroupState getSignalGroupState(){
 		return this.state ;
+	}
+
+	public void addToLink(OTFLinkWLanes toLink) {
+		if (this.toLinksData == null) {
+			this.toLinksData = new ArrayList<OTFLinkWLanes>();
+		}
+		this.toLinksData.add(toLink);
+	}
+
+	public void addToLane(OTFLane toLane) {
+		if (this.toLanes == null){
+			this.toLanes = new ArrayList<OTFLane>();
+		}
+		this.toLanes.add(toLane);
+	}
+
+	
+	public Point2D.Double getStartPoint() {
+		return startPoint;
+	}
+
+	
+	public void setStartPoint(Point2D.Double startPoint) {
+		this.startPoint = startPoint;
+	}
+
+	
+	public Point2D.Double getEndPoint() {
+		return endPoint;
+	}
+
+	
+	public void setEndPoint(Point2D.Double endPoint) {
+		this.endPoint = endPoint;
+	}
+
+	public void addSignal(OTFSignal signal) {
+		if (this.signals == null){
+			this.signals = new ArrayList<OTFSignal>();
+		}
+		this.signals.add(signal);
+	}
+	
+	public List<OTFSignal> getSignals(){
+		return this.signals;
+	}
+
+	
+	public List<OTFLinkWLanes> getToLinks() {
+		return toLinksData;
+	}
+
+	
+	public List<OTFLane> getToLanes() {
+		return toLanes;
 	}
 
 }

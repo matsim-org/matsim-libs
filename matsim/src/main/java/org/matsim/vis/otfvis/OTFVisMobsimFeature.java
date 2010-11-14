@@ -40,15 +40,18 @@ import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationAfterSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationBeforeCleanupListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
+import org.matsim.lanes.LaneDefinitions;
 import org.matsim.lanes.otfvis.drawer.OTFLaneSignalDrawer;
 import org.matsim.lanes.otfvis.io.OTFLaneReader;
 import org.matsim.lanes.otfvis.io.OTFLaneWriter;
-import org.matsim.lanes.otfvis.layer.OTFLaneLayer;
 import org.matsim.pt.otfvis.FacilityDrawer;
 import org.matsim.ptproject.qsim.QSim;
+import org.matsim.signalsystems.data.SignalsData;
+import org.matsim.signalsystems.data.signalgroups.v20.SignalGroupsData;
+import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsData;
 import org.matsim.signalsystems.otfvis.io.OTFSignalReader;
 import org.matsim.signalsystems.otfvis.io.OTFSignalWriter;
-import org.matsim.signalsystems.otfvis.layer.OTFSignalLayer;
+import org.matsim.signalsystems.otfvis.io.SignalGroupStateChangeTracker;
 import org.matsim.vis.otfvis.data.DefaultConnectionManagerFactory;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.teleportation.OTFTeleportAgentsDataReader;
@@ -137,26 +140,21 @@ SimulationInitializedListener, SimulationAfterSimStepListener, SimulationBeforeC
 						FacilityDrawer.DataDrawer.class);
 			}
 			if (config.scenario().isUseLanes() && (!config.scenario().isUseSignalSystems())) {
-				this.connectionManager.connectQLinkToWriter(OTFLaneWriter.class);
-				this.connectionManager.connectWriterToReader(OTFLaneWriter.class,
-						OTFLaneReader.class);
-				this.connectionManager.connectReaderToReceiver(OTFLaneReader.class,
-						OTFLaneSignalDrawer.class);
-				this.connectionManager.connectReceiverToLayer(OTFLaneSignalDrawer.class,
-						OTFLaneLayer.class);
+				this.otfServer.addAdditionalElement(new OTFLaneWriter(this.queueSimulation.getVisNetwork(), ((ScenarioImpl) this.queueSimulation.getScenario()).getLaneDefinitions()));
+				this.connectionManager.connectWriterToReader(OTFLaneWriter.class, OTFLaneReader.class);
+				this.connectionManager.connectReaderToReceiver(OTFLaneReader.class, OTFLaneSignalDrawer.class);
 				config.otfVis().setScaleQuadTreeRect(true);
-			} else if (config.scenario().isUseLanes() && (config.scenario().isUseSignalSystems())) {
-				// data source to writer
-				this.connectionManager.connectQLinkToWriter(OTFSignalWriter.class);
-				// writer -> reader: from server to client
-				this.connectionManager.connectWriterToReader(OTFSignalWriter.class,
-						OTFSignalReader.class);
-				// reader to drawer (or provider to receiver)
-				this.connectionManager.connectReaderToReceiver(OTFSignalReader.class,
-						OTFLaneSignalDrawer.class);
-				// drawer -> layer
-				this.connectionManager.connectReceiverToLayer(OTFLaneSignalDrawer.class,
-						OTFSignalLayer.class);
+			} 
+			else if (config.scenario().isUseSignalSystems()) {
+				SignalGroupStateChangeTracker signalTracker = new SignalGroupStateChangeTracker();
+				this.queueSimulation.getEventsManager().addHandler(signalTracker);
+				SignalsData signalsData = this.queueSimulation.getScenario().getScenarioElement(SignalsData.class);
+				LaneDefinitions laneDefs = ((ScenarioImpl)this.queueSimulation.getScenario()).getLaneDefinitions();
+				SignalSystemsData systemsData = signalsData.getSignalSystemsData();
+				SignalGroupsData groupsData = signalsData.getSignalGroupsData();
+				this.otfServer.addAdditionalElement(new OTFSignalWriter(this.queueSimulation.getVisNetwork(), laneDefs, systemsData, groupsData , signalTracker));
+				this.connectionManager.connectWriterToReader(OTFSignalWriter.class, OTFSignalReader.class);
+				this.connectionManager.connectReaderToReceiver(OTFSignalReader.class, OTFLaneSignalDrawer.class);
 				config.otfVis().setScaleQuadTreeRect(true);
 			}
 

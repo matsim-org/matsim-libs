@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * OTFLanesConnectionManagerFactory
+ * SignalGroupStateChangeTracker
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,36 +17,35 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.signalsystems.otfvis;
+package org.matsim.signalsystems.otfvis.io;
 
-import org.matsim.lanes.otfvis.drawer.OTFLaneSignalDrawer;
-import org.matsim.signalsystems.otfvis.io.OTFSignalReader;
-import org.matsim.signalsystems.otfvis.io.OTFSignalWriter;
-import org.matsim.signalsystems.otfvis.layer.OTFSignalLayer;
-import org.matsim.vis.otfvis.data.OTFConnectionManager;
-import org.matsim.vis.otfvis.data.OTFConnectionManagerFactory;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.matsim.core.events.SignalGroupStateChangedEvent;
+import org.matsim.core.events.handler.SignalGroupStateChangedEventHandler;
 
 
 /**
  * @author dgrether
  *
  */
-public class OTFSignalsConnectionManagerFactory implements OTFConnectionManagerFactory {
+public class SignalGroupStateChangeTracker implements SignalGroupStateChangedEventHandler{
 
-  private OTFConnectionManagerFactory delegate;
+	private List<SignalGroupStateChangedEvent> signalGroupEvents = new ArrayList<SignalGroupStateChangedEvent>();
+	
+	@Override
+	public void handleEvent(SignalGroupStateChangedEvent event) {
+		this.signalGroupEvents.add(event);
+	}
 
-  public OTFSignalsConnectionManagerFactory(OTFConnectionManagerFactory delegate) {
-    this.delegate = delegate;
-  }
-  
-  @Override
-  public OTFConnectionManager createConnectionManager() {
-    OTFConnectionManager connect = this.delegate.createConnectionManager();
-    connect.connectQLinkToWriter(OTFSignalWriter.class);
-    connect.connectWriterToReader(OTFSignalWriter.class, OTFSignalReader.class);
-    connect.connectReaderToReceiver(OTFSignalReader.class, OTFLaneSignalDrawer.class);
-    connect.connectReceiverToLayer(OTFLaneSignalDrawer.class, OTFSignalLayer.class);
-    return connect;
-  }
+	@Override
+	public void reset(int iteration) {
+		this.signalGroupEvents.clear();
+	}
+
+	public List<SignalGroupStateChangedEvent> getSignalGroupEvents() {
+		return signalGroupEvents;
+	}
 
 }

@@ -23,20 +23,22 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Point2D.Double;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.List;
+import java.util.Collection;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.ByteBufferUtils;
-import org.matsim.ptproject.qsim.interfaces.NetsimLink;
+import org.matsim.lanes.Lane;
+import org.matsim.lanes.LaneDefinitions;
+import org.matsim.lanes.LanesToLinkAssignment;
 import org.matsim.ptproject.qsim.qnetsimengine.QLane;
 import org.matsim.ptproject.qsim.qnetsimengine.QLinkLanesImpl;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
 import org.matsim.vis.otfvis.data.OTFServerQuad2;
-import org.matsim.vis.otfvis.data.OTFWriterFactory;
+import org.matsim.vis.snapshots.writers.VisLink;
+import org.matsim.vis.snapshots.writers.VisNetwork;
 import org.matsim.vis.vecmathutils.VectorUtils;
 
 
@@ -44,123 +46,158 @@ import org.matsim.vis.vecmathutils.VectorUtils;
  * @author dgrether
  *
  */
-public class OTFLaneWriter extends OTFDataWriter<NetsimLink> implements OTFWriterFactory<NetsimLink>{
+public class OTFLaneWriter extends OTFDataWriter<Void> {
 	
 	private static final Logger log = Logger.getLogger(OTFLaneWriter.class);
 	
 	public static final boolean DRAW_LINK_TO_LINK_LINES = true;
 	
-	private double linkScale = 1.0;
+	private double linkScale = 0.8;
 
-	protected boolean isQLinkLanesReader;
+	private final transient VisNetwork network;
+
+	private final transient LaneDefinitions lanes;
 	
-	public OTFLaneWriter(){
+	public OTFLaneWriter(VisNetwork visNetwork, LaneDefinitions laneDefinitions){
+		this.network = visNetwork;
+		this.lanes = laneDefinitions;
 	}
 	
 	@Override
 	public void writeConstData(ByteBuffer out) throws IOException {
-		if (! (this.src instanceof QLinkLanesImpl)) {
-			out.putShort((short)0);
-			this.isQLinkLanesReader = false;
+//		log.error("OffsetEast: " + OTFServerQuad2.offsetEast + " North: " + OTFServerQuad2.offsetNorth);
+		//write the data for the links
+		out.putInt(this.network.getVisLinks().size());
+		for (VisLink qLink : this.network.getVisLinks().values()) {
+			this.writeLinkData(out, qLink);
 		}
-		else {
-			out.putShort((short)1);
-			this.isQLinkLanesReader = true;
+		//write the data for the lanes
+		out.putInt(this.lanes.getLanesToLinkAssignments().size());
+		for (LanesToLinkAssignment l2l : this.lanes.getLanesToLinkAssignments().values()){
+			VisLink visLink = this.network.getVisLinks().get(l2l.getLinkId());
+			this.writeLaneData(out, visLink, l2l);
 		}
-		
-		Point2D.Double.Double linkStart = new Point2D.Double.Double(this.src.getLink().getFromNode().getCoord().getX() - OTFServerQuad2.offsetEast,
-					this.src.getLink().getFromNode().getCoord().getY() - OTFServerQuad2.offsetNorth);
-			
-			Point2D.Double.Double linkEnd = new Point2D.Double.Double(this.src.getLink().getToNode().getCoord().getX() - OTFServerQuad2.offsetEast,
-					this.src.getLink().getToNode().getCoord().getY() - OTFServerQuad2.offsetNorth);
-			//calculate length and normal
-			Point2D.Double.Double deltaLink = new Point2D.Double.Double(linkEnd.x - linkStart.x, linkEnd.y - linkStart.y);
-			double euclideanLinkLength = this.calculateEuclideanLinkLength(deltaLink);
-			Point2D.Double.Double deltaLinkNorm = new Point2D.Double.Double(deltaLink.x / euclideanLinkLength, deltaLink.y / euclideanLinkLength);
-			Point2D.Double normalizedOrthogonal = new Point2D.Double(deltaLinkNorm.y, - deltaLinkNorm.x);
-			
-			//calculate the correction factor if real link length is different than euclidean distance
-			double linkLengthCorrectionFactor = euclideanLinkLength / this.src.getLink().getLength();
-			
-			//scale the link (will be rewritten)
-			Tuple<Double, Double> scaledLink = VectorUtils.scaleVector(linkStart, linkEnd, this.linkScale);
-			Point2D.Double scaledLinkEnd = scaledLink.getSecond();
-			Point2D.Double scaledLinkStart = scaledLink.getFirst();
-			
-			//write link data
-			out.putDouble(scaledLinkStart.x);
-			out.putDouble(scaledLinkStart.y);
-			out.putDouble(scaledLinkEnd.x);
-			out.putDouble(scaledLinkEnd.y);
-			out.putDouble(deltaLinkNorm.x);
-			out.putDouble(deltaLinkNorm.y);
-			out.putDouble(normalizedOrthogonal.x);
-			out.putDouble(normalizedOrthogonal.y);
-			out.putDouble(this.src.getLink().getNumberOfLanes());
-			
-		if (this.isQLinkLanesReader){
-			int maxAlignment = 0;
-			//write lane data
-			List<QLane> qLanes = ((QLinkLanesImpl)this.src).getQueueLanes();
-			out.putInt(qLanes.size());
-			for (QLane qLane : qLanes){
-				String id = qLane.getId().toString();
-				double startPoint = (qLane.getQLink().getLink().getLength() -  qLane.getLane().getStartsAtMeterFromLinkEnd()) * linkLengthCorrectionFactor;
-//				log.error("lane " + qLane.getId() + " starts at: " + startPoint);
-				double endPoint = startPoint + (qLane.getLength() * linkLengthCorrectionFactor);
-				int alignment = qLane.getLane().getAlignment();
-				ByteBufferUtils.putString(out, id);
-				out.putDouble(startPoint);
-				out.putDouble(endPoint);
-				out.putInt(alignment);
-				out.putDouble(qLane.getLane().getNumberOfRepresentedLanes());
-				if (alignment > maxAlignment){
-					maxAlignment = alignment;
-				}
-				//write data for link2link lines
-				if (DRAW_LINK_TO_LINK_LINES){
-					if (qLane.getLane().getToLinkIds() != null){
-						out.putInt(qLane.getLane().getToLinkIds().size());
-						for (Id toLinkId :  qLane.getLane().getToLinkIds()){
-							Link toLink = ((LinkImpl) this.src.getLink()).getNetwork().getLinks().get(toLinkId);
-							if (toLink == null) {
-								throw new IllegalStateException("No Link found with id: " + toLinkId + " this is set as toLink of Lane " + qLane.getId() + " on Link " + qLane.getQLink().getLink().getId());
-							}
-							Point2D.Double normalOfToLink = calculateNormalOfLink(toLink);
-							out.putDouble(toLink.getFromNode().getCoord().getX() - OTFServerQuad2.offsetEast);
-							out.putDouble(toLink.getFromNode().getCoord().getY() - OTFServerQuad2.offsetNorth);
-							out.putDouble(normalOfToLink.x);
-							out.putDouble(normalOfToLink.y);
-							out.putDouble(toLink.getNumberOfLanes());
-						}
-					}
-					else {
-						out.putInt(0);
-					}
-				}
-			}
-			out.putInt(maxAlignment);
-		}	
 	}
 	
-	private Point2D.Double calculateNormalOfLink(Link link) {
-		//get coordinates
-		Point2D.Double linkStartPoint = new Point2D.Double(link.getFromNode().getCoord().getX() - OTFServerQuad2.offsetEast,
-				link.getFromNode().getCoord().getY() - OTFServerQuad2.offsetNorth);
-		Point2D.Double linkEndPoint = new Point2D.Double(link.getToNode().getCoord().getX()  - OTFServerQuad2.offsetEast,
-				link.getToNode().getCoord().getY() - OTFServerQuad2.offsetNorth);
-		//scale
-		Tuple<Double, Double> scaledTuple = VectorUtils.scaleVector(linkStartPoint, linkEndPoint, this.linkScale);
-		linkStartPoint = scaledTuple.getFirst();
-		linkEndPoint = scaledTuple.getSecond();
-
-		//calculate middle of toLink start
-		Point2D.Double deltaLink = new Point2D.Double(linkEndPoint.x - linkStartPoint.x, linkEndPoint.y - linkStartPoint.y);
+	private void writeLinkData(ByteBuffer out, VisLink visLink){
+		Point2D.Double.Double linkStart = new Point2D.Double.Double(visLink.getLink().getFromNode().getCoord().getX() - OTFServerQuad2.offsetEast,
+				visLink.getLink().getFromNode().getCoord().getY() - OTFServerQuad2.offsetNorth);
+		
+		Point2D.Double.Double linkEnd = new Point2D.Double.Double(visLink.getLink().getToNode().getCoord().getX() - OTFServerQuad2.offsetEast,
+				visLink.getLink().getToNode().getCoord().getY() - OTFServerQuad2.offsetNorth);
+		//calculate length and normal
+		Point2D.Double.Double deltaLink = new Point2D.Double.Double(linkEnd.x - linkStart.x, linkEnd.y - linkStart.y);
 		double euclideanLinkLength = this.calculateEuclideanLinkLength(deltaLink);
-		Point2D.Double deltaLinkNorm = new Point2D.Double(deltaLink.x / euclideanLinkLength, deltaLink.y / euclideanLinkLength);
-		Point2D.Double normalizedLinkOrthogonal = new Point2D.Double(deltaLinkNorm.y, - deltaLinkNorm.x);
-		return normalizedLinkOrthogonal;
+		Point2D.Double.Double deltaLinkNorm = new Point2D.Double.Double(deltaLink.x / euclideanLinkLength, deltaLink.y / euclideanLinkLength);
+		Point2D.Double normalizedOrthogonal = new Point2D.Double(deltaLinkNorm.y, - deltaLinkNorm.x);
+		
+		//calculate the correction factor if real link length is different than euclidean distance
+//		double linkLengthCorrectionFactor = euclideanLinkLength / qLink.getLink().getLength();
+		
+		//scale the link (will be rewritten)
+		Tuple<Double, Double> scaledLink = VectorUtils.scaleVector(linkStart, linkEnd, this.linkScale);
+		Point2D.Double scaledLinkEnd = scaledLink.getSecond();
+		Point2D.Double scaledLinkStart = scaledLink.getFirst();
+		
+		log.error("Link: " + visLink.getLink().getId() + " start (x,y): (" + scaledLinkStart.x + ", " + scaledLinkStart.y + ") end (x,y): (" + scaledLinkEnd.x + ", " + scaledLinkEnd.y + ")");
+		
+		//write link data
+		ByteBufferUtils.putString(out, visLink.getLink().getId().toString());
+		out.putDouble(scaledLinkStart.x);
+		out.putDouble(scaledLinkStart.y);
+		out.putDouble(scaledLinkEnd.x);
+		out.putDouble(scaledLinkEnd.y);
+		out.putDouble(deltaLinkNorm.x);
+		out.putDouble(deltaLinkNorm.y);
+		out.putDouble(normalizedOrthogonal.x);
+		out.putDouble(normalizedOrthogonal.y);
+		out.putDouble(visLink.getLink().getNumberOfLanes());
+		Collection<? extends Link> outlinks = visLink.getLink().getToNode().getOutLinks().values();
+		out.putInt(outlinks.size());
+		for (Link outLink : outlinks){
+			ByteBufferUtils.putString(out, outLink.getId().toString());
+		}
+
 	}
+	
+	private void writeLaneData(ByteBuffer out, VisLink visLink, LanesToLinkAssignment l2l){
+		ByteBufferUtils.putString(out, l2l.getLinkId().toString());
+		int maxAlignment = 0;
+		//write lane data
+		int noLanes = l2l.getLanes().size();
+		out.putInt(noLanes);
+		//write the lane data
+		for (Lane lane : l2l.getLanes().values()){
+			String id = lane.getId().toString();
+			double startPoint = (visLink.getLink().getLength() -  lane.getStartsAtMeterFromLinkEnd()) * this.linkScale;//linkLengthCorrectionFactor;
+//			log.error("lane " + qLane.getId() + " starts at: " + startPoint);
+			QLane ql = this.getQLane(lane.getId(), (QLinkLanesImpl)visLink);
+			double endPoint = startPoint + (ql.getLength() *  this.linkScale);//*linkLengthCorrectionFactor);
+			int alignment = lane.getAlignment();
+			ByteBufferUtils.putString(out, id);
+			out.putDouble(startPoint);
+			out.putDouble(endPoint);
+			out.putInt(alignment);
+			out.putDouble(lane.getNumberOfRepresentedLanes());
+			if (alignment > maxAlignment) {
+				maxAlignment = alignment;
+			}
+		}
+		out.putInt(maxAlignment);
+
+		if (DRAW_LINK_TO_LINK_LINES){
+			//write the connections
+			for (Lane lane : l2l.getLanes().values()){
+				ByteBufferUtils.putString(out, lane.getId().toString());
+				//write data for link2link lines
+				this.writeLaneToLinkConnections(out, visLink, lane);
+				this.writeLaneToLaneConnections(out, visLink, lane);
+			} 
+		}
+	}
+	
+	private void writeLaneToLaneConnections(ByteBuffer out, VisLink visLink, Lane lane) {
+		if (lane.getToLaneIds() != null){
+			out.putInt(lane.getToLaneIds().size());
+			for (Id toLaneId :  lane.getToLaneIds()){
+				ByteBufferUtils.putString(out, toLaneId.toString());
+			}
+		}
+		else {
+			out.putInt(0);
+		}
+	}
+
+	private void writeLaneToLinkConnections(ByteBuffer out, VisLink visLink, Lane lane){
+		if (lane.getToLinkIds() != null){
+			out.putInt(lane.getToLinkIds().size());
+			for (Id toLinkId :  lane.getToLinkIds()){
+				ByteBufferUtils.putString(out, toLinkId.toString());
+			}
+		}
+		else {
+			out.putInt(0);
+		}
+	}
+	
+//	private Point2D.Double calculateNormalOfLink(Link link) {
+//		//get coordinates
+//		Point2D.Double linkStartPoint = new Point2D.Double(link.getFromNode().getCoord().getX() - OTFServerQuad2.offsetEast,
+//				link.getFromNode().getCoord().getY() - OTFServerQuad2.offsetNorth);
+//		Point2D.Double linkEndPoint = new Point2D.Double(link.getToNode().getCoord().getX()  - OTFServerQuad2.offsetEast,
+//				link.getToNode().getCoord().getY() - OTFServerQuad2.offsetNorth);
+//		//scale
+//		Tuple<Double, Double> scaledTuple = VectorUtils.scaleVector(linkStartPoint, linkEndPoint, this.linkScale);
+//		linkStartPoint = scaledTuple.getFirst();
+//		linkEndPoint = scaledTuple.getSecond();
+//
+//		//calculate middle of toLink start
+//		Point2D.Double deltaLink = new Point2D.Double(linkEndPoint.x - linkStartPoint.x, linkEndPoint.y - linkStartPoint.y);
+//		double euclideanLinkLength = this.calculateEuclideanLinkLength(deltaLink);
+//		Point2D.Double deltaLinkNorm = new Point2D.Double(deltaLink.x / euclideanLinkLength, deltaLink.y / euclideanLinkLength);
+//		Point2D.Double normalizedLinkOrthogonal = new Point2D.Double(deltaLinkNorm.y, - deltaLinkNorm.x);
+//		return normalizedLinkOrthogonal;
+//	}
 	
 	
   private double calculateEuclideanLinkLength(Point2D.Double deltaLink) {
@@ -173,10 +210,15 @@ public class OTFLaneWriter extends OTFDataWriter<NetsimLink> implements OTFWrite
 		//nothing to do as lanes are not dynamic
 	}
 
-	@Override
-	public OTFDataWriter<NetsimLink> getWriter() {
-		return new OTFLaneWriter();
+	private QLane getQLane(Id laneId, QLinkLanesImpl link){
+		for (QLane lane : link.getQueueLanes()){
+			if (lane.getId().equals(laneId)){
+				return lane;
+			}
+		}
+		throw new IllegalArgumentException("QLane Id " + laneId + "on link Id" + link.getLink().getId() + "  not found. Check configuration!");
 	}
 
+	
 
 }

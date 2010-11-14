@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DgSimpleStaticNetLayer
+ * OTFSignalGroup
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,26 +17,39 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.lanes.otfvis.layer;
+package org.matsim.signalsystems.otfvis.io;
 
-import org.matsim.vis.otfvis.opengl.layer.SimpleStaticNetLayer;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.matsim.signalsystems.control.SignalGroupState;
 
 
 /**
  * @author dgrether
  *
  */
-public class OTFLaneLayer extends SimpleStaticNetLayer {
+public class OTFSignalGroup {
 
-	/**
-	 * 
-	 */
-	public OTFLaneLayer() {
+	private String id;
+	private List<OTFSignal> signalPositions = new ArrayList<OTFSignal>();
+	
+	OTFSignalGroup(String id){
+		this.id = id;
+	}
+	
+	String getId() {
+		return this.id;
 	}
 
-	@Override
-	public int getDrawOrder() {
-		return 10;
+	public void setState(SignalGroupState state) {
+		for (OTFSignal p : this.signalPositions){
+			p.setState(state);
+		}
+	}
+
+	public void addSignal(OTFSignal pos) {
+		this.signalPositions.add(pos);
 	}
 
 	

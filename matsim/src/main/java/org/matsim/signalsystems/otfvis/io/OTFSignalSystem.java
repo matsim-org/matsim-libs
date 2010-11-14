@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * LaneToLinkData
+ * OTFSignalSystem
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,37 +17,35 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.lanes.otfvis.io;
+package org.matsim.signalsystems.otfvis.io;
 
-import java.awt.geom.Point2D;
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
  * @author dgrether
  *
  */
-public class OTFLaneToLinkData{
+public class OTFSignalSystem {
+	
+	private String id;
+	private Map<String, OTFSignalGroup> signalGroups = new HashMap<String, OTFSignalGroup>();
 
-	private Point2D.Double startPoint;
-	private double numberOfLanes;
-	private Point2D.Double normal;
-
-	public OTFLaneToLinkData(Point2D.Double startPoint, Point2D.Double normal, double toLinkNumberOfLanes) {
-		this.startPoint = startPoint;
-		this.normal = normal;
-		this.numberOfLanes = toLinkNumberOfLanes;
-	}
-	
-	public Point2D.Double getStartPoint(){
-		return this.startPoint;
-	}
-	
-	public Point2D.Double getNormalVector(){
-		return this.normal;
-	}
-	
-	public double getNumberOfLanes(){
-		return this.numberOfLanes;
+	public OTFSignalSystem(String id){
+		this.id = id;
 	}
 
+	public String getId() {
+		return this.id;
+	}
+
+	public void addOTFSignalGroup(OTFSignalGroup group){
+		this.signalGroups.put(group.getId(), group);
+	}
+	
+	public Map<String, OTFSignalGroup> getOTFSignalGroups(){
+		return this.signalGroups;
+	}
+	
 }

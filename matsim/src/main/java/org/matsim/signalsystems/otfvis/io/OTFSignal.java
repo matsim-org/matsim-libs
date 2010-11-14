@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * OTFLanesLinkData
+ * OTFSignalPosition
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,75 +17,46 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.lanes.otfvis.io;
+package org.matsim.signalsystems.otfvis.io;
 
-import java.awt.geom.Point2D;
-import java.awt.geom.Point2D.Double;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.matsim.lanes.otfvis.io.OTFLinkWLanes;
+import org.matsim.signalsystems.control.SignalGroupState;
 
 
 /**
  * @author dgrether
  *
  */
-public class OTFLaneLinkData {
+public class OTFSignal {
 
-	private Point2D.Double linkStart;
-	private Point2D.Double linkEnd;
-	private Double normalizedLinkVector;
-	private Double linkOrthogonalVector;
-	private double numberOfLanes = 1.0;
-	private int maximalAlignment = 0;
+	private String id;
+	private SignalGroupState state;
+	private List<OTFLinkWLanes> turningMoveRestrictions = null;
 	
-	public void setLinkStart(double x, double y) {
-		this.linkStart = new Point2D.Double(x, y);
+	public OTFSignal(String signalId) {
+		this.id = signalId;
 	}
 
-	public void setLinkEnd(double x, double y) {
-		this.linkEnd = new Point2D.Double(x, y);
-	}
-
-	public void setNormalizedLinkVector(double x, double y) {
-		this.normalizedLinkVector = new Point2D.Double(x, y);
+	public void setState(SignalGroupState state){
+		this.state = state;
 	}
 	
-	public void setLinkOrthogonalVector(double x, double y){
-		this.linkOrthogonalVector = new Point2D.Double(x, y);
-	}
-
-	
-	public Point2D.Double getLinkStart() {
-		return linkStart;
-	}
-
-	
-	public Point2D.Double getLinkEnd() {
-		return linkEnd;
-	}
-
-	
-	public Double getNormalizedLinkVector() {
-		return normalizedLinkVector;
-	}
-
-	
-	public Double getLinkOrthogonalVector() {
-		return linkOrthogonalVector;
-	}
-
-	public void setNumberOfLanes(double nrLanes) {
-		this.numberOfLanes = nrLanes;
-	}
-
-	public double getNumberOfLanes() {
-		return this.numberOfLanes;
-	}
-
-	public void setMaximalAlignment(int maxAlign) {
-		this.maximalAlignment = maxAlign;
-	}
-
-	public int getMaximalAlignment(){
-		return this.maximalAlignment;
+	public SignalGroupState getSignalGroupState(){
+		return this.state;
 	}
 	
+	public List<OTFLinkWLanes> getTurningMoveRestrictions(){
+		return this.turningMoveRestrictions;
+	}
+
+	public void addTurningMoveRestriction(OTFLinkWLanes toLink) {
+		if (this.turningMoveRestrictions == null){
+			this.turningMoveRestrictions = new ArrayList<OTFLinkWLanes>();
+		}
+		this.turningMoveRestrictions.add(toLink);
+	}
+
 }
