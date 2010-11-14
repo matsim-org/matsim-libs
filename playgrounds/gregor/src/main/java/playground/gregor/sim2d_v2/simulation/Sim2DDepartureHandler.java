@@ -21,7 +21,7 @@ package playground.gregor.sim2d_v2.simulation;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.core.mobsim.framework.PersonAgent;
+import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.ptproject.qsim.interfaces.DepartureHandler;
 
 /**
@@ -48,7 +48,7 @@ public class Sim2DDepartureHandler implements DepartureHandler {
 	 * org.matsim.api.core.v01.Id, org.matsim.api.core.v01.population.Leg)
 	 */
 	@Override
-	public boolean handleDeparture(double now, PersonAgent agent, Id linkId, Leg leg) {
+	public boolean handleDeparture(double now, PlanAgent agent, Id linkId, Leg leg) {
 		// TODO new TransportMode is needed i.e. TransportMode.walk2d or the
 		// like
 		if (agent instanceof Agent2D) {

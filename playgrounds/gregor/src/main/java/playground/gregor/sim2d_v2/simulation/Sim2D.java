@@ -40,6 +40,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PersonAgent;
+import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.framework.listeners.SimulationListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationListenerManager;
 import org.matsim.core.utils.misc.Time;
@@ -335,12 +336,12 @@ public class Sim2D implements Mobsim {
 	 * .mobsim.framework.PersonAgent, org.matsim.api.core.v01.Id)
 	 */
 	@Override
-	public void agentDeparts(PersonAgent agent, Id linkId) {
+	public void agentDeparts(PlanAgent agent, Id linkId) {
 		double now = getSimTimer().getTimeOfDay();
 		Leg leg = agent.getCurrentLeg();
 		// Route route = leg.getRoute();
 		String mode = leg.getMode();
-		this.events.processEvent(this.events.getFactory().createAgentDepartureEvent(now, agent.getPerson().getId(), linkId, mode));
+		this.events.processEvent(this.events.getFactory().createAgentDepartureEvent(now, agent.getId(), linkId, mode));
 		if (handleKnownLegModeDeparture(now, agent, linkId, leg)) {
 			return;
 		} else {
@@ -356,7 +357,7 @@ public class Sim2D implements Mobsim {
 	 * @param leg
 	 * @return
 	 */
-	private boolean handleKnownLegModeDeparture(double now, PersonAgent agent, Id linkId, Leg leg) {
+	private boolean handleKnownLegModeDeparture(double now, PlanAgent agent, Id linkId, Leg leg) {
 		for (DepartureHandler departureHandler : this.departureHandlers) {
 			if (departureHandler.handleDeparture(now, agent, linkId, leg)) {
 				return true;
@@ -488,7 +489,7 @@ public class Sim2D implements Mobsim {
 	 * (org.matsim.core.mobsim.framework.PersonAgent)
 	 */
 	@Override
-	public void registerAgentAtPtWaitLocation(PersonAgent agent) {
+	public void registerAgentAtPtWaitLocation(PlanAgent planAgent) {
 		throw new RuntimeException("not implemented");
 	}
 
@@ -500,7 +501,7 @@ public class Sim2D implements Mobsim {
 	 * (org.matsim.core.mobsim.framework.PersonAgent)
 	 */
 	@Override
-	public void unregisterAgentAtPtWaitLocation(PersonAgent agent) {
+	public void unregisterAgentAtPtWaitLocation(PlanAgent planAgent) {
 		throw new RuntimeException("not implemented");
 	}
 
