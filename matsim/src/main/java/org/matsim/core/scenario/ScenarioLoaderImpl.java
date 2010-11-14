@@ -41,6 +41,7 @@ import org.matsim.households.HouseholdsReaderV10;
 import org.matsim.lanes.LaneDefinitions;
 import org.matsim.lanes.LaneDefinitionsV11ToV20Conversion;
 import org.matsim.lanes.MatsimLaneDefinitionsReader;
+import org.matsim.signalsystems.data.SignalsScenarioLoader;
 import org.xml.sax.SAXException;
 
 /**
@@ -107,6 +108,9 @@ public class ScenarioLoaderImpl implements ScenarioLoader {
 
 		if (this.config.scenario().isUseLanes()) {
 			this.loadLanes();
+		}
+		if (this.config.scenario().isUseSignalSystems()){
+			this.scenario.addScenarioElement(new SignalsScenarioLoader(this.config.signalSystems()).loadSignalsData());
 		}
 		return getScenario();
 	}
