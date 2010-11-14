@@ -26,7 +26,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.controler.ControlerIO;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.lanes.otfvis.OTFLanesConnectionManagerFactory;
 import org.matsim.ptproject.qsim.interfaces.NetsimNetwork;
 import org.matsim.vis.otfvis.data.OTFConnectionManagerFactory;
 import org.matsim.vis.otfvis.data.fileio.OTFFileWriter;
@@ -86,13 +85,6 @@ import org.matsim.vis.snapshots.writers.TransimsSnapshotWriter;
         OTFFileWriter writer = null;
 
         OTFConnectionManagerFactory connectionManagerFactory = new OTFFileWriterQSimConnectionManagerFactory();
-        if (scenario.getConfig().scenario().isUseLanes() && (!scenario.getConfig().scenario().isUseSignalSystems())) {
-          connectionManagerFactory = new OTFLanesConnectionManagerFactory(connectionManagerFactory);
-        }
-        // this is not working as otfvis is not working out of the box with dyn data writers/readers
-//        else if (scenario.getConfig().scenario().isUseLanes() && scenario.getConfig().scenario().isUseSignalSystems()){
-//          connectionManagerFactory = new OTFSignalsConnectionManagerFactory(connectionManagerFactory);
-//        }
         writer = new OTFFileWriter(snapshotPeriod, new OTFQSimServerQuadBuilder(network), snapshotFile, connectionManagerFactory);
         this.snapshotWriters.add(writer);
       }
