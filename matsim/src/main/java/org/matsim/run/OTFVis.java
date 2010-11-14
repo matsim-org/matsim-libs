@@ -262,7 +262,7 @@ public class OTFVis {
 		client.setSwing(true);
 		client.run();
 		server.getSnapshotReceiver().finish();
-	}filename
+	}
 
 	public static final void convert(final String[] args) {
 		if ((args.length < 4) || (args.length > 5)) {
