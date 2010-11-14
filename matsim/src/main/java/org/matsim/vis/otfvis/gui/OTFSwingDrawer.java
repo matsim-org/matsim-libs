@@ -183,7 +183,7 @@ public class OTFSwingDrawer extends JComponent {
 		Graphics2D g2 = (Graphics2D) g;
 		parentDrawer.mouseMan.drawElements(g2);
 
-		boolean useAntiAliasing = true;
+		boolean useAntiAliasing = false;
 
 		if (useAntiAliasing ) {
 			g2.addRenderingHints(new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON));
