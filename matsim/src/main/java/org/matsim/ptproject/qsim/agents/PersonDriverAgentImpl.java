@@ -97,9 +97,10 @@ public class PersonDriverAgentImpl implements PersonDriverAgent {
 	 * If the Leg has not changed, calling this method should have no effect
 	 * on the Results of the Simulation!
 	 */
-	public final void resetCaches() {
+	void resetCaches() {
 		// moving this method not to WithinDay for the time being since it seems to make some sense to keep this where the internal are
 		// known best.  kai, oct'10
+		// Compromise: package-private here; making it public in the Withinday class.  kai, nov'10
 		
 		this.cachedNextLinkId = null;
 		this.cachedRouteLinkIds = null;

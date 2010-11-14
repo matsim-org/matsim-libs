@@ -70,6 +70,9 @@ public class ExperimentalBasicWithindayAgent extends PersonDriverAgentImpl imple
 		super.calculateDepartureTime( act ) ;
 	}
 
-
+	@Override
+	public final void resetCaches() {
+		super.resetCaches() ;
+	}
 
 }
