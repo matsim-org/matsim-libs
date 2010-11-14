@@ -31,7 +31,7 @@ import org.matsim.vis.otfvis.OTFVisMobsimFeature;
 
 public class FourWaysVisNoLanes {
 
-	public static final String TESTINPUTDIR = "../matsim/test/input/org/matsim/signalsystems/TravelTimeFourWaysTest/";
+	public static final String TESTINPUTDIR = "../../matsim/test/input/org/matsim/signalsystems/TravelTimeFourWaysTest/";
 	
 	/**
 	 * @param args
@@ -40,10 +40,7 @@ public class FourWaysVisNoLanes {
 
 
     String netFile = TESTINPUTDIR + "network.xml.gz";
-    String lanesFile  = TESTINPUTDIR + "testLaneDefinitions_v1.1.xml";
     String popFile = TESTINPUTDIR + "plans.xml.gz";
-    String signalFile = TESTINPUTDIR + "testSignalSystems_v1.1.xml";
-    String signalConfigFile = TESTINPUTDIR + "testSignalSystemConfigurations_v1.1.xml";
     
     
     ScenarioImpl scenario = new ScenarioImpl();
@@ -53,26 +50,17 @@ public class FourWaysVisNoLanes {
     scenario.getConfig().getQSimConfigGroup().setSnapshotStyle("queue");
     scenario.getConfig().getQSimConfigGroup().setStuckTime(100.0);
     
-    scenario.getConfig().network().setLaneDefinitionsFile(lanesFile);
-//    scenario.getConfig().scenario().setUseLanes(true);
-    
-    scenario.getConfig().signalSystems().setSignalSystemFile(signalFile);
-    scenario.getConfig().signalSystems().setSignalSystemConfigFile(signalConfigFile);
-//    scenario.getConfig().scenario().setUseSignalSystems(true);
     
     ScenarioLoaderImpl loader = new ScenarioLoaderImpl(scenario);
     loader.loadScenario();
     
     EventsManager events = new EventsManagerImpl();
-	QSim otfVisQSim = new QSim(scenario, events);
-	OTFVisMobsimFeature queueSimulationFeature = new OTFVisMobsimFeature(otfVisQSim);
-	otfVisQSim.addFeature(queueSimulationFeature);
-	queueSimulationFeature.setVisualizeTeleportedAgents(scenario.getConfig().otfVis().isShowTeleportedAgents());
+    QSim otfVisQSim = new QSim(scenario, events);
+    OTFVisMobsimFeature queueSimulationFeature = new OTFVisMobsimFeature(otfVisQSim);
+    otfVisQSim.addFeature(queueSimulationFeature);
+    queueSimulationFeature.setVisualizeTeleportedAgents(scenario.getConfig().otfVis().isShowTeleportedAgents());
     
     QSim client = otfVisQSim;
-//    client.setConnectionManager(new DgConnectionManagerFactory().createConnectionManager());
-//    client.setLaneDefinitions(scenario.getLaneDefinitions());
-//    client.setSignalSystems(scenario.getSignalSystems(), scenario.getSignalSystemConfigurations());
     client.run();
 	}
 

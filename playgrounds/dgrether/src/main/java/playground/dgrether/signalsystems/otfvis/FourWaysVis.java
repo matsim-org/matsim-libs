@@ -31,8 +31,7 @@ import org.matsim.signalsystems.data.SignalsScenarioLoader;
 import org.matsim.signalsystems.model.QSimSignalEngine;
 import org.matsim.signalsystems.model.SignalEngine;
 import org.matsim.signalsystems.model.SignalSystemsManager;
-
-import playground.dgrether.signalsystems.OTFVisSignalsMobsimFeature;
+import org.matsim.vis.otfvis.OTFVisMobsimFeature;
 
 
 public class FourWaysVis {
@@ -74,16 +73,15 @@ public class FourWaysVis {
 		
 		SignalsScenarioLoader signalsLoader = new SignalsScenarioLoader(scenario.getConfig().signalSystems());
 		SignalsData signalsData = signalsLoader.loadSignalsData();
+		scenario.addScenarioElement(signalsData);
 		FromDataBuilder builder = new FromDataBuilder(signalsData, events);
 		SignalSystemsManager manager = builder.createAndInitializeSignalSystemsManager();
 		SignalEngine engine = new QSimSignalEngine(manager);
 
-		//TODO remove
-		scenario.getConfig().scenario().setUseSignalSystems(false);
 		
 		QSim otfVisQSim = new QSim(scenario, events);
 		otfVisQSim.addQueueSimulationListeners(engine);
-		OTFVisSignalsMobsimFeature qSimFeature = new OTFVisSignalsMobsimFeature(otfVisQSim);
+		OTFVisMobsimFeature qSimFeature = new OTFVisMobsimFeature(otfVisQSim);
 		otfVisQSim.addFeature(qSimFeature);
 		qSimFeature.setVisualizeTeleportedAgents(scenario.getConfig().otfVis().isShowTeleportedAgents());
 		

@@ -35,7 +35,7 @@ import playground.dgrether.DgPaths;
  */
 public class FourWaysVisMviTest {
 
-  public static final String TESTINPUTDIR = "../matsim/test/input/org/matsim/signalsystems/TravelTimeFourWaysTest/";
+  public static final String TESTINPUTDIR = "../../matsim/test/input/org/matsim/signalsystems/TravelTimeFourWaysTest/";
   
   /**
    * @param args
@@ -44,11 +44,12 @@ public class FourWaysVisMviTest {
 
     final int iteration = 0;
     
-    String netFile = TESTINPUTDIR + "network.xml.gz";
-    String lanesFile  = TESTINPUTDIR + "testLaneDefinitions_v1.1.xml";
-    String popFile = TESTINPUTDIR + "plans.xml.gz";
-    String signalFile = TESTINPUTDIR + "testSignalSystems_v1.1.xml";
-    String signalConfigFile = TESTINPUTDIR + "testSignalSystemConfigurations_v1.1.xml";
+		String netFile = TESTINPUTDIR + "network.xml.gz";
+		String lanesFile  = TESTINPUTDIR + "testLaneDefinitions_v1.1.xml";
+		String popFile = TESTINPUTDIR + "plans.xml.gz";
+		String signalFile = TESTINPUTDIR + "testSignalSystems_v2.0.xml";
+		String signalGroupsFile = TESTINPUTDIR + "testSignalGroups_v2.0.xml";
+		String signalControlFile = TESTINPUTDIR + "testSignalControl_v2.0.xml";
     
     ScenarioImpl scenario = new ScenarioImpl();
     Config conf = scenario.getConfig();
@@ -67,9 +68,10 @@ public class FourWaysVisMviTest {
     conf.network().setLaneDefinitionsFile(lanesFile);
     conf.scenario().setUseLanes(true);
     
-    conf.signalSystems().setSignalSystemFile(signalFile);
-    conf.signalSystems().setSignalSystemConfigFile(signalConfigFile);
-    conf.scenario().setUseSignalSystems(true);
+		scenario.getConfig().signalSystems().setSignalSystemFile(signalFile);
+		scenario.getConfig().signalSystems().setSignalGroupsFile(signalGroupsFile);
+		scenario.getConfig().signalSystems().setSignalControlFile(signalControlFile);
+		scenario.getConfig().scenario().setUseSignalSystems(true);
     
     conf.controler().setFirstIteration(0);
     conf.controler().setLastIteration(0);
@@ -82,8 +84,9 @@ public class FourWaysVisMviTest {
     
     //open vis
     String filename = controler.getConfig().controler().getOutputDirectory();
-    filename += "/ITERS/it."+iteration+"/" + iteration + ".otfvis.mvi";
-    System.out.println(filename);
+    System.err.println(filename);
+    filename += "/ITERS/it."+ Integer.toString(iteration)+"/" + iteration + ".otfvis.mvi";
+    System.out.println("filename is: " + filename);
     OTFVis.main(new String[] {filename});
 
     
