@@ -26,22 +26,31 @@ import org.matsim.api.core.v01.Identifiable;
 
 
 /**
+ * Holds data modelling the physics of a signal on one link/lane. 
  * @author dgrether
  *
  */
 public interface SignalData extends Identifiable {
-
+	/**
+	 * @return the Id of the Signal 
+	 */
 	public Id getId();
-	
+	/**
+	 * @return the Id of the Link the signal is located on.
+	 */
 	public Id getLinkId();
 	
 	public void setLinkId(Id id);
-
+	/**
+	 * @return A Set of Lane Ids, if the signal is placed on cerain lanes. Maybe null or empty if the signal is
+	 * on the link.
+	 */
 	public Set<Id> getLaneIds();
 	
 	public void addLaneId(Id laneId);
 	/**
-	 * @return may return null if no turning  move restrictions are set
+	 * @return Returns a Set of link Ids to that driving is allowed when the signal 
+	 * is activated. May return null if no turning  move restrictions are set.
 	 */
 	public Set<Id> getTurningMoveRestrictions();
 	
