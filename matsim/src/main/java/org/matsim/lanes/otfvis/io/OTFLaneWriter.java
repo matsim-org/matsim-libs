@@ -24,6 +24,8 @@ import java.awt.geom.Point2D.Double;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -47,7 +49,7 @@ import org.matsim.vis.vecmathutils.VectorUtils;
  *
  */
 public class OTFLaneWriter extends OTFDataWriter<Void> {
-	
+
 	private static final Logger log = Logger.getLogger(OTFLaneWriter.class);
 	
 	public static final boolean DRAW_LINK_TO_LINK_LINES = true;
@@ -66,40 +68,41 @@ public class OTFLaneWriter extends OTFDataWriter<Void> {
 	@Override
 	public void writeConstData(ByteBuffer out) throws IOException {
 //		log.error("OffsetEast: " + OTFServerQuad2.offsetEast + " North: " + OTFServerQuad2.offsetNorth);
+		Map<Id, java.lang.Double> linkLengthCorrectionFactorsByLinkId = new HashMap<Id, java.lang.Double>();
 		//write the data for the links
 		out.putInt(this.network.getVisLinks().size());
-		for (VisLink qLink : this.network.getVisLinks().values()) {
-			this.writeLinkData(out, qLink);
+		for (VisLink visLink : this.network.getVisLinks().values()) {
+			double corrFactor = this.writeLinkData(out, visLink);
+			linkLengthCorrectionFactorsByLinkId.put(visLink.getLink().getId(), corrFactor);
 		}
 		//write the data for the lanes
 		out.putInt(this.lanes.getLanesToLinkAssignments().size());
 		for (LanesToLinkAssignment l2l : this.lanes.getLanesToLinkAssignments().values()){
 			VisLink visLink = this.network.getVisLinks().get(l2l.getLinkId());
-			this.writeLaneData(out, visLink, l2l);
+			this.writeLaneData(out, visLink, l2l, linkLengthCorrectionFactorsByLinkId);
 		}
 	}
 	
-	private void writeLinkData(ByteBuffer out, VisLink visLink){
-		Point2D.Double.Double linkStart = new Point2D.Double.Double(visLink.getLink().getFromNode().getCoord().getX() - OTFServerQuad2.offsetEast,
+	private double writeLinkData(ByteBuffer out, VisLink visLink){
+		Point2D.Double linkStart = new Point2D.Double(visLink.getLink().getFromNode().getCoord().getX() - OTFServerQuad2.offsetEast,
 				visLink.getLink().getFromNode().getCoord().getY() - OTFServerQuad2.offsetNorth);
 		
-		Point2D.Double.Double linkEnd = new Point2D.Double.Double(visLink.getLink().getToNode().getCoord().getX() - OTFServerQuad2.offsetEast,
+		Point2D.Double linkEnd = new Point2D.Double(visLink.getLink().getToNode().getCoord().getX() - OTFServerQuad2.offsetEast,
 				visLink.getLink().getToNode().getCoord().getY() - OTFServerQuad2.offsetNorth);
 		//calculate length and normal
-		Point2D.Double.Double deltaLink = new Point2D.Double.Double(linkEnd.x - linkStart.x, linkEnd.y - linkStart.y);
+		Point2D.Double deltaLink = new Point2D.Double(linkEnd.x - linkStart.x, linkEnd.y - linkStart.y);
 		double euclideanLinkLength = this.calculateEuclideanLinkLength(deltaLink);
-		Point2D.Double.Double deltaLinkNorm = new Point2D.Double.Double(deltaLink.x / euclideanLinkLength, deltaLink.y / euclideanLinkLength);
-		Point2D.Double normalizedOrthogonal = new Point2D.Double(deltaLinkNorm.y, - deltaLinkNorm.x);
-		
 		//calculate the correction factor if real link length is different than euclidean distance
-//		double linkLengthCorrectionFactor = euclideanLinkLength / qLink.getLink().getLength();
+		double linkLengthCorrectionFactor = euclideanLinkLength / visLink.getLink().getLength();
+		Point2D.Double deltaLinkNorm = new Point2D.Double(deltaLink.x / euclideanLinkLength, deltaLink.y / euclideanLinkLength);
+		Point2D.Double normalizedOrthogonal = new Point2D.Double(deltaLinkNorm.y, - deltaLinkNorm.x);
 		
 		//scale the link (will be rewritten)
 		Tuple<Double, Double> scaledLink = VectorUtils.scaleVector(linkStart, linkEnd, this.linkScale);
 		Point2D.Double scaledLinkEnd = scaledLink.getSecond();
 		Point2D.Double scaledLinkStart = scaledLink.getFirst();
 		
-		log.error("Link: " + visLink.getLink().getId() + " start (x,y): (" + scaledLinkStart.x + ", " + scaledLinkStart.y + ") end (x,y): (" + scaledLinkEnd.x + ", " + scaledLinkEnd.y + ")");
+//		log.error("Link: " + visLink.getLink().getId() + " start (x,y): (" + scaledLinkStart.x + ", " + scaledLinkStart.y + ") end (x,y): (" + scaledLinkEnd.x + ", " + scaledLinkEnd.y + ")");
 		
 		//write link data
 		ByteBufferUtils.putString(out, visLink.getLink().getId().toString());
@@ -117,10 +120,12 @@ public class OTFLaneWriter extends OTFDataWriter<Void> {
 		for (Link outLink : outlinks){
 			ByteBufferUtils.putString(out, outLink.getId().toString());
 		}
-
+		return linkLengthCorrectionFactor;
 	}
 	
-	private void writeLaneData(ByteBuffer out, VisLink visLink, LanesToLinkAssignment l2l){
+	private void writeLaneData(ByteBuffer out, VisLink visLink, LanesToLinkAssignment l2l, Map<Id, java.lang.Double> linkLengthCorrectionFactorsByLinkId){
+		double linkLengthCorrectionFactor = linkLengthCorrectionFactorsByLinkId.get(visLink.getLink().getId());
+		//start to write the data
 		ByteBufferUtils.putString(out, l2l.getLinkId().toString());
 		int maxAlignment = 0;
 		//write lane data
@@ -129,10 +134,10 @@ public class OTFLaneWriter extends OTFDataWriter<Void> {
 		//write the lane data
 		for (Lane lane : l2l.getLanes().values()){
 			String id = lane.getId().toString();
-			double startPoint = (visLink.getLink().getLength() -  lane.getStartsAtMeterFromLinkEnd()) * this.linkScale;//linkLengthCorrectionFactor;
+			double startPoint = (visLink.getLink().getLength() -  lane.getStartsAtMeterFromLinkEnd()) * this.linkScale * linkLengthCorrectionFactor;
 //			log.error("lane " + qLane.getId() + " starts at: " + startPoint);
 			QLane ql = this.getQLane(lane.getId(), (QLinkLanesImpl)visLink);
-			double endPoint = startPoint + (ql.getLength() *  this.linkScale);//*linkLengthCorrectionFactor);
+			double endPoint = startPoint + (ql.getLength() *  this.linkScale * linkLengthCorrectionFactor);
 			int alignment = lane.getAlignment();
 			ByteBufferUtils.putString(out, id);
 			out.putDouble(startPoint);
