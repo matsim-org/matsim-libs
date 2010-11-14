@@ -34,6 +34,7 @@ import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.interfaces.NetsimLink;
 import org.matsim.ptproject.qsim.qnetsimengine.QNode;
 
@@ -147,7 +148,10 @@ public class MultiModalQLinkExtension {
 			// Check if PersonAgent has reached destination:
 			PersonDriverAgent driver = (PersonDriverAgent) tuple.getSecond();
 			if ((qLink.getLink().getId().equals(driver.getDestinationLinkId())) && (driver.chooseNextLinkId() == null)) {
-				driver.endLegAndAssumeControl(now);
+
+//				driver.endLegAndAssumeControl(now);
+				((QSim)this.simEngine.getMobsim()).endLegAndAssumeControl( driver, now ) ;
+
 			}
 			/*
 			 * The PersonAgent can leave, therefore we move him to the waitingToLeave Queue.

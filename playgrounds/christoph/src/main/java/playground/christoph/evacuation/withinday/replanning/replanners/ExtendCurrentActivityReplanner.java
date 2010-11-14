@@ -111,10 +111,10 @@ public class ExtendCurrentActivityReplanner extends WithinDayDuringActivityRepla
 			// If the agent is not in the activityEndsList return without doing anything else.
 			if (!found) return false;
 			
-			double oldDepartureTime = withinDayAgent.getDepartureTimeForLeg();
+			double oldDepartureTime = withinDayAgent.getActivityEndTime();
 			
 			withinDayPersonAgent.calculateDepartureTime(currentActivity);
-			double newDepartureTime = withinDayAgent.getDepartureTimeForLeg();
+			double newDepartureTime = withinDayAgent.getActivityEndTime();
 			withinDayPersonAgent.getMobsim().rescheduleActivityEnd(withinDayAgent, oldDepartureTime, newDepartureTime);
 			return true;
 		}

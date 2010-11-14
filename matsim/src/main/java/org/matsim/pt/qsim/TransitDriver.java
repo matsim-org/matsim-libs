@@ -85,6 +85,12 @@ public class TransitDriver extends AbstractTransitDriver {
 
 		this.getSimulation().getAgentCounter().decLiving();
 	}
+	
+	@Override
+	public Boolean endLegAndAdvancePlan() {
+		throw new RuntimeException("not yet implemented") ;
+	}
+	
 
 	@Override
 	public NetworkRoute getCarRoute() {
@@ -102,7 +108,7 @@ public class TransitDriver extends AbstractTransitDriver {
 	}
 
 	@Override
-	public double getDepartureTimeForLeg() {
+	public double getActivityEndTime() {
 		return this.departureTime;
 	}
 

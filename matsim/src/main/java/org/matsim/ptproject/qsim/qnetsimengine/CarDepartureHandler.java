@@ -89,7 +89,10 @@ public class CarDepartureHandler implements DepartureHandler {
 
 		if ((route.getEndLinkId().equals(linkId)) && (agent.chooseNextLinkId() == null)) {
 			// yyyy this should be handled at person level, not vehicle level.  kai, feb'10
-			agent.endLegAndAssumeControl(now);
+
+//			agent.endLegAndAssumeControl(now);
+			this.queueSimulation.endLegAndAssumeControl(agent, now) ;
+
 			qlink.addParkedVehicle(vehicle);
 		} else {
 			qlink.addDepartingVehicle(vehicle);

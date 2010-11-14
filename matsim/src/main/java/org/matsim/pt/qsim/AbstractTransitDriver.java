@@ -42,6 +42,7 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.ptproject.qsim.interfaces.Mobsim;
 import org.matsim.ptproject.qsim.qnetsimengine.QVehicle;
@@ -67,7 +68,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 	public abstract TransitRoute getTransitRoute();
 	public abstract Departure getDeparture();
 	@Override
-	public abstract double getDepartureTimeForLeg();
+	public abstract double getActivityEndTime();
 
 	public AbstractTransitDriver(Mobsim sim, TransitStopAgentTracker agentTracker2) {
 		super();
@@ -156,6 +157,11 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 		}		
 		this.sim.agentDeparts(this, this.getCurrentLeg().getRoute().getStartLinkId());
 	}
+	
+	@Override
+	public Boolean endActivityAndAdvancePlan() {
+		throw new RuntimeException("not yet implemented") ;
+	}
 
 	@Override
 	public void teleportToLink(final Id linkId) {
@@ -186,7 +192,8 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 		EventsManager events = this.sim.getEventsManager();
 		if (this.currentStop == null) {
 			this.currentStop = this.nextStop;
-			events.processEvent(new VehicleArrivesAtFacilityEventImpl(now, this.vehicle.getVehicle().getId(), stop.getId(), now - this.getDeparture().getDepartureTime() - this.currentStop.getDepartureOffset()));
+			events.processEvent(new VehicleArrivesAtFacilityEventImpl(now, this.vehicle.getVehicle().getId(), stop.getId(), 
+					now - this.getDeparture().getDepartureTime() - this.currentStop.getDepartureOffset()));
 		}
 	}
 
@@ -199,7 +206,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 	protected double longerStopTimeIfWeAreAheadOfSchedule(final double now,
 			final double stopTime) {
 		if ((this.nextStop.isAwaitDepartureTime()) && (this.nextStop.getDepartureOffset() != Time.UNDEFINED_TIME)) {
-			double earliestDepTime = getDepartureTimeForLeg() + this.nextStop.getDepartureOffset();
+			double earliestDepTime = getActivityEndTime() + this.nextStop.getDepartureOffset();
 			if (now + stopTime < earliestDepTime) {
 				return earliestDepTime - now;
 			}
@@ -209,7 +216,9 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 
 	private void depart(final double now) {
 		EventsManager events = this.sim.getEventsManager();
-		events.processEvent(new VehicleDepartsAtFacilityEventImpl(now, this.vehicle.getVehicle().getId(), this.currentStop.getStopFacility().getId(), now - this.getDeparture().getDepartureTime() - this.currentStop.getDepartureOffset()));
+		events.processEvent(new VehicleDepartsAtFacilityEventImpl(now, this.vehicle.getVehicle().getId(), 
+				this.currentStop.getStopFacility().getId(), 
+				now - this.getDeparture().getDepartureTime() - this.currentStop.getDepartureOffset()));
 		this.nextStop = (stopIterator.hasNext() ? stopIterator.next() : null);
 		if(this.nextStop == null) {
 			assertVehicleIsEmpty();
@@ -238,7 +247,8 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 			this.getSimulation().unregisterAgentAtPtWaitLocation( (PersonAgent) passenger ) ;
 			PersonDriverAgent agent = (PersonDriverAgent) passenger;
 			EventsManager events = this.sim.getEventsManager();
-			events.processEvent(((EventsFactoryImpl) events.getFactory()).createPersonEntersVehicleEvent(time, agent.getPerson().getId(), this.vehicle.getVehicle().getId(), this.getTransitRoute().getId()));
+			events.processEvent(((EventsFactoryImpl) events.getFactory()).createPersonEntersVehicleEvent(time, 
+					agent.getPerson().getId(), this.vehicle.getVehicle().getId(), this.getTransitRoute().getId()));
 		}
 		return handled;
 	}
@@ -251,7 +261,10 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 			EventsManager events = this.sim.getEventsManager();
 			events.processEvent(new PersonLeavesVehicleEventImpl(time, agent.getPerson().getId(), this.vehicle.getVehicle().getId(), this.getTransitRoute().getId()));
 			agent.teleportToLink(this.currentStop.getStopFacility().getLinkId());
-			agent.endLegAndAssumeControl(time);
+
+//			agent.endLegAndAssumeControl(time);
+			((QSim)this.sim).endLegAndAssumeControl( agent, time ) ;
+			
 		}
 		return handled;
 	}

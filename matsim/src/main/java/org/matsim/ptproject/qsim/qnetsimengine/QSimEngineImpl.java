@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Random;
 
+import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.helpers.AgentSnapshotInfoBuilder;
 import org.matsim.ptproject.qsim.interfaces.Mobsim;
 
@@ -58,13 +59,13 @@ public class QSimEngineImpl extends QSimEngineInternalI {
 	/*package*/  ArrayList<QLinkInternalI> simActivateThis = new ArrayList<QLinkInternalI>();
 
 	private final Random random;
-  private final Mobsim qsim;
+  private final QSim qsim;
 
   private final AgentSnapshotInfoBuilder positionInfoBuilder;
 private QNetwork qNetwork;
 private final double stucktimeCache;
 
-	public QSimEngineImpl(final Mobsim sim, final Random random) {
+	public QSimEngineImpl(final QSim sim, final Random random) {
     this.random = random;
     this.qsim = sim;
     this.positionInfoBuilder = new AgentSnapshotInfoBuilder( sim.getScenario() );
@@ -169,7 +170,7 @@ private final double stucktimeCache;
 	}
 
   @Override
-  public Mobsim getMobsim() {
+  public QSim getMobsim() {
     return this.qsim;
   }
 

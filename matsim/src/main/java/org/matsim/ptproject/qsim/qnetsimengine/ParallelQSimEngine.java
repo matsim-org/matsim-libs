@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.ptproject.qsim.interfaces.Mobsim;
+import org.matsim.ptproject.qsim.QSim;
 
 /**
  * An extended version of the QSimEngine that uses an array of
@@ -61,7 +61,7 @@ class ParallelQSimEngine extends QSimEngineImpl{
 	private CyclicBarrier endBarrier;
 
 
-	ParallelQSimEngine(final Mobsim sim, final Random random)
+	ParallelQSimEngine(final QSim sim, final Random random)
 	{
 		super(sim, random);
 		this.numOfThreads = this.getMobsim().getScenario().getConfig().getQSimConfigGroup().getNumberOfThreads();

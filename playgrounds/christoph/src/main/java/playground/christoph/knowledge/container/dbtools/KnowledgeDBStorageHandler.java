@@ -185,7 +185,7 @@ public class KnowledgeDBStorageHandler extends Thread implements ActivityStartEv
 		while (this.offsetActivityEndsList.peek() != null)
 		{
 			PersonAgent agent = this.offsetActivityEndsList.peek();
-			if (agent.getDepartureTimeForLeg() <= time + timeOffset)
+			if (agent.getActivityEndTime() <= time + timeOffset)
 			{
 				this.offsetActivityEndsList.poll();
 				this.addPerson((PersonImpl) agent.getPerson());

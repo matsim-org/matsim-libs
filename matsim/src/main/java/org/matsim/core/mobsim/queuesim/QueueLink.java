@@ -349,7 +349,7 @@ class QueueLink implements VisLink {
 			// Check if veh has reached destination:
 			if ((this.getLink().getId().equals(driver.getDestinationLinkId()))
 					&& (driver.chooseNextLinkId() == null)) {
-				driver.endLegAndAssumeControl(now);
+				QueueSimulation.endLegAndAssumeControl(driver,now);
 				this.processVehicleArrival(now, veh);
 				// remove _after_ processing the arrival to keep link active
 				this.vehQueue.poll();

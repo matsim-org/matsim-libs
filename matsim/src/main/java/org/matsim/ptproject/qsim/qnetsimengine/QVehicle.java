@@ -29,9 +29,6 @@ import org.matsim.vis.snapshots.writers.VisVehicle;
 @Deprecated // only makes sense for "queue" mobsims.  Should go somewhere else (I think).  kai, oct'10
 public interface QVehicle extends Identifiable, VisVehicle {
 
-	public PersonDriverAgent getDriver();
-	// yy presumably, this should return DriverAgent
-
 	public void setDriver(final PersonDriverAgent driver);
 	// yy presumably, this should set DriverAgent
 	
@@ -53,10 +50,5 @@ public interface QVehicle extends Identifiable, VisVehicle {
 
 	public void setEarliestLinkExitTime(final double time);
 	// yy not sure if this needs to be publicly exposed
-
-	/**
-	 * @return the <code>Vehicle</code> that this simulation vehicle represents
-	 */
-	public Vehicle getVehicle();
 
 }

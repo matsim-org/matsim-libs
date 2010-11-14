@@ -47,6 +47,7 @@ import org.matsim.core.mobsim.framework.DriverAgent;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
+import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.framework.listeners.SimulationListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationListenerManager;
 import org.matsim.core.utils.collections.Tuple;
@@ -92,6 +93,7 @@ import org.matsim.vis.snapshots.writers.VisNetwork;
 /**
  * Implementation of a queue-based transport simulation.
  * Lanes and SignalSystems are not initialized unless the setter are invoked.
+ * <p/>
  *
  * @author dstrippgen
  * @author mrieser
@@ -408,20 +410,33 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 				this.teleportationList.poll();
 				PersonAgent personAgent = entry.getSecond();
 				personAgent.teleportToLink(personAgent.getDestinationLinkId());
-				personAgent.endLegAndAssumeControl(now);
+				this.endLegAndAssumeControl(personAgent, now);
 			}
 			else {
 				break;
 			}
 		}
 	}
-
-
+	
+	/**
+	 * central call ...
+	 */
+	public final void endLegAndAssumeControl( PlanAgent planAgent, double now ) {
+		planAgent.endLegAndAssumeControl( now ) ;
+	}
+	
+	/**
+	 * central call ...
+	 */
+	public final void endActivityAndAssumeControl( PlanAgent planAgent, double now ) {
+		planAgent.endActivityAndAssumeControl( now ) ;
+	}
+	
 	/**
 	 * Registers this agent as performing an activity and makes sure that the agent will be informed once his departure time has come.
 	 * @param agent
 	 *
-	 * @see PersonDriverAgent#getDepartureTimeForLeg()
+	 * @see PersonDriverAgent#getActivityEndTime()
 	 */
 	@Override
 	public final void scheduleActivityEnd(final PersonAgent agent) {
@@ -502,10 +517,10 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 	private void handleActivityEnds(final double time) {
 		while (this.activityEndsList.peek() != null) {
 			PersonAgent agent = this.activityEndsList.peek();
-			if (agent.getDepartureTimeForLeg() <= time) {
+			if (agent.getActivityEndTime() <= time) {
 				this.activityEndsList.poll();
 				unregisterAgentAtActivityLocation(agent);
-				agent.endActivityAndAssumeControl(time);
+				this.endActivityAndAssumeControl(agent,time);
 				// gives control to agent; comes back via "agentDeparts" or "scheduleActivityEnd"
 			} else {
 				return;
@@ -650,7 +665,7 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 		double simStartTime = 0;
 		PersonAgent firstAgent = this.activityEndsList.peek();
 		if (firstAgent != null) {
-			simStartTime = Math.floor(Math.max(startTime, firstAgent.getDepartureTimeForLeg()));
+			simStartTime = Math.floor(Math.max(startTime, firstAgent.getActivityEndTime()));
 		}
 		this.simTimer.setSimStartTime(simStartTime);
 		this.simTimer.setTime(simStartTime);

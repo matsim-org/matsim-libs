@@ -32,14 +32,14 @@ import org.matsim.core.mobsim.framework.PersonDriverAgent;
  *
  * @author mrieser
  * 
- * @see PersonDriverAgent#getDepartureTimeForLeg()
+ * @see PersonDriverAgent#getActivityEndTime()
  */
 public class PersonAgentDepartureTimeComparator implements Comparator<PersonAgent>, Serializable {
 
 	private static final long serialVersionUID = 1L;
 
 	public int compare(PersonAgent agent1, PersonAgent agent2) {
-		int cmp = Double.compare(agent1.getDepartureTimeForLeg(), agent2.getDepartureTimeForLeg());
+		int cmp = Double.compare(agent1.getActivityEndTime(), agent2.getActivityEndTime());
 		if (cmp == 0) {
 			// Both depart at the same time -> let the one with the larger id be first (=smaller)
 			return agent2.getPerson().getId().compareTo(agent1.getPerson().getId());

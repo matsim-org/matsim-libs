@@ -20,6 +20,7 @@
 
 package org.matsim.ptproject.qsim.qnetsimengine;
 
+import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.helpers.AgentSnapshotInfoBuilder;
 import org.matsim.ptproject.qsim.interfaces.NetsimEngine;
 
@@ -35,5 +36,7 @@ abstract class QSimEngineInternalI extends LinkActivator implements NetsimEngine
 	@Override
 	abstract public QNetwork getQNetwork() ;
 
-
+	/** internally, we provide the full QSim */
+	@Override
+	abstract public QSim getMobsim() ;
 }

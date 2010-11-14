@@ -165,7 +165,7 @@ public class UmlaufDriver extends AbstractTransitDriver {
 	}
 
 	@Override
-	public double getDepartureTimeForLeg() {
+	public double getActivityEndTime() {
 		return this.departureTime;
 	}
 
@@ -196,16 +196,25 @@ public class UmlaufDriver extends AbstractTransitDriver {
 				this.getSimulation().getEventsManager().getFactory().createAgentArrivalEvent(
 						now, this.getPerson().getId(), this.getDestinationLinkId(), this.getCurrentLeg().getMode()));
 		if (this.iUmlaufStueck.hasNext()) {
-			this.setNextLeg();
-			if (this.departureTime < now) {
-				this.departureTime = now;
-			}
+			prepareNextLeg(now);
 //			this.sim.handleAgentArrival(now, this);
 			this.sim.scheduleActivityEnd(this);
 		} else {
 //			this.sim.handleAgentArrival(now, this);
 			this.getSimulation().getAgentCounter().decLiving();
 		}
+	}
+
+	private void prepareNextLeg(final double now) {
+		this.setNextLeg();
+		if (this.departureTime < now) {
+			this.departureTime = now;
+		}
+	}
+	
+	@Override
+	public Boolean endLegAndAdvancePlan() {
+		throw new RuntimeException("not yet implemented") ;
 	}
 
 	@Override

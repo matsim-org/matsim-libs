@@ -12,8 +12,12 @@ import org.matsim.vehicles.Vehicle;
  */
 public interface VisVehicle {
 	
-	Vehicle getVehicle() ;
-	
+	/**
+	 * @return the <code>Vehicle</code> that this simulation vehicle represents
+	 */
+	public Vehicle getVehicle();
+
 	PersonDriverAgent getDriver() ;
+	// yy presumably, this should return DriverAgent
 
 }

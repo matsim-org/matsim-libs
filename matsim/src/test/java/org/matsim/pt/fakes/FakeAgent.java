@@ -100,7 +100,7 @@ public class FakeAgent implements PersonDriverAgent, PassengerAgent {
 	}
 
 	@Override
-	public double getDepartureTimeForLeg() {
+	public double getActivityEndTime() {
 		return 0;
 	}
 
@@ -148,6 +148,16 @@ public class FakeAgent implements PersonDriverAgent, PassengerAgent {
 	@Override
 	public QVehicle getVehicle() {
 		return null;
+	}
+
+	@Override
+	public Boolean endLegAndAdvancePlan() {
+		throw new UnsupportedOperationException("not yet implemented") ;
+	}
+
+	@Override
+	public Boolean endActivityAndAdvancePlan() {
+		throw new UnsupportedOperationException("not yet implemented") ;
 	}
 
 }

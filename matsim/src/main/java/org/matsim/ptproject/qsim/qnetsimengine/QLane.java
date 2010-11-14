@@ -212,15 +212,15 @@ public final class QLane extends QBufferItem implements SignalizeableItem {
 			* this.laneData.getNumberOfRepresentedLanes();
 		}
 		// we need the flow capcity per sim-tick and multiplied with flowCapFactor
-		this.simulatedFlowCapacity = this.simulatedFlowCapacity * this.getQLink().getQSim().getSimTimer().getSimTimestepSize()
-		* this.getQLink().getQSim().getScenario().getConfig().getQSimConfigGroup().getFlowCapFactor();
+		this.simulatedFlowCapacity = this.simulatedFlowCapacity * this.getQLink().getMobsim().getSimTimer().getSimTimestepSize()
+		* this.getQLink().getMobsim().getScenario().getConfig().getQSimConfigGroup().getFlowCapFactor();
 		this.inverseSimulatedFlowCapacity = 1.0 / this.simulatedFlowCapacity;
 		this.flowCapFraction = this.simulatedFlowCapacity - (int) this.simulatedFlowCapacity;
 	}
 
 
 	private void calculateStorageCapacity(final double time) {
-		double storageCapFactor = this.getQLink().getQSim().getScenario().getConfig().getQSimConfigGroup().getStorageCapFactor();
+		double storageCapFactor = this.getQLink().getMobsim().getScenario().getConfig().getQSimConfigGroup().getStorageCapFactor();
 		this.bufferStorageCapacity = (int) Math.ceil(this.simulatedFlowCapacity);
 
 		double numberOfLanes = this.queueLink.getLink().getNumberOfLanes(time);
@@ -349,7 +349,10 @@ public final class QLane extends QBufferItem implements SignalizeableItem {
 			if (!handled) {
 				// Check if veh has reached destination:
 				if ((driver.getDestinationLinkId().equals(this.queueLink.getLink().getId())) && (driver.chooseNextLinkId() == null)) {
-					driver.endLegAndAssumeControl(now);
+
+//					driver.endLegAndAssumeControl(now);
+					this.getQLink().getMobsim().endLegAndAssumeControl( driver, now) ;
+
 					this.queueLink.addParkedVehicle(veh);
 					// remove _after_ processing the arrival to keep link active
 					this.vehQueue.poll();
@@ -425,7 +428,7 @@ public final class QLane extends QBufferItem implements SignalizeableItem {
 			if (toQueueLane != null) {
 				if (toQueueLane.hasSpace()) {
 					this.buffer.poll();
-					this.getQLink().getQSim().getEventsManager().processEvent(
+					this.getQLink().getMobsim().getEventsManager().processEvent(
 							new LaneLeaveEventImpl(now, veh.getDriver().getPerson().getId(), this.queueLink.getLink().getId(), this.getId()));
 					toQueueLane.addToVehicleQueue(veh, now);
 				}
@@ -468,7 +471,7 @@ public final class QLane extends QBufferItem implements SignalizeableItem {
 		this.vehQueueEnterTimeMap.put(veh, now);
 		this.usedStorageCapacity += veh.getSizeInEquivalents();
 		if (this.isFireLaneEvents()) {
-			this.queueLink.getQSim().getEventsManager()
+			this.queueLink.getMobsim().getEventsManager()
 			.processEvent(new LaneEnterEventImpl(now, veh.getDriver().getPerson().getId(), this.queueLink.getLink().getId(), this.getId()));
 		}
 		double departureTime;
@@ -521,15 +524,15 @@ public final class QLane extends QBufferItem implements SignalizeableItem {
 
 	@Override
 	 QVehicle popFirstFromBuffer() {
-		double now = this.getQLink().getQSim().getSimTimer().getTimeOfDay();
+		double now = this.getQLink().getMobsim().getSimTimer().getTimeOfDay();
 		QVehicle veh = this.buffer.poll();
 		this.bufferLastMovedTime = now; // just in case there is another vehicle in the buffer that is now the new front-most
 		if (this.isFireLaneEvents()) {
-			this.getQLink().getQSim().getEventsManager().processEvent(new LaneLeaveEventImpl(
+			this.getQLink().getMobsim().getEventsManager().processEvent(new LaneLeaveEventImpl(
 					now, veh.getDriver().getPerson().getId(), this.queueLink.getLink().getId(), this.getId()
 			));
 		}
-		this.getQLink().getQSim().getEventsManager().processEvent(new LinkLeaveEventImpl(
+		this.getQLink().getMobsim().getEventsManager().processEvent(new LinkLeaveEventImpl(
 				now, veh.getDriver().getPerson().getId(), this.queueLink.getLink().getId()
 		));
 		return veh;
@@ -582,19 +585,19 @@ public final class QLane extends QBufferItem implements SignalizeableItem {
 
 	void clearVehicles(double now) {
 		for (QVehicle veh : this.vehQueue) {
-			this.getQLink().getQSim().getEventsManager().processEvent(
+			this.getQLink().getMobsim().getEventsManager().processEvent(
 					new AgentStuckEventImpl(now, veh.getDriver().getPerson().getId(), veh.getCurrentLink().getId(), veh.getDriver().getCurrentLeg().getMode()));
 		}
-		this.queueLink.getQSim().getAgentCounter().decLiving(this.vehQueue.size());
-		this.queueLink.getQSim().getAgentCounter().incLost(this.vehQueue.size());
+		this.queueLink.getMobsim().getAgentCounter().decLiving(this.vehQueue.size());
+		this.queueLink.getMobsim().getAgentCounter().incLost(this.vehQueue.size());
 		this.vehQueue.clear();
 		this.vehQueueEnterTimeMap.clear();
 		for (QVehicle veh : this.buffer) {
-			this.getQLink().getQSim().getEventsManager().processEvent(
+			this.getQLink().getMobsim().getEventsManager().processEvent(
 					new AgentStuckEventImpl(now, veh.getDriver().getPerson().getId(), veh.getCurrentLink().getId(), veh.getDriver().getCurrentLeg().getMode()));
 		}
-		this.queueLink.getQSim().getAgentCounter().decLiving(this.buffer.size());
-		this.queueLink.getQSim().getAgentCounter().incLost(this.buffer.size());
+		this.queueLink.getMobsim().getAgentCounter().decLiving(this.buffer.size());
+		this.queueLink.getMobsim().getAgentCounter().incLost(this.buffer.size());
 		this.buffer.clear();
 
 	}
@@ -661,7 +664,7 @@ public final class QLane extends QBufferItem implements SignalizeableItem {
 		return this.vehQueue;
 	}
 
-	public NetsimLink getQLink() {
+	public QLinkInternalI getQLink() {
 		return this.queueLink;
 	}
 
@@ -715,7 +718,7 @@ public final class QLane extends QBufferItem implements SignalizeableItem {
 
 		@Override
 		public Collection<AgentSnapshotInfo> getVehiclePositions( final Collection<AgentSnapshotInfo> positions) {
-			double time = QLane.this.getQLink().getQSim().getSimTimer().getTimeOfDay() ;
+			double time = QLane.this.getQLink().getMobsim().getSimTimer().getTimeOfDay() ;
 
 
 			AgentSnapshotInfoBuilder agentSnapshotInfoBuilder = QLane.this.queueLink.getQSimEngine().getAgentSnapshotInfoBuilder();

@@ -62,9 +62,9 @@ public class MobsimFacility implements Updateable {
 
 	public void update() {
 		PersonAgent person = agentsAtActivities.peek();
-		if ( person.getDepartureTimeForLeg() <= now() ) {
+		if ( person.getActivityEndTime() <= now() ) {
 			agentsAtActivities.remove();
-			person.endActivityAndAssumeControl( now() ) ;
+			person.endActivityAndAdvancePlan() ;
 			// call departure handler
 			// how does the departure handler get access to the vehicle?
 			// or to the bus stop?

@@ -208,11 +208,11 @@ public class TransitQueueSimulationTest {
 		List<PersonAgent> agents = sim.createdAgents;
 		assertEquals(5, agents.size());
 		assertTrue(agents.get(0) instanceof TransitDriverAgent);
-		assertEquals(6.0*3600, ((TransitDriverAgent) agents.get(0)).getDepartureTimeForLeg(), MatsimTestCase.EPSILON);
-		assertEquals(7.0*3600, ((TransitDriverAgent) agents.get(1)).getDepartureTimeForLeg(), MatsimTestCase.EPSILON);
-		assertEquals(8.0*3600, ((TransitDriverAgent) agents.get(2)).getDepartureTimeForLeg(), MatsimTestCase.EPSILON);
-		assertEquals(8.5*3600, ((TransitDriverAgent) agents.get(3)).getDepartureTimeForLeg(), MatsimTestCase.EPSILON);
-		assertEquals(9.0*3600, ((TransitDriverAgent) agents.get(4)).getDepartureTimeForLeg(), MatsimTestCase.EPSILON);
+		assertEquals(6.0*3600, ((TransitDriverAgent) agents.get(0)).getActivityEndTime(), MatsimTestCase.EPSILON);
+		assertEquals(7.0*3600, ((TransitDriverAgent) agents.get(1)).getActivityEndTime(), MatsimTestCase.EPSILON);
+		assertEquals(8.0*3600, ((TransitDriverAgent) agents.get(2)).getActivityEndTime(), MatsimTestCase.EPSILON);
+		assertEquals(8.5*3600, ((TransitDriverAgent) agents.get(3)).getActivityEndTime(), MatsimTestCase.EPSILON);
+		assertEquals(9.0*3600, ((TransitDriverAgent) agents.get(4)).getActivityEndTime(), MatsimTestCase.EPSILON);
 	}
 
 	protected static class TestCreateAgentsSimulation extends QSim {

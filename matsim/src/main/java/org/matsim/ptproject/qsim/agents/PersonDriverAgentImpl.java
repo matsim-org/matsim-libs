@@ -111,7 +111,8 @@ public class PersonDriverAgentImpl implements PersonDriverAgent {
 		 */
 		PlanElement currentPlanElement = this.getPlanElements().get(this.currentPlanElementIndex);
 		if (currentPlanElement instanceof Leg) {
-			this.setCurrentLegAndResetRouteCache((Leg) currentPlanElement);
+			this.currentLeg  = ((Leg) currentPlanElement);
+			this.cachedRouteLinkIds = null;
 		}
 
 		Route route = currentLeg.getRoute();
@@ -124,6 +125,7 @@ public class PersonDriverAgentImpl implements PersonDriverAgent {
 		this.cachedDestinationLinkId = route.getEndLinkId();
 	}
 
+	@Override
 	public final boolean initializeAndCheckIfAlive() {
 		List<? extends PlanElement> planElements = this.getPlanElements();
 		this.currentPlanElementIndex = 0;
@@ -140,13 +142,53 @@ public class PersonDriverAgentImpl implements PersonDriverAgent {
 		return false; // the agent has no leg, so nothing more to do
 	}
 
+	// -----------------------------------------------------------------------------------------------------------------------------
+	// -----------------------------------------------------------------------------------------------------------------------------
+
+	private Boolean advancePlan() {
+		this.currentPlanElementIndex++;
+		
+		// check if plan has run dry:
+		if ( this.currentPlanElementIndex >= this.getPlanElements().size() ) {
+			return null ;
+		} 
+		
+		PlanElement pe = this.getCurrentPlanElement() ;
+		if (pe instanceof Activity) {
+			initNextActivity((Activity) pe);
+			return true ;
+		} else if (pe instanceof Leg) {
+
+			return initNextLeg( (Leg) pe ) ;
+		} else {
+			throw new RuntimeException("Unknown PlanElement of type: " + pe.getClass().getName());
+		}
+	}
+	
+	// -----------------------------------------------------------------------------------------------------------------------------
+	
+	@Override
+	public Boolean endActivityAndAdvancePlan() {
+		return advancePlan() ;
+	}
+	
+	@Override
 	public final void endActivityAndAssumeControl(final double now) {
 		Activity act = (Activity) this.getPlanElements().get(this.currentPlanElementIndex);
 		this.simulation.getEventsManager().processEvent(new ActivityEndEventImpl(now, this.getPerson().getId(), act.getLinkId(), act.getFacilityId(), act.getType()));
 		// note that when we are here we don't know if next is another leg, or an activity.  Therefore, we go to a general method:
-		advancePlanElement(now);
+		Boolean flag = advancePlan() ;
+		scheduleAgentInMobsim( flag );
 	}
+	
+	// -----------------------------------------------------------------------------------------------------------------------------
 
+	@Override
+	public Boolean endLegAndAdvancePlan() {
+		return advancePlan() ;
+	}
+	
+	@Override
 	public final void endLegAndAssumeControl(final double now) {
 
 //		this.simulation.handleAgentArrival(now, this);
@@ -163,8 +205,12 @@ public class PersonDriverAgentImpl implements PersonDriverAgent {
 			return;
 		}
 		// note that when we are here we don't know if next is another leg, or an activity  Therefore, we go to a general method:
-		advancePlanElement(now);
+		Boolean flag = advancePlan() ;
+		scheduleAgentInMobsim( flag );
 	}
+
+	// -----------------------------------------------------------------------------------------------------------------------------
+	// -----------------------------------------------------------------------------------------------------------------------------
 
 	@Deprecated // yyyyyy I really don't think that this belongs here.
 	public final void teleportToLink(final Id linkId) {
@@ -218,7 +264,9 @@ public class PersonDriverAgentImpl implements PersonDriverAgent {
 		return null;
 	}
 	
-	private static int lastActHasDpTimeCnt = 0 ;
+	
+	// ============================================================================================================================
+	// below there only (package-)private methods or setters/getters
 	
 	/**
 	 * If this method is called to update a changed ActivityEndTime please
@@ -275,30 +323,27 @@ public class PersonDriverAgentImpl implements PersonDriverAgent {
 		}
 		
 		if ( this.currentPlanElementIndex == this.getPlanElements().size()-1 ) {
-			if ( lastActHasDpTimeCnt < 1 && departure!=Double.POSITIVE_INFINITY ) {
+			if ( finalActHasDpTimeWrnCnt < 1 && departure!=Double.POSITIVE_INFINITY ) {
 				log.error( "last activity has end time < infty; setting it to infty") ;
 				log.error( Gbl.ONLYONCE ) ;
-				lastActHasDpTimeCnt++ ;
+				finalActHasDpTimeWrnCnt++ ;
 			}
 			departure = Double.POSITIVE_INFINITY ;
 		}
-			
-
-		
 		this.activityEndTime = departure ;
 	}
-		
-	// ============================================================================================================================
-	// below there only private methods or setters/getters
-	
-	private void advancePlanElement(final double now) {
+	private static int finalActHasDpTimeWrnCnt = 0 ;
 
-		this.currentPlanElementIndex++;
-		PlanElement pe = this.getPlanElements().get(this.currentPlanElementIndex);
+	
+	private Boolean scheduleAgentInMobsim( Boolean flag ) {
+		
+		if ( flag == null ) {
+			throw new RuntimeException("plan has run empty" ) ;
+		}
+		
+		PlanElement pe = this.getCurrentPlanElement() ;
 
 		if (pe instanceof Activity) {
-
-			initNextActivity((Activity) pe);
 
 			if ((this.currentPlanElementIndex+1) < this.getPlanElements().size()) {
 				// there is still at least on plan element left
@@ -307,26 +352,28 @@ public class PersonDriverAgentImpl implements PersonDriverAgent {
 				// this is the last activity
 				this.simulation.getAgentCounter().decLiving();
 			}
+			return true ;
 
 		} else if (pe instanceof Leg) {
 
-			if ( initNextLeg(now, (Leg) pe) ) {
+			if ( flag ) {
 				this.simulation.agentDeparts(this, this.currentLinkId);
+			} else {
+				log.error("The agent " + this.getPerson().getId() + " returned false from advancePlanElement.  Removing the ag from the mobsim ...");
+				this.simulation.getAgentCounter().decLiving();
+				this.simulation.getAgentCounter().incLost();
 			}
+			return true ;
 
-		} else {
-
-			throw new RuntimeException("Unknown PlanElement of type " + pe.getClass().getName());
-
+		} else { // (presumably, this was already caught earlier)
+			throw new RuntimeException("Unknown PlanElement of type: " + pe.getClass().getName());
 		}
 	}
 
-	private boolean initNextLeg(double now, final Leg leg) {
+	private boolean initNextLeg(final Leg leg) {
 		Route route = leg.getRoute();
 		if (route == null) {
-			log.error("The agent " + this.getPerson().getId() + " has no route in its leg. Removing the agent from the simulation.");
-			this.simulation.getAgentCounter().decLiving();
-			this.simulation.getAgentCounter().incLost();
+			log.error("The agent " + this.getPerson().getId() + " has no route in its leg.  Returning false from initNextLeg ...");
 			return false;
 		}
 		this.cachedDestinationLinkId = route.getEndLinkId();
@@ -378,7 +425,7 @@ public class PersonDriverAgentImpl implements PersonDriverAgent {
 	}
 
 	@Override
-	public final double getDepartureTimeForLeg() {
+	public final double getActivityEndTime() {
 		// yyyyyy I don't think there is any guarantee that this entry is correct after an activity end re-scheduling.  kai, oct'10
 		return this.activityEndTime;
 	}
@@ -410,11 +457,6 @@ public class PersonDriverAgentImpl implements PersonDriverAgent {
 		return (Activity) currentPlanElement;
 	}
 	
-	private final void setCurrentLegAndResetRouteCache(final Leg leg) {
-		this.currentLeg  = leg;
-		this.cachedRouteLinkIds = null;
-	}
-
 	@Override
 	public final Id getDestinationLinkId() {
 		return this.cachedDestinationLinkId;

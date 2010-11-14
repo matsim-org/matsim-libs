@@ -71,7 +71,10 @@ public class MultiModalDepartureHandler implements DepartureHandler {
 		MultiModalQLinkExtension extension = simEngine.getMultiModalQLinkExtension(qSim.getNetsimNetwork().getNetsimLink(linkId));
 		
 		if ((route.getEndLinkId().equals(linkId)) && (personAgent.chooseNextLinkId() == null)) {
-			personAgent.endLegAndAssumeControl(now);
+
+//			personAgent.endLegAndAssumeControl(now);
+			this.qSim.endLegAndAssumeControl(personAgent, now) ;
+
 		} else {
 			extension.addDepartingAgent(personAgent, now);
 		}				

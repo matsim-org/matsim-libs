@@ -488,7 +488,10 @@ public class TransitQueueNetworkTest extends TestCase {
 
 		// time 120: normalVeh2 departs, cannot be blocked from waitingQueue, so moved to buffer
 		f.qsim.getSimTimer().setTime(120);
-		f.normalVehicle2.getDriver().endActivityAndAssumeControl(120);
+
+//		f.normalVehicle2.getDriver().endActivityAndAssumeControl(120);
+		f.qsim.endActivityAndAssumeControl(f.normalVehicle2.getDriver(), 120) ;
+
 		f.simEngine.doSimStep(120);
 
 		// time 121: normalVeh2 moves to qlink2 (exit-time 221)
@@ -539,7 +542,10 @@ public class TransitQueueNetworkTest extends TestCase {
 
 		// time 120: normalVeh2 departs, moved to buffer
 		f.qsim.getSimTimer().setTime(124);
-		f.normalVehicle2.getDriver().endActivityAndAssumeControl(124);
+
+//		f.normalVehicle2.getDriver().endActivityAndAssumeControl(124);
+		f.qsim.endActivityAndAssumeControl( f.normalVehicle2.getDriver(), 124) ;
+
 		f.simEngine.doSimStep(124);
 
 		// time 125: normalVeh2 moves to qlink2 (exit-time 225)
@@ -640,7 +646,10 @@ public class TransitQueueNetworkTest extends TestCase {
 
 		// time 124: normalVeh2 departs, moved to buffer
 		f.qsim.getSimTimer().setTime(124);
-		f.normalVehicle2.getDriver().endActivityAndAssumeControl(124);
+
+//		f.normalVehicle2.getDriver().endActivityAndAssumeControl(124);
+		f.qsim.endActivityAndAssumeControl( f.normalVehicle2.getDriver(), 124 ) ;
+
 		f.simEngine.doSimStep(124);
 
 		// time 125: normalVeh2 moves to qlink2 (exit-time 225)
@@ -753,7 +762,10 @@ public class TransitQueueNetworkTest extends TestCase {
 
 		// time 124: normalVeh2 departs, moved to qlink1.buffer
 		f.qsim.getSimTimer().setTime(124);
-		f.normalVehicle2.getDriver().endActivityAndAssumeControl(124);
+
+//		f.normalVehicle2.getDriver().endActivityAndAssumeControl(124);
+		f.qsim.endActivityAndAssumeControl( f.normalVehicle2.getDriver(), 124 ) ;
+
 		f.simEngine.doSimStep(124);
 		assertEquals(2, f.qlink2.getAllVehicles().size());
 
@@ -865,7 +877,10 @@ public class TransitQueueNetworkTest extends TestCase {
 
 		// time 120: normalVeh2 departs, moved to qlink1.buffer
 		f.qsim.getSimTimer().setTime(120);
-		f.normalVehicle2.getDriver().endActivityAndAssumeControl(120);
+
+//		f.normalVehicle2.getDriver().endActivityAndAssumeControl(120);
+		f.qsim.endActivityAndAssumeControl(f.normalVehicle2.getDriver(), 120) ;
+
 		f.simEngine.doSimStep(120);
 		assertEquals(2, f.qlink2.getAllVehicles().size());
 
@@ -1066,7 +1081,9 @@ public class TransitQueueNetworkTest extends TestCase {
 			this.normalVehicle.setDriver(nDriver);
 			nDriver.setVehicle(this.normalVehicle);
 			nDriver.initializeAndCheckIfAlive();
-			nDriver.endActivityAndAssumeControl(100);
+
+//			nDriver.endActivityAndAssumeControl(100);
+			qsim.endActivityAndAssumeControl(nDriver, 100) ;
 
 			if (stop2 != null) {
 				/* we're testing two stops. Add another normal vehicle with 20 seconds delay,

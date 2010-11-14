@@ -42,8 +42,8 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.qsim.TransitQLaneFeature;
+import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.helpers.AgentSnapshotInfoBuilder;
-import org.matsim.ptproject.qsim.interfaces.Mobsim;
 import org.matsim.ptproject.qsim.interfaces.NetsimEngine;
 import org.matsim.signalsystems.control.SignalGroupState;
 import org.matsim.signalsystems.mobsim.QSignalizedItem;
@@ -332,7 +332,10 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 			if (!handled) {
 				// Check if veh has reached destination:
 				if ((this.getLink().getId().equals(driver.getDestinationLinkId())) && (driver.chooseNextLinkId() == null)) {
-					driver.endLegAndAssumeControl(now);
+
+//					driver.endLegAndAssumeControl(now);
+					this.getMobsim().endLegAndAssumeControl(driver, now) ;
+
 					this.addParkedVehicle(veh);
 					// remove _after_ processing the arrival to keep link active
 					this.vehQueue.poll();
@@ -570,7 +573,7 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 	}
 
 	@Override
-	public Mobsim getQSim() {
+	public QSim getMobsim() {
 		return this.qsimEngine.getMobsim();
 	}
 

@@ -39,10 +39,10 @@ import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.lanes.Lane;
 import org.matsim.lanes.LaneMeterFromLinkEndComparator;
+import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.helpers.AgentSnapshotInfoBuilder;
-import org.matsim.ptproject.qsim.interfaces.NetsimLink;
 import org.matsim.ptproject.qsim.interfaces.NetsimEngine;
-import org.matsim.ptproject.qsim.interfaces.Mobsim;
+import org.matsim.ptproject.qsim.interfaces.NetsimLink;
 import org.matsim.signalsystems.systems.SignalGroupDefinition;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 import org.matsim.vis.snapshots.writers.VisData;
@@ -463,7 +463,7 @@ public class QLinkLanesImpl extends QLinkInternalI {
 	}
 	
 	@Override
-	public Mobsim getQSim() {
+	public QSim getMobsim() {
 		return this.qsimEngine.getMobsim();
 	}
 
