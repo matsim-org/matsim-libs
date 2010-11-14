@@ -112,7 +112,7 @@ public class OTFVis {
 		} else if (args2[0].equalsIgnoreCase("-convert")) {
 			convert(args2);
 		} else if (args2.length == 1) {
-			String filename = args2[0].toLowerCase(Locale.ROOT);
+			String filename = args2[0];
 			play(filename, useSwing);
 		} else {
 			printUsage();
@@ -121,13 +121,14 @@ public class OTFVis {
 	}
 
 	private static final void play(String filename, boolean useSwing) {
-		if (filename.endsWith(".mvi")) {
+		String lowerCaseFilename = filename.toLowerCase();
+		if (lowerCaseFilename.endsWith(".mvi")) {
 			if (useSwing) {
 				playMVI_Swing(filename);
 			} else {
 				playMVI(filename);
 			}
-		} else if ((filename.endsWith(".xml") || filename.endsWith(".xml.gz"))) {
+		} else if ((lowerCaseFilename.endsWith(".xml") || lowerCaseFilename.endsWith(".xml.gz"))) {
 			FileType type;
 			try {
 				type = new MatsimFileTypeGuesser(filename).getGuessedFileType();
@@ -261,7 +262,7 @@ public class OTFVis {
 		client.setSwing(true);
 		client.run();
 		server.getSnapshotReceiver().finish();
-	}
+	}filename
 
 	public static final void convert(final String[] args) {
 		if ((args.length < 4) || (args.length > 5)) {
