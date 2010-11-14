@@ -138,4 +138,10 @@ public class TransitDriver extends AbstractTransitDriver {
 		return this.departure;
 	}
 
+	@Override
+	public PlanElement getNextPlanElement() {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException() ;
+	}
+
 }

@@ -27,10 +27,8 @@ import org.matsim.ptproject.qsim.qnetsimengine.QVehicle;
  * @author nagel
  *
  */
-public interface DriverAgent extends MobsimAgent {
+public interface DriverAgent extends NetworkAgent {
 
-	public Id getDestinationLinkId();
-	
 	/**
 	 * Returns the next link the vehicle will drive along.
 	 *
@@ -43,11 +41,6 @@ public interface DriverAgent extends MobsimAgent {
 	public void setVehicle( final QVehicle veh ) ;
 	public QVehicle getVehicle() ;
 	
-	/**
-	 * driver should know where she/he is
-	 */
-	public Id getCurrentLinkId();
-
 	// the methods below are yet unclear how useful they are in the interface, or if they should be moved to a Vehicle interface.
 
 	/**

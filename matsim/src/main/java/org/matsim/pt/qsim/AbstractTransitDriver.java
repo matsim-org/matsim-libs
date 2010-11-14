@@ -300,6 +300,10 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 	protected NetworkRouteWrapper getWrappedCarRoute(NetworkRoute carRoute) {
 		return new NetworkRouteWrapper(carRoute);
 	}
+	
+	public Id getId() {
+		return this.dummyPerson.getId() ;
+	}
 
 	/**
 	 * A simple wrapper that delegates all get-Methods to another instance, blocks set-methods
@@ -401,6 +405,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 				throw new AssertionError(e);
 			}
 		}
+		
 	}
 
 

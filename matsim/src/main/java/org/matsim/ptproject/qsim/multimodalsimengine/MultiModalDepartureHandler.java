@@ -28,8 +28,8 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.groups.MultiModalConfigGroup;
-import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
+import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.interfaces.DepartureHandler;
 
@@ -51,7 +51,7 @@ public class MultiModalDepartureHandler implements DepartureHandler {
 	}
 	
 	@Override
-	public boolean handleDeparture(double now, PersonAgent personAgent, Id linkId, Leg leg) {
+	public boolean handleDeparture(double now, PlanAgent personAgent, Id linkId, Leg leg) {
 
 		if (handledModes.contains(leg.getMode())) {
 			if (personAgent instanceof PersonDriverAgent) {

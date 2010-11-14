@@ -38,6 +38,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
+import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.misc.Time;
@@ -87,7 +88,7 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 
 	private final Map<Id, QVehicle> parkedVehicles = new LinkedHashMap<Id, QVehicle>(10);
 
-	private final Map<Id, PersonAgent> additionalAgentsOnLink = new LinkedHashMap<Id, PersonAgent>();
+	private final Map<Id, PlanAgent> additionalAgentsOnLink = new LinkedHashMap<Id, PlanAgent>();
 
 	/*package*/ VisData visdata = null ;
 
@@ -678,13 +679,13 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 	}
 
 	@Override
-	public void registerAgentOnLink(PersonAgent agent) {
-		this.additionalAgentsOnLink.put(agent.getPerson().getId(), agent);
+	public void registerAgentOnLink(PlanAgent planAgent) {
+		this.additionalAgentsOnLink.put(planAgent.getId(), planAgent);
 	}
 
 	@Override
-	public void unregisterAgentOnLink(PersonAgent agent) {
-		this.additionalAgentsOnLink.remove(agent.getPerson().getId());
+	public void unregisterAgentOnLink(PlanAgent planAgent) {
+		this.additionalAgentsOnLink.remove(planAgent.getId());
 	}
 
 	@Override

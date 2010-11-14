@@ -30,6 +30,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.framework.PersonAgent;
+import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
@@ -304,10 +305,10 @@ public final class AgentSnapshotInfoBuilder {
 
 
 	public int positionAgentsInActivities(final Collection<AgentSnapshotInfo> positions, Link link,
-			Collection<PersonAgent> agentsInActivities,  int cnt2) {
+			Collection<PlanAgent> agentsInActivities,  int cnt2) {
 		int c = cnt2;
-		for (PersonAgent pa : agentsInActivities) {
-			AgentSnapshotInfo agInfo = AgentSnapshotInfoFactory.staticCreateAgentSnapshotInfo(pa.getPerson().getId(), link, c) ;
+		for (PlanAgent pa : agentsInActivities) {
+			AgentSnapshotInfo agInfo = AgentSnapshotInfoFactory.staticCreateAgentSnapshotInfo(pa.getId(), link, c) ;
 			agInfo.setAgentState( AgentState.PERSON_AT_ACTIVITY ) ;
 			positions.add(agInfo) ;
 			c++ ;

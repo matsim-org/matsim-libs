@@ -24,7 +24,7 @@ import java.util.LinkedList;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.mobsim.framework.PersonAgent;
+import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.ptproject.qsim.qnetsimengine.QNode;
 import org.matsim.ptproject.qsim.qnetsimengine.QVehicle;
 import org.matsim.utils.customize.Customizable;
@@ -57,8 +57,8 @@ public interface NetsimLink extends Customizable, VisLink {
 	// yyyy these two functions should not be public since it exposes the internal mechanics that the departure logic is central
 	// while the visualization logic is link-based.  But it needs to be public as long as the network engine is a separate package. 
 	// kai, aug'10
-	public void registerAgentOnLink(PersonAgent agent);
-	public void unregisterAgentOnLink(PersonAgent agent);
+	public void registerAgentOnLink(PlanAgent planAgent);
+	public void unregisterAgentOnLink(PlanAgent planAgent);
 
 	
 	//	######################

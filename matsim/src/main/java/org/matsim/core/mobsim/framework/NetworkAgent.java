@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: matsim
- * TeleportationArrivalTimeComparator.java
+ * NetworkAgent.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,22 +18,18 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.ptproject.qsim.comparators;
+package org.matsim.core.mobsim.framework;
 
-import java.io.Serializable;
-import java.util.Comparator;
+import org.matsim.api.core.v01.Id;
 
-import org.matsim.core.mobsim.framework.PlanAgent;
-import org.matsim.core.utils.collections.Tuple;
+/**
+ * @author nagel
+ *
+ */
+public interface NetworkAgent extends MobsimAgent {
+	
+	public Id getCurrentLinkId();
 
-public class TeleportationArrivalTimeComparator implements Comparator<Tuple<Double, PlanAgent>>, Serializable {
-	private static final long serialVersionUID = 1L;
-	@Override
-	public int compare(final Tuple<Double, PlanAgent> o1, final Tuple<Double, PlanAgent> o2) {
-		int ret = o1.getFirst().compareTo(o2.getFirst()); // first compare time information
-		if (ret == 0) {
-			ret = o2.getSecond().getId().compareTo(o1.getSecond().getId()); // if they're equal, compare the Ids: the one with the larger Id should be first
-		}
-		return ret;
-	}
+	public Id getDestinationLinkId();
+
 }

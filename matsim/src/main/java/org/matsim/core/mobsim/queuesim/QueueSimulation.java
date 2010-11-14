@@ -117,8 +117,8 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 	 * Includes all agents that have transportation modes unknown to
 	 * the QueueSimulation (i.e. != "car") or have two activities on the same link
 	 */
-	private final PriorityQueue<Tuple<Double, PersonAgent>> teleportationList =
-		new PriorityQueue<Tuple<Double, PersonAgent>>(30, new TeleportationArrivalTimeComparator());
+	private final PriorityQueue<Tuple<Double, PlanAgent>> teleportationList =
+		new PriorityQueue<Tuple<Double, PlanAgent>>(30, new TeleportationArrivalTimeComparator());
 
 	private final Date starttime = new Date();
 
@@ -365,9 +365,9 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 //		double now = this.simTimer.getTimeOfDayStatic();
 		double now = this.simTimer.getTimeOfDay();
 
-		for (Tuple<Double, PersonAgent> entry : this.teleportationList) {
-			PersonAgent agent = entry.getSecond();
-			events.processEvent(new AgentStuckEventImpl(now, agent.getPerson().getId(), agent.getDestinationLinkId(), agent.getCurrentLeg().getMode()));
+		for (Tuple<Double, PlanAgent> entry : this.teleportationList) {
+			PlanAgent agent = entry.getSecond();
+			events.processEvent(new AgentStuckEventImpl(now, agent.getId(), agent.getDestinationLinkId(), agent.getCurrentLeg().getMode()));
 		}
 		this.teleportationList.clear();
 
@@ -452,7 +452,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 		QueueSimulation.events = events;
 	}
 
-	protected void handleUnknownLegMode(double now, final PersonAgent agent) {
+	protected void handleUnknownLegMode(double now, final PlanAgent planAgent) {
 //		Id startLinkId = agent.getCurrentLeg().getRoute().getStartLinkId() ;
 //		Leg leg = agent.getCurrentLeg() ;
 
@@ -465,17 +465,17 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 //		}
 
 //		double arrivalTime = this.simTimer.getTimeOfDayStatic() + agent.getCurrentLeg().getTravelTime();
-		double arrivalTime = this.simTimer.getTimeOfDay() + agent.getCurrentLeg().getTravelTime();
+		double arrivalTime = this.simTimer.getTimeOfDay() + planAgent.getCurrentLeg().getTravelTime();
 
-		this.teleportationList.add(new Tuple<Double, PersonAgent>(arrivalTime, agent));
+		this.teleportationList.add(new Tuple<Double, PlanAgent>(arrivalTime, planAgent));
 	}
 
 	protected void moveVehiclesWithUnknownLegMode(final double now) {
 		while (this.teleportationList.peek() != null ) {
-			Tuple<Double, PersonAgent> entry = this.teleportationList.peek();
+			Tuple<Double, PlanAgent> entry = this.teleportationList.peek();
 			if (entry.getFirst().doubleValue() <= now) {
 				this.teleportationList.poll();
-				PersonAgent person = entry.getSecond();
+				PlanAgent person = entry.getSecond();
 				person.teleportToLink(person.getDestinationLinkId());
 				endLegAndAssumeControl(person,now);
 			} else break;
@@ -536,11 +536,11 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 	 * @param link the link where the agent departs
 	 */
 	@Override
-	public void agentDeparts(final PersonAgent agent, final Id linkId) {
+	public void agentDeparts(final PlanAgent agent, final Id linkId) {
 		double now = this.getSimTimer().getTimeOfDay() ;
 		Leg leg = agent.getCurrentLeg();
 		String mode = leg.getMode();
-		events.processEvent( events.getFactory().createAgentDepartureEvent( now, agent.getPerson().getId(), linkId, leg.getMode() ) ) ;
+		events.processEvent( events.getFactory().createAgentDepartureEvent( now, agent.getId(), linkId, leg.getMode() ) ) ;
 		if (this.notTeleportedModes.contains(mode)){
 			this.handleKnownLegModeDeparture(now, agent, linkId, mode);
 		}
@@ -549,13 +549,13 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 		}
 	}
 
-	protected void handleKnownLegModeDeparture(double now, PersonAgent personAgent, Id linkId, String mode) {
-		Leg leg = personAgent.getCurrentLeg();
+	protected void handleKnownLegModeDeparture(double now, PlanAgent planAgent, Id linkId, String mode) {
+		Leg leg = planAgent.getCurrentLeg();
 		if (mode.equals(TransportMode.car)) {
-			if ( !(personAgent instanceof PersonDriverAgent) ) {
+			if ( !(planAgent instanceof PersonDriverAgent) ) {
 				throw new IllegalStateException("PersonAgent that is not a DriverAgent cannot have car as mode") ;
 			}
-			PersonDriverAgent driverAgent = (PersonDriverAgent) personAgent ;
+			PersonDriverAgent driverAgent = (PersonDriverAgent) planAgent ;
 			NetworkRoute route = (NetworkRoute) leg.getRoute();
 			Id vehicleId = route.getVehicleId();
 			if (vehicleId == null) {
@@ -724,14 +724,14 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 
 
 	@Override
-	public void registerAgentAtPtWaitLocation(PersonAgent agent) {
+	public void registerAgentAtPtWaitLocation(PlanAgent planAgent) {
 		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException() ;
 	}
 
 
 	@Override
-	public void unregisterAgentAtPtWaitLocation(PersonAgent agent) {
+	public void unregisterAgentAtPtWaitLocation(PlanAgent planAgent) {
 		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException() ;
 	}

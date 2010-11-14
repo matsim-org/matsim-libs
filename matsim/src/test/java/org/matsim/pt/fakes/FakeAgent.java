@@ -160,4 +160,14 @@ public class FakeAgent implements PersonDriverAgent, PassengerAgent {
 		throw new UnsupportedOperationException("not yet implemented") ;
 	}
 
+	@Override
+	public PlanElement getNextPlanElement() {
+		throw new UnsupportedOperationException() ;
+	}
+
+	@Override
+	public Id getId() {
+		return this.dummyPerson.getId() ;
+	}
+
 }

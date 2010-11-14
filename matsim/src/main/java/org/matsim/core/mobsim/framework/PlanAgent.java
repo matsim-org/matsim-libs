@@ -21,6 +21,7 @@
 package org.matsim.core.mobsim.framework;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -57,13 +58,13 @@ import org.matsim.api.core.v01.population.PlanElement;
  * Memory considerations could be addressed by lazily delaying this plans copying to the point where the modifiable
  * plan is needed.
  * <p/>
+ * Should add Identifiable to this interface; could then replace many PersonAgent by PlanAgent. 
  *
  * @author dgrether
  * @author nagel
  *
  */
-public interface PlanAgent extends MobsimAgent {
-	public Id getDestinationLinkId();
+public interface PlanAgent extends NetworkAgent, Identifiable {
 
 	/**
 	 * The time the agent wants to depart from an Activity. If the agent is currently driving,
@@ -113,6 +114,8 @@ public interface PlanAgent extends MobsimAgent {
 	
 	public PlanElement getCurrentPlanElement() ;
 	// if this does not make sense for a class, then the class is maybe not a "Plan"Agent.  kai, may'10
+	
+	public PlanElement getNextPlanElement() ;
 
 	/**
 	 * @return "(Leg) getCurrentPlanElement()" if the current plan element is a leg, otherwise null.
@@ -138,12 +141,11 @@ public interface PlanAgent extends MobsimAgent {
 	 * Design thoughts:<ul>
 	 * <li> yyyy I don't like this "initialize" method that one can easily forget to call.
 	 * And I am confident that one can do without it.  kai, may'10
-	 * <li> The "checkIfAlive" is there since an agent can have no log (staying at first activity all day), in which case
+	 * <li> The "checkIfAlive" is there since an agent can have no leg (staying at first activity all day), in which case
 	 * the agent is essentially ignored by the mobsim.  (This is how I found it; not so great since it causes problems
 	 * with the scoring.)
 	 * </ul>
 	 */
 	public boolean initializeAndCheckIfAlive();
-
-
+	
 }

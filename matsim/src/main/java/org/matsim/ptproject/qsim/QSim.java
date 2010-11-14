@@ -130,8 +130,8 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 	 * Includes all agents that have transportation modes unknown to
 	 * the QueueSimulation (i.e. != "car") or have two activities on the same link
  	 */
-	private final Queue<Tuple<Double, PersonAgent>> teleportationList =
-		new PriorityQueue<Tuple<Double, PersonAgent>>(30, new TeleportationArrivalTimeComparator());
+	private final Queue<Tuple<Double, PlanAgent>> teleportationList =
+		new PriorityQueue<Tuple<Double, PlanAgent>>(30, new TeleportationArrivalTimeComparator());
 
 	/**
 	 * This list needs to be a "blocking" queue since this is needed for thread-safety in the parallel qsim. cdobler, oct'10
@@ -327,10 +327,10 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 
 		double now = this.simTimer.getTimeOfDay();
 
-		for (Tuple<Double, PersonAgent> entry : this.teleportationList) {
-			PersonAgent agent = entry.getSecond();
+		for (Tuple<Double, PlanAgent> entry : this.teleportationList) {
+			PlanAgent agent = entry.getSecond();
 			events.processEvent(events.getFactory().
-					createAgentStuckEvent(now, agent.getPerson().getId(), agent.getDestinationLinkId(), agent.getCurrentLeg().getMode()));
+					createAgentStuckEvent(now, agent.getId(), agent.getDestinationLinkId(), agent.getCurrentLeg().getMode()));
 		}
 		this.teleportationList.clear();
 
@@ -405,10 +405,10 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 	protected final void handleTeleportationArrivals() {
 		double now = this.getSimTimer().getTimeOfDay() ;
 		while (this.teleportationList.peek() != null ) {
-			Tuple<Double, PersonAgent> entry = this.teleportationList.peek();
+			Tuple<Double, PlanAgent> entry = this.teleportationList.peek();
 			if (entry.getFirst().doubleValue() <= now) {
 				this.teleportationList.poll();
-				PersonAgent personAgent = entry.getSecond();
+				PlanAgent personAgent = entry.getSecond();
 				personAgent.teleportToLink(personAgent.getDestinationLinkId());
 				this.endLegAndAssumeControl(personAgent, now);
 			}
@@ -478,13 +478,13 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 	}
 
 	@Override
-	public final void registerAgentAtPtWaitLocation(final PersonAgent agent) {
+	public final void registerAgentAtPtWaitLocation(final PlanAgent planAgent) {
 		// called by TransitEngine
-		if (agent instanceof PersonDriverAgentImpl) { // yyyy but why is this needed?  Does the driver get registered?
-			Leg leg = (Leg) agent.getCurrentPlanElement() ;
+		if (planAgent instanceof PersonDriverAgentImpl) { // yyyy but why is this needed?  Does the driver get registered?
+			Leg leg = (Leg) planAgent.getCurrentPlanElement() ;
 			Id linkId = leg.getRoute().getStartLinkId();
 			NetsimLink qLink = this.netEngine.getQNetwork().getNetsimLink(linkId) ;
-			qLink.registerAgentOnLink( agent ) ;
+			qLink.registerAgentOnLink( planAgent ) ;
 		}
 	}
 
@@ -504,13 +504,13 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 	}
 
 	@Override
-	public final void unregisterAgentAtPtWaitLocation( final PersonAgent agent ) {
+	public final void unregisterAgentAtPtWaitLocation( final PlanAgent planAgent ) {
 		// called by TransitDriver
-		if (agent instanceof PersonDriverAgentImpl) { // yyyy but why is this needed?
-			Leg leg = (Leg) agent.getCurrentPlanElement() ;
+		if (planAgent instanceof PersonDriverAgentImpl) { // yyyy but why is this needed?
+			Leg leg = (Leg) planAgent.getCurrentPlanElement() ;
 			Id linkId = leg.getRoute().getStartLinkId();
 			NetsimLink qLink = this.netEngine.getQNetwork().getNetsimLink(linkId) ;
-			qLink.unregisterAgentOnLink( agent ) ;
+			qLink.unregisterAgentOnLink( planAgent ) ;
 		}
 	}
 
@@ -538,28 +538,28 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 	@Deprecated // unclear if this is "actEnd" or "departure"!  kai, may'10
 	// depending on this, it is a "PersonAgent" or "DriverAgent".  kai, may'10
 	// I think it is departure, but still a person agent.  kai, aug'10
-	public void agentDeparts(final PersonAgent agent, final Id linkId) {
+	public void agentDeparts(final PlanAgent agent, final Id linkId) {
 		double now = this.getSimTimer().getTimeOfDay() ;
 		Leg leg = agent.getCurrentLeg();
 //		Route route = leg.getRoute();
 		String mode = leg.getMode();
-		events.processEvent(events.getFactory().createAgentDepartureEvent(now, agent.getPerson().getId(), linkId, mode ));
+		events.processEvent(events.getFactory().createAgentDepartureEvent(now, agent.getId(), linkId, mode ));
 		if (handleKnownLegModeDeparture(now, agent, linkId, leg)) {
 			return;
 		} else {
 			handleUnknownLegMode(now, agent);
-			events.processEvent(new AdditionalTeleportationDepartureEvent( now, agent.getPerson().getId(), linkId, mode, agent.getDestinationLinkId(), leg.getTravelTime() )) ;
+			events.processEvent(new AdditionalTeleportationDepartureEvent( now, agent.getId(), linkId, mode, agent.getDestinationLinkId(), leg.getTravelTime() )) ;
 		}
 	}
 
-	private void handleUnknownLegMode(final double now, final PersonAgent personAgent) {
-		double arrivalTime = now + personAgent.getCurrentLeg().getTravelTime();
-		this.teleportationList.add(new Tuple<Double, PersonAgent>(arrivalTime, personAgent));
+	private void handleUnknownLegMode(final double now, final PlanAgent planAgent) {
+		double arrivalTime = now + planAgent.getCurrentLeg().getTravelTime();
+		this.teleportationList.add(new Tuple<Double, PlanAgent>(arrivalTime, planAgent));
 	}
 
-	private boolean handleKnownLegModeDeparture(final double now, final PersonAgent personAgent, final Id linkId, final Leg leg) {
+	private boolean handleKnownLegModeDeparture(final double now, final PlanAgent planAgent, final Id linkId, final Leg leg) {
 		for (DepartureHandler departureHandler : this.departureHandlers) {
-			if (departureHandler.handleDeparture(now, personAgent, linkId, leg)) {
+			if (departureHandler.handleDeparture(now, planAgent, linkId, leg)) {
 				return true;
 			}
 			// The code is not (yet?) very beautiful.  But structurally, this goes through all departure handlers and tries to
@@ -670,6 +670,7 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 		this.simTimer.setSimStartTime(simStartTime);
 		this.simTimer.setTime(simStartTime);
 	}
+	
 
 	// ############################################################################################################################
 	// utility methods (presumably no state change)

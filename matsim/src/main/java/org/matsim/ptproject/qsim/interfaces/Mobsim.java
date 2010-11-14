@@ -27,6 +27,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.IOSimulation;
 import org.matsim.core.mobsim.framework.ObservableSimulation;
 import org.matsim.core.mobsim.framework.PersonAgent;
+import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.ptproject.qsim.agents.AgentFactory;
 
 /**The logic is as follows:<ul>
@@ -91,7 +92,7 @@ import org.matsim.ptproject.qsim.agents.AgentFactory;
  */
 public interface Mobsim extends IOSimulation, ObservableSimulation {
 
-	void agentDeparts(PersonAgent personAgent, Id startLinkId);
+	void agentDeparts(PlanAgent planAgent, Id startLinkId);
 
 	EventsManager getEventsManager();
 
@@ -132,8 +133,8 @@ public interface Mobsim extends IOSimulation, ObservableSimulation {
 	 * 
 	 * yyyy not sure if this could not be the more general "registerOnLink" function.  kai, aug'10
 	 * 	 */
-	void registerAgentAtPtWaitLocation( final PersonAgent agent ) ;
-	void unregisterAgentAtPtWaitLocation( final PersonAgent agent ) ;
+	void registerAgentAtPtWaitLocation( final PlanAgent planAgent ) ;
+	void unregisterAgentAtPtWaitLocation( final PlanAgent planAgent ) ;
 
 
 }

@@ -23,8 +23,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
+import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.agents.PersonDriverAgentImpl;
@@ -47,7 +47,7 @@ public class CarDepartureHandler implements DepartureHandler {
 	}
 
 	@Override
-	public boolean handleDeparture(double now, PersonAgent agent, Id linkId, Leg leg) {
+	public boolean handleDeparture(double now, PlanAgent agent, Id linkId, Leg leg) {
 		if (leg.getMode().equals(TransportMode.car)) {
 			if ( agent instanceof PersonDriverAgent ) {
 				handleCarDeparture(now, (PersonDriverAgent)agent, linkId, leg);

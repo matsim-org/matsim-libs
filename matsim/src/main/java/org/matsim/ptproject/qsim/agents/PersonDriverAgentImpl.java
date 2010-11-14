@@ -35,6 +35,7 @@ import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.events.ActivityEndEventImpl;
 import org.matsim.core.events.ActivityStartEventImpl;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -89,43 +90,6 @@ public class PersonDriverAgentImpl implements PersonDriverAgent {
 	// ============================================================================================================================
 	// other
 
-	/**
-	 * Some data of the currently simulated Leg is cached to speed up
-	 * the simulation. If the Leg changes (for example the Route or
-	 * the Destination Link), those cached data has to be reseted.
-	 *
-	 * If the Leg has not changed, calling this method should have no effect
-	 * on the Results of the Simulation!
-	 */
-	void resetCaches() {
-		// moving this method not to WithinDay for the time being since it seems to make some sense to keep this where the internal are
-		// known best.  kai, oct'10
-		// Compromise: package-private here; making it public in the Withinday class.  kai, nov'10
-		
-		this.cachedNextLinkId = null;
-		this.cachedRouteLinkIds = null;
-		this.cachedDestinationLinkId = null;
-
-		/*
-		 * The Leg may have been exchanged in the Person's Plan, so
-		 * we update the Reference to the currentLeg Object.
-		 */
-		PlanElement currentPlanElement = this.getPlanElements().get(this.currentPlanElementIndex);
-		if (currentPlanElement instanceof Leg) {
-			this.currentLeg  = ((Leg) currentPlanElement);
-			this.cachedRouteLinkIds = null;
-		}
-
-		Route route = currentLeg.getRoute();
-		if (route == null) {
-			log.error("The agent " + this.getPerson().getId() + " has no route in its leg. Removing the agent from the simulation.");
-			this.simulation.getAgentCounter().decLiving();
-			this.simulation.getAgentCounter().incLost();
-			return;
-		}
-		this.cachedDestinationLinkId = route.getEndLinkId();
-	}
-
 	@Override
 	public final boolean initializeAndCheckIfAlive() {
 		List<? extends PlanElement> planElements = this.getPlanElements();
@@ -144,28 +108,6 @@ public class PersonDriverAgentImpl implements PersonDriverAgent {
 	}
 
 	// -----------------------------------------------------------------------------------------------------------------------------
-	// -----------------------------------------------------------------------------------------------------------------------------
-
-	private Boolean advancePlan() {
-		this.currentPlanElementIndex++;
-		
-		// check if plan has run dry:
-		if ( this.currentPlanElementIndex >= this.getPlanElements().size() ) {
-			return null ;
-		} 
-		
-		PlanElement pe = this.getCurrentPlanElement() ;
-		if (pe instanceof Activity) {
-			initNextActivity((Activity) pe);
-			return true ;
-		} else if (pe instanceof Leg) {
-
-			return initNextLeg( (Leg) pe ) ;
-		} else {
-			throw new RuntimeException("Unknown PlanElement of type: " + pe.getClass().getName());
-		}
-	}
-	
 	// -----------------------------------------------------------------------------------------------------------------------------
 	
 	@Override
@@ -208,6 +150,45 @@ public class PersonDriverAgentImpl implements PersonDriverAgent {
 		// note that when we are here we don't know if next is another leg, or an activity  Therefore, we go to a general method:
 		Boolean flag = advancePlan() ;
 		scheduleAgentInMobsim( flag );
+	}
+
+	// -----------------------------------------------------------------------------------------------------------------------------
+
+	private Boolean scheduleAgentInMobsim( Boolean flag ) {
+		
+		if ( flag == null ) {
+			throw new RuntimeException("plan has run empty" ) ;
+		}
+		
+		PlanElement pe = this.getCurrentPlanElement() ;
+
+		if (pe instanceof Activity) {
+
+			if ((this.currentPlanElementIndex+1) < this.getPlanElements().size()) {
+				// there is still at least on plan element left
+				this.simulation.scheduleActivityEnd(this);
+				return true ;
+			} else {
+				// this is the last activity
+				this.simulation.getAgentCounter().decLiving();
+				return false ;
+			}
+
+		} else if (pe instanceof Leg) {
+
+			if ( flag ) {
+				this.simulation.agentDeparts(this, this.currentLinkId);
+				return true ;
+			} else {
+				log.error("The agent " + this.getId() + " returned false from advancePlan.  Removing the ag from the mobsim ...");
+				this.simulation.getAgentCounter().decLiving();
+				this.simulation.getAgentCounter().incLost();
+				return false ;
+			}
+
+		} else { // (presumably, this was already caught earlier)
+			throw new RuntimeException("Unknown PlanElement of type: " + pe.getClass().getName());
+		}
 	}
 
 	// -----------------------------------------------------------------------------------------------------------------------------
@@ -269,6 +250,63 @@ public class PersonDriverAgentImpl implements PersonDriverAgent {
 	// ============================================================================================================================
 	// below there only (package-)private methods or setters/getters
 	
+	private Boolean advancePlan() {
+		this.currentPlanElementIndex++;
+		
+		// check if plan has run dry:
+		if ( this.currentPlanElementIndex >= this.getPlanElements().size() ) {
+			return null ;
+		} 
+		
+		PlanElement pe = this.getCurrentPlanElement() ;
+		if (pe instanceof Activity) {
+			initNextActivity((Activity) pe);
+			return true ;
+		} else if (pe instanceof Leg) {
+
+			return initNextLeg( (Leg) pe ) ;
+		} else {
+			throw new RuntimeException("Unknown PlanElement of type: " + pe.getClass().getName());
+		}
+	}
+	
+	/**
+	 * Some data of the currently simulated Leg is cached to speed up
+	 * the simulation. If the Leg changes (for example the Route or
+	 * the Destination Link), those cached data has to be reseted.
+	 *</p>
+	 * If the Leg has not changed, calling this method should have no effect
+	 * on the Results of the Simulation!
+	 */
+	void resetCaches() {
+		// moving this method not to WithinDay for the time being since it seems to make some sense to keep this where the internal are
+		// known best.  kai, oct'10
+		// Compromise: package-private here; making it public in the Withinday class.  kai, nov'10
+		
+		this.cachedNextLinkId = null;
+		this.cachedRouteLinkIds = null;
+		this.cachedDestinationLinkId = null;
+
+		/*
+		 * The Leg may have been exchanged in the Person's Plan, so
+		 * we update the Reference to the currentLeg Object.
+		 */
+		PlanElement currentPlanElement = this.getPlanElements().get(this.currentPlanElementIndex);
+		if (currentPlanElement instanceof Leg) {
+			this.currentLeg  = ((Leg) currentPlanElement);
+			this.cachedRouteLinkIds = null;
+		}
+
+		Route route = currentLeg.getRoute();
+		if (route == null) {
+			log.error("The agent " + this.getPerson().getId() + " has no route in its leg. Removing the agent from the simulation.");
+			this.simulation.getAgentCounter().decLiving();
+			this.simulation.getAgentCounter().incLost();
+			return;
+		}
+		this.cachedDestinationLinkId = route.getEndLinkId();
+	}
+
 	/**
 	 * If this method is called to update a changed ActivityEndTime please
 	 * ensure, that the ActivityEndsList in the {@link QSim} is also updated.
@@ -336,45 +374,14 @@ public class PersonDriverAgentImpl implements PersonDriverAgent {
 	private static int finalActHasDpTimeWrnCnt = 0 ;
 
 	
-	private Boolean scheduleAgentInMobsim( Boolean flag ) {
-		
-		if ( flag == null ) {
-			throw new RuntimeException("plan has run empty" ) ;
-		}
-		
-		PlanElement pe = this.getCurrentPlanElement() ;
-
-		if (pe instanceof Activity) {
-
-			if ((this.currentPlanElementIndex+1) < this.getPlanElements().size()) {
-				// there is still at least on plan element left
-				this.simulation.scheduleActivityEnd(this);
-			} else {
-				// this is the last activity
-				this.simulation.getAgentCounter().decLiving();
-			}
-			return true ;
-
-		} else if (pe instanceof Leg) {
-
-			if ( flag ) {
-				this.simulation.agentDeparts(this, this.currentLinkId);
-			} else {
-				log.error("The agent " + this.getPerson().getId() + " returned false from advancePlanElement.  Removing the ag from the mobsim ...");
-				this.simulation.getAgentCounter().decLiving();
-				this.simulation.getAgentCounter().incLost();
-			}
-			return true ;
-
-		} else { // (presumably, this was already caught earlier)
-			throw new RuntimeException("Unknown PlanElement of type: " + pe.getClass().getName());
-		}
-	}
-
 	private boolean initNextLeg(final Leg leg) {
 		Route route = leg.getRoute();
 		if (route == null) {
 			log.error("The agent " + this.getPerson().getId() + " has no route in its leg.  Returning false from initNextLeg ...");
+			if ( noRouteWrnCnt < 1 ) {
+				log.info( "(Route is needed inside Leg even if you want teleportation since Route carries the start/endLinkId info.)") ;
+				noRouteWrnCnt++ ;
+			}
 			return false;
 		}
 		this.cachedDestinationLinkId = route.getEndLinkId();
@@ -386,7 +393,8 @@ public class PersonDriverAgentImpl implements PersonDriverAgent {
 		this.cachedNextLinkId = null;
 		return true ;
 	}
-
+	private static int noRouteWrnCnt = 0 ;
+	
 	private void initNextActivity(final Activity act) {
 		double now = this.getMobsim().getSimTimer().getTimeOfDay() ;
 		this.simulation.getEventsManager().processEvent(new ActivityStartEventImpl(now, this.getPerson().getId(),  this.currentLinkId, act.getFacilityId(), act.getType()));
@@ -411,6 +419,15 @@ public class PersonDriverAgentImpl implements PersonDriverAgent {
 	@Override
 	public final PlanElement getCurrentPlanElement() {
 		return this.getPlanElements().get(this.currentPlanElementIndex);
+	}
+	
+	@Override
+	public final PlanElement getNextPlanElement() {
+		if ( this.currentPlanElementIndex < this.getPlanElements().size() ) {
+			return this.getPlanElements().get( this.currentPlanElementIndex+1 ) ;
+		} else {
+			return null ;
+		}
 	}
 	
 	@Override
@@ -466,6 +483,11 @@ public class PersonDriverAgentImpl implements PersonDriverAgent {
 	@Override
 	public final Person getPerson() {
 		return this.person;
+	}
+
+	@Override
+	public Id getId() {
+		return this.person.getId();
 	}
 
 }

@@ -237,4 +237,11 @@ public class UmlaufDriver extends AbstractTransitDriver {
 		return this.departure;
 	}
 
+	@Override
+	public PlanElement getNextPlanElement() {
+		// yyyy this is not so great but as long as the Activities are "not there" for this agent, there is little meaningfull
+		// that I can think of.  kai, nov'10
+		throw new UnsupportedOperationException() ;
+	}
+
 }

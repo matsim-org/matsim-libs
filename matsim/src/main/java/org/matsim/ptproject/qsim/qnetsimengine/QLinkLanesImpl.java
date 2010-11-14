@@ -37,6 +37,7 @@ import org.matsim.core.events.AgentStuckEventImpl;
 import org.matsim.core.events.AgentWait2LinkEventImpl;
 import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.mobsim.framework.PersonAgent;
+import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.lanes.Lane;
 import org.matsim.lanes.LaneMeterFromLinkEndComparator;
 import org.matsim.ptproject.qsim.QSim;
@@ -139,7 +140,7 @@ public class QLinkLanesImpl extends QLinkInternalI {
 
 	private final Map<Id, QVehicle> parkedVehicles = new LinkedHashMap<Id, QVehicle>(10);
 
-	private final Map<Id, PersonAgent> agentsInActivities = new LinkedHashMap<Id, PersonAgent>();
+	private final Map<Id, PlanAgent> agentsInActivities = new LinkedHashMap<Id, PlanAgent>();
 
 	private VisData visdata = this.new VisDataImpl();
 
@@ -529,13 +530,13 @@ public class QLinkLanesImpl extends QLinkInternalI {
 	}
 
 	@Override
-	public void registerAgentOnLink(PersonAgent agent) {
-		agentsInActivities.put(agent.getPerson().getId(), agent);
+	public void registerAgentOnLink(PlanAgent planAgent) {
+		agentsInActivities.put(planAgent.getId(), planAgent);
 	}
 
 	@Override
-	public void unregisterAgentOnLink(PersonAgent agent) {
-		agentsInActivities.remove(agent.getPerson().getId());
+	public void unregisterAgentOnLink(PlanAgent planAgent) {
+		agentsInActivities.remove(planAgent.getId());
 	}
 
 
