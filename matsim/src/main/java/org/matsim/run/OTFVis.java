@@ -44,6 +44,10 @@ import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser.FileType;
 import org.matsim.ptproject.qsim.QSim;
+import org.matsim.signalsystems.builder.FromDataBuilder;
+import org.matsim.signalsystems.data.SignalsData;
+import org.matsim.signalsystems.model.QSimSignalEngine;
+import org.matsim.signalsystems.model.SignalEngine;
 import org.matsim.vis.otfvis.OTFClientFile;
 import org.matsim.vis.otfvis.OTFClientSwing;
 import org.matsim.vis.otfvis.OTFEvent2MVI;
@@ -230,6 +234,10 @@ public class OTFVis {
 		EventsManagerImpl events = new EventsManagerImpl();
 		ControlerIO controlerIO = new ControlerIO(scenario.getConfig().controler().getOutputDirectory());
 		QSim qSim = new QSim(scenario, events);
+		if (scenario.getConfig().scenario().isUseSignalSystems()){
+			SignalEngine engine = new QSimSignalEngine(new FromDataBuilder(scenario.getScenarioElement(SignalsData.class), events).createAndInitializeSignalSystemsManager());
+			qSim.addQueueSimulationListeners(engine);
+		}
 		OTFVisMobsimFeature queueSimulationFeature = new OTFVisMobsimFeature(qSim);
 		qSim.addFeature(queueSimulationFeature);
 		queueSimulationFeature.setVisualizeTeleportedAgents(scenario.getConfig().otfVis().isShowTeleportedAgents());
