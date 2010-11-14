@@ -93,9 +93,8 @@ SimulationInitializedListener, SimulationAfterSimStepListener, SimulationBeforeC
 	}
 
 	@Override
-	public void notifySimulationInitialized(@SuppressWarnings("unused") SimulationInitializedEvent ev) {
-		log.warn("receiving simulationInitializedEvent") ;
-
+	public void notifySimulationInitialized(SimulationInitializedEvent ev) {
+		log.info("receiving simulationInitializedEvent") ;
 		for ( MobsimAgent mag : this.queueSimulation.getAgents() ) {
 			if ( mag instanceof PersonAgent ) {
 				PersonAgent pag = (PersonAgent) mag ;
