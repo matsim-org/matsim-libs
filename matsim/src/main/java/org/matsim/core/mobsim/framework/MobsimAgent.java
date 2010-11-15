@@ -20,7 +20,6 @@
 
 package org.matsim.core.mobsim.framework;
 
-import org.matsim.api.core.v01.Id;
 
 
 /**An interface for all matsim mobsim agents.  mobsim agents are entities capable of autonomous behavior.  This could, in my view, 
