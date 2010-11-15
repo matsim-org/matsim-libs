@@ -20,7 +20,6 @@
 package playground.gregor.sims.shelters.linkpenalty;
 
 import java.util.HashMap;
-import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.Map.Entry;
 
@@ -34,12 +33,10 @@ import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.events.AgentMoneyEventImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.evacuation.base.Building;
-import org.matsim.signalsystems.control.SignalSystemController;
 
 
 public class ShelterInputCounter implements LinkLeaveEventHandler, BeforeMobsimListener {
 
-	private SortedMap<Id, SignalSystemController> scs;
 	private final HashMap<Id,Counter> counts = new HashMap<Id, Counter>();
 	private final HashMap<Id, Building> shelterLinkMapping;
 	private final HashMap<Id,LinkInfo> linkInfos = new HashMap<Id, LinkInfo>();
