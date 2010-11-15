@@ -36,11 +36,6 @@ import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.signalsystems.builder.FromDataBuilder;
-import org.matsim.signalsystems.config.PlanBasedSignalSystemControlInfo;
-import org.matsim.signalsystems.config.SignalGroupSettings;
-import org.matsim.signalsystems.config.SignalSystemConfiguration;
-import org.matsim.signalsystems.config.SignalSystemConfigurations;
-import org.matsim.signalsystems.config.SignalSystemPlan;
 import org.matsim.signalsystems.data.SignalsData;
 import org.matsim.signalsystems.data.SignalsScenarioLoader;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalGroupSettingsData;
@@ -71,45 +66,6 @@ public class SignalSystemsOneAgentTest implements
 
 	@Rule
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
-	
-//	@Test
-	public void testTrafficLightIntersection2arms1Agent() {
-		String plansFile = testUtils.getClassInputDirectory() + "plans1Agent.xml";
-		String laneDefinitions = testUtils.getClassInputDirectory() + "testLaneDefinitions_v1.1.xml";
-		String lsaDefinition = testUtils.getClassInputDirectory() + "testSignalSystems_v1.1.xml";
-		String lsaConfig = testUtils.getClassInputDirectory() + "testSignalSystemConfigurations_v1.1.xml";
-
-		ScenarioImpl scenario = new ScenarioImpl();
-		Config conf = scenario.getConfig();
-		conf.network().setInputFile(testUtils.getClassInputDirectory() + "network.xml.gz");
-		conf.network().setLaneDefinitionsFile(laneDefinitions);
-		conf.signalSystems().setSignalSystemFile(lsaDefinition);
-		conf.signalSystems().setSignalSystemConfigFile(lsaConfig);
-		conf.plans().setInputFile(plansFile);
-		conf.scenario().setUseLanes(true);
-		conf.scenario().setUseSignalSystems(true);
-		conf.setQSimConfigGroup(new QSimConfigGroup());
-		conf.getQSimConfigGroup().setStuckTime(1000);
-		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(scenario);
-
-		loader.loadScenario();
-
-		EventsManagerImpl events = new EventsManagerImpl();
-		events.addHandler(this);
-		this.link2EnterTime = 38.0;
-		
-		SignalSystemConfigurations lssConfigs = scenario.getSignalSystemConfigurations();
-		for (SignalSystemConfiguration lssConfig : lssConfigs.getSignalSystemConfigurations().values()) {
-			PlanBasedSignalSystemControlInfo controlInfo = (PlanBasedSignalSystemControlInfo) lssConfig
-					.getControlInfo();
-			SignalSystemPlan p = controlInfo.getPlans().get(new IdImpl("2"));
-			p.setCycleTime(60);
-			SignalGroupSettings group = p.getGroupConfigs().get(new IdImpl("100"));
-			group.setDropping(60);
-		}
-
-		new QSim(scenario, events).run();
-	}
 	
 	private Scenario createAndLoadTestScenario(){
 		String plansFile = testUtils.getClassInputDirectory() + "plans1Agent.xml";

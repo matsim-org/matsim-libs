@@ -28,17 +28,9 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.MatsimJaxbXmlParser;
-import org.matsim.jaxb.signalsystems11.XMLIdRefType;
-import org.matsim.jaxb.signalsystems11.XMLSignalGroupDefinitionType;
-import org.matsim.jaxb.signalsystems11.XMLSignalSystemDefinitionType;
 import org.matsim.jaxb.signalsystems11.XMLSignalSystems;
-import org.matsim.signalsystems.systems.SignalGroupDefinition;
-import org.matsim.signalsystems.systems.SignalSystemDefinition;
-import org.matsim.signalsystems.systems.SignalSystems;
-import org.matsim.signalsystems.systems.SignalSystemsFactory;
 import org.xml.sax.SAXException;
 
 /**
@@ -48,11 +40,9 @@ public class SignalSystemsReader11 extends MatsimJaxbXmlParser {
 
 	private static final Logger log = Logger.getLogger(SignalSystemsReader11.class);
 
-	private SignalSystems signalSystems;
 
-	public SignalSystemsReader11(SignalSystems lightSignalSystems, String schemaLocation) {
+	public SignalSystemsReader11(String schemaLocation) {
 		super(schemaLocation);
-		this.signalSystems = lightSignalSystems;
 	}
 	
 	public XMLSignalSystems readSignalSystems11File(String filename) throws JAXBException, SAXException, ParserConfigurationException, IOException{
@@ -86,45 +76,6 @@ public class SignalSystemsReader11 extends MatsimJaxbXmlParser {
 	@Override
 	public void readFile(final String filename) throws JAXBException,
 			SAXException, ParserConfigurationException, IOException {
-		SignalSystemsFactory builder = this.signalSystems.getFactory();
-		
-		XMLSignalSystems xmlLssDefinition = this.readSignalSystems11File(filename);
-		
-		SignalSystemDefinition lssdef;
-		for (XMLSignalSystemDefinitionType xmllssDef : xmlLssDefinition
-				.getSignalSystemDefinition()) {
-			lssdef = builder.createSignalSystemDefinition(new IdImpl(xmllssDef
-					.getId()));
-			if (xmllssDef.getDefaultCycleTime() != null) {
-				lssdef.setDefaultCycleTime(xmllssDef.getDefaultCycleTime()
-						.getSeconds());
-			}
-			if (xmllssDef.getDefaultInterGreenTime() !=  null) {
-				lssdef.setDefaultInterGreenTime(xmllssDef.getDefaultInterGreenTime()
-						.getSeconds());
-			}
-			if (xmllssDef.getDefaultSynchronizationOffset() != null) {
-				lssdef.setDefaultSynchronizationOffset(xmllssDef
-						.getDefaultSynchronizationOffset().getSeconds());
-			}
-			signalSystems.addSignalSystemDefinition(lssdef);
-		}
-		// parsing lightSignalGroupDefinitions
-		SignalGroupDefinition lsgdef;
-		for (XMLSignalGroupDefinitionType xmllsgdef : xmlLssDefinition
-				.getSignalGroupDefinition()) {
-			lsgdef = builder.createSignalGroupDefinition(new IdImpl(xmllsgdef
-					.getLinkIdRef()), new IdImpl(xmllsgdef.getId()));
-			lsgdef.setSignalSystemDefinitionId(new IdImpl(xmllsgdef
-					.getSignalSystemDefinition().getRefId()));
-			for (XMLIdRefType refIds : xmllsgdef.getLane()) {
-				lsgdef.addLaneId(new IdImpl(refIds.getRefId()));
-			}
-			for (XMLIdRefType refIds : xmllsgdef.getToLink()) {
-				lsgdef.addToLinkId(new IdImpl(refIds.getRefId()));
-			}
-			signalSystems.addSignalGroupDefinition(lsgdef);
-		}
-
+		throw new UnsupportedOperationException("Use readSignalSystems11File() method");
 	}
 }

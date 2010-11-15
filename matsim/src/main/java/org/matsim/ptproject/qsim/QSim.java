@@ -79,8 +79,6 @@ import org.matsim.ptproject.qsim.qnetsimengine.DefaultQSimEngineFactory;
 import org.matsim.ptproject.qsim.qnetsimengine.QLanesNetworkFactory;
 import org.matsim.ptproject.qsim.qnetsimengine.QVehicle;
 import org.matsim.ptproject.qsim.qnetsimengine.QVehicleImpl;
-import org.matsim.ptproject.qsim.signalengine.QSimSignalEngine;
-import org.matsim.signalsystems.mobsim.SignalEngine;
 import org.matsim.vehicles.VehicleImpl;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleTypeImpl;
@@ -146,7 +144,6 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 	private AgentFactory agentFactory;
 	private SimulationListenerManager listenerManager;
 	private Scenario scenario = null;
-	private QSimSignalEngine signalEngine = null;
 
 //	private final List<MobsimFeature> queueSimulationFeatures = new ArrayList<MobsimFeature>();
 	private final List<DepartureHandler> departureHandlers = new ArrayList<DepartureHandler>();
@@ -242,9 +239,6 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 		if (this.multiModalEngine != null) {
 			this.multiModalEngine.onPrepareSim();
 		}
-		if (this.signalEngine != null) {
-			this.signalEngine.onPrepareSim();
-		}
 
 		createAgents();
 
@@ -313,10 +307,6 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 			this.transitEngine.afterSim();
 		}
 
-		if (this.signalEngine != null) {
-			this.signalEngine.afterSim();
-		}
-
 		if ( this.netEngine != null ) {
 			this.netEngine.afterSim();
 		}
@@ -365,10 +355,6 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 		// (network) change events engine:
 		if ( this.changeEventsEngine != null ) {
 			this.changeEventsEngine.doSimStep(time);
-		}
-		// signal engine:
-		if (this.signalEngine != null) {
-			this.signalEngine.doSimStep(time);
 		}
 		// teleportation "engine":
 		this.handleTeleportationArrivals();
@@ -757,14 +743,6 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 	@Override
 	public final Scenario getScenario() {
 		return this.scenario;
-	}
-
-//	public boolean isUseActivityDurations() {
-//		return this.scenario.getConfig().vspExperimental().isUseActivityDurations();
-//	}
-
-	public final SignalEngine getQSimSignalEngine() {
-		return this.signalEngine;
 	}
 
 	public final MultiModalSimEngine getMultiModalSimEngine() {

@@ -30,8 +30,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -50,7 +48,6 @@ import org.matsim.ptproject.qsim.interfaces.NetsimLink;
 import org.matsim.signalsystems.control.SignalGroupState;
 import org.matsim.signalsystems.mobsim.QSignalizedItem;
 import org.matsim.signalsystems.model.SignalizeableItem;
-import org.matsim.signalsystems.systems.SignalGroupDefinition;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 import org.matsim.vis.snapshots.writers.VisData;
 
@@ -147,8 +144,6 @@ public final class QLane extends QBufferItem implements SignalizeableItem {
 	 */
 	private final Set<Id> destinationLinkIds = new LinkedHashSet<Id>();
 
-	private SortedMap<Id, SignalGroupDefinition> signalGroups;
-
 	private final Lane laneData;
 	/**
 	 * This id is only set, if there is no laneData for the Lane, i.e. it is the original lane
@@ -180,18 +175,6 @@ public final class QLane extends QBufferItem implements SignalizeableItem {
 
 	public Lane getLane(){
 		return this.laneData;
-	}
-
-	final void addSignalGroupDefinition(final SignalGroupDefinition signalGroupDefinition) {
-		// called from QLinkLanesImpl.  kai, aug'10
-		for (Id laneId : signalGroupDefinition.getLaneIds()) {
-			if (this.laneData.getId().equals(laneId)) {
-				if (this.signalGroups == null) {
-					this.signalGroups = new TreeMap<Id, SignalGroupDefinition>();
-				}
-				this.signalGroups.put(signalGroupDefinition.getId(), signalGroupDefinition);
-			}
-		}
 	}
 
 	private void calculateFlowCapacity(final double time) {
@@ -283,24 +266,6 @@ public final class QLane extends QBufferItem implements SignalizeableItem {
 
 	double getEndsAtMeterFromLinkEnd(){
 		return this.meterFromLinkEnd;
-	}
-
-	/**
-	 * updated the status of the QueueLane's signal system
-	 */
-	public void updateGreenState(double time){
-		// "public" needed in signalengine.  kai, aug'10
-		if (this.signalGroups == null) {
-			log.fatal("This should never happen, since every lane link at a signalized intersection" +
-					" should have at least one signal(group). Please check integrity of traffic light data on link " +
-					this.queueLink.getLink().getId() + " lane " + this.laneData.getId() + ". Allowing to move anyway.");
-			this.setThisTimeStepGreen(true);
-			return;
-		}
-		//else everything normal...
-		for (SignalGroupDefinition signalGroup : this.signalGroups.values()) {
-			this.setThisTimeStepGreen(signalGroup.isGreen(time));
-		}
 	}
 
 	@Override
@@ -654,10 +619,6 @@ public final class QLane extends QBufferItem implements SignalizeableItem {
 
 	Set<Id> getDestinationLinkIds(){
 		return this.destinationLinkIds;
-	}
-
-	public SortedMap<Id, SignalGroupDefinition> getSignalGroups() {
-		return this.signalGroups;
 	}
 
 	LinkedList<QVehicle> getVehQueue() {

@@ -36,7 +36,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.events.AgentStuckEventImpl;
 import org.matsim.core.events.AgentWait2LinkEventImpl;
 import org.matsim.core.events.LinkEnterEventImpl;
-import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.lanes.Lane;
 import org.matsim.lanes.LaneMeterFromLinkEndComparator;
@@ -44,7 +43,6 @@ import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.helpers.AgentSnapshotInfoBuilder;
 import org.matsim.ptproject.qsim.interfaces.NetsimEngine;
 import org.matsim.ptproject.qsim.interfaces.NetsimLink;
-import org.matsim.signalsystems.systems.SignalGroupDefinition;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 import org.matsim.vis.snapshots.writers.VisData;
 
@@ -247,12 +245,6 @@ public class QLinkLanesImpl extends QLinkInternalI {
 
 	public List<QLane> getToNodeQueueLanes() {
 		return this.toNodeQueueLanes;
-	}
-
-	public void addSignalGroupDefinition(SignalGroupDefinition signalGroupDefinition) {
-		for (QLane lane : this.toNodeQueueLanes) {
-			lane.addSignalGroupDefinition(signalGroupDefinition);
-		}
 	}
 
 	@Override

@@ -41,10 +41,6 @@ import org.matsim.lanes.LaneDefinitionsImpl;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.roadpricing.RoadPricingScheme;
-import org.matsim.signalsystems.config.SignalSystemConfigurations;
-import org.matsim.signalsystems.config.SignalSystemConfigurationsImpl;
-import org.matsim.signalsystems.systems.SignalSystems;
-import org.matsim.signalsystems.systems.SignalSystemsImpl;
 import org.matsim.vehicles.Vehicles;
 import org.matsim.vehicles.VehiclesImpl;
 
@@ -71,8 +67,6 @@ public class ScenarioImpl implements Scenario {
 
 	//non-mandatory attributes
 	private LaneDefinitions laneDefinitions;
-	private SignalSystems signalSystems;
-	private SignalSystemConfigurations signalSystemConfigurations;
 	private RoadPricingScheme roadPricingScheme;
 	private TransitSchedule transitSchedule = null;
 
@@ -106,9 +100,6 @@ public class ScenarioImpl implements Scenario {
 		if (this.config.scenario().isUseLanes()){
 			this.createLaneDefinitionsContainer();
 		}
-		if (this.config.scenario().isUseSignalSystems()){
-			this.createSignalSystemsContainers();
-		}
 		if (this.config.scenario().isUseRoadpricing()){
 			this.createRoadPricingScheme();
 		}
@@ -138,11 +129,6 @@ public class ScenarioImpl implements Scenario {
 
 	protected void createLaneDefinitionsContainer() {
 		this.laneDefinitions = new LaneDefinitionsImpl();
-	}
-
-	protected void createSignalSystemsContainers() {
-		this.signalSystems = new SignalSystemsImpl();
-		this.signalSystemConfigurations = new SignalSystemConfigurationsImpl();
 	}
 
 	protected void createTransit() {
@@ -193,29 +179,6 @@ public class ScenarioImpl implements Scenario {
 		}
 		return laneDefinitions;
 	}
-
-
-	public SignalSystems getSignalSystems() {
-		if ((this.signalSystems == null) && this.config.scenario().isUseSignalSystems()){
-			this.createSignalSystemsContainers();
-		}
-		else if (!this.config.scenario().isUseSignalSystems()){
-			log.warn("signal systems: " + NON_ENABLED_ATTRIBUTE_WARNING);
-		}
-		return signalSystems;
-	}
-
-
-	public SignalSystemConfigurations getSignalSystemConfigurations() {
-		if ((this.signalSystemConfigurations == null) && this.config.scenario().isUseSignalSystems()){
-			this.createSignalSystemsContainers();
-		}
-		else if (!this.config.scenario().isUseSignalSystems()){
-			log.warn("signal systems configuration: " + NON_ENABLED_ATTRIBUTE_WARNING);
-		}
-		return signalSystemConfigurations;
-	}
-
 
 	public RoadPricingScheme getRoadPricingScheme() {
 		if ((this.roadPricingScheme == null) && this.config.scenario().isUseRoadpricing()){

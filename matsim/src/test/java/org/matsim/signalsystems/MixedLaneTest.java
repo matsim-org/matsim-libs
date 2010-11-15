@@ -52,16 +52,6 @@ import org.matsim.lanes.LaneDefinitionsFactory;
 import org.matsim.lanes.LaneDefinitionsV11ToV20Conversion;
 import org.matsim.lanes.LanesToLinkAssignment;
 import org.matsim.ptproject.qsim.QSim;
-import org.matsim.signalsystems.config.PlanBasedSignalSystemControlInfo;
-import org.matsim.signalsystems.config.SignalGroupSettings;
-import org.matsim.signalsystems.config.SignalSystemConfiguration;
-import org.matsim.signalsystems.config.SignalSystemConfigurations;
-import org.matsim.signalsystems.config.SignalSystemConfigurationsFactory;
-import org.matsim.signalsystems.config.SignalSystemPlan;
-import org.matsim.signalsystems.systems.SignalGroupDefinition;
-import org.matsim.signalsystems.systems.SignalSystemDefinition;
-import org.matsim.signalsystems.systems.SignalSystems;
-import org.matsim.signalsystems.systems.SignalSystemsFactory;
 
 
 /**
@@ -154,44 +144,44 @@ public class MixedLaneTest extends TestCase {
 		
 
 		//create signalsystems
-		SignalSystems signals = this.sc.getSignalSystems();
-		SignalSystemsFactory signalb = signals.getFactory();
-		SignalSystemDefinition signalSystem = signalb.createSignalSystemDefinition(id1);
-		SignalGroupDefinition signalGroup2Link2 = signalb.createSignalGroupDefinition(id1, id2);
-		signalGroup2Link2.setSignalSystemDefinitionId(id1);
-		signalGroup2Link2.addLaneId(id1);
-		signalGroup2Link2.addToLinkId(id2);
-		SignalGroupDefinition signalGroup2Link3 = signalb.createSignalGroupDefinition(id1, id3);
-		signalGroup2Link3.setSignalSystemDefinitionId(id1);
-		signalGroup2Link3.addLaneId(id1);
-		signalGroup2Link3.addToLinkId(id3);
-		signals.addSignalSystemDefinition(signalSystem);
-		signals.addSignalGroupDefinition(signalGroup2Link2);
-		signals.addSignalGroupDefinition(signalGroup2Link3);
-
-		//create signal system config
-		SignalSystemConfigurations signalConf = this.sc.getSignalSystemConfigurations();
-		SignalSystemConfigurationsFactory signalConfb = signalConf.getFactory();
-		SignalSystemConfiguration systemConf = signalConfb.createSignalSystemConfiguration(id1);
-		PlanBasedSignalSystemControlInfo signalPlanControl = signalConfb.createPlanBasedSignalSystemControlInfo();
-		SignalSystemPlan signalPlan = signalConfb.createSignalSystemPlan(id1);
-		signalPlan.setCycleTime(60);
-		SignalGroupSettings group2Settings = signalConfb.createSignalGroupSettings(id2);
-		group2Settings.setRoughCast(0);
-		group2Settings.setDropping(0);
-		group2Settings.setInterGreenTimeDropping(0);
-		group2Settings.setInterGreenTimeRoughcast(0);
-		SignalGroupSettings group3Settings = signalConfb.createSignalGroupSettings(id3);
-		group3Settings.setRoughCast(0);
-		group3Settings.setDropping(1);
-		group3Settings.setInterGreenTimeDropping(0);
-		group3Settings.setInterGreenTimeRoughcast(0);
-		//plug it together
-		signalPlan.addLightSignalGroupConfiguration(group2Settings);
-		signalPlan.addLightSignalGroupConfiguration(group3Settings);
-		signalPlanControl.addPlan(signalPlan);
-		systemConf.setSignalSystemControlInfo(signalPlanControl);
-		signalConf.addSignalSystemConfiguration(systemConf);
+//		SignalSystems signals = this.sc.getSignalSystems();
+//		SignalSystemsFactory signalb = signals.getFactory();
+//		SignalSystemDefinition signalSystem = signalb.createSignalSystemDefinition(id1);
+//		SignalGroupDefinition signalGroup2Link2 = signalb.createSignalGroupDefinition(id1, id2);
+//		signalGroup2Link2.setSignalSystemDefinitionId(id1);
+//		signalGroup2Link2.addLaneId(id1);
+//		signalGroup2Link2.addToLinkId(id2);
+//		SignalGroupDefinition signalGroup2Link3 = signalb.createSignalGroupDefinition(id1, id3);
+//		signalGroup2Link3.setSignalSystemDefinitionId(id1);
+//		signalGroup2Link3.addLaneId(id1);
+//		signalGroup2Link3.addToLinkId(id3);
+//		signals.addSignalSystemDefinition(signalSystem);
+//		signals.addSignalGroupDefinition(signalGroup2Link2);
+//		signals.addSignalGroupDefinition(signalGroup2Link3);
+//
+//		//create signal system config
+//		SignalSystemConfigurations signalConf = this.sc.getSignalSystemConfigurations();
+//		SignalSystemConfigurationsFactory signalConfb = signalConf.getFactory();
+//		SignalSystemConfiguration systemConf = signalConfb.createSignalSystemConfiguration(id1);
+//		PlanBasedSignalSystemControlInfo signalPlanControl = signalConfb.createPlanBasedSignalSystemControlInfo();
+//		SignalSystemPlan signalPlan = signalConfb.createSignalSystemPlan(id1);
+//		signalPlan.setCycleTime(60);
+//		SignalGroupSettings group2Settings = signalConfb.createSignalGroupSettings(id2);
+//		group2Settings.setRoughCast(0);
+//		group2Settings.setDropping(0);
+//		group2Settings.setInterGreenTimeDropping(0);
+//		group2Settings.setInterGreenTimeRoughcast(0);
+//		SignalGroupSettings group3Settings = signalConfb.createSignalGroupSettings(id3);
+//		group3Settings.setRoughCast(0);
+//		group3Settings.setDropping(1);
+//		group3Settings.setInterGreenTimeDropping(0);
+//		group3Settings.setInterGreenTimeRoughcast(0);
+//		//plug it together
+//		signalPlan.addLightSignalGroupConfiguration(group2Settings);
+//		signalPlan.addLightSignalGroupConfiguration(group3Settings);
+//		signalPlanControl.addPlan(signalPlan);
+//		systemConf.setSignalSystemControlInfo(signalPlanControl);
+//		signalConf.addSignalSystemConfiguration(systemConf);
 
 
 		//create population
