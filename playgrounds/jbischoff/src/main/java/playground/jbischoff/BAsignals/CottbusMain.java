@@ -30,7 +30,9 @@ public class CottbusMain {
 	
 
 	private String config = JbBaPaths.BASIMH+"scenario-lsa/cottbusConfig.xml";
-	
+//	private String config = "/media/data/work/repos/shared-svn/studies/dgrether/cottbus/Cottbus-BA/scenario-lsa/cottbusConfig.xml";
+//private String config = "/media/data/work/repos/shared-svn/studies/dgrether/cottbus/Cottbus-BA/scenario-slv/cottbusConfig.xml";
+
 	public void runCottbus(){
 		System.err.println("here");
 		
