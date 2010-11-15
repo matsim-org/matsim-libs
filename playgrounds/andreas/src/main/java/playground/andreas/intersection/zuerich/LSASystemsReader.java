@@ -1,7 +1,6 @@
 package playground.andreas.intersection.zuerich;
 
 import java.io.IOException;
-import java.util.HashMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -11,14 +10,12 @@ import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsData;
-import org.matsim.signalsystems.systems.SignalSystemDefinition;
 
 public class LSASystemsReader implements TabularFileHandler {
 
 	private static final Logger log = Logger.getLogger(LSASystemsReader.class);
 
 	private TabularFileParserConfig tabFileParserConfig;
-	private HashMap<Integer, SignalSystemDefinition> lsaMap = new HashMap<Integer, SignalSystemDefinition>();
 
 	private SignalSystemsData signals;
 
@@ -47,13 +44,12 @@ public class LSASystemsReader implements TabularFileHandler {
 
 	}
 
-	private HashMap<Integer, SignalSystemDefinition> readFile(String filename) throws IOException {
+	private void readFile(String filename) throws IOException {
 		this.tabFileParserConfig = new TabularFileParserConfig();
 		this.tabFileParserConfig.setFileName(filename);
 		this.tabFileParserConfig.setDelimiterTags(new String[] { " ", "\t" }); // \t
 		// this.tabFileParserConfig.setDelimiterTags(new String[] {"D"});
 		new TabularFileParser().parse(this.tabFileParserConfig, this);
-		return this.lsaMap;
 	}
 
 	public void readBasicLightSignalSystemDefinition(String filename) {
