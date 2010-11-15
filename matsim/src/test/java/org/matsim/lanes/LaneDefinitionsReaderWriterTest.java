@@ -25,7 +25,6 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.signalsystems.SignalSystemsReaderWriterTest;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -35,7 +34,7 @@ import org.matsim.testcases.MatsimTestCase;
  */
 public class LaneDefinitionsReaderWriterTest extends MatsimTestCase {
 
-	private static final Logger log = Logger.getLogger(SignalSystemsReaderWriterTest.class);
+	private static final Logger log = Logger.getLogger(LaneDefinitionsReaderWriterTest.class);
 
 	private static final String TESTXMLV11 = "testLaneDefinitions_v1.1.xml";
 
