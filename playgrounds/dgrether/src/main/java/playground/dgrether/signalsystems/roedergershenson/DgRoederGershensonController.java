@@ -39,7 +39,6 @@ import org.matsim.signalsystems.model.SignalController;
 import org.matsim.signalsystems.model.SignalGroup;
 import org.matsim.signalsystems.model.SignalPlan;
 import org.matsim.signalsystems.model.SignalSystem;
-import org.matsim.signalsystems.systems.SignalGroupDefinition;
 
 import playground.dgrether.signalsystems.DgSensorManager;
 
@@ -86,7 +85,6 @@ public class DgRoederGershensonController implements SignalController {
 	
 	private boolean interim = false;
 	private double interimTime;
-	private SignalGroupDefinition interimGroup;
 
 	protected boolean outLinkJam;
 	protected boolean maxRedTimeActive = false;
