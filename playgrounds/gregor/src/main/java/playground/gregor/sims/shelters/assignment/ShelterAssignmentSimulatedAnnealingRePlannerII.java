@@ -126,6 +126,7 @@ public class ShelterAssignmentSimulatedAnnealingRePlannerII extends ShelterAssig
 				log.info("System not yet melted! new  c_0 = " + this.c_k);
 				if (this.c_k > 10) {
 					this.c_k = 10;
+					this.melted = true;
 					log.info("System not yet melted! new  c_0 = " + this.c_k);
 				}
 			} else {
