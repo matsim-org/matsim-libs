@@ -263,7 +263,7 @@ public class ShelterAssignmentSimulatedAnnealingRePlannerII extends ShelterAssig
 		}
 
 		// make sure that we do not get infinities
-		f_current = Math.min(f_current, 30 * 6);
+		f_current = Math.min(f_current, 60 * 6);
 		// f_after = Math.min(f_after, 30 * 6);
 
 		double prob = 0;
@@ -337,7 +337,7 @@ public class ShelterAssignmentSimulatedAnnealingRePlannerII extends ShelterAssig
 		Link linkDestination1 = this.sc.getNetwork().getLinks().get(actDestination1.getLinkId());
 		Node nodeDestination1 = linkDestination1.getFromNode();
 		Leg leg1 = (Leg) plan1.getPlanElements().get(1);
-		double f1_current = Math.min(leg1.getTravelTime() / 600, 30 * 6);
+		double f1_current = Math.min(leg1.getTravelTime() / 600, 60 * 6);
 
 		Person p2 = null;
 		boolean found = false;
@@ -355,13 +355,13 @@ public class ShelterAssignmentSimulatedAnnealingRePlannerII extends ShelterAssig
 		Link linkDestination2 = this.sc.getNetwork().getLinks().get(actDestination2.getLinkId());
 		Node nodeDestination2 = linkDestination2.getFromNode();
 		Leg leg2 = (Leg) plan2.getPlanElements().get(1);
-		double f2_current = Math.min(leg2.getTravelTime() / 600, 30 * 6);
+		double f2_current = Math.min(leg2.getTravelTime() / 600, 60 * 6);
 
 		Path path1 = this.router.calcLeastCostPath(origin1, nodeDestination2, actOrigin1.getEndTime());
 		Path path2 = this.router.calcLeastCostPath(origin2, nodeDestination1, actOrigin2.getEndTime());
 
-		double f1_after = Math.min(path1.travelTime / 600, 30 * 6);
-		double f2_after = Math.min(path2.travelTime / 600, 30 * 6);
+		double f1_after = Math.min(path1.travelTime / 600, 60 * 6);
+		double f2_after = Math.min(path2.travelTime / 600, 60 * 6);
 
 		// invalid mutation
 		if (f1_after >= 60 * 6 || f2_after >= 60 * 6) {
