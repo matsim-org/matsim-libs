@@ -42,12 +42,9 @@ public class SignalSystemConfigurationsReader11 extends MatsimJaxbXmlParser {
 
 	private final static Logger log = Logger.getLogger(SignalSystemConfigurationsReader11.class);
 
-
-
 	public SignalSystemConfigurationsReader11(String schemaLocation) {
 		super(schemaLocation);
 	}
-	
 	
 	public XMLSignalSystemConfig readSignalSystemConfig11File(String filename) throws SAXException, ParserConfigurationException, IOException, JAXBException{
 	  XMLSignalSystemConfig xmlLssConfig;
