@@ -72,6 +72,7 @@ public class QSimSignalEngine implements SignalEngine {
 					}
 				}
 			}
+			system.simulationInitialized(qSim.getSimTimer().getTimeOfDay());
 		}
 	}
 

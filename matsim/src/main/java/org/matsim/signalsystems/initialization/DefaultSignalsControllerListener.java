@@ -20,7 +20,6 @@
 package org.matsim.signalsystems.initialization;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.config.groups.SignalSystemsConfigGroup;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -29,7 +28,6 @@ import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.signalsystems.builder.FromDataBuilder;
 import org.matsim.signalsystems.data.SignalsData;
-import org.matsim.signalsystems.data.SignalsScenarioLoader;
 import org.matsim.signalsystems.data.SignalsScenarioWriter;
 import org.matsim.signalsystems.model.QSimSignalEngine;
 import org.matsim.signalsystems.model.SignalSystemsManager;
@@ -46,7 +44,7 @@ public class DefaultSignalsControllerListener implements SignalsControllerListen
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		//load data
-		SignalsData signalsData = this.loadData(event.getControler().getConfig().signalSystems(), event.getControler().getScenario());
+		SignalsData signalsData = event.getControler().getScenario().getScenarioElement(SignalsData.class);
 		//build model
 		FromDataBuilder modelBuilder = new FromDataBuilder(signalsData, event.getControler().getEvents());
 		this.signalManager = modelBuilder.createAndInitializeSignalSystemsManager();
@@ -65,18 +63,9 @@ public class DefaultSignalsControllerListener implements SignalsControllerListen
 		this.writeData(event.getControler().getScenario(), event.getControler().getControlerIO().getOutputPath());
 	}
 	
-	@Override
 	public void writeData(Scenario sc, String outputPath){
 		SignalsData data = sc.getScenarioElement(SignalsData.class);
 		new SignalsScenarioWriter(outputPath).writeSignalsData(data);
-	}
-	
-	@Override
-	public  SignalsData loadData(SignalSystemsConfigGroup config, Scenario scenario) {
-		SignalsScenarioLoader loader = new SignalsScenarioLoader(config);
-		SignalsData signalsData = loader.loadSignalsData();
-		scenario.addScenarioElement(signalsData);
-		return signalsData;
 	}
 
 }

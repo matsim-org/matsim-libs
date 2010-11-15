@@ -53,5 +53,7 @@ public interface SignalSystem extends Identifiable {
 	public void scheduleOnset(double timeSeconds, Id signalGroupId);
 
 	public SignalController getSignalController();
+
+	public void simulationInitialized(double simStartTimeSeconds);
 	
 }

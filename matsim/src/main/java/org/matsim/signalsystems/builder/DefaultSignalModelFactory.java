@@ -19,10 +19,11 @@
  * *********************************************************************** */
 package org.matsim.signalsystems.builder;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.signalsystems.model.DefaultPlanbasedSignalSystemController;
-import org.matsim.signalsystems.model.SignalSystem;
 import org.matsim.signalsystems.model.SignalController;
+import org.matsim.signalsystems.model.SignalSystem;
 import org.matsim.signalsystems.model.SignalSystemImpl;
 import org.matsim.signalsystems.model.SignalSystemsManager;
 import org.matsim.signalsystems.model.SignalSystemsManagerImpl;
@@ -33,7 +34,9 @@ import org.matsim.signalsystems.model.SignalSystemsManagerImpl;
  * @author dgrether
  */
 public class DefaultSignalModelFactory implements SignalModelFactory {
-
+	
+	private static final Logger log = Logger.getLogger(DefaultSignalModelFactory.class);
+	
 	@Override
 	public SignalSystemsManager createSignalSystemsManager() {
 		return new SignalSystemsManagerImpl();
@@ -47,6 +50,7 @@ public class DefaultSignalModelFactory implements SignalModelFactory {
 	@Override
 	public SignalController createSignalSystemController(String controllerIdentifier) {
 		if (DefaultPlanbasedSignalSystemController.IDENTIFIER.equals(controllerIdentifier)){
+			log.info("Created SignalController: " + DefaultPlanbasedSignalSystemController.IDENTIFIER);
 			return new DefaultPlanbasedSignalSystemController();
 		}
 		//TODO improve error message and consider creation by class name

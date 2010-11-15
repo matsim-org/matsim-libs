@@ -84,8 +84,6 @@ public class SignalSystemImpl implements SignalSystem {
 		requests.addAll(rqs);
 	}
 	
-	
-	
 	@Override
 	public void updateState(double timeSeconds) {
 		this.controller.updateState(timeSeconds);
@@ -103,6 +101,12 @@ public class SignalSystemImpl implements SignalSystem {
 		}
 	}
 
+	@Override
+	public void simulationInitialized(double simStartTimeSeconds) {
+		this.controller.simulationInitialized(simStartTimeSeconds);
+	}
+
+	
 	@Override
 	public Id getId() {
 		return this.id;
@@ -131,6 +135,5 @@ public class SignalSystemImpl implements SignalSystem {
 	public SignalController getSignalController() {
 		return this.controller;
 	}
-
 
 }

@@ -62,7 +62,10 @@ public class DefaultPlanbasedSignalSystemController implements SignalController 
 		//TODO implement active plan logic
 	}
 
-
+	@Override
+	public void simulationInitialized(double simStartTimeSeconds) {
+	}
+	
 	@Override
 	public void addPlan(SignalPlan plan) {
 		if (this.plans == null){
@@ -82,5 +85,6 @@ public class DefaultPlanbasedSignalSystemController implements SignalController 
 	public void reset(Integer iterationNumber) {
 		
 	}
+
 
 }
