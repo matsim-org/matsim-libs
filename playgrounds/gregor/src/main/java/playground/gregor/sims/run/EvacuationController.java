@@ -48,7 +48,6 @@ import org.matsim.evacuation.config.EvacuationConfigGroup;
 import org.matsim.evacuation.config.EvacuationConfigGroup.EvacuationScenario;
 import org.matsim.evacuation.flooding.FloodingReader;
 import org.matsim.evacuation.riskaversion.RiskCostFromFloodingData;
-import org.matsim.evacuation.shelters.EvacuationShelterNetLoader;
 import org.matsim.evacuation.shelters.signalsystems.ShelterDoorBlockerSetup;
 import org.matsim.evacuation.shelters.signalsystems.ShelterInputCounterSignalSystems;
 import org.matsim.evacuation.socialcost.SocialCostCalculatorSingleLink;
@@ -63,6 +62,7 @@ import playground.gregor.sims.shelters.assignment.EvacuationShelterNetLoaderForS
 import playground.gregor.sims.shelters.assignment.GreedyShelterAllocator;
 import playground.gregor.sims.shelters.assignment.RandomShelterAllocator;
 import playground.gregor.sims.shelters.assignment.ShelterAssignmentRePlanner;
+import playground.gregor.sims.shelters.assignment.ShelterAssignmentSimulatedAnnealingRePlannerII;
 import playground.gregor.sims.shelters.assignment.ShelterCapacityRePlanner;
 import playground.gregor.sims.shelters.assignment.ShelterCounter;
 
@@ -132,6 +132,12 @@ public class EvacuationController extends Controler {
 			}
 			ShelterAssignmentRePlanner sARP = new ShelterAssignmentRePlanner(getScenario(), this.pluggableTravelCost, getTravelTimeCalculator(), this.buildings, sc);
 			addControlerListener(sARP);
+		} else if (this.sc.getAssignmentVersion() == Version.SA) {
+			ShelterAssignmentSimulatedAnnealingRePlannerII srp = new ShelterAssignmentSimulatedAnnealingRePlannerII(getScenario(), this.pluggableTravelCost, getTravelTimeCalculator(), this.shelterLinkMapping);
+			addControlerListener(srp);
+			if (this.sc.isCapacityAdaption()) {
+				throw new RuntimeException("Capacity adaption has not yet been implemented for simulated annealing approach!");
+			}
 		}
 	}
 

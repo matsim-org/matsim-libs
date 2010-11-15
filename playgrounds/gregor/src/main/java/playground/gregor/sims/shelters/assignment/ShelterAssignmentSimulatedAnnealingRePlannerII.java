@@ -258,7 +258,7 @@ public class ShelterAssignmentSimulatedAnnealingRePlannerII extends ShelterAssig
 		double f_after = path.travelTime / 600;
 
 		// invalid mutation
-		if (f_after >= 30 * 6) {
+		if (f_after >= 60 * 6) {
 			return false;
 		}
 
@@ -364,7 +364,7 @@ public class ShelterAssignmentSimulatedAnnealingRePlannerII extends ShelterAssig
 		double f2_after = Math.min(path2.travelTime / 600, 30 * 6);
 
 		// invalid mutation
-		if (f1_after >= 30 * 6 || f2_after >= 30 * 6) {
+		if (f1_after >= 60 * 6 || f2_after >= 60 * 6) {
 			return false;
 		}
 

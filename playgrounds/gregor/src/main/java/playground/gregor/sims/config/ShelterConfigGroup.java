@@ -40,7 +40,7 @@ public class ShelterConfigGroup extends Module {
 	}
 
 	public enum Version {
-		ICEC2010
+		ICEC2010, SA
 	}
 
 	public static final String GROUP_NAME = "shelters";
@@ -110,6 +110,9 @@ public class ShelterConfigGroup extends Module {
 	private void setAssignmentVersion(String value) {
 		if (value.equals("ICEC2010")) {
 			this.version = Version.ICEC2010;
+		}
+		if (value.equals("SimulatedAnnealing")) {
+			this.version = Version.SA;
 		} else {
 			throw new RuntimeException("unknown assignment version:" + value);
 		}
