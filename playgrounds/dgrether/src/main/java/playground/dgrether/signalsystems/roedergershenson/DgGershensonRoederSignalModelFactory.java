@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package playground.dgrether.signalsystems.roedergershenson;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.signalsystems.builder.SignalModelFactory;
 import org.matsim.signalsystems.model.SignalController;
@@ -31,7 +32,9 @@ import org.matsim.signalsystems.model.SignalSystemsManager;
  *
  */
 public class DgGershensonRoederSignalModelFactory implements SignalModelFactory {
-
+	
+	private static final Logger log = Logger.getLogger(DgGershensonRoederSignalModelFactory.class);
+	
 	private SignalModelFactory delegate;
 
 	public DgGershensonRoederSignalModelFactory(SignalModelFactory delegate){
@@ -46,6 +49,7 @@ public class DgGershensonRoederSignalModelFactory implements SignalModelFactory 
 	@Override
 	public SignalController createSignalSystemController(String controllerIdentifier) {
 		if (DgRoederGershensonController.CONTROLLER_IDENTIFIER.equals(controllerIdentifier)){
+			log.info("Created controller: " + DgRoederGershensonController.CONTROLLER_IDENTIFIER);
 			return new DgRoederGershensonController();
 		}
 		return this.delegate.createSignalSystemController(controllerIdentifier);

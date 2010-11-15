@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DgRoederGershensonControllerListenerFactory
+ * DgKoehlerStrehler2010Solution2MatsimConverter
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,32 +17,31 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.signalsystems.roedergershenson;
+package playground.dgrether.koehlerstrehlersignal;
 
-import org.apache.log4j.Logger;
-import org.matsim.signalsystems.initialization.SignalsControllerListener;
-import org.matsim.signalsystems.initialization.SignalsControllerListenerFactory;
+import playground.dgrether.DgPaths;
 
 
 /**
  * @author dgrether
  *
  */
-public class DgRoederGershensonSignalsControllerListenerFactory implements
-		SignalsControllerListenerFactory {
-	
-	private static final Logger log = Logger
-			.getLogger(DgRoederGershensonSignalsControllerListenerFactory.class);
-	
-	private SignalsControllerListenerFactory delegate;
+public class DgKoehlerStrehler2010Solution2MatsimConverter {
 
-	public DgRoederGershensonSignalsControllerListenerFactory() {
+	private static final String in = DgPaths.STUDIESDG + "koehlerStrehler2010/solution_population_100_agents.xml";
+	
+	
+	public DgKoehlerStrehler2010Solution2MatsimConverter(){}
+	
+	public void convert(){
+		
 	}
-
-	@Override
-	public SignalsControllerListener createSignalsControllerListener() {
-		log.info("Using DgRoederGershenson signal model if configured for specific signals in xml data...");
-		return new DgRoederGershensonControllerListener();
+	
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		new DgKoehlerStrehler2010Solution2MatsimConverter().convert();
 	}
 
 }

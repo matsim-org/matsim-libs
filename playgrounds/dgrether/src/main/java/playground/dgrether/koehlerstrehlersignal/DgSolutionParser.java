@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DgRoederGershensonControllerListenerFactory
+ * DgSolutionParser
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,32 +17,51 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.signalsystems.roedergershenson;
+package playground.dgrether.koehlerstrehlersignal;
 
-import org.apache.log4j.Logger;
-import org.matsim.signalsystems.initialization.SignalsControllerListener;
-import org.matsim.signalsystems.initialization.SignalsControllerListenerFactory;
+import java.io.IOException;
+import java.util.Stack;
+
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.matsim.core.utils.io.MatsimXmlParser;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
 
 
 /**
  * @author dgrether
  *
  */
-public class DgRoederGershensonSignalsControllerListenerFactory implements
-		SignalsControllerListenerFactory {
+public class DgSolutionParser extends MatsimXmlParser {
 	
-	private static final Logger log = Logger
-			.getLogger(DgRoederGershensonSignalsControllerListenerFactory.class);
 	
-	private SignalsControllerListenerFactory delegate;
-
-	public DgRoederGershensonSignalsControllerListenerFactory() {
+	private final static String VARIABLES = "variables";
+	private final static String VARIABLE = "variable";
+	
+	
+	public void readFile(final String filename) {
+		try {
+			parse(filename);
+		} catch (SAXException e) {
+			e.printStackTrace();
+		} catch (ParserConfigurationException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@Override
+	public void endTag(String name, String content, Stack<String> context) {
+		// TODO Auto-generated method stub
+		
 	}
 
 	@Override
-	public SignalsControllerListener createSignalsControllerListener() {
-		log.info("Using DgRoederGershenson signal model if configured for specific signals in xml data...");
-		return new DgRoederGershensonControllerListener();
+	public void startTag(String name, Attributes atts, Stack<String> context) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

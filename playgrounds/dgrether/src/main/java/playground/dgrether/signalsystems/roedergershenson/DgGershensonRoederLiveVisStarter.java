@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DgRoederGershensonControllerListener
+ * DgGershensonRoederLiveVisStarter
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,23 +19,22 @@
  * *********************************************************************** */
 package playground.dgrether.signalsystems.roedergershenson;
 
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.core.controler.events.IterationStartsEvent;
-import org.matsim.core.controler.events.ShutdownEvent;
-import org.matsim.core.controler.events.StartupEvent;
-import org.matsim.core.controler.listener.IterationStartsListener;
-import org.matsim.core.controler.listener.ShutdownListener;
-import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.api.experimental.ScenarioLoader;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.ptproject.qsim.QSim;
 import org.matsim.signalsystems.builder.DefaultSignalModelFactory;
 import org.matsim.signalsystems.builder.FromDataBuilder;
 import org.matsim.signalsystems.data.SignalsData;
-import org.matsim.signalsystems.data.SignalsScenarioWriter;
-import org.matsim.signalsystems.initialization.SignalsControllerListener;
 import org.matsim.signalsystems.model.QSimSignalEngine;
+import org.matsim.signalsystems.model.SignalEngine;
 import org.matsim.signalsystems.model.SignalSystem;
 import org.matsim.signalsystems.model.SignalSystemsManager;
+import org.matsim.vis.otfvis.OTFVisMobsimFeature;
 
+import playground.dgrether.koehlerstrehlersignal.DgKoehlerStrehler2010Runner;
 import playground.dgrether.signalsystems.DgSensorManager;
 
 
@@ -43,56 +42,40 @@ import playground.dgrether.signalsystems.DgSensorManager;
  * @author dgrether
  *
  */
-public class DgRoederGershensonControllerListener implements SignalsControllerListener, StartupListener, ShutdownListener, IterationStartsListener {
-	
-	private SignalSystemsManager signalManager;
-	private SignalsData signalsData;
-	private QSimSignalEngine signalEngie;
-	
-	public DgRoederGershensonControllerListener() {
-	}
+public class DgGershensonRoederLiveVisStarter {
 
-	@Override
-	public void notifyStartup(StartupEvent event) {
-		ScenarioImpl scenario = event.getControler().getScenario();
+	public DgGershensonRoederLiveVisStarter(){}
+	
+	public void runCottbus(){
+		EventsManager events = new EventsManagerImpl();
+		String conf = DgKoehlerStrehler2010Runner.signalsConfigFileGershenson;
+		ScenarioLoader loader = new ScenarioLoaderImpl(conf);
+		ScenarioImpl scenario = (ScenarioImpl) loader.loadScenario();
+		scenario.getConfig().otfVis().setAgentSize(40.0f);
 		SignalsData signalsData = scenario.getScenarioElement(SignalsData.class);
 		
-		FromDataBuilder modelBuilder = new FromDataBuilder(signalsData, new DgGershensonRoederSignalModelFactory(new DefaultSignalModelFactory()) , event.getControler().getEvents());
-		this.signalManager = modelBuilder.createAndInitializeSignalSystemsManager();
-
-		
-		//TODO init gershenson controller and sensor manager here
+		FromDataBuilder modelBuilder = new FromDataBuilder(signalsData, new DgGershensonRoederSignalModelFactory(new DefaultSignalModelFactory()) , events);
+		SignalSystemsManager signalManager = modelBuilder.createAndInitializeSignalSystemsManager();
 		DgSensorManager sensorManager = new DgSensorManager();
-		event.getControler().getEvents().addHandler(sensorManager);
-		for (SignalSystem ss : this.signalManager.getSignalSystems().values()){
+		events.addHandler(sensorManager);
+		for (SignalSystem ss : signalManager.getSignalSystems().values()){
 			if (ss.getSignalController() instanceof DgRoederGershensonController){
 				((DgRoederGershensonController)ss.getSignalController()).initSignalGroupMetadata(scenario.getNetwork(), scenario.getLaneDefinitions());
 				((DgRoederGershensonController)ss.getSignalController()).registerAndInitializeSensorManager(sensorManager);
-			
 			}
 		}
-		
-		
-		
-		this.signalEngie = new QSimSignalEngine(this.signalManager);
-		event.getControler().getQueueSimulationListener().add(this.signalEngie);
-	}
 
+		SignalEngine engine = new QSimSignalEngine(signalManager);
+		QSim otfVisQSim = new QSim(scenario, events);
+		otfVisQSim.addQueueSimulationListeners(engine);
+		OTFVisMobsimFeature qSimFeature = new OTFVisMobsimFeature(otfVisQSim);
+		otfVisQSim.addFeature(qSimFeature);
+		
+		QSim client = otfVisQSim;
+		client.run();
+	}
 	
-	@Override
-	public void notifyIterationStarts(IterationStartsEvent event) {
-		this.signalManager.resetModel(event.getIteration());
+	public static void main(String[] args) {
+		new DgGershensonRoederLiveVisStarter().runCottbus();
 	}
-
-	@Override
-	public void notifyShutdown(ShutdownEvent event) {
-		this.writeData(event.getControler().getScenario(), event.getControler().getControlerIO().getOutputPath());
-	}
-
-
-	public void writeData(Scenario sc, String outputPath) {
-		SignalsData data = sc.getScenarioElement(SignalsData.class);
-		new SignalsScenarioWriter(outputPath).writeSignalsData(data);
-	}
-
 }

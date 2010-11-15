@@ -33,7 +33,7 @@ public class DgRoederGershensonStarter {
 	 */
 	public static void main(String[] args) {
 		Controler controler = new Controler(args);
-		DgRoederGershensonSignalsControllerListenerFactory signalsFactory = new DgRoederGershensonSignalsControllerListenerFactory(controler.getSignalsControllerListenerFactory());
+		DgRoederGershensonSignalsControllerListenerFactory signalsFactory = new DgRoederGershensonSignalsControllerListenerFactory();
 		controler.setSignalsControllerListenerFactory(signalsFactory);
 		controler.run();
 	}

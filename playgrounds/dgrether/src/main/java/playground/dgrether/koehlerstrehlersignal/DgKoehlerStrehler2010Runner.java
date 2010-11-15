@@ -35,7 +35,9 @@ public class DgKoehlerStrehler2010Runner {
 	public static final String lanesConfigFile = DgPaths.STUDIESDG + "koehlerStrehler2010/config_lanes.xml";
 	
 	public static final String signalsConfigFile = DgPaths.STUDIESDG + "koehlerStrehler2010/config_signals.xml";
-	
+
+	public static final String signalsConfigFileGershenson = DgPaths.STUDIESDG + "koehlerStrehler2010/config_signals_gershenson.xml";
+
 	private String configFile = signalsConfigFile;
 	
 	

@@ -51,8 +51,9 @@ public class DgSensorManager implements LinkEnterEventHandler, LinkLeaveEventHan
 	}
 	
 
-	public void getNumberOfCarsOnLink(Id linkId){
-		
+	public int getNumberOfCarsOnLink(Id linkId){
+		//TODO implement this
+		return 0;
 	}
 	
 	public void getNumberOfCarsInDistance(Id linkId, Double distanceMeter){
