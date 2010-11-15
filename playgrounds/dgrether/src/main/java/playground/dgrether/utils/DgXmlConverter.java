@@ -26,18 +26,6 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser;
-import org.matsim.lanes.LaneDefinitions;
-import org.matsim.lanes.LaneDefinitionsImpl;
-import org.matsim.lanes.MatsimLaneDefinitionsWriter;
-import org.matsim.signalsystems.MatsimSignalSystemConfigurationsReader;
-import org.matsim.signalsystems.MatsimSignalSystemConfigurationsWriter;
-import org.matsim.signalsystems.MatsimSignalSystemsReader;
-import org.matsim.signalsystems.MatsimSignalSystemsWriter;
-import org.matsim.signalsystems.SignalSystemConfigurationsWriter11;
-import org.matsim.signalsystems.config.SignalSystemConfigurations;
-import org.matsim.signalsystems.config.SignalSystemConfigurationsImpl;
-import org.matsim.signalsystems.systems.SignalSystems;
-import org.matsim.signalsystems.systems.SignalSystemsImpl;
 
 import playground.dgrether.DgPaths;
 
@@ -84,29 +72,6 @@ public class DgXmlConverter {
 	private void convertXml(File file) throws IOException {
 		MatsimFileTypeGuesser guesser = new MatsimFileTypeGuesser(file.getAbsolutePath());
 		String filename;
-		if (MatsimSignalSystemsReader.SIGNALSYSTEMS10.compareTo(guesser.getSystemId()) == 0){
-			LaneDefinitions lanes = new LaneDefinitionsImpl();
-			SignalSystems sigSys = new SignalSystemsImpl();
-			MatsimSignalSystemsReader reader = new MatsimSignalSystemsReader(lanes, sigSys);
-			reader.readFile(file.getAbsolutePath());
-			MatsimLaneDefinitionsWriter lanewriter = new MatsimLaneDefinitionsWriter(lanes);
-			filename = file.getParentFile().getAbsolutePath() + "/testLaneDefinitions_v1.1.xml";
-			lanewriter.writeFile(filename);
-			log.info("new file: " + filename);
-			MatsimSignalSystemsWriter writer = new MatsimSignalSystemsWriter(sigSys);
-			filename = file.getParentFile().getAbsolutePath() + "/testSignalSystems_v1.1.xml";
-			writer.writeFile(filename);
-			log.info("new file: " + filename);
-		}
-		else if (MatsimSignalSystemConfigurationsReader.SIGNALSYSTEMSCONFIG10.compareTo(guesser.getSystemId()) == 0){
-			SignalSystemConfigurations configs = new SignalSystemConfigurationsImpl();
-			MatsimSignalSystemConfigurationsReader reader = new MatsimSignalSystemConfigurationsReader(configs);
-			reader.readFile(file.getAbsolutePath());
-			MatsimSignalSystemConfigurationsWriter writer = new MatsimSignalSystemConfigurationsWriter(new SignalSystemConfigurationsWriter11(configs));
-			filename = file.getParentFile().getAbsolutePath() + "/testSignalSystemConfigurations_v1.1.xml";
-			writer.writeFile(filename);
-			log.info("new file: " + filename);
-		}
 	}
 
 	private void addAllArrayElements(Object[] array, List list){
