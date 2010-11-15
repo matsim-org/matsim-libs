@@ -56,7 +56,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 	private int nextLinkIndex = 0;
 	private final TransitStopAgentTracker agentTracker;
 	private Person dummyPerson;
-	private final Mobsim sim;
+	protected final Mobsim sim;
 	private TransitRouteStop currentStop = null;
 	protected TransitRouteStop nextStop;
 	private ListIterator<TransitRouteStop> stopIterator;
@@ -144,9 +144,8 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 		}
 		return stopTime;
 	}
-
-	@Override
-	public void endActivityAndAssumeControl(final double now) {
+	
+	protected final void sendTransitDriverStartsEvent(final double now) {
 		// check if "Wenden" 
 		if(getTransitLine() == null){
 			this.sim.getEventsManager().processEvent(new TransitDriverStartsEvent(now, this.dummyPerson.getId(),
@@ -154,8 +153,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 		} else {
 			this.sim.getEventsManager().processEvent(new TransitDriverStartsEvent(now, this.dummyPerson.getId(),
 					this.vehicle.getId(), getTransitLine().getId(), getTransitRoute().getId(), getDeparture().getId()));
-		}		
-		this.sim.agentDeparts(this, this.getCurrentLeg().getRoute().getStartLinkId());
+		}
 	}
 	
 	@Override

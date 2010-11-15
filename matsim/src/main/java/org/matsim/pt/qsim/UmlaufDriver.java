@@ -20,9 +20,9 @@
 package org.matsim.pt.qsim;
 
 import java.util.Iterator;
+import java.util.ListIterator;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -52,17 +52,16 @@ public class UmlaufDriver extends AbstractTransitDriver {
 
 		PlanImpl plan = new PlanImpl();
 
-		String transportMode = TransportMode.car;
-
 		String activityType = PtConstants.TRANSIT_ACTIVITY_TYPE;
 
-		public void addTrip(NetworkRoute networkRoute) {
+		public void addTrip(NetworkRoute networkRoute, String transportMode) {
+			Activity lastActivity;
 			if (!plan.getPlanElements().isEmpty()) {
-				Activity lastActivity = (Activity) plan.getPlanElements().get(plan.getPlanElements().size()-1);
+				lastActivity = (Activity) plan.getPlanElements().get(plan.getPlanElements().size()-1);
 				assert lastActivity.getLinkId().equals(networkRoute.getStartLinkId());
 			} else {
-				Activity activity = new ActivityImpl(activityType, networkRoute.getStartLinkId());
-				plan.addActivity(activity);
+				lastActivity = new ActivityImpl(activityType, networkRoute.getStartLinkId());
+				plan.addActivity(lastActivity);
 			}
 			Leg leg = new LegImpl(transportMode);
 			leg.setRoute(networkRoute);
@@ -77,64 +76,57 @@ public class UmlaufDriver extends AbstractTransitDriver {
 
 	}
 
-	public static class LegIterator implements Iterator<Leg> {
-
-		private Iterator<PlanElement> i;
-
-		public LegIterator(Plan plan) {
-			this.i = plan.getPlanElements().iterator();
-			if (i.hasNext()) {
-				i.next();
-			}
-		}
-
-		@Override
-		public boolean hasNext() {
-			return i.hasNext();
-		}
-
-		@Override
-		public Leg next() {
-			Leg leg = (Leg) i.next();
-			i.next();
-			return leg;
-		}
-
-		@Override
-		public void remove() {
-			throw new UnsupportedOperationException();
-		}
-
-	}
-
 	private final Umlauf umlauf;
 	private Iterator<UmlaufStueckI> iUmlaufStueck;
-	private Iterator<Leg> iLeg;
+	private ListIterator<PlanElement> iPlanElement;
 	private NetworkRoute carRoute;
 	private double departureTime;
-	private final Mobsim sim;
-	private Leg currentLeg;
+	private PlanElement currentPlanElement;
 	private TransitLine transitLine;
 	private TransitRoute transitRoute;
 	private Departure departure;
 
 	public UmlaufDriver(Umlauf umlauf,
-			TransitStopAgentTracker thisAgentTracker,
-			Mobsim transitQueueSimulation) {
+			String transportMode,
+			TransitStopAgentTracker thisAgentTracker, Mobsim transitQueueSimulation) {
 		super(transitQueueSimulation, thisAgentTracker);
 		this.umlauf = umlauf;
-		this.sim = transitQueueSimulation;
 		this.iUmlaufStueck = this.umlauf.getUmlaufStuecke().iterator();
 		Person driverPerson = new PersonImpl(new IdImpl("pt_"+umlauf.getId()+"_line_"+umlauf.getLineId())); // we use the non-wrapped route for efficiency, but the leg has to return the wrapped one.
 		PlanBuilder planBuilder = new PlanBuilder();
 		for (UmlaufStueckI umlaufStueck : umlauf.getUmlaufStuecke()) {
-			planBuilder.addTrip(getWrappedCarRoute(umlaufStueck.getCarRoute()));
+			planBuilder.addTrip(getWrappedCarRoute(umlaufStueck.getCarRoute()), transportMode);
 		}
 		Plan plan = planBuilder.build();
 		driverPerson.addPlan(plan);
 		setDriver(driverPerson);
-		iLeg = new LegIterator(plan);
+		iPlanElement = plan.getPlanElements().listIterator();
+		this.currentPlanElement = iPlanElement.next();
 		setNextLeg();
+	}
+
+	@Override
+	public void endActivityAndAssumeControl(final double now) {
+		this.currentPlanElement = iPlanElement.next();
+		sendTransitDriverStartsEvent(now);	
+		this.sim.agentDeparts(this, this.getCurrentLeg().getRoute().getStartLinkId());
+	}
+
+	@Override
+	public void endLegAndAssumeControl(final double now) {
+		this.getSimulation().getEventsManager().processEvent(
+				this.getSimulation().getEventsManager().getFactory().createAgentArrivalEvent(
+						now, this.getPerson().getId(), this.getDestinationLinkId(), this.getCurrentLeg().getMode()));
+		this.currentPlanElement = iPlanElement.next();
+		if (this.iUmlaufStueck.hasNext()) {
+			if (this.departureTime < now) {
+				this.departureTime = now;
+			}
+			this.sim.scheduleActivityEnd(this);
+			setNextLeg();
+		} else {
+			this.getSimulation().getAgentCounter().decLiving();
+		}
 	}
 
 	private void setNextLeg() {
@@ -144,7 +136,6 @@ public class UmlaufDriver extends AbstractTransitDriver {
 		} else {
 			setWenden(umlaufStueck.getCarRoute());
 		}
-		this.currentLeg = iLeg.next();
 		init();
 	}
 
@@ -155,8 +146,7 @@ public class UmlaufDriver extends AbstractTransitDriver {
 		this.carRoute = carRoute;
 	}
 
-	private void setLeg(final TransitLine line, final TransitRoute route,
-			final Departure departure) {
+	private void setLeg(final TransitLine line, final TransitRoute route, final Departure departure) {
 		this.transitLine = line;
 		this.transitRoute = route;
 		this.departure = departure;
@@ -165,56 +155,34 @@ public class UmlaufDriver extends AbstractTransitDriver {
 	}
 
 	@Override
-	public double getActivityEndTime() {
-		return this.departureTime;
-	}
-
-	@Override
 	public Leg getCurrentLeg() {
-		return this.currentLeg;
+		return (Leg) this.currentPlanElement;
 	}
 
 	@Override
 	public Activity getCurrentActivity() {
-		// As far as I can see, there is never a current Activity. cdobler, nov'10
-		return null;
+		return (Activity) this.currentPlanElement;
 	}
-		
+
 	@Override
 	public PlanElement getCurrentPlanElement() {
-		return this.currentLeg ; // always a leg (?)
+		return this.currentPlanElement; 
+	}
+
+	@Override
+	public PlanElement getNextPlanElement() {
+		if (iPlanElement.hasNext()) {
+			PlanElement next = iPlanElement.next(); // peek at the next element, but...
+			iPlanElement.previous(); // ...rewind iterator by one step
+			return next;
+		} else {
+			return null ;
+		}
 	}
 
 	@Override
 	public Id getDestinationLinkId() {
-		return this.currentLeg.getRoute().getEndLinkId();
-	}
-
-	@Override
-	public void endLegAndAssumeControl(final double now) {
-		this.getSimulation().getEventsManager().processEvent(
-				this.getSimulation().getEventsManager().getFactory().createAgentArrivalEvent(
-						now, this.getPerson().getId(), this.getDestinationLinkId(), this.getCurrentLeg().getMode()));
-		if (this.iUmlaufStueck.hasNext()) {
-			prepareNextLeg(now);
-//			this.sim.handleAgentArrival(now, this);
-			this.sim.scheduleActivityEnd(this);
-		} else {
-//			this.sim.handleAgentArrival(now, this);
-			this.getSimulation().getAgentCounter().decLiving();
-		}
-	}
-
-	private void prepareNextLeg(final double now) {
-		this.setNextLeg();
-		if (this.departureTime < now) {
-			this.departureTime = now;
-		}
-	}
-	
-	@Override
-	public Boolean endLegAndAdvancePlan() {
-		throw new RuntimeException("not yet implemented") ;
+		return getCurrentLeg().getRoute().getEndLinkId();
 	}
 
 	@Override
@@ -238,10 +206,13 @@ public class UmlaufDriver extends AbstractTransitDriver {
 	}
 
 	@Override
-	public PlanElement getNextPlanElement() {
-		// yyyy this is not so great but as long as the Activities are "not there" for this agent, there is little meaningfull
-		// that I can think of.  kai, nov'10
-		throw new UnsupportedOperationException() ;
+	public double getActivityEndTime() {
+		return this.departureTime;
+	}
+
+	@Override
+	public Boolean endLegAndAdvancePlan() {
+		throw new RuntimeException("not yet implemented") ;
 	}
 
 }
