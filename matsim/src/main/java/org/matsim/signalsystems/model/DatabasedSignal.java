@@ -27,6 +27,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalData;
+import org.matsim.signalsystems.mobsim.SignalizeableItem;
 
 
 /**

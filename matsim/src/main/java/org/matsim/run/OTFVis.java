@@ -46,7 +46,7 @@ import org.matsim.core.utils.io.MatsimFileTypeGuesser.FileType;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.signalsystems.builder.FromDataBuilder;
 import org.matsim.signalsystems.data.SignalsData;
-import org.matsim.signalsystems.model.QSimSignalEngine;
+import org.matsim.signalsystems.mobsim.QSimSignalEngine;
 import org.matsim.signalsystems.model.SignalEngine;
 import org.matsim.vis.otfvis.OTFClientFile;
 import org.matsim.vis.otfvis.OTFClientSwing;

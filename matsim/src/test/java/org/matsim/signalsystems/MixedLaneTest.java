@@ -52,6 +52,12 @@ import org.matsim.lanes.LaneDefinitionsFactory;
 import org.matsim.lanes.LaneDefinitionsV11ToV20Conversion;
 import org.matsim.lanes.LanesToLinkAssignment;
 import org.matsim.ptproject.qsim.QSim;
+import org.matsim.signalsystems.data.SignalsData;
+import org.matsim.signalsystems.data.SignalsDataImpl;
+import org.matsim.signalsystems.data.signalsystems.v20.SignalData;
+import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemData;
+import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsData;
+import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsDataFactory;
 
 
 /**
@@ -144,20 +150,23 @@ public class MixedLaneTest extends TestCase {
 		
 
 		//create signalsystems
-//		SignalSystems signals = this.sc.getSignalSystems();
-//		SignalSystemsFactory signalb = signals.getFactory();
-//		SignalSystemDefinition signalSystem = signalb.createSignalSystemDefinition(id1);
-//		SignalGroupDefinition signalGroup2Link2 = signalb.createSignalGroupDefinition(id1, id2);
-//		signalGroup2Link2.setSignalSystemDefinitionId(id1);
-//		signalGroup2Link2.addLaneId(id1);
-//		signalGroup2Link2.addToLinkId(id2);
-//		SignalGroupDefinition signalGroup2Link3 = signalb.createSignalGroupDefinition(id1, id3);
-//		signalGroup2Link3.setSignalSystemDefinitionId(id1);
-//		signalGroup2Link3.addLaneId(id1);
-//		signalGroup2Link3.addToLinkId(id3);
-//		signals.addSignalSystemDefinition(signalSystem);
-//		signals.addSignalGroupDefinition(signalGroup2Link2);
-//		signals.addSignalGroupDefinition(signalGroup2Link3);
+		SignalsData signalsData = new SignalsDataImpl();
+		this.sc.addScenarioElement(signalsData);
+		SignalSystemsData signals = signalsData.getSignalSystemsData();
+		SignalSystemsDataFactory signalsFactory = signals.getFactory();
+		SignalSystemData system = signalsFactory.createSignalSystemData(id1);
+		signals.addSignalSystemData(system);
+		SignalData signal = signalsFactory.createSignalData(id2);
+		system.addSignalData(signal);
+		signal.addLaneId(id1);
+		signal.addTurningMoveRestriction(id2);
+		signal = signalsFactory.createSignalData(id3);
+		system.addSignalData(signal);
+		signal.addLaneId(id1);
+		signal.addTurningMoveRestriction(id3);
+		
+		//TODO continue here
+		
 //
 //		//create signal system config
 //		SignalSystemConfigurations signalConf = this.sc.getSignalSystemConfigurations();
@@ -224,7 +233,7 @@ public class MixedLaneTest extends TestCase {
 
 		EventsManager events = new EventsManagerImpl();
 
-//		((EventsImpl)events).addHandler(new LogOutputEventHandler());
+//		events.addHandler(new LogOutputEventHandler());
 
 		MixedLanesEventsHandler handler = new MixedLanesEventsHandler();
 		((EventsManagerImpl)events).addHandler(handler);

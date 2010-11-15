@@ -17,9 +17,10 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.signalsystems.model;
+package org.matsim.signalsystems.mobsim;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.signalsystems.model.SignalGroupState;
 
 
 /**

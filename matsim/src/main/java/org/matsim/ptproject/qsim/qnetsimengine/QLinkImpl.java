@@ -47,8 +47,8 @@ import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.helpers.AgentSnapshotInfoBuilder;
 import org.matsim.ptproject.qsim.interfaces.NetsimEngine;
 import org.matsim.signalsystems.mobsim.QSignalizedItem;
+import org.matsim.signalsystems.mobsim.SignalizeableItem;
 import org.matsim.signalsystems.model.SignalGroupState;
-import org.matsim.signalsystems.model.SignalizeableItem;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 import org.matsim.vis.snapshots.writers.VisData;
 

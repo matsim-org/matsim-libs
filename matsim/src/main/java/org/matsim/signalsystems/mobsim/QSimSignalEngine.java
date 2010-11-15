@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.signalsystems.model;
+package org.matsim.signalsystems.mobsim;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.framework.events.SimulationBeforeSimStepEvent;
@@ -28,6 +28,10 @@ import org.matsim.ptproject.qsim.interfaces.NetsimNetwork;
 import org.matsim.ptproject.qsim.qnetsimengine.QLane;
 import org.matsim.ptproject.qsim.qnetsimengine.QLinkImpl;
 import org.matsim.ptproject.qsim.qnetsimengine.QLinkLanesImpl;
+import org.matsim.signalsystems.model.Signal;
+import org.matsim.signalsystems.model.SignalEngine;
+import org.matsim.signalsystems.model.SignalSystem;
+import org.matsim.signalsystems.model.SignalSystemsManager;
 
 
 /**
