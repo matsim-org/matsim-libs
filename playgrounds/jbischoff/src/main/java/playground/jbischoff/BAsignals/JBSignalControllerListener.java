@@ -17,7 +17,7 @@ import org.matsim.signalsystems.builder.FromDataBuilder;
 import org.matsim.signalsystems.data.SignalsData;
 import org.matsim.signalsystems.data.SignalsScenarioWriter;
 import org.matsim.signalsystems.initialization.SignalsControllerListener;
-import org.matsim.signalsystems.model.QSimSignalEngine;
+import org.matsim.signalsystems.mobsim.QSimSignalEngine;
 import org.matsim.signalsystems.model.SignalEngine;
 import org.matsim.signalsystems.model.SignalSystemsManager;
 /*
