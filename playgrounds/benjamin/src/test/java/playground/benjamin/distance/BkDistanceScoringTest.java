@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BKickControler2Test
+ * BkControlerDistance
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin;
+package playground.benjamin.distance;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
@@ -33,11 +33,11 @@ import playground.benjamin.old.income.BKickIncomeControler;
 
 
 /**
- * Tests the scoring of the BkControlerDistance
+ * Tests the scoring of the BkControlerDistance and the standard Controler
  * @author dgrether
  *
  */
-public class BkScoringTestOld extends MatsimTestCase {
+public class BkDistanceScoringTest extends MatsimTestCase {
 
 	/*package*/ final static Id id1 = new IdImpl("1");
 	/*package*/ final static Id id2 = new IdImpl("2");
@@ -103,43 +103,4 @@ public class BkScoringTestOld extends MatsimTestCase {
 		assertEquals(50.23165311164136, this.planScorer.getAgentScore(id1), EPSILON);
 		assertEquals(48.45180305141842, this.planScorer.getAgentScore(id2), EPSILON);
 	}
-
-	public void testSingleIterationIncomeScoring() {
-		Config config = this.loadConfig(this.getClassInputDirectory() + "configIncomeScoreTest.xml");
-		String netFileName = this.getClassInputDirectory() + "network.xml";
-		config.network().setInputFile(netFileName);
-		config.plans().setInputFile(this.getClassInputDirectory() + "plansScoreTestV4.xml");
-		//hh loading
-		config.scenario().setUseHouseholds(true);
-		config.households().setInputFile(this.getClassInputDirectory() + "households.xml");
-
-
-		// controler with new scoring function
-		final BKickIncomeControler controler = new BKickIncomeControler(config);
-		controler.setCreateGraphs(false);
-		controler.setWriteEventsInterval(0);
-
-		controler.addControlerListener(new StartupListener() {
-
-			public void notifyStartup(final StartupEvent event) {
-//				double agent1LeaveHomeTime = controler.getPopulation().getPerson(id1).getPlans().get(0).getFirstActivity().getEndTime();
-//				double agent2LeaveHomeTime = controler.getPopulation().getPerson(id2).getPlans().get(0).getFirstActivity().getEndTime();
-//				controler.getEvents().addHandler(new TestSingleIterationEventHandler(agent1LeaveHomeTime, agent2LeaveHomeTime));
-				planScorer = new EventsToScore(controler.getPopulation(), controler.getScoringFunctionFactory(), controler.getConfig().charyparNagelScoring().getLearningRate());
-				controler.getEvents().addHandler(planScorer);
-			}
-		});
-
-		controler.run();
-		this.planScorer.finish();
-
-		//this score is calculated as follows:
-		//U_total_car = 0                          -(0.2*0.12/1000m)*50000m      +2.26*8*LN(1/(EXP((-10*3600s)/(8*3600s))))   +2.26*12*LN(15/(12*EXP((-10*3600s)/(12*3600s))))
-		//U_total_pt  = -(0.1/3600s)*(120min*60)   -(0.0535*0.28/1000m)*50000m   +2.26*8*LN(1/(EXP((-10*3600s)/(8*3600s))))   +2.26*12*LN(14/(12*EXP((-10*3600s)/(12*3600s))))
-		System.out.println("Agent 001: " + this.planScorer.getAgentScore(id1));
-		System.out.println("Agent 002: " + this.planScorer.getAgentScore(id2));
-		assertEquals(77.13122224303883, this.planScorer.getAgentScore(id1), EPSILON);
-		assertEquals(73.52118312470883, this.planScorer.getAgentScore(id2), EPSILON);
-	}
-
 }

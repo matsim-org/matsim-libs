@@ -73,7 +73,7 @@ public class BkIncomeControlerListener implements StartupListener {
 	}
 	
 	private void installTravelCostCalculatorFactory(Controler controler) {
-		//returns null, if there is no road pricing
+		// returns null, if there is no road pricing
 		if (controler.getConfig().scenario().isUseRoadpricing()){
 			RoadPricingScheme roadPricingScheme = controler.getRoadPricing().getRoadPricingScheme();
 			TravelCostCalculatorFactory travelCostCalculatorFactory = 

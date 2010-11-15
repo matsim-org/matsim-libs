@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BKickRouterTestIATBR.java
+ * BkRouterTest.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -30,13 +30,10 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.testcases.MatsimTestCase;
 
-import playground.benjamin.income.BkIncomeControler;
-import playground.benjamin.income.BkIncomeControlerListener;
-
 /**
  * Tests the routing of the BkIncomeControler
  *
- * @author dgrether
+ * @author dgrether and benjamin
  */
 public class BkRouterTest extends MatsimTestCase {
 
@@ -69,6 +66,31 @@ public class BkRouterTest extends MatsimTestCase {
 		assertTrue("Person 3 should be routed on link 10", handler.link10Ok);
 	}
 
+	public void testGeneralizedTollCostRouting() {
+			Config config = this.loadConfig(this.getClassInputDirectory() + "configRouterTest.xml");
+			config.controler().setOutputDirectory(this.getOutputDirectory());
+			String netFileName = this.getClassInputDirectory() + "networkForToll.xml";
+			config.network().setInputFile(netFileName);
+			config.plans().setInputFile(this.getClassInputDirectory() + "plansRouterTollTest.xml");
+			//hh loading
+			config.scenario().setUseHouseholds(true);
+			config.households().setInputFile(this.getClassInputDirectory() + "householdsForToll.xml");
+			//setting road pricing on link 8
+			config.scenario().setUseRoadpricing(true);
+			config.roadpricing().setTollLinksFile(this.getClassInputDirectory() + "tollLinksFile.xml");
+	
+			Controler controler = new Controler(config);
+			controler.setCreateGraphs(false);
+			final TestDataGathererToll handler = new TestDataGathererToll();
+			
+			controler.addControlerListener(new BkIncomeControlerListener());
+			controler.addControlerListener(new TestDataStartupListenerToll(handler));
+	
+			controler.run();
+			assertTrue("Person 1 should be routed on link 10", handler.link10Ok);
+		}
+
+	
 	private final class TestDataStartupListener implements StartupListener {
 		private final TestDataGatherer handler;
 
@@ -76,9 +98,22 @@ public class BkRouterTest extends MatsimTestCase {
 			this.handler = handler;
 		}
 
+		@Override
 		public void notifyStartup(final StartupEvent event) {
 			event.getControler().getEvents().addHandler(handler);
-//				event.getControler().getEvents().addHandler(new LogOutputEventHandler());
+		}
+	}
+
+	public class TestDataStartupListenerToll implements StartupListener {
+		private final TestDataGathererToll handler;
+		
+		public TestDataStartupListenerToll(TestDataGathererToll handler) {
+			this.handler = handler;
+		}
+
+		@Override
+		public void notifyStartup(StartupEvent event) {
+			event.getControler().getEvents().addHandler(handler);
 		}
 	}
 
@@ -104,38 +139,10 @@ public class BkRouterTest extends MatsimTestCase {
 	}
 
 	
-	public void testGeneralizedTollCostRouting() {
-		Config config = this.loadConfig(this.getClassInputDirectory() + "configRouterTest.xml");
-		config.controler().setOutputDirectory(this.getOutputDirectory());
-		String netFileName = this.getClassInputDirectory() + "networkForToll.xml";
-		config.network().setInputFile(netFileName);
-		config.plans().setInputFile(this.getClassInputDirectory() + "plansRouterTollTest.xml");
-		//hh loading
-		config.scenario().setUseHouseholds(true);
-		config.households().setInputFile(this.getClassInputDirectory() + "householdsForToll.xml");
-		//setting road pricing on link 8
-		config.scenario().setUseRoadpricing(true);
-		config.roadpricing().setTollLinksFile(this.getClassInputDirectory() + "tollLinksFile.xml");
-
-		Controler controler = new Controler(config);
-		controler.setCreateGraphs(false);
-		final TestDataGathererToll handler = new TestDataGathererToll();
-
-		controler.addControlerListener(new StartupListener() {
-			public void notifyStartup(final StartupEvent event) {
-				event.getControler().getEvents().addHandler(handler);
-//				event.getControler().getEvents().addHandler(new LogOutputEventHandler());
-			}
-		});
-
-		controler.run();
-		assertTrue("Person 1 should be routed on link 10", handler.link10Ok);
-	}
-
 	private static class TestDataGathererToll implements LinkEnterEventHandler{
-
+	
 		boolean link10Ok = false;
-
+	
 		//link 10
 		public void handleEvent(LinkEnterEvent e) {
 			if (e.getLinkId().equals(id10) && e.getPersonId().equals(id1)) {

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BKickControler2Test
+ * BkScoringTest
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -67,7 +67,7 @@ public class BkScoringTest extends MatsimTestCase {
 		 * turn is used by the PlansScoring-Listener. Note that the execution
 		 * order is contrary to the order the listeners are added to the list.
 		 */
-	//	controler.addControlerListener(new TestDataStartupListener(controler));
+//		controler.addControlerListener(new TestDataStartupListener(controler));
 		controler.addControlerListener(new BkIncomeControlerListener());
 		
 
