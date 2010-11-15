@@ -103,7 +103,7 @@ public class SignalSystems11To20Converter {
 	}
 
 	private XMLSignalSystems readSignals11(String filename) {
-		SignalSystemsReader11 reader = new SignalSystemsReader11(null, MatsimSignalSystemsReader.SIGNALSYSTEMS11);
+		SignalSystemsReader11 reader = new SignalSystemsReader11(MatsimSignalSystemsReader.SIGNALSYSTEMS11);
 		XMLSignalSystems xmlSignals = null;
 		try {
 			xmlSignals = reader.readSignalSystems11File(filename);

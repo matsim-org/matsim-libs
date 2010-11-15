@@ -92,7 +92,7 @@ public class SignalConfig11ToControl20Converter {
 	}
 
 	private XMLSignalSystemConfig readSignalConfigs11(String signalConfigs11) {
-		SignalSystemConfigurationsReader11 reader = new SignalSystemConfigurationsReader11(null, MatsimSignalSystemConfigurationsReader.SIGNALSYSTEMSCONFIG11);
+		SignalSystemConfigurationsReader11 reader = new SignalSystemConfigurationsReader11(MatsimSignalSystemConfigurationsReader.SIGNALSYSTEMSCONFIG11);
 		XMLSignalSystemConfig xmlSignalControl = null;
 		try {
 			xmlSignalControl = reader.readSignalSystemConfig11File(signalConfigs11);
