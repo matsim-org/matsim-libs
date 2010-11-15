@@ -20,8 +20,6 @@
 
 package playground.yu.utils.container;
 
-import static playground.yu.utils.container.Collection2Array.toArray;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -37,7 +35,7 @@ public class Collection2Array {
 		for (int i = 0; i < 10; i++) {
 			list.add(r.nextInt());
 		}
-		int[] intArray = toArray(list);
+		int[] intArray = toArrayFromInteger(list);
 		System.out.println("----------------------");
 		for (int i = 0; i < intArray.length; i++) {
 			System.out.println("intArray[\t" + i + "] :\t" + intArray[i]);
@@ -50,7 +48,7 @@ public class Collection2Array {
 		for (int i = 0; i < 10; i++) {
 			set.add(r.nextDouble());
 		}
-		double[] doubleArray = toArray(set);
+		double[] doubleArray = toArrayFromDouble(set);
 		System.out.println("----------------------");
 		for (int i = 0; i < doubleArray.length; i++) {
 			System.out.println("doubleArray[\t" + i + "] :\t" + doubleArray[i]);
@@ -72,7 +70,7 @@ public class Collection2Array {
 		System.out.println("----------------------");
 	}
 
-	public static double[] toArray(Collection<Double> collection) {
+	public static double[] toArrayFromDouble(Collection<Double> collection) {
 		int size = collection.size();
 		double[] array = new double[size];
 		Iterator<Double> it = collection.iterator();
@@ -82,7 +80,7 @@ public class Collection2Array {
 		return array;
 	}
 
-	public static int[] toArray(Collection<Integer> collection) {
+	public static int[] toArrayFromInteger(Collection<Integer> collection) {
 		int size = collection.size();
 		int[] array = new int[size];
 		Iterator<Integer> it = collection.iterator();

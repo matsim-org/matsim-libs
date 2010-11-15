@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.utils;
 
@@ -29,9 +29,9 @@ import playground.yu.utils.container.Collection2Array;
 
 /**
  * offers a few simple statistics function
- * 
+ *
  * @author yu
- * 
+ *
  */
 public class SimpleStatistics {
 	// average
@@ -49,7 +49,7 @@ public class SimpleStatistics {
 	}
 
 	public static double average(Collection<Double> collection) {
-		return average(Collection2Array.toArray(collection));
+		return average(Collection2Array.toArrayFromDouble(collection));
 	}
 
 	public static double doubleAverage(Collection<Integer> collection) {
@@ -73,7 +73,7 @@ public class SimpleStatistics {
 	}
 
 	public static double variance(Collection<Double> collection) {
-		return variance(Collection2Array.toArray(collection));
+		return variance(Collection2Array.toArrayFromDouble(collection));
 	}
 
 	public static double doubleVariance(Collection<Integer> collection) {

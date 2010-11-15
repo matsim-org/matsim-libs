@@ -54,6 +54,7 @@ public class LegScoringFunctionWithDetailedRecord extends LegScoringFunction {
 		super(plan, params);
 	}
 
+	@Override
 	protected double calcLegScore(final double departureTime,
 			final double arrivalTime, final Leg leg) {
 
@@ -102,8 +103,8 @@ public class LegScoringFunctionWithDetailedRecord extends LegScoringFunction {
 
 			Tuple<List<Double>, List<Double>> tuple = data
 					.get(destinationActType);
-			double[] departTimes = Collection2Array.toArray(tuple.getFirst());
-			double[] travTimes = Collection2Array.toArray(tuple.getSecond());
+			double[] departTimes = Collection2Array.toArrayFromDouble(tuple.getFirst());
+			double[] travTimes = Collection2Array.toArrayFromDouble(tuple.getSecond());
 
 			chart.addSeries(series, departTimes, travTimes);
 
