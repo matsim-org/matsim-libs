@@ -22,7 +22,7 @@ package org.matsim.core.events;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.signalsystems.control.SignalGroupState;
+import org.matsim.signalsystems.model.SignalGroupState;
 
 
 /**

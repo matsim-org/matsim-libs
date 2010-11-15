@@ -28,11 +28,11 @@ import org.matsim.core.events.SignalGroupStateChangedEvent;
 import org.matsim.core.utils.misc.ByteBufferUtils;
 import org.matsim.lanes.LaneDefinitions;
 import org.matsim.lanes.otfvis.io.OTFLaneWriter;
-import org.matsim.signalsystems.control.SignalGroupState;
 import org.matsim.signalsystems.data.signalgroups.v20.SignalGroupData;
 import org.matsim.signalsystems.data.signalgroups.v20.SignalGroupsData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsData;
+import org.matsim.signalsystems.model.SignalGroupState;
 import org.matsim.vis.snapshots.writers.VisNetwork;
 
 /**

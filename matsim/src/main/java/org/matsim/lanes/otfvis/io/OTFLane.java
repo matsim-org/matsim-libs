@@ -23,7 +23,7 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.signalsystems.control.SignalGroupState;
+import org.matsim.signalsystems.model.SignalGroupState;
 import org.matsim.signalsystems.otfvis.io.OTFSignal;
 
 

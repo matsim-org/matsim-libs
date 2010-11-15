@@ -29,7 +29,7 @@ import javax.media.opengl.GL;
 import org.apache.log4j.Logger;
 import org.matsim.lanes.otfvis.io.OTFLane;
 import org.matsim.lanes.otfvis.io.OTFLinkWLanes;
-import org.matsim.signalsystems.control.SignalGroupState;
+import org.matsim.signalsystems.model.SignalGroupState;
 import org.matsim.signalsystems.otfvis.io.OTFSignal;
 import org.matsim.signalsystems.otfvis.io.OTFSignalSystem;
 import org.matsim.vis.otfvis.opengl.drawer.OTFGLDrawableImpl;

@@ -23,7 +23,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.signalsystems.control.SignalGroupState;
 import org.matsim.signalsystems.data.ambertimes.v10.AmberTimeData;
 import org.matsim.signalsystems.data.ambertimes.v10.AmberTimesData;
 

@@ -22,7 +22,7 @@ package org.matsim.signalsystems.otfvis.io;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.signalsystems.control.SignalGroupState;
+import org.matsim.signalsystems.model.SignalGroupState;
 
 
 /**

@@ -24,7 +24,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.signalsystems.control.SignalGroupState;
+import org.matsim.signalsystems.model.SignalGroupState;
 import org.matsim.signalsystems.model.SignalizeableItem;
 
 

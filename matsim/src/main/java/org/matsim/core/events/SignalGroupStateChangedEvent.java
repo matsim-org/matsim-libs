@@ -21,7 +21,7 @@ package org.matsim.core.events;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.Event;
-import org.matsim.signalsystems.control.SignalGroupState;
+import org.matsim.signalsystems.model.SignalGroupState;
 
 
 /**

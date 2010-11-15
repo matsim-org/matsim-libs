@@ -26,7 +26,7 @@ import org.matsim.core.utils.misc.ByteBufferUtils;
 import org.matsim.lanes.otfvis.io.OTFLane;
 import org.matsim.lanes.otfvis.io.OTFLaneReader;
 import org.matsim.lanes.otfvis.io.OTFLinkWLanes;
-import org.matsim.signalsystems.control.SignalGroupState;
+import org.matsim.signalsystems.model.SignalGroupState;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 
 /**

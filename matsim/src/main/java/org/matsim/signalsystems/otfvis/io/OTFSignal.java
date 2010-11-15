@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.lanes.otfvis.io.OTFLinkWLanes;
-import org.matsim.signalsystems.control.SignalGroupState;
+import org.matsim.signalsystems.model.SignalGroupState;
 
 
 /**

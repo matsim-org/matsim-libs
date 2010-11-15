@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.signalsystems.control;
+package org.matsim.signalsystems.model;
 
 
 /**
