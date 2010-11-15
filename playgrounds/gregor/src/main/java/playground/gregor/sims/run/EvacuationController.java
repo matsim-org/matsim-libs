@@ -52,7 +52,7 @@ import org.matsim.evacuation.shelters.signalsystems.ShelterDoorBlockerSetup;
 import org.matsim.evacuation.shelters.signalsystems.ShelterInputCounterSignalSystems;
 import org.matsim.evacuation.socialcost.SocialCostCalculatorSingleLink;
 import org.matsim.evacuation.travelcosts.PluggableTravelCostCalculator;
-import org.matsim.signalsystems.model.QSimSignalEngine;
+import org.matsim.signalsystems.mobsim.QSimSignalEngine;
 import org.matsim.signalsystems.model.SignalSystemsManager;
 
 import playground.gregor.sims.config.ShelterConfigGroup;
