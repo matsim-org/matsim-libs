@@ -35,7 +35,7 @@ import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.config.groups.ControlerConfigGroup;
-import org.matsim.signalsystems.control.SignalGroupState;
+import org.matsim.signalsystems.model.SignalGroupState;
 
 import playground.dgrether.analysis.charts.DgAxisBuilder;
 import playground.dgrether.analysis.charts.DgDefaultAxisBuilder;

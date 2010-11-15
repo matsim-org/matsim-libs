@@ -23,7 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.core.events.SignalGroupStateChangedEvent;
-import org.matsim.signalsystems.control.SignalGroupState;
+import org.matsim.signalsystems.model.SignalGroupState;
 
 
 /**
