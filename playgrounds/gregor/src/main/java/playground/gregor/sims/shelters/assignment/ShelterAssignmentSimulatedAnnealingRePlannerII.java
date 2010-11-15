@@ -124,6 +124,10 @@ public class ShelterAssignmentSimulatedAnnealingRePlannerII extends ShelterAssig
 				double tmp = m2 / (m2 * this.chi_0 - m1 * (1 - this.chi_0));
 				this.c_k = deltaFDecr / Math.log(tmp);
 				log.info("System not yet melted! new  c_0 = " + this.c_k);
+				if (this.c_k > 10) {
+					this.c_k = 10;
+					log.info("System not yet melted! new  c_0 = " + this.c_k);
+				}
 			} else {
 				this.melted = true;
 			}
