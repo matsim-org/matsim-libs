@@ -28,12 +28,9 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.scoring.EventsToScore;
 import org.matsim.testcases.MatsimTestCase;
 
-import playground.benjamin.distance.BkControlerDistance;
-import playground.benjamin.old.income.BKickIncomeControler;
-
 
 /**
- * Tests the scoring of the BkControlerDistance and the standard Controler
+ * Tests the scoring of BkControlerDistance and Controler
  * @author dgrether
  *
  */
