@@ -4,14 +4,14 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 
-import playground.mmoyo.utils.TransScenarioLoader;
+import playground.mmoyo.utils.DataLoader;
 
 /**counts transit and mivs links-nodes of a multimodal-network**/
 public class LinkNodeCounter {
 
 	public static void main(String[] args) {
 		String conf = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/calibration/100plans_bestValues_config.xml";
-		ScenarioImpl scenario  = new TransScenarioLoader().loadScenario(conf);
+		ScenarioImpl scenario  = new DataLoader().loadScenario(conf);
 		
 		String strMiv = "miv";
 		int intMiv = 0;

@@ -1,5 +1,5 @@
 /* *********************************************************************** *
- * project: org.matsim.*
+OTFVisMobsimFeature * project: org.matsim.*
  * ScenarioPlayer.java
  *                                                                         *
  * *********************************************************************** *
@@ -20,70 +20,31 @@
 
 package playground.mmoyo.demo;
 
-import java.io.IOException;
-
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsManagerFactoryImpl;
-import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.algorithms.EventWriterTXT;
 import org.matsim.core.events.algorithms.EventWriterXML;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
-import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
-import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.pt.utils.CreateVehiclesForSchedule;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.vis.otfvis.OTFVisMobsimFeature;
-import org.xml.sax.SAXException;
-/**
- * @author mrieser
- */
 
-//Copy of Scenario player at playgound.marcel.pt.demo
+import playground.mmoyo.utils.DataLoader;
+
 public class ScenarioPlayer {
-
-	private static final String SERVERNAME = "ScenarioPlayer";
 
 	public static void play(final ScenarioImpl scenario, final EventsManager events) {
 		scenario.getConfig().simulation().setSnapshotStyle("queue");
-		final QSim sim = new QSim(scenario, ((EventsManagerImpl) events));
-		sim.addFeature(new OTFVisMobsimFeature(sim));
+		final QSim sim = new QSim(scenario, events);
+		OTFVisMobsimFeature oTFVisMobsimFeature = new OTFVisMobsimFeature(sim);
+		sim.addQueueSimulationListeners(oTFVisMobsimFeature);
+		sim.getEventsManager().addHandler(oTFVisMobsimFeature);
 		sim.run();
 	}
 
-	/**
-	 * @param args
-	 * @throws IOException
-	 * @throws ParserConfigurationException
-	 * @throws SAXException
-	 */
-	public static void main(final String[] args) throws SAXException, ParserConfigurationException, IOException {
-		String configFile = args[0]; 
-		String scheduleFile = args[1];
-		
-		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(configFile);
-		ScenarioImpl scenario = sl.getScenario();
+	public static void main(final String[] args) {
+		String configFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/calibration/100plans_bestValues_config.xml";//args[0];
 
-		NetworkImpl network = scenario.getNetwork();
-		network.getFactory().setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
-
-		sl.loadScenario();
-
-		scenario.getConfig().simulation().setSnapshotPeriod(0.0);
-		scenario.getConfig().scenario().setUseTransit(true);
-		scenario.getConfig().scenario().setUseVehicles(true);
-		
-		scenario.getConfig().setQSimConfigGroup(new QSimConfigGroup());
-			
-		TransitSchedule schedule = scenario.getTransitSchedule();
-		new TransitScheduleReaderV1(schedule, network).parse(scheduleFile);
-		new CreateVehiclesForSchedule(schedule, scenario.getVehicles()).run();
+		ScenarioImpl scenario = new DataLoader().loadScenarioWithTrSchedule(configFile);
 
 		final EventsManager events = (new EventsManagerFactoryImpl()).createEventsManager() ;
 		EventWriterXML writer = new EventWriterXML(scenario.getConfig().controler().getOutputDirectory() + "/testEvents.xml");

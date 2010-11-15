@@ -1,8 +1,6 @@
 package playground.mmoyo.utils;
 
 import java.io.IOException;
-import java.util.Iterator;
-import java.util.Map.Entry;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -15,9 +13,10 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.counts.Counts;
+import org.matsim.counts.MatsimCountsReader;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
-import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.utils.CreateVehiclesForSchedule;
@@ -85,6 +84,16 @@ public class DataLoader {
 		popReader.readFile(populationFile);
 		return scenario.getPopulation();
 	}
+
+	public ScenarioImpl readNetwork_Population(String networkFile, String populationFile) {
+		ScenarioImpl scenario = new ScenarioImpl();
+		PopulationReader popReader = new MatsimPopulationReader(scenario);
+		popReader.readFile(populationFile);
+
+		MatsimNetworkReader matsimNetReader = new MatsimNetworkReader(scenario);
+		matsimNetReader.readFile(networkFile);
+		return scenario;
+	}
 	
 	public ScenarioImpl loadScenario (final String configFile){
 		ScenarioLoaderImpl scenarioLoader = new ScenarioLoaderImpl(configFile);
@@ -98,6 +107,11 @@ public class DataLoader {
 		return schedule.getTransitLines().get(lineId).getRoutes().get(new IdImpl(strRouteId));
 	}
 	
-	
+	public Counts readCounts (String countFile){
+		Counts counts = new Counts();
+		MatsimCountsReader matsimCountsReader = new MatsimCountsReader(counts);
+		matsimCountsReader.readFile(countFile);
+		return counts;
+	}
 
 }

@@ -46,8 +46,15 @@ public class PrecLauncher {
 		DijkstraFactory dijkstraFactory = new DijkstraFactory();
 		FreespeedTravelTimeCost freespeedTravelTimeCost = new FreespeedTravelTimeCost(scenarioImpl.getConfig().charyparNagelScoring());
 		TransitConfigGroup transitConfig = new TransitConfigGroup();
+		
+		//precalculation of minimal transfers
 		PrecalPlansCalcTransitRoute precPlansCalcTransitRoute = new PrecalPlansCalcTransitRoute(scenarioImpl.getConfig().plansCalcRoute(), scenarioImpl.getNetwork(), 
 				freespeedTravelTimeCost, freespeedTravelTimeCost, dijkstraFactory, scenarioImpl.getTransitSchedule(), transitConfig, this.myTransitRouterConfig);
+		
+		//"normal"
+		//PrecalPlansCalcTransitRoute precPlansCalcTransitRoute = new PrecalPlansCalcTransitRoute(scenarioImpl.getConfig().plansCalcRoute(), scenarioImpl.getNetwork(), 
+		//		freespeedTravelTimeCost, freespeedTravelTimeCost, dijkstraFactory, scenarioImpl.getTransitSchedule(), transitConfig, this.myTransitRouterConfig);
+		
 		precPlansCalcTransitRoute.run(scenarioImpl.getPopulation());
 		
 		//write 
@@ -90,7 +97,7 @@ public class PrecLauncher {
 		myTransitRouterConfig.costLineSwitch = 240.0 * - myTransitRouterConfig.marginalUtilityOfTravelTimeTransit;	//* -this.marginalUtilityOfTravelTimeTransit; // == 1min travel time in vehicle  // in Eu.  kai, apr'10
 		myTransitRouterConfig.searchRadius = 600.0;								//initial distance for stations around origin and destination points
 		myTransitRouterConfig.extensionRadius = 200.0; 
-		myTransitRouterConfig.allowDirectWalks= true;
+		myTransitRouterConfig.allowDirectWalks= false;
 		
 		myTransitRouterConfig.scenarioName = varName;
 		System.out.println(myTransitRouterConfig.scenarioName) ;
@@ -98,5 +105,3 @@ public class PrecLauncher {
 		adaptedLauncher.run(configFilePath);
 	}
 }
-
-

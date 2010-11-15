@@ -41,13 +41,14 @@ public class AdapTimeMut_ReRouteStrategy implements PlanStrategy {
 
 		//remove transit acts
 		addStrategyModule(new TransitActsRemoverStrategy(controler.getConfig()));
-		//reroute with adapted router
-		addStrategyModule(new AdapPlanStrategyModule(controler));
+	
 		//add time allocation mutator
 		int mutationRange= Integer.parseInt(controler.getConfig().getParam(TimeAllocationMutator.CONFIG_GROUP, TimeAllocationMutator.CONFIG_MUTATION_RANGE));
 		TimeAllocationMutator timeAllocationMutator = new TimeAllocationMutator(controler.getConfig(), mutationRange);
 		this.addStrategyModule(timeAllocationMutator);
-		
+
+		//reroute with adapted router
+		addStrategyModule(new AdapPlanStrategyModule(controler));
 		
 		// these modules may, at the same time, be events listeners (so that they can collect information):
 		//controler.getEvents().addHandler( adapPlanStrategyModule ) ;

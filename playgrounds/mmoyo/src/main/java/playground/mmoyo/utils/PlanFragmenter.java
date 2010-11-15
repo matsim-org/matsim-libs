@@ -2,7 +2,6 @@ package playground.mmoyo.utils;
 
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -18,9 +17,6 @@ import org.matsim.pt.PtConstants;
 
 /**reads a pt routed population and convert each pt-connection into a plan, each new plan has a index suffix*/
 public class PlanFragmenter {
-
-	public PlanFragmenter() {
-	}
 
 	public Population run(Population population){
 		ScenarioImpl tempScenario =new ScenarioImpl();
@@ -77,12 +73,11 @@ public class PlanFragmenter {
 		String outputFile = "../playgrounds/mmoyo/output/fragmented.xml";
 		
 		DataLoader dataLoader = new DataLoader(); 
-		Network network = dataLoader.readNetwork(networkFile);
-		Population population = dataLoader.readPopulation(populationFile);
+		ScenarioImpl scenario = dataLoader.readNetwork_Population(networkFile, populationFile );
 		
-		Population fragmPopulation = new PlanFragmenter().run(population);
+		Population fragmPopulation = new PlanFragmenter().run(scenario.getPopulation());
 		System.out.println("writing output plan file..." + outputFile);
-		new PopulationWriter(fragmPopulation, network).write(outputFile);
+		new PopulationWriter(fragmPopulation, scenario.getNetwork()).write(outputFile);
 		System.out.println("done");
 	}
 

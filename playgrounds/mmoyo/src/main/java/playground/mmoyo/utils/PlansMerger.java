@@ -104,7 +104,7 @@ public class PlansMerger {
 				if (newPopulation.getPersons().containsKey(person2.getId())){
 					Person person = newPopulation.getPersons().get(person2.getId());
 					Plan newPlan  = new PlanImpl(person); 
-					newPlan.setScore(person2.getSelectedPlan().getScore());
+					//newPlan.setScore(person2.getSelectedPlan().getScore());
 					for (PlanElement pe : person2.getSelectedPlan().getPlanElements()){
 						if (pe instanceof Activity){
 							newPlan.addActivity((Activity)pe);		

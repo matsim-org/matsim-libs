@@ -134,7 +134,7 @@ public class PtRouteUtill {
 		String strAccessFacility = "1605170.1";  // "1600045.2"; //"1625150.1";
 		String strEgressFacility = "1605370.3";  // "1600045.1"; //"1610024.1";
 			
-		ScenarioImpl scenario = new TransScenarioLoader ().loadScenarioWithTrSchedule(configFile);
+		ScenarioImpl scenario = new DataLoader().loadScenarioWithTrSchedule(configFile);
 		TransitSchedule trSchedule = scenario.getTransitSchedule();
 		TransitLine line = trSchedule.getTransitLines().get(new IdImpl(strTrLine));
 		TransitRoute route = line.getRoutes().get(new IdImpl(strTrRoute));

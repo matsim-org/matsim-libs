@@ -32,16 +32,23 @@
 		<param name="lastIteration" value="0" />
 	</module>
 
-	<module name="simulation">
-		<!-- "start/endTime" of MobSim (00:00:00 == take earliest activity time/ run as long as active vehicles exist) -->
+	<module name="qsim" >
 		<param name="startTime" value="00:00:00" />
-		<param name="endTime" value="24:00:00" />
-	
-		<param name = "snapshotperiod"	value = "00:00:05"/> <!-- 5// 00:00:00 means NO snapshot writing -->
-		<param name = "snapshotFormat"	value = "otfvis"/> <!-- netvis, googleearth, transims -->
-		<param name = "snapshotStyle"   value = "queue" />
+		<param name="endTime" value="09:00:00" />
+		
+		<param name="snapshotperiod" value="00:00:00" />
+		<param name="snapshotFormat" value = "otfvis"/> 
+ 		<param name="snapshotStyle"	value = "queue"/> 
+		
+		<param name="flowCapacityFactor" value="0.02" />
+		<param name="storageCapacityFactor" value="0.06" />
+		
+		<param name="stuckTime" value="10.0" />
+		<param name="removeStuckVehicles" value="no" />
+		
+		<param name="numberOfThreads" value="1" />
 	</module>
-
+	
 	<module name="planCalcScore">
 		<param name="learningRate" value="1.0" />
 		<param name="BrainExpBeta" value="2.0" />

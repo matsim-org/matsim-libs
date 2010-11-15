@@ -5,7 +5,7 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 
-import playground.mmoyo.utils.TransScenarioLoader;
+import playground.mmoyo.utils.DataLoader;
 
 public class StopOffsetCounter {
 	
@@ -39,7 +39,7 @@ public class StopOffsetCounter {
 		}else{
 			configFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/calibration/100plans_bestValues_config.xml";	
 		}
-		ScenarioImpl scenario = new TransScenarioLoader().loadScenarioWithTrSchedule(configFile);
+		ScenarioImpl scenario = new DataLoader().loadScenarioWithTrSchedule(configFile);
 		new StopOffsetCounter().countDifferentOffsets(scenario);
 	}
 	

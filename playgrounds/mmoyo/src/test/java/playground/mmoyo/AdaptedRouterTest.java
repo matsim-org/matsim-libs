@@ -7,7 +7,7 @@ import org.matsim.testcases.MatsimTestCase;
 import playground.mmoyo.ptRouterAdapted.AdaptedTransitRouter;
 import playground.mmoyo.ptRouterAdapted.AdaptedTransitRouterNetworkTravelTimeCost;
 import playground.mmoyo.ptRouterAdapted.MyTransitRouterConfig;
-import playground.mmoyo.utils.TransScenarioLoader;
+import playground.mmoyo.utils.DataLoader;
 
 public class AdaptedRouterTest extends MatsimTestCase {
 
@@ -34,7 +34,7 @@ public class AdaptedRouterTest extends MatsimTestCase {
 		myConfig.minStationsNum= 2;
 		myConfig.scenarioName= "test";
 
-		ScenarioImpl scenarioImpl = new TransScenarioLoader ().loadScenarioWithTrSchedule(configFile);
+		ScenarioImpl scenarioImpl = new DataLoader ().loadScenarioWithTrSchedule(configFile);
 		AdaptedTransitRouterNetworkTravelTimeCost adaptedTravelTimeCost = new AdaptedTransitRouterNetworkTravelTimeCost(myConfig);
 		AdaptedTransitRouter adaptedTransitRouter = new AdaptedTransitRouter(myConfig, scenarioImpl.getTransitSchedule());
 

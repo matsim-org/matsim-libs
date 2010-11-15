@@ -21,7 +21,7 @@ import org.matsim.vis.otfvis.OTFVisMobsimFeature;
 import org.xml.sax.SAXException;
 
 import playground.mmoyo.TransitSimulation.MMoyoPlansCalcTransitRoute;
-import playground.mmoyo.utils.TransScenarioLoader;
+import playground.mmoyo.utils.DataLoader;
 
 public class PlanRouter {
 
@@ -75,6 +75,6 @@ public class PlanRouter {
 		}
 
 		/**load scenario */
-		new PlanRouter(new TransScenarioLoader().loadScenarioWithTrSchedule(configFile));
+		new PlanRouter(new DataLoader().loadScenarioWithTrSchedule(configFile));
 	}
 }

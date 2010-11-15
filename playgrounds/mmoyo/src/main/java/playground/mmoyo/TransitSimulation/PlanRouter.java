@@ -18,8 +18,8 @@ import org.matsim.pt.router.PlansCalcTransitRoute;
 import org.xml.sax.SAXException;
 
 import playground.mmoyo.PTRouter.PTValues;
+import playground.mmoyo.utils.DataLoader;
 import playground.mmoyo.utils.FileCompressor;
-import playground.mmoyo.utils.TransScenarioLoader;
 
 /**reads a config file, routes the transit plans and writes a routed plans file*/
 public class PlanRouter {
@@ -86,7 +86,7 @@ public class PlanRouter {
 			configFile = "../shared-svn/studies/countries/de/berlin-bvg09/pt/nullfall_berlin_brandenburg/config.xml";
 		}
 
-		ScenarioImpl scenarioImpl = new TransScenarioLoader ().loadScenarioWithTrSchedule(configFile); 
+		ScenarioImpl scenarioImpl = new DataLoader ().loadScenarioWithTrSchedule(configFile); 
 		
 		new PlanRouter(scenarioImpl);
 		System.out.println("total duration: " + (System.currentTimeMillis()-startTime));

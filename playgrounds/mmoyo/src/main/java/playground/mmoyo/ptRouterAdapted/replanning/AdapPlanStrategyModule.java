@@ -11,6 +11,7 @@ import org.matsim.pt.config.TransitConfigGroup;
 
 import playground.mmoyo.ptRouterAdapted.AdaptedPlansCalcTransitRoute;
 import playground.mmoyo.ptRouterAdapted.MyTransitRouterConfig;
+import playground.mmoyo.ptRouterAdapted.precalculation.PrecalPlansCalcTransitRoute;;
 
 public class AdapPlanStrategyModule extends AbstractMultithreadedModule{ //implements PlanStrategyModule, ActivityEndEventHandler { // this is just there as an example
 	private static final Logger log = Logger.getLogger(AdapPlanStrategyModule.class);
@@ -37,7 +38,13 @@ public class AdapPlanStrategyModule extends AbstractMultithreadedModule{ //imple
 		myTransitRouterConfig.searchRadius = 600.0;								//initial distance for stations around origin and destination points
 		myTransitRouterConfig.extensionRadius = 200.0; 
 		myTransitRouterConfig.allowDirectWalks= true;
-		AdaptedPlansCalcTransitRoute adaptedPlansCalcTransitRoute = new AdaptedPlansCalcTransitRoute(config.plansCalcRoute(), this.controler.getScenario().getNetwork(), freespeedTravelTimeCost, freespeedTravelTimeCost,  new DijkstraFactory(), this.controler.getScenario().getTransitSchedule(), new TransitConfigGroup(), myTransitRouterConfig);
+		
+		//normal
+		//AdaptedPlansCalcTransitRoute adaptedPlansCalcTransitRoute = new AdaptedPlansCalcTransitRoute(config.plansCalcRoute(), this.controler.getScenario().getNetwork(), freespeedTravelTimeCost, freespeedTravelTimeCost,  new DijkstraFactory(), this.controler.getScenario().getTransitSchedule(), new TransitConfigGroup(), myTransitRouterConfig);
+		
+		//with a set of precalculated routes 
+		PrecalPlansCalcTransitRoute adaptedPlansCalcTransitRoute = new PrecalPlansCalcTransitRoute(config.plansCalcRoute(), this.controler.getScenario().getNetwork(), freespeedTravelTimeCost, freespeedTravelTimeCost,  new DijkstraFactory(), this.controler.getScenario().getTransitSchedule(), new TransitConfigGroup(), myTransitRouterConfig);
+		
 		return adaptedPlansCalcTransitRoute;
 	}	
 }

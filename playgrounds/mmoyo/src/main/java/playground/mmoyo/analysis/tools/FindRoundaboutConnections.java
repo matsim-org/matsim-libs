@@ -14,22 +14,14 @@ import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
+import playground.mmoyo.utils.DataLoader;
 import playground.mmoyo.utils.PlanFragmenter;
-import playground.mmoyo.utils.TransScenarioLoader;
 
 /**finds connections with transfer point that are farther than the destination point **/ 
 public class FindRoundaboutConnections {
 	
 	private Population createDetouredPlan (final ScenarioImpl scenario){
 		Population detouredPopulation = new PopulationImpl(scenario);
-
-		/*
-		PTValues.routerCalculator = 3;
-		PTValues.distanceCoefficient =0.00;
-		PTValues.timeCoefficient = 1.00;
-		PTValues.transferPenalty = 60.0;
-		new PlanRouter(scenario);
-		*/
 
 		Population fragmentedPopulation = new PlanFragmenter().run(scenario.getPopulation());  //fragmented plans! otherwise it analyzes only the first leg
 		
@@ -76,11 +68,9 @@ public class FindRoundaboutConnections {
 	}
 	
 	public static void main(String[] args) {
-		//String configFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/comparison/BerlinBrandenburg/routed_1x_subset_xy2links_ptplansonly/fragmented/config/config_routedPlans_MoyoParameterized.xml";
 		String configFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/calibration/100plans_bestValues_config.xml";
-		//if (args[0]!= null) configFile = args[0];
 		
-		ScenarioImpl scenario = new TransScenarioLoader().loadScenarioWithTrSchedule(configFile);
+		ScenarioImpl scenario = new DataLoader().loadScenarioWithTrSchedule(configFile);
 		Population detouredPopulation = new FindRoundaboutConnections().createDetouredPlan(scenario);
 		
 		System.out.println("writing detoured population plan file in output folder..." );

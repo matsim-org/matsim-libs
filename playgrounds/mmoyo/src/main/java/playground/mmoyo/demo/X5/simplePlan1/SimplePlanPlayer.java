@@ -11,10 +11,8 @@ import playground.mmoyo.demo.ScenarioPlayer;
 public class SimplePlanPlayer {
 
 	public static void main(String[] args) throws SAXException, ParserConfigurationException, IOException {
-		//invoke controler first
 		String configFile = "../playgrounds/mmoyo/src/main/java/playground/mmoyo/demo/X5/simplePlan1/config.xml";
-		String scheduleFile =  "../playgrounds/mmoyo/src/main/java/playground/mmoyo/demo/X5/simplePlan1/simple1TransitSchedule.xml";
-		ScenarioPlayer.main(new String[]{configFile, scheduleFile});
+		ScenarioPlayer.main(new String[]{configFile});
 	}
 }
 
