@@ -58,8 +58,22 @@ public class SignalGroupStateChangeRequestImpl implements SignalGroupStateChange
 		int doubleCompare = Double.compare(this.getTimeOfDay(), other.getTimeOfDay());
 		//sorting by time only is not unique within one timestep -> sort by id
 		if (doubleCompare == 0){
-			return this.getSignalGroupId().compareTo(other.getSignalGroupId());
+			int idCompare = this.getSignalGroupId().compareTo(other.getSignalGroupId());
+			if (idCompare == 0){
+				return this.newState.compareTo(other.getRequestedState());
+			}
+			return idCompare;
 		}
 		return doubleCompare;
+	}
+	
+	@Override
+	public boolean equals(final Object other){
+		if (!(other instanceof SignalGroupStateChangeRequestImpl)){
+			return false;
+		}
+		else {
+			return (this.compareTo((SignalGroupStateChangeRequestImpl)other) == 0);
+		}
 	}
 }
