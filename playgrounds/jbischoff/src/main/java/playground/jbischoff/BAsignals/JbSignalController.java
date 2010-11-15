@@ -266,7 +266,11 @@ public class JbSignalController implements SignalController {
 	@Override
 	public void reset(Integer iterationNumber) {
 		// TODO Auto-generated method stub
+	}
 
+	@Override
+	public void simulationInitialized(double simStartTimeSeconds) {
+		
 	}
 
 }
