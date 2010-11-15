@@ -1,0 +1,77 @@
+<?xml version="1.0" ?>
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd">
+<config>
+
+	<module name="global">
+		<param name="randomSeed" value="4711" />
+		<param name="coordinateSystem" value="Atlantis" />
+	</module>
+
+  <module name="planscalcroute" >
+    <param name="bikeSpeed" value="4.166666666666667" />
+    <param name="ptSpeedFactor" value="2.0" />
+    <param name="undefinedModeSpeed" value="13.88888888888889" />
+    <param name="walkSpeed" value="0.8333333333333333" />
+  </module>
+
+	<module name="controler">
+		<param name="firstIteration" value="0" />
+		<param name="lastIteration" value="0" />
+	</module>
+
+	<module name="simulation">
+		<!-- "start/endTime" of MobSim (00:00:00 == take earliest activity time/ run as long as active vehicles exist) -->
+		<param name="startTime" value="00:00:00" />
+		<param name="endTime" value="24:00:00" />
+	
+<!--		<param name = "snapshotperiod"	value = "00:01:00"/>  00:00:00 means NO snapshot writing -->
+<!--		<param name = "snapshotFormat"	value = "otfvis"/>  netvis, googleearth, transims -->
+	</module>
+
+	<module name="planCalcScore">
+		<param name="learningRate" value="1.0" />
+		<param name="BrainExpBeta" value="2.0" />
+
+		<param name="performing" value="+1.86" />
+		<param name="lateArrival" value="-1.52" />
+		<param name="earlyDeparture" value="-0" />
+    
+		<param name="traveling" value="-0.97" />
+		<param name="travelingPt" value="-0" />
+		<param name="waiting" value="-0" />
+    
+		<param name="marginalUtlOfDistanceCar" value="-0.00012" /> <!-- in this case equal to fuel costs plus virtual toll costs -->
+		<param name="marginalUtlOfDistancePt" value="-0.00028" />
+<!--		<param name="marginalUtlOfDistancePt" value="-0.0" />-->
+    
+		<param name="activityType_0"            value="h" /> <!-- home -->
+		<param name="activityPriority_0"        value="1" />
+		<param name="activityTypicalDuration_0" value="12:00:00" />
+		<param name="activityMinimalDuration_0" value="08:00:00" />
+	
+		<param name="activityType_1"            value="w" /> <!-- work -->
+		<param name="activityPriority_1"        value="1" />
+		<param name="activityTypicalDuration_1" value="08:00:00" />
+		<param name="activityMinimalDuration_1" value="06:00:00" />
+		<param name="activityOpeningTime_1"     value="07:00:00" />
+		<param name="activityLatestStartTime_1" value="07:00:00" />
+		<param name="activityEarliestEndTime_1" value="" />
+		<param name="activityClosingTime_1"     value="18:00:00" />
+	</module>
+	
+	<module name="strategy">
+		<param name="maxAgentPlanMemorySize" value="4" /> <!-- 0 means unlimited -->
+
+		<param name="ModuleProbability_1" value="0.9" />
+		<param name="Module_1" value="ChangeExpBeta" />
+<!--		<param name="Module_1" value="BestScore" />-->
+
+		<param name="ModuleProbability_2" value="0.1" />
+		<param name="Module_2" value="TimeAllocationMutator" />
+	</module>
+
+	<module name="TimeAllocationMutator">
+	  <param name="mutationRange" value="450" />
+	</module>
+
+</config>

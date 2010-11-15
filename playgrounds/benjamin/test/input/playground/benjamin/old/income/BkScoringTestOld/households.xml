@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<households xmlns="http://www.matsim.org/files/dtd"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/households_v1.0.xsd">
+	<household id="2">
+		<members>
+			<personId refId="2"/>
+		</members>
+		<income period="year">
+				40000.0
+		</income>
+	</household>
+	<household id="1">
+		<members>
+			<personId refId="1"/>
+		</members>
+		<income period="year">
+				120000.0
+		</income>
+	</household>
+</households>
