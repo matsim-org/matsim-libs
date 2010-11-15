@@ -36,7 +36,7 @@ import org.jfree.chart.renderer.category.BarRenderer;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.signalsystems.control.SignalGroupState;
+import org.matsim.signalsystems.model.SignalGroupState;
 
 /**
  * @author droeder

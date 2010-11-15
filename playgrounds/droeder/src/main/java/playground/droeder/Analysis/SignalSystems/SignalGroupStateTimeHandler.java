@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.events.SignalGroupStateChangedEvent;
 import org.matsim.core.events.handler.SignalGroupStateChangedEventHandler;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.signalsystems.control.SignalGroupState;
+import org.matsim.signalsystems.model.SignalGroupState;
 
 
 /**
