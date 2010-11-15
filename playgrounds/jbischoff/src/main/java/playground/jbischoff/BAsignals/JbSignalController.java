@@ -27,9 +27,9 @@ import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.signalsystems.control.SignalGroupState;
 import org.matsim.signalsystems.model.SignalController;
 import org.matsim.signalsystems.model.SignalGroup;
+import org.matsim.signalsystems.model.SignalGroupState;
 import org.matsim.signalsystems.model.SignalPlan;
 import org.matsim.signalsystems.model.SignalSystem;
 
