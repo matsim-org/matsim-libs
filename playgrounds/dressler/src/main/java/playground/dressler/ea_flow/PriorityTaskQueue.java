@@ -21,15 +21,21 @@
 package playground.dressler.ea_flow;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.PriorityQueue;
 
 public class PriorityTaskQueue implements TaskQueue {
 	private PriorityQueue<BFTask> _list;
-	private TaskComparator taskcomp;
+	private Comparator<BFTask> taskcomp;
 	
-	public PriorityTaskQueue(){
-		taskcomp = new TaskComparator();
+	public PriorityTaskQueue(boolean reverse){		
+		if (reverse) {
+			taskcomp = new TaskComparatorReverse(); 
+		} else {
+			taskcomp = new TaskComparator();
+		}
 		_list = new PriorityQueue<BFTask>((1), taskcomp);
 	}
 	

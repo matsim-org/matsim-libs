@@ -256,15 +256,16 @@ public class VertexIntervals extends Intervals<VertexInterval> {
 		
 		ArrayList<VertexInterval> changed = new ArrayList<VertexInterval>();	
 		VertexInterval current = this.getIntervalAt(arrive.getLowBound());
-				
+		
 		while(current.getLowBound() < arrive.getHighBound()){
 			
 			// only do something if current was not reachable or can be improved
-			Interval improvement = arrive.isBetterThan(current);			
+			Interval improvement = arrive.isBetterThan(current);	
+		
 			if (improvement != null) {
 				
 				// let's modify the interval to look just right
-				if(current.getLowBound() < improvement.getLowBound()) {
+				if (current.getLowBound() < improvement.getLowBound()) {
 					current = this.splitAt(improvement.getLowBound());
 				}
 				
@@ -299,6 +300,8 @@ public class VertexIntervals extends Intervals<VertexInterval> {
 			}			
 			current = this.getIntervalAt(current.getHighBound());
 		}	
+				
+		
 		return changed;
 	}
 	

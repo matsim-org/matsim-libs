@@ -296,6 +296,17 @@ public class DanielMain {
 		/* --------- the actual work is done --------- */
 		
 
+		// basic statistics before decomposition
+		
+		int[] arrivals = fluss.arrivals();
+		long totalcost = 0;
+		for (int i = 0; i < arrivals.length; i++) {
+			totalcost += i*arrivals[i];
+		}
+
+		System.out.println("Total cost: " + totalcost);
+		System.out.println("Collected " + fluss.getPaths().size() + " paths.");
+		
 		// decompose the flow
 		Flow reconstructedFlow = new Flow(settings);
 		CPUTimer Tdecompose = new CPUTimer("Path Decomposition");

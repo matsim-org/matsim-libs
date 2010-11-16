@@ -88,9 +88,6 @@ public class HoldoverIntervals extends Intervals<HoldoverInterval> implements Ed
 	public ArrayList<Interval> propagate(final Interval incoming,
 			final boolean primal, final boolean reverse, int timehorizon) {
 		
-		if(reverse){
-			throw new RuntimeException("no propagating of holdover implemented for reverse search"); 
-		}
 
 		//TODO holdover a look till next labeled intevall
 		ArrayList<Interval> result = new ArrayList<Interval>();
@@ -101,123 +98,246 @@ public class HoldoverIntervals extends Intervals<HoldoverInterval> implements Ed
 		int high = -1;						
 		boolean collecting = false;
 		
-		if (primal) {
-			// if t is reachable, so is t+1
-			
-			int effectiveStart = incoming.getLowBound() ;
-			int effectiveEnd = timehorizon ;
-			
-			if (effectiveStart == effectiveEnd) {
-				return result;
-			}
-			current = this.getIntervalAt(effectiveStart);
+		
+		if (!reverse) {
+			if (primal) {
+				// if t is reachable, so is t+1
 
-			while (current.getLowBound() < effectiveEnd) {
-				int flow = current.getFlow();
-				if (flow < this._capacity) {				
-					if (collecting) {
-						high = current.getHighBound() + 1;
-					} else {
-						collecting = true;
-						low = current.getLowBound() + 1;					  
-						high = current.getHighBound() + 1;
-					}
-				} else {
-					if (collecting) { // finish the Interval
-						low = Math.max(low, effectiveStart);
-						high = Math.min(high, effectiveEnd);
-						if (low < high) {
-							toinsert = new Interval(low, high);					  
-							result.add(toinsert);								
-						}
-						collecting = false;
-					}
-					
-					// This interval is blocked. Can we restart with the next one?
-					if (incoming.getHighBound() <= current.getHighBound()) {
-						break; // No, that's it
-					}
+				int effectiveStart = incoming.getLowBound() ;
+				int effectiveEnd = timehorizon ;
+
+				if (effectiveStart == effectiveEnd) {
+					return result;
 				}
-				
-				if (this.isLast(current)) {
-					break;
-				} 
-				current = this.getIntervalAt(current.getHighBound());
+				current = this.getIntervalAt(effectiveStart);
 
-			}
-			
-			if (collecting) { // finish the Interval
-				low = Math.max(low, effectiveStart);
-				high = Math.min(high, effectiveEnd);
-				if (low < high) {
-					toinsert = new Interval(low, high);					  
-					result.add(toinsert);
-				}
-				collecting = false;
-			}
-			
-		} else {  // propagate residual holdover
-			
-			// Note: flow > 0 at time t implies that t is reachable from t+1
-			
-			int effectiveStart = incoming.getHighBound() - 1; // latest point that is really reachable			
-			int effectiveEnd = 0;
-			
-			// we may need to restart scanning within incoming ... (if there are costs etc.)
-			while (effectiveStart >= incoming.getLowBound()) {
-				
-				if (effectiveStart <= effectiveEnd) break;
-				current = this.getIntervalAt(effectiveStart - 1); // the flow one earlier is interesting
-				
-				collecting = false;
-
-				while (current.getLowBound() >= effectiveEnd) {
-
+				while (current.getLowBound() < effectiveEnd) {
 					int flow = current.getFlow();
-					if (flow > 0) {				
+					if (flow < this._capacity) {				
 						if (collecting) {
-							low = current.getLowBound();
+							high = current.getHighBound() + 1;
 						} else {
 							collecting = true;
-							low = current.getLowBound();					  
-							high = current.getHighBound(); // so highBound - 1 is reachable by holdover (capped by effectiveStart later on)
+							low = current.getLowBound() + 1;					  
+							high = current.getHighBound() + 1;
 						}
-
 					} else {
 						if (collecting) { // finish the Interval
-							low = Math.max(low, effectiveEnd);
-							high = Math.min(high, effectiveStart);
+							low = Math.max(low, effectiveStart);
+							high = Math.min(high, effectiveEnd);
 							if (low < high) {
 								toinsert = new Interval(low, high);					  
-								result.add(toinsert);
+								result.add(toinsert);								
 							}
 							collecting = false;
 						}
-						break;
 
+						// This interval is blocked. Can we restart with the next one?
+						if (incoming.getHighBound() <= current.getHighBound()) {
+							break; // No, that's it
+						}
 					}
-					
-					if (current.getLowBound()==0) {
+
+					if (this.isLast(current)) {
 						break;
-					}				
-					current = this.getIntervalAt(current.getLowBound() - 1);
+					} 
+					current = this.getIntervalAt(current.getHighBound());
+
 				}
 
 				if (collecting) { // finish the Interval
-					low = Math.max(low, effectiveEnd);
-					high = Math.min(high, effectiveStart);
+					low = Math.max(low, effectiveStart);
+					high = Math.min(high, effectiveEnd);
 					if (low < high) {
 						toinsert = new Interval(low, high);					  
 						result.add(toinsert);
 					}
-					collecting = false;;
+					collecting = false;
 				}
 
-				// this is the next point where we could try again, if it is reachable
-				effectiveStart = current.getLowBound();
+			} else {  // propagate residual holdover
+
+				// Note: flow > 0 at time t implies that t is reachable from t+1
+
+				int effectiveStart = incoming.getHighBound() - 1; // latest point that is really reachable			
+				int effectiveEnd = 0;
+
+				// we may need to restart scanning within incoming ... (if there are costs etc.)
+				while (effectiveStart >= incoming.getLowBound()) {
+
+					if (effectiveStart <= effectiveEnd) break;
+					current = this.getIntervalAt(effectiveStart - 1); // the flow one earlier is interesting
+
+					collecting = false;
+
+					while (current.getLowBound() >= effectiveEnd) {
+
+						int flow = current.getFlow();
+						if (flow > 0) {				
+							if (collecting) {
+								low = current.getLowBound();
+							} else {
+								collecting = true;
+								low = current.getLowBound();					  
+								high = current.getHighBound(); // so highBound - 1 is reachable by holdover (capped by effectiveStart later on)
+							}
+
+						} else {
+							if (collecting) { // finish the Interval
+								low = Math.max(low, effectiveEnd);
+								high = Math.min(high, effectiveStart);
+								if (low < high) {
+									toinsert = new Interval(low, high);					  
+									result.add(toinsert);
+								}
+								collecting = false;
+							}
+							break;
+
+						}
+
+						if (current.getLowBound()==0) {
+							break;
+						}				
+						current = this.getIntervalAt(current.getLowBound() - 1);
+					}
+
+					if (collecting) { // finish the Interval
+						low = Math.max(low, effectiveEnd);
+						high = Math.min(high, effectiveStart);
+						if (low < high) {
+							toinsert = new Interval(low, high);					  
+							result.add(toinsert);
+						}
+						collecting = false;;
+					}
+
+					// this is the next point where we could try again, if it is reachable
+					effectiveStart = current.getLowBound();
+
+				}
 
 			}
+		} else { // reverse search
+			//System.out.println("Holdover reverse: interval = " + incoming + " primal = " + primal + "  timehorizon = " + timehorizon);
 			
+			if (primal) {
+				// this should be unified with residual forward propagate, most likely
+				
+				int effectiveStart = incoming.getHighBound() - 1; // latest point that is already reachable			
+				int effectiveEnd = 0;
+
+				// we may need to restart scanning within incoming ... (if there are costs etc.)
+				while (effectiveStart >= incoming.getLowBound()) {
+
+					if (effectiveStart <= effectiveEnd) break;
+					current = this.getIntervalAt(effectiveStart - 1); // the flow one earlier is interesting
+
+					collecting = false;
+
+					while (current.getLowBound() >= effectiveEnd) {
+
+						int flow = current.getFlow();
+						if (flow < this._capacity) {				
+							if (collecting) {
+								low = current.getLowBound();
+							} else {
+								collecting = true;
+								low = current.getLowBound();					  
+								high = current.getHighBound(); // so highBound - 1 is reachable by holdover (capped by effectiveStart later on)
+							}
+
+						} else {
+							if (collecting) { // finish the Interval
+								low = Math.max(low, effectiveEnd);
+								high = Math.min(high, effectiveStart);
+								if (low < high) {
+									toinsert = new Interval(low, high);					  
+									result.add(toinsert);
+								}
+								collecting = false;
+							}
+							break;
+
+						}
+
+						if (current.getLowBound()==0) {
+							break;
+						}				
+						current = this.getIntervalAt(current.getLowBound() - 1);
+					}
+
+					if (collecting) { // finish the Interval
+						low = Math.max(low, effectiveEnd);
+						high = Math.min(high, effectiveStart);
+						if (low < high) {
+							toinsert = new Interval(low, high);					  
+							result.add(toinsert);
+						}
+						collecting = false;;
+					}
+
+					// this is the next point where we could try again, if it is reachable
+					effectiveStart = current.getLowBound();
+
+				}				
+
+			} else { // residual reverse holdover
+				
+				// this should be unified with primal forward propagate, most likely
+								
+				int effectiveStart = incoming.getLowBound() ;
+				int effectiveEnd = timehorizon ;
+
+				if (effectiveStart == effectiveEnd) {
+					return result;
+				}
+				current = this.getIntervalAt(effectiveStart);
+
+				while (current.getLowBound() < effectiveEnd) {
+					int flow = current.getFlow();
+					if (flow > 0) {				
+						if (collecting) {
+							high = current.getHighBound() + 1;
+						} else {
+							collecting = true;
+							low = current.getLowBound() + 1;					  
+							high = current.getHighBound() + 1;
+						}
+					} else {
+						if (collecting) { // finish the Interval
+							low = Math.max(low, effectiveStart);
+							high = Math.min(high, effectiveEnd);
+							if (low < high) {
+								toinsert = new Interval(low, high);					  
+								result.add(toinsert);								
+							}
+							collecting = false;
+						}
+
+						// This interval is blocked. Can we restart with the next one?
+						if (incoming.getHighBound() <= current.getHighBound()) {
+							break; // No, that's it
+						}
+					}
+
+					if (this.isLast(current)) {
+						break;
+					} 
+					current = this.getIntervalAt(current.getHighBound());
+
+				}
+
+				if (collecting) { // finish the Interval
+					low = Math.max(low, effectiveStart);
+					high = Math.min(high, effectiveEnd);
+					if (low < high) {
+						toinsert = new Interval(low, high);					  
+						result.add(toinsert);
+					}
+					collecting = false;
+				}
+			}
 		}
 		
 		return result;

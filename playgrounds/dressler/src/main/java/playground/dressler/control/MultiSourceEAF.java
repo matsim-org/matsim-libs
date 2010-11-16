@@ -910,9 +910,10 @@ public class MultiSourceEAF {
 			//simplenetworkfile = "/homes/combi/dressler/V/code/meine_EA/capsinks.dat";
 			//simplenetworkfile = "/homes/combi/dressler/V/code/meine_EA/padang_v2010_3_sources.dat";
 			
-			//simplenetworkfile  = "/homes/combi/dressler/V/code/meine_EA/padang_5_10s.dat";
-			simplenetworkfile  = "/homes/combi/dressler/V/code/grids/test_small.dat";
-			simplenetworkfile  = "/homes/combi/dressler/V/code/grids/grid_500x50_10000_at_all_to_10_R3.dat";
+			simplenetworkfile  = "/homes/combi/dressler/V/code/meine_EA/padang_5_10s.dat";
+			//simplenetworkfile  = "/homes/combi/dressler/V/code/grids/test_small.dat";
+			//simplenetworkfile  = "/homes/combi/dressler/V/code/grids/grid_500x50_10000_at_all_to_10_R3.dat";
+			//simplenetworkfile  = "/homes/combi/dressler/V/code/grids/grid_50x50_100000_at_all_to_10_R2.dat";
 			
 			uniformDemands = 100;
 
@@ -1074,8 +1075,8 @@ public class MultiSourceEAF {
 		settings.flowFactor = flowFactor; // default 1.0
 
 		// set additional parameters
-		//settings.TimeHorizon = 55;
-		//settings.MaxRounds = 300;
+		//settings.TimeHorizon = 550;
+		//settings.MaxRounds = 20;
 		//settings.checkConsistency = 1;
 		//settings.doGarbageCollection = 10; // > 0 generally not such a good idea.
 		//settings.minTravelTime = 1;
@@ -1084,22 +1085,22 @@ public class MultiSourceEAF {
 		settings.useImplicitVertexCleanup = true;
 		//settings.useShadowFlow = false;		
 		
-		settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_FORWARD;
+		//settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_FORWARD;
 		//settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_MIXED;
-		//settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_REVERSE;
+		settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_REVERSE;
 		settings.usePriorityQueue = true; // use a PriorityQueue instead of a Queue
 		
 		settings.useRepeatedPaths = true; // not compatible with costs!
 		// track unreachable vertices only works in REVERSE (with forward in between), and wastes time otherwise
-		//settings.trackUnreachableVertices = true  && (settings.searchAlgo == FlowCalculationSettings.SEARCHALGO_REVERSE);
+		settings.trackUnreachableVertices = true  && (settings.searchAlgo == FlowCalculationSettings.SEARCHALGO_REVERSE);
 		//settings.sortPathsBeforeAugmenting = true;
 		settings.checkTouchedNodes = false;
 		settings.keepPaths = true; // store paths at all
 		settings.unfoldPaths = false; // unfold stored paths into forward paths
 		settings.delaySinkPropagation = true; // propagate sinks (and resulting intervals) only if the search has nothing else to do 
-		settings.quickCutOff = false; // stop as soon as the first good path is found
+		settings.quickCutOff = 0.1; // <0, continue fully,  =0 stop as soon as the first good path is found, > 0 continue a bit (e.g. 0.1 continue for another 10% of the polls so far) 
 		settings.mapLinksToTEP = true; // remember which path uses an edge at a given time
-		settings.useHoldover = false; //only forward, no cost, no unwind
+		settings.useHoldover = true; //only forward/reverse, no cost, no unwind
 		//settings.whenAvailable = new HashMap<Link, Interval>();
 		//settings.whenAvailable.put(network.getLinks().get(new IdImpl("1")), new Interval(2,3));
 
@@ -1157,7 +1158,7 @@ public class MultiSourceEAF {
 			int demand = fluss.getDemands().get(node);
 			if (demand > 0) {
 				// this can be a lot of text				
-				System.out.println("node:" + node.getId().toString()+ " demand:" + demand);
+				//System.out.println("node:" + node.getId().toString()+ " demand:" + demand);
 			}
 		}
 
@@ -1169,6 +1170,7 @@ public class MultiSourceEAF {
 		Tdecompose.onoff();
 		LinkedList<TimeExpandedPath> decomp = fluss.doPathDecomposition(); 
 		Tdecompose.onoff();
+			
 		
 		Treconstruct.onoff();
 		if( decomp !=null) {
@@ -1202,7 +1204,7 @@ public class MultiSourceEAF {
 			int demand = fluss.getDemands().get(node);
 			if (demand > 0) {
 				// this can be a lot of text				
-				System.out.println("node:" + node.getId().toString()+ " demand:" + demand);
+				//System.out.println("node:" + node.getId().toString()+ " demand:" + demand);
 			}
 		}
 		
@@ -1226,7 +1228,7 @@ public class MultiSourceEAF {
 		//partitioner.printStatistics();
 		
 		String imageBaseName = "/homes/combi/dressler/V/code/meine_EA/tmpimage/";
-		partitioner.drawStatistics(imageBaseName, 2000, 200);
+		partitioner.drawStatistics(imageBaseName, 500, 500);
 
 		if(_debug){
 			System.out.println("done");

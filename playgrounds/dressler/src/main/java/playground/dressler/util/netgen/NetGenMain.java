@@ -157,7 +157,7 @@ public class NetGenMain {
 		if (params.numbersources  == 0) {
 			// all except the x = 0 column, where the sinks are
 			for (int x = 1; x < params.xdim; x++) {
-				for (int y = 1; y < params.ydim; y++) {
+				for (int y = 0; y < params.ydim; y++) {
 					sources.add(gridNodes[x][y]);
 					isSource.put(gridNodes[x][y], true);
 				}
@@ -213,6 +213,8 @@ public class NetGenMain {
             out.newLine();
             out.write("N " + network.getNodes().size());
             out.newLine();
+            out.write("M " + network.getLinks().size());
+            out.newLine();
 
             HashMap<Node,Integer> newNodeNames = new HashMap<Node,Integer>();
             int max = 0;
@@ -238,21 +240,23 @@ public class NetGenMain {
             }
 
             for (Node node : network.getNodes().values()) {
-            	if (demands.containsKey(node)) {
-            		int d = demands.get(node);
-            		/*if (d > 0) {
-            			out.write("S " + newNodeNames.get(node) + " " + d);
-            			out.newLine();
-            		}
-            		if (d < 0) {
-            			out.write("T " + newNodeNames.get(node) + " " + (-d));
-            			out.newLine();
-            		}   */
-            		
-            		// write new format with coordinates for pretty pictures
-            		out.write("V " + newNodeNames.get(node) + " " + d + " "+ node.getCoord().getX() + " " + node.getCoord().getY());
-        			out.newLine();
+            	Integer d = demands.get(node);
+            	if (d == null) d = 0;
+
+
+            	/*if (d > 0) {
+            		out.write("S " + newNodeNames.get(node) + " " + d);
+            		out.newLine();
             	}
+            	if (d < 0) {
+            		out.write("T " + newNodeNames.get(node) + " " + (-d));
+            		out.newLine();
+            	}*/
+
+            	// write new format with coordinates for pretty pictures
+            	out.write("V " + newNodeNames.get(node) + " " + d + " "+ node.getCoord().getX() + " " + node.getCoord().getY());
+            	out.newLine();
+
             }
 
             for (Link link : network.getLinks().values()) {
@@ -281,15 +285,15 @@ public class NetGenMain {
 		
 		NetGenParams params = new NetGenParams();
 						
-		params.xdim = 500;
+		params.xdim = 50;
 		params.ydim = 50;
 //		params.capmean = 3;
 //		params.capvariance = params.capmean / 2;
 //		params.lengthmean = 20;
 //		params.lengthvariance = params.lengthmean / 2;
-		params.randseed = 3;
-        params.numbersources = 0;
-		params.totalsupply = 10000;
+		params.randseed = 4;
+        params.numbersources = 5;
+		params.totalsupply = 100;
 		
 		if (outputfileDAT.charAt(outputfileDAT.length() - 1) == '/') {
 			// only a directory, add default name

@@ -66,7 +66,7 @@ public class FlowCalculationSettings {
 	public boolean unfoldPaths = true; // if they are stored, should they be unfolded to contain only forward edges?
 	public boolean mapLinksToTEP = true; // remember which path uses an edge at a given time
 	public boolean useRepeatedPaths = true && !useSinkCapacities; // try to repeat paths
-	public boolean quickCutOff = false; // stop when the first path is found
+	public double quickCutOff = -1.0; // values < 0 continue fully, otherwise ratio of how much additional polls are done, e.g., 0.0 is stop immediately when the first path is found.   
 	public boolean delaySinkPropagation = false; // propagate sinks (and resulting intervals) only if the search has nothing else to do 
 	public boolean useHoldover = false; // allow holdover at all nodes
 	public boolean useHoldoverCapacities = false;// limit holdover on each node
@@ -151,7 +151,7 @@ public class FlowCalculationSettings {
 			return false;
 		}
 
-		// check search settings for bad combinations
+		// check search settings for some (not all) bad combinations
 		if (this.useSinkCapacities) {
 			if (this.searchAlgo != this.SEARCHALGO_FORWARD) {
 				System.out.println("Only FORWARD search works with sink capacities enabled!");
@@ -164,8 +164,12 @@ public class FlowCalculationSettings {
 		}
 		
 		if (this.useHoldover) {
-			if (this.searchAlgo != this.SEARCHALGO_FORWARD) {
-				System.out.println("Only FORWARD search works with holdover enabled!");
+			if (this.searchAlgo != this.SEARCHALGO_FORWARD && this.searchAlgo != this.SEARCHALGO_REVERSE) {
+				System.out.println("Only FORWARD and REVERSE search work with holdover enabled!");
+				return false;
+			}
+			if (this.useSinkCapacities) {
+				System.out.println("Holdover cannot be combined with sink capacities!");
 				return false;
 			}
 			if (this.unfoldPaths) {
@@ -180,8 +184,8 @@ public class FlowCalculationSettings {
 		}
 		
 		if (this.usePriorityQueue) {
-			if (this.searchAlgo != this.SEARCHALGO_FORWARD) {
-				System.out.println("Only FORWARD search supports the priority queue!");
+			if (this.searchAlgo != this.SEARCHALGO_FORWARD && this.searchAlgo != this.SEARCHALGO_REVERSE) {
+				System.out.println("Only FORWARD and REVERSE search support the priority queue!");
 				return false;
 			}
 		}
@@ -1183,7 +1187,7 @@ public class FlowCalculationSettings {
     	    } else if (s.equals("--userepeatedpaths")) {
     	    	useRepeatedPaths  = Boolean.parseBoolean(t);
     	    } else if (s.equals("--quickcutoff")) {
-    	    	quickCutOff  = Boolean.parseBoolean(t);
+    	    	quickCutOff  = Double.parseDouble(t);
     	    } else if (s.equals("--delaysinkpropagation")) {
     	    	delaySinkPropagation  = Boolean.parseBoolean(t);
     	    } else if (s.equals("--useholdover")) {

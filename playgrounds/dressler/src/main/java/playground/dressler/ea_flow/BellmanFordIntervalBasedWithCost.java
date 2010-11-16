@@ -52,8 +52,6 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 
 	HashMap<Node, VertexInterval> _sinklabels;	
 	
-	boolean _haslastcost = false;
-	int _lastcost = 0;	
 	
 	// --------------------CONSTRUCTORS-------------------------------------//
 
@@ -853,6 +851,8 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 		// main loop
 		int gain = 0;
 		
+		int finalPoll = Integer.MAX_VALUE / 2;
+		boolean quickCutOffArmed = false;
 
 		
 		while (true) {
@@ -861,17 +861,19 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 
 			this._roundpolls++;
 			this._totalpolls++;
-			
+								
 			// do we have a path and want to stop looking?
-			if (this._haslastcost && cutoffcost == this._lastcost) {								
+			if (!quickCutOffArmed &&  this._haslastcost && cutoffcost == this._lastcost) {								
 				// now, we could stop ...
 				
-				// do we want to stop after the first path is found? 
-				if (this._settings.quickCutOff) {
-					if (_debug > 0) {
-						System.out.println("Stopping search because of quick cutoff.");
-					}
-					break;
+				// do we want to stop after the first path is found?
+				if (this._settings.quickCutOff >= 0.0) {			
+					finalPoll = (int) ((Integer) this._roundpolls * (1.0 + _settings.quickCutOff));
+					quickCutOffArmed = true;
+					//if (_debug > 0) {
+						System.out.println("Quickcutoff activated. search because of quick cutoff.");
+					//}
+					//break;
 				}
 				
 				// TODO make an option for this!
@@ -885,6 +887,11 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 					}
 				}	*/			
 			}
+			
+			if (quickCutOffArmed && this._roundpolls > finalPoll) {
+				break;
+			}
+
 
 			// gets the first task in the queue
 			task = queue.poll();
@@ -2188,9 +2195,11 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 	public void startNewIter(int lastArrival) {
 		super.startNewIter(lastArrival);
 		
+		// it is set, but only to last arrival not lastcost, so we cannot use it. 
+		this._haslastcost = false;
+
 		// "free" some more data structures
 		this._sinklabels = null;
-		this._haslastcost = false;
 	}
 	
 	public void startNewIter(int lastArrival, int lastCost) {

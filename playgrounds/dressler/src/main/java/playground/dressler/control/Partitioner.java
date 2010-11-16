@@ -234,7 +234,7 @@ public class Partitioner {
 			// draw exits ...
 			{
 				Coord c = sink.getCoord();
-				System.out.println(c.toString());
+				//System.out.println(c.toString());
 				Double x = c.getX() * scalex + offsetx;
 				Double y = c.getY() * scaley + offsety;
 				int X = x.intValue();
@@ -266,10 +266,7 @@ public class Partitioner {
 						g2D.setColor(color);
 						float alpha = howmany / (float) demand;
 						g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
-						//g2D.drawLine(X, Y, X, Y);
 						g2D.fillOval(X-radiusNode, Y-radiusNode, 2*radiusNode-1 , 2*radiusNode -1);
-						//g2D.fillOval(X-1, Y-1, 2, 2);
-						//g2D.drawOval(X, Y, 1, 1);
 					}
 				}
 			} else {
