@@ -1,4 +1,3 @@
-- write tests for EnergyConsumptionPlugin and ParkingTimesPlugin
 
 => perhaps based both on events file and controler (at least one)...
 
@@ -11,5 +10,15 @@ ParkingTimesPlugin =>
 
 
 EnergyConsumptionPlugin 
-=> test the joule values!
+=> test the joule values grob, ob strecken richtige genommen werden...
 
+
+
+-> make dumb charging controler with only the new plug-ins and events file => should give same results?
+=> try this out, make new controler: PSSEventsFileControler
+
+
+
+=> PSSEventsFileBasedControler => implement that
+
+=> updated PSF2.pssReadme.txt
