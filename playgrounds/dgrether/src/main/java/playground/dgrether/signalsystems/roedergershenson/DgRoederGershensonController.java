@@ -105,7 +105,13 @@ public class DgRoederGershensonController implements SignalController {
 	
 	public void registerAndInitializeSensorManager(DgSensorManager sensorManager) {
 		this.sensorManager = sensorManager;
-		//TODO initialize required information
+		for (SignalGroupMetadata metadata : this.signalGroupIdMetadataMap.values()){
+			for (Link outLink : metadata.getOutLinks()){
+				this.sensorManager.registerNumberOfCarsMonitoring(outLink);
+			}
+			//TODO initialize inLinks
+			
+		}
 		
 
 	

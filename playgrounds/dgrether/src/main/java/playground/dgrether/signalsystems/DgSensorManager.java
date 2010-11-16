@@ -19,13 +19,18 @@
  * *********************************************************************** */
 package playground.dgrether.signalsystems;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.api.experimental.events.AgentArrivalEvent;
+import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
+import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 
@@ -34,48 +39,77 @@ import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
  * @author dgrether
  *
  */
-public class DgSensorManager implements LinkEnterEventHandler, LinkLeaveEventHandler{
+public class DgSensorManager implements LinkEnterEventHandler, LinkLeaveEventHandler, 
+	AgentArrivalEventHandler, AgentWait2LinkEventHandler{
 
 	private static final Logger log = Logger.getLogger(DgSensorManager.class);
 	
-	private Set<Id> monitoredLinkIds = new HashSet<Id>();
+//	private Set<Id> monitoredLinkIds = new HashSet<Id>();
+//	private Map<Id, Double> linkIdNumberOfCarsInDistanceMap = new HashMap<Id, Double>();
+	private Map<Id, DgSensor> linkIdSensorMap = new HashMap<Id, DgSensor>();
 	
 	public DgSensorManager(){}
 	
-	public void registerNumberOfCarsMonitoring(Id linkId){
-		
+	public void registerNumberOfCarsMonitoring(Link link){
+//		this.monitoredLinkIds.add(link.getId());
+		if (!this.linkIdSensorMap.containsKey(link.getId())){
+			this.linkIdSensorMap.put(link.getId(), new DgSensor(link));
+		}
 	}
 	
-	public void registerNumberOfCarsInDistanceMonitoring(Id linkId, Double distanceMeter){
-		
+	public void registerNumberOfCarsInDistanceMonitoring(Link link, Double distanceMeter){
+//		this.linkIdNumberOfCarsInDistanceMap.put(link.getId(), distanceMeter);
+		if (!this.linkIdSensorMap.containsKey(link.getId())){
+			this.linkIdSensorMap.put(link.getId(), new DgSensor(link));
+//			this.monitoredLinkIds.add(link.getId());
+		}
+		this.linkIdSensorMap.get(link.getId()).registerDistanceToMonitor(distanceMeter);
+
 	}
-	
 
 	public int getNumberOfCarsOnLink(Id linkId){
-		//TODO implement this
-		return 0;
+		if (!this.linkIdSensorMap.containsKey(linkId)){
+			throw new IllegalStateException("No sensor on link " + linkId + "! Register measurement for this link by calling one of the 'register...' methods of this class first.");
+		}
+		return this.linkIdSensorMap.get(linkId).getNumberOfCarsOnLink();
 	}
 	
-	public void getNumberOfCarsInDistance(Id linkId, Double distanceMeter){
-		
+	public int getNumberOfCarsInDistance(Id linkId, Double distanceMeter, double timeSeconds){
+		if (!this.linkIdSensorMap.containsKey(linkId)){
+			throw new IllegalStateException("No sensor on link " + linkId + "! Register measurement for this link by calling one of the 'register...' methods of this class first.");
+		}
+		//TODO add further check
+		return this.linkIdSensorMap.get(linkId).getNumberOfCarsInDistance(distanceMeter, timeSeconds);
 	}
 	
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		if (this.monitoredLinkIds.contains(event.getLinkId())){
-			
+		if (this.linkIdSensorMap.containsKey(event.getLinkId())){
+			this.linkIdSensorMap.get(event.getLinkId()).handleEvent(event);
 		}
 	}
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		if (this.monitoredLinkIds.contains(event.getLinkId())){
-			
+		if (this.linkIdSensorMap.containsKey(event.getLinkId())){
+			this.linkIdSensorMap.get(event.getLinkId()).handleEvent(event);
 		}
 	}
+	
+	@Override
+	public void handleEvent(AgentArrivalEvent event) {
+		this.linkIdSensorMap.get(event.getLinkId()).handleEvent(event);
+	}
+	
+	@Override
+	public void handleEvent(AgentWait2LinkEvent event) {
+		this.linkIdSensorMap.get(event.getLinkId()).handleEvent(event);		
+	}
+
 	@Override
 	public void reset(int iteration) {
-		
+		//TODO 
 	}
+
 	
 }
