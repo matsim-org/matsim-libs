@@ -37,7 +37,6 @@ public class CreateNetworkFromShape {
 	private NetworkFactory netFac;
 	private Polygon area = null;
 	private ScenarioImpl sc;
-//	private CoordinateTransformation transformation;
 	
 	
 	public static void main(String[] args){
@@ -59,24 +58,6 @@ public class CreateNetworkFromShape {
 		creator.run(netOutFile);
 		creator.write2Shape(linkOutShp, nodeOutShp);
 	}
-	
-//	/**
-//	 * run <code>AnalyzeMyShapeFile</code> to get position of Attributes in ShapeFile.
-//	 * works only for <Code>LineString</code>.
-//	 * use this constructor, if the coordinates of your shapefile not specified in GK4. They will be transformed. 
-//	 * It's necessary to calculate distances 
-//	 * @param idAttributePosition
-//	 * @param geometryAtrributePosition
-//	 * @param shapeFile
-//	 * @param fromCoord
-//	 */
-//	public CreateNetworkFromShape(Integer idAttributePosition, Integer geometryAtrributePosition, String shapeFile, String fromCoord){
-//		this.myReader = new ShapeFileReader();
-//		this.shapeFile = shapeFile;
-//		this.id = idAttributePosition;
-//		this.geometry = geometryAtrributePosition;
-//		this.transformation = TransformationFactory.getCoordinateTransformation(fromCoord, TransformationFactory.GK4);
-//	}
 	
 	/**
 	 * run <code>AnalyzeMyShapeFile</code> to get position of Attributes in ShapeFile
@@ -109,7 +90,7 @@ public class CreateNetworkFromShape {
 		this.netFac = this.net.getFactory();
 		Geometry g;
 		
-		for(Feature f: features){
+		for(Feature f: this.features){
 			g = (Geometry) f.getAttribute(this.geometry);
 			
 			this.createNodesFromGeometry(g);
@@ -154,6 +135,9 @@ public class CreateNetworkFromShape {
 				
 				if(!this.net.getLinks().containsKey(id)){
 					l = this.netFac.createLink(id, from.getId(), to.getId());
+//					l.setCapacity(capacity);
+//					l.setFreespeed(freespeed);
+//					l.setLength(length);
 					this.net.addLink(l);
 				}else{
 					// TODO don't know why some links appear so often

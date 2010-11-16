@@ -23,8 +23,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
-import java.util.SortedMap;
 import java.util.Map.Entry;
+import java.util.SortedMap;
 
 import org.apache.log4j.Logger;
 import org.geotools.factory.FactoryRegistryException;
@@ -77,8 +77,20 @@ public class DaShapeWriter {
 	}
 	
 	public static void writeNodes2Shape(String fileName, Map<Id, Node> nodes){
-		initPointFeatureType("nodes");
+		initPointFeatureType("nodes", null);
 		write(createNodeFeatures(nodes), fileName);
+	}
+	
+	public static void writeDefaultPoints2Shape(String fileName, String name, Map<String, Coord> points, Map<String, SortedMap<String, String>> attributes){
+		if(attributes == null){
+			initPointFeatureType(name, null);
+		}else{
+			for (SortedMap<String, String> m : attributes.values()){
+				initPointFeatureType(name, m);
+				break;
+			}
+		}
+		write(createDefaultPointFeature(points, attributes), fileName);
 	}
 	
 	/**
@@ -104,7 +116,7 @@ public class DaShapeWriter {
 	 * @param stops2write
 	 */
 	public static void writeRouteStops2Shape(String fileName, Map<Id, TransitStopFacility> stops, Collection<Id> stops2write){
-		initPointFeatureType("TransitRouteStops");
+		initPointFeatureType("TransitRouteStops", null);
 		write(createStopFeatures(stops, stops2write), fileName);
 	}
 	
@@ -118,13 +130,11 @@ public class DaShapeWriter {
 		write(createPointDistanceFeatures(points,attributes), fileName);
 	}
 	/**
-	 * doesn't work!
 	 * @param fileName
 	 * @param name
 	 * @param lineStrings
 	 * @param attributes
 	 */
-	@Deprecated
 	public static void writeDefaultLineString2Shape(String fileName, String name,  Map<String, SortedMap<Integer, Coord>> lineStrings, Map<String, SortedMap<String, String>> attributes){
 		
 		if(attributes == null){
@@ -176,10 +186,23 @@ public class DaShapeWriter {
 		}
 	}
 	
-	private static void initPointFeatureType(String name){
-		AttributeType [] attribs = new AttributeType[2];
+	private static void initPointFeatureType(String name, SortedMap<String, String> attributes){
+		AttributeType [] attribs;
+		if(attributes == null){
+			attribs = new AttributeType[2];
+		}else{
+			attribs = new AttributeType[attributes.size() + 2];
+		}
 		attribs[0] = DefaultAttributeTypeFactory.newAttributeType("Point", Point.class, true, null, null, MGC.getCRS(TransformationFactory.WGS84_UTM35S));
 		attribs[1] = AttributeTypeFactory.newAttributeType("id", String.class);
+		Integer count = 2;
+		
+		if(!(attributes == null)){
+			for(String s : attributes.keySet()){
+				attribs[count] = AttributeTypeFactory.newAttributeType(s, String.class);
+				count++;
+			}
+		}
 		
 		try {
 			featureType = FeatureTypeBuilder.newFeatureType(attribs, name);
@@ -253,7 +276,7 @@ public class DaShapeWriter {
 		
 		for(TransitStopFacility stop : stops.values()){
 			if((stops2write == null) || stops2write.contains(stop.getId())){
-				feature = getPointFeature(stop.getCoord(), stop.getId().toString());
+				feature = getPointFeature(stop.getCoord(), stop.getId().toString(), null);
 				features.add(feature);
 			}
 		}
@@ -265,9 +288,21 @@ public class DaShapeWriter {
 		Feature feature;
 		
 		for(Node n : nodes.values()){
-			feature = getPointFeature(n.getCoord(), n.getId().toString());
+			feature = getPointFeature(n.getCoord(), n.getId().toString(), null);
 			features.add(feature);
 		}
+		return features;
+	}
+	
+	private static Collection<Feature> createDefaultPointFeature(Map<String, Coord> points, Map<String, SortedMap<String, String>> attributes){
+		Collection<Feature> features = new ArrayList<Feature>();
+		Feature feature;
+		
+		for(Entry<String, Coord> e: points.entrySet()){
+			feature =  getPointFeature(e.getValue(), e.getKey(), attributes.get(e.getKey()));
+			features.add(feature);
+		}
+		
 		return features;
 	}
 	
@@ -325,26 +360,28 @@ public class DaShapeWriter {
 		try {
 			return featureType.create(attribs);
 		} catch (IllegalAttributeException e) {
-			System.out.println(c.toString());
-			System.out.println(name);
-			System.out.println(attributes.size());
-			for(Entry<String, String> ee :attributes.entrySet()){
-				System.out.println(ee.getKey() + " " + ee.getValue());
-			}
-			System.out.println(s.toString());
-			System.out.println(attribs.length);
-			for(Object o : attribs){
-				System.out.println(o.toString());
-			}
 			throw new RuntimeException(e);
 		}
 	}
 	
-	private static Feature getPointFeature(Coord coord, String id) {
+	private static Feature getPointFeature(Coord coord, String id, SortedMap<String, String> attributes) {
 		Point p = geometryFactory.createPoint(MGC.coord2Coordinate(coord));
-		Object [] attribs = new Object[2];
+		Object [] attribs ;
+		if(attributes == null){
+			attribs = new Object[2];
+		}else{
+			attribs = new Object[attributes.size()+2];
+		}
 		attribs[0] = p;
 		attribs[1] = id;
+		Integer count = 2;
+		
+		if(!(attributes == null)){
+			for(String str : attributes.values()){
+				attribs[count] = str;
+				count++;
+			}
+		}
 		
 		try {
 			return featureType.create(attribs);
