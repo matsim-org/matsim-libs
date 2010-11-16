@@ -23,7 +23,9 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.signalsystems.model.Signal;
 import org.matsim.signalsystems.model.SignalGroup;
@@ -42,6 +44,9 @@ private Map<Id,Integer> maxOnset;
 private Map<Id,Integer> minDropping;
 private Map<Id,Integer> maxDropping;
 private List<Id> adaptiveSignalGroups;
+private Map<Id,Integer> intergreentimes;
+private static final Logger log = Logger.getLogger(AdaptiveControllHead.class);
+
 
 public AdaptiveControllHead() {
 sscmap = new HashMap<Id,SignalSystemControllerData>();
@@ -51,6 +56,7 @@ this.maxDropping= new  HashMap<Id, Integer>();
 this.maxOnset= new  HashMap<Id, Integer>();
 this.minDropping= new  HashMap<Id, Integer>();
 this.minOnset= new  HashMap<Id, Integer>();
+this.intergreentimes = new HashMap<Id, Integer>();
 
 }
 
@@ -124,18 +130,59 @@ public void sizeDownPlans(){
 				this.maxDropping.put(sgsd.getSignalGroupId(),sgsd.getDropping());
 				this.maxOnset.put(sgsd.getSignalGroupId(),sgsd.getOnset());
 				Long nos = Math.round(sgsd.getOnset()*ratio);
-				
 				Long ndr = Math.round(sgsd.getDropping()*ratio);
 				this.minDropping.put(sgsd.getSignalGroupId(),ndr.intValue());
 				this.minOnset.put(sgsd.getSignalGroupId(),nos.intValue());
+				this.checkInterGreenTimes(spd.getCycleTime());
 			}
 		
 			
 		}
 	}
+	
 }
 
 
+//checks that original intergreentimes are kept after sizing down plans
+private void checkInterGreenTimes(int cycleTime) {
+	
+for (Entry<Id, Integer> dropen : this.maxDropping.entrySet()){
+	Id ssid = this.getSignalSystemforGroupId(dropen.getKey());
+	int intergreentime = 0;
+	for (Entry<Id,Integer> onsen : this.maxOnset.entrySet()){
+		if (this.getSignalSystemforGroupId(onsen.getKey()).equals(ssid)){
+			if (onsen.getValue()>dropen.getValue()){
+				if (intergreentime == 0 || onsen.getValue()-dropen.getValue()<intergreentime)
+				intergreentime = onsen.getValue()-dropen.getValue();
+				
+			}
+		}
+		
+	}
+
+	if (intergreentime == 0) intergreentime = cycleTime-dropen.getValue();
+	this.intergreentimes.put(dropen.getKey(), intergreentime);
+}
+
+for (Entry<Id,Integer> mined : this.minDropping.entrySet()){
+	Map<Id,Integer> newons = new HashMap<Id,Integer>();
+	Id ssid = this.getSignalSystemforGroupId(mined.getKey());
+	int intergreentime = this.intergreentimes.get(mined.getKey());
+	for (Entry<Id,Integer> minon : this.minOnset.entrySet()){
+		if (this.getSignalSystemforGroupId(minon.getKey()).equals(ssid)){
+			if (minon.getValue()>mined.getValue()&minon.getValue()<mined.getValue()+intergreentime){
+				newons.put(minon.getKey(), mined.getValue()+intergreentime);
+				//log.info("changed onset of "+minon.getKey()+" from "+minon.getValue()+" to "+newons.get(minon.getKey()));
+			}
+		}
+	}
+	this.minOnset.putAll(newons);
+	
+}
+
+
+
+}
 
 public List<Id> getAdaptiveSignalGroups() {
 	return adaptiveSignalGroups;

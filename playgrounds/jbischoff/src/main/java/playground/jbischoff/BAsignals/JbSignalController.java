@@ -27,6 +27,7 @@ import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+//import org.matsim.signalsystems.control.SignalGroupState;
 import org.matsim.signalsystems.model.SignalController;
 import org.matsim.signalsystems.model.SignalGroup;
 import org.matsim.signalsystems.model.SignalGroupState;
@@ -101,7 +102,7 @@ public class JbSignalController implements SignalController {
 						.getMinDropping().get(sgid));
 				this.minOn.put(sgid, this.adaptiveControllHead.getMinOnset()
 						.get(sgid));
-				// log.info("m add "+sgid+" ; "+this.maxDrop.get(sgid));
+				// log.info("m add "+sgid+" ; "+this.minOn.get(sgid));
 			}
 		}
 
@@ -156,7 +157,8 @@ public class JbSignalController implements SignalController {
 		if ((this.adaptiveDroppings.get(sgId) - this.adaptiveOnsets.get(sgId)) <= JBBaParams.MAXPHASELENGTH) {
 			int oldmd = this.maxDrop.get(sgId);
 			oldmd = oldmd + 2;
-			this.maxDrop.put(sgId, oldmd);
+			if (oldmd < this.activePlan.getCylce()-2)
+				this.maxDrop.put(sgId, oldmd);
 			
 		}
 		int ps;
@@ -266,10 +268,12 @@ public class JbSignalController implements SignalController {
 	@Override
 	public void reset(Integer iterationNumber) {
 		// TODO Auto-generated method stub
+
 	}
 
 	@Override
 	public void simulationInitialized(double simStartTimeSeconds) {
+		// TODO Auto-generated method stub
 		
 	}
 

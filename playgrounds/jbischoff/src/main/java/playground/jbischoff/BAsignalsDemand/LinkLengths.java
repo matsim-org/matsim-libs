@@ -45,7 +45,6 @@ import org.matsim.lanes.LanesToLinkAssignment;
 import org.xml.sax.SAXException;
 
 import playground.jbischoff.BAsignals.JbBaPaths;
-import playground.joschka.lsacvs2kml.LSA;
 
 public class LinkLengths {
 
@@ -77,12 +76,12 @@ public class LinkLengths {
 	
 			}
 		
-		System.out.println(scenario.getNetwork().getLinks().get(new IdImpl(6667)).getLength());
-		/*for (Id lid : fl){
+		//System.out.println(scenario.getNetwork().getLinks().get(new IdImpl(6667)).getLength());
+		for (Id lid : fl){
 			System.out.println(lid + " length is "+scenario.getNetwork().getLinks().get(lid).getLength());
 			
-		}*/
-		/*LaneDefinitions ldf = new LaneDefinitionsImpl();
+		}
+		LaneDefinitions ldf = new LaneDefinitionsImpl();
 		LaneDefinitionsReader20 ldr = new LaneDefinitionsReader20(ldf, "http://www.matsim.org/files/dtd/laneDefinitions_v2.0.xsd");
 		ldr.readFile("/Users/JB/Desktop/BA-Arbeit/sim/scenario/scenario-lsa/lanes_cottbus_v20_jbol.xml");
 		for (LanesToLinkAssignment ltla : ldf.getLanesToLinkAssignments().values()){
@@ -94,7 +93,7 @@ public class LinkLengths {
 				try{
 				System.out.println(lid+" l: "+scenario.getNetwork().getLinks().get(new IdImpl(lid)).getLength());
 				la.setStartsAtMeterFromLinkEnd(scenario.getNetwork().getLinks().get(new IdImpl(lid)).getLength());
-
+				
 				} catch (Exception e){
 					System.err.println("Error while getting length for Link "+lid);
 				}
@@ -106,7 +105,8 @@ public class LinkLengths {
 	
 		
 		}
+	
 		LaneDefinitionsWriter20 ldw = new LaneDefinitionsWriter20(ldf);
-		ldw.write("/Users/JB/Desktop/BA-Arbeit/sim/scenario/scenario-lsa/lanes_cottbus_v20_jbol_c.xml");*/
+		ldw.write("/Users/JB/Desktop/BA-Arbeit/sim/scenario/scenario-lsa/lanes_cottbus_v20_jbol_c.xml");
 	}
 }

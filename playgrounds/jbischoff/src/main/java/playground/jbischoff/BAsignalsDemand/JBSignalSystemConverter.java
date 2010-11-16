@@ -21,6 +21,8 @@
 package playground.jbischoff.BAsignalsDemand;
 
 
+
+
 public class JBSignalSystemConverter {
 
 	/**
@@ -34,10 +36,11 @@ public class JBSignalSystemConverter {
 //		
 //		
 //		
-//		for(Entry<Id,SignalGroupDefinition> sg:	oldsigs.getSignalGroupDefinitions().entrySet()){
+//		for(Entry<Id,SignalGroupData> sg:	oldsigs.getSignalGroupDefinitions().entrySet()){
 //			//if (sg.getValue().getId()
 //			System.out.println(sg.getValue().getLinkRefId());
 //		}
+
 
 			
 		
