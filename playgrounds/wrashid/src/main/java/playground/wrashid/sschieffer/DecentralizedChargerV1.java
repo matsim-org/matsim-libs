@@ -20,6 +20,7 @@
 
 package playground.wrashid.sschieffer;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 
 import org.matsim.api.core.v01.Id;
@@ -69,9 +70,21 @@ public class DecentralizedChargerV1 {
 		for (Id personId: controler.getPopulation().getPersons().keySet()){
 			LinkedList<Double> legEnergyConsumptionList = energyConsumptionOfLegs.get(personId);
 			
+			System.out.println("energyConsumption of personId " + personId);
+			
+			for (int i=0;i<legEnergyConsumptionList.size();i++) {
+				Double legEnergyConsumption = legEnergyConsumptionList.get(i);
+				System.out.println("leg:" + i + " => " + legEnergyConsumption);
+			}
+			
 			LinkedList<ParkingIntervalInfo> parkingIntervals = parkingTimeIntervals.get(personId);
 			
-
+			System.out.println("parking intervals of personId " + personId);
+			
+			for (int i=0;i<parkingIntervals.size();i++) {
+				ParkingIntervalInfo parkingIntervalInfo = parkingIntervals.get(i);
+				System.out.println("parking dep. time:" + i + " => " + parkingIntervalInfo.getDepartureTime());
+			}
 		}
 		
 		
