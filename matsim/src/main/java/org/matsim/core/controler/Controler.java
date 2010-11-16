@@ -28,7 +28,6 @@ import java.io.StringWriter;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.EnumSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeMap;
@@ -60,6 +59,7 @@ import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityPar
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.controler.corelisteners.EventsHandling;
 import org.matsim.core.controler.corelisteners.LegHistogramListener;
 import org.matsim.core.controler.corelisteners.PlansDumping;
 import org.matsim.core.controler.corelisteners.PlansReplanning;
@@ -75,9 +75,6 @@ import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.events.EventsManagerImpl;
-import org.matsim.core.events.algorithms.EventWriter;
-import org.matsim.core.events.algorithms.EventWriterTXT;
-import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.events.parallelEventsHandler.ParallelEventsManagerImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
@@ -117,7 +114,6 @@ import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.io.CollectLogMessagesAppender;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.counts.CountControlerListener;
 import org.matsim.counts.Counts;
 import org.matsim.households.HouseholdsWriterV10;
@@ -764,6 +760,8 @@ public class Controler {
 
 		this.addCoreControlerListener(new PlansReplanning());
 		this.addCoreControlerListener(new PlansDumping());
+		
+		this.addCoreControlerListener(new EventsHandling(this.events));
 	}
 
 	/**
@@ -1146,6 +1144,10 @@ public class Controler {
 		return this.linkStats;
 	}
 
+	public CalcLegTimes getLegTimes() {
+		return this.legTimes;
+	}
+	
 	public VolumesAnalyzer getVolumes() {
 		return this.volumes;
 	}
@@ -1180,10 +1182,9 @@ public class Controler {
 	 * implemented as a ControlerListener, to keep the structure of the
 	 * Controler as simple as possible.
 	 */
-	protected static class CoreControlerListener implements StartupListener, BeforeMobsimListener, AfterMobsimListener,
-	ShutdownListener {
+	protected static class CoreControlerListener implements StartupListener {
 
-		private final List<EventWriter> eventWriters = new LinkedList<EventWriter>();
+//		private final List<EventWriter> eventWriters = new LinkedList<EventWriter>();
 
 		public CoreControlerListener() {
 			// empty public constructor for protected class
@@ -1221,74 +1222,6 @@ public class Controler {
 					" uses the default QueueSimulation that might not have all features implemented.");
 					event.getControler().setMobsimFactory(new QueueSimulationFactory());
 				}
-			}
-		}
-
-		@Override
-		public void notifyBeforeMobsim(final BeforeMobsimEvent event) {
-			Controler controler = event.getControler();
-			controler.events.resetHandlers(event.getIteration());
-			controler.events.resetCounter();
-
-			if ((controler.writeEventsInterval > 0) && (event.getIteration() % controler.writeEventsInterval == 0)) {
-				for (EventsFileFormat format : controler.config.controler().getEventsFileFormats()) {
-					switch (format) {
-					case txt:
-						this.eventWriters.add(new EventWriterTXT(event.getControler().getControlerIO().getIterationFilename(event.getIteration(),FILENAME_EVENTS_TXT)));
-						break;
-					case xml:
-						this.eventWriters.add(new EventWriterXML(event.getControler().getControlerIO().getIterationFilename(event.getIteration(), FILENAME_EVENTS_XML)));
-						break;
-					default:
-						log.warn("Unknown events file format specified: " + format.toString() + ".");
-					}
-				}
-				for (EventWriter writer : this.eventWriters) {
-					controler.getEvents().addHandler(writer);
-				}
-			}
-
-			if (event.getIteration() % 10 == 6) {
-				controler.volumes.reset(event.getIteration());
-				controler.events.addHandler(controler.volumes);
-			}
-
-			// init for event processing of new iteration
-			controler.events.initProcessing();
-		}
-
-		@Override
-		public void notifyAfterMobsim(final AfterMobsimEvent event) {
-			Controler controler = event.getControler();
-			int iteration = event.getIteration();
-
-			for (EventWriter writer : this.eventWriters) {
-				writer.closeFile();
-				event.getControler().getEvents().removeHandler(writer);
-			}
-			this.eventWriters.clear();
-
-			if (((iteration % 10 == 0) && (iteration > event.getControler().getFirstIteration())) || (iteration % 10 >= 6)) {
-				controler.linkStats.addData(controler.volumes, controler.travelTimeCalculator);
-			}
-
-			if ((iteration % 10 == 0) && (iteration > event.getControler().getFirstIteration())) {
-				controler.events.removeHandler(controler.volumes);
-				controler.linkStats.writeFile(event.getControler().getControlerIO().getIterationFilename(iteration, FILENAME_LINKSTATS));
-			}
-
-			if (controler.legTimes != null) {
-				controler.legTimes.writeStats(event.getControler().getControlerIO().getIterationFilename(iteration, "tripdurations.txt"));
-				// - print averages in log
-				log.info("[" + iteration + "] average trip duration is: " + (int) controler.legTimes.getAverageTripDuration()
-						+ " seconds = " + Time.writeTime(controler.legTimes.getAverageTripDuration(), Time.TIMEFORMAT_HHMMSS));
-			}
-		}
-
-		@Override
-		public void notifyShutdown(final ShutdownEvent event) {
-			for (EventWriter writer : this.eventWriters) {
-				writer.closeFile();
 			}
 		}
 	}
