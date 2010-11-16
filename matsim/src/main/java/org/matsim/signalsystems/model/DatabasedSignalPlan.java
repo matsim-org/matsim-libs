@@ -39,6 +39,7 @@ public class DatabasedSignalPlan implements SignalPlan {
 	
 	private SignalPlanData data;
 	private int cylce;
+	private int offset = 0;
 	
 	private Map<Integer, List<Id>> secondInPlanOnsetsMap = new HashMap<Integer, List<Id>>();
 
@@ -55,6 +56,10 @@ public class DatabasedSignalPlan implements SignalPlan {
 		}
 		else {
 			throw new IllegalStateException("This implementation of SignalPlan works only with a cycle time");
+		}
+	
+		if (this.data.getOffset() != null){
+			this.offset = this.data.getOffset();
 		}
 		
 		for (SignalGroupSettingsData sgdata : this.data.getSignalGroupSettingsDataByGroupId().values()){
@@ -78,13 +83,13 @@ public class DatabasedSignalPlan implements SignalPlan {
 
 	@Override
 	public List<Id> getDroppings(double timeSeconds) {
-		Integer currentSecondInPlan = ((int) (timeSeconds % this.cylce));
+		Integer currentSecondInPlan = ((int) ((timeSeconds + this.offset) % this.cylce));
 		return this.secondInPlanDroppingsMap.get(currentSecondInPlan);
 	}
 
 	@Override
 	public List<Id> getOnsets(double timeSeconds) {
-		Integer currentSecondInPlan = ((int) (timeSeconds % this.cylce));
+		Integer currentSecondInPlan = ((int) ((timeSeconds + this.offset) % this.cylce));
 		return this.secondInPlanOnsetsMap.get(currentSecondInPlan);
 	}
 
