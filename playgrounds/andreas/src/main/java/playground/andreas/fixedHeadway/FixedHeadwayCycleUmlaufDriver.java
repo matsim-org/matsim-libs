@@ -1,6 +1,7 @@
 package playground.andreas.fixedHeadway;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.Umlauf;
@@ -23,7 +24,7 @@ public class FixedHeadwayCycleUmlaufDriver extends UmlaufDriver {
 
 	public FixedHeadwayCycleUmlaufDriver(Umlauf umlauf, TransitStopAgentTracker thisAgentTracker,
 			Mobsim transitQueueSimulation) {
-		super(umlauf, thisAgentTracker, transitQueueSimulation);
+		super(umlauf, TransportMode.car, thisAgentTracker, transitQueueSimulation);
 		if ( useageCnt <1 ) {
 			useageCnt++ ;
 			log.info(" will be used. " + Gbl.ONLYONCE );
