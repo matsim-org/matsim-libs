@@ -23,12 +23,11 @@
 //
 package playground.wrashid.sschieffer;
 
-import static org.math.io.files.ASCIIFile.*;
-import static org.math.io.parser.ArrayString.*;
-// 
+
 import org.matsim.api.core.v01.Id;
 //
 import playground.wrashid.PSF2.pluggable.parkingTimes.*;
+import playground.wrashid.lib.GeneralLib;
 import playground.wrashid.lib.obj.LinkedListValueHashMap;
 
 import java.lang.*;
@@ -59,8 +58,7 @@ import org.jfree.data.xy.XYSeriesCollection;
 import org.matsim.core.utils.charts.ChartUtil;
 import org.matsim.core.utils.charts.XYLineChart;
 
-import static org.math.io.files.ASCIIFile.*;
-import static org.math.io.parser.ArrayString.*;
+
 
 
 public class DecentralizedChargerInfo {//implements DifferentiableMultivariateVectorialOptimizer {
@@ -153,7 +151,7 @@ public class DecentralizedChargerInfo {//implements DifferentiableMultivariateVe
 		
 		try{
 		    // Create file 
-			String title=("C:\\dev\\workspace\\playgrounds\\wrashid\\src\\main\\java\\playground\\wrashid\\sschieffer\\Output\\DecentralizedChargerInfoGamma_results.txt");
+			String title=("C:\\Output\\DecentralizedChargerInfoGamma_results.txt");
 		    FileWriter fstream = new FileWriter(title);
 		    BufferedWriter out = new BufferedWriter(fstream);
 		    out.write("Function of Base Load from File: \n");
@@ -439,7 +437,8 @@ public class DecentralizedChargerInfo {//implements DifferentiableMultivariateVe
 		// TODO: think about return type, e.g. double array
 		// read this file
 			
-		  slotBaseLoad = readDouble1DArray(new File("\\workspace\\playgrounds\\wrashid\\test\\input\\playground\\wrashid\\sschieffer\\baseLoadCurve15minBins.txt"));
+		  slotBaseLoad = GeneralLib.readMatrix(96, 1, true, "test\\input\\playground\\wrashid\\sschieffer\\baseLoadCurve15minBins.txt")[0];
+			  
 		  peakBaseConsumption=0.0;
 		  constantBaseConsumption=1.0*peakLoad;
 		  zeroLineData = new XYSeries("Zero Line");
@@ -489,7 +488,7 @@ public class DecentralizedChargerInfo {//implements DifferentiableMultivariateVe
 	      dataset.addSeries(peakLoadFigureData);
 	      
 		  JFreeChart chart = ChartFactory.createXYLineChart("Base Load from File and approximated functions", "time in hours", "Load", dataset, PlotOrientation.VERTICAL, true, true, false);
-		  ChartUtilities.saveChartAsPNG(new File("C:\\dev\\workspace\\playgrounds\\wrashid\\src\\main\\java\\playground\\wrashid\\sschieffer\\Output\\baseLoadGraph.png") , chart, 800, 600);
+		  ChartUtilities.saveChartAsPNG(new File("C:\\Output\\baseLoadGraph.png") , chart, 800, 600);
 		  //saveToFile(chart, "base Load",800, 600);
 		  //(chart).saveAsPng("Base Load Curve", 800, 600);
 		  
@@ -525,7 +524,7 @@ public class DecentralizedChargerInfo {//implements DifferentiableMultivariateVe
 	      
 	      String title= "Load and Solution graph for try "+d;
 		  JFreeChart chart = ChartFactory.createXYLineChart(title, "time in hours", "Load", dataset, PlotOrientation.VERTICAL, true, true, false);
-		  ChartUtilities.saveChartAsPNG(new File("C:\\dev\\workspace\\playgrounds\\wrashid\\src\\main\\java\\playground\\wrashid\\sschieffer\\Output\\"+title+".png") , chart, 800, 600);
+		  ChartUtilities.saveChartAsPNG(new File("C:\\Output\\"+title+".png") , chart, 800, 600);
 		  
 	}
 	
@@ -579,7 +578,7 @@ public class DecentralizedChargerInfo {//implements DifferentiableMultivariateVe
 		
 		String title= "Probability Density Functions ";
 		JFreeChart chart = ChartFactory.createXYLineChart(title, "time in hours", "Free Load for PHEV charging", dataset, PlotOrientation.VERTICAL, true, true, false);
-		ChartUtilities.saveChartAsPNG(new File("C:\\dev\\workspace\\playgrounds\\wrashid\\src\\main\\java\\playground\\wrashid\\sschieffer\\Output\\"+title+".png") , chart, 800, 600);
+		ChartUtilities.saveChartAsPNG(new File("C:\\Output\\"+title+".png") , chart, 800, 600);
 		  
 				
 		// now the integral of all probability function and their respective time intervals needs to be 1
