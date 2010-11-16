@@ -6,9 +6,14 @@ import org.apache.commons.math.FunctionEvaluationException;
 import org.apache.commons.math.MaxIterationsExceededException;
 import org.apache.commons.math.optimization.OptimizationException;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
+import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
+import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.controler.listener.StartupListener;
 
 /* *********************************************************************** *
  * project: org.matsim.*
@@ -36,39 +41,63 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 
+import playground.wrashid.PSF2.pluggable.energyConsumption.EnergyConsumptionModel;
+import playground.wrashid.PSF2.pluggable.energyConsumption.EnergyConsumptionModelPSL;
+import playground.wrashid.PSF2.pluggable.energyConsumption.EnergyConsumptionPlugin;
 import playground.wrashid.PSF2.pluggable.parkingTimes.ParkingIntervalInfo;
 import playground.wrashid.PSF2.pluggable.parkingTimes.ParkingTimesPlugin;
+import playground.wrashid.PSF2.vehicle.vehicleFleet.PlugInHybridElectricVehicle;
+import playground.wrashid.PSF2.vehicle.vehicleFleet.Vehicle;
+import playground.wrashid.lib.EventHandlerAtStartupAdder;
 import playground.wrashid.lib.obj.LinkedListValueHashMap;
 
 public class Main {
 
-	public static void main(String[] args) throws OptimizationException, MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException, IOException {
+	
+	public static ParkingTimesPlugin parkingTimesPlugin;
+	public static EnergyConsumptionPlugin energyConsumptionPlugin;
+
+	public static void main(String[] args) {
 		String configPath="test/input/playground/wrashid/sschieffer/config.xml";
 		
 		
-		final Controler controler=new Controler(configPath);
+		EventHandlerAtStartupAdder eventHandlerAtStartupAdder = new EventHandlerAtStartupAdder();
+		
+		Controler controler=new Controler(configPath);
+		
+		parkingTimesPlugin = new ParkingTimesPlugin(controler);
+		
+		eventHandlerAtStartupAdder.addEventHandler(parkingTimesPlugin);
+		
+		
+		controler.addControlerListener(new EnergyConsumptionInit());
+		
+		controler.addControlerListener(eventHandlerAtStartupAdder);
+		
 		controler.setOverwriteFiles(true);
 		
-		DecentralizedChargerInfo myChargerInfo = new DecentralizedChargerInfo(10000, 100, 100, 0.10, 0.2);
-		//double rn=Math.random();
-		//
-		//System.out.println("For a random number of "+ rn+ ", please choose the slot "+ myChargerInfo.returnChargingSlot(rn));
 		
 		
-		controler.addControlerListener(new AfterMobsimListener() {
-			ParkingTimesPlugin myParkingTimesPlugin = new ParkingTimesPlugin( controler);
-			LinkedListValueHashMap<Id, ParkingIntervalInfo> myParkingTimesList = myParkingTimesPlugin.getParkingTimeIntervals();
+		controler.addControlerListener(new IterationEndsListener() {
 			
 			@Override
-			public void notifyAfterMobsim(AfterMobsimEvent event) {
-				
+			public void notifyIterationEnds(IterationEndsEvent event) {
 				DecentralizedChargerV1 decentralizedChargerV1=new DecentralizedChargerV1();
-				//decentralizedChargerV1.performChargingAlgorithm(new DecentralizedChargerInfo());
-				
+				try {
+					
+					
+					decentralizedChargerV1.performChargingAlgorithm(Main.energyConsumptionPlugin,Main.parkingTimesPlugin);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}				
 			}
+
 		});
 		
-		controler.run();	
+		
+		
+		
+		controler.run();		
 		
 		// need to get information 
 		// which slots I have access to electricity

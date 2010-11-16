@@ -437,7 +437,7 @@ public class DecentralizedChargerInfo {//implements DifferentiableMultivariateVe
 		// TODO: think about return type, e.g. double array
 		// read this file
 			
-		  slotBaseLoad = GeneralLib.readMatrix(96, 1, true, "test\\input\\playground\\wrashid\\sschieffer\\baseLoadCurve15minBins.txt")[0];
+		  slotBaseLoad = GeneralLib.readMatrix(96, 1, false, "test\\input\\playground\\wrashid\\sschieffer\\baseLoadCurve15minBins.txt")[0];
 			  
 		  peakBaseConsumption=0.0;
 		  constantBaseConsumption=1.0*peakLoad;

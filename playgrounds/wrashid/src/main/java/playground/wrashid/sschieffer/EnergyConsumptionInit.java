@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DecentralizedChargerV1.java
+ * EnergyConsumptionInit.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,50 +20,39 @@
 
 package playground.wrashid.sschieffer;
 
-import java.util.LinkedList;
-
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.controler.events.AfterMobsimEvent;
-import org.matsim.core.controler.listener.AfterMobsimListener;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.StartupListener;
 
+import playground.wrashid.PSF2.pluggable.energyConsumption.EnergyConsumptionModel;
+import playground.wrashid.PSF2.pluggable.energyConsumption.EnergyConsumptionModelPSL;
 import playground.wrashid.PSF2.pluggable.energyConsumption.EnergyConsumptionPlugin;
-import playground.wrashid.PSF2.pluggable.parkingTimes.ParkingIntervalInfo;
-import playground.wrashid.PSF2.pluggable.parkingTimes.ParkingTimesPlugin;
+import playground.wrashid.PSF2.vehicle.vehicleFleet.PlugInHybridElectricVehicle;
+import playground.wrashid.PSF2.vehicle.vehicleFleet.Vehicle;
 import playground.wrashid.lib.obj.LinkedListValueHashMap;
 
-public class DecentralizedChargerV1 {
+public class EnergyConsumptionInit implements StartupListener {
 
-	
-	
-	public void performChargingAlgorithm(DecentralizedChargerInfo chargerInfo){
-		// TODO: implement method (main starting point of whole programming exercise...)
+	@Override
+	public void notifyStartup(StartupEvent event) {
+		Controler controler = event.getControler();
 		
-		// STELLA MAIN
+		LinkedListValueHashMap<Id, Vehicle> vehicles=new LinkedListValueHashMap<Id, Vehicle>();
 		
-		
-	}
-	
-	
-	
-	public void getElectricityFromGrid(double startChargingTime, double endChargingTime, Id agentId){
-		//TODO: adopt (e.g. use default plug power at location)
-	}
-
-
-
-	public void performChargingAlgorithm(EnergyConsumptionPlugin energyConsumptionPlugin, ParkingTimesPlugin parkingTimesPlugin) {
-		LinkedListValueHashMap<Id, Double> energyConsumptionOfLegs = energyConsumptionPlugin.getEnergyConsumptionOfLegs();
-		LinkedListValueHashMap<Id, ParkingIntervalInfo> parkingTimeIntervals = parkingTimesPlugin.getParkingTimeIntervals();
-		
-		LinkedList<Double> legsOfAgent10 = energyConsumptionOfLegs.get(new IdImpl(10));
-		
-		LinkedList<ParkingIntervalInfo> parkingTimesOfAgent10 = parkingTimeIntervals.get(new IdImpl(10));
-		
-		System.out.println();
-		for (int i=0;i<legsOfAgent10.size();i++){
-			System.out.println(legsOfAgent10.get(i));
+		for (Id personId: controler.getPopulation().getPersons().keySet()){
+			vehicles.put(personId, new PlugInHybridElectricVehicle(new IdImpl(1)));
 		}
+		
+		EnergyConsumptionModel energyConsumptionModel = new EnergyConsumptionModelPSL(140);
+		EnergyConsumptionPlugin energyConsumptionPlugin = new EnergyConsumptionPlugin(energyConsumptionModel,vehicles,controler.getNetwork());
+		
+		controler.getEvents().addHandler(energyConsumptionPlugin);
+		
+		Main.energyConsumptionPlugin=energyConsumptionPlugin;
 		
 	}
 
