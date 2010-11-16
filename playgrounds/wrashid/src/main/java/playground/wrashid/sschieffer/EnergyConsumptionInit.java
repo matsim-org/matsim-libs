@@ -36,7 +36,17 @@ import playground.wrashid.PSF2.vehicle.vehicleFleet.Vehicle;
 import playground.wrashid.lib.obj.LinkedListValueHashMap;
 
 public class EnergyConsumptionInit implements StartupListener {
-
+	
+	private double penetrationPercent;
+	
+	public EnergyConsumptionInit(double penetrationPercent){
+		this.penetrationPercent=penetrationPercent;
+	}
+	
+	private double getPenetrationPercent(){
+		return penetrationPercent;
+	}
+	
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		Controler controler = event.getControler();
@@ -44,7 +54,13 @@ public class EnergyConsumptionInit implements StartupListener {
 		LinkedListValueHashMap<Id, Vehicle> vehicles=new LinkedListValueHashMap<Id, Vehicle>();
 		
 		for (Id personId: controler.getPopulation().getPersons().keySet()){
-			vehicles.put(personId, new PlugInHybridElectricVehicle(new IdImpl(1)));
+			if (Math.random()<penetrationPercent){
+				vehicles.put(personId, new PlugInHybridElectricVehicle(new IdImpl(1)));
+			}
+			else{
+				vehicles.put(personId, null); // no car, could be extended to conventional car
+			}
+			
 		}
 		
 		EnergyConsumptionModel energyConsumptionModel = new EnergyConsumptionModelPSL(140);

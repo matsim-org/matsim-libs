@@ -53,6 +53,7 @@ import playground.wrashid.lib.obj.LinkedListValueHashMap;
 
 public class Main {
 
+	private static double penetrationPercent=0.3;
 	
 	public static ParkingTimesPlugin parkingTimesPlugin;
 	public static EnergyConsumptionPlugin energyConsumptionPlugin;
@@ -69,60 +70,31 @@ public class Main {
 		
 		eventHandlerAtStartupAdder.addEventHandler(parkingTimesPlugin);
 		
+		//penetrationPercent can be adjusted in EnergyConsumptionInit.java
 		
-		controler.addControlerListener(new EnergyConsumptionInit());
+		controler.addControlerListener(new EnergyConsumptionInit(penetrationPercent));
 		
 		controler.addControlerListener(eventHandlerAtStartupAdder);
 		
 		controler.setOverwriteFiles(true);
 		
-		
-		
 		controler.addControlerListener(new IterationEndsListener() {
 			
 			@Override
 			public void notifyIterationEnds(IterationEndsEvent event) {
-				DecentralizedChargerV1 decentralizedChargerV1=new DecentralizedChargerV1();
+				DecentralizedChargerV1 decentralizedChargerV1=new DecentralizedChargerV1(penetrationPercent, event.getControler(),Main.energyConsumptionPlugin,Main.parkingTimesPlugin);
+
 				try {
 					
-					
-					decentralizedChargerV1.performChargingAlgorithm(Main.energyConsumptionPlugin,Main.parkingTimesPlugin,event.getControler());
+					decentralizedChargerV1.performChargingAlgorithm();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}				
 			}
-
 		});
 		
-		
-		
-		
 		controler.run();		
-		
-		// need to get information 
-		// which slots I have access to electricity
-		// how many of the time slots I need to charge
-		// what is my consumption
-		
-		//TODO check general feasibility and case specific feasibility
-		// TODO call chargeInAllValidSlots
-		// TODO call chargeInAllValidSlots and addPeakSlots(int n)
-		// TODO call chooseSlots()
-		
-			
-		
-		// TODO: physical feasibility test given the time plan and charging plan
-		// for case 1 and 2, which route becomes infeasible
-		// add in one more charging slot
-		// check again...
-		
-		// for case 3 check if choice of slots within possible slots is valid
-		// if not generate a different set 
-		// if after (n over k) iterations no suitable solution is found
-		// change to case 1 and 2 procedure
-		
-		
-		
+				
 	}
 	
 }
