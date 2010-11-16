@@ -38,7 +38,9 @@ public class DgKoehlerStrehler2010Runner {
 
 	public static final String signalsConfigFileGershenson = DgPaths.STUDIESDG + "koehlerStrehler2010/config_signals_gershenson.xml";
 
-	private String configFile = signalsConfigFile;
+	public static final String signalsConfigSol8005050 = DgPaths.STUDIESDG + "koehlerStrehler2010/config_signals_signal_control_solution_figure9_from_matsim_population_800.xml";
+	
+	private String configFile = signalsConfigSol8005050;
 	
 	
 	private void runFromConfig() {

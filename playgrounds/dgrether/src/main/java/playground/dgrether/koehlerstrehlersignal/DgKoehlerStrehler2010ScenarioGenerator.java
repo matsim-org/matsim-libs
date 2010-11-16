@@ -128,20 +128,20 @@ public class DgKoehlerStrehler2010ScenarioGenerator {
 		plan.setOffset(0);
 		SignalGroupSettingsData settings1 =  control.getFactory().createSignalGroupSettingsData(id1);
 		plan.addSignalGroupSettings(settings1);
-		settings1.setOnset(0);
-		settings1.setDropping(27);
+		settings1.setOnset(30);
+		settings1.setDropping(57);
 		SignalGroupSettingsData settings2 = control.getFactory().createSignalGroupSettingsData(id2);
 		plan.addSignalGroupSettings(settings2);
 		settings2.setOnset(0);
 		settings2.setDropping(27);
-		SignalGroupSettingsData settings3 = control.getFactory().createSignalGroupSettingsData(id3);
-		plan.addSignalGroupSettings(settings3);
-		settings3.setOnset(0);
-		settings3.setDropping(27);
-		SignalGroupSettingsData settings4 = control.getFactory().createSignalGroupSettingsData(id4);
-		plan.addSignalGroupSettings(settings4);
-		settings4.setOnset(0);
-		settings4.setDropping(27);
+//		SignalGroupSettingsData settings3 = control.getFactory().createSignalGroupSettingsData(id3);
+//		plan.addSignalGroupSettings(settings3);
+//		settings3.setOnset(0);
+//		settings3.setDropping(27);
+//		SignalGroupSettingsData settings4 = control.getFactory().createSignalGroupSettingsData(id4);
+//		plan.addSignalGroupSettings(settings4);
+//		settings4.setOnset(0);
+//		settings4.setDropping(27);
 		
 		
 		// signal system 5 control
@@ -154,20 +154,20 @@ public class DgKoehlerStrehler2010ScenarioGenerator {
 		plan.setOffset(0);
 		settings1 =  control.getFactory().createSignalGroupSettingsData(id1);
 		plan.addSignalGroupSettings(settings1);
-		settings1.setOnset(0);
-		settings1.setDropping(27);
+		settings1.setOnset(30);
+		settings1.setDropping(57);
 		settings2 = control.getFactory().createSignalGroupSettingsData(id2);
 		plan.addSignalGroupSettings(settings2);
 		settings2.setOnset(0);
 		settings2.setDropping(27);
-		settings3 = control.getFactory().createSignalGroupSettingsData(id3);
-		plan.addSignalGroupSettings(settings3);
-		settings3.setOnset(0);
-		settings3.setDropping(27);
-		settings4 = control.getFactory().createSignalGroupSettingsData(id4);
-		plan.addSignalGroupSettings(settings4);
-		settings4.setOnset(0);
-		settings4.setDropping(27);
+//		settings3 = control.getFactory().createSignalGroupSettingsData(id3);
+//		plan.addSignalGroupSettings(settings3);
+//		settings3.setOnset(0);
+//		settings3.setDropping(27);
+//		settings4 = control.getFactory().createSignalGroupSettingsData(id4);
+//		plan.addSignalGroupSettings(settings4);
+//		settings4.setOnset(0);
+//		settings4.setDropping(27);
 
 		
 		//signal system 3, 4, 7, 8 control
@@ -229,14 +229,16 @@ public class DgKoehlerStrehler2010ScenarioGenerator {
 		signal = systems.getFactory().createSignalData(id3);
 		sys.addSignalData(signal);
 		signal.setLinkId(id32);
-		SignalGroupData group4signal = groups.getFactory().createSignalGroupData(id2, id3);
-		groups.addSignalGroupData(group4signal);
+//		SignalGroupData group4signal = groups.getFactory().createSignalGroupData(id2, id3);
+//		groups.addSignalGroupData(group4signal);
+		SignalGroupData group4signal  = groups.getSignalGroupDataBySignalSystemId().get(sys.getId()).get(id1);
 		group4signal.addSignalId(id3);
 		signal = systems.getFactory().createSignalData(id4);
 		sys.addSignalData(signal);
 		signal.setLinkId(id72);
-		group4signal = groups.getFactory().createSignalGroupData(id2, id4);
-		groups.addSignalGroupData(group4signal);
+//		group4signal = groups.getFactory().createSignalGroupData(id2, id4);
+//		groups.addSignalGroupData(group4signal);
+		group4signal  = groups.getSignalGroupDataBySignalSystemId().get(sys.getId()).get(id2);
 		group4signal.addSignalId(id4);
 		
 		//signal system 5
@@ -251,19 +253,27 @@ public class DgKoehlerStrehler2010ScenarioGenerator {
 		signal.setLinkId(id65);
 		signal.addLaneId(id2);
 		this.createAndAddSignalGroups(id5, groups);
+		//signals 3 and 4
 		signal = systems.getFactory().createSignalData(id3);
 		sys.addSignalData(signal);
 		signal.setLinkId(id45);
-		group4signal = groups.getFactory().createSignalGroupData(id5, id3);
-		groups.addSignalGroupData(group4signal);
+		//creates a separate group for signal 3 
+//		group4signal = groups.getFactory().createSignalGroupData(id5, id3);
+//		groups.addSignalGroupData(group4signal);
+		//eventually better: add them to existing group
+		group4signal = groups.getSignalGroupDataBySignalSystemId().get(sys.getId()).get(id1);
 		group4signal.addSignalId(id3);
 		signal = systems.getFactory().createSignalData(id4);
 		sys.addSignalData(signal);
 		signal.setLinkId(id85);
-		group4signal = groups.getFactory().createSignalGroupData(id5, id4);
-		groups.addSignalGroupData(group4signal);
+		//creates a separate group for signal 4
+//		group4signal = groups.getFactory().createSignalGroupData(id5, id4);
+//		groups.addSignalGroupData(group4signal);
+		//eventually better: add to existing group
+		group4signal = groups.getSignalGroupDataBySignalSystemId().get(sys.getId()).get(id2);
 		group4signal.addSignalId(id4);
 
+		
 		
 		
 		//signal system 3

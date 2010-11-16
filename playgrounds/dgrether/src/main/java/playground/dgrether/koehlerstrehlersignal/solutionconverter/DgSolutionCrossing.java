@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DgKoehlerStrehler2010Solution2MatsimConverter
+ * DgSolutionCrossing
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,31 +17,33 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.koehlerstrehlersignal;
+package playground.dgrether.koehlerstrehlersignal.solutionconverter;
 
-import playground.dgrether.DgPaths;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.matsim.api.core.v01.Id;
 
 
 /**
  * @author dgrether
  *
  */
-public class DgKoehlerStrehler2010Solution2MatsimConverter {
+public class DgSolutionCrossing {
 
-	private static final String in = DgPaths.STUDIESDG + "koehlerStrehler2010/solution_population_100_agents.xml";
+	private Id id = null;
+	private Map<Id, Integer> programIdOffsetMap = new HashMap<Id, Integer>();
 	
-	
-	public DgKoehlerStrehler2010Solution2MatsimConverter(){}
-	
-	public void convert(){
-		
+	public DgSolutionCrossing(Id crossingId) {
+		this.id = crossingId;
+	}
+
+	public void addOffset4Program(Id programId, int offsetSeconds) {
+		this.programIdOffsetMap.put(programId, offsetSeconds);
 	}
 	
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		new DgKoehlerStrehler2010Solution2MatsimConverter().convert();
+	public Map<Id, Integer> getProgramIdOffsetMap(){
+		return this.programIdOffsetMap;
 	}
 
 }

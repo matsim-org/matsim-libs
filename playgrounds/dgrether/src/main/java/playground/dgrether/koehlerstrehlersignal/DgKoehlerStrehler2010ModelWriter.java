@@ -211,6 +211,7 @@ public class DgKoehlerStrehler2010ModelWriter {
 			atts.clear();
 			atts.addAttribute("", "", ID, CDATA, co.getId().toString());
 			hd.startElement("", "", COMMODITY, atts);
+			atts.clear();
 			hd.startElement("", "", SOURCES, atts);
 			for (Entry<Id, Double> e : co.getSourceNodesFlowMap().entrySet()){
 				atts.clear();

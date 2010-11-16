@@ -30,7 +30,7 @@ import playground.dgrether.DgPaths;
  */
 public class CottbusLiveVis {
 
-	private String inputDir = DgPaths.STUDIESDG + "cottbus/";
+	public static final String inputDir = DgPaths.STUDIESDG + "cottbus/";
 //	private String signalSystems20 = inputDir + "signalSystemsCottbusByNodes_v2.0.xml";
 //	private String signalGroups20 = inputDir + "signalGroupsCottbusByNodes_v2.0.xml";
 //	private String signalControl20 = inputDir + "signalControlCottbusByNodes_v2.0.xml";
@@ -38,10 +38,21 @@ public class CottbusLiveVis {
 //	
 //	private String config = inputDir + "cottbusConfig.xml";
 	private String config = inputDir + "originaldaten/config_dg_livevis.xml";
+
 	
+	public static final  String newCottbusConfig = inputDir + "Cottbus-BA/scenario-lsa/cottbusConfigLiveVis.xml";
+
 	
 	private void runCottbus() {
 		OTFVis.playConfig(config);
+	}
+	
+	private void runNewCottbus(){
+		OTFVis.playConfig(newCottbusConfig);
+	}
+	
+	private void run() {
+		this.runNewCottbus();
 	}
 	
 	
@@ -50,6 +61,7 @@ public class CottbusLiveVis {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		new CottbusLiveVis().runCottbus();
+		new CottbusLiveVis().run();
 	}
+
 }

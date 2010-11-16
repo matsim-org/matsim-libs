@@ -115,9 +115,9 @@ public class DgMatsim2KoehlerStrehler2010ModelConverter {
 				if (pe instanceof Leg){
 					Leg leg = (Leg)pe;
 					DgStreet startStreet = net.getStreets().get(leg.getRoute().getStartLinkId());
-					Id fromNodeId = startStreet.getFromNode().getId();
+					Id fromNodeId = startStreet.getToNode().getId();
 					DgStreet endStreet = net.getStreets().get(leg.getRoute().getEndLinkId());
-					Id toNodeId = endStreet.getToNode().getId();
+					Id toNodeId = endStreet.getFromNode().getId();
 					Tuple<Id, Id> index = new Tuple<Id, Id>(fromNodeId, toNodeId);
 					if (!fromNodeToNodeCountMap.containsKey(index)){
 						fromNodeToNodeCountMap.put(index, 0.0);
