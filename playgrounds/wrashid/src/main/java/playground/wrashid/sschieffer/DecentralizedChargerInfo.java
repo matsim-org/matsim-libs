@@ -1,6 +1,3 @@
-
-
-
 /* *********************************************************************** *
  * project: org.matsim.*
  * DecentralizedChargerInfo.java
@@ -61,7 +58,7 @@ import org.matsim.core.utils.charts.XYLineChart;
 
 
 
-public class DecentralizedChargerInfo {//implements DifferentiableMultivariateVectorialOptimizer {
+public class DecentralizedChargerInfo {
 	
 	
 	final DifferentiableMultivariateVectorialOptimizer optimizer;
@@ -112,7 +109,19 @@ public class DecentralizedChargerInfo {//implements DifferentiableMultivariateVe
 	  
 	
 	
-	// constructor
+	/**
+	 * 
+	 * @param peakLoad
+	 * @param penetration
+	 * @param averagePHEVConsumption
+	 * @param priceBase
+	 * @param pricePeak
+	 * @throws OptimizationException
+	 * @throws MaxIterationsExceededException
+	 * @throws FunctionEvaluationException
+	 * @throws IllegalArgumentException
+	 * @throws IOException
+	 */
 	public DecentralizedChargerInfo(double peakLoad, int penetration, double averagePHEVConsumption, double priceBase, double pricePeak) throws OptimizationException, MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException, IOException{
 		this.peakLoad=peakLoad;
 		this.penetration=penetration;
@@ -202,6 +211,9 @@ public class DecentralizedChargerInfo {//implements DifferentiableMultivariateVe
 				//correct interval
 				//chargingSlot
 				// RN-probDensityRanges[i][0]=Integral(probDensityFunctions.get(i)) from 0 to t
+				
+				
+				
 				double start=valleyTimes[i][0];
 				double end=valleyTimes[i][1];
 				double error=0.001;
@@ -670,29 +682,7 @@ public class DecentralizedChargerInfo {//implements DifferentiableMultivariateVe
 	 */
 	
 	
-	
-//	
-//	public void getAdaptedProbabilityCurve(Id agentId){
-//		// TODO: implement method.
-//	}
-//	
-//	public  LinkedListValueHashMap<Id, Double> getEnergyConsumptionOfLegs(){
-//		// TODO: rw
-//		return null;
-//	}
-//	
-//	public LinkedListValueHashMap<Id, ParkingInterval> getParkingTimeIntervals(){
-//		// TODO: rw
-//		
-//		return null;
-//	}
-//	
-//	public double getSOCOfAgent(Id agentId, double time){
-//		
-//		// TODO: will find out...
-//		
-//		return -1.0;
-//	}
+
 	
 	
 }
