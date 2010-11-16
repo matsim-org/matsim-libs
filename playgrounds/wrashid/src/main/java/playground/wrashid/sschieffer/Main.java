@@ -86,7 +86,7 @@ public class Main {
 				try {
 					
 					
-					decentralizedChargerV1.performChargingAlgorithm(Main.energyConsumptionPlugin,Main.parkingTimesPlugin);
+					decentralizedChargerV1.performChargingAlgorithm(Main.energyConsumptionPlugin,Main.parkingTimesPlugin,event.getControler());
 				} catch (Exception e) {
 					e.printStackTrace();
 				}				

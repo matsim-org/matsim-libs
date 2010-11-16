@@ -24,6 +24,7 @@ import java.util.LinkedList;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 
@@ -45,25 +46,37 @@ public class DecentralizedChargerV1 {
 	}
 	
 	
-	
-	public void getElectricityFromGrid(double startChargingTime, double endChargingTime, Id agentId){
-		//TODO: adopt (e.g. use default plug power at location)
+	/**
+	 * Output call of the Decentralized Charger!
+	 * @param startChargingTime
+	 * @param endChargingTime
+	 * @param agentId
+	 * @param linkId
+	 */
+	public void getElectricityFromGrid(double startChargingTime, double endChargingTime, Id agentId, Id linkId){
+		System.out.println();
 	}
 
 
 
-	public void performChargingAlgorithm(EnergyConsumptionPlugin energyConsumptionPlugin, ParkingTimesPlugin parkingTimesPlugin) {
+	public void performChargingAlgorithm(EnergyConsumptionPlugin energyConsumptionPlugin, ParkingTimesPlugin parkingTimesPlugin, Controler controler) {
 		LinkedListValueHashMap<Id, Double> energyConsumptionOfLegs = energyConsumptionPlugin.getEnergyConsumptionOfLegs();
 		LinkedListValueHashMap<Id, ParkingIntervalInfo> parkingTimeIntervals = parkingTimesPlugin.getParkingTimeIntervals();
 		
-		LinkedList<Double> legsOfAgent10 = energyConsumptionOfLegs.get(new IdImpl(10));
+
 		
-		LinkedList<ParkingIntervalInfo> parkingTimesOfAgent10 = parkingTimeIntervals.get(new IdImpl(10));
 		
-		System.out.println();
-		for (int i=0;i<legsOfAgent10.size();i++){
-			System.out.println(legsOfAgent10.get(i));
+		for (Id personId: controler.getPopulation().getPersons().keySet()){
+			LinkedList<Double> legEnergyConsumptionList = energyConsumptionOfLegs.get(personId);
+			
+			LinkedList<ParkingIntervalInfo> parkingIntervals = parkingTimeIntervals.get(personId);
+			
+
 		}
+		
+		
+		
+		
 		
 	}
 
