@@ -27,6 +27,7 @@ import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.basic.v01.IdImpl;
 //import org.matsim.signalsystems.control.SignalGroupState;
 import org.matsim.signalsystems.model.SignalController;
 import org.matsim.signalsystems.model.SignalGroup;
@@ -138,11 +139,11 @@ public class JbSignalController implements SignalController {
 //				log.error(currentSecondinPlan+" on "+this.adaptiveOnsets.get(gId)+"for gid"+gId);
 				if (this.adaptiveOnsets.get(gId) == currentSecondinPlan) {
 					this.system.scheduleOnset(timeSeconds, gId);
-//					log.info("scheduling onset at " + currentSecondinPlan	+  ", sg " + gId);
+					if (this.system.getId().equals(new IdImpl("18"))) log.info("scheduling onset at " + currentSecondinPlan	+  ", sg " + gId);
 				}
 				if (this.adaptiveDroppings.get(gId) == currentSecondinPlan)
 					{this.system.scheduleDropping(timeSeconds, gId);
-//					log.info("scheduling drop at " + currentSecondinPlan	+  ", sg " + gId);
+					if (this.system.getId().equals(new IdImpl("18"))) log.info("scheduling drop at " + currentSecondinPlan	+  ", sg " + gId);
 			}}
 
 		} else
@@ -227,7 +228,7 @@ public class JbSignalController implements SignalController {
 		if (this.originalGreenTimes == null){
 			this.originalGreenTimes = new HashMap<Id, Integer>();
 			this.fillOriginalGreenTimes();
-			log.info("prepared Original Green Times");
+			log.info("prepared Original Green Times for "+this.system.getId());
 		}
 
 		this.availableStretchTime = JBBaParams.STRETCHTIME;
