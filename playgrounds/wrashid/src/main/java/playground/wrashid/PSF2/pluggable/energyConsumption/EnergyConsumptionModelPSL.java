@@ -43,8 +43,11 @@ public class EnergyConsumptionModelPSL implements EnergyConsumptionModel {
 	}
 
 	@Override
-	public double getEnergyConsumptionForLinkInJoule(Vehicle vehicle, double timeSpentOnLink, Link link) {
-		double speedOfVehicleOnLinkInKmPerHour = Vehicle.getAverageSpeedOfVehicleOnLinkInMetersPerSecond(timeSpentOnLink, link) / 1000 * 3600;
+	public double getEnergyConsumptionForLinkInJoule(Vehicle vehicle,
+			double timeSpentOnLink, Link link) {
+		double speedOfVehicleOnLinkInKmPerHour = Vehicle
+				.getAverageSpeedOfVehicleOnLinkInMetersPerSecond(
+						timeSpentOnLink, link) / 1000 * 3600;
 
 		if (speedOfVehicleOnLinkInKmPerHour > maxAllowedSpeedInNetworkInKmPerHour) {
 			return 0;
@@ -52,10 +55,14 @@ public class EnergyConsumptionModelPSL implements EnergyConsumptionModel {
 
 		if (vehicle.getVehicleClassId().equals(new IdImpl(1))) {
 			// NOTE: phevs must have class Id one in this case
-			return phevEnergyConsumptionModel.getEnergyConsumption(speedOfVehicleOnLinkInKmPerHour, link.getLength());
+			return phevEnergyConsumptionModel.getEnergyConsumption(
+					speedOfVehicleOnLinkInKmPerHour, link.getLength());
+		} else if (vehicle.getVehicleClassId().equals(new IdImpl(2))) {
+			return 0;
 		} else {
-			DebugLib.stopSystemAndReportInconsistency("must implement energy consumption of this vehicle class, before using this model: vehicleClassId="
-					+ vehicle.getVehicleClassId());
+			DebugLib
+					.stopSystemAndReportInconsistency("must implement energy consumption of this vehicle class, before using this model: vehicleClassId="
+							+ vehicle.getVehicleClassId());
 			return 0;
 		}
 	}
