@@ -7,7 +7,7 @@
                 <start daytime="00:00:00"/>
                 <stop daytime="00:00:00"/>
                 <cycleTime sec="57"/>
-                <offset sec="3"/>
+                <offset sec="0"/>
                 <signalGroupSettings refId="3">
                     <onset sec="37"/>
                     <dropping sec="49"/>
