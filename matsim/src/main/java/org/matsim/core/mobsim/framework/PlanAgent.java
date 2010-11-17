@@ -127,14 +127,19 @@ public interface PlanAgent extends NetworkAgent, Identifiable {
 	 */
 	public Activity getCurrentActivity();
 
-	// yyyy "Teleportation" certainly does NOT belong into a vehicle.  Also not into the driver.
-	// Might go directly into the person, as some kind of minimal mobsim convenience method
-	// (although I am not convinced).  kai, jan/apr'10
-	// zzzz Teleportation should from my point of view not be included in a data class like Person dg apr'10
-	// This is here since a in a normal leg, the driver moves from node to node and eventually is at the destination.
-	// With teleportation, this does not work, and so another setting method needs to be found.
-	// Can't say how this is done with transit.  kai, aug'10
-	@Deprecated // unclear, see somments above. kai, aug'10
+	/** Design thoughts:<ul>
+	* <li>"Teleportation" certainly does NOT belong into a vehicle.  Also not into the driver.
+	* Might go directly into the person, as some kind of minimal mobsim convenience method
+	* (although I am not convinced).  kai, jan/apr'10
+	* <li>zzzz Teleportation should from my point of view not be included in a data class like Person dg apr'10
+	* <li>This is here since a in a normal leg, the driver moves from node to node and eventually is at the destination.
+	* With teleportation, this does not work, and so another setting method needs to be found.
+	* Can't say how this is done with transit.  kai, aug'10
+	* <li>There needs to be some method that tells the agent that a teleportation has happened, similar to "moveOverNode".
+	* Could be separated out to a "teleportation" agent, but can as well leave it here.
+	* The name may still be improved.  kai, nov'10
+	* </ul>
+	*/
 	public void teleportToLink(final Id linkId);
 
 	/**

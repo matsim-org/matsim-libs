@@ -524,7 +524,7 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 	@Deprecated // unclear if this is "actEnd" or "departure"!  kai, may'10
 	// depending on this, it is a "PersonAgent" or "DriverAgent".  kai, may'10
 	// I think it is departure, but still a person agent.  kai, aug'10
-	public void agentDeparts(final PlanAgent agent, final Id linkId) {
+	public void arrangeAgentDeparture(final PlanAgent agent, final Id linkId) {
 		double now = this.getSimTimer().getTimeOfDay() ;
 		Leg leg = agent.getCurrentLeg();
 //		Route route = leg.getRoute();

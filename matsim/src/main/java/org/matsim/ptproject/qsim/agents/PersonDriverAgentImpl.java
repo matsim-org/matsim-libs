@@ -49,7 +49,7 @@ import org.matsim.ptproject.qsim.qnetsimengine.QVehicle;
  * @author dgrether
  * @author nagel
  * <p/>
- * Apart from "teleportToLink", I think this class is reasonable in terms of what is public and/or final and what not.
+ * I think this class is reasonable in terms of what is public and/or final and what not.
  */
 public class PersonDriverAgentImpl implements PersonDriverAgent {
 	// renamed this from DefaultPersonDriverAgent to PersonDriverAgentImpl to mark that people should (in my view) not
@@ -177,7 +177,7 @@ public class PersonDriverAgentImpl implements PersonDriverAgent {
 		} else if (pe instanceof Leg) {
 
 			if ( flag ) {
-				this.simulation.agentDeparts(this, this.currentLinkId);
+				this.simulation.arrangeAgentDeparture(this, this.currentLinkId);
 				return true ;
 			} else {
 				log.error("The agent " + this.getId() + " returned false from advancePlan.  Removing the ag from the mobsim ...");

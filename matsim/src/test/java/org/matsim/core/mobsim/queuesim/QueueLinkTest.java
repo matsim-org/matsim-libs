@@ -128,7 +128,7 @@ public class QueueLinkTest extends MatsimTestCase {
 		driver.setVehicle(veh);
 
 //		driver.endActivityAndAssumeControl(0);
-		QueueSimulation.endActivityAndAssumeControl(driver, 0. ) ;
+		f.qSim.endActivityAndAssumeControl(driver, 0. ) ;
 
 		// start test, check initial conditions
 		assertTrue(f.qlink1.bufferIsEmpty());
@@ -187,7 +187,7 @@ public class QueueLinkTest extends MatsimTestCase {
 		driver.setVehicle(veh);
 
 //		driver.endActivityAndAssumeControl(0);
-		QueueSimulation.endActivityAndAssumeControl( driver, 0 ) ;
+		qsim.endActivityAndAssumeControl( driver, 0 ) ;
 
 		// start test, check initial conditions
 		assertTrue(f.qlink1.bufferIsEmpty());
@@ -235,7 +235,7 @@ public class QueueLinkTest extends MatsimTestCase {
 		driver.setVehicle(veh);
 
 //		driver.endActivityAndAssumeControl(0);
-		QueueSimulation.endActivityAndAssumeControl( driver, 0 ) ;
+		qsim.endActivityAndAssumeControl( driver, 0 ) ;
 
 		// start test, check initial conditions
 		assertTrue(f.qlink1.bufferIsEmpty());

@@ -92,7 +92,7 @@ import org.matsim.ptproject.qsim.agents.AgentFactory;
  */
 public interface Mobsim extends IOSimulation, ObservableSimulation {
 
-	void agentDeparts(PlanAgent planAgent, Id startLinkId);
+	void arrangeAgentDeparture(PlanAgent planAgent, Id startLinkId);
 
 	EventsManager getEventsManager();
 
@@ -114,6 +114,9 @@ public interface Mobsim extends IOSimulation, ObservableSimulation {
 	 * confused.
 	 */
 	void rescheduleActivityEnd(final PersonAgent agent, final double oldTime, final double newTime ) ;
+
+	void endLegAndAssumeControl( PlanAgent person, double now ) ;
+	public void endActivityAndAssumeControl( PlanAgent person, double now ) ;
 
 
 	Scenario getScenario();

@@ -485,10 +485,12 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 	/**
 	 * centralizing the call to PersonAgent.endLegAndAssumeControl. 
 	 */
-	static void endLegAndAssumeControl( PlanAgent person, double now ) {
+	@Override
+	public void endLegAndAssumeControl( PlanAgent person, double now ) {
 		person.endLegAndAssumeControl( now ) ;
 	}
-	static void endActivityAndAssumeControl( PlanAgent person, double now ) {
+	@Override
+	public void endActivityAndAssumeControl( PlanAgent person, double now ) {
 		person.endActivityAndAssumeControl( now ) ;
 	}
 
@@ -536,7 +538,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 	 * @param link the link where the agent departs
 	 */
 	@Override
-	public void agentDeparts(final PlanAgent agent, final Id linkId) {
+	public void arrangeAgentDeparture(final PlanAgent agent, final Id linkId) {
 		double now = this.getSimTimer().getTimeOfDay() ;
 		Leg leg = agent.getCurrentLeg();
 		String mode = leg.getMode();
