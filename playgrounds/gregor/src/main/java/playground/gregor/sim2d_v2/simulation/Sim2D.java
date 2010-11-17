@@ -336,7 +336,7 @@ public class Sim2D implements Mobsim {
 	 * .mobsim.framework.PersonAgent, org.matsim.api.core.v01.Id)
 	 */
 	@Override
-	public void agentDeparts(PlanAgent agent, Id linkId) {
+	public void arrangeAgentDeparture(PlanAgent agent, Id linkId) {
 		double now = getSimTimer().getTimeOfDay();
 		Leg leg = agent.getCurrentLeg();
 		// Route route = leg.getRoute();
@@ -556,5 +556,17 @@ public class Sim2D implements Mobsim {
 	@Override
 	public void addQueueSimulationListeners(SimulationListener listener) {
 		throw new RuntimeException("not implemented");
+	}
+
+	@Override
+	public void endActivityAndAssumeControl(PlanAgent person, double now) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException() ;
+	}
+
+	@Override
+	public void endLegAndAssumeControl(PlanAgent person, double now) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException() ;
 	}
 }
