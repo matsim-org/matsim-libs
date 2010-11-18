@@ -32,10 +32,12 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
+import org.matsim.vehicles.Vehicles;
 
 import playground.wrashid.PSF2.pluggable.energyConsumption.EnergyConsumptionPlugin;
 import playground.wrashid.PSF2.pluggable.parkingTimes.ParkingIntervalInfo;
 import playground.wrashid.PSF2.pluggable.parkingTimes.ParkingTimesPlugin;
+import playground.wrashid.PSF2.vehicle.vehicleFleet.PlugInHybridElectricVehicle;
 import playground.wrashid.PSF2.vehicle.vehicleFleet.Vehicle;
 import playground.wrashid.lib.obj.LinkedListValueHashMap;
 
@@ -50,7 +52,7 @@ public class DecentralizedChargerV1 {
 	private double pricePeak=0.2;
 	private double peakLoad=10000;
 	
-	private double penetrationPercent;
+	
 	private double populationTotal;
 	private double penetration;
 	private double averagePHEVConsumption;
@@ -59,8 +61,8 @@ public class DecentralizedChargerV1 {
 	/**
 	 * Public constructor
 	 */
-	public DecentralizedChargerV1(double penetrationPercent, Controler controler, EnergyConsumptionPlugin energyConsumptionPlugin, ParkingTimesPlugin parkingTimesPlugin){
-		this.penetrationPercent=penetrationPercent;
+	public DecentralizedChargerV1(Controler controler, EnergyConsumptionPlugin energyConsumptionPlugin, ParkingTimesPlugin parkingTimesPlugin){
+		
 		this.controler=controler;
 		energyConsumptionOfLegs = energyConsumptionPlugin.getEnergyConsumptionOfLegs();
 		parkingTimeIntervals = parkingTimesPlugin.getParkingTimeIntervals();
@@ -82,9 +84,13 @@ public class DecentralizedChargerV1 {
 	public void performChargingAlgorithm() throws OptimizationException, MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException, IOException {
 		
 		populationTotal=controler.getPopulation().getPersons().size();
-		penetration = populationTotal*penetrationPercent;
+		penetration = populationTotal*Main.penetrationPercent;
 		averagePHEVConsumption= getAveragePHEVConsumption(penetration);
 		DecentralizedChargerInfo myChargerInfo = new DecentralizedChargerInfo(peakLoad, penetration, averagePHEVConsumption, priceBase, pricePeak); 
+		
+		//
+		
+		
 		
 		
 		for (Id personId: controler.getPopulation().getPersons().keySet()){
@@ -114,15 +120,14 @@ public class DecentralizedChargerV1 {
 	 */
 		public double getAveragePHEVConsumption(double penetration){
 			double sumOfAllConsumptions=0;
-			
+		
 			for (Id personId: controler.getPopulation().getPersons().keySet()){
 				LinkedList<Double> legEnergyConsumptionList = energyConsumptionOfLegs.get(personId);
 				
-				
 				// person has PHEV then add his total consumption to sumOfAllConsumptions
-				
-				//TODO check if this person owns a PHEV - put in if
-				if (true){
+				PlugInHybridElectricVehicle dummyPHEV= new PlugInHybridElectricVehicle(new IdImpl(1));
+				//only works if every person has only one car?
+				if (Main.vehicles.get(personId).getClass().equals(dummyPHEV.getClass())){
 					for (int i=0;i<legEnergyConsumptionList.size();i++) {
 						sumOfAllConsumptions = sumOfAllConsumptions + legEnergyConsumptionList.get(i);
 					}	

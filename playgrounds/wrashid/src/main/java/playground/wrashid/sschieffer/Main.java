@@ -7,6 +7,7 @@ import org.apache.commons.math.MaxIterationsExceededException;
 import org.apache.commons.math.optimization.OptimizationException;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -52,13 +53,15 @@ import playground.wrashid.lib.EventHandlerAtStartupAdder;
 import playground.wrashid.lib.obj.LinkedListValueHashMap;
 
 public class Main {
-
-	private static double penetrationPercent=0.3;
+	public static LinkedListValueHashMap<Id, Vehicle> vehicles;
+	public static double penetrationPercent=0.3;
 	
 	public static ParkingTimesPlugin parkingTimesPlugin;
 	public static EnergyConsumptionPlugin energyConsumptionPlugin;
 
 	public static void main(String[] args) {
+		System.out.println(System.getProperty("user.dir"));
+		
 		String configPath="test/input/playground/wrashid/sschieffer/config.xml";
 		
 		
@@ -72,7 +75,7 @@ public class Main {
 		
 		//penetrationPercent can be adjusted in EnergyConsumptionInit.java
 		
-		controler.addControlerListener(new EnergyConsumptionInit(penetrationPercent));
+		controler.addControlerListener(new EnergyConsumptionInit());
 		
 		controler.addControlerListener(eventHandlerAtStartupAdder);
 		
@@ -82,7 +85,7 @@ public class Main {
 			
 			@Override
 			public void notifyIterationEnds(IterationEndsEvent event) {
-				DecentralizedChargerV1 decentralizedChargerV1=new DecentralizedChargerV1(penetrationPercent, event.getControler(),Main.energyConsumptionPlugin,Main.parkingTimesPlugin);
+				DecentralizedChargerV1 decentralizedChargerV1=new DecentralizedChargerV1(event.getControler(),Main.energyConsumptionPlugin,Main.parkingTimesPlugin);
 
 				try {
 					

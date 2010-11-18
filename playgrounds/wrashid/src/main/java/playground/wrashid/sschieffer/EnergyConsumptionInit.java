@@ -28,25 +28,24 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 
+import playground.wrashid.PSF2.chargingSchemes.dumbCharging.ARTEMISEnergyStateMaintainer_StartChargingUponArrival;
 import playground.wrashid.PSF2.pluggable.energyConsumption.EnergyConsumptionModel;
 import playground.wrashid.PSF2.pluggable.energyConsumption.EnergyConsumptionModelPSL;
 import playground.wrashid.PSF2.pluggable.energyConsumption.EnergyConsumptionPlugin;
+import playground.wrashid.PSF2.vehicle.vehicleFleet.ConventionalVehicle;
 import playground.wrashid.PSF2.vehicle.vehicleFleet.PlugInHybridElectricVehicle;
 import playground.wrashid.PSF2.vehicle.vehicleFleet.Vehicle;
 import playground.wrashid.lib.obj.LinkedListValueHashMap;
 
 public class EnergyConsumptionInit implements StartupListener {
 	
-	private double penetrationPercent;
+
 	
-	public EnergyConsumptionInit(double penetrationPercent){
-		this.penetrationPercent=penetrationPercent;
+	public EnergyConsumptionInit(){
+		
 	}
 	
-	private double getPenetrationPercent(){
-		return penetrationPercent;
-	}
-	
+
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		Controler controler = event.getControler();
@@ -54,11 +53,13 @@ public class EnergyConsumptionInit implements StartupListener {
 		LinkedListValueHashMap<Id, Vehicle> vehicles=new LinkedListValueHashMap<Id, Vehicle>();
 		
 		for (Id personId: controler.getPopulation().getPersons().keySet()){
-			if (Math.random()<penetrationPercent){
+			if (Math.random()<Main.penetrationPercent){
 				vehicles.put(personId, new PlugInHybridElectricVehicle(new IdImpl(1)));
 			}
 			else{
+				//vehicles.put(personId, new ConventionalVehicle(new ARTEMISEnergyStateMaintainer_StartChargingUponArrival(, new IdImpl(2))); // no car, could be extended to conventional car
 				vehicles.put(personId, null); // no car, could be extended to conventional car
+				
 			}
 			
 		}
