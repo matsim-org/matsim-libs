@@ -31,7 +31,9 @@ import org.matsim.api.core.v01.Id;
  *
  */
 public class DefaultPlanbasedSignalSystemController implements SignalController {
-
+	
+//	private static final Logger log = Logger.getLogger(DefaultPlanbasedSignalSystemController.class);
+	
 	public static final String IDENTIFIER = "DefaultPlanbasedSignalSystemController";
 	private Map<Id, SignalPlan> plans;
 	private SignalSystem signalSystem;
@@ -42,18 +44,26 @@ public class DefaultPlanbasedSignalSystemController implements SignalController 
 	@Override
 	public void updateState(double timeSeconds) {
 		this.checkActivePlan();
-		
+//		log.error("update state of system: " + this.signalSystem.getId());
 		List<Id> droppingGroupIds = this.activePlan.getDroppings(timeSeconds);
-		if (droppingGroupIds != null){
-			for (Id id : droppingGroupIds){
-				this.signalSystem.scheduleDropping(timeSeconds, id);
-			}
-		}
+		this.processDroppingGroupIds(timeSeconds, droppingGroupIds);
 		
 		List<Id> onsetGroupIds = this.activePlan.getOnsets(timeSeconds);
+		this.processOnsetGroupIds(timeSeconds, onsetGroupIds);
+	}
+	
+	private void processOnsetGroupIds(double timeSeconds, List<Id> onsetGroupIds) {
 		if (onsetGroupIds != null){
 			for (Id id : onsetGroupIds){
 				this.signalSystem.scheduleOnset(timeSeconds, id);
+			}
+		}		
+	}
+
+	private void processDroppingGroupIds(double timeSeconds, List<Id> droppingGroupIds){
+		if (droppingGroupIds != null){
+			for (Id id : droppingGroupIds){
+				this.signalSystem.scheduleDropping(timeSeconds, id);
 			}
 		}
 	}
@@ -64,10 +74,12 @@ public class DefaultPlanbasedSignalSystemController implements SignalController 
 
 	@Override
 	public void simulationInitialized(double simStartTimeSeconds) {
+		
 	}
 	
 	@Override
 	public void addPlan(SignalPlan plan) {
+//		log.error("addPlan to system : " + this.signalSystem.getId());
 		if (this.plans == null){
 			this.plans = new HashMap<Id, SignalPlan>();
 			//TODO remove when checkActive is implemented

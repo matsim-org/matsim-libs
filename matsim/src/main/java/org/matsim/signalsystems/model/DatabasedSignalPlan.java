@@ -24,7 +24,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalGroupSettingsData;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalPlanData;
@@ -35,11 +34,10 @@ import org.matsim.signalsystems.data.signalcontrol.v20.SignalPlanData;
  *
  */
 public class DatabasedSignalPlan implements SignalPlan {
-	private static final Logger log = Logger.getLogger(DatabasedSignalPlan.class);
+//	private static final Logger log = Logger.getLogger(DatabasedSignalPlan.class);
 	
 	private SignalPlanData data;
 	private int cylce;
-	private int offset = 0;
 	
 	private Map<Integer, List<Id>> secondInPlanOnsetsMap = new HashMap<Integer, List<Id>>();
 
@@ -58,23 +56,29 @@ public class DatabasedSignalPlan implements SignalPlan {
 			throw new IllegalStateException("This implementation of SignalPlan works only with a cycle time");
 		}
 	
+		int offset = 0;
 		if (this.data.getOffset() != null){
-			this.offset = this.data.getOffset();
+			offset = this.data.getOffset();
 		}
 		
 		for (SignalGroupSettingsData sgdata : this.data.getSignalGroupSettingsDataByGroupId().values()){
+//			log.error("  SignalGroup " +  sgdata.getSignalGroupId());
+			int onset = sgdata.getOnset();
+			onset = (onset + offset) % this.cylce;
 			//onsets
-			List<Id> onsetsSgIds = this.secondInPlanOnsetsMap.get(sgdata.getOnset());
+			List<Id> onsetsSgIds = this.secondInPlanOnsetsMap.get(onset);
 			if (onsetsSgIds == null){
 				onsetsSgIds = new ArrayList<Id>();
-				this.secondInPlanOnsetsMap.put(sgdata.getOnset(), onsetsSgIds);
+				this.secondInPlanOnsetsMap.put(onset, onsetsSgIds);
 			}
 			onsetsSgIds.add(sgdata.getSignalGroupId());
 			//dropping
-			List<Id> droppingSgIds = this.secondInPlanDroppingsMap.get(sgdata.getDropping());
+			int dropping = sgdata.getDropping();
+			dropping = (dropping + offset) % this.cylce;
+			List<Id> droppingSgIds = this.secondInPlanDroppingsMap.get(dropping);
 			if (droppingSgIds == null){
 				droppingSgIds = new ArrayList<Id>();
-				this.secondInPlanDroppingsMap.put(sgdata.getDropping(), droppingSgIds);
+				this.secondInPlanDroppingsMap.put(dropping, droppingSgIds);
 			}
 			droppingSgIds.add(sgdata.getSignalGroupId());
 		}
@@ -83,13 +87,13 @@ public class DatabasedSignalPlan implements SignalPlan {
 
 	@Override
 	public List<Id> getDroppings(double timeSeconds) {
-		Integer currentSecondInPlan = ((int) ((timeSeconds + this.offset) % this.cylce));
+		Integer currentSecondInPlan = ((int) (timeSeconds % this.cylce));
 		return this.secondInPlanDroppingsMap.get(currentSecondInPlan);
 	}
 
 	@Override
 	public List<Id> getOnsets(double timeSeconds) {
-		Integer currentSecondInPlan = ((int) ((timeSeconds + this.offset) % this.cylce));
+		Integer currentSecondInPlan = ((int) (timeSeconds  % this.cylce));
 		return this.secondInPlanOnsetsMap.get(currentSecondInPlan);
 	}
 
