@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -27,7 +26,7 @@ public class TMC2009ToShape {
 	
 	
 	public static void main(String[] args){
-		String dir = "D:/VSP/output/Meldungen2009/";
+		String dir = DaPaths.OUTPUT + "Meldungen2009/";
 		String inFile = dir + "Meldungen2009.txt";
 		String lineOutfile = dir + "Meldungen2009Lines.shp";
 		String pointOutfile = dir + "Meldungen2009points.shp";
@@ -101,8 +100,8 @@ public class TMC2009ToShape {
 	}
 
 	private void writeToShape(String lineOutfile, String pointOutFile) {
-		new DaShapeWriter().writeDefaultLineString2Shape(lineOutfile, "TMC2009", this.lineShapes, this.shapeAttribs);
-		new DaShapeWriter().writeDefaultPoints2Shape(pointOutFile, "TMC2009", this.pointShapes, this.shapeAttribs);
+		DaShapeWriter.writeDefaultLineString2Shape(lineOutfile, "TMC2009", this.lineShapes, this.shapeAttribs);
+		DaShapeWriter.writeDefaultPoints2Shape(pointOutFile, "TMC2009", this.pointShapes, this.shapeAttribs);
 	}
 
 	private void readFromTxt() {
@@ -118,7 +117,7 @@ public class TMC2009ToShape {
 						this.messages = new Messages(columns);
 						first = false;
 					}else{
-//						if(columns[5].equals("Berlin")){
+						//if(columns[5].equals("Berlin")){
 						this.messages.addNewMessage(columns);
 					}
 					

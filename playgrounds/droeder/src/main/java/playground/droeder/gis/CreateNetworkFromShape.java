@@ -94,7 +94,7 @@ public class CreateNetworkFromShape {
 			g = (Geometry) f.getAttribute(this.geometry);
 			
 			this.createNodesFromGeometry(g);
-			this.createLinksFromGeometry(g, f.getAttribute(this.id).toString());
+			this.createLinksFromGeometry(g, f.getAttribute(this.id).toString(), null);
 		}
 	}
 
@@ -118,8 +118,8 @@ public class CreateNetworkFromShape {
 		}
 	}
 
-	//TODO set link attributes and check direction
-	private void createLinksFromGeometry(Geometry g, String origId) {
+	//TODO set link attributes (use RouteType) and check direction
+	private void createLinksFromGeometry(Geometry g, String origId, String RouteType) {
 		Coordinate[] c = g.getCoordinates();
 		Node from;
 		Node to;
@@ -137,7 +137,7 @@ public class CreateNetworkFromShape {
 					l = this.netFac.createLink(id, from.getId(), to.getId());
 //					l.setCapacity(capacity);
 //					l.setFreespeed(freespeed);
-//					l.setLength(length);
+					l.setLength(this.calcLength(from, to));
 					this.net.addLink(l);
 				}else{
 					// TODO don't know why some links appear so often
@@ -146,6 +146,16 @@ public class CreateNetworkFromShape {
 			}
 		}
 		
+	}
+	
+	private double calcLength(Node from, Node to){
+		Double length = null;
+		Double x = Math.pow(from.getCoord().getX() - to.getCoord().getX(), 2);
+		Double y = Math.pow(from.getCoord().getY() - to.getCoord().getY(), 2);
+		
+		length = Math.sqrt(x + y);
+		
+		return length;
 	}
 	
 	

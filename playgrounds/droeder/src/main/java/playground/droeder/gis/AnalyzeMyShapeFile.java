@@ -24,34 +24,37 @@ public class AnalyzeMyShapeFile {
 	public void run(String shapeFile) throws IOException{
 		FeatureSource features = ShapeFileReader.readDataFile(shapeFile);
 		
-		for(Iterator<Feature> it = features.getFeatures().iterator(); it.hasNext(); ){
-			Feature f = it.next();
-			
-			for(int i = 0; i < f.getNumberOfAttributes(); i++){
-				if(this.values.containsKey(i)){
-					if(!this.values.get(i).contains(f.getAttribute(i).toString())){
-						this.values.get(i).add(f.getAttribute(i).toString());
-					}
-				}else{
-					Set<String> temp = new TreeSet<String>();
-					temp.add(f.getAttribute(i).toString());
-					this.values.put(i, temp);
-				}
-			}
-		}
-		
-		
-		for(Entry<Integer, Set<String>> e: this.values.entrySet()){
-			System.out.print(e.getKey() + "\t");
-		}
-		
-		
-//		Feature ft = (Feature) features.getFeatures().iterator().next();
-//		for(int i = 0; i < ft.getNumberOfAttributes(); i++){
-//			System.out.print(i + " " + ft.getFeatureType().getAttributeType(i).getName() + "\t" + ft.getAttribute(i).getClass().toString() 
-//					+ "\t" + ft.getAttribute(i).toString());
+//		for(Iterator<Feature> it = features.getFeatures().iterator(); it.hasNext(); ){
+//			Feature f = it.next();
+//			
+//			for(int i = 0; i < f.getNumberOfAttributes(); i++){
+//				if(this.values.containsKey(i)){
+//					if(!this.values.get(i).contains(f.getAttribute(i).toString()) && !(this.values.get(i).size() > 100)){
+//						this.values.get(i).add(f.getAttribute(i).toString());
+//					}
+//				}else{
+//					Set<String> temp = new TreeSet<String>();
+//					temp.add(f.getAttribute(i).toString());
+//					this.values.put(i, temp);
+//				}
+//			}
+//		}
+//		
+//		
+//		for(Entry<Integer, Set<String>> e: this.values.entrySet()){
+//			System.out.print(e.getKey() + "\t");
+//			for(String s : e.getValue()){
+//				System.out.print(s + "\t");
+//			}
 //			System.out.println();
 //		}
+		
+		
+		Feature ft = (Feature) features.getFeatures().iterator().next();
+		for(int i = 0; i < ft.getNumberOfAttributes(); i++){
+			System.out.print(i + " " + ft.getFeatureType().getAttributeType(i).getName() + "\t" + ft.getAttribute(i).getClass().toString());
+			System.out.println();
+		}
 	}
 
 }
