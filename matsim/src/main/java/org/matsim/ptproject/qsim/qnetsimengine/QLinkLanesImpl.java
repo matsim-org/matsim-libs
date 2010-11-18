@@ -311,14 +311,18 @@ public class QLinkLanesImpl extends QLinkInternalI {
 
 	@Override
 	protected boolean moveLink(double now) {
-		boolean ret = false;
+		boolean activeLane = false;
+		boolean otherLaneActive = false;
 		for (QLane lane : this.queueLanes){
 			if (lane.moveLane(now)){
-				ret = true;
+				otherLaneActive = true;
+			}
+			if (lane.isActive()){
+				activeLane = true;
 			}
 		}
 		this.moveWaitToBuffer(now);
-		this.active = (ret || (!this.waitingList.isEmpty()));
+		this.active = activeLane || otherLaneActive || (!this.waitingList.isEmpty());
 		return this.active;
 	}
 

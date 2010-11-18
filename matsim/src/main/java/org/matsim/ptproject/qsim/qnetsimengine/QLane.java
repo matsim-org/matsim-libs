@@ -337,13 +337,7 @@ public final class QLane extends QBufferItem implements SignalizeableItem {
 	}
 
 
-	private boolean isActive() {
-		/*
-		 * Leave Lane active as long as there are vehicles on the link (ignore
-		 * buffer because the buffer gets emptied by nodes and not links) and leave
-		 * link active until buffercap has accumulated (so a newly arriving vehicle
-		 * is not delayed).
-		 */
+	boolean isActive() {
 		boolean active = (this.buffercap_accumulate < 1.0) || (!this.vehQueue.isEmpty())
 		|| (!this.bufferIsEmpty()) || this.transitQueueLaneFeature.isFeatureActive();
 		return active;
@@ -369,15 +363,14 @@ public final class QLane extends QBufferItem implements SignalizeableItem {
 		//    moveBufferToNextLane( now ) ;
 		// }
 		// might be easier to read?  In fact, I think even more could be done in terms of readability.  kai, nov'09
-		moveBufferToNextLane(now);
-
-		return this.isActive();
+		return moveBufferToNextLane(now);
 	}
 
-	private void moveBufferToNextLane(final double now) {
+	private boolean moveBufferToNextLane(final double now) {
 		// because of the "this.toLanes != null", this method in my does something only when there are downstream
 		// lanes on the same link.  kai, nov'09
 		boolean moveOn = true;
+		boolean movedAtLeastOne = false;
 		while (moveOn && !this.bufferIsEmpty() && (this.toLanes != null)) {
 			QVehicle veh = this.buffer.peek();
 			Id nextLinkId = veh.getDriver().chooseNextLinkId();
@@ -393,6 +386,7 @@ public final class QLane extends QBufferItem implements SignalizeableItem {
 					this.getQLink().getMobsim().getEventsManager().processEvent(
 							new LaneLeaveEventImpl(now, veh.getDriver().getPerson().getId(), this.queueLink.getLink().getId(), this.getId()));
 					toQueueLane.addToVehicleQueue(veh, now);
+					movedAtLeastOne = true;
 				}
 				else {
 					moveOn = false;
@@ -413,6 +407,7 @@ public final class QLane extends QBufferItem implements SignalizeableItem {
 				throw new IllegalStateException(b.toString());
 			}
 		} // end while
+		return movedAtLeastOne;
 	}
 
 	private void updateBufferCapacity() {
