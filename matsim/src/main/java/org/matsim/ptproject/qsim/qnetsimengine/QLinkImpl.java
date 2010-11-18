@@ -333,10 +333,7 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 			if (!handled) {
 				// Check if veh has reached destination:
 				if ((this.getLink().getId().equals(driver.getDestinationLinkId())) && (driver.chooseNextLinkId() == null)) {
-
-//					driver.endLegAndAssumeControl(now);
-					this.getMobsim().endLegAndAssumeControl(driver, now) ;
-
+					driver.endLegAndAssumeControl(now);
 					this.addParkedVehicle(veh);
 					// remove _after_ processing the arrival to keep link active
 					this.vehQueue.poll();

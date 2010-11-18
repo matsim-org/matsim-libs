@@ -35,7 +35,6 @@ import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.events.ActivityEndEventImpl;
 import org.matsim.core.events.ActivityStartEventImpl;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -111,11 +110,6 @@ public class PersonDriverAgentImpl implements PersonDriverAgent {
 	// -----------------------------------------------------------------------------------------------------------------------------
 	
 	@Override
-	public Boolean endActivityAndAdvancePlan() {
-		return advancePlan() ;
-	}
-	
-	@Override
 	public final void endActivityAndAssumeControl(final double now) {
 		Activity act = (Activity) this.getPlanElements().get(this.currentPlanElementIndex);
 		this.simulation.getEventsManager().processEvent(new ActivityEndEventImpl(now, this.getPerson().getId(), act.getLinkId(), act.getFacilityId(), act.getType()));
@@ -126,11 +120,6 @@ public class PersonDriverAgentImpl implements PersonDriverAgent {
 	
 	// -----------------------------------------------------------------------------------------------------------------------------
 
-	@Override
-	public Boolean endLegAndAdvancePlan() {
-		return advancePlan() ;
-	}
-	
 	@Override
 	public final void endLegAndAssumeControl(final double now) {
 
@@ -194,8 +183,7 @@ public class PersonDriverAgentImpl implements PersonDriverAgent {
 	// -----------------------------------------------------------------------------------------------------------------------------
 	// -----------------------------------------------------------------------------------------------------------------------------
 
-	@Deprecated // yyyyyy I really don't think that this belongs here.
-	public final void teleportToLink(final Id linkId) {
+	public final void notifyTeleportToLink(final Id linkId) {
 		this.currentLinkId = linkId;
 	}
 
@@ -486,7 +474,7 @@ public class PersonDriverAgentImpl implements PersonDriverAgent {
 	}
 
 	@Override
-	public Id getId() {
+	public final Id getId() {
 		return this.person.getId();
 	}
 

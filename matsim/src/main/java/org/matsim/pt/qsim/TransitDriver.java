@@ -93,12 +93,6 @@ public class TransitDriver extends AbstractTransitDriver {
 	}
 	
 	@Override
-	public Boolean endLegAndAdvancePlan() {
-		throw new RuntimeException("not yet implemented") ;
-	}
-	
-
-	@Override
 	public NetworkRoute getCarRoute() {
 		return this.carRoute;
 	}

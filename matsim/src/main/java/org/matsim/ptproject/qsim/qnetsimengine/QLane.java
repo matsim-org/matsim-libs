@@ -314,10 +314,7 @@ public final class QLane extends QBufferItem implements SignalizeableItem {
 			if (!handled) {
 				// Check if veh has reached destination:
 				if ((driver.getDestinationLinkId().equals(this.queueLink.getLink().getId())) && (driver.chooseNextLinkId() == null)) {
-
-//					driver.endLegAndAssumeControl(now);
-					this.getQLink().getMobsim().endLegAndAssumeControl( driver, now) ;
-
+					driver.endLegAndAssumeControl(now);
 					this.queueLink.addParkedVehicle(veh);
 					// remove _after_ processing the arrival to keep link active
 					this.vehQueue.poll();

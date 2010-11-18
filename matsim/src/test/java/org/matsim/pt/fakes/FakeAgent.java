@@ -123,7 +123,7 @@ public class FakeAgent implements PersonDriverAgent, PassengerAgent {
 	}
 
 	@Override
-	public void teleportToLink(final Id linkId) {
+	public void notifyTeleportToLink(final Id linkId) {
 	}
 
 	@Override
@@ -148,16 +148,6 @@ public class FakeAgent implements PersonDriverAgent, PassengerAgent {
 	@Override
 	public QVehicle getVehicle() {
 		return null;
-	}
-
-	@Override
-	public Boolean endLegAndAdvancePlan() {
-		throw new UnsupportedOperationException("not yet implemented") ;
-	}
-
-	@Override
-	public Boolean endActivityAndAdvancePlan() {
-		throw new UnsupportedOperationException("not yet implemented") ;
 	}
 
 	@Override

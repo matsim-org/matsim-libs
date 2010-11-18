@@ -210,9 +210,4 @@ public class UmlaufDriver extends AbstractTransitDriver {
 		return this.departureTime;
 	}
 
-	@Override
-	public Boolean endLegAndAdvancePlan() {
-		throw new RuntimeException("not yet implemented") ;
-	}
-
 }

@@ -90,9 +90,7 @@ public class TransitAgentTest extends TestCase {
 		QSim sim = new QSim(scenario, new EventsManagerImpl());
 		TransitAgent agent = new TransitAgent(person, sim);
 		agent.initializeAndCheckIfAlive();
-
-//		agent.endActivityAndAssumeControl(10);
-		sim.endActivityAndAssumeControl(agent, 10) ;
+		agent.endActivityAndAssumeControl(10);
 
 		assertTrue(agent.getEnterTransitRoute(line1, route1a, route1a.getStops()));
 		assertFalse(agent.getEnterTransitRoute(line1, route1b, route1b.getStops()));
@@ -131,9 +129,7 @@ public class TransitAgentTest extends TestCase {
 		QSim sim = new QSim(scenario, new EventsManagerImpl());
 		TransitAgent agent = new TransitAgent(person, sim);
 		agent.initializeAndCheckIfAlive();
-
-//		agent.endActivityAndAssumeControl(10);
-		sim.endActivityAndAssumeControl(agent, 10) ;
+		agent.endActivityAndAssumeControl(10);
 
 		assertFalse(agent.getExitAtStop(stop1));
 		assertTrue(agent.getExitAtStop(stop2));

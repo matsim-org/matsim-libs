@@ -59,7 +59,7 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.ptproject.qsim.comparators.PersonAgentDepartureTimeComparator;
+import org.matsim.ptproject.qsim.comparators.PlanAgentDepartureTimeComparator;
 import org.matsim.ptproject.qsim.comparators.TeleportationArrivalTimeComparator;
 import org.matsim.ptproject.qsim.helpers.AgentCounter;
 import org.matsim.ptproject.qsim.interfaces.AcceptsVisMobsimFeatures;
@@ -130,8 +130,8 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 
 	private SimulationListenerManager listenerManager;
 
-	private final PriorityBlockingQueue<PersonAgent> activityEndsList =
-		new PriorityBlockingQueue<PersonAgent>(500, new PersonAgentDepartureTimeComparator());
+	private final PriorityBlockingQueue<PlanAgent> activityEndsList =
+		new PriorityBlockingQueue<PlanAgent>(500, new PlanAgentDepartureTimeComparator());
 
 	private Scenario scenario = null;
 
@@ -330,7 +330,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 
 		// set sim start time to config-value ONLY if this is LATER than the first plans starttime
 		double simStartTime = 0;
-		PersonAgent firstAgent = this.activityEndsList.peek();
+		PlanAgent firstAgent = this.activityEndsList.peek();
 		if (firstAgent != null) {
 			simStartTime = Math.floor(Math.max(startTime, firstAgent.getActivityEndTime()));
 		}
@@ -371,8 +371,8 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 		}
 		this.teleportationList.clear();
 
-		for (PersonAgent agent : this.activityEndsList) {
-			events.processEvent(new AgentStuckEventImpl(now, agent.getPerson().getId(), agent.getDestinationLinkId(), null));
+		for (PlanAgent agent : this.activityEndsList) {
+			events.processEvent(new AgentStuckEventImpl(now, agent.getId(), agent.getDestinationLinkId(), null));
 		}
 		this.activityEndsList.clear();
 
@@ -476,24 +476,12 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 			if (entry.getFirst().doubleValue() <= now) {
 				this.teleportationList.poll();
 				PlanAgent person = entry.getSecond();
-				person.teleportToLink(person.getDestinationLinkId());
-				endLegAndAssumeControl(person,now);
+				person.notifyTeleportToLink(person.getDestinationLinkId());
+				person.endLegAndAssumeControl(now) ;
 			} else break;
 		}
 	}
 	
-	/**
-	 * centralizing the call to PersonAgent.endLegAndAssumeControl. 
-	 */
-	@Override
-	public void endLegAndAssumeControl( PlanAgent person, double now ) {
-		person.endLegAndAssumeControl( now ) ;
-	}
-	@Override
-	public void endActivityAndAssumeControl( PlanAgent person, double now ) {
-		person.endActivityAndAssumeControl( now ) ;
-	}
-
 	private void handleNetworkChangeEvents(final double time) {
 		while ((this.networkChangeEventsQueue.size() > 0) && (this.networkChangeEventsQueue.peek().getStartTime() <= time)){
 			NetworkChangeEvent event = this.networkChangeEventsQueue.poll();
@@ -512,19 +500,16 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 	 * @see PersonDriverAgent#getActivityEndTime()
 	 */
 	@Override
-	public void scheduleActivityEnd(final PersonAgent agent) {
+	public void scheduleActivityEnd(final PlanAgent agent) {
 		this.activityEndsList.add(agent);
 	}
 
 	private void handleActivityEnds(final double time) {
 		while (this.activityEndsList.peek() != null) {
-			PersonAgent agent = this.activityEndsList.peek();
+			PlanAgent agent = this.activityEndsList.peek();
 			if (agent.getActivityEndTime() <= time) {
 				this.activityEndsList.poll();
-
-//				agent.endActivityAndAssumeControl(time);
-				endActivityAndAssumeControl( agent, time );
-
+				agent.endActivityAndAssumeControl(time);
 			} else {
 				return;
 			}
@@ -587,7 +572,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 			}
 			vehicle.setDriver(driverAgent);
 			if ((route.getEndLinkId().equals(linkId)) && (driverAgent.chooseNextLinkId() == null)) {
-				endLegAndAssumeControl(driverAgent,now);
+				driverAgent.endLegAndAssumeControl(now) ;
 				qlink.processVehicleArrival(now, vehicle);
 			} else {
 				qlink.addDepartingVehicle(vehicle);
@@ -740,7 +725,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 
 
 	@Override
-	public Collection<PersonAgent> getActivityEndsList() {
+	public Collection<PlanAgent> getActivityEndsList() {
 		throw new UnsupportedOperationException() ;
 	}
 

@@ -57,7 +57,7 @@ import org.matsim.ptproject.qsim.agents.AgentFactory;
 import org.matsim.ptproject.qsim.agents.DefaultAgentFactory;
 import org.matsim.ptproject.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.ptproject.qsim.changeeventsengine.NetworkChangeEventsEngine;
-import org.matsim.ptproject.qsim.comparators.PersonAgentDepartureTimeComparator;
+import org.matsim.ptproject.qsim.comparators.PlanAgentDepartureTimeComparator;
 import org.matsim.ptproject.qsim.comparators.TeleportationArrivalTimeComparator;
 import org.matsim.ptproject.qsim.helpers.AgentCounter;
 import org.matsim.ptproject.qsim.helpers.QSimTimer;
@@ -134,8 +134,8 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 	/**
 	 * This list needs to be a "blocking" queue since this is needed for thread-safety in the parallel qsim. cdobler, oct'10
 	 */
-	private final Queue<PersonAgent> activityEndsList =
-		new PriorityBlockingQueue<PersonAgent>(500, new PersonAgentDepartureTimeComparator());
+	private final Queue<PlanAgent> activityEndsList =
+		new PriorityBlockingQueue<PlanAgent>(500, new PlanAgentDepartureTimeComparator());
 	// can't use the "Tuple" trick from teleportation list, since we need to be able to "find" agents for replanning. kai, oct'10
 	// yy On second thought, this does also not work for the teleportationList since we have the same problem there ... kai, oct'10
 
@@ -324,10 +324,10 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 		}
 		this.teleportationList.clear();
 
-		for (PersonAgent agent : this.activityEndsList) {
+		for (PlanAgent agent : this.activityEndsList) {
 			if (agent.getDestinationLinkId() != null) {
 				events.processEvent(events.getFactory().
-						createAgentStuckEvent(now, agent.getPerson().getId(), agent.getDestinationLinkId(), null));
+						createAgentStuckEvent(now, agent.getId(), agent.getDestinationLinkId(), null));
 			}
 		}
 		this.activityEndsList.clear();
@@ -395,27 +395,13 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 			if (entry.getFirst().doubleValue() <= now) {
 				this.teleportationList.poll();
 				PlanAgent personAgent = entry.getSecond();
-				personAgent.teleportToLink(personAgent.getDestinationLinkId());
-				this.endLegAndAssumeControl(personAgent, now);
+				personAgent.notifyTeleportToLink(personAgent.getDestinationLinkId());
+				personAgent.endLegAndAssumeControl(now) ;
 			}
 			else {
 				break;
 			}
 		}
-	}
-	
-	/**
-	 * central call ...
-	 */
-	public final void endLegAndAssumeControl( PlanAgent planAgent, double now ) {
-		planAgent.endLegAndAssumeControl( now ) ;
-	}
-	
-	/**
-	 * central call ...
-	 */
-	public final void endActivityAndAssumeControl( PlanAgent planAgent, double now ) {
-		planAgent.endActivityAndAssumeControl( now ) ;
 	}
 	
 	/**
@@ -425,7 +411,7 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 	 * @see PersonDriverAgent#getActivityEndTime()
 	 */
 	@Override
-	public final void scheduleActivityEnd(final PersonAgent agent) {
+	public final void scheduleActivityEnd(final PlanAgent agent) {
 		this.activityEndsList.add(agent);
 		registerAgentAtActivityLocation(agent);
 	}
@@ -447,7 +433,7 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 
 	}
 
-	private void registerAgentAtActivityLocation(final PersonAgent agent) {
+	private void registerAgentAtActivityLocation(final PlanAgent agent) {
 		// if the "activities" engine were separate, this would need to be public.  kai, aug'10
 		if (agent instanceof PersonDriverAgentImpl) { // yyyyyy is this necessary?
 //			DefaultPersonDriverAgent pa = (DefaultPersonDriverAgent) agent;
@@ -474,7 +460,7 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 		}
 	}
 
-	private void unregisterAgentAtActivityLocation(final PersonAgent agent) {
+	private void unregisterAgentAtActivityLocation(final PlanAgent agent) {
 		if (agent instanceof PersonDriverAgentImpl) { // yyyy but why is this needed?
 //			DefaultPersonDriverAgent pa = (DefaultPersonDriverAgent) agent;
 			PlanElement pe = agent.getCurrentPlanElement();
@@ -502,11 +488,11 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 
 	private void handleActivityEnds(final double time) {
 		while (this.activityEndsList.peek() != null) {
-			PersonAgent agent = this.activityEndsList.peek();
+			PlanAgent agent = this.activityEndsList.peek();
 			if (agent.getActivityEndTime() <= time) {
 				this.activityEndsList.poll();
 				unregisterAgentAtActivityLocation(agent);
-				this.endActivityAndAssumeControl(agent,time);
+				agent.endActivityAndAssumeControl(time) ;
 				// gives control to agent; comes back via "agentDeparts" or "scheduleActivityEnd"
 			} else {
 				return;
@@ -521,9 +507,12 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 	 * @param link the link where the agent departs
 	 */
 	@Override
-	@Deprecated // unclear if this is "actEnd" or "departure"!  kai, may'10
+	// unclear if this is "actEnd" or "departure"!  kai, may'10
 	// depending on this, it is a "PersonAgent" or "DriverAgent".  kai, may'10
 	// I think it is departure, but still a person agent.  kai, aug'10
+	// Now a PlanAgent, which makes more sense (I think). kai, nov'10
+	// yy Since this is now by force a PlanAgent, one could replace arrangeAgentDeparture and
+	// scheduleActivityEnd by joint startPlanElement.  kai, nov'10
 	public void arrangeAgentDeparture(final PlanAgent agent, final Id linkId) {
 		double now = this.getSimTimer().getTimeOfDay() ;
 		Leg leg = agent.getCurrentLeg();
@@ -649,7 +638,7 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 		this.simTimer.setTime(startTime);
 		// set sim start time to config-value ONLY if this is LATER than the first plans starttime
 		double simStartTime = 0;
-		PersonAgent firstAgent = this.activityEndsList.peek();
+		PlanAgent firstAgent = this.activityEndsList.peek();
 		if (firstAgent != null) {
 			simStartTime = Math.floor(Math.max(startTime, firstAgent.getActivityEndTime()));
 		}
@@ -813,7 +802,7 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 	}
 
 	@Override
-	public final Collection<PersonAgent> getActivityEndsList() {
+	public final Collection<PlanAgent> getActivityEndsList() {
 		return Collections.unmodifiableCollection( activityEndsList ) ;
 		// changed this to unmodifiable in oct'10.  kai
 	}

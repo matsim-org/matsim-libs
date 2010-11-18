@@ -88,7 +88,6 @@ public interface PlanAgent extends NetworkAgent, Identifiable {
 	 *
 	 * @param now
 	 */
-	@Deprecated
 	public void endActivityAndAssumeControl(final double now);
 
 	/**
@@ -96,22 +95,8 @@ public interface PlanAgent extends NetworkAgent, Identifiable {
 	 *
 	 * @param now the current time in the simulation
 	 */
-	@Deprecated
 	public void endLegAndAssumeControl(final double now);
 
-	/**
-	 * Design decisions:<ul>
-	 * <li> Since there is getCurrentPlanElement(), returning that plan element is not necessary.  Thus, I decided to use void
-	 * return for the time being.
-	 * <li> Turns out that some plans end here, and making sure that the next call to getCurrentPlanElement seems to be to heavy
-	 * of a requirement.  Thus, this is returning a Boolean, so it can return null if the advancePlan failed.
-	 * <li> Might just have advancePlan as a method.  For the time being, they include the type of the previous PlanElement,
-	 * since that info may be needed (although it should, in theory, be in the type of getCurrentPlanElement).
-	 * </ul>
-	 */
-	public Boolean endLegAndAdvancePlan() ;
-	public Boolean endActivityAndAdvancePlan() ;
-	
 	public PlanElement getCurrentPlanElement() ;
 	// if this does not make sense for a class, then the class is maybe not a "Plan"Agent.  kai, may'10
 	
@@ -140,7 +125,7 @@ public interface PlanAgent extends NetworkAgent, Identifiable {
 	* The name may still be improved.  kai, nov'10
 	* </ul>
 	*/
-	public void teleportToLink(final Id linkId);
+	public void notifyTeleportToLink(final Id linkId);
 
 	/**
 	 * Design thoughts:<ul>

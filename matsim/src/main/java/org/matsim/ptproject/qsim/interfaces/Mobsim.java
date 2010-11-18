@@ -101,9 +101,9 @@ public interface Mobsim extends IOSimulation, ObservableSimulation {
 	/**Method that inserts the agent (back) into the mobsim, where the agent will be at an activity until its scheduled end
 	 * (coming from the plan).
 	 * 
-	 * @param personAgent
+	 * @param planAgent
 	 */
-	void scheduleActivityEnd(PersonAgent personAgent);
+	void scheduleActivityEnd(PlanAgent planAgent);
 
 	/**Method that reschedules the activity end for an agent that is already at an activity.  Necessary for within-day replanning.
 	 * 
@@ -115,10 +115,6 @@ public interface Mobsim extends IOSimulation, ObservableSimulation {
 	 */
 	void rescheduleActivityEnd(final PersonAgent agent, final double oldTime, final double newTime ) ;
 
-	void endLegAndAssumeControl( PlanAgent person, double now ) ;
-	public void endActivityAndAssumeControl( PlanAgent person, double now ) ;
-
-
 	Scenario getScenario();
 
 	void setAgentFactory(AgentFactory agentFactory);
@@ -127,7 +123,7 @@ public interface Mobsim extends IOSimulation, ObservableSimulation {
 
 	NetsimNetwork getNetsimNetwork();
 	
-	Collection<PersonAgent> getActivityEndsList() ;
+	Collection<PlanAgent> getActivityEndsList() ;
 	
 	/**Registering and unregistering agents on links for visualization.  
 	 * 

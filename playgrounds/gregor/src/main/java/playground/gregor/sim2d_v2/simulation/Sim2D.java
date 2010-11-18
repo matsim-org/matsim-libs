@@ -46,13 +46,13 @@ import org.matsim.core.mobsim.framework.listeners.SimulationListenerManager;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.ptproject.qsim.agents.AgentFactory;
 import org.matsim.ptproject.qsim.agents.PersonDriverAgentImpl;
-import org.matsim.ptproject.qsim.comparators.PersonAgentDepartureTimeComparator;
+import org.matsim.ptproject.qsim.comparators.PlanAgentDepartureTimeComparator;
 import org.matsim.ptproject.qsim.helpers.AgentCounter;
 import org.matsim.ptproject.qsim.helpers.QSimTimer;
 import org.matsim.ptproject.qsim.interfaces.AgentCounterI;
 import org.matsim.ptproject.qsim.interfaces.DepartureHandler;
-import org.matsim.ptproject.qsim.interfaces.NetsimNetwork;
 import org.matsim.ptproject.qsim.interfaces.Mobsim;
+import org.matsim.ptproject.qsim.interfaces.NetsimNetwork;
 import org.matsim.ptproject.qsim.interfaces.SimTimerI;
 
 import playground.gregor.sim2d_v2.scenario.Scenario2DImpl;
@@ -87,7 +87,7 @@ public class Sim2D implements Mobsim {
 
 	private double stopTime;
 
-	private final Queue<PersonAgent> activityEndsList = new PriorityQueue<PersonAgent>(500, new PersonAgentDepartureTimeComparator());
+	private final Queue<PlanAgent> activityEndsList = new PriorityQueue<PlanAgent>(500, new PlanAgentDepartureTimeComparator());
 
 	private static final int INFO_PERIOD = 3600;
 	private double infoTime;
@@ -196,9 +196,9 @@ public class Sim2D implements Mobsim {
 		}
 
 		double now = this.simTimer.getTimeOfDay();
-		for (PersonAgent agent : this.activityEndsList) {
+		for (PlanAgent agent : this.activityEndsList) {
 			if (agent.getDestinationLinkId() != null) {
-				this.events.processEvent(this.events.getFactory().createAgentStuckEvent(now, agent.getPerson().getId(), agent.getDestinationLinkId(), null));
+				this.events.processEvent(this.events.getFactory().createAgentStuckEvent(now, agent.getId(), agent.getDestinationLinkId(), null));
 			}
 		}
 		this.activityEndsList.clear();
@@ -236,7 +236,7 @@ public class Sim2D implements Mobsim {
 	 */
 	private void handleActivityEnds(double time) {
 		while (this.activityEndsList.peek() != null) {
-			PersonAgent agent = this.activityEndsList.peek();
+			PlanAgent agent = this.activityEndsList.peek();
 			if (agent.getActivityEndTime() <= time) {
 				this.activityEndsList.poll();
 				unregisterAgentAtActivityLocation(agent); // TODO do wie need
@@ -254,7 +254,7 @@ public class Sim2D implements Mobsim {
 	/**
 	 * @param agent
 	 */
-	private void unregisterAgentAtActivityLocation(PersonAgent agent) {
+	private void unregisterAgentAtActivityLocation(PlanAgent agent) {
 		log.error("Not implemented!! Not sure if we need this!!");
 
 	}
@@ -301,7 +301,7 @@ public class Sim2D implements Mobsim {
 		// set sim start time to config-value ONLY if this is LATER than the
 		// first plans starttime
 		double simStartTime = 0;
-		PersonAgent firstAgent = this.activityEndsList.peek();
+		PlanAgent firstAgent = this.activityEndsList.peek();
 		if (firstAgent != null) {
 			simStartTime = Math.floor(Math.max(startTime, firstAgent.getActivityEndTime()));
 		}
@@ -421,7 +421,7 @@ public class Sim2D implements Mobsim {
 	 * .core.mobsim.framework.PersonAgent)
 	 */
 	@Override
-	public void scheduleActivityEnd(PersonAgent agent) {
+	public void scheduleActivityEnd(PlanAgent agent) {
 		// yy can't make this final since it is overwritten by christoph. kai,
 		// oct'10
 		this.activityEndsList.add(agent);
@@ -432,7 +432,7 @@ public class Sim2D implements Mobsim {
 	/**
 	 * @param agent
 	 */
-	private void registerAgentAtActivityLocation(PersonAgent agent) {
+	private void registerAgentAtActivityLocation(PlanAgent agent) {
 		// if the "activities" engine were separate, this would need to be
 		// public. kai, aug'10
 		if (agent instanceof PersonDriverAgentImpl) { // yyyyyy is this
@@ -529,7 +529,7 @@ public class Sim2D implements Mobsim {
 	 * @see org.matsim.ptproject.qsim.interfaces.QSimI#getActivityEndsList()
 	 */
 	@Override
-	public Collection<PersonAgent> getActivityEndsList() {
+	public Collection<PlanAgent> getActivityEndsList() {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -558,15 +558,4 @@ public class Sim2D implements Mobsim {
 		throw new RuntimeException("not implemented");
 	}
 
-	@Override
-	public void endActivityAndAssumeControl(PlanAgent person, double now) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException() ;
-	}
-
-	@Override
-	public void endLegAndAssumeControl(PlanAgent person, double now) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException() ;
-	}
 }

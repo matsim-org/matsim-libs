@@ -157,12 +157,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 	}
 	
 	@Override
-	public Boolean endActivityAndAdvancePlan() {
-		throw new RuntimeException("not yet implemented") ;
-	}
-
-	@Override
-	public void teleportToLink(final Id linkId) {
+	public void notifyTeleportToLink(final Id linkId) {
 	}
 
 	Mobsim getSimulation(){
@@ -258,11 +253,8 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 			PersonDriverAgent agent = (PersonDriverAgent) passenger;
 			EventsManager events = this.sim.getEventsManager();
 			events.processEvent(new PersonLeavesVehicleEventImpl(time, agent.getPerson().getId(), this.vehicle.getVehicle().getId(), this.getTransitRoute().getId()));
-			agent.teleportToLink(this.currentStop.getStopFacility().getLinkId());
-
-//			agent.endLegAndAssumeControl(time);
-			((QSim)this.sim).endLegAndAssumeControl( agent, time ) ;
-			
+			agent.notifyTeleportToLink(this.currentStop.getStopFacility().getLinkId());
+			agent.endLegAndAssumeControl(time);
 		}
 		return handled;
 	}

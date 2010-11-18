@@ -5,6 +5,7 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.framework.PersonAgent;
+import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.ptproject.qsim.agents.WithinDayAgent;
 import org.matsim.ptproject.qsim.interfaces.Mobsim;
@@ -26,7 +27,8 @@ public class OldPeopleIdentifier extends DuringActivityIdentifier {
 		}
 
 		// select agents, which should be replanned within this time step
-		for (PersonAgent agent : queueSim.getActivityEndsList()) {
+		for (PlanAgent pa : queueSim.getActivityEndsList()) {
+			PersonAgent agent = (PersonAgent) pa ;
 			if (((PersonImpl) agent.getPerson()).getAge() == 56) {
 				System.out.println("found agent");
 				set.add((WithinDayAgent)agent);
