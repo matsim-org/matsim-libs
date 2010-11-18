@@ -286,9 +286,9 @@ public class BellmanFordIntervalBased {
 		int earliestArrivalTime = Integer.MAX_VALUE;
 		
 				
-		for (Node superSink : this._flow.getSinks()) {
+		for (Node superSink : this._flow.getSinks()) {			
 			VertexInterval superSinkLabel = this._labels.get(superSink).getFirstPossibleForward();
-			if (superSinkLabel != null) {
+			if (superSinkLabel != null) {				
 				int superSinkTime = superSinkLabel.getLowBound();
 				earliestArrivalTime = Math.min(earliestArrivalTime, superSinkTime);
 			}			
@@ -351,21 +351,22 @@ public class BellmanFordIntervalBased {
 				realSinksToSendTo.add(superSink);
 			}
 
+			
+			
 			for (Node sinkNode : realSinksToSendTo) {
-				//System.out.println("sinkNode: " + sinkNode.getId());
-				
+								
 				Node toNode = sinkNode;
-				VertexInterval toLabel = this._labels.get(toNode).getFirstPossibleForward();
+				int toTime = earliestArrivalTime;		
 				
-
+				VertexInterval toLabel = this._labels.get(toNode).getIntervalAt(toTime);
+				
 				// should not happen
 				/*if (toLabel == null) {
 					throw new BFException("Sink cannot be reached at all!");
 				}*/
 				
 				// exactly when we want to arrives
-				int toTime = earliestArrivalTime;		
-
+				
 
 				//start constructing the TimeExpandedPath
 				TimeExpandedPath TEP = new TimeExpandedPath();		
@@ -390,17 +391,18 @@ public class BellmanFordIntervalBased {
 
 				pred = toLabel.getPredecessor();
 
-				while (pred != null) {
+				while (pred != null) {					
 					
 					// sadly, we treat Holdover differently, because it cannot be shifted properly
 					if (pred instanceof StepHold) {
+						
 						// could probably recycle toLabel from last iteration ...
 						VertexInterval tempi = this._labels.get(toNode).getIntervalAt(toTime);
 						
-						if (pred.getForward()) {
+						if (pred.getForward()) {							
 							// set the right arrival time, does not change start time for holdover
 							pred = pred.copyShiftedToArrival(toTime);
-
+					
 							// go back to just before the label that was reached by holdover														
 							toTime = tempi.getLowBound() - 1;
 							
@@ -409,11 +411,11 @@ public class BellmanFordIntervalBased {
 						} else {
 							pred = pred.copyShiftedToArrival(toTime);
 							
-							// go forward to the next label
+							// go forward to the next label							
 							toTime = tempi.getHighBound();
 							
 							// set the right start time, does not change arrival time for holdover
-							pred = pred.copyShiftedToStart(toTime);						
+							pred = pred.copyShiftedToStart(toTime);
 						}
 					} else {
 						pred = pred.copyShiftedToArrival(toTime);
@@ -436,7 +438,7 @@ public class BellmanFordIntervalBased {
 					} else {
 						throw new RuntimeException("Unknown instance of PathStep in ConstructRoutes()");
 					}
-
+					
 					pred = toLabel.getPredecessor();
 
 				}

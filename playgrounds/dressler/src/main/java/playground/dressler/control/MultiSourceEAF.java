@@ -360,6 +360,7 @@ public class MultiSourceEAF {
 		int lasttime = 0;
 		int lastcost = Integer.MAX_VALUE;
 		boolean haslastcost = false;
+		int failedSearches = 0;
 
 		boolean tryReverse;
 		boolean usedForwardSearch = false;
@@ -412,7 +413,7 @@ public class MultiSourceEAF {
 	            	// FIXME an arbitrary constant ...
 	            	// run reverse, unless we want to update the unreachable vertices
 	            	boolean needForward = settings.trackUnreachableVertices && (lastForward <= lasttime - 3);
-	            	if (tryReverse && !needForward) {
+	            	if (!needForward && tryReverse ) {
 	    				result = routingAlgo.doCalculationsReverse(lasttime);
 	    				usedForwardSearch = false;
 	    			} else {
@@ -445,12 +446,20 @@ public class MultiSourceEAF {
 
 
 			if (result == null || result.isEmpty()){
+				// keep track of our success
 				haslastcost = false;
+				failedSearches++;
+				
 				if (tryReverse) {
 					// backward search didn't find anything.
+					if (failedSearches <= settings.retryReverse) {
+						tryReverse = true;						
+					} else {
+						tryReverse = false;
+					}
 					// we should try forward next time to determine new arrvivaltime
 					lasttime += 1; // guess new time
-					tryReverse = false;
+
 					trySuccessfulPaths = true; // before we do the forward search, we can simply repeat paths!
 				} else {
 					// forward or mixed search didn't find anything
@@ -458,6 +467,8 @@ public class MultiSourceEAF {
 					break;
 				}
 			} else {
+				failedSearches = 0;
+				
 				// lazy way to get some element ...
 				for(TimeExpandedPath path : result) {
 					lastcost = path.getCost();
@@ -536,6 +547,7 @@ public class MultiSourceEAF {
 					// we now know that we can arrive at the old lasttime + 1 (now just lasttime)
 					// so try again!
 					tryReverse = (settings.searchAlgo == FlowCalculationSettings.SEARCHALGO_REVERSE);
+					failedSearches = 0; // no exactly correct for the name, but we found something so we are happy
 				}
 			}
 			Trepeatedpaths.onoff();
@@ -910,10 +922,11 @@ public class MultiSourceEAF {
 			//simplenetworkfile = "/homes/combi/dressler/V/code/meine_EA/capsinks.dat";
 			//simplenetworkfile = "/homes/combi/dressler/V/code/meine_EA/padang_v2010_3_sources.dat";
 			
-			simplenetworkfile  = "/homes/combi/dressler/V/code/meine_EA/padang_5_10s.dat";
+			//simplenetworkfile  = "/homes/combi/dressler/V/code/meine_EA/padang_5_10s.dat";
 			//simplenetworkfile  = "/homes/combi/dressler/V/code/grids/test_small.dat";
 			//simplenetworkfile  = "/homes/combi/dressler/V/code/grids/grid_500x50_10000_at_all_to_10_R3.dat";
 			//simplenetworkfile  = "/homes/combi/dressler/V/code/grids/grid_50x50_100000_at_all_to_10_R2.dat";
+			simplenetworkfile  = "/homes/combi/dressler/V/code/grids/grid_50x20_10000_at_all_to_10_R9.dat";
 			
 			uniformDemands = 100;
 
@@ -1091,6 +1104,7 @@ public class MultiSourceEAF {
 		settings.usePriorityQueue = true; // use a PriorityQueue instead of a Queue
 		
 		settings.useRepeatedPaths = true; // not compatible with costs!
+		settings.retryReverse = 1; // 1 = try one time step later with reverse search if no path was found.
 		// track unreachable vertices only works in REVERSE (with forward in between), and wastes time otherwise
 		settings.trackUnreachableVertices = true  && (settings.searchAlgo == FlowCalculationSettings.SEARCHALGO_REVERSE);
 		//settings.sortPathsBeforeAugmenting = true;
@@ -1098,7 +1112,7 @@ public class MultiSourceEAF {
 		settings.keepPaths = true; // store paths at all
 		settings.unfoldPaths = false; // unfold stored paths into forward paths
 		settings.delaySinkPropagation = true; // propagate sinks (and resulting intervals) only if the search has nothing else to do 
-		settings.quickCutOff = 0.1; // <0, continue fully,  =0 stop as soon as the first good path is found, > 0 continue a bit (e.g. 0.1 continue for another 10% of the polls so far) 
+		settings.quickCutOff = 0.5; // <0, continue fully,  =0 stop as soon as the first good path is found, > 0 continue a bit (e.g. 0.1 continue for another 10% of the polls so far) 
 		settings.mapLinksToTEP = true; // remember which path uses an edge at a given time
 		settings.useHoldover = true; //only forward/reverse, no cost, no unwind
 		//settings.whenAvailable = new HashMap<Link, Interval>();

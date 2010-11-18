@@ -72,7 +72,7 @@ public class FlowCalculationSettings {
 	public boolean useHoldoverCapacities = false;// limit holdover on each node
 
 	public boolean trackUnreachableVertices = true && (searchAlgo == FlowCalculationSettings.SEARCHALGO_REVERSE);; // only works in REVERSE, wastes time otherwise
-
+	public int retryReverse = 0; // how often to retry a failed reverse search with one step later (before forward is used)
 	
 	
 	/* when are links available? not included means "always" */
@@ -356,6 +356,7 @@ public class FlowCalculationSettings {
 		System.out.println("Sinks have finite capacity: " + this.useSinkCapacities);
 
 		System.out.println("Track unreachable vertices: " + this.trackUnreachableVertices);
+		System.out.println("Retry reverse: " + this.retryReverse);
 		System.out.println("Quick cutoff: " + this.quickCutOff);
 		System.out.println("Delay sink propagation: " + this.delaySinkPropagation);
 		System.out.println("Use vertex cleanup: " + this.useVertexCleanup);
@@ -1196,6 +1197,8 @@ public class FlowCalculationSettings {
     	    	useHoldoverCapacities  = Boolean.parseBoolean(t);
     	    } else if (s.equals("--trackunreachable")) {
     	    	trackUnreachableVertices  = Boolean.parseBoolean(t);
+    	    } else if (s.equals("--retryreverse")) {
+    	    	retryReverse  = Integer.parseInt(t);
     	    } else {
     	    	error += "Unknown option: " + s + "\n";
     	    }
@@ -1235,6 +1238,7 @@ public class FlowCalculationSettings {
     	s += "--useholdovercapacities\n" + useHoldoverCapacities + "\n";
 
     	s += "--trackunreachable\n" + trackUnreachableVertices + "\n";
+    	s += "--retryreverse\n" + retryReverse + "\n";
     	return s;
     }
 

@@ -221,7 +221,21 @@ public class Partitioner {
 			// colours
 			Color color;
 			if (useColor) {
-				color = Color.getHSBColor((float) (countsinks * 7 % nsinks )/ (float) nsinks,1.0f,1.0f);
+				if (nsinks <= 10) {
+					// simply spread out over the rainbow
+					color = Color.getHSBColor((float) countsinks / (float) nsinks, 1.0f,1.0f);
+				} else {
+					// spread them further apart "randomly"
+					// this is good up to 7*17 = 119, after which differences would be hard to tell anyway
+					if (nsinks % 7 != 0) {
+						color = Color.getHSBColor((float) ((countsinks * 7) % nsinks )/ (float) nsinks,1.0f,1.0f);	
+					} else {
+
+						color = Color.getHSBColor((float) ((countsinks * 17) % nsinks )/ (float) nsinks,1.0f,1.0f);
+					}
+						
+				}
+				
 			} else {
 				color = Color.BLACK;
 			}
