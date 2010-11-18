@@ -25,10 +25,10 @@ public class AgentId2EnterLeaveVehicleEventHandlerTest {
     public void testAgentId2EnterLeaveVehicleEventHandler() {
     	       
         Id[] ida= new Id[9];
-    	Set<Id> id = new TreeSet<Id>();
+    	Set<Id> idSet = new TreeSet<Id>();
         for (int ii=0; ii<9; ii++){
         	ida[ii] = new IdImpl(ii); 
-            id.add(ida[ii]);
+            idSet.add(ida[ii]);
         }
         
 //        assign Ids to routes, vehicles and agents to be used in Test
@@ -44,7 +44,7 @@ public class AgentId2EnterLeaveVehicleEventHandlerTest {
         Id persId3 = ida[8];
         
         EventsFactoryImpl ef = new EventsFactoryImpl();
-        AgentId2EnterLeaveVehicleEventHandler handler = new AgentId2EnterLeaveVehicleEventHandler(id);
+        AgentId2EnterLeaveVehicleEventHandler handler = new AgentId2EnterLeaveVehicleEventHandler(idSet);
         
 //        create Events
         
