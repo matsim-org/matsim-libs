@@ -58,8 +58,8 @@ public class EnergyConsumptionInit implements StartupListener {
 			}
 			else{
 				//vehicles.put(personId, new ConventionalVehicle(new ARTEMISEnergyStateMaintainer_StartChargingUponArrival(, new IdImpl(2))); // no car, could be extended to conventional car
-				vehicles.put(personId, null); // no car, could be extended to conventional car
-				
+				//vehicles.put(personId, null); // no car, could be extended to conventional car
+				vehicles.put(personId, new ConventionalVehicle(null, new IdImpl(2)));
 			}
 			
 		}
@@ -70,7 +70,7 @@ public class EnergyConsumptionInit implements StartupListener {
 		controler.getEvents().addHandler(energyConsumptionPlugin);
 		
 		Main.energyConsumptionPlugin=energyConsumptionPlugin;
-		
+		Main.vehicles=vehicles;
 	}
 
 }
