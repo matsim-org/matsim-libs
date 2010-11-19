@@ -110,8 +110,7 @@ public class ShelterConfigGroup extends Module {
 	private void setAssignmentVersion(String value) {
 		if (value.equals("ICEC2010")) {
 			this.version = Version.ICEC2010;
-		}
-		if (value.equals("SimulatedAnnealing")) {
+		} else if (value.equals("SimulatedAnnealing")) {
 			this.version = Version.SA;
 		} else {
 			throw new RuntimeException("unknown assignment version:" + value);
