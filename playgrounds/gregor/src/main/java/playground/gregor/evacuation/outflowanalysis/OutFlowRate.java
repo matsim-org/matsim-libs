@@ -107,8 +107,8 @@ public class OutFlowRate implements AgentArrivalEventHandler {
 		ArrayList<Integer> its = new ArrayList<Integer>();
 		// its.add(0); its.add(1); its.add(10); its.add(50); its.add(100);
 		// its.add(200);
-		its.add(0);
-		its.add(5000);
+		// its.add(0);
+		its.add(1000);
 
 		for (int it : its) {
 			String input = baseDir + "/it." + it + "/" + it + ".events.txt.gz";
