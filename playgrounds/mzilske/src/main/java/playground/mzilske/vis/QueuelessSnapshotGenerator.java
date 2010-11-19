@@ -45,6 +45,21 @@ import org.matsim.vis.snapshots.writers.AgentSnapshotInfoFactory;
 import org.matsim.vis.snapshots.writers.SnapshotWriter;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
 
+/**
+ * 
+ * Consumes a stream of mobility simulation events and produces a stream of simulation snapshots. A simulation snapshot is a set of colored dots in the plane
+ * representing agents, where they are, and what state they are in. This SnapshotGenerator only considers drivers of moving vehicles, and it colours them 
+ * by their speed normalized to the maximum speed of the link on which they are driving. It generates agent positions by linear interpolation between 
+ * the LinkEnterEvent and the LinkLeaveEvent.
+ * 
+ * Previously, this SnapshotGenerator would think up agent positions by re-simulating what happens in the queue model between these events. 
+ * We replaced that with this simpler version because we think that one should not make complex assumptions about what happens on a link when 
+ * only looking at an event file. Implementations of the mobility simulation, of course, still decide on their own where exactly the agents are at any 
+ * given time.
+ * 
+ * @author michaz
+ *
+ */
 public class QueuelessSnapshotGenerator implements AgentDepartureEventHandler, AgentArrivalEventHandler, LinkEnterEventHandler,
 		LinkLeaveEventHandler, AgentWait2LinkEventHandler, AgentStuckEventHandler {
 

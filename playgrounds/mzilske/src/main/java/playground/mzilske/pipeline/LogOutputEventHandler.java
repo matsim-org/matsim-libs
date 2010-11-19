@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.mzilske.controler;
+package playground.mzilske.pipeline;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
