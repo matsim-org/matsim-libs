@@ -17,7 +17,7 @@
 
 	<module name="plans">
 		<param name="inputPlansFile"
-			value="test/input/playground/christoph/withinday/EquilTest/testScenario/plans2.xml" />
+			value="test/input/playground/kai/usecases/withinday/EquilTest/testScenario/plans2.xml" />
 	</module>
 
 	<module name="controler">

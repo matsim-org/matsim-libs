@@ -1,4 +1,4 @@
-package playground.christoph.withinday3;
+package playground.kai.usecases.withinday;
 
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;

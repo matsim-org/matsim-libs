@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.christoph.withinday3;
+package playground.kai.usecases.withinday;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -42,14 +42,12 @@ import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
-import org.matsim.ptproject.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.ptproject.qsim.agents.ExperimentalBasicWithindayAgent;
 import org.matsim.ptproject.qsim.interfaces.Mobsim;
 import org.matsim.ptproject.qsim.interfaces.NetsimLink;
 import org.matsim.ptproject.qsim.qnetsimengine.QVehicle;
 
 import playground.christoph.withinday.utils.EditRoutes;
-import playground.christoph.withinday.utils.ReplacePlanElements;
 
 /**
  * @author nagel
@@ -152,17 +150,11 @@ public class MyMobsimListener implements SimulationListener, SimulationBeforeSim
 		
 		planElements.set( planElementsIndex+1, newAct ) ;
 		
-
-		// yyyyyy the following still needs to be improved.  For starters, it is not clear what "currentNodeIndex" is.  kai, oct'10
-
-		/*
-		 *  Replan Routes
-		 */
-		// new Route for current Leg
-		EditRoutesKai.replanCurrentLegRoute(person, planElements, planElementsIndex, 
-				withindayAgent.getCurrentRouteLinkIdIndex(), routeAlgo, now ) ;
-
-//		new EditRoutes().replanCurrentLegRoute(selectedPlan, currentLeg, ((DefaultPersonDriverAgent)personAgent).getCurrentNodeIndex(), routeAlgo, scenario.getNetwork(), now);
+		new EditRoutes().replanCurrentLegRoute(selectedPlan, planElementsIndex, 
+				withindayAgent.getCurrentRouteLinkIdIndex(), routeAlgo, this.scenario.getNetwork(), now) ;
+		// yyyy possibly easier to pass the PlanElements (easier to differentiate between modifiable/
+		// unmodifiable
+		
 		// ( compiles, but does not run, since agents are (deliberately) not instantiated as withindayreplanningagents.  kai, oct'10 )
 		// Adapted code, WithinDayPersonAgents are now only needed if they have to handle WithinDayReplanners. cdobler, oct'10
 		

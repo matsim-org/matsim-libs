@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.christoph.withinday3;
+package playground.kai.usecases.withinday;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
