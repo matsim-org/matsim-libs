@@ -22,6 +22,7 @@ package org.matsim.signalsystems;
 import junit.framework.Assert;
 
 import org.apache.log4j.Logger;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -84,6 +85,7 @@ import org.matsim.testcases.MatsimTestUtils;
  * @author aneumann
  * @author dgrether
  */
+@Ignore
 public class TravelTimeOneWayTest {
 
 	private static final Logger log = Logger.getLogger(TravelTimeOneWayTest.class);
