@@ -63,7 +63,7 @@ public class BkScoringTest extends MatsimTestCase {
 		controler.setCreateGraphs(false);
 		controler.setWriteEventsInterval(0);
 
-		// should test this one:
+		// should add this one:
 //		controler.addControlerListener(new BkIncomeControlerListener());
 		
 		// but doesnt work yet, so...
