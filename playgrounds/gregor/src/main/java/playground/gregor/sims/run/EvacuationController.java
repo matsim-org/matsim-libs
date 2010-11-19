@@ -51,6 +51,7 @@ import org.matsim.evacuation.riskaversion.RiskCostFromFloodingData;
 import org.matsim.evacuation.shelters.signalsystems.ShelterDoorBlockerSetup;
 import org.matsim.evacuation.shelters.signalsystems.ShelterInputCounterSignalSystems;
 import org.matsim.evacuation.socialcost.SocialCostCalculatorSingleLink;
+import org.matsim.evacuation.socialcost.SocialCostCalculatorSingleLinkII;
 import org.matsim.evacuation.travelcosts.PluggableTravelCostCalculator;
 import org.matsim.signalsystems.mobsim.QSimSignalEngine;
 import org.matsim.signalsystems.model.SignalSystemsManager;
@@ -153,11 +154,21 @@ public class EvacuationController extends Controler {
 
 	private void initSocialCostOptimization() {
 		initPluggableTravelCostCalculator();
-		SocialCostCalculatorSingleLink sc = new SocialCostCalculatorSingleLink(this.network, getConfig().travelTimeCalculator().getTraveltimeBinSize(), getEvents());
-		this.pluggableTravelCost.addTravelCost(sc);
-		this.events.addHandler(sc);
-		this.strategyManager = loadStrategyManager();
-		addControlerListener(sc);
+
+		if (this.ec.useSocialCostCalculatorII()) {
+			SocialCostCalculatorSingleLinkII sc = new SocialCostCalculatorSingleLinkII(this.network, getConfig().travelTimeCalculator().getTraveltimeBinSize(), getEvents());
+			this.pluggableTravelCost.addTravelCost(sc);
+			this.events.addHandler(sc);
+			this.strategyManager = loadStrategyManager();
+			addControlerListener(sc);
+		} else {
+
+			SocialCostCalculatorSingleLink sc = new SocialCostCalculatorSingleLink(this.network, getConfig().travelTimeCalculator().getTraveltimeBinSize(), getEvents());
+			this.pluggableTravelCost.addTravelCost(sc);
+			this.events.addHandler(sc);
+			this.strategyManager = loadStrategyManager();
+			addControlerListener(sc);
+		}
 	}
 
 	private void initRiskMinimization() {
