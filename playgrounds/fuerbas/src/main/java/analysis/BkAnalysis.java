@@ -38,14 +38,9 @@ import org.matsim.households.Households;
 import org.matsim.households.HouseholdsImpl;
 import org.matsim.households.HouseholdsReaderV10;
 
-import playground.benjamin.analysis.BkAnalysis;
 import playground.benjamin.analysis.BkAnalysisWriter;
 import playground.benjamin.analysis.Row;
-import playground.benjamin.analysis.BkAnalysis.ComparatorImplementation;
 import playground.benjamin.analysis.filter.BkAnalysisFilter;
-
-import analysis.BkAnalysisFilterTest;
-import analysis.Row;
 
 /**
  * @author fuerbas after bkickhoefer after kn and dgrether
