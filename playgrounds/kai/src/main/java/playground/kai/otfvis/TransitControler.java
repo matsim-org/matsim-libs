@@ -53,7 +53,7 @@ public class TransitControler extends Controler {
 
 		QSim simulation = (QSim) new QSimFactory().createMobsim(this.getScenario(), this.getEvents());
 
-		simulation.getQSimTransitEngine().setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
+		simulation.getTransitEngine().setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
 //		this.events.addHandler(new LogOutputEventHandler());
 
 		if (this.useOTFVis) {

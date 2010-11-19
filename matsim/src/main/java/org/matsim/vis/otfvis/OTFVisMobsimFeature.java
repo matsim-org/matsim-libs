@@ -129,7 +129,7 @@ SimulationInitializedListener, SimulationAfterSimStepListener, SimulationBeforeC
 				this.otfServer.addAdditionalElement(new FacilityDrawer.DataWriter_v1_0(
 						queueSimulation.getVisNetwork().getNetwork(),
 						((ScenarioImpl) queueSimulation.getScenario()).getTransitSchedule(),
-						((QSim) queueSimulation).getQSimTransitEngine().getAgentTracker()
+						((QSim) queueSimulation).getTransitEngine().getAgentTracker()
 				));
 				this.connectionManager.connectWriterToReader(
 						FacilityDrawer.DataWriter_v1_0.class,

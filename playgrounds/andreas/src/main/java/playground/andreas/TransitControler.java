@@ -36,7 +36,7 @@ public class TransitControler extends Controler {
 
 		QSim simulation = (QSim) new QSimFactory().createMobsim(this.getScenario(), this.getEvents());
 
-		simulation.getQSimTransitEngine().setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
+		simulation.getTransitEngine().setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
 //		this.events.addHandler(new LogOutputEventHandler());
 
 		if (this.useOTFVis) {
@@ -46,7 +46,7 @@ public class TransitControler extends Controler {
 		}
 
 		if(this.useHeadwayControler){
-			simulation.getQSimTransitEngine().setAbstractTransitDriverFactory(new FixedHeadwayCycleUmlaufDriverFactory());
+			simulation.getTransitEngine().setAbstractTransitDriverFactory(new FixedHeadwayCycleUmlaufDriverFactory());
 			this.events.addHandler(new FixedHeadwayControler(simulation));		
 		}
 

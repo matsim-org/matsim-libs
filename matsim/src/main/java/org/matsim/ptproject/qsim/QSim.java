@@ -122,7 +122,7 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 
 	private SimTimerI simTimer;
 
-	private Collection<PersonAgent> transitAgents;
+	private Collection<PlanAgent> transitAgents;
 
 	/**
 	 * Includes all agents that have transportation modes unknown to
@@ -204,22 +204,23 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 
 	// setters that should reasonably be called between constructor and "prepareSim" (triggered by "run"):
 
-	public void setMultiModalSimEngine(MultiModalSimEngine multiModalEngine) {
+	public final void setMultiModalSimEngine(MultiModalSimEngine multiModalEngine) {
 		this.multiModalEngine = multiModalEngine;
 	}
 
 	@Override
 	public void setAgentFactory(final AgentFactory fac) {
+		// not final since WithindayQSim overrides (essentially: disables) it.  kai, nov'10
 		this.agentFactory = fac;
 	}
 
 	@Override
-	public void setControlerIO(final ControlerIO controlerIO) {
+	public final void setControlerIO(final ControlerIO controlerIO) {
 		this.controlerIO = controlerIO;
 	}
 
 	@Override
-	public void setIterationNumber(final Integer iterationNumber) {
+	public final void setIterationNumber(final Integer iterationNumber) {
 		this.iterationNumber = iterationNumber;
 	}
 
@@ -291,7 +292,7 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 		}
 
 		if (this.transitEngine != null){
-			Collection<PersonAgent> a = this.transitEngine.createAgents();
+			Collection<PlanAgent> a = this.transitEngine.createAdditionalAgents();
 			this.transitAgents = a;
 			agents.addAll(a);
 		}
@@ -513,7 +514,7 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 	// Now a PlanAgent, which makes more sense (I think). kai, nov'10
 	// yy Since this is now by force a PlanAgent, one could replace arrangeAgentDeparture and
 	// scheduleActivityEnd by joint startPlanElement.  kai, nov'10
-	public void arrangeAgentDeparture(final PlanAgent agent, final Id linkId) {
+	public final void arrangeAgentDeparture(final PlanAgent agent, final Id linkId) {
 		double now = this.getSimTimer().getTimeOfDay() ;
 		Leg leg = agent.getCurrentLeg();
 //		Route route = leg.getRoute();
@@ -740,7 +741,7 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 
 	@Override
 	@Deprecated // if you think you need to use this, ask kai.  aug'10
-	public void addFeature(final VisMobsimFeature queueSimulationFeature) {
+	public final void addFeature(final VisMobsimFeature queueSimulationFeature) {
 //		this.queueSimulationFeatures.add(queueSimulationFeature);
 		this.addQueueSimulationListeners(queueSimulationFeature);
 		this.getEventsManager().addHandler(queueSimulationFeature) ;
@@ -757,12 +758,12 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 		return this.simTimer ;
 	}
 
-	public final NetsimEngine getQSimEngine() {
+	public final NetsimEngine getNetsimEngine() {
 	  return this.netEngine;
 	}
 
 	@Override
-	public void addSnapshotWriter(SnapshotWriter snapshotWriter) {
+	public final void addSnapshotWriter(SnapshotWriter snapshotWriter) {
 		this.snapshotManager.addSnapshotWriter(snapshotWriter);
 	}
 
@@ -789,7 +790,7 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 		this.listenerManager.addQueueSimulationListener(listener);
 	}
 
-	public final TransitQSimEngine getQSimTransitEngine() {
+	public final TransitQSimEngine getTransitEngine() {
 		return transitEngine;
 	}
 
@@ -807,7 +808,7 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 		// changed this to unmodifiable in oct'10.  kai
 	}
 
-	public final Collection<PersonAgent> getTransitAgents(){
+	public final Collection<PlanAgent> getTransitAgents(){
 		return Collections.unmodifiableCollection( this.transitAgents ) ;
 		// changed this to unmodifiable in oct'10.  kai
 	}

@@ -26,7 +26,7 @@ public class MMoyoTransitControler extends Controler {
 	protected void runMobSim() {
 		QSim sim = new QSim(this.scenarioData, this.events);
 		sim.addFeature(new OTFVisMobsimFeature(sim));
-		sim.getQSimTransitEngine().setUseUmlaeufe(true);
+		sim.getTransitEngine().setUseUmlaeufe(true);
 		sim.run();
 		/*
 		TransitQueueSimulation sim = new TransitQueueSimulation(this.scenarioData, this.events);

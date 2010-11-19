@@ -109,8 +109,8 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine {
 	}
 
 
-	public Collection<PersonAgent> createAgents() {
-		Collection<PersonAgent> ptDrivers;
+	public Collection<PlanAgent> createAdditionalAgents() {
+		Collection<PlanAgent> ptDrivers;
 		if (useUmlaeufe ) {
 			ptDrivers = createVehiclesAndDriversWithUmlaeufe(this.agentTracker);
 		} else {
@@ -135,9 +135,9 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine {
 		}
 	}
 
-	private Collection<PersonAgent> createVehiclesAndDriversWithUmlaeufe(TransitStopAgentTracker thisAgentTracker) {
+	private Collection<PlanAgent> createVehiclesAndDriversWithUmlaeufe(TransitStopAgentTracker thisAgentTracker) {
 		Vehicles vehicles = ((ScenarioImpl) this.qSim.getScenario()).getVehicles();
-		Collection<PersonAgent> drivers = new ArrayList<PersonAgent>();
+		Collection<PlanAgent> drivers = new ArrayList<PlanAgent>();
 		ReconstructingUmlaufBuilder reconstructingUmlaufBuilder = this.qSim.getScenario().getScenarioElement( ReconstructingUmlaufBuilder.class ) ;
 		if (reconstructingUmlaufBuilder != null) {
 			log.warn("found pre-existing ReconstructingUmlaufBuilder in scenario, thus using that one. This should be ok but it is not systematically tested.") ;
@@ -177,10 +177,10 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine {
 		return driver;
 	}
 
-	private Collection<PersonAgent> createVehiclesAndDriversWithoutUmlaeufe(TransitSchedule schedule,
+	private Collection<PlanAgent> createVehiclesAndDriversWithoutUmlaeufe(TransitSchedule schedule,
 			TransitStopAgentTracker agentTracker) {
 		Vehicles vehicles = ((ScenarioImpl) this.qSim.getScenario()).getVehicles();
-		Collection<PersonAgent> drivers = new ArrayList<PersonAgent>();
+		Collection<PlanAgent> drivers = new ArrayList<PlanAgent>();
 		for (TransitLine line : schedule.getTransitLines().values()) {
 			for (TransitRoute route : line.getRoutes().values()) {
 				for (Departure departure : route.getDepartures().values()) {
@@ -205,9 +205,10 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine {
 		return drivers;
 	}
 
-	public void beforeHandleAgentArrival(PersonAgent agent) {
-
-	}
+//	public void beforeHandleAgentArrival(PersonAgent agent) {
+//
+//	}
+	// this method is not used anywhere.  kai, nov'10
 
 	private void handleAgentPTDeparture(final PlanAgent planAgent, Id linkId, Leg leg) {
 		// this puts the agent into the transit stop.  

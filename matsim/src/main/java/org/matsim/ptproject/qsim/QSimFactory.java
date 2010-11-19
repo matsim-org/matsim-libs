@@ -38,8 +38,8 @@ public class QSimFactory implements MobsimFactory {
 	public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
 		QSim sim = new QSim(sc, eventsManager);
 		if (sc.getConfig().scenario().isUseTransit()) {
-			sim.getQSimTransitEngine().setUseUmlaeufe(true);
-			sim.getQSimTransitEngine().setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
+			sim.getTransitEngine().setUseUmlaeufe(true);
+			sim.getTransitEngine().setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
 		}
 		return sim;
 	}

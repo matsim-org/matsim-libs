@@ -285,7 +285,7 @@ public class TransitQueueSimulationTest {
 		simulation.run();
 
 		// check everything
-		assertEquals(1, simulation.getQSimTransitEngine().getAgentTracker().getAgentsAtStop(stop1).size());
+		assertEquals(1, simulation.getTransitEngine().getAgentTracker().getAgentsAtStop(stop1).size());
 	}
 
 	/**
@@ -538,7 +538,7 @@ public class TransitQueueSimulationTest {
 		protected void createAgents() {
 			super.createAgents();
 
-			this.driver = new SpyDriver(this.line, this.route, this.departure, this.getQSimTransitEngine().getAgentTracker(), this);
+			this.driver = new SpyDriver(this.line, this.route, this.departure, this.getTransitEngine().getAgentTracker(), this);
 
 			VehicleType vehicleType = new VehicleTypeImpl(new IdImpl("transitVehicleType"));
 			VehicleCapacity capacity = new VehicleCapacityImpl();

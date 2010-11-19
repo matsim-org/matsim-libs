@@ -146,8 +146,8 @@ public class TransitControler extends Controler {
 			otfVisQSimFeature.setVisualizeTeleportedAgents(sim.getScenario().getConfig().otfVis().isShowTeleportedAgents());
 			sim.addFeature(otfVisQSimFeature);
 		}
-		sim.getQSimTransitEngine().setUseUmlaeufe(true);
-		sim.getQSimTransitEngine().setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
+		sim.getTransitEngine().setUseUmlaeufe(true);
+		sim.getTransitEngine().setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
 
 //		this.events.addHandler(new LogOutputEventHandler());
 

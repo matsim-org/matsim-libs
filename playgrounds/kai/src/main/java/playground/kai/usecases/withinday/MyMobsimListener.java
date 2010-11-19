@@ -79,7 +79,7 @@ public class MyMobsimListener implements SimulationListener, SimulationBeforeSim
 				this.travCostCalc, this.travTimeCalc, new DijkstraFactory() );
 		
 		for ( PersonAgent pa : agentsToReplan ) {
-			doReplanning( pa, mobsim.getSimTimer().getTimeOfDay() ) ;
+			doReplanning( pa, mobsim ) ;
 		}
 	}
 	
@@ -108,7 +108,8 @@ public class MyMobsimListener implements SimulationListener, SimulationBeforeSim
 
 	}
 
-	private boolean doReplanning(PersonAgent personAgent, double now ) {
+	private boolean doReplanning(PersonAgent personAgent, Mobsim mobsim ) {
+		double now = mobsim.getSimTimer().getTimeOfDay() ;
 		
 		// preconditions:
 
@@ -163,6 +164,9 @@ public class MyMobsimListener implements SimulationListener, SimulationBeforeSim
 		int homeLegindex = planElementsIndex+2;
 //		Leg homeLeg = (Leg) planElements.get( homeLegindex ) ;
 		new EditRoutes().replanFutureLegRoute(selectedPlan, homeLegindex, routeAlgo);
+		
+		// since this is a use case, let us enumerate relevant data structure operations:
+		
 		
 		// finally reset the cached Values of the PersonAgent - they may have changed!
 		withindayAgent.resetCaches();

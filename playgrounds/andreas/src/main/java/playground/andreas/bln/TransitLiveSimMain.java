@@ -59,7 +59,7 @@ public class TransitLiveSimMain {
 
 		EventsManager events = new EventsManagerImpl();
 		QSim sim = new QSim(scenario, events);
-		sim.getQSimTransitEngine().setUseUmlaeufe(true);
+		sim.getTransitEngine().setUseUmlaeufe(true);
 		OTFVisMobsimFeature otfVisQSimFeature = new OTFVisMobsimFeature(sim);
 		otfVisQSimFeature.setVisualizeTeleportedAgents(sim.getScenario().getConfig().otfVis().isShowTeleportedAgents());
 		sim.addFeature(otfVisQSimFeature);
