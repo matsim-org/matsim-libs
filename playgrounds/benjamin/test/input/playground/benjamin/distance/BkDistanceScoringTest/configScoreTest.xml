@@ -8,15 +8,15 @@
 	</module>
 
 	<module name="network">
-		<param name="inputNetworkFile" value="../studies/bkickhoefer/scoreTest/network.xml" />
+		<param name="inputNetworkFile" value="" />
 	</module>
 
 	<module name="plans">
-		<param name="inputPlansFile" value="../studies/bkickhoefer/scoreTest/plansScoreTestV4.xml" />
+		<param name="inputPlansFile" value="" />
 	</module>
 
 	<module name="controler">
-		<param name="outputDirectory" value="../studies/bkickhoefer/output/scoreTest" />
+		<param name="outputDirectory" value="" />
 		<param name="firstIteration" value="0" />
 		<param name="lastIteration" value="0" />
 	</module>
@@ -42,7 +42,7 @@
 		<param name="travelingPt" value="-0.1" />
 <!--		<param name="travelingWalk" value="-3.523" />-->
 		<param name="waiting" value="-0" />
-		<param name="marginalUtlOfDistance" value="-0.2" /> <!-- in this case equal to fuel costs  -->
+		<param name="marginalUtlOfDistanceCar" value="-0.2" /> <!-- in this case equal to fuel costs  -->
 <!--		<param name="tollCost" value="-0.12" />-->
 		
 		<param name="activityType_0"            value="h" /> <!-- home -->
