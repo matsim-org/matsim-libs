@@ -503,9 +503,11 @@ public class MultiSourceEAF {
 
 			Trepeatedpaths.onoff();
 			if (trySuccessfulPaths && settings.useRepeatedPaths) {
+				
 				LinkedList<TimeExpandedPath> newSP = new LinkedList<TimeExpandedPath>();
 
 				for(TimeExpandedPath path : successfulPaths){
+					
 					String tempstr2 = "";
 					
 					// Careful! This is not a new path!
@@ -523,7 +525,7 @@ public class MultiSourceEAF {
 					
 					if (augment > 0) {
 						tempstr += tempstr2;
-						tempstr += "augmented " + augment + "\n";
+						tempstr += "augmented " + augment + " (reused path)\n";
 						//System.out.println("augmented " + augment + "\n");
 						// remember this path for the next timelayer
 						newSP.addLast(path); // keep the order!
@@ -918,7 +920,7 @@ public class MultiSourceEAF {
 			//simplenetworkfile = "/homes/combi/dressler/V/code/meine_EA/demo.zet.dat";
 			//simplenetworkfile = "/homes/combi/dressler/V/code/meine_EA/audimax.zet.dat";
 			//simplenetworkfile = "/homes/combi/dressler/V/code/meine_EA/otto hahn straße 14.zet.dat";
-			//simplenetworkfile = "/homes/combi/dressler/V/code/meine_EA/probeevakuierung.zet.dat";
+			simplenetworkfile = "/homes/combi/dressler/V/code/meine_EA/probeevakuierung.zet.dat";
 			//simplenetworkfile = "/homes/combi/dressler/V/code/meine_EA/capsinks.dat";
 			//simplenetworkfile = "/homes/combi/dressler/V/code/meine_EA/padang_v2010_3_sources.dat";
 			
@@ -926,7 +928,7 @@ public class MultiSourceEAF {
 			//simplenetworkfile  = "/homes/combi/dressler/V/code/grids/test_small.dat";
 			//simplenetworkfile  = "/homes/combi/dressler/V/code/grids/grid_500x50_10000_at_all_to_10_R3.dat";
 			//simplenetworkfile  = "/homes/combi/dressler/V/code/grids/grid_50x50_100000_at_all_to_10_R2.dat";
-			simplenetworkfile  = "/homes/combi/dressler/V/code/grids/grid_50x20_10000_at_all_to_10_R9.dat";
+			//simplenetworkfile  = "/homes/combi/dressler/V/code/grids/grid_50x20_10000_at_all_to_10_R9.dat";
 			
 			uniformDemands = 100;
 
@@ -1096,17 +1098,17 @@ public class MultiSourceEAF {
 		settings.useSinkCapacities = false;
 		//settings.useVertexCleanup = false;
 		settings.useImplicitVertexCleanup = true;
-		//settings.useShadowFlow = false;		
+		settings.useShadowFlow = false;		
 		
-		//settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_FORWARD;
+		settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_FORWARD;
 		//settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_MIXED;
-		settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_REVERSE;
-		settings.usePriorityQueue = true; // use a PriorityQueue instead of a Queue
+		//settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_REVERSE;
+		settings.queueAlgo = FlowCalculationSettings.QUEUE_GUIDED;
 		
 		settings.useRepeatedPaths = true; // not compatible with costs!
 		settings.retryReverse = 1; // 1 = try one time step later with reverse search if no path was found.
 		// track unreachable vertices only works in REVERSE (with forward in between), and wastes time otherwise
-		settings.trackUnreachableVertices = true  && (settings.searchAlgo == FlowCalculationSettings.SEARCHALGO_REVERSE);
+		settings.trackUnreachableVertices = true && (settings.searchAlgo == FlowCalculationSettings.SEARCHALGO_REVERSE);
 		//settings.sortPathsBeforeAugmenting = true;
 		settings.checkTouchedNodes = false;
 		settings.keepPaths = true; // store paths at all

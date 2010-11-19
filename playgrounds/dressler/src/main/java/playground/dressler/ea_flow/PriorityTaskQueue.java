@@ -27,21 +27,22 @@ import java.util.Iterator;
 import java.util.PriorityQueue;
 
 public class PriorityTaskQueue implements TaskQueue {
-	private PriorityQueue<BFTask> _list;
-	private Comparator<BFTask> taskcomp;
+	private int depth = 0;
 	
-	public PriorityTaskQueue(boolean reverse){		
-		if (reverse) {
-			taskcomp = new TaskComparatorReverse(); 
-		} else {
-			taskcomp = new TaskComparator();
-		}
+	private PriorityQueue<BFTask> _list;
+		
+	public PriorityTaskQueue(Comparator<BFTask> taskcomp){			
 		_list = new PriorityQueue<BFTask>((1), taskcomp);
 	}
 	
 	@Override
 	public boolean addAll(Collection<? extends BFTask> c) {
-		return _list.addAll(c);
+		Boolean result = false;
+		for(BFTask task: c){
+			task.depth = this.depth;
+			result = _list.add(task) || result; // never want a shortcut!		
+		}
+		return result;
 	}
 
 	@Override
@@ -51,6 +52,7 @@ public class PriorityTaskQueue implements TaskQueue {
 
 	@Override
 	public boolean add(BFTask e) {
+		e.depth = this.depth;
 		return _list.add(e);
 	}
 
@@ -59,15 +61,18 @@ public class PriorityTaskQueue implements TaskQueue {
 		boolean result = false;
 		
 		for(BFTask task: tasks){
-			Boolean test = _list.add(task);
-			if (test) result = test;
+			task.depth = this.depth;
+			result = _list.add(task) || result; // never want a shortcut!
 		}
 		return result;
 	}
 
 	@Override
 	public BFTask poll() {
-		return _list.poll();
+		BFTask temp = _list.poll();
+		if (temp != null)
+			depth = temp.depth + 1;
+		return temp;
 	}
 
 	

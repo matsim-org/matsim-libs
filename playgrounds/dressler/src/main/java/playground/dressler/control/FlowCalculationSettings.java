@@ -39,6 +39,12 @@ public class FlowCalculationSettings {
 	public static final int SEARCHALGO_FORWARD = 1;
 	public static final int SEARCHALGO_REVERSE = 2;
 	public static final int SEARCHALGO_MIXED = 3;
+	
+	public static final int QUEUE_BFS = 0;
+	public static final int QUEUE_DFS = 1;
+	public static final int QUEUE_GUIDED = 2;
+	public static final int QUEUE_STATIC = 3;
+	
 
 	/* default scaling parameters */
 	public double timeStep = 1;
@@ -53,7 +59,7 @@ public class FlowCalculationSettings {
 	/* default search settings */
 	public boolean useSinkCapacities = true;
 	public int searchAlgo = SEARCHALGO_FORWARD;
-    public boolean usePriorityQueue = false; // use a priority queue instead of simple BFS
+    public int queueAlgo = QUEUE_BFS; // use a simple BFS
 	public boolean useVertexCleanup = false;
 	public boolean useImplicitVertexCleanup = true; // unite vertex intervals before propagating?
 	public boolean useShadowFlow = false; // use arrays and shadow flows for storing the edge flow
@@ -153,7 +159,7 @@ public class FlowCalculationSettings {
 
 		// check search settings for some (not all) bad combinations
 		if (this.useSinkCapacities) {
-			if (this.searchAlgo != this.SEARCHALGO_FORWARD) {
+			if (this.searchAlgo != FlowCalculationSettings.SEARCHALGO_FORWARD) {
 				System.out.println("Only FORWARD search works with sink capacities enabled!");
 				return false;
 			}
@@ -164,7 +170,7 @@ public class FlowCalculationSettings {
 		}
 		
 		if (this.useHoldover) {
-			if (this.searchAlgo != this.SEARCHALGO_FORWARD && this.searchAlgo != this.SEARCHALGO_REVERSE) {
+			if (this.searchAlgo != FlowCalculationSettings.SEARCHALGO_FORWARD && this.searchAlgo != FlowCalculationSettings.SEARCHALGO_REVERSE) {
 				System.out.println("Only FORWARD and REVERSE search work with holdover enabled!");
 				return false;
 			}
@@ -178,16 +184,16 @@ public class FlowCalculationSettings {
 			}
 		}
 		
-		if (this.searchAlgo != this.SEARCHALGO_REVERSE && this.trackUnreachableVertices) {
+		if (this.searchAlgo != FlowCalculationSettings.SEARCHALGO_REVERSE && this.trackUnreachableVertices) {
 			System.out.println("TrackUnreachableVertices does not make sense with anything but REVERSE search! I will disable it now.");
 			this.trackUnreachableVertices = false;
 		}
 		
-		if (this.usePriorityQueue) {
-			if (this.searchAlgo != this.SEARCHALGO_FORWARD && this.searchAlgo != this.SEARCHALGO_REVERSE) {
+		if (queueAlgo != FlowCalculationSettings.QUEUE_BFS) {
+			if (this.searchAlgo != FlowCalculationSettings.SEARCHALGO_FORWARD && this.searchAlgo != FlowCalculationSettings.SEARCHALGO_REVERSE) {
 				System.out.println("Only FORWARD and REVERSE search support the priority queue!");
 				return false;
-			}
+			}			
 		}
 
 		scaleParameters();
@@ -352,7 +358,21 @@ public class FlowCalculationSettings {
 			  System.out.println("Algorithm to use: Unkown (" + this.searchAlgo +")");
 		}
 		
-		System.out.println("Use PriorityQueue: " + this.usePriorityQueue);
+		System.out.print("Use queue algo: " );
+		switch (this.queueAlgo) {
+		  case FlowCalculationSettings.QUEUE_BFS:
+			  System.out.println("simple BFS");
+			  break;
+		  case FlowCalculationSettings.QUEUE_DFS:
+			  System.out.println("totime-based DFS");
+			  break;
+		  case FlowCalculationSettings.QUEUE_GUIDED:
+			  System.out.println("guided search");
+			  break;
+		  default:
+			  System.out.println("Unkown (" + this.queueAlgo +")");
+		}
+				
 		System.out.println("Sinks have finite capacity: " + this.useSinkCapacities);
 
 		System.out.println("Track unreachable vertices: " + this.trackUnreachableVertices);
@@ -1163,8 +1183,8 @@ public class FlowCalculationSettings {
     	    	useSinkCapacities = Boolean.parseBoolean(t);
     	    } else if (s.equals("--searchalgo")) {
     	    	searchAlgo = Integer.parseInt(t);
-    	    } else if (s.equals("--usepriorityqueue")) {
-    	    	usePriorityQueue  = Boolean.parseBoolean(t);    	    	
+    	    } else if (s.equals("--queuealgo")) {
+    	    	queueAlgo  = Integer.parseInt(t);    	    	
     	    } else if (s.equals("--usevertexcleanup")) {
     	    	useVertexCleanup  = Boolean.parseBoolean(t);
     	    } else if (s.equals("--useimplicitvertexcleanup")) {
@@ -1216,9 +1236,9 @@ public class FlowCalculationSettings {
     	s += "--timehorizon\n" + TimeHorizon + "\n";
     	s += "--maxrounds\n" + MaxRounds + "\n";
 
-    	s += "--useSinkCapacities\n" + useSinkCapacities + "\n";
-    	s += "--searchAlgo\n" + searchAlgo + "\n";
-        s += "--usepriorityqueue\n" + usePriorityQueue + "\n";
+    	s += "--usesinkcapacities\n" + useSinkCapacities + "\n";
+    	s += "--searchalgo\n" + searchAlgo + "\n";
+        s += "--queuealgo\n" + queueAlgo + "\n";
     	s += "--usevertexcleanup\n" + useVertexCleanup + "\n";
     	
     	s += "--useimplicitvertexcleanup\n" + useImplicitVertexCleanup + "\n";

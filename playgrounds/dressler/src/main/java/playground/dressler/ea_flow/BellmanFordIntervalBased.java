@@ -21,11 +21,15 @@ package playground.dressler.ea_flow;
 
 // java imports
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.management.RuntimeErrorException;
+
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkImpl;
@@ -38,6 +42,7 @@ import playground.dressler.Interval.VertexInterval;
 import playground.dressler.Interval.VertexIntervals;
 import playground.dressler.control.FlowCalculationSettings;
 import playground.dressler.util.CPUTimer;
+import playground.dressler.util.Dijkstra;
 
 
 /**
@@ -84,6 +89,9 @@ public class BellmanFordIntervalBased {
 	 */
 
 	HashMap<Node, VertexInterval> _sourcelabels;
+	
+	HashMap<Id, Integer> _distforward = null;
+	HashMap<Id, Integer> _distreverse = null;	
 	
 	//private static int _warmstart;
 	//private LinkedList<Node> _warmstartlist;
@@ -1284,25 +1292,52 @@ public class BellmanFordIntervalBased {
 	 * @return maybe multiple TimeExpandedPath from active source(s) to the sink if it exists
 	 */
 	public List<TimeExpandedPath> doCalculationsForward() {
+	
 		if (_debug > 0) {
 		  System.out.println("Running BellmanFord in Forward mode.");
 		} else {
 			System.out.print(">");
 		}
 		
-		// queue to save nodes we have to scan
+		Tcalc.onoff();		
+		Tqueuetime.onoff();
+		// queue to save nodes we have to scan		
 		TaskQueue queue;
 		
-		if (this._settings.usePriorityQueue) {
-			// Dijsktra-like Priority Queue
-			queue = new PriorityTaskQueue(false);			
-		} else {
-			// simple queue for BFS
-			queue = new SimpleTaskQueue();
-		}
+		switch (this._settings.queueAlgo) {
+		  case FlowCalculationSettings.QUEUE_BFS:
+			  queue = new SimpleTaskQueue();
+			  break;
+		  case FlowCalculationSettings.QUEUE_DFS:
+			  queue = new PriorityTaskQueue(new TaskComparator());
+			  break;
+		  case FlowCalculationSettings.QUEUE_GUIDED:
+		  case FlowCalculationSettings.QUEUE_STATIC:
+			  
+			  // computing the distances is only needed once, because sinks always remain active
+			  if (this._distforward == null) {				  
+				  Dijkstra dijkstra = new Dijkstra(this._settings);
+				  //compute distances to sinks
+				  dijkstra.setStart(this._flow.getSinks()); 
+				  this._distforward = dijkstra.calcDistances(false, true);
+				  //System.out.println(this._distforward);
+			  }			  
+			  Comparator<BFTask> taskcomp;
+			  if (this._settings.queueAlgo == FlowCalculationSettings.QUEUE_GUIDED) {
+				 taskcomp = new TaskComparatorGuided(this._distforward);  
+			  } else {
+				 taskcomp = new TaskComparatorStaticGuide(this._distforward);
+			  }
+			  
+			  queue = new PriorityTaskQueue(taskcomp); 
+			  break;
+		  default:
+			  throw new RuntimeException("Unsupported Queue Algo!");
+		}		
 
 		//set fresh labels, initialize queue
 		refreshLabelsForward(queue);
+		Tqueuetime.onoff();
 		
 		//System.out.println(this._labels);
 		//System.out.println(this._sourcelabels);
@@ -1320,8 +1355,7 @@ public class BellmanFordIntervalBased {
 		BFTask task;
 
 		// main loop
-		
-		this.Tcalc.onoff();
+			
 		
 		while (true) {
 			//System.out.println("The queue is: ");
@@ -1507,19 +1541,50 @@ public class BellmanFordIntervalBased {
 			System.out.print("<");
 		}
 		
+		Tcalc.onoff();
+		Tqueuetime.onoff();
 		// queue to save nodes we have to scan
 		TaskQueue queue;
 		
-		if (this._settings.usePriorityQueue) {
-			// Dijsktra-like Priority Queue, but in reverse! latest first!
-			queue = new PriorityTaskQueue(true);			
-		} else {
-			// simple queue for BFS
-			queue = new SimpleTaskQueue();
-		}
-
+		switch (this._settings.queueAlgo) {
+		  case FlowCalculationSettings.QUEUE_BFS:
+			  queue = new SimpleTaskQueue();
+			  break;
+		  case FlowCalculationSettings.QUEUE_DFS:
+			  queue = new PriorityTaskQueue(new TaskComparatorReverse());
+			  break;
+		  case FlowCalculationSettings.QUEUE_GUIDED:
+		  case FlowCalculationSettings.QUEUE_STATIC:
+			
+			  // FIXME needs option to recalc these distances less often!
+			  
+			  Dijkstra dijkstra = new Dijkstra(this._settings);
+			  //compute distance to sources 
+							  
+			  for (Node node : this._flow.getSources()) {
+			    if (this._flow.isActiveSource(node)) {
+			    	dijkstra.setStart(node.getId());			   
+			    }
+			  }
+			  this._distreverse = dijkstra.calcDistances(true, false);
+			  //System.out.println(this._distreverse);
+				
+			  Comparator<BFTask> taskcomp;
+			  if (this._settings.queueAlgo == FlowCalculationSettings.QUEUE_GUIDED) {
+				 taskcomp = new TaskComparatorGuided(this._distreverse);  
+			  } else {
+				 taskcomp = new TaskComparatorStaticGuide(this._distreverse);
+			  }
+			  
+			  queue = new PriorityTaskQueue(taskcomp); 
+			  break;
+		  default:
+			  throw new RuntimeException("Unsupported Queue Algo!");
+		}		
+			
 		//set fresh labels, initialize queue
 		refreshLabelsReverse(queue);
+		Tqueuetime.onoff();
 		
 		//System.out.println(this._labels);
 		//System.out.println(this._sourcelabels);
@@ -1536,7 +1601,6 @@ public class BellmanFordIntervalBased {
 		// main loop
 		//int gain = 0;
 
-		this.Tcalc.onoff();
 		while (true) {
 			//System.out.println("The queue is: ");
 			//System.out.println(queue);
@@ -1544,8 +1608,10 @@ public class BellmanFordIntervalBased {
 			this._roundpolls++;
 			this._totalpolls++;			
 									
-			// gets the first task in the queue			
+			// gets the first task in the queue
+			Tqueuetime.onoff();
 			task = queue.poll();
+			Tqueuetime.onoff();
 			if (task == null) {
 				break;
 			}
@@ -1583,17 +1649,21 @@ public class BellmanFordIntervalBased {
 				
 				TaskQueue tempqueue = processSinkReverse(v, lastArrival); 
 
+				Tqueuetime.onoff();
 				if (tempqueue != null) {
 					queue.addAll(tempqueue);
 				}
+				Tqueuetime.onoff();
 				
 			} else 	if (task.node instanceof VirtualSource) {
 
 				TaskQueue tempqueue = processSourceReverse(v); 
 
+				Tqueuetime.onoff();
 				if (tempqueue != null) {
 					queue.addAll(tempqueue);
 				}
+				Tqueuetime.onoff();
 				
 			} else if (task.node instanceof VirtualNormalNode) {
 				
@@ -1614,9 +1684,11 @@ public class BellmanFordIntervalBased {
 					Pair<TaskQueue, Interval> ret = processNormalNodeReverse(v, low); 
 					TaskQueue tempqueue = ret.first;
 
+					Tqueuetime.onoff();
 					if (tempqueue != null) {
 						queue.addAll(tempqueue);
 					}
+					Tqueuetime.onoff();
 					low = ret.second.getHighBound() + 1;
 				}
 

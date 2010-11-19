@@ -58,6 +58,7 @@ public class DanielMain {
 		String imageBaseName = null;
 		boolean writeflow = false;
 		int uniformDemands = 0;
+		int goBackHowMany = 0;
 		
 		FlowCalculationSettings settings = new FlowCalculationSettings();
 		
@@ -144,6 +145,14 @@ public class DanielMain {
 					} else {
 						argsokay= false;
 						error += "--imagebasename requires an argument (truncated filename)\n";
+					}
+				}  else if (s.equals("--gobackhowmany")) {
+					i++;
+					if (i < args.length) {
+						goBackHowMany = Integer.parseInt(args[i]);
+					} else {
+						argsokay= false;
+						error += "--gobackhowmany requires an argument (int)\n";
 					}
 
 				}  else if (s.equals("--writeflow")) {
@@ -368,9 +377,8 @@ public class DanielMain {
 
 		// statistics
 		if (imageBaseName != null) {
-			// FIXME needs parameter
 			Partitioner partitioner = new Partitioner(settings);
-			partitioner.goBackHowMany = 0; 
+			partitioner.goBackHowMany = goBackHowMany; 
 			partitioner.determineStatistics(fluss.getPaths());
 			//partitioner.printStatistics();
 
