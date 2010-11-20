@@ -153,8 +153,8 @@ public class SocialCostCalculatrSingleLinkIITest extends TestCase {
 			time += 1;
 		}
 
-		AfterMobsimEvent ame = new AfterMobsimEvent(c, 1);
-		scalc.notifyAfterMobsim(ame);
+		// AfterMobsimEvent ame = new AfterMobsimEvent(c, 1);
+		// scalc.notifyAfterMobsim(ame);
 
 		// congestion end time 640
 		// soc cost = T*tbinsize - fstt;
@@ -235,8 +235,8 @@ public class SocialCostCalculatrSingleLinkIITest extends TestCase {
 			time += 1;
 		}
 
-		AfterMobsimEvent ame = new AfterMobsimEvent(c, 1);
-		scalc.notifyAfterMobsim(ame);
+		// AfterMobsimEvent ame = new AfterMobsimEvent(c, 1);
+		// scalc.notifyAfterMobsim(ame);
 
 		// congestion end time 640
 		// soc cost = T*tbinsize - fstt;
@@ -291,8 +291,8 @@ public class SocialCostCalculatrSingleLinkIITest extends TestCase {
 			events.processEvent(lle);
 		}
 
-		AfterMobsimEvent ame = new AfterMobsimEvent(c, 1);
-		scalc.notifyAfterMobsim(ame);
+		// AfterMobsimEvent ame = new AfterMobsimEvent(c, 1);
+		// scalc.notifyAfterMobsim(ame);
 		double costs = 0;
 		for (time = 0; time <= 24 * 3600; time += 180) {
 			costs += scalc.getLinkTravelCost(f.link0, time);
