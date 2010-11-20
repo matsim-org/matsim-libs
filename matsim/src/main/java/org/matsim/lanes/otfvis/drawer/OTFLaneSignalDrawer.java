@@ -239,7 +239,7 @@ public class OTFLaneSignalDrawer extends OTFGLDrawableImpl {
 				gl.glColor3d(1.0, 1.0, 0.8);
 				break;
 			case LINKSTART:
-				gl.glColor3d(0.0, 0.0, 1.0);
+				gl.glColor3d(1.0, 1.0, 0.8);
 				break;
 			default:
 				gl.glColor3d(1.0, 1.0, 0.8);
