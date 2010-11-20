@@ -33,6 +33,8 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.SignalSystemsConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.SignalGroupStateChangedEvent;
+import org.matsim.core.events.handler.SignalGroupStateChangedEventHandler;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.signalsystems.builder.FromDataBuilder;
@@ -54,7 +56,7 @@ import org.matsim.testcases.MatsimTestUtils;
  * @author dgrether
  */
 public class SignalSystemsOneAgentTest implements
-		LinkEnterEventHandler {
+		LinkEnterEventHandler, SignalGroupStateChangedEventHandler {
 
 	private static final Logger log = Logger.getLogger(SignalSystemsOneAgentTest.class);
 
@@ -171,6 +173,11 @@ public class SignalSystemsOneAgentTest implements
 
 	@Override
 	public void reset(int iteration) {
+	}
+
+	@Override
+	public void handleEvent(SignalGroupStateChangedEvent event) {
+		log.info("State changed : "  + event.getTime() + " " + event.getSignalSystemId() + " " + event.getSignalGroupId() + " " + event.getNewState());
 	}
 
 }
