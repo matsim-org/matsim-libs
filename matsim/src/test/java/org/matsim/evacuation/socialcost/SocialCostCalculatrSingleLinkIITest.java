@@ -299,7 +299,6 @@ public class SocialCostCalculatrSingleLinkIITest extends TestCase {
 		}
 
 		assertEquals(266112., costs);
-		System.out.println(apc.penalty);
 		assertEquals(-1728., apc.penalty, 0.000000001);
 	}
 
