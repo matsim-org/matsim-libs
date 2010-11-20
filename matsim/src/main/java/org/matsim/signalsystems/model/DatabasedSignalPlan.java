@@ -63,27 +63,38 @@ public class DatabasedSignalPlan implements SignalPlan {
 		
 		for (SignalGroupSettingsData sgdata : this.data.getSignalGroupSettingsDataByGroupId().values()){
 //			log.error("  SignalGroup " +  sgdata.getSignalGroupId());
-			int onset = sgdata.getOnset();
-			onset = (onset + offset) % this.cylce;
-			//onsets
-			List<Id> onsetsSgIds = this.secondInPlanOnsetsMap.get(onset);
-			if (onsetsSgIds == null){
-				onsetsSgIds = new ArrayList<Id>();
-				this.secondInPlanOnsetsMap.put(onset, onsetsSgIds);
+			//do nothing if onset == dropping or all time green is set
+			if (! ( (sgdata.getOnset() == sgdata.getDropping()) || 
+					(sgdata.getOnset() % this.cylce == 0 && sgdata.getDropping() % this.cylce == 0))){
+				int onset = sgdata.getOnset();
+				onset = (onset + offset) % this.cylce;
+				//onsets
+				List<Id> onsetsSgIds = this.secondInPlanOnsetsMap.get(onset);
+				if (onsetsSgIds == null){
+					onsetsSgIds = new ArrayList<Id>();
+					this.secondInPlanOnsetsMap.put(onset, onsetsSgIds);
+				}
+				onsetsSgIds.add(sgdata.getSignalGroupId());
+				//dropping
+				int dropping = sgdata.getDropping();
+				dropping = (dropping + offset) % this.cylce;
+				List<Id> droppingSgIds = this.secondInPlanDroppingsMap.get(dropping);
+				if (droppingSgIds == null){
+					droppingSgIds = new ArrayList<Id>();
+					this.secondInPlanDroppingsMap.put(dropping, droppingSgIds);
+				}
+				droppingSgIds.add(sgdata.getSignalGroupId());
 			}
-			onsetsSgIds.add(sgdata.getSignalGroupId());
-			//dropping
-			int dropping = sgdata.getDropping();
-			dropping = (dropping + offset) % this.cylce;
-			List<Id> droppingSgIds = this.secondInPlanDroppingsMap.get(dropping);
-			if (droppingSgIds == null){
-				droppingSgIds = new ArrayList<Id>();
-				this.secondInPlanDroppingsMap.put(dropping, droppingSgIds);
-			}
-			droppingSgIds.add(sgdata.getSignalGroupId());
 		}
-		
 	}
+	
+//	private void initSecond(double sec){
+//		double sec_in_plan = sec % this.cylce;
+//		for (int i = 0; i <= sec_in_plan; i++){
+//			this.secondInPlanDroppingsMap.get(i);
+//		}
+//	}
+//	
 
 	@Override
 	public List<Id> getDroppings(double timeSeconds) {
