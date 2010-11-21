@@ -523,10 +523,11 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 	 * @param link the link where the agent departs
 	 */
 	@Override
-	public void arrangeAgentDeparture(final PlanAgent agent, final Id linkId) {
+	public void arrangeAgentDeparture(final PlanAgent agent) {
 		double now = this.getSimTimer().getTimeOfDay() ;
 		Leg leg = agent.getCurrentLeg();
 		String mode = leg.getMode();
+		Id linkId = agent.getCurrentLinkId() ;
 		events.processEvent( events.getFactory().createAgentDepartureEvent( now, agent.getId(), linkId, leg.getMode() ) ) ;
 		if (this.notTeleportedModes.contains(mode)){
 			this.handleKnownLegModeDeparture(now, agent, linkId, mode);

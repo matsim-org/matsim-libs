@@ -96,7 +96,7 @@ public class QVehicleImpl implements QVehicle {
 	
 	@Override
 	public String toString() {
-		return "Vehicle Id " + getId() + ", driven by (personId) " + this.driver.getPerson().getId()
+		return "Vehicle Id " + getId() + ", driven by (personId) " + this.driver.getId()
 				+ ", on link " + this.currentLink.getId();
 	}
 	

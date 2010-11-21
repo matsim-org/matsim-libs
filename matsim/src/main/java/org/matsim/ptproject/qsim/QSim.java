@@ -514,11 +514,12 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 	// Now a PlanAgent, which makes more sense (I think). kai, nov'10
 	// yy Since this is now by force a PlanAgent, one could replace arrangeAgentDeparture and
 	// scheduleActivityEnd by joint startPlanElement.  kai, nov'10
-	public final void arrangeAgentDeparture(final PlanAgent agent, final Id linkId) {
+	public final void arrangeAgentDeparture(final PlanAgent agent) {
 		double now = this.getSimTimer().getTimeOfDay() ;
 		Leg leg = agent.getCurrentLeg();
 //		Route route = leg.getRoute();
 		String mode = leg.getMode();
+		Id linkId = agent.getCurrentLinkId() ;
 		events.processEvent(events.getFactory().createAgentDepartureEvent(now, agent.getId(), linkId, mode ));
 		if (handleKnownLegModeDeparture(now, agent, linkId, leg)) {
 			return;

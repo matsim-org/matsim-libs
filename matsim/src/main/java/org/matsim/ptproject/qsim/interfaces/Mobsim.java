@@ -21,7 +21,6 @@ package org.matsim.ptproject.qsim.interfaces;
 
 import java.util.Collection;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.IOSimulation;
@@ -92,7 +91,7 @@ import org.matsim.ptproject.qsim.agents.AgentFactory;
  */
 public interface Mobsim extends IOSimulation, ObservableSimulation {
 
-	void arrangeAgentDeparture(PlanAgent planAgent, Id startLinkId);
+	void arrangeAgentDeparture(PlanAgent planAgent);
 
 	EventsManager getEventsManager();
 

@@ -25,6 +25,7 @@ import java.util.List;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.ptproject.qsim.interfaces.Mobsim;
 
@@ -41,9 +42,10 @@ public class ExperimentalBasicWithindayAgent extends PersonDriverAgentImpl imple
 		super(p, simulation);
 	}
 
-	public final List<PlanElement> getModifiablePlanElements() {
-		return this.person.getSelectedPlan().getPlanElements() ;
-	}
+//	public final List<PlanElement> getModifiablePlanElements() {
+//		return this.person.getSelectedPlan().getPlanElements() ;
+//	}
+	// use getModifiablePlan.  kai, nov'10
 
 	@Override
 	public final Integer getCurrentPlanElementIndex() {
@@ -73,6 +75,11 @@ public class ExperimentalBasicWithindayAgent extends PersonDriverAgentImpl imple
 	@Override
 	public final void resetCaches() {
 		super.resetCaches() ;
+	}
+	
+	public final Plan getModifiablePlan() {
+		// yyyy for the time being, this returns the Person's selected plan, but this should be changed. kai, nov'10
+		return this.person.getSelectedPlan();
 	}
 
 }

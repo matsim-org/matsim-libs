@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
@@ -38,6 +39,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.ptproject.qsim.QSim;
@@ -166,7 +168,7 @@ public class PersonDriverAgentImpl implements PersonDriverAgent {
 		} else if (pe instanceof Leg) {
 
 			if ( flag ) {
-				this.simulation.arrangeAgentDeparture(this, this.currentLinkId);
+				this.simulation.arrangeAgentDeparture(this);
 				return true ;
 			} else {
 				log.error("The agent " + this.getId() + " returned false from advancePlan.  Removing the ag from the mobsim ...");
@@ -396,8 +398,8 @@ public class PersonDriverAgentImpl implements PersonDriverAgent {
 	 * Convenience method delegating to person's selected plan
 	 * @return list of {@link ActivityImpl}s and {@link LegImpl}s of this agent's plan
 	 */
-	public final List<PlanElement> getPlanElements() {
-		return Collections.unmodifiableList( this.person.getSelectedPlan().getPlanElements() );
+	private final List<PlanElement> getPlanElements() {
+		return Collections.unmodifiableList( this.getPlan().getPlanElements() ) ;
 	}
 	
 	public final Mobsim getMobsim(){
@@ -476,6 +478,10 @@ public class PersonDriverAgentImpl implements PersonDriverAgent {
 	@Override
 	public final Id getId() {
 		return this.person.getId();
+	}
+	
+	public final Plan getPlan() {
+		return PopulationUtils.unmodifiablePlan( this.person.getSelectedPlan() ) ;
 	}
 
 }

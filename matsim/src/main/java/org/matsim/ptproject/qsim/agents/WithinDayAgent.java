@@ -20,6 +20,7 @@
 
 package org.matsim.ptproject.qsim.agents;
 
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.mobsim.framework.PersonAgent;
 
 /*
@@ -33,4 +34,7 @@ public interface WithinDayAgent extends PersonAgent {
 	public Integer getCurrentPlanElementIndex();
 
 	public Integer getCurrentRouteLinkIdIndex();
+	
+	public Plan getModifiablePlan() ;
+
 }
