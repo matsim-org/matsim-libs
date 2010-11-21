@@ -42,6 +42,9 @@ import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
+import org.matsim.pt.qsim.PassengerAgent;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.agents.ExperimentalBasicWithindayAgent;
 import org.matsim.ptproject.qsim.interfaces.Mobsim;
 import org.matsim.ptproject.qsim.interfaces.NetsimLink;
@@ -53,7 +56,7 @@ import playground.christoph.withinday.utils.EditRoutes;
  * @author nagel
  *
  */
-public class MyMobsimListener implements SimulationListener, SimulationBeforeSimStepListener {
+public class WithinDayMobsimListener implements SimulationListener, SimulationBeforeSimStepListener {
     private static final Logger log = Logger.getLogger("dummy");
 
 	
@@ -62,7 +65,7 @@ public class MyMobsimListener implements SimulationListener, SimulationBeforeSim
 	private PlansCalcRoute routeAlgo ;
 	private Scenario scenario;
 
-	MyMobsimListener ( PersonalizableTravelCost travelCostCalculator, PersonalizableTravelTime travelTimeCalculator ) {
+	WithinDayMobsimListener ( PersonalizableTravelCost travelCostCalculator, PersonalizableTravelTime travelTimeCalculator ) {
 		this.travCostCalc = travelCostCalculator ;
 		this.travTimeCalc = travelTimeCalculator ;
 	}
@@ -118,10 +121,9 @@ public class MyMobsimListener implements SimulationListener, SimulationBeforeSim
 		}
 		ExperimentalBasicWithindayAgent withindayAgent = (ExperimentalBasicWithindayAgent) personAgent ;
 		
-		Person person = withindayAgent.getPerson();
-		Plan selectedPlan = person.getSelectedPlan();
+		Plan plan = withindayAgent.getModifiablePlan() ;
 
-		if (selectedPlan == null) {
+		if (plan == null) {
 			log.info( " we don't have a selected plan; returning ... ") ;
 			return false;
 		}
@@ -134,16 +136,14 @@ public class MyMobsimListener implements SimulationListener, SimulationBeforeSim
 			return false;
 		}
 		
-		List<PlanElement> planElements = withindayAgent.getModifiablePlanElements() ;
+		List<PlanElement> planElements = plan.getPlanElements() ;
 		final Integer planElementsIndex = withindayAgent.getCurrentPlanElementIndex() ;
 		
 		if ( !(planElements.get(planElementsIndex+1) instanceof Activity || !(planElements.get(planElementsIndex+2) instanceof Leg)) ) {
 			log.error( "this version of withinday replanning cannot deal with plans where legs and acts to not alternate; returning ...") ;
 			return false ;
 		}
-		Activity nextActivity = (Activity) planElements.get(planElementsIndex+1) ;
-		Leg legAfterNextActivity = (Leg) planElements.get(planElementsIndex+2) ;
-		
+
 		// now the real work begins:
 
 		ActivityImpl newAct = new ActivityImpl("w", this.scenario.createId("22"));
@@ -151,21 +151,60 @@ public class MyMobsimListener implements SimulationListener, SimulationBeforeSim
 		
 		planElements.set( planElementsIndex+1, newAct ) ;
 		
-		new EditRoutes().replanCurrentLegRoute(selectedPlan, planElementsIndex, 
+		// =============================================================================================================
+		// =============================================================================================================
+		// EditRoutes at this point only works for car routes
+		
+		// new Route for current Leg. yyyy should be static
+		new EditRoutes().replanCurrentLegRoute(plan, planElementsIndex, 
 				withindayAgent.getCurrentRouteLinkIdIndex(), routeAlgo, this.scenario.getNetwork(), now) ;
-		// yyyy possibly easier to pass the PlanElements (easier to differentiate between modifiable/
-		// unmodifiable
 		
 		// ( compiles, but does not run, since agents are (deliberately) not instantiated as withindayreplanningagents.  kai, oct'10 )
 		// Adapted code, WithinDayPersonAgents are now only needed if they have to handle WithinDayReplanners. cdobler, oct'10
+		// not tested.  kai, nov'10
 		
+		// the route _from_ the modified activity also needs to be replanned:
+		new EditRoutes().replanFutureLegRoute(plan, planElementsIndex+1, routeAlgo);
 		
-		// new Route for next Leg. yyyy should be static and based on the index, but this is not the real problem 
-		int homeLegindex = planElementsIndex+2;
-//		Leg homeLeg = (Leg) planElements.get( homeLegindex ) ;
-		new EditRoutes().replanFutureLegRoute(selectedPlan, homeLegindex, routeAlgo);
-		
+		// =============================================================================================================
+		// =============================================================================================================
 		// since this is a use case, let us enumerate relevant data structure operations:
+		
+		// (I) @ activity:
+		double oldTime = -1. ;
+		double newTime = -1. ;
+		mobsim.rescheduleActivityEnd(withindayAgent, oldTime, newTime) ;
+		// might be nice to be able to actively remove the agent from the activity, but this is strictly 
+		// speaking not necessary since the departure can be scheduled for immediately.  kai, nov'10
+		
+		// (II) car leg
+
+		// (a) inside vehicle and waiting to get inside traffic
+		// at this point, there is no replanning implemented for this situation.  kai, nov'10
+		
+		// (b) on link and changing arrival to arrival on current link
+		// I think you do this by changing the destinationLinkId in the driver and then reset the caches.
+		// But I am not sure.  kai, nov'10
+		
+		// (c) on link and changing next link
+		// re-program chooseNextLinkId() ;
+		
+		// (III) pt leg
+		
+		// (a) waiting for pt and changing the desired line:
+		// can be done via reprogramming getEnterTransitRoute() ;
+		
+		// (b) aborting a wait for pt:
+		TransitStopFacility stop = null ;
+		((QSim)mobsim).getTransitEngine().getAgentTracker().removeAgentFromStop((PassengerAgent)withindayAgent, stop) ;
+		// after this, it needs to start something else, e.g.:
+		mobsim.scheduleActivityEnd(withindayAgent) ;
+		// or
+		mobsim.arrangeAgentDeparture(withindayAgent) ;
+		
+		// (c) while inside vehicle and changing the desired stop to get off:
+		// can be done via reprogramming getExitAtStop() ;
+		
 		
 		
 		// finally reset the cached Values of the PersonAgent - they may have changed!

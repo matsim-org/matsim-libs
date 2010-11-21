@@ -34,7 +34,7 @@ public class YoungPeopleIdentifier extends DuringLegIdentifier {
 //			for (QVehicle vehicle : link.getVehQueue()) {
 				for (QVehicle vehicle : link.getAllNonParkedVehicles()) {
 				PersonDriverAgent agent=vehicle.getDriver();
-				System.out.println(agent.getPerson().getId());
+				System.out.println(agent.getId());
 				if (((PersonImpl) agent.getPerson()).getAge() == 18) {
 					System.out.println("found agent");
 					set.add((WithinDayAgent)agent);

@@ -396,7 +396,7 @@ public class SimpleRouterControler extends Controler {
 			for (MobsimAgent mobsimAgent : ((WithinDayQSim) sim).getAgents()) {
 				if (mobsimAgent instanceof PersonAgent) {
 					PersonAgent personAgent = (PersonAgent) mobsimAgent;
-					withinDayPersonAgents.put(personAgent.getPerson().getId(), (WithinDayPersonAgent) personAgent);
+					withinDayPersonAgents.put(personAgent.getId(), (WithinDayPersonAgent) personAgent);
 				} else {
 					log.warn("MobsimAgent was expected to be from type PersonAgent, but was from type " + mobsimAgent.getClass().toString());
 				}

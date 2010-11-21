@@ -336,11 +336,12 @@ public class Sim2D implements Mobsim {
 	 * .mobsim.framework.PersonAgent, org.matsim.api.core.v01.Id)
 	 */
 	@Override
-	public void arrangeAgentDeparture(PlanAgent agent, Id linkId) {
+	public void arrangeAgentDeparture(PlanAgent agent) {
 		double now = getSimTimer().getTimeOfDay();
 		Leg leg = agent.getCurrentLeg();
 		// Route route = leg.getRoute();
 		String mode = leg.getMode();
+		Id linkId = agent.getCurrentLinkId() ;
 		this.events.processEvent(this.events.getFactory().createAgentDepartureEvent(now, agent.getId(), linkId, mode));
 		if (handleKnownLegModeDeparture(now, agent, linkId, leg)) {
 			return;

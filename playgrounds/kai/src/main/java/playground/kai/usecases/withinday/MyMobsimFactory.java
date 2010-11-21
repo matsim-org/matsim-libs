@@ -50,7 +50,7 @@ public class MyMobsimFactory implements MobsimFactory {
 		
 		Mobsim mobsim = new QSim( sc, events ) ;
 		
-		mobsim.addQueueSimulationListeners(new MyMobsimListener(this.travCostCalc,this.travTimeCalc)) ;
+		mobsim.addQueueSimulationListeners(new WithinDayMobsimListener(this.travCostCalc,this.travTimeCalc)) ;
 		
 		mobsim.setAgentFactory( new ExperimentalBasicWithindayAgentFactory(mobsim) ) ;
 		

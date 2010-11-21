@@ -115,7 +115,7 @@ public class LinkReplanningMap implements LinkEnterEventHandler,
 			for (MobsimAgent mobsimAgent : ((QSim)sim).getAgents()) {
 				if (mobsimAgent instanceof PersonAgent) {
 					PersonAgent personAgent = (PersonAgent) mobsimAgent;
-					personAgentMapping.put(personAgent.getPerson().getId(), personAgent);
+					personAgentMapping.put(personAgent.getId(), personAgent);
 				}
 			}
 		}
