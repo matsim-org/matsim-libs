@@ -22,10 +22,10 @@ package playground.kai.usecases.withinday;
 import org.matsim.core.controler.Controler;
 import org.matsim.testcases.MatsimTestCase;
 
-public class EquilTest extends MatsimTestCase {
+public class EquilTest {
 
-	public void testScenario(){		
-		final Controler controler = new Controler(this.loadConfig(this.getInputDirectory() + "config.xml"));
+	public static void main(String[] args){		
+		final Controler controler = new Controler("examples/config.xml");
 		controler.setOverwriteFiles(true);
 		controler.addControlerListener(new MyControlerListener()) ;
 		controler.run();
