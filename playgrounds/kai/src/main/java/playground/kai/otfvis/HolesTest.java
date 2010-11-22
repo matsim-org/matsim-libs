@@ -1,5 +1,6 @@
 /* *********************************************************************** *
- * project: org.matsim.*
+ * project: kai
+ * HolesTest.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,17 +18,25 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.kai.usecases.withinday;
+package playground.kai.otfvis;
 
 import org.matsim.core.controler.Controler;
 
-public class EquilTest {
+/**
+ * @author nagel
+ *
+ */
+public class HolesTest {
 
-	public static void main(String[] args){		
-		final Controler controler = new Controler("examples/config/withinday-config.xml");
-		controler.setOverwriteFiles(true);
-		controler.addControlerListener(new MyControlerListener()) ;
-		controler.run();
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		Controler controler = new Controler( "examples/config/holes-config.xml" ) ;
+		controler.setOverwriteFiles( true ) ;
+		controler.run() ;
+		
+		org.matsim.run.OTFVis.main( new String[] {"output/holes/ITERS/it.0/0.otfvis.mvi"} ) ;
 	}
 
 }

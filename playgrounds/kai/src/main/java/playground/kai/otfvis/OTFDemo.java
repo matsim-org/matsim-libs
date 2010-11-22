@@ -61,8 +61,7 @@ public class OTFDemo {
 //		// manuel
 //		org.matsim.run.OTFVis.main(new String[] {"../shared-svn/studies/schweiz-ivtch/pt-experimental/config.xml"}) ;
 		
-		
-
+		org.matsim.run.OTFVis.main( new String[] {"examples/holes-config.xml"} ) ;
 	}
 
 }
