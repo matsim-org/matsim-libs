@@ -187,11 +187,13 @@ public final class AgentSnapshotInfoBuilder {
 		double lastDistance = Double.POSITIVE_INFINITY;
 		double ttfs = link.getLength() / link.getFreespeed(now);
 		for (QVehicle veh : vehQueue) {
+			boolean inQueue = false ;
 			double travelTime = now - veh.getLinkEnterTime();
 			double distanceOnLink = (ttfs == 0.0 ? 0.0	: ((travelTime / ttfs) * linkLength));
 			if (distanceOnLink > queueEnd) { // vehicle is already in queue
 				distanceOnLink = queueEnd;
 				queueEnd -= vehSpacing;
+				inQueue = true ;
 			}
 			if (distanceOnLink >= lastDistance) {
 				/*
@@ -207,6 +209,14 @@ public final class AgentSnapshotInfoBuilder {
 			}
 			int cmp = (int) (veh.getEarliestLinkExitTime() + inverseSimulatedFlowCapacity + 2.0);
 			double speedValueBetweenZeroAndOne = (now > cmp) ? 0.0 : 1.0 ;
+			if ("withHolesExperimental".equalsIgnoreCase(this.snapshotStyle)){
+				if ( inQueue ) {
+					speedValueBetweenZeroAndOne = 0. ;
+					// yy could be something more realistic than 0.  kai, nov'10
+				} else {
+					speedValueBetweenZeroAndOne = 1. ;
+				}
+			}
 			int lane;
 			if (laneNumber == null){
 				lane  = calculateLane(veh, NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link));

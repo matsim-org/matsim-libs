@@ -61,11 +61,11 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 	// static variables (no problem with memory)
 	final private static Logger log = Logger.getLogger(QLinkImpl.class);
 	private static int spaceCapWarningCount = 0;
-	private static final boolean HOLES = false ;
+	static boolean HOLES = false ; // can be set from elsewhere in package, but not from outside.  kai, nov'10
 	private static int congDensWarnCnt = 0;
 	private static int congDensWarnCnt2 = 0;
 
-	// dynamic variables (problem with memory)
+	// instance variables (problem with memory)
 	private final Queue<QItem> holes = new LinkedList<QItem>() ;
 
 

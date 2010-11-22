@@ -59,36 +59,44 @@ public class QSimEngineImpl extends QSimEngineInternalI {
 	/*package*/  ArrayList<QLinkInternalI> simActivateThis = new ArrayList<QLinkInternalI>();
 
 	private final Random random;
-  private final QSim qsim;
+	private final QSim qsim;
 
-  private final AgentSnapshotInfoBuilder positionInfoBuilder;
-private QNetwork qNetwork;
-private final double stucktimeCache;
+	private final AgentSnapshotInfoBuilder positionInfoBuilder;
+	private QNetwork qNetwork;
+	private final double stucktimeCache;
 
 	public QSimEngineImpl(final QSim sim, final Random random) {
-    this.random = random;
-    this.qsim = sim;
-    this.positionInfoBuilder = new AgentSnapshotInfoBuilder( sim.getScenario() );
-    this.stucktimeCache = sim.getScenario().getConfig().getQSimConfigGroup().getStuckTime();
+		this.random = random;
+		this.qsim = sim;
+		this.positionInfoBuilder = new AgentSnapshotInfoBuilder( sim.getScenario() );
+		this.stucktimeCache = sim.getScenario().getConfig().getQSimConfigGroup().getStuckTime();
+		if ( "queue".equals( sim.getScenario().getConfig().getQSimConfigGroup().getTrafficDynamics() ) ) {
+			QLinkImpl.HOLES=false ;
+		} else if ( "withHolesExperimental".equals( sim.getScenario().getConfig().getQSimConfigGroup().getTrafficDynamics() ) ) {
+			QLinkImpl.HOLES = true ;
+		} else {
+			throw new RuntimeException("trafficDynamics defined in config that does not exist: " 
+					+ sim.getScenario().getConfig().getQSimConfigGroup().getTrafficDynamics() ) ;
+		}
 	}
 
-  @Override
-  public void onPrepareSim() {
-    this.allLinks = new ArrayList<QLinkInternalI>(this.getQNetwork().getNetsimLinks().values());
-    this.simNodesArray = this.qsim.getNetsimNetwork().getNetsimNodes().values().toArray(new QNode[this.qsim.getNetsimNetwork().getNetsimNodes().values().size()]);
-    //dg[april08] as the order of nodes has an influence on the simulation
-    //results they are sorted to avoid indeterministic simulations
-    Arrays.sort(this.simNodesArray, new Comparator<QNode>() {
-      @Override
+	@Override
+	public void onPrepareSim() {
+		this.allLinks = new ArrayList<QLinkInternalI>(this.getQNetwork().getNetsimLinks().values());
+		this.simNodesArray = this.qsim.getNetsimNetwork().getNetsimNodes().values().toArray(new QNode[this.qsim.getNetsimNetwork().getNetsimNodes().values().size()]);
+		//dg[april08] as the order of nodes has an influence on the simulation
+		//results they are sorted to avoid indeterministic simulations
+		Arrays.sort(this.simNodesArray, new Comparator<QNode>() {
+			@Override
 			public int compare(final QNode o1, final QNode o2) {
-        return o1.getNode().getId().compareTo(o2.getNode().getId());
-      }
-    });
-    if (simulateAllLinks) {
-      this.simLinksArray.addAll(this.allLinks);
-    }
+				return o1.getNode().getId().compareTo(o2.getNode().getId());
+			}
+		});
+		if (simulateAllLinks) {
+			this.simLinksArray.addAll(this.allLinks);
+		}
 
-  }
+	}
 
 
 	@Override
@@ -146,7 +154,7 @@ private final double stucktimeCache;
 		}
 	}
 
-//	@Override
+	//	@Override
 	@Override
 	protected void activateLink(final QLinkInternalI link) {
 		if (!simulateAllLinks) {
@@ -169,30 +177,30 @@ private final double stucktimeCache;
 		return this.simLinksArray.size();
 	}
 
-  @Override
-  public QSim getMobsim() {
-    return this.qsim;
-  }
+	@Override
+	public QSim getMobsim() {
+		return this.qsim;
+	}
 
-  @Override
-protected AgentSnapshotInfoBuilder getAgentSnapshotInfoBuilder(){
-  	return this.positionInfoBuilder;
-  }
+	@Override
+	protected AgentSnapshotInfoBuilder getAgentSnapshotInfoBuilder(){
+		return this.positionInfoBuilder;
+	}
 
-public void setQNetwork(QNetwork qNetwork2) {
-	this.qNetwork = qNetwork2 ;
-}
+	public void setQNetwork(QNetwork qNetwork2) {
+		this.qNetwork = qNetwork2 ;
+	}
 
-@Override
-public QNetwork getQNetwork() {
-	return this.qNetwork ;
-}
+	@Override
+	public QNetwork getQNetwork() {
+		return this.qNetwork ;
+	}
 
-/**
- * convenience method so that stuck time can be cached without caching it in every node separately.  kai, jun'10
- */
-double getStuckTime() {
-	return this.stucktimeCache ;
-}
+	/**
+	 * convenience method so that stuck time can be cached without caching it in every node separately.  kai, jun'10
+	 */
+	double getStuckTime() {
+		return this.stucktimeCache ;
+	}
 
 }

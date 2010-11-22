@@ -43,7 +43,8 @@ public class QSimConfigGroup extends Module {
 	private static final String STORAGE_CAPACITY_FACTOR = "storageCapacityFactor";
 	private static final String STUCK_TIME = "stuckTime";
 	private static final String REMOVE_STUCK_VEHICLES = "removeStuckVehicles";
-  private static final String NUMBER_OF_THREADS = "numberOfThreads";
+	private static final String NUMBER_OF_THREADS = "numberOfThreads";
+	private static final String TRAFFIC_DYNAMICS = "trafficDynamics" ;
 
 	private double startTime = Time.UNDEFINED_TIME;
 	private double endTime = Time.UNDEFINED_TIME;
@@ -55,8 +56,8 @@ public class QSimConfigGroup extends Module {
 	private double stroageCapFactor = 1.0;
 	private double stuckTime = 100;
 	private boolean removeStuckVehicles = true;
-
-  private int numberOfThreads = 1;
+	private int numberOfThreads = 1;
+	private String trafficDynamics = "queue" ;
 
 	public QSimConfigGroup() {
 		super(GROUP_NAME);
@@ -86,6 +87,8 @@ public class QSimConfigGroup extends Module {
 			setRemoveStuckVehicles(Boolean.parseBoolean(value));
 		} else if (NUMBER_OF_THREADS.equals(key)){
 		  setNumberOfThreads(Integer.parseInt(value));
+		} else if (TRAFFIC_DYNAMICS.equals(key)) {
+			setTrafficDynamics(value) ;
 		}	else {
 			throw new IllegalArgumentException(key);
 		}
@@ -116,6 +119,8 @@ public class QSimConfigGroup extends Module {
 			return (isRemoveStuckVehicles() ? "true" : "false");
 		} else if (NUMBER_OF_THREADS.equals(key)) {
 		  return String.valueOf(this.getNumberOfThreads());
+		} else if (TRAFFIC_DYNAMICS.equals(key)) {
+			return getTrafficDynamics() ;
 		}	else {
 			throw new IllegalArgumentException(key);
 		}
@@ -135,6 +140,7 @@ public class QSimConfigGroup extends Module {
 		map.put(STUCK_TIME, getValue(STUCK_TIME));
 		map.put(REMOVE_STUCK_VEHICLES, getValue(REMOVE_STUCK_VEHICLES));
 		map.put(NUMBER_OF_THREADS, getValue(NUMBER_OF_THREADS));
+		map.put(TRAFFIC_DYNAMICS, getValue(TRAFFIC_DYNAMICS)) ;
 		return map;
 	}
 	
@@ -147,11 +153,12 @@ public class QSimConfigGroup extends Module {
 	@Override
 	public final Map<String, String> getComments() {
 		Map<String,String> map = super.getComments();
-		map.put(SNAPSHOT_STYLE,"snapshotStyle: `equiDist' (vehicles equidistant on link) or `queue' (vehicles queued at end of link)");
+		map.put(SNAPSHOT_STYLE,"snapshotStyle: `equiDist' (vehicles equidistant on link) or `queue' (vehicles queued at end of link) or `withHolesExperimental' (experimental!!)");
 		map.put(NUMBER_OF_THREADS, "Use number of threads > 1 for parallel version using the specified number of threads");
 		map.put(SNAPSHOT_FORMAT, "Comma-separated list of visualizer output file formats.  'plansfile', `transims', `googleearth', and `otfvis'.  'netvis' is, I think, no longer possible.") ;
 		map.put(REMOVE_STUCK_VEHICLES, REMOVE_STUCK_VEHICLES_STRING ) ;
 		map.put(STUCK_TIME, STUCK_TIME_STRING ) ;
+		map.put(TRAFFIC_DYNAMICS, "`queue' for the standard queue model, `withHolesExperimental' (experimental!!) for the queue model with holes") ;
 		return map ;
 	}
 	/* direct access */
@@ -238,13 +245,27 @@ public class QSimConfigGroup extends Module {
 	/** See {@link #getComments()} for options. */
 	public void setSnapshotStyle(final String style) {
 		this.snapshotStyle = style.intern();
-		if (!"equiDist".equals(this.snapshotStyle) && !"queue".equals(this.snapshotStyle)) {
-			Logger.getLogger(this.getClass()).warn("The snapshotStyle \"" + style + "\" is not one of the known ones (queue, equiDist).");
+		if (!"equiDist".equals(this.snapshotStyle) && !"queue".equals(this.snapshotStyle) 
+				&& !"withHolesExperimental".equals(this.snapshotStyle) ) {
+			Logger.getLogger(this.getClass()).warn("The snapshotStyle \"" + style + "\" is not one of the known ones. "
+					+ "See comment in config dump of log file for allowed styles.");
 		}
 	}
 
 	public String getSnapshotStyle() {
 		return this.snapshotStyle;
+	}
+	
+	public void setTrafficDynamics(final String str) {
+		this.trafficDynamics = str ;
+		if ( !"queue".equals(this.trafficDynamics) && !"withHolesExperimental".equals(this.trafficDynamics) ) {
+			Logger.getLogger(this.getClass()).warn("The trafficDynamics \"" + str + "\" is ot one of the known ones. "
+					+ "See comment in config dump of log file for allowed styles." ) ;
+		}
+	}
+	
+	public String getTrafficDynamics() {
+		return this.trafficDynamics ;
 	}
 
   public int getNumberOfThreads() {
