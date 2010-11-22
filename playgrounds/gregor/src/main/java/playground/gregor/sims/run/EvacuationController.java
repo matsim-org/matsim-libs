@@ -156,7 +156,7 @@ public class EvacuationController extends Controler {
 		initPluggableTravelCostCalculator();
 
 		if (this.ec.useSocialCostCalculatorII()) {
-			SocialCostCalculatorSingleLinkII sc = new SocialCostCalculatorSingleLinkII(this.network, getConfig().travelTimeCalculator().getTraveltimeBinSize(), getEvents());
+			SocialCostCalculatorSingleLinkII sc = new SocialCostCalculatorSingleLinkII(this.scenarioData, getEvents());
 			this.pluggableTravelCost.addTravelCost(sc);
 			this.events.addHandler(sc);
 			this.strategyManager = loadStrategyManager();
