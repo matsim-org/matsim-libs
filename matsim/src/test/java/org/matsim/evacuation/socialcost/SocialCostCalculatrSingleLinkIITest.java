@@ -20,7 +20,6 @@
 package org.matsim.evacuation.socialcost;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -29,22 +28,23 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.AgentMoneyEvent;
 import org.matsim.core.api.experimental.events.handler.AgentMoneyEventHandler;
+import org.matsim.core.config.Module;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
-import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.evacuation.socialcost.SocialCostCalculatorSingleLinkTest.Vehicle;
+import org.matsim.evacuation.config.EvacuationConfigGroup;
 
 import junit.framework.TestCase;
 
 /**
  * @author laemmel
  * 
+ *         TODO MSA test
  */
 public class SocialCostCalculatrSingleLinkIITest extends TestCase {
 
@@ -54,8 +54,10 @@ public class SocialCostCalculatrSingleLinkIITest extends TestCase {
 
 		EventsManagerImpl events = new EventsManagerImpl();
 
-		SocialCostCalculatorSingleLinkII scalc = new SocialCostCalculatorSingleLinkII(f.network, 60, events);
-		scalc.notifyIterationStarts(new IterationStartsEvent(c, 1));
+		f.sc.getConfig().travelTimeCalculator().setTraveltimeBinSize(60);
+		SocialCostCalculatorSingleLinkII scalc = new SocialCostCalculatorSingleLinkII(f.sc, events);
+
+		scalc.notifyBeforeMobsim(new BeforeMobsimEvent(c, 1));
 
 		events.addHandler(scalc);
 
@@ -76,8 +78,8 @@ public class SocialCostCalculatrSingleLinkIITest extends TestCase {
 
 			time++;
 		}
-		IterationStartsEvent iss = new IterationStartsEvent(c, 1);
-		scalc.notifyIterationStarts(iss);
+
+		scalc.notifyAfterMobsim(new AfterMobsimEvent(c, 1));
 
 		double costs = 0.;
 		for (; time >= 0; time--) {
@@ -94,16 +96,15 @@ public class SocialCostCalculatrSingleLinkIITest extends TestCase {
 
 		EventsManagerImpl events = new EventsManagerImpl();
 
-		SocialCostCalculatorSingleLinkII scalc = new SocialCostCalculatorSingleLinkII(f.network, 5, events);
-		scalc.notifyIterationStarts(new IterationStartsEvent(c, 1));
+		f.sc.getConfig().travelTimeCalculator().setTraveltimeBinSize(5);
+		SocialCostCalculatorSingleLinkII scalc = new SocialCostCalculatorSingleLinkII(f.sc, events);
 
 		AgentPenaltyCalculator apc = new AgentPenaltyCalculator();
 
 		events.addHandler(scalc);
 		events.addHandler(apc);
 
-		IterationStartsEvent iss = new IterationStartsEvent(c, 1);
-		scalc.notifyIterationStarts(iss);
+		scalc.notifyBeforeMobsim(new BeforeMobsimEvent(c, 1));
 
 		BeforeMobsimEvent bme = new BeforeMobsimEvent(c, 1);
 		scalc.notifyBeforeMobsim(bme);
@@ -153,8 +154,7 @@ public class SocialCostCalculatrSingleLinkIITest extends TestCase {
 			time += 1;
 		}
 
-		// AfterMobsimEvent ame = new AfterMobsimEvent(c, 1);
-		// scalc.notifyAfterMobsim(ame);
+		scalc.notifyAfterMobsim(new AfterMobsimEvent(c, 1));
 
 		// congestion end time 640
 		// soc cost = T*tbinsize - fstt;
@@ -176,19 +176,15 @@ public class SocialCostCalculatrSingleLinkIITest extends TestCase {
 
 		EventsManagerImpl events = new EventsManagerImpl();
 
-		SocialCostCalculatorSingleLinkII scalc = new SocialCostCalculatorSingleLinkII(f.network, 5, events);
-		scalc.notifyIterationStarts(new IterationStartsEvent(c, 1));
+		f.sc.getConfig().travelTimeCalculator().setTraveltimeBinSize(5);
+		SocialCostCalculatorSingleLinkII scalc = new SocialCostCalculatorSingleLinkII(f.sc, events);
 
 		AgentPenaltyCalculator apc = new AgentPenaltyCalculator();
 
 		events.addHandler(scalc);
 		events.addHandler(apc);
 
-		IterationStartsEvent iss = new IterationStartsEvent(c, 1);
-		scalc.notifyIterationStarts(iss);
-
-		BeforeMobsimEvent bme = new BeforeMobsimEvent(c, 1);
-		scalc.notifyBeforeMobsim(bme);
+		scalc.notifyBeforeMobsim(new BeforeMobsimEvent(c, 1));
 
 		double time = 0;
 		Queue<Vehicle> vehQueue = new ConcurrentLinkedQueue<Vehicle>();
@@ -235,8 +231,7 @@ public class SocialCostCalculatrSingleLinkIITest extends TestCase {
 			time += 1;
 		}
 
-		// AfterMobsimEvent ame = new AfterMobsimEvent(c, 1);
-		// scalc.notifyAfterMobsim(ame);
+		scalc.notifyAfterMobsim(new AfterMobsimEvent(c, 1));
 
 		// congestion end time 640
 		// soc cost = T*tbinsize - fstt;
@@ -259,19 +254,15 @@ public class SocialCostCalculatrSingleLinkIITest extends TestCase {
 
 		EventsManagerImpl events = new EventsManagerImpl();
 
-		SocialCostCalculatorSingleLinkII scalc = new SocialCostCalculatorSingleLinkII(f.network, 180, events);
-		scalc.notifyIterationStarts(new IterationStartsEvent(c, 1));
+		f.sc.getConfig().travelTimeCalculator().setTraveltimeBinSize(180);
+		SocialCostCalculatorSingleLinkII scalc = new SocialCostCalculatorSingleLinkII(f.sc, events);
 
 		AgentPenaltyCalculator apc = new AgentPenaltyCalculator();
 
 		events.addHandler(scalc);
 		events.addHandler(apc);
 
-		IterationStartsEvent iss = new IterationStartsEvent(c, 1);
-		scalc.notifyIterationStarts(iss);
-
-		BeforeMobsimEvent bme = new BeforeMobsimEvent(c, 1);
-		scalc.notifyBeforeMobsim(bme);
+		scalc.notifyBeforeMobsim(new BeforeMobsimEvent(c, 1));
 
 		double time = 0;
 		Queue<Vehicle> vehQueue = new ConcurrentLinkedQueue<Vehicle>();
@@ -291,8 +282,8 @@ public class SocialCostCalculatrSingleLinkIITest extends TestCase {
 			events.processEvent(lle);
 		}
 
-		// AfterMobsimEvent ame = new AfterMobsimEvent(c, 1);
-		// scalc.notifyAfterMobsim(ame);
+		scalc.notifyAfterMobsim(new AfterMobsimEvent(c, 1));
+
 		double costs = 0;
 		for (time = 0; time <= 24 * 3600; time += 180) {
 			costs += scalc.getLinkTravelCost(f.link0, time);
@@ -330,6 +321,9 @@ public class SocialCostCalculatrSingleLinkIITest extends TestCase {
 
 		public Fixture() {
 			this.sc = new ScenarioImpl();
+			Module m = new Module("evacuation");
+			EvacuationConfigGroup ecg = new EvacuationConfigGroup(m);
+			this.sc.getConfig().addModule("evacuation", ecg);
 			this.network = this.sc.getNetwork();
 
 			this.agents = new ArrayList<Vehicle>();
