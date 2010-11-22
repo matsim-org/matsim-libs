@@ -23,11 +23,10 @@ package org.matsim.ptproject.qsim.qnetsimengine;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
-import org.matsim.vehicles.Vehicle;
 import org.matsim.vis.snapshots.writers.VisVehicle;
 
 @Deprecated // only makes sense for "queue" mobsims.  Should go somewhere else (I think).  kai, oct'10
-public interface QVehicle extends Identifiable, VisVehicle {
+public interface QVehicle extends Identifiable, VisVehicle, QItem {
 
 	public void setDriver(final PersonDriverAgent driver);
 	// yy presumably, this should set DriverAgent
@@ -43,12 +42,6 @@ public interface QVehicle extends Identifiable, VisVehicle {
 	// yy not sure if this needs to be publicly exposed
 	
 	public void setLinkEnterTime(final double time);
-	// yy not sure if this needs to be publicly exposed
-
-	public double getEarliestLinkExitTime();
-	// yy not sure if this needs to be publicly exposed
-
-	public void setEarliestLinkExitTime(final double time);
 	// yy not sure if this needs to be publicly exposed
 
 }

@@ -678,8 +678,8 @@ public final class QLane extends QBufferItem implements SignalizeableItem {
 			//the offset of this lane
 			double offset= QLane.this.queueLink.getLink().getLength() - QLane.this.getLane().getStartsAtMeterFromLinkEnd();// QLane.this.queueLink.getLink().getLength() - QLane.this.getLength();
 			agentSnapshotInfoBuilder.addVehiclePositions(positions, time, QLane.this.queueLink.getLink(), QLane.this.buffer, QLane.this.vehQueue,
-					QLane.this.inverseSimulatedFlowCapacity, QLane.this.storageCapacity,
-					QLane.this.bufferStorageCapacity, QLane.this.length, offset, QLane.this.visualizerLane*3, QLane.this.transitQueueLaneFeature);
+					null, QLane.this.inverseSimulatedFlowCapacity,
+					QLane.this.storageCapacity, QLane.this.bufferStorageCapacity, QLane.this.length, offset, QLane.this.visualizerLane*3, QLane.this.transitQueueLaneFeature, -1.);
 
 			return positions;
 		}

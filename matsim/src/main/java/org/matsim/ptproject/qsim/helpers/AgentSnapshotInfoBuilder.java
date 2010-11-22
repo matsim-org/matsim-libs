@@ -35,6 +35,7 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.qsim.TransitQLaneFeature;
+import org.matsim.ptproject.qsim.qnetsimengine.QItem;
 import org.matsim.ptproject.qsim.qnetsimengine.QVehicle;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfoFactory;
@@ -66,11 +67,12 @@ public final class AgentSnapshotInfoBuilder {
 	 * See overloaded method for parameter description.
 	 */
 	public void addVehiclePositions(final Collection<AgentSnapshotInfo> positions, double now, Link link,
-			Collection<QVehicle> buffer, Collection<QVehicle> vehQueue, double inverseSimulatedFlowCapacity,
-			double storageCapacity, int bufferStorageCapacity, double linkLength, TransitQLaneFeature transitQueueLaneFeature){
+			Collection<QVehicle> buffer, Collection<QVehicle> vehQueue, Collection<QItem> holes,
+			double inverseSimulatedFlowCapacity, double storageCapacity, int bufferStorageCapacity, double linkLength, 
+			TransitQLaneFeature transitQueueLaneFeature, double congestedDensity){
 
-		this.addVehiclePositions(positions, now, link, buffer, vehQueue, inverseSimulatedFlowCapacity, storageCapacity,
-				bufferStorageCapacity, linkLength, 0.0, null, transitQueueLaneFeature);
+		this.addVehiclePositions(positions, now, link, buffer, vehQueue, holes, inverseSimulatedFlowCapacity,
+				storageCapacity, bufferStorageCapacity, linkLength, 0.0, null, transitQueueLaneFeature, congestedDensity);
 	}
 
 	/**
@@ -90,8 +92,9 @@ public final class AgentSnapshotInfoBuilder {
 	 * @param transitQueueLaneFeature
 	 */
 	public void addVehiclePositions(final Collection<AgentSnapshotInfo> positions, double now, Link link,
-			Collection<QVehicle> buffer, Collection<QVehicle> vehQueue, double inverseSimulatedFlowCapacity,
-			double storageCapacity, int bufferStorageCapacity, double linkLength, double offset, Integer laneNumber, TransitQLaneFeature transitQueueLaneFeature){
+			Collection<QVehicle> buffer, Collection<QVehicle> vehQueue, Collection<QItem> holes,
+			double inverseSimulatedFlowCapacity, double storageCapacity, int bufferStorageCapacity, double linkLength, double offset, 
+			Integer laneNumber, TransitQLaneFeature transitQueueLaneFeature, double congestedDensity){
 
 		if ("queue".equalsIgnoreCase(this.snapshotStyle)){
 			this.addVehiclePositionsAsQueue(positions, now, link, buffer, vehQueue, inverseSimulatedFlowCapacity,
@@ -101,27 +104,57 @@ public final class AgentSnapshotInfoBuilder {
 			this.addVehiclePositionsEquil(positions, now, buffer, link, vehQueue, inverseSimulatedFlowCapacity, offset,
 					laneNumber, transitQueueLaneFeature, linkLength);
 		}
+		else if ("withHolesExperimental".equalsIgnoreCase(this.snapshotStyle)){
+			this.addVehiclePositionsWithHoles(positions, now, link, buffer, vehQueue, holes,
+					inverseSimulatedFlowCapacity, storageCapacity, bufferStorageCapacity, linkLength, offset, laneNumber, 
+					transitQueueLaneFeature, congestedDensity);
+		}
 		else {
 			log.warn("The snapshotStyle \"" + this.snapshotStyle + "\" is not supported.");
 		}
+	}
+
+	private void addVehiclePositionsWithHoles(final Collection<AgentSnapshotInfo> positions, double now,
+			Link link, Collection<QVehicle> buffer, Collection<QVehicle> vehQueue, Collection<QItem> holes,
+			double inverseSimulatedFlowCapacity, double storageCapacity, int bufferStorageCapacity, double linkLength, double offset, 
+			Integer laneNumber, TransitQLaneFeature transitQueueLaneFeature, double congestedDensity) {
+
+		double currentQueueEnd = linkLength; // queue end initialized at end of link
+		
+		// for holes: using the "queue" method, but with different vehSpacing:
+//		float vehSpacingWithHoles = (float) calculateVehicleSpacingAsQueue(linkLength, storageCapacity, bufferStorageCapacity);
+		float vehSpacingWithHoles = (float) calculateVehicleSpacingWithHoles(linkLength, storageCapacity, bufferStorageCapacity, 
+				congestedDensity);
+
+		// treat vehicles from buffer: 
+		currentQueueEnd = positionVehiclesFromBufferAsQueue(positions, now, currentQueueEnd, link, vehSpacingWithHoles,
+				buffer, inverseSimulatedFlowCapacity, offset, laneNumber, transitQueueLaneFeature);
+
+		// treat other driving vehicles:
+		positionOtherDrivingVehiclesAsQueue(positions, now, currentQueueEnd, link, vehSpacingWithHoles,
+				vehQueue, inverseSimulatedFlowCapacity, offset, laneNumber, transitQueueLaneFeature, linkLength);
+
+		// yyyy waiting list, transit stops, persons at activity, etc. all do not depend on "queue" vs "equil"
+		// and should thus not be treated in this method. kai, apr'10
+	}
+
+	private double calculateVehicleSpacingWithHoles(double linkLength, double storageCapacity, double bufferStorageCapacity,
+			double congestedDensity_veh_m ) {
+		// yyyyyy abusing congDens as nHolesMax!
+		return 1.*(linkLength / (storageCapacity + bufferStorageCapacity - congestedDensity_veh_m )) ;
 	}
 
 	/**
 	 * Calculates the positions of all vehicles on this link according to the queue-logic: Vehicles are placed on the link
 	 * according to the ratio between the free-travel time and the time the vehicles are already on the link. If they could have
 	 * left the link already (based on the time), the vehicles start to build a traffic-jam (queue) at the end of the link.
-	 *
-	 * @param positions
-	 *            A collection where the calculated positions can be stored.
-	 * @param transitQueueLaneFeature
-	 * @param link2
 	 */
 	private void addVehiclePositionsAsQueue(final Collection<AgentSnapshotInfo> positions, double now,
 			Link link, Collection<QVehicle> buffer, Collection<QVehicle> vehQueue, double inverseSimulatedFlowCapacity,
 			double storageCapacity, int bufferStorageCapacity, double linkLength, double offset, Integer laneNumber, TransitQLaneFeature transitQueueLaneFeature) {
 
 		double currentQueueEnd = linkLength; // queue end initialized at end of link
-		float vehSpacingAsQueueCache = (float) calculateQueueVehicleSpacing(linkLength, storageCapacity, bufferStorageCapacity);
+		float vehSpacingAsQueueCache = (float) calculateVehicleSpacingAsQueue(linkLength, storageCapacity, bufferStorageCapacity);
 		// treat vehicles from buffer:
 		currentQueueEnd = positionVehiclesFromBufferAsQueue(positions, now, currentQueueEnd, link, vehSpacingAsQueueCache,
 				buffer, inverseSimulatedFlowCapacity, offset, laneNumber, transitQueueLaneFeature);
@@ -134,7 +167,7 @@ public final class AgentSnapshotInfoBuilder {
 		// and should thus not be treated in this method. kai, apr'10
 	}
 
-	private double calculateQueueVehicleSpacing(double linkLength, double storageCapacity, double bufferStorageCapacity) {
+	private double calculateVehicleSpacingAsQueue(double linkLength, double storageCapacity, double bufferStorageCapacity) {
 		double vehLen = Math.min( // the length of a vehicle in visualization
 				linkLength / (storageCapacity + bufferStorageCapacity), // all vehicles must have place on the link
 				this.cellSize / this.storageCapacityFactor); // a vehicle should not be larger than it's actual size. yyyy why is that an issue? kai, apr'10
@@ -146,8 +179,6 @@ public final class AgentSnapshotInfoBuilder {
 	 * calculate the position where the vehicle should be if it could drive with freespeed - if the position is already within
 	 * the congestion queue, add it to the queue with slow speed - if the position is not within the queue, just place the car
 	 * with free speed at that place
-	 * @param inverseSimulatedFlowCapacity
-	 * @param vehQueue
 	 */
 	private void positionOtherDrivingVehiclesAsQueue(final Collection<AgentSnapshotInfo> positions, double now,
 			double queueEnd, Link link, double vehSpacing, Collection<QVehicle> vehQueue, double inverseSimulatedFlowCapacity,

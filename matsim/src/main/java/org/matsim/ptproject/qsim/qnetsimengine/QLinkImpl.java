@@ -36,7 +36,6 @@ import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.network.LinkImpl;
@@ -64,9 +63,10 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 	private static int spaceCapWarningCount = 0;
 	private static final boolean HOLES = false ;
 	private static int congDensWarnCnt = 0;
+	private static int congDensWarnCnt2 = 0;
 
 	// dynamic variables (problem with memory)
-	private final LinkedList<Hole> holes = new LinkedList<Hole>() ;
+	private final Queue<QItem> holes = new LinkedList<QItem>() ;
 
 
 	/**
@@ -148,6 +148,8 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 	 * true, i.e. green, if the link is not signalized
 	 */
 	private boolean thisTimeStepGreen = true;
+	private double congestedDensity_veh_m;
+	private int nHolesMax;
 
 	/**
 	 * Initializes a QueueLink with one QueueLane.
@@ -207,10 +209,12 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 		this.vehQueue.add(veh);
 		this.usedStorageCapacity += veh.getSizeInEquivalents();
 		double departureTime;
-		/* It's not the original lane,
-		 * so there is a fractional rest we add to this link's freeSpeedTravelTime */
-		departureTime = now + this.freespeedTravelTime
-		+ veh.getEarliestLinkExitTime() - Math.floor(veh.getEarliestLinkExitTime());
+
+		/* It's not the original lane, so there is a fractional rest we add to this link's freeSpeedTravelTime */
+		departureTime = now + this.freespeedTravelTime + ( veh.getEarliestLinkExitTime() - Math.floor(veh.getEarliestLinkExitTime()) );
+		// yyyy freespeedTravelTime may be Inf, in which case the vehicle never leaves, even if the time-variant link
+		// is reset to a non-zero speed.  kai, nov'10
+		
 		/* It's a QueueLane that is directly connected to a QueueNode,
 		 * so we have to floor the freeLinkTravelTime in order the get the same
 		 * results compared to the old mobSim */
@@ -340,7 +344,7 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 					this.usedStorageCapacity -= veh.getSizeInEquivalents();
 					if ( HOLES ) {
 						Hole hole = new Hole() ;
-						hole.setEarliestLinkEndTime( now + this.link.getLength()*3600./15./1000. ) ;
+						hole.setEarliestLinkExitTime( now + this.link.getLength()*3600./15./1000. ) ;
 						holes.add( hole ) ;
 					}
 					continue;
@@ -358,7 +362,7 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 				if ( HOLES ) {
 					Hole hole = new Hole() ;
 					double offset = this.link.getLength()*3600./15./1000. ;
-					hole.setEarliestLinkEndTime( now + 0.9*offset + 0.2*MatsimRandom.getRandom().nextDouble()*offset ) ;
+					hole.setEarliestLinkExitTime( now + 0.9*offset + 0.2*MatsimRandom.getRandom().nextDouble()*offset ) ;
 					holes.add( hole ) ;
 				}
 			}
@@ -400,12 +404,12 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 			return storageOk ;
 		}
 		// at this point, storage is ok!
-		Hole hole = holes.peek();
+		QItem hole = holes.peek();
 		if ( hole==null ) { // no holes available at all; in theory, this should not happen since covered by !storageOk
 			//			log.warn( " !hasSpace since no holes available ") ;
 			return false ;
 		}
-		if ( hole.getEarliestLinkEndTime() > this.getQSimEngine().getMobsim().getSimTimer().getTimeOfDay() ) {
+		if ( hole.getEarliestLinkExitTime() > this.getQSimEngine().getMobsim().getSimTimer().getTimeOfDay() ) {
 			//			log.warn( " !hasSpace since all hole arrival times lie in future ") ;
 			return false ;
 		}
@@ -430,8 +434,8 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 		this.flowCapacityPerTimeStep = ((LinkImpl)this.getLink()).getFlowCapacity(time);
 		// we need the flow capcity per sim-tick and multiplied with flowCapFactor
 		this.flowCapacityPerTimeStep = this.flowCapacityPerTimeStep
-		* this.getQSimEngine().getMobsim().getSimTimer().getSimTimestepSize()
-		* this.getQSimEngine().getMobsim().getScenario().getConfig().getQSimConfigGroup().getFlowCapFactor();
+			* this.getQSimEngine().getMobsim().getSimTimer().getSimTimestepSize()
+			* this.getQSimEngine().getMobsim().getScenario().getConfig().getQSimConfigGroup().getFlowCapFactor();
 		this.inverseSimulatedFlowCapacityCache = 1.0 / this.flowCapacityPerTimeStep;
 		this.flowCapFractionCache = this.flowCapacityPerTimeStep - (int) this.flowCapacityPerTimeStep;
 	}
@@ -455,9 +459,13 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 		 * the flowCap to handle the flowCap.
 		 */
 		double tempStorageCapacity = this.freespeedTravelTime * this.flowCapacityPerTimeStep;
+		// yy note: freespeedTravelTime may be Inf.  In this case, storageCapacity will also be set to Inf.  This can still be
+		// interpreted, but it means that the link will act as an infinite sink.  kai, nov'10
+		
 		if (this.storageCapacity < tempStorageCapacity) {
 			if (spaceCapWarningCount <= 10) {
-				log.warn("Link " + this.getLink().getId() + " too small: enlarge storage capcity from: " + this.storageCapacity + " Vehicles to: " + tempStorageCapacity + " Vehicles.  This is not fatal, but modifies the traffic flow dynamics.");
+				log.warn("Link " + this.getLink().getId() + " too small: enlarge storage capcity from: " + this.storageCapacity 
+						+ " Vehicles to: " + tempStorageCapacity + " Vehicles.  This is not fatal, but modifies the traffic flow dynamics.");
 				if (spaceCapWarningCount == 10) {
 					log.warn("Additional warnings of this type are suppressed.");
 				}
@@ -467,37 +475,49 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 		}
 
 		if ( HOLES ) {
-			// number of initial holes (= max number of vehicles on link given bottleneck spillback) is, in fact, dicated
-			// by the bottleneck flow capacity, together with the fundamental diagram. :-(
+			// yyyy number of initial holes (= max number of vehicles on link given bottleneck spillback) is, in fact, dicated
+			// by the bottleneck flow capacity, together with the fundamental diagram. :-(  kai, ???'10
+			//
+			// Alternative would be to have link entry capacity constraint.  This, however, does not work so well with the 
+			// current "parallel" logic, where capacity constraints are modeled only on the link.  kai, nov'10
 			double bnFlowCap_s = ((LinkImpl)this.link).getFlowCapacity() ;
 
 			// ( c * n_cells - cap * L ) / (L * c) = (n_cells/L - cap/c) ;
-			double congestedDensity = this.storageCapacity/this.link.getLength() - (bnFlowCap_s*3600.)/(15.*1000) ;
+			congestedDensity_veh_m = this.storageCapacity/this.link.getLength() - (bnFlowCap_s*3600.)/(15.*1000) ;
 
+			if ( congestedDensity_veh_m > 10. ) {
+				if ( congDensWarnCnt2 < 1 ) {
+					congDensWarnCnt2++ ;
+					log.warn("congestedDensity_veh_m very large: " + congestedDensity_veh_m 
+							+ "; does this make sense?  Setting to 10 veh/m (which is still a lot but who knows). "
+							+ "Definitely can't have it at Inf." ) ;
+				}
+			}
+			
 			// congestedDensity is in veh/m.  If this is less than something reasonable (e.g. 1veh/50m) or even negative,
 			// then this means that the link has not enough storageCapacity (essentially not enough lanes) to transport the given
 			// flow capacity.  Will increase the storageCapacity accordingly:
-			if ( congestedDensity < 1./50 ) {
+			if ( congestedDensity_veh_m < 1./50 ) {
 				if ( congDensWarnCnt < 1 ) {
 					congDensWarnCnt++ ;
 					log.warn( "link not ``wide'' enough to process flow capacity with holes.  increasing storage capacity ...") ;
 					log.warn( Gbl.ONLYONCE ) ;
 				}
 				this.storageCapacity = (1./50 + bnFlowCap_s*3600./(15.*1000)) * this.link.getLength() ;
-				congestedDensity = this.storageCapacity/this.link.getLength() - (bnFlowCap_s*3600.)/(15.*1000) ;
+				congestedDensity_veh_m = this.storageCapacity/this.link.getLength() - (bnFlowCap_s*3600.)/(15.*1000) ;
 			}
 
-			int nHoles = (int) Math.ceil( congestedDensity * this.link.getLength() ) ;
+			nHolesMax = (int) Math.ceil( congestedDensity_veh_m * this.link.getLength() ) ;
 			log.warn(
-					" nHoles: " + nHoles
+					" nHoles: " + nHolesMax
 					+ " storCap: " + this.storageCapacity
 					+ " len: " + this.link.getLength()
 					+ " bnFlowCap: " + bnFlowCap_s
-					+ " congDens: " + congestedDensity
+					+ " congDens: " + congestedDensity_veh_m
 			) ;
-			for ( int ii=0 ; ii<nHoles ; ii++ ) {
+			for ( int ii=0 ; ii<nHolesMax ; ii++ ) {
 				Hole hole = new Hole() ;
-				hole.setEarliestLinkEndTime( 0. ) ;
+				hole.setEarliestLinkExitTime( 0. ) ;
 				holes.add( hole ) ;
 			}
 			//			System.exit(-1);
@@ -736,8 +756,9 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 			AgentSnapshotInfoBuilder snapshotInfoBuilder = QLinkImpl.this.getQSimEngine().getAgentSnapshotInfoBuilder();
 
 			snapshotInfoBuilder.addVehiclePositions(positions, time, QLinkImpl.this.link, QLinkImpl.this.buffer,
-					QLinkImpl.this.vehQueue, QLinkImpl.this.inverseSimulatedFlowCapacityCache, QLinkImpl.this.storageCapacity,
-					QLinkImpl.this.bufferStorageCapacity, QLinkImpl.this.getLink().getLength(), QLinkImpl.this.transitQueueLaneFeature);
+					QLinkImpl.this.vehQueue, QLinkImpl.this.holes, QLinkImpl.this.inverseSimulatedFlowCapacityCache,
+					QLinkImpl.this.storageCapacity, QLinkImpl.this.bufferStorageCapacity, QLinkImpl.this.getLink().getLength(), 
+					QLinkImpl.this.transitQueueLaneFeature, QLinkImpl.this.nHolesMax );
 
 			int cnt2 = 0 ; // a counter according to which non-moving items can be "spread out" in the visualization
 			// treat vehicles from transit stops
@@ -755,14 +776,14 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 		}
 	}
 
-	static class Hole {
+	static class Hole implements QItem {
 		private double earliestLinkEndTime ;
 
-		double getEarliestLinkEndTime() {
+		public double getEarliestLinkExitTime() {
 			return earliestLinkEndTime;
 		}
 
-		void setEarliestLinkEndTime(double earliestLinkEndTime) {
+		public void setEarliestLinkExitTime(double earliestLinkEndTime) {
 			this.earliestLinkEndTime = earliestLinkEndTime;
 		}
 	}
