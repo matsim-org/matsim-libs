@@ -31,6 +31,7 @@ import org.matsim.pt.qsim.ComplexTransitStopHandlerFactory;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.QSimFactory;
 import org.matsim.vis.otfvis.OTFVisMobsimFeature;
+import org.matsim.vis.otfvis.gui.OTFVisConfigGroup;
 
 /**
  * @author aneumann
@@ -54,6 +55,7 @@ public class TransitControler extends Controler {
 		QSim simulation = (QSim) new QSimFactory().createMobsim(this.getScenario(), this.getEvents());
 
 		simulation.getTransitEngine().setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
+//		simulation.getQSimTransitEngine().setTransitStopHandlerFactory(new SimpleTransitStopHandlerFactory());
 //		this.events.addHandler(new LogOutputEventHandler());
 
 		if (this.useOTFVis) {
@@ -91,6 +93,7 @@ public class TransitControler extends Controler {
 		new MatsimConfigReader(config).readFile(args[0]);
 		config.scenario().setUseTransit(true);
 		config.scenario().setUseVehicles(true);
+		config.otfVis().setColoringScheme( OTFVisConfigGroup.COLORING_BVG ) ;
 		
 				
 		TransitControler tc = new TransitControler(config);
