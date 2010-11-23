@@ -24,6 +24,8 @@
 
 	<module name="qsim">
 		<param name="removeStuckVehicles" value="false" />
+		<param name="stuckTime" value="140000.0" />
+
 		<param name="trafficDynamics" value="withHolesExperimental"/>
 
 		<param name="snapshotFormat" value="otfvis" />
@@ -46,12 +48,10 @@
 		<param name="activityType_0" value="h" /> <!-- home -->
 		<param name="activityPriority_0" value="1" />
 		<param name="activityTypicalDuration_0" value="12:00:00" />
-		<param name="activityMinimalDuration_0" value="08:00:00" />
 
 		<param name="activityType_1" value="w" /> <!-- work -->
 		<param name="activityPriority_1" value="1" />
 		<param name="activityTypicalDuration_1" value="08:00:00" />
-		<param name="activityMinimalDuration_1" value="06:00:00" />
 		<param name="activityOpeningTime_1" value="07:00:00" />
 		<param name="activityLatestStartTime_1" value="09:00:00" />
 		<param name="activityEarliestEndTime_1" value="" />

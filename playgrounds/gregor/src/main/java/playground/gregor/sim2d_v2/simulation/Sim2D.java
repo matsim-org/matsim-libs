@@ -48,12 +48,12 @@ import org.matsim.ptproject.qsim.agents.AgentFactory;
 import org.matsim.ptproject.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.ptproject.qsim.comparators.PlanAgentDepartureTimeComparator;
 import org.matsim.ptproject.qsim.helpers.AgentCounter;
-import org.matsim.ptproject.qsim.helpers.QSimTimer;
+import org.matsim.ptproject.qsim.helpers.MobsimTimer;
 import org.matsim.ptproject.qsim.interfaces.AgentCounterI;
 import org.matsim.ptproject.qsim.interfaces.DepartureHandler;
 import org.matsim.ptproject.qsim.interfaces.Mobsim;
 import org.matsim.ptproject.qsim.interfaces.NetsimNetwork;
-import org.matsim.ptproject.qsim.interfaces.SimTimerI;
+import org.matsim.ptproject.qsim.interfaces.MobsimTimerI;
 
 import playground.gregor.sim2d_v2.scenario.Scenario2DImpl;
 import playground.gregor.sim2d_v2.simulation.floor.Floor;
@@ -73,7 +73,7 @@ public class Sim2D implements Mobsim {
 	private EventsManagerImpl events;
 	private final Scenario2DImpl scenario;
 
-	private QSimTimer simTimer;
+	private MobsimTimer simTimer;
 
 	private SimulationListenerManager listenerManager;
 
@@ -120,7 +120,7 @@ public class Sim2D implements Mobsim {
 		Scenario sc = getScenario();
 		this.listenerManager = new SimulationListenerManager(this);
 		this.agentCounter = new AgentCounter();
-		this.simTimer = new QSimTimer(sc.getConfig().getQSimConfigGroup().getTimeStepSize());
+		this.simTimer = new MobsimTimer(sc.getConfig().getQSimConfigGroup().getTimeStepSize());
 
 		// create Sim2DEngine
 		this.sim2DEngine = factory.createSim2DEngine(this, MatsimRandom.getRandom());
@@ -410,7 +410,7 @@ public class Sim2D implements Mobsim {
 	 * @see org.matsim.ptproject.qsim.interfaces.QSimI#getSimTimer()
 	 */
 	@Override
-	public SimTimerI getSimTimer() {
+	public MobsimTimerI getSimTimer() {
 		return this.simTimer;
 	}
 
