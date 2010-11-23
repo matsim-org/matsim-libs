@@ -65,9 +65,8 @@ public class MZ2Plans {
 		System.out.println("-------------------------------------------------------------");
 		System.out.println("Analyzing MC: ... ");
 		AnalyzeMicrocensus analyzer = new AnalyzeMicrocensus();
-		analyzer.run("car", outdir + "plansMOSO.xml.gz", "s");
 		analyzer.run("car", outdir + "plansMOSO.xml.gz", "l");
-
+		analyzer.run("car", outdir + "plansMOSO.xml.gz", "s");
 		System.out.println("-------------------------------------------------------------");
 	}
 

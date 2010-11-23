@@ -124,7 +124,9 @@ public class AnalyzeMicrocensus {
 		this.distanceDistribution.plotBinnedDistribution(this.outputFolder, "m", "m");
 		this.distanceDistributionHomeBased.plotBinnedDistribution(this.outputFolder, "m", "m");
 		this.distanceDistributionHomeBasedRoundTrip.plotBinnedDistribution(this.outputFolder, "m", "m");
-		this.shoppingDistanceDistributionHomeBasedRoundTripGrocery.plotBinnedDistribution(this.outputFolder, "m", "m");
-		this.shoppingDistanceDistributionHomeBasedRoundTripNonGrocery.plotBinnedDistribution(this.outputFolder, "m", "m");
+		if (type.startsWith("s")) {
+			this.shoppingDistanceDistributionHomeBasedRoundTripGrocery.plotBinnedDistribution(this.outputFolder, "m", "m");
+			this.shoppingDistanceDistributionHomeBasedRoundTripNonGrocery.plotBinnedDistribution(this.outputFolder, "m", "m");
+		}
 	}
 }
