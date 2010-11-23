@@ -1,44 +1,39 @@
 /**
- * <h2>Usage restrictions:</h2>
+ * <h2>Signal Model</h2>
+ * 
+ * The signal model implementation consists of several components:
  * <ul>
- *   <li> Do not use, yet!</li>
+ *   <li>A SignalSystemsManager instance as central point in the model, providing its components and
+ *   with pointers to each other. Furthermore it provides access to the MATSim EventsManager.</li>
+ *   <li>An implementation for fixed-time signal control, see below</li>
+ *   <li>One or several implementations of the SignalController that may contain algorithms for 
+ *   signal control.</li>
+ *   <li>A logic to show a red-amber and a amber phase when a signal group changes from red to green.</li>
+ *   <li>A factory, i.e. an implementation of SignalSystemsFactory to create  the components of the model.</li>
+ * 		<li>An implementation of the <code>Signal</code> interface that serves as connection between
+ *				the <code>org.matsim.signalsystems.model</code> package and the 
+ * <code>org.matsim.signalsystems.mobsim</code> package. 
+ * 				Currently there are two implementations:
+ *   <ul>
+ *     <li><code>DatabasedSignal</code> for a Signal based on the given data.</li>
+ *     <li><code>SignalImpl</code> for a Signal created in initialization code </li>
+ *   </ul>
+ *   </li>
  * </ul>
  * 
- * TODO update documentation 
- * <h2>Signal Control</h2>
+ * <h3>Fixed-time Signal Control<h3>
+ * Fixed-time or also plan based signal control uses the attributes 
  * <ul>
- *   <li>SignalSystemController implementations are responsible to throw the
- *   appropriate SignalGroupStateChangedEvents.</li>
- *   <li>SingalSystemController used by the QSim of MATSim are automatically
- *   registered as a SimulationListener if one of the SimulationListener interfaces
- *   is implemented<li>
+ *   <li>cycle time</li>
+ *   <li>offset</li>
+ *   <li>onset</li>
+ *   <li>dropping</li>
  * </ul>
  * 
- * <h3>Plan Based Signal Control<h3>
- * Plan based signal control uses the attributes 
- * <ul>
- *   <li>cycle time (ct)</li>
- *   <li>roughcast (rc)</li>
- *   <li>dropping (dr)</li>
- *   <li>intergreen time roughcast (igrc)</li>
- *   <li>intergreen time dropping (igdr)</li>
- * </ul>
- * to determine the state of a signal group by the following schemes:
- * 
- * If rc <= dr:
- * <p>
- *  |__red___|_redyellow_|_green_____________|_yellow_|_red______|  <br>
- *  |------------| ---------------|-------------------------------|------------|----------------|  <br>
- *  0_______rc_________rc+igrc______________dr______dr+igdr____ct <br>
- * <p>
- * if dr < rc:
- * <p>
- *  |_green___|_yellow____|_red______________|_redyellow_|_green_|  <br>
- *  |---------------|_---------------|----------------------------|-----------------|-----------_|  <br>
- *  0_________dr_________dr+igdr____________rc________rc+igrc___ct <br>
- * <p>
- * 
- * At which state vehicles moved is responsibility of the SignalSystemControler.
+ * Whereby onset is the second the signal group starts its switch to green within a cycle time. This may
+ * first trigger a red-amber phase if amber times are defined. At second dropping within the cycle the switch
+ * to red is triggered. If amber times are defined red is preceded by a phase where the signal group is shows
+ * amber. The offset is the second onset and dropping are shifted in respect to the global simulation time.
  * 
  *	<h2>Package Maintainer(s):</h2>
  *		<ul>
