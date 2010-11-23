@@ -138,8 +138,8 @@ import org.matsim.ptproject.qsim.multimodalsimengine.tools.MultiModalNetworkCrea
 import org.matsim.ptproject.qsim.multimodalsimengine.tools.NonCarRouteDropper;
 import org.matsim.roadpricing.PlansCalcAreaTollRoute;
 import org.matsim.roadpricing.RoadPricingScheme;
-import org.matsim.signalsystems.initialization.DefaultSignalsControllerListenerFactory;
-import org.matsim.signalsystems.initialization.SignalsControllerListenerFactory;
+import org.matsim.signalsystems.controler.DefaultSignalsControllerListenerFactory;
+import org.matsim.signalsystems.controler.SignalsControllerListenerFactory;
 
 /**
  * The Controler is responsible for complete simulation runs, including the
