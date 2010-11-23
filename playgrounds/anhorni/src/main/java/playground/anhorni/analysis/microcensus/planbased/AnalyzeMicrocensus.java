@@ -42,36 +42,39 @@ public class AnalyzeMicrocensus {
 	private final static Logger log = Logger.getLogger(AnalyzeMicrocensus.class);
 	private String outputFolder="src/main/java/playground/anhorni/output/microcensus/";
 	
-	private Bins shoppingDistanceDistribution;
-	private Bins shoppingDistanceDistributionHomeBased;
-	private Bins shoppingDistanceDistributionRoundTrip;
-	private Bins shoppingDistanceDistributionRoundTripGrocery;
-	private Bins shoppingDistanceDistributionRoundTripNonGrocery;
+	private Bins distanceDistribution;
+	private Bins distanceDistributionHomeBased;
+	private Bins distanceDistributionHomeBasedRoundTrip;
+	private Bins shoppingDistanceDistributionHomeBasedRoundTripGrocery;
+	private Bins shoppingDistanceDistributionHomeBasedRoundTripNonGrocery;
 	
-	private ScenarioImpl scenario = new ScenarioImpl();
+	String type ="";
+		
+	private ScenarioImpl scenario = null;
 	private String mode = null;
 		
 	public static void main(final String[] args) {
 		AnalyzeMicrocensus analyzer = new AnalyzeMicrocensus();
-		String mode = args[0];
-		analyzer.run(mode, args[1]);	
+		analyzer.run(args[0], args[1], args[2]);	
 		log.info("Analysis finished -----------------------------------------");
 	}
 	
-	public void run(String mode, String plansFilePath) {
+	public void run(String mode, String plansFilePath, String type) {
+		this.type = type;
 		this.init(mode, plansFilePath);
 		this.runAnalysis();
 		this.write();		
 	}
 	
 	private void init(String mode, String plansFilePath) {
+		scenario = new ScenarioImpl();
 		this.mode = mode;
-		this.shoppingDistanceDistribution = new Bins(500.0, 40000.0, "shopping_trips_mc_" + this.mode);
-		this.shoppingDistanceDistributionHomeBased = new Bins(500.0, 40000.0, "shopping_trips_mc_home-based_" + this.mode);
-		this.shoppingDistanceDistributionRoundTrip = new Bins(500.0, 40000.0, "shopping_trips_mc_round-trip_" + this.mode);
+		this.distanceDistribution = new Bins(500.0, 40000.0, type + "_trips_mc_" + this.mode);
+		this.distanceDistributionHomeBased = new Bins(500.0, 40000.0, type +  "_trips_mc_home-based_" + this.mode);
+		this.distanceDistributionHomeBasedRoundTrip = new Bins(500.0, 40000.0, type +  "_trips_mc_home-based_round-trip_" + this.mode);
 		
-		this.shoppingDistanceDistributionRoundTripGrocery = new Bins(500.0, 40000.0, "shopping_trips_mc_round-trip_grocery_" + this.mode);
-		this.shoppingDistanceDistributionRoundTripNonGrocery = new Bins(500.0, 40000.0, "shopping_trips_mc_round-trip_nongrocery_" + this.mode);
+		this.shoppingDistanceDistributionHomeBasedRoundTripGrocery = new Bins(500.0, 40000.0, "s_trips_mc_home-based_round-trip_grocery_" + this.mode);
+		this.shoppingDistanceDistributionHomeBasedRoundTripNonGrocery = new Bins(500.0, 40000.0, "s_trips_mc_home-based_round-trip_nongrocery_" + this.mode);
 		
 		MatsimPopulationReader populationReader = new MatsimPopulationReader(this.scenario);
 		populationReader.readFile(plansFilePath);	
@@ -83,30 +86,30 @@ public class AnalyzeMicrocensus {
 			for (PlanElement pe : plan.getPlanElements()) {
 				if (pe instanceof Activity) {
 					ActivityImpl act = (ActivityImpl)pe;
-					if (act.getType().startsWith("s")) {
+					if (act.getType().startsWith(this.type)) {
 						if (plan.getPreviousLeg(act).getMode().equals(this.mode)) {
 							ActivityImpl previousAct = (ActivityImpl) (plan.getPlanElements().get(plan.getPlanElements().indexOf(act) - 2));
 							double distance = ((CoordImpl)previousAct.getCoord()).calcDistance(act.getCoord());
-							shoppingDistanceDistribution.addVal(distance, p.getSelectedPlan().getScore());
+							distanceDistribution.addVal(distance, p.getSelectedPlan().getScore());
 						
 							if (previousAct.getType().equals("h")) {
-								shoppingDistanceDistributionHomeBased.addVal(distance, p.getSelectedPlan().getScore());	
+								distanceDistributionHomeBased.addVal(distance, p.getSelectedPlan().getScore());	
 								
 								//check the subsequent activities
 								Activity actTmp = act;
 								String nextType = plan.getNextActivity(plan.getNextLeg(actTmp)).getType();
-								while (nextType.startsWith("s")) {
+								while (nextType.startsWith(this.type)) {
 									actTmp = plan.getNextActivity(plan.getNextLeg(actTmp));
 									nextType = actTmp.getType();
 								}
 								if (nextType.equals("h")) {
-									this.shoppingDistanceDistributionRoundTrip.addVal(distance, p.getSelectedPlan().getScore());
+									this.distanceDistributionHomeBasedRoundTrip.addVal(distance, p.getSelectedPlan().getScore());
 									
 									if (act.getType().equals("sg")) {
-										this.shoppingDistanceDistributionRoundTripGrocery.addVal(distance, p.getSelectedPlan().getScore());
+										this.shoppingDistanceDistributionHomeBasedRoundTripGrocery.addVal(distance, p.getSelectedPlan().getScore());
 									}
-									else {
-										this.shoppingDistanceDistributionRoundTripNonGrocery.addVal(distance, p.getSelectedPlan().getScore());
+									else if (act.getType().startsWith("s") && !(act.getType().equals("sg"))){
+										this.shoppingDistanceDistributionHomeBasedRoundTripNonGrocery.addVal(distance, p.getSelectedPlan().getScore());
 									}
 								}
 							}
@@ -118,10 +121,10 @@ public class AnalyzeMicrocensus {
 	}
 			
 	private void write() {
-		this.shoppingDistanceDistribution.plotBinnedDistribution(this.outputFolder, "m", "m");
-		this.shoppingDistanceDistributionHomeBased.plotBinnedDistribution(this.outputFolder, "m", "m");
-		this.shoppingDistanceDistributionRoundTrip.plotBinnedDistribution(this.outputFolder, "m", "m");
-		this.shoppingDistanceDistributionRoundTripGrocery.plotBinnedDistribution(this.outputFolder, "m", "m");
-		this.shoppingDistanceDistributionRoundTripNonGrocery.plotBinnedDistribution(this.outputFolder, "m", "m");
+		this.distanceDistribution.plotBinnedDistribution(this.outputFolder, "m", "m");
+		this.distanceDistributionHomeBased.plotBinnedDistribution(this.outputFolder, "m", "m");
+		this.distanceDistributionHomeBasedRoundTrip.plotBinnedDistribution(this.outputFolder, "m", "m");
+		this.shoppingDistanceDistributionHomeBasedRoundTripGrocery.plotBinnedDistribution(this.outputFolder, "m", "m");
+		this.shoppingDistanceDistributionHomeBasedRoundTripNonGrocery.plotBinnedDistribution(this.outputFolder, "m", "m");
 	}
 }
