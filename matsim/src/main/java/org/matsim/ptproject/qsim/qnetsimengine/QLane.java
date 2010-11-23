@@ -33,6 +33,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.events.AgentStuckEventImpl;
 import org.matsim.core.events.LaneEnterEventImpl;
 import org.matsim.core.events.LaneLeaveEventImpl;
@@ -43,7 +44,6 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.lanes.Lane;
 import org.matsim.pt.qsim.TransitQLaneFeature;
-import org.matsim.ptproject.qsim.helpers.AgentSnapshotInfoBuilder;
 import org.matsim.ptproject.qsim.interfaces.NetsimLink;
 import org.matsim.signalsystems.mobsim.DefaultSignalizeableItem;
 import org.matsim.signalsystems.mobsim.SignalizeableItem;
@@ -63,7 +63,7 @@ import org.matsim.vis.snapshots.writers.VisData;
  * @author aneumann
  * @author mrieser
  */
-public final class QLane extends QBufferItem implements SignalizeableItem {
+public final class QLane extends VisLane implements SignalizeableItem {
 	// this has public material without any kind of interface since it is accessed via qLink.get*Lane*() (in some not-yet-finalized
 	// syntax).  kai, aug'10
 
@@ -677,9 +677,9 @@ public final class QLane extends QBufferItem implements SignalizeableItem {
 			AgentSnapshotInfoBuilder agentSnapshotInfoBuilder = QLane.this.queueLink.getQSimEngine().getAgentSnapshotInfoBuilder();
 			//the offset of this lane
 			double offset= QLane.this.queueLink.getLink().getLength() - QLane.this.getLane().getStartsAtMeterFromLinkEnd();// QLane.this.queueLink.getLink().getLength() - QLane.this.getLength();
-			agentSnapshotInfoBuilder.addVehiclePositions(positions, time, QLane.this.queueLink.getLink(), QLane.this.buffer, QLane.this.vehQueue,
-					null, QLane.this.inverseSimulatedFlowCapacity,
-					QLane.this.storageCapacity, QLane.this.bufferStorageCapacity, QLane.this.length, offset, QLane.this.visualizerLane*3, QLane.this.transitQueueLaneFeature, -1.);
+			agentSnapshotInfoBuilder.addVehiclePositions(QLane.this, positions, QLane.this.buffer, QLane.this.vehQueue, null,
+					QLane.this.length, offset,
+					QLane.this.visualizerLane*3, QLane.this.transitQueueLaneFeature, -1.);
 
 			return positions;
 		}
@@ -699,5 +699,14 @@ public final class QLane extends QBufferItem implements SignalizeableItem {
 		}
 	}
 
+	@Override
+	double getInverseSimulatedFlowCapacity() {
+		return this.inverseSimulatedFlowCapacity ;
+	}
+
+	@Override
+	int getBufferStorage() {
+		return this.bufferStorageCapacity ;
+	}
 
 }

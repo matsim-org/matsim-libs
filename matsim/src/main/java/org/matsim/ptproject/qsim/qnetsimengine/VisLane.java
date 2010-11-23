@@ -1,6 +1,6 @@
 /* *********************************************************************** *
- * project: org.matsim.*
- * QBufferItem
+ * project: matsim
+ * VisLane.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,37 +17,21 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
 package org.matsim.ptproject.qsim.qnetsimengine;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
-
-
-
 /**
- * Interface representing the buffer functionality common for all Queue-Logic Links and Lanes, i.e.
- * providing selected, decorated methods for Buffer access and additional methods needed for
- * the buffer logic implemented.
- * @author dgrether
+ * @author nagel
  *
  */
-abstract class QBufferItem implements QSimFunctionalInterface {
-	/**
-	 * equivalent to a Buffer.isEmpty() operation 
-	 */
-	abstract boolean bufferIsEmpty();
-
-	/**
-	 * equivalent to a Buffer.pop() operation 
-	 */
-	abstract QVehicle popFirstFromBuffer();
-	/**
-	 * equivalent to a Buffer.peek() operation 
-	 */
-	abstract QVehicle getFirstFromBuffer();
-
-	abstract double getBufferLastMovedTime();
-
-	abstract boolean hasGreenForToLink(Id toLinkId);
+abstract class VisLane extends QBufferItem {
 	
+	abstract QLinkInternalI getQLink() ;
+	
+	abstract double getInverseSimulatedFlowCapacity() ;
+	
+	abstract double getStorageCapacity() ;
+	
+	abstract int getBufferStorage() ;
+
 }

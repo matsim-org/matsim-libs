@@ -66,7 +66,7 @@ import org.matsim.ptproject.qsim.interfaces.AcceptsVisMobsimFeatures;
 import org.matsim.ptproject.qsim.interfaces.AgentCounterI;
 import org.matsim.ptproject.qsim.interfaces.Mobsim;
 import org.matsim.ptproject.qsim.interfaces.NetsimNetwork;
-import org.matsim.ptproject.qsim.interfaces.SimTimerI;
+import org.matsim.ptproject.qsim.interfaces.MobsimTimerI;
 import org.matsim.ptproject.qsim.qnetsimengine.QVehicle;
 import org.matsim.vehicles.VehicleImpl;
 import org.matsim.vehicles.VehicleType;
@@ -148,7 +148,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 
 //	private final List<MobsimFeature> queueSimulationFeatures = new ArrayList<MobsimFeature>() ;
 	private AgentCounterI agentCounter = new AgentCounter() ;
-	private SimTimerI simTimer ;
+	private MobsimTimerI simTimer ;
 
 	/**
 	 * Initialize the QueueSimulation without signal systems
@@ -688,7 +688,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 
 
 	@Override
-	public SimTimerI getSimTimer() {
+	public MobsimTimerI getSimTimer() {
 		return this.simTimer ;
 	}
 

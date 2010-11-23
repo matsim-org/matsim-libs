@@ -21,7 +21,6 @@
 package org.matsim.ptproject.qsim.qnetsimengine;
 
 import org.matsim.ptproject.qsim.QSim;
-import org.matsim.ptproject.qsim.helpers.AgentSnapshotInfoBuilder;
 import org.matsim.ptproject.qsim.interfaces.NetsimEngine;
 
 /**

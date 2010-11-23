@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.ptproject.qsim.helpers;
+package org.matsim.ptproject.qsim.qnetsimengine;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -35,8 +35,6 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.qsim.TransitQLaneFeature;
-import org.matsim.ptproject.qsim.qnetsimengine.QItem;
-import org.matsim.ptproject.qsim.qnetsimengine.QVehicle;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfoFactory;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
@@ -45,7 +43,7 @@ import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
  * A builder for AgentSnapshotInfo objects that can be used by links with queue logic
  * @author dgrether
  */
-public final class AgentSnapshotInfoBuilder {
+ final class AgentSnapshotInfoBuilder {
 
 	private static final Logger log = Logger.getLogger(AgentSnapshotInfoBuilder.class);
 
@@ -56,7 +54,7 @@ public final class AgentSnapshotInfoBuilder {
 	private final String snapshotStyle;
 
 
-	public AgentSnapshotInfoBuilder( Scenario sc ){
+	 AgentSnapshotInfoBuilder( Scenario sc ){
 		this.storageCapacityFactor = sc.getConfig().getQSimConfigGroup().getStorageCapFactor();
 		this.cellSize = ((NetworkImpl) sc.getNetwork()).getEffectiveCellSize() ;
 		this.snapshotStyle = sc.getConfig().getQSimConfigGroup().getSnapshotStyle() ;
@@ -65,59 +63,55 @@ public final class AgentSnapshotInfoBuilder {
 
 	/**
 	 * See overloaded method for parameter description.
+	 * @param visLane TODO
 	 */
-	public void addVehiclePositions(final Collection<AgentSnapshotInfo> positions, double now, Link link,
-			Collection<QVehicle> buffer, Collection<QVehicle> vehQueue, Collection<QItem> holes,
-			double inverseSimulatedFlowCapacity, double storageCapacity, int bufferStorageCapacity, double linkLength, 
-			TransitQLaneFeature transitQueueLaneFeature, double congestedDensity){
+	 void addVehiclePositions(VisLane visLane, final Collection<AgentSnapshotInfo> positions, Collection<QVehicle> buffer,
+			Collection<QVehicle> vehQueue, Collection<QItem> holes, int bufferStorageCapacity,
+			double linkLength, TransitQLaneFeature transitQueueLaneFeature, double congestedDensity){
 
-		this.addVehiclePositions(positions, now, link, buffer, vehQueue, holes, inverseSimulatedFlowCapacity,
-				storageCapacity, bufferStorageCapacity, linkLength, 0.0, null, transitQueueLaneFeature, congestedDensity);
+		this.addVehiclePositions(visLane, positions, buffer, vehQueue, holes, linkLength, 0.0,
+				null, transitQueueLaneFeature, congestedDensity);
 	}
 
 	/**
 	 * Adds AgentSnapshotInfo instances to the Collection given as parameter for a queue-logic object located on a specific link. A queue-logic object
 	 * can be a QueueLinkImpl or a QueueLane instance or something else.
+	 * @param visLane TODO
 	 * @param positions The Collection in that the AgentSnapshotInfo instances are inserted.
-	 * @param now The current time
-	 * @param link parameter is only used to create PositionInfo instances not for calculations in this class
 	 * @param buffer
 	 * @param vehQueue
-	 * @param inverseSimulatedFlowCapacity
-	 * @param storageCapacity
-	 * @param bufferStorageCapacity
 	 * @param linkLength the length of the queue-based object
 	 * @param offset The distance between the from node of the link to the beginning of the queue-logic object
 	 * @param laneNumber
 	 * @param transitQueueLaneFeature
 	 */
-	public void addVehiclePositions(final Collection<AgentSnapshotInfo> positions, double now, Link link,
-			Collection<QVehicle> buffer, Collection<QVehicle> vehQueue, Collection<QItem> holes,
-			double inverseSimulatedFlowCapacity, double storageCapacity, int bufferStorageCapacity, double linkLength, double offset, 
-			Integer laneNumber, TransitQLaneFeature transitQueueLaneFeature, double congestedDensity){
+	 void addVehiclePositions(VisLane visLane, final Collection<AgentSnapshotInfo> positions, Collection<QVehicle> buffer,
+			Collection<QVehicle> vehQueue, Collection<QItem> holes, double linkLength,
+			double offset, Integer laneNumber, TransitQLaneFeature transitQueueLaneFeature, double congestedDensity){
 
 		if ("queue".equalsIgnoreCase(this.snapshotStyle)){
-			this.addVehiclePositionsAsQueue(positions, now, link, buffer, vehQueue, inverseSimulatedFlowCapacity,
-					storageCapacity, bufferStorageCapacity, linkLength, offset, laneNumber, transitQueueLaneFeature);
+			this.addVehiclePositionsAsQueue(positions, buffer, vehQueue, linkLength, offset, laneNumber,
+					transitQueueLaneFeature, visLane);
 		}
 		else  if ("equiDist".equalsIgnoreCase(this.snapshotStyle)){
-			this.addVehiclePositionsEquil(positions, now, buffer, link, vehQueue, inverseSimulatedFlowCapacity, offset,
-					laneNumber, transitQueueLaneFeature, linkLength);
+			this.addVehiclePositionsEquil(positions, buffer, vehQueue, offset, laneNumber, transitQueueLaneFeature, linkLength,
+					visLane);
 		}
 		else if ("withHolesExperimental".equalsIgnoreCase(this.snapshotStyle)){
-			this.addVehiclePositionsWithHoles(positions, now, link, buffer, vehQueue, holes,
-					inverseSimulatedFlowCapacity, storageCapacity, bufferStorageCapacity, linkLength, offset, laneNumber, 
-					transitQueueLaneFeature, congestedDensity);
+			this.addVehiclePositionsWithHoles(positions, buffer, vehQueue, holes, linkLength, offset,
+					laneNumber, transitQueueLaneFeature, congestedDensity, visLane);
 		}
 		else {
 			log.warn("The snapshotStyle \"" + this.snapshotStyle + "\" is not supported.");
 		}
 	}
 
-	private void addVehiclePositionsWithHoles(final Collection<AgentSnapshotInfo> positions, double now,
-			Link link, Collection<QVehicle> buffer, Collection<QVehicle> vehQueue, Collection<QItem> holes,
-			double inverseSimulatedFlowCapacity, double storageCapacity, int bufferStorageCapacity, double linkLength, double offset, 
-			Integer laneNumber, TransitQLaneFeature transitQueueLaneFeature, double congestedDensity) {
+	private void addVehiclePositionsWithHoles(final Collection<AgentSnapshotInfo> positions, Collection<QVehicle> buffer,
+			Collection<QVehicle> vehQueue, Collection<QItem> holes, double linkLength, double offset,
+			Integer laneNumber, TransitQLaneFeature transitQueueLaneFeature, double congestedDensity, VisLane visLane) 
+	{
+		double storageCapacity = visLane.getStorageCapacity() ;
+		double bufferStorageCapacity = visLane.getBufferStorage() ;
 
 		double currentQueueEnd = linkLength; // queue end initialized at end of link
 		
@@ -127,15 +121,13 @@ public final class AgentSnapshotInfoBuilder {
 				congestedDensity);
 
 		// treat vehicles from buffer: 
-		currentQueueEnd = positionVehiclesFromBufferAsQueue(positions, now, currentQueueEnd, link, vehSpacingWithHoles,
-				buffer, inverseSimulatedFlowCapacity, offset, laneNumber, transitQueueLaneFeature);
+		currentQueueEnd = positionVehiclesFromBufferAsQueue(positions, currentQueueEnd, vehSpacingWithHoles, buffer, offset,
+				laneNumber, transitQueueLaneFeature, visLane);
 
 		// treat other driving vehicles:
-		positionOtherDrivingVehiclesAsQueue(positions, now, currentQueueEnd, link, vehSpacingWithHoles,
-				vehQueue, inverseSimulatedFlowCapacity, offset, laneNumber, transitQueueLaneFeature, linkLength);
+		positionOtherDrivingVehiclesAsQueue(positions, currentQueueEnd, vehSpacingWithHoles, vehQueue, offset,
+				laneNumber, transitQueueLaneFeature, linkLength, visLane);
 
-		// yyyy waiting list, transit stops, persons at activity, etc. all do not depend on "queue" vs "equil"
-		// and should thus not be treated in this method. kai, apr'10
 	}
 
 	private double calculateVehicleSpacingWithHoles(double linkLength, double storageCapacity, double bufferStorageCapacity,
@@ -148,20 +140,24 @@ public final class AgentSnapshotInfoBuilder {
 	 * Calculates the positions of all vehicles on this link according to the queue-logic: Vehicles are placed on the link
 	 * according to the ratio between the free-travel time and the time the vehicles are already on the link. If they could have
 	 * left the link already (based on the time), the vehicles start to build a traffic-jam (queue) at the end of the link.
+	 * @param visLane TODO
 	 */
-	private void addVehiclePositionsAsQueue(final Collection<AgentSnapshotInfo> positions, double now,
-			Link link, Collection<QVehicle> buffer, Collection<QVehicle> vehQueue, double inverseSimulatedFlowCapacity,
-			double storageCapacity, int bufferStorageCapacity, double linkLength, double offset, Integer laneNumber, TransitQLaneFeature transitQueueLaneFeature) {
+	private void addVehiclePositionsAsQueue(final Collection<AgentSnapshotInfo> positions, Collection<QVehicle> buffer,
+			Collection<QVehicle> vehQueue, double linkLength, double offset, Integer laneNumber,
+			TransitQLaneFeature transitQueueLaneFeature, VisLane visLane) 
+	{
+		double storageCapacity = visLane.getStorageCapacity() ;
+		double bufferStorageCapacity = visLane.getBufferStorage() ;
 
 		double currentQueueEnd = linkLength; // queue end initialized at end of link
 		float vehSpacingAsQueueCache = (float) calculateVehicleSpacingAsQueue(linkLength, storageCapacity, bufferStorageCapacity);
 		// treat vehicles from buffer:
-		currentQueueEnd = positionVehiclesFromBufferAsQueue(positions, now, currentQueueEnd, link, vehSpacingAsQueueCache,
-				buffer, inverseSimulatedFlowCapacity, offset, laneNumber, transitQueueLaneFeature);
+		currentQueueEnd = positionVehiclesFromBufferAsQueue(positions, currentQueueEnd, vehSpacingAsQueueCache, buffer, offset,
+				laneNumber, transitQueueLaneFeature, visLane);
 
 		// treat other driving vehicles:
-		positionOtherDrivingVehiclesAsQueue(positions, now, currentQueueEnd, link, vehSpacingAsQueueCache,
-				vehQueue, inverseSimulatedFlowCapacity, offset, laneNumber, transitQueueLaneFeature, linkLength);
+		positionOtherDrivingVehiclesAsQueue(positions, currentQueueEnd, vehSpacingAsQueueCache, vehQueue, offset,
+				laneNumber, transitQueueLaneFeature, linkLength, visLane);
 
 		// yyyy waiting list, transit stops, persons at activity, etc. all do not depend on "queue" vs "equil"
 		// and should thus not be treated in this method. kai, apr'10
@@ -179,11 +175,16 @@ public final class AgentSnapshotInfoBuilder {
 	 * calculate the position where the vehicle should be if it could drive with freespeed - if the position is already within
 	 * the congestion queue, add it to the queue with slow speed - if the position is not within the queue, just place the car
 	 * with free speed at that place
+	 * @param qBufferItem TODO
 	 */
-	private void positionOtherDrivingVehiclesAsQueue(final Collection<AgentSnapshotInfo> positions, double now,
-			double queueEnd, Link link, double vehSpacing, Collection<QVehicle> vehQueue, double inverseSimulatedFlowCapacity,
-			double offset, Integer laneNumber, TransitQLaneFeature transitQueueLaneFeature, double linkLength)
+	private void positionOtherDrivingVehiclesAsQueue(final Collection<AgentSnapshotInfo> positions, double queueEnd,
+			double vehSpacing, Collection<QVehicle> vehQueue, double offset, Integer laneNumber, TransitQLaneFeature transitQueueLaneFeature,
+			double linkLength, VisLane qBufferItem)
 	{
+		double now = qBufferItem.getQLink().getMobsim().getSimTimer().getTimeOfDay() ;
+		Link  link = qBufferItem.getQLink().getLink() ;
+		double inverseSimulatedFlowCapacity = qBufferItem.getInverseSimulatedFlowCapacity() ;
+		
 		double lastDistance = Double.POSITIVE_INFINITY;
 		double ttfs = link.getLength() / link.getFreespeed(now);
 		for (QVehicle veh : vehQueue) {
@@ -244,11 +245,16 @@ public final class AgentSnapshotInfoBuilder {
 	/**
 	 *  put all cars in the buffer one after the other
 	 * @param buffer
+	 * @param qBufferItem TODO
 	 */
-	private double positionVehiclesFromBufferAsQueue(final Collection<AgentSnapshotInfo> positions, double now,
-			double queueEnd, Link link, double vehSpacing, Collection<QVehicle> buffer, double inverseSimulatedFlowCapacity,
-			double offset, Integer laneNumber, TransitQLaneFeature transitQueueLaneFeature)
+	private double positionVehiclesFromBufferAsQueue(final Collection<AgentSnapshotInfo> positions, double queueEnd,
+			double vehSpacing, Collection<QVehicle> buffer, double offset, Integer laneNumber, TransitQLaneFeature transitQueueLaneFeature,
+			VisLane qBufferItem)
 	{
+		double now = qBufferItem.getQLink().getMobsim().getSimTimer().getTimeOfDay() ;
+		Link  link = qBufferItem.getQLink().getLink() ;
+		double inverseSimulatedFlowCapacity = qBufferItem.getInverseSimulatedFlowCapacity() ;
+
 		for (QVehicle veh : buffer) {
 			int lane;
 			if (laneNumber == null){
@@ -274,17 +280,20 @@ public final class AgentSnapshotInfoBuilder {
 	 *
 	 * @param positions
 	 *            A collection where the calculated positions can be stored.
-	 * @param time
 	 * @param buffer
-	 * @param link
 	 * @param vehQueue
-	 * @param inverseSimulatedFlowCapacity
 	 * @param transitQueueLaneFeature
 	 * @param linkLength
+	 * @param qBufferItem TODO
 	 */
-	protected void addVehiclePositionsEquil(final Collection<AgentSnapshotInfo> positions, double time,
-			Collection<QVehicle> buffer, Link link, Collection<QVehicle> vehQueue, double inverseSimulatedFlowCapacity,
-			double offset, Integer laneNumber, TransitQLaneFeature transitQueueLaneFeature, double linkLength) {
+	protected void addVehiclePositionsEquil(final Collection<AgentSnapshotInfo> positions, Collection<QVehicle> buffer,
+			Collection<QVehicle> vehQueue, double offset, Integer laneNumber, TransitQLaneFeature transitQueueLaneFeature,
+			double linkLength, VisLane qBufferItem) 
+	{
+		double now = qBufferItem.getQLink().getMobsim().getSimTimer().getTimeOfDay() ;
+		Link  link = qBufferItem.getQLink().getLink() ;
+		double inverseSimulatedFlowCapacity = qBufferItem.getInverseSimulatedFlowCapacity() ;
+
 		int cnt = buffer.size() + vehQueue.size();
 		if (cnt > 0) {
 			double spacing = linkLength / cnt;
@@ -301,7 +310,7 @@ public final class AgentSnapshotInfoBuilder {
 					lane = laneNumber;
 				}
 				int cmp = (int) (veh.getEarliestLinkExitTime() + inverseSimulatedFlowCapacity + 2.0);
-				double speed = (time > cmp ? 0.0 : freespeed);
+				double speed = (now > cmp ? 0.0 : freespeed);
 				List<PersonAgent> peopleInVehicle = getPeopleInVehicle(veh, transitQueueLaneFeature);
 				createAndAddSnapshotInfoForPeopleInMovingVehicle(positions, peopleInVehicle, distFromFromNode, link, lane, speed, offset);
 				distFromFromNode -= spacing;
@@ -311,7 +320,7 @@ public final class AgentSnapshotInfoBuilder {
 			for (QVehicle veh : vehQueue) {
 				int lane = calculateLane(veh, NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link));
 				int cmp = (int) (veh.getEarliestLinkExitTime() + inverseSimulatedFlowCapacity + 2.0);
-				double speedValueBetweenZeroAndOne = (time > cmp ? 0.0 : 1.0);
+				double speedValueBetweenZeroAndOne = (now > cmp ? 0.0 : 1.0);
 				List<PersonAgent> peopleInVehicle = getPeopleInVehicle(veh, null);
 				createAndAddSnapshotInfoForPeopleInMovingVehicle(positions, peopleInVehicle, distFromFromNode, link, lane, speedValueBetweenZeroAndOne, offset);
 				distFromFromNode -= spacing;
@@ -345,7 +354,7 @@ public final class AgentSnapshotInfoBuilder {
 	}
 
 
-	public int positionAgentsInActivities(final Collection<AgentSnapshotInfo> positions, Link link,
+	 int positionAgentsInActivities(final Collection<AgentSnapshotInfo> positions, Link link,
 			Collection<PlanAgent> agentsInActivities,  int cnt2) {
 		int c = cnt2;
 		for (PlanAgent pa : agentsInActivities) {
@@ -364,7 +373,7 @@ public final class AgentSnapshotInfoBuilder {
 	 * @param waitingList
 	 * @param transitQueueLaneFeature
 	 */
-	public void positionVehiclesFromWaitingList(final Collection<AgentSnapshotInfo> positions,
+	 void positionVehiclesFromWaitingList(final Collection<AgentSnapshotInfo> positions,
 			final Link link, int cnt2, final Queue<QVehicle> waitingList, TransitQLaneFeature transitQueueLaneFeature) {
 		for (QVehicle veh : waitingList) {
 			Collection<PersonAgent> peopleInVehicle = getPeopleInVehicle(veh, transitQueueLaneFeature);

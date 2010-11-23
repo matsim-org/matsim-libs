@@ -43,7 +43,6 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.qsim.TransitQLaneFeature;
 import org.matsim.ptproject.qsim.QSim;
-import org.matsim.ptproject.qsim.helpers.AgentSnapshotInfoBuilder;
 import org.matsim.ptproject.qsim.interfaces.NetsimEngine;
 import org.matsim.signalsystems.mobsim.DefaultSignalizeableItem;
 import org.matsim.signalsystems.mobsim.SignalizeableItem;
@@ -68,17 +67,18 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 	// instance variables (problem with memory)
 	private final Queue<QItem> holes = new LinkedList<QItem>() ;
 
-
 	/**
 	 * All vehicles from parkingList move to the waitingList as soon as their time
 	 * has come. They are then filled into the vehQueue, depending on free space
 	 * in the vehQueue
 	 */
 	/*package*/ final Queue<QVehicle> waitingList = new LinkedList<QVehicle>();
+
 	/**
 	 * The Link instance containing the data
 	 */
 	private final Link link;
+
 	/**
 	 * Reference to the QueueNode which is at the end of each QueueLink instance
 	 */
@@ -100,6 +100,7 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 
 	/** the last timestep the front-most vehicle in the buffer was moved. Used for detecting dead-locks. */
 	private double bufferLastMovedTime = Time.UNDEFINED_TIME;
+
 	/**
 	 * The list of vehicles that have not yet reached the end of the link
 	 * according to the free travel speed of the link
@@ -397,19 +398,26 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 		return this.buffer.isEmpty();
 	}
 
+	private double lastEntry = 0. ;
 	@Override
 	final boolean hasSpace() {
+		double now = this.qsimEngine.getMobsim().getSimTimer().getTimeOfDay() ;
+
 		boolean storageOk = this.usedStorageCapacity < getStorageCapacity();
-		if ( !HOLES || !storageOk ) {
+		if ( !HOLES ) {
 			return storageOk ;
 		}
-		// at this point, storage is ok!
+		// continue only if HOLES
+		if ( !storageOk ) {
+			return false ;
+		}
+		// at this point, storage is ok, so start checking holes:
 		QItem hole = holes.peek();
 		if ( hole==null ) { // no holes available at all; in theory, this should not happen since covered by !storageOk
 			//			log.warn( " !hasSpace since no holes available ") ;
 			return false ;
 		}
-		if ( hole.getEarliestLinkExitTime() > this.getQSimEngine().getMobsim().getSimTimer().getTimeOfDay() ) {
+		if ( hole.getEarliestLinkExitTime() > now ) {
 			//			log.warn( " !hasSpace since all hole arrival times lie in future ") ;
 			return false ;
 		}
@@ -600,15 +608,8 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 		this.qsimEngine = (QSimEngineInternalI) qsimEngine;
 	}
 
-	/**
-	 * One should think about the need for this method
-	 * because it is only called by one testcase
-	 * </p>
-	 * If it is only called by the test case, can protect it by making it package-private and putting the test in the same
-	 * package.  kai, aug'10
-	 * @return
-	 */
 	int vehOnLinkCount() {
+		// called by one test case
 		return this.vehQueue.size();
 	}
 
@@ -652,6 +653,7 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 	}
 
 	@Override
+	@Deprecated // this really should not be exposed
 	public LinkedList<QVehicle> getVehQueue() {
 		return this.vehQueue;
 	}
@@ -755,9 +757,8 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 
 			AgentSnapshotInfoBuilder snapshotInfoBuilder = QLinkImpl.this.getQSimEngine().getAgentSnapshotInfoBuilder();
 
-			snapshotInfoBuilder.addVehiclePositions(positions, time, QLinkImpl.this.link, QLinkImpl.this.buffer,
-					QLinkImpl.this.vehQueue, QLinkImpl.this.holes, QLinkImpl.this.inverseSimulatedFlowCapacityCache,
-					QLinkImpl.this.storageCapacity, QLinkImpl.this.bufferStorageCapacity, QLinkImpl.this.getLink().getLength(), 
+			snapshotInfoBuilder.addVehiclePositions(QLinkImpl.this, positions, QLinkImpl.this.buffer, QLinkImpl.this.vehQueue,
+					QLinkImpl.this.holes, QLinkImpl.this.bufferStorageCapacity, QLinkImpl.this.getLink().getLength(),
 					QLinkImpl.this.transitQueueLaneFeature, QLinkImpl.this.nHolesMax );
 
 			int cnt2 = 0 ; // a counter according to which non-moving items can be "spread out" in the visualization
@@ -786,6 +787,24 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 		public void setEarliestLinkExitTime(double earliestLinkEndTime) {
 			this.earliestLinkEndTime = earliestLinkEndTime;
 		}
+	}
+
+	/**
+	 * this method is here so that aspects of QLane and QLink can be addressed via the same syntax.
+	 */
+	@Override
+	QLinkInternalI getQLink() {
+		return this;
+	}
+
+	@Override
+	double getInverseSimulatedFlowCapacity() {
+		return this.inverseSimulatedFlowCapacityCache ;
+	}
+
+	@Override
+	int getBufferStorage() {
+		return this.bufferStorageCapacity ;
 	}
 
 }

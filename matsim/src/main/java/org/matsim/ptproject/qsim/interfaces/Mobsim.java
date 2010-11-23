@@ -118,7 +118,7 @@ public interface Mobsim extends IOSimulation, ObservableSimulation {
 
 	void setAgentFactory(AgentFactory agentFactory);
 
-	SimTimerI getSimTimer();
+	MobsimTimerI getSimTimer();
 
 	NetsimNetwork getNetsimNetwork();
 	

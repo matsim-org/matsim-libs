@@ -19,13 +19,13 @@
  * *********************************************************************** */
 package org.matsim.ptproject.qsim.helpers;
 
-import org.matsim.ptproject.qsim.interfaces.SimTimerI;
+import org.matsim.ptproject.qsim.interfaces.MobsimTimerI;
 
 
 /**
  * @author dgrether
  */
-public class QSimTimer implements SimTimerI {
+public class MobsimTimer implements MobsimTimerI {
 	/**
 	 * TODO 24 * 3600 is a quite strange time to initialize this
 	 */
@@ -33,12 +33,12 @@ public class QSimTimer implements SimTimerI {
 	private double time = 0.0;
 	private double stepSize = 1.0;
 	
-	public QSimTimer(){
+	public MobsimTimer(){
 		this(1.0);
 	}
 	
 	
-	public QSimTimer(final double stepSize){
+	public MobsimTimer(final double stepSize){
 		this.simStartTime = 24*3600;
 		this.time = 0;
 		this.stepSize = stepSize;

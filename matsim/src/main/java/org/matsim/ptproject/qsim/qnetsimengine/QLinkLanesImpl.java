@@ -40,7 +40,6 @@ import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.lanes.Lane;
 import org.matsim.lanes.LaneMeterFromLinkEndComparator;
 import org.matsim.ptproject.qsim.QSim;
-import org.matsim.ptproject.qsim.helpers.AgentSnapshotInfoBuilder;
 import org.matsim.ptproject.qsim.interfaces.NetsimEngine;
 import org.matsim.ptproject.qsim.interfaces.NetsimLink;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
@@ -557,6 +556,36 @@ public class QLinkLanesImpl extends QLinkInternalI {
 	@Override
 	QVehicle popFirstFromBuffer() {
 		throw new UnsupportedOperationException("Method should not be called on this instance");
+	}
+
+
+	/**
+	 * this method is there so that QLane and QLink can be addressed via the same syntax
+	 */
+	@Override
+	QLinkInternalI getQLink() {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException() ;
+	}
+	
+	@Override
+	double getInverseSimulatedFlowCapacity() {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException() ;
+	}
+
+
+	@Override
+	double getStorageCapacity() {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException() ;
+	}
+
+
+	@Override
+	int getBufferStorage() {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException() ;
 	}
 
 

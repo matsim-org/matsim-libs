@@ -1,6 +1,6 @@
 package org.matsim.ptproject.qsim.interfaces;
 
-public interface SimTimerI {
+public interface MobsimTimerI {
 
 	/**
 	 * @return Returns the simStartTime. That is the lowest found start time of a leg

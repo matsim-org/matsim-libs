@@ -28,7 +28,6 @@ import java.util.ListIterator;
 import java.util.Random;
 
 import org.matsim.ptproject.qsim.QSim;
-import org.matsim.ptproject.qsim.helpers.AgentSnapshotInfoBuilder;
 
 /**
  * Coordinates the movement of vehicles on the links and the nodes.

@@ -3,8 +3,8 @@ package org.matsim.core.mobsim.queuesim;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.ptproject.qsim.agents.DefaultAgentFactory;
-import org.matsim.ptproject.qsim.helpers.QSimTimer;
-import org.matsim.ptproject.qsim.interfaces.SimTimerI;
+import org.matsim.ptproject.qsim.helpers.MobsimTimer;
+import org.matsim.ptproject.qsim.interfaces.MobsimTimerI;
 import org.matsim.ptproject.qsim.qnetsimengine.QVehicle;
 import org.matsim.ptproject.qsim.qnetsimengine.QVehicleImpl;
 import org.matsim.vehicles.Vehicle;
@@ -27,9 +27,9 @@ public class StaticFactoriesContainer {
 		return new DefaultAgentFactory( simulation ).createPersonAgent( p ) ;
 	}
 
-	public static SimTimerI createSimulationTimer(double stepSize) {
+	public static MobsimTimerI createSimulationTimer(double stepSize) {
 //		return new SimulationTimer(stepSize);
-		return new QSimTimer(stepSize);
+		return new MobsimTimer(stepSize);
 	}
 
 }

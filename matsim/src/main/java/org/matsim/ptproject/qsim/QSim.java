@@ -60,7 +60,7 @@ import org.matsim.ptproject.qsim.changeeventsengine.NetworkChangeEventsEngine;
 import org.matsim.ptproject.qsim.comparators.PlanAgentDepartureTimeComparator;
 import org.matsim.ptproject.qsim.comparators.TeleportationArrivalTimeComparator;
 import org.matsim.ptproject.qsim.helpers.AgentCounter;
-import org.matsim.ptproject.qsim.helpers.QSimTimer;
+import org.matsim.ptproject.qsim.helpers.MobsimTimer;
 import org.matsim.ptproject.qsim.interfaces.AcceptsVisMobsimFeatures;
 import org.matsim.ptproject.qsim.interfaces.AgentCounterI;
 import org.matsim.ptproject.qsim.interfaces.DepartureHandler;
@@ -69,7 +69,7 @@ import org.matsim.ptproject.qsim.interfaces.NetsimEngine;
 import org.matsim.ptproject.qsim.interfaces.NetsimEngineFactory;
 import org.matsim.ptproject.qsim.interfaces.NetsimLink;
 import org.matsim.ptproject.qsim.interfaces.NetsimNetwork;
-import org.matsim.ptproject.qsim.interfaces.SimTimerI;
+import org.matsim.ptproject.qsim.interfaces.MobsimTimerI;
 import org.matsim.ptproject.qsim.multimodalsimengine.MultiModalDepartureHandler;
 import org.matsim.ptproject.qsim.multimodalsimengine.MultiModalSimEngine;
 import org.matsim.ptproject.qsim.multimodalsimengine.MultiModalSimEngineFactory;
@@ -120,7 +120,7 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 
 	private CarDepartureHandler carDepartureHandler;
 
-	private SimTimerI simTimer;
+	private MobsimTimerI simTimer;
 
 	private Collection<PlanAgent> transitAgents;
 
@@ -561,7 +561,7 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 		Scenario sc = this.getScenario() ;
 		this.listenerManager = new SimulationListenerManager(this);
 		this.agentCounter = new AgentCounter();
-		this.simTimer = new QSimTimer(sc.getConfig().getQSimConfigGroup().getTimeStepSize());
+		this.simTimer = new MobsimTimer(sc.getConfig().getQSimConfigGroup().getTimeStepSize());
 
 		// create the NetworkEngine ...
 		this.netEngine = simEngineFac.createQSimEngine(this, MatsimRandom.getRandom());
@@ -755,7 +755,7 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 
 
 	@Override
-	public final SimTimerI getSimTimer() {
+	public final MobsimTimerI getSimTimer() {
 		return this.simTimer ;
 	}
 
