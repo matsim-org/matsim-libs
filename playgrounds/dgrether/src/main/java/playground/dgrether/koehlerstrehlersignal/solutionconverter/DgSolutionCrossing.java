@@ -46,4 +46,8 @@ public class DgSolutionCrossing {
 		return this.programIdOffsetMap;
 	}
 
+	public Id getId() {
+		return this.id;
+	}
+
 }

@@ -29,7 +29,7 @@ import org.matsim.signalsystems.builder.FromDataBuilder;
 import org.matsim.signalsystems.data.SignalsData;
 import org.matsim.signalsystems.data.SignalsScenarioLoader;
 import org.matsim.signalsystems.mobsim.QSimSignalEngine;
-import org.matsim.signalsystems.model.SignalEngine;
+import org.matsim.signalsystems.mobsim.SignalEngine;
 import org.matsim.signalsystems.model.SignalSystemsManager;
 import org.matsim.vis.otfvis.OTFVisMobsimFeature;
 

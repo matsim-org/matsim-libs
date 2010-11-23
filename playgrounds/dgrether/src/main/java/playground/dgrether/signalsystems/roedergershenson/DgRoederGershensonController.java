@@ -80,7 +80,7 @@ public class DgRoederGershensonController implements SignalController {
 
 	protected int tGreenMin =  0; // time in seconds
 	protected int minCarsTime = 0; //
-	protected double capFactor = 0;
+	protected double storageCapacityOutlinkJam = 0.8;
 	protected double maxRedTime = 15.0;
 	
 	private boolean interim = false;
@@ -201,8 +201,8 @@ public class DgRoederGershensonController implements SignalController {
 	
 	private boolean hasOutLinkJam(SignalGroup group, SignalGroupMetadata metadata){
 		for (Link link : metadata.getOutLinks()){
-			//TODO implement "5"
-			if (this.sensorManager.getNumberOfCarsOnLink(link.getId()) > 5){
+			double storageCap = (link.getLength() * link.getNumberOfLanes()) / (7.5 * this.storageCapFactor);
+			if (this.sensorManager.getNumberOfCarsOnLink(link.getId()) > (storageCap * this.storageCapacityOutlinkJam)){
 				return true;
 			}
 		}
@@ -215,6 +215,10 @@ public class DgRoederGershensonController implements SignalController {
 	private SignalGroup greenGroup;
 	
 	private Map<Id, GroupState> groupStateMap;
+
+	private double storageCapFactor;
+
+	private boolean allRed;
 	
 	private class GroupState {
 		double lastDropping;
@@ -255,9 +259,9 @@ public class DgRoederGershensonController implements SignalController {
 		log.error("  is not switching...");
 		SignalGroup newGreenGroup = null;
 		//rule 7 
-		SignalGroup maxRedViolatedGroup = this.checkMaxRedTime(timeSeconds);
-		if (maxRedViolatedGroup != null){
-			newGreenGroup = maxRedViolatedGroup;
+		SignalGroup maxRedViolatingGroup = this.checkMaxRedTime(timeSeconds);
+		if (maxRedViolatingGroup != null){
+			newGreenGroup = maxRedViolatingGroup;
 			log.error("new green group is : " + newGreenGroup.getId());
 		}
 		if (newGreenGroup != null){
@@ -265,12 +269,23 @@ public class DgRoederGershensonController implements SignalController {
 			this.switchGroup2Green(timeSeconds, newGreenGroup);
 		}
 		//rule 6
-		SignalGroup outLinkJamGroup = null;
-		if (this.greenGroup.getState().equals(SignalGroupState.GREEN) 
-				&& this.hasOutLinkJam(this.greenGroup, this.signalGroupIdMetadataMap.get(this.greenGroup.getId()))){ 
-			outLinkJamGroup = this.greenGroup;
-			this.switchGroup2Red(timeSeconds, this.greenGroup);
+		Set<SignalGroup> notOutLinkJamGroups = new HashSet<SignalGroup>();
+		for (SignalGroup group : this.system.getSignalGroups().values()){
+			if (!this.hasOutLinkJam(group, this.signalGroupIdMetadataMap.get(group.getId()))){
+				notOutLinkJamGroups.add(group);
+			}
 		}
+		if (this.greenGroup != null){
+			if (!notOutLinkJamGroups.contains(this.greenGroup)){
+				notOutLinkJamGroups.remove(this.greenGroup);
+				this.switchGroup2Red(timeSeconds, this.greenGroup);
+				this.greenGroup = null;
+			}
+		}
+		if (this.greenGroup == null && !notOutLinkJamGroups.isEmpty()) { //we have an all red but one has no jam
+			this.switchGroup2Green(timeSeconds, notOutLinkJamGroups.iterator().next());
+		}
+		//rule 4
 		
 		
 		
@@ -303,10 +318,6 @@ public class DgRoederGershensonController implements SignalController {
 //				}
 //			}
 //		}
-		//rule 5 at the end
-		if (outLinkJamGroup != null){
-			//TODO implement
-		}
 	}
 
 		
@@ -324,6 +335,11 @@ public class DgRoederGershensonController implements SignalController {
 	@Override
 	public void setSignalSystem(SignalSystem system) {
 		this.system = system;
+	}
+
+
+	public void setStorageCapFactor(double storageCapFactor) {
+		this.storageCapFactor = storageCapFactor;
 	}
 
 

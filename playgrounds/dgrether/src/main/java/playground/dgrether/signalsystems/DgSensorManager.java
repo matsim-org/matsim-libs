@@ -98,14 +98,18 @@ public class DgSensorManager implements LinkEnterEventHandler, LinkLeaveEventHan
 	
 	@Override
 	public void handleEvent(AgentArrivalEvent event) {
-		this.linkIdSensorMap.get(event.getLinkId()).handleEvent(event);
+		if (this.linkIdSensorMap.containsKey(event.getLinkId())){
+			this.linkIdSensorMap.get(event.getLinkId()).handleEvent(event);
+		}
 	}
 	
 	@Override
 	public void handleEvent(AgentWait2LinkEvent event) {
-		this.linkIdSensorMap.get(event.getLinkId()).handleEvent(event);		
+		if (this.linkIdSensorMap.containsKey(event.getLinkId())){
+			this.linkIdSensorMap.get(event.getLinkId()).handleEvent(event);		
+		}
 	}
-
+	
 	@Override
 	public void reset(int iteration) {
 		//TODO 

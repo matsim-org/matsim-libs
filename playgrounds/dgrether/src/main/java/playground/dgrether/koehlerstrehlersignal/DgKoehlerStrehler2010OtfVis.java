@@ -28,7 +28,7 @@ import org.matsim.ptproject.qsim.QSim;
 import org.matsim.signalsystems.builder.FromDataBuilder;
 import org.matsim.signalsystems.data.SignalsData;
 import org.matsim.signalsystems.mobsim.QSimSignalEngine;
-import org.matsim.signalsystems.model.SignalEngine;
+import org.matsim.signalsystems.mobsim.SignalEngine;
 import org.matsim.signalsystems.model.SignalSystemsManager;
 import org.matsim.vis.otfvis.OTFVisMobsimFeature;
 
@@ -38,7 +38,8 @@ public class DgKoehlerStrehler2010OtfVis {
 	
 	private void runFromConfig() {
 		EventsManager events = new EventsManagerImpl();
-		String conf = DgKoehlerStrehler2010Runner.signalsConfigSol8005050;
+//		String conf = DgKoehlerStrehler2010Runner.signalsConfigSol800;
+		String conf = "/media/data/work/repos/shared-svn/studies/dgrether/koehlerStrehler2010/scenario2/config_signals_coordinated.xml";
 		ScenarioLoader loader = new ScenarioLoaderImpl(conf);
 		Scenario scenario = loader.loadScenario();
 		scenario.getConfig().otfVis().setAgentSize(40.0f);
@@ -54,8 +55,6 @@ public class DgKoehlerStrehler2010OtfVis {
 		
 		QSim client = otfVisQSim;
 		client.run();
-
-		
 	}
 	
 	

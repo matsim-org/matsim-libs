@@ -326,10 +326,11 @@ public class DgMatsim2KoehlerStrehler2010ModelConverter {
 		}
 	}
 
+	//TODO check this again which offset is needed for green
 	private void createAndAddGreen4Settings(Id lightId, DgProgram program,
 		SignalGroupSettingsData groupSettings, SignalPlanData signalPlan) {
 		DgGreen green = new DgGreen(lightId);
-		green.setOffset(signalPlan.getOffset());
+		green.setOffset(groupSettings.getOnset());
 		green.setLength(this.calculateGreenTimeSeconds(groupSettings, signalPlan.getCycleTime()));
 		log.error("    green time " + green.getLength() + " offset: " + green.getOffset());
 		program.addGreen(green);
@@ -406,6 +407,6 @@ public class DgMatsim2KoehlerStrehler2010ModelConverter {
 	 */
 	public static void main(String[] args) throws SAXException, TransformerConfigurationException, IOException {
 		ScenarioImpl sc = new DgKoehlerStrehler2010ScenarioGenerator().loadScenario();
-		new DgMatsim2KoehlerStrehler2010ModelConverter().convertAndWrite(sc, DgPaths.STUDIESDG + "koehlerStrehler2010/cplex_metamodel_input.xml");
+		new DgMatsim2KoehlerStrehler2010ModelConverter().convertAndWrite(sc, DgPaths.STUDIESDG + "koehlerStrehler2010/cplex_scenario_population_800_agents.xml");
 	}
 }

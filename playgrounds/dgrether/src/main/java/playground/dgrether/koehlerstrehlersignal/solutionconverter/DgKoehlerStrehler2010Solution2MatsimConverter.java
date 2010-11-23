@@ -75,7 +75,7 @@ public class DgKoehlerStrehler2010Solution2MatsimConverter {
 		for (SignalSystemControllerData controllerData : signalControl.getSignalSystemControllerDataBySystemId().values()){
 			log.debug("Processing control for signal system id : " + controllerData.getSignalSystemId());
 			DgSolutionCrossing solutionCrossing = solutionCrossingByIdMap.get(controllerData.getSignalSystemId());
-			log.debug("  solution crossing : " + solutionCrossing);
+			log.debug("  solution crossing : " + solutionCrossing.getId());
 			for (SignalPlanData signalPlan : controllerData.getSignalPlanData().values()){
 				Integer offset = solutionCrossing.getProgramIdOffsetMap().get(signalPlan.getId());
 				log.debug("  processing plan: " + signalPlan.getId() + " offset: " + offset);

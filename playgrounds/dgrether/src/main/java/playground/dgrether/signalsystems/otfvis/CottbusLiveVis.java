@@ -38,21 +38,11 @@ public class CottbusLiveVis {
 //	
 //	private String config = inputDir + "cottbusConfig.xml";
 	private String config = inputDir + "originaldaten/config_dg_livevis.xml";
-
 	
 	public static final  String newCottbusConfig = inputDir + "Cottbus-BA/scenario-lsa/cottbusConfigLiveVis.xml";
 
-	
-	private void runCottbus() {
-		OTFVis.playConfig(config);
-	}
-	
-	private void runNewCottbus(){
-		OTFVis.playConfig(newCottbusConfig);
-	}
-	
 	private void run() {
-		this.runNewCottbus();
+		OTFVis.playConfig(config);
 	}
 	
 	
