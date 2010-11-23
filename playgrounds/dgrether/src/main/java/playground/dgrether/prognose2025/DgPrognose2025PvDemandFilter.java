@@ -30,10 +30,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.utils.misc.Time;
 
 
 /**
@@ -51,7 +48,8 @@ public class DgPrognose2025PvDemandFilter extends DgPrognose2025DemandFilter {
 		random = MatsimRandom.getLocalInstance();
 	}
 
-	private void addNewPerson(Link startLink, Person person, Population newPop, Route route, double endTime){
+	@Override
+	protected void addNewPerson(Link startLink, Person person, Population newPop, double legStartTimeSec, Link endLink) {
 		PopulationFactory popFactory = newPop.getFactory();
 		Person newPerson = popFactory.createPerson(person.getId());
 		newPop.addPerson(newPerson);
@@ -61,13 +59,12 @@ public class DgPrognose2025PvDemandFilter extends DgPrognose2025DemandFilter {
 		//home activity
 		Activity newAct = popFactory.createActivityFromCoord("pvHome", startLink.getCoord());
 		
-		newAct.setEndTime(endTime);
+		newAct.setEndTime(legStartTimeSec);
 		newPlan.addActivity(newAct);
 		//leg
 		Leg leg = popFactory.createLeg("car");
 		newPlan.addLeg(leg);
 		//work activity
-		Link endLink = net.getLinks().get(route.getEndLinkId());
 		newAct = popFactory.createActivityFromCoord("pvWork", endLink.getCoord());
 		newAct.setEndTime(oldWorkAct.getEndTime());
 		newPlan.addActivity(newAct);
@@ -78,30 +75,14 @@ public class DgPrognose2025PvDemandFilter extends DgPrognose2025DemandFilter {
 		newPlan.addActivity(newAct);
 	}
 	
-	@Override
-	protected void addNewPerson(Link startLink, Person person, Population newPop, Route route) {
-		LinkLeaveEvent leaveEvent = this.collector.getLinkLeaveEvent(person.getId(), startLink.getId());		
-		double filterAreaEnterTime = leaveEvent.getTime();
-		if (filterAreaEnterTime > 24.0 *3600.0){
-			if (random.nextDouble() < 0.33){
-				double endTime = filterAreaEnterTime % (24.0 * 3600.0);
-				log.info("Old end time: " + Time.writeTime(filterAreaEnterTime) + " new end time: " + Time.writeTime(endTime));
-				this.addNewPerson(startLink, person, newPop, route, leaveEvent.getTime());
-			}
-		}
-		else {
-			this.addNewPerson(startLink, person, newPop, route, leaveEvent.getTime());
-		}
-	}
-	
 	public static void main(String[] args) throws IOException {
 		if (args == null || args.length == 0){
-			new DgPrognose2025GvDemandFilter().filterAndWriteDemand(DgDetailedEvalFiles.PROGNOSE_2025_2004_NETWORK, 
-					DgDetailedEvalFiles.PV_POPULATION_INPUT_FILE, DgDetailedEvalFiles.PV_EVENTS_FILE, DgDetailedEvalFiles.BAVARIA_SHAPE_FILE,
+			new DgPrognose2025GvDemandFilter().filterAndWriteDemand(DgDetailedEvalFiles.PROGNOSE_2025_2004_PV_NETWORK, 
+					DgDetailedEvalFiles.PV_POPULATION_INPUT_FILE, DgDetailedEvalFiles.BAVARIA_SHAPE_FILE,
 					DgDetailedEvalFiles.PV_POPULATION_OUTPUT_FILE);
 		}
-		else if (args.length == 5){
-			new DgPrognose2025GvDemandFilter().filterAndWriteDemand(args[0], args[1], args[2], args[3], args[4]);
+		else if (args.length == 4){
+			new DgPrognose2025GvDemandFilter().filterAndWriteDemand(args[0], args[1], args[2], args[3]);
 		}
 	}
 

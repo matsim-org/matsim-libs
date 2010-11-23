@@ -32,6 +32,8 @@ public interface DgDetailedEvalFiles {
 	
 	public static final String PROGNOSE_2025_2004_NETWORK = DgPaths.REPOS + "shared-svn/studies/countries/de/prognose_2025/demand/network_cleaned_wgs84.xml.gz";
 
+	public static final String PROGNOSE_2025_2004_PV_NETWORK = DgPaths.REPOS + "shared-svn/studies/countries/de/prognose_2025/demand/network_pv_cleaned_wgs84.xml.gz";
+	
 	public static final String GV_POPULATION_INPUT_FILE = DgPaths.REPOS  + "runs-svn/run1060/1060.output_plans.xml.gz";
 
 	public static final String GV_EVENTS_FILE = DgPaths.REPOS  + "runs-svn/run1060/ITERS/it.0/1060.0.events.xml.gz";
