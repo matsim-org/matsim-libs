@@ -20,10 +20,8 @@
 package playground.dgrether.prognose2025;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -41,8 +39,6 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.events.LinkLeaveEvent;
-import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.events.EventsManagerFactoryImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -51,6 +47,8 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileReader;
+
+import playground.dgrether.utils.DgEventsByLinkIdCollector;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -77,7 +75,7 @@ public abstract class DgPrognose2025DemandFilter {
 
 	private GeometryFactory factory;
 
-	protected EventsByLinkIdCollector collector;
+	protected DgEventsByLinkIdCollector collector;
 
 	private Set<Id> linkIdsInShapefile;
 
@@ -99,7 +97,7 @@ public abstract class DgPrognose2025DemandFilter {
 		this.pop = scenario.getPopulation();
 		//read event file
 		EventsManager manager = new EventsManagerFactoryImpl().createEventsManager();
-		this.collector = new EventsByLinkIdCollector(this.linkIdsInShapefile);
+		this.collector = new DgEventsByLinkIdCollector(this.linkIdsInShapefile);
 		manager.addHandler(this.collector);
 		MatsimEventsReader eventsReader = new MatsimEventsReader(manager);
 		eventsReader.readFile(eventsFilename);
@@ -170,41 +168,5 @@ public abstract class DgPrognose2025DemandFilter {
 		PopulationWriter popWriter = new PopulationWriter(newPop, this.net);
 		popWriter.write(populationOutputFilename);
 		log.info("demand filtered and written. done.");
-	}
-	
-	class EventsByLinkIdCollector implements LinkLeaveEventHandler {
-		// person -> linkId -> LinkLeaveEvent
-		private Map<Id, Map<Id, LinkLeaveEvent>> events = new HashMap<Id, Map<Id, LinkLeaveEvent>>();
-		private Set<Id> linkIds;
-		
-		public EventsByLinkIdCollector(Set<Id> linkIds) {
-			this.linkIds  = linkIds;
-		}
-
-		@Override
-		public void handleEvent(LinkLeaveEvent event) {
-			if (this.linkIds.contains(event.getLinkId())){
-				Map<Id, LinkLeaveEvent> map = this.events.get(event.getPersonId());
-				if (map == null){
-					map = new HashMap<Id, LinkLeaveEvent>();
-					events.put(event.getPersonId(), map);
-				}
-				map.put(event.getLinkId(), event);
-			}
-		}
-
-		public LinkLeaveEvent getLinkLeaveEvent(Id personId, Id linkId){
-			Map<Id, LinkLeaveEvent> m = this.events.get(personId);
-			if (m == null){
-				throw new IllegalArgumentException("Cannot find link leave events for person " + personId);
-			}
-			return m.get(linkId);
-		}
-		
-		@Override
-		public void reset(int iteration) {
-			this.events.clear();
-		}
-
 	}
 }
