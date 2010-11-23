@@ -120,7 +120,7 @@ public abstract class DgPrognose2025DemandFilter {
 
 	protected abstract void addNewPerson(Link startLink, Person person, Population newPop, double legStartTimeSec, Link endLink); 
 	
-	public void filterAndWriteDemand(final String networkFilename, final String populationFilename, final String populationOutputFilename, final String filterShapeFileName) throws IOException{
+	public void filterAndWriteDemand(final String networkFilename, final String populationFilename, final String filterShapeFileName, final String populationOutputFilename) throws IOException{
 		log.info("start to create blauweiss demand...");
 		this.readData(networkFilename, populationFilename, filterShapeFileName);
 		log.info("data loaded...");

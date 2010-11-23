@@ -20,7 +20,6 @@
 package playground.dgrether.prognose2025;
 
 import java.io.IOException;
-import java.util.Random;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
@@ -30,7 +29,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.core.gbl.MatsimRandom;
 
 
 /**
@@ -42,10 +40,7 @@ public class DgPrognose2025PvDemandFilter extends DgPrognose2025DemandFilter {
 
 	private static final Logger log = Logger.getLogger(DgPrognose2025PvDemandFilter.class);
 	
-	private Random random;
-	
 	public DgPrognose2025PvDemandFilter(){
-		random = MatsimRandom.getLocalInstance();
 	}
 
 	@Override
@@ -77,12 +72,11 @@ public class DgPrognose2025PvDemandFilter extends DgPrognose2025DemandFilter {
 	
 	public static void main(String[] args) throws IOException {
 		if (args == null || args.length == 0){
-			new DgPrognose2025GvDemandFilter().filterAndWriteDemand(DgDetailedEvalFiles.PROGNOSE_2025_2004_PV_NETWORK, 
-					DgDetailedEvalFiles.PV_POPULATION_INPUT_FILE, DgDetailedEvalFiles.BAVARIA_SHAPE_FILE,
-					DgDetailedEvalFiles.PV_POPULATION_OUTPUT_FILE);
+			new DgPrognose2025PvDemandFilter().filterAndWriteDemand(DgDetailedEvalFiles.PROGNOSE_2025_2004_PV_NETWORK, 
+					DgDetailedEvalFiles.PV_POPULATION_INPUT_FILE, DgDetailedEvalFiles.BAVARIA_SHAPE_FILE, DgDetailedEvalFiles.PV_POPULATION_OUTPUT_FILE);
 		}
 		else if (args.length == 4){
-			new DgPrognose2025GvDemandFilter().filterAndWriteDemand(args[0], args[1], args[2], args[3]);
+			new DgPrognose2025PvDemandFilter().filterAndWriteDemand(args[0], args[1], args[2], args[3]);
 		}
 	}
 
