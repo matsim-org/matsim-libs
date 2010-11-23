@@ -19,6 +19,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.mzilske.freight.Tour.TourElement;
@@ -32,8 +33,12 @@ public class CarrierAgent {
 	private int nextId = 0;
 
 	private PlanAlgorithm router;
-
+	
 	private Map<Id, CarrierDriverAgent> carrierDriverAgents = new HashMap<Id, CarrierDriverAgent>();
+	
+	private CostAllocator costAllocator = null;
+
+	private Map<Id, ScheduledTour> driverTourMap = new HashMap<Id, ScheduledTour>();
 	
 	private static Logger logger = Logger.getLogger(CarrierAgent.class);
 	
@@ -56,7 +61,12 @@ public class CarrierAgent {
 		}
 
 		public void tellDistance(double distance) {
-			this.distance = distance;
+			this.distance += distance;
+			logger.info(driverId + " sOfDistance=" + this.distance/1000 + "km");
+		}
+		
+		public double getCost(){
+			return distance;
 		}
 		
 	}
@@ -67,6 +77,7 @@ public class CarrierAgent {
 	}
 
 	public List<Plan> createFreightDriverPlans() {
+		clear();
 		List<Plan> plans = new ArrayList<Plan>();
 		for (ScheduledTour scheduledTour : carrier.getSelectedPlan().getScheduledTours()) {
 			Plan plan = new PlanImpl();
@@ -91,24 +102,21 @@ public class CarrierAgent {
 			plans.add(plan);
 			CarrierDriverAgent carrierDriverAgent = new CarrierDriverAgent(driverId);
 			carrierDriverAgents.put(driverId, carrierDriverAgent);
+			driverTourMap.put(driverId, scheduledTour);
 		}
 		return plans;
 	}
 	
-	private void route(Plan plan) {
-		router.run(plan);
+	private void clear() {
+		carrierDriverAgents.clear();
+		driverTourMap.clear();
+		driverIds.clear();
+		nextId=0;
+		
 	}
 
-	private Person createDriverPerson(Id driverId) {
-		Person person = new PersonImpl(driverId);
-		return person;
-	}
-
-	private Id createDriverId() {
-		IdImpl id = new IdImpl("fracht_"+carrier.getId()+"_"+nextId);
-		driverIds.add(id);
-		++nextId;
-		return id;
+	public void setCostAllocator(CostAllocator costAllocator) {
+		this.costAllocator = costAllocator;
 	}
 
 	public Collection<Id> getDriverIds() {
@@ -130,6 +138,41 @@ public class CarrierAgent {
 		}
 		score += carrierScore();
 		return score;
+	}
+
+	public void calculateCostsOfSelectedPlan() {
+		
+	}
+
+	public void scoreSelectedPlan() {
+		double score = score();
+		carrier.getSelectedPlan().setScore(score);
+	}
+
+	public List<Tuple<Shipment, Double>> calculateCostsOfSelectedPlanPerShipment() {
+		List<Tuple<Shipment,Double>> listOfCostPerShipment = new ArrayList<Tuple<Shipment,Double>>();
+		for(Id driverId : driverIds){
+			ScheduledTour tour = driverTourMap.get(driverId);
+			List<Tuple<Shipment,Double>> listOfCostPerShipmentPerDriver = costAllocator.allocateCost(tour.getTour().getShipments(),carrierDriverAgents.get(driverId).getCost());
+			listOfCostPerShipment.addAll(listOfCostPerShipmentPerDriver);
+		}
+		return listOfCostPerShipment;
+	}
+
+	private Person createDriverPerson(Id driverId) {
+		Person person = new PersonImpl(driverId);
+		return person;
+	}
+
+	private void route(Plan plan) {
+		router.run(plan);
+	}
+
+	private Id createDriverId() {
+		IdImpl id = new IdImpl("fracht_"+carrier.getId()+"_"+nextId);
+		driverIds.add(id);
+		++nextId;
+		return id;
 	}
 
 	private int carrierScore() {

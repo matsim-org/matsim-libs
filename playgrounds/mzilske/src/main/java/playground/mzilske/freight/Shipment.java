@@ -54,7 +54,7 @@ public class Shipment {
 		return to;
 	}
 
-	int getSize() {
+	public int getSize() {
 		return size;
 	}
 
