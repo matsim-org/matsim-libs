@@ -31,14 +31,14 @@ import org.matsim.signalsystems.model.SignalGroupState;
  * @author dgrether
  *
  */
-public final class QSignalizedItem implements SignalizeableItem {
+public final class DefaultSignalizeableItem implements SignalizeableItem {
 
 	private Map<Id, SignalGroupState> toLinkIdSignalStates = null;
 	private SignalGroupState allToLinksState = SignalGroupState.GREEN;
 	private boolean linkGreen = true;
 	private Set<Id> outLinks;
 	
-	public QSignalizedItem(Set<Id> outLinks){
+	public DefaultSignalizeableItem(Set<Id> outLinks){
 		this.outLinks = outLinks;
 	}
 

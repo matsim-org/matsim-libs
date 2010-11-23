@@ -45,7 +45,7 @@ import org.matsim.pt.qsim.TransitQLaneFeature;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.helpers.AgentSnapshotInfoBuilder;
 import org.matsim.ptproject.qsim.interfaces.NetsimEngine;
-import org.matsim.signalsystems.mobsim.QSignalizedItem;
+import org.matsim.signalsystems.mobsim.DefaultSignalizeableItem;
 import org.matsim.signalsystems.mobsim.SignalizeableItem;
 import org.matsim.signalsystems.model.SignalGroupState;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
@@ -143,7 +143,7 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 	/**
 	 * null if the link is not signalized
 	 */
-	private QSignalizedItem qSignalizedItem = null;
+	private DefaultSignalizeableItem qSignalizedItem = null;
 	/**
 	 * true, i.e. green, if the link is not signalized
 	 */
@@ -735,7 +735,7 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 
 	@Override
 	public void setSignalized(boolean isSignalized) {
-		this.qSignalizedItem  = new QSignalizedItem(this.getLink().getToNode().getOutLinks().keySet());
+		this.qSignalizedItem  = new DefaultSignalizeableItem(this.getLink().getToNode().getOutLinks().keySet());
 	}
 
 

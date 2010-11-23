@@ -45,7 +45,7 @@ import org.matsim.lanes.Lane;
 import org.matsim.pt.qsim.TransitQLaneFeature;
 import org.matsim.ptproject.qsim.helpers.AgentSnapshotInfoBuilder;
 import org.matsim.ptproject.qsim.interfaces.NetsimLink;
-import org.matsim.signalsystems.mobsim.QSignalizedItem;
+import org.matsim.signalsystems.mobsim.DefaultSignalizeableItem;
 import org.matsim.signalsystems.mobsim.SignalizeableItem;
 import org.matsim.signalsystems.model.SignalGroupState;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
@@ -159,7 +159,7 @@ public final class QLane extends QBufferItem implements SignalizeableItem {
 
 	/*package*/ final TransitQLaneFeature transitQueueLaneFeature;
 
-	private QSignalizedItem qSignalizedItem;
+	private DefaultSignalizeableItem qSignalizedItem;
 
 	/*package*/ QLane(final NetsimLink ql, Lane laneData, boolean isOriginalLane) {
 		this.queueLink = (QLinkInternalI) ql; // yyyy needs to be of correct, but should be made typesafe.  kai, aug'10
@@ -659,7 +659,7 @@ public final class QLane extends QBufferItem implements SignalizeableItem {
 
 	@Override
 	public void setSignalized(boolean isSignalized) {
-		this.qSignalizedItem = new QSignalizedItem(this.queueLink.getLink().getToNode().getOutLinks().keySet());
+		this.qSignalizedItem = new DefaultSignalizeableItem(this.queueLink.getLink().getToNode().getOutLinks().keySet());
 	}
 	
 	/**
