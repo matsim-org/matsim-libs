@@ -19,16 +19,11 @@
 
 package playground.mzilske.city2000w;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.Simulation;
 import org.matsim.vis.otfvis.gui.OTFHostConnectionManager;
@@ -54,7 +49,6 @@ public class City2000WMobsimFactory implements MobsimFactory {
 	private boolean useOTFVis = false;
 	private String[] teleportedModes = null;
 
-	private List<Population> backgroundPopulations = new ArrayList<Population>();
 	private FreightAgentTracker freightAgentTracker;
 	
 	/**
@@ -85,8 +79,7 @@ public class City2000WMobsimFactory implements MobsimFactory {
 		} else {
 			netFeature = new FastQueueNetworkFeature(scenario.getNetwork(), engine, this.nOfThreads);
 		}
-
-		
+	
 		// setup PlanElementHandlers
 		ActivityHandler ah = new ActivityHandler(engine);
 		LegHandler lh = new LegHandler(engine);
@@ -123,15 +116,6 @@ public class City2000WMobsimFactory implements MobsimFactory {
 		
 		planSim.addAgentSource(freightAgentTracker);
 		return planSim;
-	}
-	
-	/**
-	 * Background populations are not replanned. They are not part of the Scenario container, and they are only used by the Mobsim.
-	 * 
-	 * @param population
-	 */
-	public void addBackgroundPopulation(Population population) {
-		this.backgroundPopulations.add(population);
 	}
 
 }
