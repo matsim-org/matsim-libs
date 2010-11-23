@@ -34,6 +34,7 @@ import org.matsim.signalsystems.model.SignalSystemsManager;
 
 
 /**
+ * SignalControllerListener implementation for the MATSim default, data driven signal model
  * @author dgrether
  *
  */
