@@ -35,7 +35,6 @@ import org.matsim.core.events.AgentWait2LinkEventImpl;
 import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
-import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.misc.NetworkUtils;
@@ -883,7 +882,7 @@ class QueueLink implements VisLink {
 				}
 				int lane = 1 + (tmpLane % NetworkUtils.getNumberOfLanesAsInt(
 						Time.UNDEFINED_TIME, link));
-				AgentSnapshotInfo position = AgentSnapshotInfoFactory.staticCreateAgentSnapshotInfo(1.0, veh.getDriver().getPerson().getId(), 
+				AgentSnapshotInfo position = AgentSnapshotInfoFactory.staticCreateAgentSnapshotInfo(1.0, veh.getDriver().getPerson().getId(),
 						link, distanceOnLink, lane, speedValueBetweenZeroAndOne, AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR);
 				positions.add(position);
 				lastDistance = distanceOnLink;

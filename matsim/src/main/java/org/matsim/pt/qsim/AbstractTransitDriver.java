@@ -42,7 +42,6 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.ptproject.qsim.interfaces.Mobsim;
 import org.matsim.ptproject.qsim.qnetsimengine.QVehicle;
@@ -144,9 +143,9 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 		}
 		return stopTime;
 	}
-	
+
 	protected final void sendTransitDriverStartsEvent(final double now) {
-		// check if "Wenden" 
+		// check if "Wenden"
 		if(getTransitLine() == null){
 			this.sim.getEventsManager().processEvent(new TransitDriverStartsEvent(now, this.dummyPerson.getId(),
 					this.vehicle.getId(), new IdImpl("Wenden"), new IdImpl("Wenden"), new IdImpl("Wenden")));
@@ -155,7 +154,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 					this.vehicle.getId(), getTransitLine().getId(), getTransitRoute().getId(), getDeparture().getId()));
 		}
 	}
-	
+
 	@Override
 	public void notifyTeleportToLink(final Id linkId) {
 	}
@@ -185,7 +184,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 		EventsManager events = this.sim.getEventsManager();
 		if (this.currentStop == null) {
 			this.currentStop = this.nextStop;
-			events.processEvent(new VehicleArrivesAtFacilityEventImpl(now, this.vehicle.getVehicle().getId(), stop.getId(), 
+			events.processEvent(new VehicleArrivesAtFacilityEventImpl(now, this.vehicle.getVehicle().getId(), stop.getId(),
 					now - this.getDeparture().getDepartureTime() - this.currentStop.getDepartureOffset()));
 		}
 	}
@@ -209,8 +208,8 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 
 	private void depart(final double now) {
 		EventsManager events = this.sim.getEventsManager();
-		events.processEvent(new VehicleDepartsAtFacilityEventImpl(now, this.vehicle.getVehicle().getId(), 
-				this.currentStop.getStopFacility().getId(), 
+		events.processEvent(new VehicleDepartsAtFacilityEventImpl(now, this.vehicle.getVehicle().getId(),
+				this.currentStop.getStopFacility().getId(),
 				now - this.getDeparture().getDepartureTime() - this.currentStop.getDepartureOffset()));
 		this.nextStop = (stopIterator.hasNext() ? stopIterator.next() : null);
 		if(this.nextStop == null) {
@@ -240,7 +239,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 			this.getSimulation().unregisterAgentAtPtWaitLocation( (PersonAgent) passenger ) ;
 			PersonDriverAgent agent = (PersonDriverAgent) passenger;
 			EventsManager events = this.sim.getEventsManager();
-			events.processEvent(((EventsFactoryImpl) events.getFactory()).createPersonEntersVehicleEvent(time, 
+			events.processEvent(((EventsFactoryImpl) events.getFactory()).createPersonEntersVehicleEvent(time,
 					agent.getPerson().getId(), this.vehicle.getVehicle().getId(), this.getTransitRoute().getId()));
 		}
 		return handled;
@@ -290,7 +289,8 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 	protected NetworkRouteWrapper getWrappedCarRoute(NetworkRoute carRoute) {
 		return new NetworkRouteWrapper(carRoute);
 	}
-	
+
+	@Override
 	public Id getId() {
 		return this.dummyPerson.getId() ;
 	}
@@ -395,7 +395,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 				throw new AssertionError(e);
 			}
 		}
-		
+
 	}
 
 

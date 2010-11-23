@@ -20,19 +20,16 @@
 
 package org.matsim.ptproject.qsim.agents;
 
-import java.util.List;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.ptproject.qsim.interfaces.Mobsim;
 
 /**This class is an attempt to provide access to the internals of DefaultPersonDriverAgent
- * in a way that it can be used for within-day replanning. 
+ * in a way that it can be used for within-day replanning.
  * <p/>
- * <i>The class is, as its name states, experimental.  Use at your own risk, and expect even less support than with other pieces 
+ * <i>The class is, as its name states, experimental.  Use at your own risk, and expect even less support than with other pieces
  * of matsim. </i>
  * @author nagel
  */
@@ -56,17 +53,17 @@ public class ExperimentalBasicWithindayAgent extends PersonDriverAgentImpl imple
 	public final Integer getCurrentRouteLinkIdIndex() {
 		return this.currentLinkIdIndex ;
 	}
-	
+
 	protected void setCachedNextLinkId(Id cachedNextLinkId) {
 		// yyyy I am not convinced that this method really makes sense.  Needed for DgWithinday...  .  kai, oct'10
-		
+
 		this.cachedNextLinkId = cachedNextLinkId;
 	}
 
 	protected Id getCachedNextLinkId() {
 		return this.cachedNextLinkId;
 	}
-	
+
 	@Override
 	public final void calculateDepartureTime( Activity act ) {
 		super.calculateDepartureTime( act ) ;
@@ -76,7 +73,8 @@ public class ExperimentalBasicWithindayAgent extends PersonDriverAgentImpl imple
 	public final void resetCaches() {
 		super.resetCaches() ;
 	}
-	
+
+	@Override
 	public final Plan getModifiablePlan() {
 		// yyyy for the time being, this returns the Person's selected plan, but this should be changed. kai, nov'10
 		return this.person.getSelectedPlan();

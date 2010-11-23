@@ -65,14 +65,8 @@ import org.matsim.core.controler.corelisteners.PlansDumping;
 import org.matsim.core.controler.corelisteners.PlansReplanning;
 import org.matsim.core.controler.corelisteners.PlansScoring;
 import org.matsim.core.controler.corelisteners.RoadPricing;
-import org.matsim.core.controler.events.AfterMobsimEvent;
-import org.matsim.core.controler.events.BeforeMobsimEvent;
-import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;
-import org.matsim.core.controler.listener.AfterMobsimListener;
-import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.ControlerListener;
-import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.parallelEventsHandler.ParallelEventsManagerImpl;
@@ -760,7 +754,7 @@ public class Controler {
 
 		this.addCoreControlerListener(new PlansReplanning());
 		this.addCoreControlerListener(new PlansDumping());
-		
+
 		this.addCoreControlerListener(new EventsHandling(this.events));
 	}
 
@@ -1147,7 +1141,7 @@ public class Controler {
 	public CalcLegTimes getLegTimes() {
 		return this.legTimes;
 	}
-	
+
 	public VolumesAnalyzer getVolumes() {
 		return this.volumes;
 	}

@@ -29,7 +29,6 @@ import java.util.Random;
 
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.helpers.AgentSnapshotInfoBuilder;
-import org.matsim.ptproject.qsim.interfaces.Mobsim;
 
 /**
  * Coordinates the movement of vehicles on the links and the nodes.
@@ -75,7 +74,7 @@ public class QSimEngineImpl extends QSimEngineInternalI {
 		} else if ( "withHolesExperimental".equals( sim.getScenario().getConfig().getQSimConfigGroup().getTrafficDynamics() ) ) {
 			QLinkImpl.HOLES = true ;
 		} else {
-			throw new RuntimeException("trafficDynamics defined in config that does not exist: " 
+			throw new RuntimeException("trafficDynamics defined in config that does not exist: "
 					+ sim.getScenario().getConfig().getQSimConfigGroup().getTrafficDynamics() ) ;
 		}
 	}
