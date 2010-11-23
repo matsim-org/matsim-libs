@@ -9,8 +9,9 @@ import org.matsim.core.router.util.DijkstraFactory;
 public class RouterTaskManagerFactory extends TaskManagerFactory {
 
 	@Override
-	protected TaskManager createTaskManagerImpl(Config config) {
+	protected TaskManager createTaskManagerImpl(TaskConfiguration taskConfiguration) {
 		TaskManager leastCostPathCalculatorFactory;
+		Config config = taskConfiguration.getConfig();
 		if (config.controler().getRoutingAlgorithmType().equals(RoutingAlgorithmType.Dijkstra)) {
 			leastCostPathCalculatorFactory = new LeastCostPathCalculatorTaskManager(new DijkstraTask(new DijkstraFactory()));
 		} else if (config.controler().getRoutingAlgorithmType().equals(RoutingAlgorithmType.AStarLandmarks)) {

@@ -2,9 +2,10 @@ package playground.mzilske.pipeline;
 
 import org.matsim.core.config.Config;
 
-public class PersonReplanningTaskManagerFactory {
+public class PersonReplanningTaskManagerFactory extends TaskManagerFactory {
 	
-	protected TaskManager createTaskManagerImpl(Config config) {
+	protected TaskManager createTaskManagerImpl(TaskConfiguration taskConfiguration) {
+		Config config = taskConfiguration.getConfig();
 		PersonReplanningTaskManager personReplanningTaskManager = new PersonReplanningTaskManager(new PersonReplanningTask(config));
 		return personReplanningTaskManager;
 	}

@@ -46,22 +46,24 @@ public final class Pipeline {
 	}
 
 	private void buildTasks(Config config) {
-		taskManagers.add(new ScenarioLoaderTaskManagerFactory().createTaskManagerImpl(config));
-		taskManagers.add(new EventsManagerTaskManagerFactory().createTaskManagerImpl(config));
-		taskManagers.add(new LogOutputEventHandlerTaskManagerFactory().createTaskManagerImpl(config));
-		taskManagers.add(new IteratorTaskManagerFactory().createTaskManagerImpl(config));
-		taskManagers.add(new MobsimTaskManagerFactory().createTaskManagerImpl(config));
-		taskManagers.add(new TravelTimeCalculatorTaskManagerFactory().createTaskManagerImpl(config));
-		taskManagers.add(new TravelCostCalculatorTaskManagerFactory().createTaskManagerImpl(config));
-		taskManagers.add(new RouterTaskManagerFactory().createTaskManagerImpl(config));
+		taskManagers.add(new ScenarioLoaderTaskManagerFactory().createTaskManagerImpl(new TaskConfiguration(config, null)));
+		taskManagers.add(new EventsManagerTaskManagerFactory().createTaskManagerImpl(new TaskConfiguration(config, null)));
+		taskManagers.add(new IteratorTaskManagerFactory().createTaskManagerImpl(new TaskConfiguration(config, null)));
+		taskManagers.add(new MobsimTaskManagerFactory().createTaskManagerImpl(new TaskConfiguration(config, null)));
+		taskManagers.add(new TravelTimeCalculatorTaskManagerFactory().createTaskManagerImpl(new TaskConfiguration(config, null)));
+		taskManagers.add(new TravelCostCalculatorTaskManagerFactory().createTaskManagerImpl(new TaskConfiguration(config, null)));
+		taskManagers.add(new RouterTaskManagerFactory().createTaskManagerImpl(new TaskConfiguration(config, null)));
 		if (config.controler().isLinkToLinkRoutingEnabled()) {
-			taskManagers.add(new RouterInvertedNetTaskManagerFactory().createTaskManagerImpl(config));
+			taskManagers.add(new RouterInvertedNetTaskManagerFactory().createTaskManagerImpl(new TaskConfiguration(config, null)));
 		}
-		taskManagers.add(new VehicleWatcherFactory().createTaskManagerImpl(config));
-		taskManagers.add(new ScoringTaskManagerFactory().createTaskManagerImpl(config));
-		taskManagers.add(new PersonReplanningTaskManagerFactory().createTaskManagerImpl(config));
-		taskManagers.add(new IterationTerminatorTaskManagerFactory().createTaskManagerImpl(config));
-		taskManagers.add(new ScenarioGroundFactory().createTaskManagerImpl(config));
+		taskManagers.add(new VehicleWatcherFactory().createTaskManagerImpl(new TaskConfiguration(config, null)));
+		taskManagers.add(new ScoringTaskManagerFactory().createTaskManagerImpl(new TaskConfiguration(config, null)));
+		taskManagers.add(new PersonReplanningTaskManagerFactory().createTaskManagerImpl(new TaskConfiguration(config, null)));
+		taskManagers.add(new ScenarioOutSwitchTaskManagerFactory().createTaskManagerImpl(new TaskConfiguration(config, "1-3")));
+		taskManagers.add(new ProgressTaskManagerFactory().createTaskManagerImpl(new TaskConfiguration(config, null)));
+		taskManagers.add(new ScenarioInSwitchTaskManagerFactory().createTaskManagerImpl(new TaskConfiguration(config, null)));
+		taskManagers.add(new IterationTerminatorTaskManagerFactory().createTaskManagerImpl(new TaskConfiguration(config, null)));
+		taskManagers.add(new ScenarioGroundFactory().createTaskManagerImpl(new TaskConfiguration(config, null)));
 	}
 
 	private void connectTasks() {

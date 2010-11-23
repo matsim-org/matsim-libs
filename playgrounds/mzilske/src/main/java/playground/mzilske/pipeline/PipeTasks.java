@@ -1,5 +1,8 @@
 package playground.mzilske.pipeline;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
+
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 
@@ -11,7 +14,7 @@ public class PipeTasks {
 
 	private LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
 
-	private ScenarioSource scenarioSource;
+	private Deque<ScenarioSource> scenarioSource = new ArrayDeque<ScenarioSource>();
 
 	private TravelCostCalculatorTask travelCostCalculator;
 
@@ -30,7 +33,9 @@ public class PipeTasks {
 
 	public IteratorTask getIterator() {
 		assertNotNull(iterator);
-		return iterator;
+		IteratorTask result = iterator;
+		iterator = null;
+		return result;
 	}
 
 	public LeastCostPathCalculatorFactory getLeastCostPathCalculatorFactory() {
@@ -39,10 +44,7 @@ public class PipeTasks {
 	}
 
 	public ScenarioSource getScenarioSource() {
-		assertNotNull(scenarioSource);
-		ScenarioSource result = scenarioSource;
-		scenarioSource = null;
-		return result;
+		return scenarioSource.pop();
 	}
 
 	public TravelCostCalculatorTask getTravelCostCalculator() {
@@ -68,7 +70,7 @@ public class PipeTasks {
 	}
 
 	public void setScenarioSource(ScenarioSource task) {
-		this.scenarioSource = task;
+		scenarioSource.push(task);
 	}
 
 	public void setTravelCostCalculator(TravelCostCalculatorTask task) {
@@ -80,7 +82,7 @@ public class PipeTasks {
 	}
 
 	public void assertIsComplete() {
-		if (scenarioSource != null) {
+		if (scenarioSource.size() != 0) {
 			throw new IllegalStateException("There is an unconsumed ScenarioSource in the pipeline. Hint: Close the pipeline with a ScenarioGround.");
 		}
 		if (iterator != null) {
