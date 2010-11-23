@@ -4,8 +4,8 @@
 package playground.jbischoff.BAsignals;
 
 import org.apache.log4j.Logger;
-import org.matsim.signalsystems.initialization.SignalsControllerListener;
-import org.matsim.signalsystems.initialization.SignalsControllerListenerFactory;
+import org.matsim.signalsystems.controler.SignalsControllerListener;
+import org.matsim.signalsystems.controler.SignalsControllerListenerFactory;
 
 /**
  * @author jbischoff
