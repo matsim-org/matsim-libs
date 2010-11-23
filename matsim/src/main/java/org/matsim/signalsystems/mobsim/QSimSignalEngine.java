@@ -29,7 +29,6 @@ import org.matsim.ptproject.qsim.qnetsimengine.QLane;
 import org.matsim.ptproject.qsim.qnetsimengine.QLinkImpl;
 import org.matsim.ptproject.qsim.qnetsimengine.QLinkLanesImpl;
 import org.matsim.signalsystems.model.Signal;
-import org.matsim.signalsystems.model.SignalEngine;
 import org.matsim.signalsystems.model.SignalSystem;
 import org.matsim.signalsystems.model.SignalSystemsManager;
 

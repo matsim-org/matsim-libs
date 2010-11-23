@@ -44,7 +44,7 @@ import org.matsim.signalsystems.data.signalcontrol.v20.SignalGroupSettingsData;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalPlanData;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalSystemControllerData;
 import org.matsim.signalsystems.mobsim.QSimSignalEngine;
-import org.matsim.signalsystems.model.SignalEngine;
+import org.matsim.signalsystems.mobsim.SignalEngine;
 import org.matsim.signalsystems.model.SignalSystemsManager;
 import org.matsim.testcases.MatsimTestUtils;
 

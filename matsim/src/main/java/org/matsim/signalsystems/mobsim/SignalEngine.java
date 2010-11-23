@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.signalsystems.model;
+package org.matsim.signalsystems.mobsim;
 
 import org.matsim.core.mobsim.framework.listeners.SimulationBeforeSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
