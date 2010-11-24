@@ -19,19 +19,19 @@
  * *********************************************************************** */
 
 package playground.fhuelsmann.emissions;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.TreeMap;
+
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
+import org.matsim.core.api.experimental.events.LinkEnterEvent;
+import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
+import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
+import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 
 public class TravelTimeCalculation implements LinkEnterEventHandler,LinkLeaveEventHandler, 
 AgentArrivalEventHandler,AgentDepartureEventHandler {
@@ -40,6 +40,14 @@ AgentArrivalEventHandler,AgentDepartureEventHandler {
 	private final Map<Id, Double> agentarrival = new TreeMap<Id, Double>();
 	private final Map<Id, Double> agentdeparture = new TreeMap<Id, Double>();
 		
+	/**yyyy Design questions:<ul>
+	 * <li> Why are the map entries "Strings" and not "Id"s and "Double"s?  This makes the code much harder to read,
+	 * and it is also probably less efficient.  kai, nov'10
+	 * <li> Was it a deliberate design decision to make the List of type Linked?  If not, please say so so that it may be modified.
+	 * kai, nov'10 
+	 * </ul>
+	 * 
+	 */
 	public Map<String,Map<String, LinkedList<String>>> getTravelTimes() {
 		return travelTimes;
 	}
@@ -135,20 +143,21 @@ AgentArrivalEventHandler,AgentDepartureEventHandler {
 					if (this.travelTimes.get(linkId+"") != null){
 						if (this.travelTimes.get(linkId+"").containsKey(personalId)){
 							this.travelTimes.get(linkId+"").get(personalId).push("----ohne Aktivität---,"+travelTime+","+ enterTime);
-							}else{
-								LinkedList<String> list = new LinkedList<String>();
-								list.push("----ohne Aktivität---,"+travelTime + ","+ enterTime);
-								this.travelTimes.get(linkId+"").put(personalId,list);}}
-					else{
-						
+						}else{
+							LinkedList<String> list = new LinkedList<String>();
+							list.push("----ohne Aktivität---,"+travelTime + ","+ enterTime);
+							this.travelTimes.get(linkId+"").put(personalId,list);
+						}
+					}else{
+
 						LinkedList<String> list = new LinkedList<String>();
 						list.push("----ohne Aktivität---,"+travelTime +","+ enterTime);
 						Map<String,LinkedList<String>> map = new TreeMap<String,LinkedList<String>>();
 						map.put(personalId, list);
 						this.travelTimes.put(linkId +"",map);
-						}				
-					}
-			}	
+					}				
+			}
+		}	
 		}
 	
 					    

@@ -1,0 +1,196 @@
+T_GBL	VEH_ID	LEG_NR	LINK_ID	FROM_NODE_ID	EVENT_FLAG	DESCRIPTION
+23933	23933testVehicle		52902684	0	8	actend h
+23933	23933testVehicle		52902684	0	6	departure
+23933	23933testVehicle		52902684	0	4	wait2link
+23934	23933testVehicle		52902684	0	2	left link
+23934	23933testVehicle		592536888	0	5	entered link
+23941	23933testVehicle		592536888	0	2	left link
+23941	23933testVehicle		590000822	0	5	entered link
+23953	23933testVehicle		590000822	0	2	left link
+23953	23933testVehicle		52902456	0	5	entered link
+23955	23933testVehicle		52902456	0	2	left link
+23955	23933testVehicle		52799758	0	5	entered link
+23971	23933testVehicle		52799758	0	0	arrival
+23971	23933testVehicle		52799758	0	7	actstart h
+26376	26376testVehicle		52902684	0	8	actend h
+26376	26376testVehicle		52902684	0	6	departure
+26376	26376testVehicle		52902684	0	4	wait2link
+26377	26376testVehicle		52902684	0	2	left link
+26377	26376testVehicle		592536888	0	5	entered link
+26384	26376testVehicle		592536888	0	2	left link
+26384	26376testVehicle		590000822	0	5	entered link
+26424	26376testVehicle		590000822	0	2	left link
+26424	26376testVehicle		52902456	0	5	entered link
+26426	26376testVehicle		52902456	0	2	left link
+26426	26376testVehicle		52799758	0	5	entered link
+26442	26376testVehicle		52799758	0	0	arrival
+26442	26376testVehicle		52799758	0	7	actstart h
+29618	29618testVehicle		52902684	0	8	actend h
+29618	29618testVehicle		52902684	0	6	departure
+29618	29618testVehicle		52902684	0	4	wait2link
+29619	29618testVehicle		52902684	0	2	left link
+29619	29618testVehicle		592536888	0	5	entered link
+29626	29618testVehicle		592536888	0	2	left link
+29626	29618testVehicle		590000822	0	5	entered link
+29669	29618testVehicle		590000822	0	2	left link
+29669	29618testVehicle		52902456	0	5	entered link
+29671	29618testVehicle		52902456	0	2	left link
+29671	29618testVehicle		52799758	0	5	entered link
+29687	29618testVehicle		52799758	0	0	arrival
+29687	29618testVehicle		52799758	0	7	actstart h
+32871	32871testVehicle		52902684	0	8	actend h
+32871	32871testVehicle		52902684	0	6	departure
+32871	32871testVehicle		52902684	0	4	wait2link
+32872	32871testVehicle		52902684	0	2	left link
+32872	32871testVehicle		592536888	0	5	entered link
+32879	32871testVehicle		592536888	0	2	left link
+32879	32871testVehicle		590000822	0	5	entered link
+32947	32871testVehicle		590000822	0	2	left link
+32947	32871testVehicle		52902456	0	5	entered link
+32949	32871testVehicle		52902456	0	2	left link
+32949	32871testVehicle		52799758	0	5	entered link
+32965	32871testVehicle		52799758	0	0	arrival
+32965	32871testVehicle		52799758	0	7	actstart h
+36018	36018testVehicle		52902684	0	8	actend h
+36018	36018testVehicle		52902684	0	6	departure
+36018	36018testVehicle		52902684	0	4	wait2link
+36019	36018testVehicle		52902684	0	2	left link
+36019	36018testVehicle		592536888	0	5	entered link
+36026	36018testVehicle		592536888	0	2	left link
+36026	36018testVehicle		590000822	0	5	entered link
+36038	36018testVehicle		590000822	0	2	left link
+36038	36018testVehicle		52902456	0	5	entered link
+36040	36018testVehicle		52902456	0	2	left link
+36040	36018testVehicle		52799758	0	5	entered link
+36056	36018testVehicle		52799758	0	0	arrival
+36056	36018testVehicle		52799758	0	7	actstart h
+38530	38530testVehicle		52902684	0	8	actend h
+38530	38530testVehicle		52902684	0	6	departure
+38530	38530testVehicle		52902684	0	4	wait2link
+38531	38530testVehicle		52902684	0	2	left link
+38531	38530testVehicle		592536888	0	5	entered link
+38538	38530testVehicle		592536888	0	2	left link
+38538	38530testVehicle		590000822	0	5	entered link
+38598	38530testVehicle		590000822	0	2	left link
+38598	38530testVehicle		52902456	0	5	entered link
+38600	38530testVehicle		52902456	0	2	left link
+38600	38530testVehicle		52799758	0	5	entered link
+38616	38530testVehicle		52799758	0	0	arrival
+38616	38530testVehicle		52799758	0	7	actstart h
+41241	41241testVehicle		52902684	0	8	actend h
+41241	41241testVehicle		52902684	0	6	departure
+41241	41241testVehicle		52902684	0	4	wait2link
+41242	41241testVehicle		52902684	0	2	left link
+41242	41241testVehicle		592536888	0	5	entered link
+41250	41241testVehicle		592536888	0	2	left link
+41250	41241testVehicle		590000822	0	5	entered link
+41267	41241testVehicle		590000822	0	2	left link
+41267	41241testVehicle		52902456	0	5	entered link
+41269	41241testVehicle		52902456	0	2	left link
+41269	41241testVehicle		52799758	0	5	entered link
+41285	41241testVehicle		52799758	0	0	arrival
+41285	41241testVehicle		52799758	0	7	actstart h
+43965	43965testVehicle		52902684	0	8	actend h
+43965	43965testVehicle		52902684	0	6	departure
+43965	43965testVehicle		52902684	0	4	wait2link
+43966	43965testVehicle		52902684	0	2	left link
+43966	43965testVehicle		592536888	0	5	entered link
+43973	43965testVehicle		592536888	0	2	left link
+43973	43965testVehicle		590000822	0	5	entered link
+44007	43965testVehicle		590000822	0	2	left link
+44007	43965testVehicle		52902456	0	5	entered link
+44009	43965testVehicle		52902456	0	2	left link
+44009	43965testVehicle		52799758	0	5	entered link
+44025	43965testVehicle		52799758	0	0	arrival
+44025	43965testVehicle		52799758	0	7	actstart h
+47842	47842testVehicle		52902684	0	8	actend h
+47842	47842testVehicle		52902684	0	6	departure
+47842	47842testVehicle		52902684	0	4	wait2link
+47843	47842testVehicle		52902684	0	2	left link
+47843	47842testVehicle		592536888	0	5	entered link
+47850	47842testVehicle		592536888	0	2	left link
+47850	47842testVehicle		590000822	0	5	entered link
+47867	47842testVehicle		590000822	0	2	left link
+47867	47842testVehicle		52902456	0	5	entered link
+47869	47842testVehicle		52902456	0	2	left link
+47869	47842testVehicle		52799758	0	5	entered link
+47885	47842testVehicle		52799758	0	0	arrival
+47885	47842testVehicle		52799758	0	7	actstart h
+50828	50828testVehicle		52902684	0	8	actend h
+50828	50828testVehicle		52902684	0	6	departure
+50828	50828testVehicle		52902684	0	4	wait2link
+50829	50828testVehicle		52902684	0	2	left link
+50829	50828testVehicle		592536888	0	5	entered link
+50836	50828testVehicle		592536888	0	2	left link
+50836	50828testVehicle		590000822	0	5	entered link
+50860	50828testVehicle		590000822	0	2	left link
+50860	50828testVehicle		52902456	0	5	entered link
+50862	50828testVehicle		52902456	0	2	left link
+50862	50828testVehicle		52799758	0	5	entered link
+50878	50828testVehicle		52799758	0	0	arrival
+50878	50828testVehicle		52799758	0	7	actstart h
+54313	54313testVehicle		52902684	0	8	actend h
+54313	54313testVehicle		52902684	0	6	departure
+54313	54313testVehicle		52902684	0	4	wait2link
+54314	54313testVehicle		52902684	0	2	left link
+54314	54313testVehicle		592536888	0	5	entered link
+54321	54313testVehicle		592536888	0	2	left link
+54321	54313testVehicle		590000822	0	5	entered link
+54372	54313testVehicle		590000822	0	2	left link
+54372	54313testVehicle		52902456	0	5	entered link
+54374	54313testVehicle		52902456	0	2	left link
+54374	54313testVehicle		52799758	0	5	entered link
+54390	54313testVehicle		52799758	0	0	arrival
+54390	54313testVehicle		52799758	0	7	actstart h
+56942	56942testVehicle		52902684	0	8	actend h
+56942	56942testVehicle		52902684	0	6	departure
+56942	56942testVehicle		52902684	0	4	wait2link
+56943	56942testVehicle		52902684	0	2	left link
+56943	56942testVehicle		592536888	0	5	entered link
+56950	56942testVehicle		592536888	0	2	left link
+56950	56942testVehicle		590000822	0	5	entered link
+56987	56942testVehicle		590000822	0	2	left link
+56987	56942testVehicle		52902456	0	5	entered link
+56989	56942testVehicle		52902456	0	2	left link
+56989	56942testVehicle		52799758	0	5	entered link
+57005	56942testVehicle		52799758	0	0	arrival
+57005	56942testVehicle		52799758	0	7	actstart h
+60604	60604testVehicle		52902684	0	8	actend h
+60604	60604testVehicle		52902684	0	6	departure
+60604	60604testVehicle		52902684	0	4	wait2link
+60605	60604testVehicle		52902684	0	2	left link
+60605	60604testVehicle		592536888	0	5	entered link
+60612	60604testVehicle		592536888	0	2	left link
+60612	60604testVehicle		590000822	0	5	entered link
+60705	60604testVehicle		590000822	0	2	left link
+60705	60604testVehicle		52902456	0	5	entered link
+60707	60604testVehicle		52902456	0	2	left link
+60707	60604testVehicle		52799758	0	5	entered link
+60723	60604testVehicle		52799758	0	0	arrival
+60723	60604testVehicle		52799758	0	7	actstart h
+64940	64940testVehicle		52902684	0	8	actend h
+64940	64940testVehicle		52902684	0	6	departure
+64940	64940testVehicle		52902684	0	4	wait2link
+64941	64940testVehicle		52902684	0	2	left link
+64941	64940testVehicle		592536888	0	5	entered link
+64948	64940testVehicle		592536888	0	2	left link
+64948	64940testVehicle		590000822	0	5	entered link
+65026	64940testVehicle		590000822	0	2	left link
+65026	64940testVehicle		52902456	0	5	entered link
+65028	64940testVehicle		52902456	0	2	left link
+65028	64940testVehicle		52799758	0	5	entered link
+65044	64940testVehicle		52799758	0	0	arrival
+65044	64940testVehicle		52799758	0	7	actstart h
+68011	68011testVehicle		52902684	0	8	actend h
+68011	68011testVehicle		52902684	0	6	departure
+68011	68011testVehicle		52902684	0	4	wait2link
+68012	68011testVehicle		52902684	0	2	left link
+68012	68011testVehicle		592536888	0	5	entered link
+68019	68011testVehicle		592536888	0	2	left link
+68019	68011testVehicle		590000822	0	5	entered link
+68126	68011testVehicle		590000822	0	2	left link
+68126	68011testVehicle		52902456	0	5	entered link
+68128	68011testVehicle		52902456	0	2	left link
+68128	68011testVehicle		52799758	0	5	entered link
+68144	68011testVehicle		52799758	0	0	arrival
+68144	68011testVehicle		52799758	0	7	actstart h

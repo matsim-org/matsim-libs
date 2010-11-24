@@ -1,0 +1,101 @@
+VISUM_RT_NR,VISUM_RT_NAME,HBEFA_RT_NR,HBEFA_RT_NAME
+0,gesperrte Gegenrichtung,0,
+1,gesperrte Straﬂe,0,
+2,Planungsstrecke,0,
+3,"fiktive Strecke, Anbindung",0,
+4,÷V-Fuﬂweg,0,
+5,Rad-Weg,0,
+6,leer,0,
+7,1ao 4FS 140,0,
+8,1ao 4FS 120,0,
+9,1ao 4FS 100,0,
+10,1ao 4FS 80,0,Unclear-should be Urban / City-Motorway / SpLimit:80 
+11,1ao 3FS 140,0,Not an urban road
+12,1ao 3FS 120,0,Urban / Nat-Motorway(ThrougTraffic) / SpLimit:130 
+13,1ao 3FS 100,0,Not an urban road
+14,1ao 3FS 80,0,Urban / Nat-Motorway(ThrougTraffic) / SpLimit:80 
+15,1ao 2FS 140,0,Urban / Nat-Motorway(ThrougTraffic) / SpLimit:140 
+16,1ao 2FS 120,0,Urban / Nat-Motorway(ThrougTraffic) / SpLimit:120 
+17,1ao 2FS 100,0,Urban / Nat-Motorway(ThrougTraffic) / SpLimit:100 
+18,1ao 2FS 80,0,Urban / Nat-Motorway(ThrougTraffic) / SpLimit:80 
+19,1ao 1FS 80,0,Not an urban road
+20,2ao 3FS 80,0,Urban / City-TrunkRoad / SpLimit:80
+21,2ao 2FS 120,0,Not an urban road
+22,2ao 2FS 100,0,Not an urban road
+23,2ao 2FS 80,1,Not an urban road
+24,2ao 1FS 120,0,Not an urban road
+25,2ao 1FS 100,0,Not an urban road
+26,2ao 1FS 80,0,Not an urban road
+27,2ao 1FS 70,0,Not an urban road
+28,2af 3FS 70,0,Urban / City-Motorway / SpLimit:70 
+29,2af 3FS 60,0,Urban / City-Motorway / SpLimit:60 
+30,2af 2FS 80,0,Not an urban road
+31,2af 2FS 70,0,Not an urban road
+32,2af 2FS 60,0,Unknown 
+33,2af 1FS 80,0,Not an urban road
+34,2af 1FS 70,0,Not an urban road
+35,2af 1FS 60,0,Urban / LocalCollector / SpLimit:60 
+36,2af 1FS 50,0,Not an urban road
+37,2io 4FS 60,1,Urban / City-Motorway / SpLimit:60 
+38,2io 3FS 60,13,Urban / Distributor-DistrictConnection / SpLimit:60
+39,2io 3FS 50,12,Urban / Distributor-DistrictConnection / SpLimit:50
+40,2io 2FS 60,13,Urban / Distributor-DistrictConnection / SpLimit:60
+41,2io 2FS 50,12,Urban / Distributor-DistrictConnection / SpLimit:50
+42,2io 1FS 60,17,Urban / LocalCollector / SpLimit:60 
+43,2io 1FS 50,16,Urban / LocalCollector / SpLimit:50 
+44,2io 1FS 40,19,Urban / Access-residential / SpLimit:40 
+45,R 2FS 60,8,Urban / City-TrunkRoad / SpLimit:60
+46,R 2FS 50,7,Urban / City-TrunkRoad / SpLimit:50
+47,R 2FS 40,19,Does not seem to fit with any. Could be Urban / Access-residential / SpLimit:40 
+48,R 1FS 60,17,Urban / LocalCollector / SpLimit:60 
+49,R 1FS 50,16,Urban / LocalCollector / SpLimit:50 
+50,R 1FS 40,19,Does not seem to fit with any. Could be Urban / Access-residential / SpLimit:40 
+51,MR 2io/1-2FS,17,Urban / LocalCollector / SpLimit:60 
+52,MR 2io/3FS/Planfrei,8,Urban / Distributor-DistrictConnection / SpLimit:Unknown
+53,MR 2io/2FS/Planfrei,8,Urban / City-TrunkRoad / SpLimit:60
+54,MR 2io/3FS/,8,Urban /City-TrunkRoad / SpLimit:60
+55,MR 2io/2FS/,8,Urban / City-TrunkRoad / SpLimit:60
+56,MR 2io/2FS/,8,Urban / City-TrunkRoad / SpLimit:60
+57,frei,0,Unknown
+58,frei,0,Unknown
+59,MR 2io/1-2F,8,Urban / Distributor-DistrictConnection / SpLimit:Unknown
+60,Kreis xl,16,Urban / Access-residential / SpLimit:Unknown
+61,Kreis l,19,Unknown
+62,Kreis s,19,Urban / Access-residential / SpLimit:Unknown
+63,3ao 2FS 100,5,Urban / City-Motorway / SpLimit:100 
+64,3ao 2FS 80,10,Urban / City-TrunkRoad / SpLimit:80
+65,3ao 1FS 100,0,Unknown
+66,3ao 1FS 80,3,Urban / City-Motorway / SpLimit:80 
+67,3ao 1FS 70,2,Urban / City-Motorway / SpLimit:70 
+68,3ao 1FS 60,13,Urban / Distributor-DistrictConnection / SpLimit:60
+69,3af 2FS 60,13,Urban / Distributor-DistrictConnection / SpLimit:60
+70,3af 1FS 70,14,Urban / Distributor-DistrictConnection / SpLimit:70
+71,3af 1FS 60,17,Urban / LocalCollector / SpLimit:60 
+72,3io 2FS 50,16,Urban / LocalCollector / SpLimit:50 
+73,3io 1FS 50,20,Urban / Access-residential / SpLimit:50 
+74,3io 1FS 40,19,Urban / Access-residential / SpLimit:40 
+75,3io 1FS 30,18,Urban / Access-residential / SpLimit:30 
+76,4ao 1FS 70,0,Not an urban road
+77,4ao 1FS 60,0,Not an urban road
+78,4ao 1FS 50,0,Not an urban road
+79,4ao 1FS 45,0,Not an urban road
+80,4io 2FS 45,12,Urban / Distributor-DistrictConnection / SpLimit:45?
+81,4io 1FS 45,20,Urban / Access-residential / SpLimit:45?
+82,4io 1FS 35,19,Urban / Access-residential / SpLimit:35?
+83,4io 2FS 30,19,Urban / Access-residential / SpLimit:35?
+84,5ao 1FS  40,19,Urban / Access-residential / SpLimit:40 
+85,5io 1FS 30,18,Urban / Access-residential / SpLimit:30 
+86,Wohnstraﬂe,18,Urban / Access-residential / SpLimit:30 
+87,5ao 1FS 30,0,
+88,Landw. Weg,0,
+89,leer,0,
+90,÷V allgemein,0,
+91,÷V DB; S,0,
+92,÷V  DB; S; U,0,
+93,÷V DB; S; U; T,0,
+94,÷V U-Bahn,0,
+95,÷V Tram,0,
+96,÷V Tram eG,0,
+97,÷V-Strecke,0,
+98,S-Bahn tief,0,
+99,÷V-Strecke,0,

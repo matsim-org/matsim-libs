@@ -194,7 +194,7 @@ public class EmissionFactor  {
 	}
 	
 	
-		public void printEmissionTable(){
+		public String printEmissionTable(){
 			 String result="";
 			
 			for(Entry<String, Map<String, LinkedList<SingleEvent>>> LinkIdEntry : map.entrySet()){
@@ -258,6 +258,8 @@ public class EmissionFactor  {
 					}catch (Exception e){//Catch exception if any
 						System.err.println("Error: " + e.getMessage());
 			    }
+					
+					return result ;
 		}	
 		
 /*		public Map<String,Map<String, LinkedList<SingleEvent>>> getmap() {
