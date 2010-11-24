@@ -23,23 +23,23 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.DataInputStream;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.InputStreamReader;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.TreeMap;
+import java.util.Map.Entry;
 
-import com.vividsolutions.jts.index.bintree.Key;
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.basic.v01.IdImpl;
 
 public class VelocityAverageCalculate {
 
 	public VelocityAverageCalculate(
-			Map<String,Map<String, LinkedList<String>>> oldtravelTimesWithLengthAndAverageSpeed, String filename) {
+			Map<Id,Map<String, LinkedList<String>>> oldtravelTimesWithLengthAndAverageSpeed, String filename) {
 		super();
-		this.OldtravelTimesWithLengthAndAverageSpeed = oldtravelTimesWithLengthAndAverageSpeed;
+		this.oldtravelTimesWithLengthAndAverageSpeed = oldtravelTimesWithLengthAndAverageSpeed;
 		this.filename = filename;
 	}
 
@@ -47,7 +47,7 @@ public class VelocityAverageCalculate {
 	
 	String filename;	
 	
-	private final Map<String,Map<String, LinkedList<String>>> OldtravelTimesWithLengthAndAverageSpeed;
+	private final Map<Id,Map<String, LinkedList<String>>> oldtravelTimesWithLengthAndAverageSpeed;
 	
 	private final Map<String,Map<String, LinkedList<SingleEvent>>> mapOfSingleEvent
 		= new TreeMap<String,Map<String, LinkedList<SingleEvent>>>();
@@ -71,20 +71,21 @@ public class VelocityAverageCalculate {
 
 			       	String length = array[5];
 			       	int freeVelocity;
-			    	int roadSectionNr;
 			    	int visumRoadType;
 			    	String[] a = array[1].split(",");
-			    	roadSectionNr = Integer.parseInt(a[0]);
+			    	int roadSectionNr = Integer.parseInt(a[0]);
 			    	visumRoadType = Integer.parseInt(array[4]);
 			    	freeVelocity = Integer.parseInt(array[6]);
-	 				int roadSectionNumber = roadSectionNr;
+//	 				int roadSectionNumber = roadSectionNr;
 	 				
-			  	if(this.OldtravelTimesWithLengthAndAverageSpeed.get(roadSectionNr+"") !=null){
-			       	Iterator iterator = this.OldtravelTimesWithLengthAndAverageSpeed.get(roadSectionNr+"").keySet().iterator();
+	 				Id roadSectionId = new IdImpl(a[0]) ;
+	 				
+			  	if(this.oldtravelTimesWithLengthAndAverageSpeed.get( roadSectionId ) !=null){
+			       	Iterator iterator = this.oldtravelTimesWithLengthAndAverageSpeed.get(roadSectionId).keySet().iterator();
 		 				while (iterator.hasNext()) {
 			 				String personalId =  (String) iterator.next();
 			 			
-			 			LinkedList list = this.OldtravelTimesWithLengthAndAverageSpeed.get(roadSectionNr+"").get(personalId);
+			 			LinkedList list = this.oldtravelTimesWithLengthAndAverageSpeed.get(roadSectionId).get(personalId);
 			 				
 			 			String v = (String) list.peek();
 			 			String[] activityAndTraveltime=v.split(",");
@@ -99,7 +100,7 @@ public class VelocityAverageCalculate {
 			
 				 				double averageSpeed =  length3 / (travelTimeDouble / 3600)  ;
 				 				SingleEvent result = new SingleEvent(activity,travelTimeString,averageSpeed, 
-				 						personalId,length3,roadSectionNumber,roadSectionNr,visumRoadType,activityAndTraveltime[2], freeVelocity);
+				 						personalId,length3,roadSectionNr,roadSectionNr,visumRoadType,activityAndTraveltime[2], freeVelocity);
 						
 				 				Map<String, LinkedList<SingleEvent>> map1 = this.mapOfSingleEvent.get(roadSectionNr+"");
 				 			
@@ -198,8 +199,8 @@ public class VelocityAverageCalculate {
 		this.filename = filename;
 	}
 
-	public Map<String,Map<String, LinkedList<String>>> getOldtravelTimesWithLengthAndAverageSpeed() {
-		return OldtravelTimesWithLengthAndAverageSpeed;
+	public Map<Id,Map<String, LinkedList<String>>> getOldtravelTimesWithLengthAndAverageSpeed() {
+		return oldtravelTimesWithLengthAndAverageSpeed;
 	}
 
 	public Map<String,Map<String, LinkedList<SingleEvent>>> getmapOfSingleEvent() {

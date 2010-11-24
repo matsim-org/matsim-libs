@@ -20,6 +20,7 @@
 
 package playground.fhuelsmann.emissions;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -39,7 +40,7 @@ AgentArrivalEventHandler,AgentDepartureEventHandler {
 	private final Map<Id, Double> linkenter = new TreeMap<Id, Double>();
 	private final Map<Id, Double> agentarrival = new TreeMap<Id, Double>();
 	private final Map<Id, Double> agentdeparture = new TreeMap<Id, Double>();
-		
+
 	/**yyyy Design questions:<ul>
 	 * <li> Why are the map entries "Strings" and not "Id"s and "Double"s?  This makes the code much harder to read,
 	 * and it is also probably less efficient.  kai, nov'10
@@ -48,13 +49,13 @@ AgentArrivalEventHandler,AgentDepartureEventHandler {
 	 * </ul>
 	 * 
 	 */
-	public Map<String,Map<String, LinkedList<String>>> getTravelTimes() {
+	public Map<Id,Map<String, LinkedList<String>>> getTravelTimes() {
 		return travelTimes;
 	}
 
-	private final Map<String,Map<String, LinkedList<String>>> travelTimes= new
-	TreeMap<String,Map<String, LinkedList<String>>>();
-	
+	private final Map<Id,Map<String, LinkedList<String>>> travelTimes= new
+	TreeMap<Id,Map<String, LinkedList<String>>>();
+
 	public Map<Id, Double> getLinkenter() {
 		return linkenter;
 	}
@@ -69,7 +70,7 @@ AgentArrivalEventHandler,AgentDepartureEventHandler {
 
 
 	public void reset(int iteration) {
-		
+
 		this.linkenter.clear();
 		this.agentarrival.clear();
 		this.agentdeparture.clear();
@@ -79,15 +80,15 @@ AgentArrivalEventHandler,AgentDepartureEventHandler {
 	public void handleEvent(LinkEnterEvent event) {
 		this.linkenter.put(event.getPersonId(), event.getTime());
 	}
-	
+
 	public void handleEvent(AgentArrivalEvent event) {
 		this.agentarrival.put(event.getPersonId(), event.getTime());
 	}
-	
+
 	public void handleEvent(AgentDepartureEvent event) {
 		this.agentdeparture.put(event.getPersonId(), event.getTime());
 	}
-	
+
 	public void handleEvent(LinkLeaveEvent event) {		
 		Id personId= event.getPersonId();
 		Id linkId = event.getLinkId();
@@ -98,67 +99,68 @@ AgentArrivalEventHandler,AgentDepartureEventHandler {
 				double arrivalTime = this.agentarrival.get(personId);
 				double departureTime = this.agentdeparture.get(personId);
 				double travelTime = event.getTime() - enterTime -departureTime+ arrivalTime;
-			/*	System.out.println(travelTime); 
+				/*	System.out.println(travelTime); 
 				System.out.println("----mit Aktivität---");
 				System.out.println("LinkId: " + linkId); 
 				System.out.println("PersonId: " + personId);
 				System.out.println("entertime: " + enterTime);*/
-				
-				
+
+
 				String personalId= personId.toString();
-		//		System.out.println("TravelTime: " + travelTime);
+				//		System.out.println("TravelTime: " + travelTime);
 				this.agentarrival.remove(personId);
-				
-				if (this.travelTimes.get(linkId+"") != null){				
-				if (this.travelTimes.get(linkId+"").containsKey(personalId)){
-						this.travelTimes.get(linkId+"").get(personalId+"").push("----mit Aktivität---,"+travelTime +","+  enterTime);
-						}else{
-							LinkedList<String> list = new LinkedList<String>();
-							list.push("----mit Aktivität---,"+travelTime + ","+ enterTime);
-							this.travelTimes.get(linkId+"").put(personalId+"",list);}}
+
+				if (this.travelTimes.get(linkId) != null){				
+					if (this.travelTimes.get(linkId).containsKey(personalId)){
+						this.travelTimes.get(linkId).get(personalId+"").push("----mit Aktivität---,"+travelTime +","+  enterTime);
+					}else{
+						LinkedList<String> list = new LinkedList<String>();
+						list.push("----mit Aktivität---,"+travelTime + ","+ enterTime);
+						this.travelTimes.get(linkId).put(personalId+"",list);}}
 				else{
-					
-							LinkedList<String> list = new LinkedList<String>();
-							list.push("----mit Aktivität---,"+travelTime + ","+ enterTime);
-							Map<String,LinkedList<String>> map = new TreeMap<String,LinkedList<String>>();
-							map.put(personalId+"", list);
-							this.travelTimes.put(linkId+"",map);
-							
+
+					LinkedList<String> list = new LinkedList<String>();
+					list.push("----mit Aktivität---,"+travelTime + ","+ enterTime);
+					Map<String,LinkedList<String>> map = new TreeMap<String,LinkedList<String>>();
+					map.put(personalId+"", list);
+					this.travelTimes.put(linkId,map);
+
 				}
 			}
 			else { // Ohne Aktivität
-					
-					
-					double enterTime = this.linkenter.get(personId);
-					double travelTime = event.getTime() - enterTime;
-										
-			//		System.out.println("----ohne Aktivität---");
-			//		System.out.println("LinkId: " + linkId); 
-			//		System.out.println("PersonId: " + personId);
-					String personalId= personId.toString();
-					//System.out.println(personalId);
-			//		System.out.println("TravelTime: " + travelTime);
-			//		System.out.println("entertime: " + enterTime);
-					
-					if (this.travelTimes.get(linkId+"") != null){
-						if (this.travelTimes.get(linkId+"").containsKey(personalId)){
-							this.travelTimes.get(linkId+"").get(personalId).push("----ohne Aktivität---,"+travelTime+","+ enterTime);
-						}else{
-							LinkedList<String> list = new LinkedList<String>();
-							list.push("----ohne Aktivität---,"+travelTime + ","+ enterTime);
-							this.travelTimes.get(linkId+"").put(personalId,list);
-						}
-					}else{
 
+
+				double enterTime = this.linkenter.get(personId);
+				double travelTime = event.getTime() - enterTime;
+
+				//		System.out.println("----ohne Aktivität---");
+				//		System.out.println("LinkId: " + linkId); 
+				//		System.out.println("PersonId: " + personId);
+				String personalId= personId.toString();
+				//System.out.println(personalId);
+				//		System.out.println("TravelTime: " + travelTime);
+				//		System.out.println("entertime: " + enterTime);
+
+				if (this.travelTimes.get(linkId) != null){
+					if (this.travelTimes.get(linkId).containsKey(personalId)){
+						LinkedList list = this.travelTimes.get(linkId).get(personalId) ;
+						list.push("----ohne Aktivität---,"+travelTime+","+ enterTime);
+					}else{
 						LinkedList<String> list = new LinkedList<String>();
-						list.push("----ohne Aktivität---,"+travelTime +","+ enterTime);
-						Map<String,LinkedList<String>> map = new TreeMap<String,LinkedList<String>>();
-						map.put(personalId, list);
-						this.travelTimes.put(linkId +"",map);
-					}				
+						list.push("----ohne Aktivität---,"+travelTime + ","+ enterTime);
+						this.travelTimes.get(linkId).put(personalId,list);
+					}
+				}else{
+
+					LinkedList<String> list = new LinkedList<String>();
+					list.push("----ohne Aktivität---,"+travelTime +","+ enterTime);
+					Map<String,LinkedList<String>> map = new TreeMap<String,LinkedList<String>>();
+					map.put(personalId, list);
+					this.travelTimes.put(linkId,map);
+				}				
 			}
 		}	
-		}
-	
-					    
+	}
+
+
 }
