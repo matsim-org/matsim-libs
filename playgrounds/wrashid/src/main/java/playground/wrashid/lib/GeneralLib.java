@@ -264,6 +264,9 @@ public class GeneralLib {
 			// just forward the runtime exception
 			throw e;
 		} catch (Exception e) {
+			e.printStackTrace();
+			
+			
 			throw new RuntimeException("Error reading the matrix from the file");
 		}
 
