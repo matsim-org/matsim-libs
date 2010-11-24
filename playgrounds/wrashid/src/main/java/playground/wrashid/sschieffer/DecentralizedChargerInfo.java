@@ -67,8 +67,7 @@ public class DecentralizedChargerInfo {
 	private PolynomialFitter polyFit;
 	
 	private double peakLoad;
-	private double [] slotBaseLoad; // 1D double directly read in from .txt
-	private double [] [] timeSlotBaseLoad; // modification of slotBaseLoad [time in hours][load]
+	private double [] []slotBaseLoad; // 1D double directly read in from .txt
 	private double [][] highLowIntervals; // [start time in hours][end time in hours][1 or -1 (1 if section above newBaseLoad]
 	
 	private double penetration; // number of PHEV vehicles in system
@@ -97,9 +96,7 @@ public class DecentralizedChargerInfo {
 	private double priceBase;
 	private double pricePeak;
 	
-	final double secondsPerMin=60;
-	final double secondsPer15Min=15*60;
-	final double secondsPerDay=24*60*60;
+
 	
 	private XYSeries zeroLineData; //XY Series on zero line for plots
 	private XYSeries constantLoadFigureData;//XY Series on line of constantBaseConsumption for plots
@@ -168,30 +165,28 @@ public class DecentralizedChargerInfo {
 	 */
 	public void getBaseLoadCurve() throws OptimizationException, IOException{
 		
-		  slotBaseLoad = GeneralLib.readMatrix(96, 1, false, "test\\input\\playground\\wrashid\\sschieffer\\baseLoadCurve15minBins.txt")[0];
+		  slotBaseLoad = GeneralLib.readMatrix(96, 2, false, "test\\input\\playground\\wrashid\\sschieffer\\baseLoadCurve15minBinsBinLoad.txt");
 			  
 		  peakBaseConsumption=0.0;
 		  constantBaseConsumption=1.0*peakLoad;
 		  zeroLineData = new XYSeries("Zero Line");
 		  XYSeries loadFigureData = new XYSeries("Baseload Data from File");
-		  timeSlotBaseLoad= new double[slotBaseLoad.length][2];
 		  
 		  for (int i=0;i<96;i++){ // loop over 96 bins
-			  timeSlotBaseLoad[i][0]=((double) i)*secondsPer15Min;
-			  timeSlotBaseLoad[i][1]=slotBaseLoad[i]*peakLoad;
-			  loadFigureData.add(timeSlotBaseLoad[i][0], timeSlotBaseLoad[i][1]);
-			  zeroLineData.add(i*secondsPer15Min,0);
 			  
-			  if(timeSlotBaseLoad[i][1]>peakBaseConsumption){
-				  peakBaseConsumption= timeSlotBaseLoad[i][1];
+			  loadFigureData.add(slotBaseLoad[i][0], slotBaseLoad[i][1]);
+			  zeroLineData.add(slotBaseLoad[i][0],0);
+			  
+			  if(slotBaseLoad[i][1]>peakBaseConsumption){
+				  peakBaseConsumption= slotBaseLoad[i][1];
 			  }
-			  if(timeSlotBaseLoad[i][1]<constantBaseConsumption){
-				  constantBaseConsumption= timeSlotBaseLoad[i][1];
+			  if(slotBaseLoad[i][1]<constantBaseConsumption){
+				  constantBaseConsumption= slotBaseLoad[i][1];
 			  }
 		  }
-		  polyFuncBaseLoad=fitCurve(timeSlotBaseLoad, 96);
-		  polyFuncBaseLoad24=fitCurve(timeSlotBaseLoad, 24);
-		  polyFuncBaseLoad48=fitCurve(timeSlotBaseLoad, 48);
+		  polyFuncBaseLoad=fitCurve(slotBaseLoad, 96);
+		  polyFuncBaseLoad24=fitCurve(slotBaseLoad, 24);
+		  polyFuncBaseLoad48=fitCurve(slotBaseLoad, 48);
 		  
 		  constantLoadFigureData = new XYSeries("Constant Baseload Data from File");
 		  peakLoadFigureData = new XYSeries("Peak Baseload Data from File");
@@ -201,12 +196,12 @@ public class DecentralizedChargerInfo {
 		  loadFitFuncFigureData48 = new XYSeries("Fitted Function Baseload Data (deg=48)");
 		  
 		  for (int i=0;i<96;i++){
-			  loadFitFuncFigureData.add(i*secondsPer15Min, polyFuncBaseLoad.value(i*secondsPer15Min));
-			  loadFitFuncFigureData24.add(i*secondsPer15Min, polyFuncBaseLoad24.value(i*secondsPer15Min));
-			  loadFitFuncFigureData48.add(i*secondsPer15Min, polyFuncBaseLoad48.value(i*secondsPer15Min));
+			  loadFitFuncFigureData.add(i*Main.secondsPer15Min, polyFuncBaseLoad.value(i*Main.secondsPer15Min));
+			  loadFitFuncFigureData24.add(i*Main.secondsPer15Min, polyFuncBaseLoad24.value(i*Main.secondsPer15Min));
+			  loadFitFuncFigureData48.add(i*Main.secondsPer15Min, polyFuncBaseLoad48.value(i*Main.secondsPer15Min));
 			  
-			  constantLoadFigureData.add(i*secondsPer15Min, constantBaseConsumption);
-			  peakLoadFigureData.add(i*secondsPer15Min, peakBaseConsumption);
+			  constantLoadFigureData.add(i*Main.secondsPer15Min, constantBaseConsumption);
+			  peakLoadFigureData.add(i*Main.secondsPer15Min, peakBaseConsumption);
 		  }
 		  
 		  XYSeriesCollection dataset = new XYSeriesCollection();
@@ -235,7 +230,9 @@ public class DecentralizedChargerInfo {
 	 */
 	public PolynomialFunction fitCurve(double [][] data, int degree) throws OptimizationException{
 		polyFit= new PolynomialFitter(degree, optimizer);
+		
 		for (int i=0;i<data.length;i++){
+			//System.out.println("adding point "+ data[i][0]+", " +data[i][1]+" as element " + i);
 			polyFit.addObservedPoint(1.0,data[i][0], data[i][1] );
 		  }
 		PolynomialFunction poly;
@@ -252,7 +249,7 @@ public class DecentralizedChargerInfo {
 	 */
 	public double totalBaseConsumption(PolynomialFunction p) throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
 		
-			return functionIntegrator.integrate(p, 0.0, secondsPerDay);
+			return functionIntegrator.integrate(p, 0.0, Main.secondsPerDay);
 		
 	}
 	
@@ -261,7 +258,7 @@ public class DecentralizedChargerInfo {
 	 * returns the number of PHEVs necessary to reach complete baseLoad flattening
 	 */
 	public long flatteningPenetration() throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
-		double flatteningPHEVLoad=24*peakLoad-totalBaseConsumption(polyFuncBaseLoad);
+		double flatteningPHEVLoad=Main.secondsPerDay*peakLoad-totalBaseConsumption(polyFuncBaseLoad);
 		return Math.round(flatteningPHEVLoad/averagePHEVConsumption);
 	}
 	
@@ -287,12 +284,12 @@ public class DecentralizedChargerInfo {
 		double [][] d=new double[1][3];
 		//[start time in hours][end time in hours][1 or -1 (1 if section above newBaseLoad]
 		d[0][0]=0;
-		d[0][1]=secondsPerDay;
+		d[0][1]=Main.secondsPerDay;
 		d[0][2]=1; // since penetration>flatteningPenetration always 1 and only one interval
 		double currentTry=peakLoad;
 		while (run){
 			iterationsToFindNewBaseConsumption++;
-			if ( Math.abs(currentTry*secondsPerDay-functionIntegrator.integrate(polyFuncBaseLoad, 0, secondsPerDay)-totalPHEVConsumption)<crit){
+			if ( Math.abs(currentTry*Main.secondsPerDay-functionIntegrator.integrate(polyFuncBaseLoad, 0, Main.secondsPerDay)-totalPHEVConsumption)<crit){
 				//solution found
 				newBaseConsumption=currentTry;
 				run=false;
@@ -344,8 +341,8 @@ public class DecentralizedChargerInfo {
 			tempFunction = polyFuncBaseLoad.subtract(tempFunction);
 			
 			System.out.println("currentTry=" + currentTry);
-			double segment=secondsPerMin;
-			for (double i=0; i<secondsPerDay;i=(i+segment)){
+			double segment=Main.secondsPerMin;
+			for (double i=0; i<Main.secondsPerDay;i=(i+segment)){
 				double localTempFuncValue=tempFunction.value(i);
 				System.out.println(localTempFuncValue);
 				// if close to a solution at time i, try to find an intersect with newtomSolver
@@ -357,8 +354,8 @@ public class DecentralizedChargerInfo {
 						if(i<15.0*segment){
 							start=0.0;
 						}
-						if (i>secondsPerDay-15*segment){
-							end=secondsPerDay;
+						if (i>Main.secondsPerDay-15*segment){
+							end=Main.secondsPerDay;
 						}
 							
 						double root= newtonSolver.solve(tempFunction, start, end);
@@ -386,7 +383,7 @@ public class DecentralizedChargerInfo {
 			if (solution.isEmpty()){ 	//no solutions for this currentTry
 			//should not happen, since we start from peakLoad and go to half
 				
-				if(secondsPerDay*currentTry-totalBaseConsumption(polyFuncBaseLoad)-totalPHEVConsumption<0.0){
+				if(Main.secondsPerDay*currentTry-totalBaseConsumption(polyFuncBaseLoad)-totalPHEVConsumption<0.0){
 					// solution is in upper half
 					currentLowerTry=currentTry;
 				}
@@ -406,7 +403,7 @@ public class DecentralizedChargerInfo {
 				// first entry
 				d[0][0]=0; 
 				//last entry
-				d[solution.size()][1]=secondsPerDay;// last entry
+				d[solution.size()][1]=Main.secondsPerDay;// last entry
 				
 				// fill in other entries and mark as lower (-1)or above (1) currentTry
 				for (int i=0; i<solution.size(); i++){
@@ -482,8 +479,8 @@ public class DecentralizedChargerInfo {
 		 XYSeries currentTryLevel = new XYSeries("currentTry");
 		  
 		  for (int i=0;i<96;i++){
-			  figureData.add(i*secondsPer15Min, p.value(i*secondsPer15Min));
-			  currentTryLevel.add(i*secondsPer15Min, d);
+			  figureData.add(i*Main.secondsPer15Min, p.value(i*Main.secondsPer15Min));
+			  currentTryLevel.add(i*Main.secondsPer15Min, d);
 		  }
 		  
 		  XYSeriesCollection dataset = new XYSeriesCollection();
@@ -563,7 +560,7 @@ public class DecentralizedChargerInfo {
 				String label=("Available Slots in Valley "+ i);
 				XYSeries newValley = new XYSeries(label);
 				double dx=(valleyTimes[i][1]-valleyTimes[i][0]);
-				double segments=dx/(secondsPerMin); // every minute
+				double segments=dx/(Main.secondsPerMin); // every minute
 				
 				for (double x=valleyTimes[i][0]; x<=valleyTimes[i][1]; x=x+dx/segments){
 					newValley.add(x,newBaseConsumption-polyFuncBaseLoad.value(x));
@@ -590,9 +587,9 @@ public class DecentralizedChargerInfo {
 		}
 		
 		//TODO CHeck these functions
-		totalCostBase=constantBaseConsumption*priceBase*secondsPerDay + (functionIntegrator.integrate(polyFuncBaseLoad, 0, secondsPerDay)-constantBaseConsumption*secondsPerDay)*pricePeak;
+		totalCostBase=constantBaseConsumption*priceBase*Main.secondsPerDay + (functionIntegrator.integrate(polyFuncBaseLoad, 0, Main.secondsPerDay)-constantBaseConsumption*Main.secondsPerDay)*pricePeak;
 		
-		totalCostPHEV=(-newBaseConsumption*secondsPerDay + (functionIntegrator.integrate(polyFuncBaseLoad, 0,secondsPerDay)+valleyInt))*pricePeak + newBaseConsumption*secondsPerDay*priceBase;
+		totalCostPHEV=(-newBaseConsumption*Main.secondsPerDay + (functionIntegrator.integrate(polyFuncBaseLoad, 0,Main.secondsPerDay)+valleyInt))*pricePeak + newBaseConsumption*Main.secondsPerDay*priceBase;
 		
 		
 		return ProbFuncArray;
@@ -624,7 +621,7 @@ public class DecentralizedChargerInfo {
 
 	
 	public double[][] getSlotLoad(){
-		return timeSlotBaseLoad;
+		return slotBaseLoad;
 	}
 	
 	
@@ -685,7 +682,158 @@ public class DecentralizedChargerInfo {
 	}
 	
 	
+	/**
+	 * 
+	 * @param startSecond start of Parking time in seconds
+	 * @param endSecond end of Parking time in seconds
+	 * @return returns the number of seconds which lie within feasible charging intervals and are within time intervals of minimum length = slotLength
+	 */
+	public double getFeasibleChargingTimeInInterval(double startSecond, double endSecond){
+		double totalFeasibleTime=0;
+		if(startSecond>endSecond){
+			// recursive call, only if overnight parking
+			totalFeasibleTime+=getFeasibleChargingTimeInInterval(0, endSecond);
+			totalFeasibleTime+=getFeasibleChargingTimeInInterval(startSecond, Main.secondsPerDay);
+		}
+		else{
+			// startSecond<endSecond
+			for (int i=0; i<valleyTimes.length; i++){
+				if (valleyTimes[i][0]<=startSecond && valleyTimes[i][1]>=startSecond){
+					//if startSecond is within  interval
+					if (valleyTimes[i][0]<=endSecond && valleyTimes[i][1]>=endSecond){
+						//both start and end are within the valley
+						if (endSecond-startSecond>Main.slotLength){
+							totalFeasibleTime=endSecond-startSecond;
+						}
+						
+					}
+					else{
+						if (endSecond-startSecond>Main.slotLength){
+							totalFeasibleTime=valleyTimes[i][1]-startSecond;
+						}
+						
+					}
+				}
+				
+				if (valleyTimes[i][0]<=endSecond && valleyTimes[i][1]>=endSecond && startSecond<valleyTimes[i][0]){
+					if (endSecond-startSecond>Main.slotLength){
+						totalFeasibleTime=endSecond-valleyTimes[i][0];
+					}
+					
+				}
+			}
+		}
+				
+		return totalFeasibleTime;
+	}
 
+	
+	/**
+	 * 
+	 * @param parkingTimesCurrentAgent pass the double [][] of parkingTimes of current Agent to pick suitable charging Times from these
+	 * @param noOfSlotsToBook number of slots to book within valleys
+	 * @param slotsInPeakTime number of slots to book within other times
+	 * @return returns a double array with start and end charging times for agent
+	 * @throws IllegalArgumentException 
+	 * @throws FunctionEvaluationException 
+	 * @throws MaxIterationsExceededException 
+	 */
+	public double[][] bookSlots(double[][] parkingTimesCurrentAgent, int noOfSlotsToBook, int slotsInPeakTime) throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
+		//assumes  small number of slots in peakTime --> only one longer charging slot for all nonValleyChargingTimes
+		// TODO validate assumption in simulations
+		double[][] chargingTimes = new double[noOfSlotsToBook+1][2];
+		
+		//book valleySlots
+		for (int i=0; i< noOfSlotsToBook;i++){
+			boolean slotFound=false;
+			double [][] trySlot;
+			while (slotFound==false){
+				trySlot= returnRandomChargingSlot();
+				// check if within parkingTimes 
+				 if (checkIfSlotWithinParkingTimeOfAgent(trySlot, parkingTimesCurrentAgent)){
+					 //check if not overlapping with existing slots
+					 if (checkForOverlappingSlots( trySlot, chargingTimes, i)){
+						 chargingTimes[i][0]=trySlot[0][0];
+						 chargingTimes[i][1]=trySlot[0][1];
+					 }
+				 }
+			}
+		}
+		
+		// peakSlotstoBook
+		// simply book right before first departure... check results later if sensible
+		chargingTimes[noOfSlotsToBook][1]=parkingTimesCurrentAgent[0][1];
+		chargingTimes[noOfSlotsToBook][0]=parkingTimesCurrentAgent[0][1]-(slotsInPeakTime*Main.slotLength);
+		return chargingTimes;
+	}
+	
+	/**
+	 * 
+	 * @param trySlot - pass double [][] of slot that is tested for suitability for charging Times
+	 * @param chargingTimes - double[][] of already entered charging Times
+	 * @param i - integer up to  which charging Times have already been entered into chargingTimes
+	 * @return return true if no overlap
+	 */
+	public boolean checkForOverlappingSlots(double [][] trySlot,double [][] chargingTimes, int i){
+		boolean overlapCheck=true;
+		for (int j=0; j<i; j++){
+			if ((chargingTimes [i][0] <trySlot[0][0] && chargingTimes [i][1] >trySlot[0][0])||  (chargingTimes [i][0] <trySlot[0][1] && chargingTimes [i][1] >trySlot[0][1])){
+				// if there is an overlap, return value equals false
+				overlapCheck=false;
+			}
+		}
+		return overlapCheck;
+		
+	}
+	
+	
+	
+	public boolean checkIfSlotWithinParkingTimeOfAgent(double[][] trySlot, double[][] parkingTimesCurrentAgent){
+		boolean checkSlot=false;
+		for (int i=0; i<parkingTimesCurrentAgent.length; i++){
+			if (trySlot[0][0]>=parkingTimesCurrentAgent[i][0] && trySlot[0][0]<=parkingTimesCurrentAgent[i][1] && trySlot[0][1]>parkingTimesCurrentAgent[i][0] && trySlot[0][0]<=parkingTimesCurrentAgent[i][1]){
+				checkSlot=true;
+			}
+		}
+		return checkSlot;
+	}
+
+	//return slot (1-96) for charging based on a random number between 0 and 1
+	public double[][] returnRandomChargingSlot() throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
+		double [][] slotEntry=new double [1][2];
+		double randomNumber =Math.random();
+		
+		for (int i=0; i<probDensityRanges.length; i++){
+			if (randomNumber>=probDensityRanges[i][0] && randomNumber<probDensityRanges[i][1]){
+			
+				double start=valleyTimes[i][0];
+				double end=valleyTimes[i][1];
+				double error=15; // 15 seconds error
+				boolean run=true;
+				double lowerBracket=start;
+				double upperBracket=end;
+				
+				while (run){
+					
+					double integralUptoMiddle=functionIntegrator.integrate(probDensityFunctions.get(i), start, (lowerBracket+upperBracket)/2);
+					double diff=integralUptoMiddle-(randomNumber- probDensityRanges[i][0]);
+					if(Math.abs(diff)<error){
+						slotEntry[0][0]=(lowerBracket+upperBracket)/2;
+						slotEntry[0][1]=(lowerBracket+upperBracket)/2 + Main.slotLength;
+						run=false;
+					}
+					else if(diff<0){
+						lowerBracket=(lowerBracket+upperBracket)/2;
+						
+					}
+					else{
+						upperBracket=(lowerBracket+upperBracket)/2;
+					}
+				}// end run
+			}//end if
+		}// end for
+		return slotEntry;
+	}
 	
 	
 }

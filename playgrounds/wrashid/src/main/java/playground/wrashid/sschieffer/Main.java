@@ -54,7 +54,12 @@ import playground.wrashid.lib.obj.LinkedListValueHashMap;
 
 public class Main {
 	public static LinkedListValueHashMap<Id, Vehicle> vehicles;
-	public static double penetrationPercent=0.3;
+	public static double penetrationPercent=1.0;
+	
+	public static double secondsPerMin=60;
+	public static double secondsPer15Min=15*60;
+	public static double secondsPerDay=24*60*60;
+	public static double slotLength=1*60; // choose min slot length and min bookable slot time
 	
 	public static ParkingTimesPlugin parkingTimesPlugin;
 	public static EnergyConsumptionPlugin energyConsumptionPlugin;
