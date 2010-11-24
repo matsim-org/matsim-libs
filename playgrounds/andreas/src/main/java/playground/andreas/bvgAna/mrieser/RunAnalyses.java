@@ -26,8 +26,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -35,18 +37,24 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.PersonAlgorithm;
+import org.matsim.population.algorithms.PersonFilterSelectedPlan;
+import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
@@ -54,6 +62,7 @@ import org.xml.sax.SAXException;
 
 import playground.andreas.bvgAna.level2.StopId2RemainSeatedDataMap;
 import playground.andreas.bvgAna.level2.StopId2RemainSeatedDataMapData;
+import playground.andreas.bvgAna.level3.AgentId2StopDifferenceMap;
 
 public class RunAnalyses {
 
@@ -67,6 +76,29 @@ public class RunAnalyses {
 
 	public void readNetwork() {
 		new MatsimNetworkReader(this.scenario).readFile(networkFilename);
+		((NetworkFactoryImpl) this.scenario.getNetwork().getFactory()).setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
+	}
+
+	public void readPopulation() {
+		new MatsimPopulationReader(this.scenario).readFile(plansFilename);
+	}
+
+	public void extractSelectedPlansOnly() {
+		Scenario s = new ScenarioImpl();
+		new MatsimNetworkReader(s).readFile(networkFilename);
+		PopulationImpl pop = (PopulationImpl) s.getPopulation();
+		pop.setIsStreaming(true);
+
+		PopulationWriter writer = new PopulationWriter(pop, s.getNetwork());
+		writer.startStreaming("selectedPlansOnly.xml.gz");
+		pop.addAlgorithm(new PersonFilterSelectedPlan());
+		pop.addAlgorithm(writer);
+		new MatsimPopulationReader(s).readFile(plansFilename);
+		writer.closeStreaming();
+	}
+
+	public void readSelectedPlansOnly() {
+		new MatsimPopulationReader(this.scenario).readFile("selectedPlansOnly.xml.gz");
 	}
 
 	public void createPersonAttributeTable(final String attributesFilename, final String idsFilename) {
@@ -133,19 +165,18 @@ public class RunAnalyses {
 		}
 	}
 
-	public List<Id> readIdList(final String filename) {
-		ArrayList<Id> list = new ArrayList<Id>(100);
+	public Set<Id> readIdSet(final String filename) {
+		Set<Id> set = new HashSet<Id>(500);
 		try {
 			BufferedReader reader = IOUtils.getBufferedReader(filename);
 			String line = null;
 			while ((line = reader.readLine()) != null) {
-				list.add(new IdImpl(line));
+				set.add(new IdImpl(line));
 			}
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
-		list.trimToSize();
-		return list;
+		return set;
 	}
 
 	public void readTransitSchedule() {
@@ -182,6 +213,7 @@ public class RunAnalyses {
 			}
 			list.addAll(e.getValue());
 		}
+		// sort by time, likely not needed
 		for (Map.Entry<Id, List<StopId2RemainSeatedDataMapData>> e : aggregatedMap.entrySet()) {
 			Collections.sort(e.getValue(), new Comparator<StopId2RemainSeatedDataMapData>() {
 				@Override
@@ -190,6 +222,7 @@ public class RunAnalyses {
 				}
 			});
 		}
+		// print absolute values
 		System.out.print("stopId\tstopX\tstopY\tstopName");
 		for (int slot = 0; slot <= 24*4; slot++) {
 			String time = Time.writeTime(slot*15*60, Time.TIMEFORMAT_HHMM, '_');
@@ -219,6 +252,7 @@ public class RunAnalyses {
 			}
 			System.out.println();
 		}
+		// print relative values
 		System.out.println();
 		System.out.println();
 		System.out.println();
@@ -281,13 +315,46 @@ public class RunAnalyses {
 		return slot;
 	}
 
+	public void createMissedConnectionStats(Set<Id> agentIds) {
+		AgentId2StopDifferenceMap missedConnections = new AgentId2StopDifferenceMap(this.scenario.getPopulation(), agentIds);
+
+		EventsManager em = new EventsManagerImpl();
+		em.addHandler(missedConnections);
+		new MatsimEventsReader(em).readFile(eventsFilename);
+
+		Map<Id, List<Tuple<Id, Integer>>> missedVehiclesMap = missedConnections.getNumberOfMissedVehiclesMap();
+		System.out.println("# persons with data: " + missedVehiclesMap.size());
+
+		int[] nOfMissedConnectionsHistogram = new int[11];
+		for (Id personId : scenario.getPopulation().getPersons().keySet()) {
+			List<Tuple<Id, Integer>> missed = missedVehiclesMap.get(personId);
+			int slot = 0;
+			if (missed != null) {
+				slot = missed.size();
+				if (slot >= nOfMissedConnectionsHistogram.length) {
+					slot = nOfMissedConnectionsHistogram.length - 1;
+				}
+			}
+			nOfMissedConnectionsHistogram[slot]++;
+		}
+
+		System.out.println("Distribution of missed connections:");
+		for (int i = 0; i < nOfMissedConnectionsHistogram.length; i++) {
+			System.out.println("with " + i + " missed connections: " + nOfMissedConnectionsHistogram[i]);
+		}
+	}
+
 	public static void main(String[] args) {
 		RunAnalyses app = new RunAnalyses();
 		app.readNetwork();
+//		app.readPopulation();
+//		app.extractSelectedPlansOnly();
+		app.readSelectedPlansOnly();
 //		app.createPersonAttributeTable("personAttributes.txt", "allPersonIds.txt");
-//		List<Id> allPersonIds = app.readIdList("allPersonIds.txt");
+		Set<Id> allPersonIds = app.readIdSet("allPersonIds.txt");
 //		System.out.println(allPersonIds.size());
-		app.readTransitSchedule();
-		app.createRemainSeatedStats();
+//		app.readTransitSchedule();
+//		app.createRemainSeatedStats();
+		app.createMissedConnectionStats(allPersonIds);
 	}
 }

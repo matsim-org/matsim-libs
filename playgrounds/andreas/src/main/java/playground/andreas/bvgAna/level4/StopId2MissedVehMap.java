@@ -19,7 +19,8 @@
 
 package playground.andreas.bvgAna.level4;
 
-import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -42,7 +43,7 @@ import playground.andreas.bvgAna.level3.AgentId2StopDifferenceMap;
 
 /**
  * Collects all missed vehicles events and their delay for each stop
- * 
+ *
  * @author aneumann
  *
  */
@@ -50,16 +51,16 @@ public class StopId2MissedVehMap implements TransitDriverStartsEventHandler, Veh
 
 	private final Logger log = Logger.getLogger(StopId2MissedVehMap.class);
 	private final Level logLevel = Level.DEBUG;
-	
+
 	private AgentId2StopDifferenceMap agentId2StopDifferenceMap;
 	private TreeMap<Id, StopId2MissedVehMapData> stopId2StopId2MissedVehMapDataMap = null;
-	
+
 	public StopId2MissedVehMap(Population pop){
 		this.log.setLevel(this.logLevel);
 		Set<Id> agentIds = new TreeSet<Id>(pop.getPersons().keySet());
 		this.agentId2StopDifferenceMap = new AgentId2StopDifferenceMap(pop, agentIds);
 	}
-	
+
 	/**
 	 * @return A map containing a <code>StopId2MissedVehMapData</code> for each stop.
 	 */
@@ -69,61 +70,61 @@ public class StopId2MissedVehMap implements TransitDriverStartsEventHandler, Veh
 			calculateStopId2MissedVehMap();
 			calculateStopId2AverageDelayMap();
 		}
-		
+
 		return this.stopId2StopId2MissedVehMapDataMap;
-	}	
-	
+	}
+
 	private void calculateStopId2AverageDelayMap() {
-		TreeMap<Id, ArrayList<Tuple<Id, Double>>> delayMap = this.agentId2StopDifferenceMap.getAgentId2StopDifferenceMap();
-		
-		for (ArrayList<Tuple<Id, Double>> delayList : delayMap.values()) {
-			for (Tuple<Id, Double> delayTuple : delayList) {				
+		Map<Id, List<Tuple<Id, Double>>> delayMap = this.agentId2StopDifferenceMap.getAgentId2StopDifferenceMap();
+
+		for (List<Tuple<Id, Double>> delayList : delayMap.values()) {
+			for (Tuple<Id, Double> delayTuple : delayList) {
 				if(this.stopId2StopId2MissedVehMapDataMap.get(delayTuple.getFirst()) == null){
 					this.stopId2StopId2MissedVehMapDataMap.put(delayTuple.getFirst(), new StopId2MissedVehMapData(delayTuple.getFirst()));
 				}
-				
-				this.stopId2StopId2MissedVehMapDataMap.get(delayTuple.getFirst()).addDelay(delayTuple.getSecond());				
+
+				this.stopId2StopId2MissedVehMapDataMap.get(delayTuple.getFirst()).addDelay(delayTuple.getSecond());
 			}
-		}	
-		
+		}
+
 	}
 
-	private void calculateStopId2MissedVehMap() {		
-		TreeMap<Id, ArrayList<Tuple<Id, Integer>>> numberOfMissedVehiclesMap = this.agentId2StopDifferenceMap.getNumberOfMissedVehiclesMap();
-		
-		for (ArrayList<Tuple<Id, Integer>> stopId2MissedVehiclesList : numberOfMissedVehiclesMap.values()) {
-			for (Tuple<Id, Integer> stopId2MissedVehicleTuple : stopId2MissedVehiclesList) {				
+	private void calculateStopId2MissedVehMap() {
+		Map<Id, List<Tuple<Id, Integer>>> numberOfMissedVehiclesMap = this.agentId2StopDifferenceMap.getNumberOfMissedVehiclesMap();
+
+		for (List<Tuple<Id, Integer>> stopId2MissedVehiclesList : numberOfMissedVehiclesMap.values()) {
+			for (Tuple<Id, Integer> stopId2MissedVehicleTuple : stopId2MissedVehiclesList) {
 				if(this.stopId2StopId2MissedVehMapDataMap.get(stopId2MissedVehicleTuple.getFirst()) == null){
 					this.stopId2StopId2MissedVehMapDataMap.put(stopId2MissedVehicleTuple.getFirst(), new StopId2MissedVehMapData(stopId2MissedVehicleTuple.getFirst()));
 				}
-				
-				this.stopId2StopId2MissedVehMapDataMap.get(stopId2MissedVehicleTuple.getFirst()).addMissedVehicle(stopId2MissedVehicleTuple.getSecond());				
+
+				this.stopId2StopId2MissedVehMapDataMap.get(stopId2MissedVehicleTuple.getFirst()).addMissedVehicle(stopId2MissedVehicleTuple.getSecond());
 			}
-		}		
+		}
 	}
 
 	@Override
 	public void handleEvent(VehicleDepartsAtFacilityEvent event) {
-		this.agentId2StopDifferenceMap.handleEvent(event);		
+		this.agentId2StopDifferenceMap.handleEvent(event);
 	}
-	
+
 	@Override
 	public void handleEvent(TransitDriverStartsEvent event) {
-		this.agentId2StopDifferenceMap.handleEvent(event);		
+		this.agentId2StopDifferenceMap.handleEvent(event);
 	}
 
 	@Override
 	public void reset(int iteration) {
-		this.log.debug("reset method in iteration " + iteration + " not implemented, yet");		
+		this.log.debug("reset method in iteration " + iteration + " not implemented, yet");
 	}
 
 	@Override
 	public void handleEvent(AgentDepartureEvent event) {
-		this.agentId2StopDifferenceMap.handleEvent(event);		
+		this.agentId2StopDifferenceMap.handleEvent(event);
 	}
 
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
-		this.agentId2StopDifferenceMap.handleEvent(event);		
+		this.agentId2StopDifferenceMap.handleEvent(event);
 	}
 }

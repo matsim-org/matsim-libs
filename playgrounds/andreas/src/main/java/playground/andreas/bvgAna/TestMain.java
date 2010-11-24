@@ -187,9 +187,9 @@ public class TestMain {
 			e.printStackTrace();
 		}
 
-		TreeMap<Id, ArrayList<Tuple<Id, Double>>> testMap = comp.getAgentId2StopDifferenceMap();
+		Map<Id, List<Tuple<Id, Double>>> testMap = comp.getAgentId2StopDifferenceMap();
 
-		TreeMap<Id, ArrayList<Tuple<Id, Integer>>> testMap2 = comp.getNumberOfMissedVehiclesMap();
+		Map<Id, List<Tuple<Id, Integer>>> testMap2 = comp.getNumberOfMissedVehiclesMap();
 
 		TreeMap<Id, Id> map3 = new TransitScheduleDataProvider(sc.getTransitSchedule()).getRouteId2lineIdMap();
 

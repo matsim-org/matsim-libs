@@ -20,6 +20,8 @@
 package playground.andreas.bvgAna.level0;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -38,42 +40,42 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 
 /**
- * 
+ *
  * @author aneumann
  *
  */
 public class AgentId2PlannedDepartureTimeMap {
-	
+
 	private static final Logger log = Logger.getLogger(AgentId2PlannedDepartureTimeMap.class);
 	private static final Level logLevel = Level.DEBUG;
-	
+
 	/**
 	 * Returns the planned departure time for each pt leg of a given set of agents
-	 * 
+	 *
 	 * @param pop The population
 	 * @param agentIds The Set of agents to be analyzed
 	 * @return A map sorted first by agentId, second by StopId-Time tuples
 	 */
-	public static TreeMap<Id,ArrayList<Tuple<Id,AgentId2PlannedDepartureTimeMapData>>> getAgentId2PlannedPTDepartureTimeMap(Population pop, Set<Id> agentIds){
-		
+	public static Map<Id,List<Tuple<Id,AgentId2PlannedDepartureTimeMapData>>> getAgentId2PlannedPTDepartureTimeMap(Population pop, Set<Id> agentIds){
+
 		AgentId2PlannedDepartureTimeMap.log.setLevel(AgentId2PlannedDepartureTimeMap.logLevel);
-		TreeMap<Id, ArrayList<Tuple<Id, AgentId2PlannedDepartureTimeMapData>>> agentId2PlannedDepartureMap = new TreeMap<Id, ArrayList<Tuple<Id, AgentId2PlannedDepartureTimeMapData>>>();
-		
+		Map<Id, List<Tuple<Id, AgentId2PlannedDepartureTimeMapData>>> agentId2PlannedDepartureMap = new TreeMap<Id, List<Tuple<Id, AgentId2PlannedDepartureTimeMapData>>>();
+
 		for (Person person : pop.getPersons().values()) {
 			if(agentIds.contains(person.getId())){
-				
+
 				// person in set, so do something
-				
-				ArrayList<Tuple<Id, AgentId2PlannedDepartureTimeMapData>> plannedDepartureList = new ArrayList<Tuple<Id, AgentId2PlannedDepartureTimeMapData>>();
+
+				List<Tuple<Id, AgentId2PlannedDepartureTimeMapData>> plannedDepartureList = new ArrayList<Tuple<Id, AgentId2PlannedDepartureTimeMapData>>();
 				agentId2PlannedDepartureMap.put(person.getId(), plannedDepartureList);
-				
+
 				Plan plan = person.getSelectedPlan();
 				double runningTime = 0.0;
 				boolean firstActDone = false;
 				for (PlanElement pE : plan.getPlanElements()) {
-					
+
 					if(pE instanceof ActivityImpl){
-						ActivityImpl act = (ActivityImpl) pE;					
+						ActivityImpl act = (ActivityImpl) pE;
 
 						if(!firstActDone){
 							runningTime = act.getEndTime();
@@ -86,30 +88,30 @@ public class AgentId2PlannedDepartureTimeMap {
 							}
 						}
 					}
-					
+
 					if(pE instanceof Leg){
-						
+
 						Leg leg = (Leg) pE;
-						
+
 						if(leg.getMode() == TransportMode.pt){
 							// it's the start of a new pt leg, report it
 							if (leg.getRoute() instanceof ExperimentalTransitRoute){
 								ExperimentalTransitRoute route = (ExperimentalTransitRoute) leg.getRoute();
 								plannedDepartureList.add(new Tuple<Id, AgentId2PlannedDepartureTimeMapData>(route.getAccessStopId(), new AgentId2PlannedDepartureTimeMapData(route.getAccessStopId(), runningTime, route.getLineId(), route.getRouteId())));
-							} else {
-								log.warn("unknown route descriton found - only know to handle ExperimentalTransitRoute");
+							} else if (leg.getRoute() != null) {
+								log.warn("unknown route description found - only know to handle ExperimentalTransitRoute, got " + leg.getRoute().getClass().getCanonicalName());
 							}
 						}
-						
+
 						// add the legs travel time
 						if(Double.isInfinite(leg.getTravelTime())){
 							log.debug("Infinite travel time founde");
 						} else {
 							runningTime += leg.getTravelTime();
 						}
-						
-					}					
-				}				
+
+					}
+				}
 			}
 		}
 		return agentId2PlannedDepartureMap;
