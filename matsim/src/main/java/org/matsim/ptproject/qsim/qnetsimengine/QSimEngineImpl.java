@@ -59,7 +59,7 @@ public class QSimEngineImpl extends QSimEngineInternalI {
 	 * In the future each node should get its own random number generator - then
 	 * there is no difference anymore between the results w/o de-activated nodes.
 	 */
-	/*package*/ static boolean useNodeArray = true;
+	/*package*/ static boolean useNodeArray = false;
 
 	/*package*/  List<QLinkInternalI> allLinks = null;
 	/*package*/  List<QNode> allNodes = null;
