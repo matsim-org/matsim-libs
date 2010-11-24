@@ -317,6 +317,8 @@ public class RunAnalyses {
 
 	public void createMissedConnectionStats(Set<Id> agentIds) {
 		AgentId2StopDifferenceMap missedConnections = new AgentId2StopDifferenceMap(this.scenario.getPopulation(), agentIds);
+//		VehiclePlannedRealizedMissedDepartures missedDepartures = new VehiclePlannedRealizedMissedDepartures(vehicleDelayHandler);
+//		AgentId2DepartureDelayAtStopMap
 
 		EventsManager em = new EventsManagerImpl();
 		em.addHandler(missedConnections);
@@ -330,7 +332,11 @@ public class RunAnalyses {
 			List<Tuple<Id, Integer>> missed = missedVehiclesMap.get(personId);
 			int slot = 0;
 			if (missed != null) {
-				slot = missed.size();
+				for (Tuple<Id, Integer> t : missed) {
+					if (t.getSecond().intValue() > 0) {
+						slot++;
+					}
+				}
 				if (slot >= nOfMissedConnectionsHistogram.length) {
 					slot = nOfMissedConnectionsHistogram.length - 1;
 				}
@@ -353,7 +359,7 @@ public class RunAnalyses {
 //		app.createPersonAttributeTable("personAttributes.txt", "allPersonIds.txt");
 		Set<Id> allPersonIds = app.readIdSet("allPersonIds.txt");
 //		System.out.println(allPersonIds.size());
-//		app.readTransitSchedule();
+		app.readTransitSchedule();
 //		app.createRemainSeatedStats();
 		app.createMissedConnectionStats(allPersonIds);
 	}

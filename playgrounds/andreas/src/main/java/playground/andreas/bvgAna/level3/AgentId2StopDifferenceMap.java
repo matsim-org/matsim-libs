@@ -60,7 +60,7 @@ import playground.andreas.bvgAna.level2.VehiclePlannedRealizedMissedDepartures;
 public class AgentId2StopDifferenceMap implements TransitDriverStartsEventHandler, VehicleDepartsAtFacilityEventHandler, AgentDepartureEventHandler, PersonEntersVehicleEventHandler {
 
 	private final Logger log = Logger.getLogger(AgentId2StopDifferenceMap.class);
-	private final Level logLevel = Level.DEBUG;
+	private final Level logLevel = Level.OFF;
 
 	private Population pop;
 	private Set<Id> agentIds;
@@ -107,6 +107,10 @@ public class AgentId2StopDifferenceMap implements TransitDriverStartsEventHandle
 				Id stopId = plannedDepartures.get(i).getFirst();
 				AgentId2PlannedDepartureTimeMapData depContainer = plannedDepartures.get(i).getSecond();
 				double plannedDepartureTime = depContainer.getPlannedDepartureTime();
+
+				if (depContainer.getStopId() == null) {
+					continue; // likely, no route could be calculated, thus this information is missing
+				}
 
 				// get next possible departure as scheduled
 				double nextPlannedVehDeparture = this.vehDelayAnalyzer.getNextPlannedDepartureTime(stopId, plannedDepartureTime, depContainer.getLineId(), depContainer.getRouteId());
