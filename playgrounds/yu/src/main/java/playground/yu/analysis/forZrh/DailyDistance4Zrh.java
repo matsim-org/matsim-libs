@@ -54,9 +54,9 @@ import playground.yu.utils.io.SimpleWriter;
 /**
  * compute daily distance of Zurich and Kanton Zurich respectively with through
  * traffic
- *
+ * 
  * @author yu
- *
+ * 
  */
 public class DailyDistance4Zrh extends DailyDistance implements Analysis4Zrh {
 
@@ -91,24 +91,25 @@ public class DailyDistance4Zrh extends DailyDistance implements Analysis4Zrh {
 		double othersDayDist = 0.0;
 		double throughDayDist = 0.0;
 
-		for (PlanElement pe : plan.getPlanElements())
+		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof Leg) {
 				Leg bl = (Leg) pe;
 				ActTypeZrh ats = null;
 				String tmpActType = ((PlanImpl) plan).getNextActivity(bl)
 						.getType();
-				if (tmpActType.startsWith("h"))
+				if (tmpActType.startsWith("h")) {
 					ats = ActTypeZrh.home;
-				else if (tmpActType.startsWith("w"))
+				} else if (tmpActType.startsWith("w")) {
 					ats = ActTypeZrh.work;
-				else if (tmpActType.startsWith("e"))
+				} else if (tmpActType.startsWith("e")) {
 					ats = ActTypeZrh.education;
-				else if (tmpActType.startsWith("s"))
+				} else if (tmpActType.startsWith("s")) {
 					ats = ActTypeZrh.shopping;
-				else if (tmpActType.startsWith("l"))
+				} else if (tmpActType.startsWith("l")) {
 					ats = ActTypeZrh.leisure;
-				else
+				} else {
 					ats = ActTypeZrh.others;
+				}
 				double dist = bl.getRoute().getDistance() / 1000.0;
 				// if (bl.getDepartureTime() < 86400)
 
@@ -242,18 +243,25 @@ public class DailyDistance4Zrh extends DailyDistance implements Analysis4Zrh {
 				}
 				dayDist += dist;
 			}
-		for (int i = 0; i <= Math.min(100, (int) dayDist); i++)
+		}
+		for (int i = 0; i <= Math.min(100, (int) dayDist); i++) {
 			totalDayDistanceCounts[i]++;
-		for (int i = 0; i <= Math.min(100, (int) othersDayDist); i++)
+		}
+		for (int i = 0; i <= Math.min(100, (int) othersDayDist); i++) {
 			othersDayDistanceCounts[i]++;
-		for (int i = 0; i <= Math.min(100, (int) carDayDist); i++)
+		}
+		for (int i = 0; i <= Math.min(100, (int) carDayDist); i++) {
 			carDayDistanceCounts[i]++;
-		for (int i = 0; i <= Math.min(100, (int) ptDayDist); i++)
+		}
+		for (int i = 0; i <= Math.min(100, (int) ptDayDist); i++) {
 			ptDayDistanceCounts[i]++;
-		for (int i = 0; i <= Math.min(100, (int) wlkDayDist); i++)
+		}
+		for (int i = 0; i <= Math.min(100, (int) wlkDayDist); i++) {
 			wlkDayDistanceCounts[i]++;
-		for (int i = 0; i <= Math.min(100, (int) throughDayDist); i++)
+		}
+		for (int i = 0; i <= Math.min(100, (int) throughDayDist); i++) {
 			throughDayDistanceCounts[i]++;
+		}
 	}
 
 	@Override
@@ -362,8 +370,9 @@ public class DailyDistance4Zrh extends DailyDistance implements Analysis4Zrh {
 				+ "dailyDistanceTravelDistination.png", 1200, 900);
 
 		double x[] = new double[101];
-		for (int i = 0; i < 101; i++)
+		for (int i = 0; i < 101; i++) {
 			x[i] = i;
+		}
 		double yTotal[] = new double[101];
 		double yCar[] = new double[101];
 		double yPt[] = new double[101];
@@ -384,14 +393,18 @@ public class DailyDistance4Zrh extends DailyDistance implements Analysis4Zrh {
 				"Daily Distance in km",
 				"fraction of persons with daily distance bigger than x... in %");
 		chart.addSeries(CAR, x, yCar);
-		if (CollectionSum.getSum(yPt) > 0)
+		if (CollectionSum.getSum(yPt) > 0) {
 			chart.addSeries(PT, x, yPt);
-		if (CollectionSum.getSum(yWlk) > 0)
+		}
+		if (CollectionSum.getSum(yWlk) > 0) {
 			chart.addSeries(WALK, x, yWlk);
-		if (CollectionSum.getSum(yOthers) > 0)
+		}
+		if (CollectionSum.getSum(yOthers) > 0) {
 			chart.addSeries(OTHERS, x, yOthers);
-		if (CollectionSum.getSum(yThrough) > 0)
+		}
+		if (CollectionSum.getSum(yThrough) > 0) {
 			chart.addSeries(THROUGH, x, yThrough);
+		}
 		chart.addSeries(TOTAL, x, yTotal);
 		chart.saveAsPng(outputFilename + "dailyDistance.png", 800, 600);
 
@@ -438,20 +451,26 @@ public class DailyDistance4Zrh extends DailyDistance implements Analysis4Zrh {
 					+ yPtFracs[i] + "\t" + yWlkFracs[i] + "\t"
 					+ yOthersFracs[i] + "\t" + yThroughFracs[i]);
 		}
-
-		XYLineChart chart2 = new XYLineChart("Modal Split -- leg Distance",
-				"leg Distance [km]", "mode fraction [%]");
-		chart2.addSeries(CAR, xs, yCarFracs);
-		if (CollectionSum.getSum(yPtFracs) > 0)
-			chart2.addSeries(PT, xs, yPtFracs);
-		if (CollectionSum.getSum(yWlkFracs) > 0)
-			chart2.addSeries(WALK, xs, yWlkFracs);
-		if (CollectionSum.getSum(yOthersFracs) > 0)
-			chart2.addSeries(OTHERS, xs, yOthersFracs);
-		if (CollectionSum.getSum(yThroughFracs) > 0)
-			chart2.addSeries(THROUGH, xs, yThroughFracs);
-		chart2.saveAsPng(outputFilename + "legDistanceModalSplit2.png", 800,
-				600);
+		// {//a unfair comparison of mode split with same leg travel time
+		// @Deprecated
+		// XYLineChart chart2 = new XYLineChart("Modal Split -- leg Distance",
+		// "leg Distance [km]", "mode fraction [%]");
+		// chart2.addSeries(CAR, xs, yCarFracs);
+		// if (CollectionSum.getSum(yPtFracs) > 0) {
+		// chart2.addSeries(PT, xs, yPtFracs);
+		// }
+		// if (CollectionSum.getSum(yWlkFracs) > 0) {
+		// chart2.addSeries(WALK, xs, yWlkFracs);
+		// }
+		// if (CollectionSum.getSum(yOthersFracs) > 0) {
+		// chart2.addSeries(OTHERS, xs, yOthersFracs);
+		// }
+		// if (CollectionSum.getSum(yThroughFracs) > 0) {
+		// chart2.addSeries(THROUGH, xs, yThroughFracs);
+		// }
+		// chart2.saveAsPng(outputFilename + "legDistanceModalSplit2.png",
+		// 800, 600);
+		// }
 		sw.close();
 	}
 

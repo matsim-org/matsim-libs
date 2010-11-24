@@ -46,7 +46,7 @@ import playground.yu.utils.io.SimpleWriter;
 
 /**
  * @author yu
- *
+ * 
  */
 public class ModeSplit extends AbstractPersonAlgorithm implements
 		PlanAlgorithm, Analysis {
@@ -69,34 +69,41 @@ public class ModeSplit extends AbstractPersonAlgorithm implements
 	@Override
 	public void run(final Plan plan) {
 		boolean inRange = false;
-		if (toll != null)
+		if (toll != null) {
 			inRange = TollTools.isInRange(((PlanImpl) plan).getFirstActivity()
 					.getLinkId(), toll);
-		for (PlanElement pe : plan.getPlanElements())
+		}
+		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof Leg) {
 				String m = ((Leg) pe).getMode();
 				if (TransportMode.car.equals(m)) {
 					carLegs++;
-					if (inRange)
+					if (inRange) {
 						tollCarLegs++;
+					}
 				} else if (TransportMode.pt.equals(m)) {
 					ptLegs++;
-					if (inRange)
+					if (inRange) {
 						tollPtLegs++;
+					}
 				} else if (TransportMode.walk.equals(m)) {
 					wlkLegs++;
-					if (inRange)
+					if (inRange) {
 						tollWlkLegs++;
+					}
 				} else if (TransportMode.bike.equals(m)) {
 					bikeLegs++;
-					if (inRange)
+					if (inRange) {
 						tollBikeLegs++;
+					}
 				} else {
 					othersLegs++;
-					if (inRange)
+					if (inRange) {
 						tollOthersLegs++;
+					}
 				}
 			}
+		}
 	}
 
 	@Override
@@ -176,8 +183,10 @@ public class ModeSplit extends AbstractPersonAlgorithm implements
 		new MatsimPopulationReader(scenario).readFile(plansFilename);
 
 		scenario.getConfig().scenario().setUseRoadpricing(true);
-		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(scenario
-				.getRoadPricingScheme());
+
+		RoadPricingScheme tollScheme = scenario.getRoadPricingScheme();
+		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(
+				tollScheme);
 		try {
 			tollReader.parse(tollFilename);
 		} catch (SAXException e) {
@@ -188,7 +197,7 @@ public class ModeSplit extends AbstractPersonAlgorithm implements
 			e.printStackTrace();
 		}
 
-		ModeSplit ms = new ModeSplit(null);
+		ModeSplit ms = new ModeSplit(tollScheme);
 		ms.run(population);
 		ms.write(outputPath);
 

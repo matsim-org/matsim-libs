@@ -51,7 +51,7 @@ public class CharyparNagelScoringFunctionFactoryWithWalk implements
 		scoringFunctionAccumulator
 				.addScoringFunction(new ActivityScoringFunction(plan, params));
 		scoringFunctionAccumulator
-				.addScoringFunction(new CharyparNagelScoringFunctionWithWalk(
+				.addScoringFunction(new LegScoringFunctionWithWalk(
 						plan, params, this.offsetWalk));
 		scoringFunctionAccumulator.addScoringFunction(new MoneyScoringFunction(
 				params));

@@ -38,8 +38,9 @@ public class MZ05WegeReader implements TabularFileHandler {
 	}
 
 	private void reset(final String personId) {
-		if (!changePerson)
+		if (!changePerson) {
 			append();
+		}
 		changePerson = false;
 		tmpPersonId = personId;
 		tmpWegeDists.clear();
@@ -71,12 +72,13 @@ public class MZ05WegeReader implements TabularFileHandler {
 
 	public void startRow(final String[] row) {
 		String personId = row[0] + row[1];
-		if (tmpPersonId == null)
+		if (tmpPersonId == null) {
 			reset(personId);
-		else if (!tmpPersonId.equals(personId))
+		} else if (!tmpPersonId.equals(personId)) {
 			reset(personId);
-		else if (changePerson)
+		} else if (changePerson) {
 			return;
+		}
 
 		String w_dist_obj1 = row[42];
 		if (w_dist_obj1 != null) {
@@ -98,24 +100,28 @@ public class MZ05WegeReader implements TabularFileHandler {
 				// tmpWOthers++;
 				// break;
 				// }
-				if (mode == 1)
+				if (mode == 1) {
 					tmpWLV++;
-				else if (mode == 2)
+				} else if (mode == 2) {
 					tmpWMIV++;
-				else if (mode == 3)
+				} else if (mode == 3) {
 					tmpWOeV++;
-				else
+				} else {
 					tmpWOthers++;
+				}
 				if (row[9] != null) {
 					if (row[9].equals("1")) {
-						if (tmpPersonKantonZurichId == null)
+						if (tmpPersonKantonZurichId == null) {
 							resetKantonZurich(personId);
-						else if (!tmpPersonKantonZurichId.equals(personId))
+						} else if (!tmpPersonKantonZurichId.equals(personId)) {
 							resetKantonZurich(personId);
-					} else
+						}
+					} else {
 						belongs2KantonZurich = false;
-				} else
+					}
+				} else {
 					belongs2KantonZurich = false;
+				}
 			} else {
 				changePerson = true;
 				return;
@@ -127,8 +133,9 @@ public class MZ05WegeReader implements TabularFileHandler {
 	}
 
 	public void write() {
-		if (!changePerson)
+		if (!changePerson) {
 			append();
+		}
 		double avgW_dist_obj1 = w_dist_obj1 / wCnt;
 		double avgW_dist_obj1KantonZurich = w_dist_obj1KantonZurich
 				/ wKantonZurichCnt;

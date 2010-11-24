@@ -99,4 +99,14 @@ public class Collection2Array {
 		}
 		return array;
 	}
+
+	public static String[] toArray(Collection<String> collection) {
+		int size = collection.size();
+		String[] array = new String[size];
+		Iterator<String> it = collection.iterator();
+		for (int i = 0; it.hasNext(); i++) {
+			array[i] = it.next();
+		}
+		return array;
+	}
 }

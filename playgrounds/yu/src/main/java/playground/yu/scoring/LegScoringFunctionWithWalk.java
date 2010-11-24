@@ -31,10 +31,10 @@ import org.matsim.core.scoring.charyparNagel.LegScoringFunction;
  * @author yu
  *
  */
-public class CharyparNagelScoringFunctionWithWalk extends LegScoringFunction {
+public class LegScoringFunctionWithWalk extends LegScoringFunction {
 	private final double offsetWlk;
 
-	public CharyparNagelScoringFunctionWithWalk(Plan plan,
+	public LegScoringFunctionWithWalk(Plan plan,
 			final CharyparNagelScoringParameters params, double offsetWalk) {
 		super(plan, params);
 		this.offsetWlk = offsetWalk;

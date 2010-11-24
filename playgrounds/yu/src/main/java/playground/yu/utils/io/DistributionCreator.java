@@ -28,8 +28,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Random;
+import java.util.Map.Entry;
 
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.charts.ChartUtil;
@@ -43,14 +43,14 @@ import playground.yu.utils.container.CollectionSum;
  * a small tool, which is able to create .txt-file or chart for a distribution.
  * e.g. x-axis - value of a parameter or factor or characteristic, y-axis -
  * number of this parameter with value in a small range
- *
+ * 
  * @author yu
- *
+ * 
  */
 public class DistributionCreator {
 	/**
 	 * a small test about normal distribution
-	 *
+	 * 
 	 * @param args
 	 */
 	public static void main(String[] args) {
@@ -81,10 +81,10 @@ public class DistributionCreator {
 
 	/**
 	 * no interval of the x-axis data means all data records will be used
-	 *
+	 * 
 	 * @param data
 	 *            an array of data being analyzed
-	 *
+	 * 
 	 */
 	public DistributionCreator(double[] data) {
 		this(data, 0d);
@@ -101,12 +101,12 @@ public class DistributionCreator {
 	public DistributionCreator(double[] data, double interval) {
 		this.data = data;
 		this.interval = interval;
-		this.initialize();
+		initialize();
 	}
 
 	/**
 	 * no interval of the x-axis data means all data records will be used
-	 *
+	 * 
 	 * @param dataList
 	 *            data a {@code List} of data being analyzed, ({@code Set} is
 	 *            not supported here, to avoid losing of repetition data record)
@@ -124,35 +124,35 @@ public class DistributionCreator {
 	 *            records will be used
 	 */
 	public DistributionCreator(List<Double> dataList, double interval) {
-		this.data = Collection2Array.toArrayFromDouble(dataList);
+		data = Collection2Array.toArrayFromDouble(dataList);
 		this.interval = interval;
-		this.initialize();
+		initialize();
 	}
 
 	/**
 	 * version 2, should only call methode xxxx2(...) e.g. write2(...) (more
 	 * data series version)
-	 *
+	 * 
 	 * @param dataList
 	 * @param interval
 	 */
 	public DistributionCreator(Map<String, List<Double>> dataList,
 			double interval) {
-		this.datas = new HashMap<String, double[]>();
-		this.dataMaps = new HashMap<String, Map<Double, Integer>>();
+		datas = new HashMap<String, double[]>();
+		dataMaps = new HashMap<String, Map<Double, Integer>>();
 		for (Entry<String, List<Double>> entry : dataList.entrySet()) {
-			this.datas.put(entry.getKey(), Collection2Array.toArrayFromDouble(entry
+			datas.put(entry.getKey(), Collection2Array.toArrayFromDouble(entry
 					.getValue()));
 		}
 		this.interval = interval;
-		this.initialize2();
+		initialize2();
 	}
 
 	public void createChart(String filename, String title, String xAxisLabel,
 			String yAxisLabel) {
 		XYScatterChart chart = new XYScatterChart(title, xAxisLabel, yAxisLabel);
-		double xs[] = Collection2Array.toArrayFromDouble(this.dataMap.keySet());
-		double ys[] = Collection2Array.toDoubleArray(this.dataMap.values());
+		double xs[] = Collection2Array.toArrayFromDouble(dataMap.keySet());
+		double ys[] = Collection2Array.toDoubleArray(dataMap.values());
 		chart.addSeries(title, xs, ys);
 		chart.saveAsPng(filename, 1024, 768);
 	}
@@ -160,9 +160,9 @@ public class DistributionCreator {
 	public void createChartPercent(String filename, String title,
 			String xAxisLabel, String yAxisLabel) {
 		XYScatterChart chart = new XYScatterChart(title, xAxisLabel, yAxisLabel);
-		double xs[] = Collection2Array.toArrayFromDouble(this.dataMap.keySet());
+		double xs[] = Collection2Array.toArrayFromDouble(dataMap.keySet());
 
-		Collection<Integer> values = this.dataMap.values();
+		Collection<Integer> values = dataMap.values();
 		double sum = CollectionSum.getSum(values);
 		Iterator<Integer> it = values.iterator();
 		double ys[] = new double[xs.length];
@@ -171,12 +171,12 @@ public class DistributionCreator {
 		}
 
 		chart.addSeries(title, xs, ys);
-		chart.saveAsPng(filename, 1024, 768);
+		chart.saveAsPng(filename, 640, 480);
 	}
 
 	/**
 	 * (more data series version)
-	 *
+	 * 
 	 * @param filename
 	 * @param title
 	 * @param xAxisLabel
@@ -187,8 +187,8 @@ public class DistributionCreator {
 		ChartUtil chart = timeXAxis ? new TimeScatterChart(title, xAxisLabel,
 				yAxisLabel) : new XYScatterChart(title, xAxisLabel, yAxisLabel);
 
-		for (String series : this.dataMaps.keySet()) {
-			Map<Double, Integer> aDataMap = this.dataMaps.get(series);
+		for (String series : dataMaps.keySet()) {
+			Map<Double, Integer> aDataMap = dataMaps.get(series);
 			double xs[] = Collection2Array.toArrayFromDouble(aDataMap.keySet());
 			Collection<Integer> values = aDataMap.values();
 			double sum = CollectionSum.getSum(values);
@@ -212,8 +212,8 @@ public class DistributionCreator {
 		ChartUtil chart = timeXAxis ? new TimeScatterChart(title, xAxisLabel,
 				yAxisLabel) : new XYScatterChart(title, xAxisLabel, yAxisLabel);
 
-		for (String series : this.dataMaps.keySet()) {
-			Map<Double, Integer> aDataMap = this.dataMaps.get(series);
+		for (String series : dataMaps.keySet()) {
+			Map<Double, Integer> aDataMap = dataMaps.get(series);
 			double xs[] = Collection2Array.toArrayFromDouble(aDataMap.keySet());
 
 			double ys[] = Collection2Array.toDoubleArray(aDataMap.values());
@@ -230,31 +230,30 @@ public class DistributionCreator {
 	protected void gatherInformation() {
 		double key;
 
-		for (int i = 0; i < this.data.length; i++) {
-			key = this.interval > 0d ? this.getXAxisValue(data[i]) : data[i];
-			Integer cnt = this.dataMap.get(key);
+		for (int i = 0; i < data.length; i++) {
+			key = interval > 0d ? getXAxisValue(data[i]) : data[i];
+			Integer cnt = dataMap.get(key);
 			if (cnt == null) {
-				this.dataMap.put(key, 1);
+				dataMap.put(key, 1);
 			} else {
-				this.dataMap.put(key, cnt + 1);
+				dataMap.put(key, cnt + 1);
 			}
 		}
 
 	}
 
 	protected void gatherInformation2() {
-		for (String mapKey : this.datas.keySet()) {
-			double[] aData = this.datas.get(mapKey);
+		for (String mapKey : datas.keySet()) {
+			double[] aData = datas.get(mapKey);
 
 			double key;
 			for (int i = 0; i < aData.length; i++) {
-				key = this.interval > 0d ? this.getXAxisValue(aData[i])
-						: aData[i];
+				key = interval > 0d ? getXAxisValue(aData[i]) : aData[i];
 
-				Map<Double, Integer> aDataMap = this.dataMaps.get(mapKey);
+				Map<Double, Integer> aDataMap = dataMaps.get(mapKey);
 				if (aDataMap == null) {
 					aDataMap = new HashMap<Double, Integer>();
-					this.dataMaps.put(mapKey, aDataMap);
+					dataMaps.put(mapKey, aDataMap);
 				}
 
 				Integer cnt = aDataMap.get(key);
@@ -269,14 +268,14 @@ public class DistributionCreator {
 
 	/**
 	 * use it only if interval > 0
-	 *
+	 * 
 	 * @param record
 	 *            data record
 	 * @return the value on X-axis corresponding to the data record
 	 */
 	protected double getXAxisValue(double record) {
-		return (int) (record / this.interval) * this.interval
-				- (record < 0 ? this.interval : 0d);
+		return (int) (record / interval) * interval
+				- (record < 0 ? interval : 0d);
 	}
 
 	/**
@@ -297,7 +296,7 @@ public class DistributionCreator {
 	public void write(String filename) {
 		SimpleWriter writer = new SimpleWriter(filename);
 		writer.writeln("value+\tsize");
-		for (Entry<Double, Integer> entry : this.dataMap.entrySet()) {
+		for (Entry<Double, Integer> entry : dataMap.entrySet()) {
 			writer.writeln(entry.getKey() + "\t" + entry.getValue());
 		}
 		writer.close();
@@ -306,8 +305,8 @@ public class DistributionCreator {
 	public void writePercent(String filename) {
 		SimpleWriter writer = new SimpleWriter(filename);
 		writer.writeln("value+\tfraction");
-		double sum = CollectionSum.getSum(this.dataMap.values());
-		for (Entry<Double, Integer> entry : this.dataMap.entrySet()) {
+		double sum = CollectionSum.getSum(dataMap.values());
+		for (Entry<Double, Integer> entry : dataMap.entrySet()) {
 			writer.writeln(entry.getKey() + "\t" + (double) entry.getValue()
 					/ sum * 100d);
 		}
@@ -317,11 +316,10 @@ public class DistributionCreator {
 	public void write2(String filename) {
 		SimpleWriter writer = new SimpleWriter(filename);
 
-		for (String key : this.dataMaps.keySet()) {
+		for (String key : dataMaps.keySet()) {
 
 			writer.writeln(key + "\nvalue+\tsize");
-			for (Entry<Double, Integer> entry : this.dataMaps.get(key)
-					.entrySet()) {
+			for (Entry<Double, Integer> entry : dataMaps.get(key).entrySet()) {
 				writer.writeln(entry.getKey() + "\t" + entry.getValue());
 			}
 			writer.writeln("-------------------------");
@@ -333,11 +331,11 @@ public class DistributionCreator {
 	public void write2percent(String filename) {
 		SimpleWriter writer = new SimpleWriter(filename);
 
-		for (String key : this.dataMaps.keySet()) {
+		for (String key : dataMaps.keySet()) {
 
 			writer.writeln(key + "\nvalue+\tfraction");
 
-			Map<Double, Integer> localDataMap = this.dataMaps.get(key);
+			Map<Double, Integer> localDataMap = dataMaps.get(key);
 			double sum = CollectionSum.getSum(localDataMap.values());
 			// TODO sum
 

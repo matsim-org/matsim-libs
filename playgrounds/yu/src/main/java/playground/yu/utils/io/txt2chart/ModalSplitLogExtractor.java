@@ -82,27 +82,34 @@ public class ModalSplitLogExtractor {
 		int count = -1;
 		while (line != null) {
 			line = sr.readLine();
-			if (line != null)
-				if (line.contains("ITERATION ") && line.contains(" BEGINS"))
+			if (line != null) {
+				if (line.contains("ITERATION ") && line.contains(" BEGINS")) {
 					count = getCount(line);
-				else if (line.contains("car legs")) {
-					if (count > -1)
+				} else if (line.contains("car legs")) {
+					if (count > -1) {
 						msle.addCar(count, extractFrac(line));
+					}
 				} else if (line.contains("pt legs")) {
-					if (count > -1)
+					if (count > -1) {
 						msle.addPt(count, extractFrac(line));
+					}
 				} else if (line.contains("walk legs")) {
-					if (count > -1)
+					if (count > -1) {
 						msle.addWalk(count, extractFrac(line));
+					}
 				} else if (line.contains("bike legs")) {
-					if (count > -1)
+					if (count > -1) {
 						msle.addBike(count, extractFrac(line));
+					}
 				} else if (line.contains("undefined legs")) {
-					if (count > -1)
+					if (count > -1) {
 						msle.addUndefined(count, extractFrac(line));
+					}
 				} else if (line.contains("ITERATION ")
-						&& line.contains(" ENDS"))
+						&& line.contains(" ENDS")) {
 					count = -1;
+				}
+			}
 		}
 		sr.close();
 	}
@@ -121,40 +128,50 @@ public class ModalSplitLogExtractor {
 			xs[i] = i;
 			Double carFrac = i < msle.carFracs.size() ? msle.carFracs.get(i)
 					: null;
-			if (carFrac != null)
+			if (carFrac != null) {
 				carFracs[i] = carFrac;
+			}
 
 			Double ptFrac = i < msle.ptFracs.size() ? msle.ptFracs.get(i)
 					: null;
-			if (ptFrac != null)
+			if (ptFrac != null) {
 				ptFracs[i] = ptFrac;
+			}
 			Double wlkFrac = i < msle.wlkFracs.size() ? msle.wlkFracs.get(i)
 					: null;
-			if (wlkFrac != null)
+			if (wlkFrac != null) {
 				wlkFracs[i] = wlkFrac;
+			}
 			Double bikeFrac = i < msle.bikeFracs.size() ? msle.bikeFracs.get(i)
 					: null;
-			if (bikeFrac != null)
+			if (bikeFrac != null) {
 				bikeFracs[i] = bikeFrac;
+			}
 			Double undefinedFrac = i < msle.undefinedFracs.size() ? msle.undefinedFracs
 					.get(i)
 					: null;
-			if (undefinedFrac != null)
+			if (undefinedFrac != null) {
 				undefinedFracs[i] = undefinedFrac;
+			}
 		}
 
 		XYLineChart chart = new XYLineChart("Mode Choice", "iteration",
 				"leg mode fraction [%]");
-		if (CollectionSum.getSum(carFracs) > 0)
+		if (CollectionSum.getSum(carFracs) > 0) {
 			chart.addSeries("car", xs, carFracs);
-		if (CollectionSum.getSum(ptFracs) > 0)
+		}
+		if (CollectionSum.getSum(ptFracs) > 0) {
 			chart.addSeries("pt", xs, ptFracs);
-		if (CollectionSum.getSum(wlkFracs) > 0)
+		}
+		if (CollectionSum.getSum(wlkFracs) > 0) {
 			chart.addSeries("walk", xs, wlkFracs);
-		if (CollectionSum.getSum(bikeFracs) > 0)
+		}
+		if (CollectionSum.getSum(bikeFracs) > 0) {
 			chart.addSeries("bike", xs, bikeFracs);
-		if (CollectionSum.getSum(undefinedFracs) > 0)
+		}
+		if (CollectionSum.getSum(undefinedFracs) > 0) {
 			chart.addSeries("others", xs, undefinedFracs);
+		}
 		chart.saveAsPng(chartFilename, 800, 600);
 
 		SimpleWriter sw = new SimpleWriter(outputFilename);
@@ -174,16 +191,17 @@ public class ModalSplitLogExtractor {
 	 * @param args
 	 */
 	public static void main(final String[] args) {
-		// String filenameBase = "../../runs-svn/run696/696.";
+		String filenameBase = "../runs-svn/run699/699.";
+		String logFilename = filenameBase + "logfile2.short.log";
 		// String logFilename = filenameBase + "logfile.log";
-		String filenameBase = "D:/tmp/";
-		String logFilename = filenameBase + "prepare3.log";
+		// String filenameBase = "D:/tmp/";
+		// String logFilename = filenameBase + "prepare3.log";
 		// String logFilename = "../runs-svn/run669/logfile.txt";
 		String chartFilename = filenameBase + "legModeChart.png";
 		String outputFilename = filenameBase + "legMode.txt";
 		// String logFilename2 = filenameBase + "logfile.log";
 		// String logFilename3 = filenameBase + "logfile2.log";
-		int maxIter = 501;
+		int maxIter = 1001;
 		ModalSplitLogExtractor msle = new ModalSplitLogExtractor(maxIter);
 		// reading
 		readLog(logFilename, msle);
