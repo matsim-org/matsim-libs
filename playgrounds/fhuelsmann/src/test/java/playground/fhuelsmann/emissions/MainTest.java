@@ -48,6 +48,10 @@ public class MainTest extends MatsimTestCase{
 		
 		matsimEventReader.readFile(eventsFile);
 		
+		assertEquals( "----ohne Aktivität---,2.0,23953.0" , handler.getTravelTimes().get("52902456").get("23933testVehicle").get(0).toString()  ) ;
+		
+		assertEquals( "----ohne Aktivität---,2.0,38598.0", handler.getTravelTimes().get("52902456").get("38530testVehicle").get(0).toString() ) ;
+		
 		VelocityAverageCalculate vac = new VelocityAverageCalculate(handler.getTravelTimes(),visumRoadFile);
 		vac.calculateAverageVelocity1();
 	//	System.out.println(vac.getNewtravelTimesWithLengthAndAverageSpeed().get("52799758"));
