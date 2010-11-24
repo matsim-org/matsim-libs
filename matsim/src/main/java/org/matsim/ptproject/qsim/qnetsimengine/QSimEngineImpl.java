@@ -22,6 +22,7 @@ package org.matsim.ptproject.qsim.qnetsimengine;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.ListIterator;
@@ -47,15 +48,32 @@ public class QSimEngineImpl extends QSimEngineInternalI {
 	 */
 	/*package*/ static boolean simulateAllLinks = false;
 	/*package*/ static boolean simulateAllNodes = false;
+	
+	/*
+	 * "Classic" behavior is using an array of nodes. However, in many
+	 * cases it is faster, if non-active nodes are de-activated. Note that
+	 * enabling this option might (slightly) change the simulation results. 
+	 * A node that is de-activated and re-activated later will be at another 
+	 * position in the list of nodes which are simulated. As a result, different
+	 * random numbers will be used when the node is simulated.  
+	 * In the future each node should get its own random number generator - then
+	 * there is no difference anymore between the results w/o de-activated nodes.
+	 */
+	/*package*/ static boolean useNodeArray = true;
 
 	/*package*/  List<QLinkInternalI> allLinks = null;
+	/*package*/  List<QNode> allNodes = null;
 	/** This is the collection of links that have to be moved in the simulation */
-	/*package*/  List<QLinkInternalI> simLinksArray = new ArrayList<QLinkInternalI>();
+	/*package*/  List<QLinkInternalI> simLinksList = new ArrayList<QLinkInternalI>();
 	/** This is the collection of nodes that have to be moved in the simulation */
 	/*package*/  QNode[] simNodesArray = null;
+	/*package*/  List<QNode> simNodesList = null;
 	/** This is the collection of links that have to be activated in the current time step */
-	/*package*/  ArrayList<QLinkInternalI> simActivateThis = new ArrayList<QLinkInternalI>();
+	/*package*/  ArrayList<QLinkInternalI> simActivateLinks = new ArrayList<QLinkInternalI>();
 
+	/** This is the collection of nodes that have to be activated in the current time step */
+	/*package*/  ArrayList<QNode> simActivateNodes = new ArrayList<QNode>();
+	
 	private final Random random;
 	private final QSim qsim;
 
@@ -81,19 +99,29 @@ public class QSimEngineImpl extends QSimEngineInternalI {
 	@Override
 	public void onPrepareSim() {
 		this.allLinks = new ArrayList<QLinkInternalI>(this.getQNetwork().getNetsimLinks().values());
-		this.simNodesArray = this.qsim.getNetsimNetwork().getNetsimNodes().values().toArray(new QNode[this.qsim.getNetsimNetwork().getNetsimNodes().values().size()]);
-		//dg[april08] as the order of nodes has an influence on the simulation
-		//results they are sorted to avoid indeterministic simulations
-		Arrays.sort(this.simNodesArray, new Comparator<QNode>() {
-			@Override
-			public int compare(final QNode o1, final QNode o2) {
-				return o1.getNode().getId().compareTo(o2.getNode().getId());
-			}
-		});
-		if (simulateAllLinks) {
-			this.simLinksArray.addAll(this.allLinks);
+		this.allNodes = new ArrayList<QNode>(this.getQNetwork().getNetsimNodes().values());
+		if (useNodeArray) {
+			this.simNodesArray = this.qsim.getNetsimNetwork().getNetsimNodes().values().toArray(new QNode[this.qsim.getNetsimNetwork().getNetsimNodes().values().size()]);
+			//dg[april08] as the order of nodes has an influence on the simulation
+			//results they are sorted to avoid indeterministic simulations
+			Arrays.sort(this.simNodesArray, new Comparator<QNode>() {
+				@Override
+				public int compare(final QNode o1, final QNode o2) {
+					return o1.getNode().getId().compareTo(o2.getNode().getId());
+				}
+			});			
+		} else {
+			simNodesList = new ArrayList<QNode>();
+			Collections.sort(simNodesList, new Comparator<QNode>() {
+				@Override
+				public int compare(final QNode o1, final QNode o2) {
+					return o1.getNode().getId().compareTo(o2.getNode().getId());
+				}
+			});
 		}
-
+		if (simulateAllLinks) {
+			this.simLinksList.addAll(this.allLinks);
+		}
 	}
 
 
@@ -124,22 +152,35 @@ public class QSimEngineImpl extends QSimEngineInternalI {
 	}
 
 	protected void moveNodes(final double time) {
-		for (QNode node : this.simNodesArray) {
-			if (node.isActive() /*|| node.isSignalized()*/ || simulateAllNodes) {
-				/* It is faster to first test if the node is active, and only then call moveNode(),
-				 * than calling moveNode() directly and that one returns immediately when it's not
-				 * active. Most likely, the getter isActive() can be in-lined by the compiler, while
-				 * moveNode() cannot, resulting in fewer method-calls when isActive() is used.
-				 * -marcel/20aug2008
-				 */
+		if (useNodeArray) {
+			for (QNode node : this.simNodesArray) {
+				if (node.isActive() /*|| node.isSignalized()*/ || simulateAllNodes) {
+					/* It is faster to first test if the node is active, and only then call moveNode(),
+					 * than calling moveNode() directly and that one returns immediately when it's not
+					 * active. Most likely, the getter isActive() can be in-lined by the compiler, while
+					 * moveNode() cannot, resulting in fewer method-calls when isActive() is used.
+					 * -marcel/20aug2008
+					 */
+					node.moveNode(time, random);
+				}
+			}			
+		} else {
+			reactivateNodes();
+			ListIterator<QNode> simNodes = this.simNodesList.listIterator();
+			QNode node;
+			
+			while (simNodes.hasNext()) {
+				node = simNodes.next();
 				node.moveNode(time, random);
+				
+				if (!node.isActive()) simNodes.remove();
 			}
 		}
 	}
 
 	protected void moveLinks(final double time) {
 		reactivateLinks();
-		ListIterator<QLinkInternalI> simLinks = this.simLinksArray.listIterator();
+		ListIterator<QLinkInternalI> simLinks = this.simLinksList.listIterator();
 		QLinkInternalI link;
 		boolean isActive;
 
@@ -152,27 +193,43 @@ public class QSimEngineImpl extends QSimEngineInternalI {
 		}
 	}
 
-	//	@Override
 	@Override
 	protected void activateLink(final QLinkInternalI link) {
 		if (!simulateAllLinks) {
-			this.simActivateThis.add(link);
+			this.simActivateLinks.add(link);
 		}
 	}
 
 	private void reactivateLinks() {
-		if ((!simulateAllLinks) && (!this.simActivateThis.isEmpty())) {
-			this.simLinksArray.addAll(this.simActivateThis);
-			this.simActivateThis.clear();
+		if ((!simulateAllLinks) && (!this.simActivateLinks.isEmpty())) {
+			this.simLinksList.addAll(this.simActivateLinks);
+			this.simActivateLinks.clear();
 		}
 	}
+	
+	@Override
+	protected void activateNode(QNode node) {
+		if (!useNodeArray && !simulateAllNodes) {
+			this.simActivateNodes.add(node);
+		}
+	}
+	
+	private void reactivateNodes() {
+		if ((!simulateAllNodes) && (!this.simActivateNodes.isEmpty())) {
+			this.simNodesList.addAll(this.simActivateNodes);
+			this.simActivateNodes.clear();
+		}
+	}
+	
+	@Override
+	public int getNumberOfSimulatedNodes() {
+		if (useNodeArray) return this.simNodesArray.length;
+		else return this.simNodesList.size();
+	}
 
-	/**
-	 * @return Returns the simLinksArray.
-	 */
 	@Override
 	public int getNumberOfSimulatedLinks() {
-		return this.simLinksArray.size();
+		return this.simLinksList.size();
 	}
 
 	@Override

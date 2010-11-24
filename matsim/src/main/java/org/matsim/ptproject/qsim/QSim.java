@@ -660,13 +660,14 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 			long diffreal = (endtime.getTime() - this.realWorldStarttime.getTime())/1000;
 			double diffsim  = time - this.simTimer.getSimStartTime();
 			int nofActiveLinks = this.netEngine.getNumberOfSimulatedLinks();
+			int nofActiveNodes = this.netEngine.getNumberOfSimulatedNodes();
 			log.info("SIMULATION (NEW QSim) AT " + Time.writeTime(time) + " (it." + this.iterationNumber + "): #Veh=" + this.agentCounter.getLiving()
-					+ " lost=" + this.agentCounter.getLost() + " #links=" + nofActiveLinks
+					+ " lost=" + this.agentCounter.getLost() + " #links=" + nofActiveLinks + " #nodes=" + nofActiveNodes
 					+ " simT=" + diffsim + "s realT=" + (diffreal) + "s; (s/r): " + (diffsim/(diffreal + Double.MIN_VALUE)));
 
 			if (this.multiModalEngine != null) {
 				nofActiveLinks = this.multiModalEngine.getNumberOfSimulatedLinks();
-				int nofActiveNodes = this.multiModalEngine.getNumberOfSimulatedNodes();
+				nofActiveNodes = this.multiModalEngine.getNumberOfSimulatedNodes();
 				log.info("SIMULATION (MultiModalSim) AT " + Time.writeTime(time) +
 						" #links=" + nofActiveLinks +
 						" #nodes=" + nofActiveNodes);

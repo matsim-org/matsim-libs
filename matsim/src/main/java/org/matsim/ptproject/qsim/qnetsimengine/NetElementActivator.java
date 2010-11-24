@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * LinkActivator.java
+ * NetElementActivator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,10 +20,12 @@
 
 package org.matsim.ptproject.qsim.qnetsimengine;
 
+public abstract class NetElementActivator {
 
-
-public abstract class LinkActivator {
-
+	protected abstract void activateNode(final QNode node);
+	
+	abstract int getNumberOfSimulatedNodes();
+	
 	protected abstract void activateLink(final QLinkInternalI link);
 
 	abstract int getNumberOfSimulatedLinks();

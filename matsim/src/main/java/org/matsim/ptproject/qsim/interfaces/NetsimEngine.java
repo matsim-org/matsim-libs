@@ -37,7 +37,8 @@ public interface NetsimEngine extends MobsimEngine, Steppable {
 	 * for logging purposes; otherwise this is not important.  kai, oct'10
 	 */
 	int getNumberOfSimulatedLinks();
-
+	int getNumberOfSimulatedNodes();
+	
 	NetsimNetwork getQNetwork();
 
 }

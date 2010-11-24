@@ -27,7 +27,7 @@ import org.matsim.ptproject.qsim.interfaces.NetsimEngine;
  * @author nagel
  *
  */
-abstract class QSimEngineInternalI extends LinkActivator implements NetsimEngine {
+abstract class QSimEngineInternalI extends NetElementActivator implements NetsimEngine {
 	
 	abstract AgentSnapshotInfoBuilder getAgentSnapshotInfoBuilder() ;
 	

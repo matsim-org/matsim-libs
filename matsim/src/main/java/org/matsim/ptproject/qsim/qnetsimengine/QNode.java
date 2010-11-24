@@ -53,6 +53,9 @@ public class QNode implements NetsimNode {
 
 	private final Node node;
 
+	// necessary if Nodes are (de)activated
+	private NetElementActivator activator = null;
+	
 	// for Customizable
 	private Map<String, Object> customAttributes = new HashMap<String, Object>();
 
@@ -64,6 +67,7 @@ public class QNode implements NetsimNode {
 	protected QNode(final Node n, final NetsimEngine simEngine) {
 		this.node = n;
 		this.simEngine = (QSimEngineImpl) simEngine; // needs to be of correct impl type when it arrives here.  kai, jun'10
+		this.activator = this.simEngine;	// by default (single threaded QSim)
 		int nofInLinks = this.node.getInLinks().size();
 		this.inLinksArrayCache = new QLinkInternalI[nofInLinks];
 		this.tempLinks = new QLinkInternalI[nofInLinks];
@@ -94,8 +98,19 @@ public class QNode implements NetsimNode {
 		return this.node;
 	}
 
+	/*
+	 * The ParallelQSim replaces the activator with the QSimEngineRunner 
+	 * that handles this node.
+	 */
+	/*package*/ void setNetElementActivator(NetElementActivator activator) {
+		this.activator = activator;
+	}
+	
 	protected final void activateNode() {
-		this.active = true;
+		if (!this.active) {
+			this.activator.activateNode(this);
+			this.active = true;
+		}
 	}
 
 	 final boolean isActive() {

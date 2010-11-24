@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * QSimEngineThread.java
+ * QSimEngineRunner.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -23,36 +23,44 @@ package org.matsim.ptproject.qsim.qnetsimengine;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Queue;
+import java.util.Random;
 import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CyclicBarrier;
 
 import org.matsim.core.gbl.Gbl;
 import org.matsim.ptproject.qsim.QSim;
-import org.matsim.ptproject.qsim.qnetsimengine.ParallelQSimEngine.ExtendedQueueNode;
 
 public class QSimEngineRunner extends QSimEngineInternalI implements Runnable {
 
 	private double time = 0.0;
 	private boolean simulateAllNodes = false;
 	private boolean simulateAllLinks = false;
-
+	private boolean useNodeArray = QSimEngineImpl.useNodeArray;
+	
 	private volatile boolean simulationRunning = true;
 
 	private final CyclicBarrier startBarrier;
 	private final CyclicBarrier separationBarrier;
 	private final CyclicBarrier endBarrier;
 
-	private ExtendedQueueNode[] queueNodes = null;
-	private List<QLinkInternalI> links = new ArrayList<QLinkInternalI>();
+	private QNode[] nodesArray = null;
+	private List<QNode> nodesList = null;
+	private List<QLinkInternalI> linksList = new ArrayList<QLinkInternalI>();
 
+	/** This is the collection of nodes that have to be activated in the current time step.
+	 * This needs to be thread-safe since it is not guaranteed that each incoming link is handled
+	 * by the same thread as a node itself. */
+	private final Queue<QNode> nodesToActivate = new ConcurrentLinkedQueue<QNode>();
+	
 	/** This is the collection of links that have to be activated in the current time step */
 	private final ArrayList<QLinkInternalI> linksToActivate = new ArrayList<QLinkInternalI>();
 	private final QSim qsim;
 	private final AgentSnapshotInfoBuilder positionInfoBuilder;
 
 	/*package*/ QSimEngineRunner(boolean simulateAllNodes, boolean simulateAllLinks, CyclicBarrier startBarrier, CyclicBarrier separationBarrier, CyclicBarrier endBarrier,
-			QSim sim, AgentSnapshotInfoBuilder positionInfoBuilder)
-	{
+			QSim sim, AgentSnapshotInfoBuilder positionInfoBuilder) {
 		this.simulateAllNodes = simulateAllNodes;
 		this.simulateAllLinks = simulateAllLinks;
 		this.startBarrier = startBarrier;
@@ -62,23 +70,19 @@ public class QSimEngineRunner extends QSimEngineInternalI implements Runnable {
 		this.positionInfoBuilder = positionInfoBuilder;
 	}
 
-	/*package*/ void setExtendedQueueNodeArray(ExtendedQueueNode[] queueNodes)
-	{
-		this.queueNodes = queueNodes;
+	/*package*/ void setQNodeArray(QNode[] nodes) {
+		this.nodesArray = nodes;
 	}
 
-	/*package*/ void setLinks(List<QLinkInternalI> links)
-	{
-		this.links = links;
+	/*package*/ void setQNodeList(List<QNode> nodes) {
+		this.nodesList = nodes;
+	}
+	
+	/*package*/ void setLinks(List<QLinkInternalI> links) {
+		this.linksList = links;
 	}
 
-//	private void addLink(QLink link)
-//	{
-//		this.links.add(link);
-//	}
-
-	/*package*/ void setTime(final double t)
-	{
+	/*package*/ void setTime(final double t) {
 		time = t;
 	}
 
@@ -92,22 +96,14 @@ public class QSimEngineRunner extends QSimEngineInternalI implements Runnable {
 		// nothing to do here
 	}
 
-//	public void beforeSimStep( double time ) {
-//		// nothing to do here
-//	}
-	// don't know what this was. kai, aug'10
-
 	@Override
-	public void run()
-	{
+	public void run() {
 		/*
 		 * The method is ended when the simulationRunning Flag is
 		 * set to false.
 		 */
-		while(true)
-		{
-			try
-			{
+		while(true) {
+			try {
 				/*
 				 * The Threads wait at the startBarrier until they are
 				 * triggered in the next TimeStep by the run() method in
@@ -119,8 +115,7 @@ public class QSimEngineRunner extends QSimEngineInternalI implements Runnable {
 				 * Check if Simulation is still running.
 				 * Otherwise print CPU usage and end Thread.
 				 */
-				if (!simulationRunning)
-				{
+				if (!simulationRunning) {
 					Gbl.printCurrentThreadCpuTime();
 					return;
 				}
@@ -128,18 +123,28 @@ public class QSimEngineRunner extends QSimEngineInternalI implements Runnable {
 				/*
 				 * Move Nodes
 				 */
-				for (ExtendedQueueNode extendedQueueNode : queueNodes)
-				{
-					QNode node = extendedQueueNode.getQueueNode();
-//					synchronized(node)
-//					{
-						if (node.isActive() /*|| node.isSignalized()*/ || simulateAllNodes)
-						{
-							node.moveNode(time, extendedQueueNode.getRandom());
-						}
-//					}
+				if (useNodeArray) {
+					for (QNode node : nodesArray) {
+//						synchronized(node) {
+							Random random = (Random) node.getCustomAttributes().get(Random.class.getName());
+							if (node.isActive() /*|| node.isSignalized()*/ || simulateAllNodes) {
+								node.moveNode(time, random);
+							}
+//						}
+					}
+				} else {
+					ListIterator<QNode> simNodes = this.nodesList.listIterator();
+					QNode node;
+					
+					while (simNodes.hasNext()) {
+						node = simNodes.next();
+						Random random = (Random) node.getCustomAttributes().get(Random.class.getName());
+						node.moveNode(time, random);
+						
+						if (!node.isActive()) simNodes.remove();
+					}
 				}
-
+					
 				/*
 				 * After moving the Nodes all we use a CyclicBarrier to synchronize
 				 * the Threads. By using a Runnable within the Barrier we activate
@@ -150,12 +155,11 @@ public class QSimEngineRunner extends QSimEngineInternalI implements Runnable {
 				/*
 				 * Move Links
 				 */
-				ListIterator<QLinkInternalI> simLinks = this.links.listIterator();
+				ListIterator<QLinkInternalI> simLinks = this.linksList.listIterator();
 				QLinkInternalI link;
 				boolean isActive;
 
-				while (simLinks.hasNext())
-				{
+				while (simLinks.hasNext()) {
 					link = simLinks.next();
 
 					/*
@@ -165,15 +169,13 @@ public class QSimEngineRunner extends QSimEngineInternalI implements Runnable {
 					 * QueueSimulation would contain a synchronized method to do the
 					 * teleportation instead of synchronize on EVERY QueueLink.
 					 */
-					synchronized(link)
-					{
+//					synchronized(link) {
 						isActive = link.moveLink(time);
 
-						if (!isActive && !simulateAllLinks)
-						{
+						if (!isActive && !simulateAllLinks) {
 							simLinks.remove();
 						}
-					}
+//					}
 				}
 
 				/*
@@ -182,53 +184,60 @@ public class QSimEngineRunner extends QSimEngineInternalI implements Runnable {
 				 * the main Thread can go on.
 				 */
 				endBarrier.await();
-			}
-			catch (InterruptedException e)
-			{
+			} catch (InterruptedException e) {
 				Gbl.errorMsg(e);
-			}
-            catch (BrokenBarrierException e)
-            {
+			} catch (BrokenBarrierException e) {
             	Gbl.errorMsg(e);
             }
 		}
 	}	// run()
 
 	@Override
-	protected void activateLink(QLinkInternalI link)
-	{
-		if (!simulateAllLinks)
-		{
+	protected void activateLink(QLinkInternalI link) {
+		if (!simulateAllLinks) {
 			linksToActivate.add(link);
 		}
 	}
 
-	/*package*/ void activateLinks()
-	{
-		this.links.addAll(this.linksToActivate);
+	/*package*/ void activateLinks() {
+		this.linksList.addAll(this.linksToActivate);
 		this.linksToActivate.clear();
 	}
 
-//	private List<QLink> getLinksToActivate()
-//	{
-//		return this.linksToActivate;
-//	}
-
 	@Override
-	public int getNumberOfSimulatedLinks()
-	{
-		return this.links.size();
+	public int getNumberOfSimulatedLinks() {
+		return this.linksList.size();
 	}
 
-  @Override
-  public QSim getMobsim() {
-    return this.qsim;
-  }
+	@Override
+	protected void activateNode(QNode node) {
+		if (!useNodeArray && !simulateAllNodes) {
+			this.nodesToActivate.add(node);
+		}
+	}
+	
+	/*package*/ void activateNodes() {
+		if (!useNodeArray && !simulateAllNodes) {
+			this.nodesList.addAll(this.nodesToActivate);
+			this.nodesToActivate.clear();			
+		}
+	}
+	
+	@Override
+	public int getNumberOfSimulatedNodes() {
+		if (useNodeArray) return nodesArray.length;
+		else return nodesList.size();
+	}
 
-  @Override
-  public void onPrepareSim() {
-    //currently nothing to do
-  }
+	@Override
+	public QSim getMobsim() {
+		return this.qsim;
+	}
+
+	@Override
+	public void onPrepareSim() {
+		// currently nothing to do
+	}
 
 	@Override
 	public AgentSnapshotInfoBuilder getAgentSnapshotInfoBuilder() {
@@ -238,7 +247,7 @@ public class QSimEngineRunner extends QSimEngineInternalI implements Runnable {
 	@Override
 	public QNetwork getQNetwork() {
 		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("should never be called this way since this is just the runner") ;
+		throw new UnsupportedOperationException("should never be called this way since this is just the runner");
 	}
-
+	
 }
