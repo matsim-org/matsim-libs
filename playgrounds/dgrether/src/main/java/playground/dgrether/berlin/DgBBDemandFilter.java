@@ -21,11 +21,9 @@ package playground.dgrether.berlin;
 
 import java.io.IOException;
 
-import org.matsim.core.utils.geometry.CoordinateTransformation;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-
 import playground.dgrether.DgPaths;
 import playground.dgrether.prognose2025.DgPrognose2025GvDemandFilter;
+import playground.dgrether.prognose2025.DgPrognose2025PvDemandFilter;
 
 
 /**
@@ -47,10 +45,10 @@ public class DgBBDemandFilter {
 		String gvIn10pct = "runs-svn/run1060/1060.output_plans.xml.gz";
 		String pvIn10pct = "runs-svn/run1062/1062.output_plans.xml.gz";
 		String bbshape = "shared-svn/studies/countries/de/osm_berlinbrandenburg/urdaten/brandenburg.shp";
-		String gvOut1pct = "shared-svn/studies/countries/de/osm_berlinbrandenburg/bb_gv_1pct.xml.gz";
-		String gvOut10pct = "shared-svn/studies/countries/de/osm_berlinbrandenburg/bb_gv_10pct.xml.gz";
-		String pvOut1pct = "shared-svn/studies/countries/de/osm_berlinbrandenburg/bb_pendler_1pct.xml.gz";
-		String pvOut10pct = "shared-svn/studies/countries/de/osm_berlinbrandenburg/bb_pendler_10pct.xml.gz";
+		String gvOut1pct = "shared-svn/studies/countries/de/berlin_prognose_2025/bb_gv_1pct.xml.gz";
+		String gvOut10pct = "shared-svn/studies/countries/de/berlin_prognose_2025/bb_gv_10pct.xml.gz";
+		String pvOut1pct = "shared-svn/studies/countries/de/berlin_prognose_2025/bb_pendler_1pct.xml.gz";
+		String pvOut10pct = "shared-svn/studies/countries/de/berlin_prognose_2025/bb_pendler_10pct.xml.gz";
 		
 		String base = "";
 		if (args == null || args.length == 0){
@@ -71,21 +69,21 @@ public class DgBBDemandFilter {
 		pvOut1pct = base + pvOut1pct;
 		pvOut10pct = base + pvOut10pct;
 		
-		CoordinateTransformation trans = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, 
-				TransformationFactory.WGS84); 
+//		CoordinateTransformation trans = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, 
+//				TransformationFactory.WGS84); 
 
 		
 		DgPrognose2025GvDemandFilter filter = new DgPrognose2025GvDemandFilter();
-		filter.setNetwork2ShapefileCoordinateTransformation(trans);
+//		filter.setNetwork2ShapefileCoordinateTransformation(trans);
 		filter.filterAndWriteDemand(gvNet, 
 				gvIn1pct, bbshape, gvOut1pct);
 		
-//		new DgPrognose2025PvDemandFilter().filterAndWriteDemand(pvNet, pvIn1pct, bbshape, pvOut1pct);
-//
-//		new DgPrognose2025GvDemandFilter().filterAndWriteDemand(gvNet, 
-//				gvIn10pct, bbshape, gvOut10pct);
-//		
-//		new DgPrognose2025PvDemandFilter().filterAndWriteDemand(pvNet, pvIn10pct, bbshape, pvOut10pct);
+		new DgPrognose2025PvDemandFilter().filterAndWriteDemand(pvNet, pvIn1pct, bbshape, pvOut1pct);
+
+		new DgPrognose2025GvDemandFilter().filterAndWriteDemand(gvNet, 
+				gvIn10pct, bbshape, gvOut10pct);
+		
+		new DgPrognose2025PvDemandFilter().filterAndWriteDemand(pvNet, pvIn10pct, bbshape, pvOut10pct);
 		
 	}
 

@@ -27,6 +27,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.geotools.factory.FactoryConfigurationError;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.DefaultAttributeTypeFactory;
@@ -48,6 +49,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LinearRing;
+import com.vividsolutions.jts.geom.Polygon;
 
 
 /**
@@ -55,7 +57,9 @@ import com.vividsolutions.jts.geom.LinearRing;
  *
  */
 public class DgBBShapeFileConverter {
-
+	
+	private static final Logger log = Logger.getLogger(DgBBShapeFileConverter.class);
+	
 	private static final String polygon = DgPaths.REPOS + "shared-svn/studies/countries/de/osm_berlinbrandenburg/urdaten/brandenburg.poly";
 	private static final String outfile = DgPaths.REPOS + "shared-svn/studies/countries/de/osm_berlinbrandenburg/urdaten/brandenburg.shp";
 	
@@ -69,12 +73,24 @@ public class DgBBShapeFileConverter {
 			coordinates[i] = coordsList.get(i);
 		}
 		LinearRing linearRing = geoFac.createLinearRing(coordinates);
+		Polygon poly = geoFac.createPolygon(linearRing, null);
+		
+		double x= 13.415481;
+		double y =  52.493678;
+		Geometry geo = geoFac.createPoint(new Coordinate(x, y));
+		if (poly.contains(geo)){
+			log.debug("Point in Berlin is contained in converted Shapefile.");
+		}
+		else {
+			log.error("Point in Berlin is NOT contained in converted Shapefile!!!");
+		}
+
 		
 		CoordinateReferenceSystem crs = MGC.getCRS(TransformationFactory.WGS84);
 		final AttributeType[] attribLineString = new AttributeType[1];
-		attribLineString[0] = DefaultAttributeTypeFactory.newAttributeType("LinearRing",LinearRing.class, true, null, null, crs);
-		FeatureType ftLineString  = FeatureTypeBuilder.newFeatureType(attribLineString, "linearRingFeatureType");
-		Object[] objectArray = {linearRing};
+		attribLineString[0] = DefaultAttributeTypeFactory.newAttributeType("Polygon",Polygon.class, true, null, null, crs);
+		FeatureType ftLineString  = FeatureTypeBuilder.newFeatureType(attribLineString, "PolygonFeatureType");
+		Object[] objectArray = {poly};
 		Feature feature = ftLineString.create(objectArray);
 		Set<Feature> featureSet = new HashSet<Feature>();
 		featureSet.add(feature);
@@ -98,6 +114,7 @@ public class DgBBShapeFileConverter {
 			double x = Double.parseDouble(coords[0]);
 			double y = Double.parseDouble(coords[1]);
 			Coordinate c = new Coordinate(x, y);
+//			log.debug("Created coordinate: " + c.x + " " + c.y);
 			coordsList.add(c);
 			line = reader.readLine();
 		}
@@ -112,7 +129,7 @@ public class DgBBShapeFileConverter {
 	public static void main(String[] args) throws Exception {
 		if (args == null || args.length == 0){
 			
-//			new DgBBShapeFileConverter().convertTxt2Shp(polygon, outfile);
+			new DgBBShapeFileConverter().convertTxt2Shp(polygon, outfile);
 			new DgBBShapeFileConverter().testConvertedShp(outfile);
 		}
 		else {
@@ -131,10 +148,10 @@ public class DgBBShapeFileConverter {
 		double y =  52.493678;
 		Geometry geo = factory.createPoint(new Coordinate(x, y));
 		if (feat.getDefaultGeometry().contains(geo)){
-			System.out.println("Point in Berlin is contained by converted Shapefile.");
+			System.out.println("Point in Berlin is contained in converted Shapefile.");
 		}
 		else {
-			System.err.println("Point in Berlin is NOT contained by converted Shapefile!!!");
+			System.err.println("Point in Berlin is NOT contained in converted Shapefile!!!");
 		}
 	}
 }
