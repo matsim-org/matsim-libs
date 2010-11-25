@@ -1,196 +1,167 @@
-/* *********************************************************************** *
- * project: org.matsim.*
- *                                                                         *
- * *********************************************************************** *
- *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
- *                   LICENSE and WARRANTY file.                            *
- * email           : info at matsim dot org                                *
- *                                                                         *
- * *********************************************************************** *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *   See also COPYING, LICENSE and WARRANTY file                           *
- *                                                                         *
- * *********************************************************************** */
-
 package playground.ciarif.flexibletransports.scoring;
 
 import java.util.TreeSet;
-
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
-
 import playground.ciarif.flexibletransports.config.FtConfigGroup;
 import playground.ciarif.flexibletransports.data.MyTransportMode;
 import playground.ciarif.flexibletransports.router.FtCarSharingRoute;
-import playground.meisterk.kti.router.KtiPtRoute;
+import playground.ciarif.flexibletransports.router.FtPtRoute;
+import playground.ciarif.flexibletransports.router.PlansCalcRouteFT;
 import playground.meisterk.kti.router.PlansCalcRouteKti;
 
-public class LegScoringFunction extends org.matsim.core.scoring.charyparNagel.LegScoringFunction{
+public class LegScoringFunction extends org.matsim.core.scoring.charyparNagel.LegScoringFunction
+{
+  private final FtConfigGroup ftConfigGroup;
+  private final PlansCalcRouteConfigGroup plansCalcRouteConfigGroup;
+  private static final Logger log = Logger.getLogger(LegScoringFunction.class);
 
-	private final FtConfigGroup ftConfigGroup;
-	private final PlansCalcRouteConfigGroup plansCalcRouteConfigGroup;
+  public LegScoringFunction(PlanImpl plan, CharyparNagelScoringParameters params, Config config, FtConfigGroup ftConfigGroup)
+  {
+    super(plan, params);
+    this.ftConfigGroup = ftConfigGroup;
+    this.plansCalcRouteConfigGroup = config.plansCalcRoute();
+  }
 
-	private final static Logger log = Logger.getLogger(LegScoringFunction.class);
+  protected double calcLegScore(double departureTime, double arrivalTime, Leg leg)
+  {
+    double tmpScore = 0.0D;
+    double travelTime = arrivalTime - departureTime;
 
-	public LegScoringFunction(PlanImpl plan,
-			CharyparNagelScoringParameters params,
-			Config config,
-			FtConfigGroup ftConfigGroup) {
-		super(plan, params);
-		this.ftConfigGroup = ftConfigGroup;
-		this.plansCalcRouteConfigGroup = config.plansCalcRoute();
-	}
+    double dist = 0.0D;
+    ActivityImpl actPrev = (ActivityImpl)((PlanImpl)this.plan).getPreviousActivity(leg);
+    ActivityImpl actNext = (ActivityImpl)((PlanImpl)this.plan).getNextActivity(leg);
 
-	@Override
-	protected double calcLegScore(double departureTime, double arrivalTime, Leg leg) {
+    if (TransportMode.car.equals(leg.getMode()))
+    {
+      tmpScore += this.ftConfigGroup.getConstCar();
 
-		double tmpScore = 0.0;
-		double travelTime = arrivalTime - departureTime; // traveltime in seconds
+      if (this.params.marginalUtilityOfDistanceCar != 0.0D) {
+        RouteWRefs route = (RouteWRefs)leg.getRoute();
+        dist = route.getDistance();
+        tmpScore += this.params.marginalUtilityOfDistanceCar * this.ftConfigGroup.getDistanceCostCar() / 1000.0D * dist;
+      }
+      tmpScore += travelTime * this.params.marginalUtilityOfTraveling;
+    }
+    else if (MyTransportMode.carsharing.equals(leg.getMode()))
+    {
+      dist = ((FtCarSharingRoute)leg.getRoute()).calcAccessDistance(actPrev) + ((FtCarSharingRoute)leg.getRoute()).calcEgressDistance(actNext);
 
-		double dist = 0.0; // distance in meters
-		Activity actPrev = ((PlanImpl) this.plan).getPreviousActivity(leg);
-		Activity actNext = ((PlanImpl) this.plan).getNextActivity(leg);
+      travelTime = PlansCalcRouteFT.getAccessEgressTime(dist, this.plansCalcRouteConfigGroup);
 
-		if (MyTransportMode.car.equals(leg.getMode())) {
+      tmpScore += getWalkScore(dist, travelTime);
 
-			tmpScore += this.ftConfigGroup.getConstCar();
+      if (this.params.marginalUtilityOfDistanceCar != 0.0D)
+      {
+        dist = ((FtCarSharingRoute)leg.getRoute()).calcCarDistance(actNext);
+        tmpScore += this.params.marginalUtilityOfDistanceCar * this.ftConfigGroup.getDistanceCostCar() / 1000.0D * dist;
+      }
+      travelTime = arrivalTime - departureTime;
+      tmpScore += travelTime * this.params.marginalUtilityOfTraveling;
+    }
+    else if (TransportMode.pt.equals(leg.getMode()))
+    {
+      FtPtRoute ftPtRoute = (FtPtRoute)leg.getRoute();
 
-			if (this.params.marginalUtilityOfDistanceCar != 0.0) {
-				Route route = leg.getRoute();
-				dist = route.getDistance();
-				tmpScore += this.params.marginalUtilityOfDistanceCar * ftConfigGroup.getDistanceCostCar()/1000d * dist;
-			}
-			tmpScore += travelTime * this.params.marginalUtilityOfTraveling;
+      if (ftPtRoute.getFromStop() != null)
+      {
+        dist = ((FtPtRoute)leg.getRoute()).calcAccessEgressDistance((ActivityImpl)((PlanImpl)this.plan).getPreviousActivity(leg), (ActivityImpl)((PlanImpl)this.plan).getNextActivity(leg));
+        travelTime = PlansCalcRouteKti.getAccessEgressTime(dist, this.plansCalcRouteConfigGroup);
+        tmpScore += getWalkScore(dist, travelTime);
+        dist = ((FtPtRoute)leg.getRoute()).calcInVehicleDistance();
+        travelTime = ((FtPtRoute)leg.getRoute()).getInVehicleTime().doubleValue();
+        tmpScore += getPtScore(dist, travelTime);
+      }
+      else
+      {
+        dist = leg.getRoute().getDistance();
+        tmpScore += getPtScore(dist, travelTime);
+      }
 
-		} else if (MyTransportMode.carsharing.equals(leg.getMode())) {
+    }
+    else if (TransportMode.walk.equals(leg.getMode()))
+    {
+      if (this.params.marginalUtilityOfDistanceWalk != 0.0D) {
+        dist = leg.getRoute().getDistance();
+      }
+      tmpScore += getWalkScore(dist, travelTime);
+    }
+    else if (TransportMode.bike.equals(leg.getMode()))
+    {
+      tmpScore += this.ftConfigGroup.getConstBike();
 
+      tmpScore += travelTime * this.ftConfigGroup.getTravelingBike() / 3600.0D;
+    }
+    else if (TransportMode.ride.equals(leg.getMode()))
+    {
+      if (this.ftConfigGroup.getMarginalUtilityOfDistanceRide() != 0.0D) {
+        dist = 1.5D * leg.getRoute().getDistance();
+      }
+      travelTime *= 3.0D;
 
-			if (!MyTransportMode.carsharing.equals(((PlanImpl) this.plan).getPreviousLeg(actPrev).getMode())){
-				dist = ((FtCarSharingRoute) leg.getRoute()).calcAccessDistance (actPrev, actNext);
-				// TODO now no stations are defined,
-				// introduce an input with car sharing station positions
+      tmpScore += getRideScore(dist, travelTime);
+    }
+    else
+    {
+      if (this.params.marginalUtilityOfDistanceCar != 0.0D) {
+        dist = leg.getRoute().getDistance();
+      }
 
-				travelTime = PlansCalcRouteKti.getAccessEgressTime(dist, this.plansCalcRouteConfigGroup);
+      tmpScore += travelTime * this.params.marginalUtilityOfTraveling + this.params.marginalUtilityOfDistanceCar * dist;
+    }
 
-				tmpScore += this.getWalkScore(dist, travelTime);
-			}
+    return tmpScore;
+  }
 
-			if (this.params.marginalUtilityOfDistanceCar != 0.0) {
-				Route route = leg.getRoute();
-				dist = ((FtCarSharingRoute) leg.getRoute()).calcCarDistance(actPrev, actNext);
-				tmpScore += this.params.marginalUtilityOfDistanceCar * ftConfigGroup.getDistanceCostCar()/1000d * dist;
-			}
-			tmpScore += travelTime * this.params.marginalUtilityOfTraveling;
+  private double getRideScore(double distance, double travelTime) {
+    double score = 0.0D;
 
-		} else if (MyTransportMode.pt.equals(leg.getMode())) {
+    score += this.ftConfigGroup.getConstRide();
 
-			KtiPtRoute ktiPtRoute = (KtiPtRoute) leg.getRoute();
+    score += this.ftConfigGroup.getMarginalUtilityOfDistanceRide() * this.ftConfigGroup.getDistanceCostRide() / 1000.0D * distance;
 
-			if (ktiPtRoute.getFromStop() != null) {
+    score += travelTime * this.ftConfigGroup.getTravelingRide() / 3600.0D;
 
-				dist = ((KtiPtRoute) leg.getRoute()).calcAccessEgressDistance(((PlanImpl) this.plan).getPreviousActivity(leg), ((PlanImpl) this.plan).getNextActivity(leg));
-				travelTime = PlansCalcRouteKti.getAccessEgressTime(dist, this.plansCalcRouteConfigGroup);
-				tmpScore += this.getWalkScore(dist, travelTime);
-				dist = ((KtiPtRoute) leg.getRoute()).calcInVehicleDistance();
-				travelTime = ((KtiPtRoute) leg.getRoute()).getInVehicleTime();
-				tmpScore += this.getPtScore(dist, travelTime);
+    return score;
+  }
 
-			} else {
+  private double getWalkScore(double distance, double travelTime)
+  {
+    double score = 0.0D;
 
-				dist = leg.getRoute().getDistance();
-				tmpScore += this.getPtScore(dist, travelTime);
+    score += travelTime * this.params.marginalUtilityOfTravelingWalk + this.params.marginalUtilityOfDistanceWalk * distance;
 
-			}
+    return score;
+  }
 
-		} else if (MyTransportMode.walk.equals(leg.getMode())) {
+  private double getPtScore(double distance, double travelTime)
+  {
+    double score = 0.0D;
 
-			if (this.params.marginalUtilityOfDistanceWalk != 0.0) {
-				dist = leg.getRoute().getDistance();
-			}
-			tmpScore += this.getWalkScore(dist, travelTime);
+    double distanceCost = 0.0D;
+    TreeSet travelCards = ((PersonImpl)this.plan.getPerson()).getTravelcards();
+    if (travelCards == null)
+      distanceCost = this.ftConfigGroup.getDistanceCostPtNoTravelCard();
+    else if (travelCards.contains("unknown"))
+      distanceCost = this.ftConfigGroup.getDistanceCostPtUnknownTravelCard();
+    else {
+      throw new RuntimeException("Person " + this.plan.getPerson().getId() + " has an invalid travelcard. This should never happen.");
+    }
+    score += this.params.marginalUtilityOfDistancePt * distanceCost / 1000.0D * distance;
+    score += travelTime * this.params.marginalUtilityOfTravelingPT;
+    score += score += this.ftConfigGroup.getConstPt();
 
-		} else if (MyTransportMode.bike.equals(leg.getMode())) {
-
-			tmpScore += this.ftConfigGroup.getConstBike();
-
-			tmpScore += travelTime * this.ftConfigGroup.getTravelingBike() / 3600d;
-
-		} else if (MyTransportMode.ride.equals(leg.getMode())) {
-
-			if (this.ftConfigGroup.getMarginalUtilityOfDistanceRide()!= 0.0) {
-				dist = 1.2*leg.getRoute().getDistance();
-			}
-			travelTime= travelTime*1.2;
-			tmpScore += this.getRideScore(dist, travelTime);
-
-
-		} else {
-
-			if (this.params.marginalUtilityOfDistanceCar != 0.0) {
-				dist = leg.getRoute().getDistance();
-			}
-			// use the same values as for "car"
-			tmpScore += travelTime * this.params.marginalUtilityOfTraveling + this.params.marginalUtilityOfDistanceCar * dist;
-
-		}
-
-		return tmpScore;
-	}
-
-	private double getRideScore(double distance, double travelTime) {
-		double score = 0.0;
-
-		score += this.ftConfigGroup.getConstRide();
-
-		score += this.ftConfigGroup.getMarginalUtilityOfDistanceRide() * this.ftConfigGroup.getDistanceCostRide() / 1000d * distance;
-
-		score += travelTime * this.ftConfigGroup.getTravelingRide() / 3600d;// TODO Auto-generated method stub
-
-		return score;
-	}
-
-	private double getWalkScore(double distance, double travelTime) {
-
-		double score = 0.0;
-
-		score += travelTime * this.params.marginalUtilityOfTravelingWalk + this.params.marginalUtilityOfDistanceWalk * distance;
-
-		return score;
-
-	}
-
-	private double getPtScore(double distance, double travelTime) {
-
-		double score = 0.0;
-
-		double distanceCost = 0.0;
-		TreeSet<String> travelCards = ((PersonImpl) this.plan.getPerson()).getTravelcards();
-		if (travelCards == null) {
-			distanceCost = this.ftConfigGroup.getDistanceCostPtNoTravelCard();
-		} else if (travelCards.contains("unknown")) {
-			distanceCost = this.ftConfigGroup.getDistanceCostPtUnknownTravelCard();
-		} else {
-			throw new RuntimeException("Person " + this.plan.getPerson().getId() + " has an invalid travelcard. This should never happen.");
-		}
-		score += this.params.marginalUtilityOfDistancePt * distanceCost / 1000d * distance;
-		score += travelTime * this.params.marginalUtilityOfTravelingPT;
-		score += score += this.ftConfigGroup.getConstPt();
-
-		return score;
-
-	}
-
-
+    return score;
+  }
 }
