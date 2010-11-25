@@ -240,8 +240,7 @@ public class EmissionFactor  {
 					+"\nLinklength : "+ length
 					+"\nHbefaTypeNr : "+ obj.getHbefa_Road_type()
 					+"\nVisumRoadTypeNr : " + obj.getVisumRoadType()
-					+"\nfreeVelocity: " + freeVelocity
-	 				+"\nEmissionsFactorBasedOnAverageSpeed: " + obj.getEmissionFactor()
+					+"\nEmissionsFactorBasedOnAverageSpeed: " + obj.getEmissionFactor()
 	 				+"\nEmissionsBasedOnAverageSpeed: " + obj.getEmissions()
 	 				+"\nEmissionsBasedOnFractions: " + obj.getEmissionFractions());
 	 			
@@ -258,9 +257,7 @@ public class EmissionFactor  {
 					+"\t" + obj.getEmissionFactor()
 					+"\t" + obj.getEmissions()
 					+"\t" + obj.getEmissionFractions();
-				
-	 						
-	 				 
+					 										 
 	 				}catch(Exception e){}
 	 			}
 		}
@@ -270,7 +267,7 @@ public class EmissionFactor  {
 			    FileWriter fstream = new FileWriter("../../detailedEval/teststrecke/sim/outputEmissions/out.txt");
 			        BufferedWriter out = new BufferedWriter(fstream);
 			        out.write("EnterTime \t travelTime \t AverageSpeed \t LinkId \t PersonId \tLinklength \tHbefaTypeNr \tVisumRoadTypeNr \t" + 
-			        		  "EmissionsBasedOnAverageSpeed \t EmissionsBasedOnFractions" + result);
+			        		"EmissionsFactorBasedOnAverageSpeed \t EmissionsBasedOnAverageSpeed \t EmissionsBasedOnFractions" + result);
 			    //Close the output stream
 			    out.close();
 					}catch (Exception e){//Catch exception if any
