@@ -20,6 +20,8 @@ import org.junit.Test;
 
 public class MyTest extends TestCase {
 
+	public static DecentralizedChargerV1 decentralizedChargerV1;
+	
 	
 	@Test  public void testDecentralizedChargerv1(){
 		// create a checkDecentralized ChargerV1 object and test it
@@ -37,13 +39,9 @@ public class MyTest extends TestCase {
 		public DecentralizedChargerInfo myChargerInfo;
 			@Override
 			public void notifyIterationEnds(IterationEndsEvent event) {
-				DecentralizedChargerV1 decentralizedChargerV1=new DecentralizedChargerV1(event.getControler(),Main.energyConsumptionPlugin,Main.parkingTimesPlugin);
+				decentralizedChargerV1=new DecentralizedChargerV1(event.getControler(),Main.energyConsumptionPlugin,Main.parkingTimesPlugin);
 
 				try {
-					testCalcNumberOfPHEVs(decentralizedChargerV1);
-					testAreVehiclesSameClass(decentralizedChargerV1);
-					testSumLinkedListEntries(decentralizedChargerV1);
-					
 					myChargerInfo = new DecentralizedChargerInfo(decentralizedChargerV1.getPeakLoad(), decentralizedChargerV1.calcNumberOfPHEVs(decentralizedChargerV1.controler), decentralizedChargerV1.getAveragePHEVConsumption(), decentralizedChargerV1.getPriceBase(), decentralizedChargerV1.getPricePeak()); 
 					//add Tests for...
 					/*myChargerInfo.getBaseLoadCurve();
@@ -58,6 +56,12 @@ public class MyTest extends TestCase {
 				}				
 			}
 		});
+		
+		controler.run();	
+		
+		testCalcNumberOfPHEVs(decentralizedChargerV1);
+		testAreVehiclesSameClass(decentralizedChargerV1);
+		testSumLinkedListEntries(decentralizedChargerV1);
 	}
 	
 	/*
