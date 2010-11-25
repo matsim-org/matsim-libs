@@ -19,11 +19,11 @@
  * *********************************************************************** */
 
 package playground.fhuelsmann.emission;
-import org.matsim.api.core.v01.Id;
+
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.events.LinkLeaveEvent;
+
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -34,7 +34,7 @@ public class Main {
 	
 		String eventsFile = "../../detailedEval/teststrecke/sim/inputEmissions/events_0807_it.0.txt";
 		String netfile ="../../detailedEval/teststrecke/sim/input/network.xml";
-		String visumRoadFile = "../../detailedEval/teststrecke/sim/inputEmissions/visumnetzlink.txt";
+//		String visumRoadFile = "../../detailedEval/teststrecke/sim/inputEmissions/visumnetzlink.txt";
 		String visumRoadHebefaRoadFile = "../../detailedEval/teststrecke/sim/inputEmissions/road_types.txt";
 		String Hbefa_Traffic = "../../detailedEval/teststrecke/sim/inputEmissions/hbefa_emission_factors.txt";
 
@@ -55,7 +55,7 @@ public class Main {
 		//add the handler
 		//events.addHandler(handler);
 		events.addHandler(handler);
-		System.out.println(handler.getTravelTimes());
+//		System.out.println(handler.getTravelTimes());
 
 		//create the reader and read the file
 		MatsimEventsReader matsimEventReader = new MatsimEventsReader(events);

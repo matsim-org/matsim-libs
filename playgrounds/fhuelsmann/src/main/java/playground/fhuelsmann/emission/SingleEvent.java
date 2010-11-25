@@ -1,6 +1,7 @@
-/* *********************************************************************** *
+
+ /* *********************************************************************** *
  * project: org.matsim.*
- * BKickControler
+ * FhEmissions.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -16,11 +17,13 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
+ *                                                                         
  * *********************************************************************** */
+
 
 package playground.fhuelsmann.emission;
 
-import org.matsim.api.core.v01.Id;
+
 
 public class SingleEvent {
 

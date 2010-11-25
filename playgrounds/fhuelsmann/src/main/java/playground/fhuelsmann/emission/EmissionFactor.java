@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BKickControler
+ * FhEmissions.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -16,6 +16,7 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
+ *                                                                         
  * *********************************************************************** */
 
 package playground.fhuelsmann.emission;
@@ -113,7 +114,7 @@ public class EmissionFactor  {
 			double EFc,double EFf,double vf /*,int freeVelocity*/){
 		
 		double stopGoVel = 16.67;
-	//	double freeFlowVel = 57.00; * in visumnetzlink1.txt the freeVelocity amounts to 60.00 km/h; lowest simulated average speed = 57.00 km/h
+	//	in visumnetzlink1.txt the freeVelocity is 60.00 km/h;  average free flow speed in HBEFA = 57.1577 km/h whichis taken here
 	
 		double freeFlowFraction =0.0;
 		double stopGoFraction =0.0;
@@ -123,8 +124,8 @@ public class EmissionFactor  {
 		
 		stopGoTime= (li/1000)/vij -(li/1000)/vf;  //li/vij -li/freeVelocity;
 		
-		System.out.print("\n li" + li);
-//		System.out.print("\n Stop ang go time" + stopGoTime);
+		
+//		
 		stopGoFraction = stopGoVel *stopGoTime;
 //		System.out.print("Stop ang go fraction" + stopGoFraction);
 		freeFlowFraction= (li/1000) - stopGoFraction;
