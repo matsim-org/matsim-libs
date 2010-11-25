@@ -37,6 +37,7 @@ import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.core.utils.io.IOUtils;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -44,6 +45,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import playground.dgrether.DgPaths;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LinearRing;
 
@@ -78,8 +80,9 @@ public class DgBBShapeFileConverter {
 		featureSet.add(feature);
 		
 		ShapeFileWriter.writeGeometries(featureSet, shapeFile);
-		
 	}
+	
+	
 	
 	private List<Coordinate> readCoordinates(final String polygonFile) throws FileNotFoundException, IOException {
 		BufferedReader reader = IOUtils.getBufferedReader(polygonFile);
@@ -108,10 +111,30 @@ public class DgBBShapeFileConverter {
 	 */
 	public static void main(String[] args) throws Exception {
 		if (args == null || args.length == 0){
-			new DgBBShapeFileConverter().convertTxt2Shp(polygon, outfile);
+			
+//			new DgBBShapeFileConverter().convertTxt2Shp(polygon, outfile);
+			new DgBBShapeFileConverter().testConvertedShp(outfile);
 		}
 		else {
 			
+		}
+	}
+
+
+
+	private void testConvertedShp(String shape) throws IOException {
+		Set<Feature> featuesInShape = new ShapeFileReader().readFileAndInitialize(shape);
+		Feature feat = featuesInShape.iterator().next();
+		GeometryFactory factory = new GeometryFactory();
+		//somewhere at tempelhof
+		double x= 13.415481;
+		double y =  52.493678;
+		Geometry geo = factory.createPoint(new Coordinate(x, y));
+		if (feat.getDefaultGeometry().contains(geo)){
+			System.out.println("Point in Berlin is contained by converted Shapefile.");
+		}
+		else {
+			System.err.println("Point in Berlin is NOT contained by converted Shapefile!!!");
 		}
 	}
 }

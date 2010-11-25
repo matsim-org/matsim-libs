@@ -71,11 +71,7 @@ public class DgPrognose2025PvDemandFilter extends DgPrognose2025DemandFilter {
 	}
 	
 	public static void main(String[] args) throws IOException {
-		if (args == null || args.length == 0){
-			new DgPrognose2025PvDemandFilter().filterAndWriteDemand(DgDetailedEvalFiles.PROGNOSE_2025_2004_PV_NETWORK, 
-					DgDetailedEvalFiles.PV_POPULATION_INPUT_FILE, DgDetailedEvalFiles.BAVARIA_SHAPE_FILE, DgDetailedEvalFiles.PV_POPULATION_OUTPUT_FILE);
-		}
-		else if (args.length == 4){
+		if (args.length == 4){
 			new DgPrognose2025PvDemandFilter().filterAndWriteDemand(args[0], args[1], args[2], args[3]);
 		}
 	}

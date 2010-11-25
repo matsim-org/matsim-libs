@@ -43,7 +43,6 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileReader;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -61,7 +60,7 @@ public abstract class DgPrognose2025DemandFilter {
 
 	private static final Logger log = Logger.getLogger(DgPrognose2025GvDemandFilter.class);
 
-	protected CoordinateTransformation wgs84ToDhdnGk4 = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.DHDN_GK4); 
+	protected CoordinateTransformation coordinateTransformation = null;
 	
 	protected Scenario scenario;
 
@@ -75,6 +74,13 @@ public abstract class DgPrognose2025DemandFilter {
 
 	private Set<Feature> featuesInShape;
 	
+	public DgPrognose2025DemandFilter(){}
+	
+	
+	public void setNetwork2ShapefileCoordinateTransformation(CoordinateTransformation coordTransform) {
+		this.coordinateTransformation = coordTransform;
+	}
+
 		
 	private void readData(String networkFilename, String populationFilename, String filterShapeFileName) throws IOException{
 		this.factory = new GeometryFactory();
@@ -106,8 +112,10 @@ public abstract class DgPrognose2025DemandFilter {
 	private boolean isLinkInShape(Link link) {
 		boolean found = false;
 		Coord linkCoord = link.getCoord();
-		Coord dhdnCoord = this.wgs84ToDhdnGk4.transform(linkCoord);
-		Geometry geo = factory.createPoint(new Coordinate(dhdnCoord.getX(), dhdnCoord.getY()));
+		if (this.coordinateTransformation != null){
+			linkCoord = this.coordinateTransformation.transform(linkCoord);
+		}
+		Geometry geo = factory.createPoint(new Coordinate(linkCoord.getX(), linkCoord.getY()));
 		for (Feature ft : featuesInShape){
 			if (ft.getDefaultGeometry().contains(geo)){
 				found = true;

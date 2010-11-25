@@ -60,20 +60,8 @@ public class DgPrognose2025GvDemandFilter extends DgPrognose2025DemandFilter {
 	} 
 
 	public static void main(String[] args) throws IOException {
-		if (args == null || args.length == 0){
-			new DgPrognose2025GvDemandFilter().filterAndWriteDemand(DgDetailedEvalFiles.PROGNOSE_2025_2004_NETWORK, 
-					DgDetailedEvalFiles.GV_POPULATION_INPUT_FILE, DgDetailedEvalFiles.BAVARIA_SHAPE_FILE,
-					DgDetailedEvalFiles.GV_POPULATION_OUTPUT_FILE);
-		}
-		else if (args.length == 4){
 			new DgPrognose2025GvDemandFilter().filterAndWriteDemand(args[0], args[1], args[2], args[3]);
-		}
 	}
-
-
-
-
-
 
 }
 
