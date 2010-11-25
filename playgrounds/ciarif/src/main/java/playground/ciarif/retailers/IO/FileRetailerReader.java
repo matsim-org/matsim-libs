@@ -24,11 +24,17 @@ public class FileRetailerReader {
 	private String facilityIdFile;
 	private Retailers retailers = new Retailers();
 	private ArrayList<Id> retailersLinks = new ArrayList<Id>();
+	private ArrayList<Id> retailersFacilities = new ArrayList<Id>();
 	
 	public FileRetailerReader(Map<Id, ? extends ActivityFacility> controlerFacilities, String facilityIdFile) {
 		this.controlerFacilities = controlerFacilities;
 		this.facilityIdFile = facilityIdFile;
 	}
+	
+	public FileRetailerReader(String facilityIdFile) {
+		this.facilityIdFile = facilityIdFile;
+	}
+	
 	public Retailers readRetailers(Controler controler) {
 		try { 
 			FileReader fr = new FileReader(this.facilityIdFile);
@@ -73,6 +79,28 @@ public class FileRetailerReader {
 			Gbl.errorMsg(e);
 		}
 		return this.retailers;
+	}
+	
+	public ArrayList<Id> readRetailersFacilities() {
+		try { 
+			FileReader fr = new FileReader(this.facilityIdFile);
+			BufferedReader br = new BufferedReader(fr);
+			
+			// Skip header
+			String curr_line = br.readLine();
+			while ((curr_line = br.readLine()) != null) {
+				String[] entries = curr_line.split("\t", -1);
+				// header: r_id  f_id  strategy linkId capacity
+				// index:     0     1      2	   3	  4
+				Id fId = new IdImpl (entries[1]);
+				this.retailersFacilities.add(fId);		
+						
+			}
+		} 
+		catch (IOException e) {
+			Gbl.errorMsg(e);
+		}
+		return this.retailersFacilities;
 	}
 }
 

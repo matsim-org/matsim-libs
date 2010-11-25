@@ -25,6 +25,7 @@ import java.util.Collections;
 
 import playground.fabrice.primloc.CumulativeDistribution;
 
+
 public class RetailerGA {
 	private final int populationSize;
 	private int genomeLength;

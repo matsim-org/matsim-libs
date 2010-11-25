@@ -17,19 +17,18 @@ import playground.ciarif.retailers.utils.Utils;
 
 public class RandomRetailerStrategy implements RetailerStrategy {
 	
-	private final World world;
-	public static final String NAME = "randomRetailerStrategy";
+		public static final String NAME = "randomRetailerStrategy";
 	private Map<Id,ActivityFacility> movedFacilities = new TreeMap<Id,ActivityFacility>();
 	
-	public RandomRetailerStrategy (World world) {
-		this.world = world;
+	public RandomRetailerStrategy () {
+		
 	}
 	
 	final public Map<Id, ActivityFacility> moveFacilities(Map<Id, ActivityFacility> facilities, ArrayList<LinkRetailersImpl> allowedLinks) {
 		for (ActivityFacility f : facilities.values()) {
 			int rd = MatsimRandom.getRandom().nextInt(allowedLinks.size());
 			Link link =allowedLinks.get(rd);
-			Utils.moveFacility((ActivityFacilityImpl) f,link,this.world);
+			Utils.moveFacility((ActivityFacilityImpl) f,link);
 			this.movedFacilities.put(f.getId(),f);
 		}
 		return this.movedFacilities;
