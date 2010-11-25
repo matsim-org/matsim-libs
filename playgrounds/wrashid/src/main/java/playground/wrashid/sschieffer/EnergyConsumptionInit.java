@@ -61,7 +61,6 @@ public class EnergyConsumptionInit implements StartupListener {
 				//vehicles.put(personId, null); // no car, could be extended to conventional car
 				vehicles.put(personId, new ConventionalVehicle(null, new IdImpl(2)));
 			}
-			
 		}
 		
 		EnergyConsumptionModel energyConsumptionModel = new EnergyConsumptionModelPSL(140);

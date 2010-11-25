@@ -81,7 +81,6 @@ public class DecentralizedChargerInfo {
 	private double crit; // level of +/- accuracy for finding newBaseConsumption
 	// set in constructor
 	
-	
 	private PolynomialFunction polyFuncBaseLoad; // degree of 96
 	private PolynomialFunction polyFuncBaseLoad24; // degree of 24
 	private PolynomialFunction polyFuncBaseLoad48; // degree of 48
@@ -131,16 +130,30 @@ public class DecentralizedChargerInfo {
 		this.averagePHEVConsumption=averagePHEVConsumption;
 		this.priceBase=priceBase;
 		this.pricePeak=pricePeak;
-		
+		System.out.println("peakLoad: "+peakLoad);
 		totalPHEVConsumption=averagePHEVConsumption*penetration;
 		
 		crit=5*averagePHEVConsumption;
 		
 		functionIntegrator= new SimpsonIntegrator(); 
 		newtonSolver = new NewtonSolver();
-		optimizer=new LevenbergMarquardtOptimizer();
 		
-		getBaseLoadCurve();
+		//GaussNewtonOptimizer(boolean useLU) 
+		LevenbergMarquardtOptimizer levenbergMarquardtOptimizer = new LevenbergMarquardtOptimizer();
+	/*    *  initial step bound factor: 100.0
+	    * maximal iterations: 1000
+	    * cost relative tolerance: 1.0e-10
+	    * parameters relative tolerance: 1.0e-10
+	    * orthogonality tolerance: 1.0e-10
+*/
+		levenbergMarquardtOptimizer.setMaxIterations(1000000000);
+		levenbergMarquardtOptimizer.setInitialStepBoundFactor(0.1);
+		optimizer=levenbergMarquardtOptimizer;
+		
+	}
+	
+	
+	public void findHighLowIntervals() throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException, IOException{
 		
 		if (flatteningPenetration()<penetration){ 
 			double step=0.005*constantBaseConsumption; 
@@ -149,12 +162,7 @@ public class DecentralizedChargerInfo {
 		else{
 			highLowIntervals=getLowHighTariffIntervals();
 		}
-		probDensityFunctions=findProbabilityDensityFunctions();
-		probDensityRanges=findProbabilityRanges();
-		writeSummary();
-		
 	}
-	
 	
 	/**
 	 * reads in data from input txt file from 15 min data bins 
@@ -165,7 +173,7 @@ public class DecentralizedChargerInfo {
 	 */
 	public void getBaseLoadCurve() throws OptimizationException, IOException{
 		
-		  slotBaseLoad = GeneralLib.readMatrix(96, 2, false, "test\\input\\playground\\wrashid\\sschieffer\\baseLoadCurve15minBinsBinLoad.txt");
+		  slotBaseLoad = GeneralLib.readMatrix(96, 2, false, "test\\input\\playground\\wrashid\\sschieffer\\baseLoadCurve15minBinsSecLoad.txt");
 			  
 		  peakBaseConsumption=0.0;
 		  constantBaseConsumption=1.0*peakLoad;
@@ -173,7 +181,8 @@ public class DecentralizedChargerInfo {
 		  XYSeries loadFigureData = new XYSeries("Baseload Data from File");
 		  
 		  for (int i=0;i<96;i++){ // loop over 96 bins
-			  
+			  slotBaseLoad[i][0]=((double)i)*Main.secondsPer15Min;//time
+			  slotBaseLoad[i][1]=slotBaseLoad[i][1]*peakLoad;//multiply percentage with peakLoad
 			  loadFigureData.add(slotBaseLoad[i][0], slotBaseLoad[i][1]);
 			  zeroLineData.add(slotBaseLoad[i][0],0);
 			  
@@ -232,7 +241,7 @@ public class DecentralizedChargerInfo {
 		polyFit= new PolynomialFitter(degree, optimizer);
 		
 		for (int i=0;i<data.length;i++){
-			//System.out.println("adding point "+ data[i][0]+", " +data[i][1]+" as element " + i);
+			System.out.println("adding point "+ data[i][0]+", " +data[i][1]+" as element " + i);
 			polyFit.addObservedPoint(1.0,data[i][0], data[i][1] );
 		  }
 		PolynomialFunction poly;
@@ -547,7 +556,7 @@ public class DecentralizedChargerInfo {
 	 * @throws IllegalArgumentException
 	 * @throws IOException
 	 */
-	public ArrayList<PolynomialFunction> findProbabilityDensityFunctions() throws OptimizationException, MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException, IOException{
+	public void findProbabilityDensityFunctions() throws OptimizationException, MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException, IOException{
 		double [][] valleyTimes=getValleyTimes();
 		// find number of valleys with given penetration
 		ArrayList<PolynomialFunction> ProbFuncArray=new ArrayList<PolynomialFunction>(0);
@@ -592,7 +601,7 @@ public class DecentralizedChargerInfo {
 		totalCostPHEV=(-newBaseConsumption*Main.secondsPerDay + (functionIntegrator.integrate(polyFuncBaseLoad, 0,Main.secondsPerDay)+valleyInt))*pricePeak + newBaseConsumption*Main.secondsPerDay*priceBase;
 		
 		
-		return ProbFuncArray;
+		probDensityFunctions=ProbFuncArray;
 	}
 	
 	/**
@@ -604,7 +613,7 @@ public class DecentralizedChargerInfo {
 	 * @throws FunctionEvaluationException
 	 * @throws IllegalArgumentException
 	 */
-	public double[][] findProbabilityRanges() throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
+	public void findProbabilityRanges() throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
 		//row - corresponds to entry in probDensityFunction
 		// column 1= start column 2 = end
 		double[][] ranges=new double[probDensityFunctions.size()][2];
@@ -615,7 +624,7 @@ public class DecentralizedChargerInfo {
 			ranges[i][1]=ranges[i][0]+functionIntegrator.integrate(probDensityFunctions.get(i), valleyTimes[i][0], valleyTimes[i][1]);
 			ranges[i+1][0]=ranges[i][0]+functionIntegrator.integrate(probDensityFunctions.get(i), valleyTimes[i][0], valleyTimes[i][1]);
 		}
-		return ranges;
+		probDensityRanges= ranges;
 	}	
 	
 

@@ -50,9 +50,9 @@ public class DecentralizedChargerV1 {
 	
 	private double priceBase=0.13;
 	private double pricePeak=0.2;
-	private double peakLoad=Math.pow(10, 15); // adjust max peakLoad in Joule
+	private double peakLoad=Math.pow(10, 4); // adjust max peakLoad in Joule
 	private double chargingSpeedPerSecond=11000; // Joule/second
-	private double maxChargePerSlot=chargingSpeedPerSecond*Main.secondsPer15Min;
+	//private double maxChargePerSlot=chargingSpeedPerSecond*Main.secondsPer15Min;
 	
 	private double [][] parkingTimesCurrentAgent;
 	private double [] parkingLengthCurrentAgent;
@@ -65,10 +65,22 @@ public class DecentralizedChargerV1 {
 	private DecentralizedChargerInfo myChargerInfo;
 	
 	private double populationTotal;
-	private double penetration;
+	private double noOfPHEVs;
 	private double averagePHEVConsumption;
 	final Controler controler;
 	
+	
+	public double getPeakLoad(){
+		return peakLoad;
+	}
+	
+	public double getPricePeak(){
+		return pricePeak;
+	}
+	
+	public double getPriceBase(){
+		return priceBase;
+	}
 	/**
 	 * Public constructor
 	 */
@@ -91,19 +103,27 @@ public class DecentralizedChargerV1 {
 		System.out.println();
 	}
 	
+	public double calcNumberOfPHEVs(Controler controler){
+		populationTotal=controler.getPopulation().getPersons().size();
+		return noOfPHEVs = populationTotal*Main.penetrationPercent;
+	}
+	
 	
 	public void performChargingAlgorithm() throws OptimizationException, MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException, IOException {
 		
-		populationTotal=controler.getPopulation().getPersons().size();
-		penetration = populationTotal*Main.penetrationPercent;
-		averagePHEVConsumption= getAveragePHEVConsumption(penetration);
-		myChargerInfo = new DecentralizedChargerInfo(peakLoad, penetration, averagePHEVConsumption, priceBase, pricePeak); 
+		noOfPHEVs = calcNumberOfPHEVs(controler);
+		averagePHEVConsumption= getAveragePHEVConsumption();
+		myChargerInfo = new DecentralizedChargerInfo(peakLoad, noOfPHEVs, averagePHEVConsumption, priceBase, pricePeak); 
 		
-	
+		myChargerInfo.getBaseLoadCurve();
+		myChargerInfo.findHighLowIntervals();
+		myChargerInfo.findProbabilityDensityFunctions();
+		myChargerInfo.findProbabilityRanges();
+		myChargerInfo.writeSummary();
+		
 		/*Loop over all agents
 		 * for each agent -make personal list of links and times
 		 */
-		
 		
 		for (Id personId: controler.getPopulation().getPersons().keySet()){
 			
@@ -204,9 +224,7 @@ public class DecentralizedChargerV1 {
 				feasibilityCheck=checkChargingOrderForFeasibility(actualOrder);
 			}
 			
-			
 			//getElectricityFromGrid(double startChargingTime, double endChargingTime, Id agentId, Id linkId){
-			
 			
 		}// end agent loop
 	}//end performChargingAlgorithm
@@ -250,7 +268,6 @@ public class DecentralizedChargerV1 {
 	}
 	
 	public double calculateTotalConsumption(){
-	
 		double sum=0;
 		for (int i=0; i<drivingConsumptionCurrentAgent.length; i++){
 			sum+=drivingConsumptionCurrentAgent[i];
@@ -270,48 +287,41 @@ public class DecentralizedChargerV1 {
 	 * adds up the Consumptions of all PHEV owners and divides results by Penetration
 	 * @return
 	 */
-		public double getAveragePHEVConsumption(double penetration){
+		public double getAveragePHEVConsumption(){
 			double sumOfAllConsumptions=0;
-		
-			for (Id personId: controler.getPopulation().getPersons().keySet()){
-				LinkedList<Double> legEnergyConsumptionList = energyConsumptionOfLegs.get(personId);
+			for (Id personId : Main.vehicles.getKeySet()){
+				Vehicle one= Main.vehicles.getValue(personId);
+				PlugInHybridElectricVehicle two= new PlugInHybridElectricVehicle(new IdImpl(1));
 				
-				// person has PHEV then add his total consumption to sumOfAllConsumptions
-				PlugInHybridElectricVehicle dummyPHEV= new PlugInHybridElectricVehicle(new IdImpl(1));
-				//only works if every person has only one car?
-				if (Main.vehicles.get(personId).getClass().equals(dummyPHEV.getClass())){
-					for (int i=0;i<legEnergyConsumptionList.size();i++) {
-						sumOfAllConsumptions = sumOfAllConsumptions + legEnergyConsumptionList.get(i);
-					}	
+				if(areVehiclesSameClass(one, two)){ 
+					// add persons consumption to totalPHEVConsumption - is a PHEV vehicle!
+					LinkedList<Double> legEnergyConsumptionList = energyConsumptionOfLegs.get(personId);
+					sumOfAllConsumptions+=sumUpLinkedListEntries(legEnergyConsumptionList);
 				}
-			}
-			return (sumOfAllConsumptions/penetration);
+			};
+			return (sumOfAllConsumptions/calcNumberOfPHEVs(controler));
 		}
 		
 		
-		// need to get information 
-		// which slots I have access to electricity
-		// how many of the time slots I need to charge
-		// what is my consumption
+		public double sumUpLinkedListEntries(LinkedList<Double> l){
+			double sum=0;
+			for (int i=0;i<l.size();i++) {
+				sum += l.get(i);
+			}
+			return sum;
+		}
 		
-		//TODO check general feasibility and case specific feasibility
-		// TODO call chargeInAllValidSlots
-		// TODO call chargeInAllValidSlots and addPeakSlots(int n)
-		// TODO call chooseSlots()
+		/**
+		 * 
+		 * @param one one Vehicle object
+		 * @param two second Vehicle object
+		 * @return boolean indicating whether objects have same class
+		 */
+		public boolean areVehiclesSameClass(Vehicle one, Vehicle two){
+			return one.getClass().equals(two.getClass());
+		}
 		
-			
-		
-		// TODO: physical feasibility test given the time plan and charging plan
-		// for case 1 and 2, which route becomes infeasible
-		// add in one more charging slot
-		// check again...
-		
-		// for case 3 check if choice of slots within possible slots is valid
-		// if not generate a different set 
-		// if after (n over k) iterations no suitable solution is found
-		// change to case 1 and 2 procedure
-		
-		
+	
 		
 		
 	}
