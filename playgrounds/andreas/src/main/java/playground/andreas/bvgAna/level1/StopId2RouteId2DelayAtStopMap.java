@@ -32,18 +32,18 @@ import org.matsim.core.events.handler.VehicleDepartsAtFacilityEventHandler;
 /**
  * Counts planned and realized departures at one stop for a specific route of a line.
  * <b>All</b> departures will be taken into account, regardless of the line or route served.
- * 
+ *
  * @author aneumann
  *
  */
 public class StopId2RouteId2DelayAtStopMap implements VehicleDepartsAtFacilityEventHandler, TransitDriverStartsEventHandler{
-	
+
 	private final Logger log = Logger.getLogger(StopId2RouteId2DelayAtStopMap.class);
-	private final Level logLevel = Level.DEBUG;
-	
+	private final Level logLevel = Level.OFF;
+
 	private TreeMap<Id, TransitDriverStartsEvent> veh2LastStartsEvent = new TreeMap<Id, TransitDriverStartsEvent>();
 	private TreeMap<Id, TreeMap<Id, StopId2RouteId2DelayAtStopMapData>> stopId2RouteId2DelayAtStopMap = new TreeMap<Id, TreeMap<Id, StopId2RouteId2DelayAtStopMapData>>();
-	
+
 	public StopId2RouteId2DelayAtStopMap(){
 		this.log.setLevel(this.logLevel);
 	}
@@ -58,28 +58,28 @@ public class StopId2RouteId2DelayAtStopMap implements VehicleDepartsAtFacilityEv
 
 	@Override
 	public void handleEvent(VehicleDepartsAtFacilityEvent event) {
-		
+
 		if(this.stopId2RouteId2DelayAtStopMap.get(event.getFacilityId()) == null){
 			this.log.debug("Adding new TreeMap for stop " + event.getFacilityId() + " to map.");
 			this.stopId2RouteId2DelayAtStopMap.put(event.getFacilityId(), new TreeMap<Id, StopId2RouteId2DelayAtStopMapData>());
 		}
-		
+
 		TreeMap<Id, StopId2RouteId2DelayAtStopMapData> route2DelayMap = this.stopId2RouteId2DelayAtStopMap.get(event.getFacilityId());
 		TransitDriverStartsEvent correspondingRouteServed = this.veh2LastStartsEvent.get(event.getVehicleId());
-		
+
 		if(correspondingRouteServed == null){
 			this.log.warn("This should never happen");
 		} else {
-		
-		if(route2DelayMap.get(correspondingRouteServed.getTransitRouteId()) == null){		
+
+		if(route2DelayMap.get(correspondingRouteServed.getTransitRouteId()) == null){
 			this.log.debug("Adding new VehDelayAtStopContainer for stop " + event.getFacilityId() + " and route " + correspondingRouteServed.getTransitRouteId() + " to map.");
 			route2DelayMap.put(correspondingRouteServed.getTransitRouteId(), new StopId2RouteId2DelayAtStopMapData(event.getFacilityId(), correspondingRouteServed.getTransitLineId(), correspondingRouteServed.getTransitRouteId()));
 		}
-		
-		route2DelayMap.get(correspondingRouteServed.getTransitRouteId()).addDepartureEvent(event);		
+
+		route2DelayMap.get(correspondingRouteServed.getTransitRouteId()).addDepartureEvent(event);
 		}
 	}
-	
+
 	@Override
 	public void handleEvent(TransitDriverStartsEvent event) {
 		if(this.veh2LastStartsEvent.get(event.getVehicleId()) != null){
@@ -88,11 +88,11 @@ public class StopId2RouteId2DelayAtStopMap implements VehicleDepartsAtFacilityEv
 			this.log.debug(event.getVehicleId() + " served no route");
 		}
 		this.veh2LastStartsEvent.put(event.getVehicleId(), event);
-		this.log.debug(event.getVehicleId() + " now serves route " + this.veh2LastStartsEvent.get(event.getVehicleId()).getTransitRouteId());		
+		this.log.debug(event.getVehicleId() + " now serves route " + this.veh2LastStartsEvent.get(event.getVehicleId()).getTransitRouteId());
 	}
-	
+
 	@Override
 	public void reset(int iteration) {
-		this.log.debug("reset method in iteration " + iteration + " not implemented, yet");		
+		this.log.debug("reset method in iteration " + iteration + " not implemented, yet");
 	}
 }

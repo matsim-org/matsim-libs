@@ -21,7 +21,6 @@ package playground.andreas.bvgAna;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -193,11 +192,11 @@ public class TestMain {
 
 		TreeMap<Id, Id> map3 = new TransitScheduleDataProvider(sc.getTransitSchedule()).getRouteId2lineIdMap();
 
-		TreeMap<Id, ArrayList<PersonEntersVehicleEvent>> map4 = stophandler.getStopId2PersonEnterEventMap();
-		TreeMap<Id, ArrayList<PersonLeavesVehicleEvent>> map5 = stophandler.getStopId2PersonLeaveEventMap();
+		Map<Id, List<PersonEntersVehicleEvent>> map4 = stophandler.getStopId2PersonEnterEventMap();
+		Map<Id, List<PersonLeavesVehicleEvent>> map5 = stophandler.getStopId2PersonLeaveEventMap();
 
-		HashMap<PersonEntersVehicleEvent, ActivityEndEvent> map6 = enterLeaveHandler.getPersonsEntersVehicleEvent2ActivityEndEvent();
-		HashMap<PersonLeavesVehicleEvent, ActivityStartEvent> map7 = enterLeaveHandler.getPersonLeavesVehicleEvent2ActivityStartEvent();
+		Map<PersonEntersVehicleEvent, ActivityEndEvent> map6 = enterLeaveHandler.getPersonEntersVehicleEvent2ActivityEndEvent();
+		Map<PersonLeavesVehicleEvent, ActivityStartEvent> map7 = enterLeaveHandler.getPersonLeavesVehicleEvent2ActivityStartEvent();
 		TreeMap<Id, ArrayList<PersonEntersVehicleEvent>> map8 = aid2elhandler.getAgentId2EnterEventMap();
 		TreeMap<Id, ArrayList<PersonLeavesVehicleEvent>> map9 = aid2elhandler.getAgentId2LeaveEventMap();
 
