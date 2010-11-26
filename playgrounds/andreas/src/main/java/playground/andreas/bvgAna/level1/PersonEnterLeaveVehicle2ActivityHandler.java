@@ -106,7 +106,7 @@ public class PersonEnterLeaveVehicle2ActivityHandler implements PersonEntersVehi
 			Id personId = event.getPersonId();
 			if(this.agentIds.contains(personId)){
 				this.agentId2ActEndEvent.remove(personId); // should not be necessary if we trust the events
-				List<PersonLeavesVehicleEvent> events = this.agentId2LeaveVehEvent.get(event.getPersonId());
+				List<PersonLeavesVehicleEvent> events = this.agentId2LeaveVehEvent.remove(event.getPersonId());
 				if (events != null) {
 					for (PersonLeavesVehicleEvent leaveEvent : events) {
 						this.personLeavesVehicleEvent2ActivityStartEvent.put(leaveEvent, event);
