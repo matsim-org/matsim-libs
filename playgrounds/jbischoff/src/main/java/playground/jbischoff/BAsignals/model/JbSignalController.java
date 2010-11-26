@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.jbischoff.BAsignals;
+package playground.jbischoff.BAsignals.model;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -27,24 +27,24 @@ import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
-//import org.matsim.signalsystems.control.SignalGroupState;
 import org.matsim.signalsystems.model.SignalController;
 import org.matsim.signalsystems.model.SignalGroup;
 import org.matsim.signalsystems.model.SignalGroupState;
 import org.matsim.signalsystems.model.SignalPlan;
 import org.matsim.signalsystems.model.SignalSystem;
 
+import playground.jbischoff.BAsignals.JBBaParams;
+
 /**
- * @author dgrether
  * @author jbischoff
+ * 
  */
 
 public class JbSignalController implements SignalController {
+
 	public static final String IDENTIFIER = "JBSignalController";
-	
-	private static final Logger log = Logger
-			.getLogger(JbSignalController.class);
+
+	private static final Logger log = Logger.getLogger(JbSignalController.class);
 
 	private SignalSystem system;
 	private Map<Id, SignalPlan> plans;
@@ -70,14 +70,14 @@ public class JbSignalController implements SignalController {
 
 	}
 
-	private void fillOriginalGreenTimes(){
-		for (Entry<Id,Integer> e : this.maxDrop.entrySet()){
+	private void fillOriginalGreenTimes() {
+		for (Entry<Id, Integer> e : this.maxDrop.entrySet()) {
 			int ogt = e.getValue() - this.adaptiveControllHead.getMaxOnset().get(e.getKey());
-			this.originalGreenTimes.put(e.getKey(),ogt);
-			
+			this.originalGreenTimes.put(e.getKey(), ogt);
+
 		}
 	}
-	
+
 	@Override
 	public void addPlan(SignalPlan plan) {
 		if (this.plans == null) {
@@ -97,12 +97,9 @@ public class JbSignalController implements SignalController {
 		this.system = system;
 		if (this.adaptiveControllHead.signalSystemIsAdaptive(this.system)) {
 			for (Id sgid : this.system.getSignalGroups().keySet()) {
-				this.maxDrop.put(sgid, this.adaptiveControllHead
-						.getMaxDropping().get(sgid));
-				this.minDrop.put(sgid, this.adaptiveControllHead
-						.getMinDropping().get(sgid));
-				this.minOn.put(sgid, this.adaptiveControllHead.getMinOnset()
-						.get(sgid));
+				this.maxDrop.put(sgid, this.adaptiveControllHead.getMaxDropping().get(sgid));
+				this.minDrop.put(sgid, this.adaptiveControllHead.getMinDropping().get(sgid));
+				this.minOn.put(sgid, this.adaptiveControllHead.getMinOnset().get(sgid));
 				// log.info("m add "+sgid+" ; "+this.minOn.get(sgid));
 			}
 		}
@@ -111,12 +108,12 @@ public class JbSignalController implements SignalController {
 
 	@Override
 	public void updateState(double timeSeconds) {
-		
+
 		this.checkActivePlan();
-		int currentSecondinPlan = ((int) (timeSeconds) % this.activePlan
-				.getCylce());
+		int currentSecondinPlan = ((int) (timeSeconds) % this.activePlan.getCylce());
 		if (currentSecondinPlan == 0)
 			this.resetAdaptiveSignals();
+
 		boolean artlong = true;
 		for (Id sgId : this.getGapListatSecond(timeSeconds)) {
 			if (this.adaptiveDroppings.get(sgId) < this.maxDrop.get(sgId)) {
@@ -130,23 +127,27 @@ public class JbSignalController implements SignalController {
 				if (artlong
 						&& this.availableStretchTime > 0
 						&& this.system.getSignalGroups().get(gId).getState() == SignalGroupState.GREEN
-						&& this.originalGreenTimes.get(gId)>(this.adaptiveDroppings.get(gId)-this.adaptiveOnsets.get(gId))
-							) {
+						&& this.originalGreenTimes.get(gId) > (this.adaptiveDroppings.get(gId) - this.adaptiveOnsets
+								.get(gId))) {
 					this.postPoneOffSet(gId, 1);
 					artlong = false;
 				}
-				
-//				log.error(currentSecondinPlan+" on "+this.adaptiveOnsets.get(gId)+"for gid"+gId);
+
+				// log.error(currentSecondinPlan+" on "+this.adaptiveOnsets.get(gId)+"for gid"+gId);
 				if (this.adaptiveOnsets.get(gId) == currentSecondinPlan) {
 					this.system.scheduleOnset(timeSeconds, gId);
-					if (this.system.getId().equals(new IdImpl("18"))) log.info("scheduling onset at " + currentSecondinPlan	+  ", sg " + gId);
+//					if (this.system.getId().equals(new IdImpl("18")))
+//						log.info("scheduling onset at " + currentSecondinPlan + ", sg " + gId);
 				}
-				if (this.adaptiveDroppings.get(gId) == currentSecondinPlan)
-					{this.system.scheduleDropping(timeSeconds, gId);
-					if (this.system.getId().equals(new IdImpl("18"))) log.info("scheduling drop at " + currentSecondinPlan	+  ", sg " + gId);
-			}}
+				if (this.adaptiveDroppings.get(gId) == currentSecondinPlan) {
+					this.system.scheduleDropping(timeSeconds, gId);
+//					if (this.system.getId().equals(new IdImpl("18")))
+//						log.info("scheduling drop at " + currentSecondinPlan + ", sg " + gId);
+				}
+			}
 
-		} else
+		}
+		else
 			this.updateNonAdaptiveStates(timeSeconds);
 
 		if (artlong && this.availableStretchTime > 0)
@@ -158,16 +159,16 @@ public class JbSignalController implements SignalController {
 		if ((this.adaptiveDroppings.get(sgId) - this.adaptiveOnsets.get(sgId)) <= JBBaParams.MAXPHASELENGTH) {
 			int oldmd = this.maxDrop.get(sgId);
 			oldmd = oldmd + 2;
-			if (oldmd < this.activePlan.getCylce()-2)
+			if (oldmd < this.activePlan.getCylce() - 2)
 				this.maxDrop.put(sgId, oldmd);
-			
+
 		}
 		int ps;
-		if (this.adaptiveDroppings.get(sgId) + JBBaParams.PHASESTEPPROLONGER < this.maxDrop
-				.get(sgId)) {
+		if (this.adaptiveDroppings.get(sgId) + JBBaParams.PHASESTEPPROLONGER < this.maxDrop.get(sgId)) {
 			// log.info("got it 3 ast" + this.availableStretchTime);
 			ps = JBBaParams.PHASESTEPPROLONGER;
-		} else {
+		}
+		else {
 			ps = this.maxDrop.get(sgId) - this.adaptiveDroppings.get(sgId);
 			// log.info("got it 4 ast" + this.availableStretchTime);
 
@@ -191,16 +192,15 @@ public class JbSignalController implements SignalController {
 			if (!otherSg.getId().equals(sgId)) {
 				if (otherSg.getState() == SignalGroupState.GREEN
 						| otherSg.getState() == SignalGroupState.REDYELLOW) {
-					int currentdrop = this.adaptiveDroppings.get(otherSg
-							.getId());
+					int currentdrop = this.adaptiveDroppings.get(otherSg.getId());
 					int newdrop = currentdrop + step;
 					this.adaptiveDroppings.put(otherSg.getId(), newdrop);
 					// if (step>1)
 					// log.info("Drop of Sg "+otherSg.getId()+" shifted from "+currentdrop+" to "+newdrop);
-				} else {
+				}
+				else {
 					int currentonset = this.adaptiveOnsets.get(otherSg.getId());
-					int currentdrop = this.adaptiveDroppings.get(otherSg
-							.getId());
+					int currentdrop = this.adaptiveDroppings.get(otherSg.getId());
 					int newdrop = currentdrop + step;
 					if (newdrop > this.activePlan.getCylce())
 						newdrop = this.activePlan.getCylce() - 1;
@@ -225,10 +225,10 @@ public class JbSignalController implements SignalController {
 			this.adaptiveOnsets.put(e.getKey(), e.getValue());
 		}
 
-		if (this.originalGreenTimes == null){
+		if (this.originalGreenTimes == null) {
 			this.originalGreenTimes = new HashMap<Id, Integer>();
 			this.fillOriginalGreenTimes();
-			log.info("prepared Original Green Times for "+this.system.getId());
+			log.info("prepared Original Green Times for " + this.system.getId());
 		}
 
 		this.availableStretchTime = JBBaParams.STRETCHTIME;
@@ -248,7 +248,6 @@ public class JbSignalController implements SignalController {
 				this.system.scheduleOnset(timeSeconds, id);
 			}
 		}
-
 	}
 
 	public void addGapAtSecond(double second, Id sgId) {
@@ -275,7 +274,7 @@ public class JbSignalController implements SignalController {
 	@Override
 	public void simulationInitialized(double simStartTimeSeconds) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 }

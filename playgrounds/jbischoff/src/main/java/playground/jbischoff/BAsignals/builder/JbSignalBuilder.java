@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.jbischoff.BAsignals;
+package playground.jbischoff.BAsignals.builder;
 
 import org.apache.log4j.Logger;
 import org.matsim.signalsystems.builder.FromDataBuilder;
@@ -29,6 +29,11 @@ import org.matsim.signalsystems.model.SignalController;
 import org.matsim.signalsystems.model.SignalPlan;
 import org.matsim.signalsystems.model.SignalSystem;
 import org.matsim.signalsystems.model.SignalSystemsManager;
+
+import playground.jbischoff.BAsignals.model.AdaptiveControllHead;
+import playground.jbischoff.BAsignals.model.CarsOnLaneHandler;
+import playground.jbischoff.BAsignals.model.JbSignalController;
+import playground.jbischoff.BAsignals.model.JbSignalPlan;
 
 /**
  * @author dgrether
@@ -76,21 +81,19 @@ public class JbSignalBuilder implements SignalSystemsModelBuilder {
 		//process information of SignalControlData
 		SignalSystemControllerData systemControlData = signalsData.getSignalControlData().getSignalSystemControllerDataBySystemId().get(system.getId());
 		if (systemControlData.getControllerIdentifier().equals("JBSignalController")){
-			
 			this.adaptiveControllHead.addAdaptiveSignalSystem(system, systemControlData);
 			log.info("Treating sigsy: "+system.getId() +" as adaptive");
 			this.collh.addSystem(system);
-			
+			SignalController controller = new JbSignalController(this.adaptiveControllHead);
+			controller.setSignalSystem(system);
+			system.setSignalSystemController(controller);
+			for (SignalPlanData planData : systemControlData.getSignalPlanData().values()){
+				SignalPlan plan = new JbSignalPlan(planData,this.adaptiveControllHead);
+				controller.addPlan(plan);
+			}
 		}
-		SignalController controller = new JbSignalController(this.adaptiveControllHead);
-		controller.setSignalSystem(system);
-		system.setSignalSystemController(controller);
-		for (SignalPlanData planData : systemControlData.getSignalPlanData().values()){
-			
-			SignalPlan plan = new JbSignalPlan(planData,this.adaptiveControllHead);
-			controller.addPlan(plan);
-			
-			
+		else {
+			this.dataBuilder.createAndAddSignalSystemControllerFromData(system);
 		}
 		
 	}

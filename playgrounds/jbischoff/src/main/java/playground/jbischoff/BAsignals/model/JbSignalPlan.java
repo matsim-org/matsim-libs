@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jbischoff.BAsignals;
+package playground.jbischoff.BAsignals.model;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,7 +31,10 @@ import org.matsim.signalsystems.data.signalcontrol.v20.SignalGroupSettingsData;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalPlanData;
 import org.matsim.signalsystems.model.DatabasedSignalPlan;
 import org.matsim.signalsystems.model.SignalPlan;
+
 /**
+ * 
+ * Probably not really needed
  * @author jbischoff
  *
  */

@@ -21,6 +21,8 @@ package playground.jbischoff.BAsignals;
 
 import org.matsim.core.controler.Controler;
 
+import playground.jbischoff.BAsignals.controler.JBSignalControllerListenerFactory;
+
 
 /**
  * @author dgrether
@@ -29,18 +31,14 @@ import org.matsim.core.controler.Controler;
 public class CottbusMain {
 	
 
-	private String config = JbBaPaths.BASIMH+"scenario-slv/cottbusConfig.xml";
+//	private String config = JbBaPaths.BASIMH+"scenario-slv/cottbusConfig.xml";
 //	private String config = "/media/data/work/repos/shared-svn/studies/dgrether/cottbus/Cottbus-BA/scenario-lsa/cottbusConfig.xml";
-//private String config = "/media/data/work/repos/shared-svn/studies/dgrether/cottbus/Cottbus-BA/scenario-slv/cottbusConfig.xml";
+	private String config = "/media/data/work/repos/shared-svn/studies/dgrether/cottbus/Cottbus-BA/scenario-slv/dg_cottbus_config.xml";
 
 	public void runCottbus(){
 		System.err.println("here");
-		
 		Controler controler = new Controler(config);
-		
-		
-
-		JBSignalControllerListenerFactory fact = new JBSignalControllerListenerFactory(controler.getSignalsControllerListenerFactory());
+		JBSignalControllerListenerFactory fact = new JBSignalControllerListenerFactory();
 		controler.setSignalsControllerListenerFactory(fact);
 		controler.setOverwriteFiles(true);
 		controler.run();

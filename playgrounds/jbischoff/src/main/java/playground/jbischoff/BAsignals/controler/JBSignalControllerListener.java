@@ -1,60 +1,54 @@
 /**
  * 
  */
-package playground.jbischoff.BAsignals;
+package playground.jbischoff.BAsignals.controler;
 
-import java.util.Map.Entry;
-
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.SignalSystemsConfigGroup;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;
-import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.signalsystems.builder.FromDataBuilder;
 import org.matsim.signalsystems.controler.SignalsControllerListener;
-import org.matsim.signalsystems.mobsim.QSimSignalEngine;
-import org.matsim.signalsystems.mobsim.SignalEngine;
-import org.matsim.signalsystems.model.SignalGroupState;
 import org.matsim.signalsystems.data.SignalsData;
 import org.matsim.signalsystems.data.SignalsScenarioWriter;
+import org.matsim.signalsystems.mobsim.QSimSignalEngine;
+import org.matsim.signalsystems.mobsim.SignalEngine;
 import org.matsim.signalsystems.model.SignalSystemsManager;
+
+import playground.jbischoff.BAsignals.builder.JbSignalBuilder;
+import playground.jbischoff.BAsignals.model.CarsOnLaneHandler;
 
 //import playground.dgrether.analysis.charts.utils.DgChartWriter;
 //import playground.dgrether.signalsystems.analysis.DgGreenSplitPerIterationGraph;
 //import playground.dgrether.signalsystems.analysis.DgSignalGreenSplitHandler;
 //import playground.dgrether.signalsystems.analysis.DgSignalGroupAnalysisData;
 
-
-
 /**
  * @author jbischoff
- *
+ * 
  */
-public class JBSignalControllerListener implements StartupListener, IterationStartsListener, SignalsControllerListener  {
+public class JBSignalControllerListener implements StartupListener, IterationStartsListener, ShutdownListener,
+		SignalsControllerListener {
+
 	private JbSignalBuilder jbBuilder;
 	private SignalSystemsManager manager;
-	private SignalsControllerListener delegate;
 	private CarsOnLaneHandler collh;
-//	private DgGreenSplitPerIterationGraph greenSplitPerIterationGraph;
-//	private DgGreenSplitPerIterationGraph greenSplitPerIterationGraph1;
-//	private DgGreenSplitPerIterationGraph greenSplitPerIterationGraph2;
-//
-//	private DgSignalGreenSplitHandler signalGreenSplitHandler;
-	
-	public JBSignalControllerListener(SignalsControllerListener delegate){
+
+	// private DgGreenSplitPerIterationGraph greenSplitPerIterationGraph;
+	// private DgGreenSplitPerIterationGraph greenSplitPerIterationGraph1;
+	// private DgGreenSplitPerIterationGraph greenSplitPerIterationGraph2;
+	//
+	// private DgSignalGreenSplitHandler signalGreenSplitHandler;
+
+	public JBSignalControllerListener() {
 		this.collh = new CarsOnLaneHandler();
-		this.delegate = delegate;
 	}
-	
+
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
 		this.manager.resetModel(event.getIteration());
@@ -64,17 +58,21 @@ public class JBSignalControllerListener implements StartupListener, IterationSta
 	public void notifyStartup(StartupEvent e) {
 		Controler c = e.getControler();
 		this.addControlerListeners(c);
-						
+
 		Scenario scenario = c.getScenario();
 		SignalSystemsConfigGroup signalsConfig = scenario.getConfig().signalSystems();
 		SignalsData signalsData = scenario.getScenarioElement(SignalsData.class);
-	//		this.loadData(signalsConfig, scenario);
+		// this.loadData(signalsConfig, scenario);
 		FromDataBuilder builder = new FromDataBuilder(signalsData, c.getEvents());
 		jbBuilder = new JbSignalBuilder(signalsData, builder, this.collh);
 		this.manager = jbBuilder.createAndInitializeSignalSystemsManager();
 		SignalEngine engine = new QSimSignalEngine(manager);
 		c.getQueueSimulationListener().add(engine);
-		
+	}	
+	
+	@Override
+	public void notifyShutdown(ShutdownEvent e){
+		this.writeData(e.getControler().getScenario(), e.getControler().getControlerIO().getOutputPath());
 	}
 
 	private void addControlerListeners(Controler c) {
@@ -155,19 +153,9 @@ public class JBSignalControllerListener implements StartupListener, IterationSta
 //	
 			}
 
-/*	//@Override
-	public SignalsData loadData(SignalSystemsConfigGroup config, Scenario scenario) {
-		return this.delegate.loadData(config, scenario);
-	}
-*/
-	//@Override
 	public void writeData(Scenario sc, String outputPath) {
 		SignalsData data = sc.getScenarioElement(SignalsData.class);
 		new SignalsScenarioWriter(outputPath).writeSignalsData(data);
-		}
+	}
 
-
-
-
-	
 }
