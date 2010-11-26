@@ -9,6 +9,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
 import playground.andreas.bln.pop.SharedNetScenario;
 
@@ -52,7 +53,7 @@ public class PlanExpander {
 		popReader = new MatsimPopulationReader(new SharedNetScenario(sc, inPop));
 		popReader.readFile("tmp.xml.gz");
 
-		ShuffleCoords shuffleCoords = new ShuffleCoords(net, inPop, plansFile + "_" + (numberOfAdditionalCopies + 1) + "x.xml.gz", radiusOfPerimeter);
+		ShuffleCoords shuffleCoords = new ShuffleCoords(net, inPop, plansFile + "_" + (numberOfAdditionalCopies + 1) + "x.xml.gz", radiusOfPerimeter, TransformationFactory.getCoordinateTransformation(TransformationFactory.DHDN_GK4, TransformationFactory.DHDN_GK4));
 		shuffleCoords.setChangeHomeActsOnlyOnceTrue("home");
 		shuffleCoords.run(inPop);
 		shuffleCoords.writeEndPlans();

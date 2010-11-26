@@ -19,6 +19,7 @@
 
 package playground.andreas.utils.pop;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
@@ -33,6 +34,8 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
 /**
  * Change the coords of a given plan for every person, except the original one.
@@ -45,10 +48,12 @@ public class ShuffleCoords extends NewPopulation {
 
 	private double radius; // meter
 	private String homeActString = null;
+	private CoordinateTransformation coordTransform;
 
-	public ShuffleCoords(Network network, Population plans, String filename, double radius) {
+	public ShuffleCoords(Network network, Population plans, String filename, double radius, CoordinateTransformation coordTransform) {
 		super(network, plans, filename);
 		this.radius = radius;
+		this.coordTransform = coordTransform;
 	}
 
 	/**
@@ -66,6 +71,15 @@ public class ShuffleCoords extends NewPopulation {
 		try {
 			// Keep old person untouched
 			Double.parseDouble(person.getId().toString());
+			
+			Plan plan = person.getPlans().get(0);
+			for (PlanElement planElement : plan.getPlanElements()) {
+				if(planElement instanceof ActivityImpl){
+					ActivityImpl act = (ActivityImpl) planElement;
+					act.setCoord(this.coordTransform.transform(act.getCoord()));
+				}
+			}
+			
 			this.popWriter.writePerson(person);
 		} catch (Exception e) {
 			// clones need to be handled
@@ -83,7 +97,9 @@ public class ShuffleCoords extends NewPopulation {
 
 					double scale = Math.sqrt((this.radius * this.radius)/(x * x + y * y)) * MatsimRandom.getRandom().nextDouble();
 
-					CoordImpl shuffledCoords = new CoordImpl(act.getCoord().getX() + x * scale, act.getCoord().getY() + y * scale);
+					Coord oldCoord = this.coordTransform.transform(act.getCoord());
+					
+					CoordImpl shuffledCoords = new CoordImpl(oldCoord.getX() + x * scale, oldCoord.getY() + y * scale);
 
 					if(this.homeActString != null){
 						if(act.getType().equalsIgnoreCase(this.homeActString)){
@@ -121,7 +137,7 @@ public class ShuffleCoords extends NewPopulation {
 		PopulationReader popReader = new MatsimPopulationReader(sc);
 		popReader.readFile(inPlansFile);
 
-		ShuffleCoords shuffleCoords = new ShuffleCoords(net, inPop, outPlansFile, 10.0);
+		ShuffleCoords shuffleCoords = new ShuffleCoords(net, inPop, outPlansFile, 10.0, TransformationFactory.getCoordinateTransformation(TransformationFactory.DHDN_GK4, TransformationFactory.DHDN_GK4));
 		shuffleCoords.run(inPop);
 		shuffleCoords.writeEndPlans();
 
