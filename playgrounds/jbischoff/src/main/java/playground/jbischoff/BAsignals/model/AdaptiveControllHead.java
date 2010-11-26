@@ -127,11 +127,11 @@ public class AdaptiveControllHead {
 
 
 	public void sizeDownPlans() {
-		int seconds = JBBaParams.PLANSDOWNSIZER;
+		double ratio = JBBaParams.PLANSDOWNSIZER;
 		for (SignalSystemControllerData sscd : this.sscmap.values()) {
 
 			for (SignalPlanData spd : sscd.getSignalPlanData().values()) {
-				double ratio = (double) seconds / (double) spd.getCycleTime();
+				
 				for (SignalGroupSettingsData sgsd : spd.getSignalGroupSettingsDataByGroupId().values()) {
 					this.maxDropping.put(sgsd.getSignalGroupId(), sgsd.getDropping());
 					this.maxOnset.put(sgsd.getSignalGroupId(), sgsd.getOnset());
