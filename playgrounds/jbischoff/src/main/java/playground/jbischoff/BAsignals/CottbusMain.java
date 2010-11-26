@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package playground.jbischoff.BAsignals;
 
+import org.apache.log4j.Logger;
 import org.matsim.core.controler.Controler;
 
 import playground.jbischoff.BAsignals.controler.JBSignalControllerListenerFactory;
@@ -30,25 +31,40 @@ import playground.jbischoff.BAsignals.controler.JBSignalControllerListenerFactor
  */
 public class CottbusMain {
 	
+	
+	private static final Logger log = Logger.getLogger(CottbusMain.class);
 
 //	private String config = JbBaPaths.BASIMH+"scenario-slv/cottbusConfig.xml";
 //	private String config = "/media/data/work/repos/shared-svn/studies/dgrether/cottbus/Cottbus-BA/scenario-lsa/cottbusConfig.xml";
 	private String config = "/media/data/work/repos/shared-svn/studies/dgrether/cottbus/Cottbus-BA/scenario-slv/dg_cottbus_config.xml";
 
-	public void runCottbus(){
-		System.err.println("here");
-		Controler controler = new Controler(config);
+	public void runCottbus(String c){
+		log.info("Running CottbusMain with config: " + c);
+		Controler controler = new Controler(c);
 		JBSignalControllerListenerFactory fact = new JBSignalControllerListenerFactory();
 		controler.setSignalsControllerListenerFactory(fact);
 		controler.setOverwriteFiles(true);
 		controler.run();
+	}
+	
+	private void runCottbus(){
+		this.runCottbus(config);
 	}
 
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		new CottbusMain().runCottbus();
+		if (args == null || args.length == 0){
+			new CottbusMain().runCottbus();
+		}
+		else if (args.length == 1){
+			new CottbusMain().runCottbus(args[0]);
+		}
+		else {
+			log.error("too many arguments!");
+		}
+		
 	}
 
 
