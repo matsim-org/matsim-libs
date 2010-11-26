@@ -22,8 +22,10 @@ package org.matsim.ptproject.qsim.qnetsimengine;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.PriorityQueue;
 import java.util.Queue;
 
 import org.apache.log4j.Logger;
@@ -32,6 +34,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.qsim.TransitQLaneFeature;
@@ -66,11 +69,11 @@ import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
 	 * @param visLane TODO
 	 */
 	 void addVehiclePositions(VisLane visLane, final Collection<AgentSnapshotInfo> positions, Collection<QVehicle> buffer,
-			Collection<QVehicle> vehQueue, Collection<QItem> holes, int bufferStorageCapacity,
-			double linkLength, TransitQLaneFeature transitQueueLaneFeature, double congestedDensity){
+			Collection<QVehicle> vehQueue, Collection<QItem> holes, double linkLength,
+			TransitQLaneFeature transitQueueLaneFeature){
 
 		this.addVehiclePositions(visLane, positions, buffer, vehQueue, holes, linkLength, 0.0,
-				null, transitQueueLaneFeature, congestedDensity);
+				null, transitQueueLaneFeature);
 	}
 
 	/**
@@ -87,7 +90,7 @@ import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
 	 */
 	 void addVehiclePositions(VisLane visLane, final Collection<AgentSnapshotInfo> positions, Collection<QVehicle> buffer,
 			Collection<QVehicle> vehQueue, Collection<QItem> holes, double linkLength,
-			double offset, Integer laneNumber, TransitQLaneFeature transitQueueLaneFeature, double congestedDensity){
+			double offset, Integer laneNumber, TransitQLaneFeature transitQueueLaneFeature){
 
 		if ("queue".equalsIgnoreCase(this.snapshotStyle)){
 			this.addVehiclePositionsAsQueue(positions, buffer, vehQueue, linkLength, offset, laneNumber,
@@ -99,7 +102,7 @@ import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
 		}
 		else if ("withHolesExperimental".equalsIgnoreCase(this.snapshotStyle)){
 			this.addVehiclePositionsWithHoles(positions, buffer, vehQueue, holes, linkLength, offset,
-					laneNumber, transitQueueLaneFeature, congestedDensity, visLane);
+					laneNumber, transitQueueLaneFeature, visLane);
 		}
 		else {
 			log.warn("The snapshotStyle \"" + this.snapshotStyle + "\" is not supported.");
@@ -108,7 +111,7 @@ import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
 
 	private void addVehiclePositionsWithHoles(final Collection<AgentSnapshotInfo> positions, Collection<QVehicle> buffer,
 			Collection<QVehicle> vehQueue, Collection<QItem> holes, double linkLength, double offset,
-			Integer laneNumber, TransitQLaneFeature transitQueueLaneFeature, double congestedDensity, VisLane visLane) 
+			Integer laneNumber, TransitQLaneFeature transitQueueLaneFeature, VisLane visLane) 
 	{
 		double storageCapacity = visLane.getStorageCapacity() ;
 		double bufferStorageCapacity = visLane.getBufferStorage() ;
@@ -116,25 +119,89 @@ import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
 		double currentQueueEnd = linkLength; // queue end initialized at end of link
 		
 		// for holes: using the "queue" method, but with different vehSpacing:
-//		float vehSpacingWithHoles = (float) calculateVehicleSpacingAsQueue(linkLength, storageCapacity, bufferStorageCapacity);
-		float vehSpacingWithHoles = (float) calculateVehicleSpacingWithHoles(linkLength, storageCapacity, bufferStorageCapacity, 
-				congestedDensity);
+		float vehSpacing = (float) calculateVehicleSpacingAsQueue(linkLength, storageCapacity, bufferStorageCapacity);
+//		float vehSpacingWithHoles = (float) calculateVehicleSpacingWithHoles(linkLength, storageCapacity, bufferStorageCapacity, 
+//				congestedDensity);
 
 		// treat vehicles from buffer: 
-		currentQueueEnd = positionVehiclesFromBufferAsQueue(positions, currentQueueEnd, vehSpacingWithHoles, buffer, offset,
+		currentQueueEnd = positionVehiclesFromBufferAsQueue(positions, currentQueueEnd, vehSpacing, buffer, offset,
 				laneNumber, transitQueueLaneFeature, visLane);
 
 		// treat other driving vehicles:
-		positionOtherDrivingVehiclesAsQueue(positions, currentQueueEnd, vehSpacingWithHoles, vehQueue, offset,
-				laneNumber, transitQueueLaneFeature, linkLength, visLane);
+		positionOtherDrivingVehiclesWithHoles(positions, currentQueueEnd, vehSpacing, vehQueue, holes,
+				offset, laneNumber, transitQueueLaneFeature, visLane);
 
 	}
+	
+	class TupleDoubleComparator implements Comparator<Tuple<Double, QItem>> {
 
-	private double calculateVehicleSpacingWithHoles(double linkLength, double storageCapacity, double bufferStorageCapacity,
-			double congestedDensity_veh_m ) {
-		// yyyyyy abusing congDens as nHolesMax!
-		return 1.*(linkLength / (storageCapacity + bufferStorageCapacity - congestedDensity_veh_m )) ;
+		@Override
+		public int compare(final Tuple<Double, QItem> o1, final Tuple<Double, QItem> o2) {
+			int ret = - o1.getFirst().compareTo(o2.getFirst()); // the minus should, in theory, sort by decreasing "Double" 
+			if (ret == 0) {
+				ret = o2.getSecond().toString().compareTo(o1.getSecond().toString()); 
+			}
+			return ret;
+		}
 	}
+
+	private void positionOtherDrivingVehiclesWithHoles(final Collection<AgentSnapshotInfo> positions, double queueEnd,
+			double vehSpacing, Collection<QVehicle> vehQueue, Collection<QItem> holes, double offset, Integer laneNumber,
+			TransitQLaneFeature transitQueueLaneFeature, VisLane visLane)
+	{
+		if ( visLane instanceof QLane ) {
+			throw new RuntimeException("holes visualization is not implemented for lanes since I don't understand which "
+					+ "quantities refer to the link and which to the lane.  kai, nov'10" ) ;
+		}
+		
+		double now = visLane.getQLink().getMobsim().getSimTimer().getTimeOfDay() ;
+		Link  link = visLane.getQLink().getLink() ;
+		
+		Queue<Tuple<Double, QItem>> qItemList = new PriorityQueue<Tuple<Double, QItem>>(30, new TupleDoubleComparator() );
+		for ( QVehicle veh : vehQueue ) {
+			double distanceOnLink_m = (now - veh.getLinkEnterTime() ) * link.getFreespeed(now) ;
+			qItemList.add( new Tuple<Double,QItem>( distanceOnLink_m, veh ) ) ;
+		}
+		for ( QItem hole : holes ) {
+			double distanceOnLink_m = ( hole.getEarliestLinkExitTime() - now ) * 15.*1000./3600. ;
+			// holes come from the end of the link; the remaining distance is the same as distanceOnLink_m
+			qItemList.add( new Tuple<Double,QItem>( distanceOnLink_m, hole ) ) ;
+		}
+		
+		for (QVehicle veh : vehQueue) {
+			boolean inQueue = false ;
+			double distanceOnLink_m = (now - veh.getLinkEnterTime()) * link.getFreespeed(now) ;
+			if (distanceOnLink_m > queueEnd) { // vehicle is already in queue
+				distanceOnLink_m = queueEnd;
+				queueEnd -= vehSpacing;
+				inQueue = true ;
+			}
+
+			double speedValueBetweenZeroAndOne = 1. ;
+			if ( inQueue ) {
+				speedValueBetweenZeroAndOne = 0. ; // yy could be something more realistic than 0.  kai, nov'10
+			}
+
+			int lane ;
+			if (laneNumber == null){
+				lane  = calculateLane(veh, NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link));
+			} else {
+				lane = laneNumber ;
+			}
+
+			List<PersonAgent> peopleInVehicle = getPeopleInVehicle(veh, transitQueueLaneFeature);
+
+			this.createAndAddSnapshotInfoForPeopleInMovingVehicle(positions, peopleInVehicle, distanceOnLink_m, link, lane, 
+					speedValueBetweenZeroAndOne, offset);
+		}
+		throw new RuntimeException("this is not (yet) finished; aborting ...") ;
+		
+	}
+//	private double calculateVehicleSpacingWithHoles(double linkLength, double storageCapacity, double bufferStorageCapacity,
+//			double congestedDensity_veh_m ) {
+//		// yyyyyy abusing congDens as nHolesMax!
+//		return 1.*(linkLength / (storageCapacity + bufferStorageCapacity - congestedDensity_veh_m )) ;
+//	}
 
 	/**
 	 * Calculates the positions of all vehicles on this link according to the queue-logic: Vehicles are placed on the link
@@ -175,7 +242,6 @@ import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
 	 * calculate the position where the vehicle should be if it could drive with freespeed - if the position is already within
 	 * the congestion queue, add it to the queue with slow speed - if the position is not within the queue, just place the car
 	 * with free speed at that place
-	 * @param qBufferItem TODO
 	 */
 	private void positionOtherDrivingVehiclesAsQueue(final Collection<AgentSnapshotInfo> positions, double queueEnd,
 			double vehSpacing, Collection<QVehicle> vehQueue, double offset, Integer laneNumber, TransitQLaneFeature transitQueueLaneFeature,
@@ -186,11 +252,11 @@ import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
 		double inverseSimulatedFlowCapacity = qBufferItem.getInverseSimulatedFlowCapacity() ;
 		
 		double lastDistance = Double.POSITIVE_INFINITY;
-		double ttfs = link.getLength() / link.getFreespeed(now);
+		double freeSpeedTravelTime = link.getLength() / link.getFreespeed(now);
 		for (QVehicle veh : vehQueue) {
 			boolean inQueue = false ;
 			double travelTime = now - veh.getLinkEnterTime();
-			double distanceOnLink = (ttfs == 0.0 ? 0.0	: ((travelTime / ttfs) * linkLength));
+			double distanceOnLink = (freeSpeedTravelTime == 0.0 ? 0.0	: ((travelTime / freeSpeedTravelTime) * linkLength));
 			if (distanceOnLink > queueEnd) { // vehicle is already in queue
 				distanceOnLink = queueEnd;
 				queueEnd -= vehSpacing;

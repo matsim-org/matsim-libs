@@ -758,8 +758,7 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 			AgentSnapshotInfoBuilder snapshotInfoBuilder = QLinkImpl.this.getQSimEngine().getAgentSnapshotInfoBuilder();
 
 			snapshotInfoBuilder.addVehiclePositions(QLinkImpl.this, positions, QLinkImpl.this.buffer, QLinkImpl.this.vehQueue,
-					QLinkImpl.this.holes, QLinkImpl.this.bufferStorageCapacity, QLinkImpl.this.getLink().getLength(),
-					QLinkImpl.this.transitQueueLaneFeature, QLinkImpl.this.nHolesMax );
+					QLinkImpl.this.holes, QLinkImpl.this.getLink().getLength(), QLinkImpl.this.transitQueueLaneFeature );
 
 			int cnt2 = 0 ; // a counter according to which non-moving items can be "spread out" in the visualization
 			// treat vehicles from transit stops
@@ -805,6 +804,11 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 	@Override
 	int getBufferStorage() {
 		return this.bufferStorageCapacity ;
+	}
+
+	@Override
+	double getLength() {
+		return this.length ;
 	}
 
 }

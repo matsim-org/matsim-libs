@@ -33,5 +33,7 @@ abstract class VisLane extends QBufferItem {
 	abstract double getStorageCapacity() ;
 	
 	abstract int getBufferStorage() ;
+	
+	abstract double getLength() ;
 
 }

@@ -679,7 +679,7 @@ public final class QLane extends VisLane implements SignalizeableItem {
 			double offset= QLane.this.queueLink.getLink().getLength() - QLane.this.getLane().getStartsAtMeterFromLinkEnd();// QLane.this.queueLink.getLink().getLength() - QLane.this.getLength();
 			agentSnapshotInfoBuilder.addVehiclePositions(QLane.this, positions, QLane.this.buffer, QLane.this.vehQueue, null,
 					QLane.this.length, offset,
-					QLane.this.visualizerLane*3, QLane.this.transitQueueLaneFeature, -1.);
+					QLane.this.visualizerLane*3, QLane.this.transitQueueLaneFeature);
 
 			return positions;
 		}

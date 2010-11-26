@@ -589,4 +589,11 @@ public class QLinkLanesImpl extends QLinkInternalI {
 	}
 
 
+	@Override
+	double getLength() {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException() ;
+	}
+
+
 }
