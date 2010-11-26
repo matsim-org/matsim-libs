@@ -26,6 +26,7 @@ import playground.dgrether.DgPaths;
 
 /**
  * @author dgrether
+ * @see jbischoff playground for more "intelligent" live vis code including xy2links and routing
  *
  */
 public class CottbusLiveVis {
