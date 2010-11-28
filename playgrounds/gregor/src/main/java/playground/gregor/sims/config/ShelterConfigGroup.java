@@ -24,6 +24,8 @@ import java.util.Map.Entry;
 
 import org.matsim.core.config.Module;
 
+import sun.java2d.loops.ProcessPath.EndSubPathHandler;
+
 /**
  * @author laemmel
  * 
@@ -55,6 +57,10 @@ public class ShelterConfigGroup extends Module {
 
 	private static final String CAPACITY_ADAPTION = "capacityAdaption";
 
+	private static final String CHI_0_FOR_SA = "chi_0";
+
+	private static final String EPSILON_S_FOR_SA = "epsilon_s";
+
 	private double switchProbability = 0.;
 
 	private double shiftProbability = 0.;
@@ -64,6 +70,10 @@ public class ShelterConfigGroup extends Module {
 	private InitialAssignment assignment = InitialAssignment.random;
 
 	private Version version = Version.ICEC2010;
+
+	private double chi_0 = 0.8;
+
+	private double epsilon_s = 0.02;
 
 	/**
 	 * @param name
@@ -87,10 +97,38 @@ public class ShelterConfigGroup extends Module {
 			setAssignmentVersion(value);
 		} else if (CAPACITY_ADAPTION.equals(key)) {
 			setCapacityAdaption(value);
+		} else if (CHI_0_FOR_SA.equals(key)) {
+			setChi_0(value);
+		} else if (EPSILON_S_FOR_SA.equals(key)) {
+			setEpsilon_s(value);
 		} else {
 
 			throw new IllegalArgumentException(key);
 		}
+	}
+
+	/**
+	 * @param value
+	 */
+	private void setEpsilon_s(String value) {
+		this.epsilon_s = Double.parseDouble(value);
+
+	}
+
+	/**
+	 * @param value
+	 */
+	private void setChi_0(String value) {
+		this.chi_0 = Double.parseDouble(value);
+
+	}
+
+	public double getChi_0() {
+		return this.chi_0;
+	}
+
+	public double getEspilon_s() {
+		return this.epsilon_s;
 	}
 
 	/**
@@ -160,6 +198,10 @@ public class ShelterConfigGroup extends Module {
 			return getAssignmentVersion().toString();
 		} else if (CAPACITY_ADAPTION.equals(key)) {
 			return Boolean.toString(isCapacityAdaption());
+		} else if (CHI_0_FOR_SA.equals(key)) {
+			return Double.toString(getChi_0());
+		} else if (EPSILON_S_FOR_SA.equals(key)) {
+			return Double.toString(getEspilon_s());
 		}
 		throw new IllegalArgumentException(key);
 	}
@@ -172,6 +214,8 @@ public class ShelterConfigGroup extends Module {
 		map.put(INITAL_ASSIGNMENT, getValue(INITAL_ASSIGNMENT));
 		map.put(ASSIGNMENT_VERION, getValue(ASSIGNMENT_VERION));
 		map.put(CAPACITY_ADAPTION, getValue(CAPACITY_ADAPTION));
+		map.put(EPSILON_S_FOR_SA, getValue(EPSILON_S_FOR_SA));
+		map.put(CHI_0_FOR_SA, getValue(CHI_0_FOR_SA));
 		return map;
 	}
 

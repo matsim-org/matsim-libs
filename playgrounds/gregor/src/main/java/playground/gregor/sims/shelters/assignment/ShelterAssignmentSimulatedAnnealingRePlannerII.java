@@ -46,6 +46,8 @@ import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.evacuation.base.Building;
 
+import playground.gregor.sims.config.ShelterConfigGroup;
+
 /**
  * @author laemmel
  * 
@@ -81,6 +83,9 @@ public class ShelterAssignmentSimulatedAnnealingRePlannerII extends ShelterAssig
 		super(sc, tc, tt, shelterLinkMapping);
 		this.epochLength = (int) (0.05 * this.agents.size());// TODO does this
 		// make sense
+		ShelterConfigGroup scg = (ShelterConfigGroup) sc.getConfig().getModule("shelters");
+		this.chi_0 = scg.getChi_0();
+		this.epsilon_s = scg.getEspilon_s();
 	}
 
 	@Override
@@ -127,7 +132,7 @@ public class ShelterAssignmentSimulatedAnnealingRePlannerII extends ShelterAssig
 				if (this.c_k > 10) {
 					this.c_k = 10;
 					this.melted = true;
-					log.info("System not yet melted! new  c_0 = " + this.c_k);
+					log.info("Temperature is getting to high stopping heating now! new  c_0 = " + this.c_k);
 				}
 			} else {
 				this.melted = true;
