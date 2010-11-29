@@ -33,7 +33,6 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.events.AgentStuckEventImpl;
 import org.matsim.core.events.LaneEnterEventImpl;
 import org.matsim.core.events.LaneLeaveEventImpl;
@@ -145,10 +144,6 @@ public final class QLane extends VisLane implements SignalizeableItem {
 	private final Set<Id> destinationLinkIds = new LinkedHashSet<Id>();
 
 	private final Lane laneData;
-	/**
-	 * This id is only set, if there is no laneData for the Lane, i.e. it is the original lane
-	 */
-	private Id laneId = null;
 
 	private boolean thisTimeStepGreen = true;
 	/**
@@ -347,7 +342,7 @@ public final class QLane extends VisLane implements SignalizeableItem {
 	/** called from framework, do everything related to link movement here
 	 *
 	 * @param now current time step
-	 * @return
+	 * @return true if there is at least one vehicle moved to another lane
 	 */
 	protected boolean moveLane(final double now) {
 		updateBufferCapacity();
@@ -397,7 +392,7 @@ public final class QLane extends VisLane implements SignalizeableItem {
 				b.append("Person Id: ");
 				b.append(veh.getDriver().getPerson().getId());
 				b.append(" is on Lane Id ");
-				b.append(this.laneId);
+				b.append(this.getLane().getId());
 				b.append(" on Link Id ");
 				b.append(this.queueLink.getLink().getId());
 				b.append(" and wants to go on to Link Id ");
@@ -536,6 +531,7 @@ public final class QLane extends VisLane implements SignalizeableItem {
 	 * @return Returns the maximum number of vehicles that can be placed on the
 	 *         link at a time.
 	 */
+	@Override
 	double getStorageCapacity() {
 		return this.storageCapacity;
 	}
@@ -617,6 +613,7 @@ public final class QLane extends VisLane implements SignalizeableItem {
 		return this.vehQueue;
 	}
 
+	@Override
 	public QLinkInternalI getQLink() {
 		return this.queueLink;
 	}

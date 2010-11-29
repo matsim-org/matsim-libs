@@ -312,6 +312,7 @@ public class QLinkLanesImpl extends QLinkInternalI {
 	protected boolean moveLink(double now) {
 		boolean activeLane = false;
 		boolean otherLaneActive = false;
+		boolean activeWaitBuffer = false;
 		for (QLane lane : this.queueLanes){
 			if (lane.moveLane(now)){
 				otherLaneActive = true;
@@ -320,8 +321,8 @@ public class QLinkLanesImpl extends QLinkInternalI {
 				activeLane = true;
 			}
 		}
-		this.moveWaitToBuffer(now);
-		this.active = activeLane || otherLaneActive || (!this.waitingList.isEmpty());
+		activeWaitBuffer = this.moveWaitToBuffer(now);
+		this.active = activeLane || otherLaneActive || activeWaitBuffer || (!this.waitingList.isEmpty());
 		return this.active;
 	}
 
@@ -330,14 +331,16 @@ public class QLinkLanesImpl extends QLinkInternalI {
 	 *
 	 * @param now
 	 *          the current time
+	 *  @return true if at least one vehicle is moved to the buffer of this lane
 	 */
-	private void moveWaitToBuffer(final double now) {
+	private boolean moveWaitToBuffer(final double now) {
+		boolean movedAtLeastOne = false;
 		while (this.originalLane.hasBufferSpace()) {
 			QVehicle veh = this.waitingList.poll();
 			if (veh == null) {
-				return;
+				return movedAtLeastOne;
 			}
-
+			movedAtLeastOne = true;
 			this.getQSimEngine().getMobsim().getEventsManager().processEvent(
 					new AgentWait2LinkEventImpl(now, veh.getDriver().getPerson().getId(), this.getLink().getId()));
 			boolean handled = this.originalLane.transitQueueLaneFeature.handleMoveWaitToBuffer(now, veh);
@@ -345,6 +348,7 @@ public class QLinkLanesImpl extends QLinkInternalI {
 				this.originalLane.addToBuffer(veh, now);
 			}
 		}
+		return movedAtLeastOne;
 	}
 
 
