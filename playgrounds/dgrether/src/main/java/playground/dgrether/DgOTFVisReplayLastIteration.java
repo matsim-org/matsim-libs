@@ -23,6 +23,7 @@ import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.ptproject.qsim.QSim;
+import org.matsim.signalsystems.data.SignalsScenarioWriter;
 import org.matsim.vis.otfvis.OTFVisMobsimFeature;
 
 
@@ -80,8 +81,10 @@ public class DgOTFVisReplayLastIteration {
       config.network().setLaneDefinitionsFile(oldConfControlerIO.getOutputFilename(Controler.FILENAME_LANES));
     }
     if (config.scenario().isUseSignalSystems()){
-      config.signalSystems().setSignalSystemFile(oldConfControlerIO.getOutputFilename(Controler.FILENAME_SIGNALSYSTEMS));
-      config.signalSystems().setSignalSystemConfigFile(oldConfControlerIO.getOutputFilename(Controler.FILENAME_SIGNALSYSTEMS_CONFIG));
+      config.signalSystems().setSignalSystemFile(oldConfControlerIO.getOutputFilename(SignalsScenarioWriter.FILENAME_SIGNAL_SYSTEMS));
+      config.signalSystems().setSignalGroupsFile(oldConfControlerIO.getOutputFilename(SignalsScenarioWriter.FILENAME_SIGNAL_GROUPS));
+      config.signalSystems().setSignalControlFile(oldConfControlerIO.getOutputFilename(SignalsScenarioWriter.FILENAME_SIGNAL_CONTROL));
+      config.signalSystems().setAmberTimesFile(oldConfControlerIO.getOutputFilename(SignalsScenarioWriter.FILENAME_AMBER_TIMES));
     }
 
 

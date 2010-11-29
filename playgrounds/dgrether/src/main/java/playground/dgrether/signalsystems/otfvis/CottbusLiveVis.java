@@ -38,12 +38,12 @@ public class CottbusLiveVis {
 //	private String amberTimes10 = inputDir + "amberTimesCottbusByNodes_v1.0.xml";
 //	
 //	private String config = inputDir + "cottbusConfig.xml";
-	private String config = inputDir + "originaldaten/config_dg_livevis.xml";
+	private static final String oldCottbusConfig = inputDir + "originaldaten/config_dg_livevis.xml";
 	
 	public static final  String newCottbusConfig = inputDir + "Cottbus-BA/scenario-lsa/cottbusConfigLiveVis.xml";
 
 	private void run() {
-		OTFVis.playConfig(config);
+		OTFVis.playConfig(oldCottbusConfig);
 	}
 	
 	

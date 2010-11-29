@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package playground.dgrether.signalsystems.roedergershenson;
 
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -86,13 +85,10 @@ public class DgRoederGershensonControllerListener implements SignalsControllerLi
 
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {
-		this.writeData(event.getControler().getScenario(), event.getControler().getControlerIO().getOutputPath());
+		SignalsData data = event.getControler().getScenario().getScenarioElement(SignalsData.class);
+		new SignalsScenarioWriter(event.getControler().getControlerIO()).writeSignalsData(data);
 	}
 
 
-	public void writeData(Scenario sc, String outputPath) {
-		SignalsData data = sc.getScenarioElement(SignalsData.class);
-		new SignalsScenarioWriter(outputPath).writeSignalsData(data);
-	}
 
 }

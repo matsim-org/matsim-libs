@@ -6,6 +6,7 @@ package playground.jbischoff.BAsignals.controler;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.groups.SignalSystemsConfigGroup;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.ControlerIO;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -72,7 +73,7 @@ public class JBSignalControllerListener implements StartupListener, IterationSta
 	
 	@Override
 	public void notifyShutdown(ShutdownEvent e){
-		this.writeData(e.getControler().getScenario(), e.getControler().getControlerIO().getOutputPath());
+		this.writeData(e.getControler().getScenario(), e.getControler().getControlerIO());
 	}
 
 	private void addControlerListeners(Controler c) {
@@ -153,9 +154,9 @@ public class JBSignalControllerListener implements StartupListener, IterationSta
 //	
 			}
 
-	public void writeData(Scenario sc, String outputPath) {
+	public void writeData(Scenario sc, ControlerIO controlerIO) {
 		SignalsData data = sc.getScenarioElement(SignalsData.class);
-		new SignalsScenarioWriter(outputPath).writeSignalsData(data);
+		new SignalsScenarioWriter(controlerIO).writeSignalsData(data);
 	}
 
 }
