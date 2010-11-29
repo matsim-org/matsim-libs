@@ -98,7 +98,8 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 
 	private Collection<AbstractQuery> activeQueries = new ArrayList<AbstractQuery>();
 
-	private final ByteBuffer buf = ByteBuffer.allocate(20000000);
+//	private final ByteBuffer buf = ByteBuffer.allocate(20000000);
+	private final ByteBuffer buf = ByteBuffer.allocate(80000000);
 
 	private volatile double stepToTime = 0;
 
