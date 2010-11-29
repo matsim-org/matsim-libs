@@ -499,17 +499,17 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		assertEquals(expectedNegativeDurationsSequence[7], Time.writeTime(asf.getAccumulatedNegativeDuration()));
 
 		double expectedScore = 0.0;
-		expectedScore += factory.getParams().marginalUtilityOfEarlyDeparture * Time.parseTime(expectedTooShortDurationsSequence[7]);
-		expectedScore += factory.getParams().marginalUtilityOfWaiting * Time.parseTime(expectedWaitingTimeSequence[7]);
-		expectedScore += factory.getParams().marginalUtilityOfLateArrival * 2 * Time.parseTime(expectedNegativeDurationsSequence[7]);
+		expectedScore += factory.getParams().marginalUtilityOfEarlyDeparture_s * Time.parseTime(expectedTooShortDurationsSequence[7]);
+		expectedScore += factory.getParams().marginalUtilityOfWaiting_s * Time.parseTime(expectedWaitingTimeSequence[7]);
+		expectedScore += factory.getParams().marginalUtilityOfLateArrival_s * 2 * Time.parseTime(expectedNegativeDurationsSequence[7]);
 		double duration, zeroUtilityDuration, typicalDuration;
 		for (String actType : expectedAccumulatedActivityDurations.keySet()) {
 			if (asf.getAccumulatedDurations().containsKey(actType)) {
 				typicalDuration = ((PersonImpl) this.scenario.getPopulation().getPersons().get(TEST_PERSON_ID)).getDesires().getActivityDuration(actType);
 				duration = Time.parseTime(expectedAccumulatedActivityDurations.get(actType)[7]);
 				zeroUtilityDuration = (typicalDuration / 3600.0) * Math.exp( -10.0 / (typicalDuration / 3600.0) / ActivityScoringFunction.DEFAULT_PRIORITY);
-				double utilPerf = factory.getParams().marginalUtilityOfPerforming * typicalDuration * Math.log((duration / 3600.0) / zeroUtilityDuration);
-				double utilWait = factory.getParams().marginalUtilityOfWaiting * duration;
+				double utilPerf = factory.getParams().marginalUtilityOfPerforming_s * typicalDuration * Math.log((duration / 3600.0) / zeroUtilityDuration);
+				double utilWait = factory.getParams().marginalUtilityOfWaiting_s * duration;
 				expectedScore += Math.max(0, Math.max(utilPerf, utilWait));
 
 				// check zero utility durations

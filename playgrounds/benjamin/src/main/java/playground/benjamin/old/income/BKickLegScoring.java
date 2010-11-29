@@ -66,7 +66,7 @@ public class BKickLegScoring extends LegScoringFunction {
 				throw new IllegalStateException("Route distance is NaN for person: " + this.plan.getPerson().getId());
 			}
 
-			tmpScore += travelTime * this.params.marginalUtilityOfTraveling + this.params.marginalUtilityOfDistanceCar * dist
+			tmpScore += travelTime * this.params.marginalUtilityOfTraveling_s + this.params.marginalUtilityOfDistanceCar * dist
 					* betaIncomeCar / this.incomePerTrip + betaIncomeCar * Math.log(this.incomePerTrip);
 		}
 		else if (TransportMode.pt.equals(leg.getMode())) {
@@ -75,7 +75,7 @@ public class BKickLegScoring extends LegScoringFunction {
 				if (Double.isNaN(dist)){
 					throw new IllegalStateException("Route distance is NaN for person: " + this.plan.getPerson().getId());
 				}
-				tmpScore += travelTime * this.params.marginalUtilityOfTravelingPT + this.params.marginalUtilityOfDistancePt
+				tmpScore += travelTime * this.params.marginalUtilityOfTravelingPT_s + this.params.marginalUtilityOfDistancePt
 						* dist * betaIncomePt / this.incomePerTrip + betaIncomePt * Math.log(this.incomePerTrip);
 			}
 			else {

@@ -196,11 +196,11 @@ public class ActivityScoringFunction extends org.matsim.core.scoring.charyparNag
 	}
 
 	public double getEarlyDepartureScore() {
-		return this.params.marginalUtilityOfEarlyDeparture * this.accumulatedTooShortDuration;
+		return this.params.marginalUtilityOfEarlyDeparture_s * this.accumulatedTooShortDuration;
 	}
 
 	public double getWaitingTimeScore() {
-		return this.params.marginalUtilityOfWaiting * this.timeSpentWaiting;
+		return this.params.marginalUtilityOfWaiting_s * this.timeSpentWaiting;
 	}
 
 	public double getPerformanceScore() {
@@ -227,9 +227,9 @@ public class ActivityScoringFunction extends org.matsim.core.scoring.charyparNag
 
 		double tmpScore = 0.0;
 		if (duration > 0.0) {
-			double utilPerf = this.params.marginalUtilityOfPerforming * typicalDuration *
+			double utilPerf = this.params.marginalUtilityOfPerforming_s * typicalDuration *
 				Math.log((duration / 3600.0) / this.zeroUtilityDurations.get(actType));
-			double utilWait = this.params.marginalUtilityOfWaiting * duration;
+			double utilWait = this.params.marginalUtilityOfWaiting_s * duration;
 			tmpScore = Math.max(0, Math.max(utilPerf, utilWait));
 		} else if (duration < 0.0) {
 			log.error("Accumulated activity durations < 0.0 must not happen.");
@@ -252,7 +252,7 @@ public class ActivityScoringFunction extends org.matsim.core.scoring.charyparNag
 
 	// getters and setters: --------------------------------------------------------------------------------
 	public double getLateArrivalScore() {
-		return (2 * this.params.marginalUtilityOfLateArrival * Math.abs(this.accumulatedNegativeDuration));
+		return (2 * this.params.marginalUtilityOfLateArrival_s * Math.abs(this.accumulatedNegativeDuration));
 	}
 
 	public Map<String, Double> getAccumulatedDurations() {

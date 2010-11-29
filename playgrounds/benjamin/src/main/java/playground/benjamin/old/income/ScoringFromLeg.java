@@ -72,14 +72,14 @@ public class ScoringFromLeg extends LegScoringFunction {
 			double betaIncome = betaIncomeCar;
 			double distanceCostCar = this.params.marginalUtilityOfDistanceCar * distance;
 			double distanceCost = distanceCostCar;
-			double betaTravelTime = this.params.marginalUtilityOfTraveling;
+			double betaTravelTime = this.params.marginalUtilityOfTraveling_s;
 			double legScore = calculateScore(betaIncome, distanceCost, betaTravelTime, travelTime);
 			return legScore;
 		} else if (TransportMode.pt.equals(leg.getMode())) {
 			double betaIncome = betaIncomePt;
 			double distanceCostPt = this.params.marginalUtilityOfDistancePt * distance;
 			double distanceCost = distanceCostPt;
-			double betaTravelTime = this.params.marginalUtilityOfTravelingPT;
+			double betaTravelTime = this.params.marginalUtilityOfTravelingPT_s;
 			double legScore = calculateScore(betaIncome, distanceCost, betaTravelTime, travelTime);
 			return legScore;
 		} else {

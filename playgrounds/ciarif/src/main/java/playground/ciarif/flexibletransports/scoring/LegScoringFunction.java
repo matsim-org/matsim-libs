@@ -52,7 +52,7 @@ public class LegScoringFunction extends org.matsim.core.scoring.charyparNagel.Le
         dist = route.getDistance();
         tmpScore += this.params.marginalUtilityOfDistanceCar * this.ftConfigGroup.getDistanceCostCar() / 1000.0D * dist;
       }
-      tmpScore += travelTime * this.params.marginalUtilityOfTraveling;
+      tmpScore += travelTime * this.params.marginalUtilityOfTraveling_s;
     }
     else if (MyTransportMode.carsharing.equals(leg.getMode()))
     {
@@ -68,7 +68,7 @@ public class LegScoringFunction extends org.matsim.core.scoring.charyparNagel.Le
         tmpScore += this.params.marginalUtilityOfDistanceCar * this.ftConfigGroup.getDistanceCostCar() / 1000.0D * dist;
       }
       travelTime = arrivalTime - departureTime;
-      tmpScore += travelTime * this.params.marginalUtilityOfTraveling;
+      tmpScore += travelTime * this.params.marginalUtilityOfTraveling_s;
     }
     else if (TransportMode.pt.equals(leg.getMode()))
     {
@@ -118,7 +118,7 @@ public class LegScoringFunction extends org.matsim.core.scoring.charyparNagel.Le
         dist = leg.getRoute().getDistance();
       }
 
-      tmpScore += travelTime * this.params.marginalUtilityOfTraveling + this.params.marginalUtilityOfDistanceCar * dist;
+      tmpScore += travelTime * this.params.marginalUtilityOfTraveling_s + this.params.marginalUtilityOfDistanceCar * dist;
     }
 
     return tmpScore;
@@ -140,7 +140,7 @@ public class LegScoringFunction extends org.matsim.core.scoring.charyparNagel.Le
   {
     double score = 0.0D;
 
-    score += travelTime * this.params.marginalUtilityOfTravelingWalk + this.params.marginalUtilityOfDistanceWalk * distance;
+    score += travelTime * this.params.marginalUtilityOfTravelingWalk_s + this.params.marginalUtilityOfDistanceWalk * distance;
 
     return score;
   }
@@ -159,7 +159,7 @@ public class LegScoringFunction extends org.matsim.core.scoring.charyparNagel.Le
       throw new RuntimeException("Person " + this.plan.getPerson().getId() + " has an invalid travelcard. This should never happen.");
     }
     score += this.params.marginalUtilityOfDistancePt * distanceCost / 1000.0D * distance;
-    score += travelTime * this.params.marginalUtilityOfTravelingPT;
+    score += travelTime * this.params.marginalUtilityOfTravelingPT_s;
     score += score += this.ftConfigGroup.getConstPt();
 
     return score;

@@ -86,7 +86,7 @@ public class LegScoringFunction extends org.matsim.core.scoring.charyparNagel.Le
 				dist = route.getDistance();
 				tmpScore += this.params.marginalUtilityOfDistanceCar * ktiConfigGroup.getDistanceCostCar()/1000d * dist;
 			}
-			tmpScore += travelTime * this.params.marginalUtilityOfTraveling;
+			tmpScore += travelTime * this.params.marginalUtilityOfTraveling_s;
 
 		} else if (TransportMode.pt.equals(leg.getMode())) {
 
@@ -147,7 +147,7 @@ public class LegScoringFunction extends org.matsim.core.scoring.charyparNagel.Le
 				dist = leg.getRoute().getDistance();
 			}
 			// use the same values as for "car"
-			tmpScore += travelTime * this.params.marginalUtilityOfTraveling + this.params.marginalUtilityOfDistanceCar * dist;
+			tmpScore += travelTime * this.params.marginalUtilityOfTraveling_s + this.params.marginalUtilityOfDistanceCar * dist;
 
 		}
 
@@ -158,7 +158,7 @@ public class LegScoringFunction extends org.matsim.core.scoring.charyparNagel.Le
 
 		double score = 0.0;
 
-		score += travelTime * this.params.marginalUtilityOfTravelingWalk + this.params.marginalUtilityOfDistanceWalk * distance;
+		score += travelTime * this.params.marginalUtilityOfTravelingWalk_s + this.params.marginalUtilityOfDistanceWalk * distance;
 
 		return score;
 
@@ -178,7 +178,7 @@ public class LegScoringFunction extends org.matsim.core.scoring.charyparNagel.Le
 			throw new RuntimeException("Person " + this.plan.getPerson().getId() + " has an invalid travelcard. This should never happen.");
 		}
 		score += this.params.marginalUtilityOfDistancePt * distanceCost / 1000d * distance;
-		score += travelTime * this.params.marginalUtilityOfTravelingPT;
+		score += travelTime * this.params.marginalUtilityOfTravelingPT_s;
 
 		return score;
 

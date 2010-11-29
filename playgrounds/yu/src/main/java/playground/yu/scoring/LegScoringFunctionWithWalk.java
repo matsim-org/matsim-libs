@@ -69,15 +69,15 @@ public class LegScoringFunctionWithWalk extends LegScoringFunction {
 		// }
 
 		if (TransportMode.car.equals(leg.getMode())) {
-			tmpScore += travelTime * this.params.marginalUtilityOfTraveling;
+			tmpScore += travelTime * this.params.marginalUtilityOfTraveling_s;
 		} else if (TransportMode.pt.equals(leg.getMode())) {
-			tmpScore += travelTime * this.params.marginalUtilityOfTravelingPT;
+			tmpScore += travelTime * this.params.marginalUtilityOfTravelingPT_s;
 		} else if (TransportMode.walk.equals(leg.getMode())) {
 			tmpScore += offsetWlk + travelTime
-					* this.params.marginalUtilityOfTravelingWalk;
+					* this.params.marginalUtilityOfTravelingWalk_s;
 		} else {
 			// use the same values as for "car"
-			tmpScore += travelTime * this.params.marginalUtilityOfTraveling;
+			tmpScore += travelTime * this.params.marginalUtilityOfTraveling_s;
 		}
 
 		return tmpScore;
