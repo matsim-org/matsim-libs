@@ -20,6 +20,7 @@
 package org.matsim.signalsystems.data;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.controler.ControlerIO;
 import org.matsim.signalsystems.data.ambertimes.v10.AmberTimesData;
 import org.matsim.signalsystems.data.ambertimes.v10.AmberTimesWriter10;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalControlData;
@@ -39,22 +40,31 @@ public class SignalsScenarioWriter {
 	
 	private static final Logger log = Logger.getLogger(SignalsScenarioWriter.class);
 	
-	private String signalSystemsOutputFilename = "output_signal_systems_v2.0.xml";
-	private String signalGroupsOutputFilename = "output_signal_groups_v2.0.xml";
-	private String signalControlOutputFilename = "output_signal_control_v2.0.xml";
-	private String amberTimesOutputFilename = "output_amber_times_v1.0.xml";
-	private String intergreenTimesOutputFilename = "output_intergreen_times_v1.0.xml";
+	public static final String FILENAME_SIGNAL_SYSTEMS = "output_signal_systems_v2.0.xml.gz";
+	public static final String FILENAME_SIGNAL_GROUPS = "output_signal_groups_v2.0.xml.gz";
+	public static final String FILENAME_SIGNAL_CONTROL = "output_signal_control_v2.0.xml.gz";
+	public static final String FILENAME_AMBER_TIMES = "output_amber_times_v1.0.xml.gz";
+	private static final String FILENAME_INTERGREEN_TIMES = "output_intergreen_times_v1.0.xml.gz";
+
+	private String pathToSignalSystemsOutputFilename;
+
+	private String pathToSignalGroupsOutputFilename;
+
+	private String pathToSignalControlOutputFilename;
+
+	private String pathToAmberTimesOutputFilename;
+
+	private String pathToIntergreenTimesOutputFilename;
 
 	public SignalsScenarioWriter(){
 	}
 	
-	public SignalsScenarioWriter(final String outputDirectory){
-		String sep = System.getProperty("file.separator");
-		this.signalSystemsOutputFilename = outputDirectory + sep + this.signalSystemsOutputFilename;
-		this.signalGroupsOutputFilename = outputDirectory + sep + this.signalGroupsOutputFilename;
-		this.signalControlOutputFilename = outputDirectory + sep + this.signalControlOutputFilename;
-		this.amberTimesOutputFilename = outputDirectory + sep + this.amberTimesOutputFilename;
-		this.intergreenTimesOutputFilename = outputDirectory + sep + this.intergreenTimesOutputFilename;
+	public SignalsScenarioWriter(final ControlerIO controlerIo){
+		this.pathToSignalSystemsOutputFilename = controlerIo.getOutputFilename(FILENAME_SIGNAL_SYSTEMS);
+		this.pathToSignalGroupsOutputFilename = controlerIo.getOutputFilename(FILENAME_SIGNAL_GROUPS);
+		this.pathToSignalControlOutputFilename = controlerIo.getOutputFilename(FILENAME_SIGNAL_CONTROL);
+		this.pathToAmberTimesOutputFilename = controlerIo.getOutputFilename(FILENAME_AMBER_TIMES);
+		this.pathToIntergreenTimesOutputFilename = controlerIo.getOutputFilename(FILENAME_INTERGREEN_TIMES);
 	}
 	
 	public void writeSignalsData(SignalsData signalsData){
@@ -86,22 +96,22 @@ public class SignalsScenarioWriter {
 	
 	public void writeSignalSystemsData(SignalSystemsData signalSystemsData){
 		SignalSystemsWriter20 writer = new SignalSystemsWriter20(signalSystemsData);
-		writer.write(this.signalSystemsOutputFilename);
+		writer.write(this.pathToSignalSystemsOutputFilename);
 	}
 	
 	public void writeSignalGroupsData(SignalGroupsData signalGroupsData){
 		SignalGroupsWriter20 writer = new SignalGroupsWriter20(signalGroupsData);
-		writer.write(this.signalGroupsOutputFilename);
+		writer.write(this.pathToSignalGroupsOutputFilename);
 	}
 	
 	public void writeSignalControlData(SignalControlData controlData){
 		SignalControlWriter20 writer = new SignalControlWriter20(controlData);
-		writer.write(this.signalControlOutputFilename);
+		writer.write(this.pathToSignalControlOutputFilename);
 	}
 	
 	public void writeAmberTimesData(AmberTimesData amberTimesData){
 		AmberTimesWriter10 writer = new AmberTimesWriter10(amberTimesData);
-		writer.write(this.amberTimesOutputFilename);
+		writer.write(this.pathToAmberTimesOutputFilename);
 	}
 	
 //	public void writeIntergreenTimesData(IntergreenTimesData intergreenTimesData){
@@ -110,52 +120,52 @@ public class SignalsScenarioWriter {
 
 	
 	public String getSignalSystemsOutputFilename() {
-		return signalSystemsOutputFilename;
+		return pathToSignalSystemsOutputFilename;
 	}
 
 	
 	public void setSignalSystemsOutputFilename(String signalSystemsOutputFilename) {
-		this.signalSystemsOutputFilename = signalSystemsOutputFilename;
+		this.pathToSignalSystemsOutputFilename = signalSystemsOutputFilename;
 	}
 
 	
 	public String getSignalGroupsOutputFilename() {
-		return signalGroupsOutputFilename;
+		return pathToSignalGroupsOutputFilename;
 	}
 
 	
 	public void setSignalGroupsOutputFilename(String signalGroupsOutputFilename) {
-		this.signalGroupsOutputFilename = signalGroupsOutputFilename;
+		this.pathToSignalGroupsOutputFilename = signalGroupsOutputFilename;
 	}
 
 	
 	public String getSignalControlOutputFilename() {
-		return signalControlOutputFilename;
+		return pathToSignalControlOutputFilename;
 	}
 
 	
 	public void setSignalControlOutputFilename(String signalControlOutputFilename) {
-		this.signalControlOutputFilename = signalControlOutputFilename;
+		this.pathToSignalControlOutputFilename = signalControlOutputFilename;
 	}
 
 	
 	public String getAmberTimesOutputFilename() {
-		return amberTimesOutputFilename;
+		return pathToAmberTimesOutputFilename;
 	}
 
 	
 	public void setAmberTimesOutputFilename(String amberTimesOutputFilename) {
-		this.amberTimesOutputFilename = amberTimesOutputFilename;
+		this.pathToAmberTimesOutputFilename = amberTimesOutputFilename;
 	}
 
 	
 	public String getIntergreenTimesOutputFilename() {
-		return intergreenTimesOutputFilename;
+		return pathToIntergreenTimesOutputFilename;
 	}
 
 	
 	public void setIntergreenTimesOutputFilename(String intergreenTimesOutputFilename) {
-		this.intergreenTimesOutputFilename = intergreenTimesOutputFilename;
+		this.pathToIntergreenTimesOutputFilename = intergreenTimesOutputFilename;
 	}
 	
 	

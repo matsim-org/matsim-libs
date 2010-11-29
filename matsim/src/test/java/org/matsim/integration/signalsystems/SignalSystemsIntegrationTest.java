@@ -78,7 +78,7 @@ public class SignalSystemsIntegrationTest {
 				CRCChecksum.getCRCFromFile(testUtils.getInputDirectory() + "10.plans.xml.gz"), 
 				CRCChecksum.getCRCFromFile(iterationOutput + "10.plans.xml.gz"));
 		
-		SignalsScenarioWriter writer = new SignalsScenarioWriter(c.getControlerIO().getOutputPath());
+		SignalsScenarioWriter writer = new SignalsScenarioWriter(c.getControlerIO());
 		File file = new File(writer.getSignalSystemsOutputFilename());
 		Assert.assertTrue(file.exists());
 		file = new File(writer.getSignalGroupsOutputFilename());

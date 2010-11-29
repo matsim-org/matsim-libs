@@ -20,6 +20,7 @@
 package org.matsim.signalsystems.controler;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.controler.ControlerIO;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -61,12 +62,12 @@ public class DefaultSignalsControllerListener implements SignalsControllerListen
 	
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {
-		this.writeData(event.getControler().getScenario(), event.getControler().getControlerIO().getOutputPath());
+		this.writeData(event.getControler().getScenario(), event.getControler().getControlerIO());
 	}
 	
-	public void writeData(Scenario sc, String outputPath){
+	public void writeData(Scenario sc, ControlerIO controlerIO){
 		SignalsData data = sc.getScenarioElement(SignalsData.class);
-		new SignalsScenarioWriter(outputPath).writeSignalsData(data);
+		new SignalsScenarioWriter(controlerIO).writeSignalsData(data);
 	}
 
 }
