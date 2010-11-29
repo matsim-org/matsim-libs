@@ -61,6 +61,8 @@ public class ShelterConfigGroup extends Module {
 
 	private static final String EPSILON_S_FOR_SA = "epsilon_s";
 
+	private static final String DELTA_FOR_SA = "delta";
+
 	private double switchProbability = 0.;
 
 	private double shiftProbability = 0.;
@@ -74,6 +76,8 @@ public class ShelterConfigGroup extends Module {
 	private double chi_0 = 0.8;
 
 	private double epsilon_s = 0.02;
+
+	private double delta = 0.1;
 
 	/**
 	 * @param name
@@ -101,6 +105,8 @@ public class ShelterConfigGroup extends Module {
 			setChi_0(value);
 		} else if (EPSILON_S_FOR_SA.equals(key)) {
 			setEpsilon_s(value);
+		} else if (DELTA_FOR_SA.equals(key)) {
+			setDelta(value);
 		} else {
 
 			throw new IllegalArgumentException(key);
@@ -129,6 +135,14 @@ public class ShelterConfigGroup extends Module {
 
 	public double getEspilon_s() {
 		return this.epsilon_s;
+	}
+
+	private void setDelta(String value) {
+		this.delta = Double.parseDouble(value);
+	}
+
+	public double getDelta() {
+		return this.delta;
 	}
 
 	/**
@@ -202,6 +216,8 @@ public class ShelterConfigGroup extends Module {
 			return Double.toString(getChi_0());
 		} else if (EPSILON_S_FOR_SA.equals(key)) {
 			return Double.toString(getEspilon_s());
+		} else if (DELTA_FOR_SA.equals(key)) {
+			return Double.toString(getDelta());
 		}
 		throw new IllegalArgumentException(key);
 	}
@@ -216,6 +232,7 @@ public class ShelterConfigGroup extends Module {
 		map.put(CAPACITY_ADAPTION, getValue(CAPACITY_ADAPTION));
 		map.put(EPSILON_S_FOR_SA, getValue(EPSILON_S_FOR_SA));
 		map.put(CHI_0_FOR_SA, getValue(CHI_0_FOR_SA));
+		map.put(DELTA_FOR_SA, getValue(DELTA_FOR_SA));
 		return map;
 	}
 

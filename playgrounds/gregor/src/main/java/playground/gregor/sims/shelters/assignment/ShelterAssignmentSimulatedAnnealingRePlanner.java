@@ -84,7 +84,7 @@ public class ShelterAssignmentSimulatedAnnealingRePlanner implements IterationSt
 	int proposed = 0;
 	int accepted = 0;
 
-	/* package */final double delta = 0.1;
+	/* package */double delta = 0.1;
 	/* package */double chi_0 = 0.95;
 	/* package */double epsilon_s = 0.02;
 

@@ -86,6 +86,7 @@ public class ShelterAssignmentSimulatedAnnealingRePlannerII extends ShelterAssig
 		ShelterConfigGroup scg = (ShelterConfigGroup) sc.getConfig().getModule("shelters");
 		this.chi_0 = scg.getChi_0();
 		this.epsilon_s = scg.getEspilon_s();
+		this.delta = scg.getDelta();
 	}
 
 	@Override
