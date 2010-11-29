@@ -22,47 +22,53 @@ package org.matsim.core.scoring;
 
 import java.util.TreeMap;
 
+import org.apache.log4j.Logger;
 import org.matsim.core.api.internal.MatsimParameters;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
 
 public class CharyparNagelScoringParameters implements MatsimParameters {
 	public final TreeMap<String, ActivityUtilityParameters> utilParams = new TreeMap<String, ActivityUtilityParameters>();
-	public final double marginalUtilityOfWaiting;
-	public final double marginalUtilityOfLateArrival;
-	public final double marginalUtilityOfEarlyDeparture;
-	public final double marginalUtilityOfTraveling;
-	public final double marginalUtilityOfTravelingPT; // public transport
-	public final double marginalUtilityOfTravelingWalk;
-	public final double marginalUtilityOfPerforming;
+	public final double marginalUtilityOfWaiting_s;
+	public final double marginalUtilityOfLateArrival_s;
+	public final double marginalUtilityOfEarlyDeparture_s;
+	public final double marginalUtilityOfTraveling_s;
+	public final double marginalUtilityOfTravelingPT_s; // public transport
+	public final double marginalUtilityOfTravelingWalk_s;
+	public final double marginalUtilityOfPerforming_s;
+
+	@Deprecated
 	public final double marginalUtilityOfDistanceCar;
+	@Deprecated
 	public final double marginalUtilityOfDistancePt;
+	@Deprecated
 	public final double marginalUtilityOfDistanceWalk;
+
 	public final double abortedPlanScore;
 
 	/** True if one at least one of marginal utilities for performing, waiting, being late or leaving early is not equal to 0. */
 	public final boolean scoreActs;
 	
 	public CharyparNagelScoringParameters(final CharyparNagelScoringConfigGroup config) {
-		marginalUtilityOfWaiting = config.getWaiting() / 3600.0;
-		marginalUtilityOfLateArrival = config.getLateArrival() / 3600.0;
-		marginalUtilityOfEarlyDeparture = config.getEarlyDeparture() / 3600.0;
-		marginalUtilityOfTraveling = config.getTraveling() / 3600.0;
-		marginalUtilityOfTravelingPT = config.getTravelingPt() / 3600.0;
-		marginalUtilityOfTravelingWalk = config.getTravelingWalk() / 3600.0;
-		marginalUtilityOfPerforming = config.getPerforming() / 3600.0;
+		marginalUtilityOfWaiting_s = config.getWaiting() / 3600.0;
+		marginalUtilityOfLateArrival_s = config.getLateArrival() / 3600.0;
+		marginalUtilityOfEarlyDeparture_s = config.getEarlyDeparture() / 3600.0;
+		marginalUtilityOfTraveling_s = config.getTraveling() / 3600.0;
+		marginalUtilityOfTravelingPT_s = config.getTravelingPt() / 3600.0;
+		marginalUtilityOfTravelingWalk_s = config.getTravelingWalk() / 3600.0;
+		marginalUtilityOfPerforming_s = config.getPerforming() / 3600.0;
 
 		marginalUtilityOfDistanceCar = config.getMarginalUtlOfDistanceCar();
 		marginalUtilityOfDistancePt = config.getMarginalUtlOfDistancePt();
 		marginalUtilityOfDistanceWalk = config.getMarginalUtlOfDistanceWalk();
 
 		abortedPlanScore = Math.min(
-				Math.min(marginalUtilityOfLateArrival, marginalUtilityOfEarlyDeparture),
-				Math.min(marginalUtilityOfTraveling, marginalUtilityOfWaiting)) * 3600.0 * 24.0; // SCENARIO_DURATION
+				Math.min(marginalUtilityOfLateArrival_s, marginalUtilityOfEarlyDeparture_s),
+				Math.min(marginalUtilityOfTraveling_s, marginalUtilityOfWaiting_s)) * 3600.0 * 24.0; // SCENARIO_DURATION
 		// TODO 24 has to be replaced by a variable like scenario_dur (see also other places below)
 
-		scoreActs = ((marginalUtilityOfPerforming != 0) || (marginalUtilityOfWaiting != 0) ||
-				(marginalUtilityOfLateArrival != 0) || (marginalUtilityOfEarlyDeparture != 0));
+		scoreActs = ((marginalUtilityOfPerforming_s != 0) || (marginalUtilityOfWaiting_s != 0) ||
+				(marginalUtilityOfLateArrival_s != 0) || (marginalUtilityOfEarlyDeparture_s != 0));
 
 	
 		for (ActivityParams params : config.getActivityParams()) {

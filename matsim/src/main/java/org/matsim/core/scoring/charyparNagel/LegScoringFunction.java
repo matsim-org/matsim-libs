@@ -20,10 +20,12 @@
 
 package org.matsim.core.scoring.charyparNagel;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.interfaces.BasicScoring;
@@ -80,6 +82,7 @@ public class LegScoringFunction implements LegScoring, BasicScoring {
 		return this.score;
 	}
 
+	private static int distanceWrnCnt = 0 ;
 	protected double calcLegScore(final double departureTime, final double arrivalTime, final Leg leg) {
 		double tmpScore = 0.0;
 		double travelTime = arrivalTime - departureTime; // traveltime in
@@ -96,6 +99,7 @@ public class LegScoringFunction implements LegScoring, BasicScoring {
 			if (this.params.marginalUtilityOfDistanceCar != 0.0) {
 				Route route = leg.getRoute();
 				dist = route.getDistance();
+				if ( distanceWrnCnt<1 ) {
 				/*
 				 * TODO the route-distance does not contain the length of the
 				 * first or last link of the route, because the route doesn't
@@ -106,25 +110,31 @@ public class LegScoringFunction implements LegScoring, BasicScoring {
 				 * that the distance in the leg is the actual distance driven by
 				 * the agent.
 				 */
+					Logger.getLogger(LegScoringFunction.class).warn("leg distance for scoring computed from plan, not from execution (=events)." +
+							"This is not how it is meant to be, and it will fail for within-day replanning." ) ;
+					Logger.getLogger(LegScoringFunction.class).warn("Also means that first and last link are not included." ) ;
+					Logger.getLogger(LegScoringFunction.class).warn( Gbl.ONLYONCE ) ;
+					distanceWrnCnt++ ;
+				}
 			}
-			tmpScore += travelTime * this.params.marginalUtilityOfTraveling + this.params.marginalUtilityOfDistanceCar * dist;
+			tmpScore += travelTime * this.params.marginalUtilityOfTraveling_s + this.params.marginalUtilityOfDistanceCar * dist;
 		} else if (TransportMode.pt.equals(leg.getMode())) {
 			if (this.params.marginalUtilityOfDistancePt != 0.0) {
 				dist = leg.getRoute().getDistance();
 			}
-			tmpScore += travelTime * this.params.marginalUtilityOfTravelingPT + this.params.marginalUtilityOfDistancePt * dist;
+			tmpScore += travelTime * this.params.marginalUtilityOfTravelingPT_s + this.params.marginalUtilityOfDistancePt * dist;
 		} else if (TransportMode.walk.equals(leg.getMode())
 				|| TransportMode.transit_walk.equals(leg.getMode())) {
 			if (this.params.marginalUtilityOfDistanceWalk != 0.0) {
 				dist = leg.getRoute().getDistance();
 			}
-			tmpScore += travelTime * this.params.marginalUtilityOfTravelingWalk + this.params.marginalUtilityOfDistanceWalk * dist;
+			tmpScore += travelTime * this.params.marginalUtilityOfTravelingWalk_s + this.params.marginalUtilityOfDistanceWalk * dist;
 		} else {
 			if (this.params.marginalUtilityOfDistanceCar != 0.0) {
 				dist = leg.getRoute().getDistance();
 			}
 			// use the same values as for "car"
-			tmpScore += travelTime * this.params.marginalUtilityOfTraveling + this.params.marginalUtilityOfDistanceCar * dist;
+			tmpScore += travelTime * this.params.marginalUtilityOfTraveling_s + this.params.marginalUtilityOfDistanceCar * dist;
 		}
 
 		return tmpScore;

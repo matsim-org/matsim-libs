@@ -95,7 +95,7 @@ public class CharyparNagelScoringConfigGroup extends Module {
 
 	private double waiting = -0.0;
 	
-	private double marginalUtilityOfMoney = 0.0 ;
+	private double marginalUtilityOfMoney = 1.0 ;
 	private double monetaryDistanceCostRateCar = 0.0 ;
 	private double monetaryDistanceCostRatePt = 0.0 ;
 	
@@ -103,40 +103,57 @@ public class CharyparNagelScoringConfigGroup extends Module {
 	private final HashMap<String, ActivityParams> activityTypes = new LinkedHashMap<String, ActivityParams>();
 	private final HashMap<String, ActivityParams> activityTypesByNumber = new HashMap<String, ActivityParams>();
 
+	private static String GETVALUE_ACCESS_DISABLED="getValue access disabled for scoring function params; pls use direct getters.  kai, nov'10" ;
 	@Override
 	public String getValue(final String key) {
 		if (LEARNING_RATE.equals(key)) {
-			return Double.toString(getLearningRate());
+			throw new RuntimeException( GETVALUE_ACCESS_DISABLED ) ;
+//			return Double.toString(getLearningRate());
 		} else if (BRAIN_EXP_BETA.equals(key)) {
-			return Double.toString(getBrainExpBeta());
+			throw new RuntimeException( GETVALUE_ACCESS_DISABLED ) ;
+//			return Double.toString(getBrainExpBeta());
 		} else if (PATH_SIZE_LOGIT_BETA.equals(key)) {
-			return Double.toString(getPathSizeLogitBeta());
+			throw new RuntimeException( GETVALUE_ACCESS_DISABLED ) ;
+//			return Double.toString(getPathSizeLogitBeta());
 		} else if (LATE_ARRIVAL.equals(key)) {
-			return Double.toString(getLateArrival());
+			throw new RuntimeException( GETVALUE_ACCESS_DISABLED ) ;
+//			return Double.toString(getLateArrival());
 		} else if (EARLY_DEPARTURE.equals(key)) {
-			return Double.toString(getEarlyDeparture());
+			throw new RuntimeException( GETVALUE_ACCESS_DISABLED ) ;
+//			return Double.toString(getEarlyDeparture());
 		} else if (PERFORMING.equals(key)) {
-			return Double.toString(getPerforming());
+			throw new RuntimeException( GETVALUE_ACCESS_DISABLED ) ;
+//			return Double.toString(getPerforming());
 		} else if (TRAVELING.equals(key)) {
-			return Double.toString(getTraveling());
+			throw new RuntimeException( GETVALUE_ACCESS_DISABLED ) ;
+//			return Double.toString(getTraveling());
 		} else if (TRAVELING_PT.equals(key)) {
-			return Double.toString(getTravelingPt());
+			throw new RuntimeException( GETVALUE_ACCESS_DISABLED ) ;
+//			return Double.toString(getTravelingPt());
 		} else if (TRAVELING_WALK.equals(key)) {
-			return Double.toString(getTravelingWalk());
+			throw new RuntimeException( GETVALUE_ACCESS_DISABLED ) ;
+//			return Double.toString(getTravelingWalk());
 		} else if (MARGINAL_UTL_OF_DISTANCE_CAR.equals(key)){
-			return Double.toString(this.getMarginalUtlOfDistanceCar());
+			throw new RuntimeException( GETVALUE_ACCESS_DISABLED ) ;
+//			return Double.toString(this.getMarginalUtlOfDistanceCar());
 		} else if (MARGINAL_UTL_OF_DISTANCE_PT.equals(key)){
-			return Double.toString(this.getMarginalUtlOfDistancePt());
+			throw new RuntimeException( GETVALUE_ACCESS_DISABLED ) ;
+//			return Double.toString(this.getMarginalUtlOfDistancePt());
 		} else if (MARGINAL_UTL_OF_DISTANCE_WALK.equals(key)){
-			return Double.toString(this.getMarginalUtlOfDistanceWalk());
+			throw new RuntimeException( GETVALUE_ACCESS_DISABLED ) ;
+//			return Double.toString(this.getMarginalUtlOfDistanceWalk());
 		} else if ( MARGINAL_UTL_OF_MONEY.equals(key) ) {
-			return Double.toString( this.getMarginalUtilityOfMoney() ) ;
+			throw new RuntimeException( GETVALUE_ACCESS_DISABLED ) ;
+//			return Double.toString( this.getMarginalUtilityOfMoney() ) ;
 		} else if ( MONETARY_DISTANCE_COST_RATE_CAR.equals(key) ) {
-			return Double.toString( this.getMonetaryDistanceCostRateCar() ) ;
+			throw new RuntimeException( GETVALUE_ACCESS_DISABLED ) ;
+//			return Double.toString( this.getMonetaryDistanceCostRateCar() ) ;
 		} else if ( MONETARY_DISTANCE_COST_RATE_PT.equals(key) ) {
-			return Double.toString( this.getMonetaryDistanceCostRatePt() ) ;
+			throw new RuntimeException( GETVALUE_ACCESS_DISABLED ) ;
+//			return Double.toString( this.getMonetaryDistanceCostRatePt() ) ;
 		}	else if (WAITING.equals(key)) {
-			return Double.toString(getWaiting());
+			throw new RuntimeException( GETVALUE_ACCESS_DISABLED ) ;
+//			return Double.toString(getWaiting());
 		} else if ((key != null) && key.startsWith(ACTIVITY_TYPE)) {
 			ActivityParams actParams = getActivityTypeByNumber(key.substring(ACTIVITY_TYPE.length()), false);
 			return actParams == null ? null : actParams.getType();
@@ -235,16 +252,16 @@ public class CharyparNagelScoringConfigGroup extends Module {
 	public TreeMap<String, String> getParams() {
 		TreeMap<String, String> map = new TreeMap<String, String>();
 
-		map.put(LEARNING_RATE, getValue(LEARNING_RATE));
-		map.put(BRAIN_EXP_BETA, getValue(BRAIN_EXP_BETA));
-		map.put(PATH_SIZE_LOGIT_BETA, getValue(PATH_SIZE_LOGIT_BETA));
-		map.put(LATE_ARRIVAL, getValue(LATE_ARRIVAL));
-		map.put(EARLY_DEPARTURE, getValue(EARLY_DEPARTURE));
-		map.put(PERFORMING, getValue(PERFORMING));
-		map.put(TRAVELING, getValue(TRAVELING));
-		map.put(TRAVELING_PT, getValue(TRAVELING_PT));
-		map.put(TRAVELING_WALK, getValue(TRAVELING_WALK));
-		map.put(WAITING, getValue(WAITING));
+		map.put(LEARNING_RATE, Double.toString(this.getLearningRate()) );
+		map.put(BRAIN_EXP_BETA, Double.toString(this.getBrainExpBeta()) );
+		map.put(PATH_SIZE_LOGIT_BETA, Double.toString(this.getPathSizeLogitBeta()) ); 
+		map.put(LATE_ARRIVAL, Double.toString(this.getLateArrival()) );
+		map.put(EARLY_DEPARTURE, Double.toString(this.getEarlyDeparture()) );
+		map.put(PERFORMING, Double.toString(this.getPerforming()) );
+		map.put(TRAVELING, Double.toString(this.getTraveling()) );
+		map.put(TRAVELING_PT, Double.toString(this.getTravelingPt()));
+		map.put(TRAVELING_WALK, Double.toString(this.getTravelingWalk()));
+		map.put(WAITING, Double.toString(this.getWaiting()));
 		map.put(MARGINAL_UTL_OF_DISTANCE_CAR, Double.toString(this.getMarginalUtlOfDistanceCar()));
 		map.put(MARGINAL_UTL_OF_DISTANCE_PT, Double.toString(this.getMarginalUtlOfDistancePt()));
 		map.put(MARGINAL_UTL_OF_DISTANCE_WALK, Double.toString(this.getMarginalUtlOfDistanceWalk()));

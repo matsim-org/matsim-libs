@@ -158,43 +158,43 @@ public class ActivityScoringFunction implements ActivityScoring, BasicScoring {
 		// disutility if too early
 		if (arrivalTime < activityStart) {
 			// agent arrives to early, has to wait
-			tmpScore += this.params.marginalUtilityOfWaiting * (activityStart - arrivalTime);
+			tmpScore += this.params.marginalUtilityOfWaiting_s * (activityStart - arrivalTime);
 		}
 
 		// disutility if too late
 
 		double latestStartTime = actParams.getLatestStartTime();
 		if ((latestStartTime >= 0) && (activityStart > latestStartTime)) {
-			tmpScore += this.params.marginalUtilityOfLateArrival * (activityStart - latestStartTime);
+			tmpScore += this.params.marginalUtilityOfLateArrival_s * (activityStart - latestStartTime);
 		}
 
 		// utility of performing an action, duration is >= 1, thus log is no problem
 		double typicalDuration = actParams.getTypicalDuration();
 
 		if (duration > 0) {
-			double utilPerf = this.params.marginalUtilityOfPerforming * typicalDuration
+			double utilPerf = this.params.marginalUtilityOfPerforming_s * typicalDuration
 					* Math.log((duration / 3600.0) / actParams.getZeroUtilityDuration());
-			double utilWait = this.params.marginalUtilityOfWaiting * duration;
+			double utilWait = this.params.marginalUtilityOfWaiting_s * duration;
 			tmpScore += Math.max(0, Math.max(utilPerf, utilWait));
 		} else {
-			tmpScore += 2*this.params.marginalUtilityOfLateArrival*Math.abs(duration);
+			tmpScore += 2*this.params.marginalUtilityOfLateArrival_s*Math.abs(duration);
 		}
 
 		// disutility if stopping too early
 		double earliestEndTime = actParams.getEarliestEndTime();
 		if ((earliestEndTime >= 0) && (activityEnd < earliestEndTime)) {
-			tmpScore += this.params.marginalUtilityOfEarlyDeparture * (earliestEndTime - activityEnd);
+			tmpScore += this.params.marginalUtilityOfEarlyDeparture_s * (earliestEndTime - activityEnd);
 		}
 
 		// disutility if going to away to late
 		if (activityEnd < departureTime) {
-			tmpScore += this.params.marginalUtilityOfWaiting * (departureTime - activityEnd);
+			tmpScore += this.params.marginalUtilityOfWaiting_s * (departureTime - activityEnd);
 		}
 
 		// disutility if duration was too short
 		double minimalDuration = actParams.getMinimalDuration();
 		if ((minimalDuration >= 0) && (duration < minimalDuration)) {
-			tmpScore += this.params.marginalUtilityOfEarlyDeparture * (minimalDuration - duration);
+			tmpScore += this.params.marginalUtilityOfEarlyDeparture_s * (minimalDuration - duration);
 		}
 
 		return tmpScore;
