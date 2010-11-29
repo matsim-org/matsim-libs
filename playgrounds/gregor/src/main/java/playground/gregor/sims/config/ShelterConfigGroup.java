@@ -24,7 +24,7 @@ import java.util.Map.Entry;
 
 import org.matsim.core.config.Module;
 
-import sun.java2d.loops.ProcessPath.EndSubPathHandler;
+//import sun.java2d.loops.ProcessPath.EndSubPathHandler;
 
 /**
  * @author laemmel
