@@ -63,10 +63,10 @@ public class HbefaTable {
 		    
 	    		//for all lines (whole text) we split the line to a array 
 		    	
-		    	String[] array = strLine.split(",");
+		    	String[] array = strLine.split(";");
 		    	HbefaObject obj = new HbefaObject(Integer.parseInt(array[1])
 		    			, array[2], Double.parseDouble(array[4]), Double.parseDouble(array[5]),
-		    			Double.parseDouble(array[6]), Double.parseDouble(array[7])); 
+		    			Double.parseDouble(array[6]), Double.parseDouble(array[7]),Double.parseDouble(array[8])); 
 		    	
 		    	int row = Integer.parseInt(array[1]);
 		    	

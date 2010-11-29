@@ -27,9 +27,10 @@ public class HbefaObject {
 	private double RPA;
 	private double stop;
 	private double emission_factor;
+	private double emissionFactorNox;
 
 	public HbefaObject(int road_Category, String iDTS, double velocity,
-			double rPA, double stop, double emission_factor) {
+			double rPA, double stop, double emission_factor, double emissionFactorNox) {
 		super();
 		Road_Category = road_Category;
 		IDTS = iDTS;
@@ -37,6 +38,13 @@ public class HbefaObject {
 		RPA = rPA;
 		this.stop = stop;
 		this.emission_factor = emission_factor;
+		this.emissionFactorNox = emissionFactorNox;
+	}
+	public double getEmissionFactorNox() {
+		return emissionFactorNox;
+	}
+	public void setEmissionFactorNox(double emissionFactorNox) {
+		this.emissionFactorNox = emissionFactorNox;
 	}
 	public int getRoad_Category() {
 		return Road_Category;

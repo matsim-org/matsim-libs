@@ -41,8 +41,30 @@ public class SingleEvent {
 	private int Visum_road_type_no; //
 	private int freeVelocity;
 	private double emissions;	
+	private double noxEmissions;
+	private double noxFractions;
 
 	
+	public double getNoxFractions() {
+		return noxFractions;
+	}
+
+
+	public void setNoxFractions(double noxFractions) {
+		this.noxFractions = noxFractions;
+	}
+
+
+	public double getNoxEmissions() {
+		return noxEmissions;
+	}
+
+
+	public void setNoxEmissions(double noxEmissions) {
+		this.noxEmissions = noxEmissions;
+	}
+
+
 	public int getVisum_road_Section_Nr() {
 		return Visum_road_Section_Nr;
 	}

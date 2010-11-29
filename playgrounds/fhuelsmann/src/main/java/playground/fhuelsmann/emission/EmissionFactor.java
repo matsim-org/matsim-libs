@@ -35,8 +35,6 @@ import java.util.Map.Entry;
 import org.matsim.api.core.v01.Id;
 
 
-
-
 public class EmissionFactor  {
 	private String outputPath;
 	private  HbefaObject [] [] HbefaTable =
@@ -49,11 +47,8 @@ public class EmissionFactor  {
 		this.HbefaTable = hbefaTable;
 	}
 
-	
-
 	Map<Id,Map<Id, LinkedList<SingleEvent>>> map = new TreeMap<Id,Map<Id, LinkedList<SingleEvent>>>();
 	
-
 	
 	// Emission calculation based on average speed, EFh=Emission Factor heavy; EFf=Emission Factor freeflow; 
 	// EFs= Emission Factor saturated; EFc=Emission Factor congested/stop&go; 
@@ -61,10 +56,12 @@ public class EmissionFactor  {
 	// vs= average speed saturated; vc=average speed congested/stop&go;li = link length; vij= calcuated average speed from event file
 	public static double [] emissionFactorCalculate(double vh,
 			double vij,double vf,double EFh, double li,
-			double EFs,double EFc,double EFf,double vs,double vc){
+			double EFs,double EFc,double EFf,double vs,double vc, double noxf, double noxh, double noxs, double noxc){
 		
 		double EF=0.0;
 		double emissions= 0.0;
+		double nox =0.0;
+		double noxEmissions=0.0;
 		
 		
 		if (vh <= vij && vij<=vf){
@@ -72,6 +69,8 @@ public class EmissionFactor  {
 			double b = vij-vh;
 			 EF = (a *EFh ) / (a+b) + (b * EFf ) / (a+b);
 			 emissions=EF*(li/1000);
+			 nox = (a *noxh ) / (a+b) + (b * noxf ) / (a+b);
+			 noxEmissions=nox*(li/1000);
 	//		 System.out.print("link length fast" + li);
 		
 		}
@@ -80,6 +79,8 @@ public class EmissionFactor  {
 			double b = vij-vs;
 			 EF = (a *EFs ) / (a+b) + (b * EFh ) / (a+b);
 			 emissions=EF*(li/1000);
+			 nox = (a *noxs ) / (a+b) + (b * noxh ) / (a+b);
+			 noxEmissions=nox*(li/1000);
 	//		 System.out.print("link length heavy" + li);
 		}
 		if (vc <= vij && vij<=vs){
@@ -87,31 +88,37 @@ public class EmissionFactor  {
 			double b = vij-vc;
 			 EF = (a *EFc ) / (a+b) + (b * EFs ) / (a+b);
 			 emissions=EF*(li/1000);
+			 nox = (a *noxc ) / (a+b) + (b * noxs ) / (a+b);
+			 noxEmissions=nox*(li/1000);
 	//		 System.out.print("link length slow" + li);
 		
 		}
 		if (vij > vf){
 			 EF = EFf;
 			 emissions=EF*(li/1000);
+			 nox = noxf;
+			 noxEmissions=nox*(li/1000);
 	//		 System.out.print("link length very fast" + li);
 		}
 		else if(vij<vc){
 			 EF =EFc;
-			 emissions=EF;
 			 emissions=EF*(li/1000);
+			 nox =noxc;
+			 noxEmissions=nox*(li/1000);
 	//		 System.out.print("link length very slow" + li);
 		}
-		double [] result = new double[2];
+		double [] result = new double[3];
 		result[0]=EF;
 		result[1]=emissions;
+		result[2]=noxEmissions;
 		
 		return  result;
 	}
 	
 	
 	// Emission calculation based on stop&go and free flow fractions
-	public static double emissionFreeFlowFractionCalculate(double vij,double li,
-			double EFc,double EFf,double vf /*,int freeVelocity*/){
+	public static double [] emissionFreeFlowFractionCalculate(double vij,double li,
+			double EFc,double EFf,double vf, double noxf, double noxc /*,int freeVelocity*/){
 		
 		double stopGoVel = 16.67;
 	//	in visumnetzlink1.txt the freeVelocity is 60.00 km/h;  average free flow speed in HBEFA = 57.1577 km/h whichis taken here
@@ -120,6 +127,7 @@ public class EmissionFactor  {
 		double stopGoFraction =0.0;
 		double stopGoTime =0.0;
 		double emissionsfractions =0.0;
+		double noxFractions=0.0;
 		
 		
 		stopGoTime= (li/1000)/vij -(li/1000)/vf;  //li/vij -li/freeVelocity;
@@ -131,8 +139,12 @@ public class EmissionFactor  {
 		freeFlowFraction= (li/1000) - stopGoFraction;
 		
 		emissionsfractions = stopGoFraction*	EFc + freeFlowFraction*	EFf;
+		noxFractions=  stopGoFraction*	noxc + freeFlowFraction*	noxf;
 		
-		return emissionsfractions;
+		double [] fraction = new double[2];
+		fraction[0] =emissionsfractions;
+		fraction[1] =noxFractions;
+		return fraction;
 	}
 	
 
@@ -150,29 +162,37 @@ public class EmissionFactor  {
                         double emissionFractions;
 		 				double emissionFactor;
 		 				double emissions;
+		 				double noxEmissions;
+		 				double noxFractions;
                         
 
 		 				if (obj.getHbefa_Road_type() ==0){
                         	 emissionFactor = 0.0;
                         	 emissions = 0.0;
                         	 emissionFractions= 0.0;
+                        	 noxFractions =0.0;
+                        	 noxEmissions =0.0;
                            
 
                         }	 
 		 				else{	
 		 				double vf =HbefaTable[obj.getHbefa_Road_type()][0].getVelocity();
-                        double EFh = HbefaTable[obj.getHbefa_Road_type()][0].getEmission_factor(); 
+                        double EFf = HbefaTable[obj.getHbefa_Road_type()][0].getEmission_factor(); 
+                        double noxf = HbefaTable[obj.getHbefa_Road_type()][0].getEmissionFactorNox();
 
                         double vh =HbefaTable[obj.getHbefa_Road_type()][1].getVelocity();
-                        double EFf = HbefaTable[obj.getHbefa_Road_type()][1].getEmission_factor();
+                        double EFh = HbefaTable[obj.getHbefa_Road_type()][1].getEmission_factor();
+                        double noxh = HbefaTable[obj.getHbefa_Road_type()][1].getEmissionFactorNox();
                               
 
                         double vs =HbefaTable[obj.getHbefa_Road_type()][2].getVelocity();
                         double EFs = HbefaTable[obj.getHbefa_Road_type()][2].getEmission_factor();
+                        double noxs = HbefaTable[obj.getHbefa_Road_type()][2].getEmissionFactorNox();
 
                         
                         double vc =HbefaTable[obj.getHbefa_Road_type()][3].getVelocity();
                         double EFc = HbefaTable[obj.getHbefa_Road_type()][3].getEmission_factor();
+                        double noxc = HbefaTable[obj.getHbefa_Road_type()][3].getEmissionFactorNox();
 
                         double vij = obj.getAverageSpeed();
                  
@@ -180,25 +200,25 @@ public class EmissionFactor  {
                   //      int freeVelocity = obj.getfreeVelocity();
                         
                         //call of function, double output
-                        double [] emissionFactorAndEmissions=  emissionFactorCalculate(vh,vij,vf, EFh,li,
-                        		EFs, EFc, EFf, vs, vc);
+                         double [] emissionFactorAndEmissions=  emissionFactorCalculate(vh,vij,vf, EFh,li,
+                        		EFs, EFc, EFf, vs, vc, noxf, noxh,noxs, noxc);
                          emissionFactor = emissionFactorAndEmissions[0];
-                         
-                         //that' the short version of emissionFactor = emissionFactorAndEmissions[0]; and obj.setEmissionFactor(emissionFactor);
+                         obj.setEmissionFactor(emissionFactor);
                          emissions = emissionFactorAndEmissions[1];
                          obj.setEmissions(emissions);
-
+                         noxEmissions = emissionFactorAndEmissions[2];
+                         obj.setNoxEmissions(noxEmissions);
+                         
                         
-                      //call of function double output
-                        emissionFractions=  emissionFreeFlowFractionCalculate(vij,li,
-                    			 EFc, EFf,/*freeVelocity,*/vf);
-                     
-                     //     System.out.println(emissionFactor);
-                        		 			
-		 				}
-                                               
-                        obj.setEmissionFactor(emissionFactor);
-                        obj.setEmissionFractions(emissionFractions);
+                         //call of function double output
+                         double [] fractions=  emissionFreeFlowFractionCalculate(vij,li,
+                    			 EFc, EFf,/*freeVelocity,*/vf, noxf, noxc);
+                         emissionFractions =fractions[0];
+                         obj.setEmissionFractions(emissionFractions);
+                         noxFractions =fractions [1];
+                         obj.setNoxFractions (noxFractions);
+                      		
+		 				 }
                         
 		 				value.push(obj);
 		 			//	map.entrySet.put(obj.getPersonal_id(), value);
@@ -241,8 +261,10 @@ public class EmissionFactor  {
 					+"\nHbefaTypeNr : "+ obj.getHbefa_Road_type()
 					+"\nVisumRoadTypeNr : " + obj.getVisumRoadType()
 					+"\nEmissionsFactorBasedOnAverageSpeed: " + obj.getEmissionFactor()
+					+"\nNoxEmissionsFactorBasedOnAverageSpeed: " + obj.getNoxEmissions()
 	 				+"\nEmissionsBasedOnAverageSpeed: " + obj.getEmissions()
-	 				+"\nEmissionsBasedOnFractions: " + obj.getEmissionFractions());
+	 				+"\nEmissionsBasedOnFractions: " + obj.getEmissionFractions()
+	 				+"\nNoxEmissionsBasedOnFractions: " + obj.getNoxFractions());
 	 			
 	 				result = result +"\n"
 	 				+ enterTime
@@ -255,8 +277,10 @@ public class EmissionFactor  {
 	//				+"\t" + obj.getVisum_road_Section_Nr()
 					+"\t" + obj.getVisumRoadType()
 					+"\t" + obj.getEmissionFactor()
+					+"\t" + obj.getNoxEmissions()
 					+"\t" + obj.getEmissions()
-					+"\t" + obj.getEmissionFractions();
+					+"\t" + obj.getEmissionFractions()
+	 				+"\t" + obj.getNoxFractions();
 					 										 
 	 				}catch(Exception e){}
 	 			}
@@ -264,10 +288,11 @@ public class EmissionFactor  {
 			try{
 				  
 			    // Create file 
-			    FileWriter fstream = new FileWriter("../../detailedEval/teststrecke/sim/outputEmissions/out.txt");
+			    FileWriter fstream = new FileWriter("../../detailedEval/teststrecke/sim/outputEmissions/outnewtimes.txt");
 			        BufferedWriter out = new BufferedWriter(fstream);
 			        out.write("EnterTime \t travelTime \t AverageSpeed \t LinkId \t PersonId \tLinklength \tHbefaTypeNr \tVisumRoadTypeNr \t" + 
-			        		"EmissionsFactorBasedOnAverageSpeed \t EmissionsBasedOnAverageSpeed \t EmissionsBasedOnFractions" + result);
+			        		"EmissionsFactorBasedOnAverageSpeed \t NoxEmissionsFactorBasedOnAverageSpeed \t " +
+			        		"EmissionsBasedOnAverageSpeed \t EmissionsBasedOnFractions \t NoxEmissionsBasedOnFractions" + result);
 			    //Close the output stream
 			    out.close();
 					}catch (Exception e){//Catch exception if any
