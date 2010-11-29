@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 package playground.fhuelsmann.emission;
-
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -32,7 +32,7 @@ public class Main {
 	public static void main (String[] args) throws Exception{
 
 	
-		String eventsFile = "../../detailedEval/teststrecke/sim/inputEmissions/events_0807_it.0_newstartingtimes.txt";
+		String eventsFile = "../../detailedEval/teststrecke/sim/inputEmissions/events_0807_it.0.txt";
 		String netfile ="../../detailedEval/teststrecke/sim/input/network.xml";
 //		String visumRoadFile = "../../detailedEval/teststrecke/sim/inputEmissions/visumnetzlink.txt";
 		String visumRoadHebefaRoadFile = "../../detailedEval/teststrecke/sim/inputEmissions/road_types.txt";
@@ -49,7 +49,7 @@ public class Main {
 		//create the handler
 		DataStructureOfSingleEventAttributes handler = new DataStructureOfSingleEventAttributes(network);
 		
-	//	TravelTimeCalculation handler = new TravelTimeCalculation();
+		//	TravelTimeCalculation handler = new TravelTimeCalculation();
 	
 		
 		//add the handler
@@ -81,7 +81,7 @@ public class Main {
 		
 		EmissionFactor emissionFactor = new EmissionFactor(hbefaVisum.map,hbefaTable.getHbefaTableWithSpeedAndEmissionFactor());
 		emissionFactor.createEmissionTables();
-		emissionFactor.printEmissionTable();
+	//	emissionFactor.printEmissionTable();
 		
 		
 		}

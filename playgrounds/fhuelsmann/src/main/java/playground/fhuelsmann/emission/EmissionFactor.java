@@ -22,21 +22,17 @@
 package playground.fhuelsmann.emission;
 
 import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
-import java.io.File;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
-import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.Map.Entry;
 import org.matsim.api.core.v01.Id;
 
 
 public class EmissionFactor  {
-	private String outputPath;
+	
 	private  HbefaObject [] [] HbefaTable =
 		new HbefaObject [21][4];
 	
@@ -120,8 +116,8 @@ public class EmissionFactor  {
 	public static double [] emissionFreeFlowFractionCalculate(double vij,double li,
 			double EFc,double EFf,double vf, double noxf, double noxc /*,int freeVelocity*/){
 		
-		double stopGoVel = 16.67;
-	//	in visumnetzlink1.txt the freeVelocity is 60.00 km/h;  average free flow speed in HBEFA = 57.1577 km/h whichis taken here
+		double stopGoVel = 12.7567;
+	//	in visumnetzlink1.txt the freeVelocity is 60.00 km/h;  average free flow speed in HBEFA = 57.1577 km/h which is taken here
 	
 		double freeFlowFraction =0.0;
 		double stopGoFraction =0.0;
@@ -130,16 +126,21 @@ public class EmissionFactor  {
 		double noxFractions=0.0;
 		
 		
+		if (vij<stopGoVel){
+			emissionsfractions = li/1000*EFc;
+			noxFractions=  li/1000*	noxc;
+			
+			}
+		
+		else {
 		stopGoTime= (li/1000)/vij -(li/1000)/vf;  //li/vij -li/freeVelocity;
-		
-		
-//		
+	
 		stopGoFraction = stopGoVel *stopGoTime;
-//		System.out.print("Stop ang go fraction" + stopGoFraction);
 		freeFlowFraction= (li/1000) - stopGoFraction;
 		
 		emissionsfractions = stopGoFraction*	EFc + freeFlowFraction*	EFf;
 		noxFractions=  stopGoFraction*	noxc + freeFlowFraction*	noxf;
+		}
 		
 		double [] fraction = new double[2];
 		fraction[0] =emissionsfractions;
@@ -149,14 +150,16 @@ public class EmissionFactor  {
 	
 
 	public void createEmissionTables(){
-			 
+		 String result="";
 		for(Entry<Id, Map<Id, LinkedList<SingleEvent>>> LinkIdEntry : map.entrySet()){
 			for (Iterator iter = LinkIdEntry.getValue().
 				entrySet().iterator(); iter.hasNext();) {
  				Map.Entry entry = (Map.Entry) iter.next();
  				LinkedList value = (LinkedList)entry.getValue();	
 		 					
- 						//create object from SingleEvent, object is of type SingleEvent, when class is called it will get an instance
+ 						
+ 				
+ 				//create object from SingleEvent, object is of type SingleEvent, when class is called it will get an instance
 		 				SingleEvent obj = (SingleEvent) value.pop();
 		 			     
                         double emissionFractions;
@@ -222,14 +225,55 @@ public class EmissionFactor  {
                         
 		 				value.push(obj);
 		 			//	map.entrySet.put(obj.getPersonal_id(), value);
-		 			
 		 				
+		 				
+		 				String activity = obj.getActivity();
+		 				String travelTimeString = obj.getTravelTime();
+		 				String enterTime = obj.getEnterTime();
+		 				double v_mean = obj.getAverageSpeed();
+		 				String Person_id = obj.getPersonal_id();
+		 				String Link_id = obj.getLink_id();
+		 				double length = obj.getLinkLength();
+		 				int freeVelocity =obj.getfreeVelocity();
+		 				
+		 				result = result +"\n"
+		 				+ enterTime
+		 				+"\t" + travelTimeString 
+						+"\t" + v_mean
+						+"\t" + Link_id 
+						+"\t" + Person_id 
+						+"\t" + length
+		 				+"\t" + obj.getHbefa_Road_type()
+		//				+"\t" + obj.getVisum_road_Section_Nr()
+						+"\t" + obj.getVisumRoadType()
+						+"\t" + obj.getEmissionFactor()
+						+"\t" + obj.getNoxEmissions()
+						+"\t" + obj.getEmissions()
+						+"\t" + obj.getEmissionFractions()
+		 				+"\t" + obj.getNoxFractions();
+		 				
+		 				System.out.print("\n LinkID " + Link_id + "PersonID " + Person_id);
+		 				
+		 				try {
+		 					  
+		 				    // Create file 
+		 				    FileWriter fstream = new FileWriter("../../detailedEval/teststrecke/sim/outputEmissions/out.txt");
+		 				        BufferedWriter out = new BufferedWriter(fstream);
+		 				        out.write("EnterTime \t travelTime \t AverageSpeed \t LinkId \t PersonId \tLinklength \tHbefaTypeNr \tVisumRoadTypeNr \t" + 
+		 				        		"EmissionsFactorBasedOnAverageSpeed \t NoxEmissionsFactorBasedOnAverageSpeed \t " +
+		 				        		"EmissionsBasedOnAverageSpeed \t EmissionsBasedOnFractions \t NoxEmissionsBasedOnFractions" + result);
+		 				    //Close the output stream
+		 				    out.close();
+		 						}catch (Exception e){//Catch exception if any
+		 							System.err.println("Error: " + e.getMessage());
+		 				    }
+		 				 												 				
 		 		   }
 		    }
 	}
 	
 	
-		public void printEmissionTable(){
+	/*	public void printEmissionTable(){
 			 String result="";
 			
 			for(Entry<Id, Map<Id, LinkedList<SingleEvent>>> LinkIdEntry : map.entrySet()){
@@ -285,10 +329,10 @@ public class EmissionFactor  {
 	 				}catch(Exception e){}
 	 			}
 		}
-			try{
+			try {
 				  
 			    // Create file 
-			    FileWriter fstream = new FileWriter("../../detailedEval/teststrecke/sim/outputEmissions/outnewtimes.txt");
+			    FileWriter fstream = new FileWriter("../../detailedEval/teststrecke/sim/outputEmissions/out_all.txt");
 			        BufferedWriter out = new BufferedWriter(fstream);
 			        out.write("EnterTime \t travelTime \t AverageSpeed \t LinkId \t PersonId \tLinklength \tHbefaTypeNr \tVisumRoadTypeNr \t" + 
 			        		"EmissionsFactorBasedOnAverageSpeed \t NoxEmissionsFactorBasedOnAverageSpeed \t " +
@@ -298,7 +342,7 @@ public class EmissionFactor  {
 					}catch (Exception e){//Catch exception if any
 						System.err.println("Error: " + e.getMessage());
 			    }
-		}	
+		}	*/
 		
 /*		public Map<String,Map<String, LinkedList<SingleEvent>>> getmap() {
 			return map;
