@@ -19,8 +19,6 @@
  * *********************************************************************** */
 package playground.benjamin.szenarios.munich;
 
-import java.util.List;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
