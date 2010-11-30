@@ -42,58 +42,54 @@ public class MyTest extends TestCase {
 				decentralizedChargerV1=new DecentralizedChargerV1(event.getControler(),Main.energyConsumptionPlugin,Main.parkingTimesPlugin);
 
 				try {
+
 					myChargerInfo = new DecentralizedChargerInfo(decentralizedChargerV1.getPeakLoad(), decentralizedChargerV1.calcNumberOfPHEVs(decentralizedChargerV1.controler), decentralizedChargerV1.getAveragePHEVConsumption(), decentralizedChargerV1.getPriceBase(), decentralizedChargerV1.getPricePeak()); 
 					//add Tests for...
-					/*myChargerInfo.getBaseLoadCurve();
-					myChargerInfo.findHighLowIntervals();
-					myChargerInfo.findProbabilityDensityFunctions();
-					myChargerInfo.findProbabilityRanges();
-					myChargerInfo.writeSummary();*/
-					//decentralizedChargerV1.performChargingAlgorithm();
-					// do nothing
 				} catch (Exception e) {
 					e.printStackTrace();
 				}				
 			}
 		});
+
 		
 		controler.run();	
 		
-		testCalcNumberOfPHEVs(decentralizedChargerV1);
-		testAreVehiclesSameClass(decentralizedChargerV1);
-		testSumLinkedListEntries(decentralizedChargerV1);
+
 	}
 	
 	/*
 	 * Check the calculation of PHEVs according to penetration in Decenralized Charger
 	 */
-	@Test public void testCalcNumberOfPHEVs(DecentralizedChargerV1 d){
-		double realResult=d.calcNumberOfPHEVs(d.controler);
-		double expectedResult=d.controler.getPopulation().getPersons().size()*Main.penetrationPercent;
+	@Test public void testCalcNumberOfPHEVs(){
+		double realResult=decentralizedChargerV1.calcNumberOfPHEVs(decentralizedChargerV1 .controler);
+		double expectedResult=decentralizedChargerV1.controler.getPopulation().getPersons().size()*Main.penetrationPercent;
 		assertEquals(realResult, expectedResult);
 	}
 	
-	@Test public void testGetAveragePHEVConsumption(){
-	}
 	
-	@Test public void testAreVehiclesSameClass(DecentralizedChargerV1 d){
+	
+	@Test public void testAreVehiclesSameClass(){
 		PlugInHybridElectricVehicle dummyPHEV= new PlugInHybridElectricVehicle(new IdImpl(1));
 		ConventionalVehicle dummyCar= new ConventionalVehicle(null, new IdImpl(2));
-		assertFalse(d.areVehiclesSameClass(dummyPHEV, dummyCar));
-		assertTrue(d.areVehiclesSameClass(dummyPHEV, dummyPHEV));
+		assertFalse(decentralizedChargerV1.areVehiclesSameClass(dummyPHEV, dummyCar));
+		assertTrue(decentralizedChargerV1.areVehiclesSameClass(dummyPHEV, dummyPHEV));
 	}
 	
 	/**
 	 * 
 	 * @param d pass Decentralized object to use its function
 	 */
-	@Test public void testSumLinkedListEntries(DecentralizedChargerV1 d){
+	@Test public void testSumLinkedListEntries(){
 		LinkedList<Double> l=new LinkedList();
 		l.add(1.0);
 		l.add(2.0);
 		l.add(3.0);
 		
-		assertEquals(6.0, d.sumUpLinkedListEntries(l));
+		assertEquals(6.0, decentralizedChargerV1.sumUpLinkedListEntries(l));
 	}
+	
+	
+	//myChargerInfo.getBaseLoadCurve();
+	
 	
 }

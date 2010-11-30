@@ -115,7 +115,9 @@ public class DecentralizedChargerV1 {
 		averagePHEVConsumption= getAveragePHEVConsumption();
 		myChargerInfo = new DecentralizedChargerInfo(peakLoad, noOfPHEVs, averagePHEVConsumption, priceBase, pricePeak); 
 		
-		myChargerInfo.getBaseLoadCurve();
+		myChargerInfo.loadBaseLoadCurveFromTextFile();
+		
+		myChargerInfo.getFittedLoadCurve();
 		myChargerInfo.findHighLowIntervals();
 		myChargerInfo.findProbabilityDensityFunctions();
 		myChargerInfo.findProbabilityRanges();

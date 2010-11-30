@@ -40,6 +40,8 @@ import org.apache.commons.math.analysis.solvers.LaguerreSolver;
 import org.apache.commons.math.analysis.solvers.NewtonSolver;
 import org.apache.commons.math.optimization.DifferentiableMultivariateVectorialOptimizer;
 import org.apache.commons.math.optimization.OptimizationException;
+import org.apache.commons.math.optimization.SimpleVectorialValueChecker;
+import org.apache.commons.math.optimization.VectorialConvergenceChecker;
 import org.apache.commons.math.optimization.fitting.PolynomialFitter;
 import org.apache.commons.math.optimization.general.AbstractLeastSquaresOptimizer;
 import org.apache.commons.math.optimization.general.GaussNewtonOptimizer;
@@ -61,6 +63,7 @@ public class DecentralizedChargerInfo {
 	
 	
 	final DifferentiableMultivariateVectorialOptimizer optimizer;
+	final VectorialConvergenceChecker checker;
 	
 	private SimpsonIntegrator functionIntegrator;
 	private NewtonSolver newtonSolver;
@@ -96,7 +99,7 @@ public class DecentralizedChargerInfo {
 	private double pricePeak;
 	
 
-	
+	private XYSeries loadFigureData;
 	private XYSeries zeroLineData; //XY Series on zero line for plots
 	private XYSeries constantLoadFigureData;//XY Series on line of constantBaseConsumption for plots
 	private XYSeries peakLoadFigureData;//XY Series on line of peakBaseConsumption for plots
@@ -138,17 +141,20 @@ public class DecentralizedChargerInfo {
 		functionIntegrator= new SimpsonIntegrator(); 
 		newtonSolver = new NewtonSolver();
 		
+		checker=new SimpleVectorialValueChecker(peakLoad*0.05, peakLoad*0.05);
+		
 		//GaussNewtonOptimizer(boolean useLU) 
 		LevenbergMarquardtOptimizer levenbergMarquardtOptimizer = new LevenbergMarquardtOptimizer();
-	/*    *  initial step bound factor: 100.0
-	    * maximal iterations: 1000
-	    * cost relative tolerance: 1.0e-10
-	    * parameters relative tolerance: 1.0e-10
-	    * orthogonality tolerance: 1.0e-10
-*/
+		GaussNewtonOptimizer gaussNewtonOptimizer= new GaussNewtonOptimizer(true); //useLU - true, faster  else QR more robust
+		
 		levenbergMarquardtOptimizer.setMaxIterations(1000000000);
-		levenbergMarquardtOptimizer.setInitialStepBoundFactor(0.1);
-		optimizer=levenbergMarquardtOptimizer;
+		levenbergMarquardtOptimizer.setConvergenceChecker(checker);
+		
+		gaussNewtonOptimizer.setMaxIterations(1000000000);		
+		gaussNewtonOptimizer.setConvergenceChecker(checker);
+		
+		//optimizer=levenbergMarquardtOptimizer;
+		optimizer=gaussNewtonOptimizer;
 		
 	}
 	
@@ -164,24 +170,26 @@ public class DecentralizedChargerInfo {
 		}
 	}
 	
-	/**
-	 * reads in data from input txt file from 15 min data bins 
-	 * fits the data to a functions of degrees 24,48 and 96 
-	 * plots and saves the results in the outputPath
-	 * @throws OptimizationException
-	 * @throws IOException
-	 */
-	public void getBaseLoadCurve() throws OptimizationException, IOException{
+	
+	public void loadBaseLoadCurveFromTextFile() throws IOException{
+		// read in double matrix with time and load value
+		slotBaseLoad = GeneralLib.readMatrix(96, 2, false, "test\\input\\playground\\wrashid\\sschieffer\\baseLoadCurve15minBinsSecLoad.txt");
 		
-		  slotBaseLoad = GeneralLib.readMatrix(96, 2, false, "test\\input\\playground\\wrashid\\sschieffer\\baseLoadCurve15minBinsSecLoad.txt");
-			  
-		  peakBaseConsumption=0.0;
-		  constantBaseConsumption=1.0*peakLoad;
-		  zeroLineData = new XYSeries("Zero Line");
-		  XYSeries loadFigureData = new XYSeries("Baseload Data from File");
+		/*
+		 * Loop over mattrix to find
+		 * - peakBaseConsumption (maxValue)
+		 * - constantBaseConsumption (minValue)
+		 * - put in zeroLineData - helpful for graphs
+		 * - put matrix data in XYSeries Format for graphing
+		 */
+		
+		peakBaseConsumption=0.0;
+		constantBaseConsumption=peakLoad;
+		zeroLineData = new XYSeries("Zero Line");
+		loadFigureData = new XYSeries("Baseload Data from File");
 		  
 		  for (int i=0;i<96;i++){ // loop over 96 bins
-			  slotBaseLoad[i][0]=((double)i)*Main.secondsPer15Min;//time
+			  //slotBaseLoad[i][0]=((double)i)*Main.secondsPer15Min;//time
 			  slotBaseLoad[i][1]=slotBaseLoad[i][1]*peakLoad;//multiply percentage with peakLoad
 			  loadFigureData.add(slotBaseLoad[i][0], slotBaseLoad[i][1]);
 			  zeroLineData.add(slotBaseLoad[i][0],0);
@@ -193,9 +201,31 @@ public class DecentralizedChargerInfo {
 				  constantBaseConsumption= slotBaseLoad[i][1];
 			  }
 		  }
-		  polyFuncBaseLoad=fitCurve(slotBaseLoad, 96);
-		  polyFuncBaseLoad24=fitCurve(slotBaseLoad, 24);
-		  polyFuncBaseLoad48=fitCurve(slotBaseLoad, 48);
+		  
+		  XYSeriesCollection dataset = new XYSeriesCollection();
+	      dataset.addSeries(loadFigureData);
+	      dataset.addSeries(zeroLineData);
+	     
+		  JFreeChart chart = ChartFactory.createXYLineChart("Base Load [Watts] from File", "time in seconds", "Load", dataset, PlotOrientation.VERTICAL, true, true, false);
+		  ChartUtilities.saveChartAsPNG(new File(outputPath+ "baseLoadGraph.png") , chart, 800, 600);
+		 
+	}
+	
+	/**
+	 * 
+	 * fits the data to a functions of degrees 24,48 and 96 
+	 * plots and saves the results in the outputPath
+	 * @throws OptimizationException
+	 * @throws IOException
+	 */
+	public void getFittedLoadCurve() throws OptimizationException, IOException{
+		
+		System.out.println("fitting curve of degree "+ 24);
+		polyFuncBaseLoad24=fitCurve(slotBaseLoad, 24);  
+		System.out.println("fitting curve of degree "+ 48);
+		polyFuncBaseLoad48=fitCurve(slotBaseLoad, 48);
+		System.out.println("fitting curve of degree "+ 96);
+		polyFuncBaseLoad=fitCurve(slotBaseLoad, 96);
 		  
 		  constantLoadFigureData = new XYSeries("Constant Baseload Data from File");
 		  peakLoadFigureData = new XYSeries("Peak Baseload Data from File");
@@ -213,20 +243,29 @@ public class DecentralizedChargerInfo {
 			  peakLoadFigureData.add(i*Main.secondsPer15Min, peakBaseConsumption);
 		  }
 		  
+		  plotLoadSeries("fittedLoadGraph24.png", loadFitFuncFigureData24);		  
+		  plotLoadSeries("fittedLoadGraph48.png", loadFitFuncFigureData48);
+		  plotLoadSeries("fittedLoadGraph96.png", loadFitFuncFigureData);
+		  
+		  }
+	
+	/**
+	 * 
+	 * @param nameToSavePNG  name under which plot is saved in output path, e.g. plot.png
+	 * @param xy  load Series to be plotted next to constantLoad, peakLoad, readInLoad
+	 * @throws IOException
+	 */
+	public void plotLoadSeries(String nameToSavePNG, XYSeries xy) throws IOException{
 		  XYSeriesCollection dataset = new XYSeriesCollection();
-	      dataset.addSeries(loadFigureData);
-	      dataset.addSeries(loadFitFuncFigureData);
-	      dataset.addSeries(loadFitFuncFigureData24);
-	      dataset.addSeries(loadFitFuncFigureData48);
-	      
+		  dataset.addSeries(loadFigureData);
+		  dataset.addSeries(xy);
 	      dataset.addSeries(constantLoadFigureData);
 	      dataset.addSeries(peakLoadFigureData);
 	      
 		  JFreeChart chart = ChartFactory.createXYLineChart("Base Load [Watts] from File and approximated functions", "time in seconds", "Load", dataset, PlotOrientation.VERTICAL, true, true, false);
-		  ChartUtilities.saveChartAsPNG(new File(outputPath+ "baseLoadGraph.png") , chart, 800, 600);
+		  ChartUtilities.saveChartAsPNG(new File(outputPath+ nameToSavePNG) , chart, 800, 600);
 		 
-		  }
-	
+	}
 	
 	
 	/**
@@ -241,12 +280,11 @@ public class DecentralizedChargerInfo {
 		polyFit= new PolynomialFitter(degree, optimizer);
 		
 		for (int i=0;i<data.length;i++){
-			System.out.println("adding point "+ data[i][0]+", " +data[i][1]+" as element " + i);
+			//System.out.println("adding point "+ data[i][0]+", " +data[i][1]+" as element " + i);
 			polyFit.addObservedPoint(1.0,data[i][0], data[i][1] );
 		  }
-		PolynomialFunction poly;
-		
-			poly = polyFit.fit();
+		 
+		 PolynomialFunction poly = polyFit.fit();
 		
 		return poly;
 	}

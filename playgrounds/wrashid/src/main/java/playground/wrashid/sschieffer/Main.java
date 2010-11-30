@@ -91,7 +91,7 @@ public class Main {
 			@Override
 			public void notifyIterationEnds(IterationEndsEvent event) {
 				DecentralizedChargerV1 decentralizedChargerV1=new DecentralizedChargerV1(event.getControler(),Main.energyConsumptionPlugin,Main.parkingTimesPlugin);
-
+				
 				try {
 					
 					decentralizedChargerV1.performChargingAlgorithm();
