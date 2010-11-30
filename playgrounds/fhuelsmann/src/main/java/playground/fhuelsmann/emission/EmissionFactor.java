@@ -260,8 +260,8 @@ public class EmissionFactor  {
 		 				    FileWriter fstream = new FileWriter("../../detailedEval/teststrecke/sim/outputEmissions/out.txt");
 		 				        BufferedWriter out = new BufferedWriter(fstream);
 		 				        out.write("EnterTime \t travelTime \t AverageSpeed \t LinkId \t PersonId \tLinklength \tHbefaTypeNr \tVisumRoadTypeNr \t" + 
-		 				        		"EmissionsFactorBasedOnAverageSpeed \t NoxEmissionsFactorBasedOnAverageSpeed \t " +
-		 				        		"EmissionsBasedOnAverageSpeed \t EmissionsBasedOnFractions \t NoxEmissionsBasedOnFractions" + result);
+		 				        		"MKrEmissionsFactorBasedOnAverageSpeed \t NoxEmissionsBasedOnAverageSpeed \t " +
+		 				        		"MKrBasedOnAverageSpeed \t MKrBasedOnFractions \t NoxEmissionsBasedOnFractions" + result);
 		 				    //Close the output stream
 		 				    out.close();
 		 						}catch (Exception e){//Catch exception if any
@@ -304,10 +304,10 @@ public class EmissionFactor  {
 					+"\nLinklength : "+ length
 					+"\nHbefaTypeNr : "+ obj.getHbefa_Road_type()
 					+"\nVisumRoadTypeNr : " + obj.getVisumRoadType()
-					+"\nEmissionsFactorBasedOnAverageSpeed: " + obj.getEmissionFactor()
-					+"\nNoxEmissionsFactorBasedOnAverageSpeed: " + obj.getNoxEmissions()
-	 				+"\nEmissionsBasedOnAverageSpeed: " + obj.getEmissions()
-	 				+"\nEmissionsBasedOnFractions: " + obj.getEmissionFractions()
+					+"\nMKrEmissionsFactorBasedOnAverageSpeed: " + obj.getEmissionFactor()
+					+"\nNoxEmissionsBasedOnAverageSpeed: " + obj.getNoxEmissions()
+	 				+"\nMKrBasedOnAverageSpeed: " + obj.getEmissions()
+	 				+"\nMKrBasedOnFractions: " + obj.getEmissionFractions()
 	 				+"\nNoxEmissionsBasedOnFractions: " + obj.getNoxFractions());
 	 			
 	 				result = result +"\n"
@@ -335,8 +335,8 @@ public class EmissionFactor  {
 			    FileWriter fstream = new FileWriter("../../detailedEval/teststrecke/sim/outputEmissions/out_all.txt");
 			        BufferedWriter out = new BufferedWriter(fstream);
 			        out.write("EnterTime \t travelTime \t AverageSpeed \t LinkId \t PersonId \tLinklength \tHbefaTypeNr \tVisumRoadTypeNr \t" + 
-			        		"EmissionsFactorBasedOnAverageSpeed \t NoxEmissionsFactorBasedOnAverageSpeed \t " +
-			        		"EmissionsBasedOnAverageSpeed \t EmissionsBasedOnFractions \t NoxEmissionsBasedOnFractions" + result);
+			        		"MKrEmissionsFactorBasedOnAverageSpeed \t NoxEmissionsFactorBasedOnAverageSpeed \t " +
+			        		"MKrBasedOnAverageSpeed \t MKrBasedOnFractions \t NoxEmissionsBasedOnFractions" + result);
 			    //Close the output stream
 			    out.close();
 					}catch (Exception e){//Catch exception if any
