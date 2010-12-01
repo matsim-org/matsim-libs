@@ -57,7 +57,6 @@ public class CharyparNagelScoringConfigGroup extends Module {
 	@Deprecated // this will eventually be removed from core matsim; please find other ways to use this.  kai/benjamin, oct/10
 	private static final String MARGINAL_UTL_OF_DISTANCE_PT = "marginalUtlOfDistancePt";
 
-	@Deprecated // this will eventually be removed from core matsim; please find other ways to use this.  kai/benjamin, oct/10
 	private static final String MARGINAL_UTL_OF_DISTANCE_WALK = "marginalUtlOfDistanceWalk";
 	
 	private static final String MARGINAL_UTL_OF_MONEY = "marginalUtilityOfMoney" ;
@@ -86,11 +85,11 @@ public class CharyparNagelScoringConfigGroup extends Module {
 	private double traveling = -6.0;
 	private double travelingPt = -6.0;
 	private double travelingWalk = -6.0;
-	@Deprecated // this will eventually be removed from core matsim; please find other ways to use this.  kai/benjamin, oct/10
-	private double marginalUtlOfDistanceCar = 0.0;
-	@Deprecated // this will eventually be removed from core matsim; please find other ways to use this.  kai/benjamin, oct/10
-	private double marginalUtlOfDistancePt = 0.0;
-	@Deprecated // this will eventually be removed from core matsim; please find other ways to use this.  kai/benjamin, oct/10
+
+//	@Deprecated // this will eventually be removed from core matsim; please find other ways to use this.  kai/benjamin, oct/10
+//	private double marginalUtlOfDistanceCar = 0.0;
+//	@Deprecated // this will eventually be removed from core matsim; please find other ways to use this.  kai/benjamin, oct/10
+//	private double marginalUtlOfDistancePt = 0.0;
 	private double marginalUtlOfDistanceWalk = 0.0;
 
 	private double waiting = -0.0;
@@ -262,8 +261,8 @@ public class CharyparNagelScoringConfigGroup extends Module {
 		map.put(TRAVELING_PT, Double.toString(this.getTravelingPt()));
 		map.put(TRAVELING_WALK, Double.toString(this.getTravelingWalk()));
 		map.put(WAITING, Double.toString(this.getWaiting()));
-		map.put(MARGINAL_UTL_OF_DISTANCE_CAR, Double.toString(this.getMarginalUtlOfDistanceCar()));
-		map.put(MARGINAL_UTL_OF_DISTANCE_PT, Double.toString(this.getMarginalUtlOfDistancePt()));
+//		map.put(MARGINAL_UTL_OF_DISTANCE_CAR, Double.toString(this.getMarginalUtlOfDistanceCar()));
+//		map.put(MARGINAL_UTL_OF_DISTANCE_PT, Double.toString(this.getMarginalUtlOfDistancePt()));
 		map.put(MARGINAL_UTL_OF_DISTANCE_WALK, Double.toString(this.getMarginalUtlOfDistanceWalk()));
 		map.put(MARGINAL_UTL_OF_MONEY, Double.toString( this.getMarginalUtilityOfMoney() ) ) ;
 		map.put(MONETARY_DISTANCE_COST_RATE_CAR, Double.toString( this.getMonetaryDistanceCostRateCar() ) ) ;
@@ -290,7 +289,7 @@ public class CharyparNagelScoringConfigGroup extends Module {
 		map.put(PERFORMING,"[utils/hr] marginal utility of doing an activity.  normally positive.  also the opportunity cost of time if agent is doing nothing.");
 		map.put(TRAVELING, "[utils/hr] utility offset of traveling by car.  normally negative.  this comes on top of the opportunity cost of time") ;
 		map.put(TRAVELING_PT, "[utils/hr] utility offset of traveling by pt.  normally negative.  this comes on top of the opportunity cost of time") ;
-		map.put(TRAVELING_WALK, "[utils/hr] utility offset of traveling by foot.  normally negative.  this comes on top of the opportunity cost of time") ;
+		map.put(TRAVELING_WALK, "[utils/hr] utility offset of traveling by foot.  normally negative.  this comes on top of the opportunity cost of time.  also see marginalUtlOfDistanceWalk") ;
 		map.put(LATE_ARRIVAL, "[utils/hr] utility for arriving late (i.e. after the latest start time).  normally negative") ;
 		map.put(EARLY_DEPARTURE, "[utils/hr] utility for departing early (i.e. before the earliest end time).  Probably implemented correctly, but not tested." );
 		map.put(WAITING, "[utils/hr] utility offset for waiting.  this comes on top of the opportunity cost of time.  Probably implemented correctly, but not tested.") ;
@@ -299,7 +298,7 @@ public class CharyparNagelScoringConfigGroup extends Module {
 
 		map.put(MARGINAL_UTL_OF_DISTANCE_CAR, "DON'T USE THIS!  It is not clear if this is in [utils/m] or in [Eu/m]!") ;
 		map.put(MARGINAL_UTL_OF_DISTANCE_PT, "DON'T USE THIS!  It is not clear if this is in [utils/m] or in [Eu/m]!") ;
-		map.put(MARGINAL_UTL_OF_DISTANCE_WALK, "DON'T USE THIS!  It is not clear if this is in [utils/m] or in [Eu/m]!") ;
+		map.put(MARGINAL_UTL_OF_DISTANCE_WALK, "DISCOURAGED! [utils/m] utility of walking per m, normally negative.  this is on top of the time (dis)utility.  It is discouraged to use this but in some cases it may make sense.") ;
 		
 		map.put(MARGINAL_UTL_OF_MONEY, "[utils/unit_of_money] conversion of money (e.g. toll, distance cost) into utils" ) ;
 		map.put(MONETARY_DISTANCE_COST_RATE_CAR, "[unit_of_money/m] conversion of car distance into money" ) ;
@@ -420,15 +419,19 @@ public class CharyparNagelScoringConfigGroup extends Module {
 	}
 	/**
 	 * @return the marginal utility of distance for mode walk per meter
+	 * <p/>
+	 * It is discouraged to use this but in some cases it may make sense.  benjamin/kai, dec'10
 	 */
-	@Deprecated // this will eventually be removed from core matsim; please find other ways to use this.  kai/benjamin, oct/10
+	@Deprecated // not really deprecated, but discouraged.  benjamin/kai, dec'10
 	public double getMarginalUtlOfDistanceWalk() {
 		return this.marginalUtlOfDistanceWalk;
 	}
 	/**
 	 * @param marginalUtlOfDistanceWalk the marginal utility of distance for mode walk per meter
+	 * <p/>
+	 * It is discouraged to use this but in some cases it may make sense.  benjamin/kai, dec'10
 	 */
-	@Deprecated // this will eventually be removed from core matsim; please find other ways to use this.  kai/benjamin, oct/10
+	@Deprecated // not really deprecated, but discouraged.  benjamin/kai, dec'10
 	public void setMarginalUtlOfDistanceWalk(final double marginalUtlOfDistanceWalk) {
 		this.marginalUtlOfDistanceWalk = marginalUtlOfDistanceWalk;
 	}
@@ -438,28 +441,38 @@ public class CharyparNagelScoringConfigGroup extends Module {
 	 */
 	@Deprecated // this will eventually be removed from core matsim; please find other ways to use this.  kai/benjamin, oct/10
 	public double getMarginalUtlOfDistancePt() {
-		return this.marginalUtlOfDistancePt;
+//		return this.marginalUtlOfDistancePt;
+		return this.getMarginalUtilityOfMoney() * this.getMonetaryDistanceCostRatePt() ;
 	}
 	/**
 	 * @param marginalUtlOfDistancePt the marginal utility of distance for mode pt per meter
 	 */
 	@Deprecated // this will eventually be removed from core matsim; please find other ways to use this.  kai/benjamin, oct/10
 	public void setMarginalUtlOfDistancePt(final double marginalUtlOfDistancePt) {
-		this.marginalUtlOfDistancePt = marginalUtlOfDistancePt;
+//		this.marginalUtlOfDistancePt = marginalUtlOfDistancePt;
+		if ( marginalUtlOfDistancePt != 0. ) {
+			log.warn( "marginalUtlOfDistancePt is deprecated; setting monetaryDistanceCostRatePt instead.") ;
+			this.setMonetaryDistanceCostRatePt( marginalUtlOfDistancePt/this.getMarginalUtilityOfMoney() ) ;
+		}
 	}
 	/**
 	 * @return the marginal utility of distance for mode car per meter
 	 */
 	@Deprecated // this will eventually be removed from core matsim; please find other ways to use this.  kai/benjamin, oct/10
 	public double getMarginalUtlOfDistanceCar() {
-		return this.marginalUtlOfDistanceCar;
+//		return this.marginalUtlOfDistanceCar;
+		return this.getMarginalUtilityOfMoney() * this.getMonetaryDistanceCostRateCar() ;
 	}
 	/**
 	 * @param marginalUtlOfDistanceCar the marginal utility of distance for mode car per meter
 	 */
 	@Deprecated // this will eventually be removed from core matsim; please find other ways to use this.  kai/benjamin, oct/10
 	public void setMarginalUtlOfDistanceCar(final double marginalUtlOfDistanceCar) {
-		this.marginalUtlOfDistanceCar = marginalUtlOfDistanceCar;
+//		this.marginalUtlOfDistanceCar = marginalUtlOfDistanceCar;
+		if ( marginalUtlOfDistanceCar != 0. ) {
+			log.warn( "marginalUtlOfDistanceCar is deprecated; setting monetaryDistanceCostRateCar instead") ;
+			this.setMonetaryDistanceCostRateCar( marginalUtlOfDistanceCar/this.getMarginalUtilityOfMoney() ) ;
+		}
 	}
 
 	public double getWaiting() {

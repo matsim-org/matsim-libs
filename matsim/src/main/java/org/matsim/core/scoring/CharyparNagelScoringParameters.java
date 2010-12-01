@@ -38,11 +38,12 @@ public class CharyparNagelScoringParameters implements MatsimParameters {
 	public final double marginalUtilityOfPerforming_s;
 
 	@Deprecated
-	public final double marginalUtilityOfDistanceCar;
+	public final double marginalUtilityOfDistanceCar_m;
 	@Deprecated
-	public final double marginalUtilityOfDistancePt;
-	@Deprecated
-	public final double marginalUtilityOfDistanceWalk;
+	public final double marginalUtilityOfDistancePt_m;
+
+	@Deprecated // not really deprecated, but discouraged.  benjamin/kai, dec'10
+	public final double marginalUtilityOfDistanceWalk_m;
 
 	public final double abortedPlanScore;
 
@@ -58,9 +59,10 @@ public class CharyparNagelScoringParameters implements MatsimParameters {
 		marginalUtilityOfTravelingWalk_s = config.getTravelingWalk() / 3600.0;
 		marginalUtilityOfPerforming_s = config.getPerforming() / 3600.0;
 
-		marginalUtilityOfDistanceCar = config.getMarginalUtlOfDistanceCar();
-		marginalUtilityOfDistancePt = config.getMarginalUtlOfDistancePt();
-		marginalUtilityOfDistanceWalk = config.getMarginalUtlOfDistanceWalk();
+		marginalUtilityOfDistanceCar_m = config.getMarginalUtlOfDistanceCar();
+		marginalUtilityOfDistancePt_m = config.getMarginalUtlOfDistancePt();
+
+		marginalUtilityOfDistanceWalk_m = config.getMarginalUtlOfDistanceWalk();
 
 		abortedPlanScore = Math.min(
 				Math.min(marginalUtilityOfLateArrival_s, marginalUtilityOfEarlyDeparture_s),

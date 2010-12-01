@@ -96,7 +96,7 @@ public class LegScoringFunction implements LegScoring, BasicScoring {
 		double dist = 0.0; // distance in meters
 
 		if (TransportMode.car.equals(leg.getMode())) {
-			if (this.params.marginalUtilityOfDistanceCar != 0.0) {
+			if (this.params.marginalUtilityOfDistanceCar_m != 0.0) {
 				Route route = leg.getRoute();
 				dist = route.getDistance();
 				if ( distanceWrnCnt<1 ) {
@@ -117,24 +117,24 @@ public class LegScoringFunction implements LegScoring, BasicScoring {
 					distanceWrnCnt++ ;
 				}
 			}
-			tmpScore += travelTime * this.params.marginalUtilityOfTraveling_s + this.params.marginalUtilityOfDistanceCar * dist;
+			tmpScore += travelTime * this.params.marginalUtilityOfTraveling_s + this.params.marginalUtilityOfDistanceCar_m * dist;
 		} else if (TransportMode.pt.equals(leg.getMode())) {
-			if (this.params.marginalUtilityOfDistancePt != 0.0) {
+			if (this.params.marginalUtilityOfDistancePt_m != 0.0) {
 				dist = leg.getRoute().getDistance();
 			}
-			tmpScore += travelTime * this.params.marginalUtilityOfTravelingPT_s + this.params.marginalUtilityOfDistancePt * dist;
+			tmpScore += travelTime * this.params.marginalUtilityOfTravelingPT_s + this.params.marginalUtilityOfDistancePt_m * dist;
 		} else if (TransportMode.walk.equals(leg.getMode())
 				|| TransportMode.transit_walk.equals(leg.getMode())) {
-			if (this.params.marginalUtilityOfDistanceWalk != 0.0) {
+			if (this.params.marginalUtilityOfDistanceWalk_m != 0.0) {
 				dist = leg.getRoute().getDistance();
 			}
-			tmpScore += travelTime * this.params.marginalUtilityOfTravelingWalk_s + this.params.marginalUtilityOfDistanceWalk * dist;
+			tmpScore += travelTime * this.params.marginalUtilityOfTravelingWalk_s + this.params.marginalUtilityOfDistanceWalk_m * dist;
 		} else {
-			if (this.params.marginalUtilityOfDistanceCar != 0.0) {
+			if (this.params.marginalUtilityOfDistanceCar_m != 0.0) {
 				dist = leg.getRoute().getDistance();
 			}
 			// use the same values as for "car"
-			tmpScore += travelTime * this.params.marginalUtilityOfTraveling_s + this.params.marginalUtilityOfDistanceCar * dist;
+			tmpScore += travelTime * this.params.marginalUtilityOfTraveling_s + this.params.marginalUtilityOfDistanceCar_m * dist;
 		}
 
 		return tmpScore;
