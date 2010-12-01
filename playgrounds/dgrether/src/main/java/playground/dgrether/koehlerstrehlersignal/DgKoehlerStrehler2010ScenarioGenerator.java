@@ -67,7 +67,7 @@ public class DgKoehlerStrehler2010ScenarioGenerator {
 	
 	private static final Logger log = Logger.getLogger(DgKoehlerStrehler2010ScenarioGenerator.class);
 	
-	private String baseDir = DgPaths.STUDIESDG + "koehlerStrehler2010/scenario2/";
+	private String baseDir = DgPaths.STUDIESDG + "koehlerStrehler2010/scenario4/";
 	
 	private String networkOutfile = baseDir +  "network.xml";
 
@@ -146,8 +146,8 @@ public class DgKoehlerStrehler2010ScenarioGenerator {
 			settings1.setDropping(this.dropping1);
 			SignalGroupSettingsData settings2 = control.getFactory().createSignalGroupSettingsData(id2);
 			plan.addSignalGroupSettings(settings2);
-			settings2.setOnset(this.onset2);
-			settings2.setDropping(this.dropping2);
+			settings2.setOnset(this.onset1);
+			settings2.setDropping(this.dropping1);
 		}
 		ids.clear();
 		ids.add(id7);
@@ -162,8 +162,8 @@ public class DgKoehlerStrehler2010ScenarioGenerator {
 			plan.setOffset(0);
 			SignalGroupSettingsData settings1 = control.getFactory().createSignalGroupSettingsData(id1);
 			plan.addSignalGroupSettings(settings1);
-			settings1.setOnset(this.onset2);
-			settings1.setDropping(this.dropping2);
+			settings1.setOnset(this.onset1);
+			settings1.setDropping(this.dropping1);
 			SignalGroupSettingsData settings2 = control.getFactory().createSignalGroupSettingsData(id2);
 			plan.addSignalGroupSettings(settings2);
 			settings2.setOnset(this.onset1);
