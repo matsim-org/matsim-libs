@@ -226,26 +226,27 @@ public class EmissionFactor  {
 		 				value.push(obj);
 		 			//	map.entrySet.put(obj.getPersonal_id(), value);
 		 				
+
 		 				
 		 				String activity = obj.getActivity();
-		 				String travelTimeString = obj.getTravelTime();
-		 				String enterTime = obj.getEnterTime();
+		 				double travelTime = obj.getTravelTime();
+		 				double enterTime = obj.getEnterTime();
 		 				double v_mean = obj.getAverageSpeed();
-		 				String Person_id = obj.getPersonal_id();
-		 				String Link_id = obj.getLink_id();
+		 				Id Person_id = obj.getPersonal_id();
+		 				Id Link_id = obj.getLink_id();
 		 				double length = obj.getLinkLength();
 		 				int freeVelocity =obj.getfreeVelocity();
 		 				
 		 				result = result +"\n"
 		 				+ enterTime
-		 				+"\t" + travelTimeString 
+		 				+"\t" + travelTime
 						+"\t" + v_mean
 						+"\t" + Link_id 
 						+"\t" + Person_id 
 						+"\t" + length
 		 				+"\t" + obj.getHbefa_Road_type()
 		//				+"\t" + obj.getVisum_road_Section_Nr()
-						+"\t" + obj.getVisumRoadType()
+						+"\t" + obj.getRoadType()
 						+"\t" + obj.getEmissionFactor()
 						+"\t" + obj.getNoxEmissions()
 						+"\t" + obj.getEmissions()
@@ -260,14 +261,15 @@ public class EmissionFactor  {
 		 				    FileWriter fstream = new FileWriter("../../detailedEval/teststrecke/sim/outputEmissions/out.txt");
 		 				        BufferedWriter out = new BufferedWriter(fstream);
 		 				        out.write("EnterTime \t travelTime \t AverageSpeed \t LinkId \t PersonId \tLinklength \tHbefaTypeNr \tVisumRoadTypeNr \t" + 
-		 				        		"MKrEmissionsFactorBasedOnAverageSpeed \t NoxEmissionsBasedOnAverageSpeed \t " +
-		 				        		"MKrBasedOnAverageSpeed \t MKrBasedOnFractions \t NoxEmissionsBasedOnFractions" + result);
+		 				        		"CO2EmissionsFactorBasedOnAverageSpeed \t NoxEmissionsBasedOnAverageSpeed \t " +
+		 				        		"CO2EmissionsBasedOnAverageSpeed \t CO2EmissionsBasedOnFractions \t NoxEmissionsBasedOnFractions" + result);
 		 				    //Close the output stream
 		 				    out.close();
 		 						}catch (Exception e){//Catch exception if any
 		 							System.err.println("Error: " + e.getMessage());
 		 				    }
 		 				 												 				
+
 		 		   }
 		    }
 	}

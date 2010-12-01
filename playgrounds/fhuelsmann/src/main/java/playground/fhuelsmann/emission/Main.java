@@ -77,6 +77,7 @@ public class Main {
 		hbefaTable.makeHabefaTable(Hbefa_Traffic);
 		HbefaVisum hbefaVisum = new HbefaVisum(handler.getTravelTimes());
 		hbefaVisum.creatRoadTypes(visumRoadHebefaRoadFile);
+		hbefaVisum.printHbefaVisum();
 		hbefaVisum.createMapWithHbefaRoadTypeNumber();	
 		
 		EmissionFactor emissionFactor = new EmissionFactor(hbefaVisum.map,hbefaTable.getHbefaTableWithSpeedAndEmissionFactor());
