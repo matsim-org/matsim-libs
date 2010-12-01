@@ -32,7 +32,7 @@ public class PenaltyLinkCostCalculator implements TravelCost{
 		this.tc = tc;
 		this.sc = sc;
 	}
-	public double getLinkTravelCost(Link link, double time) {
+	public double getLinkGeneralizedTravelCost(Link link, double time) {
 		return this.tc.getLinkTravelTime(link, time) + this.sc.getLinkPenalty(link, time);
 	}
 	

@@ -386,8 +386,8 @@ public class DaganzoScenarioGenerator {
 		}
 
 		// configure scoring for plans
-		config.charyparNagelScoring().setLateArrival(0.0);
-		config.charyparNagelScoring().setPerforming(0.0);
+		config.charyparNagelScoring().setLateArrival_utils_hr(0.0);
+		config.charyparNagelScoring().setPerforming_utils_hr(0.0);
 		// this is unfortunately not working at all....
 		ActivityParams homeParams = new ActivityParams("h");
 		// homeParams.setOpeningTime(0);

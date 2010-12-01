@@ -86,13 +86,17 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		Config config = super.loadConfig(null);
 		CharyparNagelScoringConfigGroup scoring = config.charyparNagelScoring();
 		scoring.setBrainExpBeta(2.0);
-		scoring.setLateArrival(0.0);
-		scoring.setEarlyDeparture(-6.0);
-		scoring.setPerforming(+6.0);
-		scoring.setTraveling(0.0);
-		scoring.setTravelingPt(0.0);
-		scoring.setMarginalUtlOfDistanceCar(0.0);
-		scoring.setWaiting(0.0);
+		scoring.setLateArrival_utils_hr(0.0);
+		scoring.setEarlyDeparture_utils_hr(-6.0);
+		scoring.setPerforming_utils_hr(+6.0);
+		scoring.setTraveling_utils_hr(0.0);
+		scoring.setTravelingPt_utils_hr(0.0);
+
+//		scoring.setMarginalUtlOfDistanceCar(0.0);
+		scoring.setMonetaryDistanceCostRateCar(0.0) ;
+		scoring.setMarginalUtilityOfMoney(1.) ;
+
+		scoring.setWaiting_utils_hr(0.0);
 
 		config.planomat().setDoLogging(false);
 

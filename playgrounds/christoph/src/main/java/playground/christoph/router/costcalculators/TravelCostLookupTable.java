@@ -51,7 +51,7 @@ public class TravelCostLookupTable implements TravelCost, LookupTable, Cloneable
 		return this.useLookupTable;
 	}
 	
-	public double getLinkTravelCost(Link link, double time)
+	public double getLinkGeneralizedTravelCost(Link link, double time)
 	{
 		if(useLookupTable)
 		{
@@ -59,7 +59,7 @@ public class TravelCostLookupTable implements TravelCost, LookupTable, Cloneable
 		}
 		else 
 		{
-			return travelCostCalculator.getLinkTravelCost(link, time);
+			return travelCostCalculator.getLinkGeneralizedTravelCost(link, time);
 		}
 	}
 	
@@ -69,7 +69,7 @@ public class TravelCostLookupTable implements TravelCost, LookupTable, Cloneable
 		
 		for (Link link : network.getLinks().values())
 		{
-			lookupTable.put(link.getId(), travelCostCalculator.getLinkTravelCost(link, time));
+			lookupTable.put(link.getId(), travelCostCalculator.getLinkGeneralizedTravelCost(link, time));
 		}
 	}
 	
@@ -87,7 +87,7 @@ public class TravelCostLookupTable implements TravelCost, LookupTable, Cloneable
 				for (Id id : links2Update.keySet())
 				{
 					Link link = network.getLinks().get(id);
-					lookupTable.put(id, travelCostCalculator.getLinkTravelCost(link, time));
+					lookupTable.put(id, travelCostCalculator.getLinkGeneralizedTravelCost(link, time));
 				}
 				lastUpdate = time;
 			}

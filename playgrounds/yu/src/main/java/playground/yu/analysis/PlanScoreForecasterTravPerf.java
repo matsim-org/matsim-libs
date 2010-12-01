@@ -83,7 +83,7 @@ public class PlanScoreForecasterTravPerf {
 		this.scoring = scoring;
 		this.betaTraveling = betaTraveling;
 		this.betaTravelingPt = betaTravelingPt;
-		this.betaPerforming = scoring.getPerforming();
+		this.betaPerforming = scoring.getPerforming_utils_hr();
 	}
 
 	public PlanScoreForecasterTravPerf(Plan selectedPlan, Plan oldSelected,

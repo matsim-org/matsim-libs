@@ -18,8 +18,13 @@ public class FtTravelTimeDistanceCostCalculator
   public FtTravelTimeDistanceCostCalculator(TravelTime timeCalculator, CharyparNagelScoringConfigGroup cnScoringGroup, FtConfigGroup ftConfigGroup)
   {
     this.timeCalculator = timeCalculator;
-    this.travelCostFactor = (-cnScoringGroup.getTraveling() / 3600.0D + cnScoringGroup.getPerforming() / 3600.0D);
-    this.marginalUtlOfDistance = (ftConfigGroup.getDistanceCostCar() / 1000.0D * cnScoringGroup.getMarginalUtlOfDistanceCar());
+    this.travelCostFactor = (-cnScoringGroup.getTraveling_utils_hr() / 3600.0D + cnScoringGroup.getPerforming_utils_hr() / 3600.0D);
+
+//    this.marginalUtlOfDistance = (ftConfigGroup.getDistanceCostCar() / 1000.0D * cnScoringGroup.getMarginalUtlOfDistanceCar());
+    this.marginalUtlOfDistance = (ftConfigGroup.getDistanceCostCar() / 1000.0D * cnScoringGroup.getMonetaryDistanceCostRateCar() 
+    		* cnScoringGroup.getMarginalUtilityOfMoney() );
+    throw new RuntimeException("this is the exact translation but I am not sure what this means maybe check.  kai, dec'10") ;
+    
   }
 
   public double getLinkMinimumTravelCost(Link link) {
@@ -28,7 +33,7 @@ public class FtTravelTimeDistanceCostCalculator
       this.marginalUtlOfDistance * link.getLength()));
   }
 
-  public double getLinkTravelCost(Link link, double time) {
+  public double getLinkGeneralizedTravelCost(Link link, double time) {
     double travelTime = this.timeCalculator.getLinkTravelTime(link, time);
     return (travelTime * this.travelCostFactor - (this.marginalUtlOfDistance * link.getLength()));
   }

@@ -50,7 +50,7 @@ public class KnowledgeTravelCostWrapper implements PersonalizableTravelCost, Clo
 		}
 	}
 	
-	public double getLinkTravelCost(final Link link, final double time) 
+	public double getLinkGeneralizedTravelCost(final Link link, final double time) 
 	{	
 		NodeKnowledge nodeKnowledge = null;
 		if (checkNodeKnowledge && person != null)
@@ -68,7 +68,7 @@ public class KnowledgeTravelCostWrapper implements PersonalizableTravelCost, Clo
 		else
 		{
 //			log.info("Get Costs from TravelCostCalculator");
-			return travelCostCalculator.getLinkTravelCost(link, time);
+			return travelCostCalculator.getLinkGeneralizedTravelCost(link, time);
 		}
 	}
 	

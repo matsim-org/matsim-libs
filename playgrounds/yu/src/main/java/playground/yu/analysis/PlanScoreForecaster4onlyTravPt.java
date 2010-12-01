@@ -68,9 +68,9 @@ public class PlanScoreForecaster4onlyTravPt {
 		this.net = net;
 		this.ttc = tt;
 		this.scoring = scoring;
-		this.betaTraveling = scoring.getTraveling();
+		this.betaTraveling = scoring.getTraveling_utils_hr();
 		this.betaTravelingPt = betaTravelingPt;
-		this.betaPerforming = scoring.getPerforming();
+		this.betaPerforming = scoring.getPerforming_utils_hr();
 	}
 
 	public PlanScoreForecaster4onlyTravPt(Plan selectedPlan, Plan oldSelected,

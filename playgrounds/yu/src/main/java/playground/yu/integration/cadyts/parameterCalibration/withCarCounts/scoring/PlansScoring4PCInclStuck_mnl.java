@@ -64,11 +64,11 @@ public class PlansScoring4PCInclStuck_mnl extends PlansScoring4PC implements
 				"attributeCount"));
 		CharyparNagelScoringConfigGroup scoringCfg = config
 				.charyparNagelScoring();
-		double traveling = scoringCfg.getTraveling(), // 
-		travelingPt = scoringCfg.getTravelingPt(), //
-		performing = scoringCfg.getPerforming(), // 
+		double traveling = scoringCfg.getTraveling_utils_hr(), // 
+		travelingPt = scoringCfg.getTravelingPt_utils_hr(), //
+		performing = scoringCfg.getPerforming_utils_hr(), // 
 		brainExpBeta = scoringCfg.getBrainExpBeta(), //
-		lateArrival = scoringCfg.getLateArrival();
+		lateArrival = scoringCfg.getLateArrival_utils_hr();
 
 		// initialize MultinomialLogit
 		MultinomialLogit mnl = new MultinomialLogit(choiceSetSize/* 1 */,

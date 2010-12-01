@@ -68,9 +68,9 @@ public class SubNetworkDijkstraTravelCostWrapper implements PersonalizableTravel
 		}
 	}
 
-	public double getLinkTravelCost(Link link, double time)
+	public double getLinkGeneralizedTravelCost(Link link, double time)
 	{
-		return travelCost.getLinkTravelCost(link, time);
+		return travelCost.getLinkGeneralizedTravelCost(link, time);
 	}
 	
 	@Override

@@ -557,7 +557,7 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 			if (tmpNode.equals(tmpLink.getToNode())) {
 				tmp += waited.get(tmpLink.getFromNode());
 				newFlow.get(tmpLink).augmentreverse(tmp, gamma);
-				tmp -= length.getLinkTravelCost(tmpLink, 0.);
+				tmp -= length.getLinkGeneralizedTravelCost(tmpLink, 0.);
 				node = tmpLink.getFromNode();
 			}
 			// forward edge
@@ -565,7 +565,7 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 				tmp += waited.get(tmpLink.getToNode());
 				newFlow.get(tmpLink).augment(tmp, gamma,
 						(int) (tmpLink.getCapacity()));
-				tmp += length.getLinkTravelCost(tmpLink, 0.);
+				tmp += length.getLinkGeneralizedTravelCost(tmpLink, 0.);
 				node = tmpLink.getToNode();
 			} else {
 				System.out.println("Error with LinkedList path!");
@@ -616,7 +616,7 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 
 				// compute new distance to neighbor
 				if (!Dists.getDistance(v).equals(Integer.MAX_VALUE)) {
-					dist = (int) length.getLinkTravelCost(link, 1.)
+					dist = (int) length.getLinkGeneralizedTravelCost(link, 1.)
 							+ Dists.getDistance(v);
 				} else {
 					dist = Integer.MAX_VALUE;
@@ -652,7 +652,7 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 								//System.out.println("tmpInt == null? " + (tmpInt == null));
 								//System.out.println("tmpInt == Intervall of Dists(v) " + (tmpInt.equals(flow.get(link).getIntervallAt(Dists.getDistance(v)))));
 								if (!(tmpInt == null) && !(tmpInt.equals(flow.get(link).getIntervallAt(Dists.getDistance(v))))) {
-									int t = tmpInt.getLowBound() + (int) (length.getLinkTravelCost(link, 1));
+									int t = tmpInt.getLowBound() + (int) (length.getLinkGeneralizedTravelCost(link, 1));
 									//System.out.println("Dist: " + Dists.getDistance(w));
 									//System.out.println("t: " + t);
 									if (Dists.getDistance(w) > t) {
@@ -669,7 +669,7 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 								}
 							}
 							else if(tmpInt.getFlow() < link.getCapacity()){
-								int t = tmpInt.getLowBound() + (int) (length.getLinkTravelCost(link, 1));
+								int t = tmpInt.getLowBound() + (int) (length.getLinkGeneralizedTravelCost(link, 1));
 								//System.out.println("Dist: " + Dists.getDistance(w));
 								//System.out.println("t: " + t);
 								//System.out.println("last intervall");
@@ -696,7 +696,7 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 				// compute new distance to neighbor
 				if (!Dists.getDistance(v).equals(Integer.MAX_VALUE)) {
 					dist = Dists.getDistance(v)
-							- (int) length.getLinkTravelCost(link, 1.);
+							- (int) length.getLinkGeneralizedTravelCost(link, 1.);
 				} else {
 					dist = Integer.MAX_VALUE;
 				}
@@ -730,7 +730,7 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 								}
 								if (tmpInt.equals(flow.get(link).getLast())) {
 									if(tmpInt.getFlow() > 0){
-										t = tmpInt.getLowBound() + (int) (length.getLinkTravelCost(link, 1));
+										t = tmpInt.getLowBound() + (int) (length.getLinkGeneralizedTravelCost(link, 1));
 										if (Dists.getDistance(w) > t) {
 										//System.out.println("backward else");
 										visitNode(v, w, t);
@@ -744,7 +744,7 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 										}
 									}
 								} else if(tmpInt.getFlow() > 0) {
-									t = tmpInt.getLowBound() + (int) (length.getLinkTravelCost(link, 1));
+									t = tmpInt.getLowBound() + (int) (length.getLinkGeneralizedTravelCost(link, 1));
 									if (flow.get(link).getFlowAt(t) > 0) {
 										if (Dists.getDistance(w) > t) {
 											visitNode(v, w, t);
@@ -953,7 +953,7 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 					if (gamma > flow.get(tmpLink).getFlowAt(tmp)) {
 						gamma = flow.get(tmpLink).getFlowAt(tmp);
 					}
-					tmp -= length.getLinkTravelCost(tmpLink, 0.);
+					tmp -= length.getLinkGeneralizedTravelCost(tmpLink, 0.);
 				}
 				// forward edge
 				else if (tmpNode.equals(tmpLink.getFromNode())) {
@@ -964,7 +964,7 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 						gamma = (int) (tmpLink.getCapacity())
 								- flow.get(tmpLink).getFlowAt(tmp);
 					}
-					tmp += length.getLinkTravelCost(tmpLink, 0.);
+					tmp += length.getLinkGeneralizedTravelCost(tmpLink, 0.);
 				}
 			} else {
 				System.out

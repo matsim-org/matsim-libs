@@ -408,7 +408,7 @@ public class FastDijkstra extends Dijkstra {
 			final double currCost, final DijkstraNode toNode) {
 
 		double travelTime = this.timeFunction.getLinkTravelTime(l.getLink(), currTime);
-		double travelCost = this.costFunction.getLinkTravelCost(l.getLink(), currTime);
+		double travelCost = this.costFunction.getLinkGeneralizedTravelCost(l.getLink(), currTime);
 		double nCost = dijkstraNode.getCost();
 		if (!dijkstraNode.isVisited(getIterationId()))
 		{

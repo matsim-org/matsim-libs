@@ -61,7 +61,7 @@ public class ActivitySwitcher {
 		router = new Dijkstra(network, new TravelCost() {
 			
 			@Override
-			public double getLinkTravelCost(Link link, double time) {
+			public double getLinkGeneralizedTravelCost(Link link, double time) {
 				return travelTime.getLinkTravelTime(link, time);
 			}
 		}, travelTime);

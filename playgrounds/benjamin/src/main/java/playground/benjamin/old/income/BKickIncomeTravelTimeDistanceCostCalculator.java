@@ -50,16 +50,18 @@ public class BKickIncomeTravelTimeDistanceCostCalculator implements Personalizab
 		/* Usually, the travel-utility should be negative (it's a disutility)
 		 * but the cost should be positive. Thus negate the utility.
 		 */
-		this.travelCostFactor = (- charyparNagelScoring.getTraveling() / 3600.0) + (charyparNagelScoring.getPerforming() / 3600.0);
-		this.marginalUtlOfDistance = charyparNagelScoring.getMarginalUtlOfDistanceCar() * 1.31;
+		this.travelCostFactor = (- charyparNagelScoring.getTraveling_utils_hr() / 3600.0) + (charyparNagelScoring.getPerforming_utils_hr() / 3600.0);
+
+//		this.marginalUtlOfDistance = charyparNagelScoring.getMarginalUtlOfDistanceCar() * 1.31;
+		this.marginalUtlOfDistance = charyparNagelScoring.getMonetaryDistanceCostRateCar() * 1.31 * charyparNagelScoring.getMarginalUtilityOfMoney() ;
 		
 		log.info("Using BKickIncomeTravelTimeDistanceCostCalculator...");
 	}
 
 	/**
-	 * @see org.matsim.core.router.util.TravelCost#getLinkTravelCost(org.matsim.core.network.LinkImpl, double)
+	 * @see org.matsim.core.router.util.TravelCost#getLinkGeneralizedTravelCost(org.matsim.core.network.LinkImpl, double)
 	 */
-	public double getLinkTravelCost(Link link, double time) {
+	public double getLinkGeneralizedTravelCost(Link link, double time) {
 		double travelTime = this.timeCalculator.getLinkTravelTime(link, time);
 		if (this.marginalUtlOfDistance == 0.0) {
 			return travelTime * this.travelCostFactor;

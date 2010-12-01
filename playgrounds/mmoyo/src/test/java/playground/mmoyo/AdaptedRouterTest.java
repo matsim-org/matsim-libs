@@ -41,7 +41,7 @@ public class AdaptedRouterTest extends MatsimTestCase {
 		//only transit links without transfer
 		double accumTime=28800;  //8:00am first departure
 		for (Link link : adaptedTransitRouter.getTransitRouterNetwork().getLinks().values()){
-			double travelCost = adaptedTravelTimeCost.getLinkTravelCost(link, accumTime);
+			double travelCost = adaptedTravelTimeCost.getLinkGeneralizedTravelCost(link, accumTime);
 			double travelTime = adaptedTravelTimeCost.getLinkTravelTime(link, accumTime);
 			assertEquals(travelCost, -travelTime * myConfig.marginalUtilityOfTravelTimeTransit - link.getLength() * myConfig.marginalUtilityOfTravelDistanceTransit);
 			accumTime += travelTime;

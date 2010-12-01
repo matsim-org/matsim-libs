@@ -241,7 +241,7 @@ public class NetworkLoaderImpl implements NetworkLoader {
 
 	private boolean isRemovalValid(Node node) {
 		for (Link l : this.removedLinks.get(node)) {
-			double c = this.cost.getLinkTravelCost(l, 0);
+			double c = this.cost.getLinkGeneralizedTravelCost(l, 0);
 			Path path = this.router.calcLeastCostPath(l.getFromNode(), l.getToNode(), 0);
 			//				if ((path.travelCost  >= c * OVER_LENGTH) && (path.travelCost  >= c+OVER_LENGTHII)) {
 			if (path == null || path.travelCost  >= c+OVER_LENGTHII) {

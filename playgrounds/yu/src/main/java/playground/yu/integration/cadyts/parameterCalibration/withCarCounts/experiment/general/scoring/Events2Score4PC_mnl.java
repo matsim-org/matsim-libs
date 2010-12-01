@@ -337,10 +337,10 @@ public class Events2Score4PC_mnl extends Events2Score4PC implements
 				PCCtlListener.BSE_CONFIG_MODULE_NAME, "attributeCount"));
 
 		CharyparNagelScoringConfigGroup scoring = config.charyparNagelScoring();
-		double traveling = scoring.getTraveling();
-		double betaStuck = Math.min(Math.min(scoring.getLateArrival(), scoring
-				.getEarlyDeparture()), Math
-				.min(traveling, scoring.getWaiting()));
+		double traveling = scoring.getTraveling_utils_hr();
+		double betaStuck = Math.min(Math.min(scoring.getLateArrival_utils_hr(), scoring
+				.getEarlyDeparture_utils_hr()), Math
+				.min(traveling, scoring.getWaiting_utils_hr()));
 
 		// initialize MultinomialLogit
 		MultinomialLogit mnl = new MultinomialLogit(choiceSetSize,// =4
@@ -354,21 +354,25 @@ public class Events2Score4PC_mnl extends Events2Score4PC implements
 		// travelTime
 		mnl.setCoefficient(attrNameList.indexOf("traveling"), traveling);
 		mnl.setCoefficient(attrNameList.indexOf("travelingPt"), scoring
-				.getTravelingPt());
+				.getTravelingPt_utils_hr());
 		mnl.setCoefficient(attrNameList.indexOf("travelingWalk"), scoring
-				.getTravelingWalk());
+				.getTravelingWalk_utils_hr());
 
 		//		
 		mnl.setCoefficient(attrNameList.indexOf("performing"), scoring
-				.getPerforming());
+				.getPerforming_utils_hr());
 		//
 		mnl.setCoefficient(attrNameList.indexOf("stuck"), betaStuck);
 
 		// distances
 		mnl.setCoefficient(attrNameList.indexOf("marginalUtlOfDistanceCar"),
-				scoring.getMarginalUtlOfDistanceCar());
+//				scoring.getMarginalUtlOfDistanceCar());
+				scoring.getMonetaryDistanceCostRateCar() * scoring.getMarginalUtilityOfMoney() ) ;
+
 		mnl.setCoefficient(attrNameList.indexOf("marginalUtlOfDistancePt"),
-				scoring.getMarginalUtlOfDistancePt());
+//				scoring.getMarginalUtlOfDistancePt());
+				scoring.getMonetaryDistanceCostRatePt() * scoring.getMarginalUtilityOfMoney() ) ;
+		
 		mnl.setCoefficient(attrNameList.indexOf("marginalUtlOfDistanceWalk"),
 				scoring.getMarginalUtlOfDistanceWalk());
 

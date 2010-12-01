@@ -146,8 +146,8 @@ public class CalculateTravelTimes {
 				 */
 				if (fromLink.getFromNode().getId().equals(toLink.getToNode().getId())) {
 					
-					double fromCosts = 0.5 * travelCost.getLinkTravelCost(fromLink, 0.0);
-					double toCosts = 0.5 * travelCost.getLinkTravelCost(fromLink, 0.0);
+					double fromCosts = 0.5 * travelCost.getLinkGeneralizedTravelCost(fromLink, 0.0);
+					double toCosts = 0.5 * travelCost.getLinkGeneralizedTravelCost(fromLink, 0.0);
 					double costs = fromDistance/connectorSpeed + fromCosts + toCosts + toDistance/connectorSpeed;
 					travelTimes[from][to] = costs;
 					to++;
@@ -167,12 +167,12 @@ public class CalculateTravelTimes {
 				double pathTravelCost = path.travelCost;
 				if (links != null) {
 					boolean fromLinkIncluded = links.get(0).getId().equals(fromLink.getId());
-					if (fromLinkIncluded) pathTravelCost = pathTravelCost - 0.5 * travelCost.getLinkTravelCost(fromLink, 0.0);
-					else pathTravelCost = pathTravelCost + 0.5 * travelCost.getLinkTravelCost(fromLink, 0.0);
+					if (fromLinkIncluded) pathTravelCost = pathTravelCost - 0.5 * travelCost.getLinkGeneralizedTravelCost(fromLink, 0.0);
+					else pathTravelCost = pathTravelCost + 0.5 * travelCost.getLinkGeneralizedTravelCost(fromLink, 0.0);
 						
 					boolean toLinkIncluded = links.get(links.size() - 1).getId().equals(toLink.getId());
-					if (toLinkIncluded) pathTravelCost = pathTravelCost - 0.5 * travelCost.getLinkTravelCost(toLink, 0.0);
-					else pathTravelCost = pathTravelCost + 0.5 * travelCost.getLinkTravelCost(toLink, 0.0);
+					if (toLinkIncluded) pathTravelCost = pathTravelCost - 0.5 * travelCost.getLinkGeneralizedTravelCost(toLink, 0.0);
+					else pathTravelCost = pathTravelCost + 0.5 * travelCost.getLinkGeneralizedTravelCost(toLink, 0.0);
 				}
 				
 				double costs = fromDistance/connectorSpeed + pathTravelCost + toDistance/connectorSpeed;
@@ -301,7 +301,7 @@ public class CalculateTravelTimes {
 			// nothing to do here
 		}
 
-		public double getLinkTravelCost(Link link, double time) {
+		public double getLinkGeneralizedTravelCost(Link link, double time) {
 			return travelTime.getLinkTravelTime(link, time);
 		}
 

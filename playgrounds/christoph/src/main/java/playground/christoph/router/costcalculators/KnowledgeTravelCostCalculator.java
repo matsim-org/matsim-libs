@@ -44,8 +44,10 @@ public class KnowledgeTravelCostCalculator implements PersonalizableTravelCost {
 		/* Usually, the travel-utility should be negative (it's a disutility)
 		 * but the cost should be positive. Thus negate the utility.
 		 */
-		this.travelCostFactor = -config.getTraveling() / 3600.0;
-		this.marginalUtlOfDistance = config.getMarginalUtlOfDistanceCar();
+		this.travelCostFactor = -config.getTraveling_utils_hr() / 3600.0;
+
+//		this.marginalUtlOfDistance = config.getMarginalUtlOfDistanceCar();
+		this.marginalUtlOfDistance = config.getMonetaryDistanceCostRateCar() * config.getMarginalUtilityOfMoney() ;
 
 		knowledgeTools = new KnowledgeTools();
 	}
@@ -56,7 +58,7 @@ public class KnowledgeTravelCostCalculator implements PersonalizableTravelCost {
 	}
 
 	@Override
-	public double getLinkTravelCost(final Link link, final double time) {
+	public double getLinkGeneralizedTravelCost(final Link link, final double time) {
 		if (checkNodeKnowledge) {
 			// try getting NodeKnowledge from the Persons Knowledge
 			NodeKnowledge nodeKnowledge = knowledgeTools.getNodeKnowledge(person);

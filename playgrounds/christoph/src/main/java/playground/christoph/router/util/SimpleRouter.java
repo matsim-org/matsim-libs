@@ -61,7 +61,7 @@ public abstract class SimpleRouter implements LeastCostPathCalculator, Personali
 	 * A typical simple Router like a Random Router ignores
 	 * the link travel costs so by default we set them to 0.
 	 */
-	public double getLinkTravelCost(Link link, double time) {
+	public double getLinkGeneralizedTravelCost(Link link, double time) {
 		return 0;
 	}
 }

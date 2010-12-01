@@ -281,7 +281,7 @@ public class ShelterAssignmentSimulatedAnnealingRePlanner implements IterationSt
 
 		Path path1 = this.router.calcLeastCostPath(origin1, nodeDestination2, actOrigin1.getEndTime());
 		Path path2 = this.router.calcLeastCostPath(origin2, nodeDestination1, actOrigin2.getEndTime());
-		double t = this.sc.getConfig().charyparNagelScoring().getTraveling();
+		double t = this.sc.getConfig().charyparNagelScoring().getTraveling_utils_hr();
 
 		double f1_after = path1.travelTime / 600;
 		double f2_after = path2.travelTime / 600;
@@ -428,7 +428,7 @@ public class ShelterAssignmentSimulatedAnnealingRePlanner implements IterationSt
 		Node testDestinationNode = this.sc.getNetwork().getLinks().get(e.getKey()).getFromNode();
 
 		Path path = this.router.calcLeastCostPath(origin, testDestinationNode, actOrigin.getEndTime());
-		double t = this.sc.getConfig().charyparNagelScoring().getTraveling();
+		double t = this.sc.getConfig().charyparNagelScoring().getTraveling_utils_hr();
 
 		double f_after = path.travelTime / 600;
 

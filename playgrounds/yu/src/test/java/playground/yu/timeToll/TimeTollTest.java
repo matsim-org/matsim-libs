@@ -44,7 +44,7 @@ public class TimeTollTest extends MatsimTestCase {
 		public void notifyIterationEnds(final IterationEndsEvent event) {
 			if (event.getIteration() == event.getControler().getLastIteration()
 					&& clt != null) {
-				double traveling = event.getControler().getConfig().charyparNagelScoring().getTraveling();
+				double traveling = event.getControler().getConfig().charyparNagelScoring().getTraveling_utils_hr();
 				double criterion = 0;
 				if (traveling == -30.0) {
 					criterion = 1710.0;

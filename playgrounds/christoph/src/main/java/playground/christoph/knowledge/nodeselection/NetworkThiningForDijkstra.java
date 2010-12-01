@@ -160,7 +160,7 @@ public class NetworkThiningForDijkstra {
 				Node outNode = outLink.getToNode();
 				
 				// calculate costs for OutLink
-				double linkCosts = costCalculator.getLinkTravelCost(outLink, time);
+				double linkCosts = costCalculator.getLinkGeneralizedTravelCost(outLink, time);
 				
 				double minTravelCosts = travelCostsMap.get(outNode);
 				
@@ -272,7 +272,7 @@ public class NetworkThiningForDijkstra {
 					Node outNode = outLink.getToNode();
 					
 					// calculate costs for OutLink
-					double linkCosts = costCalculator.getLinkTravelCost(outLink, time);
+					double linkCosts = costCalculator.getLinkGeneralizedTravelCost(outLink, time);
 					
 					double minTravelCosts = travelCostsMap.get(outNode);
 					

@@ -60,13 +60,16 @@ public class IncomeTravelCostCalculator implements PersonalizableTravelCost {
 		/* Usually, utility from traveling should be negative (it's a disutility)
 		 * but the cost should be positive. Thus negate the utility.
 		 * Distance dependent routing is only impelemted for car since pt is only pseudo transit*/
-		this.distanceCostFactor = - charyparNagelScoring.getMarginalUtlOfDistanceCar();
+
+//		this.distanceCostFactor = - charyparNagelScoring.getMarginalUtlOfDistanceCar();
+		this.distanceCostFactor = - charyparNagelScoring.getMonetaryDistanceCostRateCar() * charyparNagelScoring.getMarginalUtilityOfMoney() ;
+
 		//also opportunity costs of time have to be considered at this point (second summand)!
-		this.betaTravelTime = (- charyparNagelScoring.getTraveling() / 3600.0) + (charyparNagelScoring.getPerforming() / 3600.0);
+		this.betaTravelTime = (- charyparNagelScoring.getTraveling_utils_hr() / 3600.0) + (charyparNagelScoring.getPerforming_utils_hr() / 3600.0);
 	}
 
 	//calculate generalized travel costs
-	public double getLinkTravelCost(Link link, double time) {
+	public double getLinkGeneralizedTravelCost(Link link, double time) {
 		double betaCost = betaIncomeCar / this.incomePerDay;
 		double distance   = link.getLength();
 		double distanceCost = this.distanceCostFactor * distance;

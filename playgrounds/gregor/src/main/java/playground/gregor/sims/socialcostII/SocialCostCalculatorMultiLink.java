@@ -85,7 +85,7 @@ public class SocialCostCalculatorMultiLink implements TravelCost,BeforeMobsimLis
 		this.events = events ;
 	}
 	
-	public double getLinkTravelCost(Link link, double time) {
+	public double getLinkGeneralizedTravelCost(Link link, double time) {
 		LinkInfo li = this.linkInfos.get(link.getId());
 		if (li == null) {
 			return 0.;
@@ -198,7 +198,7 @@ public class SocialCostCalculatorMultiLink implements TravelCost,BeforeMobsimLis
 				if (enterTime == null) {
 					return;
 				}
-				cost += getLinkTravelCost(this.network.getLinks().get(id), li.getAgentEnterTime(pers.getId()));
+				cost += getLinkGeneralizedTravelCost(this.network.getLinks().get(id), li.getAgentEnterTime(pers.getId()));
 			}
 			AgentMoneyEventImpl e = new AgentMoneyEventImpl(this.maxK * this.binSize,pers.getId(),cost/-600);
 //			QueueSimulation.getEvents().processEvent(e);

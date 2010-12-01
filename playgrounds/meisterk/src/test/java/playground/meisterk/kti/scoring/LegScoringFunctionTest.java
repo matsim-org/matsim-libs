@@ -70,11 +70,17 @@ public class LegScoringFunctionTest extends MatsimTestCase {
 		this.config.addModule(KtiConfigGroup.GROUP_NAME, ktiConfigGroup);
 
 		CharyparNagelScoringConfigGroup charyparNagelConfigGroup = this.config.charyparNagelScoring();
-		charyparNagelConfigGroup.setMarginalUtlOfDistancePt(-0.5);
-		charyparNagelConfigGroup.setMarginalUtlOfDistanceCar(-0.1);
-		charyparNagelConfigGroup.setTravelingPt(-10.0);
-		charyparNagelConfigGroup.setTraveling(0.0);
-		charyparNagelConfigGroup.setTravelingWalk(-100.0);
+
+//		charyparNagelConfigGroup.setMarginalUtlOfDistancePt(-0.5);
+		charyparNagelConfigGroup.setMonetaryDistanceCostRatePt(-0.5) ;
+
+//		charyparNagelConfigGroup.setMarginalUtlOfDistanceCar(-0.1);
+		charyparNagelConfigGroup.setMonetaryDistanceCostRateCar(-0.1) ;
+		charyparNagelConfigGroup.setMarginalUtilityOfMoney(1.) ;
+
+		charyparNagelConfigGroup.setTravelingPt_utils_hr(-10.0);
+		charyparNagelConfigGroup.setTraveling_utils_hr(0.0);
+		charyparNagelConfigGroup.setTravelingWalk_utils_hr(-100.0);
 
 		network = NetworkImpl.createNetwork();
 

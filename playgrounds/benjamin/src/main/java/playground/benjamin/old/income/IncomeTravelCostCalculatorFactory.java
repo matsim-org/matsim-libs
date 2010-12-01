@@ -51,8 +51,8 @@ public class IncomeTravelCostCalculatorFactory implements TravelCostCalculatorFa
 			}
 
 			@Override
-			public double getLinkTravelCost(Link link, double time) {
-				double generalizedTravelCost = incomeTravelCostCalculator.getLinkTravelCost(link, time);
+			public double getLinkGeneralizedTravelCost(Link link, double time) {
+				double generalizedTravelCost = incomeTravelCostCalculator.getLinkGeneralizedTravelCost(link, time);
 				return generalizedTravelCost;
 			}
 			

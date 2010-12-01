@@ -83,7 +83,7 @@ public class TransitRouteValidator {
 		public PseudoTimeCost() {
 		}
 
-		public double getLinkTravelCost(final Link link, final double time) {
+		public double getLinkGeneralizedTravelCost(final Link link, final double time) {
 			return 1.0;
 		}
 		

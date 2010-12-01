@@ -63,7 +63,10 @@ public class KtiTravelTimeDistanceCostCalculatorTest extends MatsimTestCase {
 		config.addModule(KtiConfigGroup.GROUP_NAME, ktiConfigGroup);
 
 		ktiConfigGroup.setDistanceCostCar(5.0);
-		config.charyparNagelScoring().setMarginalUtlOfDistanceCar(-0.5);
+
+//		config.charyparNagelScoring().setMarginalUtlOfDistanceCar(-0.5);
+		config.charyparNagelScoring().setMonetaryDistanceCostRateCar(-0.5) ;
+		config.charyparNagelScoring().setMarginalUtilityOfMoney(1.) ;
 
 		TravelTimeCalculatorFactory travelTimeCalculatorFactory = new TravelTimeCalculatorFactoryImpl();
 		TravelTimeCalculator travelTimeCalculator = travelTimeCalculatorFactory.createTravelTimeCalculator(
@@ -112,13 +115,13 @@ public class KtiTravelTimeDistanceCostCalculatorTest extends MatsimTestCase {
 
 		double expectedLinkTravelCost = 6.5;
 
-		double actualLinkTravelCost = this.testee.getLinkTravelCost(this.network.getLinks().get(TEST_LINK_ID), Time.parseTime("06:10:00"));
+		double actualLinkTravelCost = this.testee.getLinkGeneralizedTravelCost(this.network.getLinks().get(TEST_LINK_ID), Time.parseTime("06:10:00"));
 		assertEquals(expectedLinkTravelCost, actualLinkTravelCost, MatsimTestCase.EPSILON);
 
-		actualLinkTravelCost = this.testee.getLinkTravelCost(this.network.getLinks().get(TEST_LINK_ID), Time.parseTime("05:55:55"));
+		actualLinkTravelCost = this.testee.getLinkGeneralizedTravelCost(this.network.getLinks().get(TEST_LINK_ID), Time.parseTime("05:55:55"));
 		assertEquals(2.74, actualLinkTravelCost, MatsimTestCase.EPSILON);
 
-		actualLinkTravelCost = this.testee.getLinkTravelCost(this.network.getLinks().get(TEST_LINK_ID), Time.parseTime("06:31:00"));
+		actualLinkTravelCost = this.testee.getLinkGeneralizedTravelCost(this.network.getLinks().get(TEST_LINK_ID), Time.parseTime("06:31:00"));
 		assertEquals(2.74, actualLinkTravelCost, MatsimTestCase.EPSILON);
 
 	}

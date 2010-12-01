@@ -64,10 +64,10 @@ public class MyBasicConfig {
 		// PlanCalcScore
 		config.charyparNagelScoring().setLearningRate(1.0);
 		config.charyparNagelScoring().setBrainExpBeta(2.0);
-		config.charyparNagelScoring().setLateArrival(-18.0);
-		config.charyparNagelScoring().setEarlyDeparture(-18.0);
-		config.charyparNagelScoring().setPerforming(6.0);
-		config.charyparNagelScoring().setTraveling(-6.0);
+		config.charyparNagelScoring().setLateArrival_utils_hr(-18.0);
+		config.charyparNagelScoring().setEarlyDeparture_utils_hr(-18.0);
+		config.charyparNagelScoring().setPerforming_utils_hr(6.0);
+		config.charyparNagelScoring().setTraveling_utils_hr(-6.0);
 		//---------------------------------------------------------------------
 		ActivityParams home = new ActivityParams("home");
 		home.setPriority(1.0);

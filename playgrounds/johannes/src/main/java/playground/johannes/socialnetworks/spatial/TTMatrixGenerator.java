@@ -140,7 +140,7 @@ public class TTMatrixGenerator {
 			this.matrix = matrix;
 			
 			router = new Dijkstra(network, new TravelCost() {
-				public double getLinkTravelCost(Link link, double time) {
+				public double getLinkGeneralizedTravelCost(Link link, double time) {
 					return ttCalculator.getLinkTravelTime(link, time);
 				}
 			}, ttCalculator);

@@ -89,7 +89,7 @@ public class MNLUtilsTest {
 		// initialize scoringConfigGroup
 		CharyparNagelScoringConfigGroup scoringConfigGroup = config
 				.charyparNagelScoring();
-		scoringConfigGroup.setTravelingPt(travelingPt);
+		scoringConfigGroup.setTravelingPt_utils_hr(travelingPt);
 
 		// pop?
 		Population pop = scenario.getPopulation();

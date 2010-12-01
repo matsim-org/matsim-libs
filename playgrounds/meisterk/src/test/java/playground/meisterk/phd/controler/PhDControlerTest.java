@@ -195,7 +195,7 @@ public class PhDControlerTest extends MatsimTestCase {
 		this.config.planomat().setJgapMaxGenerations(10);
 		
 		this.config.plansCalcRoute().setPtSpeedFactor(ptSpeedFactor);
-		this.config.charyparNagelScoring().setTravelingPt(travelingPt);
+		this.config.charyparNagelScoring().setTravelingPt_utils_hr(travelingPt);
 		
 		this.config.plans().setInputFile("test/input/playground/meisterk/phd/GenerateEquilPopulationsTest/testGenerateRandomCarPt/expected_plans.xml.gz");
 
@@ -209,7 +209,7 @@ public class PhDControlerTest extends MatsimTestCase {
 	
 	public void testPtSpeedFactor10() {
 
-		this.configurePtCostVariation(1.0, this.config.charyparNagelScoring().getTravelingPt());
+		this.configurePtCostVariation(1.0, this.config.charyparNagelScoring().getTravelingPt_utils_hr());
 		
 		HashMap<Id, Double> expectedPlanScores = new HashMap<Id, Double>();
 		expectedPlanScores.put(new IdImpl(1012), -203.22393647708262);
@@ -222,7 +222,7 @@ public class PhDControlerTest extends MatsimTestCase {
 	
 	public void testPtSpeedFactor11() {
 
-		this.configurePtCostVariation(1.1, this.config.charyparNagelScoring().getTravelingPt());
+		this.configurePtCostVariation(1.1, this.config.charyparNagelScoring().getTravelingPt_utils_hr());
 		
 		HashMap<Id, Double> expectedPlanScores = new HashMap<Id, Double>();
 		expectedPlanScores.put(new IdImpl(1012), -203.22393647708262);
@@ -235,7 +235,7 @@ public class PhDControlerTest extends MatsimTestCase {
 	
 	public void testPtSpeedFactor12() {
 
-		this.configurePtCostVariation(1.2, this.config.charyparNagelScoring().getTravelingPt());
+		this.configurePtCostVariation(1.2, this.config.charyparNagelScoring().getTravelingPt_utils_hr());
 		
 		HashMap<Id, Double> expectedPlanScores = new HashMap<Id, Double>();
 		expectedPlanScores.put(new IdImpl(1012), -203.22393647708262);
@@ -248,7 +248,7 @@ public class PhDControlerTest extends MatsimTestCase {
 	
 	public void testPtSpeedFactor13() {
 
-		this.configurePtCostVariation(1.3, this.config.charyparNagelScoring().getTravelingPt());
+		this.configurePtCostVariation(1.3, this.config.charyparNagelScoring().getTravelingPt_utils_hr());
 		
 		HashMap<Id, Double> expectedPlanScores = new HashMap<Id, Double>();
 		expectedPlanScores.put(new IdImpl(1012), -203.22393647708262);
@@ -261,7 +261,7 @@ public class PhDControlerTest extends MatsimTestCase {
 	
 	public void testPtSpeedFactor14() {
 
-		this.configurePtCostVariation(1.4, this.config.charyparNagelScoring().getTravelingPt());
+		this.configurePtCostVariation(1.4, this.config.charyparNagelScoring().getTravelingPt_utils_hr());
 		
 		HashMap<Id, Double> expectedPlanScores = new HashMap<Id, Double>();
 		expectedPlanScores.put(new IdImpl(1012), -203.22393647708262);
@@ -274,7 +274,7 @@ public class PhDControlerTest extends MatsimTestCase {
 	
 	public void testPtSpeedFactor15() {
 
-		this.configurePtCostVariation(1.5, this.config.charyparNagelScoring().getTravelingPt());
+		this.configurePtCostVariation(1.5, this.config.charyparNagelScoring().getTravelingPt_utils_hr());
 		
 		HashMap<Id, Double> expectedPlanScores = new HashMap<Id, Double>();
 		expectedPlanScores.put(new IdImpl(1012), -203.22393647708262);

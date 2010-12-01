@@ -141,17 +141,18 @@ public class BkScoringFunction implements ScoringFunction {
 		if (initialized) return;
 
 		utilParams.clear();
-		marginalUtilityOfWaiting = configGroup.getWaiting() / 3600.0;
-		marginalUtilityOfLateArrival = configGroup.getLateArrival() / 3600.0;
-		marginalUtilityOfEarlyDeparture = configGroup.getEarlyDeparture() / 3600.0;
-		marginalUtilityOfTraveling = configGroup.getTraveling() / 3600.0;
-		marginalUtilityOfTravelingPT = configGroup.getTravelingPt() / 3600.0;
-		marginalUtilityOfTravelingWalk = configGroup.getTravelingWalk() / 3600.0;
-		marginalUtilityOfPerforming = configGroup.getPerforming() / 3600.0;
+		marginalUtilityOfWaiting = configGroup.getWaiting_utils_hr() / 3600.0;
+		marginalUtilityOfLateArrival = configGroup.getLateArrival_utils_hr() / 3600.0;
+		marginalUtilityOfEarlyDeparture = configGroup.getEarlyDeparture_utils_hr() / 3600.0;
+		marginalUtilityOfTraveling = configGroup.getTraveling_utils_hr() / 3600.0;
+		marginalUtilityOfTravelingPT = configGroup.getTravelingPt_utils_hr() / 3600.0;
+		marginalUtilityOfTravelingWalk = configGroup.getTravelingWalk_utils_hr() / 3600.0;
+		marginalUtilityOfPerforming = configGroup.getPerforming_utils_hr() / 3600.0;
 
 //		marginalUtilityOfPtFare = marginalUtilityOfPtFare;
 
-		marginalUtilityOfFuel = configGroup.getMarginalUtlOfDistanceCar();
+//		marginalUtilityOfFuel = configGroup.getMarginalUtlOfDistanceCar();
+		marginalUtilityOfFuel = configGroup.getMonetaryDistanceCostRateCar() * configGroup.getMarginalUtilityOfMoney() ;
 
 		abortedPlanScore = Math.min(
 				Math.min(marginalUtilityOfLateArrival, marginalUtilityOfEarlyDeparture),

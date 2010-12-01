@@ -453,7 +453,7 @@ public class DijkstraForSelectNodes {
 	{   
 		if (link instanceof MyLinkImpl) return ((MyLinkImpl) link).getTravelCost();
 		
-		return costCalculator.getLinkTravelCost(link, time);
+		return costCalculator.getLinkGeneralizedTravelCost(link, time);
 	}
 
 	public void setCostCalculator(TravelCost calculator)

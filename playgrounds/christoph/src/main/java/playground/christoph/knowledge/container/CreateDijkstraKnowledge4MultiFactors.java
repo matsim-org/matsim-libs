@@ -155,7 +155,7 @@ public class CreateDijkstraKnowledge4MultiFactors {
 		 */
 		for (Link link : network.getLinks().values())
 		{
-			double travelCosts = costCalculator.getLinkTravelCost(link, Time.UNDEFINED_TIME);
+			double travelCosts = costCalculator.getLinkGeneralizedTravelCost(link, Time.UNDEFINED_TIME);
 			((MyLinkImpl)link).setTravelCost(travelCosts);
 		}
 

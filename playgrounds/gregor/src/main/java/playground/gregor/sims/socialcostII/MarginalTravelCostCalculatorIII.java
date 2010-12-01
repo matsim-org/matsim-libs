@@ -39,7 +39,7 @@ public class MarginalTravelCostCalculatorIII implements PersonalizableTravelCost
 		this.binSize = binSize;
 	}
 
-	public double getLinkTravelCost(final Link link, double time) {
+	public double getLinkGeneralizedTravelCost(final Link link, double time) {
 //		double t2, t1;
 //		Integer k1;
 //		double diff = time % this.binSize;

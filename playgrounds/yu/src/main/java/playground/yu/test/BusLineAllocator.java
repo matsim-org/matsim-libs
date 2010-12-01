@@ -82,7 +82,7 @@ public class BusLineAllocator {
 	private class TravelCostFunctionDistance implements TravelCost {
 		/** returns only the link length */
 		@Override
-		public double getLinkTravelCost(Link link, double time) {
+		public double getLinkGeneralizedTravelCost(Link link, double time) {
 			return link.getLength();
 		}
 	}

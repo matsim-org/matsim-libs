@@ -142,7 +142,7 @@ public class Template implements MatsimModule {
 					CharyparNagelScoringConfigGroup cnScoringGroup) {
 				return new PersonalizableTravelCost() {
 
-					public double getLinkTravelCost(Link link, double time) {
+					public double getLinkGeneralizedTravelCost(Link link, double time) {
 						return 0;
 					}
 					

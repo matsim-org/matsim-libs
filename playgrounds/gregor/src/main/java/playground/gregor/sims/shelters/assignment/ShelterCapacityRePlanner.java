@@ -346,11 +346,11 @@ public class ShelterCapacityRePlanner implements IterationStartsListener {
 		}
 
 		@Override
-		public double getLinkTravelCost(Link link, double time) {
-			while (Double.isInfinite(this.tc.getLinkTravelCost(link, time + this.timeOffset))) {
+		public double getLinkGeneralizedTravelCost(Link link, double time) {
+			while (Double.isInfinite(this.tc.getLinkGeneralizedTravelCost(link, time + this.timeOffset))) {
 				this.timeOffset -= 60;
 			}
-			return this.tc.getLinkTravelCost(link, time + this.timeOffset);
+			return this.tc.getLinkGeneralizedTravelCost(link, time + this.timeOffset);
 		}
 
 		public double getTimeOffsetAndReset() {

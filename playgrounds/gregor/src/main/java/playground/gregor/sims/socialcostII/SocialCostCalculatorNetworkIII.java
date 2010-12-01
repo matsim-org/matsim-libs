@@ -80,7 +80,7 @@ public class SocialCostCalculatorNetworkIII implements TravelCost, IterationStar
 		this.events = events ;
 	}
 
-	public double getLinkTravelCost(final Link link, final double time) {
+	public double getLinkGeneralizedTravelCost(final Link link, final double time) {
 		SocialCostRole sc = this.socCosts.get(link.getId().toString());
 		if (sc == null) {
 			return 0;

@@ -39,7 +39,7 @@ public class AdaptedTransitRouterNetworkTravelTimeCost extends TransitRouterNetw
 	}
 
 	@Override
-	public double getLinkTravelCost(final Link link, final double time) {
+	public double getLinkGeneralizedTravelCost(final Link link, final double time) {
 		double cost;
 		if (((TransitRouterNetworkLink) link).getRoute() == null) {
 			// transfer link

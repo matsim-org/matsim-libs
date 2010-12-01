@@ -39,7 +39,7 @@ public class OnlyTimeDependentTravelCostCalculator implements TravelMinCost, Per
 		if (timeCalculator == null) log.warn("TimeCalculator is null so FreeSpeedTravelTimes will be calculated!");
 	}
 
-	public double getLinkTravelCost(final Link link, final double time) {
+	public double getLinkGeneralizedTravelCost(final Link link, final double time) {
 		if (timeCalculator != null) {
 			double travelTime = this.timeCalculator.getLinkTravelTime(link, time);
 			return travelTime;

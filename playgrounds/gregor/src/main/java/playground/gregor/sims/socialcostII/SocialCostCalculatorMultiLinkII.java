@@ -73,7 +73,7 @@ public class SocialCostCalculatorMultiLinkII implements TravelCost, SimulationBe
 		this.events = events ;
 	}
 
-	public double getLinkTravelCost(Link link, double time) {
+	public double getLinkGeneralizedTravelCost(Link link, double time) {
 		LinkInfo li = this.linkInfos.get(link.getId());
 		if (li == null) {
 			return 0.;

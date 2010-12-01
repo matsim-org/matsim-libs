@@ -34,7 +34,7 @@ public class LinkPenaltyTravelCost implements TravelCost {
 		this.lp = lp;
 	}
 	
-	public double getLinkTravelCost(Link link, double time) {
+	public double getLinkGeneralizedTravelCost(Link link, double time) {
 			return this.tt.getLinkTravelTime(link, time) + this.lp.getLinkTravelCost(link, time);
 	}
 

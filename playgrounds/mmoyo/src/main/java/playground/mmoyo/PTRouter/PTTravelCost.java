@@ -14,7 +14,7 @@ public class PTTravelCost implements TravelCost{
 		this.ptTravelTime = ptTravelTime;
 	}
 	
-	public double getLinkTravelCost(Link link, double time){
+	public double getLinkGeneralizedTravelCost(Link link, double time){
 		double cost = ptTravelTime.getLinkTravelTime(link, time) ;  
 
 		String type = ((LinkImpl)link).getType();

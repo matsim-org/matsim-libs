@@ -41,8 +41,12 @@ public class KtiTravelTimeDistanceCostCalculator implements TravelMinCost, Perso
 			KtiConfigGroup ktiConfigGroup) {
 		super();
 		this.timeCalculator = timeCalculator;
-		this.travelCostFactor = (- cnScoringGroup.getTraveling() / 3600.0) + (cnScoringGroup.getPerforming() / 3600.0);
-		this.marginalUtlOfDistance = ktiConfigGroup.getDistanceCostCar()/1000.0 * cnScoringGroup.getMarginalUtlOfDistanceCar();
+		this.travelCostFactor = (- cnScoringGroup.getTraveling_utils_hr() / 3600.0) + (cnScoringGroup.getPerforming_utils_hr() / 3600.0);
+
+//		this.marginalUtlOfDistance = ktiConfigGroup.getDistanceCostCar()/1000.0 * cnScoringGroup.getMarginalUtlOfDistanceCar();
+		this.marginalUtlOfDistance = ktiConfigGroup.getDistanceCostCar()/1000.0 * cnScoringGroup.getMonetaryDistanceCostRateCar() 
+		   * cnScoringGroup.getMarginalUtilityOfMoney() ;
+		throw new RuntimeException("this is the exact translation but I don't know what it means maybe check.  kai, dec'10") ;
 	}
 
 	public double getLinkMinimumTravelCost(Link link) {
@@ -51,7 +55,7 @@ public class KtiTravelTimeDistanceCostCalculator implements TravelMinCost, Perso
 		- this.marginalUtlOfDistance * link.getLength();
 	}
 
-	public double getLinkTravelCost(Link link, double time) {
+	public double getLinkGeneralizedTravelCost(Link link, double time) {
 		double travelTime = this.timeCalculator.getLinkTravelTime(link, time);
 		return travelTime * this.travelCostFactor - this.marginalUtlOfDistance * link.getLength();
 	}

@@ -36,7 +36,7 @@ public class FakeTravelTimeCost implements TravelMinCost, PersonalizableTravelTi
 
 	}
 
-	public double getLinkTravelCost(Link link, double time) {
+	public double getLinkGeneralizedTravelCost(Link link, double time) {
 		return Math.round((link.getLength() / link.getFreespeed()));
 	}
 

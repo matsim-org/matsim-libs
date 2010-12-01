@@ -45,7 +45,7 @@ public class IncomeTollTravelCostCalculator implements PersonalizableTravelCost 
 		}
 
 		@Override
-		public double getLinkTravelCost(Link link, double time) {
+		public double getLinkGeneralizedTravelCost(Link link, double time) {
 			return 0;
 		}
 
@@ -77,8 +77,8 @@ public class IncomeTollTravelCostCalculator implements PersonalizableTravelCost 
 
 	//calculating additional generalized toll costs
 	@Override
-	public double getLinkTravelCost(Link link, double time) {
-		double amount = tollTravelCostCalculator.getLinkTravelCost(link, time);
+	public double getLinkGeneralizedTravelCost(Link link, double time) {
+		double amount = tollTravelCostCalculator.getLinkGeneralizedTravelCost(link, time);
 		double additionalGeneralizedTollCost = (betaIncomeCar / incomePerDay) * amount;
 		return additionalGeneralizedTollCost;
 	}

@@ -59,9 +59,9 @@ public class IncomeTollTravelCostCalculatorFactory implements TravelCostCalculat
 			//somehow summing up the income related generalized travel costs and the income related toll costs for the router...
 			//remark: this method should be named "getLinkGeneralizedTravelCosts" or "getLinkDisutilityFromTraveling"
 			@Override
-			public double getLinkTravelCost(Link link, double time) {
-				double generalizedTravelCost = incomeTravelCostCalculator.getLinkTravelCost(link, time);
-				double additionalGeneralizedTollCost = incomeTollTravelCostCalculator.getLinkTravelCost(link, time);
+			public double getLinkGeneralizedTravelCost(Link link, double time) {
+				double generalizedTravelCost = incomeTravelCostCalculator.getLinkGeneralizedTravelCost(link, time);
+				double additionalGeneralizedTollCost = incomeTollTravelCostCalculator.getLinkGeneralizedTravelCost(link, time);
 				return generalizedTravelCost + additionalGeneralizedTollCost;
 			}
 			

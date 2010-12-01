@@ -29,7 +29,7 @@ public class OnlyDistanceDependentTravelCostCalculator implements TravelMinCost,
 	{
 	}
 
-	public double getLinkTravelCost(final Link link, final double time) 
+	public double getLinkGeneralizedTravelCost(final Link link, final double time) 
 	{
 		return link.getLength();
 	}

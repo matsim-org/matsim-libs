@@ -119,8 +119,11 @@ public class NetworkDistance {
 		// set the config to only look at distance costs, not travel time costs
 		Config config = new Config();
 		config.addCoreModules();
-		config.charyparNagelScoring().setTraveling(0.0);
-		config.charyparNagelScoring().setMarginalUtlOfDistanceCar(-0.001); // -1 per kilometer == -0.001 per meter
+		config.charyparNagelScoring().setTraveling_utils_hr(0.0);
+
+//		config.charyparNagelScoring().setMarginalUtlOfDistanceCar(-0.001); // -1 per kilometer == -0.001 per meter
+		config.charyparNagelScoring().setMonetaryDistanceCostRateCar(-0.001) ;
+		config.charyparNagelScoring().setMarginalUtilityOfMoney(1.) ;
 
 		// create the router algorithm
 		TravelTime travelTime = new FreespeedTravelTimeCost(config.charyparNagelScoring());
