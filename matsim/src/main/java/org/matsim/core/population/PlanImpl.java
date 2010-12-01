@@ -40,6 +40,10 @@ import org.matsim.utils.customize.CustomizableImpl;
 public class PlanImpl implements Plan {
 	/**
 	 * @deprecated use Leg.Mode instead
+	 * 
+	 * But do not remove: minimally, kai is of the opinion that a plan type, with the consequence
+	 * that the last plan of a certain type is never removed, is extremely useful and should remain
+	 * there.  kai, dec'10
 	 */
 	@Deprecated
 	public enum Type { CAR, PT, RIDE, BIKE, WALK, UNDEFINED}
