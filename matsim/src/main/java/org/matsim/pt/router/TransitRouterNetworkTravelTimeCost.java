@@ -52,7 +52,7 @@ public class TransitRouterNetworkTravelTimeCost implements TravelTime, TravelMin
 		this.config = config;
 	}
 
-	public double getLinkTravelCost(final Link link, final double time) {
+	public double getLinkGeneralizedTravelCost(final Link link, final double time) {
 		double cost;
 		if (((TransitRouterNetworkLink) link).route == null) {
 			// it's a transfer link (walk)

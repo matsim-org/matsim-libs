@@ -113,7 +113,10 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 
 	public void testGetLegTravelTimeEstimation() {
 
-		this.scenario.getConfig().charyparNagelScoring().setMarginalUtlOfDistanceCar(0.0);
+//		this.scenario.getConfig().charyparNagelScoring().setMarginalUtlOfDistanceCar(0.0);
+		this.scenario.getConfig().charyparNagelScoring().setMonetaryDistanceCostRateCar(0.0) ;
+		this.scenario.getConfig().charyparNagelScoring().setMarginalUtilityOfMoney(1.) ; 
+
 
 		for (PlanomatConfigGroup.SimLegInterpretation simLegInterpretation : PlanomatConfigGroup.SimLegInterpretation.values()) {
 

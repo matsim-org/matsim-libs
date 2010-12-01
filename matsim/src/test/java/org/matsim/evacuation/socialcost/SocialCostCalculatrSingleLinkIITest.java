@@ -83,7 +83,7 @@ public class SocialCostCalculatrSingleLinkIITest extends TestCase {
 
 		double costs = 0.;
 		for (; time >= 0; time--) {
-			costs += scalc.getLinkTravelCost(f.link0, time);
+			costs += scalc.getLinkGeneralizedTravelCost(f.link0, time);
 		}
 
 		assertEquals(0., costs);
@@ -161,7 +161,7 @@ public class SocialCostCalculatrSingleLinkIITest extends TestCase {
 		// 6*(60-10) + 6*(120-10) + ... + 6*(480-10) = 12480
 		double costs = 0.;
 		for (; time >= 0; time -= 1) {
-			costs += scalc.getLinkTravelCost(f.link0, time);
+			costs += scalc.getLinkGeneralizedTravelCost(f.link0, time);
 		}
 		assertEquals(25., costs);
 
@@ -238,7 +238,7 @@ public class SocialCostCalculatrSingleLinkIITest extends TestCase {
 		// 6*(60-10) + 6*(120-10) + ... + 6*(480-10) = 12480
 		double costs = 0.;
 		for (; time >= 0; time -= 1) {
-			costs += scalc.getLinkTravelCost(f.link0, time);
+			costs += scalc.getLinkGeneralizedTravelCost(f.link0, time);
 		}
 		assertEquals(5 * 7 + 5 * 12. + 5 * 2.5, costs);
 
@@ -286,7 +286,7 @@ public class SocialCostCalculatrSingleLinkIITest extends TestCase {
 
 		double costs = 0;
 		for (time = 0; time <= 24 * 3600; time += 180) {
-			costs += scalc.getLinkTravelCost(f.link0, time);
+			costs += scalc.getLinkGeneralizedTravelCost(f.link0, time);
 		}
 
 		assertEquals(266112., costs);

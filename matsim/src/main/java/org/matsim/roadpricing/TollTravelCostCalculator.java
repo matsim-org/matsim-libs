@@ -49,8 +49,8 @@ public class TollTravelCostCalculator implements PersonalizableTravelCost {
 
 	}
 
-	public double getLinkTravelCost(final Link link, final double time) {
-		double baseCost = this.costHandler.getLinkTravelCost(link, time);
+	public double getLinkGeneralizedTravelCost(final Link link, final double time) {
+		double baseCost = this.costHandler.getLinkGeneralizedTravelCost(link, time);
 		double tollCost = this.tollCostHandler.getTollCost(link, time);
 		return baseCost + tollCost;
 	}

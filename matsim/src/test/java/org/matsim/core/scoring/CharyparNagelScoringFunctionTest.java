@@ -60,13 +60,17 @@ public abstract class CharyparNagelScoringFunctionTest extends ScoringFunctionTe
 		this.config = loadConfig(null);
 		CharyparNagelScoringConfigGroup scoring = this.config.charyparNagelScoring();
 		scoring.setBrainExpBeta(2.0);
-		scoring.setLateArrival(0.0);
-		scoring.setEarlyDeparture(0.0);
-		scoring.setPerforming(0.0);
-		scoring.setTraveling(0.0);
-		scoring.setTravelingPt(0.0);
-		scoring.setMarginalUtlOfDistanceCar(0.0);
-		scoring.setWaiting(0.0);
+		scoring.setLateArrival_utils_hr(0.0);
+		scoring.setEarlyDeparture_utils_hr(0.0);
+		scoring.setPerforming_utils_hr(0.0);
+		scoring.setTraveling_utils_hr(0.0);
+		scoring.setTravelingPt_utils_hr(0.0);
+
+		//		scoring.setMarginalUtlOfDistanceCar(0.0);
+		scoring.setMonetaryDistanceCostRateCar(0.0) ;
+		scoring.setMarginalUtilityOfMoney(1.) ;
+		
+		scoring.setWaiting_utils_hr(0.0);
 
 		// setup activity types h and w for scoring
 		CharyparNagelScoringConfigGroup.ActivityParams params = new CharyparNagelScoringConfigGroup.ActivityParams("h");
@@ -172,12 +176,12 @@ public abstract class CharyparNagelScoringFunctionTest extends ScoringFunctionTe
 	}
 
 	public void testTraveling() {
-		this.config.charyparNagelScoring().setTraveling(-6.0);
+		this.config.charyparNagelScoring().setTraveling_utils_hr(-6.0);
 		assertEquals(-3.0, calcScore(), EPSILON);
 	}
 
 	public void testTravelingPt() {
-		this.config.charyparNagelScoring().setTravelingPt(-9.0);
+		this.config.charyparNagelScoring().setTravelingPt_utils_hr(-9.0);
 		assertEquals(-2.25, calcScore(), EPSILON);
 	}
 
@@ -189,12 +193,12 @@ public abstract class CharyparNagelScoringFunctionTest extends ScoringFunctionTe
 		double zeroUtilDurW = getZeroUtilDuration_h(8.0, 1.0);
 		double zeroUtilDurH = getZeroUtilDuration_h(16.0, 1.0);
 
-		this.config.charyparNagelScoring().setPerforming(perf);
+		this.config.charyparNagelScoring().setPerforming_utils_hr(perf);
 		assertEquals(perf * 8.0 * Math.log(8.5 / zeroUtilDurW)
 				+ perf * 16.0 * Math.log(14.75 / zeroUtilDurH), calcScore(), EPSILON);
 
 		perf = +3.0;
-		this.config.charyparNagelScoring().setPerforming(perf);
+		this.config.charyparNagelScoring().setPerforming_utils_hr(perf);
 		assertEquals(perf * 8.0 * Math.log(8.5 / zeroUtilDurW)
 				+ perf * 16.0 * Math.log(14.75 / zeroUtilDurH), calcScore(), EPSILON);
 	}
@@ -204,7 +208,7 @@ public abstract class CharyparNagelScoringFunctionTest extends ScoringFunctionTe
 	 */
 	public void testOpeningTime() {
 		double perf = +6.0;
-		this.config.charyparNagelScoring().setPerforming(perf);
+		this.config.charyparNagelScoring().setPerforming_utils_hr(perf);
 		double initialScore = calcScore();
 
 		ActivityParams wParams = this.config.charyparNagelScoring().getActivityParams("w");
@@ -220,7 +224,7 @@ public abstract class CharyparNagelScoringFunctionTest extends ScoringFunctionTe
 	 */
 	public void testClosingTime() {
 		double perf = +6.0;
-		this.config.charyparNagelScoring().setPerforming(perf);
+		this.config.charyparNagelScoring().setPerforming_utils_hr(perf);
 		double initialScore = calcScore();
 
 		ActivityParams wParams = this.config.charyparNagelScoring().getActivityParams("w");
@@ -237,7 +241,7 @@ public abstract class CharyparNagelScoringFunctionTest extends ScoringFunctionTe
 	public void testOpeningClosingTime() {
 		double perf = +6.0;
 		double zeroUtilDurH = getZeroUtilDuration_h(16.0, 1.0);
-		this.config.charyparNagelScoring().setPerforming(perf);
+		this.config.charyparNagelScoring().setPerforming_utils_hr(perf);
 		double initialScore = calcScore();
 
 		// test1: agents has to wait before and after
@@ -272,7 +276,7 @@ public abstract class CharyparNagelScoringFunctionTest extends ScoringFunctionTe
 	 */
 	public void testWaitingTime() {
 		double waiting = -10.0;
-		this.config.charyparNagelScoring().setWaiting(waiting);
+		this.config.charyparNagelScoring().setWaiting_utils_hr(waiting);
 
 		ActivityParams wParams = this.config.charyparNagelScoring().getActivityParams("w");
 		wParams.setOpeningTime( 8*3600.0); // the agent arrives 30min early
@@ -287,7 +291,7 @@ public abstract class CharyparNagelScoringFunctionTest extends ScoringFunctionTe
 	 */
 	public void testEarlyDeparture() {
 		double disutility = -10.0;
-		this.config.charyparNagelScoring().setEarlyDeparture(disutility);
+		this.config.charyparNagelScoring().setEarlyDeparture_utils_hr(disutility);
 
 		ActivityParams wParams = this.config.charyparNagelScoring().getActivityParams("w");
 		wParams.setEarliestEndTime(16.75 * 3600.0); // require the agent to work until 16:45
@@ -301,7 +305,7 @@ public abstract class CharyparNagelScoringFunctionTest extends ScoringFunctionTe
 	 */
 	public void testMinimumDuration() {
 		double disutility = -10.0;
-		this.config.charyparNagelScoring().setEarlyDeparture(disutility);
+		this.config.charyparNagelScoring().setEarlyDeparture_utils_hr(disutility);
 
 		ActivityParams wParams = this.config.charyparNagelScoring().getActivityParams("w");
 		wParams.setMinimalDuration(10 * 3600.0); // require the agent to be 10 hours at work
@@ -315,7 +319,7 @@ public abstract class CharyparNagelScoringFunctionTest extends ScoringFunctionTe
 	 */
 	public void testLateArrival() {
 		double disutility = -10.0;
-		this.config.charyparNagelScoring().setLateArrival(disutility);
+		this.config.charyparNagelScoring().setLateArrival_utils_hr(disutility);
 
 		ActivityParams wParams = this.config.charyparNagelScoring().getActivityParams("w");
 		wParams.setLatestStartTime(7 * 3600.0); // agent should start at 7 o'clock
@@ -330,8 +334,8 @@ public abstract class CharyparNagelScoringFunctionTest extends ScoringFunctionTe
 	 */
 	public void testStuckPenalty() {
 		// test 1 where late arrival has the biggest impact
-		this.config.charyparNagelScoring().setLateArrival(-18.0);
-		this.config.charyparNagelScoring().setTraveling(-6.0);
+		this.config.charyparNagelScoring().setLateArrival_utils_hr(-18.0);
+		this.config.charyparNagelScoring().setTraveling_utils_hr(-6.0);
 
 		ScoringFunction testee = getScoringFunctionInstance(this.plan);
 		testee.endActivity(07*3600);
@@ -347,8 +351,8 @@ public abstract class CharyparNagelScoringFunctionTest extends ScoringFunctionTe
 		assertEquals(24 * -18.0 - 6.0 * 0.50, testee.getScore(), EPSILON); // stuck penalty + 30min traveling
 
 		// test 2 where traveling has the biggest impact
-		this.config.charyparNagelScoring().setLateArrival(-3.0);
-		this.config.charyparNagelScoring().setTraveling(-6.0);
+		this.config.charyparNagelScoring().setLateArrival_utils_hr(-3.0);
+		this.config.charyparNagelScoring().setTraveling_utils_hr(-6.0);
 
 		testee = getScoringFunctionInstance(this.plan);
 		testee.endActivity(07*3600);
@@ -365,8 +369,14 @@ public abstract class CharyparNagelScoringFunctionTest extends ScoringFunctionTe
 	}
 
 	public void testMarginalUtilityOfDistance() {
-		this.config.charyparNagelScoring().setMarginalUtlOfDistanceCar(-0.00001);
-		this.config.charyparNagelScoring().setMarginalUtlOfDistancePt(-0.00001);
+
+//		this.config.charyparNagelScoring().setMarginalUtlOfDistanceCar(-0.00001);
+		this.config.charyparNagelScoring().setMonetaryDistanceCostRateCar(-0.00001) ;
+		this.config.charyparNagelScoring().setMarginalUtilityOfMoney(1.);
+		
+//		this.config.charyparNagelScoring().setMarginalUtlOfDistancePt(-0.00001);
+		this.config.charyparNagelScoring().setMonetaryDistanceCostRatePt(-0.00001) ;
+		
 		assertEquals(-0.45, calcScore(), EPSILON);
 	}
 
@@ -382,7 +392,7 @@ public abstract class CharyparNagelScoringFunctionTest extends ScoringFunctionTe
 		this.config.charyparNagelScoring().addActivityParams(params);
 
 		double perf = +6.0;
-		this.config.charyparNagelScoring().setPerforming(perf);
+		this.config.charyparNagelScoring().setPerforming_utils_hr(perf);
 		double zeroUtilDurW = getZeroUtilDuration_h(8.0, 1.0);
 		double zeroUtilDurH = getZeroUtilDuration_h(16.0, 1.0);
 		double zeroUtilDurH2 = getZeroUtilDuration_h(8.0, 1.0);

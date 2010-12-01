@@ -32,6 +32,16 @@ import org.matsim.core.config.Module;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.misc.Time;
 
+/**Design decisions:<ul>
+ * <li> I have decided to modify those setters/getters that do not use SI units such that the units are attached.
+ * This means all the utility parameters which are "per hour" instead of "per second".  kai, dec'10
+ * <li> Note that a similar thing is not necessary for money units since money units do not need to be specified (they are always
+ * implicit).  kai, dec'10
+ * <li> The parameter names in the config file are <i>not</i> changed in this way since this would mean a public api change.  kai, dec'10
+ * </ul>
+ * @author nagel
+ *
+ */
 public class CharyparNagelScoringConfigGroup extends Module {
 
 	private static final Logger log = Logger.getLogger(CharyparNagelScoringConfigGroup.class);
@@ -191,17 +201,17 @@ public class CharyparNagelScoringConfigGroup extends Module {
 		} else if (PATH_SIZE_LOGIT_BETA.equals(key)) {
 			setPathSizeLogitBeta(Double.parseDouble(value));
 		} else if (LATE_ARRIVAL.equals(key)) {
-			setLateArrival(Double.parseDouble(value));
+			setLateArrival_utils_hr(Double.parseDouble(value));
 		} else if (EARLY_DEPARTURE.equals(key)) {
-			setEarlyDeparture(Double.parseDouble(value));
+			setEarlyDeparture_utils_hr(Double.parseDouble(value));
 		} else if (PERFORMING.equals(key)) {
-			setPerforming(Double.parseDouble(value));
+			setPerforming_utils_hr(Double.parseDouble(value));
 		} else if (TRAVELING.equals(key)) {
-			setTraveling(Double.parseDouble(value));
+			setTraveling_utils_hr(Double.parseDouble(value));
 		} else if (TRAVELING_PT.equals(key)) {
-			setTravelingPt(Double.parseDouble(value));
+			setTravelingPt_utils_hr(Double.parseDouble(value));
 		} else if (TRAVELING_WALK.equals(key)) {
-			setTravelingWalk(Double.parseDouble(value));
+			setTravelingWalk_utils_hr(Double.parseDouble(value));
 		} else if (MARGINAL_UTL_OF_DISTANCE_CAR.equals(key)){
 			setMarginalUtlOfDistanceCar(Double.parseDouble(value));
 		} else if (MARGINAL_UTL_OF_DISTANCE_PT.equals(key)){
@@ -215,7 +225,7 @@ public class CharyparNagelScoringConfigGroup extends Module {
 		} else if ( MONETARY_DISTANCE_COST_RATE_PT.equals(key) ) {
 			setMonetaryDistanceCostRatePt( Double.parseDouble(value) ) ;
 		} else if (WAITING.equals(key)) {
-			setWaiting(Double.parseDouble(value));
+			setWaiting_utils_hr(Double.parseDouble(value));
 		} else if ((key != null) && key.startsWith(ACTIVITY_TYPE)) {
 			ActivityParams actParams = getActivityTypeByNumber(key.substring(ACTIVITY_TYPE.length()), true);
 			this.activityTypes.remove(actParams.getType());
@@ -254,13 +264,13 @@ public class CharyparNagelScoringConfigGroup extends Module {
 		map.put(LEARNING_RATE, Double.toString(this.getLearningRate()) );
 		map.put(BRAIN_EXP_BETA, Double.toString(this.getBrainExpBeta()) );
 		map.put(PATH_SIZE_LOGIT_BETA, Double.toString(this.getPathSizeLogitBeta()) ); 
-		map.put(LATE_ARRIVAL, Double.toString(this.getLateArrival()) );
-		map.put(EARLY_DEPARTURE, Double.toString(this.getEarlyDeparture()) );
-		map.put(PERFORMING, Double.toString(this.getPerforming()) );
-		map.put(TRAVELING, Double.toString(this.getTraveling()) );
-		map.put(TRAVELING_PT, Double.toString(this.getTravelingPt()));
-		map.put(TRAVELING_WALK, Double.toString(this.getTravelingWalk()));
-		map.put(WAITING, Double.toString(this.getWaiting()));
+		map.put(LATE_ARRIVAL, Double.toString(this.getLateArrival_utils_hr()) );
+		map.put(EARLY_DEPARTURE, Double.toString(this.getEarlyDeparture_utils_hr()) );
+		map.put(PERFORMING, Double.toString(this.getPerforming_utils_hr()) );
+		map.put(TRAVELING, Double.toString(this.getTraveling_utils_hr()) );
+		map.put(TRAVELING_PT, Double.toString(this.getTravelingPt_utils_hr()));
+		map.put(TRAVELING_WALK, Double.toString(this.getTravelingWalk_utils_hr()));
+		map.put(WAITING, Double.toString(this.getWaiting_utils_hr()));
 //		map.put(MARGINAL_UTL_OF_DISTANCE_CAR, Double.toString(this.getMarginalUtlOfDistanceCar()));
 //		map.put(MARGINAL_UTL_OF_DISTANCE_PT, Double.toString(this.getMarginalUtlOfDistancePt()));
 		map.put(MARGINAL_UTL_OF_DISTANCE_WALK, Double.toString(this.getMarginalUtlOfDistanceWalk()));
@@ -337,7 +347,7 @@ public class CharyparNagelScoringConfigGroup extends Module {
 			if ((actType.getOpeningTime() != Time.UNDEFINED_TIME) && (actType.getClosingTime() != Time.UNDEFINED_TIME)) {
 				hasOpeningAndClosingTime = true;
 			}
-			if ((actType.getOpeningTime() != Time.UNDEFINED_TIME) && (getLateArrival() > 0.001)) {
+			if ((actType.getOpeningTime() != Time.UNDEFINED_TIME) && (getLateArrival_utils_hr() > 0.001)) {
 				hasOpeningTimeAndLatePenalty = true;
 			}
 		}
@@ -376,45 +386,45 @@ public class CharyparNagelScoringConfigGroup extends Module {
 		}
 		this.pathSizeLogitBeta = beta;
 	}
-	public double getLateArrival() {
+	public double getLateArrival_utils_hr() {
 		return this.lateArrival;
 	}
-	public void setLateArrival(final double lateArrival) {
+	public void setLateArrival_utils_hr(final double lateArrival) {
 		this.lateArrival = lateArrival;
 	}
 
-	public double getEarlyDeparture() {
+	public double getEarlyDeparture_utils_hr() {
 		return this.earlyDeparture;
 	}
-	public void setEarlyDeparture(final double earlyDeparture) {
+	public void setEarlyDeparture_utils_hr(final double earlyDeparture) {
 		this.earlyDeparture = earlyDeparture;
 	}
 
-	public double getPerforming() {
+	public double getPerforming_utils_hr() {
 		return this.performing;
 	}
-	public void setPerforming(final double performing) {
+	public void setPerforming_utils_hr(final double performing) {
 		this.performing = performing;
 	}
 
-	public double getTraveling() {
+	public double getTraveling_utils_hr() {
 		return this.traveling;
 	}
-	public void setTraveling(final double traveling) {
+	public void setTraveling_utils_hr(final double traveling) {
 		this.traveling = traveling;
 	}
 
-	public double getTravelingPt() {
+	public double getTravelingPt_utils_hr() {
 		return this.travelingPt;
 	}
-	public void setTravelingPt(final double travelingPt) {
+	public void setTravelingPt_utils_hr(final double travelingPt) {
 		this.travelingPt = travelingPt;
 	}
 
-	public double getTravelingWalk() {
+	public double getTravelingWalk_utils_hr() {
 		return this.travelingWalk;
 	}
-	public void setTravelingWalk(final double travelingWalk) {
+	public void setTravelingWalk_utils_hr(final double travelingWalk) {
 		this.travelingWalk = travelingWalk;
 	}
 	/**
@@ -422,7 +432,7 @@ public class CharyparNagelScoringConfigGroup extends Module {
 	 * <p/>
 	 * It is discouraged to use this but in some cases it may make sense.  benjamin/kai, dec'10
 	 */
-	@Deprecated // not really deprecated, but discouraged.  benjamin/kai, dec'10
+	@Deprecated // It is discouraged to use this but in some cases it may make sense.  benjamin/kai, dec'10
 	public double getMarginalUtlOfDistanceWalk() {
 		return this.marginalUtlOfDistanceWalk;
 	}
@@ -431,43 +441,43 @@ public class CharyparNagelScoringConfigGroup extends Module {
 	 * <p/>
 	 * It is discouraged to use this but in some cases it may make sense.  benjamin/kai, dec'10
 	 */
-	@Deprecated // not really deprecated, but discouraged.  benjamin/kai, dec'10
+	@Deprecated // It is discouraged to use this but in some cases it may make sense.  benjamin/kai, dec'10
 	public void setMarginalUtlOfDistanceWalk(final double marginalUtlOfDistanceWalk) {
 		this.marginalUtlOfDistanceWalk = marginalUtlOfDistanceWalk;
 	}
 
-	/**
-	 * @return the marginal utility of distance for mode pt per meter
-	 */
-	@Deprecated // this will eventually be removed from core matsim; please find other ways to use this.  kai/benjamin, oct/10
-	public double getMarginalUtlOfDistancePt() {
-//		return this.marginalUtlOfDistancePt;
-		return this.getMarginalUtilityOfMoney() * this.getMonetaryDistanceCostRatePt() ;
-	}
+//	/**
+//	 * @return the marginal utility of distance for mode pt per meter
+//	 */
+//	@Deprecated // this will eventually be removed from core matsim; please find other ways to use this.  kai/benjamin, oct/10
+//	private double getMarginalUtlOfDistancePt() {
+////		return this.marginalUtlOfDistancePt;
+//		return this.getMarginalUtilityOfMoney() * this.getMonetaryDistanceCostRatePt() ;
+//	}
 	/**
 	 * @param marginalUtlOfDistancePt the marginal utility of distance for mode pt per meter
 	 */
 	@Deprecated // this will eventually be removed from core matsim; please find other ways to use this.  kai/benjamin, oct/10
-	public void setMarginalUtlOfDistancePt(final double marginalUtlOfDistancePt) {
+	private void setMarginalUtlOfDistancePt(final double marginalUtlOfDistancePt) {
 //		this.marginalUtlOfDistancePt = marginalUtlOfDistancePt;
 		if ( marginalUtlOfDistancePt != 0. ) {
 			log.warn( "marginalUtlOfDistancePt is deprecated; setting monetaryDistanceCostRatePt instead.") ;
 			this.setMonetaryDistanceCostRatePt( marginalUtlOfDistancePt/this.getMarginalUtilityOfMoney() ) ;
 		}
 	}
-	/**
-	 * @return the marginal utility of distance for mode car per meter
-	 */
-	@Deprecated // this will eventually be removed from core matsim; please find other ways to use this.  kai/benjamin, oct/10
-	public double getMarginalUtlOfDistanceCar() {
-//		return this.marginalUtlOfDistanceCar;
-		return this.getMarginalUtilityOfMoney() * this.getMonetaryDistanceCostRateCar() ;
-	}
+//	/**
+//	 * @return the marginal utility of distance for mode car per meter
+//	 */
+//	@Deprecated // this will eventually be removed from core matsim; please find other ways to use this.  kai/benjamin, oct/10
+//	private double getMarginalUtlOfDistanceCar() {
+////		return this.marginalUtlOfDistanceCar;
+//		return this.getMarginalUtilityOfMoney() * this.getMonetaryDistanceCostRateCar() ;
+//	}
 	/**
 	 * @param marginalUtlOfDistanceCar the marginal utility of distance for mode car per meter
 	 */
 	@Deprecated // this will eventually be removed from core matsim; please find other ways to use this.  kai/benjamin, oct/10
-	public void setMarginalUtlOfDistanceCar(final double marginalUtlOfDistanceCar) {
+	private void setMarginalUtlOfDistanceCar(final double marginalUtlOfDistanceCar) {
 //		this.marginalUtlOfDistanceCar = marginalUtlOfDistanceCar;
 		if ( marginalUtlOfDistanceCar != 0. ) {
 			log.warn( "marginalUtlOfDistanceCar is deprecated; setting monetaryDistanceCostRateCar instead") ;
@@ -475,11 +485,11 @@ public class CharyparNagelScoringConfigGroup extends Module {
 		}
 	}
 
-	public double getWaiting() {
+	public double getWaiting_utils_hr() {
 		return this.waiting;
 	}
 	private static int setWaitingCnt=0 ;
-	public void setWaiting(final double waiting) {
+	public void setWaiting_utils_hr(final double waiting) {
 		if ( (this.earlyDeparture != 0.) && (setWaitingCnt<1) ) {
 			setWaitingCnt++ ;
 			log.warn("Setting betaWaiting different from zero is discouraged.  It is probably implemented correctly, " +

@@ -456,7 +456,7 @@ public class MultiNodeDijkstraTest extends TestCase {
 		}
 
 		@Override
-		public double getLinkTravelCost(final Link link, final double time) {
+		public double getLinkGeneralizedTravelCost(final Link link, final double time) {
 			return this.travelCosts.get(link.getId()).doubleValue();
 		}
 

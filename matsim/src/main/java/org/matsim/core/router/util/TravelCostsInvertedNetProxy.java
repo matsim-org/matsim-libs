@@ -40,11 +40,11 @@ public class TravelCostsInvertedNetProxy implements TravelCost {
 		this.travelCosts = travelCosts;
 	}
 
-	public double getLinkTravelCost(Link link, double time) {
+	public double getLinkGeneralizedTravelCost(Link link, double time) {
 		//as we have no turning move travel costs defined
 		//the fromLink is sufficient to calculate travelCosts
 		Link fromLink = this.originalNetwork.getLinks().get(link.getFromNode().getId());
-		return this.travelCosts.getLinkTravelCost(fromLink, time);
+		return this.travelCosts.getLinkGeneralizedTravelCost(fromLink, time);
 	}
 
 }

@@ -72,12 +72,13 @@ public class FreespeedTravelTimeCost implements PersonalizableTravelCost, Travel
 	}
 
 	public FreespeedTravelTimeCost(CharyparNagelScoringConfigGroup cnScoringGroup){
-		this(cnScoringGroup.getTraveling() / 3600.0, cnScoringGroup.getPerforming() / 3600.0,
-				cnScoringGroup.getMarginalUtlOfDistanceCar());
+		this(cnScoringGroup.getTraveling_utils_hr() / 3600.0, cnScoringGroup.getPerforming_utils_hr() / 3600.0,
+//				cnScoringGroup.getMarginalUtlOfDistanceCar());
+				cnScoringGroup.getMonetaryDistanceCostRateCar()*cnScoringGroup.getMarginalUtilityOfMoney());
 	}
 
 	@Override
-	public double getLinkTravelCost(Link link, double time) {
+	public double getLinkGeneralizedTravelCost(Link link, double time) {
 		if (this.marginalUtlOfDistance == 0.0) {
 			return (link.getLength() / link.getFreespeed(time)) * this.travelCostFactor;
 		}

@@ -333,7 +333,7 @@ public class Dijkstra implements IntermodalLeastCostPathCalculator {
 			final double currCost, final Node toNode) {
 
 		double travelTime = this.timeFunction.getLinkTravelTime(l, currTime);
-		double travelCost = this.costFunction.getLinkTravelCost(l, currTime);
+		double travelCost = this.costFunction.getLinkGeneralizedTravelCost(l, currTime);
 		DijkstraNodeData data = getData(n);
 		double nCost = data.getCost();
 		if (!data.isVisited(getIterationId())) {

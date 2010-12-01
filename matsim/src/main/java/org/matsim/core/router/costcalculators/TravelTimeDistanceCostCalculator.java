@@ -43,12 +43,15 @@ public class TravelTimeDistanceCostCalculator implements TravelMinCost, Personal
 		/* Usually, the travel-utility should be negative (it's a disutility)
 		 * but the cost should be positive. Thus negate the utility.
 		 */
-		this.travelCostFactor = (- cnScoringGroup.getTraveling() / 3600.0) + (cnScoringGroup.getPerforming() / 3600.0);
-		this.marginalUtlOfDistance = cnScoringGroup.getMarginalUtlOfDistanceCar();
+		this.travelCostFactor = (- cnScoringGroup.getTraveling_utils_hr() / 3600.0) + (cnScoringGroup.getPerforming_utils_hr() / 3600.0);
+
+//		this.marginalUtlOfDistance = cnScoringGroup.getMarginalUtlOfDistanceCar();
+		this.marginalUtlOfDistance = cnScoringGroup.getMonetaryDistanceCostRateCar() * cnScoringGroup.getMarginalUtilityOfMoney() ;
+		
 	}
 
 	@Override
-	public double getLinkTravelCost(final Link link, final double time) {
+	public double getLinkGeneralizedTravelCost(final Link link, final double time) {
 		double travelTime = this.timeCalculator.getLinkTravelTime(link, time);
 		if (this.marginalUtlOfDistance == 0.0) {
 			return travelTime * this.travelCostFactor;

@@ -63,7 +63,7 @@ public class RiskCostFromFloodingDataTest extends MatsimTestCase {
 		// linkLength = 318.075861755381
 		// linkCost = 8667.081123237946 * linkLength / 100 = 28044.9329790229
 		Link l0 = sc.getNetwork().getLinks().get(new IdImpl("11288"));
-		double l0Cost = rcf.getLinkTravelCost(l0, Time.UNDEFINED_TIME);
+		double l0Cost = rcf.getLinkGeneralizedTravelCost(l0, Time.UNDEFINED_TIME);
 		assertEquals(28044.9329790229, l0Cost, delta);
 
 		// Link 111288 cost = 0. (opposite direction)
@@ -71,7 +71,7 @@ public class RiskCostFromFloodingDataTest extends MatsimTestCase {
 		// toNodeTime = 35.54864794603423333333
 		// fromNodeTime < toNodeTime --> linkCost = 0
 		Link l0Inverse = sc.getNetwork().getLinks().get(new IdImpl("111288"));
-		double l0InverseCost = rcf.getLinkTravelCost(l0Inverse, Time.UNDEFINED_TIME);
+		double l0InverseCost = rcf.getLinkGeneralizedTravelCost(l0Inverse, Time.UNDEFINED_TIME);
 		assertEquals(0, l0InverseCost, delta);
 
 		// bufferSize = 250
@@ -90,7 +90,7 @@ public class RiskCostFromFloodingDataTest extends MatsimTestCase {
 		// linkLength = 15.5646142300945
 		// linkCost = toNodeCost * linkLength / 100 = 124.44247096468449
 		Link l1 = sc.getNetwork().getLinks().get(new IdImpl("9204"));
-		double l1Cost = rcf.getLinkTravelCost(l1, Time.UNDEFINED_TIME);
+		double l1Cost = rcf.getLinkGeneralizedTravelCost(l1, Time.UNDEFINED_TIME);
 		assertEquals(124.44247096468449, l1Cost, delta);
 
 		// Link 109204 cost = 0. (opposite direction)
@@ -100,7 +100,7 @@ public class RiskCostFromFloodingDataTest extends MatsimTestCase {
 		// ffromNodeCost = 3 * 3600 / 2 * (1 -(223.125 /250)) --> ca. 799.5
 		// toNodeCost < fromNodeCost --> linkCost = 0
 		Link l1Inverse = sc.getNetwork().getLinks().get(new IdImpl("109204"));
-		double l1InverseCost = rcf.getLinkTravelCost(l1Inverse, Time.UNDEFINED_TIME);
+		double l1InverseCost = rcf.getLinkGeneralizedTravelCost(l1Inverse, Time.UNDEFINED_TIME);
 		assertEquals(0, l1InverseCost, delta);
 
 		// test 2 links at the edge of the buffer
@@ -111,12 +111,12 @@ public class RiskCostFromFloodingDataTest extends MatsimTestCase {
 		// linkLength = 85.7201419982439
 		// linkCost = toNodeCost * linkLength / 100 = 497.60526643476226
 		Link l2 = sc.getNetwork().getLinks().get(new IdImpl("6798"));
-		double l2Cost = rcf.getLinkTravelCost(l2, Time.UNDEFINED_TIME);
+		double l2Cost = rcf.getLinkGeneralizedTravelCost(l2, Time.UNDEFINED_TIME);
 		assertEquals(497.60526643476226, l2Cost, delta);
 
 		// Link 106798 cost = 0. (opposite direction)
 		Link l2Inverse = sc.getNetwork().getLinks().get(new IdImpl("106798"));
-		double l2InverseCost = rcf.getLinkTravelCost(l2Inverse, Time.UNDEFINED_TIME);
+		double l2InverseCost = rcf.getLinkGeneralizedTravelCost(l2Inverse, Time.UNDEFINED_TIME);
 		assertEquals(0, l2InverseCost, delta);
 
 		// // agent penalties

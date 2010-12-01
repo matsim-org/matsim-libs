@@ -110,12 +110,12 @@ public class TransitRouterNetworkTravelTimeCostTest extends TestCase {
 		}
 
 		double oldCost = conf.costLineSwitch;
-		double cost1 = tc.getLinkTravelCost(testLink, 7.0*3600);
+		double cost1 = tc.getLinkGeneralizedTravelCost(testLink, 7.0*3600);
 		conf.costLineSwitch = 0.0;
-		double cost2 = tc.getLinkTravelCost(testLink, 7.0*3600);
+		double cost2 = tc.getLinkGeneralizedTravelCost(testLink, 7.0*3600);
 		assertEquals(oldCost, cost1 - cost2, MatsimTestCase.EPSILON);
 		conf.costLineSwitch = 40.125;
-		double cost3 = tc.getLinkTravelCost(testLink, 7.0*3600);
+		double cost3 = tc.getLinkGeneralizedTravelCost(testLink, 7.0*3600);
 		assertEquals(40.125, cost3 - cost2, MatsimTestCase.EPSILON);
 	}
 

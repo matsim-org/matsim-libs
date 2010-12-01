@@ -254,7 +254,7 @@ public class BetaTravelTest extends MatsimTestCase {
 			super.setUp();
 
 			// do some test to ensure the scenario is correct
-			double beta_travel = this.config.charyparNagelScoring().getTraveling();
+			double beta_travel = this.config.charyparNagelScoring().getTraveling_utils_hr();
 			if ((beta_travel != -6.0) && (beta_travel != -66.0)) {
 				throw new IllegalArgumentException("Unexpected value for beta_travel. Expected -6.0 or -66.0, actual value is " + beta_travel);
 			}
@@ -334,7 +334,7 @@ public class BetaTravelTest extends MatsimTestCase {
 				event.getControler().getEvents().removeHandler(this.ttAnalyzer);
 			}
 			if (iteration == 100) {
-				double beta_travel = event.getControler().getConfig().charyparNagelScoring().getTraveling();
+				double beta_travel = event.getControler().getConfig().charyparNagelScoring().getTraveling_utils_hr();
 				/* ***************************************************************
 				 * AUTOMATIC VERIFICATION OF THE TESTS:
 				 * 

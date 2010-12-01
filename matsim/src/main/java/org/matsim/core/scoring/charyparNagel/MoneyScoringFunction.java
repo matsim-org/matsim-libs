@@ -50,7 +50,7 @@ public class MoneyScoringFunction implements MoneyScoring, BasicScoring {
 	}
 
 	public void addMoney(final double amount) {
-		this.score += amount; // linear mapping of money to score
+		this.score += amount * this.params.marginalUtilityOfMoney ; // linear mapping of money to score
 	}
 
 	public void finish() {

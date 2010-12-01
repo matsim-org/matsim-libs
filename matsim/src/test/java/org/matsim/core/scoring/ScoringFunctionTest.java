@@ -54,13 +54,17 @@ public abstract class ScoringFunctionTest extends MatsimTestCase {
 	protected void setupScoringConfig(final Config config) {
 		CharyparNagelScoringConfigGroup scoring = config.charyparNagelScoring();
 		scoring.setBrainExpBeta(2.0);
-		scoring.setLateArrival(-18.0);
-		scoring.setEarlyDeparture(0.0);
-		scoring.setPerforming(6.0);
-		scoring.setTraveling(-6.0);
-		scoring.setTravelingPt(0.0);
-		scoring.setMarginalUtlOfDistanceCar(0.0);
-		scoring.setWaiting(0.0);
+		scoring.setLateArrival_utils_hr(-18.0);
+		scoring.setEarlyDeparture_utils_hr(0.0);
+		scoring.setPerforming_utils_hr(6.0);
+		scoring.setTraveling_utils_hr(-6.0);
+		scoring.setTravelingPt_utils_hr(0.0);
+
+//		scoring.setMarginalUtlOfDistanceCar(0.0);
+		scoring.setMonetaryDistanceCostRateCar(0.0) ;
+		scoring.setMarginalUtilityOfMoney(1.);
+
+		scoring.setWaiting_utils_hr(0.0);
 
 		// setup activity types h and w for scoring
 		CharyparNagelScoringConfigGroup.ActivityParams params = new CharyparNagelScoringConfigGroup.ActivityParams("home");

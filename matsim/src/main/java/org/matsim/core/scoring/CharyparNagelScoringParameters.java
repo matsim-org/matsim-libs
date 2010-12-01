@@ -45,24 +45,30 @@ public class CharyparNagelScoringParameters implements MatsimParameters {
 	@Deprecated // not really deprecated, but discouraged.  benjamin/kai, dec'10
 	public final double marginalUtilityOfDistanceWalk_m;
 
+	public final double monetaryDistanceCostRateCar;
+	public final double marginalUtilityOfMoney;
+
 	public final double abortedPlanScore;
 
 	/** True if one at least one of marginal utilities for performing, waiting, being late or leaving early is not equal to 0. */
 	public final boolean scoreActs;
 	
 	public CharyparNagelScoringParameters(final CharyparNagelScoringConfigGroup config) {
-		marginalUtilityOfWaiting_s = config.getWaiting() / 3600.0;
-		marginalUtilityOfLateArrival_s = config.getLateArrival() / 3600.0;
-		marginalUtilityOfEarlyDeparture_s = config.getEarlyDeparture() / 3600.0;
-		marginalUtilityOfTraveling_s = config.getTraveling() / 3600.0;
-		marginalUtilityOfTravelingPT_s = config.getTravelingPt() / 3600.0;
-		marginalUtilityOfTravelingWalk_s = config.getTravelingWalk() / 3600.0;
-		marginalUtilityOfPerforming_s = config.getPerforming() / 3600.0;
+		marginalUtilityOfWaiting_s = config.getWaiting_utils_hr() / 3600.0;
+		marginalUtilityOfLateArrival_s = config.getLateArrival_utils_hr() / 3600.0;
+		marginalUtilityOfEarlyDeparture_s = config.getEarlyDeparture_utils_hr() / 3600.0;
+		marginalUtilityOfTraveling_s = config.getTraveling_utils_hr() / 3600.0;
+		marginalUtilityOfTravelingPT_s = config.getTravelingPt_utils_hr() / 3600.0;
+		marginalUtilityOfTravelingWalk_s = config.getTravelingWalk_utils_hr() / 3600.0;
+		marginalUtilityOfPerforming_s = config.getPerforming_utils_hr() / 3600.0;
 
-		marginalUtilityOfDistanceCar_m = config.getMarginalUtlOfDistanceCar();
-		marginalUtilityOfDistancePt_m = config.getMarginalUtlOfDistancePt();
+		marginalUtilityOfDistanceCar_m = config.getMonetaryDistanceCostRateCar() * config.getMarginalUtilityOfMoney() ;
+		marginalUtilityOfDistancePt_m = config.getMonetaryDistanceCostRatePt() * config.getMarginalUtilityOfMoney() ;
 
 		marginalUtilityOfDistanceWalk_m = config.getMarginalUtlOfDistanceWalk();
+		
+		this.monetaryDistanceCostRateCar = config.getMonetaryDistanceCostRateCar() ;
+		this.marginalUtilityOfMoney = config.getMarginalUtilityOfMoney() ;
 
 		abortedPlanScore = Math.min(
 				Math.min(marginalUtilityOfLateArrival_s, marginalUtilityOfEarlyDeparture_s),

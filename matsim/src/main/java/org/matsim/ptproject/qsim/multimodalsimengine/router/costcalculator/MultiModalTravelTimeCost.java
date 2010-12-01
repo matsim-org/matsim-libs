@@ -73,7 +73,7 @@ public class MultiModalTravelTimeCost implements MultiModalTravelTime, Personali
 	}
 
 	@Override
-	public double getLinkTravelCost(Link link, double time) {
+	public double getLinkGeneralizedTravelCost(Link link, double time) {
 		return getLinkTravelTime(link, time);
 	}
 
