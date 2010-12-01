@@ -104,7 +104,7 @@ public class LegScoringFunction4PC extends LegScoringFunction {
 		double dist = 0.0; // distance in meters
 
 		if (TransportMode.car.equals(leg.getMode())) {
-			if (params.marginalUtilityOfDistanceCar != 0.0) {
+			if (params.marginalUtilityOfDistanceCar_m != 0.0) {
 				RouteWRefs route = (RouteWRefs) leg.getRoute();
 				dist = route.getDistance();
 				/*
@@ -119,18 +119,18 @@ public class LegScoringFunction4PC extends LegScoringFunction {
 				 */
 			}
 			tmpScore += travelTime * params.marginalUtilityOfTraveling_s
-					+ params.marginalUtilityOfDistanceCar * dist
+					+ params.marginalUtilityOfDistanceCar_m * dist
 					+ CharyparNagelScoringFunctionFactory4PC.offsetCar;
 			// traveling attr
 			travTimeAttrCar += travelTime / 3600d;
 			carLegNo++;
 			distanceAttrCar += dist;
 		} else if (TransportMode.pt.equals(leg.getMode())) {
-			if (params.marginalUtilityOfDistancePt != 0.0) {
+			if (params.marginalUtilityOfDistancePt_m != 0.0) {
 				dist = leg.getRoute().getDistance();
 			}
 			tmpScore += travelTime * params.marginalUtilityOfTravelingPT_s
-					+ params.marginalUtilityOfDistancePt * dist
+					+ params.marginalUtilityOfDistancePt_m * dist
 					+ CharyparNagelScoringFunctionFactory4PC.offsetPt;
 			// travelingPt attr
 			travTimeAttrPt += travelTime / 3600d;
@@ -138,23 +138,23 @@ public class LegScoringFunction4PC extends LegScoringFunction {
 			distanceAttrPt += dist;
 		} else if (TransportMode.walk.equals(leg.getMode())
 				|| TransportMode.transit_walk.equals(leg.getMode())) {
-			if (params.marginalUtilityOfDistanceWalk != 0.0) {
+			if (params.marginalUtilityOfDistanceWalk_m != 0.0) {
 				dist = leg.getRoute().getDistance();
 			}
 			tmpScore += travelTime * params.marginalUtilityOfTravelingWalk_s
-					+ params.marginalUtilityOfDistanceWalk * dist
+					+ params.marginalUtilityOfDistanceWalk_m * dist
 					+ CharyparNagelScoringFunctionFactory4PC.offsetWalk;
 			// travelingWalk attr
 			travTimeAttrWalk += travelTime / 3600d;
 			walkLegNo++;
 			distanceAttrWalk += dist;
 		} else {// other mode?
-			if (params.marginalUtilityOfDistanceCar != 0.0) {
+			if (params.marginalUtilityOfDistanceCar_m != 0.0) {
 				dist = leg.getRoute().getDistance();
 			}
 			// use the same values as for "car"
 			tmpScore += travelTime * params.marginalUtilityOfTraveling_s
-					+ params.marginalUtilityOfDistanceCar * dist
+					+ params.marginalUtilityOfDistanceCar_m * dist
 					+ CharyparNagelScoringFunctionFactory4PC.offsetCar;
 			// traveling attr
 			travTimeAttrCar += travelTime / 3600d;

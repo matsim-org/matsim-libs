@@ -81,10 +81,10 @@ public class LegScoringFunction extends org.matsim.core.scoring.charyparNagel.Le
 
 			tmpScore += this.ktiConfigGroup.getConstCar();
 
-			if (this.params.marginalUtilityOfDistanceCar != 0.0) {
+			if (this.params.marginalUtilityOfDistanceCar_m != 0.0) {
 				Route route = leg.getRoute();
 				dist = route.getDistance();
-				tmpScore += this.params.marginalUtilityOfDistanceCar * ktiConfigGroup.getDistanceCostCar()/1000d * dist;
+				tmpScore += this.params.marginalUtilityOfDistanceCar_m * ktiConfigGroup.getDistanceCostCar()/1000d * dist;
 			}
 			tmpScore += travelTime * this.params.marginalUtilityOfTraveling_s;
 
@@ -130,7 +130,7 @@ public class LegScoringFunction extends org.matsim.core.scoring.charyparNagel.Le
 
 		} else if (TransportMode.walk.equals(leg.getMode())) {
 
-			if (this.params.marginalUtilityOfDistanceWalk != 0.0) {
+			if (this.params.marginalUtilityOfDistanceWalk_m != 0.0) {
 				dist = leg.getRoute().getDistance();
 			}
 			tmpScore += this.getWalkScore(dist, travelTime);
@@ -143,11 +143,11 @@ public class LegScoringFunction extends org.matsim.core.scoring.charyparNagel.Le
 
 		} else {
 
-			if (this.params.marginalUtilityOfDistanceCar != 0.0) {
+			if (this.params.marginalUtilityOfDistanceCar_m != 0.0) {
 				dist = leg.getRoute().getDistance();
 			}
 			// use the same values as for "car"
-			tmpScore += travelTime * this.params.marginalUtilityOfTraveling_s + this.params.marginalUtilityOfDistanceCar * dist;
+			tmpScore += travelTime * this.params.marginalUtilityOfTraveling_s + this.params.marginalUtilityOfDistanceCar_m * dist;
 
 		}
 
@@ -158,7 +158,7 @@ public class LegScoringFunction extends org.matsim.core.scoring.charyparNagel.Le
 
 		double score = 0.0;
 
-		score += travelTime * this.params.marginalUtilityOfTravelingWalk_s + this.params.marginalUtilityOfDistanceWalk * distance;
+		score += travelTime * this.params.marginalUtilityOfTravelingWalk_s + this.params.marginalUtilityOfDistanceWalk_m * distance;
 
 		return score;
 
@@ -177,7 +177,7 @@ public class LegScoringFunction extends org.matsim.core.scoring.charyparNagel.Le
 		} else {
 			throw new RuntimeException("Person " + this.plan.getPerson().getId() + " has an invalid travelcard. This should never happen.");
 		}
-		score += this.params.marginalUtilityOfDistancePt * distanceCost / 1000d * distance;
+		score += this.params.marginalUtilityOfDistancePt_m * distanceCost / 1000d * distance;
 		score += travelTime * this.params.marginalUtilityOfTravelingPT_s;
 
 		return score;
