@@ -74,6 +74,7 @@ public class DecentralizedChargerInfo {
 	private double [][] highLowIntervals; // [start time in hours][end time in hours][1 or -1 (1 if section above newBaseLoad]
 	
 	private double penetration; // number of PHEV vehicles in system
+	private double flatteningPenetration;
 	private double averagePHEVConsumption; // passed as parameter in units [load/hour]
 	private double totalPHEVConsumption; // total load is calculated
 	private double peakBaseConsumption;//maxBaseConsumption
@@ -84,9 +85,10 @@ public class DecentralizedChargerInfo {
 	private double crit; // level of +/- accuracy for finding newBaseConsumption
 	// set in constructor
 	
-	private PolynomialFunction polyFuncBaseLoad; // degree of 96
+	private PolynomialFunction polyFuncBaseLoad96; // degree of 96
 	private PolynomialFunction polyFuncBaseLoad24; // degree of 24
 	private PolynomialFunction polyFuncBaseLoad48; // degree of 48
+	private PolynomialFunction polyFuncBaseLoadWorking;
 	private ArrayList<PolynomialFunction> probDensityFunctions; // ArrayList with PolynomialFunctons for each valley
 	private double[][] probDensityRanges; // for each polynomialFunction in probDensity Functions: [start probability][end probability]
 	private double[][] valleyTimes; // for each valley [start time in hours][end time in hours] 
@@ -104,9 +106,10 @@ public class DecentralizedChargerInfo {
 	private XYSeries constantLoadFigureData;//XY Series on line of constantBaseConsumption for plots
 	private XYSeries peakLoadFigureData;//XY Series on line of peakBaseConsumption for plots
 	  
-	private XYSeries loadFitFuncFigureData; //XY Series of fitted base load function for plots
+	private XYSeries loadFitFuncFigureData96; //XY Series of fitted base load function for plots
 	private XYSeries loadFitFuncFigureData24;
 	private XYSeries loadFitFuncFigureData48;
+	private XYSeries loadFitFuncFigureDataWorking;
 	  
 	final String outputPath="C:\\Output\\";
 	
@@ -134,9 +137,9 @@ public class DecentralizedChargerInfo {
 		this.priceBase=priceBase;
 		this.pricePeak=pricePeak;
 		System.out.println("peakLoad: "+peakLoad);
-		totalPHEVConsumption=averagePHEVConsumption*penetration;
+		totalPHEVConsumption=averagePHEVConsumption*penetration; //Watts
 		
-		crit=5*averagePHEVConsumption;
+		crit=5*averagePHEVConsumption; // Watts
 		
 		functionIntegrator= new SimpsonIntegrator(); 
 		newtonSolver = new NewtonSolver();
@@ -161,7 +164,9 @@ public class DecentralizedChargerInfo {
 	
 	public void findHighLowIntervals() throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException, IOException{
 		
-		if (flatteningPenetration()<penetration){ 
+		flatteningPenetration=flatteningPenetration();
+		if (flatteningPenetration<penetration){ 
+			
 			double step=0.005*constantBaseConsumption; 
 			highLowIntervals=getLowHighTariffIntervals(step);
 			}
@@ -176,7 +181,7 @@ public class DecentralizedChargerInfo {
 		slotBaseLoad = GeneralLib.readMatrix(96, 2, false, "test\\input\\playground\\wrashid\\sschieffer\\baseLoadCurve15minBinsSecLoad.txt");
 		
 		/*
-		 * Loop over mattrix to find
+		 * Loop over matrix to find
 		 * - peakBaseConsumption (maxValue)
 		 * - constantBaseConsumption (minValue)
 		 * - put in zeroLineData - helpful for graphs
@@ -225,17 +230,17 @@ public class DecentralizedChargerInfo {
 		System.out.println("fitting curve of degree "+ 48);
 		polyFuncBaseLoad48=fitCurve(slotBaseLoad, 48);
 		System.out.println("fitting curve of degree "+ 96);
-		polyFuncBaseLoad=fitCurve(slotBaseLoad, 96);
-		  
+		polyFuncBaseLoad96=fitCurve(slotBaseLoad, 96);
+		
 		  constantLoadFigureData = new XYSeries("Constant Baseload Data from File");
 		  peakLoadFigureData = new XYSeries("Peak Baseload Data from File");
 		  
-		  loadFitFuncFigureData = new XYSeries("Fitted Function Baseload Data (deg=96)");
+		  loadFitFuncFigureData96 = new XYSeries("Fitted Function Baseload Data (deg=96)");
 		  loadFitFuncFigureData24 = new XYSeries("Fitted Function Baseload Data (deg=24)");
 		  loadFitFuncFigureData48 = new XYSeries("Fitted Function Baseload Data (deg=48)");
 		  
 		  for (int i=0;i<96;i++){
-			  loadFitFuncFigureData.add(i*Main.secondsPer15Min, polyFuncBaseLoad.value(i*Main.secondsPer15Min));
+			  loadFitFuncFigureData96.add(i*Main.secondsPer15Min, polyFuncBaseLoad96.value(i*Main.secondsPer15Min));
 			  loadFitFuncFigureData24.add(i*Main.secondsPer15Min, polyFuncBaseLoad24.value(i*Main.secondsPer15Min));
 			  loadFitFuncFigureData48.add(i*Main.secondsPer15Min, polyFuncBaseLoad48.value(i*Main.secondsPer15Min));
 			  
@@ -245,8 +250,11 @@ public class DecentralizedChargerInfo {
 		  
 		  plotLoadSeries("fittedLoadGraph24.png", loadFitFuncFigureData24);		  
 		  plotLoadSeries("fittedLoadGraph48.png", loadFitFuncFigureData48);
-		  plotLoadSeries("fittedLoadGraph96.png", loadFitFuncFigureData);
+		  plotLoadSeries("fittedLoadGraph96.png", loadFitFuncFigureData96);
 		  
+		  // assign the polyFunction to use in this class
+		  polyFuncBaseLoadWorking=polyFuncBaseLoad24;
+		  loadFitFuncFigureDataWorking=loadFitFuncFigureData24;
 		  }
 	
 	/**
@@ -295,18 +303,16 @@ public class DecentralizedChargerInfo {
 	 * Integrates given function p over the entire day
 	 */
 	public double totalBaseConsumption(PolynomialFunction p) throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
-		
-			return functionIntegrator.integrate(p, 0.0, Main.secondsPerDay);
-		
+		return functionIntegrator.integrate(p, 0.0, Main.secondsPerDay);
 	}
 	
 	
 	/**
 	 * returns the number of PHEVs necessary to reach complete baseLoad flattening
 	 */
-	public long flatteningPenetration() throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
-		double flatteningPHEVLoad=Main.secondsPerDay*peakLoad-totalBaseConsumption(polyFuncBaseLoad);
-		return Math.round(flatteningPHEVLoad/averagePHEVConsumption);
+	public double flatteningPenetration() throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
+		double totalValleyToFill=Main.secondsPerDay*peakLoad-totalBaseConsumption(polyFuncBaseLoadWorking);
+		return (totalValleyToFill/averagePHEVConsumption);
 	}
 	
 	
@@ -336,7 +342,7 @@ public class DecentralizedChargerInfo {
 		double currentTry=peakLoad;
 		while (run){
 			iterationsToFindNewBaseConsumption++;
-			if ( Math.abs(currentTry*Main.secondsPerDay-functionIntegrator.integrate(polyFuncBaseLoad, 0, Main.secondsPerDay)-totalPHEVConsumption)<crit){
+			if ( Math.abs(currentTry*Main.secondsPerDay-functionIntegrator.integrate(polyFuncBaseLoadWorking , 0, Main.secondsPerDay)-totalPHEVConsumption)<crit){
 				//solution found
 				newBaseConsumption=currentTry;
 				run=false;
@@ -385,7 +391,7 @@ public class DecentralizedChargerInfo {
 			
 			// create polyFuncBaseLoad-currentTry to find the roots per slot
 			PolynomialFunction tempFunction = new PolynomialFunction (c);
-			tempFunction = polyFuncBaseLoad.subtract(tempFunction);
+			tempFunction = polyFuncBaseLoadWorking.subtract(tempFunction);
 			
 			System.out.println("currentTry=" + currentTry);
 			double segment=Main.secondsPerMin;
@@ -430,7 +436,7 @@ public class DecentralizedChargerInfo {
 			if (solution.isEmpty()){ 	//no solutions for this currentTry
 			//should not happen, since we start from peakLoad and go to half
 				
-				if(Main.secondsPerDay*currentTry-totalBaseConsumption(polyFuncBaseLoad)-totalPHEVConsumption<0.0){
+				if(Main.secondsPerDay*currentTry-totalBaseConsumption(polyFuncBaseLoadWorking)-totalPHEVConsumption<0.0){
 					// solution is in upper half
 					currentLowerTry=currentTry;
 				}
@@ -478,7 +484,7 @@ public class DecentralizedChargerInfo {
 				double totInt=0;
 				for (int i=0; i<d.length; i++){
 					if (d[i][2]<0){
-							funcInt=funcInt+functionIntegrator.integrate(polyFuncBaseLoad,d[i][0], d[i][1]);
+							funcInt=funcInt+functionIntegrator.integrate(polyFuncBaseLoadWorking,d[i][0], d[i][1]);
 							totInt = totInt+ Math.abs(d[i][0]-d[i][1])*currentTry;
 					}
 					// check if total integral between baseLoad and currentTry is equal to PHEV Consumption
@@ -505,7 +511,7 @@ public class DecentralizedChargerInfo {
 			}// end else, solution analysis
 			plotFunctionForStep(tempFunction, currentTry, solution);
 		}// end while
-		System.out.println("Found Solution for crit value of: "	+crit);
+		System.out.println("Found Solution within range of +- "	+crit+ "Watts");
 		return d;
 	}
 	
@@ -533,7 +539,7 @@ public class DecentralizedChargerInfo {
 		  XYSeriesCollection dataset = new XYSeriesCollection();
 	      dataset.addSeries(figureData);
 	      dataset.addSeries(currentTryLevel);
-	      dataset.addSeries(loadFitFuncFigureData);
+	      dataset.addSeries(loadFitFuncFigureDataWorking);
 	      dataset.addSeries(zeroLineData);
 	      
 		  if (intersects.isEmpty() ==false){
@@ -597,6 +603,7 @@ public class DecentralizedChargerInfo {
 	public void findProbabilityDensityFunctions() throws OptimizationException, MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException, IOException{
 		double [][] valleyTimes=getValleyTimes();
 		// find number of valleys with given penetration
+		//initialize ProbFuncArrayWithInitial size 0
 		ArrayList<PolynomialFunction> ProbFuncArray=new ArrayList<PolynomialFunction>(0);
 		XYSeriesCollection dataset = new XYSeriesCollection();
 		double valleyInt=0;
@@ -609,12 +616,17 @@ public class DecentralizedChargerInfo {
 				double dx=(valleyTimes[i][1]-valleyTimes[i][0]);
 				double segments=dx/(Main.secondsPerMin); // every minute
 				
+				PolynomialFitter valleyFitter=new PolynomialFitter((int)segments,optimizer);
+				
 				for (double x=valleyTimes[i][0]; x<=valleyTimes[i][1]; x=x+dx/segments){
-					newValley.add(x,newBaseConsumption-polyFuncBaseLoad.value(x));
-					polyFit.addObservedPoint(1.0,x, newBaseConsumption-polyFuncBaseLoad.value(x) );
+					newValley.add(x,newBaseConsumption-polyFuncBaseLoadWorking.value(x));
+					double toAdd=newBaseConsumption-polyFuncBaseLoadWorking.value(x);
+					System.out.println("Adding point "+x + ", " + toAdd);
+					valleyFitter.addObservedPoint(1.0,x,  toAdd);
 				}
+				
 				dataset.addSeries(newValley);
-				PolynomialFunction poly = polyFit.fit();
+				PolynomialFunction poly = valleyFitter.fit();
 				ProbFuncArray.add(poly);
 				valleyInt=valleyInt+functionIntegrator.integrate(poly, valleyTimes[i][0], valleyTimes[i][1]);
 			}
@@ -622,8 +634,8 @@ public class DecentralizedChargerInfo {
 		String title= "Unscaled Probability Density Functions ";
 		JFreeChart chart = ChartFactory.createXYLineChart(title, "time in seconds", "Free Load for PHEV charging", dataset, PlotOrientation.VERTICAL, true, true, false);
 		ChartUtilities.saveChartAsPNG(new File(outputPath+title+".png") , chart, 800, 600);
-		  
-				
+		
+		
 		// now the integral of all probability function and their respective time intervals needs to be 1
 		double [] c = {1.0/valleyInt};
 		
@@ -634,9 +646,9 @@ public class DecentralizedChargerInfo {
 		}
 		
 		//TODO CHeck these functions
-		totalCostBase=constantBaseConsumption*priceBase*Main.secondsPerDay + (functionIntegrator.integrate(polyFuncBaseLoad, 0, Main.secondsPerDay)-constantBaseConsumption*Main.secondsPerDay)*pricePeak;
+		totalCostBase=constantBaseConsumption*priceBase*Main.secondsPerDay + (functionIntegrator.integrate(polyFuncBaseLoadWorking, 0, Main.secondsPerDay)-constantBaseConsumption*Main.secondsPerDay)*pricePeak;
 		
-		totalCostPHEV=(-newBaseConsumption*Main.secondsPerDay + (functionIntegrator.integrate(polyFuncBaseLoad, 0,Main.secondsPerDay)+valleyInt))*pricePeak + newBaseConsumption*Main.secondsPerDay*priceBase;
+		totalCostPHEV=(-newBaseConsumption*Main.secondsPerDay + (functionIntegrator.integrate(polyFuncBaseLoadWorking, 0,Main.secondsPerDay)+valleyInt))*pricePeak + newBaseConsumption*Main.secondsPerDay*priceBase;
 		
 		
 		probDensityFunctions=ProbFuncArray;
@@ -693,7 +705,7 @@ public class DecentralizedChargerInfo {
 		    BufferedWriter out = new BufferedWriter(fstream);
 		    out.write("Function of Base Load from File: \n");
 		    // function of base Load
-		    out.write(polyFuncBaseLoad.toString() +"\n \n");
+		    out.write(polyFuncBaseLoadWorking.toString() +"\n \n");
 		    
 		    // new Base Consumption
 		    out.write("New Constant Base Load with PHEVs: " +newBaseConsumption+"\n \n");
