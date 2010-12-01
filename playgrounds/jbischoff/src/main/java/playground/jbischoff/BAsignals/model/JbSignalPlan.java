@@ -38,9 +38,9 @@ import org.matsim.signalsystems.model.SignalPlan;
  * @author jbischoff
  *
  */
-public class JbSignalPlan implements SignalPlan {
+public class JbSignalPlan implements   SignalPlan {
 	private static final Logger log = Logger.getLogger(DatabasedSignalPlan.class);
-	private AdaptiveControllHead adaptiveControllHead;
+//	private AdaptiveControllHead adaptiveControllHead;
 	private SignalPlanData data;
 	private int cylce;
 	
@@ -50,7 +50,7 @@ public class JbSignalPlan implements SignalPlan {
 	
 	public JbSignalPlan(SignalPlanData planData, AdaptiveControllHead ach) {
 		this.data = planData;
-		this.adaptiveControllHead=ach;
+//		this.adaptiveControllHead=ach;
 		this.init();
 	}
 	
@@ -62,32 +62,33 @@ public class JbSignalPlan implements SignalPlan {
 			throw new IllegalStateException("This implementation of SignalPlan works only with a cycle time");
 		}
 		
-		for (SignalGroupSettingsData sgdata : this.data.getSignalGroupSettingsDataByGroupId().values()){
-			if (this.adaptiveControllHead.getAdaptiveSignalGroups().contains(sgdata.getSignalGroupId())){
-				
-				
-			}
-			else
-			// ordinary Signals
-			{
-			
-			List<Id> onsetsSgIds = this.secondInPlanOnsetsMap.get(sgdata.getOnset());
-			//onsets
-			if (onsetsSgIds == null){
-				onsetsSgIds = new ArrayList<Id>();
-				this.secondInPlanOnsetsMap.put(sgdata.getOnset(), onsetsSgIds);
-			}
-				
-			onsetsSgIds.add(sgdata.getSignalGroupId());
-			//dropping
-			List<Id> droppingSgIds = this.secondInPlanDroppingsMap.get(sgdata.getDropping());
-			if (droppingSgIds == null){
-				droppingSgIds = new ArrayList<Id>();
-				this.secondInPlanDroppingsMap.put(sgdata.getDropping(), droppingSgIds);
-			}
-			droppingSgIds.add(sgdata.getSignalGroupId());
-		}}
-		
+//		for (SignalGroupSettingsData sgdata : this.data.getSignalGroupSettingsDataByGroupId().values()){
+//			if (this.adaptiveControllHead.getAdaptiveSignalGroups().contains(sgdata.getSignalGroupId())){
+//				
+//				
+//			}
+//			else
+//			// ordinary Signals
+//				log.error("preparing "+sgdata.getSignalGroupId());
+//			{
+//			
+//			List<Id> onsetsSgIds = this.secondInPlanOnsetsMap.get(sgdata.getOnset());
+//			//onsets
+//			if (onsetsSgIds == null){
+//				onsetsSgIds = new ArrayList<Id>();
+//				this.secondInPlanOnsetsMap.put(sgdata.getOnset(), onsetsSgIds);
+//			}
+//				
+//			onsetsSgIds.add(sgdata.getSignalGroupId());
+//			//dropping
+//			List<Id> droppingSgIds = this.secondInPlanDroppingsMap.get(sgdata.getDropping());
+//			if (droppingSgIds == null){
+//				droppingSgIds = new ArrayList<Id>();
+//				this.secondInPlanDroppingsMap.put(sgdata.getDropping(), droppingSgIds);
+//			}
+//			droppingSgIds.add(sgdata.getSignalGroupId());
+//		}}
+//		
 	}
 
 	@Override
@@ -118,9 +119,7 @@ public class JbSignalPlan implements SignalPlan {
 		return this.data.getId();
 	}
 
-	public AdaptiveControllHead getAdaptiveControllHead() {
-		return adaptiveControllHead;
-	}
+	
 
 	public int getCylce() {
 		return cylce;

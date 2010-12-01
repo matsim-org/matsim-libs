@@ -27,6 +27,7 @@ import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.signalsystems.model.DatabasedSignalPlan;
 import org.matsim.signalsystems.model.SignalController;
 import org.matsim.signalsystems.model.SignalGroup;
 import org.matsim.signalsystems.model.SignalGroupState;
@@ -83,7 +84,7 @@ public class JbSignalController implements SignalController {
 		if (this.plans == null) {
 			this.plans = new HashMap<Id, SignalPlan>();
 			// TODO remove when checkActive is implemented
-			this.activePlan = (JbSignalPlan) plan;
+			this.activePlan =  (JbSignalPlan) plan;
 		}
 		this.plans.put(plan.getId(), plan);
 	}
@@ -215,7 +216,6 @@ public class JbSignalController implements SignalController {
 	}
 
 	private void resetAdaptiveSignals() {
-
 		this.adaptiveDroppings.clear();
 		this.adaptiveOnsets.clear();
 		for (Entry<Id, Integer> e : this.minDrop.entrySet()) {
@@ -235,6 +235,8 @@ public class JbSignalController implements SignalController {
 	}
 
 	private void updateNonAdaptiveStates(double timeSeconds) {
+		log.info("Updating na ss "+this.system.getId());
+
 		List<Id> droppingGroupIds = this.activePlan.getDroppings(timeSeconds);
 		if (droppingGroupIds != null) {
 			for (Id id : droppingGroupIds) {
