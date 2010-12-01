@@ -49,11 +49,25 @@
 			<systemPath>${basedir}/lib/cadyts-1.1.0.jar</systemPath>
 		</dependency>
 		<dependency>
-			<groupId>no.uib</groupId>
-			<artifactId>cipr</artifactId>
-			<version>1.0</version>
+			<groupId>mtj</groupId>
+			<artifactId>mtj</artifactId>
+			<version>0.9.12</version>
 			<scope>system</scope>
 			<systemPath>${basedir}/lib/mtj-0.9.12.jar</systemPath>
+		</dependency>
+		<dependency>
+			<groupId>netlib</groupId>
+			<artifactId>netlib-java</artifactId>
+			<version>0.9.1</version>
+			<scope>system</scope>
+			<systemPath>${basedir}/lib/lib/netlib-java/netlib-java-0.9.1.jar</systemPath>
+		</dependency>
+		<dependency>
+			<groupId>arpack</groupId>
+			<artifactId>arpack_combo</artifactId>
+			<version>0.1</version>
+			<scope>system</scope>
+			<systemPath>${basedir}/lib/lib/netlib-java/arpack_combo-0.1.jar</systemPath>
 		</dependency>
 	</dependencies>
 </project>
