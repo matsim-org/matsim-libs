@@ -1,4 +1,5 @@
 package playground.dgrether;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -23,9 +24,12 @@ import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.ptproject.qsim.QSim;
+import org.matsim.signalsystems.builder.FromDataBuilder;
+import org.matsim.signalsystems.data.SignalsData;
 import org.matsim.signalsystems.data.SignalsScenarioWriter;
+import org.matsim.signalsystems.mobsim.QSimSignalEngine;
+import org.matsim.signalsystems.mobsim.SignalEngine;
 import org.matsim.vis.otfvis.OTFVisMobsimFeature;
-
 
 /* *********************************************************************** *
  * project: org.matsim.*
@@ -49,150 +53,172 @@ import org.matsim.vis.otfvis.OTFVisMobsimFeature;
 
 /**
  * @author dgrether
- *
+ * 
  */
 public class DgOTFVisReplayLastIteration {
 
-  private static final Logger log = Logger.getLogger(DgOTFVisReplayLastIteration.class);
+	private static final Logger log = Logger.getLogger(DgOTFVisReplayLastIteration.class);
 
+	private void playOutputConfig(String configfile) throws FileNotFoundException, IOException {
+		String currentDirectory = configfile.substring(0, configfile.lastIndexOf("/") + 1);
+		if (currentDirectory == null) {
+			currentDirectory = configfile.substring(0, configfile.lastIndexOf("\\") + 1);
+		}
+		log.info("using " + currentDirectory + " as base directory...");
+		String newConfigFile = currentDirectory + "lastItLiveConfig.xml";
+		this.handleNoLongerSupportedParameters(configfile, newConfigFile);
+		Config config = new Config();
+		config.addCoreModules();
+		MatsimConfigReader configReader = new MatsimConfigReader(config);
+		configReader.readFile(newConfigFile);
+		ControlerIO oldConfControlerIO;
+		if (config.controler().getRunId() != null) {
+			oldConfControlerIO = new ControlerIO(currentDirectory, new IdImpl(config.controler()
+					.getRunId()));
+		}
+		else {
+			oldConfControlerIO = new ControlerIO(currentDirectory);
+		}
+		config.network().setInputFile(oldConfControlerIO.getOutputFilename(Controler.FILENAME_NETWORK));
+		config.plans()
+				.setInputFile(oldConfControlerIO.getOutputFilename(Controler.FILENAME_POPULATION));
+		if (config.scenario().isUseLanes()) {
+			config.network().setLaneDefinitionsFile(
+					oldConfControlerIO.getOutputFilename(Controler.FILENAME_LANES));
+		}
+		if (config.scenario().isUseSignalSystems()) {
+			config.signalSystems().setSignalSystemFile(
+					oldConfControlerIO.getOutputFilename(SignalsScenarioWriter.FILENAME_SIGNAL_SYSTEMS));
+			config.signalSystems().setSignalGroupsFile(
+					oldConfControlerIO.getOutputFilename(SignalsScenarioWriter.FILENAME_SIGNAL_GROUPS));
+			config.signalSystems().setSignalControlFile(
+					oldConfControlerIO.getOutputFilename(SignalsScenarioWriter.FILENAME_SIGNAL_CONTROL));
+			config.signalSystems().setAmberTimesFile(
+					oldConfControlerIO.getOutputFilename(SignalsScenarioWriter.FILENAME_AMBER_TIMES));
+		}
 
-  private void playOutputConfig(String configfile) throws FileNotFoundException, IOException {
-    String currentDirectory = configfile.substring(0, configfile.lastIndexOf("/") + 1);
-    if (currentDirectory == null ) {
-      currentDirectory = configfile.substring(0, configfile.lastIndexOf("\\") + 1);
-    }
-    log.info("using " + currentDirectory + " as base directory...");
-  	String newConfigFile = currentDirectory + "lastItLiveConfig.xml";
-  	this.handleNoLongerSupportedParameters(configfile, newConfigFile);
-    Config config = new Config();
-    config.addCoreModules();
-    MatsimConfigReader configReader = new MatsimConfigReader(config);
-    configReader.readFile(newConfigFile);
-    ControlerIO oldConfControlerIO;
-    if (config.controler().getRunId() != null){
-      oldConfControlerIO = new ControlerIO(currentDirectory, new IdImpl(config.controler().getRunId()));
-    }
-    else {
-    	oldConfControlerIO = new ControlerIO(currentDirectory);
-    }
-    config.network().setInputFile(oldConfControlerIO.getOutputFilename(Controler.FILENAME_NETWORK));
-    config.plans().setInputFile(oldConfControlerIO.getOutputFilename(Controler.FILENAME_POPULATION));
-    if (config.scenario().isUseLanes()){
-      config.network().setLaneDefinitionsFile(oldConfControlerIO.getOutputFilename(Controler.FILENAME_LANES));
-    }
-    if (config.scenario().isUseSignalSystems()){
-      config.signalSystems().setSignalSystemFile(oldConfControlerIO.getOutputFilename(SignalsScenarioWriter.FILENAME_SIGNAL_SYSTEMS));
-      config.signalSystems().setSignalGroupsFile(oldConfControlerIO.getOutputFilename(SignalsScenarioWriter.FILENAME_SIGNAL_GROUPS));
-      config.signalSystems().setSignalControlFile(oldConfControlerIO.getOutputFilename(SignalsScenarioWriter.FILENAME_SIGNAL_CONTROL));
-      config.signalSystems().setAmberTimesFile(oldConfControlerIO.getOutputFilename(SignalsScenarioWriter.FILENAME_AMBER_TIMES));
-    }
+		log.info("Complete config dump:");
+		StringWriter writer = new StringWriter();
+		new ConfigWriter(config).writeStream(new PrintWriter(writer));
+		log.info("\n\n" + writer.getBuffer().toString());
+		log.info("Complete config dump done.");
 
+		if (config.getQSimConfigGroup() == null) {
+			config.setQSimConfigGroup(new QSimConfigGroup());
+			config.getQSimConfigGroup().setFlowCapFactor(config.simulation().getFlowCapFactor());
+			config.getQSimConfigGroup().setStorageCapFactor(config.simulation().getStorageCapFactor());
+			config.getQSimConfigGroup().setRemoveStuckVehicles(
+					config.simulation().isRemoveStuckVehicles());
+			config.getQSimConfigGroup().setStuckTime(config.simulation().getStuckTime());
+			config.getQSimConfigGroup().setSnapshotStyle(config.simulation().getSnapshotStyle());
+		}
+		// disable snapshot writing as the snapshot should not be overwritten
+		config.getQSimConfigGroup().setSnapshotPeriod(0.0);
 
-    log.info("Complete config dump:");
-    StringWriter writer = new StringWriter();
-    new ConfigWriter(config).writeStream(new PrintWriter(writer));
-    log.info("\n\n" + writer.getBuffer().toString());
-    log.info("Complete config dump done.");
+		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(config);
+		Scenario sc = loader.loadScenario();
+		EventsManagerImpl events = new EventsManagerImpl();
+		ControlerIO controlerIO = new ControlerIO(sc.getConfig().controler().getOutputDirectory());
+		QSim otfVisQSim = new QSim(sc, events);
+		if (sc.getConfig().scenario().isUseSignalSystems()) {
+			SignalEngine engine = new QSimSignalEngine(
+					new FromDataBuilder(sc.getScenarioElement(SignalsData.class), events)
+							.createAndInitializeSignalSystemsManager());
+			otfVisQSim.addQueueSimulationListeners(engine);
+		}
 
-    if (config.getQSimConfigGroup() == null) {
-      config.setQSimConfigGroup(new QSimConfigGroup());
-      config.getQSimConfigGroup().setFlowCapFactor(config.simulation().getFlowCapFactor());
-      config.getQSimConfigGroup().setStorageCapFactor(config.simulation().getStorageCapFactor());
-      config.getQSimConfigGroup().setRemoveStuckVehicles(config.simulation().isRemoveStuckVehicles());
-      config.getQSimConfigGroup().setStuckTime(config.simulation().getStuckTime());
-      config.getQSimConfigGroup().setSnapshotStyle(config.simulation().getSnapshotStyle());
-    }
-    //disable snapshot writing as the snapshot should not be overwritten
-    config.getQSimConfigGroup().setSnapshotPeriod(0.0);
-
-    ScenarioLoaderImpl loader = new ScenarioLoaderImpl(config);
-    Scenario sc = loader.loadScenario();
-    EventsManagerImpl events = new EventsManagerImpl();
-    ControlerIO controlerIO = new ControlerIO(sc.getConfig().controler().getOutputDirectory());
-	QSim otfVisQSim = new QSim(sc, events);
-	OTFVisMobsimFeature queueSimulationFeature = new OTFVisMobsimFeature(otfVisQSim);
-	otfVisQSim.addFeature(queueSimulationFeature);
-	queueSimulationFeature.setVisualizeTeleportedAgents(sc.getConfig().otfVis().isShowTeleportedAgents());
-    QSim queueSimulation = otfVisQSim;
-    queueSimulation.setControlerIO(controlerIO);
-    queueSimulation.setIterationNumber(sc.getConfig().controler().getLastIteration());
-    queueSimulation.run();
-  }
-
-
-
-  private void handleNoLongerSupportedParameters(String configfile, String liveConfFile) throws FileNotFoundException, IOException {
-  	BufferedReader reader = IOUtils.getBufferedReader(configfile);
-  	String line = reader.readLine();
-  	BufferedWriter writer = IOUtils.getBufferedWriter(liveConfFile);
-  	while (line != null) {
-  		if (line.contains("bikeSpeedFactor")){
-  			line = line.replaceAll("bikeSpeedFactor", "bikeSpeed");
-  		}
-  		else if (line.contains("undefinedModeSpeedFactor")){
-  			line = line.replaceAll("undefinedModeSpeedFactor", "undefinedModeSpeed");
-  		}
-  		else if (line.contains("walkSpeedFactor")){
-  			line = line.replaceAll("walkSpeedFactor", "walkSpeed");
-  		}
- 			writer.write(line);
-  		line = reader.readLine();
-  	}
-  	reader.close();
-  	writer.close();
+		OTFVisMobsimFeature queueSimulationFeature = new OTFVisMobsimFeature(otfVisQSim);
+		otfVisQSim.addFeature(queueSimulationFeature);
+		queueSimulationFeature.setVisualizeTeleportedAgents(sc.getConfig().otfVis()
+				.isShowTeleportedAgents());
+		QSim queueSimulation = otfVisQSim;
+		queueSimulation.setControlerIO(controlerIO);
+		queueSimulation.setIterationNumber(sc.getConfig().controler().getLastIteration());
+		queueSimulation.run();
 	}
 
-
+	private void handleNoLongerSupportedParameters(String configfile, String liveConfFile)
+			throws FileNotFoundException, IOException {
+		BufferedReader reader = IOUtils.getBufferedReader(configfile);
+		String line = reader.readLine();
+		BufferedWriter writer = IOUtils.getBufferedWriter(liveConfFile);
+		while (line != null) {
+			if (line.contains("bikeSpeedFactor")) {
+				line = line.replaceAll("bikeSpeedFactor", "bikeSpeed");
+			}
+			else if (line.contains("undefinedModeSpeedFactor")) {
+				line = line.replaceAll("undefinedModeSpeedFactor", "undefinedModeSpeed");
+			}
+			else if (line.contains("walkSpeedFactor")) {
+				line = line.replaceAll("walkSpeedFactor", "walkSpeed");
+			}
+			writer.write(line);
+			line = reader.readLine();
+		}
+		reader.close();
+		writer.close();
+	}
 
 	public static final String chooseFile() {
-    JFileChooser fc = new JFileChooser();
+		JFileChooser fc = new JFileChooser();
 
-    fc.setFileFilter( new FileFilter() {
-      @Override public boolean accept( File f ) {
-        return f.isDirectory() || f.getName().toLowerCase().endsWith( ".xml" );
-      }
-      @Override public String getDescription() { return "MATSim config file (*.xml)"; }
-    } );
+		fc.setFileFilter(new FileFilter() {
 
-    fc.setFileFilter( new FileFilter() {
-      @Override public boolean accept( File f ) {
-        return f.isDirectory() || f.getName().toLowerCase().endsWith( ".xml.gz" );
-      }
-      @Override public String getDescription() { return "MATSim zipped config file (*.xml.gz)"; }
-    } );
+			@Override
+			public boolean accept(File f) {
+				return f.isDirectory() || f.getName().toLowerCase().endsWith(".xml");
+			}
 
+			@Override
+			public String getDescription() {
+				return "MATSim config file (*.xml)";
+			}
+		});
 
-    int state = fc.showOpenDialog( null );
-    if ( state == JFileChooser.APPROVE_OPTION ) {
-      String args_new = fc.getSelectedFile().getAbsolutePath();
-      return args_new;
-    }
-    System.out.println( "No file selected." );
-    return null;
-  }
+		fc.setFileFilter(new FileFilter() {
 
-  /**
-   * @param args
-   * @throws IOException
-   * @throws FileNotFoundException
-   */
-  public static void main(String[] args) throws FileNotFoundException, IOException {
-//    args = new String[1];
-//    args[0] = "/home/dgrether/data/work/matsimOutput/equil/output_config.xml.gz";
-//  	args[0] = "/home/dgrether/runs-svn/run749/749.output_config.xml.gz";
-    String configfile = null;
-    if (args.length == 0){
-      configfile = chooseFile();
-    }
-    else if (args.length == 1){
-      configfile = args[0];
-    }
-    else {
-      log.error("not the correct arguments");
-    }
-    if (configfile != null) {
-      new DgOTFVisReplayLastIteration().playOutputConfig(configfile);
-    }
-  }
+			@Override
+			public boolean accept(File f) {
+				return f.isDirectory() || f.getName().toLowerCase().endsWith(".xml.gz");
+			}
+
+			@Override
+			public String getDescription() {
+				return "MATSim zipped config file (*.xml.gz)";
+			}
+		});
+
+		int state = fc.showOpenDialog(null);
+		if (state == JFileChooser.APPROVE_OPTION) {
+			String args_new = fc.getSelectedFile().getAbsolutePath();
+			return args_new;
+		}
+		System.out.println("No file selected.");
+		return null;
+	}
+
+	/**
+	 * @param args
+	 * @throws IOException
+	 * @throws FileNotFoundException
+	 */
+	public static void main(String[] args) throws FileNotFoundException, IOException {
+		// args = new String[1];
+		// args[0] = "/home/dgrether/data/work/matsimOutput/equil/output_config.xml.gz";
+		// args[0] = "/home/dgrether/runs-svn/run749/749.output_config.xml.gz";
+		String configfile = null;
+		if (args.length == 0) {
+			configfile = chooseFile();
+		}
+		else if (args.length == 1) {
+			configfile = args[0];
+		}
+		else {
+			log.error("not the correct arguments");
+		}
+		if (configfile != null) {
+			new DgOTFVisReplayLastIteration().playOutputConfig(configfile);
+		}
+	}
 
 }
