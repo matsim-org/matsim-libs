@@ -29,9 +29,9 @@ import playground.yu.utils.container.Collection2Array;
 
 /**
  * offers a few simple statistics function
- *
+ * 
  * @author yu
- *
+ * 
  */
 public class SimpleStatistics {
 	// average
@@ -54,6 +54,48 @@ public class SimpleStatistics {
 
 	public static double doubleAverage(Collection<Integer> collection) {
 		return average(Collection2Array.toDoubleArray(collection));
+	}
+
+	// min
+	public static double min(double[] array, int firstIdx, int lastIdx) {
+		double min = array[firstIdx];
+		for (int i = firstIdx + 1; i <= lastIdx; i++) {
+			min = Math.min(min, array[i]);
+		}
+		return min;
+	}
+
+	public static double min(double[] array) {
+		return min(array, 0, array.length - 1);
+	}
+
+	public static double min(Collection<Double> collection) {
+		return min(Collection2Array.toArrayFromDouble(collection));
+	}
+
+	public static int min(Collection<Integer> collection) {
+		return (int) min(Collection2Array.toDoubleArray(collection));
+	}
+
+	// max
+	public static double max(double[] array, int firstIdx, int lastIdx) {
+		double min = array[firstIdx];
+		for (int i = firstIdx + 1; i <= lastIdx; i++) {
+			min = Math.max(min, array[i]);
+		}
+		return min;
+	}
+
+	public static double max(double[] array) {
+		return max(array, 0, array.length - 1);
+	}
+
+	public static double max(Collection<Double> collection) {
+		return max(Collection2Array.toArrayFromDouble(collection));
+	}
+
+	public static int max(Collection<Integer> collection) {
+		return (int) max(Collection2Array.toDoubleArray(collection));
 	}
 
 	// variance

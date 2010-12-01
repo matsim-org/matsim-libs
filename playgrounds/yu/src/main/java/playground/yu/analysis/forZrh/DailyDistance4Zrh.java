@@ -186,9 +186,9 @@ public class DailyDistance4Zrh extends DailyDistance implements Analysis4Zrh {
 					}
 					ptLegDistanceCounts[Math.min(100, (int) dist)]++;
 				} else if (bl.getMode().equals(TransportMode.walk)) {
-					dist = CoordUtils.calcDistance(this.network.getLinks().get(
+					dist = CoordUtils.calcDistance(network.getLinks().get(
 							((PlanImpl) plan).getPreviousActivity(bl)
-									.getLinkId()).getCoord(), this.network
+									.getLinkId()).getCoord(), network
 							.getLinks().get(
 									((PlanImpl) plan).getNextActivity(bl)
 											.getLinkId()).getCoord()) * 1.5 / 1000.0;
@@ -451,26 +451,25 @@ public class DailyDistance4Zrh extends DailyDistance implements Analysis4Zrh {
 					+ yPtFracs[i] + "\t" + yWlkFracs[i] + "\t"
 					+ yOthersFracs[i] + "\t" + yThroughFracs[i]);
 		}
-		// {//a unfair comparison of mode split with same leg travel time
-		// @Deprecated
-		// XYLineChart chart2 = new XYLineChart("Modal Split -- leg Distance",
-		// "leg Distance [km]", "mode fraction [%]");
-		// chart2.addSeries(CAR, xs, yCarFracs);
-		// if (CollectionSum.getSum(yPtFracs) > 0) {
-		// chart2.addSeries(PT, xs, yPtFracs);
-		// }
-		// if (CollectionSum.getSum(yWlkFracs) > 0) {
-		// chart2.addSeries(WALK, xs, yWlkFracs);
-		// }
-		// if (CollectionSum.getSum(yOthersFracs) > 0) {
-		// chart2.addSeries(OTHERS, xs, yOthersFracs);
-		// }
-		// if (CollectionSum.getSum(yThroughFracs) > 0) {
-		// chart2.addSeries(THROUGH, xs, yThroughFracs);
-		// }
-		// chart2.saveAsPng(outputFilename + "legDistanceModalSplit2.png",
-		// 800, 600);
-		// }
+		{
+			XYLineChart chart2 = new XYLineChart("Modal Split -- leg Distance",
+					"leg Distance [km]", "mode fraction [%]");
+			chart2.addSeries(CAR, xs, yCarFracs);
+			if (CollectionSum.getSum(yPtFracs) > 0) {
+				chart2.addSeries(PT, xs, yPtFracs);
+			}
+			if (CollectionSum.getSum(yWlkFracs) > 0) {
+				chart2.addSeries(WALK, xs, yWlkFracs);
+			}
+			if (CollectionSum.getSum(yOthersFracs) > 0) {
+				chart2.addSeries(OTHERS, xs, yOthersFracs);
+			}
+			if (CollectionSum.getSum(yThroughFracs) > 0) {
+				chart2.addSeries(THROUGH, xs, yThroughFracs);
+			}
+			chart2.saveAsPng(outputFilename + "legDistanceModalSplit2.png",
+					800, 600);
+		}
 		sw.close();
 	}
 

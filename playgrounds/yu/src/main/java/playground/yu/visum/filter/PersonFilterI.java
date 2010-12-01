@@ -28,7 +28,7 @@ public interface PersonFilterI extends FilterI {
 	 * (org.matsim.playground.filters.filter.PersonFilterA) or other behavior
 	 * 
 	 * @param person -
-	 *            a person being run
+	 *            a person being playground.yu.integration.cadyts.demandCalibration.withCarCounts.run
 	 */
 	void run(Person person);
 

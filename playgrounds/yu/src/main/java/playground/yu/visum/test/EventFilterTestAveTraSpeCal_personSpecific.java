@@ -49,7 +49,7 @@ import playground.yu.visum.writer.PrintStreamUDANET;
  * (PersonFilterAlgorithm, PersonIDsExporter)] [to create events reader] [to
  * read plans file] [to running plans algorithms] [to set events algorithms
  * (EventFilterAlgorithm, EventFilterPersonSpecific, AveTraSpeCal)] [to read
- * events file] [to run events algorithms] [to print additiv netFile of
+ * events file] [to playground.yu.integration.cadyts.demandCalibration.withCarCounts.run events algorithms] [to print additiv netFile of
  * Visum...] [to print attributsFile of link...]
  *
  * @author yu chen
@@ -122,7 +122,7 @@ public class EventFilterTestAveTraSpeCal_personSpecific {
 		events.addHandler(efa);
 		System.out.println("  done");
 
-		// read file, run algos
+		// read file, playground.yu.integration.cadyts.demandCalibration.withCarCounts.run algos
 		System.out.println("  reading events file and running events algos");
 		new MatsimEventsReader(events).readFile(null /*filename not specified*/);
 		System.out.println("we have\t" + atsc.getCount()

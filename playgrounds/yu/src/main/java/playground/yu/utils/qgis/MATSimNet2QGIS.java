@@ -55,7 +55,7 @@ import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
- * This class founds on many codes of Gregor Laemmel. man should for this "run"
+ * This class founds on many codes of Gregor Laemmel. man should for this "playground.yu.integration.cadyts.demandCalibration.withCarCounts.run"
  * install com.sun.media.jai and javax.media.jai from http://jai.dev.java.net
  * 
  * @author ychen

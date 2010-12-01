@@ -9,7 +9,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.utils.misc.ConfigUtils;
 
-import playground.yu.analysis.MZComparison.MZComparisonListener;
 import playground.yu.scoring.CharyparNagelScoringFunctionFactoryWithWalk;
 
 /**
@@ -37,7 +36,7 @@ public class WalkRunTest {
 					.setScoringFunctionFactory(new CharyparNagelScoringFunctionFactoryWithWalk(
 							config.charyparNagelScoring(), config
 									.vspExperimental().getOffsetWalk()));
-			controler.addControlerListener(new MZComparisonListener());
+			// controler.addControlerListener(new MZComparisonListener());
 			controler.setWriteEventsInterval(100);
 			controler.setOverwriteFiles(true);
 			controler.run();

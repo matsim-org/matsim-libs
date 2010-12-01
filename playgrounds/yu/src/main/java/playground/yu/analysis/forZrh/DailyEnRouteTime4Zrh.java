@@ -34,7 +34,6 @@ import org.matsim.roadpricing.RoadPricingScheme;
 
 import playground.yu.analysis.DailyEnRouteTime;
 import playground.yu.utils.charts.PieChart;
-import playground.yu.utils.container.CollectionSum;
 import playground.yu.utils.io.SimpleWriter;
 
 /**
@@ -70,26 +69,28 @@ public class DailyEnRouteTime4Zrh extends DailyEnRouteTime implements
 		double ptDayTime = 0.0;
 		double wlkDayTime = 0.0;
 		double otherDayTime = 0.0;
-		for (PlanElement pe : plan.getPlanElements())
+		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof Leg) {
 				Leg bl = (Leg) pe;
 				ActTypeZrh ats = null;
 				String tmpActType = ((PlanImpl) plan).getNextActivity(bl).getType();
-				if (tmpActType.startsWith("h"))
+				if (tmpActType.startsWith("h")) {
 					ats = ActTypeZrh.home;
-				else if (tmpActType.startsWith("w"))
+				} else if (tmpActType.startsWith("w")) {
 					ats = ActTypeZrh.work;
-				else if (tmpActType.startsWith("e"))
+				} else if (tmpActType.startsWith("e")) {
 					ats = ActTypeZrh.education;
-				else if (tmpActType.startsWith("s"))
+				} else if (tmpActType.startsWith("s")) {
 					ats = ActTypeZrh.shopping;
-				else if (tmpActType.startsWith("l"))
+				} else if (tmpActType.startsWith("l")) {
 					ats = ActTypeZrh.leisure;
-				else
+				} else {
 					ats = ActTypeZrh.others;
+				}
 				double time = bl.getTravelTime() / 60.0;
-				if (time < 0)
+				if (time < 0) {
 					time = 0;
+				}
 				if (bl.getDepartureTime() < 86400) {
 					dayTime += time;
 					if (Long.parseLong(person.getId().toString()) > 1000000000) {
@@ -190,16 +191,22 @@ public class DailyEnRouteTime4Zrh extends DailyEnRouteTime implements
 					}
 				}
 			}
-		for (int i = 0; i <= Math.min(100, (int) dayTime); i++)
+		}
+		for (int i = 0; i <= Math.min(100, (int) dayTime); i++) {
 			totalDayEnRouteTimeCounts[i]++;
-		for (int i = 0; i <= Math.min(100, (int) otherDayTime); i++)
+		}
+		for (int i = 0; i <= Math.min(100, (int) otherDayTime); i++) {
 			othersDayEnRouteTimeCounts[i]++;
-		for (int i = 0; i <= Math.min(100, (int) carDayTime); i++)
+		}
+		for (int i = 0; i <= Math.min(100, (int) carDayTime); i++) {
 			carDayEnRouteTimeCounts[i]++;
-		for (int i = 0; i <= Math.min(100, (int) ptDayTime); i++)
+		}
+		for (int i = 0; i <= Math.min(100, (int) ptDayTime); i++) {
 			ptDayEnRouteTimeCounts[i]++;
-		for (int i = 0; i <= Math.min(100, (int) wlkDayTime); i++)
+		}
+		for (int i = 0; i <= Math.min(100, (int) wlkDayTime); i++) {
 			wlkDayEnRouteTimeCounts[i]++;
+		}
 	}
 
 	@Override
@@ -292,8 +299,9 @@ public class DailyEnRouteTime4Zrh extends DailyEnRouteTime implements
 				+ "dailyEnRouteTimeTravelDistination.png", 1200, 900);
 
 		double x[] = new double[101];
-		for (int i = 0; i < 101; i++)
+		for (int i = 0; i < 101; i++) {
 			x[i] = i;
+		}
 		double yTotal[] = new double[101];
 		double yCar[] = new double[101];
 		double yPt[] = new double[101];
@@ -316,57 +324,57 @@ public class DailyEnRouteTime4Zrh extends DailyEnRouteTime implements
 		chart.addSeries("total", x, yTotal);
 		chart.saveAsPng(outputFilename + "dailyEnRouteTime.png", 800, 600);
 
-		sw.writeln("");
-		sw.writeln("--Modal split -- leg duration--");
-		sw
-				.writeln("leg Duration [min]\tcar legs no.\tpt legs no.\twalk legs no.\tcar fraction [%]\tpt fraction [%]\twalk fraction [%]");
-
-		double xs[] = new double[101];
-		double yCarFracs[] = new double[101];
-		double yPtFracs[] = new double[101];
-		double yWlkFracs[] = new double[101];
-		double yBikeFracs[] = new double[101];
-		double yOthersFracs[] = new double[101];
-		for (int i = 0; i < 101; i++) {
-			double sumOfLegTimeCounts = carLegTimeCounts[i]
-					+ ptLegTimeCounts[i] + wlkLegTimeCounts[i]
-					+ bikeLegTimeCounts[i] + othersLegTimeCounts[i];
-			xs[i] = i * 2;
-			if (sumOfLegTimeCounts > 0) {
-				yCarFracs[i] = carLegTimeCounts[i] / sumOfLegTimeCounts * 100.0;
-				yPtFracs[i] = ptLegTimeCounts[i] / sumOfLegTimeCounts * 100.0;
-				yWlkFracs[i] = wlkLegTimeCounts[i] / sumOfLegTimeCounts * 100.0;
-				yBikeFracs[i] = bikeLegTimeCounts[i] / sumOfLegTimeCounts
-						* 100.0;
-				yOthersFracs[i] = othersLegTimeCounts[i] / sumOfLegTimeCounts
-						* 100.0;
-			} else {
-				yCarFracs[i] = 0;
-				yPtFracs[i] = 0;
-				yWlkFracs[i] = 0;
-				yBikeFracs[i] = 0;
-				yOthersFracs[i] = 0;
-			}
-
-			sw.writeln(i + "+\t" + carLegTimeCounts[i] + "\t"
-					+ ptLegTimeCounts[i] + "\t" + wlkLegTimeCounts[i] + "\t"
-					+ bikeLegTimeCounts[i] + "\t" + othersLegTimeCounts[i]
-					+ "\t" + yCarFracs[i] + "\t" + yPtFracs[i] + "\t"
-					+ yWlkFracs[i] + "\t" + yBikeFracs[i] + "\t"
-					+ yOthersFracs[i]);
-		}
-		XYLineChart chart2 = new XYLineChart("Modal Split -- leg Duration",
-				"leg Duration [min]", "mode fraction [%]");
-		chart2.addSeries("car", xs, yCarFracs);
-		if (CollectionSum.getSum(yPtFracs) > 0)
-			chart2.addSeries("pt", xs, yPtFracs);
-		if (CollectionSum.getSum(yWlkFracs) > 0)
-			chart2.addSeries("walk", xs, yWlkFracs);
-		if (CollectionSum.getSum(yBikeFracs) > 0)
-			chart2.addSeries("bike", xs, yBikeFracs);
-		if (CollectionSum.getSum(yOthersFracs) > 0)
-			chart2.addSeries("others", xs, yOthersFracs);
-		chart2.saveAsPng(outputFilename + "legTimeModalSplit2.png", 800, 600);
+//		sw.writeln("");
+//		sw.writeln("--Modal split -- leg duration--");
+//		sw
+//				.writeln("leg Duration [min]\tcar legs no.\tpt legs no.\twalk legs no.\tcar fraction [%]\tpt fraction [%]\twalk fraction [%]");
+//
+//		double xs[] = new double[101];
+//		double yCarFracs[] = new double[101];
+//		double yPtFracs[] = new double[101];
+//		double yWlkFracs[] = new double[101];
+//		double yBikeFracs[] = new double[101];
+//		double yOthersFracs[] = new double[101];
+//		for (int i = 0; i < 101; i++) {
+//			double sumOfLegTimeCounts = carLegTimeCounts[i]
+//					+ ptLegTimeCounts[i] + wlkLegTimeCounts[i]
+//					+ bikeLegTimeCounts[i] + othersLegTimeCounts[i];
+//			xs[i] = i * 2;
+//			if (sumOfLegTimeCounts > 0) {
+//				yCarFracs[i] = carLegTimeCounts[i] / sumOfLegTimeCounts * 100.0;
+//				yPtFracs[i] = ptLegTimeCounts[i] / sumOfLegTimeCounts * 100.0;
+//				yWlkFracs[i] = wlkLegTimeCounts[i] / sumOfLegTimeCounts * 100.0;
+//				yBikeFracs[i] = bikeLegTimeCounts[i] / sumOfLegTimeCounts
+//						* 100.0;
+//				yOthersFracs[i] = othersLegTimeCounts[i] / sumOfLegTimeCounts
+//						* 100.0;
+//			} else {
+//				yCarFracs[i] = 0;
+//				yPtFracs[i] = 0;
+//				yWlkFracs[i] = 0;
+//				yBikeFracs[i] = 0;
+//				yOthersFracs[i] = 0;
+//			}
+//
+//			sw.writeln(i + "+\t" + carLegTimeCounts[i] + "\t"
+//					+ ptLegTimeCounts[i] + "\t" + wlkLegTimeCounts[i] + "\t"
+//					+ bikeLegTimeCounts[i] + "\t" + othersLegTimeCounts[i]
+//					+ "\t" + yCarFracs[i] + "\t" + yPtFracs[i] + "\t"
+//					+ yWlkFracs[i] + "\t" + yBikeFracs[i] + "\t"
+//					+ yOthersFracs[i]);
+//		}
+//		XYLineChart chart2 = new XYLineChart("Modal Split -- leg Duration",
+//				"leg Duration [min]", "mode fraction [%]");
+//		chart2.addSeries("car", xs, yCarFracs);
+//		if (CollectionSum.getSum(yPtFracs) > 0)
+//			chart2.addSeries("pt", xs, yPtFracs);
+//		if (CollectionSum.getSum(yWlkFracs) > 0)
+//			chart2.addSeries("walk", xs, yWlkFracs);
+//		if (CollectionSum.getSum(yBikeFracs) > 0)
+//			chart2.addSeries("bike", xs, yBikeFracs);
+//		if (CollectionSum.getSum(yOthersFracs) > 0)
+//			chart2.addSeries("others", xs, yOthersFracs);
+//		chart2.saveAsPng(outputFilename + "legTimeModalSplit2.png", 800, 600);
 		sw.close();
 	}
 
