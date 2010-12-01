@@ -61,12 +61,12 @@ public class HbefaTable {
 		    
 	    	while ((strLine = br.readLine()) != null)   {
 		    
-	    		//for all lines (whole text) we split the line to a array 
+	    		//for all lines (whole text) we split the line to an array 
 		    	
 		    	String[] array = strLine.split(";");
 		    	HbefaObject obj = new HbefaObject(Integer.parseInt(array[1])
 		    			, array[2], Double.parseDouble(array[4]), Double.parseDouble(array[5]),
-		    			Double.parseDouble(array[6]), Double.parseDouble(array[7]),Double.parseDouble(array[8])); 
+		    			Double.parseDouble(array[6]), Double.parseDouble(array[9]),Double.parseDouble(array[8])); 
 		    	
 		    	int row = Integer.parseInt(array[1]);
 		    	

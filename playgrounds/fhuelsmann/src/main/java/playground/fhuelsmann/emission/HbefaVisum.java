@@ -94,12 +94,14 @@ public class HbefaVisum {
 		 				
 		 			SingleEvent singleEvent = (SingleEvent) value.pop();
 		 			HbefaTable hbefaTable = new HbefaTable();
-		 			String a = findHbefaFromVisum(singleEvent.getVisumRoadType());
+		 			String a = findHbefaFromVisum(singleEvent.getRoadType());
 		 			singleEvent.setHbefa_Road_type(Integer.parseInt(a));
 		 			value.push(singleEvent);
-				
-			}
-			}}
+		 			
+		 			
+		 			}
+		 }
+	}
 	
 	public void printTable(){
 	
@@ -117,15 +119,15 @@ public class HbefaVisum {
 		 				SingleEvent obj = (SingleEvent) value.pop();
 		 						 				
 		 				String activity = obj.getActivity();
-		 				String travelTimeString = obj.getTravelTime();
+		 				double travelTime = obj.getTravelTime();
 		 				double v_mean = obj.getAverageSpeed();
-		 				String Person_id = obj.getPersonal_id();
-		 				String linkId_Veh_Id = obj.getLink_id();
+		 				Id Person_id = obj.getPersonal_id();
+		 				Id linkId_Veh_Id = obj.getLink_id();
 		 				double length = obj.getLinkLength();
 		 			
 		 				
 		 			System.out.println("\n"+activity 
-						+"\nTravelTime :" + travelTimeString 
+						+"\nTravelTime :" + travelTime 
 						+"\nAverageSpeed :" + v_mean
 						+"\nLinkId : " + linkId_Veh_Id 
 						+"\nPersonId :" + Person_id 

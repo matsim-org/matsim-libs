@@ -22,29 +22,50 @@
 
 
 package playground.fhuelsmann.emission;
-
+import org.matsim.api.core.v01.Id;
 
 
 public class SingleEvent {
 
 	private String activity;
-	private String Personal_id; //
-	private String Link_id;
+	private Id Personal_id; //
+	private Id Link_id;
 	private double averageSpeed;
-	private String travelTime;
-	private String enterTime;
+	private double travelTime;
+	private double enterTime;
 	private double linkLength;
 	private int Hbefa_Road_type;
 	private double emissionFactor;	
 	private double emissionFractions;	
-	private int Visum_road_Section_Nr; //
-	private int Visum_road_type_no; //
+	private Id Visum_road_Section_Nr; //
 	private int freeVelocity;
+	private int  roadType;
+	
 	private double emissions;	
 	private double noxEmissions;
 	private double noxFractions;
-
 	
+
+	public int getFreeVelocity() {
+		return freeVelocity;
+	}
+
+
+	public void setFreeVelocity(int freeVelocity) {
+		this.freeVelocity = freeVelocity;
+	}
+
+
+	public int  getRoadType() {
+		return roadType;
+	}
+
+
+	public void setRoadType(int  roadType) {
+		this.roadType = roadType;
+	}
+
+
 	public double getNoxFractions() {
 		return noxFractions;
 	}
@@ -65,12 +86,12 @@ public class SingleEvent {
 	}
 
 
-	public int getVisum_road_Section_Nr() {
+	public Id getVisum_road_Section_Nr() {
 		return Visum_road_Section_Nr;
 	}
 
 
-	public void setVisum_road_Section_Nr(int visum_road_Section_Nr) {
+	public void setVisum_road_Section_Nr(Id visum_road_Section_Nr) {
 		Visum_road_Section_Nr = visum_road_Section_Nr;
 	}
 	
@@ -113,59 +134,52 @@ public class SingleEvent {
 	public void setHbefa_Road_type(int hbefa_Road_type) {
 		Hbefa_Road_type = hbefa_Road_type;
 	}
+	
 
-
-	public int getVisum_road_type_no() {
-		return Visum_road_type_no;
-	}
-
-
-	public void setVisum_road_type_no(int visum_road_type_no) {
-		Visum_road_type_no = visum_road_type_no;
-	}
-
-
-	public SingleEvent(String activity, String travelTimeString, 
-			double averageSpeed, String personalId, double length3,String Link_id,int Visum_road_Section_Nr, int Visum_road_type_no) {
+	
+	public SingleEvent(String activity, double travelTime, 
+			double averageSpeed, Id personalId, double length3,Id Link_id,Id Visum_road_Section_Nr, int Visum_road_type_no) {
 	
 		this.activity=activity;
-		this.travelTime=travelTimeString;
+		this.travelTime=travelTime;
 		this.averageSpeed=averageSpeed;
 		this.Personal_id=personalId;
 		this.linkLength=length3;
 		this.Link_id=Link_id;
 		this.Visum_road_Section_Nr= Visum_road_Section_Nr;
-		this.Visum_road_type_no = Visum_road_type_no;
+		this.roadType = Visum_road_type_no;
 	}
 	
 
-	
-	public SingleEvent(String activity, String travelTimeString, 
-			double averageSpeed, String personalId, double length3,String Link_id,int Visum_road_Section_Nr, int Visum_road_type_no,String enterTime, int freeVelocity  ) {
-	
+	public SingleEvent(String activity, double travelTime,
+			double averageSpeed, Id personId, double length,
+			Id roadSectionNrId, double enterTime, int freeVelocity, int visumRoadType) {
+		
 		this.activity=activity;
-		this.travelTime=travelTimeString;
-		this.averageSpeed=averageSpeed;
-		this.Personal_id=personalId;
-		this.linkLength=length3;
-		this.Link_id=Link_id;
-		this.Visum_road_Section_Nr= Visum_road_Section_Nr;
-		this.Visum_road_type_no = Visum_road_type_no;
-		this.enterTime=enterTime;
-		this.freeVelocity =freeVelocity;
-
+		this.travelTime = travelTime;
+		this.averageSpeed= averageSpeed;
+		this.Personal_id=personId;
+		this.linkLength=length;
+		this.Visum_road_Section_Nr=roadSectionNrId;
+		this.enterTime= enterTime;
+		this.freeVelocity= freeVelocity;
+		this.roadType =visumRoadType;
+		this.Link_id= roadSectionNrId;
+		
+		
 	}
+	
 
-
-	public SingleEvent(String activity,String travelTime,double averageSpeed, 
-				String personId,double distance,int roadType,String enterTime, int freeVelocity,String Link_id){
+	
+	public SingleEvent(String activity,double travelTime,double averageSpeed, 
+				Id personId,double distance,int  roadType,double enterTime, int freeVelocity,Id Link_id){
 
 		this.activity=activity;
 		this.travelTime=travelTime;
 		this.averageSpeed=averageSpeed;
 		this.Personal_id=personId;
 		this.linkLength=distance;
-		this.Visum_road_type_no = roadType;
+		this.roadType = roadType;
 		this.enterTime=enterTime;
 		this.freeVelocity =freeVelocity;
 		this.Link_id=Link_id;}
@@ -189,22 +203,22 @@ public class SingleEvent {
 	}
 
 
-	public String getPersonal_id() {
+	public Id getPersonal_id() {
 		return Personal_id;
 	}
 
 
-	public void setPersonal_id(String personal_id) {
+	public void setPersonal_id(Id personal_id) {
 		Personal_id = personal_id;
 	}
 
 
-	public String getLink_id() {
+	public Id getLink_id() {
 		return Link_id;
 	}
 
 
-	public void setLink_id(String link_id) {
+	public void setLink_id(Id link_id) {
 		Link_id = link_id;
 	}
 
@@ -219,21 +233,21 @@ public class SingleEvent {
 	}
 
 
-	public String getTravelTime() {
+	public double getTravelTime() {
 		return travelTime;
 	}
 
 
-	public void setTravelTime(String travelTime) {
+	public void setTravelTime(double travelTime) {
 		this.travelTime = travelTime;
 	}
 	
-	public String getEnterTime() {
+	public double getEnterTime() {
 		return enterTime;
 	}
 
 
-	public void setEnterTime(String travelTime) {
+	public void setEnterTime(double enterTime) {
 		this.enterTime = enterTime;
 	}
 
@@ -245,11 +259,6 @@ public class SingleEvent {
 
 	public void setLinkLength(double linkLength) {
 		this.linkLength = linkLength;
-	}
-
-
-	public int getVisumRoadType() {
-		return this.Visum_road_type_no;
 	}
 
 }

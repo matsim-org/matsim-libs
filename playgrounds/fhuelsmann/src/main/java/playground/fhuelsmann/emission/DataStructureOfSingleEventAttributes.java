@@ -34,6 +34,7 @@ import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.api.core.v01.network.Network;
 
 
@@ -102,12 +103,13 @@ AgentArrivalEventHandler,AgentDepartureEventHandler {
 		Id linkId = event.getLinkId();
 		
 		//get attributes of the network per link
-		Link link = this.network.getLinks().get(linkId);
-		double distance = link.getLength();
-//		int roadType = link.getType();
-		int roadType = 55;
-		int freeVelocity = (int) link.getFreespeed();
 		
+		LinkImpl link = (LinkImpl) this.network.getLinks().get(linkId);
+		double distance = link.getLength();
+//		String roadType = link.getType();
+//		int roadType = Integer.parseInt(roadTypes);
+		int freeVelocity = (int) link.getFreespeed();
+		int roadType= 55;
 		if (this.linkenter.containsKey(event.getPersonId())) {						
 			//with activity
 			if (this.agentarrival.containsKey(personId)) {
@@ -128,8 +130,8 @@ AgentArrivalEventHandler,AgentDepartureEventHandler {
 					//adds the Objects of the already existing LinkId to the List
 					if (this.travelTimes.get(linkId).containsKey(personId)){
 						
-						SingleEvent tempSingleEvent = new SingleEvent("----mit Aktivität---" , travelTime+"",averageSpeed, 
-		 						personId+"",distance,roadType,enterTime+"", freeVelocity,linkId+"");
+						SingleEvent tempSingleEvent = new SingleEvent("----mit Aktivität---" , travelTime,averageSpeed, 
+		 						personId,distance,roadType,enterTime, freeVelocity, linkId);
 						
 						
 						this.travelTimes.get(linkId).get(personId).push(tempSingleEvent);
@@ -137,11 +139,11 @@ AgentArrivalEventHandler,AgentDepartureEventHandler {
 					//List must be created when there is no PersonID
 					else{
 							LinkedList<SingleEvent> list = new LinkedList<SingleEvent>();
-							SingleEvent tempSingleEvent = new SingleEvent("----mit Aktivität---" , travelTime+"",averageSpeed, 
-			 						personId+"",distance,roadType,enterTime+"", freeVelocity, linkId+"");
+							SingleEvent tempSingleEvent = new SingleEvent("----mit Aktivität---" , travelTime,averageSpeed, 
+			 						personId,distance,roadType,enterTime, freeVelocity, linkId);
 							
 							list.push(tempSingleEvent);
-							this.travelTimes.get(linkId+"").put(personId,list);
+							this.travelTimes.get(linkId).put(personId,list);
 							}
 					}
 				
@@ -149,8 +151,8 @@ AgentArrivalEventHandler,AgentDepartureEventHandler {
 					
 					LinkedList<SingleEvent> list = new LinkedList<SingleEvent>();
 							
-					SingleEvent tempSingleEvent = new SingleEvent("----mit Aktivität---" , travelTime+"",averageSpeed, 
-			 						personId+"",distance,roadType,enterTime+"", freeVelocity, linkId+"");
+					SingleEvent tempSingleEvent = new SingleEvent("----mit Aktivität---" , travelTime,averageSpeed, 
+	 						personId,distance,roadType,enterTime, freeVelocity, linkId);
 							
 					list.push(tempSingleEvent);
 					Map<Id,LinkedList<SingleEvent>> map = new TreeMap<Id,LinkedList<SingleEvent>>();
@@ -174,10 +176,10 @@ AgentArrivalEventHandler,AgentDepartureEventHandler {
 			
 					if (this.travelTimes.get(linkId).containsKey(personId)){
  
-						SingleEvent tempSingleEvent = new SingleEvent("----ohne Aktivität---" , travelTime+"",averageSpeed, 
-		 						personId+"",distance,roadType,enterTime+"", freeVelocity, linkId+"");
+						SingleEvent tempSingleEvent = new SingleEvent("----ohne Aktivität---" , travelTime,averageSpeed, 
+		 						personId,distance,roadType,enterTime, freeVelocity, linkId);
 						
-						this.travelTimes.get(linkId+"").get(personId).push(tempSingleEvent);
+						this.travelTimes.get(linkId).get(personId).push(tempSingleEvent);
 						}
 					
 					//List must be created when there is no PersonID
@@ -185,8 +187,8 @@ AgentArrivalEventHandler,AgentDepartureEventHandler {
 							
 							LinkedList<SingleEvent> list = new LinkedList<SingleEvent>();
 						
-							SingleEvent tempSingleEvent = new SingleEvent("----ohne Aktivität---" , travelTime+"",averageSpeed, 
-			 						personId+"",distance,roadType,enterTime+"", freeVelocity,linkId+"");
+							SingleEvent tempSingleEvent = new SingleEvent("----ohne Aktivität---" , travelTime,averageSpeed, 
+			 						personId,distance,roadType,enterTime, freeVelocity, linkId);
 							
 							list.push(tempSingleEvent);
 							this.travelTimes.get(linkId).put(personId,list);
@@ -198,8 +200,8 @@ AgentArrivalEventHandler,AgentDepartureEventHandler {
 						
 						LinkedList<SingleEvent> list = new LinkedList<SingleEvent>();
 							
-						SingleEvent tempSingleEvent = new SingleEvent("----ohne Aktivität---" , travelTime+"",averageSpeed, 
-			 						personId+"",distance,roadType,enterTime+"", freeVelocity, linkId+"");
+						SingleEvent tempSingleEvent = new SingleEvent("----ohne Aktivität---" , travelTime,averageSpeed, 
+		 						personId,distance,roadType,enterTime, freeVelocity, linkId);
 							
 						list.push(tempSingleEvent);
 						Map<Id,LinkedList<SingleEvent>> map = new TreeMap<Id,LinkedList<SingleEvent>>();
