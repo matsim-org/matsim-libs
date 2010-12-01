@@ -129,30 +129,7 @@ public class DecentralizedChargerV1 {
 		 */
 		
 		assignSlotsToAllAgents();
-		for (Id personId: controler.getPopulation().getPersons().keySet()){
-			
-			LinkedList<ParkingIntervalInfo> parkingIntervals = parkingTimeIntervals.get(personId);
-			parkingLengthCurrentAgent=getParkingLengthsCurrentAgent(personId);
-											
-			// get driving legs			
-			LinkedList<Double> legEnergyConsumptionList = energyConsumptionOfLegs.get(personId);
-			double [] drivingConsumptionCurrentAgent=getdrivingConsumptionCurrentAgent(personId);
-			
-			drivingTimesCurrentAgent = getDrivingTimesCurrentAgent(parkingTimesCurrentAgent,parkingIntervals);
-			
-			double totalAgentConsumptionJoule=sumUpEntriesOf1DDoubleArray(drivingConsumptionCurrentAgent); // in Joules
-			double totalParkingTimeAgentInSeconds=sumUpEntriesOf1DDoubleArray(parkingLengthCurrentAgent);
-			
-			double potentialTotalChargingAgent=chargingSpeedPerSecond*totalParkingTimeAgentInSeconds;
-			
-			performGeneralFeasibilityCheckAgentBehavior(drivingConsumptionCurrentAgent);
-			
-			double[] realParkingLengthCurrentAgent=new double[parkingIntervals.size()];
-			performSpecificFeasibilityCheckAgentBehavior(realParkingLengthCurrentAgent,  totalAgentConsumptionJoule);			
-			
-			//getElectricityFromGrid(double startChargingTime, double endChargingTime, Id agentId, Id linkId){
-			
-		}// end agent loop
+	
 	}//end performChargingAlgorithm
 	
 	
@@ -189,6 +166,8 @@ public class DecentralizedChargerV1 {
 			double[] realParkingLengthCurrentAgent=new double[parkingIntervals.size()];
 			performSpecificFeasibilityCheckAgentBehavior(realParkingLengthCurrentAgent,  totalAgentConsumptionJoule);			
 			
+			//getElectricityFromGrid(double startChargingTime, double endChargingTime, Id agentId, Id linkId){
+			
 		}
 	}
 	
@@ -200,7 +179,7 @@ public class DecentralizedChargerV1 {
 		//special check
 		//new realParkingLengthArray - crosschecked with valleys
 		for (int i=0; i<realParkingLengthCurrentAgent.length; i++){
-			realParkingLengthCurrentAgent[i]=myChargerInfo.getFeasibleChargingTimeInInterval(parkingTimesCurrentAgent[i][0], parkingTimesCurrentAgent[i][1]);
+			realParkingLengthCurrentAgent[i]=myChargerInfo.getFeasibleChargingTimeInInterval(parkingTimesCurrentAgent[i][0], parkingTimesCurrentAgent[i][1], myChargerInfo.getValleyTimes());
 		}
 		
 		

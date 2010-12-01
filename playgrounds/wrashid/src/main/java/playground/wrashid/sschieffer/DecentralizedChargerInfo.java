@@ -69,6 +69,8 @@ public class DecentralizedChargerInfo {
 	private NewtonSolver newtonSolver;
 	private PolynomialFitter polyFit;
 	
+	private int degValleyFitter=5; 
+	
 	private double peakLoad;
 	private double [] []slotBaseLoad; // 1D double directly read in from .txt
 	private double [][] highLowIntervals; // [start time in hours][end time in hours][1 or -1 (1 if section above newBaseLoad]
@@ -616,7 +618,8 @@ public class DecentralizedChargerInfo {
 				double dx=(valleyTimes[i][1]-valleyTimes[i][0]);
 				double segments=dx/(Main.secondsPerMin); // every minute
 				
-				PolynomialFitter valleyFitter=new PolynomialFitter((int)segments,optimizer);
+				
+				PolynomialFitter valleyFitter=new PolynomialFitter(degValleyFitter,optimizer);
 				
 				for (double x=valleyTimes[i][0]; x<=valleyTimes[i][1]; x=x+dx/segments){
 					newValley.add(x,newBaseConsumption-polyFuncBaseLoadWorking.value(x));
@@ -626,6 +629,8 @@ public class DecentralizedChargerInfo {
 				}
 				
 				dataset.addSeries(newValley);
+				dataset.addSeries(loadFitFuncFigureDataWorking);
+				dataset.addSeries(loadFigureData);
 				PolynomialFunction poly = valleyFitter.fit();
 				ProbFuncArray.add(poly);
 				valleyInt=valleyInt+functionIntegrator.integrate(poly, valleyTimes[i][0], valleyTimes[i][1]);
@@ -649,7 +654,6 @@ public class DecentralizedChargerInfo {
 		totalCostBase=constantBaseConsumption*priceBase*Main.secondsPerDay + (functionIntegrator.integrate(polyFuncBaseLoadWorking, 0, Main.secondsPerDay)-constantBaseConsumption*Main.secondsPerDay)*pricePeak;
 		
 		totalCostPHEV=(-newBaseConsumption*Main.secondsPerDay + (functionIntegrator.integrate(polyFuncBaseLoadWorking, 0,Main.secondsPerDay)+valleyInt))*pricePeak + newBaseConsumption*Main.secondsPerDay*priceBase;
-		
 		
 		probDensityFunctions=ProbFuncArray;
 	}
@@ -723,10 +727,12 @@ public class DecentralizedChargerInfo {
 		    
 			// probability density functions
 		    for (int i=0; i<probDensityFunctions.size(); i++){
-		    	out.write("Valley"+i+" Probability Density Function: "+ probDensityFunctions.get(i).toString());
-		    	out.write("\t Starting Probability: " +probDensityRanges[i][0]+ "; Highest Probability: "+probDensityRanges[i][1]+"\n \n");
+		    	out.write("Valley"+i+" Probability Density Function: "+ probDensityFunctions.get(i).toString() +"\n ");
+		    	out.write("\n \t Starting Probability: " +probDensityRanges[i][0]+ "; Highest Probability: "+probDensityRanges[i][1]+"\n \n");
 			    
 		    }
+		    
+		   
 		    
 		    out.write("BasePrice: "+priceBase+"\n");
 		    out.write("PeakPrice: "+pricePeak+"\n");
@@ -747,38 +753,45 @@ public class DecentralizedChargerInfo {
 	 * @param endSecond end of Parking time in seconds
 	 * @return returns the number of seconds which lie within feasible charging intervals and are within time intervals of minimum length = slotLength
 	 */
-	public double getFeasibleChargingTimeInInterval(double startSecond, double endSecond){
+	public double getFeasibleChargingTimeInInterval(double startSecond, double endSecond, double[][] valleys2ComareTo){
 		double totalFeasibleTime=0;
 		if(startSecond>endSecond){
 			// recursive call, only if overnight parking
-			totalFeasibleTime+=getFeasibleChargingTimeInInterval(0, endSecond);
-			totalFeasibleTime+=getFeasibleChargingTimeInInterval(startSecond, Main.secondsPerDay);
+			totalFeasibleTime+=getFeasibleChargingTimeInInterval(0, endSecond,valleys2ComareTo);
+			totalFeasibleTime+=getFeasibleChargingTimeInInterval(startSecond, Main.secondsPerDay,valleys2ComareTo);
 		}
 		else{
-			// startSecond<endSecond
-			for (int i=0; i<valleyTimes.length; i++){
-				if (valleyTimes[i][0]<=startSecond && valleyTimes[i][1]>=startSecond){
+			// Loop over all valleys
+			// if start and end second are within valley
+			for (int i=0; i<valleys2ComareTo.length; i++){
+				if (valleys2ComareTo[i][0]<=startSecond && valleys2ComareTo[i][1]>=startSecond){
 					//if startSecond is within  interval
-					if (valleyTimes[i][0]<=endSecond && valleyTimes[i][1]>=endSecond){
-						//both start and end are within the valley
-						if (endSecond-startSecond>Main.slotLength){
+					if (valleys2ComareTo[i][0]<=endSecond && valleys2ComareTo[i][1]>=endSecond){
+						//if endSecond is within  interval
+						if (endSecond-startSecond>=Main.slotLength){
 							totalFeasibleTime=endSecond-startSecond;
 						}
 						
 					}
+					// if start second within but endsecond after than valleyEnd
 					else{
-						if (endSecond-startSecond>Main.slotLength){
-							totalFeasibleTime=valleyTimes[i][1]-startSecond;
+						if (valleys2ComareTo[i][1]-startSecond>=Main.slotLength){
+							totalFeasibleTime=valleys2ComareTo[i][1]-startSecond;
 						}
-						
 					}
 				}
-				
-				if (valleyTimes[i][0]<=endSecond && valleyTimes[i][1]>=endSecond && startSecond<valleyTimes[i][0]){
-					if (endSecond-startSecond>Main.slotLength){
-						totalFeasibleTime=endSecond-valleyTimes[i][0];
+				// if end second is within valley
+				if (valleys2ComareTo[i][0]<=endSecond && valleys2ComareTo[i][1]>=endSecond && startSecond<valleys2ComareTo[i][0]){
+					if (endSecond-valleys2ComareTo[i][0]>=Main.slotLength){
+						totalFeasibleTime=endSecond-valleys2ComareTo[i][0];
 					}
 					
+				}
+				
+				if (valleys2ComareTo[i][1]<endSecond && valleys2ComareTo[i][0]>startSecond){
+					if (valleys2ComareTo[i][1]-valleys2ComareTo[i][0]>=Main.slotLength){
+						totalFeasibleTime=valleys2ComareTo[i][1]-valleys2ComareTo[i][0];
+					}
 				}
 			}
 		}
