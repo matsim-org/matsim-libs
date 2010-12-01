@@ -693,6 +693,16 @@ public class DecentralizedChargerInfo {
 	}
 	
 
+	public void setProbabilityDensityFunction(PolynomialFunction p){
+		probDensityFunctions= new ArrayList<PolynomialFunction>(0);
+		probDensityFunctions.add(p);
+	}
+	
+	
+	public void setProbabilityRanges(double [][] newRanges){
+		probDensityRanges=newRanges;
+	}
+	
 	/**
 	 * saves a textfile in the specified output path containing:
 	 * -the function of the baseLoadCurve
@@ -812,7 +822,6 @@ public class DecentralizedChargerInfo {
 	 */
 	public double[][] bookSlots(double[][] parkingTimesCurrentAgent, int noOfSlotsToBook, int slotsInPeakTime) throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
 		//assumes  small number of slots in peakTime --> only one longer charging slot for all nonValleyChargingTimes
-		// TODO validate assumption in simulations
 		double[][] chargingTimes = new double[noOfSlotsToBook+1][2];
 		
 		//book valleySlots
@@ -820,7 +829,8 @@ public class DecentralizedChargerInfo {
 			boolean slotFound=false;
 			double [][] trySlot;
 			while (slotFound==false){
-				trySlot= returnRandomChargingSlot();
+				double rand= Math.random();
+				trySlot= returnRandomChargingSlot(rand);
 				// check if within parkingTimes 
 				 if (checkIfSlotWithinParkingTimeOfAgent(trySlot, parkingTimesCurrentAgent)){
 					 //check if not overlapping with existing slots
@@ -846,9 +856,9 @@ public class DecentralizedChargerInfo {
 	 * @param i - integer up to  which charging Times have already been entered into chargingTimes
 	 * @return return true if no overlap
 	 */
-	public boolean checkForOverlappingSlots(double [][] trySlot,double [][] chargingTimes, int i){
+	public boolean checkForOverlappingSlots(double [][] trySlot,double [][] chargingTimes, int j){
 		boolean overlapCheck=true;
-		for (int j=0; j<i; j++){
+		for (int i=0; i<j; i++){
 			if ((chargingTimes [i][0] <trySlot[0][0] && chargingTimes [i][1] >trySlot[0][0])||  (chargingTimes [i][0] <trySlot[0][1] && chargingTimes [i][1] >trySlot[0][1])){
 				// if there is an overlap, return value equals false
 				overlapCheck=false;
@@ -870,17 +880,20 @@ public class DecentralizedChargerInfo {
 		return checkSlot;
 	}
 
-	//return slot (1-96) for charging based on a random number between 0 and 1
-	public double[][] returnRandomChargingSlot() throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
+	public void setValleyTimes(double [][]newValleyTimes){
+		valleyTimes=newValleyTimes;
+	}
+	
+	//
+	public double[][] returnRandomChargingSlot(double randomNumber) throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
 		double [][] slotEntry=new double [1][2];
-		double randomNumber =Math.random();
 		
 		for (int i=0; i<probDensityRanges.length; i++){
 			if (randomNumber>=probDensityRanges[i][0] && randomNumber<probDensityRanges[i][1]){
 			
 				double start=valleyTimes[i][0];
 				double end=valleyTimes[i][1];
-				double error=15; // 15 seconds error
+				double error=0.01; // percentage off error
 				boolean run=true;
 				double lowerBracket=start;
 				double upperBracket=end;
@@ -888,11 +901,18 @@ public class DecentralizedChargerInfo {
 				while (run){
 					
 					double integralUptoMiddle=functionIntegrator.integrate(probDensityFunctions.get(i), start, (lowerBracket+upperBracket)/2);
+					
 					double diff=integralUptoMiddle-(randomNumber- probDensityRanges[i][0]);
 					if(Math.abs(diff)<error){
-						slotEntry[0][0]=(lowerBracket+upperBracket)/2;
-						slotEntry[0][1]=(lowerBracket+upperBracket)/2 + Main.slotLength;
+						slotEntry[0][0]=Math.round((lowerBracket+upperBracket)/2);
+						slotEntry[0][1]=Math.round((lowerBracket+upperBracket)/2) + Main.slotLength;
 						run=false;
+						// final check if slot Fully within given Valley
+						if (slotEntry[0][1]>valleyTimes[i][1]){
+							slotEntry[0][1]=valleyTimes[i][1];
+							slotEntry[0][0]=valleyTimes[i][1]-Main.slotLength;
+						}
+						
 					}
 					else if(diff<0){
 						lowerBracket=(lowerBracket+upperBracket)/2;
@@ -904,6 +924,8 @@ public class DecentralizedChargerInfo {
 				}// end run
 			}//end if
 		}// end for
+		
+		
 		return slotEntry;
 	}
 	

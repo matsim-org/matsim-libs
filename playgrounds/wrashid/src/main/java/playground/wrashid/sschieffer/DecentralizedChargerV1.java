@@ -263,9 +263,9 @@ public class DecentralizedChargerV1 {
 		double [][] actualOrder = new double [chargingTimesCurrentAgent.length+drivingTimesCurrentAgent.length][3];
 		
 		for (int i=0; i<chargingTimesCurrentAgent.length; i++){
-			actualOrder[i][0]=chargingTimesCurrentAgent[i][0];
-			actualOrder[i][1]=chargingTimesCurrentAgent[i][1];
-			actualOrder[i][2]=(chargingTimesCurrentAgent[i][1]-chargingTimesCurrentAgent[i][0])*chargingSpeedPerSecond;
+			actualOrder[i][0]=chargingTimesCurrentAgent[i][0]; //start
+			actualOrder[i][1]=chargingTimesCurrentAgent[i][1]; // end
+			actualOrder[i][2]=(chargingTimesCurrentAgent[i][1]-chargingTimesCurrentAgent[i][0])*chargingSpeedPerSecond; // charge
 		}
 		for (int i=0; i<drivingTimesCurrentAgent.length; i++){
 			actualOrder[i+chargingTimesCurrentAgent.length][0]=drivingTimesCurrentAgent[i][0];

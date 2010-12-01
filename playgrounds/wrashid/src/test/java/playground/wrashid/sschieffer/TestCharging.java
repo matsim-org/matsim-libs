@@ -19,6 +19,7 @@ import junit.framework.TestCase;
 
 import org.apache.commons.math.FunctionEvaluationException;
 import org.apache.commons.math.MaxIterationsExceededException;
+import org.apache.commons.math.analysis.polynomials.PolynomialFunction;
 import org.apache.commons.math.optimization.OptimizationException;
 import org.junit.Test;
 
@@ -67,5 +68,28 @@ public class TestCharging extends TestCase {
 		double feasibleTime5=myInfo.getFeasibleChargingTimeInInterval(20*Main.slotLength, 6*Main.slotLength, valleyTimes);
 		assertEquals(feasibleTime5, 4*Main.slotLength);
 	}
+	
+	public void testCheckIfSlotWithinParkingTimeOfAgent() throws OptimizationException, MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException, IOException{
+		DecentralizedChargerInfo myInfo= new DecentralizedChargerInfo(100, 100, 100, 0.1, 0.13);
+		
+		//double [][]valleyTimes  =  {{5*Main.slotLength,8*Main.slotLength},{13*Main.slotLength,15*Main.slotLength},{15*Main.slotLength, 23*Main.slotLength}};
+		// should be true
+		double [][] trySlot={{5*Main.slotLength, 6*Main.slotLength}};
+		assertTrue(myInfo.checkIfSlotWithinParkingTimeOfAgent(trySlot, valleyTimes));
+		// should be false
+		double [][] trySlot2={{3*Main.slotLength, 6*Main.slotLength}};
+		assertFalse(myInfo.checkIfSlotWithinParkingTimeOfAgent(trySlot2, valleyTimes));
+		
+	}
+	
+	public void testCheckIfOverllappingSlots() throws OptimizationException, MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException, IOException{
+		DecentralizedChargerInfo myInfo= new DecentralizedChargerInfo(100, 100, 100, 0.1, 0.13);
+		double [][] trySlot={{5*Main.slotLength, 6*Main.slotLength}};
+		//double [][]valleyTimes  =  {{5*Main.slotLength,8*Main.slotLength},{13*Main.slotLength,15*Main.slotLength},{15*Main.slotLength, 23*Main.slotLength}};
+		
+		boolean result= myInfo.checkForOverlappingSlots(trySlot, valleyTimes, valleyTimes.length);
+		assertEquals(result, false);
+	}
+	
 	
 }

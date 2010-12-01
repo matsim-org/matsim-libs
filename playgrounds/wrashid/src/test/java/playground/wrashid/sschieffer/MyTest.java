@@ -43,7 +43,7 @@ public class MyTest extends TestCase {
 
 				try {
 
-					myChargerInfo = new DecentralizedChargerInfo(decentralizedChargerV1.getPeakLoad(), decentralizedChargerV1.calcNumberOfPHEVs(decentralizedChargerV1.controler), decentralizedChargerV1.getAveragePHEVConsumption(), decentralizedChargerV1.getPriceBase(), decentralizedChargerV1.getPricePeak()); 
+					myChargerInfo = new DecentralizedChargerInfo(decentralizedChargerV1.getPeakLoad(), decentralizedChargerV1.calcNumberOfPHEVs(decentralizedChargerV1.controler), decentralizedChargerV1.getAveragePHEVConsumptionInWatt(), decentralizedChargerV1.getPriceBase(), decentralizedChargerV1.getPricePeak()); 
 					//add Tests for...
 				} catch (Exception e) {
 					e.printStackTrace();
