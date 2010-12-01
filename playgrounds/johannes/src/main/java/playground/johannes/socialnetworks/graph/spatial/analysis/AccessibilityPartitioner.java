@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DegreeAccessabilityTask.java
+ * AccessibilityPartitioner.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,25 +19,25 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.spatial.analysis;
 
+import gnu.trove.TDoubleObjectHashMap;
+import gnu.trove.TDoubleObjectIterator;
 import gnu.trove.TObjectDoubleHashMap;
-import gnu.trove.TObjectDoubleIterator;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.math.stat.StatUtils;
-import org.apache.log4j.Logger;
 import org.matsim.contrib.sna.graph.Graph;
-import org.matsim.contrib.sna.graph.Vertex;
-import org.matsim.contrib.sna.graph.analysis.Degree;
 import org.matsim.contrib.sna.graph.analysis.ModuleAnalyzerTask;
+import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
-import org.matsim.contrib.sna.math.Discretizer;
-import org.matsim.contrib.sna.math.FixedSampleSizeDiscretizer;
+import org.matsim.contrib.sna.math.Distribution;
+import org.matsim.contrib.sna.math.FixedBordersDiscretizer;
 
 import playground.johannes.socialnetworks.gis.SpatialCostFunction;
-import playground.johannes.socialnetworks.statistics.Correlations;
+import playground.johannes.socialnetworks.graph.analysis.AttributePartition;
+import playground.johannes.socialnetworks.survey.ivt2009.analysis.ObservedAcceptanceProbability;
 
 import com.vividsolutions.jts.geom.Point;
 
@@ -45,47 +45,44 @@ import com.vividsolutions.jts.geom.Point;
  * @author illenberger
  *
  */
-public class DegreeAccessabilityTask extends ModuleAnalyzerTask<Degree> {
-	
-	private static final Logger logger = Logger.getLogger(DegreeAccessabilityTask.class);
+public class AccessibilityPartitioner extends ModuleAnalyzerTask<Accessibility> {
 
-	private Set<Point> opportunities;
-	
 	private SpatialCostFunction costFunction;
 	
-	public DegreeAccessabilityTask(Set<Point> opportunities, SpatialCostFunction costFunction) {
-		setModule(new Degree());
+	private Set<Point> opportunities;
+	
+	public AccessibilityPartitioner(SpatialCostFunction costFunction, Set<Point> opportunities) {
 		this.costFunction = costFunction;
 		this.opportunities = opportunities;
 	}
 	
 	@Override
-	public void analyze(Graph graph, Map<String, Double> stats) {
-		if(getOutputDirectory() != null) {
-			TObjectDoubleHashMap<Vertex> kMap = module.values(graph.getVertices());
-			TObjectDoubleHashMap<SpatialVertex> accessMap = new Accessibility().values((Set<? extends SpatialVertex>) graph.getVertices(), costFunction, opportunities);
+	public void analyze(Graph g, Map<String, Double> stats) {
+		SpatialGraph graph = (SpatialGraph) g;
+		TObjectDoubleHashMap<SpatialVertex> values = module.values(graph.getVertices(), costFunction, opportunities);
+		
+		FixedBordersDiscretizer discretizer = new FixedBordersDiscretizer(new double[]{-10,3.5,4.0});
+		AttributePartition partitioner = new AttributePartition(discretizer);
+		
+		TDoubleObjectHashMap<Set<SpatialVertex>> partitions = partitioner.partition(values);
+		
+		TDoubleObjectIterator<Set<SpatialVertex>> it = partitions.iterator();
+		for(int i = 0; i < partitions.size(); i++) {
+			it.advance();
+			System.out.println(it.key() +": size=" + it.value().size());
 			
-			double[] accessValues = new double[kMap.size()];
-			double[] kValues = new double[kMap.size()];
-			
-			TObjectDoubleIterator<Vertex> it = kMap.iterator();
-			for(int i = 0; i < kMap.size(); i++) {
-				it.advance();
-				accessValues[i] = accessMap.get((SpatialVertex) it.key());
-				kValues[i] = it.value();
-			}
-			
-			try{
-				double binsize = (StatUtils.max(accessValues) - StatUtils.min(accessValues))/20.0;
-				Discretizer disc = FixedSampleSizeDiscretizer.create(accessValues, 20);
-				Correlations.writeToFile(Correlations.correlationMean(accessValues, kValues, disc), String.format("%1$s/k_access.txt", getOutputDirectory()), "access", "k_mean");
+			ObservedAcceptanceProbability acc = new ObservedAcceptanceProbability();
+			Distribution distr = acc.distribution((Set<? extends SpatialVertex>) it.value(), opportunities);
+			try {
+				writeHistograms(distr, 1, false, "acc_a="+it.key());
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			} catch (IOException e) {
+				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-		} else {
-			logger.warn("No output directory specified!");
 		}
-		
 	}
 
 }

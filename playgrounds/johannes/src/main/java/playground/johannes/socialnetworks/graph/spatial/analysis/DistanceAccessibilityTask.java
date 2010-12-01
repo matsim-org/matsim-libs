@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DegreeAccessabilityTask.java
+ * DistanceAccessibilityTask.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.spatial.analysis;
 
+import gnu.trove.TDoubleArrayList;
 import gnu.trove.TObjectDoubleHashMap;
 import gnu.trove.TObjectDoubleIterator;
 
@@ -29,9 +30,9 @@ import java.util.Set;
 import org.apache.commons.math.stat.StatUtils;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.sna.graph.Graph;
-import org.matsim.contrib.sna.graph.Vertex;
-import org.matsim.contrib.sna.graph.analysis.Degree;
 import org.matsim.contrib.sna.graph.analysis.ModuleAnalyzerTask;
+import org.matsim.contrib.sna.graph.spatial.SpatialEdge;
+import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
 import org.matsim.contrib.sna.math.Discretizer;
 import org.matsim.contrib.sna.math.FixedSampleSizeDiscretizer;
@@ -45,16 +46,16 @@ import com.vividsolutions.jts.geom.Point;
  * @author illenberger
  *
  */
-public class DegreeAccessabilityTask extends ModuleAnalyzerTask<Degree> {
-	
-	private static final Logger logger = Logger.getLogger(DegreeAccessabilityTask.class);
+public class DistanceAccessibilityTask extends ModuleAnalyzerTask<Distance> {
+
+	private static final Logger logger = Logger.getLogger(DistanceAccessibilityTask.class);
 
 	private Set<Point> opportunities;
 	
 	private SpatialCostFunction costFunction;
-	
-	public DegreeAccessabilityTask(Set<Point> opportunities, SpatialCostFunction costFunction) {
-		setModule(new Degree());
+
+	public DistanceAccessibilityTask(Set<Point> opportunities, SpatialCostFunction costFunction) {
+		setModule(new Distance());
 		this.costFunction = costFunction;
 		this.opportunities = opportunities;
 	}
@@ -62,23 +63,51 @@ public class DegreeAccessabilityTask extends ModuleAnalyzerTask<Degree> {
 	@Override
 	public void analyze(Graph graph, Map<String, Double> stats) {
 		if(getOutputDirectory() != null) {
-			TObjectDoubleHashMap<Vertex> kMap = module.values(graph.getVertices());
+			SpatialGraph spatialGraph = (SpatialGraph) graph;
+			/*
+			 * mean distance
+			 */
+			TObjectDoubleHashMap<SpatialVertex> distMap = module.vertexMeanValues((Set<? extends SpatialVertex>) graph.getVertices());
 			TObjectDoubleHashMap<SpatialVertex> accessMap = new Accessibility().values((Set<? extends SpatialVertex>) graph.getVertices(), costFunction, opportunities);
 			
-			double[] accessValues = new double[kMap.size()];
-			double[] kValues = new double[kMap.size()];
+			double[] accessValues = new double[distMap.size()];
+			double[] dValues = new double[distMap.size()];
 			
-			TObjectDoubleIterator<Vertex> it = kMap.iterator();
-			for(int i = 0; i < kMap.size(); i++) {
+			TObjectDoubleIterator<SpatialVertex> it = distMap.iterator();
+			for(int i = 0; i < distMap.size(); i++) {
 				it.advance();
 				accessValues[i] = accessMap.get((SpatialVertex) it.key());
-				kValues[i] = it.value();
+				dValues[i] = it.value();
 			}
 			
 			try{
 				double binsize = (StatUtils.max(accessValues) - StatUtils.min(accessValues))/20.0;
 				Discretizer disc = FixedSampleSizeDiscretizer.create(accessValues, 20);
-				Correlations.writeToFile(Correlations.correlationMean(accessValues, kValues, disc), String.format("%1$s/k_access.txt", getOutputDirectory()), "access", "k_mean");
+				Correlations.writeToFile(Correlations.correlationMean(accessValues, dValues, disc), String.format("%1$s/d_mean_access.txt", getOutputDirectory()), "access", "d_mean");
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			/*
+			 * edge length 
+			 */
+			TDoubleArrayList accessValues2 = new TDoubleArrayList(graph.getEdges().size() * 2);
+			TDoubleArrayList dValues2 = new TDoubleArrayList(graph.getEdges().size() * 2);
+			
+			for(SpatialEdge edge : spatialGraph.getEdges()) {
+				double length = edge.length();
+				if(!Double.isNaN(length)) {
+					accessValues2.add(accessMap.get(edge.getVertices().getFirst()));
+					dValues2.add(length);
+					
+					accessValues2.add(accessMap.get(edge.getVertices().getSecond()));
+					dValues2.add(length);
+				}
+			}
+			try{
+				accessValues = accessValues2.toNativeArray();
+				dValues = dValues2.toNativeArray();
+				Discretizer disc = FixedSampleSizeDiscretizer.create(accessValues, 100);
+				Correlations.writeToFile(Correlations.correlationMean(accessValues, dValues, disc), String.format("%1$s/d_access.txt", getOutputDirectory()), "access", "d");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

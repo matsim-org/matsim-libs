@@ -21,12 +21,12 @@ package playground.johannes.socialnetworks.graph.social.mcmc;
 
 import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
+import org.matsim.contrib.sna.math.Discretizer;
+import org.matsim.contrib.sna.math.LinearDiscretizer;
 
 import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
 import playground.johannes.socialnetworks.gis.DistanceCalculator;
 import playground.johannes.socialnetworks.graph.mcmc.EdgeSwitchCondition;
-import playground.johannes.socialnetworks.statistics.Discretizer;
-import playground.johannes.socialnetworks.statistics.LinearDiscretizer;
 
 /**
  * @author illenberger

@@ -64,10 +64,16 @@ public class WaveSizeTask extends AnalyzerTask {
 		for(Edge e : graph.getEdges()) {
 			SampledVertex v_i = (SampledVertex)e.getVertices().getFirst();
 			SampledVertex v_j = (SampledVertex)e.getVertices().getSecond();
-			if(v_i.isSampled() && v_j.isSampled()) {
-				int it = Math.max(v_i.getIterationSampled(), v_j.getIterationSampled());
-				sampledEdges.adjustOrPutValue(it, 1, 1);
-			}
+//			if(v_i.isSampled() && v_j.isSampled()) {
+//				int it = Math.max(v_i.getIterationSampled(), v_j.getIterationSampled());
+//				sampledEdges.adjustOrPutValue(it, 1, 1);
+//			}
+			int it = Integer.MAX_VALUE;
+			if(v_i.isSampled())
+				it = Math.min(it, v_i.getIterationSampled());
+			if(v_j.isSampled())
+				it = Math.min(it, v_j.getIterationSampled());
+			sampledEdges.adjustOrPutValue(it, 1, 1);
 		}
 		
 		int detectedTotal = 0;
@@ -102,6 +108,7 @@ public class WaveSizeTask extends AnalyzerTask {
 			try {
 				write(sampled, getOutputDirectory() + "/sampled.txt");
 				write(detected, getOutputDirectory() + "/detected.txt");
+				write(sampledEdges, getOutputDirectory() + "sampled_edges.txt");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

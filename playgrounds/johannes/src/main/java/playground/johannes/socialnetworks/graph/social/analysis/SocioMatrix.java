@@ -105,8 +105,9 @@ public abstract class SocioMatrix {
 		Set<String> values = new HashSet<String>();
 		for(SocialVertex vertex : graph.getVertices()) {
 			String value = getAttributeValue(vertex);
-			if(value != null)
-				values.add(value);
+			if(value != null) {
+				values.add(convert(value));
+			}
 		}
 		
 		attrs = new ArrayList<String>(values);
@@ -115,13 +116,13 @@ public abstract class SocioMatrix {
 		
 		for(SocialVertex vertex : graph.getVertices()) {
 			if(((SampledVertex)vertex).isSampled()) {
-			String att1 = getAttributeValue(vertex);
+			String att1 = convert(getAttributeValue(vertex));
 			if (att1 != null) {
 				int idx_i = attrs.indexOf(att1);
 				int cnt[] = new int[attrs.size()];
 				int total = 0;
 				for (SocialEdge edge : vertex.getEdges()) {
-					String att2 = getAttributeValue(edge.getOpposite(vertex));
+					String att2 = convert(getAttributeValue(edge.getOpposite(vertex)));
 					if(att2 != null) {
 						int idx_j = attrs.indexOf(att2);
 						cnt[idx_j]++;
@@ -146,5 +147,16 @@ public abstract class SocioMatrix {
 		}
 		
 		return matrix;
+	}
+	
+	private String convert(String value) {
+//		if(value == null)
+//			return null;
+//		
+//		if(value.equalsIgnoreCase("6") || value.equalsIgnoreCase("7"))
+//			return "academic";
+//		else
+//			return "nonacademic";
+		return value;
 	}
 }

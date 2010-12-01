@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * LinearDiscretizer.java
+ * ObservedAccessability.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,23 +17,38 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.statistics;
+package playground.johannes.socialnetworks.survey.ivt2009.analysis;
+
+import gnu.trove.TObjectDoubleHashMap;
+
+import java.util.Set;
+
+import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
+import org.matsim.contrib.sna.math.Distribution;
+import org.matsim.contrib.sna.snowball.SampledVertex;
+import org.matsim.contrib.sna.snowball.analysis.SnowballPartitions;
+
+import playground.johannes.socialnetworks.gis.SpatialCostFunction;
+import playground.johannes.socialnetworks.graph.spatial.analysis.Accessibility;
+
+import com.vividsolutions.jts.geom.Point;
 
 /**
  * @author illenberger
  *
  */
-public class LinearDiscretizer implements Discretizer {
+public class ObservedAccessibility extends Accessibility {
 
-	private final double binsize;
-	
-	public LinearDiscretizer(double binsize) {
-		this.binsize = binsize;
-	}
-	
 	@Override
-	public double discretize(double value) {
-		return Math.ceil(value/binsize);
+	public Distribution distribution(Set<? extends SpatialVertex> vertices, SpatialCostFunction costFunction,
+			Set<Point> opportunities) {
+		return super.distribution((Set<? extends SpatialVertex>) SnowballPartitions.createSampledPartition((Set<? extends SampledVertex>)vertices), costFunction, opportunities);
+	}
+
+	@Override
+	public TObjectDoubleHashMap<SpatialVertex> values(Set<? extends SpatialVertex> vertices,
+			SpatialCostFunction costFunction, Set<Point> opportunities) {
+		return super.values((Set<? extends SpatialVertex>) SnowballPartitions.createSampledPartition((Set<? extends SampledVertex>)vertices), costFunction, opportunities);
 	}
 
 }

@@ -19,8 +19,9 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.gis;
 
-import playground.johannes.socialnetworks.statistics.Discretizer;
-import playground.johannes.socialnetworks.statistics.LinearDiscretizer;
+import org.matsim.contrib.sna.math.Discretizer;
+import org.matsim.contrib.sna.math.LinearDiscretizer;
+
 
 import com.vividsolutions.jts.geom.Point;
 
@@ -55,7 +56,7 @@ public class GravityCostFunction implements SpatialCostFunction {
 	
 	@Override
 	public double costs(Point p1, Point p2) {
-		double d = Math.max(1.0, discretizer.discretize(calculator.distance(p1, p2)));
+		double d = Math.max(1.0, discretizer.index(calculator.distance(p1, p2)));
 		
 		return gamma * Math.log(d) + constant;
 	}

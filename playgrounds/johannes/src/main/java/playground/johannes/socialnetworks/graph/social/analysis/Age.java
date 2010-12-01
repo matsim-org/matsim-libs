@@ -136,14 +136,17 @@ public class Age {
 		int maxLen = 0;
 		TIntObjectHashMap<TIntArrayList> map = new TIntObjectHashMap<TIntArrayList>();
 		for(int i = 0; i < values1.size(); i++) {
-			TIntArrayList list = map.get(values1.get(i));
+			int age = (int) (Math.ceil(values1.get(i)/5.0)*5);
+			if(age > 0) {
+			TIntArrayList list = map.get(age);
 			if(list == null) {
 				list = new TIntArrayList();
-				map.put(values1.get(i), list);
+				map.put(age, list);
 			}
 			list.add(values2.get(i));
 			
 			maxLen = Math.max(maxLen, list.size());
+			}
 		}
 		
 		int keys[] = map.keys();
@@ -151,21 +154,25 @@ public class Age {
 		
 		try {
 			BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-			for(int k : keys) {
-				writer.write(String.valueOf(k));
-				writer.write("\t");
+			for(int k = 0; k < keys.length; k++) {
+				writer.write("\"");
+				writer.write(String.valueOf(keys[k]));
+				writer.write("\"");
+				if(k+1 < keys.length)
+					writer.write("\t");
 			}
 			writer.newLine();
 			
 			for(int i = 0; i < maxLen; i++) {
-				for(int k : keys) {
-					TIntArrayList list = map.get(k);
+				for(int k = 0; k < keys.length; k++) {
+					TIntArrayList list = map.get(keys[k]);
 					if(i < list.size()) {
 						writer.write(String.valueOf(list.get(i)));
 					} else {
 						writer.write("NA");
 					}
-					writer.write("\t");
+					if(k+1 < keys.length)
+						writer.write("\t");
 				}
 				writer.newLine();
 			}

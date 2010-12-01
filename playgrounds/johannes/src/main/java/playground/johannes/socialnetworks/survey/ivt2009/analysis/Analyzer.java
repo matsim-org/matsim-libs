@@ -85,8 +85,8 @@ public class Analyzer {
 		Set<Point> choiceSet = new HashSet<Point>();
 		SpatialSparseGraph graph2 = new Population2SpatialGraph(CRSUtils.getCRS(21781)).read("/Users/jillenberger/Work/socialnets/data/schweiz/complete/plans/plans.0.001.xml");
 		
-		graph.getDelegate().transformToCRS(CRSUtils.getCRS(21781));
-//		graph2.transformToCRS(CRSUtils.getCRS(4326));
+//		graph.getDelegate().transformToCRS(CRSUtils.getCRS(21781));
+		graph2.transformToCRS(CRSUtils.getCRS(4326));
 		for(SpatialVertex v : graph2.getVertices()) {	
 			choiceSet.add(v.getPoint());
 		}
@@ -106,7 +106,7 @@ public class Analyzer {
 //		filter.apply(graph.getDelegate());
 ////		SampledGraphProjectionBuilder<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge> builder = new SampledGraphProjectionBuilder<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge>();
 //		builder.synchronize(graph);
-//		
+		
 //		output = output+"/clip/";
 //		new File(output).mkdirs();
 //		analyze(graph, zones, choiceSet, scenario.getNetwork(), output);

@@ -24,16 +24,14 @@
 package playground.johannes.statistics;
 
 import gnu.trove.TDoubleDoubleHashMap;
-
-import org.matsim.testcases.MatsimTestCase;
-
+import junit.framework.TestCase;
 import playground.johannes.socialnetworks.statistics.Correlations;
 
 /**
  * @author illenberger
  *
  */
-public class CorrelationsTest extends MatsimTestCase {
+public class CorrelationsTest extends TestCase {
 
 	public void testCorrelationMean1() {
 		double[] values1 = new double[]{1, 1, 2, 2, 3, 3, 3};
@@ -52,9 +50,9 @@ public class CorrelationsTest extends MatsimTestCase {
 		
 		TDoubleDoubleHashMap meanValues = Correlations.correlationMean(values1, values2, 1.0);
 		
-		assertEquals(4.0, meanValues.get(1));
-		assertEquals(2.0, meanValues.get(2));
-		assertEquals(4.0, meanValues.get(3));
+		assertEquals(5.0, meanValues.get(1));
+		assertEquals(3.0, meanValues.get(2));
+		assertEquals(3.666, meanValues.get(3),0.001);
 	}
 	
 	public void testCorrelationMean3() {
@@ -63,7 +61,8 @@ public class CorrelationsTest extends MatsimTestCase {
 		
 		TDoubleDoubleHashMap meanValues = Correlations.correlationMean(values1, values2, 2.0);
 		
-		assertEquals(4.0, meanValues.get(0));
-		assertEquals(3.2, meanValues.get(2));
+		assertEquals(0.0, meanValues.get(0));
+		assertEquals(4.0, meanValues.get(2));
+		assertEquals(3.2, meanValues.get(4));
 	}
 }

@@ -37,15 +37,15 @@ import org.apache.log4j.Logger;
 import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
+import org.matsim.contrib.sna.math.Discretizer;
 import org.matsim.contrib.sna.math.Distribution;
+import org.matsim.contrib.sna.math.LinearDiscretizer;
 
 import playground.johannes.socialnetworks.gis.BeelineCostFunction;
 import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
 import playground.johannes.socialnetworks.gis.DistanceCalculator;
 import playground.johannes.socialnetworks.graph.mcmc.GraphProbability;
-import playground.johannes.socialnetworks.graph.spatial.analysis.Accessability;
-import playground.johannes.socialnetworks.statistics.Discretizer;
-import playground.johannes.socialnetworks.statistics.LinearDiscretizer;
+import playground.johannes.socialnetworks.graph.spatial.analysis.Accessibility;
 
 import com.vividsolutions.jts.geom.Point;
 
@@ -72,7 +72,7 @@ public class ErgmEdgeCost2 implements GraphProbability {
 		}
 
 		logger.info("Calculating accessability...");
-		Accessability access = new Accessability();
+		Accessibility access = new Accessibility();
 		BeelineCostFunction cFunc = new BeelineCostFunction();
 		cFunc.setDistanceCalculator(new CartesianDistanceCalculator());
 		TObjectDoubleHashMap<SpatialVertex> values = access.values(vertices, cFunc, opportunities);

@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.matsim.contrib.sna.graph.Graph;
+import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.graph.analysis.AnalyzerTask;
 import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
 import org.matsim.contrib.sna.graph.matrix.Dijkstra;
@@ -47,7 +48,8 @@ import playground.johannes.socialnetworks.graph.social.SocialVertex;
 public class SeedConnectionTask extends AnalyzerTask {
 
 	public static final String NUM_CONNECTS = "n_connects";
-	
+
+	public Set<List<SampledVertexDecorator<SocialVertex>>> pathSet = new HashSet<List<SampledVertexDecorator<SocialVertex>>>();
 	@Override
 	public void analyze(Graph graph, Map<String, Double> stats) {
 		Set<SampledVertex> seedSet = (Set<SampledVertex>) SnowballPartitions.createSampledPartition((Set<? extends SampledVertex>)graph.getVertices(), 0);
@@ -131,7 +133,9 @@ public class SeedConnectionTask extends AnalyzerTask {
 	
 	private void dumpPaths(Set<TIntArrayList> paths, AdjacencyMatrix<SampledVertex> y) throws IOException {
 		BufferedWriter writer = new BufferedWriter(new FileWriter(String.format("%1$s/paths.txt", getOutputDirectory())));
+		
 		for(TIntArrayList path : paths) {
+			List<SampledVertexDecorator<SocialVertex>> list = new ArrayList<SampledVertexDecorator<SocialVertex>>();
 			for(int i = 0; i < path.size(); i++) {
 				SampledVertex v = y.getVertex(path.get(i));
 				SampledVertexDecorator<SocialVertex> vertex = (SampledVertexDecorator<SocialVertex>) v;
@@ -139,8 +143,11 @@ public class SeedConnectionTask extends AnalyzerTask {
 				writer.write("(");
 				writer.write(String.valueOf(vertex.getIterationSampled()));
 				writer.write(")\t");
+				
+				list.add(vertex);
 			}
 			writer.newLine();
+			pathSet.add(list);
 		}
 		writer.close();
 	}

@@ -19,11 +19,14 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.spatial.analysis;
 
+import gnu.trove.TDoubleArrayList;
+import gnu.trove.TIntArrayList;
 import gnu.trove.TObjectDoubleHashMap;
 
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.commons.math.stat.StatUtils;
 import org.matsim.contrib.sna.graph.spatial.SpatialEdge;
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
 import org.matsim.contrib.sna.math.Distribution;
@@ -88,8 +91,32 @@ public class Distance {
 		return values;
 	}
 	
+	public TObjectDoubleHashMap<SpatialVertex> vertexMedianValues(Set<? extends SpatialVertex> vertices) {
+		TObjectDoubleHashMap<SpatialVertex> values = new TObjectDoubleHashMap<SpatialVertex>();
+		
+		for(SpatialVertex vertex : vertices) {
+			TDoubleArrayList list = new TDoubleArrayList();
+			for(SpatialEdge e : vertex.getEdges()) {
+				double d = e.length();
+				
+				if(!Double.isNaN(d)) {
+					list.add(d);
+				}
+			}
+			if(list.size() > 0)
+				values.put(vertex, StatUtils.percentile(list.toNativeArray(), 50));
+		}
+		
+		return values;
+	}
+	
 	public Distribution vertexMeanDistribution(Set<? extends SpatialVertex> vertices) {
 		TObjectDoubleHashMap<SpatialVertex> values = vertexMeanValues(vertices);
+		return new Distribution(values.getValues());
+	}
+	
+	public Distribution vertexMedianDistribution(Set<? extends SpatialVertex> vertices) {
+		TObjectDoubleHashMap<SpatialVertex> values = vertexMedianValues(vertices);
 		return new Distribution(values.getValues());
 	}
 }

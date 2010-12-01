@@ -24,12 +24,12 @@ import gnu.trove.TObjectDoubleHashMap;
 import java.util.Set;
 
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
+import org.matsim.contrib.sna.math.Discretizer;
 import org.matsim.contrib.sna.math.Distribution;
+import org.matsim.contrib.sna.math.LinearDiscretizer;
 
 import playground.johannes.socialnetworks.gis.DistanceCalculator;
 import playground.johannes.socialnetworks.gis.OrthodromicDistanceCalculator;
-import playground.johannes.socialnetworks.statistics.Discretizer;
-import playground.johannes.socialnetworks.statistics.LinearDiscretizer;
 
 /**
  * @author illenberger
@@ -58,7 +58,7 @@ public class GravityGamma {
 		for(SpatialVertex vertex : vertices) {
 			double sum = 0;
 			for(SpatialVertex neighbor : vertex.getNeighbours()) {
-				double d = Math.max(1.0, discretizer.discretize(calculator.distance(vertex.getPoint(), neighbor.getPoint())));
+				double d = Math.max(1.0, discretizer.index(calculator.distance(vertex.getPoint(), neighbor.getPoint())));
 				sum += Math.log(d);
 			}
 			

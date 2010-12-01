@@ -28,21 +28,20 @@ import org.matsim.contrib.sna.graph.analysis.DegreeTask;
 import org.matsim.contrib.sna.graph.analysis.GraphSizeTask;
 import org.matsim.contrib.sna.graph.analysis.TransitivityTask;
 
+import playground.johannes.socialnetworks.gis.GravityCostFunction;
+import playground.johannes.socialnetworks.gis.SpatialCostFunction;
+import playground.johannes.socialnetworks.gis.WGS84DistanceCalculator;
 import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
 import playground.johannes.socialnetworks.graph.analysis.TransitivityDegreeTask;
 import playground.johannes.socialnetworks.graph.social.analysis.AgeTask;
-import playground.johannes.socialnetworks.graph.social.analysis.DegreeAgeTask;
-import playground.johannes.socialnetworks.graph.social.analysis.DegreeGenderTask;
-import playground.johannes.socialnetworks.graph.social.analysis.EducationTask;
-import playground.johannes.socialnetworks.graph.social.analysis.GenderTask;
-import playground.johannes.socialnetworks.graph.spatial.analysis.AcceptanceProbabilityTask;
+import playground.johannes.socialnetworks.graph.spatial.analysis.AcceptFactorTask;
+import playground.johannes.socialnetworks.graph.spatial.analysis.AccessibilityPartitioner;
 import playground.johannes.socialnetworks.graph.spatial.analysis.DegreeDensityTask;
-import playground.johannes.socialnetworks.graph.spatial.analysis.DegreeEdgeLengthTask;
+import playground.johannes.socialnetworks.graph.spatial.analysis.DistanceAccessibilityTask;
 import playground.johannes.socialnetworks.graph.spatial.analysis.DistanceTask;
 import playground.johannes.socialnetworks.snowball2.analysis.DegreeIterationTask;
 import playground.johannes.socialnetworks.snowball2.analysis.ObservedDegree;
 import playground.johannes.socialnetworks.snowball2.analysis.ObservedTransitivity;
-import playground.johannes.socialnetworks.snowball2.analysis.ResponseRateTask;
 import playground.johannes.socialnetworks.snowball2.analysis.SeedConnectionTask;
 import playground.johannes.socialnetworks.snowball2.analysis.WaveSizeTask;
 import playground.johannes.socialnetworks.snowball2.social.analysis.ObservedAge;
@@ -83,53 +82,78 @@ public class ObservedAnalyzerTask extends AnalyzerTaskComposite {
 //		AcceptanceProbabilityTask pAccept = new AcceptanceProbabilityTask(choiceSet);
 //		addTask(pAccept);
 		
-		DegreeDensityTask kRhoTask = new DegreeDensityTask(zones);
-		kRhoTask.setModule(new ObservedDegree());
-		addTask(kRhoTask);
+		addTask(new AcceptFactorTask(choiceSet));
+//		DegreeDensityTask kRhoTask = new DegreeDensityTask(zones);
+//		kRhoTask.setModule(new ObservedDegree());
+//		addTask(kRhoTask);
+//		
+//		AgeTask age = new AgeTask();
+//		age.setModule(new ObservedAge());
+//		addTask(age);
 		
-		AgeTask age = new AgeTask();
-		age.setModule(new ObservedAge());
-		addTask(age);
-		
-		addTask(new ComponentsTask());
+//		addTask(new ComponentsTask());
 		
 //		EdgeCostsTask costs = new EdgeCostsTask(null);
-//		costs.setModule(new ObservedEdgeCosts(new GravityEdgeCostFunction(1.6, 1.0)));
+//		costs.setModule(new ObservedEdgeCosts(new GravityEdgeCostFunction(1.6, 0.0)));
 //		addTask(costs);
 		
-		addTask(new SeedConnectionTask());
+//		addTask(new SeedConnectionTask());
 		
-		DegreeEdgeLengthTask kdTask = new DegreeEdgeLengthTask();
-		kdTask.setModule(new ObservedDegree());
-		addTask(kdTask);
+//		DegreeEdgeLengthTask kdTask = new DegreeEdgeLengthTask();
+//		kdTask.setModule(new ObservedDegree());
+//		addTask(kdTask);
+//		
+//		DegreeAgeTask daTask = new DegreeAgeTask();
+//		daTask.setModule(new ObservedDegree());
+//		addTask(daTask);
 		
-		DegreeAgeTask daTask = new DegreeAgeTask();
-		daTask.setModule(new ObservedDegree());
-		addTask(daTask);
+//		SpatialCostFunction costFunction = new GravityCostFunction(1.6, 0, new WGS84DistanceCalculator());
+//		
+//		AccessibilityPartitioner partitioner = new AccessibilityPartitioner(costFunction, choiceSet);
+//		partitioner.setModule(new ObservedAccessibility());
+//		addTask(partitioner);
+		
+//		AccessibilityTask t = new AccessibilityTask(costFunction, choiceSet);
+//		t.setModule(new ObservedAccessibility());
+//		addTask(t);
+////		DegreeAccessabilityTask task = new DegreeAccessabilityTask(choiceSet, costFunction);
+//		task.setModule(new ObservedDegree());
+//		addTask(task);
+//		
+//		DistanceAccessibilityTask distAccessTask = new DistanceAccessibilityTask(choiceSet, costFunction);
+//		distAccessTask.setModule(new ObservedDistance());
+//		addTask(distAccessTask);
+		
+//		addTask(new DensityAccessibilityTask(choiceSet, costFunction));
 		
 //		DegreeGridTask gridTask = new DegreeGridTask();
 //		gridTask.setModule(new ObservedDegree());
 //		addTask(gridTask);
 		
 //		addTask(new TravelTimeTask(network));
+//		
+//		addTask(new FrequencyTask());
+//		addTask(new GenderTask());
+//		
+//		DegreeGenderTask kgTask = new DegreeGenderTask();
+//		kgTask.setModule(new ObservedDegree());
+//		addTask(kgTask);
 		
-		addTask(new FrequencyTask());
-		addTask(new GenderTask());
+//		addTask(new ResponseRateTask());
 		
-		DegreeGenderTask kgTask = new DegreeGenderTask();
-		kgTask.setModule(new ObservedDegree());
-		addTask(kgTask);
+//		addTask(new FrequencyDistanceTask(choiceSet));
 		
-		addTask(new ResponseRateTask());
-		
-		addTask(new FrequencyDistanceTask());
-		
-		addTask(new EducationTask());
+//		addTask(new EducationTask());
 //		addTask(new EdgeTypeTask(choiceSet));
 //		addTask(new DistanceSocioAttribute(choiceSet));
 //		addTask(new IncomeTask());
 //		addTask(new CivilStatusTask());
-		addTask(new playground.johannes.socialnetworks.survey.ivt2009.analysis.DegreeGenderTask());
+//		addTask(new playground.johannes.socialnetworks.survey.ivt2009.analysis.DegreeGenderTask());
+//		addTask(new DistanceAge());
+//		
+//		addTask(new FrequencyDegree());
+//		
+//		addTask(new GyrationRadiusTask());
 	}
 
 }

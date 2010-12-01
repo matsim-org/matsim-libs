@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PowerDiscretizer.java
+ * DistanceCalculatorFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,50 +17,22 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.statistics;
+package playground.johannes.socialnetworks.gis;
+
+import org.geotools.referencing.cs.DefaultCartesianCS;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
  * @author illenberger
  *
  */
-public class LogDiscretizer implements Discretizer {
+public class DistanceCalculatorFactory {
 
-	private double base;
-	
-	private double discretization;
-	
-	private double max = Double.POSITIVE_INFINITY;
-	
-	public LogDiscretizer(double base) {
-		this(base, 1.0);
-	}
-	
-	public LogDiscretizer(double base, double discretization) {
-		this(base, discretization, Double.POSITIVE_INFINITY);
-	}
-	
-	public LogDiscretizer(double base, double discretization, double max) {
-		this.base = base;
-		this.discretization = discretization;
-		this.max = max;
-	}
-	
-	@Override
-	public double discretize(double value) {
-		if(value == 0)
-			System.err.println();
-		value = Math.min(value, max);
-		double bin = getBin(value, discretization);
-		if(bin < 0)
-			return 0;
-		else {
-			return Math.pow(base, bin) * discretization;
+	public static DistanceCalculator createDistanceCalculator(CoordinateReferenceSystem crs) {
+		if(crs.getCoordinateSystem() instanceof DefaultCartesianCS) {
+			return new CartesianDistanceCalculator();
+		} else {
+			return new OrthodromicDistanceCalculator();
 		}
-	}
-
-	public double getBin(double value, double discretization) {
-		double bin = Math.ceil(Math.log(value/discretization)/Math.log(base));
-//		return Math.max(bin, 0);
-		return bin;
 	}
 }

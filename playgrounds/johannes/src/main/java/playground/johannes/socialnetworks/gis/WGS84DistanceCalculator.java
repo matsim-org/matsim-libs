@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Descretizer.java
+ * WGS84DistanceCalculator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,13 +17,26 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.statistics;
+package playground.johannes.socialnetworks.gis;
+
+import org.geotools.referencing.GeodeticCalculator;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
+
+import com.vividsolutions.jts.geom.Point;
 
 /**
  * @author illenberger
  *
  */
-public interface Discretizer {
+public class WGS84DistanceCalculator implements DistanceCalculator {
 
-	public double discretize(double value);
+	private final GeodeticCalculator geoCalc = new GeodeticCalculator(DefaultGeographicCRS.WGS84);
+	
+	@Override
+	public double distance(Point p1, Point p2) {
+		geoCalc.setStartingGeographicPoint(p1.getX(), p1.getY());
+		geoCalc.setDestinationGeographicPoint(p2.getX(), p2.getY());
+		return geoCalc.getOrthodromicDistance();
+	}
+
 }

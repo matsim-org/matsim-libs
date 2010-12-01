@@ -46,26 +46,38 @@ import org.xml.sax.SAXException;
  */
 public class LegDistanceAnalyzer {
 
-	public static Map<String, TDoubleDoubleHashMap> analyze(Population population) {
-		Map<String, TDoubleDoubleHashMap> map = new HashMap<String, TDoubleDoubleHashMap>();
-
+	public static Map<String, Distribution> analyze(Population population) {
+//		Map<String, TDoubleDoubleHashMap> map = new HashMap<String, TDoubleDoubleHashMap>();
+		Map<String, Distribution> map = new HashMap<String, Distribution>();
+//		TDoubleDoubleHashMap all = new TDoubleDoubleHashMap();
+		Distribution all = new Distribution();
+		map.put("all", all);
+		
 		for (Person person : population.getPersons().values()) {
 			Plan plan = person.getSelectedPlan();
 			if (plan.getPlanElements().size() > 1) {
 				for (int i = 1; i < plan.getPlanElements().size(); i += 2) {
 					Route route = ((Leg) plan.getPlanElements().get(i)).getRoute();
 					if (route != null) {
-//						double dist = route.getDistance();
-						double dist = route.getTravelTime();
+						double dist = route.getDistance();
+//						double dist = route.getTravelTime();
 						String type = ((Activity) plan.getPlanElements().get(i + 1)).getType();//.substring(0, 1);
-
-						TDoubleDoubleHashMap hist = map.get(type);
+//						if(type.equalsIgnoreCase("visit") || type.equalsIgnoreCase("bar") || type.equalsIgnoreCase("loudoor")) {
+//							type = "leisure";
+//						TDoubleDoubleHashMap hist = map.get(type);
+						Distribution hist = map.get(type);
 						if (hist == null) {
-							hist = new TDoubleDoubleHashMap();
+//							hist = new TDoubleDoubleHashMap();
+							hist = new Distribution();
 							map.put(type, hist);
 						}
 
-						hist.adjustOrPutValue(Math.ceil(dist / 300.0)*5, 1, 1);
+//						hist.adjustOrPutValue(Math.ceil(dist / 300.0)*5, 1, 1);
+//						hist.adjustOrPutValue(Math.ceil(dist / 1000.0), 1, 1);
+						hist.add(dist);
+//						}
+//						all.adjustOrPutValue(Math.ceil(dist / 1000.0), 1, 1);
+						all.add(dist);
 					}
 				}
 			}
@@ -80,15 +92,17 @@ public class LegDistanceAnalyzer {
 //		netReader.parse("/Users/jillenberger/Work/shared-svn/studies/schweiz-ivtch/baseCase/network/ivtch-osm.xml");
 		PopulationReaderMatsimV4 reader = new PopulationReaderMatsimV4(scenario);
 //		reader.readFile("/Users/jillenberger/Work/shared-svn/studies/schweiz-ivtch/baseCase/plans/plans_miv_zrh30km_transitincl_10pct.xml");
-		reader.readFile("/Users/jillenberger/Work/work/socialnets/data/schweiz/mz2005/rawdata/plans.xml");
+		reader.readFile("/Users/jillenberger/Work/socialnets/data/schweiz/mz2005/rawdata/plans.xml");
 		
 		Population population = scenario.getPopulation();
-		Map<String , TDoubleDoubleHashMap> map = analyze(population);
+		Map<String , Distribution> map = analyze(population);
 		
-		Distribution distr = new Distribution();
-		for(Entry<String, TDoubleDoubleHashMap> entry : map.entrySet()) {
-			
-			Distribution.writeHistogram(distr.normalizedDistribution(entry.getValue()), "/Users/jillenberger/Work/work/socialnets/data/schweiz/mz2005/analysis/" + entry.getKey() + ".tt.ref.txt");
+
+		for(Entry<String, Distribution> entry : map.entrySet()) {
+			Distribution distr = entry.getValue();
+//			if(distr.getValues().length > 100) {
+			Distribution.writeHistogram(distr.normalizedDistribution(distr.absoluteDistribution(1000)), "/Users/jillenberger/Work/socialnets/data/schweiz/mz2005/analysis/" + entry.getKey() + ".dist.ref.txt");
+//			}
 		}
 	}
 }

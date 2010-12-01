@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.survey.ivt2009.graph.io;
 
+import gnu.trove.TDoubleArrayList;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -29,14 +31,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import org.apache.commons.math.stat.StatUtils;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.contrib.sna.gis.CRSUtils;
-import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
-import org.matsim.contrib.sna.graph.spatial.io.KMLIconVertexStyle;
-import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphKMLWriter;
-import org.matsim.contrib.sna.graph.spatial.io.VertexDegreeColorizer;
+import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.math.Distribution;
 import org.matsim.contrib.sna.snowball.SampledGraphProjection;
 import org.matsim.contrib.sna.snowball.SampledVertexDecorator;
@@ -44,17 +44,15 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.collections.Tuple;
 
 import playground.johannes.socialnetworks.graph.social.SocialPerson;
-import playground.johannes.socialnetworks.graph.social.io.SocialGraphMLWriter;
 import playground.johannes.socialnetworks.snowball2.io.SampledGraphProjMLWriter;
 import playground.johannes.socialnetworks.snowball2.spatial.SpatialSampledGraphProjectionBuilder;
+import playground.johannes.socialnetworks.statistics.Correlations;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseEdge;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseGraph;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseGraphBuilder;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseVertex;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.io.AlterTableReader.VertexRecord;
-import playground.johannes.socialnetworks.survey.ivt2009.graph.io.GraphML2KML.SampledPartition;
 
-import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
 
@@ -203,7 +201,7 @@ public class GraphBuilder {
 		/*
 		 * Sociogram
 		 */
-//		loadSociogramData(alterReader.getVertices().values(), sqlReader);
+		loadSociogramData(alterReader.getVertices().values(), sqlReader);
 		
 		logger.info(errLogger.toString());
 		return proj;
@@ -269,30 +267,44 @@ public class GraphBuilder {
 		Distribution numDistrNoZero = new Distribution();
 		Distribution sizeDistr = new Distribution();
 		
+		TDoubleArrayList sizeValues = new TDoubleArrayList();
+		TDoubleArrayList kSizeValues = new TDoubleArrayList();
+		TDoubleArrayList numValues = new TDoubleArrayList();
+		TDoubleArrayList numValues2 = new TDoubleArrayList();
+		TDoubleArrayList kNumValues = new TDoubleArrayList();
+		
 		for(VertexRecord record : records) {
 			if(record.isEgo) {
 			List<Set<String>> cliques = sqlData.getCliques(record);
 			numDistr.add(cliques.size());
+			
+			Vertex v = idMap.get(record.id);
+			numValues.add(cliques.size());
+			kNumValues.add(v.getNeighbours().size());
+			
 			if(!cliques.isEmpty())
 				numDistrNoZero.add(cliques.size());
 			
 			for(Set<String> clique : cliques) {
-				sizeDistr.add(clique.size());
-				List<SocialSparseVertex> vertices = new ArrayList<SocialSparseVertex>(clique.size());
-				for(String alter : clique) {
-					VertexRecord r = map.get(record.egoSQLId+alter);
-					if(r!=null) {
-					SocialSparseVertex vertex = idMap.get(r.id);
-					if(vertex != null) {
-					vertices.add(vertex);
-					} else {
-						logger.warn("Vertex not found.");
+					sizeDistr.add(clique.size());
+					sizeValues.add(clique.size());
+					kSizeValues.add(v.getNeighbours().size());
+					numValues2.add(cliques.size());
+					List<SocialSparseVertex> vertices = new ArrayList<SocialSparseVertex>(clique.size());
+					for (String alter : clique) {
+						VertexRecord r = map.get(record.egoSQLId + alter);
+						if (r != null) {
+							SocialSparseVertex vertex = idMap.get(r.id);
+							if (vertex != null) {
+								vertices.add(vertex);
+							} else {
+								logger.warn("Vertex not found.");
+							}
+						} else {
+							logger.warn("Record not found.");
+						}
 					}
-					} else {
-						logger.warn("Record not found.");
-					}
-				}
-				
+
 				for(int i = 0; i < vertices.size(); i++) {
 					for(int j = i+1; j < vertices.size(); j++) {
 						SocialSparseEdge socialEdge = builder.addEdge(graph, vertices.get(i), vertices.get(j));
@@ -314,8 +326,18 @@ public class GraphBuilder {
 		try {
 			logger.info("Mean num of cliques: " + numDistrNoZero.mean());
 			logger.info("Mean size: " + sizeDistr.mean());
-			Distribution.writeHistogram(numDistr.absoluteDistribution(), "/Users/jillenberger/Work/work/socialnets/data/ivt2009/raw/09-2010/graph/sociogram/numCliques.txt");
-			Distribution.writeHistogram(sizeDistr.absoluteDistribution(), "/Users/jillenberger/Work/work/socialnets/data/ivt2009/raw/09-2010/graph/sociogram/numPersons.txt");
+			logger.info("Median num of cliques: " + StatUtils.percentile(numDistrNoZero.getValues(), 50));
+			logger.info("Median size: " + StatUtils.percentile(sizeDistr.getValues(), 50));
+			Distribution.writeHistogram(numDistr.absoluteDistribution(), "/Users/jillenberger/Work/socialnets/data/ivt2009/09-2010/graph/sociogram/numCliques.txt");
+			Distribution.writeHistogram(sizeDistr.absoluteDistribution(), "/Users/jillenberger/Work/socialnets/data/ivt2009/09-2010/graph/sociogram/numPersons.txt");
+			
+			Correlations.writeToFile(Correlations.correlationMean(kSizeValues.toNativeArray(), sizeValues.toNativeArray()),
+					"/Users/jillenberger/Work/socialnets/data/ivt2009/09-2010/graph/sociogram/size_k.txt", "k", "size");
+			Correlations.writeToFile(Correlations.correlationMean(kNumValues.toNativeArray(), numValues.toNativeArray()), 
+					"/Users/jillenberger/Work/socialnets/data/ivt2009/09-2010/graph/sociogram/num_k.txt", "k", "n");
+			
+			Correlations.writeToFile(Correlations.correlationMean(numValues2.toNativeArray(), sizeValues.toNativeArray()), 
+					"/Users/jillenberger/Work/socialnets/data/ivt2009/09-2010/graph/sociogram/size_num.txt", "num", "size");
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -404,6 +426,7 @@ public class GraphBuilder {
 		
 		SampledGraphProjection<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge> graph = builder.buildGraph(alterTables, egoTables, sqlDumps);
 		SampledGraphProjMLWriter writer = new SampledGraphProjMLWriter(new SocialSparseGraphMLWriter());
-		writer.write(graph, "/Users/jillenberger/Work/socialnets/data/ivt2009/09-2010/graph/noH/graph.graphml");
+//		writer.write(graph, "/Users/jillenberger/Work/socialnets/data/ivt2009/09-2010/graph/noH/graph.graphml");
+		writer.write(graph, "/Users/jillenberger/Work/socialnets/data/ivt2009/09-2010/graph/sociogram/graph.graphml");
 	}
 }

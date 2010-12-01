@@ -32,11 +32,11 @@ import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
 import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphMLReader;
 import org.matsim.contrib.sna.math.Distribution;
+import org.matsim.contrib.sna.math.LinearDiscretizer;
 
 import playground.johannes.socialnetworks.gis.BeelineCostFunction;
 import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
 import playground.johannes.socialnetworks.graph.analysis.AttributePartition;
-import playground.johannes.socialnetworks.statistics.LinearDiscretizer;
 
 import com.vividsolutions.jts.geom.Point;
 
@@ -67,7 +67,7 @@ public class Analyzer {
 			opportunities.add(v.getPoint());
 		}
 		
-		Accessability access = new Accessability();
+		Accessibility access = new Accessibility();
 		TObjectDoubleHashMap<SpatialVertex> values = access.values(graph.getVertices(), func, opportunities);
 		
 		AttributePartition partition = new AttributePartition(new LinearDiscretizer(50));

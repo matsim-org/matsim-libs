@@ -36,15 +36,15 @@ import org.matsim.contrib.sna.graph.spatial.SpatialSparseVertex;
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
 import org.matsim.contrib.sna.graph.spatial.io.KMLVertexDescriptor;
 import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphKMLWriter;
+import org.matsim.contrib.sna.math.Discretizer;
+import org.matsim.contrib.sna.math.LinearDiscretizer;
 
 import playground.johannes.socialnetworks.gis.BeelineCostFunction;
 import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
 import playground.johannes.socialnetworks.gis.DistanceCalculator;
-import playground.johannes.socialnetworks.graph.spatial.analysis.Accessability;
+import playground.johannes.socialnetworks.graph.spatial.analysis.Accessibility;
 import playground.johannes.socialnetworks.graph.spatial.analysis.StandardAnalyzerTask;
 import playground.johannes.socialnetworks.graph.spatial.io.Population2SpatialGraph;
-import playground.johannes.socialnetworks.statistics.Discretizer;
-import playground.johannes.socialnetworks.statistics.LinearDiscretizer;
 
 import com.vividsolutions.jts.geom.Point;
 
@@ -101,7 +101,7 @@ public class NaiveGraphGenerator {
 			opportunities.add(vertex.getPoint());
 		}
 		
-		Accessability access = new Accessability();
+		Accessibility access = new Accessibility();
 		BeelineCostFunction cFunc = new BeelineCostFunction();
 		cFunc.setDistanceCalculator(new CartesianDistanceCalculator());
 		TObjectDoubleHashMap<SpatialVertex> values = access.values(graph.getVertices(), cFunc, opportunities);
@@ -141,7 +141,7 @@ public class NaiveGraphGenerator {
 	}
 	
 	private double probability(SpatialVertex v1, SpatialVertex v2, double gamma) {
-		double d = discretizer.discretize(distanceCalculator.distance(v1.getPoint(), v2.getPoint()));
+		double d = discretizer.index(distanceCalculator.distance(v1.getPoint(), v2.getPoint()));
 		d = Math.max(1.0, d);
 		return scaleConst * Math.pow(d, -gamma);
 	}

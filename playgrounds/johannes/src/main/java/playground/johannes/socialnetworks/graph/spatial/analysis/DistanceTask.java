@@ -136,6 +136,17 @@ public class DistanceTask extends ModuleAnalyzerTask<Distance> {
 			}
 		
 
+			distr = module.vertexMedianDistribution((Set<? extends SpatialVertex>) graph.getVertices());
+			System.err.println("<d_i_median>=" + distr.mean());
+			try {
+				Distribution.writeHistogram(distr.absoluteDistribution(1000), getOutputDirectory()+"d_i_meadin.txt");
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 	}
 
 }

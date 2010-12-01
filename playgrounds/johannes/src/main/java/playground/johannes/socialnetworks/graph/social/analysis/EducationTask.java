@@ -34,6 +34,7 @@ import org.matsim.contrib.sna.graph.Graph;
 
 import playground.johannes.socialnetworks.graph.social.SocialGraph;
 import playground.johannes.socialnetworks.graph.social.SocialVertex;
+import playground.johannes.socialnetworks.snowball2.analysis.ObservedDegree;
 
 /**
  * @author illenberger
@@ -58,6 +59,9 @@ public class EducationTask extends SocioMatrixTask {
 						female.add(vertex);
 				}
 //				double total = male.size() + female.size();
+//				ObservedDegree degree = new ObservedDegree();
+//				System.err.println("Degree female = " + degree.distribution(female).mean());
+//				System.err.println("Degree male = " + degree.distribution(male).mean());
 				
 				TObjectIntHashMap<String> distr = edu.distribution(graph.getVertices());
 				TObjectIntHashMap<String> distrMale = edu.distribution(male);
@@ -90,11 +94,30 @@ public class EducationTask extends SocioMatrixTask {
 				double[][] matrix = edu.socioMatrix(graph);
 				List<String> values = edu.getAttributes();
 				double[][] normMatrix = edu.normalizedSocioMatrix(matrix, distr, values);
-				double[][] matrixAvr = edu.socioMatrixLocalAvr(graph);
 				
-				writeSocioMatrix(matrix, values, getOutputDirectory() + "/edu.matrix.txt");
-				writeSocioMatrix(normMatrix, values, getOutputDirectory() + "/edu.matrix.norm.txt");
+				double[][] matrixAvr = edu.socioMatrixLocalAvr(graph);
+				values = edu.getAttributes();
+				
+//				writeSocioMatrix(matrix, values, getOutputDirectory() + "/edu.matrix.txt");
+//				writeSocioMatrix(normMatrix, values, getOutputDirectory() + "/edu.matrix.norm.txt");
 				writeSocioMatrix(matrixAvr, values, getOutputDirectory() + "/edu.matrix.norm2.txt");
+				
+				/*
+				 * 
+				 * 
+				 */
+				Set<SocialVertex> academic = new HashSet<SocialVertex>();
+				Set<SocialVertex> nonacademic = new HashSet<SocialVertex>();
+				for(SocialVertex vertex : graph.getVertices()) {
+					if("6".equalsIgnoreCase(vertex.getPerson().getEducation()) || "7".equalsIgnoreCase(vertex.getPerson().getEducation()))
+						academic.add(vertex);
+					else if(vertex.getPerson().getEducation() != null)
+						nonacademic.add(vertex);
+				}
+//				double total = male.size() + female.size();
+				ObservedDegree degree = new ObservedDegree();
+				System.err.println("Degree academic = " + degree.distribution(academic).mean());
+				System.err.println("Degree nonacademic = " + degree.distribution(nonacademic).mean());
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

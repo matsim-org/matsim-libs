@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ObservedAccessability.java
+ * GyrationRadius.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,36 +19,55 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.survey.ivt2009.analysis;
 
-import gnu.trove.TObjectDoubleHashMap;
-
-import java.util.Set;
-
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
-import org.matsim.contrib.sna.math.Distribution;
-import org.matsim.contrib.sna.snowball.SampledVertex;
-import org.matsim.contrib.sna.snowball.analysis.SnowballPartitions;
-
-import playground.johannes.socialnetworks.gis.SpatialCostFunction;
-import playground.johannes.socialnetworks.graph.spatial.analysis.Accessability;
-
-import com.vividsolutions.jts.geom.Point;
 
 /**
  * @author illenberger
  *
  */
-public class ObservedAccessability extends Accessability {
+public class GyrationRadius {
 
-	@Override
-	public Distribution distribution(Set<? extends SpatialVertex> vertices, SpatialCostFunction costFunction,
-			Set<Point> opportunities) {
-		return super.distribution((Set<? extends SpatialVertex>) SnowballPartitions.createSampledPartition((Set<? extends SampledVertex>)vertices), costFunction, opportunities);
+	public double radiusOfGyration(SpatialVertex vertex) {
+		double dsum = 0;
+		
+		
+		double[] cm = centerMass(vertex);
+		double xcm = cm[0];
+		double ycm = cm[1];
+		
+		double dx = vertex.getPoint().getX() - xcm;
+		double dy = vertex.getPoint().getY() - ycm;
+		double d = Math.sqrt(dx*dx + dy*dy);
+		
+		dsum += d;
+		int cnt = 1;
+		for(SpatialVertex neighbor : vertex.getNeighbours()) {
+			if(neighbor.getPoint() != null) {
+			dx = neighbor.getPoint().getX() - xcm;
+			dy = neighbor.getPoint().getY() - ycm;
+			d = (dx*dx + dy*dy);
+			
+			dsum += d;
+			cnt++;
+			}
+		}
+		
+		return Math.sqrt(dsum/(double)cnt);
 	}
-
-	@Override
-	public TObjectDoubleHashMap<SpatialVertex> values(Set<? extends SpatialVertex> vertices,
-			SpatialCostFunction costFunction, Set<Point> opportunities) {
-		return super.values((Set<? extends SpatialVertex>) SnowballPartitions.createSampledPartition((Set<? extends SampledVertex>)vertices), costFunction, opportunities);
+	
+	private double[] centerMass(SpatialVertex vertex) {
+		double xsum = vertex.getPoint().getX();
+		double ysum = vertex.getPoint().getY();
+		double cnt = 1;
+		for(SpatialVertex neighbor : vertex.getNeighbours()) {
+			if(neighbor.getPoint() != null) {
+			xsum += neighbor.getPoint().getX();
+			ysum += neighbor.getPoint().getY();
+			cnt++;
+			}
+		}
+		
+		
+		return new double[]{xsum/cnt, ysum/cnt};
 	}
-
 }

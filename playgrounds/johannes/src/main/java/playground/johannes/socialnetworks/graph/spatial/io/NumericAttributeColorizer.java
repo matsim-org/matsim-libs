@@ -65,8 +65,8 @@ public class NumericAttributeColorizer implements Colorizable {
 	
 	protected double getValue(Object object) {
 		double r = values.get(object);
-		if(r == 0)
-			throw new IllegalArgumentException();
+//		if(r == 0)
+//			throw new IllegalArgumentException();
 		
 		return r;
 	}

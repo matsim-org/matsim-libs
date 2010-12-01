@@ -29,12 +29,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.contrib.sna.graph.Vertex;
+import org.matsim.contrib.sna.math.Discretizer;
+import org.matsim.contrib.sna.math.FixedSampleSizeDiscretizer;
 import org.matsim.contrib.sna.snowball.SampledGraph;
 import org.matsim.contrib.sna.snowball.SampledVertex;
 import org.matsim.contrib.sna.snowball.sim.ProbabilityEstimator;
 
-import playground.johannes.socialnetworks.statistics.Discretizer;
-import playground.johannes.socialnetworks.statistics.FixedSampleSizeDiscretizer;
 
 /**
  * @author illenberger
@@ -212,7 +212,7 @@ public class Estimator11 implements ProbabilityEstimator {
 				degrees.add(vertex.getNeighbours().size());
 			}
 		}
-		discretizer = new FixedSampleSizeDiscretizer(degrees.toNativeArray(), 200);
+		discretizer = FixedSampleSizeDiscretizer.create(degrees.toNativeArray(), 200);
 	}
 
 }

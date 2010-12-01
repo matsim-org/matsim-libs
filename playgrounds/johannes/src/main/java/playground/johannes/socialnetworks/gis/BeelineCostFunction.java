@@ -19,8 +19,9 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.gis;
 
-import playground.johannes.socialnetworks.statistics.Discretizer;
-import playground.johannes.socialnetworks.statistics.LinearDiscretizer;
+import org.matsim.contrib.sna.math.Discretizer;
+import org.matsim.contrib.sna.math.LinearDiscretizer;
+
 
 import com.vividsolutions.jts.geom.Point;
 
@@ -40,7 +41,7 @@ public class BeelineCostFunction implements SpatialCostFunction {
 	
 	@Override
 	public double costs(Point p1, Point p2) {
-		return discretizer.discretize(calculator.distance(p1, p2));
+		return discretizer.index(calculator.distance(p1, p2));
 	}
 
 }

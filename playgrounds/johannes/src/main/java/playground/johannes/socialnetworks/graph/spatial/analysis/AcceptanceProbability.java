@@ -26,13 +26,13 @@ import java.util.Set;
 
 import org.matsim.contrib.sna.graph.spatial.SpatialEdge;
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
+import org.matsim.contrib.sna.math.Discretizer;
 import org.matsim.contrib.sna.math.Distribution;
+import org.matsim.contrib.sna.math.LinearDiscretizer;
 
 import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
 import playground.johannes.socialnetworks.gis.DistanceCalculator;
 import playground.johannes.socialnetworks.gis.OrthodromicDistanceCalculator;
-import playground.johannes.socialnetworks.statistics.Discretizer;
-import playground.johannes.socialnetworks.statistics.LinearDiscretizer;
 
 import com.vividsolutions.jts.geom.Point;
 
@@ -44,7 +44,7 @@ public class AcceptanceProbability {
 
 	private Discretizer discretizer = new LinearDiscretizer(1000);
 
-	private DistanceCalculator distanceCalculator = new CartesianDistanceCalculator();// OrthodromicDistanceCalculator();
+	private DistanceCalculator distanceCalculator = new OrthodromicDistanceCalculator();
 
 	public void setDistanceCalculator(DistanceCalculator calculator) {
 		this.distanceCalculator = calculator;
@@ -119,10 +119,12 @@ public class AcceptanceProbability {
 
 					if (p1 != null && neighbor.getPoint() != null) {
 						double d = distanceCalculator.distance(p1, neighbor.getPoint());
-
-						double n = n_d.get(discretizer.discretize(d));
-						if (n > 0)
-							distribution.add(d, 1 / n);
+						if(d > 0) {
+							d = discretizer.discretize(d);
+							double n = n_d.get(d);
+							if (n > 0)
+								distribution.add(d, 1 / n);
+						}
 					}
 				}
 			}

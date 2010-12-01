@@ -32,6 +32,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Arrays;
 
+import org.matsim.contrib.sna.math.Discretizer;
+import org.matsim.contrib.sna.math.LinearDiscretizer;
 import org.matsim.core.utils.io.IOUtils;
 
 /**
@@ -83,6 +85,9 @@ public class Correlations {
 			double key = values1[i];
 //			if(binsize > 0.0)
 //				key = Math.floor(key/binsize) * binsize;
+			/*
+			 * FIXME Need to fix LinearDisctetizer!!!
+			 */
 			key = discretizer.discretize(key);
 			sums.adjustOrPutValue(key, values2[i], values2[i]);
 			counts.adjustOrPutValue(key, 1, 1);

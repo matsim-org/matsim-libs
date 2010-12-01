@@ -27,7 +27,9 @@ import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.graph.VertexDecorator;
 import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraph;
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
+import org.matsim.contrib.sna.math.Discretizer;
 import org.matsim.contrib.sna.math.Distribution;
+import org.matsim.contrib.sna.math.LinearDiscretizer;
 import org.matsim.contrib.sna.snowball.SampledGraphProjection;
 import org.matsim.contrib.sna.snowball.SampledVertex;
 
@@ -37,8 +39,6 @@ import playground.johannes.socialnetworks.graph.spatial.generators.GravityEdgeCo
 import playground.johannes.socialnetworks.graph.spatial.io.Population2SpatialGraph;
 import playground.johannes.socialnetworks.snowball2.io.SampledGraphProjMLReader;
 import playground.johannes.socialnetworks.snowball2.social.SocialSampledGraphProjectionBuilder;
-import playground.johannes.socialnetworks.statistics.Discretizer;
-import playground.johannes.socialnetworks.statistics.LinearDiscretizer;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseEdge;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseGraph;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseVertex;
@@ -94,7 +94,7 @@ public class CostAnalysis {
 //					total += costFunction.edgeCost((SpatialVertex)vertex, (SpatialVertex)opportunity);
 					double dx = ((SpatialVertex) vertex).getPoint().getCoordinate().x - ((SpatialVertex) opportunity).getPoint().getCoordinate().x;
 					double dy = ((SpatialVertex) vertex).getPoint().getCoordinate().y - ((SpatialVertex) opportunity).getPoint().getCoordinate().y;
-					double d = Math.max(1.0, discretizer.discretize(Math.sqrt(dx*dx + dy*dy)));
+					double d = Math.max(1.0, discretizer.index(Math.sqrt(dx*dx + dy*dy)));
 					total += d;
 				}
 				distr.add(total/sum);

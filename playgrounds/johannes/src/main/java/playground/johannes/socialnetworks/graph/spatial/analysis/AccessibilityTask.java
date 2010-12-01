@@ -38,7 +38,7 @@ import com.vividsolutions.jts.geom.Point;
  * @author illenberger
  *
  */
-public class AccessabilityTask extends ModuleAnalyzerTask<Accessability> {
+public class AccessibilityTask extends ModuleAnalyzerTask<Accessibility> {
 
 	private Set<Point> choiceSet;;
 	
@@ -46,13 +46,13 @@ public class AccessabilityTask extends ModuleAnalyzerTask<Accessability> {
 	
 	private SpatialCostFunction costFunction;
 	
-	public AccessabilityTask(SpatialCostFunction costFunction) {
-		setModule(new Accessability());
+	public AccessibilityTask(SpatialCostFunction costFunction) {
+		setModule(new Accessibility());
 		this.costFunction = costFunction;
 		graphAsChoiceSet = true;
 	}
 	
-	public AccessabilityTask(SpatialCostFunction costFunction, Set<Point> choiceSet) {
+	public AccessibilityTask(SpatialCostFunction costFunction, Set<Point> choiceSet) {
 		this(costFunction);
 		graphAsChoiceSet = false;
 		this.choiceSet = choiceSet;

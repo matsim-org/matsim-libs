@@ -35,13 +35,13 @@ import org.apache.log4j.Logger;
 import org.matsim.contrib.sna.gis.CRSUtils;
 import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
+import org.matsim.contrib.sna.math.Discretizer;
 import org.matsim.contrib.sna.math.Distribution;
+import org.matsim.contrib.sna.math.LinearDiscretizer;
 
 import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
 import playground.johannes.socialnetworks.gis.DistanceCalculator;
 import playground.johannes.socialnetworks.graph.spatial.io.Population2SpatialGraph;
-import playground.johannes.socialnetworks.statistics.Discretizer;
-import playground.johannes.socialnetworks.statistics.LinearDiscretizer;
 
 /**
  * @author illenberger
@@ -133,7 +133,7 @@ public class GammaSolver {
 			for(SpatialVertex vj : vertices) {
 				if (vi != vj) {
 					double d = distanceCalculator.distance(vi.getPoint(), vj.getPoint());
-					d = discretizer.discretize(d);
+					d = discretizer.index(d);
 					d = Math.max(1, d);
 					sum += Math.pow(d, -x);
 				}
@@ -153,7 +153,7 @@ public class GammaSolver {
 			for(SpatialVertex vj : primitive.vertices) {
 				if (primitive.vi != vj) {
 					double d = distanceCalculator.distance(primitive.vi.getPoint(), vj.getPoint());
-					d = discretizer.discretize(d);
+					d = discretizer.index(d);
 					d = Math.max(1, d);
 					sum += -Math.log(d) * Math.pow(d, -x);
 				}

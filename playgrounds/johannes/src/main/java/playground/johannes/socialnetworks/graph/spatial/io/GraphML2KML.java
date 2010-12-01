@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * FixedSampleSizeDiscretizer.java
+ * GraphML2KML.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,57 +17,39 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.statistics;
+package playground.johannes.socialnetworks.graph.spatial.io;
 
-import gnu.trove.TDoubleArrayList;
-import gnu.trove.TDoubleIntHashMap;
-
-import java.util.Arrays;
+import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
+import org.matsim.contrib.sna.graph.spatial.io.KMLIconVertexStyle;
+import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphKMLWriter;
+import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphMLReader;
+import org.matsim.contrib.sna.graph.spatial.io.VertexDegreeColorizer;
 
 /**
  * @author illenberger
  *
  */
-public class FixedSampleSizeDiscretizer implements Discretizer {
+public class GraphML2KML {
 
-	private TDoubleArrayList borders;
-	
-	public FixedSampleSizeDiscretizer(double[] samples, int minSize) {
-		Arrays.sort(samples);
-		TDoubleIntHashMap hist = new TDoubleIntHashMap(samples.length);
-		for(int i = 0; i < samples.length; i++) {
-			hist.adjustOrPutValue(samples[i], 1, 1);
-		}
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		SpatialGraphMLReader reader = new SpatialGraphMLReader();
+		SpatialGraph graph = reader.readGraph("/Users/jillenberger/Work/socialnets/mcmc/output/50000000/graph.graphml");
 		
-		double keys[] = hist.keys();
-		Arrays.sort(keys);
-		borders = new TDoubleArrayList(keys.length);
-		int size = 0;
-		for(int i = 0; i < keys.length; i++) {
-			size += hist.get(keys[i]);
-			if(size >= minSize) {
-				borders.add(keys[i]);
-				size = 0;
-			}
-		}
-		if(size > 0)
-			borders.add(samples[samples.length - 1]);
+		SpatialGraphKMLWriter writer = new SpatialGraphKMLWriter();
+		VertexDegreeColorizer colorizer = new VertexDegreeColorizer(graph);
+		colorizer.setLogscale(true);
+		KMLIconVertexStyle style = new KMLIconVertexStyle(graph);
+		style.setVertexColorizer(colorizer);
+		writer.setKmlVertexStyle(style);
+		writer.setDrawEdges(false);
+		writer.addKMZWriterListener(style);
+		writer.write(graph, "/Users/jillenberger/Work/socialnets/mcmc/output/50000000/graph.kmz");
 		
-//		System.out.println("----------- borders --------------");
-//		for(int i = 0; i < borders.size(); i++) {
-//			System.out.println(String.valueOf(borders.get(i)));
-//		}
-//		System.out.println("----------- borders --------------");
-	}
-	
-	@Override
-	public double discretize(double value) {
-		int idx = borders.binarySearch(value);
-		if(idx > -1) {
-			return borders.get(idx);
-		} else {
-			return borders.get(-idx - 1);
-		}
+		
+
 	}
 
 }

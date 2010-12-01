@@ -21,11 +21,11 @@ package playground.johannes.socialnetworks.graph.spatial.generators;
 
 import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
+import org.matsim.contrib.sna.math.Discretizer;
+import org.matsim.contrib.sna.math.LinearDiscretizer;
 
 import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
 import playground.johannes.socialnetworks.gis.DistanceCalculator;
-import playground.johannes.socialnetworks.statistics.Discretizer;
-import playground.johannes.socialnetworks.statistics.LinearDiscretizer;
 
 /**
  * @author illenberger
@@ -63,7 +63,7 @@ public class EdgePowerLawDistance implements EdgeProbabilityFunction {
 	@Override
 	public double probability(int i, int j) {
 		double d = distanceCalculator.distance(y.getVertex(i).getPoint(), y.getVertex(j).getPoint());
-		d = discretizer.discretize(d);
+		d = discretizer.index(d);
 		d = Math.max(1.0, d);
 		
 		return konst * Math.pow(d, gamma);
