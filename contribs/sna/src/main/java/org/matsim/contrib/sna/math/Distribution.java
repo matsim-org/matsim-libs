@@ -300,7 +300,7 @@ public class Distribution {
 	 * bins with log2 scaled width. The key of the bin is the upper bin
 	 * border.
 	 * 
-	 * @param descretization a constant to decretize samples before they are aggregated into log bins.
+	 * @param descretization a constant to discretize samples before they are aggregated into log bins.
 	 * @return a histogram of all samples.
 	 */
 	public TDoubleDoubleHashMap absoluteDistributionLog2(double descretization) {
@@ -317,6 +317,50 @@ public class Distribution {
 	}
 
 	/**
+	 * Returns a histogram where samples are first discretized into equal size
+	 * bins of width <tt>discretization</tt> and the further discretized into
+	 * log-scaled bins.
+	 * 
+	 * @param discretization
+	 *            bin width of equal size bins
+	 * @param base
+	 *            log base
+	 * @return a histogram.
+	 */
+	public TDoubleDoubleHashMap absoluteDistributionLog(double discretization, double base) {
+		TDoubleDoubleHashMap freq = new TDoubleDoubleHashMap();
+		int size = values.size();
+		for(int i = 0; i < size; i++) {
+			double bin = Math.ceil(Math.log(values.get(i)/discretization)/Math.log(base));
+			bin = Math.max(bin, 0.0);
+			double binWidth = Math.pow(base, bin) - Math.pow(base, bin-1);
+			binWidth = Math.max(1.0, binWidth);
+			freq.adjustOrPutValue(Math.pow(base, bin)*discretization, weights.get(i)/binWidth, weights.get(i)/binWidth);
+		}
+		return freq;
+	}
+	
+	/**
+	 * Returns a histogram where samples are aggregated into bins where each bin
+	 * contains approximately the same number of samples.
+	 * 
+	 * @param minSize
+	 *            the approximately number of samples per bin
+	 * @return a histogram.
+	 */
+	public TDoubleDoubleHashMap absoluteDistributionFixed(int minSize) {
+		Discretizer discretizer = FixedSampleSizeDiscretizer.create(values.toNativeArray(), minSize);
+		TDoubleDoubleHashMap freq = new TDoubleDoubleHashMap();
+		int size = values.size();
+		for(int i = 0; i < size; i++) {
+			double val = values.get(i);
+			double bin = discretizer.discretize(val);
+			double binWidth = discretizer.binWidth(val);
+			freq.adjustOrPutValue(bin, weights.get(i)/binWidth, weights.get(i)/binWidth);
+		}
+		return freq;
+	}
+	/**
 	 * Returns a histogram of all samples where the values are normalized so
 	 * that the sum of all samples equals one.
 	 * 
@@ -329,7 +373,7 @@ public class Distribution {
 	/**
 	 * Returns a histogram of all samples where the values are first aggregated
 	 * into bins of width <tt>binsize</tt> and then normalized so that the sum
-	 * of all descretized samples equals one.
+	 * of all discretized samples equals one.
 	 * 
 	 * @return a normalized histogram of all samples.
 	 */

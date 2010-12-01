@@ -102,6 +102,9 @@ public abstract class AnalyzerTask {
 					.format("%1$s/%2$s.share.log10.txt", output, name));
 			Distribution.writeHistogram(distr.normalizedDistribution(distr.absoluteDistributionLog2(binsize)), String
 					.format("%1$s/%2$s.share.log2.txt", output, name));
+			
+			Distribution.writeHistogram(distr.normalizedDistribution(distr.absoluteDistributionFixed(100)), String
+					.format("%1$s/%2$s.share.fixed.txt", output, name));
 		}
 	}
 }
