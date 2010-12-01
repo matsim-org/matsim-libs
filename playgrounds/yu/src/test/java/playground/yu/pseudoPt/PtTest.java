@@ -56,9 +56,9 @@ public class PtTest extends MatsimTestCase {
 			pc = new PtCheck();
 		}
 
+		@Override
 		public void notifyIterationEnds(final IterationEndsEvent event) {
-			double betaPt = Double.parseDouble(event.getControler().getConfig()
-					.getParam("planCalcScore", "travelingPt"));
+			double betaPt = event.getControler().getConfig().charyparNagelScoring().getTravelingPt();
 			int iteration = event.getIteration();
 			if (iteration % 10 == 0) {
 				pc.resetCnt();

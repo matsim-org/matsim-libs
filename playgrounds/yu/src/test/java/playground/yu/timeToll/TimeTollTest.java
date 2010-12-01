@@ -40,11 +40,11 @@ public class TimeTollTest extends MatsimTestCase {
 			IterationEndsListener, IterationStartsListener {
 		private CalcLegTimes clt = null;
 
+		@Override
 		public void notifyIterationEnds(final IterationEndsEvent event) {
 			if (event.getIteration() == event.getControler().getLastIteration()
 					&& clt != null) {
-				double traveling = Double.parseDouble(event.getControler()
-						.getConfig().getParam("planCalcScore", "traveling"));
+				double traveling = event.getControler().getConfig().charyparNagelScoring().getTraveling();
 				double criterion = 0;
 				if (traveling == -30.0) {
 					criterion = 1710.0;
@@ -59,6 +59,7 @@ public class TimeTollTest extends MatsimTestCase {
 			}
 		}
 
+		@Override
 		public void notifyIterationStarts(final IterationStartsEvent event) {
 			if (event.getIteration() == event.getControler().getLastIteration()) {
 				clt = new CalcLegTimes(event.getControler().getPopulation());
