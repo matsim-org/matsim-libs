@@ -22,7 +22,6 @@ package org.matsim.core.scoring;
 
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
 import org.matsim.core.api.internal.MatsimParameters;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
@@ -46,6 +45,7 @@ public class CharyparNagelScoringParameters implements MatsimParameters {
 	public final double marginalUtilityOfDistanceWalk_m;
 
 	public final double monetaryDistanceCostRateCar;
+	public final double monetaryDistanceCostRatePt;
 	public final double marginalUtilityOfMoney;
 
 	public final double abortedPlanScore;
@@ -67,16 +67,17 @@ public class CharyparNagelScoringParameters implements MatsimParameters {
 
 		marginalUtilityOfDistanceWalk_m = config.getMarginalUtlOfDistanceWalk();
 		
-		this.monetaryDistanceCostRateCar = config.getMonetaryDistanceCostRateCar() ;
-		this.marginalUtilityOfMoney = config.getMarginalUtilityOfMoney() ;
+		monetaryDistanceCostRateCar = config.getMonetaryDistanceCostRateCar() ;
+		monetaryDistanceCostRatePt = config.getMonetaryDistanceCostRatePt();
+		marginalUtilityOfMoney = config.getMarginalUtilityOfMoney() ;
 
 		abortedPlanScore = Math.min(
 				Math.min(marginalUtilityOfLateArrival_s, marginalUtilityOfEarlyDeparture_s),
 				Math.min(marginalUtilityOfTraveling_s, marginalUtilityOfWaiting_s)) * 3600.0 * 24.0; // SCENARIO_DURATION
 		// TODO 24 has to be replaced by a variable like scenario_dur (see also other places below)
 
-		scoreActs = ((marginalUtilityOfPerforming_s != 0) || (marginalUtilityOfWaiting_s != 0) ||
-				(marginalUtilityOfLateArrival_s != 0) || (marginalUtilityOfEarlyDeparture_s != 0));
+		scoreActs = marginalUtilityOfPerforming_s != 0 || marginalUtilityOfWaiting_s != 0 ||
+				marginalUtilityOfLateArrival_s != 0 || marginalUtilityOfEarlyDeparture_s != 0;
 
 	
 		for (ActivityParams params : config.getActivityParams()) {
