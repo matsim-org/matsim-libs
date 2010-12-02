@@ -19,8 +19,8 @@
  * *********************************************************************** */
 package playground.gregor.snapshots.writers;
 
-import playground.gregor.sim2d.events.XYZAzimuthEvent;
-import playground.gregor.sim2d.events.XYZEventsHandler;
+import playground.gregor.sim2d_v2.events.XYZAzimuthEvent;
+import playground.gregor.sim2d_v2.events.XYZEventsHandler;
 
 public class XYZAzimuthSnapshotGenerator implements XYZEventsHandler {
 

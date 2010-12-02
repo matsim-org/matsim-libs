@@ -41,9 +41,9 @@ import org.xml.sax.SAXException;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
-import playground.gregor.sim2d.events.XYZAzimuthEvent;
-import playground.gregor.sim2d.events.XYZEventsFileReader;
-import playground.gregor.sim2d.events.XYZEventsHandler;
+import playground.gregor.sim2d_v2.events.XYZAzimuthEvent;
+import playground.gregor.sim2d_v2.events.XYZEventsFileReader;
+import playground.gregor.sim2d_v2.events.XYZEventsHandler;
 
 /**
  * @author laemmel

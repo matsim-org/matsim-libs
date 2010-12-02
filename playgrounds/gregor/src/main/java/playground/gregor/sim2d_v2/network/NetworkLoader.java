@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * XYZAzimuthEvent.java
+ * NetworkLoader.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,26 +17,19 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.gregor.sim2d.events;
+package playground.gregor.sim2d_v2.network;
 
-import org.matsim.core.api.experimental.events.PersonEvent;
+import java.util.List;
+import java.util.Map;
 
-import com.vividsolutions.jts.geom.Coordinate;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 
-/**
- * @author laemmel
- * 
- */
-public interface XYZAzimuthEvent extends PersonEvent {
+import com.vividsolutions.jts.geom.MultiPolygon;
 
-	public double getX();
+public interface NetworkLoader {
 
-	public double getY();
+	Map<MultiPolygon, List<Link>> getFloors();
 
-	public double getZ();
-
-	public double getAzimuth();
-
-	// convenience method
-	public Coordinate getCoordinate();
+	Network loadNetwork();
 }

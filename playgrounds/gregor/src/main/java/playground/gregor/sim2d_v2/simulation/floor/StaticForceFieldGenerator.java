@@ -22,9 +22,9 @@ package playground.gregor.sim2d_v2.simulation.floor;
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.collections.QuadTree;
 
-import playground.gregor.sim2d.gisdebug.GisDebugger;
-import playground.gregor.sim2d.simulation.Force;
 import playground.gregor.sim2d_v2.controller.Sim2DConfig;
+import playground.gregor.sim2d_v2.gisdebug.GisDebugger;
+import playground.gregor.sim2d_v2.illdependencies.Force;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;

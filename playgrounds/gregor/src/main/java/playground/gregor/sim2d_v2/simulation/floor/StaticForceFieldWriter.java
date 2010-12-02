@@ -24,7 +24,7 @@ import java.io.IOException;
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 
-import playground.gregor.sim2d.simulation.Force;
+import playground.gregor.sim2d_v2.illdependencies.Force;
 
 public class StaticForceFieldWriter extends MatsimXmlWriter {
 	

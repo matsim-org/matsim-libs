@@ -31,8 +31,8 @@ import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.xml.sax.SAXException;
 
-import playground.gregor.sim2d.events.XYZEventsFileReader;
-import playground.gregor.sim2d.events.XYZEventsManager;
+import playground.gregor.sim2d_v2.events.XYZEventsFileReader;
+import playground.gregor.sim2d_v2.events.XYZEventsManager;
 
 public class Sim2DOTFSnapshotGenerator {
 	public static String SHARED_SVN = "../../../../../arbeit/svn/shared-svn/studies";

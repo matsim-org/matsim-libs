@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.gregor.sim2d.scenario;
+package playground.gregor.sim2d_v2.scenario;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -45,10 +45,10 @@ import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.operation.distance.DistanceOp;
 
-import playground.gregor.sim2d.gisdebug.GisDebugger;
-import playground.gregor.sim2d.simulation.Force;
-import playground.gregor.sim2d.simulation.SegmentedStaticForceField;
 import playground.gregor.sim2d_v2.controller.Sim2DConfig;
+import playground.gregor.sim2d_v2.gisdebug.GisDebugger;
+import playground.gregor.sim2d_v2.illdependencies.Force;
+import playground.gregor.sim2d_v2.illdependencies.SegmentedStaticForceField;
 
 
 public class StaticForceFieldGeneratorIII {

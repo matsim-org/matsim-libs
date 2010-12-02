@@ -33,8 +33,8 @@ import org.matsim.core.events.AgentArrivalEventImpl;
 import org.matsim.core.events.AgentDepartureEventImpl;
 import org.matsim.ptproject.qsim.interfaces.Mobsim;
 
-import playground.gregor.sim2d.events.XYZAzimuthEventImpl;
 import playground.gregor.sim2d_v2.controller.Sim2DConfig;
+import playground.gregor.sim2d_v2.events.XYZAzimuthEventImpl;
 import playground.gregor.sim2d_v2.scenario.Scenario2DImpl;
 
 import com.vividsolutions.jts.geom.Coordinate;

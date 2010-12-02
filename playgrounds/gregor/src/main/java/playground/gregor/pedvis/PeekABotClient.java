@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.gregor.sim2d.peekabot;
+package playground.gregor.pedvis;
 
 import org.matsim.core.gbl.MatsimRandom;
 

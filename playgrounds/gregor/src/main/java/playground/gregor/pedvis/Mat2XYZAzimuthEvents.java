@@ -29,9 +29,9 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.algorithms.EventWriterXML;
 
-import playground.gregor.sim2d.events.XYZAzimuthEvent;
-import playground.gregor.sim2d.events.XYZAzimuthEventImpl;
-import playground.gregor.sim2d.events.XYZEventsManager;
+import playground.gregor.sim2d_v2.events.XYZAzimuthEvent;
+import playground.gregor.sim2d_v2.events.XYZAzimuthEventImpl;
+import playground.gregor.sim2d_v2.events.XYZEventsManager;
 
 import com.vividsolutions.jts.geom.Coordinate;
 

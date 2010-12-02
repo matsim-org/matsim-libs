@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * XYZEventsManager.java
+ * XYZEventsFactoryImpl.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,25 +17,40 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.gregor.sim2d.events;
-
-import java.util.ArrayList;
-import java.util.List;
+package playground.gregor.sim2d_v2.events;
 
 import org.matsim.core.api.experimental.events.Event;
+import org.matsim.core.api.experimental.events.EventsFactory;
+import org.matsim.core.basic.v01.IdImpl;
 
-public class XYZEventsManager {
+/**
+ * @author laemmel
+ * 
+ */
+public class XYZAzimuthEventsFactoryImpl {
 
-	private final List<XYZEventsHandler> handler = new ArrayList<XYZEventsHandler>();
+	private final EventsFactory factory;
 
-	public void processXYZEvent(XYZAzimuthEvent e) {
-		for (XYZEventsHandler h : this.handler) {
-			h.handleEvent(e);
-		}
+	public XYZAzimuthEventsFactoryImpl(EventsFactory factory) {
+		this.factory = factory;
 	}
 
-	public void addHandler(XYZEventsHandler h) {
-		this.handler.add(h);
+	public EventsFactory getFactory() {
+		return this.factory;
+	}
+
+	/**
+	 * @param x
+	 * @param y
+	 * @param z
+	 * @param azimuth
+	 * @param id
+	 * @param time
+	 * @return
+	 */
+	public Event createXYZAzimuthEvent(String x, String y, String z, String azimuth, String id, double time) {
+		XYZAzimuthEventImpl e = new XYZAzimuthEventImpl(new IdImpl(id), Double.parseDouble(x), Double.parseDouble(y), Double.parseDouble(z), Double.parseDouble(azimuth), time);
+		return e;
 	}
 
 }

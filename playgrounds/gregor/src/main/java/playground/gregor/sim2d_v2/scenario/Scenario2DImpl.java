@@ -31,8 +31,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.config.Config;
 
-import playground.gregor.sim2d.events.XYZAzimuthEvent;
-import playground.gregor.sim2d.simulation.SegmentedStaticForceField;
+import playground.gregor.sim2d_v2.events.XYZAzimuthEvent;
+import playground.gregor.sim2d_v2.illdependencies.SegmentedStaticForceField;
 import playground.gregor.sim2d_v2.simulation.floor.StaticForceField;
 
 import com.vividsolutions.jts.geom.Coordinate;

@@ -32,7 +32,7 @@ import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
-import playground.gregor.sim2d.simulation.Force;
+import playground.gregor.sim2d_v2.illdependencies.Force;
 
 public class StaticForceFieldReader extends MatsimXmlParser {
 	

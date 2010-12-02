@@ -23,7 +23,7 @@ import java.util.Collection;
 
 import org.matsim.core.utils.collections.QuadTree;
 
-import playground.gregor.sim2d.simulation.Force;
+import playground.gregor.sim2d_v2.illdependencies.Force;
 
 import com.vividsolutions.jts.geom.Coordinate;
 

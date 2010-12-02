@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.gregor.sim2d.events.debug;
+package playground.gregor.sim2d_v2.events.debug;
 
 import java.util.Map;
 

@@ -29,7 +29,6 @@ import org.matsim.core.gbl.MatsimRandom;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
-import playground.gregor.sim2d.peekabot.PeekABotClient;
 
 /**
  * @author laemmel

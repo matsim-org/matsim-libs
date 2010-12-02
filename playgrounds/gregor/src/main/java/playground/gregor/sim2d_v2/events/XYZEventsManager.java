@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Agent2DDepartureTimeComparator.java
+ * XYZEventsManager.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,19 +17,25 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.gregor.sim2d.simulation;
+package playground.gregor.sim2d_v2.events;
 
-import java.util.Comparator;
+import java.util.ArrayList;
+import java.util.List;
 
-public class Agent2DDepartureTimeComparator implements Comparator<Agent2D> {
+import org.matsim.core.api.experimental.events.Event;
 
-	public int compare(Agent2D o1, Agent2D o2) {
-		if (o1.getNextDepartureTime() < o2.getNextDepartureTime()) {
-			return -1;
-		} else if (o1.getNextDepartureTime() > o2.getNextDepartureTime()) {
-			return 1;
+public class XYZEventsManager {
+
+	private final List<XYZEventsHandler> handler = new ArrayList<XYZEventsHandler>();
+
+	public void processXYZEvent(XYZAzimuthEvent e) {
+		for (XYZEventsHandler h : this.handler) {
+			h.handleEvent(e);
 		}
-		return 0;
+	}
+
+	public void addHandler(XYZEventsHandler h) {
+		this.handler.add(h);
 	}
 
 }

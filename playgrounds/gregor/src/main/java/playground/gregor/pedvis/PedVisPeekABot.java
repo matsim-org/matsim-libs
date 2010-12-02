@@ -42,12 +42,11 @@ import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
-import playground.gregor.sim2d.events.XYZAzimuthEvent;
-import playground.gregor.sim2d.events.XYZEventsFileReader;
-import playground.gregor.sim2d.events.XYZEventsHandler;
-import playground.gregor.sim2d.events.debug.ArrowEvent;
-import playground.gregor.sim2d.events.debug.ArrowEventHandler;
-import playground.gregor.sim2d.peekabot.PeekABotClient;
+import playground.gregor.sim2d_v2.events.XYZAzimuthEvent;
+import playground.gregor.sim2d_v2.events.XYZEventsFileReader;
+import playground.gregor.sim2d_v2.events.XYZEventsHandler;
+import playground.gregor.sim2d_v2.events.debug.ArrowEvent;
+import playground.gregor.sim2d_v2.events.debug.ArrowEventHandler;
 
 /**
  * @author laemmel

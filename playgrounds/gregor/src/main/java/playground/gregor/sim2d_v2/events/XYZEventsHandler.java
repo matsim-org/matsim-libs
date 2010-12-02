@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.gregor.sim2d.events;
+package playground.gregor.sim2d_v2.events;
 
 import org.matsim.core.events.handler.EventHandler;
 

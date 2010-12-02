@@ -33,9 +33,9 @@ import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandle
 import org.matsim.core.events.EventsManagerImpl;
 import org.xml.sax.SAXException;
 
-import playground.gregor.sim2d.events.XYZAzimuthEvent;
-import playground.gregor.sim2d.events.XYZEventsFileReader;
-import playground.gregor.sim2d.events.XYZEventsHandler;
+import playground.gregor.sim2d_v2.events.XYZAzimuthEvent;
+import playground.gregor.sim2d_v2.events.XYZEventsFileReader;
+import playground.gregor.sim2d_v2.events.XYZEventsHandler;
 
 /**
  * @author laemmel

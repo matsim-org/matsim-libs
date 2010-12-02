@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.gregor.sim2d.network;
+package playground.gregor.sim2d_v2.network;
 
 import java.io.IOException;
 import java.util.ArrayList;

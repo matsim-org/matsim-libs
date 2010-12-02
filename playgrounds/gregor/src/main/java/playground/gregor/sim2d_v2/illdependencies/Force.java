@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * XYZEventsFactoryImpl.java
+ * Force.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,40 +17,79 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.gregor.sim2d.events;
+package playground.gregor.sim2d_v2.illdependencies;
 
-import org.matsim.core.api.experimental.events.Event;
-import org.matsim.core.api.experimental.events.EventsFactory;
-import org.matsim.core.basic.v01.IdImpl;
+@Deprecated
+public class Force {
 
-/**
- * @author laemmel
- * 
- */
-public class XYZAzimuthEventsFactoryImpl {
+	private double x = 0;
+	private double y = 0;
+	private double oldX = 0;
+	private double oldY = 0;
 
-	private final EventsFactory factory;
+	private final double xCoord;
+	private final double yCoord;
 
-	public XYZAzimuthEventsFactoryImpl(EventsFactory factory) {
-		this.factory = factory;
+	public Force() {
+		this.xCoord = Double.NaN;
+		this.yCoord = Double.NaN;
 	}
 
-	public EventsFactory getFactory() {
-		return this.factory;
+	public Force(double fX, double fY, double xCoord, double yCoord) {
+		setFx(fX);
+		setFy(fY);
+		this.xCoord = xCoord;
+		this.yCoord = yCoord;
 	}
 
-	/**
-	 * @param x
-	 * @param y
-	 * @param z
-	 * @param azimuth
-	 * @param id
-	 * @param time
-	 * @return
-	 */
-	public Event createXYZAzimuthEvent(String x, String y, String z, String azimuth, String id, double time) {
-		XYZAzimuthEventImpl e = new XYZAzimuthEventImpl(new IdImpl(id), Double.parseDouble(x), Double.parseDouble(y), Double.parseDouble(z), Double.parseDouble(azimuth), time);
-		return e;
+	public double getXCoord() {
+		return this.xCoord;
 	}
+
+	public double getYCoord() {
+		return this.yCoord;
+	}
+
+	public void setFx(double x) {
+		this.x = x;
+	}
+
+	public double getFx() {
+		return this.x;
+	}
+
+	public void setFy(double y) {
+		this.y = y;
+	}
+
+	public double getFy() {
+		return this.y;
+	}
+
+	public void setOldFx(double x) {
+		this.oldX = x;
+	}
+
+	public double getOldFx() {
+		return this.oldX;
+	}
+
+	public void setOldFy(double y) {
+		this.oldY = y;
+	}
+
+	public double getOldFy() {
+		return this.oldY;
+	}
+
+	// //DEBUG
+	// double interactionX = 0;
+	// double interactionY = 0;
+	// double envX = 0;
+	// double envY = 0;
+	// double driveX = 0;
+	// double driveY = 0;
+	// double pathX = 0;
+	// double pathY = 0;
 
 }
