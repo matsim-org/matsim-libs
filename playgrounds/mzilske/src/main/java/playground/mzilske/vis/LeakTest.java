@@ -7,6 +7,7 @@ import java.util.Collection;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.groups.MobsimConfigGroupI;
 import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -32,7 +33,7 @@ public class LeakTest {
 		
 		
 		double snapshotPeriod = 60;
-		SimulationConfigGroup simulationConfigGroup = new SimulationConfigGroup();
+		MobsimConfigGroupI simulationConfigGroup = new SimulationConfigGroup();
 		ScenarioImpl scenario = new ScenarioImpl();
 		
 		scenario.setPopulation(new PopulationOnDisk((ScenarioImpl) scenario, DirectoryUtils.createTempDirectory()));

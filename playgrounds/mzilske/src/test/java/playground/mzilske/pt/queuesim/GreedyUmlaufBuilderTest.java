@@ -41,7 +41,7 @@ public class GreedyUmlaufBuilderTest {
 	public void testGreedyUmlaufBuilder() {
 		createIds();
 		Config config = this.scenario.getConfig();
-		config.setQSimConfigGroup(new QSimConfigGroup());
+		config.addQSimConfigGroup(new QSimConfigGroup());
 		config.scenario().setUseTransit(true);
 		config.scenario().setUseVehicles(true);
 		config.getQSimConfigGroup().setSnapshotStyle("queue");

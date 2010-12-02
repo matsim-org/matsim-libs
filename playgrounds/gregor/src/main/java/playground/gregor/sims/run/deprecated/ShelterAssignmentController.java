@@ -102,7 +102,7 @@ public class ShelterAssignmentController extends Controler {
 		this.plans = plans;
 		// this.config.scenario().setUseSignalSystems(true);
 		// this.config.scenario().setUseLanes(true);
-		this.config.setQSimConfigGroup(new QSimConfigGroup());
+		this.config.addQSimConfigGroup(new QSimConfigGroup());
 	}
 
 	@Override

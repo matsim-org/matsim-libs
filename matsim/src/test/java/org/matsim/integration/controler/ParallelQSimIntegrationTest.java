@@ -41,7 +41,7 @@ public class ParallelQSimIntegrationTest {
 		final Config config = this.util.loadConfig("test/scenarios/equil/config_plans1.xml");
 		config.controler().setLastIteration(0);
 		Assert.assertNull(config.getQSimConfigGroup());
-		config.setQSimConfigGroup(new QSimConfigGroup());
+		config.addQSimConfigGroup(new QSimConfigGroup());
 		config.getQSimConfigGroup().setNumberOfThreads(3);
 
 		final ParallelQSimTestController controler = new ParallelQSimTestController(config);

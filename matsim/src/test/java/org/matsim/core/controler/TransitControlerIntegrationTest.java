@@ -39,6 +39,7 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
@@ -59,7 +60,7 @@ public class TransitControlerIntegrationTest extends MatsimTestCase {
 		Config config = super.loadConfig(null);
 		config.scenario().setUseTransit(true);
 		config.scenario().setUseVehicles(true);
-		config.setQSimConfigGroup(new QSimConfigGroup());
+		config.addQSimConfigGroup(new QSimConfigGroup());
 		ScenarioImpl scenario = new ScenarioImpl(config);
 
 		Id id1 = scenario.createId("1");
@@ -130,6 +131,7 @@ public class TransitControlerIntegrationTest extends MatsimTestCase {
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(1);
 
+		config.addSimulationConfigGroup( new SimulationConfigGroup() ) ;
 		config.simulation().setEndTime(8.0 * 3600);
 
 		ActivityParams params = new ActivityParams("h");

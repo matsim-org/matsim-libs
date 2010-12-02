@@ -4,6 +4,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.matsim.core.config.groups.MobsimConfigGroupI;
 import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
@@ -28,7 +29,7 @@ public class NeoLiveMain {
 		String eventsFileName = "../../matsim/output/example5/ITERS/it.10/10.events.xml.gz";
 
 		double snapshotPeriod = 60;
-		SimulationConfigGroup simulationConfigGroup = new SimulationConfigGroup();
+		MobsimConfigGroupI simulationConfigGroup = new SimulationConfigGroup();
 		NeoScenario scenario = new NeoScenario(directory, config);
 		try {
 			Transaction tx = scenario.beginTx();

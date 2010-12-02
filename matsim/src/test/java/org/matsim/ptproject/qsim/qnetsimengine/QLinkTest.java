@@ -81,7 +81,7 @@ public class QLinkTest extends MatsimTestCase {
 
 		PersonImpl p = new PersonImpl(new IdImpl("1"));
 		ScenarioImpl scenario = new ScenarioImpl();
-		scenario.getConfig().setQSimConfigGroup(new QSimConfigGroup());
+		scenario.getConfig().addQSimConfigGroup(new QSimConfigGroup());
 		v.setDriver(new PersonDriverAgentImpl(p, new QSim(scenario, new EventsManagerImpl())));
 
 		f.qlink1.addFromIntersection(v);
@@ -233,7 +233,7 @@ public class QLinkTest extends MatsimTestCase {
 	public void testBuffer() {
 	  Config conf = super.loadConfig(null);
 	  ScenarioImpl scenario = new ScenarioImpl(conf);
-	  conf.setQSimConfigGroup(new QSimConfigGroup());
+	  conf.addQSimConfigGroup(new QSimConfigGroup());
 
 		NetworkImpl network = scenario.getNetwork();
 		network.setCapacityPeriod(1.0);
@@ -366,7 +366,7 @@ public class QLinkTest extends MatsimTestCase {
 
 		/*package*/ Fixture() {
 			this.scenario = new ScenarioImpl();
-			this.scenario.getConfig().setQSimConfigGroup(new QSimConfigGroup());
+			this.scenario.getConfig().addQSimConfigGroup(new QSimConfigGroup());
 			NetworkImpl network = this.scenario.getNetwork();
 			network.setCapacityPeriod(3600.0);
 			Node node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(0, 0));

@@ -128,7 +128,7 @@ public class QLaneTest extends MatsimTestCase {
   
 	public void testCapacityWoLanes() {
 		ScenarioImpl scenario = new ScenarioImpl();
-		scenario.getConfig().setQSimConfigGroup(new QSimConfigGroup());
+		scenario.getConfig().addQSimConfigGroup(new QSimConfigGroup());
 		
 		this.initNetwork(scenario.getNetwork());
 		
@@ -142,7 +142,7 @@ public class QLaneTest extends MatsimTestCase {
 	
 	public void testCapacityWithOneLaneOneLane() {
 		ScenarioImpl scenario = new ScenarioImpl();
-		scenario.getConfig().setQSimConfigGroup(new QSimConfigGroup());
+		scenario.getConfig().addQSimConfigGroup(new QSimConfigGroup());
 		scenario.getConfig().scenario().setUseLanes(true);
 		this.initNetwork(scenario.getNetwork());
 		this.createOneLane(scenario, 1);
@@ -173,7 +173,7 @@ public class QLaneTest extends MatsimTestCase {
 
 	public void testCapacityWithOneLaneOneLaneTwoLanes() {
 		ScenarioImpl scenario = new ScenarioImpl();
-		scenario.getConfig().setQSimConfigGroup(new QSimConfigGroup());
+		scenario.getConfig().addQSimConfigGroup(new QSimConfigGroup());
 		scenario.getConfig().scenario().setUseLanes(true);
 		this.initNetwork(scenario.getNetwork());
 		this.createOneLane(scenario, 2);
@@ -206,7 +206,7 @@ public class QLaneTest extends MatsimTestCase {
 	
 	public void testCapacityWithLanes() {
 		ScenarioImpl scenario = new ScenarioImpl();
-		scenario.getConfig().setQSimConfigGroup(new QSimConfigGroup());
+		scenario.getConfig().addQSimConfigGroup(new QSimConfigGroup());
 		scenario.getConfig().scenario().setUseLanes(true);
 		this.initNetwork(scenario.getNetwork());
 		this.createLanes(scenario);

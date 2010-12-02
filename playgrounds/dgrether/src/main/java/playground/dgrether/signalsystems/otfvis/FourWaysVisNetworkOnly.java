@@ -47,7 +47,7 @@ public class FourWaysVisNetworkOnly {
 //		OTFVis.playNetwork(netArray);
 		//this is hack
 		ScenarioImpl scenario = new ScenarioImpl();
-    scenario.getConfig().setQSimConfigGroup(new QSimConfigGroup());
+    scenario.getConfig().addQSimConfigGroup(new QSimConfigGroup());
 		NetworkImpl network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFile);
 //		PopulationImpl population = scenario.getPopulation();

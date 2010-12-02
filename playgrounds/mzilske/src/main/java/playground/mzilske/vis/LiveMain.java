@@ -3,6 +3,7 @@ package playground.mzilske.vis;
 import java.lang.reflect.InvocationTargetException;
 
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.core.config.groups.MobsimConfigGroupI;
 import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
@@ -33,7 +34,7 @@ public class LiveMain {
 //		String populationFileName = "output/brandenburg/output_plans.xml.gz";
 		
 		double snapshotPeriod = 60;
-		SimulationConfigGroup simulationConfigGroup = new SimulationConfigGroup();
+		MobsimConfigGroupI simulationConfigGroup = new SimulationConfigGroup();
 		ScenarioImpl scenario = new ScenarioImpl();
 		
 		new MatsimNetworkReader(scenario).readFile(networkFileName);

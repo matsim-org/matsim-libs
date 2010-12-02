@@ -122,8 +122,8 @@ public class Config {
 		this.controler = new ControlerConfigGroup();
 		this.modules.put(ControlerConfigGroup.GROUP_NAME, this.controler);
 
-		this.simulation = new SimulationConfigGroup();
-		this.modules.put(SimulationConfigGroup.GROUP_NAME, this.simulation);
+//		this.simulation = new SimulationConfigGroup();
+//		this.modules.put(SimulationConfigGroup.GROUP_NAME, this.simulation);
 
 		this.counts = new CountsConfigGroup();
 		this.modules.put(CountsConfigGroup.GROUP_NAME, this.counts);
@@ -455,14 +455,23 @@ public class Config {
 		return this.transit;
 	}
 
-	// methods that are somehow out of the "regular" system:
-
-	public void setQSimConfigGroup(final QSimConfigGroup qSimConfigGroup) {
-		log.warn("setting QSimConfigGroup in Config.  This will silently overwrite any pre-existing entry.");
-		log.warn("Might be better to modify the code to use the existing create/add/removeModule mechanics. kai, oct'10");
-		this.qSimConfigGroup = qSimConfigGroup;
-		this.modules.put(QSimConfigGroup.GROUP_NAME, qSimConfigGroup);
+	// typed adders:
+	// (config groups that are not core config groups are, in principle, not typed.  This is a way around that.)
+	
+	public void addSimulationConfigGroup( final SimulationConfigGroup tmp ) {
+		this.simulation = tmp ;
+		this.addModule( SimulationConfigGroup.GROUP_NAME, tmp ) ;
 	}
+
+	public void addQSimConfigGroup(final QSimConfigGroup qSimConfigGroup) {
+//		log.warn("setting QSimConfigGroup in Config.  This will silently overwrite any pre-existing entry.");
+//		log.warn("Might be better to modify the code to use the existing create/add/removeModule mechanics. kai, oct'10");
+		this.qSimConfigGroup = qSimConfigGroup;
+//		this.modules.put(QSimConfigGroup.GROUP_NAME, qSimConfigGroup);
+		this.addModule(QSimConfigGroup.GROUP_NAME, qSimConfigGroup) ;
+	}
+	
+	// other:
 
 	public void addConfigConsistencyChecker(final ConfigConsistencyChecker checker) {
 		this.consistencyCheckers.add(checker);

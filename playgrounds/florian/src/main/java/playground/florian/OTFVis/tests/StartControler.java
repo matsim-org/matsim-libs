@@ -10,7 +10,7 @@ public class StartControler {
 	public static void main(String[] args) {
 		Controler con = new Controler(config);
 		con.setOverwriteFiles(true);
-		con.getConfig().setQSimConfigGroup(new QSimConfigGroup());
+		con.getConfig().addQSimConfigGroup(new QSimConfigGroup());
 		con.getConfig().getQSimConfigGroup().setSnapshotFormat("otfvis");
 		con.getConfig().getQSimConfigGroup().setSnapshotPeriod(60.0);
 		con.getConfig().getQSimConfigGroup().setSnapshotStyle("queue");

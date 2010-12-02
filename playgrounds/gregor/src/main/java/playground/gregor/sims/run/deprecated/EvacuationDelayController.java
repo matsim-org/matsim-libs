@@ -80,7 +80,7 @@ public class EvacuationDelayController extends Controler {
 		setOverwriteFiles(true);
 		this.config.scenario().setUseSignalSystems(true);
 		this.config.scenario().setUseLanes(true);
-		this.config.setQSimConfigGroup(new QSimConfigGroup());
+		this.config.addQSimConfigGroup(new QSimConfigGroup());
 	}
 
 	@Override

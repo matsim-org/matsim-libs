@@ -3,6 +3,7 @@ package playground.mzilske.vis;
 import java.lang.reflect.InvocationTargetException;
 
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.core.config.groups.MobsimConfigGroupI;
 import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
@@ -23,7 +24,7 @@ public class Main {
 		String eventsFileName = "../../run657/it.1000/1000.events.txt.gz";
 		
 		double snapshotPeriod = 10;
-		SimulationConfigGroup simulationConfigGroup = new SimulationConfigGroup();
+		MobsimConfigGroupI simulationConfigGroup = new SimulationConfigGroup();
 		ScenarioImpl scenario = new ScenarioImpl();
 		
 		new MatsimNetworkReader(scenario).readFile(networkFileName);

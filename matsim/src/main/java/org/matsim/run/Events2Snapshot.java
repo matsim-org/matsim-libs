@@ -146,7 +146,7 @@ public class Events2Snapshot {
 		this.eventsfile = eventsFile.getAbsolutePath();
 		this.config = config;
 
-		if (this.config.simulation().getSnapshotPeriod() <= 0.0) {
+		if (this.config.getQSimConfigGroup().getSnapshotPeriod() <= 0.0) {
 			System.out.println("The snapshotPeriod must be larger than 0 seconds.");
 			return;
 		}
@@ -182,7 +182,8 @@ public class Events2Snapshot {
 		this.events = new EventsManagerImpl();
 
 		// create SnapshotGenerator
-		this.visualizer = new SnapshotGenerator(this.network, this.config.simulation().getSnapshotPeriod(), this.config.simulation());
+		this.visualizer = new SnapshotGenerator(this.network, this.config.getQSimConfigGroup().getSnapshotPeriod(), 
+				this.config.getQSimConfigGroup());
 		this.events.addHandler(this.visualizer);
 	}
 
@@ -196,7 +197,7 @@ public class Events2Snapshot {
 		  this.visualizer.addSnapshotWriter(this.writer);
 		}
 
-		String snapshotFormat = this.config.simulation().getSnapshotFormat();
+		String snapshotFormat = this.config.getQSimConfigGroup().getSnapshotFormat();
 
 		if (snapshotFormat.contains("plansfile")) {
 			String snapshotFilePrefix = outputDir + "/positionInfoPlansFile";

@@ -43,7 +43,7 @@ public class CottbusController {
 		// configuration that describes current scenario
 		
 		Controler controler = new Controler(config);
-		controler.getConfig().setQSimConfigGroup(new QSimConfigGroup());
+		controler.getConfig().addQSimConfigGroup(new QSimConfigGroup());
 		controler.setOverwriteFiles(true);
 		// effects output-folder
 		controler.run();
@@ -55,7 +55,7 @@ public class CottbusController {
 		// visualization via OTFVis
 		ScenarioLoaderImpl scl = new ScenarioLoaderImpl(config);
 		Scenario sc = scl.loadScenario();
-		sc.getConfig().setQSimConfigGroup(new QSimConfigGroup());
+		sc.getConfig().addQSimConfigGroup(new QSimConfigGroup());
 		EventsManagerImpl e = new EventsManagerImpl();
 		QSim otfVisQSim = new QSim(sc, e);
 		OTFVisMobsimFeature queueSimulationFeature = new OTFVisMobsimFeature(otfVisQSim);

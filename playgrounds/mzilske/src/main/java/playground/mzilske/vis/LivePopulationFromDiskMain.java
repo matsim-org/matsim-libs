@@ -3,6 +3,7 @@ package playground.mzilske.vis;
 import java.lang.reflect.InvocationTargetException;
 
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.core.config.groups.MobsimConfigGroupI;
 import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
@@ -31,7 +32,7 @@ public class LivePopulationFromDiskMain {
 		String populationFileName = "../../run951/951.output_plans.xml.gz";
 		
 		double snapshotPeriod = 60;
-		SimulationConfigGroup simulationConfigGroup = new SimulationConfigGroup();
+		MobsimConfigGroupI simulationConfigGroup = new SimulationConfigGroup();
 		ScenarioImpl scenario = new ScenarioImpl();
 		
 		scenario.setPopulation(new PopulationOnDisk(scenario, DirectoryUtils.createTempDirectory()));

@@ -125,7 +125,7 @@ import org.matsim.vis.snapshots.writers.VisNode;
 		return this.queuenodes.get(id);
 	}
 
-	public Mobsim getQSim() {
+	public Mobsim getMobsim() {
 		return qSim;
 	}
 }

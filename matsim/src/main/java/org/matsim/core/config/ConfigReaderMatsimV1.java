@@ -29,6 +29,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.log4j.Logger;
 import org.matsim.core.api.internal.MatsimSomeReader;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
@@ -81,7 +82,10 @@ public class ConfigReaderMatsimV1 extends MatsimXmlParser implements MatsimSomeR
 		  //if there are type safe optional modules they have to be added here
 		  if (name.equals(QSimConfigGroup.GROUP_NAME)){
 		    this.currmodule = new QSimConfigGroup();
-		    this.config.setQSimConfigGroup((QSimConfigGroup) this.currmodule);
+		    this.config.addQSimConfigGroup((QSimConfigGroup) this.currmodule);
+		  } else if ( name.equals(SimulationConfigGroup.GROUP_NAME) ) {
+			  this.currmodule = new SimulationConfigGroup() ;
+			  this.config.addSimulationConfigGroup((SimulationConfigGroup) this.currmodule) ;
 		  }
 		  //it must be a not type safe generic module
 		  else {

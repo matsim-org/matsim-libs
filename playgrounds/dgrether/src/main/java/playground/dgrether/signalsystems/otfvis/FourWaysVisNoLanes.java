@@ -46,7 +46,7 @@ public class FourWaysVisNoLanes {
     ScenarioImpl scenario = new ScenarioImpl();
     scenario.getConfig().network().setInputFile(netFile);
     scenario.getConfig().plans().setInputFile(popFile);
-    scenario.getConfig().setQSimConfigGroup(new QSimConfigGroup());
+    scenario.getConfig().addQSimConfigGroup(new QSimConfigGroup());
     scenario.getConfig().getQSimConfigGroup().setSnapshotStyle("queue");
     scenario.getConfig().getQSimConfigGroup().setStuckTime(100.0);
     

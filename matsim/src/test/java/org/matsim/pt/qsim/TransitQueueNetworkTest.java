@@ -969,7 +969,7 @@ public class TransitQueueNetworkTest extends TestCase {
 			// setup: config
 			ScenarioImpl scenario = new ScenarioImpl();
 			scenario.getConfig().scenario().setUseTransit(true);
-			scenario.getConfig().setQSimConfigGroup(new QSimConfigGroup());
+			scenario.getConfig().addQSimConfigGroup(new QSimConfigGroup());
 			Id id1 = scenario.createId("1");
 			Id id2 = scenario.createId("2");
 			Id id3 = scenario.createId("3");

@@ -181,7 +181,7 @@ class QueueLink implements VisLink {
 	/* package */void addFromIntersection(final QVehicle veh) {
 
 //		double now = SimulationTimer.getTimeOfDayStatic();
-		double now = this.queueNetwork.getQSim().getSimTimer().getTimeOfDay();
+		double now = this.queueNetwork.getMobsim().getSimTimer().getTimeOfDay();
 
 		activateLink();
 		this.add(veh, now);
@@ -224,7 +224,7 @@ class QueueLink implements VisLink {
 		this.parkedVehicles.clear();
 
 //		double now = SimulationTimer.getTimeOfDayStatic();
-		double now = this.queueNetwork.getQSim().getSimTimer().getTimeOfDay() ;
+		double now = this.queueNetwork.getMobsim().getSimTimer().getTimeOfDay() ;
 
 		for (QVehicle veh : this.waitingList) {
 			QueueSimulation.getEvents().processEvent(
@@ -234,11 +234,11 @@ class QueueLink implements VisLink {
 		}
 
 		// QueueAgentCounter.staticDecLiving(this.waitingList.size());
-		this.queueNetwork.getQSim().getAgentCounter().decLiving(
+		this.queueNetwork.getMobsim().getAgentCounter().decLiving(
 				this.waitingList.size());
 
 		// QueueAgentCounter.staticIncLost(this.waitingList.size());
-		this.queueNetwork.getQSim().getAgentCounter().incLost(
+		this.queueNetwork.getMobsim().getAgentCounter().incLost(
 				this.waitingList.size());
 
 		this.waitingList.clear();
@@ -251,11 +251,11 @@ class QueueLink implements VisLink {
 		}
 
 		// QueueAgentCounter.staticDecLiving(this.vehQueue.size());
-		this.queueNetwork.getQSim().getAgentCounter().decLiving(
+		this.queueNetwork.getMobsim().getAgentCounter().decLiving(
 				this.vehQueue.size());
 
 		// QueueAgentCounter.staticIncLost(this.vehQueue.size());
-		this.queueNetwork.getQSim().getAgentCounter().incLost(
+		this.queueNetwork.getMobsim().getAgentCounter().incLost(
 				this.vehQueue.size());
 
 		this.vehQueue.clear();
@@ -268,11 +268,11 @@ class QueueLink implements VisLink {
 		}
 
 		// QueueAgentCounter.staticDecLiving(this.buffer.size());
-		this.queueNetwork.getQSim().getAgentCounter().decLiving(
+		this.queueNetwork.getMobsim().getAgentCounter().decLiving(
 				this.buffer.size());
 
 		// QueueAgentCounter.staticIncLost(this.buffer.size());
-		this.queueNetwork.getQSim().getAgentCounter().incLost(
+		this.queueNetwork.getMobsim().getAgentCounter().incLost(
 				this.buffer.size());
 
 		this.buffer.clear();
@@ -426,11 +426,11 @@ class QueueLink implements VisLink {
 				.getFlowCapacity(time);
 		// we need the flow capcity per sim-tick and multiplied with
 		// flowCapFactor
-		if ( this.queueNetwork.getQSim() != null ) {
+		if ( this.queueNetwork.getMobsim() != null ) {
 			this.simulatedFlowCapacity = this.simulatedFlowCapacity
-				* this.queueNetwork.getQSim().getSimTimer().getSimTimestepSize()
+				* this.queueNetwork.getMobsim().getSimTimer().getSimTimestepSize()
 //				* Gbl.getConfig().simulation().getFlowCapFactor();
-				* this.queueNetwork.getQSim().getScenario().getConfig().simulation().getFlowCapFactor();
+				* this.queueNetwork.getMobsim().getScenario().getConfig().simulation().getFlowCapFactor();
 		} // else there is no qsim i.e. it is a test case.  kai, jun'10
 		this.inverseSimulatedFlowCapacity = 1.0 / this.simulatedFlowCapacity;
 		this.flowCapFraction = this.simulatedFlowCapacity
@@ -438,7 +438,7 @@ class QueueLink implements VisLink {
 	}
 
 	private void calculateStorageCapacity(final double time) {
-		double storageCapFactor = this.queueNetwork.getQSim().getScenario().getConfig().simulation().getStorageCapFactor();
+		double storageCapFactor = this.queueNetwork.getMobsim().getScenario().getConfig().simulation().getStorageCapFactor();
 		this.bufferStorageCapacity = (int) Math
 				.ceil(this.simulatedFlowCapacity);
 
@@ -645,7 +645,7 @@ class QueueLink implements VisLink {
 	/* package */QVehicle popFirstFromBuffer() {
 
 //		double now = SimulationTimer.getTimeOfDayStatic();
-		double now = this.queueNetwork.getQSim().getSimTimer().getTimeOfDay() ;
+		double now = this.queueNetwork.getMobsim().getSimTimer().getTimeOfDay() ;
 
 		QVehicle veh = this.buffer.poll();
 		this.bufferLastMovedTime = now; // just in case there is another vehicle
@@ -703,7 +703,7 @@ class QueueLink implements VisLink {
 				final Collection<AgentSnapshotInfo> positions) {
 
 //			double time = SimulationTimer.getTimeOfDayStatic();
-			double time = QueueLink.this.queueNetwork.getQSim().getSimTimer().getTimeOfDay() ;
+			double time = QueueLink.this.queueNetwork.getMobsim().getSimTimer().getTimeOfDay() ;
 
 			int cnt = QueueLink.this.buffer.size()
 					+ QueueLink.this.vehQueue.size();
@@ -759,7 +759,7 @@ class QueueLink implements VisLink {
 				final Collection<AgentSnapshotInfo> positions) {
 
 //			double now = SimulationTimer.getTimeOfDayStatic();
-			double now = QueueLink.this.queueNetwork.getQSim().getSimTimer().getTimeOfDay() ;
+			double now = QueueLink.this.queueNetwork.getMobsim().getSimTimer().getTimeOfDay() ;
 
 			Link link = QueueLink.this.getLink();
 			double queueEnd = getInitialQueueEnd();

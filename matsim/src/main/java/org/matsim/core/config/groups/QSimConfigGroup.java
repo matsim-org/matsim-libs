@@ -27,7 +27,7 @@ import org.apache.log4j.Logger;
 import org.matsim.core.config.Module;
 import org.matsim.core.utils.misc.Time;
 
-public class QSimConfigGroup extends Module {
+public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 
 	private static final long serialVersionUID = 1L;
 

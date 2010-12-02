@@ -50,7 +50,7 @@ public class SignalSystemsIntegrationTest {
 	public void testSignalSystems() {
 		Config config = testUtils.loadConfig(testUtils.getClassInputDirectory() + CONFIG_FILE_NAME);
 		config.controler().setOutputDirectory(testUtils.getOutputDirectory());
-		config.setQSimConfigGroup(new QSimConfigGroup());
+		config.addQSimConfigGroup(new QSimConfigGroup());
 		Controler c = new Controler(config);
 		c.setCreateGraphs(false);
 		c.run();

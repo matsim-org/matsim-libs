@@ -63,8 +63,12 @@ public class OTFEvent2MVI extends OTFFileWriter {
 
 	public void convert(final Config config) {
 		open();
-		config.simulation().setSnapshotFormat("none");
-		config.simulation().setSnapshotPeriod(this.interval_s);
+
+//		config.simulation().setSnapshotFormat("none");
+//		config.simulation().setSnapshotPeriod(this.interval_s);
+		config.getQSimConfigGroup().setSnapshotFormat("none");
+		config.getQSimConfigGroup().setSnapshotPeriod(this.interval_s);
+
 		Events2Snapshot app = new Events2Snapshot();
 		app.addExternalSnapshotWriter(this);
 		app.run(new File(this.eventFileName), config, this.network.getNetwork());

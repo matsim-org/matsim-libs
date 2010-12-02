@@ -1025,7 +1025,7 @@ public class ParallelQSimTest extends TestCase {
 	public void testStartAndEndTime() {
 		ScenarioImpl scenario = new ScenarioImpl();
 		Config config = scenario.getConfig();
-    config.setQSimConfigGroup(new QSimConfigGroup());
+    config.addQSimConfigGroup(new QSimConfigGroup());
 
 		// build simple network with 1 link
 		NetworkImpl network = scenario.getNetwork();
@@ -1167,7 +1167,7 @@ public class ParallelQSimTest extends TestCase {
 		synchronizedEvents.addHandler(collector);
 
 		// run the simulation
-		config.setQSimConfigGroup(new QSimConfigGroup());
+		config.addQSimConfigGroup(new QSimConfigGroup());
 		config.getQSimConfigGroup().setEndTime(simEndTime);
 		/* use two parallel Threads */
 		QSimConfigGroup conf = (QSimConfigGroup) scenario.getConfig().getModule(QSimConfigGroup.GROUP_NAME);
@@ -1250,7 +1250,7 @@ public class ParallelQSimTest extends TestCase {
 		public Fixture() {
 			this.scenario = new ScenarioImpl();
 			this.config = scenario.getConfig();
-			this.config.setQSimConfigGroup(new QSimConfigGroup());
+			this.config.addQSimConfigGroup(new QSimConfigGroup());
 			this.config.getQSimConfigGroup().setFlowCapFactor(1.0);
 			this.config.getQSimConfigGroup().setStorageCapFactor(1.0);
 

@@ -90,7 +90,7 @@ public class TransitControler extends Controler {
 			this.transitConfig.addParam("transitModes", oldModule.getValue("transitModes"));
 		}
 		if (this.config.getQSimConfigGroup() == null) {
-		  this.config.setQSimConfigGroup(new QSimConfigGroup());
+		  this.config.addQSimConfigGroup(new QSimConfigGroup());
 		}
 		this.config.scenario().setUseTransit(true);
 		this.config.scenario().setUseVehicles(true);

@@ -72,7 +72,7 @@ public class TravelTimeFourWaysTest {
 		signalsConfig.setSignalGroupsFile(signalGroupsFile);
 		signalsConfig.setSignalControlFile(signalControlFile);
 		signalsConfig.setAmberTimesFile(amberTimesFile);
-		conf.setQSimConfigGroup(new QSimConfigGroup());
+		conf.addQSimConfigGroup(new QSimConfigGroup());
 
 		return scenario;
 	}

@@ -69,7 +69,7 @@ public class TwoLinesDemo {
 		Config config = this.scenario.getConfig();
 		config.scenario().setUseTransit(true);
 		config.scenario().setUseVehicles(true);
-		config.setQSimConfigGroup(new QSimConfigGroup());
+		config.addQSimConfigGroup(new QSimConfigGroup());
 		config.getQSimConfigGroup().setSnapshotStyle("queue");
 		config.getQSimConfigGroup().setEndTime(24.0*3600);
 	}

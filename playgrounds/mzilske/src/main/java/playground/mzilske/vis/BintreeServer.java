@@ -13,7 +13,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.groups.SimulationConfigGroup;
+import org.matsim.core.config.groups.MobsimConfigGroupI;
 import org.matsim.core.utils.collections.QuadTree.Rect;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.OTFServerQuad2;
@@ -87,7 +87,7 @@ public final class BintreeServer implements OTFServerRemote {
 		
 	}
 	
-	public BintreeServer(Network network, EventsManager eventsManager, double snapshotPeriod, SimulationConfigGroup simulationConfigGroup) {
+	public BintreeServer(Network network, EventsManager eventsManager, double snapshotPeriod, MobsimConfigGroupI simulationConfigGroup) {
 		this.network = network;
 		bintreeGenerator = new BintreeGenerator(network);
 		quadTree = new MyQuadTree();

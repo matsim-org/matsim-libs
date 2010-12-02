@@ -227,7 +227,7 @@ public class OTFVis {
 					"Fixing this by adding default config module for QSim. " +
 					"Please check if default values fit your needs, otherwise correct them in " +
 			"the config given as parameter to get a valid visualization!");
-			loader.getScenario().getConfig().setQSimConfigGroup(new QSimConfigGroup());
+			loader.getScenario().getConfig().addQSimConfigGroup(new QSimConfigGroup());
 		}
 		loader.loadScenario();
 		ScenarioImpl scenario = loader.getScenario();
@@ -285,7 +285,7 @@ public class OTFVis {
 			snapshotPeriod = Integer.parseInt(args[4]);
 		}
 		Scenario scenario = new ScenarioImpl();
-		scenario.getConfig().setQSimConfigGroup(new QSimConfigGroup());
+		scenario.getConfig().addQSimConfigGroup(new QSimConfigGroup());
 		new MatsimNetworkReader(scenario).readFile(networkFile);
 		QSim sim = new QSim(scenario, new EventsManagerImpl());
 		OTFEvent2MVI converter = new OTFEvent2MVI(sim.getNetsimNetwork(), eventFile, mviFile, snapshotPeriod);

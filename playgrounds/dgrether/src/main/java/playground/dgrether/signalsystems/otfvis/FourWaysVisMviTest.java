@@ -59,7 +59,7 @@ public class FourWaysVisMviTest {
     a.setTypicalDuration(8.0 * 3600.0);
     conf.charyparNagelScoring().addActivityParams(a);
     
-    conf.setQSimConfigGroup(new QSimConfigGroup());
+    conf.addQSimConfigGroup(new QSimConfigGroup());
     conf.getQSimConfigGroup().setSnapshotFormat("otfvis");
     conf.getQSimConfigGroup().setSnapshotPeriod(15.0);
     conf.getQSimConfigGroup().setSnapshotStyle("queue");

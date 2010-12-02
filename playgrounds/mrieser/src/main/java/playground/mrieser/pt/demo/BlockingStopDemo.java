@@ -84,7 +84,7 @@ public class BlockingStopDemo {
 
 	private void prepareConfig() {
 		Config config = this.scenario.getConfig();
-		config.setQSimConfigGroup(new QSimConfigGroup());
+		config.addQSimConfigGroup(new QSimConfigGroup());
 		config.scenario().setUseVehicles(true);
 		config.scenario().setUseTransit(true);
 		config.getQSimConfigGroup().setSnapshotStyle("queue");

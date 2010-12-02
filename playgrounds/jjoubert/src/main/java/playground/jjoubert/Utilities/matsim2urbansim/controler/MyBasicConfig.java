@@ -110,7 +110,7 @@ public class MyBasicConfig {
 		qsim.setNumberOfThreads(2);
 		qsim.setSnapshotFormat("googleearth");
 		qsim.setSnapshotPeriod(900);
-		config.setQSimConfigGroup(qsim);
+		config.addQSimConfigGroup(qsim);
 	}
 	
 	public Config getConfig(){

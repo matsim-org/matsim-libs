@@ -42,7 +42,7 @@ public class DgSatellicWithindayTestStarter {
 		confReader.readFile(configfile);
 
 		config.controler().setLastIteration(0);
-		config.setQSimConfigGroup(new QSimConfigGroup());
+		config.addQSimConfigGroup(new QSimConfigGroup());
 		config.getQSimConfigGroup().setSnapshotFormat("otfvis");
 		config.getQSimConfigGroup().setSnapshotPeriod(10.0);
 		config.getQSimConfigGroup().setSnapshotStyle("queue");

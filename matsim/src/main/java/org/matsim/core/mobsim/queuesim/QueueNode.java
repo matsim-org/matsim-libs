@@ -119,7 +119,7 @@ class QueueNode implements VisNode {
 			}
 
 			// check if veh is stuck!
-			Mobsim qSim = this.queueNetwork.getQSim() ;
+			Mobsim qSim = this.queueNetwork.getMobsim() ;
 			Scenario sc = qSim.getScenario() ;
 			Config config = sc.getConfig() ;
 
@@ -131,8 +131,8 @@ class QueueNode implements VisNode {
 				 */
 				if (config.simulation().isRemoveStuckVehicles()) {
 					link.popFirstFromBuffer();
-					this.queueNetwork.getQSim().getAgentCounter().decLiving();
-					this.queueNetwork.getQSim().getAgentCounter().incLost();
+					this.queueNetwork.getMobsim().getAgentCounter().decLiving();
+					this.queueNetwork.getMobsim().getAgentCounter().incLost();
 					QueueSimulation.getEvents().processEvent(
 							new AgentStuckEventImpl(now, veh.getDriver().getPerson().getId(), currentLink.getId(), veh.getDriver().getCurrentLeg().getMode()));
 				} else {
@@ -147,8 +147,8 @@ class QueueNode implements VisNode {
 
 		// --> nextLink == null
 		link.popFirstFromBuffer();
-		this.queueNetwork.getQSim().getAgentCounter().decLiving();
-		this.queueNetwork.getQSim().getAgentCounter().incLost();
+		this.queueNetwork.getMobsim().getAgentCounter().decLiving();
+		this.queueNetwork.getMobsim().getAgentCounter().incLost();
 		log.error(
 				"Agent has no or wrong route! agentId=" + veh.getDriver().getPerson().getId()
 						+ " currentLink=" + currentLink.getId().toString()

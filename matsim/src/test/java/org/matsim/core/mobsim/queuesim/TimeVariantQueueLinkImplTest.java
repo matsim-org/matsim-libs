@@ -26,13 +26,14 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.network.NetworkChangeEvent;
-import org.matsim.core.network.NetworkChangeEvent.ChangeType;
-import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.TimeVariantLinkFactory;
 import org.matsim.core.network.TimeVariantLinkImpl;
+import org.matsim.core.network.NetworkChangeEvent.ChangeType;
+import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.testcases.MatsimTestCase;
@@ -52,7 +53,8 @@ public class TimeVariantQueueLinkImplTest extends MatsimTestCase {
 	 */
 	public void testStorageCapacity() {
 		Scenario s = new ScenarioImpl();
-		s.getConfig().setQSimConfigGroup(new QSimConfigGroup());
+//		s.getConfig().addQSimConfigGroup(new QSimConfigGroup());
+		s.getConfig().addSimulationConfigGroup(new SimulationConfigGroup()) ;
 
 		// create a network
 		final NetworkImpl network = NetworkImpl.createNetwork();
@@ -76,7 +78,8 @@ public class TimeVariantQueueLinkImplTest extends MatsimTestCase {
 		change2.setLanesChange(new ChangeValue(ChangeType.FACTOR, 0.5));
 		network.addNetworkChangeEvent(change2);
 
-		QueueNetwork qNetwork = new QueueNetwork(network, new QSim(s, null));
+//		QueueNetwork qNetwork = new QueueNetwork(network, new QSim(s, null));
+		QueueNetwork qNetwork = new QueueNetwork(network, new QueueSimulation(s, null));
 		QueueLink qLink = qNetwork.getQueueLink(new IdImpl("1"));
 		qLink.finishInit();
 
@@ -103,7 +106,8 @@ public class TimeVariantQueueLinkImplTest extends MatsimTestCase {
 	 */
 	public void testFlowCapacity(){
 		Scenario s = new ScenarioImpl();
-		s.getConfig().setQSimConfigGroup(new QSimConfigGroup());
+//		s.getConfig().addQSimConfigGroup(new QSimConfigGroup());
+		s.getConfig().addSimulationConfigGroup(new SimulationConfigGroup()) ;
 
 		// create a network
 		final NetworkImpl network = NetworkImpl.createNetwork();
@@ -127,7 +131,8 @@ public class TimeVariantQueueLinkImplTest extends MatsimTestCase {
 		change2.setFlowCapacityChange(new ChangeValue(ChangeType.FACTOR, 0.5));
 		network.addNetworkChangeEvent(change2);
 
-		QueueNetwork qNetwork = new QueueNetwork(network, new QSim(s, null));
+//		QueueNetwork qNetwork = new QueueNetwork(network, new QSim(s, null));
+		QueueNetwork qNetwork = new QueueNetwork(network, new QueueSimulation(s, null));
 		QueueLink qLink = qNetwork.getQueueLink(new IdImpl("1"));
 		qLink.finishInit();
 

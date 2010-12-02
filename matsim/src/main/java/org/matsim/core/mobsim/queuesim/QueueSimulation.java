@@ -41,6 +41,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.controler.ControlerIO;
 import org.matsim.core.events.AgentStuckEventImpl;
 import org.matsim.core.gbl.Gbl;
@@ -163,6 +164,14 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 	protected QueueSimulation(final Scenario sc, final EventsManager events, final QueueNetworkFactory factory){
 		this.scenario = sc;
 		this.config = scenario.getConfig();
+		
+		if ( this.config.getModule(SimulationConfigGroup.GROUP_NAME) == null ) {
+			log.warn("Started QueueSimulation without a `simulation' config module.  Presumably due to removing " +
+					"`simulation' from the core modules.  Add simulation config module before calling QueueSimulation " +
+					"creational method to avoid this warning.  kai, dec'10");
+			this.config.addSimulationConfigGroup(new SimulationConfigGroup()) ;
+		}
+		
 		this.listenerManager = new SimulationListenerManager(this);
 //		AbstractSimulation.reset(this.config.simulation().getStuckTime());
 

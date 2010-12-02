@@ -407,7 +407,7 @@ public class DaganzoScenarioGenerator {
 		config.controler().setEventsFileFormats(set);
 
 		// configure simulation and snapshot writing
-		config.setQSimConfigGroup(new QSimConfigGroup());
+		config.addQSimConfigGroup(new QSimConfigGroup());
 		if (this.doOtfOutput){
 			config.getQSimConfigGroup().setSnapshotFormat("otfvis");
 			config.getQSimConfigGroup().setSnapshotPeriod(10.0);

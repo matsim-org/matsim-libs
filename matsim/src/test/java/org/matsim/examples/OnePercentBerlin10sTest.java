@@ -23,6 +23,7 @@ package org.matsim.examples;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.algorithms.EventWriterTXT;
 import org.matsim.core.gbl.MatsimRandom;
@@ -46,6 +47,7 @@ public class OnePercentBerlin10sTest extends MatsimTestCase {
 
 		MatsimRandom.reset(7411L);
 
+		config.addSimulationConfigGroup(new SimulationConfigGroup()) ;
 		// this needs to be done before reading the network
 		// because QueueLinks timeCap dependents on SIM_TICK_TIME_S
 		config.simulation().setTimeStepSize(10.0);

@@ -42,7 +42,7 @@ import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
-import org.matsim.core.config.groups.SimulationConfigGroup;
+import org.matsim.core.config.groups.MobsimConfigGroupI;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.NetworkUtils;
@@ -65,7 +65,7 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 	private final String snapshotStyle;
 	private double skipUntil = 0.0;
 
-	public SnapshotGenerator(final Network network, final double snapshotPeriod, final SimulationConfigGroup config) {
+	public SnapshotGenerator(final Network network, final double snapshotPeriod, final MobsimConfigGroupI config) {
 		this.network = network;
 		int initialCapacity = (int)(network.getLinks().size()*1.1);
 		this.eventLinks = new HashMap<Id, EventLink>(initialCapacity, 0.95f);

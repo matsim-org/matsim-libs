@@ -55,10 +55,11 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.config.consistency.ConfigConsistencyCheckerImpl;
+import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.corelisteners.EventsHandling;
 import org.matsim.core.controler.corelisteners.LegHistogramListener;
 import org.matsim.core.controler.corelisteners.PlansDumping;
@@ -334,6 +335,7 @@ public class Controler {
 		if (this.state == ControlerState.Init) {
 			init();
 			this.controlerListenerManager.fireControlerStartupEvent();
+			this.checkConfigConsistencyAndWriteToLog("Config dump before doIterations:") ;
 			doIterations();
 			shutdown(false);
 		} else {
@@ -618,19 +620,31 @@ public class Controler {
 				throw new RuntimeException(e);
 			}
 		}
-		log.info("Checking consistency of config...");
-		this.config.checkConsistency();
-		log.info("Complete config dump:");
-		StringWriter writer = new StringWriter();
-		new ConfigWriter(this.config).writeStream(new PrintWriter(writer));
-		log.info("\n\n" + writer.getBuffer().toString());
-		log.info("Complete config dump done.");
+		checkConfigConsistencyAndWriteToLog( "Complete config dump after reading the config file:");
 
 		/* use writeEventsInterval from config file, only if not already
 		 * initialized programmatically */
 		if (this.writeEventsInterval == -1) {
 			this.writeEventsInterval = this.config.controler().getWriteEventsInterval();
 		}
+	}
+
+	/**Design decisions:<ul>
+	 * <li> I extracted this method since it is now called <i>twice</i>: once directly after reading, and once
+	 * before the iterations start.  The second call seems more important, but I wanted to leave the first one
+	 * there in case the program fails before that config dump.  Might be put into the "unexpected shutdown hook" 
+	 * instead. kai, dec'10
+	 * </ul>
+	 * @param message the message that is written just before the config dump
+	 */
+	private void checkConfigConsistencyAndWriteToLog( String message ) {
+		log.info("Checking consistency of config...");
+		this.config.checkConsistency();
+		log.info( message );
+		StringWriter writer = new StringWriter();
+		new ConfigWriter(this.config).writeStream(new PrintWriter(writer));
+		log.info("\n\n" + writer.getBuffer().toString());
+		log.info("Complete config dump done.");
 	}
 
 	private final void setUpOutputDir() {
@@ -852,7 +866,7 @@ public class Controler {
 	 */
 
 	protected void runMobSim() {
-		if (this.config.simulation().getExternalExe() == null) {
+		if ( this.config.simulation()==null || this.config.simulation().getExternalExe() == null) {
 			Simulation simulation = this.getMobsimFactory().createMobsim(this.getScenario(), this.getEvents());
 			if (simulation instanceof IOSimulation){
 				((IOSimulation)simulation).setControlerIO(this.getControlerIO());
@@ -1211,9 +1225,13 @@ public class Controler {
 					}
 				} else if (c.getModule("JDEQSim") != null) {
 					event.getControler().setMobsimFactory(new JDEQSimulationFactory());
+				} else if ( c.getModule(SimulationConfigGroup.GROUP_NAME) != null ) {
+					event.getControler().setMobsimFactory(new QueueSimulationFactory());
 				} else {
-					log.warn("There might be no configuration for a mobility simulation in the config. The Controler " +
-					" uses the default QueueSimulation that might not have all features implemented.");
+					log.warn("There is no configuration for a mobility simulation in the config. The Controler " +
+					"uses the default `Simulation'.  Add a (possibly empty) `Simulation' module to your config file " +
+					"to avoid this warning");
+					c.addSimulationConfigGroup(new SimulationConfigGroup()) ;
 					event.getControler().setMobsimFactory(new QueueSimulationFactory());
 				}
 			}

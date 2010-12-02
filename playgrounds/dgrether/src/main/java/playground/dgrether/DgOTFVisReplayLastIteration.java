@@ -104,7 +104,7 @@ public class DgOTFVisReplayLastIteration {
 		log.info("Complete config dump done.");
 
 		if (config.getQSimConfigGroup() == null) {
-			config.setQSimConfigGroup(new QSimConfigGroup());
+			config.addQSimConfigGroup(new QSimConfigGroup());
 			config.getQSimConfigGroup().setFlowCapFactor(config.simulation().getFlowCapFactor());
 			config.getQSimConfigGroup().setStorageCapFactor(config.simulation().getStorageCapFactor());
 			config.getQSimConfigGroup().setRemoveStuckVehicles(

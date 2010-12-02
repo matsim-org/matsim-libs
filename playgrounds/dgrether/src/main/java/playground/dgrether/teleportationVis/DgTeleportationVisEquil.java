@@ -60,7 +60,7 @@ public class DgTeleportationVisEquil {
 		EventsManager events = new EventsManagerImpl();
 		events.addHandler(new LogOutputEventHandler());
 		scenario.getConfig().otfVis().setShowTeleportedAgents(true);
-		scenario.getConfig().setQSimConfigGroup(new QSimConfigGroup());
+		scenario.getConfig().addQSimConfigGroup(new QSimConfigGroup());
 		QSim otfVisQSim = new QSim(scenario, events);
 		OTFVisMobsimFeature queueSimulationFeature = new OTFVisMobsimFeature(otfVisQSim);
 		otfVisQSim.addFeature(queueSimulationFeature);

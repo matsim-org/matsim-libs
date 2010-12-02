@@ -1,5 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * MobsimConfigGroupI.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,47 +18,33 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.integration.controler;
+package org.matsim.core.config.groups;
 
-import junit.framework.Assert;
-
-import org.junit.Rule;
-import org.junit.Test;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.controler.Controler;
-import org.matsim.ptproject.qsim.QSimFactory;
-import org.matsim.testcases.MatsimTestUtils;
-
-/**
- * @author mrieser
+/**Interface which is there so that some params that exist jointly in different mobsim config groups can
+ * be passed as arguments via the same channel.  One could argue that this should be a "QueueMobsimConfigGroupI",
+ * but in the interest of simplicity the 1-2 args that arguable only make sense for queue were included. 
+ * @author nagel
  */
-public class QSimIntegrationTest {
+public interface MobsimConfigGroupI {
 
-	@Rule public MatsimTestUtils util = new MatsimTestUtils();
+	public abstract double getStartTime();
 
-	@Test
-	public void testUseQSimFactory() {
-		final Config config = this.util.loadConfig("test/scenarios/equil/config_plans1.xml");
-		config.controler().setLastIteration(0);
-		Assert.assertNull(config.getQSimConfigGroup());
-		config.addQSimConfigGroup(new QSimConfigGroup());
+	public abstract double getEndTime();
 
-		final QSimTestController controler = new QSimTestController(config);
-		controler.setCreateGraphs(false);
-		controler.run();
-		Assert.assertEquals(1, controler.callCounter);
-	}
+	public abstract double getTimeStepSize();
 
-	/*package*/ static class QSimTestController extends Controler {
-		/*package*/ int callCounter = 0;
-		public QSimTestController(Config config) {
-			super(config);
-		}
-		@Override
-		protected void runMobSim() {
-			Assert.assertTrue(this.getMobsimFactory() instanceof QSimFactory);
-			this.callCounter++;
-		}
-	}
+	public abstract double getSnapshotPeriod();
+
+	public abstract String getSnapshotFormat();
+
+	public abstract double getFlowCapFactor();
+
+	public abstract double getStorageCapFactor();
+
+	public abstract double getStuckTime();
+
+	public abstract boolean isRemoveStuckVehicles();
+
+	public abstract String getSnapshotStyle();
+
 }

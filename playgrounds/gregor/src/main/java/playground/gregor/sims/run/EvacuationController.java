@@ -90,7 +90,7 @@ public class EvacuationController extends Controler {
 		setOverwriteFiles(true);
 		this.config.scenario().setUseSignalSystems(false);
 		this.config.scenario().setUseLanes(true);
-		this.config.setQSimConfigGroup(new QSimConfigGroup());
+		this.config.addQSimConfigGroup(new QSimConfigGroup());
 	}
 
 	@Override

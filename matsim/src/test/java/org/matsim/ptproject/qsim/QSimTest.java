@@ -957,7 +957,7 @@ public class QSimTest {
 	public void testStartAndEndTime() {
 		ScenarioImpl scenario = new ScenarioImpl();
 		Config config = scenario.getConfig();
-    config.setQSimConfigGroup(new QSimConfigGroup());
+    config.addQSimConfigGroup(new QSimConfigGroup());
 
 		// build simple network with 1 link
 		NetworkImpl network = scenario.getNetwork();
@@ -1092,7 +1092,7 @@ public class QSimTest {
 		events.addHandler(collector);
 
 		// run the simulation
-		config.setQSimConfigGroup(new QSimConfigGroup());
+		config.addQSimConfigGroup(new QSimConfigGroup());
 		config.getQSimConfigGroup().setEndTime(simEndTime);
 		QSim sim = new QSim(scenario, events);
 		sim.run();
@@ -1170,7 +1170,7 @@ public class QSimTest {
 		public Fixture() {
 			this.scenario = new ScenarioImpl();
 			this.config = scenario.getConfig();
-			this.config.setQSimConfigGroup(new QSimConfigGroup());
+			this.config.addQSimConfigGroup(new QSimConfigGroup());
 			this.config.getQSimConfigGroup().setFlowCapFactor(1.0);
 			this.config.getQSimConfigGroup().setStorageCapFactor(1.0);
 

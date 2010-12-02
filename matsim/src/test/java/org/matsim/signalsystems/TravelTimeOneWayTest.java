@@ -100,7 +100,7 @@ public class TravelTimeOneWayTest {
 		conf.plans().setInputFile(this.testUtils.getClassInputDirectory() + "plans.xml.gz");
 		String laneDefinitions = testUtils.getClassInputDirectory() + "testLaneDefinitions_v1.1.xml";
 		conf.network().setLaneDefinitionsFile(laneDefinitions);
-		conf.setQSimConfigGroup(new QSimConfigGroup());
+		conf.addQSimConfigGroup(new QSimConfigGroup());
 		conf.getQSimConfigGroup().setStuckTime(1000);
 		conf.getQSimConfigGroup().setRemoveStuckVehicles(false);
 		conf.scenario().setUseLanes(true);

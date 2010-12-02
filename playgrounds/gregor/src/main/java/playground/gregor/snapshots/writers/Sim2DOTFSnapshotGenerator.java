@@ -88,7 +88,7 @@ public class Sim2DOTFSnapshotGenerator {
 
 		// this.scenario.getConfig().simulation().set
 		// this.scenario.getConfig().setQSimConfigGroup(new QSimConfigGroup());
-		this.scenario.getConfig().setQSimConfigGroup(new QSimConfigGroup());
+		this.scenario.getConfig().addQSimConfigGroup(new QSimConfigGroup());
 
 		// this.scenario.getConfig().evacuation().setBuildingsFile(SHARED_SVN +
 		// "/countries/id/padang/gis/buildings_v20100315/evac_zone_buildings_v20100315.shp");

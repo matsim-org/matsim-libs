@@ -66,7 +66,7 @@ public class PseudoNetworkDemo {
 		}
 
 		ScenarioImpl scenario = new ScenarioImpl();
-		scenario.getConfig().setQSimConfigGroup(new QSimConfigGroup());
+		scenario.getConfig().addQSimConfigGroup(new QSimConfigGroup());
 		scenario.getConfig().scenario().setUseVehicles(true);
 		scenario.getConfig().scenario().setUseTransit(true);
 		scenario.getConfig().getQSimConfigGroup().setSnapshotStyle("queue");

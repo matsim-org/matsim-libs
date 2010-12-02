@@ -48,6 +48,7 @@ import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.events.ActivityEndEventImpl;
 import org.matsim.core.events.ActivityStartEventImpl;
 import org.matsim.core.events.AgentArrivalEventImpl;
@@ -1165,6 +1166,7 @@ public class QueueSimulationTest extends TestCase {
 		public Fixture() {
 			this.scenario = new ScenarioImpl();
 			this.config = scenario.getConfig();
+			this.config.addSimulationConfigGroup(new SimulationConfigGroup()) ;
 			this.config.simulation().setFlowCapFactor(1.0);
 			this.config.simulation().setStorageCapFactor(1.0);
 			this.config.simulation().setStuckTime(1.0) ;

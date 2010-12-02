@@ -48,7 +48,7 @@ public class TravelTimeTest {
 		ScenarioLoaderImpl sl = new ScenarioLoaderImpl("test/scenarios/equil/config.xml");
 		ScenarioImpl data = sl.getScenario();
 		Config conf = data.getConfig();
-		conf.setQSimConfigGroup(new QSimConfigGroup());
+		conf.addQSimConfigGroup(new QSimConfigGroup());
 
 		String popFileName = "test/scenarios/equil/plans1.xml";
 		conf.plans().setInputFile(popFileName);
@@ -75,7 +75,7 @@ public class TravelTimeTest {
 		ScenarioLoaderImpl sl = new ScenarioLoaderImpl("test/scenarios/equil/config.xml");
 		ScenarioImpl data = sl.getScenario();
 		Config conf = data.getConfig();
-		conf.setQSimConfigGroup(new QSimConfigGroup());
+		conf.addQSimConfigGroup(new QSimConfigGroup());
 
 		String popFileName = "test/scenarios/equil/plans2.xml";
 		conf.plans().setInputFile(popFileName);

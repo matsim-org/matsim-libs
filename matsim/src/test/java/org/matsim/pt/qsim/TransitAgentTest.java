@@ -56,7 +56,7 @@ public class TransitAgentTest extends TestCase {
 
 	public void testAcceptLineRoute() {
 		ScenarioImpl scenario = new ScenarioImpl();
-		scenario.getConfig().setQSimConfigGroup(new QSimConfigGroup());
+		scenario.getConfig().addQSimConfigGroup(new QSimConfigGroup());
 		
 		NetworkImpl network = scenario.getNetwork();
 		Node node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(   0, 0));
@@ -100,7 +100,7 @@ public class TransitAgentTest extends TestCase {
 
 	public void testArriveAtStop() {
 		ScenarioImpl scenario = new ScenarioImpl();
-		scenario.getConfig().setQSimConfigGroup(new QSimConfigGroup());
+		scenario.getConfig().addQSimConfigGroup(new QSimConfigGroup());
 		
 		NetworkImpl network = scenario.getNetwork();
 		Node node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(   0, 0));

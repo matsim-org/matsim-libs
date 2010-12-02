@@ -27,7 +27,7 @@ import org.apache.log4j.Logger;
 import org.matsim.core.config.Module;
 import org.matsim.core.utils.misc.Time;
 
-public class SimulationConfigGroup extends Module {
+public class SimulationConfigGroup extends Module implements MobsimConfigGroupI {
 
 	private static final long serialVersionUID = 1L;
 
@@ -163,6 +163,9 @@ public class SimulationConfigGroup extends Module {
 		this.startTime = startTime;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.matsim.core.config.groups.MobsimConfigGroupI#getStartTime()
+	 */
 	public double getStartTime() {
 		return this.startTime;
 	}
@@ -171,6 +174,9 @@ public class SimulationConfigGroup extends Module {
 		this.endTime = endTime;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.matsim.core.config.groups.MobsimConfigGroupI#getEndTime()
+	 */
 	public double getEndTime() {
 		return this.endTime;
 	}
@@ -184,6 +190,9 @@ public class SimulationConfigGroup extends Module {
 		this.timeStepSize = seconds;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.matsim.core.config.groups.MobsimConfigGroupI#getTimeStepSize()
+	 */
 	public double getTimeStepSize() {
 		return this.timeStepSize;
 	}
@@ -192,6 +201,9 @@ public class SimulationConfigGroup extends Module {
 		this.snapshotPeriod = snapshotPeriod;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.matsim.core.config.groups.MobsimConfigGroupI#getSnapshotPeriod()
+	 */
 	public double getSnapshotPeriod() {
 		return this.snapshotPeriod;
 	}
@@ -204,6 +216,9 @@ public class SimulationConfigGroup extends Module {
 		this.snapshotFormat = snapshotFormat;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.matsim.core.config.groups.MobsimConfigGroupI#getSnapshotFormat()
+	 */
 	public String getSnapshotFormat() {
 		return this.snapshotFormat;
 	}
@@ -212,6 +227,9 @@ public class SimulationConfigGroup extends Module {
 		this.flowCapFactor = flowCapFactor;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.matsim.core.config.groups.MobsimConfigGroupI#getFlowCapFactor()
+	 */
 	public double getFlowCapFactor() {
 		return this.flowCapFactor;
 	}
@@ -220,6 +238,9 @@ public class SimulationConfigGroup extends Module {
 		this.stroageCapFactor = stroageCapFactor;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.matsim.core.config.groups.MobsimConfigGroupI#getStorageCapFactor()
+	 */
 	public double getStorageCapFactor() {
 		return this.stroageCapFactor;
 	}
@@ -228,6 +249,9 @@ public class SimulationConfigGroup extends Module {
 		this.stuckTime = stuckTime;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.matsim.core.config.groups.MobsimConfigGroupI#getStuckTime()
+	 */
 	public double getStuckTime() {
 		return this.stuckTime;
 	}
@@ -236,6 +260,9 @@ public class SimulationConfigGroup extends Module {
 		this.removeStuckVehicles = removeStuckVehicles;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.matsim.core.config.groups.MobsimConfigGroupI#isRemoveStuckVehicles()
+	 */
 	public boolean isRemoveStuckVehicles() {
 		return this.removeStuckVehicles;
 	}
@@ -264,6 +291,9 @@ public class SimulationConfigGroup extends Module {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see org.matsim.core.config.groups.MobsimConfigGroupI#getSnapshotStyle()
+	 */
 	public String getSnapshotStyle() {
 		return this.snapshotStyle;
 	}

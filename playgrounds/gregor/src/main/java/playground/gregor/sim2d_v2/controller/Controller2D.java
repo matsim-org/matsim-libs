@@ -35,7 +35,7 @@ public class Controller2D extends Controler {
 	public Controller2D(String[] args) {
 		super(args);
 		setOverwriteFiles(true);
-		this.config.setQSimConfigGroup(new QSimConfigGroup());
+		this.config.addQSimConfigGroup(new QSimConfigGroup());
 		this.config.getQSimConfigGroup().setEndTime(2 * 60);
 	}
 

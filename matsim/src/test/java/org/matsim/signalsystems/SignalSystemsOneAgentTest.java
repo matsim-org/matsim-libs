@@ -80,7 +80,7 @@ public class SignalSystemsOneAgentTest implements
 		conf.scenario().setUseLanes(true);
 		//as signals are configured below we don't need signals on
 		conf.scenario().setUseSignalSystems(false);
-		conf.setQSimConfigGroup(new QSimConfigGroup());
+		conf.addQSimConfigGroup(new QSimConfigGroup());
 		conf.getQSimConfigGroup().setStuckTime(1000);
 		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(scenario);
 		loader.loadScenario();
