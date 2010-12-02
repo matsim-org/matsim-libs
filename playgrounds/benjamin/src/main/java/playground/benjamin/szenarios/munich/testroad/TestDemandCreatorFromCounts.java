@@ -69,8 +69,8 @@ public class TestDemandCreatorFromCounts {
 		Population pop3 = generatePopulation(countsPath + day3 + "/" + lane1 + ".txt", countsPath + day3 + "/" + lane2 + ".txt");
 		
 		fuzzifyTimes(pop1);
-		fuzzifyTimes(pop1);
-		fuzzifyTimes(pop1);
+		fuzzifyTimes(pop2);
+		fuzzifyTimes(pop3);
 		
 		addTestVehicle(pop1, testVehiclePath + day1 + "_inflowTimes.txt");
 		addTestVehicle(pop2, testVehiclePath + day2 + "_inflowTimes.txt");
@@ -91,6 +91,9 @@ public class TestDemandCreatorFromCounts {
 		List<Integer> inflowTimes = getTestVehicleInflowTimes(dayFile);
 		for(int time : inflowTimes){
 			Id personId = sc.createId(time + "testVehicle");
+			
+			System.out.println(personId);
+			
 			Person person = population.getFactory().createPerson(personId);
 			Plan plan = population.getFactory().createPlan();
 			person.addPlan(plan);
@@ -113,6 +116,7 @@ public class TestDemandCreatorFromCounts {
 
 			population.addPerson(person);
 		}
+		System.out.println("=========");
 	}
 
 	/**
@@ -165,6 +169,7 @@ public class TestDemandCreatorFromCounts {
 			Plan plan = person.getPlans().iterator().next();
 			planMutateTimeAllocation.run(plan);
 		}
+//		System.out.println("fuzzified times for population");
 	}
 
 	/**
@@ -233,7 +238,8 @@ public class TestDemandCreatorFromCounts {
 			else{
 				Double vehicelesTotal = vehiclesLane1 + vehiclesLane2;
 				aggregatedEndTime2NoOfVehicles.put(endTime, vehicelesTotal);
-				System.out.println(/*"End of time interval: " +*/ endTime + "\t" + /*"Sum of cars: " +*/ vehicelesTotal);
+				
+//				System.out.println(/*"End of time interval: " +*/ endTime + "\t" + /*"Sum of cars: " +*/ vehicelesTotal);
 			}
 		}
 		return aggregatedEndTime2NoOfVehicles;
