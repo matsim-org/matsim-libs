@@ -50,11 +50,11 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
 
 public class MyPlansProcessorTest extends MatsimTestCase{
-	
+
 	private Logger log = Logger.getLogger(MyPlansProcessorTest.class);
 	private Scenario scenario;
 	private List<MyZone> zones;
-	
+
 	public void testMyPlansProcessorConstructor(){
 		setupTest();
 		MyPlansProcessor mpp = new MyPlansProcessor(scenario, zones);
@@ -65,7 +65,7 @@ public class MyPlansProcessorTest extends MatsimTestCase{
 		assertEquals("Matrix has wrong number of rows.", zones.size(), mpp.getOdMatrix().rows());
 		assertEquals("Matrix has wrong number of columns.", zones.size(), mpp.getOdMatrix().columns());
 	}
-	
+
 	public void testProcessPlans(){
 		setupTest();
 		MyPlansProcessor mpp = new MyPlansProcessor(scenario, zones);
@@ -73,7 +73,7 @@ public class MyPlansProcessorTest extends MatsimTestCase{
 		assertEquals("Wrong travel time from zone 1 to 4.", ((30.0 + 40.0)*60)/2, mpp.getAvgOdTravelTime(0, 3));
 		assertEquals("Wrong travel time from zone 4 to 1.", ((10.0 + 20.0)*60)/2, mpp.getAvgOdTravelTime(3, 0));
 	}
-	
+
 	public void testWriteOdMatrixToDbf(){
 		setupTest();
 		MyPlansProcessor mpp = new MyPlansProcessor(scenario, zones);
@@ -81,10 +81,10 @@ public class MyPlansProcessorTest extends MatsimTestCase{
 		mpp.writeOdMatrixToDbf(getOutputDirectory() + "testDbf.dbf");
 		assertTrue("Dbf table file does not exist", ((new File(getOutputDirectory() + "testDbf.dbf")).exists()));
 	}
-	
+
 
 	/**
-	 * 
+	 *
 	 */
 	private void setupTest() {
 		// Set up zones.
@@ -92,11 +92,11 @@ public class MyPlansProcessorTest extends MatsimTestCase{
 		String shapefile = folder.getParent() + "/zones.shp";
 		MyZoneReader mzr = new MyZoneReader(shapefile);
 		mzr.readZones(1);
-		zones = (List<MyZone>) mzr.getZoneList();
-		
+		zones = mzr.getZoneList();
+
 		// Set up scenario.
 		scenario = new ScenarioImpl();
-		
+
 		//=====================================================================
 		// Network.
 		//---------------------------------------------------------------------
@@ -107,7 +107,7 @@ public class MyPlansProcessorTest extends MatsimTestCase{
 		Node n2 = nf.createNode(new IdImpl("2"), new CoordImpl(8,3));
 		Node n3 = nf.createNode(new IdImpl("3"), new CoordImpl(7,7));
 		Node n4 = nf.createNode(new IdImpl("4"), new CoordImpl(3,7));
-		
+
 		n.addNode(n1); n.addNode(n2); n.addNode(n3); n.addNode(n4);
 
 		n.addLink(nf.createLink(new IdImpl("12"), n1.getId(), n2.getId()));
@@ -122,12 +122,12 @@ public class MyPlansProcessorTest extends MatsimTestCase{
 		n.addLink(nf.createLink(new IdImpl("41"), n4.getId(), n1.getId()));
 		n.addLink(nf.createLink(new IdImpl("42"), n4.getId(), n2.getId()));
 		n.addLink(nf.createLink(new IdImpl("43"), n4.getId(), n3.getId()));
-		
+
 		NetworkWriter nw = new NetworkWriter(n);
 		nw.write(getOutputDirectory() + "/networkTest.xml");
 		//=====================================================================
-		
-		
+
+
 		//=====================================================================
 		// Plans.
 		//---------------------------------------------------------------------
@@ -152,9 +152,9 @@ public class MyPlansProcessorTest extends MatsimTestCase{
 		l1.setRoute(nr1);
 		l1.setTravelTime(30.0*60.0);
 		plan.addLeg(l1);
-		// TODO Try dijkstra here.	
+		// TODO Try dijkstra here.
 		// Work.
-		Activity a2 = new ActivityImpl("work", new CoordImpl(9.0, 9.0)); 
+		Activity a2 = new ActivityImpl("work", new CoordImpl(9.0, 9.0));
 		a2.setStartTime(7*3600);
 		a2.setEndTime(16*3600);
 		plan.addActivity(a2);
@@ -170,7 +170,6 @@ public class MyPlansProcessorTest extends MatsimTestCase{
 		plan.addActivity(a3);
 		//---------------------------------------------------------------------
 		p1.addPlan(plan);
-		plan.setSelected(true);
 		p.addPerson(p1);
 		//---------------------------------------------------------------------
 		// Person 2. Same characteristics as Person 1, but he (or SHE, rather)
@@ -192,9 +191,9 @@ public class MyPlansProcessorTest extends MatsimTestCase{
 		l1.setRoute(nr1);
 		l1.setTravelTime(40.0*60.0);
 		plan.addLeg(l1);
-		// TODO Try dijkstra here.	
+		// TODO Try dijkstra here.
 		// Work.
-		a2 = new ActivityImpl("work", new CoordImpl(9.0, 9.0)); 
+		a2 = new ActivityImpl("work", new CoordImpl(9.0, 9.0));
 		a2.setStartTime(7*3600);
 		a2.setEndTime(16*3600);
 		plan.addActivity(a2);
@@ -210,16 +209,15 @@ public class MyPlansProcessorTest extends MatsimTestCase{
 		plan.addActivity(a3);
 		//---------------------------------------------------------------------
 		p2.addPlan(plan);
-		plan.setSelected(true);
 		p.addPerson(p2);
 
 		PopulationWriter pw = new PopulationWriter(p, n);
 		pw.writeFileV4(getOutputDirectory() + "/populationTest.xml");
 		//=====================================================================
 		log.info("Wrote population.");
-		
-		
-			
+
+
+
 	}
 
 }

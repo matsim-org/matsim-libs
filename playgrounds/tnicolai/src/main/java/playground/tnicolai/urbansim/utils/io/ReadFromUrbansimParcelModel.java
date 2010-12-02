@@ -195,10 +195,10 @@ public class ReadFromUrbansimParcelModel {
 		long notFoundCnt = 0 ;
 		long jobLocationIdNullCnt = 0 ;
 		boolean flag = false;
-		
+
 		String filename = Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + Constants.URBANSIM_PERSON_DATASET_TABLE + this.year + Constants.FILE_TYPE_TAB;
 		log.info( "Starting to read persons from " + filename ) ;
-		
+
 		try {
 			BufferedReader reader = IOUtils.getBufferedReader( filename );
 
@@ -212,8 +212,8 @@ public class ReadFromUrbansimParcelModel {
 			// We consider two cases:
 			// (1) We have an old population.  Then we look for those people who have the same id.
 			// (2) We do not have an old population.  Then we construct a new one.
-			// In both cases we assume that the new population has the right size.			
-			
+			// In both cases we assume that the new population has the right size.
+
 			while ( (line=reader.readLine()) != null ) {
 				NUrbansimPersons++;
 				String[] parts = line.split( Constants.TAB_SEPERATOR );
@@ -226,7 +226,7 @@ public class ReadFromUrbansimParcelModel {
 					continue ;
 
 				flag = false ;
-				
+
 				// get home location id
 				Id homeParcelId = new IdImpl( parts[ indexParcelID_HOME ] ) ;
 				ActivityFacility homeLocation = facilities.getFacilities().get( homeParcelId ) ;
@@ -239,10 +239,9 @@ public class ReadFromUrbansimParcelModel {
 					log.warn( "homeCoord==null; personId: " + personId + " parcelId: " + homeParcelId + ' ' + this ) ;
 					continue ;
 				}
-				
+
 				// add home location to plan
 				PlanImpl plan = newPerson.createAndAddPlan(true);
-				plan.setSelected(true) ;
 				CommonMATSimUtilities.makeHomePlan(plan, homeCoord) ;
 
 				// determine employment status
@@ -270,9 +269,9 @@ public class ReadFromUrbansimParcelModel {
 				// at this point, we have a full "new" person.  Now check against pre-existing population ...
 
 				while ( true ) { // loop from which we can "break":
-					
+
 					Person oldPerson ;
-					
+
 					if ( oldPop==null ) { // no pre-existing population.  Accept:
 						newPop.addPerson(newPerson);
 						break;
@@ -339,23 +338,23 @@ public class ReadFromUrbansimParcelModel {
 
 		log.info( "Done with reading persons." ) ;
 	}
-	
+
 	/**
 	 * determine if a person already exists
 	 * @param oldPop
 	 * @param personId
-	 * @return true if a person already exists in an old poulation 
+	 * @return true if a person already exists in an old poulation
 	 */
 	private boolean personExistsInOldPopulation(Population oldPop, Id personId){
-		
+
 		if(oldPop == null)
 			return false;
 		else
 			return oldPop.getPersons().get( personId) != null;
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @return number of persons determined by person id
 	 */
 	public int countPersons(){
@@ -363,7 +362,7 @@ public class ReadFromUrbansimParcelModel {
 		log.info( "Starting to read persons from " + filename ) ;
 		// counter
 		int persons = 0;
-		
+
 		try {
 			BufferedReader reader = IOUtils.getBufferedReader( filename );
 
@@ -371,12 +370,12 @@ public class ReadFromUrbansimParcelModel {
 			// get columns for home, work and person id
 			Map<String,Integer> idxFromKey = CommonMATSimUtilities.createIdxFromKey( line, Constants.TAB_SEPERATOR );
 			final int indexPersonID			= idxFromKey.get( Constants.PERSON_ID );
-			
+
 			while ( (line=reader.readLine()) != null ) {
 				String[] parts = line.split( Constants.TAB_SEPERATOR );
 
 				try{
-					// make sure that column contains an id 
+					// make sure that column contains an id
 					Integer.parseInt( parts[ indexPersonID ] );
 					persons ++;
 				}

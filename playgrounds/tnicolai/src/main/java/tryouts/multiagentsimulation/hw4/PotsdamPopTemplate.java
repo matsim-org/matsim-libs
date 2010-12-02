@@ -237,7 +237,6 @@ public class PotsdamPopTemplate implements Runnable {
 	 */
 	private void createPlans(PersonImpl person, Zone zone, boolean isCommuter){
 		PlanImpl plan = person.createAndAddPlan( true );
-		plan.setSelected( true );
 		// create an activities (home -> work -> home)
 
 			// home

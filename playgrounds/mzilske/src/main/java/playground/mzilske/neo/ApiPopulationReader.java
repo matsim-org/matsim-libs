@@ -255,7 +255,7 @@ public class ApiPopulationReader extends MatsimXmlParser implements PopulationRe
 		this.currplan = this.scenario.getPopulation().getFactory().createPlan();
 		this.currperson.addPlan(this.currplan);
 		if (selected) {
-			this.currplan.setSelected(selected);
+			((NeoPlanImpl) this.currplan).setSelected(selected);
 		}
 
 		String scoreString = atts.getValue("score");

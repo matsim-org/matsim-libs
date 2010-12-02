@@ -17,17 +17,17 @@ import org.neo4j.graphdb.StopEvaluator;
 import org.neo4j.graphdb.Traverser.Order;
 
 public class NeoPlanImpl implements Plan {
-	
+
 	static final String KEY_SCORE = "score";
 
 	static final String KEY_SELECTED = "isSelected";
-	
+
 	private final Node underlyingNode;
 
 	public NeoPlanImpl(Node underlyingNode) {
 		this.underlyingNode = underlyingNode;
 	}
-	
+
 	@Override
 	public void addActivity(Activity act) {
 		Node actNode = ((NeoActivityImpl) act).getUnderlyingNode();
@@ -100,7 +100,6 @@ public class NeoPlanImpl implements Plan {
 		underlyingNode.setProperty(KEY_SCORE, score);
 	}
 
-	@Override
 	public void setSelected(boolean selected) {
 		underlyingNode.setProperty(KEY_SELECTED, selected);
 	}

@@ -370,7 +370,6 @@ public class PlansCreateFromMZ {
 			boolean has_changed = false;
 			Plan plan = p.getSelectedPlan();
 			PlanImpl plan2 = new org.matsim.core.population.PlanImpl(p);
-			plan2.setSelected(true);
 			plan2.setScore(plan.getScore());
 			plan2.addActivity((ActivityImpl)plan.getPlanElements().get(0));
 

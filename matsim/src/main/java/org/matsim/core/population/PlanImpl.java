@@ -40,7 +40,7 @@ import org.matsim.utils.customize.CustomizableImpl;
 public class PlanImpl implements Plan {
 	/**
 	 * @deprecated use Leg.Mode instead
-	 * 
+	 *
 	 * But do not remove: minimally, kai is of the opinion that a plan type, with the consequence
 	 * that the last plan of a certain type is never removed, is extremely useful and should remain
 	 * there.  kai, dec'10
@@ -232,14 +232,6 @@ public class PlanImpl implements Plan {
 	@Override
 	public final boolean isSelected() {
 		return this.getPerson().getSelectedPlan() == this;
-	}
-
-	@Override
-	public void setSelected(final boolean selected) {
-		if(!selected)
-			throw new IllegalArgumentException("You can't unmark a plan as selected.");
-		
-		this.getPerson().setSelectedPlan(this);
 	}
 
 	@Override

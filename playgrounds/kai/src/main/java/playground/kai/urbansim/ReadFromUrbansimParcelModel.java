@@ -178,7 +178,6 @@ public class ReadFromUrbansimParcelModel {
 				}
 
 				PlanImpl plan = newPerson.createAndAddPlan(true);
-				plan.setSelected(true) ;
 				Utils.makeHomePlan(plan, homeCoord) ;
 
 				int idx = idxFromKey.get("parcel_id_work") ;

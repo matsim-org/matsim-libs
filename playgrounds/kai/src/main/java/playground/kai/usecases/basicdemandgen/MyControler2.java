@@ -104,8 +104,6 @@ public class MyControler2 {
 				Plan plan = pb.createPlan() ;
 				person.addPlan(plan) ;
 
-				plan.setSelected(true) ; // will also work without
-
 				Activity act = pb.createActivityFromCoord("home",coord) ;
 				plan.getPlanElements().add(act) ;
 			}

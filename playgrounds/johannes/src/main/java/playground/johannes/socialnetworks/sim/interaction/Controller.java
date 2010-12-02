@@ -39,6 +39,7 @@ import org.matsim.contrib.sna.graph.analysis.Degree;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.network.NetworkReaderMatsimV1;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReaderMatsimV4;
@@ -60,99 +61,99 @@ import playground.johannes.socialnetworks.survey.ivt2009.graph.io.SocialSparseGr
  *
  */
 public class Controller {
-	
+
 	private static final Logger logger = Logger.getLogger(Controller.class);
 
 	private Population population;
-	
+
 	private List<Person> persons;
-	
+
 	private Random random;
-	
+
 	private EndTimeMutator mutator;
-	
+
 	private PseudoSim sim;
-	
+
 	private Network network;
-	
+
 	private TravelTime travelTime;
-	
+
 	private EventsManagerImpl eventManager;
-	
+
 	private EventsToScore scorer;
-	
+
 //	private double oldScore;
-	
+
 	private int accepts;
-	
+
 //	private SocialGraph graph;
-	
+
 	private Map<Person, SocialVertex> vertexMapping;
-	
+
 	public Controller(Population population, Network network, SocialGraph graph) {
 //		this.graph = graph;
 		vertexMapping = new HashMap<Person, SocialVertex>();
 		for(SocialVertex vertex : graph.getVertices()) {
 			vertexMapping.put(vertex.getPerson().getPerson(), vertex);
 		}
-		
+
 		random = new Random();
-		
+
 		this.population = population;
 		this.network = network;
-	
+
 		persons = new ArrayList<Person>(population.getPersons().values());
-		
+
 		eventManager = new EventsManagerImpl();
 		VisitorTracker tracker = new VisitorTracker();
 		eventManager.addHandler(tracker);
-		
+
 		scorer = new EventsToScore(population, new JointActivityScoringFunctionFactory(tracker, graph));
 		eventManager.addHandler(scorer);
-		
+
 		travelTime = new TravelTimeCalculator(network, 3600, 86400, new TravelTimeCalculatorConfigGroup());
-		
+
 		sim = new PseudoSim();
-		
+
 		mutator = new EndTimeMutator();
 	}
-	
+
 	public void run(int iterations, String outputDir) {
 		PopulationWriter writer = new PopulationWriter(population, network);
-		
+
 		JointActivityScorer.totalJoinTime = 0;
 		scorer.reset(0);
 		sim.run(population, network, travelTime, eventManager);
 		scorer.finish();
 		double initialJoinTime = JointActivityScorer.totalJoinTime;
-		
+
 		accepts = 0;
 		for(int i = 0; i < iterations+1; i++) {
 			if(i % 10000 == 0)
-				logger.info(String.format("Running iteration %1$s, accepted %2$s steps.", i, accepts));			
-		
+				logger.info(String.format("Running iteration %1$s, accepted %2$s steps.", i, accepts));
+
 			step();
-			
+
 			if(i % 100000 == 0 && i > 0) {
 				logger.info("Dumping plans...");
 				writer.write(String.format("%1$s/%2$s.plan.xml", outputDir, i));
-				
+
 				JointActivityScorer.totalJoinTime = 0;
 				scorer.reset(0);
 				sim.run(population, network, travelTime, eventManager);
 				scorer.finish();
-				
+
 				double deltaJoinTime = initialJoinTime - JointActivityScorer.totalJoinTime;
-				logger.info(String.format("Delta join time: total = %1$s, per person = %2$s", deltaJoinTime, Time.writeTime(deltaJoinTime/(double)population.getPersons().size())));
+				logger.info(String.format("Delta join time: total = %1$s, per person = %2$s", deltaJoinTime, Time.writeTime(deltaJoinTime/population.getPersons().size())));
 			}
-				
+
 		}
 		logger.info(String.format("Accepted %1$s steps.", accepts));
 	}
-	
+
 	public void step() {
-		
-		
+
+
 		Logger.getRootLogger().setLevel(Level.WARN);
 		/*
 		 * randomly select one plan
@@ -165,7 +166,7 @@ public class Controller {
 			person = persons.get(random.nextInt(persons.size()));
 			oldPlan = (PlanImpl) person.getSelectedPlan();
 			newPlan = new PlanImpl(oldPlan.getPerson());
-			newPlan.copyPlan(oldPlan);	
+			newPlan.copyPlan(oldPlan);
 			/*
 			 * mutate
 			 */
@@ -188,14 +189,14 @@ public class Controller {
 		 * add new plan and simulate new state
 		 */
 		person.addPlan(newPlan);
-		newPlan.setSelected(true);
+		((PersonImpl) person).setSelectedPlan(newPlan);
 		JointActivityScorer.totalJoinTime = 0;
 		scorer.reset(0);
 		sim.run(tmpPop, network, travelTime, eventManager);
 		scorer.finish();
 		double newscore = avrScore(tmpPop);
 		double deltaJoinTime = oldJoinTime - JointActivityScorer.totalJoinTime;
-		
+
 		double delta = oldScore - newscore;
 		/*
 		 * select
@@ -205,17 +206,17 @@ public class Controller {
 //		logger.info(String.format("Score of old plan: %1$s, score of new plan: %2$s.", oldPlan.getScore(), newPlan.getScore()));
 //		logger.info(String.format("New score: %1$s, old score: %2$s, score diff = %3$s.", newscore, oldScore, delta));
 //		logger.info(String.format("Delta join time: %1$s", deltaJoinTime));
-		
+
 		double p = 1/(1 + Math.exp(100*delta));
 		if(random.nextDouble() < p) {
 			/*
 			 * accept
 			 */
 			person.getPlans().remove(oldPlan);
-			newPlan.setSelected(true);
-			
+			((PersonImpl) person).setSelectedPlan(newPlan);
+
 //			oldScore = newscore;
-			
+
 			accepts++;
 //			logger.info("Accepted new plan.");
 		} else {
@@ -223,11 +224,11 @@ public class Controller {
 			 * reject
 			 */
 			person.getPlans().remove(newPlan);
-			oldPlan.setSelected(true);
+			((PersonImpl) person).setSelectedPlan(oldPlan);
 //			logger.info("Rejected new plan.");
 		}
 	}
-	
+
 	private Population affectedPersons(Person person) {
 		Population p = new PopulationImpl(null);
 		p.addPerson(person);
@@ -237,15 +238,15 @@ public class Controller {
 		}
 		return p;
 	}
-	
+
 	private double avrScore(Population pop) {
 		double sum = 0;
 		for(Person p : pop.getPersons().values()) {
 			sum += p.getSelectedPlan().getScore();
 		}
-		return sum/(double)pop.getPersons().size();
+		return sum/pop.getPersons().size();
 	}
-	
+
 	public static void main(String args[]) throws SAXException, ParserConfigurationException, IOException {
 		String netFile = args[0];//"/Users/jillenberger/Work/shared-svn/studies/schweiz-ivtch/baseCase/network/ivtch.xml";
 		String facFile = args[1];//"/Users/jillenberger/Work/work/socialnets/sim/facilities.xml";
@@ -253,9 +254,9 @@ public class Controller {
 		String outputDir = args[3];
 		String graphFile = args[4];
 		int iters = Integer.parseInt(args[5]);
-		
+
 		Scenario scenario = new ScenarioImpl();
-		
+
 		NetworkReaderMatsimV1 netReader = new NetworkReaderMatsimV1(scenario);
 		netReader.parse(netFile);
 
@@ -274,20 +275,20 @@ public class Controller {
 //			Coord home = ((Activity) person.getSelectedPlan().getPlanElements().get(0)).getCoord();
 //			builder.addVertex(graph, sp, geoFactory.createPoint(new Coordinate(home.getX(), home.getY())));
 //		}
-		
+
 //		ErdosRenyiGenerator<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge> generator = new ErdosRenyiGenerator<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge>(builder);
 //		generator.setRandomDrawMode(true);
 //		generator.generate(graph, 0.0004, 0);
-		
+
 		SocialSparseGraphMLReader graphReader = new SocialSparseGraphMLReader();
 		SocialSparseGraph graph = graphReader.readGraph(graphFile, scenario.getPopulation());
-		
+
 		double k_mean = new Degree().distribution(graph.getVertices()).mean();
 		logger.info("k_mean = " + k_mean);
-		
+
 		Controller controller = new Controller(scenario.getPopulation(), scenario.getNetwork(), graph);
 		controller.run(iters, outputDir);
-		
+
 		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).write(String.format("%1$s/%2$s.plans.xml", outputDir, "final"));
 	}
 }

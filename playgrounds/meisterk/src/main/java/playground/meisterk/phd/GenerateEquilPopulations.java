@@ -53,31 +53,30 @@ import org.matsim.core.utils.misc.Time;
 public class GenerateEquilPopulations {
 
 	public static final int NUM_AGENTS = 4000;
-	
+
 	public GenerateEquilPopulations() {
 		// TODO Auto-generated constructor stub
 	}
 
 	protected void generateRandomInitialDemand(ScenarioImpl scenario) {
-		
+
 		PopulationImpl pop = (PopulationImpl) scenario.getPopulation();
 		PopulationFactory popFactory = pop.getFactory();
 
 		Network network = scenario.getNetwork();
-		
+
 		Activity act = null;
 		Leg leg = null;
 		for (int ii=0; ii < NUM_AGENTS; ii++) {
-			
+
 			PersonImpl person = (PersonImpl) popFactory.createPerson(new IdImpl(ii));
 			person.setEmployed(null);
-			
+
 			pop.addPerson(person);
-			
+
 			Plan plan = popFactory.createPlan();
 			person.addPlan(plan);
-			plan.setSelected(true);
-			
+
 			act = popFactory.createActivityFromLinkId("h", network.getLinks().get(new IdImpl(1)).getId());
 			plan.addActivity(act);
 			leg = popFactory.createLeg("undefined");
@@ -89,57 +88,56 @@ public class GenerateEquilPopulations {
 			act = popFactory.createActivityFromLinkId("h", network.getLinks().get(new IdImpl(1)).getId());
 			plan.addActivity(act);
 		}
-		
+
 		Config config = scenario.getConfig();
 		// no activity facilities are used here
 		config.planomat().setTripStructureAnalysisLayer(PlanomatConfigGroup.TripStructureAnalysisLayerOption.link);
-		
+
 		EventsManagerImpl emptyEvents = new EventsManagerImpl();
 		TravelTimeCalculator tTravelEstimator = new TravelTimeCalculator(scenario.getNetwork(), config.travelTimeCalculator());
 		ScoringFunctionFactory scoringFunctionFactory = new CharyparNagelScoringFunctionFactory(config.charyparNagelScoring());
 		PersonalizableTravelCost travelCostEstimator = new TravelTimeDistanceCostCalculator(tTravelEstimator, config.charyparNagelScoring());
-		
+
 		Controler dummyControler = new Controler(scenario);
 		dummyControler.setLeastCostPathCalculatorFactory(new DijkstraFactory());
-		
+
 		PlanomatModule planomat = new PlanomatModule(
-				dummyControler, 
-				emptyEvents, 
-				scenario.getNetwork(), 
-				scoringFunctionFactory, 
-				travelCostEstimator, 
+				dummyControler,
+				emptyEvents,
+				scenario.getNetwork(),
+				scoringFunctionFactory,
+				travelCostEstimator,
 				tTravelEstimator);
-		
+
 		planomat.prepareReplanning();
 		for (Person person : scenario.getPopulation().getPersons().values()) {
 			Plan plan = person.getPlans().get(0);
 			planomat.handlePlan(plan);
-			
+
 		}
 		planomat.finishReplanning();
 
 	}
-	
+
 	protected void generateAll6AMInitialDemand(ScenarioImpl scenario) {
 
 		PopulationImpl pop = (PopulationImpl) scenario.getPopulation();
 		PopulationFactory popFactory = pop.getFactory();
 
 		Network network = scenario.getNetwork();
-		
+
 		Activity act = null;
 		Leg leg = null;
 		for (int ii=0; ii < NUM_AGENTS; ii++) {
-			
+
 			PersonImpl person = (PersonImpl) popFactory.createPerson(new IdImpl(ii));
 			person.setEmployed(null);
 
 			pop.addPerson(person);
-			
+
 			Plan plan = popFactory.createPlan();
 			person.addPlan(plan);
-			plan.setSelected(true);
-			
+
 			act = popFactory.createActivityFromLinkId("h", network.getLinks().get(new IdImpl(1)).getId());
 			act.setEndTime(Time.parseTime("06:00:00"));
 			plan.addActivity(act);
@@ -154,34 +152,34 @@ public class GenerateEquilPopulations {
 			plan.addLeg(leg);
 			act = popFactory.createActivityFromLinkId("h", network.getLinks().get(new IdImpl(1)).getId());
 			plan.addActivity(act);
-			
+
 		}
-		
+
 		// initial routes = free speed routes
 		TravelTimeCalculatorFactory travelTimeCalculatorFactory = new TravelTimeCalculatorFactoryImpl();
 		PersonalizableTravelTime travelTimeCalculator = travelTimeCalculatorFactory.createTravelTimeCalculator(
-				network, 
+				network,
 				scenario.getConfig().travelTimeCalculator());
 		TravelCostCalculatorFactory travelCostCalculatorFactory = new TravelCostCalculatorFactoryImpl();
 		PersonalizableTravelCost travelCostCalculator = travelCostCalculatorFactory.createTravelCostCalculator(
-				travelTimeCalculator, 
+				travelTimeCalculator,
 				scenario.getConfig().charyparNagelScoring());
-		
+
 		ReRouteDijkstra router = new ReRouteDijkstra(
-				scenario.getConfig(), 
-				network, 
-				travelCostCalculator, 
+				scenario.getConfig(),
+				network,
+				travelCostCalculator,
 				travelTimeCalculator);
-		
+
 		router.prepareReplanning();
 		for (Person person : scenario.getPopulation().getPersons().values()) {
 
 			Plan plan = person.getPlans().get(0);
 			router.handlePlan(plan);
-			
+
 		}
 		router.finishReplanning();
 
 	}
-	
+
 }

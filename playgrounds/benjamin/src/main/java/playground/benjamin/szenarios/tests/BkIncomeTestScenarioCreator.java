@@ -79,7 +79,6 @@ public class BkIncomeTestScenarioCreator {
 			//adding carPlan to person
 			Plan plan = builder.createPlan();
 			p.addPlan(plan);
-			plan.setSelected(true);
 
 			Activity act1 = builder.createActivityFromLinkId("h", id1);
 			act1.setEndTime(homeEndTime);
@@ -118,7 +117,6 @@ public class BkIncomeTestScenarioCreator {
 			//adding ptPlan to person
 			plan = builder.createPlan();
 			p.addPlan(plan);
-			//plan.setSelected(true);
 
 			plan.addActivity(act1);
 

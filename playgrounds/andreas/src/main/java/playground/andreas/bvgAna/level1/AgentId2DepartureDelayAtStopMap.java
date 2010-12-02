@@ -33,18 +33,18 @@ import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
 
 /**
  * Collects the <code>AgentDepartureEventHandler</code> and the corresponding <code>PersonEntersVehicleEventHandler</code> for a given set of agent ids.
- * 
+ *
  * @author aneumann
  *
  */
 public class AgentId2DepartureDelayAtStopMap implements AgentDepartureEventHandler, PersonEntersVehicleEventHandler{
-	
+
 	private final Logger log = Logger.getLogger(AgentId2DepartureDelayAtStopMap.class);
-	private final Level logLevel = Level.DEBUG;
-	
+	private final Level logLevel = Level.OFF;
+
 	private final Set<Id> agentIds;
 	private TreeMap<Id, AgentId2DepartureDelayAtStopMapData> stopId2DelayAtStopMap = new TreeMap<Id, AgentId2DepartureDelayAtStopMapData>();
-	
+
 	public AgentId2DepartureDelayAtStopMap(Set<Id> agentIds){
 		this.log.setLevel(this.logLevel);
 		this.agentIds = agentIds;
@@ -52,19 +52,19 @@ public class AgentId2DepartureDelayAtStopMap implements AgentDepartureEventHandl
 
 	@Override
 	public void handleEvent(AgentDepartureEvent event) {
-		
+
 		if(this.agentIds.contains(event.getPersonId())){
-			
+
 			if(event.getLegMode() == TransportMode.pt){
-		
+
 				if(this.stopId2DelayAtStopMap.get(event.getPersonId()) == null){
-					this.log.debug("Adding new AgentDelayAtStopContainer for agent " + event.getPersonId() + " to map.");
+//					this.log.debug("Adding new AgentDelayAtStopContainer for agent " + event.getPersonId() + " to map.");
 					this.stopId2DelayAtStopMap.put(event.getPersonId(), new AgentId2DepartureDelayAtStopMapData(event.getPersonId()));
 				}
 
 				this.stopId2DelayAtStopMap.get(event.getPersonId()).addAgentDepartureEvent(event);
-			} else {
-				this.log.debug("AgentDepartureEvent but no pt");
+//			} else {
+//				this.log.debug("AgentDepartureEvent but no pt");
 			}
 		}
 	}
@@ -76,22 +76,22 @@ public class AgentId2DepartureDelayAtStopMap implements AgentDepartureEventHandl
 
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
-		
+
 		if(this.agentIds.contains(event.getPersonId())){
 			this.stopId2DelayAtStopMap.get(event.getPersonId()).addPersonEntersVehicleEvent(event);
 		}
-		
+
 	}
 
 	/**
 	 * Returns departure and enter vehicle time information.
-	 * 
+	 *
 	 * @return A map containing a <code>AgentDelayAtStopContainer</code> for each agent id
 	 */
 	public TreeMap<Id, AgentId2DepartureDelayAtStopMapData> getStopId2DelayAtStopMap() {
 		return this.stopId2DelayAtStopMap;
 	}
-	
-	
+
+
 
 }

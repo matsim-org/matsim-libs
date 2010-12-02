@@ -35,8 +35,6 @@ public interface Plan extends MatsimPopulationObject, Customizable {
 
 	public boolean isSelected();
 
-	public void setSelected(boolean selected);
-
 	public void setScore(Double score);
 
 	public Double getScore();

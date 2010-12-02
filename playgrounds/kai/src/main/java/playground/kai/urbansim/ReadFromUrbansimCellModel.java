@@ -163,7 +163,6 @@ public class ReadFromUrbansimCellModel implements ReadFromUrbansim {
 					population.addPerson(person) ;
 
 					PlanImpl plan = person.createAndAddPlan(true);
-					plan.setSelected(true) ;
 					Utils.makeHomePlan(plan, homeCoord) ;
 
 					if ( ii<nWorkers ) {

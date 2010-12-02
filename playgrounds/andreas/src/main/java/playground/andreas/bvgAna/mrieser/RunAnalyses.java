@@ -566,6 +566,56 @@ public class RunAnalyses {
 			}
 		}
 
+		// aggregation
+		int aggregateSize = 100; // 100m x 100m blocks
+		Map<Tuple<Integer, Integer>, Integer> fromBlockCnt = new HashMap<Tuple<Integer, Integer>, Integer>();
+		Map<Tuple<Integer, Integer>, Integer> toBlockCnt = new HashMap<Tuple<Integer, Integer>, Integer>();
+		for (List<AgentTripData> list : agentData.values()) {
+			for (AgentTripData data : list) {
+				if (data.fromActCoord != null) {
+					Tuple<Integer, Integer> blockId = new Tuple<Integer, Integer>((int) data.fromActCoord.getX() / aggregateSize, (int) data.fromActCoord.getY() / aggregateSize);
+					Integer blockCnt = fromBlockCnt.get(blockId);
+					if (blockCnt == null) {
+						fromBlockCnt.put(blockId, 1);
+					} else {
+						fromBlockCnt.put(blockId, blockCnt.intValue() + 1);
+					}
+				}
+				if (data.toActCoord != null) {
+					Tuple<Integer, Integer> blockId = new Tuple<Integer, Integer>((int) data.toActCoord.getX() / aggregateSize, (int) data.toActCoord.getY() / aggregateSize);
+					Integer blockCnt = toBlockCnt.get(blockId);
+					if (blockCnt == null) {
+						toBlockCnt.put(blockId, 1);
+					} else {
+						toBlockCnt.put(blockId, blockCnt.intValue() + 1);
+					}
+				}
+			}
+		}
+		Set<Tuple<Integer, Integer>> keySet = new HashSet<Tuple<Integer, Integer>>(fromBlockCnt.keySet());
+		keySet.addAll(toBlockCnt.keySet());
+		System.out.println();
+		System.out.println();
+		System.out.println();
+		System.out.println("BlockX\tBlockY\tfromCount\ttoCount");
+		for (Tuple<Integer, Integer> t : keySet) {
+			System.out.print(t.getFirst() * aggregateSize + aggregateSize * 0.5 + "\t" + (t.getSecond() * aggregateSize + aggregateSize * 0.5) + "\t");
+			Integer cnt = fromBlockCnt.get(t);
+			if (cnt == null) {
+				System.out.print("0");
+			} else {
+				System.out.print(cnt.intValue());
+			}
+			System.out.print("\t");
+			cnt = toBlockCnt.get(t);
+			if (cnt == null) {
+				System.out.print("0");
+			} else {
+				System.out.print(cnt.intValue());
+			}
+			System.out.println();
+		}
+
 	}
 
 	private static class AgentTripData {
