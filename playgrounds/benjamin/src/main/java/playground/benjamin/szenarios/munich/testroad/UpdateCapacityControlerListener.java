@@ -44,85 +44,83 @@ import org.matsim.core.controler.listener.StartupListener;
 public class UpdateCapacityControlerListener implements StartupListener, IterationEndsListener, ShutdownListener {
 
 	private TravelTimeEventHandler eventHandler;
-	private SortedMap<Double, Double> activityEndTimes2travelTimesPerIteration = new TreeMap<Double, Double>();
-	private SortedMap<Integer, SortedMap<Double, Double>> tableTotal = new TreeMap<Integer, SortedMap<Double, Double>>();
+	private SortedMap<Id, Double> personId2travelTimesPerIteration = new TreeMap<Id, Double>();
+	private SortedMap<Integer, SortedMap<Id, Double>> travelTimes = new TreeMap<Integer, SortedMap<Id, Double>>();
+	private SortedMap<Id, Double> personId2enterTimesPerIteration = new TreeMap<Id, Double>();
+	private SortedMap<Integer, SortedMap<Id, Double>> enterTimes = new TreeMap<Integer, SortedMap<Id, Double>>();
+	
 	private Scenario scenario;
 	private Integer capacity;
-	private Id linkId;
-	private Id testVehicleActivityLinkId;
+	private Id linkLeaveId;
+	private Id linkEnterId;
 	private Integer stepSize;
 
-	public UpdateCapacityControlerListener(Scenario scenario, String linkId, String testVehicleActivityLinkId, int startCapacity, int stepSize) {
+	public UpdateCapacityControlerListener(Scenario scenario, String linkLeaveId, String linkEnterId, int startCapacity, int stepSize) {
 		this.scenario = scenario;
-		this.linkId = scenario.createId(linkId);
-		this.testVehicleActivityLinkId = scenario.createId(testVehicleActivityLinkId);
+		this.linkLeaveId = scenario.createId(linkLeaveId);
+		this.linkEnterId = scenario.createId(linkEnterId);
 		this.capacity = startCapacity;
 		this.stepSize = stepSize;
 	}
 
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		this.eventHandler = new TravelTimeEventHandler(activityEndTimes2travelTimesPerIteration, linkId, testVehicleActivityLinkId);
+		this.eventHandler = new TravelTimeEventHandler(personId2travelTimesPerIteration, personId2enterTimesPerIteration, linkLeaveId, linkEnterId);
 		event.getControler().getEvents().addHandler(this.eventHandler);
 		
-		Link link = scenario.getNetwork().getLinks().get(this.linkId);
+		Link link = scenario.getNetwork().getLinks().get(this.linkLeaveId);
 		link.setCapacity(this.capacity);
 	}
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
-		writeTravelTimes(this.activityEndTimes2travelTimesPerIteration);
-		addTravelTimesToTableTotal(this.activityEndTimes2travelTimesPerIteration);
-		this.activityEndTimes2travelTimesPerIteration.clear();
+//		writeTravelTimes(this.personId2travelTimesPerIteration);
+		addTravelTimesToTable(this.personId2travelTimesPerIteration);
+		this.personId2travelTimesPerIteration.clear();
+		
+		addEnterTimesToTable(this.personId2enterTimesPerIteration);
+		this.personId2enterTimesPerIteration.clear();
 		
 		capacity = this.capacity + this.stepSize;
-		Link link = scenario.getNetwork().getLinks().get(this.linkId);
+		Link link = scenario.getNetwork().getLinks().get(this.linkLeaveId);
 		link.setCapacity(capacity);
 	}
 
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {
-		writeAllTravelTimes(this.tableTotal);
+		writeTable(this.travelTimes, "x_travelTimes");
+		writeTable(this.enterTimes, "x_enterTimes");
 	}
 
-	private void addTravelTimesToTableTotal(SortedMap<Double, Double> activityEndTimes2travelTimesPerIteration) {
-		SortedMap<Double, Double> temp = new TreeMap<Double, Double>();
-			for(Double activityEndTime : activityEndTimes2travelTimesPerIteration.keySet()){
-				Double travelTime = activityEndTimes2travelTimesPerIteration.get(activityEndTime);
-				
-				temp.put(activityEndTime , travelTime);
-			}
-			tableTotal.put(capacity, temp);
-	}
-
-	private void writeTravelTimes(SortedMap<Double, Double> activityEndTimes2travelTimes) {
-		String outputPath = this.scenario.getConfig().controler().getOutputDirectory();
-		
-		try {
-			BufferedWriter bw = new BufferedWriter(new FileWriter(new File(outputPath + "/travelTimes_cap_" + capacity + ".txt")));
-			bw.write("activityEndTime \t travelTime");
-			bw.newLine();
-			for(Double dd : activityEndTimes2travelTimes.keySet()) {
-				bw.write(dd + "\t" + activityEndTimes2travelTimes.get(dd));
-				bw.newLine();
-			}
-			bw.close();
+	private void addEnterTimesToTable(SortedMap<Id, Double> personId2enterTimesPerIteration) {
+		SortedMap<Id, Double> temp = new TreeMap<Id, Double>();
+		for(Id personId : personId2enterTimesPerIteration.keySet()){
+			Double enterTime = personId2enterTimesPerIteration.get(personId);
 			
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			temp.put(personId , enterTime);
 		}
+		enterTimes.put(capacity, temp);
 	}
 
-	private void writeAllTravelTimes(SortedMap<Integer, SortedMap<Double, Double>> tableTotal) {
-		String outputPath = this.scenario.getConfig().controler().getOutputDirectory();
+	private void addTravelTimesToTable(SortedMap<Id, Double> personId2travelTimesPerIteration) {
+		SortedMap<Id, Double> temp = new TreeMap<Id, Double>();
+			for(Id personId : personId2travelTimesPerIteration.keySet()){
+				Double travelTime = personId2travelTimesPerIteration.get(personId);
+				
+				temp.put(personId , travelTime);
+			}
+			travelTimes.put(capacity, temp);
+	}
+
+	private void writeTable(SortedMap<Integer, SortedMap<Id, Double>> table, String outputName) {
+		String outputPath = this.scenario.getConfig().controler().getOutputDirectory() + "/";
 
 		try {
-			BufferedWriter bw = new BufferedWriter(new FileWriter(new File(outputPath + "/travelTimes" + ".txt")));
+			BufferedWriter bw = new BufferedWriter(new FileWriter(new File(outputPath + outputName + ".txt")));
 			//header
-			bw.write("activityEndTime" + "\t");
-			for(int iteration : tableTotal.keySet()){
-				if(iteration == tableTotal.lastKey()){
+			bw.write("personId" + "\t");
+			for(int iteration : table.keySet()){
+				if(iteration == table.lastKey()){
 					bw.write("cap" + iteration);
 				}
 				else{
@@ -132,16 +130,16 @@ public class UpdateCapacityControlerListener implements StartupListener, Iterati
 			bw.newLine();
 			
 			//fill with values
-			SortedMap<Double, Double> firstCapacity = tableTotal.get(tableTotal.firstKey());
-			for(Double activityEndTime : firstCapacity.keySet()){
-				bw.write(activityEndTime + "\t");
-				for(int iteration : tableTotal.keySet()){
-					Double travelTime = tableTotal.get(iteration).get(activityEndTime);
-					if(iteration == tableTotal.lastKey()){
-						bw.write(travelTime.toString());
+			SortedMap<Id, Double> firstCapacity = table.get(table.firstKey());
+			for(Id personId : firstCapacity.keySet()){
+				bw.write(personId + "\t");
+				for(int iteration : table.keySet()){
+					Double time = table.get(iteration).get(personId);
+					if(iteration == table.lastKey()){
+						bw.write(time.toString());
 					}
 					else{
-						bw.write(travelTime + "\t");
+						bw.write(time + "\t");
 					}
 				}
 				bw.newLine();
@@ -155,3 +153,23 @@ public class UpdateCapacityControlerListener implements StartupListener, Iterati
 
 	}		
 }
+
+
+//private void writeTravelTimes(SortedMap<Id, Double> personId2travelTimes) {
+//String outputPath = this.scenario.getConfig().controler().getOutputDirectory();
+//
+//try {
+//	BufferedWriter bw = new BufferedWriter(new FileWriter(new File(outputPath + "/travelTimes_cap_" + capacity + ".txt")));
+//	bw.write("personId \t travelTime");
+//	bw.newLine();
+//	for(Id personId : personId2travelTimes.keySet()) {
+//		bw.write(personId + "\t" + personId2travelTimes.get(personId));
+//		bw.newLine();
+//	}
+//	bw.close();
+//	
+//} catch (IOException e) {
+//	// TODO Auto-generated catch block
+//	e.printStackTrace();
+//}
+//}

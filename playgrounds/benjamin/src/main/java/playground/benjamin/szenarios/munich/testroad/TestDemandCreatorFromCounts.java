@@ -56,22 +56,25 @@ public class TestDemandCreatorFromCounts {
 	static String day1 = "20090707";
 	static String day2 = "20090708";
 	static String day3 = "20090709";
+	
+	static String lane1 = "4006013";
+	static String lane2 = "4006014";
 
 
 	public static void main(String[] args) {
 
 		//instancing one population for every day
-		Population pop1 = generatePopulation(countsPath + day1 + "/");
-		Population pop2 = generatePopulation(countsPath + day2 + "/");
-		Population pop3 = generatePopulation(countsPath + day3 + "/");
+		Population pop1 = generatePopulation(countsPath + day1 + "/" + lane1 + ".txt", countsPath + day1 + "/" + lane2 + ".txt");
+		Population pop2 = generatePopulation(countsPath + day2 + "/" + lane1 + ".txt", countsPath + day2 + "/" + lane2 + ".txt");
+		Population pop3 = generatePopulation(countsPath + day3 + "/" + lane1 + ".txt", countsPath + day3 + "/" + lane2 + ".txt");
 		
 		fuzzifyTimes(pop1);
 		fuzzifyTimes(pop1);
 		fuzzifyTimes(pop1);
 		
-		addTestVehicle(pop1, testVehiclePath + day1 + "_departureTimes.txt");
-		addTestVehicle(pop2, testVehiclePath + day2 + "_departureTimes.txt");
-		addTestVehicle(pop3, testVehiclePath + day3 + "_departureTimes.txt");		
+		addTestVehicle(pop1, testVehiclePath + day1 + "_inflowTimes.txt");
+		addTestVehicle(pop2, testVehiclePath + day2 + "_inflowTimes.txt");
+		addTestVehicle(pop3, testVehiclePath + day3 + "_inflowTimes.txt");		
 		
 		writePlans(pop1, day1);
 		writePlans(pop2, day2);
@@ -85,8 +88,8 @@ public class TestDemandCreatorFromCounts {
 	private static void addTestVehicle(Population population, String dayFile) {
 		Scenario sc = new ScenarioImpl();
 
-		List<Integer> departureTimes = getTestVehicleDepartureTimes(dayFile);
-		for(int time : departureTimes){
+		List<Integer> inflowTimes = getTestVehicleInflowTimes(dayFile);
+		for(int time : inflowTimes){
 			Id personId = sc.createId(time + "testVehicle");
 			Person person = population.getFactory().createPerson(personId);
 			Plan plan = population.getFactory().createPlan();
@@ -94,11 +97,12 @@ public class TestDemandCreatorFromCounts {
 
 			String actTypeHome = "h";
 			String actTypeWork = "h";
-			Id linkIdHome = sc.createId("52902684");
+			Id linkIdHome = sc.createId("52799702");
 			Id linkIdWork = sc.createId("52799758");
 
 			Activity home = population.getFactory().createActivityFromLinkId(actTypeHome, linkIdHome);
-			home.setEndTime(time);
+			// endTime needs to be set as follows (if my calculation is right :))
+			home.setEndTime(time - 12);
 			plan.addActivity(home);
 
 			Leg leg = population.getFactory().createLeg(TransportMode.car);
@@ -115,8 +119,8 @@ public class TestDemandCreatorFromCounts {
 	 * @param dayFile
 	 * @return
 	 */
-	private static List<Integer> getTestVehicleDepartureTimes(String dayFile) {
-		final List<Integer> departureTimes = new ArrayList<Integer>();
+	private static List<Integer> getTestVehicleInflowTimes(String dayFile) {
+		final List<Integer> inflowTimes = new ArrayList<Integer>();
 		
 		TabularFileParserConfig tabFileParserConfig = new TabularFileParserConfig();
 		tabFileParserConfig.setFileName(dayFile);
@@ -141,14 +145,14 @@ public class TestDemandCreatorFromCounts {
 					Integer minutes = new Integer(row[MINUTES]);
 					Integer seconds = new Integer(row[SECONDS]);
 					Integer departureTimeInSeconds = 60 * 60 * hours + 60 * minutes + seconds;
-					departureTimes.add(departureTimeInSeconds);
+					inflowTimes.add(departureTimeInSeconds);
 				}
 			});
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return departureTimes;
+		return inflowTimes;
 	}
 
 	/**
@@ -165,17 +169,16 @@ public class TestDemandCreatorFromCounts {
 
 	/**
 	 * @param dayPath
+	 * @param laneFile2 
+	 * @param laneFile1 
 	 * @return
 	 */
-	private static Population generatePopulation(String dayPath) {
+	private static Population generatePopulation(String laneFile1, String laneFile2) {
 		Scenario sc = new ScenarioImpl();
 		Population population = sc.getPopulation();
 
-		String lane1 = dayPath + "4006013.txt";
-		String lane2 = dayPath + "4006014.txt";
-
-		SortedMap<Integer, Double> endTime2NoOfVehiclesLane1 = getEndTime2NoOfVehicles(lane1);
-		SortedMap<Integer, Double> endTime2NoOfVehiclesLane2 = getEndTime2NoOfVehicles(lane2);
+		SortedMap<Integer, Double> endTime2NoOfVehiclesLane1 = getEndTime2NoOfVehicles(laneFile1);
+		SortedMap<Integer, Double> endTime2NoOfVehiclesLane2 = getEndTime2NoOfVehicles(laneFile2);
 		SortedMap<Integer, Double> aggregatedEndTime2NoOfVehicles = aggregateVehicles(endTime2NoOfVehiclesLane1, endTime2NoOfVehiclesLane2);
 
 		for(Entry<Integer, Double> entry : aggregatedEndTime2NoOfVehicles.entrySet()){
@@ -240,11 +243,11 @@ public class TestDemandCreatorFromCounts {
 	 * @param lane
 	 * @return
 	 */
-	private static SortedMap<Integer, Double> getEndTime2NoOfVehicles(String lane) {
+	private static SortedMap<Integer, Double> getEndTime2NoOfVehicles(String laneFile) {
 		final SortedMap<Integer, Double> EndTime2NoOfVehicles = new TreeMap<Integer, Double>();
 
 		TabularFileParserConfig tabFileParserConfig = new TabularFileParserConfig();
-		tabFileParserConfig.setFileName(lane);
+		tabFileParserConfig.setFileName(laneFile);
 		tabFileParserConfig.setDelimiterTags(new String[] {";"});
 		tabFileParserConfig.setCommentTags(new String[] {"#"});
 		

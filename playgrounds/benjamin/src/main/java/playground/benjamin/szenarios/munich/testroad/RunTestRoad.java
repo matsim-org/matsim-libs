@@ -34,8 +34,8 @@ public class RunTestRoad {
 		int day1 = 20090707;
 		int day2 = 20090708;
 		int day3 = 20090709;
-		String linkId = "590000822";
-		String testVehicleActivityLinkId = "52902684";
+		String linkLeaveId = "590000822";
+		String linkEnterId = "592536888";
 		int startCapacity = 1200;
 		int stepSize = 50;
 		
@@ -55,7 +55,7 @@ public class RunTestRoad {
 			Controler controler = new Controler(config);
 			controler.setOverwriteFiles(true);
 			Scenario scenario = controler.getScenario();
-			controler.addControlerListener(new UpdateCapacityControlerListener(scenario, linkId, testVehicleActivityLinkId, startCapacity, stepSize));
+			controler.addControlerListener(new UpdateCapacityControlerListener(scenario, linkLeaveId, linkEnterId, startCapacity, stepSize));
 			controler.run();
 		}
 	}
