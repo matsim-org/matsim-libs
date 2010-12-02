@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.events.parallelEventsHandler.ParallelEventsManagerImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PersonAgent;
@@ -43,6 +44,7 @@ import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.ptproject.qsim.interfaces.Mobsim;
 
 import playground.christoph.events.algorithms.FixedOrderQueueSimulationListener;
+import playground.christoph.events.parallelEventsHandler.SimStepParallelEventsManagerImpl;
 import playground.christoph.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
 import playground.christoph.scoring.OnlyTimeDependentScoringFunctionFactory;
 import playground.christoph.withinday.mobsim.DuringActivityReplanningModule;
@@ -96,12 +98,12 @@ public class WithinDayControler extends Controler {
 	 */
 	protected double pInitialReplanning = 0.0;
 	protected double pActEndReplanning = 1.0;
-	protected double pLeaveLinkReplanning = 0.0;
+	protected double pLeaveLinkReplanning = 1.0;
 
 	/*
 	 * How many parallel Threads shall do the Replanning.
 	 */
-	protected int numReplanningThreads = 6;
+	protected int numReplanningThreads = 2;
 
 	protected PersonalizableTravelTime travelTime;
 
@@ -172,13 +174,19 @@ public class WithinDayControler extends Controler {
 		this.initialReplanner.addAgentsToReplanIdentifier(this.initialIdentifier);
 		this.parallelInitialReplanner.addWithinDayReplanner(this.initialReplanner);
 
-		ActivityReplanningMap activityReplanningMap = new ActivityReplanningMap(this.getEvents(), this.getQueueSimulationListener());
+//		ActivityReplanningMap activityReplanningMap = new ActivityReplanningMap(this.getEvents(), this.getQueueSimulationListener());
+//		ActivityReplanningMap activityReplanningMap = new ActivityReplanningMap(this.getEvents(), sim);
+		ActivityReplanningMap activityReplanningMap = new ActivityReplanningMap(this.getEvents());
+		foqsl.addQueueSimulationListener(activityReplanningMap);
 		this.duringActivityIdentifier = new ActivityEndIdentifierFactory(activityReplanningMap).createIdentifier();
 		this.duringActivityReplanner = new NextLegReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
 		this.duringActivityReplanner.addAgentsToReplanIdentifier(this.duringActivityIdentifier);
 		this.parallelActEndReplanner.addWithinDayReplanner(this.duringActivityReplanner);
 
-		LinkReplanningMap linkReplanningMap = new LinkReplanningMap(this.getEvents(), this.getQueueSimulationListener());
+//		LinkReplanningMap linkReplanningMap = new LinkReplanningMap(this.getEvents(), this.getQueueSimulationListener());
+//		LinkReplanningMap linkReplanningMap = new LinkReplanningMap(this.getEvents(), sim);
+		LinkReplanningMap linkReplanningMap = new LinkReplanningMap(this.getEvents());
+		foqsl.addQueueSimulationListener(linkReplanningMap);
 		this.duringLegIdentifier = new LeaveLinkIdentifierFactory(linkReplanningMap).createIdentifier();
 		this.duringLegReplanner = new CurrentLegReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
 		this.duringLegReplanner.addAgentsToReplanIdentifier(this.duringLegIdentifier);
@@ -205,6 +213,22 @@ public class WithinDayControler extends Controler {
 	}
 
 	@Override
+	protected void setUp() {
+		/*
+		 * SimStepParallelEventsManagerImpl might be moved to org.matsim.
+		 * Then this piece of code could be placed in the controller.
+		 */
+		if (this.events instanceof ParallelEventsManagerImpl) {
+			log.info("Replacing ParallelEventsManagerImpl with SimStepParallelEventsManagerImpl. This is needed for Within-Day Replanning.");
+			SimStepParallelEventsManagerImpl manager = new SimStepParallelEventsManagerImpl();
+			this.foqsl.addQueueSimulationAfterSimStepListener(manager);
+			this.events = manager;
+		}
+		
+		super.setUp();
+	}
+	
+	@Override
 	protected void runMobSim() {
 		createHandlersAndListeners();
 
@@ -221,7 +245,7 @@ public class WithinDayControler extends Controler {
 		foqsl.addQueueSimulationBeforeSimStepListener(replanningManager);
 
 		sim.addQueueSimulationListeners(foqsl);
-
+		
 		log.info("Initialize Parallel Replanning Modules");
 		initParallelReplanningModules();
 

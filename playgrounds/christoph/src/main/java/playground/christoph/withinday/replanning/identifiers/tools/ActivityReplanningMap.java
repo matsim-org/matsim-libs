@@ -44,7 +44,6 @@ import org.matsim.core.mobsim.framework.events.SimulationAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationAfterSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
-import org.matsim.core.mobsim.framework.listeners.SimulationListener;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.interfaces.Mobsim;
 
@@ -77,20 +76,33 @@ public class ActivityReplanningMap implements AgentStuckEventHandler,
 	 */
 	private Map<Id, PersonAgent> personAgentMapping;	// PersonId, PersonDriverAgent
 
-	public ActivityReplanningMap() {
-		log.warn("ActivityReplanningMap is initialized with empty constructor. " +
-				"Please ensure that it is added as Handler to an EventsManager and as Listener to " +
-				"a ObserableSimulation!");
+//	public ActivityReplanningMap() {
+//		log.warn("ActivityReplanningMap is initialized with empty constructor. " +
+//				"Please ensure that it is added as Handler to an EventsManager and as Listener to " +
+//				"a ObserableSimulation!");
+//		init();
+//	}
+	
+	// simulationListeners... the List used in the Controller!
+//	public ActivityReplanningMap(EventsManager eventsManager, List<SimulationListener> simulationListeners) {
+//		eventsManager.addHandler(this);
+//		simulationListeners.add(this);
+//		init();
+//	}
+
+	public ActivityReplanningMap(EventsManager eventsManager) {
+		log.warn("ActivityReplanningMap is initialized without a MobSim. " +
+				"Please ensure that it is added as a Listener to an ObserableSimulation!");
+		eventsManager.addHandler(this);
 		init();
 	}
 	
-	// simulationListeners... the List used in the Controller!
-	public ActivityReplanningMap(EventsManager eventsManager, List<SimulationListener> simulationListeners) {
+	public ActivityReplanningMap(EventsManager eventsManager, Mobsim mobsim) {
 		eventsManager.addHandler(this);
-		simulationListeners.add(this);
+		mobsim.addQueueSimulationListeners(this);
 		init();
 	}
-
+	
 	private void init() {
 		this.personAgentMapping = new TreeMap<Id, PersonAgent>();
 		this.replanningSet = new TreeSet<Id>();
@@ -107,7 +119,7 @@ public class ActivityReplanningMap implements AgentStuckEventHandler,
 	 */
 	@Override
 	public void notifySimulationInitialized(SimulationInitializedEvent e) {
-
+		
 		Mobsim sim = (Mobsim) e.getQueueSimulation();
 
 		personAgentMapping = new HashMap<Id, PersonAgent>();
@@ -117,6 +129,9 @@ public class ActivityReplanningMap implements AgentStuckEventHandler,
 				if (mobsimAgent instanceof PersonAgent) {
 					PersonAgent personAgent = (PersonAgent) mobsimAgent;
 					personAgentMapping.put(personAgent.getId(), personAgent);
+					
+					// mark the agent as currently performing an Activity
+					replanningSet.add(((PersonAgent) mobsimAgent).getId());
 				}
 			}
 		}

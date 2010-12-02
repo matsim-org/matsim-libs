@@ -25,6 +25,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -67,6 +68,9 @@ public class EditRoutes {
 		Activity toActivity = (Activity) plan.getPlanElements().get(legPlanElementIndex + 1);
 		
 		Route oldRoute = leg.getRoute();
+		
+		// if the route type is not supported (e.g. because it is a walking agent)
+		if (!(oldRoute instanceof NetworkRoute)) return false;
 		
 		if (oldRoute != null) {
 			// Update the startLinkId if it has changed.
@@ -144,6 +148,7 @@ public class EditRoutes {
 			leg = (Leg) planElement;
 		} else return false;
 
+		
 		// yyyy I can't say how safe this is.  There is no guarantee that the same entry is not used twice in the plan.  This will in
 		// particular be a problem if we override the "equals" contract, in the sense that two activities are equal if
 		// certain (or all) elements are equal.  kai, oct'10
@@ -153,6 +158,9 @@ public class EditRoutes {
 		Activity toActivity = (Activity) plan.getPlanElements().get(legPlanElementIndex + 1);
 
 		Route oldRoute = leg.getRoute();
+		
+		// if the route type is not supported (e.g. because it is a walking agent)
+		if (!(oldRoute instanceof NetworkRoute)) return false;
 		
 		/*
 		 *  Get the Id of the current Link.

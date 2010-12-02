@@ -28,6 +28,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.events.parallelEventsHandler.ParallelEventsManagerImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimFactory;
@@ -59,6 +60,7 @@ import playground.christoph.evacuation.withinday.replanning.replanners.CurrentLe
 import playground.christoph.evacuation.withinday.replanning.replanners.EndActivityAndEvacuateReplannerFactory;
 import playground.christoph.evacuation.withinday.replanning.replanners.ExtendCurrentActivityReplannerFactory;
 import playground.christoph.events.algorithms.FixedOrderQueueSimulationListener;
+import playground.christoph.events.parallelEventsHandler.SimStepParallelEventsManagerImpl;
 import playground.christoph.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
 import playground.christoph.scoring.OnlyTimeDependentScoringFunctionFactory;
 import playground.christoph.withinday.mobsim.DuringActivityReplanningModule;
@@ -230,7 +232,10 @@ public class EvacuationControler extends MultiModalControler {
 		/*
 		 * Create ActivityReplanningMap here and reuse it for both duringActivityReplanners!
 		 */
-		ActivityReplanningMap activityReplanningMap = new ActivityReplanningMap(this.getEvents(), this.getQueueSimulationListener());
+//		ActivityReplanningMap activityReplanningMap = new ActivityReplanningMap(this.getEvents(), this.getQueueSimulationListener());
+//		ActivityReplanningMap activityReplanningMap = new ActivityReplanningMap(this.getEvents(), sim);
+		ActivityReplanningMap activityReplanningMap = new ActivityReplanningMap(this.getEvents());
+		foqsl.addQueueSimulationListener(activityReplanningMap);
 
 		this.duringSecureActivityIdentifier = new SecureActivityPerformingIdentifierFactory(activityReplanningMap, EvacuationConfig.centerCoord, EvacuationConfig.innerRadius).createIdentifier();
 		this.duringSecureActivityReplanner = new ExtendCurrentActivityReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
@@ -247,7 +252,10 @@ public class EvacuationControler extends MultiModalControler {
 		/*
 		 * Create LegReplanningMap here and reuse it for all three duringLegReplanners!
 		 */
-		LinkReplanningMap linkReplanningMap = new LinkReplanningMap(this.getEvents(), this.getQueueSimulationListener());
+//		LinkReplanningMap linkReplanningMap = new LinkReplanningMap(this.getEvents(), this.getQueueSimulationListener());
+//		LinkReplanningMap linkReplanningMap = new LinkReplanningMap(this.getEvents(), sim);
+		LinkReplanningMap linkReplanningMap = new LinkReplanningMap(this.getEvents());
+		foqsl.addQueueSimulationListener(linkReplanningMap);
 
 		this.duringSecureLegIdentifier = new SecureLegPerformingIdentifierFactory(linkReplanningMap, network, EvacuationConfig.centerCoord, EvacuationConfig.innerRadius).createIdentifier();
 		this.duringSecureLegReplanner = new CurrentLegToSecureFacilityReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
@@ -289,6 +297,17 @@ public class EvacuationControler extends MultiModalControler {
 
 	@Override
 	protected void setUp() {
+		/*
+		 * SimStepParallelEventsManagerImpl might be moved to org.matsim.
+		 * Then this piece of code could be placed in the controller.
+		 */
+		if (this.events instanceof ParallelEventsManagerImpl) {
+			log.info("Replacing ParallelEventsManagerImpl with SimStepParallelEventsManagerImpl. This is needed for Within-Day Replanning.");
+			SimStepParallelEventsManagerImpl manager = new SimStepParallelEventsManagerImpl();
+			this.foqsl.addQueueSimulationAfterSimStepListener(manager);
+			this.events = manager;
+		}
+		
 		super.setUp();
 
 		createHandlersAndListeners();

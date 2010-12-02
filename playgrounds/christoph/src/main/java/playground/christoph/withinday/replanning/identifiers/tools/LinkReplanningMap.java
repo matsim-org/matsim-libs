@@ -46,7 +46,6 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
-import org.matsim.core.mobsim.framework.listeners.SimulationListener;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.ptproject.qsim.QSim;
@@ -90,16 +89,28 @@ public class LinkReplanningMap implements LinkEnterEventHandler,
 	private Map<Id, Tuple<Id, Double>> replanningMap;	// PersonId, Tuple<LinkId, ReplanningTime>
 
 	// simulationListeners... the List used in the Controller!
-	public LinkReplanningMap(EventsManager eventsManager, List<SimulationListener> simulationListeners) {
+//	public LinkReplanningMap(EventsManager eventsManager, List<SimulationListener> simulationListeners) {
+//		eventsManager.addHandler(this);
+//		simulationListeners.add(this);
+//		init();
+//	}
+	
+	public LinkReplanningMap(EventsManager eventsManager) {
+		log.warn("LinkReplanningMap is initialized without a MobSim. " +
+			"Please ensure that it is added as a Listener to an ObserableSimulation!");
 		eventsManager.addHandler(this);
-		simulationListeners.add(this);
+		init();
+	}
+	
+	public LinkReplanningMap(EventsManager eventsManager, Mobsim sim) {
+		eventsManager.addHandler(this);
+		sim.addQueueSimulationListeners(this);
 		init();
 	}
 	
 	private void init() {
 		this.replanningMap = new HashMap<Id, Tuple<Id, Double>>();
 	}
-
 
 	@Override
 	public void notifySimulationInitialized(SimulationInitializedEvent e) {

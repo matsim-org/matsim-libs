@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007, 2008 by the members listed in the COPYING,  *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -29,17 +29,15 @@ import org.matsim.core.events.EventImpl;
  */
 public class LastEventOfSimStep extends EventImpl {
 
+	public static final String EVENT_TYPE = "simstepend";
+	
 	public LastEventOfSimStep(final double time) {
 		super(time);
 	}
 
 	@Override
 	public String getEventType() {
-		return null;
-	}
-
-	public String getTextRepresentation() {
-		return "";
+		return EVENT_TYPE;
 	}
 
 }
