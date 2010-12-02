@@ -88,8 +88,8 @@ public abstract class Events2Score4PC extends EventsToScore implements
 		// stuck
 		attrNameList.add("stuck");
 		// distanceAttr
-		attrNameList.add("marginalUtlOfDistanceCar");
-		attrNameList.add("marginalUtlOfDistancePt");
+		attrNameList.add("monetaryDistanceCostRateCar");
+		attrNameList.add("monetaryDistanceCostRatePt");
 		attrNameList.add("marginalUtlOfDistanceWalk");
 		// LegOffsetAttr
 		attrNameList.add("offsetCar");

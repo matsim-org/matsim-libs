@@ -30,8 +30,12 @@ import org.matsim.core.scoring.charyparNagel.LegScoringFunction;
 public class LegScoringFunction4PC extends LegScoringFunction {
 
 	private double travTimeAttrCar/* [h] */= 0d, travTimeAttrPt/* [h] */= 0d,
-			travTimeAttrWalk/* [h] */= 0d, distanceAttrCar/* [m] */,
-			distanceAttrPt/* [m] */, distanceAttrWalk/* [m] */;
+			travTimeAttrWalk/* [h] */= 0d, distanceAttrCar/*
+														 * [m*utils/unit_of_money
+														 * ]
+														 */,
+			distanceAttrPt/* [m*utils/unit_of_money] */,
+			distanceAttrWalk/* [m] */;
 
 	private int carLegNo = 0, ptLegNo = 0, walkLegNo = 0;
 
@@ -104,7 +108,7 @@ public class LegScoringFunction4PC extends LegScoringFunction {
 		double dist = 0.0; // distance in meters
 
 		if (TransportMode.car.equals(leg.getMode())) {
-			if (params.marginalUtilityOfDistanceCar_m != 0.0) {
+			if (params.monetaryDistanceCostRateCar != 0.0) {
 				RouteWRefs route = (RouteWRefs) leg.getRoute();
 				dist = route.getDistance();
 				/*
@@ -118,24 +122,30 @@ public class LegScoringFunction4PC extends LegScoringFunction {
 				 * the agent.
 				 */
 			}
+			// distanceCar attr
+			distanceAttrCar += params.marginalUtilityOfMoney * dist;
 			tmpScore += travelTime * params.marginalUtilityOfTraveling_s
-					+ params.marginalUtilityOfDistanceCar_m * dist
+					+ params.monetaryDistanceCostRateCar * distanceAttrCar
 					+ CharyparNagelScoringFunctionFactory4PC.offsetCar;
 			// traveling attr
 			travTimeAttrCar += travelTime / 3600d;
+			// offsetCar attr
 			carLegNo++;
-			distanceAttrCar += dist;
+
 		} else if (TransportMode.pt.equals(leg.getMode())) {
-			if (params.marginalUtilityOfDistancePt_m != 0.0) {
+			if (params.monetaryDistanceCostRatePt != 0.0) {
 				dist = leg.getRoute().getDistance();
 			}
+			// distanceCar attr
+			distanceAttrPt += params.marginalUtilityOfMoney * dist;
 			tmpScore += travelTime * params.marginalUtilityOfTravelingPT_s
-					+ params.marginalUtilityOfDistancePt_m * dist
+					+ params.monetaryDistanceCostRatePt * distanceAttrPt
 					+ CharyparNagelScoringFunctionFactory4PC.offsetPt;
 			// travelingPt attr
 			travTimeAttrPt += travelTime / 3600d;
+			// offsetPt attr
 			ptLegNo++;
-			distanceAttrPt += dist;
+
 		} else if (TransportMode.walk.equals(leg.getMode())
 				|| TransportMode.transit_walk.equals(leg.getMode())) {
 			if (params.marginalUtilityOfDistanceWalk_m != 0.0) {
@@ -149,17 +159,20 @@ public class LegScoringFunction4PC extends LegScoringFunction {
 			walkLegNo++;
 			distanceAttrWalk += dist;
 		} else {// other mode?
-			if (params.marginalUtilityOfDistanceCar_m != 0.0) {
+			if (params.monetaryDistanceCostRateCar != 0.0) {
 				dist = leg.getRoute().getDistance();
 			}
+			// distanceCar attr
+			distanceAttrCar += params.marginalUtilityOfMoney * dist;
+
 			// use the same values as for "car"
 			tmpScore += travelTime * params.marginalUtilityOfTraveling_s
-					+ params.marginalUtilityOfDistanceCar_m * dist
+					+ params.monetaryDistanceCostRateCar * distanceAttrCar
 					+ CharyparNagelScoringFunctionFactory4PC.offsetCar;
 			// traveling attr
 			travTimeAttrCar += travelTime / 3600d;
+			// offsetCar attr
 			carLegNo++;
-			distanceAttrCar += dist;
 		}
 
 		return tmpScore;

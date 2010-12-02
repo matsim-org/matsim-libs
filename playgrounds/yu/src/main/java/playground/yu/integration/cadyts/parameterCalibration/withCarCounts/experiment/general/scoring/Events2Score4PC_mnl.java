@@ -181,9 +181,9 @@ public class Events2Score4PC_mnl extends Events2Score4PC implements
 
 				// distances
 				mnl.setAttribute(choiceIdx, attrNameList
-						.indexOf("marginalUtlOfDistanceCar"), distanceCar);
+						.indexOf("monetaryDistanceCostRateCar"), distanceCar);
 				mnl.setAttribute(choiceIdx, attrNameList
-						.indexOf("marginalUtlOfDistancePt"), distancePt);
+						.indexOf("monetaryDistanceCostRatePt"), distancePt);
 				mnl.setAttribute(choiceIdx, attrNameList
 						.indexOf("marginalUtlOfDistanceWalk"), distanceWalk);
 
@@ -299,12 +299,13 @@ public class Events2Score4PC_mnl extends Events2Score4PC implements
 					attrVector.set(attrNameList.indexOf("stuck"), stuckAttr);
 				}
 
-				else if (attrName.equals("marginalUtlOfDistanceCar")) {
+				else if (attrName.equals("monetaryDistanceCostRateCar")) {
 					attrVector.set(attrNameList
-							.indexOf("marginalUtlOfDistanceCar"), distanceCar);
-				} else if (attrName.equals("marginalUtlOfDistancePt")) {
+							.indexOf("monetaryDistanceCostRateCar"),
+							distanceCar);
+				} else if (attrName.equals("monetaryDistanceCostRatePt")) {
 					attrVector.set(attrNameList
-							.indexOf("marginalUtlOfDistancePt"), distancePt);
+							.indexOf("monetaryDistanceCostRatePt"), distancePt);
 				} else if (attrName.equals("marginalUtlOfDistanceWalk")) {
 					attrVector
 							.set(attrNameList
@@ -338,9 +339,9 @@ public class Events2Score4PC_mnl extends Events2Score4PC implements
 
 		CharyparNagelScoringConfigGroup scoring = config.charyparNagelScoring();
 		double traveling = scoring.getTraveling_utils_hr();
-		double betaStuck = Math.min(Math.min(scoring.getLateArrival_utils_hr(), scoring
-				.getEarlyDeparture_utils_hr()), Math
-				.min(traveling, scoring.getWaiting_utils_hr()));
+		double betaStuck = Math.min(Math.min(scoring.getLateArrival_utils_hr(),
+				scoring.getEarlyDeparture_utils_hr()), Math.min(traveling,
+				scoring.getWaiting_utils_hr()));
 
 		// initialize MultinomialLogit
 		MultinomialLogit mnl = new MultinomialLogit(choiceSetSize,// =4
@@ -365,14 +366,16 @@ public class Events2Score4PC_mnl extends Events2Score4PC implements
 		mnl.setCoefficient(attrNameList.indexOf("stuck"), betaStuck);
 
 		// distances
-		mnl.setCoefficient(attrNameList.indexOf("marginalUtlOfDistanceCar"),
-//				scoring.getMarginalUtlOfDistanceCar());
-				scoring.getMonetaryDistanceCostRateCar() * scoring.getMarginalUtilityOfMoney() ) ;
+		mnl.setCoefficient(attrNameList.indexOf("monetaryDistanceCostRateCar"),
+		// scoring.getMarginalUtlOfDistanceCar());
+				scoring.getMonetaryDistanceCostRateCar()
+						* scoring.getMarginalUtilityOfMoney());
 
-		mnl.setCoefficient(attrNameList.indexOf("marginalUtlOfDistancePt"),
-//				scoring.getMarginalUtlOfDistancePt());
-				scoring.getMonetaryDistanceCostRatePt() * scoring.getMarginalUtilityOfMoney() ) ;
-		
+		mnl.setCoefficient(attrNameList.indexOf("monetaryDistanceCostRatePt"),
+		// scoring.getMarginalUtlOfDistancePt());
+				scoring.getMonetaryDistanceCostRatePt()
+						* scoring.getMarginalUtilityOfMoney());
+
 		mnl.setCoefficient(attrNameList.indexOf("marginalUtlOfDistanceWalk"),
 				scoring.getMarginalUtlOfDistanceWalk());
 
