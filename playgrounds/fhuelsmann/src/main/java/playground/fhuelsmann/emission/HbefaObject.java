@@ -17,8 +17,13 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.fhuelsmann.emission; 
+/**
 
-package playground.fhuelsmann.emission;
+
+VehCat;Road_Category;IDTS;TS;S (speed);RPA;%stop;mKr;EF_Nox;EF_CO2(rep.);EF_CO2(total);NO2;PM
+
+**/
 public class HbefaObject {
 
 	private int Road_Category ;
@@ -26,19 +31,73 @@ public class HbefaObject {
 	private double velocity;
 	private double RPA;
 	private double stop;
-	private double emission_factor;
-	private double emissionFactorNox;
+	
+	
+	public double getMkr() {
+		return mkr;
+	}
+	public void setMkr(double mkr) {
+		this.mkr = mkr;
+	}
+	public double getNo2() {
+		return no2;
+	}
+	public void setNo2(double no2) {
+		this.no2 = no2;
+	}
+	public double getPm() {
+		return pm;
+	}
+	public void setPm(double pm) {
+		this.pm = pm;
+	}
 
-	public HbefaObject(int road_Category, String iDTS, double velocity,
-			double rPA, double stop, double emission_factor, double emissionFactorNox) {
-		super();
-		Road_Category = road_Category;
-		IDTS = iDTS;
-		this.velocity = velocity;
-		RPA = rPA;
-		this.stop = stop;
-		this.emission_factor = emission_factor;
+	public double getEmissionFactorCo2Rep() {
+		return emissionFactorCo2Rep;
+	}
+	public void setEmissionFactorCo2Rep(double emissionFactorCo2Rep) {
+		this.emissionFactorCo2Rep = emissionFactorCo2Rep;
+	}
+	public double getEmissionFactorCo2Total() {
+		return emissionFactorCo2Total;
+	}
+	public void setEmissionFactorCo2Total(double emissionFactorCo2Total) {
+		this.emissionFactorCo2Total = emissionFactorCo2Total;
+	}
+	
+	private double emissionFactorNox;
+	private double mkr;
+	private double emissionFactorCo2Rep;
+	private double emissionFactorCo2Total;
+	private double no2;
+	private double pm;
+	
+
+	public HbefaObject(
+			int road_Category, 
+			String iDTS, 
+			double velocity,
+			double rPA,
+			double stop, 
+			double mkr,
+			double emissionFactorNox,
+			double emissionFactorCo2Rep,
+			double emissionFactorCo2Total,
+			double NO2, 
+			double PM){
+		
+		this.Road_Category= road_Category;
+		this.IDTS= iDTS;
+		this.velocity= velocity;
+		this.RPA=rPA;
+		this.stop= stop;
+		this.mkr= mkr;
 		this.emissionFactorNox = emissionFactorNox;
+		this.emissionFactorCo2Rep = emissionFactorCo2Rep;
+		this.emissionFactorCo2Total = emissionFactorCo2Total;
+		this.no2 =NO2;
+		this.pm= PM;
+		
 	}
 	public double getEmissionFactorNox() {
 		return emissionFactorNox;
@@ -75,11 +134,4 @@ public class HbefaObject {
 	}
 	public void setStop(double stop) {
 		this.stop = stop;
-	}
-	public double getEmission_factor() {
-		return emission_factor;
-	}
-	public void setEmission_factor(double emission_factor) {
-		this.emission_factor = emission_factor;
-	}
-}
+	}}

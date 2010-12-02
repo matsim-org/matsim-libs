@@ -1,4 +1,4 @@
-
+package playground.fhuelsmann.emission;
  /* *********************************************************************** *
  * project: org.matsim.*
  * FhEmissions.java
@@ -20,8 +20,6 @@
  *                                                                         
  * *********************************************************************** */
 
-
-package playground.fhuelsmann.emission;
 import org.matsim.api.core.v01.Id;
 
 
@@ -32,59 +30,143 @@ public class SingleEvent {
 	private Id Link_id;
 	private double averageSpeed;
 	private double travelTime;
+	
+	
+	
 	private double enterTime;
 	private double linkLength;
 	private int Hbefa_Road_type;
-	private double emissionFactor;	
-	private double emissionFractions;	
 	private Id Visum_road_Section_Nr; //
 	private int freeVelocity;
 	private int  roadType;
 	
-	private double emissions;	
-	private double noxEmissions;
-	private double noxFractions;
 	
+	private double mKrBasedOnAverageSpeed;
+	private double mKrBasedOnFractions;
+	private double noxEmissionsBasedOnAverageSpeed;
+	private double noxEmissionsBasedOnFractions;
+	private double co2repEmissionsBasedOnAverageSpeed;
+	private double co2repEmissionsBasedOnFractions;
+	private double co2EmissionsBasedOnAverageSpeed;
+	private double co2EmissionsBasedOnFractions;
+	private double no2EmissionsBasedOnAverageSpeed;
+	private double no2EmissionsBasedOnFractions;
+	private double pmEmissionsBasedOnAverageSpeed;
+	private double pmEmissionsBasedOnFractions;
+	
+	
+	//mKr
+	public double getmKrBasedOnAverageSpeed() {
+		return mKrBasedOnAverageSpeed;
+	}
+	public void setmKrBasedOnAverageSpeed(double mKrBasedOnAverageSpeed) {
+		this.mKrBasedOnAverageSpeed = mKrBasedOnAverageSpeed;
+	}
+	
+	public double getmKrBasedOnFractions() {
+		return mKrBasedOnFractions;
+	}
+	public void setmKrBasedOnFractions(double mKrBasedOnFractions) {
+		this.mKrBasedOnFractions = mKrBasedOnFractions;
+	}
+	
+	//Nox
+	public double getNoxEmissionsBasedOnAverageSpeed() {
+		return noxEmissionsBasedOnAverageSpeed;
+	}
+	public void setNoxEmissionsBasedOnAverageSpeed(
+			double noxEmissionsBasedOnAverageSpeed) {
+		this.noxEmissionsBasedOnAverageSpeed = noxEmissionsBasedOnAverageSpeed;
+	}
+	
+	public double getNoxEmissionsBasedOnFractions() {
+		return noxEmissionsBasedOnFractions;
+	}
+	public void setNoxEmissionsBasedOnFractions(double noxEmissionsBasedOnFractions) {
+		this.noxEmissionsBasedOnFractions = noxEmissionsBasedOnFractions;
+	}
+	
+	// CO2 rep
+	public double getCO2repEmissionsBasedOnAverageSpeed() {
+		return co2repEmissionsBasedOnAverageSpeed;
+	}
+	public void setCO2repEmissionsBasedOnAverageSpeed(
+			double co2repEmissionsBasedOnAverageSpeed) {
+		this.co2repEmissionsBasedOnAverageSpeed = co2repEmissionsBasedOnAverageSpeed;
+	}
+	
+	public double getCO2repEmissionsBasedOnFractions() {
+		return co2repEmissionsBasedOnFractions;
+	}
+	public void setCO2repEmissionsBasedOnFractions(
+			double co2repEmissionsBasedOnFractions) {
+		this.co2repEmissionsBasedOnFractions = co2repEmissionsBasedOnFractions;
+	}
+	
+	//CO2 total
+	public double getCO2EmissionsBasedOnAverageSpeed() {
+		return co2EmissionsBasedOnAverageSpeed;
+	}
 
+	public void setCO2EmissionsBasedOnAverageSpeed(
+			double co2EmissionsBasedOnAverageSpeed) {
+		this.co2EmissionsBasedOnAverageSpeed = co2EmissionsBasedOnAverageSpeed;
+	}
+
+	public double getCO2EmissionsBasedOnFractions() {
+		return co2EmissionsBasedOnFractions;
+	}
+
+	public void setCO2EmissionsBasedOnFractions(double co2EmissionsBasedOnFractions) {
+		this.co2EmissionsBasedOnFractions = co2EmissionsBasedOnFractions;
+	}
+	
+	//NO2
+	public double getNo2EmissionsBasedOnAverageSpeed() {
+		return no2EmissionsBasedOnAverageSpeed;
+	}
+	public void setNo2EmissionsBasedOnAverageSpeed(
+			double no2EmissionsBasedOnAverageSpeed) {
+		this.no2EmissionsBasedOnAverageSpeed = no2EmissionsBasedOnAverageSpeed;
+	}
+	public double getNo2EmissionsBasedOnFractions() {
+		return no2EmissionsBasedOnFractions;
+	}
+	public void setNo2EmissionsBasedOnFractions(double no2EmissionsBasedOnFractions) {
+		this.no2EmissionsBasedOnFractions = no2EmissionsBasedOnFractions;
+	}
+	//PM
+	public double getPmEmissionsBasedOnAverageSpeed() {
+		return pmEmissionsBasedOnAverageSpeed;
+	}
+	public void setPmEmissionsBasedOnAverageSpeed(
+			double pmEmissionsBasedOnAverageSpeed) {
+		this.pmEmissionsBasedOnAverageSpeed = pmEmissionsBasedOnAverageSpeed;
+	}
+	public double getPmEmissionsBasedOnFractions() {
+		return pmEmissionsBasedOnFractions;
+	}
+	public void setPmEmissionsBasedOnFractions(double pmEmissionsBasedOnFractions) {
+		this.pmEmissionsBasedOnFractions = pmEmissionsBasedOnFractions;
+	}
+	
+	//FreeVelocity
 	public int getFreeVelocity() {
 		return freeVelocity;
 	}
-
 
 	public void setFreeVelocity(int freeVelocity) {
 		this.freeVelocity = freeVelocity;
 	}
 
-
+	//roadType
 	public int  getRoadType() {
 		return roadType;
 	}
 
-
 	public void setRoadType(int  roadType) {
 		this.roadType = roadType;
 	}
-
-
-	public double getNoxFractions() {
-		return noxFractions;
-	}
-
-
-	public void setNoxFractions(double noxFractions) {
-		this.noxFractions = noxFractions;
-	}
-
-
-	public double getNoxEmissions() {
-		return noxEmissions;
-	}
-
-
-	public void setNoxEmissions(double noxEmissions) {
-		this.noxEmissions = noxEmissions;
-	}
-
 
 	public Id getVisum_road_Section_Nr() {
 		return Visum_road_Section_Nr;
@@ -94,37 +176,6 @@ public class SingleEvent {
 	public void setVisum_road_Section_Nr(Id visum_road_Section_Nr) {
 		Visum_road_Section_Nr = visum_road_Section_Nr;
 	}
-	
-
-	public double getEmissions() {
-		return emissions;
-	}
-
-
-	public void setEmissions(double emissions) {
-		this.emissions = emissions;
-	}
-
-
-	public double getEmissionFactor() {
-		return emissionFactor;
-	}
-
-
-	public void setEmissionFactor(double emissionFactor) {
-		this.emissionFactor = emissionFactor;
-	}
-	
-
-	public double getEmissionFractions() {
-		return emissionFractions;
-	}
-
-
-	public void setEmissionFractions(double emissionFractions) {
-		this.emissionFractions= emissionFractions;
-	}
-
 
 	public int getHbefa_Road_type() {
 		return Hbefa_Road_type;
@@ -165,7 +216,6 @@ public class SingleEvent {
 		this.freeVelocity= freeVelocity;
 		this.roadType =visumRoadType;
 		this.Link_id= roadSectionNrId;
-		
 		
 	}
 	

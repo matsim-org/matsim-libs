@@ -18,7 +18,6 @@
  *                                                                         *
  *                                                                         
  * *********************************************************************** */
-
 package playground.fhuelsmann.emission;
 import java.io.BufferedReader;
 import java.io.DataInputStream;
@@ -62,11 +61,24 @@ public class HbefaTable {
 	    	while ((strLine = br.readLine()) != null)   {
 		    
 	    		//for all lines (whole text) we split the line to an array 
-		    	
+		  
+	    		
 		    	String[] array = strLine.split(";");
-		    	HbefaObject obj = new HbefaObject(Integer.parseInt(array[1])
-		    			, array[2], Double.parseDouble(array[4]), Double.parseDouble(array[5]),
-		    			Double.parseDouble(array[6]), Double.parseDouble(array[9]),Double.parseDouble(array[8])); 
+		    	HbefaObject obj = new HbefaObject(
+		    			Integer.parseInt(array[1]) //Road_Category
+		    			,array[2], //IDTS
+		    			Double.parseDouble(array[4]), //S (speed)
+		    			Double.parseDouble(array[5]), //RPA
+		    			Double.parseDouble(array[6]), //%stop
+		    			Double.parseDouble(array[7]), //mKr
+		    			Double.parseDouble(array[8]), //EF_Nox
+		    			Double.parseDouble(array[9]), //EF_CO2(rep.)
+		    			Double.parseDouble(array[10]),//EF_CO2(total)
+		    			Double.parseDouble(array[11]), //NO2
+		    			Double.parseDouble(array[12])); // PM
+		    	
+
+		    	
 		    	
 		    	int row = Integer.parseInt(array[1]);
 		    	

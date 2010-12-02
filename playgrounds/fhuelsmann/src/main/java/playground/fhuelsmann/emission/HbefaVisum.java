@@ -18,7 +18,6 @@
  *                                                                         *
  *                                                                         
  * *********************************************************************** */
-
 package playground.fhuelsmann.emission;
 import java.io.BufferedReader;
 import org.matsim.api.core.v01.Id;
@@ -105,10 +104,6 @@ public class HbefaVisum {
 	
 	public void printTable(){
 	
-		
-		
-		
-		 
 		for(Entry<Id, Map<Id, LinkedList<SingleEvent>>> LinkIdEntry : this.map.entrySet()){	 
 			 for (Iterator iter = LinkIdEntry.getValue().
 		    			entrySet().iterator(); iter.hasNext();) {

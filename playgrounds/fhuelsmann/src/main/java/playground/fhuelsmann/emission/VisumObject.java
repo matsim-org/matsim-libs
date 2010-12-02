@@ -18,7 +18,6 @@
  *                                                                         *
  *                                                                         
  * *********************************************************************** */
-
 package playground.fhuelsmann.emission;
 public class VisumObject {
 
