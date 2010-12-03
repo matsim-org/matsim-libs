@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package org.matsim.signalsystems.mobsim;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.framework.events.SimulationBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
@@ -38,6 +39,8 @@ import org.matsim.signalsystems.model.SignalSystemsManager;
  *
  */
 public class QSimSignalEngine implements SignalEngine {
+
+	private static final Logger log = Logger.getLogger(QSimSignalEngine.class);
 
 	private SignalSystemsManager signalManager;
 
@@ -60,6 +63,7 @@ public class QSimSignalEngine implements SignalEngine {
 		NetsimNetwork net = qSim.getNetsimNetwork();
 		for (SignalSystem system : this.signalManager.getSignalSystems().values()){
 			for (Signal signal : system.getSignals().values()){
+				log.debug("initializing signal " + signal.getId() + " on link " + signal.getLinkId());
 				NetsimLink link = net.getNetsimLinks().get(signal.getLinkId());
 				if (signal.getLaneIds() == null || signal.getLaneIds().isEmpty()){
 					QLinkImpl l = (QLinkImpl) link;
