@@ -92,7 +92,7 @@ public class TestDemandCreatorFromCounts {
 		for(int time : inflowTimes){
 			Id personId = sc.createId(time + "testVehicle");
 			
-			System.out.println(personId);
+			System.out.println(time);
 			
 			Person person = population.getFactory().createPerson(personId);
 			Plan plan = population.getFactory().createPlan();

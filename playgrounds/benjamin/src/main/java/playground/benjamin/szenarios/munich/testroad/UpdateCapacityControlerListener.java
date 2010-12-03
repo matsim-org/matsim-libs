@@ -132,7 +132,15 @@ public class UpdateCapacityControlerListener implements StartupListener, Iterati
 			//fill with values
 			SortedMap<Id, Double> firstCapacity = table.get(table.firstKey());
 			for(Id personId : firstCapacity.keySet()){
-				bw.write(personId + "\t");
+				
+				/*not too elegant and a bit dangerous --
+				but there is writeTable(enterTime) 
+				to compare real enter time (from personId)
+				with simulated enter time*/
+				String personId2Split = personId.toString();
+				String [] array = personId2Split.split("t");
+				bw.write(array[0] + "\t");
+				
 				for(int iteration : table.keySet()){
 					Double time = table.get(iteration).get(personId);
 					if(iteration == table.lastKey()){
@@ -153,23 +161,3 @@ public class UpdateCapacityControlerListener implements StartupListener, Iterati
 
 	}		
 }
-
-
-//private void writeTravelTimes(SortedMap<Id, Double> personId2travelTimes) {
-//String outputPath = this.scenario.getConfig().controler().getOutputDirectory();
-//
-//try {
-//	BufferedWriter bw = new BufferedWriter(new FileWriter(new File(outputPath + "/travelTimes_cap_" + capacity + ".txt")));
-//	bw.write("personId \t travelTime");
-//	bw.newLine();
-//	for(Id personId : personId2travelTimes.keySet()) {
-//		bw.write(personId + "\t" + personId2travelTimes.get(personId));
-//		bw.newLine();
-//	}
-//	bw.close();
-//	
-//} catch (IOException e) {
-//	// TODO Auto-generated catch block
-//	e.printStackTrace();
-//}
-//}
