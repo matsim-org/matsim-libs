@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE roadpricing SYSTEM "http://www.matsim.org/files/dtd/roadpricing_v1.dtd">
+
+<roadpricing type="distance" name="distance based toll on testnetwork">
+
+	<description>distance based toll for testing</description>
+
+	<links>
+    <link id="2">
+     <cost start_time="05:00" end_time="10:00" amount="0.002" />
+    </link>
+	</links>
+
+	<cost start_time="06:00" end_time="10:00" amount="0.00000" /> <!-- unused, but required by dtd... -->
+
+</roadpricing>
