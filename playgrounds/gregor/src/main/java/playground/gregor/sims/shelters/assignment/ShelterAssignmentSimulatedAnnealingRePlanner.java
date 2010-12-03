@@ -120,7 +120,7 @@ public class ShelterAssignmentSimulatedAnnealingRePlanner implements IterationSt
 			}
 		}
 
-		this.c_k = 3;
+		this.c_k = 0.1;
 
 		validateShelterUtilization();
 
