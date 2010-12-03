@@ -51,17 +51,17 @@ public class EvacuationShelterNetLoaderForShelterAllocation extends EvacuationSh
 	public void generateShelterLinks(int numOfPers) {
 
 		Node saveNode = this.network.getNodes().get(new IdImpl("en1")); // TODO
-																		// GL
-																		// Apr.
-																		// 09 --
-																		// evacuation
-																		// node
-																		// should
-																		// not
-																		// retrieved
-																		// via
-																		// String
-																		// id
+		// GL
+		// Apr.
+		// 09 --
+		// evacuation
+		// node
+		// should
+		// not
+		// retrieved
+		// via
+		// String
+		// id
 		Id saveLinkId = saveNode.getOutLinks().values().iterator().next().getId();
 		int cap = 0;
 
@@ -86,7 +86,8 @@ public class EvacuationShelterNetLoaderForShelterAllocation extends EvacuationSh
 			cap += building.getShelterSpace();
 			// cap += 1;
 
-			double flowCap = 0.4 * building.getMinWidth() * ((EvacuationConfigGroup) this.scenario.getConfig().getModule("evacuation")).getSampleSize();
+			double flowCap = 0.4 * building.getMinWidth() * this.scenario.getConfig().getQSimConfigGroup().getTimeStepSize(); // ((EvacuationConfigGroup)
+																																// this.scenario.getConfig().getModule("evacuation")).getSampleSize();
 			// flowCap = 6;
 			String shelterId = building.getId().toString();
 			Coord c = MGC.point2Coord(building.getGeo().getCentroid());
@@ -97,30 +98,30 @@ public class EvacuationShelterNetLoaderForShelterAllocation extends EvacuationSh
 			Node sn1 = this.network.createAndAddNode(new IdImpl("sn" + shelterId + "a"), c);
 			Node sn2 = this.network.createAndAddNode(new IdImpl("sn" + shelterId + "b"), c);
 			Link l1 = this.network.createAndAddLink(new IdImpl("sl" + shelterId + "a"), from, sn1, 1.66, 1.66, flowCap, 1); // FIXME
-																															// find
-																															// right
-																															// values
-																															// flow
-																															// cap,
-																															// lanes,
-																															// ...
+			// find
+			// right
+			// values
+			// flow
+			// cap,
+			// lanes,
+			// ...
 			Link l2 = this.network.createAndAddLink(new IdImpl("sl" + shelterId + "b"), sn1, sn2, 10, 1.66, flowCap, 1); // FIXME
-																															// find
-																															// right
-																															// values
-																															// flow
-																															// cap,
-																															// lanes,
-																															// ...
+			// find
+			// right
+			// values
+			// flow
+			// cap,
+			// lanes,
+			// ...
 			getShelterLinkMapping().put(l2.getId(), building);
 			Link l3 = this.network.createAndAddLink(new IdImpl("sl" + shelterId + "c"), sn2, toNode, 10, 10000, 10000, 1); // FIXME
-																															// find
-																															// right
-																															// values
-																															// flow
-																															// cap,
-																															// lanes,
-																															// ...
+			// find
+			// right
+			// values
+			// flow
+			// cap,
+			// lanes,
+			// ...
 			getShelterLinks().add(l1);
 			getShelterLinks().add(l2);
 			getShelterLinks().add(l3);
