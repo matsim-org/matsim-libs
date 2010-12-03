@@ -259,10 +259,11 @@ public class ShelterAssignmentSimulatedAnnealingRePlannerII extends ShelterAssig
 
 		Node testDestinationNode = this.sc.getNetwork().getLinks().get(e.getKey()).getFromNode();
 
-		// test for NULL shift
-		if (testDestinationLink.getId() == ((Activity) plan.getPlanElements().get(2)).getLinkId()) {
-			return false;
-		}
+		// // test for NULL shift
+		// if (testDestinationLink.getId() == ((Activity)
+		// plan.getPlanElements().get(2)).getLinkId()) {
+		// return false;
+		// }
 
 		Path path = this.router.calcLeastCostPath(origin, testDestinationNode, actOrigin.getEndTime());
 
