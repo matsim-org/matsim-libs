@@ -20,23 +20,24 @@
  * *********************************************************************** */
 package playground.fhuelsmann.emission;
 import java.io.BufferedReader;
-import org.matsim.api.core.v01.Id;
 import java.io.DataInputStream;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.Map.Entry;
 
+import org.matsim.api.core.v01.Id;
+
 public class HbefaVisum {
 
 	private final VisumObject[] roadTypes = new VisumObject[100];
-	Map<Id,Map<Id, LinkedList<SingleEvent>>> map = new  
-		TreeMap<Id,Map<Id, LinkedList<SingleEvent>>>();
+	Map<Id, Map<Id, Collection<SingleEvent>>> map = new TreeMap<Id,Map<Id, Collection<SingleEvent>>>();
 	
-	public HbefaVisum(Map<Id,Map<Id, LinkedList<SingleEvent>>> map) {
+	public HbefaVisum(Map<Id, Map<Id, Collection<SingleEvent>>> map) {
 		super();
 		this.map = map;
 	}
@@ -85,7 +86,7 @@ public class HbefaVisum {
 	
 	public void createMapWithHbefaRoadTypeNumber(){
 
-	for(Entry<Id, Map<Id, LinkedList<SingleEvent>>> LinkIdEntry : this.map.entrySet()){	 
+	for(Entry<Id, Map<Id, Collection<SingleEvent>>> LinkIdEntry : this.map.entrySet()){	 
 		 for (Iterator iter = LinkIdEntry.getValue().
 	    			entrySet().iterator(); iter.hasNext();) {
 				Map.Entry entry = (Map.Entry) iter.next();
@@ -104,7 +105,7 @@ public class HbefaVisum {
 	
 	public void printTable(){
 	
-		for(Entry<Id, Map<Id, LinkedList<SingleEvent>>> LinkIdEntry : this.map.entrySet()){	 
+		for(Entry<Id, Map<Id, Collection<SingleEvent>>> LinkIdEntry : this.map.entrySet()){	 
 			 for (Iterator iter = LinkIdEntry.getValue().
 		    			entrySet().iterator(); iter.hasNext();) {
 					Map.Entry entry = (Map.Entry) iter.next();

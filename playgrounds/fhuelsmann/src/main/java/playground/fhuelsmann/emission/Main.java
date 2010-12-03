@@ -77,6 +77,7 @@ public class Main {
 		
 		EmissionFactor emissionFactor = new EmissionFactor(hbefaVisum.map,hbefaTable.getHbefaTableWithSpeedAndEmissionFactor());
 		emissionFactor.createEmissionTables();
+		emissionFactor.createEmissionFile();
 	//	emissionFactor.printEmissionTable();
 		
 		
