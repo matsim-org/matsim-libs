@@ -25,6 +25,7 @@ import org.matsim.signalsystems.builder.SignalSystemsModelBuilder;
 import org.matsim.signalsystems.data.SignalsData;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalPlanData;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalSystemControllerData;
+import org.matsim.signalsystems.model.DatabasedSignalPlan;
 import org.matsim.signalsystems.model.SignalController;
 import org.matsim.signalsystems.model.SignalPlan;
 import org.matsim.signalsystems.model.SignalSystem;
@@ -33,7 +34,6 @@ import org.matsim.signalsystems.model.SignalSystemsManager;
 import playground.jbischoff.BAsignals.model.AdaptiveControllHead;
 import playground.jbischoff.BAsignals.model.CarsOnLaneHandler;
 import playground.jbischoff.BAsignals.model.JbSignalController;
-import playground.jbischoff.BAsignals.model.JbSignalPlan;
 
 /**
  * @author dgrether
@@ -88,7 +88,7 @@ public class JbSignalBuilder implements SignalSystemsModelBuilder {
 			controller.setSignalSystem(system);
 			system.setSignalSystemController(controller);
 			for (SignalPlanData planData : systemControlData.getSignalPlanData().values()){
-				SignalPlan plan = new JbSignalPlan(planData,this.adaptiveControllHead);
+				SignalPlan plan = new DatabasedSignalPlan(planData);
 				controller.addPlan(plan);
 			}
 		}

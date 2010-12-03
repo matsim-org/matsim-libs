@@ -27,7 +27,6 @@ import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.signalsystems.model.DatabasedSignalPlan;
 import org.matsim.signalsystems.model.SignalController;
 import org.matsim.signalsystems.model.SignalGroup;
 import org.matsim.signalsystems.model.SignalGroupState;
@@ -49,7 +48,7 @@ public class JbSignalController implements SignalController {
 
 	private SignalSystem system;
 	private Map<Id, SignalPlan> plans;
-	private JbSignalPlan activePlan;
+	private SignalPlan activePlan;
 	private Map<Id, Integer> adaptiveOnsets;
 	private Map<Id, Integer> adaptiveDroppings;
 	private AdaptiveControllHead adaptiveControllHead;
@@ -84,7 +83,7 @@ public class JbSignalController implements SignalController {
 		if (this.plans == null) {
 			this.plans = new HashMap<Id, SignalPlan>();
 			// TODO remove when checkActive is implemented
-			this.activePlan =  (JbSignalPlan) plan;
+			this.activePlan =  plan;
 		}
 		this.plans.put(plan.getId(), plan);
 	}
@@ -111,7 +110,7 @@ public class JbSignalController implements SignalController {
 	public void updateState(double timeSeconds) {
 
 		this.checkActivePlan();
-		int currentSecondinPlan = ((int) (timeSeconds) % this.activePlan.getCylce());
+		int currentSecondinPlan = ((int) (timeSeconds) % this.activePlan.getCycleTime());
 		if (currentSecondinPlan == 0)
 			this.resetAdaptiveSignals();
 
@@ -160,7 +159,7 @@ public class JbSignalController implements SignalController {
 		if ((this.adaptiveDroppings.get(sgId) - this.adaptiveOnsets.get(sgId)) <= JBBaParams.MAXPHASELENGTH) {
 			int oldmd = this.maxDrop.get(sgId);
 			oldmd = oldmd + 2;
-			if (oldmd < this.activePlan.getCylce() - 2)
+			if (oldmd < this.activePlan.getCycleTime() - 2)
 				this.maxDrop.put(sgId, oldmd);
 
 		}
@@ -203,8 +202,8 @@ public class JbSignalController implements SignalController {
 					int currentonset = this.adaptiveOnsets.get(otherSg.getId());
 					int currentdrop = this.adaptiveDroppings.get(otherSg.getId());
 					int newdrop = currentdrop + step;
-					if (newdrop > this.activePlan.getCylce())
-						newdrop = this.activePlan.getCylce() - 1;
+					if (newdrop > this.activePlan.getCycleTime())
+						newdrop = this.activePlan.getCycleTime() - 1;
 					this.adaptiveDroppings.put(otherSg.getId(), newdrop);
 					int newonset = currentonset + step;
 					this.adaptiveOnsets.put(otherSg.getId(), newonset);
