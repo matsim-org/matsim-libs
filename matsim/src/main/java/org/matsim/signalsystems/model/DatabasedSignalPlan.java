@@ -124,4 +124,14 @@ public class DatabasedSignalPlan implements SignalPlan {
 		return this.data.getId();
 	}
 
+	@Override
+	public Integer getOffset() {
+		return this.data.getOffset();
+	}
+
+	@Override
+	public Integer getCycleTime() {
+		return this.data.getCycleTime();
+	}
+
 }

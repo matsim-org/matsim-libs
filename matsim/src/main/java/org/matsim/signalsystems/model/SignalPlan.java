@@ -40,6 +40,8 @@ public interface SignalPlan {
 
 	public Id getId();
 	
+	public Integer getOffset();
 	
+	public Integer getCycleTime();
 	
 }
