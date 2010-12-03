@@ -432,7 +432,7 @@ public class EmissionFactor  {
 		 				try {
 		 					  
 		 				    // Create file 
-		 				    FileWriter fstream = new FileWriter("../../detailedEval/teststrecke/sim/outputEmissions/allemissions.txt");
+		 				    FileWriter fstream = new FileWriter("../../detailedEval/teststrecke/sim/outputEmissions/alllemissions.txt");
 		 				        BufferedWriter out = new BufferedWriter(fstream);
 		 				        out.write("EnterTime " +
 		 				        		"\t " +

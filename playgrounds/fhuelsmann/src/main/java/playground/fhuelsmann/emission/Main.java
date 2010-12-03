@@ -46,7 +46,7 @@ public class Main {
 		Network network = scenario.getNetwork(); 
 		new MatsimNetworkReader(scenario).readFile(netfile);
 		
-		//create the handler
+		//create the handler 
 		DataStructureOfSingleEventAttributes handler = new DataStructureOfSingleEventAttributes(network);
 		
 		//	TravelTimeCalculation handler = new TravelTimeCalculation();
@@ -55,29 +55,24 @@ public class Main {
 		//add the handler
 		//events.addHandler(handler);
 		events.addHandler(handler);
-//		System.out.println(handler.getTravelTimes());
+
 
 		//create the reader and read the file
 		MatsimEventsReader matsimEventReader = new MatsimEventsReader(events);
 		
 		matsimEventReader.readFile(eventsFile);
-		//System.out.println(handler2.getTravelTimes(.);
-		//for attributes of the network
-		
-		
-		//here the constructor gets the data structure of the class TravelTimeCalculation
-	//	VelocityAverageCalculate vac = new VelocityAverageCalculate(handler.getTravelTimes(),visumRoadFile);
-	//	vac.calculateAverageVelocity1();
-		
-		//vac.printVelocities();
-		//System.out.println();
-		//System.out.println(vac.getmapOfSingleEvent().get("592536888").get("23933testVehicle").getFirst().getLinkLength());
+	
+		//for cold start emissions 
+		handler.printTable();
+		handler.printTable2();
+	
+	
 		
 		HbefaTable hbefaTable = new HbefaTable();
 		hbefaTable.makeHabefaTable(Hbefa_Traffic);
 		HbefaVisum hbefaVisum = new HbefaVisum(handler.getTravelTimes());
 		hbefaVisum.creatRoadTypes(visumRoadHebefaRoadFile);
-		hbefaVisum.printHbefaVisum();
+	//	hbefaVisum.printHbefaVisum();
 		hbefaVisum.createMapWithHbefaRoadTypeNumber();	
 		
 		EmissionFactor emissionFactor = new EmissionFactor(hbefaVisum.map,hbefaTable.getHbefaTableWithSpeedAndEmissionFactor());
