@@ -31,54 +31,63 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.evacuation.base.Building;
+import org.matsim.evacuation.config.EvacuationConfigGroup;
 import org.matsim.evacuation.flooding.FloodingReader;
 import org.matsim.evacuation.shelters.EvacuationShelterNetLoader;
 
 public class EvacuationShelterNetLoaderForShelterAllocation extends EvacuationShelterNetLoader {
 
-	private NetworkImpl network;
-	private List<Building> buildings;
-	private Scenario scenario;
+	private final NetworkImpl network;
+	private final List<Building> buildings;
+	private final Scenario scenario;
 
-	public EvacuationShelterNetLoaderForShelterAllocation(
-			List<Building> buildings, Scenario scenario, List<FloodingReader> netcdf) {
-		super(buildings, scenario,netcdf);
+	public EvacuationShelterNetLoaderForShelterAllocation(List<Building> buildings, Scenario scenario, List<FloodingReader> netcdf) {
+		super(buildings, scenario, netcdf);
 		this.network = (NetworkImpl) scenario.getNetwork();
 		this.buildings = buildings;
 		this.scenario = scenario;
 	}
 
-
 	public void generateShelterLinks(int numOfPers) {
 
-		Node saveNode = this.network.getNodes().get(new IdImpl("en1")); //TODO GL Apr. 09 -- evacuation node should not retrieved via String id
+		Node saveNode = this.network.getNodes().get(new IdImpl("en1")); // TODO
+																		// GL
+																		// Apr.
+																		// 09 --
+																		// evacuation
+																		// node
+																		// should
+																		// not
+																		// retrieved
+																		// via
+																		// String
+																		// id
 		Id saveLinkId = saveNode.getOutLinks().values().iterator().next().getId();
 		int cap = 0;
-		
-		Node toNode = this.network.createAndAddNode(new IdImpl("en3"), new CoordImpl(662433,9898853));
-		
-		
+
+		Node toNode = this.network.createAndAddNode(new IdImpl("en3"), new CoordImpl(662433, 9898853));
+
 		for (Building building : this.buildings) {
-			
-//			if (MatsimRandom.getRandom().nextDouble() < 0.01) {
-//				building.setIsQuakeProof(1);
-//				building.setMinWidth(3);
-//			building.setShelterSpace((int) (100*this.scenario.getConfig().evacuation().getSampleSize()));
-//			} else {
-//				building.setIsQuakeProof(0);
-//			}
-			
-			
+
+			// if (MatsimRandom.getRandom().nextDouble() < 0.01) {
+			// building.setIsQuakeProof(1);
+			// building.setMinWidth(3);
+			// building.setShelterSpace((int)
+			// (100*this.scenario.getConfig().evacuation().getSampleSize()));
+			// } else {
+			// building.setIsQuakeProof(0);
+			// }
+
 			if (!building.isQuakeProof()) {
 				continue;
 			}
-			
-//			building.setShelterSpace(250000);
+
+			// building.setShelterSpace(250000);
 			cap += building.getShelterSpace();
-//			cap += 1;
-			
-			double flowCap = 0.4 * building.getMinWidth() * this.scenario.getConfig().simulation().getTimeStepSize();
-//			flowCap = 6;
+			// cap += 1;
+
+			double flowCap = 0.4 * building.getMinWidth() * ((EvacuationConfigGroup) this.scenario.getConfig().getModule("evacuation")).getSampleSize();
+			// flowCap = 6;
 			String shelterId = building.getId().toString();
 			Coord c = MGC.point2Coord(building.getGeo().getCentroid());
 			Node from = this.network.getNearestNode(c);
@@ -87,35 +96,57 @@ public class EvacuationShelterNetLoaderForShelterAllocation extends EvacuationSh
 			}
 			Node sn1 = this.network.createAndAddNode(new IdImpl("sn" + shelterId + "a"), c);
 			Node sn2 = this.network.createAndAddNode(new IdImpl("sn" + shelterId + "b"), c);
-			Link l1 = this.network.createAndAddLink(new IdImpl("sl" + shelterId + "a"), from, sn1, 1.66 , 1.66, flowCap, 1); //FIXME find right values flow cap, lanes, ...
-			Link l2 = this.network.createAndAddLink(new IdImpl("sl" + shelterId + "b"), sn1,sn2, 10 , 1.66, flowCap, 1); //FIXME find right values flow cap, lanes, ...
-			this.getShelterLinkMapping().put(l2.getId(), building);
-			Link l3 = this.network.createAndAddLink(new IdImpl("sl" + shelterId + "c"), sn2,toNode, 10 , 10000, 10000, 1); //FIXME find right values flow cap, lanes, ...
-			this.getShelterLinks().add(l1);
-			this.getShelterLinks().add(l2);
-			this.getShelterLinks().add(l3);
-			
-//			try {
-//				bw.append(from.getId() + "," + flowCap + "," + building.getShelterSpace() + "\n");
-//			} catch (IOException e) {
-//				e.printStackTrace();
-//			}
-//			if (cap > 200) {
-//				break;
-//			}
+			Link l1 = this.network.createAndAddLink(new IdImpl("sl" + shelterId + "a"), from, sn1, 1.66, 1.66, flowCap, 1); // FIXME
+																															// find
+																															// right
+																															// values
+																															// flow
+																															// cap,
+																															// lanes,
+																															// ...
+			Link l2 = this.network.createAndAddLink(new IdImpl("sl" + shelterId + "b"), sn1, sn2, 10, 1.66, flowCap, 1); // FIXME
+																															// find
+																															// right
+																															// values
+																															// flow
+																															// cap,
+																															// lanes,
+																															// ...
+			getShelterLinkMapping().put(l2.getId(), building);
+			Link l3 = this.network.createAndAddLink(new IdImpl("sl" + shelterId + "c"), sn2, toNode, 10, 10000, 10000, 1); // FIXME
+																															// find
+																															// right
+																															// values
+																															// flow
+																															// cap,
+																															// lanes,
+																															// ...
+			getShelterLinks().add(l1);
+			getShelterLinks().add(l2);
+			getShelterLinks().add(l3);
+
+			// try {
+			// bw.append(from.getId() + "," + flowCap + "," +
+			// building.getShelterSpace() + "\n");
+			// } catch (IOException e) {
+			// e.printStackTrace();
+			// }
+			// if (cap > 200) {
+			// break;
+			// }
 		}
-//		int superCap = numOfPers; // - cap;
-//		Building superShelter = new Building(new IdImpl("super_shelter"),0,0,0,0,superCap,10000,1,null);
-//		this.buildings.add(superShelter);
-//		this.getShelterLinkMapping().put(saveLinkId, superShelter);
-		
-//		try {
-//			bw.close();
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
+		// int superCap = numOfPers; // - cap;
+		// Building superShelter = new Building(new
+		// IdImpl("super_shelter"),0,0,0,0,superCap,10000,1,null);
+		// this.buildings.add(superShelter);
+		// this.getShelterLinkMapping().put(saveLinkId, superShelter);
+
+		// try {
+		// bw.close();
+		// } catch (IOException e) {
+		// e.printStackTrace();
+		// }
 		this.network.connect();
 	}
 
-	
 }
