@@ -21,8 +21,10 @@ package playground.dgrether.lanes;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -38,7 +40,6 @@ import org.matsim.lanes.LanesToLinkAssignment;
 import org.matsim.lanes.MatsimLaneDefinitionsReader;
 import org.matsim.lanes.MatsimLaneDefinitionsWriter;
 
-import playground.dgrether.DgPaths;
 import playground.dgrether.consistency.ConsistencyChecker;
 
 
@@ -79,21 +80,71 @@ public class LanesConsistencyChecker implements ConsistencyChecker{
 			}
 			
 			//check toLinks
+			//first check matching of Lane definitions -> Link
 			for (Lane lane : l2l.getLanes().values()) {
-				Map<Id, Lane> toLinkIdToLaneMap = new HashMap<Id, Lane>();
 				//check availability of toLink in network
-				for (Id toLinkId : lane.getToLinkIds()) {
-					if (this.network.getLinks().get(toLinkId) == null){
-						log.error("No link found in network for toLinkId " + toLinkId + " of laneId " + lane.getId() + " of link id " + l2l.getLinkId());
-						malformedLinkIds.add(l2l.getLinkId());
+				Map<Id, Lane> toLinkIdToLaneMap = new HashMap<Id, Lane>();
+				if (lane.getToLinkIds() != null){
+					for (Id toLinkId : lane.getToLinkIds()) {
+						if (this.network.getLinks().get(toLinkId) == null){
+							log.error("No link found in network for toLinkId " + toLinkId + " of laneId " + lane.getId() + " of link id " + l2l.getLinkId());
+							malformedLinkIds.add(l2l.getLinkId());
+						}
+						//check if multiple lanes have the same toLink
+						if (toLinkIdToLaneMap.containsKey(toLinkId)){
+							//TODO improve error message
+							log.error("On link Id " + l2l.getLinkId() + " exists more than one lane leading to Link Id " + toLinkId);
+						}
+						else {
+							toLinkIdToLaneMap.put(toLinkId, lane);
+						}
 					}
-					//check if multiple lanes have the same toLink
-					if (toLinkIdToLaneMap.containsKey(toLinkId)){
-						//TODO improve error message
-						log.error("On link Id " + l2l.getLinkId() + " exists more than one lane leading to Link Id " + toLinkId);
-					}
-					else {
-						toLinkIdToLaneMap.put(toLinkId, lane);
+				}
+			}
+			
+			//second check matching of link's outlinks and lane's toLinks
+			Link link = this.network.getLinks().get(l2l.getLinkId());
+			log.info("Link id: " + l2l.getLinkId());
+			Map<Id, ? extends Link> outLinksMap = link.getToNode().getOutLinks();
+			Set<Id> linkLanes2LinkIds = new HashSet<Id>();
+			for (Lane lane : l2l.getLanes().values()){
+				if (lane.getToLinkIds() != null){
+					linkLanes2LinkIds.addAll(lane.getToLinkIds());
+				}
+			}
+			
+//			if (outLinksMap.size() != linkLanes2LinkIds.size()){
+//				log.error("Link " + l2l.getLinkId() + ": The number of toLinks is different in LanesToLinkAssignment (" + linkLanes2LinkIds.size()+ ") and " +
+//						" in Link definition (" + outLinksMap.size() + ")");
+//				log.error("  Link id: " + link.getId());
+//				for (Link outLink : outLinksMap.values()){
+//					log.error("    has outlink: " + outLink.getId());
+//				}
+//				log.error("");
+//				for (Lane lane : l2l.getLanes().values()){
+//					log.error("  Lane id: " + lane.getId());
+//					if (lane.getToLinkIds() != null){
+//						for (Id id : lane.getToLinkIds()){
+//							log.error("    has toLinkId: " + id);
+//						}
+//					}
+//				}
+//			}
+			
+			for (Link outLink : outLinksMap.values()){
+				log.info("    has outlink: " + outLink.getId());
+				if (!linkLanes2LinkIds.contains(outLink.getId())){
+					malformedLinkIds.add(l2l.getLinkId());
+					log.error("The lanes of link " + link.getId() + " do not lead to all of the outlinks of the links toNode. The outlink " + outLink.getId()
+					+ " is not reachable from the lanes of this link. ");
+					log.error("");
+					for (Lane lane : l2l.getLanes().values()){
+						log.error("  Lane id: " + lane.getId());
+						if (lane.getToLinkIds() != null){
+							for (Id id : lane.getToLinkIds()){
+								log.error("    has toLinkId: " + id);
+							}
+						}
 					}
 				}
 			}
@@ -125,8 +176,11 @@ public class LanesConsistencyChecker implements ConsistencyChecker{
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String netFile = DgPaths.IVTCHBASE + "baseCase/network/ivtch-osm.xml";
-		String lanesFile = DgPaths.STUDIESDG + "signalSystemsZh/laneDefinitions.xml";
+//		String netFile = DgPaths.IVTCHBASE + "baseCase/network/ivtch-osm.xml";
+//		String lanesFile = DgPaths.STUDIESDG + "signalSystemsZh/laneDefinitions.xml";
+		String netFile = "/media/data/work/repos/shared-svn/studies/dgrether/cottbus/Cottbus-BA/scenario-lsa/network.xml";
+		String lanesFile = "/media/data/work/repos/shared-svn/studies/dgrether/cottbus/Cottbus-BA/scenario-lsa/lanes_cottbus_v20_jbol_c.xml";
+
 		ScenarioImpl scenario = new ScenarioImpl();
 		NetworkImpl net = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFile);
@@ -138,10 +192,10 @@ public class LanesConsistencyChecker implements ConsistencyChecker{
 	  laneReader.readFile(lanesFile);
 	  
 	  LanesConsistencyChecker lcc = new LanesConsistencyChecker(net, laneDefs);
-		lcc.setRemoveMalformed(true);
+		lcc.setRemoveMalformed(false);
 		lcc.checkConsistency();
 		
 		MatsimLaneDefinitionsWriter laneWriter = new MatsimLaneDefinitionsWriter(laneDefs);
-		laneWriter.writeFile(lanesFile);
+		laneWriter.writeFile(lanesFile + ".new.xml");
 	}
 }
