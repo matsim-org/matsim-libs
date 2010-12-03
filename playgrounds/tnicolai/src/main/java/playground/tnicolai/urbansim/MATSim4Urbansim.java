@@ -76,7 +76,6 @@ public class MATSim4Urbansim {
 			return;
 		}
 
-
 		// init scenario and config object
 		scenario = MATSimConfigObject.getScenario();
 		config = MATSimConfigObject.getConfig();

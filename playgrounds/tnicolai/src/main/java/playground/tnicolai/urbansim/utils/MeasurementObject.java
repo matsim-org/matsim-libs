@@ -172,7 +172,7 @@ public class MeasurementObject {
 			bstream.write("\n");
 			bstream.write("Duration reading person table and creating a population in seconds:" + DURATION_READ_PERSONS_URBANSIM_OUTPUT/1000);
 			bstream.write("\n");
-			bstream.write("Duration writing travel_data.csv ins seconds:" + DURATION_WRITE_TRAVEL_DATA_MATSIM_OUTPUT/1000);
+			bstream.write("Duration writing travel_data.csv in seconds:" + DURATION_WRITE_TRAVEL_DATA_MATSIM_OUTPUT/1000);
 			bstream.write("\n\n");
 			
 			bstream.flush();
