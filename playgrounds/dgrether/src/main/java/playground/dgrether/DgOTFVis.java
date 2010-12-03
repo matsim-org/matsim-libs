@@ -1,5 +1,8 @@
 package playground.dgrether;
 
+import java.net.URL;
+import java.net.URLClassLoader;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.controler.ControlerIO;
 import org.matsim.core.events.EventsManagerImpl;
@@ -64,6 +67,18 @@ public class DgOTFVis {
 		this.playScenario(sc);
 	}
 	
+	
+	public static void  printClasspath(){
+		System.out.println("Classpath: ");
+	//Get the System Classloader
+    ClassLoader sysClassLoader = ClassLoader.getSystemClassLoader();
+    //Get the URLs
+    URL[] urls = ((URLClassLoader)sysClassLoader).getURLs();
+    for(int i=0; i< urls.length; i++)
+    {
+        System.out.println("  " + urls[i].getFile());
+    }
+	}
 	
 	/**
 	 * @param args

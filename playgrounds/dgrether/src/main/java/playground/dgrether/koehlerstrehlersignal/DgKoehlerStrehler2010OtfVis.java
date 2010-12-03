@@ -32,6 +32,8 @@ import org.matsim.signalsystems.mobsim.SignalEngine;
 import org.matsim.signalsystems.model.SignalSystemsManager;
 import org.matsim.vis.otfvis.OTFVisMobsimFeature;
 
+import playground.dgrether.DgOTFVis;
+
 
 
 public class DgKoehlerStrehler2010OtfVis {
@@ -53,6 +55,8 @@ public class DgKoehlerStrehler2010OtfVis {
 		otfVisQSim.addQueueSimulationListeners(engine);
 		OTFVisMobsimFeature qSimFeature = new OTFVisMobsimFeature(otfVisQSim);
 		otfVisQSim.addFeature(qSimFeature);
+		
+		DgOTFVis.printClasspath();
 		
 		QSim client = otfVisQSim;
 		client.run();

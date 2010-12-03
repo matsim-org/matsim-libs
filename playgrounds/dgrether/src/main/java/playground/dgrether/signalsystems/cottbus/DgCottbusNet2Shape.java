@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * CottbusLiveVis
+ * DgCottbusNet2Shape
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,42 +17,33 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.signalsystems.otfvis;
+package playground.dgrether.signalsystems.cottbus;
 
-import playground.dgrether.DgOTFVis;
-import playground.dgrether.DgPaths;
+import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkImpl;
+import org.matsim.utils.gis.matsim2esri.network.Links2ESRIShape;
 
 
 /**
  * @author dgrether
- * @see jbischoff playground for more "intelligent" live vis code including xy2links and routing
  *
  */
-public class CottbusLiveVis {
+public class DgCottbusNet2Shape {
 
-	public static final String inputDir = DgPaths.STUDIESDG + "cottbus/";
-//	private String signalSystems20 = inputDir + "signalSystemsCottbusByNodes_v2.0.xml";
-//	private String signalGroups20 = inputDir + "signalGroupsCottbusByNodes_v2.0.xml";
-//	private String signalControl20 = inputDir + "signalControlCottbusByNodes_v2.0.xml";
-//	private String amberTimes10 = inputDir + "amberTimesCottbusByNodes_v1.0.xml";
-//	
-//	private String config = inputDir + "cottbusConfig.xml";
-	private static final String oldCottbusConfig = inputDir + "originaldaten/config_dg_livevis.xml";
-	
-	public static final  String newCottbusConfig = inputDir + "Cottbus-BA/scenario-lsa/cottbusConfigLiveVis.xml";
-
-	private void run() {
-		String config = newCottbusConfig;
-		new DgOTFVis().playAndRouteConfig(config);
-	}
-	
-	
-	
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		new CottbusLiveVis().run();
+		String netFile = "/media/data/work/repos/shared-svn/studies/dgrether/cottbus/Cottbus-BA/scenario-lsa/network.xml";
+		ScenarioImpl scenario = new ScenarioImpl();
+		NetworkImpl net = scenario.getNetwork();
+		new MatsimNetworkReader(scenario).readFile(netFile);
+
+		
+		new Links2ESRIShape(net, "/media/data/work/repos/shared-svn/studies/dgrether/cottbus/Cottbus-BA/scenario-lsa/network.shp", "WGS84").write();
+		
+		
 	}
 
 }

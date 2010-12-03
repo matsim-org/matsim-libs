@@ -189,16 +189,16 @@ public class DgKoehlerStrehler2010ScenarioGenerator {
 		settings1.setDropping(this.dropping2);
 		SignalGroupSettingsData settings2 = control.getFactory().createSignalGroupSettingsData(id2);
 		plan.addSignalGroupSettings(settings2);
-		settings2.setOnset(this.onset1);
-		settings2.setDropping(this.dropping1);
+		settings2.setOnset(this.onset2);
+		settings2.setDropping(this.dropping2);
 		SignalGroupSettingsData settings3 = control.getFactory().createSignalGroupSettingsData(id3);
 		plan.addSignalGroupSettings(settings3);
 		settings3.setOnset(this.onset1);
 		settings3.setDropping(this.dropping1);
 		SignalGroupSettingsData settings4 = control.getFactory().createSignalGroupSettingsData(id4);
 		plan.addSignalGroupSettings(settings4);
-		settings4.setOnset(this.onset2);
-		settings4.setDropping(this.dropping2);
+		settings4.setOnset(this.onset1);
+		settings4.setDropping(this.dropping1);
 	}
 
 	private void createSystem2Control(SignalControlData control) {
@@ -216,16 +216,16 @@ public class DgKoehlerStrehler2010ScenarioGenerator {
 		settings1.setDropping(this.dropping1);
 		SignalGroupSettingsData settings2 = control.getFactory().createSignalGroupSettingsData(id2);
 		plan.addSignalGroupSettings(settings2);
-		settings2.setOnset(this.onset2);
-		settings2.setDropping(this.dropping2);
+		settings2.setOnset(this.onset1);
+		settings2.setDropping(this.dropping1);
 		SignalGroupSettingsData settings3 = control.getFactory().createSignalGroupSettingsData(id3);
 		plan.addSignalGroupSettings(settings3);
 		settings3.setOnset(this.onset2);
 		settings3.setDropping(this.dropping2);
 		SignalGroupSettingsData settings4 = control.getFactory().createSignalGroupSettingsData(id4);
 		plan.addSignalGroupSettings(settings4);
-		settings4.setOnset(this.onset1);
-		settings4.setDropping(this.dropping1);
+		settings4.setOnset(this.onset2);
+		settings4.setDropping(this.dropping2);
 	}
 
 	private void createAndAddSignalGroups(Id signalSystemId, SignalGroupsData groups){

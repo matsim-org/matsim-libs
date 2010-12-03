@@ -79,19 +79,21 @@ public class DgCountPerIterationGraph {
 		plot.setDomainAxis(xAxis);
 		plot.setRangeAxis(yAxis);
 		
+		plot.setDataset(0, this.dataset);
+
 		DgColorScheme colorScheme = new DgColorScheme();
-		
 		XYItemRenderer renderer2;
 		renderer2 = new XYLineAndShapeRenderer(true, true);
-		renderer2.setSeriesItemLabelsVisible(0, true);
+		for (int i = 0; i < this.dataset.getSeriesCount(); i++){
+			renderer2.setSeriesItemLabelsVisible(i, true);
+			renderer2.setSeriesOutlineStroke(i, new BasicStroke(3.0f));
+			renderer2.setSeriesStroke(i, new BasicStroke(2.0f));
+			renderer2.setSeriesPaint(i, colorScheme.getColor(i+1, "a"));
+		}
 //		renderer2.setSeriesItemLabelGenerator(0, this.labelGenerator);
-		plot.setDataset(0, this.dataset);
-		renderer2.setSeriesStroke(0, new BasicStroke(2.0f));
-		renderer2.setSeriesOutlineStroke(0, new BasicStroke(3.0f));
-		renderer2.setSeriesPaint(0, colorScheme.getColor(1, "a"));
-		renderer2.setSeriesStroke(1, new BasicStroke(2.0f));
-		renderer2.setSeriesOutlineStroke(1, new BasicStroke(3.0f));
-		renderer2.setSeriesPaint(1, colorScheme.getColor(2, "a"));
+//		renderer2.setSeriesStroke(1, new BasicStroke(2.0f));
+//		renderer2.setSeriesOutlineStroke(1, new BasicStroke(3.0f));
+//		renderer2.setSeriesPaint(1, colorScheme.getColor(2, "a"));
 		
 		plot.setRenderer(0, renderer2);
 		
