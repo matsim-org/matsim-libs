@@ -37,7 +37,23 @@ public class TransportChainBuilder {
 		if(!openPickUp){
 			throw new IllegalStateException("No shipment has been picked up. Thus, cannot create a leg.");
 		}
+		if(openLeg){
+			throw new IllegalStateException("Cannot create a leg, because a leg is still open");
+		}
 		ChainLeg leg = createLeg(carrierId);
+		chainElements.add(leg);
+		openLeg = true;
+	}
+	
+	public void scheduleLeg(Id carrierId, double duration){
+		if(!openPickUp){
+			throw new IllegalStateException("No shipment has been picked up. Thus, cannot create a leg.");
+		}
+		if(openLeg){
+			throw new IllegalStateException("Cannot create a leg, because a leg is still open");
+		}
+		ChainLeg leg = createLeg(carrierId);
+		leg.setDuration(duration);
 		chainElements.add(leg);
 		openLeg = true;
 	}

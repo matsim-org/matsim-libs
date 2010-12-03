@@ -18,6 +18,16 @@ public class TransportChain {
 	public static class ChainLeg extends ChainElement{
 		private Id carrierId;
 		
+		private double duration;
+		
+		public double getDuration() {
+			return duration;
+		}
+
+		public void setDuration(double duration) {
+			this.duration = duration;
+		}
+
 		public ChainLeg(Id carrierId){
 			this.carrierId = carrierId;
 		}
