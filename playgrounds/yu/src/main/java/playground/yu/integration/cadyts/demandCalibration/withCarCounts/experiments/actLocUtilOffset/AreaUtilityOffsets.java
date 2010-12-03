@@ -26,8 +26,8 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 
-import playground.yu.utils.SimpleStatistics;
 import playground.yu.utils.io.DistributionCreator;
+import playground.yu.utils.math.SimpleStatistics;
 
 public class AreaUtilityOffsets {
 	private Coord coord;

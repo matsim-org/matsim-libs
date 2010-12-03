@@ -46,7 +46,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.counts.Counts;
 
 import playground.yu.utils.ArrayTools;
-import playground.yu.utils.SimpleStatistics;
+import playground.yu.utils.math.SimpleStatistics;
 import cadyts.utilities.misc.DynamicData;
 
 /**

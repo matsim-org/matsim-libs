@@ -41,7 +41,7 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
-import playground.yu.utils.SimpleStatistics;
+import playground.yu.utils.math.SimpleStatistics;
 
 /**
  * calculate the average typical duration of aggregated activity type e.g. h, w

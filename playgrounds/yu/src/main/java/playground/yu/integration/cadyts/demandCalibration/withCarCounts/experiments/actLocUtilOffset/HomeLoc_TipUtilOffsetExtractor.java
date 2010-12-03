@@ -49,7 +49,7 @@ import org.matsim.counts.MatsimCountsReader;
 import playground.yu.integration.cadyts.demandCalibration.withCarCounts.BseLinkCostOffsetsXMLFileIO;
 import playground.yu.integration.cadyts.demandCalibration.withCarCounts.experiments.actLocUtilOffset.forLeg.ActivityLocationUtilOffsetExtractor;
 import playground.yu.integration.cadyts.demandCalibration.withCarCounts.utils.qgis.HomeUtilOffset2QGIS;
-import playground.yu.utils.SimpleStatistics;
+import playground.yu.utils.math.SimpleStatistics;
 import playground.yu.utils.qgis.X2QGIS;
 import cadyts.utilities.misc.DynamicData;
 

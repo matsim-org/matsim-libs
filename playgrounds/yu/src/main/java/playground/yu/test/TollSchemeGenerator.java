@@ -63,9 +63,9 @@ import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
 /**
  * it's only a copy of Grether's
  * codes:playground.dgrether.roadpricing.TollSchemeGenerator
- *
+ * 
  * @author dgrether
- *
+ * 
  */
 public class TollSchemeGenerator {
 
@@ -73,7 +73,7 @@ public class TollSchemeGenerator {
 			.getLogger(TollSchemeGenerator.class);
 
 	private static final String CONFIG = "../shared-svn/projects/detailedEval/toll/generator.xml";
-	private static final String OUTSCHEME = "../shared-svn/projects/detailedEval/toll/Muenchen.xml";
+	private static final String OUTSCHEME = "../shared-svn/projects/detailedEval/toll/boundary.xml";
 	private static final String OUTBASE = "../shared-svn/projects/detailedEval/toll/Muenchen";
 	private static final String GISOUTBASE = "../shared-svn/projects/detailedEval/toll/Muenchen";
 	private static final String googleEarthPolyCoordsMuenchen = "11.45751595497328,48.20847045537611,0 11.4197367824207,"
@@ -1321,8 +1321,9 @@ public class TollSchemeGenerator {
 	private RoadPricingScheme createRoadPricingScheme(
 			final NetworkImpl tollNetwork) {
 		RoadPricingScheme scheme = new RoadPricingScheme();
-		for (Link l : tollNetwork.getLinks().values())
+		for (Link l : tollNetwork.getLinks().values()) {
 			scheme.addLink(l.getId());
+		}
 		scheme.addCost(usedStart, usedStop, usedAmount);
 		return scheme;
 	}
@@ -1426,8 +1427,7 @@ public class TollSchemeGenerator {
 		log.info("Network written to kmz!");
 	}
 
-	private NetworkImpl filterNetwork(final NetworkImpl net,
-			final boolean full) {
+	private NetworkImpl filterNetwork(final NetworkImpl net, final boolean full) {
 		NetworkImpl n = NetworkImpl.createNetwork();
 		GeometryFactory geofac = new GeometryFactory();
 		Coordinate[] geoToolCoords = new Coordinate[usedCoords.length];
@@ -1449,8 +1449,18 @@ public class TollSchemeGenerator {
 			if (ppp.contains(new Point(new CoordinateArraySequence(
 					new Coordinate[] { fromCord }), geofac))
 					&& ppp.contains(new Point(new CoordinateArraySequence(
-							new Coordinate[] { toCord }), geofac)))
+							new Coordinate[] { toCord }), geofac))) {
+				/*
+				 * have to hack
+				 * 
+				 * NetworkImpl.getLinks() { return links;
+				 * // return Collections.unmodifiableMap(links);
+				 * 
+				 * }
+				 */
 				n.getLinks().put(l.getId(), l);
+
+			}
 		}
 		return n;
 	}

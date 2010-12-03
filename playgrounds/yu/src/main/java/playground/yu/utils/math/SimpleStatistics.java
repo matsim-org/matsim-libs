@@ -21,7 +21,7 @@
 /**
  *
  */
-package playground.yu.utils;
+package playground.yu.utils.math;
 
 import java.util.Collection;
 

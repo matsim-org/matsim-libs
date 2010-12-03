@@ -48,6 +48,7 @@ import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.exper
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.general.scoring.Events2Score4PC_mnl;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.general.withLegModeASC.CharyparNagelScoringFunctionFactory4PC;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.mnlValidation.MultinomialLogitChoice;
+import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.scoring.ScoringConfigGetValue;
 import playground.yu.utils.io.SimpleWriter;
 import cadyts.calibrators.Calibrator;
 import cadyts.calibrators.analytical.ChoiceParameterCalibrator;
@@ -141,13 +142,14 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 	}
 
 	private void setInitialParametersInCalibrator(Config config) {
+		ScoringConfigGetValue.setConfig(config);
 		CharyparNagelScoringConfigGroup scoringCfg = config
 				.charyparNagelScoring();
 
 		Vector initialParams = new Vector(paramDim);
 		for (int i = 0; i < initialParams.size(); i++) {
 			if (scoringCfg.getParams().containsKey(paramNames[i])) {
-				initialParams.set(i, Double.parseDouble(scoringCfg
+				initialParams.set(i, Double.parseDouble(ScoringConfigGetValue
 						.getValue(paramNames[i])));
 			} else/* bse */{
 				initialParams.set(i, Double.parseDouble(config.findParam(

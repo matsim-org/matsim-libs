@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -124,8 +125,9 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 	public CalcLinksAvgSpeed(final Network network, final RoadPricingScheme toll) {
 		this(network);
 		this.toll = toll;
-		if (toll != null)
+		if (toll != null) {
 			interestLinks = new HashSet<Id>(toll.getLinkIdSet());
+		}
 	}
 
 	public static class SpeedCounter {
@@ -192,8 +194,9 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 	@Override
 	public void handleEvent(final AgentArrivalEvent arrival) {
 		SpeedCounter sc = speedCounters.get(arrival.getLinkId().toString());
-		if (sc != null)
+		if (sc != null) {
 			sc.removeTmpEnterTime(arrival.getPersonId().toString());
+		}
 	}
 
 	@Override
@@ -202,9 +205,10 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 		SpeedCounter sc = speedCounters.get(linkId);
 		if (sc == null) {
 			double[] freeSpeeds = new double[nofBins];
-			for (int i = 0; i < nofBins - 1; i++)
+			for (int i = 0; i < nofBins - 1; i++) {
 				freeSpeeds[i] = network.getLinks().get(new IdImpl(linkId))
 						.getFreespeed(i * 86400.0 / nofBins);
+			}
 			sc = new SpeedCounter(freeSpeeds);
 		}
 		sc.setTmpEnterTime(enter.getPersonId().toString(), enter.getTime());
@@ -231,9 +235,10 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 	}
 
 	private int getBinIdx(final double time) {
-		int bin = ((int) time) / binSize;
-		if (bin >= nofBins)
+		int bin = (int) time / binSize;
+		if (bin >= nofBins) {
 			return nofBins - 1;
+		}
 		return bin;
 	}
 
@@ -251,9 +256,10 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 			BufferedWriter out = IOUtils.getBufferedWriter(filename);
 			StringBuffer head = new StringBuffer(
 					"avg. Speed (car)\nlinkId\tCapacity");
-			for (int i = 0; i < nofBins - 1; i++)
+			for (int i = 0; i < nofBins - 1; i++) {
 				head.append("\tH" + Integer.toString(i) + "-"
 						+ Integer.toString(i + 1));
+			}
 			head.append('\n');
 			out.write(head.toString());
 			out.flush();
@@ -262,7 +268,14 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 					.keySet() : interestLinks) {
 				StringBuffer line = new StringBuffer(linkId.toString());
 				line.append('\t');
-				line.append(this.network.getLinks().get(linkId).getCapacity());
+				Link link = network.getLinks().get(linkId);
+				if (link != null) {
+					line.append(link.getCapacity());
+				} else {
+					Logger.getLogger("Analysis").info(
+							"NULLPOINT ERROR:\tlink\t" + linkId
+									+ "\tdoes not exist in network!");
+				}
 
 				for (int j = 0; j < nofBins - 1; j++) {
 					double speed = getAvgSpeed(linkId, (double) j * binSize);
@@ -288,14 +301,17 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 	public void writeChart(final String chartFilename) {
 		int xsLength = nofBins - 1;
 		double[] xs = new double[xsLength];
-		for (int i = 0; i < xsLength; i++)
+		for (int i = 0; i < xsLength; i++) {
 			xs[i] = (double) i * (double) binSize / 3600.0;
+		}
 		double[] ySpeed = new double[xsLength];
-		for (int i = 0; i < xsLength; i++)
-			if (speedsCount[i] > 0)
+		for (int i = 0; i < xsLength; i++) {
+			if (speedsCount[i] > 0) {
 				ySpeed[i] = speeds[i] / speedsCount[i];
+			}
+		}
 		XYLineChart avgSpeedChart = new XYLineChart("avg. speed (car) in "
-				+ ((toll == null) ? "cityarea" : "toll range"), "time",
+				+ (toll == null ? "cityarea" : "toll range"), "time",
 				"avg. speed (car) [km/h]");
 		avgSpeedChart.addSeries("avg. speed of all agents (car)", xs, ySpeed);
 		avgSpeedChart.saveAsPng(chartFilename, 1024, 768);
@@ -303,10 +319,11 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 		SimpleWriter writer = new SimpleWriter(chartFilename.replace(".png",
 				".txt"));
 		writer.writeln("time\tavg. speed (car) in "
-				+ ((toll == null) ? "cityarea" : "toll range") + " [km/h]");
+				+ (toll == null ? "cityarea" : "toll range") + " [km/h]");
 
-		for (int i = 0; i < xs.length; i++)
+		for (int i = 0; i < xs.length; i++) {
 			writer.writeln(Time.writeTime(xs[i] * 3600.0) + "\t" + ySpeed[i]);
+		}
 		writer.close();
 	}
 
