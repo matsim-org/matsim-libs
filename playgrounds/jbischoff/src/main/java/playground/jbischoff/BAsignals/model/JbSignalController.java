@@ -102,7 +102,10 @@ public class JbSignalController implements SignalController {
 				this.minOn.put(sgid, this.adaptiveControllHead.getMinOnset().get(sgid));
 				// log.info("m add "+sgid+" ; "+this.minOn.get(sgid));
 			}
+			
 		}
+		this.resetAdaptiveSignals();
+
 
 	}
 
