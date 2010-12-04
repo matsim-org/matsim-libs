@@ -47,7 +47,7 @@ import playground.yu.utils.io.SimpleWriter;
 
 /**
  * @author ychen
- *
+ * 
  */
 public class AnalysisTest4Muc implements Analysis4Muc {
 	private static boolean withToll = false;
@@ -94,7 +94,7 @@ public class AnalysisTest4Muc implements Analysis4Muc {
 				+ args[1]/* runId */
 				+ "." + (scenario.equals("normal") ? "" : scenario + ".");
 
-		String tollFilename = (!scenario.equals(ONLY_MUNICH)) ? null
+		String tollFilename = !scenario.equals(ONLY_MUNICH) ? null
 				: args[args.length - 1];// last parameter, man needs tollFile
 		// only for Munich.
 
@@ -155,9 +155,7 @@ public class AnalysisTest4Muc implements Analysis4Muc {
 		CalcTrafficPerformance ctpf = new CalcTrafficPerformance(network, toll);
 		CalcNetAvgSpeed cas = new CalcNetAvgSpeed(network, toll);
 		CalcLinksAvgSpeed clas = null;
-		if (scenario.equals("Zurich")) {
-			clas = new CalcLinksAvgSpeed(network, 682845.0, 247388.0, 2000.0);
-		} else if (withToll) {
+		if (withToll) {
 			clas = new CalcLinksAvgSpeed(network, toll);
 		} else {
 			clas = new CalcLinksAvgSpeed(network);
@@ -168,15 +166,16 @@ public class AnalysisTest4Muc implements Analysis4Muc {
 		events.addHandler(clas);
 		events.addHandler(ld);
 
-		if (orms != null)
+		if (orms != null) {
 			events.addHandler(orms);
-		if (lttms != null)
+		}
+		if (lttms != null) {
 			events.addHandler(lttms);
+		}
 
 		new MatsimEventsReader(events).readFile(eventsFilename);
 
 		if (orms != null) {
-
 			orms.write(outputBase4analysis + "onRoute.txt");
 			orms.writeCharts(outputBase4analysis);
 		}
@@ -193,21 +192,25 @@ public class AnalysisTest4Muc implements Analysis4Muc {
 		sw.write("netfile:\t" + netFilename + "\neventsFile:\t"
 				+ eventsFilename + "\noutputpath:\t" + outputBase4analysis
 				+ "\n");
-		if (catl != null)
+		if (catl != null) {
 			sw.write("avg. Trip length:\t" + catl.getAverageTripLength()
 					+ " [m]\n");
+		}
 		sw.write("traffic performance (car):\t" + ctpf.getTrafficPerformance()
 				+ " [Pkm]\n");
 		sw.write("avg. speed of the total network (car):\t"
 				+ cas.getNetAvgSpeed() + " [km/h]\n");
 		sw.close();
 
-		if (dd != null)
+		if (dd != null) {
 			dd.write(outputBase4analysis);
-		if (dert != null)
+		}
+		if (dert != null) {
 			dert.write(outputBase4analysis);
-		if (ms != null)
+		}
+		if (ms != null) {
 			ms.write(outputBase4analysis);
+		}
 		System.out.println("done.");
 	}
 

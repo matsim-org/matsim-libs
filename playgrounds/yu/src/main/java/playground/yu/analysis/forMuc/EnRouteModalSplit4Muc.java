@@ -39,9 +39,9 @@ import playground.yu.utils.container.CollectionSum;
 /**
  * compute daily En Route/ departures/ arrivals of Munich Network and Munich
  * Region respectively with through traffic
- *
+ * 
  * @author yu
- *
+ * 
  */
 public class EnRouteModalSplit4Muc extends EnRouteModalSplit implements
 		Analysis4Muc {
@@ -58,10 +58,10 @@ public class EnRouteModalSplit4Muc extends EnRouteModalSplit implements
 			Population plans) {
 		super(scenario, binSize, nofBins, plans);
 		if (scenario.equals(MUNICH) || scenario.equals(ONLY_MUNICH)) {
-			this.rideDep = new double[nofBins + 1];
-			this.rideArr = new double[nofBins + 1];
-			this.rideEnRoute = new double[nofBins + 1];
-			this.rideStuck = new double[nofBins + 1];
+			rideDep = new double[nofBins + 1];
+			rideArr = new double[nofBins + 1];
+			rideEnRoute = new double[nofBins + 1];
+			rideStuck = new double[nofBins + 1];
 		}
 	}
 
@@ -70,8 +70,7 @@ public class EnRouteModalSplit4Muc extends EnRouteModalSplit implements
 	 * @param binSize
 	 * @param plans
 	 */
-	public EnRouteModalSplit4Muc(String scenario, int binSize,
-			Population plans) {
+	public EnRouteModalSplit4Muc(String scenario, int binSize, Population plans) {
 		this(scenario, binSize, 30 * 3600 / binSize + 1, plans);
 	}
 
@@ -101,28 +100,33 @@ public class EnRouteModalSplit4Muc extends EnRouteModalSplit implements
 		allCount[binIdx]++;
 		Integer itg = legCounts.get(ae.getPersonId());
 		if (itg != null) {
-			String mode = ((LegImpl) plan.getPlanElements().get(2 * itg + 1)).getMode();
+			String mode = ((LegImpl) plan.getPlanElements().get(2 * itg + 1))
+					.getMode();
 			if (TransportMode.car.equals(mode)) {
 				carCount[binIdx]++;
 			} else if (TransportMode.pt.equals(mode)) {
-				if (ptCount != null)
+				if (ptCount != null) {
 					ptCount[binIdx]++;
+				}
 			} else if (TransportMode.walk.equals(mode)) {
-				if (wlkCount != null)
+				if (wlkCount != null) {
 					wlkCount[binIdx]++;
+				}
 			} else if (TransportMode.bike.equals(mode)) {
-				if (bikeCount != null)
+				if (bikeCount != null) {
 					bikeCount[binIdx]++;
+				}
 			} else {
-				if (othersCount != null)
+				if (othersCount != null) {
 					othersCount[binIdx]++;
+				}
 			}
 		}
 	}
 
 	@Override
 	public void handleEvent(AgentArrivalEvent event) {
-		internalHandleEvent(event, this.arr, this.carArr, this.ptArr, wlkArr,
+		internalHandleEvent(event, arr, carArr, ptArr, wlkArr,
 				bikeArr, rideArr, othersArr);
 	}
 
@@ -130,16 +134,17 @@ public class EnRouteModalSplit4Muc extends EnRouteModalSplit implements
 	public void handleEvent(AgentDepartureEvent event) {
 		Id id = event.getPersonId();
 		Integer itg = legCounts.get(id);
-		if (itg == null)
+		if (itg == null) {
 			itg = Integer.valueOf(-1);
+		}
 		legCounts.put(id, itg.intValue() + 1);
-		internalHandleEvent(event, this.dep, this.carDep, this.ptDep, wlkDep,
+		internalHandleEvent(event, dep, carDep, ptDep, wlkDep,
 				bikeDep, rideDep, othersDep);
 	}
 
 	@Override
 	public void handleEvent(AgentStuckEvent event) {
-		internalHandleEvent(event, this.stuck, this.carStuck, null, null, null,
+		internalHandleEvent(event, stuck, carStuck, null, null, null,
 				rideStuck, null);
 	}
 
@@ -164,7 +169,7 @@ public class EnRouteModalSplit4Muc extends EnRouteModalSplit implements
 
 	/**
 	 * Writes the gathered data tab-separated into a text stream.
-	 *
+	 * 
 	 * @param bw
 	 *            The data stream where to write the gathered data.
 	 */
@@ -181,22 +186,22 @@ public class EnRouteModalSplit4Muc extends EnRouteModalSplit implements
 							+ "bikeDepartures\tbikeArrivals\tbikeStuck\tbikeOnRoute\t"
 							+ "rideDepartures\trideArrivals\trideStuck\trideOnRoute\t"
 							+ "othersDepartures\tothersArrivals\tothersStuck\tothersOnRoute\n");
-			for (int i = 0; i < this.dep.length; i++) {
-				bw.write(Time.writeTime(i * this.binSize) + "\t"
-						+ i * this.binSize + "\t" + this.dep[i] + "\t"
-						+ this.arr[i] + "\t" + this.stuck[i] + "\t"
-						+ this.enRoute[i] + "\t" + this.carDep[i] + "\t"
-						+ this.carArr[i] + "\t" + this.carStuck[i] + "\t"
-						+ this.carEnRoute[i] + "\t" + this.ptDep[i] + "\t"
-						+ this.ptArr[i] + "\t" + 0 + "\t" + this.ptEnRoute[i]
-						+ "\t" + this.wlkDep[i] + "\t" + this.wlkArr[i] + "\t"
-						+ 0 + "\t" + this.wlkEnRoute[i] + "\t"
-						+ this.bikeDep[i] + "\t" + this.bikeArr[i] + "\t" + 0
-						+ "\t" + this.bikeEnRoute[i] + "\t" + this.rideDep[i]
-						+ "\t" + this.rideArr[i] + "\t" + this.rideStuck[i]
-						+ "\t" + this.rideEnRoute[i] + "\t" + this.othersDep[i]
-						+ "\t" + this.othersArr[i] + "\t" + 0 + "\t"
-						+ this.othersEnRoute[i] + "\t");
+			for (int i = 0; i < dep.length; i++) {
+				bw.write(Time.writeTime(i * binSize) + "\t"
+						+ i * binSize + "\t" + dep[i] + "\t"
+						+ arr[i] + "\t" + stuck[i] + "\t"
+						+ enRoute[i] + "\t" + carDep[i] + "\t"
+						+ carArr[i] + "\t" + carStuck[i] + "\t"
+						+ carEnRoute[i] + "\t" + ptDep[i] + "\t"
+						+ ptArr[i] + "\t" + 0 + "\t" + ptEnRoute[i]
+						+ "\t" + wlkDep[i] + "\t" + wlkArr[i] + "\t"
+						+ 0 + "\t" + wlkEnRoute[i] + "\t"
+						+ bikeDep[i] + "\t" + bikeArr[i] + "\t" + 0
+						+ "\t" + bikeEnRoute[i] + "\t" + rideDep[i]
+						+ "\t" + rideArr[i] + "\t" + rideStuck[i]
+						+ "\t" + rideEnRoute[i] + "\t" + othersDep[i]
+						+ "\t" + othersArr[i] + "\t" + 0 + "\t"
+						+ othersEnRoute[i] + "\t");
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -207,7 +212,7 @@ public class EnRouteModalSplit4Muc extends EnRouteModalSplit implements
 
 	/**
 	 * Writes the gathered data tab-separated into a text file.
-	 *
+	 * 
 	 * @param filename
 	 *            The name of a file where to write the gathered data.
 	 */
@@ -231,23 +236,28 @@ public class EnRouteModalSplit4Muc extends EnRouteModalSplit implements
 		int length = enRoute.length;
 		double[] xs = new double[length];
 		for (int j = 0; j < xs.length; j++) {
-			xs[j] = ((double) j) * (double) this.binSize / 3600.0;
+			xs[j] = (double) j * (double) binSize / 3600.0;
 		}
 
 		// enRoute chart
 		XYLineChart enRouteChart = new XYLineChart("Leg Histogramm - En Route",
 				"time", "agents en route from " + scenario);
 		enRouteChart.addSeries("drivers", xs, carEnRoute);
-		if (CollectionSum.getSum(ptEnRoute) > 0)
+		if (CollectionSum.getSum(ptEnRoute) > 0) {
 			enRouteChart.addSeries("public transit users", xs, ptEnRoute);
-		if (CollectionSum.getSum(wlkEnRoute) > 0)
+		}
+		if (CollectionSum.getSum(wlkEnRoute) > 0) {
 			enRouteChart.addSeries("pedestrians", xs, wlkEnRoute);
-		if (CollectionSum.getSum(bikeEnRoute) > 0)
+		}
+		if (CollectionSum.getSum(bikeEnRoute) > 0) {
 			enRouteChart.addSeries("cyclists", xs, bikeEnRoute);
-		if (CollectionSum.getSum(rideEnRoute) > 0)
+		}
+		if (CollectionSum.getSum(rideEnRoute) > 0) {
 			enRouteChart.addSeries("ride", xs, rideEnRoute);
-		if (CollectionSum.getSum(othersEnRoute) > 0)
+		}
+		if (CollectionSum.getSum(othersEnRoute) > 0) {
 			enRouteChart.addSeries("others", xs, othersEnRoute);
+		}
 		enRouteChart.addSeries("all agents", xs, enRoute);
 		enRouteChart.saveAsPng(filename + "enRoute.png", 1024, 768);
 
@@ -256,16 +266,21 @@ public class EnRouteModalSplit4Muc extends EnRouteModalSplit implements
 				"Leg Histogramm - Departures", "time", "departing agents from "
 						+ scenario);
 		departChart.addSeries("drivers", xs, carDep);
-		if (CollectionSum.getSum(ptDep) > 0)
+		if (CollectionSum.getSum(ptDep) > 0) {
 			departChart.addSeries("public transit users", xs, ptDep);
-		if (CollectionSum.getSum(wlkDep) > 0)
+		}
+		if (CollectionSum.getSum(wlkDep) > 0) {
 			departChart.addSeries("pedestrians", xs, wlkDep);
-		if (CollectionSum.getSum(bikeDep) > 0)
+		}
+		if (CollectionSum.getSum(bikeDep) > 0) {
 			departChart.addSeries("cyclists", xs, bikeDep);
-		if (CollectionSum.getSum(rideDep) > 0)
+		}
+		if (CollectionSum.getSum(rideDep) > 0) {
 			departChart.addSeries("ride", xs, rideDep);
-		if (CollectionSum.getSum(othersDep) > 0)
+		}
+		if (CollectionSum.getSum(othersDep) > 0) {
 			departChart.addSeries("others", xs, othersDep);
+		}
 		departChart.addSeries("all agents", xs, dep);
 		departChart.saveAsPng(filename + "departures.png", 1024, 768);
 
@@ -273,16 +288,21 @@ public class EnRouteModalSplit4Muc extends EnRouteModalSplit implements
 		XYLineChart arrChart = new XYLineChart("Leg Histogramm - Arrivals",
 				"time", "arriving agents from " + scenario);
 		arrChart.addSeries("drivers", xs, carArr);
-		if (CollectionSum.getSum(ptArr) > 0)
+		if (CollectionSum.getSum(ptArr) > 0) {
 			arrChart.addSeries("public transit users", xs, ptArr);
-		if (CollectionSum.getSum(wlkArr) > 0)
+		}
+		if (CollectionSum.getSum(wlkArr) > 0) {
 			arrChart.addSeries("pedestrians", xs, wlkArr);
-		if (CollectionSum.getSum(bikeArr) > 0)
+		}
+		if (CollectionSum.getSum(bikeArr) > 0) {
 			arrChart.addSeries("cyclists", xs, bikeArr);
-		if (CollectionSum.getSum(rideArr) > 0)
+		}
+		if (CollectionSum.getSum(rideArr) > 0) {
 			arrChart.addSeries("ride", xs, rideArr);
-		if (CollectionSum.getSum(othersArr) > 0)
+		}
+		if (CollectionSum.getSum(othersArr) > 0) {
 			arrChart.addSeries("others", xs, othersArr);
+		}
 		arrChart.addSeries("all agents", xs, arr);
 		arrChart.saveAsPng(filename + "arrivals.png", 1024, 768);
 	}

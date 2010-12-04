@@ -58,9 +58,9 @@ import playground.yu.utils.io.SimpleWriter;
  * This class can only be used with plansfile, in that all <code>Leg</code>s in
  * a <code>Plan</code> muss be equiped with the same {@code Mode}
  * {@link org.matsim.api.core.v01.TransportMode} in a day.
- *
+ * 
  * @author ychen
- *
+ * 
  */
 public class LegTravelTimeModalSplit implements AgentDepartureEventHandler,
 		AgentArrivalEventHandler, Analysis {
@@ -90,18 +90,18 @@ public class LegTravelTimeModalSplit implements AgentDepartureEventHandler,
 		this.plans = plans;
 		this.binSize = binSize;
 
-		this.travelTimes = new double[nofBins + 1];
-		this.arrCount = new int[nofBins + 1];
+		travelTimes = new double[nofBins + 1];
+		arrCount = new int[nofBins + 1];
 
-		this.carTravelTimes = new double[nofBins + 1];
-		this.ptTravelTimes = new double[nofBins + 1];
-		this.wlkTravelTimes = new double[nofBins + 1];
+		carTravelTimes = new double[nofBins + 1];
+		ptTravelTimes = new double[nofBins + 1];
+		wlkTravelTimes = new double[nofBins + 1];
 		bikeTravelTimes = new double[nofBins + 1];
 		othersTravelTimes = new double[nofBins + 1];
 
-		this.carArrCount = new int[nofBins + 1];
-		this.ptArrCount = new int[nofBins + 1];
-		this.wlkArrCount = new int[nofBins + 1];
+		carArrCount = new int[nofBins + 1];
+		ptArrCount = new int[nofBins + 1];
+		wlkArrCount = new int[nofBins + 1];
 		bikeArrCount = new int[nofBins + 1];
 		othersArrCount = new int[nofBins + 1];
 	}
@@ -125,48 +125,50 @@ public class LegTravelTimeModalSplit implements AgentDepartureEventHandler,
 			// only inhabitant from Kanton
 			if (TollTools.isInRange(((PlanImpl) plans.getPersons().get(
 					event.getPersonId()).getSelectedPlan()).getFirstActivity()
-					.getLinkId(), toll))
-				this.tmpDptTimes.put(event.getPersonId().toString(), event
-						.getTime());
-		} else
-			this.tmpDptTimes.put(event.getPersonId().toString(), event
-					.getTime());
+					.getLinkId(), toll)) {
+				tmpDptTimes
+						.put(event.getPersonId().toString(), event.getTime());
+			}
+		} else {
+			tmpDptTimes.put(event.getPersonId().toString(), event.getTime());
+		}
 	}
 
 	@Override
 	public void reset(final int iteration) {
-		this.tmpDptTimes.clear();
+		tmpDptTimes.clear();
 	}
 
 	@Override
 	public void handleEvent(final AgentArrivalEvent event) {
 		double arrTime = event.getTime();
 		String agentId = event.getPersonId().toString();
-		if (toll == null)
+		if (toll == null) {
 			internalCompute(agentId, arrTime);
-		else if (TollTools.isInRange(((PlanImpl) plans.getPersons().get(
+		} else if (TollTools.isInRange(((PlanImpl) plans.getPersons().get(
 				event.getPersonId()).getSelectedPlan()).getFirstActivity()
-				.getLinkId(), toll))
+				.getLinkId(), toll)) {
 			internalCompute(agentId, arrTime);
+		}
 	}
 
 	protected void internalCompute(String agentId, double arrTime) {
-		Double dptTime = this.tmpDptTimes.remove(agentId);
+		Double dptTime = tmpDptTimes.remove(agentId);
 		if (dptTime != null) {
 			int binIdx = getBinIndex(arrTime);
 			double travelTime = arrTime - dptTime;
-			this.travelTimes[binIdx] += travelTime;
-			this.arrCount[binIdx]++;
+			travelTimes[binIdx] += travelTime;
+			arrCount[binIdx]++;
 
 			Plan selectedplan = plans.getPersons().get(new IdImpl(agentId))
 					.getSelectedPlan();
 			String mode = PlanModeJudger.getMode(selectedplan);
 			if (TransportMode.car.equals(mode)) {
-				this.carTravelTimes[binIdx] += travelTime;
-				this.carArrCount[binIdx]++;
+				carTravelTimes[binIdx] += travelTime;
+				carArrCount[binIdx]++;
 			} else if (TransportMode.pt.equals(mode)) {
-				this.ptTravelTimes[binIdx] += travelTime;
-				this.ptArrCount[binIdx]++;
+				ptTravelTimes[binIdx] += travelTime;
+				ptArrCount[binIdx]++;
 			} else if (TransportMode.walk.equals(mode)) {
 				wlkTravelTimes[binIdx] += travelTime;
 				wlkArrCount[binIdx]++;
@@ -174,16 +176,17 @@ public class LegTravelTimeModalSplit implements AgentDepartureEventHandler,
 				bikeTravelTimes[binIdx] += travelTime;
 				bikeArrCount[binIdx]++;
 			} else {
-				this.othersTravelTimes[binIdx] += travelTime;
-				this.othersArrCount[binIdx]++;
+				othersTravelTimes[binIdx] += travelTime;
+				othersArrCount[binIdx]++;
 			}
 		}
 	}
 
 	protected int getBinIndex(final double time) {
-		int bin = (int) (time / this.binSize);
-		if (bin >= this.travelTimes.length)
-			return this.travelTimes.length - 1;
+		int bin = (int) (time / binSize);
+		if (bin >= travelTimes.length) {
+			return travelTimes.length - 1;
+		}
 		return bin;
 	}
 
@@ -197,22 +200,21 @@ public class LegTravelTimeModalSplit implements AgentDepartureEventHandler,
 						+ "\twalk_traveltimes [s]\twalk_n._arrivals\twalk_avg. traveltimes [s]"
 						+ "\tbike_traveltimes [s]\tbike_n._arrivals\tbike_avg. traveltimes [s]"
 						+ "\tothers_traveltimes [s]\tothers_n._arrivals\tothers_avg. traveltimes [s]");
-		for (int i = 0; i < this.travelTimes.length; i++)
-			sw.writeln(Time.writeTime(i * this.binSize) + "\t"
-					+ i * this.binSize + "\t" + this.travelTimes[i] + "\t"
-					+ this.arrCount[i] + "\t"
-					+ this.travelTimes[i] / this.arrCount[i] + "\t"
-					+ this.carTravelTimes[i] + "\t" + this.carArrCount[i]
-					+ "\t" + this.carTravelTimes[i] / this.carArrCount[i]
-					+ "\t" + this.ptTravelTimes[i] + "\t" + this.ptArrCount[i]
-					+ "\t" + this.ptTravelTimes[i] / this.ptArrCount[i] + "\t"
-					+ this.wlkTravelTimes[i] + "\t" + this.wlkArrCount[i]
-					+ "\t" + this.wlkTravelTimes[i] / this.wlkArrCount[i]
-					+ "\t" + this.bikeTravelTimes[i] + "\t"
-					+ this.bikeArrCount[i] + "\t" + this.bikeTravelTimes[i]
-					/ this.bikeArrCount[i] + "\t" + this.othersTravelTimes[i]
-					+ "\t" + this.othersArrCount[i] + "\t"
-					+ this.othersTravelTimes[i] / this.othersArrCount[i]);
+		for (int i = 0; i < travelTimes.length; i++) {
+			sw.writeln(Time.writeTime(i * binSize) + "\t" + i * binSize + "\t"
+					+ travelTimes[i] + "\t" + arrCount[i] + "\t"
+					+ travelTimes[i] / arrCount[i] + "\t" + carTravelTimes[i]
+					+ "\t" + carArrCount[i] + "\t"
+					+ carTravelTimes[i] / carArrCount[i] + "\t"
+					+ ptTravelTimes[i] + "\t" + ptArrCount[i] + "\t"
+					+ ptTravelTimes[i] / ptArrCount[i] + "\t"
+					+ wlkTravelTimes[i] + "\t" + wlkArrCount[i] + "\t"
+					+ wlkTravelTimes[i] / wlkArrCount[i] + "\t"
+					+ bikeTravelTimes[i] + "\t" + bikeArrCount[i] + "\t"
+					+ bikeTravelTimes[i] / bikeArrCount[i] + "\t"
+					+ othersTravelTimes[i] + "\t" + othersArrCount[i] + "\t"
+					+ othersTravelTimes[i] / othersArrCount[i]);
+		}
 
 		sw.write("----------------------------------------\n");
 		sw
@@ -255,65 +257,74 @@ public class LegTravelTimeModalSplit implements AgentDepartureEventHandler,
 	}
 
 	public void writeCharts(final String filename) {
-		int xsLength = this.travelTimes.length + 1;
+		int xsLength = travelTimes.length + 1;
 		double[] xs = new double[xsLength];
-		for (int i = 0; i < xsLength; i++)
-			xs[i] = (double) i * (double) this.binSize / 3600.0;
+		for (int i = 0; i < xsLength; i++) {
+			xs[i] = (double) i * (double) binSize / 3600.0;
+		}
 		XYLineChart travelTimeSumChart = new XYLineChart("TravelTimes", "time",
 				"sum of TravelTimes [s]");
 		travelTimeSumChart.addSeries("sum of traveltimes of drivers", xs,
-				this.carTravelTimes);
-		if (CollectionSum.getSum(ptTravelTimes) > 0)
+				carTravelTimes);
+		if (CollectionSum.getSum(ptTravelTimes) > 0) {
 			travelTimeSumChart.addSeries(
 					"sum of traveltime of public transit users", xs,
-					this.ptTravelTimes);
-		if (CollectionSum.getSum(wlkTravelTimes) > 0)
+					ptTravelTimes);
+		}
+		if (CollectionSum.getSum(wlkTravelTimes) > 0) {
 			travelTimeSumChart.addSeries("sum of traveltime of walkers", xs,
-					this.wlkTravelTimes);
-		if (CollectionSum.getSum(bikeTravelTimes) > 0)
+					wlkTravelTimes);
+		}
+		if (CollectionSum.getSum(bikeTravelTimes) > 0) {
 			travelTimeSumChart.addSeries("sum of traveltime of cyclists", xs,
-					this.bikeTravelTimes);
-		if (CollectionSum.getSum(othersTravelTimes) > 0)
+					bikeTravelTimes);
+		}
+		if (CollectionSum.getSum(othersTravelTimes) > 0) {
 			travelTimeSumChart.addSeries(
 					"sum of traveltime of other modes users", xs,
-					this.othersTravelTimes);
+					othersTravelTimes);
+		}
 		travelTimeSumChart.addSeries("sum of traveltimes of all agents", xs,
-				this.travelTimes);
+				travelTimes);
 		travelTimeSumChart.saveAsPng(filename + "Sum.png", 1024, 768);
 
 		for (int j = 0; j < xsLength - 1; j++) {
-			this.travelTimes[j] = this.arrCount[j] == 0 ? -1
-					: this.travelTimes[j] / this.arrCount[j];
-			this.carTravelTimes[j] = this.carArrCount[j] == 0 ? -1
-					: this.carTravelTimes[j] / this.carArrCount[j];
-			this.ptTravelTimes[j] = this.ptArrCount[j] == 0 ? -1
-					: this.ptTravelTimes[j] / this.ptArrCount[j];
-			this.wlkTravelTimes[j] = this.wlkArrCount[j] == 0 ? -1
-					: this.wlkTravelTimes[j] / this.wlkArrCount[j];
-			this.bikeTravelTimes[j] = this.bikeArrCount[j] == 0 ? -1
-					: this.bikeTravelTimes[j] / this.bikeArrCount[j];
-			this.othersTravelTimes[j] = this.othersArrCount[j] == 0 ? -1
-					: this.othersTravelTimes[j] / this.othersArrCount[j];
+			travelTimes[j] = arrCount[j] == 0 ? -1 : travelTimes[j]
+					/ arrCount[j];
+			carTravelTimes[j] = carArrCount[j] == 0 ? -1 : carTravelTimes[j]
+					/ carArrCount[j];
+			ptTravelTimes[j] = ptArrCount[j] == 0 ? -1 : ptTravelTimes[j]
+					/ ptArrCount[j];
+			wlkTravelTimes[j] = wlkArrCount[j] == 0 ? -1 : wlkTravelTimes[j]
+					/ wlkArrCount[j];
+			bikeTravelTimes[j] = bikeArrCount[j] == 0 ? -1 : bikeTravelTimes[j]
+					/ bikeArrCount[j];
+			othersTravelTimes[j] = othersArrCount[j] == 0 ? -1
+					: othersTravelTimes[j] / othersArrCount[j];
 		}
 		XYLineChart avgTravelTimeChart = new XYLineChart(
 				"average LegTravelTime", "time", "average TravelTimes [s]");
 		avgTravelTimeChart.addSeries("average traveltime of drivers", xs,
-				this.carTravelTimes);
-		if (CollectionSum.getSum(ptArrCount) > 0)
+				carTravelTimes);
+		if (CollectionSum.getSum(ptArrCount) > 0) {
 			avgTravelTimeChart.addSeries(
 					"average traveltime of public transit Users", xs,
-					this.ptTravelTimes);
-		if (CollectionSum.getSum(wlkArrCount) > 0)
+					ptTravelTimes);
+		}
+		if (CollectionSum.getSum(wlkArrCount) > 0) {
 			avgTravelTimeChart.addSeries("average traveltime of walkers", xs,
-					this.wlkTravelTimes);
-		if (CollectionSum.getSum(bikeArrCount) > 0)
+					wlkTravelTimes);
+		}
+		if (CollectionSum.getSum(bikeArrCount) > 0) {
 			avgTravelTimeChart.addSeries("average traveltime of cyclists", xs,
-					this.bikeTravelTimes);
-		if (CollectionSum.getSum(othersArrCount) > 0)
+					bikeTravelTimes);
+		}
+		if (CollectionSum.getSum(othersArrCount) > 0) {
 			avgTravelTimeChart.addSeries("average traveltime of others", xs,
-					this.othersTravelTimes);
+					othersTravelTimes);
+		}
 		avgTravelTimeChart.addSeries("average traveltime of all agents", xs,
-				this.travelTimes);
+				travelTimes);
 		avgTravelTimeChart.saveAsPng(filename + "Avg.png", 1024, 768);
 	}
 

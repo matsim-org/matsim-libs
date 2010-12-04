@@ -40,7 +40,8 @@ public interface Analysis4Muc extends Analysis {
 		unknown("unknown"), work("work"), education("education"), business(
 				"business"), shopping("shopping"), private_("private"), leisure(
 				"leisure"), sports("sports"), home("home"), friends("friends"), pickup(
-				"pickup"), with_adult("with adult"), other("other");
+				"pickup"), with_adult("with adult"), other("other"), pvHome(
+				"pvHome"), pvWork("pvWork"), gvHome("gvHome");
 
 		private final String actTypeName;
 

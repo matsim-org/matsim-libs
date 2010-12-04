@@ -37,7 +37,7 @@ import playground.yu.utils.io.SimpleWriter;
 
 /**
  * @author yu
- *
+ * 
  */
 public class ModeSplit4Muc extends ModeSplit implements Analysis4Muc {
 	private int rideLegs = 0,//
@@ -53,38 +53,46 @@ public class ModeSplit4Muc extends ModeSplit implements Analysis4Muc {
 	@Override
 	public void run(final Plan plan) {
 		boolean inRange = false;
-		if (toll != null)
+		if (toll != null) {
 			inRange = TollTools.isInRange(((PlanImpl) plan).getFirstActivity()
 					.getLinkId(), toll);
-		for (PlanElement pe : plan.getPlanElements())
+		}
+		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof Leg) {
 				String m = ((Leg) pe).getMode();
 				if (TransportMode.car.equals(m)) {
 					carLegs++;
-					if (inRange)
+					if (inRange) {
 						tollCarLegs++;
+					}
 				} else if (TransportMode.pt.equals(m)) {
 					ptLegs++;
-					if (inRange)
+					if (inRange) {
 						tollPtLegs++;
+					}
 				} else if (TransportMode.walk.equals(m)) {
 					wlkLegs++;
-					if (inRange)
+					if (inRange) {
 						tollWlkLegs++;
+					}
 				} else if (TransportMode.bike.equals(m)) {
 					bikeLegs++;
-					if (inRange)
+					if (inRange) {
 						tollBikeLegs++;
+					}
 				} else if (TransportMode.ride.equals(m)) {
 					rideLegs++;
-					if (inRange)
+					if (inRange) {
 						tollRideLegs++;
+					}
 				} else {
 					othersLegs++;
-					if (inRange)
+					if (inRange) {
 						tollOthersLegs++;
+					}
 				}
 			}
+		}
 	}
 
 	@Override
