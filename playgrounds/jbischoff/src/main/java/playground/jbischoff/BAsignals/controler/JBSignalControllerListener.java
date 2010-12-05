@@ -3,12 +3,9 @@
  */
 package playground.jbischoff.BAsignals.controler;
 
-import java.util.Map;
-import java.util.TreeMap;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
-import org.jfree.util.Log;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.basic.v01.IdImpl;
@@ -32,15 +29,12 @@ import org.matsim.signalsystems.mobsim.SignalEngine;
 import org.matsim.signalsystems.model.SignalGroupState;
 import org.matsim.signalsystems.model.SignalSystemsManager;
 
+//import playground.dgrether.signalsystems.analysis.DgSignalGreenSplitHandler;
+//import playground.dgrether.signalsystems.analysis.DgSignalGroupAnalysisData;
 import playground.jbischoff.BAsignals.analysis.TimeCalcHandler;
 import playground.jbischoff.BAsignals.builder.JbSignalBuilder;
 import playground.jbischoff.BAsignals.model.AdaptiveControllHead;
 import playground.jbischoff.BAsignals.model.CarsOnLaneHandler;
-
-import playground.dgrether.analysis.charts.utils.DgChartWriter;
-import playground.dgrether.signalsystems.analysis.DgGreenSplitPerIterationGraph;
-import playground.dgrether.signalsystems.analysis.DgSignalGreenSplitHandler;
-import playground.dgrether.signalsystems.analysis.DgSignalGroupAnalysisData;
 
 /**
  * @author jbischoff
@@ -56,7 +50,7 @@ public class JBSignalControllerListener implements StartupListener, IterationSta
 	private AdaptiveControllHead ach;
 
 	
-	 private DgSignalGreenSplitHandler signalGreenSplitHandler;
+//	private DgSignalGreenSplitHandler signalGreenSplitHandler;
 
 	public JBSignalControllerListener() {
 		this.collh = new CarsOnLaneHandler();
@@ -93,20 +87,20 @@ public class JBSignalControllerListener implements StartupListener, IterationSta
 
 	private void addControlerListeners(Controler c) {
 		// strange compilation error
-		signalGreenSplitHandler = new DgSignalGreenSplitHandler();
-		signalGreenSplitHandler.addSignalSystem(new IdImpl("18"));
-		signalGreenSplitHandler.addSignalSystem(new IdImpl("17"));
-		signalGreenSplitHandler.addSignalSystem(new IdImpl("1"));
-
-
-		c.getEvents().addHandler(signalGreenSplitHandler);
-		c.addControlerListener(new StartupListener() {
-
-			public void notifyStartup(StartupEvent e) {
-				e.getControler().getEvents()
-						.addHandler(signalGreenSplitHandler);
-			}
-		});
+//		signalGreenSplitHandler = new DgSignalGreenSplitHandler();
+//		signalGreenSplitHandler.addSignalSystem(new IdImpl("18"));
+//		signalGreenSplitHandler.addSignalSystem(new IdImpl("17"));
+//		signalGreenSplitHandler.addSignalSystem(new IdImpl("1"));
+//
+//
+//		c.getEvents().addHandler(signalGreenSplitHandler);
+//		c.addControlerListener(new StartupListener() {
+//
+//			public void notifyStartup(StartupEvent e) {
+//				e.getControler().getEvents()
+//						.addHandler(signalGreenSplitHandler);
+//			}
+//		});
 
 		
 		c.addControlerListener(new IterationEndsListener() {
@@ -123,32 +117,32 @@ public class JBSignalControllerListener implements StartupListener, IterationSta
 			}
 		});
 
-		c.addControlerListener(new ShutdownListener() {
-			private final Logger logg = Logger
-					.getLogger(ShutdownListener.class);
-
-			public void notifyShutdown(ShutdownEvent e) {
-
-			
-				for (Id ssid : signalGreenSplitHandler
-						.getSystemIdAnalysisDataMap().keySet()) {
-					// logg.info("=======Statistic for SignalSystem: "+ssid+" =============");
-					for (Entry<Id, DgSignalGroupAnalysisData> entry : signalGreenSplitHandler
-							.getSystemIdAnalysisDataMap().get(ssid)
-							.getSystemGroupAnalysisDataMap().entrySet()) {
-						// logg.info("for signalgroup: "+entry.getKey());
-						for (Entry<SignalGroupState, Double> ee : entry
-								.getValue().getStateTimeMap().entrySet()) {
-							// logg.info(ee.getKey()+": "+ee.getValue());
-							logg.info("b;" + ssid + ";" + entry.getKey() + ";"
-									+ ee.getKey() + ";" + ee.getValue());
-
-						}
-					}
-				}
-			}
-		}
-				);
+//		c.addControlerListener(new ShutdownListener() {
+//			private final Logger logg = Logger
+//					.getLogger(ShutdownListener.class);
+//
+//			public void notifyShutdown(ShutdownEvent e) {
+//
+//			
+//				for (Id ssid : signalGreenSplitHandler
+//						.getSystemIdAnalysisDataMap().keySet()) {
+//					// logg.info("=======Statistic for SignalSystem: "+ssid+" =============");
+//					for (Entry<Id, DgSignalGroupAnalysisData> entry : signalGreenSplitHandler
+//							.getSystemIdAnalysisDataMap().get(ssid)
+//							.getSystemGroupAnalysisDataMap().entrySet()) {
+//						// logg.info("for signalgroup: "+entry.getKey());
+//						for (Entry<SignalGroupState, Double> ee : entry
+//								.getValue().getStateTimeMap().entrySet()) {
+//							// logg.info(ee.getKey()+": "+ee.getValue());
+//							logg.info("b;" + ssid + ";" + entry.getKey() + ";"
+//									+ ee.getKey() + ";" + ee.getValue());
+//
+//						}
+//					}
+//				}
+//			}
+//		}
+//				);
 
 	
 			}
