@@ -127,7 +127,7 @@ public class AdaptiveControllHead {
 
 
 	public void sizeDownPlans() {
-		double ratio = JBBaParams.PLANSDOWNSIZER;
+		double ratio = JBBaParams.SCALE;
 		for (SignalSystemControllerData sscd : this.sscmap.values()) {
 
 			for (SignalPlanData spd : sscd.getSignalPlanData().values()) {
@@ -211,5 +211,16 @@ public class AdaptiveControllHead {
 	public Map<Id, Integer> getMaxDropping() {
 		return maxDropping;
 	}
-
+	public boolean laneIsAdaptive(Id laneid) {
+		try {
+			Id ssid = this.getSignalSystemforLaneId(laneid);
+			if (ssid != null) {
+				return true;
+			}
+			else
+				return false;
+		} catch (NullPointerException e) {
+			return false;
+		}
+	}
 }

@@ -35,6 +35,10 @@ import org.matsim.signalsystems.model.SignalSystem;
 
 import playground.jbischoff.BAsignals.JBBaParams;
 
+/**
+ * @author JB
+ *
+ */
 public class CarsOnLaneHandler implements LaneEnterEventHandler {
 
 	private static final Logger log = Logger.getLogger(CarsOnLaneHandler.class);
@@ -43,13 +47,11 @@ public class CarsOnLaneHandler implements LaneEnterEventHandler {
 	private Map<Id, Double> timeStamp;
 	private Map<Double, List<Id>> gapsAtSecond;
 	private Map<Id, SignalSystem> signalSystemMap;
-	private Set<Id> carsPassed;
 
 	public CarsOnLaneHandler() {
 		this.timeStamp = new HashMap<Id, Double>();
 		this.gapsAtSecond = new HashMap<Double, List<Id>>();
 		this.signalSystemMap = new HashMap<Id, SignalSystem>();
-		this.carsPassed = new HashSet<Id>();
 	}
 
 	public void setAdaptiveControllHead(AdaptiveControllHead ach) {
@@ -62,14 +64,13 @@ public class CarsOnLaneHandler implements LaneEnterEventHandler {
 
 	@Override
 	public void handleEvent(LaneEnterEvent event) {
-		if (this.laneIsAdaptive(event.getLaneId()) & (!event.getLaneId().toString().endsWith(".ol"))) {
+		if (this.adaptiveControllHead.laneIsAdaptive(event.getLaneId()) & (!event.getLaneId().toString().endsWith(".ol"))) {
 			// log.info(event.getTime()+" time in l");
-			this.carsPassed.add(event.getPersonId());
 			if (!timeStamp.containsKey(event.getLaneId())) {
 				timeStamp.put(event.getLaneId(), event.getTime());
 			}
 			double timeGap = calcTimeGap(event);
-			if ((timeGap != 0) && (timeGap < JBBaParams.DETECTORACCURACY)) {
+			if ((timeGap != 0) && (timeGap < JBBaParams.ACTUATIONACCURACY)) {
 				// log.info(event.getTime()+": Time Gap on Lane " +event.getLaneId()+
 				// " , sg: "+this.adaptiveControllHead.getSignalGroupforLaneId(event.getLaneId()) +" is "+timeGap);
 				Id sysid = this.adaptiveControllHead.getSignalSystemforLaneId(event.getLaneId());
@@ -100,18 +101,7 @@ public class CarsOnLaneHandler implements LaneEnterEventHandler {
 	/**
 	 * Could be cached and then removed
 	 */
-	private boolean laneIsAdaptive(Id laneid) {
-		try {
-			Id ssid = this.adaptiveControllHead.getSignalSystemforLaneId(laneid);
-			if (ssid != null) {
-				return true;
-			}
-			else
-				return false;
-		} catch (NullPointerException e) {
-			return false;
-		}
-	}
+
 
 	@Override
 	public void reset(int iteration) {
@@ -123,8 +113,7 @@ public class CarsOnLaneHandler implements LaneEnterEventHandler {
 		return adaptiveControllHead;
 	}
 
-	public long getPassedAgents() {
-		return this.carsPassed.size();
-	}
+
+	
 
 }

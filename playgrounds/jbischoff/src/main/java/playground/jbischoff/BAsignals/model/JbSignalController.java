@@ -167,13 +167,11 @@ public class JbSignalController implements SignalController {
 
 		}
 		int ps;
-		if (this.adaptiveDroppings.get(sgId) + JBBaParams.PHASESTEPPROLONGER < this.maxDrop.get(sgId)) {
-			// log.info("got it 3 ast" + this.availableStretchTime);
-			ps = JBBaParams.PHASESTEPPROLONGER;
+		if (this.adaptiveDroppings.get(sgId) + JBBaParams.EXPANSION < this.maxDrop.get(sgId)) {
+			ps = JBBaParams.EXPANSION;
 		}
 		else {
 			ps = this.maxDrop.get(sgId) - this.adaptiveDroppings.get(sgId);
-			// log.info("got it 4 ast" + this.availableStretchTime);
 
 		}
 		this.postPoneOffSet(sgId, ps);

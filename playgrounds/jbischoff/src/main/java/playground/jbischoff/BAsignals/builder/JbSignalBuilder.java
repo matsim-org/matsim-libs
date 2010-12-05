@@ -47,10 +47,10 @@ public class JbSignalBuilder implements SignalSystemsModelBuilder {
 	private AdaptiveControllHead adaptiveControllHead;
 	private CarsOnLaneHandler collh;
 	
-	public JbSignalBuilder(SignalsData signalsData, FromDataBuilder dataBuilder, CarsOnLaneHandler carsOnLaneHandler){
+	public JbSignalBuilder(SignalsData signalsData, FromDataBuilder dataBuilder, CarsOnLaneHandler carsOnLaneHandler, AdaptiveControllHead ach){
 		this.dataBuilder = dataBuilder;
 		this.signalsData = signalsData;
-		this.adaptiveControllHead = new AdaptiveControllHead();
+		this.adaptiveControllHead = ach;
 		this.collh = carsOnLaneHandler;
 	}
 	

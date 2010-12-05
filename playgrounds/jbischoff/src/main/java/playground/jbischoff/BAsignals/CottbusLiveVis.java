@@ -46,7 +46,7 @@ import playground.jbischoff.BAsignals.model.CarsOnLaneHandler;
  */
 public class CottbusLiveVis {
 
-	private final String config = "/media/data/work/repos/shared-svn/studies/dgrether/cottbus/Cottbus-BA/scenario-slv/dg_cottbus_config_live_vis.xml";
+	private final String config = "/Users/JB/Documents/Work/cottbus/Cottbus-BA/scenario-slv/dg_cottbus_config_live_vis.xml";
 
 	
 	private void runCottbus() {
@@ -66,7 +66,7 @@ public class CottbusLiveVis {
 			AdaptiveControllHead adaptiveControllHead = new AdaptiveControllHead();
 			CarsOnLaneHandler carsOnLaneHandler = new CarsOnLaneHandler();
 			carsOnLaneHandler.setAdaptiveControllHead(adaptiveControllHead);
-			JbSignalBuilder jbBuilder = new JbSignalBuilder(scenario.getScenarioElement(SignalsData.class), new FromDataBuilder(scenario.getScenarioElement(SignalsData.class), events), carsOnLaneHandler);
+			JbSignalBuilder jbBuilder = new JbSignalBuilder(scenario.getScenarioElement(SignalsData.class), new FromDataBuilder(scenario.getScenarioElement(SignalsData.class), events), carsOnLaneHandler, adaptiveControllHead);
 			SignalEngine engine = new QSimSignalEngine(jbBuilder.createAndInitializeSignalSystemsManager());
 			qSim.addQueueSimulationListeners(engine);
 		}
