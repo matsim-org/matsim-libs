@@ -1,1 +1,0 @@
-moved to tutorial.programming.example10PlanStrategy.  Kai, 25/Sep/2010
