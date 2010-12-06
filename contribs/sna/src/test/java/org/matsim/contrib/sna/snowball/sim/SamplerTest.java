@@ -58,7 +58,7 @@ public class SamplerTest extends TestCase {
 		sampler.setSeedGenerator(new FixedSizeRandomPartition<Vertex>(1, 1));
 		sampler.run(graph);
 
-		Degree degree = new Degree();
+		Degree degree = Degree.getInstance();
 		for (int it = 0; it <= sampler.getIteration(); it++) {
 			Set<? extends SampledVertex> vertices = SnowballPartitions.createSampledPartition(sampler.getSampledGraph()
 					.getVertices(), it);

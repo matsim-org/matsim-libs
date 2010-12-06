@@ -56,7 +56,7 @@ public class DegreeTest extends TestCase {
 		builder.addEdge(graph, v6, v1);
 		builder.addEdge(graph, v2, v5);
 		
-		Degree degree = new Degree();
+		Degree degree = Degree.getInstance();
 		
 		Distribution distr = degree.distribution(graph.getVertices());
 		assertEquals(2.33, distr.mean(), 0.01);

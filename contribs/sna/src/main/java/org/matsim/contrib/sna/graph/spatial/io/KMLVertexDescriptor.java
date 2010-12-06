@@ -46,7 +46,7 @@ public class KMLVertexDescriptor implements KMLObjectDetail {
 	 * @param graph a graph
 	 */
 	public KMLVertexDescriptor(Graph graph) {
-		kDistr = new Degree().values(graph.getVertices());
+		kDistr = Degree.getInstance().values(graph.getVertices());
 	}
 
 	/**

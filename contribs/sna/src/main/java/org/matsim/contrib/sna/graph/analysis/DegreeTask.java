@@ -50,7 +50,7 @@ public class DegreeTask extends ModuleAnalyzerTask<Degree> {
 	 * analysis.
 	 */
 	public DegreeTask() {
-		setModule(new Degree());
+		setModule(Degree.getInstance());
 	}
 
 	/**

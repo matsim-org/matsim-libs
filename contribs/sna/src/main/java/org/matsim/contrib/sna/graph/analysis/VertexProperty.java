@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TransitivityTest.java
+ * VertexProperty.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -23,48 +23,14 @@ import gnu.trove.TObjectDoubleHashMap;
 
 import java.util.Set;
 
-import junit.framework.TestCase;
-
-import org.matsim.contrib.sna.graph.SparseGraph;
-import org.matsim.contrib.sna.graph.SparseGraphBuilder;
-import org.matsim.contrib.sna.graph.SparseVertex;
 import org.matsim.contrib.sna.graph.Vertex;
-import org.matsim.contrib.sna.math.Distribution;
 
 /**
- * @author jillenberger
+ * @author illenberger
+ *
  */
-public class TransitivityTest extends TestCase {
+public interface VertexProperty<V extends Vertex> {
 
-	@SuppressWarnings("unchecked")
-	public void test() {
-		SparseGraphBuilder builder = new SparseGraphBuilder();
-		SparseGraph graph = builder.createGraph();
-
-		SparseVertex v1 = builder.addVertex(graph);
-		SparseVertex v2 = builder.addVertex(graph);
-		SparseVertex v3 = builder.addVertex(graph);
-		SparseVertex v4 = builder.addVertex(graph);
-
-		builder.addEdge(graph, v1, v2);
-		builder.addEdge(graph, v1, v4);
-		builder.addEdge(graph, v1, v3);
-		builder.addEdge(graph, v2, v4);
-
-		Transitivity degree = Transitivity.getInstance();
-
-		Distribution distr = degree.localClusteringDistribution(graph.getVertices());
-		assertEquals(7/12.0, distr.mean(), 0.01);
-		assertEquals(0.0, distr.min());
-		assertEquals(1.0, distr.max());
-
-		TObjectDoubleHashMap<Vertex> values = (TObjectDoubleHashMap<Vertex>) degree.localClusteringCoefficients((Set<? extends Vertex>)graph.getVertices());
-
-		assertEquals(1/3.0, values.get(v1));
-		assertEquals(1.0, values.get(v2));
-		assertEquals(1.0, values.get(v4));
-		assertEquals(0.0, values.get(v3));
-
-		assertEquals(3/5.0, degree.globalClusteringCoefficient(graph));
-	}
+	public TObjectDoubleHashMap<V> values(Set<? extends V> vertices);
+	
 }

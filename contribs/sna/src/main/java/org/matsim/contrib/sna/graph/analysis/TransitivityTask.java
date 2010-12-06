@@ -50,7 +50,7 @@ public class TransitivityTask extends ModuleAnalyzerTask<Transitivity> {
 	 * used for analysis.
 	 */
 	public TransitivityTask() {
-		setModule(new Transitivity());
+		setModule(Transitivity.getInstance());
 	}
 
 	/**

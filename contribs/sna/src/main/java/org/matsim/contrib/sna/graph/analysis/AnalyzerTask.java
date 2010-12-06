@@ -23,6 +23,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.math.Distribution;
 
@@ -35,6 +36,8 @@ import org.matsim.contrib.sna.math.Distribution;
  */
 public abstract class AnalyzerTask {
 
+	private static final Logger logger = Logger.getLogger(AnalyzerTask.class);
+	
 	private String output;
 
 	/**
@@ -105,6 +108,15 @@ public abstract class AnalyzerTask {
 			
 			Distribution.writeHistogram(distr.normalizedDistribution(distr.absoluteDistributionFixed(100)), String
 					.format("%1$s/%2$s.share.fixed.txt", output, name));
+		}
+	}
+	
+	protected boolean outputDirectoryNotNull() {
+		if(getOutputDirectory() != null)
+			return true;
+		else {
+			logger.warn("No output directory specified.");
+			return false;
 		}
 	}
 }

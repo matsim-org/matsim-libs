@@ -50,7 +50,7 @@ public class VertexDegreeColorizer implements Colorizable {
 	 *            a graph
 	 */
 	public VertexDegreeColorizer(Graph graph) {
-		Degree degree = new Degree();
+		Degree degree = Degree.getInstance();
 		Distribution distr = degree.distribution(graph.getVertices());
 		k_min = (int) distr.min();
 		k_max = (int) distr.max();

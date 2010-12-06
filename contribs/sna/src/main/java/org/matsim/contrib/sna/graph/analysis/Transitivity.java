@@ -37,8 +37,16 @@ import org.matsim.contrib.sna.math.Distribution;
  * @author illenberger
  * 
  */
-public class Transitivity {
+public class Transitivity implements VertexProperty<Vertex>{
 
+	private static Transitivity instance;
+	
+	public static Transitivity getInstance() {
+		if(instance == null)
+			instance = new Transitivity();
+		return instance;
+	}
+	
 	/**
 	 * Calculates the distribution of local clustering coefficients.
 	 * 
@@ -134,5 +142,10 @@ public class Transitivity {
 		}
 
 		return n_triangles / (double) n_tripples;
+	}
+
+	@Override
+	public TObjectDoubleHashMap<Vertex> values(Set<? extends Vertex> vertices) {
+		return (TObjectDoubleHashMap<Vertex>) localClusteringCoefficients(vertices);
 	}
 }

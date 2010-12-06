@@ -21,7 +21,6 @@ package org.matsim.contrib.sna.graph.analysis;
 
 import gnu.trove.TObjectDoubleHashMap;
 
-import java.util.Collection;
 import java.util.Set;
 
 import org.matsim.contrib.sna.graph.Edge;
@@ -36,8 +35,16 @@ import org.matsim.contrib.sna.math.Distribution;
  * @author illenberger
  * 
  */
-public class Degree {
+public class Degree implements VertexProperty<Vertex> {
 
+	private static Degree instance;
+	
+	public static Degree getInstance() {
+		if(instance == null)
+			instance = new Degree();
+		return instance;
+	}
+	
 	/**
 	 * Returns the degree distribution of vertices in <tt>vertices</tt>. The
 	 * graph is treated as undirected.
@@ -62,7 +69,7 @@ public class Degree {
 	 *            a set of vertices
 	 * @return a Vertex-double-map containing the degree of each vertex.
 	 */
-	public TObjectDoubleHashMap<Vertex> values(Collection<? extends Vertex> vertices) {
+	public TObjectDoubleHashMap<Vertex> values(Set<? extends Vertex> vertices) {
 		TObjectDoubleHashMap<Vertex> values = new TObjectDoubleHashMap<Vertex>();
 		for (Vertex v : vertices)
 			values.put(v, v.getEdges().size());
