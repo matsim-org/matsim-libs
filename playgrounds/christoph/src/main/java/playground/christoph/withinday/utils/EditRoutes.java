@@ -43,11 +43,15 @@ public class EditRoutes {
 
 	private static final Logger logger = Logger.getLogger(EditRoutes.class);
 	
-	/*
-	 * We create a new Plan which contains only the Leg
-	 * that should be replanned and its previous and next
-	 * Activities. By doing so the PlanAlgorithm will only
-	 * change the Route of that Leg.
+	/**Re-plans a future route between two activities.  The route is given by its leg, which is given by the planElementIndex.
+	 * <p/>
+	 * The leg needs to be preceded and followed by activities in order for this method to work.  This is not as strong a 
+	 * requirement as one may think, since pt plans also need to be stripped down to the "real" activities before routing starts.
+	 * <p/> 
+	 * @param plan the plan containing the leg/route to be re-planned
+	 * @param legPlanElementIndex the index for the leg containing the route to be re-planned
+	 * @param planAlgorithm an algorithm that fulfills the PlanAlgorithm interface, but needs to be a router for this method to make sense
+	 * @return true when replacing the route worked, false when something went wrong
 	 */
 	public boolean replanFutureLegRoute(Plan plan, int legPlanElementIndex, PlanAlgorithm planAlgorithm) {
 		
@@ -59,11 +63,8 @@ public class EditRoutes {
 		if (planElement instanceof Leg) {
 			leg = (Leg) planElement;
 		} else return false;
-		
-		// yyyy I can't say how safe this is.  There is no guarantee that the same entry is not used twice in the plan.  This will in
-		// particular be a problem if we override the "equals" contract, in the sense that two activities are equal if
-		// certain (or all) elements are equal.  kai, oct'10
-		
+
+		// yy This will (obviously) fail if the plan does not have alternating acts and legs.  kai, nov'10
 		Activity fromActivity = (Activity) plan.getPlanElements().get(legPlanElementIndex - 1);
 		Activity toActivity = (Activity) plan.getPlanElements().get(legPlanElementIndex + 1);
 		
@@ -96,6 +97,12 @@ public class EditRoutes {
 			}		
 		}
 		
+		/*
+		 * We create a new Plan which contains only the Leg
+		 * that should be replanned and its previous and next
+		 * Activities. By doing so the PlanAlgorithm will only
+		 * change the Route of that Leg.
+		 */
 		/*
 		 *  Create a new Plan that contains only the Leg
 		 *  which should be replanned and run the PlanAlgorithm.
