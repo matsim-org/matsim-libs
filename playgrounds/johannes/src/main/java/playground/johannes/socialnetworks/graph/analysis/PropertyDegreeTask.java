@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DegreeEdgeLength.java
+ * TransitivityDegreeTask.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,59 +17,35 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.graph.spatial.analysis;
+package playground.johannes.socialnetworks.graph.analysis;
 
-import gnu.trove.TObjectDoubleHashMap;
-import gnu.trove.TObjectDoubleIterator;
+import gnu.trove.TDoubleDoubleHashMap;
 
 import java.io.IOException;
 import java.util.Map;
-import java.util.Set;
 
-import org.apache.log4j.Logger;
 import org.matsim.contrib.sna.graph.Graph;
-import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.graph.analysis.Degree;
 import org.matsim.contrib.sna.graph.analysis.ModuleAnalyzerTask;
-import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
+import org.matsim.contrib.sna.graph.analysis.Transitivity;
 
 import playground.johannes.socialnetworks.statistics.Correlations;
 
 /**
  * @author illenberger
- *
+ * 
  */
-public class DegreeEdgeLengthTask extends ModuleAnalyzerTask<Degree> {
-
-	private static final Logger logger = Logger.getLogger(DegreeEdgeLengthTask.class);
-	
-	public DegreeEdgeLengthTask() {
-		setModule(Degree.getInstance());
-	}
+public class PropertyDegreeTask extends ModuleAnalyzerTask<Degree> {
 	
 	@Override
 	public void analyze(Graph graph, Map<String, Double> stats) {
-		if(getOutputDirectory() != null) {
-			
-		TObjectDoubleHashMap<Vertex> kValues = module.values(graph.getVertices());
-		TObjectDoubleHashMap<SpatialVertex> dValues = new Distance().vertexMeanValues((Set<? extends SpatialVertex>) graph.getVertices());
-		
-		double[] kValues2 = new double[kValues.size()];
-		double[] dValues2 = new double[kValues.size()];
-		TObjectDoubleIterator<Vertex> it = kValues.iterator();
-		for(int i = 0; i < kValues.size(); i++) {
-			it.advance();
-			kValues2[i] = it.value();
-			dValues2[i] = dValues.get((SpatialVertex) it.key());
-		}
-		
-		try {
-			Correlations.writeToFile(Correlations.correlationMean(kValues2, dValues2, 3.0), getOutputDirectory() + "/k_distance.txt", "k", "distance_mean");
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		} else {
-			logger.warn("No ouput directory specified!");
+		if (outputDirectoryNotNull()) {			
+			TDoubleDoubleHashMap c = VertexPropertyCorrelation.mean(Transitivity.getInstance(), module, graph.getVertices());
+			try {
+				Correlations.writeToFile(c, getOutputDirectory() + "/c_k.txt", "k", "c_local");
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 

@@ -47,7 +47,7 @@ public class DegreeDensityTask extends ModuleAnalyzerTask<Degree> {
 	private ZoneLayer zones;
 	
 	public DegreeDensityTask(ZoneLayer zones) {
-		setModule(new Degree());
+		setModule(Degree.getInstance());
 		this.zones = zones;
 	}
 

@@ -32,7 +32,7 @@ import playground.johannes.socialnetworks.gis.GravityCostFunction;
 import playground.johannes.socialnetworks.gis.SpatialCostFunction;
 import playground.johannes.socialnetworks.gis.WGS84DistanceCalculator;
 import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
-import playground.johannes.socialnetworks.graph.analysis.TransitivityDegreeTask;
+import playground.johannes.socialnetworks.graph.analysis.PropertyDegreeTask;
 import playground.johannes.socialnetworks.graph.social.analysis.AgeTask;
 import playground.johannes.socialnetworks.graph.spatial.analysis.AcceptFactorTask;
 import playground.johannes.socialnetworks.graph.spatial.analysis.AccessibilityPartitioner;
@@ -71,8 +71,8 @@ public class ObservedAnalyzerTask extends AnalyzerTaskComposite {
 		transitivity.setModule(new ObservedTransitivity());
 		addTask(transitivity);
 		
-		TransitivityDegreeTask transDegree = new TransitivityDegreeTask();
-		transDegree.setModule(new ObservedTransitivity());
+		PropertyDegreeTask transDegree = new PropertyDegreeTask();
+		transDegree.setModule(new ObservedDegree());
 		addTask(transDegree);
 		
 		DistanceTask distance = new DistanceTask();

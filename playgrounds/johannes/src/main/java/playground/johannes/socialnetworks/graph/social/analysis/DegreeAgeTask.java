@@ -44,7 +44,7 @@ public class DegreeAgeTask extends ModuleAnalyzerTask<Degree> {
 	private static final Logger logger = Logger.getLogger(DegreeAgeTask.class);
 	
 	public DegreeAgeTask() {
-		setModule(new Degree());
+		setModule(Degree.getInstance());
 	}
 	
 	@Override

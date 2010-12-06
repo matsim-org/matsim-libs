@@ -54,7 +54,7 @@ public class DegreeAccessabilityTask extends ModuleAnalyzerTask<Degree> {
 	private SpatialCostFunction costFunction;
 	
 	public DegreeAccessabilityTask(Set<Point> opportunities, SpatialCostFunction costFunction) {
-		setModule(new Degree());
+		setModule(Degree.getInstance());
 		this.costFunction = costFunction;
 		this.opportunities = opportunities;
 	}

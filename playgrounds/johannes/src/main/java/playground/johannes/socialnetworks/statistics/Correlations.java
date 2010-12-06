@@ -83,11 +83,6 @@ public class Correlations {
 		
 		for(int i = 0; i < values1.length; i++) {
 			double key = values1[i];
-//			if(binsize > 0.0)
-//				key = Math.floor(key/binsize) * binsize;
-			/*
-			 * FIXME Need to fix LinearDisctetizer!!!
-			 */
 			key = discretizer.discretize(key);
 			sums.adjustOrPutValue(key, values2[i], values2[i]);
 			counts.adjustOrPutValue(key, 1, 1);

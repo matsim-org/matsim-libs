@@ -49,7 +49,7 @@ public class RandomGraphGenerator {
 		ErdosRenyiGenerator<SpatialSparseGraph, SpatialSparseVertex, SpatialSparseEdge> generator = new ErdosRenyiGenerator<SpatialSparseGraph, SpatialSparseVertex, SpatialSparseEdge>(new SpatialSparseGraphBuilder(graph.getCoordinateReferenceSysten()));
 		graph = generator.generate(graph, 0.001, 4711);
 		
-		System.out.println(new Degree().distribution(graph.getVertices()).mean());
+		System.out.println(Degree.getInstance().distribution(graph.getVertices()).mean());
 //		SpatialGraphAnalyzer.analyze(graph, "/Users/fearonni/vsp-work/work/socialnets/mcmc/", false, SpatialGrid.readFromFile("/Users/fearonni/vsp-work/work/socialnets/data/schweiz/zrh100km/popdensity/popdensity.1000.xml"));
 		SpatialGraphMLWriter writer = new SpatialGraphMLWriter();
 		writer.write(graph, "/Users/fearonni/vsp-work/work/socialnets/mcmc/graph.graphml");

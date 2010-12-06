@@ -48,7 +48,7 @@ public class PajekClusteringColorizer<V extends Vertex, E extends Edge> extends 
 	@SuppressWarnings("unchecked")
 	public PajekClusteringColorizer(Graph g) {
 		super();
-		clustering = new Transitivity().localClusteringCoefficients((Set<V>)g.getVertices());		
+		clustering = Transitivity.getInstance().localClusteringCoefficients((Set<V>)g.getVertices());		
 		c_min = StatUtils.min(clustering.getValues());
 		c_max = StatUtils.max(clustering.getValues());
 	}

@@ -44,7 +44,7 @@ public class PajekDegreeColorizer<V extends Vertex, E extends Edge> extends Paje
 	public PajekDegreeColorizer(Graph g, boolean logScale) {
 		super();
 		setLogScale(logScale);
-		Distribution stats = new Degree().distribution(g.getVertices());
+		Distribution stats = Degree.getInstance().distribution(g.getVertices());
 		k_min = stats.min();
 		k_max = stats.max();
 	}

@@ -109,7 +109,7 @@ public class EstimDiff extends RunLocator<EstimDiffContainer> {
 		SparseGraphMLReader reader = new SparseGraphMLReader();
 		Graph graph = reader.readGraph(graphFile);
 		
-		return new Degree().distribution(graph.getVertices()).absoluteDistribution();
+		return Degree.getInstance().distribution(graph.getVertices()).absoluteDistribution();
 	}
 
 	@Override

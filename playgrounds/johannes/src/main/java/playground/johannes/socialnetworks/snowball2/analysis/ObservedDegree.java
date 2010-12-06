@@ -50,7 +50,7 @@ public class ObservedDegree extends Degree {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public TObjectDoubleHashMap<Vertex> values(Collection<? extends Vertex> vertices) {
+	public TObjectDoubleHashMap<Vertex> values(Set<? extends Vertex> vertices) {
 		return (TObjectDoubleHashMap<Vertex>) super.values(SnowballPartitions.<SampledVertex>createSampledPartition((Collection<SampledVertex>) vertices));
 	}
 
