@@ -1,9 +1,0 @@
-There are as of today (8/Jul/2009) two versions:
-
-(1) BasicDemandGenerator, based on the "basic" interfaces, but essentially deprecated.
-
-(2) DemandGenerator, based on the core.api.experimental API.
-
-The goal is that eventually (2) becomes the standard version, but we aren't there yet.
-
-kai, jul09
