@@ -40,6 +40,9 @@ public class MyMobsimFactory implements MobsimFactory {
 	private PersonalizableTravelCost travCostCalc;
 	private PersonalizableTravelTime travTimeCalc;
 	
+	private enum ReplanningType { general, carPlans }
+	private ReplanningType replanningType = ReplanningType.general ;
+
 	MyMobsimFactory( PersonalizableTravelCost travelCostCalculator, PersonalizableTravelTime travelTimeCalculator ) {
 		this.travCostCalc = travelCostCalculator ;
 		this.travTimeCalc = travelTimeCalculator ;
@@ -50,7 +53,11 @@ public class MyMobsimFactory implements MobsimFactory {
 		
 		Mobsim mobsim = new QSim( sc, events ) ;
 		
-		mobsim.addQueueSimulationListeners(new WithinDayMobsimListener(this.travCostCalc,this.travTimeCalc)) ;
+		if ( replanningType.equals( ReplanningType.general ) ) {
+			mobsim.addQueueSimulationListeners(new WithinDayMobsimListener(this.travCostCalc,this.travTimeCalc)) ;
+		} else if ( replanningType.equals( ReplanningType.carPlans ) ) {
+			mobsim.addQueueSimulationListeners(new WithinDayMobsimListener2(this.travCostCalc,this.travTimeCalc)) ;
+		}
 		
 		mobsim.setAgentFactory( new ExperimentalBasicWithindayAgentFactory(mobsim) ) ;
 		
