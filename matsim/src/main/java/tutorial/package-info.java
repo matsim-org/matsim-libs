@@ -1,11 +1,9 @@
 /**
  * <p>
- * This package contains matsim tutorial files.  In theory, they should be described in "Getting started with MATSim".  In practice, the files here
+ * This package contains MATSim tutorial files.  In theory, they should be described in "Getting started with MATSim".  In practice, the files here
  * have a tendency to be more modern than the descriptions in the tutorial.  Here is some help:
  * <ul>
- * <li> "config" contains files illustrating how to use matsim by modifying the (xml-) config files only. </li>
- * <li> "demandgeneration" contains examples on how to generate an initial demand (initial population file) for matsim.  There are many ways of doing this; the examples here 
- * only show a very small number of methods. </li>
+ * <li> "config" contains files illustrating how to use MATSim by modifying the (xml-) config files only. </li>
  * <li> "programming" illustrates how one can extend matsim in useful ways, while remaining minimally invasive. </li>
  * </ul>
  * 
