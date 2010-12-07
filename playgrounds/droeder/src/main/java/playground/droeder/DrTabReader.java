@@ -34,31 +34,24 @@ import org.matsim.core.utils.io.IOUtils;
  */
 public class DrTabReader {
 	private static final Logger log = Logger.getLogger(DrTabReader.class);
-	private Set<String[]> lines = null;
-	private String[] header = null;
-	String inFile;
 	
-	public DrTabReader(String inFile){
-		this.inFile = inFile;
-		this.lines = new TreeSet<String[]>();
-	}
 	
-	public void readTabFile(boolean header){
+	public static Set<String[]> readTabFileContent(String inFile, boolean hasHeader){
 		
-		boolean first = header;
+		boolean first = hasHeader;
+		Set<String[]> lines = new TreeSet<String[]>();
+		
 		String line;
-		
 		try {
-			BufferedReader reader = IOUtils.getBufferedReader(this.inFile);
+			BufferedReader reader = IOUtils.getBufferedReader(inFile);
 			line = reader.readLine();
 			do{
 				if(!(line == null)){
 					String[] columns = line.split("\t");
 					if(first == true){
-						this.header = columns;
 						first = false;
 					}else{
-						this.lines.add(columns);
+						lines.add(columns);
 					}
 					
 					line = reader.readLine();
@@ -71,24 +64,30 @@ public class DrTabReader {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
+		return lines;
 	}
 	
-	public Set<String[]> getContent(){
-		if(this.lines == null){
-			throw new RuntimeException("call readTabFile() first!");
+	public static String[] readTabFileHeader(String inFile){
+		
+		String line;
+		String[] header = null;
+		try {
+			BufferedReader reader = IOUtils.getBufferedReader(inFile);
+			line = reader.readLine();
+			if(!(line == null)){
+				header = line.split("\t");
+			}
+			reader.close();
+			
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
-		return this.lines;
+		
+		return header;
 	}
 	
-	public String[] getHeader(){
-		if (this.lines == null){
-			throw new RuntimeException("call readTabFile() first!");
-		} else if(this.header == null){
-			log.error("file has no header!");
-			return null;
-		}else{
-			return this.header;
-		}
-	}
 
 }
