@@ -31,7 +31,7 @@ public final class QueryServer {
 	}
 
 	public OTFQueryRemote answerQuery(AbstractQuery query) {
-		query.installQuery(scenario, queueModel);
+		query.installQuery(queueModel);
 		activeQueries.add(query);
 		return query;
 	}

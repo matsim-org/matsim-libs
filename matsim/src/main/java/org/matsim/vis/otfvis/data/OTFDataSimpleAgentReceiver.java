@@ -27,22 +27,6 @@ import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 
 public interface OTFDataSimpleAgentReceiver extends OTFDataReceiver{
 	
-	/**
-	 * @param id
-	 * @param startX
-	 * @param startY
-	 * @param state ... is ignored in most if not all places.  kai, jan'10
-	 * @param userdefined
-	 * @param color
-	 * 
-	 * <p>
-	 * yyyy My intuition is that we should try to remove both "state" and "userdefined".  If this is not possible
-	 * for backwards compatibility reasons, then the old setAgent should be set deprecated, and there should 
-	 * be a newer one, with shorter signature.  kai, jan'10
-	 * </p>
-	 */
-	@Deprecated
-	public void setAgent(char[] id, float startX, float startY, int state, int userdefined, float color);
 	public void setAgent( AgentSnapshotInfo agInfo ) ;
 
 }

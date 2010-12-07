@@ -5,10 +5,16 @@ import java.nio.ByteBuffer;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.algorithms.SnapshotGenerator;
 import org.matsim.core.utils.collections.QuadTree.Rect;
@@ -48,11 +54,23 @@ public final class OTFVisLiveServer implements OTFLiveServerRemote {
 
 	private SnapshotGenerator snapshotGenerator;
 
+	private Map<Id, Plan> plans;
+
 	private final class CurrentTimeStepView implements SimulationViewForQueries {
 
 		@Override
 		public Collection<AgentSnapshotInfo> getSnapshot() {
 			return nextTimeStep.agentPositions;
+		}
+
+		@Override
+		public Map<Id, Plan> getPlans() {
+			return plans;
+		}
+
+		@Override
+		public Network getNetwork() {
+			return scenario.getNetwork();
 		}
 
 	}
@@ -141,6 +159,11 @@ public final class OTFVisLiveServer implements OTFLiveServerRemote {
 		SimulationViewForQueries queueModel = new CurrentTimeStepView();
 		this.queryServer = new QueryServer(scenario, eventsManager, queueModel);
 		this.nextTimeStep = new TimeStep();
+		this.plans = new HashMap<Id, Plan>();
+		for (Person person : scenario.getPopulation().getPersons().values()) {
+			Plan plan = person.getSelectedPlan();
+			this.plans.put(person.getId(), plan);
+		}
 	}
 
 	@Override
@@ -254,6 +277,11 @@ public final class OTFVisLiveServer implements OTFLiveServerRemote {
 
 	public void setSnapshotGenerator(SnapshotGenerator snapshotGenerator) {
 		this.snapshotGenerator = snapshotGenerator;
+	}
+
+	public void addAdditionalPlans(Map<Id, Plan> additionalPlans) {
+		this.plans.putAll(additionalPlans);
+
 	}
 
 }

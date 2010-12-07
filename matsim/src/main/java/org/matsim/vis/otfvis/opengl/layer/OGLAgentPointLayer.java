@@ -32,7 +32,6 @@ import java.util.Map;
 
 import javax.media.opengl.GL;
 
-import org.apache.log4j.Logger;
 import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.caching.DefaultSceneLayer;
 import org.matsim.vis.otfvis.caching.SceneGraph;
@@ -58,11 +57,7 @@ import com.sun.opengl.util.texture.Texture;
  */
 public class OGLAgentPointLayer extends DefaultSceneLayer {
 
-	private final static Logger log = Logger.getLogger(OGLAgentPointLayer.class);
-
 	private final static int BUFFERSIZE = 10000;
-
-	private static int agentPointDrawerSetAgentCnt = 0 ;
 
 	private static OTFOGLDrawer.FastColorizer colorizer = new OTFOGLDrawer.FastColorizer(
 			new double[] { 0.0, 30., 50.}, new Color[] {
@@ -222,20 +217,6 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 	public class AgentPointDrawer extends OTFGLDrawableImpl implements OTFDataSimpleAgentReceiver {
 		
 		@Override
-		@Deprecated
-		public void setAgent(char[] id, float startX, float startY, int state, int userdefined, float color) {
-			if ( agentPointDrawerSetAgentCnt < 1 ) {
-				agentPointDrawerSetAgentCnt++ ;
-				log.warn("calling setAgent") ;
-			}
-			if (userdefined != 2) {
-				OGLAgentPointLayer.this.drawer.addAgent(id, startX, startY, colorizer.getColor(color), true);
-			} else {
-				OGLAgentPointLayer.this.drawer.addAgent(id, startX, startY, new Color(0.0f, 0.7f, 1.0f), true);
-			}
-		}
-		
-		@Override
 		public void setAgent( AgentSnapshotInfo agInfo ) {
 			char[] id = agInfo.getId().toString().toCharArray();
 			
@@ -301,17 +282,9 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 			return new Color(idR, idG,idB,250);
 		}
 
-		@Override
-		public void setAgent(char[] id, float startX, float startY, int state, int user, float color) {
-			OGLAgentPointLayer.this.drawer.addAgent(id, startX, startY, getColorFromID(id), true);
-		}
 	}
 
 	public static class NoAgentDrawer extends OTFGLDrawableImpl implements OTFDataSimpleAgentReceiver  {
-
-		@Override
-		public void setAgent(char[] id, float startX, float startY, int state, int user, float color){
-		}
 
 		@Override
 		public void setAgent( AgentSnapshotInfo agInfo ) {

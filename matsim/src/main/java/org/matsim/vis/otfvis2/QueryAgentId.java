@@ -24,7 +24,6 @@ import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.vis.otfvis.OTFVisMobsimFeature;
 import org.matsim.vis.otfvis.SimulationViewForQueries;
@@ -75,7 +74,7 @@ public final class QueryAgentId extends AbstractQuery {
 	}
 
 	@Override
-	public void installQuery(Scenario scenario, SimulationViewForQueries queueModel) {
+	public void installQuery(SimulationViewForQueries queueModel) {
 		this.result = new Result();
 		double minDist = Double.POSITIVE_INFINITY;
 		double dist = 0;

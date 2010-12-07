@@ -54,7 +54,7 @@ public class FreightAgentTrackerBuilder {
 
 	public FreightAgentTracker build(){
 		if(carriersInitialized && routerInitialized && networkInitialized && eventsManagerInitialized){
-			FreightAgentTracker tracker = new FreightAgentTracker(carriers, router, eventsManager);
+			FreightAgentTracker tracker = new FreightAgentTracker(carriers, router);
 			tracker.setNetwork(network);
 			for(CarrierCostListener ccl : costListeners){
 				tracker.getCostListeners().add(ccl);

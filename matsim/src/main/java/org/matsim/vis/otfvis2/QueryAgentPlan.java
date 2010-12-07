@@ -37,14 +37,12 @@ import javax.media.opengl.GL;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -111,25 +109,24 @@ public final class QueryAgentPlan extends AbstractQuery {
 	}
 
 	@Override
-	public void installQuery(Scenario scenario, SimulationViewForQueries queueModel) {
+	public void installQuery(SimulationViewForQueries simulationView) {
 		result = new Result();
 		result.agentId = this.agentId.toString();
-		Person person = scenario.getPopulation().getPersons().get(this.agentId);
-		if (person != null) {
-			Plan plan = person.getSelectedPlan();
+		Plan plan = simulationView.getPlans().get(this.agentId);
+		if (plan != null) {
 			for (PlanElement e : plan.getPlanElements()) {
 				if (e instanceof Activity) {
 					Activity act = (Activity) e;
 					Coord coord = act.getCoord();
 					if (coord == null) {
-						Link link = scenario.getNetwork().getLinks().get(act.getLinkId());
+						Link link = simulationView.getNetwork().getLinks().get(act.getLinkId());
 						coord = link.getCoord();
 					}
 					result.acts.add(new MyInfoText((float) coord.getX(),
 							(float) coord.getY(), act.getType()));
 				}
 			}
-			buildRoute(plan, result, agentId, scenario.getNetwork());
+			buildRoute(plan, result, agentId, simulationView.getNetwork());
 			result.hasPlan = true;
 		} else {
 			log.error("No plan found for id " + this.agentId);

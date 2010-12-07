@@ -19,10 +19,15 @@
 
 package playground.mzilske.city2000w;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.Simulation;
@@ -30,6 +35,7 @@ import org.matsim.vis.otfvis.gui.OTFHostConnectionManager;
 import org.matsim.vis.otfvis2.OTFVisClient;
 import org.matsim.vis.otfvis2.OTFVisLiveServer;
 
+import playground.mrieser.core.mobsim.api.PlanAgent;
 import playground.mrieser.core.mobsim.features.OTFVisFeature;
 import playground.mrieser.core.mobsim.features.StatusFeature;
 import playground.mrieser.core.mobsim.features.fastQueueNetworkFeature.FastQueueNetworkFeature;
@@ -104,6 +110,8 @@ public class City2000WMobsimFactory implements MobsimFactory {
 
 		if (useOTFVis) {
 			OTFVisLiveServer server = new OTFVisLiveServer(scenario, eventsManager);
+			Map<Id, Plan> freightAgentPlans = createFreightAgentPlanMap();
+			server.addAdditionalPlans(freightAgentPlans);
 			OTFHostConnectionManager hostConnectionManager = new OTFHostConnectionManager("Wurst", server);
 			OTFVisClient client = new OTFVisClient();
 			client.setHostConnectionManager(hostConnectionManager);
@@ -116,6 +124,19 @@ public class City2000WMobsimFactory implements MobsimFactory {
 		
 		planSim.addAgentSource(freightAgentTracker);
 		return planSim;
+	}
+
+	private Map<Id, Plan> createFreightAgentPlanMap() {
+		Map<Id, Plan> result = new HashMap<Id, Plan>();
+		for(PlanAgent planAgent : freightAgentTracker.getAgents()) {
+			Plan plan = planAgent.getPlan();
+			result.put(plan.getPerson().getId(), plan);
+		}
+		return result;
+	}
+
+	public void setUseOTFVis(boolean useOTFVis) {
+		this.useOTFVis = useOTFVis;
 	}
 
 }

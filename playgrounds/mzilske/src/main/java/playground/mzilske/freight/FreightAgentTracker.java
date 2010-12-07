@@ -8,7 +8,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
@@ -31,19 +30,23 @@ public class FreightAgentTracker implements AgentSource, ActivityEndEventHandler
 
 	private PlanAlgorithm router;
 
-	private EventsManager eventsManager;
-	
 	private Network network;
+
+	private List<PlanAgent> agents;
 	
-	public FreightAgentTracker(Collection<CarrierImpl> carriers, PlanAlgorithm router, EventsManager eventsManager) {
+	public FreightAgentTracker(Collection<CarrierImpl> carriers, PlanAlgorithm router) {
 		this.carriers = carriers;
 		this.router = router;
-		this.eventsManager = eventsManager;
 		createCarrierAgents();
+		agents = createPlanAgents();
 	}
 
 	@Override
 	public List<PlanAgent> getAgents() {
+		return agents;
+	}
+
+	private List<PlanAgent> createPlanAgents() {
 		List<PlanAgent> agents = new ArrayList<PlanAgent>();
 		for (CarrierAgent carrierAgent : carrierAgents) {
 			List<Plan> plans = carrierAgent.createFreightDriverPlans();

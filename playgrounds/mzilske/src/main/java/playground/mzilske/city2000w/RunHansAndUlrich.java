@@ -30,7 +30,7 @@ import playground.mzilske.freight.Shipment.TimeWindow;
 
 public class RunHansAndUlrich implements StartupListener, ScoringListener, ReplanningListener, BeforeMobsimListener, AfterMobsimListener {
 
-	private static final String NETWORK_FILENAME = "../../matsim/examples/equil/network.xml";
+	private static final String NETWORK_FILENAME = "examples/equil/network.xml";
 	private CarrierImpl c1;
 	private CarrierImpl c2;
 	private Carriers carriers;
@@ -49,12 +49,12 @@ public class RunHansAndUlrich implements StartupListener, ScoringListener, Repla
 		Config config = new Config();
 		config.addCoreModules();
 		config.controler().setFirstIteration(0);
-		config.controler().setLastIteration(10);
+		config.controler().setLastIteration(1);
 		ScenarioImpl scenario = new ScenarioImpl(config);
 		new MatsimNetworkReader(scenario).readFile(NETWORK_FILENAME);
 		Controler controler = new Controler(scenario);
 		controler.addControlerListener(this);
-
+		controler.setCreateGraphs(false);
 		controler.setOverwriteFiles(true);
 		controler.run();
 	}
@@ -126,9 +126,11 @@ public class RunHansAndUlrich implements StartupListener, ScoringListener, Repla
 		carriers.getCarriers().add(c1);
 		carriers.getCarriers().add(c2);
 		
-		freightAgentTracker = new FreightAgentTracker(controler.getScenario().getScenarioElement(Carriers.class).getCarriers(), controler.createRoutingAlgorithm(), controler.getEvents());
+		freightAgentTracker = new FreightAgentTracker(controler.getScenario().getScenarioElement(Carriers.class).getCarriers(), controler.createRoutingAlgorithm());
+		freightAgentTracker.setNetwork(event.getControler().getScenario().getNetwork());
 		
 		City2000WMobsimFactory mobsimFactory = new City2000WMobsimFactory(0, freightAgentTracker);
+		mobsimFactory.setUseOTFVis(true);
 		event.getControler().setMobsimFactory(mobsimFactory);
 	}
 

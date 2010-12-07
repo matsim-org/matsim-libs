@@ -74,8 +74,6 @@ abstract class OTFSwingDrawable implements OTFDrawable, OTFDataReceiver{
  * @author dstrippgen
  */
 public class OTFSwingDrawer extends JComponent {
-	private static final Logger log = Logger.getLogger("dummy");
-
 	public static Graphics2D g2d = null;
 
 	double scale = 1;
@@ -212,9 +210,7 @@ public class OTFSwingDrawer extends JComponent {
 	public static class SimpleQuadDrawer extends OTFSwingDrawable implements OTFDataQuadReceiver{
 		protected final float[] line = new float[5];
 		protected String id = "noId";
-		//		protected float coloridx = 0;
-
-
+		
 		@Override
 		public void setQuad(float startX, float startY, float endX, float endY) {
 			setQuad(startX, startY,endX, endY, 1);
@@ -231,7 +227,7 @@ public class OTFSwingDrawer extends JComponent {
 
 		@Override
 		public void setColor(float coloridx) {
-//			this.coloridx = coloridx;
+			
 		}
 
 		@Override
@@ -281,64 +277,29 @@ public class OTFSwingDrawer extends JComponent {
 	public static class AgentDrawer extends OTFSwingDrawable implements OTFDataSimpleAgentReceiver{
 		//Anything above 50km/h should be yellow!
 		private final static ValueColorizer colorizer = new ValueColorizer(
-				new double[] { 0.0, 30., 50.}, new Color[] {
+				new double[] { 0.0, 0.3, 0.5}, new Color[] {
 						Color.RED, Color.YELLOW, Color.GREEN});
 
 		protected char[] id;
-		protected float startX, startY, color;
+		protected float startX, startY, colorValueBetweenZeroAndOne;
 		protected int state;
-		
-		@Override
-		public void setAgent(char[] id, float startX, float startY, int state, int user, float color) {
-			this.id = id;
-			this.startX = startX;
-			this.startY = startY;
-			this.color = color;
-			this.state = state;
-		}
 
 		@Override
 		public void setAgent( AgentSnapshotInfo agInfo ) {
 			this.id = agInfo.getId().toString().toCharArray();
 			this.startX = (float) agInfo.getEasting() ;
 			this.startY = (float) agInfo.getNorthing() ;
-			this.color = (float) agInfo.getColorValueBetweenZeroAndOne() ;
+			this.colorValueBetweenZeroAndOne = (float) agInfo.getColorValueBetweenZeroAndOne() ;
 			this.state = agInfo.getAgentState().ordinal() ;
 		}
 
-		//		protected void setColor(Graphics2D display) {
-		//			Color color = colorizer.getColor(0.1 + 0.9*this.color);
-		//			if ((state & 1) != 0) {
-		//				color = Color.lightGray;
-		//			}
-		//			display.setColor(color);
-		//
-		//		}
-		//
-
 		@Override
 		public void onDraw(Graphics2D display) {
-			Color color = colorizer.getColor(0.1 + 0.9*this.color);
-			if ((state & 1) != 0) color = Color.lightGray;
-
+			Color color = colorizer.getColor(this.colorValueBetweenZeroAndOne);
 			Point2D.Float pos = new Point2D.Float(startX, startY);
-			// draw agent...
-			//			final int lane = (RANDOMIZE_LANES ? (agent.hashCode()
-			//			% lanes + 1) : agent.getLane());
-
-
-//			final double agentWidth = linkWidth *0.9;
-//			final double agentLength = agentWidth*0.9;
 			float agentSize = OTFClientControl.getInstance().getOTFVisConfig().getAgentSize();
 			double offset = - 0.5 * agentSize;
-
-			// there is only ONE displayvalue!
-			if (state == 1 ) {
-				display.setColor(Color.gray);
-			} else {
-				display.setColor(color);
-			}
-
+			display.setColor(color);
 			display.fillOval((int) Math.round(pos.x + offset), (int)Math.round(pos.y + offset), Math.round(agentSize), Math.round(agentSize));
 		}
 
