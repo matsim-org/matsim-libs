@@ -31,6 +31,12 @@ public interface NetworkFactory extends MatsimFactory {
 
 	public Node createNode(final Id id, final Coord coord ) ;
 
+	/**
+	 * @param id
+	 * @param fromNodeId needs to be an id of a node that has already been added to the network
+	 * @param toNodeId needs to be an id of a node that has already been added to the network
+	 * @return the created link
+	 */
 	public Link createLink(final Id id, final Id fromNodeId, final Id toNodeId);
 
 }

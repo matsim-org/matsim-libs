@@ -22,6 +22,8 @@ package org.matsim.core.network;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+import org.jfree.util.Log;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -64,7 +66,15 @@ public class NetworkFactoryImpl implements NetworkFactory {
 	 */
 	@Override
 	public Link createLink(final Id id, final Id fromNodeId, final Id toNodeId) {
-		return this.linkFactory.createLink(id, this.network.getNodes().get(fromNodeId), this.network.getNodes().get(toNodeId), this.network, 1.0, 1.0, 1.0, 1.0);
+		Node fromNode = this.network.getNodes().get(fromNodeId) ;
+		if ( fromNode==null ) {
+			Logger.getLogger(NetworkFactoryImpl.class).error("could not find fromNodeId in network; this will probably fail downstream; have you added the node to the network?") ;
+		}
+		Node toNode = this.network.getNodes().get(toNodeId) ;
+		if ( toNode==null ) {
+			Logger.getLogger(NetworkFactoryImpl.class).error("could not find toNodeId in network; this will probably fail downstream; have you added the node to the network?") ;
+		}
+		return this.linkFactory.createLink(id, fromNode, toNode, this.network, 1.0, 1.0, 1.0, 1.0);
 	}
 
 	public Link createLink(final Id id, final Node from, final Node to,
