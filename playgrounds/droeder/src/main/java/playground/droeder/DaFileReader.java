@@ -32,22 +32,22 @@ import org.matsim.core.utils.io.IOUtils;
  * @author droeder
  *
  */
-public class DrTabReader {
-	private static final Logger log = Logger.getLogger(DrTabReader.class);
+public class DaFileReader {
+	private static final Logger log = Logger.getLogger(DaFileReader.class);
 	
-	
-	public static Set<String[]> readTabFileContent(String inFile, boolean hasHeader){
+	public static Set<String[]> readFileContent(String inFile, String splitByExpr, boolean hasHeader){
 		
 		boolean first = hasHeader;
 		Set<String[]> lines = new TreeSet<String[]>();
 		
 		String line;
 		try {
+			log.info("start reading content of " + inFile);
 			BufferedReader reader = IOUtils.getBufferedReader(inFile);
 			line = reader.readLine();
 			do{
 				if(!(line == null)){
-					String[] columns = line.split("\t");
+					String[] columns = line.split(splitByExpr);
 					if(first == true){
 						first = false;
 					}else{
@@ -58,6 +58,7 @@ public class DrTabReader {
 				}
 			}while(!(line == null));
 			reader.close();
+			log.info("finished...");
 			
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -68,18 +69,19 @@ public class DrTabReader {
 		return lines;
 	}
 	
-	public static String[] readTabFileHeader(String inFile){
+	public static String[] readFileHeader(String inFile, String splitByExpr){
 		
 		String line;
 		String[] header = null;
 		try {
+			log.info("start reading header of " + inFile);
 			BufferedReader reader = IOUtils.getBufferedReader(inFile);
 			line = reader.readLine();
 			if(!(line == null)){
-				header = line.split("\t");
+				header = line.split(splitByExpr);
 			}
 			reader.close();
-			
+			log.info("finished...");
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
