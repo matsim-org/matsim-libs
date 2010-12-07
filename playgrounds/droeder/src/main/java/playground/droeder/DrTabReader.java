@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.apache.log4j.Logger;
 import org.matsim.core.utils.io.IOUtils;
 
 /**
@@ -32,6 +33,7 @@ import org.matsim.core.utils.io.IOUtils;
  *
  */
 public class DrTabReader {
+	private static final Logger log = Logger.getLogger(DrTabReader.class);
 	private Set<String[]> lines = null;
 	private String[] header = null;
 	String inFile;
@@ -41,9 +43,9 @@ public class DrTabReader {
 		this.lines = new TreeSet<String[]>();
 	}
 	
-	public void readTabFile(){
+	public void readTabFile(boolean header){
 		
-		boolean first = true;
+		boolean first = header;
 		String line;
 		
 		try {
@@ -73,16 +75,20 @@ public class DrTabReader {
 	
 	public Set<String[]> getContent(){
 		if(this.lines == null){
-			this.readTabFile();
+			throw new RuntimeException("call readTabFile() first!");
 		}
 		return this.lines;
 	}
 	
 	public String[] getHeader(){
-		if (this.header == null){
-			this.readTabFile();
+		if (this.lines == null){
+			throw new RuntimeException("call readTabFile() first!");
+		} else if(this.header == null){
+			log.error("file has no header!");
+			return null;
+		}else{
+			return this.header;
 		}
-		return this.header;
 	}
 
 }
