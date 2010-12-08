@@ -22,8 +22,6 @@ package playground.gregor.sim2d_v2.events;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.core.api.experimental.events.Event;
-
 public class XYZEventsManager {
 
 	private final List<XYZEventsHandler> handler = new ArrayList<XYZEventsHandler>();
