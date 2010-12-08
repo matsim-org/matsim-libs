@@ -2,35 +2,75 @@ MATSim - Multi Agent Transport Simulation
 ===============================================================================
 
 
+
 Release version 0.x.x
 -------------------------------------------------------------------------------
 
-Features:
+Main focus of this release:
+>>tbd<<
 
-- org.matsim.run.OTFVis now supports Swing-GUI (-swing) 
-- org.matsim.run.OTFVis now supports Double-MVI (r11281), and removed again (r12288)
-- Swing-OTFVis can now show Link-Ids (r11300) and different link-widths (r11366)
-- NetVis is no longer available (r11317ff)
-- OsmNetworkReader more stable, e.g. does not crash if specified node-ref is missing (e.g. by filtering osm-file with osmosis 0.36 as shown in tutorial) (r11383, users-mailing-list 30sept2010)
+Changes:
+
+- New features:
+  - ?
+
+- Feature improvements:
+  - transit router got faster (r13753)
+  - ?
+
+- Other changes for developers:
+
+  API-Changes:
+  - ?
+
+  Non-API Changes:
+  - ?
 
 
-API-Changes:
-
-- ScenarioImpl.getPopulation() returns Population instead of PopulationImpl (r11288)
-- A bunch of classes no longer implement or extend Serializable, mostly for Network and Population data structure (r11637, r11638, r11650 - r11653, r11655)
-- remove no longer supported config parameters (r11975, <http://sourceforge.net/mailarchive/forum.php?thread_name=F3A57F88000BEE4FBC74E5DC0562E8D987E9CF%40axonlu-msvr2.teledata.local&forum_name=matsim-devel>)
-- Use String instead of enum TransportMode for specifying modes of transportation (r11985, r11987)
 
 
-Bug-Fixes:
+Release Fall 2010 (version 0.2.0)
+-------------------------------------------------------------------------------
 
-- Swing-OTFVis can open mvi-files created by conversion from events (r11476)
+Main focus of this release:
+Simulation of public transport, Improvements to OTFVis, Code cleanup
 
-Non-API Changes:
 
-- QVehicle.getBasicVehicle() has been renamed to QVehicle.getVehicle()
-- org.matsim.withinday removed completely
-- World, Layer data structures removed completely
+Changes:
+
+- New features:
+  - OTFVis (org.matsim.run.OTFVis) can now be started in Swing mode (-swing).
+    In Swing-Mode, no OpenGL is required, but only very limited capabilities
+    are available (Network-Viewing, simple visualization of vehicles)
+  - NetVis was removed from MATSim, use OTFVis in Swing mode instead.
+  - Simulation of public transport possible
+    see tutorial on http://matsim.org/docs/tutorials/transit
+
+- Feature improvements:
+  - improved stability of OsmNetworkReader to convert networks from OpenStreetMap
+  - Swing-OTFVis can open mvi-files created by conversion from events
+
+- Other changes for developers:
+
+  API-Changes:
+  - ScenarioImpl.getPopulation() returns Population instead of PopulationImpl (r11288)
+  - A bunch of classes no longer implement or extend Serializable, mostly for Network and Population data structure (r11637, r11638, r11650 - r11653, r11655)
+  - remove no longer supported config parameters (r11975, <http://sourceforge.net/mailarchive/forum.php?thread_name=F3A57F88000BEE4FBC74E5DC0562E8D987E9CF%40axonlu-msvr2.teledata.local&forum_name=matsim-devel>)
+  - Use String instead of enum TransportMode for specifying modes of transportation (r11985, r11987)
+
+  Non-API Changes:
+  - QVehicle.getBasicVehicle() has been renamed to QVehicle.getVehicle()
+  - org.matsim.withinday removed completely
+  - World, Layer data structures removed completely
+  - Completely re-engineered signalsystems implementation
+
+
+Please note that OTFVis may not be able to read mvi-files created with an older release of MATSim.
+Please make sure your mvi-files work as expected in OTFVis before deleting any older release of
+MATSim. In the case of problems, it might be useful to keep the old release around just for
+looking at old mvi-files.
+
+
 
 
 Release version 0.1.1
