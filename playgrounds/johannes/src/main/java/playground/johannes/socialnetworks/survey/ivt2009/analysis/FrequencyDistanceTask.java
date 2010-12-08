@@ -80,13 +80,13 @@ public class FrequencyDistanceTask extends AnalyzerTask {
 			}
 		}
 		
-		TDoubleDoubleHashMap map = Correlations.correlationMean(values1.toNativeArray(), values2.toNativeArray(), new LogDiscretizer(1.12, 52));
+		TDoubleDoubleHashMap map = Correlations.mean(values1.toNativeArray(), values2.toNativeArray(), new LogDiscretizer(1.12, 52));
 		
 			Correlations.writeToFile(map, getOutputDirectory() + "d_freq.txt", "frequency", "distance");
 //			Correlations.writeToFile(map, getOutputDirectory() + "cost_freq.txt", "frequency", "cost");
 			
 //			map = Correlations.correlationMean(values2.toNativeArray(), values1.toNativeArray(), new LinearDiscretizer(1000));
-			map = Correlations.correlationMean(values2.toNativeArray(), values1.toNativeArray(), FixedSampleSizeDiscretizer.create(values2.toNativeArray(), 200));
+			map = Correlations.mean(values2.toNativeArray(), values1.toNativeArray(), FixedSampleSizeDiscretizer.create(values2.toNativeArray(), 200));
 //			map = Correlations.correlationMean(values2.toNativeArray(), values1.toNativeArray(), new LogDiscretizer(2, 1000));
 			Correlations.writeToFile(map, getOutputDirectory() + "freq_d.txt", "distance", "frequency");
 			

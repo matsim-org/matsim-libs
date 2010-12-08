@@ -86,10 +86,10 @@ public class ObservedAnalyzerTask extends AnalyzerTaskComposite {
 //		DegreeDensityTask kRhoTask = new DegreeDensityTask(zones);
 //		kRhoTask.setModule(new ObservedDegree());
 //		addTask(kRhoTask);
-//		
-//		AgeTask age = new AgeTask();
-//		age.setModule(new ObservedAge());
-//		addTask(age);
+		
+		AgeTask age = new AgeTask();
+		age.setModule(new ObservedAge());
+		addTask(age);
 		
 //		addTask(new ComponentsTask());
 		

@@ -19,11 +19,14 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.social.analysis;
 
+import gnu.trove.TDoubleObjectHashMap;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.analysis.ModuleAnalyzerTask;
@@ -31,7 +34,7 @@ import org.matsim.contrib.sna.math.Distribution;
 
 import playground.johannes.socialnetworks.graph.social.SocialEdge;
 import playground.johannes.socialnetworks.graph.social.SocialVertex;
-import playground.johannes.socialnetworks.statistics.Correlations;
+import playground.johannes.socialnetworks.utils.TXTWriter;
 
 /**
  * @author illenberger
@@ -73,9 +76,10 @@ public class AgeTask extends ModuleAnalyzerTask<Age> {
 		if(getOutputDirectory() != null) {
 			try {
 				writeHistograms(distr, 1, false, "age.txt");
-				Correlations.writeToFile(age.correlation((Set<? extends SocialVertex>) graph.getVertices()), getOutputDirectory() + "/r_age.txt", "age", "age_mean");
+				TXTWriter.writeMap(age.correlation((Set<? extends SocialVertex>) graph.getVertices()), "age", "age_mean", getOutputDirectory() + "/age_age.mean.txt");
 				
-				module.boxplot((Set<? extends SocialVertex>) graph.getVertices(), getOutputDirectory() + "/age.boxplot.txt");
+				TDoubleObjectHashMap<DescriptiveStatistics> stat = module.boxplot((Set<? extends SocialVertex>) graph.getVertices());
+				TXTWriter.writeStatsTable(stat, getOutputDirectory() + "age_age.table.txt");
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			} catch (IOException e) {

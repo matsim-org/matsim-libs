@@ -83,7 +83,7 @@ public class DistanceAccessibilityTask extends ModuleAnalyzerTask<Distance> {
 			try{
 				double binsize = (StatUtils.max(accessValues) - StatUtils.min(accessValues))/20.0;
 				Discretizer disc = FixedSampleSizeDiscretizer.create(accessValues, 20);
-				Correlations.writeToFile(Correlations.correlationMean(accessValues, dValues, disc), String.format("%1$s/d_mean_access.txt", getOutputDirectory()), "access", "d_mean");
+				Correlations.writeToFile(Correlations.mean(accessValues, dValues, disc), String.format("%1$s/d_mean_access.txt", getOutputDirectory()), "access", "d_mean");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -107,7 +107,7 @@ public class DistanceAccessibilityTask extends ModuleAnalyzerTask<Distance> {
 				accessValues = accessValues2.toNativeArray();
 				dValues = dValues2.toNativeArray();
 				Discretizer disc = FixedSampleSizeDiscretizer.create(accessValues, 100);
-				Correlations.writeToFile(Correlations.correlationMean(accessValues, dValues, disc), String.format("%1$s/d_access.txt", getOutputDirectory()), "access", "d");
+				Correlations.writeToFile(Correlations.mean(accessValues, dValues, disc), String.format("%1$s/d_access.txt", getOutputDirectory()), "access", "d");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

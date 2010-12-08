@@ -331,12 +331,12 @@ public class GraphBuilder {
 			Distribution.writeHistogram(numDistr.absoluteDistribution(), "/Users/jillenberger/Work/socialnets/data/ivt2009/09-2010/graph/sociogram/numCliques.txt");
 			Distribution.writeHistogram(sizeDistr.absoluteDistribution(), "/Users/jillenberger/Work/socialnets/data/ivt2009/09-2010/graph/sociogram/numPersons.txt");
 			
-			Correlations.writeToFile(Correlations.correlationMean(kSizeValues.toNativeArray(), sizeValues.toNativeArray()),
+			Correlations.writeToFile(Correlations.mean(kSizeValues.toNativeArray(), sizeValues.toNativeArray()),
 					"/Users/jillenberger/Work/socialnets/data/ivt2009/09-2010/graph/sociogram/size_k.txt", "k", "size");
-			Correlations.writeToFile(Correlations.correlationMean(kNumValues.toNativeArray(), numValues.toNativeArray()), 
+			Correlations.writeToFile(Correlations.mean(kNumValues.toNativeArray(), numValues.toNativeArray()), 
 					"/Users/jillenberger/Work/socialnets/data/ivt2009/09-2010/graph/sociogram/num_k.txt", "k", "n");
 			
-			Correlations.writeToFile(Correlations.correlationMean(numValues2.toNativeArray(), sizeValues.toNativeArray()), 
+			Correlations.writeToFile(Correlations.mean(numValues2.toNativeArray(), sizeValues.toNativeArray()), 
 					"/Users/jillenberger/Work/socialnets/data/ivt2009/09-2010/graph/sociogram/size_num.txt", "num", "size");
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block

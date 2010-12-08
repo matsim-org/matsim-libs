@@ -65,7 +65,7 @@ public class TableToHistogram {
 		}
 		
 		Discretizer disc = FixedSampleSizeDiscretizer.create(values1.toNativeArray(), 100);
-		TDoubleDoubleHashMap map = Correlations.correlationMean(values1.toNativeArray(), values2.toNativeArray(), disc);
+		TDoubleDoubleHashMap map = Correlations.mean(values1.toNativeArray(), values2.toNativeArray(), disc);
 		Correlations.writeToFile(map, "/Users/jillenberger/Work/shared-svn/projects/socialnets/papers/drafts/epj-vwproceedings/fig/data/freq_phys.txt", "distance", "frequency");
 	}
 

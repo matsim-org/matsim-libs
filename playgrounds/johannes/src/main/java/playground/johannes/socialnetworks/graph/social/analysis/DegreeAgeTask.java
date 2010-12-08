@@ -64,7 +64,7 @@ public class DegreeAgeTask extends ModuleAnalyzerTask<Degree> {
 			}
 			
 			try {
-				Correlations.writeToFile(Correlations.correlationMean(kValues2, ageValues2, 5.0), getOutputDirectory() + "/k_age.txt", "k", "age");
+				Correlations.writeToFile(Correlations.mean(kValues2, ageValues2, 5.0), getOutputDirectory() + "/k_age.txt", "k", "age");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

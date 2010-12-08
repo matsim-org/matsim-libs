@@ -78,7 +78,7 @@ public class DegreeAccessabilityTask extends ModuleAnalyzerTask<Degree> {
 			try{
 				double binsize = (StatUtils.max(accessValues) - StatUtils.min(accessValues))/20.0;
 				Discretizer disc = FixedSampleSizeDiscretizer.create(accessValues, 20);
-				Correlations.writeToFile(Correlations.correlationMean(accessValues, kValues, disc), String.format("%1$s/k_access.txt", getOutputDirectory()), "access", "k_mean");
+				Correlations.writeToFile(Correlations.mean(accessValues, kValues, disc), String.format("%1$s/k_access.txt", getOutputDirectory()), "access", "k_mean");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

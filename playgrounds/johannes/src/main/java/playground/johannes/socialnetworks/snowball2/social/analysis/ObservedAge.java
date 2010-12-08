@@ -20,9 +20,11 @@
 package playground.johannes.socialnetworks.snowball2.social.analysis;
 
 import gnu.trove.TDoubleDoubleHashMap;
+import gnu.trove.TDoubleObjectHashMap;
 
 import java.util.Set;
 
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.sna.snowball.analysis.SnowballPartitions;
 
 import playground.johannes.socialnetworks.graph.social.SocialVertex;
@@ -37,19 +39,11 @@ public class ObservedAge extends Age {
 
 	@Override
 	public TDoubleDoubleHashMap correlation(Set<? extends SocialVertex> vertices) {
-		// TODO Auto-generated method stub
 		return super.correlation(SnowballPartitions.<SocialSampledVertexDecorator<?>>createSampledPartition((Set<SocialSampledVertexDecorator<?>>)vertices));
 	}
 
 	@Override
-	public void boxplot(Set<? extends SocialVertex> vertices, String file) {
-		// TODO Auto-generated method stub
-		super.boxplot(SnowballPartitions.<SocialSampledVertexDecorator<?>>createSampledPartition((Set<SocialSampledVertexDecorator<?>>)vertices), file);
+	public TDoubleObjectHashMap<DescriptiveStatistics> boxplot(Set<? extends SocialVertex> vertices) {
+		return super.boxplot(SnowballPartitions.<SocialSampledVertexDecorator<?>>createSampledPartition((Set<SocialSampledVertexDecorator<?>>)vertices));
 	}
-
-//	@Override
-//	public Distribution distribution(Set<? extends SocialVertex> vertices) {
-//		return super.distribution(SnowballPartitions.<SocialSampledVertexDecorator<?>>createSampledPartition((Set<SocialSampledVertexDecorator<?>>)vertices));
-//	}
-
 }

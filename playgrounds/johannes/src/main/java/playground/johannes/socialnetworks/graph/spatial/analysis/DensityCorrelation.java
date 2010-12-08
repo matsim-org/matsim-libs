@@ -68,7 +68,7 @@ public class DensityCorrelation {
 		if(fails > 0)
 			logger.warn(String.format("Dropped %1$s samples out of %2$s because the zone for one vertex could not be obtained.", fails, i + fails));
 		
-		return Correlations.correlationMean(rhoValues1, rhoValues2, binsize);
+		return Correlations.mean(rhoValues1, rhoValues2, binsize);
 	}
 	
 	public double pearsonCorrelation(SpatialGraph graph, ZoneLayer zones) {

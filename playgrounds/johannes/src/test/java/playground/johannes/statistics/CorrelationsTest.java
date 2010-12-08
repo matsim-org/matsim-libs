@@ -37,7 +37,7 @@ public class CorrelationsTest extends TestCase {
 		double[] values1 = new double[]{1, 1, 2, 2, 3, 3, 3};
 		double[] values2 = new double[]{5, 3, 1, 3, 7, 3, 2};
 		
-		TDoubleDoubleHashMap meanValues = Correlations.correlationMean(values1, values2);
+		TDoubleDoubleHashMap meanValues = Correlations.mean(values1, values2);
 		
 		assertEquals(4.0, meanValues.get(1));
 		assertEquals(2.0, meanValues.get(2));
@@ -48,7 +48,7 @@ public class CorrelationsTest extends TestCase {
 		double[] values1 = new double[]{1, 1.2, 2.999, 2.5, 3.0, 3.4632, 3.63};
 		double[] values2 = new double[]{5, 3, 1, 3, 7, 3, 2};
 		
-		TDoubleDoubleHashMap meanValues = Correlations.correlationMean(values1, values2, 1.0);
+		TDoubleDoubleHashMap meanValues = Correlations.mean(values1, values2, 1.0);
 		
 		assertEquals(5.0, meanValues.get(1));
 		assertEquals(3.0, meanValues.get(2));
@@ -59,7 +59,7 @@ public class CorrelationsTest extends TestCase {
 		double[] values1 = new double[]{1, 1.2, 2.999, 2.5, 3.0, 3.4632, 3.63};
 		double[] values2 = new double[]{5, 3, 1, 3, 7, 3, 2};
 		
-		TDoubleDoubleHashMap meanValues = Correlations.correlationMean(values1, values2, 2.0);
+		TDoubleDoubleHashMap meanValues = Correlations.mean(values1, values2, 2.0);
 		
 		assertEquals(0.0, meanValues.get(0));
 		assertEquals(4.0, meanValues.get(2));

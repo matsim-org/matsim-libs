@@ -91,13 +91,13 @@ public class GenderTask extends SocioMatrixTask {
 					TDoubleArrayList kValues = new TDoubleArrayList();
 					TDoubleArrayList mValues = new TDoubleArrayList();
 					calcValues(graph, kDistr, kValues, mValues, "m");
-					TDoubleDoubleHashMap cor = Correlations.correlationMean(kValues.toNativeArray(), mValues.toNativeArray(), 5);
+					TDoubleDoubleHashMap cor = Correlations.mean(kValues.toNativeArray(), mValues.toNativeArray(), 5);
 					Correlations.writeToFile(cor, getOutputDirectory() + "/gender_k_m.txt", "k", "ratio male");
 					
 					kValues = new TDoubleArrayList();
 					mValues = new TDoubleArrayList();
 					calcValues(graph, kDistr, kValues, mValues, "f");
-					cor = Correlations.correlationMean(kValues.toNativeArray(), mValues.toNativeArray(), 5);
+					cor = Correlations.mean(kValues.toNativeArray(), mValues.toNativeArray(), 5);
 					Correlations.writeToFile(cor, getOutputDirectory() + "/gender_k_f.txt", "k", "ratio male");
 					
 				} catch (IOException e) {

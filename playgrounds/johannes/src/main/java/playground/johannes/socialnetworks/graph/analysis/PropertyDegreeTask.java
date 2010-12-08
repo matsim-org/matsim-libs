@@ -20,16 +20,18 @@
 package playground.johannes.socialnetworks.graph.analysis;
 
 import gnu.trove.TDoubleDoubleHashMap;
+import gnu.trove.TDoubleObjectHashMap;
 
 import java.io.IOException;
 import java.util.Map;
 
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.analysis.Degree;
 import org.matsim.contrib.sna.graph.analysis.ModuleAnalyzerTask;
 import org.matsim.contrib.sna.graph.analysis.Transitivity;
 
-import playground.johannes.socialnetworks.statistics.Correlations;
+import playground.johannes.socialnetworks.utils.TXTWriter;
 
 /**
  * @author illenberger
@@ -39,10 +41,14 @@ public class PropertyDegreeTask extends ModuleAnalyzerTask<Degree> {
 	
 	@Override
 	public void analyze(Graph graph, Map<String, Double> stats) {
-		if (outputDirectoryNotNull()) {			
-			TDoubleDoubleHashMap c = VertexPropertyCorrelation.mean(Transitivity.getInstance(), module, graph.getVertices());
+		if (outputDirectoryNotNull()) {
 			try {
-				Correlations.writeToFile(c, getOutputDirectory() + "/c_k.txt", "k", "c_local");
+				TDoubleDoubleHashMap map = VertexPropertyCorrelation.mean(Transitivity.getInstance(), module, graph.getVertices());
+				TXTWriter.writeMap(map, getOutputDirectory() + "/c_k.mean.txt", "k", "c_local");
+				
+				TDoubleObjectHashMap<DescriptiveStatistics> stat = VertexPropertyCorrelation.statistics(Transitivity.getInstance(), module, graph.getVertices());
+				TXTWriter.writeStatsTable(stat, getOutputDirectory() + "/c_k.table.txt");
+				
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

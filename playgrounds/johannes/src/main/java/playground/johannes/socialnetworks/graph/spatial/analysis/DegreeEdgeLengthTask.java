@@ -64,7 +64,7 @@ public class DegreeEdgeLengthTask extends ModuleAnalyzerTask<Degree> {
 		}
 		
 		try {
-			Correlations.writeToFile(Correlations.correlationMean(kValues2, dValues2, 3.0), getOutputDirectory() + "/k_distance.txt", "k", "distance_mean");
+			Correlations.writeToFile(Correlations.mean(kValues2, dValues2, 3.0), getOutputDirectory() + "/k_distance.txt", "k", "distance_mean");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
