@@ -102,7 +102,7 @@ public class AcceptFactorTask extends AnalyzerTask {
 						d = distDiscretizer.discretize(d);
 						double n = n_d.get(d);
 						if(n > 0) {
-							double w = 1/(n * Math.pow(d, gamma));
+							double w = 1/(n * Math.pow(d/1000.0, gamma));
 							double k = hist.get(d) * w;
 							sum += k;
 							cnt++;
