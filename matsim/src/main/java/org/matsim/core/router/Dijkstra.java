@@ -340,9 +340,10 @@ public class Dijkstra implements IntermodalLeastCostPathCalculator {
 			visitNode(n, data, pendingNodes, currTime + travelTime, currCost
 					+ travelCost, l);
 			return true;
-		} else if (currCost + travelCost < nCost) {
-			revisitNode(n, data, pendingNodes, currTime + travelTime, currCost
-					+ travelCost, l);
+		}
+		double totalCost = currCost + travelCost;
+		if (totalCost < nCost) {
+			revisitNode(n, data, pendingNodes, currTime + travelTime, totalCost, l);
 			return true;
 		}
 
