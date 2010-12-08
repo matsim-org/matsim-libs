@@ -118,12 +118,15 @@ public final class TransitRouterNetwork implements Network {
 		final TransitRoute route;
 		final TransitLine line;
 		final Id id;
+		private final double length;
+
 		public TransitRouterNetworkLink(final Id id, final TransitRouterNetworkNode fromNode, final TransitRouterNetworkNode toNode, final TransitRoute route, final TransitLine line) {
 			this.id = id;
 			this.fromNode = fromNode;
 			this.toNode = toNode;
 			this.route = route;
 			this.line = line;
+			this.length = CoordUtils.calcDistance(this.toNode.stop.getStopFacility().getCoord(), this.fromNode.stop.getStopFacility().getCoord());
 		}
 
 		@Override
@@ -173,7 +176,7 @@ public final class TransitRouterNetwork implements Network {
 
 		@Override
 		public double getLength() {
-			return CoordUtils.calcDistance(this.toNode.stop.getStopFacility().getCoord(), this.fromNode.stop.getStopFacility().getCoord());
+			return this.length;
 		}
 
 		@Override

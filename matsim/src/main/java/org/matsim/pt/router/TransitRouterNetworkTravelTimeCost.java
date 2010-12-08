@@ -52,6 +52,7 @@ public class TransitRouterNetworkTravelTimeCost implements TravelTime, TravelMin
 		this.config = config;
 	}
 
+	@Override
 	public double getLinkGeneralizedTravelCost(final Link link, final double time) {
 		double cost;
 		if (((TransitRouterNetworkLink) link).route == null) {
@@ -89,6 +90,7 @@ public class TransitRouterNetworkTravelTimeCost implements TravelTime, TravelMin
 	}
 
 
+	@Override
 	public double getLinkTravelTime(final Link link, final double time) {
 		if ((link == this.previousLink) && (time == this.previousTime)) {
 			return this.cachedTravelTime;
@@ -97,12 +99,14 @@ public class TransitRouterNetworkTravelTimeCost implements TravelTime, TravelMin
 		this.previousTime = time;
 
 		TransitRouterNetworkLink wrapped = (TransitRouterNetworkLink) link;
+		TransitRouteStop fromStop = wrapped.fromNode.stop;
+		TransitRouteStop toStop = wrapped.toNode.stop;
 		if (wrapped.route != null) {
 			// agent stays on the same route, so use transit line travel time
-			double bestDepartureTime = getNextDepartureTime(wrapped.route, wrapped.fromNode.stop, time);
+			double bestDepartureTime = getNextDepartureTime(wrapped.route, fromStop, time);
 
-			double arrivalOffset = (wrapped.toNode.stop.getArrivalOffset() != Time.UNDEFINED_TIME) ? wrapped.toNode.stop.getArrivalOffset() : wrapped.toNode.stop.getDepartureOffset();
-			double time2 = (bestDepartureTime - time) + (arrivalOffset - wrapped.fromNode.stop.getDepartureOffset());
+			double arrivalOffset = (toStop.getArrivalOffset() != Time.UNDEFINED_TIME) ? toStop.getArrivalOffset() : toStop.getDepartureOffset();
+			double time2 = (bestDepartureTime - time) + (arrivalOffset - fromStop.getDepartureOffset());
 			if (time2 < 0) {
 				time2 += MIDNIGHT;
 			}
@@ -110,7 +114,7 @@ public class TransitRouterNetworkTravelTimeCost implements TravelTime, TravelMin
 			return time2;
 		}
 		// different transit routes, so it must be a line switch
-		double distance = CoordUtils.calcDistance(wrapped.fromNode.stop.getStopFacility().getCoord(), wrapped.toNode.stop.getStopFacility().getCoord());
+		double distance = wrapped.getLength();
 		double time2 = distance / this.config.beelineWalkSpeed;
 		this.cachedTravelTime = time2;
 		return time2;
