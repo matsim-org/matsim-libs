@@ -23,34 +23,32 @@ import java.util.Collection;
 
 import org.matsim.core.utils.collections.QuadTree;
 
-import playground.gregor.sim2d_v2.illdependencies.Force;
-
 import com.vividsolutions.jts.geom.Coordinate;
 
 public class StaticForceField {
 
-	private final QuadTree<Force> forceQuad;
+	private final QuadTree<ForceLocation> forceQuad;
 
-	public StaticForceField(QuadTree<Force> forceQuad) {
-		this.forceQuad = forceQuad;
+	public StaticForceField(QuadTree<ForceLocation> ret) {
+		this.forceQuad = ret;
 	}
 
 	public Force getForceWithin(Coordinate location, double range) {
 		if (this.forceQuad.get(location.x, location.y, range).size() > 0) {
-			return this.forceQuad.get(location.x, location.y);
+			return this.forceQuad.get(location.x, location.y).getForce();
 		}
 		return null;
 	}
 
-	public Collection<Force> getForcesWithin(Coordinate location, double range) {
+	public Collection<ForceLocation> getForcesWithin(Coordinate location, double range) {
 		return this.forceQuad.get(location.x, location.y, range);
 	}
 
-	public Collection<Force> getForces() {
+	public Collection<ForceLocation> getForces() {
 		return this.forceQuad.values();
 	}
 
-	public void addForce(Force force) {
-		this.forceQuad.put(force.getXCoord(), force.getYCoord(), force);
-	}
+	// public void addForce(ForceLocation force) {
+	// this.forceQuad.put(force.getLocation().x, force.getYCoord(), force);
+	// }
 }

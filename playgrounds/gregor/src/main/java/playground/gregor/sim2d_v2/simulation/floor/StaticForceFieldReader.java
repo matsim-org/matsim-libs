@@ -20,8 +20,6 @@
 package playground.gregor.sim2d_v2.simulation.floor;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Stack;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -32,13 +30,13 @@ import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
-import playground.gregor.sim2d_v2.illdependencies.Force;
+import com.vividsolutions.jts.geom.Coordinate;
 
 public class StaticForceFieldReader extends MatsimXmlParser {
-	
+
 	private static final Logger log = Logger.getLogger(StaticForceFieldReader.class);
-	
-	private Stack<Force> forces;
+
+	private Stack<ForceLocation> forces;
 
 	private double maxY = Double.NEGATIVE_INFINITY;
 
@@ -48,20 +46,20 @@ public class StaticForceFieldReader extends MatsimXmlParser {
 
 	private double minX = Double.POSITIVE_INFINITY;
 
-	private QuadTree<Force> ret;
+	private QuadTree<ForceLocation> ret;
 
 	private final String file;
-	
-	private Force currentForce = null;
 
 	private StaticForceField sff;
+
+	private ForceLocation currentForceLocation = null;
 
 	public StaticForceFieldReader(String file) {
 		this.file = file;
 	}
-	
+
 	private void readStaticForceField() {
-		this.forces = new Stack<Force>();
+		this.forces = new Stack<ForceLocation>();
 		log.info("parsing static force file...");
 		try {
 			super.parse(this.file);
@@ -73,12 +71,12 @@ public class StaticForceFieldReader extends MatsimXmlParser {
 			log.fatal("Error during parsing.", e);
 		}
 		log.info("done.");
-		
+
 		log.info("loading forces into quad tree...");
-		this.ret = new QuadTree<Force>(this.minX,this.minY,this.maxX,this.maxY);
+		this.ret = new QuadTree<ForceLocation>(this.minX, this.minY, this.maxX, this.maxY);
 		while (this.forces.size() > 0) {
-			Force f = this.forces.pop();
-			this.ret.put(f.getXCoord(), f.getYCoord(), f);
+			ForceLocation f = this.forces.pop();
+			this.ret.put(f.getLocation().x, f.getLocation().y, f);
 		}
 		log.info("done.");
 	}
@@ -90,12 +88,12 @@ public class StaticForceFieldReader extends MatsimXmlParser {
 		}
 		return this.sff;
 	}
-	
+
 	@Override
 	public void endTag(String name, String content, Stack<String> context) {
-		if(this.currentForce != null) {
-			this.forces.push(this.currentForce);
-			this.currentForce = null;
+		if (this.currentForceLocation != null) {
+			this.forces.push(this.currentForceLocation);
+			this.currentForceLocation = null;
 		}
 	}
 
@@ -106,25 +104,28 @@ public class StaticForceFieldReader extends MatsimXmlParser {
 			String ys = atts.getValue(StaticForceFieldWriter.Y_COORD_TAG);
 			String xfs = atts.getValue(StaticForceFieldWriter.FORCE_X_TAG);
 			String yfs = atts.getValue(StaticForceFieldWriter.FORCE_Y_TAG);
-			createForce(xs,ys,xfs,yfs);
-//			System.out.println(xs + "  " + ys + " " + xfs + " " + yfs);
+			createForce(xs, ys, xfs, yfs);
+			// System.out.println(xs + "  " + ys + " " + xfs + " " + yfs);
 		}
-		
+
 	}
 
 	private void createForce(String xs, String ys, String xfs, String yfs) {
-		Force f = new Force(Double.parseDouble(xfs),Double.parseDouble(yfs),Double.parseDouble(xs),Double.parseDouble(ys));
-		if (f.getXCoord() > this.maxX) {
-			this.maxX = f.getXCoord();
-		} else if (f.getXCoord() < this.minX) {
-			this.minX = f.getXCoord();
+		Force f = new Force();
+		f.setXComponent(Double.parseDouble(xfs));
+		f.setYComponent(Double.parseDouble(yfs));
+		ForceLocation fc = new ForceLocation(f, new Coordinate(Double.parseDouble(xs), Double.parseDouble(ys)));
+		if (fc.getLocation().x > this.maxX) {
+			this.maxX = fc.getLocation().x;
+		} else if (fc.getLocation().x < this.minX) {
+			this.minX = fc.getLocation().x;
 		}
-		if (f.getYCoord() > this.maxY) {
-			this.maxY = f.getYCoord();
-		} else if (f.getYCoord() < this.minY) {
-			this.minY = f.getYCoord();
+		if (fc.getLocation().y > this.maxY) {
+			this.maxY = fc.getLocation().y;
+		} else if (fc.getLocation().y < this.minY) {
+			this.minY = fc.getLocation().y;
 		}
-		this.currentForce = f;
+		this.currentForceLocation = fc;
 	}
 
 }

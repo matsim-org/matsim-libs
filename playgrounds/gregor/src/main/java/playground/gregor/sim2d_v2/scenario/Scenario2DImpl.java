@@ -23,7 +23,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
-import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
@@ -31,11 +30,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.config.Config;
 
-import playground.gregor.sim2d_v2.events.XYZAzimuthEvent;
-import playground.gregor.sim2d_v2.illdependencies.SegmentedStaticForceField;
 import playground.gregor.sim2d_v2.simulation.floor.StaticForceField;
 
-import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiPolygon;
 
@@ -46,7 +42,6 @@ import com.vividsolutions.jts.geom.MultiPolygon;
 public class Scenario2DImpl extends ScenarioImpl {
 
 	private Map<MultiPolygon, List<Link>> mps;
-	private SegmentedStaticForceField ssff;
 	private StaticForceField sff;
 	private HashMap<Id, LineString> lsmp;
 	private Queue<Event> phantomPopulation = null;
@@ -60,21 +55,6 @@ public class Scenario2DImpl extends ScenarioImpl {
 
 	public Scenario2DImpl() {
 		throw new RuntimeException("Do not try to call this constructor!!");
-	}
-
-	/**
-	 * @param ssff
-	 */
-	public void setSegmentedStaticForceField(SegmentedStaticForceField ssff) {
-		this.ssff = ssff;
-
-	}
-
-	/**
-	 * @return
-	 */
-	public SegmentedStaticForceField getSegmentedStaticForceField() {
-		return this.ssff;
 	}
 
 	/**

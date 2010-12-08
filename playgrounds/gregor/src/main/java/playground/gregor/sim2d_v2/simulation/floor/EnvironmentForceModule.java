@@ -23,7 +23,6 @@ import com.vividsolutions.jts.geom.Coordinate;
 
 import playground.gregor.sim2d_v2.controller.Sim2DConfig;
 import playground.gregor.sim2d_v2.events.debug.ArrowEvent;
-import playground.gregor.sim2d_v2.illdependencies.Force;
 import playground.gregor.sim2d_v2.scenario.Scenario2DImpl;
 import playground.gregor.sim2d_v2.simulation.Agent2D;
 
@@ -57,14 +56,13 @@ public class EnvironmentForceModule implements ForceModule {
 	@Override
 	public void run(Agent2D agent) {
 
-		// TODO instance of deprecated Force implenetation
 		Force f = this.sff.getForceWithin(agent.getPosition(), Sim2DConfig.STATIC_FORCE_RESOLUTION + 0.01);
 		double fx = 0.;
 		double fy = 0.;
 
 		if (f != null) {
-			fx = f.getFx();
-			fy = f.getFy();
+			fx = f.getXComponent();
+			fy = f.getYComponent();
 		}
 
 		fx = (Sim2DConfig.Apw * fx / agent.getWeight());

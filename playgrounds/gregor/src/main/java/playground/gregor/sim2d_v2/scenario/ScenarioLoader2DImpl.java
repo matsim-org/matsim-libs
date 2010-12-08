@@ -54,9 +54,6 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.gregor.sim2d_v2.controller.Sim2DConfig;
 import playground.gregor.sim2d_v2.events.XYZAzimuthEvent;
-import playground.gregor.sim2d_v2.gisdebug.StaticForceFieldToShape;
-import playground.gregor.sim2d_v2.illdependencies.SegmentedStaticForceField;
-import playground.gregor.sim2d_v2.illdependencies.StaticForceFieldGeneratorII;
 import playground.gregor.sim2d_v2.network.NetworkFromLsFile;
 import playground.gregor.sim2d_v2.network.NetworkLoader;
 import playground.gregor.sim2d_v2.network.NetworkLoaderImpl;
@@ -76,8 +73,6 @@ public class ScenarioLoader2DImpl extends ScenarioLoaderImpl {
 	private Map<MultiPolygon, List<Link>> mps;
 
 	private StaticForceField sff;
-
-	private SegmentedStaticForceField ssff;
 
 	private HashMap<Id, LineString> lsmp;
 
@@ -212,8 +207,9 @@ public class ScenarioLoader2DImpl extends ScenarioLoaderImpl {
 	}
 
 	private void loadStaticForceFieldII(Map<Id, List<Id>> linkSubLinkMapping) {
-		this.ssff = new StaticForceFieldGeneratorIII(linkSubLinkMapping).getStaticForceField();
-		this.scenarioData.setSegmentedStaticForceField(this.ssff);
+		// this.ssff = new
+		// StaticForceFieldGeneratorIII(linkSubLinkMapping).getStaticForceField();
+		// this.scenarioData.setSegmentedStaticForceField(this.ssff);
 
 	}
 
