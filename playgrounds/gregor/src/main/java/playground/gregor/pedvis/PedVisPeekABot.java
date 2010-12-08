@@ -123,7 +123,7 @@ public class PedVisPeekABot implements XYZEventsHandler, AgentDepartureEventHand
 	}
 
 	private void drawSegment(Point pointN1, Point pointN2) {
-		this.pc.initPolygon(this.segmentCount, 5, .75f, .75f, .75f, 3);
+		this.pc.initPolygon(this.segmentCount, 5, .75f, .75f, .75f, 3.f);
 		float x1 = (float) (pointN1.getX() - this.ofX);
 		float y1 = (float) (pointN1.getY() - this.ofY);
 		float x2 = (float) (pointN2.getX() - this.ofX);
