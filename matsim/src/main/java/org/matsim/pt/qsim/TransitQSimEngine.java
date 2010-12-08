@@ -168,6 +168,9 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine {
 		driver.setVehicle(veh);
 		Leg firstLeg = (Leg) driver.getNextPlanElement();
 		NetsimLink qlink = this.qSim.getNetsimNetwork().getNetsimLinks().get(firstLeg.getRoute().getStartLinkId());
+		if ( qlink==null ) {
+			throw new RuntimeException("did not find link from transit route with id: " + firstLeg.getRoute().getStartLinkId() + " in network; aborting ...") ;
+		}
 		qlink.addParkedVehicle(veh);
 		// yyyyyy this could, in principle, also be a method mobsim.addVehicle( ..., linkId), and then the qnetwork
 		// would not need to be exposed at all.  kai, may'10
