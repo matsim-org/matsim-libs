@@ -55,7 +55,10 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
+import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkFalsifier;
@@ -81,6 +84,7 @@ import org.matsim.population.algorithms.PersonRemoveLinkAndRoute;
 import org.matsim.population.algorithms.PersonRemovePlansWithoutLegs;
 import org.matsim.population.algorithms.PlanFilterActTypes;
 import org.matsim.population.algorithms.PlansFilterByLegMode;
+import org.matsim.population.algorithms.PlansFilterByLegMode.FilterType;
 import org.matsim.population.algorithms.PlansFilterPersonHasPlans;
 import org.matsim.population.algorithms.XY2Links;
 import org.matsim.vis.kml.KMZWriter;
@@ -157,7 +161,7 @@ public class MyRuns {
 		Scenario scenario = sl.loadScenario();
 
 		System.out.println("  processing plans...");
-		new PlansFilterByLegMode(TransportMode.car, false).run(scenario.getPopulation());
+		new PlansFilterByLegMode(TransportMode.car, FilterType.keepAllPlansWithMode).run(scenario.getPopulation());
 
 		System.out.println("  writing plans...");
 		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).write(null);//scenario.getConfig().plans().getOutputFile());
@@ -180,7 +184,7 @@ public class MyRuns {
 		final Population plans = scenario.getPopulation();
 
 		System.out.println("  processing plans...");
-		new PlansFilterByLegMode(TransportMode.pt, true).run(plans);
+		new PlansFilterByLegMode(TransportMode.pt, FilterType.keepPlansWithOnlyThisMode).run(plans);
 
 		System.out.println("  writing plans...");
 		new PopulationWriter(plans, scenario.getNetwork()).write(null);//scenario.getConfig().plans().getOutputFile());
@@ -595,8 +599,25 @@ public class MyRuns {
 //		System.out.println(i1 == i3);
 //		System.out.println(i3 == i4);
 
+		EventsManager events = new EventsManagerImpl();
+		System.out.println("START READ 8m txt " + new Date());
+		new MatsimEventsReader(events).readFile("/Volumes/Data/vis/zrh25pct/60.events-sample8m.txt");
+		System.out.println("STOP READ 8m txt " + new Date());
 
+		events = new EventsManagerImpl();
+		System.out.println("START READ 8m xml.gz " + new Date());
+		new MatsimEventsReader(events).readFile("/Volumes/Data/vis/zrh/100.events-sample8m.xml.gz");
+		System.out.println("STOP READ 8m xml gz " + new Date());
 
+		events = new EventsManagerImpl();
+		System.out.println("START READ 4m xml.gz " + new Date());
+		new MatsimEventsReader(events).readFile("/Volumes/Data/vis/zrh/100.events-sample4m.xml.gz");
+		System.out.println("STOP READ 4m xml gz " + new Date());
+
+		events = new EventsManagerImpl();
+		System.out.println("START READ 4m xml " + new Date());
+		new MatsimEventsReader(events).readFile("/Volumes/Data/vis/zrh/100.events-sample4m.xml");
+		System.out.println("STOP READ 4m xml " + new Date());
 	}
 
 	public static void someMethod(final List<Integer> list) {
@@ -812,25 +833,25 @@ public class MyRuns {
 //		readCounts(args);
 //		writeKml();
 //		runSimulation();
-//		someTest(args);
-		try {
-			writeReadBinaryStuff();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		someTest(args);
+//		try {
+//			writeReadBinaryStuff();
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
 
-		System.out.println("-----");
-
-		int i = 1;
-		System.out.println(Integer.toBinaryString(i));
-		System.out.println(Integer.toBinaryString(i << 1));
-		System.out.println(Integer.toBinaryString(i << 2));
-		System.out.println(Integer.toBinaryString(i << 8));
-		System.out.println(Integer.toBinaryString(i << 16));
-		System.out.println(Integer.toBinaryString(i << 24));
-
-		Date d = new Date((long)(14852.5723 * 86400 * 1000));
-		System.out.println(d);
+//		System.out.println("-----");
+//
+//		int i = 1;
+//		System.out.println(Integer.toBinaryString(i));
+//		System.out.println(Integer.toBinaryString(i << 1));
+//		System.out.println(Integer.toBinaryString(i << 2));
+//		System.out.println(Integer.toBinaryString(i << 8));
+//		System.out.println(Integer.toBinaryString(i << 16));
+//		System.out.println(Integer.toBinaryString(i << 24));
+//
+//		Date d = new Date((long)(14852.5723 * 86400 * 1000));
+//		System.out.println(d);
 
 //		Gbl.printSystemInfo();
 //		long maxMem = Runtime.getRuntime().maxMemory();

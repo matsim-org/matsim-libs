@@ -39,6 +39,7 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.population.algorithms.PlansFilterByLegMode;
+import org.matsim.population.algorithms.PlansFilterByLegMode.FilterType;
 import org.matsim.population.filters.PersonIntersectAreaFilter;
 
 import playground.mrieser.PseudoScenario;
@@ -133,7 +134,7 @@ public class PlansPrepare {
 		new MatsimPopulationReader(new PseudoScenario(this.scenario, pop)).readFile(fromFile);
 
 		log.info("filter plans with " + mode + "-legs");
-		new PlansFilterByLegMode(mode, false).run(pop);
+		new PlansFilterByLegMode(mode, FilterType.keepAllPlansWithMode).run(pop);
 		log.info("# persons remaining: " + pop.getPersons().size());
 
 		log.info("writing plans to file: " + toFile);
