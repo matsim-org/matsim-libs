@@ -40,6 +40,7 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.pt.router.TransitActsRemover;
 import org.matsim.pt.router.TransitRouter;
+import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
@@ -57,10 +58,10 @@ public class RouterTester {
 		TransitSchedule ts = s.getTransitSchedule();
 		PopulationImpl p = (PopulationImpl) s.getPopulation();
 
-		new MatsimNetworkReader(s).readFile("/data/vis/zrh/output_network.xml.gz");
-		new VehicleReaderV1(v).readFile("/data/vis/zrh/vehicles10pct.oevModellZH.xml");
+		new MatsimNetworkReader(s).readFile("/Volumes/Data/vis/zrh/output_network.xml.gz");
+		new VehicleReaderV1(v).readFile("/Volumes/Data/vis/zrh/vehicles10pct.oevModellZH.xml");
 		try {
-			new TransitScheduleReader(s).readFile("/data/vis/zrh/transitSchedule.networkOevModellZH.xml");
+			new TransitScheduleReader(s).readFile("/Volumes/Data/vis/zrh/transitSchedule.networkOevModellZH.xml");
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (SAXException e) {
@@ -69,15 +70,15 @@ public class RouterTester {
 			e.printStackTrace();
 		}
 
-		TransitRouter router = new TransitRouter(ts);
+		TransitRouter router = new TransitRouter(ts, new TransitRouterConfig());
 
 		PtRouter ptR = new PtRouter(router);
 
 		p.setIsStreaming(true);
 		p.addAlgorithm(ptR);
 
-//		new MatsimPopulationReader(s).readFile("/data/vis/zrh/100.plans.xml.gz");
-		new MatsimPopulationReader(s).readFile("/data/vis/zrh/plan-sample.xml");
+		new MatsimPopulationReader(s).readFile("/Volumes/Data/vis/zrh/100.plans.xml.gz");
+//		new MatsimPopulationReader(s).readFile("/Volumes/Data/vis/zrh/plan-sample.xml");
 
 		ptR.close();
 	}
@@ -91,7 +92,7 @@ public class RouterTester {
 		public PtRouter(final TransitRouter router) {
 			this.router = router;
 			try {
-				this.out = IOUtils.getBufferedWriter("/data/vis/routesLandmarks.txt");
+				this.out = IOUtils.getBufferedWriter("/Volumes/Data/vis/routesDijkstra1.txt");
 			} catch (FileNotFoundException e) {
 				throw new RuntimeException(e);
 			} catch (IOException e) {

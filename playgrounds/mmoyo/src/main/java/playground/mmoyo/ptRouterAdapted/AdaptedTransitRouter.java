@@ -37,9 +37,9 @@ import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.pt.router.MultiNodeDijkstra.InitialNode;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterNetwork;
-import org.matsim.pt.router.MultiNodeDijkstra.InitialNode;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkLink;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkNode;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -54,7 +54,7 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 public class AdaptedTransitRouter extends TransitRouter {
 
 	public AdaptedTransitRouter(MyTransitRouterConfig myTRConfig, final TransitSchedule schedule) {   //creado una vez
-		super(schedule, myTRConfig, new AdaptedTransitRouterNetworkTravelTimeCost(myTRConfig));    
+		super(schedule, myTRConfig, new AdaptedTransitRouterNetworkTravelTimeCost(myTRConfig));
 		//attention : the transit network is created first in the upper class   with "this.adaptedTransitNetwork = buildNetwork()";
 	}
 
@@ -119,16 +119,15 @@ public class AdaptedTransitRouter extends TransitRouter {
 				return legs;
 			}
 		}
-		
+
 		return convert( departureTime, p, fromCoord, toCoord ) ;
 	}
 
-	/**necessary to override since it uses a different algo than marcel.  kai, apr'10 
-	 * 
+	/**necessary to override since it uses a different algo than marcel.  kai, apr'10
+	 *
 	 */
-	@Override
 	protected TransitRouterNetwork buildNetwork() {
-				
+
 		final TransitRouterNetwork network = new TransitRouterNetwork();
 
 		// build nodes and links connecting the nodes according to the transit routes
@@ -137,10 +136,8 @@ public class AdaptedTransitRouter extends TransitRouter {
 				TransitRouterNetworkNode prevNode = null;
 				for (TransitRouteStop stop : route.getStops()) {
 					TransitRouterNetworkNode node = network.createNode(stop, route, line);
-					this.getNodeMappings().put(node, stop.getStopFacility());
 					if (prevNode != null) {
 						TransitRouterNetworkLink link = network.createLink(prevNode, node, route, line);
-						this.getLinkMappings().put(link, new Tuple<TransitLine, TransitRoute>(line, route));
 					}
 					prevNode = node;
 				}

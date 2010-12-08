@@ -280,9 +280,8 @@ public class Dijkstra implements IntermodalLeastCostPathCalculator {
 		DijkstraNodeData outData = getData(outNode);
 		double currTime = outData.getTime();
 		double currCost = outData.getCost();
-		PreProcessDijkstra.DeadEndData ddOutData = null;
 		if (this.pruneDeadEnds) {
-			ddOutData = getPreProcessData(outNode);
+			PreProcessDijkstra.DeadEndData ddOutData = getPreProcessData(outNode);
 			for (Link l : outNode.getOutLinks().values()) {
 				if (canPassLink(l)) {
 					Node n = l.getToNode();

@@ -260,7 +260,7 @@ public class TransitRouterTest extends TestCase {
 	public void testCoordFarAway() {
 		Fixture f = new Fixture();
 		f.init();
-		TransitRouter router = new TransitRouter(f.schedule);
+		TransitRouter router = new TransitRouter(f.schedule, new TransitRouterConfig());
 		List<Leg> legs = router.calcRoute(f.scenario.createCoord(-2000, 0), f.scenario.createCoord(+42000, 0), 5.5*3600); // should map to stops A and I
 		assertEquals(3, legs.size());
 		assertEquals(TransportMode.transit_walk, legs.get(0).getMode());

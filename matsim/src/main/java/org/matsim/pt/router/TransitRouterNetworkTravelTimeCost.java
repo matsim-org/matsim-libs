@@ -37,6 +37,8 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 /**
  * TravelTime and TravelCost calculator to be used with the transit network used for transit routing.
  *
+ * <em>This class is NOT thread-safe!</em>
+ *
  * @author mrieser
  */
 public class TransitRouterNetworkTravelTimeCost implements TravelTime, TravelMinCost, TravelCost {

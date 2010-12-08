@@ -22,9 +22,12 @@ package org.matsim.pt.router;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -33,17 +36,21 @@ import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.collections.QuadTree;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 
 /**
  * @author mrieser
  */
 public final class TransitRouterNetwork implements Network {
+
+	private final static Logger log = Logger.getLogger(TransitRouterNetwork.class);
 
 	private final Map<Id, TransitRouterNetworkLink> links = new LinkedHashMap<Id, TransitRouterNetworkLink>();
 	private final Map<Id, TransitRouterNetworkNode> nodes = new LinkedHashMap<Id, TransitRouterNetworkNode>();
@@ -313,21 +320,70 @@ public final class TransitRouterNetwork implements Network {
 
 	@Override
 	public void addNode(Node nn) {
-		throw new UnsupportedOperationException() ;
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public void addLink(Link ll) {
-		throw new UnsupportedOperationException() ;
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public Link removeLink(Id linkId) {
-		throw new UnsupportedOperationException() ;
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public Node removeNode(Id nodeId) {
-		throw new UnsupportedOperationException() ;
+		throw new UnsupportedOperationException();
+	}
+
+	public static TransitRouterNetwork createFromSchedule(final TransitSchedule schedule, final double maxBeelineWalkConnectionDistance) {
+		final TransitRouterNetwork network = new TransitRouterNetwork();
+
+		// build nodes and links connecting the nodes according to the transit routes
+		for (TransitLine line : schedule.getTransitLines().values()) {
+			for (TransitRoute route : line.getRoutes().values()) {
+				TransitRouterNetworkNode prevNode = null;
+				for (TransitRouteStop stop : route.getStops()) {
+					TransitRouterNetworkNode node = network.createNode(stop, route, line);
+					if (prevNode != null) {
+						TransitRouterNetworkLink link = network.createLink(prevNode, node, route, line);
+					}
+					prevNode = node;
+				}
+			}
+		}
+		network.finishInit(); // not nice to call "finishInit" here before we added all links...
+		// in my view, it would be possible to completely do without finishInit: do the
+		// additions to the central data structures as items come in, not near the end.  I would
+		// prefer that because nobody could forget the "finishInit".  kai, apr'10
+		// well, not really. finishInit creates the quadtree, for this, the extent must be known,
+		// which is not at the very start, so the quadtree data structure cannot be updated as
+		// links come in. mrieser, dec'10
+
+		List<Tuple<TransitRouterNetworkNode, TransitRouterNetworkNode>> toBeAdded = new LinkedList<Tuple<TransitRouterNetworkNode, TransitRouterNetworkNode>>();
+		// connect all stops with walking links if they're located less than beelineWalkConnectionDistance from each other
+		for (TransitRouterNetworkNode node : network.getNodes().values()) {
+			if (node.getInLinks().size() > 0) { // only add links from this node to other nodes if agents actually can arrive here
+				for (TransitRouterNetworkNode node2 : network.getNearestNodes(node.stop.getStopFacility().getCoord(), maxBeelineWalkConnectionDistance)) {
+					if ((node != node2) && (node2.getOutLinks().size() > 0)) { // only add links to other nodes when agents can depart there
+						if ((node.line != node2.line) || (node.stop.getStopFacility() != node2.stop.getStopFacility())) {
+							// do not yet add them to the network, as this would change in/out-links
+							toBeAdded.add(new Tuple<TransitRouterNetworkNode, TransitRouterNetworkNode>(node, node2));
+						}
+					}
+				}
+			}
+		}
+		for (Tuple<TransitRouterNetworkNode, TransitRouterNetworkNode> tuple : toBeAdded) {
+			network.createLink(tuple.getFirst(), tuple.getSecond(), null, null);
+		}
+
+		log.info("transit router network statistics:");
+		log.info(" # nodes: " + network.getNodes().size());
+		log.info(" # links: " + network.getLinks().size());
+
+		return network;
 	}
 }

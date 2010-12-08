@@ -46,11 +46,11 @@ public class PlansCalcTransitRouteTest extends TestCase {
 		TransitConfigGroup transitConfig = new TransitConfigGroup();
 		PlansCalcRouteConfigGroup routerConfig = new PlansCalcRouteConfigGroup();
 		FreespeedTravelTimeCost ttc = new FreespeedTravelTimeCost(new CharyparNagelScoringConfigGroup());
-		PlansCalcTransitRoute router = new PlansCalcTransitRoute(routerConfig, f.network, ttc, ttc, new DijkstraFactory(), f.schedule, transitConfig);
-		
+		PlansCalcTransitRoute router = new PlansCalcTransitRoute(routerConfig, f.network, ttc, ttc, new DijkstraFactory(), transitConfig, new TransitRouter(f.schedule, new TransitRouterConfig()));
+
 		Coord fromCoord = f.scenario.createCoord(3800, 5100);
 		Coord toCoord = f.scenario.createCoord(16100, 10050);
-		
+
 		PopulationFactory pb = f.scenario.getPopulation().getFactory();
 		Plan plan = pb.createPlan();
 		Activity act1 = pb.createActivityFromCoord("h", fromCoord);
@@ -62,7 +62,7 @@ public class PlansCalcTransitRouteTest extends TestCase {
 		plan.addActivity(act1);
 		plan.addLeg(leg);
 		plan.addActivity(act2);
-		
+
 		router.run(plan);
 
 		List<PlanElement> pes = plan.getPlanElements();

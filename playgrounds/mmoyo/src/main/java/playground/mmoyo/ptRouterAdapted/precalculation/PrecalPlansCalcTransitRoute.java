@@ -37,9 +37,10 @@ import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.utils.collections.Tuple;
-//import org.matsim.core.utils.collections.Tuple;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.router.PlansCalcTransitRoute;
+import org.matsim.pt.router.TransitRouter;
+import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
@@ -58,12 +59,12 @@ public class PrecalPlansCalcTransitRoute extends PlansCalcTransitRoute {
 	final String COMMA = ",";
 	final String NO_PT_FOUND = "no pt connection found";
 	int kBestRoute = 0;
-	
+
 	public PrecalPlansCalcTransitRoute(final PlansCalcRouteConfigGroup config, final Network network,
 			final PersonalizableTravelCost costCalculator, final PersonalizableTravelTime timeCalculator,
 			final LeastCostPathCalculatorFactory factory, final TransitSchedule schedule,
 			final TransitConfigGroup transitConfig, MyTransitRouterConfig myTransitRouterConfig) {
-		super(config, network, costCalculator, timeCalculator, factory, schedule, transitConfig);
+		super(config, network, costCalculator, timeCalculator, factory, transitConfig, new TransitRouter(schedule, new TransitRouterConfig()));
 		this.adaptedTransitRouter = new AdaptedTransitRouter( myTransitRouterConfig, schedule);
 	}
 
@@ -73,11 +74,11 @@ public class PrecalPlansCalcTransitRoute extends PlansCalcTransitRoute {
 		double vdTime = depTime;
 		Map <Id, StaticConnection> connectionMap = new HashMap <Id, StaticConnection>(); //a map that stores precalculated pt connections
 		List<Leg> selectedConnection = null;
-		
+
 		//System.out.print("\npt connections from " + fromAct.getCoord().toString() + " to " + toAct.getCoord().toString());
 		for (vdTime = depTime+600; vdTime>=depTime-300; vdTime-=180){   //find all possible connections in next 10 mins
 			List<Leg> legs= this.adaptedTransitRouter.calcRoute(fromAct.getCoord(), toAct.getCoord(), vdTime);
-			
+
 			//calculate travelTime and distance
 			travelTime = 0.0;
 			double travelDistance = 0.0;
@@ -93,11 +94,11 @@ public class PrecalPlansCalcTransitRoute extends PlansCalcTransitRoute {
 					}
 					//TODO: travelDistance += leg2.; //set distance
 				}
-				
-				if (ptLegsNum >0){ 
-					StaticConnection staticConnection = new StaticConnection(new IdImpl(routeId.toString()), legs, travelTime, travelDistance, ptLegsNum);	
+
+				if (ptLegsNum >0){
+					StaticConnection staticConnection = new StaticConnection(new IdImpl(routeId.toString()), legs, travelTime, travelDistance, ptLegsNum);
 					if (!connectionMap.containsKey(staticConnection.getId())){
-						connectionMap.put(staticConnection.getId(), staticConnection);	
+						connectionMap.put(staticConnection.getId(), staticConnection);
 					}
 				}else{
 					selectedConnection = legs; //select transit-walk connection in case that there is not a pt leg at all
@@ -105,14 +106,14 @@ public class PrecalPlansCalcTransitRoute extends PlansCalcTransitRoute {
 			}
 		}
 
-		
+
 		//select a connection
 		if (connectionMap.size() >0){
 			StaticConnection [] connectionArray = connectionMap.values().toArray(new StaticConnection[connectionMap.size()]);
-		
+
 			//*sort it in case we may choose the "best" ones
 			Arrays.sort(connectionArray);
-		
+
 			// in console
 			/*
 			//System.out.println();
@@ -125,24 +126,24 @@ public class PrecalPlansCalcTransitRoute extends PlansCalcTransitRoute {
 				System.out.println(connection.getId() + "    " + connection.getPtTripNum() + "    " + connection.getTravelTime());
 			}
 		   */
-		
-			
+
+
 			Random randomGenerator = new Random();
-			if(kBestRoute <  connectionArray.length){ 
+			if(kBestRoute <  connectionArray.length){
 				if (connectionArray.length>1){
 					// select randomly among the connections
-					//kBestRoute = randomGenerator.nextInt(connectionArray.length-1);	
+					//kBestRoute = randomGenerator.nextInt(connectionArray.length-1);
 
 					//add here Pareto Optimal calculation
-					
+
 					//or select the fastest connection  with min transfer!!
 					kBestRoute =0;
-				}	
-				selectedConnection = connectionArray[kBestRoute].getLegs(); 
+				}
+				selectedConnection = connectionArray[kBestRoute].getLegs();
 			}
 			randomGenerator = null;
 			connectionArray= null;
-			
+
 		}else{   //if not pt legs return a transit walk leg
 			log.warn(NO_PT_FOUND);
 		}
@@ -150,12 +151,12 @@ public class PrecalPlansCalcTransitRoute extends PlansCalcTransitRoute {
 		super.getLegReplacements().add(new Tuple<Leg, List<Leg>>(leg, selectedConnection ));
 		//super.getLegReplacements().add(new Tuple<Leg, List<Leg>>(leg, lessTransConnection.getLegs() ));
 		//super.getLegReplacements().add(new Tuple<Leg, List<Leg>>(leg, fastestConnection.getLegs() ));
-		
+
 		//matsim router
-		//super.getLegReplacements().add(new Tuple<Leg, List<Leg>>(leg, legs));  
-		
+		//super.getLegReplacements().add(new Tuple<Leg, List<Leg>>(leg, legs));
+
 		connectionMap=null;
-		
+
 		return travelTime;
 	}
 }

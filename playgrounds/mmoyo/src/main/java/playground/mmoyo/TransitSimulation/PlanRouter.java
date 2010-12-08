@@ -15,6 +15,8 @@ import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.population.algorithms.PlansFilterByLegMode;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.router.PlansCalcTransitRoute;
+import org.matsim.pt.router.TransitRouter;
+import org.matsim.pt.router.TransitRouterConfig;
 import org.xml.sax.SAXException;
 
 import playground.mmoyo.PTRouter.PTValues;
@@ -36,7 +38,7 @@ public class PlanRouter {
 		if (!outDirectory.exists()){
 			throw new FileNotFoundException("Can not find output directory");
 		}
-		
+
 		/**route plans*/
 		DijkstraFactory dijkstraFactory = new DijkstraFactory();
 		FreespeedTravelTimeCost timeCostCalculator = new FreespeedTravelTimeCost(scenario.getConfig().charyparNagelScoring());
@@ -46,7 +48,7 @@ public class PlanRouter {
 		System.out.println( PTValues.routerCalculator );
 		switch (PTValues.routerCalculator){
 			case 1:  //rieser
-				router = new PlansCalcTransitRoute(scenario.getConfig().plansCalcRoute(), scenario.getNetwork(), timeCostCalculator, timeCostCalculator, dijkstraFactory, scenario.getTransitSchedule(), transitConfig);
+				router = new PlansCalcTransitRoute(scenario.getConfig().plansCalcRoute(), scenario.getNetwork(), timeCostCalculator, timeCostCalculator, dijkstraFactory, transitConfig, new TransitRouter(scenario.getTransitSchedule(), new TransitRouterConfig()));
 				routedPlansFile += ("/rieser_" + PTValues.scenarioName + ".xml");
 				break;
 			case 3:	 //moyo parameterized
@@ -58,23 +60,23 @@ public class PlanRouter {
 		router.run(scenario.getPopulation());
 
 		//write plan
-		
+
 		System.out.println("writing output plan file..." + routedPlansFile);
 		PopulationWriter popwriter = new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()) ;
 		popwriter.write(routedPlansFile) ;
-	
-		
+
+
 		//write fragmented version of the plan
 		/*
-		scenario.setPopulation(new PlanFragmenter().run(scenario.getPopulation()));		
+		scenario.setPopulation(new PlanFragmenter().run(scenario.getPopulation()));
 		System.out.println("writing output plan file..." + routedPlansFile + "frag");
 		PopulationWriter popwriter2 = new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()) ;
 		popwriter2.write(routedPlansFile) ;
 		*/
-		new FileCompressor().run(routedPlansFile);  
+		new FileCompressor().run(routedPlansFile);
 		System.out.println("done");
 	}
-	
+
 	public static void main(final String[] args) throws SAXException, ParserConfigurationException, IOException {
 		double startTime = System.currentTimeMillis();
 
@@ -86,10 +88,10 @@ public class PlanRouter {
 			configFile = "../shared-svn/studies/countries/de/berlin-bvg09/pt/nullfall_berlin_brandenburg/config.xml";
 		}
 
-		ScenarioImpl scenarioImpl = new DataLoader ().loadScenarioWithTrSchedule(configFile); 
-		
+		ScenarioImpl scenarioImpl = new DataLoader ().loadScenarioWithTrSchedule(configFile);
+
 		new PlanRouter(scenarioImpl);
 		System.out.println("total duration: " + (System.currentTimeMillis()-startTime));
 	}
-	
+
 }

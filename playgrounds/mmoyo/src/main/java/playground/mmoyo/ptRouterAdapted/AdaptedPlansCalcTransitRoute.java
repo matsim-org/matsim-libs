@@ -33,6 +33,8 @@ import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.router.PlansCalcTransitRoute;
+import org.matsim.pt.router.TransitRouter;
+import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 public class AdaptedPlansCalcTransitRoute extends PlansCalcTransitRoute {
@@ -49,10 +51,10 @@ public class AdaptedPlansCalcTransitRoute extends PlansCalcTransitRoute {
 			final LeastCostPathCalculatorFactory factory, final TransitSchedule schedule,
 			final TransitConfigGroup transitConfig, MyTransitRouterConfig myTransitRouterConfig) {
 		//super(config, network, costCalculator, timeCalculator, factory);
-		super(config, network, costCalculator, timeCalculator, factory, schedule, transitConfig);
-		
+		super(config, network, costCalculator, timeCalculator, factory, transitConfig, new TransitRouter(schedule, new TransitRouterConfig()));
+
 		this.adaptedTransitRouter = new AdaptedTransitRouter( myTransitRouterConfig, schedule);
-	
+
 //		// both "super" route algos are made to route only on the "car" network.  yy I assume this is since the non-car modes are handled
 //		// here.  This is, in fact, NOT correct, since this does not handle bike, so would need to be fixed before production use).  kai, apr'10
 //		LeastCostPathCalculator routeAlgo = super.getLeastCostPathCalculator();
@@ -73,7 +75,7 @@ public class AdaptedPlansCalcTransitRoute extends PlansCalcTransitRoute {
 		// yy also, I would like a design explanation of why there is a "TransitRouter" between "plansCalcRoute" and
 		// "LeastCostPathAlgo"?  kai, apr'10
 		// yyyy but first step really is to remove code duplication as much as possible.  kai, apr'10
-		
+
 		List<Leg> legs= this.adaptedTransitRouter.calcRoute(fromAct.getCoord(), toAct.getCoord(), depTime);
 //		this.legReplacements.add(new Tuple<Leg, List<Leg>>(leg, legs));
 		super.getLegReplacements().add(new Tuple<Leg, List<Leg>>(leg, legs));
@@ -100,7 +102,7 @@ public class AdaptedPlansCalcTransitRoute extends PlansCalcTransitRoute {
 		this.currentPlan = plan;
 
 		this.legReplacements.clear();
-		
+
 		super.handlePlan(person, plan);
 
 		// yy Please explain somewhere what the legReplacements are doing. kai, apr'10
@@ -187,5 +189,5 @@ public class AdaptedPlansCalcTransitRoute extends PlansCalcTransitRoute {
 			}
 		}
 	}*/
-	
+
 }

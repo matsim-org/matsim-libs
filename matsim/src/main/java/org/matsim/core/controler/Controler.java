@@ -55,11 +55,11 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.config.consistency.ConfigConsistencyCheckerImpl;
-import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
+import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.controler.corelisteners.EventsHandling;
 import org.matsim.core.controler.corelisteners.LegHistogramListener;
 import org.matsim.core.controler.corelisteners.PlansDumping;
@@ -122,6 +122,7 @@ import org.matsim.pt.PtConstants;
 import org.matsim.pt.TransitControlerListener;
 import org.matsim.pt.counts.PtCountControlerListener;
 import org.matsim.pt.router.PlansCalcTransitRoute;
+import org.matsim.pt.router.TransitRouterFactory;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.ptproject.qsim.ParallelQSimFactory;
 import org.matsim.ptproject.qsim.QSimFactory;
@@ -246,6 +247,7 @@ public class Controler {
 	private MobsimFactory mobsimFactory = null;
 
 	private SignalsControllerListenerFactory signalsFactory = new DefaultSignalsControllerListenerFactory();
+	private TransitRouterFactory transitRouterFactory = null;
 
 	/** initializes Log4J */
 	static {
@@ -632,7 +634,7 @@ public class Controler {
 	/**Design decisions:<ul>
 	 * <li> I extracted this method since it is now called <i>twice</i>: once directly after reading, and once
 	 * before the iterations start.  The second call seems more important, but I wanted to leave the first one
-	 * there in case the program fails before that config dump.  Might be put into the "unexpected shutdown hook" 
+	 * there in case the program fails before that config dump.  Might be put into the "unexpected shutdown hook"
 	 * instead. kai, dec'10
 	 * </ul>
 	 * @param message the message that is written just before the config dump
@@ -1083,7 +1085,7 @@ public class Controler {
 					.getLeastCostPathCalculatorFactory(), this.scenarioData.getRoadPricingScheme());
 		} else if (this.config.scenario().isUseTransit()) {
 			return new PlansCalcTransitRoute(this.config.plansCalcRoute(), this.network, travelCosts, travelTimes,
-					this.getLeastCostPathCalculatorFactory(), this.scenarioData.getTransitSchedule(), this.config.transit());
+					this.getLeastCostPathCalculatorFactory(), this.config.transit(), this.transitRouterFactory.createTransitRouter());
 		} else if (this.config.multiModal().isMultiModalSimulationEnabled()) {
 			PlansCalcRoute plansCalcRoute = new PlansCalcRoute(this.config.plansCalcRoute(), this.network, travelCosts,
 					travelTimes, this.getLeastCostPathCalculatorFactory());
@@ -1299,14 +1301,20 @@ public class Controler {
 		this.mobsimFactory = mobsimFactory;
 	}
 
-
 	public SignalsControllerListenerFactory getSignalsControllerListenerFactory() {
 		return signalsFactory;
 	}
 
-
 	public void setSignalsControllerListenerFactory(SignalsControllerListenerFactory signalsFactory) {
 		this.signalsFactory = signalsFactory;
+	}
+
+	public TransitRouterFactory getTransitRouterFactory() {
+		return this.transitRouterFactory;
+	}
+
+	public void setTransitRouterFactory(TransitRouterFactory transitRouterFactory) {
+		this.transitRouterFactory = transitRouterFactory;
 	}
 
 }

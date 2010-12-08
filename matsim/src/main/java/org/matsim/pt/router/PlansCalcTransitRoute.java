@@ -55,7 +55,6 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 public class PlansCalcTransitRoute extends PlansCalcRoute {
 
 	private final TransitActsRemover transitLegsRemover = new TransitActsRemover();
-	private final TransitRouterConfig routerConfig = new TransitRouterConfig();
 	private final TransitRouter transitRouter;
 	private final TransitConfigGroup transitConfig;
 	private final TransitSchedule schedule;
@@ -68,19 +67,18 @@ public class PlansCalcTransitRoute extends PlansCalcRoute {
 	 * <li> It passes the arguments <tt>config, network, costCalculator, timeCalculator, factory</tt> through to the "normal"
 	 *      PlanCalcRoute. </li>
 	 * <li> It restricts the usable part of the network for the above to "car". </li>
-	 * <li> It sets a non-configurable TransitRouter, based on <tt>schedule</tt> and an internally defined TransitRouterConfig. </li>
 	 * <li> It remembers <tt>transitConfig</tt>.
 	 * </ul>
 	 */
 	public PlansCalcTransitRoute(final PlansCalcRouteConfigGroup config, final Network network,
 			final PersonalizableTravelCost costCalculator, final PersonalizableTravelTime timeCalculator,
-			final LeastCostPathCalculatorFactory factory, final TransitSchedule schedule,
-			final TransitConfigGroup transitConfig) {
+			final LeastCostPathCalculatorFactory factory,
+			final TransitConfigGroup transitConfig, final TransitRouter transitRouter) {
 		super(config, network, costCalculator, timeCalculator, factory);
 
-		this.schedule = schedule;
 		this.transitConfig = transitConfig;
-		this.transitRouter = new TransitRouter(schedule, this.routerConfig);
+		this.transitRouter = transitRouter;
+		this.schedule = this.transitRouter.getSchedule();
 
 		LeastCostPathCalculator routeAlgo = super.getLeastCostPathCalculator();
 		if (routeAlgo instanceof IntermodalLeastCostPathCalculator) {
@@ -195,10 +193,6 @@ public class PlansCalcTransitRoute extends PlansCalcRoute {
 
 	protected TransitActsRemover getTransitLegsRemover() {
 		return transitLegsRemover;
-	}
-
-	protected TransitRouterConfig getRouterConfig() {
-		return routerConfig;
 	}
 
 	protected TransitRouter getTransitRouter() {

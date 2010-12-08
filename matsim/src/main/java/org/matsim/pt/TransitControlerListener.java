@@ -25,6 +25,8 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.pt.router.TransitRouterConfig;
+import org.matsim.pt.router.TransitRouterFactory;
 import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.vehicles.VehicleReaderV1;
 import org.xml.sax.SAXException;
@@ -68,6 +70,9 @@ public class TransitControlerListener implements StartupListener {
 				event.getControler().getScenario().getConfig().charyparNagelScoring());
 		reconstructingUmlaufBuilder.build();
 		event.getControler().getScenario().addScenarioElement( reconstructingUmlaufBuilder ) ;
+
+		event.getControler().setTransitRouterFactory(new TransitRouterFactory(event.getControler().getScenario().getTransitSchedule(), new TransitRouterConfig()));
+
 	}
 
 }

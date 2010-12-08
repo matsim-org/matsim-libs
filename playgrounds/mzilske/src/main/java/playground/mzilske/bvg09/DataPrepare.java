@@ -47,6 +47,7 @@ import org.matsim.pt.UmlaufInterpolator;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.router.PlansCalcTransitRoute;
 import org.matsim.pt.router.TransitRouter;
+import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.transitSchedule.TransitScheduleWriterV1;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
@@ -183,7 +184,7 @@ public class DataPrepare {
 		TransitConfigGroup transitConfig = new TransitConfigGroup();
 		PlansCalcTransitRoute router = new PlansCalcTransitRoute(this.scenario.getConfig().plansCalcRoute(),
 				this.scenario.getNetwork(), timeCostCalculator, timeCostCalculator, dijkstraFactory,
-				this.scenario.getTransitSchedule(), transitConfig);
+				transitConfig, new TransitRouter(this.scenario.getTransitSchedule(), new TransitRouterConfig()));
 		log.info("start pt-router");
 		router.run(pop);
 		log.info("write routed plans out.");
@@ -191,7 +192,7 @@ public class DataPrepare {
 	}
 
 	protected void visualizeRouterNetwork() {
-		TransitRouter router = new TransitRouter(this.scenario.getTransitSchedule());
+		TransitRouter router = new TransitRouter(this.scenario.getTransitSchedule(), new TransitRouterConfig());
 		Network routerNet = router.getTransitRouterNetwork();
 
 		log.info("create vis network");
