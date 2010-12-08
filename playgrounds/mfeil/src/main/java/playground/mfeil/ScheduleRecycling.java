@@ -28,6 +28,7 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Random;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
@@ -73,20 +74,20 @@ public class ScheduleRecycling implements PlanStrategyModule{
 	public static PrintStream 						assignment;
 	private final Knowledges 						knowledges;
 	private final ActivityTypeFinder 				finder;
-	private final int 								iterationsFirstTime, 
-													iterationsFurtherTimes, 
-													noOfIndividualAgents, 
-													noOfRecycledAgents, 
+	private final int 								iterationsFirstTime,
+													iterationsFurtherTimes,
+													noOfIndividualAgents,
+													noOfRecycledAgents,
 													noOfSoftCoefficients;
 	protected final DistanceCoefficients 			coefficients;
 	private ArrayList<double[]> 					tabuList;
-	private final String 							primActsDistance, 
-													homeLocationDistance, 
-													municipality, 
-													gender, 
-													age, 
-													license, 
-													car_avail, 
+	private final String 							primActsDistance,
+													homeLocationDistance,
+													municipality,
+													gender,
+													age,
+													license,
+													car_avail,
 													employed;
 	private final ArrayList<String> 				softCoef,
 													allCoef;
@@ -98,7 +99,7 @@ public class ScheduleRecycling implements PlanStrategyModule{
 
 		this.controler=controler;
 		this.knowledges 			= controler.getScenario().getKnowledges();
-		this.locator 				= new LocationMutatorwChoiceSet(controler.getNetwork(), controler, this.knowledges);
+		this.locator 				= new LocationMutatorwChoiceSet(controler.getNetwork(), controler, this.knowledges, new Random(4711));
 		this.scorer 				= new PlanScorer (controler.getScoringFunctionFactory());
 		this.network 				= controler.getNetwork();
 		this.init(network);
@@ -206,7 +207,7 @@ public class ScheduleRecycling implements PlanStrategyModule{
 			this.calculate();
 			if (!this.nonassignedAgents.isEmpty()) this.rescheduleNonassigedAgents();
 		}
-	
+
 		/* Print statistics of individual optimization */
 		assignment.println("Iteration "+this.controler.getIterationNumber());
 		assignment.println("Individual optimization");
@@ -228,7 +229,7 @@ public class ScheduleRecycling implements PlanStrategyModule{
 		for (int i=this.noOfRecycledAgents;i<list[1].size();i++){
 			assignmentModule.handlePlan(list[1].get(i));
 		}
-		
+
 		assignmentModule.finishReplanning();
 
 		/* Individually optimize all agents that couldn't be assigned */

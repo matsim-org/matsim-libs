@@ -51,18 +51,6 @@ public class LocationMutatorTGSimple extends LocationMutator {
 	protected int unsuccessfullLC = 0;
 	private final DefineFlexibleActivities defineFlexibleActivities;
 
-	/**
-	 * @deprecated  Please use RandomLocationMutator(..., Random random) for deterministic results in multithreated replanning
-	 */
-	@Deprecated
-	public LocationMutatorTGSimple(final Network network, Controler controler, Knowledges knowledges,
-			TreeMap<String, QuadTreeRing<ActivityFacility>> quad_trees,
-			TreeMap<String, ActivityFacilityImpl []> facilities_of_type) {
-
-		super(network, controler, knowledges, quad_trees, facilities_of_type);
-		this.defineFlexibleActivities = new DefineFlexibleActivities(this.knowledges, controler.getConfig().locationchoice());
-	}
-	
 	public LocationMutatorTGSimple(final Network network, Controler controler, Knowledges knowledges,
 			TreeMap<String, QuadTreeRing<ActivityFacility>> quad_trees,
 			TreeMap<String, ActivityFacilityImpl []> facilities_of_type, Random random) {

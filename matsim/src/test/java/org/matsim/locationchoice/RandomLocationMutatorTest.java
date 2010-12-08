@@ -19,6 +19,8 @@
 
 package org.matsim.locationchoice;
 
+import java.util.Random;
+
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -29,7 +31,7 @@ public class RandomLocationMutatorTest  extends MatsimTestCase {
 		Initializer initializer = new Initializer();
 		initializer.init(this);
 		return new RandomLocationMutator(initializer.getControler().getNetwork(),
-				initializer.getControler(), (initializer.getControler().getScenario()).getKnowledges());
+				initializer.getControler(), (initializer.getControler().getScenario()).getKnowledges(), new Random(1111));
 	}
 
 	/*

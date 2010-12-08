@@ -21,6 +21,7 @@
 package playground.mfeil;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Network;
@@ -35,14 +36,14 @@ import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
 
 /**
  * Extension of Horni's location choice: Removes origin and destination facilities from choice set
- * to avoid 0m trips. 
+ * to avoid 0m trips.
  * @author Matthias Feil
  *
  */
 public class LMwCSCustomized extends LocationMutatorwChoiceSet {
 
 	public LMwCSCustomized(final Network network, Controler controler, Knowledges kn) {
-		super(network, controler, kn);
+		super(network, controler, kn, new Random(4711));
 	}
 
 	@Override

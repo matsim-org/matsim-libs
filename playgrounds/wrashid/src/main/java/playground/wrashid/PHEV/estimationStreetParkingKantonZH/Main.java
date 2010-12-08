@@ -13,8 +13,8 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkReaderMatsimV1;
 
 import playground.balmermi.world.Layer;
 import playground.balmermi.world.MatsimWorldReader;
@@ -276,9 +276,8 @@ public class Main {
 
 		// read network layer
 		network = scenario.getNetwork();
-		NetworkReaderMatsimV1 nr = new NetworkReaderMatsimV1(scenario);
-		//nr.readFile("C:\\data\\SandboxCVS\\ivt\\studies\\switzerland\\networks\\navteq\\network.xml\\network.xml");
-		nr.readFile("C:\\data\\SandboxCVS\\ivt\\studies\\switzerland\\networks\\ivtch\\network.xml");
+		//new MatsimNetworkReader(scenario).readFile("C:\\data\\SandboxCVS\\ivt\\studies\\switzerland\\networks\\navteq\\network.xml\\network.xml");
+		new MatsimNetworkReader(scenario).readFile("C:\\data\\SandboxCVS\\ivt\\studies\\switzerland\\networks\\ivtch\\network.xml");
 
 
 

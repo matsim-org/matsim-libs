@@ -29,6 +29,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
@@ -79,7 +80,7 @@ public class ConnectHomesAndWorkplaces {
 
 		// create the locachoice object:
 		Knowledges knowledges = scenario.getKnowledges() ;
-		LocationMutator locachoice = new RandomLocationMutator(controler.getNetwork(), controler, knowledges) ;
+		LocationMutator locachoice = new RandomLocationMutator(controler.getNetwork(), controler, knowledges, MatsimRandom.getRandom()) ;
 
 		final PopulationImpl plans = (PopulationImpl) scenario.getPopulation() ;
 		plans.setIsStreaming(true);

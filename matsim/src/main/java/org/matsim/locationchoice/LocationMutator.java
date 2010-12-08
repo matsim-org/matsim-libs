@@ -56,30 +56,24 @@ public abstract class LocationMutator extends AbstractPersonAlgorithm implements
 	protected DefineFlexibleActivities defineFlexibleActivities;
 	protected boolean locationChoiceBasedOnKnowledge = true;
 	protected Knowledges knowledges = null;
-	protected Random random = new Random(4711);
+	protected final Random random;
 
 	// ----------------------------------------------------------
-	
-	/**
-	 * @deprecated  Please use LocationMutator(..., Random random) for deterministic results in multithreated replanning
-	 */
-	@Deprecated
-	public LocationMutator(final Network network, final Controler controler, final Knowledges kn) {
+
+	public LocationMutator(final Network network, final Controler controler, final Knowledges kn, Random random) {
 		this.knowledges = kn;
 		this.defineFlexibleActivities = new DefineFlexibleActivities(this.knowledges, controler.getConfig().locationchoice());
 		this.quadTreesOfType = new TreeMap<String, QuadTreeRing<ActivityFacility>>();
 		this.facilitiesOfType = new TreeMap<String, ActivityFacilityImpl []>();
 		this.config = controler.getConfig().locationchoice();
+		this.random = random;
 		this.initLocal(network, controler);
 	}
-	
-	/**
-	 * @deprecated  Please use LocationMutator(..., Random random) for deterministic results in multithreated replanning
-	 */
-	@Deprecated
+
 	public LocationMutator(final Network network, final Controler controler, final Knowledges kn,
 			TreeMap<String, QuadTreeRing<ActivityFacility>> quad_trees,
-			TreeMap<String, ActivityFacilityImpl []> facilities_of_type) {
+			TreeMap<String, ActivityFacilityImpl []> facilities_of_type, Random random) {
+
 		this.knowledges = kn;
 		this.defineFlexibleActivities = new DefineFlexibleActivities(this.knowledges, controler.getConfig().locationchoice());
 		this.quadTreesOfType = quad_trees;
@@ -90,21 +84,9 @@ public abstract class LocationMutator extends AbstractPersonAlgorithm implements
 		if (this.defineFlexibleActivities.getFlexibleTypes().size() > 0) {
 			locationChoiceBasedOnKnowledge = false;
 		}
-	}
-	
-	public LocationMutator(final Network network, final Controler controler, final Knowledges kn, Random random) {
-		this(network, controler, kn);
 		this.random = random;
 	}
-	
-	public LocationMutator(final Network network, final Controler controler, final Knowledges kn,
-			TreeMap<String, QuadTreeRing<ActivityFacility>> quad_trees,
-			TreeMap<String, ActivityFacilityImpl []> facilities_of_type, Random random) {
-		
-		this(network, controler, kn, quad_trees, facilities_of_type);
-		this.random = random;
-	}
-	
+
 
 	private void initLocal(final Network network, Controler controler) {
 
@@ -136,6 +118,7 @@ public abstract class LocationMutator extends AbstractPersonAlgorithm implements
 		}
 	}
 
+	@Override
 	public void run(final Plan plan) {
 		handlePlan(plan);
 	}

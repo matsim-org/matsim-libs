@@ -30,6 +30,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
@@ -111,7 +112,7 @@ public class PlansConstructor implements PlanStrategyModule{
 		this.network = controler.getNetwork();
 		this.init(network);
 		this.router = new PlansCalcRoute (controler.getConfig().plansCalcRoute(), controler.getNetwork(), controler.createTravelCostCalculator(), controler.getTravelTimeCalculator(), controler.getLeastCostPathCalculatorFactory());
-		this.locator = new LocationMutatorwChoiceSet(controler.getNetwork(), controler, controler.getScenario().getKnowledges());
+		this.locator = new LocationMutatorwChoiceSet(controler.getNetwork(), controler, controler.getScenario().getKnowledges(), new Random(4711));
 		this.linker = new XY2Links (this.controler.getNetwork());
 		this.beta				= "yes";
 		this.gamma				= "no";
@@ -159,6 +160,7 @@ public class PlansConstructor implements PlanStrategyModule{
 		this.network.connect();
 	}
 
+	@Override
 	public void prepareReplanning() {
 		// Read the external plans file.
 		this.controler.getScenario().setPopulation(this.population);
@@ -166,10 +168,12 @@ public class PlansConstructor implements PlanStrategyModule{
 		log.info("Reading population done.");
 	}
 
+	@Override
 	public void handlePlan(final Plan plan) {
 		// Do nothing here. We work only on the external plans.
 	}
 
+	@Override
 	public void finishReplanning(){
 
 	//	Once-off task to filter Zurich people from overall census people
@@ -1077,7 +1081,7 @@ public class PlansConstructor implements PlanStrategyModule{
 				counterRow++;
 			}
 			if (incomeBoxCox.equals("yes")) {
-				stream.print(((double)(aaa.getIncome().get(person.getId()))/(double)(incomeAverage))+"\t");
+				stream.print(((aaa.getIncome().get(person.getId()))/(incomeAverage))+"\t");
 				counterRow++;
 			}
 	/*		if (age.equals("yes")) {

@@ -51,30 +51,6 @@ public class LocationMutatorwChoiceSet extends LocationMutator {
 	private double recursionTravelSpeed = 30.0;
 	protected int maxRecursions = 10;
 
-	/**
-	 * @deprecated  Please use LocationMutatorwChoiceSet(..., Random random) for deterministic results in multithreated replanning
-	 */
-	@Deprecated
-	public LocationMutatorwChoiceSet(final Network network, Controler controler, Knowledges kn,
-			TreeMap<String, QuadTreeRing<ActivityFacility>> quad_trees,
-			TreeMap<String, ActivityFacilityImpl []> facilities_of_type) {
-		super(network, controler, kn, quad_trees, facilities_of_type);
-		this.recursionTravelSpeedChange = Double.parseDouble(this.config.getRecursionTravelSpeedChange());
-		this.maxRecursions = Integer.parseInt(this.config.getMaxRecursions());
-		this.recursionTravelSpeed = Double.parseDouble(this.config.getRecursionTravelSpeed());
-	}
-
-	/**
-	 * @deprecated  Please use LocationMutatorwChoiceSet(..., Random random) for deterministic results in multithreated replanning
-	 */
-	@Deprecated
-	public LocationMutatorwChoiceSet(final Network network, Controler controler, Knowledges kn) {
-		super(network, controler, kn);
-		this.recursionTravelSpeedChange = Double.parseDouble(this.config.getRecursionTravelSpeedChange());
-		this.maxRecursions = Integer.parseInt(this.config.getMaxRecursions());
-		this.recursionTravelSpeed = Double.parseDouble(this.config.getRecursionTravelSpeed());
-	}
-	
 	public LocationMutatorwChoiceSet(final Network network, Controler controler, Knowledges kn,
 			TreeMap<String, QuadTreeRing<ActivityFacility>> quad_trees,
 			TreeMap<String, ActivityFacilityImpl []> facilities_of_type, Random random) {

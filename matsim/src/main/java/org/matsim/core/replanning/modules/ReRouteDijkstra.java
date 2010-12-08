@@ -22,7 +22,6 @@ package org.matsim.core.replanning.modules;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.DijkstraFactory;
@@ -41,24 +40,14 @@ public class ReRouteDijkstra extends AbstractMultithreadedModule {
 	PersonalizableTravelTime timeCalculator = null;
 	Network network = null;
 	private PlansCalcRouteConfigGroup configGroup = null;
-	
-	/**
-	 * @deprecated use other constructor and give the PlansCalcRouteConfigGroup
-	 * as argument 
-	 */
-	@Deprecated
-	protected ReRouteDijkstra(GlobalConfigGroup globalConfigGroup, final Network network, final PersonalizableTravelCost costCalculator, final PersonalizableTravelTime timeCalculator) {
-		super(globalConfigGroup);
+
+	public ReRouteDijkstra(Config config, final Network network, final PersonalizableTravelCost costCalculator, final PersonalizableTravelTime timeCalculator) {
+		super(config.global());
 		this.network = network;
 		this.costCalculator = costCalculator;
 		this.timeCalculator = timeCalculator;
-	}
-	
-	public ReRouteDijkstra(Config config, final Network network, final PersonalizableTravelCost costCalculator, final PersonalizableTravelTime timeCalculator) {
-		this(config.global(), network, costCalculator, timeCalculator);
 		this.configGroup = config.plansCalcRoute();
 	}
-	
 
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {

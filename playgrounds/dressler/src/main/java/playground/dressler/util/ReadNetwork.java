@@ -26,8 +26,8 @@ package playground.dressler.util;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkReaderMatsimV1;
 
 public class ReadNetwork {
 
@@ -39,9 +39,8 @@ public class ReadNetwork {
 		 System.out.println("Ich lebe");
 			ScenarioImpl scenario = new ScenarioImpl();
 			NetworkImpl network = scenario.getNetwork();
-		 NetworkReaderMatsimV1 networkReader = new NetworkReaderMatsimV1(scenario);
 
-		 networkReader.readFile("./examples/equil/network.xml");
+		 new MatsimNetworkReader(scenario).readFile("./examples/equil/network.xml");
 
 		 //Map<IdI, ? extends Node> nodes = network.getNodes();
 		 //Map<IdI, ? extends Link> links = network.getLinks();

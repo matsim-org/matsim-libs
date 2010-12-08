@@ -40,34 +40,16 @@ import org.matsim.locationchoice.utils.QuadTreeRing;
  */
 public class RandomLocationMutator extends LocationMutator {
 
-	/**
-	 * @deprecated  Please use RandomLocationMutator(..., Random random) for deterministic results in multithreated replanning
-	 */
-	@Deprecated
-	public RandomLocationMutator(final Network network, Controler controler, Knowledges kn) {
-		super(network, controler, kn);
-	}
-	
-	/**
-	 * @deprecated  Please use RandomLocationMutator(..., Random random) for deterministic results in multithreated replanning
-	 */
-	@Deprecated
-	public RandomLocationMutator(final Network network, Controler controler, Knowledges kn,
-			TreeMap<String, QuadTreeRing<ActivityFacility>> quad_trees,
-			TreeMap<String, ActivityFacilityImpl []> facilities_of_type) {
-		super(network, controler, kn, quad_trees, facilities_of_type);
-	}
-	
 	public RandomLocationMutator(final Network network, Controler controler, Knowledges kn, Random random) {
 		super(network, controler, kn, random);
 	}
-	
+
 	public RandomLocationMutator(final Network network, Controler controler, Knowledges kn,
 			TreeMap<String, QuadTreeRing<ActivityFacility>> quad_trees,
 			TreeMap<String, ActivityFacilityImpl []> facilities_of_type, Random random) {
 		super(network, controler, kn, quad_trees, facilities_of_type, random);
 	}
-	
+
 
 	/*
 	 * For all secondary activities of the plan chose randomly a new facility which provides

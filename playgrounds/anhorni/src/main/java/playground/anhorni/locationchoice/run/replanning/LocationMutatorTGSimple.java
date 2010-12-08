@@ -23,6 +23,7 @@ package playground.anhorni.locationchoice.run.replanning;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 import java.util.TreeMap;
 import java.util.Vector;
 
@@ -64,7 +65,7 @@ public class LocationMutatorTGSimple extends LocationMutator {
 			TreeMap<String, QuadTreeRing<ActivityFacility>> quad_trees,
 			TreeMap<String, ActivityFacilityImpl []> facilities_of_type) {
 
-		super(network, controler, knowledges, quad_trees, facilities_of_type);
+		super(network, controler, knowledges, quad_trees, facilities_of_type, new Random(4711));
 
 		log.info("Using modified TGMutator");
 

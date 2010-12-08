@@ -20,6 +20,7 @@
 package org.matsim.locationchoice.constrained;
 
 import java.util.List;
+import java.util.Random;
 
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
@@ -33,7 +34,7 @@ public class LocationMutatorwChoiceSetTest  extends MatsimTestCase {
 		Initializer initializer = new Initializer();
 		initializer.init(this);
 		return new LocationMutatorwChoiceSet(initializer.getControler().getNetwork(),
-				initializer.getControler(), initializer.getControler().getScenario().getKnowledges());
+				initializer.getControler(), initializer.getControler().getScenario().getKnowledges(), new Random(4711));
 	}
 
 	public void testConstructor() {

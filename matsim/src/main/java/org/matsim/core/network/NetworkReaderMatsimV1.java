@@ -20,12 +20,9 @@
 
 package org.matsim.core.network;
 
-import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Stack;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
@@ -36,7 +33,6 @@ import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.StringUtils;
 import org.matsim.core.utils.misc.Time;
 import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
 
 /**
  * A reader for network-files of MATSim according to <code>network_v1.dtd</code>.
@@ -77,26 +73,6 @@ public class NetworkReaderMatsimV1 extends MatsimXmlParser {
 	@Override
 	public void endTag(final String name, final String content, final Stack<String> context) {
 		// currently, we do not have anything to do when a tag ends, maybe later sometimes...
-	}
-
-	/**
-	 * Parses the specified network file. This method calls {@link #parse(String)}, but handles all
-	 * possible exceptions on its own.
-	 *
-	 * @param filename The name of the file to parse.
-	 * @deprecated please use {@link #parse(String)}
-	 */
-	@Deprecated
-	public void readFile(final String filename) {
-		try {
-			parse(filename);
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 	}
 
 	private void startNetwork(final Attributes atts) {

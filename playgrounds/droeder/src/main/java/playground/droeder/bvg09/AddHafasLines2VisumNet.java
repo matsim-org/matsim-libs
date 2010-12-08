@@ -5,9 +5,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import java.util.Map.Entry;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -20,8 +20,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
+import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.Dijkstra;
@@ -41,62 +41,62 @@ import org.xml.sax.SAXException;
 import playground.droeder.DaPaths;
 
 public class AddHafasLines2VisumNet {
-	
+
 	private final String PATH = DaPaths.OUTPUT + "bvg09/";
-	
+
 	private final String NETFILE = PATH + "intermediateNetwork.xml";
 	private final String HAFASTRANSITFILE = PATH + "transitSchedule-HAFAS-Coord.xml";
 	private final String VISUMTRANSITFILE = PATH + "intermediateTransitSchedule.xml";
 	private final String FINALTRANSITFILE = PATH + "finalTransit.xml";
 	private final String NEWLINESSHAPE = PATH + "newLines.shp";
-	
-	private final Id ERROR = new IdImpl("Error"); 
-	
+
+	private final Id ERROR = new IdImpl("Error");
+
 	private ScenarioImpl visumSc;
 	private ScenarioImpl hafasSc;
 	private ScenarioImpl newSc;
-	
+
 	private NetworkImpl visumNet;
 	private TransitSchedule visumTransit;
-	
+
 	private TransitSchedule hafasTransit;
-	
+
 	private TransitSchedule finalTransitSchedule;
 	private TransitScheduleFactory finalTransitFactory;
-	
-	
+
+
 	private TreeMap<Id, Id> vis2HafLines;
-	
+
 	private Map<Id, Id> haf2VisNearestStop;
-	
+
 	public static void main (String[] args){
 		AddHafasLines2VisumNet add = new AddHafasLines2VisumNet();
 		add.run();
 	}
 
-	
+
 	public AddHafasLines2VisumNet(){
 		this.visumSc = new ScenarioImpl();
 		this.hafasSc = new ScenarioImpl();
-		
+
 		visumSc.getConfig().scenario().setUseTransit(true);
 		readSchedule(VISUMTRANSITFILE, visumSc);
 		visumTransit = visumSc.getTransitSchedule();
-		new NetworkReaderMatsimV1(visumSc).readFile(NETFILE);
+		new MatsimNetworkReader(visumSc).readFile(NETFILE);
 		visumNet = visumSc.getNetwork();
-		
+
 		hafasSc.getConfig().scenario().setUseTransit(true);
 		readSchedule(HAFASTRANSITFILE, hafasSc);
 		hafasTransit = hafasSc.getTransitSchedule();
-		
+
 		this.createHafasLineIdsFromVisum();
-		
+
 		newSc = new ScenarioImpl();
 		newSc.getConfig().scenario().setUseTransit(true);
 		finalTransitFactory = newSc.getTransitSchedule().getFactory();
 		finalTransitSchedule = finalTransitFactory.createTransitSchedule();
 	}
-	
+
 	public void run(){
 		this.createHafasLineIdsFromVisum();
 		this.findNearestStops();
@@ -104,7 +104,7 @@ public class AddHafasLines2VisumNet {
 		this.validate();
 //		DaShapeWriter.writeDefaultLineString2Shape(NEWLINESSHAPE, "newRoutes", prepareNewRoutesForShape(), null);
 	}
-	
+
 	private void readSchedule(String fileName, ScenarioImpl sc){
 		TransitScheduleReader reader = new TransitScheduleReader(sc);
 		try {
@@ -120,10 +120,10 @@ public class AddHafasLines2VisumNet {
 			e.printStackTrace();
 		}
 	}
-	
+
 	private void findNearestStops(){
 		this.haf2VisNearestStop = new HashMap<Id, Id>();
-		
+
 		for(TransitStopFacility h : hafasTransit.getFacilities().values()){
 			Id vis = ERROR;
 			Double dist = Double.MAX_VALUE;
@@ -137,11 +137,11 @@ public class AddHafasLines2VisumNet {
 			if(vis.equals(ERROR)){
 				throw new RuntimeException("no Stop matched to hafasstop " + h.getId() + "!");
 			}else{
-				
+
 				haf2VisNearestStop.put(h.getId(), vis);
 			}
 		}
-		
+
 		// add some points not matched by the algorithm
 		haf2VisNearestStop.put(new IdImpl("9160525"), new IdImpl("1605250"));
 		haf2VisNearestStop.put(new IdImpl("9160524"), new IdImpl("1605240"));
@@ -151,10 +151,10 @@ public class AddHafasLines2VisumNet {
 		haf2VisNearestStop.put(new IdImpl("9160523"), new IdImpl("1605230"));
 		haf2VisNearestStop.put(new IdImpl("9160021"), new IdImpl("1600210"));
 	}
-	
+
 	private Map<String, SortedMap<Integer, Coord>> prepareNewRoutesForShape(){
 		Map<String, SortedMap<Integer, Coord>> preparedRoutes = new HashMap<String, SortedMap<Integer,Coord>>();
-		
+
 		for(TransitLine l : finalTransitSchedule.getTransitLines().values()){
 			for(TransitRoute r : l.getRoutes().values()){
 				int  i = 0;
@@ -167,29 +167,29 @@ public class AddHafasLines2VisumNet {
 				}
 				preparedRoutes.put(l.getId().toString() + "_" + r.getId().toString(), temp);
 			}
-			
+
 		}
 		return preparedRoutes;
 	}
-	
+
 	private void getNewRoutesFromMatchedStops(){
 		TransitLine newLine;
 		TransitRoute newRoute;
 		TransitRouteStop newStop;
 		TransitStopFacility newFacility;
 		List<TransitRouteStop> stops;
-		
-		
+
+
 		Map<Id, TransitStopFacility> facilities = new HashMap<Id, TransitStopFacility>();
 		for (Entry<Id, Id> e : vis2HafLines.entrySet()){
 			newLine = finalTransitFactory.createTransitLine(e.getKey());
 			for(TransitRoute hr : hafasTransit.getTransitLines().get(e.getValue()).getRoutes().values()){
 				stops = new ArrayList<TransitRouteStop>();
-				
+
 				for(TransitRouteStop stop : hr.getStops()){
 					TransitStopFacility hFacility = stop.getStopFacility();
 					TransitStopFacility vFacility = visumTransit.getFacilities().get(haf2VisNearestStop.get(hFacility.getId()));
-					
+
 					if(facilities.containsKey(vFacility.getId())){
 						newFacility = facilities.get(vFacility.getId());
 					}else{
@@ -197,27 +197,27 @@ public class AddHafasLines2VisumNet {
 						newFacility.setLinkId(findNextLink(newFacility));
 						facilities.put(vFacility.getId(), newFacility);
 					}
-					
+
 					newStop = finalTransitFactory.createTransitRouteStop(newFacility, stop.getArrivalOffset(), stop.getDepartureOffset());
 					stops.add(newStop);
 				}
-				
+
 				NetworkRoute networkRoute = getNetworkRoute(stops);
-				
+
 				newRoute = finalTransitFactory.createTransitRoute(hr.getId(), networkRoute, stops, TransportMode.pt);
 				newLine.addRoute(newRoute);
 			}
 			finalTransitSchedule.addTransitLine(newLine);
 		}
 	}
-	
+
 	private NetworkRoute getNetworkRoute(List<TransitRouteStop> stops){
 		List<Link> links = new ArrayList<Link>();
-		
-		LeastCostPathCalculator router = new Dijkstra(visumNet, 
-				new FreespeedTravelTimeCost(new CharyparNagelScoringConfigGroup()), 
+
+		LeastCostPathCalculator router = new Dijkstra(visumNet,
+				new FreespeedTravelTimeCost(new CharyparNagelScoringConfigGroup()),
 				new FreespeedTravelTimeCost(new CharyparNagelScoringConfigGroup()));
-		
+
 		boolean first = true;
 		Path p;
 		Node fromNode = null;
@@ -231,7 +231,7 @@ public class AddHafasLines2VisumNet {
 			fromNode = toNode;
 			first = false;
 		}
-		
+
 		List<Id> linkIds = NetworkUtils.getLinkIds(links);
 		Id start, end;
 		start = stops.get(0).getStopFacility().getLinkId();
@@ -240,9 +240,9 @@ public class AddHafasLines2VisumNet {
 		route.setLinkIds(start, linkIds, end);
 		return route;
 	}
-	
-	
-	
+
+
+
 	private Id findNextLink(TransitStopFacility newFacility) {
 		if(newFacility.getId().equals(new IdImpl("484014"))){
 			return new IdImpl("1397");
@@ -273,7 +273,7 @@ public class AddHafasLines2VisumNet {
 		for(TransitLine line : visumSc.getTransitSchedule().getTransitLines().values()){
 			createdHafasId = new StringBuffer();
 			idToChar = line.getId().toString().split("");
-			
+
 			if(idToChar[1].equals("B")){
 				if(idToChar[4].equals(" ") ){
 					createdHafasId.append(idToChar[3]);
@@ -305,22 +305,22 @@ public class AddHafasLines2VisumNet {
 				createdHafasId.append(idToChar[4]);
 				createdHafasId.append("   ");
 			}
-			
+
 			hafasId = createdHafasId.toString();
 			if(createdHafasId.length()>0 && hafasSc.getTransitSchedule().getTransitLines().containsKey(new IdImpl(hafasId)) ){
 				vis2HafLines.put(line.getId() , new IdImpl(hafasId));
 			}
 		}
 	}
-	
+
 	private void validate(){
-		
+
 		for(TransitLine l : finalTransitSchedule.getTransitLines().values()){
 			for(TransitRoute r : l.getRoutes().values()){
 				double offset = 0;
 				for(TransitRouteStop s : r.getStops()){
 					if(s.getArrivalOffset()< offset){
-						Log.error("On Line:" + l.getId()+ " route:" + r.getId() + 
+						Log.error("On Line:" + l.getId()+ " route:" + r.getId() +
 								" Arrivaloffset of Stop " + s.getStopFacility().getId() + " then departureOffset of the stop before!");
 					}
 					offset = s.getDepartureOffset();
@@ -328,12 +328,12 @@ public class AddHafasLines2VisumNet {
 			}
 		}
 	}
-	
+
 	protected double getDist(Coord one, Coord two){
-		
+
 		double xDif = one.getX() - two.getX();
 		double yDif = one.getY() - two.getY();
-		
+
 		return Math.sqrt(Math.pow(xDif, 2.0) + Math.pow(yDif, 2.0));
 	}
 }
