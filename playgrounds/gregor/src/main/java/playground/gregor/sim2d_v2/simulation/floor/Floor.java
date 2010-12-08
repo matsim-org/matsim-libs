@@ -32,15 +32,12 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.utils.geometry.geotools.MGC;
 
 import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.index.quadtree.Quadtree;
 
 import playground.gregor.sim2d_v2.controller.Sim2DConfig;
 import playground.gregor.sim2d_v2.events.XYZAzimuthEvent;
 import playground.gregor.sim2d_v2.events.XYZAzimuthEventImpl;
-import playground.gregor.sim2d_v2.events.debug.ArrowEvent;
 import playground.gregor.sim2d_v2.scenario.Scenario2DImpl;
 import playground.gregor.sim2d_v2.simulation.Agent2D;
 import playground.gregor.sim2d_v2.simulation.PhantomManager;
@@ -161,7 +158,7 @@ public class Floor {
 			agent.moveToPostion(newPos);
 			double azimuth = getAzimuth(oldPos, newPos);
 			XYZAzimuthEvent e = new XYZAzimuthEventImpl(agent.getPerson().getId(), agent.getPosition(), azimuth, time);
-			this.getSim2D().getEventsManager().processEvent(e);
+			getSim2D().getEventsManager().processEvent(e);
 
 			f.reset();
 
@@ -304,7 +301,7 @@ public class Floor {
 	 * @return the sim2D
 	 */
 	public Sim2D getSim2D() {
-		return sim2D;
+		return this.sim2D;
 	}
 
 }

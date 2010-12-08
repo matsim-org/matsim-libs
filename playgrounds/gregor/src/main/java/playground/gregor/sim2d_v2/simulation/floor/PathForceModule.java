@@ -41,7 +41,6 @@ import playground.gregor.sim2d_v2.simulation.Agent2D;
 public class PathForceModule implements ForceModule {
 
 	private final Floor floor;
-	private final Scenario2DImpl sc;
 	private HashMap<Id, Coordinate> drivingDirections;
 	private HashMap<Id, Coordinate> fromCoords;
 	private HashMap<Id, LineString> linkGeos;
@@ -52,7 +51,6 @@ public class PathForceModule implements ForceModule {
 	 */
 	public PathForceModule(Floor floor, Scenario2DImpl scenario) {
 		this.floor = floor;
-		this.sc = scenario;
 
 	}
 
