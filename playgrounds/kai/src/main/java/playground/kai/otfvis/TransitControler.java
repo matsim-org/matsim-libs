@@ -88,6 +88,7 @@ public class TransitControler extends Controler {
 	}
 
 	public static void main(final String[] args) {
+//		args[0] = "/Users/nagel/kw/rotterdam/config.xml" ;
 		Config config = new Config();
 		config.addCoreModules();
 		new MatsimConfigReader(config).readFile(args[0]);
