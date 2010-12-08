@@ -48,14 +48,21 @@ import playground.benjamin.dataprepare.CheckingTabularFileHandler;
  * @author benjamin
  *
  */
-public class TestDemandCreatorFromCounts {
+public class DemandCreatorFromCounts {
 	static String netFile = "";
 	static String countsPath = "../../detailedEval/teststrecke/zaehlstellen_einfluss/";
 	static String testVehiclePath = "../../detailedEval/teststrecke/testVehicle/";
 	static String outPath = "../../detailedEval/teststrecke/sim/input/";
-	static String day1 = "20090707";
-	static String day2 = "20090708";
-	static String day3 = "20090709";
+	
+	static String day1 = "20060125";
+	static String day2 = "20060127";
+	static String day3 = "20060131";
+	static String day4 = "20090317";
+	static String day5 = "20090318";
+	static String day6 = "20090319";
+	static String day7 = "20090707";
+	static String day8 = "20090708";
+	static String day9 = "20090709";
 	
 	static String lane1 = "4006013";
 	static String lane2 = "4006014";
@@ -67,28 +74,54 @@ public class TestDemandCreatorFromCounts {
 		Population pop1 = generatePopulation(countsPath + day1 + "/" + lane1 + ".txt", countsPath + day1 + "/" + lane2 + ".txt");
 		Population pop2 = generatePopulation(countsPath + day2 + "/" + lane1 + ".txt", countsPath + day2 + "/" + lane2 + ".txt");
 		Population pop3 = generatePopulation(countsPath + day3 + "/" + lane1 + ".txt", countsPath + day3 + "/" + lane2 + ".txt");
+		Population pop4 = generatePopulation(countsPath + day4 + "/" + lane1 + ".txt", countsPath + day4 + "/" + lane2 + ".txt");
+		Population pop5 = generatePopulation(countsPath + day5 + "/" + lane1 + ".txt", countsPath + day5 + "/" + lane2 + ".txt");
+		Population pop6 = generatePopulation(countsPath + day6 + "/" + lane1 + ".txt", countsPath + day6 + "/" + lane2 + ".txt");
+		Population pop7 = generatePopulation(countsPath + day7 + "/" + lane1 + ".txt", countsPath + day7 + "/" + lane2 + ".txt");
+		Population pop8 = generatePopulation(countsPath + day8 + "/" + lane1 + ".txt", countsPath + day8 + "/" + lane2 + ".txt");
+		Population pop9 = generatePopulation(countsPath + day9 + "/" + lane1 + ".txt", countsPath + day9 + "/" + lane2 + ".txt");
 		
+		/*inflow times are randomly equally mutated within a 2min time bin;
+		one could think of modelling peak inflows due to upstream signals...*/
 		fuzzifyTimes(pop1);
 		fuzzifyTimes(pop2);
 		fuzzifyTimes(pop3);
+		fuzzifyTimes(pop4);
+		fuzzifyTimes(pop5);
+		fuzzifyTimes(pop6);
+		fuzzifyTimes(pop7);
+		fuzzifyTimes(pop8);
+		fuzzifyTimes(pop9);
 		
-		addTestVehicle(pop1, testVehiclePath + day1 + "_inflowTimes.txt");
-		addTestVehicle(pop2, testVehiclePath + day2 + "_inflowTimes.txt");
-		addTestVehicle(pop3, testVehiclePath + day3 + "_inflowTimes.txt");		
+		addTestVehicle(pop1, testVehiclePath + day1 + "_travelTimes.csv");
+		addTestVehicle(pop2, testVehiclePath + day2 + "_travelTimes.csv");
+		addTestVehicle(pop3, testVehiclePath + day3 + "_travelTimes.csv");
+		addTestVehicle(pop4, testVehiclePath + day4 + "_travelTimes.csv");
+		addTestVehicle(pop5, testVehiclePath + day5 + "_travelTimes.csv");
+		addTestVehicle(pop6, testVehiclePath + day6 + "_travelTimes.csv");
+		addTestVehicle(pop7, testVehiclePath + day7 + "_travelTimes.csv");
+		addTestVehicle(pop8, testVehiclePath + day8 + "_travelTimes.csv");
+		addTestVehicle(pop9, testVehiclePath + day9 + "_travelTimes.csv");		
 		
 		writePlans(pop1, day1);
 		writePlans(pop2, day2);
 		writePlans(pop3, day3);
+		writePlans(pop4, day4);
+		writePlans(pop5, day5);
+		writePlans(pop6, day6);
+		writePlans(pop7, day7);
+		writePlans(pop8, day8);
+		writePlans(pop9, day9);
 	}
 
 	/**
 	 * @param population
-	 * @param dayFile 
+	 * @param inflowTimesFile 
 	 */
-	private static void addTestVehicle(Population population, String dayFile) {
+	private static void addTestVehicle(Population population, String inflowTimesFile) {
 		Scenario sc = new ScenarioImpl();
 
-		List<Integer> inflowTimes = getTestVehicleInflowTimes(dayFile);
+		List<Integer> inflowTimes = getTestVehicleInflowTimes(inflowTimesFile);
 		for(int time : inflowTimes){
 			Id personId = sc.createId(time + "testVehicle");
 			
@@ -120,22 +153,21 @@ public class TestDemandCreatorFromCounts {
 	}
 
 	/**
-	 * @param dayFile
+	 * @param inflowTimesFile
 	 * @return
 	 */
-	private static List<Integer> getTestVehicleInflowTimes(String dayFile) {
+	private static List<Integer> getTestVehicleInflowTimes(String inflowTimesFile) {
 		final List<Integer> inflowTimes = new ArrayList<Integer>();
 		
 		TabularFileParserConfig tabFileParserConfig = new TabularFileParserConfig();
-		tabFileParserConfig.setFileName(dayFile);
-		tabFileParserConfig.setDelimiterTags(new String[] {":"});
+		tabFileParserConfig.setFileName(inflowTimesFile);
+		tabFileParserConfig.setDelimiterTags(new String[] {";"});
 		
 		try {
 			new TabularFileParser().parse(tabFileParserConfig, new CheckingTabularFileHandler() {
 
-				private static final int HOURS = 0;
-				private static final int MINUTES = 1;
-				private static final int SECONDS = 2;
+				private static final int INFLOWTIME = 0;
+				private static final int TRAVELTIME = 1;
 				
 				public void startRow(String[] row) {
 					first = false;
@@ -145,16 +177,13 @@ public class TestDemandCreatorFromCounts {
 				}
 
 				private void addDepartureTime(String[] row) {
-					Integer hours = new Integer(row[HOURS]);
-					Integer minutes = new Integer(row[MINUTES]);
-					Integer seconds = new Integer(row[SECONDS]);
-					Integer departureTimeInSeconds = 60 * 60 * hours + 60 * minutes + seconds;
-					inflowTimes.add(departureTimeInSeconds);
+					Integer inflowTime = new Integer(row[INFLOWTIME]);
+					Integer travelTime = new Integer(row[TRAVELTIME]);
+					inflowTimes.add(inflowTime);
 				}
 			});
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
 		return inflowTimes;
 	}
@@ -169,7 +198,7 @@ public class TestDemandCreatorFromCounts {
 			Plan plan = person.getPlans().iterator().next();
 			planMutateTimeAllocation.run(plan);
 		}
-//		System.out.println("fuzzified times for population");
+		System.out.println("fuzzified times for population " + population);
 	}
 
 	/**
@@ -281,8 +310,7 @@ public class TestDemandCreatorFromCounts {
 				}
 			});
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
 		return EndTime2NoOfVehicles;
 	}

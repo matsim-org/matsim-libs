@@ -155,8 +155,7 @@ public class UpdateCapacityControlerListener implements StartupListener, Iterati
 			bw.close();
 
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
 
 	}		
