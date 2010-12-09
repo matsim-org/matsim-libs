@@ -83,7 +83,6 @@ public class cleanGautengNetwork {
 			throw new RuntimeException("Need an input and output network file path specified.");
 		}
 		
-		                              
 		cn.log.info("Gauteng network cleaner created.");
 		
 		/*
@@ -92,8 +91,8 @@ public class cleanGautengNetwork {
 		 * that you use the RIGHT files. 
 		 */
 //		cn.removeIdentifiedLinks(cn.inputNetwork, cn.tempFile1);
-//		cn.cleanNetwork(cn.tempFile1, cn.tempFile2);
-		cn.updateLaneDefinitions(cn.inputNetwork, cn.outputNetwork);		
+		cn.cleanNetwork(cn.inputNetwork, cn.outputNetwork);
+//		cn.updateLaneDefinitions(cn.inputNetwork, cn.outputNetwork);		
 		
 		cn.writeNetworkToShapefile(cn.outputNetwork);
 		

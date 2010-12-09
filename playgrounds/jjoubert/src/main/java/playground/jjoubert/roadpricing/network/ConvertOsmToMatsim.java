@@ -46,10 +46,10 @@ public class ConvertOsmToMatsim {
 	 */
 	public static void main(String[] args) {
 
-		String inputFile = "/Users/johanwjoubert/MATSim/workspace/MATSimData/Gauteng/SANRAL/Network/gauteng.osm";
-		String outputFile = "/Users/johanwjoubert/MATSim/workspace/MATSimData/Gauteng/SANRAL/Network/gautengNetwork_Clean.xml.gz";
-		String shapefileLinks = "/Users/johanwjoubert/MATSim/workspace/MATSimData/Gauteng/SANRAL/Network/gautengNetwork_Clean_Links.shp";
-		String shapefileNodes = "/Users/johanwjoubert/MATSim/workspace/MATSimData/Gauteng/SANRAL/Network/gautengNetwork_Clean_Nodes.shp";
+		String inputFile = "/Users/johanwjoubert/MATSim/workspace/MATSimData/Gauteng/SANRAL/Network/gauteng_201012.osm";
+		String outputFile = "/Users/johanwjoubert/MATSim/workspace/MATSimData/Gauteng/SANRAL/Network/gautengNetwork2_Clean.xml.gz";
+		String shapefileLinks = "/Users/johanwjoubert/MATSim/workspace/MATSimData/Gauteng/SANRAL/Network/gautengNetwork2_Clean_Links.shp";
+		String shapefileNodes = "/Users/johanwjoubert/MATSim/workspace/MATSimData/Gauteng/SANRAL/Network/gautengNetwork2_Clean_Nodes.shp";
 
 		Scenario sc = new ScenarioImpl();
 		Network nw = sc.getNetwork();
