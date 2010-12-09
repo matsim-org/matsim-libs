@@ -44,8 +44,8 @@ public class JbOsmReader {
 						TransformationFactory.WGS84_UTM33N), false);
 		osmReader.setKeepPaths(false);
 		osmReader.setScaleMaxSpeed(true);
-		String input = "/Users/JB/Desktop/BA-Arbeit/sim/brandenburg.osm";
-		String output = "/Users/JB/Desktop/BA-Arbeit/sim/brandenburg";
+		String input = "/Users/JB/Documents/Work/brandenburg.osm";
+		String output = "/Users/JB/Desktop/BA-Arbeit/sim/brandenburggg";
 
 //		 set osmReader useHighwayDefaults false
 //		 Autobahn
@@ -69,7 +69,11 @@ public class JbOsmReader {
 		osmReader.setHighwayDefaults(2, "residential",   1,  30.0/3.6, 1.0,  600);
 //		 Spielstrassen irrelevant, since only tiny percentile
 //		 osmReader.setHighwayDefaults(6, "living_street", 1,  15.0/3.6, 1.0,  300);
-		osmReader.setHierarchyLayer(52.04382,13.499222, 51.258248,14.887619, 1);
+//		More Brandenburg:		
+//		osmReader.setHierarchyLayer(52.04382,13.499222, 51.258248,14.887619, 1);
+		
+//		used for BA:		
+		osmReader.setHierarchyLayer( 52.045199,14.115944, 51.551772,14.817009, 1);
 		osmReader.setHierarchyLayer(51.820578,14.247866, 51.684789,14.507332, 2);
 
 		try {
