@@ -39,6 +39,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.ControlerIO;
 import org.matsim.core.events.AdditionalTeleportationDepartureEvent;
 import org.matsim.core.gbl.Gbl;
@@ -632,20 +633,36 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 
 
 	private void initSimTimer() {
-		double startTime = this.scenario.getConfig().getQSimConfigGroup().getStartTime();
+		Double startTime = this.scenario.getConfig().getQSimConfigGroup().getStartTime();
 		this.stopTime = this.scenario.getConfig().getQSimConfigGroup().getEndTime();
-		if (startTime == Time.UNDEFINED_TIME) startTime = 0.0;
-		if ((this.stopTime == Time.UNDEFINED_TIME) || (this.stopTime == 0)) this.stopTime = Double.MAX_VALUE;
-		this.simTimer.setSimStartTime(24*3600);
-		this.simTimer.setTime(startTime);
-		// set sim start time to config-value ONLY if this is LATER than the first plans starttime
-		double simStartTime = 0;
-		PlanAgent firstAgent = this.activityEndsList.peek();
-		if (firstAgent != null) {
-			simStartTime = Math.floor(Math.max(startTime, firstAgent.getActivityEndTime()));
+		if (startTime == Time.UNDEFINED_TIME) {
+			startTime = 0.0;
 		}
+		if ((this.stopTime == Time.UNDEFINED_TIME) || (this.stopTime == 0)) {
+			this.stopTime = Double.MAX_VALUE;
+		}
+		
+//		this.simTimer.setSimStartTime(24*3600);
+//		this.simTimer.setTime(startTime);
+
+		double simStartTime = 0;
+		if ( QSimConfigGroup.MAX_OF_STARTTIME_AND_EARLIEST_ACTIVITY_END.equals(
+				this.scenario.getConfig().getQSimConfigGroup().getSimStarttimeInterpretation() ) ) {
+			PlanAgent firstAgent = this.activityEndsList.peek();
+			if (firstAgent != null) {
+				// set sim start time to config-value ONLY if this is LATER than the first plans starttime
+				simStartTime = Math.floor(Math.max(startTime, firstAgent.getActivityEndTime()));
+			}
+		} else if ( QSimConfigGroup.ONLY_USE_STARTTIME.equals( 
+				this.scenario.getConfig().getQSimConfigGroup().getSimStarttimeInterpretation() ) ) {
+			simStartTime = startTime ;
+		} else {
+			throw new RuntimeException( "unkonwn starttimeInterpretation; aborting ...") ;
+		}
+
 		this.simTimer.setSimStartTime(simStartTime);
 		this.simTimer.setTime(simStartTime);
+
 	}
 	
 

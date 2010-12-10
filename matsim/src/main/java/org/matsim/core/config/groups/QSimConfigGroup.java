@@ -45,19 +45,30 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 	private static final String REMOVE_STUCK_VEHICLES = "removeStuckVehicles";
 	private static final String NUMBER_OF_THREADS = "numberOfThreads";
 	private static final String TRAFFIC_DYNAMICS = "trafficDynamics" ;
+	private static final String SIM_STARTTIME_INTERPRETATION = "simStarttimeInterpretation" ;
+	
+	public static final String SNAPSHOT_EQUI_DIST = "equiDist" ;
+	public static final String SNAPSHOT_AS_QUEUE = "queue" ;
+
+	public static final String TRAFF_DYN_QUEUE = "queue" ;
+	public static final String TRAFF_DYN_W_HOLES = "withHolesExperimental" ;
+
+	public static final String MAX_OF_STARTTIME_AND_EARLIEST_ACTIVITY_END = "maxOfStarttimeAndEarliestActivityEnd" ;
+	public static final String ONLY_USE_STARTTIME = "onlyUseStarttime" ;
 
 	private double startTime = Time.UNDEFINED_TIME;
 	private double endTime = Time.UNDEFINED_TIME;
 	private double timeStepSize = 1.0;
 	private double snapshotPeriod = 0; // off, no snapshots
 	private String snapshotFormat = "";
-	private String snapshotStyle = "equiDist"; // currently supported: queue, equiDist
+	private String snapshotStyle = SNAPSHOT_EQUI_DIST ;
 	private double flowCapFactor = 1.0;
-	private double stroageCapFactor = 1.0;
+	private double storageCapFactor = 1.0;
 	private double stuckTime = 100;
 	private boolean removeStuckVehicles = true;
 	private int numberOfThreads = 1;
-	private String trafficDynamics = "queue" ;
+	private String trafficDynamics = TRAFF_DYN_QUEUE ;
+	private String simStarttimeInterpretation = MAX_OF_STARTTIME_AND_EARLIEST_ACTIVITY_END ;
 
 	public QSimConfigGroup() {
 		super(GROUP_NAME);
@@ -89,6 +100,8 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 		  setNumberOfThreads(Integer.parseInt(value));
 		} else if (TRAFFIC_DYNAMICS.equals(key)) {
 			setTrafficDynamics(value) ;
+		} else if (SIM_STARTTIME_INTERPRETATION.equals(key)) {
+			setSimStarttimeInterpretation(value) ;
 		}	else {
 			throw new IllegalArgumentException(key);
 		}
@@ -97,50 +110,54 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 
 	@Override
 	public final String getValue(final String key) {
-		if (START_TIME.equals(key)) {
-			return Time.writeTime(getStartTime());
-		} else if (END_TIME.equals(key)) {
-			return Time.writeTime(getEndTime());
-		} else if (TIME_STEP_SIZE.equals(key)) {
-			return Time.writeTime(getTimeStepSize());
-		} else if (SNAPSHOT_PERIOD.equals(key)) {
-			return Time.writeTime(getSnapshotPeriod());
-		} else if (SNAPSHOT_FORMAT.equals(key)) {
-			return getSnapshotFormat();
-		} else if (SNAPSHOT_STYLE.equals(key)) {
-			return getSnapshotStyle();
-		} else if (FLOW_CAPACITY_FACTOR.equals(key)) {
-			return Double.toString(getFlowCapFactor());
-		} else if (STORAGE_CAPACITY_FACTOR.equals(key)) {
-			return Double.toString(getStorageCapFactor());
-		} else if (STUCK_TIME.equals(key)) {
-			return Double.toString(getStuckTime());
-		} else if (REMOVE_STUCK_VEHICLES.equals(key)) {
-			return (isRemoveStuckVehicles() ? "true" : "false");
-		} else if (NUMBER_OF_THREADS.equals(key)) {
-		  return String.valueOf(this.getNumberOfThreads());
-		} else if (TRAFFIC_DYNAMICS.equals(key)) {
-			return getTrafficDynamics() ;
-		}	else {
-			throw new IllegalArgumentException(key);
-		}
+		throw new RuntimeException("Please don't use `getValue' for QSimConfigGroup; use direct getters instead.  kai, dec'10") ;
+//		if (START_TIME.equals(key)) {
+//			return Time.writeTime(getStartTime());
+//		} else if (END_TIME.equals(key)) {
+//			return Time.writeTime(getEndTime());
+//		} else if (TIME_STEP_SIZE.equals(key)) {
+//			return Time.writeTime(getTimeStepSize());
+//		} else if (SNAPSHOT_PERIOD.equals(key)) {
+//			return Time.writeTime(getSnapshotPeriod());
+//		} else if (SNAPSHOT_FORMAT.equals(key)) {
+//			return getSnapshotFormat();
+//		} else if (SNAPSHOT_STYLE.equals(key)) {
+//			return getSnapshotStyle();
+//		} else if (FLOW_CAPACITY_FACTOR.equals(key)) {
+//			return Double.toString(getFlowCapFactor());
+//		} else if (STORAGE_CAPACITY_FACTOR.equals(key)) {
+//			return Double.toString(getStorageCapFactor());
+//		} else if (STUCK_TIME.equals(key)) {
+//			return Double.toString(getStuckTime());
+//		} else if (REMOVE_STUCK_VEHICLES.equals(key)) {
+//			return (isRemoveStuckVehicles() ? "true" : "false");
+//		} else if (NUMBER_OF_THREADS.equals(key)) {
+//		  return String.valueOf(this.getNumberOfThreads());
+//		} else if (TRAFFIC_DYNAMICS.equals(key)) {
+//			return getTrafficDynamics() ;
+//		} else if (SIM_STARTTIME_INTERPRETATION.equals(key)) {
+//			return this.getSimStarttimeInterpretation() ;
+//		}	else {
+//			throw new IllegalArgumentException(key);
+//		}
 	}
 
 	@Override
 	public final TreeMap<String, String> getParams() {
 		TreeMap<String, String> map = new TreeMap<String, String>();
-		map.put(START_TIME, getValue(START_TIME));
-		map.put(END_TIME, getValue(END_TIME));
-		map.put(TIME_STEP_SIZE, getValue(TIME_STEP_SIZE));
-		map.put(SNAPSHOT_PERIOD, getValue(SNAPSHOT_PERIOD));
-		map.put(SNAPSHOT_FORMAT, getValue(SNAPSHOT_FORMAT));
-		map.put(SNAPSHOT_STYLE, getValue(SNAPSHOT_STYLE));
-		map.put(FLOW_CAPACITY_FACTOR, getValue(FLOW_CAPACITY_FACTOR));
-		map.put(STORAGE_CAPACITY_FACTOR, getValue(STORAGE_CAPACITY_FACTOR));
-		map.put(STUCK_TIME, getValue(STUCK_TIME));
-		map.put(REMOVE_STUCK_VEHICLES, getValue(REMOVE_STUCK_VEHICLES));
-		map.put(NUMBER_OF_THREADS, getValue(NUMBER_OF_THREADS));
-		map.put(TRAFFIC_DYNAMICS, getValue(TRAFFIC_DYNAMICS)) ;
+		map.put(START_TIME, Time.writeTime(getStartTime()));
+		map.put(END_TIME, Time.writeTime(getEndTime()));
+		map.put(TIME_STEP_SIZE, Time.writeTime(getTimeStepSize()));
+		map.put(SNAPSHOT_PERIOD, Time.writeTime(getSnapshotPeriod()));
+		map.put(SNAPSHOT_FORMAT, getSnapshotFormat());
+		map.put(SNAPSHOT_STYLE, getSnapshotStyle());
+		map.put(FLOW_CAPACITY_FACTOR, String.valueOf(getFlowCapFactor()));
+		map.put(STORAGE_CAPACITY_FACTOR, String.valueOf(getStorageCapFactor()));
+		map.put(STUCK_TIME, String.valueOf(getStuckTime()));
+		map.put(REMOVE_STUCK_VEHICLES, String.valueOf(isRemoveStuckVehicles()));
+		map.put(NUMBER_OF_THREADS, String.valueOf(getNumberOfThreads()));
+		map.put(TRAFFIC_DYNAMICS, getTrafficDynamics());
+		map.put(SIM_STARTTIME_INTERPRETATION, getSimStarttimeInterpretation());
 		return map;
 	}
 	
@@ -158,7 +175,12 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 		map.put(SNAPSHOT_FORMAT, "Comma-separated list of visualizer output file formats.  'plansfile', `transims', `googleearth', and `otfvis'.  'netvis' is, I think, no longer possible.") ;
 		map.put(REMOVE_STUCK_VEHICLES, REMOVE_STUCK_VEHICLES_STRING ) ;
 		map.put(STUCK_TIME, STUCK_TIME_STRING ) ;
-		map.put(TRAFFIC_DYNAMICS, "`queue' for the standard queue model, `withHolesExperimental' (experimental!!) for the queue model with holes") ;
+		map.put(TRAFFIC_DYNAMICS, "`" 
+				+ TRAFF_DYN_QUEUE + "' for the standard queue model, `"
+				+ TRAFF_DYN_W_HOLES + "' (experimental!!) for the queue model with holes") ;
+		map.put(SIM_STARTTIME_INTERPRETATION, "`" 
+				+ MAX_OF_STARTTIME_AND_EARLIEST_ACTIVITY_END + "' (default behavior) or `"
+				+ ONLY_USE_STARTTIME + "'" ) ;
 		return map ;
 	}
 	/* direct access */
@@ -218,12 +240,12 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 		return this.flowCapFactor;
 	}
 
-	public void setStorageCapFactor(final double stroageCapFactor) {
-		this.stroageCapFactor = stroageCapFactor;
+	public void setStorageCapFactor(final double val) {
+		this.storageCapFactor = val;
 	}
 
 	public double getStorageCapFactor() {
-		return this.stroageCapFactor;
+		return this.storageCapFactor;
 	}
 
 	public void setStuckTime(final double stuckTime) {
@@ -245,7 +267,7 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 	/** See {@link #getComments()} for options. */
 	public void setSnapshotStyle(final String style) {
 		this.snapshotStyle = style.intern();
-		if (!"equiDist".equals(this.snapshotStyle) && !"queue".equals(this.snapshotStyle) 
+		if (!SNAPSHOT_EQUI_DIST.equals(this.snapshotStyle) && !SNAPSHOT_AS_QUEUE.equals(this.snapshotStyle) 
 				&& !"withHolesExperimental".equals(this.snapshotStyle) ) {
 			Logger.getLogger(this.getClass()).warn("The snapshotStyle \"" + style + "\" is not one of the known ones. "
 					+ "See comment in config dump of log file for allowed styles.");
@@ -258,9 +280,9 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 	
 	public void setTrafficDynamics(final String str) {
 		this.trafficDynamics = str ;
-		if ( !"queue".equals(this.trafficDynamics) && !"withHolesExperimental".equals(this.trafficDynamics) ) {
+		if ( !TRAFF_DYN_QUEUE.equals(this.trafficDynamics) && !TRAFF_DYN_W_HOLES.equals(this.trafficDynamics) ) {
 			Logger.getLogger(this.getClass()).warn("The trafficDynamics \"" + str + "\" is ot one of the known ones. "
-					+ "See comment in config dump of log file for allowed styles." ) ;
+					+ "See comment in config dump in log file for allowed styles." ) ;
 		}
 	}
 	
@@ -268,13 +290,26 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 		return this.trafficDynamics ;
 	}
 
-  public int getNumberOfThreads() {
-    return this.numberOfThreads ;
-  }
+	public int getNumberOfThreads() {
+		return this.numberOfThreads ;
+	}
 
 
-  public void setNumberOfThreads(final int numberOfThreads) {
-    this.numberOfThreads = numberOfThreads;
-  }
+	public void setNumberOfThreads(final int numberOfThreads) {
+		this.numberOfThreads = numberOfThreads;
+	}
+
+	public String getSimStarttimeInterpretation() {
+		return simStarttimeInterpretation;
+	}
+
+	public void setSimStarttimeInterpretation(String str) {
+		this.simStarttimeInterpretation = str;
+		if ( !MAX_OF_STARTTIME_AND_EARLIEST_ACTIVITY_END.equals(str)
+				&& !ONLY_USE_STARTTIME.equals(str) ) {
+			Logger.getLogger(this.getClass()).warn("The simStarttimeInterpretation '" + str + "' is not one of the known ones. "
+					+ "See comment in config dump in log file for allowed styles.") ;
+		}
+	}
 
 }
