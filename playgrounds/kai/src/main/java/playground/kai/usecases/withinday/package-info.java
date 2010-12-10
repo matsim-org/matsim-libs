@@ -10,10 +10,10 @@
  * run ("first run strategy module 1 for all agents, then strategy  module 2, etc.", rather than "for every agent, run the necessary
  * strategy modules), but also the multiple layers and caches of agent structure in the mobsim which essentially assume that a 
  * plan does not change while the mobsim is running.
- * 
+ * <p/>
  * <b>This package contains (as of dec'10):</b><ul>
  * <li>EquilTest (very short), which contains the main method.
- * <li>MyControlerListener (very short), which tells the Controler at the right time in the initaliziation sequence to use a certain
+ * <li>MyControlerListener (very short), which tells the Control(l)er at the right time in the initaliziation sequence to use a certain
  * setup of the mobsim.
  * <li>MyMobsimFactory (still very short), which defines that mobsim setup.
  * <li>WithinDayMobsimListener, which contains the "meat", i.e. the definitions how the within-day replanning should function.
@@ -23,6 +23,12 @@
  * <li>WithinDayMobsimListener2, which contains a concrete implementation for withinday replanning of vehicle drivers.  
  * This is a bare boned version of Christoph's code, still in the playground, but soon moving to be a withinday replanning package
  * for matsim.  Christoph's code will contain more elaborate examples and configuration options.
+ * </ul>
+ * <p/>
+ * Much of this is using material that is not in the public api, so there are only two recommended ways of using this:<ul>
+ * <li> use a release and go from there, but be aware that your code will work <i>only</i> with this release
+ * <li> find a way to collaborate with the matsim team.  This will, however, mean that there needs to be (possibly scientific)
+ * funding for the matsim team
  * </ul>
  * 
  */
