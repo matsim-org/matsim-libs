@@ -46,7 +46,7 @@ import playground.mrieser.core.mobsim.impl.LegHandler;
 import playground.mrieser.core.mobsim.impl.PlanSimulationImpl;
 import playground.mrieser.core.mobsim.impl.TeleportationHandler;
 import playground.mrieser.core.mobsim.network.api.VisNetwork;
-import playground.mzilske.freight.FreightAgentTracker;
+import playground.mzilske.freight.CarrierAgentTracker;
 
 // This is rather a Builder than a factory... but the interface is named Factory, so well....
 public class City2000WMobsimFactory implements MobsimFactory {
@@ -55,14 +55,14 @@ public class City2000WMobsimFactory implements MobsimFactory {
 	private boolean useOTFVis = false;
 	private String[] teleportedModes = null;
 
-	private FreightAgentTracker freightAgentTracker;
+	private CarrierAgentTracker freightAgentTracker;
 	
 	/**
 	 * @param nOfThreads use <code>0</code> if you do not want to use threads
 	 * @param freightAgentTracker 
 	 * @param controler 
 	 */
-	public City2000WMobsimFactory(final int nOfThreads, FreightAgentTracker freightAgentTracker) {
+	public City2000WMobsimFactory(final int nOfThreads, CarrierAgentTracker freightAgentTracker) {
 		this.nOfThreads = nOfThreads;
 		this.freightAgentTracker = freightAgentTracker;
 	}

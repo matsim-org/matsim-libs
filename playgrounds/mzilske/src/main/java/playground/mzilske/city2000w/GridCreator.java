@@ -38,16 +38,20 @@ public class GridCreator {
 				if (i != 0) {
 					Link iLink = network.getFactory().createLink(makeLinkId(i, j), makeId(i-1, j), makeId(i, j));
 					iLink.setLength(1000);
+					iLink.setFreespeed(100);
 					Link iLinkR = network.getFactory().createLink(scenario.createId("i("+i+","+j+")"+"R"), makeId(i, j),makeId(i-1, j));
 					iLinkR.setLength(1000);
+					iLinkR.setFreespeed(100);
 					network.addLink(iLink);
 					network.addLink(iLinkR);
 				}
 				if (j != 0) {
 					Link jLink = network.getFactory().createLink(scenario.createId("j("+i+","+j+")"), makeId(i, j-1), makeId(i, j));
 					jLink.setLength(1000);
+					jLink.setFreespeed(100);
 					Link jLinkR = network.getFactory().createLink(scenario.createId("j("+i+","+j+")"+"R"), makeId(i, j), makeId(i, j-1));
 					jLinkR.setLength(1000);
+					jLinkR.setFreespeed(100);
 					network.addLink(jLink);
 					network.addLink(jLinkR);
 				}

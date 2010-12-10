@@ -24,7 +24,7 @@ import playground.mzilske.freight.CarrierPlan;
 import playground.mzilske.freight.CarrierVehicle;
 import playground.mzilske.freight.Carriers;
 import playground.mzilske.freight.Contract;
-import playground.mzilske.freight.FreightAgentTracker;
+import playground.mzilske.freight.CarrierAgentTracker;
 import playground.mzilske.freight.Shipment;
 import playground.mzilske.freight.Shipment.TimeWindow;
 
@@ -34,7 +34,7 @@ public class RunHansAndUlrich implements StartupListener, ScoringListener, Repla
 	private CarrierImpl c1;
 	private CarrierImpl c2;
 	private Carriers carriers;
-	private FreightAgentTracker freightAgentTracker;
+	private CarrierAgentTracker freightAgentTracker;
 	
 	
 
@@ -61,8 +61,6 @@ public class RunHansAndUlrich implements StartupListener, ScoringListener, Repla
 
 	private static void score(CarrierImpl c1) {
 		System.out.println("Scoring " + c1.getId());
-		TrivialScorer trivialScorer = new TrivialScorer();
-
 	}
 
 	private static void replan(CarrierImpl c1) {
@@ -126,7 +124,7 @@ public class RunHansAndUlrich implements StartupListener, ScoringListener, Repla
 		carriers.getCarriers().add(c1);
 		carriers.getCarriers().add(c2);
 		
-		freightAgentTracker = new FreightAgentTracker(controler.getScenario().getScenarioElement(Carriers.class).getCarriers(), controler.createRoutingAlgorithm());
+		freightAgentTracker = new CarrierAgentTracker(controler.getScenario().getScenarioElement(Carriers.class).getCarriers(), controler.createRoutingAlgorithm());
 		freightAgentTracker.setNetwork(event.getControler().getScenario().getNetwork());
 		
 		City2000WMobsimFactory mobsimFactory = new City2000WMobsimFactory(0, freightAgentTracker);

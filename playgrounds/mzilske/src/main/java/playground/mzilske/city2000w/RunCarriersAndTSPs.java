@@ -11,6 +11,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
@@ -28,15 +29,14 @@ import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.network.MatsimNetworkReader;
 
-
+import playground.mzilske.freight.CarrierAgentTracker;
+import playground.mzilske.freight.CarrierAgentTrackerBuilder;
 import playground.mzilske.freight.CarrierCapabilities;
 import playground.mzilske.freight.CarrierImpl;
 import playground.mzilske.freight.CarrierPlan;
 import playground.mzilske.freight.CarrierVehicle;
 import playground.mzilske.freight.Carriers;
 import playground.mzilske.freight.Contract;
-import playground.mzilske.freight.FreightAgentTracker;
-import playground.mzilske.freight.FreightAgentTrackerBuilder;
 import playground.mzilske.freight.Shipment;
 import playground.mzilske.freight.TSPAgentTracker;
 import playground.mzilske.freight.TSPCapabilities;
@@ -60,7 +60,7 @@ public class RunCarriersAndTSPs implements StartupListener, ScoringListener, Rep
 	private Carriers carriers;
 	private TransportServiceProviders transportServiceProviders;
 	
-	private FreightAgentTracker freightAgentTracker;
+	private CarrierAgentTracker freightAgentTracker;
 	private TSPAgentTracker tspAgentTracker;
 	
 	
@@ -77,7 +77,7 @@ public class RunCarriersAndTSPs implements StartupListener, ScoringListener, Rep
 		
 		Controler controler = event.getControler();
 		
-		createTransportServiceProviderWithContracts();
+		createTransportServiceProviderWithContracts(controler.getNetwork());
 		
 		createCarrier();
 		
@@ -90,7 +90,7 @@ public class RunCarriersAndTSPs implements StartupListener, ScoringListener, Rep
 		
 		event.getControler().getScenario().addScenarioElement(carriers);
 		
-		FreightAgentTrackerBuilder freightAgentTrackerBuilder = new FreightAgentTrackerBuilder();
+		CarrierAgentTrackerBuilder freightAgentTrackerBuilder = new CarrierAgentTrackerBuilder();
 		freightAgentTrackerBuilder.setCarriers(controler.getScenario().getScenarioElement(Carriers.class).getCarriers());
 		freightAgentTrackerBuilder.setRouter(controler.createRoutingAlgorithm());
 		freightAgentTrackerBuilder.setNetwork(controler.getNetwork());
@@ -218,7 +218,7 @@ public class RunCarriersAndTSPs implements StartupListener, ScoringListener, Rep
 		carriers.getCarriers().add(c2);
 	}
 
-	private void createTransportServiceProviderWithContracts() {
+	private void createTransportServiceProviderWithContracts(Network network) {
 		TransportServiceProviderImpl tsp = new TransportServiceProviderImpl(new IdImpl("guenter"));
 		logger.debug("TransportServiceProvider " + tsp.getId() + " has come into play");
 		tsp.getContracts().add(new TSPContract(Arrays.asList(
@@ -235,7 +235,7 @@ public class RunCarriersAndTSPs implements StartupListener, ScoringListener, Rep
 		tsp.setTspCapabilities(cap);
 		printCap(cap);
 		
-		TrivialTSPPlanBuilder tspPlanBuilder = new TrivialTSPPlanBuilder();
+		MinimumDepotDistanceToDestinationTSPPlanBuilder tspPlanBuilder = new MinimumDepotDistanceToDestinationTSPPlanBuilder(network);
 		TSPPlan plan = tspPlanBuilder.buildPlan(tsp.getContracts(),tsp.getTspCapabilities());
 		printTSPPlan(plan);
 		tsp.getPlans().add(plan);
