@@ -6,6 +6,8 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 
+import playground.mzilske.freight.Shipment.TimeWindow;
+
 public class Tour {
 
 	public static abstract class TourElement {
@@ -17,6 +19,8 @@ public class Tour {
 		public abstract double getDuration();
 		
 		public abstract Shipment getShipment();
+		
+		public abstract TimeWindow getTimeWindow();
 		
 	};
 	
@@ -30,7 +34,12 @@ public class Tour {
 
 		@Override
 		public String getActivityType() {
-			return "pickup";
+			return FreightConstants.PICKUP;
+		}
+
+		@Override
+		public TimeWindow getTimeWindow() {
+			return shipment.getPickupTimeWindow();
 		}
 
 		@Override
@@ -58,8 +67,13 @@ public class Tour {
 		}
 
 		@Override
+		public TimeWindow getTimeWindow() {
+			return shipment.getDeliveryTimeWindow();
+		}
+
+		@Override
 		public String getActivityType() {
-			return "delivery";
+			return FreightConstants.DELIVERY;
 		}
 
 		@Override

@@ -8,14 +8,12 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 
-public class FreightAgentTrackerBuilder {
+public class CarrierAgentTrackerBuilder {
 	
 	private Collection<CarrierImpl> carriers;
 	
 	private PlanAlgorithm router;
 
-	private EventsManager eventsManager;
-	
 	private Network network;
 	
 	private Collection<CarrierCostListener> costListeners = new ArrayList<CarrierCostListener>();
@@ -39,7 +37,6 @@ public class FreightAgentTrackerBuilder {
 	}
 
 	public void setEventsManager(EventsManager eventsManager) {
-		this.eventsManager = eventsManager;
 		eventsManagerInitialized=true;
 	}
 
@@ -52,9 +49,9 @@ public class FreightAgentTrackerBuilder {
 		costListeners.add(costListener);
 	}
 
-	public FreightAgentTracker build(){
+	public CarrierAgentTracker build(){
 		if(carriersInitialized && routerInitialized && networkInitialized && eventsManagerInitialized){
-			FreightAgentTracker tracker = new FreightAgentTracker(carriers, router);
+			CarrierAgentTracker tracker = new CarrierAgentTracker(carriers, router);
 			tracker.setNetwork(network);
 			for(CarrierCostListener ccl : costListeners){
 				tracker.getCostListeners().add(ccl);

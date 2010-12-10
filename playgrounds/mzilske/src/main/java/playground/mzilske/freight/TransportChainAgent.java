@@ -4,6 +4,7 @@
 package playground.mzilske.freight;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -27,6 +28,10 @@ public class TransportChainAgent {
 
 	private TransportChain tpChain;
 
+	private List<Shipment> shipments = new ArrayList<Shipment>();
+
+	private int currentShipmentIndex;
+	
 	public TransportChainAgent(TransportChain tpChain) {
 		this.tpChain = tpChain;
 	}
@@ -61,17 +66,22 @@ public class TransportChainAgent {
 				to = delivery.getLocation();
 				deliveryTimeWindow = new TimeWindow(delivery.getTimeWindow().getStart(),
 						delivery.getTimeWindow().getEnd());
-				shipments.add(new Tuple<Id,Shipment>(carrierId,createShipment(from,to,tpChain.getShipment().getSize(),
-						pickUpTimeWindow,deliveryTimeWindow)));				
+				Shipment shipment = createAndRegisterShipment(from,to,tpChain.getShipment().getSize(), pickUpTimeWindow,deliveryTimeWindow);
+				shipments.add(new Tuple<Id,Shipment>(carrierId,shipment));				
 			}
 			if(element instanceof ChainLeg){
 				ChainLeg leg = (ChainLeg)element;
 				carrierId = leg.getCarrierId();
 			}
 		}
+		initIterator();
 		return shipments;
 	}
 		
+	private void initIterator() {
+		currentShipmentIndex = 0;
+	}
+
 	public void informCost(double cost){
 		this.cost += cost;
 	}
@@ -81,12 +91,55 @@ public class TransportChainAgent {
 	}
 	
 	void reset(){
-		logger.info("set cost from " + cost + " to 0");
 		cost = 0.0;
 	}
 
-	private Shipment createShipment(Id from, Id to, Integer size,
+	private Shipment createAndRegisterShipment(Id from, Id to, Integer size,
 			TimeWindow pickUpTimeWindow, TimeWindow deliveryTimeWindow) {
-		return new Shipment(from,to,size,pickUpTimeWindow,deliveryTimeWindow);
+		Shipment shipment = new Shipment(from,to,size,pickUpTimeWindow,deliveryTimeWindow);
+		shipments.add(shipment);
+		return shipment;
 	}
+
+	public void informPickup(Shipment shipment, double time) {
+		if (currentShipmentIndex > shipments.size() - 1) {
+			throw new RuntimeException("We have another pickup after our transport chain is already complete.");
+		}
+		if (shipments.get(currentShipmentIndex) != shipment) {
+			throw new RuntimeException("We have a pickup where the preceding delivery is still missing.");
+		}
+		checkShipmentPickupTime(shipment, time);
+	}
+
+	private void checkShipmentPickupTime(Shipment shipment, double time) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void informDelivery(Shipment shipment, double time) {
+		if (shipments.get(currentShipmentIndex) != shipment) {
+			throw new RuntimeException("We are having a delivery where the preceding delivery is still missing.");
+		}
+		checkShipmentDeliveryTime(shipment, time);
+		currentShipmentIndex++;
+	}
+
+	private void checkShipmentDeliveryTime(Shipment shipment, double time) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public int getNumberOfStopps() {
+		int nOfStopps = getTpChain().getChainElements().size()/3 - 1;
+		return nOfStopps;
+	}
+
+	public boolean hasSucceeded() {
+		if (currentShipmentIndex == shipments.size()) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
 }

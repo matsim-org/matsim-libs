@@ -26,6 +26,8 @@ import playground.mzilske.freight.Tour.TourElement;
 
 public class CarrierAgent {
 	
+	private static final double EPSILON = 0.0001;
+
 	private CarrierImpl carrier;
 	
 	private Collection<Id> driverIds = new ArrayList<Id>();
@@ -39,10 +41,14 @@ public class CarrierAgent {
 	private CostAllocator costAllocator = null;
 
 	private Map<Id, ScheduledTour> driverTourMap = new HashMap<Id, ScheduledTour>();
+
+	private CarrierAgentTracker tracker;
 	
 	private static Logger logger = Logger.getLogger(CarrierAgent.class);
 	
 	class CarrierDriverAgent {
+		
+		private int activityCounter = 0;
 		
 		private Id driverId;
 		
@@ -52,12 +58,17 @@ public class CarrierAgent {
 			this.driverId = driverId;
 		}
 
-		public double getScore() {
-			return -distance;
-		}
-
-		public void activityEnds(String activityType) {
-			logger.info("Driver " + driverId + " has had a " + activityType);
+		public void activityOccurs(String activityType, double time) {
+			Tour tour = driverTourMap.get(driverId).getTour();
+			if (FreightConstants.PICKUP.equals(activityType)) {
+				TourElement tourElement = tour.getTourElements().get(activityCounter);
+				tracker.notifyPickup(tourElement.getShipment(), time);
+				activityCounter++;
+			} else if (FreightConstants.DELIVERY.equals(activityType)) {
+				TourElement tourElement = tour.getTourElements().get(activityCounter);
+				tracker.notifyDelivery(tourElement.getShipment(), time);
+				activityCounter++;
+			}
 		}
 
 		public void tellDistance(double distance) {
@@ -71,7 +82,8 @@ public class CarrierAgent {
 		
 	}
 
-	public CarrierAgent(CarrierImpl carrier, PlanAlgorithm router) {
+	public CarrierAgent(CarrierAgentTracker carrierAgentTracker, CarrierImpl carrier, PlanAlgorithm router) {
+		this.tracker = carrierAgentTracker;
 		this.carrier = carrier;
 		this.router = router;
 	}
@@ -81,19 +93,19 @@ public class CarrierAgent {
 		List<Plan> plans = new ArrayList<Plan>();
 		for (ScheduledTour scheduledTour : carrier.getSelectedPlan().getScheduledTours()) {
 			Plan plan = new PlanImpl();
-			Activity startActivity = new ActivityImpl("start", scheduledTour.getVehicle().getLocation());
+			Activity startActivity = new ActivityImpl(FreightConstants.START, scheduledTour.getVehicle().getLocation());
 			startActivity.setEndTime(scheduledTour.getDeparture());
 			plan.addActivity(startActivity);
 			Leg startLeg = new LegImpl(TransportMode.car);
 			plan.addLeg(startLeg);
 			for (TourElement tourElement : scheduledTour.getTour().getTourElements()) {
 				Activity tourElementActivity = new ActivityImpl(tourElement.getActivityType(), tourElement.getLocation());
-				((ActivityImpl) tourElementActivity).setDuration(tourElement.getDuration());
+				((ActivityImpl) tourElementActivity).setEndTime(tourElement.getTimeWindow().getStart());
 				plan.addActivity(tourElementActivity);
 				Leg leg = new LegImpl(TransportMode.car);
 				plan.addLeg(leg);
 			}
-			Activity endActivity = new ActivityImpl("end", scheduledTour.getVehicle().getLocation());
+			Activity endActivity = new ActivityImpl(FreightConstants.END, scheduledTour.getVehicle().getLocation());
 			plan.addActivity(endActivity);
 			Id driverId = createDriverId();
 			Person driverPerson = createDriverPerson(driverId);
@@ -123,40 +135,47 @@ public class CarrierAgent {
 		return Collections.unmodifiableCollection(driverIds);
 	}
 
-	public void activityEnds(Id personId, String activityType) {
-		carrierDriverAgents.get(personId).activityEnds(activityType);
+	public void activityOccurs(Id personId, String activityType, double time) {
+		carrierDriverAgents.get(personId).activityOccurs(activityType, time);
 	}
 	
 	public void tellDistance(Id personId, double distance) {
 		carrierDriverAgents.get(personId).tellDistance(distance);
 	}
 
-	public double score() {
-		int score = 0;
-		for (Id driverId : getDriverIds()) {
-			score += carrierDriverAgents.get(driverId).getScore();
-		}
-		score += carrierScore();
-		return score;
-	}
-
-	public void calculateCostsOfSelectedPlan() {
-		
-	}
-
 	public void scoreSelectedPlan() {
-		double score = score();
-		carrier.getSelectedPlan().setScore(score);
+		double cost = calculateCost();
+		carrier.getSelectedPlan().setScore(cost * (-1));
+	}
+	
+	private double calculateCost() {
+		double cost = 0;
+		for (Id driverId : getDriverIds()) {
+			cost += carrierDriverAgents.get(driverId).getCost();
+		}
+		return cost;
 	}
 
 	public List<Tuple<Shipment, Double>> calculateCostsOfSelectedPlanPerShipment() {
 		List<Tuple<Shipment,Double>> listOfCostPerShipment = new ArrayList<Tuple<Shipment,Double>>();
 		for(Id driverId : driverIds){
 			ScheduledTour tour = driverTourMap.get(driverId);
-			List<Tuple<Shipment,Double>> listOfCostPerShipmentPerDriver = costAllocator.allocateCost(tour.getTour().getShipments(),carrierDriverAgents.get(driverId).getCost());
+			logger.debug("allocating cost of driver "+driverId+", carrier "+carrier.getId());
+			List<Tuple<Shipment,Double>> listOfCostPerShipmentPerDriver = costAllocator.allocateCost(tour.getTour().getShipments(), carrierDriverAgents.get(driverId).getCost());
 			listOfCostPerShipment.addAll(listOfCostPerShipmentPerDriver);
 		}
+		assertSum(listOfCostPerShipment, calculateCost());
 		return listOfCostPerShipment;
+	}
+
+	private void assertSum(List<Tuple<Shipment, Double>> listOfCostPerShipment, double calculateCostOfSelectedPlan) {
+		double sum = 0.0;
+		for (Tuple<Shipment, Double> t : listOfCostPerShipment) {
+			sum += t.getSecond();
+		}
+		if ( Math.abs(calculateCostOfSelectedPlan - sum) > EPSILON) {
+			throw new RuntimeException ("For the moment, we want the total cost to be the sum of the costs per shipment.");
+		}
 	}
 
 	private Person createDriverPerson(Id driverId) {
@@ -173,10 +192,6 @@ public class CarrierAgent {
 		driverIds.add(id);
 		++nextId;
 		return id;
-	}
-
-	private int carrierScore() {
-		return 0;
 	}
 
 }

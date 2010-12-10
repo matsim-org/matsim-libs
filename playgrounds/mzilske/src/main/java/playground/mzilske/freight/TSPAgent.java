@@ -74,39 +74,40 @@ public class TSPAgent {
 	Collection<TransportChainAgent> getTransportChainAgents(){
 		return Collections.unmodifiableCollection(transportChainAgents);
 	}
-	
-	void calculateCostsOfSelectedPlan(){
-		logger.debug(transportChainAgents.size() + " active transportChainAgents");
-		for(TransportChainAgent tca : transportChainAgents){
-			int nOfStopps = tca.getTpChain().getChainElements().size()/3 - 1; //=>#stopps
-			double costs = nOfStopps*tca.getTpChain().getShipment().getSize()*CostParameter.transshipmentHandlingCost_per_unit;
-			logger.info("Umschlagkosten="+costs+" Shipment=" + tca.getTpChain().getShipment());
-			tca.informCost(costs);
-		}
-	}
 
 	List<Tuple<TSPShipment,Double>> calculateCostsOfSelectedPlanPerShipment(){
 		List<Tuple<TSPShipment,Double>> costsPerShipment = new ArrayList<Tuple<TSPShipment,Double>>();
 		for(TransportChainAgent tca : transportChainAgents){
-			double cost = tca.getCost();
+			double cost = tca.getCost() + umschlagskosten(tca.getNumberOfStopps()) + strafkosten(tca.hasSucceeded()); 
 			Tuple<TSPShipment,Double> shipmentCostTuple = new Tuple<TSPShipment,Double>(tca.getTpChain().getShipment(),cost);
 			costsPerShipment.add(shipmentCostTuple);
 		}
 		return costsPerShipment;
 	}
 	
-	public void scoreSelectedPlan() {
-		double score = 0.0;
-		for(TransportChainAgent tca : transportChainAgents){
-			score += tca.getCost()*(-1);
+	private double strafkosten(boolean hasSucceeded) {
+		if (hasSucceeded) {
+			return 0.0;
+		} else {
+			return 100000.0;
 		}
-		score += tspScore();
-		tsp.getSelectedPlan().setScore(score);
 	}
 
-	private double tspScore() {
+	private double umschlagskosten(int numberOfStopps) {
 		return 0;
 	}
+
+	public void scoreSelectedPlan() {
+		double cost = calculateCost();
+		tsp.getSelectedPlan().setScore(cost * (-1));
+	}
 	
+	private double calculateCost() {
+		double cost = 0.0;
+		for(Tuple<TSPShipment,Double> t : calculateCostsOfSelectedPlanPerShipment()) {
+			cost += t.getSecond();
+		}
+		return cost;
+	}
 	
 }

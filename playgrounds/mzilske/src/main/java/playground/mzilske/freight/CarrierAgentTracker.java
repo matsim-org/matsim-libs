@@ -18,13 +18,15 @@ import playground.mrieser.core.mobsim.api.AgentSource;
 import playground.mrieser.core.mobsim.api.PlanAgent;
 import playground.mrieser.core.mobsim.impl.DefaultPlanAgent;
 
-public class FreightAgentTracker implements AgentSource, ActivityEndEventHandler, LinkEnterEventHandler {
+public class CarrierAgentTracker implements AgentSource, ActivityEndEventHandler, LinkEnterEventHandler {
 	
 	private Collection<CarrierImpl> carriers;
 
 	private Collection<CarrierAgent> carrierAgents = new ArrayList<CarrierAgent>();
 	
 	private Collection<CarrierCostListener> costListeners = new ArrayList<CarrierCostListener>();
+	
+	private Collection<ShipmentStatusListener> shipmentStatusListeners = new ArrayList<ShipmentStatusListener>();
 	
 	double weight = 1;
 
@@ -34,7 +36,7 @@ public class FreightAgentTracker implements AgentSource, ActivityEndEventHandler
 
 	private List<PlanAgent> agents;
 	
-	public FreightAgentTracker(Collection<CarrierImpl> carriers, PlanAlgorithm router) {
+	public CarrierAgentTracker(Collection<CarrierImpl> carriers, PlanAlgorithm router) {
 		this.carriers = carriers;
 		this.router = router;
 		createCarrierAgents();
@@ -73,7 +75,7 @@ public class FreightAgentTracker implements AgentSource, ActivityEndEventHandler
 		String activityType = event.getActType();
 		for (CarrierAgent carrierAgent : carrierAgents) {
 			if (carrierAgent.getDriverIds().contains(personId)) {
-				carrierAgent.activityEnds(personId, activityType);
+				carrierAgent.activityOccurs(personId, activityType, event.getTime());
 			}
 		}
 	}
@@ -93,7 +95,6 @@ public class FreightAgentTracker implements AgentSource, ActivityEndEventHandler
 	public void calculateCostsScoreCarriersAndInform() {
 		//inclusive cost per shipment
 		for(CarrierAgent carrierAgent : carrierAgents){
-			carrierAgent.calculateCostsOfSelectedPlan();
 			carrierAgent.scoreSelectedPlan();
 			List<Tuple<Shipment,Double>> shipmentCostTuple = carrierAgent.calculateCostsOfSelectedPlanPerShipment();
 			for(Tuple<Shipment,Double> t : shipmentCostTuple){
@@ -107,6 +108,10 @@ public class FreightAgentTracker implements AgentSource, ActivityEndEventHandler
 		return costListeners;
 	}
 
+	public Collection<ShipmentStatusListener> getShipmentStatusListeners() {
+		return shipmentStatusListeners;
+	}
+
 	private void informCostListeners(Shipment shipment, Double cost) {
 		for(CarrierCostListener cl : costListeners){
 			cl.informCost(shipment, cost);
@@ -115,12 +120,22 @@ public class FreightAgentTracker implements AgentSource, ActivityEndEventHandler
 
 	private void createCarrierAgents() {
 		for (CarrierImpl carrier : carriers) {
-			CarrierAgent carrierAgent = new CarrierAgent(carrier, router);
+			CarrierAgent carrierAgent = new CarrierAgent(this, carrier, router);
 			carrierAgent.setCostAllocator(new CostAllocator());
 			carrierAgents.add(carrierAgent);
 		}
 	}
-	
-	
+
+	public void notifyPickup(Shipment shipment, double time) {
+		for (ShipmentStatusListener listener: shipmentStatusListeners) {
+			listener.shipmentPickedUp(shipment, time);
+		}
+	}
+
+	public void notifyDelivery(Shipment shipment, double time) {
+		for (ShipmentStatusListener listener: shipmentStatusListeners) {
+			listener.shipmentDelivered(shipment, time);
+		}
+	}
 	
 }

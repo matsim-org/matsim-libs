@@ -18,7 +18,7 @@ import org.matsim.core.utils.collections.Tuple;
  * @author stscr
  *
  */
-public class TSPAgentTracker implements CarrierCostListener{
+public class TSPAgentTracker implements CarrierCostListener, ShipmentStatusListener {
 	
 	private Logger logger = Logger.getLogger(TSPAgentTracker.class);	
 	
@@ -57,17 +57,36 @@ public class TSPAgentTracker implements CarrierCostListener{
 	
 	@Override
 	public void informCost(Shipment shipment, Double cost){
-		for(TSPAgent agent : tspAgents){
-			if(agent.getShipmentChainMap().containsKey(shipment)){
-				TransportChainAgent chainAgent = agent.getShipmentChainMap().get(shipment); 
-				chainAgent.informCost(cost);
-			}
-		}
+		TSPAgent agent = findTSPAgentForShipment(shipment);
+		TransportChainAgent chainAgent = agent.getShipmentChainMap().get(shipment); 
+		chainAgent.informCost(cost);
 	}
 	
+	private TSPAgent findTSPAgentForShipment(Shipment shipment) {
+		for(TSPAgent agent : tspAgents){
+			if(agent.getShipmentChainMap().containsKey(shipment)){
+				return agent;
+			}
+		}
+		throw new RuntimeException("No TSPAgent found for a shipment.");
+	}
+
+	@Override
+	public void shipmentPickedUp(Shipment shipment, double time) {
+		TSPAgent agent = findTSPAgentForShipment(shipment);
+		TransportChainAgent chainAgent = agent.getShipmentChainMap().get(shipment);
+		chainAgent.informPickup(shipment, time);
+	}
+
+	@Override
+	public void shipmentDelivered(Shipment shipment, double time) {
+		TSPAgent agent = findTSPAgentForShipment(shipment);
+		TransportChainAgent chainAgent = agent.getShipmentChainMap().get(shipment);
+		chainAgent.informDelivery(shipment, time);
+	}
+
 	public void calculateCostsScoreTSPAndInform(){
 		for(TSPAgent tspAgent : tspAgents){
-			tspAgent.calculateCostsOfSelectedPlan();
 			tspAgent.scoreSelectedPlan();
 			List<Tuple<TSPShipment,Double>> shipmentCostTuple = tspAgent.calculateCostsOfSelectedPlanPerShipment();
 			for(Tuple<TSPShipment,Double> t : shipmentCostTuple){
@@ -97,8 +116,5 @@ public class TSPAgentTracker implements CarrierCostListener{
 			a.reset();
 		}
 	}
-
-	
-	
 	
 }
