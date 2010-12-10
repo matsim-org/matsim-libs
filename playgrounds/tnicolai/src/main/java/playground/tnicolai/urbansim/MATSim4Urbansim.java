@@ -83,12 +83,7 @@ public class MATSim4Urbansim {
 		// get the network. Always cleaning it seems a good idea since someone may have modified the input files manually in
 		// order to implement policy measures.  Get network early so readXXX can check if links still exist.
 		NetworkImpl network = scenario.getNetwork();
-
-		log.info("") ;
-		log.info("Cleaning network ...");
-		( new NetworkCleaner() ).run(network);
-		log.info("... finished cleaning network.") ;
-		log.info("") ; 
+		cleanNetwork(network);
 		
 		// get the data from urbansim (parcels and persons)
 		ReadFromUrbansimParcelModel readFromUrbansim = new ReadFromUrbansimParcelModel( MATSimConfigObject.getYear() );
@@ -103,15 +98,7 @@ public class MATSim4Urbansim {
 
 		// set population in scenario
 		scenario.setPopulation(newPopulation);
-//		Controler controler = new Controler(scenario);
-//		controler.setOverwriteFiles(true);	// sets, whether output files are overwritten
-//		controler.setCreateGraphs(false);	// sets, whether output Graphs are created
-//		
-//		// The following lines register what should be done _after_ the iterations were run:
-//		controler.addControlerListener( getControlerListener(zones) );
-//
-//		// run the iterations, including the post-processing:
-//		controler.run() ;
+
 		runControler(zones);
 	}
 	
@@ -164,6 +151,10 @@ public class MATSim4Urbansim {
 		return newPopulation;
 	}
 	
+	/**
+	 * run simulation
+	 * @param zones
+	 */
 	protected void runControler( ActivityFacilitiesImpl zones ){
 		Controler controler = new Controler(scenario);
 		controler.setOverwriteFiles(true);	// sets, whether output files are overwritten
@@ -219,6 +210,18 @@ public class MATSim4Urbansim {
 		if( (new File(matsimConfigFile)).exists() )
 			return true;
 		return false;
+	}
+	
+	/**
+	 * 
+	 * @param network
+	 */
+	protected void cleanNetwork(NetworkImpl network){
+		log.info("") ;
+		log.info("Cleaning network ...");
+		( new NetworkCleaner() ).run(network);
+		log.info("... finished cleaning network.");
+		log.info(""); 
 	}
 	
 	/**

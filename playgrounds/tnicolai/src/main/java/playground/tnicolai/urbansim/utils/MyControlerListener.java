@@ -83,7 +83,7 @@ public class MyControlerListener implements /*IterationEndsListener,*/ ShutdownL
 					
 					// travel costs
 					//LinkImpl toLink = network.getNearestLink( toCoord );
-					//double tcost = st.getTravelCostCalulator().getLinkTravelCost(toLink, depatureTime);
+					//double tcost = st.getTravelCostCalulator().getLinkGeneralizedTravelCost(toLink, depatureTime); // .getLinkTravelCost(toLink, depatureTime);
 					
 					// end tnicolai test
 					
