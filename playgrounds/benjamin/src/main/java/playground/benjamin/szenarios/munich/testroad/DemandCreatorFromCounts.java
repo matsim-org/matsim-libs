@@ -53,65 +53,36 @@ public class DemandCreatorFromCounts {
 	static String countsPath = "../../detailedEval/teststrecke/zaehlstellen_einfluss/";
 	static String testVehiclePath = "../../detailedEval/teststrecke/testVehicle/";
 	static String outPath = "../../detailedEval/teststrecke/sim/input/";
-	
-	static String day1 = "20060125";
-	static String day2 = "20060127";
-	static String day3 = "20060131";
-	static String day4 = "20090317";
-	static String day5 = "20090318";
-	static String day6 = "20090319";
-	static String day7 = "20090707";
-	static String day8 = "20090708";
-	static String day9 = "20090709";
-	
+
 	static String lane1 = "4006013";
 	static String lane2 = "4006014";
 
+	static Integer [] days = {
+		// dont use this since they changed counts logfile format during the day!
+		//20060125,
+
+		20060127,
+		20060131,
+		20090317,
+		20090318,
+		20090319,
+		20090707,
+		20090708,
+		20090709
+	};
 
 	public static void main(String[] args) {
 
-		//instancing one population for every day
-		Population pop1 = generatePopulation(countsPath + day1 + "/" + lane1 + ".txt", countsPath + day1 + "/" + lane2 + ".txt");
-		Population pop2 = generatePopulation(countsPath + day2 + "/" + lane1 + ".txt", countsPath + day2 + "/" + lane2 + ".txt");
-		Population pop3 = generatePopulation(countsPath + day3 + "/" + lane1 + ".txt", countsPath + day3 + "/" + lane2 + ".txt");
-		Population pop4 = generatePopulation(countsPath + day4 + "/" + lane1 + ".txt", countsPath + day4 + "/" + lane2 + ".txt");
-		Population pop5 = generatePopulation(countsPath + day5 + "/" + lane1 + ".txt", countsPath + day5 + "/" + lane2 + ".txt");
-		Population pop6 = generatePopulation(countsPath + day6 + "/" + lane1 + ".txt", countsPath + day6 + "/" + lane2 + ".txt");
-		Population pop7 = generatePopulation(countsPath + day7 + "/" + lane1 + ".txt", countsPath + day7 + "/" + lane2 + ".txt");
-		Population pop8 = generatePopulation(countsPath + day8 + "/" + lane1 + ".txt", countsPath + day8 + "/" + lane2 + ".txt");
-		Population pop9 = generatePopulation(countsPath + day9 + "/" + lane1 + ".txt", countsPath + day9 + "/" + lane2 + ".txt");
-		
-		/*inflow times are randomly equally mutated within a 2min time bin;
-		one could think of modelling peak inflows due to upstream signals...*/
-		fuzzifyTimes(pop1);
-		fuzzifyTimes(pop2);
-		fuzzifyTimes(pop3);
-		fuzzifyTimes(pop4);
-		fuzzifyTimes(pop5);
-		fuzzifyTimes(pop6);
-		fuzzifyTimes(pop7);
-		fuzzifyTimes(pop8);
-		fuzzifyTimes(pop9);
-		
-		addTestVehicle(pop1, testVehiclePath + day1 + "_travelTimes.csv");
-		addTestVehicle(pop2, testVehiclePath + day2 + "_travelTimes.csv");
-		addTestVehicle(pop3, testVehiclePath + day3 + "_travelTimes.csv");
-		addTestVehicle(pop4, testVehiclePath + day4 + "_travelTimes.csv");
-		addTestVehicle(pop5, testVehiclePath + day5 + "_travelTimes.csv");
-		addTestVehicle(pop6, testVehiclePath + day6 + "_travelTimes.csv");
-		addTestVehicle(pop7, testVehiclePath + day7 + "_travelTimes.csv");
-		addTestVehicle(pop8, testVehiclePath + day8 + "_travelTimes.csv");
-		addTestVehicle(pop9, testVehiclePath + day9 + "_travelTimes.csv");		
-		
-		writePlans(pop1, day1);
-		writePlans(pop2, day2);
-		writePlans(pop3, day3);
-		writePlans(pop4, day4);
-		writePlans(pop5, day5);
-		writePlans(pop6, day6);
-		writePlans(pop7, day7);
-		writePlans(pop8, day8);
-		writePlans(pop9, day9);
+		for(int day : days){
+			Population population = generatePopulation(countsPath + day + "/" + lane1 + ".txt", countsPath + day + "/" + lane2 + ".txt");
+
+			/*inflow times are randomly equally mutated within a 2min time bin;
+			one could think of modelling peak inflows due to upstream signals systems...*/
+			fuzzifyTimes(population);
+
+			addTestVehicle(population, testVehiclePath + day + "_travelTimes.csv");
+			writePlans(population, day);
+		}
 	}
 
 	/**
@@ -124,9 +95,9 @@ public class DemandCreatorFromCounts {
 		List<Integer> inflowTimes = getTestVehicleInflowTimes(inflowTimesFile);
 		for(int time : inflowTimes){
 			Id personId = sc.createId(time + "testVehicle");
-			
+
 			System.out.println(time);
-			
+
 			Person person = population.getFactory().createPerson(personId);
 			Plan plan = population.getFactory().createPlan();
 			person.addPlan(plan);
@@ -158,17 +129,17 @@ public class DemandCreatorFromCounts {
 	 */
 	private static List<Integer> getTestVehicleInflowTimes(String inflowTimesFile) {
 		final List<Integer> inflowTimes = new ArrayList<Integer>();
-		
+
 		TabularFileParserConfig tabFileParserConfig = new TabularFileParserConfig();
 		tabFileParserConfig.setFileName(inflowTimesFile);
 		tabFileParserConfig.setDelimiterTags(new String[] {";"});
-		
+
 		try {
 			new TabularFileParser().parse(tabFileParserConfig, new CheckingTabularFileHandler() {
 
 				private static final int INFLOWTIME = 0;
 				private static final int TRAVELTIME = 1;
-				
+
 				public void startRow(String[] row) {
 					first = false;
 					numColumns = row.length;
@@ -219,28 +190,28 @@ public class DemandCreatorFromCounts {
 			Integer endTimeInSeconds = entry.getKey();
 			Double vehicelesTotal = entry.getValue();
 			for(int i=0; i < vehicelesTotal; i++){
-				
+
 				int j = i+1;
 				Id personId = sc.createId(endTimeInSeconds + "_" + j);
 				Person person = population.getFactory().createPerson(personId);
 				Plan plan = population.getFactory().createPlan();
 				person.addPlan(plan);
-				
+
 				String actTypeHome = "h";
 				String actTypeWork = "h";
 				Id linkIdHome = sc.createId("576273431");
 				Id linkIdWork = sc.createId("52799758");
-				
+
 				Activity home = population.getFactory().createActivityFromLinkId(actTypeHome, linkIdHome);
 				home.setEndTime(endTimeInSeconds);
 				plan.addActivity(home);
-				
+
 				Leg leg = population.getFactory().createLeg(TransportMode.car);
 				plan.addLeg(leg);
-				
+
 				Activity work = population.getFactory().createActivityFromLinkId(actTypeWork, linkIdWork);
 				plan.addActivity(work);
-				
+
 				population.addPerson(person);
 			}
 		}
@@ -254,7 +225,7 @@ public class DemandCreatorFromCounts {
 	 */
 	private static SortedMap<Integer, Double> aggregateVehicles(Map<Integer, Double> endTime2NoOfVehiclesLane1, Map<Integer, Double> endTime2NoOfVehiclesLane2) {
 		SortedMap<Integer, Double> aggregatedEndTime2NoOfVehicles = new TreeMap<Integer, Double>();
-		
+
 		for(Entry<Integer, Double> entry : endTime2NoOfVehiclesLane1.entrySet()){
 			Integer endTime = entry.getKey();
 			Double vehiclesLane1 = entry.getValue();
@@ -267,8 +238,8 @@ public class DemandCreatorFromCounts {
 			else{
 				Double vehicelesTotal = vehiclesLane1 + vehiclesLane2;
 				aggregatedEndTime2NoOfVehicles.put(endTime, vehicelesTotal);
-				
-//				System.out.println(/*"End of time interval: " +*/ endTime + "\t" + /*"Sum of cars: " +*/ vehicelesTotal);
+
+				//				System.out.println(/*"End of time interval: " +*/ endTime + "\t" + /*"Sum of cars: " +*/ vehicelesTotal);
 			}
 		}
 		return aggregatedEndTime2NoOfVehicles;
@@ -285,7 +256,7 @@ public class DemandCreatorFromCounts {
 		tabFileParserConfig.setFileName(laneFile);
 		tabFileParserConfig.setDelimiterTags(new String[] {";"});
 		tabFileParserConfig.setCommentTags(new String[] {"#"});
-		
+
 		try {
 			new TabularFileParser().parse(tabFileParserConfig, new CheckingTabularFileHandler() {
 
@@ -296,11 +267,11 @@ public class DemandCreatorFromCounts {
 					first = false;
 					numColumns = row.length;
 					check(row);
-//					if(!row[0].startsWith("#")) {
+					//					if(!row[0].startsWith("#")) {
 					addEndTimeNoOfVehicles(row);
-//					} else {
-						// This is the header. Nothing to do.
-//					}
+					//					} else {
+					// This is the header. Nothing to do.
+					//					}
 				}
 
 				private void addEndTimeNoOfVehicles(String[] row) {
@@ -315,7 +286,7 @@ public class DemandCreatorFromCounts {
 		return EndTime2NoOfVehicles;
 	}
 
-	private static void writePlans(Population pop, String day) {
+	private static void writePlans(Population pop, int day) {
 		PopulationWriter populationWriter = new PopulationWriter(pop, null);
 		populationWriter.write(outPath + day + "_plans.xml.gz");
 	}

@@ -27,29 +27,26 @@ import org.matsim.core.controler.Controler;
  * @author benjamin
  *
  */
-public class RunTestRoad {
+public class RunTestRoadCapacityChanges {
 
 	public static void main(String[] args) {
 
-		int day1 = 20090707;
-		int day2 = 20090708;
-		int day3 = 20090709;
 		String linkLeaveId = "590000822";
 		String linkEnterId = "592536888";
 		int startCapacity = 1200;
 		int stepSize = 50;
-		
+
 		String inputpath = "../../detailedEval/teststrecke/sim/input/";
 		String configName = "_config_capacityChanges.xml";
-//		String configName = "_config.xml";
-		
-		
+		// String configName = "_config.xml";
+
+
 		int [] days = {
-					   day1,
-					   day2,
-					   day3
-					   };
-		
+				20090707,
+				20090708,
+				20090709
+		};
+
 		for(int day : days){
 			String config = inputpath + day + configName;
 			Controler controler = new Controler(config);

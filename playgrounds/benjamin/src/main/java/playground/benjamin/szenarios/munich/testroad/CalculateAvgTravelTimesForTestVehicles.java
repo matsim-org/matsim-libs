@@ -44,7 +44,7 @@ public class CalculateAvgTravelTimesForTestVehicles {
 	static String fileName = "_travelTimes.csv";
 
 	static Integer [] days = {
-		20060125,
+		// dont use this since they changed counts logfile format during the day! 20060125,
 		20060127,
 		20060131,
 		20090317,
@@ -52,7 +52,10 @@ public class CalculateAvgTravelTimesForTestVehicles {
 		20090319,
 		20090707,
 		20090708,
-		20090709
+		20090709,
+		20091201,
+		20091202,
+		20091203
 	};
 
 	private static SortedMap<Integer, SortedMap<Integer, Integer>> data = new TreeMap<Integer, SortedMap<Integer, Integer>>();
@@ -108,7 +111,7 @@ public class CalculateAvgTravelTimesForTestVehicles {
 	private static SortedMap<Integer, Double> calculateAvgTravelTimesPerHour(SortedMap<Integer, SortedMap<Integer, Integer>> data) {
 		SortedMap<Integer, Double> hours2TravelTimes = new TreeMap<Integer, Double>();
 
-		for(int i = 6; i < 21; i++){
+		for(int i = 6; i < 20; i++){
 			List<Integer> travelTimes = new ArrayList<Integer>();
 			Integer lowerBound = i * 3600;
 			Integer upperBound = (i+1) * 3600;
