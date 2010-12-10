@@ -29,7 +29,6 @@ import org.matsim.core.gbl.MatsimRandom;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
-
 /**
  * @author laemmel
  * 
@@ -55,7 +54,7 @@ public class PedVis {
 		System.err.println(peds.size());
 
 		PeekABotClient pc = new PeekABotClient();
-		pc.init();
+		pc.initII();
 
 		double step = 1000. / 25.;
 		long oldTime = System.currentTimeMillis();
@@ -82,18 +81,18 @@ public class PedVis {
 						float z = (float) c.z;
 						if (!init.contains(ped.id)) {
 							init.add(ped.id);
-							pc.addBot(Integer.parseInt(ped.id.toString()), x, y, z);
+							pc.addBotII(Integer.parseInt(ped.id.toString()), x, y, z);
 							if (ped.color.equals("red")) {
-								pc.setBotColor(Integer.parseInt(ped.id.toString()), 1.f, 0, MatsimRandom.getRandom().nextFloat());
+								pc.setBotColorII(Integer.parseInt(ped.id.toString()), 1.f, 0, MatsimRandom.getRandom().nextFloat());
 							} else {
-								pc.setBotColor(Integer.parseInt(ped.id.toString()), 0, 1.f, MatsimRandom.getRandom().nextFloat());
+								pc.setBotColorII(Integer.parseInt(ped.id.toString()), 0, 1.f, MatsimRandom.getRandom().nextFloat());
 							}
 						} else {
-							pc.setBotPosition(Integer.parseInt(ped.id.toString()), x, y, z, a);
+							pc.setBotPositionII(Integer.parseInt(ped.id.toString()), x, y, z, a);
 						}
 					}
 					if (time >= ped.arrived) {
-						pc.setBotPosition(Integer.parseInt(ped.id.toString()), 20, 20, 0, 0.f);
+						pc.setBotPositionII(Integer.parseInt(ped.id.toString()), 20, 20, 0, 0.f);
 					}
 				}
 

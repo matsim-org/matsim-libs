@@ -26,15 +26,15 @@ public class Sim2DConfig {
 	public static double STATIC_FORCE_RESOLUTION = 0.1;
 	public static final double TIME_STEP_SIZE = 0.2; // 1. / 25;
 
-	public static final double Bpath = 1.5;
+	public static final double Bpath = .5;
 	public static final double PSqrSensingRange = 12.25;
 	public static final double PNeighborhoddRange = 1.5;
 
 	public static final double Bp = .45;
-	public static final double Bw = .75;// wall
+	public static final double Bw = 1.5;// wall
 	public static final double App = 500.;
-	public static final double Apath = 5.;
-	public static final double Apw = 10.;
+	public static final double Apath = 50.;
+	public static final double Apw = 100.;
 	public static final double tau = 1 / TIME_STEP_SIZE;
 	public static final double B_PATH = 3;
 

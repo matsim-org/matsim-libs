@@ -23,25 +23,60 @@ import org.matsim.core.gbl.MatsimRandom;
 
 public class PeekABotClient {
 
-	public native void addBot(int id, float x, float y, float z);
+	// public native void addBot(int id, float x, float y, float z);
 
-	public native void setBotPosition(int id, float x, float y, float z, float azimuth);
+	// public native void setBotPosition(int id, float x, float y, float z,
+	// float azimuth);
 
-	public native void setBotColor(int id, float r, float g, float b);
+	// public native void setBotColor(int id, float r, float g, float b);
 
-	public native void removeBot(int id);
+	// public native void removeBot(int id);
 
-	public native void initPolygon(int id, int numCoords, float r, float g, float b, float height);
+	// public native void initPolygon(int id, int numCoords, float r, float g,
+	// float b, float height);
+	//
+	// public native void addPolygonCoord(int id, float x, float y, float z);
+	//
+	// public native void init();
 
-	public native void addPolygonCoord(int id, float x, float y, float z);
+	// public native void restAgents();
 
-	public native void init();
+	// public native void addArrow(int arrowId, int agentId, float r, float g,
+	// float b, float fromX, float fromY, float fromZ, float toX, float toY,
+	// float toZ);
+	//
+	// public native void removeArrow(int arrowId, int agentId);
 
-	public native void restAgents();
+	public native void initII();
 
-	public native void addArrow(int arrowId, int agentId, float r, float g, float b, float fromX, float fromY, float fromZ, float toX, float toY, float toZ);
+	public native void addBotII(int id, float x, float y, float z);
 
-	public native void removeArrow(int arrowId, int agentId);
+	public native void setBotPositionII(int id, float x, float y, float z, float azimuth);
+
+	public native void removeBotII(int id);
+
+	public native void removeAllBotsII();
+
+	public native void setBotColorII(int id, float r, float g, float b);
+
+	public native void initPolygonII(int id, int numCoords, float r, float g, float b, float height);
+
+	public native void addPolygonCoordII(int id, float x, float y, float z);
+
+	/**
+	 * @param arrowId
+	 * @param agentId
+	 * @param r
+	 * @param g
+	 * @param b
+	 * @param fromX
+	 * @param fromY
+	 * @param fromZ
+	 * @param toX
+	 * @param toY
+	 * @param toZ
+	 */
+	public native void drawArrowII(int arrowId, int agentId, float r, float g, float b, float fromX, float fromY, float fromZ, float toX, float toY, float toZ);
 
 	static {
 		System.loadLibrary("peekabotclient");
@@ -49,56 +84,37 @@ public class PeekABotClient {
 
 	public static void main(String args[]) {
 		PeekABotClient pc = new PeekABotClient();
-		pc.initPolygon(0, 4, .5f, 1, 0, 0);
-		pc.addPolygonCoord(0, 10, 10, 0);
-		pc.addPolygonCoord(0, 10, 0, 0);
-		pc.addPolygonCoord(0, 0, 0, 0);
-		pc.addPolygonCoord(0, 0, 15, 0);
+		pc.initII();
 
-		pc.initPolygon(1, 4, 1, .5f, 0, 0);
-		pc.addPolygonCoord(1, 10, 10, 3);
-		pc.addPolygonCoord(1, 10, 0, 3);
-		pc.addPolygonCoord(1, 0, 0, 3);
-		pc.addPolygonCoord(1, 0, 15, 3);
-		pc.init();
-		for (int i = 0; i < 10; i++) {
-			float x = MatsimRandom.getRandom().nextFloat() * 10;
-			float y = MatsimRandom.getRandom().nextFloat() * 10;
-			pc.addBot(i, x, y, 0.f);
+		for (int i = 0; i < 2500; i++) {
+			float x = MatsimRandom.getRandom().nextFloat() * 50;
+			float y = MatsimRandom.getRandom().nextFloat() * 50;
+			pc.addBotII(i, x, y, 0);
 		}
-		int count = 0;
-		while (true) {
+
+		for (int i = 0; i < 50; i++) {
+
 			try {
-				Thread.sleep(1000);
+				Thread.sleep(100);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			for (int i = 0; i < 10; i++) {
-				float x = MatsimRandom.getRandom().nextFloat() * 10;
-				float y = MatsimRandom.getRandom().nextFloat() * 10;
-				float vx;
-				float vy;
-				double rnd = MatsimRandom.getRandom().nextDouble();
-				double alpha = (Math.PI * 2) * rnd;
+			float x = MatsimRandom.getRandom().nextFloat();
+			float y = MatsimRandom.getRandom().nextFloat();
+			for (int j = 0; j < 2500; j++) {
+				pc.setBotPositionII(j, x, y, 0.4f, 1);
+				x += 5 * (MatsimRandom.getRandom().nextFloat() - .5f);
+				y += 5 * (MatsimRandom.getRandom().nextFloat() - .5f);
 
-				vx = (float) Math.cos(alpha);
-				vy = (float) Math.sin(alpha);
-				pc.setBotPosition(i, x, y, 0.f, (float) alpha);
-				if (count > 165 && i >= 86) {
-					// System.out.println(i + " vx:" + vx + " vy:" + vy + "  " +
-					// (vx*vx + vy*vy));
-				}
+				float r = MatsimRandom.getRandom().nextFloat();
+				float g = MatsimRandom.getRandom().nextFloat();
+				float b = MatsimRandom.getRandom().nextFloat();
+				pc.setBotColorII(j, r, g, b);
 			}
-			System.out.println(count++);
 
 		}
+		pc.removeAllBotsII();
 
-		// try {
-		// Thread.sleep(10000);
-		// } catch (InterruptedException e) {
-		// e.printStackTrace();
-		// }
-		// pc.addBot(100, 0., 0.);
 	}
 
 }

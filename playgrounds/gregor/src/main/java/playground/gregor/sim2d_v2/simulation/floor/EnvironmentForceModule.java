@@ -69,7 +69,7 @@ public class EnvironmentForceModule implements ForceModule {
 		fy = (Sim2DConfig.Apw * fy / agent.getWeight());
 
 		// DEBUG
-		ArrowEvent arrow = new ArrowEvent(agent.getPerson().getId(), new Coordinate(0, 0, 0), new Coordinate(-50 * fx, -50 * fy, 0), 1.f, 0.f, 1.f, 2);
+		ArrowEvent arrow = new ArrowEvent(agent.getPerson().getId(), agent.getPosition(), new Coordinate(agent.getPosition().x + 50 * fx, agent.getPosition().y + 50 * fy, 0), 1.f, 0.f, 1.f, 2);
 		this.floor.getSim2D().getEventsManager().processEvent(arrow);
 
 		agent.getForce().incrementX(fx);

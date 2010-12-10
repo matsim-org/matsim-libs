@@ -47,7 +47,8 @@ public class Controller2D extends Controler {
 			this.loader.loadScenario();
 			this.network = this.loader.getScenario().getNetwork();
 			this.population = this.loader.getScenario().getPopulation();
-			((ScenarioLoader2DImpl) this.loader).setPhantomPopulationEventsFile("/home/laemmel/devel/dfg/events.xml");
+			// ((ScenarioLoader2DImpl)
+			// this.loader).setPhantomPopulationEventsFile("/home/laemmel/devel/dfg/events.xml");
 			this.scenarioLoaded = true;
 
 			this.vis = new PedVisPeekABot(0.2);

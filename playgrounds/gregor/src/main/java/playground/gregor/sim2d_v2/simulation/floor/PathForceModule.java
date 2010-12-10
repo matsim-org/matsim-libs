@@ -45,6 +45,8 @@ public class PathForceModule implements ForceModule {
 	private HashMap<Id, Coordinate> fromCoords;
 	private HashMap<Id, LineString> linkGeos;
 
+	int redraws = 0;
+
 	/**
 	 * @param floor
 	 * @param scenario
@@ -105,9 +107,12 @@ public class PathForceModule implements ForceModule {
 
 		deltaX = Sim2DConfig.Apath * deltaX / agent.getWeight();
 		deltaY = Sim2DConfig.Apath * deltaY / agent.getWeight();
-		// DEBUG
-		ArrowEvent arrow = new ArrowEvent(agent.getPerson().getId(), new Coordinate(0, 0, 0), new Coordinate(-50 * deltaX, -50 * deltaY, 0), 1.f, 0.f, 0.f, 0);
+		// // DEBUG
+		// if (this.redraws <= 100) {
+		ArrowEvent arrow = new ArrowEvent(agent.getPerson().getId(), agent.getPosition(), new Coordinate(agent.getPosition().x + 50 * deltaX, agent.getPosition().y + 50 * deltaY, 0), 1.f, 0.f, 0.f, 0);
 		this.floor.getSim2D().getEventsManager().processEvent(arrow);
+		// }
+		// this.redraws++;
 
 		agent.getForce().incrementX(deltaX);
 		agent.getForce().incrementY(deltaY);

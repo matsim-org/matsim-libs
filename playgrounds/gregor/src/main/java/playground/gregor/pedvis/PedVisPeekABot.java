@@ -82,7 +82,7 @@ public class PedVisPeekABot implements XYZEventsHandler, AgentDepartureEventHand
 				e.printStackTrace();
 			}
 		}
-		this.pc.init();
+		this.pc.initII();
 	}
 
 	/**
@@ -123,23 +123,23 @@ public class PedVisPeekABot implements XYZEventsHandler, AgentDepartureEventHand
 	}
 
 	private void drawSegment(Point pointN1, Point pointN2) {
-		this.pc.initPolygon(this.segmentCount, 5, .75f, .75f, .75f, 3.f);
+		this.pc.initPolygonII(this.segmentCount, 5, .75f, .75f, .75f, 3.f);
 		float x1 = (float) (pointN1.getX() - this.ofX);
 		float y1 = (float) (pointN1.getY() - this.ofY);
 		float x2 = (float) (pointN2.getX() - this.ofX);
 		float y2 = (float) (pointN2.getY() - this.ofY);
-		this.pc.addPolygonCoord(this.segmentCount, x1, y1, 0);
-		this.pc.addPolygonCoord(this.segmentCount, x2, y2, 0);
-		this.pc.addPolygonCoord(this.segmentCount, x2, y2, FLOOR_HEIGHT);
-		this.pc.addPolygonCoord(this.segmentCount, x1, y1, FLOOR_HEIGHT);
-		this.pc.addPolygonCoord(this.segmentCount++, x1, y1, 0);
+		this.pc.addPolygonCoordII(this.segmentCount, x1, y1, 0);
+		this.pc.addPolygonCoordII(this.segmentCount, x2, y2, 0);
+		this.pc.addPolygonCoordII(this.segmentCount, x2, y2, FLOOR_HEIGHT);
+		this.pc.addPolygonCoordII(this.segmentCount, x1, y1, FLOOR_HEIGHT);
+		this.pc.addPolygonCoordII(this.segmentCount++, x1, y1, 0);
 
 	}
 
 	public PedVisPeekABot(String eventsFile, boolean loop, double speedUp) {
 		this.speedUp = speedUp;
 		this.pc = new PeekABotClient();
-		this.pc.init();
+		this.pc.initII();
 		this.file = eventsFile;
 		if (!loop) {
 			run();
@@ -172,7 +172,7 @@ public class PedVisPeekABot implements XYZEventsHandler, AgentDepartureEventHand
 
 	public void handleEvent(XYZAzimuthEvent e) {
 		testWait(e.getTime());
-		this.pc.setBotPosition(Integer.parseInt(e.getPersonId().toString()), (float) e.getX(), (float) e.getY(), (float) e.getZ(), (float) e.getAzimuth());
+		this.pc.setBotPositionII(Integer.parseInt(e.getPersonId().toString()), (float) e.getX(), (float) e.getY(), (float) e.getZ(), (float) e.getAzimuth());
 
 	}
 
@@ -209,7 +209,7 @@ public class PedVisPeekABot implements XYZEventsHandler, AgentDepartureEventHand
 	 */
 	@Override
 	public void reset(int iteration) {
-		this.pc.restAgents();
+		this.pc.removeAllBotsII();
 	}
 
 	/*
@@ -221,7 +221,7 @@ public class PedVisPeekABot implements XYZEventsHandler, AgentDepartureEventHand
 	 */
 	@Override
 	public void handleEvent(AgentDepartureEvent e) {
-		this.pc.addBot(Integer.parseInt(e.getPersonId().toString()), 10, 10, 10);
+		this.pc.addBotII(Integer.parseInt(e.getPersonId().toString()), 10, 10, 10);
 		float r = 0;
 		float g = 0;
 		float b = 0;
@@ -239,7 +239,7 @@ public class PedVisPeekABot implements XYZEventsHandler, AgentDepartureEventHand
 			g = 1.f;
 		}
 
-		this.pc.setBotColor(Integer.parseInt(e.getPersonId().toString()), r, g, b);
+		this.pc.setBotColorII(Integer.parseInt(e.getPersonId().toString()), r, g, b);
 	}
 
 	/*
@@ -251,7 +251,7 @@ public class PedVisPeekABot implements XYZEventsHandler, AgentDepartureEventHand
 	 */
 	@Override
 	public void handleEvent(AgentArrivalEvent e) {
-		this.pc.setBotPosition(Integer.parseInt(e.getPersonId().toString()), -100, -100, -10, -10);
+		this.pc.setBotPositionII(Integer.parseInt(e.getPersonId().toString()), -100, -100, -10, -10);
 		// this.pc.removeBot(Integer.parseInt(e.getPersonId().toString()));
 	}
 
@@ -265,6 +265,9 @@ public class PedVisPeekABot implements XYZEventsHandler, AgentDepartureEventHand
 	@Override
 	public void handleEvent(ArrowEvent event) {
 		int arrowId = event.getType();
+		if (arrowId > 2) {
+			return;
+		}
 		int agentId = Integer.parseInt(event.getPersId().toString());
 		float r = event.getR();
 		float g = event.getG();
@@ -276,6 +279,6 @@ public class PedVisPeekABot implements XYZEventsHandler, AgentDepartureEventHand
 		float toY = (float) event.getTo().y;
 		float toZ = (float) event.getTo().z;
 
-		this.pc.addArrow(arrowId, agentId, r, g, b, fromX, fromY, fromZ, toX, toY, toZ);
+		this.pc.drawArrowII(arrowId, agentId, r, g, b, fromX, fromY, fromZ, toX, toY, toZ);
 	}
 }
