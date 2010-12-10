@@ -32,6 +32,10 @@ import org.matsim.core.utils.misc.Time;
 
 /**
  * Writes the current position of all vehicles into a plans file.
+ * <p/>
+ * Comment: This is (presumably) not meant for visualization, but as a starting point for, say, evacuation.  Where it is assumed
+ * that the warning comes out at a certain time, and one wants to know where everybody is.  Which is a result from the normal
+ * activity-based traffic simulation.  kai, dec'10 
  *
  * @author glaemmel
  *
@@ -78,8 +82,12 @@ public class PlansFileSnapshotWriter implements SnapshotWriter {
 		PersonImpl pers = new PersonImpl(position.getId());
 
 		PlanImpl plan = new PlanImpl(pers);
+
 		ActivityImpl actA = new org.matsim.core.population.ActivityImpl("h", new CoordImpl(position.getEasting(), position.getNorthing()),
 				((PositionInfo)position).getLinkId());
+		// yy if this writer is meant for evacuation (see comment on top), then `h' as activity does not really make sense;
+		// even something like `dummy' might be better.  kai, dec'10 
+
 		actA.setEndTime(this.currenttime);
 		plan.addActivity(actA);
 		pers.addPlan(plan);
