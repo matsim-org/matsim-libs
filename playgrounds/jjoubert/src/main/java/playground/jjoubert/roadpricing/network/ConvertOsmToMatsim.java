@@ -34,7 +34,6 @@ import org.matsim.core.utils.io.OsmNetworkReader;
 import org.matsim.utils.gis.matsim2esri.network.CapacityBasedWidthCalculator;
 import org.matsim.utils.gis.matsim2esri.network.FeatureGeneratorBuilderImpl;
 import org.matsim.utils.gis.matsim2esri.network.Links2ESRIShape;
-import org.matsim.utils.gis.matsim2esri.network.Nodes2ESRIShape;
 import org.matsim.utils.gis.matsim2esri.network.PolygonFeatureGenerator;
 import org.xml.sax.SAXException;
 
@@ -45,17 +44,25 @@ public class ConvertOsmToMatsim {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-
-		String inputFile = "/Users/johanwjoubert/MATSim/workspace/MATSimData/Gauteng/SANRAL/Network/gauteng_201012.osm";
-		String outputFile = "/Users/johanwjoubert/MATSim/workspace/MATSimData/Gauteng/SANRAL/Network/gautengNetwork2_Clean.xml.gz";
-		String shapefileLinks = "/Users/johanwjoubert/MATSim/workspace/MATSimData/Gauteng/SANRAL/Network/gautengNetwork2_Clean_Links.shp";
-		String shapefileNodes = "/Users/johanwjoubert/MATSim/workspace/MATSimData/Gauteng/SANRAL/Network/gautengNetwork2_Clean_Nodes.shp";
+		String inputFile = null;
+		String outputFile = null;
+		String shapefileLinks = null;
+		boolean fullNetwork = true;
+		
+		if(args.length != 4){
+			throw new IllegalArgumentException("Must have three arguments: and osm-file; network-file; and shapefile.");
+		} else{
+			inputFile = args[0];
+			outputFile = args[1];
+			shapefileLinks = args[2];	
+			fullNetwork = Boolean.parseBoolean(args[3]);
+		}
 
 		Scenario sc = new ScenarioImpl();
 		Network nw = sc.getNetwork();
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.WGS84_UTM35S);
 		OsmNetworkReader onr = new OsmNetworkReader(nw, ct);
-		onr.setKeepPaths(false);
+		onr.setKeepPaths(fullNetwork);
 		/*
 		 * Configure the highway classification.
 		 */
@@ -78,7 +85,6 @@ public class ConvertOsmToMatsim {
 		builder.setWidthCalculatorPrototype(CapacityBasedWidthCalculator.class);
 		
 		new Links2ESRIShape(nw, shapefileLinks, builder).write();
-		new Nodes2ESRIShape(nw, shapefileNodes, "WGS84_UTM35S").write();
 	}
 
 }
