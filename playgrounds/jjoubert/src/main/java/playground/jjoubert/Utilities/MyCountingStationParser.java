@@ -94,7 +94,7 @@ public class MyCountingStationParser {
 		cp.log.info("========================================================================================");
 		
 		if(abnormal != null){
-			cp.getAbnormalDays(abnormal);
+			cp.abnormalList = cp.getAbnormalDays(abnormal);
 		}
 
 		String folder = root + year + "/Raw/";
@@ -499,9 +499,11 @@ public class MyCountingStationParser {
 	/** 
 	 * Reads a flat file containing one date per line in the format <code>YYYY/MM/DD</code>.
 	 * @param filename absolute path of the file to be read;
+	 * @return 
 	 */
-	private void getAbnormalDays(String filename){
+	public List<GregorianCalendar> getAbnormalDays(String filename){
 		log.info("Reading abnormal days from " + filename + "...");
+		List<GregorianCalendar> result = new ArrayList<GregorianCalendar>();
 		
 		try {
 			BufferedReader br = IOUtils.getBufferedReader(filename);
@@ -515,7 +517,7 @@ public class MyCountingStationParser {
 					int month = Integer.parseInt(date[1]);
 					int day = Integer.parseInt(date[2]);
 					GregorianCalendar gc = new GregorianCalendar(year,month,day);
-					abnormalList.add(gc);
+					result.add(gc);
 				}
 			} finally{
 				br.close();
@@ -526,5 +528,7 @@ public class MyCountingStationParser {
 			e.printStackTrace();
 		}
 		log.info("Done.");
+		return result;
 	}
+
 }
