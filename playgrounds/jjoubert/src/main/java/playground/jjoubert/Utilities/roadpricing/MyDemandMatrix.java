@@ -266,6 +266,7 @@ public class MyDemandMatrix {
 					plan.addLeg(toWork);
 					Activity work = pf.createActivityFromCoord("work", locationCoordinates.get(theDestination));
 					work.setStartTime(25200); // 07:00
+					work.setEndTime(57600);
 					plan.addActivity(work);
 					Leg fromWork = pf.createLeg("car");
 					plan.addLeg(fromWork);
