@@ -40,8 +40,10 @@ import playground.benjamin.dataprepare.CheckingTabularFileHandler;
  */
 public class CalculateAvgTravelTimesForTestVehicles {
 
-	static String testVehiclePath = "../../detailedEval/teststrecke/testVehicle/";
+	static String testVehicleDataPath = "../../detailedEval/teststrecke/testVehicle/";
 	static String fileName = "_travelTimes.csv";
+
+	private static SortedMap<Integer, SortedMap<Integer, Integer>> data = new TreeMap<Integer, SortedMap<Integer, Integer>>();
 
 	static Integer [] days = {
 		// dont use this since they changed counts logfile format during the day! 20060125,
@@ -58,18 +60,27 @@ public class CalculateAvgTravelTimesForTestVehicles {
 		20091203
 	};
 
-	private static SortedMap<Integer, SortedMap<Integer, Integer>> data = new TreeMap<Integer, SortedMap<Integer, Integer>>();
 
 	public static void main(String[] args) {
 
+		calculateAvgTravelTimesFromData(testVehicleDataPath, fileName, days, data);
+		calculateAvgTravelTimesFromSim();
+	}
+
+	private static void calculateAvgTravelTimesFromData(String testVehicleDataPath2, String fileName, Integer[] days,	SortedMap<Integer, SortedMap<Integer, Integer>> data) {
+
 		for(int day : days){
-			SortedMap<Integer, Integer> inflowTimes2TravelTimes = getInflowTimes2TravelTimes(testVehiclePath + day + fileName);
+			SortedMap<Integer, Integer> inflowTimes2TravelTimes = getInflowTimes2TravelTimes(testVehicleDataPath + day + fileName);
 			data.put(day, inflowTimes2TravelTimes);
 		}
 
 		SortedMap<Integer, Double> hours2AvgTravelTimes = calculateAvgTravelTimesPerHour(data);
 		writeAvgTravelTimesPerHour(hours2AvgTravelTimes);
+	}
 
+	private static void calculateAvgTravelTimesFromSim() {
+		// TODO Auto-generated method stub
+		
 	}
 
 	private static SortedMap<Integer, Integer> getInflowTimes2TravelTimes(String inputFile) {
@@ -148,7 +159,7 @@ public class CalculateAvgTravelTimesForTestVehicles {
 
 	private static void writeAvgTravelTimesPerHour(SortedMap<Integer, Double> hours2AvgTravelTimes) {
 		try {
-			BufferedWriter bw = new BufferedWriter(new FileWriter(new File(testVehiclePath + "averageTravelTimes.txt")));
+			BufferedWriter bw = new BufferedWriter(new FileWriter(new File(testVehicleDataPath + "averageTravelTimes.txt")));
 			//header
 			bw.write("hour" + "\t" + "avgTravelTime");
 			bw.newLine();
@@ -164,7 +175,7 @@ public class CalculateAvgTravelTimesForTestVehicles {
 				bw.newLine();
 			}
 			bw.close();
-			System.out.println("Wrote average travel times to " + testVehiclePath);
+			System.out.println("Wrote average travel times to " + testVehicleDataPath);
 
 		} catch (IOException e) {
 			throw new RuntimeException(e);

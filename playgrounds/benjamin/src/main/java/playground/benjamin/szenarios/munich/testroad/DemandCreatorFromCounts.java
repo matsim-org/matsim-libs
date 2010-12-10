@@ -85,10 +85,6 @@ public class DemandCreatorFromCounts {
 		}
 	}
 
-	/**
-	 * @param population
-	 * @param inflowTimesFile 
-	 */
 	private static void addTestVehicle(Population population, String inflowTimesFile) {
 		Scenario sc = new ScenarioImpl();
 
@@ -123,10 +119,6 @@ public class DemandCreatorFromCounts {
 		System.out.println("=========");
 	}
 
-	/**
-	 * @param inflowTimesFile
-	 * @return
-	 */
 	private static List<Integer> getTestVehicleInflowTimes(String inflowTimesFile) {
 		final List<Integer> inflowTimes = new ArrayList<Integer>();
 
@@ -159,9 +151,6 @@ public class DemandCreatorFromCounts {
 		return inflowTimes;
 	}
 
-	/**
-	 * @param population
-	 */
 	private static void fuzzifyTimes(Population population) {
 		PlanMutateTimeAllocation planMutateTimeAllocation = new PlanMutateTimeAllocation(1 * 60, new Random());
 		planMutateTimeAllocation.setUseActivityDurations(false);
@@ -172,12 +161,6 @@ public class DemandCreatorFromCounts {
 		System.out.println("fuzzified times for population " + population);
 	}
 
-	/**
-	 * @param dayPath
-	 * @param laneFile2 
-	 * @param laneFile1 
-	 * @return
-	 */
 	private static Population generatePopulation(String laneFile1, String laneFile2) {
 		Scenario sc = new ScenarioImpl();
 		Population population = sc.getPopulation();
@@ -218,11 +201,6 @@ public class DemandCreatorFromCounts {
 		return population;
 	}
 
-	/**
-	 * @param endTime2NoOfVehiclesLane1
-	 * @param endTime2NoOfVehiclesLane2
-	 * @return
-	 */
 	private static SortedMap<Integer, Double> aggregateVehicles(Map<Integer, Double> endTime2NoOfVehiclesLane1, Map<Integer, Double> endTime2NoOfVehiclesLane2) {
 		SortedMap<Integer, Double> aggregatedEndTime2NoOfVehicles = new TreeMap<Integer, Double>();
 
@@ -245,10 +223,6 @@ public class DemandCreatorFromCounts {
 		return aggregatedEndTime2NoOfVehicles;
 	}
 
-	/**
-	 * @param lane
-	 * @return
-	 */
 	private static SortedMap<Integer, Double> getEndTime2NoOfVehicles(String laneFile) {
 		final SortedMap<Integer, Double> EndTime2NoOfVehicles = new TreeMap<Integer, Double>();
 

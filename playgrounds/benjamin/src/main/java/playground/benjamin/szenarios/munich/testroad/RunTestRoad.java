@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BkMain.java
+ * RunTestRoad.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,43 +19,71 @@
  * *********************************************************************** */
 package playground.benjamin.szenarios.munich.testroad;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.controler.Controler;
-
 
 /**
  * @author benjamin
  *
  */
-public class RunTestRoadCapacityChanges {
+public class RunTestRoad {
 
 	static String inputPath = "../../detailedEval/teststrecke/sim/input/";
-	static String configName = "_config_capacityChanges.xml";
-	// String configName = "_config.xml";
+	static String outputPath = "../../detailedEval/teststrecke/sim/output/";
+	static String configName = "multipleRunsConfig.xml";
 
-	static String linkLeaveId = "590000822";
-	static String linkEnterId = "592536888";
-	static int startCapacity = 1200;
-	static int stepSize = 50;
-	
-	
-	
-	static int [] days = {
-			20090707,
-			20090708,
-			20090709
+	static Id linkLeaveId = new IdImpl("590000822");
+	static Id linkEnterId = new IdImpl("592536888");
+
+	static Integer linkCapacity = 1400;
+
+	static Integer [] days = {
+		20060127,
+		20060131,
+		20090317,
+		20090318,
+		20090319,
+		20090707,
+		20090708,
+		20090709
 	};
-	
+
 	public static void main(String[] args) {
 
-
 		for(int day : days){
-			String config = inputPath + day + configName;
+			Config config = new Config();
+			config.addCoreModules();
+			MatsimConfigReader confReader = new MatsimConfigReader(config);
+			confReader.readFile(inputPath + configName);
 			Controler controler = new Controler(config);
+
+			// controler settings	
 			controler.setOverwriteFiles(true);
+			controler.setCreateGraphs(false);
+
+			// config settings
+			config.controler().setOutputDirectory(outputPath + day + "/");
+			config.controler().setFirstIteration(0);
+			config.controler().setLastIteration(0);
+			config.network().setInputFile(inputPath + "network.xml");
+			config.network().setTimeVariantNetwork(true);
+			config.network().setChangeEventInputFile(inputPath + "capacityChanges.xml");
+			config.plans().setInputFile(inputPath + day + "_plans.xml.gz");
+
 			Scenario scenario = controler.getScenario();
-			controler.addControlerListener(new UpdateCapacityControlerListener(scenario, linkLeaveId, linkEnterId, startCapacity, stepSize));
+//			Link link = scenario.getNetwork().getLinks().get(linkLeaveId);
+//			link.setCapacity(linkCapacity);
+
+			controler.addControlerListener(new SimpleControlerListener(scenario, linkLeaveId, linkEnterId));
+
 			controler.run();
 		}
+
 	}
+
 }

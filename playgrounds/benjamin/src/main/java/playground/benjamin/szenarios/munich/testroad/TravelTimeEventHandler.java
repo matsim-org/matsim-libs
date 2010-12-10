@@ -65,6 +65,7 @@ public class TravelTimeEventHandler implements LinkEnterEventHandler, LinkLeaveE
 				personId = event.getPersonId();
 				
 				this.personId2enterTimesPerIteration.put(personId, enterTime);
+//				System.out.println(this.personId2enterTimesPerIteration);
 			}
 		}
 	}
@@ -77,6 +78,7 @@ public class TravelTimeEventHandler implements LinkEnterEventHandler, LinkLeaveE
 				leaveTime = event.getTime();
 				
 				this.personId2travelTimesPerIteration.put(personId, leaveTime - enterTime);
+//				System.out.println(this.personId2travelTimesPerIteration);
 			}
 		}
 	}
