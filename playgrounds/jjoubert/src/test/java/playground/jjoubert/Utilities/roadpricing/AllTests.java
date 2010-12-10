@@ -18,27 +18,19 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jjoubert.Utilities;
+package playground.jjoubert.Utilities.roadpricing;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-
 public class AllTests {
-		
+	
 	public static Test suite(){
-		TestSuite suite = new TestSuite("Tests for playground.jjoubert.Utilities");
+		TestSuite suite = new TestSuite("Tests for playground.jjoubert.Utilities.roadpricing");
 		
-		suite.addTestSuite(MyXmlConverterTest.class);
-		suite.addTestSuite(MyVehicleIdentifierTest.class);
-		suite.addTestSuite(MyFileSamplerTest.class);
-		suite.addTestSuite(MyLinkStatsReaderTest.class);
-		suite.addTestSuite(MyOsmNetworkCleanerTest.class);
-		
-		suite.addTest(playground.jjoubert.Utilities.KernelDensityEstimation.AllTests.suite());
-		suite.addTest(playground.jjoubert.Utilities.matsim2urbansim.AllTests.suite());
-		suite.addTest(playground.jjoubert.Utilities.roadpricing.AllTests.suite());
+		suite.addTestSuite(MyDemandMatrixTest.class);
 		
 		return suite;
 	}
+
 }
