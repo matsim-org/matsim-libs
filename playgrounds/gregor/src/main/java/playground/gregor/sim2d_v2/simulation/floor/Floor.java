@@ -38,6 +38,7 @@ import com.vividsolutions.jts.geom.LineString;
 import playground.gregor.sim2d_v2.controller.Sim2DConfig;
 import playground.gregor.sim2d_v2.events.XYZAzimuthEvent;
 import playground.gregor.sim2d_v2.events.XYZAzimuthEventImpl;
+import playground.gregor.sim2d_v2.events.debug.ArrowEvent;
 import playground.gregor.sim2d_v2.scenario.Scenario2DImpl;
 import playground.gregor.sim2d_v2.simulation.Agent2D;
 import playground.gregor.sim2d_v2.simulation.PhantomManager;
@@ -150,6 +151,11 @@ public class Floor {
 			Force f = agent.getForce();
 			Coordinate oldPos = agent.getPosition();
 			Coordinate newPos = new Coordinate(oldPos.x + f.getXComponent(), oldPos.y + f.getYComponent(), 0);
+
+			// DEBUG
+			ArrowEvent arrow = new ArrowEvent(agent.getPerson().getId(), agent.getPosition(), new Coordinate(agent.getPosition().x + f.getXComponent() / Sim2DConfig.TIME_STEP_SIZE, agent.getPosition().y + f.getYComponent() / Sim2DConfig.TIME_STEP_SIZE, 0), 0.5f, 0.75f, 1.f, -1);
+			getSim2D().getEventsManager().processEvent(arrow);
+
 			boolean endOfLeg = checkForEndOfLinkReached(agent, oldPos, newPos, time);
 			if (endOfLeg) {
 				it.remove();
@@ -241,8 +247,8 @@ public class Floor {
 		Force force = agent.getForce();
 		double norm = Math.sqrt(Math.pow(force.getXComponent(), 2) + Math.pow(force.getYComponent(), 2));
 		if (norm > agent.getDesiredVelocity() * Sim2DConfig.TIME_STEP_SIZE) {
-			force.setXComponent(force.getXComponent() * ((2 * agent.getDesiredVelocity() * Sim2DConfig.TIME_STEP_SIZE) / norm));
-			force.setYComponent(force.getYComponent() * ((2 * agent.getDesiredVelocity() * Sim2DConfig.TIME_STEP_SIZE) / norm));
+			force.setXComponent(force.getXComponent() * ((agent.getDesiredVelocity() * Sim2DConfig.TIME_STEP_SIZE) / norm));
+			force.setYComponent(force.getYComponent() * ((agent.getDesiredVelocity() * Sim2DConfig.TIME_STEP_SIZE) / norm));
 		}
 	}
 

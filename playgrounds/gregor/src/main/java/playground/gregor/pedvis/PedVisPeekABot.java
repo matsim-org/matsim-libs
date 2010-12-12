@@ -251,8 +251,9 @@ public class PedVisPeekABot implements XYZEventsHandler, AgentDepartureEventHand
 	 */
 	@Override
 	public void handleEvent(AgentArrivalEvent e) {
-		this.pc.setBotPositionII(Integer.parseInt(e.getPersonId().toString()), -100, -100, -10, -10);
-		// this.pc.removeBot(Integer.parseInt(e.getPersonId().toString()));
+		// this.pc.setBotPositionII(Integer.parseInt(e.getPersonId().toString()),
+		// -100, -100, -10, -10);
+		this.pc.removeBotII(Integer.parseInt(e.getPersonId().toString()));
 	}
 
 	/*
@@ -265,9 +266,6 @@ public class PedVisPeekABot implements XYZEventsHandler, AgentDepartureEventHand
 	@Override
 	public void handleEvent(ArrowEvent event) {
 		int arrowId = event.getType();
-		if (arrowId > 2) {
-			return;
-		}
 		int agentId = Integer.parseInt(event.getPersId().toString());
 		float r = event.getR();
 		float g = event.getG();

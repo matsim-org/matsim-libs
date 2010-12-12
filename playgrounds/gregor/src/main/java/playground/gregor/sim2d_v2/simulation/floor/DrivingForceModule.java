@@ -86,7 +86,7 @@ public class DrivingForceModule implements ForceModule {
 		driveY *= (Sim2DConfig.TIME_STEP_SIZE * agent.getDesiredVelocity() - agent.getForce().getOldYComponent()) / Sim2DConfig.tau;
 
 		// DEBUG
-		ArrowEvent arrow = new ArrowEvent(agent.getPerson().getId(), agent.getPosition(), new Coordinate(agent.getPosition().x + 50 * driveX, agent.getPosition().y + 50 * driveY, 0), 0.f, 1.f, 0.f, 1);
+		ArrowEvent arrow = new ArrowEvent(agent.getPerson().getId(), agent.getPosition(), new Coordinate(agent.getPosition().x + driveX / Sim2DConfig.TIME_STEP_SIZE, agent.getPosition().y + driveY / Sim2DConfig.TIME_STEP_SIZE, 0), 0.f, 1.f, 0.f, 1);
 		this.floor.getSim2D().getEventsManager().processEvent(arrow);
 
 		agent.getForce().incrementX(driveX);
