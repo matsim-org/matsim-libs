@@ -15,7 +15,8 @@ Changes:
   - ?
 
 - Feature improvements:
-  - transit router got faster (r13753)
+  - transit router got faster (r13753, r13765) and uses less memory during parallel replanning (r13765)
+  - Swing-OTFVis now shows vehicles in different colors instead of just gray (r13751)
   - ?
 
 - Other changes for developers:
