@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd"
 	[
-		<!ENTITY INBASE  "test/scenarios/chessboard">
+		<!ENTITY INBASE  "test/scenarios/equil">
 		<!ENTITY OUTBASE "test/output/playground/wrashid/PSF2/chargingSchemes/dumbCharging/1">
 		<!ENTITY TESTBASE  "test/input/playground/wrashid/PSF2/chargingSchemes/dumbCharging">
 	]
@@ -20,12 +20,10 @@
 		<param name="inputNetworkFile" value="&INBASE;/network.xml" />
 	</module>
 
-	<module name="facilities">
-		<param name="inputFacilitiesFile" value="&INBASE;/facilities.xml" />
-	</module>
+	
 
 	<module name="plans">
-		<param name="inputPlansFile" value="&INBASE;/plans.xml" />
+		<param name="inputPlansFile" value="&INBASE;/plans100.xml" />
 	</module>
 
 	<module name="controler">
@@ -54,12 +52,12 @@
 		<param name="traveling" value="-6" />
 		<param name="waiting" value="-0" />
 		
-		<param name="activityType_0"            value="home" /> <!-- home -->
+		<param name="activityType_0"            value="h" /> <!-- home -->
 		<param name="activityPriority_0"        value="1" />
 		<param name="activityTypicalDuration_0" value="12:00:00" />
 		<param name="activityMinimalDuration_0" value="08:00:00" />
 	
-		<param name="activityType_1"            value="work" /> <!-- work -->
+		<param name="activityType_1"            value="w" /> <!-- work -->
 		<param name="activityPriority_1"        value="1" />
 		<param name="activityTypicalDuration_1" value="08:00:00" />
 		<param name="activityMinimalDuration_1" value="06:00:00" />
@@ -67,20 +65,6 @@
 		<param name="activityLatestStartTime_1" value="09:00:00" />
 		<param name="activityEarliestEndTime_1" value="" />
 		<param name="activityClosingTime_1"     value="18:00:00" />
-		
-		<param name="activityType_2"            value="shopping" /> <!-- depart from parking -->
-		<param name="activityPriority_2"        value="1" />
-		<param name="activityTypicalDuration_2" value="00:01:00" />
-		<param name="activityMinimalDuration_2" value="00:01:00" />
-		
-		<param name="activityType_3"            value="leisure" /> <!-- arrival in parking -->
-		<param name="activityPriority_3"        value="1" />
-		<param name="activityTypicalDuration_3" value="00:01:00" />
-		<param name="activityMinimalDuration_3" value="00:01:00" />
-		
-		<param name="activityType_4"            value="edu" />
-		<param name="activityPriority_4"        value="1" />
-		<param name="activityTypicalDuration_4" value="08:00:00" />
 	</module>
 	
 	<module name="strategy">
@@ -112,7 +96,7 @@
 		<param name="default.chargingPowerAtParking" value="3500" /> <!-- in [W]  -->
 		<param name="main.chargingTimesOutputFilePath" value="&OUTBASE;/chargingLog.txt" />
 		<param name="main.energyUsageStatistics" value="&OUTBASE;/vehicleEnergyConsumption" />
-		<param name="main.inputEventsForSimulationPath" value="test/input/playground/wrashid/PSF2/pluggable/0.events.txt.gz" />
+		<param name="main.inputEventsForSimulationPath" value="&TESTBASE;/0.events.txt.gz" />
 		
 	
 		<param name="testingModeOn" value="false" /> <!-- this is the main switch for all testing values -->
