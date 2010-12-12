@@ -2,7 +2,7 @@
 <!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd"
 	[
 		<!ENTITY INBASE  "test/scenarios/chessboard">
-		<!ENTITY OUTBASE "test/output/playground/wrashid/PSF2/chargingSchemes/dumbCharging/0">
+		<!ENTITY OUTBASE "test/output/playground/wrashid/PSF2/chargingSchemes/dumbCharging/1">
 		<!ENTITY TESTBASE  "test/input/playground/wrashid/PSF2/chargingSchemes/dumbCharging">
 	]
 >
@@ -112,6 +112,8 @@
 		<param name="default.chargingPowerAtParking" value="3500" /> <!-- in [W]  -->
 		<param name="main.chargingTimesOutputFilePath" value="&OUTBASE;/chargingLog.txt" />
 		<param name="main.energyUsageStatistics" value="&OUTBASE;/vehicleEnergyConsumption" />
+		<param name="main.inputEventsForSimulationPath" value="test/input/playground/wrashid/PSF2/pluggable/0.events.txt.gz" />
+		
 	
 		<param name="testingModeOn" value="false" /> <!-- this is the main switch for all testing values -->
 		
