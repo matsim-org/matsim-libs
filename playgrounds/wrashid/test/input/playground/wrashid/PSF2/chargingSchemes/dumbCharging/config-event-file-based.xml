@@ -20,7 +20,9 @@
 		<param name="inputNetworkFile" value="&INBASE;/network.xml" />
 	</module>
 
-	
+	<module name="facilities">
+		<param name="inputFacilitiesFile" value="&INBASE;/facilities.xml" />
+	</module>
 
 	<module name="plans">
 		<param name="inputPlansFile" value="&INBASE;/plans100.xml" />
