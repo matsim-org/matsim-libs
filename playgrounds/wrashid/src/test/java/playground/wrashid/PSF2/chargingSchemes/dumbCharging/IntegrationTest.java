@@ -61,6 +61,15 @@ public class IntegrationTest extends MatsimTestCase {
 		
 		ParametersPSF2.setChargingLocationFilter(null);
 		
-	} 
+	}
+	
+	public void testEventFileBased(){
+		PSSControler pssControler=new PSSControlerDumbCharging("test/input/playground/wrashid/PSF2/chargingSchemes/dumbCharging/config-event-file-based.xml", null);
+		pssControler.runMATSimIterations();
+		
+		LinkedList<ChargeLog> chargingTimesForAgent1 = ParametersPSF2.chargingTimes.get(new IdImpl(1)).getChargingTimes();
+		assertEquals(3, chargingTimesForAgent1.size());
+		assertEquals(10*3600*1000.0, chargingTimesForAgent1.getLast().getEndSOC());
+	}
 	
 }
