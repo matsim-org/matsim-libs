@@ -54,7 +54,7 @@
 		<param name="traveling" value="-6" />
 		<param name="waiting" value="-0" />
 		
-		<param name="activityType_0"            value="h" /> <!-- home -->
+		<param name="activityType_0"            value="home" /> <!-- home -->
 		<param name="activityPriority_0"        value="1" />
 		<param name="activityTypicalDuration_0" value="12:00:00" />
 		<param name="activityMinimalDuration_0" value="08:00:00" />
