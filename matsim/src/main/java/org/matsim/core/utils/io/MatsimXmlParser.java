@@ -155,6 +155,11 @@ public abstract class MatsimXmlParser extends DefaultHandler {
 		parse(new InputSource(url.toExternalForm()));
 	}
 
+	public void parse(final InputStream stream) throws SAXException, ParserConfigurationException, IOException {
+		this.source = "stream";
+		parse(new InputSource(stream));
+	}
+
 	protected void parse(final InputSource input) throws SAXException, ParserConfigurationException, IOException {
 		SAXParserFactory factory = SAXParserFactory.newInstance();
 		factory.setValidating(this.isValidating);
