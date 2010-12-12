@@ -23,6 +23,9 @@ package playground.wrashid.PSF2.chargingSchemes.dumbCharging;
 import java.util.HashMap;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.controler.Controler;
@@ -37,6 +40,8 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.mobsim.framework.events.SimulationBeforeCleanupEvent;
+import org.matsim.core.scoring.ScoringFunction;
+import org.matsim.core.scoring.ScoringFunctionFactory;
 
 import playground.wrashid.PSF.ParametersPSF;
 import playground.wrashid.PSF.ParametersPSFMutator;
@@ -76,6 +81,10 @@ public class PSSControlerDumbCharging extends PSSControler {
 			// event file is null and this causes some probelems in my
 			// handlers...
 			controler = new EventReadControler(configFilePath, tempStringValue);
+			ParametersPSF2.isEventsFileBasedControler=true;
+			
+			setDumbScoringFunctionFactory(controler);
+			
 		} else {
 			controler = new Controler(configFilePath);
 		}
@@ -97,6 +106,10 @@ public class PSSControlerDumbCharging extends PSSControler {
 		controler.run();
 
 	}
+
+	
+
+
 
 	private void addAfterSimulationListener(Controler controler) {
 		controler.addControlerListener(new IterationEndsListener() {
@@ -165,4 +178,103 @@ public class PSSControlerDumbCharging extends PSSControler {
 
 	}
 
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	private void setDumbScoringFunctionFactory(Controler controler) {
+		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
+			
+			@Override
+			public ScoringFunction createNewScoringFunction(Plan plan) {
+				// TODO Auto-generated method stub
+				return new ScoringFunction() {
+					
+					@Override
+					public void startLeg(double time, Leg leg) {
+						// TODO Auto-generated method stub
+						
+					}
+					
+					@Override
+					public void startActivity(double time, Activity act) {
+						// TODO Auto-generated method stub
+						
+					}
+					
+					@Override
+					public void reset() {
+						// TODO Auto-generated method stub
+						
+					}
+					
+					@Override
+					public double getScore() {
+						// TODO Auto-generated method stub
+						return 0;
+					}
+					
+					@Override
+					public void finish() {
+						// TODO Auto-generated method stub
+						
+					}
+					
+					@Override
+					public void endLeg(double time) {
+						// TODO Auto-generated method stub
+						
+					}
+					
+					@Override
+					public void endActivity(double time) {
+						// TODO Auto-generated method stub
+						
+					}
+					
+					@Override
+					public void agentStuck(double time) {
+						// TODO Auto-generated method stub
+						
+					}
+					
+					@Override
+					public void addMoney(double amount) {
+						// TODO Auto-generated method stub
+						
+					}
+				};
+			}
+		});
+		
+	}
+	
+	
+	
+	
 }

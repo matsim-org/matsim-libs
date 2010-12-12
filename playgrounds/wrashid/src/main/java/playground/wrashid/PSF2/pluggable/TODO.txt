@@ -24,3 +24,4 @@ EnergyConsumptionPlugin
 => updated PSF2.pssReadme.txt
 
 => make both plug-ins auto configurable (as used for semesterarbeit)
+

@@ -66,6 +66,8 @@ public class ParametersPSF2 {
 
 	private static GeneralLogObject generalLogObject;
 	private static GeneralLogObject iterationLogObject;
+
+	public static boolean isEventsFileBasedControler=false;
 	
 	public static void initVehicleFleet(Controler controler){
 		ParametersPSF2.vehicles=ParametersPSF2.fleetInitializer.getVehicles(controler.getPopulation().getPersons().keySet(), ParametersPSF2.energyStateMaintainer);
