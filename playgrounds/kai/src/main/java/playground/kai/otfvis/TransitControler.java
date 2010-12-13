@@ -20,72 +20,20 @@
 
 package playground.kai.otfvis;
 
-import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.mobsim.framework.IOSimulation;
-import org.matsim.core.mobsim.framework.ObservableSimulation;
-import org.matsim.core.mobsim.framework.listeners.SimulationListener;
+import org.matsim.core.mobsim.framework.MobsimFactory;
+import org.matsim.core.mobsim.framework.Simulation;
 import org.matsim.pt.qsim.ComplexTransitStopHandlerFactory;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.QSimFactory;
 import org.matsim.vis.otfvis.OTFVisMobsimFeature;
 import org.matsim.vis.otfvis.gui.OTFVisConfigGroup;
 
-/**
- * @author aneumann
- */
-public class TransitControler extends Controler {
-
-	private final static Logger log = Logger.getLogger(TransitControler.class);
-
-	private boolean useOTFVis = true;
-//	private boolean useHeadwayControler = false;
-	
-	public TransitControler(Config config) {
-		super(config);
-	}
-	
-	@Override
-	protected void runMobSim() {
-		
-		log.info("Overriding runMobSim()");
-
-		QSim simulation = (QSim) new QSimFactory().createMobsim(this.getScenario(), this.getEvents());
-
-		simulation.getTransitEngine().setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
-//		simulation.getQSimTransitEngine().setTransitStopHandlerFactory(new SimpleTransitStopHandlerFactory());
-//		this.events.addHandler(new LogOutputEventHandler());
-
-		if (this.useOTFVis) {
-			OTFVisMobsimFeature otfVisQSimFeature = new OTFVisMobsimFeature(simulation);
-			otfVisQSimFeature.setVisualizeTeleportedAgents(simulation.getScenario().getConfig().otfVis().isShowTeleportedAgents());
-			simulation.addFeature(otfVisQSimFeature);
-			simulation.getScenario().getConfig().otfVis().setDrawTransitFacilities(false) ;
-			simulation.getScenario().getConfig().otfVis().setShowParking(true) ;
-		}
-
-//		if(this.useHeadwayControler){
-//			simulation.getQSimTransitEngine().setAbstractTransitDriverFactory(new FixedHeadwayCycleUmlaufDriverFactory());
-//			this.events.addHandler(new FixedHeadwayControler(simulation));		
-//		}
-
-		if (simulation instanceof IOSimulation){
-			((IOSimulation)simulation).setControlerIO(this.getControlerIO());
-			((IOSimulation)simulation).setIterationNumber(this.getIterationNumber());
-		}
-		if (simulation instanceof ObservableSimulation){
-			for (SimulationListener l : this.getQueueSimulationListener()) {
-				((ObservableSimulation)simulation).addQueueSimulationListeners(l);
-			}
-		}
-		simulation.run();
-	}	
-	
-	void setUseOTFVis(boolean useOTFVis) {
-		this.useOTFVis = useOTFVis;
-	}
+public class TransitControler {
 
 	public static void main(final String[] args) {
 //		args[0] = "/Users/nagel/kw/rotterdam/config.xml" ;
@@ -96,13 +44,42 @@ public class TransitControler extends Controler {
 		config.scenario().setUseVehicles(true);
 		config.otfVis().setColoringScheme( OTFVisConfigGroup.COLORING_BVG ) ;
 		
+		Controler tc = new Controler(config) ;
+		
+		MobsimFactory mobsimFactory = new MyMobsimFactory() ; 
+		tc.setMobsimFactory(mobsimFactory) ;
 				
-		TransitControler tc = new TransitControler(config);
-//		if(args.length > 1 && args[1].equalsIgnoreCase("true")){
-//			tc.setUseOTFVis(true);
-//		}
 		tc.setOverwriteFiles(true);
 //		tc.setCreateGraphs(false);
 		tc.run();
+	}
+	
+	static class MyMobsimFactory implements MobsimFactory {
+		private boolean useOTFVis = true ;
+
+		@Override
+		public Simulation createMobsim(Scenario sc, EventsManager eventsManager) {
+			QSim simulation = (QSim) new QSimFactory().createMobsim(sc, eventsManager);
+
+			simulation.getTransitEngine().setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
+//			simulation.getQSimTransitEngine().setTransitStopHandlerFactory(new SimpleTransitStopHandlerFactory());
+//			this.events.addHandler(new LogOutputEventHandler());
+
+			if ( useOTFVis ) {
+				OTFVisMobsimFeature otfVisQSimFeature = new OTFVisMobsimFeature(simulation);
+				otfVisQSimFeature.setVisualizeTeleportedAgents(simulation.getScenario().getConfig().otfVis().isShowTeleportedAgents());
+				simulation.addQueueSimulationListeners(otfVisQSimFeature);
+				simulation.getEventsManager().addHandler(otfVisQSimFeature) ;
+				simulation.getScenario().getConfig().otfVis().setDrawTransitFacilities(false) ;
+				simulation.getScenario().getConfig().otfVis().setShowParking(true) ;
+			}
+
+//			if(this.useHeadwayControler){
+//				simulation.getQSimTransitEngine().setAbstractTransitDriverFactory(new FixedHeadwayCycleUmlaufDriverFactory());
+//				this.events.addHandler(new FixedHeadwayControler(simulation));		
+//			}
+			
+			return simulation ;
+		}
 	}
 }
