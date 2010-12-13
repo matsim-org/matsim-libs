@@ -9,7 +9,7 @@ import org.matsim.core.router.util.DijkstraFactory;
 public class RouterTaskManagerFactory extends TaskManagerFactory {
 
 	@Override
-	protected TaskManager createTaskManagerImpl(TaskConfiguration taskConfiguration) {
+	public TaskManager createTaskManagerImpl(TaskConfiguration taskConfiguration) {
 		TaskManager leastCostPathCalculatorFactory;
 		Config config = taskConfiguration.getConfig();
 		if (config.controler().getRoutingAlgorithmType().equals(RoutingAlgorithmType.Dijkstra)) {

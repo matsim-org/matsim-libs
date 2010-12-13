@@ -24,11 +24,13 @@ package org.matsim.vis.otfvis;
 import java.awt.BorderLayout;
 import java.rmi.RemoteException;
 
+import org.matsim.vis.otfvis.caching.SimpleSceneLayer;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.fileio.queuesim.OTFQueueSimLinkAgentsWriter;
-import org.matsim.vis.otfvis.gui.OTFSwingDrawer;
 import org.matsim.vis.otfvis.gui.OTFSwingDrawerContainer;
 import org.matsim.vis.otfvis.gui.OTFVisConfigGroup;
+import org.matsim.vis.otfvis.gui.SwingAgentDrawer;
+import org.matsim.vis.otfvis.gui.SwingSimpleQuadDrawer;
 import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
 import org.matsim.vis.otfvis.handler.OTFDefaultLinkHandler;
 import org.matsim.vis.otfvis.handler.OTFDefaultNodeHandler;
@@ -77,12 +79,13 @@ public class OTFClientSwing extends OTFClient {
 		this.connectionManager.connectWriterToReader(OTFLinkAgentsHandler.Writer.class, OTFLinkAgentsHandler.class);
 		this.connectionManager.connectWriterToReader(OTFLinkAgentsNoParkingHandler.Writer.class, OTFLinkAgentsHandler.class);
 		this.connectionManager.connectWriterToReader(OTFDefaultNodeHandler.Writer.class, OTFDefaultNodeHandler.class);
-		/**
-		 * The next two connections is triggering the swing drawing code
-		 */
-		this.connectionManager.connectReaderToReceiver(OTFLinkLanesAgentsNoParkingHandler.class, OTFSwingDrawer.SimpleQuadDrawer.class);
-		this.connectionManager.connectReaderToReceiver(OTFLinkLanesAgentsNoParkingHandler.class, OTFSwingDrawer.AgentDrawer.class);
-		this.connectionManager.connectReaderToReceiver(OTFAgentsListHandler.class, OTFSwingDrawer.AgentDrawer.class);
+
+		
+		this.connectionManager.connectReaderToReceiver(OTFLinkLanesAgentsNoParkingHandler.class, SwingSimpleQuadDrawer.class);
+		this.connectionManager.connectReaderToReceiver(OTFLinkLanesAgentsNoParkingHandler.class, SwingAgentDrawer.class);
+		this.connectionManager.connectReaderToReceiver(OTFAgentsListHandler.class, SwingAgentDrawer.class);
+		this.connectionManager.connectReceiverToLayer(SwingSimpleQuadDrawer.class, SimpleSceneLayer.class);
+		this.connectionManager.connectReceiverToLayer(SwingAgentDrawer.class, SimpleSceneLayer.class);
 
 	}
 

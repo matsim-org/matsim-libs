@@ -16,14 +16,13 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+
+import playground.mzilske.pipeline.PersonSink;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -89,37 +88,24 @@ public class PopulationGenerator implements Runnable {
 
 	private Map<Integer, Zone> zones = new HashMap<Integer, Zone>();
 
-	private Scenario scenario;
-
-	private PopulationImpl population;
-
-	private PopulationWriter populationWriter;
-
-	private CoordinateTransformation DhdnGk4Towgs84 = TransformationFactory.getCoordinateTransformation(TransformationFactory.DHDN_GK4, TransformationFactory.WGS84);
-
-	private String filename; 
+	private double populationScaleFactor;
+	
+	private PopulationFactory populationFactory;
+	
+	private PersonSink sink;
 
 	@Override
-	public void run() {
-		scenario = new ScenarioImpl();
-		population = (PopulationImpl) scenario.getPopulation();
-		population.setIsStreaming(true);
-		populationWriter = new PopulationWriter(population, scenario.getNetwork());
-		population.addAlgorithm(populationWriter);
-		populationWriter.startStreaming(filename);
-		
+	public void run() {		
 		int i=0;
 		for (Entry entry : entries) {
 			Zone source = zones.get(entry.source);
 			Zone sink = zones.get(entry.sink);
-			int quantity = scale(getCarQuantity(source, sink, entry.carWorkTripsPerDay));
+			int quantity = scale(getQuantity(source, sink, entry.carWorkTripsPerDay));
 			createFromToCar(source, sink, quantity);
-			quantity = scale(getPtQuantity(source, sink));
+			quantity = scale(getQuantity(source, sink, entry.ptWorkTripsPerDay));
 			createFromToPt(source, sink, quantity);
 			log.info(++i + " / " + entries.size());
 		}
-		
-		populationWriter.closeStreaming();
 	}
 
 	public int countPersons() {
@@ -127,18 +113,13 @@ public class PopulationGenerator implements Runnable {
 		for (Entry entry : entries) {
 			Zone source = zones.get(entry.source);
 			Zone sink = zones.get(entry.sink);
-			int quantity = scale(getCarQuantity(source, sink, entry.carWorkTripsPerDay));
+			int quantity = scale(getQuantity(source, sink, entry.carWorkTripsPerDay));
 			all += quantity;
 		}
 		return all;
 	}
-
-	private int getPtQuantity(Zone source, Zone sink) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	private int getCarQuantity(Zone source, Zone sink, int carWorkTripsPerDay) {
+	
+	private int getQuantity(Zone source, Zone sink, int carWorkTripsPerDay) {
 		double outWeight = ((double) source.workingPopulation * sink.workplaces) /  ((double) source.workplaces * sink.workingPopulation);
 		double inWeight = ((double) source.workplaces * sink.workingPopulation) /  ((double) source.workingPopulation * sink.workplaces);
 		// System.out.println(source.id + " -> " + sink.id + ": " + outWeight + " / " + inWeight);
@@ -148,7 +129,7 @@ public class PopulationGenerator implements Runnable {
 	}
 
 	private int scale(int quantityOut) {
-		int scaled = (int) (quantityOut * 0.1);
+		int scaled = (int) (quantityOut * populationScaleFactor);
 		if (quantityOut != 0) {
 			System.out.println("quantity: " + quantityOut);
 			System.out.println("scaled: " + scaled);
@@ -156,56 +137,56 @@ public class PopulationGenerator implements Runnable {
 		return scaled;
 	}
 
-	private void createFromToCar(Zone source, Zone sink, int quantity) {
+	private void createFromToCar(Zone origin, Zone destination, int quantity) {
 		for (int i=0; i<quantity; i++) {
-			Person person = population.getFactory().createPerson(createId(source, sink, i, TransportMode.car));
-			Plan plan = population.getFactory().createPlan();
-			Coord homeLocation = shoot(source);
-			Coord workLocation = shoot(sink);
+			Person person = populationFactory.createPerson(createId(origin, destination, i, TransportMode.car));
+			Plan plan = populationFactory.createPlan();
+			Coord homeLocation = shoot(origin);
+			Coord workLocation = shoot(destination);
 			plan.addActivity(createHome(homeLocation));
 			plan.addLeg(createDriveLeg());
 			plan.addActivity(createWork(workLocation));
 			plan.addLeg(createDriveLeg());
 			plan.addActivity(createHome(homeLocation));
 			person.addPlan(plan);
-			population.addPerson(person);
+			sink.process(person);
 		}
 	}
 
-	private void createFromToPt(Zone source, Zone sink, int quantity) {
+	private void createFromToPt(Zone origin, Zone destination, int quantity) {
 		for (int i=0; i<quantity; i++) {
-			Person person = population.getFactory().createPerson(createId(source, sink, i, TransportMode.pt));
-			Plan plan = population.getFactory().createPlan();
-			Coord homeLocation = shoot(source);
-			Coord workLocation = shoot(sink);
+			Person person = populationFactory.createPerson(createId(origin, destination, i, TransportMode.pt));
+			Plan plan = populationFactory.createPlan();
+			Coord homeLocation = shoot(origin);
+			Coord workLocation = shoot(destination);
 			plan.addActivity(createHome(homeLocation));
 			plan.addLeg(createPtLeg());
 			plan.addActivity(createWork(workLocation));
 			plan.addLeg(createPtLeg());
 			plan.addActivity(createHome(homeLocation));
 			person.addPlan(plan);
-			population.addPerson(person);
+			sink.process(person);
 		}
 	}
 
 	private Leg createDriveLeg() {
-		Leg leg = population.getFactory().createLeg(TransportMode.car);
+		Leg leg = populationFactory.createLeg(TransportMode.car);
 		return leg;
 	}
 
 	private Leg createPtLeg() {
-		Leg leg = population.getFactory().createLeg(TransportMode.pt);
+		Leg leg = populationFactory.createLeg(TransportMode.pt);
 		return leg;
 	}
 
 	private Activity createWork(Coord workLocation) {
-		Activity activity = population.getFactory().createActivityFromCoord("work", workLocation);
+		Activity activity = populationFactory.createActivityFromCoord("work", workLocation);
 		activity.setEndTime(calculateRandomEndTime(17*60*60));
 		return activity;
 	}
 
 	private Activity createHome(Coord homeLocation) {
-		Activity activity = population.getFactory().createActivityFromCoord("home", homeLocation);
+		Activity activity = populationFactory.createActivityFromCoord("home", homeLocation);
 		activity.setEndTime(calculateRandomEndTime(8*60*60));
 		return activity;
 	}
@@ -225,9 +206,9 @@ public class PopulationGenerator implements Runnable {
 
 	private Coord shoot(Zone source) {
 		if (source.geometry != null) {
-			return DhdnGk4Towgs84.transform(doShoot(source));
+			return doShoot(source);
 		} else {
-			return DhdnGk4Towgs84.transform(source.coord);
+			return source.coord;
 		}
 	}
 
@@ -242,7 +223,7 @@ public class PopulationGenerator implements Runnable {
 		return new IdImpl(transportMode + "_" + source.id + "_" + sink.id + "_" + i);
 	}
 
-	public void addZone(int gemeindeschluessel, Geometry defaultGeometry) {
+	public void addShape(int gemeindeschluessel, Geometry defaultGeometry) {
 		Zone zone = zones.get(gemeindeschluessel);
 		if (zone == null) {
 			log.error("No such zone. " + gemeindeschluessel);
@@ -287,8 +268,25 @@ public class PopulationGenerator implements Runnable {
 		}
 	}
 
-	public void setFilename(String filename2) {
-		this.filename = filename2;
+	void setPopulationScaleFactor(double populationScaleFactor) {
+		this.populationScaleFactor = populationScaleFactor;
+	}
+
+	Random getRandom() {
+		return random;
+	}
+
+	void setRandom(Random random) {
+		this.random = random;
+	}
+
+	public PopulationGenerator() {
+		Scenario scenario = new ScenarioImpl();
+		populationFactory = scenario.getPopulation().getFactory();
+	}
+
+	void setSink(PersonSink sink) {
+		this.sink = sink;
 	}
 
 }

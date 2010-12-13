@@ -115,7 +115,7 @@ public class City2000WMobsimFactory implements MobsimFactory {
 			OTFHostConnectionManager hostConnectionManager = new OTFHostConnectionManager("Wurst", server);
 			OTFVisClient client = new OTFVisClient();
 			client.setHostConnectionManager(hostConnectionManager);
-			client.setSwing(true);
+			client.setSwing(false);
 			client.run();
 			VisNetwork visNetwork = netFeature.getVisNetwork();
 			OTFVisFeature otfvisFeature = new OTFVisFeature(visNetwork, server.getSnapshotReceiver());

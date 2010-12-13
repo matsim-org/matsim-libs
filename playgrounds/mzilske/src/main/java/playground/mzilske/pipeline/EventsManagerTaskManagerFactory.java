@@ -8,7 +8,7 @@ import org.matsim.core.events.parallelEventsHandler.ParallelEventsManagerImpl;
 public class EventsManagerTaskManagerFactory extends TaskManagerFactory {
 
 	@Override
-	protected TaskManager createTaskManagerImpl(TaskConfiguration taskConfiguration) {
+	public TaskManager createTaskManagerImpl(TaskConfiguration taskConfiguration) {
 		final String PARALLEL_EVENT_HANDLING = "parallelEventHandling";
 		final String NUMBER_OF_THREADS = "numberOfThreads";
 		final String ESTIMATED_NUMBER_OF_EVENTS = "estimatedNumberOfEvents";

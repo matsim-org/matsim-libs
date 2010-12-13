@@ -21,33 +21,23 @@
 package org.matsim.vis.otfvis.gui;
 
 import java.awt.BasicStroke;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
-import java.awt.RenderingHints;
 import java.awt.Toolkit;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.Line2D;
-import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.Point2D.Double;
 
 import javax.swing.JComponent;
 
-import org.apache.log4j.Logger;
-import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.data.OTFClientQuad;
-import org.matsim.vis.otfvis.data.OTFDataQuadReceiver;
 import org.matsim.vis.otfvis.data.OTFDataReceiver;
-import org.matsim.vis.otfvis.data.OTFDataSimpleAgentReceiver;
 import org.matsim.vis.otfvis.interfaces.OTFQueryHandler;
-import org.matsim.vis.otfvis.opengl.gui.ValueColorizer;
-import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 
 /**
  * @author david
@@ -180,17 +170,7 @@ public class OTFSwingDrawer extends JComponent {
 	public void paint(Graphics g) {
 		Graphics2D g2 = (Graphics2D) g;
 		parentDrawer.mouseMan.drawElements(g2);
-
-		boolean useAntiAliasing = false;
-
-		if (useAntiAliasing ) {
-			g2.addRenderingHints(new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON));
-		} else {
-			g2.addRenderingHints(new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF));
-		}
-
 		OTFSwingDrawer.g2d = g2;
-
 		g2.setStroke(new BasicStroke(Math.round(0.05 * linkWidth)));
 		g2.transform(getBoxTransform());
 		SceneGraph sceneGraph = quad.getSceneGraph(hostControlBar.getOTFHostControl().getSimTime(), null, parentDrawer);
@@ -203,108 +183,6 @@ public class OTFSwingDrawer extends JComponent {
 	public OTFClientQuad getQuad() {
 		return quad;
 	}
-
-	/***
-	 * Drawer class for drawing simple quads
-	 */
-	public static class SimpleQuadDrawer extends OTFSwingDrawable implements OTFDataQuadReceiver{
-		protected final float[] line = new float[5];
-		protected String id = "noId";
-		
-		@Override
-		public void setQuad(float startX, float startY, float endX, float endY) {
-			setQuad(startX, startY,endX, endY, 1);
-		}
-
-		@Override
-		public void setQuad(float startX, float startY, float endX, float endY, int nrLanes) {
-			this.line[0] = startX;
-			this.line[1] = startY;
-			this.line[2] = endX;
-			this.line[3] = endY;
-			this.line[4] = nrLanes;
-		}
-
-		@Override
-		public void setColor(float coloridx) {
-			
-		}
-
-		@Override
-		public void onDraw(Graphics2D display) {
-			display.setColor(new Color(OTFClientControl.getInstance().getOTFVisConfig().getNetworkColor().getRGB()));
-			display.setStroke(new BasicStroke(this.line[4] * OTFClientControl.getInstance().getOTFVisConfig().getLinkWidth(), BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-			display.drawLine(Math.round(this.line[0]), Math.round(this.line[1]), Math.round(this.line[2]), Math.round(this.line[3]));
-			display.setStroke(new BasicStroke(5));
-
-
-			// Show LinkIds
-			if (OTFClientControl.getInstance().getOTFVisConfig().drawLinkIds()){
-			    float idSize = 4*OTFClientControl.getInstance().getOTFVisConfig().getLinkWidth();
-			    int fontSize = (int)idSize;
-			    float middleX = (float)(0.5*this.line[0] + (0.5)*this.line[2]);
-			    float middleY = (float)(0.5*this.line[1] + (0.5)*this.line[3]);
-				Line2D line = new Line2D.Float(middleX, middleY, (middleX + idSize),(middleY + idSize));
-				display.setColor(Color.blue);
-				display.draw(line);
-				java.awt.Font font_old = display.getFont();
-				AffineTransform tx = new AffineTransform(1,0,0,-1,0,0);
-				display.transform(tx);
-				java.awt.Font font = new java.awt.Font("Arial Unicode MS", java.awt.Font.PLAIN, fontSize);
-				display.setFont(font);
-				display.drawString(this.id,(float)(middleX + 1.25*idSize),-(float)(middleY + 0.75*idSize));
-				try {
-					tx.invert();
-				} catch (NoninvertibleTransformException e) {
-					e.printStackTrace();
-				}
-				display.transform(tx);
-				display.setFont(font_old);
-			}
-
-		}
-
-		@Override
-		public void setId(char[] idBuffer) {
-			this.id = String.valueOf(idBuffer);
-		}
-	}
-
-
-	/***
-	 * Drawer class for drawing agents
-	 */
-	public static class AgentDrawer extends OTFSwingDrawable implements OTFDataSimpleAgentReceiver{
-		//Anything above 50km/h should be yellow!
-		private final static ValueColorizer colorizer = new ValueColorizer(
-				new double[] { 0.0, 0.3, 0.5}, new Color[] {
-						Color.RED, Color.YELLOW, Color.GREEN});
-
-		protected char[] id;
-		protected float startX, startY, colorValueBetweenZeroAndOne;
-		protected int state;
-
-		@Override
-		public void setAgent( AgentSnapshotInfo agInfo ) {
-			this.id = agInfo.getId().toString().toCharArray();
-			this.startX = (float) agInfo.getEasting() ;
-			this.startY = (float) agInfo.getNorthing() ;
-			this.colorValueBetweenZeroAndOne = (float) agInfo.getColorValueBetweenZeroAndOne() ;
-			this.state = agInfo.getAgentState().ordinal() ;
-		}
-
-		@Override
-		public void onDraw(Graphics2D display) {
-			Color color = colorizer.getColor(this.colorValueBetweenZeroAndOne);
-			Point2D.Float pos = new Point2D.Float(startX, startY);
-			float agentSize = OTFClientControl.getInstance().getOTFVisConfig().getAgentSize();
-			double offset = - 0.5 * agentSize;
-			display.setColor(color);
-			display.fillOval((int) Math.round(pos.x + offset), (int)Math.round(pos.y + offset), Math.round(agentSize), Math.round(agentSize));
-		}
-
-	}
-
 
 	public void clearCache() {
 		if(quad != null) quad.clearCache();

@@ -65,7 +65,7 @@ public class RunChessboard implements StartupListener, ScoringListener, Replanni
 
 	private ScenarioImpl scenario;
 	
-	private static final String NETWORK_FILENAME = "../playgrounds/mzilske/output/grid.xml";
+	private static final String NETWORK_FILENAME = "output/grid.xml";
 	
 	
 	/**

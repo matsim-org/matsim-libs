@@ -37,9 +37,10 @@ import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.vis.otfvis.opengl.gui.OTFTimeLine;
 import org.matsim.vis.otfvis.opengl.gui.SettingsSaver;
+import org.matsim.vis.otfvis.opengl.layer.AgentPointDrawer;
 import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer;
-import org.matsim.vis.otfvis.opengl.layer.SimpleStaticNetLayer;
-import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer.AgentPointDrawer;
+import org.matsim.vis.otfvis.opengl.layer.OGLSimpleQuadDrawer;
+import org.matsim.vis.otfvis.opengl.layer.OGLSimpleStaticNetLayer;
 
 /**
  * This file starts OTFVis using a .mvi file.
@@ -68,12 +69,12 @@ public class OTFClientFile extends OTFClient {
 		this.connect.connectWriterToReader(OTFLinkLanesAgentsNoParkingHandler.Writer.class, OTFLinkLanesAgentsNoParkingHandler.class);
 		this.connect.connectWriterToReader(OTFAgentsListHandler.Writer.class,  OTFAgentsListHandler.class);
 		
-		this.connect.connectReaderToReceiver(OTFLinkLanesAgentsNoParkingHandler.class, SimpleStaticNetLayer.SimpleQuadDrawer.class);
-		this.connect.connectReaderToReceiver(OTFLinkLanesAgentsNoParkingHandler.class, OGLAgentPointLayer.AgentPointDrawer.class);
-		this.connect.connectReaderToReceiver(OTFAgentsListHandler.class,  OGLAgentPointLayer.AgentPointDrawer.class);
+		this.connect.connectReaderToReceiver(OTFLinkLanesAgentsNoParkingHandler.class, OGLSimpleQuadDrawer.class);
+		this.connect.connectReaderToReceiver(OTFLinkLanesAgentsNoParkingHandler.class, AgentPointDrawer.class);
+		this.connect.connectReaderToReceiver(OTFAgentsListHandler.class,  AgentPointDrawer.class);
 		
 		
-		this.connect.connectReceiverToLayer(SimpleStaticNetLayer.SimpleQuadDrawer.class, SimpleStaticNetLayer.class);		
+		this.connect.connectReceiverToLayer(OGLSimpleQuadDrawer.class, OGLSimpleStaticNetLayer.class);		
 		this.connect.connectReceiverToLayer(AgentPointDrawer.class, OGLAgentPointLayer.class);
 
 		/*
@@ -91,12 +92,12 @@ public class OTFClientFile extends OTFClient {
 		// those lines are from my point of view not really needed dg dez 09
 		// yes, they are. michaz mar 10 :-(
 		connectR.remove(OTFLinkAgentsHandler.class);
-		connectR.connectReaderToReceiver(OTFLinkAgentsHandler.class,  SimpleStaticNetLayer.SimpleQuadDrawer.class);
-		connectR.connectReaderToReceiver(OTFLinkLanesAgentsNoParkingHandler.class, SimpleStaticNetLayer.SimpleQuadDrawer.class);
-		connectR.connectReceiverToLayer(SimpleStaticNetLayer.SimpleQuadDrawer.class, SimpleStaticNetLayer.class);
+		connectR.connectReaderToReceiver(OTFLinkAgentsHandler.class,  OGLSimpleQuadDrawer.class);
+		connectR.connectReaderToReceiver(OTFLinkLanesAgentsNoParkingHandler.class, OGLSimpleQuadDrawer.class);
+		connectR.connectReceiverToLayer(OGLSimpleQuadDrawer.class, OGLSimpleStaticNetLayer.class);
 		connectR.connectReaderToReceiver(OTFLinkAgentsHandler.class,  AgentPointDrawer.class);
 		connectR.connectReaderToReceiver(OTFLinkLanesAgentsNoParkingHandler.class,  AgentPointDrawer.class);
-		connectR.connectReceiverToLayer(OGLAgentPointLayer.AgentPointDrawer.class, OGLAgentPointLayer.class);
+		connectR.connectReceiverToLayer(AgentPointDrawer.class, OGLAgentPointLayer.class);
 		//end dg dez 09
 		OTFClientQuad clientQ2 = createNewView(null, connectR, this.hostControlBar.getOTFHostConnectionManager());
 		return clientQ2;

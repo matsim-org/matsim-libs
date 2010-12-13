@@ -38,7 +38,7 @@ import org.matsim.vis.otfvis.data.OTFServerQuad2;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.interfaces.OTFQuery;
 import org.matsim.vis.otfvis.interfaces.OTFQueryResult;
-import org.matsim.vis.otfvis.opengl.layer.SimpleStaticNetLayer;
+import org.matsim.vis.otfvis.opengl.layer.OGLSimpleQuadDrawer;
 import org.matsim.vis.snapshots.writers.VisLink;
 
 /**
@@ -130,12 +130,12 @@ public class QueryLinkId extends AbstractQuery {
 						if (minDist - dist > epsilon) result.linkIds.clear();
 
 						minDist = dist;
-						Point2D.Float anchor = SimpleStaticNetLayer.SimpleQuadDrawer.calcOrtho(fromX, fromY, middleX, middleY, cellWidth/2.);			
+						Point2D.Float anchor = OGLSimpleQuadDrawer.calcOrtho(fromX, fromY, middleX, middleY, cellWidth/2.);			
 						result.linkIds.put(new CoordImpl(middleX + anchor.x, middleY + anchor.y), link.getId().toString());
 					}
 
 				} else {
-					Point2D.Float anchor = SimpleStaticNetLayer.SimpleQuadDrawer.calcOrtho(fromX, fromY, middleX, middleY, cellWidth/2.);			
+					Point2D.Float anchor = OGLSimpleQuadDrawer.calcOrtho(fromX, fromY, middleX, middleY, cellWidth/2.);			
 					result.linkIds.put(new CoordImpl(middleX + anchor.x, middleY + anchor.y), link.getId().toString());
 				}
 			}

@@ -49,7 +49,6 @@ class LayerDrawingOrderComparator implements Comparator<SceneLayer>, Serializabl
 
 	public int compare(SceneLayer o1, SceneLayer o2) {
 		int diff = (int)Math.signum(o1.getDrawOrder() - o2.getDrawOrder());
-
 		return diff;
 	}
 
@@ -84,13 +83,7 @@ public class SceneGraph {
 		this.rect = rect;
 		this.drawer = drawer;
 		this.time = time;
-
-		// default layer, might be overridden from connect!
-		layers.put(Object.class, new SimpleSceneLayer());
-
 		connect.fillLayerMap(layers);
-
-		// do initialising action if necessary
 		for (SceneLayer layer : layers.values()) {
 			layer.init(this, time == -1 ? true : false);
 			drawingLayers.add(layer);
@@ -112,16 +105,11 @@ public class SceneGraph {
 
 	public OTFDataReceiver newInstance(Class<? extends OTFDataReceiver> clazz) throws InstantiationException, IllegalAccessException {
 		SceneLayer layer = layers.get(clazz);
-		if (layer == null) {
-		  layer = layers.get(Object.class); //DS must exist: default handling
-		}
 		return layer.newInstance(clazz);
 	}
 
 	public void addItem(OTFDataReceiver item) {
 		SceneLayer layer = layers.get(item.getClass());
-		if (layer == null)layer = layers.get(Object.class); //DS must exist: default handling
-
 		layer.addItem(item);
 	}
 
@@ -133,12 +121,10 @@ public class SceneGraph {
 
 	public SceneLayer getLayer(Class clazz) {
 		SceneLayer layer = layers.get(clazz);
-		if (layer == null)layer = layers.get(Object.class); //DS must exist: default handling
 		return layer;
 	}
 
 	public void draw() {
-		// do initialising action if necessary
 		for (SceneLayer layer : drawingLayers) layer.draw();
 	}
 

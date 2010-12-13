@@ -23,8 +23,8 @@ package org.matsim.vis.otfvis.opengl.layer;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.vis.otfvis.caching.DefaultSceneLayer;
 import org.matsim.vis.otfvis.caching.SceneGraph;
+import org.matsim.vis.otfvis.caching.SceneLayer;
 import org.matsim.vis.otfvis.data.OTFClientQuad;
 import org.matsim.vis.otfvis.data.OTFDataReceiver;
 import org.matsim.vis.otfvis.opengl.drawer.AbstractBackgroundDrawer;
@@ -37,7 +37,7 @@ import org.matsim.vis.otfvis.opengl.drawer.AbstractBackgroundDrawer;
  * @author dstrippgen
  *
  */
-public class OGLSimpleBackgroundLayer extends DefaultSceneLayer {
+public class OGLSimpleBackgroundLayer implements SceneLayer {
 
 	private double offsetEast;
 	private double offsetNorth;
@@ -73,5 +73,20 @@ public class OGLSimpleBackgroundLayer extends DefaultSceneLayer {
 
 	public int getDrawOrder() {
 		return 0;
+	}
+
+	@Override
+	public void finish() {
+	}
+
+	@Override
+	public OTFDataReceiver newInstance(Class<? extends OTFDataReceiver> clazz) {
+		try {
+			return clazz.newInstance();
+		} catch (InstantiationException e) {
+			throw new RuntimeException(e);
+		} catch (IllegalAccessException e) {
+			throw new RuntimeException(e);
+		}
 	}
 }

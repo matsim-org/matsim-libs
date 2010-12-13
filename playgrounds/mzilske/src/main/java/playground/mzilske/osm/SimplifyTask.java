@@ -34,6 +34,8 @@ public class SimplifyTask implements SinkSource, EntityProcessor {
 
 	private int count = 0; // just for debug stats
 
+	private IdTracker availableNodes;
+
 	/**
 	 * Creates a new instance.
 	 * 
@@ -43,6 +45,7 @@ public class SimplifyTask implements SinkSource, EntityProcessor {
 	public SimplifyTask(IdTrackerType idTrackerType) {
 		requiredNodes = IdTrackerFactory.createInstance(idTrackerType);
 		visitedNodes = IdTrackerFactory.createInstance(idTrackerType);
+		availableNodes = IdTrackerFactory.createInstance(idTrackerType);
 		allNodes = new SimpleObjectStore<NodeContainer>(
 				new SingleClassObjectSerializationFactory(NodeContainer.class),
 				"afnd", true);
@@ -75,6 +78,7 @@ public class SimplifyTask implements SinkSource, EntityProcessor {
 	public void process(NodeContainer container) {
 
 		// stuff all nodes into a file
+		availableNodes.set(container.getEntity().getId());
 		allNodes.add(container);
 
 		// debug
@@ -170,7 +174,7 @@ public class SimplifyTask implements SinkSource, EntityProcessor {
 			ListIterator<WayNode> i = way.getWayNodes().listIterator();
 			while (i.hasNext()) {
 				WayNode wayNode = i.next();
-				if (!requiredNodes.get(wayNode.getNodeId())) {
+				if (!requiredNodes.get(wayNode.getNodeId()) || !availableNodes.get(wayNode.getNodeId())) {
 					i.remove();
 				}
 			}

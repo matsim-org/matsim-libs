@@ -7,7 +7,7 @@ import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
 public class TravelCostCalculatorTaskManagerFactory extends TaskManagerFactory {
 
 	@Override
-	protected TaskManager createTaskManagerImpl(TaskConfiguration taskConfiguration) {
+	public TaskManager createTaskManagerImpl(TaskConfiguration taskConfiguration) {
 		Config config = taskConfiguration.getConfig();
 		TravelCostCalculatorFactory factory = new TravelCostCalculatorFactoryImpl();
 		TravelCostCalculatorTask task = new TravelCostCalculatorTask(factory, config.charyparNagelScoring());

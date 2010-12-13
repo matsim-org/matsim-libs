@@ -7,7 +7,7 @@ import playground.mzilske.deteval.VehicleWatchingEventHandler;
 public class VehicleWatcherFactory extends TaskManagerFactory {
 
 	@Override
-	protected TaskManager createTaskManagerImpl(TaskConfiguration taskConfiguration) {
+	public TaskManager createTaskManagerImpl(TaskConfiguration taskConfiguration) {
 		EventHandler eventHandler = new VehicleWatchingEventHandler();
 		return new EventHandlerTaskManager(eventHandler);
 	}

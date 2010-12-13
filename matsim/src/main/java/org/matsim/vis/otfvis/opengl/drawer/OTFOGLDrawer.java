@@ -114,15 +114,17 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider {
 	private final static Logger log = Logger.getLogger(OTFOGLDrawer.class);
 
 	private static int linkTexWidth = 0;
-	private int netDisplList = 0;
+	
 	private GL gl = null;
+	
 	private VisGUIMouseHandler mouseMan = null;
+	
 	private final OTFClientQuad clientQ;
+	
 	private String lastTime = "";
+	
 	private int lastShot = -1;
 
-	//Handle these separately, as the agents needs textures set, which should only be done once
-	private final List<OTFGLDrawable> netItems = new ArrayList<OTFGLDrawable>();
 	private final List<OTFGLDrawable> overlayItems = new ArrayList<OTFGLDrawable>();
 
 	private static List<OTFGLDrawable> newItems = new ArrayList<OTFGLDrawable>();
@@ -329,17 +331,6 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider {
 		return this.mouseMan;
 	}
 
-	private void drawNetList(){
-		// make quad filled to hit every pixel/texel
-		this.gl.glNewList(this.netDisplList, GL.GL_COMPILE);
-		log.info("DRAWING NET ONCE: objects count: " + this.netItems.size() );
-		OTFGLDrawableImpl.setGl(this.gl);
-		for (OTFGLDrawable item : this.netItems) {
-			item.draw();
-		}
-		this.gl.glEndList();
-	}
-
 	private void displayLinkIds(Map<Coord, String> linkIds) {
 		String testText = "0000000";
 		Rectangle2D test = InfoText.getBoundsOf(testText);
@@ -459,19 +450,14 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider {
 	@Override
 	public void init(GLAutoDrawable drawable) {
 		if(motherContext == null) motherContext = drawable.getContext();
-
 		this.gl = drawable.getGL();
 		this.gl.setSwapInterval(0);
 		float[] components = OTFClientControl.getInstance().getOTFVisConfig().getBackgroundColor().getColorComponents(new float[4]);
 		this.gl.glClearColor(components[0], components[1], components[2], components[3]);
 		this.gl.glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		this.mouseMan.init(this.gl);
-
 		AgentDrawer.agentpng = createTexture(MatsimResource.getAsInputStream("icon18.png"));
-
-		this.netDisplList = this.gl.glGenLists(1);
-
-		drawNetList();
+		OTFGLDrawableImpl.setGl(this.gl);
 	}
 
 	@Override

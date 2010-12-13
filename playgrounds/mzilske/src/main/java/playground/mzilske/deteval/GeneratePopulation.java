@@ -57,11 +57,11 @@ public class GeneratePopulation {
 
 	private static final String HOUSEHOLDS_FILE = "../detailedEval/pop/befragte-personen/households.xml";
 
-	private static final String CLONED_PLANS = "../detailedEval/pop/140k-synthetische-personen/plans.xml";
+	private static final String CLONED_PLANS = "../detailedEval/pop/14k-synthetische-personen/plans.xml.gz";
 
-	private static final String CLONED_HOUSEHOLDS_FILE = "../detailedEval/pop/140k-synthetische-personen/households.xml";
+	private static final String CLONED_HOUSEHOLDS_FILE = "../detailedEval/pop/14k-synthetische-personen/households.xml.gz";
 
-	private static final Integer NUMBER_OF_SIMULATED_PEOPLE = 140000;
+	private static final Integer NUMBER_OF_SIMULATED_PEOPLE = 14000;
 
 	private Random random = new Random();
 

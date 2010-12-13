@@ -58,7 +58,15 @@ public class NetworkSink implements SinkSource {
 			WayNode fromNode = wayNodes.get(0);
 			for (int i = 1, n = wayNodes.size(); i < n; i++) {
 				WayNode toNode = wayNodes.get(i);
-				double length = CoordUtils.calcDistance(network.getNodes().get(new IdImpl(fromNode.getNodeId())).getCoord(), network.getNodes().get(new IdImpl(toNode.getNodeId())).getCoord());
+				org.matsim.api.core.v01.network.Node fromMatsimNode = network.getNodes().get(new IdImpl(fromNode.getNodeId()));
+				if (fromMatsimNode == null) {
+					throw new RuntimeException("Missing node: "+fromNode.getNodeId());
+				}
+				org.matsim.api.core.v01.network.Node toMatsimNode = network.getNodes().get(new IdImpl(toNode.getNodeId()));
+				if (toMatsimNode == null) {
+					throw new RuntimeException("Missing node: "+toNode.getNodeId());
+				}
+				double length = CoordUtils.calcDistance(fromMatsimNode.getCoord(), toMatsimNode.getCoord());
 				createLink((NetworkImpl) this.network, entry, fromNode, toNode, length);
 				fromNode = toNode;
 			}

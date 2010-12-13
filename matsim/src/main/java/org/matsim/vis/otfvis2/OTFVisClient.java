@@ -7,11 +7,13 @@ import java.util.List;
 
 import org.matsim.vis.otfvis.OTFClient;
 import org.matsim.vis.otfvis.OTFClientControl;
+import org.matsim.vis.otfvis.caching.SimpleSceneLayer;
 import org.matsim.vis.otfvis.data.OTFClientQuad;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
+import org.matsim.vis.otfvis.gui.SwingSimpleQuadDrawer;
+import org.matsim.vis.otfvis.gui.SwingAgentDrawer;
 import org.matsim.vis.otfvis.gui.OTFQueryControl;
 import org.matsim.vis.otfvis.gui.OTFQueryControlToolBar;
-import org.matsim.vis.otfvis.gui.OTFSwingDrawer;
 import org.matsim.vis.otfvis.gui.OTFSwingDrawerContainer;
 import org.matsim.vis.otfvis.gui.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.gui.QueryEntry;
@@ -21,9 +23,10 @@ import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.vis.otfvis.opengl.gui.OTFTimeLine;
 import org.matsim.vis.otfvis.opengl.gui.SettingsSaver;
+import org.matsim.vis.otfvis.opengl.layer.AgentPointDrawer;
 import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer;
-import org.matsim.vis.otfvis.opengl.layer.SimpleStaticNetLayer;
-import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer.AgentPointDrawer;
+import org.matsim.vis.otfvis.opengl.layer.OGLSimpleQuadDrawer;
+import org.matsim.vis.otfvis.opengl.layer.OGLSimpleStaticNetLayer;
 
 public final class OTFVisClient extends OTFClient {
 
@@ -39,12 +42,14 @@ public final class OTFVisClient extends OTFClient {
 		this.connect.connectWriterToReader(LinkHandler.Writer.class, LinkHandler.class);
 		this.connect.connectWriterToReader(OTFAgentsListHandler.Writer.class, OTFAgentsListHandler.class);
 		if (swing) {
-			this.connect.connectReaderToReceiver(LinkHandler.class, OTFSwingDrawer.SimpleQuadDrawer.class);
-			this.connect.connectReaderToReceiver(OTFAgentsListHandler.class, OTFSwingDrawer.AgentDrawer.class);
+			this.connect.connectReaderToReceiver(LinkHandler.class, SwingSimpleQuadDrawer.class);
+			this.connect.connectReaderToReceiver(OTFAgentsListHandler.class, SwingAgentDrawer.class);
+			this.connect.connectReceiverToLayer(SwingSimpleQuadDrawer.class, SimpleSceneLayer.class);
+			this.connect.connectReceiverToLayer(SwingAgentDrawer.class, SimpleSceneLayer.class);
 		} else {
-			this.connect.connectReaderToReceiver(OTFAgentsListHandler.class, OGLAgentPointLayer.AgentPointDrawer.class);
-			this.connect.connectReaderToReceiver(LinkHandler.class,  SimpleStaticNetLayer.SimpleQuadDrawer.class);
-			this.connect.connectReceiverToLayer(SimpleStaticNetLayer.SimpleQuadDrawer.class, SimpleStaticNetLayer.class);		
+			this.connect.connectReaderToReceiver(OTFAgentsListHandler.class, AgentPointDrawer.class);
+			this.connect.connectReaderToReceiver(LinkHandler.class,  OGLSimpleQuadDrawer.class);
+			this.connect.connectReceiverToLayer(OGLSimpleQuadDrawer.class, OGLSimpleStaticNetLayer.class);		
 			this.connect.connectReceiverToLayer(AgentPointDrawer.class, OGLAgentPointLayer.class);
 		}
 	}

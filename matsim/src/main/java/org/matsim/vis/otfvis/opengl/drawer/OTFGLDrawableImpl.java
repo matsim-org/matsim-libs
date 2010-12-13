@@ -62,7 +62,7 @@ public abstract class OTFGLDrawableImpl implements OTFGLDrawable, OTFDataReceive
 	protected static void setGl(GL gl) {
 		OTFGLDrawableImpl.gl = gl;
 	}
-	protected static GL getGl() {
+	public static GL getGl() {
 		return gl;
 	}
 

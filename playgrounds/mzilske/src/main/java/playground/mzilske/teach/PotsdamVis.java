@@ -11,6 +11,6 @@ public class PotsdamVis implements Runnable {
 	
 	@Override
 	public void run() {
-		OTFVis.main(new String[]{"inputs/brandenburg/config-live.xml"});
+		OTFVis.main(new String[]{"mzilske/inputs/brandenburg/config-live.xml"});
 	}
 }

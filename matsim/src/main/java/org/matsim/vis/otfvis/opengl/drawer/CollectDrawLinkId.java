@@ -32,7 +32,7 @@ import org.matsim.vis.otfvis.data.OTFClientQuad;
 import org.matsim.vis.otfvis.data.OTFDataQuadReceiver;
 import org.matsim.vis.otfvis.handler.OTFDefaultLinkHandler;
 import org.matsim.vis.otfvis.interfaces.OTFDataReader;
-import org.matsim.vis.otfvis.opengl.layer.SimpleStaticNetLayer.SimpleQuadDrawer;
+import org.matsim.vis.otfvis.opengl.layer.OGLSimpleQuadDrawer;
 
 /**
  * CollectDrawLinkId is a specialized class for collecting and drawing the linkIds, if that
@@ -95,8 +95,8 @@ public class CollectDrawLinkId {
     public void execute(double x, double y, OTFDataReader reader)  {
       if(reader instanceof OTFDefaultLinkHandler) {
         OTFDataQuadReceiver quadReceiver = ((OTFDefaultLinkHandler) reader).getQuadReceiver();
-        if (quadReceiver != null && quadReceiver instanceof SimpleQuadDrawer){
-          SimpleQuadDrawer drawer = (SimpleQuadDrawer) quadReceiver;
+        if (quadReceiver != null && quadReceiver instanceof OGLSimpleQuadDrawer){
+          OGLSimpleQuadDrawer drawer = (OGLSimpleQuadDrawer) quadReceiver;
             drawer.prepareLinkId(linkIdMap);
         }
         else {

@@ -6,6 +6,11 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.geotools.feature.Feature;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.config.Config;
+import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -13,6 +18,9 @@ import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
+
+import playground.mzilske.pipeline.PopulationWriterTask;
+import playground.mzilske.pipeline.RoutePersonTask;
 
 
 
@@ -32,41 +40,43 @@ public class PVMatrixReader {
 
 	private PopulationGenerator populationBuilder = new PopulationGenerator();
 
-	private static final String FILENAME = "../../prognose_2025/demand/population_pv_10pct.xml";
+	private static final String FILENAME = "../../prognose_2025/demand/population_pv_01pct.xml";
 
-	private CoordinateTransformation wgs84ToDhdnGk4 = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.DHDN_GK4); 
+	private static final String NETWORK_FILENAME = "/Users/michaelzilske/osm/motorway_germany.xml";
+
+	private CoordinateTransformation wgs84ToDhdnGk4 = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.DHDN_GK4);
+
+	private Network network; 
 
 	public void run() {
 		readNodes();
-		readShape();
+		// readShapes();
 		readMatrix();
-		int notFound = 0;
-		for (Integer cellid : seenCellsInMatrix) {
-			if (! seenCellsInShape.contains(cellid)) {
-				++notFound;
-			}
-		}
-		System.out.println("Not found: " + notFound + " of " + seenCellsInMatrix.size());
-		int notRequired = 0;
-		for (Integer cellid : seenCellsInShape) {
-			if (! seenCellsInMatrix.contains(cellid)) {
-				++notRequired;
-			}
-		}
-		System.out.println("Not required: " + notRequired + " of " + seenCellsInShape.size());
-		System.out.println("Creating " + populationBuilder.countPersons() + " people.");
-		populationBuilder.setFilename(FILENAME);
+		readNetwork();
+		PopulationWriterTask populationWriter = new PopulationWriterTask(FILENAME);
+		populationWriter.setNetwork(network);
+		Config config = new Config();
+		config.addCoreModules();
+		RoutePersonTask router = new RoutePersonTask(config, network);
+		populationBuilder.setPopulationScaleFactor(0.01);
+		populationBuilder.setSink(router);
+		router.setSink(populationWriter);
 		populationBuilder.run();
-
 	}
 
-	private void readShape() {
+	private void readNetwork() {
+		Scenario scenario = new ScenarioImpl();
+		new MatsimNetworkReader(scenario).readFile(NETWORK_FILENAME);
+		network = scenario.getNetwork();
+	}
+
+	private void readShapes() {
 		try {
 			Collection<Feature> landkreise = new ShapeFileReader().readFileAndInitialize(LANDKREISE);
 			for (Feature landkreis : landkreise) {
 				Integer gemeindeschluessel = Integer.parseInt((String) landkreis.getAttribute("gemeindesc"));
 				seenCellsInShape.add(gemeindeschluessel);
-				populationBuilder.addZone(gemeindeschluessel, landkreis.getDefaultGeometry());
+				populationBuilder.addShape(gemeindeschluessel, landkreis.getDefaultGeometry());
 			}
 		} catch (IOException e) {
 			throw new RuntimeException(e);

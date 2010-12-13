@@ -9,7 +9,7 @@ import playground.mzilske.pipeline.TaskManagerFactory;
 public class LogOutputEventHandlerTaskManagerFactory extends TaskManagerFactory {
 
 	@Override
-	protected TaskManager createTaskManagerImpl(TaskConfiguration taskConfiguration) {
+	public TaskManager createTaskManagerImpl(TaskConfiguration taskConfiguration) {
 		return new EventHandlerTaskManager(new LogOutputEventHandler());
 	}
 
