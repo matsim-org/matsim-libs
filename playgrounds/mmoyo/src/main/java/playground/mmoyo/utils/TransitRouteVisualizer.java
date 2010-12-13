@@ -1,10 +1,11 @@
 package playground.mmoyo.utils;
 
+import java.util.List;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -14,53 +15,61 @@ import org.matsim.run.OTFVis;
 public class TransitRouteVisualizer {
 	
 	public TransitRouteVisualizer(String configfile,String strTrRouteId){
-		ScenarioImpl scenario = new DataLoader ().loadScenarioWithTrSchedule(configfile);
-		TransitRoute transitRoute = new DataLoader().getTransitRoute(strTrRouteId,scenario.getTransitSchedule());
+		DataLoader dataLoader = new DataLoader();
+		ScenarioImpl scenario = dataLoader.loadScenarioWithTrSchedule(configfile);
+		TransitRoute transitRoute = dataLoader.getTransitRoute(strTrRouteId, scenario.getTransitSchedule());
 		if (transitRoute==null){
 			throw new java.lang.NullPointerException("transit route does not exist: " + strTrRouteId);
 		}
 		
-		//create net
-		ScenarioImpl newScenario = new ScenarioImpl();
-		NetworkImpl newNetwork = newScenario.getNetwork();
+		//create route net
+		NetworkImpl routeNet = new ScenarioImpl().getNetwork();
 
-		//<- add initial link
-		for(Id linkId: transitRoute.getRoute().getLinkIds()){		  
+		//add also start and end links that normally are not include in transitRoute.getRoute().getLinkIds()!! 
+		List<Id> linkList = transitRoute.getRoute().getLinkIds();
+		linkList.add(0, transitRoute.getRoute().getStartLinkId());
+		linkList.add(transitRoute.getRoute().getEndLinkId());
+		
+		StringBuffer sBuff = null;
+		String p1 = "(";
+		String p2 = ")";
+		String r1 = "--";
+		String r2 = "-->(";
+		
+		for(Id linkId: linkList){		  
 			Link link = scenario.getNetwork().getLinks().get(linkId);
-			System.out.println(link.getId());		
 			
+			if (sBuff==null){
+				sBuff = new StringBuffer(p1 + link.getFromNode().getId() + p2);
+			}
+			sBuff.append(r1 + link.getId() + r2 + link.getToNode().getId() + p2);
+
 			Node fromNode = null;
-			if (!newNetwork.getNodes().containsKey(link.getFromNode().getId())){
-				fromNode = newNetwork.createAndAddNode(link.getFromNode().getId(), link.getFromNode().getCoord());	
+			if (!routeNet.getNodes().containsKey(link.getFromNode().getId())){
+				fromNode = routeNet.createAndAddNode(link.getFromNode().getId(), link.getFromNode().getCoord());	
 			}else{
-				fromNode = newNetwork.getNodes().get(link.getFromNode().getId());
+				fromNode = routeNet.getNodes().get(link.getFromNode().getId());
 			}
 
 			Node toNode= null;
-			if (!newNetwork.getNodes().containsKey(link.getToNode().getId())){
-				toNode= newNetwork.createAndAddNode(link.getToNode().getId(), link.getToNode().getCoord());
+			if (!routeNet.getNodes().containsKey(link.getToNode().getId())){
+				toNode= routeNet.createAndAddNode(link.getToNode().getId(), link.getToNode().getCoord());
 			}
 			else{
-				toNode = newNetwork.getNodes().get(link.getToNode().getId());
+				toNode = routeNet.getNodes().get(link.getToNode().getId());
 			}
 			
-			if (!newNetwork.getLinks().containsKey(link.getId())){
-				newNetwork.createAndAddLink(link.getId(), fromNode, toNode, link.getLength(), link.getFreespeed(), link.getCapacity(), link.getNumberOfLanes());
+			if (!routeNet.getLinks().containsKey(link.getId())){
+				routeNet.createAndAddLink(link.getId(), fromNode, toNode, link.getLength(), link.getFreespeed(), link.getCapacity(), link.getNumberOfLanes());
 			}else{
-				//newNetwork.getLinks().remove(link.getId());
-				//newNetwork.getLinks().remove(newNetwork.getLinks().get(link.getId()));
-				//newNetwork.removeLink(link.getId());
-
-				//newNetwork.createAndAddLink(link.getId(), fromNode, toNode, link.getLength(), link.getFreespeed(), link.getCapacity(), link.getNumberOfLanes());
 				System.out.println("the link already exist! " + link.getId());
 			}
 		}
-		
-		//add last link
-		
-		String newNetFile = scenario.getConfig().controler().getOutputDirectory() + "/Net_" + strTrRouteId + ".xml";
-		new NetworkWriter(newNetwork).write(newNetFile );
-		OTFVis.playNetwork(newNetFile);
+	
+		System.out.println(sBuff.toString());
+		String routeNetFile = scenario.getConfig().controler().getOutputDirectory() + "/Net_" + strTrRouteId + ".xml";
+		new NetworkWriter(routeNet).write(routeNetFile );
+		OTFVis.playNetwork_Swing(routeNetFile);
 	}
 	
 	public static void main(String[] args) {
@@ -71,7 +80,7 @@ public class TransitRouteVisualizer {
 			configFile = args[0];
 		}else{
 			configFile= "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/calibration/100plans_bestValues_config.xml";
-			strTrRouteId = "S-42.002.001.H";
+			strTrRouteId = "B-M44.101.901.H";
 		}
 		new TransitRouteVisualizer(configFile, strTrRouteId);
 	}

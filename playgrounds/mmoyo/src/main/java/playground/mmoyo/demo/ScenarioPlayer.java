@@ -32,30 +32,30 @@ import playground.mmoyo.utils.DataLoader;
 
 public class ScenarioPlayer {
 
-	public static void play(final ScenarioImpl scenario, final EventsManager events) {
+	public static void play(final ScenarioImpl scenario) {
 		scenario.getConfig().simulation().setSnapshotStyle("queue");
-		final QSim sim = new QSim(scenario, events);
-		OTFVisMobsimFeature oTFVisMobsimFeature = new OTFVisMobsimFeature(sim);
-		sim.addQueueSimulationListeners(oTFVisMobsimFeature);
-		sim.getEventsManager().addHandler(oTFVisMobsimFeature);
-		sim.run();
-	}
-
-	public static void main(final String[] args) {
-		String configFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/calibration/100plans_bestValues_config.xml";//args[0];
-
-		ScenarioImpl scenario = new DataLoader().loadScenarioWithTrSchedule(configFile);
-
+		
 		final EventsManager events = (new EventsManagerFactoryImpl()).createEventsManager() ;
 		EventWriterXML writer = new EventWriterXML(scenario.getConfig().controler().getOutputDirectory() + "/testEvents.xml");
 		EventWriterTXT writertxt = new EventWriterTXT(scenario.getConfig().controler().getOutputDirectory() + "/testEvents.txt");
 		events.addHandler(writer);
 		events.addHandler(writertxt);
-
-		play(scenario, events);
-
+		
+		final QSim sim = new QSim(scenario, events);
+		OTFVisMobsimFeature oTFVisMobsimFeature = new OTFVisMobsimFeature(sim);
+		sim.addQueueSimulationListeners(oTFVisMobsimFeature);
+		sim.getEventsManager().addHandler(oTFVisMobsimFeature);
+		sim.run();
+		
 		writer.closeFile();
 		writertxt.closeFile();
+	}
+
+	public static void main(final String[] args) {
+		String configFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/calibration/100plans_bestValues_config.xml";//args[0];
+		ScenarioImpl scenario = new DataLoader().loadScenarioWithTrSchedule(configFile);
+		
+		play(scenario);
 	}
 
 }

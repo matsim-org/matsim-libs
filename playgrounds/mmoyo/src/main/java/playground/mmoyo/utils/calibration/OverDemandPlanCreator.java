@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mmoyo.utils;
+package playground.mmoyo.utils.calibration;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -28,70 +28,84 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 
-public class Planx2 {
+import playground.mmoyo.utils.DataLoader;
 
-	final String SEPARATOR = "_2";
+public class OverDemandPlanCreator {
+	private Population population;
+	
+	final String SEP = "_";
 	final String home = "home";
 	final String walk = "walk";
 	
-	private void run(String planFile, String netFile, String outPlanFile) {
-		DataLoader dataLoader = new DataLoader();
-		Population population = dataLoader.readPopulation(planFile);
-		NetworkImpl net = dataLoader.readNetwork(netFile);
-		PopulationImpl newPopulation = new PopulationImpl(new ScenarioImpl());
+	public OverDemandPlanCreator(String planFile){
+		this.population =  new DataLoader().readPopulation(planFile);		
+	}
 
-		for (Person person : population.getPersons().values()) {
-			// create "home" plan
+	public OverDemandPlanCreator(Population population){
+		this.population = population;
+	}
+	
+	public Population run(int cloneNum, int homePlanNum) {
+		PopulationImpl outPop = new PopulationImpl(new ScenarioImpl());
+
+		for (Person person : this.population.getPersons().values()) {
+			// create and add "home" plan
 			Plan homePlan = new PlanImpl();
-			Coord homeCoord = ((ActivityImpl) person.getSelectedPlan()
-					.getPlanElements().get(0)).getCoord();
+			Coord homeCoord = ((ActivityImpl) person.getSelectedPlan().getPlanElements().get(0)).getCoord();
 			ActivityImpl homeAct = new ActivityImpl(home, homeCoord);
 			homeAct.setEndTime(3600.0);
 			homePlan.addActivity(homeAct);
-			
-			Leg leg = population.getFactory().createLeg("walk");
+			Leg leg = this.population.getFactory().createLeg("walk");
 			leg.setTravelTime(10.0);
 			homePlan.addLeg(leg);
-			
 			homeAct = new ActivityImpl(home, homeCoord);
 			homeAct.setStartTime(85500.0);//85500 = 23:45 hr
 			homePlan.addActivity(homeAct);
+			for (int i=1; i<=homePlanNum;i++){
+				person.addPlan(homePlan);	
+			}
+			
+			//add the original
+			outPop.addPerson(person);
 
-			person.addPlan(homePlan);
-
-			Id newId = new IdImpl(person.getId().toString() + SEPARATOR);
-			Person personClon = new PersonImpl(newId);
-			personClon.addPlan(person.getSelectedPlan());
-			personClon.addPlan(homePlan);
-
-			newPopulation.addPerson(person);
-			newPopulation.addPerson(personClon);
+			//create and add clones
+			for (int i=1; i<=cloneNum;i++){
+				Id newId = new IdImpl(person.getId().toString() + SEP + (i+1));
+				Person personClon = new PersonImpl(newId);
+				for (Plan plan :person.getPlans()){
+					personClon.addPlan(plan);
+				}
+				outPop.addPerson(personClon);
+			}
+			
 		}
 
-		// write plan
-		System.out.println("writing output plan file...");
-		new PopulationWriter(newPopulation, net).write(outPlanFile);
-		System.out.println("Done");
+		return outPop;
 
 	}
 
 	public static void main(String[] args) {
-		String network = "../shared-svn/studies/countries/de/berlin-bvg09/pt/nullfall_berlin_brandenburg/input/network_multimodal.xml.gz";
+		String networkFile = "../shared-svn/studies/countries/de/berlin-bvg09/pt/nullfall_berlin_brandenburg/input/network_multimodal.xml.gz";
 
-//		String planFile ="../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/calibration/inputPlans/minTransfersRoutes_plan.xml.gz";
-//		String outPlanFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/calibration/inputPlans/doubleMinTransfersRoutes_plan2.xml";
+		String popFile ="../playgrounds/mmoyo/output/doubPlan/routedPlan_walk10.0_dist0.0_tran1200.0.xml.gz";
+		String outPlanFile = "../playgrounds/mmoyo/output/doubPlan/doubledPlan_walk10.0_dist0.0_tran1200.0.xml.gz";
 
-		String planFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/calibration/1plan.xml";
-		String outPlanFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/calibration/inputPlans/double1_plan.xml";
+		//String planFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/calibration/1plan.xml";
+		//String outPlanFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/calibration/inputPlans/double1_plan.xml";
 
-		new Planx2().run(planFile, network, outPlanFile);
+		ScenarioImpl scn = new DataLoader().readNetwork_Population(networkFile, popFile);
+		Population multPop = new OverDemandPlanCreator(scn.getPopulation()).run(2,1);
+
+		// write plan
+		System.out.println("writing output plan file...");
+		new PopulationWriter(multPop, scn.getNetwork()).write(outPlanFile);
+		System.out.println("Done");
 	}
 
 }

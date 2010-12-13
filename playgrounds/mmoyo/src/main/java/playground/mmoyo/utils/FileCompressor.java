@@ -21,6 +21,8 @@ public class FileCompressor {
 		fileInputStream.close();
 		gZIPOutputStream.finish();
 		gZIPOutputStream.close();
+		fileInputStream= null;
+		gZIPOutputStream= null;
 		System.out.println("done");
 	}
 	

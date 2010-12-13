@@ -7,12 +7,13 @@ import java.io.IOException;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.listener.ControlerListener;
 
 import playground.mmoyo.analysis.counts.chen.CountsComparingGraph;
 import playground.mmoyo.analysis.counts.chen.CountsComparingGraphMinMax;
 import playground.mmoyo.ptRouterAdapted.AdaptedLauncher;
 import playground.mmoyo.ptRouterAdapted.MyTransitRouterConfig;
-import playground.yu.run.TrCtl;
 
 public class Comparer {
 	final String configFile;
@@ -68,8 +69,8 @@ public class Comparer {
 	private void routeAndSimulate(final MyTransitRouterConfig myTransitRouterConfig, String strVarValue){
 		myTransitRouterConfig.scenarioName = this.varName + strVarValue;
 		System.out.println ("routing " + myTransitRouterConfig.scenarioName);
-		AdaptedLauncher adaptedLauncher	= new AdaptedLauncher(myTransitRouterConfig);
-		String routedPlan = adaptedLauncher.route(this.configFile);
+		AdaptedLauncher adaptedLauncher	= new AdaptedLauncher(this.configFile);
+		String routedPlan = adaptedLauncher.route(myTransitRouterConfig);
 		
 		//create new config file
 		String newConfigFile = this.configsDir + "config_" + strVarValue + XML;
@@ -79,9 +80,18 @@ public class Comparer {
 		configWriter.write(newConfigFile);
 		System.out.println("config file written: " + newConfigFile);
 		
-		//launch controller
+		//read newConfig and launch controller
 		System.out.println("\n\n  simulating: " + newConfigFile);
-		TrCtl.main(new String[]{newConfigFile});
+		Config config = new Config();
+		config.addCoreModules();
+		new MatsimConfigReader(config).readFile(newConfigFile);
+		config.scenario().setUseTransit(true);
+		config.scenario().setUseVehicles(true);
+		Controler controler = new Controler( config ) ;
+		controler.setCreateGraphs(false);
+		controler.setOverwriteFiles(true);
+		controler.run();
+
 	}
 	
 	private void generateComparingGraphs() throws IOException{

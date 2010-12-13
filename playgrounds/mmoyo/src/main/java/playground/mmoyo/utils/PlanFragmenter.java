@@ -22,16 +22,17 @@ public class PlanFragmenter {
 		ScenarioImpl tempScenario =new ScenarioImpl();
 		PopulationImpl newPopulation = new PopulationImpl(tempScenario);
 		
-		System.out.println("plans before fragmentation: " + population.getPersons().size());
+		System.out.println("persons before fragmentation: " + population.getPersons().size());
 		
 		for (Person person : population.getPersons().values()) {
 			char suffix = 'a';
-			Person clonPerson=null;
-			Plan newPlan=null;
-			Leg leg = null;
-			int numOfLegs=0;
 
 			for (Plan plan: person.getPlans()){
+				Person clonPerson=null;
+				Plan newPlan=null;
+				Leg leg = null;
+				int numOfLegs=0;
+				
 				for (PlanElement pe : plan.getPlanElements()){
 					if (pe instanceof Activity) {
 						Activity act = (Activity) pe;
@@ -61,19 +62,17 @@ public class PlanFragmenter {
 				}
 			}
 		}
-		System.out.println("plans after fragmentation: " + newPopulation.getPersons().size());
+		System.out.println("persons after fragmentation: " + newPopulation.getPersons().size());
 		
 		return newPopulation;
 	}
 
 	public static void main(String[] args) {
-		//String configFile = args[0];
-		String populationFile = "../playgrounds/mmoyo/output/best/configs/config_best.xml";
+		String populationFile = "../playgrounds/mmoyo/output/merge/routedPlan_walk10.0_dist0.6_tran1020.0.xml.gz";
 		String networkFile = "../shared-svn/studies/countries/de/berlin-bvg09/pt/nullfall_berlin_brandenburg/input/network_multimodal.xml.gz";
-		String outputFile = "../playgrounds/mmoyo/output/fragmented.xml";
+		String outputFile = "../playgrounds/mmoyo/output/merge/Fragmented_routedPlan_walk10.0_dist0.6_tran1020.0.xml.gz";
 		
-		DataLoader dataLoader = new DataLoader(); 
-		ScenarioImpl scenario = dataLoader.readNetwork_Population(networkFile, populationFile );
+		ScenarioImpl scenario = new DataLoader().readNetwork_Population(networkFile, populationFile );
 		
 		Population fragmPopulation = new PlanFragmenter().run(scenario.getPopulation());
 		System.out.println("writing output plan file..." + outputFile);
