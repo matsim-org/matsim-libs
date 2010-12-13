@@ -43,7 +43,7 @@ public class RunTestRoad {
 	static Integer linkCapacity = 1400;
 
 	static Integer [] days = {
-		20060127,
+//		20060127,
 		20060131,
 		20090317,
 		20090318,

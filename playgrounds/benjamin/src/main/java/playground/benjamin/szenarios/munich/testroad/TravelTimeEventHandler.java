@@ -27,16 +27,17 @@ import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
+import org.matsim.core.basic.v01.IdImpl;
 
 /**
  * @author benjamin
  *
  */
 public class TravelTimeEventHandler implements LinkEnterEventHandler, LinkLeaveEventHandler {
-	
+
 	private SortedMap<Id, Double> personId2travelTimesPerIteration = new TreeMap<Id, Double>();
 	private SortedMap<Id, Double> personId2enterTimesPerIteration = new TreeMap<Id, Double>();
-	
+
 	private double leaveTime;
 	private double enterTime;
 	private Id linkLeaveId;
@@ -63,9 +64,15 @@ public class TravelTimeEventHandler implements LinkEnterEventHandler, LinkLeaveE
 			if(event.getLinkId().equals(this.linkEnterId)){
 				enterTime = event.getTime();
 				personId = event.getPersonId();
-				
+
 				this.personId2enterTimesPerIteration.put(personId, enterTime);
-//				System.out.println(this.personId2enterTimesPerIteration);
+
+				if(personId.equals(new IdImpl("43080testVehicle"))){
+					System.out.println(personId + " enters link" + this.linkEnterId + " at " + enterTime);
+				}
+				if (personId.equals(new IdImpl("43083testVehicle"))){
+					System.out.println(personId + " enters link" + this.linkEnterId + " at " + enterTime);
+				}
 			}
 		}
 	}
@@ -76,11 +83,16 @@ public class TravelTimeEventHandler implements LinkEnterEventHandler, LinkLeaveE
 		if(id.contains("testVehicle")){
 			if(event.getLinkId().equals(this.linkLeaveId)){
 				leaveTime = event.getTime();
-				
+
 				this.personId2travelTimesPerIteration.put(personId, leaveTime - enterTime);
-//				System.out.println(this.personId2travelTimesPerIteration);
+
+				if(personId.equals(new IdImpl("43080testVehicle"))){
+					System.out.println(personId + " leaves link" + this.linkLeaveId + " at " + leaveTime);
+				}
+				if (personId.equals(new IdImpl("43083testVehicle"))){
+					System.out.println(personId + " leaves link" + this.linkLeaveId + " at " + leaveTime);
+				}
 			}
 		}
 	}
-
 }
