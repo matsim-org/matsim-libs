@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package tutorial.programming.example50VeryExperimentalWithinDayReplanning;
+package tutorial.unsupported.example50VeryExperimentalWithinDayReplanning;
 
 import java.util.ArrayList;
 import java.util.Collection;
