@@ -58,7 +58,7 @@ import org.matsim.api.core.v01.population.PlanElement;
  * Memory considerations could be addressed by lazily delaying this plans copying to the point where the modifiable
  * plan is needed.
  * <p/>
- * Should add Identifiable to this interface; could then replace many PersonAgent by PlanAgent. 
+ * <strike>Should add Identifiable to this interface; could then replace many PersonAgent by PlanAgent.  done.  kai, dec'10</strike>
  *
  * @author dgrether
  * @author nagel
