@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: kai
- * IdTest.java
+ * MyPersonImpl.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,18 +20,26 @@
 
 package playground.kai.ids;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.population.PersonImpl;
+
 /**
  * @author nagel
  *
  */
-public class IdTest {
+public class MyPersonImpl extends PersonImpl {
+	PersonId id ;
 
 	/**
-	 * @param args
+	 * @param id
 	 */
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException();
+	public MyPersonImpl(Id id) {
+		super(id);
+		this.id = (PersonId) id ;
+	}
+	
+	public PersonId getId() {
+		return id ;
 	}
 
 }

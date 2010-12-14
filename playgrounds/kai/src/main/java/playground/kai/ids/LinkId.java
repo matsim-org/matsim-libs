@@ -1,10 +1,10 @@
 /* *********************************************************************** *
- * project: kai
- * PersonId.java
+ * project: org.matsim.*
+ * IdI.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -22,17 +22,11 @@ package playground.kai.ids;
 
 import org.matsim.api.core.v01.Id;
 
-/**The necessary steps seem to be:<ul>
- * <li> Generate interface PersonId.
- * <li> Make IdImpl implement PersonId.
- * <li> Make PersonImpl internally store PersonId instead of Id, and return PersonId.
- * <li> Generate PopulationIdFactory.createId(...) that creates PersonId.
- * <li> Set Scenario.createId(...) to deprecated.
- * <li> Set new IdImpl(...) to deprecated.
- * <li> As a perspective, I would like to make new IdImpl(...) protected so that it cannot be used any longer. 
- * </ul>
- * @author nagel
+
+/**
+ * Represents a unique identifier.  This is essentially a c++ typedef, except that
+ * typedefs don't exist in Java.
  */
-public interface PersonId extends Id {
+public interface LinkId extends Id {
 
 }
