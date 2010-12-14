@@ -31,14 +31,25 @@ import org.matsim.api.core.v01.population.PlanElement;
  * (activity, net, teleportation, ...).
  * After advancing the Plan, the agent would not return its control to the calling method, but insert itself directly into the 
  * Mobsim.
+ * <strike>
  * <li>When trying around with object composition, we found that this does not work, since the PlanAgent delegate would only
  * schedule the delegate back into the Mobsim.  Discussing a bit, we found that this is a problem in other places as well
  * (e.g. context switches in window-driven systems, where the calling method needs to know about the context switch).  The decision
  * was thus to modify the design such that control about the agent is always returned to the calling method.  This is, however,
  * not yet implemented (nov'10).
+ * <li>I attempted this, but abandoned it eventually.  A major problem is that an agent that cannot insert him/herself into 
+ * the next process but returns to where it was called from somehow needs to pass to that location what he/she wants to do next.
+ * Since we do not want to assume that every agent is a PlanAgent, using the full PlanAgent interface really is too strong.
+ * This, however, indicates that one would need some "return code", e.g. something like
+ * <pre>
+ * enum NextAction { StartActivity, StartLeg, ...}
+ * </pre>
+ * In the end, I considered this too much infrastructure, because if we have infrastructure, we can as well have a back pointer to
+ * the "original agent" as part of the delegate.  kai, dec'10 
+ * </strike>
  * </ul>
  * 
- * Towards a concept for status pointers:<ul>
+ * <strike>Towards a concept for status pointers:<ul>
  * <li> Let us start with the PlanElements Iterator.
  * </li><li> Re-using standard iterators does not make sense since those are always <i>between</i> elements,
  * but we need a "current" here.
@@ -46,6 +57,9 @@ import org.matsim.api.core.v01.population.PlanElement;
  * </li><li> How do we insert and remove?  In ArrayList, the Iterator fails if there is insert/remove
  * outside of the iterator.  But here, we cannot move the iterator away from its current position.
  * </li>
+ * Some useful version is currently implemented, experimentally, into the experimental version of the WithinDayAgent.  If
+ * necessary, disscuss there.  kai, dec'10
+ * </strike>
  * </ul>
  * In terms of design, the assumption is that the plan remains unchanged in the mobsim, at least from the
  * perspective of the iterations: plan = genotype, execution = phenotype.  Therefore, <i>already Christoph's implementation
