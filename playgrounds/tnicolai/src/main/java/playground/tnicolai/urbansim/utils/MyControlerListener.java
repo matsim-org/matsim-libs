@@ -30,10 +30,12 @@ public class MyControlerListener implements /*IterationEndsListener,*/ ShutdownL
 
 	private ActivityFacilitiesImpl zones;
 	private String travelDataPath;
+	private String zonesPath ;
 
 	public MyControlerListener( ActivityFacilitiesImpl zones ) {
 		this.zones = zones;
 		this.travelDataPath = Constants.OPUS_HOME + MATSimConfigObject.getTempDirectory() + "travel_data.csv";
+		this.zonesPath = Constants.OPUS_HOME + MATSimConfigObject.getTempDirectory() + "zones.csv";
 	}
 
 	public void notifyShutdown(ShutdownEvent event) {
@@ -50,14 +52,19 @@ public class MyControlerListener implements /*IterationEndsListener,*/ ShutdownL
 		st.setDepartureTime(depatureTime);
 
 		try {
-			BufferedWriter writer = IOUtils.getBufferedWriter( travelDataPath );
+			BufferedWriter travelDataWriter = IOUtils.getBufferedWriter( travelDataPath );
+			BufferedWriter zonesWriter = IOUtils.getBufferedWriter( zonesPath );
 
 			log.info("Computing and writing travel_data" ) ;
 //			log.warn("Can't feed floats to urbansim; am thus feeding ints for the ttime.") ;
 			// solved 3dec08 by travis
 
 			// writer.write ( "from_zone_id:i4,to_zone_id:i4,single_vehicle_to_work_travel_cost:f4" ) ; writer.newLine();
-			writer.write ( "from_zone_id:i4,to_zone_id:i4,single_vehicle_to_work_travel_cost:f4,am_single_vehicle_to_work_travel_time:f4" ) ; writer.newLine();
+			travelDataWriter.write ( "from_zone_id:i4,to_zone_id:i4,single_vehicle_to_work_travel_cost:f4,am_single_vehicle_to_work_travel_time:f4" ) ; 
+			travelDataWriter.newLine();
+			
+			zonesWriter.write( "zone_id:i4,workplace_accessibility:f4") ;
+			zonesWriter.newLine();
 
 			System.out.println("|--------------------------------------------------------------------------------------------------|") ;
 			long cnt = 0 ; long percentDone = 0 ;
@@ -72,6 +79,9 @@ public class MyControlerListener implements /*IterationEndsListener,*/ ShutdownL
 				assert( fromNode != null ) ;
 				st.setOrigin( fromNode ) ;
 				st.run(network) ;
+				
+				double accessibility = 0. ;
+				
 				for ( ActivityFacility toZone : zones.getFacilities().values() ) {
 					Coord toCoord = toZone.getCoord() ;
 					Node toNode = network.getNearestNode( toCoord ) ;
@@ -87,15 +97,21 @@ public class MyControlerListener implements /*IterationEndsListener,*/ ShutdownL
 					
 					// end tnicolai test
 					
-					writer.write ( fromZone.getId().toString()
+					accessibility += zones.getFacilities().size() * Math.exp( - 1. * ttime ) ;
+					// yyyy should only be work facilities!!!! kai & thomas, dec'10
+					
+					travelDataWriter.write ( fromZone.getId().toString()
 							+ "," + toZone.getId().toString()
 							+ "," + ttime //tcost
 							+ "," + ttime ) ;
-					writer.newLine();
+					travelDataWriter.newLine();
 				}
+				
+				zonesWriter.write( fromZone.getId().toString() + "," + accessibility ) ;
+				
 			}
-			writer.flush();
-			writer.close();
+			travelDataWriter.flush();
+			travelDataWriter.close();
 			System.out.println(" ... done") ;
 			log.info("... done with writing travel_data" ) ;
 
