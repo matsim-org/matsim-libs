@@ -27,6 +27,7 @@ import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.signalsystems.model.SignalController;
 import org.matsim.signalsystems.model.SignalGroup;
 import org.matsim.signalsystems.model.SignalGroupState;
@@ -182,8 +183,8 @@ public class JbSignalController implements SignalController {
 			int currentdrop = this.adaptiveDroppings.get(sgId);
 			int newdrop = currentdrop + step;
 			this.adaptiveDroppings.put(sgId, newdrop);
-			// if (step>1)
-			// log.info("Drop of Sg "+sgId+" shifted from "+currentdrop+" to "+newdrop);
+//			 if (step>1)
+//			 log.info("Drop of Sg "+sgId+" shifted from "+currentdrop+" to "+newdrop);
 			this.updateOtherSignalGroups(sgId, step);
 		}
 	}

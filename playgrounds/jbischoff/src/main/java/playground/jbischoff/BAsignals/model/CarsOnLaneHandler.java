@@ -33,6 +33,7 @@ import org.matsim.core.events.LaneEnterEvent;
 import org.matsim.core.events.handler.LaneEnterEventHandler;
 import org.matsim.signalsystems.model.SignalSystem;
 
+import playground.jbischoff.BAsignals.CottbusMain;
 import playground.jbischoff.BAsignals.JBBaParams;
 
 /**
@@ -71,8 +72,8 @@ public class CarsOnLaneHandler implements LaneEnterEventHandler {
 			}
 			double timeGap = calcTimeGap(event);
 			if ((timeGap != 0) && (timeGap < JBBaParams.ACTUATIONACCURACY)) {
-				// log.info(event.getTime()+": Time Gap on Lane " +event.getLaneId()+
-				// " , sg: "+this.adaptiveControllHead.getSignalGroupforLaneId(event.getLaneId()) +" is "+timeGap);
+//				 log.info(event.getTime()+": Time Gap on Lane " +event.getLaneId()+
+//				 " , sg: "+this.adaptiveControllHead.getSignalGroupforLaneId(event.getLaneId()) +" is "+timeGap);
 				Id sysid = this.adaptiveControllHead.getSignalSystemforLaneId(event.getLaneId());
 				JbSignalController jbs = (JbSignalController) this.signalSystemMap.get(sysid)
 						.getSignalController();

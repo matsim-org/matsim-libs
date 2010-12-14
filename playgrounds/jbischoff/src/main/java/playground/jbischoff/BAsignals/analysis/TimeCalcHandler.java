@@ -1,11 +1,16 @@
 package playground.jbischoff.BAsignals.analysis;
 
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.Map.Entry;
 
+import org.apache.log4j.Logger;
+import org.jfree.util.Log;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
@@ -22,8 +27,14 @@ import org.matsim.core.events.handler.LaneEnterEventHandler;
 import playground.jbischoff.BAsignals.model.AdaptiveControllHead;
 
 public class TimeCalcHandler implements LinkEnterEventHandler, LinkLeaveEventHandler, 
-AgentArrivalEventHandler, AgentDepartureEventHandler, LaneEnterEventHandler {
+AgentArrivalEventHandler, AgentDepartureEventHandler, LaneEnterEventHandler  {
+	private static final Logger log = Logger.getLogger(TimeCalcHandler.class);
 
+	private Map<Id,Double> arrivaltimestofbspn;
+	private Map<Id,Double> arrivaltimestofbcb;
+
+	private Map<Id,Double> arrivaltimesfromfbspn;
+	private Map<Id,Double> arrivaltimesfromfbcb;
 	private Map<Id,Double> ttmap;
 	private AdaptiveControllHead ach;
 	private Set<Id> carsPassed;
@@ -36,6 +47,10 @@ public TimeCalcHandler(AdaptiveControllHead ach){
 	this.carsPassed = new HashSet<Id>();
 	this.wannabeadaptiveLanes = new HashSet<Id>();
 	this.fillWannaBes();
+	this.arrivaltimesfromfbcb = new TreeMap<Id,Double>();
+	this.arrivaltimesfromfbspn = new TreeMap<Id,Double>();
+	this.arrivaltimestofbcb = new TreeMap<Id,Double>();
+	this.arrivaltimestofbspn = new TreeMap<Id,Double>();
 	
 
 	
@@ -61,7 +76,32 @@ public TimeCalcHandler(AdaptiveControllHead ach){
 	@Override
 	public void handleEvent(AgentArrivalEvent event) {
 		Double agentTt = this.ttmap.get(event.getPersonId());
-		this.ttmap.put(event.getPersonId(), agentTt + event.getTime()) ;		
+		
+		
+		this.ttmap.put(event.getPersonId(), agentTt + event.getTime()) ;	
+		if (event.getPersonId().toString().endsWith("SPN_SDF")){
+			Double tr = this.arrivaltimestofbspn.get(event.getPersonId());
+			
+			if (tr == null){
+			this.arrivaltimestofbspn.put(event.getPersonId(), event.getTime());	
+			}
+			else{
+				this.arrivaltimesfromfbspn.put(event.getPersonId(), event.getTime());	
+
+			}
+		}
+			if (event.getPersonId().toString().endsWith("CB_SDF")){
+				Double tr = this.arrivaltimestofbcb.get(event.getPersonId());
+				if (tr == null){
+				this.arrivaltimestofbcb.put(event.getPersonId(), event.getTime());	
+				}
+				else{
+					this.arrivaltimesfromfbcb.put(event.getPersonId(), event.getTime());	
+
+				}
+			}
+		
+		
 
 	}
 
@@ -115,25 +155,75 @@ public TimeCalcHandler(AdaptiveControllHead ach){
 		return carsPassed;
 	}
 	
-	public double getAverageAdaptiveTravelTime(){
-	if (this.getPassedAgents() == 0) return 0;
-		Double att = 0.0;
-		for (Entry<Id,Double> entry : ttmap.entrySet()){
-			if (this.getPassedCars().contains(entry.getKey())){
-				att += entry.getValue();
-			}
-		}
-		att = att / this.getPassedAgents();
-		return att;
+	
+	public void exportArrivalTime(int iteration,String outdir){
+		String filename = outdir+iteration+".arrivalTimesFromFB_CB.csv";
+		this.exportMaptoCVS(this.arrivaltimesfromfbcb,  filename);
+		filename = outdir+iteration+".arrivalTimesFromFB_SPN.csv";
+		this.exportMaptoCVS(this.arrivaltimesfromfbspn,  filename);
+		filename = outdir+iteration+".arrivalTimesToFB_CB.csv";
+		this.exportMaptoCVS(this.arrivaltimestofbcb,  filename);
+		filename = outdir+iteration+".arrivalTimesToSPN_CB.csv";
+		this.exportMaptoCVS(this.arrivaltimestofbspn,  filename);
 	}
 	
-	public double getAverageTravelTime(){
+	private void exportMaptoCVS(Map<Id, Double> atmap,  String filename) {
+		try {
+			FileWriter writer = new FileWriter(filename);
+		
+		for (Entry<Id,Double> e : atmap.entrySet()){
+		writer.append(e.getKey().toString()+";"+e.getValue()+";"+"\n");	
+		}
+		writer.flush();
+		writer.close();
+		log.info("Wrote "+filename);
+		} catch (IOException e1) {
+			log.error("cannot write to file: "+filename);
+			e1.printStackTrace();
+		}
+	
+		
+		
+	}
+	
+	public double getLatestArrivalCBSDF(){
+		return Collections.max(this.arrivaltimestofbcb.values()).doubleValue();
+		
+	}	
+	public double getLatestArrivalSPNSDF(){
+		return Collections.max(this.arrivaltimestofbspn.values()).doubleValue();
+		
+	}
+	public double getLatestArrivalSDFCB(){
+		return Collections.max(this.arrivaltimesfromfbcb.values()).doubleValue();
+		
+	}
+	public double getLatestArrivalSDFSPN(){
+		return Collections.max(this.arrivaltimesfromfbspn.values()).doubleValue();
+		
+	}
+	
+	public int getAverageTravelTime(){
 		
 		Double att = 0.0;
 		for (Entry<Id,Double> entry : ttmap.entrySet()){
 				att += entry.getValue();
 		}
 		att = att / ttmap.size();
-		return att;
+		return att.intValue();
 	}
+	public int getAverageAdaptiveTravelTime(){
+		if (this.getPassedAgents() == 0) return 0;
+			Double att = 0.0;
+			for (Entry<Id,Double> entry : ttmap.entrySet()){
+				if (this.getPassedCars().contains(entry.getKey())){
+					att += entry.getValue();
+				}
+			}
+			att = att / this.getPassedAgents();
+			return att.intValue();
+			
+
+			
+		}
 }

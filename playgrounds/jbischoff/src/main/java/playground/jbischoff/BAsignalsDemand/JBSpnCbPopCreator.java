@@ -46,6 +46,7 @@ public class JBSpnCbPopCreator implements Runnable {
 	}
 	
 	//private static EnumSet<Zone> zones = EnumSet.allOf(Zone.class);
+	private final double scaleFactor = 1.0;
 	
 	private static Map<Zone, Geometry> zoneGeometries = new EnumMap<Zone, Geometry>(Zone.class);
 	private static int SPNtoCB;
@@ -55,7 +56,6 @@ public class JBSpnCbPopCreator implements Runnable {
 	private static int CBtoSDF;
 	private static int SPNtoSDF;
 	
-	private final double scaleFactor = 1;
 	static {
 		GeometryFactory geometryFactory= new GeometryFactory();
 		WKTReader wktReader = new WKTReader(geometryFactory);
@@ -105,12 +105,12 @@ public class JBSpnCbPopCreator implements Runnable {
 	public void run() {
 		scenario = new ScenarioImpl();
 		population = scenario.getPopulation();
-		generatePopulation();
-		PopulationWriter populationWriter = new PopulationWriter(scenario.getPopulation(), scenario.getNetwork());
-		populationWriter.write("/Users/JB/Desktop/BA-Arbeit/sim/scenario/cb-plans_usual_"+scaleFactor+".xml");
+//		generatePopulation();
+//		PopulationWriter populationWriter = new PopulationWriter(scenario.getPopulation(), scenario.getNetwork());
+//		populationWriter.write("/Users/JB/Desktop/BA-Arbeit/sim/scenario/cb-plans_usual_bb"+scaleFactor+".xml");
 		generateFans();
-		populationWriter = new PopulationWriter(scenario.getPopulation(), scenario.getNetwork());
-		populationWriter.write("/Users/JB/Desktop/BA-Arbeit/sim/scenario/cb-plans_fb_"+scaleFactor+".xml");
+		PopulationWriter populationWriter = new PopulationWriter(scenario.getPopulation(), scenario.getNetwork());
+		populationWriter.write("/Users/JB/Desktop/BA-Arbeit/sim/scenario/cb-plans_fb_only"+scaleFactor+".xml");
 		
 		
 	}
@@ -121,18 +121,20 @@ public class JBSpnCbPopCreator implements Runnable {
 				 double factor = 0;
 				//SPNtoSPN				
 				factor = 1; 
-				/*SPNtoSPN =(int) (0.5* Zone.SPN.workTripsToSPNPerDay);
-				CBtoCB = (int) (0.5* Zone.CB.workTripsToCBPerDay);
-				factor = ((double)Zone.CB.workingPopulation * (double)Zone.SPN.workplaces)/((double)Zone.SPN.workingPopulation *	(double)Zone.CB.workplaces );
-				SPNtoCB =  (int) Math.round(0.5*(Zone.SPN.workTripsToCBPerDay*factor)/(1+factor));
-				CBtoSPN = (int) (0.5*Zone.SPN.workTripsToCBPerDay-SPNtoCB);
-				*/
+//				SPNtoSPN =(int) (0.5* Zone.SPN.workTripsToSPNPerDay);
+//				CBtoCB = (int) (0.5* Zone.CB.workTripsToCBPerDay);
+//				factor = ((double)Zone.SPN.workingPopulation * (double)Zone.CB.workplaces)/((double)Zone.CB.workingPopulation *	(double)Zone.SPN.workplaces );
+//				SPNtoCB =  (int) Math.round(0.5*(Zone.SPN.workTripsToCBPerDay*factor)/(1+factor));
+//				CBtoSPN = (int) (0.5*Zone.SPN.workTripsToCBPerDay-SPNtoCB);
+//				System.out.println("SPN2CB: "+SPNtoCB);
+//				System.out.println("CB2SPN: "+CBtoSPN);
+
+				
 				SPNtoSPN = 12820;
 				SPNtoCB = 6522;
 				CBtoSPN = 2383;
 				CBtoCB = 11754;
-				CBtoSDF = 500;
-				SPNtoSDF =1500; 
+
 				
 				System.out.println(CBtoSPN);
 				System.out.println(SPNtoCB);
@@ -175,7 +177,8 @@ public class JBSpnCbPopCreator implements Runnable {
 	}
 	
 	public void generateFans(){
-		
+		CBtoSDF = 500;
+		SPNtoSDF =1500; 
 		int fans = 0;
 		for (int i=0; i<SPNtoSDF; i++){
 			generateFootBallNerd(fans, Zone.SPN);

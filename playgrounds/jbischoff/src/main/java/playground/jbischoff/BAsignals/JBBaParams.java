@@ -2,7 +2,7 @@ package playground.jbischoff.BAsignals;
 
 public class JBBaParams {
 	
-	public static int ACTUATIONACCURACY = 10;
+	public static int ACTUATIONACCURACY = 8;
 	//actuation accuracy in seconds, gap between two agents
 	public static double SCALE = 0.5;
 	// Scale to create minimum cycles

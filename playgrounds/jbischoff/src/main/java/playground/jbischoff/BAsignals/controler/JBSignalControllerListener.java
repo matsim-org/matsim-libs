@@ -3,6 +3,8 @@
  */
 package playground.jbischoff.BAsignals.controler;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
@@ -29,8 +31,9 @@ import org.matsim.signalsystems.mobsim.SignalEngine;
 import org.matsim.signalsystems.model.SignalGroupState;
 import org.matsim.signalsystems.model.SignalSystemsManager;
 
-//import playground.dgrether.signalsystems.analysis.DgSignalGreenSplitHandler;
-//import playground.dgrether.signalsystems.analysis.DgSignalGroupAnalysisData;
+import playground.dgrether.signalsystems.analysis.DgSignalGreenSplitHandler;
+import playground.dgrether.signalsystems.analysis.DgSignalGroupAnalysisData;
+import playground.jbischoff.BAsignals.CottbusMain;
 import playground.jbischoff.BAsignals.analysis.TimeCalcHandler;
 import playground.jbischoff.BAsignals.builder.JbSignalBuilder;
 import playground.jbischoff.BAsignals.model.AdaptiveControllHead;
@@ -50,7 +53,7 @@ public class JBSignalControllerListener implements StartupListener, IterationSta
 	private AdaptiveControllHead ach;
 
 	
-//	private DgSignalGreenSplitHandler signalGreenSplitHandler;
+	private DgSignalGreenSplitHandler signalGreenSplitHandler;
 
 	public JBSignalControllerListener() {
 		this.collh = new CarsOnLaneHandler();
@@ -87,62 +90,81 @@ public class JBSignalControllerListener implements StartupListener, IterationSta
 
 	private void addControlerListeners(Controler c) {
 		// strange compilation error
-//		signalGreenSplitHandler = new DgSignalGreenSplitHandler();
-//		signalGreenSplitHandler.addSignalSystem(new IdImpl("18"));
-//		signalGreenSplitHandler.addSignalSystem(new IdImpl("17"));
-//		signalGreenSplitHandler.addSignalSystem(new IdImpl("1"));
-//
-//
-//		c.getEvents().addHandler(signalGreenSplitHandler);
-//		c.addControlerListener(new StartupListener() {
-//
-//			public void notifyStartup(StartupEvent e) {
-//				e.getControler().getEvents()
-//						.addHandler(signalGreenSplitHandler);
-//			}
-//		});
+		signalGreenSplitHandler = new DgSignalGreenSplitHandler();
+		signalGreenSplitHandler.addSignalSystem(new IdImpl("18"));
+		signalGreenSplitHandler.addSignalSystem(new IdImpl("17"));
+		signalGreenSplitHandler.addSignalSystem(new IdImpl("1"));
+		signalGreenSplitHandler.addSignalSystem(new IdImpl("28"));
+		signalGreenSplitHandler.addSignalSystem(new IdImpl("27"));
+		signalGreenSplitHandler.addSignalSystem(new IdImpl("12"));
+
+
+		c.getEvents().addHandler(signalGreenSplitHandler);
+		c.addControlerListener(new StartupListener() {
+
+			public void notifyStartup(StartupEvent e) {
+				e.getControler().getEvents()
+						.addHandler(signalGreenSplitHandler);
+			}
+		});
 
 		
 		c.addControlerListener(new IterationEndsListener() {
 			private final Logger logg = Logger
 			.getLogger(IterationEndsListener.class);
 			public void notifyIterationEnds(IterationEndsEvent e) {
-				logg.info("Agents that passed an adaptive signal system at least once: "
+				logg.info("Agents that passed an adaptive signal system (1,17 or 18) at least once: "
 						+ tch.getPassedAgents());
 
 		
-		logg.info(" Average TravelTime for Agents that passed an adaptive signal at least once: "+tch.getAverageAdaptiveTravelTime());
+		logg.info("Average TravelTime for Agents that passed an adaptive signal at least once: "+tch.getAverageAdaptiveTravelTime());
 		logg.info("Average TT of all Agents" +tch.getAverageTravelTime() ); 
+		tch.exportArrivalTime(e.getIteration(), e.getControler().getConfig().controler().getOutputDirectory());
+		logg.info("Latest arrival time at stadium for Agents coming from Cottbus: "+tch.getLatestArrivalCBSDF());
+		logg.info("Latest arrival time at stadium for Agents coming from SPN: "+tch.getLatestArrivalSPNSDF());
+		logg.info("Latest home time for agents going from stadium to Cottbus"+tch.getLatestArrivalSDFCB());
+		logg.info("Latest home time for agents going from stadium to SPN"+tch.getLatestArrivalSDFSPN());
 
+		
 			}
 		});
 
-//		c.addControlerListener(new ShutdownListener() {
-//			private final Logger logg = Logger
-//					.getLogger(ShutdownListener.class);
-//
-//			public void notifyShutdown(ShutdownEvent e) {
-//
-//			
-//				for (Id ssid : signalGreenSplitHandler
-//						.getSystemIdAnalysisDataMap().keySet()) {
-//					// logg.info("=======Statistic for SignalSystem: "+ssid+" =============");
-//					for (Entry<Id, DgSignalGroupAnalysisData> entry : signalGreenSplitHandler
-//							.getSystemIdAnalysisDataMap().get(ssid)
-//							.getSystemGroupAnalysisDataMap().entrySet()) {
-//						// logg.info("for signalgroup: "+entry.getKey());
-//						for (Entry<SignalGroupState, Double> ee : entry
-//								.getValue().getStateTimeMap().entrySet()) {
-//							// logg.info(ee.getKey()+": "+ee.getValue());
-//							logg.info("b;" + ssid + ";" + entry.getKey() + ";"
-//									+ ee.getKey() + ";" + ee.getValue());
-//
-//						}
-//					}
-//				}
-//			}
-//		}
-//				);
+		c.addControlerListener(new ShutdownListener() {
+			private final Logger logg = Logger
+					.getLogger(ShutdownListener.class);
+
+			public void notifyShutdown(ShutdownEvent e) {
+				try {
+					FileWriter fw = new FileWriter(e.getControler().getConfig().controler().getOutputDirectory()+"signal_statistic.csv");
+					for (Id ssid : signalGreenSplitHandler.getSystemIdAnalysisDataMap().keySet()) {
+						for (Entry<Id, DgSignalGroupAnalysisData> entry : signalGreenSplitHandler
+								.getSystemIdAnalysisDataMap().get(ssid)
+								.getSystemGroupAnalysisDataMap().entrySet()) {
+							// logg.info("for signalgroup: "+entry.getKey());
+							for (Entry<SignalGroupState, Double> ee : entry
+									.getValue().getStateTimeMap().entrySet()) {
+								// logg.info(ee.getKey()+": "+ee.getValue());
+							fw.append(ssid + ";" + entry.getKey() + ";"
+										+ ee.getKey() + ";" + ee.getValue()+";\n");
+
+							}
+						}
+					}				
+				fw.flush();
+				fw.close();
+				logg.info("Wrote signalsystemstats.");
+				
+				
+				
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+
+
+			}
+		}
+				);
 
 	
 			}
