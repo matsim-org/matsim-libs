@@ -26,6 +26,10 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.Map.Entry;
 
+import net.opengis.kml._2.DocumentType;
+import net.opengis.kml._2.KmlType;
+import net.opengis.kml._2.ObjectFactory;
+
 import org.apache.log4j.Logger;
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
@@ -37,6 +41,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.network.KmlNetworkWriter;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.utils.collections.QuadTree;
@@ -45,6 +50,7 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.GeotoolsTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.vis.kml.KMZWriter;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
@@ -55,6 +61,7 @@ public class CreateZoneConnectors {
 	
 	private static String networkInFile = "../../matsim/mysimulations/netherlands/network/network.xml.gz";
 	private static String networkOutFile = "../../matsim/mysimulations/netherlands/network/network_with_connectors.xml.gz";
+	private static String kmzOutFile = "../../matsim/mysimulations/netherlands/network/network_with_connectors.kmz";
 	private static String shapeFile = "../../matsim/mysimulations/netherlands/zones/postcode4_org.shp";
 
 	private double connectorLinkFreeSpeed = 40 / 3.6;	// 40 km/h
@@ -118,6 +125,22 @@ public class CreateZoneConnectors {
 		log.info("writing network ...");
 		new NetworkWriter(network).write(networkOutFile);
 		log.info(" ... done.");
+		
+		log.info("writing kmz network ...");
+		ObjectFactory kmlObjectFactory = new ObjectFactory();
+		KMZWriter kmzWriter = new KMZWriter(kmzOutFile);
+		
+		KmlType mainKml = kmlObjectFactory.createKmlType();
+		DocumentType mainDoc = kmlObjectFactory.createDocumentType();
+		mainKml.setAbstractFeatureGroup(kmlObjectFactory.createDocument(mainDoc));
+		
+		KmlNetworkWriter kmlNetworkWriter;
+		kmlNetworkWriter = new KmlNetworkWriter(network, new GeotoolsTransformation("EPSG:28992", "WGS84"), kmzWriter, mainDoc);
+		
+		mainDoc.getAbstractFeatureGroup().add(kmlObjectFactory.createFolder(kmlNetworkWriter.getNetworkFolder()));
+		kmzWriter.writeMainKml(mainKml);
+		kmzWriter.close();
+		log.info("... done.");
 	}
 	
 	/*package*/ void addConnectorLinks() {
@@ -148,7 +171,7 @@ public class CreateZoneConnectors {
 			Id nodeId = scenario.createId(String.valueOf(zoneId));
 			network.addNode(factory.createNode(nodeId, nodeCoord));
 			
-			Node networkConnectorNode = quadTree.get(point.getCoordinate().x, point.getCoordinate().y);
+			Node networkConnectorNode = quadTree.get(nodeCoord.getX(), nodeCoord.getY());
 			Id networkConnectorNodeId = networkConnectorNode.getId();
 			
 			double length = CoordUtils.calcDistance(nodeCoord, networkConnectorNode.getCoord());

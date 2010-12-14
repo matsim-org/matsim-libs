@@ -48,7 +48,9 @@ public class AlbatrossPopulationCreator {
 
 	private static final Logger log = Logger.getLogger(AlbatrossPopulationCreator.class);
 
-	private static String populationFile = "../../matsim/mysimulations/netherlands/population/example-plans-Albatross.txt";
+	
+	private static String populationFile = "../../matsim/mysimulations/netherlands/population/export-thursday2000-plans-clean.txt";
+//	private static String populationFile = "../../matsim/mysimulations/netherlands/population/example-plans-Albatross.txt";
 	private static String networkFile = "../../matsim/mysimulations/netherlands/network/network_with_connectors.xml.gz";
 	private static String facilitiesFile = "../../matsim/mysimulations/netherlands/facilities/facilities.xml";
 	private static String outFile = "../../matsim/mysimulations/netherlands/population/plans.xml.gz";
@@ -165,8 +167,16 @@ public class AlbatrossPopulationCreator {
 			
 			// Activity
 			int zone = albatrossPerson.PPC.get(i);
-			Id linkId = this.selectLinkByZone(zone);
-			Facility facility = getActivityFacilityByLinkId(linkId);
+			Id linkId = null;
+			Facility facility = null;
+			// if it is a home activity we already know the home facility
+			if (albatrossPerson.ATYPE.get(i) == 9) {
+				linkId = homeLinkId;
+				facility = homeFacility;
+			} else {
+				linkId = this.selectLinkByZone(zone);
+				facility = getActivityFacilityByLinkId(linkId);				
+			}
  
 			String activityType = getActivityType(albatrossPerson.ATYPE.get(i));
 			activity = (ActivityImpl) populationFactory.createActivityFromLinkId(activityType, linkId);
@@ -180,15 +190,16 @@ public class AlbatrossPopulationCreator {
 			activity.setFacilityId(facility.getId());
 			activity.setCoord(facility.getCoord());
 			// if it is not a home activity
-			if (albatrossPerson.ATYPE.get(i) != 9) desires.accumulateActivityDuration(activity.getType(), activity.getDuration());
+			if (albatrossPerson.ATYPE.get(i) != 9 && activity.getDuration() > 0.0) desires.accumulateActivityDuration(activity.getType(), activity.getDuration());
 			plan.addActivity(activity);
-		}
-				
+		}	
 
 		/*
 		 * Finally add a home desire that has a duration of 86400 - all other activities.
+		 * If only home activities are performed, we add a 24h at home desire
 		 */
-		if (plan.getPlanElements().size() == 1) desires.accumulateActivityDuration("home", 86400.0);
+//		if (plan.getPlanElements().size() == 1) desires.accumulateActivityDuration("home", 86400.0);
+		if (desires.getActivityDurations() == null) desires.accumulateActivityDuration("home", 86400.0);
 		else {
 			double otherDurations = 0.0;
 			for (double duration : desires.getActivityDurations().values()) {

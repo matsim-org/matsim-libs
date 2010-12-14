@@ -30,6 +30,7 @@ public class SpecialZones {
 
 	/*package*/ static List<Integer> zonesToRemove;
 	/*package*/ static List<Integer> invalidZones;
+	/*package*/ static List<Integer> notExistingZones;
 	
 	/*
 	 * Numbers are PostCodes
@@ -70,6 +71,23 @@ public class SpecialZones {
 		 */
 		invalidZones = new ArrayList<Integer>();
 		invalidZones.add(1601);
+		
+		/*
+		 * Zones which seem not to be part of the shape file
+		 */
+		notExistingZones = new ArrayList<Integer>();
+		notExistingZones.add(2081);
+		notExistingZones.add(3509);
+		notExistingZones.add(7111);
+		notExistingZones.add(7112);
+		notExistingZones.add(7113);
+		notExistingZones.add(7114);
+		notExistingZones.add(7117);
+		notExistingZones.add(7118);
+		notExistingZones.add(7713);
+		notExistingZones.add(7928);
+		notExistingZones.add(8292);
+		notExistingZones.add(9643);	
 	}
 	
 	/*
@@ -84,9 +102,17 @@ public class SpecialZones {
 		int id = ((Long)zone.getAttribute(3)).intValue();	// PostCode
 		if (zonesToRemove.contains(id)) return true;
 		if (invalidZones.contains(id)) return true;
+		if (notExistingZones.contains(id)) return true;
 		else return false;
 	}
-
+	
+	public static boolean skipZone(int zoneId) {
+		if (zonesToRemove.contains(zoneId)) return true;
+		if (invalidZones.contains(zoneId)) return true;
+		if (notExistingZones.contains(zoneId)) return true;
+		else return false;
+	}
+	
 	/*
 	 * Drop some zones that should not be respected by the model.
 	 * Examples are the islands which are not connected to the road network. 
