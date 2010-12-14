@@ -26,14 +26,18 @@ import org.matsim.core.events.handler.EventHandler;
 
 
 /**
+ * This class can be used by parallel mobility simulations. 
+ * If you are not programming parallel code that generates events better use EventsManagerImpl.
+ * 
+ * The method processEvent is synchronized in this
+ * implementation to avoid thread interference errors.
+ * This class is just a delegate that uses all the logic that can be found in another EventsManager instance
+ * except the synchronization of processEvent().
+ * 
  * @author dgrether
  *
  */
 public class SynchronizedEventsManagerImpl implements EventsManager {
-	// yy I assume this is needed in order to make "processEvent" synchronized.  But could someone please explain to me
-	// (preferably in javadoc to this class) why it makes sense to maintain both classes, one without the
-	// "synchronized" and one with it?  I assume there is a deeper reason, but without guidance I would assume
-	// that people will just randomly select one or the other.  Thanks.  kai, jun'10
 
   private final EventsManager delegate;
   
