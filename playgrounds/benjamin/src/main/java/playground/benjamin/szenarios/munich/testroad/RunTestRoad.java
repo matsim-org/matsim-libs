@@ -21,7 +21,6 @@ package playground.benjamin.szenarios.munich.testroad;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
@@ -37,13 +36,13 @@ public class RunTestRoad {
 	static String outputPath = "../../detailedEval/teststrecke/sim/output/";
 	static String configName = "multipleRunsConfig.xml";
 
-	static Id linkLeaveId = new IdImpl("590000822");
-	static Id linkEnterId = new IdImpl("592536888");
+	static Id enterLinkId = new IdImpl("592536888");
+	static Id leaveLinkId = new IdImpl("590000822");
 
-	static Integer linkCapacity = 1400;
+	static Integer leaveLinkCapacity = 1400;
 
 	static Integer [] days = {
-//		20060127,
+		20060127,
 		20060131,
 		20090317,
 		20090318,
@@ -76,10 +75,8 @@ public class RunTestRoad {
 			config.plans().setInputFile(inputPath + day + "_plans.xml.gz");
 
 			Scenario scenario = controler.getScenario();
-//			Link link = scenario.getNetwork().getLinks().get(linkLeaveId);
-//			link.setCapacity(linkCapacity);
 
-			controler.addControlerListener(new SimpleControlerListener(scenario, linkLeaveId, linkEnterId));
+			controler.addControlerListener(new SimpleControlerListener(scenario, enterLinkId, leaveLinkId, leaveLinkCapacity));
 
 			controler.run();
 		}

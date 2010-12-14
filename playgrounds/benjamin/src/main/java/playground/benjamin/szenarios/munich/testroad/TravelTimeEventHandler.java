@@ -38,60 +38,44 @@ public class TravelTimeEventHandler implements LinkEnterEventHandler, LinkLeaveE
 	private SortedMap<Id, Double> personId2travelTimesPerIteration = new TreeMap<Id, Double>();
 	private SortedMap<Id, Double> personId2enterTimesPerIteration = new TreeMap<Id, Double>();
 
-	private double leaveTime;
-	private double enterTime;
-	private Id linkLeaveId;
-	private Id linkEnterId;
-	private Id personId;
+	private Id enterLinkId;
+	private Id leaveLinkId;
 
-	public TravelTimeEventHandler(SortedMap<Id, Double> personId2travelTimesPerIteration, SortedMap<Id, Double> personId2enterTimesPerIteration, Id linkLeaveId, Id linkEnterId) {
+	public TravelTimeEventHandler(SortedMap<Id, Double> personId2travelTimesPerIteration, SortedMap<Id, Double> personId2enterTimesPerIteration, Id enterLinkId, Id leaveLinkId) {
 		this.personId2travelTimesPerIteration = personId2travelTimesPerIteration;
 		this.personId2enterTimesPerIteration = personId2enterTimesPerIteration;
-		this.linkLeaveId = linkLeaveId;
-		this.linkEnterId = linkEnterId;
+		this.enterLinkId = enterLinkId;
+		this.leaveLinkId = leaveLinkId;
 	}
 
 	@Override
 	public void reset(int iteration) {
 		// TODO Auto-generated method stub
-
 	}
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		String id = event.getPersonId().toString();
-		if(id.contains("testVehicle")){
-			if(event.getLinkId().equals(this.linkEnterId)){
-				enterTime = event.getTime();
-				personId = event.getPersonId();
+		if(event.getLinkId().equals(this.enterLinkId)){
+			String id = event.getPersonId().toString();
+			if(id.contains("testVehicle")){
+				Id personId = event.getPersonId();
+				Double enterTime = event.getTime();
 
 				this.personId2enterTimesPerIteration.put(personId, enterTime);
-
-				if(personId.equals(new IdImpl("43080testVehicle"))){
-					System.out.println(personId + " enters link" + this.linkEnterId + " at " + enterTime);
-				}
-				if (personId.equals(new IdImpl("43083testVehicle"))){
-					System.out.println(personId + " enters link" + this.linkEnterId + " at " + enterTime);
-				}
 			}
 		}
 	}
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		String id = event.getPersonId().toString();
-		if(id.contains("testVehicle")){
-			if(event.getLinkId().equals(this.linkLeaveId)){
-				leaveTime = event.getTime();
+		if(event.getLinkId().equals(this.leaveLinkId)){
+			String id = event.getPersonId().toString();
+			if(id.contains("testVehicle")){
+				Id personId = event.getPersonId();
+				Double leaveTime = event.getTime();
+				Double enterTime = this.personId2enterTimesPerIteration.get(personId);
 
 				this.personId2travelTimesPerIteration.put(personId, leaveTime - enterTime);
-
-				if(personId.equals(new IdImpl("43080testVehicle"))){
-					System.out.println(personId + " leaves link" + this.linkLeaveId + " at " + leaveTime);
-				}
-				if (personId.equals(new IdImpl("43083testVehicle"))){
-					System.out.println(personId + " leaves link" + this.linkLeaveId + " at " + leaveTime);
-				}
 			}
 		}
 	}

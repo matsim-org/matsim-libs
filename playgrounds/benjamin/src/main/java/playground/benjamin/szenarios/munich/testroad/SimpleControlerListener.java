@@ -25,9 +25,11 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
@@ -44,28 +46,33 @@ public class SimpleControlerListener implements StartupListener, ShutdownListene
 	private SortedMap<Id, Double> personId2enterTimes = new TreeMap<Id, Double>();
 
 	private Scenario scenario;
-	private Id linkLeaveId;
-	private Id linkEnterId;
+	private Id enterLinkId;
+	private Id leaveLinkId;
+	private Integer leaveLinkCapacity;
 
-	public SimpleControlerListener(Scenario scenario, Id linkLeaveId, Id linkEnterId) {
+	public SimpleControlerListener(Scenario scenario, Id enterLinkId, Id leaveLinkId, Integer leaveLinkCapacity) {
 		this.scenario = scenario;
-		this.linkLeaveId = linkLeaveId;
-		this.linkEnterId = linkEnterId;
+		this.enterLinkId = enterLinkId;
+		this.leaveLinkId = leaveLinkId;
+		this.leaveLinkCapacity = leaveLinkCapacity;
 	}
 
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		this.eventHandler = new TravelTimeEventHandler(personId2travelTimes, personId2enterTimes, linkLeaveId, linkEnterId);
+		this.eventHandler = new TravelTimeEventHandler(personId2travelTimes, personId2enterTimes, enterLinkId, leaveLinkId);
 		event.getControler().getEvents().addHandler(this.eventHandler);
+		
+		Link link = scenario.getNetwork().getLinks().get(this.leaveLinkId);
+		link.setCapacity(leaveLinkCapacity);
 	}
 
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {
 		SortedMap<Double, Double> enterTimes2travelTimes = createEnterTimes2travelTimes(this.personId2travelTimes, this.personId2enterTimes);
 		
-//		System.out.println(this.personId2travelTimes);
-//		System.out.println(this.personId2enterTimes);
-//		System.out.println(enterTimes2travelTimes);
+		System.out.println(this.personId2travelTimes);
+		System.out.println(this.personId2enterTimes);
+		System.out.println(enterTimes2travelTimes);
 		
 		writeTable(enterTimes2travelTimes, "enterTimes2travelTimes");
 	}
@@ -87,8 +94,9 @@ public class SimpleControlerListener implements StartupListener, ShutdownListene
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(new File(outputPath + outputName + ".txt")));
 
-			for(Double enterTime : enterTimes2travelTimes.keySet()){
-				Double travelTime = enterTimes2travelTimes.get(enterTime);
+			for(Entry <Double, Double> entry : enterTimes2travelTimes.entrySet()){
+				Integer enterTime = ((Double) entry.getKey()).intValue();
+				Integer travelTime = ((Double) entry.getValue()).intValue();
 				
 				bw.write(enterTime.toString());
 				bw.write(";");

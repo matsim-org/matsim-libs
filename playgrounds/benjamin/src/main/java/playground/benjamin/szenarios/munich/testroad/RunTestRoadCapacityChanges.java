@@ -33,8 +33,8 @@ public class RunTestRoadCapacityChanges {
 	static String configName = "_config_capacityChanges.xml";
 	// String configName = "_config.xml";
 
-	static String linkLeaveId = "590000822";
-	static String linkEnterId = "592536888";
+	static String enterLinkId = "592536888";
+	static String leaveLinkId = "590000822";
 	static int startCapacity = 1200;
 	static int stepSize = 50;
 	
@@ -54,7 +54,7 @@ public class RunTestRoadCapacityChanges {
 			Controler controler = new Controler(config);
 			controler.setOverwriteFiles(true);
 			Scenario scenario = controler.getScenario();
-			controler.addControlerListener(new UpdateCapacityControlerListener(scenario, linkLeaveId, linkEnterId, startCapacity, stepSize));
+			controler.addControlerListener(new UpdateCapacityControlerListener(scenario, enterLinkId, leaveLinkId, startCapacity, stepSize));
 			controler.run();
 		}
 	}

@@ -51,24 +51,24 @@ public class UpdateCapacityControlerListener implements StartupListener, Iterati
 	
 	private Scenario scenario;
 	private Integer capacity;
-	private Id linkLeaveId;
-	private Id linkEnterId;
+	private Id enterLinkId;
+	private Id leaveLinkId;
 	private Integer stepSize;
 
-	public UpdateCapacityControlerListener(Scenario scenario, String linkLeaveId, String linkEnterId, int startCapacity, int stepSize) {
+	public UpdateCapacityControlerListener(Scenario scenario, String enterLinkId, String leaveLinkId, int startCapacity, int stepSize) {
 		this.scenario = scenario;
-		this.linkLeaveId = scenario.createId(linkLeaveId);
-		this.linkEnterId = scenario.createId(linkEnterId);
+		this.enterLinkId = scenario.createId(enterLinkId);
+		this.leaveLinkId = scenario.createId(leaveLinkId);
 		this.capacity = startCapacity;
 		this.stepSize = stepSize;
 	}
 
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		this.eventHandler = new TravelTimeEventHandler(personId2travelTimesPerIteration, personId2enterTimesPerIteration, linkLeaveId, linkEnterId);
+		this.eventHandler = new TravelTimeEventHandler(personId2travelTimesPerIteration, personId2enterTimesPerIteration, enterLinkId, leaveLinkId);
 		event.getControler().getEvents().addHandler(this.eventHandler);
 		
-		Link link = scenario.getNetwork().getLinks().get(this.linkLeaveId);
+		Link link = scenario.getNetwork().getLinks().get(this.leaveLinkId);
 		link.setCapacity(this.capacity);
 	}
 
@@ -82,7 +82,7 @@ public class UpdateCapacityControlerListener implements StartupListener, Iterati
 		this.personId2enterTimesPerIteration.clear();
 		
 		capacity = this.capacity + this.stepSize;
-		Link link = scenario.getNetwork().getLinks().get(this.linkLeaveId);
+		Link link = scenario.getNetwork().getLinks().get(this.leaveLinkId);
 		link.setCapacity(capacity);
 	}
 

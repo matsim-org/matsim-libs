@@ -41,9 +41,10 @@ import playground.benjamin.dataprepare.CheckingTabularFileHandler;
 public class CalculateAvgTravelTimesForTestVehicles {
 
 	static String testVehicleDataPath = "../../detailedEval/teststrecke/testVehicle/";
-	static String fileName = "_travelTimes.csv";
+	static String dataFileName = "_travelTimes.csv";
 
-	private static SortedMap<Integer, SortedMap<Integer, Integer>> data = new TreeMap<Integer, SortedMap<Integer, Integer>>();
+	static String testVehicleSimPath = "../../detailedEval/teststrecke/sim/output/";
+	static String simFileName = "enterTimes2travelTimes.txt";
 
 	static Integer [] days = {
 		// dont use this since they changed counts logfile format during the day! 20060125,
@@ -55,32 +56,40 @@ public class CalculateAvgTravelTimesForTestVehicles {
 		20090707,
 		20090708,
 		20090709,
-		20091201,
-		20091202,
-		20091203
+//		20091201,
+//		20091202,
+//		20091203
 	};
 
 
 	public static void main(String[] args) {
 
-		calculateAvgTravelTimesFromData(testVehicleDataPath, fileName, days, data);
-		calculateAvgTravelTimesFromSim();
+		calculateAvgTravelTimesFromData(testVehicleDataPath, dataFileName, days);
+		calculateAvgTravelTimesFromSim(testVehicleSimPath, simFileName, days);
 	}
 
-	private static void calculateAvgTravelTimesFromData(String testVehicleDataPath2, String fileName, Integer[] days,	SortedMap<Integer, SortedMap<Integer, Integer>> data) {
-
+	private static void calculateAvgTravelTimesFromData(String testVehicleDataPath, String dataFileName, Integer[] days) {
+		SortedMap<Integer, SortedMap<Integer, Integer>> realData = new TreeMap<Integer, SortedMap<Integer, Integer>>();
+		
 		for(int day : days){
-			SortedMap<Integer, Integer> inflowTimes2TravelTimes = getInflowTimes2TravelTimes(testVehicleDataPath + day + fileName);
-			data.put(day, inflowTimes2TravelTimes);
+			SortedMap<Integer, Integer> inflowTimes2TravelTimes = getInflowTimes2TravelTimes(testVehicleDataPath + day + dataFileName);
+			realData.put(day, inflowTimes2TravelTimes);
 		}
 
-		SortedMap<Integer, Double> hours2AvgTravelTimes = calculateAvgTravelTimesPerHour(data);
-		writeAvgTravelTimesPerHour(hours2AvgTravelTimes);
+		SortedMap<Integer, Double> hours2AvgTravelTimes = calculateAvgTravelTimesPerHour(realData);
+		writeAvgTravelTimesPerHour(hours2AvgTravelTimes, testVehicleDataPath);
 	}
 
-	private static void calculateAvgTravelTimesFromSim() {
-		// TODO Auto-generated method stub
+	private static void calculateAvgTravelTimesFromSim(String testVehicleSimPath, String simFileName, Integer[] days) {
+		SortedMap<Integer, SortedMap<Integer, Integer>> simData = new TreeMap<Integer, SortedMap<Integer, Integer>>();
 		
+		for(int day : days){
+			SortedMap<Integer, Integer> inflowTimes2TravelTimes = getInflowTimes2TravelTimes(testVehicleSimPath + day + "/" + simFileName);
+			simData.put(day, inflowTimes2TravelTimes);
+		}
+		
+		SortedMap<Integer, Double> hours2AvgTravelTimes = calculateAvgTravelTimesPerHour(simData);
+		writeAvgTravelTimesPerHour(hours2AvgTravelTimes, testVehicleSimPath);
 	}
 
 	private static SortedMap<Integer, Integer> getInflowTimes2TravelTimes(String inputFile) {
@@ -157,9 +166,9 @@ public class CalculateAvgTravelTimesForTestVehicles {
 		return hours2TravelTimes;
 	}
 
-	private static void writeAvgTravelTimesPerHour(SortedMap<Integer, Double> hours2AvgTravelTimes) {
+	private static void writeAvgTravelTimesPerHour(SortedMap<Integer, Double> hours2AvgTravelTimes, String outputPath) {
 		try {
-			BufferedWriter bw = new BufferedWriter(new FileWriter(new File(testVehicleDataPath + "averageTravelTimes.txt")));
+			BufferedWriter bw = new BufferedWriter(new FileWriter(new File(outputPath + "averageTravelTimes.txt")));
 			//header
 			bw.write("hour" + "\t" + "avgTravelTime");
 			bw.newLine();
@@ -175,7 +184,7 @@ public class CalculateAvgTravelTimesForTestVehicles {
 				bw.newLine();
 			}
 			bw.close();
-			System.out.println("Wrote average travel times to " + testVehicleDataPath);
+			System.out.println("Wrote average travel times to " + outputPath);
 
 		} catch (IOException e) {
 			throw new RuntimeException(e);
