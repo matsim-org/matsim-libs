@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.MatsimXmlWriter;
@@ -35,7 +36,9 @@ import org.matsim.core.utils.io.MatsimXmlWriter;
  *
  */
 public class VehicleWriterV1 extends MatsimXmlWriter {
-
+  
+	private static final Logger log = Logger.getLogger(VehicleWriterV1.class);
+	
 	private List<Tuple<String, String>> atts = new ArrayList<Tuple<String, String>>();
 	private Map<Id, VehicleType> vehicleTypes;
 	private Map<Id, Vehicle> vehicles;
@@ -51,6 +54,7 @@ public class VehicleWriterV1 extends MatsimXmlWriter {
 		this.writeXmlHead();
 		this.writeRootElement();
 		this.close();
+		log.info("Vehicles written to: " + filename);
 	}
 
 	private void writeRootElement() throws IOException {
