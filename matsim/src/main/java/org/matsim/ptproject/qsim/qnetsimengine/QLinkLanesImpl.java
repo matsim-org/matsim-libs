@@ -237,8 +237,9 @@ public class QLinkLanesImpl extends QLinkInternalI {
 					}
 				}
 			}
+			qLane.finishInitialization();
 		}
-
+		
 		Collections.sort(this.queueLanes, QLinkLanesImpl.fromLinkEndComparator);
 	}
 

@@ -155,6 +155,8 @@ public final class QLane extends VisLane implements SignalizeableItem {
 	/*package*/ final TransitQLaneFeature transitQueueLaneFeature;
 
 	private DefaultSignalizeableItem qSignalizedItem;
+	
+	private Map<Id, List<QLane>> toLinkToQLanesMap = null;
 
 	/*package*/ QLane(final NetsimLink ql, Lane laneData, boolean isOriginalLane) {
 		this.queueLink = (QLinkInternalI) ql; // yyyy needs to be of correct, but should be made typesafe.  kai, aug'10
@@ -162,6 +164,21 @@ public final class QLane extends VisLane implements SignalizeableItem {
 		this.isOriginalLane = isOriginalLane;
 		this.laneData = laneData;
 	}
+	
+	/*package*/ void finishInitialization() {
+		if (this.toLanes != null){
+			this.toLinkToQLanesMap = new HashMap<Id, List<QLane>>(this.getDestinationLinkIds().size());
+			for (QLane toLane : this.toLanes){
+				for (Id toLinkId : toLane.getDestinationLinkIds()){
+					if (!this.toLinkToQLanesMap.containsKey(toLinkId)){
+						this.toLinkToQLanesMap.put(toLinkId, new ArrayList<QLane>());
+					}
+					this.toLinkToQLanesMap.get(toLinkId).add(toLane);
+				}
+			}
+		}
+	}
+
 
 	public Id getId(){
 		// same as getLane().getId().  kai, aug'10
@@ -221,12 +238,7 @@ public final class QLane extends VisLane implements SignalizeableItem {
 		double tempStorageCapacity = this.freespeedTravelTime * this.simulatedFlowCapacity;
 		if (this.storageCapacity < tempStorageCapacity) {
 			if (spaceCapWarningCount <= 10) {
-				if (!this.isOriginalLane  || (this.toLanes != null)) {
 					log.warn("Lane " + this.getId() + " on Link " + this.queueLink.getLink().getId() + " too small: enlarge storage capcity from: " + this.storageCapacity + " Vehicles to: " + tempStorageCapacity + " Vehicles.  This is not fatal, but modifies the traffic flow dynamics.");
-				}
-				else {
-					log.warn("Link " + this.queueLink.getLink().getId() + " too small: enlarge storage capcity from: " + this.storageCapacity + " Vehicles to: " + tempStorageCapacity + " Vehicles.  This is not fatal, but modifies the traffic flow dynamics.");
-				}
 				if (spaceCapWarningCount == 10) {
 					log.warn("Additional warnings of this type are suppressed.");
 				}
@@ -290,7 +302,6 @@ public final class QLane extends VisLane implements SignalizeableItem {
 		QVehicle veh;
 
 		this.transitQueueLaneFeature.beforeMoveLaneToBuffer(now);
-
 		// handle regular traffic
 		while ((veh = this.vehQueue.peek()) != null) {
 			//we have an original QueueLink behaviour
@@ -360,6 +371,22 @@ public final class QLane extends VisLane implements SignalizeableItem {
 		// might be easier to read?  In fact, I think even more could be done in terms of readability.  kai, nov'09
 		return moveBufferToNextLane(now);
 	}
+	
+	private QLane chooseNextLane(Id toLinkId){
+		List<QLane> nextLanes = this.toLinkToQLanesMap.get(toLinkId);
+		if (nextLanes.size() == 1){
+			return nextLanes.get(0);
+		}
+		//else chose lane by storage cap
+		QLane retLane = nextLanes.get(0);
+		for (QLane l : nextLanes) {
+			if (l.usedStorageCapacity < retLane.usedStorageCapacity){
+				retLane = l;
+			}
+		}
+		return retLane;
+	}
+	
 
 	private boolean moveBufferToNextLane(final double now) {
 		// because of the "this.toLanes != null", this method in my does something only when there are downstream
@@ -370,11 +397,7 @@ public final class QLane extends VisLane implements SignalizeableItem {
 			QVehicle veh = this.buffer.peek();
 			Id nextLinkId = veh.getDriver().chooseNextLinkId();
 			QLane toQueueLane = null;
-			for (QLane l : this.toLanes) {
-				if (l.getDestinationLinkIds().contains(nextLinkId)) {
-					toQueueLane = l;
-				}
-			}
+			toQueueLane = this.chooseNextLane(nextLinkId);
 			if (toQueueLane != null) {
 				if (toQueueLane.hasSpace()) {
 					this.buffer.poll();
@@ -618,6 +641,7 @@ public final class QLane extends VisLane implements SignalizeableItem {
 		return this.queueLink;
 	}
 
+	@Override
 	public double getLength(){
 		return this.length;
 	}
@@ -695,7 +719,7 @@ public final class QLane extends VisLane implements SignalizeableItem {
 			}
 		}
 	}
-
+	
 	@Override
 	double getInverseSimulatedFlowCapacity() {
 		return this.inverseSimulatedFlowCapacity ;
@@ -705,5 +729,6 @@ public final class QLane extends VisLane implements SignalizeableItem {
 	int getBufferStorage() {
 		return this.bufferStorageCapacity ;
 	}
+
 
 }
