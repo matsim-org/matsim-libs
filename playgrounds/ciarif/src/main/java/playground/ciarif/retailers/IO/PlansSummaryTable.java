@@ -51,7 +51,7 @@ public class PlansSummaryTable implements PlanAlgorithm {
 			for (int i=1; i<plan.getPlanElements().size()-2; i=i+2) {
 				//Leg l = (Leg)plan.getActsLegs().get(i);
 				ActivityImpl a = (ActivityImpl)plan.getPlanElements().get(i+1);
-				if (a.getType().contains("shop")) {
+				if (a.getType().contains("shopgrocery")) {
 					//Link arr_link = a.getLink();
 					//out.write(a.getType() + "\t");
 					out.write(a.getLinkId() + "\t");

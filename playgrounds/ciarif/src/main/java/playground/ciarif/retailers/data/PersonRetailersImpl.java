@@ -1,6 +1,8 @@
 package playground.ciarif.retailers.data;
 
 import java.util.List;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Plan;
@@ -27,23 +29,13 @@ public class PersonRetailersImpl extends PersonImpl
     setSelectedPlan(p.getSelectedPlan());
     this.desires = new MyDesires(p.getDesires());
     createDesires(p.getDesires().toString());
-
-    if (p.getDesires().getActivityDuration("shop") > 0.0D) {
-      this.desires.putActivityDuration("shop", Double.valueOf(p.getDesires().getActivityDuration("shop")).toString());
+    
+    for (String actType:p.getDesires().getActivityDurations().keySet()) {
+    	Double actDur = p.getDesires().getActivityDuration(actType);
+    	this.desires.putActivityDuration(actType, actDur);
     }
-    if (p.getDesires().getActivityDuration("work") > 0.0D) {
-      this.desires.putActivityDuration("work", Double.valueOf(p.getDesires().getActivityDuration("work")).toString());
-    }
-    if (p.getDesires().getActivityDuration("home") > 0.0D) {
-      this.desires.putActivityDuration("home", Double.valueOf(p.getDesires().getActivityDuration("home")).toString());
-    }
-
-    if (p.getDesires().getActivityDuration("education") > 0.0D) {
-      this.desires.putActivityDuration("education", Double.valueOf(p.getDesires().getActivityDuration("education")).toString());
-    }
-    if (p.getDesires().getActivityDuration("leisure") > 0.0D)
-      this.desires.putActivityDuration("leisure", Double.valueOf(p.getDesires().getActivityDuration("leisure")).toString());
   }
+   
 
   public void setGlobalShopsUtility(double average)
   {

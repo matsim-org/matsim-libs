@@ -47,7 +47,7 @@ public class CountRetailerCustomers {
 					Activity act = (Activity) pe2;
 					Id f_Id = act.getFacilityId();
 
-					if (act.getType().equals("shop") && this.retailer.getFacilities().containsKey(f_Id)) {
+					if (act.getType().equals("shopgrocery") && this.retailer.getFacilities().containsKey(f_Id)) {
 
 						customersCount = customersCount+1;
 					}

@@ -37,8 +37,7 @@ public class LogitMaxLinkRetailerStrategy implements RetailerStrategy {
 //		controler.getNetwork().getLink("").getUpMapping();
 		
 
-		for (ActivityFacility f : facilities.values()) { //francesco: TODO check again this loop (or one of the internal one), it seems that too many 
-			// facility relocations are performed, if this might not influence the results it is certainly a waste of memory
+		for (ActivityFacility f : facilities.values()) {
 			
 			double[] utils = new double[alternatives];
 			Link[] links = controler.getNetwork().getLinks().values().toArray(new Link[controler.getNetwork().getLinks().size()]);

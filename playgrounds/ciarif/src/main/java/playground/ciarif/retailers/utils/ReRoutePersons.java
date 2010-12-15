@@ -62,7 +62,7 @@ public class ReRoutePersons {
 				}
 			}
 			if (routeIt) {
-				log.info("reRouting person: " + p.getId());
+				//log.info("reRouting person: " + p.getId());
 				pcrl.run(p);
 				counterPersons = counterPersons+1;
 			}

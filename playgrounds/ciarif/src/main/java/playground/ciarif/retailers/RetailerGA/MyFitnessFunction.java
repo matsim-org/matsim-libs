@@ -20,14 +20,14 @@ public class MyFitnessFunction
   public MyFitnessFunction(boolean isMax, int number) {
     this.max = isMax;
     this.numberOfPoints = number;
-    this.points = new ArrayList(this.numberOfPoints);
+    this.points = new ArrayList<Coordinate>(this.numberOfPoints);
     this.precedenceVector = generateRandomInstance(this.numberOfPoints, -100, 100, -100, 100);
   }
 
   public MyFitnessFunction(boolean isMax, int number, RetailerModel rm) {
     this.max = isMax;
     this.numberOfPoints = number;
-    this.points = new ArrayList(this.numberOfPoints);
+    this.points = new ArrayList<Coordinate>(this.numberOfPoints);
     this.precedenceVector = generateRandomInstance(this.numberOfPoints, -100, 100, -100, 100);
     this.rm = rm;
   }

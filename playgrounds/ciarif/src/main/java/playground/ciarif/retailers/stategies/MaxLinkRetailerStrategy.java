@@ -124,11 +124,13 @@ public class MaxLinkRetailerStrategy implements RetailerStrategy {
 	}
 
 
+	@Override
 	public Map<Id, ActivityFacilityImpl> moveFacilities(
-			Map<Id, ActivityFacilityImpl> facilities,
-			TreeMap<Id, LinkRetailersImpl> links) {
+			Map<Id, ActivityFacilityImpl> paramMap,
+			TreeMap<Id, LinkRetailersImpl> paramTreeMap) {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
 
 }	

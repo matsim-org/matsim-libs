@@ -43,7 +43,7 @@ public class GravityModelRetailerStrategy extends RetailerStrategyImpl
   private RetailZones retailZones;
   private ArrayList<Consumer> consumers;
   private Map<Id, Integer> shops_keys;
-  private Map<Id, ActivityFacilityImpl> movedFacilities = new TreeMap();
+  private Map<Id, ActivityFacilityImpl> movedFacilities = new TreeMap<Id, ActivityFacilityImpl>();
 
   public GravityModelRetailerStrategy(Controler controler) {
     super(controler);
@@ -77,10 +77,10 @@ public class GravityModelRetailerStrategy extends RetailerStrategyImpl
     if (numberGenerations == null) log.warn("In config file, param = numberOfGenerations in module = Retailers not defined, the value '100' will be used as default for this parameter");
 
     RunRetailerGA rrGA = new RunRetailerGA(populationSize, numberGenerations);
-    TreeMap first = createInitialLocationsForGA(mergeLinks(freeLinks, retailerFacilities));
+    TreeMap<Integer,String> first = createInitialLocationsForGA(mergeLinks(freeLinks, retailerFacilities));
     gm.setFirst(first);
     gm.setInitialSolution(first.size());
-    ArrayList solution = rrGA.runGA(gm);
+    ArrayList<Integer> solution = rrGA.runGA(gm);
     int count = 0;
     for (ActivityFacilityImpl af : this.retailerFacilities.values()) {
       if (first.get(solution.get(count)) != af.getLinkId().toString()) {
@@ -125,11 +125,11 @@ public class GravityModelRetailerStrategy extends RetailerStrategyImpl
       for (ActivityFacilityImpl aaff : this.shops.values()) {
         dist2 = aaff.calcDistance(((PlanImpl)c.getPerson().getSelectedPlan()).getFirstActivity().getCoord());
         sumDist += dist2;
-        dim = ((ActivityOptionImpl)aaff.getActivityOptions().get("shop")).getCapacity().doubleValue();
+        dim = ((ActivityOptionImpl)aaff.getActivityOptions().get("shopgrocery")).getCapacity().doubleValue();
         sumDim += dim;
       }
       variables_matrix.set(consumer_index, 0, Math.log(dist1 / sumDist / this.shops.size()));
-      variables_matrix.set(consumer_index, 1, Math.log(((ActivityOptionImpl)af.getActivityOptions().get("shop")).getCapacity().doubleValue() / sumDim / this.shops.size()));
+      variables_matrix.set(consumer_index, 1, Math.log(((ActivityOptionImpl)af.getActivityOptions().get("shopgrocery")).getCapacity().doubleValue() / sumDim / this.shops.size()));
     }
 
     log.info("A 'zero distance' has been detected and modified, in " + cases + " cases");
@@ -144,10 +144,10 @@ public class GravityModelRetailerStrategy extends RetailerStrategyImpl
 
   private DenseDoubleMatrix2D findProb()
   {
-    this.consumers = new ArrayList();
+    this.consumers = new ArrayList<Consumer>();
     DenseDoubleMatrix2D prob_i_j = new DenseDoubleMatrix2D(this.retailZones.getRetailZones().values().size(), this.shops.size());
 
-    this.shops_keys = new TreeMap();
+    this.shops_keys = new TreeMap<Id,Integer>();
     int consumer_count = 0;
     int j = 0;
     log.info("This scenario has " + this.shops.size() + " shops");
@@ -167,7 +167,7 @@ public class GravityModelRetailerStrategy extends RetailerStrategyImpl
             if (pe2 instanceof Activity) {
               Activity act = (Activity)pe2;
 
-              if ((act.getType().equals("shop")) && (act.getFacilityId().equals(f.getId()))) {
+              if ((act.getType().equals("shopgrocery")) && (act.getFacilityId().equals(f.getId()))) {
                 if ((first_shop) && (this.retailerFacilities.containsKey(f.getId()))) {
                   Consumer consumer = new Consumer(consumer_count, p, rz.getId());
                   consumer.setShoppingFacility(f);

@@ -79,7 +79,7 @@ public class GravityModel extends RetailerModelImpl
 
   private ArrayList<Double> computeNormalPotential(ArrayList<Integer> solution)
   {
-    ArrayList newFitness = new ArrayList();
+    ArrayList<Double> newFitness = new ArrayList<Double>();
     double global_likelihood = 0.0D;
     int a = 0;
 
@@ -101,7 +101,7 @@ public class GravityModel extends RetailerModelImpl
         if (dist1 == 0.0D) {
           dist1 = 10.0D;
         }
-        pers_potential = Math.pow(dist1, this.betas[0]) + Math.pow(((ActivityOption)c.getActivityOptions().get("shop")).getCapacity().doubleValue(), this.betas[1]);
+        pers_potential = Math.pow(dist1, this.betas[0]) + Math.pow(((ActivityOption)c.getActivityOptions().get("shopgrocery")).getCapacity().doubleValue(), this.betas[1]);
 
         if (pr.getGlobalShopsUtility() == 0.0D) {
           processPerson();
@@ -130,7 +130,7 @@ public class GravityModel extends RetailerModelImpl
               ++count;
             }
 
-            double potential = Math.pow(dist, this.betas[0]) + Math.pow(((ActivityOption)s.getActivityOptions().get("shop")).getCapacity().doubleValue(), this.betas[1]);
+            double potential = Math.pow(dist, this.betas[0]) + Math.pow(((ActivityOption)s.getActivityOptions().get("shopgrocery")).getCapacity().doubleValue(), this.betas[1]);
 
             pers_sum_potential += potential;
           }
@@ -197,7 +197,7 @@ public class GravityModel extends RetailerModelImpl
           if (dist1 == 0.0D) {
             dist1 = 10.0D;
           }
-          pers_potential = Math.pow(dist1, this.betas[0]) + Math.pow(((ActivityOption)c.getActivityOptions().get("shop")).getCapacity().doubleValue(), this.betas[1]);
+          pers_potential = Math.pow(dist1, this.betas[0]) + Math.pow(((ActivityOption)c.getActivityOptions().get("shopgrocery")).getCapacity().doubleValue(), this.betas[1]);
 
           if (pr.getGlobalShopsUtility() == 0.0D) {
             processPerson();
@@ -227,7 +227,7 @@ public class GravityModel extends RetailerModelImpl
                 ++count;
               }
 
-              double potential = Math.pow(dist, this.betas[0]) + Math.pow(((ActivityOption)s.getActivityOptions().get("shop")).getCapacity().doubleValue(), this.betas[1]);
+              double potential = Math.pow(dist, this.betas[0]) + Math.pow(((ActivityOption)s.getActivityOptions().get("shopgrocery")).getCapacity().doubleValue(), this.betas[1]);
 
               pers_sum_potential += potential;
             }
@@ -247,6 +247,8 @@ public class GravityModel extends RetailerModelImpl
     return newFitness;
   }
 
+  
+  //TODO all this methods createZones... should be in a specific class an not here
   private void createZonesFromPersonsShops(int n) {
     log.info("Zones are created");
     double minx = (1.0D / 0.0D);

@@ -72,7 +72,8 @@ public class MinTravelCostsModel extends RetailerModelImpl
       double scoreSum = 0.0D;
       LinkRetailersImpl link = new LinkRetailersImpl((Link)this.controler.getNetwork().getLinks().get(new IdImpl(linkId)), (NetworkImpl)this.controler.getNetwork(), Double.valueOf(0.0D), Double.valueOf(0.0D));
       Collection<PersonPrimaryActivity> primaryActivities = Utils.getPersonPrimaryActivityQuadTree().get(link.getCoord().getX(), link.getCoord().getY(), 2000.0D);
-
+      
+      
       for (PersonPrimaryActivity ppa : primaryActivities)
       {
         Network network = this.controler.getNetwork();
@@ -101,7 +102,7 @@ public class MinTravelCostsModel extends RetailerModelImpl
         log.info("Travel Time: " + li.getTravelTime() + ", Arrival Time: " + li.getArrivalTime() + ", Departure Time: " + li.getDepartureTime());
         scoreSum += score;
       }
-      link.setPotentialCustomers(scoreSum);
+      link.setPotentialCustomers(scoreSum/primaryActivities.size());
       this.availableLinks.put(link.getId(), link);
     }
   }

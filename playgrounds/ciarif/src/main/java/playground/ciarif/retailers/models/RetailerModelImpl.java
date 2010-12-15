@@ -17,14 +17,14 @@ public class RetailerModelImpl
   implements RetailerModel
 {
   protected static final Logger log = Logger.getLogger(RetailerModelImpl.class);
-  protected final Map<Id, PersonImpl> persons = new TreeMap();
-  protected final Map<Id, PersonRetailersImpl> retailersPersons = new TreeMap();
+  protected final Map<Id, PersonImpl> persons = new TreeMap<Id, PersonImpl>();
+  protected final Map<Id, PersonRetailersImpl> retailersPersons = new TreeMap<Id, PersonRetailersImpl>();
   protected Controler controler;
   protected Map<Id, ActivityFacilityImpl> retailerFacilities;
   protected ActivityFacilities controlerFacilities;
   protected Map<Id, ActivityFacilityImpl> shops;
   protected TreeMap<Integer, String> first;
-  protected ArrayList<Integer> initialSolution = new ArrayList();
+  protected ArrayList<Integer> initialSolution = new ArrayList<Integer>();
 
   public double computePotential(ArrayList<Integer> solution)
   {
@@ -33,9 +33,9 @@ public class RetailerModelImpl
 
   protected Map<Id, ActivityFacilityImpl> findScenarioShops(Collection<? extends ActivityFacility> controlerFacilities)
   {
-    Map shops = new TreeMap();
+    Map<Id, ActivityFacilityImpl> shops = new TreeMap<Id, ActivityFacilityImpl>();
     for (ActivityFacility f : controlerFacilities) {
-      if (f.getActivityOptions().entrySet().toString().contains("shop")) {
+      if (f.getActivityOptions().entrySet().toString().contains("shopgrocery")) {
         shops.put(f.getId(), (ActivityFacilityImpl)f);
       }
     }

@@ -133,8 +133,8 @@ public abstract class Utils
     minx -= 1.0D; miny -= 1.0D; maxx += 1.0D; maxy += 1.0D;
     QuadTree<ActivityFacility> shopsQuadTree = new QuadTree<ActivityFacility>(minx, miny, maxx, maxy);
     for (ActivityFacility f : controler.getFacilities().getFacilities().values()) {
-      log.info("activity options = " + f.getActivityOptions());
-      if (f.getActivityOptions().containsKey("shop")) {
+      //log.info("activity options = " + f.getActivityOptions());
+      if (f.getActivityOptions().containsKey("shopgrocery")) {
         Coord c = f.getCoord();
         shopsQuadTree.put(c.getX(), c.getY(), f);
       }
@@ -167,7 +167,7 @@ public abstract class Utils
       boolean hasEducation = false;
       //boolean hasShop = false;
 
-      if (p.getSelectedPlan().getPlanElements().toString().contains("type=shop")) {
+      if (p.getSelectedPlan().getPlanElements().toString().contains("type=shopgrocery")) {
         for (PlanElement pe : p.getSelectedPlan().getPlanElements())
         {
           if (pe instanceof Activity) {
@@ -220,7 +220,7 @@ public abstract class Utils
         i += primaryActivityCount;
       }
 
-      log.info("Global Primary activity count = " + i);
+      //log.info("Global Primary activity count = " + i);
     }
 
     return personPrimaryActivityQuadTree;

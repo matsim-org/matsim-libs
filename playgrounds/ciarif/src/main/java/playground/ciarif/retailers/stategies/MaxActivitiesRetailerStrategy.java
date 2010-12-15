@@ -1,18 +1,15 @@
 package playground.ciarif.retailers.stategies;
 
-import java.util.ArrayList;
+import java.util.ArrayList; 
 import java.util.Map;
 import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.jfree.util.Log;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.network.NetworkImpl;
 import playground.ciarif.retailers.RetailerGA.RunRetailerGA;
 import playground.ciarif.retailers.data.LinkRetailersImpl;
 import playground.ciarif.retailers.models.MaxActivityModel;
@@ -26,7 +23,7 @@ public class MaxActivitiesRetailerStrategy extends RetailerStrategyImpl
   public static final String POPULATION = "PopulationSize";
   private Map<Id, ActivityFacilityImpl> shops;
   private Map<Id, ActivityFacilityImpl> retailerFacilities;
-  private Map<Id, ActivityFacilityImpl> movedFacilities = new TreeMap();
+  private Map<Id, ActivityFacilityImpl> movedFacilities = new TreeMap<Id, ActivityFacilityImpl>();
 
   public MaxActivitiesRetailerStrategy(Controler controler)
   {
@@ -37,7 +34,7 @@ public class MaxActivitiesRetailerStrategy extends RetailerStrategyImpl
   {
     this.retailerFacilities = retailerFacilities;
     MaxActivityModel mam = new MaxActivityModel(this.controler, retailerFacilities);
-    TreeMap first = createInitialLocationsForGA(mergeLinks(freeLinks, retailerFacilities));
+    TreeMap<Integer, String> first = createInitialLocationsForGA(mergeLinks(freeLinks, retailerFacilities));
     Log.info("first = " + first);
     mam.init(first);
     this.shops = mam.getScenarioShops();
@@ -46,7 +43,7 @@ public class MaxActivitiesRetailerStrategy extends RetailerStrategyImpl
     Integer numberGenerations = Integer.valueOf(Integer.parseInt(this.controler.getConfig().findParam("Retailers", "numberOfGenerations")));
     if (numberGenerations == null) log.warn("In config file, param = numberOfGenerations in module = Retailers not defined, the value '100' will be used as default for this parameter");
     RunRetailerGA rrGA = new RunRetailerGA(populationSize, numberGenerations);
-    ArrayList solution = rrGA.runGA(mam);
+    ArrayList<Integer> solution = rrGA.runGA(mam);
     int count = 0;
     for (ActivityFacilityImpl af : this.retailerFacilities.values())
     {

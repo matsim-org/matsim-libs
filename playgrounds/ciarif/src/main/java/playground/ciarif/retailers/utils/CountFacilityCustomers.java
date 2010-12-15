@@ -44,7 +44,7 @@ public class CountFacilityCustomers {
 			for (PlanElement pe : plan.getPlanElements()) {
 				if (pe instanceof Activity) {
 					Activity act = (Activity) pe;
-					if (act.getType().equals("shop") && act.getFacilityId().equals(facility.getId())){
+					if (act.getType().equals("shopgrocery") && act.getFacilityId().equals(facility.getId())){
 						customersCount=customersCount+1;
 					}
 				}

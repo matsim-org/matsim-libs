@@ -15,16 +15,16 @@ public class RetailZone
   private Id id;
   private QuadTree<Person> personsQuadTree;
   private QuadTree<ActivityFacility> shopsQuadTree;
-  private ArrayList<Person> persons = new ArrayList();
-  private ArrayList<ActivityFacility> shops = new ArrayList();
+  private ArrayList<Person> persons = new ArrayList<Person>();
+  private ArrayList<ActivityFacility> shops = new ArrayList<ActivityFacility>();
   private CoordImpl minCoord;
   private CoordImpl maxCoord;
 
   public RetailZone(Id id, Double minx, Double miny, Double maxx, Double maxy)
   {
     this.id = id;
-    this.personsQuadTree = new QuadTree(minx.doubleValue(), miny.doubleValue(), maxx.doubleValue(), maxy.doubleValue());
-    this.shopsQuadTree = new QuadTree(minx.doubleValue(), miny.doubleValue(), maxx.doubleValue(), maxy.doubleValue());
+    this.personsQuadTree = new QuadTree<Person>(minx.doubleValue(), miny.doubleValue(), maxx.doubleValue(), maxy.doubleValue());
+    this.shopsQuadTree = new QuadTree<ActivityFacility>(minx.doubleValue(), miny.doubleValue(), maxx.doubleValue(), maxy.doubleValue());
     this.minCoord = new CoordImpl(minx.toString(), miny.toString());
     this.maxCoord = new CoordImpl(maxx.toString(), maxy.toString());
   }

@@ -4,7 +4,6 @@ import java.util.Map;
 import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import playground.ciarif.retailers.stategies.CatchmentAreaRetailerStrategy;
@@ -20,10 +19,10 @@ import playground.ciarif.retailers.stategies.RetailerStrategy;
 public class Retailer
 {
   private final Id id;
-  private final Map<Id, ActivityFacilityImpl> facilities = new TreeMap();
+  private final Map<Id, ActivityFacilityImpl> facilities = new TreeMap<Id, ActivityFacilityImpl>();
   private static final Logger log = Logger.getLogger(Retailer.class);
   private RetailerStrategy strategy;
-  private Map<Id, ActivityFacilityImpl> movedFacilities = new TreeMap();
+  private Map<Id, ActivityFacilityImpl> movedFacilities = new TreeMap<Id, ActivityFacilityImpl>();
 
   public Retailer(Id id, RetailerStrategy rs) {
     this.id = id;
@@ -46,6 +45,7 @@ public class Retailer
   {
     if (strategyName.contains("randomRetailerStrategy")) {
       this.strategy = new RandomRetailerStrategy();
+      //log.info("The retailer " + this.id + " is using a random Stategy");
       return true;
     }
     if (strategyName.contains("maxLinkRetailerStrategy")) {
@@ -65,7 +65,7 @@ public class Retailer
       return true;
     }
     if (strategyName.contains("gravityModelRetailerStrategy")) {
-      log.info("Controler =" + controler);
+      //log.info("Controler =" + controler);
       this.strategy = new GravityModelRetailerStrategy(controler);
       return true;
     }
@@ -89,6 +89,8 @@ public class Retailer
   }
 
   public final void runStrategy(TreeMap<Id, LinkRetailersImpl> links) {
+	log.info("available Links are= " + links);
+	log.info("A " + this.strategy + " will be used");
     this.movedFacilities = this.strategy.moveFacilities(this.facilities, links);
   }
 

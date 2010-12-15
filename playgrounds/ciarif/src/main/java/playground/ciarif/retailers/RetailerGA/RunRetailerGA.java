@@ -54,7 +54,7 @@ public class RunRetailerGA
     System.out.printf("\t               Incumbent fitness:  %6.2f\n", new Object[] { Double.valueOf(ga.getIncumbent().getFitness()) });
     System.out.printf("\tAverage time per generation (ms):  %6.2f\n", new Object[] { Double.valueOf(avgTime) });
 
-    ArrayList solution = ga.getIncumbent().getGenome();
+    ArrayList<Integer> solution = ga.getIncumbent().getGenome();
     log.info("The optimized solution is: " + solution);
     return solution;
   }

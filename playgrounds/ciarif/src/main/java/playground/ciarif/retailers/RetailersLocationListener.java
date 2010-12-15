@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.Map;
 import org.apache.log4j.Logger;
 import org.jfree.util.Log;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.Config;
@@ -46,30 +47,6 @@ public class RetailersLocationListener
   private RetailersSummaryWriter rsw;
   private CountFacilityCustomers cfc;
 
-//  public void notifyStartup(StartupEvent event)
-//  {
-//    this.controler = event.getControler();
-//    FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(this.controler.getConfig().charyparNagelScoring());
-//    this.pcrl = new PlansCalcRoute(this.controler.getConfig().plansCalcRoute(), this.controler.getNetwork(), timeCostCalc, timeCostCalc, new AStarLandmarksFactory(this.controler.getNetwork(), timeCostCalc));
-//
-//    this.facilityIdFile = this.controler.getConfig().findParam("Retailers", "retailers");
-//    if (this.facilityIdFile == null) throw new RuntimeException("In config file, param = retailers in module = Retailers not defined!");
-//
-//    this.retailers = new FileRetailerReader(this.controler.getFacilities().getFacilities(), this.facilityIdFile).readRetailers(this.controler);
-//
-//    this.lrr = new LinksRetailerReader(this.controler, this.retailers);
-//    this.lrr.init();
-//
-//    String rswOutputFile = this.controler.getConfig().findParam("Retailers", "rswOutputFile");
-//    if (rswOutputFile == null) {
-//      throw new RuntimeException("The file to which the Retailers Summary should be written has not been set");
-//    }
-//
-//    this.rsw = new RetailersSummaryWriter(rswOutputFile);
-//
-//    this.cfc = new CountFacilityCustomers(this.controler.getPopulation().getPersons());
-//  }
-  
   public void notifyStartup(StartupEvent event)
   {
     this.controler = event.getControler();
@@ -136,7 +113,8 @@ public class RetailersLocationListener
     }
     if ((this.controler.getIterationNumber().intValue() != 0) && (this.controler.getIterationNumber().intValue() % analysisFrequency == 0) && (this.controler.getIterationNumber().intValue() != gravityModelIter) && (this.controler.getIterationNumber().intValue() != this.controler.getLastIteration()))
     {
-      for (Iterator<Retailer> localIterator = this.retailers.getRetailers().values().iterator(); localIterator.hasNext(); ) { r = (Retailer)localIterator.next();
+    	log.info("Test1");
+    	for (Iterator<Retailer> localIterator = this.retailers.getRetailers().values().iterator(); localIterator.hasNext(); ) { r = (Retailer)localIterator.next();
 
         this.rsw.write(r, this.controler.getIterationNumber().intValue(), this.cfc);
       }
@@ -148,6 +126,7 @@ public class RetailersLocationListener
     for (Iterator<Retailer> localIterator = this.retailers.getRetailers().values().iterator(); localIterator.hasNext(); ) { r = (Retailer)localIterator.next();
 
       this.rsw.write(r, this.controler.getIterationNumber().intValue(), this.cfc);
+      log.info("Test2");
     }
 
     this.rsw.close();

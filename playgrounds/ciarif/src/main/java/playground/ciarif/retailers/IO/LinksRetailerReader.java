@@ -128,8 +128,8 @@ public class LinksRetailerReader
 	      }
 	    }
     this.currentLinks = links;
-    for (LinkRetailersImpl l : this.currentLinks.values())
-      log.info("Current Links list contains link: " + l.getId());
+   // for (LinkRetailersImpl l : this.currentLinks.values())
+     // log.info("Current Links list contains link: " + l.getId());
   }
 
   private double findPersonsShopsMinRatio()
@@ -145,8 +145,8 @@ public class LinksRetailerReader
         double numberPersons = 0.0D;
         for (ActivityFacility facility : facilities)
         {
-          if (facility.getActivityOptions().get("shop") != null) {
-            double shopCapacity = ((ActivityOption)facility.getActivityOptions().get("shop")).getCapacity().doubleValue();
+          if (facility.getActivityOptions().get("shopgrocery") != null) {
+            double shopCapacity = ((ActivityOption)facility.getActivityOptions().get("shopgrocery")).getCapacity().doubleValue();
             globalCapacity += shopCapacity;
           }
         }
@@ -199,10 +199,12 @@ public class LinksRetailerReader
         Collection<ActivityFacility> facilities = Utils.getFacilityQuadTree().get(link.getCoord().getX(), link.getCoord().getY(), 1000.0D);
         double globalCapacity = 0.0D;
         double numberPersons = 0.0D;
+        int numberShops = 0;
         for (ActivityFacility facility : facilities) {
-          if (facility.getActivityOptions().get("shop") != null) {
-            double shopCapacity = ((ActivityOption)facility.getActivityOptions().get("shop")).getCapacity().doubleValue();
+          if (facility.getActivityOptions().get("shopgrocery") != null) {
+            double shopCapacity = ((ActivityOption)facility.getActivityOptions().get("shopgrocery")).getCapacity().doubleValue();
             globalCapacity += shopCapacity;
+            numberShops = numberShops+1;
           }
         }
         log.info("Link " + link.getId());
@@ -212,9 +214,10 @@ public class LinksRetailerReader
         log.info("The number of person around the link " + link.getId() + " is: " + numberPersons);
         ratio = numberPersons / globalCapacity;
         log.info("The ratio persons/shopsCapacity of the link " + link.getId() + " is: " + ratio);
+        log.info("The number of shops around the link " + link.getId() + " is: " + numberShops);
 
         if (attempts < numberLinks) {
-          if ((((ratio > referenceRatio) ? 1 : 0) & ((numberPersons > 50.0D) ? 1 : 0)) != 0)
+          if ((((ratio > referenceRatio) ? 1 : 0) & ((numberPersons > 50.0D) ? 1 : 0) ) != 0 & numberShops<3)
           {
             this.freeLinks.put(link.getId(), link);
             log.info("the link " + link.getId() + " has been added to the free links");
@@ -224,7 +227,7 @@ public class LinksRetailerReader
         }
         else {
           this.freeLinks.put(link.getId(), link);
-          log.info("the link " + link.getId() + " has been added to the free links");
+          log.warn("the link " + link.getId() + " has been added to the free links even if it deosn't fullfill all requested attributes");
           log.info("free links are" + this.freeLinks.keySet());
           this.allLinks.put(link.getId(), link);
         }

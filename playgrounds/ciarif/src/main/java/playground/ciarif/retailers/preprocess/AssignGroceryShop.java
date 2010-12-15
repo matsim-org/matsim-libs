@@ -29,8 +29,9 @@ public class AssignGroceryShop {
 	private String plansfilePath;
 	private String facilitiesfilePath;
 	private String networkfilePath;
-	private final String outpath = "../../matsim/output/preprocess/";
-
+	//private final String outpath = "../../matsim/output/preprocess/";
+	private final String outpath = "/data/matsim/ciarif/output/preprocess/";
+	
 	private final static Logger log = Logger.getLogger(AssignGroceryShop.class);
 
 	public static void main(String [] args) {

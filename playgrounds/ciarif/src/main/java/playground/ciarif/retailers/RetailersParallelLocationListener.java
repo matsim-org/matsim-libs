@@ -231,7 +231,7 @@ public class RetailersParallelLocationListener implements StartupListener, Befor
 					for (PlanElement pe2 : p.getSelectedPlan().getPlanElements()) {
 						if (pe2 instanceof ActivityImpl) {
 							ActivityImpl act = (ActivityImpl) pe2;
-							if (act.getType().equals("shop") && act.getFacilityId().equals(f.getId())) {
+							if (act.getType().equals("shopgrocery") && act.getFacilityId().equals(f.getId())) {
 								// TODO here characteristics of persons are checked (in which shop the shop activity happened, distance from home, 
 								//dimension, etc., the information is then saved in a special data structure having the facility ID as ID field 
 							}
