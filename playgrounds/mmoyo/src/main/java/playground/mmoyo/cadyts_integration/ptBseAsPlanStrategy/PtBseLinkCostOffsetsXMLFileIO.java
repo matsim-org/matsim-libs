@@ -1,4 +1,4 @@
-package playground.mmoyo.w_ptCounts_from_kai.ptBseAsPlanStrategy;
+package playground.mmoyo.cadyts_integration.ptBseAsPlanStrategy;
 
 /* *********************************************************************** *
  * project: org.matsim.*

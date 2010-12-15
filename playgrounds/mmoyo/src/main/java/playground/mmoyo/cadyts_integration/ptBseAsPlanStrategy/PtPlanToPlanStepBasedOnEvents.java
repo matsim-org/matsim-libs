@@ -18,9 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mmoyo.w_ptCounts_from_kai.ptBseAsPlanStrategy;
-
-import playground.mmoyo.withPtCounts2_v110.ptBseAsPlanStrategy.analysis.PtBseOccupancyAnalyzer;
+package playground.mmoyo.cadyts_integration.ptBseAsPlanStrategy;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -54,6 +52,7 @@ import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
+import playground.mmoyo.cadyts_integration.ptBseAsPlanStrategy.analysis.PtBseOccupancyAnalyzer;
 import playground.mmoyo.utils.PtRouteUtill;
 import cadyts.demand.PlanBuilder;
 /**

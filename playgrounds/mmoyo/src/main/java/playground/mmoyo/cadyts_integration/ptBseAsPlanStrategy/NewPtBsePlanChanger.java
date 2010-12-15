@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.mmoyo.w_ptCounts_from_kai.ptBseAsPlanStrategy;
+package playground.mmoyo.cadyts_integration.ptBseAsPlanStrategy;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;

@@ -18,9 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mmoyo.w_ptCounts_from_kai.ptBseAsPlanStrategy;
-
-import playground.mmoyo.withPtCounts2_v110.ptBseAsPlanStrategy.analysis.PtBseOccupancyAnalyzer;
+package playground.mmoyo.cadyts_integration.ptBseAsPlanStrategy;
 
 import java.io.IOException;
 import java.util.Map;
@@ -28,7 +26,6 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
-
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.config.Config;
@@ -46,11 +43,11 @@ import org.matsim.counts.Volume;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
-import cadyts.interfaces.matsim.MATSimUtilityModificationCalibrator; 
+import playground.mmoyo.cadyts_integration.ptBseAsPlanStrategy.analysis.PtBseOccupancyAnalyzer;
+import cadyts.interfaces.matsim.MATSimUtilityModificationCalibrator;
+import cadyts.measurements.SingleLinkMeasurement;
 import cadyts.measurements.SingleLinkMeasurement.TYPE;
-import cadyts.measurements.SingleLinkMeasurement; 
 import cadyts.supply.SimResults;
-
 import cadyts.utilities.misc.DynamicData;
 
 public class NewPtBsePlanStrategy implements PlanStrategy, AdditionalTeleportationDepartureEventHandler {

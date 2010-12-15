@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mmoyo.w_ptCounts_from_kai.ptBseAsPlanStrategy.analysis;
+package playground.mmoyo.cadyts_integration.ptBseAsPlanStrategy.analysis;
 
 import java.util.ArrayList;
 import java.util.List;

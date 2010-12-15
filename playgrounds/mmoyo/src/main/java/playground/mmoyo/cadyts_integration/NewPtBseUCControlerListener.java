@@ -18,11 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mmoyo.w_ptCounts_from_kai;
-
-import playground.mmoyo.withPtCounts2_v110.ptBseAsPlanStrategy.NewPtBsePlanStrategy;
-import playground.mmoyo.withPtCounts2_v110.ptBseAsPlanStrategy.analysis.PtBseCountsComparisonAlgorithm;
-import playground.mmoyo.withPtCounts2_v110.ptBseAsPlanStrategy.analysis.PtBseOccupancyAnalyzer;
+package playground.mmoyo.cadyts_integration;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,8 +45,12 @@ import org.matsim.counts.MatsimCountsReader;
 import org.matsim.pt.config.PtCountsConfigGroup;
 import org.matsim.pt.counts.PtCountSimComparisonKMLWriter;
 import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+
+import playground.mmoyo.cadyts_integration.ptBseAsPlanStrategy.NewPtBsePlanStrategy;
+import playground.mmoyo.cadyts_integration.ptBseAsPlanStrategy.analysis.PtBseCountsComparisonAlgorithm;
+import playground.mmoyo.cadyts_integration.ptBseAsPlanStrategy.analysis.PtBseOccupancyAnalyzer;
 
 class NewPtBseUCControlerListener implements StartupListener , 
 											IterationEndsListener, 
