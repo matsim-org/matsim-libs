@@ -41,7 +41,7 @@ import org.matsim.households.HouseholdsReaderV10;
 import playground.benjamin.analysis.filter.BkAnalysisFilter;
 
 /**
- * @author bkickhoefer after kn and dgrether
+ * @author benjamin after kn and dgrether
  */
 
 public class BkAnalysis {

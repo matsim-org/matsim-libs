@@ -84,7 +84,7 @@ public class BkGo {
 	// scenario
 		ScenarioConfigGroup scg = kontrolle.getConfig().scenario();
 		HouseholdsConfigGroup hcg = kontrolle.getConfig().households();
-		scg.setUseVehicles(true);
+		scg.setUseVehicles(false);
 		scg.setUseHouseholds(false);
 		hcg.setInputFile(householdsFile);
 		
