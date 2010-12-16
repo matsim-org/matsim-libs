@@ -167,7 +167,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 		
 		if ( this.config.getModule(SimulationConfigGroup.GROUP_NAME) == null ) {
 			log.warn("Started QueueSimulation without a `simulation' config module.  Presumably due to removing " +
-					"`simulation' from the core modules.  Add simulation config module before calling QueueSimulation " +
+					"`simulation' from the core modules in nov/dec'10.  Add simulation config module before calling QueueSimulation " +
 					"creational method to avoid this warning.  kai, dec'10");
 			this.config.addSimulationConfigGroup(new SimulationConfigGroup()) ;
 		}

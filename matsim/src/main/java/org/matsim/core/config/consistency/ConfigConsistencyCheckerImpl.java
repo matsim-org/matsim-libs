@@ -22,7 +22,9 @@ package org.matsim.core.config.consistency;
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.ScenarioConfigGroup;
+import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 
 /**
@@ -43,6 +45,29 @@ public class ConfigConsistencyCheckerImpl implements ConfigConsistencyChecker {
 		this.checkLaneDefinitionRoutingConfiguration(config);
 		this.checkSignalSystemConfiguration(config);
 		this.checkTransitReplanningConfiguration(config);
+		this.checkMobsimSelection(config) ;
+	}
+	
+	private void checkMobsimSelection(Config config) {
+		if ( config.simulation()!=null ) {
+			if ( config.getQSimConfigGroup()!=null ) {
+				log.warn("have both `simulation' and `qsim' config groups; presumably both are defined in" +
+						" the config file; removing the `simulation' config group; in future versions, this" +
+						" may become a fatal error") ;
+				config.removeModule( SimulationConfigGroup.GROUP_NAME ) ;
+			} else if ( config.getModule("JDEQSim")!=null ) { 
+				log.warn("have both `simulation' and `JDEQSim' config groups; presumably both are defined in" +
+						" the config file; removing the `simulation' config group; in future versions, this" +
+						" may become a fatal error") ;
+				config.removeModule( SimulationConfigGroup.GROUP_NAME ) ;
+			}
+		}
+		if ( config.getQSimConfigGroup()!=null && config.getModule("JDEQSim")!=null ) { 
+			log.warn("have both `qsim' and `JDEQSim' config groups; presumably both are defined in" +
+					" the config file; removing the `qsim' config group; in future versions, this" +
+					" may become a fatal error") ;
+			config.removeModule( QSimConfigGroup.GROUP_NAME ) ;
+		}
 	}
 
 	private void checkEventsFormatLanesSignals(Config c) {
