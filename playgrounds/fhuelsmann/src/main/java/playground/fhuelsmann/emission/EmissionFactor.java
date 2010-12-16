@@ -264,7 +264,7 @@ public class EmissionFactor {
 	public void createEmissionFile() {
 		if (this.calculated) {
 			try {
-				FileWriter fstream = new FileWriter("../../detailedEval/teststrecke/sim/outputEmissions/alllemissions.txt");
+				FileWriter fstream = new FileWriter("../../detailedEval/teststrecke/sim/outputEmissions/allemissions.txt");
 				BufferedWriter outputStream = new BufferedWriter(fstream);
 				String header = "EnterTime " +
 				"\t " +

@@ -2,7 +2,7 @@ package playground.fhuelsmann.emission;
 
 import org.matsim.api.core.v01.Id;
 
-public class parkingTimeObject {
+public class ParkingTimeObject {
 
 	String activity;
 	Id personId;
@@ -25,7 +25,7 @@ public class parkingTimeObject {
 	public void setTime(double time) {
 		this.time = time;
 	}
-	public parkingTimeObject(Id personId, double time,String activity) {
+	public ParkingTimeObject(Id personId, double time,String activity) {
 		super();
 		this.personId = personId;
 		this.time = time;

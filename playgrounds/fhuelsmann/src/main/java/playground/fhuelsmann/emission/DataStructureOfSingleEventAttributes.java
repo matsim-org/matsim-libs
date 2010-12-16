@@ -75,8 +75,8 @@ AgentArrivalEventHandler,AgentDepartureEventHandler,ActivityEndEventHandler,Acti
 	public Map<Id,Map<Integer,DistanceObject>> cold  =
 		new TreeMap<Id,Map<Integer,DistanceObject>>();
 
-	public Map<Id,Map<Integer,parkingTimeObject>> parkingTime  =
-		new TreeMap<Id,Map<Integer,parkingTimeObject>>();
+	public Map<Id,Map<Integer,ParkingTimeObject>> parkingTime  =
+		new TreeMap<Id,Map<Integer,ParkingTimeObject>>();
 
 	private final Map<Id, Map<Id, Collection<SingleEvent>>> travelTimes= new TreeMap<Id,Map<Id, Collection<SingleEvent>>>();
 
@@ -90,13 +90,16 @@ AgentArrivalEventHandler,AgentDepartureEventHandler,ActivityEndEventHandler,Acti
 	}
 
 	public void handleEvent(LinkEnterEvent event) {
+		String id = event.getPersonId().toString();
+		if(id.contains("testVehicle")){
 		this.linkenter.put(event.getPersonId(), event.getTime());
-
+		}
 	}
 
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
-
+		String id = event.getPersonId().toString();
+		if(id.contains("testVehicle")){
 		this.activityend.put(event.getPersonId(), event.getTime());
 		Id personId= event.getPersonId();
 		Id linkId = event.getLinkId();
@@ -110,8 +113,8 @@ AgentArrivalEventHandler,AgentDepartureEventHandler,ActivityEndEventHandler,Acti
 			String temp1 = event.getAttributes().toString();
 			String[] temp2 = temp1.split(",");
 
-			parkingTimeObject object = 
-				new parkingTimeObject(event.getPersonId(),event.getTime(),temp2[1].split("=")[1]);
+			ParkingTimeObject object = 
+				new ParkingTimeObject(event.getPersonId(),event.getTime(),temp2[1].split("=")[1]);
 			this.parkingTime.get(personId).put((parkingTime.get(personId).size()),object );}
 
 		else{
@@ -119,19 +122,21 @@ AgentArrivalEventHandler,AgentDepartureEventHandler,ActivityEndEventHandler,Acti
 			String temp1 = event.getAttributes().toString();
 			String[] temp2 = temp1.split(",");
 
-			parkingTimeObject object = 
-				new parkingTimeObject(event.getPersonId(),event.getTime(),temp2[1].split("=")[1]);
+			ParkingTimeObject object = 
+				new ParkingTimeObject(event.getPersonId(),event.getTime(),temp2[1].split("=")[1]);
 
-			Map<Integer,parkingTimeObject> tempMap = 
-				new TreeMap<Integer,parkingTimeObject>();
+			Map<Integer,ParkingTimeObject> tempMap = 
+				new TreeMap<Integer,ParkingTimeObject>();
 				tempMap.put(0, object);
 				parkingTime.put(personId, tempMap);}
 
-
+		}
 	}
 
 	@Override
 	public void handleEvent(ActivityStartEvent event) {
+		String id = event.getPersonId().toString();
+		if(id.contains("testVehicle")){
 		this.activitystart.put(event.getPersonId(), event.getTime());
 		Id personId= event.getPersonId();
 		Id linkId = event.getLinkId();
@@ -168,8 +173,8 @@ AgentArrivalEventHandler,AgentDepartureEventHandler,ActivityEndEventHandler,Acti
 			String temp1 = event.getAttributes().toString();
 			String[] temp2 = temp1.split(",");
 
-			parkingTimeObject object = 
-				new parkingTimeObject(event.getPersonId(),event.getTime(),temp2[1].split("=")[1]);
+			ParkingTimeObject object = 
+				new ParkingTimeObject(event.getPersonId(),event.getTime(),temp2[1].split("=")[1]);
 			this.parkingTime.get(personId).put((parkingTime.get(personId).size()),object );}
 
 		else{
@@ -177,27 +182,33 @@ AgentArrivalEventHandler,AgentDepartureEventHandler,ActivityEndEventHandler,Acti
 			String temp1 = event.getAttributes().toString();
 			String[] temp2 = temp1.split(",");
 
-			parkingTimeObject object = 
-				new parkingTimeObject(event.getPersonId(),event.getTime(),temp2[1].split("=")[1]);
+			ParkingTimeObject object = 
+				new ParkingTimeObject(event.getPersonId(),event.getTime(),temp2[1].split("=")[1]);
 
-			Map<Integer,parkingTimeObject> tempMap = 
-				new TreeMap<Integer,parkingTimeObject>();
+			Map<Integer,ParkingTimeObject> tempMap = 
+				new TreeMap<Integer,ParkingTimeObject>();
 				tempMap.put(0, object);
 				parkingTime.put(personId, tempMap);}
+		}
 	}
 
 	public void handleEvent(AgentArrivalEvent event) {
+		String id = event.getPersonId().toString();
+		if(id.contains("testVehicle")){
 		this.agentarrival.put(event.getPersonId(), event.getTime());
-
+		}
 	}
 
 	public void handleEvent(AgentDepartureEvent event) {
+		String id = event.getPersonId().toString();
+		if(id.contains("testVehicle")){
 		this.agentdeparture.put(event.getPersonId(), event.getTime());
-
+		}
 	}
 
 	public void handleEvent(LinkLeaveEvent event) {	
-
+		String id = event.getPersonId().toString();
+		if(id.contains("testVehicle")){
 		Id personId= event.getPersonId();
 		Id linkId = event.getLinkId();
 
@@ -327,6 +338,7 @@ AgentArrivalEventHandler,AgentDepartureEventHandler,ActivityEndEventHandler,Acti
 				}
 			}
 		}
+		}
 	}
 
 	public Map<Id, Map<Integer, DistanceObject>> getCold() {
@@ -370,7 +382,7 @@ AgentArrivalEventHandler,AgentDepartureEventHandler,ActivityEndEventHandler,Acti
 
 				// Create file 
 				FileWriter fstream = 
-					new FileWriter("../../detailedEval/teststrecke/sim/outputEmissions/outcoldDistance.txt");
+					new FileWriter("../../teststrecke/sim/outputEmissions/outcoldDistance.txt");
 				BufferedWriter out = new BufferedWriter(fstream);
 				out.write("Distance \t  PersonId \t \t \t \t LinkId \t \t Activity \n"   
 						+ result);
@@ -389,7 +401,7 @@ AgentArrivalEventHandler,AgentDepartureEventHandler,ActivityEndEventHandler,Acti
 
 		String result ="";
 
-		for(Entry<Id, Map<Integer, parkingTimeObject>> LinkIdEntry : parkingTime.entrySet()){
+		for(Entry<Id, Map<Integer, ParkingTimeObject>> LinkIdEntry : parkingTime.entrySet()){
 			int count=0;
 			boolean start=false;
 
@@ -397,7 +409,7 @@ AgentArrivalEventHandler,AgentDepartureEventHandler,ActivityEndEventHandler,Acti
 			for (Iterator iter = LinkIdEntry.getValue().
 					entrySet().iterator(); iter.hasNext();) {
 				Map.Entry entry = (Map.Entry) iter.next();
-				parkingTimeObject value = (parkingTimeObject)entry.getValue();
+				ParkingTimeObject value = (ParkingTimeObject)entry.getValue();
 				{
 					try{ 
 						double timedifference=0.0; 
@@ -424,7 +436,7 @@ AgentArrivalEventHandler,AgentDepartureEventHandler,ActivityEndEventHandler,Acti
 
 				// Create file 
 				FileWriter fstream = 
-					new FileWriter("../../detailedEval/teststrecke/sim/outputEmissions/outcoldParking.txt");
+					new FileWriter("../../teststrecke/sim/outputEmissions/outcoldParking.txt");
 				BufferedWriter out = new BufferedWriter(fstream);
 				out.write("PersonId \t  \t \t Time \t \t  TimeDifference \t   Activity\n"   
 						+ result);

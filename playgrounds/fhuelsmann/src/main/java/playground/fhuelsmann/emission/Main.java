@@ -32,7 +32,7 @@ public class Main {
 	public static void main (String[] args) throws Exception{
 
 	
-		String eventsFile = "../../detailedEval/teststrecke/sim/inputEmissions/events_0807_it.0.txt";
+		String eventsFile = "../../detailedEval/teststrecke/sim/output/20090707/ITERS/it.0/0.events.txt.gz";
 		String netfile ="../../detailedEval/teststrecke/sim/input/network.xml";
 //		String visumRoadFile = "../../detailedEval/teststrecke/sim/inputEmissions/visumnetzlink.txt";
 		String visumRoadHebefaRoadFile = "../../detailedEval/teststrecke/sim/inputEmissions/road_types.txt";
@@ -63,8 +63,8 @@ public class Main {
 		matsimEventReader.readFile(eventsFile);
 	
 		//for cold start emissions 
-		handler.printTable();
-		handler.printTable2();
+	//	handler.printTable();
+	//	handler.printTable2();
 	
 	
 		
