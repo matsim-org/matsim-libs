@@ -50,6 +50,7 @@ import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
+import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
 import playground.gregor.sim2d_v2.controller.Sim2DConfig;
 import playground.gregor.sim2d_v2.network.NetworkFromLsFile;
 import playground.gregor.sim2d_v2.network.NetworkLoader;
@@ -76,9 +77,12 @@ public class ScenarioLoader2DImpl extends ScenarioLoaderImpl {
 
 	private Queue<Event> phantomPopulation;
 
+	private final Sim2DConfigGroup sim2DConfig;
+
 	public ScenarioLoader2DImpl(Scenario2DImpl scenarioData) {
 		super(scenarioData);
 		this.scenarioData = scenarioData;
+		this.sim2DConfig = (Sim2DConfigGroup) scenarioData.getConfig().getModule("sim2d");
 	}
 
 	@Override
@@ -113,7 +117,7 @@ public class ScenarioLoader2DImpl extends ScenarioLoaderImpl {
 				}
 			}
 			try {
-				ShapeFileWriter.writeGeometries(fts, Sim2DConfig.FLOOR_SHAPE_FILE);
+				ShapeFileWriter.writeGeometries(fts, this.sim2DConfig.getFloorShapeFile());
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
@@ -131,7 +135,7 @@ public class ScenarioLoader2DImpl extends ScenarioLoaderImpl {
 	private void loadLsMp() {
 		FeatureSource fs = null;
 		try {
-			fs = ShapeFileReader.readDataFile(Sim2DConfig.LS_SHAPE_FILE);
+			fs = ShapeFileReader.readDataFile(this.sim2DConfig.getLSShapeFile());
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
@@ -159,7 +163,7 @@ public class ScenarioLoader2DImpl extends ScenarioLoaderImpl {
 	private void loadMps() {
 		FeatureSource fs = null;
 		try {
-			fs = ShapeFileReader.readDataFile(Sim2DConfig.FLOOR_SHAPE_FILE);
+			fs = ShapeFileReader.readDataFile(this.sim2DConfig.getFloorShapeFile());
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
@@ -211,12 +215,12 @@ public class ScenarioLoader2DImpl extends ScenarioLoaderImpl {
 
 	private void loadStaticForceField() {
 		if (Sim2DConfig.LOAD_STATIC_FORCE_FIELD_FROM_FILE) {
-			this.sff = new StaticForceFieldReader(Sim2DConfig.STATIC_FORCE_FIELD_FILE).getStaticForceField();
+			this.sff = new StaticForceFieldReader(this.sim2DConfig.getStaticForceFieldFile()).getStaticForceField();
 		} else {
 			// this.sff = new
 			// StaticForceFieldGenerator(this.mps.keySet().iterator().next()).loadStaticForceField();
 			this.sff = new StaticForceFieldGenerator(this.mps.keySet().iterator().next()).loadStaticForceField();
-			new StaticForceFieldWriter().write(Sim2DConfig.STATIC_FORCE_FIELD_FILE, this.sff);
+			new StaticForceFieldWriter().write(this.sim2DConfig.getStaticForceFieldFile(), this.sff);
 		}
 		this.scenarioData.setStaticForceField(this.sff);
 		// new StaticForceFieldToShape(this.sff).createShp();

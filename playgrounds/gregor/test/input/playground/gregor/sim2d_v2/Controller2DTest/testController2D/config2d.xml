@@ -1,0 +1,150 @@
+<?xml version="1.0" ?>
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd"
+	[
+		<!ENTITY INPUTBASE    "test/input/playground/gregor/sim2d_v2/Controller2DTest/testController2D/">
+		<!ENTITY OUTPUTBASE    "test/output/playground/gregor/sim2d_v2/Controller2DTest/testController2D/">
+		<!ENTITY LOCALDTDBASE "./dtd">
+		<!ENTITY WEBDTDBASE   "http://www.matsim.org/files/dtd">
+	]
+>
+<config>
+
+	<module name="travelTimeCalculator" >
+		<param name = "travelTimeCalculator" value = "TravelTimeCalculatorHashMap" />
+		<param name = "travelTimeAggregator" value = "experimental_LastMile" />
+		<param name = "travelTimeBinSize" value = "120" />
+	</module>
+<!-- ====================================================================== -->
+
+	<module name="global">
+		<param name="coordinateSystem" value="WGS84_UTM47S" /> 
+<!--		<param name="coordinateSystem" value="GK4" /> -->
+	</module>	
+
+<!-- ====================================================================== -->
+
+	<module name="simulation">
+		<!-- "start/endTime" of MobSim (00:00:00 == take earliest activity time/ run as long as active vehicles exist) -->
+		<param name="startTime" value="00:00:00" />
+		<param name="endTime" value="12:00:00" /> 
+		
+
+		<param name = "snapshotperiod"	value = "00:00:00" /> <!-- 00:00:00 means NO snapshot writing -->
+
+		<param name = "snapshotFormat"	value = "transims" /> <!-- netvis, googleearth, transims, plansfile -->
+
+	<!--	<param name ="evacuationTime" value = "02:59:59" /> --> <!-- make sure that the specific snapshot plans file exists -->
+		
+	
+		<param name = "flowCapacityFactor"	value = "1.0" />
+		<param name = "storageCapacityFactor"	value = "1.0" />
+		<param name="stuckTime" value="120" />		
+	</module>
+<!-- ====================================================================== -->
+<!--	<module name="parallelEventHandling">
+		<param name="numberOfThreads" value="1" />
+	</module> -->
+
+
+<!-- ====================================================================== 
+
+	<module name="signalsystems" >
+		<param name="signalsystems" value="nullnull" />
+		<param name="signalsystemsconfiguration" value="nullnull" />
+	</module>
+====================================================================== -->
+
+<module name="sim2d">
+	<param name ="staticForceFieldFile" value="&INPUTBASE;/staticForceField.xml.gz" />
+	<param name="floorShapeFile" value="&INPUTBASE;/90grad.shp"/>
+	<param name="lsShapeFile" value="&INPUTBASE;/90gradNetwork.shp" />
+</module>
+
+<!-- ====================================================================== -->
+
+
+	<module name="controler">
+		<param name="outputDirectory" value="&OUTPUTBASE;" />
+		<param name="firstIteration" value="0" />
+		<param name="lastIteration" value="0" />
+		<param name="eventsFileFormat" value="xml" />
+	
+		 
+	</module>	
+	
+<!-- ====================================================================== -->	
+
+	<module name="plans">
+		<param name="inputPlansFile" value="&INPUTBASE;/90gradPlans.xml" />
+
+
+	</module>
+	
+<!-- ====================================================================== -->	
+	
+	<module name="network">
+		<param name="inputNetworkFile" value="&INPUTBASE;/90gradNetwork.xml" />
+								       
+	</module>
+	
+<!-- ====================================================================== -->	
+
+	<module name="planCalcScore">
+
+		<param name="learningRate" value="1" />
+	
+		<param name="BrainExpBeta" value="10" />
+		<!--<param name="PathSizeLogitBeta" value="1" />-->
+
+
+		<param name="lateArrival" value="0" />
+		<param name="earlyDeparture" value="-0" />
+		<param name="performing" value="0" />
+		<param name="traveling" value="-6" />
+		<param name="waiting" value="-6" />
+                <!-- Activity indices (the numbers after the '_') go from 0 to n.  The ordering doesn't matter.  -->
+                <param name="activityType_0"            value="h" /> <!-- home -->
+                <param name="activityPriority_0"        value="1" />
+                <param name="activityTypicalDuration_0" value="10:00:00" />
+                <param name="activityMinimalDuration_0" value="00:00:01" />
+                <param name="activityType_1"            value="w" /> <!-- work -->
+                <param name="activityPriority_1"        value="1" />
+                <param name="activityTypicalDuration_1" value="12:00:00" />
+                <param name="activityMinimalDuration_1" value="00:00:01" />
+	
+	</module>
+	
+
+<!-- ====================================================================== -->
+	<module name="strategy">
+		<param name="maxAgentPlanMemorySize" value="2" /> <!-- 0 means unlimited -->
+
+		<param name="ModuleProbability_1" value="0.1" />
+		<param name="Module_1" value="ReRoute" />
+		<param name="ModuleDisableAfterIteration_1" value="90" />  
+		
+		<param name="ModuleProbability_2" value="0.9" />
+		<param name="Module_2" value="ChangeExpBeta" />
+	
+<!--		<param name="ModuleProbability_2" value="0.9" />
+		<param name="Module_2" value="BestScore" /> -->
+
+<!--		<param name="ModuleProbability_2" value="0.005" />
+		<param name="Module_2" value="SelectRandom" /> -->
+		
+<!--		<param name="ModuleProbability_3" value="0.001" />
+		<param name="Module_3" value="BestScore" /> 
+		<param name="ModuleDisableAfterIteration_3" value="100" />  -->
+<!--               <param name="ModuleProbability_3" value="0.05" />
+	       <param name="Module_3" value="RemoveWorstPlan" />
+
+		<param name="ModuleProbability_4" value="0.1" />
+		<param name="Module_4" value="ReRoute" />
+		<param name="ModuleDisableAfterIteration_4" value="20" /> 
+		
+		<param name="ModuleProbability_5" value="0.01" />
+		<param name="Module_5" value="ReRoute" /> -->
+	</module>
+
+<!-- ====================================================================== -->
+</config>

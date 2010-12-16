@@ -70,7 +70,7 @@ public class Agent2D extends PersonDriverAgentImpl {
 	 */
 	public void moveToPostion(Coordinate newPos) {
 		// TODO check for choose next link and so on ...
-		this.currentPosition = newPos;
+		this.currentPosition.setCoordinate(newPos);
 	}
 
 	/**

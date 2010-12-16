@@ -42,7 +42,7 @@ public class AgentInteractionModule implements DynamicForceModule {
 	protected final Floor floor;
 	protected final Scenario2DImpl scenario;
 
-	private final double quadUpdateInterval = 1;
+	private final double quadUpdateInterval = 2;
 	private double lastQuadUpdate = Double.NEGATIVE_INFINITY;
 	protected Quadtree coordsQuad = new Quadtree();
 
@@ -77,6 +77,8 @@ public class AgentInteractionModule implements DynamicForceModule {
 	/* package */void updateForces(Agent2D agent, List<Coordinate> neighbors) {
 		double fx = 0;
 		double fy = 0;
+
+		int otherId = 4;
 		for (Coordinate other : neighbors) {
 			if (other.equals(agent.getPosition())) {
 				continue;
@@ -102,16 +104,21 @@ public class AgentInteractionModule implements DynamicForceModule {
 
 			fx += x;
 			fy += y;
+
+			if (Sim2DConfig.DEBUG) {
+				ArrowEvent arrow = new ArrowEvent(agent.getPerson().getId(), agent.getPosition(), other, 0.2f, 0.2f, 0.2f, otherId++);
+				this.floor.getSim2D().getEventsManager().processEvent(arrow);
+			}
+
 		}
 
 		fx = Sim2DConfig.App * fx / agent.getWeight() * Sim2DConfig.TIME_STEP_SIZE;
 		fy = Sim2DConfig.App * fy / agent.getWeight() * Sim2DConfig.TIME_STEP_SIZE;
 
-		// if (fx != 0 || fy != 0) {
-		// DEBUG
-		ArrowEvent arrow = new ArrowEvent(agent.getPerson().getId(), agent.getPosition(), new Coordinate(agent.getPosition().x + fx / Sim2DConfig.TIME_STEP_SIZE, agent.getPosition().y + fy / Sim2DConfig.TIME_STEP_SIZE, 0), 0.f, 0.f, 0.f, 3);
-		this.floor.getSim2D().getEventsManager().processEvent(arrow);
-		// }
+		if (Sim2DConfig.DEBUG) {
+			ArrowEvent arrow = new ArrowEvent(agent.getPerson().getId(), agent.getPosition(), new Coordinate(agent.getPosition().x + fx / Sim2DConfig.TIME_STEP_SIZE, agent.getPosition().y + fy / Sim2DConfig.TIME_STEP_SIZE, 0), 0.f, 0.f, 0.f, 3);
+			this.floor.getSim2D().getEventsManager().processEvent(arrow);
+		}
 
 		agent.getForce().incrementX(fx);
 		agent.getForce().incrementY(fy);

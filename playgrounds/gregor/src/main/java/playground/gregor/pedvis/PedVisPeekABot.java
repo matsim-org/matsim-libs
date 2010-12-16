@@ -267,6 +267,9 @@ public class PedVisPeekABot implements XYZEventsHandler, AgentDepartureEventHand
 	public void handleEvent(ArrowEvent event) {
 		int arrowId = event.getType();
 		int agentId = Integer.parseInt(event.getPersId().toString());
+		if (agentId != 30) {
+			return;
+		}
 		float r = event.getR();
 		float g = event.getG();
 		float b = event.getB();

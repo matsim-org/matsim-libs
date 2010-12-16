@@ -152,17 +152,19 @@ public class Floor {
 			Coordinate oldPos = agent.getPosition();
 			Coordinate newPos = new Coordinate(oldPos.x + f.getXComponent(), oldPos.y + f.getYComponent(), 0);
 
-			// DEBUG
-			ArrowEvent arrow = new ArrowEvent(agent.getPerson().getId(), agent.getPosition(), new Coordinate(agent.getPosition().x + f.getXComponent() / Sim2DConfig.TIME_STEP_SIZE, agent.getPosition().y + f.getYComponent() / Sim2DConfig.TIME_STEP_SIZE, 0), 0.5f, 0.75f, 1.f, -1);
-			getSim2D().getEventsManager().processEvent(arrow);
+			if (Sim2DConfig.DEBUG) {
+				ArrowEvent arrow = new ArrowEvent(agent.getPerson().getId(), agent.getPosition(), new Coordinate(agent.getPosition().x + f.getXComponent() / Sim2DConfig.TIME_STEP_SIZE, agent.getPosition().y + f.getYComponent() / Sim2DConfig.TIME_STEP_SIZE, 0), 0.5f, 0.75f, 1.f, -1);
+				getSim2D().getEventsManager().processEvent(arrow);
+			}
 
 			boolean endOfLeg = checkForEndOfLinkReached(agent, oldPos, newPos, time);
 			if (endOfLeg) {
 				it.remove();
 				continue;
 			}
-			agent.moveToPostion(newPos);
+
 			double azimuth = getAzimuth(oldPos, newPos);
+			agent.moveToPostion(newPos);
 			XYZAzimuthEvent e = new XYZAzimuthEventImpl(agent.getPerson().getId(), agent.getPosition(), azimuth, time);
 			getSim2D().getEventsManager().processEvent(e);
 

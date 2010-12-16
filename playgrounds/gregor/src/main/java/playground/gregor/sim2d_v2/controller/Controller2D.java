@@ -19,13 +19,16 @@
  * *********************************************************************** */
 package playground.gregor.sim2d_v2.controller;
 
+import org.matsim.core.config.Module;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 
 import playground.gregor.pedvis.PedVisPeekABot;
+import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
 import playground.gregor.sim2d_v2.scenario.Scenario2DImpl;
 import playground.gregor.sim2d_v2.scenario.ScenarioLoader2DImpl;
 import playground.gregor.sim2d_v2.simulation.Sim2D;
+import playground.gregor.sims.config.ShelterConfigGroup;
 
 public class Controller2D extends Controler {
 
@@ -33,7 +36,7 @@ public class Controller2D extends Controler {
 	private PedVisPeekABot vis;
 
 	public Controller2D(String[] args) {
-		super(args);
+		super(args[0]);
 		setOverwriteFiles(true);
 		this.config.addQSimConfigGroup(new QSimConfigGroup());
 		this.config.getQSimConfigGroup().setEndTime(2 * 60);
@@ -42,6 +45,7 @@ public class Controller2D extends Controler {
 	@Override
 	protected void loadData() {
 		if (!this.scenarioLoaded) {
+			initSim2DConfigGroup();
 			this.scenario2DData = new Scenario2DImpl(this.config);
 			this.loader = new ScenarioLoader2DImpl(this.scenario2DData);
 			this.loader.loadScenario();
@@ -51,11 +55,25 @@ public class Controller2D extends Controler {
 			// this.loader).setPhantomPopulationEventsFile("/home/laemmel/devel/dfg/events.xml");
 			this.scenarioLoaded = true;
 
-			this.vis = new PedVisPeekABot(1);
-			this.vis.setFloorShapeFile(Sim2DConfig.FLOOR_SHAPE_FILE);
-			this.events.addHandler(this.vis);
+			// this.vis = new PedVisPeekABot(1);
+			// this.vis.setFloorShapeFile(Sim2DConfig.FLOOR_SHAPE_FILE);
+			// this.events.addHandler(this.vis);
 		}
 
+	}
+
+	/**
+	 * 
+	 */
+	private void initSim2DConfigGroup() {
+		Module module = this.config.getModule("sim2d");
+		Sim2DConfigGroup s = null;
+		if (module == null) {
+			s = new Sim2DConfigGroup();
+		} else {
+			s = new Sim2DConfigGroup(module);
+		}
+		this.config.getModules().put("sim2d", s);
 	}
 
 	@Override
@@ -74,7 +92,9 @@ public class Controller2D extends Controler {
 		// }
 		sim.run();
 		// writer.closeFile();
-		this.vis.reset(getIterationNumber());
+		if (this.vis != null) {
+			this.vis.reset(getIterationNumber());
+		}
 	}
 
 	public static void main(String[] args) {
