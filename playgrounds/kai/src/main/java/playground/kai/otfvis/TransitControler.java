@@ -67,11 +67,12 @@ public class TransitControler {
 
 			if ( useOTFVis ) {
 				OTFVisMobsimFeature otfVisQSimFeature = new OTFVisMobsimFeature(simulation);
-				otfVisQSimFeature.setVisualizeTeleportedAgents(simulation.getScenario().getConfig().otfVis().isShowTeleportedAgents());
+				final OTFVisConfigGroup otfVisConfig = simulation.getScenario().getConfig().otfVis();
+				otfVisQSimFeature.setVisualizeTeleportedAgents(otfVisConfig.isShowTeleportedAgents());
 				simulation.addQueueSimulationListeners(otfVisQSimFeature);
 				simulation.getEventsManager().addHandler(otfVisQSimFeature) ;
-				simulation.getScenario().getConfig().otfVis().setDrawTransitFacilities(false) ;
-				simulation.getScenario().getConfig().otfVis().setShowParking(true) ;
+				otfVisConfig.setDrawTransitFacilities(false) ;
+				otfVisConfig.setShowParking(true) ;
 			}
 
 //			if(this.useHeadwayControler){
