@@ -93,8 +93,14 @@ public class JBSpnCbPopCreator implements Runnable {
 	private CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.WGS84_UTM33N);
 	
 	private Scenario scenario;
+	private Scenario scenariocb;
+	private Scenario scenariospn;
+
+	
 
 	private Population population;
+	private Population cbfbpopulation;
+	private Population spnfbpopulation;
 	
 	public static void main(String[] args) {
 		JBSpnCbPopCreator potsdamPop = new JBSpnCbPopCreator();
@@ -105,22 +111,87 @@ public class JBSpnCbPopCreator implements Runnable {
 	public void run() {
 		scenario = new ScenarioImpl();
 		population = scenario.getPopulation();
+		
+		scenariocb = new ScenarioImpl();
+		scenariospn = new ScenarioImpl();
+		spnfbpopulation = scenariospn.getPopulation();
+		cbfbpopulation = scenariocb.getPopulation();
+		
 //		generatePopulation();
 //		PopulationWriter populationWriter = new PopulationWriter(scenario.getPopulation(), scenario.getNetwork());
 //		populationWriter.write("/Users/JB/Desktop/BA-Arbeit/sim/scenario/cb-plans_usual_bb"+scaleFactor+".xml");
 		generateFans();
+		writeFanSample();
 		PopulationWriter populationWriter = new PopulationWriter(scenario.getPopulation(), scenario.getNetwork());
 		populationWriter.write("/Users/JB/Desktop/BA-Arbeit/sim/scenario/cb-plans_fb_only"+scaleFactor+".xml");
 		
 		
+		
+	}
+	
+	@SuppressWarnings("unchecked")
+	private void writeFanSample(){
+		System.out.println("cbs ");
+		double scale = 0.05;
+		do {
+			Scenario fanscen = new ScenarioImpl();
+			Population fanpop = fanscen.getPopulation();
+			//CB
+			Map<Id,Person> cbpersons = (Map<Id, Person>) cbfbpopulation.getPersons(); 
+
+			for (int pc = 1; pc<=cbpersons.size()*scale;pc++){
+				boolean b = true;
+				do {
+				int item = new Random().nextInt(cbpersons.size());
+				Id itemid = (Id) cbpersons.keySet().toArray()[item];
+				Person p = fanpop.getPersons().get(itemid);
+
+				if (p == null){
+					fanpop.addPerson(cbpersons.get(itemid));
+					b= false;
+						}
+				
+				} while (b);
+			}
+			//SPN
+			Map<Id,Person> spnpersons = (Map<Id, Person>) this.spnfbpopulation.getPersons(); 
+			for (double pc = 1.0; pc<=spnpersons.size()*scale;pc++){
+				boolean b = true;
+				do {
+				int item = new Random().nextInt(spnpersons.size());
+				Id itemid = (Id) spnpersons.keySet().toArray()[item];
+				Person p = fanpop.getPersons().get(itemid);
+				if (p == null){
+					fanpop.addPerson(spnpersons.get(itemid));
+					b= false;
+						}
+				
+				} while (b);
+			}
+			PopulationWriter populationWriter = new PopulationWriter(fanscen.getPopulation(), fanscen.getNetwork());
+			populationWriter.write("/Users/JB/Desktop/BA-Arbeit/sim/scenario/cb-plans_fb_only"+scale+".xml");
+			scale = scale + 0.05;
+			fanscen.getPopulation().getPersons().clear();
+			
+		}
+		while (scale<1);
+			
+			
+		//}
+		
+		
+		
+		
 	}
 
+	@SuppressWarnings("unused")
 	private void generatePopulation() {
 		
 			
 				 double factor = 0;
 				//SPNtoSPN				
 				factor = 1; 
+// needed for demand generation with 2025-data				
 //				SPNtoSPN =(int) (0.5* Zone.SPN.workTripsToSPNPerDay);
 //				CBtoCB = (int) (0.5* Zone.CB.workTripsToCBPerDay);
 //				factor = ((double)Zone.SPN.workingPopulation * (double)Zone.CB.workplaces)/((double)Zone.CB.workingPopulation *	(double)Zone.SPN.workplaces );
@@ -129,7 +200,7 @@ public class JBSpnCbPopCreator implements Runnable {
 //				System.out.println("SPN2CB: "+SPNtoCB);
 //				System.out.println("CB2SPN: "+CBtoSPN);
 
-				
+//	Source: BA				
 				SPNtoSPN = 12820;
 				SPNtoCB = 6522;
 				CBtoSPN = 2383;
@@ -178,7 +249,7 @@ public class JBSpnCbPopCreator implements Runnable {
 	
 	public void generateFans(){
 		CBtoSDF = 500;
-		SPNtoSDF =1500; 
+		SPNtoSDF = 1500; 
 		int fans = 0;
 		for (int i=0; i<SPNtoSDF; i++){
 			generateFootBallNerd(fans, Zone.SPN);
@@ -200,6 +271,8 @@ public class JBSpnCbPopCreator implements Runnable {
 		Zone homeZone = home;
 		Person p;
 		p = generatePerson(homeZone,Zone.SDF,start,end,fans);
+		if (home == Zone.CB) this.cbfbpopulation.addPerson(p);
+		if (home == Zone.SPN) this.spnfbpopulation.addPerson(p);
 		population.addPerson(p);
 	
 		
