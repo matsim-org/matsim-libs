@@ -17,7 +17,7 @@ public class FGGeoInfo {
 		
 		Gbl.startMeasurement();
 		
-		String inputDir = "d:\\Berlin\\berlin-fggeoinfo\\30_Run_20_percent\\20101005_run777_778\\";
+		String inputDir = "d:\\Berlin\\berlin-fggeoinfo\\30_Run_20_percent\\20101214_run793_794\\";
 		String networkFile = inputDir + "network_modified_20100806_added_BBI_AS_cl.xml.gz";
 		String inPlansFile = "d:\\Berlin\\berlin-sharedsvn\\plans\\baseplan_10x_900s.xml.gz";
 		

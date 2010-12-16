@@ -61,11 +61,11 @@ public class BBIextraDemand {
 	
 	void createDemand(){
 		// create BBI only demand -> new demand
-		createAgents(false);
+		createAgents(true);
 		writePopulation(this.newDemandBBIoutFile);
 		
 		// create demand heading for TXLSXF -> old demand
-		createAgents(true);
+		createAgents(false);
 		writePopulation(this.oldDemandTXLSXFoutFile);
 	}
 
