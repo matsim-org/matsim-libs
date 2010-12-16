@@ -26,7 +26,7 @@ public class TMC2009ToShape {
 	
 	
 	public static void main(String[] args){
-		String dir = DaPaths.OUTPUT + "Meldungen2009/";
+		String dir = "F:/temp/";
 		String inFile = dir + "Meldungen2009.txt";
 		String lineOutfile = dir + "Meldungen2009Lines.shp";
 		String pointOutfile = dir + "Meldungen2009points.shp";
