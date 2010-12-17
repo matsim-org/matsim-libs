@@ -98,7 +98,9 @@ public class AgentInteractionModule implements DynamicForceModule {
 
 			// double contrariness = getContrariness(force,length,x,y);
 
-			double exp = Math.exp(Sim2DConfig.Bp / length) / length; // *
+			double exp = Math.exp(Sim2DConfig.Bp / length) / length; // ???
+																		// check
+																		// this!!
 			x *= exp;
 			y *= exp;
 
