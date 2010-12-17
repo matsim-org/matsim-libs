@@ -13,9 +13,9 @@ import org.matsim.counts.CountsReaderMatsimV1;
 import org.xml.sax.SAXException;
 
 import playground.andreas.osmBB.osm2counts.Osm2Counts;
-import playground.droeder.osm.ResizeLinksByCount2;
-import playground.droeder.osm.ResizeLinksByCount3;
-import playground.droeder.osm.ResizeLinksByCount4;
+//import playground.droeder.osm.ResizeLinksByCount2;
+//import playground.droeder.osm.ResizeLinksByCount3;
+//import playground.droeder.osm.ResizeLinksByCount4;
 //import playground.droeder.osm.ResizeLinksByCount2;
 //import playground.droeder.osm.ResizeLinksByCount3;
 import playground.mzilske.osm.OsmPrepare;
@@ -71,8 +71,8 @@ public class PTCountsOsm2Matsim {
 //		ResizeLinksByCount3 r = new ResizeLinksByCount3(outDir + outName + "_network.xml", counts, shortNameMap, 1.0);
 //		r.run(outDir + outName + "_network_resized.xml");
 		
-		ResizeLinksByCount4 r = new ResizeLinksByCount4(outDir + outName + "_network.xml", counts, shortNameMap, 1.0);
-		r.run(outDir + outName + "_network_resized.xml");
+//		ResizeLinksByCount4 r = new ResizeLinksByCount4(outDir + outName + "_network.xml", counts, shortNameMap, 1.0);
+//		r.run(outDir + outName + "_network_resized.xml");
 		
 		PTCountsNetworkSimplifier ptCountNetSimplifier = new PTCountsNetworkSimplifier(outDir + outName + "_network_resized.xml", outDir + outName + "_schedule.xml", outDir + outName + "_network_merged.xml", outDir + outName + "_schedule_merged.xml", shortNameMap, counts, countsOutFile);
 		Set<Integer> nodeTypesToMerge = new TreeSet<Integer>();
