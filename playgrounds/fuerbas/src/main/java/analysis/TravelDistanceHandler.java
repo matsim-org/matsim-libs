@@ -6,29 +6,39 @@ import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 
 public class TravelDistanceHandler implements LinkLeaveEventHandler, LinkEnterEventHandler {
-	
-	
+
+
 
 	@Override
 	public void reset(int iteration) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
 		// TODO Auto-generated method stub
-		
+
+	}
+
+	public void createHandlerScenario() {
+		// TODO Auto-generated method stub
+
+	}
+
+	public void returnDistances() {
+		// TODO Auto-generated method stub
+
 	}
 
 
-	
-	
+
+
 
 }
