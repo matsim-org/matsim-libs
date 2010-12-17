@@ -37,8 +37,7 @@ public class TSPAgent {
 	
 	private Collection<TransportChainAgent> transportChainAgents = new ArrayList<TransportChainAgent>();
 	
-	private Map<Shipment,TransportChainAgent> shipmentChainMap = 
-		new HashMap<Shipment, TransportChainAgent>();
+	private Map<Shipment,TransportChainAgent> shipmentChainMap = new HashMap<Shipment, TransportChainAgent>();
 
 	Map<Shipment, TransportChainAgent> getShipmentChainMap() {
 		return shipmentChainMap;

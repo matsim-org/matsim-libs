@@ -117,15 +117,29 @@ public class TransportChainAgent {
 	}
 
 	public void informDelivery(Shipment shipment, double time) {
-		if (shipments.get(currentShipmentIndex) != shipment) {
-			throw new RuntimeException("We are having a delivery where the preceding delivery is still missing.");
+		try{
+			if (shipments.get(currentShipmentIndex) != shipment) {
+				throw new RuntimeException("We are having a delivery where the preceding delivery is still missing.");
+			}
+			checkShipmentDeliveryTime(shipment, time);
+			currentShipmentIndex++;
 		}
-		checkShipmentDeliveryTime(shipment, time);
-		currentShipmentIndex++;
+		catch(IndexOutOfBoundsException e){
+			for(Shipment s : shipments){
+				logger.error(s);
+			}
+			logger.error("Shipment="+shipment+";time="+time+";currentShipmentIndex="+currentShipmentIndex);
+			//throw new IndexOutOfBoundsException(e.toString());
+			/*
+			 * informDelivery is called more than one even if the transportChain consist of one shipment only,
+			 * which can just be delivered once
+			 * 
+			 */
+		}
 	}
 
 	private void checkShipmentDeliveryTime(Shipment shipment, double time) {
-		// TODO Auto-generated method stub
+	
 		
 	}
 

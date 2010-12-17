@@ -94,18 +94,21 @@ public class CarrierAgent {
 		for (ScheduledTour scheduledTour : carrier.getSelectedPlan().getScheduledTours()) {
 			Plan plan = new PlanImpl();
 			Activity startActivity = new ActivityImpl(FreightConstants.START, scheduledTour.getVehicle().getLocation());
+			logger.info("startActivity: " + startActivity);
 			startActivity.setEndTime(scheduledTour.getDeparture());
 			plan.addActivity(startActivity);
 			Leg startLeg = new LegImpl(TransportMode.car);
 			plan.addLeg(startLeg);
 			for (TourElement tourElement : scheduledTour.getTour().getTourElements()) {
 				Activity tourElementActivity = new ActivityImpl(tourElement.getActivityType(), tourElement.getLocation());
+				logger.info("tourActivity: " + tourElementActivity);
 				((ActivityImpl) tourElementActivity).setEndTime(tourElement.getTimeWindow().getStart());
 				plan.addActivity(tourElementActivity);
 				Leg leg = new LegImpl(TransportMode.car);
 				plan.addLeg(leg);
 			}
 			Activity endActivity = new ActivityImpl(FreightConstants.END, scheduledTour.getVehicle().getLocation());
+			logger.info("EndActivity: " + endActivity);
 			plan.addActivity(endActivity);
 			Id driverId = createDriverId();
 			Person driverPerson = createDriverPerson(driverId);

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
@@ -20,6 +21,8 @@ import playground.mrieser.core.mobsim.impl.DefaultPlanAgent;
 
 public class CarrierAgentTracker implements AgentSource, ActivityEndEventHandler, LinkEnterEventHandler {
 	
+	private static Logger logger = Logger.getLogger(CarrierAgentTracker.class);
+	
 	private Collection<CarrierImpl> carriers;
 
 	private Collection<CarrierAgent> carrierAgents = new ArrayList<CarrierAgent>();
@@ -35,6 +38,8 @@ public class CarrierAgentTracker implements AgentSource, ActivityEndEventHandler
 	private Network network;
 
 	private List<PlanAgent> agents;
+	
+	private double sumOfTotalDistance = 0.0;
 	
 	public CarrierAgentTracker(Collection<CarrierImpl> carriers, PlanAlgorithm router) {
 		this.carriers = carriers;
@@ -90,6 +95,9 @@ public class CarrierAgentTracker implements AgentSource, ActivityEndEventHandler
 				carrierAgent.tellDistance(personId, distance);
 			}
 		}
+		sumOfTotalDistance += distance/1000;
+		logger.info("totalDistanceTraveled = " + sumOfTotalDistance + " km");
+		
 	}
 
 	public void calculateCostsScoreCarriersAndInform() {
