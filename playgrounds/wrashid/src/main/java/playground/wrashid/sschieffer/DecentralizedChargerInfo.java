@@ -71,7 +71,7 @@ public class DecentralizedChargerInfo {
 	
 	private int degValleyFitter=5; 
 	
-	private double peakLoad;
+	
 	private double [] []slotBaseLoad; // 1D double directly read in from .txt
 	private double [][] highLowIntervals; // [start time in hours][end time in hours][1 or -1 (1 if section above newBaseLoad]
 	
@@ -83,6 +83,8 @@ public class DecentralizedChargerInfo {
 	private double constantBaseConsumption; //constant minBaseConsumption
 	private double newBaseConsumption; // new level of constant min base load with PHEVs
 	
+	private double totalCostBase;
+	private double totalCostPHEV;
 	
 	private double crit; // level of +/- accuracy for finding newBaseConsumption
 	// set in constructor
@@ -94,15 +96,11 @@ public class DecentralizedChargerInfo {
 	private ArrayList<PolynomialFunction> probDensityFunctions; // ArrayList with PolynomialFunctons for each valley
 	private double[][] probDensityRanges; // for each polynomialFunction in probDensity Functions: [start probability][end probability]
 	private double[][] valleyTimes; // for each valley [start time in hours][end time in hours] 
+	private double[][] peakTimes;
 	private double [] chargingSlots;// (96*1) double array with 1.0 or 0 entries for (non)avaible slots for charging	
 	private int iterationsToFindNewBaseConsumption;
 	
-	private double totalCostBase;
-	private double totalCostPHEV;
-	private double priceBase;
-	private double pricePeak;
 	
-
 	private XYSeries loadFigureData;
 	private XYSeries zeroLineData; //XY Series on zero line for plots
 	private XYSeries constantLoadFigureData;//XY Series on line of constantBaseConsumption for plots
@@ -132,13 +130,12 @@ public class DecentralizedChargerInfo {
 	 * @throws IllegalArgumentException
 	 * @throws IOException
 	 */
-	public DecentralizedChargerInfo(double peakLoad, double penetration, double averagePHEVConsumption, double priceBase, double pricePeak) throws OptimizationException, MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException, IOException{
-		this.peakLoad=peakLoad;
+	public DecentralizedChargerInfo(double penetration, double averagePHEVConsumption) throws OptimizationException, MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException, IOException{
+		
 		this.penetration=penetration;
 		this.averagePHEVConsumption=averagePHEVConsumption;
-		this.priceBase=priceBase;
-		this.pricePeak=pricePeak;
-		System.out.println("peakLoad: "+peakLoad);
+		
+		System.out.println("peakLoad: "+Main.peakLoad);
 		totalPHEVConsumption=averagePHEVConsumption*penetration; //Watts
 		
 		crit=5*averagePHEVConsumption; // Watts
@@ -146,7 +143,7 @@ public class DecentralizedChargerInfo {
 		functionIntegrator= new SimpsonIntegrator(); 
 		newtonSolver = new NewtonSolver();
 		
-		checker=new SimpleVectorialValueChecker(peakLoad*0.05, peakLoad*0.05);
+		checker=new SimpleVectorialValueChecker(Main.peakLoad*0.05, Main.peakLoad*0.05);
 		
 		//GaussNewtonOptimizer(boolean useLU) 
 		LevenbergMarquardtOptimizer levenbergMarquardtOptimizer = new LevenbergMarquardtOptimizer();
@@ -191,13 +188,13 @@ public class DecentralizedChargerInfo {
 		 */
 		
 		peakBaseConsumption=0.0;
-		constantBaseConsumption=peakLoad;
+		constantBaseConsumption=Main.peakLoad;
 		zeroLineData = new XYSeries("Zero Line");
 		loadFigureData = new XYSeries("Baseload Data from File");
 		  
 		  for (int i=0;i<96;i++){ // loop over 96 bins
 			  //slotBaseLoad[i][0]=((double)i)*Main.secondsPer15Min;//time
-			  slotBaseLoad[i][1]=slotBaseLoad[i][1]*peakLoad;//multiply percentage with peakLoad
+			  slotBaseLoad[i][1]=slotBaseLoad[i][1]*Main.peakLoad;//multiply percentage with peakLoad
 			  loadFigureData.add(slotBaseLoad[i][0], slotBaseLoad[i][1]);
 			  zeroLineData.add(slotBaseLoad[i][0],0);
 			  
@@ -313,7 +310,7 @@ public class DecentralizedChargerInfo {
 	 * returns the number of PHEVs necessary to reach complete baseLoad flattening
 	 */
 	public double flatteningPenetration() throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
-		double totalValleyToFill=Main.secondsPerDay*peakLoad-totalBaseConsumption(polyFuncBaseLoadWorking);
+		double totalValleyToFill=Main.secondsPerDay*Main.peakLoad-totalBaseConsumption(polyFuncBaseLoadWorking);
 		return (totalValleyToFill/averagePHEVConsumption);
 	}
 	
@@ -341,7 +338,7 @@ public class DecentralizedChargerInfo {
 		d[0][0]=0;
 		d[0][1]=Main.secondsPerDay;
 		d[0][2]=1; // since penetration>flatteningPenetration always 1 and only one interval
-		double currentTry=peakLoad;
+		double currentTry=Main.peakLoad;
 		while (run){
 			iterationsToFindNewBaseConsumption++;
 			if ( Math.abs(currentTry*Main.secondsPerDay-functionIntegrator.integrate(polyFuncBaseLoadWorking , 0, Main.secondsPerDay)-totalPHEVConsumption)<crit){
@@ -377,7 +374,7 @@ public class DecentralizedChargerInfo {
 		iterationsToFindNewBaseConsumption=0;
 		double [][] d=null;
 		
-		double currentUpperTry=peakLoad;
+		double currentUpperTry=Main.peakLoad;
 		double currentLowerTry=constantBaseConsumption;
 		
 		boolean run=true;
@@ -550,7 +547,7 @@ public class DecentralizedChargerInfo {
 				  String label= ("Intersect at "+intersects.get(i));
 				  XYSeries intersectData = new XYSeries(label);
 				  intersectData.add((double)intersects.get(i), 0);
-				  intersectData.add((double)intersects.get(i), peakLoad);
+				  intersectData.add((double)intersects.get(i), Main.peakLoad);
 				  dataset.addSeries(intersectData);
 			  }
 		  }
@@ -559,6 +556,76 @@ public class DecentralizedChargerInfo {
 		  JFreeChart chart = ChartFactory.createXYLineChart(title, "time in hours", "Load", dataset, PlotOrientation.VERTICAL, true, true, false);
 		  ChartUtilities.saveChartAsPNG(new File(outputPath+title+".png") , chart, 800, 600);
 		  
+	}
+	
+	
+	public double [][] getPeakTimes(double [][] valleys2ComareTo){
+		// if defineCase=0; valleyTimes are not at beginning or end of day
+		// if defineCase=1; valleyTime is at beginning of day
+		// if defineCase=2; valleyTime is at  end of day
+		// if defineCase=3; valleyTime are at beginning and end
+		
+		int defineCase;
+		if (valleys2ComareTo[0][0]==0) //valleyAtBeginnging
+		{
+			defineCase=1;
+			if (valleys2ComareTo[valleys2ComareTo.length-1][1]==Main.secondsPerDay){
+				// at beginning and end
+				defineCase=3;
+			}
+		}
+		
+		else if ( valleys2ComareTo[valleys2ComareTo.length-1][1]==Main.secondsPerDay){
+			defineCase=2;
+		}
+		else{defineCase=0;}
+		
+		// create peakTimes
+		
+		if (defineCase==0){
+			// if defineCase=0; valleyTimes are not at beginning or end of day
+			peakTimes= new double[valleys2ComareTo.length+1][2];
+			peakTimes[0][0]=0;
+			peakTimes[0][1]=valleys2ComareTo[0][0];
+			for (int i=0; i<valleys2ComareTo.length-1; i++){
+				peakTimes[i+1][0]=valleys2ComareTo[i][1];
+				peakTimes[i+1][1]=valleys2ComareTo[i+1][0];                                 
+			}
+			peakTimes[peakTimes.length-1][0]=valleys2ComareTo[valleys2ComareTo.length-1][1]; 
+			peakTimes[peakTimes.length-1][1]=Main.secondsPerDay;
+		}
+		
+		if (defineCase==1){
+			// if defineCase=1; valleyTime is at beginning of day
+			peakTimes= new double[valleys2ComareTo.length][2];
+			for (int i=0; i<peakTimes.length-1; i++){
+				peakTimes[i][0]=valleys2ComareTo[i][1];
+				peakTimes[i][1]=valleys2ComareTo[i+1][0];
+			}
+			peakTimes[peakTimes.length-1][0]=valleys2ComareTo[valleys2ComareTo.length-1][1];
+			peakTimes[peakTimes.length-1][1]=Main.secondsPerDay;
+		}
+		if (defineCase==2){
+			// if defineCase=1; valleyTime is at end of day
+			peakTimes= new double[valleys2ComareTo.length][2];
+			peakTimes[0][0]=0;
+			peakTimes[0][1]=valleys2ComareTo[0][0];
+			for (int i=1; i<peakTimes.length; i++){
+				peakTimes[i][0]=valleys2ComareTo[i-1][1];
+				peakTimes[i][1]=valleys2ComareTo[i][0];                                 
+			}
+		}
+		
+		if (defineCase==3){
+			// if defineCase=2; valleyTime are at beginning and end
+			peakTimes= new double[valleys2ComareTo.length-1][2];
+			for (int i=0; i<peakTimes.length; i++){
+				peakTimes[i][0]=valleys2ComareTo[i][1];
+				peakTimes[i][1]=valleys2ComareTo[i+1][0];   
+			}
+		}
+		
+		return peakTimes;
 	}
 	
 	
@@ -651,9 +718,9 @@ public class DecentralizedChargerInfo {
 		}
 		
 		//TODO CHeck these functions
-		totalCostBase=constantBaseConsumption*priceBase*Main.secondsPerDay + (functionIntegrator.integrate(polyFuncBaseLoadWorking, 0, Main.secondsPerDay)-constantBaseConsumption*Main.secondsPerDay)*pricePeak;
+		totalCostBase=constantBaseConsumption*Main.priceBase*Main.secondsPerDay + (functionIntegrator.integrate(polyFuncBaseLoadWorking, 0, Main.secondsPerDay)-constantBaseConsumption*Main.secondsPerDay)*Main.pricePeak;
 		
-		totalCostPHEV=(-newBaseConsumption*Main.secondsPerDay + (functionIntegrator.integrate(polyFuncBaseLoadWorking, 0,Main.secondsPerDay)+valleyInt))*pricePeak + newBaseConsumption*Main.secondsPerDay*priceBase;
+		totalCostPHEV=(-newBaseConsumption*Main.secondsPerDay + (functionIntegrator.integrate(polyFuncBaseLoadWorking, 0,Main.secondsPerDay)+valleyInt))*Main.pricePeak + newBaseConsumption*Main.secondsPerDay*Main.priceBase;
 		
 		probDensityFunctions=ProbFuncArray;
 	}
@@ -681,7 +748,6 @@ public class DecentralizedChargerInfo {
 		probDensityRanges= ranges;
 	}	
 	
-
 	
 	public double[][] getSlotLoad(){
 		return slotBaseLoad;
@@ -744,8 +810,8 @@ public class DecentralizedChargerInfo {
 		    
 		   
 		    
-		    out.write("BasePrice: "+priceBase+"\n");
-		    out.write("PeakPrice: "+pricePeak+"\n");
+		    out.write("BasePrice: "+Main.priceBase+"\n");
+		    out.write("PeakPrice: "+Main.pricePeak+"\n");
 		    out.write("Total Costs before "+ totalCostBase+" \n \n");
 		    out.write("Total Costs after"+ totalCostPHEV+" \n \n");
 		    
@@ -764,6 +830,7 @@ public class DecentralizedChargerInfo {
 	 * @return returns the number of seconds which lie within feasible charging intervals and are within time intervals of minimum length = slotLength
 	 */
 	public double getFeasibleChargingTimeInInterval(double startSecond, double endSecond, double[][] valleys2ComareTo){
+		
 		double totalFeasibleTime=0;
 		if(startSecond>endSecond){
 			// recursive call, only if overnight parking
@@ -780,6 +847,7 @@ public class DecentralizedChargerInfo {
 						//if endSecond is within  interval
 						if (endSecond-startSecond>=Main.slotLength){
 							totalFeasibleTime=endSecond-startSecond;
+							
 						}
 						
 					}
@@ -804,12 +872,66 @@ public class DecentralizedChargerInfo {
 					}
 				}
 			}
-		}
-				
+		}	
 		return totalFeasibleTime;
 	}
 
 	
+	
+public ArrayList<double[][]> getFeasibleChargingIntervalInParkingInterval(ArrayList<double[][]> list, double startSecond, double endSecond, double[][] valleys2ComareTo){
+		
+		if(startSecond>endSecond){
+			// recursive call, only if overnight parking
+			list =getFeasibleChargingIntervalInParkingInterval(list, 0, endSecond,valleys2ComareTo);
+			list =getFeasibleChargingIntervalInParkingInterval(list, startSecond, Main.secondsPerDay,valleys2ComareTo);
+			
+		}
+		else{
+			// Loop over all valleys
+			// if start and end second are within valley
+			for (int i=0; i<valleys2ComareTo.length; i++){
+				if (valleys2ComareTo[i][0]<=startSecond && valleys2ComareTo[i][1]>=startSecond){
+					//if startSecond is within  interval
+					if (valleys2ComareTo[i][0]<=endSecond && valleys2ComareTo[i][1]>=endSecond){
+						//if endSecond is within  interval
+						if (endSecond-startSecond>=Main.slotLength){
+							list.add(new double[][] {{startSecond, endSecond}});
+							//totalFeasibleTime=endSecond-startSecond;
+							
+						}
+						
+					}
+					// if start second within but endsecond after than valleyEnd
+					else{
+						if (valleys2ComareTo[i][1]-startSecond>=Main.slotLength){
+							list.add(new double[][] {{startSecond, valleys2ComareTo[i][1]}});
+							//totalFeasibleTime=valleys2ComareTo[i][1]-startSecond;
+						}
+					}
+				}
+				// if end second is within valley
+				if (valleys2ComareTo[i][0]<=endSecond && valleys2ComareTo[i][1]>=endSecond && startSecond<valleys2ComareTo[i][0]){
+					if (endSecond-valleys2ComareTo[i][0]>=Main.slotLength){
+						list.add(new double[][] {{valleys2ComareTo[i][0], endSecond}});
+						//totalFeasibleTime=endSecond-valleys2ComareTo[i][0];
+					}
+					
+				}
+				
+				if (valleys2ComareTo[i][1]<endSecond && valleys2ComareTo[i][0]>startSecond){
+					if (valleys2ComareTo[i][1]-valleys2ComareTo[i][0]>=Main.slotLength){
+						list.add(new double[][] {{valleys2ComareTo[i][0], valleys2ComareTo[i][1]}});
+						//totalFeasibleTime=valleys2ComareTo[i][1]-valleys2ComareTo[i][0];
+					}
+				}
+			}
+		}	
+		return list;
+	}
+
+	
+
+
 	/**
 	 * 
 	 * @param parkingTimesCurrentAgent pass the double [][] of parkingTimes of current Agent to pick suitable charging Times from these
@@ -822,7 +944,15 @@ public class DecentralizedChargerInfo {
 	 */
 	public double[][] bookSlots(double[][] parkingTimesCurrentAgent, int noOfSlotsToBook, int slotsInPeakTime) throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
 		//assumes  small number of slots in peakTime --> only one longer charging slot for all nonValleyChargingTimes
-		double[][] chargingTimes = new double[noOfSlotsToBook+1][2];
+		double[][] chargingTimes;
+		if (slotsInPeakTime==0)
+		{
+			chargingTimes = new double[noOfSlotsToBook][2];
+		}
+		else{
+			chargingTimes = new double[noOfSlotsToBook+slotsInPeakTime][2];
+		}
+		
 		
 		//book valleySlots
 		for (int i=0; i< noOfSlotsToBook;i++){
@@ -837,17 +967,140 @@ public class DecentralizedChargerInfo {
 					 if (checkForOverlappingSlots( trySlot, chargingTimes, i)){
 						 chargingTimes[i][0]=trySlot[0][0];
 						 chargingTimes[i][1]=trySlot[0][1];
+						 slotFound=true;
 					 }
 				 }
 			}
 		}
 		
-		// peakSlotstoBook
-		// simply book right before first departure... check results later if sensible
-		chargingTimes[noOfSlotsToBook][1]=parkingTimesCurrentAgent[0][1];
-		chargingTimes[noOfSlotsToBook][0]=parkingTimesCurrentAgent[0][1]-(slotsInPeakTime*Main.slotLength);
+		// peakSlotstoBook 
+		double [][]parkAndPeakTimesCurrentAgent=getParkAndPeakTimesCurrentAgent(parkingTimesCurrentAgent);
+		
+		
+		for (int i=noOfSlotsToBook; i< noOfSlotsToBook+slotsInPeakTime;i++){
+			boolean slotFound=false;
+			double [][] trySlot=new double [1][2];
+			while (slotFound==false){
+				double rand= Math.random();
+				trySlot[0][0]=rand*(Main.secondsPerDay-Main.slotLength);
+				trySlot[0][1]=rand*(Main.secondsPerDay-Main.slotLength)+Main.slotLength;
+					
+				// check if within parkAndPeakTimes 
+				 if (checkIfSlotWithinParkingTimeOfAgent(trySlot, parkAndPeakTimesCurrentAgent)){
+					 //check if not overlapping with existing slots
+					 if (checkForOverlappingSlots( trySlot, chargingTimes, i)){
+						 chargingTimes[i][0]=trySlot[0][0];
+						 chargingTimes[i][1]=trySlot[0][1];
+						 slotFound=true;
+					 }
+				 }
+			}
+		}
+				
 		return chargingTimes;
 	}
+	
+	
+	
+	
+	/**
+	 * books slots in all times where agent parks within valleys and books "slotsInPeakTime" additional slots in peak time
+	 * @param parkingTimesCurrentAgent
+	 * @param valleys2ComareTo
+	 * @param slotsInPeakTime
+	 * @return
+	 * @throws MaxIterationsExceededException
+	 * @throws FunctionEvaluationException
+	 * @throws IllegalArgumentException
+	 */
+	public double[][] bookSlotsAll(double[][] parkingTimesCurrentAgent, double [][] valleys2ComareTo, int slotsInPeakTime) throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException {
+		
+		ArrayList<double[][]> list= new ArrayList<double [][]>(0);
+		for (int i=0; i<parkingTimesCurrentAgent.length; i++){
+			list=getFeasibleChargingIntervalInParkingInterval(list, parkingTimesCurrentAgent[i][0], parkingTimesCurrentAgent[i][1], valleys2ComareTo);
+
+		}
+		
+		// create double for charging times with space for All Valley Times and peakTimeSlot
+		double[][] chargingTimes;
+		if (slotsInPeakTime==0)
+		{
+			chargingTimes = new double[list.size()][2];
+		}
+		else{
+			chargingTimes = new double[list.size()+slotsInPeakTime][2];
+			}
+		
+		// copy entries from list with parking times within valleys to charging TImes
+		for (int i=0; i<list.size(); i++){
+			
+			double [][] entry=list.get(i);
+			for (int j=0; j<entry.length; j++){
+				chargingTimes[i][0]=entry[j][0];
+				chargingTimes[i][1]=entry[j][1];
+			}
+		}
+		
+		
+		double [][]parkAndPeakTimesCurrentAgent=getParkAndPeakTimesCurrentAgent(parkingTimesCurrentAgent);
+		
+		
+		for (int i=list.size(); i< list.size()+slotsInPeakTime;i++){
+			boolean slotFound=false;
+			double [][] trySlot=new double [1][2];
+			while (slotFound==false){
+				double rand= Math.random();
+				trySlot[0][0]=(int)Math.round(rand*(Main.secondsPerDay-Main.slotLength));
+				trySlot[0][1]=trySlot[0][0]+(int)Main.slotLength;
+				
+				// check if within parkAndpeakTimes 
+				 if (checkIfSlotWithinParkingTimeOfAgent(trySlot, parkAndPeakTimesCurrentAgent)){
+					 //check if not overlapping with existing slots
+					 if (checkForOverlappingSlots( trySlot, chargingTimes, i)){
+						 chargingTimes[i][0]=trySlot[0][0];
+						 chargingTimes[i][1]=trySlot[0][1];
+						 slotFound=true;
+					 }
+				 }
+			}
+		}
+		
+		return chargingTimes;
+	}
+	
+	
+	
+	
+	/**
+	 * returns a double [][] with the time intervals in peak TIme in which current agent parks
+	 * @param parkingTimesCurrentAgent
+	 * @return
+	 */
+	public double [][] getParkAndPeakTimesCurrentAgent(double [][] parkingTimesCurrentAgent){
+		// identify times of parking and peak - save in parkAndPeakTimesList
+		peakTimes=getPeakTimes(valleyTimes);
+		ArrayList<double[][]> parkAndPeakTimesList= new ArrayList<double[][]>(0);
+		for (int i=0; i<parkingTimesCurrentAgent.length; i++){
+			parkAndPeakTimesList=getFeasibleChargingIntervalInParkingInterval(parkAndPeakTimesList, parkingTimesCurrentAgent[i][0], parkingTimesCurrentAgent[i][1], peakTimes);
+
+		}
+		
+		// transfer ArrayList to double [][]
+		double [][] parkAndPeakTimesCurrentAgent=new double[parkAndPeakTimesList.size()][2];
+		
+		for (int i=0; i<parkAndPeakTimesList.size(); i++){
+			
+			double [][] entry=parkAndPeakTimesList.get(i);
+			for (int j=0; j<entry.length; j++){
+				parkAndPeakTimesCurrentAgent[i][0]=entry[j][0];
+				parkAndPeakTimesCurrentAgent[i][1]=entry[j][1];
+			}
+		}
+		
+		return parkAndPeakTimesCurrentAgent;
+	}
+	
+	
 	
 	/**
 	 * 
@@ -877,6 +1130,16 @@ public class DecentralizedChargerInfo {
 				checkSlot=true;
 			}
 		}
+		// special check for first overnight slot
+		if (parkingTimesCurrentAgent[0][0]>parkingTimesCurrentAgent[0][1]){
+			if (trySlot[0][0]<=parkingTimesCurrentAgent[0][1] && trySlot[0][1]<=parkingTimesCurrentAgent[0][1] ){
+				checkSlot=true;
+			}
+			if (trySlot[0][0]>=parkingTimesCurrentAgent[0][0] && trySlot[0][1]<=Main.secondsPerDay){
+				checkSlot=true;
+			}
+		}
+		
 		return checkSlot;
 	}
 

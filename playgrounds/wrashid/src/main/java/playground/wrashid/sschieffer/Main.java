@@ -55,6 +55,14 @@ import playground.wrashid.lib.obj.LinkedListValueHashMap;
 public class Main {
 	public static LinkedListValueHashMap<Id, Vehicle> vehicles;
 	public static double penetrationPercent=1.0;
+	public static double batteryCapacity= 16000*3600; //Wsec Andersson 2010 10kWh
+	public static double minCharge=0.2;
+	public static double maxCharge=0.9;
+	public static double startSOCInWattSeconds=batteryCapacity*(maxCharge-minCharge); // Wsec
+	public static double priceBase=0.13;
+	public static double pricePeak=0.2;
+	public static double peakLoad=Math.pow(10, 3); // adjust max peakLoad in Joule
+	public static double chargingSpeedPerSecond=15000; // Joule/second = Watt
 	
 	public static double secondsPerMin=60;
 	public static double secondsPer15Min=15*60;

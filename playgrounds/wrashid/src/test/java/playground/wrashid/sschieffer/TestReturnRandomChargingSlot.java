@@ -13,7 +13,7 @@ public class TestReturnRandomChargingSlot extends TestCase{
 
 	
 	public void testReturnRandomChargingSlot() throws OptimizationException, MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException, IOException{
-		DecentralizedChargerInfo myInfo= new DecentralizedChargerInfo(100, 100, 100, 0.1, 0.13);
+		DecentralizedChargerInfo myInfo= new DecentralizedChargerInfo(100, 100);
 		double [][] newValleyTimes  =  {{0, 1000}};
 		myInfo.setValleyTimes(newValleyTimes);
 		

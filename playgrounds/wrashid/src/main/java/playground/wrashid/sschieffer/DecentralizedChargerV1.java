@@ -21,6 +21,7 @@
 package playground.wrashid.sschieffer;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 
@@ -45,14 +46,16 @@ public class DecentralizedChargerV1 {
 
 	private LinkedListValueHashMap<Id, Double> energyConsumptionOfLegs;
 	private LinkedListValueHashMap<Id, ParkingIntervalInfo> parkingTimeIntervals;
+	//public ArrayList<Double> realChargingTimes;
 	//TODO add method to return vehicles in energyConsumptionPlugin
 	//LinkedListValueHashMap<Id, Vehicle> vehicles=energyConsumptionPlugin.
 	
-	private double priceBase=0.13;
-	private double pricePeak=0.2;
-	private double peakLoad=Math.pow(10, 4); // adjust max peakLoad in Joule
-	private double chargingSpeedPerSecond=3000; // Joule/second = Watt
+	
 	//private double maxChargePerSlot=chargingSpeedPerSecond*Main.secondsPer15Min;
+	
+	public int statsInfeasible;
+	public int statsTight;
+	public int statsLoose;
 	
 	private double [][] parkingTimesCurrentAgent;
 	private double [] parkingLengthCurrentAgent;
@@ -70,17 +73,8 @@ public class DecentralizedChargerV1 {
 	final Controler controler;
 	
 	
-	public double getPeakLoad(){
-		return peakLoad;
-	}
 	
-	public double getPricePeak(){
-		return pricePeak;
-	}
 	
-	public double getPriceBase(){
-		return priceBase;
-	}
 	/**
 	 * Public constructor
 	 */
@@ -99,8 +93,8 @@ public class DecentralizedChargerV1 {
 	 * @param agentId
 	 * @param linkId
 	 */
-	public void getElectricityFromGrid(double startChargingTime, double endChargingTime, Id agentId, Id linkId){
-		System.out.println();
+	public void getElectricityFromGrid(double startChargingTime, double endChargingTime, Id agentId){
+		System.out.println("Electricity for Agent:"+ agentId.toString() +" from "+startChargingTime +" to " +endChargingTime);
 	}
 	
 	public double calcNumberOfPHEVs(Controler controler){
@@ -113,7 +107,7 @@ public class DecentralizedChargerV1 {
 		
 		noOfPHEVs = calcNumberOfPHEVs(controler);
 		averagePHEVConsumptionInWatts= getAveragePHEVConsumptionInWatt();
-		myChargerInfo = new DecentralizedChargerInfo(peakLoad, noOfPHEVs, averagePHEVConsumptionInWatts, priceBase, pricePeak); 
+		myChargerInfo = new DecentralizedChargerInfo(noOfPHEVs, averagePHEVConsumptionInWatts); 
 		
 		myChargerInfo.loadBaseLoadCurveFromTextFile();
 		
@@ -147,74 +141,117 @@ public class DecentralizedChargerV1 {
 
 		for (Id personId: controler.getPopulation().getPersons().keySet()){
 			
+			System.out.println("Start Check Agent:" + personId.toString());
 			LinkedList<ParkingIntervalInfo> parkingIntervals = parkingTimeIntervals.get(personId);
-			double [] parkingLengthsCurrentAgent=getParkingLengthsCurrentAgent(personId);
+			double [] parkingLengthsCurrentAgent=getParkingLengthsCurrentAgent(parkingIntervals);
 											
 			// get driving legs			
 			LinkedList<Double> legEnergyConsumptionList = energyConsumptionOfLegs.get(personId);
-			double [] drivingConsumptionCurrentAgent=getdrivingConsumptionCurrentAgent(personId);
+			drivingConsumptionCurrentAgent=getdrivingConsumptionCurrentAgent(personId);
 			
 			drivingTimesCurrentAgent = getDrivingTimesCurrentAgent(parkingTimesCurrentAgent,parkingIntervals);
 			
 			double totalAgentConsumptionJoule=sumUpEntriesOf1DDoubleArray(drivingConsumptionCurrentAgent); // in Joules
 			double totalParkingTimeAgentInSeconds=sumUpEntriesOf1DDoubleArray(parkingLengthsCurrentAgent);
 			
-			double potentialTotalChargingAgent=chargingSpeedPerSecond*totalParkingTimeAgentInSeconds;
+			double potentialTotalChargingAgent=Main.chargingSpeedPerSecond*totalParkingTimeAgentInSeconds;
 			
 			performGeneralFeasibilityCheckAgentBehavior(drivingConsumptionCurrentAgent);
 			
 			double[] realParkingLengthCurrentAgent=new double[parkingIntervals.size()];
+			statsInfeasible=0;
+			statsTight=0;
+			statsLoose=0;
+			
+			System.out.println("Specific Feasibility Test for Agent:" + personId.toString());
 			performSpecificFeasibilityCheckAgentBehavior(realParkingLengthCurrentAgent,  totalAgentConsumptionJoule);			
 			
-			//getElectricityFromGrid(double startChargingTime, double endChargingTime, Id agentId, Id linkId){
+			for (int i=0; i< chargingTimesCurrentAgent.length; i++){
+				getElectricityFromGrid(chargingTimesCurrentAgent[i][0], chargingTimesCurrentAgent[i][1], personId);
+					
+			}
 			
 		}
+		
+		System.out.println("Statistics:");
+		System.out.println("Agent with Infeasible charging patterns: "+ statsInfeasible);
+		System.out.println("Agent with Tight charging patterns: "+ statsTight);
+		System.out.println("Agent with Loose charging patterns: "+ statsLoose);
 	}
-	
-	
-	
 	
 	
 	public void	performSpecificFeasibilityCheckAgentBehavior(double[] realParkingLengthCurrentAgent, double totalAgentConsumptionJoule) throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
 		//special check
 		//new realParkingLengthArray - crosschecked with valleys
+		
 		for (int i=0; i<realParkingLengthCurrentAgent.length; i++){
 			realParkingLengthCurrentAgent[i]=myChargerInfo.getFeasibleChargingTimeInInterval(parkingTimesCurrentAgent[i][0], parkingTimesCurrentAgent[i][1], myChargerInfo.getValleyTimes());
 		}
 		
-		
 		double totalRealChargingTimeAgentInSeconds=sumUpEntriesOf1DDoubleArray(realParkingLengthCurrentAgent);
-		double realTotalCharging=chargingSpeedPerSecond*totalRealChargingTimeAgentInSeconds;
-		double maxChargeInJoulePerSlot=Main.slotLength*chargingSpeedPerSecond; // sec*Joule/sec
+		double realTotalCharging=Main.chargingSpeedPerSecond*totalRealChargingTimeAgentInSeconds;
+		double maxChargeInJoulePerSlot=Main.slotLength*Main.chargingSpeedPerSecond; // sec*Joule/sec
 		
 		// number of slots to book dependent on consumption
 		int noOfSlotsToBook= (int) Math.ceil(totalAgentConsumptionJoule/maxChargeInJoulePerSlot);
 		//number of feasible slots to book is parkingTime within Valleys = totalRealCHargingTimeAgendInSeconds
 		int feasibleNoOfSlotsToBook= (int) Math.ceil(totalRealChargingTimeAgentInSeconds/Main.slotLength);
 		
+		int noOfSlotInDay=(int)Math.ceil(Main.secondsPerDay/Main.slotLength);
+		if (noOfSlotsToBook>noOfSlotInDay){
+			System.out.println("infeasible numbers, change charging speed or consumption info.");
+			System.out.println("necessary number of charging slots higher than slots in day!");
+		}
 		int slotsInPeakTime=noOfSlotsToBook-feasibleNoOfSlotsToBook;
 		if (slotsInPeakTime<=0){
 			slotsInPeakTime=0;
 		}
 		
+		
+		int systemConstraint=0;
 		if (totalAgentConsumptionJoule>realTotalCharging){
 			System.out.println("Special check: infeasible");
-			
+			systemConstraint=1;
+			statsInfeasible++;
 		}
 		else if (totalAgentConsumptionJoule==realTotalCharging){
 			System.out.println("Special check: tight");
-			
+			systemConstraint=1;
+			statsTight++;
 		}
 		else{
 			System.out.println("Special check: loose");
+			systemConstraint=0;
+			statsLoose++;
 		}
+		
 		
 		
 		boolean feasibilityCheck=false;
 		while (feasibilityCheck==false){
-			chargingTimesCurrentAgent=myChargerInfo.bookSlots(parkingTimesCurrentAgent, noOfSlotsToBook, slotsInPeakTime);
+			if (systemConstraint==1){
+				// tight - book all realCHargingSlotTImes
+				System.out.println("get ALL Charging Slots for Agent");
+				System.out.println("get "+ slotsInPeakTime +" Charging Slots in PeakTime for Agent");
+				
+				chargingTimesCurrentAgent=myChargerInfo.bookSlotsAll(parkingTimesCurrentAgent, myChargerInfo.getValleyTimes(),slotsInPeakTime);
+				
+				
+			}
+			else{
+				// loose
+				System.out.println("get"+ noOfSlotsToBook +"Charging Slots for Agent");
+				chargingTimesCurrentAgent=myChargerInfo.bookSlots(parkingTimesCurrentAgent, noOfSlotsToBook, slotsInPeakTime);
+				
+			}
+			System.out.println("get Actual Order");
 			double [][] actualOrder=getActualOrder(chargingTimesCurrentAgent, drivingTimesCurrentAgent, drivingConsumptionCurrentAgent); 
-			feasibilityCheck=checkChargingOrderForFeasibility(actualOrder);
+			
+			System.out.println("check Feasibility");
+			feasibilityCheck=checkChargingOrderForFeasibility(actualOrder, totalAgentConsumptionJoule);
+			if (!feasibilityCheck){
+				System.out.println("not Feasible - REPEAT");
+			}
 		}
 	}
 	
@@ -225,7 +262,7 @@ public class DecentralizedChargerV1 {
 	public double [] getdrivingConsumptionCurrentAgent(Id personId){
 			LinkedList<Double> legEnergyConsumptionList = energyConsumptionOfLegs.get(personId);
 			int noOfTrips=legEnergyConsumptionList.size();
-			double [] drivingConsumptionCurrentAgent = new double[noOfTrips];
+			drivingConsumptionCurrentAgent = new double[noOfTrips];
 			
 			for (int i=0;i<legEnergyConsumptionList.size();i++) {
 				drivingConsumptionCurrentAgent[i]=legEnergyConsumptionList.get(i);
@@ -234,10 +271,7 @@ public class DecentralizedChargerV1 {
 	}
 	
 	
-	public double[] getParkingLengthsCurrentAgent(Id personId){
-		
-		// get parking Intervals
-		LinkedList<ParkingIntervalInfo> parkingIntervals = parkingTimeIntervals.get(personId);
+	public double[] getParkingLengthsCurrentAgent(LinkedList<ParkingIntervalInfo> parkingIntervals){
 		
 		// arrival- departure
 		parkingTimesCurrentAgent = new double[parkingIntervals.size()][2];
@@ -254,35 +288,106 @@ public class DecentralizedChargerV1 {
 		}
 		// correction of first entry
 		if (parkingLengthCurrentAgent[0]<0){
-			parkingLengthCurrentAgent[0]=parkingTimesCurrentAgent[0][1]+Main.secondsPerDay-parkingTimesCurrentAgent[parkingTimesCurrentAgent.length-1][0];
+			parkingLengthCurrentAgent[0]=parkingTimesCurrentAgent[0][1]+Main.secondsPerDay-parkingTimesCurrentAgent[0][0];
 		}
 		return parkingLengthCurrentAgent;
 }
 	
 	public double [][] getActualOrder(double [][] chargingTimesCurrentAgent, double [][]drivingTimesCurrentAgent, double [] drivingConsumptionCurrentAgent){
 		double [][] actualOrder = new double [chargingTimesCurrentAgent.length+drivingTimesCurrentAgent.length][3];
-		
+		// add chargingtimes and driving times to actualOrder
 		for (int i=0; i<chargingTimesCurrentAgent.length; i++){
 			actualOrder[i][0]=chargingTimesCurrentAgent[i][0]; //start
 			actualOrder[i][1]=chargingTimesCurrentAgent[i][1]; // end
-			actualOrder[i][2]=(chargingTimesCurrentAgent[i][1]-chargingTimesCurrentAgent[i][0])*chargingSpeedPerSecond; // charge
+			actualOrder[i][2]=(chargingTimesCurrentAgent[i][1]-chargingTimesCurrentAgent[i][0])*Main.chargingSpeedPerSecond; // charge
 		}
 		for (int i=0; i<drivingTimesCurrentAgent.length; i++){
 			actualOrder[i+chargingTimesCurrentAgent.length][0]=drivingTimesCurrentAgent[i][0];
 			actualOrder[i+chargingTimesCurrentAgent.length][1]=drivingTimesCurrentAgent[i][1];
-			actualOrder[i+chargingTimesCurrentAgent.length][2]=drivingConsumptionCurrentAgent[i];
+			actualOrder[i+chargingTimesCurrentAgent.length][2]=-1*drivingConsumptionCurrentAgent[i];
+			//double [] drivingConsumptionCurrentAgent=getdrivingConsumptionCurrentAgent(personId);
+			
 		}
 		
-		// TODO find an awesome way to sort a multidimensional array effectively by first column
-		
+		// sort actual order by time
+		actualOrder= minAtStartMaxAtEnd(actualOrder, 3);
 		return actualOrder;
 		
 	} 
 	
+	/**
+	 * Recursive method to sort double array by first entry in row
+	 * 
+	 * @param d
+	 * @param elementsPerRow
+	 * @return
+	 */
+	public double[][] minAtStartMaxAtEnd(double [][]d, int elementsPerRow){
+		int min=0;
+		int max=0;
+		for (int i=0; i<d.length; i++){
+			if (d[i][0]<d[min][0]){
+				min=i;
+			}
+			if(d[i][0]>d[max][0]){
+				max=i;
+			}
+		}
+		
+		double[][] clone=d.clone();
+		clone[0]=d[min];
+		clone[d.length-1]=d[max];
+		
+		
+		double [][] leftInMiddle=removeEntryIFromDoubleArray( d, min, elementsPerRow);
+		if (min<max)
+			{leftInMiddle=removeEntryIFromDoubleArray(leftInMiddle, max-1, elementsPerRow);}
+		else
+			{leftInMiddle=removeEntryIFromDoubleArray(leftInMiddle, max, elementsPerRow);}
+		
+		if(leftInMiddle.length>1){
+			leftInMiddle=minAtStartMaxAtEnd(leftInMiddle, 3);
+		}
+		
+		// insert middle back into clone
+		//System.out.println(leftInMiddle.length);
+		for (int i=0; i<leftInMiddle.length; i++){
+			clone[i+1]=leftInMiddle[i];
+		}
+		return clone;
+	}
 	
-	public boolean checkChargingOrderForFeasibility(double [][] actualOrder){
+	
+	public double [][] removeEntryIFromDoubleArray(double [][] d, int i, int elementsPerRow){
+		double [][] newD=new double [d.length-1][elementsPerRow];
+		int count=0;
+		for (int c=0; c<d.length; c++){
+			if (c==i){}
+			else{
+				newD[count]=d[c];
+				count++;
+			}
+		}
+		return newD;
+	}
+	
+	
+	public boolean checkChargingOrderForFeasibility(double [][] actualOrder, double totalAgentConsumptionJoule){
 		boolean check=true;
-		// TODO
+		// chronological  start end consumption negative / charging positive
+		double SOC=Main.startSOCInWattSeconds; // Watt*Sec = Joule // max batteryCharge (max-min)
+		for (int i=0; i<actualOrder.length; i++){
+			SOC+=actualOrder[i][2];
+			if (SOC<0 ){
+				System.out.println("SOC cant be negative");
+				check=false;
+			}
+			if (SOC>Main.batteryCapacity)
+			{
+				System.out.println("SOC cant go over maximum");
+				check=false;
+			}
+		}
 		return check; 
 	}
 	
@@ -315,7 +420,7 @@ public class DecentralizedChargerV1 {
 		//Joules per second * second = Watt*s= Joule
 		double totalAgentConsumptionJoule=sumUpEntriesOf1DDoubleArray(drivingConsumptionCurrentAgent); // in Joules
 		double totalParkingTimeAgentInSeconds=sumUpEntriesOf1DDoubleArray(parkingLengthCurrentAgent);
-		double potentialTotalChargingAgent=chargingSpeedPerSecond*totalParkingTimeAgentInSeconds;
+		double potentialTotalChargingAgent=Main.chargingSpeedPerSecond*totalParkingTimeAgentInSeconds;
 		
 		
 		if (totalAgentConsumptionJoule>potentialTotalChargingAgent){
@@ -360,7 +465,7 @@ public class DecentralizedChargerV1 {
 		
 		public double getTotalTripLengthOfPerson(Id personId){
 			LinkedList<ParkingIntervalInfo> parkingIntervals = parkingTimeIntervals.get(personId);
-			double [] parkingLengthsCurrentAgent=getParkingLengthsCurrentAgent(personId);
+			double [] parkingLengthsCurrentAgent=getParkingLengthsCurrentAgent(parkingIntervals);
 			return sumUpEntriesOf1DDoubleArray(parkingLengthsCurrentAgent);
 		}
 		
