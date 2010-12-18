@@ -21,6 +21,7 @@
 package org.matsim.core.population.routes;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
@@ -35,6 +36,7 @@ import org.matsim.api.core.v01.population.LinkNetworkRoute;
 public class LinkNetworkRouteImpl extends AbstractRoute implements NetworkRoute, LinkNetworkRoute, Cloneable {
 
 	private ArrayList<Id> route = new ArrayList<Id>();
+	private List<Id> safeRoute = Collections.unmodifiableList(this.route);
 	private double travelCost = Double.NaN;
 	private Id vehicleId = null;
 
@@ -47,14 +49,13 @@ public class LinkNetworkRouteImpl extends AbstractRoute implements NetworkRoute,
 		LinkNetworkRouteImpl cloned = (LinkNetworkRouteImpl) super.clone();
 		ArrayList<Id> tmp = cloned.route;
 		cloned.route = new ArrayList<Id>(tmp); // deep copy of route
+		cloned.safeRoute = Collections.unmodifiableList(cloned.route);
 		return cloned;
 	}
 
 	@Override
 	public List<Id> getLinkIds() {
-		ArrayList<Id> ids = new ArrayList<Id>(this.route.size());
-		ids.addAll(this.route);
-		return ids;
+		return this.safeRoute;
 	}
 
 	@Override
