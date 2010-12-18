@@ -77,13 +77,13 @@ public class PersonDriverAgentImpl implements PersonDriverAgent {
 	private List<Id> cachedRouteLinkIds = null;
 
 	int currentLinkIdIndex;
-	
+
 	// ============================================================================================================================
 	// c'tor
 
 	public PersonDriverAgentImpl(final Person p, final Mobsim simulation) {
 		// yyyy this should, in my opinion, be protected since there is an interface.  kai, oct'10
-		
+
 		this.person = p;
 		this.simulation = simulation;
 	}
@@ -110,7 +110,7 @@ public class PersonDriverAgentImpl implements PersonDriverAgent {
 
 	// -----------------------------------------------------------------------------------------------------------------------------
 	// -----------------------------------------------------------------------------------------------------------------------------
-	
+
 	@Override
 	public final void endActivityAndAssumeControl(final double now) {
 		Activity act = (Activity) this.getPlanElements().get(this.currentPlanElementIndex);
@@ -119,7 +119,7 @@ public class PersonDriverAgentImpl implements PersonDriverAgent {
 		Boolean flag = advancePlan() ;
 		scheduleAgentInMobsim( flag );
 	}
-	
+
 	// -----------------------------------------------------------------------------------------------------------------------------
 
 	@Override
@@ -146,11 +146,11 @@ public class PersonDriverAgentImpl implements PersonDriverAgent {
 	// -----------------------------------------------------------------------------------------------------------------------------
 
 	private Boolean scheduleAgentInMobsim( Boolean flag ) {
-		
+
 		if ( flag == null ) {
 			throw new RuntimeException("plan has run empty" ) ;
 		}
-		
+
 		PlanElement pe = this.getCurrentPlanElement() ;
 
 		if (pe instanceof Activity) {
@@ -185,10 +185,12 @@ public class PersonDriverAgentImpl implements PersonDriverAgent {
 	// -----------------------------------------------------------------------------------------------------------------------------
 	// -----------------------------------------------------------------------------------------------------------------------------
 
+	@Override
 	public final void notifyTeleportToLink(final Id linkId) {
 		this.currentLinkId = linkId;
 	}
 
+	@Override
 	public final void notifyMoveOverNode() {
 		this.currentLinkId = this.cachedNextLinkId;
 		this.currentLinkIdIndex++;
@@ -200,6 +202,7 @@ public class PersonDriverAgentImpl implements PersonDriverAgent {
 	 *
 	 * @return The next link the vehicle will drive on, or null if an error has happened.
 	 */
+	@Override
 	public Id chooseNextLinkId() {
 		if (this.cachedNextLinkId != null) {
 			return this.cachedNextLinkId;
@@ -235,19 +238,19 @@ public class PersonDriverAgentImpl implements PersonDriverAgent {
 		// yyyyyy personally, I would throw some kind of abort event here.  kai, aug'10
 		return null;
 	}
-	
-	
+
+
 	// ============================================================================================================================
 	// below there only (package-)private methods or setters/getters
-	
+
 	private Boolean advancePlan() {
 		this.currentPlanElementIndex++;
-		
+
 		// check if plan has run dry:
 		if ( this.currentPlanElementIndex >= this.getPlanElements().size() ) {
 			return null ;
-		} 
-		
+		}
+
 		PlanElement pe = this.getCurrentPlanElement() ;
 		if (pe instanceof Activity) {
 			initNextActivity((Activity) pe);
@@ -259,7 +262,7 @@ public class PersonDriverAgentImpl implements PersonDriverAgent {
 			throw new RuntimeException("Unknown PlanElement of type: " + pe.getClass().getName());
 		}
 	}
-	
+
 	/**
 	 * Some data of the currently simulated Leg is cached to speed up
 	 * the simulation. If the Leg changes (for example the Route or
@@ -272,7 +275,7 @@ public class PersonDriverAgentImpl implements PersonDriverAgent {
 		// moving this method not to WithinDay for the time being since it seems to make some sense to keep this where the internal are
 		// known best.  kai, oct'10
 		// Compromise: package-private here; making it public in the Withinday class.  kai, nov'10
-		
+
 		this.cachedNextLinkId = null;
 		this.cachedRouteLinkIds = null;
 		this.cachedDestinationLinkId = null;
@@ -310,7 +313,7 @@ public class PersonDriverAgentImpl implements PersonDriverAgent {
 			this.activityEndTime = Double.POSITIVE_INFINITY ;
 			return ;
 		}
-		
+
 		double departure = 0;
 
 		if ( this.simulation.getScenario().getConfig().vspExperimental().getActivityDurationInterpretation()
@@ -345,12 +348,12 @@ public class PersonDriverAgentImpl implements PersonDriverAgent {
 		}
 
 		if (departure < now) {
-			// we cannot depart before we arrived, thus change the time so the time stamp in events will be right 
+			// we cannot depart before we arrived, thus change the time so the time stamp in events will be right
 			//			[[how can events not use the simulation time?  kai, aug'10]]
 			departure = now;
 			// actually, we will depart in (now+1) because we already missed the departing in this time step
 		}
-		
+
 		if ( this.currentPlanElementIndex == this.getPlanElements().size()-1 ) {
 			if ( finalActHasDpTimeWrnCnt < 1 && departure!=Double.POSITIVE_INFINITY ) {
 				log.error( "last activity has end time < infty; setting it to infty") ;
@@ -363,7 +366,7 @@ public class PersonDriverAgentImpl implements PersonDriverAgent {
 	}
 	private static int finalActHasDpTimeWrnCnt = 0 ;
 
-	
+
 	private boolean initNextLeg(final Leg leg) {
 		Route route = leg.getRoute();
 		if (route == null) {
@@ -384,7 +387,7 @@ public class PersonDriverAgentImpl implements PersonDriverAgent {
 		return true ;
 	}
 	private static int noRouteWrnCnt = 0 ;
-	
+
 	private void initNextActivity(final Activity act) {
 		double now = this.getMobsim().getSimTimer().getTimeOfDay() ;
 		this.simulation.getEventsManager().processEvent(new ActivityStartEventImpl(now, this.getPerson().getId(),  this.currentLinkId, act.getFacilityId(), act.getType()));
@@ -401,7 +404,7 @@ public class PersonDriverAgentImpl implements PersonDriverAgent {
 	private final List<PlanElement> getPlanElements() {
 		return Collections.unmodifiableList( this.getPlan().getPlanElements() ) ;
 	}
-	
+
 	public final Mobsim getMobsim(){
 		return this.simulation;
 	}
@@ -410,7 +413,7 @@ public class PersonDriverAgentImpl implements PersonDriverAgent {
 	public final PlanElement getCurrentPlanElement() {
 		return this.getPlanElements().get(this.currentPlanElementIndex);
 	}
-	
+
 	@Override
 	public final PlanElement getNextPlanElement() {
 		if ( this.currentPlanElementIndex < this.getPlanElements().size() ) {
@@ -419,7 +422,7 @@ public class PersonDriverAgentImpl implements PersonDriverAgent {
 			return null ;
 		}
 	}
-	
+
 	@Override
 	public final void setVehicle(final QVehicle veh) {
 		// yyyy something like this makes sense but does it need to be "Q"Vehicle?  kai, oct'10
@@ -450,21 +453,22 @@ public class PersonDriverAgentImpl implements PersonDriverAgent {
 
 	@Override
 	public final Leg getCurrentLeg() {
-		PlanElement currentPlanElement = this.getCurrentPlanElement(); 
+		PlanElement currentPlanElement = this.getCurrentPlanElement();
 		if (!(currentPlanElement instanceof Leg)) {
 			return null;
 		}
 		return (Leg) currentPlanElement;
 	}
 
+	@Override
 	public final Activity getCurrentActivity() {
-		PlanElement currentPlanElement = this.getCurrentPlanElement(); 
+		PlanElement currentPlanElement = this.getCurrentPlanElement();
 		if (!(currentPlanElement instanceof Activity)) {
 			return null;
 		}
 		return (Activity) currentPlanElement;
 	}
-	
+
 	@Override
 	public final Id getDestinationLinkId() {
 		return this.cachedDestinationLinkId;
@@ -479,7 +483,7 @@ public class PersonDriverAgentImpl implements PersonDriverAgent {
 	public final Id getId() {
 		return this.person.getId();
 	}
-	
+
 	public final Plan getPlan() {
 		return PopulationUtils.unmodifiablePlan( this.person.getSelectedPlan() ) ;
 	}
