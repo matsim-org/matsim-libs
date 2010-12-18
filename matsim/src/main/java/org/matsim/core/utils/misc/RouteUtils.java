@@ -44,10 +44,11 @@ public class RouteUtils {
 	 * @return
 	 */
 	public static List<Node> getNodes(final NetworkRoute route, final Network network) {
-		List<Node> nodes = new ArrayList<Node>(route.getLinkIds().size() + 1);
-		if ((route.getLinkIds().size() > 0)) {
-			nodes.add(network.getLinks().get(route.getLinkIds().get(0)).getFromNode());
-			for (Id linkId : route.getLinkIds()) {
+		List<Id> linkIds = route.getLinkIds();
+		List<Node> nodes = new ArrayList<Node>(linkIds.size() + 1);
+		if ((linkIds.size() > 0)) {
+			nodes.add(network.getLinks().get(linkIds.get(0)).getFromNode());
+			for (Id linkId : linkIds) {
 				Link link = network.getLinks().get(linkId);
 				nodes.add(link.getToNode());
 			}
