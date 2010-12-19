@@ -55,14 +55,42 @@ import playground.wrashid.lib.obj.LinkedListValueHashMap;
 public class Main {
 	public static LinkedListValueHashMap<Id, Vehicle> vehicles;
 	public static double penetrationPercent=1.0;
-	public static double batteryCapacity= 16000*3600; //Wsec Andersson 2010 10kWh
-	public static double minCharge=0.2;
+	
+	/*/
+	 * battery capacity
+	 * /Andersson 2010 - 10kWh
+	 * Nissan Leaf - 24kWh
+	 */
+	
+	public static double batteryCapacity= 24000*3600; //Wsec = Joules
+	
+	/*
+	 * depth of discharge
+	 * Andersson 2010 - 80%
+	 * 
+	 */
+	public static double minCharge=0.1;
 	public static double maxCharge=0.9;
 	public static double startSOCInWattSeconds=batteryCapacity*(maxCharge-minCharge); // Wsec
+	/*
+	 * prices.... random up to now, TODO CHANGE
+	 */
 	public static double priceBase=0.13;
 	public static double pricePeak=0.2;
-	public static double peakLoad=Math.pow(10, 3); // adjust max peakLoad in Joule
-	public static double chargingSpeedPerSecond=15000; // Joule/second = Watt
+	/*
+	 * random assumption up to now TODO
+	 * wikipedia national grid UK - average power flow of 11GW
+	 */
+	public static double peakLoad=Math.pow(10, 6); // adjust max peakLoad in Joule
+	
+	/*
+	 * charging speed
+	 * Andersson 2010 - 3.5kW (standard European 230V, 16A) and 15kW
+	 * Kempton Tomic 2005 - 10-15kW
+	 * William Kurani 2007 - 1.8-17.9kW
+	 * Nissan leaf speed charge - 50kW
+	 */
+	public static double chargingSpeedPerSecond=50000; // Joule/second = Watt
 	
 	public static double secondsPerMin=60;
 	public static double secondsPer15Min=15*60;

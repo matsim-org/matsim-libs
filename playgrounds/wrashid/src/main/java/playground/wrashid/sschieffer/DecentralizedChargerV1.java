@@ -70,6 +70,7 @@ public class DecentralizedChargerV1 {
 	private double populationTotal;
 	private double noOfPHEVs;
 	private double averagePHEVConsumptionInWatts;
+	private double averagePHEVConsumptionInJoules;
 	final Controler controler;
 	
 	
@@ -106,8 +107,9 @@ public class DecentralizedChargerV1 {
 	public void performChargingAlgorithm() throws OptimizationException, MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException, IOException {
 		
 		noOfPHEVs = calcNumberOfPHEVs(controler);
+		averagePHEVConsumptionInJoules= getAveragePHEVConsumptionInJoules();
 		averagePHEVConsumptionInWatts= getAveragePHEVConsumptionInWatt();
-		myChargerInfo = new DecentralizedChargerInfo(noOfPHEVs, averagePHEVConsumptionInWatts); 
+		myChargerInfo = new DecentralizedChargerInfo(noOfPHEVs, averagePHEVConsumptionInJoules); 
 		
 		myChargerInfo.loadBaseLoadCurveFromTextFile();
 		
@@ -121,6 +123,9 @@ public class DecentralizedChargerV1 {
 		/*Loop over all agents
 		 * for each agent -make personal list of links and times
 		 */
+		statsInfeasible=0;
+		statsTight=0;
+		statsLoose=0;
 		
 		assignSlotsToAllAgents();
 	
@@ -159,9 +164,7 @@ public class DecentralizedChargerV1 {
 			performGeneralFeasibilityCheckAgentBehavior(drivingConsumptionCurrentAgent);
 			
 			double[] realParkingLengthCurrentAgent=new double[parkingIntervals.size()];
-			statsInfeasible=0;
-			statsTight=0;
-			statsLoose=0;
+			
 			
 			System.out.println("Specific Feasibility Test for Agent:" + personId.toString());
 			performSpecificFeasibilityCheckAgentBehavior(realParkingLengthCurrentAgent,  totalAgentConsumptionJoule);			
@@ -211,7 +214,7 @@ public class DecentralizedChargerV1 {
 		int systemConstraint=0;
 		if (totalAgentConsumptionJoule>realTotalCharging){
 			System.out.println("Special check: infeasible");
-			systemConstraint=1;
+			systemConstraint=2;
 			statsInfeasible++;
 		}
 		else if (totalAgentConsumptionJoule==realTotalCharging){
@@ -229,7 +232,7 @@ public class DecentralizedChargerV1 {
 		
 		boolean feasibilityCheck=false;
 		while (feasibilityCheck==false){
-			if (systemConstraint==1){
+			if (systemConstraint>0){
 				// tight - book all realCHargingSlotTImes
 				System.out.println("get ALL Charging Slots for Agent");
 				System.out.println("get "+ slotsInPeakTime +" Charging Slots in PeakTime for Agent");
@@ -247,11 +250,19 @@ public class DecentralizedChargerV1 {
 			System.out.println("get Actual Order");
 			double [][] actualOrder=getActualOrder(chargingTimesCurrentAgent, drivingTimesCurrentAgent, drivingConsumptionCurrentAgent); 
 			
-			System.out.println("check Feasibility");
-			feasibilityCheck=checkChargingOrderForFeasibility(actualOrder, totalAgentConsumptionJoule);
-			if (!feasibilityCheck){
-				System.out.println("not Feasible - REPEAT");
+			if (systemConstraint!=2){
+				System.out.println("check Feasibility");
+				feasibilityCheck=checkChargingOrderForFeasibility(actualOrder, totalAgentConsumptionJoule);
+				if (!feasibilityCheck){
+					System.out.println("not Feasible - REPEAT");
+				}
 			}
+			else{
+				System.out.println("infeasible by default");
+				feasibilityCheck=true; //need to give negative feed back to agent planning
+				// measure of severity ?
+			}
+			
 		}
 	}
 	
@@ -376,11 +387,14 @@ public class DecentralizedChargerV1 {
 		boolean check=true;
 		// chronological  start end consumption negative / charging positive
 		double SOC=Main.startSOCInWattSeconds; // Watt*Sec = Joule // max batteryCharge (max-min)
+		double missingCharge=0;
 		for (int i=0; i<actualOrder.length; i++){
+			
 			SOC+=actualOrder[i][2];
 			if (SOC<0 ){
 				System.out.println("SOC cant be negative");
 				check=false;
+				
 			}
 			if (SOC>Main.batteryCapacity)
 			{
@@ -461,6 +475,27 @@ public class DecentralizedChargerV1 {
 			// AverageWatt = SUm of All WattConsumptions/number of people with PHEV
 			return sumOfAllConsumptionsInWatt/(populationTotal*Main.penetrationPercent);
 		}
+		
+		/**
+		 * adds up Consumption of all agents and divides by number of agents
+		 * @return
+		 */
+			public double getAveragePHEVConsumptionInJoules(){
+				double sumOfAllConsumptionsInJoules=0;
+				for (Id personId : Main.vehicles.getKeySet()){
+					
+					Vehicle one= Main.vehicles.getValue(personId);
+					PlugInHybridElectricVehicle two= new PlugInHybridElectricVehicle(new IdImpl(1));
+					
+					if(areVehiclesSameClass(one, two)){ 
+						// add persons consumption to totalPHEVConsumption - is a PHEV vehicle!
+						sumOfAllConsumptionsInJoules=sumUpLinkedListEntries(energyConsumptionOfLegs.get(personId));
+							
+					}
+				};
+				// AverageWatt = SUm of All WattConsumptions/number of people with PHEV
+				return sumOfAllConsumptionsInJoules/(populationTotal*Main.penetrationPercent);
+			}
 		
 		
 		public double getTotalTripLengthOfPerson(Id personId){

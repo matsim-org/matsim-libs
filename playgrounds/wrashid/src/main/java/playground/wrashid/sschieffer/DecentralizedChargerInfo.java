@@ -77,7 +77,7 @@ public class DecentralizedChargerInfo {
 	
 	private double penetration; // number of PHEV vehicles in system
 	private double flatteningPenetration;
-	private double averagePHEVConsumption; // passed as parameter in units [load/hour]
+	private double averagePHEVConsumption; // passed as parameter in Joules
 	private double totalPHEVConsumption; // total load is calculated
 	private double peakBaseConsumption;//maxBaseConsumption
 	private double constantBaseConsumption; //constant minBaseConsumption
@@ -121,7 +121,7 @@ public class DecentralizedChargerInfo {
 	 * 
 	 * @param peakLoad - is a double in Watts corresponding to the daily peakLoad = 100%
 	 * @param penetration - the number of PHEV cars in the system
-	 * @param averagePHEVConsumption - average daily consumption per car in Watt
+	 * @param averagePHEVConsumption - average daily consumption per car in Joules
 	 * @param priceBase - price for electricity in base load
 	 * @param pricePeak - price for electricity in peak times
 	 * @throws OptimizationException
@@ -133,12 +133,12 @@ public class DecentralizedChargerInfo {
 	public DecentralizedChargerInfo(double penetration, double averagePHEVConsumption) throws OptimizationException, MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException, IOException{
 		
 		this.penetration=penetration;
-		this.averagePHEVConsumption=averagePHEVConsumption;
+		this.averagePHEVConsumption=averagePHEVConsumption; //Joules
 		
 		System.out.println("peakLoad: "+Main.peakLoad);
-		totalPHEVConsumption=averagePHEVConsumption*penetration; //Watts
+		totalPHEVConsumption=averagePHEVConsumption*penetration; //Joules
 		
-		crit=5*averagePHEVConsumption; // Watts
+		crit=5*averagePHEVConsumption; // JOules
 		
 		functionIntegrator= new SimpsonIntegrator(); 
 		newtonSolver = new NewtonSolver();
@@ -210,7 +210,7 @@ public class DecentralizedChargerInfo {
 	      dataset.addSeries(loadFigureData);
 	      dataset.addSeries(zeroLineData);
 	     
-		  JFreeChart chart = ChartFactory.createXYLineChart("Base Load [Watts] from File", "time in seconds", "Load", dataset, PlotOrientation.VERTICAL, true, true, false);
+		  JFreeChart chart = ChartFactory.createXYLineChart("Base Load [Joules] from File", "time in seconds", "Load", dataset, PlotOrientation.VERTICAL, true, true, false);
 		  ChartUtilities.saveChartAsPNG(new File(outputPath+ "baseLoadGraph.png") , chart, 800, 600);
 		 
 	}
@@ -269,7 +269,7 @@ public class DecentralizedChargerInfo {
 	      dataset.addSeries(constantLoadFigureData);
 	      dataset.addSeries(peakLoadFigureData);
 	      
-		  JFreeChart chart = ChartFactory.createXYLineChart("Base Load [Watts] from File and approximated functions", "time in seconds", "Load", dataset, PlotOrientation.VERTICAL, true, true, false);
+		  JFreeChart chart = ChartFactory.createXYLineChart("Base Load [Joules] from File and approximated functions", "time in seconds", "Load", dataset, PlotOrientation.VERTICAL, true, true, false);
 		  ChartUtilities.saveChartAsPNG(new File(outputPath+ nameToSavePNG) , chart, 800, 600);
 		 
 	}
@@ -310,8 +310,10 @@ public class DecentralizedChargerInfo {
 	 * returns the number of PHEVs necessary to reach complete baseLoad flattening
 	 */
 	public double flatteningPenetration() throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
+		// seconds * W = s * J/s  = J
 		double totalValleyToFill=Main.secondsPerDay*Main.peakLoad-totalBaseConsumption(polyFuncBaseLoadWorking);
-		return (totalValleyToFill/averagePHEVConsumption);
+		double flatteningP=(totalValleyToFill/averagePHEVConsumption);
+		return flatteningP;
 	}
 	
 	
