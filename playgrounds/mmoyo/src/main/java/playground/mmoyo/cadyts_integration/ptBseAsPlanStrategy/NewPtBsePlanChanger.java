@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package playground.mmoyo.cadyts_integration.ptBseAsPlanStrategy;
 
+//import java.util.Random;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -45,14 +47,6 @@ class NewPtBsePlanChanger implements PlanSelector
 
 	private MATSimUtilityModificationCalibrator<TransitStopFacility> matsimCalibrator;
 	
-	/*
-	final String currentOLD = "currentPlanCadytsCorrectionOLD: ";
-	final String currentNEW = " currentPlanCadytsCorrectionNEW: ";
-	final String otherOLD   = "otherPlanCadytsCorrectionOLD: ";
-	final String otherNEW   = " otherPlanCadytsCorrectionNEW: ";
-	final String separator = "====================================";
-	*/
-	
 	NewPtBsePlanChanger(PtPlanToPlanStepBasedOnEvents ptStep, MATSimUtilityModificationCalibrator<TransitStopFacility> calib ) {
 		log.error( "value for beta currently ignored (set to one)") ;
 		this.ptPlanToPlanStep = ptStep ;
@@ -65,7 +59,6 @@ class NewPtBsePlanChanger implements PlanSelector
 		if ( person.getPlans().size() <= 1 || currentPlan.getScore()==null ) {
 			return currentPlan ;
 		}
-		
 		//ChoiceSampler<TransitStopFacility> sampler = ((SamplingCalibrator<TransitStopFacility>)this.matsimCalibrator).getSampler(person) ;
 		
 		// random plan:
@@ -95,16 +88,18 @@ class NewPtBsePlanChanger implements PlanSelector
 		// (beta is the slope (strength) of the operation: large beta means strong reaction)
 
 		Plan selectedPlan = currentPlan ;
+		cadyts.demand.Plan<TransitStopFacility> selectedPlanSteps =currentPlanSteps; 
 		if (MatsimRandom.getRandom().nextDouble() < 0.01*weight ) { 
 			// as of now, 0.01 is hardcoded (proba to change when both scores are the same)
-
+			
 			selectedPlan = otherPlan;
+			selectedPlanSteps = otherPlanSteps;
 		}
 
 		//sampler.enforceNextAccept();
 		//sampler.isAccepted(this.ptPlanToPlanStep.getPlanSteps(selectedPlan));
-
-		this.matsimCalibrator.addToDemand(this.ptPlanToPlanStep.getPlanSteps(selectedPlan));//?
+		
+		this.matsimCalibrator.registerChoice(selectedPlanSteps);
 		
 		return selectedPlan ;
 	}

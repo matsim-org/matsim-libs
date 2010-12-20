@@ -166,9 +166,7 @@ VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler
 				// add the "turn" to the planStepfactory
 				// yy I think we could adapt this to use facilities instead of links
 				TransitStopFacility fac = this.schedule.getFacilities().get( facId ) ; 
-//LINK				Link link = this.sc.getNetwork().getLinks().get( fac.getLinkId() ) ;
 
-//LINK				tmpPlanStepFactory.addTurn( link, (int) time ) ;
 				tmpPlanStepFactory.addTurn( fac, (int) time ) ;
 			}
 		}
