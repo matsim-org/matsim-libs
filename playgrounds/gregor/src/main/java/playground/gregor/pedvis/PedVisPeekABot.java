@@ -20,11 +20,7 @@
 package playground.gregor.pedvis;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
 
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
@@ -36,17 +32,17 @@ import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.gis.ShapeFileReader;
 
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
-
 import playground.gregor.sim2d_v2.events.XYZAzimuthEvent;
 import playground.gregor.sim2d_v2.events.XYZEventsFileReader;
 import playground.gregor.sim2d_v2.events.XYZEventsHandler;
 import playground.gregor.sim2d_v2.events.debug.ArrowEvent;
 import playground.gregor.sim2d_v2.events.debug.ArrowEventHandler;
+
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
 
 /**
  * @author laemmel
@@ -69,6 +65,11 @@ public class PedVisPeekABot implements XYZEventsHandler, AgentDepartureEventHand
 	public PedVisPeekABot(double speedUp) {
 		this.speedUp = speedUp;
 		this.pc = new PeekABotClient();
+	}
+
+	public void setOffsets(double d, double e) {
+		this.ofX = (float) d;
+		this.ofY = (float) e;
 	}
 
 	/**
@@ -172,7 +173,7 @@ public class PedVisPeekABot implements XYZEventsHandler, AgentDepartureEventHand
 
 	public void handleEvent(XYZAzimuthEvent e) {
 		testWait(e.getTime());
-		this.pc.setBotPositionII(Integer.parseInt(e.getPersonId().toString()), (float) e.getX(), (float) e.getY(), (float) e.getZ(), (float) e.getAzimuth());
+		this.pc.setBotPositionII(Integer.parseInt(e.getPersonId().toString()), (float) e.getX() - this.ofX, (float) e.getY() - this.ofY, (float) e.getZ(), (float) e.getAzimuth());
 
 	}
 
@@ -273,11 +274,11 @@ public class PedVisPeekABot implements XYZEventsHandler, AgentDepartureEventHand
 		float r = event.getR();
 		float g = event.getG();
 		float b = event.getB();
-		float fromX = (float) event.getFrom().x;
-		float fromY = (float) event.getFrom().y;
+		float fromX = (float) event.getFrom().x - this.ofX;
+		float fromY = (float) event.getFrom().y - this.ofY;
 		float fromZ = (float) event.getFrom().z;
-		float toX = (float) event.getTo().x;
-		float toY = (float) event.getTo().y;
+		float toX = (float) event.getTo().x - this.ofX;
+		float toY = (float) event.getTo().y - this.ofY;
 		float toZ = (float) event.getTo().z;
 
 		this.pc.drawArrowII(arrowId, agentId, r, g, b, fromX, fromY, fromZ, toX, toY, toZ);

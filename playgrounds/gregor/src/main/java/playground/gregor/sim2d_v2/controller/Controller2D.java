@@ -28,12 +28,12 @@ import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
 import playground.gregor.sim2d_v2.scenario.Scenario2DImpl;
 import playground.gregor.sim2d_v2.scenario.ScenarioLoader2DImpl;
 import playground.gregor.sim2d_v2.simulation.Sim2D;
-import playground.gregor.sims.config.ShelterConfigGroup;
 
 public class Controller2D extends Controler {
 
 	private Scenario2DImpl scenario2DData;
 	private PedVisPeekABot vis;
+	private Sim2DConfigGroup sim2dConfig;
 
 	public Controller2D(String[] args) {
 		super(args[0]);
@@ -56,7 +56,9 @@ public class Controller2D extends Controler {
 			this.scenarioLoaded = true;
 
 			// this.vis = new PedVisPeekABot(1);
-			// this.vis.setFloorShapeFile(Sim2DConfig.FLOOR_SHAPE_FILE);
+			// Link l = this.network.getLinks().get(new IdImpl(0));
+			// this.vis.setOffsets(l.getCoord().getX(), l.getCoord().getY());
+			// this.vis.setFloorShapeFile(this.sim2dConfig.getFloorShapeFile());
 			// this.events.addHandler(this.vis);
 		}
 
@@ -73,6 +75,7 @@ public class Controller2D extends Controler {
 		} else {
 			s = new Sim2DConfigGroup(module);
 		}
+		this.sim2dConfig = s;
 		this.config.getModules().put("sim2d", s);
 	}
 

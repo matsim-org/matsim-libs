@@ -55,7 +55,7 @@ public class StaticForceFieldGenerator {
 	private Envelope envelope;
 
 	public StaticForceFieldGenerator(MultiPolygon structure) {
-		this.structure = structure;
+		this.structure = (MultiPolygon) structure.buffer(0);
 	}
 
 	public StaticForceField loadStaticForceField() {

@@ -73,6 +73,8 @@ public class Floor {
 	private final GeometryFactory geofac = new GeometryFactory();
 	private PhantomManager phantomMgr = null;
 
+	private final boolean ms = true;
+
 	public Floor(Scenario2DImpl scenario, List<Link> list, Sim2D sim) {
 		this.scenario = scenario;
 		this.links = list;
@@ -231,18 +233,57 @@ public class Floor {
 			m.update(time);
 		}
 
-		for (Agent2D agent : this.agents) {
-			for (ForceModule m : this.dynamicForceModules) {
-				m.run(agent);
-			}
-			for (ForceModule m : this.forceModules) {
-				m.run(agent);
+		if (this.ms) {
+			multitThreadedForceUpdate();
+		} else {
+			for (Agent2D agent : this.agents) {
+
+				for (ForceModule m : this.dynamicForceModules) {
+					m.run(agent);
+				}
+				for (ForceModule m : this.forceModules) {
+					m.run(agent);
+				}
 			}
 		}
 
 		for (Agent2D agent : this.agents) {
 			validateForce(agent);
 		}
+	}
+
+	/**
+	 * 
+	 */
+	private void multitThreadedForceUpdate() {
+
+		List<Agent2D> l1 = new ArrayList<Agent2D>();
+		List<Agent2D> l2 = new ArrayList<Agent2D>();
+		Iterator<Agent2D> it = this.agents.iterator();
+		for (int i = 0; i < this.agents.size(); i++) {
+			if (i < this.agents.size() / 2) {
+				l1.add(it.next());
+			} else {
+				l2.add(it.next());
+			}
+		}
+
+		MultiThreadedForceUpdater u1 = new MultiThreadedForceUpdater(l1, this.forceModules, this.dynamicForceModules);
+		MultiThreadedForceUpdater u2 = new MultiThreadedForceUpdater(l2, this.forceModules, this.dynamicForceModules);
+
+		Thread t1 = new Thread(u1);
+		Thread t2 = new Thread(u2);
+
+		t1.start();
+		t2.start();
+
+		try {
+			t1.join();
+			t2.join();
+		} catch (InterruptedException e) {
+			throw new RuntimeException(e);
+		}
+
 	}
 
 	private void validateForce(Agent2D agent) {
@@ -312,4 +353,34 @@ public class Floor {
 		return this.sim2D;
 	}
 
+	private static class MultiThreadedForceUpdater implements Runnable {
+
+		private final List<Agent2D> agents;
+		private final List<ForceModule> fm;
+		private final List<DynamicForceModule> dfm;
+
+		public MultiThreadedForceUpdater(List<Agent2D> agents, List<ForceModule> fm, List<DynamicForceModule> dfm) {
+			this.agents = agents;
+			this.fm = fm;
+			this.dfm = dfm;
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see java.lang.Runnable#run()
+		 */
+		@Override
+		public void run() {
+			for (Agent2D agent : this.agents) {
+				for (ForceModule m : this.dfm) {
+					m.run(agent);
+				}
+				for (ForceModule m : this.fm) {
+					m.run(agent);
+				}
+			}
+		}
+
+	}
 }
