@@ -40,9 +40,7 @@ public class Controler_launcher {
 		if (args.length==1){
 			configFile = args[0];
 		}else{
-			configFile = "../playgrounds/mmoyo/test/input/playground/mmoyo/EquilCalibration/equil_config.xml";
-			//configFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/calibration/100plans_bestValues_config.xml";
-			//configFile = "../playgrounds/mmoyo/test/input/playground/mmoyo/EquilCalibration/equil_config.xml";
+			configFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/calibration/100plans_bestValues_config.xml";
 		}
 
 		if (!new File(configFile).exists()) {
