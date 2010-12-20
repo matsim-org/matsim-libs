@@ -32,6 +32,7 @@ import playground.wrashid.PSF2.ParametersPSF2;
 import playground.wrashid.PSF2.vehicle.energyStateMaintainance.EnergyStateMaintainer;
 import playground.wrashid.lib.DebugLib;
 import playground.wrashid.lib.GeneralLib;
+import playground.wrashid.lib.MathLib;
 
 public class PlugInHybridElectricVehicle extends Vehicle {
 
@@ -81,7 +82,7 @@ public class PlugInHybridElectricVehicle extends Vehicle {
 	private void chargeVehicle(double energyConsumptionInJoule){
 		setCurrentBatteryChargeInJoule(getCurrentBatteryChargeInJoule() + energyConsumptionInJoule);
 		
-		if (getCurrentBatteryChargeInJoule()>getBatterySizeInJoule()){
+		if (getCurrentBatteryChargeInJoule()>getBatterySizeInJoule() && !MathLib.equals(getCurrentBatteryChargeInJoule(), getBatterySizeInJoule(), 0.1)){
 			DebugLib.stopSystemAndReportInconsistency();
 		}
 	}
