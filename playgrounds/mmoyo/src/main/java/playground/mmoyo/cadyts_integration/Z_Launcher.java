@@ -23,14 +23,12 @@
  */
 package playground.mmoyo.cadyts_integration;
 
-import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.listener.ControlerListener;
 
 public class Z_Launcher {
-	private static final Logger log = Logger.getLogger("noname");
 
 	public static void main(final String[] args) {
 		String configFile = null ;
