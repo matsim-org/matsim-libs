@@ -89,6 +89,9 @@ AfterMobsimListener  {
 		
 
 	public NewPtBsePlanStrategy( Controler controler ) {
+		// IMPORTANT: Do not change this constructor.  It needs to be like this in order to be callable as a "Module"
+		// from the config file.  kai/manuel, dec'10
+		
 		// under normal circumstances, this is called relatively late in the initialization sequence, since otherwise the
 		// strategyManager to which this needs to be added is not yet there. Thus, everything that was in notifyStartup can go
 		// here. kai, oct'10
