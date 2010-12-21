@@ -21,28 +21,47 @@
 package playground.mmoyo.cadyts_integration.ptBseAsPlanStrategy;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.ControlerIO;
+import org.matsim.core.controler.events.AfterMobsimEvent;
+import org.matsim.core.controler.events.BeforeMobsimEvent;
+import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.listener.AfterMobsimListener;
+import org.matsim.core.controler.listener.BeforeMobsimListener;
+import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.events.AdditionalTeleportationDepartureEvent;
 import org.matsim.core.events.handler.AdditionalTeleportationDepartureEventHandler;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.selectors.PlanSelector;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.MatsimCountsReader;
 import org.matsim.counts.Volume;
+import org.matsim.pt.config.PtCountsConfigGroup;
+import org.matsim.pt.counts.PtCountSimComparisonKMLWriter;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
+import playground.mmoyo.cadyts_integration.ptBseAsPlanStrategy.analysis.PtBseCountsComparisonAlgorithm;
 import playground.mmoyo.cadyts_integration.ptBseAsPlanStrategy.analysis.PtBseOccupancyAnalyzer;
 import cadyts.interfaces.matsim.MATSimUtilityModificationCalibrator;
 import cadyts.measurements.SingleLinkMeasurement;
@@ -50,7 +69,10 @@ import cadyts.measurements.SingleLinkMeasurement.TYPE;
 import cadyts.supply.SimResults;
 import cadyts.utilities.misc.DynamicData;
 
-public class NewPtBsePlanStrategy implements PlanStrategy, AdditionalTeleportationDepartureEventHandler {
+public class NewPtBsePlanStrategy implements PlanStrategy, AdditionalTeleportationDepartureEventHandler,  
+IterationEndsListener, 
+BeforeMobsimListener, 
+AfterMobsimListener  {
 	// yyyyyy something beyond just "reset" is needed in terms of events handling, otherwise it does not work.
 
 	private PlanStrategy delegate = null ;
@@ -59,9 +81,14 @@ public class NewPtBsePlanStrategy implements PlanStrategy, AdditionalTeleportati
 	private final static String MODULE_NAME = "ptCounts";
 	private final static String BSE_MOD_NAME = "bse";
 	private MATSimUtilityModificationCalibrator<TransitStopFacility> calibrator = null;
-	private static double countsScaleFactor = 1 ;
-	
-	public NewPtBsePlanStrategy( Controler controler , PtBseOccupancyAnalyzer ptBseOccupAnalyzer ) {
+	private static double countsScaleFactor = 1 ;  // not so great
+	private final Counts occupCounts = new Counts();
+	private final Counts boardCounts = new Counts();
+	private final Counts alightCounts = new Counts();
+	private PtBseOccupancyAnalyzer ptBseOccupAnalyzer;
+		
+
+	public NewPtBsePlanStrategy( Controler controler ) {
 		// under normal circumstances, this is called relatively late in the initialization sequence, since otherwise the
 		// strategyManager to which this needs to be added is not yet there. Thus, everything that was in notifyStartup can go
 		// here. kai, oct'10
@@ -71,7 +98,12 @@ public class NewPtBsePlanStrategy implements PlanStrategy, AdditionalTeleportati
 		
 		// add "this" to the events channel so that reset is called between iterations
 		controler.getEvents().addHandler( this ) ;
+		controler.addControlerListener(this) ;
 
+		// set up the bus occupancy analyzer    <- no more. a PtBseOccupancyAnalyzer object comes above as parameter
+		PtBseOccupancyAnalyzer ptBseOccupAnalyzer = new PtBseOccupancyAnalyzer();
+		controler.getEvents().addHandler(ptBseOccupAnalyzer);
+		
 		// this collects events and generates cadyts plans from it
 		PtPlanToPlanStepBasedOnEvents ptStep = new PtPlanToPlanStepBasedOnEvents( controler.getScenario() , ptBseOccupAnalyzer ) ;
 		controler.getEvents().addHandler( ptStep ) ;
@@ -84,10 +116,6 @@ public class NewPtBsePlanStrategy implements PlanStrategy, AdditionalTeleportati
 //LINK			this.linkId_stopId_Map.put(trStopFac.getLinkId(), trStopFac.getId());
 //LINK	}
 
-		// set up the bus occupancy analyzer    <- no more. a PtBseOccupancyAnalyzer object comes above as parameter
-		//PtBseOccupancyAnalyzer occupancyAnalyzer = new PtBseOccupancyAnalyzer();
-		//controler.getEvents().addHandler(occupancyAnalyzer);
-		
 		// prepare resultsContainer. 
 		this.simResults = new SimResultsContainerImpl( ptBseOccupAnalyzer );
 		
@@ -98,6 +126,15 @@ public class NewPtBsePlanStrategy implements PlanStrategy, AdditionalTeleportati
 		this.delegate = new PlanStrategyImpl( new NewPtBsePlanChanger( ptStep, this.calibrator ) ) ;
 		
 		// NOTE: The coupling between calibrator and simResults is done in "reset".
+		
+		//read occup counts from file
+		String occupancyCountsFilename = controler.getConfig().findParam("ptCounts", "inputOccupancyCountsFile");
+		if (occupancyCountsFilename != null) {
+			new MatsimCountsReader(this.occupCounts).readFile(occupancyCountsFilename);
+		}
+		countsScaleFactor = Double.parseDouble(controler.getConfig().getParam("ptCounts", "countsScaleFactor"));
+
+
 	}
 	
 	@Override
@@ -347,6 +384,107 @@ public class NewPtBsePlanStrategy implements PlanStrategy, AdditionalTeleportati
 			return stringBuffer2.toString() ;
 		}
 
+	}
+	//Analysis methods
+	///////////////////////////////////////////////////////
+	@Override
+	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
+		int iter = event.getIteration();
+		if ( isActiveInThisIteration( iter, event.getControler() ) ) {
+			ptBseOccupAnalyzer.reset(iter);
+		}
+	}
+	
+	@Override
+	public void notifyAfterMobsim(AfterMobsimEvent event) {
+		int it = event.getIteration();
+		if ( isActiveInThisIteration( it, event.getControler() ) ) {
+			event.getControler().getEvents().removeHandler(ptBseOccupAnalyzer);
+			
+			//Get all M44 stations and invoke the method write to get all information of them
+			TransitLine lineM44 = event.getControler().getScenario().getTransitSchedule().getTransitLines().get(new IdImpl("B-M44"));
+			List<Id> m44StopIds = new ArrayList<Id>();
+			for (TransitRoute route :lineM44.getRoutes().values()){
+				for (TransitRouteStop stop: route.getStops()){
+					m44StopIds.add( stop.getStopFacility().getId());
+				}	
+				
+			}
+			String outFile = event.getControler().getControlerIO().getIterationFilename(it, "ptBseOccupancyAnalysis.txt");
+			ptBseOccupAnalyzer.write(outFile, this.occupCounts , m44StopIds );
+		}
+	}
+	
+	//Determines the pt counts interval (currently each 10 iterations)
+	private boolean isActiveInThisIteration( int iter , Controler controler ) {
+		return (iter % controler.getConfig().ptCounts().getPtCountsInterval() == 0)  &&  (iter >= controler.getFirstIteration());
+	}
+	
+	@Override
+	public void notifyIterationEnds(final IterationEndsEvent event) {
+		Config config = event.getControler().getConfig();
+		PtCountsConfigGroup ptCounts = config.ptCounts() ;
+		if (ptCounts.getAlightCountsFileName() != null) { // yyyy this check should reasonably also be done in isActiveInThisIteration.  kai, oct'10
+			Controler controler = event.getControler();
+			int iter = event.getIteration();
+			if ( isActiveInThisIteration( iter, controler ) ) {
+
+				if ( config.ptCounts().getPtCountsInterval() != 10 )
+					Logger.getLogger(this.getClass()).warn("yyyy This may not work when the pt counts interval is different from 10 because I think I changed things at two "
+							+ "places but I can't find the other one any more :-(.  (May just be inefficient.)  kai, oct'10" ) ;
+
+				controler.stopwatch.beginOperation("compare with pt counts");
+
+				Network network = controler.getNetwork();
+				PtBseCountsComparisonAlgorithm ccaBoard = new PtBseCountsComparisonAlgorithm(this.ptBseOccupAnalyzer, this.boardCounts, network, countsScaleFactor);
+				PtBseCountsComparisonAlgorithm ccaAlight = new PtBseCountsComparisonAlgorithm(this.ptBseOccupAnalyzer, this.alightCounts, network, countsScaleFactor);
+				PtBseCountsComparisonAlgorithm ccaOccupancy = new PtBseCountsComparisonAlgorithm(this.ptBseOccupAnalyzer, this.occupCounts, network, countsScaleFactor);
+
+				String distanceFilterStr = config.findParam("ptCounts", "distanceFilter");
+				String distanceFilterCenterNodeId = config.findParam("ptCounts", "distanceFilterCenterNode");
+				if ((distanceFilterStr != null)
+						&& (distanceFilterCenterNodeId != null)) {
+					Double distanceFilter = Double.valueOf(distanceFilterStr);
+					ccaBoard.setDistanceFilter(distanceFilter, distanceFilterCenterNodeId);
+					ccaAlight.setDistanceFilter(distanceFilter, distanceFilterCenterNodeId);
+					ccaOccupancy.setDistanceFilter(distanceFilter, distanceFilterCenterNodeId);
+				}
+
+				ccaBoard.setCountsScaleFactor(countsScaleFactor);
+				ccaAlight.setCountsScaleFactor(countsScaleFactor);
+				ccaOccupancy.setCountsScaleFactor(countsScaleFactor);
+				
+				//filter stations here??
+				
+				ccaBoard.run();
+				ccaAlight.run();
+				ccaOccupancy.run();
+
+				String outputFormat = config.findParam("ptCounts", "outputformat");
+				if (outputFormat.contains("kml") || outputFormat.contains("all")) {
+					ControlerIO ctlIO=controler.getControlerIO();
+
+					String filename = ctlIO.getIterationFilename(iter, "ptBseCountscompare.kmz");
+					PtCountSimComparisonKMLWriter kmlWriter = new PtCountSimComparisonKMLWriter(ccaBoard.getComparison(), ccaAlight.getComparison(), ccaOccupancy.getComparison(),
+							TransformationFactory.getCoordinateTransformation(config.global().getCoordinateSystem(),TransformationFactory.WGS84),
+							this.boardCounts, this.alightCounts, this.occupCounts);
+
+					kmlWriter.setIterationNumber(iter);
+					kmlWriter.writeFile(filename);
+					if (ccaBoard != null) {
+						ccaBoard.write(ctlIO.getIterationFilename(iter, "simBseCountCompareBoarding.txt"));
+					}
+					if (ccaAlight != null) {
+						ccaAlight.write(ctlIO.getIterationFilename(iter, "simBseCountCompareAlighting.txt"));
+					}
+					if (ccaOccupancy != null) {
+						ccaOccupancy.write(ctlIO.getIterationFilename(iter,	"simBseCountCompareOccupancy.txt"));
+					}
+				}
+
+				controler.stopwatch.endOperation("compare with pt counts");
+			}
+		}
 	}
 
 
