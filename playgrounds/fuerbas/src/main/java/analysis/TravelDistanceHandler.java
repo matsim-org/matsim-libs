@@ -48,6 +48,7 @@ public class TravelDistanceHandler implements LinkLeaveEventHandler, LinkEnterEv
 	String plansfile = "893.2200.plans.xml.gz";
 	
 	
+	
 	public void createHandlerScenario() {
 		Scenario scen = new ScenarioFactoryImpl().createScenario();
 		Config config = scen.getConfig();
