@@ -54,6 +54,7 @@ import org.matsim.core.mobsim.framework.listeners.SimulationListenerManager;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.qsim.TransitQSimEngine;
+import org.matsim.pt.qsim.UmlaufDriver;
 import org.matsim.ptproject.qsim.agents.AgentFactory;
 import org.matsim.ptproject.qsim.agents.DefaultAgentFactory;
 import org.matsim.ptproject.qsim.agents.PersonDriverAgentImpl;
@@ -66,11 +67,11 @@ import org.matsim.ptproject.qsim.interfaces.AcceptsVisMobsimFeatures;
 import org.matsim.ptproject.qsim.interfaces.AgentCounterI;
 import org.matsim.ptproject.qsim.interfaces.DepartureHandler;
 import org.matsim.ptproject.qsim.interfaces.Mobsim;
+import org.matsim.ptproject.qsim.interfaces.MobsimTimerI;
 import org.matsim.ptproject.qsim.interfaces.NetsimEngine;
 import org.matsim.ptproject.qsim.interfaces.NetsimEngineFactory;
 import org.matsim.ptproject.qsim.interfaces.NetsimLink;
 import org.matsim.ptproject.qsim.interfaces.NetsimNetwork;
-import org.matsim.ptproject.qsim.interfaces.MobsimTimerI;
 import org.matsim.ptproject.qsim.multimodalsimengine.MultiModalDepartureHandler;
 import org.matsim.ptproject.qsim.multimodalsimengine.MultiModalSimEngine;
 import org.matsim.ptproject.qsim.multimodalsimengine.MultiModalSimEngineFactory;
@@ -327,9 +328,14 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 		this.teleportationList.clear();
 
 		for (PlanAgent agent : this.activityEndsList) {
-			if (agent.getDestinationLinkId() != null) {
-				events.processEvent(events.getFactory().
-						createAgentStuckEvent(now, agent.getId(), agent.getDestinationLinkId(), null));
+			if ( agent instanceof UmlaufDriver ) {
+				Logger.getLogger(this.getClass()).error( "this does not terminate correctly for UmlaufDrivers; needs to be " +
+						"fixed but for the time being we skip the next couple of lines.  kai, dec'10") ;
+			} else {
+				if (agent.getDestinationLinkId() != null) {
+					events.processEvent(events.getFactory().
+							createAgentStuckEvent(now, agent.getId(), agent.getDestinationLinkId(), null));
+				}
 			}
 		}
 		this.activityEndsList.clear();
