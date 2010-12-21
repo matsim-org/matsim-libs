@@ -64,7 +64,8 @@ public class IntegrationTest extends MatsimTestCase {
 	}
 	
 	public void testEventFileBased(){
-		PSSControler pssControler=new PSSControlerDumbCharging("test/input/playground/wrashid/PSF2/chargingSchemes/dumbCharging/config-event-file-based.xml", null);
+		 PSSControler pssControler=new PSSControlerDumbCharging("test/input/playground/wrashid/PSF2/chargingSchemes/dumbCharging/config-event-file-based.xml", null);
+		// PSSControler pssControler=new PSSControlerDumbCharging("H:\\data\\experiments\\ARTEMIS\\input\\pss\\zh\\config-event-file-based.xml", null);
 		pssControler.runMATSimIterations();
 		
 		LinkedList<ChargeLog> chargingTimesForAgent1 = ParametersPSF2.chargingTimes.get(new IdImpl(1)).getChargingTimes();
