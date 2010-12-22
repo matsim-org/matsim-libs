@@ -32,17 +32,21 @@ import playground.gregor.sim2d_v2.controller.Sim2DConfig;
 import playground.gregor.sim2d_v2.events.debug.ArrowEvent;
 import playground.gregor.sim2d_v2.scenario.Scenario2DImpl;
 import playground.gregor.sim2d_v2.simulation.Agent2D;
+import playground.gregor.sim2d_v2.simulation.Sim2D;
 
 /**
+ * Agent interaction forces according to: D. Helbing, I. Farkas, T. Vicsek,
+ * Nature 407, 487-490 (2000)
+ * 
  * @author laemmel
  * 
  */
-public class AgentInteractionModule implements DynamicForceModule {
+public class CircularAgentInteractionModule implements DynamicForceModule {
 
 	protected final Floor floor;
 	protected final Scenario2DImpl scenario;
 
-	private final double quadUpdateInterval = 2;
+	private final double quadUpdateInterval = 0.1;
 	private double lastQuadUpdate = Double.NEGATIVE_INFINITY;
 	protected Quadtree coordsQuad = new Quadtree();
 
@@ -52,7 +56,7 @@ public class AgentInteractionModule implements DynamicForceModule {
 	 * @param floor
 	 * @param sceanrio
 	 */
-	public AgentInteractionModule(Floor floor, Scenario2DImpl scenario) {
+	public CircularAgentInteractionModule(Floor floor, Scenario2DImpl scenario) {
 		this.floor = floor;
 		this.scenario = scenario;
 	}
@@ -84,28 +88,18 @@ public class AgentInteractionModule implements DynamicForceModule {
 				continue;
 			}
 
-			double x = agent.getPosition().x - other.x;
-			double y = agent.getPosition().y - other.y;
-			double sqrLength = Math.pow(x, 2) + Math.pow(y, 2);
-			if (sqrLength > Sim2DConfig.PSqrSensingRange) {
+			double dist = other.distance(agent.getPosition());
+			if (dist > Sim2DConfig.Bp) {
 				continue;
 			}
-			if (sqrLength < 0.1) {
-				sqrLength = 0.1;
-			}
+			double dx = (agent.getPosition().x - other.x) / dist;
+			double dy = (agent.getPosition().y - other.y) / dist;
 
-			double length = Math.sqrt(sqrLength);
+			double xc = Sim2DConfig.App * Math.exp((Agent2D.AGENT_DIAMETER - dist) / Sim2DConfig.Bp) * dx;
+			double yc = Sim2DConfig.App * Math.exp((Agent2D.AGENT_DIAMETER - dist) / Sim2DConfig.Bp) * dy;
 
-			// double contrariness = getContrariness(force,length,x,y);
-
-			double exp = Math.exp(Sim2DConfig.Bp / length) / length; // ???
-																		// check
-																		// this!!
-			x *= exp;
-			y *= exp;
-
-			fx += x;
-			fy += y;
+			fx += xc;
+			fy += yc;
 
 			if (Sim2DConfig.DEBUG) {
 				ArrowEvent arrow = new ArrowEvent(agent.getPerson().getId(), agent.getPosition(), other, 0.2f, 0.2f, 0.2f, otherId++);
@@ -114,8 +108,8 @@ public class AgentInteractionModule implements DynamicForceModule {
 
 		}
 
-		fx = Sim2DConfig.App * fx / agent.getWeight() * Sim2DConfig.TIME_STEP_SIZE;
-		fy = Sim2DConfig.App * fy / agent.getWeight() * Sim2DConfig.TIME_STEP_SIZE;
+		fx /= Agent2D.AGENT_WEIGHT * Sim2DConfig.TIME_STEP_SIZE;
+		fy /= Agent2D.AGENT_WEIGHT * Sim2DConfig.TIME_STEP_SIZE;
 
 		if (Sim2DConfig.DEBUG) {
 			ArrowEvent arrow = new ArrowEvent(agent.getPerson().getId(), agent.getPosition(), new Coordinate(agent.getPosition().x + fx / Sim2DConfig.TIME_STEP_SIZE, agent.getPosition().y + fy / Sim2DConfig.TIME_STEP_SIZE, 0), 0.f, 0.f, 0.f, 3);

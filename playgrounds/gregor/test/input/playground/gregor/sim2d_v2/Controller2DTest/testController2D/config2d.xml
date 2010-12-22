@@ -55,7 +55,7 @@
 ====================================================================== -->
 
 <module name="sim2d">
-	<param name ="staticForceFieldFile" value="&INPUTBASE;/staticForceField.xml.gz" />
+	<param name ="staticEnvFieldFile" value="&INPUTBASE;/staticEnvField.xml.gz" />
 	<param name="floorShapeFile" value="&INPUTBASE;/90grad.shp"/>
 	<param name="lsShapeFile" value="&INPUTBASE;/90gradNetwork.shp" />
 </module>

@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package playground.gregor.sim2d_v2.controller;
 
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Module;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
@@ -55,7 +57,7 @@ public class Controller2D extends Controler {
 			// this.loader).setPhantomPopulationEventsFile("/home/laemmel/devel/dfg/events.xml");
 			this.scenarioLoaded = true;
 
-			// this.vis = new PedVisPeekABot(1);
+			// this.vis = new PedVisPeekABot(0.2);
 			// Link l = this.network.getLinks().get(new IdImpl(0));
 			// this.vis.setOffsets(l.getCoord().getX(), l.getCoord().getY());
 			// this.vis.setFloorShapeFile(this.sim2dConfig.getFloorShapeFile());

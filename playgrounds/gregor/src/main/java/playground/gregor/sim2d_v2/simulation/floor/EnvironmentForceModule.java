@@ -56,17 +56,20 @@ public class EnvironmentForceModule implements ForceModule {
 	@Override
 	public void run(Agent2D agent) {
 
-		Force f = this.sff.getForceWithin(agent.getPosition(), Sim2DConfig.STATIC_FORCE_RESOLUTION + 0.01);
-		double fx = 0.;
-		double fy = 0.;
-
-		if (f != null) {
-			fx = f.getXComponent();
-			fy = f.getYComponent();
+		ForceLocation fl = this.sff.getForceLocationWithin(agent.getPosition(), Sim2DConfig.STATIC_FORCE_RESOLUTION + 0.01);
+		if (fl == null) {
+			return;
 		}
 
-		fx = (Sim2DConfig.Apw * fx / agent.getWeight()) * Sim2DConfig.TIME_STEP_SIZE;
-		fy = (Sim2DConfig.Apw * fy / agent.getWeight()) * Sim2DConfig.TIME_STEP_SIZE;
+		Force f = fl.getForce();
+
+		if (f == null) {
+			initForce(fl);
+			f = fl.getForce();
+		}
+
+		double fx = f.getXComponent();
+		double fy = f.getYComponent();
 
 		if (Sim2DConfig.DEBUG) {
 			ArrowEvent arrow = new ArrowEvent(agent.getPerson().getId(), agent.getPosition(), new Coordinate(agent.getPosition().x + fx / Sim2DConfig.TIME_STEP_SIZE, agent.getPosition().y + fy / Sim2DConfig.TIME_STEP_SIZE, 0), 1.f, 0.f, 1.f, 2);
@@ -74,6 +77,34 @@ public class EnvironmentForceModule implements ForceModule {
 		}
 		agent.getForce().incrementX(fx);
 		agent.getForce().incrementY(fy);
+
+	}
+
+	/**
+	 * @param fl
+	 */
+	private synchronized void initForce(ForceLocation fl) {
+		if (fl.getForce() == null) {
+			EnvironmentDistances ed = fl.getEnvironmentDistances();
+			double fx = 0;
+			double fy = 0;
+			for (Coordinate obj : ed.getObjects()) {
+				double dist = obj.distance(ed.getLocation());
+				if (dist > Sim2DConfig.Bw) {
+					continue;
+				}
+				double dx = (ed.getLocation().x - obj.x) / dist;
+				double dy = (ed.getLocation().y - obj.y) / dist;
+				fx += Sim2DConfig.Apw * Math.exp((Agent2D.AGENT_DIAMETER - dist) / Sim2DConfig.Bw) * dx;
+				fy += Sim2DConfig.Apw * Math.exp((Agent2D.AGENT_DIAMETER - dist) / Sim2DConfig.Bw) * dy;
+			}
+			fx /= Agent2D.AGENT_WEIGHT * Sim2DConfig.TIME_STEP_SIZE;
+			fy /= Agent2D.AGENT_WEIGHT * Sim2DConfig.TIME_STEP_SIZE;
+			Force f = new Force();
+			f.setXComponent(fx);
+			f.setYComponent(fy);
+			fl.setForce(f);
+		}
 
 	}
 

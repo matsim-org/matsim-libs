@@ -105,8 +105,8 @@ public class PathForceModule implements ForceModule {
 		deltaX *= f / pathDist;
 		deltaY *= f / pathDist;
 
-		deltaX = Sim2DConfig.Apath * deltaX / agent.getWeight() * Sim2DConfig.TIME_STEP_SIZE;
-		deltaY = Sim2DConfig.Apath * deltaY / agent.getWeight() * Sim2DConfig.TIME_STEP_SIZE;
+		deltaX = Sim2DConfig.Apath * deltaX / Agent2D.AGENT_WEIGHT * Sim2DConfig.TIME_STEP_SIZE;
+		deltaY = Sim2DConfig.Apath * deltaY / Agent2D.AGENT_WEIGHT * Sim2DConfig.TIME_STEP_SIZE;
 
 		if (Sim2DConfig.DEBUG) {
 			ArrowEvent arrow = new ArrowEvent(agent.getPerson().getId(), agent.getPosition(), new Coordinate(agent.getPosition().x + deltaX / Sim2DConfig.TIME_STEP_SIZE, agent.getPosition().y + deltaY / Sim2DConfig.TIME_STEP_SIZE, 0), 1.f, 0.f, 0.f, 0);

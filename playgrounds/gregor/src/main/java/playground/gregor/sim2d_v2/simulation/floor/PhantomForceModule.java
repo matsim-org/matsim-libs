@@ -34,7 +34,7 @@ import playground.gregor.sim2d_v2.simulation.PhantomManager;
  * @author laemmel
  * 
  */
-public class PhantomForceModule extends AgentInteractionModule implements DynamicForceModule {
+public class PhantomForceModule extends CircularAgentInteractionModule implements DynamicForceModule {
 
 	private final PhantomManager phantomMgr;
 

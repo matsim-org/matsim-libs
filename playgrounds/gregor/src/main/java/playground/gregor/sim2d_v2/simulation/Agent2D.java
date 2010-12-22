@@ -37,7 +37,9 @@ public class Agent2D extends PersonDriverAgentImpl {
 	private Coordinate currentPosition;
 	private final Force force = new Force();
 	private final double desiredVelocity;
-	private final double agentWeight;
+
+	public static final double AGENT_WEIGHT = 75 * 1000;
+	public static final double AGENT_DIAMETER = 0.25;
 
 	/**
 	 * @param p
@@ -47,9 +49,8 @@ public class Agent2D extends PersonDriverAgentImpl {
 		super(p, sim2d);
 
 		// TODO think about this
-		this.desiredVelocity = 1.34;// + (MatsimRandom.getRandom().nextDouble()
-									// - 0.5) / 2;
-		this.agentWeight = 75 * 1000;
+		this.desiredVelocity = 1.34 + (MatsimRandom.getRandom().nextDouble() - 0.5) / 2;
+
 	}
 
 	/**
@@ -82,11 +83,11 @@ public class Agent2D extends PersonDriverAgentImpl {
 		return this.desiredVelocity;
 	}
 
-	/**
-	 * @return
-	 */
-	public double getWeight() {
-		return this.agentWeight;
-	}
+	// /**
+	// * @return
+	// */
+	// public double getWeight() {
+	// return this.agentWeight;
+	// }
 
 }

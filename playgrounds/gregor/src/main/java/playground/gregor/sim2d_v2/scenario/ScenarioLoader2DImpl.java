@@ -28,6 +28,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.geotools.data.FeatureSource;
 import org.geotools.factory.FactoryRegistryException;
 import org.geotools.feature.AttributeType;
@@ -49,6 +51,7 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.xml.sax.SAXException;
 
 import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
 import playground.gregor.sim2d_v2.controller.Sim2DConfig;
@@ -56,10 +59,8 @@ import playground.gregor.sim2d_v2.network.NetworkFromLsFile;
 import playground.gregor.sim2d_v2.network.NetworkLoader;
 import playground.gregor.sim2d_v2.network.NetworkLoaderImpl;
 import playground.gregor.sim2d_v2.network.NetworkLoaderImplII;
+import playground.gregor.sim2d_v2.simulation.floor.EnvironmentDistancesReader;
 import playground.gregor.sim2d_v2.simulation.floor.StaticForceField;
-import playground.gregor.sim2d_v2.simulation.floor.StaticForceFieldGenerator;
-import playground.gregor.sim2d_v2.simulation.floor.StaticForceFieldReader;
-import playground.gregor.sim2d_v2.simulation.floor.StaticForceFieldWriter;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
@@ -210,17 +211,27 @@ public class ScenarioLoader2DImpl extends ScenarioLoaderImpl {
 		// this.ssff = new
 		// StaticForceFieldGeneratorIII(linkSubLinkMapping).getStaticForceField();
 		// this.scenarioData.setSegmentedStaticForceField(this.ssff);
+		throw new RuntimeException("not implemented!!");
 
 	}
 
 	private void loadStaticForceField() {
-		if (Sim2DConfig.LOAD_STATIC_FORCE_FIELD_FROM_FILE) {
-			this.sff = new StaticForceFieldReader(this.sim2DConfig.getStaticForceFieldFile()).getStaticForceField();
+		if (Sim2DConfig.LOAD_STATIC_ENV_FIELD_FROM_FILE) {
+			EnvironmentDistancesReader r = new EnvironmentDistancesReader();
+			try {
+				r.setValidating(false);
+				r.parse(this.sim2DConfig.getStaticEnvFieldFile());
+			} catch (SAXException e) {
+				e.printStackTrace();
+			} catch (ParserConfigurationException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			this.sff = new StaticForceField(r.getEnvDistQuadTree());
+
 		} else {
-			// this.sff = new
-			// StaticForceFieldGenerator(this.mps.keySet().iterator().next()).loadStaticForceField();
-			this.sff = new StaticForceFieldGenerator(this.mps.keySet().iterator().next()).loadStaticForceField();
-			new StaticForceFieldWriter().write(this.sim2DConfig.getStaticForceFieldFile(), this.sff);
+			throw new RuntimeException("not implemented!!");
 		}
 		this.scenarioData.setStaticForceField(this.sff);
 		// new StaticForceFieldToShape(this.sff).createShp();

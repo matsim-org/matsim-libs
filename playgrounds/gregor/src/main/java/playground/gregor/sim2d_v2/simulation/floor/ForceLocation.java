@@ -27,8 +27,15 @@ import com.vividsolutions.jts.geom.Coordinate;
  */
 public class ForceLocation {
 
-	private final Force f;
+	private Force f = null;
 	private final Coordinate c;
+
+	private EnvironmentDistances ed;
+
+	public ForceLocation(EnvironmentDistances ed) {
+		this.ed = ed;
+		this.c = ed.getLocation();
+	}
 
 	public ForceLocation(Force f, Coordinate c) {
 		this.f = f;
@@ -41,6 +48,15 @@ public class ForceLocation {
 
 	public Force getForce() {
 		return this.f;
+	}
+
+	public EnvironmentDistances getEnvironmentDistances() {
+		return this.ed;
+	}
+
+	public void setForce(Force f) {
+		this.f = f;
+		this.ed = null;
 	}
 
 }

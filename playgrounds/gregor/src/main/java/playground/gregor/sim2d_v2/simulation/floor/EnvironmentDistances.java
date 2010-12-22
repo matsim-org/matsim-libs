@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * StaticForceField.java
+ * EnvironmentDistances.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -19,43 +19,34 @@
  * *********************************************************************** */
 package playground.gregor.sim2d_v2.simulation.floor;
 
-import java.util.Collection;
-
-import org.matsim.core.utils.collections.QuadTree;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
-public class StaticForceField {
+/**
+ * @author laemmel
+ * 
+ */
+public class EnvironmentDistances {
 
-	private final QuadTree<ForceLocation> forceQuad;
+	private final Coordinate location;
+	private final List<Coordinate> objects = new ArrayList<Coordinate>();
 
-	public StaticForceField(QuadTree<ForceLocation> ret) {
-		this.forceQuad = ret;
+	public EnvironmentDistances(Coordinate location) {
+		this.location = location;
 	}
 
-	// /**
-	// * @param distancesQuadTree
-	// */
-	// public StaticForceField(QuadTree<DistanceVector> distancesQuadTree) {
-	// // TODO Auto-generated constructor stub
-	// }
-
-	public ForceLocation getForceLocationWithin(Coordinate location, double range) {
-		if (this.forceQuad.get(location.x, location.y, range).size() > 0) {
-			return this.forceQuad.get(location.x, location.y);
-		}
-		return null;
+	public void addEnvironmentDistanceLocation(Coordinate obj) {
+		this.objects.add(obj);
 	}
 
-	public Collection<ForceLocation> getForcesWithin(Coordinate location, double range) {
-		return this.forceQuad.get(location.x, location.y, range);
+	public Coordinate getLocation() {
+		return this.location;
 	}
 
-	public Collection<ForceLocation> getForces() {
-		return this.forceQuad.values();
+	public List<Coordinate> getObjects() {
+		return this.objects;
 	}
 
-	// public void addForce(ForceLocation force) {
-	// this.forceQuad.put(force.getLocation().x, force.getYCoord(), force);
-	// }
 }

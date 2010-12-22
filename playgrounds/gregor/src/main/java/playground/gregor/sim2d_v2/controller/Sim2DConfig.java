@@ -23,26 +23,27 @@ package playground.gregor.sim2d_v2.controller;
 @Deprecated
 public class Sim2DConfig {
 
-	public static double STATIC_FORCE_RESOLUTION = 0.05;
-	public static final double TIME_STEP_SIZE = 1. / 25;
+	public static double STATIC_FORCE_RESOLUTION = .05;
+	public static final double TIME_STEP_SIZE = 0.2; // 1. / 25;
 
 	public static final double Bpath = 1.5;
 	public static final double PSqrSensingRange = 12.25;
-	public static final double PNeighborhoddRange = 1.5;
+	public static final double PNeighborhoddRange = 3;
 
-	public static final double Bp = 1;
+	public static final double Bp = 1.5;
+	public static final double MaxWallSensingRange = 2;// wall
 	public static final double Bw = 1.7193;// wall
-	public static final double App = 600.;
+	public static final double App = 300.;
 	public static final double Apath = 6000.;
 	public static final double Apw = 300.;
-	public static final double tau = 0.2;// / TIME_STEP_SIZE;
+	public static final double tau = .5;// / TIME_STEP_SIZE;
 	public static final double B_PATH = 3;
 
-	public static final boolean LOAD_STATIC_FORCE_FIELD_FROM_FILE = true;
+	public static final boolean LOAD_STATIC_ENV_FIELD_FROM_FILE = true;
 
 	public static final boolean LOAD_NETWORK_FROM_XML_FILE = true;
 	public static final boolean NETWORK_LOADERII = true;
-	public static final boolean NETWORK_LOADER_LS = false;
+	public static final boolean NETWORK_LOADER_LS = true;
 
 	public static final double NEIGHBORHOOD_UPDATE = 1;
 	public static final boolean DEBUG = false;

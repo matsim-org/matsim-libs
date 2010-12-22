@@ -86,7 +86,7 @@ public class Floor {
 	 * 
 	 */
 	public void init() {
-		this.dynamicForceModules.add(new AgentInteractionModule(this, this.scenario));
+		this.dynamicForceModules.add(new CircularAgentInteractionModule(this, this.scenario));
 		if (this.phantomMgr != null) {
 			this.dynamicForceModules.add(new PhantomForceModule(this, this.scenario, this.phantomMgr));
 		}
