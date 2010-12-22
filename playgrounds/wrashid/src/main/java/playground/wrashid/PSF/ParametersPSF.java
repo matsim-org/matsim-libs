@@ -82,7 +82,7 @@ public class ParametersPSF {
 	
 	// when this is set, unmapped links are added automatically when loading the mapping
 	// the number of hubs in the config needs to add one hub number manually
-	// the price file needs to have one additional column (at the beginning).
+	// the price file needs to have one additional column (at the end)
 	private static final String main_initUnmappedLinks="main.initUnmappedLinks";
 	private static Boolean mainInitUnmappedLinks=null;
 	
