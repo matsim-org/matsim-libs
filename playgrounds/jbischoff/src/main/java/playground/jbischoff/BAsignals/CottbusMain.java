@@ -19,6 +19,10 @@
  * *********************************************************************** */
 package playground.jbischoff.BAsignals;
 
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.Map.Entry;
+
 import org.apache.log4j.Logger;
 import org.matsim.core.controler.Controler;
 
@@ -32,23 +36,59 @@ import playground.jbischoff.BAsignals.controler.JBSignalControllerListenerFactor
 public class CottbusMain {
 	
 	
-	private static final Logger log = Logger.getLogger(CottbusMain.class);
+	public static double CURRENT_TT;
+	public static double CURRENT_TTA;
 
-//	private String config = JbBaPaths.BASIMH+"scenario-slv/cottbusConfig.xml";
+
+	private static final Logger log = Logger.getLogger(CottbusMain.class);
+	private String config = "/Users/JB/Desktop/BA-Arbeit/sim/scen/1211/config_slv_l.xml";
 //	private String config = "/media/data/work/repos/shared-svn/studies/dgrether/cottbus/Cottbus-BA/scenario-lsa/cottbusConfig.xml";
-	private String config = "/media/data/work/repos/shared-svn/studies/dgrether/cottbus/Cottbus-BA/scenario-slv/dg_cottbus_config.xml";
+//	private String config = "/media/data/work/repos/shared-svn/studies/dgrether/cottbus/Cottbus-BA/scenario-slv/dg_cottbus_config.xml";
 
 	public void runCottbus(String c){
-		log.info("Running CottbusMain with config: " + c);
+		log.info("Running CottbusMain with confikk: " + c);
 		Controler controler = new Controler(c);
+		controler.getConfig().controler().setOutputDirectory("/Users/JB/Desktop/BA-Arbeit/sim/scen/1211/output-slv_ot100ii/");
 		JBSignalControllerListenerFactory fact = new JBSignalControllerListenerFactory();
 		controler.setSignalsControllerListenerFactory(fact);
 		controler.setOverwriteFiles(true);
 		controler.run();
 	}
 	
+	
+	public void runCottbusBatch(String c){
+		log.info("Running CottbusMainBatch with config: " + c);
+		String configlsa = "/Users/JB/Desktop/BA-Arbeit/sim/scen/1211/config_lsa.xml";
+		String configslv = "/Users/JB/Desktop/BA-Arbeit/sim/scen/1211/config_slv.xml";
+		int scale = 0;
+		do {
+			Controler controler = new Controler(configlsa);
+			controler.getConfig().controler().setOutputDirectory("/Users/JB/Desktop/BA-Arbeit/sim/scen/1211/output-lsa/"+scale);
+			controler.getConfig().plans().setInputFile("/Users/JB/Desktop/BA-Arbeit/sim/scen/1211/planswithfb/output_plans_"+scale+".xml.gz");
+			JBSignalControllerListenerFactory fact = new JBSignalControllerListenerFactory();
+			controler.setSignalsControllerListenerFactory(fact);
+			controler.setOverwriteFiles(true);
+			controler.run();
+			
+			controler = new Controler(configslv);
+			controler.getConfig().controler().setOutputDirectory("/Users/JB/Desktop/BA-Arbeit/sim/scen/1211/output-slv/x"+scale+"/");
+			controler.getConfig().plans().setInputFile("/Users/JB/Desktop/BA-Arbeit/sim/scen/1211/planswithfb/output_plans_"+scale+".xml.gz");
+			fact = new JBSignalControllerListenerFactory();
+			controler.setSignalsControllerListenerFactory(fact);
+			controler.setOverwriteFiles(true);
+			controler.run();
+			
+			
+			scale = scale + 5;
+
+		}
+		while (scale<=100);
+
+
+	}
+	
 	private void runCottbus(){
-		this.runCottbus(config);
+		this.runCottbusBatch(config);
 	}
 
 	/**

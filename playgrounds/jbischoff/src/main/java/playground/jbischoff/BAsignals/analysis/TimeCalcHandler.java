@@ -51,7 +51,11 @@ public TimeCalcHandler(AdaptiveControllHead ach){
 	this.arrivaltimesfromfbspn = new TreeMap<Id,Double>();
 	this.arrivaltimestofbcb = new TreeMap<Id,Double>();
 	this.arrivaltimestofbspn = new TreeMap<Id,Double>();
-	
+	this.arrivaltimesfromfbcb.put(new IdImpl(0),0.0);
+	this.arrivaltimestofbspn.put(new IdImpl(0),0.0);
+	this.arrivaltimestofbcb.put(new IdImpl(0),0.0);
+	this.arrivaltimesfromfbspn.put(new IdImpl(0),0.0);
+
 
 	
 }
@@ -165,8 +169,23 @@ public TimeCalcHandler(AdaptiveControllHead ach){
 		this.exportMaptoCVS(this.arrivaltimestofbcb,  filename);
 		filename = outdir+iteration+".arrivalTimesToSPN_CB.csv";
 		this.exportMaptoCVS(this.arrivaltimestofbspn,  filename);
+		filename = outdir+iteration+".latestArrivals.csv";
+
+		this.exportLatestArrivals(filename);
 	}
 	
+	private void exportLatestArrivals(String filename) {
+		try {
+			FileWriter writer = new FileWriter(filename);
+			writer.append(Collections.max(this.arrivaltimestofbcb.values())+";"+Collections.max(this.arrivaltimestofbspn.values())+";"+Collections.max(this.arrivaltimesfromfbcb.values())+";"+Collections.max(this.arrivaltimesfromfbspn.values())+";\n");
+			writer.flush();
+			writer.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
 	private void exportMaptoCVS(Map<Id, Double> atmap,  String filename) {
 		try {
 			FileWriter writer = new FileWriter(filename);

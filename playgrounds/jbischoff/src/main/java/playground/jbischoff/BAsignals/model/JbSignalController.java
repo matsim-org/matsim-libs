@@ -133,6 +133,7 @@ public class JbSignalController implements SignalController {
 						&& this.system.getSignalGroups().get(gId).getState() == SignalGroupState.GREEN
 						&& this.originalGreenTimes.get(gId) > (this.adaptiveDroppings.get(gId) - this.adaptiveOnsets
 								.get(gId))) {
+					//Zwangsdehnung
 					this.postPoneOffSet(gId, 1);
 					artlong = false;
 				}
@@ -140,13 +141,13 @@ public class JbSignalController implements SignalController {
 				// log.error(currentSecondinPlan+" on "+this.adaptiveOnsets.get(gId)+"for gid"+gId);
 				if (this.adaptiveOnsets.get(gId) == currentSecondinPlan) {
 					this.system.scheduleOnset(timeSeconds, gId);
-//					if (this.system.getId().equals(new IdImpl("18")))
-//						log.info("scheduling onset at " + currentSecondinPlan + ", sg " + gId);
+					if (this.system.getId().equals(new IdImpl("1")))
+						log.info("scheduling onset at "+timeSeconds+" at " + currentSecondinPlan + ", sg " + gId);
 				}
 				if (this.adaptiveDroppings.get(gId) == currentSecondinPlan) {
 					this.system.scheduleDropping(timeSeconds, gId);
-//					if (this.system.getId().equals(new IdImpl("18")))
-//						log.info("scheduling drop at " + currentSecondinPlan + ", sg " + gId);
+					if (this.system.getId().equals(new IdImpl("1")))
+						log.info("scheduling drop at "+timeSeconds+" at "+ currentSecondinPlan + ", sg " + gId);
 				}
 			}
 
@@ -164,8 +165,11 @@ public class JbSignalController implements SignalController {
 			int oldmd = this.maxDrop.get(sgId);
 			oldmd = oldmd + 2;
 			if (oldmd < this.activePlan.getCycleTime() - 2)
+				
 				this.maxDrop.put(sgId, oldmd);
-
+			if (this.system.getId().equals(new IdImpl("1")))
+				log.info("maxdrop of "+sgId+ "is now " +oldmd);
+				
 		}
 		int ps;
 		if (this.adaptiveDroppings.get(sgId) + JBBaParams.EXPANSION < this.maxDrop.get(sgId)) {
@@ -204,8 +208,8 @@ public class JbSignalController implements SignalController {
 					int currentonset = this.adaptiveOnsets.get(otherSg.getId());
 					int currentdrop = this.adaptiveDroppings.get(otherSg.getId());
 					int newdrop = currentdrop + step;
-					if (newdrop > this.activePlan.getCycleTime())
-						newdrop = this.activePlan.getCycleTime() - 1;
+					if (newdrop > this.activePlan.getCycleTime()-2)
+						newdrop = this.activePlan.getCycleTime() - 2;
 					this.adaptiveDroppings.put(otherSg.getId(), newdrop);
 					int newonset = currentonset + step;
 					this.adaptiveOnsets.put(otherSg.getId(), newonset);

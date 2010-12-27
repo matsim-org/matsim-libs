@@ -46,7 +46,7 @@ import playground.jbischoff.BAsignals.model.CarsOnLaneHandler;
  */
 public class CottbusLiveVis {
 
-	private final String config = "/Users/JB/Documents/Work/cottbus/Cottbus-BA/scenario-slv/dg_cottbus_config_live_vis.xml";
+	private final String config = "/Users/JB/Desktop/BA-Arbeit/sim/scen/1211/config_slv_l.xml";
 
 	
 	private void runCottbus() {
