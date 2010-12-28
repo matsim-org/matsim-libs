@@ -50,6 +50,18 @@ import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 /**
+ * This is the wrapper that wraps the transit router so it can be used as a PlanStrategy (with a run(plan) method). The PlanStrategy
+ * is then plugged into a PlanStrategyModule (where, essentially, the planStrategyModule.handlePlan(plan) is connected to the
+ * planStrategy.run(plan) method).
+ * <p/>
+ * Design thoughts:
+ * <ul>
+ * <li>Do we really need separate methods planStrategy.run(plan) and planStrategyModule.handlePlan(plan). Or could
+ * PlanStrategyModule inherit the method name from PlanStrategy?
+ * <li>Do we really need yet another plansCalcRoute.handlePlan( person, plan ) method? Presumably a leftover from the days where
+ * plan did not have a back pointer to person.
+ * </ul>
+ * 
  * @author mrieser
  */
 public class PlansCalcTransitRoute extends PlansCalcRoute {
@@ -91,7 +103,7 @@ public class PlansCalcTransitRoute extends PlansCalcRoute {
 	}
 
 	@Override
-	public void handlePlan(Person person, final Plan plan) {
+	protected void handlePlan(Person person, final Plan plan) {
 		this.transitLegsRemover.run(plan);
 		this.currentPlan = plan;
 		this.legReplacements.clear();
@@ -164,12 +176,15 @@ public class PlansCalcTransitRoute extends PlansCalcRoute {
 								i++;
 								if (leg2.getRoute() instanceof ExperimentalTransitRoute) {
 									ExperimentalTransitRoute tRoute = (ExperimentalTransitRoute) leg2.getRoute();
-									ActivityImpl act = new ActivityImpl(PtConstants.TRANSIT_ACTIVITY_TYPE, this.schedule.getFacilities().get(tRoute.getAccessStopId()).getCoord(), tRoute.getStartLinkId());
+									ActivityImpl act = new ActivityImpl(PtConstants.TRANSIT_ACTIVITY_TYPE, 
+											this.schedule.getFacilities().get(tRoute.getAccessStopId()).getCoord(), 
+											tRoute.getStartLinkId());
 									act.setDuration(0.0);
 									planElements.add(i, act);
 									nextCoord = this.schedule.getFacilities().get(tRoute.getEgressStopId()).getCoord();
 								} else { // walk legs don't have a coord, use the coord from the last egress point
-									ActivityImpl act = new ActivityImpl(PtConstants.TRANSIT_ACTIVITY_TYPE, nextCoord, leg2.getRoute().getStartLinkId());
+									ActivityImpl act = new ActivityImpl(PtConstants.TRANSIT_ACTIVITY_TYPE, nextCoord, 
+											leg2.getRoute().getStartLinkId());
 									act.setDuration(0.0);
 									planElements.add(i, act);
 								}

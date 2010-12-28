@@ -51,7 +51,18 @@ import org.matsim.population.algorithms.PlanAlgorithm;
  * </p><p>
  * Dijkstra can be replaced by something else by using the <tt>factory</tt> parameter.
  * </p>
- */
+   The PlanStrategy
+ * is then plugged into a PlanStrategyModule (where, essentially, the planStrategyModule.handlePlan(plan) is connected to the
+ * planStrategy.run(plan) method).
+ * <p/>
+ * Design thoughts:
+ * <ul>
+ * <li>Do we really need separate methods planStrategy.run(plan) and planStrategyModule.handlePlan(plan). Or could
+ * PlanStrategyModule inherit the method name from PlanStrategy?
+ * <li>Do we really need yet another plansCalcRoute.handlePlan( person, plan ) method? Presumably a leftover from the days where
+ * plan did not have a back pointer to person.
+ * </ul>
+ * */
 public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgorithm {
 
 	private static final Logger log = Logger.getLogger(PlansCalcRoute.class);
