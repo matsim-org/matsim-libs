@@ -47,13 +47,12 @@ public class SfOagFilter {
 		String[] euroCountries = {"AD","AL","AM","AT","AX","AZ","BA","BE","BG","BY","CH","CY","CZ",
 				"DE","DK","EE","ES","FI","FO","FR","GB","GE","GG","GR","HR","HU","IE","IM","IS","IT",
 				"JE","KZ","LI","LT","LU","LV","MC","MD","ME","MK","MT","NL","NO","PL","PT","RO","RS",
-				"RU","SE","SI","SJ","SK","SM","TK","UA","VA"
-		};
+				"RU","SE","SI","SJ","SK","SM","TK","UA","VA" };
 		
 		BufferedReader br = new BufferedReader(new FileReader(new File(input)));
 		BufferedWriter bw = new BufferedWriter(new FileWriter(new File(output)));
-		br.ready();
-		while (br.readLine()!=null) {
+		
+		while (br.ready()) {
 			String oneLine = br.readLine();
 			String[] lineEntries = new String[81];
 			lineEntries = oneLine.split(",");
@@ -79,6 +78,7 @@ public class SfOagFilter {
 				}
 			}
 		}
+		
 		br.close();
 		bw.close();
 		
