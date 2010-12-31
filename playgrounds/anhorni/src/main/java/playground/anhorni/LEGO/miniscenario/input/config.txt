@@ -1,0 +1,20 @@
+path	src/main/java/playground/anhorni/LEGO/miniscenario/
+spacing	250.0
+sideLength	20000
+personsPerLoc	50
+linkCapacity	400
+scoringBeta	-0.0005
+varTastes	0.0000004
+scoreElementTT	1.0
+scoreElementDistance	0.0
+scoreElementTastes	0.0
+scoreElementFLoad	0.0
+scoreElementEpsilons	1.0
+gumbel	true
+actScoreScale	3.0
+actScoreOffset	112.0
+analysisPopulationOffset	1000000000
+linearDistanceUtility	true
+approximationLevel	1
+
+

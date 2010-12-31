@@ -1,0 +1,170 @@
+<?xml version="1.0" ?>
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd">
+<config>
+	<!-- ====================================================================== -->
+	
+	<module name="global">
+		<param name="randomSeed" value="4711" />
+		<param name="coordinateSystem" value="Atlantis" />
+		<param name="numberOfThreads" value="4" />
+	</module>
+			
+	<!-- ====================================================================== -->
+
+	<module name="network">
+		<param name="inputNetworkFile" value="src/main/java/playground/anhorni/LEGO/miniscenario/input/network.xml" />
+	</module>
+	
+	<!-- ====================================================================== -->
+
+	<module name="facilities">
+		<param name="inputFacilitiesFile" value="src/main/java/playground/anhorni/LEGO/miniscenario/input/facilities.xml" />
+	</module>
+	
+	<!-- ====================================================================== -->
+
+	<module name="plans">
+		<param name="inputPlansFile" value="src/main/java/playground/anhorni/LEGO/miniscenario/input/plans.xml" />
+	</module>
+	
+	<!-- ====================================================================== -->
+	
+	<module name="simulation" >
+		<param name="endTime" value="00:00:00" />
+		<param name="flowCapacityFactor" value="1.0" />
+		<param name="storageCapacityFactor" value="1.0" />
+
+	</module>	
+	
+	<!-- ====================================================================== -->
+
+	<module name="controler">
+		<param name="outputDirectory" value="src/main/java/playground/anhorni/LEGO/miniscenario/output/" />
+		<param name="firstIteration" value="0" />
+		<param name="lastIteration" value="200" />		
+		<param name="runId" value="mixed1" />
+		<param name="routingAlgorithmType" value="AStarLandmarks" />
+	</module>
+	
+	<!-- ====================================================================== -->
+	
+	<module name="parallelEventHandling">
+		<param name="numberOfThreads" value="5" />
+	</module>
+	
+	<!-- ====================================================================== -->
+	
+	<module name="counts">
+		<param name="countsScaleFactor" value="1" />
+		<param name="inputCountsFile" value="null" />
+		<param name="outputformat" value="all" />
+	</module>
+	
+	<!-- ====================================================================== -->
+
+	<module name="simulation">
+		<!-- "start/endTime" of MobSim (00:00:00 == take earliest activity time/ run as long as active vehicles exist) -->
+		<param name="startTime" value="00:00:00" />
+		<param name="endTime" value="00:00:00" />
+	
+		<param name = "snapshotperiod"	value = "00:00:00"/> <!-- 00:00:00 means NO snapshot writing -->
+		<param name = "snapshotFormat"	value = "netvis"/> <!-- netvis, googleearth, transims -->
+	</module>
+	
+	<!-- ====================================================================== -->
+
+	<module name="planCalcScore">
+	          <param name="learningRate" value="1.0" />
+	          <param name="BrainExpBeta" value="2.0" />
+
+	          <param name="lateArrival" value="0" />
+	          <param name="earlyDeparture" value="0" />
+	          <param name="performing" value="6" />
+	          <param name="traveling" value="0" />
+	          <param name="waiting" value="0" />
+
+	          <param name="activityType_0"            value="home" />
+	          <param name="activityPriority_0"        value="1" />
+	          <param name="activityTypicalDuration_0" value="20:00:00" />
+	          <param name="activityMinimalDuration_0" value="12:00:00" />
+
+	          <param name="activityType_1"            value="shop" /> 
+	          <param name="activityPriority_1"        value="1" />
+	          <param name="activityTypicalDuration_1" value="03:00:00" />
+	          <param name="activityMinimalDuration_1" value="00:30:00" />
+	          <param name="activityOpeningTime_1"     value="09:30:00" />
+	          <param name="activityClosingTime_1"     value="14:30:00" />
+
+	</module>
+	
+	<!-- ====================================================================== -->
+
+	<module name="locationchoice" >
+	          <param name="flexible_types" value="shop" />
+	          <param name="maxRecursions" value="5" />
+	          <param name="recursionTravelSpeed" value="1000.0" />
+	          <param name="recursionTravelSpeedChange" value="0.2" />
+	          <param name="restraintFcnExp" value="0.0" />
+	          <param name="restraintFcnFactor" value="0.0" />
+	          <param name="scaleFactor" value="1" />
+
+	          <param name="centerNode" value="null" />
+	          <param name="radius" value="null" />
+	          <param name="fixByActType" value="false" />
+	          <param name="constrained" value="true" />
+	          <param name="simple_tg" value="false" />
+	          
+	          <param name="algorithm" value="bestResponse" />
+	          <param name="tt_approximationLevel" value="1" />
+	          <param name="travelTimes" value="true" />
+	          <param name="searchSpaceBeta" value="-0.0005" />
+	          <param name="maxSearchSpaceRadius" value="-1.0" />
+	</module>
+
+	
+	<!-- ====================================================================== -->
+	
+	<module name="strategy">
+		<param name="maxAgentPlanMemorySize" value="5" />
+
+		<param name="ModuleProbability_1" value="0.8" />
+		<param name="Module_1" value="BestScore" />	
+
+		<param name="ModuleProbability_2" value="0.2" />
+		<param name="Module_2" value="LocationChoice" />
+	</module>
+	
+	<!-- ====================================================================== -->
+		
+	<module name="scenario" >
+
+		<!-- Set this parameter to true if households should be used, false if not. -->
+		<param name="useHouseholds" value="false" />
+
+		<!-- Set this parameter to true if knowledge should be used, false if not. -->
+		<param name="useKnowledge" value="false" />
+
+		<!-- Set this parameter to true if lanes should be used, false if not. -->
+		<param name="useLanes" value="false" />
+
+		<!-- Set this parameter to true if roadpricing should be used, false if not. -->
+		<param name="useRoadpricing" value="false" />
+
+		<!-- Set this parameter to true if signal systems should be used, false if not. -->
+		<param name="useSignalsystems" value="false" />
+
+		<!-- Set this parameter to true if transit should be simulated, false if not. -->
+		<param name="useTransit" value="false" />
+
+		<!-- Set this parameter to true if vehicles should be used, false if not. -->
+		<param name="useVehicles" value="false" />
+	</module>
+
+	<!-- ====================================================================== -->
+
+	
+	
+	
+	
+
+</config>
