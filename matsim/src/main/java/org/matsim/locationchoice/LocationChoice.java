@@ -37,6 +37,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.knowledges.Knowledges;
+import org.matsim.locationchoice.bestresponse.LocationMutatorBestResponse;
 import org.matsim.locationchoice.constrained.LocationMutatorTGSimple;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
 import org.matsim.locationchoice.utils.DefineFlexibleActivities;
@@ -86,15 +87,9 @@ public class LocationChoice extends AbstractMultithreadedModule {
 		initLocal();
 	}
 
-
 	private void initLocal() {
-
 		if (this.controler.getConfig().locationchoice().getMode().equals("true")) {
 			this.constrained = true;
-			log.info("Doing constrained location choice");
-		}
-		else {
-			log.info("Doing random location choice on univ. choice set");
 		}
 		((NetworkImpl) this.network).connect();
 		this.initTrees(this.controler.getFacilities(), this.controler.getConfig().locationchoice());
@@ -142,22 +137,50 @@ public class LocationChoice extends AbstractMultithreadedModule {
 
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
-		if (!this.constrained) {
-			this.planAlgoInstances.add(new RandomLocationMutator(this.network, this.controler, this.knowledges,
-					this.quadTreesOfType, this.facilitiesOfType, MatsimRandom.getLocalInstance()));
-		}
-		else {
-			// only moving one flexible activity
-			if (this.controler.getConfig().locationchoice().getSimpleTG().equals("true")) {
+		
+		// this is the way location choice should be configured ...
+		String algorithm = this.controler.getConfig().locationchoice().getAlgorithm();
+		if (!algorithm.equals("null")) {
+			if (algorithm.equals("random")) {
+				this.planAlgoInstances.add(new RandomLocationMutator(this.network, this.controler, this.knowledges,
+						this.quadTreesOfType, this.facilitiesOfType, MatsimRandom.getLocalInstance()));
+			}
+			else if (algorithm.equals("bestResponse")) {
+				this.planAlgoInstances.add(new LocationMutatorBestResponse(this.network, this.controler,  this.knowledges,
+						this.quadTreesOfType, this.facilitiesOfType, MatsimRandom.getLocalInstance()));
+			}
+			else if (algorithm.equals("localSearchRecursive")) {
+				this.planAlgoInstances.add(new LocationMutatorwChoiceSet(this.network, this.controler,  this.knowledges,
+						this.quadTreesOfType, this.facilitiesOfType, MatsimRandom.getLocalInstance()));
+			}
+			else if (algorithm.equals("localSearchSingleAct")) {
 				this.planAlgoInstances.add(new LocationMutatorTGSimple(this.network, this.controler, this.knowledges,
-					this.quadTreesOfType, this.facilitiesOfType, MatsimRandom.getLocalInstance()));
+						this.quadTreesOfType, this.facilitiesOfType, MatsimRandom.getLocalInstance()));
 			}
 			else {
-				// computing new chain of flexible activity
-				this.planAlgoInstances.add(new LocationMutatorwChoiceSet(this.network, this.controler,  this.knowledges,
-				this.quadTreesOfType, this.facilitiesOfType, MatsimRandom.getLocalInstance()));
+				log.error("Location choice configuration error: Please specify a location choice algorithm.");
 			}
 		}
+		// deprecated: to be compatible with earlier versions ... ------------------------------------------
+		else { 	
+			if (!this.constrained) {
+				this.planAlgoInstances.add(new RandomLocationMutator(this.network, this.controler, this.knowledges,
+						this.quadTreesOfType, this.facilitiesOfType, MatsimRandom.getLocalInstance()));
+			}
+			else {
+				// only moving one flexible activity
+				if (this.controler.getConfig().locationchoice().getSimpleTG().equals("true")) {
+					this.planAlgoInstances.add(new LocationMutatorTGSimple(this.network, this.controler, this.knowledges,
+						this.quadTreesOfType, this.facilitiesOfType, MatsimRandom.getLocalInstance()));
+				}
+				else {
+					// computing new chain of flexible activity
+					this.planAlgoInstances.add(new LocationMutatorwChoiceSet(this.network, this.controler,  this.knowledges,
+							this.quadTreesOfType, this.facilitiesOfType, MatsimRandom.getLocalInstance()));
+				}
+			}
+		} // deprecated: ------------------------------------------------------------------------------------------
+		
 		return this.planAlgoInstances.get(this.planAlgoInstances.size()-1);
 	}
 
@@ -182,5 +205,4 @@ public class LocationChoice extends AbstractMultithreadedModule {
 	public void setConstrained(boolean constrained) {
 		this.constrained = constrained;
 	}
-
 }
