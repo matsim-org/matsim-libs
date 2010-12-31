@@ -45,6 +45,12 @@ public class LocationChoiceConfigGroup extends Module {
 	private static final String CENTER_NODE = "centerNode";
 	private static final String RADIUS = "radius";
 	private static final String FLEXIBLE_TYPES = "flexible_types";
+	
+	private static final String ALGO = "algorithm";
+	private static final String TT_APPROX_LEVEL = "tt_approximationLevel";
+	private static final String TT = "travelTimes";
+	private static final String SEARCHSPACEBETA = "searchSpaceBeta";
+	private static final String MAXRADIUS = "maxSearchSpaceRadius";
 
 	//default values
 	private String constrained = "false";
@@ -59,6 +65,12 @@ public class LocationChoiceConfigGroup extends Module {
 	private String centerNode = "null";
 	private String radius = "null";
 	private String flexible_types = "null";
+		
+	private String algorithm = "null";
+	private String tt_approximationLevel = "0";
+	private String travelTimes = "true";
+	private String searchSpaceBeta = "0.0001";
+	private String maxSearchSpaceRadius = "-1.0";
 
 	private final static Logger log = Logger.getLogger(LocationChoiceConfigGroup.class);
 
@@ -104,6 +116,21 @@ public class LocationChoiceConfigGroup extends Module {
 		}
 		if (FLEXIBLE_TYPES.equals(key)) {
 			return getFlexibleTypes();
+		}
+		if (ALGO.equals(key)) {
+			return getAlgorithm();
+		}
+		if (TT_APPROX_LEVEL.equals(key)) {
+			return getTravelTimeApproximationLevel();
+		}
+		if (TT.equals(key)) {
+			return getTravelTimes();
+		}
+		if (SEARCHSPACEBETA.equals(key)) {
+			return getSearchSpaceBeta();
+		}
+		if (MAXRADIUS.equals(key)) {
+			return getMaxSearchSpaceRadius();
 		}
 		throw new IllegalArgumentException(key);
 	}
@@ -196,6 +223,31 @@ public class LocationChoiceConfigGroup extends Module {
 			else {
 				setFlexibleTypes(value);
 			}
+		} else if (ALGO.equals(key)) {
+			setAlgorithm(value);
+		} else if (TT_APPROX_LEVEL.equals(key)) {
+			if (!(value.equals("0") || value.equals("1") || value.equals("1"))) {
+				log.warn("set travel time approximation level to 0, 1 or 2. Set to default value '0' now (no approximation)");
+			}
+			else {
+				setTravelTimeApproximationLevel(value);
+			}
+		} else if (TT.equals(key)) {
+			if (!(value.equals("true") || value.equals("false"))) {
+				log.warn("set 'travelTimes' to either 'true' or 'false'. Set to default value 'true' now");
+			}
+			else {
+				setTravelTimes(value);
+			}
+		} else if (SEARCHSPACEBETA.equals(key)) {
+			if (Double.parseDouble(value) >= 0.0) {
+				log.warn("set 'searchSpaceBeta' to a negative value. Set to default value '-0.0001' now.");
+			}
+			else {
+				setSearchSpaceBeta(value);
+			}
+		} else if (MAXRADIUS.equals(key)) {
+			setMaxSearchSpaceRadius(value);
 		}
 		else
 		{
@@ -218,6 +270,11 @@ public class LocationChoiceConfigGroup extends Module {
 		this.addParameterToMap(map, CENTER_NODE);
 		this.addParameterToMap(map, RADIUS);
 		this.addParameterToMap(map, FLEXIBLE_TYPES);
+		this.addParameterToMap(map, ALGO);
+		this.addParameterToMap(map, TT_APPROX_LEVEL);
+		this.addParameterToMap(map, TT);
+		this.addParameterToMap(map, SEARCHSPACEBETA);
+		this.addParameterToMap(map, MAXRADIUS);
 		return map;
 	}
 
@@ -293,5 +350,35 @@ public class LocationChoiceConfigGroup extends Module {
 	}
 	public void setFlexibleTypes(final String flexibleTypes) {
 		this.flexible_types = flexibleTypes;
+	}
+	public String getAlgorithm() {
+		return algorithm;
+	}
+	public void setAlgorithm(String algorithm) {
+		this.algorithm = algorithm;
+	}
+	public String getTravelTimeApproximationLevel() {
+		return tt_approximationLevel;
+	}
+	public void setTravelTimeApproximationLevel(String tt_approximationLevel) {
+		this.tt_approximationLevel = tt_approximationLevel;
+	}
+	public String getTravelTimes() {
+		return travelTimes;
+	}
+	public void setTravelTimes(String travelTimes) {
+		this.travelTimes = travelTimes;
+	}
+	public String getSearchSpaceBeta() {
+		return searchSpaceBeta;
+	}
+	public void setSearchSpaceBeta(String searchSpaceBeta) {
+		this.searchSpaceBeta = searchSpaceBeta;
+	}
+	public String getMaxSearchSpaceRadius() {
+		return maxSearchSpaceRadius;
+	}
+	public void setMaxSearchSpaceRadius(String maxSearchSpaceRadius) {
+		this.maxSearchSpaceRadius = maxSearchSpaceRadius;
 	}
 }
