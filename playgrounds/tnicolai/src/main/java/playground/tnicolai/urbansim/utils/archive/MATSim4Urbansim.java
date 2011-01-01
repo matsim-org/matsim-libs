@@ -147,7 +147,7 @@ public class MATSim4Urbansim {
 		controler.setCreateGraphs(false);	// sets, whether output Graphs are created
 		
 		// The following lines register what should be done _after_ the iterations were run:
-		MyControlerListener myControlerListener = new MyControlerListener( zones ) ;
+		MyControlerListener myControlerListener = new MyControlerListener( zones, null ) ;
 		controler.addControlerListener(myControlerListener);
 
 		// run the iterations, including the post-processing:

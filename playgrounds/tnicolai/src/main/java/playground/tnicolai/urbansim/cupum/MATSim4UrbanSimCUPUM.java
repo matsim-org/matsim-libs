@@ -24,19 +24,19 @@
 package playground.tnicolai.urbansim.cupum;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkImpl;
 
 import playground.tnicolai.urbansim.MATSim4Urbansim;
 import playground.tnicolai.urbansim.utils.MATSimConfigObject;
+import playground.tnicolai.urbansim.utils.WorkplaceObject;
 import playground.tnicolai.urbansim.utils.io.ReadFromUrbansimParcelModel;
 
 /**
@@ -74,7 +74,7 @@ public class MATSim4UrbanSimCUPUM extends MATSim4Urbansim{
 		// order to implement policy measures.  Get network early so readXXX can check if links still exist.
 		NetworkImpl network = scenario.getNetwork();
 		cleanNetwork(network);
-		modifyLinks(network);
+		//modifyLinks(network); // en- or disable
 		
 		// get the data from urbansim (parcels and persons)
 		ReadFromUrbansimParcelModel readFromUrbansim = new ReadFromUrbansimParcelModel( MATSimConfigObject.getYear() );
@@ -84,13 +84,14 @@ public class MATSim4UrbanSimCUPUM extends MATSim4Urbansim{
 		
 		ReadUrbansimParcelModel(readFromUrbansim, facilities, zones);
 		Population newPopulation = ReadUrbansimPersons(readFromUrbansim, facilities, network);
-
+		Map<Id,WorkplaceObject> numberOfWorkplacesPerZone = ReadUrbansimJobs(readFromUrbansim);
+		
 		log.info("### DONE with demand generation from urbansim ###") ;
 
 		// set population in scenario
 		scenario.setPopulation(newPopulation);
 
-		runControler(zones);
+		runControler(zones, numberOfWorkplacesPerZone);
 	}
 	
 	/**
@@ -99,9 +100,9 @@ public class MATSim4UrbanSimCUPUM extends MATSim4Urbansim{
 	 */
 	private void modifyLinks(NetworkImpl network){
 		
-		double newFreespeed = 200/3.6; // 200km/h in meter/sec
-		int numberOfLanes = 1;
+		log.info("Modifiying network now ...");
 		
+		double newFreespeed = 70*0.44704; // 70mph -> meter/sec
 		
 		ArrayList<IdImpl> wantedIdSet = new ArrayList<IdImpl>(){
 			private static final long serialVersionUID = 1L;
@@ -118,32 +119,18 @@ public class MATSim4UrbanSimCUPUM extends MATSim4Urbansim{
 				add(new IdImpl(2060));
 			}
 		};
-		ArrayList<LinkImpl> wantedLinkSet = new ArrayList<LinkImpl>();
 		
 		for(int i = 0; i < wantedIdSet.size(); i++){
 			IdImpl id = wantedIdSet.get(i);
 			LinkImpl link = (LinkImpl)network.getLinks().get(id);
-			wantedLinkSet.add(link);
 			
-			
-			
+			// modify link
+			link.setFreespeed( newFreespeed );
 			
 			printLinkInfo(link);			
 		}
-		
-		
-		// TODO tnicolai : ändern der capacity + freespeed???
-		{
-			// this is only a test, don't use this further!!!!!!
-			LinkImpl testLink = wantedLinkSet.get(0);
-			testLink.setCapacity(2000.0);
-			testLink.setFreespeed(55.55);
-			IdImpl testID = (IdImpl)testLink.getId();
-		}
-		
+		log.info("Finished modifying network.");
 	}
-	
-	
 	
 	/**
 	 * prints key data of a link
@@ -154,7 +141,7 @@ public class MATSim4UrbanSimCUPUM extends MATSim4Urbansim{
 		
 		log.info("#########################################");
 		log.info("Link ID:" + link.getId());
-		log.info("Link Capacity:" + link.getCapacity()); // capacity in vehicles/hour
+		log.info("Link Capacity:" + link.getCapacity()); // capacity in vehicles/hour (standrad for german autobhan = 2000)
 		log.info("Link FlowCapacity:" + link.getFlowCapacity());
 		log.info("Link Freespeed:" + link.getFreespeed()); // freespeed in meter/sec
 		log.info("Link FreespeedTravelTime:" + link.getFreespeedTravelTime()); // = length/freespeed
@@ -171,6 +158,5 @@ public class MATSim4UrbanSimCUPUM extends MATSim4Urbansim{
 		MATSim4UrbanSimCUPUM m4uc = new MATSim4UrbanSimCUPUM(args);
 		m4uc.runMATSim();
 	}
-
 }
 

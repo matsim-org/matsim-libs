@@ -36,6 +36,7 @@ import org.matsim.core.utils.io.IOUtils;
 import playground.kai.urbansim.ids.ZoneId;
 import playground.tnicolai.urbansim.constants.Constants;
 import playground.tnicolai.urbansim.utils.CommonMATSimUtilities;
+import playground.tnicolai.urbansim.utils.WorkplaceObject;
 
 /**
  * @author nagel
@@ -66,7 +67,7 @@ public class ReadFromUrbansimParcelModel {
 	public void readFacilities(final ActivityFacilitiesImpl parcels, final ActivityFacilitiesImpl zones) {
 		// (these are simply defined as those entities that have x/y coordinates in urbansim)
 		String filename = Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + Constants.URBANSIM_PARCEL_DATASET_TABLE + this.year + Constants.FILE_TYPE_TAB;
-		log.info( "Starting to read urbansim parcels from " + filename );
+		log.info( "Starting to read urbansim parcels table from " + filename );
 
 		// temporary data structure in order to get coordinates for zones:
 		// Map<Id,Id> zoneFromParcel = new HashMap<Id,Id>();
@@ -94,22 +95,22 @@ public class ReadFromUrbansimParcelModel {
 
 			//
 			while ( (line = reader.readLine()) != null ) {
-				parts = line.split(Constants.TAB_SEPERATOR); //String[] parts = line.split("[\t]+");
+				parts = line.split(Constants.TAB_SEPERATOR);
 
 				// Urbansim sometimes writes IDs as floats!
-				long parcelIdAsLong = (long) Double.parseDouble( parts[ indexParcelID ] ) ;
+				long parcelIdAsLong = (long) Double.parseDouble( parts[ indexParcelID ] );
 				parcel_ID = new IdImpl( parcelIdAsLong ) ;
 
 				// get the coordinates of that parcel
-				coord = new CoordImpl( parts[ indexXCoodinate ],parts[ indexYCoodinate ] ) ;
+				coord = new CoordImpl( parts[ indexXCoodinate ],parts[ indexYCoodinate ] );
 
 				// create a facility (within the parcels) object at this coordinate with the correspondent parcel ID
-				ActivityFacilityImpl facility = parcels.createFacility(parcel_ID,coord) ;
+				ActivityFacilityImpl facility = parcels.createFacility(parcel_ID,coord);
 				facility.setDesc( Constants.FACILITY_DESCRIPTION ) ;
 
 				// get zone ID
-				long zoneIdAsLong = (long) Double.parseDouble( parts[ indexZoneID ] ) ;
-				zone_ID = new ZoneId( zoneIdAsLong ) ;
+				long zoneIdAsLong = (long) Double.parseDouble( parts[ indexZoneID ] );
+				zone_ID = new ZoneId( zoneIdAsLong );
 
 				// the pseudoZones (HashMap) is a temporary data structure to create zones.
 				// this intermediate step is needed to make sure that every zone id just exists once.
@@ -140,21 +141,6 @@ public class ReadFromUrbansimParcelModel {
 	}
 
 	/**
-	 * pseudo zone is a temporary data structure. it can contain the summation of x and y coordinates
-	 * of different parcels with the same zone ID. the attribute "count" counts the number of parcels
-	 * with the the same zone ID. its used as a denominator to get the average x and y coordinate of
-	 * a zone.
-	 *
-	 * @author nagel
-	 *
-	 */
-	class PseudoZone {
-		protected double sumXCoordinate = 0.0;
-		protected double sumYCoordinate = 0.0;
-		protected long count = 0;	// denominator of x and y coordinate
-	}
-
-	/**
 	 * this method creates the final zones from the merged parcels (with the same zone ID)
 	 * by computing the average value of the coordinates for each zone ID.
 	 *
@@ -172,12 +158,28 @@ public class ReadFromUrbansimParcelModel {
 		// constructing the zones from the pseudoZones:
 		for ( Entry<Id,PseudoZone> entry : pseudoZones.entrySet() ) {
 			zone_ID = entry.getKey();
-			pz = entry.getValue() ;
+			pz = entry.getValue();
 			// compute the average center of a zone
-			coord = new CoordImpl( pz.sumXCoordinate/pz.count , pz.sumYCoordinate/pz.count ) ;
-			zones.createFacility(zone_ID, coord) ;
+			coord = new CoordImpl( pz.sumXCoordinate/pz.count , pz.sumYCoordinate/pz.count );
+			zones.createFacility(zone_ID, coord);
 		}
 		log.info( "Finished constructing urbansim zones" ) ;
+	}
+	
+	/**
+	 * pseudo zone is a temporary data structure. it can contain the summation of x and y coordinates
+	 * of different parcels with the same zone ID. the attribute "count" counts the number of parcels
+	 * with the the same zone ID. its used as a denominator to get the average x and y coordinate of
+	 * a zone.
+	 *
+	 * @author nagel
+	 *
+	 */
+	public class PseudoZone {
+
+			protected double sumXCoordinate = 0.0;
+			protected double sumYCoordinate = 0.0;
+			protected long count = 0;	// denominator of x and y coordinate
 	}
 
 	/**
@@ -197,7 +199,7 @@ public class ReadFromUrbansimParcelModel {
 		boolean flag = false;
 
 		String filename = Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + Constants.URBANSIM_PERSON_DATASET_TABLE + this.year + Constants.FILE_TYPE_TAB;
-		log.info( "Starting to read persons from " + filename ) ;
+		log.info( "Starting to read persons table from " + filename ) ;
 
 		try {
 			BufferedReader reader = IOUtils.getBufferedReader( filename );
@@ -338,6 +340,54 @@ public class ReadFromUrbansimParcelModel {
 
 		log.info( "Done with reading persons." ) ;
 	}
+	
+	/**
+	 * Reads in the job table from urbansim that contains for every "job_id" the corresponded "parcel_id_work" and "zone_id_work"
+	 * and returns an HashMap with the number of job for each zone.
+	 * 
+	 * @return HashMap
+	 */
+	public Map<Id,WorkplaceObject> readJobs(){
+		
+		String filename = Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + Constants.URBANSIM_JOB_DATASET_TABLE + this.year + Constants.FILE_TYPE_TAB;
+		log.info( "Starting to read jobs table from " + filename ) ;
+
+		Map<Id,WorkplaceObject> numberOfWorkplacesPerZone = new HashMap<Id,WorkplaceObject>();
+		
+		try {
+			BufferedReader reader = IOUtils.getBufferedReader( filename );
+			
+			String line = reader.readLine();
+			// get columns for home, work and person id
+			Map<String,Integer> idxFromKey = CommonMATSimUtilities.createIdxFromKey( line, Constants.TAB_SEPERATOR );
+			final int indexZoneID_WORK		= idxFromKey.get( Constants.ZONE_ID_WORK );
+			
+			ZoneId zone_ID;
+			WorkplaceObject workObj;
+			
+			while ( (line=reader.readLine()) != null ) {
+				String[] parts = line.split( Constants.TAB_SEPERATOR );
+				
+				// get zone ID
+				long zoneIdAsLong = (long) Double.parseDouble( parts[ indexZoneID_WORK ] );
+				zone_ID = new ZoneId( zoneIdAsLong );
+				
+				// each zone ID indicates a job
+				workObj = numberOfWorkplacesPerZone.get(zone_ID);
+				if( workObj == null){
+					workObj = new WorkplaceObject();
+					numberOfWorkplacesPerZone.put(zone_ID, workObj);
+				}
+				workObj.counter++;
+			}
+
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return numberOfWorkplacesPerZone;
+	}
 
 	/**
 	 * determine if a person already exists
@@ -408,6 +458,10 @@ public class ReadFromUrbansimParcelModel {
 			return true ;
 		}
 		return false ;
+	}
+	
+	public int getYear(){
+		return this.year;
 	}
 
 }

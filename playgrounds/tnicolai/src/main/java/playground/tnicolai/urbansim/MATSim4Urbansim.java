@@ -25,8 +25,10 @@ package playground.tnicolai.urbansim;
 
 
 import java.io.File;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
@@ -41,6 +43,7 @@ import playground.tnicolai.urbansim.constants.Constants;
 import playground.tnicolai.urbansim.utils.JAXBUnmaschal;
 import playground.tnicolai.urbansim.utils.MATSimConfigObject;
 import playground.tnicolai.urbansim.utils.MyControlerListener;
+import playground.tnicolai.urbansim.utils.WorkplaceObject;
 import playground.tnicolai.urbansim.utils.io.ReadFromUrbansimParcelModel;
 
 /**
@@ -93,13 +96,14 @@ public class MATSim4Urbansim {
 		
 		ReadUrbansimParcelModel(readFromUrbansim, facilities, zones);
 		Population newPopulation = ReadUrbansimPersons(readFromUrbansim, facilities, network);
+		Map<Id,WorkplaceObject> numberOfWorkplacesPerZone = ReadUrbansimJobs(readFromUrbansim);
 
 		log.info("### DONE with demand generation from urbansim ###") ;
 
 		// set population in scenario
 		scenario.setPopulation(newPopulation);
 
-		runControler(zones);
+		runControler(zones, numberOfWorkplacesPerZone);
 	}
 	
 	/**
@@ -113,7 +117,7 @@ public class MATSim4Urbansim {
 
 		readFromUrbansim.readFacilities(facilities, zones);
 		// write the facilities from the urbansim parcel model as a compressed locations.xml file into the temporary directory as input for ???
-		new FacilitiesWriter(facilities).write( Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + "locations.xml.gz" );
+		// new FacilitiesWriter(facilities).write( Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + "locations.xml.gz" );
 	}
 	
 	/**
@@ -143,25 +147,37 @@ public class MATSim4Urbansim {
 		Population newPopulation = new ScenarioImpl().getPopulation();
 		// read urbansim persons.  Generates hwh acts as side effect
 		readFromUrbansim.readPersons( oldPopulation, newPopulation, facilities, network, MATSimConfigObject.getSampeRate() ) ;
-		oldPopulation=null ;
-		System.gc() ;
-
-		new PopulationWriter(newPopulation,network).write( Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + "pop.xml.gz" );
+		oldPopulation=null;
+		System.gc();
+		
+		// tnicolai : diabeld only for debugging reasons. Activate again!!!
+		// new PopulationWriter(newPopulation,network).write( Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + "pop.xml.gz" );
 		
 		return newPopulation;
+	}
+	
+	/**
+	 * Reads in the job table from urbansim that contains for every "job_id" the corresponded "parcel_id_work" and "zone_id_work"
+	 * and returns an HashMap with the number of job for each zone.
+	 * 
+	 * @return HashMap
+	 */
+	protected Map<Id,WorkplaceObject> ReadUrbansimJobs(ReadFromUrbansimParcelModel readFromUrbansim){
+
+		return readFromUrbansim.readJobs();
 	}
 	
 	/**
 	 * run simulation
 	 * @param zones
 	 */
-	protected void runControler( ActivityFacilitiesImpl zones ){
+	protected void runControler( ActivityFacilitiesImpl zones, Map<Id,WorkplaceObject> numberOfWorkplacesPerZone ){
 		Controler controler = new Controler(scenario);
 		controler.setOverwriteFiles(true);	// sets, whether output files are overwritten
 		controler.setCreateGraphs(false);	// sets, whether output Graphs are created
 		
 		// The following lines register what should be done _after_ the iterations were run:
-		controler.addControlerListener( new MyControlerListener( zones ) );
+		controler.addControlerListener( new MyControlerListener( zones, numberOfWorkplacesPerZone ) );
 
 		// run the iterations, including the post-processing:
 		controler.run() ;
