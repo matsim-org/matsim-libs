@@ -36,22 +36,38 @@ public class MATSimAccessibilityMain {
 	
 	private static String configPath = null;
 	
+	private static Config config = null;
+	
+	private static ScenarioImpl scenario = null;
 
+	/**
+	 * constructor
+	 * @param args
+	 */
 	public MATSimAccessibilityMain(String[] args){
 		
-		configPath = "/Users/thomas/Development/workspace/playgrounds/tnicolai/src/main/java/playground/tnicolai/accessability/config/config.xml";
-		
+		configPath = "/Users/thomas/SustainCity/Data/Zurich/config.xml";
+		init();
 	}
 	
-	private void runMATSim(){
-		
-		Config config = new Config();
+	/**
+	 * init matsim config + scenario
+	 */
+	private void init(){
+		config = new Config();
 		config.addCoreModules();
 		new MatsimConfigReader(config).readFile( configPath );
 		config.scenario().setUseTransit(true);
 		config.scenario().setUseVehicles(true);
-		ScenarioImpl scenario = new ScenarioImpl(config);
+		scenario = new ScenarioImpl(config);
 		scenario = (ScenarioImpl) new ScenarioLoaderImpl(scenario).loadScenario();
+	}
+	
+	private void runMATSim(){
+		
+		
+		
+		
 	}
 	
 	/**
