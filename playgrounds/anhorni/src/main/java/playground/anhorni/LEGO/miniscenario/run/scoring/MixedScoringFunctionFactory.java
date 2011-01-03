@@ -34,21 +34,19 @@ public class MixedScoringFunctionFactory extends org.matsim.core.scoring.charypa
 	private MixedActivityScoringFunction scoringFunction = null;
 	private final Controler controler;
 	private ConfigReader configReader = new ConfigReader();
-	private DestinationChoicePreviousScoreComputer previousScoreComputer;
 
-	public MixedScoringFunctionFactory(CharyparNagelScoringConfigGroup config, Controler controler, ConfigReader configReader, 
-			DestinationChoicePreviousScoreComputer previousScoreComputer) {
+	public MixedScoringFunctionFactory(CharyparNagelScoringConfigGroup config, Controler controler, ConfigReader configReader) {
 		super(config);				
 		this.controler = controler;
 		this.configReader = configReader;
-		this.previousScoreComputer = previousScoreComputer;
 	}
 
 	public ScoringFunction createNewScoringFunction(Plan plan) {	
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 		
 		this.scoringFunction = new MixedActivityScoringFunction((PlanImpl)plan, super.getParams(), this.controler.getFacilities(), 
-				MatsimRandom.getLocalInstance(), this.configReader, this.controler.getFacilityPenalties(), this.previousScoreComputer);
+				MatsimRandom.getLocalInstance(), this.configReader, this.controler.getFacilityPenalties(), this.controler.getConfig());
+		
 		scoringFunctionAccumulator.addScoringFunction(this.scoringFunction);		
 		return scoringFunctionAccumulator;
 	}

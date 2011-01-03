@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
+import org.matsim.core.config.Config;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
@@ -46,17 +47,19 @@ public class MixedActivityScoringFunction extends LocationChoiceScoringFunction 
 	private ConfigReader configReader;
 	private Random random;
 	private DestinationChoiceScoring destinationChoiceScoring;	
+	private Config config;
 	// ------------------------------------
 
 	public MixedActivityScoringFunction(Plan plan, CharyparNagelScoringParameters params, 
 			final ActivityFacilities facilities, Random random, ConfigReader configReader,
 			final TreeMap<Id, FacilityPenalty> facilityPenalties,
-			DestinationChoicePreviousScoreComputer previousScoreComputer) {
+			Config config) {
 		super(plan, params, facilityPenalties, facilities);
 		this.random = random;
 		this.facilities = facilities;
 		this.configReader = configReader;
-		destinationChoiceScoring = new DestinationChoiceScoring(this.random, this.facilities, this.configReader);
+		this.config = config;
+		this.destinationChoiceScoring = new DestinationChoiceScoring(this.random, this.facilities, this.configReader);
 	}
 	
 	@Override
@@ -80,7 +83,7 @@ public class MixedActivityScoringFunction extends LocationChoiceScoringFunction 
 		
 		super.finish();
 		
-		if (configReader.getScoreElementTT() > 0.000001 && !distance) {
+		if (Boolean.parseBoolean(this.config.locationchoice().getTravelTimes()) && !distance) {
 			this.score = (this.score - configReader.getActScoreOffset()) * configReader.getActScoreScale();
 		}
 		else {
