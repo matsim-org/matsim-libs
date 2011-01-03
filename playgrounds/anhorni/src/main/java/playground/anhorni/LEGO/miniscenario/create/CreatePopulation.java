@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.Config;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -38,12 +39,14 @@ import playground.anhorni.random.RandomFromVarDistr;
 public class CreatePopulation {
 	private ScenarioImpl scenario = null;	
 	private ConfigReader configReader = null;
+	private Config config;
 	private final static Logger log = Logger.getLogger(CreatePopulation.class);
 	private RandomFromVarDistr rnd;
 			
-	public void createPopulation(ScenarioImpl scenario, ConfigReader configReader, RandomFromVarDistr rnd) {		
+	public void createPopulation(ScenarioImpl scenario, ConfigReader configReader, RandomFromVarDistr rnd, Config config) {		
 		this.scenario = scenario;
 		this.configReader = configReader;
+		this.config = config;
 		this.rnd = rnd;
 		
 		this.addPersons();
@@ -53,14 +56,14 @@ public class CreatePopulation {
 		this.finishPlans();
 		this.removeNonAnalysisPersons();
 			
-		ComputeMaxEpsilons maxEpsilonComputer = new ComputeMaxEpsilons(10, scenario, "shop", configReader);
+		ComputeMaxEpsilons maxEpsilonComputer = new ComputeMaxEpsilons(10, scenario, "shop", configReader, config);
 		maxEpsilonComputer.prepareReplanning();
 		for (Person p : this.scenario.getPopulation().getPersons().values()) {
 			maxEpsilonComputer.handlePlan(p.getSelectedPlan());
 		}
 		maxEpsilonComputer.finishReplanning();
 		
-		maxEpsilonComputer = new ComputeMaxEpsilons(10, scenario, "leisure", configReader);
+		maxEpsilonComputer = new ComputeMaxEpsilons(10, scenario, "leisure", configReader, config);
 		maxEpsilonComputer.prepareReplanning();
 		for (Person p : this.scenario.getPopulation().getPersons().values()) {
 			maxEpsilonComputer.handlePlan(p.getSelectedPlan());
@@ -175,7 +178,7 @@ public class CreatePopulation {
 //	}
 	
 	private void assignTasteValues() {
-		HandleUnobservedHeterogeneity handler = new HandleUnobservedHeterogeneity(scenario, configReader, rnd);
+		HandleUnobservedHeterogeneity handler = new HandleUnobservedHeterogeneity(scenario, configReader, rnd, config);
 		handler.assign();
 	}
 				

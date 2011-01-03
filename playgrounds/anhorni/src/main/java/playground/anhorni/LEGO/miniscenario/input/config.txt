@@ -3,7 +3,6 @@ spacing	250.0
 sideLength	20000
 personsPerLoc	50
 linkCapacity	400
-scoringBeta	-0.0005
 varTastes	0.0000004
 scoreElementDistance	0.0
 scoreElementTastes	0.0

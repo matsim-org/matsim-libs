@@ -59,7 +59,7 @@ public class MixedActivityScoringFunction extends LocationChoiceScoringFunction 
 		this.facilities = facilities;
 		this.configReader = configReader;
 		this.config = config;
-		this.destinationChoiceScoring = new DestinationChoiceScoring(this.random, this.facilities, this.configReader);
+		this.destinationChoiceScoring = new DestinationChoiceScoring(this.random, this.facilities, this.configReader, this.config);
 	}
 	
 	@Override

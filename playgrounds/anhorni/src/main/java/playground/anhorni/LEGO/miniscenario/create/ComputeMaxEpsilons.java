@@ -6,6 +6,7 @@ import java.util.TreeMap;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.core.config.Config;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -19,13 +20,13 @@ public class ComputeMaxEpsilons extends AbstractMultithreadedModule {
 	private DestinationChoiceScoring scorer;
 	private ConfigReader configReader;
 	
-	public ComputeMaxEpsilons(int numOfThreads, ScenarioImpl scenario, String type, ConfigReader configReader) {
+	public ComputeMaxEpsilons(int numOfThreads, ScenarioImpl scenario, String type, ConfigReader configReader, Config config) {
 		super(numOfThreads);
 		this.scenario = scenario;
 		this.type = type;
 		this.configReader = configReader;
 		this.typedFacilities = this.scenario.getActivityFacilities().getFacilitiesForActivityType(type);
-		this.scorer = new DestinationChoiceScoring(new Random(), this.scenario.getActivityFacilities(), configReader);	
+		this.scorer = new DestinationChoiceScoring(new Random(), this.scenario.getActivityFacilities(), configReader, config);	
 	}
 
 	@Override

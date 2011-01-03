@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.ActivityOptionImpl;
@@ -45,6 +46,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.locationchoice.utils.ActTypeConverter;
@@ -85,26 +87,30 @@ public class AdaptZHScenario {
 	private void run() {	
 		ConfigReader configReader = new ConfigReader();
 		configReader.read();
+		
+		ScenarioImpl scenario = new ScenarioLoaderImpl("src/main/java/playground/anhorni/input/zh10Pct/config.xml").getScenario();
+		Config config = scenario.getConfig();
+		
 		log.info("Handling heterogeneity ...");
 		
 		RandomFromVarDistr rnd = new RandomFromVarDistr();
 		rnd.setSeed(this.seed);
 		
-		HandleUnobservedHeterogeneity hhandler = new HandleUnobservedHeterogeneity(this.scenario, configReader, rnd);
+		HandleUnobservedHeterogeneity hhandler = new HandleUnobservedHeterogeneity(this.scenario, configReader, rnd, config);
 		hhandler.assign(); 
 		log.info("Adding opening times to facilities ...");
 		this.addOpeningTimes();
 		log.info("Adapting plans ...");
 		this.adaptPlans();
 		
-		ComputeMaxEpsilons maxEpsilonComputer = new ComputeMaxEpsilons(10, scenario, "s", configReader);
+		ComputeMaxEpsilons maxEpsilonComputer = new ComputeMaxEpsilons(10, scenario, "s", configReader, config);
 		maxEpsilonComputer.prepareReplanning();
 		for (Person p : this.scenario.getPopulation().getPersons().values()) {
 			maxEpsilonComputer.handlePlan(p.getSelectedPlan());
 		}
 		maxEpsilonComputer.finishReplanning();
 		
-		maxEpsilonComputer = new ComputeMaxEpsilons(10, scenario, "l", configReader);
+		maxEpsilonComputer = new ComputeMaxEpsilons(10, scenario, "l", configReader, config);
 		maxEpsilonComputer.prepareReplanning();
 		for (Person p : this.scenario.getPopulation().getPersons().values()) {
 			maxEpsilonComputer.handlePlan(p.getSelectedPlan());

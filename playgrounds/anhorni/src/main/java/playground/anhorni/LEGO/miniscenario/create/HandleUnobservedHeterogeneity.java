@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
@@ -45,18 +46,18 @@ public class HandleUnobservedHeterogeneity {
 	private ScenarioImpl scenario;	
 	private ConfigReader configReader;
 	private RandomFromVarDistr rnd;
-//	private double b;
+	private Config config;
 	private final static Logger log = Logger.getLogger(HandleUnobservedHeterogeneity.class);
 			
-	public HandleUnobservedHeterogeneity(ScenarioImpl scenario, ConfigReader configReader, RandomFromVarDistr rnd) {		
+	public HandleUnobservedHeterogeneity(ScenarioImpl scenario, ConfigReader configReader, RandomFromVarDistr rnd, Config config) {		
 		this.scenario = scenario;
 		this.configReader = configReader;
 		this.rnd = rnd;
-//		b = this.configReader.getMaxDistance();
+		this.config = config;
 	}
 	
 	public void assign() {				
-		double beta = configReader.getBeta();
+		double beta = Double.parseDouble(config.locationchoice().getSearchSpaceBeta());
 		double utVarEpsilon = 1.0;	// utMeanEpsilon = 0.0;
 		this.assignPersonsTastes(beta, configReader.getVarTastes());
 		this.assignKValuesPersons(0.5 * utVarEpsilon);
@@ -69,7 +70,8 @@ public class HandleUnobservedHeterogeneity {
 			if (((PersonImpl)p).getDesires() == null) {
 				((PersonImpl)p).createDesires("");
 			}
-			((PersonImpl)p).getDesires().setDesc(String.valueOf(rnd.getGaussian(configReader.getBeta(), Math.sqrt(var))));
+			((PersonImpl)p).getDesires().setDesc(String.valueOf(rnd.getGaussian(
+					Double.parseDouble(config.locationchoice().getSearchSpaceBeta()), Math.sqrt(var))));
 		}
 	}
 	
@@ -106,7 +108,7 @@ public class HandleUnobservedHeterogeneity {
 		int counter = 0;
 		int nextMsg = 1;
 		
-		DestinationChoiceScoring scorer = new DestinationChoiceScoring(new Random(), this.scenario.getActivityFacilities(), configReader);	
+		DestinationChoiceScoring scorer = new DestinationChoiceScoring(new Random(), this.scenario.getActivityFacilities(), configReader, this.config);	
 		log.info("Computing max epsilons for type: " + type + "...");
 		log.info(scenario.getActivityFacilities().getFacilitiesForActivityType(type).size() + " " + type + " facilities");
 		
@@ -143,56 +145,5 @@ public class HandleUnobservedHeterogeneity {
 			((PersonImpl)p).getDesires().setDesc(desiresDesc + "_" + maxEpsilon);
 		}
 	}
-}
-
-// old: --------------------------------------------------------------------------------------------
-	
-//	private double getScaleDistance(double utVarDistanceSoll) {
-//		return Math.sqrt(utVarDistanceSoll / (Math.pow(this.getBetaDistance(b), 2.0) * this.getVarianceDistance()));
-//	}
-	
-//	private double getVarianceTot() {
-//		double var = 1.0;
-//		if (configReader.getScoreElementDistance() > 0.00000001) {
-//			var += this.getVarShare(configReader.getScoreElementDistance());
-//		}
-//		return var;		
-//	}
-	
-//	private double getVarShare(double f) {
-//		return f / (1-f);
-//	}
-	
-//	private double getUtilityVarianceDue2Tastes(double b, double f) {
-//		if (f==0) return 0.0;
-//		
-//		double beta = this.getBetaDistance(b);
-//		
-//		return Math.pow(this.getExpectedValueDistance(), 2.0) * this.getVarianceOfTastes(b, f) +
-//			Math.pow(beta, 2.0) * this.getVarianceDistance() + 
-//			this.getVarianceDistance() * this.getVarianceOfTastes(b, f);
-//	}
-	
-//	//ok
-//	private double getExpectedValueDistance() {
-//		return (1.0 * this.b / 3.0);
-//	}
-//	
-//	//ok
-//	private double getVarianceDistance() {
-//		return (Math.pow(this.b, 2.0) / 18.0);
-//	}
-	
-//	private double getBetaDistance(double b) {
-//		return (- 2.0 / Math.pow(b, 2.0));
-//	}
-		
-//	private double getVarianceOfTastes(double b, double f) {
-//		if (f==0.0) return 0.0;
-//		
-//		double beta = this.getBetaDistance(b);
-//		 
-//		return (Math.pow(beta, 2.0) * this.getVarianceDistance() *(1 - f)) / 
-//			(f * (Math.pow(this.getExpectedValueDistance(), 2.0) + this.getVarianceDistance()));
-//	}	
+}	
 

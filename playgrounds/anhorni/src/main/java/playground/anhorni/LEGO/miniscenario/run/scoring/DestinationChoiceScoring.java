@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
@@ -38,11 +39,13 @@ public class DestinationChoiceScoring {
 	private Random rnd;
 	private ActivityFacilities facilities;
 	private ConfigReader configReader;
+	private Config config;
 	
-	public DestinationChoiceScoring(Random rnd, ActivityFacilities facilities , ConfigReader configReader) {
+	public DestinationChoiceScoring(Random rnd, ActivityFacilities facilities , ConfigReader configReader, Config config) {
 		this.rnd = rnd;
 		this.facilities = facilities;
 		this.configReader = configReader;
+		this.config = config;
 	}
 				
 	public double getDestinationScore(PlanImpl plan, ActivityImpl act, boolean distance) {
@@ -67,12 +70,14 @@ public class DestinationChoiceScoring {
 		double distance = ((CoordImpl)actPre.getCoord()).calcDistance(act.getCoord()) + 
 		((CoordImpl)act.getCoord()).calcDistance(actPost.getCoord()) - distanceDirect;
 		
+		double beta = Double.parseDouble(this.config.locationchoice().getSearchSpaceBeta());
+		
 		double utilityDistanceObserved = 0.0;
 		if (configReader.isLinearDistanceUtility()) {
-			utilityDistanceObserved = configReader.getBeta() * distance;
+			utilityDistanceObserved = beta * distance;
 		}
 		else {
-			utilityDistanceObserved = (-2.0) * Math.log(1.0 + distance * configReader.getBeta() * (-1.0));
+			utilityDistanceObserved = (-2.0) * Math.log(1.0 + distance * beta * (-1.0));
 		}
 		double utilityDistanceUnobserved = 0.0;		
 		if (configReader.getScoreElementTastes() > 0.000001) {

@@ -25,11 +25,13 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.core.config.Config;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.anhorni.LEGO.miniscenario.ConfigReader;
@@ -41,6 +43,7 @@ public class UtilitySampler {
 	private final static Logger log = Logger.getLogger(UtilitySampler.class);
 	private ScenarioImpl scenario = new ScenarioImpl();	
 	private ConfigReader configReader = new ConfigReader();
+	private Config config;
 	private Random rnd;
 		
 	public static void main(final String[] args) {
@@ -53,6 +56,10 @@ public class UtilitySampler {
 	
 	private void init() {
 		configReader.read();	
+		
+		ScenarioImpl scenario = new ScenarioLoaderImpl(configReader.getPath() + "input/config.xml").getScenario();
+		this.config = scenario.getConfig();
+		
 		this.rnd = new Random(4711);
 		MatsimPopulationReader populationReader = new MatsimPopulationReader(this.scenario);
 		populationReader.readFile(this.configReader.getPath() + "input/plans.xml");
@@ -61,7 +68,7 @@ public class UtilitySampler {
 	}
 
 	private void run() {	
-		DestinationChoiceScoring scorer = new DestinationChoiceScoring(this.rnd, this.scenario.getActivityFacilities(), this.configReader);
+		DestinationChoiceScoring scorer = new DestinationChoiceScoring(this.rnd, this.scenario.getActivityFacilities(), this.configReader, config);
 		
 		int counter = 0;
 		int nextMsg = 1;

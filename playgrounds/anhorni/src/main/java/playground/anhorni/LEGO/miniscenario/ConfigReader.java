@@ -35,9 +35,7 @@ public class ConfigReader {
 	private int personsPerLocation = 0;
 	private double linkCapacity = 0.0;
 	
-	private double beta = 0.0;
 	private double varTastes = 0.0;
-	
 	private double scoreElementDistance = 0.0;	
 	private double scoreElementTastes = 0.0;
 	private double scoreElementFLoad = 0.0;
@@ -76,12 +74,7 @@ public class ConfigReader {
           parts = line.split("\t");
           this.linkCapacity = Double.parseDouble(parts[1]);
           log.info("link capacity: " + linkCapacity);
-                    
-          line = bufferedReader.readLine();
-          parts = line.split("\t");
-          this.beta = Double.parseDouble(parts[1]);
-          log.info("Beta: " + beta);
-          
+                              
           line = bufferedReader.readLine();
           parts = line.split("\t");
           this.varTastes = Double.parseDouble(parts[1]);
@@ -155,10 +148,6 @@ public class ConfigReader {
 
 	public double getLinkCapacity() {
 		return linkCapacity;
-	}
-
-	public double getBeta() {
-		return beta;
 	}
 
 	public double getVarTastes() {
