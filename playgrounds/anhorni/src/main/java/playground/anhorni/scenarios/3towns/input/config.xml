@@ -1,0 +1,95 @@
+<?xml version="1.0" ?>
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd">
+<config>
+
+	<module name="global">
+		<param name="randomSeed" value="4711" />
+		<param name="coordinateSystem" value="Atlantis" />
+	</module>
+
+	<module name="network">
+		<param name="inputNetworkFile" value="src/main/java/playground/anhorni/scenarios/3towns/input/network.xml" />
+	</module>
+
+	<module name="facilities">
+		<param name="inputFacilitiesFile" value="src/main/java/playground/anhorni/scenarios/3towns/input/facilities.xml" />
+	</module>
+
+	<module name="plans">
+		<param name="inputPlansFile" value="src/main/java/playground/anhorni/scenarios/3towns/input/plans/plans.xml" />
+	</module>
+
+	<module name="controler">
+		<param name="outputDirectory" value="src/main/java/playground/anhorni/scenarios/3towns/output/" />
+		<param name="firstIteration" value="0" />
+		<param name="lastIteration" value="1" />		
+		<param name="runId" value="id" />
+	</module>
+	
+	<module name="counts" >
+		<param name="countsScaleFactor" value="1" />
+		<param name="inputCountsFile" value="src/main/java/playground/anhorni/scenarios/3towns/input/counts.xml" />
+		<param name="outputformat" value="all" />
+	</module>
+
+	<module name="simulation">
+		<!-- "start/endTime" of MobSim (00:00:00 == take earliest activity time/ run as long as active vehicles exist) -->
+		<param name="startTime" value="00:00:00" />
+		<param name="endTime" value="00:00:00" />
+	
+		<param name = "snapshotperiod"	value = "00:00:00"/> <!-- 00:00:00 means NO snapshot writing -->
+		<param name = "snapshotFormat"	value = "netvis"/> <!-- netvis, googleearth, transims -->
+	</module>
+
+	<module name="planCalcScore">
+		<param name="learningRate" value="1.0" />
+		<param name="BrainExpBeta" value="2.0" />
+
+		<param name="lateArrival" value="-18" />
+		<param name="earlyDeparture" value="-0" />
+		<param name="performing" value="+6" />
+		<param name="traveling" value="-6" />
+		<param name="waiting" value="-0" />
+		
+		<param name="activityType_0"            value="h" /> <!-- home -->
+		<param name="activityPriority_0"        value="1" />
+		<param name="activityTypicalDuration_0" value="12:00:00" />
+		<param name="activityMinimalDuration_0" value="08:00:00" />
+	
+		<param name="activityType_1"            value="w" /> <!-- work -->
+		<param name="activityPriority_1"        value="1" />
+		<param name="activityTypicalDuration_1" value="09:50:00" />
+		<param name="activityMinimalDuration_1" value="07:00:00" />
+		<param name="activityOpeningTime_1"     value="07:00:00" />
+		<param name="activityClosingTime_1"     value="22:00:00" />
+		
+		<param name="activityType_2"            value="sh" /> <!-- shop in home town -->
+		<param name="activityPriority_2"        value="1" />
+		<param name="activityTypicalDuration_2" value="00:30:00" />
+		<param name="activityMinimalDuration_2" value="00:10:00" />
+		<param name="activityOpeningTime_2"     value="09:00:00" />
+		<param name="activityClosingTime_2"     value="18:30:00" />
+		
+		<param name="activityType_3"            value="sc" /> <!-- shop in the city -->
+		<param name="activityPriority_3"        value="1" />
+		<param name="activityTypicalDuration_3" value="01:30:00" />
+		<param name="activityMinimalDuration_3" value="00:45:00" />
+		<param name="activityOpeningTime_3"     value="09:00:00" />
+		<param name="activityClosingTime_3"     value="20:00:00" />
+		
+	</module>
+	
+	<module name="strategy">
+		<param name="maxAgentPlanMemorySize" value="5" /> <!-- 0 means unlimited -->
+
+		<param name="ModuleProbability_1" value="0.8" />
+		<param name="Module_1" value="SelectExpBeta" />	
+
+		<param name="ModuleProbability_2" value="0.1" />
+		<param name="Module_2" value="ReRoute" />
+		
+		<param name="ModuleProbability_3" value="0.1" />
+		<param name="Module_3" value="TimeAllocationMutator" />
+	</module>
+
+</config>
