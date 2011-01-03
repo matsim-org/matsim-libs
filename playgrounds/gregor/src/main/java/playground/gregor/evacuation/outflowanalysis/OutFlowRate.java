@@ -101,15 +101,15 @@ public class OutFlowRate implements AgentArrivalEventHandler {
 
 	public static void main(final String[] args) {
 
-		int run = 1003;
-		String baseDir = "/home/laemmel/arbeit/svn/runs-svn/run" + run + "/output/ITERS";
-		String baseOutput = "/home/laemmel/arbeit/svn/runs-svn/run" + run + "/analysis/";
+		int run = 1359;
+		String baseDir = "/Users/laemmel/svn/runs-svn/run" + run + "/output/ITERS";
+		String baseOutput = "/Users/laemmel/svn/runs-svn/run" + run + "/analysis/";
 		ArrayList<Integer> its = new ArrayList<Integer>();
 		// its.add(0); its.add(1); its.add(10); its.add(50); its.add(100);
 		// its.add(200);
 		// its.add(0);
-		its.add(1000);
-
+		its.add(0);
+		its.add(500);
 		for (int it : its) {
 			String input = baseDir + "/it." + it + "/" + it + ".events.txt.gz";
 			String output = baseOutput + "/" + run + "it." + it + ".outflow.txt";
