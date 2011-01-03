@@ -51,9 +51,8 @@ public class CreatePopulation {
 		
 		log.info("Finishing plans ...");
 		this.finishPlans();
-		if (!(configReader.getScoreElementTT() > 0.00000001)) {
-				this.removeNonAnalysisPersons();
-		}	
+		this.removeNonAnalysisPersons();
+			
 		ComputeMaxEpsilons maxEpsilonComputer = new ComputeMaxEpsilons(10, scenario, "shop", configReader);
 		maxEpsilonComputer.prepareReplanning();
 		for (Person p : this.scenario.getPopulation().getPersons().values()) {

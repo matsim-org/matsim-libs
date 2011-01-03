@@ -38,7 +38,6 @@ public class ConfigReader {
 	private double beta = 0.0;
 	private double varTastes = 0.0;
 	
-	private double scoreElementTT = 0.0;
 	private double scoreElementDistance = 0.0;	
 	private double scoreElementTastes = 0.0;
 	private double scoreElementFLoad = 0.0;
@@ -87,12 +86,7 @@ public class ConfigReader {
           parts = line.split("\t");
           this.varTastes = Double.parseDouble(parts[1]);
           log.info("variance of distance tastes: " + varTastes);
-                   
-          line = bufferedReader.readLine();
-          parts = line.split("\t");
-          this.scoreElementTT = Double.parseDouble(parts[1]);
-          log.info("Score share tt: " + scoreElementTT);
-          
+                             
           line = bufferedReader.readLine();
           parts = line.split("\t");
           this.scoreElementDistance = Double.parseDouble(parts[1]);
@@ -177,10 +171,6 @@ public class ConfigReader {
 
 	public double getScoreElementTastes() {
 		return scoreElementTastes;
-	}
-
-	public double getScoreElementTT() {
-		return scoreElementTT;
 	}
 
 	public double getScoreElementFLoad() {
