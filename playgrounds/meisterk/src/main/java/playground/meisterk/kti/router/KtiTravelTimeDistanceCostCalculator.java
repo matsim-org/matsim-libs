@@ -20,6 +20,7 @@
 
 package playground.meisterk.kti.router;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
@@ -46,7 +47,7 @@ public class KtiTravelTimeDistanceCostCalculator implements TravelMinCost, Perso
 //		this.marginalUtlOfDistance = ktiConfigGroup.getDistanceCostCar()/1000.0 * cnScoringGroup.getMarginalUtlOfDistanceCar();
 		this.marginalUtlOfDistance = ktiConfigGroup.getDistanceCostCar()/1000.0 * cnScoringGroup.getMonetaryDistanceCostRateCar() 
 		   * cnScoringGroup.getMarginalUtilityOfMoney() ;
-		throw new RuntimeException("this is the exact translation but I don't know what it means maybe check.  kai, dec'10") ;
+		Logger.getLogger(this.getClass()).warn("this is the exact translation but I don't know what it means maybe check.  kai, dec'10") ;
 	}
 
 	public double getLinkMinimumTravelCost(Link link) {
