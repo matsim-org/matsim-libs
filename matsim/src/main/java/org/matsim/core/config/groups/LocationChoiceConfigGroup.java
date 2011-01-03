@@ -51,6 +51,7 @@ public class LocationChoiceConfigGroup extends Module {
 	private static final String TT = "travelTimes";
 	private static final String SEARCHSPACEBETA = "searchSpaceBeta";
 	private static final String MAXRADIUS = "maxSearchSpaceRadius";
+	private static final String PLANSELECTOR = "planSelector";
 
 	//default values
 	private String constrained = "false";
@@ -71,6 +72,7 @@ public class LocationChoiceConfigGroup extends Module {
 	private String travelTimes = "true";
 	private String searchSpaceBeta = "0.0001";
 	private String maxSearchSpaceRadius = "-1.0";
+	private String planSelector = "SelectExpBeta";
 
 	private final static Logger log = Logger.getLogger(LocationChoiceConfigGroup.class);
 
@@ -131,6 +133,9 @@ public class LocationChoiceConfigGroup extends Module {
 		}
 		if (MAXRADIUS.equals(key)) {
 			return getMaxSearchSpaceRadius();
+		}
+		if (PLANSELECTOR.equals(key)) {
+			return getPlanSelector();
 		}
 		throw new IllegalArgumentException(key);
 	}
@@ -248,6 +253,13 @@ public class LocationChoiceConfigGroup extends Module {
 			}
 		} else if (MAXRADIUS.equals(key)) {
 			setMaxSearchSpaceRadius(value);
+		} else if (PLANSELECTOR.equals(key)) {
+			if (!(value.equals("BestScore") || value.equals("SelectExpBeta") || value.equals("ChangeExpBeta") || value.equals("SelectRandom"))) {
+				log.warn("set a valid plan selector for location choice. Set to default value 'SelectExpBeta' now");
+			}
+			else {
+				setPlanSelector(value);
+			}
 		}
 		else
 		{
@@ -275,6 +287,7 @@ public class LocationChoiceConfigGroup extends Module {
 		this.addParameterToMap(map, TT);
 		this.addParameterToMap(map, SEARCHSPACEBETA);
 		this.addParameterToMap(map, MAXRADIUS);
+		this.addParameterToMap(map, PLANSELECTOR);
 		return map;
 	}
 
@@ -380,5 +393,11 @@ public class LocationChoiceConfigGroup extends Module {
 	}
 	public void setMaxSearchSpaceRadius(String maxSearchSpaceRadius) {
 		this.maxSearchSpaceRadius = maxSearchSpaceRadius;
+	}
+	public String getPlanSelector() {
+		return planSelector;
+	}
+	public void setPlanSelector(String planSelector) {
+		this.planSelector = planSelector;
 	}
 }

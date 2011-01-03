@@ -178,7 +178,16 @@ public final class StrategyManagerConfigLoader {
 			} else if (name.equals("SelectPathSizeLogit")) {
 				strategy = new PlanStrategyImpl(new PathSizeLogitSelector(controler.getNetwork(), config.charyparNagelScoring()));
 			} else if (name.equals("LocationChoice")) {
-				strategy = new PlanStrategyImpl(new ExpBetaPlanSelector(config.charyparNagelScoring()));
+				String planSelector = config.locationchoice().getPlanSelector();
+				if (planSelector.equals("BestScore")) {
+					strategy = new PlanStrategyImpl(new BestPlanSelector());					
+				} else if (planSelector.equals("ChangeExpBeta")) {
+					strategy = new PlanStrategyImpl(new ExpBetaPlanChanger(config.charyparNagelScoring().getBrainExpBeta()));
+				} else if (planSelector.equals("SelectRandom")) {
+					strategy = new PlanStrategyImpl(new RandomPlanSelector());
+				} else {
+					strategy = new PlanStrategyImpl(new ExpBetaPlanSelector(config.charyparNagelScoring()));
+				}
 				strategy.addStrategyModule(new LocationChoice(controler.getNetwork(), controler, (controler.getScenario()).getKnowledges()));
 				strategy.addStrategyModule(new ReRoute(controler));
 				strategy.addStrategyModule(new TimeAllocationMutator(config));
