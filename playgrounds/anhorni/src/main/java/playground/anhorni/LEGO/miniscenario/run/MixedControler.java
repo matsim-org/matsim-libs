@@ -25,7 +25,6 @@ import org.matsim.core.controler.Controler;
 
 import playground.anhorni.LEGO.miniscenario.ConfigReader;
 import playground.anhorni.LEGO.miniscenario.run.analysis.CalculatePlanTravelStats;
-import playground.anhorni.LEGO.miniscenario.run.scoring.DestinationChoicePreviousScoreComputer;
 import playground.anhorni.LEGO.miniscenario.run.scoring.MixedScoringFunctionFactory;
 
 
@@ -53,16 +52,13 @@ public class MixedControler extends Controler {
       if (!(configReader.getScoreElementFLoad() > 0.00000001)) {
     	  this.getConfig().setParam("locationchoice", "restraintFcnFactor", "0.0");
       }
-      
-      DestinationChoicePreviousScoreComputer previousScoreComputer = new DestinationChoicePreviousScoreComputer();
-      
+           
       MixedScoringFunctionFactory mixedScoringFunctionFactory =
-			new MixedScoringFunctionFactory(this.config.charyparNagelScoring(), this, this.configReader, previousScoreComputer);
+			new MixedScoringFunctionFactory(this.config.charyparNagelScoring(), this, this.configReader);
   	
 		this.setScoringFunctionFactory(mixedScoringFunctionFactory);
 		//this.addControlerListener(new FacilitiesLoadCalculator(this.getFacilityPenalties()));
 		this.addControlerListener(new CalculatePlanTravelStats(configReader, "best", "s"));
 		this.addControlerListener(new CalculatePlanTravelStats(configReader, "best", "l"));
-		//this.addControlerListener(previousScoreComputer);
 	}    
 }
