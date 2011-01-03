@@ -119,6 +119,8 @@
 	          <param name="travelTimes" value="true" />
 	          <param name="searchSpaceBeta" value="-0.0005" />
 	          <param name="maxSearchSpaceRadius" value="-1.0" />
+	          <param name="planSelector" value="BestScore" />
+	       <!--<param name="planSelector" value="SelectExpBeta" /> -->  
 	</module>
 
 	
