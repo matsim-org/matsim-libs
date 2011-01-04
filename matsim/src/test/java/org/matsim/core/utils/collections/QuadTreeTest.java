@@ -32,7 +32,7 @@ import java.util.Iterator;
 
 import junit.framework.TestCase;
 
-import org.jfree.util.Log;
+import org.apache.log4j.Logger;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 /**
@@ -41,6 +41,8 @@ import org.matsim.core.utils.geometry.CoordImpl;
  * @author mrieser
  */
 public class QuadTreeTest extends TestCase {
+
+	private final static Logger log = Logger.getLogger(QuadTreeTest.class);
 
 	/**
 	 * @return A simple QuadTree with 6 entries for tests.
@@ -494,7 +496,7 @@ public class QuadTreeTest extends TestCase {
 			fail("missing exception.");
 		}
 		catch (ConcurrentModificationException e) {
-			Log.info("catched expected exception: ", e);
+			log.info("catched expected exception: ", e);
 		}
 	}
 
@@ -583,6 +585,7 @@ public class QuadTreeTest extends TestCase {
 
 		public final Collection<Tuple<CoordImpl, String>> objects = new ArrayList<Tuple<CoordImpl, String>>();
 
+		@Override
 		public void execute(final double x, final double y, final String object) {
 			this.objects.add(new Tuple<CoordImpl, String>(new CoordImpl(x, y), object));
 		}
