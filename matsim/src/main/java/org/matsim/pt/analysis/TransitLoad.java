@@ -79,6 +79,7 @@ public class TransitLoad implements VehicleArrivesAtFacilityEventHandler, Vehicl
 		return getStopInformation(line, route, stopFacility.getId(), departure, false);
 	}
 
+	@Override
 	public void handleEvent(VehicleArrivesAtFacilityEvent event) {
 		this.vehicleFacilityMap.put(event.getVehicleId(), event.getFacilityId());
 		if (this.vehicleData == null) {
@@ -119,6 +120,7 @@ public class TransitLoad implements VehicleArrivesAtFacilityEventHandler, Vehicl
 		si.nOfLeaving++;
 	}
 
+	@Override
 	public void reset(int iteration) {
 		this.vehicleFacilityMap.clear();
 		if (this.vehicleData != null) {
