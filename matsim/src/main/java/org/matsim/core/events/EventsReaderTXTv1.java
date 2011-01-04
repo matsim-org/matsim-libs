@@ -116,12 +116,11 @@ public class EventsReaderTXTv1 implements MatsimSomeReader {
 	protected void parseLine(final String line) {
 		String[] result = StringUtils.explode(line, '\t', 7);
 		if (result.length == 7) {
-			Event data = createEvent(Double.parseDouble(result[0]), new IdImpl(result[1]),	// time
-					new IdImpl(result[3]),		// vehID
-					//Integer.parseInt(result[4]),		// nodeID
-					Integer.parseInt(result[5]),		// linkID
-					result[6],		// flag
-					"");		// description
+			Event data = createEvent(Double.parseDouble(result[0]), new IdImpl(result[1]),	// time, vehId
+					new IdImpl(result[3]),		// linkId
+					Integer.parseInt(result[5]),		// nodeId
+					result[6],		// description
+					"");		// unused
 			events.processEvent(data);
 		}
 	}
