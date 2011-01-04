@@ -81,14 +81,14 @@ public class RetailersLocationListener
   public void notifyIterationEnds(IterationEndsEvent event)
   {
     Retailer r;
-    int gravityModelIter = 0;
+    int modelIter = 0;
     String modelIterParam = this.controler.getConfig().findParam("Retailers", "modelIteration");
     if (modelIterParam == null) {
       log.warn("The iteration in which the model should be run has not been set, the model will be performed at the last iteration");
-      gravityModelIter = this.controler.getLastIteration();
+      modelIter = this.controler.getLastIteration();
     }
     else {
-      gravityModelIter = Integer.parseInt(modelIterParam);
+      modelIter = Integer.parseInt(modelIterParam);
     }
 
     int analysisFrequency = 0;
@@ -101,7 +101,7 @@ public class RetailersLocationListener
       analysisFrequency = Integer.parseInt(AnalysisFrequencyParam);
     }
 
-    if (event.getIteration() == gravityModelIter)
+    if (event.getIteration() == modelIter)
     {
       for (Iterator<Retailer> localIterator = this.retailers.getRetailers().values().iterator(); localIterator.hasNext(); ) { r = (Retailer)localIterator.next();
         this.rsw.write(r, event.getIteration(), this.cfc);
@@ -111,7 +111,7 @@ public class RetailersLocationListener
         new ReRoutePersons().run(r.getMovedFacilities(), this.controler.getNetwork(), persons, this.pcrl, this.controler.getFacilities());
       }
     }
-    if ((this.controler.getIterationNumber().intValue() != 0) && (this.controler.getIterationNumber().intValue() % analysisFrequency == 0) && (this.controler.getIterationNumber().intValue() != gravityModelIter) && (this.controler.getIterationNumber().intValue() != this.controler.getLastIteration()))
+    if ((this.controler.getIterationNumber().intValue() != 0) && (this.controler.getIterationNumber().intValue() % analysisFrequency == 0) && (this.controler.getIterationNumber().intValue() != modelIter) && (this.controler.getIterationNumber().intValue() != this.controler.getLastIteration()))
     {
     	log.info("Test1");
     	for (Iterator<Retailer> localIterator = this.retailers.getRetailers().values().iterator(); localIterator.hasNext(); ) { r = (Retailer)localIterator.next();

@@ -1,5 +1,6 @@
 package playground.ciarif.retailers.stategies;
 
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.TreeMap;
 import org.apache.log4j.Logger;
@@ -64,4 +65,11 @@ public class RetailerStrategyImpl
     availableLinks.putAll(freeLinks);
     return availableLinks;
   }
+
+public TreeMap<Id, ActivityFacilityImpl> moveFacilities(
+		TreeMap<Id, ActivityFacilityImpl> facilities,
+		ArrayList<LinkRetailersImpl> allowedLinks) {
+	// TODO Auto-generated method stub
+	return null;
+}
 }

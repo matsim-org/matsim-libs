@@ -44,8 +44,7 @@ public class Retailer
   public final boolean addStrategy(Controler controler, String strategyName)
   {
     if (strategyName.contains("randomRetailerStrategy")) {
-      this.strategy = new RandomRetailerStrategy();
-      //log.info("The retailer " + this.id + " is using a random Stategy");
+      this.strategy = new RandomRetailerStrategy(controler);
       return true;
     }
     if (strategyName.contains("maxLinkRetailerStrategy")) {
@@ -89,8 +88,7 @@ public class Retailer
   }
 
   public final void runStrategy(TreeMap<Id, LinkRetailersImpl> links) {
-	log.info("available Links are= " + links);
-	log.info("A " + this.strategy + " will be used");
+	
     this.movedFacilities = this.strategy.moveFacilities(this.facilities, links);
   }
 

@@ -71,7 +71,7 @@ public class MinTravelCostsModel extends RetailerModelImpl
       String linkId = (String)this.first.get(i);
       double scoreSum = 0.0D;
       LinkRetailersImpl link = new LinkRetailersImpl((Link)this.controler.getNetwork().getLinks().get(new IdImpl(linkId)), (NetworkImpl)this.controler.getNetwork(), Double.valueOf(0.0D), Double.valueOf(0.0D));
-      Collection<PersonPrimaryActivity> primaryActivities = Utils.getPersonPrimaryActivityQuadTree().get(link.getCoord().getX(), link.getCoord().getY(), 2000.0D);
+      Collection<PersonPrimaryActivity> primaryActivities = Utils.getPersonPrimaryActivityQuadTree().get(link.getCoord().getX(), link.getCoord().getY(), 3000.0D);
       
       
       for (PersonPrimaryActivity ppa : primaryActivities)
@@ -86,8 +86,8 @@ public class MinTravelCostsModel extends RetailerModelImpl
 
         LegImpl li = new LegImpl(TransportMode.car);
         li.setDepartureTime(0.0D);
-        log.info("fromLink " + link);
-        log.info("toLink " + (Link)this.controler.getNetwork().getLinks().get(ppa.getActivityLinkId()));
+        //log.info("fromLink " + link);
+        //log.info("toLink " + (Link)this.controler.getNetwork().getLinks().get(ppa.getActivityLinkId()));
         handleCarLeg(li, link, (Link)this.controler.getNetwork().getLinks().get(ppa.getActivityLinkId()), network, pcr, routeAlgo);
 
         Plan plan = this.controler.getPopulation().getFactory().createPlan();
@@ -98,8 +98,8 @@ public class MinTravelCostsModel extends RetailerModelImpl
         ScoringFunction scoringFunction = this.controler.getScoringFunctionFactory().createNewScoringFunction(plan);
         double score = getLegScore(li, scoringFunction);
 
-        log.info("Score: " + score);
-        log.info("Travel Time: " + li.getTravelTime() + ", Arrival Time: " + li.getArrivalTime() + ", Departure Time: " + li.getDepartureTime());
+        //log.info("Score: " + score);
+        //log.info("Travel Time: " + li.getTravelTime() + ", Arrival Time: " + li.getArrivalTime() + ", Departure Time: " + li.getDepartureTime());
         scoreSum += score;
       }
       link.setPotentialCustomers(scoreSum/primaryActivities.size());

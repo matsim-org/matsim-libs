@@ -4,61 +4,39 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.jfree.util.Log;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.MatsimRandom;
 
-import playground.balmermi.world.World;
-import playground.ciarif.retailers.data.FacilityRetailersImpl;
 import playground.ciarif.retailers.data.LinkRetailersImpl;
 import playground.ciarif.retailers.utils.Utils;
 
-public class RandomRetailerStrategy implements RetailerStrategy {
-	
-		public static final String NAME = "randomRetailerStrategy";
-	private Map<Id,ActivityFacility> movedFacilities = new TreeMap<Id,ActivityFacility>();
-	
-	public RandomRetailerStrategy () {
-		
+public class RandomRetailerStrategy extends RetailerStrategyImpl
+{
+
+	private TreeMap<Id, ActivityFacilityImpl> movedFacilities = new TreeMap<Id, ActivityFacilityImpl>();
+
+	public RandomRetailerStrategy(Controler controler) {
+		super(controler);
 	}
 	
-	final public Map<Id, ActivityFacility> moveFacilities(Map<Id, ActivityFacility> facilities, ArrayList<LinkRetailersImpl> allowedLinks) {
-		for (ActivityFacility f : facilities.values()) {
-			int rd = MatsimRandom.getRandom().nextInt(allowedLinks.size());
-			Link link =allowedLinks.get(rd);
-			Log.info("The link " + link.getId() + " has been added" );
-			Utils.moveFacility((ActivityFacilityImpl) f,link);
+	
+	public Map<Id, ActivityFacilityImpl> moveFacilities(Map<Id, ActivityFacilityImpl> facilities, TreeMap<Id, LinkRetailersImpl> freeLinks) 
+	{
+		log.info("available Links are= " + freeLinks);
+		log.info("The facilities are= " + facilities);
+		this.retailerFacilities=facilities;
+		for (ActivityFacilityImpl f : this.retailerFacilities.values()) 
+		{
+			int rd = MatsimRandom.getRandom().nextInt(freeLinks.size());
+			LinkRetailersImpl newLink =(LinkRetailersImpl) freeLinks.values().toArray()[rd];
+			LinkRetailersImpl oldLink = new LinkRetailersImpl(this.controler.getNetwork().getLinks().get(f.getLinkId()), controler.getNetwork(), 0.0, 0.0);
+			Utils.moveFacility((ActivityFacilityImpl) f,newLink);
+			freeLinks.put(oldLink.getId(),oldLink );
 			this.movedFacilities.put(f.getId(),f);
 		}
 		return this.movedFacilities;
 	}
-
-	public void moveRetailersFacilities(
-			Map<Id, FacilityRetailersImpl> facilities) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public ArrayList<LinkRetailersImpl> findAvailableLinks() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public Map<Id, ActivityFacility> moveFacilities(
-			Map<Id, ActivityFacility> facilities,
-			Map<Id, LinkRetailersImpl> links) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public Map<Id, ActivityFacilityImpl> moveFacilities(
-			Map<Id, ActivityFacilityImpl> facilities,
-			TreeMap<Id, LinkRetailersImpl> links) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 }
