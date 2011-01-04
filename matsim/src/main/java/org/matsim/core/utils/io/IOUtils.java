@@ -33,6 +33,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
 import java.util.List;
+import java.util.Locale;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -235,6 +236,25 @@ public class IOUtils {
 	public static BufferedWriter getBufferedWriter(final String filename) throws FileNotFoundException, IOException {
 		return getBufferedWriter(filename, Charset.forName("UTF8"));
 	}
+
+
+	/**
+	 * Tries to open the specified file for writing and returns a BufferedWriter for it.
+	 * If the filename ends with ".gz", data will be automatically gzip-compressed.
+	 * The data written will be encoded as UTF-8 (only relevant if you use Umlauts or
+	 * other characters not used in plain English). If the file already exists, content
+	 * will not be overwritten, but new content be appended to the file.
+	 *
+	 * @param filename The filename where to write the data.
+	 * @return BufferedWriter for the specified file.
+	 * @throws FileNotFoundException
+	 * @throws IOException
+	 */
+	public static BufferedWriter getAppendingBufferedWriter(final String filename) throws FileNotFoundException, IOException {
+		return getBufferedWriter(filename, Charset.forName("UTF8"), true);
+	}
+
+
 	/**
 	 * Tries to open the specified file for writing and returns a BufferedWriter for it.
 	 * If the filename ends with ".gz", data will be automatically gzip-compressed.
@@ -246,14 +266,52 @@ public class IOUtils {
 	 * @throws IOException
 	 */
 	public static BufferedWriter getBufferedWriter(final String filename, final Charset charset) throws FileNotFoundException, IOException {
+		return getBufferedWriter(filename, charset, false);
+	}
+
+
+	/**
+	 * Tries to open the specified file for writing and returns a BufferedWriter for it.
+	 * If the filename ends with ".gz", data will be automatically gzip-compressed. If
+	 * the file already exists, content will not be overwritten, but new content be
+	 * appended to the file.
+	 *
+	 * @param filename The filename where to write the data.
+	 * @param charset the encoding to use to write the file.
+	 * @return BufferedWriter for the specified file.
+	 * @throws FileNotFoundException
+	 * @throws IOException
+	 */
+	public static BufferedWriter getAppendingBufferedWriter(final String filename, final Charset charset) throws FileNotFoundException, IOException {
+		return getBufferedWriter(filename, charset, true);
+	}
+
+
+	/**
+	 * Tries to open the specified file for writing and returns a BufferedWriter for it.
+	 * If the filename ends with ".gz", data will be automatically gzip-compressed.
+	 *
+	 * @param filename The filename where to write the data.
+	 * @param charset the encoding to use to write the file.
+	 * @param append <code>true</code> if the file should be opened for appending, instead of overwriting
+	 * @return BufferedWriter for the specified file.
+	 * @throws FileNotFoundException
+	 * @throws IOException
+	 */
+	public static BufferedWriter getBufferedWriter(final String filename, final Charset charset, final boolean append) throws FileNotFoundException, IOException {
 		if (filename == null) {
 			throw new FileNotFoundException("No filename given (filename == null)");
 		}
-		if (filename.endsWith(GZ)) {
-			return new BufferedWriter(new OutputStreamWriter(new GZIPOutputStream(new FileOutputStream(filename)), charset));
+		if (filename.toLowerCase(Locale.ROOT).endsWith(GZ)) {
+			File f = new File(filename);
+			if (append && f.exists() && (f.length() > 0)) {
+				throw new IllegalArgumentException("Appending to an existing gzip-compressed file is not supported.");
+			}
+			return new BufferedWriter(new OutputStreamWriter(new GZIPOutputStream(new FileOutputStream(filename, append)), charset));
 		}
-		return new BufferedWriter(new OutputStreamWriter(new FileOutputStream (filename), charset));
+		return new BufferedWriter(new OutputStreamWriter(new FileOutputStream (filename, append), charset));
 	}
+
 
 	/**
 	 * Attempts to rename a file. The built-in method File.renameTo() often fails

@@ -259,4 +259,70 @@ public class IOUtilsTest {
 		Assert.assertEquals("File was not written with encoding UTF8.", crc1, crc2);
 	}
 
+	@Test
+	public void testGetBufferedWriter_overwrite() throws IOException {
+		String filename = this.utils.getOutputDirectory() + "test.txt";
+		BufferedWriter writer = IOUtils.getBufferedWriter(filename);
+		writer.write("aaa");
+		writer.close();
+		BufferedWriter writer2 = IOUtils.getBufferedWriter(filename);
+		writer2.write("bbb");
+		writer2.close();
+		BufferedReader reader = IOUtils.getBufferedReader(filename);
+		String line = reader.readLine();
+		Assert.assertEquals("bbb", line);
+	}
+
+	@Test
+	public void testGetBufferedWriter_append() throws IOException {
+		String filename = this.utils.getOutputDirectory() + "test.txt";
+		BufferedWriter writer = IOUtils.getAppendingBufferedWriter(filename);
+		writer.write("aaa");
+		writer.close();
+		BufferedWriter writer2 = IOUtils.getAppendingBufferedWriter(filename);
+		writer2.write("bbb");
+		writer2.close();
+		BufferedReader reader = IOUtils.getBufferedReader(filename);
+		String line = reader.readLine();
+		Assert.assertEquals("aaabbb", line);
+	}
+
+	@Test
+	public void testGetBufferedWriter_overwrite_gzipped() throws IOException {
+		String filename = this.utils.getOutputDirectory() + "test.txt.gz";
+		BufferedWriter writer = IOUtils.getBufferedWriter(filename);
+		writer.write("aaa");
+		writer.close();
+		BufferedWriter writer2 = IOUtils.getBufferedWriter(filename);
+		writer2.write("bbb");
+		writer2.close();
+		BufferedReader reader = IOUtils.getBufferedReader(filename);
+		String line = reader.readLine();
+		Assert.assertEquals("bbb", line);
+	}
+
+	@Test
+	public void testGetBufferedWriter_append_gzipped() throws IOException {
+		String filename = this.utils.getOutputDirectory() + "test.txt.gz";
+		BufferedWriter writer = IOUtils.getAppendingBufferedWriter(filename);
+		writer.write("aaa");
+		writer.close();
+		try {
+			IOUtils.getAppendingBufferedWriter(filename);
+			Assert.fail("expected exception.");
+		} catch (IllegalArgumentException e) {
+			log.info("Catched expected exception.", e);
+		}
+	}
+
+	@Test
+	public void testGetBufferedWriter_gzipped() throws IOException {
+		String filename = this.utils.getOutputDirectory() + "test.txt.gz";
+		BufferedWriter writer = IOUtils.getBufferedWriter(filename);
+		writer.write("12345678901234567890123456789012345678901234567890");
+		writer.close();
+		File file = new File(filename);
+		Assert.assertTrue("compressed file should be less than 50 bytes, but is " + file.length(), file.length() < 50);
+	}
+
 }
