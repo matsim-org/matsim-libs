@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AdaptedControler.java
+ * NodeLinksCounter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,40 +18,21 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mmoyo.ptRouterAdapted;
+package playground.mmoyo.utils;
 
-import java.io.IOException;
+import org.matsim.core.network.NetworkImpl;
 
-import org.matsim.core.config.Config;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.utils.misc.ConfigUtils;
+public class NodeLinksCounter {
 
-import playground.mmoyo.ptRouterAdapted.replanning.AdapContListener;
-
-/**
- * @author manuel
- * 
- * runs transit simulation with adapter router, loading it as a pluggablePlanStrategy
-  */
-public class SimWithAdapRouterLauncher {
-
-	public static void main(String[] args) throws IOException{
-		Config config;
-		if ( args.length==0 ) {
-			//config = ConfigUtils.loadConfig( "../playgrounds/mmoyo/test/input/playground/mmoyo/EquilCalibration/equil_config.xml" ) ;
-			config = ConfigUtils.loadConfig( "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/calibration/100plans_bestValues_config.xml" ) ;
-		} else {
-			config = ConfigUtils.loadConfig(args[0]);
-		}
-		
-		config.scenario().setUseTransit(true);  //just in case that it is not set in config file
-		config.scenario().setUseVehicles(true);
-
-		final Controler controler = new Controler(config);
-		controler.setCreateGraphs(true);
-		controler.setOverwriteFiles(true);
-		controler.setWriteEventsInterval(5); 
-		//controler.addControlerListener(new AdapContListener(controler)) ;
-		controler.run();
+	private void run(NetworkImpl net){
+		System.out.println("links: " + net.getLinks().size());
+		System.out.println("nodes: " + net.getNodes().size());
 	}
+	
+	public static void main(String[] args) {
+		String netFile = "../shared-svn/studies/countries/de/berlin-bvg09/pt/nullfall_berlin_brandenburg/input/pt_network.xml.gz";
+		NetworkImpl net = new DataLoader().readNetwork(netFile);
+		new NodeLinksCounter().run(net);
+	}
+
 }

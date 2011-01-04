@@ -53,7 +53,7 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
  */
 public class AdaptedTransitRouter extends TransitRouter {
 
-	public AdaptedTransitRouter(MyTransitRouterConfig myTRConfig, final TransitSchedule schedule) {   //creado una vez
+	public AdaptedTransitRouter(MyTransitRouterConfig myTRConfig, final TransitSchedule schedule) {
 		super(schedule, myTRConfig, new AdaptedTransitRouterNetworkTravelTimeCost(myTRConfig));
 		//attention : the transit network is created first in the upper class   with "this.adaptedTransitNetwork = buildNetwork()";
 	}

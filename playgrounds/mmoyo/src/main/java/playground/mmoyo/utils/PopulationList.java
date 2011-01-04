@@ -50,7 +50,7 @@ public class PopulationList {
 		if (args.length>0){
 			populationFile = args[0];
 		}else{
-			populationFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/calibration/inputPlans/normal_fast_minTra_routes.xml.gz";	
+			populationFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/calibration/bestValues_plans.xml.gz";	
 		}
 		System.out.println("counting population for population file: " + populationFile);
 		Population population = new DataLoader().readPopulation(populationFile);

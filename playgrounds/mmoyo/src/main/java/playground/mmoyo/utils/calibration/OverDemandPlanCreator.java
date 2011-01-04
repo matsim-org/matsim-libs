@@ -35,6 +35,7 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 
 import playground.mmoyo.utils.DataLoader;
+import playground.mmoyo.utils.FirstPlansExtractor;
 
 public class OverDemandPlanCreator {
 	private Population population;
@@ -93,19 +94,27 @@ public class OverDemandPlanCreator {
 	public static void main(String[] args) {
 		String networkFile = "../shared-svn/studies/countries/de/berlin-bvg09/pt/nullfall_berlin_brandenburg/input/network_multimodal.xml.gz";
 
-		String popFile ="../playgrounds/mmoyo/output/doubPlan/routedPlan_walk10.0_dist0.0_tran1200.0.xml.gz";
-		String outPlanFile = "../playgrounds/mmoyo/output/doubPlan/doubledPlan_walk10.0_dist0.0_tran1200.0.xml.gz";
+		String popFile ="../playgrounds/mmoyo/output/cadyts/matsim_adapted_mintransfer_1home.xml.gz";
+		//String outPlanFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/calibration/inputPlans/Dbl_normal_fast_minTra_routes_3home.xml.gz";
 
-		//String planFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/calibration/1plan.xml";
+		//String popFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/calibration/1plan.xml";
 		//String outPlanFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/calibration/inputPlans/double1_plan.xml";
 
 		ScenarioImpl scn = new DataLoader().readNetwork_Population(networkFile, popFile);
-		Population multPop = new OverDemandPlanCreator(scn.getPopulation()).run(2,1);
+		PopulationWriter popWriter;
+		final Population scnPopulation= scn.getPopulation();
+		
+		//write the plan with over demand
+		String outPlanFile = "../playgrounds/mmoyo/output/cadyts/matsim_adapted_mintransfer_1homeCloned.xml.gz";
+		Population multPop = new OverDemandPlanCreator(scnPopulation).run(1,0);
+		popWriter= new PopulationWriter(multPop, scn.getNetwork());
+		popWriter.write(outPlanFile);
 
-		// write plan
-		System.out.println("writing output plan file...");
-		new PopulationWriter(multPop, scn.getNetwork()).write(outPlanFile);
-		System.out.println("Done");
+		//write a sample
+		popWriter = new PopulationWriter(new FirstPlansExtractor().run(multPop),scn.getNetwork());
+		popWriter.write("../playgrounds/mmoyo/output/cadyts/samplePlans.xml") ;
+
+		
 	}
 
 }

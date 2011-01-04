@@ -18,7 +18,7 @@ import playground.mmoyo.Validators.PlanValidator;
 
 /**Reads a plan file, selects the first plans and creates a new plan file with them*/ 
 public class FirstPlansExtractor {
-	final int agentNum=100;
+	final int agentNum=2;
 	private boolean selectPlan_act = true;   //select only plans whose first and last activities are the same type.
 	private boolean selectBuslines = false;  //select only plans with pt legs that have the mentioned transit routes.
 
@@ -54,7 +54,7 @@ public class FirstPlansExtractor {
 		if (args.length==1){
 			configFile= args[0];
 		}else{
-			configFile= "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/calibration/bestValues_config.xml";
+			configFile= "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/calibration/100plans_bestValues_config.xml";
 		}
 		
 		ScenarioLoaderImpl scenarioLoader = new ScenarioLoaderImpl(configFile);
@@ -64,7 +64,7 @@ public class FirstPlansExtractor {
 		System.out.println(scenario.getConfig().plans().getInputFile());
 		System.out.println("writing output plan file...");
 		PopulationWriter popwriter = new PopulationWriter(new FirstPlansExtractor().run(scenario.getPopulation()),scenario.getNetwork());
-		popwriter.write(scenario.getConfig().controler().getOutputDirectory() + "Berlin5x_onlyCorrectActs.xml") ;
+		popwriter.write(scenario.getConfig().controler().getOutputDirectory() + "2plans.xml") ;
 		System.out.println("done");
 	}
 }

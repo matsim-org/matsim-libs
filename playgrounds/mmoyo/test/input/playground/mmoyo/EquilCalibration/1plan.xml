@@ -3,13 +3,13 @@
 <plans>
 	<person id="1">
 	<plan>
-		<act type="h" x="-25000" y="0" link="1" end_time="06:00" />
+		<act type="h" link="1" x="-25000" y="0" start_time="00:00:00" end_time="06:00:00" />
 		<leg mode="pt">
 		</leg>
-		<act type="w" x="10000" y="0" link="20" dur="00:10" />
+		<act type="w" link="20" x="10000" y="0"  start_time="08:00:00" dur="06:00:00" />
 		<leg mode="pt">
 		</leg>
-		<act type="h" x="-25000" y="0" link="1" />
+		<act type="h" link="1" x="-25000" y="0"  start_time="18:00:00"/>
 	</plan>
 </person>
 </plans>

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AdaptedControler.java
+ * ModeEnumerator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,40 +18,51 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mmoyo.ptRouterAdapted;
+package playground.mmoyo.utils;
 
-import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.matsim.core.config.Config;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.utils.misc.ConfigUtils;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 
-import playground.mmoyo.ptRouterAdapted.replanning.AdapContListener;
+public class ModeEnumerator {
+	Population population;
+	
+	public ModeEnumerator (Population population){
+		this.population = population;
+	}
 
-/**
- * @author manuel
- * 
- * runs transit simulation with adapter router, loading it as a pluggablePlanStrategy
-  */
-public class SimWithAdapRouterLauncher {
-
-	public static void main(String[] args) throws IOException{
-		Config config;
-		if ( args.length==0 ) {
-			//config = ConfigUtils.loadConfig( "../playgrounds/mmoyo/test/input/playground/mmoyo/EquilCalibration/equil_config.xml" ) ;
-			config = ConfigUtils.loadConfig( "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/calibration/100plans_bestValues_config.xml" ) ;
-		} else {
-			config = ConfigUtils.loadConfig(args[0]);
+	public void run(){
+		List<String> modeList = new ArrayList<String>();
+		for (Person person : this.population.getPersons().values()){
+			for (Plan plan : person.getPlans()){
+				for (PlanElement pe : plan.getPlanElements()){
+					if ((pe instanceof Leg)) {
+						String mode = ((Leg)pe).getMode();
+						if (!modeList.contains(mode)){
+							modeList.add(mode);
+						}
+					}
+				}
+			}
+		}		
+		
+		//show modes
+		for (String mode: modeList){
+			System.out.println(mode);
 		}
 		
-		config.scenario().setUseTransit(true);  //just in case that it is not set in config file
-		config.scenario().setUseVehicles(true);
-
-		final Controler controler = new Controler(config);
-		controler.setCreateGraphs(true);
-		controler.setOverwriteFiles(true);
-		controler.setWriteEventsInterval(5); 
-		//controler.addControlerListener(new AdapContListener(controler)) ;
-		controler.run();
 	}
+		
+	public static void main(String[] args) {
+		String populationFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/calibration/inputPlans/doubleMinTransfersRoutes_plan2.xml.gz";
+		Population population = new DataLoader().readPopulation(populationFile);
+		new ModeEnumerator(population).run();
+	}
+	
 }
+

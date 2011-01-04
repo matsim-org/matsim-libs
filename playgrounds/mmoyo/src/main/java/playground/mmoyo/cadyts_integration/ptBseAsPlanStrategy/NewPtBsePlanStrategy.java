@@ -63,6 +63,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import playground.mmoyo.cadyts_integration.ptBseAsPlanStrategy.analysis.PtBseCountsComparisonAlgorithm;
 import playground.mmoyo.cadyts_integration.ptBseAsPlanStrategy.analysis.PtBseOccupancyAnalyzer;
+import playground.mmoyo.utils.DataLoader;
 import cadyts.interfaces.matsim.MATSimUtilityModificationCalibrator;
 import cadyts.measurements.SingleLinkMeasurement;
 import cadyts.measurements.SingleLinkMeasurement.TYPE;
@@ -86,8 +87,8 @@ AfterMobsimListener  {
 	private final Counts boardCounts = new Counts();
 	private final Counts alightCounts = new Counts();
 	private PtBseOccupancyAnalyzer ptBseOccupAnalyzer;
-		
-
+	static TransitSchedule trSched ;
+	
 	public NewPtBsePlanStrategy( Controler controler ) {
 		// IMPORTANT: Do not change this constructor.  It needs to be like this in order to be callable as a "Module"
 		// from the config file.  kai/manuel, dec'10
@@ -100,42 +101,34 @@ AfterMobsimListener  {
 		this.controler = controler ;
 		
 		// add "this" to the events channel so that reset is called between iterations
-		controler.getEvents().addHandler( this ) ;
-		controler.addControlerListener(this) ;
+		this.controler.getEvents().addHandler( this ) ;
+		this.controler.addControlerListener(this) ;
 
 		// set up the bus occupancy analyzer    <- no more. a PtBseOccupancyAnalyzer object comes above as parameter
-		PtBseOccupancyAnalyzer ptBseOccupAnalyzer = new PtBseOccupancyAnalyzer();
-		controler.getEvents().addHandler(ptBseOccupAnalyzer);
-		
-		// this collects events and generates cadyts plans from it
-		PtPlanToPlanStepBasedOnEvents ptStep = new PtPlanToPlanStepBasedOnEvents( controler.getScenario() , ptBseOccupAnalyzer ) ;
-		controler.getEvents().addHandler( ptStep ) ;
-		
-		//fill  the linkId_stopId_Map  that stores the relation link -> stop
-		// yyyy if we move the bus stop id's, this is no longer needed.  kai, oct'10
-//LINK		this.transitSchedule = controler.getScenario().getTransitSchedule();
-//LINK		this.linkId_stopId_Map = new TreeMap<Id, Id>();
-//LINK		for (TransitStopFacility trStopFac : this.transitSchedule.getFacilities().values()){
-//LINK			this.linkId_stopId_Map.put(trStopFac.getLinkId(), trStopFac.getId());
-//LINK	}
+		this.ptBseOccupAnalyzer = new PtBseOccupancyAnalyzer();
+		this.controler.getEvents().addHandler(ptBseOccupAnalyzer);
 
+		// this collects events and generates cadyts plans from it
+		PtPlanToPlanStepBasedOnEvents ptStep = new PtPlanToPlanStepBasedOnEvents( this.controler.getScenario() , ptBseOccupAnalyzer ) ;
+		this.controler.getEvents().addHandler( ptStep ) ;
+		
 		// prepare resultsContainer. 
 		this.simResults = new SimResultsContainerImpl( ptBseOccupAnalyzer );
 		
 		// build the calibrator.  This is a static method, and in consequence has no side effects
-		this.calibrator = buildCalibrator( controler.getScenario() );
-
+		this.calibrator = buildCalibrator( this.controler.getScenario() );
+		
 		// finally, we create the PlanStrategy, with the bse-based plan selector:
 		this.delegate = new PlanStrategyImpl( new NewPtBsePlanChanger( ptStep, this.calibrator ) ) ;
 		
 		// NOTE: The coupling between calibrator and simResults is done in "reset".
 		
 		//read occup counts from file
-		String occupancyCountsFilename = controler.getConfig().findParam("ptCounts", "inputOccupancyCountsFile");
+		String occupancyCountsFilename = this.controler.getConfig().findParam("ptCounts", "inputOccupancyCountsFile");
 		if (occupancyCountsFilename != null) {
 			new MatsimCountsReader(this.occupCounts).readFile(occupancyCountsFilename);
 		}
-		countsScaleFactor = Double.parseDouble(controler.getConfig().getParam("ptCounts", "countsScaleFactor"));
+		countsScaleFactor = Double.parseDouble(this.controler.getConfig().getParam("ptCounts", "countsScaleFactor"));
 
 
 	}
@@ -206,9 +199,7 @@ AfterMobsimListener  {
 	
 	private static MATSimUtilityModificationCalibrator<TransitStopFacility> buildCalibrator(final Scenario sc) {
 			// made this method static so that there cannot be any side effects.  kai, oct'10
-			
 			Config config = sc.getConfig();
-			TransitSchedule trSched = ((ScenarioImpl) sc).getTransitSchedule() ;
 			
 			// get default regressionInertia
 			String regressionInertiaValue = config.findParam(NewPtBsePlanStrategy.BSE_MOD_NAME, "regressionInertia");
@@ -299,7 +290,6 @@ AfterMobsimListener  {
 			// Should be in Scenario or ScenarioImpl.  If it is not there, it should be added there.  kai, oct'10
 			
 			//add a module in config not in file but "in execution"
-			//reads occupancy counts data based on stops
 
 			String countsFilename = config.findParam(NewPtBsePlanStrategy.MODULE_NAME, "inputOccupancyCountsFile");
 			if ( countsFilename==null ) {
@@ -318,6 +308,10 @@ AfterMobsimListener  {
 			int arStartTime = Integer.parseInt(config.findParam(NewPtBsePlanStrategy.BSE_MOD_NAME, "startTime"));
 			int arEndTime = Integer.parseInt(config.findParam(NewPtBsePlanStrategy.BSE_MOD_NAME, "endTime"));
 	
+			//the trSchedule has not been read by the controler. it is loaded here
+			DataLoader loader = new DataLoader();
+			trSched = loader.readTransitSchedule(sc.getConfig().findParam("network", "inputNetworkFile"), sc.getConfig().findParam("transit", "transitScheduleFile"));
+
 			//add counts data into calibrator
 			for (Map.Entry<Id, Count> entry : occupCounts.getCounts().entrySet()) {
 				TransitStopFacility stop= trSched.getFacilities().get(entry.getKey());

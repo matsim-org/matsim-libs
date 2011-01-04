@@ -29,12 +29,12 @@
 	<module name="controler">
 		<param name="outputDirectory" value="../playgrounds/mmoyo/output" />
 		<param name="firstIteration" value="0" />
-		<param name="lastIteration" value="0" />
+		<param name="lastIteration" value="15" />
 	</module>
 
 	<module name="qsim" >
 		<param name="startTime" value="00:00:00" />
-		<param name="endTime" value="09:00:00" />
+		<param name="endTime" value="30:00:00" />
 		
 		<param name="snapshotperiod" value="00:00:00" />
 		<param name="snapshotFormat" value = "otfvis"/> 
@@ -73,11 +73,6 @@
 		<param name="activityEarliestEndTime_1" value="" />
 		<param name="activityClosingTime_1"     value="18:00:00" />
 	
-		<!-- Experiment of Manuel -->
-		<param name="activityType_2"        	value="transitInteraction" /> <!-- home -->
-		<param name="activityPriority_2"        value="1" />
-		<param name="activityTypicalDuration_2" value="00:00:02" />
-		<param name="activityMinimalDuration_2" value="00:00:02" />
 	
 	
 	</module>

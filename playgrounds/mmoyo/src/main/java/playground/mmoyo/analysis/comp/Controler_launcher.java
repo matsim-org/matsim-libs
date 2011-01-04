@@ -57,6 +57,12 @@ public class Controler_launcher {
 		controler.setCreateGraphs(true);
 		controler.setOverwriteFiles(true);
 		controler.setWriteEventsInterval(5); 
+		
+		int a=1,b=2;
+		if (a!=b) {
+			throw new RuntimeException("trSched.getFacilities().size() "  + (controler.getScenario().getTransitSchedule().getFacilities().size()) );
+		}	
+		
 		controler.run();
 	} 
 }

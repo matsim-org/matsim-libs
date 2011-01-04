@@ -29,7 +29,7 @@
 
 	<module name="qsim" >
 		<param name="startTime" value="00:00:00" />
-		<param name="endTime" value="09:00:00" />
+		<param name="endTime" value="30:00:00" />
 		
 		<param name="snapshotperiod" value="00:00:00" />
 		<param name="snapshotFormat"	value = "otfvis"/> 
@@ -70,11 +70,12 @@
 		<param name="activityClosingTime_1"     value="18:00:00" />
 	
 		<!-- Experiment of Manuel -->
-		<param name="activityType_2"        	value="transitInteraction" /> <!-- home -->
+		 <!--
+		<param name="activityType_2"        	value="transitInteraction" /> 
 		<param name="activityPriority_2"        value="1" />
 		<param name="activityTypicalDuration_2" value="00:00:02" />
 		<param name="activityMinimalDuration_2" value="00:00:02" />
-	
+	 	-->
 	
 	</module>
 	

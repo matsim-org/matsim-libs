@@ -94,11 +94,11 @@
 			</route>
 
 			<departures>
-				<departure id="2H.1" departureTime="05:50:00" vehicleRefId="tr_5" />
-				<departure id="2H.2" departureTime="06:00:00" vehicleRefId="tr_6" />
-				<departure id="2H.3" departureTime="06:10:00" vehicleRefId="tr_7" />
-				<departure id="2H.4" departureTime="06:20:00" vehicleRefId="tr_8" />
-				<departure id="2H.5" departureTime="08:00:00" vehicleRefId="tr_9" />
+				<departure id="2H.1" departureTime="05:51:00" vehicleRefId="tr_5" />
+				<departure id="2H.2" departureTime="06:01:00" vehicleRefId="tr_6" />
+				<departure id="2H.3" departureTime="06:11:00" vehicleRefId="tr_7" />
+				<departure id="2H.4" departureTime="06:21:00" vehicleRefId="tr_8" />
+				<departure id="2H.5" departureTime="08:01:00" vehicleRefId="tr_9" />
 			</departures>
 		</transitRoute>
 
@@ -148,11 +148,11 @@
 			</route>
 
 			<departures>
-				<departure id="3H.1" departureTime="05:50:00" vehicleRefId="tr_10" />
-				<departure id="3H.2" departureTime="06:00:00" vehicleRefId="tr_11" />
-				<departure id="3H.3" departureTime="06:10:00" vehicleRefId="tr_12" />
-				<departure id="3H.4" departureTime="06:20:00" vehicleRefId="tr_13" />
-				<departure id="3H.5" departureTime="08:00:00" vehicleRefId="tr_14" />
+				<departure id="3H.1" departureTime="05:52:00" vehicleRefId="tr_10" />
+				<departure id="3H.2" departureTime="06:02:00" vehicleRefId="tr_11" />
+				<departure id="3H.3" departureTime="06:12:00" vehicleRefId="tr_12" />
+				<departure id="3H.4" departureTime="06:22:00" vehicleRefId="tr_13" />
+				<departure id="3H.5" departureTime="08:02:00" vehicleRefId="tr_14" />
 			</departures>
 		</transitRoute>
 
@@ -201,11 +201,11 @@
 			</route>
 
 			<departures>
-				<departure id="4H.1" departureTime="05:50:00" vehicleRefId="tr_15" />
-				<departure id="4H.2" departureTime="06:00:00" vehicleRefId="tr_16" />
-				<departure id="4H.3" departureTime="06:10:00" vehicleRefId="tr_17" />
-				<departure id="4H.4" departureTime="06:20:00" vehicleRefId="tr_18" />
-				<departure id="4H.5" departureTime="08:00:00" vehicleRefId="tr_19" />
+				<departure id="4H.1" departureTime="05:53:00" vehicleRefId="tr_15" />
+				<departure id="4H.2" departureTime="06:03:00" vehicleRefId="tr_16" />
+				<departure id="4H.3" departureTime="06:13:00" vehicleRefId="tr_17" />
+				<departure id="4H.4" departureTime="06:23:00" vehicleRefId="tr_18" />
+				<departure id="4H.5" departureTime="08:03:00" vehicleRefId="tr_19" />
 			</departures>
 		</transitRoute>
 
@@ -254,11 +254,11 @@
 			</route>
 
 			<departures>
-				<departure id="5H.1" departureTime="05:50:00" vehicleRefId="tr_20" />
-				<departure id="5H.2" departureTime="06:00:00" vehicleRefId="tr_21" />
-				<departure id="5H.3" departureTime="06:10:00" vehicleRefId="tr_22" />
-				<departure id="5H.4" departureTime="06:20:00" vehicleRefId="tr_23" />
-				<departure id="5H.5" departureTime="08:00:00" vehicleRefId="tr_24" />
+				<departure id="5H.1" departureTime="05:54:00" vehicleRefId="tr_20" />
+				<departure id="5H.2" departureTime="06:04:00" vehicleRefId="tr_21" />
+				<departure id="5H.3" departureTime="06:14:00" vehicleRefId="tr_22" />
+				<departure id="5H.4" departureTime="06:24:00" vehicleRefId="tr_23" />
+				<departure id="5H.5" departureTime="08:04:00" vehicleRefId="tr_24" />
 			</departures>
 		</transitRoute>
 
@@ -307,11 +307,11 @@
 			</route>
 
 			<departures>
-				<departure id="6H.1" departureTime="05:50:00" vehicleRefId="tr_25" />
-				<departure id="6H.2" departureTime="06:00:00" vehicleRefId="tr_26" />
-				<departure id="6H.3" departureTime="06:10:00" vehicleRefId="tr_27" />
-				<departure id="6H.4" departureTime="06:20:00" vehicleRefId="tr_28" />
-				<departure id="6H.5" departureTime="08:00:00" vehicleRefId="tr_29" />
+				<departure id="6H.1" departureTime="05:55:00" vehicleRefId="tr_25" />
+				<departure id="6H.2" departureTime="06:05:00" vehicleRefId="tr_26" />
+				<departure id="6H.3" departureTime="06:15:00" vehicleRefId="tr_27" />
+				<departure id="6H.4" departureTime="06:25:00" vehicleRefId="tr_28" />
+				<departure id="6H.5" departureTime="08:05:00" vehicleRefId="tr_29" />
 			</departures>
 		</transitRoute>
 
@@ -360,11 +360,11 @@
 			</route>
 
 			<departures>
-				<departure id="7H.1" departureTime="05:50:00" vehicleRefId="tr_30" />
-				<departure id="7H.2" departureTime="06:00:00" vehicleRefId="tr_31" />
-				<departure id="7H.3" departureTime="06:10:00" vehicleRefId="tr_32" />
-				<departure id="7H.4" departureTime="06:20:00" vehicleRefId="tr_33" />
-				<departure id="7H.5" departureTime="08:00:00" vehicleRefId="tr_34" />
+				<departure id="7H.1" departureTime="05:56:00" vehicleRefId="tr_30" />
+				<departure id="7H.2" departureTime="06:06:00" vehicleRefId="tr_31" />
+				<departure id="7H.3" departureTime="06:16:00" vehicleRefId="tr_32" />
+				<departure id="7H.4" departureTime="06:26:00" vehicleRefId="tr_33" />
+				<departure id="7H.5" departureTime="08:06:00" vehicleRefId="tr_34" />
 			</departures>
 		</transitRoute>
 
@@ -413,11 +413,11 @@
 			</route>
 
 			<departures>
-				<departure id="8H.1" departureTime="05:50:00" vehicleRefId="tr_35" />
-				<departure id="8H.2" departureTime="06:00:00" vehicleRefId="tr_36" />
-				<departure id="8H.3" departureTime="06:10:00" vehicleRefId="tr_37" />
-				<departure id="8H.4" departureTime="06:20:00" vehicleRefId="tr_38" />
-				<departure id="8H.5" departureTime="08:00:00" vehicleRefId="tr_39" />
+				<departure id="8H.1" departureTime="05:57:00" vehicleRefId="tr_35" />
+				<departure id="8H.2" departureTime="06:07:00" vehicleRefId="tr_36" />
+				<departure id="8H.3" departureTime="06:17:00" vehicleRefId="tr_37" />
+				<departure id="8H.4" departureTime="06:27:00" vehicleRefId="tr_38" />
+				<departure id="8H.5" departureTime="08:07:00" vehicleRefId="tr_39" />
 			</departures>
 		</transitRoute>
 
@@ -466,11 +466,11 @@
 			</route>
 
 			<departures>
-				<departure id="9H.1" departureTime="05:50:00" vehicleRefId="tr_40" />
-				<departure id="9H.2" departureTime="06:00:00" vehicleRefId="tr_41" />
-				<departure id="9H.3" departureTime="06:10:00" vehicleRefId="tr_42" />
-				<departure id="9H.4" departureTime="06:20:00" vehicleRefId="tr_43" />
-				<departure id="9H.5" departureTime="08:00:00" vehicleRefId="tr_44" />
+				<departure id="9H.1" departureTime="05:58:00" vehicleRefId="tr_40" />
+				<departure id="9H.2" departureTime="06:08:00" vehicleRefId="tr_41" />
+				<departure id="9H.3" departureTime="06:18:00" vehicleRefId="tr_42" />
+				<departure id="9H.4" departureTime="06:28:00" vehicleRefId="tr_43" />
+				<departure id="9H.5" departureTime="08:08:00" vehicleRefId="tr_44" />
 			</departures>
 		</transitRoute>
 

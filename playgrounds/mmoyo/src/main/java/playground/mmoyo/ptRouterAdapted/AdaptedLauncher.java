@@ -97,6 +97,8 @@ public class AdaptedLauncher {
 			new PlanFragmenter().run(pop);					
 		}
 		
+		
+		
 		//write 
 		String routedPlansFile = scenario.getConfig().controler().getOutputDirectory()+ "routedPlan_" + myTransitRouterConfig.scenarioName + ".xml";
 		System.out.println("writing output plan file..." + routedPlansFile);
@@ -135,22 +137,15 @@ public class AdaptedLauncher {
 	}
 	
 	public static void main(String[] args) throws FileNotFoundException{
-		String configFilePath = null;
-		double betaWalk;
-		double betaDistance;
-		double betaTransfer;
+		double betaWalk = 6.0;
+		double betaDistance = 0.7;
+		double betaTransfer = 240.0;
 
-		if (args.length>0){
-			configFilePath = args[0];
-			betaWalk= Double.parseDouble(args[1]) ;
-			betaDistance= Double.parseDouble(args[2]);
-			betaTransfer= Double.parseDouble(args[3]);
-		}else{
+		String configFilePath = null;
+		if (args.length ==0){
 			configFilePath = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/calibration/100plans_bestValues_config.xml";
-			
-			betaWalk= 6.0 ;   	//"best values"
-			betaDistance= 0.6;  
-			betaTransfer= 240.0;
+		}else{
+			configFilePath = args[0];
 		}
 		AdaptedLauncher adaptedLauncher	= new AdaptedLauncher(configFilePath);
 		

@@ -82,7 +82,9 @@ public class DataLoader {
 		ScenarioImpl scenario = new ScenarioImpl();
 		PopulationReader popReader = new MatsimPopulationReader(scenario);
 		popReader.readFile(populationFile);
-		return scenario.getPopulation();
+		Population population = scenario.getPopulation();
+		scenario = null;
+		return population;
 	}
 
 	public ScenarioImpl readNetwork_Population(String networkFile, String populationFile) {

@@ -128,16 +128,12 @@ public class PlansMerger {
 	}
 	
 	public static void main(String[] args) {
-		String [] configs = new String[3];
-		configs[0]="";
-		configs[1]="";
-		configs[2]="";
-
 		String config = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/calibration/100plans_bestValues_config.xml";
 		Scenario scenario =   new DataLoader().loadScenario(config);
 		String [] plansArray = new String[3];
-		plansArray[0]="../playgrounds/mmoyo/output/merge/routedPlan_walk10.0_dist0.0_tran240.0.xml.gz";
-		plansArray[1]="../playgrounds/mmoyo/output/merge/routedPlan_walk10.0_dist0.6_tran1020.0.xml.gz";
+		plansArray[0]="../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/calibration/inputPlans/NOSCOREoutputrieserRoutedPlan.xml.gz";
+		plansArray[1]="../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/calibration/inputPlans/NOSCOREroutedPlan_walk6.0_dist0.7_tran240.0.xml.gz";
+		plansArray[2]="../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/calibration/inputPlans/NOSCOREplan_walk4.0_dist0.0_tran1020.0.xml.gz";
 		Population mergedPop = new PlansMerger().plansAggregator(plansArray);
 		
 		//write population

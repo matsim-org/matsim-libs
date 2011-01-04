@@ -30,9 +30,9 @@ public class PlanScoreRemover {
 	}
 
 	public static void main(String[] args) {
-		String populationFile = "../playgrounds/mmoyo/output/precalculation/setNull.xml";
+		String populationFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/calibration/inputPlans/plan_walk4.0_dist0.0_tran1020.0.xml.gz";
 		String networkFile = "../shared-svn/studies/countries/de/berlin-bvg09/pt/nullfall_berlin_brandenburg/input/network_multimodal.xml.gz";
-		String outputFile = "../playgrounds/mmoyo/output/test/setNullwoSCORES.xml";
+		String outputFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/calibration/inputPlans/NOSCOREplan_walk4.0_dist0.0_tran1020.0.xml.gz";
 		
 		ScenarioImpl scenario = new DataLoader().readNetwork_Population(networkFile, populationFile );
 	
