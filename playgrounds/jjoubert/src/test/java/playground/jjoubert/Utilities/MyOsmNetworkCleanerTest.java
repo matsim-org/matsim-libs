@@ -39,87 +39,74 @@ import com.vividsolutions.jts.geom.MultiPolygon;
 
 
 public class MyOsmNetworkCleanerTest extends MatsimTestCase{
-	
+
 	/**
-	 * Test to check that the method keeps all (and only) links that have at 
+	 * Test to check that the method keeps all (and only) links that have at
 	 * least one of its nodes within a given polygon.
+	 * @throws IOException
+	 * @throws ParserConfigurationException
+	 * @throws SAXException
 	 */
-	public void testCleanNetwork(){
-		setUp();
+	public void testCleanNetwork() throws SAXException, ParserConfigurationException, IOException{
 		MyShapefileReader msr = new MyShapefileReader(getInputDirectory() + "Test.shp");
 		MultiPolygon mp = msr.readMultiPolygon();
-		
+
 		assertEquals("Polygon is not a square.", 5, mp.getNumPoints());
 
 		Scenario sc = new ScenarioImpl();
 		MatsimNetworkReader nr = new MatsimNetworkReader(sc);
-		try {
-			nr.parse(getOutputDirectory() + "network.xml.gz");
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
+		nr.parse(getOutputDirectory() + "network.xml.gz");
+
 		assertEquals("Network must have 4 links.", 4, sc.getNetwork().getLinks().size());
-		
+
 		MyOsmNetworkCleaner monc = new MyOsmNetworkCleaner();
 		monc.cleanNetwork(sc.getNetwork(), mp);
 		assertEquals("Wrong number of remaining links.", 2, monc.getNewNetwork().getLinks().size());
-		
+
 		Network n = monc.getNewNetwork();
 		assertEquals("Link #2 not in network.", true, n.getLinks().containsKey(new IdImpl("2")));
 		assertEquals("Link #3 not in network.", true, n.getLinks().containsKey(new IdImpl("3")));
 	}
-	
+
 	/**
-	 * Test to check that a new network can only be returned once the 
+	 * Test to check that a new network can only be returned once the
 	 * {@link MyOsmNetworkCleaner#cleanNetwork(Network, MultiPolygon)} method
 	 * has been called. Otherwise <code>null</code> is returned.
+	 * @throws IOException
+	 * @throws ParserConfigurationException
+	 * @throws SAXException
 	 */
-	public void testGetNewNetwork(){
-		setUp();
+	public void testGetNewNetwork() throws SAXException, ParserConfigurationException, IOException{
 		MyOsmNetworkCleaner monc = new MyOsmNetworkCleaner();
 		assertNull("No cleaned network should exist.", monc.getNewNetwork());
-		
+
 		//TODO: Add bit to check not null network.
-		
+
 		MyShapefileReader msr = new MyShapefileReader(getInputDirectory() + "Test.shp");
 		MultiPolygon mp = msr.readMultiPolygon();
-		
+
 		Scenario sc = new ScenarioImpl();
 		MatsimNetworkReader nr = new MatsimNetworkReader(sc);
-		try {
-			nr.parse(getOutputDirectory() + "network.xml.gz");
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
+		nr.parse(getOutputDirectory() + "network.xml.gz");
+
 		monc.cleanNetwork(sc.getNetwork(), mp);
 		assertNotNull("Cleaned network should exists.", monc.getNewNetwork());
 	}
-	
+
 	/**
-	 * Overwrite the basic setUp() method so that a new MATSim network is created. 
+	 * Overwrite the basic setUp() method so that a new MATSim network is created.
+	 * @throws Exception
 	 */
-	public void setUp(){
-		try {
-			super.setUp();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+	@Override
+	public void setUp() throws Exception {
+		// this method is automatically called by JUnit, no need to call it manually
+		super.setUp();
 
 		// Build the test network.
 		Scenario sc = new ScenarioImpl();
 		Network n = sc.getNetwork();
 		NetworkFactory nf = n.getFactory();
-		
+
 		// Link 1.
 		n.addNode(nf.createNode(new IdImpl("1"), new CoordImpl(0.0, 5.0)));
 		n.addNode(nf.createNode(new IdImpl("2"), new CoordImpl(11.0, 5.0)));
@@ -134,12 +121,12 @@ public class MyOsmNetworkCleanerTest extends MatsimTestCase{
 		// Link 4.
 		n.addNode(nf.createNode(new IdImpl("6"), new CoordImpl(8.0, 12.0)));
 		n.addLink(nf.createLink(new IdImpl("4"), new IdImpl("5"), new IdImpl("6")));
-		
+
 		// Write network to file.
 		NetworkWriter nw = new NetworkWriter(n);
 		nw.write(getOutputDirectory() + "network.xml.gz");
-		
+
 	}
-	
+
 
 }
