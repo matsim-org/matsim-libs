@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Stack;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -92,6 +93,9 @@ public class OsmNetworkReader {
 	/*package*/ final CoordinateTransformation transform;
 	private boolean keepPaths = false;
 	private boolean scaleMaxSpeed = false;
+
+	private boolean slowButLowMemory = false;
+
 	/*package*/ final List<OsmFilter> hierarchyLayers = new ArrayList<OsmFilter>();
 
 	/**
@@ -162,11 +166,31 @@ public class OsmNetworkReader {
 			log.warn("No hierarchy layer specified. Will convert every highway specified by setHighwayDefaults.");
 		}
 
-		OsmXmlParser parser = new OsmXmlParser(this.nodes, this.ways, this.transform);
-		if (stream != null) {
-			parser.parse(new InputSource(stream));
+		OsmXmlParser parser = null;
+		if (this.slowButLowMemory) {
+			log.info("parsing osm file first time: identifying nodes used by ways");
+			parser = new OsmXmlParser(this.nodes, this.ways, this.transform);
+			parser.enableOptimization(1);
+			if (stream != null) {
+				parser.parse(new InputSource(stream));
+			} else {
+				parser.parse(osmFilename);
+			}
+			log.info("parsing osm file second time: loading required nodes and ways");
+			parser.enableOptimization(2);
+			if (stream != null) {
+				parser.parse(new InputSource(stream));
+			} else {
+				parser.parse(osmFilename);
+			}
+			log.info("done loading data");
 		} else {
-			parser.parse(osmFilename);
+			parser = new OsmXmlParser(this.nodes, this.ways, this.transform);
+			if (stream != null) {
+				parser.parse(new InputSource(stream));
+			} else {
+				parser.parse(osmFilename);
+			}
 		}
 		convert();
 		log.info("= conversion statistics: ==========================");
@@ -255,6 +279,17 @@ public class OsmNetworkReader {
 	 */
 	public void setHierarchyLayer(final double coordNWLat, final double coordNWLon, final double coordSELat, final double coordSELon, final int hierarchy) {
 		this.hierarchyLayers.add(new OsmFilter(this.transform.transform(new CoordImpl(coordNWLon, coordNWLat)), this.transform.transform(new CoordImpl(coordSELon, coordSELat)), hierarchy));
+	}
+
+	/**
+	 * By default, this converter caches a lot of data internally to speed up the network generation.
+	 * This can lead to OutOfMemoryExceptions when converting huge osm files. By enabling this
+	 * memory optimization, the converter tries to reduce its memory usage, but will run slower.
+	 *
+	 * @param memoryEnabled
+	 */
+	public void setMemoryOptimization(final boolean memoryEnabled) {
+		this.slowButLowMemory = memoryEnabled;
 	}
 
 	private void convert() {
@@ -557,6 +592,10 @@ public class OsmNetworkReader {
 		/*package*/ final Counter nodeCounter = new Counter("node ");
 		/*package*/ final Counter wayCounter = new Counter("way ");
 		private final CoordinateTransformation transform;
+		private boolean loadNodes = true;
+		private boolean loadWays = true;
+		private boolean mergeNodes = false;
+		private boolean collectNodes = false;
 
 		public OsmXmlParser(final Map<String, OsmNode> nodes, final Map<String, OsmWay> ways, final CoordinateTransformation transform) {
 			super();
@@ -566,23 +605,49 @@ public class OsmNetworkReader {
 			this.setValidating(false);
 		}
 
+		public void enableOptimization(final int step) {
+			this.loadNodes = false;
+			this.loadWays = false;
+			this.collectNodes = false;
+			this.mergeNodes = false;
+			if (step == 1) {
+				this.collectNodes = true;
+			} else if (step == 2) {
+				this.mergeNodes = true;
+				this.loadWays = true;
+			}
+		}
+
 		@Override
 		public void startTag(final String name, final Attributes atts, final Stack<String> context) {
 			if ("node".equals(name)) {
-				Id id = new IdImpl(atts.getValue("id"));
-				double lat = Double.parseDouble(atts.getValue("lat"));
-				double lon = Double.parseDouble(atts.getValue("lon"));
-				this.nodes.put(atts.getValue("id"), new OsmNode(id, this.transform.transform(new CoordImpl(lon, lat))));
-				this.nodeCounter.incCounter();
+				if (this.loadNodes) {
+					String idString = StringCache.get(atts.getValue("id"));
+					Id id = new IdImpl(idString);
+					double lat = Double.parseDouble(atts.getValue("lat"));
+					double lon = Double.parseDouble(atts.getValue("lon"));
+					this.nodes.put(idString, new OsmNode(id, this.transform.transform(new CoordImpl(lon, lat))));
+					this.nodeCounter.incCounter();
+				} else if (this.mergeNodes) {
+					OsmNode node = this.nodes.get(atts.getValue("id"));
+					if (node != null) {
+						double lat = Double.parseDouble(atts.getValue("lat"));
+						double lon = Double.parseDouble(atts.getValue("lon"));
+						Coord c = this.transform.transform(new CoordImpl(lon, lat));
+						node.coord.setXY(c.getX(), c.getY());
+						this.nodeCounter.incCounter();
+					}
+				}
 			} else if ("way".equals(name)) {
 				this.currentWay = new OsmWay(Long.parseLong(atts.getValue("id")));
 			} else if ("nd".equals(name)) {
 				if (this.currentWay != null) {
-					this.currentWay.nodes.add(atts.getValue("ref"));
+					String nodeId = StringCache.get(atts.getValue("ref"));
+					this.currentWay.nodes.add(nodeId);
 				}
 			} else if ("tag".equals(name)) {
 				if (this.currentWay != null) {
-					this.currentWay.tags.put(atts.getValue("k"), atts.getValue("v"));
+					this.currentWay.tags.put(StringCache.get(atts.getValue("k")), StringCache.get(atts.getValue("v")));
 				}
 			}
 		}
@@ -596,35 +661,66 @@ public class OsmNetworkReader {
 					int hierarchy = osmHighwayDefaults.hierarchy;
 					this.currentWay.hierarchy = hierarchy;
 					if (hierarchyLayers.isEmpty()) {
-						for (String nodeId : this.currentWay.nodes) {
-							OsmNode node = nodes.get(nodeId);
-							if(node != null) {
-								used = true;
-								break;
-							}
-						}
+//						for (String nodeId : this.currentWay.nodes) {
+//							OsmNode node = nodes.get(nodeId);
+//							if(node != null) {
+//								used = true;
+//								break;
+//							}
+//						}
+						used = true;
 					}
-					for (OsmFilter osmFilter : hierarchyLayers) {
-						for (String nodeId : this.currentWay.nodes) {
-							OsmNode node = nodes.get(nodeId);
-							if(node != null && osmFilter.coordInFilter(node.coord, this.currentWay.hierarchy)){
-								used = true;
+					if (this.collectNodes) {
+						used = true;
+					} else {
+						for (OsmFilter osmFilter : hierarchyLayers) {
+							for (String nodeId : this.currentWay.nodes) {
+								OsmNode node = nodes.get(nodeId);
+								if(node != null && osmFilter.coordInFilter(node.coord, this.currentWay.hierarchy)){
+									used = true;
+									break;
+								}
+							}
+							if (used) {
 								break;
 							}
-						}
-						if (used) {
-							break;
 						}
 					}
 				}
 				if (used) {
-					this.ways.put(Long.toString(this.currentWay.id), this.currentWay);
-					this.wayCounter.incCounter();
+					if (this.collectNodes) {
+						for (String id : this.currentWay.nodes) {
+							this.nodes.put(id, new OsmNode(new IdImpl(id), new CoordImpl(0, 0)));
+						}
+					} else if (this.loadWays) {
+						this.ways.put(Long.toString(this.currentWay.id), this.currentWay);
+						this.wayCounter.incCounter();
+					}
 				}
 				this.currentWay = null;
 			}
 		}
 
+	}
+
+	private static class StringCache {
+
+		private static ConcurrentHashMap<String, String> cache = new ConcurrentHashMap<String, String>(10000);
+
+		/**
+		 * Returns the cached version of the given String. If the strings was
+		 * not yet in the cache, it is added and returned as well.
+		 *
+		 * @param string
+		 * @return cached version of string
+		 */
+		public static String get(final String string) {
+			String s = cache.putIfAbsent(string, string);
+			if (s == null) {
+				return string;
+			}
+			return s;
+		}
 	}
 
 }

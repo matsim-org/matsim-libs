@@ -86,6 +86,28 @@ public class OsmNetworkReaderTest {
 	}
 
 	@Test
+	public void testConversionWithDetails_witMemoryOptimized() throws SAXException, ParserConfigurationException, IOException {
+		String filename = this.utils.getClassInputDirectory() + "adliswil.osm.gz";
+
+		Scenario sc = new ScenarioImpl();
+		Network net = sc.getNetwork();
+
+		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.CH1903_LV03);
+
+		OsmNetworkReader reader = new OsmNetworkReader(net,ct);
+		reader.setKeepPaths(true);
+		reader.setMemoryOptimization(true);
+		reader.parse(filename);
+
+		Assert.assertEquals("number of nodes is wrong.", 1844, net.getNodes().size());
+		Assert.assertEquals("number of links is wrong.", 3537, net.getLinks().size());
+
+		new NetworkCleaner().run(net);
+		Assert.assertEquals("number of nodes is wrong.", 1561, net.getNodes().size());
+		Assert.assertEquals("number of links is wrong.", 3168, net.getLinks().size());
+	}
+
+	@Test
 	public void testConversionWithSettings() throws SAXException, ParserConfigurationException, IOException {
 		String filename = this.utils.getClassInputDirectory() + "adliswil.osm.gz";
 
@@ -96,6 +118,28 @@ public class OsmNetworkReaderTest {
 
 		OsmNetworkReader reader = new OsmNetworkReader(net,ct);
 		reader.setHierarchyLayer(47.4, 8.5, 47.2, 8.6, 5);
+		reader.setMemoryOptimization(false);
+		reader.parse(filename);
+
+		Assert.assertEquals("number of nodes is wrong.", 67, net.getNodes().size());
+		Assert.assertEquals("number of links is wrong.", 122, net.getLinks().size());
+		new NetworkCleaner().run(net);
+		Assert.assertEquals("number of nodes is wrong.", 57, net.getNodes().size());
+		Assert.assertEquals("number of links is wrong.", 114, net.getLinks().size());
+	}
+
+	@Test
+	public void testConversionWithSettings_withMemoryOptimization() throws SAXException, ParserConfigurationException, IOException {
+		String filename = this.utils.getClassInputDirectory() + "adliswil.osm.gz";
+
+		Scenario sc = new ScenarioImpl();
+		Network net = sc.getNetwork();
+
+		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.CH1903_LV03);
+
+		OsmNetworkReader reader = new OsmNetworkReader(net,ct);
+		reader.setHierarchyLayer(47.4, 8.5, 47.2, 8.6, 5);
+		reader.setMemoryOptimization(true);
 		reader.parse(filename);
 
 		Assert.assertEquals("number of nodes is wrong.", 67, net.getNodes().size());
