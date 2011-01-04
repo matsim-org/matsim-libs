@@ -56,7 +56,7 @@ public class SanralIntegrationTest {
 
 		Assert.assertEquals("expected 3 money events", 3, events.size());
 		Assert.assertEquals(-2.0, events.get(0).getAmount(), 1e-8); // factor assumed to be 1.0
-		Assert.assertEquals(-4.0, events.get(1).getAmount(), 1e-8); // factor assumed to be 2.0
+		Assert.assertEquals(-6.0, events.get(1).getAmount(), 1e-8); // factor assumed to be 3.0
 		Assert.assertEquals(-10.0, events.get(2).getAmount(), 1e-8); // factor assumed to be 5.0
 	}
 }
