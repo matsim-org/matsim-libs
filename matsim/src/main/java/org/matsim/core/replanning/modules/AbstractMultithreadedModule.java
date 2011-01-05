@@ -20,8 +20,11 @@
 
 package org.matsim.core.replanning.modules;
 
+import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Plan;
@@ -54,8 +57,11 @@ abstract public class AbstractMultithreadedModule implements PlanStrategyModule 
 	private PlanAlgorithm directAlgo = null;
 	private String name = null;
 
-	private int counter = 0;
-	private int nextCounter = 1;
+	private final AtomicInteger counter = new AtomicInteger(0);
+	private final AtomicInteger nextCounter = new AtomicInteger(1);
+
+	private final AtomicBoolean hadException = new AtomicBoolean(false);
+	private final ExceptionHandler exceptionHandler = new ExceptionHandler(this.hadException);
 
 	static final private Logger log = Logger.getLogger(AbstractMultithreadedModule.class);
 
@@ -69,6 +75,7 @@ abstract public class AbstractMultithreadedModule implements PlanStrategyModule 
 		this.numOfThreads = numOfThreads;
 	}
 
+	@Override
 	public void prepareReplanning() {
 		if (this.numOfThreads == 0) {
 			// it seems, no threads are desired :(
@@ -78,20 +85,22 @@ abstract public class AbstractMultithreadedModule implements PlanStrategyModule 
 		}
 	}
 
+	@Override
 	public void handlePlan(final Plan plan) {
 		if (this.directAlgo == null) {
-			this.algothreads[this.counter % this.numOfThreads].handlePlan(plan);
-			this.counter++;
+			this.algothreads[this.counter.get() % this.numOfThreads].handlePlan(plan);
+			this.counter.incrementAndGet();
 		} else {
 			this.directAlgo.run(plan);
 		}
 	}
 
+	@Override
 	public void finishReplanning() {
 		if (this.directAlgo == null) {
 			// only try to start threads if we did not directly work on all the plans
 			log.info("[" + this.name + "] starting threads, handling " + this.counter + " plans");
-			this.counter = 0;
+			this.counter.set(0);
 
 			// start threads
 			for (Thread thread : this.threads) {
@@ -104,22 +113,26 @@ abstract public class AbstractMultithreadedModule implements PlanStrategyModule 
 					thread.join();
 				}
 			} catch (InterruptedException e) {
-				Gbl.errorMsg(e);
+				throw new RuntimeException(e);
 			}
 			log.info("[" + this.name + "] all threads finished.");
+			if (this.hadException.get()) {
+				throw new RuntimeException("Some threads crashed, thus not all plans may have been handled.");
+			}
 		}
 		// reset
 		this.algothreads = null;
 		this.threads = null;
-		this.counter = 0;
-		this.nextCounter = 1;
+		this.counter.set(0);
+		this.nextCounter.set(1);
 	}
 
 	private void initThreads() {
 		if (this.threads != null) {
-			Gbl.errorMsg("threads are already initialized");
+			throw new RuntimeException("threads are already initialized");
 		}
 
+		this.hadException.set(false);
 		this.threads = new Thread[this.numOfThreads];
 		this.algothreads = new PlanAlgoThread[this.numOfThreads];
 
@@ -129,18 +142,19 @@ abstract public class AbstractMultithreadedModule implements PlanStrategyModule 
 			if (i == 0) {
 				this.name = algo.getClass().getSimpleName();
 			}
-			PlanAlgoThread algothread = new PlanAlgoThread(i, algo);
+			PlanAlgoThread algothread = new PlanAlgoThread(algo);
 			Thread thread = new Thread(algothread, this.name + "." + i);
+			thread.setUncaughtExceptionHandler(this.exceptionHandler);
 			this.threads[i] = thread;
 			this.algothreads[i] = algothread;
 		}
 	}
 
-	synchronized /*package*/ void incCounter() {
-		this.counter++;
-		if (this.counter == this.nextCounter) {
+	/*package*/ void incCounter() {
+		int i = this.counter.incrementAndGet();
+		if (i == this.nextCounter.get()) {
 			log.info("[" + this.name + "] handled plan # " + this.counter);
-			this.nextCounter *= 2;
+			this.nextCounter.set(i*2);
 			Gbl.printMemoryUsage();
 		}
 	}
@@ -149,14 +163,28 @@ abstract public class AbstractMultithreadedModule implements PlanStrategyModule 
 		return numOfThreads;
 	}
 
+	private static class ExceptionHandler implements UncaughtExceptionHandler {
+
+		private final AtomicBoolean hadException;
+
+		public ExceptionHandler(final AtomicBoolean hadException) {
+			this.hadException = hadException;
+		}
+
+		@Override
+		public void uncaughtException(Thread t, Throwable e) {
+			log.error("Thread died with exception. Will stop after all threads finished.", e);
+			this.hadException.set(true);
+		}
+
+	}
+
 	private class PlanAlgoThread implements Runnable {
 
-		public final int threadId;
 		private final PlanAlgorithm planAlgo;
 		private final List<Plan> plans = new LinkedList<Plan>();
 
-		public PlanAlgoThread(final int i, final PlanAlgorithm algo) {
-			this.threadId = i;
+		public PlanAlgoThread(final PlanAlgorithm algo) {
 			this.planAlgo = algo;
 		}
 
@@ -164,6 +192,7 @@ abstract public class AbstractMultithreadedModule implements PlanStrategyModule 
 			this.plans.add(plan);
 		}
 
+		@Override
 		public void run() {
 			for (Plan plan : this.plans) {
 				this.planAlgo.run(plan);

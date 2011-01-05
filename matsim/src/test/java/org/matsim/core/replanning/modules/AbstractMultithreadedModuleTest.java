@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008, 2011 by the members listed in the COPYING,  *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -20,21 +20,47 @@
 
 package org.matsim.core.replanning.modules;
 
+import org.apache.log4j.Logger;
+import org.junit.Assert;
+import org.junit.Test;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.testcases.MatsimTestCase;
 
-public class AbstractMultithreadedModuleTest extends MatsimTestCase {
+/**
+ * @author mrieser
+ */
+public class AbstractMultithreadedModuleTest {
 
+	private final static Logger log = Logger.getLogger(AbstractMultithreadedModuleTest.class);
+
+	@Test
 	public void testGetNumOfThreads() {
-		Config config = super.loadConfig(null);
+		Config config = new Config();
+		config.addCoreModules();
 		config.global().setNumberOfThreads(3);
 		DummyAbstractMultithreadedModule testee = new DummyAbstractMultithreadedModule(config.global());
-		assertEquals(3, testee.getNumOfThreads());
+		Assert.assertEquals(3, testee.getNumOfThreads());
 	}
 
-	private static class DummyAbstractMultithreadedModule extends AbstractMultithreadedModule { 
+	@Test
+	public void testCrashingThread() {
+		try {
+			DummyCrashingModule testee = new DummyCrashingModule(2);
+			testee.prepareReplanning();
+			testee.handlePlan(null);
+			testee.handlePlan(null);
+			testee.handlePlan(null);
+			testee.finishReplanning();
+			Assert.fail("expected exception, got none.");
+		} catch (Exception e) {
+			log.info("Catched expected exception.", e);
+		}
+
+	}
+
+	private static class DummyAbstractMultithreadedModule extends AbstractMultithreadedModule {
 
 		public DummyAbstractMultithreadedModule(
 				GlobalConfigGroup globalConfigGroup) {
@@ -47,4 +73,22 @@ public class AbstractMultithreadedModuleTest extends MatsimTestCase {
 
 	}
 
+	private static class DummyCrashingModule extends AbstractMultithreadedModule {
+
+		public DummyCrashingModule(final int nOfThreads) {
+			super(nOfThreads);
+		}
+
+		@Override
+		public PlanAlgorithm getPlanAlgoInstance() {
+			return new PlanAlgorithm() {
+				@Override
+				public void run(Plan plan) {
+					@SuppressWarnings("unused")
+					int i = 1/0;
+				}
+			};
+		}
+
+	}
 }
