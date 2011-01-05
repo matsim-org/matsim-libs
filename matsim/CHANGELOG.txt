@@ -17,12 +17,14 @@ Changes:
 - Feature improvements:
   - transit router got faster (r13753, r13765) and uses less memory during parallel replanning (r13765)
   - Swing-OTFVis now shows vehicles in different colors instead of just gray (r13751)
+  - OsmNetworkReader has option to reduce memory consumption, but will run slower (off by default) (r13910)
   - ?
 
 - Other changes for developers:
 
   API-Changes:
-  - ?
+  - deprecated NetworkFactory.createLink(Id, Id, Id) (r13924)
+  - added NetworkFactory.createLink(Id, Node, Node) (r13924)
 
   Non-API Changes:
   - ?
