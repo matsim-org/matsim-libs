@@ -100,27 +100,28 @@
 	<!-- ====================================================================== -->
 
 	<module name="locationchoice" >
-	          <param name="flexible_types" value="shop" />
+	          
 	          <param name="maxRecursions" value="5" />
-	          <param name="recursionTravelSpeed" value="1000.0" />
 	          <param name="recursionTravelSpeedChange" value="0.2" />
 	          <param name="restraintFcnExp" value="0.0" />
 	          <param name="restraintFcnFactor" value="0.0" />
-	          <param name="scaleFactor" value="1" />
-
+	          <param name="scaleFactor" value="10" />
 	          <param name="centerNode" value="null" />
 	          <param name="radius" value="null" />
 	          <param name="fixByActType" value="false" />
 	          <param name="constrained" value="true" />
 	          <param name="simple_tg" value="false" />
 	          
+	          <param name="flexible_types" value="shop" />
+	          <param name="recursionTravelSpeed" value="20.0" />
+
 	          <param name="algorithm" value="bestResponse" />
 	          <param name="tt_approximationLevel" value="1" />
 	          <param name="travelTimes" value="true" />
 	          <param name="searchSpaceBeta" value="-0.0005" />
 	          <param name="maxSearchSpaceRadius" value="-1.0" />
-	          <param name="planSelector" value="BestScore" />
-	       <!--<param name="planSelector" value="SelectExpBeta" /> -->  
+<!--	          <param name="planSelector" value="BestScore" /> -->
+	          <param name="planSelector" value="SelectExpBeta" />   
 	</module>
 
 	
