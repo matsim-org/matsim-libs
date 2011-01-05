@@ -20,18 +20,20 @@
 
 package org.matsim.core.utils.misc;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.apache.log4j.Logger;
 
 /**
  * A simple class that implements a counter that outputs the current counter-value from time to time.
- * The method {@link #incCounter()} is synchronized, so it can be used with Threads.
+ * This class is thread-safe.
  *
  * @author mrieser
  */
 public final class Counter {
 	private final String prefix;
-	private int counter = 0;
-	private int nextCounter = 1;
+	private AtomicInteger counter = new AtomicInteger(0);
+	private AtomicInteger nextCounter = new AtomicInteger(1);
 	private static final Logger log = Logger.getLogger(Counter.class);
 
 	/**
@@ -41,11 +43,11 @@ public final class Counter {
 		this.prefix = prefix;
 	}
 
-	synchronized public void incCounter() {
-		this.counter++;
-		if (this.counter == this.nextCounter) {
+	public void incCounter() {
+		int i = this.counter.incrementAndGet();
+		if (i == this.nextCounter.get()) {
 			printCounter();
-			this.nextCounter *= 2;
+			this.nextCounter.set(i * 2);
 		}
 	}
 
@@ -53,12 +55,12 @@ public final class Counter {
 		log.info(this.prefix + this.counter);
 	}
 
-	synchronized public int getCounter() {
-		return this.counter;
+	public int getCounter() {
+		return this.counter.get();
 	}
 
-	synchronized public void reset() {
-		this.counter = 0;
-		this.nextCounter = 1;
+	public void reset() {
+		this.counter.set(0);
+		this.nextCounter.set(1);
 	}
 }
