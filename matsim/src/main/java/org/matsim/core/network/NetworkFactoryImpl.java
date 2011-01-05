@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008, 2011 by the members listed in the COPYING,  *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -23,7 +23,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.jfree.util.Log;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -37,8 +36,11 @@ import org.matsim.core.population.routes.RouteFactory;
 
 /**
  * @author dgrether
+ * @author mrieser
  */
 public class NetworkFactoryImpl implements NetworkFactory {
+
+	private final static Logger log = Logger.getLogger(NetworkFactoryImpl.class);
 
 	private LinkFactory linkFactory = null;
 
@@ -61,20 +63,26 @@ public class NetworkFactoryImpl implements NetworkFactory {
 		return node ;
 	}
 
-	/**
+	/*
 	 * TODO how to set other attributes of link consistently without invalidating time variant attributes
 	 */
 	@Override
+	public Link createLink(Id id, Node fromNode, Node toNode) {
+		return this.linkFactory.createLink(id, fromNode, toNode, this.network, 1.0, 1.0, 1.0, 1.0);
+	}
+
+	@Override
+	@Deprecated
 	public Link createLink(final Id id, final Id fromNodeId, final Id toNodeId) {
 		Node fromNode = this.network.getNodes().get(fromNodeId) ;
 		if ( fromNode==null ) {
-			Logger.getLogger(NetworkFactoryImpl.class).error("could not find fromNodeId in network; this will probably fail downstream; have you added the node to the network?") ;
+			log.error("could not find fromNodeId in network; this will probably fail downstream; have you added the node to the network?") ;
 		}
 		Node toNode = this.network.getNodes().get(toNodeId) ;
 		if ( toNode==null ) {
-			Logger.getLogger(NetworkFactoryImpl.class).error("could not find toNodeId in network; this will probably fail downstream; have you added the node to the network?") ;
+			log.error("could not find toNodeId in network; this will probably fail downstream; have you added the node to the network?") ;
 		}
-		return this.linkFactory.createLink(id, fromNode, toNode, this.network, 1.0, 1.0, 1.0, 1.0);
+		return createLink(id, fromNode, toNode);
 	}
 
 	public Link createLink(final Id id, final Node from, final Node to,
