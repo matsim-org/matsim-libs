@@ -1,9 +1,15 @@
+/**The javadoc is attached to the PackageInfo class below rather than to the package, since when it is attached to the class you
+ * get wysiwyg in eclipse.
+ */
+
+package tutorial.unsupported.example50VeryExperimentalWithinDayReplanning;
 
 /**This package contains code that demonstrates some <i> ideas </i> of how to use matsim for withinday replanning.  
  * <p/>
  * <b>Definition:</b> Withinday replanning means that agents can replan while they are on their way, technically while the mobsim is running.
  * <p/>
- * <b>Why we are where we are:</b>Historically, matsim was (and still is) written with large-scale performance as its 
+ * <b>Why we are where we are:</b> Historically, matsim was (and still is) written with large-scale performance (while remaining 
+ * microscopic) as its 
  * prime technological goal, which in practice
  * means the capability to simulate regions with 10 million inhabitants or more.  This has meant a couple of design decisions that
  * are, in fact, detrimental to within-day replanning.  Examples for this are the "horizontal" way in which strategy modules are 
@@ -27,7 +33,7 @@
  * </ul>
  * <p/>
  * Much of this is using material that is not in the public api, so there are only two recommended ways of using this:<ul>
- * <li> use a release and go from there, but be aware that your code will work <i>only</i> with this release
+ * <li> use a release and go from there, but be aware that your code will work <i>only</i> with that release
  * <li> find a way to collaborate with the matsim team.  This will, however, mean that there needs to be (possibly scientific)
  * funding for the matsim team
  * </ul>
@@ -36,5 +42,7 @@
  * to nagel (or to the developers email list).
  * 
  */
+class PackageInfo {
+	private PackageInfo() {} // do not instantiate this class
+}
 
-package tutorial.unsupported.example50VeryExperimentalWithinDayReplanning;
