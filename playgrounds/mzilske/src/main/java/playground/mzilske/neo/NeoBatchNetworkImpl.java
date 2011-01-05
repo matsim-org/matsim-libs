@@ -411,6 +411,11 @@ public class NeoBatchNetworkImpl implements Network {
 			}
 
 			@Override
+			public Link createLink(Id id, Node fromNode, Node toNode) {
+				return new BasicLink(id, fromNode.getId(), toNode.getId());
+			}
+
+			@Override
 			public Node createNode(Id id, Coord coord) {
 				return new BasicNode(id, coord);
 			}

@@ -1,28 +1,21 @@
 package playground.ciarif.retailers.stategies;
 
-import cern.colt.matrix.DoubleMatrix1D;
-import cern.colt.matrix.impl.DenseDoubleMatrix1D;
-import cern.colt.matrix.impl.DenseDoubleMatrix2D;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Map;
 import java.util.TreeMap;
+
 import org.apache.commons.math.stat.regression.OLSMultipleLinearRegression;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOptionImpl;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PlanImpl;
+
 import playground.ciarif.retailers.RetailerGA.RunRetailerGA;
 import playground.ciarif.retailers.data.Consumer;
 import playground.ciarif.retailers.data.LinkRetailersImpl;
@@ -30,9 +23,13 @@ import playground.ciarif.retailers.data.RetailZone;
 import playground.ciarif.retailers.data.RetailZones;
 import playground.ciarif.retailers.models.GravityModel;
 import playground.ciarif.retailers.utils.Utils;
+import cern.colt.matrix.impl.DenseDoubleMatrix1D;
+import cern.colt.matrix.impl.DenseDoubleMatrix2D;
 
 public class GravityModelRetailerStrategy extends RetailerStrategyImpl
 {
+	private final static Logger log = Logger.getLogger(GravityModelRetailerStrategy.class);
+
   public static final String CONFIG_GROUP = "Retailers";
   public static final String COMPUTE_BETAS = "computeParameters";
   public static final String GENERATIONS = "numberOfGenerations";
@@ -50,7 +47,8 @@ public class GravityModelRetailerStrategy extends RetailerStrategyImpl
     log.info("Controler" + this.controler);
   }
 
-  public Map<Id, ActivityFacilityImpl> moveFacilities(Map<Id, ActivityFacilityImpl> retailerFacilities, TreeMap<Id, LinkRetailersImpl> freeLinks)
+  @Override
+	public Map<Id, ActivityFacilityImpl> moveFacilities(Map<Id, ActivityFacilityImpl> retailerFacilities, TreeMap<Id, LinkRetailersImpl> freeLinks)
   {
     this.retailerFacilities = retailerFacilities;
     log.info("Controler" + this.controler);
@@ -84,7 +82,7 @@ public class GravityModelRetailerStrategy extends RetailerStrategyImpl
     int count = 0;
     for (ActivityFacilityImpl af : this.retailerFacilities.values()) {
       if (first.get(solution.get(count)) != af.getLinkId().toString()) {
-        Utils.moveFacility(af, (Link)this.controler.getNetwork().getLinks().get(new IdImpl((String)first.get(solution.get(count)))));
+        Utils.moveFacility(af, this.controler.getNetwork().getLinks().get(new IdImpl(first.get(solution.get(count)))));
         log.info("The facility " + af.getId() + " has been moved");
         this.movedFacilities.put(af.getId(), af);
         log.info("Link Id after = " + af.getLinkId());
@@ -111,7 +109,7 @@ public class GravityModelRetailerStrategy extends RetailerStrategyImpl
       int consumer_index = Integer.parseInt(c.getId().toString());
       int zone_index = Integer.parseInt(c.getRzId().toString());
       ActivityFacilityImpl af = (ActivityFacilityImpl)c.getShoppingFacility();
-      double prob = prob_zone_shop.get(zone_index, ((Integer)this.shops_keys.get(af.getId())).intValue());
+      double prob = prob_zone_shop.get(zone_index, (this.shops_keys.get(af.getId())).intValue());
       regressand_matrix.set(consumer_index, Math.log(prob / prob_zone_shop.viewRow(zone_index).zSum()));
       double dist1 = af.calcDistance(((PlanImpl)c.getPerson().getSelectedPlan()).getFirstActivity().getCoord());
       if (dist1 == 0.0D) {
