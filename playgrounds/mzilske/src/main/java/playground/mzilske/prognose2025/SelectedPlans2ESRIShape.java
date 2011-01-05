@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.geotools.factory.FactoryRegistryException;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
@@ -33,7 +34,6 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeBuilder;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
-import org.jfree.util.Log;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
@@ -69,7 +69,7 @@ import com.vividsolutions.jts.geom.Point;
  * @author laemmel
  */
 public class SelectedPlans2ESRIShape {
-
+	private final static Logger log = Logger.getLogger(SelectedPlans2ESRIShape.class);
 	private final CoordinateReferenceSystem crs;
 	private final Population population;
 	private double outputSample = 1;
@@ -257,7 +257,7 @@ public class SelectedPlans2ESRIShape {
 		try {
 			sp.write();
 		} catch (IOException e) {
-			Log.error(e.getMessage(), e);
+			log.error(e.getMessage(), e);
 		}
 	}
 

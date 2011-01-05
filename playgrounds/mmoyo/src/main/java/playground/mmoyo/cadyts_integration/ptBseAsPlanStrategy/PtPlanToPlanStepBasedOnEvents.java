@@ -55,32 +55,28 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import playground.mmoyo.cadyts_integration.ptBseAsPlanStrategy.analysis.PtBseOccupancyAnalyzer;
 import playground.mmoyo.utils.PtRouteUtill;
 import cadyts.demand.PlanBuilder;
-/**
- * 
- *
- */
 class PtPlanToPlanStepBasedOnEvents implements PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler,
 VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler
 {
-	private static final Logger log = Logger.getLogger("dummy");
+	private static final Logger log = Logger.getLogger(PtPlanToPlanStepBasedOnEvents.class);
 
 	private final Network net;
 	private final Scenario sc ;
 	private final TransitSchedule schedule;
-	
+
 	private final Map< Id, Collection<Id> > personsFromVehId = new HashMap< Id, Collection<Id> >() ;
-	
+
 	private int iteration = -1 ;
-	
+
 	// this is _only_ there for output:
 	Set<Plan> plansEverSeen = new HashSet<Plan>() ;
 
 	// these are there so that print functions can be called from the outside (for debugging):
 	private static Network NET ;
 	private static TransitSchedule SCHEDULE ;
-	
+
 	private PtBseOccupancyAnalyzer delegOcupAnalizer;
-	
+
 	PtPlanToPlanStepBasedOnEvents(Scenario sc, PtBseOccupancyAnalyzer delOcupAnalizer) {
 		this.sc = sc ;
 		this.net = sc.getNetwork();
@@ -107,11 +103,11 @@ VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler
 	@Override
 	public void reset(int iteration) {
 		this.iteration = iteration ;
-		
-		log.warn("found " + this.plansFound + " out of " + (this.plansFound+this.plansNotFound) 
+
+		log.warn("found " + this.plansFound + " out of " + (this.plansFound+this.plansNotFound)
 				+ " (" + (100.*this.plansFound/(this.plansFound+this.plansNotFound)) + "%)" ) ;
 		log.warn("(above values may both be at zero for a couple of iterations if multiple plans per agent all have no score)") ;
-		
+
 		personsFromVehId.clear();
 		this.delegOcupAnalizer.reset(iteration);
 	}
@@ -140,7 +136,7 @@ VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler
 	public void handleEvent(VehicleArrivesAtFacilityEvent event) {
 		this.delegOcupAnalizer.handleEvent(event);
 	}
-	
+
 	@Override
 	public void handleEvent(VehicleDepartsAtFacilityEvent event) {
 		double time = event.getTime() ;
@@ -159,13 +155,13 @@ VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler
 			Plan selectedPlan = person.getSelectedPlan() ;
 
 			// get the planStepFactory for the plan (or create one):
-			PlanBuilder</*Link*/TransitStopFacility> tmpPlanStepFactory = getPlanStepFactoryForPlan(selectedPlan); 
+			PlanBuilder</*Link*/TransitStopFacility> tmpPlanStepFactory = getPlanStepFactoryForPlan(selectedPlan);
 
-			if ( tmpPlanStepFactory != null ) { 
+			if ( tmpPlanStepFactory != null ) {
 
 				// add the "turn" to the planStepfactory
 				// yy I think we could adapt this to use facilities instead of links
-				TransitStopFacility fac = this.schedule.getFacilities().get( facId ) ; 
+				TransitStopFacility fac = this.schedule.getFacilities().get( facId ) ;
 
 				tmpPlanStepFactory.addTurn( fac, (int) time ) ;
 			}
@@ -173,31 +169,31 @@ VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler
 		this.delegOcupAnalizer.handleEvent(event);
 	}
 
-	
+
 	// ###################################################################################
 	// only private functions below here (low level functionality)
-	
+
 	private void addPersonToVehicleContainer(Id personId, Id vehId) {
 		// get the personsContainer that belongs to the vehicle:
 		Collection<Id> personsInVehicle = this.personsFromVehId.get( vehId ) ;
-		
+
 		if ( personsInVehicle == null ) {
 			// means does not exist yet
 			personsInVehicle = new ArrayList<Id>();
 			this.personsFromVehId.put( vehId, personsInVehicle ) ;
 		}
-		
+
 		personsInVehicle.add( personId ) ;
 	}
-	
+
 	private void removePersonFromVehicleContainer(Id personId, Id vehId) {
 		// get the personsContainer that belongs to the vehicle:
 		Collection<Id> personsInVehicle = this.personsFromVehId.get( vehId ) ;
-		
+
 		if ( personsInVehicle == null ) {
 			Gbl.errorMsg( "should not be possible: person should enter before leaving, and then construct the container" ) ;
 		}
-		
+
 		// remove the person from the personsContainer:
 		personsInVehicle.remove( personId ) ; // linear time operation; a HashMap might be better.
 	}
@@ -209,8 +205,8 @@ VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler
 		planStepFactory = (PlanBuilder</*Link*/TransitStopFacility>) selectedPlan.getCustomAttributes().get("planStepFactory") ;
 		Integer factoryIteration = (Integer) selectedPlan.getCustomAttributes().get("iteration") ;
 		if ( planStepFactory == null
-				// (means there is not yet a plansStepFactory for this plan 
-				|| factoryIteration==null || factoryIteration != iteration 
+				// (means there is not yet a plansStepFactory for this plan
+				|| factoryIteration==null || factoryIteration != iteration
 				// (means the iteration for which the plansStepFactory was build is over)
 				) {
 			// attach the iteration number to the plan:
@@ -219,14 +215,14 @@ VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler
 			// construct a new PlanBulder and attach it to the plan:
 			planStepFactory = new PlanBuilder</*Link*/TransitStopFacility>() ;
 			selectedPlan.getCustomAttributes().put( "planStepFactory", planStepFactory ) ;
-			
+
 			// memorize the plan as being seen:
 			plansEverSeen.add( selectedPlan ) ;
 		}
-		
+
 		return planStepFactory;
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	private void printCadytsAndMatsimPlans() {
 		String separator = 	"\n==============================";
@@ -268,7 +264,7 @@ VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler
 			if ((planElement instanceof Leg)) {
 				Leg leg= (Leg)planElement;
 				if (leg.getRoute()!= null && (leg.getMode().equals("pt")) ){
-					ExperimentalTransitRoute exptr = (ExperimentalTransitRoute)leg.getRoute(); 
+					ExperimentalTransitRoute exptr = (ExperimentalTransitRoute)leg.getRoute();
 					if ( exptr.getRouteDescription().contains("M44") ) {
 						containsM44 = true ;
 						System.err.print( exptr.getRouteDescription() + ": " ) ;

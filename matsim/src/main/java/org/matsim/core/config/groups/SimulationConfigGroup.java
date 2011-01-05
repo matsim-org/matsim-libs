@@ -29,6 +29,7 @@ import org.matsim.core.utils.misc.Time;
 
 public class SimulationConfigGroup extends Module implements MobsimConfigGroupI {
 
+	private final static Logger log = Logger.getLogger(SimulationConfigGroup.class);
 	private static final long serialVersionUID = 1L;
 
 	public static final String GROUP_NAME = "simulation";
@@ -166,6 +167,7 @@ public class SimulationConfigGroup extends Module implements MobsimConfigGroupI 
 	/* (non-Javadoc)
 	 * @see org.matsim.core.config.groups.MobsimConfigGroupI#getStartTime()
 	 */
+	@Override
 	public double getStartTime() {
 		return this.startTime;
 	}
@@ -177,6 +179,7 @@ public class SimulationConfigGroup extends Module implements MobsimConfigGroupI 
 	/* (non-Javadoc)
 	 * @see org.matsim.core.config.groups.MobsimConfigGroupI#getEndTime()
 	 */
+	@Override
 	public double getEndTime() {
 		return this.endTime;
 	}
@@ -193,6 +196,7 @@ public class SimulationConfigGroup extends Module implements MobsimConfigGroupI 
 	/* (non-Javadoc)
 	 * @see org.matsim.core.config.groups.MobsimConfigGroupI#getTimeStepSize()
 	 */
+	@Override
 	public double getTimeStepSize() {
 		return this.timeStepSize;
 	}
@@ -204,6 +208,7 @@ public class SimulationConfigGroup extends Module implements MobsimConfigGroupI 
 	/* (non-Javadoc)
 	 * @see org.matsim.core.config.groups.MobsimConfigGroupI#getSnapshotPeriod()
 	 */
+	@Override
 	public double getSnapshotPeriod() {
 		return this.snapshotPeriod;
 	}
@@ -219,6 +224,7 @@ public class SimulationConfigGroup extends Module implements MobsimConfigGroupI 
 	/* (non-Javadoc)
 	 * @see org.matsim.core.config.groups.MobsimConfigGroupI#getSnapshotFormat()
 	 */
+	@Override
 	public String getSnapshotFormat() {
 		return this.snapshotFormat;
 	}
@@ -230,6 +236,7 @@ public class SimulationConfigGroup extends Module implements MobsimConfigGroupI 
 	/* (non-Javadoc)
 	 * @see org.matsim.core.config.groups.MobsimConfigGroupI#getFlowCapFactor()
 	 */
+	@Override
 	public double getFlowCapFactor() {
 		return this.flowCapFactor;
 	}
@@ -241,6 +248,7 @@ public class SimulationConfigGroup extends Module implements MobsimConfigGroupI 
 	/* (non-Javadoc)
 	 * @see org.matsim.core.config.groups.MobsimConfigGroupI#getStorageCapFactor()
 	 */
+	@Override
 	public double getStorageCapFactor() {
 		return this.stroageCapFactor;
 	}
@@ -252,6 +260,7 @@ public class SimulationConfigGroup extends Module implements MobsimConfigGroupI 
 	/* (non-Javadoc)
 	 * @see org.matsim.core.config.groups.MobsimConfigGroupI#getStuckTime()
 	 */
+	@Override
 	public double getStuckTime() {
 		return this.stuckTime;
 	}
@@ -263,6 +272,7 @@ public class SimulationConfigGroup extends Module implements MobsimConfigGroupI 
 	/* (non-Javadoc)
 	 * @see org.matsim.core.config.groups.MobsimConfigGroupI#isRemoveStuckVehicles()
 	 */
+	@Override
 	public boolean isRemoveStuckVehicles() {
 		return this.removeStuckVehicles;
 	}
@@ -287,13 +297,14 @@ public class SimulationConfigGroup extends Module implements MobsimConfigGroupI 
 	public void setSnapshotStyle(final String style) {
 		this.snapshotStyle = style.intern();
 		if (!"equiDist".equals(this.snapshotStyle) && !"queue".equals(this.snapshotStyle)) {
-			Logger.getLogger(this.getClass()).warn("The snapshotStyle \"" + style + "\" is not one of the known ones (queue, equiDist).");
+			log.warn("The snapshotStyle \"" + style + "\" is not one of the known ones (queue, equiDist).");
 		}
 	}
 
 	/* (non-Javadoc)
 	 * @see org.matsim.core.config.groups.MobsimConfigGroupI#getSnapshotStyle()
 	 */
+	@Override
 	public String getSnapshotStyle() {
 		return this.snapshotStyle;
 	}

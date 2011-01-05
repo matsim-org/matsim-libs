@@ -35,11 +35,11 @@ import org.matsim.ptproject.qsim.interfaces.Mobsim;
  *
  */
 public class MyMobsimFactory implements MobsimFactory {
-	private static final Logger log = Logger.getLogger("dummy");
+	private static final Logger log = Logger.getLogger(MyMobsimFactory.class);
 
 	private PersonalizableTravelCost travCostCalc;
 	private PersonalizableTravelTime travTimeCalc;
-	
+
 	private enum ReplanningType { general, carPlans }
 	private ReplanningType replanningType = ReplanningType.general ;
 
@@ -50,9 +50,9 @@ public class MyMobsimFactory implements MobsimFactory {
 
 	@Override
 	public Simulation createMobsim(Scenario sc, EventsManager events) {
-		
+
 		Mobsim mobsim = new QSim( sc, events ) ;
-		
+
 		if ( replanningType.equals( ReplanningType.general ) ) {
 			mobsim.addQueueSimulationListeners(new MyWithinDayMobsimListener(this.travCostCalc,this.travTimeCalc)) ;
 
@@ -61,12 +61,12 @@ public class MyMobsimFactory implements MobsimFactory {
 			// the above should work (at the same level as the remainder of the package if not better), but it uses
 			// EditRoutes, which at the time of moving this material into "matsim" was still in "playground" and thus
 			// cannot be referenced from here.  MyWithinDayMobsimListener2 is unter playground.kai.usecases.withinday .  kai, dec'10
-			
+
 		}
-		
+
 		mobsim.setAgentFactory( new ExperimentalBasicWithindayAgentFactory(mobsim) ) ;
-		
+
 		return mobsim ;
 	}
-	
+
 }

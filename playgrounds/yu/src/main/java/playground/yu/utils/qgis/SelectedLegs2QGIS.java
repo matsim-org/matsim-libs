@@ -22,8 +22,8 @@ package playground.yu.utils.qgis;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import org.apache.log4j.Logger;
 import org.geotools.feature.Feature;
-import org.jfree.util.Log;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
@@ -43,7 +43,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * @author yu
  */
 public class SelectedLegs2QGIS extends SelectedPlans2ESRIShapeChanged {
-
+	private final static Logger log = Logger.getLogger(SelectedLegs2QGIS.class);
 	private final Network network;
 
 	public SelectedLegs2QGIS(Population population, Network network,
@@ -100,7 +100,7 @@ public class SelectedLegs2QGIS extends SelectedPlans2ESRIShapeChanged {
 		try {
 			sp.write();
 		} catch (IOException e) {
-			Log.error(e.getMessage(), e);
+			log.error(e);
 		}
 	}
 

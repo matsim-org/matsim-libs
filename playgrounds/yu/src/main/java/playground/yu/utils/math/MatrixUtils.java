@@ -19,21 +19,21 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.utils.math;
 
 import java.text.DecimalFormat;
-import java.util.logging.Logger;
+
+import org.apache.log4j.Logger;
 
 import Jama.Matrix;
 
 /**
  * @author yu
- * 
  */
 public class MatrixUtils {
-	private static String MATRIX_CALCULATION = "Matrix Calculation";
+	private final static Logger log = Logger.getLogger(MatrixUtils.class);
 
 	/**
 	 * @param A
@@ -83,19 +83,16 @@ public class MatrixUtils {
 	public static Matrix getMinimumNormSolution(Matrix A, Matrix y) {
 		Matrix GI;
 		if (isConsistantEquation(A, y)) {// consistant
-			Logger.getLogger(MATRIX_CALCULATION).info(
+			log.info(
 					"Generalized Inverse BEGAN");
 			GI = MatrixUtils.getGeneralizedInverse(A);
-			Logger.getLogger(MATRIX_CALCULATION).info(
+			log.info(
 					"Generalized Inverse ENDED");
 
 			Matrix A_adjugate = A.transpose();
 			Matrix GAA_adjugate = GI.times(A).times(A_adjugate);
 			if (MatrixUtils.equals(A_adjugate, GAA_adjugate))
-				Logger
-						.getLogger(MATRIX_CALCULATION)
-						.info(
-								"this generalized inverse is a appropriate one for the minimum norm solution!!!");
+				log.info("this generalized inverse is a appropriate one for the minimum norm solution!!!");
 			else {
 				System.err
 						.println("this generalized inverse is NOT for the minimum norm solution!!!");
@@ -103,15 +100,11 @@ public class MatrixUtils {
 				return null;
 			}
 		} else {// inconsistant
-			Logger
-					.getLogger(MATRIX_CALCULATION)
-					.info(
+			log.info(
 							"Ax=y is an inconsistant equation, so the minimum norm least squares solution will be calculated.");
-			Logger.getLogger(MATRIX_CALCULATION).info(
-					"Moore-Pernrose Pseudo Inverse BEGAN");
+			log.info("Moore-Pernrose Pseudo Inverse BEGAN");
 			GI = MatrixUtils.getMoorePernrosePseudoInverse(A);
-			Logger.getLogger(MATRIX_CALCULATION).info(
-					"Moore-Pernrose Pseudo Inverse ENDED");
+			log.info("Moore-Pernrose Pseudo Inverse ENDED");
 		}
 		return GI.times(y);
 	}
@@ -140,7 +133,7 @@ public class MatrixUtils {
 	/**
 	 * @param A
 	 *            Matrix
-	 * 
+	 *
 	 * @return if A is a real matrix, return (Moore-Penrose pseudo inverse ==)
 	 *         generalized inverse, else it doesn't belong to this application
 	 */
@@ -149,11 +142,9 @@ public class MatrixUtils {
 	}
 
 	public static Matrix getGeneralizedInverse(Matrix A) {
-		Logger.getLogger(MATRIX_CALCULATION).info(
-				"Full-rank Decomposition BEGAN");
+		log.info("Full-rank Decomposition BEGAN");
 		FullRankDecompositionWithJAMA frd = new FullRankDecompositionWithJAMA(A);
-		Logger.getLogger(MATRIX_CALCULATION).info(
-				"Full-rank Decomposition ENDED");
+		log.info("Full-rank Decomposition ENDED");
 		Matrix F_t = frd.getF().transpose(), G_t = frd.getG().transpose();
 		Matrix F_txAxG_t = F_t.times(A).times(G_t);
 		System.out.println("F_txAxG_t^-1 =\t" + F_txAxG_t.det());
@@ -250,11 +241,9 @@ public class MatrixUtils {
 			m = this.REF.getRowDimension();
 			n = this.REF.getColumnDimension();
 			TE = Matrix.identity(m, m);// Identity matrix
-			Logger.getLogger(MATRIX_CALCULATION).info(
-					"Pivot Gaussian Elimination BEGAN");
+			log.info("Pivot Gaussian Elimination BEGAN");
 			calculate();
-			Logger.getLogger(MATRIX_CALCULATION).info(
-					"Pivot Gaussian Elimination ENDED");
+			log.info("Pivot Gaussian Elimination ENDED");
 		}
 
 		public Matrix getRowEchelonForm() {
@@ -276,7 +265,7 @@ public class MatrixUtils {
 						maxi = k;
 				}// end for
 
-				// if A[maxi,j] ≠ 0 then
+				// if A[maxi,j] != 0 then
 				// swap rows i and maxi, but do not change the value of i
 				// Now A[i,j] will contain the old value of A[maxi,j].
 				if (REF.get(maxi, j) != 0d) {

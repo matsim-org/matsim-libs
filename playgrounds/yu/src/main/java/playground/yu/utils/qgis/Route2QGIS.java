@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.yu.utils.qgis;
 
 import java.io.IOException;
@@ -5,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.geotools.factory.FactoryRegistryException;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
@@ -15,7 +35,6 @@ import org.geotools.feature.FeatureTypeBuilder;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.referencing.CRS;
-import org.jfree.util.Log;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
@@ -44,6 +63,7 @@ import com.vividsolutions.jts.geom.Polygon;
  */
 public class Route2QGIS extends SelectedPlans2ESRIShapeChanged implements
 		X2QGIS {
+	private final static Logger log = Logger.getLogger(Route2QGIS.class);
 	protected Map<List<Id>, Integer> routeCounters;
 	protected NetworkImpl network;
 	private FeatureType featureTypeRoute;
@@ -194,7 +214,7 @@ public class Route2QGIS extends SelectedPlans2ESRIShapeChanged implements
 		} catch (FactoryException e1) {
 			e1.printStackTrace();
 		} catch (IOException e) {
-			Log.error(e.getMessage(), e);
+			log.error(e.getMessage(), e);
 		}
 	}
 

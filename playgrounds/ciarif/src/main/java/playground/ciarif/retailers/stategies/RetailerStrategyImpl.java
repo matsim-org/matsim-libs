@@ -3,18 +3,18 @@ package playground.ciarif.retailers.stategies;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.TreeMap;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.network.NetworkImpl;
+
 import playground.ciarif.retailers.data.LinkRetailersImpl;
 
 public class RetailerStrategyImpl
   implements RetailerStrategy
 {
-  protected static final Logger log = Logger.getLogger(GravityModelRetailerStrategy.class);
+  private static final Logger log = Logger.getLogger(GravityModelRetailerStrategy.class);
   protected Map<Id, ActivityFacilityImpl> retailerFacilities;
   protected Controler controler;
 
@@ -24,7 +24,8 @@ public class RetailerStrategyImpl
     log.info("Controler" + this.controler);
   }
 
-  public Map<Id, ActivityFacilityImpl> moveFacilities(Map<Id, ActivityFacilityImpl> facilities, TreeMap<Id, LinkRetailersImpl> links)
+  @Override
+	public Map<Id, ActivityFacilityImpl> moveFacilities(Map<Id, ActivityFacilityImpl> facilities, TreeMap<Id, LinkRetailersImpl> links)
   {
     return null;
   }
@@ -59,7 +60,7 @@ public class RetailerStrategyImpl
     TreeMap<Id,LinkRetailersImpl> availableLinks = new TreeMap<Id,LinkRetailersImpl>();
     for (ActivityFacilityImpl af : this.retailerFacilities.values()) {
     	Id id = af.getLinkId();
-    	LinkRetailersImpl link = new LinkRetailersImpl((Link)this.controler.getNetwork().getLinks().get(id), (NetworkImpl)this.controler.getNetwork(), Double.valueOf(0.0D), Double.valueOf(0.0D));
+    	LinkRetailersImpl link = new LinkRetailersImpl(this.controler.getNetwork().getLinks().get(id), this.controler.getNetwork(), Double.valueOf(0.0D), Double.valueOf(0.0D));
     	availableLinks.put(id, link);
     }
     availableLinks.putAll(freeLinks);

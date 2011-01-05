@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.general.scoring;
 
@@ -33,19 +33,21 @@ import org.matsim.core.controler.listener.StartupListener;
 /**
  * a changed copy of {@code PlansScoring} for the parameter calibration,
  * especially in order to put new parameters to CharyparNagelScoringConfigGroup
- * 
+ *
  * @author yu
- * 
+ *
  */
 public class PlansScoring4PC_mnl extends PlansScoring4PC implements
 		StartupListener, ScoringListener, IterationStartsListener {
+	private final static Logger log = Logger.getLogger(PlansScoring4PC_mnl.class);
+	@Override
 	public void notifyStartup(final StartupEvent event) {
 		Controler ctl = event.getControler();
 
 		planScorer = new Events2Score4PC_mnl(ctl.getConfig(), ctl
 				.getScoringFunctionFactory(), ctl.getPopulation());
 
-		Logger.getLogger(PlansScoring4PC_mnl.class).debug(
+		log.debug(
 				"PlansScoring4PC_mnl loaded ScoringFunctionFactory");
 
 		ctl.getEvents().addHandler(planScorer);

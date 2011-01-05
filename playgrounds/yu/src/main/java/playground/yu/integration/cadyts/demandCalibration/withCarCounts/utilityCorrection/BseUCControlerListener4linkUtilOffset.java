@@ -29,10 +29,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
-import java.util.logging.Logger;
+import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -73,6 +73,9 @@ import cadyts.utilities.misc.DynamicData;
 
 public class BseUCControlerListener4linkUtilOffset implements StartupListener,
 		AfterMobsimListener, BeforeMobsimListener, BseControlerListener {
+
+	private final static Logger log = Logger.getLogger(BseUCControlerListener4linkUtilOffset.class);
+
 	private MATSimUtilityModificationCalibrator<Link> calibrator = null;
 	private SimResults<Link> resultsContainer = null;
 	/* default */VolumesAnalyzer volumes = null;
@@ -98,6 +101,7 @@ public class BseUCControlerListener4linkUtilOffset implements StartupListener,
 		return ((LinkImpl) l).calcDistance(distanceFilterCenterNodeCoord) < distanceFilter;
 	}
 
+	@Override
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
 		int iter = event.getIteration();
 		if (iter % 100 == 0 && iter > strategyDisableAfter) {
@@ -107,6 +111,7 @@ public class BseUCControlerListener4linkUtilOffset implements StartupListener,
 		}
 	}
 
+	@Override
 	public void notifyAfterMobsim(final AfterMobsimEvent event) {
 		calibrator.afterNetworkLoading(resultsContainer
 		// , null
@@ -156,11 +161,9 @@ public class BseUCControlerListener4linkUtilOffset implements StartupListener,
 			System.out.println("rank[A] =\t" + A.rank() + "\trank[A_b] =\t"
 					+ A_b.rank());
 
-			Logger.getLogger(MATRIX_CALCULATION).info(
-					"Minimum Norm Solution BEGAN");
+			log.info("Minimum Norm Solution BEGAN");
 			Matrix x = MatrixUtils.getMinimumNormSolution(A, b);
-			Logger.getLogger(MATRIX_CALCULATION).info(
-					"Minimum Norm Solution ENDED");
+			log.info("Minimum Norm Solution ENDED");
 
 			// output unknown x
 			SimpleWriter writer = new SimpleWriter(io.getIterationFilename(
@@ -207,7 +210,7 @@ public class BseUCControlerListener4linkUtilOffset implements StartupListener,
 
 			double rnorm = Residual.normInf();
 			System.out.println("Matrix\tResidual Infinity norm:\t" + rnorm);
-			//			
+			//
 			pltbmc.reset(iter);
 		}
 	}
@@ -252,10 +255,12 @@ public class BseUCControlerListener4linkUtilOffset implements StartupListener,
 	// }
 	// }
 
+	@Override
 	public void setWriteQGISFile(final boolean writeQGISFile) {
 		this.writeQGISFile = writeQGISFile;
 	}
 
+	@Override
 	public void notifyStartup(final StartupEvent event) {
 		final Controler ctl = event.getControler();
 		final Network network = ctl.getNetwork();
@@ -434,6 +439,7 @@ public class BseUCControlerListener4linkUtilOffset implements StartupListener,
 		/***/
 		private static final long serialVersionUID = 1L;
 
+		@Override
 		public double getSimValue(final Link link, final int startTime_s,
 				final int endTime_s, final TYPE type) {
 			int hour = startTime_s / 3600;

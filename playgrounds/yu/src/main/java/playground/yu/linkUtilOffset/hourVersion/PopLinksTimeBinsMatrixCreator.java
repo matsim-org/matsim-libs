@@ -57,6 +57,7 @@ import Jama.QRDecomposition;
  *
  */
 public class PopLinksTimeBinsMatrixCreator implements LinkLeaveEventHandler {
+	private final static Logger log = Logger.getLogger(PopLinksTimeBinsMatrixCreator.class);
 	/** matrix[mxn] m-number of pop, n-number of links */
 	private Matrix matrix;
 	private static double TIME_BIN = 3600d;// an hour
@@ -284,10 +285,8 @@ public class PopLinksTimeBinsMatrixCreator implements LinkLeaveEventHandler {
 	}
 
 	public static void main(String[] args) {
-		Logger.getLogger(PopLinksTimeBinsMatrixCreator.class).info(
-				"----------------->STARTED-------------------------");
+		log.info("----------------->STARTED-------------------------");
 		runJama(args);
-		Logger.getLogger(PopLinksTimeBinsMatrixCreator.class).info(
-				"----------------->ENDED-------------------------");
+		log.info("----------------->ENDED-------------------------");
 	}
 }

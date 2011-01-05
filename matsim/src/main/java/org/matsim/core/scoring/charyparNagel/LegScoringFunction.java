@@ -39,6 +39,7 @@ import org.matsim.core.scoring.interfaces.LegScoring;
  */
 public class LegScoringFunction implements LegScoring, BasicScoring {
 
+	private final static Logger log = Logger.getLogger(LegScoringFunction.class);
 	protected final Plan plan;
 
 	protected double score;
@@ -59,25 +60,30 @@ public class LegScoringFunction implements LegScoring, BasicScoring {
 		this.plan = plan;
 	}
 
+	@Override
 	public void reset() {
 		this.lastTime = INITIAL_LAST_TIME;
 		this.index = INITIAL_INDEX;
 		this.score = INITIAL_SCORE;
 	}
 
+	@Override
 	public void startLeg(final double time, final Leg leg) {
 		this.lastTime = time;
 	}
 
+	@Override
 	public void endLeg(final double time) {
 		handleLeg(time);
 		this.lastTime = time;
 	}
 
+	@Override
 	public void finish() {
 
 	}
 
+	@Override
 	public double getScore() {
 		return this.score;
 	}
@@ -110,10 +116,10 @@ public class LegScoringFunction implements LegScoring, BasicScoring {
 				 * that the distance in the leg is the actual distance driven by
 				 * the agent.
 				 */
-					Logger.getLogger(LegScoringFunction.class).warn("leg distance for scoring computed from plan, not from execution (=events)." +
+					log.warn("leg distance for scoring computed from plan, not from execution (=events)." +
 							"This is not how it is meant to be, and it will fail for within-day replanning." ) ;
-					Logger.getLogger(LegScoringFunction.class).warn("Also means that first and last link are not included." ) ;
-					Logger.getLogger(LegScoringFunction.class).warn( Gbl.ONLYONCE ) ;
+					log.warn("Also means that first and last link are not included." ) ;
+					log.warn( Gbl.ONLYONCE ) ;
 					distanceWrnCnt++ ;
 				}
 			}

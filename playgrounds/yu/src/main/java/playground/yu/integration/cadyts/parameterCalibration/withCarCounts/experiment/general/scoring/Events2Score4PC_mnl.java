@@ -19,14 +19,14 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.general.scoring;
 
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -42,10 +42,13 @@ import cadyts.utilities.math.Vector;
 
 /**
  * @author yu
- * 
+ *
  */
 public class Events2Score4PC_mnl extends Events2Score4PC implements
 		MultinomialLogitChoice {
+
+	private final static Logger log = Logger.getLogger(Events2Score4PC_mnl.class);
+
 	protected MultinomialLogit mnl;
 
 	public Events2Score4PC_mnl(Config config, ScoringFunctionFactory sfFactory,
@@ -54,6 +57,7 @@ public class Events2Score4PC_mnl extends Events2Score4PC implements
 		mnl = createMultinomialLogit(config);
 	}
 
+	@Override
 	public MultinomialLogit getMultinomialLogit() {
 		return mnl;
 	}
@@ -66,11 +70,12 @@ public class Events2Score4PC_mnl extends Events2Score4PC implements
 	 * set Attr. and Utility (not the score in MATSim) of plans of a person.
 	 * This method should be called after removedPlans, i.e. there should be
 	 * only choiceSetSize plans in the memory of an agent.
-	 * 
+	 *
 	 * @param person
 	 * @param travelingCarStats
 	 * @param performingStats
 	 */
+	@Override
 	public void setPersonAttrs(Person person) {
 		Id agentId = person.getId();
 		Map<Plan, Double> legDurMapCar = legDursCar.get(agentId), legDurMapPt = legDursPt
@@ -133,7 +138,7 @@ public class Events2Score4PC_mnl extends Events2Score4PC implements
 
 					|| Double.isNaN(carLegNo) || Double.isNaN(ptLegNo)
 					|| Double.isNaN(walkLegNo)) {
-				Logger.getLogger("MC_INTEGRATION").warning(
+				log.warn(
 						"\tNaN Exception:\nattr of traveling\t" + legDurCar
 								+ "\nattr of travelingPt\t" + legDurPt
 								+ "\nattr of travelingWalk\t" + legDurWalk
@@ -157,7 +162,7 @@ public class Events2Score4PC_mnl extends Events2Score4PC implements
 			if (plans.size() <= maxPlansPerAgent)/* with mnl */{
 				// choice set index & size check
 				if (choiceIdx < 0 || choiceIdx >= mnl.getChoiceSetSize()) {
-					Logger.getLogger("MC_INTEGRATION").warning(
+					log.warn(
 							"IndexOutofBound, choiceIdx<0 or >=choiceSetSize!\nperson "
 									+ agentId + " the " + choiceIdx + ". Plan");
 					throw new RuntimeException();
@@ -172,7 +177,7 @@ public class Events2Score4PC_mnl extends Events2Score4PC implements
 				mnl.setAttribute(choiceIdx, attrNameList
 						.indexOf("travelingWalk"), legDurWalk);
 
-				//				
+				//
 				mnl.setAttribute(choiceIdx, attrNameList.indexOf("performing"),
 						perfAttr);
 
@@ -198,6 +203,7 @@ public class Events2Score4PC_mnl extends Events2Score4PC implements
 		}
 	}
 
+	@Override
 	public void setPersonScore(Person person) {
 		Id agentId = person.getId();
 		Map<Plan, Double> legDurMapCar = legDursCar.get(agentId), legDurMapPt = legDursPt
@@ -258,7 +264,7 @@ public class Events2Score4PC_mnl extends Events2Score4PC implements
 
 					|| Double.isNaN(carLegNo) || Double.isNaN(ptLegNo)
 					|| Double.isNaN(walkLegNo)) {
-				Logger.getLogger("MC_INTEGRATION").warning(
+				log.warn(
 						"\tNaN Exception:\nattr of traveling\t" + legDurCar
 								+ "\nattr of travelingPt\t" + legDurPt
 								+ "\nattr of travelingWalk\t" + legDurWalk
@@ -359,7 +365,7 @@ public class Events2Score4PC_mnl extends Events2Score4PC implements
 		mnl.setCoefficient(attrNameList.indexOf("travelingWalk"), scoring
 				.getTravelingWalk_utils_hr());
 
-		//		
+		//
 		mnl.setCoefficient(attrNameList.indexOf("performing"), scoring
 				.getPerforming_utils_hr());
 		//

@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.jjoubert.CommercialTraffic;
 
 import java.io.BufferedReader;
@@ -9,9 +28,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Scanner;
 
+import org.apache.log4j.Logger;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.CRS;
-import org.jfree.util.Log;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
@@ -21,13 +40,14 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
 import com.vividsolutions.jts.geom.Coordinate;
 
 public class VehicleReport {
+	private final static Logger log = Logger.getLogger(VehicleReport.class);
 	static String VEHICLE = "100869";
 	static String PROVINCE = "Gauteng";
-	
+
 	static String ROOT = "/Users/johanwjoubert/MATSim/workspace/MATSimData/";
 	static String RAW_SOURCE = ROOT + PROVINCE + "/Sorted/" + VEHICLE + ".txt";
 	static String XML_SOURCE = ROOT + PROVINCE + "/XML/" + VEHICLE + ".xml";
-	
+
 	static String OUPUT_FOLDER = ROOT + "Temp/" + VEHICLE + "/";
 
 	private final static String WGS84 = "GEOGCS[\"GCS_WGS_1984\",DATUM[\"D_WGS_1984\",SPHEROID[\"WGS_1984\", 6378137.0, 298.257223563]],PRIMEM[\"Greenwich\", 0.0],UNIT[\"degree\", 0.017453292519943295],AXIS[\"Lon\", EAST],AXIS[\"Lat\", NORTH]]";
@@ -52,16 +72,16 @@ public class VehicleReport {
 			e.printStackTrace();
 		}
 
-		// Ensure the output directory exist 
+		// Ensure the output directory exist
 		File outputFolder = new File( OUPUT_FOLDER );
 		boolean checkDirectory = outputFolder.mkdirs();
 		if(!checkDirectory){
-			Log.warn("Could not make " + outputFolder.toString() + ", or it already exists!");
+			log.warn("Could not make " + outputFolder.toString() + ", or it already exists!");
 		}
 
 		// Convert the vehicle file to the essential, and WGS84_UMT35S, format
 		convertRawInput(mt);
-		
+
 		// Convert the vehicle's XML file into activity chains
 		convertXMLInput();
 	}
@@ -74,7 +94,7 @@ public class VehicleReport {
 			try{
 				output.write("Long,Lat,Major");
 				output.newLine();
-				
+
 				for (Chain chain : vehicle.getChains() ) {
 					for (int i = 0; i < chain.getActivities().size(); i++ ) {
 						int type = 2;
@@ -103,7 +123,7 @@ public class VehicleReport {
 		try {
 			Scanner input = new Scanner(new BufferedReader(new FileReader(new File( RAW_SOURCE ) ) ) );
 			BufferedWriter output = new BufferedWriter(new FileWriter(new File( OUPUT_FOLDER + VEHICLE + ".txt" ) ) );
-			
+
 			try{
 				output.write( "Long,Lat" );
 				output.newLine();
@@ -120,13 +140,13 @@ public class VehicleReport {
 							output.newLine();
 						} catch (TransformException e) {
 							;
-						}			
+						}
 					}
 				}
 			} finally{
 				output.close();
 			}
-			
+
 		} catch (FileNotFoundException e) { // For Scanner
 			e.printStackTrace();
 		} catch (IOException e) { // For BufferedWriter
@@ -134,11 +154,11 @@ public class VehicleReport {
 		}
 		System.out.printf("Done.\n\n");
 	}
-	
+
 	private static String readVehicleStringFromFile(int vehID){
 		BufferedReader br = null;
 		StringBuilder sb = new StringBuilder();
-		
+
 		try{
 			br = new BufferedReader( new FileReader( XML_SOURCE ) );
 			try{
@@ -153,9 +173,9 @@ public class VehicleReport {
 		} catch (IOException ex) {
 			ex.printStackTrace();
 		}
-		return sb.toString();		
+		return sb.toString();
 	}
-	
+
 	private static Vehicle convertVehicleFromXML (String XMLString){
 		Vehicle vehicle = null;
 		XStream xstream = new XStream(new DomDriver());

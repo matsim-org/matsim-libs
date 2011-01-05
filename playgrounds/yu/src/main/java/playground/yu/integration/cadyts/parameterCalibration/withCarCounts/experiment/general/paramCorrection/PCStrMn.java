@@ -51,6 +51,7 @@ import cadyts.utilities.math.Vector;
 
 public class PCStrMn extends BseParamCalibrationStrategyManager implements
 		BseStrategyManager {
+	private final static Logger log = Logger.getLogger(PCStrMn.class);
 	private double delta, brainExpBeta;
 	// private ChoiceParameterCalibrator3<Link> calibrator = null;
 	private int paramDimension;
@@ -78,6 +79,7 @@ public class PCStrMn extends BseParamCalibrationStrategyManager implements
 		this.delta = delta;
 	}
 
+	@Override
 	protected void beforePopulationRunHook(Population population) {
 		// the most things before "removePlans"
 		super.beforePopulationRunHook(population);// iter++
@@ -100,11 +102,13 @@ public class PCStrMn extends BseParamCalibrationStrategyManager implements
 		}
 	}
 
+	@Override
 	protected void afterRemovePlanHook(Plan plan) {
 		super.afterRemovePlanHook(plan);
 		// something could be done here.
 	}
 
+	@Override
 	protected void beforeStrategyRunHook(Person person, PlanStrategy strategy) {
 		// choose reset because of removeWorstPlan
 		resetChooser();
@@ -155,6 +159,7 @@ public class PCStrMn extends BseParamCalibrationStrategyManager implements
 		}
 	}
 
+	@Override
 	protected void afterStrategyRunHook(Person person, PlanStrategy strategy) {
 		super.afterStrategyRunHook(person, strategy);
 		if (strategy != null) {
@@ -197,7 +202,7 @@ public class PCStrMn extends BseParamCalibrationStrategyManager implements
 					Vector probs = mnl.getProbs();
 
 					if (Double.isNaN(probs.sum())) {
-						Logger.getLogger(PCStrMn.class).fatal("mnl/probs/NaN");
+						log.fatal("mnl/probs/NaN");
 						System.out
 								.println("selecteIdx from ChangeExpBeta (MATSim)\t"
 										+ selectIdx
@@ -344,7 +349,7 @@ public class PCStrMn extends BseParamCalibrationStrategyManager implements
 	// false/* without ASC */);
 	// if (Double.isNaN(probs.get(0))
 	// || Double.isNaN(probs.get(1))) {
-	// Logger.getLogger(PCStrMn.class).fatal(
+	// log.fatal(
 	// "mnl/probs/NaN");
 	// System.out
 	// .println("selecteIdx from ExpBetaPlanChanger\t"
@@ -422,6 +427,7 @@ public class PCStrMn extends BseParamCalibrationStrategyManager implements
 	// strategy.finish();
 	// }
 
+	@Override
 	protected void afterRunHook(Population population) {
 		super.afterRunHook(population);
 		// output stats and variabilities

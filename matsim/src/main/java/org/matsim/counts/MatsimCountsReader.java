@@ -38,6 +38,7 @@ import org.xml.sax.SAXException;
  */
 public class MatsimCountsReader extends MatsimXmlParser {
 
+	private final static Logger log = Logger.getLogger(MatsimCountsReader.class);
 	private final static String COUNTS_V1 = "counts_v1.xsd";
 
 	private final Counts counts;
@@ -86,7 +87,7 @@ public class MatsimCountsReader extends MatsimXmlParser {
 		// Currently the only counts-type is v1
 		if (COUNTS_V1.equals(doctype)) {
 			this.delegate = new CountsReaderMatsimV1(this.counts);
-			Logger.getLogger(MatsimCountsReader.class).info("using counts_v1-reader.");
+			log.info("using counts_v1-reader.");
 		} else {
 			throw new IllegalArgumentException("Doctype \"" + doctype + "\" not known.");
 		}

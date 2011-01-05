@@ -52,6 +52,7 @@ import playground.gregor.snapshots.postprocessors.PostProcessorI;
 
 public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArrivalEventHandler, LinkEnterEventHandler,
 		LinkLeaveEventHandler, AgentWait2LinkEventHandler, AgentStuckEventHandler {
+	private final static Logger log = Logger.getLogger(SnapshotGenerator.class);
 
 	private final NetworkImpl network;
 	private int lastSnapshotIndex = -1;
@@ -89,36 +90,43 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 		this.colorizers .add(colorizer);
 	}
 
+	@Override
 	public void handleEvent(final AgentDepartureEvent event) {
 		testForSnapshot(event.getTime());
 		this.eventLinks.get(event.getLinkId()).departure(getEventAgent(event));
 	}
 
+	@Override
 	public void handleEvent(final AgentArrivalEvent event) {
 		testForSnapshot(event.getTime());
 		this.eventLinks.get(event.getLinkId()).arrival(getEventAgent(event));
 	}
 
+	@Override
 	public void handleEvent(final LinkEnterEvent event) {
 		testForSnapshot(event.getTime());
 		this.eventLinks.get(event.getLinkId()).enter(getEventAgent(event));
 	}
 
+	@Override
 	public void handleEvent(final LinkLeaveEvent event) {
 		testForSnapshot(event.getTime());
 		this.eventLinks.get(event.getLinkId()).leave(getEventAgent(event));
 	}
 
+	@Override
 	public void handleEvent(final AgentWait2LinkEvent event) {
 		testForSnapshot(event.getTime());
 		this.eventLinks.get(event.getLinkId()).wait2link(getEventAgent(event));
 	}
 
+	@Override
 	public void handleEvent(final AgentStuckEvent event) {
 		testForSnapshot(event.getTime());
 		this.eventLinks.get(event.getLinkId()).stuck(getEventAgent(event));
 	}
 
+	@Override
 	public void reset(final int iteration) {
 		this.eventLinks.clear();
 		for (Link link : this.network.getLinks().values()) {
@@ -192,7 +200,7 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 				link.getVehiclePositionsEquil(positions, time);
 			}
 		} else {
-			Logger.getLogger(this.getClass()).warn("The snapshotStyle \"" + this.snapshotStyle + "\" is not supported.");
+			log.warn("The snapshotStyle \"" + this.snapshotStyle + "\" is not supported.");
 		}
 		return positions;
 	}
@@ -463,6 +471,7 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 			this.intId = id.hashCode();
 		}
 
+		@Override
 		public int compareTo(final EventAgent o) {
 			return this.id.compareTo(o.id);
 		}

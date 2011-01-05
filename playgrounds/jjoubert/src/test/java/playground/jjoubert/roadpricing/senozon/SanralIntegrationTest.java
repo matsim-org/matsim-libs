@@ -28,6 +28,7 @@ import org.junit.Test;
 import org.matsim.core.api.experimental.events.AgentMoneyEvent;
 import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.testcases.MatsimTestUtils;
@@ -55,8 +56,13 @@ public class SanralIntegrationTest {
 		}
 
 		Assert.assertEquals("expected 3 money events", 3, events.size());
-		Assert.assertEquals(-2.0, events.get(0).getAmount(), 1e-8); // factor assumed to be 1.0
-		Assert.assertEquals(-6.0, events.get(1).getAmount(), 1e-8); // factor assumed to be 3.0
-		Assert.assertEquals(-10.0, events.get(2).getAmount(), 1e-8); // factor assumed to be 5.0
+
+		double amount1 = SanralTollFactor.getTollFactor(new IdImpl(1));
+		double amount2 = SanralTollFactor.getTollFactor(new IdImpl(1000000));
+		double amount3 = SanralTollFactor.getTollFactor(new IdImpl(2000000));
+
+		Assert.assertEquals(-2 * amount1, events.get(0).getAmount(), 1e-8);
+		Assert.assertEquals(-2 * amount2, events.get(1).getAmount(), 1e-8);
+		Assert.assertEquals(-2 * amount3, events.get(2).getAmount(), 1e-8);
 	}
 }

@@ -48,13 +48,13 @@ import org.matsim.ptproject.qsim.interfaces.NetsimLink;
 import org.matsim.ptproject.qsim.qnetsimengine.QVehicle;
 
 /**As stated in the package info, this class is an <i>untested</i> design suggestion.  Comments are welcome.  kai, dec'10
- * 
+ *
  * @author nagel
  */
 public class MyWithinDayMobsimListener implements SimulationListener, SimulationBeforeSimStepListener {
-    private static final Logger log = Logger.getLogger("dummy");
+    private static final Logger log = Logger.getLogger(MyWithinDayMobsimListener.class);
 
-	
+
 	private PersonalizableTravelCost travCostCalc;
 	private PersonalizableTravelTime travTimeCalc;
 	private PlansCalcRoute routeAlgo ;
@@ -67,20 +67,20 @@ public class MyWithinDayMobsimListener implements SimulationListener, Simulation
 
 	@Override
 	public void notifySimulationBeforeSimStep(SimulationBeforeSimStepEvent event) {
-		
+
 		Mobsim mobsim = (Mobsim) event.getQueueSimulation() ;
 		this.scenario = mobsim.getScenario();
 
-		Collection<PersonAgent> agentsToReplan = getAgentsToReplan( mobsim ) ; 
-		
-		this.routeAlgo = new PlansCalcRoute(mobsim.getScenario().getConfig().plansCalcRoute(), mobsim.getScenario().getNetwork(), 
+		Collection<PersonAgent> agentsToReplan = getAgentsToReplan( mobsim ) ;
+
+		this.routeAlgo = new PlansCalcRoute(mobsim.getScenario().getConfig().plansCalcRoute(), mobsim.getScenario().getNetwork(),
 				this.travCostCalc, this.travTimeCalc, new DijkstraFactory() );
-		
+
 		for ( PersonAgent pa : agentsToReplan ) {
 			doReplanning( pa, mobsim ) ;
 		}
 	}
-	
+
 	private List<PersonAgent> getAgentsToReplan(Mobsim mobsim ) {
 
 		List<PersonAgent> set = new ArrayList<PersonAgent>();
@@ -102,32 +102,32 @@ public class MyWithinDayMobsimListener implements SimulationListener, Simulation
 	}
 
 	private boolean doReplanning(PersonAgent personAgent, Mobsim mobsim ) {
-		
+
 		// preconditions:
 
 		if ( !(personAgent instanceof ExperimentalBasicWithindayAgent) ) {
 			log.error("agent of wrong type; returning ... " ) ;
 		}
 		ExperimentalBasicWithindayAgent withindayAgent = (ExperimentalBasicWithindayAgent) personAgent ;
-		
+
 		Plan plan = withindayAgent.getModifiablePlan() ;
 
 		if (plan == null) {
 			log.info( " we don't have a selected plan; returning ... ") ;
 			return false;
 		}
-		
+
 		// =============================================================================================================
 		// =============================================================================================================
 		// since this is a use case, let us enumerate relevant data structure operations:
-		
+
 		if ( withindayAgent.getCurrentPlanElement() instanceof Activity ) {
 
 			// (I) @ activity:
 			double oldTime = -1. ;
 			double newTime = -1. ;
 			mobsim.rescheduleActivityEnd(withindayAgent, oldTime, newTime) ;
-			// might be nice to be able to actively remove the agent from the activity, but this is strictly 
+			// might be nice to be able to actively remove the agent from the activity, but this is strictly
 			// speaking not necessary since the departure can be scheduled for immediately.  kai, nov'10
 
 		} else if ( withindayAgent.getCurrentPlanElement() instanceof Leg ) {
@@ -167,10 +167,10 @@ public class MyWithinDayMobsimListener implements SimulationListener, Simulation
 			}
 
 		}
-		
+
 		// finally reset the cached Values of the PersonAgent - they may have changed!
 		withindayAgent.resetCaches();
-		
+
 		return true;
 	}
 

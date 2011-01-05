@@ -42,6 +42,7 @@ import org.xml.sax.SAXException;
  */
 public class ConfigReaderMatsimV1 extends MatsimXmlParser implements MatsimSomeReader {
 
+	private final static Logger log = Logger.getLogger(ConfigReaderMatsimV1.class);
 //	private final static String CONFIG = "config";
 	private final static String MODULE = "module";
 	private final static String INCLUDE = "include";
@@ -63,7 +64,7 @@ public class ConfigReaderMatsimV1 extends MatsimXmlParser implements MatsimSomeR
 		} else if (MODULE.equals(name)) {
 			startModule(atts);
 		} else if (INCLUDE.equals(name)) {
-			Logger.getLogger(this.getClass()).warn("<incude> is currently not supported.");
+			log.warn("<incude> is currently not supported.");
 		}
 	}
 
@@ -140,7 +141,7 @@ public class ConfigReaderMatsimV1 extends MatsimXmlParser implements MatsimSomeR
 		if (is == null && this.localDtd != null) {
 			File dtdFile = new File(this.localDtd);
 			if (dtdFile.exists() && dtdFile.isFile() && dtdFile.canRead()) {
-				Logger.getLogger(this.getClass()).info("Using the local DTD " + this.localDtd);
+				log.info("Using the local DTD " + this.localDtd);
 				return new InputSource(this.localDtd);
 			}
 			return null;

@@ -348,7 +348,7 @@ public final class TransitRouterNetwork implements Network {
 				for (TransitRouteStop stop : route.getStops()) {
 					TransitRouterNetworkNode node = network.createNode(stop, route, line);
 					if (prevNode != null) {
-						TransitRouterNetworkLink link = network.createLink(prevNode, node, route, line);
+						network.createLink(prevNode, node, route, line);
 					}
 					prevNode = node;
 				}

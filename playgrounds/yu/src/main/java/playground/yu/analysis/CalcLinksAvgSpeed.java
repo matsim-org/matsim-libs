@@ -29,10 +29,10 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.logging.Logger;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
@@ -57,9 +57,11 @@ import playground.yu.utils.io.SimpleWriter;
 
 /**
  * @author ychen
- * 
+ *
  */
 public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
+	private final static Logger log = Logger.getLogger(CalcLinksAvgSpeed.class);
+
 	/**
 	 * @param arg0
 	 *            - a String linkId
@@ -99,7 +101,7 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 
 	/**
 	 * support the speed calculation only for the links in a circle area
-	 * 
+	 *
 	 * @param network
 	 * @param x
 	 *            -abscissa of the center of the circle area
@@ -272,7 +274,7 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 				if (link != null) {
 					line.append(link.getCapacity());
 				} else {
-					Logger.getLogger("Analysis").info(
+					log.info(
 							"NULLPOINT ERROR:\tlink\t" + linkId
 									+ "\tdoes not exist in network!");
 				}

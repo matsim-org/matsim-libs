@@ -40,19 +40,23 @@ import org.matsim.core.scoring.EventsToScore;
  */
 public class PlansScoring implements StartupListener, ScoringListener, IterationStartsListener {
 
+	private final static Logger log = Logger.getLogger(PlansScoring.class);
 	private EventsToScore planScorer;
 
+	@Override
 	public void notifyStartup(final StartupEvent event) {
 		Controler controler = event.getControler();
 		this.planScorer = new EventsToScore(controler.getPopulation(), controler.getScoringFunctionFactory(), controler.getConfig().charyparNagelScoring().getLearningRate());
-		Logger.getLogger(PlansScoring.class).debug("PlanScoring loaded ScoringFunctionFactory");
+		log.debug("PlanScoring loaded ScoringFunctionFactory");
 		event.getControler().getEvents().addHandler(this.planScorer);
 	}
 
+	@Override
 	public void notifyIterationStarts(final IterationStartsEvent event) {
 		this.planScorer.reset(event.getIteration());
 	}
 
+	@Override
 	public void notifyScoring(final ScoringEvent event) {
 		this.planScorer.finish();
 	}

@@ -20,8 +20,6 @@
 package org.matsim.ptproject.qsim.qnetsimengine;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
-
 
 
 /**
@@ -33,21 +31,21 @@ import org.matsim.api.core.v01.network.Link;
  */
 abstract class QBufferItem implements QSimFunctionalInterface {
 	/**
-	 * equivalent to a Buffer.isEmpty() operation 
+	 * equivalent to a Buffer.isEmpty() operation
 	 */
 	abstract boolean bufferIsEmpty();
 
 	/**
-	 * equivalent to a Buffer.pop() operation 
+	 * equivalent to a Buffer.pop() operation
 	 */
 	abstract QVehicle popFirstFromBuffer();
 	/**
-	 * equivalent to a Buffer.peek() operation 
+	 * equivalent to a Buffer.peek() operation
 	 */
 	abstract QVehicle getFirstFromBuffer();
 
 	abstract double getBufferLastMovedTime();
 
 	abstract boolean hasGreenForToLink(Id toLinkId);
-	
+
 }

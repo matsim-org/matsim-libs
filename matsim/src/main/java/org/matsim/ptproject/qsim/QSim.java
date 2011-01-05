@@ -329,7 +329,7 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 
 		for (PlanAgent agent : this.activityEndsList) {
 			if ( agent instanceof UmlaufDriver ) {
-				Logger.getLogger(this.getClass()).error( "this does not terminate correctly for UmlaufDrivers; needs to be " +
+				log.error( "this does not terminate correctly for UmlaufDrivers; needs to be " +
 						"fixed but for the time being we skip the next couple of lines.  kai, dec'10") ;
 			} else {
 				if (agent.getDestinationLinkId() != null) {
@@ -411,7 +411,7 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 			}
 		}
 	}
-	
+
 	/**
 	 * Registers this agent as performing an activity and makes sure that the agent will be informed once his departure time has come.
 	 * @param agent
@@ -647,7 +647,7 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 		if ((this.stopTime == Time.UNDEFINED_TIME) || (this.stopTime == 0)) {
 			this.stopTime = Double.MAX_VALUE;
 		}
-		
+
 //		this.simTimer.setSimStartTime(24*3600);
 //		this.simTimer.setTime(startTime);
 
@@ -659,7 +659,7 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 				// set sim start time to config-value ONLY if this is LATER than the first plans starttime
 				simStartTime = Math.floor(Math.max(startTime, firstAgent.getActivityEndTime()));
 			}
-		} else if ( QSimConfigGroup.ONLY_USE_STARTTIME.equals( 
+		} else if ( QSimConfigGroup.ONLY_USE_STARTTIME.equals(
 				this.scenario.getConfig().getQSimConfigGroup().getSimStarttimeInterpretation() ) ) {
 			simStartTime = startTime ;
 		} else {
@@ -670,7 +670,7 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 		this.simTimer.setTime(simStartTime);
 
 	}
-	
+
 
 	// ############################################################################################################################
 	// utility methods (presumably no state change)

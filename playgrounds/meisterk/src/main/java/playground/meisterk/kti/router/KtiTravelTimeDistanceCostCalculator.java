@@ -32,6 +32,7 @@ import playground.meisterk.kti.config.KtiConfigGroup;
 
 public class KtiTravelTimeDistanceCostCalculator implements TravelMinCost, PersonalizableTravelCost {
 
+	private final static Logger log = Logger.getLogger(KtiTravelTimeDistanceCostCalculator.class);
 	protected final TravelTime timeCalculator;
 	private final double travelCostFactor;
 	private final double marginalUtlOfDistance;
@@ -45,17 +46,19 @@ public class KtiTravelTimeDistanceCostCalculator implements TravelMinCost, Perso
 		this.travelCostFactor = (- cnScoringGroup.getTraveling_utils_hr() / 3600.0) + (cnScoringGroup.getPerforming_utils_hr() / 3600.0);
 
 //		this.marginalUtlOfDistance = ktiConfigGroup.getDistanceCostCar()/1000.0 * cnScoringGroup.getMarginalUtlOfDistanceCar();
-		this.marginalUtlOfDistance = ktiConfigGroup.getDistanceCostCar()/1000.0 * cnScoringGroup.getMonetaryDistanceCostRateCar() 
+		this.marginalUtlOfDistance = ktiConfigGroup.getDistanceCostCar()/1000.0 * cnScoringGroup.getMonetaryDistanceCostRateCar()
 		   * cnScoringGroup.getMarginalUtilityOfMoney() ;
-		Logger.getLogger(this.getClass()).warn("this is the exact translation but I don't know what it means maybe check.  kai, dec'10") ;
+		log.warn("this is the exact translation but I don't know what it means maybe check.  kai, dec'10") ;
 	}
 
+	@Override
 	public double getLinkMinimumTravelCost(Link link) {
 		return
 		(link.getLength() / link.getFreespeed()) * this.travelCostFactor
 		- this.marginalUtlOfDistance * link.getLength();
 	}
 
+	@Override
 	public double getLinkGeneralizedTravelCost(Link link, double time) {
 		double travelTime = this.timeCalculator.getLinkTravelTime(link, time);
 		return travelTime * this.travelCostFactor - this.marginalUtlOfDistance * link.getLength();
@@ -72,9 +75,9 @@ public class KtiTravelTimeDistanceCostCalculator implements TravelMinCost, Perso
 	@Override
 	public void setPerson(Person person) {
 		// TODO Auto-generated method stub
-		
+
 	}
-	
-	
+
+
 
 }

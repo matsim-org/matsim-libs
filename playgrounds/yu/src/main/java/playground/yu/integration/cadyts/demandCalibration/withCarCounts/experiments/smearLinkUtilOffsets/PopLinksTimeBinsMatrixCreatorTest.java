@@ -19,18 +19,17 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.integration.cadyts.demandCalibration.withCarCounts.experiments.smearLinkUtilOffsets;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.Map.Entry;
-import java.util.logging.Logger;
 
 import no.uib.cipr.matrix.Vector;
 import no.uib.cipr.matrix.sparse.BiCGstab;
@@ -40,6 +39,7 @@ import no.uib.cipr.matrix.sparse.IterativeSolverNotConvergedException;
 import no.uib.cipr.matrix.sparse.OutputIterationReporter;
 import no.uib.cipr.matrix.sparse.SparseVector;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -68,9 +68,10 @@ import cadyts.utilities.misc.DynamicData;
 
 /**
  * @author yu
- * 
+ *
  */
 public class PopLinksTimeBinsMatrixCreatorTest implements LinkLeaveEventHandler {
+	private final static Logger log = Logger.getLogger(PopLinksTimeBinsMatrixCreatorTest.class);
 	/** matrix[mxn] m-number of pop, n-number of links x timeBins */
 	private CompRowMatrix A, AT;
 	private Map<Tuple<Integer/* rowIdx */, Integer/* colIdx */>, Integer/* value */> coordNonZeros = new HashMap<Tuple<Integer, Integer>, Integer>();
@@ -159,6 +160,7 @@ public class PopLinksTimeBinsMatrixCreatorTest implements LinkLeaveEventHandler 
 		return linkTimeBinSequence2;
 	}
 
+	@Override
 	public void handleEvent(LinkLeaveEvent event) {
 		double time = event.getTime();
 		int timeBin = getCalibrationTimeBin(time);
@@ -241,8 +243,7 @@ public class PopLinksTimeBinsMatrixCreatorTest implements LinkLeaveEventHandler 
 	}
 
 	public int[][] prepareNonZeroATmultA() {
-		Logger.getLogger(PopLinksTimeBinsMatrixCreatorTest.class.getName())
-				.info("prepare nonZeroArray for ATA BEGAN!");
+		log.info("prepare nonZeroArray for ATA BEGAN!");
 		int n = linkTimeBinSequence.size(), m = personSequence.size();
 		int[][] nonZero4ATA = new int[n][];
 
@@ -252,9 +253,7 @@ public class PopLinksTimeBinsMatrixCreatorTest implements LinkLeaveEventHandler 
 			int kLength = nonZero4A[k].length;
 			if (k == 2 * tmpK) {
 				tmpK = k;
-				Logger.getLogger(
-						PopLinksTimeBinsMatrixCreatorTest.class.getName())
-						.info("prepareNonZeroATmultA k =\t" + tmpK);
+				log.info("prepareNonZeroATmultA k =\t" + tmpK);
 			}
 			if (kLength > 0) {
 				for (int i = 0; i < kLength; i++) {
@@ -291,15 +290,13 @@ public class PopLinksTimeBinsMatrixCreatorTest implements LinkLeaveEventHandler 
 			}
 		}
 		ArrayUtils.complete(nonZero4ATA);
-		Logger.getLogger(PopLinksTimeBinsMatrixCreatorTest.class.getName())
-				.info("prepare nonZeroArray for ATA ENDED!");
+		log.info("prepare nonZeroArray for ATA ENDED!");
 		return nonZero4ATA;
 	}
 
 	public CompRowMatrix ATmultA() {
 		int[][] nonZero4ATA = prepareNonZeroATmultA();
-		Logger.getLogger(PopLinksTimeBinsMatrixCreatorTest.class.getName())
-				.info("Multiplication ATA = AT * A BEGAN!");
+		log.info("Multiplication ATA = AT * A BEGAN!");
 		int n = A.numColumns();
 		CompRowMatrix ATA = new CompRowMatrix(n, n, nonZero4ATA);
 		int m = A.numRows(), tmpK = 1;
@@ -308,9 +305,7 @@ public class PopLinksTimeBinsMatrixCreatorTest implements LinkLeaveEventHandler 
 			int kLength = nonZero4A[k].length;
 			if (k == 2 * tmpK) {
 				tmpK = k;
-				Logger.getLogger(
-						PopLinksTimeBinsMatrixCreatorTest.class.getName())
-						.info("multiplication ATA=AT*A k =\t" + tmpK);
+				log.info("multiplication ATA=AT*A k =\t" + tmpK);
 			}
 			if (kLength > 0) {
 				for (int i = 0; i < kLength; i++) {
@@ -326,8 +321,7 @@ public class PopLinksTimeBinsMatrixCreatorTest implements LinkLeaveEventHandler 
 				}
 			}
 		}
-		Logger.getLogger(PopLinksTimeBinsMatrixCreatorTest.class.getName())
-				.info("Multiplication ATA = AT * A ENDED!");
+		log.info("Multiplication ATA = AT * A ENDED!");
 		return ATA;
 	}
 
@@ -381,6 +375,7 @@ public class PopLinksTimeBinsMatrixCreatorTest implements LinkLeaveEventHandler 
 		}
 	}
 
+	@Override
 	public void reset(int iteration) {
 		linkTimeBinSequence.clear();
 		linkTimeBinSequence2.clear();
@@ -433,7 +428,7 @@ public class PopLinksTimeBinsMatrixCreatorTest implements LinkLeaveEventHandler 
 		// linkUtilityOffsetFilename =
 		// "../integration-demandCalibration1.0.1/test/input/um1/linkIdTimeBinX.log";
 
-		String networkFilename = "/work/chen/data/ivtch/input/ivtch-osm.xml", // 
+		String networkFilename = "/work/chen/data/ivtch/input/ivtch-osm.xml", //
 		populationFilename = "../matsim-bse/outputs/4SE_DC/middle_um1/ITERS/it.1000/1000.plans.xml.gz", //
 		eventsFilename = "../matsim-bse/outputs/4SE_DC/middle_um1/ITERS/it.1000/1000.events.txt.gz", //
 		scoreModificationFilename = "../matsim-bse/outputs/4SE_DC/middle_um1/scoreModification.log", //
@@ -474,11 +469,9 @@ public class PopLinksTimeBinsMatrixCreatorTest implements LinkLeaveEventHandler 
 		CompRowMatrix AT = new CompRowMatrix(A.numColumns(), A.numRows(),
 				nonZero4AT);
 		// /////////////////////////////////
-		Logger.getLogger(PopLinksTimeBinsMatrixCreatorTest.class.getName())
-				.info("Transpose (A -> AT) BEGAN!");
+		log.info("Transpose (A -> AT) BEGAN!");
 		AT = (CompRowMatrix) A.transpose(AT);
-		Logger.getLogger(PopLinksTimeBinsMatrixCreatorTest.class.getName())
-				.info("Transpose (A -> AT) ENDED!");
+		log.info("Transpose (A -> AT) ENDED!");
 		MatrixUtils.writeMatrix(AT, ATFilename);
 
 		// //////////////////////////////////////////
@@ -510,20 +503,16 @@ public class PopLinksTimeBinsMatrixCreatorTest implements LinkLeaveEventHandler 
 
 		Vector ATb = new SparseVector(n);
 
-		Logger.getLogger(PopLinksTimeBinsMatrixCreatorTest.class.getName())
-				.info("multiplication ATb = AT * b BEGAN!");
+		log.info("multiplication ATb = AT * b BEGAN!");
 		ATb = AT.mult(b, ATb);
-		Logger.getLogger(PopLinksTimeBinsMatrixCreatorTest.class.getName())
-				.info("multiplication ATb = AT * b ENDED!");
+		log.info("multiplication ATb = AT * b ENDED!");
 		VectorUtils.writeVector(ATb, ATbFilename);
 
 		// /////////////////////////////////////////////////////////////
-		Logger.getLogger(PopLinksTimeBinsMatrixCreatorTest.class.getName())
-				.info("CG (Conjugate Gradients) Method BEGAN!");
+		log.info("CG (Conjugate Gradients) Method BEGAN!");
 		Vector x = new SparseVector(n);
 
-		Logger.getLogger(PopLinksTimeBinsMatrixCreatorTest.class.getName())
-				.info("\"Allocate storage for Conjugate Gradients\" BEGAN!");
+		log.info("\"Allocate storage for Conjugate Gradients\" BEGAN!");
 
 		// read counts
 		Counts counts = new Counts();
@@ -559,61 +548,55 @@ public class PopLinksTimeBinsMatrixCreatorTest implements LinkLeaveEventHandler 
 
 		// Allocate storage for Conjugate Gradients
 		IterativeSolver solver = new BiCGstab(template);
-		Logger.getLogger(PopLinksTimeBinsMatrixCreatorTest.class.getName())
-				.info("\"Allocate storage for Conjugate Gradients\" ENDED!");
+		log.info("\"Allocate storage for Conjugate Gradients\" ENDED!");
 
-		// Logger.getLogger(PopLinksTimeBinsMatrixCreator.class.getName()).info(
+		// log.info(
 		// "\"Create a Cholesky preconditioner\" BEGAN!");
 		// // Create a Cholesky preconditioner
 		// Preconditioner M = new ICC(ATA.copy());
-		// Logger.getLogger(PopLinksTimeBinsMatrixCreator.class.getName()).info(
+		// log.info(
 		// "\"Create a Cholesky preconditioner\" ENDED!");
 		//
-		// Logger.getLogger(PopLinksTimeBinsMatrixCreator.class.getName()).info(
+		// log.info(
 		// "\"Set up the preconditioner, and attach it\" BEGAN!");
 		// // Set up the preconditioner, and attach it
 		// M.setMatrix(ATA);
 		// solver.setPreconditioner(M);
-		// Logger.getLogger(PopLinksTimeBinsMatrixCreator.class.getName()).info(
+		// log.info(
 		// "\"Set up the preconditioner, and attach it\" ENDED!");
 
-		// Logger.getLogger(PopLinksTimeBinsMatrixCreatorTest.class.getName())
+		// log
 		// .info("\"Add a convergence monitor\" BEGAN!");
 		// // Add a convergence monitor
 		// solver.setIterationMonitor(new DefaultIterationMonitor(2000, 1e-1,
 		// 1e-2, 1e+5));
-		// Logger.getLogger(PopLinksTimeBinsMatrixCreatorTest.class.getName())
+		// log
 		// .info("\"Add a convergence monitor\" ENDED!");
 
-		Logger.getLogger(PopLinksTimeBinsMatrixCreatorTest.class.getName())
-				.info("\"Add a convergence monitor\" BEGAN!");
+		log.info("\"Add a convergence monitor\" BEGAN!");
 		// Add a convergence monitor
 		solver.getIterationMonitor().setIterationReporter(
 				new OutputIterationReporter());
-		Logger.getLogger(PopLinksTimeBinsMatrixCreatorTest.class.getName())
-				.info("\"Add a convergence monitor\" ENDED!");
+		log.info("\"Add a convergence monitor\" ENDED!");
 
-		Logger.getLogger(PopLinksTimeBinsMatrixCreatorTest.class.getName())
-				.info("\"Start the solver, and check for problems\" BEGAN!");
+		log.info("\"Start the solver, and check for problems\" BEGAN!");
 		// Start the solver, and check for problems
 		try {
 			solver.solve(ATA, ATb, x);
 		} catch (IterativeSolverNotConvergedException e) {
 			System.err.println("Iterative solver failed to converge");
 		}
-		Logger.getLogger(PopLinksTimeBinsMatrixCreatorTest.class.getName())
-				.info("\"Start the solver, and check for problems\" ENDED!");
+		log.info("\"Start the solver, and check for problems\" ENDED!");
 
-		Logger.getLogger(PopLinksTimeBinsMatrixCreatorTest.class.getName())
-				.info("CG (Conjugate Gradients) Method ENDED!");
+		log.info("CG (Conjugate Gradients) Method ENDED!");
 		VectorUtils.writeVector(x, xFilename);
 	}
 
 	public static void main(String[] args) {
-		Logger.getLogger("Start time").info(
+		log.info(
 				"----------------->STARTED-------------------------");
 		runMTJ(args);
-		Logger.getLogger("End time").info(
+		log.info(
 				"----------------->ENDED-------------------------");
 	}
 }

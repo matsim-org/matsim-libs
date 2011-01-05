@@ -29,6 +29,7 @@ import org.matsim.core.utils.misc.Time;
 
 public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 
+	private final static Logger log = Logger.getLogger(QSimConfigGroup.class);
 	private static final long serialVersionUID = 1L;
 
 	public static final String GROUP_NAME = "qsim";
@@ -46,7 +47,7 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 	private static final String NUMBER_OF_THREADS = "numberOfThreads";
 	private static final String TRAFFIC_DYNAMICS = "trafficDynamics" ;
 	private static final String SIM_STARTTIME_INTERPRETATION = "simStarttimeInterpretation" ;
-	
+
 	public static final String SNAPSHOT_EQUI_DIST = "equiDist" ;
 	public static final String SNAPSHOT_AS_QUEUE = "queue" ;
 
@@ -160,7 +161,7 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 		map.put(SIM_STARTTIME_INTERPRETATION, getSimStarttimeInterpretation());
 		return map;
 	}
-	
+
 	// measure so that comments remain consistent between Simulation and QSim.  kai, aug'10
 	/* package */ static String REMOVE_STUCK_VEHICLES_STRING=
 		"Boolean. `true': stuck vehicles are removed, aborting the plan; `false': stuck vehicles are forced into the next link. `false' is probably the better choice.";
@@ -175,10 +176,10 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 		map.put(SNAPSHOT_FORMAT, "Comma-separated list of visualizer output file formats.  'plansfile', `transims', `googleearth', and `otfvis'.  'netvis' is, I think, no longer possible.") ;
 		map.put(REMOVE_STUCK_VEHICLES, REMOVE_STUCK_VEHICLES_STRING ) ;
 		map.put(STUCK_TIME, STUCK_TIME_STRING ) ;
-		map.put(TRAFFIC_DYNAMICS, "`" 
+		map.put(TRAFFIC_DYNAMICS, "`"
 				+ TRAFF_DYN_QUEUE + "' for the standard queue model, `"
 				+ TRAFF_DYN_W_HOLES + "' (experimental!!) for the queue model with holes") ;
-		map.put(SIM_STARTTIME_INTERPRETATION, "`" 
+		map.put(SIM_STARTTIME_INTERPRETATION, "`"
 				+ MAX_OF_STARTTIME_AND_EARLIEST_ACTIVITY_END + "' (default behavior) or `"
 				+ ONLY_USE_STARTTIME + "'" ) ;
 		return map ;
@@ -189,6 +190,7 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 		this.startTime = startTime;
 	}
 
+	@Override
 	public double getStartTime() {
 		return this.startTime;
 	}
@@ -197,6 +199,7 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 		this.endTime = endTime;
 	}
 
+	@Override
 	public double getEndTime() {
 		return this.endTime;
 	}
@@ -210,6 +213,7 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 		this.timeStepSize = seconds;
 	}
 
+	@Override
 	public double getTimeStepSize() {
 		return this.timeStepSize;
 	}
@@ -218,6 +222,7 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 		this.snapshotPeriod = snapshotPeriod;
 	}
 
+	@Override
 	public double getSnapshotPeriod() {
 		return this.snapshotPeriod;
 	}
@@ -228,6 +233,7 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 		this.snapshotFormat = snapshotFormat;
 	}
 
+	@Override
 	public String getSnapshotFormat() {
 		return this.snapshotFormat;
 	}
@@ -236,6 +242,7 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 		this.flowCapFactor = flowCapFactor;
 	}
 
+	@Override
 	public double getFlowCapFactor() {
 		return this.flowCapFactor;
 	}
@@ -244,6 +251,7 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 		this.storageCapFactor = val;
 	}
 
+	@Override
 	public double getStorageCapFactor() {
 		return this.storageCapFactor;
 	}
@@ -252,6 +260,7 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 		this.stuckTime = stuckTime;
 	}
 
+	@Override
 	public double getStuckTime() {
 		return this.stuckTime;
 	}
@@ -260,6 +269,7 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 		this.removeStuckVehicles = removeStuckVehicles;
 	}
 
+	@Override
 	public boolean isRemoveStuckVehicles() {
 		return this.removeStuckVehicles;
 	}
@@ -267,25 +277,26 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 	/** See {@link #getComments()} for options. */
 	public void setSnapshotStyle(final String style) {
 		this.snapshotStyle = style.intern();
-		if (!SNAPSHOT_EQUI_DIST.equals(this.snapshotStyle) && !SNAPSHOT_AS_QUEUE.equals(this.snapshotStyle) 
+		if (!SNAPSHOT_EQUI_DIST.equals(this.snapshotStyle) && !SNAPSHOT_AS_QUEUE.equals(this.snapshotStyle)
 				&& !"withHolesExperimental".equals(this.snapshotStyle) ) {
-			Logger.getLogger(this.getClass()).warn("The snapshotStyle \"" + style + "\" is not one of the known ones. "
+			log.warn("The snapshotStyle \"" + style + "\" is not one of the known ones. "
 					+ "See comment in config dump of log file for allowed styles.");
 		}
 	}
 
+	@Override
 	public String getSnapshotStyle() {
 		return this.snapshotStyle;
 	}
-	
+
 	public void setTrafficDynamics(final String str) {
 		this.trafficDynamics = str ;
 		if ( !TRAFF_DYN_QUEUE.equals(this.trafficDynamics) && !TRAFF_DYN_W_HOLES.equals(this.trafficDynamics) ) {
-			Logger.getLogger(this.getClass()).warn("The trafficDynamics \"" + str + "\" is ot one of the known ones. "
+			log.warn("The trafficDynamics \"" + str + "\" is ot one of the known ones. "
 					+ "See comment in config dump in log file for allowed styles." ) ;
 		}
 	}
-	
+
 	public String getTrafficDynamics() {
 		return this.trafficDynamics ;
 	}
@@ -307,7 +318,7 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 		this.simStarttimeInterpretation = str;
 		if ( !MAX_OF_STARTTIME_AND_EARLIEST_ACTIVITY_END.equals(str)
 				&& !ONLY_USE_STARTTIME.equals(str) ) {
-			Logger.getLogger(this.getClass()).warn("The simStarttimeInterpretation '" + str + "' is not one of the known ones. "
+			log.warn("The simStarttimeInterpretation '" + str + "' is not one of the known ones. "
 					+ "See comment in config dump in log file for allowed styles.") ;
 		}
 	}

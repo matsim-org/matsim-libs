@@ -70,11 +70,13 @@ import cadyts.measurements.SingleLinkMeasurement.TYPE;
 import cadyts.supply.SimResults;
 import cadyts.utilities.misc.DynamicData;
 
-public class NewPtBsePlanStrategy implements PlanStrategy, AdditionalTeleportationDepartureEventHandler,  
-IterationEndsListener, 
-BeforeMobsimListener, 
+public class NewPtBsePlanStrategy implements PlanStrategy, AdditionalTeleportationDepartureEventHandler,
+IterationEndsListener,
+BeforeMobsimListener,
 AfterMobsimListener  {
 	// yyyyyy something beyond just "reset" is needed in terms of events handling, otherwise it does not work.
+
+	private final static Logger log = Logger.getLogger(NewPtBsePlanStrategy.class);
 
 	private PlanStrategy delegate = null ;
 	private Controler controler;
@@ -88,18 +90,19 @@ AfterMobsimListener  {
 	private final Counts alightCounts = new Counts();
 	private PtBseOccupancyAnalyzer ptBseOccupAnalyzer;
 	static TransitSchedule trSched ;
-	
+
+
 	public NewPtBsePlanStrategy( Controler controler ) {
 		// IMPORTANT: Do not change this constructor.  It needs to be like this in order to be callable as a "Module"
 		// from the config file.  kai/manuel, dec'10
-		
+
 		// under normal circumstances, this is called relatively late in the initialization sequence, since otherwise the
 		// strategyManager to which this needs to be added is not yet there. Thus, everything that was in notifyStartup can go
 		// here. kai, oct'10
-		
+
 		// remember the controler:
 		this.controler = controler ;
-		
+
 		// add "this" to the events channel so that reset is called between iterations
 		this.controler.getEvents().addHandler( this ) ;
 		this.controler.addControlerListener(this) ;
@@ -111,18 +114,18 @@ AfterMobsimListener  {
 		// this collects events and generates cadyts plans from it
 		PtPlanToPlanStepBasedOnEvents ptStep = new PtPlanToPlanStepBasedOnEvents( this.controler.getScenario() , ptBseOccupAnalyzer ) ;
 		this.controler.getEvents().addHandler( ptStep ) ;
-		
-		// prepare resultsContainer. 
+
+		// prepare resultsContainer.
 		this.simResults = new SimResultsContainerImpl( ptBseOccupAnalyzer );
-		
+
 		// build the calibrator.  This is a static method, and in consequence has no side effects
 		this.calibrator = buildCalibrator( this.controler.getScenario() );
-		
+
 		// finally, we create the PlanStrategy, with the bse-based plan selector:
 		this.delegate = new PlanStrategyImpl( new NewPtBsePlanChanger( ptStep, this.calibrator ) ) ;
-		
+
 		// NOTE: The coupling between calibrator and simResults is done in "reset".
-		
+
 		//read occup counts from file
 		String occupancyCountsFilename = this.controler.getConfig().findParam("ptCounts", "inputOccupancyCountsFile");
 		if (occupancyCountsFilename != null) {
@@ -132,14 +135,14 @@ AfterMobsimListener  {
 
 
 	}
-	
+
 	@Override
 	public void reset(int iteration) {
 		String filename = this.controler.getControlerIO().getIterationFilename(iteration, "linkCostOffsets.xml") ;
-		
+
 		//show in log the results of sim volumes
 		//System.out.println( "resultsContainer.toString() " +  simResults.toString() ) ;
-		
+
 		// mobsim results are in resultsContainer, which is (implicitly) an events listener.  Communicate them to the calibrator:
 		this.calibrator.afterNetworkLoading(this.simResults);
 
@@ -152,7 +155,7 @@ AfterMobsimListener  {
 		}
 
 	}
-	
+
 	@Override
 	public void handleEvent(AdditionalTeleportationDepartureEvent eve) {
 		// dummy
@@ -161,7 +164,7 @@ AfterMobsimListener  {
 
 	// ===========================================================================================================================
 	// private methods & pure delegate methods only below this line
-	
+
 	@Override
 	public void addStrategyModule(PlanStrategyModule module) {
 		this.delegate.addStrategyModule(module);
@@ -196,11 +199,12 @@ AfterMobsimListener  {
 	public PlanSelector getPlanSelector() {
 		return this.delegate.getPlanSelector();
 	}
-	
+
 	private static MATSimUtilityModificationCalibrator<TransitStopFacility> buildCalibrator(final Scenario sc) {
 			// made this method static so that there cannot be any side effects.  kai, oct'10
+
 			Config config = sc.getConfig();
-			
+
 			// get default regressionInertia
 			String regressionInertiaValue = config.findParam(NewPtBsePlanStrategy.BSE_MOD_NAME, "regressionInertia");
 			double regressionInertia = 0;
@@ -210,11 +214,11 @@ AfterMobsimListener  {
 				regressionInertia = Double.parseDouble(regressionInertiaValue);
 				// this works since it is used in the constructor
 			}
-			
+
 			MATSimUtilityModificationCalibrator<TransitStopFacility> calibrator = new MATSimUtilityModificationCalibrator <TransitStopFacility>(MatsimRandom.getLocalInstance(), regressionInertia);
 			//MATSimUtilityModificationCalibrator<TransitStopFacility> calibrator = new MATSimUtilityModificationCalibrator<TransitStopFacility>("calibration-log.txt", MatsimRandom.getLocalInstance().nextLong(), 3600);
 			//calibrator.setRegressionInertia(regressionInertia);
-			
+
 			// Set default standard deviation
 			{
 				String value = config.findParam(NewPtBsePlanStrategy.BSE_MOD_NAME, "minFlowStddevVehH");
@@ -224,7 +228,7 @@ AfterMobsimListener  {
 					System.out.println("BSE:\tminFlowStddevVehH\t=\t" + stddev_veh_h);
 				}
 			}
-			
+
 			//SET MAX DRAWS
 			/*
 			{
@@ -233,10 +237,10 @@ AfterMobsimListener  {
 					final int maxDraws = Integer.parseInt(maxDrawStr);
 					System.out.println("BSE:\tmaxDraws=" + maxDraws);
 					calibrator.setMaxDraws(maxDraws);
-				} 
+				}
 			}
 			*/
-	
+
 			// SET FREEZE ITERATION
 			{
 				final String freezeIterationStr = config.findParam(NewPtBsePlanStrategy.BSE_MOD_NAME, "freezeIteration");
@@ -244,7 +248,7 @@ AfterMobsimListener  {
 					final int freezeIteration = Integer.parseInt(freezeIterationStr);
 					System.out.println("BSE:\tfreezeIteration\t= " + freezeIteration);
 					calibrator.setFreezeIteration(freezeIteration);
-				} 
+				}
 			}
 
 			// SET Preparatory Iterations
@@ -254,9 +258,9 @@ AfterMobsimListener  {
 					final int preparatoryIterations = Integer.parseInt(preparatoryIterationsStr);
 					System.out.println("BSE:\tpreparatoryIterations\t= " + preparatoryIterations);
 					calibrator.setPreparatoryIterations(preparatoryIterations);
-				} 
+				}
 			}
-	
+
 			// SET varianceScale
 			{
 				final String varianceScaleStr = config.findParam(NewPtBsePlanStrategy.BSE_MOD_NAME, "varianceScale");
@@ -264,9 +268,9 @@ AfterMobsimListener  {
 					final double varianceScale = Double.parseDouble(varianceScaleStr);
 					System.out.println("BSE:\tvarianceScale\t= " + varianceScale);
 					calibrator.setVarianceScale(varianceScale);
-				} 
+				}
 			}
-	
+
 			//SET useBruteForce
 			{
 				final String useBruteForceStr = config.findParam(NewPtBsePlanStrategy.BSE_MOD_NAME, "useBruteForce");
@@ -274,40 +278,40 @@ AfterMobsimListener  {
 					final boolean useBruteForce = new Boolean(useBruteForceStr).booleanValue();
 					System.out.println("BSE:\tuseBruteForce\t= " + useBruteForce);
 					calibrator.setBruteForce(useBruteForce);
-				} 
+				}
 			}
-			
+
 			calibrator.setStatisticsFile("calibration-stats.txt");
-			
+
 			// SET countsScale
 			//double countsScaleFactor = config.counts().getCountsScaleFactor(); this is for private autos and we don't have this parameter in config file
 			countsScaleFactor = Double.parseDouble(config.findParam(NewPtBsePlanStrategy.MODULE_NAME, "countsScaleFactor"));
 			System.out.println("BSE:\tusing the countsScaleFactor of " + countsScaleFactor + " as packetSize from config.");
 			// yyyy how is this information moved into cadyts?
-			//in inner class SimResultsContainerImpl.getSimValue with "return values[hour] * countsScaleFactor;" 
-			
+			//in inner class SimResultsContainerImpl.getSimValue with "return values[hour] * countsScaleFactor;"
+
 			// pt counts data were already read by ptContolerListener of controler. Can that information get achieved from here?
 			// Should be in Scenario or ScenarioImpl.  If it is not there, it should be added there.  kai, oct'10
-			
+
 			//add a module in config not in file but "in execution"
 
 			String countsFilename = config.findParam(NewPtBsePlanStrategy.MODULE_NAME, "inputOccupancyCountsFile");
 			if ( countsFilename==null ) {
 				throw new RuntimeException("could not get counts filename from config; aborting" ) ;
 			}
-			
+
 			Counts occupCounts = new Counts() ;
 			new MatsimCountsReader(occupCounts).readFile(countsFilename);
 			if (occupCounts.getCounts().size()==0){
 				throw new RuntimeException("BSE requires counts-data.");
 			}
-			
+
 			// set up center and radius of counts stations locations
 	//		distanceFilterCenterNodeCoord = network.getNodes().get(new IdImpl(config.findParam("counts", "distanceFilterCenterNode"))).getCoord();
 	//		distanceFilter = Double.parseDouble(config.findParam("counts", "distanceFilter"));
 			int arStartTime = Integer.parseInt(config.findParam(NewPtBsePlanStrategy.BSE_MOD_NAME, "startTime"));
 			int arEndTime = Integer.parseInt(config.findParam(NewPtBsePlanStrategy.BSE_MOD_NAME, "endTime"));
-	
+
 			//the trSchedule has not been read by the controler. it is loaded here
 			DataLoader loader = new DataLoader();
 			trSched = loader.readTransitSchedule(sc.getConfig().findParam("network", "inputNetworkFile"), sc.getConfig().findParam("transit", "transitScheduleFile"));
@@ -315,7 +319,7 @@ AfterMobsimListener  {
 			//add counts data into calibrator
 			for (Map.Entry<Id, Count> entry : occupCounts.getCounts().entrySet()) {
 				TransitStopFacility stop= trSched.getFacilities().get(entry.getKey());
-				for (Volume volume : entry.getValue().getVolumes().values()){        
+				for (Volume volume : entry.getValue().getVolumes().values()){
 					if (volume.getHour() >= arStartTime && volume.getHour() <= arEndTime) {    //add volumes for each hour to calibrator
 						int start_s = (volume.getHour() - 1) * 3600;
 						int end_s = volume.getHour() * 3600 - 1;
@@ -324,7 +328,7 @@ AfterMobsimListener  {
 					}
 				}
 			}
-	
+
 			return calibrator ;
 		}
 
@@ -332,11 +336,11 @@ AfterMobsimListener  {
 	class SimResultsContainerImpl implements SimResults<TransitStopFacility> {
 		private static final long serialVersionUID = 1L;
 		private PtBseOccupancyAnalyzer occupancyAnalyzer = null ;
-		
+
 		SimResultsContainerImpl( PtBseOccupancyAnalyzer oa ) {
 			this.occupancyAnalyzer = oa ;
 		}
-		
+
 		@Override
 		public double getSimValue(final TransitStopFacility stop , final int startTime_s, final int endTime_s, final TYPE type) {  //stopFacility or link
 			int hour = startTime_s / 3600;
@@ -346,10 +350,10 @@ AfterMobsimListener  {
 			if (values == null){
 				return 0;
 			}
-			
+
 			return values[hour] * NewPtBsePlanStrategy.this.countsScaleFactor;
 		}
-		
+
 		@Override
 		public String toString() {
 			final StringBuffer stringBuffer2 = new StringBuffer();
@@ -357,26 +361,26 @@ AfterMobsimListener  {
 			final String VALUES = "; values:";
 			final char TAB = '\t';
 			final char RETURN =  '\n';
-			
+
 			for ( Id stopId : this.occupancyAnalyzer.getOccupancyStopIds()) {  //Only occupancy!
 				StringBuffer stringBuffer = new StringBuffer();
-				stringBuffer.append(STOPID ) ; 
-				stringBuffer.append( stopId ) ;	
+				stringBuffer.append(STOPID ) ;
+				stringBuffer.append( stopId ) ;
 				stringBuffer.append( VALUES) ;
-				
+
 				boolean hasValues = false;   //only prints stops with volumes > 0
 				int[] values = this.occupancyAnalyzer.getOccupancyVolumesForStop(stopId ) ;
-				
+
 				for ( int ii=0 ; ii<values.length ; ii++ ) {
-					hasValues = hasValues || (values[ii]>0); 
-					
+					hasValues = hasValues || (values[ii]>0);
+
 					stringBuffer.append(TAB) ;
 					stringBuffer.append( values[ii] ) ;
 				}
 				stringBuffer.append(RETURN) ;
 				if (hasValues)
 					stringBuffer2.append(stringBuffer.toString());
-			
+
 			}
 			return stringBuffer2.toString() ;
 		}
@@ -391,32 +395,32 @@ AfterMobsimListener  {
 			ptBseOccupAnalyzer.reset(iter);
 		}
 	}
-	
+
 	@Override
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
 		int it = event.getIteration();
 		if ( isActiveInThisIteration( it, event.getControler() ) ) {
 			event.getControler().getEvents().removeHandler(ptBseOccupAnalyzer);
-			
+
 			//Get all M44 stations and invoke the method write to get all information of them
 			TransitLine lineM44 = event.getControler().getScenario().getTransitSchedule().getTransitLines().get(new IdImpl("B-M44"));
 			List<Id> m44StopIds = new ArrayList<Id>();
 			for (TransitRoute route :lineM44.getRoutes().values()){
 				for (TransitRouteStop stop: route.getStops()){
 					m44StopIds.add( stop.getStopFacility().getId());
-				}	
-				
+				}
+
 			}
 			String outFile = event.getControler().getControlerIO().getIterationFilename(it, "ptBseOccupancyAnalysis.txt");
 			ptBseOccupAnalyzer.write(outFile, this.occupCounts , m44StopIds );
 		}
 	}
-	
+
 	//Determines the pt counts interval (currently each 10 iterations)
 	private boolean isActiveInThisIteration( int iter , Controler controler ) {
 		return (iter % controler.getConfig().ptCounts().getPtCountsInterval() == 0)  &&  (iter >= controler.getFirstIteration());
 	}
-	
+
 	@Override
 	public void notifyIterationEnds(final IterationEndsEvent event) {
 		Config config = event.getControler().getConfig();
@@ -427,7 +431,7 @@ AfterMobsimListener  {
 			if ( isActiveInThisIteration( iter, controler ) ) {
 
 				if ( config.ptCounts().getPtCountsInterval() != 10 )
-					Logger.getLogger(this.getClass()).warn("yyyy This may not work when the pt counts interval is different from 10 because I think I changed things at two "
+					log.warn("yyyy This may not work when the pt counts interval is different from 10 because I think I changed things at two "
 							+ "places but I can't find the other one any more :-(.  (May just be inefficient.)  kai, oct'10" ) ;
 
 				controler.stopwatch.beginOperation("compare with pt counts");
@@ -450,9 +454,9 @@ AfterMobsimListener  {
 				ccaBoard.setCountsScaleFactor(countsScaleFactor);
 				ccaAlight.setCountsScaleFactor(countsScaleFactor);
 				ccaOccupancy.setCountsScaleFactor(countsScaleFactor);
-				
+
 				//filter stations here??
-				
+
 				ccaBoard.run();
 				ccaAlight.run();
 				ccaOccupancy.run();

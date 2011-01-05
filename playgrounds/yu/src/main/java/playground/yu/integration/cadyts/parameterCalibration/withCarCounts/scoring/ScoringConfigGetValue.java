@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.scoring;
 
@@ -29,9 +29,10 @@ import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 
 /**
  * @author yu
- * 
+ *
  */
 public class ScoringConfigGetValue {
+	private final static Logger log = Logger.getLogger(ScoringConfigGetValue.class);
 	private static CharyparNagelScoringConfigGroup scoringCfgGroup;
 	private static Config config;
 
@@ -59,16 +60,16 @@ public class ScoringConfigGetValue {
 	 * <param name="parameterName_0" value="traveling" /> <param
 	 * name="parameterName_1" value="travelingPt" /> <param
 	 * name="parameterName_2" value="travelingWalk" />
-	 * 
+	 *
 	 * <param name="parameterName_3" value="performing" />
-	 * 
+	 *
 	 * <param name="parameterName_4" value="offsetCar" /> <param
 	 * name="parameterName_5" value="offsetPt" /> <param name="parameterName_6"
 	 * value="offsetWalk" />
-	 * 
+	 *
 	 * <param name="parameterName_0" value="monetaryDistanceCostRateCar" />
 	 * <param name="parameterName_8" value="monetaryDistanceCostRatePt" />
-	 * 
+	 *
 	 * <param name="parameterName_9" value="marginalUtlOfDistanceWalk" />
 	 */
 	public static String getValue(String key) {
@@ -96,8 +97,7 @@ public class ScoringConfigGetValue {
 		} else if (OFFSET_WALK.equals(key)) {
 			return config.findParam("bse", key);
 		} else {
-			Logger.getLogger("Parameter Calibration Parameter Config").info(
-					key + "\tcan not be calibrated by the current code.");
+			log.info(key + "\tcan not be calibrated by the current code.");
 			throw new RuntimeException();
 		}
 	}

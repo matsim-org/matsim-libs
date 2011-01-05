@@ -1,14 +1,28 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.ciarif.retailers;
 
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
+
 import org.apache.log4j.Logger;
-import org.jfree.util.Log;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.api.experimental.facilities.ActivityFacilities;
-import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -19,6 +33,7 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.AStarLandmarksFactory;
+
 import playground.ciarif.retailers.IO.FileRetailerReader;
 import playground.ciarif.retailers.IO.LinksRetailerReader;
 import playground.ciarif.retailers.IO.RetailersSummaryWriter;
@@ -47,7 +62,8 @@ public class RetailersLocationListener
   private RetailersSummaryWriter rsw;
   private CountFacilityCustomers cfc;
 
-  public void notifyStartup(StartupEvent event)
+  @Override
+	public void notifyStartup(StartupEvent event)
   {
     this.controler = event.getControler();
     FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(this.controler.getConfig().charyparNagelScoring());
@@ -74,11 +90,13 @@ public class RetailersLocationListener
     this.rsw = new RetailersSummaryWriter(rswOutputFile);
   }
 
-  public void notifyBeforeMobsim(BeforeMobsimEvent event)
+  @Override
+	public void notifyBeforeMobsim(BeforeMobsimEvent event)
   {
   }
 
-  public void notifyIterationEnds(IterationEndsEvent event)
+  @Override
+	public void notifyIterationEnds(IterationEndsEvent event)
   {
     Retailer r;
     int modelIter = 0;
@@ -103,7 +121,7 @@ public class RetailersLocationListener
 
     if (event.getIteration() == modelIter)
     {
-      for (Iterator<Retailer> localIterator = this.retailers.getRetailers().values().iterator(); localIterator.hasNext(); ) { r = (Retailer)localIterator.next();
+      for (Iterator<Retailer> localIterator = this.retailers.getRetailers().values().iterator(); localIterator.hasNext(); ) { r = localIterator.next();
         this.rsw.write(r, event.getIteration(), this.cfc);
         r.runStrategy(this.lrr.getFreeLinks());
         this.lrr.updateFreeLinks();
@@ -114,7 +132,7 @@ public class RetailersLocationListener
     if ((this.controler.getIterationNumber().intValue() != 0) && (this.controler.getIterationNumber().intValue() % analysisFrequency == 0) && (this.controler.getIterationNumber().intValue() != modelIter) && (this.controler.getIterationNumber().intValue() != this.controler.getLastIteration()))
     {
     	log.info("Test1");
-    	for (Iterator<Retailer> localIterator = this.retailers.getRetailers().values().iterator(); localIterator.hasNext(); ) { r = (Retailer)localIterator.next();
+    	for (Iterator<Retailer> localIterator = this.retailers.getRetailers().values().iterator(); localIterator.hasNext(); ) { r = localIterator.next();
 
         this.rsw.write(r, this.controler.getIterationNumber().intValue(), this.cfc);
       }
@@ -123,7 +141,7 @@ public class RetailersLocationListener
 
     if (this.controler.getIterationNumber().intValue() != this.controler.getLastIteration())
       return;
-    for (Iterator<Retailer> localIterator = this.retailers.getRetailers().values().iterator(); localIterator.hasNext(); ) { r = (Retailer)localIterator.next();
+    for (Iterator<Retailer> localIterator = this.retailers.getRetailers().values().iterator(); localIterator.hasNext(); ) { r = localIterator.next();
 
       this.rsw.write(r, this.controler.getIterationNumber().intValue(), this.cfc);
       log.info("Test2");

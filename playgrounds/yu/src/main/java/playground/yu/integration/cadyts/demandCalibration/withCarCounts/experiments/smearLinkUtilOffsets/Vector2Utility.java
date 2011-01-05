@@ -19,15 +19,15 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.integration.cadyts.demandCalibration.withCarCounts.experiments.smearLinkUtilOffsets;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.logging.Logger;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
@@ -41,11 +41,12 @@ import playground.yu.utils.qgis.X2QGIS;
 
 /**
  * added linkUtilityOffset value as attributes of links into network
- * 
+ *
  * @author yu
- * 
+ *
  */
 public class Vector2Utility implements X2QGIS {
+	private final static Logger log = Logger.getLogger(Vector2Utility.class);
 	private Network network;
 	private int calibrationStartTimeBin, calibrationEndTimeBin;
 	private SimpleWriter writer;
@@ -89,7 +90,7 @@ public class Vector2Utility implements X2QGIS {
 						linkOffsets.put(link.getId(), value);
 					}
 				} else {
-					Logger.getLogger(Vector2Utility.class.getName()).info(
+					log.info(
 							"in vector, line\t" + idx + "\ti.e. link\t"
 									+ linkIdStr + "\ttimeBin\t" + tb
 									+ "\tvalue DOESN'T EXIST!!!");

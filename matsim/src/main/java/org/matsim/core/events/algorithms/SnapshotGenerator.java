@@ -53,6 +53,7 @@ import org.matsim.vis.snapshots.writers.SnapshotWriter;
 public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArrivalEventHandler, LinkEnterEventHandler,
 		LinkLeaveEventHandler, AgentWait2LinkEventHandler, AgentStuckEventHandler {
 
+	private final static Logger log = Logger.getLogger(SnapshotGenerator.class);
 	private final Network network;
 	private int lastSnapshotIndex = -1;
 	private final double snapshotPeriod;
@@ -188,7 +189,7 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 				link.getVehiclePositionsEquil(positions, time);
 			}
 		} else {
-			Logger.getLogger(this.getClass()).warn("The snapshotStyle \"" + this.snapshotStyle + "\" is not supported.");
+			log.warn("The snapshotStyle \"" + this.snapshotStyle + "\" is not supported.");
 		}
 		return positions;
 	}

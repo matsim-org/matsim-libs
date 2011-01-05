@@ -1,7 +1,25 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.ciarif.retailers.utils;
 
 import org.apache.log4j.Logger;
-import org.jfree.util.Log;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
@@ -14,6 +32,7 @@ import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
+
 import playground.ciarif.retailers.data.PersonPrimaryActivity;
 
 public abstract class Utils
@@ -35,10 +54,10 @@ public abstract class Utils
     f.setCoord(coord);
     f.setLinkId(link.getId());
   }
-  
+
 //TODO This class should be modified at least for the following aspects:
 // - Avoid to pass the controler but pass directly the Facilities or the Persons which are actually used
-// - Try to create a routine which can be used by all the different create<something>quadTree methods instead of 
+// - Try to create a routine which can be used by all the different create<something>quadTree methods instead of
 // repeat this for each of them
 
   public static final void setPersonQuadTree(QuadTree<Person> personQuadTree)
@@ -74,7 +93,7 @@ public abstract class Utils
     return facilityQuadTree;
   }
 
-  public static final QuadTree<ActivityFacility> createFacilityQuadTree(Controler controler) { 
+  public static final QuadTree<ActivityFacility> createFacilityQuadTree(Controler controler) {
     double minx = (1.0D / 0.0D);
     double miny = (1.0D / 0.0D);
     double maxx = (-1.0D / 0.0D);
@@ -202,7 +221,7 @@ public abstract class Utils
                 ++primaryActivityCount;
               }
             } else {
-              if ((!(act.getType().equals("education"))) || 
+              if ((!(act.getType().equals("education"))) ||
                 (hasEducation)) continue;
               c = ((ActivityFacility)controler.getFacilities().getFacilities().get(act.getFacilityId())).getCoord();
               activityLink = (IdImpl)((ActivityFacility)controler.getFacilities().getFacilities().get(act.getFacilityId())).getLinkId();

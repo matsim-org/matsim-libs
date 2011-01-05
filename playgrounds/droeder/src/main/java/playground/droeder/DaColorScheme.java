@@ -21,14 +21,15 @@ package playground.droeder;
 
 import java.awt.Color;
 
-import org.jfree.util.Log;
+import org.apache.log4j.Logger;
 
 /**
  * @author droeder
  *
  */
 public class DaColorScheme {
-	
+	private final static Logger log = Logger.getLogger(DaColorScheme.class);
+
 	private Color c0 = new Color(102,0,51);
 	private Color c1 = new Color(0, 0 ,102);
 	private Color c2 = new Color(0, 102, 0);
@@ -42,7 +43,7 @@ public class DaColorScheme {
 	private Color c10 = new Color(51,51,102);
 	private Color c11 = new Color(51,102,51);
 	private Color c12 = new Color(102,51,51);
-	
+
 	public Color getColor(int i){
 		if(i==0){
 			return c0;
@@ -71,10 +72,10 @@ public class DaColorScheme {
 		}else if(i==12){
 			return c12;
 		}else{
-			Log.error("no color for this argument");
+			log.error("no color for this argument");
 			return new Color(0);
 		}
 	}
-	
+
 
 }

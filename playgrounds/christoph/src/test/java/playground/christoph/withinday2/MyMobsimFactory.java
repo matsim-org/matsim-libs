@@ -54,13 +54,13 @@ import playground.christoph.withinday.replanning.replanners.interfaces.WithinDay
  *
  */
 public class MyMobsimFactory implements MobsimFactory {
-	private static final Logger log = Logger.getLogger("dummy");
+	private static final Logger log = Logger.getLogger(MyMobsimFactory.class);
 	private ParallelInitialReplanner parallelInitialReplanner;
 	private ParallelDuringActivityReplanner parallelActEndReplanner;
 	private ParallelDuringLegReplanner parallelLeaveLinkReplanner;
 	private PersonalizableTravelCost travCostCalc;
 	private PersonalizableTravelTime travTimeCalc;
-	
+
 	MyMobsimFactory( PersonalizableTravelCost travelCostCalculator, PersonalizableTravelTime travelTimeCalculator ) {
 		this.travCostCalc = travelCostCalculator ;
 		this.travTimeCalc = travelTimeCalculator ;
@@ -70,14 +70,14 @@ public class MyMobsimFactory implements MobsimFactory {
 	public Simulation createMobsim(Scenario sc, EventsManager eventsManager) {
 		int numReplanningThreads = 1;
 
-		
+
 		Mobsim mobsim = new QSim( sc, eventsManager ) ;
-		
+
 		AgentFactory agentFactory = new WithinDayAgentFactory( mobsim ) ;
 		mobsim.setAgentFactory(agentFactory) ;
-		
+
 		ReplanningManager replanningManager = new ReplanningManager();
-		
+
 		// Use a FixedOrderQueueSimulationListener to bundle the Listeners and
 		// ensure that they are started in the needed order.
 		FixedOrderQueueSimulationListener foqsl = new FixedOrderQueueSimulationListener();
@@ -85,7 +85,7 @@ public class MyMobsimFactory implements MobsimFactory {
 		foqsl.addQueueSimulationBeforeSimStepListener(replanningManager);
 		mobsim.addQueueSimulationListeners(foqsl);
 		// (essentially, can just imagine the replanningManager as a regular MobsimListener)
-		
+
 		List<SimulationListener> simulationListenerList = new ArrayList<SimulationListener>() ;
 
 		log.info("Initialize Parallel Replanning Modules");
@@ -93,7 +93,7 @@ public class MyMobsimFactory implements MobsimFactory {
 		this.parallelActEndReplanner = new ParallelDuringActivityReplanner(numReplanningThreads, simulationListenerList );
 		this.parallelLeaveLinkReplanner = new ParallelDuringLegReplanner(numReplanningThreads, simulationListenerList );
 		// these are containers, but they don't do anything by themselves
-		
+
 		for ( SimulationListener siml : simulationListenerList ) {
 			mobsim.addQueueSimulationListeners( siml ) ;
 		}
@@ -113,10 +113,10 @@ public class MyMobsimFactory implements MobsimFactory {
 		replanningManager.doActEndReplanning(true);
 		replanningManager.doInitialReplanning(false);
 		replanningManager.doLeaveLinkReplanning(true);
-		
+
 		return mobsim ;
 	}
-	
+
 	/*
 	 * New Routers for the Replanning are used instead of using the controler's.
 	 * By doing this every person can use a personalised Router.
@@ -124,7 +124,7 @@ public class MyMobsimFactory implements MobsimFactory {
 	private void initReplanningRouter(Scenario sc, Mobsim mobsim ) {
 
 		//		PlansCalcRoute dijkstraRouter = new PlansCalcRoute(new PlansCalcRouteConfigGroup(), network, this.createTravelCostCalculator(), travelTime, new DijkstraFactory());
-		AbstractMultithreadedModule routerModule = 
+		AbstractMultithreadedModule routerModule =
 			new ReplanningModule(sc.getConfig(), sc.getNetwork(), this.travCostCalc, this.travTimeCalc, new DijkstraFactory());
 		// (ReplanningModule is a wrapper that either returns PlansCalcRoute or MultiModalPlansCalcRoute)
 		// this pretends being a general Plan Algorithm, but I wonder if it can reasonably be anything else but a router?
@@ -135,19 +135,19 @@ public class MyMobsimFactory implements MobsimFactory {
 
 		WithinDayDuringActivityReplanner duringActivityReplanner = new OldPeopleReplannerFactory(sc, mobsim.getAgentCounter(), routerModule, 1.0).createReplanner();
 		// defines a "doReplanning" method which contains the core of the work
-		// as a piece, it re-routes a _future_ leg.  
-		
+		// as a piece, it re-routes a _future_ leg.
+
 		duringActivityReplanner.addAgentsToReplanIdentifier(new OldPeopleIdentifierFactory(mobsim).createIdentifier());
 		// which persons to replan
-		
+
 		this.parallelActEndReplanner.addWithinDayReplanner(duringActivityReplanner);
 		// I think this just adds the stuff to the threads mechanics (can't say why it is not enough to use the multithreaded
 		// module).  kai, oct'10
 
-		
+
 
 		// replanning while on leg:
-		
+
 		WithinDayDuringLegReplanner duringLegReplanner = new YoungPeopleReplannerFactory(sc, mobsim.getAgentCounter(), routerModule, 1.0).createReplanner();
 		// defines a "doReplanning" method which contains the core of the work
 		// it replaces the next activity

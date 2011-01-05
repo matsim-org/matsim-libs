@@ -40,6 +40,7 @@ import org.xml.sax.SAXException;
  */
 public class MatsimNetworkReader extends MatsimXmlParser implements MatsimSomeReader {
 
+	private final static Logger log = Logger.getLogger(MatsimNetworkReader.class);
 	private final static String NETWORK_V1 = "network_v1.dtd";
 
 	private final Scenario scenario;
@@ -89,7 +90,7 @@ public class MatsimNetworkReader extends MatsimXmlParser implements MatsimSomeRe
 		// Currently the only network-type is v1
 		if (NETWORK_V1.equals(doctype)) {
 			this.delegate = new NetworkReaderMatsimV1(this.scenario);
-			Logger.getLogger(this.getClass()).info("using network_v1-reader.");
+			log.info("using network_v1-reader.");
 		} else {
 			throw new IllegalArgumentException("Doctype \"" + doctype + "\" not known.");
 		}

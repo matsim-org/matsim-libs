@@ -37,7 +37,7 @@ import cadyts.interfaces.matsim.MATSimUtilityModificationCalibrator;
  */
 class NewPtBsePlanChanger implements PlanSelector
 {
-	private static final Logger log = Logger.getLogger("dummy");
+	private static final Logger log = Logger.getLogger(NewPtBsePlanChanger.class);
 
 	private static boolean scoreWrnFlag = true;
 
@@ -46,7 +46,7 @@ class NewPtBsePlanChanger implements PlanSelector
 	private PtPlanToPlanStepBasedOnEvents ptPlanToPlanStep;
 
 	private MATSimUtilityModificationCalibrator<TransitStopFacility> matsimCalibrator;
-	
+
 	NewPtBsePlanChanger(PtPlanToPlanStepBasedOnEvents ptStep, MATSimUtilityModificationCalibrator<TransitStopFacility> calib ) {
 		log.error( "value for beta currently ignored (set to one)") ;
 		this.ptPlanToPlanStep = ptStep ;
@@ -60,7 +60,7 @@ class NewPtBsePlanChanger implements PlanSelector
 			return currentPlan ;
 		}
 		//ChoiceSampler<TransitStopFacility> sampler = ((SamplingCalibrator<TransitStopFacility>)this.matsimCalibrator).getSampler(person) ;
-		
+
 		// random plan:
 		Plan otherPlan = null ;
 		do {
@@ -70,15 +70,15 @@ class NewPtBsePlanChanger implements PlanSelector
 		if ( otherPlan.getScore()==null ) {
 			return otherPlan;
 		}
-		
+
 		cadyts.demand.Plan<TransitStopFacility> currentPlanSteps = this.ptPlanToPlanStep.getPlanSteps( currentPlan );
 		double currentPlanCadytsCorrection = this.matsimCalibrator.getUtilityCorrection(currentPlanSteps)/ this.beta;
 		double currentScore = currentPlan.getScore().doubleValue() + currentPlanCadytsCorrection;
-		
+
 		cadyts.demand.Plan<TransitStopFacility> otherPlanSteps = this.ptPlanToPlanStep.getPlanSteps( otherPlan );
 		double otherPlanCadytsCorrection  = this.matsimCalibrator.getUtilityCorrection(otherPlanSteps)/ this.beta;
 		double otherScore = otherPlan.getScore().doubleValue() + otherPlanCadytsCorrection ;
-		
+
 		if ( currentPlanCadytsCorrection != otherPlanCadytsCorrection) {
 			log.info( "currPlanCadytsCorr: " + currentPlanCadytsCorrection+ " otherPlanCadytsCorr: " + otherPlanCadytsCorrection) ;
 		}
@@ -88,19 +88,19 @@ class NewPtBsePlanChanger implements PlanSelector
 		// (beta is the slope (strength) of the operation: large beta means strong reaction)
 
 		Plan selectedPlan = currentPlan ;
-		cadyts.demand.Plan<TransitStopFacility> selectedPlanSteps =currentPlanSteps; 
-		if (MatsimRandom.getRandom().nextDouble() < 0.01*weight ) { 
+		cadyts.demand.Plan<TransitStopFacility> selectedPlanSteps =currentPlanSteps;
+		if (MatsimRandom.getRandom().nextDouble() < 0.01*weight ) {
 			// as of now, 0.01 is hardcoded (proba to change when both scores are the same)
-			
+
 			selectedPlan = otherPlan;
 			selectedPlanSteps = otherPlanSteps;
 		}
 
 		//sampler.enforceNextAccept();
 		//sampler.isAccepted(this.ptPlanToPlanStep.getPlanSteps(selectedPlan));
-		
+
 		this.matsimCalibrator.registerChoice(selectedPlanSteps);
-		
+
 		return selectedPlan ;
 	}
 

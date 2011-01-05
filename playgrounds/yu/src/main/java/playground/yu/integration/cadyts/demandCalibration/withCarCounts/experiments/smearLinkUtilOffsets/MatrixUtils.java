@@ -21,17 +21,21 @@
 package playground.yu.integration.cadyts.demandCalibration.withCarCounts.experiments.smearLinkUtilOffsets;
 
 import java.util.Iterator;
-import java.util.logging.Logger;
 
 import no.uib.cipr.matrix.Matrix;
 import no.uib.cipr.matrix.MatrixEntry;
+
+import org.apache.log4j.Logger;
+
 import playground.yu.utils.io.SimpleWriter;
 
 public class MatrixUtils {
+	private final static Logger log = Logger.getLogger(MatrixUtils.class);
+
 	private static String MATRIX_UTILS = MatrixUtils.class.getName();
 
 	public static void writeMatrix(Matrix matrix, String outputFilename) {
-		Logger.getLogger(MATRIX_UTILS).info(
+		log.info(
 				"write Matrix into\t" + outputFilename + "\tBEGAN!");
 		SimpleWriter writer = new SimpleWriter(outputFilename);
 		writer.writeln("rowIdx\tcolIdx\tvalue");
@@ -40,7 +44,7 @@ public class MatrixUtils {
 			writer.flush();
 		}
 		writer.close();
-		Logger.getLogger(MATRIX_UTILS).info(
+		log.info(
 				"write Matrix into\t" + outputFilename + "\tENDED!");
 	}
 

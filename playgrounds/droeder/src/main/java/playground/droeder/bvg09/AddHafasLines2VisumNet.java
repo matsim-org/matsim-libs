@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.droeder.bvg09;
 
 import java.io.IOException;
@@ -11,7 +30,7 @@ import java.util.TreeMap;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.jfree.util.Log;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
@@ -42,6 +61,7 @@ import playground.droeder.DaPaths;
 
 public class AddHafasLines2VisumNet {
 
+	private final static Logger log = Logger.getLogger(AddHafasLines2VisumNet.class);
 	private final String PATH = DaPaths.OUTPUT + "bvg09/";
 
 	private final String NETFILE = PATH + "intermediateNetwork.xml";
@@ -320,7 +340,7 @@ public class AddHafasLines2VisumNet {
 				double offset = 0;
 				for(TransitRouteStop s : r.getStops()){
 					if(s.getArrivalOffset()< offset){
-						Log.error("On Line:" + l.getId()+ " route:" + r.getId() +
+						log.error("On Line:" + l.getId()+ " route:" + r.getId() +
 								" Arrivaloffset of Stop " + s.getStopFacility().getId() + " then departureOffset of the stop before!");
 					}
 					offset = s.getDepartureOffset();

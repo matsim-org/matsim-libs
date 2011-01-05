@@ -21,8 +21,8 @@ package playground.yu.utils.qgis;
 
 import java.io.IOException;
 
+import org.apache.log4j.Logger;
 import org.geotools.referencing.CRS;
-import org.jfree.util.Log;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -41,6 +41,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  *
  */
 public class SelectedPlan2QGISDemo implements X2QGIS {
+	private final static Logger log = Logger.getLogger(SelectedPlan2QGISDemo.class);
 	public static void main(final String[] args) throws FactoryException {
 		// final String populationFilename = "./examples/equil/plans100.xml";
 		// final String populationFilename =
@@ -80,7 +81,7 @@ public class SelectedPlan2QGISDemo implements X2QGIS {
 		try {
 			sp.write();
 		} catch (IOException e) {
-			Log.error(e.getMessage(), e);
+			log.error(e);
 		}
 	}
 }
