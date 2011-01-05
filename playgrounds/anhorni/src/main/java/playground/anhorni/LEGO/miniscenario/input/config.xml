@@ -105,7 +105,7 @@
 	          <param name="recursionTravelSpeedChange" value="0.2" />
 	          <param name="restraintFcnExp" value="0.0" />
 	          <param name="restraintFcnFactor" value="0.0" />
-	          <param name="scaleFactor" value="10" />
+	          <param name="scaleFactor" value="1" />
 	          <param name="centerNode" value="null" />
 	          <param name="radius" value="null" />
 	          <param name="fixByActType" value="false" />
