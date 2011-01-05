@@ -34,8 +34,6 @@ public class MyControlerListener implements ShutdownListener {
 	private Map<Id,WorkplaceObject> numberOfWorkplacesPerZone;
 	private String travelDataPath;
 	private String zonesPath;
-	
-	private StringBuffer messageBuffer = null;
 
 	/**
 	 * constructor
@@ -46,19 +44,13 @@ public class MyControlerListener implements ShutdownListener {
 		this.numberOfWorkplacesPerZone = numberOfWorkplacesPerZone;
 		this.travelDataPath = Constants.OPUS_HOME + MATSimConfigObject.getTempDirectory() + "travel_data.csv";
 		this.zonesPath = Constants.OPUS_HOME + MATSimConfigObject.getTempDirectory() + "zones.csv";
-		
-		this.messageBuffer = new StringBuffer();
-		this.messageBuffer.append("The computed accessibility for the following zones is < 0.\n");
-		this.messageBuffer.append("Therefore their value will be set to 1 to avoid negative logsum values in the zone.csv table.\n");
-		this.messageBuffer.append("affected zones are:\n");
 	}
 	
 	/**
-	 *	
+	 *	calculating und dumping zone2zone impeadences and workplace accessibility 
 	 */
 	public void notifyShutdown(ShutdownEvent event) {
 		log.info("Entering notifyShutdown ..." ) ;
-		boolean isSmallerOne = false;
 
 		// get the calling controler:
 		Controler controler = event.getControler() ;
@@ -109,22 +101,27 @@ public class MyControlerListener implements ShutdownListener {
 				st.run(network);
 				
 				// initialize accessibility for origin (from) zone
-				double accessibility = 0.;
-				double beta = -1.;
-				
-				// 
+				double accessibility 	= 0.;
+				double beta 			= -12/3600.; // -1 is too large
+				double minTravelTime 	= Double.MAX_VALUE;
+
 				for ( ActivityFacility toZone : zones.getFacilities().values() ) {
+					
+					if(fromZone.getId().compareTo(toZone.getId()) == 0)
+						continue;
+					
 					Coord toCoord = toZone.getCoord();
 					Node toNode = network.getNearestNode( toCoord );
 					double arrivalTime = st.getTree().get(toNode.getId()).getTime();
-					// travel times
-					double ttime = arrivalTime - depatureTime ;
+					// travel times in sec
+					double ttime = arrivalTime - depatureTime;
 					
-					// tnicolai test
-					// travel costs
+					// get minimum travel time for in zone accessibility (see below)
+					minTravelTime = Math.min(ttime, minTravelTime);
+					
+					// tnicolai test to caculate travel costs
 					//LinkImpl toLink = network.getNearestLink( toCoord );
 					//double tcost = st.getTravelCostCalulator().getLinkGeneralizedTravelCost(toLink, depatureTime); // .getLinkTravelCost(toLink, depatureTime);
-					// end tnicolai test
 					
 					// this sum corresponts to the sum term of the log sum computation
 					if(numberOfWorkplacesPerZone.get(toZone.getId()) != null){
@@ -132,6 +129,7 @@ public class MyControlerListener implements ShutdownListener {
 						double costFunction = Math.exp( beta * ttime );
 						accessibility += weight * costFunction;
 					}
+
 					// yyyy should only be work facilities!!!! kai & thomas, dec'10
 					
 					travelDataWriter.write ( fromZone.getId().toString()	//origin zone id
@@ -140,12 +138,14 @@ public class MyControlerListener implements ShutdownListener {
 							+ "," + ttime ) ;								//ttimes
 					travelDataWriter.newLine();
 				}
-				
-				if(accessibility < 1){
-					isSmallerOne = true;
-					messageBuffer.append("Zone: " + fromZone.getId());
-					accessibility = 1;
+				// add in zone accessibility 
+				if(numberOfWorkplacesPerZone.get(fromZone.getId()) != null){
+					long weight = numberOfWorkplacesPerZone.get(fromZone.getId()).counter;
+					double costFunction = Math.exp( beta * (minTravelTime / 2) );
+					accessibility += weight * costFunction;
 				}
+				
+				// it is possible to get a negative log sum term (for accessibility < 1)
 				zonesWriter.write( fromZone.getId().toString() + "," +  Math.log( accessibility ) ) ;
 				zonesWriter.newLine();
 				
@@ -159,9 +159,6 @@ public class MyControlerListener implements ShutdownListener {
 			zonesWriter.flush();
 			zonesWriter.flush();
 			log.info("... done with writing zones.csv" );
-			
-			if(isSmallerOne)
-				log.warn(messageBuffer.toString());
 			
 			System.out.println(" ... done");
 

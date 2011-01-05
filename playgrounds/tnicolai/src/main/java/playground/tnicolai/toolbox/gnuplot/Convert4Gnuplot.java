@@ -292,8 +292,8 @@ public class Convert4Gnuplot {
 			
 			xAxisLabel = "years";
 			yAxisLable = getYAxisLabel(parts1);
-			series1 = "Scenario1";
-			series2 = "Scenario2";
+			series1 = "Ferry Scenario";
+			series2 = "Highway Scenario";
 			title = yAxisLable + " in zone " + zone_id;
 			
 			xAxis = getXAxis(parts1);
