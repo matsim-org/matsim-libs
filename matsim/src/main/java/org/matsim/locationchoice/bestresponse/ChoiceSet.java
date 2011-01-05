@@ -15,6 +15,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
+import org.matsim.core.config.Config;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
@@ -36,11 +37,13 @@ public class ChoiceSet {
 	private List<Id> notYetVisited = new Vector<Id>();
 	private PlansCalcRoute router = null;
 	private Network network = null;
+	private Config config;
 		
-	public ChoiceSet(int approximationLevel, PlansCalcRoute router, Network network) {
+	public ChoiceSet(int approximationLevel, PlansCalcRoute router, Network network, Config config) {
 		this.approximationLevel = approximationLevel;
 		this.router = router;
 		this.network = network;
+		this.config = config;
 	}
 	
 	public void addDestination(Id id) {
@@ -188,7 +191,7 @@ public class ChoiceSet {
 			
 	public void adaptAndScoreTimes(PlanImpl plan, int actlegIndex, PlanImpl planTmp, ScoringFunctionAccumulator scoringFunction, 
 			LeastCostPathCalculator leastCostPathCalculator, int approximationLevel) {
-		PlanTimesAdapter adapter = new PlanTimesAdapter(approximationLevel, leastCostPathCalculator, this.network);
+		PlanTimesAdapter adapter = new PlanTimesAdapter(approximationLevel, leastCostPathCalculator, this.network, this.config);
 		adapter.adaptAndScoreTimes(plan, actlegIndex, planTmp, scoringFunction, router);
 	}
 }

@@ -128,7 +128,8 @@ public class LocationMutatorBestResponse extends LocationMutatorwChoiceSet {
 					int travelTimeApproximationLevel = Integer.parseInt(
 							this.controler.getConfig().locationchoice().getTravelTimeApproximationLevel());
 					
-					ChoiceSet cs = new ChoiceSet(travelTimeApproximationLevel, (PlansCalcRoute)this.controler.createRoutingAlgorithm(), this.network);
+					ChoiceSet cs = new ChoiceSet(travelTimeApproximationLevel, (PlansCalcRoute)this.controler.createRoutingAlgorithm(), 
+							this.network, this.controler.getConfig());
 					this.createChoiceSetCircle(center, maxRadius, ActTypeConverter.convert2FullType(((ActivityImpl)actToMove).getType()), cs);
 										
 					// **************************************************

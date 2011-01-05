@@ -6,6 +6,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.config.Config;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
@@ -23,11 +24,13 @@ public class PlanTimesAdapter {
 	private int approximationLevel = 0; 
 	private LeastCostPathCalculator leastCostPathCalculator = null;
 	private Network network;
+	private Config config;
 		
-	public PlanTimesAdapter(int approximationLevel, LeastCostPathCalculator leastCostPathCalculator, Network network) {
+	public PlanTimesAdapter(int approximationLevel, LeastCostPathCalculator leastCostPathCalculator, Network network, Config config) {
 		this.approximationLevel = approximationLevel;
 		this.leastCostPathCalculator = leastCostPathCalculator;
 		this.network = network;
+		this.config = config;
 	}
 	
 	public void adaptAndScoreTimes(PlanImpl plan, int actlegIndex, PlanImpl planTmp, ScoringFunctionAccumulator scoringFunction,
@@ -109,7 +112,7 @@ public class PlanTimesAdapter {
 		Activity actPre = plan.getPreviousActivity(plan.getPreviousLeg(pe));
 		double distance = 1.5 * ((CoordImpl)actPre.getCoord()).calcDistance(pe.getCoord());
 		// TODO: get better speed estimation
-		double speed = 20.0;
+		double speed = Double.parseDouble(this.config.locationchoice().getRecursionTravelSpeed());
 		return distance / speed;
 	}
 	
