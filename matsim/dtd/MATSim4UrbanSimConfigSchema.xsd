@@ -63,6 +63,8 @@
 			<xs:element name="year" type="xs:nonNegativeInteger"/>
 			<xs:element name="tempDirectory" type="xs:token"/>
 			<xs:element name="isTestRun" type="xs:boolean"/>
+			<xs:element name="testParameter" type="xs:token" minOccurs="0" 
+				maxOccurs="1"/>
 			<xs:element name="opusHOME" type="xs:token"/>
 		</xs:sequence>
 	</xs:complexType>
