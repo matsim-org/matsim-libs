@@ -19,7 +19,7 @@ import playground.jjoubert.Utilities.ProgressBar;
 /**
  * The second step in processing the DigiCore data file. This class reads vehicle files 
  * split from the DigiCore data set and sort them chronologically according to the time 
- * stamp, i.e. the first field.
+ * stamp.
  * 
  * @author jwjoubert
  */
