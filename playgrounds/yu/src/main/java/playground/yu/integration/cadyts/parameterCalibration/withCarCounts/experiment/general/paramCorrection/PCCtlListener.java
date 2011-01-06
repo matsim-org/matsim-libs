@@ -504,7 +504,7 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 			String chartFilename = "";
 			for (int i = 0; i < paramNames.length; i++) {
 				chart.addSeries(paramNames[i], xs, paramArrays[i]);
-				chartFilename += paramNames + ".";
+				chartFilename += paramNames[i] + ".";
 			}
 
 			chart.saveAsPng(ctlIO.getIterationFilename(iter, chartFilename

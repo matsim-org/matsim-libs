@@ -72,8 +72,6 @@ public class Events2Score4PC_mnl extends Events2Score4PC implements
 	 * only choiceSetSize plans in the memory of an agent.
 	 *
 	 * @param person
-	 * @param travelingCarStats
-	 * @param performingStats
 	 */
 	@Override
 	public void setPersonAttrs(Person person) {
