@@ -70,6 +70,11 @@ public class SortDigicoreFiles {
 				log.info("   files sorted: " + counter);
 				multiplier *= 2;
 			}
+			
+			boolean deleted = theFile.delete();
+			if(!deleted){
+				log.warn("Could not delete file " + theFile.getName() + " after sorting.");
+			}
 		}
 		log.info("   files sorted: " + counter + " (Done)");
 		
