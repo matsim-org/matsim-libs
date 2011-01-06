@@ -61,34 +61,29 @@ public class AbstractMultithreadedModuleTest {
 	}
 
 	private static class DummyAbstractMultithreadedModule extends AbstractMultithreadedModule {
-
-		public DummyAbstractMultithreadedModule(
-				GlobalConfigGroup globalConfigGroup) {
+		public DummyAbstractMultithreadedModule(GlobalConfigGroup globalConfigGroup) {
 			super(globalConfigGroup);
 		}
 		@Override
 		public PlanAlgorithm getPlanAlgoInstance() {
 			return null;
 		}
-
 	}
 
 	private static class DummyCrashingModule extends AbstractMultithreadedModule {
-
 		public DummyCrashingModule(final int nOfThreads) {
 			super(nOfThreads);
 		}
-
 		@Override
 		public PlanAlgorithm getPlanAlgoInstance() {
-			return new PlanAlgorithm() {
-				@Override
-				public void run(Plan plan) {
-					@SuppressWarnings("unused")
-					int i = 1/0;
-				}
-			};
+			return new CrashingPlanAlgo();
 		}
+	}
 
+	private static class CrashingPlanAlgo implements PlanAlgorithm {
+		@Override
+		public void run(Plan plan) {
+			throw new IllegalArgumentException("just some exception to crash this thread.");
+		}
 	}
 }

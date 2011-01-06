@@ -173,7 +173,7 @@ abstract public class AbstractMultithreadedModule implements PlanStrategyModule 
 
 		@Override
 		public void uncaughtException(Thread t, Throwable e) {
-			log.error("Thread died with exception. Will stop after all threads finished.", e);
+			log.error("Thread " + t.getName() + " died with exception. Will stop after all threads finished.", e);
 			this.hadException.set(true);
 		}
 
