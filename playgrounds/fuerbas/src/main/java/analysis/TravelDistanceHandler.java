@@ -47,7 +47,9 @@ public class TravelDistanceHandler implements LinkLeaveEventHandler, LinkEnterEv
 	String networkfile = "893.output_network.xml.gz";
 	String plansfile = "893.2200.plans.xml.gz";
 	
-	
+	public TravelDistanceHandler() {
+		this.distance = distance;
+	}
 	
 	public void createHandlerScenario() {
 		Scenario scen = new ScenarioFactoryImpl().createScenario();
@@ -61,7 +63,7 @@ public class TravelDistanceHandler implements LinkLeaveEventHandler, LinkEnterEv
 	
 	
 	public void returnDistances(){
-		System.out.println(distance.toString());
+		System.out.println(this.distance.toString());
 	}
 	
 	
@@ -74,15 +76,13 @@ public class TravelDistanceHandler implements LinkLeaveEventHandler, LinkEnterEv
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		
-		System.out.println("I AM TOTALLY HANDLING STUFF");
-		
-		if (distance.containsKey(event.getPersonId())) {
-			double distanceSoFar = distance.get(event.getPersonId());
-			distance.put(event.getPersonId(), distanceSoFar+network.getLinks().get(event.getLinkId()).getLength());
+				
+		if (this.distance.containsKey(event.getPersonId())) {
+			double distanceSoFar = this.distance.get(event.getPersonId());
+			this.distance.put(event.getPersonId(), distanceSoFar+network.getLinks().get(event.getLinkId()).getLength());
 		}
 		else
-			distance.put(event.getPersonId(), network.getLinks().get(event.getLinkId()).getLength());
+			this.distance.put(event.getPersonId(), network.getLinks().get(event.getLinkId()).getLength());
 	}
 
 	@Override
