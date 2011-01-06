@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package org.matsim.lanes;
 
+import java.io.Serializable;
 import java.util.Comparator;
 
 /**
@@ -26,7 +27,9 @@ import java.util.Comparator;
  * attribute.
  * @author dgrether
  */
-public class LaneMeterFromLinkEndComparator implements Comparator<Lane>{
+public class LaneMeterFromLinkEndComparator implements Comparator<Lane>, Serializable {
+
+	private static final long serialVersionUID = 1L;
 
 	@Override
 	public int compare(Lane o1, Lane o2) {
