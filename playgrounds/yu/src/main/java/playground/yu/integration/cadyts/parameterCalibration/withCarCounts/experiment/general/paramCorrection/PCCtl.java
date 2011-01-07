@@ -24,6 +24,7 @@ import java.io.IOException;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.corelisteners.EventsHandling;
 import org.matsim.core.controler.corelisteners.PlansDumping;
 import org.matsim.core.controler.corelisteners.PlansReplanning;
 import org.matsim.core.replanning.PlanStrategy;
@@ -64,6 +65,10 @@ public class PCCtl extends BseParamCalibrationControler {
 		addControlerListener(extension);
 	}
 
+	/**
+	 * please check the method in super class, when the super class {@code
+	 * org.matsim.core.controler.Controler} is changed sometimes
+	 */
 	@Override
 	protected void loadCoreListeners() {
 		addCoreControlerListener(new CoreControlerListener());
@@ -82,6 +87,8 @@ public class PCCtl extends BseParamCalibrationControler {
 
 		addCoreControlerListener(new PlansReplanning());
 		addCoreControlerListener(new PlansDumping());
+		// EventsHanding ... very important
+		addCoreControlerListener(new EventsHandling(events));
 	}
 
 	@Override
