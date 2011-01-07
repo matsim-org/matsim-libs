@@ -68,9 +68,7 @@ public class DgPrognose2025GvVerschmierer {
 	}
 	
 	public void verschmierePopulation(){
-		Verschmierer verschmierer = new Verschmierer();
-		verschmierer.setFilename(LANDKREISE);
-		verschmierer.prepare();
+		Verschmierer verschmierer = new Verschmierer(LANDKREISE);
 		
 		Scenario scenario = new ScenarioImpl();
 		MatsimPopulationReader popReader = new MatsimPopulationReader(scenario);

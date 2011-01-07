@@ -18,9 +18,11 @@ public class PopulationWriterTask implements PersonSink {
 
 	private Network network;
 	
-	public PopulationWriterTask(String filename) {
+	public PopulationWriterTask(String filename, Network network) {
 		super();
 		this.filename = filename;
+		this.network = network;
+		init();
 	}
 	
 	private void init() {
@@ -38,11 +40,6 @@ public class PopulationWriterTask implements PersonSink {
 	
 	public void complete() {
 		populationWriter.closeStreaming();
-	}
-
-	public void setNetwork(Network network) {
-		this.network = network;
-		init();
 	}
 
 }

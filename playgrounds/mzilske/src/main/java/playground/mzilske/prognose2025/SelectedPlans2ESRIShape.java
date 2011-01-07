@@ -236,11 +236,9 @@ public class SelectedPlans2ESRIShape {
 
 	public static void main(final String [] args) {
 		// FIXME hard-coded file names; does this class really need a main-method?
-		final String populationFilename = "../prognose_2025/demand/population_pv_1pct.xml";
-		final String networkFilename = "../prognose_2025/demand/network_ab_wgs84.xml";
-//		final String populationFilename = "./test/scenarios/berlin/plans_hwh_1pct.xml.gz";
-//		final String networkFilename = "./test/scenarios/berlin/network.xml.gz";
-
+		final String populationFilename = "/Users/michaelzilske/workspace/prognose_2025/demand/naechster_versuch.xml";
+		final String networkFilename = "/Users/michaelzilske/osm/motorway_germany.xml";
+		
 		final String outputDir = "../playgrounds/mzilske/output";
 
 		ScenarioImpl scenario = new ScenarioImpl();

@@ -34,5 +34,10 @@ public class RoutePersonTask implements PersonSinkSource {
 		PersonalizableTravelCost travelCosts = new TravelCostCalculatorFactoryImpl().createTravelCostCalculator(travelTimes, config.charyparNagelScoring());
 		personPrepareForSim = new PersonPrepareForSim(new PlansCalcRoute(config.plansCalcRoute(), network, travelCosts, travelTimes, new DijkstraFactory()), (NetworkImpl) network);
 	}
+
+	@Override
+	public void complete() {
+		sink.complete();
+	}
 	
 }
