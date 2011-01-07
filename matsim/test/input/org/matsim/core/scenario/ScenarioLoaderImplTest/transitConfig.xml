@@ -21,7 +21,7 @@
 	</module>
 	
 	<module name="transit">
-		<param name="transitScheduleFile" value="test/input/org/matsim/core/scenario/ScenarioLoaderImplTest/transitschedule.xml" />
+		<param name="transitScheduleFile" value="test/input/org/matsim/core/scenario/ScenarioLoaderImplTest/transitSchedule.xml" />
 		<param name="vehiclesFile" value="test/input/org/matsim/core/scenario/ScenarioLoaderImplTest/transitVehicles.xml" />
 		<param name="transitModes" value="pt" />
 	</module>
