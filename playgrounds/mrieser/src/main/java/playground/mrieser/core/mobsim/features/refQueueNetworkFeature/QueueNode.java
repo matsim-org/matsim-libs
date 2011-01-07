@@ -30,10 +30,10 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.events.AgentStuckEventImpl;
 
-import playground.mrieser.core.mobsim.api.SimVehicle;
-import playground.mrieser.core.mobsim.network.api.MobSimNode;
+import playground.mrieser.core.mobsim.api.MobsimVehicle;
+import playground.mrieser.core.mobsim.network.api.MobsimNode2;
 
-/*package*/ class QueueNode implements MobSimNode {
+/*package*/ class QueueNode implements MobsimNode2 {
 
 	private final static Logger log = Logger.getLogger(QueueNode.class);
 
@@ -117,7 +117,7 @@ import playground.mrieser.core.mobsim.network.api.MobSimNode;
 	}
 
 	private void clearLinkBuffer(final QueueBuffer buffer, final double now) {
-		SimVehicle veh;
+		MobsimVehicle veh;
 		while ((veh = buffer.getFirstVehicleInBuffer()) != null) {
       if (!moveVehicleOverNode(veh, buffer, now)) {
 //      	System.out.println("       MOVE failed.");
@@ -133,7 +133,7 @@ import playground.mrieser.core.mobsim.network.api.MobSimNode;
 	 * @return <code>true</code> if the vehicle was successfully moved over the node,
 	 * 	<code>false</code> otherwise (e.g. in case where the next link is jammed)
 	 */
-	private boolean moveVehicleOverNode(final SimVehicle vehicle, final QueueBuffer buffer, final double now) {
+	private boolean moveVehicleOverNode(final MobsimVehicle vehicle, final QueueBuffer buffer, final double now) {
 		Id nextLinkId = vehicle.getDriver().getNextLinkId();
 
     // veh has to move over node
@@ -181,7 +181,7 @@ import playground.mrieser.core.mobsim.network.api.MobSimNode;
     return true;
 	}
 
-	private void checkNextLinkSemantics(final QueueLink currentLink, final QueueLink nextLink, final SimVehicle veh){
+	private void checkNextLinkSemantics(final QueueLink currentLink, final QueueLink nextLink, final MobsimVehicle veh){
     if (currentLink.link.getToNode() != nextLink.link.getFromNode()) {
       throw new RuntimeException("Cannot move vehicle " + veh.getId() +
           " from link " + currentLink.getId() + " to link " + nextLink.getId());

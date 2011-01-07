@@ -44,12 +44,12 @@ import org.matsim.testcases.utils.LogCounter;
 
 import playground.mrieser.core.mobsim.api.PlanAgent;
 import playground.mrieser.core.mobsim.api.PlanElementHandler;
-import playground.mrieser.core.mobsim.api.SimVehicle;
+import playground.mrieser.core.mobsim.api.MobsimVehicle;
 import playground.mrieser.core.mobsim.api.TimestepSimEngine;
 import playground.mrieser.core.mobsim.fakes.FakeSimVehicle;
 import playground.mrieser.core.mobsim.features.NetworkFeature;
 import playground.mrieser.core.mobsim.features.refQueueNetworkFeature.RefQueueNetworkFeature;
-import playground.mrieser.core.mobsim.network.api.MobSimLink;
+import playground.mrieser.core.mobsim.network.api.MobsimLink2;
 
 /**
  * @author mrieser
@@ -74,9 +74,9 @@ public class CarDepartureHandlerTest {
 		plan.addActivity(f.scenario.getPopulation().getFactory().createActivityFromLinkId("work", f.ids[3]));
 		plan.setPerson(f.scenario.getPopulation().getFactory().createPerson(f.ids[0]));
 		PlanAgent agent = new DefaultPlanAgent(plan, 1.0);
-		MobSimLink link = f.networkFeature.getSimNetwork().getLinks().get(f.ids[0]);
-		SimVehicle veh = new FakeSimVehicle(f.ids[0]);
-		link.insertVehicle(veh, MobSimLink.POSITION_AT_TO_NODE, MobSimLink.PRIORITY_PARKING);
+		MobsimLink2 link = f.networkFeature.getSimNetwork().getLinks().get(f.ids[0]);
+		MobsimVehicle veh = new FakeSimVehicle(f.ids[0]);
+		link.insertVehicle(veh, MobsimLink2.POSITION_AT_TO_NODE, MobsimLink2.PRIORITY_PARKING);
 		Assert.assertEquals(veh, link.getParkedVehicle(veh.getId()));
 		agent.useNextPlanElement(); // homeAct
 		agent.useNextPlanElement(); // leg
@@ -119,9 +119,9 @@ public class CarDepartureHandlerTest {
 
 		plan.setPerson(f.scenario.getPopulation().getFactory().createPerson(f.ids[0]));
 		PlanAgent agent = new DefaultPlanAgent(plan, 1.0);
-		MobSimLink link = f.networkFeature.getSimNetwork().getLinks().get(f.ids[3]);
-		SimVehicle veh = new FakeSimVehicle(f.ids[0]);
-		link.insertVehicle(veh, MobSimLink.POSITION_AT_TO_NODE, MobSimLink.PRIORITY_PARKING);
+		MobsimLink2 link = f.networkFeature.getSimNetwork().getLinks().get(f.ids[3]);
+		MobsimVehicle veh = new FakeSimVehicle(f.ids[0]);
+		link.insertVehicle(veh, MobsimLink2.POSITION_AT_TO_NODE, MobsimLink2.PRIORITY_PARKING);
 		Assert.assertEquals(veh, link.getParkedVehicle(veh.getId()));
 		agent.useNextPlanElement(); // homeAct
 		agent.useNextPlanElement(); // leg
@@ -191,7 +191,7 @@ public class CarDepartureHandlerTest {
 		f.networkFeature.doSimStep(101); // agent moved to link2
 		f.networkFeature.doSimStep(200); // agent arrives, work
 
-		SimVehicle vehicle = f.networkFeature.getSimNetwork().getLinks().get(f.ids[2]).getParkedVehicle(personId);
+		MobsimVehicle vehicle = f.networkFeature.getSimNetwork().getLinks().get(f.ids[2]).getParkedVehicle(personId);
 		Assert.assertNotNull(vehicle);
 
 		Assert.assertTrue(agent.useNextPlanElement() instanceof Leg); // leg
@@ -267,7 +267,7 @@ public class CarDepartureHandlerTest {
 		f.networkFeature.doSimStep(101); // agent moved to link2
 		f.networkFeature.doSimStep(200); // agent arrives, work
 
-		SimVehicle vehicle = f.networkFeature.getSimNetwork().getLinks().get(f.ids[2]).getParkedVehicle(personId);
+		MobsimVehicle vehicle = f.networkFeature.getSimNetwork().getLinks().get(f.ids[2]).getParkedVehicle(personId);
 		Assert.assertNotNull(vehicle);
 
 		Assert.assertTrue(agent.useNextPlanElement() instanceof Leg); // leg walk
@@ -336,7 +336,7 @@ public class CarDepartureHandlerTest {
 		f.networkFeature.doSimStep(101); // agent moved to link2
 		f.networkFeature.doSimStep(200); // agent arrives, work
 
-		SimVehicle vehicle = f.networkFeature.getSimNetwork().getLinks().get(f.ids[2]).getParkedVehicle(personId);
+		MobsimVehicle vehicle = f.networkFeature.getSimNetwork().getLinks().get(f.ids[2]).getParkedVehicle(personId);
 		Assert.assertNotNull(vehicle);
 
 		Assert.assertTrue(agent.useNextPlanElement() instanceof Leg); // leg walk

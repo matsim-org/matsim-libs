@@ -39,6 +39,6 @@ public interface NewSimEngine {
 
 	public void runSim();
 
-	public void addKeepAlive(final SimKeepAlive keepAlive);
+	public void addKeepAlive(final MobsimKeepAlive keepAlive);
 
 }

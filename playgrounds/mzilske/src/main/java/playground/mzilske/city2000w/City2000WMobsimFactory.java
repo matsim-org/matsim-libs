@@ -76,7 +76,7 @@ public class City2000WMobsimFactory implements MobsimFactory {
 
 		PlanSimulationImpl planSim = new PlanSimulationImpl(scenario);
 		DefaultTimestepSimEngine engine = new DefaultTimestepSimEngine(planSim, eventsManager);
-		planSim.setSimEngine(engine);
+		planSim.setMobsimEngine(engine);
 
 		// setup network
 		FastQueueNetworkFeature netFeature;
@@ -103,10 +103,10 @@ public class City2000WMobsimFactory implements MobsimFactory {
 		}
 
 		// register all features at the end in the right order
-		planSim.addSimFeature(new StatusFeature());
-		planSim.addSimFeature(teleporter); // how should a user know teleporter is a simfeature?
-		planSim.addSimFeature(ah); // how should a user know ah is a simfeature, bug lh not?
-		planSim.addSimFeature(netFeature); // order of features is important!
+		planSim.addMobsimFeature(new StatusFeature());
+		planSim.addMobsimFeature(teleporter); // how should a user know teleporter is a simfeature?
+		planSim.addMobsimFeature(ah); // how should a user know ah is a simfeature, bug lh not?
+		planSim.addMobsimFeature(netFeature); // order of features is important!
 
 		if (useOTFVis) {
 			OTFVisLiveServer server = new OTFVisLiveServer(scenario, eventsManager);
@@ -119,7 +119,7 @@ public class City2000WMobsimFactory implements MobsimFactory {
 			client.run();
 			VisNetwork visNetwork = netFeature.getVisNetwork();
 			OTFVisFeature otfvisFeature = new OTFVisFeature(visNetwork, server.getSnapshotReceiver());
-			planSim.addSimFeature(otfvisFeature);
+			planSim.addMobsimFeature(otfvisFeature);
 		}
 		
 		planSim.addAgentSource(freightAgentTracker);

@@ -71,7 +71,7 @@ public class DetailedEvaluationMobsimFactory implements MobsimFactory {
 
 		PlanSimulationImpl planSim = new PlanSimulationImpl(scenario);
 		DefaultTimestepSimEngine engine = new DefaultTimestepSimEngine(planSim, eventsManager);
-		planSim.setSimEngine(engine);
+		planSim.setMobsimEngine(engine);
 
 		// setup network
 		FastQueueNetworkFeature netFeature;
@@ -99,10 +99,10 @@ public class DetailedEvaluationMobsimFactory implements MobsimFactory {
 		}
 
 		// register all features at the end in the right order
-		planSim.addSimFeature(new StatusFeature());
-		planSim.addSimFeature(teleporter); // how should a user know teleporter is a simfeature?
-		planSim.addSimFeature(ah); // how should a user know ah is a simfeature, bug lh not?
-		planSim.addSimFeature(netFeature); // order of features is important!
+		planSim.addMobsimFeature(new StatusFeature());
+		planSim.addMobsimFeature(teleporter); // how should a user know teleporter is a simfeature?
+		planSim.addMobsimFeature(ah); // how should a user know ah is a simfeature, bug lh not?
+		planSim.addMobsimFeature(netFeature); // order of features is important!
 
 		if (useOTFVis) {
 			OTFVisLiveServer server = new OTFVisLiveServer(scenario, eventsManager);
@@ -113,7 +113,7 @@ public class DetailedEvaluationMobsimFactory implements MobsimFactory {
 			client.run();
 			VisNetwork visNetwork = netFeature.getVisNetwork();
 			OTFVisFeature otfvisFeature = new OTFVisFeature(visNetwork, server.getSnapshotReceiver());
-			planSim.addSimFeature(otfvisFeature);
+			planSim.addMobsimFeature(otfvisFeature);
 		}
 
 		
@@ -121,12 +121,12 @@ public class DetailedEvaluationMobsimFactory implements MobsimFactory {
 		// register agent sources
 		planSim.addAgentSource(new PopulationAgentSource(scenario.getPopulation(), 1.0));
 		CarDistributor carDistributor = new CarDistributor(scenario.getPopulation(), ((ScenarioImpl) scenario).getVehicles(), netFeature, engine);
-		planSim.addSimFeature(carDistributor);
+		planSim.addMobsimFeature(carDistributor);
 		for (Population backgroundPopulation : this.backgroundPopulations) {
 			planSim.addAgentSource(new PopulationAgentSource(backgroundPopulation, 1.0));
 			CarDistributor backgroundCarDistributor = new CarDistributor(backgroundPopulation, ((ScenarioImpl) scenario).getVehicles(), netFeature, engine);
 			backgroundCarDistributor.setPunishVehicleMove(false);
-			planSim.addSimFeature(backgroundCarDistributor);
+			planSim.addMobsimFeature(backgroundCarDistributor);
 		}
 				
 		return planSim;

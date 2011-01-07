@@ -17,17 +17,35 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mrieser.core.mobsim.features;
+package playground.mrieser.core.mobsim.features.fastQueueNetworkFeature;
 
-import org.matsim.core.mobsim.framework.Steppable;
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
-/**
- * @author mrieser
- */
-public interface MobSimFeature extends Steppable {
+public class BusyWaitCyclicBarrier {
 
-	public void beforeMobSim();
+	private final int parties;
+	private final AtomicLong generation = new AtomicLong(Long.MIN_VALUE);
+	private final AtomicInteger counter = new AtomicInteger(0);
 
-	public void afterMobSim();
+	public BusyWaitCyclicBarrier(final int parties) {
+		this.parties = parties;
+		this.counter.set(parties);
+	}
+
+	public int await() throws InterruptedException, BrokenBarrierException {
+		long gen = this.generation.get();
+		int i = this.counter.decrementAndGet();
+		if (i == 0) {
+			this.counter.set(this.parties);
+			this.generation.incrementAndGet();
+		}
+//		System.out.println("Waiting: i = " + i + " gen = " + gen);
+		while (gen == this.generation.get()) {
+			 ; // busy waiting
+		}
+		return i;
+	}
 
 }

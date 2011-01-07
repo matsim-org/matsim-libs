@@ -27,12 +27,12 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 
 import playground.mrieser.core.mobsim.api.TimestepSimEngine;
-import playground.mrieser.core.mobsim.network.api.MobSimNetwork;
+import playground.mrieser.core.mobsim.network.api.MobsimNetwork2;
 
 /**
  * @author mrieser
  */
-/*package*/ class QueueNetwork implements MobSimNetwork {
+/*package*/ class QueueNetwork implements MobsimNetwork2 {
 
 	protected final TimestepSimEngine simEngine;
 	private final Map<Id, QueueLink> links;

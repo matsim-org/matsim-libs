@@ -47,16 +47,16 @@ public class TransitSimFactory implements MobsimFactory {
 
 		PlanSimulationImpl planSim = new PlanSimulationImpl(scenario);
 		DefaultTimestepSimEngine engine = new DefaultTimestepSimEngine(planSim, eventsManager);
-		planSim.setSimEngine(engine);
+		planSim.setMobsimEngine(engine);
 
 		// setup network
 		RefQueueNetworkFeature netFeature = new RefQueueNetworkFeature(scenario.getNetwork(), engine);
 
 		// setup features; order is important!
-		planSim.addSimFeature(new StatusFeature());
-		planSim.addSimFeature(new SignalSystemsFeature());
-		planSim.addSimFeature(new TransitFeature());
-		planSim.addSimFeature(netFeature);
+		planSim.addMobsimFeature(new StatusFeature());
+		planSim.addMobsimFeature(new SignalSystemsFeature());
+		planSim.addMobsimFeature(new TransitFeature());
+		planSim.addMobsimFeature(netFeature);
 
 		// setup PlanElementHandlers
 		ActivityHandler ah = new ActivityHandler(engine);

@@ -23,7 +23,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsManagerImpl;
 
 import playground.mrieser.core.mobsim.api.PlanAgent;
-import playground.mrieser.core.mobsim.api.SimKeepAlive;
+import playground.mrieser.core.mobsim.api.MobsimKeepAlive;
 import playground.mrieser.core.mobsim.api.TimestepSimEngine;
 
 /**
@@ -64,7 +64,7 @@ public class FakeSimEngine implements TimestepSimEngine {
 	}
 
 	@Override
-	public void addKeepAlive(SimKeepAlive keepAlive) {
+	public void addKeepAlive(MobsimKeepAlive keepAlive) {
 		this.countAddKeepAlive++;
 	}
 

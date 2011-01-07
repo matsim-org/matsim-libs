@@ -33,7 +33,7 @@ import playground.mrieser.core.mobsim.api.NewSimEngine;
 import playground.mrieser.core.mobsim.api.PlanAgent;
 import playground.mrieser.core.mobsim.api.PlanElementHandler;
 import playground.mrieser.core.mobsim.api.PlanSimulation;
-import playground.mrieser.core.mobsim.features.MobSimFeature;
+import playground.mrieser.core.mobsim.features.MobsimFeature2;
 import playground.mrieser.core.mobsim.utils.ClassBasedMap;
 
 /**
@@ -46,7 +46,7 @@ public class PlanSimulationImpl implements PlanSimulation, Simulation { // TODO 
 	private final Scenario scenario;
 	private NewSimEngine simEngine = null;
 	private final ClassBasedMap<PlanElement, PlanElementHandler> peHandlers = new ClassBasedMap<PlanElement, PlanElementHandler>();
-	private final LinkedList<MobSimFeature> simFeatures = new LinkedList<MobSimFeature>();
+	private final LinkedList<MobsimFeature2> simFeatures = new LinkedList<MobsimFeature2>();
 	private final LinkedList<AgentSource> agentSources = new LinkedList<AgentSource>();
 
 	public PlanSimulationImpl(final Scenario scenario) {
@@ -54,7 +54,7 @@ public class PlanSimulationImpl implements PlanSimulation, Simulation { // TODO 
 	}
 
 	@Override
-	public void setSimEngine(final NewSimEngine simEngine) {
+	public void setMobsimEngine(final NewSimEngine simEngine) {
 		this.simEngine = simEngine;
 	}
 
@@ -75,11 +75,11 @@ public class PlanSimulationImpl implements PlanSimulation, Simulation { // TODO 
 
 	@Override
 	public void run() {
-		runSim();
+		runMobsim();
 	}
 
 	@Override
-	public void runSim() {
+	public void runMobsim() {
 		log.info("begin simulation.");
 
 		// TODO
@@ -114,16 +114,16 @@ public class PlanSimulationImpl implements PlanSimulation, Simulation { // TODO 
 	}
 
 	@Override
-	public void addSimFeature(final MobSimFeature feature) {
+	public void addMobsimFeature(final MobsimFeature2 feature) {
 		this.simFeatures.add(feature);
 	}
 
-	public void removeSimFeature(final MobSimFeature feature) {
+	public void removeSimFeature(final MobsimFeature2 feature) {
 		this.simFeatures.remove(feature);
 	}
 
 	@Override
-	public List<MobSimFeature> getSimFeatures() {
+	public List<MobsimFeature2> getMobsimFeatures() {
 		return Collections.unmodifiableList(this.simFeatures);
 	}
 }

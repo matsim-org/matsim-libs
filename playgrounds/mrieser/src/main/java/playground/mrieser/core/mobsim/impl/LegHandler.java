@@ -31,12 +31,12 @@ import playground.mrieser.core.mobsim.api.DepartureHandler;
 import playground.mrieser.core.mobsim.api.NewSimEngine;
 import playground.mrieser.core.mobsim.api.PlanAgent;
 import playground.mrieser.core.mobsim.api.PlanElementHandler;
-import playground.mrieser.core.mobsim.api.SimKeepAlive;
+import playground.mrieser.core.mobsim.api.MobsimKeepAlive;
 
 /**
  * @author mrieser
  */
-public class LegHandler implements PlanElementHandler, SimKeepAlive {
+public class LegHandler implements PlanElementHandler, MobsimKeepAlive {
 
 	private final NewSimEngine simEngine;
 	private final ConcurrentHashMap<String, DepartureHandler> departureHandlers = new ConcurrentHashMap<String, DepartureHandler>();

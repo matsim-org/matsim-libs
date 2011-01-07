@@ -31,13 +31,13 @@ import org.matsim.core.utils.misc.Time;
 import playground.mrieser.core.mobsim.api.DepartureHandler;
 import playground.mrieser.core.mobsim.api.NewSimEngine;
 import playground.mrieser.core.mobsim.api.PlanAgent;
-import playground.mrieser.core.mobsim.api.SimKeepAlive;
-import playground.mrieser.core.mobsim.features.MobSimFeature;
+import playground.mrieser.core.mobsim.api.MobsimKeepAlive;
+import playground.mrieser.core.mobsim.features.MobsimFeature2;
 
 /**
  * @author mrieser
  */
-public class TeleportationHandler implements DepartureHandler, MobSimFeature, SimKeepAlive {
+public class TeleportationHandler implements DepartureHandler, MobsimFeature2, MobsimKeepAlive {
 
 	private final static Logger log = Logger.getLogger(TeleportationHandler.class);
 

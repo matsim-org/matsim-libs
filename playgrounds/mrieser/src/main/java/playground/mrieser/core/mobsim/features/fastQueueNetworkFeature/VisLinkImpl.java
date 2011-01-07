@@ -25,7 +25,7 @@ import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfoFactory;
 
-import playground.mrieser.core.mobsim.api.SimVehicle;
+import playground.mrieser.core.mobsim.api.MobsimVehicle;
 import playground.mrieser.core.mobsim.network.api.VisLink;
 
 public class VisLinkImpl implements VisLink {
@@ -43,7 +43,7 @@ public class VisLinkImpl implements VisLink {
 		int vehCount = this.link.buffer.buffer.size() + this.link.vehQueue.size();
 		double vehSize = Math.min(7.5, dist / vehCount);
 
-		for (SimVehicle veh : this.link.buffer.buffer) {
+		for (MobsimVehicle veh : this.link.buffer.buffer) {
 			dist -= vehSize;
 			AgentSnapshotInfo pi = AgentSnapshotInfoFactory.staticCreateAgentSnapshotInfo(veh.getId(), this.link.link, dist, 1);
 			pi.setColorValueBetweenZeroAndOne(1.0);
@@ -51,7 +51,7 @@ public class VisLinkImpl implements VisLink {
 			positions.add(pi);
 		}
 		vehSize = dist / this.link.vehQueue.size();
-		for (SimVehicle veh : this.link.vehQueue) {
+		for (MobsimVehicle veh : this.link.vehQueue) {
 			dist -= vehSize;
 			AgentSnapshotInfo pi = AgentSnapshotInfoFactory.staticCreateAgentSnapshotInfo(veh.getId(), this.link.link, dist, 1);
 			pi.setColorValueBetweenZeroAndOne(0.5);

@@ -17,38 +17,9 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mrieser.core.mobsim.features.refQueueNetworkFeature;
+package playground.mrieser.core.mobsim.impl;
 
-import org.matsim.api.core.v01.network.Network;
+public class MobsimVehicleFleet {
 
-import playground.mrieser.core.mobsim.api.TimestepSimEngine;
-import playground.mrieser.core.mobsim.features.NetworkFeature;
-import playground.mrieser.core.mobsim.network.api.MobsimNetwork2;
-
-public class RefQueueNetworkFeature implements NetworkFeature {
-
-	private final MobsimNetwork2 network;
-
-	public RefQueueNetworkFeature(final Network network, final TimestepSimEngine simEngine) {
-		this.network = QueueNetworkCreator.createQueueNetwork(network, simEngine);
-	}
-
-	@Override
-	public void beforeMobSim() {
-	}
-
-	@Override
-	public void doSimStep(double time) {
-		this.network.doSimStep(time);
-	}
-
-	@Override
-	public void afterMobSim() {
-	}
-
-	@Override
-	public MobsimNetwork2 getSimNetwork() {
-		return this.network;
-	}
 
 }

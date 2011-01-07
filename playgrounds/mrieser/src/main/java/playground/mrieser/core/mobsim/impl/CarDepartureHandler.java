@@ -36,9 +36,9 @@ import playground.mrieser.core.mobsim.api.DepartureHandler;
 import playground.mrieser.core.mobsim.api.DriverAgent;
 import playground.mrieser.core.mobsim.api.NewSimEngine;
 import playground.mrieser.core.mobsim.api.PlanAgent;
-import playground.mrieser.core.mobsim.api.SimVehicle;
+import playground.mrieser.core.mobsim.api.MobsimVehicle;
 import playground.mrieser.core.mobsim.features.NetworkFeature;
-import playground.mrieser.core.mobsim.network.api.MobSimLink;
+import playground.mrieser.core.mobsim.network.api.MobsimLink2;
 
 /**
  * This DepartureHandler assigns departing agents to a vehicle which is placed on
@@ -83,20 +83,20 @@ public class CarDepartureHandler implements DepartureHandler {
 		Leg leg = (Leg) agent.getCurrentPlanElement();
 		NetworkRoute route = (NetworkRoute) leg.getRoute();
 
-		MobSimLink link = this.networkFeature.getSimNetwork().getLinks().get(route.getStartLinkId());
+		MobsimLink2 link = this.networkFeature.getSimNetwork().getLinks().get(route.getStartLinkId());
 		Id vehId = agent.getPlan().getPerson().getId(); // TODO [MR] use vehicleId instead of personId
-		SimVehicle simVehicle = link.getParkedVehicle(vehId);
+		MobsimVehicle simVehicle = link.getParkedVehicle(vehId);
 		if (simVehicle == null) {
 			Id linkId = this.vehicleLocations.get(vehId);
 			if (linkId == null) {
 				simVehicle = new DefaultSimVehicle(new VehicleImpl(vehId, this.defaultVehicleType));
-				link.insertVehicle(simVehicle, MobSimLink.POSITION_AT_TO_NODE, MobSimLink.PRIORITY_PARKING);
+				link.insertVehicle(simVehicle, MobsimLink2.POSITION_AT_TO_NODE, MobsimLink2.PRIORITY_PARKING);
 			} else if (this.teleportVehicles) {
 				log.warn("Agent departs on link " + route.getStartLinkId() + ", but vehicle is on link " + linkId + ". Teleporting the vehicle.");
-				MobSimLink link2 = this.networkFeature.getSimNetwork().getLinks().get(linkId);
+				MobsimLink2 link2 = this.networkFeature.getSimNetwork().getLinks().get(linkId);
 				simVehicle = link2.getParkedVehicle(vehId);
 				link2.removeVehicle(simVehicle);
-				link.insertVehicle(simVehicle, MobSimLink.POSITION_AT_TO_NODE, MobSimLink.PRIORITY_PARKING);
+				link.insertVehicle(simVehicle, MobsimLink2.POSITION_AT_TO_NODE, MobsimLink2.PRIORITY_PARKING);
 			} else {
 				log.error("Agent departs on link " + route.getStartLinkId() + ", but vehicle is on link " + linkId + ". Agent is removed from simulation.");
 				return;

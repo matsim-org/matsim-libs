@@ -44,7 +44,7 @@ public class RefSimFactory implements MobsimFactory {
 
 		PlanSimulationImpl planSim = new PlanSimulationImpl(scenario);
 		DefaultTimestepSimEngine engine = new DefaultTimestepSimEngine(planSim, eventsManager);
-		planSim.setSimEngine(engine);
+		planSim.setMobsimEngine(engine);
 
 		// setup network
 		RefQueueNetworkFeature netFeature = new RefQueueNetworkFeature(scenario.getNetwork(), engine);
@@ -67,10 +67,10 @@ public class RefSimFactory implements MobsimFactory {
 		lh.setDepartureHandler(TransportMode.ride, teleporter);
 
 		// register all features at the end in the right order
-		planSim.addSimFeature(new StatusFeature());
-		planSim.addSimFeature(teleporter); // how should a user know teleporter is a simfeature?
-		planSim.addSimFeature(ah); // how should a user know ah is a simfeature, bug lh not?
-		planSim.addSimFeature(netFeature); // order of features is important!
+		planSim.addMobsimFeature(new StatusFeature());
+		planSim.addMobsimFeature(teleporter); // how should a user know teleporter is a simfeature?
+		planSim.addMobsimFeature(ah); // how should a user know ah is a simfeature, bug lh not?
+		planSim.addMobsimFeature(netFeature); // order of features is important!
 
 		// register agent sources
 		planSim.addAgentSource(new PopulationAgentSource(scenario.getPopulation(), 1.0));

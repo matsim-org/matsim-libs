@@ -67,7 +67,7 @@ public class OptimizedCarSimFactory implements MobsimFactory {
 
 		PlanSimulationImpl planSim = new PlanSimulationImpl(scenario);
 		DefaultTimestepSimEngine engine = new DefaultTimestepSimEngine(planSim, eventsManager);
-		planSim.setSimEngine(engine);
+		planSim.setMobsimEngine(engine);
 
 		// setup network
 		FastQueueNetworkFeature netFeature;
@@ -95,15 +95,15 @@ public class OptimizedCarSimFactory implements MobsimFactory {
 		}
 
 		// register all features at the end in the right order
-		planSim.addSimFeature(new StatusFeature());
-		planSim.addSimFeature(teleporter); // how should a user know teleporter is a simfeature?
-		planSim.addSimFeature(ah); // how should a user know ah is a simfeature, bug lh not?
-		planSim.addSimFeature(netFeature); // order of features is important!
+		planSim.addMobsimFeature(new StatusFeature());
+		planSim.addMobsimFeature(teleporter); // how should a user know teleporter is a simfeature?
+		planSim.addMobsimFeature(ah); // how should a user know ah is a simfeature, bug lh not?
+		planSim.addMobsimFeature(netFeature); // order of features is important!
 
 		if (this.otfvisServer != null) {
 			VisNetwork visNetwork = netFeature.getVisNetwork();
 			OTFVisFeature otfvisFeature = new OTFVisFeature(visNetwork, this.otfvisServer.getSnapshotReceiver());
-			planSim.addSimFeature(otfvisFeature);
+			planSim.addMobsimFeature(otfvisFeature);
 		}
 
 		// register agent sources

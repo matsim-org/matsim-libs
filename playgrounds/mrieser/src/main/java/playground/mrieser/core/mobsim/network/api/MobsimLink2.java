@@ -21,9 +21,9 @@ package playground.mrieser.core.mobsim.network.api;
 
 import org.matsim.api.core.v01.Id;
 
-import playground.mrieser.core.mobsim.api.SimVehicle;
+import playground.mrieser.core.mobsim.api.MobsimVehicle;
 
-public interface MobSimLink {
+public interface MobsimLink2 {
 
 	public static final double POSITION_AT_FROM_NODE = 0.0;
 	public static final double POSITION_AT_TO_NODE = 1.0;
@@ -44,14 +44,14 @@ public interface MobSimLink {
 	 * between 0.0 and 1.0 may be handled differently by different
 	 * implementations. If a vehicle cannot immediately be inserted into the
 	 * traffic flow, the request is cached and performed once space is available.
-	 * The special case {@link MobSimLink#PRIORITY_PARKING} is used to initially
+	 * The special case {@link MobsimLink2#PRIORITY_PARKING} is used to initially
 	 * place the vehicles on the network.
 	 *
 	 * @param vehicle
-	 * @param position value between 0.0 ({@link MobSimLink#POSITION_AT_FROM_NODE}) and 1.0 ({@link MobSimLink#POSITION_AT_TO_NODE})
-	 * @param priority value between 0.0 ({@link MobSimLink#PRIORITY_AS_SOON_AS_SPACE_AVAILABLE}) and 1.0 ({@link MobSimLink#PRIORITY_IMMEDIATELY}), or {@link MobSimLink#PRIORITY_PARKING}.
+	 * @param position value between 0.0 ({@link MobsimLink2#POSITION_AT_FROM_NODE}) and 1.0 ({@link MobsimLink2#POSITION_AT_TO_NODE})
+	 * @param priority value between 0.0 ({@link MobsimLink2#PRIORITY_AS_SOON_AS_SPACE_AVAILABLE}) and 1.0 ({@link MobsimLink2#PRIORITY_IMMEDIATELY}), or {@link MobsimLink2#PRIORITY_PARKING}.
 	 */
-	public void insertVehicle(final SimVehicle vehicle, final double position, final double priority);
+	public void insertVehicle(final MobsimVehicle vehicle, final double position, final double priority);
 
 	/**
 	 * Removes a vehicle from the traffic flow or from parking.
@@ -59,26 +59,26 @@ public interface MobSimLink {
 	 * @param vehicle
 	 * @return
 	 */
-	public void removeVehicle(final SimVehicle vehicle);
+	public void removeVehicle(final MobsimVehicle vehicle);
 
 	/**
 	 * Stops the vehicle on the link wherever it currently is, probably blocking
 	 * other traffic.
 	 *
 	 * @param vehicle
-	 * @see MobSimLink#continueVehicle(SimVehicle)
+	 * @see MobsimLink2#continueVehicle(MobsimVehicle)
 	 */
-	public void stopVehicle(final SimVehicle vehicle);
+	public void stopVehicle(final MobsimVehicle vehicle);
 
 	/**
 	 * Lets a vehicle continue again after it was stopped or parked. If a
 	 * vehicle was not stopped or parked before, the method does nothing.
 	 *
 	 * @param vehicle
-	 * @see MobSimLink#stopVehicle(SimVehicle)
-	 * @see MobSimLink#parkVehicle(SimVehicle)
+	 * @see MobsimLink2#stopVehicle(MobsimVehicle)
+	 * @see MobsimLink2#parkVehicle(MobsimVehicle)
 	 */
-	public void continueVehicle(final SimVehicle vehicle);
+	public void continueVehicle(final MobsimVehicle vehicle);
 
 	/**
 	 * Removes a vehicle from the traffic flow, but keeps the vehicle
@@ -86,15 +86,15 @@ public interface MobSimLink {
 	 * nothing happens.
 	 *
 	 * @param vehicle
-	 * @see MobSimLink#getParkedVehicle(Id)
-	 * @see MobSimLink#continueVehicle(SimVehicle)
+	 * @see MobsimLink2#getParkedVehicle(Id)
+	 * @see MobsimLink2#continueVehicle(MobsimVehicle)
 	 */
-	public void parkVehicle(final SimVehicle vehicle);
+	public void parkVehicle(final MobsimVehicle vehicle);
 
 	/**
 	 * @param vehicleId
 	 * @return <code>null</code> if no vehicle with the given id is parked along this link
 	 */
-	public SimVehicle getParkedVehicle(final Id vehicleId);
+	public MobsimVehicle getParkedVehicle(final Id vehicleId);
 
 }

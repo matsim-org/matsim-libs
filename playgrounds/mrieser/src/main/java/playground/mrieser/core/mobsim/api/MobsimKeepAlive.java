@@ -17,12 +17,13 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mrieser.core.mobsim.network.api;
+package playground.mrieser.core.mobsim.api;
 
-import org.matsim.api.core.v01.Id;
+public interface MobsimKeepAlive {
 
-public interface MobSimNode {
-
-	public Id getId();
-
+	/**
+	 * @return <code>true</code> if the simulation should continue running,
+	 * 		<code>false</code> otherwise.
+	 */
+	public boolean keepAlive();
 }

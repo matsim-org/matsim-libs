@@ -31,10 +31,10 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.mrieser.core.mobsim.api.DriverAgent;
-import playground.mrieser.core.mobsim.api.SimVehicle;
+import playground.mrieser.core.mobsim.api.MobsimVehicle;
 import playground.mrieser.core.mobsim.fakes.FakeSimEngine;
 import playground.mrieser.core.mobsim.fakes.FakeSimVehicle;
-import playground.mrieser.core.mobsim.network.api.MobSimLink;
+import playground.mrieser.core.mobsim.network.api.MobsimLink2;
 
 /**
  * @author mrieser
@@ -45,7 +45,7 @@ public class QueueNodeTest {
 	public void testMoveNode_singleCarAwaiting() {
 		Fixture f = new Fixture();
 
-		SimVehicle veh1 = new FakeSimVehicle(new IdImpl(5));
+		MobsimVehicle veh1 = new FakeSimVehicle(new IdImpl(5));
 		TestDriverAgent driver = new TestDriverAgent();
 		veh1.setDriver(driver);
 
@@ -62,10 +62,10 @@ public class QueueNodeTest {
 	public void testMoveNode_multipleCarsOnOneInlink() {
 		Fixture f = new Fixture();
 
-		SimVehicle veh1 = new FakeSimVehicle(new IdImpl(5));
+		MobsimVehicle veh1 = new FakeSimVehicle(new IdImpl(5));
 		TestDriverAgent driver1 = new TestDriverAgent();
 		veh1.setDriver(driver1);
-		SimVehicle veh2 = new FakeSimVehicle(new IdImpl(10));
+		MobsimVehicle veh2 = new FakeSimVehicle(new IdImpl(10));
 		TestDriverAgent driver2 = new TestDriverAgent();
 		veh2.setDriver(driver2);
 
@@ -88,7 +88,7 @@ public class QueueNodeTest {
 	public void test_Deadlock() {
 		Fixture f = new Fixture();
 
-		SimVehicle veh1 = new FakeSimVehicle(new IdImpl(5));
+		MobsimVehicle veh1 = new FakeSimVehicle(new IdImpl(5));
 		TestDriverAgent driver1 = new TestDriverAgent();
 		veh1.setDriver(driver1);
 
@@ -130,7 +130,7 @@ public class QueueNodeTest {
 
 		f.qnet.setStuckTime(20);
 
-		SimVehicle veh1 = new FakeSimVehicle(new IdImpl(5));
+		MobsimVehicle veh1 = new FakeSimVehicle(new IdImpl(5));
 		TestDriverAgent driver1 = new TestDriverAgent();
 		veh1.setDriver(driver1);
 
@@ -231,7 +231,7 @@ public class QueueNodeTest {
 			return -1.0;
 		}
 		@Override
-		public void handleNextAction(final MobSimLink link) {
+		public void handleNextAction(final MobsimLink2 link) {
 		}
 	}
 

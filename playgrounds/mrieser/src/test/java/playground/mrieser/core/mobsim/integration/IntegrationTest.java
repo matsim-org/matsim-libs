@@ -39,8 +39,8 @@ import playground.mrieser.core.mobsim.impl.LegHandler;
 import playground.mrieser.core.mobsim.impl.PlanSimulationImpl;
 import playground.mrieser.core.mobsim.impl.PopulationAgentSource;
 import playground.mrieser.core.mobsim.impl.TeleportationHandler;
-import playground.mrieser.core.mobsim.network.api.MobSimLink;
-import playground.mrieser.core.mobsim.network.api.MobSimNetwork;
+import playground.mrieser.core.mobsim.network.api.MobsimLink2;
+import playground.mrieser.core.mobsim.network.api.MobsimNetwork2;
 
 /**
  * @author mrieser
@@ -57,27 +57,27 @@ public class IntegrationTest {
 		/* setup start */
 		PlanSimulationImpl planSim = new PlanSimulationImpl(f.scenario);
 		DefaultTimestepSimEngine engine = new DefaultTimestepSimEngine(planSim, events);
-		planSim.setSimEngine(engine);
+		planSim.setMobsimEngine(engine);
 
 		// setup network
 		NetworkFeature netFeature = new RefQueueNetworkFeature(f.scenario.getNetwork(), engine);
-		MobSimNetwork simNetwork = netFeature.getSimNetwork();
+		MobsimNetwork2 simNetwork = netFeature.getSimNetwork();
 
 		// setup features; order is important!
-		planSim.addSimFeature(new StatusFeature());
-		planSim.addSimFeature(netFeature);
+		planSim.addMobsimFeature(new StatusFeature());
+		planSim.addMobsimFeature(netFeature);
 
 		// setup PlanElementHandlers
 		ActivityHandler ah = new ActivityHandler(engine);
 		LegHandler lh = new LegHandler(engine);
 		planSim.setPlanElementHandler(Activity.class, ah);
 		planSim.setPlanElementHandler(Leg.class, lh);
-		planSim.addSimFeature(ah); // how should a user now ah is a simfeature, bug lh not?
+		planSim.addMobsimFeature(ah); // how should a user now ah is a simfeature, bug lh not?
 
 		// setup DepartureHandlers
 		lh.setDepartureHandler(TransportMode.car, new CarDepartureHandler(engine, netFeature, f.scenario));
 		TeleportationHandler teleporter = new TeleportationHandler(engine);
-		planSim.addSimFeature(teleporter); // how should a user now teleporter is a simfeature?
+		planSim.addMobsimFeature(teleporter); // how should a user now teleporter is a simfeature?
 		lh.setDepartureHandler(TransportMode.pt, teleporter);
 		lh.setDepartureHandler(TransportMode.walk, teleporter);
 		lh.setDepartureHandler(TransportMode.bike, teleporter);
@@ -86,9 +86,9 @@ public class IntegrationTest {
 		// register agent sources
 		planSim.addAgentSource(new PopulationAgentSource(f.scenario.getPopulation(), 1.0));
 
-		planSim.runSim();
+		planSim.runMobsim();
 
-		MobSimLink simLink = simNetwork.getLinks().get(((Leg) person1.getSelectedPlan().getPlanElements().get(1)).getRoute().getEndLinkId());
+		MobsimLink2 simLink = simNetwork.getLinks().get(((Leg) person1.getSelectedPlan().getPlanElements().get(1)).getRoute().getEndLinkId());
 		Assert.assertNotNull("car should be parked, but cannot be found on link.", simLink.getParkedVehicle(person1.getId()));
 	}
 
@@ -102,22 +102,22 @@ public class IntegrationTest {
 		/* setup start */
 		PlanSimulationImpl planSim = new PlanSimulationImpl(f.scenario);
 		DefaultTimestepSimEngine engine = new DefaultTimestepSimEngine(planSim, events);
-		planSim.setSimEngine(engine);
+		planSim.setMobsimEngine(engine);
 
 		// setup network
 		NetworkFeature netFeature = new RefQueueNetworkFeature(f.scenario.getNetwork(), engine);
-		MobSimNetwork simNetwork = netFeature.getSimNetwork();
+		MobsimNetwork2 simNetwork = netFeature.getSimNetwork();
 
 		// setup features; order is important!
-		planSim.addSimFeature(new StatusFeature());
-		planSim.addSimFeature(netFeature);
+		planSim.addMobsimFeature(new StatusFeature());
+		planSim.addMobsimFeature(netFeature);
 
 		// setup PlanElementHandlers
 		ActivityHandler ah = new ActivityHandler(engine);
 		LegHandler lh = new LegHandler(engine);
 		planSim.setPlanElementHandler(Activity.class, ah);
 		planSim.setPlanElementHandler(Leg.class, lh);
-		planSim.addSimFeature(ah); // how should a user know ah is a simfeature, bug lh not?
+		planSim.addMobsimFeature(ah); // how should a user know ah is a simfeature, bug lh not?
 
 		// setup DepartureHandlers
 		lh.setDepartureHandler(TransportMode.car, new CarDepartureHandler(engine, netFeature, f.scenario));
@@ -126,9 +126,9 @@ public class IntegrationTest {
 		// register agent sources
 		planSim.addAgentSource(new PopulationAgentSource(f.scenario.getPopulation(), 1.0));
 
-		planSim.runSim();
+		planSim.runMobsim();
 
-		MobSimLink simLink = simNetwork.getLinks().get(((Leg) person2.getSelectedPlan().getPlanElements().get(3)).getRoute().getEndLinkId());
+		MobsimLink2 simLink = simNetwork.getLinks().get(((Leg) person2.getSelectedPlan().getPlanElements().get(3)).getRoute().getEndLinkId());
 		Assert.assertNotNull("car should be parked, but cannot be found on link.", simLink.getParkedVehicle(person2.getId()));
 	}
 
@@ -143,22 +143,22 @@ public class IntegrationTest {
 		/* setup start */
 		PlanSimulationImpl planSim = new PlanSimulationImpl(f.scenario);
 		DefaultTimestepSimEngine engine = new DefaultTimestepSimEngine(planSim, events);
-		planSim.setSimEngine(engine);
+		planSim.setMobsimEngine(engine);
 
 		// setup network
 		NetworkFeature netFeature = new RefQueueNetworkFeature(f.scenario.getNetwork(), engine);
-		MobSimNetwork simNetwork = netFeature.getSimNetwork();
+		MobsimNetwork2 simNetwork = netFeature.getSimNetwork();
 
 		// setup features; order is important!
-		planSim.addSimFeature(new StatusFeature());
-		planSim.addSimFeature(netFeature);
+		planSim.addMobsimFeature(new StatusFeature());
+		planSim.addMobsimFeature(netFeature);
 
 		// setup PlanElementHandlers
 		ActivityHandler ah = new ActivityHandler(engine);
 		LegHandler lh = new LegHandler(engine);
 		planSim.setPlanElementHandler(Activity.class, ah);
 		planSim.setPlanElementHandler(Leg.class, lh);
-		planSim.addSimFeature(ah); // how should a user know ah is a simfeature, bug lh not?
+		planSim.addMobsimFeature(ah); // how should a user know ah is a simfeature, bug lh not?
 
 		// setup DepartureHandlers
 		lh.setDepartureHandler(TransportMode.car, new CarDepartureHandler(engine, netFeature, f.scenario));
@@ -167,9 +167,9 @@ public class IntegrationTest {
 		// register agent sources
 		planSim.addAgentSource(new PopulationAgentSource(f.scenario.getPopulation(), 1.0));
 
-		planSim.runSim();
+		planSim.runMobsim();
 
-		MobSimLink simLink = simNetwork.getLinks().get(((Leg) person3.getSelectedPlan().getPlanElements().get(5)).getRoute().getEndLinkId());
+		MobsimLink2 simLink = simNetwork.getLinks().get(((Leg) person3.getSelectedPlan().getPlanElements().get(5)).getRoute().getEndLinkId());
 		Assert.assertNotNull("car should be parked, but cannot be found on link.", simLink.getParkedVehicle(person3.getId()));
 	}
 }

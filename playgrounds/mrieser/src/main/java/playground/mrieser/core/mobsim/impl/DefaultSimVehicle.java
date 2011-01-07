@@ -23,14 +23,14 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.vehicles.Vehicle;
 
 import playground.mrieser.core.mobsim.api.DriverAgent;
-import playground.mrieser.core.mobsim.api.SimVehicle;
+import playground.mrieser.core.mobsim.api.MobsimVehicle;
 
 /**
  * Implementation of SimVehicle which delegates most of the work to a {@link DriverAgent}.
  *
  * @author mrieser
  */
-public class DefaultSimVehicle implements SimVehicle {
+public class DefaultSimVehicle implements MobsimVehicle {
 
 	private final Vehicle vehicle;
 	private DriverAgent driver = null;

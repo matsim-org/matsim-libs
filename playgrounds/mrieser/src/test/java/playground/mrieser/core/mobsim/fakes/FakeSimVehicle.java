@@ -22,12 +22,12 @@ package playground.mrieser.core.mobsim.fakes;
 import org.matsim.api.core.v01.Id;
 
 import playground.mrieser.core.mobsim.api.DriverAgent;
-import playground.mrieser.core.mobsim.api.SimVehicle;
+import playground.mrieser.core.mobsim.api.MobsimVehicle;
 
 /**
  * @author mrieser
  */
-public class FakeSimVehicle implements SimVehicle {
+public class FakeSimVehicle implements MobsimVehicle {
 
 	private DriverAgent driver = null;
 	private final Id id;

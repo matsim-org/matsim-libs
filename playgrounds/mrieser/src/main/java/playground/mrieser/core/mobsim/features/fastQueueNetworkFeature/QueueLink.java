@@ -33,10 +33,10 @@ import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.mobsim.framework.Steppable;
 import org.matsim.core.network.LinkImpl;
 
-import playground.mrieser.core.mobsim.api.SimVehicle;
-import playground.mrieser.core.mobsim.network.api.MobSimLink;
+import playground.mrieser.core.mobsim.api.MobsimVehicle;
+import playground.mrieser.core.mobsim.network.api.MobsimLink2;
 
-/*package*/ class QueueLink implements MobSimLink, Steppable {
+/*package*/ class QueueLink implements MobsimLink2, Steppable {
 
 	private final static Logger log = Logger.getLogger(QueueLink.class);
 
@@ -51,8 +51,8 @@ import playground.mrieser.core.mobsim.network.api.MobSimLink;
 	 * The list of vehicles that have not yet reached the end of the link
 	 * according to the free travel speed of the link
 	 */
-	/*package*/ final LinkedList<SimVehicle> vehQueue = new LinkedList<SimVehicle>();
-	/*package*/ final HashMap<SimVehicle, Double> earliestLeaveTimes = new HashMap<SimVehicle, Double>();
+	/*package*/ final LinkedList<MobsimVehicle> vehQueue = new LinkedList<MobsimVehicle>();
+	/*package*/ final HashMap<MobsimVehicle, Double> earliestLeaveTimes = new HashMap<MobsimVehicle, Double>();
 
 	private double storageCapacity = 0.0;
 
@@ -62,11 +62,11 @@ import playground.mrieser.core.mobsim.network.api.MobSimLink;
 
 	/* WAITING QUEUE = DRIVEWAYS */
 
-	private final Queue<SimVehicle> waitingList = new LinkedList<SimVehicle>();
+	private final Queue<MobsimVehicle> waitingList = new LinkedList<MobsimVehicle>();
 
 	/* PARKING */
 
-	private final Map<Id, SimVehicle> parkedVehicles = new LinkedHashMap<Id, SimVehicle>(10);
+	private final Map<Id, MobsimVehicle> parkedVehicles = new LinkedHashMap<Id, MobsimVehicle>(10);
 
 	/* TRAFFIC FLOW CHARACTERISTICS */
 
@@ -126,18 +126,18 @@ import playground.mrieser.core.mobsim.network.api.MobSimLink;
 
 	}
 
-	/*package*/ void addVehicleFromIntersection(final SimVehicle vehicle) {
-		insertVehicle(vehicle, MobSimLink.POSITION_AT_FROM_NODE, MobSimLink.PRIORITY_IMMEDIATELY);
+	/*package*/ void addVehicleFromIntersection(final MobsimVehicle vehicle) {
+		insertVehicle(vehicle, MobsimLink2.POSITION_AT_FROM_NODE, MobsimLink2.PRIORITY_IMMEDIATELY);
 	}
 
 	@Override
-	public void insertVehicle(final SimVehicle vehicle, final double position, final double priority) {
+	public void insertVehicle(final MobsimVehicle vehicle, final double position, final double priority) {
 		double now = this.network.simEngine.getCurrentTime();
-		if (priority == MobSimLink.PRIORITY_PARKING) {
+		if (priority == MobsimLink2.PRIORITY_PARKING) {
 			this.parkedVehicles.put(vehicle.getId(), vehicle);
 			return;
 		}
-		if (position == MobSimLink.POSITION_AT_FROM_NODE) {
+		if (position == MobsimLink2.POSITION_AT_FROM_NODE) {
 			activate();
 			// vehicle enters from intersection
 			this.vehQueue.add(vehicle);
@@ -148,7 +148,7 @@ import playground.mrieser.core.mobsim.network.api.MobSimLink;
 					new LinkEnterEventImpl(now, vehicle.getId(), this.link.getId()));
 		} else {
 			activate();
-			if (priority == MobSimLink.PRIORITY_IMMEDIATELY) {
+			if (priority == MobsimLink2.PRIORITY_IMMEDIATELY) {
 				this.usedStorageCapacity += vehicle.getSizeInEquivalents();
 				// vehicle enters from a driveway
 				this.vehQueue.addFirst(vehicle);
@@ -160,7 +160,7 @@ import playground.mrieser.core.mobsim.network.api.MobSimLink;
 	}
 
 	@Override
-	public void removeVehicle(final SimVehicle vehicle) {
+	public void removeVehicle(final MobsimVehicle vehicle) {
 		if (this.parkedVehicles.remove(vehicle.getId()) != null) {
 			return;
 		}
@@ -174,7 +174,7 @@ import playground.mrieser.core.mobsim.network.api.MobSimLink;
 	}
 
 	@Override
-	public void continueVehicle(final SimVehicle vehicle) {
+	public void continueVehicle(final MobsimVehicle vehicle) {
 		if (this.parkedVehicles.remove(vehicle.getId()) != null) {
 			this.waitingList.add(vehicle);
 			this.activate();
@@ -184,18 +184,18 @@ import playground.mrieser.core.mobsim.network.api.MobSimLink;
 	}
 
 	@Override
-	public void stopVehicle(final SimVehicle vehicle) {
+	public void stopVehicle(final MobsimVehicle vehicle) {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public SimVehicle getParkedVehicle(final Id vehicleId) {
+	public MobsimVehicle getParkedVehicle(final Id vehicleId) {
 		return this.parkedVehicles.get(vehicleId);
 	}
 
 	@Override
-	public void parkVehicle(final SimVehicle vehicle) {
+	public void parkVehicle(final MobsimVehicle vehicle) {
 		if (this.vehQueue.remove(vehicle)) {
 			this.usedStorageCapacity -= vehicle.getSizeInEquivalents();
 			this.parkedVehicles.put(vehicle.getId(), vehicle);
@@ -228,7 +228,7 @@ import playground.mrieser.core.mobsim.network.api.MobSimLink;
 	}
 
 	private void moveLinkToBuffer(final double time) {
-		SimVehicle veh;
+		MobsimVehicle veh;
 		while ((veh = this.vehQueue.peek()) != null) {
 			if (this.earliestLeaveTimes.get(veh).doubleValue() > time) {
 				return;
@@ -247,7 +247,7 @@ import playground.mrieser.core.mobsim.network.api.MobSimLink;
 
 	private void moveWaitToBuffer(final double time) {
 		while (this.buffer.hasSpace()) {
-			SimVehicle vehicle = this.waitingList.poll();
+			MobsimVehicle vehicle = this.waitingList.poll();
 			if (vehicle == null) {
 				return;
 			}

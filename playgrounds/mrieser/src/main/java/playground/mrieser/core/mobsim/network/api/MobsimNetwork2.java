@@ -24,14 +24,14 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.framework.Steppable;
 
-public interface MobSimNetwork extends Steppable {
+public interface MobsimNetwork2 extends Steppable {
 
 	public void beforeMobSim();
 
 	public void afterMobSim();
 
-	Map<Id, ? extends MobSimLink> getLinks();
+	Map<Id, ? extends MobsimLink2> getLinks();
 
-	Map<Id, ? extends MobSimNode> getNodes();
+	Map<Id, ? extends MobsimNode2> getNodes();
 
 }

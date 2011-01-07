@@ -17,18 +17,17 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mrieser.core.mobsim.api;
+package playground.mrieser.core.mobsim.features;
 
-import org.matsim.api.core.v01.Id;
+import org.matsim.core.mobsim.framework.Steppable;
 
-public interface SimVehicle {
+/**
+ * @author mrieser
+ */
+public interface MobsimFeature2 extends Steppable {
 
-	public Id getId();
+	public void beforeMobSim();
 
-	public void setDriver(final DriverAgent driver);
-
-	public DriverAgent getDriver();
-
-	public double getSizeInEquivalents(); // TODO [MR] IMO, this should come from Vehicle
+	public void afterMobSim();
 
 }

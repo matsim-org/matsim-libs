@@ -29,9 +29,9 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import playground.mrieser.core.mobsim.api.PlanAgent;
 import playground.mrieser.core.mobsim.api.PlanElementHandler;
 import playground.mrieser.core.mobsim.api.PlanSimulation;
-import playground.mrieser.core.mobsim.api.SimKeepAlive;
+import playground.mrieser.core.mobsim.api.MobsimKeepAlive;
 import playground.mrieser.core.mobsim.api.TimestepSimEngine;
-import playground.mrieser.core.mobsim.features.MobSimFeature;
+import playground.mrieser.core.mobsim.features.MobsimFeature2;
 
 public class DefaultTimestepSimEngine implements TimestepSimEngine {
 
@@ -41,7 +41,7 @@ public class DefaultTimestepSimEngine implements TimestepSimEngine {
 	private final EventsManager events;
 	private double time;
 	private final double timeStepSize;
-	private final List<SimKeepAlive> aliveKeepers = new LinkedList<SimKeepAlive>();
+	private final List<MobsimKeepAlive> aliveKeepers = new LinkedList<MobsimKeepAlive>();
 
 	public DefaultTimestepSimEngine(final PlanSimulation sim, final EventsManager events) {
 		this(sim, events, 1.0);
@@ -97,28 +97,28 @@ public class DefaultTimestepSimEngine implements TimestepSimEngine {
 
 //		this.time = 8.0 * 3600.0;  // TODO [MR] remove sim-start-time hack
 
-		List<MobSimFeature> tmpList = this.sim.getSimFeatures();
-		MobSimFeature[] simFeatures = tmpList.toArray(new MobSimFeature[tmpList.size()]);
+		List<MobsimFeature2> tmpList = this.sim.getMobsimFeatures();
+		MobsimFeature2[] simFeatures = tmpList.toArray(new MobsimFeature2[tmpList.size()]);
 
 		log.info("registered features:");
-		for (MobSimFeature feature : simFeatures) {
+		for (MobsimFeature2 feature : simFeatures) {
 			log.info("  " + feature.getClass());
 		}
 
-		for (MobSimFeature feature : simFeatures) {
+		for (MobsimFeature2 feature : simFeatures) {
 			feature.beforeMobSim();
 		}
 
 		boolean running = true;
 		while (running) {
-			for (MobSimFeature feature : simFeatures) {
+			for (MobsimFeature2 feature : simFeatures) {
 				feature.doSimStep(this.time);
 			}
 			running = keepAlive();
 			if (this.time >= 55.0 * 3600) {  // TODO [MR] remove sim-end-time hack
 				running = false;
 				log.warn("Stopping simulation at 55:00:00");
-				for (SimKeepAlive ska : this.aliveKeepers) {
+				for (MobsimKeepAlive ska : this.aliveKeepers) {
 					if (ska.keepAlive()) {
 						log.warn("still alive: " + ska.getClass().getCanonicalName());
 					}
@@ -129,18 +129,18 @@ public class DefaultTimestepSimEngine implements TimestepSimEngine {
 			}
 		}
 
-		for (MobSimFeature feature : simFeatures) {
+		for (MobsimFeature2 feature : simFeatures) {
 			feature.afterMobSim();
 		}
 	}
 
 	@Override
-	public void addKeepAlive(final SimKeepAlive keepAlive) {
+	public void addKeepAlive(final MobsimKeepAlive keepAlive) {
 		this.aliveKeepers.add(keepAlive);
 	}
 
 	private boolean keepAlive() {
-		for (SimKeepAlive ska : this.aliveKeepers) {
+		for (MobsimKeepAlive ska : this.aliveKeepers) {
 			if (ska.keepAlive()) {
 				return true;
 			}

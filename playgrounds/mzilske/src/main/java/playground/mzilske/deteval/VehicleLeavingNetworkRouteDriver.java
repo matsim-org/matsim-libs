@@ -29,19 +29,19 @@ import org.matsim.core.population.routes.NetworkRoute;
 import playground.mrieser.core.mobsim.api.DriverAgent;
 import playground.mrieser.core.mobsim.api.NewSimEngine;
 import playground.mrieser.core.mobsim.api.PlanAgent;
-import playground.mrieser.core.mobsim.api.SimVehicle;
-import playground.mrieser.core.mobsim.network.api.MobSimLink;
+import playground.mrieser.core.mobsim.api.MobsimVehicle;
+import playground.mrieser.core.mobsim.network.api.MobsimLink2;
 
 public class VehicleLeavingNetworkRouteDriver implements DriverAgent {
 
 	private final PlanAgent agent;
-	private final SimVehicle vehicle;
+	private final MobsimVehicle vehicle;
 	private final NewSimEngine simEngine;
 	private final Id[] linkIds;
 	private int nextLinkIndex = 0;
 	private Id nextLinkId = null;
 
-	public VehicleLeavingNetworkRouteDriver(final PlanAgent agent, final NewSimEngine simEngine, final NetworkRoute route, final SimVehicle vehicle) {
+	public VehicleLeavingNetworkRouteDriver(final PlanAgent agent, final NewSimEngine simEngine, final NetworkRoute route, final MobsimVehicle vehicle) {
 		this.agent = agent;
 		this.simEngine = simEngine;
 		this.vehicle = vehicle;
@@ -86,13 +86,13 @@ public class VehicleLeavingNetworkRouteDriver implements DriverAgent {
 	@Override
 	public double getNextActionOnCurrentLink() {
 		if (this.nextLinkId == null) {
-			return MobSimLink.POSITION_AT_TO_NODE;
+			return MobsimLink2.POSITION_AT_TO_NODE;
 		}
 		return -1.0;
 	}
 
 	@Override
-	public void handleNextAction(final MobSimLink link) {
+	public void handleNextAction(final MobsimLink2 link) {
 		link.parkVehicle(this.vehicle);
 		EventsManager eventsManager = this.simEngine.getEventsManager();
 		eventsManager.processEvent(((EventsFactoryImpl) eventsManager.getFactory()).createPersonLeavesVehicleEvent(this.simEngine.getCurrentTime(), agent.getPlan().getPerson().getId(), vehicle.getId(), null));

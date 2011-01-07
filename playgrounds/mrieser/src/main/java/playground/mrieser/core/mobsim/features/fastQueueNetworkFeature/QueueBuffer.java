@@ -25,7 +25,7 @@ import java.util.Queue;
 import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.utils.misc.Time;
 
-import playground.mrieser.core.mobsim.api.SimVehicle;
+import playground.mrieser.core.mobsim.api.MobsimVehicle;
 
 /**
  * The "buffer" contains those vehicles that are allowed to leave a link. A
@@ -52,7 +52,7 @@ import playground.mrieser.core.mobsim.api.SimVehicle;
  * bufferCapAccumulate >= 1.0.
  * </ul>
  * Whenever a vehicle is added to the buffer, is uses up some of the capacity. Thus,
- * the capacity consumed by the vehicle (see {@link SimVehicle#getSizeInEquivalents()})
+ * the capacity consumed by the vehicle (see {@link MobsimVehicle#getSizeInEquivalents()})
  * is subtracted from either bufferCap or bufferCapAccumulate. If it is a large vehicle
  * (consuming more capacity than 1 standard vehicle), it may happen that bufferCap gets
  * negative. In this case, bufferCap is set to zero, but the missing difference is
@@ -82,7 +82,7 @@ import playground.mrieser.core.mobsim.api.SimVehicle;
 	/**
 	 * Holds all vehicles that are ready to cross the outgoing intersection
 	 */
-	/*package*/ final Queue<SimVehicle> buffer = new LinkedList<SimVehicle>();
+	/*package*/ final Queue<MobsimVehicle> buffer = new LinkedList<MobsimVehicle>();
 
 	private int storageCapacity = 0;
 
@@ -107,19 +107,19 @@ import playground.mrieser.core.mobsim.api.SimVehicle;
 		return this.lastMovedTime;
 	}
 
-	/*package*/ SimVehicle getFirstVehicleInBuffer() {
+	/*package*/ MobsimVehicle getFirstVehicleInBuffer() {
 		return this.buffer.peek();
 	}
 
-	/*package*/ SimVehicle removeFirstVehicleInBuffer() {
+	/*package*/ MobsimVehicle removeFirstVehicleInBuffer() {
 		double now = this.link.network.simEngine.getCurrentTime();
-		SimVehicle veh = this.buffer.poll();
+		MobsimVehicle veh = this.buffer.poll();
 		this.lastMovedTime = now;
 		this.link.network.simEngine.getEventsManager().processEvent(new LinkLeaveEventImpl(now, veh.getId(), this.link.getId()));
 		return veh;
 	}
 
-	/*package*/ boolean removeVehicle(final SimVehicle vehicle) {
+	/*package*/ boolean removeVehicle(final MobsimVehicle vehicle) {
 		return this.buffer.remove(vehicle);
 	}
 
@@ -128,7 +128,7 @@ import playground.mrieser.core.mobsim.api.SimVehicle;
 				&& ((this.bufferCap + this.buffercap_accumulate) >= 1.0));
 	}
 
-	/*package*/ void addVehicle(final SimVehicle veh, final double now) {
+	/*package*/ void addVehicle(final MobsimVehicle veh, final double now) {
 		if (this.bufferCap + this.buffercap_accumulate >= 1.0) {
 			this.bufferCap -= veh.getSizeInEquivalents();
 			if (this.bufferCap < 0.0) {

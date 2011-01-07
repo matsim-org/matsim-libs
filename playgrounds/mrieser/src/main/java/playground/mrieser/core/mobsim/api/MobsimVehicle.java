@@ -17,9 +17,18 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mrieser.core.mobsim.impl;
+package playground.mrieser.core.mobsim.api;
 
-public class SimVehicleFleet {
+import org.matsim.api.core.v01.Id;
 
+public interface MobsimVehicle {
+
+	public Id getId();
+
+	public void setDriver(final DriverAgent driver);
+
+	public DriverAgent getDriver();
+
+	public double getSizeInEquivalents(); // TODO [MR] IMO, this should come from Vehicle
 
 }

@@ -43,10 +43,10 @@ public class TeleportOnlySimFactory implements MobsimFactory {
 		PlanSimulationImpl planSim = new PlanSimulationImpl(sc);
 
 		DefaultTimestepSimEngine engine = new DefaultTimestepSimEngine(planSim, eventsManager);
-		planSim.setSimEngine(engine);
+		planSim.setMobsimEngine(engine);
 
 		// setup features; order is important!
-		planSim.addSimFeature(new StatusFeature());
+		planSim.addMobsimFeature(new StatusFeature());
 
 		// setup PlanElementHandlers
 		ActivityHandler ah = new ActivityHandler(engine);
@@ -54,12 +54,12 @@ public class TeleportOnlySimFactory implements MobsimFactory {
 		planSim.setPlanElementHandler(Activity.class, ah);
 		planSim.setPlanElementHandler(Leg.class, lh);
 
-		planSim.addSimFeature(ah); // how should a user now ah is a simfeature, bug lh not?
+		planSim.addMobsimFeature(ah); // how should a user now ah is a simfeature, bug lh not?
 
 		// setup DepartureHandlers
 		TeleportationHandler teleporter = new TeleportationHandler(engine);
 		teleporter.setDefaultTeleportationTime(180); // this should usually not be set! TODO [MR] remove line
-		planSim.addSimFeature(teleporter); // how should a user now teleporter is a simfeature?
+		planSim.addMobsimFeature(teleporter); // how should a user now teleporter is a simfeature?
 		lh.setDepartureHandler(TransportMode.car, teleporter);
 		lh.setDepartureHandler(TransportMode.pt, teleporter);
 		lh.setDepartureHandler(TransportMode.walk, teleporter);

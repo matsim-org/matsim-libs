@@ -31,13 +31,13 @@ import org.matsim.core.utils.misc.Time;
 import playground.mrieser.core.mobsim.api.NewSimEngine;
 import playground.mrieser.core.mobsim.api.PlanAgent;
 import playground.mrieser.core.mobsim.api.PlanElementHandler;
-import playground.mrieser.core.mobsim.api.SimKeepAlive;
-import playground.mrieser.core.mobsim.features.MobSimFeature;
+import playground.mrieser.core.mobsim.api.MobsimKeepAlive;
+import playground.mrieser.core.mobsim.features.MobsimFeature2;
 
 /**
  * @author mrieser
  */
-public class ActivityHandler implements PlanElementHandler, MobSimFeature, SimKeepAlive {
+public class ActivityHandler implements PlanElementHandler, MobsimFeature2, MobsimKeepAlive {
 
 	private final static Logger log = Logger.getLogger(ActivityHandler.class);
 
