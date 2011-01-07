@@ -27,15 +27,22 @@ import org.apache.commons.math.stat.descriptive.rank.Percentile;
 import org.apache.commons.math.util.ResizableDoubleArray;
 
 /**
+ * Descriptive statistics object where each sample has a pi-value assigned.
+ * 
  * @author illenberger
- *
+ * 
  */
 public class DescriptivePiStatistics extends DescriptiveStatistics {
 
 	private ResizableDoubleArray piValues = new ResizableDoubleArray();
-	
+
 	private static final long serialVersionUID = 552953838961616624L;
 
+	/**
+	 * Creates a new descriptive statistics object initialized with dummy
+	 * implementations that return {@link Double#NaN} (except
+	 * min/max-implementations).
+	 */
 	public DescriptivePiStatistics() {
 		DummyPiStatistics dummyStats = new DummyPiStatistics();
 		setMeanImpl(dummyStats);
@@ -49,42 +56,67 @@ public class DescriptivePiStatistics extends DescriptiveStatistics {
 		setSumsqImpl(dummyStats);
 		setSumImpl(dummyStats);
 	}
-	
+
+	/**
+	 * Adds a sample with pi=1.0.
+	 */
 	@Override
 	public void addValue(double v) {
 		addValue(v, 1.0);
 	}
 
+	/**
+	 * Adds a sample with a pi-value.
+	 * 
+	 * @param v
+	 *            a sample
+	 * @param pi
+	 *            the sample's pi-value
+	 */
 	public void addValue(double v, double pi) {
 		if (windowSize != INFINITE_WINDOW) {
-            if (getN() == windowSize) {
-            	piValues.addElementRolling(pi);
-            } else if (getN() < windowSize) {
-            	piValues.addElement(pi);
-            }
-        } else {
-        	piValues.addElement(pi);
-        }
-		
+			if (getN() == windowSize) {
+				piValues.addElementRolling(pi);
+			} else if (getN() < windowSize) {
+				piValues.addElement(pi);
+			}
+		} else {
+			piValues.addElement(pi);
+		}
+
 		super.addValue(v);
 	}
-	
+
+	/**
+	 * Returns the pi-values (insertion-ordered).
+	 * 
+	 * @return the pi-values.
+	 */
 	public double[] getPiValues() {
 		return piValues.getElements();
 	}
-	
+
+	/**
+	 * @see {@link DescriptiveStatistics#apply(UnivariateStatistic)}.
+	 */
 	@Override
 	public double apply(UnivariateStatistic stat) {
-		((UnivariatePiStatistic)stat).setPiValues(piValues.getInternalValues());
+		((UnivariatePiStatistic) stat).setPiValues(piValues.getInternalValues());
 		return super.apply(stat);
 	}
 
+	/**
+	 * @see {@link DescriptiveStatistics#clear()}.
+	 */
 	@Override
 	public void clear() {
 		piValues.clear();
 		super.clear();
 	}
 
+	/**
+	 * @see {@link DescriptiveStatistics#removeMostRecentValue()}.
+	 */
 	@Override
 	public void removeMostRecentValue() {
 		piValues.discardMostRecentElements(1);
@@ -113,15 +145,15 @@ public class DescriptivePiStatistics extends DescriptiveStatistics {
 			return Double.NaN;
 		}
 	}
-	
+
 	private static class StatisticsWrapper implements UnivariatePiStatistic {
 
 		private UnivariateStatistic delegate;
-		
+
 		public StatisticsWrapper(UnivariateStatistic delegate) {
 			this.delegate = delegate;
 		}
-		
+
 		@Override
 		public void setPiValues(double[] piValues) {
 			// does nothing
@@ -142,7 +174,7 @@ public class DescriptivePiStatistics extends DescriptiveStatistics {
 			return delegate.evaluate(values, begin, length);
 		}
 	}
-	
+
 	private static class DummyPiPercentile extends Percentile implements UnivariatePiStatistic {
 
 		private static final long serialVersionUID = 3778314678555629077L;
@@ -180,6 +212,6 @@ public class DescriptivePiStatistics extends DescriptiveStatistics {
 		public double evaluate(double[] values) {
 			return Double.NaN;
 		}
-		
+
 	}
 }
