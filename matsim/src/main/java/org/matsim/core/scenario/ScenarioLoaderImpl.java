@@ -41,7 +41,9 @@ import org.matsim.households.HouseholdsReaderV10;
 import org.matsim.lanes.LaneDefinitions;
 import org.matsim.lanes.LaneDefinitionsV11ToV20Conversion;
 import org.matsim.lanes.MatsimLaneDefinitionsReader;
+import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.signalsystems.data.SignalsScenarioLoader;
+import org.matsim.vehicles.VehicleReaderV1;
 import org.xml.sax.SAXException;
 
 /**
@@ -105,7 +107,9 @@ public class ScenarioLoaderImpl implements ScenarioLoader {
 		if (this.config.scenario().isUseHouseholds()) {
 			this.loadHouseholds();
 		}
-
+		if (this.config.scenario().isUseTransit()) {
+			this.loadTransit();
+		}
 		if (this.config.scenario().isUseLanes()) {
 			this.loadLanes();
 		}
@@ -152,6 +156,20 @@ public class ScenarioLoaderImpl implements ScenarioLoader {
 				network.setNetworkChangeEvents(parser.getEvents());
 			}
 		}
+	}
+
+
+	private void loadTransit() {
+		try {
+			new TransitScheduleReader(this.scenario).readFile(this.config.transit().getTransitScheduleFile());
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		} catch (SAXException e) {
+			throw new RuntimeException(e);
+		} catch (ParserConfigurationException e) {
+			throw new RuntimeException(e);
+		}
+		new VehicleReaderV1(this.getScenario().getVehicles()).readFile(this.config.transit().getVehiclesFile());
 	}
 
 
