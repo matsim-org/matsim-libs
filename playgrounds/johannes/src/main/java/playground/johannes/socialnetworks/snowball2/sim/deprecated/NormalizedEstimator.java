@@ -17,13 +17,15 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.snowball2.sim;
+package playground.johannes.socialnetworks.snowball2.sim.deprecated;
 
 import gnu.trove.TIntDoubleHashMap;
 
 import org.matsim.contrib.sna.snowball.SampledGraph;
 import org.matsim.contrib.sna.snowball.SampledVertex;
 import org.matsim.contrib.sna.snowball.analysis.PiEstimator;
+
+import playground.johannes.socialnetworks.snowball2.sim.SampleStats;
 
 /**
  * This estimator normalizes the estimates from a delegate estimator such that

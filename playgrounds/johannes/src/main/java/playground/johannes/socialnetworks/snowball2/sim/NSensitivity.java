@@ -44,6 +44,7 @@ import org.matsim.contrib.sna.snowball.sim.SamplerListener;
 
 import playground.johannes.socialnetworks.snowball2.analysis.WSMStatsFactory;
 import playground.johannes.socialnetworks.snowball2.sim.deprecated.EstimatedDegree2;
+import playground.johannes.socialnetworks.snowball2.sim.deprecated.NormalizedEstimator;
 
 /**
  * @author illenberger

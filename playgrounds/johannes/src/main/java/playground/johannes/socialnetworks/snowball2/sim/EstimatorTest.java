@@ -60,6 +60,8 @@ import org.matsim.contrib.sna.snowball.sim.Sampler;
 import org.matsim.contrib.sna.snowball.sim.SamplerListener;
 import org.matsim.core.config.Config;
 
+import playground.johannes.socialnetworks.snowball2.sim.deprecated.NormalizedEstimator;
+
 
 /**
  * @author illenberger

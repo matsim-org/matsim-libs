@@ -19,11 +19,10 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.snowball2.sim;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.Map.Entry;
 
 import org.matsim.contrib.sna.graph.Edge;
 import org.matsim.contrib.sna.graph.Graph;
@@ -48,7 +47,6 @@ import org.matsim.contrib.sna.snowball.sim.Sampler;
 import org.matsim.contrib.sna.snowball.sim.SamplerListenerComposite;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
-import org.matsim.core.utils.collections.Tuple;
 
 import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
 import playground.johannes.socialnetworks.snowball2.analysis.HTStatsFactory;
@@ -99,26 +97,10 @@ public class Loader {
 		/*
 		 * Init estimators.
 		 */
-//		final int interval = Integer.parseInt(config.getParam(MODULENAME, "interval"));
-		final int N = graph.getVertices().size();
-		final int M = graph.getEdges().size();
-		Map<String, Tuple<PiEstimator, DescriptivePiStatisticsFactory>> estimators = new HashMap<String, Tuple<PiEstimator, DescriptivePiStatisticsFactory>>();
-		Set<PiEstimator> estimatorSet = new HashSet<PiEstimator>();
-		
-		PiEstimator estim1 = new SimplePiEstimator(N);
-		PiEstimator estim1Norm = new NormalizedEstimator(estim1, N);
-		
-		estimatorSet.add(estim1);
-		estimatorSet.add(estim1Norm);
-		
-		WSMStatsFactory wsmFactory = new WSMStatsFactory();
-		HTStatsFactory htFactory = new HTStatsFactory(N);
-		estimators.put("estim1a", new Tuple<PiEstimator, DescriptivePiStatisticsFactory>(estim1, wsmFactory));
-		estimators.put("estim1b", new Tuple<PiEstimator, DescriptivePiStatisticsFactory>(estim1, htFactory));
-		/*
-		 * Load analyzers.
-		 */
-		Map<String, AnalyzerTask> analyzers = loadAnalyzers(estimators);
+		PiEstimator estimator = new SimplePiEstimator(graph.getVertices().size());
+		Map<String, AnalyzerTask> analyzers = loadAnalyzers(graph, estimator);
+		List<PiEstimator> estimators = new ArrayList<PiEstimator>(1);
+		estimators.add(estimator);
 		/*
 		 * Get output directory.
 		 */
@@ -126,8 +108,9 @@ public class Loader {
 		/*
 		 * Init sample analyzers.
 		 */
+//		final int interval = Integer.parseInt(config.getParam(MODULENAME, "interval"));
 //		IntervalSampleAnalyzer intervalAnalyzer = new IntervalSampleAnalyzer(analyzers, estimatorSet, output);
-		IterationSampleAnalyzer iterationAnalyzer = new IterationSampleAnalyzer(analyzers, estimatorSet, output);
+		IterationSampleAnalyzer iterationAnalyzer = new IterationSampleAnalyzer(analyzers, estimators, output);
 //		FinalSampleAnalyzer completeAnalyzer = new FinalSampleAnalyzer(analyzers, estimatorSet, output);
 //		ConnectionSampleAnalyzer connectionAnalyzer = new ConnectionSampleAnalyzer(numSeeds, analyzers, output);
 		/*
@@ -173,68 +156,79 @@ public class Loader {
 		return reader.readGraph(file);
 	}
 	
-	private static Map<String, AnalyzerTask> loadAnalyzers(Map<String, Tuple<PiEstimator, DescriptivePiStatisticsFactory>> estimators) {
+	private static Map<String, AnalyzerTask> loadAnalyzers(Graph graph, PiEstimator estimator) {
 		Map<String, AnalyzerTask> analyzers = new HashMap<String, AnalyzerTask>();
 		/*
-		 * observed
+		 * observed 1
 		 */
 		AnalyzerTaskComposite tasks = new AnalyzerTaskComposite();
 		tasks.addTask(new GraphSizeTask());
 		tasks.addTask(new WaveSizeTask());
 		
 		DegreeTask obsDegree = new DegreeTask();
-		obsDegree.setModule(new ObservedDegree());
+		obsDegree.setModule(ObservedDegree.getInstance());
 		tasks.addTask(obsDegree);
 		
 		TransitivityTask obsTransitivity = new TransitivityTask();
-		obsTransitivity.setModule(new ObservedTransitivity());
+		obsTransitivity.setModule(ObservedTransitivity.getInstance());
 		tasks.addTask(obsTransitivity);
 		
 		tasks.addTask(new ResponseRateTask());
-//		tasks.addTask(new DegreeCorrelationTask());
-//		tasks.addTask(new ComponentsTask());
+		
 		analyzers.put("obs", tasks);
+		/*
+		 * observed 2
+		 */
+		tasks = new AnalyzerTaskComposite();
+		tasks.addTask(new TransitivityTask());
+		analyzers.put("obs2", tasks);
 		/*
 		 * estimated
 		 */
-		for(Entry<String, Tuple<PiEstimator, DescriptivePiStatisticsFactory>> entry : estimators.entrySet()) {
-			tasks = new AnalyzerTaskComposite();
-			
-			PiEstimator biasdDistr = entry.getValue().getFirst();
-			DescriptivePiStatisticsFactory factory = entry.getValue().getSecond();
-//			PopulationEstimator estimator = entry.getValue().vertexEstimator;
-//			PopulationEstimator edgeEstimator = entry.getValue().edgeEstimator;
-			
-			DegreeTask estimDegree = new DegreeTask();
-			estimDegree.setModule(new EstimatedDegree(biasdDistr, factory));
-			tasks.addTask(estimDegree);
-			
-			TransitivityTask estimTransitivity = new TransitivityTask();
-			EstimatedTransitivity trans = new EstimatedTransitivity(biasdDistr, factory, false);
-			trans.enableCaching(true);
-			estimTransitivity.setModule(trans);
-			tasks.addTask(estimTransitivity);
-			
-			tasks.addTask(new EstimatorTask(entry.getValue().getFirst()));
-			
-			analyzers.put(entry.getKey(), tasks);
-		}
+		DescriptivePiStatisticsFactory wsmFactory = new WSMStatsFactory();
+		analyzers.put("wsm", createDefaultEstimAnalyzer(estimator, wsmFactory));
+		
+		DescriptivePiStatisticsFactory htFactory = new HTStatsFactory(graph.getVertices().size());
+		analyzers.put("ht", createDefaultEstimAnalyzer(estimator, htFactory));
+		/*
+		 * estimated transitivity without edge estim
+		 */
+		tasks = new AnalyzerTaskComposite();
+		TransitivityTask estimTransitivity = new TransitivityTask();
+		EstimatedTransitivity trans = new EstimatedTransitivity(estimator, wsmFactory, false);
+		trans.enableCaching(false);
+		estimTransitivity.setModule(trans);
+		tasks.addTask(estimTransitivity);
+		analyzers.put("transNoEdgeWSM", tasks);
+		/*
+		 * estimated transitivity without edge estim
+		 */
+		tasks = new AnalyzerTaskComposite();
+		estimTransitivity = new TransitivityTask();
+		trans = new EstimatedTransitivity(estimator, htFactory, false);
+		trans.enableCaching(false);
+		estimTransitivity.setModule(trans);
+		tasks.addTask(estimTransitivity);
+		analyzers.put("transNoEdgeHT", tasks);
 		
 		return analyzers;
 	}
 	
-//	private static class EstimatorSet {
-//		
-//		private PiEstimator distribution;
-//		
-//		private PopulationEstimator vertexEstimator;
-//		
-//		private PopulationEstimator edgeEstimator;
-//		
-//		public EstimatorSet(PiEstimator distribution, PopulationEstimator vertexEstimator, PopulationEstimator edgeEstimator) {
-//			this.distribution = distribution;
-//			this.vertexEstimator = vertexEstimator;
-//			this.edgeEstimator = edgeEstimator;
-//		}
-//	}
+	private static AnalyzerTask createDefaultEstimAnalyzer(PiEstimator estimator, DescriptivePiStatisticsFactory factory) {
+		AnalyzerTaskComposite tasks = new AnalyzerTaskComposite();
+		
+		DegreeTask estimDegree = new DegreeTask();
+		estimDegree.setModule(new EstimatedDegree(estimator, factory));
+		tasks.addTask(estimDegree);
+		
+		TransitivityTask estimTransitivity = new TransitivityTask();
+		EstimatedTransitivity trans = new EstimatedTransitivity(estimator, factory, true);
+		trans.enableCaching(false);
+		estimTransitivity.setModule(trans);
+		tasks.addTask(estimTransitivity);
+		
+		tasks.addTask(new EstimatorTask(estimator));
+		
+		return tasks;
+	}
 }
