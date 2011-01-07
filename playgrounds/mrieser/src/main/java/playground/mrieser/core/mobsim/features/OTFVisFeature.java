@@ -45,7 +45,7 @@ public class OTFVisFeature implements MobsimFeature {
 
 	@Override
 	public void doSimStep(double time) {
-		if (time > 0) {
+		if (takeSnapshots) {
 			Collection<AgentSnapshotInfo> positions = new ArrayList<AgentSnapshotInfo>(10000);
 			for (VisLink link : visNetwork.getLinks().values()) {
 				link.getVehiclePositions(positions);
@@ -56,6 +56,15 @@ public class OTFVisFeature implements MobsimFeature {
 			}
 			this.snapshotWriter.endSnapshot();
 		}
+	}
+
+	/**
+	 * Enable or disable the taking of snapshots.
+	 *
+	 * @param takeSnapshots
+	 */
+	public void setTakeSnapshots(boolean takeSnapshots) {
+		this.takeSnapshots = takeSnapshots;
 	}
 
 	@Override
