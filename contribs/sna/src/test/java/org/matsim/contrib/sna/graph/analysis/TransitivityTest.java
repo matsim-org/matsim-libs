@@ -25,11 +25,11 @@ import java.util.Set;
 
 import junit.framework.TestCase;
 
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.sna.graph.SparseGraph;
 import org.matsim.contrib.sna.graph.SparseGraphBuilder;
 import org.matsim.contrib.sna.graph.SparseVertex;
 import org.matsim.contrib.sna.graph.Vertex;
-import org.matsim.contrib.sna.math.Distribution;
 
 /**
  * @author jillenberger
@@ -53,10 +53,10 @@ public class TransitivityTest extends TestCase {
 
 		Transitivity degree = Transitivity.getInstance();
 
-		Distribution distr = degree.localClusteringDistribution(graph.getVertices());
-		assertEquals(7/12.0, distr.mean(), 0.01);
-		assertEquals(0.0, distr.min());
-		assertEquals(1.0, distr.max());
+		DescriptiveStatistics distr = degree.localClusteringDistribution(graph.getVertices());
+		assertEquals(7/12.0, distr.getMean(), 0.01);
+		assertEquals(0.0, distr.getMin());
+		assertEquals(1.0, distr.getMax());
 
 		TObjectDoubleHashMap<Vertex> values = (TObjectDoubleHashMap<Vertex>) degree.localClusteringCoefficients((Set<? extends Vertex>)graph.getVertices());
 

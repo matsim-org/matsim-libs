@@ -23,10 +23,10 @@ import gnu.trove.TObjectDoubleHashMap;
 
 import java.util.Set;
 
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.sna.graph.Edge;
 import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.Vertex;
-import org.matsim.contrib.sna.math.Distribution;
 
 /**
  * A class that provides functionality to analyze degree related
@@ -35,7 +35,7 @@ import org.matsim.contrib.sna.math.Distribution;
  * @author illenberger
  * 
  */
-public class Degree implements VertexProperty<Vertex> {
+public class Degree implements VertexProperty {
 
 	private static Degree instance;
 	
@@ -46,18 +46,18 @@ public class Degree implements VertexProperty<Vertex> {
 	}
 	
 	/**
-	 * Returns the degree distribution of vertices in <tt>vertices</tt>. The
+	 * Returns a descriptive statistics object containing the elements of <tt>vertices</tt>. The
 	 * graph is treated as undirected.
 	 * 
 	 * @param vertices
-	 *            a collection of vertices to retrieve the degree distribution
-	 *            from.
-	 * @return the degree distribution.
+	 *            a collection of vertices.
+	 *            
+	 * @return a descriptive statistics object.
 	 */
-	public Distribution distribution(Set<? extends Vertex> vertices) {
-		Distribution distribution = new Distribution();
+	public DescriptiveStatistics distribution(Set<? extends Vertex> vertices) {
+		DescriptiveStatistics distribution = new DescriptiveStatistics();
 		for (Vertex v : vertices)
-			distribution.add(v.getEdges().size());
+			distribution.addValue(v.getEdges().size());
 
 		return distribution;
 	}

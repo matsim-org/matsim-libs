@@ -19,13 +19,19 @@
  * *********************************************************************** */
 package org.matsim.contrib.sna.graph.analysis;
 
+import gnu.trove.TDoubleDoubleHashMap;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Map;
 
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.sna.graph.Graph;
+import org.matsim.contrib.sna.math.Discretizer;
 import org.matsim.contrib.sna.math.Distribution;
+import org.matsim.contrib.sna.math.Histogram;
+import org.matsim.contrib.sna.util.TXTWriter;
 
 /**
  * An AnalyzerTask performs specific analysis on a graph and returns the results
@@ -109,6 +115,13 @@ public abstract class AnalyzerTask {
 			Distribution.writeHistogram(distr.normalizedDistribution(distr.absoluteDistributionFixed(100)), String
 					.format("%1$s/%2$s.share.fixed.txt", output, name));
 		}
+	}
+	
+	protected void writeHistograms(DescriptiveStatistics stats, Discretizer discretizer, String name) throws IOException {
+		TDoubleDoubleHashMap hist = Histogram.createHistogram(stats, discretizer); 
+		TXTWriter.writeMap(hist, name, "n", String.format("%1$s/%2$s.txt", output, name));
+		Histogram.normalize(hist);
+		TXTWriter.writeMap(hist, name, "share", String.format("%1$s/%2$s.share.txt", output, name));
 	}
 	
 	protected boolean outputDirectoryNotNull() {

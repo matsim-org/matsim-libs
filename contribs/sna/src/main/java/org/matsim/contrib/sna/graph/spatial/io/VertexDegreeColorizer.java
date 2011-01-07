@@ -21,10 +21,10 @@ package org.matsim.contrib.sna.graph.spatial.io;
 
 import java.awt.Color;
 
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.graph.analysis.Degree;
-import org.matsim.contrib.sna.math.Distribution;
 
 /**
  * A VertexDegreeColorizer colorizes vertices according to their degree. The
@@ -51,9 +51,9 @@ public class VertexDegreeColorizer implements Colorizable {
 	 */
 	public VertexDegreeColorizer(Graph graph) {
 		Degree degree = Degree.getInstance();
-		Distribution distr = degree.distribution(graph.getVertices());
-		k_min = (int) distr.min();
-		k_max = (int) distr.max();
+		DescriptiveStatistics distr = degree.distribution(graph.getVertices());
+		k_min = (int) distr.getMin();
+		k_max = (int) distr.getMax();
 	}
 
 	/**

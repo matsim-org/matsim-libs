@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Estimator.java
+ * DescriptivePiStatisticsFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,35 +17,23 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.sna.snowball.sim;
+package org.matsim.contrib.sna.math;
 
-import org.matsim.contrib.sna.snowball.SampledGraph;
-import org.matsim.contrib.sna.snowball.SampledVertex;
 
 /**
- * A ProbabilityEstimator estimates the inclusion probability of a vertex in a
- * snowball sample.
+ * A factory for creating pre-configured instance of
+ * {@link DescriptivePiStatistics}.
  * 
  * @author illenberger
  * 
  */
-public interface ProbabilityEstimator {
+public interface DescriptivePiStatisticsFactory {
 
 	/**
-	 * Notifies the estimator that the sample has changed.
+	 * Creates and returns a new instance of {@link DescriptivePiStatistics}.
 	 * 
-	 * @param graph
-	 *            the sampled snwoball graph
+	 * @return a new instance of {@link DescriptivePiStatistics}.
 	 */
-	public void update(SampledGraph graph);
-
-	/**
-	 * Returns the inclusion probability of a vertex in the snowball sample.
-	 * 
-	 * @param vertex
-	 *            a sampled vertex
-	 * @return the inclusion probability of a vertex in the snowball sample.
-	 */
-	public double getProbability(SampledVertex vertex);
+	public DescriptivePiStatistics newInstance();
 
 }

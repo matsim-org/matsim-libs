@@ -55,7 +55,7 @@ public class AdjacencyMatrixTest extends TestCase {
 		Degree degree = Degree.getInstance();
 		assertEquals(g2.getVertices().size(), g1.getVertices().size());
 		assertEquals(g2.getEdges().size(), g1.getEdges().size());
-		assertEquals(degree.distribution(g2.getVertices()).mean(), degree.distribution(g1.getVertices()).mean());
+		assertEquals(degree.distribution(g2.getVertices()).getMean(), degree.distribution(g1.getVertices()).getMean());
 		
 		for(int i = 0; i < 100; i+=2) {
 			m.addEdge(i, i+1);
@@ -67,7 +67,7 @@ public class AdjacencyMatrixTest extends TestCase {
 		
 		Graph g3 = m.getGraph(new SparseGraphBuilder());
 		assertEquals(g3.getEdges().size(), g1.getEdges().size());
-		assertEquals(degree.distribution(g2.getVertices()).mean(), degree.distribution(g1.getVertices()).mean());
+		assertEquals(degree.distribution(g2.getVertices()).getMean(), degree.distribution(g1.getVertices()).getMean());
 		
 		for(int i = 0; i < 100; i+=2) {
 			m.addEdge(i, i+1);

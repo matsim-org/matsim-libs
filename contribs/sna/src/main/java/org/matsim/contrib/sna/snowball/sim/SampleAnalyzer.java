@@ -30,6 +30,7 @@ import org.apache.log4j.Logger;
 import org.matsim.contrib.sna.graph.analysis.AnalyzerTask;
 import org.matsim.contrib.sna.graph.analysis.GraphAnalyzer;
 import org.matsim.contrib.sna.snowball.SampledGraphProjection;
+import org.matsim.contrib.sna.snowball.analysis.PiEstimator;
 
 /**
  * Abstract base class for sample analyzers. Organizes the analyzers output into
@@ -42,7 +43,7 @@ public abstract class SampleAnalyzer implements SamplerListener {
 
 	private Map<String, AnalyzerTask> tasks;
 
-	private Collection<ProbabilityEstimator> estimators;
+	private Collection<PiEstimator> estimators;
 
 	private String rootDirectory;
 
@@ -58,7 +59,7 @@ public abstract class SampleAnalyzer implements SamplerListener {
 	 * @param rootDirectory
 	 *            The root directory for the analysis output.
 	 */
-	public SampleAnalyzer(Map<String, AnalyzerTask> tasks, Collection<ProbabilityEstimator> estimators,
+	public SampleAnalyzer(Map<String, AnalyzerTask> tasks, Collection<PiEstimator> estimators,
 			String rootDirectory) {
 		this.tasks = tasks;
 		this.rootDirectory = rootDirectory;
@@ -92,7 +93,7 @@ public abstract class SampleAnalyzer implements SamplerListener {
 			/*
 			 * Update all estimators.
 			 */
-			for (ProbabilityEstimator estimator : estimators) {
+			for (PiEstimator estimator : estimators) {
 				estimator.update(graph);
 			}
 			/*

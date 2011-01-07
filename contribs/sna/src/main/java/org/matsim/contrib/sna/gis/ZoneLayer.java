@@ -81,6 +81,10 @@ public class ZoneLayer {
 	public void overwriteCRS(CoordinateReferenceSystem crs) {
 		this.crs = crs;
 		this.srid = CRSUtils.getSRID(crs);
+		for(Zone zone : zones) {
+//			zone.getFeature().getDefaultGeometry().setSRID(srid);
+			zone.getGeometry().setSRID(srid);
+		}
 	}
 
 	@SuppressWarnings("unchecked")

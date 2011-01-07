@@ -23,9 +23,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Map;
 
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.sna.graph.Graph;
-import org.matsim.contrib.sna.math.Distribution;
+import org.matsim.contrib.sna.math.LinearDiscretizer;
 
 /**
  * An AnalyzerTask that calculated transitivity related measurements.
@@ -67,10 +68,10 @@ public class TransitivityTask extends ModuleAnalyzerTask<Transitivity> {
 	 */
 	@Override
 	public void analyze(Graph graph, Map<String, Double> stats) {
-		Distribution distr = module.localClusteringDistribution(graph.getVertices());
-		double c_mean = distr.mean();
-		double c_max = distr.max();
-		double c_min = distr.min();
+		DescriptiveStatistics distr = module.localClusteringDistribution(graph.getVertices());
+		double c_mean = distr.getMean();
+		double c_max = distr.getMax();
+		double c_min = distr.getMin();
 		stats.put(MEAN_LOCAL_CLUSTERING, c_mean);
 		stats.put(MAX_LOCAL_CLUSTERING, c_max);
 		stats.put(MIN_LOCAL_CLUSTERING, c_min);
@@ -84,7 +85,7 @@ public class TransitivityTask extends ModuleAnalyzerTask<Transitivity> {
 
 		if (getOutputDirectory() != null) {
 			try {
-				writeHistograms(distr, 0.05, false, "c");
+				writeHistograms(distr, new LinearDiscretizer(0.05), "c_local");
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			} catch (IOException e) {

@@ -25,6 +25,7 @@ import java.util.Set;
 
 import junit.framework.TestCase;
 
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.sna.TestCaseUtils;
 import org.matsim.contrib.sna.graph.Edge;
 import org.matsim.contrib.sna.graph.Graph;
@@ -32,9 +33,11 @@ import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.graph.analysis.Degree;
 import org.matsim.contrib.sna.graph.analysis.FixedSizeRandomPartition;
 import org.matsim.contrib.sna.graph.io.SparseGraphMLReader;
-import org.matsim.contrib.sna.math.Distribution;
+import org.matsim.contrib.sna.math.Histogram;
+import org.matsim.contrib.sna.math.LinearDiscretizer;
 import org.matsim.contrib.sna.snowball.SampledVertex;
 import org.matsim.contrib.sna.snowball.analysis.SnowballPartitions;
+import org.matsim.contrib.sna.util.TXTWriter;
 import org.matsim.core.utils.misc.CRCChecksum;
 
 /**
@@ -62,12 +65,12 @@ public class SamplerTest extends TestCase {
 		for (int it = 0; it <= sampler.getIteration(); it++) {
 			Set<? extends SampledVertex> vertices = SnowballPartitions.createSampledPartition(sampler.getSampledGraph()
 					.getVertices(), it);
-			Distribution distr = degree.distribution(vertices);
+			DescriptiveStatistics distr = degree.distribution(vertices);
 
 			String reference = String.format("%1$s/k.%2$s.txt", TestCaseUtils.getPackageInputDirecoty(getClass()), it);
 			String tmp = String.format("%1$s/k.%2$s.txt", TestCaseUtils.getOutputDirectory(), it);
 
-			Distribution.writeHistogram(distr.absoluteDistribution(), tmp);
+			TXTWriter.writeMap(Histogram.createHistogram(distr, new LinearDiscretizer(1.0)), "bin", "count", tmp);
 
 			assertEquals(CRCChecksum.getCRCFromFile(reference), CRCChecksum.getCRCFromFile(tmp));
 		}

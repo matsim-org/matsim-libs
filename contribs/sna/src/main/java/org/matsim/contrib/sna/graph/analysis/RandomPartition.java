@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package org.matsim.contrib.sna.graph.analysis;
 
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Random;
 import java.util.Set;
 
@@ -70,7 +70,7 @@ public class RandomPartition<V extends Vertex> implements VertexFilter<V> {
 	 */
 	@Override
 	public Set<V> apply(Set<V> vertices) {
-		Set<V> partition = new HashSet<V>();
+		Set<V> partition = new LinkedHashSet<V>();
 		for (V vertex : vertices) {
 			if (random.nextDouble() < proba) {
 				partition.add(vertex);

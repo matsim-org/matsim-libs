@@ -25,6 +25,7 @@ import java.util.Map;
 
 import org.matsim.contrib.sna.graph.analysis.AnalyzerTask;
 import org.matsim.contrib.sna.snowball.SampledVertexDecorator;
+import org.matsim.contrib.sna.snowball.analysis.PiEstimator;
 
 
 /**
@@ -41,7 +42,7 @@ public class FinalSampleAnalyzer extends SampleAnalyzer {
 	/**
 	 * @see {@link SampleAnalyzer#SampleAnalyzer(Map, Collection, String)}
 	 */
-	public FinalSampleAnalyzer(Map<String, AnalyzerTask> tasks, Collection<ProbabilityEstimator> estimators,
+	public FinalSampleAnalyzer(Map<String, AnalyzerTask> tasks, Collection<PiEstimator> estimators,
 			String output) {
 		super(tasks, estimators, output);
 	}

@@ -20,15 +20,16 @@
 package org.matsim.contrib.sna.graph.analysis;
 
 import gnu.trove.TObjectDoubleHashMap;
+import gnu.trove.TObjectDoubleIterator;
 
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.Vertex;
-import org.matsim.contrib.sna.math.Distribution;
 
 /**
  * A class that provides functionality to analyze triangular configurations in a
@@ -37,7 +38,7 @@ import org.matsim.contrib.sna.math.Distribution;
  * @author illenberger
  * 
  */
-public class Transitivity implements VertexProperty<Vertex>{
+public class Transitivity implements VertexProperty {
 
 	private static Transitivity instance;
 	
@@ -55,9 +56,14 @@ public class Transitivity implements VertexProperty<Vertex>{
 	 * 
 	 * @return the distribution of local clustering coefficients.
 	 */
-	public Distribution localClusteringDistribution(Set<? extends Vertex> vertices) {
-		Distribution stats = new Distribution();
-		stats.addAll(localClusteringCoefficients(vertices).getValues());
+	public DescriptiveStatistics localClusteringDistribution(Set<? extends Vertex> vertices) {
+		DescriptiveStatistics stats = new DescriptiveStatistics();
+		TObjectDoubleHashMap<?> values = values(vertices);
+		TObjectDoubleIterator<?> it = values.iterator();
+		for(int i = 0; i < values.size(); i++) {
+			it.advance();
+			stats.addValue(it.value());
+		}
 		return stats;
 	}
 
@@ -144,6 +150,10 @@ public class Transitivity implements VertexProperty<Vertex>{
 		return n_triangles / (double) n_tripples;
 	}
 
+	/**
+	 * Calls {@link Transitivity#localClusteringCoefficients(Collection)}.
+	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	public TObjectDoubleHashMap<Vertex> values(Set<? extends Vertex> vertices) {
 		return (TObjectDoubleHashMap<Vertex>) localClusteringCoefficients(vertices);

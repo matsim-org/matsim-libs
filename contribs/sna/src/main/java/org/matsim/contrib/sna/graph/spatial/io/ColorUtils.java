@@ -53,7 +53,7 @@ public class ColorUtils {
 			float blue = 0;
 
 			int segment = (int) Math.ceil(value * 4);
-			float val = (float) (value / (double) segment * 4);
+			float val = (float) ((value - (segment*.25-0.25)) * 4);
 			switch (segment) {
 			case 1:
 				red = val;

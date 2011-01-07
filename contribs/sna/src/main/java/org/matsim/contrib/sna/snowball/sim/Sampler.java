@@ -20,6 +20,7 @@
 package org.matsim.contrib.sna.snowball.sim;
 
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -143,7 +144,7 @@ public class Sampler<G extends Graph, V extends Vertex, E extends Edge> {
 		while (!recruits.isEmpty()) {
 			logger.info(String.format("Sampling iteration %1$s.", iteration));
 
-			Set<TaggedVertex> newRecruits = new HashSet<TaggedVertex>();
+			Set<TaggedVertex> newRecruits = new LinkedHashSet<TaggedVertex>();
 			for (TaggedVertex vertex : recruits) {
 				if (!listener.beforeSampling(this, vertex.getProjection()))
 					return;
@@ -205,7 +206,7 @@ public class Sampler<G extends Graph, V extends Vertex, E extends Edge> {
 		 * draw the seed vertices
 		 */
 		Set<V> seeds = (Set<V>) seedGenerator.apply(responsive);
-		Set<TaggedVertex> taggedSeeds = new HashSet<TaggedVertex>();
+		Set<TaggedVertex> taggedSeeds = new LinkedHashSet<TaggedVertex>();
 		for (V vertex : seeds) {
 			TaggedVertex taggedVertex = taggedGraph.getVertex(vertex);
 			SampledVertexDecorator<V> sampledVertex = builder.addVertex(sampledGraph, vertex);

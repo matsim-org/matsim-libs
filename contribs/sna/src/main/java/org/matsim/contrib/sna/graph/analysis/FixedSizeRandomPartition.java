@@ -21,7 +21,7 @@ package org.matsim.contrib.sna.graph.analysis;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
@@ -74,7 +74,7 @@ public class FixedSizeRandomPartition<V extends Vertex> implements VertexFilter<
 	public Set<V> apply(Set<V> vertices) {
 		List<V> list = new ArrayList<V>(vertices);
 		Collections.shuffle(list, random);
-		Set<V> seeds = new HashSet<V>();
+		Set<V> seeds = new LinkedHashSet<V>();
 		for (int i = 0; i < n; i++)
 			seeds.add(list.get(i));
 

@@ -23,9 +23,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Map;
 
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.sna.graph.Graph;
-import org.matsim.contrib.sna.math.Distribution;
+import org.matsim.contrib.sna.math.LinearDiscretizer;
 
 /**
  * An AnalyzerTaks that calculated degree related measurements.
@@ -65,10 +66,10 @@ public class DegreeTask extends ModuleAnalyzerTask<Degree> {
 	 */
 	@Override
 	public void analyze(Graph graph, Map<String, Double> stats) {
-		Distribution distr = module.distribution(graph.getVertices());
-		double k_mean = distr.mean();
-		double k_min = distr.min();
-		double k_max = distr.max();
+		DescriptiveStatistics distr = module.distribution(graph.getVertices());
+		double k_mean = distr.getMean();
+		double k_min = distr.getMin();
+		double k_max = distr.getMax();
 		stats.put(MEAN_DEGREE, k_mean);
 		stats.put(MAX_DEGREE, k_max);
 		stats.put(MIN_DEGREE, k_min);
@@ -78,10 +79,12 @@ public class DegreeTask extends ModuleAnalyzerTask<Degree> {
 		stats.put(DEGREE_CORRELATION, r_k);
 		logger.info(String.format("r_k = %1$.4f", r_k));
 
-		if (getOutputDirectory() != null) {
+		if (outputDirectoryNotNull()) {
 			try {
-				writeHistograms(distr, 1.0, false, "k");
-				writeHistograms(distr, 5.0, false, "k_5");
+				writeHistograms(distr, new LinearDiscretizer(1.0), "k");
+				writeHistograms(distr, new LinearDiscretizer(5.0), "k_5");
+//				writeHistograms(distr, 1.0, false, "k");
+//				writeHistograms(distr, 5.0, false, "k_5");
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			} catch (IOException e) {

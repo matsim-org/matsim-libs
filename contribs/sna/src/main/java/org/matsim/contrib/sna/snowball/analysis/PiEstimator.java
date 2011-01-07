@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * VertexProperty.java
+ * Estimator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,20 +17,48 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.sna.graph.analysis;
+package org.matsim.contrib.sna.snowball.analysis;
 
-import gnu.trove.TObjectDoubleHashMap;
-
-import java.util.Set;
-
-import org.matsim.contrib.sna.graph.Vertex;
+import org.matsim.contrib.sna.snowball.SampledGraph;
+import org.matsim.contrib.sna.snowball.SampledVertex;
 
 /**
+ * A ProbabilityEstimator estimates the inclusion probability of a vertex in a
+ * snowball sample.
+ * 
  * @author illenberger
- *
+ * 
  */
-public interface VertexProperty {
+public interface PiEstimator {
 
-	public TObjectDoubleHashMap<Vertex> values(Set<? extends Vertex> vertices);
+	/**
+	 * Notifies the estimator that the sample has changed.
+	 * 
+	 * @param graph
+	 *            the sampled snwoball graph
+	 */
+	public void update(SampledGraph graph);
+
+	/**
+	 * Returns the inclusion probability of a vertex in the snowball sample.
+	 * 
+	 * @param vertex
+	 *            a sampled vertex
+	 * @return the inclusion probability of a vertex in the snowball sample.
+	 */
+	public double probability(SampledVertex vertex);
 	
+	/**
+	 * Returns the inclusion probability of a vertex in the snowball sample.
+	 * 
+	 * @param vertex
+	 *            a sampled vertex
+	 * @param iteration
+	 *            the snowball iteration
+	 * 
+	 * @return the inclusion probability of a vertex in the snowball sample of
+	 *         iteration <tt>iteration</tt>.
+	 */
+	public double probability(SampledVertex vertex, int iteration);
+
 }

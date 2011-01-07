@@ -23,12 +23,11 @@ import gnu.trove.TObjectDoubleHashMap;
 import gnu.trove.TObjectDoubleIterator;
 import junit.framework.TestCase;
 
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.sna.graph.SparseGraph;
 import org.matsim.contrib.sna.graph.SparseGraphBuilder;
 import org.matsim.contrib.sna.graph.SparseVertex;
 import org.matsim.contrib.sna.graph.Vertex;
-import org.matsim.contrib.sna.graph.analysis.Degree;
-import org.matsim.contrib.sna.math.Distribution;
 
 
 /**
@@ -58,10 +57,10 @@ public class DegreeTest extends TestCase {
 		
 		Degree degree = Degree.getInstance();
 		
-		Distribution distr = degree.distribution(graph.getVertices());
-		assertEquals(2.33, distr.mean(), 0.01);
-		assertEquals(2.0, distr.min());
-		assertEquals(3.0, distr.max());
+		DescriptiveStatistics stats = degree.distribution(graph.getVertices());
+		assertEquals(2.33, stats.getMean(), 0.01);
+		assertEquals(2.0, stats.getMin());
+		assertEquals(3.0, stats.getMax());
 		
 		TObjectDoubleHashMap<? extends Vertex> values = degree.values(graph.getVertices());
 		TObjectDoubleIterator<? extends Vertex> it = values.iterator();

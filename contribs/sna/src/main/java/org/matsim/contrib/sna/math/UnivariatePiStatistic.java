@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * VertexProperty.java
+ * UnivariatePiStatistic.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,20 +17,16 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.sna.graph.analysis;
+package org.matsim.contrib.sna.math;
 
-import gnu.trove.TObjectDoubleHashMap;
-
-import java.util.Set;
-
-import org.matsim.contrib.sna.graph.Vertex;
+import org.apache.commons.math.stat.descriptive.UnivariateStatistic;
 
 /**
  * @author illenberger
  *
  */
-public interface VertexProperty {
+public interface UnivariatePiStatistic extends UnivariateStatistic {
 
-	public TObjectDoubleHashMap<Vertex> values(Set<? extends Vertex> vertices);
+	public void setPiValues(double[] piValues);
 	
 }
