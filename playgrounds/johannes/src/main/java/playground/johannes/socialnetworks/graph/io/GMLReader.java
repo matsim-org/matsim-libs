@@ -33,6 +33,7 @@ import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.GraphBuilder;
 import org.matsim.contrib.sna.graph.SparseGraphBuilder;
 import org.matsim.contrib.sna.graph.Vertex;
+import org.matsim.contrib.sna.graph.io.GraphMLWriter;
 
 
 /**
@@ -293,7 +294,9 @@ public class GMLReader {
 	
 	public static void main(String args[]) throws IOException {
 		GMLReader reader = new GMLReader();
-		Graph graph = reader.read("/Users/fearonni/Downloads/karate/karate.gml", new SparseGraphBuilder());
+		Graph graph = reader.read("/Users/jillenberger/Downloads/polblogs/polblogs.gml", new SparseGraphBuilder());
 		System.out.println(graph.getVertices().size() + " vertices");
+		GraphMLWriter writer = new GraphMLWriter();
+		writer.write(graph, "/Users/jillenberger/Downloads/polblogs/polblogs.graphml");
 	}
 }

@@ -20,13 +20,14 @@
 package playground.johannes.socialnetworks.graph.spatial.analysis;
 
 import gnu.trove.TDoubleArrayList;
-import gnu.trove.TIntArrayList;
 import gnu.trove.TObjectDoubleHashMap;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.math.stat.StatUtils;
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.sna.graph.spatial.SpatialEdge;
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
 import org.matsim.contrib.sna.math.Distribution;
@@ -38,6 +39,14 @@ import org.matsim.contrib.sna.math.Distribution;
  */
 public class Distance {
 
+	private static Distance instance;
+	
+	public static Distance getInstance() {
+		if(instance == null)
+			instance = new Distance();
+		return instance;
+	}
+	
 	public Distribution distribution(Set<? extends SpatialVertex> vertices) {
 		Distribution distribution = new Distribution();
 		
@@ -71,7 +80,7 @@ public class Distance {
 		return distribution;
 	}
 	
-	public TObjectDoubleHashMap<SpatialVertex> vertexMeanValues(Set<? extends SpatialVertex> vertices) {
+	public TObjectDoubleHashMap<SpatialVertex> vertexMean(Set<? extends SpatialVertex> vertices) {
 		TObjectDoubleHashMap<SpatialVertex> values = new TObjectDoubleHashMap<SpatialVertex>();
 		
 		for(SpatialVertex vertex : vertices) {
@@ -91,7 +100,7 @@ public class Distance {
 		return values;
 	}
 	
-	public TObjectDoubleHashMap<SpatialVertex> vertexMedianValues(Set<? extends SpatialVertex> vertices) {
+	public TObjectDoubleHashMap<SpatialVertex> vertexMedian(Set<? extends SpatialVertex> vertices) {
 		TObjectDoubleHashMap<SpatialVertex> values = new TObjectDoubleHashMap<SpatialVertex>();
 		
 		for(SpatialVertex vertex : vertices) {
@@ -111,12 +120,12 @@ public class Distance {
 	}
 	
 	public Distribution vertexMeanDistribution(Set<? extends SpatialVertex> vertices) {
-		TObjectDoubleHashMap<SpatialVertex> values = vertexMeanValues(vertices);
+		TObjectDoubleHashMap<SpatialVertex> values = vertexMean(vertices);
 		return new Distribution(values.getValues());
 	}
 	
 	public Distribution vertexMedianDistribution(Set<? extends SpatialVertex> vertices) {
-		TObjectDoubleHashMap<SpatialVertex> values = vertexMedianValues(vertices);
+		TObjectDoubleHashMap<SpatialVertex> values = vertexMedian(vertices);
 		return new Distribution(values.getValues());
 	}
 }

@@ -23,27 +23,18 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.sna.gis.ZoneLayer;
-import org.matsim.contrib.sna.graph.analysis.ComponentsTask;
-import org.matsim.contrib.sna.graph.analysis.DegreeTask;
-import org.matsim.contrib.sna.graph.analysis.GraphSizeTask;
-import org.matsim.contrib.sna.graph.analysis.TransitivityTask;
+import org.matsim.contrib.sna.math.LinearDiscretizer;
+import org.matsim.contrib.sna.snowball.analysis.ObservedDegree;
 
 import playground.johannes.socialnetworks.gis.GravityCostFunction;
 import playground.johannes.socialnetworks.gis.SpatialCostFunction;
 import playground.johannes.socialnetworks.gis.WGS84DistanceCalculator;
 import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
-import playground.johannes.socialnetworks.graph.analysis.PropertyDegreeTask;
 import playground.johannes.socialnetworks.graph.social.analysis.AgeTask;
 import playground.johannes.socialnetworks.graph.spatial.analysis.AcceptFactorTask;
-import playground.johannes.socialnetworks.graph.spatial.analysis.AccessibilityPartitioner;
-import playground.johannes.socialnetworks.graph.spatial.analysis.DegreeDensityTask;
-import playground.johannes.socialnetworks.graph.spatial.analysis.DistanceAccessibilityTask;
 import playground.johannes.socialnetworks.graph.spatial.analysis.DistanceTask;
-import playground.johannes.socialnetworks.snowball2.analysis.DegreeIterationTask;
-import playground.johannes.socialnetworks.snowball2.analysis.ObservedDegree;
-import playground.johannes.socialnetworks.snowball2.analysis.ObservedTransitivity;
-import playground.johannes.socialnetworks.snowball2.analysis.SeedConnectionTask;
-import playground.johannes.socialnetworks.snowball2.analysis.WaveSizeTask;
+import playground.johannes.socialnetworks.graph.spatial.analysis.SpatialPropertyAccessibilityTask;
+import playground.johannes.socialnetworks.graph.spatial.analysis.SpatialPropertyDegreeTask;
 import playground.johannes.socialnetworks.snowball2.social.analysis.ObservedAge;
 import playground.johannes.socialnetworks.snowball2.spatial.analysis.ObservedDistance;
 
@@ -56,48 +47,41 @@ import com.vividsolutions.jts.geom.Point;
 public class ObservedAnalyzerTask extends AnalyzerTaskComposite {
 	
 	public ObservedAnalyzerTask(ZoneLayer zones, Set<Point> choiceSet, Network network) {
-		addTask(new GraphSizeTask());
-		addTask(new WaveSizeTask());
+		AnalyzerTaskArray array = new AnalyzerTaskArray();
+		array.addAnalyzerTask(new TopoObsAnalyzerTask(), "topo");
+		array.addAnalyzerTask(new SnowballAnalyzerTask(), "snowball");
+		addTask(array);
 		
-		DegreeTask degree = new DegreeTask();
-		degree.setModule(new ObservedDegree());
-		addTask(degree);
 		
-		DegreeIterationTask degreeIt = new DegreeIterationTask();
-		degreeIt.setModule(new ObservedDegree());
-		addTask(degreeIt);
-		
-		TransitivityTask transitivity = new TransitivityTask();
-		transitivity.setModule(new ObservedTransitivity());
-		addTask(transitivity);
-		
-		PropertyDegreeTask transDegree = new PropertyDegreeTask();
-		transDegree.setModule(new ObservedDegree());
-		addTask(transDegree);
-		
-		DistanceTask distance = new DistanceTask();
-		distance.setModule(new ObservedDistance());
-		addTask(distance);
-		
-//		AcceptanceProbabilityTask pAccept = new AcceptanceProbabilityTask(choiceSet);
-//		addTask(pAccept);
-		
-		addTask(new AcceptFactorTask(choiceSet));
-//		DegreeDensityTask kRhoTask = new DegreeDensityTask(zones);
-//		kRhoTask.setModule(new ObservedDegree());
-//		addTask(kRhoTask);
 		
 		AgeTask age = new AgeTask();
 		age.setModule(new ObservedAge());
 		addTask(age);
 		
-//		addTask(new ComponentsTask());
+		SpatialCostFunction costFunction = new GravityCostFunction(1.6, 0, new WGS84DistanceCalculator());
+//		Accessibility accessibility = new Accessibility(costFunction, choiceSet);
+		SpatialPropertyDegreeTask spxkTask = new SpatialPropertyDegreeTask(costFunction, choiceSet);
+		spxkTask.setModule(new ObservedDegree());
+		spxkTask.setDiscretizer(new LinearDiscretizer(5.0));
+		addTask(spxkTask);
+		
+		SpatialPropertyAccessibilityTask spxaTask = new SpatialPropertyAccessibilityTask(costFunction, choiceSet);
+		spxaTask.setModule(new ObservedAccessibility());
+		spxaTask.setDiscretizer(new LinearDiscretizer(1.0));
+		addTask(spxaTask);
+		
+		SocialPropertyDegreeTask xkTask = new SocialPropertyDegreeTask();
+		xkTask.setDiscretizer(new LinearDiscretizer(5.0));
+		xkTask.setModule(new ObservedDegree());
+		addTask(xkTask);
+		
+
 		
 //		EdgeCostsTask costs = new EdgeCostsTask(null);
 //		costs.setModule(new ObservedEdgeCosts(new GravityEdgeCostFunction(1.6, 0.0)));
 //		addTask(costs);
 		
-//		addTask(new SeedConnectionTask());
+//		
 		
 //		DegreeEdgeLengthTask kdTask = new DegreeEdgeLengthTask();
 //		kdTask.setModule(new ObservedDegree());
@@ -107,7 +91,7 @@ public class ObservedAnalyzerTask extends AnalyzerTaskComposite {
 //		daTask.setModule(new ObservedDegree());
 //		addTask(daTask);
 		
-//		SpatialCostFunction costFunction = new GravityCostFunction(1.6, 0, new WGS84DistanceCalculator());
+//		
 //		
 //		AccessibilityPartitioner partitioner = new AccessibilityPartitioner(costFunction, choiceSet);
 //		partitioner.setModule(new ObservedAccessibility());
@@ -139,7 +123,7 @@ public class ObservedAnalyzerTask extends AnalyzerTaskComposite {
 //		kgTask.setModule(new ObservedDegree());
 //		addTask(kgTask);
 		
-//		addTask(new ResponseRateTask());
+//		
 		
 //		addTask(new FrequencyDistanceTask(choiceSet));
 		

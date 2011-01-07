@@ -30,8 +30,8 @@ import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.analysis.Degree;
 import org.matsim.contrib.sna.graph.analysis.ModuleAnalyzerTask;
 import org.matsim.contrib.sna.graph.analysis.Transitivity;
+import org.matsim.contrib.sna.util.TXTWriter;
 
-import playground.johannes.socialnetworks.utils.TXTWriter;
 
 /**
  * @author illenberger
@@ -47,7 +47,7 @@ public class PropertyDegreeTask extends ModuleAnalyzerTask<Degree> {
 				TXTWriter.writeMap(map, getOutputDirectory() + "/c_k.mean.txt", "k", "c_local");
 				
 				TDoubleObjectHashMap<DescriptiveStatistics> stat = VertexPropertyCorrelation.statistics(Transitivity.getInstance(), module, graph.getVertices());
-				TXTWriter.writeStatsTable(stat, getOutputDirectory() + "/c_k.table.txt");
+				TXTWriter.writeBoxplotStats(stat, getOutputDirectory() + "/c_k.table.txt");
 				
 			} catch (IOException e) {
 				e.printStackTrace();

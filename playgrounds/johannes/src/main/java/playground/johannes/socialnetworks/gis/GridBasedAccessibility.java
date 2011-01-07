@@ -30,6 +30,7 @@ import java.util.Set;
 
 import javax.swing.text.IconView;
 
+import org.apache.log4j.Logger;
 import org.matsim.contrib.sna.gis.CRSUtils;
 import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
@@ -42,8 +43,11 @@ import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphKMLWriter;
 import playground.johannes.socialnetworks.graph.spatial.io.NumericAttributeColorizer;
 import playground.johannes.socialnetworks.graph.spatial.io.Population2SpatialGraph;
 
+import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geomgraph.GeometryGraph;
 
 /**
  * @author illenberger
@@ -52,33 +56,57 @@ import com.vividsolutions.jts.geom.Point;
 public class GridBasedAccessibility {
 
 	private SpatialCostFunction costFunction;
+	
+	private final GeometryFactory geoFactory = new GeometryFactory();
+	
+	private static final Logger logger = Logger.getLogger(GridBasedAccessibility.class);
 	/**
 	 * @param args
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
 		GridBasedAccessibility access = new GridBasedAccessibility();
-		access.costFunction = new GravityCostFunction(-1.6, 1, new CartesianDistanceCalculator());
+		access.costFunction = new GravityCostFunction(-1.6, 0, new CartesianDistanceCalculator());
 		Set<Point> points = access.loadPoints(args[0]);
-		TObjectDoubleHashMap<Point> pointAccess = access.pointAccessibility(points);
-		for (int i = 1; i < 10; i++) {
-			double size = 5000/(double)i;
-			SpatialGrid<Set<Point>> pointGrid = access.createPointGrid(points, size);
-			
-			SpatialGrid<Double> accessGrid = access.gridAccessibility(pointGrid);
-			SpatialGridTableWriter writer = new SpatialGridTableWriter();
-			writer.write(accessGrid, args[1] + "access." + (int)size +".txt");
-			access.writeTable(accessGrid, args[1] + "accessTable." + (int)size +".txt");
-			
-			SpatialGrid<Double> mse = access.mse(pointAccess, accessGrid);
-			writer.write(mse, args[1] + "mse." + (int)size +".txt");
-			access.writeTable(mse, args[1] + "mseTable." + (int)size +".txt");
-		}
-		
 //		TObjectDoubleHashMap<Point> pointAccess = access.pointAccessibility(points);
-//		TObjectDoubleHashMap<Point> deltas = access.mse(pointAccess, accessGrid);
-//		access.writePointTable(deltas, args[2]);
+		Envelope env = PointUtils.envelope(points);
 
+//		logger.info("Calculation microscopic accessibility...");
+//		SpatialGrid<Double> accessGridMicro = new SpatialGrid<Double>(env.getMinX(), env.getMinY(), env.getMaxX(), env.getMaxY(), 1000.0);
+//		access.accessPoints(accessGridMicro, points);
+//		SpatialGridTableWriter writer = new SpatialGridTableWriter();
+		SpatialGridKMLWriter writer = new SpatialGridKMLWriter();
+//		writer.write(accessGridMicro, args[1] + "access.micro.txt");
+		
+		for (int i = 1; i < 2; i++) {
+			double size = i*1000;
+			logger.info("Calculating accessibility on " + (int)size + " grid...");
+			SpatialGrid<Double> accessGridMacro = new SpatialGrid<Double>(env.getMinX(), env.getMinY(), env.getMaxX(), env.getMaxY(), 1000.0);
+			SpatialGrid<Double> targetGrid = new SpatialGrid<Double>(env.getMinX(), env.getMinY(), env.getMaxX(), env.getMaxY(), size);
+						
+//			SpatialGrid<Set<Point>> pointGrid = access.createPointGrid(points, size);	
+//			access.accessGrid(accessGridMacro, pointGrid);
+//			writer.write(accessGridMacro, CRSUtils.getCRS(21781), args[1] + "access.macro." + (int)size +".kmz");
+			
+			writer.write(targetGrid, CRSUtils.getCRS(21781), args[1] + "targetGrid." + (int)size +".kmz");
+//			writer.write(accessGridMacro, args[1] + "access.macro." + (int)size +".txt");
+
+//			SpatialGrid<Double> deltaGrid = delta(accessGridMacro, accessGridMicro);
+			
+			
+//			writer.write(deltaGrid, args[1] + "delta." + (int)size + ".txt");
+			
+		}
+	}
+	
+	private static SpatialGrid<Double> delta(SpatialGrid<Double> grid1, SpatialGrid<Double> grid2) {
+		SpatialGrid<Double> deltaGrid = new SpatialGrid<Double>(grid1);
+		for(int i = 0; i < grid1.getNumRows(); i++) {			
+			for(int j = 0; j < grid1.getNumCols(i); j++) {
+				deltaGrid.setValue(i, j, grid1.getValue(i, j) - grid2.getValue(i, j));
+			}
+		}
+		return deltaGrid;
 	}
 	
 	private void writeTable(SpatialGrid<Double> grid, String file) throws IOException {
@@ -242,19 +270,30 @@ public class GridBasedAccessibility {
 		return centerGrid;
 	}
 	
-	private SpatialGrid<Double> gridAccessibility(SpatialGrid<Set<Point>> pointGrid) {
-		SpatialGrid<Double> accessGrid = new SpatialGrid<Double>(pointGrid.getXmin(), pointGrid.getYmin(), pointGrid.getXmax(), pointGrid.getYmax(), pointGrid.getResolution());
-		SpatialGrid<Point> centerGrid = createCenterGrid(pointGrid);
+	private void accessGrid(SpatialGrid<Double> sourceGird, SpatialGrid<Set<Point>> targetGrid) {	
+		SpatialGrid<Point> centerGrid = createCenterGrid(targetGrid);
 		
-		for(int i = 0; i < pointGrid.getNumRows(); i++) {			
-			for(int j = 0; j < pointGrid.getNumCols(i); j++) {
-				Point source = centerGrid.getValue(i, j);
-				if(source != null)
-					accessGrid.setValue(i, j, cellAccessibility(source, pointGrid, centerGrid));
+		for(int i = 0; i < sourceGird.getNumRows(); i++) {			
+			for(int j = 0; j < sourceGird.getNumCols(i); j++) {
+				double x = sourceGird.getXmin() + j * sourceGird.getResolution();
+				double y = sourceGird.getYmin() + i * sourceGird.getResolution();
+				Point source = geoFactory.createPoint(new Coordinate(x, y));
+				sourceGird.setValue(i, j, cellAccessibility(source, targetGrid, centerGrid));
 			}
 		}
 		
-		return accessGrid;
+		
+	}
+	
+	private void accessPoints(SpatialGrid<Double> sourceGird, Set<Point> targets) {
+		for(int i = 0; i < sourceGird.getNumRows(); i++) {			
+			for(int j = 0; j < sourceGird.getNumCols(i); j++) {
+				double x = sourceGird.getXmin() + j * sourceGird.getResolution();
+				double y = sourceGird.getYmin() + i * sourceGird.getResolution();
+				Point source = geoFactory.createPoint(new Coordinate(x, y));
+				sourceGird.setValue(i, j, pointAccessibility(source, targets));
+			}
+		}
 	}
 	
 	private double cellAccessibility(Point source, SpatialGrid<Set<Point>> pointGrid, SpatialGrid<Point> centerGrid) {
@@ -274,19 +313,14 @@ public class GridBasedAccessibility {
 		return Math.log(sum);
 	}
 	
-	private TObjectDoubleHashMap<Point> pointAccessibility(Set<Point> points) {
-		TObjectDoubleHashMap<Point> values = new TObjectDoubleHashMap<Point>();
-		
-		for(Point p1 : points) {
-			double sum = 0;
-			for(Point p2 : points) {
-				if(p1 != p2) {
-					sum += Math.exp(costFunction.costs(p1, p2));
-				}
+	private double pointAccessibility(Point source, Set<Point> points) {
+		double sum = 0;
+		for (Point p2 : points) {
+			if (source != p2) {
+				sum += Math.exp(costFunction.costs(source, p2));
 			}
-			
-			values.put(p1, Math.log(sum));
 		}
-		return values;
+
+		return Math.log(sum);
 	}
 }

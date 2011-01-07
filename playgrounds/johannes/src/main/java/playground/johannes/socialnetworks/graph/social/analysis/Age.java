@@ -28,6 +28,8 @@ import java.util.Set;
 
 import org.apache.commons.math.stat.correlation.PearsonsCorrelation;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.matsim.contrib.sna.graph.Vertex;
+import org.matsim.contrib.sna.graph.analysis.VertexProperty;
 import org.matsim.contrib.sna.math.Distribution;
 import org.matsim.contrib.sna.math.LinearDiscretizer;
 
@@ -39,8 +41,16 @@ import playground.johannes.socialnetworks.statistics.Correlations;
  * @author illenberger
  *
  */
-public class Age {
+public class Age implements VertexProperty {
 
+	private static Age instance;
+	
+	public static Age getInstance() {
+		if(instance == null)
+			instance = new Age();
+		return instance;
+	}
+	
 	public Distribution distribution(Set<? extends SocialVertex> vertices) {
 		Distribution distr = new Distribution();
 		for(SocialVertex vertex : vertices) {
@@ -52,10 +62,10 @@ public class Age {
 		return distr;
 	}
 	
-	public TObjectDoubleHashMap<SocialVertex> values(Set<? extends SocialVertex> vertices) {
-		TObjectDoubleHashMap<SocialVertex> values = new TObjectDoubleHashMap<SocialVertex>();
-		for(SocialVertex vertex : vertices) {
-			int age = vertex.getPerson().getAge();
+	public TObjectDoubleHashMap<Vertex> values(Set<? extends Vertex> vertices) {
+		TObjectDoubleHashMap<Vertex> values = new TObjectDoubleHashMap<Vertex>();
+		for(Vertex vertex : vertices) {
+			int age = ((SocialVertex) vertex).getPerson().getAge();
 			if(age > -1)
 				values.put(vertex, age);
 		}

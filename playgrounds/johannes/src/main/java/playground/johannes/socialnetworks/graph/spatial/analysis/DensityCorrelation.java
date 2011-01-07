@@ -30,6 +30,7 @@ import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
 
 import playground.johannes.socialnetworks.statistics.Correlations;
+import visad.data.netcdf.UnsupportedOperationException;
 
 /**
  * @author illenberger
@@ -52,8 +53,8 @@ public class DensityCorrelation {
 			Zone zone1 = zones.getZone(v1.getPoint());
 			Zone zone2 = zones.getZone(v2.getPoint());
 			if(zone1 != null && zone2 != null) {
-				double rho1 = zone1.getPopulationDensity();
-				double rho2 = zone2.getPopulationDensity();
+				double rho1 = 0;//zone1.getPopulationDensity();
+				double rho2 = 0;//zone2.getPopulationDensity();
 			
 				rhoValues1[i] = rho1;
 				rhoValues2[i] = rho2;
@@ -61,6 +62,8 @@ public class DensityCorrelation {
 				rhoValues1[i] = rho2;
 				rhoValues2[i] = rho1;
 				i++;
+				
+				throw new UnsupportedOperationException("Fix this!");
 			} else
 				fails++;
 		}

@@ -26,6 +26,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.graph.analysis.Degree;
@@ -82,8 +83,8 @@ public class DegreeGridTask extends ModuleAnalyzerTask<Degree> {
 			for(int j = 0; j < kGrid.getNumCols(i); j++) {
 				Set<SpatialVertex> set = vertexGrid.getValue(i, j);
 				if(set != null) {
-					Distribution distr = module.distribution(set);
-					kGrid.setValue(i, j, distr.mean());
+					DescriptiveStatistics distr = module.distribution(set);
+					kGrid.setValue(i, j, distr.getMean());
 				} else {
 					kGrid.setValue(i, j, 0.0);
 				}

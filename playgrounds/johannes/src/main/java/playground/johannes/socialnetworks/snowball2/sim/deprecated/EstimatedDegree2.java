@@ -17,15 +17,17 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.snowball2.analysis;
+package playground.johannes.socialnetworks.snowball2.sim.deprecated;
 
 import org.matsim.contrib.sna.graph.Graph;
+import org.matsim.contrib.sna.math.DescriptivePiStatisticsFactory;
 import org.matsim.contrib.sna.snowball.SampledEdge;
 import org.matsim.contrib.sna.snowball.SampledGraph;
 import org.matsim.contrib.sna.snowball.SampledVertex;
-import org.matsim.contrib.sna.snowball.sim.ProbabilityEstimator;
+import org.matsim.contrib.sna.snowball.analysis.EstimatedDegree;
+import org.matsim.contrib.sna.snowball.analysis.PiEstimator;
 
-import playground.johannes.socialnetworks.snowball2.sim.deprecated.PopulationEstimator;
+import playground.johannes.socialnetworks.snowball2.sim.SampleStats;
 
 /**
  * @author illenberger
@@ -33,20 +35,22 @@ import playground.johannes.socialnetworks.snowball2.sim.deprecated.PopulationEst
  */
 public class EstimatedDegree2 extends EstimatedDegree {
 
+	private PiEstimator piEstimator;
 	/**
 	 * @param estimator
 	 * @param vertexEstimator
 	 * @param edgeEstimator
 	 */
-	public EstimatedDegree2(ProbabilityEstimator estimator, PopulationEstimator vertexEstimator,
-			PopulationEstimator edgeEstimator) {
-		super(estimator, vertexEstimator, edgeEstimator);
+	public EstimatedDegree2(PiEstimator estimator, DescriptivePiStatisticsFactory factory) {
+		super(estimator, factory);
+		this.piEstimator = estimator;
 	}
 
 	@Override
 	public double assortativity(Graph g) {
 		SampledGraph graph = (SampledGraph) g;
-
+		SampleStats stats = new SampleStats(graph);
+		
 		double M = 0;
 
 		double t_ij = 0;
@@ -60,7 +64,7 @@ public class EstimatedDegree2 extends EstimatedDegree {
 			SampledVertex v_j = edge.getVertices().getSecond();
 
 			if (v_i.isSampled() && v_j.isSampled()) {
-				double p = 0;
+//				double p = 0;
 //				int it_i = v_i.getIterationSampled();
 //				int it_j = v_j.getIterationSampled();
 //				if(it_i > it_j) {
@@ -68,13 +72,13 @@ public class EstimatedDegree2 extends EstimatedDegree {
 //				} else if(it_i < it_j) {
 //					p = biasedDistribution.getProbability(v_j);
 //				} else {
-					double p_i = biasedDistribution.getProbability(v_i);
-					double p_j = biasedDistribution.getProbability(v_j);
-					p = Math.max(p_i, p_j);
+					double p_i = piEstimator.probability(v_i, stats.getMaxIteration() - 1);
+					double p_j = piEstimator.probability(v_j, stats.getMaxIteration() - 1);
+//					p = Math.max(p_i, p_j);
 //				}
-				if(p > 0) {
-//				if (p_i > 0 && p_j > 0) {
-//					double p = (p_i + p_j) - (p_i * p_j);
+//				if(p > 0) {
+				if (p_i > 0 && p_j > 0) {
+					double p = (p_i + p_j) - (p_i * p_j);
 //					double p = (p_i * p_j);
 					double k_i = v_i.getNeighbours().size();
 					double k_j = v_j.getNeighbours().size();

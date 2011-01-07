@@ -36,6 +36,14 @@ import playground.johannes.socialnetworks.snowball2.spatial.SpatialSampledVertex
  */
 public class ObservedDistance extends Distance {
 
+	private static ObservedDistance instance;
+	
+	public static ObservedDistance getInstance() {
+		if(instance == null)
+			instance = new ObservedDistance();
+		return instance;
+	}
+	
 	@SuppressWarnings("unchecked")
 	@Override
 	public Distribution distribution(Set<? extends SpatialVertex> vertices) {
@@ -60,8 +68,8 @@ public class ObservedDistance extends Distance {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public TObjectDoubleHashMap<SpatialVertex> vertexMeanValues(Set<? extends SpatialVertex> vertices) {
+	public TObjectDoubleHashMap<SpatialVertex> vertexMean(Set<? extends SpatialVertex> vertices) {
 		Set<SpatialSampledVertexDecorator<SpatialVertex>> spatialVertices = (Set<SpatialSampledVertexDecorator<SpatialVertex>>)vertices;
-		return super.vertexMeanValues(SnowballPartitions.createSampledPartition(spatialVertices));
+		return super.vertexMean(SnowballPartitions.createSampledPartition(spatialVertices));
 	}
 }

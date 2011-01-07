@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.snowball2.sim;
+package playground.johannes.socialnetworks.snowball2.sim.deprecated;
 
 import gnu.trove.TDoubleArrayList;
 import gnu.trove.TIntDoubleHashMap;
@@ -33,14 +33,16 @@ import org.matsim.contrib.sna.math.Discretizer;
 import org.matsim.contrib.sna.math.FixedSampleSizeDiscretizer;
 import org.matsim.contrib.sna.snowball.SampledGraph;
 import org.matsim.contrib.sna.snowball.SampledVertex;
-import org.matsim.contrib.sna.snowball.sim.ProbabilityEstimator;
+import org.matsim.contrib.sna.snowball.analysis.PiEstimator;
+
+import playground.johannes.socialnetworks.snowball2.sim.SampleStats;
 
 
 /**
  * @author illenberger
  *
  */
-public class Estimator11 implements ProbabilityEstimator {
+public class Estimator11 implements PiEstimator {
 
 	private SampleStats stats;
 
@@ -63,11 +65,11 @@ public class Estimator11 implements ProbabilityEstimator {
 	}
 
 	@Override
-	public double getProbability(SampledVertex vertex) {
-		return getProbability(vertex, stats.getMaxIteration());
+	public double probability(SampledVertex vertex) {
+		return probability(vertex, stats.getMaxIteration());
 	}
 
-	private double getProbability(SampledVertex vertex, int it) {
+	public double probability(SampledVertex vertex, int it) {
 		TObjectDoubleHashMap<SampledVertex> probas = probaItMap.get(it);
 		if(probas == null) {
 			probas = new TObjectDoubleHashMap<SampledVertex>();
@@ -155,7 +157,7 @@ public class Estimator11 implements ProbabilityEstimator {
 				int delta = hasNeighborK(sv, k);
 
 				if(delta > 0) {
-					double p = getProbability(sv, it-1);
+					double p = probability(sv, it-1);
 					p_sum += delta/p;
 				}
 			}
@@ -213,6 +215,14 @@ public class Estimator11 implements ProbabilityEstimator {
 			}
 		}
 		discretizer = FixedSampleSizeDiscretizer.create(degrees.toNativeArray(), 200);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.matsim.contrib.sna.snowball.sim.ProbabilityEstimator#getPrevProbability(org.matsim.contrib.sna.snowball.SampledVertex)
+	 */
+	
+	public double getPrevProbability(SampledVertex vertex) {
+		throw new UnsupportedOperationException();
 	}
 
 }

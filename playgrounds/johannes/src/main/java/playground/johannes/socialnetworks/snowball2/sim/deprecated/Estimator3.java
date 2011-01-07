@@ -28,16 +28,15 @@ import java.util.TreeSet;
 import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.snowball.SampledGraph;
 import org.matsim.contrib.sna.snowball.SampledVertex;
-import org.matsim.contrib.sna.snowball.sim.ProbabilityEstimator;
+import org.matsim.contrib.sna.snowball.analysis.PiEstimator;
 
 import playground.johannes.socialnetworks.snowball2.sim.SampleStats;
-import playground.johannes.socialnetworks.statistics.Histogram;
 
 /**
  * @author illenberger
  *
  */
-public class Estimator3 implements ProbabilityEstimator {
+public class Estimator3 implements PiEstimator {
 
 	private SampleStats stats;
 	
@@ -54,7 +53,7 @@ public class Estimator3 implements ProbabilityEstimator {
 	}
 	
 	@Override
-	public double getProbability(SampledVertex vertex) {
+	public double probability(SampledVertex vertex) {
 		int it = stats.getMaxIteration();
 		int k = vertex.getNeighbours().size();
 		
@@ -155,6 +154,17 @@ public class Estimator3 implements ProbabilityEstimator {
 			hist.convertToEqualCount(5, 1.0);
 			map.put(it.key(), hist);
 		}
+	}
+
+	
+
+	/* (non-Javadoc)
+	 * @see org.matsim.contrib.sna.snowball.analysis.PiEstimator#probability(org.matsim.contrib.sna.snowball.SampledVertex, int)
+	 */
+	@Override
+	public double probability(SampledVertex vertex, int iteration) {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
 }

@@ -24,7 +24,7 @@ import gnu.trove.TObjectDoubleHashMap;
 import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.snowball.SampledGraph;
 import org.matsim.contrib.sna.snowball.SampledVertex;
-import org.matsim.contrib.sna.snowball.sim.ProbabilityEstimator;
+import org.matsim.contrib.sna.snowball.analysis.PiEstimator;
 
 import playground.johannes.socialnetworks.snowball2.sim.SampleStats;
 
@@ -32,7 +32,7 @@ import playground.johannes.socialnetworks.snowball2.sim.SampleStats;
  * @author illenberger
  *
  */
-public class Estimator10 implements ProbabilityEstimator {
+public class Estimator10 implements PiEstimator {
 
 	private final int N;
 	
@@ -81,7 +81,24 @@ public class Estimator10 implements ProbabilityEstimator {
 	 * @see playground.johannes.socialnetworks.snowball2.sim.BiasedDistribution#getProbability(org.matsim.contrib.sna.snowball.SampledVertex)
 	 */
 	@Override
-	public double getProbability(SampledVertex vertex) {
+	public double probability(SampledVertex vertex) {
 		return probas.get(vertex);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.matsim.contrib.sna.snowball.sim.ProbabilityEstimator#getPrevProbability(org.matsim.contrib.sna.snowball.SampledVertex)
+	 */
+
+	public double getPrevProbability(SampledVertex vertex) {
+		throw new UnsupportedOperationException();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.matsim.contrib.sna.snowball.analysis.PiEstimator#probability(org.matsim.contrib.sna.snowball.SampledVertex, int)
+	 */
+	@Override
+	public double probability(SampledVertex vertex, int iteration) {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 }

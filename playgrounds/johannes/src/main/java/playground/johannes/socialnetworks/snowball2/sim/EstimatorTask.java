@@ -35,7 +35,7 @@ import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.graph.analysis.AnalyzerTask;
 import org.matsim.contrib.sna.snowball.SampledVertex;
-import org.matsim.contrib.sna.snowball.sim.ProbabilityEstimator;
+import org.matsim.contrib.sna.snowball.analysis.PiEstimator;
 
 /**
  * @author illenberger
@@ -43,9 +43,9 @@ import org.matsim.contrib.sna.snowball.sim.ProbabilityEstimator;
  */
 public class EstimatorTask extends AnalyzerTask {
 
-	private final ProbabilityEstimator estimator;
+	private final PiEstimator estimator;
 
-	public EstimatorTask(ProbabilityEstimator estimator) {
+	public EstimatorTask(PiEstimator estimator) {
 		this.estimator = estimator;
 	}
 
@@ -58,7 +58,7 @@ public class EstimatorTask extends AnalyzerTask {
 		for (Vertex vertex : graph.getVertices()) {
 			if (((SampledVertex) vertex).isSampled()) {
 				int k = vertex.getNeighbours().size();
-				double p = estimator.getProbability((SampledVertex) vertex);
+				double p = estimator.probability((SampledVertex) vertex);
 
 				probas.adjustOrPutValue(k, p, p);
 				counts.adjustOrPutValue(k, 1, 1);
@@ -74,8 +74,8 @@ public class EstimatorTask extends AnalyzerTask {
 			SampledVertex v_i = (SampledVertex) edge.getVertices().getFirst();
 			SampledVertex v_j = (SampledVertex) edge.getVertices().getSecond();
 			if (v_i.isSampled() && v_j.isSampled()) {
-				double p_i = estimator.getProbability(v_i);
-				double p_j = estimator.getProbability(v_j);
+				double p_i = estimator.probability(v_i);
+				double p_j = estimator.probability(v_j);
 				if (p_i > 0 && p_j > 0) {
 					M_estim += 1 / ((p_i + p_j) - (p_i * p_j));
 //					M_estim += 1/(p_i * p_j);

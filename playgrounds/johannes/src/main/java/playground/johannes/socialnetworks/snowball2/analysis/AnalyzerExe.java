@@ -25,6 +25,7 @@ import org.matsim.contrib.sna.graph.analysis.DegreeTask;
 import org.matsim.contrib.sna.graph.analysis.GraphAnalyzer;
 import org.matsim.contrib.sna.graph.analysis.GraphSizeTask;
 import org.matsim.contrib.sna.graph.analysis.TransitivityTask;
+import org.matsim.contrib.sna.snowball.analysis.ObservedDegree;
 
 import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
 import playground.johannes.socialnetworks.graph.spatial.analysis.DistanceTask;

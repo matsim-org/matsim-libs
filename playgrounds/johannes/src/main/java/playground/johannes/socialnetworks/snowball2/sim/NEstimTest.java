@@ -36,7 +36,8 @@ import org.matsim.contrib.sna.graph.analysis.FixedSizeRandomPartition;
 import org.matsim.contrib.sna.graph.analysis.RandomPartition;
 import org.matsim.contrib.sna.graph.io.SparseGraphMLReader;
 import org.matsim.contrib.sna.snowball.SampledVertexDecorator;
-import org.matsim.contrib.sna.snowball.sim.ProbabilityEstimator;
+import org.matsim.contrib.sna.snowball.analysis.PiEstimator;
+import org.matsim.contrib.sna.snowball.analysis.SimplePiEstimator;
 import org.matsim.contrib.sna.snowball.sim.Sampler;
 import org.matsim.contrib.sna.snowball.sim.SamplerListener;
 import org.matsim.core.config.Config;
@@ -158,7 +159,7 @@ public class NEstimTest {
 	
 	private static class NEstimListener implements SamplerListener {
 		
-		private ProbabilityEstimator estimator;
+		private PiEstimator estimator;
 		
 		private int lastIteration;
 
@@ -174,7 +175,7 @@ public class NEstimTest {
 
 		public void reset(int N) {
 			lastIteration = 0;
-			estimator = new Estimator1(N);
+			estimator = new SimplePiEstimator(N);
 		}
 		
 		@Override
@@ -199,7 +200,7 @@ public class NEstimTest {
 					if(vertex.isSampled()) {
 						Vertex delegate = vertex.getDelegate();
 						
-						double p_estim = estimator.getProbability(vertex);
+						double p_estim = estimator.probability(vertex);
 						double p_obs = 0;
 						double[] probas = vertexProbas.get(delegate);
 						if(probas != null)

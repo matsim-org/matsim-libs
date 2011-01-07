@@ -31,10 +31,10 @@ import java.util.Map;
 import java.util.Set;
 
 import org.matsim.contrib.sna.graph.Graph;
+import org.matsim.contrib.sna.snowball.analysis.ObservedDegree;
 
 import playground.johannes.socialnetworks.graph.social.SocialGraph;
 import playground.johannes.socialnetworks.graph.social.SocialVertex;
-import playground.johannes.socialnetworks.snowball2.analysis.ObservedDegree;
 
 /**
  * @author illenberger
@@ -116,8 +116,8 @@ public class EducationTask extends SocioMatrixTask {
 				}
 //				double total = male.size() + female.size();
 				ObservedDegree degree = new ObservedDegree();
-				System.err.println("Degree academic = " + degree.distribution(academic).mean());
-				System.err.println("Degree nonacademic = " + degree.distribution(nonacademic).mean());
+				System.err.println("Degree academic = " + degree.distribution(academic).getMean());
+				System.err.println("Degree nonacademic = " + degree.distribution(nonacademic).getMean());
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

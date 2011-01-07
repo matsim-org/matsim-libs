@@ -33,6 +33,8 @@ import org.apache.log4j.Logger;
 import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.analysis.Degree;
 import org.matsim.contrib.sna.graph.io.SparseGraphMLReader;
+import org.matsim.contrib.sna.math.Histogram;
+import org.matsim.contrib.sna.math.LinearDiscretizer;
 
 /**
  * @author illenberger
@@ -60,7 +62,7 @@ public class EstimRelation extends RunLocator<Double> {
 		SparseGraphMLReader reader = new SparseGraphMLReader();
 		Graph graph = reader.readGraph(graphFile);
 		
-		estimRelation.targetDistr = Degree.getInstance().distribution(graph.getVertices()).absoluteDistribution();
+		estimRelation.targetDistr = Histogram.createHistogram(Degree.getInstance().distribution(graph.getVertices()), new LinearDiscretizer(1.0));
 		/*
 		 * Locate and load run dirs.
 		 */

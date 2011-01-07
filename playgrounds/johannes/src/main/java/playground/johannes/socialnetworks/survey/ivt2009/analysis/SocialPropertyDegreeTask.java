@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DegreeAgeTask.java
+ * SocialPropertyDegreeTask.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,60 +17,56 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.graph.social.analysis;
+package playground.johannes.socialnetworks.survey.ivt2009.analysis;
 
-import gnu.trove.TObjectDoubleHashMap;
-import gnu.trove.TObjectDoubleIterator;
+import gnu.trove.TDoubleDoubleHashMap;
+import gnu.trove.TDoubleObjectHashMap;
 
 import java.io.IOException;
 import java.util.Map;
-import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.sna.graph.Graph;
-import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.graph.analysis.Degree;
 import org.matsim.contrib.sna.graph.analysis.ModuleAnalyzerTask;
+import org.matsim.contrib.sna.math.Discretizer;
+import org.matsim.contrib.sna.math.DummyDiscretizer;
+import org.matsim.contrib.sna.util.TXTWriter;
 
-import playground.johannes.socialnetworks.graph.social.SocialVertex;
-import playground.johannes.socialnetworks.statistics.Correlations;
+import playground.johannes.socialnetworks.graph.analysis.VertexPropertyCorrelation;
+import playground.johannes.socialnetworks.graph.social.SocialGraph;
+import playground.johannes.socialnetworks.graph.social.analysis.Age;
 
 /**
  * @author illenberger
  *
  */
-public class DegreeAgeTask extends ModuleAnalyzerTask<Degree> {
+public class SocialPropertyDegreeTask extends ModuleAnalyzerTask<Degree> {
 
-	private static final Logger logger = Logger.getLogger(DegreeAgeTask.class);
+	private Discretizer discretizer = new DummyDiscretizer();
 	
-	public DegreeAgeTask() {
-		setModule(Degree.getInstance());
+	public void setDiscretizer(Discretizer discretizer) {
+		this.discretizer = discretizer;
 	}
 	
 	@Override
-	public void analyze(Graph graph, Map<String, Double> stats) {
-		if(getOutputDirectory() != null) {
-			
-			TObjectDoubleHashMap<Vertex> kValues = module.values(graph.getVertices());
-			TObjectDoubleHashMap<SocialVertex> ageValues = new Age().values((Set<? extends SocialVertex>) graph.getVertices());
-			
-			double[] kValues2 = new double[kValues.size()];
-			double[] ageValues2 = new double[kValues.size()];
-			TObjectDoubleIterator<Vertex> it = kValues.iterator();
-			for(int i = 0; i < kValues.size(); i++) {
-				it.advance();
-				kValues2[i] = it.value();
-				ageValues2[i] = ageValues.get((SocialVertex) it.key());
-			}
-			
+	public void analyze(Graph g, Map<String, Double> stats) {
+		if(outputDirectoryNotNull()) {
 			try {
-				Correlations.writeToFile(Correlations.mean(kValues2, ageValues2, 5.0), getOutputDirectory() + "/k_age.txt", "k", "age");
+				SocialGraph graph = (SocialGraph) g;
+				/*
+				 * age-degree correlation
+				 */
+				TDoubleDoubleHashMap correl = VertexPropertyCorrelation.mean(Age.getInstance(), module, graph.getVertices(), discretizer);
+				TXTWriter.writeMap(correl, "k", "age", getOutputDirectory() + "/age_k.mean.txt");
+				
+				TDoubleObjectHashMap<DescriptiveStatistics> stat = VertexPropertyCorrelation.statistics(Age.getInstance(), module, graph.getVertices(), discretizer);
+				TXTWriter.writeBoxplotStats(stat, getOutputDirectory() + "/age_k.table.txt");
+				
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			} else {
-				logger.warn("No ouput directory specified!");
-			}
+		}
 		
 	}
 

@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PajekScalarColorizer.java
+ * HTStatsFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,59 +17,30 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.johannes.socialnetworks.snowball2.analysis;
 
-/**
- * 
- */
-package playground.johannes.socialnetworks.graph.io;
+import org.matsim.contrib.sna.math.DescriptivePiStatistics;
+import org.matsim.contrib.sna.math.DescriptivePiStatisticsFactory;
 
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.matsim.contrib.sna.graph.Edge;
-import org.matsim.contrib.sna.graph.Graph;
-import org.matsim.contrib.sna.graph.Vertex;
-import org.matsim.contrib.sna.graph.analysis.Degree;
+import playground.johannes.socialnetworks.statistics.HorwitzThompsonEstimator;
 
 /**
  * @author illenberger
  *
  */
-public class PajekDegreeColorizer<V extends Vertex, E extends Edge> extends PajekColorizer<V, E> {
+public class HTStatsFactory implements DescriptivePiStatisticsFactory {
+
+	private int N;
 	
-	private double k_min;
-	
-	private double k_max;
-	
-	private boolean logScale;
-	
-	public PajekDegreeColorizer(Graph g, boolean logScale) {
-		super();
-		setLogScale(logScale);
-		DescriptiveStatistics stats = Degree.getInstance().distribution(g.getVertices());
-		k_min = stats.getMin();
-		k_max = stats.getMax();
-	}
-	
-	public void setLogScale(boolean flag) {
-		logScale = flag;
+	public HTStatsFactory(int N) {
+		this.N = N;
 	}
 	
 	@Override
-	public String getEdgeColor(E e) {
-		return getColor(-1);
+	public DescriptivePiStatistics newInstance() {
+		DescriptivePiStatistics stats = new DescriptivePiStatistics();
+		stats.setMeanImpl(new HorwitzThompsonEstimator(N));
+		return stats;
 	}
 
-	@Override
-	public String getVertexFillColor(V ego) {
-		int k = ego.getNeighbours().size();
-		double color = -1;
-		if(logScale) {
-			double min = Math.log(k_min + 1);
-			double max = Math.log(k_max + 1);
-			color = (Math.log(k + 1) - min) / (max - min);
-		} else {
-			color = (k - k_min) / (k_max - k_min);
-		}
-		
-		return getColor(color);
-	}
 }

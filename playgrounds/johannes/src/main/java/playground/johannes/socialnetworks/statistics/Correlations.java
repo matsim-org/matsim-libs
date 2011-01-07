@@ -35,8 +35,8 @@ import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.sna.math.Discretizer;
 import org.matsim.contrib.sna.math.DummyDiscretizer;
 import org.matsim.contrib.sna.math.LinearDiscretizer;
+import org.matsim.contrib.sna.util.TXTWriter;
 
-import playground.johannes.socialnetworks.utils.TXTWriter;
 
 /**
  * @author illenberger

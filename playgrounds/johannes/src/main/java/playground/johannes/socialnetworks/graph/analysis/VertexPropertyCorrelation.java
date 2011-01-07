@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.analysis;
 
+import gnu.trove.TDoubleArrayList;
 import gnu.trove.TDoubleDoubleHashMap;
 import gnu.trove.TDoubleObjectHashMap;
 import gnu.trove.TObjectDoubleHashMap;
@@ -41,16 +42,16 @@ import playground.johannes.socialnetworks.statistics.Correlations;
  */
 public class VertexPropertyCorrelation {
 
-	public static <V extends Vertex> TDoubleDoubleHashMap mean(VertexProperty<V> propY, VertexProperty<V> porpX, Set<? extends V> vertices) {
+	public static TDoubleDoubleHashMap mean(VertexProperty propY, VertexProperty porpX, Set<? extends Vertex> vertices) {
 		return mean(propY, porpX, vertices, new DummyDiscretizer());
 	}
 	
-	public static <V extends Vertex> TDoubleDoubleHashMap mean(VertexProperty<V> propY, VertexProperty<V> propX, Set<? extends V> vertices, Discretizer discretizer) {
-		TObjectDoubleHashMap<V> propValuesX = propX.values(vertices);
-		Set<V> filtered = filter(propValuesX);
-		TObjectDoubleHashMap<V> propValuesY = propY.values(filtered);
+	public static TDoubleDoubleHashMap mean(VertexProperty propY, VertexProperty propX, Set<? extends Vertex> vertices, Discretizer discretizer) {
+		TObjectDoubleHashMap<Vertex> propValuesX = propX.values(vertices);
+		Set<Vertex> filtered = filter(propValuesX);
+		TObjectDoubleHashMap<Vertex> propValuesY = propY.values(filtered);
 		
-		return mean(propValuesY, propValuesX, filtered, discretizer);
+		return mean(propValuesY, propValuesX, discretizer);
 	}
 	
 	private static <V extends Vertex> Set<V> filter(TObjectDoubleHashMap<V> propValuesX) {
@@ -63,47 +64,45 @@ public class VertexPropertyCorrelation {
 		return filtered;
 	}
 	
-	public static <V extends Vertex> TDoubleDoubleHashMap mean(TObjectDoubleHashMap<V> propValuesY, TObjectDoubleHashMap<V> propValuesX, Set<? extends V> vertices, Discretizer discretizer) {
-		double[] valuesY = new double[propValuesY.size()];
-		double[] valuesX = new double[propValuesX.size()];
-		int i = 0;
-		for(V vertex : vertices) {
-			valuesY[i] = propValuesY.get(vertex);
-			valuesX[i] = discretizer.discretize(propValuesX.get(vertex));
-			i++;
-		}
+	public static TDoubleDoubleHashMap mean(TObjectDoubleHashMap<? extends Vertex> propValuesY, TObjectDoubleHashMap<? extends Vertex> propValuesX, Discretizer discretizer) {
+		TDoubleArrayList valuesY = new TDoubleArrayList(propValuesX.size());
+		TDoubleArrayList valuesX = new TDoubleArrayList(propValuesX.size());
+
+		discretizeValues((TObjectDoubleHashMap<Vertex>) propValuesY, (TObjectDoubleHashMap<Vertex>) propValuesX, valuesX, valuesY, discretizer);
 		
-		return Correlations.mean(valuesX, valuesY);
+		return Correlations.mean(valuesX.toNativeArray(), valuesY.toNativeArray());
 	}
 	
-	public static <V extends Vertex> TDoubleObjectHashMap<DescriptiveStatistics> statistics(VertexProperty<V> propY, VertexProperty<V> porpX, Set<? extends V> vertices) {
+	public static TDoubleObjectHashMap<DescriptiveStatistics> statistics(VertexProperty propY, VertexProperty porpX, Set<? extends Vertex> vertices) {
 		return statistics(propY, porpX, vertices, new DummyDiscretizer());
 	}
 	
-	public static <V extends Vertex> TDoubleObjectHashMap<DescriptiveStatistics> statistics(VertexProperty<V> propY, VertexProperty<V> propX, Set<? extends V> vertices, Discretizer discretizer) {
-		TObjectDoubleHashMap<V> propValuesX = propX.values(vertices);
-		Set<V> filtered = filter(propValuesX);
-		TObjectDoubleHashMap<V> propValuesY = propY.values(filtered);
+	public static TDoubleObjectHashMap<DescriptiveStatistics> statistics(VertexProperty propY, VertexProperty propX, Set<? extends Vertex> vertices, Discretizer discretizer) {
+		TObjectDoubleHashMap<Vertex> propValuesX = propX.values(vertices);
+		Set<Vertex> filtered = filter(propValuesX);
+		TObjectDoubleHashMap<Vertex> propValuesY = propY.values(filtered);
 		
-		return statistics(propValuesY, propValuesX, filtered, discretizer);
+		return statistics(propValuesY, propValuesX, discretizer);
 	}
 	
-	public static <V extends Vertex> TDoubleObjectHashMap<DescriptiveStatistics> statistics(TObjectDoubleHashMap<V> propValuesY, TObjectDoubleHashMap<V> propValuesX, Set<? extends Vertex> vertices, Discretizer discretizer) {
-		double[] valuesY = new double[propValuesY.size()];
-		double[] valuesX = new double[propValuesX.size()];
+	public static TDoubleObjectHashMap<DescriptiveStatistics> statistics(TObjectDoubleHashMap<? extends Vertex> propValuesY, TObjectDoubleHashMap<? extends Vertex> propValuesX, Discretizer discretizer) {
+		TDoubleArrayList valuesY = new TDoubleArrayList(propValuesX.size());
+		TDoubleArrayList valuesX = new TDoubleArrayList(propValuesX.size());
 		
-		discretizeValues(propValuesY, propValuesX, valuesX, valuesY, discretizer);
+		discretizeValues((TObjectDoubleHashMap<Vertex>)propValuesY, (TObjectDoubleHashMap<Vertex>)propValuesX, valuesX, valuesY, discretizer);
 		
-		return Correlations.statistics(valuesX, valuesY, discretizer);
+		return Correlations.statistics(valuesX.toNativeArray(), valuesY.toNativeArray(), discretizer);
 	}
 	
-	private static <V extends Vertex> void discretizeValues(TObjectDoubleHashMap<V> propValuesY, TObjectDoubleHashMap<V> propValuesX, double[] valuesX, double[] valuesY, Discretizer discretizer) {
-		TObjectDoubleIterator<V> it = propValuesX.iterator();
+	private static void discretizeValues(TObjectDoubleHashMap<Vertex> propValuesY, TObjectDoubleHashMap<Vertex> propValuesX, TDoubleArrayList valuesX, TDoubleArrayList valuesY, Discretizer discretizer) {
+		TObjectDoubleIterator<Vertex> it = propValuesX.iterator();
 		
 		for(int i = 0; i < propValuesX.size(); i++) {
 			it.advance();
-			valuesY[i] = propValuesY.get(it.key());
-			valuesX[i] = discretizer.discretize(it.value());
+			if(propValuesY.containsKey(it.key())) {
+				valuesY.add(propValuesY.get(it.key()));
+				valuesX.add(discretizer.discretize(it.value()));
+			}
 		}
 	}
 }

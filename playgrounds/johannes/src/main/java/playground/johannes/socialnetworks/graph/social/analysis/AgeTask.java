@@ -31,10 +31,10 @@ import org.apache.log4j.Logger;
 import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.analysis.ModuleAnalyzerTask;
 import org.matsim.contrib.sna.math.Distribution;
+import org.matsim.contrib.sna.util.TXTWriter;
 
 import playground.johannes.socialnetworks.graph.social.SocialEdge;
 import playground.johannes.socialnetworks.graph.social.SocialVertex;
-import playground.johannes.socialnetworks.utils.TXTWriter;
 
 /**
  * @author illenberger
@@ -79,7 +79,7 @@ public class AgeTask extends ModuleAnalyzerTask<Age> {
 				TXTWriter.writeMap(age.correlation((Set<? extends SocialVertex>) graph.getVertices()), "age", "age_mean", getOutputDirectory() + "/age_age.mean.txt");
 				
 				TDoubleObjectHashMap<DescriptiveStatistics> stat = module.boxplot((Set<? extends SocialVertex>) graph.getVertices());
-				TXTWriter.writeStatsTable(stat, getOutputDirectory() + "age_age.table.txt");
+				TXTWriter.writeBoxplotStats(stat, getOutputDirectory() + "age_age.table.txt");
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			} catch (IOException e) {

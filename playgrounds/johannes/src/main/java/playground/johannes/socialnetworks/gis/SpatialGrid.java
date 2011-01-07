@@ -62,7 +62,11 @@ public class SpatialGrid<T> {
 		this.resolution = resolution;
 		int numXBins = (int)Math.ceil((maxX - minX) / resolution) + 1;
 		int numYBins = (int)Math.ceil((maxY - minY) / resolution) + 1;
-		matrix = new Object[numXBins][numYBins];
+		matrix = new Object[numYBins][numXBins];
+	}
+	
+	public SpatialGrid(SpatialGrid<?> grid) {
+		this(grid.getXmin(), grid.getYmin(), grid.getXmax(), grid.getYmax(), grid.getResolution());
 	}
 	
 	public double getXmin() {
@@ -96,14 +100,14 @@ public class SpatialGrid<T> {
 	@SuppressWarnings("unchecked")
 	public T getValue(Point point) {
 		if(isInBounds(point))
-			return (T)matrix[getRow(point.getX())][getColumn(point.getY())];
+			return (T)matrix[getRow(point.getY())][getColumn(point.getX())];
 		else
 			return null;
 	}
 	
 	public boolean setValue(T value, Point point) {
 		if(isInBounds(point)) {
-			matrix[getRow(point.getX())][getColumn(point.getY())] = value;
+			matrix[getRow(point.getY())][getColumn(point.getX())] = value;
 			return true;
 		} else
 			return false;
@@ -130,12 +134,12 @@ public class SpatialGrid<T> {
 			return false;
 	}
 	
-	public int getRow(double xCoord) {
-		return (int)Math.floor((xCoord - minX) / resolution);
+	public int getRow(double yCoord) {
+		return matrix.length - 1 - (int)Math.floor((yCoord - minY) / resolution);
 	}
 	
-	public int getColumn(double yCoord) {
-		return (int)Math.floor((yCoord - minY) / resolution);
+	public int getColumn(double xCoord) {
+		return (int)Math.floor((xCoord - minX) / resolution);
 	}
 	
 	@SuppressWarnings("unchecked")

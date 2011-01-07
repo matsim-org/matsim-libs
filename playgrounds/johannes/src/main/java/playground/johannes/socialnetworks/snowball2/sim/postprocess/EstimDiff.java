@@ -38,6 +38,8 @@ import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.analysis.Degree;
 import org.matsim.contrib.sna.graph.io.SparseGraphMLReader;
 import org.matsim.contrib.sna.math.Distribution;
+import org.matsim.contrib.sna.math.Histogram;
+import org.matsim.contrib.sna.math.LinearDiscretizer;
 
 /**
  * @author illenberger
@@ -109,7 +111,7 @@ public class EstimDiff extends RunLocator<EstimDiffContainer> {
 		SparseGraphMLReader reader = new SparseGraphMLReader();
 		Graph graph = reader.readGraph(graphFile);
 		
-		return Degree.getInstance().distribution(graph.getVertices()).absoluteDistribution();
+		return Histogram.createHistogram(Degree.getInstance().distribution(graph.getVertices()), new LinearDiscretizer(1.0));
 	}
 
 	@Override

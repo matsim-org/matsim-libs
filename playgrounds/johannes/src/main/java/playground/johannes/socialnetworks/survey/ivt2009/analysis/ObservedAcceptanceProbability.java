@@ -36,6 +36,15 @@ import com.vividsolutions.jts.geom.Point;
  */
 public class ObservedAcceptanceProbability extends AcceptanceProbability {
 
+	private static ObservedAcceptanceProbability instance;
+	
+	public static ObservedAcceptanceProbability getInstance() {
+		if(instance == null)
+			instance = new ObservedAcceptanceProbability();
+		return instance;
+	}
+	
+	@SuppressWarnings("unchecked")
 	@Override
 	public Distribution distribution(Set<? extends SpatialVertex> vertices, Set<Point> choiceSet) {
 		return super.distribution((Set<? extends SpatialVertex>) SnowballPartitions.createSampledPartition((Set<? extends SampledVertex>)vertices), choiceSet);

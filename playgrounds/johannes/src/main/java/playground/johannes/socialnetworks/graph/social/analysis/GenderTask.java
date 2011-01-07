@@ -35,11 +35,11 @@ import java.util.Map;
 import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.graph.analysis.Degree;
+import org.matsim.contrib.sna.snowball.analysis.ObservedDegree;
 
 import playground.johannes.socialnetworks.graph.matrix.CalcCentrality;
 import playground.johannes.socialnetworks.graph.social.SocialGraph;
 import playground.johannes.socialnetworks.graph.social.SocialVertex;
-import playground.johannes.socialnetworks.snowball2.analysis.ObservedDegree;
 import playground.johannes.socialnetworks.statistics.Correlations;
 
 /**

@@ -51,49 +51,49 @@ public class ZoneLayerSHP {
 	 * @throws IOException
 	 */
 	public static void write(ZoneLayer layer, String filename) throws IOException {
-		/*
-		 * Create a data store
-		 */
-		URL url = new File(filename).toURI().toURL();
-		ShapefileDataStore datastore = new ShapefileDataStore(url);
-		/*
-		 * Retrieve one feature to get the FeatureType for schema creation
-		 */
-		FeatureType featureType = layer.getZones().iterator().next().getFeature().getFeatureType();
-		datastore.createSchema(featureType);
-		/*
-		 * Create a FeatureWriter and write the attributes
-		 */
-		FeatureWriter writer = datastore.getFeatureWriter(Transaction.AUTO_COMMIT);
-		for(Zone zone : layer.getZones()) {
-			Feature feature = writer.next();
-			for(int i = 0; i < zone.getFeature().getNumberOfAttributes(); i++) {
-				try {
-					feature.setAttribute(i, zone.getFeature().getAttribute(i));
-				} catch (ArrayIndexOutOfBoundsException e) {
-					e.printStackTrace();
-				} catch (IllegalAttributeException e) {
-					e.printStackTrace();
-				}
-			}
-			writer.write();
-		}
-		/*
-		 * It seems that in some cases the .prj file is not written. This is a
-		 * workaround to manually write the .prj file.
-		 */
-		int idx = filename.lastIndexOf(".");
-		if(idx >= 0) 
-			filename = filename.substring(0,  idx + 1) + "prj";
-		else
-			filename = filename + ".prj";
-		File file = new File(filename);
-		if(!file.exists()) {
-			PrintWriter pwriter = new PrintWriter(new File(filename));
-			String wkt = featureType.getDefaultGeometry().getCoordinateSystem().toWKT();
-			pwriter.write(wkt);
-			pwriter.close();
-		}
+//		/*
+//		 * Create a data store
+//		 */
+//		URL url = new File(filename).toURI().toURL();
+//		ShapefileDataStore datastore = new ShapefileDataStore(url);
+//		/*
+//		 * Retrieve one feature to get the FeatureType for schema creation
+//		 */
+//		FeatureType featureType = layer.getZones().iterator().next().getFeature().getFeatureType();
+//		datastore.createSchema(featureType);
+//		/*
+//		 * Create a FeatureWriter and write the attributes
+//		 */
+//		FeatureWriter writer = datastore.getFeatureWriter(Transaction.AUTO_COMMIT);
+//		for(Zone zone : layer.getZones()) {
+//			Feature feature = writer.next();
+//			for(int i = 0; i < zone.getFeature().getNumberOfAttributes(); i++) {
+//				try {
+//					feature.setAttribute(i, zone.getFeature().getAttribute(i));
+//				} catch (ArrayIndexOutOfBoundsException e) {
+//					e.printStackTrace();
+//				} catch (IllegalAttributeException e) {
+//					e.printStackTrace();
+//				}
+//			}
+//			writer.write();
+//		}
+//		/*
+//		 * It seems that in some cases the .prj file is not written. This is a
+//		 * workaround to manually write the .prj file.
+//		 */
+//		int idx = filename.lastIndexOf(".");
+//		if(idx >= 0) 
+//			filename = filename.substring(0,  idx + 1) + "prj";
+//		else
+//			filename = filename + ".prj";
+//		File file = new File(filename);
+//		if(!file.exists()) {
+//			PrintWriter pwriter = new PrintWriter(new File(filename));
+//			String wkt = featureType.getDefaultGeometry().getCoordinateSystem().toWKT();
+//			pwriter.write(wkt);
+//			pwriter.close();
+//		}
 	}
 
 	/**
@@ -107,7 +107,7 @@ public class ZoneLayerSHP {
 	public static ZoneLayer read(String filename) throws IOException {
 		Set<Zone> zones = new HashSet<Zone>();
 		for(Feature feature : FeatureSHP.readFeatures(filename)) {
-			zones.add(new Zone(feature));
+			zones.add(new Zone(feature.getDefaultGeometry()));
 		}
 		
 		return new ZoneLayer(zones);

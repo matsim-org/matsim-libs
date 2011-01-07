@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.statistics;
+package playground.johannes.socialnetworks.snowball2.sim.deprecated;
 
 import gnu.trove.TDoubleArrayList;
 

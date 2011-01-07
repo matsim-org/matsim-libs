@@ -20,6 +20,7 @@
 package playground.johannes.socialnetworks.snowball2.sim.postprocess;
 
 import gnu.trove.TIntDoubleHashMap;
+import gnu.trove.TIntIntHashMap;
 import gnu.trove.TIntObjectHashMap;
 
 import java.io.BufferedReader;
@@ -30,6 +31,8 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.SortedSet;
 import java.util.TreeSet;
+
+import org.apache.commons.math.stat.StatUtils;
 
 /**
  * @author illenberger
@@ -70,13 +73,19 @@ public class Merge {
 			
 			String line;
 			
+			double lastVal = 0;
 			while((line = reader.readLine()) != null) {
 				String tokens[] = line.split("\t");
-				int key = Integer.parseInt(tokens[0]);
-				double val = Double.parseDouble(tokens[1]);
+				int key = (int) Double.parseDouble(tokens[1]);
+				double val = Double.parseDouble(tokens[0]);
 				
+				if(key < lastVal)
+					break;
+				else {
 				row.put(key, val);
 				dumpKeys.add(key);
+				lastVal = key;
+				}
 			}
 			
 			table.put(dumpKey, row);
@@ -91,12 +100,18 @@ public class Merge {
 		int[] paramVals = table.keys();
 		Arrays.sort(paramVals);
 		
+		TIntDoubleHashMap maxVals = new TIntDoubleHashMap();
+		
 		for(int val : paramVals) {
 			writer.write(String.valueOf(val));
 			writer.write("\t");
+			
+			TIntDoubleHashMap row = table.get(val);
+			maxVals.put(val, StatUtils.max(row.getValues()));
 		}
 		writer.newLine();
 		
+		TIntIntHashMap lastVal = new TIntIntHashMap();
 		for(Integer key : dumpKeys) {
 			writer.write(key.toString());
 			writer.write("\t");
@@ -104,8 +119,13 @@ public class Merge {
 				TIntDoubleHashMap row = table.get(seed);
 				if(row.containsKey(key)) {
 					writer.write(String.valueOf(row.get(key)));
+					lastVal.put(seed, (int) row.get(key));
 				} else {
-					writer.write("NA");
+					double last = lastVal.get(seed);
+					if(last >= maxVals.get(seed))
+						writer.write("NA");
+					else
+						writer.write(String.valueOf(last));
 				}
 				writer.write("\t");
 			}

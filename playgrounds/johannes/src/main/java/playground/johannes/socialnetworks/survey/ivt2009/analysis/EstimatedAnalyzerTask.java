@@ -22,15 +22,14 @@ package playground.johannes.socialnetworks.survey.ivt2009.analysis;
 import org.matsim.contrib.sna.graph.analysis.DegreeTask;
 import org.matsim.contrib.sna.graph.analysis.TransitivityTask;
 import org.matsim.contrib.sna.snowball.SampledGraph;
-import org.matsim.contrib.sna.snowball.sim.ProbabilityEstimator;
+import org.matsim.contrib.sna.snowball.analysis.EstimatedTransitivity;
+import org.matsim.contrib.sna.snowball.analysis.PiEstimator;
+import org.matsim.contrib.sna.snowball.analysis.SimplePiEstimator;
 
 import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
-import playground.johannes.socialnetworks.snowball2.analysis.EstimatedDegree2;
-import playground.johannes.socialnetworks.snowball2.analysis.EstimatedTransitivity2;
-import playground.johannes.socialnetworks.snowball2.sim.Estimator1;
+import playground.johannes.socialnetworks.snowball2.analysis.WSMStatsFactory;
 import playground.johannes.socialnetworks.snowball2.sim.EstimatorTask;
-import playground.johannes.socialnetworks.snowball2.sim.NormalizedEstimator;
-import playground.johannes.socialnetworks.snowball2.sim.deprecated.HTEstimator;
+import playground.johannes.socialnetworks.snowball2.sim.deprecated.EstimatedDegree2;
 
 /**
  * @author illenberger
@@ -41,17 +40,17 @@ public class EstimatedAnalyzerTask extends AnalyzerTaskComposite {
 	private final static int N = 5200000;
 	
 	public EstimatedAnalyzerTask(SampledGraph graph) {
-		ProbabilityEstimator estim = new Estimator1(N);
+		PiEstimator estim = new SimplePiEstimator(N);
 //		ProbabilityEstimator estim = new NormalizedEstimator(new Estimator1(N), N);
 		estim.update(graph);
 		
 		DegreeTask kTask = new DegreeTask();
 //		kTask.setModule(new EstimatedDegree2(estim, new HTEstimator(N), new HTEstimator(N)));
-		kTask.setModule(new EstimatedDegree2(estim, null, null));
+		kTask.setModule(new EstimatedDegree2(estim, new WSMStatsFactory()));
 		addTask(kTask);
 		
 		TransitivityTask tTask = new TransitivityTask();
-		tTask.setModule(new EstimatedTransitivity2(estim, new HTEstimator(N)));
+		tTask.setModule(new EstimatedTransitivity(estim, new WSMStatsFactory(), true));
 		addTask(tTask);
 		
 		addTask(new EstimatorTask(estim));

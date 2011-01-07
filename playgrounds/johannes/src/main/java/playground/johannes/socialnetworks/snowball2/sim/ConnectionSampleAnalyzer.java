@@ -32,7 +32,7 @@ import org.matsim.contrib.sna.graph.analysis.AnalyzerTask;
 import org.matsim.contrib.sna.graph.analysis.Components;
 import org.matsim.contrib.sna.snowball.SampledVertex;
 import org.matsim.contrib.sna.snowball.SampledVertexDecorator;
-import org.matsim.contrib.sna.snowball.sim.ProbabilityEstimator;
+import org.matsim.contrib.sna.snowball.analysis.PiEstimator;
 import org.matsim.contrib.sna.snowball.sim.SampleAnalyzer;
 import org.matsim.contrib.sna.snowball.sim.Sampler;
 
@@ -55,7 +55,7 @@ public class ConnectionSampleAnalyzer extends SampleAnalyzer {
 	
 	private Components components;
 		
-	public ConnectionSampleAnalyzer(int numSeeds, Map<String, AnalyzerTask> tasks, Collection<ProbabilityEstimator> estimators, String rootDirectory) {
+	public ConnectionSampleAnalyzer(int numSeeds, Map<String, AnalyzerTask> tasks, Collection<PiEstimator> estimators, String rootDirectory) {
 		super(tasks, estimators, rootDirectory);
 		matrix = new boolean[numSeeds][numSeeds];
 		try {

@@ -19,9 +19,11 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.snowball2.sim;
 
+import gnu.trove.TIntDoubleHashMap;
+
 import org.matsim.contrib.sna.snowball.SampledGraph;
 import org.matsim.contrib.sna.snowball.SampledVertex;
-import org.matsim.contrib.sna.snowball.sim.ProbabilityEstimator;
+import org.matsim.contrib.sna.snowball.analysis.PiEstimator;
 
 /**
  * This estimator normalizes the estimates from a delegate estimator such that
@@ -30,14 +32,16 @@ import org.matsim.contrib.sna.snowball.sim.ProbabilityEstimator;
  * @author illenberger
  * 
  */
-public class NormalizedEstimator implements ProbabilityEstimator {
+public class NormalizedEstimator implements PiEstimator {
 
-	private ProbabilityEstimator delegate;
+	private PiEstimator delegate;
 
 	private final double N;
 
-	private double konst;
+	private TIntDoubleHashMap konst = new TIntDoubleHashMap();
 
+	private int currentIt;
+	
 	/**
 	 * Creates a new estimator.
 	 * 
@@ -46,7 +50,7 @@ public class NormalizedEstimator implements ProbabilityEstimator {
 	 * @param N
 	 *            the size of the total population of vertices
 	 */
-	public NormalizedEstimator(ProbabilityEstimator delegate, int N) {
+	public NormalizedEstimator(PiEstimator delegate, int N) {
 		this.delegate = delegate;
 		this.N = N;
 	}
@@ -61,8 +65,8 @@ public class NormalizedEstimator implements ProbabilityEstimator {
 	 *         <code>\sum_i{1/p_i} / N</code>.
 	 */
 	@Override
-	public double getProbability(SampledVertex vertex) {
-		return konst * delegate.getProbability(vertex);
+	public double probability(SampledVertex vertex) {
+		return konst.get(currentIt) * delegate.probability(vertex);
 	}
 
 	/**
@@ -73,18 +77,27 @@ public class NormalizedEstimator implements ProbabilityEstimator {
 	 */
 	@Override
 	public void update(SampledGraph graph) {
+		SampleStats stats = new SampleStats(graph);
+		currentIt = stats.getMaxIteration();
+		
 		delegate.update(graph);
 
 		double sum = 0;
 		for (SampledVertex vertex : graph.getVertices()) {
 			if (vertex.isSampled()) {
-				double p = delegate.getProbability(vertex);
+				double p = delegate.probability(vertex);
 				if(p > 0)
 					sum += 1 / p;
 			}
 		}
 
-		konst = sum / (double) N;
+		konst.put(currentIt, sum / (double) N);
+		
+	}
+
+	@Override
+	public double probability(SampledVertex vertex, int iteration) {
+		return konst.get(Math.max(0, iteration - 1)) * delegate.probability(vertex, iteration);
 	}
 
 }

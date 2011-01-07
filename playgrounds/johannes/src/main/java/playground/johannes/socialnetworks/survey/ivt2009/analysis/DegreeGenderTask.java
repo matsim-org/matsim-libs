@@ -31,10 +31,10 @@ import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.analysis.Degree;
 import org.matsim.contrib.sna.graph.analysis.ModuleAnalyzerTask;
 import org.matsim.contrib.sna.snowball.SampledGraph;
+import org.matsim.contrib.sna.snowball.analysis.ObservedDegree;
 import org.matsim.contrib.sna.snowball.analysis.SnowballPartitions;
 
 import playground.johannes.socialnetworks.graph.social.SocialVertex;
-import playground.johannes.socialnetworks.snowball2.analysis.ObservedDegree;
 
 /**
  * @author illenberger
@@ -71,9 +71,9 @@ public class DegreeGenderTask extends ModuleAnalyzerTask<Degree> {
 					
 					writer.write(String.valueOf(i));
 					writer.write("\t");
-					writer.write(String.valueOf(module.distribution(male).mean()));
+					writer.write(String.valueOf(module.distribution(male).getMean()));
 					writer.write("\t");
-					writer.write(String.valueOf(module.distribution(female).mean()));
+					writer.write(String.valueOf(module.distribution(female).getMean()));
 					writer.newLine();
 				}
 				writer.close();

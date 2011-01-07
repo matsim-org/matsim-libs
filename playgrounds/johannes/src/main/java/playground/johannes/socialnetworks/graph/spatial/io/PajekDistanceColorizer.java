@@ -50,7 +50,7 @@ public class PajekDistanceColorizer extends PajekColorizer<SpatialSparseVertex, 
 	public PajekDistanceColorizer(SpatialSparseGraph graph, boolean logScale) {
 		super();
 		setLogScale(logScale);
-		d_mean = new Distance().vertexMeanValues(graph.getVertices());
+		d_mean = new Distance().vertexMean(graph.getVertices());
 		
 		d_min = Double.MAX_VALUE;
 		d_max = Double.MIN_VALUE;

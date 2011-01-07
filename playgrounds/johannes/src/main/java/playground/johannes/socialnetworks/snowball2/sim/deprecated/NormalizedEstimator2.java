@@ -17,11 +17,11 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.snowball2.sim;
+package playground.johannes.socialnetworks.snowball2.sim.deprecated;
 
 import org.matsim.contrib.sna.snowball.SampledGraph;
 import org.matsim.contrib.sna.snowball.SampledVertex;
-import org.matsim.contrib.sna.snowball.sim.ProbabilityEstimator;
+import org.matsim.contrib.sna.snowball.analysis.PiEstimator;
 
 /**
  * This estimator normalizes the estimates from a delegate estimator such that
@@ -30,9 +30,9 @@ import org.matsim.contrib.sna.snowball.sim.ProbabilityEstimator;
  * @author illenberger
  * 
  */
-public class NormalizedEstimator2 implements ProbabilityEstimator {
+public class NormalizedEstimator2 implements PiEstimator {
 
-	private ProbabilityEstimator delegate;
+	private PiEstimator delegate;
 
 	private final double N;
 
@@ -46,7 +46,7 @@ public class NormalizedEstimator2 implements ProbabilityEstimator {
 	 * @param N
 	 *            the size of the total population of vertices
 	 */
-	public NormalizedEstimator2(ProbabilityEstimator delegate, int N) {
+	public NormalizedEstimator2(PiEstimator delegate, int N) {
 		this.delegate = delegate;
 		this.N = N;
 	}
@@ -61,8 +61,8 @@ public class NormalizedEstimator2 implements ProbabilityEstimator {
 	 *         <code>\sum_i{1/p_i} / N</code>.
 	 */
 	@Override
-	public double getProbability(SampledVertex vertex) {
-		return konst * delegate.getProbability(vertex);
+	public double probability(SampledVertex vertex) {
+		return konst * delegate.probability(vertex);
 	}
 
 	/**
@@ -79,7 +79,7 @@ public class NormalizedEstimator2 implements ProbabilityEstimator {
 		int n = 0;
 		for (SampledVertex vertex : graph.getVertices()) {
 			if (vertex.isSampled()) {
-				sum_p_i += delegate.getProbability(vertex);
+				sum_p_i += delegate.probability(vertex);
 				n++;
 			}
 		}
@@ -99,6 +99,15 @@ public class NormalizedEstimator2 implements ProbabilityEstimator {
 //		double n_square = Math.pow(stats.getAccumulatedNumSampled(stats.getMaxIteration()), 2);
 //		konst = n_square/(double)N * 1/sum;
 
+	}
+
+	/* (non-Javadoc)
+	 * @see org.matsim.contrib.sna.snowball.analysis.PiEstimator#probability(org.matsim.contrib.sna.snowball.SampledVertex, int)
+	 */
+	@Override
+	public double probability(SampledVertex vertex, int iteration) {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
 }

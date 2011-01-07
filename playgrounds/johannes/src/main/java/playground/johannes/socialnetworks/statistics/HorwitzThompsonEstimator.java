@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PajekScalarColorizer.java
+ * HorwitzThompsonEstimator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,59 +17,50 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.johannes.socialnetworks.statistics;
 
-/**
- * 
- */
-package playground.johannes.socialnetworks.graph.io;
-
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.matsim.contrib.sna.graph.Edge;
-import org.matsim.contrib.sna.graph.Graph;
-import org.matsim.contrib.sna.graph.Vertex;
-import org.matsim.contrib.sna.graph.analysis.Degree;
+import org.apache.commons.math.stat.descriptive.UnivariateStatistic;
+import org.matsim.contrib.sna.math.UnivariatePiStatistic;
 
 /**
  * @author illenberger
  *
  */
-public class PajekDegreeColorizer<V extends Vertex, E extends Edge> extends PajekColorizer<V, E> {
+public class HorwitzThompsonEstimator implements UnivariatePiStatistic {
+
+	private final double N;
 	
-	private double k_min;
-	
-	private double k_max;
-	
-	private boolean logScale;
-	
-	public PajekDegreeColorizer(Graph g, boolean logScale) {
-		super();
-		setLogScale(logScale);
-		DescriptiveStatistics stats = Degree.getInstance().distribution(g.getVertices());
-		k_min = stats.getMin();
-		k_max = stats.getMax();
-	}
-	
-	public void setLogScale(boolean flag) {
-		logScale = flag;
+	private double[] piValues;
+
+	public HorwitzThompsonEstimator(double N) {
+		this.N = N;
 	}
 	
 	@Override
-	public String getEdgeColor(E e) {
-		return getColor(-1);
+	public void setPiValues(double[] piValues) {
+		this.piValues = piValues;
 	}
 
 	@Override
-	public String getVertexFillColor(V ego) {
-		int k = ego.getNeighbours().size();
-		double color = -1;
-		if(logScale) {
-			double min = Math.log(k_min + 1);
-			double max = Math.log(k_max + 1);
-			color = (Math.log(k + 1) - min) / (max - min);
-		} else {
-			color = (k - k_min) / (k_max - k_min);
+	public UnivariateStatistic copy() {
+		HorwitzThompsonEstimator ht = new HorwitzThompsonEstimator(N);
+		ht.setPiValues(piValues);
+		return ht;
+	}
+
+	@Override
+	public double evaluate(double[] values) {
+		return evaluate(values, 0, values.length);
+	}
+
+	@Override
+	public double evaluate(double[] values, int begin, int length) {
+		double sum = 0;
+		for(int i = begin; i < (begin + length); i++) {
+			sum += values[i]/piValues[i];
 		}
 		
-		return getColor(color);
+		return sum/N;
 	}
+
 }

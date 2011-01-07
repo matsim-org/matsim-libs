@@ -35,6 +35,7 @@ import org.matsim.contrib.sna.graph.analysis.ModuleAnalyzerTask;
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
 
 import playground.johannes.socialnetworks.statistics.Correlations;
+import visad.data.netcdf.UnsupportedOperationException;
 
 /**
  * @author illenberger
@@ -68,8 +69,9 @@ public class DegreeDensityTask extends ModuleAnalyzerTask<Degree> {
 				if(v.getPoint() != null) {
 				Zone zone = zones.getZone(v.getPoint());
 				if (zone != null) {
-					rhoValues[i] = zone.getPopulationDensity();
+//					rhoValues[i] = zone.getPopulationDensity();
 					kValues[i] = it.value();
+					throw new UnsupportedOperationException("Fix this!");
 				} else {
 					noZone++;
 				}

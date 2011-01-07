@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SpatialGridTableWriter.java
+ * TopoAnalyzerTask.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,40 +17,40 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.gis;
+package playground.johannes.socialnetworks.survey.ivt2009.analysis;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
+import org.matsim.contrib.sna.graph.analysis.ComponentsTask;
+import org.matsim.contrib.sna.graph.analysis.DegreeTask;
+import org.matsim.contrib.sna.graph.analysis.TransitivityTask;
+import org.matsim.contrib.sna.snowball.analysis.ObservedDegree;
+import org.matsim.contrib.sna.snowball.analysis.ObservedTransitivity;
+
+import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
+import playground.johannes.socialnetworks.graph.analysis.PropertyDegreeTask;
+import playground.johannes.socialnetworks.snowball2.analysis.WaveSizeTask;
 
 /**
  * @author illenberger
  *
  */
-public class SpatialGridTableWriter {
+public class TopoObsAnalyzerTask extends AnalyzerTaskComposite {
 
-	public void write(SpatialGrid<Double> grid, String file) throws IOException {
-		BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+	public TopoObsAnalyzerTask() {
+		addTask(new WaveSizeTask());
 		
-		for(int j = 0; j < grid.getNumCols(0); j++) {
-			writer.write("\t");
-			writer.write(String.valueOf(grid.getXmin() + j * grid.getResolution()));
-		}
-		writer.newLine();
+		DegreeTask degreeTask = new DegreeTask();
+		degreeTask.setModule(ObservedDegree.getInstance());
+		addTask(degreeTask);
 		
-		for(int i = grid.getNumRows() - 1; i >=0 ; i--) {
-			writer.write(String.valueOf(grid.getYmax() - i * grid.getResolution()));
-			for(int j = 0; j < grid.getNumCols(i); j++) {
-				writer.write("\t");
-				Double val = grid.getValue(i, j);
-				if(val != null)
-					writer.write(String.valueOf(val));
-				else
-					writer.write("NA");
-			}
-			writer.newLine();
-		}
+		TransitivityTask transitivityTask = new TransitivityTask();
+		transitivityTask.setModule(ObservedTransitivity.getInstance());
+		addTask(transitivityTask);
 		
-		writer.close();
+		PropertyDegreeTask xDegreeTask = new PropertyDegreeTask();
+		xDegreeTask.setModule(ObservedDegree.getInstance());
+		addTask(xDegreeTask);
+		
+		addTask(new ComponentsTask());
 	}
+
 }

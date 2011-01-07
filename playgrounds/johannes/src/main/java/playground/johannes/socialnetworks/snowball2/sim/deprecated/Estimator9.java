@@ -24,7 +24,7 @@ import gnu.trove.TIntIntHashMap;
 import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.snowball.SampledGraph;
 import org.matsim.contrib.sna.snowball.SampledVertex;
-import org.matsim.contrib.sna.snowball.sim.ProbabilityEstimator;
+import org.matsim.contrib.sna.snowball.analysis.PiEstimator;
 
 import playground.johannes.socialnetworks.snowball2.sim.SampleStats;
 
@@ -32,7 +32,7 @@ import playground.johannes.socialnetworks.snowball2.sim.SampleStats;
  * @author illenberger
  *
  */
-public class Estimator9 implements ProbabilityEstimator {
+public class Estimator9 implements PiEstimator {
 
 	private TIntIntHashMap numNeighbors;
 	
@@ -47,7 +47,7 @@ public class Estimator9 implements ProbabilityEstimator {
 	}
 	
 	@Override
-	public double getProbability(SampledVertex vertex) {
+	public double probability(SampledVertex vertex) {
 		int it = stats.getMaxIteration();
 		int k = vertex.getNeighbours().size();
 		
@@ -90,6 +90,16 @@ public class Estimator9 implements ProbabilityEstimator {
 		}
 		
 		C = Math.pow(stats.getAccumulatedNumSampled(stats.getMaxIteration() - 1), 2) / sum;
+	}
+
+
+	/* (non-Javadoc)
+	 * @see org.matsim.contrib.sna.snowball.analysis.PiEstimator#probability(org.matsim.contrib.sna.snowball.SampledVertex, int)
+	 */
+	@Override
+	public double probability(SampledVertex vertex, int iteration) {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
 }

@@ -33,7 +33,7 @@ public class ResponseRate {
 
 	public static double responseRate(Set<? extends SampledVertex> vertices) {
 		double[] rates = responseRatesAccumulated(vertices); 
-		return rates[rates.length - 2];
+		return rates[rates.length - 1];
 	}
 	
 	public static double[] responseRatesAccumulated(Set<? extends SampledVertex> vertices) {

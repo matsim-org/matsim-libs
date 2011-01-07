@@ -158,7 +158,7 @@ public class SnowballAnalyzer {
 			for(int i = 0; i <= it; i++) {
 //				SampledGraphFilter filter = new SampledGraphFilter(builder, i);
 				SampledGraphProjFilter<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge> filter =
-					new SampledGraphProjFilter<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge>(0);
+					new SampledGraphProjFilter<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge>(i);
 				filter.setBuilder(builder);
 				task.addFilter(filter, String.format("it.%1$s", i));
 			}

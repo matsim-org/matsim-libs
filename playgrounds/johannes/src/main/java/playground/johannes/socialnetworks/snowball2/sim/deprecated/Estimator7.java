@@ -32,7 +32,7 @@ import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.math.Distribution;
 import org.matsim.contrib.sna.snowball.SampledGraph;
 import org.matsim.contrib.sna.snowball.SampledVertex;
-import org.matsim.contrib.sna.snowball.sim.ProbabilityEstimator;
+import org.matsim.contrib.sna.snowball.analysis.PiEstimator;
 
 import playground.johannes.socialnetworks.snowball2.sim.SampleStats;
 
@@ -40,7 +40,7 @@ import playground.johannes.socialnetworks.snowball2.sim.SampleStats;
  * @author illenberger
  *
  */
-public class Estimator7 implements ProbabilityEstimator {
+public class Estimator7 implements PiEstimator {
 
 	private SampleStats stats;
 	
@@ -53,7 +53,7 @@ public class Estimator7 implements ProbabilityEstimator {
 	}
 	
 	@Override
-	public double getProbability(SampledVertex vertex) {
+	public double probability(SampledVertex vertex) {
 		int it = stats.getMaxIteration();
 		int k = vertex.getNeighbours().size();
 		
@@ -100,7 +100,7 @@ public class Estimator7 implements ProbabilityEstimator {
 	
 	
 	public double getWeight(SampledVertex vertex) {
-		return 1/getProbability(vertex);
+		return 1/probability(vertex);
 	}
 
 	@Override
@@ -191,5 +191,15 @@ public class Estimator7 implements ProbabilityEstimator {
 //				p = stats.getNumSampled(it)/((double)stats.getNumDetected(it - 1) * stats.getResonseRate());
 			return p * p_k;
 		}
+	}
+
+
+	/* (non-Javadoc)
+	 * @see org.matsim.contrib.sna.snowball.analysis.PiEstimator#probability(org.matsim.contrib.sna.snowball.SampledVertex, int)
+	 */
+	@Override
+	public double probability(SampledVertex vertex, int iteration) {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 }

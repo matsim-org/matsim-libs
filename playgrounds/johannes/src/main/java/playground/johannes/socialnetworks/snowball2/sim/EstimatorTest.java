@@ -39,6 +39,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.apache.commons.math.stat.StatUtils;
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.sna.graph.Edge;
@@ -49,9 +50,12 @@ import org.matsim.contrib.sna.graph.analysis.FixedSizeRandomPartition;
 import org.matsim.contrib.sna.graph.analysis.RandomPartition;
 import org.matsim.contrib.sna.graph.io.SparseGraphMLReader;
 import org.matsim.contrib.sna.math.Distribution;
+import org.matsim.contrib.sna.math.Histogram;
+import org.matsim.contrib.sna.math.LinearDiscretizer;
 import org.matsim.contrib.sna.snowball.SampledEdgeDecorator;
 import org.matsim.contrib.sna.snowball.SampledVertexDecorator;
-import org.matsim.contrib.sna.snowball.sim.ProbabilityEstimator;
+import org.matsim.contrib.sna.snowball.analysis.PiEstimator;
+import org.matsim.contrib.sna.snowball.analysis.SimplePiEstimator;
 import org.matsim.contrib.sna.snowball.sim.Sampler;
 import org.matsim.contrib.sna.snowball.sim.SamplerListener;
 import org.matsim.core.config.Config;
@@ -85,7 +89,7 @@ public class EstimatorTest implements SamplerListener {
 	
 	private TDoubleArrayList[] M_estim = new TDoubleArrayList[INIT_CAPACITY];
 	
-	private ProbabilityEstimator estimator;
+	private PiEstimator estimator;
 	
 	private static final int INIT_CAPACITY = 100;
 	
@@ -114,9 +118,9 @@ public class EstimatorTest implements SamplerListener {
 		lastIteration = 0;
 		int N = graph.getVertices().size();
 		if("estim1b".equalsIgnoreCase(estimtype))
-			estimator = new Estimator1(N);
+			estimator = new SimplePiEstimator(N);
 		else if("estim1a".equalsIgnoreCase(estimtype))
-			estimator = new NormalizedEstimator(new Estimator1(N), N);
+			estimator = new NormalizedEstimator(new SimplePiEstimator(N), N);
 		else {
 			logger.warn(String.format("Estimator type %1$s unkown!", estimtype));
 			System.exit(-1);
@@ -150,7 +154,7 @@ public class EstimatorTest implements SamplerListener {
 
 					double[] probas = vertexProbas.get(delegate);
 					double[] weights = vertexWeights.get(delegate);
-					double p = estimator.getProbability(v);
+					double p = estimator.probability(v);
 					probas[it - 1] += p;
 					weights[it - 1] += 1/p;
 					
@@ -174,8 +178,8 @@ public class EstimatorTest implements SamplerListener {
 					
 					edgeCounts.get(delegate)[it - 1]++;
 					
-					double p_i = estimator.getProbability(v_i);
-					double p_j = estimator.getProbability(v_j);
+					double p_i = estimator.probability(v_i, it - 2);
+					double p_j = estimator.probability(v_j, it - 2);
 
 //					double p_e = p_i * p_j;
 					double p_e = (p_i + p_j) - (p_i * p_j);
@@ -201,12 +205,12 @@ public class EstimatorTest implements SamplerListener {
 
 	private void analyze(Graph graph, String output) throws IOException {
 		final int N = graph.getVertices().size();
-		Distribution k_distr = Degree.getInstance().distribution(graph.getVertices());
-		final int k_max = (int) k_distr.max(); 
+		DescriptiveStatistics k_distr = Degree.getInstance().distribution(graph.getVertices());
+		final int k_max = (int) k_distr.getMax(); 
 		/*
 		 * initialize arrays
 		 */
-		TDoubleDoubleHashMap kHist = k_distr.absoluteDistribution();
+		TDoubleDoubleHashMap kHist = Histogram.createHistogram(k_distr, new LinearDiscretizer(1.0));
 		TDoubleDoubleHashMap[] pObs_k = new TDoubleDoubleHashMap[maxIteration + 1];
 		TDoubleDoubleHashMap[] wObs_k = new TDoubleDoubleHashMap[maxIteration + 1];
 		TDoubleDoubleHashMap[] pEstim_k = new TDoubleDoubleHashMap[maxIteration + 1];
