@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,51 +17,14 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mrieser.core.mobsim.impl;
+package playground.mrieser.core.mobsim.transit;
 
-import java.util.Iterator;
+import org.matsim.core.api.internal.MatsimFactory;
+import org.matsim.pt.qsim.AbstractTransitDriver;
+import org.matsim.pt.qsim.TransitStopAgentTracker;
 
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
+public interface TransitDriverFactory extends MatsimFactory {
 
-import playground.mrieser.core.mobsim.api.PlanAgent;
-
-public class DefaultPlanAgent implements PlanAgent {
-
-	private final Plan plan;
-	private final Iterator<PlanElement> peIterator;
-	private PlanElement currentElement = null;
-	private final double weight;
-
-	public DefaultPlanAgent(final Plan plan, final double weight) {
-		this.plan = plan;
-		this.weight = weight;
-		this.peIterator = this.plan.getPlanElements().iterator();
-	}
-
-	@Override
-	public PlanElement getCurrentPlanElement() {
-		return this.currentElement;
-	}
-
-	@Override
-	public Plan getPlan() {
-		return this.plan;
-	}
-
-	@Override
-	public PlanElement useNextPlanElement() {
-		if (this.peIterator.hasNext()) {
-			this.currentElement = this.peIterator.next();
-		} else {
-			this.currentElement = null;
-		}
-		return this.currentElement;
-	}
-
-	@Override
-	public double getWeight() {
-		return this.weight;
-	}
+	public AbstractTransitDriver createTransitDriver(final TransitStopAgentTracker agentTracker);
 
 }

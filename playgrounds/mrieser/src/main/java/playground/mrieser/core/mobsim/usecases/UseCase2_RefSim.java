@@ -25,13 +25,10 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
-import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.mobsim.framework.Simulation;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.misc.ConfigUtils;
-import org.matsim.ptproject.qsim.QSimFactory;
 
 /**
  * @author mrieser
@@ -56,25 +53,16 @@ public class UseCase2_RefSim {
 		Scenario scenario = loader.loadScenario();
 		System.out.println("# persons: " + scenario.getPopulation().getPersons().size());
 		EventsManager events = new EventsManagerImpl();
-		EventWriterXML ew;
+//		EventWriterXML ew;
 		/* **************************************************************** */
 
-		if (true) {
-			ew = new EventWriterXML("testEventsNewBln.xml");
-			events.addHandler(ew);
-			Simulation sim = new RefSimFactory().createMobsim(scenario, events);
-			sim.run(); // replace with PlanSimulation.runSim();
-		} else {
-			ew = new EventWriterXML("testEventsOldBln.xml");
-			events.addHandler(ew);
-			config.addQSimConfigGroup(new QSimConfigGroup());
-//			config.getQSimConfigGroup().setEndTime(10.0 * 3600);
-			Simulation oldSim = new QSimFactory().createMobsim(scenario, events);
-			oldSim.run();
-		}
+//		ew = new EventWriterXML("testEventsNewBln.xml");
+//		events.addHandler(ew);
+		Simulation sim = new RefSimFactory().createMobsim(scenario, events);
+		sim.run(); // replace with PlanSimulation.runMobsim();
 
 		/* **************************************************************** */
 
-		ew.closeFile();
+//		ew.closeFile();
 	}
 }

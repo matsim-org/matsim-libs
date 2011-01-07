@@ -17,51 +17,22 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mrieser.core.mobsim.impl;
+package playground.mrieser.core.mobsim.transit;
 
-import java.util.Iterator;
+import playground.mrieser.core.mobsim.features.MobsimFeature;
 
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
+public class TransitFeature implements MobsimFeature {
 
-import playground.mrieser.core.mobsim.api.PlanAgent;
-
-public class DefaultPlanAgent implements PlanAgent {
-
-	private final Plan plan;
-	private final Iterator<PlanElement> peIterator;
-	private PlanElement currentElement = null;
-	private final double weight;
-
-	public DefaultPlanAgent(final Plan plan, final double weight) {
-		this.plan = plan;
-		this.weight = weight;
-		this.peIterator = this.plan.getPlanElements().iterator();
+	@Override
+	public void beforeMobSim() {
 	}
 
 	@Override
-	public PlanElement getCurrentPlanElement() {
-		return this.currentElement;
+	public void doSimStep(double time) {
 	}
 
 	@Override
-	public Plan getPlan() {
-		return this.plan;
-	}
-
-	@Override
-	public PlanElement useNextPlanElement() {
-		if (this.peIterator.hasNext()) {
-			this.currentElement = this.peIterator.next();
-		} else {
-			this.currentElement = null;
-		}
-		return this.currentElement;
-	}
-
-	@Override
-	public double getWeight() {
-		return this.weight;
+	public void afterMobSim() {
 	}
 
 }

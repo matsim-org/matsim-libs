@@ -53,9 +53,10 @@ import org.matsim.core.gbl.Gbl;
 	private final CyclicBarrier startLinksBarrier;
 	private final CyclicBarrier finishedBarrier;
 	private QueueNetwork queueNetwork = null;
+	private SlaveOperator master = null;
 
 	public ParallelOperator(final int nOfThreads) {
-		this.nOfThreads = Math.max(1, nOfThreads);
+		this.nOfThreads = Math.max(0, nOfThreads - 1); // the main thread acts also as a thread, thus -1
 		this.threads = new Thread[this.nOfThreads];
 		this.slaves = new SlaveOperator[this.nOfThreads];
 		this.startNodesBarrier = new CyclicBarrier(this.nOfThreads + 1);
@@ -79,18 +80,20 @@ import org.matsim.core.gbl.Gbl;
 
 	@Override
 	public void beforeMobSim() {
+		this.master = new SlaveOperator(this.startNodesBarrier, this.startLinksBarrier, this.finishedBarrier);
 		for (int i = 0; i < this.nOfThreads; i++) {
 			this.slaves[i] = new SlaveOperator(this.startNodesBarrier, this.startLinksBarrier, this.finishedBarrier);
 		}
 		int threadId = 0;
 		for (QueueNode node : this.queueNetwork.getNodes().values()) {
-			node.setOperator(this.slaves[threadId]);
+			SlaveOperator slave = (threadId == this.slaves.length) ? this.master : this.slaves[threadId];
+			node.setOperator(slave);
 			for (Link link : node.node.getOutLinks().values()) {
 				QueueLink qLink = this.queueNetwork.getLinks().get(link.getId());
-				qLink.setOperator(this.slaves[threadId]);
+				qLink.setOperator(slave);
 			}
 			threadId++;
-			if (threadId == this.slaves.length) {
+			if (threadId > this.slaves.length) {
 				threadId = 0;
 			}
 		}
@@ -102,19 +105,19 @@ import org.matsim.core.gbl.Gbl;
 
 	@Override
 	public void doSimStep(double time) {
+		this.master.setTime(time);
 		for (int i = 0; i < this.nOfThreads; i++) {
 			this.slaves[i].setTime(time);
 		}
 		try {
-			this.startNodesBarrier.await();
-			this.startLinksBarrier.await();
-			this.finishedBarrier.await();
+			this.master.handleTimeStep();
+//			this.startNodesBarrier.await();
+//			this.startLinksBarrier.await();
+//			this.finishedBarrier.await();
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		} catch (BrokenBarrierException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -126,11 +129,9 @@ import org.matsim.core.gbl.Gbl;
 		try {
 			this.startNodesBarrier.await();
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		} catch (BrokenBarrierException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -185,24 +186,28 @@ import org.matsim.core.gbl.Gbl;
 		@Override
 		public void run() {
 			try {
-			while (true) {
-					this.startNodesBarrier.await();
-					if (this.finished) {
-						Gbl.printCurrentThreadCpuTime();
-						return;
-					}
-					moveNodes();
-					this.startLinksBarrier.await();
-					moveLinks();
-					this.finishedBarrier.await();
+				while (!this.finished) {
+					handleTimeStep();
 				}
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				throw new RuntimeException(e);
 			} catch (BrokenBarrierException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				throw new RuntimeException(e);
 			}
+			finally {
+				Gbl.printCurrentThreadCpuTime();
+			}
+		}
+
+		private void handleTimeStep() throws InterruptedException, BrokenBarrierException {
+			this.startNodesBarrier.await();
+			if (this.finished) {
+				return;
+			}
+			moveNodes();
+			this.startLinksBarrier.await();
+			moveLinks();
+			this.finishedBarrier.await();
 		}
 
 		private void moveNodes() {

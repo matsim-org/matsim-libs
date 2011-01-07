@@ -17,20 +17,38 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mrieser.core.mobsim.features;
+package playground.mrieser.core.mobsim.transit;
 
-public class TransitFeature implements MobsimFeature {
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.pt.qsim.PassengerAgent;
+import org.matsim.pt.qsim.TransitStopAgentTracker;
+import org.matsim.pt.routes.ExperimentalTransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
-	@Override
-	public void beforeMobSim() {
+import playground.mrieser.core.mobsim.api.DepartureHandler;
+import playground.mrieser.core.mobsim.api.PlanAgent;
+
+/**
+ * @author mrieser
+ */
+public class TransitDepartureHandler implements DepartureHandler {
+
+	private final TransitSchedule schedule;
+	private final TransitStopAgentTracker agentTracker;
+
+	public TransitDepartureHandler(final TransitSchedule schedule, final TransitStopAgentTracker agentTracker) {
+		this.schedule = schedule;
+		this.agentTracker = agentTracker;
 	}
 
 	@Override
-	public void doSimStep(double time) {
-	}
-
-	@Override
-	public void afterMobSim() {
+	public void handleDeparture(final PlanAgent agent) {
+		Leg leg = (Leg) agent.getCurrentPlanElement();
+		ExperimentalTransitRoute route = (ExperimentalTransitRoute) leg.getRoute();
+		Id accessStopId = route.getAccessStopId();
+		PassengerAgent passenger = new PassengerAgentImpl(route);
+		this.agentTracker.addAgentToStop(passenger, this.schedule.getFacilities().get(accessStopId));
 	}
 
 }

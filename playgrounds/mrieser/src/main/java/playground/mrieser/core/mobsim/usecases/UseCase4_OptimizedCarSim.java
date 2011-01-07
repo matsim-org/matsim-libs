@@ -58,7 +58,7 @@ public class UseCase4_OptimizedCarSim {
 		OptimizedCarSimFactory simFactory = new OptimizedCarSimFactory(2);
 		simFactory.setTeleportedModes(new String[] {TransportMode.bike, TransportMode.pt, TransportMode.ride, TransportMode.walk});
 		Simulation sim = simFactory.createMobsim(scenario, events);
-		sim.run(); // replace with PlanSimulation.runSim();
+		sim.run(); // replace with PlanSimulation.runMobsim();
 
 		/* **************************************************************** */
 

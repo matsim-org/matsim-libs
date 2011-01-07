@@ -28,8 +28,10 @@ import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.mobsim.framework.Simulation;
+import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.misc.ConfigUtils;
+import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 
 /**
  * @author mrieser
@@ -38,17 +40,21 @@ public class UseCase3_TransitSim {
 
 	public static void main(String[] args) {
 
-		String prefix = "../../MATSim/";
+		String prefix = "../../matsim/";
 
 		// load data
 		Config config;
 		try {
-			config = ConfigUtils.loadConfig(prefix + "test/scenarios/equil/config.xml");
+			config = ConfigUtils.loadConfig(prefix + "examples/pt-tutorial/0.config.xml");
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
 		ConfigUtils.modifyFilePaths(config, prefix);
+
 		ScenarioLoader loader = new ScenarioLoaderImpl(config);
+
+		((NetworkFactoryImpl) loader.getScenario().getNetwork().getFactory()).setRouteFactory("pt", new ExperimentalTransitRouteFactory());
+
 		Scenario scenario = loader.loadScenario();
 		EventsManager events = new EventsManagerImpl();
 		EventWriterXML ew = new EventWriterXML("testEvents.xml");
@@ -57,7 +63,7 @@ public class UseCase3_TransitSim {
 		/* **************************************************************** */
 
 		Simulation sim = new TransitSimFactory().createMobsim(scenario, events);
-		sim.run(); // replace with PlanSimulation.runSim();
+		sim.run(); // replace with PlanSimulation.runMobsim();
 
 		/* **************************************************************** */
 

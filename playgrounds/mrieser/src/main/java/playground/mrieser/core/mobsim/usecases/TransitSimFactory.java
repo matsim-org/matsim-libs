@@ -20,16 +20,18 @@
 package playground.mrieser.core.mobsim.usecases;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.Simulation;
+import org.matsim.pt.qsim.TransitStopAgentTracker;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.vehicles.Vehicles;
 
-import playground.mrieser.core.mobsim.features.SignalSystemsFeature;
 import playground.mrieser.core.mobsim.features.StatusFeature;
-import playground.mrieser.core.mobsim.features.TransitFeature;
 import playground.mrieser.core.mobsim.features.refQueueNetworkFeature.RefQueueNetworkFeature;
 import playground.mrieser.core.mobsim.impl.ActivityHandler;
 import playground.mrieser.core.mobsim.impl.CarDepartureHandler;
@@ -38,25 +40,38 @@ import playground.mrieser.core.mobsim.impl.LegHandler;
 import playground.mrieser.core.mobsim.impl.PlanSimulationImpl;
 import playground.mrieser.core.mobsim.impl.PopulationAgentSource;
 import playground.mrieser.core.mobsim.impl.TeleportationHandler;
-import playground.mrieser.core.mobsim.impl.TransitDepartureHandler;
+import playground.mrieser.core.mobsim.transit.TransitDepartureHandler;
+import playground.mrieser.core.mobsim.transit.TransitDriverAgentSource;
 
 public class TransitSimFactory implements MobsimFactory {
 
+	private double populationWeight = 1.0;
+
+	/**
+	 * Sets the weight for agents created from the population.
+	 * If your population is a 20%-sample, the weight is typically 5
+	 * (each agent should count for 5 persons).
+	 *
+	 * @param populationWeight
+	 */
+	public void setPopulationWeight(double populationWeight) {
+		this.populationWeight = populationWeight;
+	}
+
 	@Override
 	public Simulation createMobsim(Scenario scenario, EventsManager eventsManager) {
+		// setup transit related stuff
+		TransitSchedule schedule = ((ScenarioImpl) scenario).getTransitSchedule();
+		Vehicles transitVehicles = ((ScenarioImpl) scenario).getVehicles();
+		TransitStopAgentTracker agentTracker = new TransitStopAgentTracker();
 
+		// setup mobsim
 		PlanSimulationImpl planSim = new PlanSimulationImpl(scenario);
 		DefaultTimestepSimEngine engine = new DefaultTimestepSimEngine(planSim, eventsManager);
 		planSim.setMobsimEngine(engine);
 
 		// setup network
 		RefQueueNetworkFeature netFeature = new RefQueueNetworkFeature(scenario.getNetwork(), engine);
-
-		// setup features; order is important!
-		planSim.addMobsimFeature(new StatusFeature());
-		planSim.addMobsimFeature(new SignalSystemsFeature());
-		planSim.addMobsimFeature(new TransitFeature());
-		planSim.addMobsimFeature(netFeature);
 
 		// setup PlanElementHandlers
 		ActivityHandler ah = new ActivityHandler(engine);
@@ -66,15 +81,23 @@ public class TransitSimFactory implements MobsimFactory {
 
 		// setup DepartureHandlers
 		lh.setDepartureHandler(TransportMode.car, new CarDepartureHandler(engine, netFeature, scenario));
-		lh.setDepartureHandler(TransportMode.pt, new TransitDepartureHandler());
+		lh.setDepartureHandler(TransportMode.pt, new TransitDepartureHandler(schedule, agentTracker));
+//		lh.setDepartureHandler("transitVehicle", new TransitDriverDepartureHandler(schedule, agentTracker));
 		TeleportationHandler teleporter = new TeleportationHandler(engine);
 		lh.setDepartureHandler(TransportMode.walk, teleporter);
+		lh.setDepartureHandler(TransportMode.transit_walk, teleporter);
 		lh.setDepartureHandler(TransportMode.bike, teleporter);
 
-		// register agent sources
-		planSim.addAgentSource(new PopulationAgentSource(scenario.getPopulation(), 1.0));
-		// TODO transit agent source
+		// setup features; order is important!
+		planSim.addMobsimFeature(new StatusFeature());
+		planSim.addMobsimFeature(teleporter);
+		planSim.addMobsimFeature(ah);
+//		planSim.addMobsimFeature(new TransitFeature()); // is this really needed?
+		planSim.addMobsimFeature(netFeature);
 
+		// register agent sources
+		planSim.addAgentSource(new PopulationAgentSource(scenario.getPopulation(), this.populationWeight));
+		planSim.addAgentSource(new TransitDriverAgentSource(schedule, transitVehicles, scenario.getNetwork(), agentTracker));
 		return planSim;
 	}
 

@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,19 +17,16 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mrieser.core.mobsim.impl;
+package playground.mrieser.core.mobsim.transit;
 
-import playground.mrieser.core.mobsim.api.DepartureHandler;
-import playground.mrieser.core.mobsim.api.PlanAgent;
+import org.matsim.pt.qsim.AbstractTransitDriver;
+import org.matsim.pt.qsim.TransitStopAgentTracker;
 
-/**
- * @author mrieser
- */
-public class TransitDepartureHandler implements DepartureHandler {
+public class DefaultTransitDriverFactory implements TransitDriverFactory {
 
 	@Override
-	public void handleDeparture(final PlanAgent agent) {
-		throw new RuntimeException("not yet implemented.");
+	public AbstractTransitDriver createTransitDriver(TransitStopAgentTracker agentTracker) {
+		return null;
 	}
 
 }

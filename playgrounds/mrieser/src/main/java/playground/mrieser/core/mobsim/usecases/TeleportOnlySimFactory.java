@@ -37,6 +37,19 @@ import playground.mrieser.core.mobsim.impl.TeleportationHandler;
 
 public class TeleportOnlySimFactory implements MobsimFactory {
 
+	private double populationWeight = 1.0;
+
+	/**
+	 * Sets the weight for agents created from the population.
+	 * If your population is a 20%-sample, the weight is typically 5
+	 * (each agent should count for 5 persons).
+	 *
+	 * @param populationWeight
+	 */
+	public void setPopulationWeight(double populationWeight) {
+		this.populationWeight = populationWeight;
+	}
+
 	@Override
 	public Simulation createMobsim(Scenario sc, EventsManager eventsManager) {
 
@@ -67,7 +80,7 @@ public class TeleportOnlySimFactory implements MobsimFactory {
 		lh.setDepartureHandler("undefined", teleporter);
 
 		// register agent sources
-		planSim.addAgentSource(new PopulationAgentSource(sc.getPopulation(), 1.0));
+		planSim.addAgentSource(new PopulationAgentSource(sc.getPopulation(), this.populationWeight));
 
 		return planSim;
 	}

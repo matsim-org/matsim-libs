@@ -46,6 +46,7 @@ public class OptimizedCarSimFactory implements MobsimFactory {
 	private final int nOfThreads;
 	private OTFVisLiveServer otfvisServer = null;
 	private String[] teleportedModes = null;
+	private double populationWeight = 1.0;
 
 	/**
 	 * @param nOfThreads use <code>0</code> if you do not want to use threads
@@ -60,6 +61,17 @@ public class OptimizedCarSimFactory implements MobsimFactory {
 
 	public void setTeleportedModes(final String[] teleportedModes) {
 		this.teleportedModes = teleportedModes.clone();
+	}
+
+	/**
+	 * Sets the weight for agents created from the population.
+	 * If your population is a 20%-sample, the weight is typically 5
+	 * (each agent should count for 5 persons).
+	 *
+	 * @param populationWeight
+	 */
+	public void setPopulationWeight(double populationWeight) {
+		this.populationWeight = populationWeight;
 	}
 
 	@Override
@@ -96,9 +108,9 @@ public class OptimizedCarSimFactory implements MobsimFactory {
 
 		// register all features at the end in the right order
 		planSim.addMobsimFeature(new StatusFeature());
-		planSim.addMobsimFeature(teleporter); // how should a user know teleporter is a simfeature?
-		planSim.addMobsimFeature(ah); // how should a user know ah is a simfeature, bug lh not?
-		planSim.addMobsimFeature(netFeature); // order of features is important!
+		planSim.addMobsimFeature(teleporter);
+		planSim.addMobsimFeature(ah);
+		planSim.addMobsimFeature(netFeature);
 
 		if (this.otfvisServer != null) {
 			VisNetwork visNetwork = netFeature.getVisNetwork();
@@ -107,7 +119,7 @@ public class OptimizedCarSimFactory implements MobsimFactory {
 		}
 
 		// register agent sources
-		planSim.addAgentSource(new PopulationAgentSource(scenario.getPopulation(), 1.0));
+		planSim.addAgentSource(new PopulationAgentSource(scenario.getPopulation(), this.populationWeight));
 
 		return planSim;
 	}

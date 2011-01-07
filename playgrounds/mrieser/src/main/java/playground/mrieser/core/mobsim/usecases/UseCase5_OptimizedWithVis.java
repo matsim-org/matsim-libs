@@ -37,7 +37,7 @@ import org.matsim.vis.otfvis2.OTFVisLiveServer;
 /**
  * @author mrieser
  */
-public class UseCase5_FastWithVis {
+public class UseCase5_OptimizedWithVis {
 
 	public static void main(final String[] args) {
 
@@ -69,7 +69,7 @@ public class UseCase5_FastWithVis {
 		simFactory.setTeleportedModes(new String[] {TransportMode.bike, TransportMode.pt, TransportMode.ride, TransportMode.walk});
 		simFactory.setOtfvisServer(server);
 		Simulation sim = simFactory.createMobsim(scenario, events);
-		sim.run(); // replace with PlanSimulation.runSim();
+		sim.run(); // replace with PlanSimulation.runMobsim();
 
 
 		/* **************************************************************** */
