@@ -98,16 +98,6 @@ public class VisGUIMouseHandler extends MouseInputAdapter implements MouseWheelL
 		this.clickHandler = clickHandler;
 	}
 
-	public VisGUIMouseHandler(VisGUIMouseHandler other) {
-		this.clickHandler = other.clickHandler;
-		this.bounds = other.bounds;
-		this.camera.setLocation(other.cameraStart);
-		this.camera.setTarget(other.cameraTarget);
-		this.cameraStart = other.cameraStart;
-		this.cameraTarget = other.cameraTarget;
-		this.currentRect = other.currentRect;
-	}
-
 	private void invalidateHandler() {
 		clickHandler.redraw();
 	}
@@ -129,12 +119,6 @@ public class VisGUIMouseHandler extends MouseInputAdapter implements MouseWheelL
 				cameraTarget = camera.getTarget();
 			}});
 		cameraAnimator.start();
-	}
-
-	private void initCamera() {
-		camera = new Camera();
-		camera.setLocation(cameraStart);
-		camera.setTarget(cameraTarget);
 	}
 
 	private void scrollToNewPos(Point3f cameraEnd){
@@ -373,7 +357,9 @@ public class VisGUIMouseHandler extends MouseInputAdapter implements MouseWheelL
 	}
 
 	public void init(GL gl) {
-		initCamera();
+		camera = new Camera();
+		camera.setLocation(cameraStart);
+		camera.setTarget(cameraTarget);
 	}
 
 	public void setAspectRatio(double aspectRatio) {

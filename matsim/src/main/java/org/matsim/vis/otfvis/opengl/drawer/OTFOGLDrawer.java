@@ -312,21 +312,6 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider {
 		this.hostControlBar = hostControlBar;
 	}
 
-	public void replaceMouseHandler(VisGUIMouseHandler newHandler) {
-		if(newHandler == null) {
-			// replace with a copy that is autark
-			this.canvas.removeMouseListener(this.mouseMan);
-			this.canvas.removeMouseMotionListener(this.mouseMan);
-			this.canvas.removeMouseWheelListener(this.mouseMan);
-			this.mouseMan = new VisGUIMouseHandler(this.mouseMan);
-		} else {
-			this.mouseMan = newHandler;
-		}
-		this.canvas.addMouseListener(this.mouseMan);
-		this.canvas.addMouseMotionListener(this.mouseMan);
-		this.canvas.addMouseWheelListener(this.mouseMan);
-	}
-
 	public VisGUIMouseHandler getMouseHandler() {
 		return this.mouseMan;
 	}
