@@ -23,7 +23,7 @@ import java.util.List;
 
 import org.matsim.api.core.v01.population.PlanElement;
 
-import playground.mrieser.core.mobsim.features.MobsimFeature2;
+import playground.mrieser.core.mobsim.features.MobsimFeature;
 
 /**
  * @author mrieser
@@ -48,9 +48,9 @@ public interface PlanSimulation {
 
 	public void runMobsim();
 
-	public void addMobsimFeature(final MobsimFeature2 feature);
+	public void addMobsimFeature(final MobsimFeature feature);
 
 	public void addAgentSource(final AgentSource agentSource);
 
-	public List<MobsimFeature2> getMobsimFeatures();
+	public List<MobsimFeature> getMobsimFeatures();
 }

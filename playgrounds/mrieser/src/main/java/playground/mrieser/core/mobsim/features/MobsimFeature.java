@@ -24,7 +24,7 @@ import org.matsim.core.mobsim.framework.Steppable;
 /**
  * @author mrieser
  */
-public interface MobsimFeature2 extends Steppable {
+public interface MobsimFeature extends Steppable {
 
 	public void beforeMobSim();
 

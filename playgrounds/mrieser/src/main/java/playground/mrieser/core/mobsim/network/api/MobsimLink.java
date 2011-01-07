@@ -23,7 +23,7 @@ import org.matsim.api.core.v01.Id;
 
 import playground.mrieser.core.mobsim.api.MobsimVehicle;
 
-public interface MobsimLink2 {
+public interface MobsimLink {
 
 	public static final double POSITION_AT_FROM_NODE = 0.0;
 	public static final double POSITION_AT_TO_NODE = 1.0;
@@ -44,12 +44,12 @@ public interface MobsimLink2 {
 	 * between 0.0 and 1.0 may be handled differently by different
 	 * implementations. If a vehicle cannot immediately be inserted into the
 	 * traffic flow, the request is cached and performed once space is available.
-	 * The special case {@link MobsimLink2#PRIORITY_PARKING} is used to initially
+	 * The special case {@link MobsimLink#PRIORITY_PARKING} is used to initially
 	 * place the vehicles on the network.
 	 *
 	 * @param vehicle
-	 * @param position value between 0.0 ({@link MobsimLink2#POSITION_AT_FROM_NODE}) and 1.0 ({@link MobsimLink2#POSITION_AT_TO_NODE})
-	 * @param priority value between 0.0 ({@link MobsimLink2#PRIORITY_AS_SOON_AS_SPACE_AVAILABLE}) and 1.0 ({@link MobsimLink2#PRIORITY_IMMEDIATELY}), or {@link MobsimLink2#PRIORITY_PARKING}.
+	 * @param position value between 0.0 ({@link MobsimLink#POSITION_AT_FROM_NODE}) and 1.0 ({@link MobsimLink#POSITION_AT_TO_NODE})
+	 * @param priority value between 0.0 ({@link MobsimLink#PRIORITY_AS_SOON_AS_SPACE_AVAILABLE}) and 1.0 ({@link MobsimLink#PRIORITY_IMMEDIATELY}), or {@link MobsimLink#PRIORITY_PARKING}.
 	 */
 	public void insertVehicle(final MobsimVehicle vehicle, final double position, final double priority);
 
@@ -66,7 +66,7 @@ public interface MobsimLink2 {
 	 * other traffic.
 	 *
 	 * @param vehicle
-	 * @see MobsimLink2#continueVehicle(MobsimVehicle)
+	 * @see MobsimLink#continueVehicle(MobsimVehicle)
 	 */
 	public void stopVehicle(final MobsimVehicle vehicle);
 
@@ -75,8 +75,8 @@ public interface MobsimLink2 {
 	 * vehicle was not stopped or parked before, the method does nothing.
 	 *
 	 * @param vehicle
-	 * @see MobsimLink2#stopVehicle(MobsimVehicle)
-	 * @see MobsimLink2#parkVehicle(MobsimVehicle)
+	 * @see MobsimLink#stopVehicle(MobsimVehicle)
+	 * @see MobsimLink#parkVehicle(MobsimVehicle)
 	 */
 	public void continueVehicle(final MobsimVehicle vehicle);
 
@@ -86,8 +86,8 @@ public interface MobsimLink2 {
 	 * nothing happens.
 	 *
 	 * @param vehicle
-	 * @see MobsimLink2#getParkedVehicle(Id)
-	 * @see MobsimLink2#continueVehicle(MobsimVehicle)
+	 * @see MobsimLink#getParkedVehicle(Id)
+	 * @see MobsimLink#continueVehicle(MobsimVehicle)
 	 */
 	public void parkVehicle(final MobsimVehicle vehicle);
 

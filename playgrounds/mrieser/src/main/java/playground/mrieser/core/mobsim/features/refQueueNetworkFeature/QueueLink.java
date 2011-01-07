@@ -34,9 +34,9 @@ import org.matsim.core.mobsim.framework.Steppable;
 import org.matsim.core.network.LinkImpl;
 
 import playground.mrieser.core.mobsim.api.MobsimVehicle;
-import playground.mrieser.core.mobsim.network.api.MobsimLink2;
+import playground.mrieser.core.mobsim.network.api.MobsimLink;
 
-/*package*/ class QueueLink implements MobsimLink2, Steppable {
+/*package*/ class QueueLink implements MobsimLink, Steppable {
 
 	private final static Logger log = Logger.getLogger(QueueLink.class);
 
@@ -120,17 +120,17 @@ import playground.mrieser.core.mobsim.network.api.MobsimLink2;
 	}
 
 	/*package*/ void addVehicleFromIntersection(final MobsimVehicle vehicle) {
-		insertVehicle(vehicle, MobsimLink2.POSITION_AT_FROM_NODE, MobsimLink2.PRIORITY_IMMEDIATELY);
+		insertVehicle(vehicle, MobsimLink.POSITION_AT_FROM_NODE, MobsimLink.PRIORITY_IMMEDIATELY);
 	}
 
 	@Override
 	public void insertVehicle(final MobsimVehicle vehicle, final double position, final double priority) {
 		double now = this.network.simEngine.getCurrentTime();
-		if (priority == MobsimLink2.PRIORITY_PARKING) {
+		if (priority == MobsimLink.PRIORITY_PARKING) {
 			this.parkedVehicles.put(vehicle.getId(), vehicle);
 			return;
 		}
-		if (position == MobsimLink2.POSITION_AT_FROM_NODE) {
+		if (position == MobsimLink.POSITION_AT_FROM_NODE) {
 			// vehicle enters from intersection
 			this.vehQueue.add(vehicle);
 			double earliestLeaveTime = (int) (now + this.freespeedTravelTime); // (int) for backwards compatibility
@@ -139,7 +139,7 @@ import playground.mrieser.core.mobsim.network.api.MobsimLink2;
 			this.network.simEngine.getEventsManager().processEvent(
 					new LinkEnterEventImpl(now, vehicle.getId(), this.link.getId()));
 		} else {
-			if (priority == MobsimLink2.PRIORITY_IMMEDIATELY) {
+			if (priority == MobsimLink.PRIORITY_IMMEDIATELY) {
 				this.usedStorageCapacity += vehicle.getSizeInEquivalents();
 				// vehicle enters from a driveway
 				this.vehQueue.addFirst(vehicle);

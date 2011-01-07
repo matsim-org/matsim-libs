@@ -28,7 +28,7 @@ import org.matsim.vis.snapshots.writers.SnapshotWriter;
 import playground.mrieser.core.mobsim.network.api.VisLink;
 import playground.mrieser.core.mobsim.network.api.VisNetwork;
 
-public class OTFVisFeature implements MobsimFeature2 {
+public class OTFVisFeature implements MobsimFeature {
 
 	private final VisNetwork visNetwork;
 	private final SnapshotWriter snapshotWriter;

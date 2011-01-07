@@ -34,7 +34,7 @@ import playground.mrieser.core.mobsim.api.NewSimEngine;
 import playground.mrieser.core.mobsim.api.PlanAgent;
 import playground.mrieser.core.mobsim.api.MobsimVehicle;
 import playground.mrieser.core.mobsim.features.NetworkFeature;
-import playground.mrieser.core.mobsim.network.api.MobsimLink2;
+import playground.mrieser.core.mobsim.network.api.MobsimLink;
 
 public class StrictCarDepartureHandler implements DepartureHandler {
 
@@ -53,7 +53,7 @@ public class StrictCarDepartureHandler implements DepartureHandler {
 		Leg leg = (Leg) agent.getCurrentPlanElement();
 		NetworkRoute route = (NetworkRoute) leg.getRoute();
 
-		MobsimLink2 link = this.networkFeature.getSimNetwork().getLinks().get(route.getStartLinkId());
+		MobsimLink link = this.networkFeature.getSimNetwork().getLinks().get(route.getStartLinkId());
 		Person person = agent.getPlan().getPerson();
 		Id vehId = person.getId();
 		MobsimVehicle simVehicle = link.getParkedVehicle(vehId);

@@ -31,7 +31,7 @@ import playground.mrieser.core.mobsim.api.PlanElementHandler;
 import playground.mrieser.core.mobsim.api.PlanSimulation;
 import playground.mrieser.core.mobsim.api.MobsimKeepAlive;
 import playground.mrieser.core.mobsim.api.TimestepSimEngine;
-import playground.mrieser.core.mobsim.features.MobsimFeature2;
+import playground.mrieser.core.mobsim.features.MobsimFeature;
 
 public class DefaultTimestepSimEngine implements TimestepSimEngine {
 
@@ -97,21 +97,21 @@ public class DefaultTimestepSimEngine implements TimestepSimEngine {
 
 //		this.time = 8.0 * 3600.0;  // TODO [MR] remove sim-start-time hack
 
-		List<MobsimFeature2> tmpList = this.sim.getMobsimFeatures();
-		MobsimFeature2[] simFeatures = tmpList.toArray(new MobsimFeature2[tmpList.size()]);
+		List<MobsimFeature> tmpList = this.sim.getMobsimFeatures();
+		MobsimFeature[] simFeatures = tmpList.toArray(new MobsimFeature[tmpList.size()]);
 
 		log.info("registered features:");
-		for (MobsimFeature2 feature : simFeatures) {
+		for (MobsimFeature feature : simFeatures) {
 			log.info("  " + feature.getClass());
 		}
 
-		for (MobsimFeature2 feature : simFeatures) {
+		for (MobsimFeature feature : simFeatures) {
 			feature.beforeMobSim();
 		}
 
 		boolean running = true;
 		while (running) {
-			for (MobsimFeature2 feature : simFeatures) {
+			for (MobsimFeature feature : simFeatures) {
 				feature.doSimStep(this.time);
 			}
 			running = keepAlive();
@@ -129,7 +129,7 @@ public class DefaultTimestepSimEngine implements TimestepSimEngine {
 			}
 		}
 
-		for (MobsimFeature2 feature : simFeatures) {
+		for (MobsimFeature feature : simFeatures) {
 			feature.afterMobSim();
 		}
 	}

@@ -23,7 +23,7 @@ import org.matsim.api.core.v01.network.Network;
 
 import playground.mrieser.core.mobsim.api.TimestepSimEngine;
 import playground.mrieser.core.mobsim.features.NetworkFeature;
-import playground.mrieser.core.mobsim.network.api.MobsimNetwork2;
+import playground.mrieser.core.mobsim.network.api.MobsimNetwork;
 import playground.mrieser.core.mobsim.network.api.VisNetwork;
 
 public class FastQueueNetworkFeature implements NetworkFeature {
@@ -57,7 +57,7 @@ public class FastQueueNetworkFeature implements NetworkFeature {
 	}
 
 	@Override
-	public MobsimNetwork2 getSimNetwork() {
+	public MobsimNetwork getSimNetwork() {
 		return this.network;
 	}
 

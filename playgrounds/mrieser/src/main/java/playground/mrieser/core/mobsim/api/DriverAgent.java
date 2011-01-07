@@ -21,7 +21,7 @@ package playground.mrieser.core.mobsim.api;
 
 import org.matsim.api.core.v01.Id;
 
-import playground.mrieser.core.mobsim.network.api.MobsimLink2;
+import playground.mrieser.core.mobsim.network.api.MobsimLink;
 
 public interface DriverAgent {
 
@@ -40,6 +40,6 @@ public interface DriverAgent {
 	 */
 	public double getNextActionOnCurrentLink();
 
-	public void handleNextAction(final MobsimLink2 link);
+	public void handleNextAction(final MobsimLink link);
 
 }

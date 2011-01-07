@@ -39,8 +39,8 @@ import playground.mrieser.core.mobsim.impl.LegHandler;
 import playground.mrieser.core.mobsim.impl.PlanSimulationImpl;
 import playground.mrieser.core.mobsim.impl.PopulationAgentSource;
 import playground.mrieser.core.mobsim.impl.TeleportationHandler;
-import playground.mrieser.core.mobsim.network.api.MobsimLink2;
-import playground.mrieser.core.mobsim.network.api.MobsimNetwork2;
+import playground.mrieser.core.mobsim.network.api.MobsimLink;
+import playground.mrieser.core.mobsim.network.api.MobsimNetwork;
 
 /**
  * @author mrieser
@@ -61,7 +61,7 @@ public class IntegrationTest {
 
 		// setup network
 		NetworkFeature netFeature = new RefQueueNetworkFeature(f.scenario.getNetwork(), engine);
-		MobsimNetwork2 simNetwork = netFeature.getSimNetwork();
+		MobsimNetwork simNetwork = netFeature.getSimNetwork();
 
 		// setup features; order is important!
 		planSim.addMobsimFeature(new StatusFeature());
@@ -88,7 +88,7 @@ public class IntegrationTest {
 
 		planSim.runMobsim();
 
-		MobsimLink2 simLink = simNetwork.getLinks().get(((Leg) person1.getSelectedPlan().getPlanElements().get(1)).getRoute().getEndLinkId());
+		MobsimLink simLink = simNetwork.getLinks().get(((Leg) person1.getSelectedPlan().getPlanElements().get(1)).getRoute().getEndLinkId());
 		Assert.assertNotNull("car should be parked, but cannot be found on link.", simLink.getParkedVehicle(person1.getId()));
 	}
 
@@ -106,7 +106,7 @@ public class IntegrationTest {
 
 		// setup network
 		NetworkFeature netFeature = new RefQueueNetworkFeature(f.scenario.getNetwork(), engine);
-		MobsimNetwork2 simNetwork = netFeature.getSimNetwork();
+		MobsimNetwork simNetwork = netFeature.getSimNetwork();
 
 		// setup features; order is important!
 		planSim.addMobsimFeature(new StatusFeature());
@@ -128,7 +128,7 @@ public class IntegrationTest {
 
 		planSim.runMobsim();
 
-		MobsimLink2 simLink = simNetwork.getLinks().get(((Leg) person2.getSelectedPlan().getPlanElements().get(3)).getRoute().getEndLinkId());
+		MobsimLink simLink = simNetwork.getLinks().get(((Leg) person2.getSelectedPlan().getPlanElements().get(3)).getRoute().getEndLinkId());
 		Assert.assertNotNull("car should be parked, but cannot be found on link.", simLink.getParkedVehicle(person2.getId()));
 	}
 
@@ -147,7 +147,7 @@ public class IntegrationTest {
 
 		// setup network
 		NetworkFeature netFeature = new RefQueueNetworkFeature(f.scenario.getNetwork(), engine);
-		MobsimNetwork2 simNetwork = netFeature.getSimNetwork();
+		MobsimNetwork simNetwork = netFeature.getSimNetwork();
 
 		// setup features; order is important!
 		planSim.addMobsimFeature(new StatusFeature());
@@ -169,7 +169,7 @@ public class IntegrationTest {
 
 		planSim.runMobsim();
 
-		MobsimLink2 simLink = simNetwork.getLinks().get(((Leg) person3.getSelectedPlan().getPlanElements().get(5)).getRoute().getEndLinkId());
+		MobsimLink simLink = simNetwork.getLinks().get(((Leg) person3.getSelectedPlan().getPlanElements().get(5)).getRoute().getEndLinkId());
 		Assert.assertNotNull("car should be parked, but cannot be found on link.", simLink.getParkedVehicle(person3.getId()));
 	}
 }

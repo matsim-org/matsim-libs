@@ -33,7 +33,7 @@ import playground.mrieser.core.mobsim.api.NewSimEngine;
 import playground.mrieser.core.mobsim.api.PlanAgent;
 import playground.mrieser.core.mobsim.api.PlanElementHandler;
 import playground.mrieser.core.mobsim.api.PlanSimulation;
-import playground.mrieser.core.mobsim.features.MobsimFeature2;
+import playground.mrieser.core.mobsim.features.MobsimFeature;
 import playground.mrieser.core.mobsim.utils.ClassBasedMap;
 
 /**
@@ -46,7 +46,7 @@ public class PlanSimulationImpl implements PlanSimulation, Simulation { // TODO 
 	private final Scenario scenario;
 	private NewSimEngine simEngine = null;
 	private final ClassBasedMap<PlanElement, PlanElementHandler> peHandlers = new ClassBasedMap<PlanElement, PlanElementHandler>();
-	private final LinkedList<MobsimFeature2> simFeatures = new LinkedList<MobsimFeature2>();
+	private final LinkedList<MobsimFeature> simFeatures = new LinkedList<MobsimFeature>();
 	private final LinkedList<AgentSource> agentSources = new LinkedList<AgentSource>();
 
 	public PlanSimulationImpl(final Scenario scenario) {
@@ -114,16 +114,16 @@ public class PlanSimulationImpl implements PlanSimulation, Simulation { // TODO 
 	}
 
 	@Override
-	public void addMobsimFeature(final MobsimFeature2 feature) {
+	public void addMobsimFeature(final MobsimFeature feature) {
 		this.simFeatures.add(feature);
 	}
 
-	public void removeSimFeature(final MobsimFeature2 feature) {
+	public void removeSimFeature(final MobsimFeature feature) {
 		this.simFeatures.remove(feature);
 	}
 
 	@Override
-	public List<MobsimFeature2> getMobsimFeatures() {
+	public List<MobsimFeature> getMobsimFeatures() {
 		return Collections.unmodifiableList(this.simFeatures);
 	}
 }

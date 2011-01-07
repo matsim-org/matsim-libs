@@ -21,7 +21,7 @@ package playground.mrieser.core.mobsim.network.api;
 
 import org.matsim.api.core.v01.Id;
 
-public interface MobsimNode2 {
+public interface MobsimNode {
 
 	public Id getId();
 

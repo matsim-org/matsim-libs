@@ -19,7 +19,7 @@
 
 package playground.mrieser.core.mobsim.features;
 
-public class TransitFeature implements MobsimFeature2 {
+public class TransitFeature implements MobsimFeature {
 
 	@Override
 	public void beforeMobSim() {

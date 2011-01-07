@@ -34,7 +34,7 @@ import playground.mrieser.core.mobsim.api.DriverAgent;
 import playground.mrieser.core.mobsim.api.MobsimVehicle;
 import playground.mrieser.core.mobsim.fakes.FakeSimEngine;
 import playground.mrieser.core.mobsim.fakes.FakeSimVehicle;
-import playground.mrieser.core.mobsim.network.api.MobsimLink2;
+import playground.mrieser.core.mobsim.network.api.MobsimLink;
 
 /**
  * @author mrieser
@@ -231,7 +231,7 @@ public class QueueNodeTest {
 			return -1.0;
 		}
 		@Override
-		public void handleNextAction(final MobsimLink2 link) {
+		public void handleNextAction(final MobsimLink link) {
 		}
 	}
 

@@ -32,12 +32,12 @@ import playground.mrieser.core.mobsim.api.DepartureHandler;
 import playground.mrieser.core.mobsim.api.NewSimEngine;
 import playground.mrieser.core.mobsim.api.PlanAgent;
 import playground.mrieser.core.mobsim.api.MobsimKeepAlive;
-import playground.mrieser.core.mobsim.features.MobsimFeature2;
+import playground.mrieser.core.mobsim.features.MobsimFeature;
 
 /**
  * @author mrieser
  */
-public class TeleportationHandler implements DepartureHandler, MobsimFeature2, MobsimKeepAlive {
+public class TeleportationHandler implements DepartureHandler, MobsimFeature, MobsimKeepAlive {
 
 	private final static Logger log = Logger.getLogger(TeleportationHandler.class);
 

@@ -35,20 +35,20 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.Vehicles;
 
 import playground.mrieser.core.mobsim.api.MobsimVehicle;
-import playground.mrieser.core.mobsim.features.MobsimFeature2;
+import playground.mrieser.core.mobsim.features.MobsimFeature;
 import playground.mrieser.core.mobsim.features.NetworkFeature;
 import playground.mrieser.core.mobsim.impl.DefaultSimVehicle;
 import playground.mrieser.core.mobsim.impl.DefaultTimestepSimEngine;
-import playground.mrieser.core.mobsim.network.api.MobsimLink2;
+import playground.mrieser.core.mobsim.network.api.MobsimLink;
 
-public class CarDistributor implements MobsimFeature2 {
+public class CarDistributor implements MobsimFeature {
 
 	Logger logger = Logger.getLogger(CarDistributor.class);
 
 	private Population population;
 	private Vehicles vehicles;
 	private NetworkFeature networkFeature;
-	private Map<MobsimVehicle, MobsimLink2> expectedVehicleLocations = new HashMap<MobsimVehicle, MobsimLink2>();
+	private Map<MobsimVehicle, MobsimLink> expectedVehicleLocations = new HashMap<MobsimVehicle, MobsimLink>();
 
 	private boolean punishVehicleMove = true;
 
@@ -75,9 +75,9 @@ public class CarDistributor implements MobsimFeature2 {
 					Id vehicleId = person.getId();
 					Vehicle vehicle = vehicles.getVehicles().get(vehicleId);
 					if (vehicle != null) {
-						MobsimLink2 link2 = this.networkFeature.getSimNetwork().getLinks().get(linkId);
+						MobsimLink link2 = this.networkFeature.getSimNetwork().getLinks().get(linkId);
 						MobsimVehicle simVehicle = new DefaultSimVehicle(vehicle);
-						link2.insertVehicle(simVehicle, MobsimLink2.POSITION_AT_TO_NODE, MobsimLink2.PRIORITY_PARKING);
+						link2.insertVehicle(simVehicle, MobsimLink.POSITION_AT_TO_NODE, MobsimLink.PRIORITY_PARKING);
 						expectedVehicleLocations.put(simVehicle, link2);
 						logger.info("Parked car for agent " + person.getId() + " at link " + linkId);
 						return;
@@ -99,9 +99,9 @@ public class CarDistributor implements MobsimFeature2 {
 	@Override
 	public void afterMobSim() {
 		if (punishVehicleMove) {
-			for (Map.Entry<MobsimVehicle, MobsimLink2> entry : expectedVehicleLocations.entrySet()) {
+			for (Map.Entry<MobsimVehicle, MobsimLink> entry : expectedVehicleLocations.entrySet()) {
 				MobsimVehicle vehicle = entry.getKey();
-				MobsimLink2 link = entry.getValue();
+				MobsimLink link = entry.getValue();
 				if (link.getParkedVehicle(vehicle.getId()) == null) {
 					engine.getEventsManager().processEvent(engine.getEventsManager().getFactory().createAgentStuckEvent(99999999, vehicle.getId(), link.getId(), TransportMode.car));
 				}

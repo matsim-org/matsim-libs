@@ -22,7 +22,7 @@ package playground.mrieser.core.mobsim.features;
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.misc.Time;
 
-public class StatusFeature implements MobsimFeature2 {
+public class StatusFeature implements MobsimFeature {
 
 	private final static Logger log = Logger.getLogger(StatusFeature.class);
 

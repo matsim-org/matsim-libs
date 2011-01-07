@@ -32,12 +32,12 @@ import playground.mrieser.core.mobsim.api.NewSimEngine;
 import playground.mrieser.core.mobsim.api.PlanAgent;
 import playground.mrieser.core.mobsim.api.PlanElementHandler;
 import playground.mrieser.core.mobsim.api.MobsimKeepAlive;
-import playground.mrieser.core.mobsim.features.MobsimFeature2;
+import playground.mrieser.core.mobsim.features.MobsimFeature;
 
 /**
  * @author mrieser
  */
-public class ActivityHandler implements PlanElementHandler, MobsimFeature2, MobsimKeepAlive {
+public class ActivityHandler implements PlanElementHandler, MobsimFeature, MobsimKeepAlive {
 
 	private final static Logger log = Logger.getLogger(ActivityHandler.class);
 
