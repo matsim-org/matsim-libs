@@ -52,7 +52,7 @@ public class TransitDriver extends AbstractTransitDriver {
 	final double departureTime;
 
 	private final Leg currentLeg;
-	
+
 	// as long as all instance variables are final, it should be ok to leave "resetCaches" empty.  kai, oct'10
 
 	public TransitDriver(final TransitLine line, final TransitRoute route, final Departure departure, final TransitStopAgentTracker agentTracker, final Mobsim sim) {
@@ -91,7 +91,7 @@ public class TransitDriver extends AbstractTransitDriver {
 
 		this.getSimulation().getAgentCounter().decLiving();
 	}
-	
+
 	@Override
 	public NetworkRoute getCarRoute() {
 		return this.carRoute;
@@ -122,7 +122,7 @@ public class TransitDriver extends AbstractTransitDriver {
 		// As far as I can see, there is never a current Activity. cdobler, nov'10
 		return null;
 	}
-	
+
 	@Override
 	public PlanElement getCurrentPlanElement() {
 		return this.currentLeg ; // always a leg (?)
@@ -140,7 +140,6 @@ public class TransitDriver extends AbstractTransitDriver {
 
 	@Override
 	public PlanElement getNextPlanElement() {
-		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException() ;
 	}
 

@@ -38,7 +38,7 @@ public class QSimEngineRunner extends QSimEngineInternalI implements Runnable {
 	private boolean simulateAllNodes = false;
 	private boolean simulateAllLinks = false;
 	private boolean useNodeArray = QSimEngineImpl.useNodeArray;
-	
+
 	private volatile boolean simulationRunning = true;
 
 	private final CyclicBarrier startBarrier;
@@ -53,7 +53,7 @@ public class QSimEngineRunner extends QSimEngineInternalI implements Runnable {
 	 * This needs to be thread-safe since it is not guaranteed that each incoming link is handled
 	 * by the same thread as a node itself. */
 	private final Queue<QNode> nodesToActivate = new ConcurrentLinkedQueue<QNode>();
-	
+
 	/** This is the collection of links that have to be activated in the current time step */
 	private final ArrayList<QLinkInternalI> linksToActivate = new ArrayList<QLinkInternalI>();
 	private final QSim qsim;
@@ -77,7 +77,7 @@ public class QSimEngineRunner extends QSimEngineInternalI implements Runnable {
 	/*package*/ void setQNodeList(List<QNode> nodes) {
 		this.nodesList = nodes;
 	}
-	
+
 	/*package*/ void setLinks(List<QLinkInternalI> links) {
 		this.linksList = links;
 	}
@@ -135,16 +135,16 @@ public class QSimEngineRunner extends QSimEngineInternalI implements Runnable {
 				} else {
 					ListIterator<QNode> simNodes = this.nodesList.listIterator();
 					QNode node;
-					
+
 					while (simNodes.hasNext()) {
 						node = simNodes.next();
 						Random random = (Random) node.getCustomAttributes().get(Random.class.getName());
 						node.moveNode(time, random);
-						
+
 						if (!node.isActive()) simNodes.remove();
 					}
 				}
-					
+
 				/*
 				 * After moving the Nodes all we use a CyclicBarrier to synchronize
 				 * the Threads. By using a Runnable within the Barrier we activate
@@ -215,14 +215,14 @@ public class QSimEngineRunner extends QSimEngineInternalI implements Runnable {
 			this.nodesToActivate.add(node);
 		}
 	}
-	
+
 	/*package*/ void activateNodes() {
 		if (!useNodeArray && !simulateAllNodes) {
 			this.nodesList.addAll(this.nodesToActivate);
-			this.nodesToActivate.clear();			
+			this.nodesToActivate.clear();
 		}
 	}
-	
+
 	@Override
 	public int getNumberOfSimulatedNodes() {
 		if (useNodeArray) return nodesArray.length;
@@ -246,8 +246,7 @@ public class QSimEngineRunner extends QSimEngineInternalI implements Runnable {
 
 	@Override
 	public QNetwork getQNetwork() {
-		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException("should never be called this way since this is just the runner");
 	}
-	
+
 }

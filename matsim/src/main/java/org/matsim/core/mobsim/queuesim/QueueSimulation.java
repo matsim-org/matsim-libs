@@ -66,8 +66,8 @@ import org.matsim.ptproject.qsim.helpers.AgentCounter;
 import org.matsim.ptproject.qsim.interfaces.AcceptsVisMobsimFeatures;
 import org.matsim.ptproject.qsim.interfaces.AgentCounterI;
 import org.matsim.ptproject.qsim.interfaces.Mobsim;
-import org.matsim.ptproject.qsim.interfaces.NetsimNetwork;
 import org.matsim.ptproject.qsim.interfaces.MobsimTimerI;
+import org.matsim.ptproject.qsim.interfaces.NetsimNetwork;
 import org.matsim.ptproject.qsim.qnetsimengine.QVehicle;
 import org.matsim.vehicles.VehicleImpl;
 import org.matsim.vehicles.VehicleType;
@@ -164,14 +164,14 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 	protected QueueSimulation(final Scenario sc, final EventsManager events, final QueueNetworkFactory factory){
 		this.scenario = sc;
 		this.config = scenario.getConfig();
-		
+
 		if ( this.config.getModule(SimulationConfigGroup.GROUP_NAME) == null ) {
 			log.warn("Started QueueSimulation without a `simulation' config module.  Presumably due to removing " +
 					"`simulation' from the core modules in nov/dec'10.  Add simulation config module before calling QueueSimulation " +
 					"creational method to avoid this warning.  kai, dec'10");
 			this.config.addSimulationConfigGroup(new SimulationConfigGroup()) ;
 		}
-		
+
 		this.listenerManager = new SimulationListenerManager(this);
 //		AbstractSimulation.reset(this.config.simulation().getStuckTime());
 
@@ -490,7 +490,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 			} else break;
 		}
 	}
-	
+
 	private void handleNetworkChangeEvents(final double time) {
 		while ((this.networkChangeEventsQueue.size() > 0) && (this.networkChangeEventsQueue.peek().getStartTime() <= time)){
 			NetworkChangeEvent event = this.networkChangeEventsQueue.poll();
@@ -715,21 +715,18 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 
 	@Override
 	public Collection<MobsimAgent> getAgents() {
-		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException() ;
 	}
 
 
 	@Override
 	public void registerAgentAtPtWaitLocation(PlanAgent planAgent) {
-		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException() ;
 	}
 
 
 	@Override
 	public void unregisterAgentAtPtWaitLocation(PlanAgent planAgent) {
-		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException() ;
 	}
 
