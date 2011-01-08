@@ -127,6 +127,7 @@ import org.matsim.core.gbl.Gbl;
 			this.slaves[i].afterMobSim();
 		}
 		try {
+			// release the other threads
 			this.startNodesBarrier.await();
 		} catch (InterruptedException e) {
 			throw new RuntimeException(e);
@@ -186,8 +187,9 @@ import org.matsim.core.gbl.Gbl;
 		@Override
 		public void run() {
 			try {
-				while (!this.finished) {
-					handleTimeStep();
+				boolean finished = false;
+				while (!finished) {
+					finished = handleTimeStep();
 				}
 			} catch (InterruptedException e) {
 				throw new RuntimeException(e);
@@ -199,15 +201,16 @@ import org.matsim.core.gbl.Gbl;
 			}
 		}
 
-		private void handleTimeStep() throws InterruptedException, BrokenBarrierException {
+		private boolean handleTimeStep() throws InterruptedException, BrokenBarrierException {
 			this.startNodesBarrier.await();
 			if (this.finished) {
-				return;
+				return true;
 			}
 			moveNodes();
 			this.startLinksBarrier.await();
 			moveLinks();
 			this.finishedBarrier.await();
+			return false;
 		}
 
 		private void moveNodes() {
