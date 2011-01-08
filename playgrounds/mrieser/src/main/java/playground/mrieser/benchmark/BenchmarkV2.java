@@ -85,6 +85,11 @@ public class BenchmarkV2 {
 			e.printStackTrace();
 		}
 		new NetworkCleaner().run(this.scenario.getNetwork());
+		for (Link link : this.scenario.getNetwork().getLinks().values()) {
+			if (link.getFreespeed() == 0.0) {
+				link.setFreespeed(5.0); // fix data problems
+			}
+		}
 		new NetworkWriter(this.scenario.getNetwork()).write("network.xml.gz");
 	}
 
@@ -208,6 +213,7 @@ public class BenchmarkV2 {
 		if ("newsim".equals(mobsim)) {
 			System.out.println("using newsim mobsim-factory");
 			OptimizedCarSimFactory factory = new OptimizedCarSimFactory(nOfThreadsSim);
+			factory.setMobsimStopTime(30.0 * 3600);
 			factory.setPopulationWeight(1.0 / flowFactor);
 			ctrl.setMobsimFactory(factory);
 		}
@@ -216,13 +222,13 @@ public class BenchmarkV2 {
 	}
 
 	public static void main(String[] args) throws FileNotFoundException, IOException {
-		args=new String[]{"-r2", "-s 2", "-e=0", "-a5000", "-f1.0", "-m newsim"};
+//		args=new String[]{"-r2", "-s 2", "-e=0", "-a10000", "-f1.0", "-m newsim"};
 
 		double flowFactor = 1.0;
 		int nOfThreadsReplanning = 4;
-		int nOfThreadsSim = 2;
-		int nOfThreadsEvents = 2;
-		int nOfAgents = 5000;
+		int nOfThreadsSim = 3;
+		int nOfThreadsEvents = 1;
+		int nOfAgents = 10000;
 		String mobsim = "qsim";
 
 		String outputDir = "output_";
