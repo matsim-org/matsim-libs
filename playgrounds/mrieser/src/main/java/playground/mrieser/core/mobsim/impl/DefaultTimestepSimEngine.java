@@ -26,10 +26,10 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.EventsManager;
 
+import playground.mrieser.core.mobsim.api.MobsimKeepAlive;
 import playground.mrieser.core.mobsim.api.PlanAgent;
 import playground.mrieser.core.mobsim.api.PlanElementHandler;
 import playground.mrieser.core.mobsim.api.PlanSimulation;
-import playground.mrieser.core.mobsim.api.MobsimKeepAlive;
 import playground.mrieser.core.mobsim.api.TimestepSimEngine;
 import playground.mrieser.core.mobsim.features.MobsimFeature;
 
@@ -42,6 +42,7 @@ public class DefaultTimestepSimEngine implements TimestepSimEngine {
 	private double time;
 	private final double timeStepSize;
 	private final List<MobsimKeepAlive> aliveKeepers = new LinkedList<MobsimKeepAlive>();
+	private double stopTime = Double.POSITIVE_INFINITY;
 
 	public DefaultTimestepSimEngine(final PlanSimulation sim, final EventsManager events) {
 		this(sim, events, 1.0);
@@ -52,6 +53,10 @@ public class DefaultTimestepSimEngine implements TimestepSimEngine {
 		this.events = events;
 		this.timeStepSize = timeStepSize;
 		this.time = 0;
+	}
+
+	public void setStopTime(final double stopTime) {
+		this.stopTime = stopTime;
 	}
 
 	@Override
@@ -95,8 +100,6 @@ public class DefaultTimestepSimEngine implements TimestepSimEngine {
 	@Override
 	public void runSim() {
 
-//		this.time = 8.0 * 3600.0;  // TODO [MR] remove sim-start-time hack
-
 		List<MobsimFeature> tmpList = this.sim.getMobsimFeatures();
 		MobsimFeature[] simFeatures = tmpList.toArray(new MobsimFeature[tmpList.size()]);
 
@@ -115,7 +118,7 @@ public class DefaultTimestepSimEngine implements TimestepSimEngine {
 				feature.doSimStep(this.time);
 			}
 			running = keepAlive();
-			if (this.time >= 55.0 * 3600) {  // TODO [MR] remove sim-end-time hack
+			if (this.time >= this.stopTime) {
 				running = false;
 				log.warn("Stopping simulation at 55:00:00");
 				for (MobsimKeepAlive ska : this.aliveKeepers) {

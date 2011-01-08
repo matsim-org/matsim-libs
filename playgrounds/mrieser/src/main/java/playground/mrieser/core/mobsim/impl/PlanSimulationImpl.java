@@ -82,7 +82,6 @@ public class PlanSimulationImpl implements PlanSimulation, Simulation { // TODO 
 	public void runMobsim() {
 		log.info("begin simulation.");
 
-		// TODO
 		// init
 		if (this.simEngine == null) {
 			throw new NullPointerException("No SimEngine set! see PlanSimulation.setSimEngine();");

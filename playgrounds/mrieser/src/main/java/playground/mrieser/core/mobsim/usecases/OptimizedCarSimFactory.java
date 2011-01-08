@@ -47,6 +47,7 @@ public class OptimizedCarSimFactory implements MobsimFactory {
 	private OTFVisLiveServer otfvisServer = null;
 	private String[] teleportedModes = null;
 	private double populationWeight = 1.0;
+	private double mobsimStopTime = Double.POSITIVE_INFINITY;
 
 	/**
 	 * @param nOfThreads use <code>0</code> if you do not want to use threads
@@ -74,11 +75,23 @@ public class OptimizedCarSimFactory implements MobsimFactory {
 		this.populationWeight = populationWeight;
 	}
 
+	/**
+	 * Sets a time at which the mobsim will stop its execution, no matter
+	 * if all agents have completed their plans or not. Initially set to
+	 * {@link Double#POSITIVE_INFINITY}.
+	 *
+	 * @param stopTime
+	 */
+	public void setMobsimStopTime(final double stopTime) {
+		this.mobsimStopTime = stopTime;
+	}
+
 	@Override
 	public Simulation createMobsim(final Scenario scenario, final EventsManager eventsManager) {
 
 		PlanSimulationImpl planSim = new PlanSimulationImpl(scenario);
 		DefaultTimestepSimEngine engine = new DefaultTimestepSimEngine(planSim, eventsManager);
+		engine.setStopTime(this.mobsimStopTime);
 		planSim.setMobsimEngine(engine);
 
 		// setup network
