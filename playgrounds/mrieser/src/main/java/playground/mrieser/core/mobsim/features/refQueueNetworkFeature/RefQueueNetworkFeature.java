@@ -35,6 +35,7 @@ public class RefQueueNetworkFeature implements NetworkFeature {
 
 	@Override
 	public void beforeMobSim() {
+		this.network.beforeMobSim();
 	}
 
 	@Override
@@ -44,6 +45,7 @@ public class RefQueueNetworkFeature implements NetworkFeature {
 
 	@Override
 	public void afterMobSim() {
+		this.network.afterMobSim();
 	}
 
 	@Override

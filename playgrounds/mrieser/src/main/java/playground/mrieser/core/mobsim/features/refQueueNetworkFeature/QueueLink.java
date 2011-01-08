@@ -28,6 +28,7 @@ import java.util.Queue;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.events.AgentStuckEventImpl;
 import org.matsim.core.events.AgentWait2LinkEventImpl;
 import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.mobsim.framework.Steppable;
@@ -232,6 +233,25 @@ import playground.mrieser.core.mobsim.network.api.MobsimLink;
 		}
 	}
 
+	/*package*/ void makeAllVehiclesStuck() {
+		double now = this.network.simEngine.getCurrentTime();
+		for (MobsimVehicle v : this.buffer.buffer) {
+			this.network.simEngine.getEventsManager().processEvent(
+					new AgentStuckEventImpl(now, v.getId(), this.link.getId(), null));
+		}
+		for (MobsimVehicle v : this.vehQueue) {
+			this.network.simEngine.getEventsManager().processEvent(
+					new AgentStuckEventImpl(now, v.getId(), this.link.getId(), null));
+		}
+		for (MobsimVehicle v : this.parkedVehicles.values()) {
+			this.network.simEngine.getEventsManager().processEvent(
+					new AgentStuckEventImpl(now, v.getId(), this.link.getId(), null));
+		}
+		for (MobsimVehicle v : this.waitingList) {
+			this.network.simEngine.getEventsManager().processEvent(
+					new AgentStuckEventImpl(now, v.getId(), this.link.getId(), null));
+		}
+	}
 
 	@Override
 	public Id getId() {

@@ -53,10 +53,9 @@ import org.matsim.core.gbl.Gbl;
 	private final CyclicBarrier startLinksBarrier;
 	private final CyclicBarrier finishedBarrier;
 	private QueueNetwork queueNetwork = null;
-	private SlaveOperator master = null;
 
 	public ParallelOperator(final int nOfThreads) {
-		this.nOfThreads = Math.max(0, nOfThreads - 1); // the main thread acts also as a thread, thus -1
+		this.nOfThreads = Math.max(1, nOfThreads);
 		this.threads = new Thread[this.nOfThreads];
 		this.slaves = new SlaveOperator[this.nOfThreads];
 		this.startNodesBarrier = new CyclicBarrier(this.nOfThreads + 1);
@@ -80,20 +79,19 @@ import org.matsim.core.gbl.Gbl;
 
 	@Override
 	public void beforeMobSim() {
-		this.master = new SlaveOperator(this.startNodesBarrier, this.startLinksBarrier, this.finishedBarrier);
 		for (int i = 0; i < this.nOfThreads; i++) {
 			this.slaves[i] = new SlaveOperator(this.startNodesBarrier, this.startLinksBarrier, this.finishedBarrier);
 		}
 		int threadId = 0;
 		for (QueueNode node : this.queueNetwork.getNodes().values()) {
-			SlaveOperator slave = (threadId == this.slaves.length) ? this.master : this.slaves[threadId];
+			SlaveOperator slave = this.slaves[threadId];
 			node.setOperator(slave);
 			for (Link link : node.node.getOutLinks().values()) {
 				QueueLink qLink = this.queueNetwork.getLinks().get(link.getId());
 				qLink.setOperator(slave);
 			}
 			threadId++;
-			if (threadId > this.slaves.length) {
+			if (threadId == this.slaves.length) {
 				threadId = 0;
 			}
 		}
@@ -105,15 +103,13 @@ import org.matsim.core.gbl.Gbl;
 
 	@Override
 	public void doSimStep(double time) {
-		this.master.setTime(time);
 		for (int i = 0; i < this.nOfThreads; i++) {
 			this.slaves[i].setTime(time);
 		}
 		try {
-			this.master.handleTimeStep();
-//			this.startNodesBarrier.await();
-//			this.startLinksBarrier.await();
-//			this.finishedBarrier.await();
+			this.startNodesBarrier.await();
+			this.startLinksBarrier.await();
+			this.finishedBarrier.await();
 		} catch (InterruptedException e) {
 			throw new RuntimeException(e);
 		} catch (BrokenBarrierException e) {
@@ -199,6 +195,14 @@ import org.matsim.core.gbl.Gbl;
 			finally {
 				Gbl.printCurrentThreadCpuTime();
 			}
+
+			// generate stuck events for agents still on the road
+			this.activeLinks.addAll(this.linksToActivate);
+			ListIterator<QueueLink> simLinks = this.activeLinks.listIterator();
+			while (simLinks.hasNext()) {
+				QueueLink link = simLinks.next();
+				link.makeAllVehiclesStuck();
+			}
 		}
 
 		private boolean handleTimeStep() throws InterruptedException, BrokenBarrierException {
@@ -238,9 +242,9 @@ import org.matsim.core.gbl.Gbl;
 			ListIterator<QueueLink> simLinks = this.activeLinks.listIterator();
 			while (simLinks.hasNext()) {
 				QueueLink link = simLinks.next();
-				synchronized (link) {
+//				synchronized (link) {
 					link.doSimStep(time);
-				}
+//				}
 				if (!link.isActive()) {
 					simLinks.remove();
 				}

@@ -53,6 +53,13 @@ import org.apache.log4j.Logger;
 
 	@Override
 	public void afterMobSim() {
+		// generate stuck events for agents still on the road
+		this.activeLinks.addAll(this.linksToActivate);
+		ListIterator<QueueLink> simLinks = this.activeLinks.listIterator();
+		while (simLinks.hasNext()) {
+			QueueLink link = simLinks.next();
+			link.makeAllVehiclesStuck();
+		}
 	}
 
 	@Override

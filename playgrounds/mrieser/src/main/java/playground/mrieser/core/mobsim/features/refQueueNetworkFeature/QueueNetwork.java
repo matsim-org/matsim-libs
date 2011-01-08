@@ -68,6 +68,10 @@ import playground.mrieser.core.mobsim.network.api.MobsimNetwork;
 
 	@Override
 	public void afterMobSim() {
+		// generate stuck events for agents still on the road
+		for (QueueLink link : this.links.values()) {
+			link.makeAllVehiclesStuck();
+		}
 	}
 
 	private void initialize() {
