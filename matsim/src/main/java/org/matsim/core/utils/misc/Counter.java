@@ -45,14 +45,16 @@ public final class Counter {
 
 	public void incCounter() {
 		int i = this.counter.incrementAndGet();
-		if (i == this.nextCounter.get()) {
-			printCounter();
-			this.nextCounter.set(i * 2);
+		int n = this.nextCounter.get();
+		if (i >= n) {
+			if (this.nextCounter.compareAndSet(n, n*2)) {
+				log.info(this.prefix + n);
+			}
 		}
 	}
 
-	synchronized public void printCounter() {
-		log.info(this.prefix + this.counter);
+	public void printCounter() {
+		log.info(this.prefix + this.counter.get());
 	}
 
 	public int getCounter() {
