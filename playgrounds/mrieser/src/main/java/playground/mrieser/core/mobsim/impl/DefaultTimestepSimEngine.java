@@ -25,6 +25,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.utils.misc.Time;
 
 import playground.mrieser.core.mobsim.api.MobsimKeepAlive;
 import playground.mrieser.core.mobsim.api.PlanAgent;
@@ -120,7 +121,7 @@ public class DefaultTimestepSimEngine implements TimestepSimEngine {
 			running = keepAlive();
 			if (this.time >= this.stopTime) {
 				running = false;
-				log.warn("Stopping simulation at 55:00:00");
+				log.warn("Stopping simulation at " + Time.writeTime(this.time));
 				for (MobsimKeepAlive ska : this.aliveKeepers) {
 					if (ska.keepAlive()) {
 						log.warn("still alive: " + ska.getClass().getCanonicalName());
