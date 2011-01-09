@@ -42,12 +42,12 @@ import org.matsim.core.population.routes.NetworkRoute;
 /**
  * @author mrieser
  */
-/*package*/ class Fixture {
+public class Fixture {
 
 	private final Id[] ids = new Id[10];
 	public final Scenario scenario;
 
-	/*package*/ Fixture() {
+	public Fixture() {
 		this.scenario = new ScenarioImpl();
 
 		for (int i = 0; i < ids.length; i++) {

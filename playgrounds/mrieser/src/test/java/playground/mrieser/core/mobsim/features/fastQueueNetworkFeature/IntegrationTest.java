@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,7 +17,9 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mrieser.core.mobsim.integration;
+package playground.mrieser.core.mobsim.features.fastQueueNetworkFeature;
+
+import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -25,42 +27,46 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.api.experimental.events.ActivityEndEvent;
+import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.core.api.experimental.events.AgentStuckEvent;
+import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
+import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.api.experimental.events.LinkEnterEvent;
+import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.events.EventsManagerImpl;
-import org.matsim.testcases.utils.EventsLogger;
+import org.matsim.testcases.utils.EventsCollector;
 
 import playground.mrieser.core.mobsim.features.NetworkFeature;
 import playground.mrieser.core.mobsim.features.StatusFeature;
-import playground.mrieser.core.mobsim.features.refQueueNetworkFeature.RefQueueNetworkFeature;
 import playground.mrieser.core.mobsim.impl.ActivityHandler;
 import playground.mrieser.core.mobsim.impl.CarDepartureHandler;
 import playground.mrieser.core.mobsim.impl.DefaultTimestepSimEngine;
 import playground.mrieser.core.mobsim.impl.LegHandler;
 import playground.mrieser.core.mobsim.impl.PlanSimulationImpl;
 import playground.mrieser.core.mobsim.impl.PopulationAgentSource;
-import playground.mrieser.core.mobsim.network.api.MobsimLink;
-import playground.mrieser.core.mobsim.network.api.MobsimNetwork;
+import playground.mrieser.core.mobsim.integration.Fixture;
 
-/**
- * @author mrieser
- */
 public class IntegrationTest {
 
 	@Test
-	public void test_ArrivingCarIsParked() {
+	public void test_StuckEventOnLinkAtSimulationEnd_SingleCPU() {
 		Fixture f = new Fixture();
 		Person person1 = f.addPersonWithOneLeg();
 
 		EventsManager events = new EventsManagerImpl();
+		EventsCollector eventsCollector = new EventsCollector();
+		events.addHandler(eventsCollector);
 
 		/* setup start */
 		PlanSimulationImpl planSim = new PlanSimulationImpl(f.scenario);
 		DefaultTimestepSimEngine engine = new DefaultTimestepSimEngine(planSim, events);
 		planSim.setMobsimEngine(engine);
+		engine.setStopTime(7.0 * 3600 + 10);
 
 		// setup network
-		NetworkFeature netFeature = new RefQueueNetworkFeature(f.scenario.getNetwork(), engine);
-		MobsimNetwork simNetwork = netFeature.getSimNetwork();
+		NetworkFeature netFeature = new FastQueueNetworkFeature(f.scenario.getNetwork(), engine);
 
 		// setup features; order is important!
 		planSim.addMobsimFeature(new StatusFeature());
@@ -82,25 +88,34 @@ public class IntegrationTest {
 
 		planSim.runMobsim();
 
-		MobsimLink simLink = simNetwork.getLinks().get(((Leg) person1.getSelectedPlan().getPlanElements().get(1)).getRoute().getEndLinkId());
-		Assert.assertNotNull("car should be parked, but cannot be found on link.", simLink.getParkedVehicle(person1.getId()));
+		List<Event> allEvents = eventsCollector.getEvents();
+		Assert.assertEquals(6, allEvents.size());
+		Assert.assertTrue(allEvents.get(0) instanceof ActivityEndEvent);
+		Assert.assertTrue(allEvents.get(1) instanceof AgentDepartureEvent);
+		Assert.assertTrue(allEvents.get(2) instanceof AgentWait2LinkEvent);
+		Assert.assertTrue(allEvents.get(3) instanceof LinkLeaveEvent);
+		Assert.assertTrue(allEvents.get(4) instanceof LinkEnterEvent);
+		Assert.assertTrue(allEvents.get(5) instanceof AgentStuckEvent);
+		Assert.assertEquals(person1.getId(), ((AgentStuckEvent) allEvents.get(5)).getPersonId());
 	}
 
 	@Test
-	public void test_ArrivingCarDepartsAgain() {
+	public void test_StuckEventOnLinkAtSimulationEnd_Multithreaded() {
 		Fixture f = new Fixture();
-		Person person2 = f.addPersonWithTwoLegs();
+		Person person1 = f.addPersonWithOneLeg();
 
 		EventsManager events = new EventsManagerImpl();
+		EventsCollector eventsCollector = new EventsCollector();
+		events.addHandler(eventsCollector);
 
 		/* setup start */
 		PlanSimulationImpl planSim = new PlanSimulationImpl(f.scenario);
 		DefaultTimestepSimEngine engine = new DefaultTimestepSimEngine(planSim, events);
 		planSim.setMobsimEngine(engine);
+		engine.setStopTime(7.0 * 3600 + 10);
 
 		// setup network
-		NetworkFeature netFeature = new RefQueueNetworkFeature(f.scenario.getNetwork(), engine);
-		MobsimNetwork simNetwork = netFeature.getSimNetwork();
+		NetworkFeature netFeature = new FastQueueNetworkFeature(f.scenario.getNetwork(), engine, 2);
 
 		// setup features; order is important!
 		planSim.addMobsimFeature(new StatusFeature());
@@ -111,59 +126,28 @@ public class IntegrationTest {
 		LegHandler lh = new LegHandler(engine);
 		planSim.setPlanElementHandler(Activity.class, ah);
 		planSim.setPlanElementHandler(Leg.class, lh);
-		planSim.addMobsimFeature(ah); // how should a user know ah is a simfeature, bug lh not?
+		planSim.addMobsimFeature(ah);
 
 		// setup DepartureHandlers
 		lh.setDepartureHandler(TransportMode.car, new CarDepartureHandler(engine, netFeature, f.scenario));
-		/* setup end */ // TODO too much boilerplate code for testing
+		/* setup end */  // TODO too much boilerplate code for testing
 
 		// register agent sources
 		planSim.addAgentSource(new PopulationAgentSource(f.scenario.getPopulation(), 1.0));
 
 		planSim.runMobsim();
 
-		MobsimLink simLink = simNetwork.getLinks().get(((Leg) person2.getSelectedPlan().getPlanElements().get(3)).getRoute().getEndLinkId());
-		Assert.assertNotNull("car should be parked, but cannot be found on link.", simLink.getParkedVehicle(person2.getId()));
-	}
-
-	@Test
-	public void test_TwoActsOnSameLink() {
-		Fixture f = new Fixture();
-		Person person3 = f.addPersonWithTwoActsOnSameLink();
-
-		EventsManager events = new EventsManagerImpl();
-		events.addHandler(new EventsLogger());
-
-		/* setup start */
-		PlanSimulationImpl planSim = new PlanSimulationImpl(f.scenario);
-		DefaultTimestepSimEngine engine = new DefaultTimestepSimEngine(planSim, events);
-		planSim.setMobsimEngine(engine);
-
-		// setup network
-		NetworkFeature netFeature = new RefQueueNetworkFeature(f.scenario.getNetwork(), engine);
-		MobsimNetwork simNetwork = netFeature.getSimNetwork();
-
-		// setup features; order is important!
-		planSim.addMobsimFeature(new StatusFeature());
-		planSim.addMobsimFeature(netFeature);
-
-		// setup PlanElementHandlers
-		ActivityHandler ah = new ActivityHandler(engine);
-		LegHandler lh = new LegHandler(engine);
-		planSim.setPlanElementHandler(Activity.class, ah);
-		planSim.setPlanElementHandler(Leg.class, lh);
-		planSim.addMobsimFeature(ah); // how should a user know ah is a simfeature, bug lh not?
-
-		// setup DepartureHandlers
-		lh.setDepartureHandler(TransportMode.car, new CarDepartureHandler(engine, netFeature, f.scenario));
-		/* setup end */ // TODO too much boilerplate code for testing
-
-		// register agent sources
-		planSim.addAgentSource(new PopulationAgentSource(f.scenario.getPopulation(), 1.0));
-
-		planSim.runMobsim();
-
-		MobsimLink simLink = simNetwork.getLinks().get(((Leg) person3.getSelectedPlan().getPlanElements().get(5)).getRoute().getEndLinkId());
-		Assert.assertNotNull("car should be parked, but cannot be found on link.", simLink.getParkedVehicle(person3.getId()));
+		List<Event> allEvents = eventsCollector.getEvents();
+		for (Event e : allEvents) {
+			System.out.println(e);
+		}
+		Assert.assertEquals(6, allEvents.size());
+		Assert.assertTrue(allEvents.get(0) instanceof ActivityEndEvent);
+		Assert.assertTrue(allEvents.get(1) instanceof AgentDepartureEvent);
+		Assert.assertTrue(allEvents.get(2) instanceof AgentWait2LinkEvent);
+		Assert.assertTrue(allEvents.get(3) instanceof LinkLeaveEvent);
+		Assert.assertTrue(allEvents.get(4) instanceof LinkEnterEvent);
+		Assert.assertTrue(allEvents.get(5) instanceof AgentStuckEvent);
+		Assert.assertEquals(person1.getId(), ((AgentStuckEvent) allEvents.get(5)).getPersonId());
 	}
 }
