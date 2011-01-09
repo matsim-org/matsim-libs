@@ -20,6 +20,7 @@
 package playground.mrieser.core.mobsim.features;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.misc.Time;
 
 public class StatusFeature implements MobsimFeature {
@@ -45,6 +46,7 @@ public class StatusFeature implements MobsimFeature {
 		}
 		if (time >= this.nextTime) {
 			log.info("Simulation time: " + Time.writeTime(time) + " speed-up: " + ((time - this.firstTime) / ((System.currentTimeMillis() - this.firstRealTime) / 1000.0)));
+			Gbl.printMemoryUsage();
 		}
 		while (this.nextTime <= time) {
 			this.nextTime += 3600.0;
