@@ -125,6 +125,10 @@ import org.matsim.core.gbl.Gbl;
 		try {
 			// release the other threads
 			this.startNodesBarrier.await();
+			// wait until they have finished
+			for (int i = 0; i < this.nOfThreads; i++) {
+				this.threads[i].join();
+			}
 		} catch (InterruptedException e) {
 			throw new RuntimeException(e);
 		} catch (BrokenBarrierException e) {
