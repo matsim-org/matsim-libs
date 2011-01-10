@@ -43,7 +43,7 @@ public class TransitIntegrationTest {
 
 		ScenarioImpl s = controler.getScenario();
 		Assert.assertNotNull(s.getTransitSchedule());
-		Assert.assertEquals(3, s.getTransitSchedule().getFacilities().size());
+		Assert.assertEquals(4, s.getTransitSchedule().getFacilities().size());
 		Assert.assertEquals(1, s.getTransitSchedule().getTransitLines().size());
 	}
 }
