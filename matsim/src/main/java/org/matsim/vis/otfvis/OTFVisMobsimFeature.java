@@ -52,6 +52,7 @@ import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsData;
 import org.matsim.signalsystems.otfvis.io.OTFSignalReader;
 import org.matsim.signalsystems.otfvis.io.OTFSignalWriter;
 import org.matsim.signalsystems.otfvis.io.SignalGroupStateChangeTracker;
+import org.matsim.vis.otfvis.caching.SimpleSceneLayer;
 import org.matsim.vis.otfvis.data.DefaultConnectionManagerFactory;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.teleportation.OTFTeleportAgentsDataReader;
@@ -137,11 +138,13 @@ SimulationInitializedListener, SimulationAfterSimStepListener, SimulationBeforeC
 				this.connectionManager.connectReaderToReceiver(
 						FacilityDrawer.DataReader_v1_0.class,
 						FacilityDrawer.DataDrawer.class);
+				this.connectionManager.connectReceiverToLayer(FacilityDrawer.DataDrawer.class, SimpleSceneLayer.class);
 			}
 			if (config.scenario().isUseLanes() && (!config.scenario().isUseSignalSystems())) {
 				this.otfServer.addAdditionalElement(new OTFLaneWriter(this.queueSimulation.getVisNetwork(), ((ScenarioImpl) this.queueSimulation.getScenario()).getLaneDefinitions()));
 				this.connectionManager.connectWriterToReader(OTFLaneWriter.class, OTFLaneReader.class);
 				this.connectionManager.connectReaderToReceiver(OTFLaneReader.class, OTFLaneSignalDrawer.class);
+				this.connectionManager.connectReceiverToLayer(OTFLaneSignalDrawer.class, SimpleSceneLayer.class);
 				config.otfVis().setScaleQuadTreeRect(true);
 			} 
 			else if (config.scenario().isUseSignalSystems()) {
@@ -154,6 +157,7 @@ SimulationInitializedListener, SimulationAfterSimStepListener, SimulationBeforeC
 				this.otfServer.addAdditionalElement(new OTFSignalWriter(this.queueSimulation.getVisNetwork(), laneDefs, systemsData, groupsData , signalTracker));
 				this.connectionManager.connectWriterToReader(OTFSignalWriter.class, OTFSignalReader.class);
 				this.connectionManager.connectReaderToReceiver(OTFSignalReader.class, OTFLaneSignalDrawer.class);
+				this.connectionManager.connectReceiverToLayer(OTFLaneSignalDrawer.class, SimpleSceneLayer.class);
 				config.otfVis().setScaleQuadTreeRect(true);
 			}
 
