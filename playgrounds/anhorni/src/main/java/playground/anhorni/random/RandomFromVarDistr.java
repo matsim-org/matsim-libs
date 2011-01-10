@@ -30,8 +30,27 @@ public class RandomFromVarDistr {
 		return mean + sigma  * rnd.nextGaussian();
 	}
 	
-	public double getGumbel(double mu, double beta) {
-		double r = mu - beta * Math.log((Math.log(-1.0 * this.getUniform(1.0))));
-		return r;
+	// not used in LEGO:
+	// Wikipedia:  X=mu-beta ln(-ln(U)) 
+	public double getStandardGumbel(double mu, double beta, double sigma) {
+		double uniform = rnd.nextDouble();
+		
+		// ln(-ln(0)) undefined
+		while (uniform == 0.0) {
+			uniform = rnd.nextDouble();
+		}
+		// ln(0) = infinity
+		if (uniform == 1.0) {
+			return Double.MAX_VALUE;
+		}		
+		double r = mu - beta * Math.log(-Math.log(uniform));
+		//scale to sigma^2 = sigma_in: 
+		//var(aX) 	= a^2 var(X) 	= beta^2 * PI^2 /(6.0) scale to 1
+		//stdev(aX) = a * stdev(X) 	= beta * PI / sqrt(6.0) scale to 1
+		
+		// => a = sqrt(6) / (PI * beta)
+		
+		// sigma_gumbel = beta * PI / sqrt(6.0)
+		return (r * sigma * Math.sqrt(6.0) / (Math.PI * beta));
 	}
 }
