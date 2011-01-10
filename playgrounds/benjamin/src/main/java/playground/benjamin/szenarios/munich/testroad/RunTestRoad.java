@@ -36,7 +36,7 @@ public class RunTestRoad {
 	static String outputPath = "../../detailedEval/teststrecke/sim/output/";
 	static String configName = "multipleRunsConfig.xml";
 
-	static Id enterLinkId = new IdImpl("592536888");
+	static Id enterLinkId = new IdImpl("590000822");
 	static Id leaveLinkId = new IdImpl("590000822");
 
 	static Integer leaveLinkCapacity = 1400;

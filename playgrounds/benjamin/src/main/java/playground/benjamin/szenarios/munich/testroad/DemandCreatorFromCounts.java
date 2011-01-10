@@ -78,7 +78,7 @@ public class DemandCreatorFromCounts {
 
 			/*inflow times are randomly equally mutated within a 2min time bin;
 			one could think of modelling peak inflows due to upstream signals systems...*/
-			fuzzifyTimes(population);
+			//fuzzifyTimes(population);
 
 			addTestVehicle(population, testVehiclePath + day + "_travelTimes.csv");
 			writePlans(population, day);
@@ -152,7 +152,7 @@ public class DemandCreatorFromCounts {
 	}
 
 	private static void fuzzifyTimes(Population population) {
-		PlanMutateTimeAllocation planMutateTimeAllocation = new PlanMutateTimeAllocation(1 * 60, new Random());
+		PlanMutateTimeAllocation planMutateTimeAllocation = new PlanMutateTimeAllocation(1 * 60, new Random(4711));
 		planMutateTimeAllocation.setUseActivityDurations(false);
 		for (Person person : population.getPersons().values()) {
 			Plan plan = person.getPlans().iterator().next();

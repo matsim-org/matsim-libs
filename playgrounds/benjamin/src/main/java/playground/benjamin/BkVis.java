@@ -37,7 +37,7 @@ public class BkVis {
 //			String otffile = "../detailedEval/teststrecke/sim/output/20090707/ITERS/it.0/0.otfvis.mvi";
 //			String otffile = "../matsim/output/singleIteration/ITERS/it.0/0.otfvis.mvi";
 //			String otffile = BkPaths.RUNSSVN + "run749/it.2000/749.2000.Zurich.otfvis.mvi";
-			String otffile = BkPaths.RUNSSVN + "run953/it.1000/953.1000.events.mvi";
+//			String otffile = BkPaths.RUNSSVN + "run953/it.1000/953.1000.events.mvi";
 
 //===========================================================================================================		
 /*	Für den interactiven Modus:
@@ -61,7 +61,7 @@ public class BkVis {
 //		String otffile = "../matsim/examples/tutorial/singleIteration.xml";
 //		String otffile = BkPaths.RUNSSVN + "run749/TestOTFVis_interactive/749.output_config.xml";
 //		String otffile = "../detailedEval/pop/140k-synthetische-personen/config-for-visualisation.xml";
-//		String otffile = "../detailedEval/teststrecke/sim/input/liveConfig_benjamin.xml";
+		String otffile = "../detailedEval/teststrecke/sim/input/liveConfig_benjamin.xml";
 //		String otffile = BkPaths.RUNSSVN + "run950/950.output_config.xml";
 
 		
