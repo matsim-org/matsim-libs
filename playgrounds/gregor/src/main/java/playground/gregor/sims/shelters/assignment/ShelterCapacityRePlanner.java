@@ -164,6 +164,9 @@ public class ShelterCapacityRePlanner implements IterationStartsListener {
 	private int reduceOvercapacity() {
 		int cap = 0;
 		for (ShelterInfo si : this.shelters) {
+			if (si.id.toString().equals("el1")) {
+				continue;
+			}
 			int totalOvercap = si.freeSpace + si.overCapacityDeltT;
 			if (totalOvercap > 0) {
 
