@@ -20,10 +20,20 @@
 
 package org.matsim.core.controler;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.EnumSet;
 
+import org.apache.log4j.Logger;
+import org.junit.Assert;
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
@@ -53,10 +63,14 @@ import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 
-public class ControlerTest extends MatsimTestCase {
+public class ControlerTest {
 
+	private final static Logger log = Logger.getLogger(ControlerTest.class);
+	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
+
+	@Test
 	public void testConstructor() {
 		Controler controler = new Controler(new String[]{"test/scenarios/equil/config.xml"});
 		assertNotNull(controler.getNetwork()); // is required, e.g. for changing the factories
@@ -71,8 +85,9 @@ public class ControlerTest extends MatsimTestCase {
 	 *
 	 * @author mrieser
 	 */
+	@Test
 	public void testTravelTimeCalculation() {
-		Config config = loadConfig(null);
+		Config config = utils.loadConfig(null);
 		Fixture f = new Fixture(config);
 
 		/* Create 2 persons driving from link 1 to link 3, both starting at the
@@ -157,8 +172,9 @@ public class ControlerTest extends MatsimTestCase {
 	 *
 	 * @author mrieser
 	 */
+	@Test
 	public void testSetScoringFunctionFactory() {
-		final Config config = loadConfig(null);
+		final Config config = utils.loadConfig(null);
 		config.controler().setLastIteration(0);
 
 		ScenarioImpl scenario = new ScenarioImpl(config);
@@ -192,8 +208,9 @@ public class ControlerTest extends MatsimTestCase {
 	 *
 	 * @author mrieser
 	 */
+	@Test
 	public void testCalcMissingRoutes() {
-		Config config = loadConfig(null);
+		Config config = utils.loadConfig(null);
 		Fixture f = new Fixture(config);
 
 		/* Create a person with two plans, driving from link 1 to link 3, starting at 7am.  */
@@ -256,8 +273,9 @@ public class ControlerTest extends MatsimTestCase {
 	 *
 	 * @author mrieser
 	 */
+	@Test
 	public void testCalcMissingActLinks() {
-		Config config = loadConfig(null);
+		Config config = utils.loadConfig(null);
 		Fixture f = new Fixture(config);
 
 		/* Create a person with two plans, driving from link 1 to link 3, starting at 7am.  */
@@ -329,8 +347,9 @@ public class ControlerTest extends MatsimTestCase {
 	/**
 	 * @author mrieser
 	 */
+	@Test
 	public void testSetWriteEventsInterval() {
-		final Config config = loadConfig("test/scenarios/equil/config_plans1.xml");
+		final Config config = utils.loadConfig("test/scenarios/equil/config_plans1.xml");
 		config.controler().setLastIteration(10);
 
 		final Controler controler = new Controler(config);
@@ -357,8 +376,9 @@ public class ControlerTest extends MatsimTestCase {
 	/**
 	 * @author wrashid
 	 */
+	@Test
 	public void testSetWriteEventsIntervalConfig() {
-		final Config config = loadConfig("test/scenarios/equil/config_plans1.xml");
+		final Config config = utils.loadConfig("test/scenarios/equil/config_plans1.xml");
 		config.controler().setLastIteration(10);
 
 		final Controler controler = new Controler(config);
@@ -384,8 +404,9 @@ public class ControlerTest extends MatsimTestCase {
 	/**
 	 * @author mrieser
 	 */
+	@Test
 	public void testSetWriteEventsNever() {
-		final Config config = loadConfig("test/scenarios/equil/config_plans1.xml");
+		final Config config = utils.loadConfig("test/scenarios/equil/config_plans1.xml");
 		config.controler().setLastIteration(1);
 
 		final Controler controler = new Controler(config);
@@ -403,8 +424,9 @@ public class ControlerTest extends MatsimTestCase {
 	/**
 	 * @author mrieser
 	 */
+	@Test
 	public void testSetWriteEventsAlways() {
-		final Config config = loadConfig("test/scenarios/equil/config_plans1.xml");
+		final Config config = utils.loadConfig("test/scenarios/equil/config_plans1.xml");
 		config.controler().setLastIteration(1);
 
 		final Controler controler = new Controler(config);
@@ -420,8 +442,9 @@ public class ControlerTest extends MatsimTestCase {
 	/**
 	 * @author mrieser
 	 */
+	@Test
 	public void testSetWriteEventsTxt() {
-		final Config config = loadConfig("test/scenarios/equil/config_plans1.xml");
+		final Config config = utils.loadConfig("test/scenarios/equil/config_plans1.xml");
 		config.controler().setLastIteration(0);
 		config.controler().setEventsFileFormats(EnumSet.of(EventsFileFormat.txt));
 
@@ -438,8 +461,9 @@ public class ControlerTest extends MatsimTestCase {
 	/**
 	 * @author mrieser
 	 */
+	@Test
 	public void testSetWriteEventsXml() {
-		final Config config = loadConfig("test/scenarios/equil/config_plans1.xml");
+		final Config config = utils.loadConfig("test/scenarios/equil/config_plans1.xml");
 		config.controler().setLastIteration(0);
 		config.controler().setEventsFileFormats(EnumSet.of(EventsFileFormat.xml));
 
@@ -456,8 +480,9 @@ public class ControlerTest extends MatsimTestCase {
 	/**
 	 * @author mrieser
 	 */
+	@Test
 	public void testSetWriteEventsTxtXml() {
-		final Config config = loadConfig("test/scenarios/equil/config_plans1.xml");
+		final Config config = utils.loadConfig("test/scenarios/equil/config_plans1.xml");
 		config.controler().setLastIteration(0);
 		config.controler().setEventsFileFormats(EnumSet.of(EventsFileFormat.txt, EventsFileFormat.xml));
 
@@ -474,8 +499,9 @@ public class ControlerTest extends MatsimTestCase {
 	/**
 	 * @author mrieser
 	 */
+	@Test
 	public void testSetMobsimFactory() {
-		final Config config = loadConfig("test/scenarios/equil/config_plans1.xml");
+		final Config config = utils.loadConfig("test/scenarios/equil/config_plans1.xml");
 		config.controler().setLastIteration(1);
 		config.controler().setEventsFileFormats(EnumSet.of(EventsFileFormat.txt, EventsFileFormat.xml));
 
@@ -487,6 +513,40 @@ public class ControlerTest extends MatsimTestCase {
 		controler.setCreateGraphs(false);
 		controler.run();
 		assertEquals(2, testFactory.counter);
+	}
+
+	@Test
+	public void test_ExceptionOnMissingPopulationFile() {
+		final Config config = utils.loadConfig("test/scenarios/equil/config_plans1.xml");
+		config.controler().setLastIteration(0);
+		config.plans().setInputFile("dummy/non-existing/population.xml");
+
+		final Controler controler = new Controler(config);
+		controler.setMobsimFactory(new FakeMobsimFactory());
+		controler.setCreateGraphs(false);
+		try {
+			controler.run();
+			Assert.fail("expected exception, got none.");
+		} catch (RuntimeException e) {
+			log.info("catched expected exception.", e);
+		}
+	}
+
+	@Test
+	public void test_ExceptionOnMissingNetworkFile() {
+		final Config config = utils.loadConfig("test/scenarios/equil/config_plans1.xml");
+		config.controler().setLastIteration(0);
+		config.network().setInputFile("dummy/non-existing/network.xml");
+
+		final Controler controler = new Controler(config);
+		controler.setMobsimFactory(new FakeMobsimFactory());
+		controler.setCreateGraphs(false);
+		try {
+			controler.run();
+			Assert.fail("expected exception, got none.");
+		} catch (RuntimeException e) {
+			log.info("catched expected exception.", e);
+		}
 	}
 
 	/*package*/ static class FakeMobsim implements Simulation {
