@@ -25,6 +25,7 @@ Changes:
   API-Changes:
   - deprecated NetworkFactory.createLink(Id, Id, Id) (r13924)
   - added NetworkFactory.createLink(Id, Node, Node) (r13924)
+  - ScenarioLoaderImpl now also loads transit-related data if transit is enabled in the configuration (r13950)
 
   Non-API Changes:
   - ?
