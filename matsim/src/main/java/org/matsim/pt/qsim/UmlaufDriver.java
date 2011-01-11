@@ -119,11 +119,11 @@ public class UmlaufDriver extends AbstractTransitDriver {
 						now, this.getPerson().getId(), this.getDestinationLinkId(), this.getCurrentLeg().getMode()));
 		this.currentPlanElement = iPlanElement.next();
 		if (this.iUmlaufStueck.hasNext()) {
+			setNextLeg();
 			if (this.departureTime < now) {
 				this.departureTime = now;
 			}
 			this.sim.scheduleActivityEnd(this);
-			setNextLeg();
 		} else {
 			this.getSimulation().getAgentCounter().decLiving();
 		}
