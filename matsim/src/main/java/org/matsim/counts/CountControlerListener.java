@@ -94,6 +94,8 @@ public class CountControlerListener implements StartupListener,
 				CountSimComparisonTableWriter ctw=new CountSimComparisonTableWriter(cca.getComparison(),Locale.ENGLISH);
 				ctw.writeFile(filename);
 			}
+//			controler.getLinkStats().reset(); // This is, presumably, a good place where CalcLinkStats.reset() could be called.  
+			// But would need to be tested.  kai, jan'11
 			controler.stopwatch.endOperation("compare with counts");
 		}
 	}
