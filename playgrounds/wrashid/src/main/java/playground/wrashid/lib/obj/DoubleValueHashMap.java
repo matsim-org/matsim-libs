@@ -2,6 +2,8 @@ package playground.wrashid.lib.obj;
 
 import java.util.HashMap;
 
+import playground.wrashid.lib.GeneralLib;
+
 /**
  * Often one needs a HashMap, where the value can be incremented and
  * decremented. This data structure provides that facility for doubles.
@@ -49,6 +51,23 @@ public class DoubleValueHashMap<KeyClass> {
 	
 	public void remove(KeyClass id){
 		hm.remove(id);
+	}
+	
+	public void printToConsole(){
+		GeneralLib.printHashmapToConsole(hm);
+	}
+	
+	public KeyClass getKeyForMaxValue(){
+		double maxValue=Double.MIN_VALUE;
+		KeyClass maxKey=null;
+		for (KeyClass key:hm.keySet()){
+			double curValue=hm.get(key);
+			if (curValue>maxValue){
+				maxValue=curValue;
+				maxKey=key;
+			}
+		}	
+		return maxKey;
 	}
 
 }

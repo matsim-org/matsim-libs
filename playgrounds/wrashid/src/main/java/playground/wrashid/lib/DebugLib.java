@@ -10,6 +10,12 @@ public class DebugLib {
 		}
 	}
 
+	public static void assertTrue(boolean val, String errorString){
+		if (!val){
+			stopSystemAndReportInconsistency(errorString);	
+		}
+	}
+	
 	public static void startDebuggingInIteration(int iterationNumber){
 		if (iterationNumber==18){
 			System.out.println();

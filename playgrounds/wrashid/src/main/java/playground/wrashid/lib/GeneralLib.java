@@ -11,6 +11,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.StringTokenizer;
 
@@ -657,4 +658,10 @@ public class GeneralLib {
 		return matrix;
 	}
 		
+	public static void printHashmapToConsole(HashMap hm){
+		for (Object key:hm.keySet()){
+			System.out.println(key.toString() +"\t"+hm.get(key));
+		}	
+	}
+	
 }
