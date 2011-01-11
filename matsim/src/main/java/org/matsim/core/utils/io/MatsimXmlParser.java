@@ -63,7 +63,7 @@ public abstract class MatsimXmlParser extends DefaultHandler {
 	private boolean isValidating = true;
 	private boolean isNamespaceAware = true;
 
-	private String localDtdBase = "dtd/";
+	private String localDtdBase = "dtd";
 
 	private String doctype = null;
 	/**
@@ -223,7 +223,7 @@ public abstract class MatsimXmlParser extends DefaultHandler {
 		}
 		// systemId could not be resolved, try it locally
 		if (this.localDtdBase != null) {
-			String localFileName = this.localDtdBase + shortSystemId;
+			String localFileName = this.localDtdBase + "/" + shortSystemId;
 			File dtdFile = new File(localFileName);
 			log.debug("dtdfile: " + dtdFile.getAbsolutePath());
 			if (dtdFile.exists() && dtdFile.isFile() && dtdFile.canRead()) {
