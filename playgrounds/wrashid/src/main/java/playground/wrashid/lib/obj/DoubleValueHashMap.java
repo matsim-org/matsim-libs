@@ -15,7 +15,7 @@ import playground.wrashid.lib.GeneralLib;
 public class DoubleValueHashMap<KeyClass> {
 
 	private HashMap<KeyClass, Double> hm = new HashMap<KeyClass, Double>();
-
+	
 	public double get(KeyClass id) {
 		if (!hm.containsKey(id)) {
 			hm.put(id, 0.0);
@@ -70,4 +70,14 @@ public class DoubleValueHashMap<KeyClass> {
 		return maxKey;
 	}
 
+	// TODO: write test
+	public double getAverage() {
+		double sum = 0;
+		for (KeyClass key : hm.keySet()) {
+			double curValue = hm.get(key);
+			sum += curValue;
+		}
+		return sum / hm.size();
+	}
+	
 }

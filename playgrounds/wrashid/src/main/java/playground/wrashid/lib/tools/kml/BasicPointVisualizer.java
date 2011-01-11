@@ -9,6 +9,12 @@ import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
 
 import playground.wrashid.lib.GeneralLib;
 
+
+/**
+ * Output of this can be looked at in google earth and google maps
+ * @author wrashid
+ *
+ */
 public class BasicPointVisualizer {
 
 	// TODO: make object out of these three lists (and just one list of that object...
