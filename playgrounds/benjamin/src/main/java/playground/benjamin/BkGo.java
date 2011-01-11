@@ -33,21 +33,22 @@ import org.matsim.core.controler.Controler;
  *
  */
 public class BkGo {
+	
+	static String baseDirectory = "../../detailedEval/teststrecke/sim/";
+	
+	static String configFile = baseDirectory + "inputVehicles/config_vehiclesTest.xml";
+	
+	static String outputDirectory = baseDirectory + "outputVehicles";
+	
+	static String networkFile = baseDirectory + "input/network.xml";
+	
+	static String changeEventsInputFile = baseDirectory + "input/capacityChanges.xml";
+	
+	static String plansFile = baseDirectory + "input/20090708_plans.xml.gz";
+	
+	static String householdsFile = baseDirectory + "";
 
 	public static void main(String[] args) {
-		String baseDirectory = "../../detailedEval/teststrecke/sim/";
-		
-		String configFile = baseDirectory + "inputVehicles/config_vehiclesTest.xml";
-		
-		String outputDirectory = baseDirectory + "outputVehicles";
-		
-		String networkFile = baseDirectory + "input/network.xml";
-		
-		String changeEventsInputFile = baseDirectory + "input/capacityChanges.xml";
-		
-		String plansFile = baseDirectory + "input/20090708_plans.xml.gz";
-		
-		String householdsFile = baseDirectory + "";
 		
 		Config config = new Config();
 		config.addCoreModules();
