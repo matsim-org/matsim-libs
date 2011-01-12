@@ -19,6 +19,8 @@
 
 package playground.mrieser.objectattributes;
 
+import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -26,7 +28,7 @@ import java.util.Map;
  * A simple helper class to store arbitrary attributes (identified by Strings) for
  * arbitrary objects (identified by String-Ids). Note that this implementation uses
  * large amounts of memory for storing many attributes for many objects, it is not
- * optimized in any way.
+ * heavily optimized.
  *
  * <em>This class is not thread-safe.</em>
  *
@@ -34,15 +36,16 @@ import java.util.Map;
  */
 public class ObjectAttributes {
 
-	/*package*/ Map<String, Map<String, Object>> attributes = new LinkedHashMap<String, Map<String, Object>>();
+	/*package*/ Map<String, Map<String, Object>> attributes = new LinkedHashMap<String, Map<String, Object>>(1000);
+	Map<String, String> stringCache = new HashMap<String, String>(1000);
 
 	public Object putAttribute(final String objectId, final String attribute, final Object value) {
 		Map<String, Object> attMap = this.attributes.get(objectId);
 		if (attMap == null) {
-			attMap = new LinkedHashMap<String, Object>(5);
+			attMap = new IdentityHashMap<String, Object>(5);
 			this.attributes.put(objectId, attMap);
 		}
-		return attMap.put(attribute, value);
+		return attMap.put(attribute.intern(), value);
 	}
 
 	public Object getAttribute(final String objectId, final String attribute) {
@@ -50,7 +53,7 @@ public class ObjectAttributes {
 		if (attMap == null) {
 			return null;
 		}
-		return attMap.get(attribute);
+		return attMap.get(attribute.intern());
 	}
 
 	public Object removeAttribute(final String objectId, final String attribute) {
@@ -58,7 +61,7 @@ public class ObjectAttributes {
 		if (attMap == null) {
 			return null;
 		}
-		return attMap.remove(attribute);
+		return attMap.remove(attribute.intern());
 	}
 
 	public void removeAllAttributes(final String objectId) {
