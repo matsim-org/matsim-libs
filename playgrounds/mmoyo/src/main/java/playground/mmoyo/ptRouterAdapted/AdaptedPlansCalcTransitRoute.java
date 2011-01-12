@@ -41,7 +41,7 @@ public class AdaptedPlansCalcTransitRoute extends PlansCalcTransitRoute {
 	private static final Logger log = Logger.getLogger(AdaptedPlansCalcTransitRoute.class);
 
 	//private final TransitActsRemover transitLegsRemover = new TransitActsRemover();
-	private final AdaptedTransitRouter adaptedTransitRouter;
+	//private final AdaptedTransitRouter adaptedTransitRouter;
 
 	//private Plan currentPlan = null;
 	//private final List<Tuple<Leg, List<Leg>>> legReplacements = new LinkedList<Tuple<Leg, List<Leg>>>();
@@ -51,9 +51,9 @@ public class AdaptedPlansCalcTransitRoute extends PlansCalcTransitRoute {
 			final LeastCostPathCalculatorFactory factory, final TransitSchedule schedule,
 			final TransitConfigGroup transitConfig, MyTransitRouterConfig myTransitRouterConfig) {
 		//super(config, network, costCalculator, timeCalculator, factory);
-		super(config, network, costCalculator, timeCalculator, factory, transitConfig, new TransitRouter(schedule, new TransitRouterConfig()));
+		super(config, network, costCalculator, timeCalculator, factory, transitConfig, new AdaptedTransitRouter(myTransitRouterConfig, schedule));
 
-		this.adaptedTransitRouter = new AdaptedTransitRouter( myTransitRouterConfig, schedule);
+		//this.adaptedTransitRouter = new AdaptedTransitRouter( myTransitRouterConfig, schedule);
 
 //		// both "super" route algos are made to route only on the "car" network.  yy I assume this is since the non-car modes are handled
 //		// here.  This is, in fact, NOT correct, since this does not handle bike, so would need to be fixed before production use).  kai, apr'10
@@ -76,7 +76,9 @@ public class AdaptedPlansCalcTransitRoute extends PlansCalcTransitRoute {
 		// "LeastCostPathAlgo"?  kai, apr'10
 		// yyyy but first step really is to remove code duplication as much as possible.  kai, apr'10
 
-		List<Leg> legs= this.adaptedTransitRouter.calcRoute(fromAct.getCoord(), toAct.getCoord(), depTime);
+		//List<Leg> legs= this.adaptedTransitRouter.calcRoute(fromAct.getCoord(), toAct.getCoord(), depTime);
+		List<Leg> legs= ((AdaptedTransitRouter)this.getTransitRouter()).calcRoute(fromAct.getCoord(), toAct.getCoord(), depTime);
+
 //		this.legReplacements.add(new Tuple<Leg, List<Leg>>(leg, legs));
 		super.getLegReplacements().add(new Tuple<Leg, List<Leg>>(leg, legs));
 

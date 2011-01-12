@@ -39,7 +39,9 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.router.MultiNodeDijkstra.InitialNode;
 import org.matsim.pt.router.TransitRouter;
+import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterNetwork;
+import org.matsim.pt.router.TransitRouterNetworkTravelTimeCost;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkLink;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkNode;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -54,7 +56,9 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 public class AdaptedTransitRouter extends TransitRouter {
 
 	public AdaptedTransitRouter(MyTransitRouterConfig myTRConfig, final TransitSchedule schedule) {
-		super(schedule, myTRConfig, new AdaptedTransitRouterNetworkTravelTimeCost(myTRConfig));
+		
+		//super(schedule, myTRConfig, new AdaptedTransitRouterNetworkTravelTimeCost(myTRConfig));
+		super (schedule, myTRConfig, new AdaptedTransitRouterNetworkTravelTimeCost(myTRConfig), buildNetwork(schedule, myTRConfig.beelineWalkConnectionDistance ));
 		//attention : the transit network is created first in the upper class   with "this.adaptedTransitNetwork = buildNetwork()";
 	}
 
@@ -124,20 +128,22 @@ public class AdaptedTransitRouter extends TransitRouter {
 	}
 
 	/**necessary to override since it uses a different algo than marcel.  kai, apr'10
+	 * @param beelineWalkConnectionDistance 
 	 *
 	 */
-	protected TransitRouterNetwork buildNetwork() {
+	protected static TransitRouterNetwork buildNetwork(final TransitSchedule sch, final double beelineWalkConnectionDistance) {
 
 		final TransitRouterNetwork network = new TransitRouterNetwork();
 
 		// build nodes and links connecting the nodes according to the transit routes
-		for (TransitLine line : this.getSchedule().getTransitLines().values()) {
+		for (TransitLine line : sch.getTransitLines().values()) {
 			for (TransitRoute route : line.getRoutes().values()) {
 				TransitRouterNetworkNode prevNode = null;
 				for (TransitRouteStop stop : route.getStops()) {
 					TransitRouterNetworkNode node = network.createNode(stop, route, line);
 					if (prevNode != null) {
-						TransitRouterNetworkLink link = network.createLink(prevNode, node, route, line);
+						//TransitRouterNetworkLink link = network.createLink(prevNode, node, route, line);
+						network.createLink(prevNode, node, route, line);
 					}
 					prevNode = node;
 				}
@@ -150,10 +156,9 @@ public class AdaptedTransitRouter extends TransitRouter {
 
 		// reduced creation of transferlinks*
 		for (TransitRouterNetworkNode centerNode : network.getNodes().values()) {
-			for (TransitRouterNetworkNode nearNode : network.getNearestNodes(centerNode.getCoord(),
-					this.getConfig().beelineWalkConnectionDistance)) {
+			for (TransitRouterNetworkNode nearNode : network.getNearestNodes(centerNode.getCoord(), beelineWalkConnectionDistance)) {
 				if (centerNode != nearNode && centerNode.line != nearNode.line) { // || centerNode.stop.getStopFacility() !=
-					// nearNode.stop.getStopFacility() this
+					// nearNode.stop.getStopFacility() this 
 					// condition creates more transfer links
 					if (centerNode.route.getStops().get(0) != centerNode.stop
 							&& nearNode.route.getStops().get(nearNode.route.getStops().size() - 1) != nearNode.stop) {

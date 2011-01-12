@@ -34,7 +34,7 @@ public class AdaptedLauncher {
 	final String routing = "routing ";
 	
 	public AdaptedLauncher(final String configFile) {
-		this.scenario = new DataLoader ().loadScenarioWithTrSchedule(configFile); 
+		this.scenario = new DataLoader ().loadScenario(configFile); 
 		validateOutDir();
 	}
 	
