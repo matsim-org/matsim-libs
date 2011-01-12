@@ -1094,7 +1094,7 @@ public class Controler {
 					travelTimes, this.getLeastCostPathCalculatorFactory());
 
 			for (String mode : CollectionUtils.stringToArray(this.config.multiModal().getSimulatedModes())) {
-				plansCalcRoute.addLegHandler(multiModalLegHandler, mode);
+				plansCalcRoute.addLegHandler(mode, multiModalLegHandler);
 			}
 
 			return plansCalcRoute;

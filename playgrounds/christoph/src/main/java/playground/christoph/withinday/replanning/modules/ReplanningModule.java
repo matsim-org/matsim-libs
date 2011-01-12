@@ -60,10 +60,10 @@ public class ReplanningModule extends AbstractMultithreadedModule {
 			MultiModalLegHandler multiModalLegHandler = new MultiModalLegHandler(this.config.multiModal(), this.network, timeCalculator, factory);
 			
 			String simulatedModes = this.config.multiModal().getSimulatedModes().toLowerCase();
-			if (simulatedModes.contains(TransportMode.walk)) plansCalcRoute.addLegHandler(multiModalLegHandler, TransportMode.walk);
-			if (simulatedModes.contains(TransportMode.bike)) plansCalcRoute.addLegHandler(multiModalLegHandler, TransportMode.bike);
-			if (simulatedModes.contains(TransportMode.ride)) plansCalcRoute.addLegHandler(multiModalLegHandler, TransportMode.ride);
-			if (simulatedModes.contains(TransportMode.pt)) plansCalcRoute.addLegHandler(multiModalLegHandler, TransportMode.pt);
+			if (simulatedModes.contains(TransportMode.walk)) plansCalcRoute.addLegHandler(TransportMode.walk, multiModalLegHandler);
+			if (simulatedModes.contains(TransportMode.bike)) plansCalcRoute.addLegHandler(TransportMode.bike, multiModalLegHandler);
+			if (simulatedModes.contains(TransportMode.ride)) plansCalcRoute.addLegHandler(TransportMode.ride, multiModalLegHandler);
+			if (simulatedModes.contains(TransportMode.pt)) plansCalcRoute.addLegHandler(TransportMode.pt, multiModalLegHandler);
 		}
 		
 		return plansCalcRoute;

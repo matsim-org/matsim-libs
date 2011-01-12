@@ -60,7 +60,7 @@ public class ReRouteDijkstraTurningMoves extends AbstractMultithreadedModule {
 		PlansCalcRoute plansCalcRoute = new PlansCalcRoute(config, wrappedNetwork, costCalculator, timeCalculator);
 		
 		DijkstraLegHandler dijkstraLegHandler = new DijkstraLegHandler(this.originalNetwork, this.wrappedNetwork, costCalculator, timeCalculator);	
-		plansCalcRoute.addLegHandler(dijkstraLegHandler, TransportMode.car);
+		plansCalcRoute.addLegHandler(TransportMode.car, dijkstraLegHandler);
 		
 		return plansCalcRoute;
 	}

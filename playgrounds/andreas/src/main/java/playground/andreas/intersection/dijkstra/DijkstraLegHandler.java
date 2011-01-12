@@ -33,7 +33,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.Dijkstra;
-import org.matsim.core.router.LegHandler;
+import org.matsim.core.router.LegRouter;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.PersonalizableTravelCost;
@@ -49,7 +49,7 @@ import org.matsim.core.utils.misc.RouteUtils;
  *
  * @author mrieser, aneumann, cdobler
  */
-public class DijkstraLegHandler implements LegHandler {
+public class DijkstraLegHandler implements LegRouter {
 
 	Network wrappedNetwork;
 	Network originalNetwork;
@@ -64,7 +64,7 @@ public class DijkstraLegHandler implements LegHandler {
 	}
 	
 	@Override
-	public double handleLeg(Person person, Leg leg, Activity fromAct, Activity toAct, double depTime) {
+	public double routeLeg(Person person, Leg leg, Activity fromAct, Activity toAct, double depTime) {
 			String legMode = leg.getMode();
 		
 		if (TransportMode.car.equals(legMode)) {

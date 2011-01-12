@@ -97,7 +97,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 
 	private final PersonalizableTravelTime timeCalculator;
 
-	private Map<String, LegHandler> legHandlers;
+	private Map<String, LegRouter> legHandlers;
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
@@ -150,18 +150,18 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 	}
 
 	private void initDefaultLegHandlers() {
-		legHandlers = new HashMap<String, LegHandler>();
+		legHandlers = new HashMap<String, LegRouter>();
 
 		DefaultLegHandler legHandler = new DefaultLegHandler(configGroup, network, routeAlgo, routeAlgoPtFreeflow);
-		this.addLegHandler(legHandler, TransportMode.pt);
-		this.addLegHandler(legHandler, TransportMode.car);
-		this.addLegHandler(legHandler, TransportMode.bike);
-		this.addLegHandler(legHandler, TransportMode.ride);
-		this.addLegHandler(legHandler, TransportMode.walk);
-		this.addLegHandler(legHandler, "undefined");
+		this.addLegHandler(TransportMode.car, legHandler);
+		this.addLegHandler(TransportMode.ride, legHandler);
+		this.addLegHandler(TransportMode.pt, legHandler);
+		this.addLegHandler(TransportMode.bike, new TeleportationLegRouter(this.routeFactory, this.configGroup.getBikeSpeed()));
+		this.addLegHandler(TransportMode.walk, new TeleportationLegRouter(this.routeFactory, this.configGroup.getWalkSpeed()));
+		this.addLegHandler("undefined", new TeleportationLegRouter(this.routeFactory, this.configGroup.getUndefinedModeSpeed()));
 	}
 
-	public final void addLegHandler(LegHandler legHandler, String transportMode) {
+	public final void addLegHandler(String transportMode, LegRouter legHandler) {
 		if (legHandlers.get(transportMode) != null) {
 			log.warn("A LegHandler for " + transportMode + " legs is already registered - it is replaced!");
 		}
@@ -243,9 +243,9 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 	 */
 	public double handleLeg(Person person, final Leg leg, final Activity fromAct, final Activity toAct, final double depTime) {
 		String legmode = leg.getMode();
-		LegHandler legHandler = legHandlers.get(legmode);
+		LegRouter legHandler = legHandlers.get(legmode);
 		if (legHandler != null) {
-			return legHandler.handleLeg(person, leg, fromAct, toAct, depTime);
+			return legHandler.routeLeg(person, leg, fromAct, toAct, depTime);
 		} else {
 			throw new RuntimeException("cannot handle legmode '" + legmode + "'.");
 		}

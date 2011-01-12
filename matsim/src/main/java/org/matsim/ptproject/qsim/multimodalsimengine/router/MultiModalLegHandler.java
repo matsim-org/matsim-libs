@@ -37,7 +37,7 @@ import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteFactory;
 import org.matsim.core.router.IntermodalLeastCostPathCalculator;
-import org.matsim.core.router.LegHandler;
+import org.matsim.core.router.LegRouter;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.PersonalizableTravelTime;
@@ -48,7 +48,7 @@ import org.matsim.ptproject.qsim.multimodalsimengine.router.costcalculator.Buffe
 import org.matsim.ptproject.qsim.multimodalsimengine.router.costcalculator.MultiModalTravelTimeCost;
 import org.matsim.ptproject.qsim.multimodalsimengine.router.costcalculator.TravelTimeCalculatorWithBuffer;
 
-public class MultiModalLegHandler implements LegHandler {
+public class MultiModalLegHandler implements LegRouter {
 
 	/**
 	 * if not set via constructor use the default values
@@ -84,7 +84,7 @@ public class MultiModalLegHandler implements LegHandler {
 	}
 	
 	@Override
-	public double handleLeg(Person person, Leg leg, Activity fromAct, Activity toAct, double depTime) {
+	public double routeLeg(Person person, Leg leg, Activity fromAct, Activity toAct, double depTime) {
 		String legMode = leg.getMode();
 		
 		if (TransportMode.ride.equals(legMode)) {

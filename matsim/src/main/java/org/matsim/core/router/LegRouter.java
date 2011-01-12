@@ -24,7 +24,8 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 
-public interface LegHandler {
+public interface LegRouter {
 
-	public double handleLeg(Person person, Leg leg, Activity fromAct, Activity toAct, double depTime);
+	public double routeLeg(Person person, Leg leg, Activity fromAct, Activity toAct, double depTime);
+
 }
