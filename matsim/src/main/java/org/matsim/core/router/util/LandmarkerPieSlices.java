@@ -36,7 +36,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.NetworkUtils;
 
-class LandmarkerPieSlices {
+/*package*/ class LandmarkerPieSlices {
 
 	private Node[] landmarks;
 
@@ -278,10 +278,10 @@ class LandmarkerPieSlices {
 
 	private Coord getCenter(final Collection<? extends Node> nodes) {
 		double[] bBox = NetworkUtils.getBoundingBox(nodes);
-		double maxX = bBox[0];
-		double minX = bBox[1];
-		double maxY = bBox[2];
-		double minY = bBox[3];
+		double minX = bBox[0];
+		double minY = bBox[1];
+		double maxX = bBox[2];
+		double maxY = bBox[3];
 
 		double centerX = (maxX - minX) / 2 + minX;
 		double centerY = (maxY - minY) / 2 + minY;

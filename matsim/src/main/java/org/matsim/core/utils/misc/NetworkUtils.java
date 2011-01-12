@@ -45,26 +45,25 @@ public class NetworkUtils {
 	 */
 	public static double[] getBoundingBox(final Collection<? extends Node> nodes) {
 		double[] bBox = new double[4];
-		bBox[0] = Double.MIN_VALUE;
-		bBox[1] = Double.MAX_VALUE;
-		bBox[2] = Double.MIN_VALUE;
-		bBox[3] = Double.MAX_VALUE;
+		bBox[0] = Double.POSITIVE_INFINITY;
+		bBox[1] = Double.POSITIVE_INFINITY;
+		bBox[2] = Double.NEGATIVE_INFINITY;
+		bBox[3] = Double.NEGATIVE_INFINITY;
 
 		for (Node n : nodes) {
-			if (n.getCoord().getX() > bBox[0]) {
+			if (n.getCoord().getX() < bBox[0]) {
 				bBox[0] = n.getCoord().getX();
 			}
-			if (n.getCoord().getX() < bBox[1]) {
-				bBox[1] = n.getCoord().getX();
+			if (n.getCoord().getX() > bBox[2]) {
+				bBox[2] = n.getCoord().getX();
 			}
-			if (n.getCoord().getY() > bBox[2]) {
-				bBox[2] = n.getCoord().getY();
-			}
-			if (n.getCoord().getY() < bBox[3]) {
+			if (n.getCoord().getY() > bBox[3]) {
 				bBox[3] = n.getCoord().getY();
 			}
+			if (n.getCoord().getY() < bBox[1]) {
+				bBox[1] = n.getCoord().getY();
+			}
 		}
-
 		return bBox;
 	}
 
@@ -153,8 +152,10 @@ public class NetworkUtils {
 
 	public static List<Id> getLinkIds(final List<Link> links) {
 		List<Id> linkIds = new ArrayList<Id>();
-		for (Link link : links) {
-			linkIds.add(link.getId());
+		if (links != null) {
+			for (Link link : links) {
+				linkIds.add(link.getId());
+			}
 		}
 		return linkIds;
 	}

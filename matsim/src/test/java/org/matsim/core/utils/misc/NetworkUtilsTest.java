@@ -20,15 +20,21 @@
 
 package org.matsim.core.utils.misc;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.fakes.FakeLink;
+import org.matsim.testcases.fakes.FakeNode;
 
 /**
  * @author mrieser
@@ -75,25 +81,25 @@ public class NetworkUtilsTest extends MatsimTestCase {
 			log.info("catched expected exception: " + e.getMessage());
 		}
 	}
-	
+
 	public void testGetLinks_Empty() {
 		NetworkImpl network = getTestNetwork();
 		List<Link> links = NetworkUtils.getLinks(network, "");
 		assertEquals(0, links.size());
-		
+
 		List<Link> links2 = NetworkUtils.getLinks(network, " ");
 		assertEquals(0, links2.size());
-		
+
 		List<Link> links3 = NetworkUtils.getLinks(network, " \t\r\n \t  \t ");
 		assertEquals(0, links3.size());
 	}
-	
+
 	public void testGetLinks_StringNull() {
 		NetworkImpl network = getTestNetwork();
 		List<Link> links = NetworkUtils.getLinks(network, (String)null);
 		assertEquals(0, links.size());
 	}
-	
+
 	public void testGetLinks_mixedDelimiters() {
 		NetworkImpl network = getTestNetwork();
 		List<Link> links = NetworkUtils.getLinks(network, " 1\t\t2 \n4\t \t      3 ");
@@ -103,7 +109,7 @@ public class NetworkUtilsTest extends MatsimTestCase {
 		assertEquals(network.getLinks().get(new IdImpl(4)), links.get(2));
 		assertEquals(network.getLinks().get(new IdImpl(3)), links.get(3));
 	}
-	
+
 	public void testGetLinks_NonExistant() {
 		NetworkImpl network = getTestNetwork();
 		try {
@@ -113,10 +119,91 @@ public class NetworkUtilsTest extends MatsimTestCase {
 			log.info("catched expected exception: " + e.getMessage());
 		}
 	}
-	
+
+	public void testGetLinksID_ListNull() {
+		List<Id> linkIds = NetworkUtils.getLinkIds((List<Link>) null);
+		assertEquals(0, linkIds.size());
+	}
+
+	public void testGetLinksID_StringNull() {
+		List<Id> linkIds = NetworkUtils.getLinkIds((String) null);
+		assertEquals(0, linkIds.size());
+	}
+
+	public void testGetNumberOfLanesAsInt() {
+		assertEquals(3, NetworkUtils.getNumberOfLanesAsInt(7*3600, new PseudoLink(3.2)));
+		assertEquals(3, NetworkUtils.getNumberOfLanesAsInt(7*3600, new PseudoLink(3.1)));
+		assertEquals(3, NetworkUtils.getNumberOfLanesAsInt(7*3600, new PseudoLink(3.0)));
+		assertEquals(2, NetworkUtils.getNumberOfLanesAsInt(7*3600, new PseudoLink(2.9)));
+		assertEquals(2, NetworkUtils.getNumberOfLanesAsInt(7*3600, new PseudoLink(2.5)));
+		assertEquals(2, NetworkUtils.getNumberOfLanesAsInt(7*3600, new PseudoLink(2.0)));
+		assertEquals(1, NetworkUtils.getNumberOfLanesAsInt(7*3600, new PseudoLink(1.9)));
+		assertEquals(1, NetworkUtils.getNumberOfLanesAsInt(7*3600, new PseudoLink(1.5)));
+		assertEquals(1, NetworkUtils.getNumberOfLanesAsInt(7*3600, new PseudoLink(1.0)));
+		assertEquals(1, NetworkUtils.getNumberOfLanesAsInt(7*3600, new PseudoLink(0.9)));
+		assertEquals(1, NetworkUtils.getNumberOfLanesAsInt(7*3600, new PseudoLink(0.5)));
+		assertEquals(1, NetworkUtils.getNumberOfLanesAsInt(7*3600, new PseudoLink(0.1)));
+		assertEquals(1, NetworkUtils.getNumberOfLanesAsInt(7*3600, new PseudoLink(0.0)));
+	}
+
+	public void testGetBoundingBox() {
+		Collection<Node> nodes = new ArrayList<Node>();
+		Id id = new IdImpl("dummy");
+		nodes.add(new PseudoNode(id, new CoordImpl(100, 100)));
+		nodes.add(new PseudoNode(id, new CoordImpl(200, 105)));
+		nodes.add(new PseudoNode(id, new CoordImpl(120, 250)));
+		nodes.add(new PseudoNode(id, new CoordImpl(150, 300)));
+		nodes.add(new PseudoNode(id, new CoordImpl(50, 199)));
+		double[] box = NetworkUtils.getBoundingBox(nodes);
+		assertEquals(50, box[0], EPSILON); // minX
+		assertEquals(100, box[1], EPSILON); // miny
+		assertEquals(200, box[2], EPSILON); // maxX
+		assertEquals(300, box[3], EPSILON); // maxY
+	}
+
+	public void testGetBoundingBox_negativeNodesOnly() {
+		Collection<Node> nodes = new ArrayList<Node>();
+		Id id = new IdImpl("dummy");
+		nodes.add(new PseudoNode(id, new CoordImpl(-100, -100)));
+		nodes.add(new PseudoNode(id, new CoordImpl(-200, -105)));
+		nodes.add(new PseudoNode(id, new CoordImpl(-120, -250)));
+		nodes.add(new PseudoNode(id, new CoordImpl(-150, -300)));
+		nodes.add(new PseudoNode(id, new CoordImpl(-50, -199)));
+		double[] box = NetworkUtils.getBoundingBox(nodes);
+		assertEquals(-200, box[0], EPSILON); // minX
+		assertEquals(-300, box[1], EPSILON); // minY
+		assertEquals(-50, box[2], EPSILON); // maxX
+		assertEquals(-100, box[3], EPSILON); // maxY
+	}
+
+	private static class PseudoLink extends FakeLink {
+		private final double nOfLanes;
+		public PseudoLink(final double nOfLanes) {
+			super(new IdImpl(1));
+			this.nOfLanes = nOfLanes;
+		}
+
+		@Override
+		public double getNumberOfLanes(double time) {
+			return this.nOfLanes;
+		}
+	}
+
+	private static class PseudoNode extends FakeNode {
+		private final Coord coord;
+		public PseudoNode(Id id, Coord coord) {
+			super(id);
+			this.coord = coord;
+		}
+		@Override
+		public Coord getCoord() {
+			return this.coord;
+		}
+	}
+
 	private NetworkImpl getTestNetwork() {
 		int numOfLinks = 5;
-		
+
 		NetworkImpl network = NetworkImpl.createNetwork();
 		Node[] nodes = new Node[numOfLinks+1];
 		for (int i = 0; i <= numOfLinks; i++) {
