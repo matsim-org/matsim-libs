@@ -197,6 +197,7 @@ public class ControlerTest {
 		assertTrue("Custom ScoringFunctionFactory was not set.",
 				controler.getScoringFunctionFactory() instanceof DummyScoringFunctionFactory);
 
+		controler.setMobsimFactory(new FakeMobsimFactory());
 		controler.run();
 
 		assertTrue("Custom ScoringFunctionFactory got overwritten.",
@@ -259,6 +260,7 @@ public class ControlerTest {
 		Controler controler = new Controler(f.scenario);
 		controler.setCreateGraphs(false);
 		controler.setWriteEventsInterval(0);
+		controler.setMobsimFactory(new FakeMobsimFactory());
 		controler.run();
 		/* if something goes wrong, there will be an exception we don't catch and the test fails,
 		 * otherwise, everything is fine. */
@@ -329,6 +331,7 @@ public class ControlerTest {
 		Controler controler = new Controler(f.scenario);
 		controler.setCreateGraphs(false);
 		controler.setWriteEventsInterval(0);
+		controler.setMobsimFactory(new FakeMobsimFactory());
 		controler.run();
 		/* if something goes wrong, there will be an exception we don't catch and the test fails,
 		 * otherwise, everything is fine. */
@@ -358,6 +361,7 @@ public class ControlerTest {
 		controler.setWriteEventsInterval(3);
 		assertEquals(3, controler.getWriteEventsInterval());
 		controler.setCreateGraphs(false);
+		controler.setMobsimFactory(new FakeMobsimFactory());
 		controler.run();
 
 		assertTrue(new File(controler.getControlerIO().getIterationFilename(0, Controler.FILENAME_EVENTS_TXT)).exists());
@@ -385,6 +389,7 @@ public class ControlerTest {
 		assertFalse("Default for Controler.writeEventsInterval should be different from the interval we plan to use, otherwise it's hard to decide if it works correctly.",
 				3 == controler.getWriteEventsInterval());
 		controler.setCreateGraphs(false);
+		controler.setMobsimFactory(new FakeMobsimFactory());
 		controler.run();
 		assertEquals(4, controler.getWriteEventsInterval());
 
@@ -415,6 +420,7 @@ public class ControlerTest {
 		controler.setWriteEventsInterval(0);
 		assertEquals(0, controler.getWriteEventsInterval());
 		controler.setCreateGraphs(false);
+		controler.setMobsimFactory(new FakeMobsimFactory());
 		controler.run();
 
 		assertFalse(new File(controler.getControlerIO().getIterationFilename(0, Controler.FILENAME_EVENTS_TXT)).exists());
@@ -433,6 +439,7 @@ public class ControlerTest {
 		controler.setWriteEventsInterval(1);
 		assertEquals(1, controler.getWriteEventsInterval());
 		controler.setCreateGraphs(false);
+		controler.setMobsimFactory(new FakeMobsimFactory());
 		controler.run();
 
 		assertTrue(new File(controler.getControlerIO().getIterationFilename(0, Controler.FILENAME_EVENTS_TXT)).exists());
@@ -452,6 +459,7 @@ public class ControlerTest {
 		controler.setWriteEventsInterval(1);
 		assertEquals(1, controler.getWriteEventsInterval());
 		controler.setCreateGraphs(false);
+		controler.setMobsimFactory(new FakeMobsimFactory());
 		controler.run();
 
 		assertTrue(new File(controler.getControlerIO().getIterationFilename(0, Controler.FILENAME_EVENTS_TXT)).exists());
@@ -471,6 +479,7 @@ public class ControlerTest {
 		controler.setWriteEventsInterval(1);
 		assertEquals(1, controler.getWriteEventsInterval());
 		controler.setCreateGraphs(false);
+		controler.setMobsimFactory(new FakeMobsimFactory());
 		controler.run();
 
 		assertFalse(new File(controler.getControlerIO().getIterationFilename(0,  Controler.FILENAME_EVENTS_TXT)).exists());
@@ -490,6 +499,7 @@ public class ControlerTest {
 		controler.setWriteEventsInterval(1);
 		assertEquals(1, controler.getWriteEventsInterval());
 		controler.setCreateGraphs(false);
+		controler.setMobsimFactory(new FakeMobsimFactory());
 		controler.run();
 
 		assertTrue(new File(controler.getControlerIO().getIterationFilename(0, Controler.FILENAME_EVENTS_TXT)).exists());
@@ -537,6 +547,23 @@ public class ControlerTest {
 		final Config config = utils.loadConfig("test/scenarios/equil/config_plans1.xml");
 		config.controler().setLastIteration(0);
 		config.network().setInputFile("dummy/non-existing/network.xml");
+
+		final Controler controler = new Controler(config);
+		controler.setMobsimFactory(new FakeMobsimFactory());
+		controler.setCreateGraphs(false);
+		try {
+			controler.run();
+			Assert.fail("expected exception, got none.");
+		} catch (RuntimeException e) {
+			log.info("catched expected exception.", e);
+		}
+	}
+
+	@Test
+	public void test_ExceptionOnMissingFacilitiesFile() {
+		final Config config = utils.loadConfig("test/scenarios/equil/config_plans1.xml");
+		config.controler().setLastIteration(0);
+		config.facilities().setInputFile("dummy/non-existing/network.xml");
 
 		final Controler controler = new Controler(config);
 		controler.setMobsimFactory(new FakeMobsimFactory());
