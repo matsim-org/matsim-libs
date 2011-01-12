@@ -136,7 +136,7 @@ public class CalcLinkStats {
 	public void reset() {
 		this.linkData.clear();
 		this.count = 0;
-		Logger.getLogger(this.getClass()).info( " resetting `count' to zero.  This info is here since we want to check when this" +
+		log.info( " resetting `count' to zero.  This info is here since we want to check when this" +
 				" is happening during normal simulation runs.  kai, jan'11") ;
 
 		// initialize our data-table
