@@ -53,6 +53,7 @@ public class NetworkFactoryImpl implements NetworkFactory {
 		this.network = network;
 		this.linkFactory = new LinkFactoryImpl();
 		this.routeFactories.put(TransportMode.car, new LinkNetworkRouteFactory());
+		this.routeFactories.put(TransportMode.ride, new LinkNetworkRouteFactory());
 		this.routeFactories.put(TransportMode.pt, new GenericRouteFactory());
 	}
 

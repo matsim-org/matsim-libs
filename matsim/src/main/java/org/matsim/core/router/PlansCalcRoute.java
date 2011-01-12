@@ -151,11 +151,9 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 
 	private void initDefaultLegHandlers() {
 		legHandlers = new HashMap<String, LegRouter>();
-
-		DefaultLegHandler legHandler = new DefaultLegHandler(configGroup, network, routeAlgo, routeAlgoPtFreeflow);
-		this.addLegHandler(TransportMode.car, legHandler);
-		this.addLegHandler(TransportMode.ride, legHandler);
-		this.addLegHandler(TransportMode.pt, legHandler);
+		this.addLegHandler(TransportMode.car, new NetworkLegRouter(this.network, this.routeAlgo, this.routeFactory));
+		this.addLegHandler(TransportMode.ride, new NetworkLegRouter(this.network, this.routeAlgo, this.routeFactory));
+		this.addLegHandler(TransportMode.pt, new PseudoTransitLegRouter(this.network, this.routeAlgoPtFreeflow, this.configGroup.getPtSpeedFactor(), this.routeFactory));
 		this.addLegHandler(TransportMode.bike, new TeleportationLegRouter(this.routeFactory, this.configGroup.getBikeSpeed()));
 		this.addLegHandler(TransportMode.walk, new TeleportationLegRouter(this.routeFactory, this.configGroup.getWalkSpeed()));
 		this.addLegHandler("undefined", new TeleportationLegRouter(this.routeFactory, this.configGroup.getUndefinedModeSpeed()));
