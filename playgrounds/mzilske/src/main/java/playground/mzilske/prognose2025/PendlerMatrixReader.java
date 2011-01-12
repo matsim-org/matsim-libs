@@ -31,21 +31,21 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 
 
 
-public class PVMatrixReader {
+public class PendlerMatrixReader {
 
-	private static final Logger log = Logger.getLogger(PVMatrixReader.class);
+	private static final Logger log = Logger.getLogger(PendlerMatrixReader.class);
 
-	private static final String PV_MATRIX = "/Users/michaelzilske/workspace/prognose_2025/orig/pv-matrizen/2004_nuts_102r6x6.csv";
+	private static final String PV_MATRIX = "/Users/michaelzilske/workspace/pendler_nach_gemeinden/CD_Pendler_Gemeindeebene_30_06_2009/einpendler-muenchen.csv";
 
 	private static final String NODES = "/Users/michaelzilske/workspace/prognose_2025/orig/netze/netz-2004/strasse/knoten_wgs84.csv";
 
 	private Map<Integer, Zone> zones = new HashMap<Integer, Zone>();
 
-	private static final String FILENAME = "/Users/michaelzilske/workspace/prognose_2025/demand/naechster_versuch.xml";
-
-	private static final String NETWORK_FILENAME = "/Users/michaelzilske/osm/motorway_germany.xml";
-
-	private static final String FILTER_FILENAME = "/Users/michaelzilske/workspace/prognose_2025/demand/filter.shp";
+//	private static final String FILENAME = "/Users/michaelzilske/workspace/prognose_2025/demand/naechster_versuch.xml";
+//
+//	private static final String NETWORK_FILENAME = "/Users/michaelzilske/osm/motorway_germany.xml";
+//
+//	private static final String FILTER_FILENAME = "/Users/michaelzilske/workspace/prognose_2025/demand/filter.shp";
 
 	private TripFlowSink flowSink;
 	
@@ -84,7 +84,7 @@ public class PVMatrixReader {
 	private void readMatrix() {
 		TabularFileParserConfig tabFileParserConfig = new TabularFileParserConfig();
 		tabFileParserConfig.setFileName(PV_MATRIX);
-		tabFileParserConfig.setDelimiterTags(new String[] {";"});
+		tabFileParserConfig.setDelimiterTags(new String[] {","});
 		try {
 			new TabularFileParser().parse(tabFileParserConfig,
 					new TabularFileHandler() {
@@ -94,13 +94,24 @@ public class PVMatrixReader {
 					if (row[0].startsWith("#")) {
 						return;
 					}
-					int quelle = Integer.parseInt(row[0]);
-					int ziel = Integer.parseInt(row[1]);
-					int workPt = Integer.parseInt(row[2]);
-					int educationPt = Integer.parseInt(row[3]);
-					int workCar = Integer.parseInt(row[8]);
-					int educationCar = Integer.parseInt(row[9]);
-					process(quelle, ziel, workPt, educationPt, workCar, educationCar);
+					Integer quelle = null ;
+					try {
+						quelle = Integer.parseInt(row[2]);
+						int ziel = 9162 ;
+						int workPt = 0 ;
+						int educationPt = 0 ;
+						int workCar = Integer.parseInt(row[4]);
+						int educationCar = 0 ;
+						String label = row[3] ;
+						if ( !label.contains("brige ") && quelle!=ziel ) {
+							process(quelle, ziel, workPt, educationPt, workCar, educationCar);
+						} else {
+							System.out.println( " uebrige? : " + label ) ;
+						}
+					} catch ( Exception ee ) {
+						System.err.println("we are trying to read quelle: " + quelle ) ;
+//						System.exit(-1) ;
+					}
 				}
 
 			});
@@ -132,7 +143,7 @@ public class PVMatrixReader {
 			log.error("Unknown sink: " + ziel);
 			return;
 		}
-		int carQuantity = getCarQuantity(source, sink, (workCar + educationCar)) / 255;
+		int carQuantity = workCar + educationCar ;
 		int scaledCarQuantity = scale(carQuantity);
 		if (scaledCarQuantity != 0) {
 			log.info(quelle + "->" + ziel + ": "+scaledCarQuantity);
@@ -140,43 +151,16 @@ public class PVMatrixReader {
 		}
 	}
 
-	public static void main(String[] args) {
-		PopulationGenerator populationBuilder = new PopulationGenerator();
-		Scenario osmNetwork = new ScenarioImpl();
-		new MatsimNetworkReader(osmNetwork).readFile(NETWORK_FILENAME);
-		RouterFilter routerFilter = new RouterFilter(osmNetwork.getNetwork());
-		Set<Feature> featuresInShape;
-		try {
-			featuresInShape = new ShapeFileReader().readFileAndInitialize(FILTER_FILENAME);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-		GeometryFactory factory = new GeometryFactory();
-		for (Node node : osmNetwork.getNetwork().getNodes().values()) {
-			if (isCoordInShape(node.getCoord(), featuresInShape, factory)) {
-				routerFilter.getInterestingNodeIds().add(node.getId());
-			}
-		}
-		PopulationWriterTask populationWriter = new PopulationWriterTask(FILENAME, osmNetwork.getNetwork());
-		RoutePersonTask router = new RoutePersonTask(osmNetwork.getConfig(), osmNetwork.getNetwork());
-		PVMatrixReader pvMatrixReader = new PVMatrixReader();
-		pvMatrixReader.setFlowSink(routerFilter);
-		routerFilter.setSink(populationBuilder);
-		populationBuilder.setSink(router);
-		router.setSink(populationWriter);
-		pvMatrixReader.run();
-	}
-
-	private int getCarQuantity(Zone source, Zone sink, int carWorkTripsPerDay) {
-		double outWeight = ((double) source.workingPopulation * sink.workplaces) /  ((double) source.workplaces * sink.workingPopulation);
-		double inWeight = ((double) source.workplaces * sink.workingPopulation) /  ((double) source.workingPopulation * sink.workplaces);
-		double outShare = outWeight / (inWeight + outWeight);
-		int amount = (int) (outShare * carWorkTripsPerDay * 0.5);
-		return amount;
-	}
+//	private int getCarQuantity(Zone source, Zone sink, int carWorkTripsPerDay) {
+//		double outWeight = ((double) source.workingPopulation * sink.workplaces) /  ((double) source.workplaces * sink.workingPopulation);
+//		double inWeight = ((double) source.workplaces * sink.workingPopulation) /  ((double) source.workingPopulation * sink.workplaces);
+//		double outShare = outWeight / (inWeight + outWeight);
+//		int amount = (int) (outShare * carWorkTripsPerDay * 0.5);
+//		return amount;
+//	}
 
 	private int scale(int quantityOut) {
-		int scaled = (int) (quantityOut * 0.01);
+		int scaled = (int) (quantityOut * 0.01 );
 		return scaled;
 	}
 

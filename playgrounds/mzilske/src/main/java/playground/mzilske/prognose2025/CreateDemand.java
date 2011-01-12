@@ -49,67 +49,70 @@ private static final String GV_NETWORK_FILENAME = "/Users/michaelzilske/workspac
 	}
 
 	public static void main(String[] args) {
-		Scenario gvNetwork = new ScenarioImpl();
-		new MatsimNetworkReader(gvNetwork).readFile(GV_NETWORK_FILENAME);
+//		Scenario gvNetwork = new ScenarioImpl();
+//		new MatsimNetworkReader(gvNetwork).readFile(GV_NETWORK_FILENAME);
 		Scenario osmNetwork = new ScenarioImpl();
-		new MatsimNetworkReader(osmNetwork).readFile(NETWORK_FILENAME);
-		Set<Feature> featuresInShape;
-		try {
-			featuresInShape = new ShapeFileReader().readFileAndInitialize(FILTER_FILENAME);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+//		new MatsimNetworkReader(osmNetwork).readFile(NETWORK_FILENAME);
+//		Set<Feature> featuresInShape;
+//		try {
+//			featuresInShape = new ShapeFileReader().readFileAndInitialize(FILTER_FILENAME);
+//		} catch (IOException e) {
+//			throw new RuntimeException(e);
+//		}
 		
-		PopulationReaderTask gvPopulationReaderTask = new PopulationReaderTask(GV_PLANS, gvNetwork.getNetwork());
+//		PopulationReaderTask gvPopulationReaderTask = new PopulationReaderTask(GV_PLANS, gvNetwork.getNetwork());
 		
-		PersonDereferencerTask personDereferencerTask = new PersonDereferencerTask();
+//		PersonDereferencerTask personDereferencerTask = new PersonDereferencerTask();
 		
-		PersonGeoTransformatorTask personGeoTransformatorTask = new PersonGeoTransformatorTask(TransformationFactory.WGS84, TransformationFactory.DHDN_GK4);
+//		PersonGeoTransformatorTask personGeoTransformatorTask = new PersonGeoTransformatorTask(TransformationFactory.WGS84, TransformationFactory.DHDN_GK4);
 		
-		PersonRouterFilter personRouterFilter = new PersonRouterFilter(osmNetwork.getNetwork());
-		GeometryFactory factory = new GeometryFactory();
-		for (Node node : osmNetwork.getNetwork().getNodes().values()) {
-			if (isCoordInShape(node.getCoord(), featuresInShape, factory)) {
-				personRouterFilter.getInterestingNodeIds().add(node.getId());
-			}
-		}
+//		PersonRouterFilter personRouterFilter = new PersonRouterFilter(osmNetwork.getNetwork());
+//		GeometryFactory factory = new GeometryFactory();
+//		for (Node node : osmNetwork.getNetwork().getNodes().values()) {
+//			if (isCoordInShape(node.getCoord(), featuresInShape, factory)) {
+//				personRouterFilter.getInterestingNodeIds().add(node.getId());
+//			}
+//		}
 		
 		PersonVerschmiererTask personVerschmiererTask = new PersonVerschmiererTask(LANDKREISE);
 		
 		PersonMerger personMerger = new PersonMerger(2);
 		
-		RoutePersonTask router = new RoutePersonTask(osmNetwork.getConfig(), osmNetwork.getNetwork());
+//		RoutePersonTask router = new RoutePersonTask(osmNetwork.getConfig(), osmNetwork.getNetwork());
 		
 		PopulationWriterTask populationWriter = new PopulationWriterTask(OUTPUT_POPULATION_FILENAME, osmNetwork.getNetwork());
 		
-		gvPopulationReaderTask.setSink(personDereferencerTask);
-		personDereferencerTask.setSink(personGeoTransformatorTask);
-		personGeoTransformatorTask.setSink(personRouterFilter);
-		personRouterFilter.setSink(personMerger.getSink(0));
+//		gvPopulationReaderTask.setSink(personDereferencerTask);
+//		personDereferencerTask.setSink(personGeoTransformatorTask);
+//		personGeoTransformatorTask.setSink(personRouterFilter);
+//		personRouterFilter.setSink(personMerger.getSink(0));
 		
 		
 		PopulationGenerator populationBuilder = new PopulationGenerator();
 		
-		RouterFilter routerFilter = new RouterFilter(osmNetwork.getNetwork());
-		for (Node node : osmNetwork.getNetwork().getNodes().values()) {
-			if (isCoordInShape(node.getCoord(), featuresInShape, factory)) {
-				routerFilter.getInterestingNodeIds().add(node.getId());
-			}
-		}
+//		RouterFilter routerFilter = new RouterFilter(osmNetwork.getNetwork());
+//		for (Node node : osmNetwork.getNetwork().getNodes().values()) {
+//			if (isCoordInShape(node.getCoord(), featuresInShape, factory)) {
+//				routerFilter.getInterestingNodeIds().add(node.getId());
+//			}
+//		}
+//		
 		
+//		PV2025MatrixReader pvMatrixReader = new PV2025MatrixReader();
+		PendlerMatrixReader pvMatrixReader = new PendlerMatrixReader();
+		pvMatrixReader.setFlowSink(populationBuilder);
+//		routerFilter.setSink(populationBuilder);
+//		populationBuilder.setSink(personMerger.getSink(1));
 		
-		PVMatrixReader pvMatrixReader = new PVMatrixReader();
-		pvMatrixReader.setFlowSink(routerFilter);
-		routerFilter.setSink(populationBuilder);
-		populationBuilder.setSink(personMerger.getSink(1));
-		
-		personMerger.setSink(personVerschmiererTask);
-		personVerschmiererTask.setSink(router);
-		router.setSink(populationWriter);
+//		personMerger.setSink(personVerschmiererTask);
+//		personVerschmiererTask.setSink(router);
+		populationBuilder.setSink(populationWriter);
 		
 		
 		pvMatrixReader.run();
-		gvPopulationReaderTask.run();
+//		gvPopulationReaderTask.run();
+		
+		System.err.println("some landkreises do not work because of gebietsreform; check!") ;
 	}
 	
 }
