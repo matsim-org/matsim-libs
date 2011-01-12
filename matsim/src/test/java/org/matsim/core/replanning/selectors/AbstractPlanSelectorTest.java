@@ -22,9 +22,7 @@ package org.matsim.core.replanning.selectors;
 
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -51,7 +49,7 @@ public abstract class AbstractPlanSelectorTest extends MatsimTestCase {
 		PersonImpl person;
 		PlanSelector selector = getPlanSelector();
 		PlanImpl plan;
-		
+
 		// test 1: exactly one plan, with undefined score
 		person = new PersonImpl(new IdImpl(1));
 		person.createAndAddPlan(false);
