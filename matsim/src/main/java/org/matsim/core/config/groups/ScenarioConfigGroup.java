@@ -80,7 +80,7 @@ public class ScenarioConfigGroup extends Module {
 			this.useTransit = Boolean.parseBoolean(value.trim());
 		}
 		else {
-			throw new IllegalArgumentException(value + " is not a valid parameter value for key: "+ key + " of config group " + GROUP_NAME);
+			throw new IllegalArgumentException(key + " is not a valid parameter of config group " + GROUP_NAME);
 		}
 	}
 
