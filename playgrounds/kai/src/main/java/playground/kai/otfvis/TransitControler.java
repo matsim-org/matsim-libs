@@ -71,7 +71,7 @@ public class TransitControler {
 				otfVisQSimFeature.setVisualizeTeleportedAgents(otfVisConfig.isShowTeleportedAgents());
 				simulation.addQueueSimulationListeners(otfVisQSimFeature);
 				simulation.getEventsManager().addHandler(otfVisQSimFeature) ;
-//				otfVisConfig.setDrawTransitFacilities(false) ;
+				otfVisConfig.setDrawTransitFacilities(true) ;
 				otfVisConfig.setShowParking(true) ;
 			}
 
