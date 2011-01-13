@@ -56,11 +56,27 @@ public class MultimodalNetworkCleaner {
 	}
 
 	/**
+	 * Removes nodes from the network that have no incoming or outgoing links attached to them.
+	 */
+	public void removeNodesWithoutLinks() {
+		List<Node> toBeRemoved = new ArrayList<Node>();
+		for (Node node : this.network.getNodes().values()) {
+			if ((node.getInLinks().size() == 0) && (node.getOutLinks().size() == 0)) {
+				toBeRemoved.add(node);
+			}
+		}
+		for (Node node : toBeRemoved) {
+			this.network.removeNode(node.getId());
+		}
+	}
+
+	/**
 	 * Modifies the network such as the subnetwork containing only links that have at least
 	 * one of the specified transport modes in their set of allowed transport modes is strongly
 	 * connected (=every link/node can be reached by every other link/node). If multiple modes
 	 * are given, the algorithm does <em>not</em> guarantee that the resulting network is strongly
-	 * connected for each of the modes individually!
+	 * connected for each of the modes individually! Nodes having links connected to them before
+	 * cleaning, but none after cleaning, are removed from the network.
 	 *
 	 * @param modes
 	 */

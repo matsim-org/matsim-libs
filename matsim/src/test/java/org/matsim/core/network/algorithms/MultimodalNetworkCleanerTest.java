@@ -146,6 +146,9 @@ public class MultimodalNetworkCleanerTest {
 		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[11]).getAllowedModes());
 		Assert.assertNull(network.getLinks().get(f.ids[10]));
 
+		Assert.assertEquals("wrong number of links.", 9, network.getLinks().size());
+		Assert.assertEquals("wrong number of nodes.", 7, network.getNodes().size());
+
 		cleaner.run(createHashSet(TransportMode.walk));
 		Assert.assertEquals("wrong number of links.", 8, network.getLinks().size());
 		Assert.assertEquals("wrong number of nodes.", 6, network.getNodes().size());
@@ -158,6 +161,9 @@ public class MultimodalNetworkCleanerTest {
 		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[7]).getAllowedModes());
 		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[8]).getAllowedModes());
 		Assert.assertNull(network.getLinks().get(f.ids[11]));
+
+		Assert.assertEquals("wrong number of links.", 8, network.getLinks().size());
+		Assert.assertEquals("wrong number of nodes.", 6, network.getNodes().size());
 	}
 
 	@Test
@@ -183,6 +189,9 @@ public class MultimodalNetworkCleanerTest {
 		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[7]).getAllowedModes());
 		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[8]).getAllowedModes()); // only remove mode, not link!
 
+		Assert.assertEquals("wrong number of links.", 8, network.getLinks().size());
+		Assert.assertEquals("wrong number of nodes.", 6, network.getNodes().size());
+
 		cleaner.run(createHashSet(TransportMode.walk));
 		Assert.assertEquals("wrong number of links.", 8, network.getLinks().size());
 		Assert.assertEquals("wrong number of nodes.", 6, network.getNodes().size());
@@ -194,6 +203,9 @@ public class MultimodalNetworkCleanerTest {
 		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[6]).getAllowedModes());
 		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[7]).getAllowedModes());
 		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[8]).getAllowedModes());
+
+		Assert.assertEquals("wrong number of links.", 8, network.getLinks().size());
+		Assert.assertEquals("wrong number of nodes.", 6, network.getNodes().size());
 	}
 
 	@Test
@@ -277,6 +289,9 @@ public class MultimodalNetworkCleanerTest {
 		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[11]).getAllowedModes());
 		Assert.assertNull(network.getLinks().get(f.ids[10]));
 
+		Assert.assertEquals("wrong number of links.", 9, network.getLinks().size());
+		Assert.assertEquals("wrong number of nodes.", 7, network.getNodes().size());
+
 		cleaner.run(createHashSet(TransportMode.walk));
 		Assert.assertEquals("wrong number of links.", 8, network.getLinks().size());
 		Assert.assertEquals("wrong number of nodes.", 6, network.getNodes().size());
@@ -289,6 +304,29 @@ public class MultimodalNetworkCleanerTest {
 		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[7]).getAllowedModes());
 		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[8]).getAllowedModes());
 		Assert.assertNull(network.getLinks().get(f.ids[11]));
+
+		Assert.assertEquals("wrong number of links.", 8, network.getLinks().size());
+		Assert.assertEquals("wrong number of nodes.", 6, network.getNodes().size());
+	}
+
+	@Test
+	public void testRemoveNodesWithoutLinks() {
+		Fixture f = new Fixture();
+		Network network = f.scenario.getNetwork();
+		network.addNode(network.getFactory().createNode(f.ids[10], f.scenario.createCoord(300, 300)));
+		MultimodalNetworkCleaner cleaner = new MultimodalNetworkCleaner(network);
+		Assert.assertEquals("wrong number of links.", 8, network.getLinks().size());
+		Assert.assertEquals("wrong number of nodes.", 7, network.getNodes().size());
+
+		cleaner.run(createHashSet(TransportMode.walk));
+
+		Assert.assertEquals("wrong number of links after cleaning.", 8, network.getLinks().size());
+		Assert.assertEquals("empty node should not be removed by cleaning.", 7, network.getNodes().size());
+
+		cleaner.removeNodesWithoutLinks();
+
+		Assert.assertEquals("wrong number of links after cleaning.", 8, network.getLinks().size());
+		Assert.assertEquals("wrong number of nodes after cleaning.", 6, network.getNodes().size());
 	}
 
 	@Test
