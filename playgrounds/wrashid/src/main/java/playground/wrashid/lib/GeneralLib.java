@@ -77,6 +77,7 @@ public class GeneralLib {
 	
 	/*
 	 * Reads the population from the plans file.
+	 * 
 	 */
 	public static Scenario readScenario(String plansFile, String networkFile, String facilititiesPath) {
 		ScenarioImpl sc = new ScenarioImpl();
@@ -121,6 +122,10 @@ public class GeneralLib {
 		populationWriter.write(plansFile);
 	}
 
+	/**
+	 * @param facilitiesFile
+	 * @return
+	 */
 	public static ActivityFacilitiesImpl readActivityFacilities(String facilitiesFile) {
 		ScenarioImpl scenario = new ScenarioImpl();
 		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
@@ -658,6 +663,10 @@ public class GeneralLib {
 		return matrix;
 	}
 		
+	/**
+	 * TODO: move method to approporaite place where the data structures are located.
+	 * @param hm
+	 */
 	public static void printHashmapToConsole(HashMap hm){
 		for (Object key:hm.keySet()){
 			System.out.println(key.toString() +"\t"+hm.get(key));

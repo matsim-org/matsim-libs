@@ -30,4 +30,8 @@ public class DebugLib {
 		throw new Error("system is in inconsistent state");
 	}
 
+	public static void emptyMethodForBreakPoint() {
+		
+	}
+
 }
