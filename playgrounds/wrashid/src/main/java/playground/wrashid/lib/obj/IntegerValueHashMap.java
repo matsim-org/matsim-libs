@@ -9,6 +9,8 @@ import playground.wrashid.lib.GeneralLib;
  * Often one needs a HashMap, where the value can be incremented and
  * decremented. This data structure provides that facility for integers.
  * 
+ * TODO: delete this (DoubleValueHashMap can do most of the work here => just add a method there for conversion to id perhaps...)
+ * 
  * @author rashid_waraich
  * 
  * @param <KeyClass>
