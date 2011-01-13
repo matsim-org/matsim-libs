@@ -357,16 +357,17 @@ public class ReadFromUrbansimParcelModel {
 		try {
 			BufferedReader reader = IOUtils.getBufferedReader( filename );
 			
+			// reading header
 			String line = reader.readLine();
 			// get columns for home, work and person id
-			Map<String,Integer> idxFromKey = CommonMATSimUtilities.createIdxFromKey( line, Constants.TAB_SEPERATOR );
-			final int indexZoneID_WORK		= idxFromKey.get( Constants.ZONE_ID_WORK );
+			Map<String,Integer> idxFromKey = CommonMATSimUtilities.createIdxFromKey( line, Constants.TAB );
+			final int indexZoneID_WORK	   = idxFromKey.get( Constants.ZONE_ID_WORK );
 			
 			ZoneId zone_ID;
 			WorkplaceObject workObj;
 			
 			while ( (line=reader.readLine()) != null ) {
-				String[] parts = line.split( Constants.TAB_SEPERATOR );
+				String[] parts = line.split( Constants.TAB );
 				
 				// get zone ID
 				long zoneIdAsLong = (long) Double.parseDouble( parts[ indexZoneID_WORK ] );

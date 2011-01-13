@@ -25,6 +25,7 @@ import playground.toronto.ttimematrix.SpanningTree;
 /**
  *
  * @author nagel
+ * @author thomas
  *
  */
 public class MyControlerListener implements ShutdownListener {
@@ -107,41 +108,44 @@ public class MyControlerListener implements ShutdownListener {
 
 				for ( ActivityFacility toZone : zones.getFacilities().values() ) {
 					
-					if(fromZone.getId().compareTo(toZone.getId()) == 0)
-						continue;
-					
 					Coord toCoord = toZone.getCoord();
 					Node toNode = network.getNearestNode( toCoord );
 					double arrivalTime = st.getTree().get(toNode.getId()).getTime();
 					// travel times in sec
 					double ttime = arrivalTime - depatureTime;
 					
-					// get minimum travel time for in zone accessibility (see below)
-					minTravelTime = Math.min(ttime, minTravelTime);
-					
 					// tnicolai test to caculate travel costs
 					//LinkImpl toLink = network.getNearestLink( toCoord );
 					//double tcost = st.getTravelCostCalulator().getLinkGeneralizedTravelCost(toLink, depatureTime); // .getLinkTravelCost(toLink, depatureTime);
-					
-					// this sum corresponts to the sum term of the log sum computation
-					if(numberOfWorkplacesPerZone.get(toZone.getId()) != null){
-						long weight = numberOfWorkplacesPerZone.get(toZone.getId()).counter;
-						double costFunction = Math.exp( beta * ttime );
-						accessibility += weight * costFunction;
-					}
-
-					// yyyy should only be work facilities!!!! kai & thomas, dec'10
 					
 					travelDataWriter.write ( fromZone.getId().toString()	//origin zone id
 							+ "," + toZone.getId().toString()				//destination zone id
 							+ "," + ttime 									//tcost
 							+ "," + ttime ) ;								//ttimes
 					travelDataWriter.newLine();
+					
+					// frome here workplace accessibility computation
+					
+					// skip workplace accessibility computation if origin and destination zone are equal
+					// comutation of this case followos below on same zone computation
+					if(fromZone.getId().compareTo(toZone.getId()) == 0)
+						continue;
+					
+					// get minimum travel time for in zone accessibility (see below)
+					minTravelTime = Math.min(ttime, minTravelTime);
+					
+					// this sum corresponts to the sum term of the log sum computation
+					if(numberOfWorkplacesPerZone.get(toZone.getId()) != null){ // skipping zones no workplaces
+						long weight = numberOfWorkplacesPerZone.get(toZone.getId()).counter;
+						double costFunction = Math.exp( beta * ttime ); // tnicolai: implement cost function as: Math.exp ( apha * traveltime + beta * traveltime**2 + gamma * ln(traveltime) + delta * distance + epsilon * distance**2 + phi * ln(distance) ) 
+						accessibility += weight * costFunction;
+					}
+					// yyyy should only be work facilities!!!! kai & thomas, dec'10
 				}
-				// add in zone accessibility 
-				if(numberOfWorkplacesPerZone.get(fromZone.getId()) != null){
+				// add in zone accessibility (same zone computation)
+				if(numberOfWorkplacesPerZone.get(fromZone.getId()) != null){ // skipping zones no workplaces
 					long weight = numberOfWorkplacesPerZone.get(fromZone.getId()).counter;
-					double costFunction = Math.exp( beta * (minTravelTime / 2) );
+					double costFunction = Math.exp( beta * (minTravelTime / 2) ); // tnicolai : see above comutation of cost function ...
 					accessibility += weight * costFunction;
 				}
 				

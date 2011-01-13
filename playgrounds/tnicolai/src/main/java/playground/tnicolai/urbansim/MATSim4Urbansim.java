@@ -34,10 +34,8 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
-import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.NetworkCleaner;
-import org.matsim.core.population.PopulationWriter;
 
 import playground.tnicolai.urbansim.constants.Constants;
 import playground.tnicolai.urbansim.utils.JAXBUnmaschal;
@@ -63,6 +61,7 @@ public class MATSim4Urbansim {
 	protected ScenarioImpl scenario = null;
 	
 	public MATSim4Urbansim(String args[]){
+
 		// checks if args parameter contains a valid path
 		isValidPath(args);
 		// loading and initializing MATSim config
@@ -178,7 +177,7 @@ public class MATSim4Urbansim {
 		
 		// The following lines register what should be done _after_ the iterations were run:
 		controler.addControlerListener( new MyControlerListener( zones, numberOfWorkplacesPerZone ) );
-
+		
 		// run the iterations, including the post-processing:
 		controler.run() ;
 	}
@@ -200,7 +199,7 @@ public class MATSim4Urbansim {
 	 */
 	private void init(){
 		
-		JAXBUnmaschal unmarschal = new JAXBUnmaschal( matsimConfigFile );
+		JAXBUnmaschal unmarschal = new JAXBUnmaschal( matsimConfigFile);
 		
 		// binding the parameter from the MATSim Config into the JaxB data structure
 		if(!unmarschal.unmaschalMATSimConfig()){

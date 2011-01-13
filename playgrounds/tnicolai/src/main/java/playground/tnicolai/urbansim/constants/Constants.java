@@ -41,6 +41,7 @@ public class Constants {
 	public static String MATSIM_CONFIG_DIRECTORY;// = System.getenv("OPUS_HOME")+'/'+"opus_matsim/matsim_config/";		// 		 a method to set those paths is already been implemented (setOpusHomeDirectory)
 	public static String OPUS_MATSIM_OUTPUT_DIRECTORY;// = System.getenv("OPUS_HOME")+'/'+"opus_matsim/output/";
 	public static String OPUS_MATSIM_TEMPORARY_DIRECTORY;// = System.getenv("OPUS_HOME")+'/'+"opus_matsim/tmp/";
+	public static String OPUS_DATA_PATH;// = System.getenv("OPUS_HOME")+'/'+"opus_matsim/tmp/";
 	
 	/**
 	 * Apply a new root path for the OPUS_HOME directory
@@ -52,6 +53,7 @@ public class Constants {
 			opusHome += "/";
 		
 		OPUS_HOME = opusHome;
+		OPUS_DATA_PATH = opusHome+"data/";
 		OPUS_MATSIM_DIRECTORY = opusHome+"opus_matsim/";
 		MATSIM_CONFIG_DIRECTORY = opusHome+"opus_matsim/matsim_config/";
 		OPUS_MATSIM_OUTPUT_DIRECTORY = opusHome+"opus_matsim/output/";
@@ -59,6 +61,7 @@ public class Constants {
 		
 		log.info("");
 		log.info("Set OPUS_HOME to :" + OPUS_HOME);
+		log.info("Set OPUS_DATA_PATH to :" + OPUS_DATA_PATH);
 		log.info("Set OPUS MATSim directory to :" + OPUS_MATSIM_DIRECTORY);
 		log.info("Set MATSim config directory to :" + MATSIM_CONFIG_DIRECTORY);
 		log.info("Set OPUS MATSim output directory to :" + OPUS_MATSIM_OUTPUT_DIRECTORY);
@@ -112,6 +115,7 @@ public class Constants {
 	
 	/** xsd on matsim.org */
 	public static final String MATSim_4_UrbanSim_XSD = "http://www.matsim.org/files/dtd/MATSim4UrbanSimConfigSchema.xsd";
+	public static final String XSD_FILE_NAME = "MATSim4UrbanSimConfigSchema.xsd";
 	
 	/** MATSim properties */
 	public static final String MATSIM_PROPERTIES_FILE = "matsim.properties";

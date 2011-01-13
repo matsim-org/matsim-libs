@@ -25,6 +25,7 @@ package playground.tnicolai.urbansim.utils;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Map;
 
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
@@ -37,10 +38,10 @@ import javax.xml.validation.SchemaFactory;
 import org.apache.log4j.Logger;
 import org.xml.sax.SAXException;
 
-import playground.tnicolai.urbansim.MATSim4Urbansim;
 import playground.tnicolai.urbansim.com.matsim.config.MatsimConfigType;
 import playground.tnicolai.urbansim.constants.Constants;
 import playground.tnicolai.urbansim.utils.io.LoadFile;
+import playground.tnicolai.urbansim.utils.io.TempDirectoryUtil;
 
 /**
  * @author thomas
@@ -54,7 +55,7 @@ public class JAXBUnmaschal {
 	private String matsimConfigFile = null;
 	
 	public JAXBUnmaschal(String configFile){
-		matsimConfigFile = configFile;
+		this.matsimConfigFile = configFile;
 	}
 	
 	/**
@@ -74,22 +75,33 @@ public class JAXBUnmaschal {
 			SchemaFactory schemaFactory = SchemaFactory.newInstance( XMLConstants.W3C_XML_SCHEMA_NS_URI );
 			// ... and initialize it with an xsd (xsd lies in the urbansim project)
 			
-			LoadFile loadFile = new LoadFile(Constants.MATSim_4_UrbanSim_XSD, CommonUtilities.getCurrentPath(MATSim4Urbansim.class) + "tmp/", "MATSim4UrbanSimConfigSchema.xsd");
-			File file2XSD = loadFile.loadMATSim4UrbanSimXSD();
+			String tempDir = TempDirectoryUtil.createCustomTempDirectory("tmp");
+
+			// init loadFile object: it downloads a xsd from matsim.org into a temp directory
+			LoadFile loadFile = new LoadFile(Constants.MATSim_4_UrbanSim_XSD, tempDir , Constants.XSD_FILE_NAME);
+			File file2XSD = loadFile.loadMATSim4UrbanSimXSD(); // trigger loadFile
 			
-			// for debugging
+//			// tnicolai : remove this (only for testing)
+//			String opusHomeTmp = null;
+//			Map<String, String> env = System.getenv();
+//	        for (String envName : env.keySet()) {
+//	        	if(envName.equalsIgnoreCase("opus_home")){
+//	        		opusHomeTmp = env.get(envName);
+//	        		System.out.println("Found OUPUS HOME: " + opusHomeTmp);
+//	        	}
+//	        }
+//	        if (opusHomeTmp == null)
+//	        	return false;
+//			File file2XSD = new File(opusHomeTmp+"/MATSim4UrbanSimConfigSchema.xsd");
+//			// tnicolai : end testing
+			
+			// tnicolai: for debugging
 			// File file2XSD = new File( "/Users/thomas/Development/workspace/urbansim_trunk/opus_matsim/sustain_city/models/pyxb_xml_parser/MATSim4UrbanSimConfigSchema.xsd" ); 
 			if(file2XSD == null || !file2XSD.exists()){
-				
-				log.warn(file2XSD.getCanonicalPath() + " is not available. Loading compensatory xsd instead (this could be an older xsd version and may not work correctly).");
-				log.warn("Compensatory xsd file: " + CommonUtilities.getCurrentPath(MATSim4Urbansim.class) + "tmp/MATSim4UrbanSimConfigSchema.xsd");
-				
-				file2XSD = new File(CommonUtilities.getCurrentPath(MATSim4Urbansim.class) + "tmp/MATSim4UrbanSimConfigSchema.xsd");
-				if(!file2XSD.exists()){
-					log.error(file2XSD.getCanonicalPath() + " not found!!!");
-					return false;
-				}
+				log.error(file2XSD.getCanonicalPath() + " not found!!!");
+				return false;
 			}
+			
 			log.info("Using following xsd schema: " + file2XSD.getCanonicalPath());
 			// create a schema object via the given xsd to validate the MATSim xml config.
 			Schema schema = schemaFactory.newSchema(file2XSD);
@@ -133,6 +145,7 @@ public class JAXBUnmaschal {
 			e.printStackTrace();
 			return false;
 		}
+		TempDirectoryUtil.cleaningUpCustomTempDirectories();
 		log.info("... finished unmarschallig");
 		return true;
 	}
