@@ -42,7 +42,7 @@ public class TransitControler {
 		new MatsimConfigReader(config).readFile(args[0]);
 		config.scenario().setUseTransit(true);
 		config.scenario().setUseVehicles(true);
-		config.otfVis().setColoringScheme( OTFVisConfigGroup.COLORING_BVG ) ;
+//		config.otfVis().setColoringScheme( OTFVisConfigGroup.COLORING_BVG ) ;
 		
 		Controler tc = new Controler(config) ;
 		
@@ -71,7 +71,7 @@ public class TransitControler {
 				otfVisQSimFeature.setVisualizeTeleportedAgents(otfVisConfig.isShowTeleportedAgents());
 				simulation.addQueueSimulationListeners(otfVisQSimFeature);
 				simulation.getEventsManager().addHandler(otfVisQSimFeature) ;
-				otfVisConfig.setDrawTransitFacilities(false) ;
+//				otfVisConfig.setDrawTransitFacilities(false) ;
 				otfVisConfig.setShowParking(true) ;
 			}
 
