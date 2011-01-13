@@ -99,7 +99,12 @@ public class ActivityIntervalTracker_NonParallelizableHandler implements Activit
 
 	@Override
 	public void handleEvent(ActivityStartEvent event) {
+		
+		
+		
 		activityStartTime.put(event.getPersonId(), event.getLinkId(), event.getTime());
+		
+		throw new Error("we do not check here, if the last leg was really a car trip or not!!!!!");
 	}
 
 }
