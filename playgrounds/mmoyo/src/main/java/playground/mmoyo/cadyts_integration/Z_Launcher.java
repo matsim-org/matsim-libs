@@ -26,7 +26,6 @@ package playground.mmoyo.cadyts_integration;
 import java.io.IOException;
 
 import org.matsim.core.config.Config;
-import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.utils.misc.ConfigUtils;
@@ -41,24 +40,6 @@ public class Z_Launcher {
 			configFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/calibration/100plans_bestValues_config.xml";
 		}
 
-		/*
-		Config config = new Config();
-		config.addCoreModules();
-		new MatsimConfigReader(config).readFile(configFile);
-		config.scenario().setUseTransit(true);
-		config.scenario().setUseVehicles(true);
-		Controler ptBseUCControler = new Controler( config ) ;
-		
-		//ControlerListener ptBseUCControlerListener = new NewPtBseUCControlerListener();
-		//ptBseUCControler.addControlerListener(ptBseUCControlerListener);
-
-		ptBseUCControler.setCreateGraphs(false);
-		ptBseUCControler.setOverwriteFiles(true);
-//		ptBseUCControler.setWriteEventsInterval(5); 
-		//ptBseUCControler.setUseOTFVis(false) ;
-		ptBseUCControler.run();
-		*/
-		
 		Config config = null;
 		try {
 			config = ConfigUtils.loadConfig(configFile);
@@ -68,8 +49,10 @@ public class Z_Launcher {
 
 		final Controler controler = new Controler(config);
 		controler.setOverwriteFiles(true);
+	
+		ControlerListener ptBseUCControlerListener = new NewPtBseUCControlerListener();
+		controler.addControlerListener(ptBseUCControlerListener);
 		
 		controler.run();
-
 	}
 }
