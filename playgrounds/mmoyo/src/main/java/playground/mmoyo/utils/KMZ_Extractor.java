@@ -20,11 +20,9 @@ public class KMZ_Extractor {
     
     public void extractGraphs(){
         try{
-            byte[] buffer = new byte[1024];
-            ZipInputStream zipInputStream = null;
-            ZipEntry zipEntry;
-            zipInputStream = new ZipInputStream(new FileInputStream(this.kmzFile));
-            zipEntry = zipInputStream.getNextEntry();
+        	byte[] buffer = new byte[1024];
+            ZipInputStream zipInputStream = new ZipInputStream(new FileInputStream(this.kmzFile));
+            ZipEntry zipEntry = zipInputStream.getNextEntry();
            
             while (zipEntry != null) {
                 String zipEntryName = zipEntry.getName();
@@ -34,6 +32,39 @@ public class KMZ_Extractor {
                 
                 //if is in parent directory and (is numeric or errorGraph)
                 if (parentFile==null && ( nameNoExtension.matches("((-|\\+)?[0-9]+(\\.[0-9]+)?)+") || nameNoExtension.startsWith(ERR_PREFIX)  )){
+                	System.out.println("extracting: "+ outputDir + zipEntryName );
+                	
+                	FileOutputStream fileoutputstream;
+                	fileoutputstream = new FileOutputStream(this.outputDir + zipEntryName);             
+                	int i;
+                	while ((i = zipInputStream.read(buffer, 0, 1024)) > -1){
+                		fileoutputstream.write(buffer, 0, i);
+                	}
+                	fileoutputstream.close(); 
+                	zipInputStream.closeEntry();
+                }
+                zipEntry = zipInputStream.getNextEntry();
+            }
+            zipInputStream.close();
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+    
+    public void extractFile(String strFile){
+        try{
+            byte[] buffer = new byte[1024];
+            ZipInputStream zipInputStream = new ZipInputStream(new FileInputStream(this.kmzFile));
+            ZipEntry zipEntry = zipInputStream.getNextEntry();
+           
+            while (zipEntry != null) {
+                String zipEntryName = zipEntry.getName();
+                File file = new File(zipEntryName);
+                String parentFile = file.getParent();
+                
+                //only on parent directory
+                if (parentFile==null && zipEntryName.equals(strFile)){
                 	System.out.println("extracting: "+ outputDir + zipEntryName );
                 	
                 	FileOutputStream fileoutputstream;

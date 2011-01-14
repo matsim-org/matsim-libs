@@ -53,6 +53,7 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import playground.mmoyo.cadyts_integration.ptBseAsPlanStrategy.analysis.PtBseOccupancyAnalyzer;
+import playground.mmoyo.utils.DataLoader;
 import playground.mmoyo.utils.PtRouteUtill;
 import cadyts.demand.PlanBuilder;
 class PtPlanToPlanStepBasedOnEvents implements PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler,
@@ -77,10 +78,19 @@ VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler
 
 	private PtBseOccupancyAnalyzer delegOcupAnalizer;
 
+	private final static String STR_M44 = "M44";
+	private final String STR_PLANSTEPFACTORY = "planStepFactory";
+	private final String STR_ITERATION = "iteration";
+	
 	PtPlanToPlanStepBasedOnEvents(Scenario sc, PtBseOccupancyAnalyzer delOcupAnalizer) {
 		this.sc = sc ;
 		this.net = sc.getNetwork();
+		
 		this.schedule = ((ScenarioImpl) sc).getTransitSchedule() ;
+		
+		//DataLoader loader = new DataLoader();
+		//this.schedule = loader.readTransitSchedule(sc.getConfig().findParam("network", "inputNetworkFile"), sc.getConfig().findParam("transit", "transitScheduleFile"));
+		
 		NET = this.net ;
 		SCHEDULE = this.schedule ;
 		this.delegOcupAnalizer = delOcupAnalizer;
@@ -90,7 +100,7 @@ VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler
 	private long plansNotFound = 0 ;
 	@SuppressWarnings("unchecked")
 	final cadyts.demand.Plan<TransitStopFacility> getPlanSteps(Plan plan) {
-		PlanBuilder<TransitStopFacility> planStepFactory = (PlanBuilder<TransitStopFacility>) plan.getCustomAttributes().get("planStepFactory") ;
+		PlanBuilder<TransitStopFacility> planStepFactory = (PlanBuilder<TransitStopFacility>) plan.getCustomAttributes().get(STR_PLANSTEPFACTORY) ;
 		if ( planStepFactory == null ) {
 			this.plansNotFound ++ ;
 			return null ;
@@ -115,7 +125,7 @@ VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
 		Id transitLineId = ((PersonEntersVehicleEventImpl) event).getTransitRouteId() ;
-		if ( !transitLineId.toString().contains("M44")) {
+		if ( !transitLineId.toString().contains(STR_M44)) {
 			return ;
 		}
 		addPersonToVehicleContainer(event.getPersonId(), event.getVehicleId());
@@ -125,7 +135,7 @@ VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler
 	@Override
 	public void handleEvent(PersonLeavesVehicleEvent event) {
 		Id transitLineId = ((PersonLeavesVehicleEventImpl) event).getTransitRouteId() ;
-		if ( !transitLineId.toString().contains("M44")) {
+		if ( !transitLineId.toString().contains(STR_M44)) {
 			return ;
 		}
 		removePersonFromVehicleContainer(event.getPersonId(), event.getVehicleId());
@@ -155,12 +165,12 @@ VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler
 			Plan selectedPlan = person.getSelectedPlan() ;
 
 			// get the planStepFactory for the plan (or create one):
-			PlanBuilder</*Link*/TransitStopFacility> tmpPlanStepFactory = getPlanStepFactoryForPlan(selectedPlan);
+
+			PlanBuilder<TransitStopFacility> tmpPlanStepFactory = getPlanStepFactoryForPlan(selectedPlan); 
 
 			if ( tmpPlanStepFactory != null ) {
 
 				// add the "turn" to the planStepfactory
-				// yy I think we could adapt this to use facilities instead of links
 				TransitStopFacility fac = this.schedule.getFacilities().get( facId ) ;
 
 				tmpPlanStepFactory.addTurn( fac, (int) time ) ;
@@ -199,22 +209,22 @@ VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler
 	}
 
 	@SuppressWarnings("unchecked")
-		private PlanBuilder</*Link*/TransitStopFacility> getPlanStepFactoryForPlan(Plan selectedPlan) {
-		PlanBuilder</*Link*/TransitStopFacility> planStepFactory = null ;
+	private PlanBuilder<TransitStopFacility> getPlanStepFactoryForPlan(Plan selectedPlan) {
+		PlanBuilder<TransitStopFacility> planStepFactory = null ;
 
-		planStepFactory = (PlanBuilder</*Link*/TransitStopFacility>) selectedPlan.getCustomAttributes().get("planStepFactory") ;
-		Integer factoryIteration = (Integer) selectedPlan.getCustomAttributes().get("iteration") ;
+		planStepFactory = (PlanBuilder<TransitStopFacility>) selectedPlan.getCustomAttributes().get(STR_PLANSTEPFACTORY) ;
+		Integer factoryIteration = (Integer) selectedPlan.getCustomAttributes().get(STR_ITERATION) ;
 		if ( planStepFactory == null
 				// (means there is not yet a plansStepFactory for this plan
 				|| factoryIteration==null || factoryIteration != iteration
 				// (means the iteration for which the plansStepFactory was build is over)
 				) {
 			// attach the iteration number to the plan:
-			selectedPlan.getCustomAttributes().put( "iteration", iteration ) ;
+			selectedPlan.getCustomAttributes().put( STR_ITERATION, iteration ) ;
 
 			// construct a new PlanBulder and attach it to the plan:
-			planStepFactory = new PlanBuilder</*Link*/TransitStopFacility>() ;
-			selectedPlan.getCustomAttributes().put( "planStepFactory", planStepFactory ) ;
+			planStepFactory = new PlanBuilder<TransitStopFacility>() ;
+			selectedPlan.getCustomAttributes().put( STR_PLANSTEPFACTORY, planStepFactory ) ;
 
 			// memorize the plan as being seen:
 			plansEverSeen.add( selectedPlan ) ;
@@ -229,8 +239,8 @@ VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler
 		System.err.println("results:") ;
 
 		for ( Plan matsimPlan : this.plansEverSeen ) {
-			PlanBuilder</*Link*/TransitStopFacility> planStepFactory = (PlanBuilder</*Link*/TransitStopFacility>) matsimPlan.getCustomAttributes().get("planStepFactory") ;
-			cadyts.demand.Plan</*Link*/TransitStopFacility> cadytsPlan = planStepFactory.getResult() ;
+			PlanBuilder<TransitStopFacility> planStepFactory = (PlanBuilder<TransitStopFacility>) matsimPlan.getCustomAttributes().get(STR_PLANSTEPFACTORY) ;
+			cadyts.demand.Plan<TransitStopFacility> cadytsPlan = planStepFactory.getResult() ;
 
 			System.err.println(separator);
 
@@ -240,14 +250,14 @@ VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler
 
 		}
 	}
-	static void printCadytsPlan(cadyts.demand.Plan</*Link*/TransitStopFacility> cadytsPlan) {
+	static void printCadytsPlan(cadyts.demand.Plan<TransitStopFacility> cadytsPlan) {
 		//prints Cadyts plan
 		String sepCadStr = 	"==printing Cadyts Plan==";
 		System.err.println(sepCadStr);
 		if ( cadytsPlan!= null ) {
 			for( int ii=0 ; ii<cadytsPlan.size(); ii++ ) {
-				cadyts.demand.PlanStep</*Link*/TransitStopFacility> cadytsPlanStep = cadytsPlan.getStep(ii) ;
-				System.err.println( /*"linkId: "*/"stopId" + cadytsPlanStep.getLink().getId() + " time: " + cadytsPlanStep.getEntryTime_s() ) ;
+				cadyts.demand.PlanStep<TransitStopFacility> cadytsPlanStep = cadytsPlan.getStep(ii) ;
+				System.err.println("stopId" + cadytsPlanStep.getLink().getId() + " time: " + cadytsPlanStep.getEntryTime_s() ) ;
 			}
 		} else {
 			System.err.println( " cadyts plan is null ") ;
@@ -255,8 +265,8 @@ VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler
 	}
 	static boolean printMatsimPlanPtLinks(Plan matsimPlan) {
 		//prints MATSim plan
-		String sepMatStr = 	"==printing MATSim plan exp transit routes==";
-		String personIdStr = "person Id: ";
+		final String sepMatStr = 	"==printing MATSim plan exp transit routes==";
+		final String personIdStr = "person Id: ";
 		boolean containsM44 = false ;
 		System.err.println(sepMatStr);
 		System.err.println(personIdStr + matsimPlan.getPerson().getId());
@@ -265,7 +275,7 @@ VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler
 				Leg leg= (Leg)planElement;
 				if (leg.getRoute()!= null && (leg.getMode().equals("pt")) ){
 					ExperimentalTransitRoute exptr = (ExperimentalTransitRoute)leg.getRoute();
-					if ( exptr.getRouteDescription().contains("M44") ) {
+					if ( exptr.getRouteDescription().contains(STR_M44) ) {
 						containsM44 = true ;
 						System.err.print( exptr.getRouteDescription() + ": " ) ;
 

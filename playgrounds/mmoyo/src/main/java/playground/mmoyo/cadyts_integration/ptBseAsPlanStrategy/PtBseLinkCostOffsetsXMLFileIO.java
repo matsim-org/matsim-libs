@@ -36,30 +36,12 @@ import cadyts.utilities.misc.DynamicDataXMLFileIO;
 class PtBseLinkCostOffsetsXMLFileIO extends DynamicDataXMLFileIO</*Link*/TransitStopFacility> {
 	/***/
 	private static final long serialVersionUID = 1L;
-//LINK	private Network net;
 	private TransitSchedule schedule; 
 	
 	PtBseLinkCostOffsetsXMLFileIO(TransitSchedule schedule) {
 		super();
 		this.schedule = schedule;
 	}
-	
-//LINK	
-	/*	
-	PtBseLinkCostOffsetsXMLFileIO(Network net) {
-		super();
-		this.net = net;
-	}
- 
-//LINK
- 	@Override
-	protected Link attrValue2key(String linkId) {
-		System.out.println("-----attrValue2key------:\t" + linkId);
-		Link link = net.getLinks().get(new IdImpl(linkId));
-		System.out.println("link :\t" + link);
-		return link;
-	}
-	*/
 
 	String strAttrValue2key = "-----attrValue2key------:\t";
 	String strStop = "stop :\t";
@@ -75,11 +57,6 @@ class PtBseLinkCostOffsetsXMLFileIO extends DynamicDataXMLFileIO</*Link*/Transit
 	protected String key2attrValue(/*Link*/TransitStopFacility key) {
 		return key.getId().toString();
 	}
-
-//	@Override
-//	protected DynamicData<Link> newInstance(int startTime_s, int binSize_s, int binCnt) {
-//		return new DynamicData<Link>(startTime_s, binSize_s, binCnt);
-//	}
 
 //	@Override
 //	public void startElement(String uri, String localName, String name, Attributes attributes) {

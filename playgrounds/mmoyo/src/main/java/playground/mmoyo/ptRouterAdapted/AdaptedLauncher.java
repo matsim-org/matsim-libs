@@ -116,18 +116,31 @@ public class AdaptedLauncher {
 		return routedPlansFile;
 	}
 	
-	public void set_muttWalk(double betaWalk){
+	public void set_betaWalk(double betaWalk){
 		this.betaWalk = betaWalk;
 	}
 	
-	public void set_mutDistance(double betaDistance){
+	public void set_betaDistance(double betaDistance){
 		this.betaDistance = betaDistance;
 	}
 	
-	public void set_mutTransfer(double betaTransfer){
+	public void set_betaTransfer(double betaTransfer){
 		this.betaTransfer = betaTransfer;
 	}
 
+	public double get_betaWalk(){
+		return this.betaWalk;
+	}
+	
+	public double get_betaDistance(){
+		return this.betaDistance;
+	}
+	
+	public double get_betaTransfer(){
+		return this.betaTransfer;
+	}
+	
+	
 	public void setNoCarPland(boolean noCarPlans){
 		this.noCarPlans = noCarPlans;
 	}
@@ -159,9 +172,9 @@ public class AdaptedLauncher {
 		myTransitRouterConfig.compressPlan = true;
 
 		//route once
-		adaptedLauncher.set_muttWalk(betaWalk);
-		adaptedLauncher.set_mutDistance(betaDistance);
-		adaptedLauncher.set_mutTransfer(betaTransfer);
+		adaptedLauncher.set_betaWalk(betaWalk);
+		adaptedLauncher.set_betaDistance(betaDistance);
+		adaptedLauncher.set_betaTransfer(betaTransfer);
 		adaptedLauncher.route(myTransitRouterConfig);
 		
 		

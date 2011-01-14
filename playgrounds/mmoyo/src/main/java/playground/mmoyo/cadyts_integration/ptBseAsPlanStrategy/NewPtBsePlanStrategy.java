@@ -70,10 +70,12 @@ import cadyts.measurements.SingleLinkMeasurement.TYPE;
 import cadyts.supply.SimResults;
 import cadyts.utilities.misc.DynamicData;
 
-public class NewPtBsePlanStrategy implements PlanStrategy, AdditionalTeleportationDepartureEventHandler,
-IterationEndsListener,
-BeforeMobsimListener,
-AfterMobsimListener  {
+public class NewPtBsePlanStrategy implements PlanStrategy, 
+											AdditionalTeleportationDepartureEventHandler,  
+											IterationEndsListener, 
+											BeforeMobsimListener, 
+											AfterMobsimListener  {
+
 	// yyyyyy something beyond just "reset" is needed in terms of events handling, otherwise it does not work.
 
 	private final static Logger log = Logger.getLogger(NewPtBsePlanStrategy.class);
@@ -91,7 +93,6 @@ AfterMobsimListener  {
 	private PtBseOccupancyAnalyzer ptBseOccupAnalyzer;
 	static TransitSchedule trSched ;
 
-
 	public NewPtBsePlanStrategy( Controler controler ) {
 		// IMPORTANT: Do not change this constructor.  It needs to be like this in order to be callable as a "Module"
 		// from the config file.  kai/manuel, dec'10
@@ -107,7 +108,7 @@ AfterMobsimListener  {
 		this.controler.getEvents().addHandler( this ) ;
 		this.controler.addControlerListener(this) ;
 
-		// set up the bus occupancy analyzer    <- no more. a PtBseOccupancyAnalyzer object comes above as parameter
+		// set up the bus occupancy analyzer  
 		this.ptBseOccupAnalyzer = new PtBseOccupancyAnalyzer();
 		this.controler.getEvents().addHandler(ptBseOccupAnalyzer);
 
@@ -205,6 +206,8 @@ AfterMobsimListener  {
 
 			Config config = sc.getConfig();
 
+			// get default regressionInertia, it is used as parameter in the constructor
+
 			// get default regressionInertia
 			String regressionInertiaValue = config.findParam(NewPtBsePlanStrategy.BSE_MOD_NAME, "regressionInertia");
 			double regressionInertia = 0;
@@ -214,17 +217,17 @@ AfterMobsimListener  {
 				regressionInertia = Double.parseDouble(regressionInertiaValue);
 				// this works since it is used in the constructor
 			}
-
-			MATSimUtilityModificationCalibrator<TransitStopFacility> calibrator = new MATSimUtilityModificationCalibrator <TransitStopFacility>(MatsimRandom.getLocalInstance(), regressionInertia);
-			//MATSimUtilityModificationCalibrator<TransitStopFacility> calibrator = new MATSimUtilityModificationCalibrator<TransitStopFacility>("calibration-log.txt", MatsimRandom.getLocalInstance().nextLong(), 3600);
 			//calibrator.setRegressionInertia(regressionInertia);
-
+			
+			MATSimUtilityModificationCalibrator<TransitStopFacility> matsimCalibrator = new MATSimUtilityModificationCalibrator <TransitStopFacility>(MatsimRandom.getLocalInstance(), regressionInertia);
+			//MATSimUtilityModificationCalibrator<TransitStopFacility> calibrator = new MATSimUtilityModificationCalibrator<TransitStopFacility>("calibration-log.txt", MatsimRandom.getLocalInstance().nextLong(), 3600);
+	
 			// Set default standard deviation
 			{
 				String value = config.findParam(NewPtBsePlanStrategy.BSE_MOD_NAME, "minFlowStddevVehH");
 				if (value != null) {
 					double stddev_veh_h = Double.parseDouble(value);
-					calibrator.setMinStddev(stddev_veh_h, TYPE.FLOW_VEH_H);
+					matsimCalibrator.setMinStddev(stddev_veh_h, TYPE.FLOW_VEH_H);
 					System.out.println("BSE:\tminFlowStddevVehH\t=\t" + stddev_veh_h);
 				}
 			}
@@ -247,7 +250,7 @@ AfterMobsimListener  {
 				if (freezeIterationStr != null) {
 					final int freezeIteration = Integer.parseInt(freezeIterationStr);
 					System.out.println("BSE:\tfreezeIteration\t= " + freezeIteration);
-					calibrator.setFreezeIteration(freezeIteration);
+					matsimCalibrator.setFreezeIteration(freezeIteration);
 				}
 			}
 
@@ -257,7 +260,7 @@ AfterMobsimListener  {
 				if (preparatoryIterationsStr != null) {
 					final int preparatoryIterations = Integer.parseInt(preparatoryIterationsStr);
 					System.out.println("BSE:\tpreparatoryIterations\t= " + preparatoryIterations);
-					calibrator.setPreparatoryIterations(preparatoryIterations);
+					matsimCalibrator.setPreparatoryIterations(preparatoryIterations);
 				}
 			}
 
@@ -267,7 +270,7 @@ AfterMobsimListener  {
 				if (varianceScaleStr != null) {
 					final double varianceScale = Double.parseDouble(varianceScaleStr);
 					System.out.println("BSE:\tvarianceScale\t= " + varianceScale);
-					calibrator.setVarianceScale(varianceScale);
+					matsimCalibrator.setVarianceScale(varianceScale);
 				}
 			}
 
@@ -277,11 +280,11 @@ AfterMobsimListener  {
 				if (useBruteForceStr != null) {
 					final boolean useBruteForce = new Boolean(useBruteForceStr).booleanValue();
 					System.out.println("BSE:\tuseBruteForce\t= " + useBruteForce);
-					calibrator.setBruteForce(useBruteForce);
+					matsimCalibrator.setBruteForce(useBruteForce);
 				}
 			}
 
-			calibrator.setStatisticsFile("calibration-stats.txt");
+			matsimCalibrator.setStatisticsFile("calibration-stats.txt");
 
 			// SET countsScale
 			//double countsScaleFactor = config.counts().getCountsScaleFactor(); this is for private autos and we don't have this parameter in config file
@@ -313,9 +316,11 @@ AfterMobsimListener  {
 			int arEndTime = Integer.parseInt(config.findParam(NewPtBsePlanStrategy.BSE_MOD_NAME, "endTime"));
 
 			//the trSchedule has not been read by the controler. it is loaded here
-			DataLoader loader = new DataLoader();
-			trSched = loader.readTransitSchedule(sc.getConfig().findParam("network", "inputNetworkFile"), sc.getConfig().findParam("transit", "transitScheduleFile"));
-
+			//DataLoader loader = new DataLoader();
+			//trSched = loader.readTransitSchedule(sc.getConfig().findParam("network", "inputNetworkFile"), sc.getConfig().findParam("transit", "transitScheduleFile"));
+			//Config config = sc.getConfig();
+			trSched = ((ScenarioImpl)sc).getTransitSchedule();
+						
 			//add counts data into calibrator
 			for (Map.Entry<Id, Count> entry : occupCounts.getCounts().entrySet()) {
 				TransitStopFacility stop= trSched.getFacilities().get(entry.getKey());
@@ -324,12 +329,12 @@ AfterMobsimListener  {
 						int start_s = (volume.getHour() - 1) * 3600;
 						int end_s = volume.getHour() * 3600 - 1;
 						double val_passager_h = volume.getValue();
-						calibrator.addMeasurement(stop, start_s, end_s, val_passager_h, SingleLinkMeasurement.TYPE.FLOW_VEH_H);
+						matsimCalibrator.addMeasurement(stop, start_s, end_s, val_passager_h, SingleLinkMeasurement.TYPE.FLOW_VEH_H);
 					}
 				}
 			}
 
-			return calibrator ;
+			return matsimCalibrator ;
 		}
 
 

@@ -86,23 +86,21 @@ public class FindAgentRejectNearStop {
 		//look for persons who use stations around the given stop
 		final String ptInteraction = "pt interaction";
 		for (Person person : fragPop.getPersons().values()){
-			//for (Plan plan : person.getPlans()){  // all plans or only selected plan?
-				Plan plan = person.getSelectedPlan();
-				for (PlanElement pe : plan.getPlanElements()){
-					if ((pe instanceof Activity)) {
-						Activity act = (Activity)pe;
-						if (nearNodesCoord.contains(act.getCoord())){
-							if (act.getType().equals(ptInteraction)){
-								if (!act.getCoord().equals(stopCoord)){  
-									if ( !outputPopulation.getPersons().containsKey(person.getId())  ){
-										outputPopulation.addPerson(person);	
-									}
+			Plan plan = person.getSelectedPlan();
+			for (PlanElement pe : plan.getPlanElements()){
+				if ((pe instanceof Activity)) {
+					Activity act = (Activity)pe;
+					if (nearNodesCoord.contains(act.getCoord())){
+						if (act.getType().equals(ptInteraction)){
+							if (!act.getCoord().equals(stopCoord)){  
+								if ( !outputPopulation.getPersons().containsKey(person.getId())  ){
+									outputPopulation.addPerson(person);	
 								}
 							}
 						}
 					}
 				}
-			//}
+			}
 		}
 		System.out.println("persons around area: " +  outputPopulation.getPersons().size());
 		
@@ -110,7 +108,7 @@ public class FindAgentRejectNearStop {
 	}
 	
 	
-	///////"output" methods////////
+	///////"output" method////////
 	public void playAvoidingPopulation (String strStopId){
 		Population pop = findPersRejectStop(strStopId);  
 
@@ -120,7 +118,7 @@ public class FindAgentRejectNearStop {
 		String outConfig = this.scn.getConfig().getParam("controler", "outputDirectory") + "config_avoid_" + strStopId + this.type + ".xml";
 		new ConfigWriter(this.scn.getConfig()).write(outConfig);
 
-		//set data containers to null, the OTFVis may need that memory
+		//set data containers to null, the OTFVis may need that memory space
 		pop= null;
 		this.scn = null;
 		
@@ -151,46 +149,10 @@ public class FindAgentRejectNearStop {
 		double distance = 500.0;
 		final String type =  "pt";   //options:  "pt" , "car"  "pt+car"
 		
-		ScenarioImpl scenario = new DataLoader().loadScenarioWithTrSchedule(configFile);
+		ScenarioImpl scenario = new DataLoader().loadScenario(configFile);
 		FindAgentRejectNearStop agentsNearStop = new FindAgentRejectNearStop(scenario, distance, type);
 		//agentsNearStop.writePlan(badStopsArray[0]);                
 		agentsNearStop.playAvoidingPopulation(badStopsArray[0]);    
 	}
 
 }
-
-
-
-
-/*
-public void findNearAgentsCar (final Coord stopCoord, Population outputPopulation){
-	final String CAR = "car"; 
-	for (Person person : scn.getPopulation().getPersons().values()){
-		//for (Plan plan : person.getPlans()){  // all plans or only selected plan?
-			Plan plan = person.getSelectedPlan();
-			
-			//find first act and leg
-			Activity firstAct= null;
-			Leg firstLeg= null;
-			int i=0;
-			while ((firstAct== null || firstLeg== null) && i< plan.getPlanElements().size()){
-				PlanElement pe = plan.getPlanElements().get(i++);
-				if (pe instanceof Activity ) {
-					if(firstAct==null){
-						firstAct = (Activity) pe;	
-					}
-				}else {
-					if(firstLeg==null){
-						firstLeg = (Leg) pe;	
-					}
-				}
-			}
-			
-			//Add the agent to new population if the firstAct is near the stop and the first leg is car
-			double dist1thAct2Stop = CoordUtils.calcDistance(firstAct.getCoord(), stopCoord);
-			if (dist1thAct2Stop <= this.distance && firstLeg.getMode().equals(CAR)){
-				outputPopulation.addPerson(person);
-			}
-	}
-	
-}*/

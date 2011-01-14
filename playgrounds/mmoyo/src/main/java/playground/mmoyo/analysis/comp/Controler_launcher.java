@@ -33,8 +33,6 @@ import org.matsim.core.controler.Controler;
  */
 public class Controler_launcher {
 	
-	
-	
 	public static void main(String[] args) throws FileNotFoundException {
 		String configFile; 
 		if (args.length==1){
@@ -47,21 +45,15 @@ public class Controler_launcher {
 			throw new FileNotFoundException(configFile);
 		}
 
+		
 		Config config = new Config();
 		config.addCoreModules();
 		new MatsimConfigReader(config).readFile(configFile);
-		config.scenario().setUseTransit(true);
-		config.scenario().setUseVehicles(true);
 
 		Controler controler = new Controler( config ) ;
 		controler.setCreateGraphs(true);
 		controler.setOverwriteFiles(true);
 		controler.setWriteEventsInterval(5); 
-		
-		int a=1,b=2;
-		if (a!=b) {
-			throw new RuntimeException("trSched.getFacilities().size() "  + (controler.getScenario().getTransitSchedule().getFacilities().size()) );
-		}	
 		
 		controler.run();
 	} 

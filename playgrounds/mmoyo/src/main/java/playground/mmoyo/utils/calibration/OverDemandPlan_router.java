@@ -76,9 +76,9 @@ public class OverDemandPlan_router {
 
 			//route
 			AdaptedLauncher adaptedLauncher	= new AdaptedLauncher(this.scenario);
-			adaptedLauncher.set_muttWalk(Double.parseDouble(strComb2[0]));
-			adaptedLauncher.set_mutDistance(Double.parseDouble(strComb2[1]));
-			adaptedLauncher.set_mutTransfer(Double.parseDouble(strComb2[2]));
+			adaptedLauncher.set_betaWalk(Double.parseDouble(strComb2[0]));
+			adaptedLauncher.set_betaDistance(Double.parseDouble(strComb2[1]));
+			adaptedLauncher.set_betaTransfer(Double.parseDouble(strComb2[2]));
 			routedPlanArray[i] = adaptedLauncher.route(myTransitRouterConfig);
 			adaptedLauncher= null;
 		}
