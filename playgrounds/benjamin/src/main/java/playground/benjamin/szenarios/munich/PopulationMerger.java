@@ -43,12 +43,13 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
  */
 public class PopulationMerger {
 
-	private String networkFile = "../../detailedEval/Net/network.xml";
-	private String midDemandFile = "../../detailedEval/pop/140k-synthetische-personen/plans.xml";
-	private String prognose2025FreightDemandFile = "../../detailedEval/pop/gueterVerkehr/population_gv_bavaria_10pct_wgs84.xml.gz";
-	private String prognose2025CommuterDemandFile = "../../detailedEval/pop/pendlerVerkehr/population_pv_bavaria_10pct_wgs84.xml.gz";
+	private String networkFile = "../../detailedEval/Net/network-86-85-87-84.xml";
+	private String midDemandFile = "../../detailedEval/pop/14k-synthetische-personen/plans.xml";
+	private String prognose2025FreightDemandFile = "../../detailedEval/pop/gueterVerkehr/population_gv_bavaria_1pct_wgs84.xml.gz";
+	private String prognose2025CommuterDemandFile = "../../detailedEval/pop/pendlerVerkehr/population_pv_bavaria_1pct_wgs84.xml.gz";
+	private String pendlerstatistikInCommutingDemandFile = "../../detailedEval/pop/pendlerVerkehr/pendlerverkehr_1pct_dhdn_gk4.xml.gz";
 	private String outputPath = "../../detailedEval/pop/merged/";
-	private String outputFileName = "mergedPopulation_10pct_gk4.xml.gz";
+	private String outputFileName = "mergedPopulation_All_1pct_gk4.xml.gz";
 
 	private PopulationWriter populationWriter;
 	
@@ -70,11 +71,21 @@ public class PopulationMerger {
 		populationWriter.startStreaming(outputPath + outputFileName);
 
 		addMidDemand(midDemandFile, networkFile, mergedPopulation);
+		addPendlerstatistikInCommuterDemand(pendlerstatistikInCommutingDemandFile, networkFile, mergedPopulation);
 		addPrognose2025FreightDemand(prognose2025FreightDemandFile, networkFile, mergedPopulation);
-		addPrognose2025CommuterDemand(prognose2025CommuterDemandFile, networkFile, mergedPopulation);
+//		addPrognose2025CommuterDemand(prognose2025CommuterDemandFile, networkFile, mergedPopulation);
 
 		populationWriter.closeStreaming();
 		System.out.println("Population merged!");
+	}
+
+	private void addPendlerstatistikInCommuterDemand(String pendlerstatistikInCommutingDemandFile, String networkFile, PopulationImpl mergedPopulation) {
+		Population inCommuterPopulation = PopulationMerger.getPopulation(pendlerstatistikInCommutingDemandFile, networkFile);
+		
+		for(Person person : inCommuterPopulation.getPersons().values()){
+			addCommuterPrefix(person);
+			mergedPopulation.addPerson(person);
+		}
 	}
 
 	private static void addMidDemand(String midDemandFile, String networkFile, Population mergedPopulation) {
