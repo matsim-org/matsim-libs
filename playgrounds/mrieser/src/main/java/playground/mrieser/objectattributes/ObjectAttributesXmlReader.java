@@ -29,6 +29,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
 
+import org.apache.log4j.Logger;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -42,13 +43,14 @@ import org.xml.sax.SAXException;
  * @author mrieser
  */
 public class ObjectAttributesXmlReader extends MatsimXmlParser {
-
+	private final static Logger log = Logger.getLogger(ObjectAttributesXmlReader.class);
 	private final Map<String, AttributeConverter> converters = new HashMap<String, AttributeConverter>();
 	private final ObjectAttributes attributes;
 	private boolean readCharacters = false;
 	private String currentObject = null;
 	private String currentAttribute = null;
 	private String currentAttributeClass = null;
+	private long count = 0;
 
 	public ObjectAttributesXmlReader(final ObjectAttributes attributes) {
 		this.attributes = attributes;
@@ -77,6 +79,10 @@ public class ObjectAttributesXmlReader extends MatsimXmlParser {
 			Object o = this.converters.get(this.currentAttributeClass).convert(content);
 			this.attributes.putAttribute(this.currentObject, this.currentAttribute, o);
 		} else if (TAG_OBJECT.equals(name)) {
+			if (this.count % 100000 == 0) {
+				log.info("reading object #" + this.count);
+			}
+			this.count++;
 			this.currentObject = null;
 		}
 	}
@@ -137,9 +143,15 @@ public class ObjectAttributesXmlReader extends MatsimXmlParser {
 		}
 	}
 	private static class StringConverter implements AttributeConverter {
+		private final Map<String, String> stringCache = new HashMap<String,  String>(1000);
 		@Override
 		public String convert(String value) {
-			return value;
+			String s = this.stringCache.get(value);
+			if (s == null) {
+				s = new String(value); // copy, in case 'value' was generated as substring from a larger string
+				this.stringCache.put(s, s);
+			}
+			return s;
 		}
 	}
 	private static class BooleanConverter implements AttributeConverter {

@@ -19,7 +19,6 @@
 
 package playground.mrieser.objectattributes;
 
-import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -37,7 +36,6 @@ import java.util.Map;
 public class ObjectAttributes {
 
 	/*package*/ Map<String, Map<String, Object>> attributes = new LinkedHashMap<String, Map<String, Object>>(1000);
-	Map<String, String> stringCache = new HashMap<String, String>(1000);
 
 	public Object putAttribute(final String objectId, final String attribute, final Object value) {
 		Map<String, Object> attMap = this.attributes.get(objectId);
