@@ -50,8 +50,12 @@ public class Z_Launcher {
 		final Controler controler = new Controler(config);
 		controler.setOverwriteFiles(true);
 	
-		ControlerListener ptBseUCControlerListener = new NewPtBseUCControlerListener();
-		controler.addControlerListener(ptBseUCControlerListener);
+		//to use cadyts as strategy from code
+		//ControlerListener ptBseUCControlerListener = new NewPtBseUCControlerListener();
+		//controler.addControlerListener(ptBseUCControlerListener);
+		
+		//to use cadyts as strategy from file use this in module "strategy" from config File
+		//<param name="Module_1" value="playground.mmoyo.cadyts_integration.ptBseAsPlanStrategy.NewPtBsePlanStrategy" />
 		
 		controler.run();
 	}
