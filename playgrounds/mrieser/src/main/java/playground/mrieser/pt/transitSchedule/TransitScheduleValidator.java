@@ -21,6 +21,7 @@ package playground.mrieser.pt.transitSchedule;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -122,10 +123,31 @@ public abstract class TransitScheduleValidator {
 		return result;
 	}
 
+	public static ValidationResult validateUsedStopsHaveLinkId(final TransitSchedule schedule) {
+		ValidationResult result = new ValidationResult();
+		for (TransitLine line : schedule.getTransitLines().values()) {
+			for (TransitRoute route : line.getRoutes().values()) {
+				for (TransitRouteStop stop : route.getStops()) {
+					Id linkId = stop.getStopFacility().getLinkId();
+					if (linkId == null) {
+						result.addError("Transit Stop Facility " + stop.getStopFacility().getId() + " has no linkId, but is used by transit line " + line.getId() + ", route " + route.getId());
+					}
+				}
+			}
+		}
+		return result;
+	}
+
 	public static ValidationResult validateAll(final TransitSchedule schedule, final Network network) {
-		ValidationResult v = validateNetworkRoutes(schedule, network);
-		ValidationResult v2 = validateStopsOnNetworkRoute(schedule, network);
+		ValidationResult v = validateUsedStopsHaveLinkId(schedule);
+		ValidationResult v2 = validateNetworkRoutes(schedule, network);
 		v.add(v2);
+		try {
+			ValidationResult v3 = validateStopsOnNetworkRoute(schedule, network);
+			v.add(v3);
+		} catch (NullPointerException e) {
+			v.addError("Exception during 'validateStopsOnNetworkRoute'. Most likely something is wrong in the file, but it cannot be specified in more detail." + Arrays.toString(e.getStackTrace())); // TODO [MR] improve
+		}
 		return v;
 	}
 
@@ -144,6 +166,7 @@ public abstract class TransitScheduleValidator {
 //		args = new String[] {"/data/projects/bvg2010/Daten/transitSchedule.oevnet.xml", "/data/projects/bvg2010/Daten/transit-network.xml"};
 //		args = new String[] {"/Users/cello/Desktop/MATSim/pt-test/matsim-0.2.0-rc1-release/pt-rdam/transitSchedule.xml", "/Users/cello/Desktop/MATSim/pt-test/matsim-0.2.0-rc1-release/pt-rdam/rdamnetwork.xml"};
 //		args = new String[] {"/data/senozon/visumData/matsim/transitSchedule.xml", "/data/senozon/visumData/matsim/network.cleaned.xml"};
+		args = new String[] {"/Users/cello/Desktop/bvgnet7/transitSchedule.xml", "/Users/cello/Desktop/bvgnet7/network.xml"};
 
 		new MatsimNetworkReader(s).parse(args[1]);
 		new TransitScheduleReader(s).readFile(args[0]);
