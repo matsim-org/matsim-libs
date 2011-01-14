@@ -23,9 +23,13 @@
  */
 package playground.yu.travelCost;
 
+import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
+import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
+import org.matsim.core.scoring.charyparNagel.CharyparNagelScoringFunctionFactory;
 
 import playground.yu.replanning.ControlerWithRemoveOldestPlan;
 
@@ -36,7 +40,8 @@ import playground.yu.replanning.ControlerWithRemoveOldestPlan;
  * @author yu
  * 
  */
-public class DiverseRouteListener implements IterationStartsListener {
+public class DiverseRouteListener implements IterationStartsListener,
+		IterationEndsListener {
 
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
@@ -45,8 +50,26 @@ public class DiverseRouteListener implements IterationStartsListener {
 		int firstIter = ctl.getFirstIteration();
 		ctl
 				.setTravelCostCalculatorFactory(new ParameterizedTravelCostCalculatorFactoryImpl(
-						0d + 0.5 * (iter - firstIter - 1)/* A - travelTime */,
-						1d - 0.5 * (iter - firstIter - 1)/* B - travelDistance */));
+						1d - (iter - firstIter - 1) / 3d/* A -> travelTime */,
+						0d + (iter - firstIter - 1) / 3d/* B -> travelDistance */));
+	}
+
+	/**
+	 * changes the value of monetaryDistanceCostRateCar from default value 0 to
+	 * -0.00012 by the end of the first iteration
+	 */
+	@Override
+	public void notifyIterationEnds(IterationEndsEvent event) {
+		Controler ctl = event.getControler();
+		int iter = event.getIteration();/* firstIter+1, +2, +3 */
+		if (iter == ctl.getFirstIteration()) {
+			CharyparNagelScoringConfigGroup scoringCfg = ctl.getConfig()
+					.charyparNagelScoring();
+			scoringCfg.setMonetaryDistanceCostRateCar(-0.00012);
+			ctl
+					.setScoringFunctionFactory(new CharyparNagelScoringFunctionFactory(
+							scoringCfg));
+		}
 	}
 
 	public static void main(String[] args) {
@@ -56,4 +79,5 @@ public class DiverseRouteListener implements IterationStartsListener {
 		controler.setCreateGraphs(false);
 		controler.run();
 	}
+
 }

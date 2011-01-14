@@ -48,14 +48,13 @@ public class ParameterizedTravelTimeDistanceCostCalculator implements
 		 * Usually, the travel-utility should be negative (it's a disutility)
 		 * but the cost should be positive. Thus negate the utility.
 		 */
-		travelCostFactor = (-cnScoringGroup.getTraveling_utils_hr() / 3600.0 + cnScoringGroup
-				.getPerforming_utils_hr() / 3600.0)
+		travelCostFactor = (-cnScoringGroup.getTraveling_utils_hr() / 3600d + cnScoringGroup
+				.getPerforming_utils_hr() / 3600d)
 				* A;
 
 		// this.marginalUtlOfDistance =
 		// cnScoringGroup.getMarginalUtlOfDistanceCar();
-		marginalUtlOfDistance = cnScoringGroup
-				.getMonetaryDistanceCostRateCar()
+		marginalUtlOfDistance = cnScoringGroup.getMonetaryDistanceCostRateCar()
 				* cnScoringGroup.getMarginalUtilityOfMoney() * B;
 
 	}
@@ -74,8 +73,7 @@ public class ParameterizedTravelTimeDistanceCostCalculator implements
 	@Override
 	public double getLinkMinimumTravelCost(final Link link) {
 		if (marginalUtlOfDistance == 0.0) {
-			return link.getLength() / link.getFreespeed()
-					* travelCostFactor;
+			return link.getLength() / link.getFreespeed() * travelCostFactor;
 		}
 		return link.getLength() / link.getFreespeed() * travelCostFactor
 				- marginalUtlOfDistance * link.getLength();
