@@ -3,9 +3,10 @@
  * 
  * <h2>Package Maintainer(s):</h2>
  * <ul>
- *   <li>Michael Balmer</li>
+ *   <li>Marcel Rieser, Michael Balmer</li>
  * </ul>
  * 
+ * <h2>Details</h2>
  * Likely not the best implementation at the moment, speak to the maintainer for proposed changes.
  */
 package org.matsim.matrices;
