@@ -10,7 +10,42 @@
  * 
   * <h2>Parameters:<a name="controler_parameters"></a></h2>
  * <ul>
- * 	<li><strong><font color="blue">...</font></strong> <br>
+ * 	<li><strong><font color="blue">outputDirectory</font></strong> <br>
+ * 		Type and range: ... <br>
+ * 		Default: ... <br>
+ * 		Description: ...
+ * 	</li>
+ * <li><strong><font color="blue">firstIteration</font></strong> <br>
+ * 		Type and range: integer >= 0 <br>
+ * 		Default: ... <br>
+ * 		Description: ...
+ * 	</li>
+ * <li><strong><font color="blue">lastIteration</font></strong> <br>
+ * 		Type and range: integer >=1000 <br>
+ * 		Default: ... <br>
+ * 		Description: ...
+ * 	</li>
+ * <li><strong><font color="blue">routingAlgorithmType</font></strong> <br>
+ * 		Type and range: ... <br>
+ * 		Default: ... <br>
+ * 		Description: ...
+ * 	</li>
+ * <li><strong><font color="blue">runId</font></strong> <br>
+ * 		Type and range: String <br>
+ * 		Default: ... <br>
+ * 		Description: ...
+ * 	</li>
+ * <li><strong><font color="blue">enableLinkToLinkRouting</font></strong> <br>
+ * 		Type and range: ... <br>
+ * 		Default: ... <br>
+ * 		Description: ...
+ * 	</li>
+ * <li><strong><font color="blue">eventsFileFormat</font></strong> <br>
+ * 		Type and range: ... <br>
+ * 		Default: ... <br>
+ * 		Description: ...
+ * 	</li>
+ * <li><strong><font color="blue">writeEventsInterval</font></strong> <br>
  * 		Type and range: ... <br>
  * 		Default: ... <br>
  * 		Description: ...
