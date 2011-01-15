@@ -2,6 +2,22 @@
  * The Controler is responsible for complete simulation runs, including
  * the initialization of all required data, running the iterations and
  * the replanning, analyses, etc.
+ * 
+ * <h2>Package Maintainer:</h2>
+ * <ul>
+ *   <li>Marcel Rieser</li>
+ * </ul>
+ * 
+  * <h2>Parameters:<a name="controler_parameters"></a></h2>
+ * <ul>
+ * 	<li><strong><font color="blue">...</font></strong> <br>
+ * 		Type and range: ... <br>
+ * 		Default: ... <br>
+ * 		Description: ...
+ * 	</li>
+ * </ul>
+ * 
+ * <h2>Details</h2>
  *
  * <h3>Conceptual Structure</h3>
  * <p>The Controler has three main parts:<ul>
