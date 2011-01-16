@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.anhorni.PLOC;
+package playground.anhorni.PLOC.run;
 
 import java.io.File;
 
@@ -28,6 +28,7 @@ import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.MatsimConfigReader;
 
 import playground.anhorni.LEGO.miniscenario.run.MixedControler;
+import playground.anhorni.PLOC.PLOCConfigReader;
 
 public class MultiplerunsControler {
 	
