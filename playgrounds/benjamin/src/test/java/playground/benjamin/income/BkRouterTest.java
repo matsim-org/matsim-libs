@@ -21,6 +21,8 @@
 package playground.benjamin.income;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
@@ -28,6 +30,12 @@ import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.core.scoring.ScoringFunctionFactory;
+import org.matsim.households.Households;
+import org.matsim.households.PersonHouseholdMapping;
+import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -36,6 +44,9 @@ import org.matsim.testcases.MatsimTestCase;
  * @author dgrether and benjamin
  */
 public class BkRouterTest extends MatsimTestCase {
+	
+	private PersonHouseholdMapping personHouseholdMapping;
+
 
 	/*package*/ final static Id id1 = new IdImpl("1");
 	/*package*/ final static Id id2 = new IdImpl("2");
@@ -52,12 +63,21 @@ public class BkRouterTest extends MatsimTestCase {
 		//hh loading
 		config.scenario().setUseHouseholds(true);
 		config.households().setInputFile(this.getClassInputDirectory() + "households.xml");
+		
+		ScenarioLoaderImpl scLoader = new ScenarioLoaderImpl(config) ;
+		ScenarioImpl sc = (ScenarioImpl) scLoader.loadScenario() ;
 
-		Controler controler = new Controler(config);
+		Controler controler = new Controler(sc);
 		controler.setCreateGraphs(false);
 		final TestDataGatherer handler = new TestDataGatherer();
 		
-		controler.addControlerListener(new BkIncomeControlerListener());
+		this.personHouseholdMapping = new PersonHouseholdMapping( ((ScenarioImpl) controler.getScenario()).getHouseholds() );
+		
+		// Make sure both the scoring function and the travel cost calculator (for the routing) are configured in a consistent way!
+		installScoringFunctionFactory(controler);
+		installTravelCostCalculatorFactory(controler);
+
+		
 		controler.addControlerListener(new TestDataStartupListener(handler));
 
 		controler.run();
@@ -83,7 +103,6 @@ public class BkRouterTest extends MatsimTestCase {
 			controler.setCreateGraphs(false);
 			final TestDataGathererToll handler = new TestDataGathererToll();
 			
-			controler.addControlerListener(new BkIncomeControlerListener());
 			controler.addControlerListener(new TestDataStartupListenerToll(handler));
 	
 			controler.run();
@@ -151,4 +170,28 @@ public class BkRouterTest extends MatsimTestCase {
 		}
 		public void reset(int iteration) {}
 	}
+	
+	private void installScoringFunctionFactory(Controler controler) {
+		Scenario scenario = controler.getScenario();
+		ScoringFunctionFactory scoringFactory = 
+			new IncomeScoringFunctionFactory(scenario.getConfig(), personHouseholdMapping, scenario.getNetwork());
+		controler.setScoringFunctionFactory(scoringFactory);
+	}
+	
+	private void installTravelCostCalculatorFactory(Controler controler) {
+		// returns null, if there is no road pricing
+		if (controler.getConfig().scenario().isUseRoadpricing()){
+			RoadPricingScheme roadPricingScheme = controler.getRoadPricing().getRoadPricingScheme();
+			TravelCostCalculatorFactory travelCostCalculatorFactory = 
+				new IncomeTollTravelCostCalculatorFactory(personHouseholdMapping, roadPricingScheme);
+			controler.setTravelCostCalculatorFactory(travelCostCalculatorFactory);
+		}
+		else{
+			TravelCostCalculatorFactory travelCostCalculatorFactory = new IncomeTravelCostCalculatorFactory(personHouseholdMapping);
+			controler.setTravelCostCalculatorFactory(travelCostCalculatorFactory);
+		}
+	}
+
+
+
 }

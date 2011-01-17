@@ -20,13 +20,20 @@
 package playground.benjamin.income;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scoring.EventsToScore;
+import org.matsim.core.scoring.ScoringFunctionFactory;
+import org.matsim.households.PersonHouseholdMapping;
+import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.testcases.MatsimTestCase;
 
 import playground.benjamin.old.income.BkControlerIncome;
@@ -46,37 +53,45 @@ public class BkScoringTest extends MatsimTestCase {
 	private EventsToScore planScorer;
 
 	public void testSingleIterationIncomeScoring() {
+		
+		// reading the config file:
 		Config config = this.loadConfig(this.getClassInputDirectory() + "configIncomeScoreTest.xml");
+		
+		// modifying the config:
 		String netFileName = this.getClassInputDirectory() + "network.xml";
 		config.network().setInputFile(netFileName);
 		config.plans().setInputFile(this.getClassInputDirectory() + "plansScoreTestV4.xml");
-		//hh loading
 		config.scenario().setUseHouseholds(true);
 		config.households().setInputFile(this.getClassInputDirectory() + "households.xml");
 
-		// should be:
-//		final Controler controler = new Controler(config);
+		// reading the scenario (based on the config):
+		ScenarioLoaderImpl scLoader = new ScenarioLoaderImpl(config) ;
+		ScenarioImpl sc = (ScenarioImpl) scLoader.loadScenario() ;
 		
-		// but doesnt work yet, so...
-		final Controler controler =  new BkControlerIncome(config);
-		
+		// creating a controler
+		final Controler controler =  new Controler(sc);
+
+		// some controler configuration:
 		controler.setCreateGraphs(false);
 		controler.setWriteEventsInterval(0);
 
-		// should add this one:
-//		controler.addControlerListener(new BkIncomeControlerListener());
-		
-		// but doesnt work yet, so...
 		controler.addControlerListener(new TestDataStartupListener(controler));
+
+		// installing the income-based scoring function and related:
+		final PersonHouseholdMapping personHouseholdMapping = 
+			new PersonHouseholdMapping( ((ScenarioImpl) controler.getScenario()).getHouseholds() );
+		installScoringFunctionFactory(controler, personHouseholdMapping);
+		installTravelCostCalculatorFactory(controler, personHouseholdMapping);
 		
+		// running the controler:
 		controler.run();
-		
+
 		// should test this one:
-//		checkThatScoresAreRight(controler.getScenario().getPopulation());
+		//		checkThatScoresAreRight(controler.getScenario().getPopulation());
 		this.planScorer.finish();
 
-		
-//============================================
+
+		//============================================
 		//this score is calculated as follows:
 		//U_total_car = 4.58*LN(120000CHF/240)   -   4.58*(((0.12/1000m)*50000m)/(120000CHF/240)))   -   (0.97/3600s)*(60min*60)   +   1.86*8*LN(1/(EXP((-10*3600s)/(8*3600s))))   +   1.86*12*LN(15/(12*EXP((-10*3600s)/(12*3600s))))
 		//            = 28.46291                 -   0.05496                                        -   0.97                      +   14.88 *LN(3.490342957)                      +   22.32  *LN(2.876218905)
@@ -116,19 +131,40 @@ public class BkScoringTest extends MatsimTestCase {
 	}
 
 	private final class TestDataStartupListener implements StartupListener {
-			private final Controler controler;
-	
-			private TestDataStartupListener(Controler controler) {
-				this.controler = controler;
-			}
-	
-			public void notifyStartup(final StartupEvent event) {
-	//				double agent1LeaveHomeTime = controler.getPopulation().getPerson(id1).getPlans().get(0).getFirstActivity().getEndTime();
-	//				double agent2LeaveHomeTime = controler.getPopulation().getPerson(id2).getPlans().get(0).getFirstActivity().getEndTime();
-	//				controler.getEvents().addHandler(new TestSingleIterationEventHandler(agent1LeaveHomeTime, agent2LeaveHomeTime));
-				planScorer = new EventsToScore(controler.getPopulation(), controler.getScoringFunctionFactory(), controler.getConfig().charyparNagelScoring().getLearningRate());
-				controler.getEvents().addHandler(planScorer);
-			}
+		private final Controler controler;
+
+		private TestDataStartupListener(Controler controler) {
+			this.controler = controler;
 		}
 
+		public void notifyStartup(final StartupEvent event) {
+			//				double agent1LeaveHomeTime = controler.getPopulation().getPerson(id1).getPlans().get(0).getFirstActivity().getEndTime();
+			//				double agent2LeaveHomeTime = controler.getPopulation().getPerson(id2).getPlans().get(0).getFirstActivity().getEndTime();
+			//				controler.getEvents().addHandler(new TestSingleIterationEventHandler(agent1LeaveHomeTime, agent2LeaveHomeTime));
+			planScorer = new EventsToScore(controler.getPopulation(), controler.getScoringFunctionFactory(), controler.getConfig().charyparNagelScoring().getLearningRate());
+			controler.getEvents().addHandler(planScorer);
+		}
+	}
+
+	private void installScoringFunctionFactory(Controler controler, PersonHouseholdMapping personHouseholdMapping) {
+		Scenario scenario = controler.getScenario();
+		ScoringFunctionFactory scoringFactory = 
+			new IncomeScoringFunctionFactory(scenario.getConfig(), personHouseholdMapping, scenario.getNetwork());
+		controler.setScoringFunctionFactory(scoringFactory);
+	}
+	
+	private void installTravelCostCalculatorFactory(Controler controler, PersonHouseholdMapping personHouseholdMapping) {
+		// returns null, if there is no road pricing
+		if (controler.getConfig().scenario().isUseRoadpricing()){
+			RoadPricingScheme roadPricingScheme = controler.getRoadPricing().getRoadPricingScheme();
+			TravelCostCalculatorFactory travelCostCalculatorFactory = 
+				new IncomeTollTravelCostCalculatorFactory(personHouseholdMapping, roadPricingScheme);
+			controler.setTravelCostCalculatorFactory(travelCostCalculatorFactory);
+		}
+		else{
+			TravelCostCalculatorFactory travelCostCalculatorFactory = new IncomeTravelCostCalculatorFactory(personHouseholdMapping);
+			controler.setTravelCostCalculatorFactory(travelCostCalculatorFactory);
+		}
+	}
+	
 }
