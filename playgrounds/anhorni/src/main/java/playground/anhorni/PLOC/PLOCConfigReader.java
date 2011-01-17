@@ -26,7 +26,7 @@ import java.io.IOException;
 
 public class PLOCConfigReader {
 	
-	private String configFile = "src/main/java/playground/anhorni/input/PLOC/configs/config.txt";
+	private String configFile = "src/main/java/playground/anhorni/input/PLOC/config.txt";
 	
 	private int numberOfRandomRuns = -1;
 	private int numberOfAnalyses = -1;

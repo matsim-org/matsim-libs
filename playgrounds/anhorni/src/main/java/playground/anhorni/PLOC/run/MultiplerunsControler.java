@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * LCControler.java
+ * MultiplerunsControler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -20,20 +20,13 @@
 
 package playground.anhorni.PLOC.run;
 
-import java.io.File;
-
 import org.apache.log4j.Logger;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigWriter;
-import org.matsim.core.config.MatsimConfigReader;
-
 import playground.anhorni.LEGO.miniscenario.run.MixedControler;
 import playground.anhorni.PLOC.PLOCConfigReader;
 
 public class MultiplerunsControler {
 	
 	private final static Logger log = Logger.getLogger(MultiplerunsControler.class);
-	private static String path = "src/main/java/playground/anhorni/PLOC/";
 	private int numberOfRandomRuns = -1; // from PLOCConfigReader
 	private PLOCConfigReader plocConfigReader = new PLOCConfigReader();
 	
@@ -45,31 +38,14 @@ public class MultiplerunsControler {
     private void init() {
     	this.plocConfigReader.read();
     	this.numberOfRandomRuns = plocConfigReader.getNumberOfRandomRuns();
-    	this.createConfigs();
     }
-       
-    private void createConfigs() {
-    	Config config = new Config();
-    	MatsimConfigReader configReader = new MatsimConfigReader(config);
-    	configReader.readFile(path + "../input/PLOC/configs/config.xml");   	
-    	    	
-    	for (int i = 0; i < numberOfRandomRuns; i++) {
-    		config.setParam("plans", "inputPlansFile", path + "../input/PLOC/plans/" + i + "_plans.xml");
-        	config.setParam("controler", "runId", "run_" + String.valueOf(i));
-        	String outputPath = path + "../output/PLOC/runs/";
-        	new File(outputPath).mkdir();
-        	config.setParam("controler", "outputDirectory", outputPath + i);
-        	ConfigWriter configWriter = new ConfigWriter(config);
-        	configWriter.write(path + "../input/PLOC/configs/" + i + "_config.xml");
-    	}  	
-    }
-    
+        
     public void run() {
     	
     	this.init();
     	    	    	   	
     	for (int runIndex = 0; runIndex < numberOfRandomRuns; runIndex++) {
-    		String config [] = {"src/main/java/playground/anhorni/input/PLOC/configs/" + runIndex + "_config.xml"};
+    		String config [] = {"src/main/java/playground/anhorni/input/PLOC/run" + runIndex + "config.xml"};
     		
     		MixedControler controler = new MixedControler(config);
     		controler.setOverwriteFiles(true);
