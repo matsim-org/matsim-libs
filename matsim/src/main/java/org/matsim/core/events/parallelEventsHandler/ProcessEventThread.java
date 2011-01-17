@@ -21,8 +21,6 @@
 package org.matsim.core.events.parallelEventsHandler;
 
 import java.util.ArrayList;
-import java.util.concurrent.BrokenBarrierException;
-import java.util.concurrent.CyclicBarrier;
 
 import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -30,22 +28,20 @@ import org.matsim.core.gbl.Gbl;
 
 /**
  * The wrapper around the Events class for allowing parallelization.
- * 
+ *
  * @author rashid_waraich
  */
 public class ProcessEventThread implements Runnable {
-	ArrayList<Event> preInputBuffer = null;
-	ConcurrentListSPSC<Event> eventQueue = null;
+	private ArrayList<Event> preInputBuffer = null;
+	private ConcurrentListSPSC<Event> eventQueue = null;
 	private EventsManager events;
-	CyclicBarrier cb = null;
 	private int preInputBufferMaxLength;
 
-	public ProcessEventThread(EventsManager events, int preInputBufferMaxLength, CyclicBarrier cb) {
+	public ProcessEventThread(EventsManager events, int preInputBufferMaxLength) {
 		this.events = events;
 		this.preInputBufferMaxLength = preInputBufferMaxLength;
 		eventQueue = new ConcurrentListSPSC<Event>();
 		preInputBuffer = new ArrayList<Event>();
-		this.cb = cb;
 	}
 
 	public synchronized void processEvent(Event event) {
@@ -60,6 +56,7 @@ public class ProcessEventThread implements Runnable {
 		}
 	}
 
+	@Override
 	public void run() {
 		// process events, until LastEventOfIteration arrives
 		Event nextEvent = null;
@@ -72,15 +69,7 @@ public class ProcessEventThread implements Runnable {
 				getEvents().processEvent(nextEvent);
 			}
 		}
-		// inform main thread, that processing finished
-		try {
-			cb.await();
-			Gbl.printCurrentThreadCpuTime();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		} catch (BrokenBarrierException e) {
-			e.printStackTrace();
-		}
+		Gbl.printCurrentThreadCpuTime();
 	}
 
 	// schedule LastEventOfIteration and flush buffered events

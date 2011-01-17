@@ -20,40 +20,41 @@
 
 package org.matsim.core.events.parallelEventsHandler;
 
-import java.util.concurrent.BrokenBarrierException;
-import java.util.concurrent.CyclicBarrier;
+import java.lang.Thread.UncaughtExceptionHandler;
+import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.apache.log4j.Logger;
 import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.handler.EventHandler;
 
 /**
- * 
+ *
  * ParallelEvents allows parallelization for events handling. Usage: First
  * create an object of this class. Before each iteration, call initProcessing.
  * After each iteration, call finishProcessing. This has already been
  * incorporated into the Controller.
- * 
+ *
  * Usage via config.xml:
- * 
+ *
  * <pre>
  * <module name="parallelEventHandling">
  *  <param name="numberOfThreads" value="2" />
  * </module>
  * </pre>
- * 
+ *
  * optionally you can also specify the estimated number of events per iteration:
- * 
+ *
  * <pre>
  *  <param name="estimatedNumberOfEvents" value="10000000" />
  * </pre>
- * 
+ *
  * (not really needed, but can make performance slightly faster in larger
  * simulations).
- * 
+ *
  * @see http://www.matsim.org/node/238
  * @author rashid_waraich
- * 
+ *
  */
 public class ParallelEventsManagerImpl extends EventsManagerImpl {
 
@@ -61,8 +62,13 @@ public class ParallelEventsManagerImpl extends EventsManagerImpl {
 	private int numberOfThreads;
 	private EventsManagerImpl[] events = null;
 	private ProcessEventThread[] eventsProcessThread = null;
+	private Thread[] threads = null;
 	private int numberOfAddedEventsHandler = 0;
-	private CyclicBarrier barrier = null;
+	private final AtomicBoolean hadException = new AtomicBoolean(false);
+	private final ExceptionHandler uncaughtExceptionHandler = new ExceptionHandler(hadException);
+
+	private final static Logger log = Logger.getLogger(ParallelEventsManagerImpl.class);
+
 	// this number should be set in the following way:
 	// if the number of events is estimated as x, then this number
 	// could be set to x/10
@@ -81,7 +87,7 @@ public class ParallelEventsManagerImpl extends EventsManagerImpl {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param numberOfThreads
 	 * @param estimatedNumberOfEvents
 	 *            Only use this constructor for larger simulations (20M+
@@ -162,8 +168,8 @@ public class ParallelEventsManagerImpl extends EventsManagerImpl {
 		this.numberOfThreads = numberOfThreads;
 		this.events = new EventsManagerImpl[numberOfThreads];
 		this.eventsProcessThread = new ProcessEventThread[numberOfThreads];
+		this.threads = new Thread[numberOfThreads];
 		// the additional 1 is for the simulation barrier
-		barrier = new CyclicBarrier(numberOfThreads + 1);
 		for (int i = 0; i < numberOfThreads; i++) {
 			events[i] = new EventsManagerImpl();
 		}
@@ -182,10 +188,10 @@ public class ParallelEventsManagerImpl extends EventsManagerImpl {
 		}
 
 		try {
-			barrier.await();
+			for (Thread t : this.threads) {
+				t.join();
+			}
 		} catch (InterruptedException e) {
-			e.printStackTrace();
-		} catch (BrokenBarrierException e) {
 			e.printStackTrace();
 		}
 
@@ -197,6 +203,10 @@ public class ParallelEventsManagerImpl extends EventsManagerImpl {
 		 */
 
 		parallelMode = false;
+
+		if (this.hadException.get()) {
+			throw new RuntimeException("Exception while processing events. Cannot guarantee that all events have been fully processed.");
+		}
 	}
 
 	// create event handler threads
@@ -205,9 +215,30 @@ public class ParallelEventsManagerImpl extends EventsManagerImpl {
 	public void initProcessing() {
 		// reset this class, so that it can be reused for the next iteration
 		for (int i = 0; i < numberOfThreads; i++) {
-			eventsProcessThread[i] = new ProcessEventThread(events[i], preInputBufferMaxLength, barrier);
-			new Thread(eventsProcessThread[i], "Events-" + i).start();
+			this.eventsProcessThread[i] = new ProcessEventThread(events[i], preInputBufferMaxLength);
+			this.threads[i] = new Thread(eventsProcessThread[i], "Events-" + i);
+			this.threads[i].setUncaughtExceptionHandler(this.uncaughtExceptionHandler);
+			this.threads[i].start();
 		}
+	}
+
+	/**
+	 * @author mrieser
+	 */
+	private static class ExceptionHandler implements UncaughtExceptionHandler {
+
+		private final AtomicBoolean hadException;
+
+		public ExceptionHandler(final AtomicBoolean hadException) {
+			this.hadException = hadException;
+		}
+
+		@Override
+		public void uncaughtException(Thread t, Throwable e) {
+			log.error("Thread " + t.getName() + " died with exception while handling events.", e);
+			this.hadException.set(true);
+		}
+
 	}
 
 }

@@ -1,5 +1,25 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package org.matsim.core.events.parallelEventsHandler;
 
+import org.apache.log4j.Logger;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
@@ -12,6 +32,8 @@ import org.matsim.testcases.MatsimTestCase;
  */
 public class ParallelEventsTest extends MatsimTestCase {
 
+	private final static Logger log = Logger.getLogger(ParallelEventsTest.class);
+
 	/** Tests if the right number of events were processed by the handler(s)
 	 * for different number of threads, events, handlers and different
 	 * constructors */
@@ -19,8 +41,8 @@ public class ParallelEventsTest extends MatsimTestCase {
 		processEvents(new ParallelEventsManagerImpl(1), 100, 1, 1);
 		processEvents(new ParallelEventsManagerImpl(2), 100, 10, 2);
 		processEvents(new ParallelEventsManagerImpl(4), 100, 1, 10);
-		processEvents(new ParallelEventsManagerImpl(2), 150000, 2, 1);
-		processEvents(new ParallelEventsManagerImpl(2), 300000, 3, 1);
+		processEvents(new ParallelEventsManagerImpl(2), 1500, 2, 1);
+		processEvents(new ParallelEventsManagerImpl(2), 3000, 3, 1);
 		processEvents(new ParallelEventsManagerImpl(1, 100), 100, 1, 1);
 		processEvents(new ParallelEventsManagerImpl(1, 100), 1000, 1, 1);
 		processEvents(new ParallelEventsManagerImpl(1, 1000), 100, 1, 1);
@@ -69,7 +91,6 @@ public class ParallelEventsTest extends MatsimTestCase {
 			// initialize events handling for new iteration
 			events.initProcessing();
 
-
 			for (int i = 0; i < eventCount; i++) {
 				events.processEvent(linkLeaveEvent);
 			}
@@ -83,7 +104,32 @@ public class ParallelEventsTest extends MatsimTestCase {
 						.getNumberOfProcessedMessages());
 				handlers[i].resetNumberOfProcessedMessages();
 			}
+		}
+	}
 
+	/**
+	 * @author mrieser
+	 */
+	public void testCrashingHandler() {
+		EventsManagerImpl events = new ParallelEventsManagerImpl(2);
+
+		// start iteration
+		events.initProcessing();
+
+		CrashingHandler handler1 = new CrashingHandler();
+		CrashingHandler handler2 = new CrashingHandler();
+		events.addHandler(handler1);
+		events.addHandler(handler2);
+
+		LinkLeaveEventImpl linkLeaveEvent = new LinkLeaveEventImpl(0, new IdImpl(""), new IdImpl(""));
+		try {
+			for (int i = 0; i < 10; i++) {
+				events.processEvent(linkLeaveEvent);
+			}
+			events.finishProcessing();
+			fail("Expected Exception, but got none!");
+		} catch (RuntimeException e) {
+			log.info("Catched expected exception.", e);
 		}
 
 	}
@@ -100,17 +146,32 @@ public class ParallelEventsTest extends MatsimTestCase {
 			this.numberOfProcessedMessages = 0;
 		}
 
+		@Override
 		public void handleEvent(final LinkLeaveEvent event) {
 			this.numberOfProcessedMessages++;
 		}
 
+		@Override
 		public void reset(final int iteration) {
 		}
 
 		public Handler1() {
-
 		}
 
+	}
+
+	/**
+	 * @author mrieser
+	 */
+	private static class CrashingHandler implements LinkLeaveEventHandler {
+		@Override
+		public void reset(int iteration) {
+		}
+		@Override
+		public void handleEvent(LinkLeaveEvent event) {
+			// just some random exception to crash this thread
+			throw new IllegalArgumentException("just some exception to crash this thread.");
+		}
 	}
 
 }

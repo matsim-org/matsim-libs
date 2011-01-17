@@ -20,12 +20,14 @@
 
 package org.matsim.core.events;
 
+import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.api.experimental.events.Event;
@@ -64,6 +66,8 @@ public class MultiThreadEventsManager implements EventsManager, SimulationAfterS
 	private EventsManager eventsManager;
 	private ProcessEventsThread processEventsThread;
 	private EventsDelegator[] eventsDelegators;
+	private AtomicBoolean hadException = new AtomicBoolean(false);
+	private ExceptionHandler uncaughtExceptionHandler = new ExceptionHandler(hadException);
 
 	/*
 	 * For every SimStep a List of Queues. Each Queue contains
@@ -116,21 +120,26 @@ public class MultiThreadEventsManager implements EventsManager, SimulationAfterS
 		}
 
 		processEventsThread = new ProcessEventsThread(this, eventsQueues, syncToSimSteps);
+		processEventsThread.setUncaughtExceptionHandler(this.uncaughtExceptionHandler);
 		processEventsThread.start();
 	}
 
+	@Override
 	public void addHandler(EventHandler handler) {
 		eventsManager.addHandler(handler);
 	}
 
+	@Override
 	public EventsFactory getFactory() {
 		return eventsManager.getFactory();
 	}
 
+	@Override
 	public void processEvent(Event event) {
 		eventsManager.processEvent(event);
 	}
 
+	@Override
 	public void removeHandler(EventHandler handler) {
 		eventsManager.removeHandler(handler);
 	}
@@ -156,6 +165,7 @@ public class MultiThreadEventsManager implements EventsManager, SimulationAfterS
 	 * When doing Within Day Replanning we have to wait until all Events
 	 * have been processed! This could be done using a CyclicBarrier for example.
 	 */
+	@Override
 	public void notifySimulationAfterSimStep(SimulationAfterSimStepEvent e) {
 		collectEvents();
 
@@ -180,6 +190,7 @@ public class MultiThreadEventsManager implements EventsManager, SimulationAfterS
 	 * If the simulation has ended we have to wait until all Events have
 	 * been processed.
 	 */
+	@Override
 	public void notifySimulationBeforeCleanup(SimulationBeforeCleanupEvent e) {
 		finishProcessing();
 	}
@@ -209,7 +220,9 @@ public class MultiThreadEventsManager implements EventsManager, SimulationAfterS
 		{
 			Gbl.errorMsg(e1);
 		}
-
+		if (this.hadException.get()) {
+			throw new RuntimeException("Caught Exception while processing events. Cannot guarantee that all events have been processed.");
+		}
 		log.info("... done.");
 	}
 
@@ -290,5 +303,25 @@ public class MultiThreadEventsManager implements EventsManager, SimulationAfterS
 			Gbl.printCurrentThreadCpuTime();
 		}
 	}	// ProcessEventsThread
+
+	/**
+	 * @author mrieser
+	 */
+	private static class ExceptionHandler implements UncaughtExceptionHandler {
+
+		private final AtomicBoolean hadException;
+
+		public ExceptionHandler(final AtomicBoolean hadException) {
+			this.hadException = hadException;
+		}
+
+		@Override
+		public void uncaughtException(Thread t, Throwable e) {
+			log.error("Thread " + t.getName() + " died with exception while handling events.", e);
+			this.hadException.set(true);
+		}
+
+	}
+
 
 }
