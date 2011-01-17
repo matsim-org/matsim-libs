@@ -24,13 +24,12 @@ import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.config.groups.GlobalConfigGroup;
-import org.matsim.core.gbl.Gbl;
+import org.matsim.core.utils.misc.Counter;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 /**
@@ -57,8 +56,7 @@ abstract public class AbstractMultithreadedModule implements PlanStrategyModule 
 	private PlanAlgorithm directAlgo = null;
 	private String name = null;
 
-	private final AtomicInteger counter = new AtomicInteger(0);
-	private final AtomicInteger nextCounter = new AtomicInteger(1);
+	private int count = 0;
 
 	private final AtomicBoolean hadException = new AtomicBoolean(false);
 	private final ExceptionHandler exceptionHandler = new ExceptionHandler(this.hadException);
@@ -88,8 +86,8 @@ abstract public class AbstractMultithreadedModule implements PlanStrategyModule 
 	@Override
 	public void handlePlan(final Plan plan) {
 		if (this.directAlgo == null) {
-			this.algothreads[this.counter.get() % this.numOfThreads].handlePlan(plan);
-			this.counter.incrementAndGet();
+			this.algothreads[this.count % this.numOfThreads].handlePlan(plan);
+			this.count++;
 		} else {
 			this.directAlgo.run(plan);
 		}
@@ -99,8 +97,7 @@ abstract public class AbstractMultithreadedModule implements PlanStrategyModule 
 	public void finishReplanning() {
 		if (this.directAlgo == null) {
 			// only try to start threads if we did not directly work on all the plans
-			log.info("[" + this.name + "] starting threads, handling " + this.counter + " plans");
-			this.counter.set(0);
+			log.info("[" + this.name + "] starting threads, handling " + this.count + " plans");
 
 			// start threads
 			for (Thread thread : this.threads) {
@@ -123,8 +120,7 @@ abstract public class AbstractMultithreadedModule implements PlanStrategyModule 
 		// reset
 		this.algothreads = null;
 		this.threads = null;
-		this.counter.set(0);
-		this.nextCounter.set(1);
+		this.count = 0;
 	}
 
 	private void initThreads() {
@@ -136,26 +132,19 @@ abstract public class AbstractMultithreadedModule implements PlanStrategyModule 
 		this.threads = new Thread[this.numOfThreads];
 		this.algothreads = new PlanAlgoThread[this.numOfThreads];
 
+		Counter counter = null;
 		// setup threads
 		for (int i = 0; i < this.numOfThreads; i++) {
 			PlanAlgorithm algo = getPlanAlgoInstance();
 			if (i == 0) {
 				this.name = algo.getClass().getSimpleName();
+				counter = new Counter("[" + this.name + "] handled plan # ");
 			}
-			PlanAlgoThread algothread = new PlanAlgoThread(algo);
+			PlanAlgoThread algothread = new PlanAlgoThread(algo, counter);
 			Thread thread = new Thread(algothread, this.name + "." + i);
 			thread.setUncaughtExceptionHandler(this.exceptionHandler);
 			this.threads[i] = thread;
 			this.algothreads[i] = algothread;
-		}
-	}
-
-	/*package*/ void incCounter() {
-		int i = this.counter.incrementAndGet();
-		if (i == this.nextCounter.get()) {
-			log.info("[" + this.name + "] handled plan # " + this.counter);
-			this.nextCounter.set(i*2);
-			Gbl.printMemoryUsage();
 		}
 	}
 
@@ -183,9 +172,11 @@ abstract public class AbstractMultithreadedModule implements PlanStrategyModule 
 
 		private final PlanAlgorithm planAlgo;
 		private final List<Plan> plans = new LinkedList<Plan>();
+		private final Counter counter;
 
-		public PlanAlgoThread(final PlanAlgorithm algo) {
+		public PlanAlgoThread(final PlanAlgorithm algo, final Counter counter) {
 			this.planAlgo = algo;
+			this.counter = counter;
 		}
 
 		public void handlePlan(final Plan plan) {
@@ -196,7 +187,7 @@ abstract public class AbstractMultithreadedModule implements PlanStrategyModule 
 		public void run() {
 			for (Plan plan : this.plans) {
 				this.planAlgo.run(plan);
-				incCounter();
+				this.counter.incCounter();
 			}
 		}
 	}
