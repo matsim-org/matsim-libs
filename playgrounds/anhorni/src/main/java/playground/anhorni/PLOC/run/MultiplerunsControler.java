@@ -45,7 +45,7 @@ public class MultiplerunsControler {
     	this.init();
     	    	    	   	
     	for (int runIndex = 0; runIndex < numberOfRandomRuns; runIndex++) {
-    		String config [] = {"src/main/java/playground/anhorni/input/PLOC/run" + runIndex + "config.xml"};
+    		String config [] = {"src/main/java/playground/anhorni/input/PLOC/run" + runIndex + "/config.xml"};
     		
     		MixedControler controler = new MixedControler(config);
     		controler.setOverwriteFiles(true);

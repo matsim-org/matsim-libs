@@ -70,7 +70,7 @@ public class CreateScenarios {
     	configReader.readFile(pathPre + "input/PLOC/config.xml");   	
     	    	
     	for (int i = 0; i < plocConfigReader.getNumberOfRandomRuns(); i++) {
-    		config.setParam("plans", "inputPlansFile", pathPre + "input/PLOC/run " + i + "/plans.xml");
+    		config.setParam("plans", "inputPlansFile", pathPre + "input/PLOC/run" + i + "/plans.xml");
         	config.setParam("controler", "runId", "run" + String.valueOf(i));
         	String outputPath = pathPre + "output/PLOC/run" + i + "/";
         	new File(outputPath).mkdir();
