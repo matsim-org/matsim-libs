@@ -182,8 +182,8 @@ public class CreatePopulation {
 		handler.assign();
 	}
 				
-	public void write() {
-		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).write(configReader.getPath() + "input/plans.xml");
+	public void write(String path) {
+		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).write(path + "plans.xml");
 	}
 	
 	// better quality of assignment of tastes!

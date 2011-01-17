@@ -150,16 +150,16 @@ public class CreateNetwork {
 		log.info("Created " + nodeCnt + " nodes");
 	}
 	
-	public void write() {
-		this.writeNetwork();
-		this.writeFacilities();
+	public void write(String path) {
+		this.writeNetwork(path);
+		this.writeFacilities(path);
 	}
 			
-	private void writeNetwork() {
-		new NetworkWriter(this.scenario.getNetwork()).write(configReader.getPath() + "/input/network.xml");
+	private void writeNetwork(String path) {
+		new NetworkWriter(this.scenario.getNetwork()).write(path + "network.xml");
 	}
 	
-	private void writeFacilities() {
-		new FacilitiesWriter(this.scenario.getActivityFacilities()).write(configReader.getPath() + "/input/facilities.xml");
+	private void writeFacilities(String path) {
+		new FacilitiesWriter(this.scenario.getActivityFacilities()).write(path + "facilities.xml");
 	}
 }

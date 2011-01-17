@@ -33,20 +33,24 @@ public class CreateScenario {
 	private ScenarioImpl scenario = new ScenarioImpl();	
 	private ConfigReader configReader = new ConfigReader();
 	private RandomFromVarDistr rnd;
+	
+	private long seed = 109877L;
+	private String outPath = "src/main/java/playground/anhorni/LEGO/miniscenario/input/";
 		
 	public static void main(final String[] args) {
 		CreateScenario scenarioCreator = new CreateScenario();		
-		scenarioCreator.init();
 		scenarioCreator.run();			
 		log.info("Scenario creation finished \n ----------------------------------------------------");
 	}
 	
-	private void init() {
+	public void run() {
 		configReader.read();	
 		rnd = new RandomFromVarDistr();
+		rnd.setSeed(this.seed);
+		this.create();
 	}
-
-	private void run() {			
+	
+	private void create() {			
 		CreateNetwork networkCreator = new CreateNetwork();
 		networkCreator.createNetwork(this.scenario, this.configReader);
 		
@@ -56,8 +60,16 @@ public class CreateScenario {
 		CreatePopulation populationCreator = new CreatePopulation();
 		populationCreator.createPopulation(this.scenario, this.configReader, rnd, config);	
 		log.info("Writing population ...");
-		populationCreator.write();
+		populationCreator.write(this.outPath);
 		log.info("Writing network ...");
-		networkCreator.write();
+		networkCreator.write(this.outPath);
+	}
+
+	public void setSeed(long seed) {
+		this.seed = seed;
+	}
+
+	public void setOutPath(String outPath) {
+		this.outPath = outPath;
 	}
 }
