@@ -21,7 +21,7 @@
 /**
  *
  */
-package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.general.scoring;
+package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.general.normal.scoring;
 
 import java.util.List;
 import java.util.Map;
@@ -35,7 +35,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 
-import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.general.paramCorrection.PCCtlListener;
+import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.general.normal.paramCorrection.PCCtlListener;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.mnlValidation.MultinomialLogitChoice;
 import cadyts.utilities.math.MultinomialLogit;
 import cadyts.utilities.math.Vector;
@@ -166,35 +166,55 @@ public class Events2Score4PC_mnl extends Events2Score4PC implements
 
 				// set attributes to MultinomialLogit
 				// travelTime
-				mnl.setAttribute(choiceIdx, attrNameList.indexOf("traveling"),
-						legDurCar);
-				mnl.setAttribute(choiceIdx,
-						attrNameList.indexOf("travelingPt"), legDurPt);
-				mnl.setAttribute(choiceIdx, attrNameList
-						.indexOf("travelingWalk"), legDurWalk);
+				int attrNameIndex = attrNameList.indexOf("traveling");
+				mnl.setAttribute(choiceIdx, attrNameIndex, legDurCar
+						/ paramScaleFactorList.get(attrNameIndex));
+
+				attrNameIndex = attrNameList.indexOf("travelingPt");
+				mnl.setAttribute(choiceIdx, attrNameIndex, legDurPt
+						/ paramScaleFactorList.get(attrNameIndex));
+
+				attrNameIndex = attrNameList.indexOf("travelingWalk");
+				mnl.setAttribute(choiceIdx, attrNameIndex, legDurWalk
+						/ paramScaleFactorList.get(attrNameIndex));
 
 				//
-				mnl.setAttribute(choiceIdx, attrNameList.indexOf("performing"),
-						perfAttr);
+				attrNameIndex = attrNameList.indexOf("performing");
+				mnl.setAttribute(choiceIdx, attrNameIndex, perfAttr
+						/ paramScaleFactorList.get(attrNameIndex));
 
-				mnl.setAttribute(choiceIdx, attrNameList.indexOf("stuck"),
-						stuckAttr);
+				attrNameIndex = attrNameList.indexOf("stuck");
+				mnl.setAttribute(choiceIdx, attrNameIndex, stuckAttr
+						/ paramScaleFactorList.get(attrNameIndex));
 
 				// distances
-				mnl.setAttribute(choiceIdx, attrNameList
-						.indexOf("monetaryDistanceCostRateCar"), distanceCar);
-				mnl.setAttribute(choiceIdx, attrNameList
-						.indexOf("monetaryDistanceCostRatePt"), distancePt);
-				mnl.setAttribute(choiceIdx, attrNameList
-						.indexOf("marginalUtlOfDistanceWalk"), distanceWalk);
+				attrNameIndex = attrNameList
+						.indexOf("monetaryDistanceCostRateCar");
+				mnl.setAttribute(choiceIdx, attrNameIndex, distanceCar
+						/ paramScaleFactorList.get(attrNameIndex));
+
+				attrNameIndex = attrNameList
+						.indexOf("monetaryDistanceCostRatePt");
+				mnl.setAttribute(choiceIdx, attrNameIndex, distancePt
+						/ paramScaleFactorList.get(attrNameIndex));
+
+				attrNameIndex = attrNameList
+						.indexOf("marginalUtlOfDistanceWalk");
+				mnl.setAttribute(choiceIdx, attrNameIndex, distanceWalk
+						/ paramScaleFactorList.get(attrNameIndex));
 
 				// offsets
-				mnl.setAttribute(choiceIdx, attrNameList.indexOf("offsetCar"),
-						carLegNo);
-				mnl.setAttribute(choiceIdx, attrNameList.indexOf("offsetPt"),
-						ptLegNo);
-				mnl.setAttribute(choiceIdx, attrNameList.indexOf("offsetWalk"),
-						walkLegNo);
+				attrNameIndex = attrNameList.indexOf("offsetCar");
+				mnl.setAttribute(choiceIdx, attrNameIndex, carLegNo
+						/ paramScaleFactorList.get(attrNameIndex));
+
+				attrNameIndex = attrNameList.indexOf("offsetPt");
+				mnl.setAttribute(choiceIdx, attrNameIndex, ptLegNo
+						/ paramScaleFactorList.get(attrNameIndex));
+
+				attrNameIndex = attrNameList.indexOf("offsetWalk");
+				mnl.setAttribute(choiceIdx, attrNameIndex, walkLegNo
+						/ paramScaleFactorList.get(attrNameIndex));
 			}
 		}
 	}
@@ -280,46 +300,61 @@ public class Events2Score4PC_mnl extends Events2Score4PC implements
 			// calculate utility of the plan
 			Vector attrVector = new Vector(attrNameList.size());
 			for (String attrName : attrNameList) {
+				int attrNameIndex;
 				if (attrName.equals("traveling")) {
-					attrVector
-							.set(attrNameList.indexOf("traveling"), legDurCar);
+					attrNameIndex = attrNameList.indexOf("traveling");
+					attrVector.set(attrNameIndex, legDurCar
+							/ paramScaleFactorList.get(attrNameIndex));
 				} else if (attrName.equals("travelingPt")) {
-					attrVector.set(attrNameList.indexOf("travelingPt"),
-							legDurPt);
+					attrNameIndex = attrNameList.indexOf("travelingPt");
+					attrVector.set(attrNameIndex, legDurPt
+							/ paramScaleFactorList.get(attrNameIndex));
 				} else if (attrName.equals("travelingWalk")) {
-					attrVector.set(attrNameList.indexOf("travelingWalk"),
-							legDurWalk);
+					attrNameIndex = attrNameList.indexOf("travelingWalk");
+					attrVector.set(attrNameIndex, legDurWalk
+							/ paramScaleFactorList.get(attrNameIndex));
 				}
 
 				else if (attrName.equals("performing")) {
-					attrVector
-							.set(attrNameList.indexOf("performing"), perfAttr);
+					attrNameIndex = attrNameList.indexOf("performing");
+					attrVector.set(attrNameIndex, perfAttr
+							/ paramScaleFactorList.get(attrNameIndex));
 				} else if (attrName.equals("stuck")) {
-					attrVector.set(attrNameList.indexOf("stuck"), stuckAttr);
+					attrNameIndex = attrNameList.indexOf("stuck");
+					attrVector.set(attrNameIndex, stuckAttr
+							/ paramScaleFactorList.get(attrNameIndex));
 				}
 
 				else if (attrName.equals("monetaryDistanceCostRateCar")) {
-					attrVector.set(attrNameList
-							.indexOf("monetaryDistanceCostRateCar"),
-							distanceCar);
+					attrNameIndex = attrNameList
+							.indexOf("monetaryDistanceCostRateCar");
+					attrVector.set(attrNameIndex, distanceCar
+							/ paramScaleFactorList.get(attrNameIndex));
 				} else if (attrName.equals("monetaryDistanceCostRatePt")) {
-					attrVector.set(attrNameList
-							.indexOf("monetaryDistanceCostRatePt"), distancePt);
+					attrNameIndex = attrNameList
+							.indexOf("monetaryDistanceCostRatePt");
+					attrVector.set(attrNameIndex, distancePt
+							/ paramScaleFactorList.get(attrNameIndex));
 				} else if (attrName.equals("marginalUtlOfDistanceWalk")) {
-					attrVector
-							.set(attrNameList
-									.indexOf("marginalUtlOfDistanceWalk"),
-									distanceWalk);
+					attrNameIndex = attrNameList
+							.indexOf("marginalUtlOfDistanceWalk");
+					attrVector.set(attrNameIndex, distanceWalk
+							/ paramScaleFactorList.get(attrNameIndex));
 
 				}
 
 				else if (attrName.equals("offsetCar")) {
-					attrVector.set(attrNameList.indexOf("offsetCar"), carLegNo);
+					attrNameIndex = attrNameList.indexOf("offsetCar");
+					attrVector.set(attrNameIndex, carLegNo
+							/ paramScaleFactorList.get(attrNameIndex));
 				} else if (attrName.equals("offsetPt")) {
-					attrVector.set(attrNameList.indexOf("offsetPt"), ptLegNo);
+					attrNameIndex = attrNameList.indexOf("offsetPt");
+					attrVector.set(attrNameIndex, ptLegNo
+							/ paramScaleFactorList.get(attrNameIndex));
 				} else if (attrName.equals("offsetWalk")) {
-					attrVector.set(attrNameList.indexOf("offsetWalk"),
-							walkLegNo);
+					attrNameIndex = attrNameList.indexOf("offsetWalk");
+					attrVector.set(attrNameIndex, walkLegNo
+							/ paramScaleFactorList.get(attrNameIndex));
 				}
 			}
 
@@ -352,47 +387,66 @@ public class Events2Score4PC_mnl extends Events2Score4PC implements
 			mnl.setASC(i, 0);
 		}
 		// travelTime
-		mnl.setCoefficient(attrNameList.indexOf("traveling"), traveling);
-		mnl.setCoefficient(attrNameList.indexOf("travelingPt"), scoring
-				.getTravelingPt_utils_hr());
-		mnl.setCoefficient(attrNameList.indexOf("travelingWalk"), scoring
-				.getTravelingWalk_utils_hr());
+		int attrNameIndex = attrNameList.indexOf("traveling");
+		mnl.setCoefficient(attrNameIndex, traveling
+				* paramScaleFactorList.get(attrNameIndex));
+
+		attrNameIndex = attrNameList.indexOf("travelingPt");
+		mnl.setCoefficient(attrNameIndex, scoring.getTravelingPt_utils_hr()
+				* paramScaleFactorList.get(attrNameIndex));
+
+		attrNameIndex = attrNameList.indexOf("travelingWalk");
+		mnl.setCoefficient(attrNameIndex, scoring.getTravelingWalk_utils_hr()
+				* paramScaleFactorList.get(attrNameIndex));
 
 		//
-		mnl.setCoefficient(attrNameList.indexOf("performing"), scoring
-				.getPerforming_utils_hr());
+		attrNameIndex = attrNameList.indexOf("performing");
+		mnl.setCoefficient(attrNameIndex, scoring.getPerforming_utils_hr()
+				* paramScaleFactorList.get(attrNameIndex));
 		//
-		mnl.setCoefficient(attrNameList.indexOf("stuck"), betaStuck);
+		attrNameIndex = attrNameList.indexOf("stuck");
+		mnl.setCoefficient(attrNameIndex, betaStuck
+				* paramScaleFactorList.get(attrNameIndex));
 
 		// distances
-		mnl.setCoefficient(attrNameList.indexOf("monetaryDistanceCostRateCar"),
-		// scoring.getMarginalUtlOfDistanceCar());
-				scoring.getMonetaryDistanceCostRateCar()
-						* scoring.getMarginalUtilityOfMoney());
+		attrNameIndex = attrNameList.indexOf("monetaryDistanceCostRateCar");
+		mnl.setCoefficient(attrNameIndex, scoring
+				.getMonetaryDistanceCostRateCar()
+				* scoring.getMarginalUtilityOfMoney()
+				* paramScaleFactorList.get(attrNameIndex));
 
-		mnl.setCoefficient(attrNameList.indexOf("monetaryDistanceCostRatePt"),
-		// scoring.getMarginalUtlOfDistancePt());
-				scoring.getMonetaryDistanceCostRatePt()
-						* scoring.getMarginalUtilityOfMoney());
+		attrNameIndex = attrNameList.indexOf("monetaryDistanceCostRatePt");
+		mnl.setCoefficient(attrNameIndex, scoring
+				.getMonetaryDistanceCostRatePt()
+				* scoring.getMarginalUtilityOfMoney()
+				* paramScaleFactorList.get(attrNameIndex));
 
-		mnl.setCoefficient(attrNameList.indexOf("marginalUtlOfDistanceWalk"),
-				scoring.getMarginalUtlOfDistanceWalk());
+		attrNameIndex = attrNameList.indexOf("marginalUtlOfDistanceWalk");
+		mnl.setCoefficient(attrNameIndex, scoring
+				.getMarginalUtlOfDistanceWalk()
+				* paramScaleFactorList.get(attrNameIndex));
 
 		// offsets
+		attrNameIndex = attrNameList.indexOf("offsetCar");
 		String offsetCarStr = config.findParam(
 				PCCtlListener.BSE_CONFIG_MODULE_NAME, "offsetCar");
-		mnl.setCoefficient(attrNameList.indexOf("offsetCar"),
-				offsetCarStr == null ? 0d : Double.parseDouble(offsetCarStr));
+		mnl.setCoefficient(attrNameIndex, (offsetCarStr == null ? 0d : Double
+				.parseDouble(offsetCarStr))
+				* paramScaleFactorList.get(attrNameIndex));
 
+		attrNameIndex = attrNameList.indexOf("offsetPt");
 		String offsetPtStr = config.findParam(
 				PCCtlListener.BSE_CONFIG_MODULE_NAME, "offsetPt");
-		mnl.setCoefficient(attrNameList.indexOf("offsetPt"),
-				offsetPtStr == null ? 0d : Double.parseDouble(offsetPtStr));
+		mnl.setCoefficient(attrNameIndex, (offsetPtStr == null ? 0d : Double
+				.parseDouble(offsetPtStr))
+				* paramScaleFactorList.get(attrNameIndex));
 
+		attrNameIndex = attrNameList.indexOf("offsetWalk");
 		String offsetWalkStr = config.findParam(
 				PCCtlListener.BSE_CONFIG_MODULE_NAME, "offsetWalk");
-		mnl.setCoefficient(attrNameList.indexOf("offsetWalk"),
-				offsetWalkStr == null ? 0d : Double.parseDouble(offsetWalkStr));
+		mnl.setCoefficient(attrNameIndex, (offsetWalkStr == null ? 0d : Double
+				.parseDouble(offsetWalkStr))
+				* paramScaleFactorList.get(attrNameIndex));
 
 		return mnl;
 	}
