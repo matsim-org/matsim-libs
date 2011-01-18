@@ -35,6 +35,7 @@ import org.matsim.jaxb.signalgroups20.XMLIdRefType;
 import org.matsim.jaxb.signalgroups20.XMLSignalGroupType;
 import org.matsim.jaxb.signalgroups20.XMLSignalGroups;
 import org.matsim.jaxb.signalgroups20.XMLSignalSystemSignalGroupType;
+import org.matsim.signalsystems.MatsimSignalSystemsReader;
 import org.xml.sax.SAXException;
 
 /**
@@ -52,6 +53,10 @@ public class SignalGroupsReader20 extends MatsimJaxbXmlParser {
 		this.signalGroupsData = signalGroupsData;
 		this.factory = signalGroupsData.getFactory();
 
+	}
+
+	public  SignalGroupsReader20(SignalGroupsData signalGroupsData) {
+		this(signalGroupsData, MatsimSignalSystemsReader.SIGNALGROUPS20);
 	}
 
 	@Override

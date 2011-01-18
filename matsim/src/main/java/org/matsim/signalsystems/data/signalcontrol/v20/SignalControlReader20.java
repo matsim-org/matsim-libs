@@ -37,6 +37,7 @@ import org.matsim.jaxb.signalcontrol20.XMLSignalGroupSettingsType;
 import org.matsim.jaxb.signalcontrol20.XMLSignalPlanType;
 import org.matsim.jaxb.signalcontrol20.XMLSignalSystemControllerType;
 import org.matsim.jaxb.signalcontrol20.XMLSignalSystemType;
+import org.matsim.signalsystems.MatsimSignalSystemsReader;
 import org.xml.sax.SAXException;
 
 
@@ -51,6 +52,11 @@ public class SignalControlReader20 extends MatsimJaxbXmlParser {
 	
 	private SignalControlData signalControlData;
 	
+	
+	public SignalControlReader20(SignalControlData signalControlData){
+		super(MatsimSignalSystemsReader.SIGNALCONTROL20);
+		this.signalControlData = signalControlData;
+	}
 	
 	public SignalControlReader20(SignalControlData signalControlData, String schemaLocation) {
 		super(schemaLocation);

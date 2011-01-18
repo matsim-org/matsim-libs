@@ -37,6 +37,7 @@ import org.matsim.jaxb.signalsystems20.XMLSignalSystems;
 import org.matsim.jaxb.signalsystems20.XMLSignalType;
 import org.matsim.jaxb.signalsystems20.XMLSignalType.XMLLane;
 import org.matsim.jaxb.signalsystems20.XMLSignalType.XMLTurningMoveRestrictions;
+import org.matsim.signalsystems.MatsimSignalSystemsReader;
 import org.xml.sax.SAXException;
 
 
@@ -54,6 +55,10 @@ public class SignalSystemsReader20 extends MatsimJaxbXmlParser {
 	public SignalSystemsReader20(SignalSystemsData signalSystemData, String schemaLocation) {
 		super(schemaLocation);
 		this.signalSystemsData = signalSystemData;
+	}
+
+	public SignalSystemsReader20(SignalSystemsData signalSystemData) {
+		this(signalSystemData, MatsimSignalSystemsReader.SIGNALSYSTEMS20);
 	}
 
 	@Override

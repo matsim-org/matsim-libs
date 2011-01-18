@@ -49,9 +49,13 @@ public class AmberTimesReader10 extends MatsimJaxbXmlParser {
 	public AmberTimesReader10(AmberTimesData amberTimesData, String schemaLocation) {
 		super(schemaLocation);
 		this.amberTimesData = amberTimesData;
-
 	}
 
+	public AmberTimesReader10(AmberTimesData amberTimesData) {
+		this(amberTimesData, AmberTimesWriter10.AMBERTIMES10);
+	}
+	
+	
 	@Override
 	public void readFile(final String filename) throws JAXBException, SAXException,
 			ParserConfigurationException, IOException {
