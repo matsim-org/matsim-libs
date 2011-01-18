@@ -39,11 +39,11 @@ import com.vividsolutions.jts.index.quadtree.Quadtree;
  * @author illenberger
  *
  */
-public class ZoneLayer {
+public class ZoneLayer<T> {
 
 	private final SpatialIndex quadtree;
 	
-	private final Set<Zone> zones;
+	private final Set<Zone<T>> zones;
 	
 	private CoordinateReferenceSystem crs;
 	
@@ -54,8 +54,8 @@ public class ZoneLayer {
 	 * 
 	 * @param zones a set of zones.
 	 */
-	public ZoneLayer(Set<Zone> zones) {
-		for(Zone z : zones) {
+	public ZoneLayer(Set<Zone<T>> zones) {
+		for(Zone<T> z : zones) {
 			if(srid < 0) {
 				srid = z.getGeometry().getSRID();
 				crs = CRSUtils.getCRS(srid);
@@ -67,7 +67,7 @@ public class ZoneLayer {
 		
 		this.zones = Collections.unmodifiableSet(zones);
 		quadtree = new Quadtree();
-		for(Zone zone : zones) {
+		for(Zone<T> zone : zones) {
 			quadtree.insert(zone.getGeometry().getEnvelopeInternal(), zone);
 		}
 	}
@@ -81,19 +81,19 @@ public class ZoneLayer {
 	public void overwriteCRS(CoordinateReferenceSystem crs) {
 		this.crs = crs;
 		this.srid = CRSUtils.getSRID(crs);
-		for(Zone zone : zones) {
+		for(Zone<?> zone : zones) {
 //			zone.getFeature().getDefaultGeometry().setSRID(srid);
 			zone.getGeometry().setSRID(srid);
 		}
 	}
 
 	@SuppressWarnings("unchecked")
-	private List<Zone> getZones(Point point) {
+	private List<Zone<T>> getZones(Point point) {
 		if(point.getSRID() != srid)
 			point = transformPoint(point);
 		
 		List<Zone> result = quadtree.query(point.getEnvelopeInternal());
-		List<Zone> zones = new ArrayList<Zone>(result.size());
+		List<Zone<T>> zones = new ArrayList<Zone<T>>(result.size());
 		for(Zone z : result) {
 			if(z.getGeometry().contains(point))
 				zones.add(z);
@@ -120,8 +120,8 @@ public class ZoneLayer {
 	 * @param point a point geometry
 	 * @return the zone containing <tt>point</tt>, or <tt>null</tt> if no zone contains <tt>point</tt>.
 	 */
-	public Zone getZone(Point point) {
-		List<Zone> zones = getZones(point);
+	public Zone<T> getZone(Point point) {
+		List<Zone<T>> zones = getZones(point);
 		if(zones.isEmpty())
 			return null;
 		else
@@ -133,7 +133,7 @@ public class ZoneLayer {
 	 * 
 	 * @return a set of all zones.
 	 */
-	public Set<Zone> getZones() {
+	public Set<Zone<T>> getZones() {
 		return zones;
 	}
 }
