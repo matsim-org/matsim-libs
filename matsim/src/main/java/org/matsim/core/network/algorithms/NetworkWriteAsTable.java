@@ -23,12 +23,15 @@ package org.matsim.core.network.algorithms;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.NetworkRunnable;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
@@ -40,13 +43,19 @@ public class NetworkWriteAsTable implements NetworkRunnable {
 	//////////////////////////////////////////////////////////////////////
 
 	private final String outdir;
+	private final double offset;
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public NetworkWriteAsTable(final String outdir) {
+	public NetworkWriteAsTable(final String outdir, double offset) {
+		this.offset = offset;
 		this.outdir = outdir;
+	}
+
+	public NetworkWriteAsTable(final String outdir) {
+		this(outdir,0.0);
 	}
 
 	public NetworkWriteAsTable() {
@@ -97,8 +106,14 @@ public class NetworkWriteAsTable implements NetworkRunnable {
 			for (Link l : network.getLinks().values()) {
 				Node f = l.getFromNode();
 				Node t = l.getToNode();
-				out_l.write(l.getId() + "\t" + f.getCoord().getX() + "\t" + f.getCoord().getY() + "\t");
-				out_l.write(t.getCoord().getX() + "\t" + t.getCoord().getY() + "\t" + l.getLength() + "\t");
+				
+				Coord offsetVector = new CoordImpl(t.getCoord().getY()-f.getCoord().getY(),-t.getCoord().getX()+f.getCoord().getX());
+				offsetVector = CoordUtils.scalarMult(offset/CoordUtils.length(offsetVector),offsetVector);
+				Coord fc = CoordUtils.plus(f.getCoord(),offsetVector);
+				Coord tc = CoordUtils.plus(t.getCoord(),offsetVector);
+				
+				out_l.write(l.getId() + "\t" + fc.getX() + "\t" + fc.getY() + "\t");
+				out_l.write(tc.getX() + "\t" + tc.getY() + "\t" + l.getLength() + "\t");
 				out_l.write(l.getFreespeed()+"\t"
 						+(l.getCapacity()/capperiod)+"\t"
 						+ NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, l)+"\t"
@@ -109,8 +124,8 @@ public class NetworkWriteAsTable implements NetworkRunnable {
 				out_et.write(Math.round(l.getLength()) + "\t" + Math.round(l.getFreespeed()*3.6) + "\t");
 				out_et.write(Math.round(l.getCapacity()/capperiod) + "\t" + NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, l) + "\t");
 				out_et.write(((LinkImpl) l).getOrigId() + "\t" + ((LinkImpl) l).getType() + "\t"+l.getAllowedModes().toString()+"\n");
-				out_et.write(f.getCoord().getX() + "\t" + f.getCoord().getY() + "\n");
-				out_et.write(t.getCoord().getX() + "\t" + t.getCoord().getY() + "\n");
+				out_et.write(fc.getX() + "\t" + fc.getY() + "\n");
+				out_et.write(tc.getX() + "\t" + tc.getY() + "\n");
 				out_et.write("END\n");
 			}
 			out_l.flush();
