@@ -87,7 +87,7 @@ public class PseudoNetworkDemo {
 
 		TransitSchedule schedule = scenario.getTransitSchedule();
 		try {
-			new TransitScheduleReaderV1(schedule, network).readFile(transitScheduleFile);
+			new TransitScheduleReaderV1(schedule, network, scenario).readFile(transitScheduleFile);
 		} catch (SAXException e1) {
 			e1.printStackTrace();
 		} catch (ParserConfigurationException e1) {

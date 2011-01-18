@@ -58,7 +58,7 @@ public class CreateTimetableForStopTest {
 
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
 		TransitSchedule schedule = builder.createTransitSchedule();
-		new TransitScheduleReaderV1(schedule, network).readFile(inputDir + INPUT_TEST_FILE_TRANSITSCHEDULE);
+		new TransitScheduleReaderV1(schedule, network, scenario).readFile(inputDir + INPUT_TEST_FILE_TRANSITSCHEDULE);
 
 		TransitLine line = schedule.getTransitLines().get(new IdImpl("T1"));
 		CreateTimetableForStop timetable = new CreateTimetableForStop(line);

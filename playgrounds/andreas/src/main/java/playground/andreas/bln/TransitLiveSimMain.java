@@ -20,9 +20,9 @@ import org.matsim.vis.otfvis.OTFVisMobsimFeature;
 import org.xml.sax.SAXException;
 
 public class TransitLiveSimMain {
-	
+
 	public static void main(String[] args) {
-		
+
 		String inputDir = "e:/_out/otflivetest/";
 
 		double snapshotPeriod = 60;
@@ -35,9 +35,9 @@ public class TransitLiveSimMain {
 		config.scenario().setUseVehicles(true);
 		ScenarioImpl scenario = new ScenarioImpl(config);
 		scenario = (ScenarioImpl) new ScenarioLoaderImpl(scenario).loadScenario();
-		
+
         try {
-			new TransitScheduleReaderV1(scenario.getTransitSchedule(), scenario.getNetwork()).readFile(inputDir + "transitSchedule.xml");
+			new TransitScheduleReaderV1(scenario.getTransitSchedule(), scenario.getNetwork(), scenario).readFile(inputDir + "transitSchedule.xml");
 			new VehicleReaderV1(scenario.getVehicles()).parse(inputDir + "vehicles.xml");
 		} catch (SAXException e) {
 			// TODO Auto-generated catch block
@@ -49,10 +49,10 @@ public class TransitLiveSimMain {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-	
+
+
 		ReconstructingUmlaufBuilder reconstructingUmlaufBuilder = new ReconstructingUmlaufBuilder(
-				scenario.getNetwork(), 
+				scenario.getNetwork(),
 				scenario.getTransitSchedule().getTransitLines().values(),
 				scenario.getVehicles(),
 				scenario.getConfig().charyparNagelScoring());
@@ -65,16 +65,16 @@ public class TransitLiveSimMain {
 		otfVisQSimFeature.setVisualizeTeleportedAgents(sim.getScenario().getConfig().otfVis().isShowTeleportedAgents());
 		sim.addFeature(otfVisQSimFeature);
 
-		
+
 //		if(useHeadwayControler){
 //			sim.getQSimTransitEngine().setAbstractTransitDriverFactory(new FixedHeadwayCycleUmlaufDriverFactory());
-//			this.events.addHandler(new FixedHeadwayControler(sim));		
-//		}		
-//		this.events.addHandler(new LogOutputEventHandler());	
-		
+//			this.events.addHandler(new FixedHeadwayControler(sim));
+//		}
+//		this.events.addHandler(new LogOutputEventHandler());
 
-		sim.run();		
-		
+
+		sim.run();
+
 	}
 
 }

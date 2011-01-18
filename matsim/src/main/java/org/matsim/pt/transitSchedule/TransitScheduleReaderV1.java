@@ -32,6 +32,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.api.experimental.IdFactory;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -47,8 +48,6 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
-
-
 /**
  * Reads a transit schedule from a XML file in the format described by <code>transitSchedule_v1.dtd</code>.
  *
@@ -58,14 +57,31 @@ public class TransitScheduleReaderV1 extends MatsimXmlParser {
 
 	private final TransitSchedule schedule;
 	private final Network network;
+	private final IdFactory idf;
 
 	private TransitLine currentTransitLine = null;
 	private TempTransitRoute currentTransitRoute = null;
 	private TempRoute currentRouteProfile = null;
 
+	/**
+	 * @param schedule
+	 * @param network
+	 * @deprecated use {@link #TransitScheduleReaderV1(TransitSchedule, Network, IdFactory)}
+	 */
+	@Deprecated
 	public TransitScheduleReaderV1(final TransitSchedule schedule, final Network network) {
+		this(schedule, network, new IdFactory() {
+			@Override
+			public Id createId(String id) {
+				return new IdImpl(id);
+			}
+		});
+	}
+
+	public TransitScheduleReaderV1(final TransitSchedule schedule, final Network network, final IdFactory idf) {
 		this.schedule = schedule;
 		this.network = network;
+		this.idf = idf;
 	}
 
 	public void readFile(final String fileName) throws SAXException, ParserConfigurationException, IOException {
@@ -77,9 +93,9 @@ public class TransitScheduleReaderV1 extends MatsimXmlParser {
 		if (Constants.STOP_FACILITY.equals(name)) {
 			boolean isBlocking = Boolean.parseBoolean(atts.getValue(Constants.IS_BLOCKING));
 			TransitStopFacility stop = new TransitStopFacilityImpl(
-					new IdImpl(atts.getValue(Constants.ID)), new CoordImpl(atts.getValue("x"), atts.getValue("y")), isBlocking);
+					this.idf.createId(atts.getValue(Constants.ID)), new CoordImpl(atts.getValue("x"), atts.getValue("y")), isBlocking);
 			if (atts.getValue(Constants.LINK_REF_ID) != null) {
-				Id linkId = new IdImpl(atts.getValue(Constants.LINK_REF_ID));
+				Id linkId = this.idf.createId(atts.getValue(Constants.LINK_REF_ID));
 				stop.setLinkId(linkId);
 			}
 			if (atts.getValue(Constants.NAME) != null) {
@@ -87,18 +103,18 @@ public class TransitScheduleReaderV1 extends MatsimXmlParser {
 			}
 			this.schedule.addStopFacility(stop);
 		} else if (Constants.TRANSIT_LINE.equals(name)) {
-			Id id = new IdImpl(atts.getValue(Constants.ID));
+			Id id = this.idf.createId(atts.getValue(Constants.ID));
 			this.currentTransitLine = new TransitLineImpl(id);
 			this.schedule.addTransitLine(this.currentTransitLine);
 		} else if (Constants.TRANSIT_ROUTE.equals(name)) {
-			Id id = new IdImpl(atts.getValue(Constants.ID));
+			Id id = this.idf.createId(atts.getValue(Constants.ID));
 			this.currentTransitRoute = new TempTransitRoute(id);
 		} else if (Constants.DEPARTURE.equals(name)) {
-			Id id = new IdImpl(atts.getValue(Constants.ID));
+			Id id = this.idf.createId(atts.getValue(Constants.ID));
 			Departure departure = new DepartureImpl(id, Time.parseTime(atts.getValue("departureTime")));
 			String vehicleRefId = atts.getValue(Constants.VEHICLE_REF_ID);
 			if (vehicleRefId != null) {
-				departure.setVehicleId(new IdImpl(vehicleRefId));
+				departure.setVehicleId(this.idf.createId(vehicleRefId));
 			}
 			this.currentTransitRoute.departures.put(id, departure);
 		} else if (Constants.ROUTE_PROFILE.equals(name)) {
@@ -106,15 +122,15 @@ public class TransitScheduleReaderV1 extends MatsimXmlParser {
 		} else if (Constants.LINK.equals(name)) {
 			String linkStr = atts.getValue(Constants.REF_ID);
 			if (!linkStr.contains(" ")) {
-				this.currentRouteProfile.addLink(new IdImpl(linkStr));
+				this.currentRouteProfile.addLink(this.idf.createId(linkStr));
 			} else {
 				String[] links = linkStr.split(" ");
 				for (int i = 0; i < links.length; i++) {
-					this.currentRouteProfile.addLink(new IdImpl(links[i]));
+					this.currentRouteProfile.addLink(this.idf.createId(links[i]));
 				}
 			}
 		} else if (Constants.STOP.equals(name)) {
-			Id id = new IdImpl(atts.getValue(Constants.REF_ID));
+			Id id = this.idf.createId(atts.getValue(Constants.REF_ID));
 			TransitStopFacility facility = this.schedule.getFacilities()
 					.get(id);
 			if (facility == null) {

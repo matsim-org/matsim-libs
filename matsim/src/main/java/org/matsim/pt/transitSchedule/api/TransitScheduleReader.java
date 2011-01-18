@@ -48,7 +48,7 @@ public class TransitScheduleReader {
 		MatsimFileTypeGuesser guesser = new MatsimFileTypeGuesser(filename);
 		String systemId = guesser.getSystemId();
 		if (systemId.endsWith("transitSchedule_v1.dtd")) {
-			new TransitScheduleReaderV1(this.scenario.getTransitSchedule(), this.scenario.getNetwork()).readFile(filename);
+			new TransitScheduleReaderV1(this.scenario.getTransitSchedule(), this.scenario.getNetwork(), this.scenario).readFile(filename);
 		} else {
 			throw new IOException("Unsupported file format: " + systemId);
 		}

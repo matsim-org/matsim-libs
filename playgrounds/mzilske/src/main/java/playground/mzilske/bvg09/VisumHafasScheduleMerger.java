@@ -29,8 +29,8 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.visum.VisumNetwork;
-import org.matsim.visum.VisumNetworkReader;
 import org.matsim.visum.VisumNetwork.StopPoint;
+import org.matsim.visum.VisumNetworkReader;
 import org.xml.sax.SAXException;
 
 
@@ -83,7 +83,7 @@ public class VisumHafasScheduleMerger {
 		ScenarioLoaderImpl hafasLoader = new ScenarioLoaderImpl(hafasScenario);
 		hafasLoader.loadScenario();
 		try {
-			new TransitScheduleReaderV1(intermediateScenario.getTransitSchedule(), intermediateScenario.getNetwork()).readFile(InTransitScheduleFile);
+			new TransitScheduleReaderV1(intermediateScenario.getTransitSchedule(), intermediateScenario.getNetwork(), intermediateScenario).readFile(InTransitScheduleFile);
 		} catch (SAXException e) {
 			throw new RuntimeException("could not read transit schedule.", e);
 		} catch (ParserConfigurationException e) {
@@ -92,7 +92,7 @@ public class VisumHafasScheduleMerger {
 			throw new RuntimeException("could not read transit schedule.", e);
 		}
 		try {
-			new TransitScheduleReaderV1(hafasScenario.getTransitSchedule(), hafasScenario.getNetwork()).readFile(HafasTransitScheduleFile);
+			new TransitScheduleReaderV1(hafasScenario.getTransitSchedule(), hafasScenario.getNetwork(), hafasScenario).readFile(HafasTransitScheduleFile);
 		} catch (SAXException e) {
 			throw new RuntimeException("could not read transit schedule.", e);
 		} catch (ParserConfigurationException e) {
@@ -104,13 +104,13 @@ public class VisumHafasScheduleMerger {
 		outLoader.loadScenario();
 		readVisumNetwork();
 	}
-	
-	private void treatAllRoutes(){		
+
+	private void treatAllRoutes(){
 		Map<Id, Map<Id, Id>> hafas2visumMap = Hafas2VisumMapper.getHafas2VisumMap();
 		Map<Id, Id> visum2hafasLineIds = Hafas2VisumMapper.getMappedLines();
-		
+
 		for (Entry<Id, TransitLine> entry : this.intermediateScenario.getTransitSchedule().getTransitLines().entrySet()) {
-			
+
 			if (visum2hafasLineIds.get(entry.getKey()) == null) {
 				log.warn("Could not find hafas line for visum line " + entry.getKey() + " Adding anyway.");
 				outSchedule.addTransitLine(this.intermediateScenario.getTransitSchedule().getTransitLines().get(entry.getKey()));
@@ -260,7 +260,7 @@ public class VisumHafasScheduleMerger {
 		VisumHafasScheduleMerger visumHafasScheduleMerger = new VisumHafasScheduleMerger();
 		visumHafasScheduleMerger.prepareConfig();
 		visumHafasScheduleMerger.copyFacilities();
-		visumHafasScheduleMerger.treatAllRoutes();				
+		visumHafasScheduleMerger.treatAllRoutes();
 		visumHafasScheduleMerger.writeNetworkAndScheduleAndVehicles();
 	}
 

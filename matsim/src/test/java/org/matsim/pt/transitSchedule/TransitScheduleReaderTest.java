@@ -33,8 +33,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
-import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -63,7 +61,7 @@ public class TransitScheduleReaderTest extends MatsimTestCase {
 
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
 		TransitSchedule schedule = builder.createTransitSchedule();
-		new TransitScheduleReaderV1(schedule, network).readFile(inputDir + INPUT_TEST_FILE_TRANSITSCHEDULE);
+		new TransitScheduleReaderV1(schedule, network, scenario).readFile(inputDir + INPUT_TEST_FILE_TRANSITSCHEDULE);
 
 		assertEquals("wrong number of transit lines.", 1, schedule.getTransitLines().size());
 		assertEquals("wrong line id.", new IdImpl("T1"), schedule.getTransitLines().keySet().iterator().next());

@@ -29,14 +29,14 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.visum.VisumNetwork;
-import org.matsim.visum.VisumNetworkReader;
 import org.matsim.visum.VisumNetwork.StopPoint;
+import org.matsim.visum.VisumNetworkReader;
 import org.xml.sax.SAXException;
 
 import playground.droeder.DaPaths;
 /**
  * doesn't work yet. need to be checked
- * 
+ *
  * @author droeder
  *
  */
@@ -91,7 +91,7 @@ public class DaVisumHafasScheduleMerger {
 		ScenarioLoaderImpl hafasLoader = new ScenarioLoaderImpl(hafasScenario);
 		hafasLoader.loadScenario();
 		try {
-			new TransitScheduleReaderV1(intermediateScenario.getTransitSchedule(), intermediateScenario.getNetwork()).readFile(InTransitScheduleFile);
+			new TransitScheduleReaderV1(intermediateScenario.getTransitSchedule(), intermediateScenario.getNetwork(), intermediateScenario).readFile(InTransitScheduleFile);
 		} catch (SAXException e) {
 			throw new RuntimeException("could not read transit schedule.", e);
 		} catch (ParserConfigurationException e) {
@@ -100,7 +100,7 @@ public class DaVisumHafasScheduleMerger {
 			throw new RuntimeException("could not read transit schedule.", e);
 		}
 		try {
-			new TransitScheduleReaderV1(hafasScenario.getTransitSchedule(), hafasScenario.getNetwork()).readFile(HafasTransitScheduleFile);
+			new TransitScheduleReaderV1(hafasScenario.getTransitSchedule(), hafasScenario.getNetwork(), hafasScenario).readFile(HafasTransitScheduleFile);
 		} catch (SAXException e) {
 			throw new RuntimeException("could not read transit schedule.", e);
 		} catch (ParserConfigurationException e) {
@@ -112,17 +112,17 @@ public class DaVisumHafasScheduleMerger {
 		outLoader.loadScenario();
 		readVisumNetwork();
 	}
-	
-	private void treatAllRoutes(){		
-		
+
+	private void treatAllRoutes(){
+
 		Visum2HafasMapper mapper = new Visum2HafasMapper();
 		Map<Id, Map<Id, Id>> visum2HafasMap = mapper.getVisum2HafasMap();
 		Map<Id, Id> visum2hafasLineIds = mapper.getMatchedLines();
-		
+
 		for(Entry<Id, Id> e : visum2hafasLineIds.entrySet()){
 			System.out.println(e.getKey() + " " + e.getValue());
 		}
-		
+
 		int i = 0;
 		for (Entry<Id, TransitLine> entry : this.intermediateScenario.getTransitSchedule().getTransitLines().entrySet()) {
 			if (visum2hafasLineIds.get(entry.getKey()) == null) {
@@ -292,7 +292,7 @@ public class DaVisumHafasScheduleMerger {
 		DaVisumHafasScheduleMerger visumHafasScheduleMerger = new DaVisumHafasScheduleMerger();
 		visumHafasScheduleMerger.prepareConfig();
 		visumHafasScheduleMerger.copyFacilities();
-		visumHafasScheduleMerger.treatAllRoutes();				
+		visumHafasScheduleMerger.treatAllRoutes();
 		visumHafasScheduleMerger.writeNetworkAndScheduleAndVehicles();
 	}
 

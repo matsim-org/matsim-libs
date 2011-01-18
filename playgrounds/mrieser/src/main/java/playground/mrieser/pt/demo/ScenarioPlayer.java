@@ -72,7 +72,7 @@ public class ScenarioPlayer {
 		scenario.getConfig().scenario().setUseVehicles(true);
 
 		TransitSchedule schedule = scenario.getTransitSchedule();
-		new TransitScheduleReaderV1(schedule, network).parse("test/input/org/matsim/transitSchedule/TransitScheduleReaderTest/transitSchedule.xml");
+		new TransitScheduleReaderV1(schedule, network, scenario).parse("test/input/org/matsim/transitSchedule/TransitScheduleReaderTest/transitSchedule.xml");
 		new CreateVehiclesForSchedule(schedule, scenario.getVehicles()).run();
 
 		final EventsManagerImpl events = new EventsManagerImpl();

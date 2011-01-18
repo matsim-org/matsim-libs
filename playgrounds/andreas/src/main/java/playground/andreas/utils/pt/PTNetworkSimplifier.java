@@ -71,29 +71,29 @@ public class PTNetworkSimplifier {
 	private TransitSchedule transitSchedule;
 	private TreeSet<String> linksNeededByTransitSchedule = null;
 	private Network network;
-	
+
 	private String netInFile;
 	private String scheduleInFile;
 	private String netOutFile;
 	private String scheduleOutFile;
 	private Set<Integer> nodeTypesToMerge = new TreeSet<Integer>();
-	
+
 	public PTNetworkSimplifier(String netInFile, String scheduleInFile, String netOutFile, String scheduleOutFile){
 		this.netInFile = netInFile;
 		this.scheduleInFile = scheduleInFile;
 		this.netOutFile = netOutFile;
 		this.scheduleOutFile = scheduleOutFile;
-	}	
+	}
 
 	public void run(final Network net, final TransitSchedule tranSched) {
-		
+
 		this.network = net;
 		this.transitSchedule = tranSched;
-		
+
 		TransitScheduleCleaner.removeEmptyLines(this.transitSchedule);
 		TransitScheduleCleaner.removeStopsNotUsed(this.transitSchedule);
 		this.network = TransitScheduleCleaner.tagTransitLinksInNetwork(this.transitSchedule, this.network);
-		
+
 		if(this.nodeTypesToMerge.size() == 0){
 			Gbl.errorMsg("No types of node specified. Please use setNodesToMerge to specify which nodes should be merged");
 		}
@@ -105,21 +105,21 @@ public class PTNetworkSimplifier {
 
 		NetworkCalcTopoType nodeTopo = new NetworkCalcTopoType();
 		nodeTopo.run(this.network);
-		
+
 		TreeSet<String> nodesConnectedToTransitStop = new TreeSet<String>();
-		
+
 		int nodesProcessed = 0;
 		int nextMessageAt = 2;
-		
+
 
 		for (Node node : this.network.getNodes().values()) {
-			
+
 			nodesProcessed++;
 			if(nextMessageAt == nodesProcessed){
 				log.info(nodesProcessed + " nodes processed so far");
 				nextMessageAt = 2 * nodesProcessed;
 			}
-			
+
 			if(nodesConnectedToTransitStop.contains(node.getId().toString())){
 				continue;
 			}
@@ -137,13 +137,13 @@ public class PTNetworkSimplifier {
 						LinkImpl outLink = (LinkImpl) oL;
 
 						if(inLink != null && outLink != null){
-							
+
 							if(!outLink.getToNode().equals(inLink.getFromNode())){
-								
+
 								if(!linkNeededByTransitStop(inLink, outLink)){
-									
+
 									Link link = null;
-									
+
 									if(this.mergeLinkStats){
 
 										// Try to merge both links by guessing the resulting links attributes
@@ -171,7 +171,7 @@ public class PTNetworkSimplifier {
 										);
 
 										//									inLink.getOrigId() + "-" + outLink.getOrigId(),
-										
+
 
 									} else {
 
@@ -181,21 +181,21 @@ public class PTNetworkSimplifier {
 													new IdImpl(inLink.getId() + "-" + outLink.getId()),
 													inLink.getFromNode().getId(),
 													outLink.getToNode().getId());
-													
+
 											link.setLength(inLink.getLength() + outLink.getLength());
-											
+
 											link.setFreespeed(inLink.getFreespeed());
-											
-											
+
+
 											link.setCapacity(inLink.getCapacity());
-											
+
 											link.setNumberOfLanes(inLink.getNumberOfLanes());
-											
-											link.setAllowedModes(inLink.getAllowedModes());											
+
+											link.setAllowedModes(inLink.getAllowedModes());
 										}
 
 									}
-									
+
 									if(link != null){
 										if(!nodesConnectedToTransitStop.contains(node.getId().toString())){
 											if(!nodesConnectedToTransitStop.contains(link.getFromNode().getId().toString())){
@@ -212,13 +212,13 @@ public class PTNetworkSimplifier {
 														this.network.removeLink(inLink.getId());
 														this.network.removeLink(outLink.getId());
 													}
-														
+
 												}
 											}
 										}
-									
+
 									}
-									
+
 								} else {
 									nodesConnectedToTransitStop.add(node.getId().toString());
 								}
@@ -239,7 +239,7 @@ public class PTNetworkSimplifier {
 		log.info("  resulting network contains " + this.network.getNodes().size() + " nodes and " +
 				this.network.getLinks().size() + " links.");
 		log.info("done.");
-		
+
 		TransitScheduleCleaner.removeAllRoutesWithMissingLinksFromSchedule(this.transitSchedule, this.network);
 		TransitScheduleCleaner.removeEmptyLines(this.transitSchedule);
 		TransitScheduleCleaner.removeStopsNotUsed(this.transitSchedule);
@@ -249,7 +249,7 @@ public class PTNetworkSimplifier {
 		// first test - links must not be changed if, only one link is part of a route, but the other one not
 		for (TransitLine transitLine : this.transitSchedule.getTransitLines().values()) {
 			for (TransitRoute transitRoute : transitLine.getRoutes().values()) {
-				
+
 				if(transitRoute.getRoute().getLinkIds().contains(inLink.getId()) || transitRoute.getRoute().getLinkIds().contains(inLink.getId())){
 
 					LinkedList<Id> routeLinkIds = new LinkedList<Id>();
@@ -276,12 +276,12 @@ public class PTNetworkSimplifier {
 				}
 			}
 		}
-		
+
 		// second perform
-		
+
 		for (TransitLine transitLine : this.transitSchedule.getTransitLines().values()) {
 			for (TransitRoute transitRoute : transitLine.getRoutes().values()) {
-				
+
 				if(transitRoute.getRoute().getLinkIds().contains(inLink.getId()) || transitRoute.getRoute().getLinkIds().contains(inLink.getId())){
 
 					LinkedList<Id> routeLinkIds = new LinkedList<Id>();
@@ -309,21 +309,21 @@ public class PTNetworkSimplifier {
 	}
 
 	private boolean linkNeededByTransitStop(LinkImpl inLink, LinkImpl outLink) {
-		
+
 		if(this.linksNeededByTransitSchedule == null){
 			this.linksNeededByTransitSchedule = new TreeSet<String>();
 			for (TransitStopFacility transitStopFacility : this.transitSchedule.getFacilities().values()) {
 				this.linksNeededByTransitSchedule.add(transitStopFacility.getLinkId().toString());
-			}			
-		}		
-		
+			}
+		}
+
 		if(this.linksNeededByTransitSchedule.contains(inLink.getId().toString())){
-			return true;				
+			return true;
 		}
 		if(this.linksNeededByTransitSchedule.contains(outLink.getId().toString())){
-			return true;				
-		}			
-		
+			return true;
+		}
+
 		return false;
 	}
 
@@ -366,7 +366,7 @@ public class PTNetworkSimplifier {
 
 		return bothLinksHaveSameLinkStats;
 	}
-	
+
 	public static void main(String[] args) {
 		PTNetworkSimplifier simplifier = new PTNetworkSimplifier("e:/_out/osm/transit-network_bb_subway.xml", "e:/_out/osm/osm_transitSchedule_subway.xml", "e:/_out/osm/transit-network_bb_subway_simplified_merged.xml", "e:/_out/osm/osm_transitSchedule_subway_merged.xml");
 		Set<Integer> nodeTypesToMerge = new TreeSet<Integer>();
@@ -376,7 +376,7 @@ public class PTNetworkSimplifier {
 		simplifier.setMergeLinkStats(false);
 		simplifier.simplifyPTNetwork();
 	}
-	
+
 	public void simplifyPTNetwork(){
 
 		log.info("Start...");
@@ -384,18 +384,18 @@ public class PTNetworkSimplifier {
 		this.network = scenario.getNetwork();
 		log.info("Reading " + this.netInFile);
 		new MatsimNetworkReader(scenario).readFile(this.netInFile);
-					
+
 		ScenarioImpl osmScenario = new ScenarioImpl();
-		Config osmConfig = osmScenario.getConfig();		
+		Config osmConfig = osmScenario.getConfig();
 		osmConfig.scenario().setUseTransit(true);
 		osmConfig.scenario().setUseVehicles(true);
-		osmConfig.network().setInputFile(this.netInFile);		
+		osmConfig.network().setInputFile(this.netInFile);
 		ScenarioLoaderImpl osmLoader = new ScenarioLoaderImpl(osmScenario);
 		osmLoader.loadScenario();
-	
+
 		log.info("Reading " + this.scheduleInFile);
 		try {
-			new TransitScheduleReaderV1(osmScenario.getTransitSchedule(), osmScenario.getNetwork()).readFile(this.scheduleInFile);
+			new TransitScheduleReaderV1(osmScenario.getTransitSchedule(), osmScenario.getNetwork(), osmScenario).readFile(this.scheduleInFile);
 		} catch (SAXException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -405,12 +405,12 @@ public class PTNetworkSimplifier {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}		
+		}
 
 		log.info("Running simplifier...");
-		run(this.network, osmScenario.getTransitSchedule());		
+		run(this.network, osmScenario.getTransitSchedule());
 		TransitScheduleCleaner.removeAllRoutesWithMissingLinksFromSchedule(osmScenario.getTransitSchedule(), this.network);
-		
+
 		log.info("Writing network to " + this.netOutFile);
 		new NetworkWriter(this.network).write(this.netOutFile);
 		try {

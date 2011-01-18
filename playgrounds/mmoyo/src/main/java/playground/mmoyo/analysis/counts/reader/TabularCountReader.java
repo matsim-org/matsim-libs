@@ -73,7 +73,7 @@ public class TabularCountReader implements TabularFileHandler {
 		/* **************reads the transitSchedule file********* */
 		new MatsimNetworkReader(scenario).readFile(ptNetworkPath);
 		try {
-			new TransitScheduleReaderV1(this.transitSchedule, network).readFile(transitScheddulePath);
+			new TransitScheduleReaderV1(this.transitSchedule, network, scenario).readFile(transitScheddulePath);
 		} catch (SAXException e){
 			e.printStackTrace();
 		} catch (ParserConfigurationException e) {

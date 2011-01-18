@@ -28,22 +28,22 @@ public class TransitLineFilter {
 		final String FILTERED_SCHEDULE_FILE = "../playgrounds/mmoyo/output/filteredSchedule.xml";
 		//final String[] linesArray = {"BVB----M44", "BVB----344"};
 		final String[] linesArray = {"S45", "S46", "S47", "BVU----U7", "BVU----U8", "BVB----M11", "BVB----M29", "BVB----M41", "BVB----M44", "BVB----M46", "BVB----X11", "BVB----104",  "BVB----167", "BVB----170",  "BVB----171", "BVB----172", "BVB----181", "BVB----194", "BVB----246", "BVB----277", "BVB----344", "735", "736",  "BVB----N8"};
-		
+
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
 		TransitSchedule transitSchedule = builder.createTransitSchedule();
 		TransitSchedule filteredTransitSchedule = builder.createTransitSchedule();
-		
+
 		//reads the transitSchedule file
 		ScenarioImpl scenario = new ScenarioImpl();
 		NetworkImpl network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(NETWORKFILE);
-		new TransitScheduleReaderV1(transitSchedule, network).readFile(SCHEDULEFILE);
-		
-		System.out.println ("List of lines");		
+		new TransitScheduleReaderV1(transitSchedule, network, scenario).readFile(SCHEDULEFILE);
+
+		System.out.println ("List of lines");
 		for (TransitLine line : transitSchedule.getTransitLines().values()){
 			System.out.println(line.getId());
 		}
-		
+
 		//filter, deleting the rest of lines
 		for (int i=0 ; i<linesArray.length ; i++){
 			Id idLine=  new IdImpl(linesArray[i]);
@@ -60,9 +60,9 @@ public class TransitLineFilter {
 			}
 			filteredTransitSchedule.addTransitLine(line);
 		}
-		
+
 		new TransitScheduleWriterV1(filteredTransitSchedule).write(FILTERED_SCHEDULE_FILE);
 	}
-	
+
 
 }

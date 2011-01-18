@@ -131,7 +131,7 @@ public class PTCountsNetworkSimplifier {
 
 		log.info("Reading " + this.scheduleInFile);
 		try {
-			new TransitScheduleReaderV1(osmScenario.getTransitSchedule(), osmScenario.getNetwork()).readFile(this.scheduleInFile);
+			new TransitScheduleReaderV1(osmScenario.getTransitSchedule(), osmScenario.getNetwork(), osmScenario).readFile(this.scheduleInFile);
 		} catch (SAXException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

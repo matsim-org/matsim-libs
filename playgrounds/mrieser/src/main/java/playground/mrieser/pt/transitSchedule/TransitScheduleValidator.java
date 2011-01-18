@@ -166,7 +166,7 @@ public abstract class TransitScheduleValidator {
 //		args = new String[] {"/data/projects/bvg2010/Daten/transitSchedule.oevnet.xml", "/data/projects/bvg2010/Daten/transit-network.xml"};
 //		args = new String[] {"/Users/cello/Desktop/MATSim/pt-test/matsim-0.2.0-rc1-release/pt-rdam/transitSchedule.xml", "/Users/cello/Desktop/MATSim/pt-test/matsim-0.2.0-rc1-release/pt-rdam/rdamnetwork.xml"};
 //		args = new String[] {"/data/senozon/visumData/matsim/transitSchedule.xml", "/data/senozon/visumData/matsim/network.cleaned.xml"};
-		args = new String[] {"/Users/cello/Desktop/bvgnet7/transitSchedule.xml", "/Users/cello/Desktop/bvgnet7/network.xml"};
+		args = new String[] {"/Users/cello/Desktop/bvgnet8/transitSchedule.xml", "/Users/cello/Desktop/bvgnet8/network.xml"};
 
 		new MatsimNetworkReader(s).parse(args[1]);
 		new TransitScheduleReader(s).readFile(args[0]);

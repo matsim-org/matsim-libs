@@ -34,17 +34,17 @@ public class OccupancyCounts {
 
 	public static void play(final ScenarioImpl scenario, final EventsManager events) {
 		scenario.getConfig().simulation().setSnapshotStyle("queue");
-		final QSim sim = new QSim(scenario, ((EventsManagerImpl) events));
+		final QSim sim = new QSim(scenario, (events));
 		sim.getTransitEngine().setUseUmlaeufe(true);
 		sim.run();
 	}
 
 	public static void main(final String[] args) throws SAXException, ParserConfigurationException, IOException {
-		String configFile = args[0]; 
+		String configFile = args[0];
 		String transitLineStrId = args[1];
 		String transitRouteStrId1 = args[2];
 		String transitRouteStrId2 = args[3];
-		
+
 		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(configFile);
 		ScenarioImpl scenario = sl.getScenario();
 
@@ -57,7 +57,7 @@ public class OccupancyCounts {
 		scenario.getConfig().scenario().setUseVehicles(true);
 		//scenario.getConfig().setQSimConfigGroup(new QSimConfigGroup());
 
-		new TransitScheduleReaderV1(scenario.getTransitSchedule(), scenario.getNetwork()).parse(scenario.getConfig().getParam("transit", "transitScheduleFile"));
+		new TransitScheduleReaderV1(scenario.getTransitSchedule(), scenario.getNetwork(), scenario).parse(scenario.getConfig().getParam("transit", "transitScheduleFile"));
 		new CreateVehiclesForSchedule(scenario.getTransitSchedule(), scenario.getVehicles()).run();
 
 		for (TransitLine line : scenario.getTransitSchedule().getTransitLines().values()){
@@ -67,7 +67,7 @@ public class OccupancyCounts {
 				}
 		}
 		//////////////////
-		
+
 		EventsManagerImpl events = new EventsManagerImpl();
 		VehicleTracker vehTracker = new VehicleTracker();
 		events.addHandler(vehTracker);
@@ -84,7 +84,7 @@ public class OccupancyCounts {
 
 		///////////show and save results/////////////////////
 		String[] data = new String[route1.getStops().size() + 1];
-		data[0]= "stop\t#exitleaving\t#enter\t#inVehicle \n"; 
+		data[0]= "stop\t#exitleaving\t#enter\t#inVehicle \n";
 		System.out.println(data[0]);
 		int inVehicle = 0;
 		int i=0;
@@ -102,7 +102,7 @@ public class OccupancyCounts {
 		System.out.println(data2[0]);
 		inVehicle = 0;
 		i=0;
-		
+
 		for (TransitRouteStop stop : route2.getStops()) {
 			Id stopId = stop.getStopFacility().getId();
 			int enter = analysis2.getNumberOfEnteringPassengers(stopId);
@@ -111,19 +111,19 @@ public class OccupancyCounts {
 			data2[++i] = stopId + "\t" + leave + "\t" + enter + "\t" + inVehicle + "\n";
 			System.out.print( data2[i]);
 		}
-	
-		try { 
-			BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(scenario.getConfig().controler().getOutputDirectory() + "/" + new File( scenario.getConfig().plans().getInputFile() ).getName() + "_counts.txt")); 
+
+		try {
+			BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(scenario.getConfig().controler().getOutputDirectory() + "/" + new File( scenario.getConfig().plans().getInputFile() ).getName() + "_counts.txt"));
 			 for(i = 0; i < data.length; i++) {
 	              bufferedWriter.write(data[i]);
-	        }    
+	        }
 			 bufferedWriter.write("\n");
 			 for(i = 0; i < data2.length; i++) {
 	              bufferedWriter.write(data2[i]);
-	        }    
-			bufferedWriter.close(); 
+	        }
+			bufferedWriter.close();
 		} catch (IOException e) {
-			
-		} 
+
+		}
 	}
 }

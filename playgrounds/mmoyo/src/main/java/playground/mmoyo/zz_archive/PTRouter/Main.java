@@ -55,7 +55,7 @@ public class Main {
 		/* **************reads the transitSchedule file********* */
 		new MatsimNetworkReader(scenario).readFile(netWorkFile);
 		try {
-			new TransitScheduleReaderV1(transitSchedule, network).readFile(transitScheduleFile);
+			new TransitScheduleReaderV1(transitSchedule, network, scenario).readFile(transitScheduleFile);
 		} catch (SAXException e){
 			e.printStackTrace();
 		} catch (ParserConfigurationException e) {

@@ -48,7 +48,7 @@ public class PTRouterTest extends MatsimTestCase {
 		new MatsimNetworkReader(scenario).readFile(NETWORK);
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
 		TransitSchedule transitSchedule = builder.createTransitSchedule();
-		new TransitScheduleReaderV1(transitSchedule, network).readFile(TRANSITSCHEDULE);
+		new TransitScheduleReaderV1(transitSchedule, network, scenario).readFile(TRANSITSCHEDULE);
 		LogicFactory logicFactory = new LogicFactory(transitSchedule); // Creates logic elements: logicNetwork, logicTransitSchedule, logicToPlanConverter
 		NetworkImpl logicNet= logicFactory.getLogicNet();
 		PTRouter ptRouter = new PTRouter (logicNet);

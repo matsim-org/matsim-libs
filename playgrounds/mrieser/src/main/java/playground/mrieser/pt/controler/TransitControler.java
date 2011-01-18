@@ -141,7 +141,7 @@ public class TransitControler extends Controler {
 		public void notifyStartup(final StartupEvent event) {
 			if (this.config.getTransitScheduleFile() != null) {
 				try {
-					new TransitScheduleReaderV1(event.getControler().getScenario().getTransitSchedule(), event.getControler().getScenario().getNetwork()).readFile(this.config.getTransitScheduleFile());
+					new TransitScheduleReaderV1(event.getControler().getScenario().getTransitSchedule(), event.getControler().getScenario().getNetwork(), event.getControler().getScenario()).readFile(this.config.getTransitScheduleFile());
 				} catch (SAXException e) {
 					throw new RuntimeException("could not read transit schedule.", e);
 				} catch (ParserConfigurationException e) {

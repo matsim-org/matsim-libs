@@ -3,8 +3,8 @@ package playground.andreas.bln.counts;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.Random;
 import java.util.Map.Entry;
+import java.util.Random;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -32,7 +32,7 @@ import org.xml.sax.SAXException;
 
 /**
  * Generates population from counts data for specified lines. Additional group of agents can be added as an option.
- * 
+ *
  * @author aneumann
  *
  */
@@ -213,7 +213,7 @@ public class Counts2Plans {
 		matsimNetReader.readFile(networkFile);
 
 		TransitSchedule transitSchedule = new TransitScheduleFactoryImpl().createTransitSchedule();
-		TransitScheduleReaderV1 transitScheduleReaderV1 = new TransitScheduleReaderV1(transitSchedule, scenario.getNetwork());
+		TransitScheduleReaderV1 transitScheduleReaderV1 = new TransitScheduleReaderV1(transitSchedule, scenario.getNetwork(), scenario);
 
 		try {
 			transitScheduleReaderV1.readFile(transitScheduleFile);

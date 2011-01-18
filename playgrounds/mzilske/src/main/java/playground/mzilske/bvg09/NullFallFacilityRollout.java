@@ -141,7 +141,7 @@ public class NullFallFacilityRollout {
 		ScenarioLoaderImpl inLoader = new ScenarioLoaderImpl(inScenario);
 		inLoader.loadScenario();
 		try {
-			new TransitScheduleReaderV1(inScenario.getTransitSchedule(), inScenario.getNetwork()).readFile(InTransitScheduleFile);
+			new TransitScheduleReaderV1(inScenario.getTransitSchedule(), inScenario.getNetwork(), inScenario).readFile(InTransitScheduleFile);
 		} catch (SAXException e) {
 			throw new RuntimeException("could not read transit schedule.", e);
 		} catch (ParserConfigurationException e) {
