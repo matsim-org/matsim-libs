@@ -38,6 +38,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.misc.Counter;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -339,16 +340,20 @@ public final class TransitRouterNetwork implements Network {
 	}
 
 	public static TransitRouterNetwork createFromSchedule(final TransitSchedule schedule, final double maxBeelineWalkConnectionDistance) {
+		log.info("start creating transit network");
 		final TransitRouterNetwork network = new TransitRouterNetwork();
-
+		final Counter linkCounter = new Counter(" link #");
+		final Counter nodeCounter = new Counter(" node #");
 		// build nodes and links connecting the nodes according to the transit routes
 		for (TransitLine line : schedule.getTransitLines().values()) {
 			for (TransitRoute route : line.getRoutes().values()) {
 				TransitRouterNetworkNode prevNode = null;
 				for (TransitRouteStop stop : route.getStops()) {
 					TransitRouterNetworkNode node = network.createNode(stop, route, line);
+					nodeCounter.incCounter();
 					if (prevNode != null) {
 						network.createLink(prevNode, node, route, line);
+						linkCounter.incCounter();
 					}
 					prevNode = node;
 				}
@@ -361,6 +366,7 @@ public final class TransitRouterNetwork implements Network {
 		// well, not really. finishInit creates the quadtree, for this, the extent must be known,
 		// which is not at the very start, so the quadtree data structure cannot be updated as
 		// links come in. mrieser, dec'10
+		log.info("add transfer links");
 
 		List<Tuple<TransitRouterNetworkNode, TransitRouterNetworkNode>> toBeAdded = new LinkedList<Tuple<TransitRouterNetworkNode, TransitRouterNetworkNode>>();
 		// connect all stops with walking links if they're located less than beelineWalkConnectionDistance from each other
@@ -376,13 +382,16 @@ public final class TransitRouterNetwork implements Network {
 				}
 			}
 		}
+		log.info(toBeAdded.size() + " transfer links to be added.");
 		for (Tuple<TransitRouterNetworkNode, TransitRouterNetworkNode> tuple : toBeAdded) {
 			network.createLink(tuple.getFirst(), tuple.getSecond(), null, null);
+			linkCounter.incCounter();
 		}
 
 		log.info("transit router network statistics:");
 		log.info(" # nodes: " + network.getNodes().size());
-		log.info(" # links: " + network.getLinks().size());
+		log.info(" # links total:     " + network.getLinks().size());
+		log.info(" # transfer links:  " + toBeAdded.size());
 
 		return network;
 	}
