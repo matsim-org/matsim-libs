@@ -29,7 +29,7 @@ import org.matsim.contrib.sna.graph.analysis.GraphAnalyzer;
 import org.matsim.contrib.sna.graph.analysis.TransitivityTask;
 import org.matsim.contrib.sna.graph.io.SparseGraphMLReader;
 
-import playground.johannes.socialnetworks.graph.analysis.StandardAnalyzerTask;
+import playground.johannes.socialnetworks.graph.analysis.TopologyAnalyzerTask;
 
 /**
  * @author illenberger
@@ -43,7 +43,7 @@ public class GraphAnalyzerTest extends TestCase {
 		SparseGraphMLReader reader = new SparseGraphMLReader();
 		Graph graph = reader.readGraph(INPUT_FILE);
 		
-		Map<String, Double> stats = GraphAnalyzer.analyze(graph, new StandardAnalyzerTask());
+		Map<String, Double> stats = GraphAnalyzer.analyze(graph, new TopologyAnalyzerTask());
 		
 		assertEquals(7.1462, stats.get(DegreeTask.MEAN_DEGREE), 0.0001);
 		assertEquals(19.0, stats.get(DegreeTask.MAX_DEGREE));

@@ -43,7 +43,7 @@ import playground.johannes.socialnetworks.gis.BeelineCostFunction;
 import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
 import playground.johannes.socialnetworks.gis.DistanceCalculator;
 import playground.johannes.socialnetworks.graph.spatial.analysis.Accessibility;
-import playground.johannes.socialnetworks.graph.spatial.analysis.StandardAnalyzerTask;
+import playground.johannes.socialnetworks.graph.spatial.analysis.SpatialAnalyzerTask;
 import playground.johannes.socialnetworks.graph.spatial.io.Population2SpatialGraph;
 
 import com.vividsolutions.jts.geom.Point;
@@ -85,7 +85,7 @@ public class NaiveGraphGenerator {
 		writer.setKmlVertexDetail(new KMLVertexDescriptor(graph));
 		writer.write(graph, graphFile);
 		
-		StandardAnalyzerTask task = new StandardAnalyzerTask();
+		SpatialAnalyzerTask task = new SpatialAnalyzerTask();
 		task.setOutputDirectoy("/Users/jillenberger/Work/work/socialnets/mcmc/output/");
 		GraphAnalyzer.analyze(graph,task);
 		

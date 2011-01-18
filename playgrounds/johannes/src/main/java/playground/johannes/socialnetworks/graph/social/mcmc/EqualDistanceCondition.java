@@ -36,7 +36,7 @@ public class EqualDistanceCondition implements EdgeSwitchCondition {
 
 	private DistanceCalculator calculator = new CartesianDistanceCalculator();
 	
-	private Discretizer discretizer = new LinearDiscretizer(1000);
+	private Discretizer discretizer = new LinearDiscretizer(2000);
 	
 	private final double threshold = 0;
 	

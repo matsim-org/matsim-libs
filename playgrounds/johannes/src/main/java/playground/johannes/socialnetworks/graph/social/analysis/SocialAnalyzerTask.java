@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * HTDistribution.java
+ * SocialAnalyzerTask.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,30 +17,17 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.statistics;
+package playground.johannes.socialnetworks.graph.social.analysis;
 
-import org.matsim.contrib.sna.math.Distribution;
-
-import playground.johannes.socialnetworks.snowball2.sim.deprecated.PopulationEstimator;
+import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
 
 /**
  * @author illenberger
  *
  */
-public class EstimatedDistribution extends Distribution {
+public class SocialAnalyzerTask extends AnalyzerTaskComposite {
 
-	private final PopulationEstimator estimator;
-	
-	public EstimatedDistribution(PopulationEstimator estimator) {
-		this.estimator = estimator;
+	public SocialAnalyzerTask() {
+		addTask(new AgeTask());
 	}
-	
-	@Override
-	public double mean() {
-		if(estimator == null)
-			return super.mean();
-		else
-			return estimator.mean(getValues(), getWeights());
-	}
-
 }

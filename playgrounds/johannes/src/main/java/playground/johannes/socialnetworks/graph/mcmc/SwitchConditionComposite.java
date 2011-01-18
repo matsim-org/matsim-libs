@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ErgmTriangles.java
+ * SwitchConditionComposite.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,30 +17,29 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
-/**
- * 
- */
 package playground.johannes.socialnetworks.graph.mcmc;
 
-import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
-
-
 
 /**
  * @author illenberger
  *
  */
-public class ErgmTriangles extends ErgmTerm implements GraphProbability {
+public class SwitchConditionComposite implements EdgeSwitchCondition {
+
+	private EdgeSwitchCondition[] components;
 	
-	public ErgmTriangles(double theta) {
-		setTheta(theta);
+	public void setComponents(EdgeSwitchCondition[] components) {
+		this.components = components;
 	}
 	
 	@Override
-	public <V extends Vertex> double difference(AdjacencyMatrix<V> m, int i, int j, boolean y_ij) {
-		return Math.exp(- getTheta() * m.getCommonNeighbors(i, j));
+	public boolean allowSwitch(AdjacencyMatrix<?> y, int i, int j, int u, int v) {
+		for(int k = 0; k < components.length; k++)
+			if(!components[k].allowSwitch(y, i, j, u, v))
+				return false;
+		
+		return true;
 	}
 
 }

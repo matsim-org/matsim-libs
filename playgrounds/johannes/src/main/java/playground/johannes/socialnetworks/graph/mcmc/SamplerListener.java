@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ErgmTriangles.java
+ * SampleHandler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,30 +17,17 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
-/**
- * 
- */
 package playground.johannes.socialnetworks.graph.mcmc;
 
 import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
 
-
-
 /**
  * @author illenberger
  *
  */
-public class ErgmTriangles extends ErgmTerm implements GraphProbability {
-	
-	public ErgmTriangles(double theta) {
-		setTheta(theta);
-	}
-	
-	@Override
-	public <V extends Vertex> double difference(AdjacencyMatrix<V> m, int i, int j, boolean y_ij) {
-		return Math.exp(- getTheta() * m.getCommonNeighbors(i, j));
-	}
+public interface SamplerListener<V extends Vertex> {
 
+	public boolean afterSampling(AdjacencyMatrix<V> y, long iteration);
+	
 }

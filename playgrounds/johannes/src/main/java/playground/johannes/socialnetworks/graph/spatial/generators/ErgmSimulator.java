@@ -26,24 +26,32 @@ import java.util.Set;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.sna.gis.CRSUtils;
 import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
-import org.matsim.contrib.sna.graph.spatial.SpatialSparseEdge;
-import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraph;
-import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraphBuilder;
-import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraphFactory;
 import org.matsim.contrib.sna.graph.spatial.SpatialSparseVertex;
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.population.MatsimPopulationReader;
 import org.xml.sax.SAXException;
 
 import playground.johannes.socialnetworks.graph.generators.BarabasiAlbertGenerator;
+import playground.johannes.socialnetworks.graph.mcmc.ConserveDegreeDistribution;
 import playground.johannes.socialnetworks.graph.mcmc.Ergm;
-import playground.johannes.socialnetworks.graph.mcmc.GibbsEdgeFlip;
-import playground.johannes.socialnetworks.graph.mcmc.GibbsSampler;
-import playground.johannes.socialnetworks.graph.spatial.io.Population2SpatialGraph;
-import playground.johannes.socialnetworks.graph.spatial.io.SpatialSparseVertexPool;
+import playground.johannes.socialnetworks.graph.mcmc.GibbsEdgeSwitch;
+import playground.johannes.socialnetworks.graph.mcmc.SamplerListener;
+import playground.johannes.socialnetworks.graph.social.SocialVertex;
+import playground.johannes.socialnetworks.graph.social.io.SocialSparseVertexPool;
+import playground.johannes.socialnetworks.graph.social.mcmc.DumpHandler;
+import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseEdge;
+import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseGraph;
+import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseGraphBuilder;
+import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseGraphFactory;
+import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseVertex;
 
 import com.vividsolutions.jts.geom.Point;
 
@@ -67,10 +75,15 @@ public class ErgmSimulator {
 		MatsimConfigReader creader = new MatsimConfigReader(config);
 		creader.parse(args[0]);
 		
-		Population2SpatialGraph reader = new Population2SpatialGraph(CRSUtils.getCRS(21781));
-		SpatialSparseGraph graph = reader.read(config.findParam("plans", "inputPlansFile"));
+//		Population2SpatialGraph reader = new Population2SpatialGraph(CRSUtils.getCRS(21781));
+//		SpatialSparseGraph graph = reader.read(config.findParam("plans", "inputPlansFile"));
+//		
 //		Population2SocialGraph reader = new Population2SocialGraph();
 //		SocialSparseGraph graph = reader.read(config.findParam("plans", "inputPlansFile"), CRSUtils.getCRS(21781));
+		Scenario scenario = new ScenarioImpl();
+		MatsimPopulationReader popReader = new MatsimPopulationReader(scenario);
+		popReader.readFile(config.findParam("plans", "inputPlansFile"));
+		Population population = scenario.getPopulation();
 		
 		long randomSeed = Long.parseLong(config.getParam("global", "randomSeed"));
 
@@ -96,18 +109,25 @@ public class ErgmSimulator {
 //		generator.generate(graph, p, randomSeed);
 //
 //		
-		Set<Point> points = new HashSet<Point>();
-		for(SpatialVertex vertex : graph.getVertices())
-			points.add(vertex.getPoint());
+//		Set<Point> points = new HashSet<Point>();
+//		for(SpatialVertex vertex : graph.getVertices())
+//			points.add(vertex.getPoint());
 		
-		SpatialSparseGraphFactory factory = new SpatialSparseVertexPool(points, graph.getCoordinateReferenceSysten());
-		SpatialSparseGraphBuilder builder = new SpatialSparseGraphBuilder(factory);
-		BarabasiAlbertGenerator<SpatialSparseGraph, SpatialSparseVertex, SpatialSparseEdge> generator = new BarabasiAlbertGenerator<SpatialSparseGraph, SpatialSparseVertex, SpatialSparseEdge>(builder);
-		graph = generator.generate(5, 5, points.size() - 5 , randomSeed);
+//		SpatialSparseGraphFactory factory = new SpatialSparseVertexPool(points, graph.getCoordinateReferenceSysten());
+//		SpatialSparseGraphBuilder builder = new SpatialSparseGraphBuilder(factory);
+//		BarabasiAlbertGenerator<SpatialSparseGraph, SpatialSparseVertex, SpatialSparseEdge> generator = new BarabasiAlbertGenerator<SpatialSparseGraph, SpatialSparseVertex, SpatialSparseEdge>(builder);
+//		graph = generator.generate(5, 5, points.size() - 5 , randomSeed);
+		
+		Set<Person> persons = new HashSet<Person>(population.getPersons().values());
+		SocialSparseGraphFactory factory = new SocialSparseVertexPool(persons, CRSUtils.getCRS(21781));
+		SocialSparseGraphBuilder builder = new SocialSparseGraphBuilder(factory);
+		BarabasiAlbertGenerator<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge> generator = new BarabasiAlbertGenerator<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge>(builder);
+		SocialSparseGraph graph = generator.generate(5, 5, persons.size() - 5 , randomSeed);
 		/*
 		 * convert graph to matrix
 		 */
-		AdjacencyMatrix<SpatialSparseVertex> y = new AdjacencyMatrix<SpatialSparseVertex>(graph);
+//		AdjacencyMatrix<SpatialSparseVertex> y = new AdjacencyMatrix<SpatialSparseVertex>(graph);
+		AdjacencyMatrix<SocialSparseVertex> y = new AdjacencyMatrix<SocialSparseVertex>(graph);
 		/*
 		 * setup ergm terms.
 		 */
@@ -137,18 +157,20 @@ public class ErgmSimulator {
 		/*
 		 * setup gibbs sampler.
 		 */
-		GibbsSampler sampler = new GibbsEdgeFlip(randomSeed);
+		GibbsEdgeSwitch sampler = new GibbsEdgeSwitch();
+//		GibbsSampler sampler = new GibbsEdgeFlip(randomSeed);
 //		GibbsSampler sampler = new GibbsSampler(randomSeed);
 		sampler.setInterval(1000000);
 		
-		DumpHandler handler = new DumpHandler(graph, builder, outputDir);
+//		DumpHandler handler = new DumpHandler(graph, builder, outputDir);
+		SamplerListener<SocialSparseVertex> handler = new playground.johannes.socialnetworks.graph.social.mcmc.DumpHandler(graph, builder, outputDir);
 //		handler.getAnalyzerTaks().addTask(new EdgeCostsTask(costFunction));
-		handler.setBurnin(burnin);
-		handler.setDumpInterval(sampleInterval);
-		handler.setLogInterval(logInterval);
-		handler.analyze(y, 0);
+		((DumpHandler) handler).setBurnin(burnin);
+		((DumpHandler) handler).setDumpInterval(sampleInterval);
+		((DumpHandler) handler).setLogInterval(logInterval);
+		((DumpHandler) handler).analyze(y, 0);
 		logger.info(String.format("Starting gibbs sampler. Burnin time: %1$s iterations.", burnin));
-		sampler.sample(y, ergm, handler);
+		sampler.sample(y, ergm, handler, new ConserveDegreeDistribution());
 		logger.info("Gibbs sampler terminated.");
 	}
 

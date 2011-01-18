@@ -39,12 +39,12 @@ public class GibbsEdgeSwitch extends GibbsEdgeFlip {
 	}
 
 	@Override
-	public <V extends Vertex> void sample(AdjacencyMatrix<V> y, GraphProbability d, SampleHandler<V> handler) {
+	public <V extends Vertex> void sample(AdjacencyMatrix<V> y, GraphProbability d, SamplerListener<V> handler) {
 		switchCondition = new DefaultSwitchCondition();
 		super.sample(y, d, handler);
 	}
 	
-	public <V extends Vertex> void sample(AdjacencyMatrix<V> y, GraphProbability d, SampleHandler<V> handler, EdgeSwitchCondition condition) {
+	public <V extends Vertex> void sample(AdjacencyMatrix<V> y, GraphProbability d, SamplerListener<V> handler, EdgeSwitchCondition condition) {
 		switchCondition = condition;
 		super.sample(y, d, handler);
 	}

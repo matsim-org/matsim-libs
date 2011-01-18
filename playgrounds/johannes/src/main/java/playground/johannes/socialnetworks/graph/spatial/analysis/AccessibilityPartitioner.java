@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.spatial.analysis;
 
+import gnu.trove.TDoubleDoubleHashMap;
 import gnu.trove.TDoubleObjectHashMap;
 import gnu.trove.TDoubleObjectIterator;
 import gnu.trove.TObjectDoubleHashMap;
@@ -32,12 +33,20 @@ import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.analysis.ModuleAnalyzerTask;
 import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
+import org.matsim.contrib.sna.math.DescriptivePiStatistics;
 import org.matsim.contrib.sna.math.Distribution;
 import org.matsim.contrib.sna.math.FixedBordersDiscretizer;
+import org.matsim.contrib.sna.math.FixedSampleSizeDiscretizer;
+import org.matsim.contrib.sna.math.Histogram;
+import org.matsim.contrib.sna.math.LinearDiscretizer;
+import org.matsim.contrib.sna.util.TXTWriter;
 
+import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
 import playground.johannes.socialnetworks.gis.SpatialCostFunction;
+import playground.johannes.socialnetworks.gis.WGS84DistanceCalculator;
 import playground.johannes.socialnetworks.graph.analysis.AttributePartition;
 import playground.johannes.socialnetworks.survey.ivt2009.analysis.ObservedAcceptanceProbability;
+import playground.johannes.socialnetworks.survey.ivt2009.graph.io.GraphReaderFacade;
 
 import com.vividsolutions.jts.geom.Point;
 
@@ -61,7 +70,7 @@ public class AccessibilityPartitioner extends ModuleAnalyzerTask<Accessibility> 
 		SpatialGraph graph = (SpatialGraph) g;
 		TObjectDoubleHashMap<SpatialVertex> values = module.values(graph.getVertices(), costFunction, opportunities);
 		
-		FixedBordersDiscretizer discretizer = new FixedBordersDiscretizer(new double[]{-10,3.5,4.0});
+		FixedBordersDiscretizer discretizer = new FixedBordersDiscretizer(new double[]{-10,5.5,10});
 		AttributePartition partitioner = new AttributePartition(discretizer);
 		
 		TDoubleObjectHashMap<Set<SpatialVertex>> partitions = partitioner.partition(values);
@@ -72,9 +81,12 @@ public class AccessibilityPartitioner extends ModuleAnalyzerTask<Accessibility> 
 			System.out.println(it.key() +": size=" + it.value().size());
 			
 			ObservedAcceptanceProbability acc = new ObservedAcceptanceProbability();
-			Distribution distr = acc.distribution((Set<? extends SpatialVertex>) it.value(), opportunities);
+			acc.setDistanceCalculator(new CartesianDistanceCalculator());
+			DescriptivePiStatistics distr = acc.distribution((Set<? extends SpatialVertex>) it.value(), opportunities);
 			try {
-				writeHistograms(distr, 1, false, "acc_a="+it.key());
+				TDoubleDoubleHashMap hist = Histogram.createHistogram(distr, FixedSampleSizeDiscretizer.create(distr.getValues(), 100));
+				TXTWriter.writeMap(hist, "d", "p_accept", getOutputDirectory() + "acc_a="+it.key()+".txt");
+//				writeHistograms(distr, 1, false, "acc_a="+it.key());
 			} catch (FileNotFoundException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -84,5 +96,7 @@ public class AccessibilityPartitioner extends ModuleAnalyzerTask<Accessibility> 
 			}
 		}
 	}
+	
+	
 
 }

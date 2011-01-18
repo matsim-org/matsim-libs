@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ErgmEdgeProba.java
+ * StandardAnalyzerTask.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,41 +17,49 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.graph.spatial.generators;
+package playground.johannes.socialnetworks.graph.analysis;
 
-import org.matsim.contrib.sna.graph.Vertex;
-import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
+import java.io.IOException;
+import java.util.Map;
 
-import playground.johannes.socialnetworks.graph.mcmc.ErgmTerm;
+import org.matsim.contrib.sna.graph.Graph;
+import org.matsim.contrib.sna.graph.analysis.AnalyzerTask;
+import org.matsim.contrib.sna.graph.analysis.ComponentsTask;
+import org.matsim.contrib.sna.graph.analysis.DegreeTask;
+import org.matsim.contrib.sna.graph.analysis.GraphAnalyzer;
+import org.matsim.contrib.sna.graph.analysis.GraphSizeTask;
+import org.matsim.contrib.sna.graph.analysis.TransitivityTask;
+import org.matsim.contrib.sna.graph.io.SparseGraphMLReader;
+
 
 /**
  * @author illenberger
- * 
+ *
  */
-public class ErgmEdgeProba extends ErgmTerm {
+public class TopologyAnalyzerTask extends AnalyzerTaskComposite {
 
-	private final EdgeProbabilityFunction probaFunction;
-
-	public ErgmEdgeProba(EdgeProbabilityFunction function) {
-		probaFunction = function;
+	public TopologyAnalyzerTask() {
+		addTask(new GraphSizeTask());
+		addTask(new DegreeTask());
+		addTask(new TransitivityTask());
+		addTask(new ComponentsTask());
 	}
 
-	@Override
-	public <V extends Vertex> double difference(AdjacencyMatrix<V> y, int i, int j, boolean yIj) {
-		double p = probaFunction.probability(i, j);
-
-		if(p == 0)
-			return Double.POSITIVE_INFINITY;
-		else if(Double.isInfinite(p))
-			return 0;
-		else {
-			return (1 - p) / p;
-//			if(Double.isNaN(r)) {
-//				System.err.println("NaN");
-//				return 0;
-//			} else
-//				return r;
-				
+	public static void main(String args[]) throws IOException {
+		SparseGraphMLReader reader = new SparseGraphMLReader();
+		Graph graph = reader.readGraph(args[0]);
+		String output = null;
+		if(args.length > 1) {
+			output = args[1];
 		}
+		
+		AnalyzerTask task = new TopologyAnalyzerTask();
+		if(output != null)
+			task.setOutputDirectoy(output);
+		
+		Map<String, Double> stats = GraphAnalyzer.analyze(graph, task);
+		
+		if(output != null)
+			GraphAnalyzer.writeStats(stats, output + "/stats.txt");
 	}
 }

@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * EdgePowerLawDistance.java
+ * ErgmLnDistance.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -22,6 +22,7 @@ package playground.johannes.socialnetworks.graph.spatial.generators;
 import gnu.trove.TIntDoubleHashMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
 import org.matsim.contrib.sna.math.Discretizer;
@@ -29,69 +30,54 @@ import org.matsim.contrib.sna.math.LinearDiscretizer;
 
 import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
 import playground.johannes.socialnetworks.gis.DistanceCalculator;
+import playground.johannes.socialnetworks.graph.mcmc.ErgmTerm;
+
+import com.vividsolutions.jts.geom.Point;
 
 /**
  * @author illenberger
  *
  */
-public class EdgePowerLawDistance implements EdgeProbabilityFunction {
-	
-	private static final Logger logger = Logger.getLogger(EdgePowerLawDistance.class);
+public class ErgmLnDistance extends ErgmTerm {
 
-	private AdjacencyMatrix<? extends SpatialVertex> y;
+	private static final Logger logger = Logger.getLogger(ErgmLnDistance.class);
 	
-	private DistanceCalculator distanceCalculator;
+	private Discretizer discretizer = new LinearDiscretizer(500.0);
 	
-	private Discretizer discretizer;
+	private DistanceCalculator distanceCalculator = new CartesianDistanceCalculator();
 	
-//	private double konst;
+	private TIntDoubleHashMap konstants;
 	
-	private TIntDoubleHashMap konsts = new TIntDoubleHashMap();
-	
-	private final double gamma;
-	
-	public EdgePowerLawDistance(AdjacencyMatrix<? extends SpatialVertex> y, double gamma, double mExpect) {
-		this.y = y;
-		this.gamma = gamma;
-		discretizer = new LinearDiscretizer(500.0);
-		distanceCalculator = new CartesianDistanceCalculator();
-//		
-//		konst = 1;
-//		double sum = 0;
-//		for(int i = 0; i < y.getVertexCount(); i++) {
-//			for(int j = i+1; j < y.getVertexCount(); j++) {
-//				sum += probability(i, j);
-//			}
-//		}
-//		
-//		konst = mExpect/sum;
-//		konst = 1;
+	public ErgmLnDistance(AdjacencyMatrix<? extends SpatialVertex> y, double theta) {
+		this.setTheta(theta);
 		
 		logger.info("Calculating norm constants...");
+		konstants = new TIntDoubleHashMap();
 		for(int i = 0; i < y.getVertexCount(); i++) {
 			double sum = 0;
 			for(int j = 0; j < y.getVertexCount(); j++) {
 				double d = distanceCalculator.distance(y.getVertex(i).getPoint(), y.getVertex(j).getPoint());
 				d = discretizer.index(d);
 				d = Math.max(1.0, d);
-				sum += Math.pow(d, gamma);
+				sum += Math.pow(d, theta);
 			}
 			if(Double.isInfinite(sum))
 				logger.warn("Infinity");
 			else if(Double.isNaN(sum))
 				logger.warn("NaN");
 			
-			konsts.put(i, 1/sum);
+			konstants.put(i, 1/sum);
 		}
 	}
 	
 	@Override
-	public double probability(int i, int j) {
-		double d = distanceCalculator.distance(y.getVertex(i).getPoint(), y.getVertex(j).getPoint());
+	public <V extends Vertex> double difference(AdjacencyMatrix<V> y, int i, int j, boolean yIj) {
+		Point p1 = ((SpatialVertex) y.getVertex(i)).getPoint();
+		Point p2 = ((SpatialVertex) y.getVertex(j)).getPoint();
+		double d = distanceCalculator.distance(p1, p2);
 		d = discretizer.index(d);
-//		d = Math.max(1.0, d);
-		
-		return konsts.get(i) * Math.pow(d, gamma);
+
+		return Math.pow(d, -getTheta()) * 1/konstants.get(i);
 	}
 
 }

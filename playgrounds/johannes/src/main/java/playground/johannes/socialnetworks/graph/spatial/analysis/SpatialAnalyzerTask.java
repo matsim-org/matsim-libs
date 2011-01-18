@@ -27,26 +27,18 @@ import org.matsim.contrib.sna.graph.analysis.GraphAnalyzer;
 import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
 import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphMLReader;
 
-import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
-import playground.johannes.socialnetworks.graph.spatial.generators.GravityEdgeCostFunction;
+import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
 
 /**
  * @author illenberger
  *
  */
-public class StandardAnalyzerTask extends playground.johannes.socialnetworks.graph.analysis.StandardAnalyzerTask {
+public class SpatialAnalyzerTask extends AnalyzerTaskComposite {
 
-	public StandardAnalyzerTask() {
-//		super();
-//		addTask(new DistanceTask());
-		AcceptanceProbabilityTask acc = new AcceptanceProbabilityTask();
-//		AcceptanceProbability p = new AcceptanceProbability();
-//		p.setDistanceCalculator(new CartesianDistanceCalculator());
-		acc.setDistanceCalculator(new CartesianDistanceCalculator());
-		addTask(acc);
-		addTask(new EdgeCostsTask(new GravityEdgeCostFunction(1.6, 1, new CartesianDistanceCalculator())));
-		
+	public SpatialAnalyzerTask() {
+		addTask(new DistanceTask());
 	}
+
 	/**
 	 * @param args
 	 * @throws IOException 
@@ -60,7 +52,7 @@ public class StandardAnalyzerTask extends playground.johannes.socialnetworks.gra
 			output = args[1];
 		}
 		
-		AnalyzerTask task = new StandardAnalyzerTask();
+		AnalyzerTask task = new SpatialAnalyzerTask();
 		if(output != null)
 			task.setOutputDirectoy(output);
 		

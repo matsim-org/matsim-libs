@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ErgmTriangles.java
+ * AgeCorrelation.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,30 +17,32 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
-/**
- * 
- */
-package playground.johannes.socialnetworks.graph.mcmc;
+package playground.johannes.socialnetworks.graph.social.mcmc;
 
 import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
 
-
+import playground.johannes.socialnetworks.graph.mcmc.ErgmTerm;
+import playground.johannes.socialnetworks.graph.social.SocialVertex;
 
 /**
  * @author illenberger
  *
  */
-public class ErgmTriangles extends ErgmTerm implements GraphProbability {
-	
-	public ErgmTriangles(double theta) {
+public class ErgmAge extends ErgmTerm {
+
+	public ErgmAge(double theta) {
 		setTheta(theta);
 	}
 	
 	@Override
-	public <V extends Vertex> double difference(AdjacencyMatrix<V> m, int i, int j, boolean y_ij) {
-		return Math.exp(- getTheta() * m.getCommonNeighbors(i, j));
+	public <V extends Vertex> double difference(AdjacencyMatrix<V> y, int i, int j, boolean yIj) {
+		int a1 = ((SocialVertex) y.getVertex(i)).getPerson().getAge();
+		int a2 = ((SocialVertex) y.getVertex(j)).getPerson().getAge();
+		
+		if(a1 > 0)
+			return Math.exp(- getTheta() * Math.abs((a2 - a1)/(double)a1));
+		else
+			return 0;
 	}
-
 }

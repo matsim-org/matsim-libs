@@ -40,7 +40,7 @@ import org.matsim.contrib.sna.math.Distribution;
 import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
 import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
 import playground.johannes.socialnetworks.graph.mcmc.AdjacencyMatrixStatistics;
-import playground.johannes.socialnetworks.graph.mcmc.SampleHandler;
+import playground.johannes.socialnetworks.graph.mcmc.SamplerListener;
 import playground.johannes.socialnetworks.graph.social.analysis.AgeTask;
 import playground.johannes.socialnetworks.graph.social.io.SocialGraphMLWriter;
 import playground.johannes.socialnetworks.graph.spatial.analysis.AcceptanceProbabilityTask;
@@ -54,7 +54,7 @@ import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseVerte
  * @author illenberger
  *
  */
-public class DumpHandler implements SampleHandler<SocialSparseVertex> {
+public class DumpHandler implements SamplerListener<SocialSparseVertex> {
 
 	private static final Logger logger = Logger.getLogger(DumpHandler.class);
 	
@@ -140,7 +140,7 @@ public class DumpHandler implements SampleHandler<SocialSparseVertex> {
 		this.logInterval = logInterval;
 	}
 
-	public boolean handle(AdjacencyMatrix<SocialSparseVertex> y, long iteration) {
+	public boolean afterSampling(AdjacencyMatrix<SocialSparseVertex> y, long iteration) {
 		if(iteration % logInterval == 0) {
 			log(y, iteration);
 		}

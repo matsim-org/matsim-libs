@@ -22,6 +22,7 @@ package playground.johannes.socialnetworks.survey.ivt2009.analysis;
 import java.util.Set;
 
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
+import org.matsim.contrib.sna.math.DescriptivePiStatistics;
 import org.matsim.contrib.sna.math.Distribution;
 import org.matsim.contrib.sna.snowball.SampledVertex;
 import org.matsim.contrib.sna.snowball.analysis.SnowballPartitions;
@@ -46,7 +47,7 @@ public class ObservedAcceptanceProbability extends AcceptanceProbability {
 	
 	@SuppressWarnings("unchecked")
 	@Override
-	public Distribution distribution(Set<? extends SpatialVertex> vertices, Set<Point> choiceSet) {
+	public DescriptivePiStatistics distribution(Set<? extends SpatialVertex> vertices, Set<Point> choiceSet) {
 		return super.distribution((Set<? extends SpatialVertex>) SnowballPartitions.createSampledPartition((Set<? extends SampledVertex>)vertices), choiceSet);
 	}
 

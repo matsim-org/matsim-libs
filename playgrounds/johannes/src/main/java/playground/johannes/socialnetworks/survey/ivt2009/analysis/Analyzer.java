@@ -83,10 +83,10 @@ public class Analyzer {
 		zones.overwriteCRS(CRSUtils.getCRS(21781));
 		
 		Set<Point> choiceSet = new HashSet<Point>();
-		SpatialSparseGraph graph2 = new Population2SpatialGraph(CRSUtils.getCRS(21781)).read("/Users/jillenberger/Work/socialnets/data/schweiz/complete/plans/plans.0.001.xml");
+		SpatialSparseGraph graph2 = new Population2SpatialGraph(CRSUtils.getCRS(21781)).read("/Users/jillenberger/Work/socialnets/data/schweiz/complete/plans/plans.0.005.xml");
 		
-//		graph.getDelegate().transformToCRS(CRSUtils.getCRS(21781));
-		graph2.transformToCRS(CRSUtils.getCRS(4326));
+		graph.getDelegate().transformToCRS(CRSUtils.getCRS(21781));
+//		graph2.transformToCRS(CRSUtils.getCRS(4326));
 		for(SpatialVertex v : graph2.getVertices()) {	
 			choiceSet.add(v.getPoint());
 		}

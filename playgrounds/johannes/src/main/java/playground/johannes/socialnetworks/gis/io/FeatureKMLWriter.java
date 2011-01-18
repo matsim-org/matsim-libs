@@ -69,6 +69,14 @@ public class FeatureKMLWriter {
 	
 	private MathTransform transform;
 
+	public Colorizable getColorizable() {
+		return colorizable;
+	}
+
+	public void setColorizable(Colorizable colorizable) {
+		this.colorizable = colorizable;
+	}
+
 	public void write(Set<Geometry> features, String filename) {
 		CoordinateReferenceSystem sourceCRS = CRSUtils.getCRS(features.iterator().next().getSRID());
 		try {
@@ -208,13 +216,13 @@ public class FeatureKMLWriter {
 	}
 
 	public static void main(String args[]) throws IOException {
-		ZoneLayer zoneLayer = ZoneLayerSHP.read("/Users/jillenberger/Work/socialnets/data/schweiz/complete/zones/G1G08.shp");
+		ZoneLayer<Object> zoneLayer = ZoneLayerSHP.read("/Users/jillenberger/Work/socialnets/data/schweiz/complete/zones/G1G08.shp");
 		zoneLayer.overwriteCRS(CRSUtils.getCRS(21781));
 		
 		FeatureKMLWriter writer = new FeatureKMLWriter();
 		
 		Set<Geometry> features = new HashSet<Geometry>();
-		for(Zone zone : zoneLayer.getZones()) {
+		for(Zone<?> zone : zoneLayer.getZones()) {
 			features.add(zone.getGeometry());
 		}
 		writer.write(features, "/Users/jillenberger/Work/socialnets/data/schweiz/complete/zones/G1G08.kmz");

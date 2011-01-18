@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * StandardAnalyzerTask.java
+ * ErgmPrefAttachment.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,47 +17,26 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.graph.analysis;
+package playground.johannes.socialnetworks.graph.mcmc;
 
-import java.io.IOException;
-import java.util.Map;
-
-import org.matsim.contrib.sna.graph.Graph;
-import org.matsim.contrib.sna.graph.analysis.AnalyzerTask;
-import org.matsim.contrib.sna.graph.analysis.DegreeTask;
-import org.matsim.contrib.sna.graph.analysis.GraphAnalyzer;
-import org.matsim.contrib.sna.graph.analysis.GraphSizeTask;
-import org.matsim.contrib.sna.graph.analysis.TransitivityTask;
-import org.matsim.contrib.sna.graph.io.SparseGraphMLReader;
-
+import org.matsim.contrib.sna.graph.Vertex;
+import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
 
 /**
  * @author illenberger
  *
  */
-public class StandardAnalyzerTask extends AnalyzerTaskComposite {
+public class ErgmPrefAttachment implements GraphProbability {
 
-	public StandardAnalyzerTask() {
-		addTask(new GraphSizeTask());
-		addTask(new DegreeTask());
-		addTask(new TransitivityTask());
+	@Override
+	public <V extends Vertex> double difference(AdjacencyMatrix<V> y, int i, int j, boolean yIj) {
+		int k_minus = y.getNeighborCount(j);
+		if(yIj)
+			k_minus--;
+		
+		int k_plus = k_minus + 1;
+		
+		return Math.exp(-k_minus + k_plus);
 	}
 
-	public static void main(String args[]) throws IOException {
-		SparseGraphMLReader reader = new SparseGraphMLReader();
-		Graph graph = reader.readGraph(args[0]);
-		String output = null;
-		if(args.length > 1) {
-			output = args[1];
-		}
-		
-		AnalyzerTask task = new StandardAnalyzerTask();
-		if(output != null)
-			task.setOutputDirectoy(output);
-		
-		Map<String, Double> stats = GraphAnalyzer.analyze(graph, task);
-		
-		if(output != null)
-			GraphAnalyzer.writeStats(stats, output + "/stats.txt");
-	}
 }

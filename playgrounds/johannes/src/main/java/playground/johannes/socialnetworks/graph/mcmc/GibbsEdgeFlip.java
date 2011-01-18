@@ -45,13 +45,13 @@ public class GibbsEdgeFlip extends GibbsSampler {
 		super(seed);
 	}
 
-	public <V extends Vertex> void sample(AdjacencyMatrix<V> y, GraphProbability d, SampleHandler<V> handler, EdgeSwitchCondition condition) {
+	public <V extends Vertex> void sample(AdjacencyMatrix<V> y, GraphProbability d, SamplerListener<V> handler, EdgeSwitchCondition condition) {
 		switchCondition = condition;
 		sample(y, d, handler);
 	}
 	
 	@Override
-	public <V extends Vertex> void sample(AdjacencyMatrix<V> y, GraphProbability d, SampleHandler<V> handler) {
+	public <V extends Vertex> void sample(AdjacencyMatrix<V> y, GraphProbability d, SamplerListener<V> handler) {
 		if(switchCondition == null)
 			switchCondition = new GibbsEdgeSwitch.DefaultSwitchCondition();
 		

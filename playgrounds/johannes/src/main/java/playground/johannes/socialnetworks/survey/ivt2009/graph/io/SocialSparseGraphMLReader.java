@@ -70,8 +70,13 @@ public class SocialSparseGraphMLReader
 	protected SocialSparseEdge addEdge(SocialSparseVertex v1, SocialSparseVertex v2, Attributes attrs) {
 		SocialSparseEdge edge = builder.addEdge(getGraph(), v1, v2);
 		
-		edge.setFrequency(Double.parseDouble(attrs.getValue(SocialSparseGraphML.FREQUENCY_ATTR)));
-		edge.setType(attrs.getValue(SocialSparseGraphML.EDGE_TYPE_ATTR));
+		String val = attrs.getValue(SocialSparseGraphML.FREQUENCY_ATTR);
+		if(val != null)
+			edge.setFrequency(Double.parseDouble(val));
+		
+		val = attrs.getValue(SocialSparseGraphML.EDGE_TYPE_ATTR);
+		if(val != null)
+			edge.setType(val);
 		
 		return edge;
 	}

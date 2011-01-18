@@ -42,6 +42,7 @@ import org.matsim.contrib.sna.snowball.analysis.ObservedDegree;
 import org.matsim.contrib.sna.snowball.analysis.ObservedTransitivity;
 import org.matsim.contrib.sna.snowball.analysis.PiEstimator;
 import org.matsim.contrib.sna.snowball.analysis.SimplePiEstimator;
+import org.matsim.contrib.sna.snowball.sim.IntervalSampleAnalyzer;
 import org.matsim.contrib.sna.snowball.sim.IterationSampleAnalyzer;
 import org.matsim.contrib.sna.snowball.sim.Sampler;
 import org.matsim.contrib.sna.snowball.sim.SamplerListenerComposite;
@@ -109,7 +110,7 @@ public class Loader {
 		 * Init sample analyzers.
 		 */
 //		final int interval = Integer.parseInt(config.getParam(MODULENAME, "interval"));
-//		IntervalSampleAnalyzer intervalAnalyzer = new IntervalSampleAnalyzer(analyzers, estimatorSet, output);
+		IntervalSampleAnalyzer intervalAnalyzer = new IntervalSampleAnalyzer(analyzers, estimators, output);
 		IterationSampleAnalyzer iterationAnalyzer = new IterationSampleAnalyzer(analyzers, estimators, output);
 //		FinalSampleAnalyzer completeAnalyzer = new FinalSampleAnalyzer(analyzers, estimatorSet, output);
 //		ConnectionSampleAnalyzer connectionAnalyzer = new ConnectionSampleAnalyzer(numSeeds, analyzers, output);
@@ -128,7 +129,7 @@ public class Loader {
 		/*
 		 * Add analyzers to listener.
 		 */
-//		listeners.addComponent(intervalAnalyzer);
+		listeners.addComponent(intervalAnalyzer);
 		listeners.addComponent(iterationAnalyzer);
 //		listeners.addComponent(completeAnalyzer);
 //		listeners.addComponent(connectionAnalyzer);
@@ -175,13 +176,13 @@ public class Loader {
 		
 		tasks.addTask(new ResponseRateTask());
 		
-		analyzers.put("obs", tasks);
+//		analyzers.put("obs", tasks);
 		/*
 		 * observed 2
 		 */
 		tasks = new AnalyzerTaskComposite();
 		tasks.addTask(new TransitivityTask());
-		analyzers.put("obs2", tasks);
+//		analyzers.put("obs2", tasks);
 		/*
 		 * estimated
 		 */
@@ -189,7 +190,7 @@ public class Loader {
 		analyzers.put("wsm", createDefaultEstimAnalyzer(estimator, wsmFactory));
 		
 		DescriptivePiStatisticsFactory htFactory = new HTStatsFactory(graph.getVertices().size());
-		analyzers.put("ht", createDefaultEstimAnalyzer(estimator, htFactory));
+//		analyzers.put("ht", createDefaultEstimAnalyzer(estimator, htFactory));
 		/*
 		 * estimated transitivity without edge estim
 		 */
@@ -199,7 +200,7 @@ public class Loader {
 		trans.enableCaching(false);
 		estimTransitivity.setModule(trans);
 		tasks.addTask(estimTransitivity);
-		analyzers.put("transNoEdgeWSM", tasks);
+//		analyzers.put("transNoEdgeWSM", tasks);
 		/*
 		 * estimated transitivity without edge estim
 		 */
@@ -209,7 +210,7 @@ public class Loader {
 		trans.enableCaching(false);
 		estimTransitivity.setModule(trans);
 		tasks.addTask(estimTransitivity);
-		analyzers.put("transNoEdgeHT", tasks);
+//		analyzers.put("transNoEdgeHT", tasks);
 		
 		return analyzers;
 	}

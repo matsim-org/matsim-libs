@@ -104,12 +104,12 @@ public class ZoneLayerSHP {
 	 * @return a zone layer initialized with the features read from the shape file.
 	 * @throws IOException
 	 */
-	public static ZoneLayer read(String filename) throws IOException {
-		Set<Zone> zones = new HashSet<Zone>();
+	public static <T> ZoneLayer<T> read(String filename) throws IOException {
+		Set<Zone<T>> zones = new HashSet<Zone<T>>();
 		for(Feature feature : FeatureSHP.readFeatures(filename)) {
-			zones.add(new Zone(feature.getDefaultGeometry()));
+			zones.add(new Zone<T>(feature.getDefaultGeometry()));
 		}
 		
-		return new ZoneLayer(zones);
+		return new ZoneLayer<T>(zones);
 	}
 }

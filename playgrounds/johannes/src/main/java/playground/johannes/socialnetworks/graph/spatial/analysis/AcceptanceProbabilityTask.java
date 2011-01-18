@@ -19,16 +19,21 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.spatial.analysis;
 
+import gnu.trove.TDoubleDoubleHashMap;
+
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.graph.analysis.ModuleAnalyzerTask;
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
-import org.matsim.contrib.sna.math.Distribution;
+import org.matsim.contrib.sna.math.Histogram;
+import org.matsim.contrib.sna.math.LinearDiscretizer;
+import org.matsim.contrib.sna.util.TXTWriter;
 
 import playground.johannes.socialnetworks.gis.DistanceCalculator;
 
@@ -70,9 +75,11 @@ public class AcceptanceProbabilityTask extends ModuleAnalyzerTask<AcceptanceProb
 					choiceSet.add(((SpatialVertex) vertex).getPoint());
 			}
 			
-			Distribution distr = module.distribution((Set<? extends SpatialVertex>) graph.getVertices(), choiceSet);
+			DescriptiveStatistics distr = module.distribution((Set<? extends SpatialVertex>) graph.getVertices(), choiceSet);
 			try {
-				writeHistograms(distr, 1000, true, "p_accept");
+				TDoubleDoubleHashMap hist = Histogram.createHistogram(distr, new LinearDiscretizer(1000.0));
+				TXTWriter.writeMap(hist, "d", "p", String.format("%1$s/p_accept.txt", getOutputDirectory()));
+//				writeHistograms(distr, 1000, true, "p_accept");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

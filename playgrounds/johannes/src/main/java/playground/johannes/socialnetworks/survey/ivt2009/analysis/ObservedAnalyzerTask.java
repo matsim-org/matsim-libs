@@ -26,17 +26,17 @@ import org.matsim.contrib.sna.gis.ZoneLayer;
 import org.matsim.contrib.sna.math.LinearDiscretizer;
 import org.matsim.contrib.sna.snowball.analysis.ObservedDegree;
 
+import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
 import playground.johannes.socialnetworks.gis.GravityCostFunction;
 import playground.johannes.socialnetworks.gis.SpatialCostFunction;
-import playground.johannes.socialnetworks.gis.WGS84DistanceCalculator;
 import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
 import playground.johannes.socialnetworks.graph.social.analysis.AgeTask;
 import playground.johannes.socialnetworks.graph.spatial.analysis.AcceptFactorTask;
-import playground.johannes.socialnetworks.graph.spatial.analysis.DistanceTask;
+import playground.johannes.socialnetworks.graph.spatial.analysis.AccessibilityPartitioner;
+import playground.johannes.socialnetworks.graph.spatial.analysis.AccessibilityTask;
 import playground.johannes.socialnetworks.graph.spatial.analysis.SpatialPropertyAccessibilityTask;
 import playground.johannes.socialnetworks.graph.spatial.analysis.SpatialPropertyDegreeTask;
 import playground.johannes.socialnetworks.snowball2.social.analysis.ObservedAge;
-import playground.johannes.socialnetworks.snowball2.spatial.analysis.ObservedDistance;
 
 import com.vividsolutions.jts.geom.Point;
 
@@ -58,7 +58,7 @@ public class ObservedAnalyzerTask extends AnalyzerTaskComposite {
 		age.setModule(new ObservedAge());
 		addTask(age);
 		
-		SpatialCostFunction costFunction = new GravityCostFunction(1.6, 0, new WGS84DistanceCalculator());
+		SpatialCostFunction costFunction = new GravityCostFunction(1.6, 0, new CartesianDistanceCalculator());
 //		Accessibility accessibility = new Accessibility(costFunction, choiceSet);
 		SpatialPropertyDegreeTask spxkTask = new SpatialPropertyDegreeTask(costFunction, choiceSet);
 		spxkTask.setModule(new ObservedDegree());
@@ -76,7 +76,7 @@ public class ObservedAnalyzerTask extends AnalyzerTaskComposite {
 		addTask(xkTask);
 		
 
-		
+		addTask(new AcceptFactorTask(choiceSet));
 //		EdgeCostsTask costs = new EdgeCostsTask(null);
 //		costs.setModule(new ObservedEdgeCosts(new GravityEdgeCostFunction(1.6, 0.0)));
 //		addTask(costs);

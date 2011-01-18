@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SampleHandler.java
+ * ConserveDegreeDistribution.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -19,15 +19,25 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.mcmc;
 
-import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
 
 /**
  * @author illenberger
  *
  */
-public interface SampleHandler<V extends Vertex> {
+public class ConserveDegreeDistribution implements EdgeSwitchCondition {
 
-	public boolean handle(AdjacencyMatrix<V> y, long iteration);
-	
+	@Override
+	public boolean allowSwitch(AdjacencyMatrix<?> y, int i, int j, int u, int v) {
+		int k_i = y.getNeighborCount(i);
+		int k_j = y.getNeighborCount(j);
+		int k_u = y.getNeighborCount(u) + 1;
+		int k_v = y.getNeighborCount(v) + 1;
+		
+		boolean cond1 = k_i == k_u && k_j == k_v;
+		boolean cond2 = k_j == k_u && k_i == k_v;
+		
+		return cond1 || cond2;
+	}
+
 }

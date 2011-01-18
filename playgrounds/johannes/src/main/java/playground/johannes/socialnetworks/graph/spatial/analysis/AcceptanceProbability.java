@@ -20,12 +20,16 @@
 package playground.johannes.socialnetworks.graph.spatial.analysis;
 
 import gnu.trove.TDoubleDoubleHashMap;
+import gnu.trove.TObjectDoubleHashMap;
 
 import java.util.HashSet;
 import java.util.Set;
 
+import org.matsim.contrib.sna.graph.Vertex;
+import org.matsim.contrib.sna.graph.analysis.VertexProperty;
 import org.matsim.contrib.sna.graph.spatial.SpatialEdge;
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
+import org.matsim.contrib.sna.math.DescriptivePiStatistics;
 import org.matsim.contrib.sna.math.Discretizer;
 import org.matsim.contrib.sna.math.Distribution;
 import org.matsim.contrib.sna.math.LinearDiscretizer;
@@ -50,7 +54,7 @@ public class AcceptanceProbability {
 		this.distanceCalculator = calculator;
 	}
 
-	public Distribution distribution(Set<? extends SpatialVertex> vertices, Set<Point> choiceSet) {
+	public DescriptivePiStatistics distribution(Set<? extends SpatialVertex> vertices, Set<Point> choiceSet) {
 		// CoordinateReferenceSystem crs =
 		// CRSUtils.getCRS(21781);//DefaultEngineeringCRS.CARTESIAN_2D; FIXME
 
@@ -61,7 +65,7 @@ public class AcceptanceProbability {
 //			throw new RuntimeException(
 //					"Vertices and points of choice set do not have the same coordinate reference system.");
 
-		Distribution distribution = new Distribution();
+		DescriptivePiStatistics distribution = new DescriptivePiStatistics();
 		Set<SpatialEdge> touched = new HashSet<SpatialEdge>();
 
 		// try {
@@ -120,10 +124,10 @@ public class AcceptanceProbability {
 					if (p1 != null && neighbor.getPoint() != null) {
 						double d = distanceCalculator.distance(p1, neighbor.getPoint());
 						if(d > 0) {
-							d = discretizer.discretize(d);
-							double n = n_d.get(d);
+//							d = discretizer.discretize(d);
+							double n = n_d.get(discretizer.discretize(d));
 							if (n > 0)
-								distribution.add(d, 1 / n);
+								distribution.addValue(d, n);
 						}
 					}
 				}

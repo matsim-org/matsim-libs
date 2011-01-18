@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ErgmEdgeProba.java
+ * RemoveNoCoordinates.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,41 +17,50 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.graph.spatial.generators;
+package playground.johannes.socialnetworks.survey.ivt2009.analysis;
 
-import org.matsim.contrib.sna.graph.Vertex;
-import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
+import java.util.HashSet;
+import java.util.Set;
 
-import playground.johannes.socialnetworks.graph.mcmc.ErgmTerm;
+import org.matsim.contrib.sna.graph.GraphBuilder;
+import org.matsim.contrib.sna.graph.spatial.SpatialEdge;
+import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
+import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
+
+import playground.johannes.socialnetworks.graph.analysis.GraphFilter;
 
 /**
  * @author illenberger
- * 
+ *
  */
-public class ErgmEdgeProba extends ErgmTerm {
+public class RemoveNoCoordinates implements GraphFilter<SpatialGraph> {
 
-	private final EdgeProbabilityFunction probaFunction;
-
-	public ErgmEdgeProba(EdgeProbabilityFunction function) {
-		probaFunction = function;
+	private GraphBuilder<SpatialGraph, SpatialVertex, SpatialEdge> builder;
+	
+	public RemoveNoCoordinates(GraphBuilder<? extends SpatialGraph, ? extends SpatialVertex, ? extends SpatialEdge> builder) {
+		this.builder = (GraphBuilder<SpatialGraph, SpatialVertex, SpatialEdge>) builder;
 	}
-
+	
 	@Override
-	public <V extends Vertex> double difference(AdjacencyMatrix<V> y, int i, int j, boolean yIj) {
-		double p = probaFunction.probability(i, j);
-
-		if(p == 0)
-			return Double.POSITIVE_INFINITY;
-		else if(Double.isInfinite(p))
-			return 0;
-		else {
-			return (1 - p) / p;
-//			if(Double.isNaN(r)) {
-//				System.err.println("NaN");
-//				return 0;
-//			} else
-//				return r;
-				
+	public SpatialGraph apply(SpatialGraph graph) {
+		Set<SpatialVertex> vertices = new HashSet<SpatialVertex>();
+		Set<SpatialEdge> edges = new HashSet<SpatialEdge>();
+		
+		for(SpatialVertex vertex : graph.getVertices()) {
+			if(vertex.getPoint() == null) {
+				vertices.add(vertex);
+				edges.addAll(vertex.getEdges());
+			}
 		}
+		
+		for(SpatialEdge edge : edges) {
+			builder.removeEdge(graph, edge);
+		}
+		
+		for(SpatialVertex vertex : vertices)
+			builder.removeVertex(graph, vertex);
+		
+		return graph;
 	}
+
 }
