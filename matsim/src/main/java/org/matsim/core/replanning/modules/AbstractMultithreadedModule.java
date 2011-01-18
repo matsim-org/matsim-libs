@@ -168,7 +168,7 @@ abstract public class AbstractMultithreadedModule implements PlanStrategyModule 
 
 	}
 
-	private class PlanAlgoThread implements Runnable {
+	private static class PlanAlgoThread implements Runnable {
 
 		private final PlanAlgorithm planAlgo;
 		private final List<Plan> plans = new LinkedList<Plan>();
