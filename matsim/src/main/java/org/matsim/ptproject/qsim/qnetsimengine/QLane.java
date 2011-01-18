@@ -166,6 +166,7 @@ public final class QLane extends VisLane implements SignalizeableItem {
 	}
 	
 	/*package*/ void finishInitialization() {
+		//do some indexing
 		if (this.toLanes != null){
 			this.toLinkToQLanesMap = new HashMap<Id, List<QLane>>(this.getDestinationLinkIds().size());
 			for (QLane toLane : this.toLanes){
