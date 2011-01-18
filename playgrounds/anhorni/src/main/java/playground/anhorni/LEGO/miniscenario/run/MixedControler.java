@@ -39,7 +39,7 @@ public class MixedControler extends Controler {
     public static void main (final String[] args) { 
     	MixedControler controler = new MixedControler(args);
     	controler.setOverwriteFiles(true);
-    	controler.setWriteEventsInterval(250);
+    	//controler.setWriteEventsInterval(250);
     	controler.run();
     }
     
