@@ -21,6 +21,7 @@ package org.matsim.api.core.v01;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.experimental.IdFactory;
 import org.matsim.core.config.Config;
 
 
@@ -35,15 +36,13 @@ import org.matsim.core.config.Config;
  *
  * @author dgrether
  */
-public interface Scenario {
+public interface Scenario extends IdFactory {
 
 	public Network getNetwork();
 
 	public Population getPopulation() ;
 
 	public Config getConfig();
-
-	public Id createId(String string);
 
 	public Coord createCoord(double x, double y);
 
