@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * RunEquil.java
+ * AllTests.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,20 +18,20 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jjoubert.TemporaryCode;
+package playground.jjoubert.roadpricing.analysis;
 
-import org.matsim.core.controler.Controler;
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
-public class RunEquil {
 
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		Controler c = new Controler(args[0]	);
-		c.setCreateGraphs(false);
-		c.setOverwriteFiles(true);
-		c.run();
+public class AllTests {
+	
+	public static Test suite(){
+		TestSuite suite = new TestSuite("All tests for playground.jjoubert.roadpricing.analysis");
+		
+		suite.addTestSuite(MyGantryComparatorTest.class);
+		
+		return suite;
 	}
 
 }

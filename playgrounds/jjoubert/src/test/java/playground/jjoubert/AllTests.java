@@ -33,6 +33,7 @@ public class AllTests {
 		suite.addTest(playground.jjoubert.CommercialDemandGeneration.AllTests.suite());
 		suite.addTest(playground.jjoubert.CommercialTraffic.AllTests.suite());
 		suite.addTest(playground.jjoubert.Utilities.AllTests.suite());
+		suite.addTest(playground.jjoubert.roadpricing.AllTests.suite());
 		
 		return suite;
 	}
