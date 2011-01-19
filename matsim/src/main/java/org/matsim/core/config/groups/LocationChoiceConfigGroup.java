@@ -50,7 +50,7 @@ public class LocationChoiceConfigGroup extends Module {
 	private static final String TT_APPROX_LEVEL = "tt_approximationLevel";
 	private static final String TT = "travelTimes";
 	private static final String SEARCHSPACEBETA = "searchSpaceBeta";
-	private static final String MAXRADIUS = "maxSearchSpaceRadius";
+	private static final String MAXDISTANCEEPSILON = "maxDistanceEpsilon";
 	private static final String PLANSELECTOR = "planSelector";
 
 	//default values
@@ -71,7 +71,7 @@ public class LocationChoiceConfigGroup extends Module {
 	private String tt_approximationLevel = "0";
 	private String travelTimes = "true";
 	private String searchSpaceBeta = "0.0001";
-	private String maxSearchSpaceRadius = "-1.0";
+	private String maxDistanceEpsilon = "-1.0";
 	private String planSelector = "SelectExpBeta";
 
 	private final static Logger log = Logger.getLogger(LocationChoiceConfigGroup.class);
@@ -131,8 +131,8 @@ public class LocationChoiceConfigGroup extends Module {
 		if (SEARCHSPACEBETA.equals(key)) {
 			return getSearchSpaceBeta();
 		}
-		if (MAXRADIUS.equals(key)) {
-			return getMaxSearchSpaceRadius();
+		if (MAXDISTANCEEPSILON.equals(key)) {
+			return getMaxDistanceEpsilon();
 		}
 		if (PLANSELECTOR.equals(key)) {
 			return getPlanSelector();
@@ -251,8 +251,8 @@ public class LocationChoiceConfigGroup extends Module {
 			else {
 				setSearchSpaceBeta(value);
 			}
-		} else if (MAXRADIUS.equals(key)) {
-			setMaxSearchSpaceRadius(value);
+		} else if (MAXDISTANCEEPSILON.equals(key)) {
+			setMaxDistanceEpsilon(value);
 		} else if (PLANSELECTOR.equals(key)) {
 			if (!(value.equals("BestScore") || value.equals("SelectExpBeta") || value.equals("ChangeExpBeta") || value.equals("SelectRandom"))) {
 				log.warn("set a valid plan selector for location choice. Set to default value 'SelectExpBeta' now");
@@ -286,7 +286,7 @@ public class LocationChoiceConfigGroup extends Module {
 		this.addParameterToMap(map, TT_APPROX_LEVEL);
 		this.addParameterToMap(map, TT);
 		this.addParameterToMap(map, SEARCHSPACEBETA);
-		this.addParameterToMap(map, MAXRADIUS);
+		this.addParameterToMap(map, MAXDISTANCEEPSILON);
 		this.addParameterToMap(map, PLANSELECTOR);
 		return map;
 	}
@@ -388,11 +388,11 @@ public class LocationChoiceConfigGroup extends Module {
 	public void setSearchSpaceBeta(String searchSpaceBeta) {
 		this.searchSpaceBeta = searchSpaceBeta;
 	}
-	public String getMaxSearchSpaceRadius() {
-		return maxSearchSpaceRadius;
+	public String getMaxDistanceEpsilon() {
+		return maxDistanceEpsilon;
 	}
-	public void setMaxSearchSpaceRadius(String maxSearchSpaceRadius) {
-		this.maxSearchSpaceRadius = maxSearchSpaceRadius;
+	public void setMaxDistanceEpsilon(String maxSearchSpaceRadius) {
+		this.maxDistanceEpsilon = maxSearchSpaceRadius;
 	}
 	public String getPlanSelector() {
 		return planSelector;

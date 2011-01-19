@@ -222,8 +222,8 @@ public class LocationMutatorBestResponse extends LocationMutatorwChoiceSet {
 		
 		// non-linear and tastes: exhaustive search for the moment
 		// later implement non-linear equation solver
-		if (Double.parseDouble(this.controler.getConfig().locationchoice().getMaxSearchSpaceRadius()) > 0.0) {
-			maxDistance = Double.parseDouble(this.controler.getConfig().locationchoice().getMaxSearchSpaceRadius());
+		if (Double.parseDouble(this.controler.getConfig().locationchoice().getMaxDistanceEpsilon()) > 0.0) {
+			maxDistance = Double.parseDouble(this.controler.getConfig().locationchoice().getMaxDistanceEpsilon());
 		}
 		return maxDistance;
 	}
