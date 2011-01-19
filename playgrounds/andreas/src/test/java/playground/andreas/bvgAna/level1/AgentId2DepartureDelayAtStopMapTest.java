@@ -32,19 +32,13 @@ public class AgentId2DepartureDelayAtStopMapTest {
         
         Id routeId1 = ida[2];
         Id routeId2 = ida[3];
-        Id routeId3 = ida[7]; 
         Id vehId1 = ida[4];
         Id vehId2 = ida[1];
-        Id vehId3 = ida[6];
-        final Id persId1 = ida[0];
+        Id persId1 = ida[0];
         Id persId2 = ida[5];
-        Id persId3 = ida[8];
-        Id facilId1 = ida[9];
-        Id facilId2 = ida[11];
-        final Id linkId1 = ida[14];
-        Id linkId2 = ida[12];
+        Id linkId1 = ida[14];
         Id linkId3 = ida[13];
-        Id linkId4 = ida[10];
+
         
         EventsFactoryImpl ef = new EventsFactoryImpl();
         AgentId2DepartureDelayAtStopMap handler = new AgentId2DepartureDelayAtStopMap(idSet);
