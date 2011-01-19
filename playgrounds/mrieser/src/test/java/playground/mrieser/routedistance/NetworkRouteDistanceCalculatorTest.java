@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.testcases.MatsimTestUtils;
@@ -98,19 +99,26 @@ public class NetworkRouteDistanceCalculatorTest {
 				this.ids[i] = this.scenario.createId(Integer.toString(i));
 			}
 
-			this.network.addNode(nf.createNode(this.ids[0], this.scenario.createCoord(0, 0)));
-			this.network.addNode(nf.createNode(this.ids[1], this.scenario.createCoord(100, 0)));
-			this.network.addNode(nf.createNode(this.ids[2], this.scenario.createCoord(200, 0)));
-			this.network.addNode(nf.createNode(this.ids[3], this.scenario.createCoord(300, 0)));
-			this.network.addNode(nf.createNode(this.ids[4], this.scenario.createCoord(400, 0)));
-			this.network.addNode(nf.createNode(this.ids[5], this.scenario.createCoord(500, 0)));
-			this.network.addNode(nf.createNode(this.ids[6], this.scenario.createCoord(600, 0)));
-			this.network.addLink(nf.createLink(this.ids[0], this.ids[0], this.ids[1]));
-			this.network.addLink(nf.createLink(this.ids[1], this.ids[1], this.ids[2]));
-			this.network.addLink(nf.createLink(this.ids[2], this.ids[2], this.ids[3]));
-			this.network.addLink(nf.createLink(this.ids[3], this.ids[3], this.ids[4]));
-			this.network.addLink(nf.createLink(this.ids[4], this.ids[4], this.ids[5]));
-			this.network.addLink(nf.createLink(this.ids[5], this.ids[5], this.ids[6]));
+			Node n0 = nf.createNode(this.ids[0], this.scenario.createCoord(0, 0));
+			Node n1 = nf.createNode(this.ids[1], this.scenario.createCoord(100, 0));
+			Node n2 = nf.createNode(this.ids[2], this.scenario.createCoord(200, 0));
+			Node n3 = nf.createNode(this.ids[3], this.scenario.createCoord(300, 0));
+			Node n4 = nf.createNode(this.ids[4], this.scenario.createCoord(400, 0));
+			Node n5 = nf.createNode(this.ids[5], this.scenario.createCoord(500, 0));
+			Node n6 = nf.createNode(this.ids[6], this.scenario.createCoord(600, 0));
+			this.network.addNode(n0);
+			this.network.addNode(n1);
+			this.network.addNode(n2);
+			this.network.addNode(n3);
+			this.network.addNode(n4);
+			this.network.addNode(n5);
+			this.network.addNode(n6);
+			this.network.addLink(nf.createLink(this.ids[0], n0, n1));
+			this.network.addLink(nf.createLink(this.ids[1], n1, n2));
+			this.network.addLink(nf.createLink(this.ids[2], n2, n3));
+			this.network.addLink(nf.createLink(this.ids[3], n3, n4));
+			this.network.addLink(nf.createLink(this.ids[4], n4, n5));
+			this.network.addLink(nf.createLink(this.ids[5], n5, n6));
 
 			this.network.getLinks().get(this.ids[0]).setLength(100.0);
 			this.network.getLinks().get(this.ids[1]).setLength(200.0);
