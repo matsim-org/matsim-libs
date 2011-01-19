@@ -30,9 +30,7 @@ import java.util.Set;
 import net.opengis.kml._2.FolderType;
 
 import org.matsim.contrib.sna.graph.Graph;
-import org.matsim.contrib.sna.graph.GraphBuilder;
 import org.matsim.contrib.sna.graph.analysis.AnalyzerTask;
-import org.matsim.contrib.sna.graph.spatial.SpatialEdge;
 import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
 import org.matsim.contrib.sna.graph.spatial.io.KMLIconVertexStyle;
@@ -43,12 +41,6 @@ import org.matsim.contrib.sna.snowball.SampledVertex;
 import playground.johannes.socialnetworks.graph.social.SocialGraph;
 import playground.johannes.socialnetworks.graph.social.SocialVertex;
 import playground.johannes.socialnetworks.graph.spatial.io.NumericAttributeColorizer;
-import playground.johannes.socialnetworks.snowball2.social.SocialSampledGraphProjectionBuilder;
-import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseEdge;
-import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseGraph;
-import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseVertex;
-import playground.johannes.socialnetworks.survey.ivt2009.graph.io.GraphReaderFacade;
-import playground.johannes.socialnetworks.survey.ivt2009.graph.io.GraphML2KML.SampledPartition;
 
 /**
  * @author illenberger
@@ -124,15 +116,15 @@ public class AgeHomophilyTask extends AnalyzerTask {
 			return 2;
 	}
 	
-	public static void main(String args[]) {
-		Graph graph = GraphReaderFacade.read("/Users/jillenberger/Work/socialnets/data/ivt2009/09-2010/graph/noH/graph.graphml");
-		
-		SocialSampledGraphProjectionBuilder<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge> builder = new SocialSampledGraphProjectionBuilder<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge>();
-		
-		RemoveNoCoordinates filter = new RemoveNoCoordinates((GraphBuilder<? extends SpatialGraph, ? extends SpatialVertex, ? extends SpatialEdge>) builder);
-		graph = filter.apply((SpatialGraph) graph);
-		
-		new AgeHomophilyTask().analyze(graph, null);
-	}
+//	public static void main(String args[]) {
+//		Graph graph = GraphReaderFacade.read("/Users/jillenberger/Work/socialnets/data/ivt2009/09-2010/graph/noH/graph.graphml");
+//		
+//		SocialSampledGraphProjectionBuilder<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge> builder = new SocialSampledGraphProjectionBuilder<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge>();
+//		
+//		RemoveNoCoordinates filter = new RemoveNoCoordinates((GraphBuilder<? extends SpatialGraph, ? extends SpatialVertex, ? extends SpatialEdge>) builder);
+//		graph = filter.apply((SpatialGraph) graph);
+//		
+//		new AgeHomophilyTask().analyze(graph, null);
+//	}
 
 }
