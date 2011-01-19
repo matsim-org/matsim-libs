@@ -76,6 +76,8 @@ public class TravelDistanceHandler implements LinkLeaveEventHandler, LinkEnterEv
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
+		
+		System.out.println("handling LinkEnterEvent");
 				
 		if (this.distance.containsKey(event.getPersonId())) {
 			double distanceSoFar = this.distance.get(event.getPersonId());

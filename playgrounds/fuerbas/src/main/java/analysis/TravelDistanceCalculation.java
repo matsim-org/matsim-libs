@@ -39,23 +39,19 @@ public class TravelDistanceCalculation {
 		//create an event object
 		EventsManager events = new EventsManagerImpl();
 		
-		//create the reader and read the file
-		MatsimEventsReader reader = new MatsimEventsReader(events);
-		reader.readFile(inputFile);
-		
 		//create the handler
-		TravelDistanceHandler handler = new TravelDistanceHandler();
-		
+		TravelDistanceHandler handler = new TravelDistanceHandler();	
 		handler.createHandlerScenario();
 		
 		//add the handler
 		events.addHandler(handler);
 		
-
+		//create the reader and read the file
+		MatsimEventsReader reader = new MatsimEventsReader(events);
+		reader.readFile(inputFile);
 		
 		handler.returnDistances();
-		
-//		...
+
 
 	}
 
