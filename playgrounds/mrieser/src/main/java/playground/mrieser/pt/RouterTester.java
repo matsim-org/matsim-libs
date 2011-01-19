@@ -26,6 +26,7 @@ import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -49,6 +50,19 @@ import org.matsim.vehicles.Vehicles;
 import org.xml.sax.SAXException;
 
 public class RouterTester {
+
+//	private static final String NETWORK = "/Volumes/Data/vis/zrh/output_network.xml.gz";
+//	private static final String VEHICLES = "/Volumes/Data/vis/zrh/vehicles10pct.oevModellZH.xml";
+//	private static final String SCHEDULE = "/Volumes/Data/vis/zrh/transitSchedule.networkOevModellZH.xml";
+//	private static final String PLANS = "/Volumes/Data/vis/zrh/100.plans.xml.gz";
+
+	private static final String NETWORK = "/Volumes/Data/projects/speedupTransit/bvg1pct/network.cleaned.xml";
+	private static final String SCHEDULE = "/Volumes/Data/projects/speedupTransit/bvg1pct/transitSchedule.xml";
+	private static final String VEHICLES = "/Volumes/Data/projects/speedupTransit/bvg1pct/transitVehicles.xml";
+	private static final String PLANS = "/Volumes/Data/projects/speedupTransit/bvg1pct/plans.xml";
+
+	private final static Logger log = Logger.getLogger(RouterTester.class);
+
 	public static void main(String[] args) {
 		ScenarioImpl s = new ScenarioImpl();
 		s.getConfig().scenario().setUseTransit(true);
@@ -58,10 +72,10 @@ public class RouterTester {
 		TransitSchedule ts = s.getTransitSchedule();
 		PopulationImpl p = (PopulationImpl) s.getPopulation();
 
-		new MatsimNetworkReader(s).readFile("/Volumes/Data/vis/zrh/output_network.xml.gz");
-		new VehicleReaderV1(v).readFile("/Volumes/Data/vis/zrh/vehicles10pct.oevModellZH.xml");
+		new MatsimNetworkReader(s).readFile(NETWORK);
+		new VehicleReaderV1(v).readFile(VEHICLES);
 		try {
-			new TransitScheduleReader(s).readFile("/Volumes/Data/vis/zrh/transitSchedule.networkOevModellZH.xml");
+			new TransitScheduleReader(s).readFile(SCHEDULE);
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (SAXException e) {
@@ -69,6 +83,7 @@ public class RouterTester {
 		} catch (ParserConfigurationException e) {
 			e.printStackTrace();
 		}
+		log.info("build transit router...");
 
 		TransitRouter router = new TransitRouter(ts, new TransitRouterConfig());
 
@@ -77,8 +92,8 @@ public class RouterTester {
 		p.setIsStreaming(true);
 		p.addAlgorithm(ptR);
 
-		new MatsimPopulationReader(s).readFile("/Volumes/Data/vis/zrh/100.plans.xml.gz");
-//		new MatsimPopulationReader(s).readFile("/Volumes/Data/vis/zrh/plan-sample.xml");
+		log.info("start processing persons...");
+		new MatsimPopulationReader(s).readFile(PLANS);
 
 		ptR.close();
 	}
