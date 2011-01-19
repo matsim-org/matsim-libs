@@ -114,7 +114,7 @@ public class DataPrepare {
 
 			// the ones for Zurich
 //			converter.registerTransportMode("B", TransportMode.bus); // BUS
-//			converter.registerTransportMode("F", TransportMode.walk); // BUSS
+//			converter.registerTransportMode("F", TransportMode.walk); // FUSS
 //			converter.registerTransportMode("I", TransportMode.car); // IV-PW
 //			converter.registerTransportMode("R", TransportMode.train); // REGIONALVERKEHR
 //			converter.registerTransportMode("S", TransportMode.other); // SCHIFF
