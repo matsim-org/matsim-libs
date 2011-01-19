@@ -47,7 +47,8 @@ public class VehId2DelayAtStopMapDataTest {
         mapData.addVehicleDepartsAtFacilityEvent(event2);
         
 //        now that I completed the test setup I am wondering, what should I test here?
-
+        
+        
 		
 	}
 
