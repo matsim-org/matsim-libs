@@ -28,13 +28,13 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-
-import javax.sound.midi.SysexMessage;
+import java.util.Map;
 
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.tnicolai.urbansim.constants.Constants;
+import playground.tnicolai.urbansim.utils.CommonMATSimUtilities;
 import playground.tnicolai.urbansim.utils.io.filter.TabFilter;
 
 /**
@@ -42,6 +42,10 @@ import playground.tnicolai.urbansim.utils.io.filter.TabFilter;
  *
  */
 public class Convert4Gnuplot {
+	// sample arguments
+//	/Users/thomas/Documents/SVN_Studies/tnicolai/cupum/Data/Ferry_Scenario/run_33.2010_12_26_09_30/indicators/ /Users/thomas/Documents/SVN_Studies/tnicolai/cupum/Data/Highway_Scenario/run_32.2010_12_25_13_45/indicators/ 908
+	
+// /Users/thomas/Development/opus_home/data/psrc_parcel_cupum_preliminary/runs/run_3.2011_01_17_09_37/indicators 908
 	
 	private static String source1;
 	private static File[] fileList1;
@@ -51,6 +55,9 @@ public class Convert4Gnuplot {
 	private static int zone_id;
 	
 	private static boolean isSingleDataSet = true;
+	
+	private static HeaderObject ho1 = null;
+	private static HeaderObject ho2 = null;
 	
 	/**
 	 * starting point
@@ -165,14 +172,14 @@ public class Convert4Gnuplot {
 		System.out.println("... finished writing chart.");
 	}
 	
-	public static void writeChartMultipleDataSet(String filename1, String filename2, String title, String xAxisLabel, String yAxisLable, String series1, String series2, double[] xAxis, double[] yAxis1, double[] yAxis2) {
+	public static void writeChartMultipleDataSet(String filename1, String filename2, String title, String xAxisLabel, String yAxisLable, String series1, String series2, double[] xAxis1, double[] xAxis2, double[] yAxis1, double[] yAxis2) {
 		System.out.println("Writing chart to: ");
 		System.out.println(filename1);
 		System.out.println(filename2);
 
 		XYLineChart chart = new XYLineChart(title, xAxisLabel, yAxisLable);
-		chart.addSeries(series1, xAxis, yAxis1);
-		chart.addSeries(series2, xAxis, yAxis2);
+		chart.addSeries(series1, xAxis1, yAxis1);
+		chart.addSeries(series2, xAxis2, yAxis2);
 //		chart.addMatsimLogo();
 		chart.saveAsPng(filename1, 1920, 1080);
 		chart.saveAsPng(filename2, 1920, 1080);
@@ -189,13 +196,13 @@ public class Convert4Gnuplot {
 		
 		String line;
 		int id;
-		String[] parts;
+		String[] parts = null;
 		
 		String title, xAxisLabel, yAxisLable, series;
 		
 		double xAxis[];
 		double yAxis[];
-		
+		// tnicolai: sort by years
 		for(File file : fileList1){
 			
 			String source = file.getCanonicalPath();
@@ -211,18 +218,20 @@ public class Convert4Gnuplot {
 			line = br.readLine();
 			parts = line.split(Constants.TAB);
 			
+			ho1 = initHeaderObject(line);
+			
 			xAxisLabel = "years";
 			yAxisLable = getYAxisLabel(parts);
 			series = yAxisLable;
 			title = yAxisLable + " in zone " + zone_id;
 			
-			xAxis = getXAxis(parts);
+			xAxis = ho1.getSortedHeaderAsDouble();
 			yAxis = new double[xAxis.length];
 			
 			while ( (line = br.readLine()) != null ){
 
 				parts = line.split("\t");
-				id = Integer.parseInt(parts[0]);
+				id = Integer.parseInt(parts[ho1.getZoneId()]);
 				
 				if( id == zone_id){
 					
@@ -230,7 +239,7 @@ public class Convert4Gnuplot {
 					
 					for(int i = 1; i < parts.length; i++){
 						// for JFreeChart
-						yAxis[i-1] = Double.parseDouble(parts[i]);
+						yAxis[i-1] = Double.parseDouble(parts[ho1.getIndexOf(i)]);
 						// for gnuplot
 						content.append( ((int)xAxis[i-1]) + Constants.TAB + yAxis[i-1] + Constants.NEW_LINE);
 					}
@@ -260,7 +269,8 @@ public class Convert4Gnuplot {
 		String[] parts1, parts2;
 		
 		String title, xAxisLabel, yAxisLable, series1, series2;
-		double xAxis[];
+		double xAxis1[];
+		double xAxis2[];
 		double yAxis1[];
 		double yAxis2[];
 		
@@ -289,6 +299,10 @@ public class Convert4Gnuplot {
 				System.err.println("Different headers in " + source1 + " and " + source2);
 			
 			parts1 = lineSource1.split(Constants.TAB);
+			parts2 = lineSource2.split(Constants.TAB);
+			
+			ho1 = initHeaderObject(lineSource1);
+			ho2 = initHeaderObject(lineSource2);
 			
 			xAxisLabel = "years";
 			yAxisLable = getYAxisLabel(parts1);
@@ -296,9 +310,10 @@ public class Convert4Gnuplot {
 			series2 = "Highway Scenario";
 			title = yAxisLable + " in zone " + zone_id;
 			
-			xAxis = getXAxis(parts1);
-			yAxis1 = new double[xAxis.length];
-			yAxis2 = new double[xAxis.length];
+			xAxis1 = ho1.getSortedHeaderAsDouble();
+			xAxis2 = ho2.getSortedHeaderAsDouble();
+			yAxis1 = new double[xAxis1.length];
+			yAxis2 = new double[xAxis2.length];
 			
 			boolean foundZoneID1 = false;
 			boolean foundZoneID2 = false;
@@ -315,28 +330,40 @@ public class Convert4Gnuplot {
 				
 				parts1 = lineSource1.split(Constants.TAB);
 				parts2 = lineSource2.split(Constants.TAB);
-				id1 = Integer.parseInt(parts1[0]);
-				id2 = Integer.parseInt(parts2[0]);
+				
+				if(parts1.length != parts2.length)
+					System.err.println("Number of columns differ in " + source1 + " and " + source2 + ".");
+				
+				id1 = Integer.parseInt(parts1[ho1.getZoneId()]);
+				id2 = Integer.parseInt(parts2[ho2.getZoneId()]);
 				
 				if( (id1 == zone_id) ){
 					
-					System.out.println("Found zone : " + id1);
+					System.out.println("Found zone in source dir 1 : " + id1);
 					
-					for(int j = 1; j < parts1.length && parts1.length == parts2.length; j++){
+					for(int j = 1; j < parts1.length; j++){
 						// for JFreeChart
-						yAxis1[j-1] = Double.parseDouble(parts1[j]);
-						yAxis2[j-1] = Double.parseDouble(parts2[j]);
+						yAxis1[j-1] = Double.parseDouble(parts1[ho1.getIndexOf(j)]);
 						// for gnuplot
-						content1.append( ((int)xAxis[j-1]) + Constants.TAB + yAxis1[j-1] + Constants.NEW_LINE);
-						content2.append( ((int)xAxis[j-1]) + Constants.TAB + yAxis2[j-1] + Constants.NEW_LINE);
+						content1.append( ((int)xAxis1[j-1]) + Constants.TAB + yAxis1[j-1] + Constants.NEW_LINE);
 					}
 					foundZoneID1 = true;
+				}
+				if(id2 == zone_id){
+					
+					System.out.println("Found zone in source dir 2 : " + id1);
+					
+					for(int j = 1; j < parts2.length; j++){
+						// for JFreeChart
+						yAxis2[j-1] = Double.parseDouble(parts2[ho2.getIndexOf(j)]);
+						// for gnuplot
+						content2.append( ((int)xAxis2[j-1]) + Constants.TAB + yAxis2[j-1] + Constants.NEW_LINE);
+					}
 					foundZoneID2 = true;
-					break;
 				}
 			}
 			if(foundZoneID1 && foundZoneID2){
-				writeChartMultipleDataSet(destination1PNG, destination2PNG, title, xAxisLabel, yAxisLable, series1, series2, xAxis, yAxis1, yAxis2);
+				writeChartMultipleDataSet(destination1PNG, destination2PNG, title, xAxisLabel, yAxisLable, series1, series2, xAxis1, xAxis2, yAxis1, yAxis2);
 				// create gnuplot dat
 				System.out.println("Writing gnuplot dat: " + destination1DAT);
 				bw1.write(content1.toString());
@@ -360,6 +387,7 @@ public class Convert4Gnuplot {
 	 * @return
 	 * @throws NumberFormatException
 	 */
+	@SuppressWarnings("all")
 	private static double[] getXAxis(String[] header) throws NumberFormatException{
 		
 		String[] tmp;
@@ -403,6 +431,44 @@ public class Convert4Gnuplot {
 		columnName = tmpName.trim();
 		
 		return columnName;
+	}
+	
+	/**
+	 * creates an header object. A header object retuns the indices of columns
+	 * in ascending order.
+	 * 
+	 * @param line
+	 */
+	private static HeaderObject initHeaderObject(String line){
+		
+		String parts[] = line.split( Constants.TAB );
+
+		int unsortedHeaderArray[] = new int[parts.length];
+		int sortedHeaderArray[] = new int[parts.length];
+		
+		// puts a header like "zone_id:i8	var_2018:f8	var_2019:f8	var_2012:f8"
+		// into two unsorted arrays with the followg structure: [-1, 2018, 2019, 2012]
+		for(int i = 0; i < parts.length; i++){
+			int index = parts[i].indexOf(":");
+			parts[i] = parts[i].substring(0, index);
+			
+			String key[] = parts[i].split("_");
+			
+			try{
+				unsortedHeaderArray[i] = Integer.parseInt( key[key.length-1]);
+			}
+			catch(NumberFormatException nfe){
+				unsortedHeaderArray[i] = -1; // -> zone id
+			}
+			// only copy values to other array
+			sortedHeaderArray[i] = unsortedHeaderArray[i];
+		}
+		// stores unsorted array as a map of <YEAR, INDEX>
+		Map<Integer,Integer> idxFromKey = CommonMATSimUtilities.createIdxFromKey( unsortedHeaderArray );
+		// sorted array in chonological order. The zone id is stored as -1 and schould be the first value
+		CommonMATSimUtilities.ArrayQuicksort( sortedHeaderArray );
+		
+		return new HeaderObject(idxFromKey, sortedHeaderArray);
 	}
 	
 //	/**
@@ -493,5 +559,39 @@ public class Convert4Gnuplot {
 ////	ImageIO.write(it.getImage(), "png", new File("/Users/thomas/Documents/SVN_Studies/tnicolai/cupum/Data/gnuplot/sin.png"));
 //}
 
+}
+
+class HeaderObject{
+	
+	private Map<Integer,Integer> idxFromKey = null;
+	private int sortedHeaderArray[] = null;
+	
+	public HeaderObject(Map<Integer,Integer> idxFromKey, int sortedHeaderArray[]){
+		this.idxFromKey = idxFromKey;
+		this.sortedHeaderArray = sortedHeaderArray;
+	}
+
+	/**
+	 * returns the index for zone_id
+	 * @return index
+	 */
+	public int getZoneId(){
+		int index = idxFromKey.get(-1);
+		return index;
+	}
+	
+	public int getIndexOf(int i){
+		int year = sortedHeaderArray[i];
+		int index = idxFromKey.get(year);
+		return index;
+	}
+	
+	public double[] getSortedHeaderAsDouble(){
+		double tmp[] = new double[sortedHeaderArray.length-1];
+		for (int i = 1; i < sortedHeaderArray.length; i++)
+			tmp[i-1] = (double) sortedHeaderArray[i];
+		return tmp;
+	}
+	
 }
 
