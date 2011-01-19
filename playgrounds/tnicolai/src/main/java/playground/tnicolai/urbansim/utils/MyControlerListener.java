@@ -114,6 +114,14 @@ public class MyControlerListener implements ShutdownListener {
 					// travel times in sec
 					double ttime = arrivalTime - depatureTime;
 					
+					// convert travel times in minutes for urbansim ???
+					ttime = ttime / 60.;
+					
+					// we gues that any value less than 1.2 leads to errors on the urbansim side
+					// since ln(0) is not defined or ln(1) = 0 causes toubles as a denominator ...
+					if(ttime < 1.2)
+						ttime = 1.2;
+					
 					// tnicolai test to caculate travel costs
 					//LinkImpl toLink = network.getNearestLink( toCoord );
 					//double tcost = st.getTravelCostCalulator().getLinkGeneralizedTravelCost(toLink, depatureTime); // .getLinkTravelCost(toLink, depatureTime);

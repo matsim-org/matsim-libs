@@ -62,6 +62,71 @@ public class CommonMATSimUtilities {
 		}
 		return idxFromKey ;
 	}
+	
+	/**
+	 * See describtion from createIdxFromKey( String line, String seperator )
+	 * 
+	 * @param keys
+	 * @return idxFromKey
+	 */
+	public static Map<Integer,Integer> createIdxFromKey( int keys[]) {
+
+		Map<Integer,Integer> idxFromKey = new HashMap<Integer, Integer>() ;
+		for ( int i=0 ; i<keys.length ; i++ ) {
+			idxFromKey.put(keys[i], i ) ;
+		}
+		return idxFromKey ;
+	}
+	
+	/**
+	 * sorts a given array
+	 * 
+	 * @param array
+	 * 
+	 * @author thomas
+	 */
+	public static int[] ArrayQuicksort(int array[]){
+	    int i;
+	
+	    System.out.println("Values Before the sort:\n");
+	    for(i = 0; i < array.length; i++)
+	      System.out.print( array[i]+"  ");
+	    System.out.println();
+	    quick_srt(array,0,array.length-1);
+	    System.out.print("Values after the sort:\n");
+	    for(i = 0; i <array.length; i++)
+	      System.out.print(array[i]+"  ");
+	    return array;
+	}
+	
+	private static void quick_srt(int array[],int low, int n){
+	    int lo = low;
+	    int hi = n;
+	    if (lo >= n) {
+	      return;
+	    }
+	    int mid = array[(lo + hi) / 2];
+	    while (lo < hi) {
+	      while (lo<hi && array[lo] < mid) {
+	        lo++;
+	      }
+	      while (lo<hi && array[hi] > mid) {
+	        hi--;
+	      }
+	      if (lo < hi) {
+	        int T = array[lo];
+	        array[lo] = array[hi];
+	        array[hi] = T;
+	      }
+	    }
+	    if (hi < lo) {
+	      int T = hi;
+	      hi = lo;
+	      lo = T;
+	    }
+	    quick_srt(array, low, lo);
+	    quick_srt(array, lo == low ? lo+1 : lo, n);
+	  }
 
 	/**
 	 * Helper method to start a plan by inserting the home location.  This is really only useful together with "completePlanToHwh",
