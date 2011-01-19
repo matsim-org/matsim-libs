@@ -35,7 +35,7 @@ public class CreateScenario {
 	private RandomFromVarDistr rnd;
 	
 	private long seed = 109877L;
-	private String outPath = "src/main/java/playground/anhorni/LEGO/miniscenario/input/";
+	private String outPath = "src/main/java/playground/anhorni/input/LEGO/";
 		
 	public static void main(final String[] args) {
 		CreateScenario scenarioCreator = new CreateScenario();		
@@ -54,7 +54,7 @@ public class CreateScenario {
 		CreateNetwork networkCreator = new CreateNetwork();
 		networkCreator.createNetwork(this.scenario, this.configReader);
 		
-		ScenarioImpl scenario = new ScenarioLoaderImpl(configReader.getPath() + "input/config.xml").getScenario();
+		ScenarioImpl scenario = new ScenarioLoaderImpl(configReader.getPath() + "config.xml").getScenario();
 		Config config = scenario.getConfig();
 				
 		CreatePopulation populationCreator = new CreatePopulation();

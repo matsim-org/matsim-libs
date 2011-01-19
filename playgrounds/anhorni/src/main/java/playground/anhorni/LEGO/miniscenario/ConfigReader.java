@@ -28,7 +28,7 @@ import org.apache.log4j.Logger;
 
 public class ConfigReader {
 	
-	private String configFile = "src/main/java/playground/anhorni/LEGO/miniscenario/input/config.txt";
+	private String configFile = "src/main/java/playground/anhorni/input/LEGO/config.txt";
 	private String path = "";
 	private double spacing = 0.0;
 	private int sideLengt = 0;
