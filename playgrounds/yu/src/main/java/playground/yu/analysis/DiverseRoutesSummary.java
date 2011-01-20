@@ -178,12 +178,13 @@ public class DiverseRoutesSummary extends AbstractPersonAlgorithm {
 								) {
 									routeLinkList.add(r.getStartLinkId());
 								}
-
+								String personLegId = personId + "_Leg"
+										+ legIndex;
 								List<LegRoute> personDailyRoutes = legRoutes
-										.get(personId);
+										.get(personLegId);
 								if (personDailyRoutes == null) {
 									personDailyRoutes = new ArrayList<LegRoute>();
-									legRoutes.put(personId + "_Leg" + legIndex,
+									legRoutes.put(personLegId,
 											personDailyRoutes);
 								}
 								personDailyRoutes.add(new LegRoute(planIndex,
