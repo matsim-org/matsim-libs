@@ -67,8 +67,7 @@ public class ShoppingLegZoneAnalyzer {
 	private Map<Id, List<Integer>> shoppingActivities;	// <PersonId, List<Index of Shopping Activity>
 	private List<Double> probabilities;
 	
-	public static void main(String[] args)
-	{
+	public static void main(String[] args) {
 		Scenario scenario = new ScenarioImpl();
 		
 		// load network
@@ -80,8 +79,7 @@ public class ShoppingLegZoneAnalyzer {
 		new ShoppingLegZoneAnalyzer(scenario);
 	}
 	
-	public ShoppingLegZoneAnalyzer(Scenario scenario)
-	{
+	public ShoppingLegZoneAnalyzer(Scenario scenario) {
 		this.scenario = scenario;
 		
 		log.info("Identifying shopping activities...");
@@ -106,12 +104,10 @@ public class ShoppingLegZoneAnalyzer {
 		log.info("done.");
 	}
 	
-	private void getProbabilities()
-	{
+	private void getProbabilities() {
 		probabilities = new ArrayList<Double>();
 		
-		for (Person person : scenario.getPopulation().getPersons().values())
-		{
+		for (Person person : scenario.getPopulation().getPersons().values()) {
 			List<Integer> shoppingActivitiesList = shoppingActivities.get(person.getId());
 			
 			if (shoppingActivitiesList == null) continue;
@@ -121,8 +117,7 @@ public class ShoppingLegZoneAnalyzer {
 			 */
 			Activity homeActivity = (Activity) person.getSelectedPlan().getPlanElements().get(0);
 			
-			for (int index : shoppingActivitiesList)
-			{	
+			for (int index : shoppingActivitiesList) {	
 				Activity shoppingActivity = (Activity) person.getSelectedPlan().getPlanElements().get(index);
 				double probability = getProbability(homeActivity, shoppingActivity);
 				
@@ -131,8 +126,7 @@ public class ShoppingLegZoneAnalyzer {
 		}
 	}
 	
-	private double getProbability(Activity homeActivity, Activity shoppingActivity)
-	{
+	private double getProbability(Activity homeActivity, Activity shoppingActivity) {
 		Id homeLinkId = homeActivity.getLinkId();
 		Id shoppingLinkId = shoppingActivity.getLinkId();
 		
@@ -144,14 +138,12 @@ public class ShoppingLegZoneAnalyzer {
 		return probabilities.get(shoppingTAZ);
 	}
 	
-	private void writeFile(String outFile)
-	{
+	private void writeFile(String outFile) {
 		FileOutputStream fos = null; 
 		OutputStreamWriter osw = null; 
 	    BufferedWriter bw = null;
 		
-	    try 
-	    {
+	    try {
 			fos = new FileOutputStream(outFile);
 			osw = new OutputStreamWriter(fos, charset);
 			bw = new BufferedWriter(osw);
@@ -160,8 +152,7 @@ public class ShoppingLegZoneAnalyzer {
 			bw.write("probability" + "\n");
 			
 			// write Values
-			for (Double probability : probabilities)
-			{
+			for (Double probability : probabilities) {
 				bw.write(String.valueOf(probability));
 				bw.write("\n");
 			}
@@ -169,9 +160,7 @@ public class ShoppingLegZoneAnalyzer {
 			bw.close();
 			osw.close();
 			fos.close();
-		}
-		catch (IOException e) 
-		{
+		} catch (IOException e) {
 			e.printStackTrace();
 		}	
 	}

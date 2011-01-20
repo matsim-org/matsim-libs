@@ -45,7 +45,10 @@ public class TelAvivControler extends Controler {
 		
 	/*
 	 * Use a TTAStrategyManager that ignores TTA Agents when doing
-	 * the replanning. 
+	 * the replanning.
+	 * 
+	 * Use LocationChoiceStrategyManagerConfigLoader which performs location choice for
+	 * main shopping activities.
 	 */
 	@Override
 	protected StrategyManager loadStrategyManager() {

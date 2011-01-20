@@ -41,6 +41,9 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 import playground.telaviv.facilities.Emme2FacilitiesCreator;
 import playground.telaviv.zones.ZoneMapping;
 
+/*
+ * Use fixed probabilities over the day which are read from a text file.
+ */
 public class LocationChoicePlanAlgorithm implements PlanAlgorithm {
 
 	private static final Logger log = Logger.getLogger(LocationChoicePlanAlgorithm.class);
@@ -55,8 +58,7 @@ public class LocationChoicePlanAlgorithm implements PlanAlgorithm {
 	
 	LocationChoicePlanAlgorithm(Scenario scenario, Emme2FacilitiesCreator facilitiesCreator, 
 			LocationChoiceProbabilityCreator locationChoiceProbabilityCreator,
-			ZoneMapping zoneMapping, Map<Id, List<Integer>> shoppingActivities)
-	{
+			ZoneMapping zoneMapping, Map<Id, List<Integer>> shoppingActivities) {
 		this.scenario = scenario;
 		this.facilitiesCreator = facilitiesCreator;
 		this.locationChoiceProbabilityCreator = locationChoiceProbabilityCreator;
@@ -70,28 +72,25 @@ public class LocationChoicePlanAlgorithm implements PlanAlgorithm {
 	 * false is returned.
 	 */
 	@Override
-	public void run(Plan plan)
-	{
+	public void run(Plan plan) {
 		List<Integer> shoppingIndices = shoppingActivities.get(plan.getPerson().getId());
 		
-		// if List is null, the Person has no main shopping activity
-		if (shoppingIndices == null) return;
-			
 		List<PlanElement> planElements = plan.getPlanElements();
-		
-		for (int index : shoppingIndices)
-		{
-			/*
-			 * The Probabilites for the Shopping Zones depends on the Home Zone.
-			 * The first Activity in each plan is beeing at home. Therefore we use
-			 * "planElements.get(0)".
-			 */
-			relocateActivity((Activity) planElements.get(0), (Activity) planElements.get(index));
+
+		// if List is null, the Person has no main shopping activity which could be relocated
+		if (shoppingIndices != null) {
+			for (int index : shoppingIndices) {
+				/*
+				 * The Probabilities for the Shopping Zones depends on the Home Zone.
+				 * The first Activity in each plan is being at home. Therefore we use
+				 * "planElements.get(0)".
+				 */
+				relocateActivity((Activity) planElements.get(0), (Activity) planElements.get(index));
+			}		
 		}
 	}
 	
-	private void relocateActivity(Activity homeActivity, Activity shoppingActivity)
-	{
+	private void relocateActivity(Activity homeActivity, Activity shoppingActivity) {
 		Id homeLinkId = homeActivity.getLinkId();
 		
 		int homeTAZ = zoneMapping.getLinkTAZ(homeLinkId);
@@ -114,14 +113,12 @@ public class LocationChoicePlanAlgorithm implements PlanAlgorithm {
 		((ActivityImpl) shoppingActivity).setCoord(facility.getCoord());
 	}
 	
-	private int selectZoneByProbability(Map<Integer, Double> probabilities)
-	{
+	private int selectZoneByProbability(Map<Integer, Double> probabilities) {
 		double sumProbability = 0.0;
 		double randomProbability = random.nextDouble();
 		
 		int counter = 0;
-		for (Entry<Integer, Double> entry : probabilities.entrySet())
-		{
+		for (Entry<Integer, Double> entry : probabilities.entrySet()) {
 			counter++;
 			
 			/*
@@ -141,27 +138,23 @@ public class LocationChoicePlanAlgorithm implements PlanAlgorithm {
 	 * The link is selected randomly but the length of the links 
 	 * is used to weight the probability.
 	 */
-	private Id selectLinkByZone(int TAZ)
-	{		
+	private Id selectLinkByZone(int TAZ) {		
 		List<Id> linkIds = facilitiesCreator.getLinkIdsInZoneForFacilites(TAZ);
 		
-		if (linkIds == null)
-		{
+		if (linkIds == null) {
 			log.warn("Zone " + TAZ + " has no mapped Links!");
 			return null;
 		}
 		
 		double totalLength = 0;
-		for (Id id : linkIds)
-		{
+		for (Id id : linkIds) {
 			Link link = zoneMapping.getNetwork().getLinks().get(id);
 			totalLength = totalLength + link.getLength();
 		}
 		
 		double[] probabilities = new double[linkIds.size()];
 		double sumProbability = 0.0;
-		for (int i = 0; i < linkIds.size(); i++)
-		{
+		for (int i = 0; i < linkIds.size(); i++) {
 			Link link = zoneMapping.getNetwork().getLinks().get(linkIds.get(i));
 			double probability = link.getLength() / totalLength;
 			probabilities[i] = sumProbability + probability;
@@ -169,8 +162,7 @@ public class LocationChoicePlanAlgorithm implements PlanAlgorithm {
 		}
 		
 		double randomProbability = random.nextDouble();
-		for (int i = 0; i < linkIds.size() - 1; i++)
-		{
+		for (int i = 0; i < linkIds.size() - 1; i++) {
 			if (randomProbability <= probabilities[i + 1]) return linkIds.get(i);
 		}
 		return null;

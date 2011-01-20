@@ -71,8 +71,7 @@ public class Emme2FacilitiesCreator {
 	
 	private int[] validLinkTypes = new int[] { 2, 3, 4, 5, 6, 9 };
 	
-	public static void main(String[] args)
-	{
+	public static void main(String[] args) {
 		Scenario scenario = new ScenarioImpl();
 		new MatsimNetworkReader(scenario).readFile(networkFile);
 		Emme2FacilitiesCreator facilitiesCreator = new Emme2FacilitiesCreator(scenario);
@@ -83,15 +82,13 @@ public class Emme2FacilitiesCreator {
 		facilitiesCreator.writeFacilities();		
 	}
 	
-	public Emme2FacilitiesCreator(Scenario scenario)
-	{
+	public Emme2FacilitiesCreator(Scenario scenario) {
 		this.scenario = scenario;
 		
 		zoneMapping = new ZoneMapping(scenario, TransformationFactory.getCoordinateTransformation("EPSG:2039", "WGS84"));
 	}
 	
-	public Emme2FacilitiesCreator(Scenario scenario, ZoneMapping zoneMapping)
-	{
+	public Emme2FacilitiesCreator(Scenario scenario, ZoneMapping zoneMapping) {
 		this.scenario = scenario;			
 		this.zoneMapping = zoneMapping;			
 	}
@@ -103,15 +100,13 @@ public class Emme2FacilitiesCreator {
 	 * the link. If we would use exactly the same coordinate as the link
 	 * we could get two facilities with the same coordinate (from & to link). 
 	 */
-	public void createInternalFacilities()
-	{
+	public void createInternalFacilities() {
 		activityFacilities = ((ScenarioImpl)scenario).getActivityFacilities();
 		
 		List<Integer> validTypes = new ArrayList<Integer>();
 		for (int type : validLinkTypes) validTypes.add(type);
 	
-		for (Entry<Id, Feature> entry : zoneMapping.getLinkMapping().entrySet())
-		{
+		for (Entry<Id, Feature> entry : zoneMapping.getLinkMapping().entrySet()) {
 			Id id = entry.getKey();
 			
 			Link link = zoneMapping.getNetwork().getLinks().get(id);
@@ -160,13 +155,11 @@ public class Emme2FacilitiesCreator {
 	/*
 	 * Create external Facilities that are used by Transit Traffic Agents.
 	 */
-	public void createExternalFacilities()
-	{	
+	public void createExternalFacilities() {	
 		/*
 		 * we add a tta Activity to all already existing facilities 
 		 */
-		for (ActivityFacility facility : activityFacilities.getFacilities().values())
-		{
+		for (ActivityFacility facility : activityFacilities.getFacilities().values()) {
 			ActivityOptionImpl activityOption = ((ActivityFacilityImpl)facility).createActivityOption("tta");			
 			activityOption.addOpeningTime(new OpeningTimeImpl(OpeningTime.DayType.wk, 0*3600, 24*3600));
 			activityOption.setCapacity(capacity);
@@ -177,12 +170,10 @@ public class Emme2FacilitiesCreator {
 		 * already host a Facility. If not, a new Facility with a tta
 		 * ActivityOption will be created and added. 
 		 */
-		for (Id id : zoneMapping.getExternalNodes())
-		{
+		for (Id id : zoneMapping.getExternalNodes()) {
 			Node externalNode = zoneMapping.getNetwork().getNodes().get(id);
 			
-			for (Link externalLink : externalNode.getOutLinks().values())
-			{
+			for (Link externalLink : externalNode.getOutLinks().values()) {
 				ActivityFacility facility = activityFacilities.getFacilities().get(externalLink.getId());
 				
 				// if already a facility exists we have nothing left to do
@@ -238,8 +229,7 @@ public class Emme2FacilitiesCreator {
 	 * Religions Character -> ignore
 	 * Transportation -> work, leisure (airport, big train stations, etc.)
 	 */
-	private void createAndAddActivityOptions(ActivityFacilityImpl facility)
-	{
+	private void createAndAddActivityOptions(ActivityFacilityImpl facility) {
 		boolean hasHome = false;
 		boolean hasWork = false;
 		boolean hasEducationUniversity = false;
@@ -274,50 +264,43 @@ public class Emme2FacilitiesCreator {
 		
 	
 		
-		if (hasHome)
-		{
+		if (hasHome) {
 			activityOption = facility.createActivityOption("home");
 			activityOption.addOpeningTime(new OpeningTimeImpl(OpeningTime.DayType.wk, 0*3600, 24*3600));
 			activityOption.setCapacity(capacity);			
 		}
 		
-		if (hasWork)
-		{
+		if (hasWork) {
 			activityOption = facility.createActivityOption("work");
 			activityOption.addOpeningTime(new OpeningTimeImpl(OpeningTime.DayType.wk, 8*3600, 18*3600));
 			activityOption.setCapacity(capacity);			
 		}
 		
-		if (hasEducationUniversity)
-		{
+		if (hasEducationUniversity) {
 			activityOption = facility.createActivityOption("education_university");
 			activityOption.addOpeningTime(new OpeningTimeImpl(OpeningTime.DayType.wk, 9*3600, 18*3600));
 			activityOption.setCapacity(capacity);			
 		}
 		
-		if (hasEducationHighSchool)
-		{
+		if (hasEducationHighSchool) {
 			activityOption = facility.createActivityOption("education_highschool");
 			activityOption.addOpeningTime(new OpeningTimeImpl(OpeningTime.DayType.wk, 8*3600, 16*3600));
 			activityOption.setCapacity(capacity);			
 		}
 
-		if (hasEducationElementarySchool)
-		{
+		if (hasEducationElementarySchool) {
 			activityOption = facility.createActivityOption("education_elementaryschool");
 			activityOption.addOpeningTime(new OpeningTimeImpl(OpeningTime.DayType.wk, 8*3600, 14*3600));
 			activityOption.setCapacity(capacity);			
 		}
 		
-		if (hasShopping)
-		{
+		if (hasShopping) {
 			activityOption = facility.createActivityOption("shopping");
 			activityOption.addOpeningTime(new OpeningTimeImpl(OpeningTime.DayType.wk, 9*3600, 19*3600));
 			activityOption.setCapacity(capacity);
 		}
 
-		if (hasLeisure)
-		{
+		if (hasLeisure) {
 			activityOption = facility.createActivityOption("leisure");
 			activityOption.addOpeningTime(new OpeningTimeImpl(OpeningTime.DayType.wk, 6*3600, 22*3600));
 			activityOption.setCapacity(capacity);			
@@ -327,8 +310,7 @@ public class Emme2FacilitiesCreator {
 	/*
 	 * Write facilities file
 	 */
-	public void writeFacilities()
-	{
+	public void writeFacilities() {
 		log.info("Writing facilities to a file...");
 		FacilitiesWriter facilitiesWriter = new FacilitiesWriter(activityFacilities);
 		facilitiesWriter.write(facilitiesFile);
@@ -341,11 +323,9 @@ public class Emme2FacilitiesCreator {
 	 * We have only one facility per link so we use a 1:1 mapping of the IDs.
 	 * 
 	 */
-	public void createAndWriteF2LMapping()
-	{
+	public void createAndWriteF2LMapping() {
 		log.info("Creating f2l mapping and write it to a file...");
-		try 
-		{
+		try {
 			FileOutputStream fos = new FileOutputStream(f2lFile);
 			OutputStreamWriter osw = new OutputStreamWriter(fos, charset);
 			BufferedWriter bw = new BufferedWriter(osw);
@@ -353,8 +333,7 @@ public class Emme2FacilitiesCreator {
 			// write Header
 			bw.write("fid" + "\t" + "lid" + "\n");
 			
-			for (Id id : zoneMapping.getLinkMapping().keySet())
-			{
+			for (Id id : zoneMapping.getLinkMapping().keySet()) {
 				bw.write(id.toString() + "\t" + id.toString() + "\n");
 			}
 			
@@ -362,16 +341,13 @@ public class Emme2FacilitiesCreator {
 			osw.close();
 			fos.close();
 			
-		}
-		catch (IOException e) 
-		{
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		log.info("done.");		
 	}
 	
-	public List<Id> getLinkIdsInZoneForFacilites(int TAZ)
-	{
+	public List<Id> getLinkIdsInZoneForFacilites(int TAZ) {
 		Emme2Zone zone = zoneMapping.getParsedZone(TAZ);
 		if (zone == null) return null;
 		
@@ -381,8 +357,7 @@ public class Emme2FacilitiesCreator {
 		for (int type : validLinkTypes) validTypes.add(type);
 
 		Iterator<Id> iter = validLinks.iterator();
-		while (iter.hasNext())
-		{
+		while (iter.hasNext()) {
 			LinkImpl link = (LinkImpl) zoneMapping.getNetwork().getLinks().get(iter.next());
 			int type = Integer.valueOf(link.getType());
 			if (!validTypes.contains(type)) iter.remove();
@@ -391,8 +366,7 @@ public class Emme2FacilitiesCreator {
 		return validLinks;
 	}
 	
-	public ActivityFacility getActivityFacility(Id id)
-	{
+	public ActivityFacility getActivityFacility(Id id) {
 		return this.activityFacilities.getFacilities().get(id);
 	}
 }

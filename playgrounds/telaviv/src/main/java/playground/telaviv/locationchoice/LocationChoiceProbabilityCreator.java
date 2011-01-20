@@ -35,14 +35,7 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import playground.telaviv.zones.ZoneMapping;
 
 /*
- * Assigning the counts from a Emme2Model to a MATSim Network.
- * 
- * When creating the MATSim Network some Links of the Emme2Network have to be
- * converted due to the fact that they contain turning conditions that cannot
- * be directly converted to the MATSim Links. Therefore not for all Links a 
- * 1:1 mapping is possible. In those cases the link with the best fit is
- * searched. (Alternatively the mapping could be done via the origId Tag of the
- * link. This Attribute could contain the Ids of the original nodes).
+ * Use fixed probabilities over the day which are read from a text file.
  */
 public class LocationChoiceProbabilityCreator {
 
@@ -58,20 +51,17 @@ public class LocationChoiceProbabilityCreator {
 	
 	private Map<Integer, Double>[] fromZoneProbabilities;	// <toZoneId, Probability>[fromZoneId from zoneToMatrixMapping]
 	
-	public static void main(String[] args)
-	{
+	public static void main(String[] args) {
 		Map<Integer, Double> probabs = new LocationChoiceProbabilityCreator(new ScenarioImpl()).getFromZoneProbabilities(1525);
 		
 		double sum = 0.0;
-		for (double value : probabs.values())
-		{
+		for (double value : probabs.values()) {
 			sum = sum + value;
 		}
-		System.out.println("Sum Probabilities = " + sum);
+		log.info("Sum Probabilities = " + sum);
 	}
 	
-	public LocationChoiceProbabilityCreator(Scenario scenario)
-	{		
+	public LocationChoiceProbabilityCreator(Scenario scenario) {		
 		log.info("Creating zone mapping...");
 		zoneMapping = new ZoneMapping(scenario, TransformationFactory.getCoordinateTransformation("EPSG:2039", "WGS84"));
 		log.info("done.");
@@ -85,12 +75,10 @@ public class LocationChoiceProbabilityCreator {
 		log.info("done.");
 	}
 	
-	private void createZoneToMatrixMapping()
-	{
+	private void createZoneToMatrixMapping() {
 		List<Integer> TAZs = new ArrayList<Integer>(); 
 		
-		for (Integer TAZ : zoneMapping.getParsedZones().keySet())
-		{
+		for (Integer TAZ : zoneMapping.getParsedZones().keySet()) {
 			TAZs.add(TAZ);
 		}
 		
@@ -100,8 +88,7 @@ public class LocationChoiceProbabilityCreator {
 		matrixToZoneMapping = new HashMap<Integer, Integer>();
 		
 		int id = 0;
-		for (int TAZ : TAZs)
-		{
+		for (int TAZ : TAZs) {
 			zoneToMatrixMapping.put(TAZ, id);
 			matrixToZoneMapping.put(id, TAZ);
 			id++;
@@ -109,15 +96,13 @@ public class LocationChoiceProbabilityCreator {
 	}
 	
 	@SuppressWarnings("unchecked")
-	private void createProbabilityMaps()
-	{	
+	private void createProbabilityMaps() {	
 		int zoneCount = zoneToMatrixMapping.size();
 		probabilityMatrix = new double[zoneCount][zoneCount];
 		
 		List<LocationChoiceProbability> probabilities = new LocationChoiceFileParser(locationChoiceFile).readFile();
 				
-		for (LocationChoiceProbability probability : probabilities)
-		{
+		for (LocationChoiceProbability probability : probabilities) {
 			int fromZone = probability.fromZone;
 			int toZone = probability.toZone;
 			
@@ -125,14 +110,12 @@ public class LocationChoiceProbabilityCreator {
 		}
 		
 		fromZoneProbabilities = new Map[probabilityMatrix.length];
-		for (int fromZoneId = 0; fromZoneId < probabilityMatrix.length; fromZoneId++)
-		{
+		for (int fromZoneId = 0; fromZoneId < probabilityMatrix.length; fromZoneId++) {
 			double[] fromZoneProbab = probabilityMatrix[fromZoneId];
 			
 			Map<Integer, Double> map = new TreeMap<Integer, Double>();
 			
-			for (int index = 0; index < fromZoneProbab.length; index++)
-			{
+			for (int index = 0; index < fromZoneProbab.length; index++) {
 				map.put(matrixToZoneMapping.get(index), fromZoneProbab[index]);
 			}
 			
@@ -143,8 +126,7 @@ public class LocationChoiceProbabilityCreator {
 	/**
 	 * @return Map<toZone TAZ, Probability of that Zone>
 	 */
-	public Map<Integer, Double> getFromZoneProbabilities(int fromZoneTAZ)
-	{	
+	public Map<Integer, Double> getFromZoneProbabilities(int fromZoneTAZ) {	
 		return fromZoneProbabilities[zoneToMatrixMapping.get(fromZoneTAZ)];
 	}
 }

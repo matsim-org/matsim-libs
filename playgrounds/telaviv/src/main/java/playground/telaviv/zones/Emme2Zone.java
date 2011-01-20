@@ -93,5 +93,5 @@ public class Emme2Zone {
 	public double LSIZEINTS;
 	public double LSUMSIZE0;
 	public double LSUMSIZES;
-	
+	public int SUPERZONE;
 }

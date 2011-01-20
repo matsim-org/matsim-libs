@@ -35,21 +35,18 @@ public class LocationChoiceFileParser {
 	private String separator = ",";
 	private Charset charset = Charset.forName("UTF-8");
 	
-	public LocationChoiceFileParser(String inFile)
-	{
+	public LocationChoiceFileParser(String inFile) {
 		this.inFile = inFile;
 	}
 	
-	public List<LocationChoiceProbability> readFile()
-	{
+	public List<LocationChoiceProbability> readFile() {
 		List<LocationChoiceProbability> probabilities = new ArrayList<LocationChoiceProbability>();
 		
 		FileInputStream fis = null;
 		InputStreamReader isr = null;
 	    BufferedReader br = null;
 	       
-    	try 
-    	{
+    	try {
     		fis = new FileInputStream(inFile);
     		isr = new InputStreamReader(fis, charset);
 			br = new BufferedReader(isr);
@@ -58,8 +55,7 @@ public class LocationChoiceFileParser {
 			br.readLine();
 			 
 			String line;
-			while((line = br.readLine()) != null)
-			{
+			while((line = br.readLine()) != null) {
 				LocationChoiceProbability probability = new LocationChoiceProbability();
 				
 				String[] cols = line.split(separator);
@@ -74,28 +70,21 @@ public class LocationChoiceFileParser {
 			br.close();
 			isr.close();
 			fis.close();
-    	}
-    	catch (FileNotFoundException e) 
-    	{
+    	} catch (FileNotFoundException e) {
 			e.printStackTrace();
-		}
-		catch (IOException e) 
-		{
+		} catch (IOException e) {
 			e.printStackTrace();
-		}
-		
+		}		
 		return probabilities;
 	}
 	
-	private int parseInteger(String string)
-	{
+	private int parseInteger(String string) {
 		if (string == null) return 0;
 		else if (string.trim().equals("")) return 0;
 		else return Integer.valueOf(string);
 	}
 	
-	private double parseDouble(String string)
-	{
+	private double parseDouble(String string) {
 		if (string == null) return 0.0;
 		else if (string.trim().equals("")) return 0.0;
 		else return Double.valueOf(string);

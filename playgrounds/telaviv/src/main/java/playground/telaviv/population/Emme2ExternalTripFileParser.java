@@ -35,21 +35,18 @@ public class Emme2ExternalTripFileParser {
 	private String separator = ",";
 	private Charset charset = Charset.forName("UTF-8");
 	
-	public Emme2ExternalTripFileParser(String inFile)
-	{
+	public Emme2ExternalTripFileParser(String inFile) {
 		this.inFile = inFile;
 	}
 	
-	public List<Emme2ExternalTrip> readFile()
-	{
+	public List<Emme2ExternalTrip> readFile() {
 		List<Emme2ExternalTrip> externalTrips = new ArrayList<Emme2ExternalTrip>();
 		
 		FileInputStream fis = null;
 		InputStreamReader isr = null;
 	    BufferedReader br = null;
 	       
-    	try 
-    	{
+    	try {
     		fis = new FileInputStream(inFile);
     		isr = new InputStreamReader(fis, charset);
 			br = new BufferedReader(isr);
@@ -58,8 +55,7 @@ public class Emme2ExternalTripFileParser {
 			br.readLine();
 			 
 			String line;
-			while((line = br.readLine()) != null)
-			{
+			while((line = br.readLine()) != null) {
 				Emme2ExternalTrip externalTrip = new Emme2ExternalTrip();
 				
 				String[] cols = line.split(separator);
@@ -74,28 +70,22 @@ public class Emme2ExternalTripFileParser {
 			br.close();
 			isr.close();
 			fis.close();
-    	}
-    	catch (FileNotFoundException e) 
-    	{
+    	} catch (FileNotFoundException e) {
 			e.printStackTrace();
-		}
-		catch (IOException e) 
-		{
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		
 		return externalTrips;
 	}
 	
-	private int parseInteger(String string)
-	{
+	private int parseInteger(String string) {
 		if (string == null) return 0;
 		else if (string.trim().equals("")) return 0;
 		else return Integer.valueOf(string);
 	}
 	
-	private double parseDouble(String string)
-	{
+	private double parseDouble(String string) {
 		if (string == null) return 0.0;
 		else if (string.trim().equals("")) return 0.0;
 		else return Double.valueOf(string);

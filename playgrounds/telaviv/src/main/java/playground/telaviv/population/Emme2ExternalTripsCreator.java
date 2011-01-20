@@ -73,6 +73,7 @@ public class Emme2ExternalTripsCreator {
 	private double scaleFactor = 0.1; 
 	
 	/*
+	 * OLD:
 	 * Trips:
 	 * 0600 .. 0900
 	 * 
@@ -83,15 +84,22 @@ public class Emme2ExternalTripsCreator {
 	 * 0730 - 0800: 3/12
 	 * 0800 - 0830: 2/12
 	 * 0830 - 0900:	1/12
+	 * 
+	 * NEW:
+	 * Trips
+	 * 0630 .. 0830
+ 	 * Distribution of the departure Times of the Trips:
+	 * 0630 - 0700: 1/6
+	 * 0700 - 0730: 2/6
+	 * 0730 - 0800: 2/6
+	 * 0800 - 0830: 1/6
 	 */
 	
-	public static void main(String[] args)
-	{
+	public static void main(String[] args) {
 		new Emme2ExternalTripsCreator(new ScenarioImpl());
 	}
 	
-	public Emme2ExternalTripsCreator(Scenario scenario)
-	{		
+	public Emme2ExternalTripsCreator(Scenario scenario) {		
 		this.scenario = scenario;
 		
 		new MatsimNetworkReader(scenario).readFile(networkFile);
@@ -110,12 +118,10 @@ public class Emme2ExternalTripsCreator {
 		PopulationFactory populationFactory = scenario.getPopulation().getFactory();
 		
 		int idCounter = 0;
-		for (Emme2ExternalTrip externalTrip : externalTrips)
-		{
+		for (Emme2ExternalTrip externalTrip : externalTrips) {
 			int numOfTrips = (int)(periodDuration * Double.valueOf(externalTrip.numOfTrips));
 			
-			for (int i = 0; i < numOfTrips; i++)
-			{
+			for (int i = 0; i < numOfTrips; i++) {
 				Id id = scenario.createId("tta_" + String.valueOf(idCounter++));
 				PersonImpl person = (PersonImpl)populationFactory.createPerson(id);
 				
@@ -136,8 +142,7 @@ public class Emme2ExternalTripsCreator {
 	/*
 	 * Set some basic person parameters like age, sex, license and car availability.
 	 */
-	private void setBasicParameters(PersonImpl person)
-	{
+	private void setBasicParameters(PersonImpl person) {
 		person.setAge(100);
 		person.setSex("m");
 		person.setLicence("yes");
@@ -154,8 +159,7 @@ public class Emme2ExternalTripsCreator {
 	 * 3 - shopping
 	 * 4 - other (leisure)
 	 */
-	public void createAndAddInitialPlan(PersonImpl person, Emme2ExternalTrip externalTrip)
-	{
+	public void createAndAddInitialPlan(PersonImpl person, Emme2ExternalTrip externalTrip) {
 		PopulationFactory populationFactory = scenario.getPopulation().getFactory();
 		
 		Plan plan = populationFactory.createPlan();
@@ -215,30 +219,26 @@ public class Emme2ExternalTripsCreator {
 	 * The link is selected randomly but the length of the links 
 	 * is used to weight the probability.
 	 */
-	private Id selectLinkByStartNode(Id nodeId)
-	{		
+	private Id selectLinkByStartNode(Id nodeId) {		
 		Node startNode = network.getNodes().get(nodeId);
 		List<Id> linkIds = new ArrayList<Id>();
 		
 		for (Link link : startNode.getOutLinks().values()) linkIds.add(link.getId());
 		
-		if (linkIds == null)
-		{
+		if (linkIds == null) {
 			log.warn("startNode " + startNode.getId() + " has no outgoing Links!");
 			return null;
 		}
 		
 		double totalLength = 0;
-		for (Id id : linkIds)
-		{
+		for (Id id : linkIds) {
 			Link link = network.getLinks().get(id);
 			totalLength = totalLength + link.getLength();
 		}
 		
 		double[] probabilities = new double[linkIds.size()];
 		double sumProbability = 0.0;
-		for (int i = 0; i < linkIds.size(); i++)
-		{
+		for (int i = 0; i < linkIds.size(); i++) {
 			Link link = network.getLinks().get(linkIds.get(i));
 			double probability = link.getLength() / totalLength;
 			probabilities[i] = sumProbability + probability;
@@ -250,32 +250,36 @@ public class Emme2ExternalTripsCreator {
 		
 		// else find the right one
 		double randomProbability = random.nextDouble();
-		for (int i = 0; i <= linkIds.size(); i++)
-		{
+		for (int i = 0; i <= linkIds.size(); i++) {
 			if (randomProbability <= probabilities[i]) return linkIds.get(i);
 		}
 		return null;
 	}
 		
-	private double getDepartureTime()
-	{
+	private double getDepartureTime() {
 		double d = random.nextDouble();
 		
-		d = d * 12;
+//		d = d * 12;
+//		
+//		if (d < 1)       return 6.0 * 3600 + Math.round(d * 30 * 60);
+//		else if (d < 3)  return 6.5 * 3600 + Math.round((d - 1)/2 * 30 * 60);
+//		else if (d < 6)  return 7.0 * 3600 + Math.round((d - 3)/3 * 30 * 60);
+//		else if (d < 9)  return 7.5 * 3600 + Math.round((d - 6)/3 * 30 * 60);
+//		else if (d < 11) return 8.0 * 3600 + Math.round((d - 9)/2 * 30 * 60);
+//		else             return 8.5 * 3600 + Math.round((d - 11)/2 * 30 * 60);	// shouldn't that be (d - 11) * 30 * 60???
 		
-		if (d < 1)       return 6.0 * 3600 + Math.round(d * 30 * 60);
-		else if (d < 3)  return 6.5 * 3600 + Math.round((d - 1)/2 * 30 * 60);
-		else if (d < 6)  return 7.0 * 3600 + Math.round((d - 3)/3 * 30 * 60);
-		else if (d < 9)  return 7.5 * 3600 + Math.round((d - 6)/3 * 30 * 60);
-		else if (d < 11) return 8.0 * 3600 + Math.round((d - 9)/2 * 30 * 60);
-		else             return 8.5 * 3600 + Math.round((d - 11)/2 * 30 * 60);
+		d = d * 6;
+		
+		if (d < 1)       return 6.5 * 3600 + Math.round(d * 30 * 60);
+		else if (d < 3)  return 7.0 * 3600 + Math.round((d - 1)/2 * 30 * 60);
+		else if (d < 5)  return 7.5 * 3600 + Math.round((d - 3)/2 * 30 * 60);
+		else             return 8.0 * 3600 + Math.round((d - 5) * 30 * 60);
 	}
 	
 	/*
 	 * We get the Id of a Link that is connected to an external Node.
 	 */
-	private ActivityFacility getActivityFacilityByLinkId(Id id)
-	{	
+	private ActivityFacility getActivityFacilityByLinkId(Id id) {	
 		return activityFacilities.getFacilities().get(id);
 	}
 }

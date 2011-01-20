@@ -29,27 +29,26 @@ import java.nio.charset.Charset;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.matsim.core.gbl.Gbl;
+
 public class Emme2ZonesFileParser {
 
 	private String inFile;
 	private String separator = ",";
 	private Charset charset = Charset.forName("UTF-8");
 	
-	public Emme2ZonesFileParser(String inFile)
-	{
+	public Emme2ZonesFileParser(String inFile) {
 		this.inFile = inFile;
 	}
 	
-	public Map<Integer, Emme2Zone> readFile()
-	{
+	public Map<Integer, Emme2Zone> readFile() {
 		Map<Integer, Emme2Zone> zones = new TreeMap<Integer, Emme2Zone>();
 		
 		FileInputStream fis = null;
 		InputStreamReader isr = null;
 	    BufferedReader br = null;
 	       
-    	try 
-    	{
+    	try {
     		fis = new FileInputStream(inFile);
     		isr = new InputStreamReader(fis, charset);
 			br = new BufferedReader(isr);
@@ -58,8 +57,7 @@ public class Emme2ZonesFileParser {
 //			br.readLine();
 			 
 			String line;
-			while((line = br.readLine()) != null)
-			{
+			while((line = br.readLine()) != null) {
 				Emme2Zone zone = new Emme2Zone();
 				
 				String[] cols = line.split(separator);
@@ -124,6 +122,7 @@ public class Emme2ZonesFileParser {
 				zone.LSIZEINTS = parseDouble(cols[57]);
 				zone.LSUMSIZE0 = parseDouble(cols[58]);
 				zone.LSUMSIZES = parseDouble(cols[59]);
+				zone.SUPERZONE = parseInteger(cols[60]);
 				
 				zones.put(zone.TAZ, zone);
 			}
@@ -131,28 +130,22 @@ public class Emme2ZonesFileParser {
 			br.close();
 			isr.close();
 			fis.close();
-    	}
-    	catch (FileNotFoundException e) 
-    	{
-			e.printStackTrace();
-		}
-		catch (IOException e) 
-		{
-			e.printStackTrace();
+    	} catch (FileNotFoundException e)  {
+			Gbl.errorMsg(e);
+		} catch (IOException e) {
+			Gbl.errorMsg(e);
 		}
 		
 		return zones;
 	}
 	
-	private int parseInteger(String string)
-	{
+	private int parseInteger(String string) {
 		if (string == null) return 0;
 		else if (string.trim().equals("")) return 0;
 		else return Integer.valueOf(string);
 	}
 	
-	private double parseDouble(String string)
-	{
+	private double parseDouble(String string) {
 		if (string == null) return 0.0;
 		else if (string.trim().equals("")) return 0.0;
 		else return Double.valueOf(string);

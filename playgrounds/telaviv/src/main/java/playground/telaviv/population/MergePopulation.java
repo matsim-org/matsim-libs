@@ -38,13 +38,11 @@ public class MergePopulation {
 	
 	private static final Logger log = Logger.getLogger(MergePopulation.class);
 	
-	public static void main(String[] args)
-	{
+	public static void main(String[] args) {
 		new MergePopulation(new ScenarioImpl());
 	}
 	
-	public MergePopulation(Scenario scenario)
-	{
+	public MergePopulation(Scenario scenario) {
 		log.info("Loading internal population...");
 		Scenario internalScenario = new ScenarioImpl();
 		new MatsimPopulationReader(internalScenario).readFile(internalPopulationFile);

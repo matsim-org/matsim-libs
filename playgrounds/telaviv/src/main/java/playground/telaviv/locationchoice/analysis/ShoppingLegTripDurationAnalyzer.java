@@ -52,7 +52,7 @@ import org.matsim.core.utils.misc.RouteUtils;
 
 import playground.telaviv.locationchoice.LocationChoicePlanModule;
 
-public class ShoppingLegTripDurationAnalyzer implements  AgentDepartureEventHandler, AgentArrivalEventHandler {
+public class ShoppingLegTripDurationAnalyzer implements AgentDepartureEventHandler, AgentArrivalEventHandler {
 
 	private static final Logger log = Logger.getLogger(ShoppingLegTripDurationAnalyzer.class);
 	
@@ -79,8 +79,7 @@ public class ShoppingLegTripDurationAnalyzer implements  AgentDepartureEventHand
 	private List<Leg> fromLegsCar;
 	private List<Leg> fromLegsUndefined;
 	
-	public static void main(String[] args)
-	{
+	public static void main(String[] args) {
 		Scenario scenario = new ScenarioImpl();
 		
 		// load network
@@ -92,8 +91,7 @@ public class ShoppingLegTripDurationAnalyzer implements  AgentDepartureEventHand
 		new ShoppingLegTripDurationAnalyzer(scenario);
 	}
 	
-	public ShoppingLegTripDurationAnalyzer(Scenario scenario)
-	{
+	public ShoppingLegTripDurationAnalyzer(Scenario scenario) {
 		this.scenario = scenario;
 		
 		log.info("Identifying shopping activities...");
@@ -108,8 +106,7 @@ public class ShoppingLegTripDurationAnalyzer implements  AgentDepartureEventHand
 		/*
 		 * Error checking - did we miss some Trips???
 		 */
-		for (Entry<Id, List<Integer>> entry : shoppingActivities.entrySet())
-		{
+		for (Entry<Id, List<Integer>> entry : shoppingActivities.entrySet()) {
 			if (entry.getValue().size() > 0)
 			{
 				Person person = scenario.getPopulation().getPersons().get(entry.getKey());
@@ -127,8 +124,7 @@ public class ShoppingLegTripDurationAnalyzer implements  AgentDepartureEventHand
 		log.info("done.");
 	}
 	
-	private void readEvents()
-	{	
+	private void readEvents() {	
 		reset(0);
 		
 		EventsManager eventsManager = new EventsManagerImpl();
@@ -137,14 +133,12 @@ public class ShoppingLegTripDurationAnalyzer implements  AgentDepartureEventHand
 		reader.readFile(eventsFile);
 	}
 
-	private void writeFile(List<Leg> legs, String outFile)
-	{
+	private void writeFile(List<Leg> legs, String outFile) {
 		FileOutputStream fos = null; 
 		OutputStreamWriter osw = null; 
 	    BufferedWriter bw = null;
 		
-	    try 
-	    {
+	    try {
 			fos = new FileOutputStream(outFile);
 			osw = new OutputStreamWriter(fos, charset);
 			bw = new BufferedWriter(osw);
@@ -164,17 +158,14 @@ public class ShoppingLegTripDurationAnalyzer implements  AgentDepartureEventHand
 			bw.close();
 			osw.close();
 			fos.close();
-		}
-		catch (IOException e) 
-		{
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	    
 		
 	}
 	
-	private void analyzeResults()
-	{
+	private void analyzeResults() {
 		double toTravelTimesPt = 0.0;
 		double toTravelTimesCar = 0.0;
 		double toTravelTimesUndefined = 0.0;
@@ -191,8 +182,7 @@ public class ShoppingLegTripDurationAnalyzer implements  AgentDepartureEventHand
 		double fromDistancesCar = 0.0;
 		double fromDistancesUndefined = 0.0;
 		
-//		for (Leg leg : toLegsPt)
-//		{
+//		for (Leg leg : toLegsPt) {
 //			toTravelTimesPt = toTravelTimesPt + leg.getTravelTime();
 //			toDistancesPt = toDistancesPt + RouteUtils.calcDistance((NetworkRoute)leg.getRoute(), scenario.getNetwork());
 //		}
@@ -201,8 +191,7 @@ public class ShoppingLegTripDurationAnalyzer implements  AgentDepartureEventHand
 //		log.info("mean to-distancesPt = " + toDistancesPt / toLegsPt.size());
 		log.info("");
 		
-		for (Leg leg : toLegsCar)
-		{
+		for (Leg leg : toLegsCar) {
 			toTravelTimesCar = toTravelTimesCar + leg.getTravelTime();
 			toDistancesCar = toDistancesCar + RouteUtils.calcDistance((NetworkRoute)leg.getRoute(), scenario.getNetwork());
 		}
@@ -211,8 +200,7 @@ public class ShoppingLegTripDurationAnalyzer implements  AgentDepartureEventHand
 		log.info("mean to-distancesCar = " + toDistancesCar / toLegsCar.size());
 		log.info("");
 		
-//		for (Leg leg : toLegsUndefined)
-//		{
+//		for (Leg leg : toLegsUndefined) {
 //			toTravelTimesUndefined = toTravelTimesUndefined + leg.getTravelTime();
 //			toDistancesUndefined = toDistancesUndefined + RouteUtils.calcDistance((NetworkRoute)leg.getRoute(), scenario.getNetwork());
 //		}
@@ -221,8 +209,7 @@ public class ShoppingLegTripDurationAnalyzer implements  AgentDepartureEventHand
 //		log.info("mean to-distancesUndefined = " + toDistancesUndefined / toLegsUndefined.size());
 		log.info("");
 		
-//		for (Leg leg : fromLegsPt)
-//		{
+//		for (Leg leg : fromLegsPt) {
 //			fromTravelTimesPt = fromTravelTimesPt + leg.getTravelTime();
 //			fromDistancesPt = fromDistancesPt + RouteUtils.calcDistance((NetworkRoute)leg.getRoute(), scenario.getNetwork());
 //		}
@@ -231,8 +218,7 @@ public class ShoppingLegTripDurationAnalyzer implements  AgentDepartureEventHand
 //		log.info("mean from-distancesPt = " + fromDistancesPt / fromLegsPt.size());
 		log.info("");
 		
-		for (Leg leg : fromLegsCar)
-		{
+		for (Leg leg : fromLegsCar) {
 			fromTravelTimesCar = fromTravelTimesCar + leg.getTravelTime();
 			fromDistancesCar = fromDistancesCar + RouteUtils.calcDistance((NetworkRoute)leg.getRoute(), scenario.getNetwork());
 		}
@@ -241,8 +227,7 @@ public class ShoppingLegTripDurationAnalyzer implements  AgentDepartureEventHand
 		log.info("mean from-distancesCar = " + fromDistancesCar / fromLegsCar.size());
 		log.info("");
 		
-//		for (Leg leg : fromLegsUndefined)
-//		{
+//		for (Leg leg : fromLegsUndefined) {
 //			fromTravelTimesUndefined = fromTravelTimesUndefined + leg.getTravelTime();
 //			fromDistancesUndefined = fromDistancesUndefined + RouteUtils.calcDistance((NetworkRoute)leg.getRoute(), scenario.getNetwork());
 //		}
@@ -255,8 +240,7 @@ public class ShoppingLegTripDurationAnalyzer implements  AgentDepartureEventHand
 	@Override
 	public void handleEvent(AgentDepartureEvent event) {
 		
-		if (legCounter.containsKey(event.getPersonId()))
-		{
+		if (legCounter.containsKey(event.getPersonId())) {
 			int count = legCounter.get(event.getPersonId());
 			
 			// increase leg count
@@ -271,14 +255,12 @@ public class ShoppingLegTripDurationAnalyzer implements  AgentDepartureEventHand
 	public void handleEvent(AgentArrivalEvent event) {
 		
 		List<Integer> shoppingIndices = null;
-		if ((shoppingIndices = shoppingActivities.get(event.getPersonId())) != null)
-		{
+		if ((shoppingIndices = shoppingActivities.get(event.getPersonId())) != null) {
 			int count = legCounter.get(event.getPersonId());
 			
 			double departureTime = departures.remove(event.getPersonId());
 			
-			if (shoppingIndices.contains(count + 1))
-			{
+			if (shoppingIndices.contains(count + 1)) {
 				Leg toLeg = (Leg) scenario.getPopulation().getPersons().get(event.getPersonId()).getSelectedPlan().getPlanElements().get(count);
 				toLeg.setDepartureTime(departureTime);
 				toLeg.setTravelTime(event.getTime() - departureTime);
@@ -287,8 +269,7 @@ public class ShoppingLegTripDurationAnalyzer implements  AgentDepartureEventHand
 				else if (toLeg.getMode().equals(TransportMode.pt)) toLegsPt.add(toLeg);
 				else toLegsUndefined.add(toLeg);
 			}
-			else if (shoppingIndices.contains(count - 1))
-			{
+			else if (shoppingIndices.contains(count - 1)) {
 				Leg fromLeg = (Leg) scenario.getPopulation().getPersons().get(event.getPersonId()).getSelectedPlan().getPlanElements().get(count);
 				fromLeg.setDepartureTime(departureTime);
 				fromLeg.setTravelTime(event.getTime() - departureTime);
@@ -309,8 +290,7 @@ public class ShoppingLegTripDurationAnalyzer implements  AgentDepartureEventHand
 	@Override
 	public void reset(int iteration) {
 		legCounter = new HashMap<Id, Integer>();
-		for (Id id : shoppingActivities.keySet())
-		{
+		for (Id id : shoppingActivities.keySet()) {
 			legCounter.put(id, 0);
 		}
 	
@@ -323,5 +303,4 @@ public class ShoppingLegTripDurationAnalyzer implements  AgentDepartureEventHand
 		fromLegsCar = new ArrayList<Leg>();
 		fromLegsUndefined = new ArrayList<Leg>();
 	}
-
 }

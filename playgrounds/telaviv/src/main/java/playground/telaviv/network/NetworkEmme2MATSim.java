@@ -31,21 +31,13 @@ import net.opengis.kml._2.KmlType;
 import net.opengis.kml._2.ObjectFactory;
 
 import org.apache.log4j.Logger;
-import org.geotools.factory.FactoryRegistryException;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.DefaultAttributeTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeBuilder;
-import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.SchemaException;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.KmlNetworkWriter;
 import org.matsim.core.network.LinkImpl;
@@ -58,8 +50,15 @@ import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.vis.kml.KMZWriter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-
-import playground.toronto.maneuvers.NetworkAddEmmeManeuverRestrictions;
+import org.geotools.factory.FactoryRegistryException;
+import org.geotools.feature.AttributeType;
+import org.geotools.feature.AttributeTypeFactory;
+import org.geotools.feature.DefaultAttributeTypeFactory;
+import org.geotools.feature.Feature;
+import org.geotools.feature.FeatureType;
+import org.geotools.feature.FeatureTypeBuilder;
+import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.SchemaException;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -67,6 +66,8 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
+
+import playground.toronto.maneuvers.NetworkAddEmmeManeuverRestrictions;
 
 /**
  * Translates emme2 networks into matsim networks.
@@ -126,6 +127,8 @@ public class NetworkEmme2MATSim {
 	 */
 	private static enum modes {c, u, b, p, r};
 	
+	private static double capacityScaleFator = 1.1;	// increase capacity by 10%
+	
 	private static String ITM = "EPSG:2039";	// network coding String
 	
 	private static String nodesFile = "../../matsim/mysimulations/telaviv/network/nodes.csv";
@@ -162,8 +165,7 @@ public class NetworkEmme2MATSim {
 			// skip header line
 			reader.readLine();
 			
-			while ((line = reader.readLine()) != null)
-			{
+			while ((line = reader.readLine()) != null) {
 				String[] parts = line.split(separator);
 				String idStr = parts[0];
 				String xxStr = parts[1];
@@ -172,12 +174,10 @@ public class NetworkEmme2MATSim {
 				String yyStrWGS84 = parts[5];
 				String carAssignStr = parts[3];
 				
-				if (useWGS84)
-				{
+				if (useWGS84) {
 					Node node = network.createAndAddNode(scenario.createId(idStr), new CoordImpl(xxStrWGS84, yyStrWGS84));
 				}
-				else
-				{
+				else {
 					double xx = Double.valueOf(xxStr);
 					double yy = Double.valueOf(yyStr);
 					
@@ -203,24 +203,20 @@ public class NetworkEmme2MATSim {
 			
 			long linkCnt = 0;
 			
-			while ((line = reader.readLine()) != null)
-			{
+			while ((line = reader.readLine()) != null) {
 				String[] parts = line.split(separator);
 
 				Node fromNode = network.getNodes().get(scenario.createId(parts[0]));
 				Node   toNode = network.getNodes().get(scenario.createId(parts[1]));
-				if ( fromNode==null || toNode==null )
-				{
+				if ( fromNode==null || toNode==null ) {
 					log.info("fromNode or toNode == null; probably connector link; skipping it ...") ;
 					continue ;
 				}
-//				if ( parts[3].contains("r") || parts[3].contains("b") )
-//				{
+//				if ( parts[3].contains("r") || parts[3].contains("b") ) {
 //					log.info("rail only or bus only link; skipping it ...") ;
 //					continue;
 //				}
-				if (!parts[3].contains("c"))
-				{
+				if (!parts[3].contains("c")) {
 					log.info("no car link; skipping it ...") ;
 					continue;
 				}
@@ -234,7 +230,7 @@ public class NetworkEmme2MATSim {
 				String oridId = parts[0] + "#" + parts[1];
 				String type = parts[4];
 				
-				double capacity = Double.valueOf(parts[15]);
+				double capacity = Double.valueOf(parts[15]) * capacityScaleFator;
 				double freespeed = Double.valueOf(parts[16]);
 				
 //				double capacity, freespeed;
@@ -286,8 +282,7 @@ public class NetworkEmme2MATSim {
 			mr.run(networkITM);
 			mr.run(networkWGS84);
 		}
-		catch (Exception e1)
-		{
+		catch (Exception e1) {
 			e1.printStackTrace();
 		}
 		
@@ -317,8 +312,7 @@ public class NetworkEmme2MATSim {
 			kmzWriter.writeMainKml(mainKml);
 			kmzWriter.close();
 		} 
-		catch (IOException e)
-		{
+		catch (IOException e) {
 			e.printStackTrace();
 		}
 		
@@ -331,26 +325,22 @@ public class NetworkEmme2MATSim {
 			ShapeFileWriter.writeGeometries(ft, shpLinksFile);
 			
 		} 
-		catch (NumberFormatException e)
-		{
+		catch (NumberFormatException e) {
 			e.printStackTrace();
 		}
-		catch (SchemaException e)
-		{
+		catch (SchemaException e) {
 			e.printStackTrace();
 		}
-		catch (IllegalAttributeException e)
-		{
+		catch (IllegalAttributeException e) {
 			e.printStackTrace();
 		} 
-		catch (IOException e)
-		{
+		catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 	
 	
-	public static Collection<Feature> generateLinksFromNet(NetworkImpl network) throws FactoryRegistryException, SchemaException, IllegalAttributeException {
+	public static Collection<Feature> generateLinksFromNet(Network network) throws FactoryRegistryException, SchemaException, IllegalAttributeException {
 
 		GeometryFactory geoFac = new GeometryFactory();
 		Collection<Feature> features = new ArrayList<Feature>();
@@ -364,8 +354,7 @@ public class NetworkEmme2MATSim {
 		AttributeType type = AttributeTypeFactory.newAttributeType("type", String.class);
 		FeatureType ftRoad = FeatureTypeBuilder.newFeatureType(new AttributeType[] {geom, id, fromNode, toNode, length, type}, "link");
 		
-		for (Link link : network.getLinks().values())
-		{		
+		for (Link link : network.getLinks().values()) {		
 			LineString ls = new LineString(new CoordinateArraySequence(new Coordinate [] {coord2Coordinate(link.getFromNode().getCoord()), coord2Coordinate(link.getCoord()), coord2Coordinate(link.getToNode().getCoord())}), geoFac);
 			Feature ft = ftRoad.create(new Object [] {ls , link.getId().toString(), link.getFromNode().getId().toString(),link.getToNode().getId().toString(),link.getLength(), ((LinkImpl)link).getType()}, "links");
 			features.add(ft);
@@ -374,7 +363,7 @@ public class NetworkEmme2MATSim {
 		return features;
 	}
 
-	public static Collection<Feature> generateNodesFromNet(NetworkImpl network) throws FactoryRegistryException, SchemaException, IllegalAttributeException {
+	public static Collection<Feature> generateNodesFromNet(Network network) throws FactoryRegistryException, SchemaException, IllegalAttributeException {
 
 		GeometryFactory geoFac = new GeometryFactory();
 		Collection<Feature> features = new ArrayList<Feature>();
@@ -384,14 +373,12 @@ public class NetworkEmme2MATSim {
 		AttributeType id = AttributeTypeFactory.newAttributeType("ID", String.class);
 		FeatureType ftNode = FeatureTypeBuilder.newFeatureType(new AttributeType[] {geom, id}, "node");
 		
-		for (Node node : network.getNodes().values())
-		{
+		for (Node node : network.getNodes().values()) {
 			Point point = geoFac.createPoint(coord2Coordinate(node.getCoord()));
 
 			Feature ft = ftNode.create(new Object[] {point, node.getId().toString()}, "nodes");
 			features.add(ft);
 		}
-
 				
 		return features;
 	}

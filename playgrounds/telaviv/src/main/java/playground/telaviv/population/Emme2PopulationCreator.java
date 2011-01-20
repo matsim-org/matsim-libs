@@ -73,13 +73,11 @@ public class Emme2PopulationCreator {
 	 * shop 9..19
 	 */
 
-	public static void main(String[] args)
-	{
+	public static void main(String[] args) {
 		new Emme2PopulationCreator(new ScenarioImpl());
 	}
 
-	public Emme2PopulationCreator(Scenario scenario)
-	{
+	public Emme2PopulationCreator(Scenario scenario) {
 		this.scenario = scenario;
 		log.info("Read Network File...");
 		new MatsimNetworkReader(scenario).readFile(networkFile);
@@ -105,8 +103,7 @@ public class Emme2PopulationCreator {
 		log.info("Creating MATSim population...");
 		PopulationFactory populationFactory = scenario.getPopulation().getFactory();
 
-		for (Entry<Integer, Emme2Person> entry : personMap.entrySet())
-		{
+		for (Entry<Integer, Emme2Person> entry : personMap.entrySet()) {
 			Id id = scenario.createId(String.valueOf(entry.getKey()));
 			Emme2Person emme2Person = entry.getValue();
 
@@ -128,22 +125,19 @@ public class Emme2PopulationCreator {
 	/*
 	 * Set some basic person parameters like age, sex, license and car availability.
 	 */
-	private void setBasicParameters(PersonImpl person, Emme2Person emme2Person)
-	{
+	private void setBasicParameters(PersonImpl person, Emme2Person emme2Person) {
 		person.setAge(emme2Person.AGE);
 
 		if (emme2Person.GENDER == 1) person.setSex("m");
 		else person.setSex("f");
 
-		if (emme2Person.LICENSE == 1)
-		{
+		if (emme2Person.LICENSE == 1) {
 			person.setLicence("yes");
 			if (emme2Person.NUMVEH == 0) person.setCarAvail("never");
 			else if (emme2Person.NUMVEH >= emme2Person.HHLICENSES) person.setCarAvail("always");
 			else person.setCarAvail("sometimes");
 		}
-		else
-		{
+		else {
 			person.setLicence("no");
 			person.setCarAvail("sometimes");
 		}
@@ -159,8 +153,7 @@ public class Emme2PopulationCreator {
 	 * 3 - shopping
 	 * 4 - other (leisure)
 	 */
-	public void createAndAddInitialPlan(PersonImpl person, Emme2Person emme2Person)
-	{
+	public void createAndAddInitialPlan(PersonImpl person, Emme2Person emme2Person) {
 		PopulationFactory populationFactory = scenario.getPopulation().getFactory();
 //		RouteFactory routeFactory = new GenericRouteFactory();
 
@@ -236,20 +229,17 @@ public class Emme2PopulationCreator {
 		activity = (ActivityImpl) populationFactory.createActivityFromLinkId("home", homeLinkId);
 		activity.setStartTime(0.0);
 
-		if (hasPrimaryActivity)
-		{
+		if (hasPrimaryActivity) {
 			activity.setDuration(emme2Person.START_1);
 			activity.setEndTime(emme2Person.START_1);
 			time = time + emme2Person.START_1;
 		}
-		else if (hasSecondaryActivity)
-		{
+		else if (hasSecondaryActivity) {
 			activity.setDuration(emme2Person.START_2);
 			activity.setEndTime(emme2Person.START_2);
 			time = time + emme2Person.START_2;
 		}
-		else
-		{
+		else {
 			// It is the only Activity in the plan so we don't set an endtime.
 		}
 
@@ -268,13 +258,11 @@ public class Emme2PopulationCreator {
 		/*
 		 * Primary Activity
 		 */
-		if (hasPrimaryActivity)
-		{
+		if (hasPrimaryActivity) {
 			/*
 			 * If we have an Activity before the primary Activity
 			 */
-			if (primaryPreStop)
-			{
+			if (primaryPreStop) {
 				Id primaryPreLinkId = selectLinkByZone(primaryPreStopActivityZone);
 
 				leg = (LegImpl)populationFactory.createLeg(transportMode);
@@ -329,8 +317,7 @@ public class Emme2PopulationCreator {
 			/*
 			 * If we have an Activity after the primary Activity
 			 */
-			if (primaryPostStop)
-			{
+			if (primaryPostStop) {
 				Id primaryPostLinkId = selectLinkByZone(primaryPostStopActivityZone);
 
 				leg = (LegImpl)populationFactory.createLeg(transportMode);
@@ -371,8 +358,7 @@ public class Emme2PopulationCreator {
 			 * the duration of the home activity at the end of the main
 			 * activity trip.
 			 */
-			if (hasSecondaryActivity)
-			{
+			if (hasSecondaryActivity) {
 				activity.setDuration(emme2Person.START_2 - time);
 				activity.setEndTime(emme2Person.START_2);
 			}
@@ -387,8 +373,7 @@ public class Emme2PopulationCreator {
 		/*
 		 * Secondary Activity
 		 */
-		if (hasSecondaryActivity)
-		{
+		if (hasSecondaryActivity) {
 			time = emme2Person.START_2;
 			homeLinkId = selectLinkByZone(homeZone);
 
@@ -398,8 +383,7 @@ public class Emme2PopulationCreator {
 			/*
 			 * If we have an Activity before the secondary Activity
 			 */
-			if (secondaryPreStop)
-			{
+			if (secondaryPreStop) {
 				Id secondaryPreLinkId = selectLinkByZone(secondaryPreStopActivityZone);
 
 				leg = (LegImpl)populationFactory.createLeg(transportMode);
@@ -453,8 +437,7 @@ public class Emme2PopulationCreator {
 			/*
 			 * If we have an Activity after the secondary Activity
 			 */
-			if (secondaryPostStop)
-			{
+			if (secondaryPostStop) {
 				Id secondaryPostLinkId = selectLinkByZone(secondaryPostStopActivityZone);
 
 				leg = (LegImpl)populationFactory.createLeg(transportMode);
@@ -503,8 +486,7 @@ public class Emme2PopulationCreator {
 			 * Finally add a home desire that has a duration of 86400 - all other activities.
 			 */
 			double otherDurations = 0.0;
-			for (double duration : desires.getActivityDurations().values())
-			{
+			for (double duration : desires.getActivityDurations().values()) {
 				otherDurations = otherDurations + duration;
 			}
 			if (otherDurations < 86400) desires.accumulateActivityDuration("home", 86400 - otherDurations);
@@ -515,27 +497,23 @@ public class Emme2PopulationCreator {
 	 * The link is selected randomly but the length of the links
 	 * is used to weight the probability.
 	 */
-	private Id selectLinkByZone(int TAZ)
-	{
+	private Id selectLinkByZone(int TAZ) {
 		List<Id> linkIds = facilitiesCreator.getLinkIdsInZoneForFacilites(TAZ);
 
-		if (linkIds == null)
-		{
+		if (linkIds == null) {
 			log.warn("Zone " + TAZ + " has no mapped Links!");
 			return null;
 		}
 
 		double totalLength = 0;
-		for (Id id : linkIds)
-		{
+		for (Id id : linkIds) {
 			Link link = zoneMapping.getNetwork().getLinks().get(id);
 			totalLength = totalLength + link.getLength();
 		}
 
 		double[] probabilities = new double[linkIds.size()];
 		double sumProbability = 0.0;
-		for (int i = 0; i < linkIds.size(); i++)
-		{
+		for (int i = 0; i < linkIds.size(); i++) {
 			Link link = zoneMapping.getNetwork().getLinks().get(linkIds.get(i));
 			double probability = link.getLength() / totalLength;
 			probabilities[i] = sumProbability + probability;
@@ -543,8 +521,7 @@ public class Emme2PopulationCreator {
 		}
 
 		double randomProbability = random.nextDouble();
-		for (int i = 0; i < linkIds.size() - 1; i++)
-		{
+		for (int i = 0; i < linkIds.size() - 1; i++) {
 			if (randomProbability <= probabilities[i + 1]) return linkIds.get(i);
 		}
 		return null;
@@ -554,16 +531,13 @@ public class Emme2PopulationCreator {
 	 * We have one ActivityFacility per Links that has the same
 	 * Id as the Link itself.
 	 */
-	private ActivityFacility getActivityFacilityByLinkId(Id id)
-	{
+	private ActivityFacility getActivityFacilityByLinkId(Id id) {
 		return activityFacilities.getFacilities().get(id);
 	}
 
-	private String getPrimaryTransportMode(int code)
-	{
+	private String getPrimaryTransportMode(int code) {
 		String transportMode = null;
-		switch (code)
-		{
+		switch (code) {
 //			case 1: transportMode = TransportMode.train; break; // Rail Park & Ride
 			case 1: transportMode = TransportMode.pt; break; // Rail Park & Ride
 //			case 2: transportMode = TransportMode.train; break; // Rail Bus Assess
@@ -596,10 +570,8 @@ public class Emme2PopulationCreator {
 		return transportMode;
 	}
 
-	private String getSwitchedTransportMode(int code, String currentTransportMode)
-	{
-		switch (code)
-		{
+	private String getSwitchedTransportMode(int code, String currentTransportMode) {
+		switch (code) {
 			case 1: break; // no switch
 //			case 2: currentTransportMode = TransportMode.train; break; // to rail
 			case 2: currentTransportMode = TransportMode.pt; break; // to rail
@@ -620,11 +592,9 @@ public class Emme2PopulationCreator {
 		return currentTransportMode;
 	}
 
-	private String getSecondaryTransportMode(int code)
-	{
+	private String getSecondaryTransportMode(int code) {
 		String transportMode = null;
-		switch (code)
-		{
+		switch (code) {
 //			case 1: transportMode = TransportMode.bus; break; // Bus
 			case 1: transportMode = TransportMode.pt; break; // Bus
 			case 2: transportMode = TransportMode.car; break; // Car Driver
@@ -639,12 +609,10 @@ public class Emme2PopulationCreator {
 	}
 
 	private static int activityNotSupportedCounter = 0;
-	private String getActivityTypeString(int code, ActivityFacility activityFacility)
-	{
+	private String getActivityTypeString(int code, ActivityFacility activityFacility) {
 		String string;
 
-		switch (code)
-		{
+		switch (code) {
 //			case 0: string = "h"; break;	// no -> home
 //			case 1: string = "w"; break;	// work -> work
 //			case 2: string = "e"; break;	// study -> education
@@ -652,75 +620,63 @@ public class Emme2PopulationCreator {
 //			case 4: string = "l"; break;	// other -> leisure
 
 			case 1: // no -> home
-				if (facilityContainsActivityType("home", activityFacility))
-				{
+				if (facilityContainsActivityType("home", activityFacility)) {
 					string = "home";
 					break;
 				}
-				else
-				{
+				else {
 					log.warn("No home ActivityOption found!" + ++activityNotSupportedCounter);
 					string = "home";
 					break;
 				}
 
 			case 2: // work -> work
-				if (facilityContainsActivityType("work", activityFacility))
-				{
+				if (facilityContainsActivityType("work", activityFacility)) {
 					string = "work";
 					break;
 				}
-				else
-				{
+				else {
 					log.warn("No work ActivityOption found!" + ++activityNotSupportedCounter);
 					string = "work";
 					break;
 				}
 
 			case 3: // study -> education
-				if (facilityContainsActivityType("education_university", activityFacility))
-				{
+				if (facilityContainsActivityType("education_university", activityFacility)) {
 					string = "education_university";
 					break;
 				}
-				else if (facilityContainsActivityType("education_highschool", activityFacility))
-				{
+				else if (facilityContainsActivityType("education_highschool", activityFacility)) {
 					string = "education_highschool";
 					break;
 				}
-				else if (facilityContainsActivityType("education_elementaryschool", activityFacility))
-				{
+				else if (facilityContainsActivityType("education_elementaryschool", activityFacility)) 	{
 					string = "education_elementaryschool";
 					break;
 				}
-				else
-				{
+				else {
 					log.warn("No education ActivityOption found!" + ++activityNotSupportedCounter);
 					string = "education";
 					break;
 				}
 
 			case 4: // shopping -> shopping
-				if (facilityContainsActivityType("shopping", activityFacility))
-				{
+				if (facilityContainsActivityType("shopping", activityFacility)) {
 					string = "shopping";
 					break;
 				}
-				else
-				{
+				else {
 					log.warn("No shopping ActivityOption found!" + ++activityNotSupportedCounter);
 					string = "shopping";
 					break;
 				}
 
 			case 5: // other -> leisure
-				if (facilityContainsActivityType("leisure", activityFacility))
-				{
+				if (facilityContainsActivityType("leisure", activityFacility)) {
 					string = "leisure";
 					break;
 				}
-				else
-				{
+				else {
 					log.warn("No leisure ActivityOption found!" + ++activityNotSupportedCounter);
 					string = "leisure";
 					break;
@@ -732,23 +688,19 @@ public class Emme2PopulationCreator {
 		return string;
 	}
 
-	private boolean facilityContainsActivityType(String string, ActivityFacility activityFacility)
-	{
-		for (ActivityOption activityOption : activityFacility.getActivityOptions().values())
-		{
+	private boolean facilityContainsActivityType(String string, ActivityFacility activityFacility) {
+		for (ActivityOption activityOption : activityFacility.getActivityOptions().values()) {
 			if(activityOption.getType().equalsIgnoreCase(string)) return true;
 		}
 
 		return false;
 	}
 
-	private int[] CTODCalculator(int CTOD)
-	{
+	private int[] CTODCalculator(int CTOD) {
 		int start = 0;
 		int end = 0;
 
-		switch (CTOD)
-		{
+		switch (CTOD) {
 			case 1: start = 1; end = 1; break;
 			case 2: start = 1; end = 2; break;
 			case 3: start = 1; end = 3; break;
@@ -771,8 +723,7 @@ public class Emme2PopulationCreator {
 		return new int[]{start, end};
 	}
 
-	private double[] getCTODTimeWindow(int CTOD)
-	{
+	private double[] getCTODTimeWindow(int CTOD) {
 //		MO	3:00 to 6:30
 //		AM	6:30 to 8:30
 //		MD	8:30 to 15:00
@@ -781,8 +732,7 @@ public class Emme2PopulationCreator {
 
 		double[] window = new double[2];
 
-		switch (CTOD)
-		{
+		switch (CTOD) {
 			case 1: window = new double[]{3, 6.5}; break;	// MO - morning
 			case 2: window = new double[]{6.5, 8.5}; break;	// AM - am peak
 			case 3: window = new double[]{8.5, 15}; break;	// MD - midday

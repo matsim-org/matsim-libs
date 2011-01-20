@@ -52,19 +52,16 @@ public class CountsCreator {
 
 	private Scenario scenario;
 
-	public static void main(String[] args)
-	{
+	public static void main(String[] args) {
 		new CountsCreator(new ScenarioImpl()).createCounts();
 	}
 
-	public CountsCreator(Scenario scenario)
-	{
+	public CountsCreator(Scenario scenario) {
 		this.scenario = scenario;
 		new MatsimNetworkReader(scenario).readFile(networkFile);
 	}
 
-	public void createCounts()
-	{
+	public void createCounts() {
 		Counts counts = new Counts();
 		counts.setName("Tel Aviv Model");
 		counts.setDescription("Tel Aviv Model");
@@ -72,8 +69,7 @@ public class CountsCreator {
 
 		List<Emme2Count> emme2Counts = new CountsFileParser(countsFile).readFile();
 
-		for (Emme2Count emme2Count : emme2Counts)
-		{
+		for (Emme2Count emme2Count : emme2Counts) {
 			Id fromNodeId = scenario.createId(String.valueOf(emme2Count.inode));
 			Id toNodeId = scenario.createId(String.valueOf(emme2Count.jnode));
 
@@ -84,8 +80,7 @@ public class CountsCreator {
 			if (fromNode == null || toNode == null) link = searchTransformedLink(emme2Count, fromNode, toNode);
 			else link = searchLink(emme2Count, fromNode, toNode);
 
-			if (link != null)
-			{
+			if (link != null) {
 				Count count = counts.createCount(link.getId(), link.getId().toString());
 
 				count.createVolume(6, emme2Count.volau);
@@ -98,12 +93,9 @@ public class CountsCreator {
 		new CountsWriter(counts).write(outFile);
 	}
 
-	private Link searchLink(Emme2Count emme2Count, Node fromNode, Node toNode)
-	{
-		for (Link link : fromNode.getOutLinks().values())
-		{
-			if (link.getToNode().getId().equals(toNode.getId()))
-			{
+	private Link searchLink(Emme2Count emme2Count, Node fromNode, Node toNode) {
+		for (Link link : fromNode.getOutLinks().values()) {
+			if (link.getToNode().getId().equals(toNode.getId())) {
 				return link;
 			}
 		}
@@ -116,21 +108,18 @@ public class CountsCreator {
 	 * represent turning conditions. In that case we try to find
 	 * the new created link that fits best to the original one.
 	 */
-	private Link searchTransformedLink(Emme2Count emme2Count, Node fromNode, Node toNode)
-	{
+	private Link searchTransformedLink(Emme2Count emme2Count, Node fromNode, Node toNode) {
 		List<Node> possibleFromNodes = new ArrayList<Node>();
 		List<Node> possibleToNodes = new ArrayList<Node>();
 		List<Link> possibleLinks = new ArrayList<Link>();
 
-		if (fromNode == null)
-		{
+		if (fromNode == null) {
 			/*
 			 * fromNode not found - so maybe it has been transformed to represent
 			 * turn conditions...
 			 */
 			int i = 0;
-			while (true)
-			{
+			while (true) {
 				Id nextId = scenario.createId(String.valueOf(emme2Count.inode) + "-" + i++);
 				Node nextNode = scenario.getNetwork().getNodes().get(nextId);
 				if (nextNode == null && i > 20) break;
@@ -140,21 +129,18 @@ public class CountsCreator {
 		}
 		else possibleFromNodes.add(fromNode);
 
-		if (possibleFromNodes.size() == 0)
-		{
+		if (possibleFromNodes.size() == 0) {
 			System.out.println("No potential FromNode found!");
 			return null;
 		}
 
-		if (toNode == null)
-		{
+		if (toNode == null) {
 			/*
 			 * toNode not found - so maybe it has been transformed to represent
 			 * turn conditions...
 			 */
 			int i = 0;
-			while (true)
-			{
+			while (true) {
 				Id nextId = scenario.createId(String.valueOf(emme2Count.jnode) + "-" + i++);
 				Node nextNode = scenario.getNetwork().getNodes().get(nextId);
 				if (nextNode == null && i > 20) break;
@@ -164,8 +150,7 @@ public class CountsCreator {
 		}
 		else possibleToNodes.add(toNode);
 
-		if (possibleToNodes.size() == 0)
-		{
+		if (possibleToNodes.size() == 0) {
 			System.out.println("No potential ToNode found!");
 			return null;
 		}
@@ -173,10 +158,8 @@ public class CountsCreator {
 		/*
 		 * Search all possible Links
 		 */
-		for (Node possibleFromNode : possibleFromNodes)
-		{
-			for (Node possibleToNode : possibleToNodes)
-			{
+		for (Node possibleFromNode : possibleFromNodes) {
+			for (Node possibleToNode : possibleToNodes) {
 				Link possibleLink = searchLink(emme2Count, possibleFromNode, possibleToNode);
 				if (possibleLink != null) possibleLinks.add(possibleLink);
 			}
@@ -189,8 +172,7 @@ public class CountsCreator {
 		 * Look for the longest among the possible Links
 		 */
 		Link longestLink = possibleLinks.get(0);
-		for (Link link : possibleLinks)
-		{
+		for (Link link : possibleLinks) {
 			if (link.getLength() > longestLink.getLength()) longestLink = link;
 		}
 		if (longestLink.getLength() < 1.0) System.out.println("Link is very short...");

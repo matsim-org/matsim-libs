@@ -35,21 +35,18 @@ public class Emme2PersonFileParser {
 	private String separator = ",";
 	private Charset charset = Charset.forName("UTF-8");
 	
-	public Emme2PersonFileParser(String inFile)
-	{
+	public Emme2PersonFileParser(String inFile) {
 		this.inFile = inFile;
 	}
 	
-	public Map<Integer, Emme2Person> readFile()
-	{
+	public Map<Integer, Emme2Person> readFile() {
 		Map<Integer, Emme2Person> zones = new TreeMap<Integer, Emme2Person>();
 		
 		FileInputStream fis = null;
 		InputStreamReader isr = null;
 	    BufferedReader br = null;
 	       
-    	try 
-    	{
+    	try {
     		fis = new FileInputStream(inFile);
     		isr = new InputStreamReader(fis, charset);
 			br = new BufferedReader(isr);
@@ -58,8 +55,7 @@ public class Emme2PersonFileParser {
 //			br.readLine();
 			 
 			String line;
-			while((line = br.readLine()) != null)
-			{
+			while((line = br.readLine()) != null) {
 				Emme2Person emme2Person = new Emme2Person();
 				
 				String[] cols = line.split(separator);
@@ -120,27 +116,22 @@ public class Emme2PersonFileParser {
 			isr.close();
 			fis.close();
     	}
-    	catch (FileNotFoundException e) 
-    	{
+    	catch (FileNotFoundException e) {
 			e.printStackTrace();
-		}
-		catch (IOException e) 
-		{
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		
 		return zones;
 	}
 	
-	private int parseInteger(String string)
-	{
+	private int parseInteger(String string) {
 		if (string == null) return 0;
 		else if (string.trim().equals("")) return 0;
 		else return Integer.valueOf(string);
 	}
 	
-	private double parseDouble(String string)
-	{
+	private double parseDouble(String string) {
 		if (string == null) return 0.0;
 		else if (string.trim().equals("")) return 0.0;
 		else return Double.valueOf(string);
