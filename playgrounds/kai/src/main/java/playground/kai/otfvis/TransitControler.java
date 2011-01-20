@@ -42,7 +42,7 @@ public class TransitControler {
 		new MatsimConfigReader(config).readFile(args[0]);
 		config.scenario().setUseTransit(true);
 		config.scenario().setUseVehicles(true);
-//		config.otfVis().setColoringScheme( OTFVisConfigGroup.COLORING_BVG ) ;
+		config.otfVis().setColoringScheme( OTFVisConfigGroup.COLORING_BVG ) ;
 		
 		Controler tc = new Controler(config) ;
 		
@@ -66,13 +66,15 @@ public class TransitControler {
 //			this.events.addHandler(new LogOutputEventHandler());
 
 			if ( useOTFVis ) {
-				OTFVisMobsimFeature otfVisQSimFeature = new OTFVisMobsimFeature(simulation);
+				// otfvis configuration.  There is more you can do here than via file!
 				final OTFVisConfigGroup otfVisConfig = simulation.getScenario().getConfig().otfVis();
+				otfVisConfig.setDrawTransitFacilities(false) ; // this DOES work
+//				otfVisConfig.setShowParking(true) ; // this does not really work
+
+				final OTFVisMobsimFeature otfVisQSimFeature = new OTFVisMobsimFeature(simulation);
 				otfVisQSimFeature.setVisualizeTeleportedAgents(otfVisConfig.isShowTeleportedAgents());
 				simulation.addQueueSimulationListeners(otfVisQSimFeature);
 				simulation.getEventsManager().addHandler(otfVisQSimFeature) ;
-				otfVisConfig.setDrawTransitFacilities(true) ;
-				otfVisConfig.setShowParking(true) ;
 			}
 
 //			if(this.useHeadwayControler){
