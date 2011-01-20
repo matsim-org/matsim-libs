@@ -38,8 +38,8 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
-import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
-import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -65,13 +65,13 @@ public class PlanScoreForecaster {
 	private PlanImpl plan, oldSelected;
 	private NetworkImpl net;
 	private TravelTime ttc;
-	private CharyparNagelScoringConfigGroup scoring;
+	private PlanCalcScoreConfigGroup scoring;
 	private double score = 0.0, betaTraveling, betaPerforming, betaDist,
 			firstActEndTime, attrTraveling = 0.0, attrPerforming = 0.0,
 			attrDistance = 0.0;
 
 	public PlanScoreForecaster(Plan plan, NetworkImpl net, TravelTime ttc,
-			CharyparNagelScoringConfigGroup scoring, double betaTraveling,
+			PlanCalcScoreConfigGroup scoring, double betaTraveling,
 			double betaPerforming) {
 		this.plan = (PlanImpl) plan;
 		this.net = net;
@@ -83,14 +83,14 @@ public class PlanScoreForecaster {
 
 	public PlanScoreForecaster(Plan selectedPlan, Plan oldSelected,
 			NetworkImpl net2, TravelTime tt,
-			CharyparNagelScoringConfigGroup scoring2, double d, double e) {
+			PlanCalcScoreConfigGroup scoring2, double d, double e) {
 		this(selectedPlan, net2, tt, scoring2, d, e);
 		this.oldSelected = (PlanImpl) oldSelected;
 	}
 
 	public PlanScoreForecaster(Plan selectedPlan, Plan oldSelected,
 			NetworkImpl net, TravelTime tt,
-			CharyparNagelScoringConfigGroup scoring, double betaTraveling,
+			PlanCalcScoreConfigGroup scoring, double betaTraveling,
 			double betaPerforming, double betaDist) {
 		this(selectedPlan, oldSelected, net, tt, scoring, betaTraveling,
 				betaPerforming);
@@ -264,7 +264,7 @@ public class PlanScoreForecaster {
 
 		Config cf = sc.getConfig();
 		new MatsimConfigReader(cf).readFile(configFilename);
-		CharyparNagelScoringConfigGroup scoring = cf.charyparNagelScoring();
+		PlanCalcScoreConfigGroup scoring = cf.charyparNagelScoring();
 
 		NetworkImpl net = (NetworkImpl) sc.getNetwork();
 		new MatsimNetworkReader(sc).readFile(netFilename);

@@ -38,7 +38,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.scoring.EventsToScore;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -73,7 +73,7 @@ public abstract class Events2Score4PC extends EventsToScore implements
 			walkLegNos = new HashMap<Id, Map<Plan, Integer>>();
 	protected Population pop = null;
 	protected ScoringFunctionFactory sfFactory = null;
-	protected CharyparNagelScoringConfigGroup scoring;
+	protected PlanCalcScoreConfigGroup scoring;
 	// protected boolean setPersonScore = true;
 	protected int maxPlansPerAgent;
 	protected final TreeMap<Id, Tuple<Plan, ScoringFunction>> agentScorers = new TreeMap<Id, Tuple<Plan, ScoringFunction>>();
@@ -124,7 +124,7 @@ public abstract class Events2Score4PC extends EventsToScore implements
 				.parseDouble(paramScaleFactorIStr));
 	}
 
-	public CharyparNagelScoringConfigGroup getScoring() {
+	public PlanCalcScoreConfigGroup getScoring() {
 		return scoring;
 	}
 

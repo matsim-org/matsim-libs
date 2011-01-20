@@ -27,8 +27,8 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
-import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.scoring.ActivityUtilityParameters;
@@ -50,7 +50,7 @@ public class BkScoringFunction implements ScoringFunction {
 	private int index; // the current position in plan.actslegs
 	private double firstActTime;
 	private final int lastActIndex;
-	private static CharyparNagelScoringConfigGroup configGroup;
+	private static PlanCalcScoreConfigGroup configGroup;
 
 	private static final double INITIAL_LAST_TIME = 0.0;
 	private static final int INITIAL_INDEX = 0;
@@ -80,7 +80,7 @@ public class BkScoringFunction implements ScoringFunction {
 
 
 
-	public BkScoringFunction(final Plan plan, CharyparNagelScoringConfigGroup config) {
+	public BkScoringFunction(final Plan plan, PlanCalcScoreConfigGroup config) {
 		configGroup = config;
 		init();
 		this.reset();
@@ -337,7 +337,7 @@ public class BkScoringFunction implements ScoringFunction {
 	/**
 	 * reads all activity utility values from the config-file
 	 */
-	private static final void readUtilityValues(CharyparNagelScoringConfigGroup config) {
+	private static final void readUtilityValues(PlanCalcScoreConfigGroup config) {
 		for (ActivityParams params : config.getActivityParams()) {
 			String type = params.getType();
 			double priority = params.getPriority();

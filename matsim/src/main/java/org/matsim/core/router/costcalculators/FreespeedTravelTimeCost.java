@@ -23,7 +23,7 @@ package org.matsim.core.router.costcalculators;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.TravelMinCost;
@@ -71,7 +71,7 @@ public class FreespeedTravelTimeCost implements PersonalizableTravelCost, Travel
 		this.marginalUtlOfDistance = scaledMarginalUtilityOfDistance;
 	}
 
-	public FreespeedTravelTimeCost(CharyparNagelScoringConfigGroup cnScoringGroup){
+	public FreespeedTravelTimeCost(PlanCalcScoreConfigGroup cnScoringGroup){
 		this(cnScoringGroup.getTraveling_utils_hr() / 3600.0, cnScoringGroup.getPerforming_utils_hr() / 3600.0,
 //				cnScoringGroup.getMarginalUtlOfDistanceCar());
 				cnScoringGroup.getMonetaryDistanceCostRateCar()*cnScoringGroup.getMarginalUtilityOfMoney());

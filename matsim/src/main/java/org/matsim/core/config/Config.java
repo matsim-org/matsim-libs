@@ -26,7 +26,7 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.config.consistency.ConfigConsistencyChecker;
-import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.CountsConfigGroup;
 import org.matsim.core.config.groups.FacilitiesConfigGroup;
@@ -71,7 +71,7 @@ public class Config {
 	 */
 
 	// config groups that are in org.matsim.core.config.groups:
-	private CharyparNagelScoringConfigGroup charyparNagelScoring = null;
+	private PlanCalcScoreConfigGroup charyparNagelScoring = null;
 	private ControlerConfigGroup controler = null;
 	private CountsConfigGroup counts = null;
 	private FacilitiesConfigGroup facilities = null;
@@ -128,8 +128,8 @@ public class Config {
 		this.counts = new CountsConfigGroup();
 		this.modules.put(CountsConfigGroup.GROUP_NAME, this.counts);
 
-		this.charyparNagelScoring = new CharyparNagelScoringConfigGroup();
-		this.modules.put(CharyparNagelScoringConfigGroup.GROUP_NAME, this.charyparNagelScoring);
+		this.charyparNagelScoring = new PlanCalcScoreConfigGroup();
+		this.modules.put(PlanCalcScoreConfigGroup.GROUP_NAME, this.charyparNagelScoring);
 
 		this.network = new NetworkConfigGroup();
 		this.modules.put(NetworkConfigGroup.GROUP_NAME, this.network);
@@ -379,7 +379,7 @@ public class Config {
 		return this.counts;
 	}
 
-	public final CharyparNagelScoringConfigGroup charyparNagelScoring() {
+	public final PlanCalcScoreConfigGroup charyparNagelScoring() {
 		return this.charyparNagelScoring;
 	}
 

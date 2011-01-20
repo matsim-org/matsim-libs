@@ -25,7 +25,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
 
 /**
@@ -39,7 +39,7 @@ public class ExpBetaPlanSelector implements PlanSelector {
 	protected static final double MIN_WEIGHT = Double.MIN_VALUE;
 	protected final double beta;
 
-	public ExpBetaPlanSelector(CharyparNagelScoringConfigGroup charyparNagelScoringConfigGroup) {
+	public ExpBetaPlanSelector(PlanCalcScoreConfigGroup charyparNagelScoringConfigGroup) {
 		this.beta = charyparNagelScoringConfigGroup.getBrainExpBeta();
 	}
 

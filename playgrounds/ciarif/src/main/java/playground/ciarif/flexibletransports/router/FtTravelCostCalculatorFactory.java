@@ -1,6 +1,6 @@
 package playground.ciarif.flexibletransports.router;
 
-import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
@@ -17,14 +17,14 @@ public class FtTravelCostCalculatorFactory
     this.ftConfigGroup = ftConfigGroup;
   }
 
-  public PersonalizableTravelCost createTravelCostCalculator(TravelTime timeCalculator, CharyparNagelScoringConfigGroup cnScoringGroup) {
+  public PersonalizableTravelCost createTravelCostCalculator(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
     return new FtTravelTimeDistanceCostCalculator(timeCalculator, cnScoringGroup, this.ftConfigGroup);
   }
 
 @Override
 public PersonalizableTravelCost createTravelCostCalculator(
 		PersonalizableTravelTime timeCalculator,
-		CharyparNagelScoringConfigGroup cnScoringGroup) {
+		PlanCalcScoreConfigGroup cnScoringGroup) {
 	// TODO Auto-generated method stub
 	return null;
 }

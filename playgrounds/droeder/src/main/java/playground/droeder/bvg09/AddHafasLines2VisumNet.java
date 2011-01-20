@@ -38,7 +38,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
@@ -235,8 +235,8 @@ public class AddHafasLines2VisumNet {
 		List<Link> links = new ArrayList<Link>();
 
 		LeastCostPathCalculator router = new Dijkstra(visumNet,
-				new FreespeedTravelTimeCost(new CharyparNagelScoringConfigGroup()),
-				new FreespeedTravelTimeCost(new CharyparNagelScoringConfigGroup()));
+				new FreespeedTravelTimeCost(new PlanCalcScoreConfigGroup()),
+				new FreespeedTravelTimeCost(new PlanCalcScoreConfigGroup()));
 
 		boolean first = true;
 		Path p;

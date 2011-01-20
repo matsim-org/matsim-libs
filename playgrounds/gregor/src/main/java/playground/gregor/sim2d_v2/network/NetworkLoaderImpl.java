@@ -48,7 +48,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.router.Dijkstra;
@@ -111,12 +111,12 @@ public class NetworkLoaderImpl implements NetworkLoader {
 
 	private FreespeedTravelTimeCost cost;
 
-	private final CharyparNagelScoringConfigGroup config;
+	private final PlanCalcScoreConfigGroup config;
 
 	private Dijkstra router;
 
 
-	public NetworkLoaderImpl(NetworkImpl net, final CharyparNagelScoringConfigGroup config) {
+	public NetworkLoaderImpl(NetworkImpl net, final PlanCalcScoreConfigGroup config) {
 		this.network = net;
 		this.config = config;
 	}

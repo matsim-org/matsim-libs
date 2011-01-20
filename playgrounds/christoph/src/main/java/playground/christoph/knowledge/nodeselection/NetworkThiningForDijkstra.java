@@ -12,7 +12,7 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.TravelCost;
@@ -33,7 +33,7 @@ public class NetworkThiningForDijkstra {
 	private double time = Time.UNDEFINED_TIME;
 	
 	// CostCalculator for the Dijkstra Algorithm
-	private TravelCost costCalculator = new FreespeedTravelTimeCost(new CharyparNagelScoringConfigGroup());
+	private TravelCost costCalculator = new FreespeedTravelTimeCost(new PlanCalcScoreConfigGroup());
 	private DijkstraForSelectNodes dijkstra;
 	
 	private Map<Id, Link> notUsedLinks;
@@ -217,7 +217,7 @@ public class NetworkThiningForDijkstra {
 	{
 		
 		// CostCalculator for the Dijkstra Algorithm
-		private TravelCost costCalculator = new FreespeedTravelTimeCost(new CharyparNagelScoringConfigGroup());
+		private TravelCost costCalculator = new FreespeedTravelTimeCost(new PlanCalcScoreConfigGroup());
 		private DijkstraForSelectNodes dijkstra;
 		
 		private Map<Id, Link> notUsedLinks;

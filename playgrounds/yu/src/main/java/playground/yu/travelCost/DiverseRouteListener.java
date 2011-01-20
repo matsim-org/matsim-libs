@@ -23,7 +23,7 @@
  */
 package playground.yu.travelCost;
 
-import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
@@ -63,7 +63,7 @@ public class DiverseRouteListener implements IterationStartsListener,
 		Controler ctl = event.getControler();
 		int iter = event.getIteration();/* firstIter+1, +2, +3 */
 		if (iter == ctl.getFirstIteration()) {
-			CharyparNagelScoringConfigGroup scoringCfg = ctl.getConfig()
+			PlanCalcScoreConfigGroup scoringCfg = ctl.getConfig()
 					.charyparNagelScoring();
 			scoringCfg.setMonetaryDistanceCostRateCar(-0.00012);
 			ctl

@@ -20,7 +20,7 @@
 package playground.anhorni.LEGO.miniscenario.run.scoring;
 
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PlanImpl;
@@ -35,7 +35,7 @@ public class MixedScoringFunctionFactory extends org.matsim.core.scoring.charypa
 	private final Controler controler;
 	private ConfigReader configReader = new ConfigReader();
 
-	public MixedScoringFunctionFactory(CharyparNagelScoringConfigGroup config, Controler controler, ConfigReader configReader) {
+	public MixedScoringFunctionFactory(PlanCalcScoreConfigGroup config, Controler controler, ConfigReader configReader) {
 		super(config);				
 		this.controler = controler;
 		this.configReader = configReader;

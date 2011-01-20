@@ -33,7 +33,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.LocationChoiceConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
@@ -137,7 +137,7 @@ public class LocationMutatorBestResponse extends LocationMutatorwChoiceSet {
 						// maybe repeat this a couple of times
 						TravelTime travelTime = super.getControler().getTravelTimeCalculator();
 						TravelCost travelCost = super.getControler().getTravelCostCalculatorFactory().
-							createTravelCostCalculator((PersonalizableTravelTime)travelTime, (CharyparNagelScoringConfigGroup)super.getControler().getConfig().getModule("planCalcScore"));
+							createTravelCostCalculator((PersonalizableTravelTime)travelTime, (PlanCalcScoreConfigGroup)super.getControler().getConfig().getModule("planCalcScore"));
 						
 						ScoringFunctionAccumulator scorer = (ScoringFunctionAccumulator) this.controler.getPlansScoring().getPlanScorer().getScoringFunctionForAgent(plan.getPerson().getId());
 						this.setLocation((ActivityImpl)actToMove, 

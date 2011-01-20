@@ -35,7 +35,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
-import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -87,7 +87,7 @@ public class MNLUtilsTest {
 		mnl.setCoefficient(3, -18d/* lateArrival */);
 
 		// initialize scoringConfigGroup
-		CharyparNagelScoringConfigGroup scoringConfigGroup = config
+		PlanCalcScoreConfigGroup scoringConfigGroup = config
 				.charyparNagelScoring();
 		scoringConfigGroup.setTravelingPt_utils_hr(travelingPt);
 

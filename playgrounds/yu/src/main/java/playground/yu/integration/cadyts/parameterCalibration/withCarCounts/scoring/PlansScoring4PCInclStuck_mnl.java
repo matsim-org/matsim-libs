@@ -25,7 +25,7 @@ package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.scor
 
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
@@ -62,7 +62,7 @@ public class PlansScoring4PCInclStuck_mnl extends PlansScoring4PC implements
 		int choiceSetSize = config.strategy().getMaxAgentPlanMemorySize(), //
 		attributeCount = Integer.parseInt(config.findParam("bse",
 				"attributeCount"));
-		CharyparNagelScoringConfigGroup scoringCfg = config
+		PlanCalcScoreConfigGroup scoringCfg = config
 				.charyparNagelScoring();
 		double traveling = scoringCfg.getTraveling_utils_hr(), //
 		travelingPt = scoringCfg.getTravelingPt_utils_hr(), //

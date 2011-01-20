@@ -26,7 +26,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
@@ -85,7 +85,7 @@ public class IterativeKnowledgeControler extends Controler{
 			@Override
 			public PersonalizableTravelCost createTravelCostCalculator(
 					PersonalizableTravelTime timeCalculator,
-					CharyparNagelScoringConfigGroup cnScoringGroup) {
+					PlanCalcScoreConfigGroup cnScoringGroup) {
 				return travelCostWrapper;
 			}
 			

@@ -22,7 +22,7 @@ package org.matsim.core.router.costcalculators;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.TravelMinCost;
 import org.matsim.core.router.util.TravelTime;
@@ -38,7 +38,7 @@ public class TravelTimeDistanceCostCalculator implements TravelMinCost, Personal
 	private final double travelCostFactor;
 	private final double marginalUtlOfDistance;
 
-	public TravelTimeDistanceCostCalculator(final TravelTime timeCalculator, CharyparNagelScoringConfigGroup cnScoringGroup) {
+	public TravelTimeDistanceCostCalculator(final TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
 		this.timeCalculator = timeCalculator;
 		/* Usually, the travel-utility should be negative (it's a disutility)
 		 * but the cost should be positive. Thus negate the utility.

@@ -20,7 +20,7 @@
 package playground.yu.scoring;
 
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
@@ -41,7 +41,7 @@ public class CharyparNagelScoringFunctionFactoryWithWalk implements
 	private final double offsetWalk;
 
 	public CharyparNagelScoringFunctionFactoryWithWalk(
-			final CharyparNagelScoringConfigGroup config, final double offsetWalk) {
+			final PlanCalcScoreConfigGroup config, final double offsetWalk) {
 		this.params = new CharyparNagelScoringParameters(config);
 		this.offsetWalk = offsetWalk;
 	}

@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.mnlValidation.MultinomialLogitChoice;
@@ -49,7 +49,7 @@ public class Events2Score4TravPerf_mnl extends Events2Score4TravPerf implements
 
 	public Events2Score4TravPerf_mnl(MultinomialLogit mnl,
 			ScoringFunctionFactory sfFactory, Population pop,
-			int maxPlansPerAgent, CharyparNagelScoringConfigGroup scoring) {
+			int maxPlansPerAgent, PlanCalcScoreConfigGroup scoring) {
 		super(pop, sfFactory, scoring.getLearningRate(), maxPlansPerAgent,
 				scoring);
 		this.mnl = mnl;

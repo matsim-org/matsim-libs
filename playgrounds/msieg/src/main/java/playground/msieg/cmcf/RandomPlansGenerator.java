@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
@@ -116,7 +116,7 @@ public class RandomPlansGenerator {
 	private void initDijkstra(){
 		PreProcessDijkstra preProcessData = new PreProcessDijkstra();
 		preProcessData.run(this.network);
-		final FreespeedTravelTimeCost costFunction = new FreespeedTravelTimeCost(new CharyparNagelScoringConfigGroup());
+		final FreespeedTravelTimeCost costFunction = new FreespeedTravelTimeCost(new PlanCalcScoreConfigGroup());
 		this.routingAlgo = new Dijkstra(this.network, costFunction, costFunction, preProcessData);
 	}
 

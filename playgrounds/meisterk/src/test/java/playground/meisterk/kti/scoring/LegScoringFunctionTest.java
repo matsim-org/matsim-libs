@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -69,7 +69,7 @@ public class LegScoringFunctionTest extends MatsimTestCase {
 		ktiConfigGroup.setConstCar(-0.6);
 		this.config.addModule(KtiConfigGroup.GROUP_NAME, ktiConfigGroup);
 
-		CharyparNagelScoringConfigGroup charyparNagelConfigGroup = this.config.charyparNagelScoring();
+		PlanCalcScoreConfigGroup charyparNagelConfigGroup = this.config.charyparNagelScoring();
 
 //		charyparNagelConfigGroup.setMarginalUtlOfDistancePt(-0.5);
 		charyparNagelConfigGroup.setMonetaryDistanceCostRatePt(-0.5) ;

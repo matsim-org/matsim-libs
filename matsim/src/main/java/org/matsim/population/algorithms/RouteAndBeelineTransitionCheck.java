@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.LegImpl;
@@ -60,7 +60,7 @@ public class RouteAndBeelineTransitionCheck implements PlanAlgorithm {
 	public RouteAndBeelineTransitionCheck(final NetworkImpl net, final Set<Id> areaOfInterest) {
 		this.network = net;
 		this.aOI = areaOfInterest;
-		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(new CharyparNagelScoringConfigGroup());
+		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(new PlanCalcScoreConfigGroup());
 		this.router = new PlansCalcRoute(new PlansCalcRouteConfigGroup(), this.network, timeCostCalc, timeCostCalc, new DijkstraFactory());
 		this.count = new int[4];
 	}

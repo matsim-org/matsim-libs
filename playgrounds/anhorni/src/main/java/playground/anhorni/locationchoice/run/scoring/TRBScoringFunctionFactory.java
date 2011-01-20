@@ -22,7 +22,7 @@ package playground.anhorni.locationchoice.run.scoring;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.population.PlanImpl;
@@ -45,7 +45,7 @@ public class TRBScoringFunctionFactory extends org.matsim.core.scoring.charyparN
 
 	private final static Logger log = Logger.getLogger(TRBScoringFunctionFactory.class);
 
-	public TRBScoringFunctionFactory(CharyparNagelScoringConfigGroup config, Controler controler) {
+	public TRBScoringFunctionFactory(PlanCalcScoreConfigGroup config, Controler controler) {
 		super(config);
 		this.controler = controler;
 		this.init();

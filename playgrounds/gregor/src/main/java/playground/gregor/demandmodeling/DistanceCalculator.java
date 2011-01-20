@@ -29,7 +29,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.Dijkstra;
@@ -44,9 +44,9 @@ public class DistanceCalculator {
 	private final List<String []> entries = new ArrayList<String []>();
 	private final HashMap<String,Household> housholds = new HashMap<String,Household>();
 	private final String outfile;
-	private final CharyparNagelScoringConfigGroup config;
+	private final PlanCalcScoreConfigGroup config;
 
-	public DistanceCalculator(NetworkImpl network, String csvfile, String outfile, CharyparNagelScoringConfigGroup config) {
+	public DistanceCalculator(NetworkImpl network, String csvfile, String outfile, PlanCalcScoreConfigGroup config) {
 		this.network = network;
 		this.csvfile = csvfile;
 		this.outfile = outfile;

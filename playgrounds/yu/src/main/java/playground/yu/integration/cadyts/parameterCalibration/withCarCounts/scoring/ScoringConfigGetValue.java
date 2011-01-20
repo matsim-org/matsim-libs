@@ -25,7 +25,7 @@ package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.scor
 
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 
 /**
  * @author yu
@@ -33,7 +33,7 @@ import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
  */
 public class ScoringConfigGetValue {
 	private final static Logger log = Logger.getLogger(ScoringConfigGetValue.class);
-	private static CharyparNagelScoringConfigGroup scoringCfgGroup;
+	private static PlanCalcScoreConfigGroup scoringCfgGroup;
 	private static Config config;
 
 	private static final String PERFORMING = "performing";

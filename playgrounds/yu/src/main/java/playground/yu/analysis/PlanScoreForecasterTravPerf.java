@@ -39,8 +39,8 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
-import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
-import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -67,7 +67,7 @@ public class PlanScoreForecasterTravPerf {
 	private PlanImpl plan, oldSelected;
 	private NetworkImpl net;
 	private TravelTime ttc;
-	private CharyparNagelScoringConfigGroup scoring;
+	private PlanCalcScoreConfigGroup scoring;
 	private double score = 0.0, betaTraveling, betaTravelingPt, betaPerforming,
 	// betaDist,
 			firstActEndTime, attrTraveling = 0.0, attrPerforming = 0.0
@@ -75,7 +75,7 @@ public class PlanScoreForecasterTravPerf {
 			;
 
 	public PlanScoreForecasterTravPerf(Plan plan, NetworkImpl net,
-			TravelTime ttc, CharyparNagelScoringConfigGroup scoring,
+			TravelTime ttc, PlanCalcScoreConfigGroup scoring,
 			double betaTraveling, double betaTravelingPt) {
 		this.plan = (PlanImpl) plan;
 		this.net = net;
@@ -88,7 +88,7 @@ public class PlanScoreForecasterTravPerf {
 
 	public PlanScoreForecasterTravPerf(Plan selectedPlan, Plan oldSelected,
 			NetworkImpl net, TravelTime tt,
-			CharyparNagelScoringConfigGroup scoring, double d, double e) {
+			PlanCalcScoreConfigGroup scoring, double d, double e) {
 		this(selectedPlan, net, tt, scoring, d, e);
 		this.oldSelected = (PlanImpl) oldSelected;
 	}
@@ -277,7 +277,7 @@ public class PlanScoreForecasterTravPerf {
 
 		Config cf = sc.getConfig();
 		new MatsimConfigReader(cf).readFile(configFilename);
-		CharyparNagelScoringConfigGroup scoring = cf.charyparNagelScoring();
+		PlanCalcScoreConfigGroup scoring = cf.charyparNagelScoring();
 
 		NetworkImpl net = (NetworkImpl) sc.getNetwork();
 		new MatsimNetworkReader(sc).readFile(netFilename);

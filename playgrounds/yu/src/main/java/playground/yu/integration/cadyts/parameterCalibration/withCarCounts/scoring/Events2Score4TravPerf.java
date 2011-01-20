@@ -37,7 +37,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.scoring.EventsToScore;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -59,7 +59,7 @@ public abstract class Events2Score4TravPerf extends EventsToScore implements
 			stuckAttrs = new HashMap<Id, Map<Plan, Double>>();
 	protected Population pop = null;
 	protected ScoringFunctionFactory sfFactory = null;
-	protected CharyparNagelScoringConfigGroup scoring;
+	protected PlanCalcScoreConfigGroup scoring;
 	// protected boolean setPersonScore = true;
 	protected int maxPlansPerAgent;
 	protected final TreeMap<Id, Tuple<Plan, ScoringFunction>> agentScorers = new TreeMap<Id, Tuple<Plan, ScoringFunction>>();
@@ -67,7 +67,7 @@ public abstract class Events2Score4TravPerf extends EventsToScore implements
 
 	public Events2Score4TravPerf(Population population,
 			ScoringFunctionFactory factory, double learningRate,
-			int maxPlansPerAgent, CharyparNagelScoringConfigGroup scoring) {
+			int maxPlansPerAgent, PlanCalcScoreConfigGroup scoring) {
 		super(population, factory, scoring.getLearningRate());
 		this.scoring = scoring;
 		pop = population;
@@ -75,7 +75,7 @@ public abstract class Events2Score4TravPerf extends EventsToScore implements
 		sfFactory = factory;
 	}
 
-	public CharyparNagelScoringConfigGroup getScoring() {
+	public PlanCalcScoreConfigGroup getScoring() {
 		return scoring;
 	}
 

@@ -34,7 +34,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NodeImpl;
@@ -88,7 +88,7 @@ public class PathSetGenerator {
 	public PathSetGenerator(final NetworkImpl network) {
 		if (network == null) { throw new RuntimeException("Network must exist."); }
 		this.network = network;
-		this.frespeedCost = new FreespeedTravelTimeCost(new CharyparNagelScoringConfigGroup());
+		this.frespeedCost = new FreespeedTravelTimeCost(new PlanCalcScoreConfigGroup());
 		PreProcessLandmarks preProcessLandmarks = new PreProcessLandmarks(this.frespeedCost);
 		preProcessLandmarks.run(network);
 		this.router = new AStarLandmarks(this.network,preProcessLandmarks,this.frespeedCost);

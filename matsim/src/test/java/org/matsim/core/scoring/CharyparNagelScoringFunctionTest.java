@@ -27,8 +27,8 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
-import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -58,7 +58,7 @@ public abstract class CharyparNagelScoringFunctionTest extends ScoringFunctionTe
 	public void setUp() throws Exception {
 		super.setUp();
 		this.config = loadConfig(null);
-		CharyparNagelScoringConfigGroup scoring = this.config.charyparNagelScoring();
+		PlanCalcScoreConfigGroup scoring = this.config.charyparNagelScoring();
 		scoring.setBrainExpBeta(2.0);
 		scoring.setLateArrival_utils_hr(0.0);
 		scoring.setEarlyDeparture_utils_hr(0.0);
@@ -73,11 +73,11 @@ public abstract class CharyparNagelScoringFunctionTest extends ScoringFunctionTe
 		scoring.setWaiting_utils_hr(0.0);
 
 		// setup activity types h and w for scoring
-		CharyparNagelScoringConfigGroup.ActivityParams params = new CharyparNagelScoringConfigGroup.ActivityParams("h");
+		PlanCalcScoreConfigGroup.ActivityParams params = new PlanCalcScoreConfigGroup.ActivityParams("h");
 		params.setTypicalDuration(16*3600);
 		scoring.addActivityParams(params);
 
-		params = new CharyparNagelScoringConfigGroup.ActivityParams("w");
+		params = new PlanCalcScoreConfigGroup.ActivityParams("w");
 		params.setTypicalDuration(8*3600);
 		scoring.addActivityParams(params);
 
@@ -387,7 +387,7 @@ public abstract class CharyparNagelScoringFunctionTest extends ScoringFunctionTe
 		// change the last act to something different than the first act
 		((Activity) this.plan.getPlanElements().get(4)).setType("h2");
 
-		CharyparNagelScoringConfigGroup.ActivityParams params = new CharyparNagelScoringConfigGroup.ActivityParams("h2");
+		PlanCalcScoreConfigGroup.ActivityParams params = new PlanCalcScoreConfigGroup.ActivityParams("h2");
 		params.setTypicalDuration(8*3600);
 		this.config.charyparNagelScoring().addActivityParams(params);
 

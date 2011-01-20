@@ -36,7 +36,7 @@ import org.apache.commons.math.util.ResizableDoubleArray;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -263,7 +263,7 @@ public class PersonTreatmentRecorder implements StartupListener, IterationEndsLi
 	
 	boolean isPersonSatisfied(
 			Person person, 
-			CharyparNagelScoringConfigGroup charyparNagelScoringConfigGroup) {
+			PlanCalcScoreConfigGroup charyparNagelScoringConfigGroup) {
 		
 		boolean isPersonSatisfied = false;
 		
@@ -279,7 +279,7 @@ public class PersonTreatmentRecorder implements StartupListener, IterationEndsLi
 
 	String getIsPersonSatisfiedString(
 			Map<String, Set<Person>> personTreatment,
-			CharyparNagelScoringConfigGroup charyparNagelScoringConfigGroup) {
+			PlanCalcScoreConfigGroup charyparNagelScoringConfigGroup) {
 
 		String str = new String();
 

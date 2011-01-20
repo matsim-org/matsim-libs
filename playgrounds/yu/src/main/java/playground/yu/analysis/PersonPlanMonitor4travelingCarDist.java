@@ -31,8 +31,8 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
-import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 
 import playground.yu.utils.DebugTools;
 
@@ -99,7 +99,7 @@ public class PersonPlanMonitor4travelingCarDist {
 		return legDur;
 	}
 
-	public double getTotalPerformTime_h(CharyparNagelScoringConfigGroup scoring) {
+	public double getTotalPerformTime_h(PlanCalcScoreConfigGroup scoring) {
 		if (this.stuck)
 			return 0.0;
 		if (this.idx % 2 == 1)

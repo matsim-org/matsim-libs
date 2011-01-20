@@ -22,7 +22,7 @@ package playground.jjoubert.roadpricing.senozon;
 
 import org.apache.log4j.Logger;
 import org.matsim.analysis.CalcAverageTolledTripLength;
-import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
@@ -90,7 +90,7 @@ public class SanralRoadPricing implements StartupListener, AfterMobsimListener, 
 				@Override
 				public PersonalizableTravelCost createTravelCostCalculator(
 						PersonalizableTravelTime timeCalculator,
-						CharyparNagelScoringConfigGroup cnScoringGroup) {
+						PlanCalcScoreConfigGroup cnScoringGroup) {
 					return new SanralTollTravelCostCalculator(previousTravelCostCalculatorFactory.createTravelCostCalculator(timeCalculator, cnScoringGroup), SanralRoadPricing.this.scheme);
 				}
 

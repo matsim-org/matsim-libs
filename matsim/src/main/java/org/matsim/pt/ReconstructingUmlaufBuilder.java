@@ -29,7 +29,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -58,7 +58,7 @@ public class ReconstructingUmlaufBuilder implements UmlaufBuilder {
 
 
 	public ReconstructingUmlaufBuilder(Network network, Collection<TransitLine> transitLines,
-			Vehicles basicVehicles, CharyparNagelScoringConfigGroup config) {
+			Vehicles basicVehicles, PlanCalcScoreConfigGroup config) {
 		super();
 		this.umlaufInterpolator = new UmlaufInterpolator(network, config);
 		this.transitLines = transitLines;

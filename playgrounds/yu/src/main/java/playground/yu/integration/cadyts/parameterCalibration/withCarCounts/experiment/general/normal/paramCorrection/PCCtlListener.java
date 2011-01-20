@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.ControlerIO;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -142,7 +142,7 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 
 	private void setInitialParametersInCalibrator(Config config) {
 		ScoringConfigGetValue.setConfig(config);
-		CharyparNagelScoringConfigGroup scoringCfg = config
+		PlanCalcScoreConfigGroup scoringCfg = config
 				.charyparNagelScoring();
 
 		Vector initialParams = new Vector(paramDim);
@@ -543,7 +543,7 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 			// ****SET CALIBRATED PARAMETERS FOR SCORE CALCULATION AGAIN!!!***
 			Vector params = ((ChoiceParameterCalibrator<Link>) calibrator)
 					.getParameters();
-			CharyparNagelScoringConfigGroup scoringCfg = config
+			PlanCalcScoreConfigGroup scoringCfg = config
 					.charyparNagelScoring();
 
 			// VERY IMPORTANT #########################################

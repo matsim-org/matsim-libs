@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package playground.yu.travelCost;
 
-import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
@@ -39,7 +39,7 @@ public class ParameterizedTravelCostCalculatorFactoryImpl implements
 
 	public PersonalizableTravelCost createTravelCostCalculator(
 			PersonalizableTravelTime timeCalculator,
-			CharyparNagelScoringConfigGroup cnScoringGroup) {
+			PlanCalcScoreConfigGroup cnScoringGroup) {
 		return new ParameterizedTravelTimeDistanceCostCalculator(
 				timeCalculator, cnScoringGroup, A, B);
 	}

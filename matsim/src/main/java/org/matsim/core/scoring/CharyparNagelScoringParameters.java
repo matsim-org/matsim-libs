@@ -23,8 +23,8 @@ package org.matsim.core.scoring;
 import java.util.TreeMap;
 
 import org.matsim.core.api.internal.MatsimParameters;
-import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
-import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 
 public class CharyparNagelScoringParameters implements MatsimParameters {
 	public final TreeMap<String, ActivityUtilityParameters> utilParams = new TreeMap<String, ActivityUtilityParameters>();
@@ -53,7 +53,7 @@ public class CharyparNagelScoringParameters implements MatsimParameters {
 	/** True if one at least one of marginal utilities for performing, waiting, being late or leaving early is not equal to 0. */
 	public final boolean scoreActs;
 	
-	public CharyparNagelScoringParameters(final CharyparNagelScoringConfigGroup config) {
+	public CharyparNagelScoringParameters(final PlanCalcScoreConfigGroup config) {
 		marginalUtilityOfWaiting_s = config.getWaiting_utils_hr() / 3600.0;
 		marginalUtilityOfLateArrival_s = config.getLateArrival_utils_hr() / 3600.0;
 		marginalUtilityOfEarlyDeparture_s = config.getEarlyDeparture_utils_hr() / 3600.0;

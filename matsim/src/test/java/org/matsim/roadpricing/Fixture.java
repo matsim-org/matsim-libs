@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.mobsim.framework.Simulation;
 import org.matsim.core.mobsim.queuesim.QueueSimulationFactory;
@@ -205,7 +205,7 @@ import org.matsim.core.utils.misc.Time;
 		return person;
 	}
 
-	protected static Population createReferencePopulation1(final CharyparNagelScoringConfigGroup config) {
+	protected static Population createReferencePopulation1(final PlanCalcScoreConfigGroup config) {
 		// run mobsim once without toll and get score for network1/population1
 		ScenarioImpl scenario = new ScenarioImpl();
 		Fixture.createNetwork1(scenario);

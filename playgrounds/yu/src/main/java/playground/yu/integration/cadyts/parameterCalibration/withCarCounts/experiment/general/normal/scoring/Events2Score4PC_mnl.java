@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.general.normal.paramCorrection.PCCtlListener;
@@ -371,7 +371,7 @@ public class Events2Score4PC_mnl extends Events2Score4PC implements
 		attributeCount = Integer.parseInt(config.findParam(
 				PCCtlListener.BSE_CONFIG_MODULE_NAME, "attributeCount"));
 
-		CharyparNagelScoringConfigGroup scoring = config.charyparNagelScoring();
+		PlanCalcScoreConfigGroup scoring = config.charyparNagelScoring();
 		double traveling = scoring.getTraveling_utils_hr();
 		double betaStuck = Math.min(Math.min(scoring.getLateArrival_utils_hr(),
 				scoring.getEarlyDeparture_utils_hr()), Math.min(traveling,

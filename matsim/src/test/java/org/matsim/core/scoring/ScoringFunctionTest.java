@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.events.AgentMoneyEventImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -52,7 +52,7 @@ public abstract class ScoringFunctionTest extends MatsimTestCase {
 	 * @param config
 	 */
 	protected void setupScoringConfig(final Config config) {
-		CharyparNagelScoringConfigGroup scoring = config.charyparNagelScoring();
+		PlanCalcScoreConfigGroup scoring = config.charyparNagelScoring();
 		scoring.setBrainExpBeta(2.0);
 		scoring.setLateArrival_utils_hr(-18.0);
 		scoring.setEarlyDeparture_utils_hr(0.0);
@@ -67,11 +67,11 @@ public abstract class ScoringFunctionTest extends MatsimTestCase {
 		scoring.setWaiting_utils_hr(0.0);
 
 		// setup activity types h and w for scoring
-		CharyparNagelScoringConfigGroup.ActivityParams params = new CharyparNagelScoringConfigGroup.ActivityParams("home");
+		PlanCalcScoreConfigGroup.ActivityParams params = new PlanCalcScoreConfigGroup.ActivityParams("home");
 		params.setTypicalDuration(16*3600);
 		scoring.addActivityParams(params);
 
-		params = new CharyparNagelScoringConfigGroup.ActivityParams("work");
+		params = new PlanCalcScoreConfigGroup.ActivityParams("work");
 		params.setTypicalDuration(8*3600);
 		scoring.addActivityParams(params);
 	}

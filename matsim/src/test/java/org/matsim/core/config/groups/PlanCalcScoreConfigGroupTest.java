@@ -5,14 +5,14 @@ import java.util.Map;
 import junit.framework.Assert;
 
 import org.junit.Test;
-import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.utils.misc.Time;
 
-public class CharyparNagelScoringConfigGroupTest {
+public class PlanCalcScoreConfigGroupTest {
 
 	@Test
 	public void testAddActivityParams() {
-		CharyparNagelScoringConfigGroup c = new CharyparNagelScoringConfigGroup();
+		PlanCalcScoreConfigGroup c = new PlanCalcScoreConfigGroup();
 		Assert.assertNull(c.getActivityParams("type1"));
 		Assert.assertEquals(0, c.getActivityParams().size());
 		ActivityParams ap = new ActivityParams("type1");
@@ -23,7 +23,7 @@ public class CharyparNagelScoringConfigGroupTest {
 
 	@Test
 	public void testAddActivityParams_getParams() {
-		CharyparNagelScoringConfigGroup c = new CharyparNagelScoringConfigGroup();
+		PlanCalcScoreConfigGroup c = new PlanCalcScoreConfigGroup();
 		Map<String, String> params = c.getParams();
 		Assert.assertNull(params.get("activityTypicalDuration_0"));
 		ActivityParams ap = new ActivityParams("type1");

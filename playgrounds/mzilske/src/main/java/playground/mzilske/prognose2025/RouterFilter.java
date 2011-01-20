@@ -8,7 +8,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
@@ -30,7 +30,7 @@ public class RouterFilter implements TripFlowSink {
 
 	public RouterFilter(Network network) {
 		this.network = network;
-		FreespeedTravelTimeCost fttc = new FreespeedTravelTimeCost(new CharyparNagelScoringConfigGroup());
+		FreespeedTravelTimeCost fttc = new FreespeedTravelTimeCost(new PlanCalcScoreConfigGroup());
 		dijkstra = new Dijkstra(network, fttc, fttc);
 	}
 

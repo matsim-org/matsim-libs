@@ -48,7 +48,7 @@ import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandle
 import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
-import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -74,12 +74,12 @@ public class ScoreCalTest implements AgentArrivalEventHandler,
 	private Map<Id, Map<Plan, Double>> legDurs = new HashMap<Id, Map<Plan, Double>>(),
 			actDurs = new HashMap<Id, Map<Plan, Double>>();
 	private Population pop;
-	private CharyparNagelScoringConfigGroup scoring;
+	private PlanCalcScoreConfigGroup scoring;
 	private Network network;
 
 	// private Set<Id> tollLinkIds = new HashSet<Id>();
 
-	public ScoreCalTest(CharyparNagelScoringConfigGroup scoringCfg,
+	public ScoreCalTest(PlanCalcScoreConfigGroup scoringCfg,
 			Population pop) {
 		this.scoring = scoringCfg;
 		this.pop = pop;
@@ -287,7 +287,7 @@ public class ScoreCalTest implements AgentArrivalEventHandler,
 
 		Config cf = sc.getConfig();
 		new MatsimConfigReader(cf).readFile(configFilename);
-		CharyparNagelScoringConfigGroup scoring = cf.charyparNagelScoring();
+		PlanCalcScoreConfigGroup scoring = cf.charyparNagelScoring();
 
 		// Network net = sc.getNetwork();
 		new MatsimNetworkReader(sc).readFile(netFilename);

@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
@@ -45,7 +45,7 @@ public class PlansCalcTransitRouteTest extends TestCase {
 		f.init();
 		TransitConfigGroup transitConfig = new TransitConfigGroup();
 		PlansCalcRouteConfigGroup routerConfig = new PlansCalcRouteConfigGroup();
-		FreespeedTravelTimeCost ttc = new FreespeedTravelTimeCost(new CharyparNagelScoringConfigGroup());
+		FreespeedTravelTimeCost ttc = new FreespeedTravelTimeCost(new PlanCalcScoreConfigGroup());
 		PlansCalcTransitRoute router = new PlansCalcTransitRoute(routerConfig, f.network, ttc, ttc, new DijkstraFactory(), transitConfig, new TransitRouter(f.schedule, new TransitRouterConfig()));
 
 		Coord fromCoord = f.scenario.createCoord(3800, 5100);

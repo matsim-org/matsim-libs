@@ -31,8 +31,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
-import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -54,7 +54,7 @@ public class PlanScoreForecaster4onlyTravPt {
 	private PlanImpl plan, oldSelected;
 	private NetworkImpl net;
 	private TravelTime ttc;
-	private CharyparNagelScoringConfigGroup scoring;
+	private PlanCalcScoreConfigGroup scoring;
 	private double score = 0.0, betaTraveling, betaTravelingPt, betaPerforming,
 	// betaDist,
 			firstActEndTime, attrTraveling = 0.0, attrPerforming = 0.0
@@ -62,7 +62,7 @@ public class PlanScoreForecaster4onlyTravPt {
 			;
 
 	public PlanScoreForecaster4onlyTravPt(Plan plan, NetworkImpl net,
-			TravelTime tt, CharyparNagelScoringConfigGroup scoring,
+			TravelTime tt, PlanCalcScoreConfigGroup scoring,
 			double betaTravelingPt) {
 		this.plan = (PlanImpl) plan;
 		this.net = net;
@@ -75,14 +75,14 @@ public class PlanScoreForecaster4onlyTravPt {
 
 	public PlanScoreForecaster4onlyTravPt(Plan selectedPlan, Plan oldSelected,
 			NetworkImpl net, TravelTime tt,
-			CharyparNagelScoringConfigGroup scoring, double d) {
+			PlanCalcScoreConfigGroup scoring, double d) {
 		this(selectedPlan, net, tt, scoring, d);
 		this.oldSelected = (PlanImpl) oldSelected;
 	}
 
 	public PlanScoreForecaster4onlyTravPt(Plan selectedPlan, Plan oldSelected,
 			NetworkImpl net, TravelTime tt,
-			CharyparNagelScoringConfigGroup scoring, double d0, double d1) {
+			PlanCalcScoreConfigGroup scoring, double d0, double d1) {
 
 	}
 

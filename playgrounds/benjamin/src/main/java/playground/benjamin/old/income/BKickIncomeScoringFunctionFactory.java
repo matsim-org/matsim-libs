@@ -19,7 +19,7 @@
 package playground.benjamin.old.income;
 
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
@@ -36,12 +36,12 @@ import org.matsim.households.PersonHouseholdMapping;
  */
 public class BKickIncomeScoringFunctionFactory implements ScoringFunctionFactory {
 
-	private CharyparNagelScoringConfigGroup configGroup;
+	private PlanCalcScoreConfigGroup configGroup;
 	private CharyparNagelScoringParameters params;
 	private PersonHouseholdMapping hhdb;
 
 	public BKickIncomeScoringFunctionFactory(
-			CharyparNagelScoringConfigGroup charyparNagelScoring, PersonHouseholdMapping hhmapping) {
+			PlanCalcScoreConfigGroup charyparNagelScoring, PersonHouseholdMapping hhmapping) {
 		this.configGroup = charyparNagelScoring;
 		this.params = new CharyparNagelScoringParameters(configGroup);
 		this.hhdb = hhmapping;

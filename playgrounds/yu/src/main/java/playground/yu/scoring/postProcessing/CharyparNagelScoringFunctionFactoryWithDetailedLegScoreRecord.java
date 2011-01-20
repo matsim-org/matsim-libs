@@ -21,7 +21,7 @@
 package playground.yu.scoring.postProcessing;
 
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.charyparNagel.ActivityScoringFunction;
@@ -33,7 +33,7 @@ public class CharyparNagelScoringFunctionFactoryWithDetailedLegScoreRecord
 		extends CharyparNagelScoringFunctionFactory {
 
 	public CharyparNagelScoringFunctionFactoryWithDetailedLegScoreRecord(
-			CharyparNagelScoringConfigGroup config) {
+			PlanCalcScoreConfigGroup config) {
 		super(config);
 		// TODO Auto-generated constructor stub
 	}

@@ -22,7 +22,7 @@ package playground.benjamin.old.income;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.households.Income;
@@ -45,7 +45,7 @@ public class BKickIncomeTravelTimeDistanceCostCalculator implements Personalizab
 	
 	private double income;
 
-	public BKickIncomeTravelTimeDistanceCostCalculator(final TravelTime timeCalculator, CharyparNagelScoringConfigGroup charyparNagelScoring) {
+	public BKickIncomeTravelTimeDistanceCostCalculator(final TravelTime timeCalculator, PlanCalcScoreConfigGroup charyparNagelScoring) {
 		this.timeCalculator = timeCalculator;
 		/* Usually, the travel-utility should be negative (it's a disutility)
 		 * but the cost should be positive. Thus negate the utility.

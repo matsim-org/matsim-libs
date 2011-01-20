@@ -42,9 +42,9 @@ import org.matsim.core.utils.misc.Time;
  * @author nagel
  *
  */
-public class CharyparNagelScoringConfigGroup extends Module {
+public class PlanCalcScoreConfigGroup extends Module {
 
-	private static final Logger log = Logger.getLogger(CharyparNagelScoringConfigGroup.class);
+	private static final Logger log = Logger.getLogger(PlanCalcScoreConfigGroup.class);
 
 	private static final long serialVersionUID = 1L;
 
@@ -82,7 +82,7 @@ public class CharyparNagelScoringConfigGroup extends Module {
 	private static final String ACTIVITY_EARLIEST_END_TIME = "activityEarliestEndTime_";
 	private static final String ACTIVITY_CLOSING_TIME = "activityClosingTime_";
 
-	public CharyparNagelScoringConfigGroup() {
+	public PlanCalcScoreConfigGroup() {
 		super(GROUP_NAME);
 	}
 

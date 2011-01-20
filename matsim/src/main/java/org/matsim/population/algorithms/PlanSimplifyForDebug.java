@@ -27,7 +27,7 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
@@ -80,7 +80,7 @@ public class PlanSimplifyForDebug extends AbstractPersonAlgorithm {
 		// this.eduActs.add("e0.5");
 		// this.eduActs.add("uni");
 
-		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(new CharyparNagelScoringConfigGroup());
+		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(new PlanCalcScoreConfigGroup());
 		this.router = new PlansCalcRoute(new PlansCalcRouteConfigGroup(), network, timeCostCalc, timeCostCalc, new DijkstraFactory());
 	}
 

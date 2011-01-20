@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -50,7 +50,7 @@ public class PathSizeLogitSelector implements PlanSelector {
 	private final double tau;
 	private final Network network;
 
-	public PathSizeLogitSelector(final Network network, final CharyparNagelScoringConfigGroup config) {
+	public PathSizeLogitSelector(final Network network, final PlanCalcScoreConfigGroup config) {
 		this.beta = config.getPathSizeLogitBeta();
 
 		//in PSL tau is  the equivalent to BrainExpBeta in the multinomial logit model

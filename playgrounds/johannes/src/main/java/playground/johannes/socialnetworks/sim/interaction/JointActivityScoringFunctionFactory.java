@@ -24,7 +24,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.scoring.ActivityUtilityParameters;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
@@ -47,7 +47,7 @@ public class JointActivityScoringFunctionFactory extends CharyparNagelScoringFun
 	 * @param config
 	 */
 	public JointActivityScoringFunctionFactory(VisitorTracker tracker, SocialGraph graph) {
-		super(new CharyparNagelScoringConfigGroup());
+		super(new PlanCalcScoreConfigGroup());
 		this.tracker = tracker;
 		
 		vertexMapping = new HashMap<Person, SocialVertex>();

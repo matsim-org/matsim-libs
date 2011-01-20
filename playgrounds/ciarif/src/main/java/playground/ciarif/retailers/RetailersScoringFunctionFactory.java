@@ -5,7 +5,7 @@ import java.util.TreeMap;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
-import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.locationchoice.facilityload.FacilityPenalty;
@@ -21,7 +21,7 @@ public class RetailersScoringFunctionFactory extends org.matsim.core.scoring.cha
 	private final ActivityFacilities facilities;
 	
 	public RetailersScoringFunctionFactory(
-			CharyparNagelScoringConfigGroup config, 
+			PlanCalcScoreConfigGroup config, 
 			final TreeMap<Id, FacilityPenalty> facilityPenalties,
 			ActivityFacilities facilities) {
 		super(config);

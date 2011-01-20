@@ -21,7 +21,7 @@
 package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.scoring;
 
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.charyparNagel.ActivityScoringFunction;
@@ -34,7 +34,7 @@ import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.exper
 public class CharyparNagelScoringFunctionFactory4PC extends
 		CharyparNagelScoringFunctionFactory {
 	public CharyparNagelScoringFunctionFactory4PC(
-			CharyparNagelScoringConfigGroup config) {
+			PlanCalcScoreConfigGroup config) {
 		super(config);
 	}
 

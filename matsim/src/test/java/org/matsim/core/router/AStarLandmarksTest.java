@@ -21,7 +21,7 @@
 package org.matsim.core.router;
 
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.PreProcessLandmarks;
@@ -30,7 +30,7 @@ public class AStarLandmarksTest extends AbstractLeastCostPathCalculatorTest {
 
 	@Override
 	protected LeastCostPathCalculator getLeastCostPathCalculator(Network network) {
-		FreespeedTravelTimeCost travelTimeCostCalculator = new FreespeedTravelTimeCost(new CharyparNagelScoringConfigGroup());
+		FreespeedTravelTimeCost travelTimeCostCalculator = new FreespeedTravelTimeCost(new PlanCalcScoreConfigGroup());
 		PreProcessLandmarks preProcessData = new PreProcessLandmarks(travelTimeCostCalculator);
 		preProcessData.run(network);
 		return new AStarLandmarks(network, preProcessData, travelTimeCostCalculator);

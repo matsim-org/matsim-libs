@@ -36,7 +36,7 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.events.ActivityEndEventImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
@@ -84,7 +84,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 
 		// generate config
 		Config config = super.loadConfig(null);
-		CharyparNagelScoringConfigGroup scoring = config.charyparNagelScoring();
+		PlanCalcScoreConfigGroup scoring = config.charyparNagelScoring();
 		scoring.setBrainExpBeta(2.0);
 		scoring.setLateArrival_utils_hr(0.0);
 		scoring.setEarlyDeparture_utils_hr(-6.0);

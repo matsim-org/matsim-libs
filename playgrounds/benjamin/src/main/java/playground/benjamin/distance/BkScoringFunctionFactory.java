@@ -19,7 +19,7 @@
 package playground.benjamin.distance;
 
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 
@@ -30,10 +30,10 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
  */
 public class BkScoringFunctionFactory implements ScoringFunctionFactory {
 
-	private CharyparNagelScoringConfigGroup configGroup;
+	private PlanCalcScoreConfigGroup configGroup;
 
 	public BkScoringFunctionFactory(
-			CharyparNagelScoringConfigGroup charyparNagelScoring) {
+			PlanCalcScoreConfigGroup charyparNagelScoring) {
 		this.configGroup = charyparNagelScoring;
 	}
 

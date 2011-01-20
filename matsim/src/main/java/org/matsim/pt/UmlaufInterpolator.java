@@ -6,7 +6,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.Dijkstra;
@@ -18,9 +18,9 @@ import org.matsim.core.utils.misc.NetworkUtils;
 public class UmlaufInterpolator {
 
 	private final Network network;
-	private final CharyparNagelScoringConfigGroup config;
+	private final PlanCalcScoreConfigGroup config;
 
-	public UmlaufInterpolator(Network network, final CharyparNagelScoringConfigGroup config) {
+	public UmlaufInterpolator(Network network, final PlanCalcScoreConfigGroup config) {
 		super();
 		this.network = network;
 		this.config = config;

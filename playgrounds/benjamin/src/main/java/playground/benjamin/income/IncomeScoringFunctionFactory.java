@@ -23,7 +23,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
@@ -46,7 +46,7 @@ import playground.benjamin.income.ScoringFromToll;
 public class IncomeScoringFunctionFactory implements ScoringFunctionFactory {
 
 	private Config config;
-	private CharyparNagelScoringConfigGroup configGroup;
+	private PlanCalcScoreConfigGroup configGroup;
 	private CharyparNagelScoringParameters params;
 	private PersonHouseholdMapping hhdb;
 	private final Network network;

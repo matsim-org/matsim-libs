@@ -1,7 +1,7 @@
 package playground.mzilske.pipeline;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 
@@ -9,7 +9,7 @@ public class TravelCostCalculatorTask implements ScenarioSinkSource {
 
 	private ScenarioSink sink;
 	
-	private CharyparNagelScoringConfigGroup group;
+	private PlanCalcScoreConfigGroup group;
 
 	private TravelTimeCalculatorTask travelTimeCalculator;
 
@@ -33,7 +33,7 @@ public class TravelCostCalculatorTask implements ScenarioSinkSource {
 		sink.process(scenario);
 	}
 
-	public TravelCostCalculatorTask(TravelCostCalculatorFactory travelCostCalculatorFactory, CharyparNagelScoringConfigGroup group) {
+	public TravelCostCalculatorTask(TravelCostCalculatorFactory travelCostCalculatorFactory, PlanCalcScoreConfigGroup group) {
 		super();
 		this.travelCostCalculatorFactory = travelCostCalculatorFactory;
 		this.group = group;

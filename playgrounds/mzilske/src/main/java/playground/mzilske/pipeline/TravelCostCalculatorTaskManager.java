@@ -1,6 +1,6 @@
 package playground.mzilske.pipeline;
 
-import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
 
 
@@ -16,7 +16,7 @@ public class TravelCostCalculatorTaskManager extends TaskManager {
 		pipeTasks.setTravelCostCalculator(task);
 	}
 
-	public TravelCostCalculatorTaskManager(TravelCostCalculatorFactory travelCostCalculatorFactory, CharyparNagelScoringConfigGroup group) {
+	public TravelCostCalculatorTaskManager(TravelCostCalculatorFactory travelCostCalculatorFactory, PlanCalcScoreConfigGroup group) {
 		super();
 	}
 

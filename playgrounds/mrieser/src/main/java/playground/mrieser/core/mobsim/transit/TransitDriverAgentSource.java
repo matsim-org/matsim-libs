@@ -25,7 +25,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.pt.ReconstructingUmlaufBuilder;
 import org.matsim.pt.Umlauf;
 import org.matsim.pt.qsim.TransitQVehicle;
@@ -57,7 +57,7 @@ public class TransitDriverAgentSource implements AgentSource {
 		this.agentTracker = agentTracker;
 		this.driverFactory = new DefaultTransitDriverFactory();
 		this.umlaufBuilder = new ReconstructingUmlaufBuilder(network, this.schedule.getTransitLines().values(),
-				this.transitVehicles, new CharyparNagelScoringConfigGroup()); // TODO [MR] use config, not create new
+				this.transitVehicles, new PlanCalcScoreConfigGroup()); // TODO [MR] use config, not create new
 	}
 
 	@Override

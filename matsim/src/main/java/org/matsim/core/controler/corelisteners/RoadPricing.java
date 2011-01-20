@@ -22,7 +22,7 @@ package org.matsim.core.controler.corelisteners;
 
 import org.apache.log4j.Logger;
 import org.matsim.analysis.CalcAverageTolledTripLength;
-import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
@@ -88,7 +88,7 @@ public class RoadPricing implements StartupListener, AfterMobsimListener, Iterat
 				@Override
 				public PersonalizableTravelCost createTravelCostCalculator(
 						PersonalizableTravelTime timeCalculator,
-						CharyparNagelScoringConfigGroup cnScoringGroup) {
+						PlanCalcScoreConfigGroup cnScoringGroup) {
 					return new TollTravelCostCalculator(previousTravelCostCalculatorFactory.createTravelCostCalculator(timeCalculator, cnScoringGroup), RoadPricing.this.scheme);
 				}
 				

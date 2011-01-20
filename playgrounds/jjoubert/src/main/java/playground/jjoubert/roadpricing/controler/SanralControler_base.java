@@ -2,7 +2,7 @@ package playground.jjoubert.roadpricing.controler;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
-import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.controler.Controler;
 
 import playground.jjoubert.Utilities.matsim2urbansim.controler.MyBasicConfig;

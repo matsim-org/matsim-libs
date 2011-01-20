@@ -25,7 +25,7 @@ import java.util.TreeMap;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
-import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.scoring.charyparNagel.AgentStuckScoringFunction;
 import org.matsim.core.scoring.charyparNagel.LegScoringFunction;
 import org.matsim.core.scoring.charyparNagel.MoneyScoringFunction;
@@ -44,7 +44,7 @@ public class LocationChoiceScoringFunctionFactory implements ScoringFunctionFact
 	private final CharyparNagelScoringParameters params;
 	private final ActivityFacilities facilities;
 	
-	public LocationChoiceScoringFunctionFactory(final CharyparNagelScoringConfigGroup config, 
+	public LocationChoiceScoringFunctionFactory(final PlanCalcScoreConfigGroup config, 
 			final TreeMap<Id, FacilityPenalty> facilityPenalties, final ActivityFacilities facilities) {
 		this.params = new CharyparNagelScoringParameters(config);
 		this.facilityPenalties = facilityPenalties;

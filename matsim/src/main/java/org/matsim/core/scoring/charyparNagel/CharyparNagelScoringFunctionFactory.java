@@ -21,7 +21,7 @@
 package org.matsim.core.scoring.charyparNagel;
 
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
@@ -42,7 +42,7 @@ public class CharyparNagelScoringFunctionFactory implements ScoringFunctionFacto
 
 	private final CharyparNagelScoringParameters params;
 
-	public CharyparNagelScoringFunctionFactory(final CharyparNagelScoringConfigGroup config) {
+	public CharyparNagelScoringFunctionFactory(final PlanCalcScoreConfigGroup config) {
 		this.params = new CharyparNagelScoringParameters(config);
 	}
 

@@ -25,7 +25,7 @@ package playground.yu.replanning.selectors;
 
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 
@@ -41,7 +41,7 @@ public class ExpBetaPlanSelector_Probs extends ExpBetaPlanSelector {
 	 * @param charyparNagelScoringConfigGroup
 	 */
 	public ExpBetaPlanSelector_Probs(
-			CharyparNagelScoringConfigGroup charyparNagelScoringConfigGroup) {
+			PlanCalcScoreConfigGroup charyparNagelScoringConfigGroup) {
 		super(charyparNagelScoringConfigGroup);
 	}
 

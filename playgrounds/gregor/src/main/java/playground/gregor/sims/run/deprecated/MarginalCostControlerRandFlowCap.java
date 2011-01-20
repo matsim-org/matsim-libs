@@ -20,7 +20,7 @@
 
 package playground.gregor.sims.run.deprecated;
 
-import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
@@ -58,7 +58,7 @@ public class MarginalCostControlerRandFlowCap extends Controler {
 		setTravelCostCalculatorFactory(new TravelCostCalculatorFactory() {
 
 			@Override
-			public PersonalizableTravelCost createTravelCostCalculator(PersonalizableTravelTime timeCalculator, CharyparNagelScoringConfigGroup cnScoringGroup) {
+			public PersonalizableTravelCost createTravelCostCalculator(PersonalizableTravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
 				return new MarginalTravelCostCalculatorII(MarginalCostControlerRandFlowCap.this.getTravelTimeCalculator(), sc);
 			}
 

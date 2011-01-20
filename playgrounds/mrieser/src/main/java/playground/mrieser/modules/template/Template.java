@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.config.Module;
-import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
@@ -139,7 +139,7 @@ public class Template implements MatsimModule {
 			@Override
 			public PersonalizableTravelCost createTravelCostCalculator(
 					PersonalizableTravelTime timeCalculator,
-					CharyparNagelScoringConfigGroup cnScoringGroup) {
+					PlanCalcScoreConfigGroup cnScoringGroup) {
 				return new PersonalizableTravelCost() {
 
 					public double getLinkGeneralizedTravelCost(Link link, double time) {
