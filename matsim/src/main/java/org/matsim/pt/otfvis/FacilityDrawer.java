@@ -164,7 +164,8 @@ public class FacilityDrawer {
 		public void initTexts() {
 			for (VisBusStop stop : this.stops) {
 				if ( stop.linkId!=null ) {
-					stop.stopText = InfoTextContainer.showTextOnce(stop.buildText(), (float) stop.x - 100.0f, (float) stop.y + 50.0f, 2.0f); // kai: text size
+					stop.stopText = InfoTextContainer.showTextOnce(stop.buildText(), 
+							(float) stop.x - 100.0f, (float) stop.y + 50.0f, -0.001f); // kai: text size
 					stop.stopText.setLinkId(new IdImpl(stop.linkId));
 				}
 			}

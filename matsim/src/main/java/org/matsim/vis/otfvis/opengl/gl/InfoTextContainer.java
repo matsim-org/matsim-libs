@@ -33,6 +33,14 @@ public class InfoTextContainer {
 	private static LinkedList<InfoText> elements = new LinkedList<InfoText>(); 
 	private static Set<InfoText> elementsPermanent = new HashSet<InfoText>(); 
 
+	/**
+	 * @param text
+	 * @param x
+	 * @param y
+	 * @param size positive values mean size is relative to scenario (i.e. font size on window changes with zoom)
+	 * negative values mean size is relative to window (i.e. font size on window does <i>not</i> change with zoom)
+	 * @return
+	 */
 	public static InfoText showTextOnce(String text, float x, float y, float size) {
 		InfoText tt = new InfoText(text, x,y,0,size);
 		tt.setDecorated(false);
