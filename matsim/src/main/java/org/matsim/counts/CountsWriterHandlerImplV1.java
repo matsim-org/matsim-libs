@@ -31,6 +31,8 @@ public class CountsWriterHandlerImplV1 implements CountsWriterHandler {
 
 		if (counts.getName() != null) {
 			out.write(" name=\"" + counts.getName() + "\"");
+		} else {
+			out.write(" name=\"\"");
 		}
 		if (counts.getDescription() != null) {
 			out.write(" desc=\"" + counts.getDescription() + "\"");

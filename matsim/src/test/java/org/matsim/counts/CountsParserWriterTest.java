@@ -21,15 +21,30 @@
 package org.matsim.counts;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Iterator;
 
-import org.matsim.testcases.MatsimTestCase;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.junit.Assert;
+import org.junit.Rule;
+import org.junit.Test;
+import org.matsim.testcases.MatsimTestUtils;
+import org.xml.sax.SAXException;
 
 /**
  * Tests if parsing and writing of the counts xml file is done correctly
+ *
+ * @author ahorni
  */
-public class CountsParserWriterTest extends MatsimTestCase {
+public class CountsParserWriterTest {
 
+	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
+
+	/**
+	 * @author ahorni
+	 */
+	@Test
 	public void testParserWriter() {
 		CountsFixture fixture = new CountsFixture();
 		fixture.setUp();
@@ -39,21 +54,21 @@ public class CountsParserWriterTest extends MatsimTestCase {
 
 		// test if required fields of schema are filled out:
 		// Counts:
-		assertNotNull(fixture.counts.getCounts());
-		assertTrue(fixture.counts.getYear()>2000);
-		assertNotNull(fixture.counts.getName());
+		Assert.assertNotNull(fixture.counts.getCounts());
+		Assert.assertTrue(fixture.counts.getYear()>2000);
+		Assert.assertNotNull(fixture.counts.getName());
 
 		// Count & Volume
 		Iterator<Count> c_it = fixture.counts.getCounts().values().iterator();
 		while (c_it.hasNext()) {
 			Count c = c_it.next();
-			assertNotNull(c.getLocId());
+			Assert.assertNotNull(c.getLocId());
 
 			Iterator<Volume> vol_it = c.getVolumes().values().iterator();
 			while (vol_it.hasNext()) {
 				Volume v = vol_it.next();
-				assertTrue(v.getHour()>0);
-				assertTrue(v.getValue()>=0.0);
+				Assert.assertTrue(v.getHour()>0);
+				Assert.assertTrue(v.getValue()>=0.0);
 			}//while
 		}//while
 
@@ -61,10 +76,31 @@ public class CountsParserWriterTest extends MatsimTestCase {
 		// what to test?
 		// check if xml file not empty
 
-		String filename = this.getOutputDirectory() + "output_counts.xml";
+		String filename = this.utils.getOutputDirectory() + "output_counts.xml";
 		CountsWriter counts_writer = new CountsWriter(fixture.counts);
 		counts_writer.write(filename);
 		File f = new File(filename);
-		assertTrue(f.length() > 0.0);
+		Assert.assertTrue(f.length() > 0.0);
+	}
+
+	/**
+	 * @throws SAXException
+	 * @throws ParserConfigurationException
+	 * @throws IOException
+	 *
+	 * @author mrieser
+	 */
+	@Test
+	public void testWriteParse_nameIsNull() throws SAXException, ParserConfigurationException, IOException {
+		CountsFixture f = new CountsFixture();
+		f.setUp();
+		f.counts.setName(null);
+		Assert.assertNull(f.counts.getName());
+		String filename = this.utils.getOutputDirectory() + "counts.xml";
+		new CountsWriter(f.counts).write(filename);
+
+		Counts counts2 = new Counts();
+		new CountsReaderMatsimV1(counts2).parse(filename);
+		Assert.assertEquals("", counts2.getName());
 	}
 }
