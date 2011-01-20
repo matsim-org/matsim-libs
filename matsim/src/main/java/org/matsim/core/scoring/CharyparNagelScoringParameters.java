@@ -37,7 +37,7 @@ public class CharyparNagelScoringParameters implements MatsimParameters {
 	public final double marginalUtilityOfPerforming_s;
 
 	@Deprecated
-	protected final double marginalUtilityOfDistanceCar_m;
+	public final double marginalUtilityOfDistanceCar_m;
 	@Deprecated
 	public final double marginalUtilityOfDistancePt_m;
 
