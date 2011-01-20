@@ -64,29 +64,27 @@ import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
 public class SingleRoute2QGIS extends SelectedPlans2ESRIShapeChanged implements
 		X2QGIS {
 	private final static Logger log = Logger.getLogger(SingleRoute2QGIS.class);
-	protected Map<Id, List<LegRoute>> dailyRoutes;
+	protected Map<String, List<LegRoute>> dailyRoutes;
 	protected NetworkImpl network;
 	private FeatureType featureTypeRoute;
 	private boolean writeRoutes = true;
 
 	public SingleRoute2QGIS(Population population,
 			final CoordinateReferenceSystem crs, final String outputDir,
-			final NetworkImpl network, final Map<Id, List<LegRoute>> dailyRoutes) {
+			final NetworkImpl network, final Map<String, List<LegRoute>> map) {
 		super(population, network, crs, outputDir);
 		this.network = network;
-		this.dailyRoutes = dailyRoutes;
+		dailyRoutes = map;
 	}
 
 	@Override
 	protected void initFeatureType() {
-		AttributeType[] attrRoute = new AttributeType[4];
+		AttributeType[] attrRoute = new AttributeType[3];
 		attrRoute[0] = DefaultAttributeTypeFactory.newAttributeType(
 				"LineString", LineString.class, true, null, null, getCrs());
 		attrRoute[1] = AttributeTypeFactory.newAttributeType("PERSON_ID",
 				String.class);
 		attrRoute[2] = AttributeTypeFactory.newAttributeType("PLAN_INDEX",
-				Integer.class);
-		attrRoute[3] = AttributeTypeFactory.newAttributeType("LEG_INDEX",
 				Integer.class);
 		try {
 			setFeatureTypeRoute(FeatureTypeBuilder.newFeatureType(attrRoute,
@@ -102,7 +100,7 @@ public class SingleRoute2QGIS extends SelectedPlans2ESRIShapeChanged implements
 		this.featureTypeRoute = featureTypeRoute;
 	}
 
-	protected Feature getRouteFeature(Id personId, LegRoute dailyRoutes) {
+	protected Feature getRouteFeature(String personLegId, LegRoute dailyRoutes) {
 		List<Id> routeLinkIds = dailyRoutes.getRouteLinkIds();
 		Coordinate[] coordinates = new Coordinate[routeLinkIds.size() + 1];
 
@@ -112,9 +110,10 @@ public class SingleRoute2QGIS extends SelectedPlans2ESRIShapeChanged implements
 					new Object[] {
 							new LineString(new CoordinateArraySequence(
 									coordinates), getGeofac()),
-							personId.toString()/* 1. element */,
-							dailyRoutes.getPlanIndex()/* 2. element */,
-							dailyRoutes.getLegIndex() /* 3. element */});
+							personLegId.toString()/* 1. element */,
+							dailyRoutes.getPlanIndex() /* 2. element */
+					// ,dailyRoutes.getLegIndex() /* 3. element */
+					});
 		} catch (IllegalAttributeException e) {
 			e.printStackTrace();
 		}
@@ -142,19 +141,19 @@ public class SingleRoute2QGIS extends SelectedPlans2ESRIShapeChanged implements
 
 	protected void writeRoutes() throws IOException {
 
-		for (Entry<Id, List<LegRoute>> personDailyRoutes : dailyRoutes
+		for (Entry<String, List<LegRoute>> personDailyRoutes : dailyRoutes
 				.entrySet()) {
 			ArrayList<Feature> fts = new ArrayList<Feature>();
 
-			Id personId = personDailyRoutes.getKey();
+			String personLegId = personDailyRoutes.getKey();
 			for (LegRoute legRoute : personDailyRoutes.getValue()) {
-				Feature ft = getRouteFeature(personId, legRoute);
+				Feature ft = getRouteFeature(personLegId, legRoute);
 				if (ft != null) {
 					fts.add(ft);
 				}
 			}
 			ShapeFileWriter.writeGeometries(fts, getOutputDir() + "_"
-					+ personId + "_routes.shp");// TODO for one person?
+					+ personLegId + "_routes.shp");
 		}
 
 	}

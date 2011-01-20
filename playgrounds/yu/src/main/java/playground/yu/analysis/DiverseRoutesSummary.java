@@ -54,15 +54,15 @@ import playground.yu.utils.io.SimpleWriter;
 public class DiverseRoutesSummary extends AbstractPersonAlgorithm {
 	public static class LegRoute {
 		// private Id personId;
-		private int planIndex, legIndex;
+		private int planIndex;
 		private List<Id> routeLinkIds;
 
 		public LegRoute(
 		// Id personId,
-				int planIndex, int legIndex, List<Id> routeLinkIds) {
+				int planIndex, List<Id> routeLinkIds) {
 			// this.personId = personId;
 			this.planIndex = planIndex;
-			this.legIndex = legIndex;
+			// this.legIndex = legIndex;
 			this.routeLinkIds = routeLinkIds;
 		}
 
@@ -74,9 +74,9 @@ public class DiverseRoutesSummary extends AbstractPersonAlgorithm {
 			return planIndex;
 		}
 
-		public int getLegIndex() {
-			return legIndex;
-		}
+		// public int getLegIndex() {
+		// return legIndex;
+		// }
 
 		public List<Id> getRouteLinkIds() {
 			return routeLinkIds;
@@ -87,8 +87,8 @@ public class DiverseRoutesSummary extends AbstractPersonAlgorithm {
 			// sb.append("\t");
 			StringBuffer sb = new StringBuffer();
 			sb.append(planIndex);
-			sb.append("\t");
-			sb.append(legIndex);
+			// sb.append("\t");
+			// sb.append(legIndex);
 			sb.append("\t[\t");
 			for (Id linkId : routeLinkIds) {
 				sb.append(linkId.toString());
@@ -105,10 +105,10 @@ public class DiverseRoutesSummary extends AbstractPersonAlgorithm {
 	 * @param routes
 	 *            Map<List<Id routelinkId>,Integer routeFlows (car, total day)>
 	 */
-	private Map<Id, List<LegRoute>> dailyRoutest = new HashMap<Id, List<LegRoute>>();
+	private Map<String, List<LegRoute>> legRoutes = new HashMap<String, List<LegRoute>>();
 
-	public Map<Id, List<LegRoute>> getDailyRouteList() {
-		return dailyRoutest;
+	public Map<String, List<LegRoute>> getDailyRouteList() {
+		return legRoutes;
 	}
 
 	public DiverseRoutesSummary(final double outputSample, final String filename) {
@@ -120,11 +120,11 @@ public class DiverseRoutesSummary extends AbstractPersonAlgorithm {
 	}
 
 	public void write() {
-		for (Entry<Id, List<LegRoute>> personDailyRoutes : dailyRoutest
+		for (Entry<String, List<LegRoute>> personDailyRoutes : legRoutes
 				.entrySet()) {
-			Id personId = personDailyRoutes.getKey();
+			String personLegId = personDailyRoutes.getKey();
 			for (LegRoute dailyRoute : personDailyRoutes.getValue()) {
-				writer.writeln(personId + "\t" + dailyRoute.toString());
+				writer.writeln(personLegId + "\t" + dailyRoute.toString());
 			}
 			writer.writeln("--------------------");
 			writer.flush();
@@ -179,15 +179,15 @@ public class DiverseRoutesSummary extends AbstractPersonAlgorithm {
 									routeLinkList.add(r.getStartLinkId());
 								}
 
-								List<LegRoute> personDailyRoutes = dailyRoutest
+								List<LegRoute> personDailyRoutes = legRoutes
 										.get(personId);
 								if (personDailyRoutes == null) {
 									personDailyRoutes = new ArrayList<LegRoute>();
-									dailyRoutest.put(personId,
+									legRoutes.put(personId + "_Leg" + legIndex,
 											personDailyRoutes);
 								}
 								personDailyRoutes.add(new LegRoute(planIndex,
-										legIndex, routeLinkList));
+										routeLinkList));
 							}
 
 							legIndex++;
