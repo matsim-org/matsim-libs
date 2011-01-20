@@ -37,7 +37,7 @@ public class CharyparNagelScoringParameters implements MatsimParameters {
 	public final double marginalUtilityOfPerforming_s;
 
 	@Deprecated
-	public final double marginalUtilityOfDistanceCar_m;
+	protected final double marginalUtilityOfDistanceCar_m;
 	@Deprecated
 	public final double marginalUtilityOfDistancePt_m;
 
@@ -50,7 +50,7 @@ public class CharyparNagelScoringParameters implements MatsimParameters {
 
 	public final double abortedPlanScore;
 
-	/** True if one at least one of marginal utilities for performing, waiting, being late or leaving early is not equal to 0. */
+	/** True if at least one of marginal utilities for performing, waiting, being late or leaving early is not equal to 0. */
 	public final boolean scoreActs;
 	
 	public CharyparNagelScoringParameters(final PlanCalcScoreConfigGroup config) {
