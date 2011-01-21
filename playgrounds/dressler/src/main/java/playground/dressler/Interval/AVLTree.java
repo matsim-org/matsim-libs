@@ -303,7 +303,7 @@ extends      SearchTree
 	//if ( INSERT )
 	//    System.out.println( "insert( " + obj + " ): after insertion:" + this ) ;
 	
-	checkBalances() ;                 // check balance property (debugging)
+	//checkBalances() ;                 // check balance property (debugging)
 	
 	return obj ;
 
@@ -367,7 +367,7 @@ extends      SearchTree
 	//    System.out.println(   "remove(): return object " + obj
 	//	      + ", after removal: " + this ) ;
 
-	checkBalances() ;                 // check balance property (debugging)
+	//checkBalances() ;                 // check balance property (debugging)
 
 	return obj ;
 
@@ -424,12 +424,15 @@ extends      SearchTree
       */
     public boolean checkBalances ( )
     {
+    	throw new UnsupportedOperationException( );
+    	
+    	/*
 	_retval = _checkTree() ;                  // check search tree property
 
 	if ( _checkMode  &&  ! isEmpty() )                   // checking wanted
 	    _checkBal( _getRoot() ) ;
 
-	return _retval ;
+	return _retval ;*/
 
     }  // checkBalances()
 
