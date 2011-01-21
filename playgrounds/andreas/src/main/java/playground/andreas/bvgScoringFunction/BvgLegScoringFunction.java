@@ -144,7 +144,7 @@ public class BvgLegScoringFunction implements LegScoring, BasicScoring {
 			tmpScore += dist * this.charyparNagelParameters.monetaryDistanceCostRateCar * this.charyparNagelParameters.marginalUtilityOfMoney;
 			
 			// add offset for using car mode
-			tmpScore += this.bvgParameters.offsetCar * this.charyparNagelParameters.marginalUtilityOfMoney;
+			tmpScore += this.bvgParameters.offsetCar * this.bvgParameters.betaOffsetCar * this.charyparNagelParameters.marginalUtilityOfMoney;
 			
 		} else if (TransportMode.pt.equals(leg.getMode())) {
 			
@@ -162,7 +162,7 @@ public class BvgLegScoringFunction implements LegScoring, BasicScoring {
 			}
 			
 			// add offset for using pt mode
-			tmpScore += this.bvgParameters.offsetPt * this.charyparNagelParameters.marginalUtilityOfMoney;
+			tmpScore += this.bvgParameters.offsetPt * this.bvgParameters.betaOffsetPt * this.charyparNagelParameters.marginalUtilityOfMoney;
 
 		} else if (TransportMode.ride.equals(leg.getMode())) {
 			
@@ -178,7 +178,7 @@ public class BvgLegScoringFunction implements LegScoring, BasicScoring {
 			tmpScore += dist * this.bvgParameters.monetaryDistanceCostRateRide * this.charyparNagelParameters.marginalUtilityOfMoney;
 			
 			// add offset for using ride mode
-			tmpScore += this.bvgParameters.offsetRide * this.charyparNagelParameters.marginalUtilityOfMoney;
+			tmpScore += this.bvgParameters.offsetRide * this.bvgParameters.betaOffsetRide * this.charyparNagelParameters.marginalUtilityOfMoney;
 			
 		} else if (TransportMode.bike.equals(leg.getMode())) {
 			
@@ -194,7 +194,7 @@ public class BvgLegScoringFunction implements LegScoring, BasicScoring {
 			tmpScore += dist * this.bvgParameters.monetaryDistanceCostRateBike * this.charyparNagelParameters.marginalUtilityOfMoney;
 			
 			// add offset for using bike mode
-			tmpScore += this.bvgParameters.offsetBike * this.charyparNagelParameters.marginalUtilityOfMoney;
+			tmpScore += this.bvgParameters.offsetBike * this.bvgParameters.betaOffsetBike * this.charyparNagelParameters.marginalUtilityOfMoney;
 			
 		} else if (TransportMode.walk.equals(leg.getMode())) {
 			
@@ -210,7 +210,7 @@ public class BvgLegScoringFunction implements LegScoring, BasicScoring {
 			tmpScore += dist * this.bvgParameters.monetaryDistanceCostRateWalk * this.charyparNagelParameters.marginalUtilityOfMoney;
 			
 			// add offset for using walk mode
-			tmpScore += this.bvgParameters.offsetWalk * this.charyparNagelParameters.marginalUtilityOfMoney;
+			tmpScore += this.bvgParameters.offsetWalk * this.bvgParameters.betaOffsetWalk * this.charyparNagelParameters.marginalUtilityOfMoney;
 			
 		} else if (TransportMode.transit_walk.equals(leg.getMode())) {
 			
@@ -228,7 +228,7 @@ public class BvgLegScoringFunction implements LegScoring, BasicScoring {
 			}
 			
 			// add offset for using walk mode
-			tmpScore += this.bvgParameters.offsetWalk * this.charyparNagelParameters.marginalUtilityOfMoney;
+			tmpScore += this.bvgParameters.offsetWalk * this.bvgParameters.betaOffsetWalk * this.charyparNagelParameters.marginalUtilityOfMoney;
 			
 		} else {
 			

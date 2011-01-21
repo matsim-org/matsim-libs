@@ -37,6 +37,12 @@ public class BvgScoringFunctionParameters {
 	public double offsetBike;
 	public double offsetWalk;
 	
+	public double betaOffsetCar;
+	public double betaOffsetPt;
+	public double betaOffsetRide;
+	public double betaOffsetBike;
+	public double betaOffsetWalk;
+	
 	public double monetaryDistanceCostRateRide;
 	public double monetaryDistanceCostRateBike;
 	public double monetaryDistanceCostRateWalk;
@@ -51,6 +57,12 @@ public class BvgScoringFunctionParameters {
 		this.offsetRide = bvgConfig.getOffsetRide();
 		this.offsetBike = bvgConfig.getOffsetBike();
 		this.offsetWalk = bvgConfig.getOffsetWalk();
+		
+		this.betaOffsetCar = bvgConfig.getBetaOffsetCar();
+		this.betaOffsetPt = bvgConfig.getBetaOffsetPt();
+		this.betaOffsetRide = bvgConfig.getBetaOffsetRide();
+		this.betaOffsetBike = bvgConfig.getBetaOffsetBike();
+		this.betaOffsetWalk = bvgConfig.getBetaOffsetWalk();
 		
 		this.monetaryDistanceCostRateRide = bvgConfig.getMonetaryDistanceCostRateRide();
 		this.monetaryDistanceCostRateBike = bvgConfig.getMonetaryDistanceCostRateBike();
