@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.MatsimXmlWriter;
@@ -56,7 +57,13 @@ public class ObjectAttributesXmlWriter extends MatsimXmlWriter {
 			xmlAttributes.add(super.createTuple(ATTR_OBJECTID, entry.getKey()));
 			writeStartTag(TAG_OBJECT, xmlAttributes);
 			xmlAttributes.clear();
+			// sort attributes by name
+			Map<String,Object> objAttributes = new TreeMap<String, Object>();
 			for (Map.Entry<String, Object> objAttribute : entry.getValue().entrySet()) {
+				objAttributes.put(objAttribute.getKey(),objAttribute.getValue());
+			}
+			// write attributes
+			for (Map.Entry<String, Object> objAttribute : objAttributes.entrySet()) {
 				xmlAttributes.add(super.createTuple(ATTR_ATTRIBUTENAME, objAttribute.getKey()));
 				xmlAttributes.add(super.createTuple(ATTR_ATTRIBUTECLASS, objAttribute.getValue().getClass().getCanonicalName()));
 				writeStartTag(TAG_ATTRIBUTE, xmlAttributes);
