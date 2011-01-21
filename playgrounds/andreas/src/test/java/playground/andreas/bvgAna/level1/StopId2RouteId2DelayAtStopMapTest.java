@@ -1,7 +1,5 @@
 package playground.andreas.bvgAna.level1;
 
-import static org.junit.Assert.*;
-
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -58,6 +56,8 @@ public class StopId2RouteId2DelayAtStopMapTest {
 	    System.out.println(test.getStopId2RouteId2DelayAtStopMap().toString());
 	    
 	    // to be completed
+	    
+	    
 	    
 	    
 	}

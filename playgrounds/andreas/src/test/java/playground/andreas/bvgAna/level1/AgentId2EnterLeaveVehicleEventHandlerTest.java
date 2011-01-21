@@ -1,15 +1,11 @@
 package playground.andreas.bvgAna.level1;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsFactoryImpl;
 import org.matsim.core.events.PersonEntersVehicleEvent;

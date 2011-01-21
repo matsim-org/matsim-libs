@@ -1,8 +1,5 @@
 package playground.andreas.bvgAna.level1;
 
-import static org.junit.Assert.*;
-
-import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 

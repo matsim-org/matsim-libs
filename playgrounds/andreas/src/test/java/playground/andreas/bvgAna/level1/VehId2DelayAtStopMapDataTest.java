@@ -1,11 +1,7 @@
 package playground.andreas.bvgAna.level1;
 
-import static org.junit.Assert.*;
-
 import java.util.Set;
 import java.util.TreeSet;
-
-import junit.framework.Assert;
 
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -13,7 +9,6 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsFactoryImpl;
 import org.matsim.core.events.TransitDriverStartsEvent;
 import org.matsim.core.events.VehicleDepartsAtFacilityEvent;
-import org.matsim.core.events.VehicleDepartsAtFacilityEventImpl;
 
 public class VehId2DelayAtStopMapDataTest {
 
@@ -39,14 +34,14 @@ public class VehId2DelayAtStopMapDataTest {
 		
         EventsFactoryImpl ef = new EventsFactoryImpl();
         
-        TransitDriverStartsEvent event1 = new TransitDriverStartsEvent(2.4*3600, driverId1, vehId1, transitLineId1, transitRouteId1, departureId1);
-        VehicleDepartsAtFacilityEvent event2 = new VehicleDepartsAtFacilityEventImpl(2.3*3600, vehId1, facilId1, 1.);
+        TransitDriverStartsEvent event1 = ef.createTransitDriverStartsEvent(2.4*3600, driverId1, vehId1, transitLineId1, transitRouteId1, departureId1);
+        VehicleDepartsAtFacilityEvent event2 = ef.createVehicleDepartsAtFacilityEvent(2.3*3600, vehId1, facilId1, 1.);
         
         VehId2DelayAtStopMapData mapData = new VehId2DelayAtStopMapData(event1);
         
         mapData.addVehicleDepartsAtFacilityEvent(event2);
         
-//        now that I completed the test setup I am wondering, what should I test here?
+ 
         
         
 		
