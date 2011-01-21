@@ -3,7 +3,7 @@ package playground.dressler.ea_flow;
 import java.util.Comparator;
 
 // Comparator needs total order!!!
-class TaskComparator implements Comparator<BFTask> {
+class TaskComparator implements TaskComparatorI {
 	public int compare(BFTask first, BFTask second) {
 		if (first.time < second.time) return -1; 
 		if (first.time > second.time) return 1;
@@ -38,5 +38,9 @@ class TaskComparator implements Comparator<BFTask> {
 
 		return first.node.getRealNode().getId().compareTo(second.node.getRealNode().getId());
 
+	}
+	
+	public int getValue(BFTask task) {
+		return task.time;
 	}
 }

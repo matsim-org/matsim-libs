@@ -720,7 +720,7 @@ public class MultiSourceEAF {
 		int timeStep;
 		double flowFactor;
 
-		int instance = -1;
+		int instance = 4;
 		// 1 = siouxfalls, demand 500
 		// 11 same as above only Manuel and 5s euclid
 		// 2 = swissold, demand 100
@@ -1090,11 +1090,11 @@ public class MultiSourceEAF {
 		settings.flowFactor = flowFactor; // default 1.0
 
 		// set additional parameters
-		//settings.TimeHorizon = 550;
+		//settings.TimeHorizon = 2500;
 		//settings.MaxRounds = 20;
 		//settings.checkConsistency = 1;
 		//settings.doGarbageCollection = 10; // > 0 generally not such a good idea.
-		//settings.minTravelTime = 1;
+		settings.minTravelTime = 0;
 		settings.useSinkCapacities = false;
 		//settings.useVertexCleanup = false;
 		settings.useImplicitVertexCleanup = true;
@@ -1104,6 +1104,7 @@ public class MultiSourceEAF {
 		//settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_MIXED;
 		//settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_REVERSE;
 		settings.queueAlgo = FlowCalculationSettings.QUEUE_GUIDED;
+		settings.useBucketQueue = false;
 		
 		settings.useRepeatedPaths = true; // not compatible with costs!
 		settings.retryReverse = 1; // 1 = try one time step later with reverse search if no path was found.
@@ -1114,9 +1115,10 @@ public class MultiSourceEAF {
 		settings.keepPaths = true; // store paths at all
 		settings.unfoldPaths = false; // unfold stored paths into forward paths
 		settings.delaySinkPropagation = true; // propagate sinks (and resulting intervals) only if the search has nothing else to do 
-		settings.quickCutOff = 0.5; // <0, continue fully,  =0 stop as soon as the first good path is found, > 0 continue a bit (e.g. 0.1 continue for another 10% of the polls so far) 
+		settings.quickCutOff = -99; // <0, continue fully,  =0 stop as soon as the first good path is found, > 0 continue a bit (e.g. 0.1 continue for another 10% of the polls so far)
+		settings.filterOrigins = false;
 		settings.mapLinksToTEP = true; // remember which path uses an edge at a given time
-		settings.useHoldover = true; //only forward/reverse, no cost, no unwind
+		settings.useHoldover = false; //only forward/reverse, no cost, no unwind
 		//settings.whenAvailable = new HashMap<Link, Interval>();
 		//settings.whenAvailable.put(network.getLinks().get(new IdImpl("1")), new Interval(2,3));
 
@@ -1149,6 +1151,7 @@ public class MultiSourceEAF {
 		//settings.writeSimpleNetwork(false);
 		//settings.writeNET(true);
 		//settings.writeLodyfa();
+		//settings.writeDIMACS(false);
 		//if(true)return;
 		
 		fluss = MultiSourceEAF.calcEAFlow(settings, flowpaths);

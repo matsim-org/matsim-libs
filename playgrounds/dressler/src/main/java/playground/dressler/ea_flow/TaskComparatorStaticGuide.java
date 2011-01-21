@@ -5,7 +5,7 @@ import java.util.HashMap;
 
 import org.matsim.api.core.v01.Id;
 
-class TaskComparatorStaticGuide implements Comparator<BFTask> {
+class TaskComparatorStaticGuide implements TaskComparatorI {
 	private Comparator<BFTask> fallback = new TaskComparator();
 	private HashMap<Id, Integer> _dist;
 
@@ -34,5 +34,9 @@ class TaskComparatorStaticGuide implements Comparator<BFTask> {
 			}
 		}
 
+	}
+	
+	public int getValue(BFTask task) {
+		return _dist.get(task.node.getRealNode().getId());
 	}
 }

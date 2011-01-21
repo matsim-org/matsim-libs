@@ -5,7 +5,7 @@ import java.util.HashMap;
 
 import org.matsim.api.core.v01.Id;
 
-class TaskComparatorGuided implements Comparator<BFTask> {
+class TaskComparatorGuided implements TaskComparatorI {
 	private Comparator<BFTask> fallback = new TaskComparator();
 	private HashMap<Id, Integer> _dist;
 
@@ -34,5 +34,12 @@ class TaskComparatorGuided implements Comparator<BFTask> {
 			}
 		}
 
+	}
+	
+	// not equivalent to the above!
+	// and might work better if task.depth is added ... 
+	// weird, the BucketQueue already has BFS within each category 
+	public int getValue(BFTask task) {
+		return _dist.get(task.node.getRealNode().getId()) + task.time; 
 	}
 }

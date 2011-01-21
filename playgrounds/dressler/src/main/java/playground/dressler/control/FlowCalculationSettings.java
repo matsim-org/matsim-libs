@@ -22,6 +22,7 @@
 package playground.dressler.control;
 
 //matsim imports
+import java.util.Arrays;
 import java.util.HashMap;
 
 import org.matsim.api.core.v01.Id;
@@ -44,7 +45,6 @@ public class FlowCalculationSettings {
 	public static final int QUEUE_DFS = 1;
 	public static final int QUEUE_GUIDED = 2;
 	public static final int QUEUE_STATIC = 3;
-	
 
 	/* default scaling parameters */
 	public double timeStep = 1;
@@ -60,6 +60,8 @@ public class FlowCalculationSettings {
 	public boolean useSinkCapacities = true;
 	public int searchAlgo = SEARCHALGO_FORWARD;
     public int queueAlgo = QUEUE_BFS; // use a simple BFS
+    public boolean useBucketQueue = false; // use a normal queue, not the weird bucket queue 
+    	
 	public boolean useVertexCleanup = false;
 	public boolean useImplicitVertexCleanup = true; // unite vertex intervals before propagating?
 	public boolean useShadowFlow = false; // use arrays and shadow flows for storing the edge flow
@@ -72,7 +74,8 @@ public class FlowCalculationSettings {
 	public boolean unfoldPaths = true; // if they are stored, should they be unfolded to contain only forward edges?
 	public boolean mapLinksToTEP = true; // remember which path uses an edge at a given time
 	public boolean useRepeatedPaths = true && !useSinkCapacities; // try to repeat paths
-	public double quickCutOff = -1.0; // values < 0 continue fully, otherwise ratio of how much additional polls are done, e.g., 0.0 is stop immediately when the first path is found.   
+	public double quickCutOff = -1.0; // values < 0 continue fully, otherwise ratio of how much additional polls are done, e.g., 0.0 is stop immediately when the first path is found.
+	public boolean filterOrigins = false; // only search for one path from each origin. Works only with priority queue.
 	public boolean delaySinkPropagation = false; // propagate sinks (and resulting intervals) only if the search has nothing else to do 
 	public boolean useHoldover = false; // allow holdover at all nodes
 	public boolean useHoldoverCapacities = false;// limit holdover on each node
@@ -194,6 +197,11 @@ public class FlowCalculationSettings {
 				System.out.println("Only FORWARD and REVERSE search support the priority queue!");
 				return false;
 			}			
+		}
+		
+		if (queueAlgo == FlowCalculationSettings.QUEUE_BFS && filterOrigins) {
+			System.out.println("BFS Queue does not support filter origins!");
+			return false;
 		}
 
 		scaleParameters();
@@ -330,6 +338,7 @@ public class FlowCalculationSettings {
 		System.out.println("Network has " + this._network.getNodes().size() + " nodes and " + this._network.getLinks().size() + " edges.");
 		System.out.println("Number sources: " + this._numsources + " | sinks: " + this._numsinks);
 		System.out.println("Total demand sources: " + this._totaldemandsources + " | sinks: " + this._totaldemandsinks);
+		System.out.println("Sinks have finite capacity: " + this.useSinkCapacities);
 		System.out.println("Time Horizon: " + this.TimeHorizon);
 		System.out.println("Use holdover: " + this.useHoldover);
 		System.out.println(" finite holdover capacity: " + this.useHoldoverCapacities);
@@ -372,12 +381,13 @@ public class FlowCalculationSettings {
 		  default:
 			  System.out.println("Unkown (" + this.queueAlgo +")");
 		}
-				
-		System.out.println("Sinks have finite capacity: " + this.useSinkCapacities);
+		System.out.println("Use Bucket Queue: " + this.useBucketQueue);		
+		
 
 		System.out.println("Track unreachable vertices: " + this.trackUnreachableVertices);
 		System.out.println("Retry reverse: " + this.retryReverse);
 		System.out.println("Quick cutoff: " + this.quickCutOff);
+		System.out.println("Filter origins: " + this.filterOrigins);
 		System.out.println("Delay sink propagation: " + this.delaySinkPropagation);
 		System.out.println("Use vertex cleanup: " + this.useVertexCleanup);
 		System.out.println("Use implicit vertex cleanup: " + this.useImplicitVertexCleanup);
@@ -522,6 +532,8 @@ public class FlowCalculationSettings {
 		if (t >= this.TimeHorizon) return null;
 		return "n#" + nodeNames.get(node) + "#t" + t;
 	}
+	
+
 
 	private String NameSource(Node node, HashMap<Node,Integer> nodeNames) {
 		return "source#" + nodeNames.get(node);
@@ -559,6 +571,28 @@ public class FlowCalculationSettings {
 		return "supersourcelink#" + nodeNames.get(node);
 	}
 
+	
+	// assign consecutive numbers to all nodes, starting at 1 ...
+	private int NumberNode(Node node, int t, HashMap<Node,Integer> nodeNames) {
+		if (t < 0) return -1;
+		if (t >= this.TimeHorizon) return -1;
+				
+		int i = nodeNames.get(node);
+		return this.TimeHorizon * i + t  + 1;
+	}
+	
+	private int NumberSupersource() {
+		return this.getNetwork().getNodes().size() * this.TimeHorizon + 1;
+	}
+	
+	private int NumberSupersink() {
+		return NumberSupersource() + 1; 
+	}
+	
+	private int NumberSourceSink(Node node, HashMap<Node,Integer> newTerminalNames) {
+		return NumberSupersink() + 1 + newTerminalNames.get(node); 
+	}
+	
 	/**
 	 * Writes the EAT problem as .lp file for CPLEX etc to standard out
 	 * This might be a big file and it includes some useless comments at the top ...
@@ -568,6 +602,7 @@ public class FlowCalculationSettings {
         System.out.println("\\ N " + this._network.getNodes().size());
         System.out.println("\\ TIME " + this.TimeHorizon);
         HashMap<Node,Integer> newNodeNames = new HashMap<Node,Integer>();
+        
         int max = 0;
         for (Node node : this._network.getNodes().values()) {
         	try {
@@ -980,6 +1015,238 @@ public class FlowCalculationSettings {
         System.out.println("ENDNETWORK");
 	}
 
+	
+	/**
+	 * Writes the EAT problem as DIMACS mincostflow network file to standard out
+	 * This might be a big file and it includes some useless comments at the top ...
+	 * @param costOnSinks if true, only the sink links will have non-zero costs, which is an equivalent formulation
+	 */
+	public void writeDIMACS(boolean costOnSinks) {
+		
+		StringBuilder headerOut = new StringBuilder();
+		StringBuilder supplyOut = new StringBuilder();
+		StringBuilder arcsOut = new StringBuilder();
+		
+		headerOut.append("c generated from matsim data \n");
+		headerOut.append("c N " + this._network.getNodes().size() + "\n");
+		headerOut.append("c TIME " + this.TimeHorizon + "\n");
+        
+        
+        // remap the vertices to numbers 0 .. getNodes().size() - 1
+        
+        HashMap<Node,Integer> newNodeNames = new HashMap<Node,Integer>();
+        boolean[] usedNumber = new boolean[this._network.getNodes().size()];
+        
+        for (Node node : this._network.getNodes().values()) {
+        	try {
+        		int i = Integer.parseInt(node.getId().toString());
+        		if (i >= 0 && i < this._network.getNodes().size()) {
+        			newNodeNames.put(node,i);
+        			usedNumber[i] = true;
+        		}
+        	} catch (Exception except) {
+
+        	}
+        }
+
+        int findNextFree = 0;
+        for (Node node : this._network.getNodes().values()) {        	
+        	if (!newNodeNames.containsKey(node)) {
+        		while (usedNumber[findNextFree]) findNextFree++;
+        		newNodeNames.put(node, findNextFree);
+        		usedNumber[findNextFree] = true;
+        		headerOut.append("c Node " + findNextFree  + " was " + node.getId() + "\n");
+        	}
+        }
+                       
+        // remap the terminals to numbers 0 .. terminals - 1
+        HashMap<Node,Integer> newTerminalNames = new HashMap<Node, Integer>();
+
+        
+        int numberTerminals = 0;
+        for (Node node : this._network.getNodes().values()) {
+        	if (getDemand(node) != 0) 
+        		numberTerminals++;
+        }
+        
+        boolean[] usedTerminalNumber = new boolean[numberTerminals];
+        
+        for (Node node : this._network.getNodes().values()) {
+        	if (getDemand(node) == 0) continue;
+        	
+        	if (newNodeNames.get(node) < numberTerminals) {
+        		newTerminalNames.put(node, newNodeNames.get(node));
+        		usedTerminalNumber[newNodeNames.get(node)] = true;
+        	}
+        }
+        
+        findNextFree = 0;
+        for (Node node : this._network.getNodes().values()) {
+        	if (getDemand(node) == 0) continue;
+        	if (!newTerminalNames.containsKey(node)) {
+        		while (usedTerminalNumber[findNextFree]) findNextFree++;
+        		newTerminalNames.put(node, findNextFree);
+        		usedTerminalNumber[findNextFree] = true;
+        		headerOut.append("c Terminal " + findNextFree + " was " + node.getId() + " \n");
+        	}
+        }                  
+        
+        // compute the number of vertices and arcs in the time-expanded network
+        int totalVertices = 0;
+        int totalArcs = 0;
+        
+        totalVertices = 2; // super source and sink
+        for (Node node : this._network.getNodes().values()) {
+        	totalVertices += this.TimeHorizon;
+        	
+        	int d = 0;
+        	if (this._demands.containsKey(node)) {
+        		d = this._demands.get(node);
+        	}
+        	if (d != 0) {
+        		totalVertices++;
+        		totalArcs += this.TimeHorizon; // sourceoutflow, sinkinflow
+        		totalArcs++; // link to supersource/sink
+        	}
+        }
+        
+        for (Link link : this._network.getLinks().values()) {
+        	totalArcs += this.TimeHorizon - getLength(link);
+        }
+        
+
+
+        headerOut.append("p min " + totalVertices + " " + totalArcs + " \n");
+        
+        supplyOut.append("n " + NumberSupersource() + " " + this._totaldemandsources + "\n");
+        // we need an transshipment! and sink demands are just upper bounds anyway
+        supplyOut.append("n " + NumberSupersink() + " " + (- this._totaldemandsources) + "\n");        
+
+        System.out.println(headerOut);
+        System.out.println(supplyOut);
+        
+        // the time-expanded arcs
+        for (Link link : this._network.getLinks().values()) {
+        	Interval when = null;
+        	int low = 0;
+        	int high = this.TimeHorizon;
+        	if (this.whenAvailable != null) {
+        		when = this.whenAvailable.get(link.getId());
+        		if (when != null) {
+        			low = when.getLowBound();
+        			high = when.getHighBound();
+        		}
+        	}
+
+        	for (int t = low; t < high; t++) {
+        		if (t + getLength(link) < this.TimeHorizon) {
+        			int v = NumberNode(link.getFromNode(), t, newNodeNames);
+        			int w = NumberNode(link.getToNode(), t + this.getLength(link), newNodeNames);
+        			arcsOut.append("a " + v + " " + w + " 0 " + getCapacity(link));
+        			if (costOnSinks) {
+        				arcsOut.append(" 0");
+        			} else {
+        				 arcsOut.append(" " + getLength(link));
+        			}
+        			arcsOut.append("\n");
+        			//totalArcs++;
+        		} else {
+        			break;
+        		}
+        	}
+        	System.out.println(arcsOut);
+        	arcsOut = new StringBuilder();
+        }
+
+        // the arcs from the virtual sources to the source node
+        // and from the sink nodes to the virtual sinks
+        for (Node node : this._network.getNodes().values()) {
+        	//totalVertices += this.TimeHorizon;
+        	
+        	int d = 0;
+        	if (this._demands.containsKey(node)) {
+        		d = this._demands.get(node);
+        	}
+        	if (d == 0) 
+        		continue;
+        	
+        	//totalVertices++;
+
+        	if (d < 0) {        		
+        		for (int t = 0; t < this.TimeHorizon; t++) {        			
+        		    arcsOut.append("a ");
+        		    arcsOut.append(NumberNode(node, t, newNodeNames));
+        		    arcsOut.append(" ");
+        		    arcsOut.append(NumberSourceSink(node, newTerminalNames));        		    
+        		    arcsOut.append(" 0 9876543 ");
+        		    if (costOnSinks) {
+        		    	arcsOut.append(t);
+        		    } else {
+        		    	arcsOut.append(" 0");
+        		    }
+
+        		    arcsOut.append("\n");
+        		    //totalArcs++;
+        		}
+        	} else {
+        		for (int t = 0; t < this.TimeHorizon; t++) {
+        			StringBuilder sb = new StringBuilder();
+        		    sb.append(NameSourceLink(node, t, newNodeNames));
+        		    sb.append(" : " + NameSource(node, newNodeNames));
+        		    sb.append(" -> " + NameNode(node, t, newNodeNames));
+        		    
+        		    arcsOut.append("a ");
+        		    arcsOut.append(NumberSourceSink(node, newTerminalNames));
+        		    arcsOut.append(" ");
+        		    arcsOut.append(NumberNode(node, t, newNodeNames));
+        		    arcsOut.append(" 0 9876543 ");
+        		    if (costOnSinks) {
+        		    	arcsOut.append(" 0");
+        		    } else {
+        		    	arcsOut.append(" " + t);
+        		    }
+
+        		    arcsOut.append("\n");
+        		    //totalArcs++;
+        		}
+        	}
+        }
+
+        System.out.println(arcsOut);
+    	arcsOut = new StringBuilder();
+
+        // the arcs from the supersource/supersink to the virtual sources/sinks
+        for (Node node : this._network.getNodes().values()) {
+        	int d = 0;
+        	if (this._demands.containsKey(node)) {
+        		d = this._demands.get(node);
+        	}
+        	if (d == 0)
+        		continue;
+        	
+        	if (d < 0) {
+        		arcsOut.append("a ");
+        		arcsOut.append(NumberSourceSink(node, newTerminalNames));
+        		arcsOut.append(" ");
+        		arcsOut.append(NumberSupersink());
+        		arcsOut.append(" 0 ");
+        		arcsOut.append(-d + " 0\n");
+        		//totalArcs++;
+        		
+        	} else {
+        		arcsOut.append("a ");
+        		arcsOut.append(NumberSupersource());
+        		arcsOut.append(" ");
+        		arcsOut.append(NumberSourceSink(node, newTerminalNames));        		
+        		arcsOut.append(" 0 ");
+        		arcsOut.append(d + " 0\n");
+        		//totalArcs++;
+        	}            
+        }
+
+        System.out.println(arcsOut);
+	}
+	
 	/**
 	 * Writes a single-sink EAF problem as .lod network file for LODYFA EAF to standard out
 	 * This might be a big file.
@@ -1219,6 +1486,10 @@ public class FlowCalculationSettings {
     	    	trackUnreachableVertices  = Boolean.parseBoolean(t);
     	    } else if (s.equals("--retryreverse")) {
     	    	retryReverse  = Integer.parseInt(t);
+    	    } else if (s.equals("--filterorigins")) {
+    	    	filterOrigins = Boolean.parseBoolean(t);
+    	    } else if (s.equals("--usebucketqueue")) {
+    	    	useBucketQueue = Boolean.parseBoolean(t);
     	    } else {
     	    	error += "Unknown option: " + s + "\n";
     	    }
@@ -1239,6 +1510,7 @@ public class FlowCalculationSettings {
     	s += "--usesinkcapacities\n" + useSinkCapacities + "\n";
     	s += "--searchalgo\n" + searchAlgo + "\n";
         s += "--queuealgo\n" + queueAlgo + "\n";
+        s += "--usebucketqueue" + useBucketQueue + "\n";
     	s += "--usevertexcleanup\n" + useVertexCleanup + "\n";
     	
     	s += "--useimplicitvertexcleanup\n" + useImplicitVertexCleanup + "\n";
@@ -1253,6 +1525,7 @@ public class FlowCalculationSettings {
     	s += "--maplinkstotep\n" + mapLinksToTEP + "\n";
     	s += "--userepeatedpaths\n" + useRepeatedPaths + "\n";
     	s += "--quickcutoff\n" + quickCutOff + "\n";
+    	s += "--filterorigins\n" + filterOrigins + "\n";
     	s += "--delaysinkpropagation\n" + delaySinkPropagation  + "\n"; 
     	s += "--useholdover\n" + useHoldover + "\n";
     	s += "--useholdovercapacities\n" + useHoldoverCapacities + "\n";

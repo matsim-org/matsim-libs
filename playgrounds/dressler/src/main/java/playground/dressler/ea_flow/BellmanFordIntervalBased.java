@@ -93,6 +93,8 @@ public class BellmanFordIntervalBased {
 	HashMap<Id, Integer> _distforward = null;
 	HashMap<Id, Integer> _distreverse = null;	
 	
+	HashMap<Id, Boolean> _originsToIgnore = null;
+	
 	//private static int _warmstart;
 	//private LinkedList<Node> _warmstartlist;
 	
@@ -204,8 +206,10 @@ public class BellmanFordIntervalBased {
 			_labels.put(node, label);
 			if (this._settings.isSource(node)) {
 				VertexInterval temp2 = new VertexInterval(0, this._settings.TimeHorizon);
-				if (this._flow.isActiveSource(node)){				
-					queue.add(new BFTask(new VirtualSource(node), temp2, false));
+				if (this._flow.isActiveSource(node)){
+					BFTask task =  new BFTask(new VirtualSource(node), temp2, false);
+					task.origin = node.getId();
+					queue.add(task);
 					temp2.setScanned(false);
 					temp2.setReachable(true);				
 				} else {
@@ -236,7 +240,9 @@ public class BellmanFordIntervalBased {
 			}
 			
 			if (this._settings.isSink(node)) {
-			    queue.add(new BFTask(new VirtualSink(node), 0, true));
+				BFTask task = new BFTask(new VirtualSink(node), 0, true);
+				task.origin = node.getId();
+			    queue.add(task);
 			}
 		}		
 	}		
@@ -258,8 +264,10 @@ public class BellmanFordIntervalBased {
 			if (this._settings.isSource(node)) {
 				// mark sources reachable and add them to the queue
 				VertexInterval temp2 = new VertexInterval(0, this._settings.TimeHorizon);
-				if (this._flow.isActiveSource(node)){				
-					queue.add(new BFTask(new VirtualSource(node), temp2, false));
+				if (this._flow.isActiveSource(node)){
+					BFTask task = new BFTask(new VirtualSource(node), temp2, false);
+					task.origin = node.getId();
+					queue.add(task);
 					temp2.setScanned(false);
 					temp2.setReachable(true);
 				} else {
@@ -271,7 +279,9 @@ public class BellmanFordIntervalBased {
 
 			// also add sinks to the queue
 			if (this._settings.isSink(node)) {
-			    queue.add(new BFTask(new VirtualSink(node), 0, true));
+				BFTask task = new BFTask(new VirtualSink(node), 0, true);
+				task.origin = node.getId();				
+			    queue.add(task);
 			}
 		}		
 	}	
@@ -1309,7 +1319,11 @@ public class BellmanFordIntervalBased {
 			  queue = new SimpleTaskQueue();
 			  break;
 		  case FlowCalculationSettings.QUEUE_DFS:
-			  queue = new PriorityTaskQueue(new TaskComparator());
+			  if (this._settings.useBucketQueue) {
+				  queue = new BucketTaskQueue(new TaskComparator());
+			  } else {
+				  queue = new PriorityTaskQueue(new TaskComparator());
+			  }
 			  break;
 		  case FlowCalculationSettings.QUEUE_GUIDED:
 		  case FlowCalculationSettings.QUEUE_STATIC:
@@ -1322,14 +1336,18 @@ public class BellmanFordIntervalBased {
 				  this._distforward = dijkstra.calcDistances(false, true);
 				  //System.out.println(this._distforward);
 			  }			  
-			  Comparator<BFTask> taskcomp;
+			  TaskComparatorI taskcomp;
 			  if (this._settings.queueAlgo == FlowCalculationSettings.QUEUE_GUIDED) {
 				 taskcomp = new TaskComparatorGuided(this._distforward);  
 			  } else {
 				 taskcomp = new TaskComparatorStaticGuide(this._distforward);
 			  }
 			  
-			  queue = new PriorityTaskQueue(taskcomp); 
+			  if (this._settings.useBucketQueue) {
+				  queue = new BucketTaskQueue(taskcomp);
+			  } else {
+				  queue = new PriorityTaskQueue(taskcomp);
+			  } 
 			  break;
 		  default:
 			  throw new RuntimeException("Unsupported Queue Algo!");
@@ -1348,6 +1366,8 @@ public class BellmanFordIntervalBased {
 		// this is decreased whenever a sink is found
 		int cutofftime = this._settings.TimeHorizon;
 
+		this._originsToIgnore = new HashMap<Id, Boolean>();		
+		
 		int finalPoll = Integer.MAX_VALUE / 2;
 		boolean quickCutOffArmed = false;
 		_hasPath = false;
@@ -1370,7 +1390,16 @@ public class BellmanFordIntervalBased {
 			Tqueuetime.onoff();
 			
 			if (task == null) {
+				//System.out.println("queue empty");
 				break;
+			}
+			
+			// FIXME experimental ... ignore tasks from sources which already have a path.
+			if (this._originsToIgnore.get(task.origin) != null) {
+				//System.out.println("Ignoring a task due to origin!");
+				this._roundnonpolls++;
+				this._totalnonpolls++;
+				continue;
 			}
 											
 			
@@ -1406,17 +1435,28 @@ public class BellmanFordIntervalBased {
 			if (this._settings.isSink(v)) {		
 				Tsinktime.onoff();
 				if (this._flow.isActiveSink(v)) {
+									
 					if (task.time < cutofftime) {				  
 						cutofftime = task.time;	
 						if (_debug > 0) {
 							System.out.println("Setting new cutoff time: " + cutofftime);
 						}
-						
-						// do we have a shortest path?
-						if (_haslastcost && cutofftime == _lastcost) {
-							_hasPath = true;
-						}
+												
 					}
+					
+					// do we have a shortest path?
+					if (_haslastcost && task.time == _lastcost) {
+						_hasPath = true;
+						
+						//System.out.println("Have shortest path to " + v.getId());
+						//System.out.println("Have shortest path from " + task.origin);
+						
+						// FIXME experimental
+						//System.out.println("Ignoring source " + task.origin);
+						if (this._settings.filterOrigins) {
+							this._originsToIgnore.put(task.origin, true);
+						}
+					}					
 					
 				}
 				Tsinktime.onoff();
@@ -2592,6 +2632,8 @@ public class BellmanFordIntervalBased {
 		// "free" some data structures
 		this._labels = null;
 		this._sourcelabels = null;
+		
+		this._originsToIgnore = null;
 		
 		// reset statistics
 		this._vertexGain = 0;
