@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ConditionalDistribution.java
+ * ObservedSocialAnalyzerTask.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,39 +17,22 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.johannes.socialnetworks.survey.ivt2009.analysis;
 
-/**
- * 
- */
-package playground.johannes.socialnetworks.graph.mcmc;
-
-import org.matsim.contrib.sna.graph.Vertex;
-import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
+import playground.johannes.socialnetworks.graph.social.analysis.AgeTask;
+import playground.johannes.socialnetworks.graph.social.analysis.GenderTask;
+import playground.johannes.socialnetworks.graph.social.analysis.SocialAnalyzerTask;
+import playground.johannes.socialnetworks.snowball2.social.analysis.ObservedAge;
 
 /**
  * @author illenberger
- * 
+ *
  */
-public interface GraphProbability {
+public class ObservedSocialAnalyzerTask extends SocialAnalyzerTask {
 
-	/**
-	 * Determines the probability difference of the matrix with
-	 * <tt>y_ij = 0</tt> to a matrix with <tt>y_ij = 1</tt>.
-	 * 
-	 * @param <V>
-	 *            the vertex type
-	 * @param y
-	 *            an adjacency matrix
-	 * @param i
-	 *            a vertex index
-	 * @param j
-	 *            a vertex index
-	 * @param y_ij
-	 *            <tt>true</tt> if in the current configuration
-	 *            <tt>y_ij = 1</tt>, <tt>false</tt> otherwise
-	 * @return the probability difference of the matrix with <tt>y_ij = 0</tt>
-	 *         to a matrix with <tt>y_is = 1</tt>.
-	 */
-	public <V extends Vertex> double difference(AdjacencyMatrix<V> y, int i, int j, boolean y_ij);
+	public ObservedSocialAnalyzerTask() {
+		addTask(new AgeTask(new ObservedAge()));
+		addTask(new GenderTask(new ObservedGender()));
+	}
 
 }

@@ -19,114 +19,66 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.social.analysis;
 
-import gnu.trove.TDoubleArrayList;
-import gnu.trove.TDoubleDoubleHashMap;
 import gnu.trove.TObjectDoubleHashMap;
-import gnu.trove.TObjectDoubleIterator;
-import gnu.trove.TObjectIntHashMap;
-import gnu.trove.TObjectIntIterator;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.matsim.contrib.sna.graph.Graph;
-import org.matsim.contrib.sna.graph.Vertex;
-import org.matsim.contrib.sna.graph.analysis.Degree;
-import org.matsim.contrib.sna.snowball.analysis.ObservedDegree;
+import org.matsim.contrib.sna.graph.analysis.ModuleAnalyzerTask;
+import org.matsim.contrib.sna.util.TXTWriter;
 
-import playground.johannes.socialnetworks.graph.matrix.CalcCentrality;
 import playground.johannes.socialnetworks.graph.social.SocialGraph;
 import playground.johannes.socialnetworks.graph.social.SocialVertex;
-import playground.johannes.socialnetworks.statistics.Correlations;
 
 /**
  * @author illenberger
  *
  */
-public class GenderTask extends SocioMatrixTask {
+public class GenderTask extends ModuleAnalyzerTask<Gender> {
 
-	/* (non-Javadoc)
-	 * @see org.matsim.contrib.sna.graph.analysis.AnalyzerTask#analyze(org.matsim.contrib.sna.graph.Graph, java.util.Map)
-	 */
-	@Override
-	public void analyze(Graph g, Map<String, Double> stats) {
-		if(getOutputDirectory() != null) {
-			
-			try {
-				SocialGraph graph = (SocialGraph) g;
-
-				Gender gender = new Gender();
-
-					TObjectIntHashMap<String> distr = gender.distribution(graph.getVertices());
-					BufferedWriter writer = new BufferedWriter(new FileWriter(getOutputDirectory() + "/gender.txt"));
-					TObjectIntIterator<String> it = distr.iterator();
-					writer.write("gender\tcount");
-					writer.newLine();
-					for(int i = 0; i < distr.size(); i++) {
-						it.advance();
-						writer.write(it.key());
-						writer.write("\t");
-						writer.write(String.valueOf(it.value()));
-						writer.newLine();
-					}
-					writer.close();
-					
-//					writer = new BufferedWriter(new FileWriter(getOutputDirectory() + "/gender.matrix.txt"));
-					double[][] matrix = gender.socioMatrix(graph);
-					List<String> values = gender.getAttributes();
-					
-					double[][] normMatrix = gender.normalizedSocioMatrix(matrix, distr, values);
-					double[][] matrixAvr = gender.socioMatrixLocalAvr(graph);
-					
-					writeSocioMatrix(matrix, values, getOutputDirectory() + "/gender.matrix.txt");
-					writeSocioMatrix(normMatrix, values, getOutputDirectory() + "/gender.matrix.norm.txt");
-					writeSocioMatrix(matrixAvr, values, getOutputDirectory() + "/gender.matrix.norm2.txt");
-					
-					Degree degree = new ObservedDegree();
-					TObjectDoubleHashMap<Vertex> kDistr = degree.values(graph.getVertices());
-					
-					TDoubleArrayList kValues = new TDoubleArrayList();
-					TDoubleArrayList mValues = new TDoubleArrayList();
-					calcValues(graph, kDistr, kValues, mValues, "m");
-					TDoubleDoubleHashMap cor = Correlations.mean(kValues.toNativeArray(), mValues.toNativeArray(), 5);
-					Correlations.writeToFile(cor, getOutputDirectory() + "/gender_k_m.txt", "k", "ratio male");
-					
-					kValues = new TDoubleArrayList();
-					mValues = new TDoubleArrayList();
-					calcValues(graph, kDistr, kValues, mValues, "f");
-					cor = Correlations.mean(kValues.toNativeArray(), mValues.toNativeArray(), 5);
-					Correlations.writeToFile(cor, getOutputDirectory() + "/gender_k_f.txt", "k", "ratio male");
-					
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-
+	private static final Logger logger = Logger.getLogger(GenderTask.class);
+	
+	public GenderTask() {
+		setModule(Gender.getInstance());
 	}
 	
-	private void calcValues(SocialGraph graph, TObjectDoubleHashMap<Vertex> kDistr, TDoubleArrayList kValues, TDoubleArrayList mValues, String sex) {
-		TObjectDoubleIterator<Vertex> it2 = kDistr.iterator();
-		for(int i = 0; i < kDistr.size(); i++) {
-			it2.advance();
-			if(sex.equalsIgnoreCase(((SocialVertex)it2.key()).getPerson().getPerson().getSex())) {
-			kValues.add(it2.value());
-			int male = 0;
-			int total = 0;
-			for(Vertex neighbor : it2.key().getNeighbours()) {
-				if((((SocialVertex)neighbor).getPerson().getPerson().getSex()) != null)
-					total++;
+	public GenderTask(Gender module) {
+		setModule(module);
+	}
+	
+	@Override
+	public void analyze(Graph g, Map<String, Double> stats) {
+		SocialGraph graph = (SocialGraph) g;
+		
+		Map<SocialVertex, String> values = module.values(graph.getVertices());
+		TObjectDoubleHashMap<String> hist = LinguisticHistogram.create(values.values());
+		double male = hist.get(Gender.MALE);
+		double female = hist.get(Gender.FEMALE);
+	
+		logger.info(String.format("male = %1$s, female = %2$s.", male, female));
+		
+		if(outputDirectoryNotNull()) {
+			try {
+				TXTWriter.writeMap(hist, "gender", "n", String.format("%1$s/gender.txt", getOutputDirectory()));
 				
-				if("m".equalsIgnoreCase(((SocialVertex)neighbor).getPerson().getPerson().getSex())) {
-					male++;
-				}
-			}
-			
-			mValues.add(male/(double)total);
+				SocioMatrix<String> m = module.countsMatrix(graph.getVertices());
+				m.toFile(String.format("%1$s/gender.countsMatrix.txt", getOutputDirectory()));
+				
+				SocioMatrixBuilder.normalizeTotalSum(m);
+				m.toFile(String.format("%1$s/gender.countsMatrix.normTotal.txt", getOutputDirectory()));
+				
+				m = module.countsMatrix(graph.getVertices());
+				SocioMatrixBuilder.normalizeRowSum(m);
+				m.toFile(String.format("%1$s/gender.countsMatrix.normRow.txt", getOutputDirectory()));
+				
+				
+				m = module.probaMatrix(graph.getVertices());
+				m.toFile(String.format("%1$s/gender.probaMatrix.txt", getOutputDirectory()));
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
 		}
 	}
-
 }

@@ -31,15 +31,15 @@ import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
 import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphMLReader;
 
 import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
-import playground.johannes.socialnetworks.graph.mcmc.GibbsSampler;
-import playground.johannes.socialnetworks.graph.mcmc.GraphProbability;
+import playground.johannes.socialnetworks.graph.mcmc.GibbsEdgeInsert;
+import playground.johannes.socialnetworks.graph.mcmc.EnsembleProbability;
 import playground.johannes.socialnetworks.graph.spatial.io.Population2SpatialGraph;
 
 /**
  * @author illenberger
  *
  */
-public class UtilFuncDiff implements GraphProbability {
+public class UtilFuncDiff implements EnsembleProbability {
 
 	private EdgeCostFunction costFunc;
 	
@@ -57,7 +57,7 @@ public class UtilFuncDiff implements GraphProbability {
 	}
 	
 	@Override
-	public <V extends Vertex> double difference(AdjacencyMatrix<V> y, int i, int j, boolean yIj) {
+	public <V extends Vertex> double ratio(AdjacencyMatrix<V> y, int i, int j, boolean yIj) {
 		double c_sum = 0;
 		SpatialVertex v_i = (SpatialVertex) y.getVertex(i);
 		SpatialVertex v_j = (SpatialVertex) y.getVertex(j);
@@ -88,15 +88,14 @@ public class UtilFuncDiff implements GraphProbability {
 		
 		AdjacencyMatrix<SpatialSparseVertex> y = new AdjacencyMatrix<SpatialSparseVertex>(graph);
 		
-		GibbsSampler sampler = new GibbsSampler();
-		sampler.setInterval((int)1e6);
+		GibbsEdgeInsert sampler = new GibbsEdgeInsert();
 		
 		DumpHandler handler = new DumpHandler(graph, new SpatialSparseGraphBuilder(graph.getCoordinateReferenceSysten()), "/Users/jillenberger/Work/work/socialnets/mcmc/output/");
 		handler.setBurnin((int)2E9);
 		handler.setDumpInterval((int)5e7);
 		handler.setLogInterval((int)5e6);
 		
-		GraphProbability p = new UtilFuncDiff(new GravityEdgeCostFunction(1.6, 1, new CartesianDistanceCalculator()), 1, -100, 60);
+		EnsembleProbability p = new UtilFuncDiff(new GravityEdgeCostFunction(1.6, 1, new CartesianDistanceCalculator()), 1, -100, 60);
 		
 		handler.analyze(y, 0);
 		sampler.sample(y, p, handler);

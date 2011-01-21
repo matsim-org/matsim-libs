@@ -37,7 +37,7 @@ public class ErgmEdgeProba extends ErgmTerm {
 	}
 
 	@Override
-	public <V extends Vertex> double difference(AdjacencyMatrix<V> y, int i, int j, boolean yIj) {
+	public <V extends Vertex> double ratio(AdjacencyMatrix<V> y, int i, int j, boolean yIj) {
 		double p = probaFunction.probability(i, j);
 
 		if(p == 0)

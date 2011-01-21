@@ -160,7 +160,6 @@ public class ErgmSimulator {
 		GibbsEdgeSwitch sampler = new GibbsEdgeSwitch();
 //		GibbsSampler sampler = new GibbsEdgeFlip(randomSeed);
 //		GibbsSampler sampler = new GibbsSampler(randomSeed);
-		sampler.setInterval(1000000);
 		
 //		DumpHandler handler = new DumpHandler(graph, builder, outputDir);
 		SamplerListener<SocialSparseVertex> handler = new playground.johannes.socialnetworks.graph.social.mcmc.DumpHandler(graph, builder, outputDir);

@@ -35,6 +35,7 @@ import org.matsim.contrib.sna.snowball.analysis.ObservedDegree;
 
 import playground.johannes.socialnetworks.graph.social.SocialGraph;
 import playground.johannes.socialnetworks.graph.social.SocialVertex;
+import playground.johannes.socialnetworks.survey.ivt2009.analysis.SocioMatrixTask;
 
 /**
  * @author illenberger

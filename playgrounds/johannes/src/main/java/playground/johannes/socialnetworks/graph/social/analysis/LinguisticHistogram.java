@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Educatiion.java
+ * LinguisticHistogram.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -19,18 +19,21 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.social.analysis;
 
-import playground.johannes.socialnetworks.graph.social.SocialVertex;
-import playground.johannes.socialnetworks.survey.ivt2009.analysis.SocioMatrixLegacy;
+import gnu.trove.TObjectDoubleHashMap;
+
+import java.util.Collection;
 
 /**
  * @author illenberger
  *
  */
-public class Education extends SocioMatrixLegacy {
+public class LinguisticHistogram {
 
-	@Override
-	protected String getAttributeValue(SocialVertex vertex) {
-		return vertex.getPerson().getEducation();
+	public static TObjectDoubleHashMap<String> create(Collection<String> values) {
+		TObjectDoubleHashMap<String> hist = new TObjectDoubleHashMap<String>();
+		for(String value : values) {
+			hist.adjustOrPutValue(value, 1.0, 1.0);
+		}
+		return hist;
 	}
-
 }

@@ -138,7 +138,7 @@ public class DumpHandler implements SamplerListener<SpatialSparseVertex> {
 		this.logInterval = logInterval;
 	}
 
-	public boolean afterSampling(AdjacencyMatrix<SpatialSparseVertex> y, long iteration) {
+	public boolean beforeSampling(AdjacencyMatrix<SpatialSparseVertex> y, long iteration) {
 		if(iteration % logInterval == 0) {
 			log(y, iteration);
 		}

@@ -44,7 +44,7 @@ import org.matsim.contrib.sna.math.LinearDiscretizer;
 import playground.johannes.socialnetworks.gis.BeelineCostFunction;
 import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
 import playground.johannes.socialnetworks.gis.DistanceCalculator;
-import playground.johannes.socialnetworks.graph.mcmc.GraphProbability;
+import playground.johannes.socialnetworks.graph.mcmc.EnsembleProbability;
 import playground.johannes.socialnetworks.graph.spatial.analysis.Accessibility;
 
 import com.vividsolutions.jts.geom.Point;
@@ -53,7 +53,7 @@ import com.vividsolutions.jts.geom.Point;
  * @author illenberger
  *
  */
-public class ErgmEdgeCost2 implements GraphProbability {
+public class ErgmEdgeCost2 implements EnsembleProbability {
 
 	private static final Logger logger = Logger.getLogger(ErgmEdgeCost2.class);
 	
@@ -135,7 +135,7 @@ public class ErgmEdgeCost2 implements GraphProbability {
 	
 	@SuppressWarnings("unchecked")
 	@Override
-	public <V extends Vertex> double difference(AdjacencyMatrix<V> y, int i, int j, boolean yIj) {
+	public <V extends Vertex> double ratio(AdjacencyMatrix<V> y, int i, int j, boolean yIj) {
 		SpatialVertex vi = ((AdjacencyMatrix<SpatialVertex>)y).getVertex(i);
 		SpatialVertex vj = ((AdjacencyMatrix<SpatialVertex>)y).getVertex(j);
 		

@@ -34,7 +34,7 @@ import org.matsim.contrib.sna.util.Composite;
  * @author illenberger
  *
  */
-public class Ergm extends Composite<GraphProbability> implements GraphProbability {
+public class Ergm extends Composite<EnsembleProbability> implements EnsembleProbability {
 
 //	private ErgmTerm[] ergmTerms;
 //	
@@ -49,10 +49,10 @@ public class Ergm extends Composite<GraphProbability> implements GraphProbabilit
 //	}
 	
 
-	public <V extends Vertex> double difference(AdjacencyMatrix<V> y, int i, int j, boolean y_ij) {
+	public <V extends Vertex> double ratio(AdjacencyMatrix<V> y, int i, int j, boolean y_ij) {
 		double prod = 1;
 		for(int k = 0; k < components.size(); k++) {
-			prod *= components.get(k).difference(y, i, j, y_ij);
+			prod *= components.get(k).ratio(y, i, j, y_ij);
 		}
 		
 //		if(Double.isInfinite(prod))

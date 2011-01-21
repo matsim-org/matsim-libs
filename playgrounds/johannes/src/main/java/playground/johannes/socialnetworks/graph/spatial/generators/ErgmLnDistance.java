@@ -71,7 +71,7 @@ public class ErgmLnDistance extends ErgmTerm {
 	}
 	
 	@Override
-	public <V extends Vertex> double difference(AdjacencyMatrix<V> y, int i, int j, boolean yIj) {
+	public <V extends Vertex> double ratio(AdjacencyMatrix<V> y, int i, int j, boolean yIj) {
 		Point p1 = ((SpatialVertex) y.getVertex(i)).getPoint();
 		Point p2 = ((SpatialVertex) y.getVertex(j)).getPoint();
 		double d = distanceCalculator.distance(p1, p2);

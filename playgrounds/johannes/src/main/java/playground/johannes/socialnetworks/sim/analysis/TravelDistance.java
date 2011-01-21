@@ -69,7 +69,9 @@ public class TravelDistance {
 						statsMap.put(act.getType(), stats);
 					}
 
-					stats.addValue(getDistance(plan, i));
+					double d = getDistance(plan, i);
+					if(!Double.isNaN(d))
+						stats.addValue(d);
 				}
 			}
 		}
@@ -92,8 +94,9 @@ public class TravelDistance {
 			Route route = ((Leg) plan.getPlanElements().get(idx)).getRoute();
 			if (route == null)
 				return 0;
-			else
+			else {
 				return route.getDistance();
+			}
 		}
 	}
 }

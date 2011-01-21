@@ -56,6 +56,10 @@ public class AgeTask extends ModuleAnalyzerTask<Age> {
 		setModule(new Age());
 	}
 	
+	public AgeTask(Age module) {
+		setModule(module);
+	}
+	
 	@SuppressWarnings("unchecked")
 	@Override
 	public void analyze(Graph graph, Map<String, Double> stats) {

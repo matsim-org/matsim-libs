@@ -28,29 +28,22 @@ import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
  */
 public class GibbsEdgeSwitch extends GibbsEdgeFlip {
 
-	private EdgeSwitchCondition switchCondition;
-	
+	/**
+	 * 
+	 */
 	public GibbsEdgeSwitch() {
 		super();
 	}
 
+	/**
+	 * @param seed
+	 */
 	public GibbsEdgeSwitch(long seed) {
 		super(seed);
 	}
 
 	@Override
-	public <V extends Vertex> void sample(AdjacencyMatrix<V> y, GraphProbability d, SamplerListener<V> handler) {
-		switchCondition = new DefaultSwitchCondition();
-		super.sample(y, d, handler);
-	}
-	
-	public <V extends Vertex> void sample(AdjacencyMatrix<V> y, GraphProbability d, SamplerListener<V> handler, EdgeSwitchCondition condition) {
-		switchCondition = condition;
-		super.sample(y, d, handler);
-	}
-
-	@Override
-	public <V extends Vertex> boolean step(AdjacencyMatrix<V> y, GraphProbability d) {
+	public <V extends Vertex> boolean step(AdjacencyMatrix<V> y, EnsembleProbability d) {
 		boolean accept = false;
 		int idx_ij = random.nextInt(edges.length);
 		int i = edges[idx_ij][0];
@@ -61,7 +54,7 @@ public class GibbsEdgeSwitch extends GibbsEdgeFlip {
 		
 		if(u != v && !y.getEdge(u, v)) {
 			if (switchCondition.allowSwitch(y, i, j, u, v)) {
-				double p_change = 1 / d.difference(y, i, j, true) * d.difference(y, u, v, false);
+				double p_change = 1 / d.ratio(y, i, j, true) * d.ratio(y, u, v, false);
 
 				double p = 1 / (1 + p_change);
 				if (random.nextDouble() <= p) {
@@ -77,14 +70,5 @@ public class GibbsEdgeSwitch extends GibbsEdgeFlip {
 		}
 		
 		return accept;
-	}
-	
-	public static class DefaultSwitchCondition implements EdgeSwitchCondition {
-
-		@Override
-		public boolean allowSwitch(AdjacencyMatrix<?> y, int i, int j, int u, int v) {
-			return true;
-		}
-		
 	}
 }

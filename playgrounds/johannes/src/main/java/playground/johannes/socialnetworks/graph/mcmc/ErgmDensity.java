@@ -34,7 +34,7 @@ import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
 public class ErgmDensity extends ErgmTerm {
 
 	@Override
-	public <V extends Vertex> double difference(AdjacencyMatrix<V> m, int i, int j, boolean y_ij) {
+	public <V extends Vertex> double ratio(AdjacencyMatrix<V> m, int i, int j, boolean y_ij) {
 		return Math.exp(getTheta());
 	}
 

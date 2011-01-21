@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Educatiion.java
+ * ObservedGender.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,20 +17,30 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.graph.social.analysis;
+package playground.johannes.socialnetworks.survey.ivt2009.analysis;
+
+import java.util.Map;
+import java.util.Set;
+
+import org.matsim.contrib.sna.snowball.SampledVertex;
+import org.matsim.contrib.sna.snowball.analysis.SnowballPartitions;
 
 import playground.johannes.socialnetworks.graph.social.SocialVertex;
-import playground.johannes.socialnetworks.survey.ivt2009.analysis.SocioMatrixLegacy;
+import playground.johannes.socialnetworks.graph.social.analysis.Gender;
+import playground.johannes.socialnetworks.graph.social.analysis.SocioMatrix;
+import playground.johannes.socialnetworks.graph.social.analysis.SocioMatrixBuilder;
+import playground.johannes.socialnetworks.snowball2.social.SocialSampledVertexDecorator;
 
 /**
  * @author illenberger
  *
  */
-public class Education extends SocioMatrixLegacy {
+public class ObservedGender extends Gender {
 
 	@Override
-	protected String getAttributeValue(SocialVertex vertex) {
-		return vertex.getPerson().getEducation();
+	public SocioMatrix<String> probaMatrix(Set<? extends SocialVertex> vertices) {
+		Map<SocialVertex, String> egos = super.values(SnowballPartitions.<SocialSampledVertexDecorator<?>>createSampledPartition((Set<SocialSampledVertexDecorator<?>>)vertices));
+		Map<SocialVertex, String> alters = super.values(vertices);
+		return SocioMatrixBuilder.probaMatrix(egos, alters);
 	}
-
 }

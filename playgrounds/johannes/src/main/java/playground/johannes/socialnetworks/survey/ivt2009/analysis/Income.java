@@ -20,13 +20,12 @@
 package playground.johannes.socialnetworks.survey.ivt2009.analysis;
 
 import playground.johannes.socialnetworks.graph.social.SocialVertex;
-import playground.johannes.socialnetworks.graph.social.analysis.SocioMatrix;
 
 /**
  * @author illenberger
  *
  */
-public class Income extends SocioMatrix {
+public class Income extends SocioMatrixLegacy {
 
 	@Override
 	protected String getAttributeValue(SocialVertex vertex) {

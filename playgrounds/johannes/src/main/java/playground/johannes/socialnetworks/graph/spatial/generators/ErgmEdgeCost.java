@@ -29,13 +29,13 @@ import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
 import org.matsim.contrib.sna.math.Distribution;
 
-import playground.johannes.socialnetworks.graph.mcmc.GraphProbability;
+import playground.johannes.socialnetworks.graph.mcmc.EnsembleProbability;
 
 /**
  * @author illenberger
  *
  */
-public class ErgmEdgeCost implements GraphProbability {
+public class ErgmEdgeCost implements EnsembleProbability {
 
 	private double[] thetas;
 	
@@ -82,7 +82,7 @@ public class ErgmEdgeCost implements GraphProbability {
 	
 	@SuppressWarnings("unchecked")
 	@Override
-	public <V extends Vertex> double difference(AdjacencyMatrix<V> y, int i, int j, boolean yIj) {
+	public <V extends Vertex> double ratio(AdjacencyMatrix<V> y, int i, int j, boolean yIj) {
 		SpatialVertex vi = ((AdjacencyMatrix<SpatialVertex>)y).getVertex(i);
 		SpatialVertex vj = ((AdjacencyMatrix<SpatialVertex>)y).getVertex(j);
 		

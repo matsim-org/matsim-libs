@@ -40,7 +40,7 @@ import org.xml.sax.SAXException;
 import playground.johannes.socialnetworks.graph.generators.BarabasiAlbertGenerator;
 import playground.johannes.socialnetworks.graph.mcmc.Ergm;
 import playground.johannes.socialnetworks.graph.mcmc.GibbsEdgeFlip;
-import playground.johannes.socialnetworks.graph.mcmc.GibbsSampler;
+import playground.johannes.socialnetworks.graph.mcmc.GibbsEdgeInsert;
 import playground.johannes.socialnetworks.graph.social.io.SocialSparseVertexPool;
 import playground.johannes.socialnetworks.graph.spatial.generators.EdgePowerLawDistance;
 import playground.johannes.socialnetworks.graph.spatial.generators.EdgeProbabilityFunction;
@@ -135,9 +135,7 @@ public class ErgmSimulator {
 		/*
 		 * setup gibbs sampler.
 		 */
-		GibbsSampler sampler = new GibbsEdgeFlip(randomSeed);
-//		GibbsSampler sampler = new GibbsSampler(randomSeed);
-		sampler.setInterval(100000000);
+		GibbsEdgeFlip sampler = new GibbsEdgeFlip(randomSeed);
 		
 		DumpHandler handler = new DumpHandler(graph, builder, outputDir);
 //		handler.getAnalyzerTaks().addTask(new EdgeCostsTask(costFunction));

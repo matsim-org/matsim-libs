@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SocioMatrix.java
+ * SocioMatrix2.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -19,144 +19,76 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.social.analysis;
 
-import gnu.trove.TObjectIntHashMap;
-
-import java.util.ArrayList;
-import java.util.HashSet;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.List;
-import java.util.Set;
-
-import org.matsim.contrib.sna.snowball.SampledVertex;
-
-import playground.johannes.socialnetworks.graph.social.SocialEdge;
-import playground.johannes.socialnetworks.graph.social.SocialGraph;
-import playground.johannes.socialnetworks.graph.social.SocialVertex;
+import java.util.Locale;
 
 /**
  * @author illenberger
  *
  */
-public abstract class SocioMatrix {
+public class SocioMatrix<K> {
 
-	private List<String> attrs;
+	private double[][] m;
 	
-	protected abstract String getAttributeValue(SocialVertex vertex);
-	 
-	public double[][] socioMatrix(SocialGraph graph) {
-		Set<String> values = new HashSet<String>();
-		for(SocialVertex vertex : graph.getVertices()) {
-			String value = getAttributeValue(vertex);
-			if(value != null)
-				values.add(value);
+	private List<K> keys;
+	
+	public SocioMatrix(List<K> keys) {
+		m = new double[keys.size()][keys.size()];
+		this.keys = keys;
+	}
+	
+	public List<K> getKeys() {
+		return keys;
+	}
+	
+	public void setValue(double value, K key1, K key2) {
+		int i = keys.indexOf(key1);
+		int j = keys.indexOf(key2);
+		
+		m[i][j] = value;
+	}
+	
+	public double getValue(K key1, K key2) {
+		int i = keys.indexOf(key1);
+		int j = keys.indexOf(key2);
+		
+		return m[i][j];
+	}
+	
+	public void adjustValue(K key1, K key2, double adjustValue) {
+		int i = keys.indexOf(key1);
+		int j = keys.indexOf(key2);
+		
+		m[i][j] += adjustValue;
+	}
+	
+	double[][] getMatrix() {
+		return m;
+	}
+	
+	public void toFile(String file) throws IOException {
+		BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+		
+		for(K value : keys) {
+			writer.write("\t");
+			writer.write(value.toString());
 		}
+		writer.newLine();
 		
-		attrs = new ArrayList<String>(values);
-		double[][] matrix = new double[attrs.size()][attrs.size()];
-		
-		for(SocialEdge edge : graph.getEdges()) {
-			String att1 = getAttributeValue(edge.getVertices().getFirst());
-			String att2 = getAttributeValue(edge.getVertices().getSecond());
+		for(int i = 0; i < m.length; i++) {
+			writer.write(keys.get(i).toString());
 			
-			if(att1 != null && att2 != null) {
-				int idx_i = attrs.indexOf(att1);
-				int idx_j = attrs.indexOf(att2);
+			for(int j = 0; j < m.length; j++) {
+				writer.write("\t");
+				writer.write(String.format(Locale.US, "%1$.2f", m[i][j]));
 				
-				matrix[idx_i][idx_j]++;
-				if(idx_i != idx_j)
-					matrix[idx_j][idx_i]++;
 			}
+			writer.newLine();
 		}
 		
-		return matrix;
-	}
-	
-	public List<String> getAttributes() {
-		return attrs;
-	}
-	
-	public TObjectIntHashMap<String> distribution(Set<? extends SocialVertex> vertices) {
-		TObjectIntHashMap<String> distr = new TObjectIntHashMap<String>();
-		for(SocialVertex vertex : vertices) {
-			String key = getAttributeValue(vertex);
-			if(key != null)
-				distr.adjustOrPutValue(key, 1, 1);
-		}
-		
-		return distr;
-	}
-	
-	public double[][] normalizedSocioMatrix(double[][] matrix, TObjectIntHashMap<String> distr, List<String> values) {
-		double[][] normMatrix = new double[matrix.length][matrix.length];
-		
-		for(int i = 0; i < normMatrix.length; i++) {
-			double sum = 0;
-			for(int j = 0; j < normMatrix.length; j++) {
-				sum += matrix[i][j];
-			}
-			for(int j = 0; j < normMatrix.length; j++) {
-				normMatrix[i][j] = matrix[i][j]/sum;
-			}
-		}
-		
-		return normMatrix;
-	}
-	
-	public double[][] socioMatrixLocalAvr(SocialGraph graph) {
-		Set<String> values = new HashSet<String>();
-		for(SocialVertex vertex : graph.getVertices()) {
-			String value = getAttributeValue(vertex);
-			if(value != null) {
-				values.add(convert(value));
-			}
-		}
-		
-		attrs = new ArrayList<String>(values);
-		double[][] matrix = new double[attrs.size()][attrs.size()];
-		double[][] count = new double[attrs.size()][attrs.size()];
-		
-		for(SocialVertex vertex : graph.getVertices()) {
-			if(((SampledVertex)vertex).isSampled()) {
-			String att1 = convert(getAttributeValue(vertex));
-			if (att1 != null) {
-				int idx_i = attrs.indexOf(att1);
-				int cnt[] = new int[attrs.size()];
-				int total = 0;
-				for (SocialEdge edge : vertex.getEdges()) {
-					String att2 = convert(getAttributeValue(edge.getOpposite(vertex)));
-					if(att2 != null) {
-						int idx_j = attrs.indexOf(att2);
-						cnt[idx_j]++;
-						total++;
-					}
-				}
-				
-				for(int j = 0; j < matrix.length; j++) {
-					if(total > 0) {
-					matrix[idx_i][j] += cnt[j]/(double)total;
-					count[idx_i][j]++;
-					}
-				}
-			}
-			}
-		}
-		
-		for(int i = 0; i < matrix.length; i++) {
-			for(int j = 0; j < matrix.length; j++) {
-				matrix[i][j] = matrix[i][j]/count[i][j]; 
-			}
-		}
-		
-		return matrix;
-	}
-	
-	private String convert(String value) {
-//		if(value == null)
-//			return null;
-//		
-//		if(value.equalsIgnoreCase("6") || value.equalsIgnoreCase("7"))
-//			return "academic";
-//		else
-//			return "nonacademic";
-		return value;
+		writer.close();
 	}
 }

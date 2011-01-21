@@ -30,10 +30,10 @@ import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
  * @author illenberger
  *
  */
-public class ErgmTwoStars extends ErgmTerm implements GraphProbability {
+public class ErgmTwoStars extends ErgmTerm implements EnsembleProbability {
 
 	@Override
-	public <V extends Vertex> double difference(AdjacencyMatrix<V> m, int i, int j, boolean y_ij) {
+	public <V extends Vertex> double ratio(AdjacencyMatrix<V> m, int i, int j, boolean y_ij) {
 		if(y_ij) {
 			return Math.exp(getTheta() * -(m.getNeighborCount(i) + m.getNeighborCount(j) - 2));
 		} else {

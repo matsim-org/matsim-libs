@@ -26,7 +26,6 @@ import java.util.Map;
 import org.matsim.contrib.sna.graph.Graph;
 
 import playground.johannes.socialnetworks.graph.social.SocialGraph;
-import playground.johannes.socialnetworks.graph.social.analysis.SocioMatrixTask;
 
 /**
  * @author illenberger

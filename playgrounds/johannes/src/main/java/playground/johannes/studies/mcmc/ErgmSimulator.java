@@ -48,11 +48,9 @@ import playground.johannes.socialnetworks.graph.social.analysis.SocialAnalyzerTa
 import playground.johannes.socialnetworks.graph.social.io.SocialGraphMLWriter;
 import playground.johannes.socialnetworks.graph.social.io.SocialSparseVertexPool;
 import playground.johannes.socialnetworks.graph.social.mcmc.ErgmAge;
+import playground.johannes.socialnetworks.graph.social.mcmc.ErgmGender;
 import playground.johannes.socialnetworks.graph.spatial.analysis.SpatialAnalyzerTask;
-import playground.johannes.socialnetworks.graph.spatial.generators.EdgePowerLawDistance;
-import playground.johannes.socialnetworks.graph.spatial.generators.ErgmEdgeProba;
 import playground.johannes.socialnetworks.graph.spatial.generators.ErgmLnDistance;
-import playground.johannes.socialnetworks.statistics.PowerLawFit;
 import playground.johannes.socialnetworks.survey.ivt2009.analysis.AnalyzerTaskArray;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseEdge;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseGraph;
@@ -116,12 +114,12 @@ public class ErgmSimulator {
 		Ergm ergm = new Ergm();
 		ergm.addComponent(new ErgmLnDistance(y, -1.6));
 		ergm.addComponent(new ErgmAge(-1));
+		ergm.addComponent(new ErgmGender(-1));
 		ergm.addComponent(new ErgmTriangles(2));
 		/*
 		 * initialize sampler
 		 */
 		GibbsEdgeSwitch sampler = new GibbsEdgeSwitch(randomSeed);
-		sampler.setInterval((int) 1E6);
 		
 		SampleAnalyzer<SocialSparseGraph, SocialSparseEdge, SocialSparseVertex> analyzer = new SampleAnalyzer<SocialSparseGraph, SocialSparseEdge, SocialSparseVertex>(graph, builder, output);
 		analyzer.setAnalysisInterval(sampleInterval);

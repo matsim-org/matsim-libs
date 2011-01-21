@@ -140,7 +140,7 @@ public class DumpHandler implements SamplerListener<SocialSparseVertex> {
 		this.logInterval = logInterval;
 	}
 
-	public boolean afterSampling(AdjacencyMatrix<SocialSparseVertex> y, long iteration) {
+	public boolean beforeSampling(AdjacencyMatrix<SocialSparseVertex> y, long iteration) {
 		if(iteration % logInterval == 0) {
 			log(y, iteration);
 		}

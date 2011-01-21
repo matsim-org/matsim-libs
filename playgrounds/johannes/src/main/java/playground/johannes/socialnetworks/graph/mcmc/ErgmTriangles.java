@@ -32,14 +32,14 @@ import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
  * @author illenberger
  *
  */
-public class ErgmTriangles extends ErgmTerm implements GraphProbability {
+public class ErgmTriangles extends ErgmTerm implements EnsembleProbability {
 	
 	public ErgmTriangles(double theta) {
 		setTheta(theta);
 	}
 	
 	@Override
-	public <V extends Vertex> double difference(AdjacencyMatrix<V> m, int i, int j, boolean y_ij) {
+	public <V extends Vertex> double ratio(AdjacencyMatrix<V> m, int i, int j, boolean y_ij) {
 		return Math.exp(- getTheta() * m.getCommonNeighbors(i, j));
 	}
 

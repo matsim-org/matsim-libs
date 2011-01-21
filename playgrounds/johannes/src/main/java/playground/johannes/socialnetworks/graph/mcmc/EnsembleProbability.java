@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Educatiion.java
+ * ConditionalDistribution.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,20 +17,39 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.graph.social.analysis;
 
-import playground.johannes.socialnetworks.graph.social.SocialVertex;
-import playground.johannes.socialnetworks.survey.ivt2009.analysis.SocioMatrixLegacy;
+/**
+ * 
+ */
+package playground.johannes.socialnetworks.graph.mcmc;
+
+import org.matsim.contrib.sna.graph.Vertex;
+import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
 
 /**
  * @author illenberger
- *
+ * 
  */
-public class Education extends SocioMatrixLegacy {
+public interface EnsembleProbability {
 
-	@Override
-	protected String getAttributeValue(SocialVertex vertex) {
-		return vertex.getPerson().getEducation();
-	}
+	/**
+	 * Determines the ratio of the probability of a graph with <tt>y_ij = 0</tt>
+	 * to the probability of a graph with <tt>y_ij = 1</tt>.
+	 * 
+	 * @param <V>
+	 *            the vertex type
+	 * @param y
+	 *            an adjacency matrix
+	 * @param i
+	 *            a vertex index
+	 * @param j
+	 *            a vertex index
+	 * @param y_ij
+	 *            <tt>true</tt> if in the current configuration
+	 *            <tt>y_ij = 1</tt>, <tt>false</tt> otherwise
+	 * @return the ratio of the probability of a graph with <tt>y_ij = 0</tt> to
+	 *         the probability of a graph with <tt>y_ij = 1</tt>.
+	 */
+	public <V extends Vertex> double ratio(AdjacencyMatrix<V> y, int i, int j, boolean y_ij);
 
 }

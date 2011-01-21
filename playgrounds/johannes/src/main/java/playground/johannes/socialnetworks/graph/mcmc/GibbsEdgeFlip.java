@@ -31,27 +31,33 @@ import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
  * @author illenberger
  *
  */
-public class GibbsEdgeFlip extends GibbsSampler {
+public class GibbsEdgeFlip extends AbstractGibbsSampler {
 
-	protected int[][] edges;
-	
-	private EdgeSwitchCondition switchCondition;
-	
+	/**
+	 * 
+	 */
 	public GibbsEdgeFlip() {
 		super();
 	}
 
+	/**
+	 * @param seed
+	 */
 	public GibbsEdgeFlip(long seed) {
 		super(seed);
 	}
 
-	public <V extends Vertex> void sample(AdjacencyMatrix<V> y, GraphProbability d, SamplerListener<V> handler, EdgeSwitchCondition condition) {
+	protected int[][] edges;
+	
+	protected EdgeSwitchCondition switchCondition;
+	
+	public <V extends Vertex> void sample(AdjacencyMatrix<V> y, EnsembleProbability d, SamplerListener<V> handler, EdgeSwitchCondition condition) {
 		switchCondition = condition;
 		sample(y, d, handler);
 	}
 	
 	@Override
-	public <V extends Vertex> void sample(AdjacencyMatrix<V> y, GraphProbability d, SamplerListener<V> handler) {
+	public <V extends Vertex> void sample(AdjacencyMatrix<V> y, EnsembleProbability d, SamplerListener<V> handler) {
 		if(switchCondition == null)
 			switchCondition = new GibbsEdgeSwitch.DefaultSwitchCondition();
 		
@@ -72,7 +78,7 @@ public class GibbsEdgeFlip extends GibbsSampler {
 	}
 	
 	@Override
-	public <V extends Vertex> boolean step(AdjacencyMatrix<V> y, GraphProbability d) {
+	public <V extends Vertex> boolean step(AdjacencyMatrix<V> y, EnsembleProbability d) {
 		boolean accept = false;
 		int idx_ij = random.nextInt(edges.length);
 		int i = edges[idx_ij][0];
@@ -93,10 +99,10 @@ public class GibbsEdgeFlip extends GibbsSampler {
 			 * ************************************************
 			 * TODO: CHECK THIS!
 			 */
-			double p_change = d.difference(y, i, u, false)
-					* d.difference(y, j, v, false)
-					* 1/d.difference(y, i, j, true)
-					* 1/d.difference(y, u, v, true); 
+			double p_change = d.ratio(y, i, u, false)
+					* d.ratio(y, j, v, false)
+					* 1/d.ratio(y, i, j, true)
+					* 1/d.ratio(y, u, v, true); 
 			double p = 1 / (1 + p_change);
 			/*
 			 * ************************************************
@@ -118,5 +124,14 @@ public class GibbsEdgeFlip extends GibbsSampler {
 		}
 		
 		return accept;
+	}
+	
+	public static class DefaultSwitchCondition implements EdgeSwitchCondition {
+
+		@Override
+		public boolean allowSwitch(AdjacencyMatrix<?> y, int i, int j, int u, int v) {
+			return true;
+		}
+		
 	}
 }

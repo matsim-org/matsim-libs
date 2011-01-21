@@ -26,10 +26,10 @@ import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
  * @author illenberger
  *
  */
-public class ErgmPrefAttachment implements GraphProbability {
+public class ErgmPrefAttachment implements EnsembleProbability {
 
 	@Override
-	public <V extends Vertex> double difference(AdjacencyMatrix<V> y, int i, int j, boolean yIj) {
+	public <V extends Vertex> double ratio(AdjacencyMatrix<V> y, int i, int j, boolean yIj) {
 		int k_minus = y.getNeighborCount(j);
 		if(yIj)
 			k_minus--;

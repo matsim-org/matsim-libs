@@ -157,7 +157,7 @@ public class PopulationGenerator {
 	}
 	
 	public static void main(String args[]) throws IOException {
-		String basedir = "/Users/jillenberger/Work/work/socialnets/data/schweiz/mz2005/rawdata/";
+		String basedir = "/Users/jillenberger/Work/socialnets/data/schweiz/mz2005/rawdata/";
 		DataParser parser = new DataParser();
 		
 		Map<String, PersonData> persons = parser.readPersons(basedir + "Zielpersonen.dat");
@@ -191,6 +191,6 @@ public class PopulationGenerator {
 		
 		logger.info(String.format("Created %1$s persons with at least one leg.", pop.getPersons().size()));
 		PopulationWriter writer = new PopulationWriter(pop, null);
-		writer.write(basedir + "/plans.xml");
+		writer.write(basedir + "/plans.w_dist_obj2.xml");
 	}
 }

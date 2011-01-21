@@ -29,5 +29,6 @@ public class SocialAnalyzerTask extends AnalyzerTaskComposite {
 
 	public SocialAnalyzerTask() {
 		addTask(new AgeTask());
+		addTask(new GenderTask());
 	}
 }

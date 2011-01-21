@@ -36,7 +36,7 @@ public class ErgmAge extends ErgmTerm {
 	}
 	
 	@Override
-	public <V extends Vertex> double difference(AdjacencyMatrix<V> y, int i, int j, boolean yIj) {
+	public <V extends Vertex> double ratio(AdjacencyMatrix<V> y, int i, int j, boolean yIj) {
 		int a1 = ((SocialVertex) y.getVertex(i)).getPerson().getAge();
 		int a2 = ((SocialVertex) y.getVertex(j)).getPerson().getAge();
 		

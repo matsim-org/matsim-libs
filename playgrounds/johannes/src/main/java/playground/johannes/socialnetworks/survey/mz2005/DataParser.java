@@ -198,7 +198,7 @@ public class DataParser {
 				container.personId = householdId + "." + personId;
 				
 				container.tripId = tokens[colNames.get("WEGNR")];
-				container.distance = Double.parseDouble(tokens[colNames.get("w_dist_subj")]);
+				container.distance = Double.parseDouble(tokens[colNames.get("w_dist_obj2")]);
 				container.startTime = Integer.parseInt(tokens[colNames.get("F58")]);
 				container.endTime = Integer.parseInt(tokens[colNames.get("F514")]);
 				container.duration = Double.parseDouble(tokens[colNames.get("dauer1")]);

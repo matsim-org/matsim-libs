@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.sim.analysis;
 
+import gnu.trove.TDoubleDoubleHashMap;
+
 import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
@@ -28,6 +30,10 @@ import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.contrib.sna.math.FixedSampleSizeDiscretizer;
+import org.matsim.contrib.sna.math.Histogram;
+import org.matsim.contrib.sna.math.LinLogDiscretizer;
+import org.matsim.contrib.sna.util.TXTWriter;
 import org.matsim.core.population.MatsimPopulationReader;
 
 /**
@@ -38,6 +44,7 @@ public class TravelDistanceTask implements PlansAnalyzerTask {
 
 	private static final String TRAVEL_DISTANCE_PREFIX = "d_mean_";
 	
+	private String output;
 	@Override
 	public void analyze(Set<Plan> plans, Map<String, Double> stats) {
 		TravelDistance distance = new TravelDistance();
@@ -45,6 +52,14 @@ public class TravelDistanceTask implements PlansAnalyzerTask {
 		
 		for(Entry<String, DescriptiveStatistics> entry : statsMap.entrySet()) {
 			stats.put(TRAVEL_DISTANCE_PREFIX + entry.getKey(), entry.getValue().getMean());
+//			TDoubleDoubleHashMap hist = Histogram.createHistogram(entry.getValue(), FixedSampleSizeDiscretizer.create(entry.getValue().getValues(), 100));
+			TDoubleDoubleHashMap hist = Histogram.createHistogram(entry.getValue(), new LinLogDiscretizer(500.0, 2));
+			Histogram.normalize(hist);
+			try {
+				TXTWriter.writeMap(hist, "d", "n", String.format("%1$s/d.%2$s.txt", output, entry.getKey()));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 		
 		distance.setGeodesicMode(true);
@@ -52,6 +67,13 @@ public class TravelDistanceTask implements PlansAnalyzerTask {
 		
 		for(Entry<String, DescriptiveStatistics> entry : statsMap.entrySet()) {
 			stats.put(TRAVEL_DISTANCE_PREFIX + "geo_" + entry.getKey(), entry.getValue().getMean());
+			TDoubleDoubleHashMap hist = Histogram.createHistogram(entry.getValue(), new LinLogDiscretizer(500.0, 2));
+			Histogram.normalize(hist);
+			try {
+				TXTWriter.writeMap(hist, "d", "n", String.format("%1$s/d.geo.%2$s.txt", output, entry.getKey()));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -59,10 +81,11 @@ public class TravelDistanceTask implements PlansAnalyzerTask {
 	public static void main(String args[]) throws IOException {
 		Scenario scenario = new ScenarioImpl();
 		MatsimPopulationReader reader = new MatsimPopulationReader(scenario);
-		reader.readFile("/Users/jillenberger/Work/work/socialnets/data/schweiz/mz2005/rawdata/plans.xml");
+		reader.readFile("/Users/jillenberger/Work/socialnets/data/schweiz/mz2005/rawdata/plans.w_dist_obj2.xml");
 		
 		TravelDistanceTask task = new TravelDistanceTask();
+		task.output = "/Users/jillenberger/Work/socialnets/data/schweiz/mz2005/rawdata/analysis.w_dist_obj2/";
 		Map<String, Double> stats = PlansAnalyzer.analyzeSelectedPlans(scenario.getPopulation(), task);
-		PlansAnalyzer.write(stats, "/Users/jillenberger/Work/work/socialnets/data/schweiz/mz2005/rawdata/stats.txt");
+		PlansAnalyzer.write(stats, "/Users/jillenberger/Work/socialnets/data/schweiz/mz2005/rawdata/stats.txt");
 	}
 }

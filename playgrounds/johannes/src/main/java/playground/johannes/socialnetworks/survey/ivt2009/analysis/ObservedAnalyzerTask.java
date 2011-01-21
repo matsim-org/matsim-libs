@@ -31,6 +31,7 @@ import playground.johannes.socialnetworks.gis.GravityCostFunction;
 import playground.johannes.socialnetworks.gis.SpatialCostFunction;
 import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
 import playground.johannes.socialnetworks.graph.social.analysis.AgeTask;
+import playground.johannes.socialnetworks.graph.social.analysis.SocialAnalyzerTask;
 import playground.johannes.socialnetworks.graph.spatial.analysis.AcceptFactorTask;
 import playground.johannes.socialnetworks.graph.spatial.analysis.AccessibilityPartitioner;
 import playground.johannes.socialnetworks.graph.spatial.analysis.AccessibilityTask;
@@ -50,6 +51,7 @@ public class ObservedAnalyzerTask extends AnalyzerTaskComposite {
 		AnalyzerTaskArray array = new AnalyzerTaskArray();
 		array.addAnalyzerTask(new TopoObsAnalyzerTask(), "topo");
 		array.addAnalyzerTask(new SnowballAnalyzerTask(), "snowball");
+		array.addAnalyzerTask(new ObservedSocialAnalyzerTask(), "social");
 		addTask(array);
 		
 		

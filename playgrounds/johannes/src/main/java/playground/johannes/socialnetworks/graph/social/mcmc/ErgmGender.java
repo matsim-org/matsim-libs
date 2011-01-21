@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Educatiion.java
+ * ErgmGender.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,20 +17,37 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.graph.social.analysis;
+package playground.johannes.socialnetworks.graph.social.mcmc;
 
+import org.matsim.contrib.sna.graph.Vertex;
+import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
+
+import playground.johannes.socialnetworks.graph.mcmc.ErgmTerm;
 import playground.johannes.socialnetworks.graph.social.SocialVertex;
-import playground.johannes.socialnetworks.survey.ivt2009.analysis.SocioMatrixLegacy;
+import playground.johannes.socialnetworks.graph.social.analysis.Gender;
 
 /**
  * @author illenberger
  *
  */
-public class Education extends SocioMatrixLegacy {
+public class ErgmGender extends ErgmTerm {
+
+	public ErgmGender(double theta) {
+		setTheta(theta);
+	}
 
 	@Override
-	protected String getAttributeValue(SocialVertex vertex) {
-		return vertex.getPerson().getEducation();
+	public <V extends Vertex> double ratio(AdjacencyMatrix<V> y, int i, int j, boolean y_ij) {
+		int gender_i = 0;
+		int gender_j = 0;
+		
+		if(Gender.MALE.equalsIgnoreCase(((SocialVertex)y.getVertex(i)).getPerson().getPerson().getSex()))
+			gender_i = 1;
+		
+		if(Gender.MALE.equalsIgnoreCase(((SocialVertex)y.getVertex(j)).getPerson().getPerson().getSex()))
+			gender_j = 1;
+		
+		return - getTheta() * Math.abs(gender_i - gender_j);
 	}
 
 }

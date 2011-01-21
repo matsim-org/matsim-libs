@@ -84,7 +84,7 @@ public class SampleAnalyzer<G extends Graph, E extends Edge, V extends Vertex> i
 	}
 
 	@Override
-	public boolean afterSampling(AdjacencyMatrix<V> y, long iteration) {
+	public boolean beforeSampling(AdjacencyMatrix<V> y, long iteration) {
 		if(iteration % analysisInterval == 0) {
 			analyze(y, iteration);
 		}

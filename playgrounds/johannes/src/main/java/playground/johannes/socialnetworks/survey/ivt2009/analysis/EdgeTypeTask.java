@@ -32,7 +32,6 @@ import org.matsim.contrib.sna.math.Distribution;
 
 import playground.johannes.socialnetworks.graph.social.SocialEdge;
 import playground.johannes.socialnetworks.graph.social.SocialGraph;
-import playground.johannes.socialnetworks.graph.social.analysis.SocioMatrixTask;
 
 import com.vividsolutions.jts.geom.Point;
 

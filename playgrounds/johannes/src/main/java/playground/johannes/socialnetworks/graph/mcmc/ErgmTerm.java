@@ -31,7 +31,7 @@ import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
  * @author illenberger
  *
  */
-public abstract class ErgmTerm implements GraphProbability {
+public abstract class ErgmTerm implements EnsembleProbability {
 
 	private double theta;
 	
@@ -43,6 +43,6 @@ public abstract class ErgmTerm implements GraphProbability {
 		return theta;
 	}
 	
-	abstract public <V extends Vertex> double difference(AdjacencyMatrix<V> y, int i, int j, boolean y_ij);
+	abstract public <V extends Vertex> double ratio(AdjacencyMatrix<V> y, int i, int j, boolean y_ij);
 	
 }
