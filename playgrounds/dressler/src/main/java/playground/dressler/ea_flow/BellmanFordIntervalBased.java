@@ -139,10 +139,12 @@ public class BellmanFordIntervalBased {
 		
 	// details for the processnormalnode
 	CPUTimer Tpickintervaltime = new CPUTimer(" +-Pickintervall");
+	CPUTimer Tholdovertime = new CPUTimer(" +-holdover");
 	CPUTimer Tforwardtime = new CPUTimer(" +-forward");
 	CPUTimer Tbackwardtime = new CPUTimer(" +-backward");
-	CPUTimer Tpropagate = new CPUTimer("  *-propagate");
+	CPUTimer Tpropagate = new CPUTimer("  *-propagate");	
 	CPUTimer Tsettrue = new CPUTimer("  *-settrue");
+	CPUTimer TinnerQueue = new CPUTimer("  *-innerqueue");
 	CPUTimer Temptysourcestime = new CPUTimer(" +-emptysources");
 	CPUTimer Tupdatesinkstime = new CPUTimer(" +-updatesinks");
 	
@@ -208,8 +210,8 @@ public class BellmanFordIntervalBased {
 				VertexInterval temp2 = new VertexInterval(0, this._settings.TimeHorizon);
 				if (this._flow.isActiveSource(node)){
 					BFTask task =  new BFTask(new VirtualSource(node), temp2, false);
-					task.origin = node.getId();
-					queue.add(task);
+					task.origin = node.getId();					
+					queue.add(task);					
 					temp2.setScanned(false);
 					temp2.setReachable(true);				
 				} else {
@@ -723,11 +725,12 @@ public class BellmanFordIntervalBased {
 	 * @param reverse Is this for the reverse search?
 	 * @return null or the list of labels that have changed
 	 */
-	private ArrayList<VertexInterval> relabel(Node from, Interval ival, Node to, Link over, boolean original, boolean reverse, int timehorizon) {		
+	private ArrayList<VertexInterval> relabel(Node from, Interval ival, Node to, Link over, boolean original, boolean reverse, int timehorizon) {
+		    this.Tpropagate.onoff();
+		    
 			VertexIntervals labelto = _labels.get(to);
 			EdgeFlowI flowover = this._flow.getFlow(over);
 			ArrayList<VertexInterval> changed;
-
 
 			ArrayList<Interval> arrive;
 
@@ -754,13 +757,15 @@ public class BellmanFordIntervalBased {
 				arriveProperties.setSuccessor(succ);
 			}
 
-
-
+			//this.Tpropagate.onoff();
 			arrive = flowover.propagate(ival, original, reverse, timehorizon);
+			this.Tpropagate.onoff();
 						
 
-			if (arrive != null && !arrive.isEmpty()) {				
+			if (arrive != null && !arrive.isEmpty()) {
+				this.Tsettrue.onoff();
 				changed = labelto.setTrueList(arrive, arriveProperties);
+				this.Tsettrue.onoff();
 				
 				return changed;
 			}else{					
@@ -771,7 +776,15 @@ public class BellmanFordIntervalBased {
 	}
 
 	
+	
+	
 	TaskQueue processSourceForward(Node v) {
+		TaskQueue queue = new SimpleTaskQueue();
+		processSourceForward(v, queue);
+		return queue;
+	}
+		
+	void processSourceForward(Node v, TaskQueue queue) {
 		// send out of source v
 		// just set the regular label on v
 				
@@ -780,16 +793,16 @@ public class BellmanFordIntervalBased {
 		// already scanned or not reachable (neither should occur ...)				
 		if (!inter.getReachable()) {
 			System.out.println("Source " + v.getId() + " was not reachable!");
-			return null;
+			//return null;
 		}
 		
 		if (inter.isScanned()) {
 			// don't scan again ... but for a source, this should not happen anyway
-			return null;
+			//return null;
 		}
 		inter.setScanned(true);
 		
-		TaskQueue queue = new SimpleTaskQueue();
+		//List<BFTask> queue = new ArrayList<BFTask>();
 		
 		PathStep pred = new StepSourceFlow(v, 0, true);
 		
@@ -799,11 +812,14 @@ public class BellmanFordIntervalBased {
 		arrive.setPredecessor(pred);		
 		arrive.setReachable(true);
 		ArrayList<VertexInterval> changed = this._labels.get(v).setTrueList(arrive);
+		
+		//this.TinnerQueue.onoff();
 		for(VertexInterval changedintervall : changed){
 			queue.add(new BFTask(new VirtualNormalNode(v, 0), changedintervall, false));
-		}
+		}	
+		//this.TinnerQueue.onoff();
 		
-		return queue;
+		//return queue;
 	}
 	
 	
@@ -814,16 +830,25 @@ public class BellmanFordIntervalBased {
 	 * @return The resulting tasks and the processed interval (containing t)
 	 */
 	Pair<TaskQueue, Interval> processNormalNodeForward(Node v, int t) {
+		TaskQueue queue = new SimpleTaskQueue();
+		Interval i = processNormalNodeForward(v, t, queue);
+		return new Pair<TaskQueue, Interval>(queue, i);
+	}	
+	
+	Interval processNormalNodeForward(Node v, int t, TaskQueue queue) {
 				
 		Interval inter;
 		
+		this.Tpickintervaltime.onoff();
 		if (this._settings.useImplicitVertexCleanup) {
 			Pair<Boolean, Interval> todo = getUnscannedInterSetScanned(v, t, false);
 			inter = todo.second;
 			if (!todo.first) { // we don't have anything todo
 				this._totalnonpolls++;
 				this._roundnonpolls++;
-				return new Pair<TaskQueue, Interval>(null, inter);
+				
+				this.Tpickintervaltime.onoff();
+				return inter;
 			}
 		    
 		} else {
@@ -831,20 +856,27 @@ public class BellmanFordIntervalBased {
 			
 			if (!temp.getReachable() || temp.getPredecessor() == null) {
 				System.out.println("Node " + v.getId() + " was not reachable or had no predecessor!");
-				return new Pair<TaskQueue, Interval>(null, temp);
+				return temp;
 			}
 			
 			if (temp.isScanned()) {
 				// don't scan again ... can happen with vertex cleanup
 				this._totalnonpolls++;
 				this._roundnonpolls++;
-				return new Pair<TaskQueue, Interval>(null, temp);
+				
+				this.Tpickintervaltime.onoff();
+				return temp;
 			}
 			temp.setScanned(true);
 			inter = temp;
 		}
+		this.Tpickintervaltime.onoff();
+		
+		
 			
-		TaskQueue queue = new SimpleTaskQueue();
+		//List<BFTask> queue = new ArrayList<BFTask>();
+		
+		this.Tholdovertime.onoff();
 		
 		if (this._settings.useHoldover) {
 			int max = inter.getHighBound();
@@ -895,29 +927,45 @@ public class BellmanFordIntervalBased {
 				inter = tempinter;
 			}
 		}
+		this.Tholdovertime.onoff();
+		this.Tforwardtime.onoff();
 		
 		// visit neighbors
 		// link is outgoing edge of v => forward edge
 		for (Link link : v.getOutLinks().values()) {				
 			Node w = link.getToNode();
+			//this.Tpropagate.onoff(); // stopped in relabel
 			ArrayList<VertexInterval> changed = relabel(v, inter, w, link, true, false, this._settings.TimeHorizon);
 			if (changed == null) continue;
 
-			for(VertexInterval changedinterval : changed){
-				queue.add(new BFTask(new VirtualNormalNode(w, 0), changedinterval, false));
-			}					
+			this.TinnerQueue.onoff();
+			for(VertexInterval changedinterval : changed){				
+				queue.add(new BFTask(new VirtualNormalNode(w, 0), changedinterval, false));				
+			}
+			this.TinnerQueue.onoff();			
 
 		}
+		
+		this.Tforwardtime.onoff();
+		this.Tbackwardtime.onoff();
+		
 		// link is incoming edge of v => backward edge
 		for (Link link : v.getInLinks().values()) {
 			Node w = link.getFromNode();
+			
+			//this.Tpropagate.onoff(); // stopped in relabel
 			ArrayList<VertexInterval> changed = relabel(v, inter, w, link, false, false, this._settings.TimeHorizon);
 			if (changed == null) continue;
 
-			for(VertexInterval changedinterval : changed){
-				queue.add(new BFTask(new VirtualNormalNode(w, 0), changedinterval, false));
+			this.TinnerQueue.onoff();
+			for(VertexInterval changedinterval : changed){				
+				queue.add(new BFTask(new VirtualNormalNode(w, 0), changedinterval, false));				
 			}
+			this.TinnerQueue.onoff();
 		}
+		
+		this.Tbackwardtime.onoff();
+		this.Temptysourcestime.onoff();
 		
 		// treat empty sources! 
 		if (this._flow.isNonActiveSource(v)) {
@@ -943,8 +991,9 @@ public class BellmanFordIntervalBased {
 			}
 		}
 		
+		this.Temptysourcestime.onoff();
 		
-		return new Pair<TaskQueue, Interval>(queue, inter);
+		return inter;
 	}
 	
 	private ArrayList<VertexInterval> relabelHoldover(Node v, Interval inter,boolean original, boolean reverse,
@@ -1354,6 +1403,7 @@ public class BellmanFordIntervalBased {
 		}		
 
 		//set fresh labels, initialize queue
+		
 		refreshLabelsForward(queue);
 		Tqueuetime.onoff();
 		
@@ -1464,15 +1514,7 @@ public class BellmanFordIntervalBased {
 				Tsourcetime.onoff();
 				// send out of source v
 				
-				TaskQueue tempqueue = processSourceForward(v); 
-				Tsourcetime.onoff();
-				
-				Tqueuetime.onoff();
-				if (tempqueue != null) {					
-				  queue.addAll(tempqueue);				  
-				}
-				Tqueuetime.onoff();
-				
+				processSourceForward(v, queue); 
 			} else if (task.node instanceof VirtualNormalNode) {
 				Tnormaltime.onoff();
 				if (this._settings.useVertexCleanup) { 			
@@ -1484,18 +1526,9 @@ public class BellmanFordIntervalBased {
 				// This does not really matter here, but in the search with cost.
 				int low = task.ival.getLowBound();
 				while (low < task.ival.getHighBound()) {
-					Pair<TaskQueue, Interval> ret = processNormalNodeForward(v, low); 
-					TaskQueue tempqueue = ret.first;
-
-					Tnormaltime.onoff();
-					Tqueuetime.onoff();
-					if (tempqueue != null) {
-						queue.addAll(tempqueue);
-					}
-					Tqueuetime.onoff();
-					Tnormaltime.onoff();
+					Interval ret = processNormalNodeForward(v, low, queue);
 					
-					low = ret.second.getHighBound() + 1;
+					low = ret.getHighBound() + 1;
 				}
 				Tnormaltime.onoff();
 			} else {
@@ -2584,10 +2617,12 @@ public class BellmanFordIntervalBased {
 			"\n  " + this.Tqueuetime +
 			"\n  " + this.Tnormaltime +
 			"\n  " + this.Tpickintervaltime +
+			"\n  " + this.Tholdovertime +
 			"\n  " + this.Tforwardtime +
 			"\n  " + this.Tbackwardtime +
 			"\n  " + this.Tpropagate +
 			"\n  " + this.Tsettrue +
+			"\n  " + this.TinnerQueue +
 			"\n  " + this.Temptysourcestime +
 			"\n  " + this.Tupdatesinkstime + 
 			"\n  " + this.Tsourcetime +

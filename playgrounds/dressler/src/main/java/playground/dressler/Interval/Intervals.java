@@ -20,7 +20,7 @@
 
 package playground.dressler.Interval;
 
-public class Intervals<T extends Interval > {
+public class Intervals<T extends Interval > implements IntervalsInterface<T> {
 //------------------------FIELDS----------------------------------//
 
 	/**

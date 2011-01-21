@@ -239,7 +239,7 @@ extends      BinTree
     		return null ;
 
     	BinTreeNode parent = _findParentAt( t ) ;               // "parent" of obj
-    	//TODO interval finden
+    	// interval finden
     	BinTreeNode node   = (parent==_dummy || (t- parent.obj.getLowBound()) < 0
     			?  parent.left  :  parent.right ) ;
 
@@ -340,57 +340,59 @@ extends      BinTree
       *
       * @return are properties consistent in tree?
       */
-    protected boolean _checkTree ( )
-    {
-	boolean retval = _checkLinks() ;          // check links in entire tree
+    protected boolean _checkTree ( ) {
+    	throw new UnsupportedOperationException( );
+    	
+//    	
+//	boolean retval = _checkLinks() ;          // check links in entire tree
+//
+//	if (     ! _checkMode                             // no checking wanted
+//	     ||  isEmpty() )                              // nothing to do
+//	    return true ;
+//
+//    /***  check whether tree keys are ascending in inorder sequence  ***/
+//
+//	BinTreeNode save = _curr ;                      // save _curr for later
+//	reset() ;
+//	BinTreeNode prev = _curr ;
+//
+//	if ( ! isAtEnd() )
+//	{
+//	    int size = 1 ;
+//
+//	    for ( increment() ;  ! isAtEnd() ;  increment() )      // use _curr
+//	    {
+//		if ( ! ( prev.obj instanceof Comparable ) )
+//		    throw new ClassCastException(   "SearchTree._checkTree():"
+//						  + " cannot cast object to "
+//						  + "needed Comparable<T>!" ) ;
+//
+//		if ( prev.obj.compareTo( _curr.obj ) > 0 )
+//		{
+//		    System.err.println(   "SearchTree: key order between "
+//					+ "nodes " + prev + " and " + _curr
+//					+ " is inconsistent!" ) ;
+//		    retval = false ;
+//		}
+//
+//		++size ;
+//		prev = _curr ;
+//
+//	    }  // for ( _curr )
+//
+//	    if ( size != _size )
+//	    {
+//		System.err.println(   "SearchTree: size count of " + size
+//				    + " is inconsistent with variable "
+//				    + "_size = " + _size + " !" ) ;
+//		retval = false ;
+//	    }
+//	}  // if ( ! isAtEnd() )
+//
+//	_curr = save ;                                         // restore _curr
+//
+//	return retval ;
 
-	if (     ! _checkMode                             // no checking wanted
-	     ||  isEmpty() )                              // nothing to do
-	    return true ;
-
-    /***  check whether tree keys are ascending in inorder sequence  ***/
-
-	BinTreeNode save = _curr ;                      // save _curr for later
-	reset() ;
-	BinTreeNode prev = _curr ;
-
-	if ( ! isAtEnd() )
-	{
-	    int size = 1 ;
-
-	    for ( increment() ;  ! isAtEnd() ;  increment() )      // use _curr
-	    {
-		if ( ! ( prev.obj instanceof Comparable ) )
-		    throw new ClassCastException(   "SearchTree._checkTree():"
-						  + " cannot cast object to "
-						  + "needed Comparable<T>!" ) ;
-
-		if ( prev.obj.compareTo( _curr.obj ) > 0 )
-		{
-		    System.err.println(   "SearchTree: key order between "
-					+ "nodes " + prev + " and " + _curr
-					+ " is inconsistent!" ) ;
-		    retval = false ;
-		}
-
-		++size ;
-		prev = _curr ;
-
-	    }  // for ( _curr )
-
-	    if ( size != _size )
-	    {
-		System.err.println(   "SearchTree: size count of " + size
-				    + " is inconsistent with variable "
-				    + "_size = " + _size + " !" ) ;
-		retval = false ;
-	    }
-	}  // if ( ! isAtEnd() )
-
-	_curr = save ;                                         // restore _curr
-
-	return retval ;
-
-    }  // _checkTree()
+    }  
 
 }  // class SearchTree

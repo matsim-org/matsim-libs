@@ -55,6 +55,7 @@ public class EdgeIntervals extends Intervals<EdgeInterval> implements EdgeFlowI 
 	 */
 	public final int _capacity;
 	
+	private boolean _clean;
 	
 	/**
 	 * debug flag
@@ -77,6 +78,7 @@ public class EdgeIntervals extends Intervals<EdgeInterval> implements EdgeFlowI 
 		// Intervals expects that it starts at 0, so we cannot restrict ourselves
 		// to just the available interval ...
 		this._whenAvailable = whenAvailable;
+		this._clean = true;
 	}
 
 
@@ -204,6 +206,10 @@ public class EdgeIntervals extends Intervals<EdgeInterval> implements EdgeFlowI 
 	 * unifies adjacent EdgeIntervals, call only when you feel it is safe to do
 	 */
 	public int cleanup() {
+		if (_clean) {			
+			return 0; // nothing to do
+		}
+		
 		int gain = 0;
 		int timestop = this._last.getHighBound();
 		EdgeInterval i, j;
@@ -223,6 +229,7 @@ public class EdgeIntervals extends Intervals<EdgeInterval> implements EdgeFlowI 
 		  i = j;		  		 		
 		}		
 		this._last = i; // we might have to update it, just do it always
+		_clean = true;
 		return gain;
 	}
 	
@@ -234,6 +241,8 @@ public class EdgeIntervals extends Intervals<EdgeInterval> implements EdgeFlowI 
 	 * @param f aumount of flow to augment (can be negative)
 	 */
 	public void augment(final int t, final int gamma){
+		_clean = false;
+		
 		if (t<0){
 			throw new IllegalArgumentException("negative time: "+ t);
 		}
@@ -265,6 +274,8 @@ public class EdgeIntervals extends Intervals<EdgeInterval> implements EdgeFlowI 
 	 * @param gamma aumount of flow to augment (can be negative) 
 	 */
 	public void augmentUnsafe(final int t, final int gamma){
+		_clean = false;
+		
 		EdgeInterval i = getIntervalAt(t);
 
 		if(i.getLowBound() < t){

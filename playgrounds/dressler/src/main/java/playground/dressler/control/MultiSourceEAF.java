@@ -38,7 +38,6 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -150,10 +149,6 @@ public class MultiSourceEAF {
 
 		for(Person person : scenario.getPopulation().getPersons().values() ){
 
-			Plan plan = person.getPlans().get(0);
-			/*if(((PlanImpl) plan).getFirstActivity().getLinkId()==null){
-				continue;
-			}*/
 			Id id =
 				((org.matsim.core.population.ActivityImpl)person.getPlans().get(0).getPlanElements().get(0)).getLinkId();
 			//Link link = scenario.getNetwork().getLinks().get(((PlanImpl) plan).getFirstActivity().getLinkId());
@@ -1098,13 +1093,13 @@ public class MultiSourceEAF {
 		settings.useSinkCapacities = false;
 		//settings.useVertexCleanup = false;
 		settings.useImplicitVertexCleanup = true;
-		settings.useShadowFlow = false;		
+		settings.useShadowFlow = false;				
 		
 		settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_FORWARD;
 		//settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_MIXED;
 		//settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_REVERSE;
 		settings.queueAlgo = FlowCalculationSettings.QUEUE_GUIDED;
-		settings.useBucketQueue = false;
+		settings.useBucketQueue = true;
 		
 		settings.useRepeatedPaths = true; // not compatible with costs!
 		settings.retryReverse = 1; // 1 = try one time step later with reverse search if no path was found.

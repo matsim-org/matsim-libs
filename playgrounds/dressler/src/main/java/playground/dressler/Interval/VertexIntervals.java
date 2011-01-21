@@ -344,73 +344,20 @@ public class VertexIntervals extends Intervals<VertexInterval> {
 	}
 
 	
-	/*	*//**
-		 * Gives the first reachable but unscanned VertexInterval 
-		 * @return the VertexInterval or null if it does not exist
-		 *//*
-		public VertexInterval getFirstUnscannedInterval()
-		{
-			int lowBound = 0;
-			VertexInterval vI;
-			do
-			{
-				vI = this.getIntervalAt(lowBound);
-				if(vI.getReachable() &&  !vI.isScanned())
-					return vI;
-				lowBound = vI.getHighBound();
-				if (isLast(vI)) {
-					break;
-				}
-			} while (!isLast(vI));
-			return null;
-		}
-		*/
-	/*	*//**
-		 * Returns the lowbound of the first unscanned but reachable VertexInterval
-		 * @return the Value of the lowbound or null if it does not exist
-		 *//*
-		public Integer getFirstTimePointWithDistTrue()
-		{
-			VertexInterval vInterval = this.getFirstUnscannedInterval();
-			if(vInterval == null)
-				return null;
-			else
-				return vInterval.getLowBound();
-		}*/
-	
-	/**
-	 * Sets arrival true for all time steps in arrive and sets predecessor to link for each time t
-	 * where it was null beforehand
-	 * @deprecated setTrueList does the same and better
-	 * @param arrive VertexIntervals at which node is reachable
-	 * @param pred Predecessor PathStep. It will always be shifted to the beginning of the interval
-	 * @return true iff anything was changed
-	 *//*
-	public boolean setTrue(ArrayList<Interval> arrive, PathStep pred) {
-		boolean changed = false;
-		boolean temp;
-		// there used to be condensing here ...
-		// but propagate already condenses these days
-		for(int i=0; i< arrive.size(); i++){
-		  temp = setTrue(arrive.get(i), pred);
-		  changed = changed || temp;
-		}
-		return changed;
-	}*/
-	
-
-	
-/*	*//**
-	 * Sets arrival true for all time steps in arrive that were not reachable and sets the predecessor to pred
-	 * @deprecated setTrueList does the same and better  
-	 * @param arrive Interval at which node is reachable
-	 * @param pred Predecessor PathStep. It will always be shifted to the beginning of the interval
-	 * @return true iff anything was changed
-	 *//*
-	public boolean setTrue(Interval arrive, PathStep pred){
-		// slightly slower, but easier to manage if this just calls the new setTrueList
-		ArrayList<VertexInterval> temp = setTrueList(arrive, pred);
-		return (temp != null && !temp.isEmpty());
-	}*/
+	// primitive TEST
+	public static void main (String[] args) {
+		System.out.println("Running test for VertexIntervals");
+		VertexIntervals VI = new VertexIntervals(new VertexInterval(0, 1000));
+		System.out.println(VI);
+		System.out.flush();
+		VI.splitAt(5);
+		System.out.println(VI);
+		VI.splitAt(7);
+		System.out.println(VI);
+		VI.splitAt(10);
+		System.out.println(VI);
+		VI.splitAt(1);
+		System.out.println(VI);
+	}
 	
 }

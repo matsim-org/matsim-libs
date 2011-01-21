@@ -115,9 +115,10 @@ public class ShadowEdgeFlow implements EdgeFlowI {
 	public void augmentUnsafe(int t, int gamma) {
 		
 		if (t >= this._flow.size()) {
-		  for (int n = this._flow.size(); n <= t; n++) {
-			  this._flow.add(0);
-		  }		  
+			_flow.ensureCapacity(t + 1);
+			for (int n = this._flow.size(); n <= t; n++) {
+				this._flow.add(0);
+			}		  
 		}
 		
 		int f = this._flow.get(t);	

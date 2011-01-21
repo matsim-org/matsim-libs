@@ -199,6 +199,7 @@ public class SourceIntervals extends Intervals<EdgeInterval> {
 	 * unifies adjacent EdgeIntervals, call only when you feel it is safe to do
 	 */
 	public int cleanup() {
+		
 		int gain = 0;
 		int timestop = getLast().getHighBound();
 		EdgeInterval i, j;

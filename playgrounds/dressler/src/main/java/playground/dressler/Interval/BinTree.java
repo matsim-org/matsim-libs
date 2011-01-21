@@ -93,7 +93,7 @@ abstract class BinTree
     /**
      * flag for debugging
      */
-    protected static boolean _checkMode = false ;
+    //protected static boolean _checkMode = false ;
 
     /**
      * dummy node referencing root of tree
@@ -249,9 +249,9 @@ abstract class BinTree
     /**
      * switch debugging mode
      */
-    public static void setCheck ( boolean mode )
-    {
-	_checkMode = mode ;
+    public static void setCheck ( boolean mode ) {    
+    	throw new UnsupportedOperationException( );
+		//checkMode = mode ;
     }
 
 
@@ -284,52 +284,55 @@ abstract class BinTree
     public void increment ( )
     {
     	Interval old = this._curr.obj;
-	if ( isAtEnd() )                             // stay in place if at end
-	    return ;
+    	if ( isAtEnd() )                             // stay in place if at end
+    		return ;
 
-        final int LEFT  = 1 ;
-	final int RIGHT = 2 ;
-	final int ABOVE = 3 ;
-	int   origin    = LEFT ;                          // informal invariant
+    	final int LEFT  = 1 ;
+    	final int RIGHT = 2 ;
+    	final int ABOVE = 3 ;
+    	int   origin    = LEFT ;                          // informal invariant
 
-	do                         // while ( origin != LEFT  &&  ! isAtEnd() )
-	{
-		switch ( origin )
-		{
-		case LEFT:
-			if ( _curr.right != null )
-			{
-				origin = ABOVE ;
-				_curr  = _curr.right ;      // we go from above into right
-			}
-			else
-				origin = RIGHT ;  // pretend we finished the right subtree
-			break ;
+    	do                         // while ( origin != LEFT  &&  ! isAtEnd() )
+    	{
+    		switch ( origin )
+    		{
+    		case LEFT:
+    			if ( _curr.right != null )
+    			{
+    				origin = ABOVE ;
+    				_curr  = _curr.right ;      // we go from above into right
+    			}
+    			else
+    				origin = RIGHT ;  // pretend we finished the right subtree
+    			break ;
 
-		case RIGHT:
-			if ( _curr.isLeftChild() )
-				origin = LEFT ;
-			_curr = _curr.parent ;         // we go from below into parent
-			break ;
+    		case RIGHT:
+    			if ( _curr.isLeftChild() )
+    				origin = LEFT ;
+    			_curr = _curr.parent ;         // we go from below into parent
+    			break ;
 
-		case ABOVE:
-			if ( _curr.left != null )
-				_curr = _curr.left ;        // we go from above into right
-			else
-				return ;
-			break ;
+    		case ABOVE:
+    			if ( _curr.left != null )
+    				_curr = _curr.left ;        // we go from above into right
+    			else
+    				return ;
+    			break ;
 
-		default: ;
+    		default: ;
 
-		}  // switch ( origin )
+    		}  // switch ( origin )
 
-	} while ( origin != LEFT ) ;
-	Interval newOne = this._curr.obj;
-	if(old != null && newOne != null && old.getHighBound() != newOne.getLowBound())
-	{
-		throw new RuntimeException("foobar!");
-	}
-	
+    	} while ( origin != LEFT ) ;
+    	
+    	/* This checks whether the intervals are consecutive. But that is
+    	 * not always the case during cleanUp() ... 
+    	Interval newOne = this._curr.obj;
+    	if(old != null && newOne != null && old.getHighBound() != newOne.getLowBound())
+    	{
+    		throw new RuntimeException("foobar!");
+    	}*/
+
     }  // increment()
 
 
@@ -445,14 +448,14 @@ abstract class BinTree
       *
       * @return are links consistent in tree?
       */
-    protected boolean _checkLinks ( )
-    {
-	boolean retval = true ;
-
-	if ( _checkMode  &&  ! isEmpty() )                   // checking wanted
+    protected boolean _checkLinks ( )    {
+    	throw new UnsupportedOperationException( );
+	/* boolean retval = true ;
+	
+	 if ( _checkMode  &&  ! isEmpty() )                   // checking wanted
 	    retval = _checkLink( _getRoot() ) ;
 
-	return retval ;
+	return retval ;*/
 
     }  // _checkLinks()
 
