@@ -71,7 +71,7 @@ public class MultimodalNetworkCleaner {
 	}
 
 	/**
-	 * Modifies the network such as the subnetwork containing only links that have at least
+	 * Modifies the network such that the subnetwork containing only links that have at least
 	 * one of the specified transport modes in their set of allowed transport modes is strongly
 	 * connected (=every link/node can be reached by every other link/node). If multiple modes
 	 * are given, the algorithm does <em>not</em> guarantee that the resulting network is strongly
@@ -81,10 +81,37 @@ public class MultimodalNetworkCleaner {
 	 * @param modes
 	 */
 	public void run(final Set<String> modes) {
+		run(modes, new HashSet<String>());
+	}
+
+	/**
+	 * Modifies the network such that the subnetwork containing only links that have at least
+	 * one of the specified transport modes (<code>cleaningModes</code> as well as
+	 * <code>connectivityModes</code>) in their set of allowed transport modes is strongly
+	 * connected (=every link/node can be reached by every other link/node). In contrast to
+	 * {@link #run(Set)}, this method will only remove <code>cleaningModes</code> from links,
+	 * but not <code>connectivityModes</code>. Thus, the resulting  network may still contain
+	 * nodes that are sources or sinks for modes of <code>connectivityModes</code>, but not
+	 * for modes of <code>cleaningModes</code> and <code>connectivityModes</code> combined. If
+	 * multiple modes are given as <code>cleaningModes</code>, the algorithm does <em>not</em>
+	 * guarantee that the resulting network is strongly connected for each of the modes
+	 * individually! The subnetwork consisting of links having only modes from
+	 * <code>cleaningModes</code> may not be strongly connected, only in combination with links
+	 * having modes from <code>connectivityModes</code>, a strongly connected subnetwork emerges.
+	 * Nodes having links connected to them before cleaning, but none after cleaning, are removed
+	 * from the network.
+	 *
+	 * @param cleaningModes
+	 * @param connectivityModes
+	 */
+	public void run(final Set<String> cleaningModes, final Set<String> connectivityModes) {
+		final Set<String> combinedModes = new HashSet<String>(cleaningModes);
+		combinedModes.addAll(connectivityModes);
 		final Map<Id, Link> visitedLinks = new TreeMap<Id, Link>();
 		Map<Id, Link> biggestCluster = new TreeMap<Id, Link>();
 
-		log.info("running " + this.getClass().getName() + " algorithm for modes " + Arrays.toString(modes.toArray()) + "...");
+		log.info("running " + this.getClass().getName() + " algorithm for modes " + Arrays.toString(cleaningModes.toArray())
+				+ " with connectivity modes " + Arrays.toString(connectivityModes.toArray()) + "...");
 
 		// search the biggest cluster of nodes in the network
 		log.info("  checking " + this.network.getNodes().size() + " nodes and " +
@@ -93,8 +120,8 @@ public class MultimodalNetworkCleaner {
 		Iterator<? extends Link> iter = this.network.getLinks().values().iterator();
 		while (iter.hasNext() && stillSearching) {
 			Link startLink = iter.next();
-			if ((!visitedLinks.containsKey(startLink.getId())) && (intersectingSets(modes, startLink.getAllowedModes()))) {
-				Map<Id, Link> cluster = this.findCluster(startLink, modes);
+			if ((!visitedLinks.containsKey(startLink.getId())) && (intersectingSets(combinedModes, startLink.getAllowedModes()))) {
+				Map<Id, Link> cluster = this.findCluster(startLink, combinedModes);
 				visitedLinks.putAll(cluster);
 				if (cluster.size() > biggestCluster.size()) {
 					biggestCluster = cluster;
@@ -115,7 +142,7 @@ public class MultimodalNetworkCleaner {
 		for (Link link : allLinks) {
 			if (!biggestCluster.containsKey(link.getId())) {
 				Set<String> reducedModes = new HashSet<String>(link.getAllowedModes());
-				reducedModes.removeAll(modes);
+				reducedModes.removeAll(cleaningModes);
 				link.setAllowedModes(reducedModes);
 				if (reducedModes.isEmpty()) {
 					this.network.removeLink(link.getId());
