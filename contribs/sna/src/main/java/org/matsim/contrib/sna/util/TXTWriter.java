@@ -22,6 +22,7 @@ package org.matsim.contrib.sna.util;
 import gnu.trove.TDoubleDoubleHashMap;
 import gnu.trove.TDoubleObjectHashMap;
 import gnu.trove.TDoubleObjectIterator;
+import gnu.trove.TObjectDoubleHashMap;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -53,6 +54,27 @@ public class TXTWriter {
 		
 		for(double key : keys) {
 			writer.write(String.valueOf(key));
+			writer.write(TAB);
+			writer.write(String.valueOf(map.get(key)));
+			writer.newLine();
+		}
+		
+		writer.close();
+	}
+	
+	public static void writeMap(TObjectDoubleHashMap<String> map, String keyCol, String valCol, String file) throws IOException {
+		BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+		
+		writer.write(keyCol);
+		writer.write(TAB);
+		writer.write(valCol);
+		writer.newLine();
+		
+		String[] keys = map.keys(new String[map.size()]);
+		Arrays.sort(keys);
+		
+		for(String key : keys) {
+			writer.write(key);
 			writer.write(TAB);
 			writer.write(String.valueOf(map.get(key)));
 			writer.newLine();
