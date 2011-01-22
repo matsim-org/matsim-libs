@@ -26,8 +26,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.ListIterator;
 
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Node;
+import playground.dressler.network.IndexedNodeI;
 
 /**
  * Class representing a path with flow over time on an network
@@ -55,7 +54,7 @@ public class TimeExpandedPath {
 	 * which real nodes are part of this path?
 	 * only build when needed  
 	 */
-	private HashSet<Node> nodesTouched = null;
+	private HashSet<IndexedNodeI> nodesTouched = null;
 	
 
 	/**
@@ -90,50 +89,6 @@ public class TimeExpandedPath {
 	  this.startTime = other.startTime;
 	}
 	
-	/**
-	 * Method to append a new Edge to the end of the path with the specified input
-	 * @param edge Link used
-	 * @param time starting time
-	 * @param forward flag if edge is forward or backward
-	 * @exception throws an IllegalArgumentException if the new edge is not adjacent to te last edge in the path
-	 */
-	public void append(Link edge, int startTime, int arrivalTime, boolean forward){
-		//adding first PathStep
-		StepEdge temp = new StepEdge(edge, startTime, arrivalTime, forward);
-		if(this._steps.isEmpty()){			
-			this._steps.addLast(temp);
-		}else{
-			PathStep old = this._steps.getLast();			
-			if(checkPair(old,temp)){
-				this._steps.addLast(temp);
-			}else{
-				throw new IllegalArgumentException("non adjacent PathSteps: ... " + old.toString() +" "+ temp.toString() ); 
-			}
-		}
-	}
-	
-
-	/**
-	 * Method to prepend a new Edge to the beginning of the path with the specified input
-	 * @param edge Link used
-	 * @param time starting time
-	 * @param forward flag if edge is forward or backward
-	 * @exception throws an IllegalArgumentException if the new edge is not adjacent to te first edge in the path
-	 */
-	public void prepend(Link edge, int startTime, int arrivalTime, boolean forward){
-		//adding first PathStep
-		StepEdge temp = new StepEdge(edge, startTime, arrivalTime, forward);
-		if(this._steps.isEmpty()){			
-			this._steps.addLast(temp);
-		}else{
-			PathStep old = this._steps.getFirst();			
-			if(checkPair(temp, old)){
-				this._steps.addLast(temp);
-			}else{
-				throw new IllegalArgumentException("non adjacent PathSteps: ... " + temp.toString() +" "+ old.toString() ); 
-			}
-		}		
-	}
 	
 	/**
 	 * checks whether two steps are adjacent with respect to their direction and time 
@@ -181,7 +136,7 @@ public class TimeExpandedPath {
 	 * This function ignores virtual nodes! 
 	 * @return first Node 
 	 */
-	public Node getSource(){
+	public IndexedNodeI getSource(){
 		PathStep step = this._steps.getFirst();
 
 		return step.getStartNode().getRealNode();
@@ -192,7 +147,7 @@ public class TimeExpandedPath {
 	 * This function ignores virtual nodes! 
 	 * @return first Node 
 	 */
-	public Node getSink(){
+	public IndexedNodeI getSink(){
 		PathStep step = this._steps.getLast();
 
 		return step.getArrivalNode().getRealNode();
@@ -224,87 +179,6 @@ public class TimeExpandedPath {
 		
 		return result;
 	}
-	
-	/**
-	 * Method to indicate, if link is in a path
-	 * @param PathEdge edge
-	 * @return boolean 
-	 *//*
-	public boolean containsForwardLink(PathEdge edge){
-		if(edge.isForward()){
-			System.out.println("Error: Try to find forward link of an forward link.");
-			return false;
-		}
-		boolean result = false;
-		for(PathEdge pathEdge : this._edges){
-			if(pathEdge.getEdge().equals(edge.getEdge())){
-				if(pathEdge.getStartTime() == edge.getStartTime()
-						&& pathEdge.getArrivalTime() == edge.getArrivalTime()){
-					result = true;
-					break;
-				}
-			}
-		}
-		return result;
-	}*/
-	
-	/**
-	 * Method to find the forward link of an backward link in a path
-	 * @param PathEdge edge
-	 * @return PathEdge 
-	 *//*
-	public PathEdge getForwardLink(PathEdge edge){
-		if(edge.isForward()){
-			System.out.println("Error: Try to find forward link of an forward link.");
-			return null;
-		}
-		if(!containsForwardLink(edge)){
-			System.out.println("Error: Forward link is not contained in this path.");
-			return null;
-		}
-		PathEdge result = null;
-		for(PathEdge pathEdge : this._edges){
-			if(pathEdge.getEdge().equals(edge.getEdge())){
-				if(pathEdge.getStartTime() == edge.getStartTime()
-						&& pathEdge.getArrivalTime() == edge.getArrivalTime()){
-					result = pathEdge;
-					break;
-				}
-			}
-		}
-		return result;
-	}*/
-	
-	/**
-	 * Method to find the index of the forward link of an backward link in a path
-	 * @param PathEdge edge
-	 * @return index of forward link 
-	 *//*
-	public Integer getIndexOfForwardLink(PathEdge edge){
-		if(edge.isForward()){
-			System.out.println("Error: Try to find forward link of an forward link.");
-			return null;
-		}
-		if(!containsForwardLink(edge)){
-			System.out.println("Error: Forward link is not contained in this path.");
-			return null;
-		}
-		Integer result = 0;
-		for(PathEdge pathEdge : this._edges){
-			if(pathEdge.getEdge().equals(edge.getEdge())){
-				if(pathEdge.getStartTime() == edge.getStartTime()
-						&& pathEdge.getArrivalTime() == edge.getArrivalTime()){
-					break;
-				}
-			}
-			result++;
-		}
-		if(result >= this._edges.size()){
-			System.out.println("Error: No index found!");
-			return null;
-		}
-		return result;
-	}*/
 	
 	/**
 	 * returns a String representation of the Path
@@ -558,7 +432,7 @@ public class TimeExpandedPath {
 	 *  method to rebuild the set of touched nodes
 	 */
 	public void rebuildTouchedNodes() {
-	  this.nodesTouched = new HashSet<Node>(3*this._steps.size()/2); // effectively a bit too big!
+	  this.nodesTouched = new HashSet<IndexedNodeI>(3*this._steps.size()/2); // effectively a bit too big!
 	  for (PathStep step : this._steps) {
 		  this.nodesTouched.add(step.getStartNode().getRealNode());
 		  this.nodesTouched.add(step.getArrivalNode().getRealNode());
@@ -571,7 +445,7 @@ public class TimeExpandedPath {
 	 * this only works reliable if touchednodes is updated after any change
 	 * which is not done automatically!
 	 */	
-	public boolean doesTouch(Node node) {
+	public boolean doesTouch(IndexedNodeI node) {
 		// careful ... this might not be up to date if the TEP was changed!
 		
 		if (this.nodesTouched == null) {

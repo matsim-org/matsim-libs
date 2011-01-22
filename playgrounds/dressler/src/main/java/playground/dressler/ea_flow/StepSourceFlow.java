@@ -20,7 +20,7 @@
 
 package playground.dressler.ea_flow;
 
-import org.matsim.api.core.v01.network.Node;
+import playground.dressler.network.IndexedNodeI;
 
 
 public class StepSourceFlow implements PathStep {	
@@ -28,7 +28,7 @@ public class StepSourceFlow implements PathStep {
 	/**
 	 * Source node
 	 */
-	private final Node node;
+	private final IndexedNodeI node;
 	
 
 	/**
@@ -49,7 +49,7 @@ public class StepSourceFlow implements PathStep {
 	 * @param arrivalTime arrival time
 	 * @param forward flag if edge is forward or backward
 	 */
-	public StepSourceFlow(Node node, int leaveTime, boolean forward){
+	public StepSourceFlow(IndexedNodeI node, int leaveTime, boolean forward){
 		if (node == null) {
 			throw new IllegalArgumentException("StepSourceFlow, Node node may not be null");
 		}

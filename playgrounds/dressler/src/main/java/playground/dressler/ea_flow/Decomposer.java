@@ -22,10 +22,10 @@ package playground.dressler.ea_flow;
 
 import java.util.LinkedList;
 
-import org.matsim.api.core.v01.network.*;
-
 import playground.dressler.Interval.SourceIntervals;
 import playground.dressler.control.FlowCalculationSettings;
+import playground.dressler.network.IndexedLinkI;
+import playground.dressler.network.IndexedNodeI;
 
 
 
@@ -44,13 +44,13 @@ public class Decomposer {
 	public LinkedList<TimeExpandedPath> decompose() {
 		_paths = new LinkedList<TimeExpandedPath>();
 		
-		for (Node source : _flow.getSources()) {		
+		for (IndexedNodeI source : _flow.getSources()) {		
 			startPath(source);
 		}	
 		return _paths;
 	}
 	
-	private int startPath(Node source) {
+	private int startPath(IndexedNodeI source) {
 		//System.out.println("Decompose from source " + source.getId());
 		int sum = 0;
 		SourceIntervals si = _flow.getSourceOutflow(source);
@@ -73,7 +73,7 @@ public class Decomposer {
 		return sum;
 	}
 	
-	private int continuePath(Node node, int t, int targetFlow) {
+	private int continuePath(IndexedNodeI node, int t, int targetFlow) {
 		int sum = 0;
 		
 		//System.out.println("Decompose at node " + node.getId() + " @ " + t + " target " + targetFlow);
@@ -84,7 +84,7 @@ public class Decomposer {
 			targetFlow -= f;
 		}
 		
-		for (Link edge : node.getOutLinks().values()) {
+		for (IndexedLinkI edge : node.getOutLinks()) {
 			int f = _flow.getFlow(edge).getFlowAt(t);
 			f = Math.min(targetFlow, f);
 			if (f > 0) {				
@@ -129,7 +129,7 @@ public class Decomposer {
 		return sum;
 	}
 	
-	private int finishPath(Node node, int t, int targetFlow) {
+	private int finishPath(IndexedNodeI node, int t, int targetFlow) {
 		//System.out.println("Decompose at sink " + node.getId() + " @ " + t);
 		
 		int f = _flow.getSinkFlow(node).getFlowAt(t);

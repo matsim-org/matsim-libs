@@ -36,6 +36,7 @@ import org.matsim.core.population.PopulationWriter;
 
 import playground.dressler.ea_flow.Flow;
 import playground.dressler.ea_flow.TimeExpandedPath;
+import playground.dressler.network.IndexedNodeI;
 import playground.dressler.util.CPUTimer;
 import playground.dressler.util.ImportSimpleNetwork;
 
@@ -279,7 +280,7 @@ public class DanielMain {
 
 		settings.setNetwork(network);
 		settings.setDemands(demands);
-		settings.supersink = sink;
+		settings.supersink = settings.getNetwork().getIndexedNode(sink.getId());
 
 		System.out.println("Finished reading input.");
 		
@@ -353,8 +354,8 @@ public class DanielMain {
 		System.out.println(fluss.arrivalsToString());
 		System.out.println(fluss.arrivalPatternToString());
 		System.out.println("unsatisfied demands:");
-		for (Node node : fluss.getDemands().keySet()){
-			int demand = fluss.getDemands().get(node);
+		for (IndexedNodeI node : fluss.getSources()){
+			int demand = fluss.getDemands()[node.getIndex()];
 			if (demand > 0) {
 				// this can be a lot of text				
 				System.out.println("node:" + node.getId().toString()+ " demand:" + demand);

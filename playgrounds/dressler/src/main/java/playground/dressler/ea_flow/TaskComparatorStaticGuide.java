@@ -7,16 +7,16 @@ import org.matsim.api.core.v01.Id;
 
 class TaskComparatorStaticGuide implements TaskComparatorI {
 	private Comparator<BFTask> fallback = new TaskComparator();
-	private HashMap<Id, Integer> _dist;
+	private int[] _dist;
 
 
-	public TaskComparatorStaticGuide(HashMap<Id, Integer> dist) {
+	public TaskComparatorStaticGuide(int[] dist) {
 		this._dist = dist;
 	}
 
 	public int compare(BFTask first, BFTask second) {
-		int d1 = _dist.get(first.node.getRealNode().getId());
-		int d2 = _dist.get(second.node.getRealNode().getId());
+		int d1 = _dist[first.node.getRealNode().getIndex()];
+		int d2 = _dist[second.node.getRealNode().getIndex()];
 
 		if (d1  < d2 ) {
 			return -1;
@@ -37,6 +37,6 @@ class TaskComparatorStaticGuide implements TaskComparatorI {
 	}
 	
 	public int getValue(BFTask task) {
-		return _dist.get(task.node.getRealNode().getId());
+		return _dist[task.node.getRealNode().getIndex()];
 	}
 }

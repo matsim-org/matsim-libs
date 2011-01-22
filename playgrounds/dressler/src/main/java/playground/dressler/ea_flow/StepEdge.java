@@ -20,7 +20,7 @@
 
 package playground.dressler.ea_flow;
 
-import org.matsim.api.core.v01.network.Link;
+import playground.dressler.network.IndexedLinkI;
 
 
 public class StepEdge implements PathStep {	
@@ -28,7 +28,7 @@ public class StepEdge implements PathStep {
 	/**
 	 * Edge in a path
 	 */
-	private final Link edge;
+	private final IndexedLinkI edge;
 	
 	/**
 	 * time upon which the flow enters the edge
@@ -54,7 +54,7 @@ public class StepEdge implements PathStep {
 	 * @param arrivalTime arrival time (usually < starttime for residual links)
 	 * @param forward flag if edge is forward or backward
 	 */
-	public StepEdge(Link edge, int startTime, int arrivalTime, boolean forward){
+	public StepEdge(IndexedLinkI edge, int startTime, int arrivalTime, boolean forward){
 		if (edge == null) {
 			throw new IllegalArgumentException("StepEdge, Link edge may not be null");
 		}
@@ -90,7 +90,7 @@ public class StepEdge implements PathStep {
 	 * Getter for the Link used
 	 * @return the edge
 	 */	
-	public Link getEdge() {
+	public IndexedLinkI getEdge() {
 		return edge;
 	}
 

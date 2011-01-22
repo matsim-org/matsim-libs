@@ -10,6 +10,7 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PopulationWriter;
 
 import playground.dressler.ea_flow.Flow;
+import playground.dressler.network.IndexedNodeI;
 //
 public class ExampleMain {
 
@@ -95,8 +96,8 @@ public class ExampleMain {
 		System.out.println(fluss.arrivalsToString());
 		System.out.println(fluss.arrivalPatternToString());
 		System.out.println("unsatisfied demands:");
-		for (Node node : fluss.getDemands().keySet()){
-			int demand = fluss.getDemands().get(node);
+		for (IndexedNodeI node : fluss.getSources()){
+			int demand = fluss.getDemands()[node.getIndex()];
 			if (demand > 0) {
 				System.out.println("node:" + node.getId().toString()+ " demand:" + demand);
 			}

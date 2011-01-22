@@ -1,6 +1,7 @@
 package playground.dressler.ea_flow;
 
-import org.matsim.api.core.v01.network.Node;
+
+import playground.dressler.network.IndexedNodeI;
 
 
 public class StepSinkFlow implements PathStep {	
@@ -8,7 +9,7 @@ public class StepSinkFlow implements PathStep {
 	/**
 	 * Sink node
 	 */
-	private final Node node;
+	private final IndexedNodeI node;
 	
 
 	/**
@@ -29,7 +30,7 @@ public class StepSinkFlow implements PathStep {
 	 * @param arrivalTime arrival time
 	 * @param forward flag if edge is forward or backward
 	 */
-	public StepSinkFlow(Node node, int leaveTime, boolean forward){
+	public StepSinkFlow(IndexedNodeI node, int leaveTime, boolean forward){
 		if (node == null) {
 			throw new IllegalArgumentException("StepSinkFlow, Node node may not be null");
 		}

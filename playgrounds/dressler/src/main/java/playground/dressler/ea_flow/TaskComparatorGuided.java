@@ -7,16 +7,16 @@ import org.matsim.api.core.v01.Id;
 
 class TaskComparatorGuided implements TaskComparatorI {
 	private Comparator<BFTask> fallback = new TaskComparator();
-	private HashMap<Id, Integer> _dist;
+	private int[] _dist;
 
 
-	public TaskComparatorGuided(HashMap<Id, Integer> dist) {
+	public TaskComparatorGuided(int[] dist) {
 		this._dist = dist;
 	}
 
 	public int compare(BFTask first, BFTask second) {
-		int d1 = _dist.get(first.node.getRealNode().getId());
-		int d2 = _dist.get(second.node.getRealNode().getId());
+		int d1 = _dist[first.node.getRealNode().getIndex()];
+		int d2 = _dist[second.node.getRealNode().getIndex()];
 
 		if (d1 + first.time < d2 + second.time) {			
 			return -1;			
@@ -40,6 +40,6 @@ class TaskComparatorGuided implements TaskComparatorI {
 	// and might work better if task.depth is added ... 
 	// weird, the BucketQueue already has BFS within each category 
 	public int getValue(BFTask task) {
-		return _dist.get(task.node.getRealNode().getId()) + task.time; 
+		return _dist[task.node.getRealNode().getIndex()] + task.time; 
 	}
 }

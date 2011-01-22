@@ -30,9 +30,11 @@ import java.util.PriorityQueue;
 
 import org.matsim.api.core.v01.Id;
 
+import playground.dressler.network.IndexedNodeI;
+
 public class BucketTaskQueue implements TaskQueue {
 	private int depth = 0;
-	private Id origin = null;
+	private IndexedNodeI origin = null;
 	
 	final int INITIAL_INDEX_SIZE = 10000;
 	final int INITIAL_QUEUE_SIZE = 10000;

@@ -25,6 +25,9 @@ import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import playground.dressler.ea_flow.PathStep;
 import playground.dressler.ea_flow.StepEdge;
 import playground.dressler.ea_flow.TimeExpandedPath;
+import playground.dressler.network.IndexedLinkI;
+import playground.dressler.network.IndexedNetworkI;
+import playground.dressler.network.IndexedNodeI;
 
 public class PopulationCreator {
 //////////////////////////////////////////////////////////////////////////////////////
@@ -35,7 +38,7 @@ public class PopulationCreator {
 		public HashMap<Id, Id> pathSuffix;
 	
 		private FlowCalculationSettings _settings;
-		private NetworkImpl _network;
+		private IndexedNetworkI _network;
 		
 		public PopulationCreator(FlowCalculationSettings settings) {
 			this._settings = settings;
@@ -48,7 +51,7 @@ public class PopulationCreator {
 		 * Careful, this cannot deal with cycles!
 		 * @param sink the real final supersink
 		 */
-		public void autoFixSink(Node sink) {
+		public void autoFixSink(IndexedNodeI sink) {
 			System.out.println("Starting Autofix sink " + sink.getId());
 			autoFixSink(sink, null);						
 		}
@@ -59,7 +62,7 @@ public class PopulationCreator {
 		 * @param sinkid the Id of the real final supersink
 		 */
 		public void autoFixSink(Id sinkid) {		
-			Node sink = this._network.getNodes().get(sinkid);
+			IndexedNodeI sink = this._network.getIndexedNode(sinkid);
 			if (sink == null) {
 				System.out.println("Warning: autoFixSink could not find sink: '" + sinkid + "'. Skipping.");
 			} else {
@@ -67,7 +70,7 @@ public class PopulationCreator {
 			}									
 		}
 		
-		private void autoFixSink(Node sink, Link nextLink) {						
+		private void autoFixSink(IndexedNodeI sink, IndexedLinkI nextLink) {						
 			// this vertex already has a direction ... we don't want to change it.
 			// this also prevents infinite loops in the algorithm, but doesn't really solve the associated problem 
 			if (this.pathSuffix.containsKey(sink.getId())) return;
@@ -79,7 +82,7 @@ public class PopulationCreator {
 			if (this._settings.isSink(sink)) return;
 			
 			// we are not at a sink
-			for (Link link : sink.getInLinks().values()) {
+			for (IndexedLinkI link : sink.getInLinks()) {
 				// recurse ...
 				autoFixSink(link.getFromNode(), link);				
 			}			
@@ -110,7 +113,8 @@ public class PopulationCreator {
 					}
 
 					Node node = link.getToNode();
-					if (!this._network.getNodes().containsValue(node)) {
+					IndexedNodeI inode = this._network.getIndexedNode(node.getId());
+					if (!this._network.getNodes().contains(inode)) {
 						continue;
 					}
 					
@@ -148,7 +152,7 @@ public class PopulationCreator {
 						Id currentLinkId = ids.getLast();
 												
 						do {
-						  Id currentNodeId = this._network.getLinks().get(currentLinkId).getToNode().getId();						  
+						  Id currentNodeId = this._network.getIndexedLink(currentLinkId).getToNode().getId();						  
 						  currentLinkId = pathSuffix.get(currentNodeId);
 						  
 						  if (currentLinkId != null) {
@@ -159,7 +163,7 @@ public class PopulationCreator {
 						
 					}
 									
-					Node firstnode  = _network.getLinks().get(ids.get(0)).getFromNode();
+					Node firstnode  = _network.getIndexedLink(ids.get(0)).getFromNode().getMatsimNode();
 
 					// for each unit of flow, construct a person and plan
 					for (int i = 1 ; i <= nofpersons; i++){

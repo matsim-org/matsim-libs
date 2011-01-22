@@ -20,39 +20,27 @@
 
 package playground.dressler.control;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedList;
-
 import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.Map;
+import java.util.LinkedList;
 
 import javax.imageio.ImageIO;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.routes.NetworkRoute;
 
 import playground.dressler.ea_flow.PathStep;
 import playground.dressler.ea_flow.TimeExpandedPath;
+import playground.dressler.network.IndexedNetworkI;
+import playground.dressler.network.IndexedNodeI;
 
 
 public class Partitioner {	
@@ -70,8 +58,8 @@ public class Partitioner {
 		this._settings = settings;
 	}
 
-	public Node getWhereTo(TimeExpandedPath path) {
-		Node node;
+	public IndexedNodeI getWhereTo(TimeExpandedPath path) {
+		IndexedNodeI node;
 		LinkedList<PathStep> steps = path.getPathSteps();
 
 		node = steps.get(steps.size() - 1 - goBackHowMany).getArrivalNode().getRealNode();
@@ -87,8 +75,8 @@ public class Partitioner {
 		exitStatistics = new HashMap<Id, HashMap<Id, Integer>>();
 
 		for (TimeExpandedPath TEP : paths) {
-			Node source = TEP.getSource();
-			Node sink = getWhereTo(TEP);
+			IndexedNodeI source = TEP.getSource();
+			IndexedNodeI sink = getWhereTo(TEP);
 			HashMap<Id, Integer> whereTo = exitStatistics.get(source.getId());
 			if (whereTo == null) {
 				whereTo = new HashMap<Id, Integer>();
@@ -106,8 +94,8 @@ public class Partitioner {
 
 		exitStatisticsInverse = new HashMap<Id, HashMap<Id, Integer>>();
 		for (TimeExpandedPath TEP : paths) {
-			Node source = TEP.getSource();
-			Node sink = getWhereTo(TEP);
+			IndexedNodeI source = TEP.getSource();
+			IndexedNodeI sink = getWhereTo(TEP);
 
 			HashMap<Id, Integer> whereFrom = exitStatisticsInverse.get(sink.getId());
 			if (whereFrom == null) {
@@ -129,7 +117,7 @@ public class Partitioner {
 		System.out.println("Exit statistics:");
 		int count = 0;
 		if (exitStatistics != null) {
-			for (Node source : this._settings.getNetwork().getNodes().values()) {
+			for (IndexedNodeI source : this._settings.getNetwork().getNodes()) {
 				HashMap<Id, Integer> whereTo = exitStatistics.get(source.getId());
 				if (whereTo != null) {
 					for (Id sinkid : whereTo.keySet()) {
@@ -147,7 +135,7 @@ public class Partitioner {
 		System.out.println("Exit statistics Inverse:");
 		count = 0;
 		if (exitStatisticsInverse != null) {
-			for (Node sink : this._settings.getNetwork().getNodes().values()) {
+			for (IndexedNodeI sink : this._settings.getNetwork().getNodes()) {
 				HashMap<Id, Integer> whereFrom = exitStatisticsInverse.get(sink.getId());
 				if (whereFrom != null) {
 					for (Id sourceid : whereFrom.keySet()) {
@@ -179,8 +167,8 @@ public class Partitioner {
 		Double miny = +500000000d;
 		Double maxy = -500000000d;
 
-		for (Node node : this._settings.getNetwork().getNodes().values()) {
-			Coord c = node.getCoord();
+		for (IndexedNodeI node : this._settings.getNetwork().getNodes()) {
+			Coord c = node.getMatsimNode().getCoord();
 
 			minx = Math.min(c.getX(), minx);
 			miny = Math.min(c.getY(), miny);
@@ -215,8 +203,8 @@ public class Partitioner {
 
 		for (Id sinkid : exitStatisticsInverse.keySet()) {
 
-			NetworkImpl network = this._settings.getNetwork();
-			Node sink = network.getNodes().get(sinkid);
+			IndexedNetworkI network = this._settings.getNetwork();
+			IndexedNodeI sink = network.getIndexedNode(sinkid);
 
 			// colours
 			Color color;
@@ -247,7 +235,7 @@ public class Partitioner {
 			
 			// draw exits ...
 			{
-				Coord c = sink.getCoord();
+				Coord c = sink.getMatsimNode().getCoord();
 				//System.out.println(c.toString());
 				Double x = c.getX() * scalex + offsetx;
 				Double y = c.getY() * scaley + offsety;
@@ -263,7 +251,7 @@ public class Partitioner {
 			HashMap<Id, Integer> whereFrom = exitStatisticsInverse.get(sink.getId());
 			if (whereFrom != null) {
 				for (Id sourceid : whereFrom.keySet()) {
-					Node source = network.getNodes().get(sourceid);
+					IndexedNodeI source = network.getIndexedNode(sourceid);
 					Integer howmany = whereFrom.get(sourceid);
 					Integer demand = this._settings.getDemand(source);
 					if (demand == null) {
@@ -271,7 +259,7 @@ public class Partitioner {
 					} else {
 
 						// get coords
-						Coord c = source.getCoord();
+						Coord c = source.getMatsimNode().getCoord();
 						Double x = c.getX() * scalex + offsetx;
 						Double y = c.getY() * scaley + offsety;
 						int X = x.intValue();

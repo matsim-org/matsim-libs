@@ -20,13 +20,13 @@
 
 package playground.dressler.ea_flow;
 
-import org.matsim.api.core.v01.network.Node;
+import playground.dressler.network.IndexedNodeI;
 
 public abstract class VirtualNode {
 	
    public abstract int getRealTime();
   
-   public abstract Node getRealNode();
+   public abstract IndexedNodeI getRealNode();
   
    public abstract boolean equals(VirtualNode other);
    

@@ -20,11 +20,11 @@
 
 package playground.dressler.ea_flow;
 
-import org.matsim.api.core.v01.network.Node;
+import playground.dressler.network.IndexedNodeI;
 
 public class StepHold implements PathStep {
 	
-	private final Node node;
+	private final IndexedNodeI node;
 	/**
 	 * time upon which the flow enters the edge
 	 */
@@ -48,7 +48,7 @@ public class StepHold implements PathStep {
 	 * @param arrivalTime arrival time (is < starttime for residual holdover)
 	 * @param forward flag if holdover is forward or backward
 	 */
-	public StepHold(Node node, int startTime, int arrivalTime, boolean forward){
+	public StepHold(IndexedNodeI node, int startTime, int arrivalTime, boolean forward){
 		if (node == null) {
 			throw new IllegalArgumentException("StepHold, holdover Node may not be null");
 		}

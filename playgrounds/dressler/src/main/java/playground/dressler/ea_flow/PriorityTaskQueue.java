@@ -27,9 +27,11 @@ import java.util.PriorityQueue;
 
 import org.matsim.api.core.v01.Id;
 
+import playground.dressler.network.IndexedNodeI;
+
 public class PriorityTaskQueue implements TaskQueue {
 	private int depth = 0;
-	private Id origin = null;
+	private IndexedNodeI origin = null;
 	
 	private PriorityQueue<BFTask> _list;
 		

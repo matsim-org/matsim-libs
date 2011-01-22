@@ -25,27 +25,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.ListIterator;
-import java.util.Map;
 import java.util.TreeMap;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 
 import playground.dressler.Interval.EdgeFlowI;
 import playground.dressler.Interval.EdgeInterval;
@@ -57,6 +41,9 @@ import playground.dressler.Interval.ShadowEdgeFlow;
 import playground.dressler.Interval.SinkIntervals;
 import playground.dressler.Interval.SourceIntervals;
 import playground.dressler.control.FlowCalculationSettings;
+import playground.dressler.network.IndexedLinkI;
+import playground.dressler.network.IndexedNetworkI;
+import playground.dressler.network.IndexedNodeI;
 import playground.dressler.util.CPUTimer;
 /**
  * Class representing a dynamic flow on an network with multiple sources and a single sink
@@ -77,25 +64,27 @@ public class Flow {
 	 * The network on which we find routes.
 	 * We expect the network not to change between runs!
 	 */
-	private final NetworkImpl _network;
+	private final IndexedNetworkI _network;
+	private int nnodes;
+	private int nlinks;
 
 	/**
 	 * Edge representation of flow on the network
 	 */
 //	private HashMap<Link, EdgeIntervals> _flow;
-	private HashMap<Link, EdgeFlowI> _flow;
+	private EdgeFlowI[] _flow;
 	//TODO holdover done declare _holdover
-	private HashMap<Node,EdgeFlowI>_holdover;
+	private EdgeFlowI[] _holdover;
 
 	/**
 	 * Source outflow, somewhat like holdover for sources
 	 */
-	private HashMap<Node, SourceIntervals> _sourceoutflow;
+	private SourceIntervals[] _sourceoutflow;
 
 	/**
 	 * Flow into sinks
 	 */
-	private HashMap<Node, SinkIntervals> _sinkflow;
+	private SinkIntervals[] _sinkflow;
 
 	/**
 	 * TimeExpandedTimeExpandedPath representation of flow on the network
@@ -111,18 +100,18 @@ public class Flow {
 	/**
 	 * list of all sources
 	 */
-	private final ArrayList<Node> _sources;
+	private final ArrayList<IndexedNodeI> _sources;
 
 	/**
 	 * list of all sinks
 	 */
-	private final ArrayList<Node> _sinks;
+	private final ArrayList<IndexedNodeI> _sinks;
 
 	/**
 	 * stores unsatisfied demands for each vertex.
 	 * positive means source, negative means sink
 	 */
-	private Map<Node,Integer> _demands;
+	private int[] _demands;
 
 	/**
 	 * the Time Horizon (for easy access)
@@ -167,9 +156,12 @@ public class Flow {
 
 		this._settings = settings;
 		this._network = settings.getNetwork();
-		this._flow = new HashMap<Link,EdgeFlowI>();
-		this._sourceoutflow = new HashMap<Node, SourceIntervals>();
-		this._sinkflow = new HashMap<Node, SinkIntervals>();
+		nnodes = _network.getLargestIndexNodes() + 1;
+		nlinks = _network.getLargestIndexLinks() + 1;
+		
+		this._flow = new EdgeFlowI[nlinks];
+		this._sourceoutflow = new SourceIntervals[nnodes];
+		this._sinkflow = new SinkIntervals[nnodes];
 
 		this._checkTouchedNodes = settings.checkTouchedNodes;
 
@@ -177,40 +169,41 @@ public class Flow {
 		this._unfoldpaths = settings.unfoldPaths;
 
 		this._TimeExpandedPaths = new LinkedList<TimeExpandedPath>();
-		this._demands = new HashMap<Node, Integer>();
-		this._sources = new ArrayList<Node>();
-		this._sinks = new ArrayList<Node>();
+		this._demands = new int[nnodes];
+		this._sources = new ArrayList<IndexedNodeI>();
+		this._sinks = new ArrayList<IndexedNodeI>();
 		this._edgePathMap =new HashMap<Link,TreeMap<Integer,LinkedList<TimeExpandedPath>>>();
 		this._sinkPathMap =new HashMap<Node,TreeMap<Integer,LinkedList<TimeExpandedPath>>>();
 		this._sourcePathMap =new HashMap<Node,TreeMap<Integer,LinkedList<TimeExpandedPath>>>();
-		this._holdover =new HashMap<Node,EdgeFlowI>();
-		for(Node node : this._network.getNodes().values()){
+		this._holdover =new EdgeFlowI[nnodes];
+		
+		for(IndexedNodeI node : this._network.getNodes()){
 			if (this._settings.isSource(node)) {
-				int i = this._settings.getDemand(node);
+				int d = this._settings.getDemand(node);
 				this._sources.add(node);
 				EdgeInterval temp = new EdgeInterval(0,this._settings.TimeHorizon);
-				this._sourceoutflow.put(node, new SourceIntervals(temp));
-				this._demands.put(node, i);
+				this._sourceoutflow[node.getIndex()] = new SourceIntervals(temp);
+				this._demands[node.getIndex()] = d;
 			} else if (this._settings.isSink(node)) {
-				int i = this._settings.getDemand(node);
+				int d = this._settings.getDemand(node);
 				this._sinks.add(node);
 				EdgeInterval temp = new EdgeInterval(0,this._settings.TimeHorizon);
-				this._sinkflow.put(node, new SinkIntervals(temp));
-				this._demands.put(node, i);
+				this._sinkflow[node.getIndex()] =  new SinkIntervals(temp);
+				this._demands[node.getIndex()] = d;
 			}
 			//TODO holdover done initialize _holdover
 			if(settings.useHoldover){
 				HoldoverInterval temp = new HoldoverInterval(0,settings.TimeHorizon);
 				HoldoverIntervals temps = new HoldoverIntervals(temp,Integer.MAX_VALUE);
-				this._holdover.put(node,temps);
+				this._holdover[node.getIndex()] = temps;
 			}
 		}
 
 		// initialize EdgeIntervalls or the ShadowEdgeFlows and edgePathMap
-		for (Link edge : this._network.getLinks().values()) {
+		for (IndexedLinkI edge : this._network.getLinks()) {
 			if(settings.mapLinksToTEP){
 				TreeMap<Integer,LinkedList<TimeExpandedPath>> temp = new TreeMap<Integer,LinkedList<TimeExpandedPath>>();
-				this._edgePathMap.put(edge, temp);
+				this._edgePathMap.put(edge.getMatsimLink(), temp);
 			}
 			
 			int low = 0;
@@ -222,8 +215,8 @@ public class Flow {
 			// to just the available interval ...
 
 			Interval available;
-			if (this._settings.whenAvailable != null) {
-				available = this._settings.whenAvailable.get(edge.getId());
+			if (this._settings.getWhenAvailable(edge) != null) {
+				available = this._settings.getWhenAvailable(edge);
 				// could still be null, which means "always"
 			} else {
 				available = null;
@@ -242,7 +235,7 @@ public class Flow {
 				ShadowEdgeFlow edgeflow = new ShadowEdgeFlow(temp, this._settings.getLength(edge),
 						this._settings.getCapacity(edge), available);
 
-				this._flow.put(edge, edgeflow);
+				this._flow[edge.getIndex()] = edgeflow;
 			} else {
 
 				EdgeInterval temp = new EdgeInterval(low, high);
@@ -250,7 +243,7 @@ public class Flow {
 				EdgeIntervals edgeflow = new EdgeIntervals(temp, this._settings.getLength(edge),
 						this._settings.getCapacity(edge), available);
 
-				this._flow.put(edge, edgeflow);
+				this._flow[edge.getIndex()] = edgeflow;
 			}
 			
 		}
@@ -268,13 +261,8 @@ public class Flow {
 	 * @param node Node that is checked
 	 * @return true iff Node is a Source and has positive demand
 	 */
-	public boolean isActiveSource(final Node node) {
-		Integer i = _demands.get(node);
-		if (i== null) {
-			return false;
-		} else {
-			return (i > 0);
-		}
+	public boolean isActiveSource(final IndexedNodeI node) {
+		return _demands[node.getIndex()] > 0;		
 	}
 
 	/**
@@ -282,10 +270,9 @@ public class Flow {
 	 * @param node Node to check for
 	 * @return true iff node is a Source now with demand 0
 	 */
-	public boolean isNonActiveSource(final Node node){
+	public boolean isNonActiveSource(final IndexedNodeI node){
 		if (this._settings.isSource(node)) {
-		  Integer i = this._demands.get(node);
-		  return (i != null && i == 0);
+			return _demands[node.getIndex()] == 0;
 		}
 		return false;
 	}
@@ -295,13 +282,8 @@ public class Flow {
 	 * @param node Node that is checked
 	 * @return true iff Node is a sink and has demand left (i.e. demand < 0)
 	 */
-	public boolean isActiveSink(final Node node) {
-		Integer i = _demands.get(node);
-		if (i== null) {
-			return false;
-		} else {
-			return (i < 0);
-		}
+	public boolean isActiveSink(final IndexedNodeI node) {
+		return _demands[node.getIndex()] < 0;	
 	}
 
 	/**
@@ -309,10 +291,9 @@ public class Flow {
 	 * @param node Node to check for
 	 * @return true iff node is a Sink now with demand 0
 	 */
-	public boolean isNonActiveSink(final Node node){
+	public boolean isNonActiveSink(final IndexedNodeI node){
 		if (this._settings.isSink(node)) {
-		  Integer i = this._demands.get(node);
-		  return (i != null && i == 0);
+		  return _demands[node.getIndex()] == 0;
 		}
 		return false;
 	}
@@ -325,10 +306,10 @@ public class Flow {
 	 */
 	public int bottleNeckCapacity(final TimeExpandedPath TimeExpandedPath){
 		//check if first node is a source
-		Node temp;
+		IndexedNodeI temp;
 		temp = TimeExpandedPath.getSource();
-		Integer demand = this._demands.get(temp);
-		if(demand == null || demand < 0){
+		int demand = this._demands[temp.getIndex()];
+		if (!_settings.isSource(temp)) {
 			throw new IllegalArgumentException("Startnode is no source " + TimeExpandedPath);
 		}
 
@@ -342,13 +323,13 @@ public class Flow {
 
 		// check if the final node is a sink
 		temp = TimeExpandedPath.getSink();
-		demand = this._demands.get(temp);
-		if(demand == null || demand > 0){
+		demand = this._demands[temp.getIndex()];
+		if (!_settings.isSink(temp)){
 			throw new IllegalArgumentException("Endnode is no sink " + TimeExpandedPath);
 		}
 		result = Math.min(result, -demand);
 
-		if(result == 0) {
+		if (result == 0) {
 			return 0;
 		}
 
@@ -361,30 +342,28 @@ public class Flow {
 			// FIXME really bad style ...
 			if (step instanceof StepEdge) {
 				StepEdge se = (StepEdge) step;
-				Link edge = se.getEdge();
+				IndexedLinkI edge = se.getEdge();
 
 				if(se.getForward()){
-					cap = this._settings.getCapacity(edge) - this._flow.get(edge).getFlowAt(se.getStartTime());
+					cap = this._settings.getCapacity(edge) - this._flow[edge.getIndex()].getFlowAt(se.getStartTime());
 					
 					// check if the edge exists
-					if (this._settings.whenAvailable != null) {
-						Interval when = this._settings.whenAvailable.get(edge.getId());
-						if (when != null && !when.contains(se.getStartTime())) {
-							cap = 0;
-						}
+					Interval when = this._settings.getWhenAvailable(edge);
+					if (when != null && !when.contains(se.getStartTime())) {
+							cap = 0;					
 					}
 				} else {
-					cap = this._flow.get(edge).getFlowAt(se.getArrivalTime());
+					cap = this._flow[edge.getIndex()].getFlowAt(se.getArrivalTime());
 				}
 				if(cap<result ){
 					result= cap;
 				}
 			} else if (step instanceof StepSourceFlow) {
 				StepSourceFlow ssf = (StepSourceFlow) step;
-				Node node  = ssf.getStartNode().getRealNode();
+				IndexedNodeI node  = ssf.getStartNode().getRealNode();
 
 				if (!ssf.getForward()) {
-					SourceIntervals si = this._sourceoutflow.get(node);
+					SourceIntervals si = this._sourceoutflow[node.getIndex()];
 					if (si == null) {
 						System.out.println("Weird. Source of StepSourceFlow has no sourceoutflow!");
 						return 0;
@@ -400,7 +379,7 @@ public class Flow {
 				   demand of sources we pass through does not matter) */
 			} else if (step instanceof StepSinkFlow) {
 				StepSinkFlow ssf = (StepSinkFlow) step;
-				Node sink;
+				IndexedNodeI sink;
 
 				// the same node anyway ...
 				if (ssf.getForward()) {
@@ -412,7 +391,7 @@ public class Flow {
 				// Flow through a sink is not capped by the demand of the sink.
 				// The final destination was already checked in the beginning.
 				if (!step.getForward()) {
-					SinkIntervals si = this._sinkflow.get(sink);
+					SinkIntervals si = this._sinkflow[sink.getIndex()];
 					if (si == null) {
 						System.out.println("Weird. Sink of StepSinkFlow has no sinkflow!");
 						return 0;
@@ -427,12 +406,12 @@ public class Flow {
 			} else if (step instanceof StepHold) {
 				
 				StepHold hold = (StepHold) step;
-				Node node = hold.getStartNode().getRealNode();
+				IndexedNodeI node = hold.getStartNode().getRealNode();
 				
 				int starttime = hold.getStartTime();
 				int stoptime = hold.getArrivalTime();
 				
-				HoldoverIntervals intervals = (HoldoverIntervals) this._holdover.get(node);
+				HoldoverIntervals intervals = (HoldoverIntervals) this._holdover[node.getIndex()];
 				
 				// this also adjusts the indices appropriately
 				cap = intervals.bottleneck(starttime, stoptime, hold.getForward());
@@ -523,17 +502,17 @@ public class Flow {
 		// FIXME really bad style ...
 		if (step instanceof StepEdge) {
 			StepEdge se = (StepEdge) step;
-			Link edge = se.getEdge();
+			IndexedLinkI edge = se.getEdge();
 
 			if(se.getForward()){
-				this._flow.get(edge).augment(se.getStartTime(), gamma);
+				this._flow[edge.getIndex()].augment(se.getStartTime(), gamma);
 			}	else {
-				this._flow.get(edge).augment(se.getArrivalTime(), -gamma);
+				this._flow[edge.getIndex()].augment(se.getArrivalTime(), -gamma);
 			}
 
 		} else if (step instanceof StepSourceFlow) {
 			StepSourceFlow ssf = (StepSourceFlow) step;
-			Node source;
+			IndexedNodeI source;
 
 			// doesn't really matter, both retun the source ...
 			if (ssf.getForward()) {
@@ -554,20 +533,20 @@ public class Flow {
 //				if (demand < 0) {
 //					throw new IllegalArgumentException("too much flow on StepSourceFlow " + step);
 //				}
-				this._sourceoutflow.get(source).augment(ssf.getArrivalTime(), gamma, Integer.MAX_VALUE);
+				this._sourceoutflow[source.getIndex()].augment(ssf.getArrivalTime(), gamma, Integer.MAX_VALUE);
 //				this._demands.put(source, demand);
 			} else {
 //				demand += gamma;
 //				if (demand > this._settings.getDemand(source)) {
 //					throw new IllegalArgumentException("too much flow sent back into source " + step);
 //				}
-				this._sourceoutflow.get(source).augment(ssf.getStartTime(), -gamma, Integer.MAX_VALUE);
+				this._sourceoutflow[source.getIndex()].augment(ssf.getStartTime(), -gamma, Integer.MAX_VALUE);
 //				this._demands.put(source, demand);
 			}
 
 		} else if (step instanceof StepSinkFlow) {
 			StepSinkFlow ssf = (StepSinkFlow) step;
-			Node sink;
+			IndexedNodeI sink;
 
 			// doesn't really matter, both retun the sink ...
 			if (ssf.getForward()) {
@@ -587,7 +566,7 @@ public class Flow {
 //				demand -= gamma;
 //				this._demands.put(sink, demand);
 				// there isn't any upper capacity on this link
-				this._sinkflow.get(sink).augment(step.getArrivalTime(), -gamma, Integer.MAX_VALUE);
+				this._sinkflow[sink.getIndex()].augment(step.getArrivalTime(), -gamma, Integer.MAX_VALUE);
 			} else {
 //				demand += gamma;
 //				if (demand > 0) {
@@ -595,16 +574,16 @@ public class Flow {
 //				}
 //				this._demands.put(sink, demand);
 				// there isn't any upper capacity on this link
-				this._sinkflow.get(sink).augment(step.getStartTime(), gamma, Integer.MAX_VALUE);
+				this._sinkflow[sink.getIndex()].augment(step.getStartTime(), gamma, Integer.MAX_VALUE);
 			}
 		} else if (step instanceof StepHold) {
 			StepHold hold = (StepHold) step;
-			Node node = hold.getStartNode().getRealNode();
+			IndexedNodeI node = hold.getStartNode().getRealNode();
 			
 			int starttime = hold.getStartTime();
 			int stoptime = hold.getArrivalTime();
 			
-			HoldoverIntervals intervals = (HoldoverIntervals) this._holdover.get(node);
+			HoldoverIntervals intervals = (HoldoverIntervals) this._holdover[node.getIndex()];
 			if (hold.getForward()) {
 				intervals.augment(starttime, stoptime , gamma);
 			} else {
@@ -618,57 +597,6 @@ public class Flow {
 	}
 
 	/**
-	 * Method to change just the flow values on the step, no checking is done!
-	 * @param step The Step
-	 * @param gamma Amount of flow to augment, positive or negative!
-	 * @deprecated
-	 */
-
-	/*private void augmentStepUnsafe(PathStep step, int gamma) {
-
-		// FIXME really bad style ...
-		if (step instanceof StepEdge) {
-			StepEdge se = (StepEdge) step;
-			Link edge = se.getEdge();
-
-			if(se.getForward()){
-				this._flow.get(edge).augmentUnsafe(se.getStartTime(), gamma);
-			}	else {
-				this._flow.get(edge).augmentUnsafe(se.getArrivalTime(), -gamma);
-			}
-		} else if (step instanceof StepSourceFlow) {
-			StepSourceFlow ssf = (StepSourceFlow) step;
-			Node source;
-
-			if (ssf.getForward()) {
-				source = ssf.getStartNode().getRealNode();
-			} else {
-				source = ssf.getArrivalNode().getRealNode();
-			}
-
-			Integer demand = this._demands.get(source);
-
-			if (demand == null) {
-				throw new IllegalArgumentException("Startnode is no source four StepSourceFlow " + step);
-			}
-
-			if (ssf.getForward()) {
-				demand -= gamma;
-				this._sourceoutflow.get(source).augmentUnsafe(ssf.getArrivalTime(), gamma);
-				this._demands.put(source, demand);
-			} else {
-				demand += gamma;
-				this._sourceoutflow.get(source).augmentUnsafe(ssf.getStartTime(), -gamma);
-				this._demands.put(source, demand);
-			}
-
-		} else {
-			throw new RuntimeException("Unsupported kind of PathStep!");
-		}
-
-	}*/
-
-	/**
 	 * Method to check the flow on the edge associated with step
 	 * @param step The Step to check.
 	 * @return true iff 0 <= flow <= capacity at time associated with step
@@ -680,17 +608,17 @@ public class Flow {
 		// FIXME really bad style ...
 		if (step instanceof StepEdge) {
 			StepEdge se = (StepEdge) step;
-			Link edge = se.getEdge();
+			IndexedLinkI edge = se.getEdge();
 
 			if(se.getForward()){
-				return this._flow.get(edge).checkFlowAt(se.getStartTime(), this._settings.getCapacity(edge));
+				return this._flow[edge.getIndex()].checkFlowAt(se.getStartTime(), this._settings.getCapacity(edge));
 
 			}	else {
-				return this._flow.get(edge).checkFlowAt(se.getArrivalTime(), this._settings.getCapacity(edge));
+				return this._flow[edge.getIndex()].checkFlowAt(se.getArrivalTime(), this._settings.getCapacity(edge));
 			}
 		} else if (step instanceof StepSourceFlow) {
 			StepSourceFlow ssf = (StepSourceFlow) step;
-			Node source;
+			IndexedNodeI source;
 
 			if (ssf.getForward()) {
 				source = ssf.getStartNode().getRealNode();
@@ -698,7 +626,7 @@ public class Flow {
 				source = ssf.getArrivalNode().getRealNode();
 			}
 
-			Integer demand = this._demands.get(source);
+			Integer demand = this._demands[source.getIndex()];
 
 			if (demand == null) {
 				throw new IllegalArgumentException("Startnode is no source four StepSourceFlow " + step);
@@ -710,9 +638,9 @@ public class Flow {
 			}
 
 			if (ssf.getForward()) {
-				return this._sourceoutflow.get(source).getIntervalAt(ssf.getArrivalTime()).checkFlow(Integer.MAX_VALUE);
+				return this._sourceoutflow[source.getIndex()].getIntervalAt(ssf.getArrivalTime()).checkFlow(Integer.MAX_VALUE);
 			} else {
-				return this._sourceoutflow.get(source).getIntervalAt(ssf.getStartTime()).checkFlow(Integer.MAX_VALUE);
+				return this._sourceoutflow[source.getIndex()].getIntervalAt(ssf.getStartTime()).checkFlow(Integer.MAX_VALUE);
 			}
 
 		} else {
@@ -735,21 +663,21 @@ public class Flow {
 
 		tempflow.cleanUp();
 
-		for (Node source : this._sources) {
+		for (IndexedNodeI source : this._sources) {
 			boolean thisisbad = false;
 
 			int timeToStopChecking;
 
-			if (this._sourceoutflow.get(source).getLast().getFlow() == 0) {
-				timeToStopChecking = this._sourceoutflow.get(source).getLast().getLowBound();
+			if (this._sourceoutflow[source.getIndex()].getLast().getFlow() == 0) {
+				timeToStopChecking = this._sourceoutflow[source.getIndex()].getLast().getLowBound();
 			} else {
-				timeToStopChecking = this._sourceoutflow.get(source).getLast().getHighBound();
+				timeToStopChecking = this._sourceoutflow[source.getIndex()].getLast().getHighBound();
 			}
 
-			if (tempflow._sourceoutflow.get(source).getLast().getFlow() == 0) {
-				timeToStopChecking = Math.max(timeToStopChecking, tempflow._sourceoutflow.get(source).getLast().getLowBound());
+			if (tempflow._sourceoutflow[source.getIndex()].getLast().getFlow() == 0) {
+				timeToStopChecking = Math.max(timeToStopChecking, tempflow._sourceoutflow[source.getIndex()].getLast().getLowBound());
 			} else {
-				timeToStopChecking = Math.max(timeToStopChecking, tempflow._sourceoutflow.get(source).getLast().getHighBound());
+				timeToStopChecking = Math.max(timeToStopChecking, tempflow._sourceoutflow[source.getIndex()].getLast().getHighBound());
 			}
 
 			if (timeToStopChecking > this._timeHorizon) {
@@ -758,7 +686,7 @@ public class Flow {
 			}
 
 			for (int t = 0; t < timeToStopChecking; t++) {
-				if (tempflow._sourceoutflow.get(source).getFlowAt(t) != this._sourceoutflow.get(source).getFlowAt(t)) {
+				if (tempflow._sourceoutflow[source.getIndex()].getFlowAt(t) != this._sourceoutflow[source.getIndex()].getFlowAt(t)) {
 					thisisbad = true;
 					System.out.println("Flows differ on source: " + source.getId());
 					break;
@@ -766,25 +694,25 @@ public class Flow {
 			}
 			if (thisisbad) {
 				System.out.println("Original flow believes: ");
-				System.out.println(this._sourceoutflow.get(source));
+				System.out.println(this._sourceoutflow[source.getIndex()]);
 				System.out.println("Reconstructed flow believes: ");
-				System.out.println(tempflow._sourceoutflow.get(source));
+				System.out.println(tempflow._sourceoutflow[source.getIndex()]);
 				everythingOkay = false;
 			}
 		}
 
 		// TODO check sink labels
 
-		for (Link edge : this._network.getLinks().values()) {
+		for (IndexedLinkI edge : this._network.getLinks()) {
 			//System.out.println("Checking edge " + edge.getId() + " ...");
 			boolean thisisbad = false;
 
 			int timeToStopChecking;
 
 
-			timeToStopChecking = this._flow.get(edge).getLastTime();
+			timeToStopChecking = this._flow[edge.getIndex()].getLastTime();
 
-			timeToStopChecking = Math.max(timeToStopChecking, tempflow._flow.get(edge).getLastTime());
+			timeToStopChecking = Math.max(timeToStopChecking, tempflow._flow[edge.getIndex()].getLastTime());
 
 			if (timeToStopChecking > this._timeHorizon) {
 				System.out.println("Weird. There is flow beyond the TimeHorizon!");
@@ -792,7 +720,7 @@ public class Flow {
 			}
 
 			for (int t = 0; t < timeToStopChecking; t++) {
-				if (tempflow._flow.get(edge).getFlowAt(t) != this._flow.get(edge).getFlowAt(t)) {
+				if (tempflow._flow[edge.getIndex()].getFlowAt(t) != this._flow[edge.getIndex()].getFlowAt(t)) {
 					thisisbad = true;
 					System.out.println("Flows differ on edge: " + edge.getId() + " " + edge.getFromNode().getId() + "-->" + edge.getToNode().getId());
 					break;
@@ -800,9 +728,9 @@ public class Flow {
 			}
 			if (thisisbad) {
 				System.out.println("Original flow believes: ");
-				System.out.println(this._flow.get(edge));
+				System.out.println(this._flow[edge.getIndex()]);
 				System.out.println("Reconstructed flow believes: ");
-				System.out.println(tempflow._flow.get(edge));
+				System.out.println(tempflow._flow[edge.getIndex()]);
 				everythingOkay = false;
 			}
 		}
@@ -830,7 +758,7 @@ public class Flow {
 		{
 			StepSourceFlow ssf = (StepSourceFlow) TEP.getPathSteps().getFirst();
 
-			Node source;
+			IndexedNodeI source;
 
 			// doesn't really matter, both retun the source ...
 			if (ssf.getForward()) {
@@ -839,7 +767,7 @@ public class Flow {
 				source = ssf.getArrivalNode().getRealNode();
 			}
 
-			Integer demand = this._demands.get(source);
+			Integer demand = this._demands[source.getIndex()];
 
 			if (demand == null) {
 				throw new IllegalArgumentException("Startnode is no source for StepSourceFlow " + ssf);
@@ -856,14 +784,14 @@ public class Flow {
 					throw new IllegalArgumentException("too much flow sent back into source " + ssf);
 				}
 			}
-			this._demands.put(source, demand);
+			this._demands[source.getIndex()] = demand;
 
 		}
 
 		// the Sink
 		{
 			StepSinkFlow ssf = (StepSinkFlow) TEP.getPathSteps().getLast();
-			Node sink;
+			IndexedNodeI sink;
 
 			// doesn't really matter, both retun the sink ...
 			if (ssf.getForward()) {
@@ -871,7 +799,7 @@ public class Flow {
 			} else {
 				sink = ssf.getStartNode().getRealNode();
 			}
-			Integer demand = this._demands.get(sink);
+			Integer demand = this._demands[sink.getIndex()];
 
 			if (demand == null) {
 				throw new IllegalArgumentException("Startnode is no sink for StepSinkFlow " + ssf);
@@ -885,7 +813,7 @@ public class Flow {
 					throw new IllegalArgumentException("too much flow sent into sink " + ssf);
 				}
 			}
-			this._demands.put(sink, demand);
+			this._demands[sink.getIndex()] = demand;
 		}
 
 		// Now do all the steps, including the first and last to fix the actual source/sinkflows.
@@ -1102,10 +1030,10 @@ public class Flow {
                for (PathStep step : TEP.getPathSteps()) {
             	   if (step instanceof StepEdge) {
  					  System.out.println("Flow on edge for: " + step);
- 					  System.out.println(this._flow.get(((StepEdge) step).getEdge()));
+ 					  System.out.println(this._flow[((StepEdge) step).getEdge().getIndex()]);
  					} else if (step instanceof StepSourceFlow) {
  						System.out.println("Flow for source: " + step);
-   					    System.out.println(this._sourceoutflow.get(((StepSourceFlow) step).getStartNode().getRealNode()));
+   					    System.out.println(this._sourceoutflow[((StepSourceFlow) step).getStartNode().getRealNode().getIndex()]);
  					} else if (step instanceof StepSinkFlow) {
  						System.out.println("Step sink flow " + step + " ...");
  					} else {
@@ -1372,16 +1300,16 @@ public class Flow {
 		if (step instanceof StepEdge){
 			StepEdge edge =(StepEdge) step;
 			time = edge.getArrivalTime();
-			Link link = edge.getEdge();
+			Link link = edge.getEdge().getMatsimLink();
 			tree =this._edgePathMap.get(link);
 		}else if(step instanceof StepSourceFlow){
 			StepSourceFlow sourcestep = (StepSourceFlow)step;
-			Node source =sourcestep.getArrivalNode().getRealNode();
+			Node source =sourcestep.getArrivalNode().getRealNode().getMatsimNode();
 			time = sourcestep.getStartTime();
 			tree =this._sourcePathMap.get(source);
 		}else if(step instanceof StepSinkFlow){
 			StepSinkFlow sinkstep = (StepSinkFlow)step;
-			Node sink =sinkstep.getArrivalNode().getRealNode();
+			Node sink =sinkstep.getArrivalNode().getRealNode().getMatsimNode();
 			time = sinkstep.getArrivalTime();
 			tree =this._sinkPathMap.get(sink);
 		}
@@ -1396,8 +1324,9 @@ public class Flow {
 	
 	
 	private boolean mappedPathsExist(boolean complete){
-		boolean error =false;
-		for(Link edge : this._network.getLinks().values()){
+		boolean error = false;
+		for(IndexedLinkI iedge : _network.getLinks()){
+			Link edge = iedge.getMatsimLink();
 			for(LinkedList<TimeExpandedPath> list : this._edgePathMap.get(edge).values()){
 				for(TimeExpandedPath path :list){
 					if(!this._TimeExpandedPaths.contains(path)){
@@ -1454,16 +1383,16 @@ public class Flow {
 				if (step instanceof StepEdge){
 					StepEdge edge =(StepEdge) step;
 					time = edge.getStartTime();
-					Link link = edge.getEdge();
+					Link link = edge.getEdge().getMatsimLink();
 					tree =this._edgePathMap.get(link);
 				}else if(step instanceof StepSourceFlow){
 					StepSourceFlow sourcestep = (StepSourceFlow)step;
-					Node source =sourcestep.getArrivalNode().getRealNode();
+					Node source =sourcestep.getArrivalNode().getRealNode().getMatsimNode();
 					time = sourcestep.getArrivalTime();
 					tree =this._sourcePathMap.get(source);
 				}else if(step instanceof StepSinkFlow){
 					StepSinkFlow sinkstep = (StepSinkFlow)step;
-					Node sink =sinkstep.getArrivalNode().getRealNode();
+					Node sink =sinkstep.getArrivalNode().getRealNode().getMatsimNode();
 					time = sinkstep.getStartTime();
 					tree =this._sinkPathMap.get(sink);
 				}
@@ -1509,7 +1438,7 @@ public class Flow {
 			if (step instanceof StepEdge){
 				StepEdge edge =(StepEdge) step;
 				time = edge.getStartTime();
-				Link link = edge.getEdge();
+				Link link = edge.getEdge().getMatsimLink();
 				tree =this._edgePathMap.get(link);
 				if(tree == null){
 					tree = new TreeMap<Integer,LinkedList<TimeExpandedPath>>();
@@ -1517,7 +1446,7 @@ public class Flow {
 				}
 			}else if(step instanceof StepSourceFlow){
 				StepSourceFlow sourcestep = (StepSourceFlow)step;
-				Node source =sourcestep.getArrivalNode().getRealNode();
+				Node source =sourcestep.getArrivalNode().getRealNode().getMatsimNode();
 				time = sourcestep.getArrivalTime();
 				tree =this._sourcePathMap.get(source);
 				if(tree == null){
@@ -1526,7 +1455,7 @@ public class Flow {
 				}
 			}else if(step instanceof StepSinkFlow){
 				StepSinkFlow sinkstep = (StepSinkFlow)step;
-				Node sink =sinkstep.getArrivalNode().getRealNode();
+				Node sink =sinkstep.getArrivalNode().getRealNode().getMatsimNode();
 				time = sinkstep.getStartTime();
 				tree =this._sinkPathMap.get(sink);
 				if(tree == null){
@@ -1553,16 +1482,16 @@ public class Flow {
 				if (step instanceof StepEdge){
 					StepEdge edge =(StepEdge) step;
 					time = edge.getStartTime();
-					Link link = edge.getEdge();
+					Link link = edge.getEdge().getMatsimLink();
 					tree =this._edgePathMap.get(link);
 				}else if(step instanceof StepSourceFlow){
 					StepSourceFlow sourcestep = (StepSourceFlow)step;
-					Node source = sourcestep.getArrivalNode().getRealNode();
+					Node source = sourcestep.getArrivalNode().getRealNode().getMatsimNode();
 					time = sourcestep.getArrivalTime();
 					tree =this._sourcePathMap.get(source);
 				}else if(step instanceof StepSinkFlow){
 					StepSinkFlow sinkstep = (StepSinkFlow)step;
-					Node sink =sinkstep.getArrivalNode().getRealNode();
+					Node sink =sinkstep.getArrivalNode().getRealNode().getMatsimNode();
 					time = sinkstep.getStartTime();
 					tree =this._sinkPathMap.get(sink);
 				}
@@ -1992,8 +1921,8 @@ public class Flow {
 	public int[] arrivals(){
 		int maxtime = 0;
 		
-		for (Node sink : this._sinks) {
-		   SinkIntervals si = this._sinkflow.get(sink);
+		for (IndexedNodeI sink : this._sinks) {
+		   SinkIntervals si = this._sinkflow[sink.getIndex()];
 		   int t = 0;
 		   if (si.getLast().getFlow() > 0) {
 			   t = si.getLast().getHighBound() - 1;
@@ -2005,8 +1934,8 @@ public class Flow {
 		
 		int[] arrivals = new int[maxtime + 1];
 
-		for (Node sink : this._sinks) {
-			SinkIntervals si = this._sinkflow.get(sink);
+		for (IndexedNodeI sink : this._sinks) {
+			SinkIntervals si = this._sinkflow[sink.getIndex()];
 			for (int t = 0; t <= maxtime; t++) {
 			   arrivals[t] += si.getFlowAt(t); 
 			}
@@ -2070,16 +1999,19 @@ public class Flow {
 	public int cleanUp() {
 
 		int gain = 0;
-		for (EdgeFlowI EI : _flow.values()) {
+		
+		for (EdgeFlowI EI : _flow) {
 		  gain += EI.cleanup();
 		}
-		for (Node node : this._sourceoutflow.keySet()) {
-			 SourceIntervals si = this._sourceoutflow.get(node);
+		
+		for (IndexedNodeI source : this._sources) {
+			SourceIntervals si = this._sourceoutflow[source.getIndex()];
 			 if (si != null)
 			   gain += si.cleanup();
 		}
-		for (Node node : this._sinkflow.keySet()) {
-			 SinkIntervals si = this._sinkflow.get(node);
+		
+		for (IndexedNodeI sink : this._sinks) {
+			SinkIntervals si = this._sinkflow[sink.getIndex()];
 			 if (si != null)
 			   gain += si.cleanup();
 		}
@@ -2097,8 +2029,8 @@ public class Flow {
 	@Override
 	public String toString(){
 		StringBuilder strb = new StringBuilder();
-		for(Link link : _flow.keySet()){
-			EdgeFlowI edge =_flow.get(link);
+		for(IndexedLinkI link : _network.getLinks()){
+			EdgeFlowI edge =_flow[link.getIndex()];
 			strb.append(link.getId().toString()+ ": " + edge.toString()+ "\n");
 		}
 		return strb.toString();
@@ -2129,49 +2061,49 @@ public class Flow {
 	/**
 	 * @return the _demands
 	 */
-	public Map<Node, Integer> getDemands() {
+	public int[] getDemands() {
 		return this._demands;
 	}
 
 	/**
 	 * @return the _flow
 	 */
-	public EdgeFlowI getFlow(Link edge) {
-		return this._flow.get(edge);
+	public EdgeFlowI getFlow(IndexedLinkI edge) {
+		return this._flow[edge.getIndex()];
 	}
 	
-	public EdgeFlowI getHoldover(Node node){
-		return this._holdover.get(node);
+	public EdgeFlowI getHoldover(IndexedNodeI node){
+		return this._holdover[node.getIndex()];
 	}
 	//TODO holdover done implement getHoldover
 	
 
-	public SourceIntervals getSourceOutflow(Node node) {
-		return this._sourceoutflow.get(node);
+	public SourceIntervals getSourceOutflow(IndexedNodeI node) {
+		return this._sourceoutflow[node.getIndex()];
 	}
 
-	public SinkIntervals getSinkFlow(Node node) {
-		return this._sinkflow.get(node);
+	public SinkIntervals getSinkFlow(IndexedNodeI node) {
+		return this._sinkflow[node.getIndex()];
 	}
 
 	/**
 	 * @return the _sink
 	 */
-	public ArrayList<Node> getSinks() {
+	public ArrayList<IndexedNodeI> getSinks() {
 		return _sinks;
 	}
 
 	/**
 	 * @return the _sources
 	 */
-	public ArrayList<Node> getSources() {
+	public ArrayList<IndexedNodeI> getSources() {
 		return this._sources;
 	}
 
 	/**
 	 * @return the network
 	 */
-	public NetworkImpl getNetwork() {
+	public IndexedNetworkI getNetwork() {
 		return this._network;
 	}
 
@@ -2215,7 +2147,8 @@ public class Flow {
 		int min = Integer.MAX_VALUE;
 		int max = 0;
 		long sum = 0;
-		for (EdgeFlowI i : this._flow.values()) {
+		for (EdgeFlowI i : this._flow) {
+			if (i == null) continue;
 			int size = i.getMeasure();
 			sum += size;
 			min = Math.min(min, size);
@@ -2226,7 +2159,8 @@ public class Flow {
 		sum = 0;
 		max = 0;
 		min = Integer.MAX_VALUE;
-		for (SourceIntervals i : this._sourceoutflow.values()) {
+		for (SourceIntervals i : this._sourceoutflow) {
+			if (i == null) continue;
 			int size = i.getSize();
 			sum += size;
 			min = Math.min(min, size);
@@ -2237,7 +2171,8 @@ public class Flow {
 		sum = 0;
 		max = 0;
 		min = Integer.MAX_VALUE;
-		for (SinkIntervals i : this._sinkflow.values()) {
+		for (SinkIntervals i : this._sinkflow) {
+			if (i == null) continue;
 			int size = i.getSize();
 			sum += size;
 			min = Math.min(min, size);

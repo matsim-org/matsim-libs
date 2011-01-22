@@ -60,6 +60,8 @@ import playground.dressler.ea_flow.StepEdge;
 import playground.dressler.ea_flow.StepSinkFlow;
 import playground.dressler.ea_flow.StepSourceFlow;
 import playground.dressler.ea_flow.TimeExpandedPath;
+import playground.dressler.network.IndexedLinkI;
+import playground.dressler.network.IndexedNodeI;
 import playground.dressler.util.CPUTimer;
 import playground.dressler.util.ImportSimpleNetwork;
 
@@ -248,7 +250,7 @@ public class MultiSourceEAF {
 		in.close();
 		
 	}
-	public static List<TimeExpandedPath> readPathFlow(NetworkImpl network, String filename ) throws IOException{
+	public static List<TimeExpandedPath> readPathFlow(FlowCalculationSettings settings, NetworkImpl network, String filename ) throws IOException{
 		List<TimeExpandedPath> result = new LinkedList<TimeExpandedPath>();
 		BufferedReader in = new BufferedReader(new FileReader(filename));
 		String inline = null;
@@ -270,16 +272,16 @@ public class MultiSourceEAF {
 				//read a sourcestep
 				if(step[0].trim().equals("source")){
 					Id nodeid = new IdImpl(step[1].trim());
-					Node node = network.getNodes().get(nodeid);
+					IndexedNodeI node = settings.getNetwork().getIndexedNode(nodeid);
 					int time = Integer.valueOf(step[2].trim());
 					boolean forward = Boolean.valueOf(step[3].trim());
-					StepSourceFlow sourcestep =new StepSourceFlow(node,time,forward);
+					StepSourceFlow sourcestep = new StepSourceFlow(node,time,forward);
 					path.append(sourcestep);
 				}
 				//read a sinkstep
 				if(step[0].trim().equals("sink")){
 					Id nodeid = new IdImpl(step[1].trim());
-					Node node = network.getNodes().get(nodeid);
+					IndexedNodeI node = settings.getNetwork().getIndexedNode(nodeid);
 					int time = Integer.valueOf(step[2].trim());
 					boolean forward = Boolean.valueOf(step[3].trim());
 					StepSinkFlow sinkstep =new StepSinkFlow(node,time,forward);
@@ -288,7 +290,8 @@ public class MultiSourceEAF {
 				//read a edgestep
 				if(step[0].trim().equals("edge")){
 					Id edgeid = new IdImpl(step[1].trim());
-					Link link = network.getLinks().get(edgeid);
+					IndexedLinkI link = settings.getNetwork().getIndexedLink(edgeid);	
+					
 					int starttime = Integer.valueOf(step[2].trim());
 					int endtime = Integer.valueOf(step[3].trim());
 					boolean forward = Boolean.valueOf(step[4].trim());
@@ -1078,9 +1081,9 @@ public class MultiSourceEAF {
 		settings = new FlowCalculationSettings();
 		settings.setNetwork(network);
 		settings.setDemands(demands);
-		settings.whenAvailable = whenAvailable;
+		settings.setWhenAvailable(whenAvailable);
 		
-		settings.supersink = sink;
+		settings.supersink = settings.getNetwork().getIndexedNode(sink);
 		settings.timeStep = timeStep; // default 1
 		settings.flowFactor = flowFactor; // default 1.0
 
@@ -1133,7 +1136,7 @@ public class MultiSourceEAF {
 		List<TimeExpandedPath> flowpaths = null;
 		if (flowfile != null) {
 			try {
-			flowpaths = readPathFlow(network, flowfile);
+			flowpaths = readPathFlow(settings, network, flowfile);
 			} catch(Exception e) {
 				e.printStackTrace();
 				return;
@@ -1168,8 +1171,8 @@ public class MultiSourceEAF {
 		System.out.println(fluss.arrivalsToString());
 		System.out.println(fluss.arrivalPatternToString());
 		System.out.println("unsatisfied demands:");
-		for (Node node : fluss.getDemands().keySet()){
-			int demand = fluss.getDemands().get(node);
+		for (IndexedNodeI node : fluss.getSources()){
+			int demand = fluss.getDemands()[node.getIndex()];
 			if (demand > 0) {
 				// this can be a lot of text				
 				//System.out.println("node:" + node.getId().toString()+ " demand:" + demand);
@@ -1214,8 +1217,8 @@ public class MultiSourceEAF {
 		System.out.println(fluss.arrivalsToString());
 		System.out.println(fluss.arrivalPatternToString());
 		System.out.println("unsatisfied demands:");
-		for (Node node : fluss.getDemands().keySet()){
-			int demand = fluss.getDemands().get(node);
+		for (IndexedNodeI node : fluss.getSources()){
+			int demand = fluss.getDemands()[node.getIndex()];
 			if (demand > 0) {
 				// this can be a lot of text				
 				//System.out.println("node:" + node.getId().toString()+ " demand:" + demand);

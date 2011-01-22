@@ -1,8 +1,7 @@
 package playground.dressler.ea_flow;
 
-import org.matsim.api.core.v01.Id;
-
 import playground.dressler.Interval.VertexInterval;
+import playground.dressler.network.IndexedNodeI;
 
 public class BFTask {
 	final public int time;
@@ -10,7 +9,7 @@ public class BFTask {
 	final public VirtualNode node;
 	final public boolean reverse; 
 	public int depth = 0;
-	public Id origin = null;
+	public IndexedNodeI origin = null;
 	
 	
 	BFTask(VirtualNode node, VertexInterval oldival, boolean rev){

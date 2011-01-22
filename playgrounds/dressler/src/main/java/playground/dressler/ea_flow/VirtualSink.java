@@ -20,13 +20,13 @@ package playground.dressler.ea_flow;
  *                                                                         *
  * *********************************************************************** */
 
-import org.matsim.api.core.v01.network.Node;
+import playground.dressler.network.IndexedNodeI;
 
 public class VirtualSink extends VirtualNode {
    //public int time;
-   public Node node;
+   public IndexedNodeI node;
    
-   VirtualSink (Node node) {
+   VirtualSink (IndexedNodeI node) {
 	   this.node = node;
    }
    
@@ -36,7 +36,7 @@ public class VirtualSink extends VirtualNode {
    }
    
    @Override
-   public Node getRealNode() {
+   public IndexedNodeI getRealNode() {
 	   return this.node;
    }
   
@@ -56,7 +56,7 @@ public class VirtualSink extends VirtualNode {
    
    @Override
    public String toString() {
-     return "Virtual Sink " + node.getId().toString();	   
+     return "Virtual Sink " + node.getMatsimNode().getId().toString();	   
    }
    
    @Override
