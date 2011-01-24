@@ -134,14 +134,17 @@ public class PseudoRemovePriorityQueue<E> {
 
 			final Iterator<E> iterDelegate = PseudoRemovePriorityQueue.this.lastEntry.keySet().iterator();
 
+			@Override
 			public boolean hasNext() {
 				return this.iterDelegate.hasNext();
 			}
 
+			@Override
 			public E next() {
 				return this.iterDelegate.next();
 			}
 
+			@Override
 			public void remove() {
 				throw new UnsupportedOperationException();
 			}
@@ -161,6 +164,7 @@ public class PseudoRemovePriorityQueue<E> {
 
 	/*package*/ static class PseudoComparator<T> implements Comparator<PseudoEntry<T>>, Serializable {
 		private static final long serialVersionUID = 1L;
+		@Override
 		public int compare(final PseudoEntry<T> o1, final PseudoEntry<T> o2) {
 			return Double.compare(o1.priority, o2.priority);
 		}
