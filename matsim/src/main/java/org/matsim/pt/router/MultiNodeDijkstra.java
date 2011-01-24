@@ -83,10 +83,10 @@ public class MultiNodeDijkstra extends Dijkstra {
 				// seems we have no more nodes left, but not yet reached all endNodes...
 				endNodes.clear();
 			} else {
+				DijkstraNodeData data = getData(outNode);
 				if (endNodes.contains(outNode)) {
 					endNodes.remove(outNode);
 					foundNodes.add(outNode);
-					DijkstraNodeData data = getData(outNode);
 					InitialNode initData = toNodes.get(outNode);
 					double cost = data.getCost() + initData.initialCost;
 					if (cost < minCost) {
@@ -94,7 +94,6 @@ public class MultiNodeDijkstra extends Dijkstra {
 						minCostNode = outNode;
 					}
 				}
-				DijkstraNodeData data = getData(outNode);
 				if (data.getCost() > minCost) {
 					endNodes.clear(); // we can't get any better now
 				} else {
