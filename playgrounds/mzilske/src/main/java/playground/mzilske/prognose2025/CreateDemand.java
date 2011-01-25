@@ -34,7 +34,7 @@ private static final String GV_NETWORK_FILENAME = "/Users/michaelzilske/workspac
 	
 	private static final String LANDKREISE = "/Users/michaelzilske/workspace/prognose_2025/osm_zellen/landkreise.shp";
 	
-	private static final String OUTPUT_POPULATION_FILENAME = "/Users/michaelzilske/workspace/prognose_2025/demand/naechster_versuch.xml";
+	private static final String OUTPUT_POPULATION_FILENAME = "/Users/michaelzilske/workspace/detailedEval/pop/pendlerVerkehr/pendlerverkehr_10pct_dhdn_gk4.xml.gz";
 	
 	private static boolean isCoordInShape(Coord linkCoord, Set<Feature> features, GeometryFactory factory) {
 		boolean found = false;
@@ -106,8 +106,8 @@ private static final String GV_NETWORK_FILENAME = "/Users/michaelzilske/workspac
 		
 //		personMerger.setSink(personVerschmiererTask);
 //		personVerschmiererTask.setSink(router);
-		populationBuilder.setSink(populationWriter);
-		
+		populationBuilder.setSink(personVerschmiererTask);
+		personVerschmiererTask.setSink(populationWriter);
 		
 		pvMatrixReader.run();
 //		gvPopulationReaderTask.run();

@@ -67,7 +67,7 @@ public class PopulationGenerator implements TripFlowSink {
 
 	private Activity createHome(Coord homeLocation, double travelTimeOffset) {
 		Activity activity = populationFactory.createActivityFromCoord("home", homeLocation);
-		activity.setEndTime(calculateRandomEndTime(8*60*60) + travelTimeOffset);
+		activity.setEndTime(calculateRandomEndTime(7*60*60) + travelTimeOffset);
 		return activity;
 	}
 
@@ -79,8 +79,8 @@ public class PopulationGenerator implements TripFlowSink {
 
 		//Box-Muller-Method in order to get a normally distributed variable
 		double normal = Math.cos(2 * Math.PI * r1) * Math.sqrt(-2 * Math.log(r2));
-		//linear transformation in order to optain N[i,7200²]
-		double endTimeInSec = 120 * 60 * normal + i;
+		//linear transformation in order to optain N[i,3600²]
+		double endTimeInSec = 60 * 60 * normal + i;
 		return endTimeInSec;
 	}
 

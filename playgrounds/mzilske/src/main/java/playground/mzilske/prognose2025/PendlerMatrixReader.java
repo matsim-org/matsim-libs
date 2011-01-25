@@ -160,7 +160,7 @@ public class PendlerMatrixReader {
 //	}
 
 	private int scale(int quantityOut) {
-		int scaled = (int) (quantityOut * 0.01 );
+		int scaled = (int) (quantityOut * 0.1 );
 		return scaled;
 	}
 
