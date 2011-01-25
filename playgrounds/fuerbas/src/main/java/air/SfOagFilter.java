@@ -26,13 +26,17 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class SfOagFilter {
 
 	/** @author fuerbas
 	 * @throws IOException 
 	 * Filters the OAG Schedule Data to include intra-European flights only.
-	 * Work in progress...
+	 * 
+	 * Einbauen in eine Kopie: OsmAerowayParser bzw. SfOsm2Matsim, sodass nur Flughäfen, die in Osm
+	 * enthalten sind in die Flugliste übernommen werden.
 	 */
 	public static void main(String[] args) throws IOException {
 		
@@ -51,32 +55,69 @@ public class SfOagFilter {
 		
 		BufferedReader br = new BufferedReader(new FileReader(new File(input)));
 		BufferedWriter bw = new BufferedWriter(new FileWriter(new File(output)));
+		Map<String, String> flights = new HashMap<String, String>();
+		String flight = "";
+		int lines = 0;
 		
 		while (br.ready()) {
 			String oneLine = br.readLine();
 			String[] lineEntries = new String[81];
 			lineEntries = oneLine.split(",");
-
-			String orig = lineEntries[6];
-			String dest = lineEntries[9];
-			boolean origin = false; boolean destination = false;
 			
-			for (int ii=0; ii<euroCountries.length; ii++) {
-				if (orig.contains(euroCountries[ii])) origin=true;
-				if (dest.contains(euroCountries[ii])) destination=true;
+		if (lines>0) {
+
+			for (int jj=0; jj<81; jj++){
+				lineEntries[jj]=lineEntries[jj].replaceAll("\"", "");
 			}
 			
+				String orig = lineEntries[6];
+				String dest = lineEntries[9];
+				String hours = lineEntries[13].substring(1, 3);
+				String minutes = lineEntries[13].substring(3);
+				System.out.println(hours);
+				System.out.println(minutes);
+				double durationMinutes = Double.parseDouble(minutes)*60;	//convert flight dur minutes into seconds
+				double durationHours = Double.parseDouble(hours)*3600;
+				double duration = durationHours+durationMinutes;
+				boolean origin = false; boolean destination = false;
 			
-			if (origin && destination) {
-			if (lineEntries[47].contains("O")) {
+				for (int ii=0; ii<euroCountries.length; ii++) {
+					if (orig.contains(euroCountries[ii])) origin=true;
+					if (dest.contains(euroCountries[ii])) destination=true;
+				}
 			
-				bw.write(lineEntries[0]+"\t"+lineEntries[1]+"\t"+lineEntries[4]+"\t"
-						+lineEntries[7]+"\t"+lineEntries[10]+"\t"+lineEntries[11]+"\t"
-						+lineEntries[13]+"\t"+lineEntries[14]+"\t"+lineEntries[20]+"\t"
-						+lineEntries[23]+"\t"+lineEntries[42]);
-				bw.newLine();
+			
+				if (origin && destination) {
+					if (lineEntries[47].contains("O")) {
+				
+						flight=lineEntries[0]+lineEntries[1];
+						int seatsAvail = Integer.parseInt(lineEntries[23]);
+				
+						if (lineEntries[14].contains("2") && !flights.containsKey(flight) && seatsAvail>0) {
+							bw.write(
+									lineEntries[4]+lineEntries[7]+"\t"+		//TransitRoute
+									lineEntries[4]+lineEntries[7]+"_"+lineEntries[0]+"\t"+	//TransitLine
+									lineEntries[0]+lineEntries[1]+"\t"+		//vehicleId
+									lineEntries[0]+"\t"+	//carrier code
+									lineEntries[1]+"\t"+	//flt number
+									lineEntries[4]+"\t"+	//departure arpt
+									lineEntries[7]+"\t"+	//arrival arpt
+									lineEntries[10]+"\t"+	//departure time (24h)
+									lineEntries[11]+"\t"+	//arrival time
+									duration+"\t"+	//journey time (HHHMM)
+//									lineEntries[14]+"\t"+	//ops days
+									lineEntries[21]+"\t"+	//aircraft
+									lineEntries[23]+"\t"+	//seats avail
+									lineEntries[42]);		//distance (statute miles)
+							flights.put(flight, "");
+							bw.newLine();
+						}
+					}
 				}
 			}
+		
+		lines++;
+		
 		}
 		
 		br.close();
