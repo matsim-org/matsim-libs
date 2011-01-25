@@ -73,7 +73,9 @@ public class JbOsmReader {
 //		osmReader.setHierarchyLayer(52.04382,13.499222, 51.258248,14.887619, 1);
 		
 //		used for BA:		
+		//spree neisse
 		osmReader.setHierarchyLayer( 52.045199,14.115944, 51.551772,14.817009, 1);
+		//cottbus innenstadt
 		osmReader.setHierarchyLayer(51.820578,14.247866, 51.684789,14.507332, 2);
 
 		try {
