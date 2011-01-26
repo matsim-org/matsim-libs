@@ -96,7 +96,7 @@ public class TransportChainBuilder {
 		if(openPickUp){
 			throw new IllegalStateException("A pickUp is still open.");
 		}
-		if(lastDelivery.getLocation() != lastDelivery.getShipment().getTo()){
+		if(!lastDelivery.getLocation().equals(lastDelivery.getShipment().getTo())){
 			throw new IllegalStateException("Final delivery must be at destination of shipment.");
 		}
 		return new TransportChain(shipment,chainElements);

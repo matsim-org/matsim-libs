@@ -46,11 +46,11 @@ public class Shipment {
 		this.deliveryTimeWindow = deliveryTimeWindow;
 	}
 
-	Id getFrom() {
+	public Id getFrom() {
 		return from;
 	}
 
-	Id getTo() {
+	public Id getTo() {
 		return to;
 	}
 
