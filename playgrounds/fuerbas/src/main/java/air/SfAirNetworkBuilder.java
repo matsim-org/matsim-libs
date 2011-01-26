@@ -2,7 +2,6 @@ package air;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
@@ -28,6 +27,7 @@ public class SfAirNetworkBuilder {
 		
 		BufferedReader brAirports = new BufferedReader(new FileReader(new File("/home/soeren/workspace/OsmTest.txt")));
 		BufferedReader brRoutes = new BufferedReader(new FileReader(new File("/home/soeren/workspace/cityPairs.txt")));
+		
 		
 		while (brAirports.ready()) {
 			String oneLine = brAirports.readLine();
@@ -65,7 +65,7 @@ public class SfAirNetworkBuilder {
 
 		
 		new NetworkWriter(network).write(output + ".xml.gz");
-		System.out.println("Done! Unprocessed MATSim Network saved as " + output + ".xml.gz");
+		System.out.println("Done! Unprocessed MATSim Network saved as " + output + ".xml");
 		
 		brAirports.close();
 		brRoutes.close();
