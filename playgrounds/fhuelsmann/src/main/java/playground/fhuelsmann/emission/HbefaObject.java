@@ -1,6 +1,7 @@
+package playground.fhuelsmann.emission;
 /* *********************************************************************** *
  * project: org.matsim.*
- * BKickControler
+ * FhMain.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,7 +18,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.fhuelsmann.emission; 
+
 /**
 
 

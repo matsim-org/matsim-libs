@@ -1,3 +1,4 @@
+package playground.fhuelsmann.emission;
 /* *********************************************************************** *
  * project: org.matsim.*
  * FhMain.java
@@ -18,7 +19,6 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.fhuelsmann.emission;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Network;
@@ -32,12 +32,14 @@ public class Main {
 	public static void main (String[] args) throws Exception{
 
 	
-		String eventsFile = "../../detailedEval/teststrecke/sim/output/20090707/ITERS/it.0/0.events.txt.gz";
+		String eventsFile = "../../detailedEval/teststrecke/sim/output/20090319/ITERS/it.0/0.events.txt.gz";
 		String netfile ="../../detailedEval/teststrecke/sim/input/network.xml";
 //		String visumRoadFile = "../../detailedEval/teststrecke/sim/inputEmissions/visumnetzlink.txt";
 		String visumRoadHebefaRoadFile = "../../detailedEval/teststrecke/sim/inputEmissions/road_types.txt";
-		String Hbefa_Traffic = "../../detailedEval/teststrecke/sim/inputEmissions/hbefa_emission_factors.txt";
-
+		String Hbefa_Traffic = "../../detailedEval/teststrecke/sim/inputEmissions/hbefa_emission_factors_EU3_D.txt";
+		String Hbefa_Cold_Traffic = "../../detailedEval/teststrecke/sim/inputEmissions/hbefa_coldstart_emission_factors.txt";
+		
+		
 		//create an event object
 		EventsManager events = new EventsManagerImpl();	
 		
@@ -53,34 +55,46 @@ public class Main {
 	
 		
 		//add the handler
-		//events.addHandler(handler);
 		events.addHandler(handler);
-
-
+		
+		hbefaColdTable hbefaColdTable = new hbefaColdTable();
+		hbefaColdTable.makeHbefaColdTable(Hbefa_Cold_Traffic);
+		hbefaColdTable.printHbefaCold();
+		
+		
 		//create the reader and read the file
 		MatsimEventsReader matsimEventReader = new MatsimEventsReader(events);
 		
 		matsimEventReader.readFile(eventsFile);
-	
+			
 		//for cold start emissions 
-	//	handler.printTable();
-	//	handler.printTable2();
-	
-	
+		//handler.printTable();
+		//handler.printTable2();
+		ColdEmissionFactor em = 
+			new ColdEmissionFactor(handler.coldDistance,handler.parkingTime,hbefaColdTable.getHbefaColdTable());
+		
+		em.MapForColdEmissionFactor();
+		em.printColdEmissionFactor();
+		
+	/*
 		
 		HbefaTable hbefaTable = new HbefaTable();
 		hbefaTable.makeHabefaTable(Hbefa_Traffic);
+		
+//		hbefaColdTable hbefaColdTable = new hbefaColdTable();
+//		hbefaColdTable.makeHbefaColdTable(Hbefa_Cold_Traffic);
+//		hbefaColdTable.printHbefaCold();
 		HbefaVisum hbefaVisum = new HbefaVisum(handler.getTravelTimes());
 		hbefaVisum.creatRoadTypes(visumRoadHebefaRoadFile);
-	//	hbefaVisum.printHbefaVisum();
+		hbefaVisum.printHbefaVisum();
 		hbefaVisum.createMapWithHbefaRoadTypeNumber();	
 		
 		EmissionFactor emissionFactor = new EmissionFactor(hbefaVisum.map,hbefaTable.getHbefaTableWithSpeedAndEmissionFactor());
 		emissionFactor.createEmissionTables();
 		emissionFactor.createEmissionFile();
-	//	emissionFactor.printEmissionTable();
+//		emissionFactor.printEmissionTable();
 		
 		
-		}
+		*/}
 	}	
 	
