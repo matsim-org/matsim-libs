@@ -63,8 +63,8 @@ public class MyGantryComparator {
 		log.info(" Links Ids from: " + mgc.linkIdFile.getAbsolutePath());
 		
 		mgc.compareTotalCount();
-		mgc.writeComparisonToFile(args[3]);
-//		mgc.writeComparisonToDbf(args[3]);
+//		mgc.writeComparisonToFile(args[3]);
+		mgc.writeComparisonToDbf(args[3]);
 		
 		log.info("---------------------------------------------------------------------------");
 		log.info("                                Completed");
@@ -130,7 +130,7 @@ public class MyGantryComparator {
 		Field id = new Field("linkId", Type.NUMBER, 10, 0);
 		Field base = new Field("baseCount", Type.NUMBER, 10, 0);
 		Field comp = new Field("compCount", Type.NUMBER, 10, 0);
-		Field change = new Field("change", Type.NUMBER, 6, 4);
+		Field change = new Field("change", Type.NUMBER, 10, 4);
 		
 		List<Field> fields = new ArrayList<Field>();
 		fields.add(id);
@@ -153,7 +153,7 @@ public class MyGantryComparator {
 					map.put("linkId", vId);
 					map.put("baseCount", vBase);
 					map.put("compCount", vComp);
-//					map.put("change", vChange);
+					map.put("change", vChange);
 					t.addRecord(new Record(map));
 				}
 			} catch (DbfLibException e) {

@@ -69,7 +69,7 @@ public class SanralTollTravelCostCalculator implements PersonalizableTravelCost 
 			if (cost == null) {
 				return 0.0;
 			}
-			return cost.amount * link.getLength() * SanralTollFactor.getTollFactor(person.getId());
+			return cost.amount * link.getLength() * SanralTollFactor.getTollFactor(person.getId(), link.getId(), time);
 		}
 	}
 
@@ -94,7 +94,7 @@ public class SanralTollTravelCostCalculator implements PersonalizableTravelCost 
 			if (cost == null) {
 				return 0.0;
 			}
-			return cost.amount * SanralTollFactor.getTollFactor(person.getId());
+			return cost.amount * SanralTollFactor.getTollFactor(person.getId(), link.getId(), time);
 		}
 	}
 

@@ -170,7 +170,7 @@ public class SanralCalcPaidToll implements LinkEnterEventHandler, AgentWait2Link
 			Cost baseCost = SanralCalcPaidToll.this.scheme.getLinkCost(link.getId(),
 					event.getTime());
 			if (baseCost != null) {
-				double newToll = link.getLength() * baseCost.amount * SanralTollFactor.getTollFactor(event.getPersonId());
+				double newToll = link.getLength() * baseCost.amount * SanralTollFactor.getTollFactor(event.getPersonId(), link.getId(), event.getTime());
 				AgentInfo info = SanralCalcPaidToll.this.agents.get(event.getPersonId());
 				if (info == null) {
 					info = new AgentInfo();
@@ -192,7 +192,7 @@ public class SanralCalcPaidToll implements LinkEnterEventHandler, AgentWait2Link
 				if (info == null) {
 					info = new AgentInfo();
 					SanralCalcPaidToll.this.agents.put(event.getPersonId(), info);
-					info.toll = baseCost.amount * SanralTollFactor.getTollFactor(event.getPersonId());
+					info.toll = baseCost.amount * SanralTollFactor.getTollFactor(event.getPersonId(), link.getId(), event.getTime());
 				}
 			}
 		}
@@ -217,7 +217,7 @@ public class SanralCalcPaidToll implements LinkEnterEventHandler, AgentWait2Link
 				} else if (!info.insideCordonArea) {
 					// agent was outside before, now inside the toll area --> agent has to pay
 					info.insideCordonArea = true;
-					info.toll += baseCost.amount * SanralTollFactor.getTollFactor(event.getPersonId());
+					info.toll += baseCost.amount * SanralTollFactor.getTollFactor(event.getPersonId(), link.getId(), event.getTime());
 				}
 			} else {
 				// this is a link outside the toll area.

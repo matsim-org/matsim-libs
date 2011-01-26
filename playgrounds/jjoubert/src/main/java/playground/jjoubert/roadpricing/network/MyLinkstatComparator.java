@@ -66,6 +66,8 @@ public class MyLinkstatComparator {
 	 *  	above which differences are recorded and written to file. 
 	 *  <li> <b>minimumLanes</b> indicating what the minimum number of lanes are
 	 *  	that should be considered in the comparison.
+	 *  <li> <b>network</b> absolute pathname of the <code>network.xml.gz</code> 
+	 *  	file used in link comparisons. 
 	 * </ol>
 	 */
 	public static void main(String[] args) {
@@ -117,7 +119,7 @@ public class MyLinkstatComparator {
 	 * @param compareFile absolute path of the <code>linkstats.txt.gz</code> file
 	 * 		compared to the baseline file.
 	 * @param compareField the <i>correct</i> description of the field that will be
-	 * 		used as the basis for the comparison, for example <code>"HRS5-6avg"
+	 * 		used as the basis for the comparison, for example <code>"HRS5-6avg"</code>
 	 * 		to indicate the average number of vehicles on each link between 05:00
 	 * 		and 06:00 in the morning. 
 	 */
