@@ -50,6 +50,7 @@ public class RunM2U {
 	private static final Logger log = Logger.getLogger(RunM2U.class);
 
 	/**
+	 * 
 	 * @param args
 	 */
 	public static void main(String[] args) {
