@@ -16,6 +16,7 @@ public class MATSimAirport {
 		this.coord=coord;
 	}
 	
+	@SuppressWarnings("deprecation")
 	public void createRunways(Network network) {
 		
 //		Node mit IATA als Zentrales Element, Link mit IATA Code an Node,
