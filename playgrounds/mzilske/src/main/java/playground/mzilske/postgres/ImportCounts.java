@@ -41,7 +41,7 @@ import org.xml.sax.SAXException;
 
 public class ImportCounts {
 
-	private static final String COUNTS_FILE_PREFIX = "../../detailedEval/counts/counts";
+	private static final String COUNTS_FILE_PREFIX = "../detailedEval/counts/counts";
 
 	private void parseCounts() throws IOException {
 
@@ -52,7 +52,7 @@ public class ImportCounts {
 			DatabaseMetaData dbmd = connection.getMetaData();
 			System.out.println("Connection to " + dbmd.getDatabaseProductName() + " " + dbmd.getDatabaseProductVersion() + " successful.\n");
 			final Statement statement = connection.createStatement();
-			final PreparedStatement statement2 = connection.prepareStatement("select messstellen.messstelle, messstellen.richtung, h, sum, links.link_id from counts_by_hour, messstellen, links " +
+			final PreparedStatement statement2 = connection.prepareStatement("select messstellen.messstelle, messstellen.richtung, hour, sum, links.link_id from counts_by_hour, messstellen, links " +
 					"where counts_by_hour.messstelle = messstellen.messstelle and counts_by_hour.richtung = messstellen.richtung and messstellen.link_id = links.link_id and counts_by_hour.date = ? ");
 
 			ResultSet rs = statement.executeQuery("select distinct date from counts_by_hour");

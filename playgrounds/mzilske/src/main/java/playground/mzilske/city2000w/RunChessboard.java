@@ -6,6 +6,7 @@ package playground.mzilske.city2000w;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -37,6 +38,7 @@ import playground.mzilske.freight.CarrierPlan;
 import playground.mzilske.freight.CarrierVehicle;
 import playground.mzilske.freight.Carriers;
 import playground.mzilske.freight.Contract;
+import playground.mzilske.freight.HyperNetworkBuilder;
 import playground.mzilske.freight.Shipment;
 import playground.mzilske.freight.TSPAgentTracker;
 import playground.mzilske.freight.TSPCapabilities;
@@ -259,6 +261,20 @@ public class RunChessboard implements StartupListener, ScoringListener, Replanni
 		createInitialPlans(tsp);
 		transportServiceProviders = new TransportServiceProviders();
 		transportServiceProviders.getTransportServiceProviders().add(tsp);
+		createHyperNetwork(tsp);
+	}
+
+	private void createHyperNetwork(TransportServiceProviderImpl tsp) {
+		Collection<Id> locations = new HashSet<Id>();
+		for (TSPContract contract : tsp.getContracts()) {
+			for (TSPShipment shipment : contract.getShipments()) {
+				locations.add(shipment.getFrom());
+				locations.add(shipment.getTo());
+			}
+		}
+		
+		HyperNetworkBuilder hnb = new HyperNetworkBuilder(tsp.getTspCapabilities(), locations, carriers);
+		
 	}
 
 	private void createInitialPlans(TransportServiceProviderImpl tsp) {

@@ -45,7 +45,8 @@ public class MinimumDepotDistanceToDestinationTSPPlanBuilder {
 					CarrierImpl carrier = pickCarrier(transshipmentCentre);
 					chainBuilder.scheduleLeg(carrier.getId());
 					chainBuilder.scheduleDelivery(transshipmentCentre, new TimeWindow(0.0,24*3600));
-					chainBuilder.schedulePickup(transshipmentCentre, new TimeWindow(1800,24*3600));
+					// chainBuilder.schedulePickup(transshipmentCentre, new TimeWindow(1800,24*3600)); // works
+					chainBuilder.schedulePickup(transshipmentCentre, new TimeWindow(120,24*3600)); // too early
 				}
 				CarrierImpl carrier = pickCarrier(s.getTo());
 				chainBuilder.scheduleLeg(carrier.getId());

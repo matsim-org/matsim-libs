@@ -114,4 +114,18 @@ public class TransportChainBuilder {
 	private Delivery createDelivery(TSPShipment shipment, Id location, TimeWindow timeWindow) {
 		return new Delivery(shipment,location,timeWindow);
 	}
+
+	public void schedule(ChainElement chainElement) {
+		if (chainElement instanceof PickUp) {
+			PickUp pickup = (PickUp) chainElement;
+			schedulePickup(pickup.getLocation(), pickup.getTimeWindow());
+		} else if (chainElement instanceof Delivery) {
+			Delivery delivery = (Delivery) chainElement;
+			scheduleDelivery(delivery.getLocation(), delivery.getTimeWindow());
+		} else if (chainElement instanceof ChainLeg) {
+			ChainLeg chainLeg = (ChainLeg) chainElement;
+			scheduleLeg(chainLeg.getCarrierId(), chainLeg.getDuration());
+		}
+	}
+	
 }
