@@ -57,9 +57,9 @@ public class SanralIntegrationTest {
 
 		Assert.assertEquals("expected 3 money events", 3, events.size());
 
-		double amount1 = SanralTollFactor.getTollFactor(new IdImpl(1));
-		double amount2 = SanralTollFactor.getTollFactor(new IdImpl(1000000));
-		double amount3 = SanralTollFactor.getTollFactor(new IdImpl(2000000));
+		double amount1 = SanralTollFactor.getTollFactor(new IdImpl(1), new IdImpl(2), 22000);
+		double amount2 = SanralTollFactor.getTollFactor(new IdImpl(1000000), new IdImpl(2), 22000);
+		double amount3 = SanralTollFactor.getTollFactor(new IdImpl(2000000), new IdImpl(2), 22000);
 
 		Assert.assertEquals(-2 * amount1, events.get(0).getAmount(), 1e-8);
 		Assert.assertEquals(-2 * amount2, events.get(1).getAmount(), 1e-8);

@@ -22,6 +22,8 @@ package playground.jjoubert.Utilities;
 
 import org.matsim.testcases.MatsimTestCase;
 
+import playground.jjoubert.Utilities.MyXmlConverter;
+
 public class MyXmlConverterTest extends MatsimTestCase{
 
 	/**

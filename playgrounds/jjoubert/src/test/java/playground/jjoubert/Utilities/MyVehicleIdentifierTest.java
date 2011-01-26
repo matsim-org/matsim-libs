@@ -24,6 +24,8 @@ import java.util.List;
 
 import org.matsim.testcases.MatsimTestCase;
 
+import playground.jjoubert.Utilities.MyVehicleIdentifier;
+
 
 public class MyVehicleIdentifierTest extends MatsimTestCase{
 	

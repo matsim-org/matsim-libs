@@ -35,6 +35,9 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
 import org.xml.sax.SAXException;
 
+import playground.jjoubert.Utilities.MyOsmNetworkCleaner;
+import playground.jjoubert.Utilities.MyShapefileReader;
+
 import com.vividsolutions.jts.geom.MultiPolygon;
 
 
