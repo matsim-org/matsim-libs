@@ -48,10 +48,10 @@ public class MATSimAirport {
 		
 		network.addLink(network.getFactory().createLink(idApron, idApron, idApronEnd));
 		
-		network.addLink(network.getFactory().createLink(idTaxiIn, idApron, idTaxiIn));
+		network.addLink(network.getFactory().createLink(idTaxiIn, idTaxiIn, idApron));
 		network.addLink(network.getFactory().createLink(idTaxiOut, idApron, idTaxiOut));
 		
-		network.addLink(network.getFactory().createLink(idRunwayIn, idTaxiIn, idRunwayIn));
+		network.addLink(network.getFactory().createLink(idRunwayIn, idRunwayIn, idTaxiIn));
 		network.addLink(network.getFactory().createLink(idRunwayOut, idTaxiOut, idRunwayOut));
 	}
 
