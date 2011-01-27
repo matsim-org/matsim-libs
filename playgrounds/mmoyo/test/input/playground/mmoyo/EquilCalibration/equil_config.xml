@@ -29,7 +29,7 @@
 	<module name="controler">
 		<param name="outputDirectory" value="&OUTPUTBASE;" />
 		<param name="firstIteration" value="1" />  
-		<param name="lastIteration" value="10" />
+		<param name="lastIteration" value="50" />
 		<param name="writeEventsInterval" value="1" />
 	</module>
 
@@ -51,10 +51,10 @@
 	</module>
 	
 	<module name="strategy">
-		<param name="maxAgentPlanMemorySize" value="4" /> <!-- 0 means unlimited -->
+		<param name="maxAgentPlanMemorySize" value="3" /> <!-- 0 means unlimited -->
  		
 		<param name="ModuleProbability_1" value="1.0" />
-		<param name="Module_1" value="playground.mmoyo.ptRouterAdapted.replanning.AdapTimeMut_ReRouteStrategy"/>
+		<param name="Module_1" value="playground.mmoyo.cadyts_integration.ptBseAsPlanStrategy.NewPtBsePlanStrategy" />
 
 		<!-- 
  		<param name="ModuleProbability_1" value="0.0" />
@@ -97,6 +97,15 @@
 		<param name="learningRate" value="1.0" />
 		<param name="BrainExpBeta" value="2.0" />
 
+		<param name="lateArrival" value="1e-9" />      <!-- Warning: score function is turned off here -->
+		<param name="earlyDeparture" value="1e-9" />
+		<param name="performing" value="1e-9" />
+		<param name="traveling" value="1e-9" />
+		<param name="travelingPt" value="1e-9" />
+		<param name="travelingWalk" value="1e-9" />
+		<param name="waiting" value="1e-9" />
+
+		<!-- 		
 		<param name="lateArrival" value="-18" />
 		<param name="earlyDeparture" value="-0" />
 		<param name="performing" value="+6" />
@@ -104,18 +113,19 @@
 		<param name="travelingPt" value="-3" />
 		<param name="travelingWalk" value="-18" />
 		<param name="waiting" value="-0" />
+		-->
 		
 		<param name="activityType_0"            value="h" /> 
 		<param name="activityPriority_0"        value="1" />
-		<param name="activityTypicalDuration_0" value="12:00:00" />
-		<param name="activityMinimalDuration_0" value="18:00:00" />
+		<param name="activityTypicalDuration_0" value="06:00:00" />
+		<param name="activityMinimalDuration_0" value="00:10:00" />
 		<param name="activityOpeningTime_0"	value="00:00:00" />
 		<param name="activityClosingTime_0"     value="24:00:00" />
 	
 		<param name="activityType_1"            value="w" /> 
 		<param name="activityPriority_1"        value="1" />
-		<param name="activityTypicalDuration_1" value="08:00:00" />
-		<param name="activityMinimalDuration_1" value="06:00:00" />
+		<param name="activityTypicalDuration_1" value="09:00:00" />
+		<param name="activityMinimalDuration_1" value="02:00:00" />
 		<param name="activityOpeningTime_0"		value="07:00:00" />
 		<param name="activityClosingTime_1"     value="24:00:00" />	
 	</module>
@@ -129,11 +139,11 @@
 	</module>	
 	
 	<module name="bse">
-		<param name="startTime" value="6" />
+		<param name="startTime" value="4" />
 		<param name="endTime" value="20" />
 		<param name="regressionInertia" value="0.95"/>
 		<param name="minFlowStddevVehH" value="8"/>  <!-- 8,9,10 -->
-		
+		<param name="useBruteForce" value="true"/>
 		<!-- 
 		<param name="preparatoryIterations" value="20"/>
 		<param name="freezeIteration" value="200" /> 
@@ -150,8 +160,8 @@
 		
 		<param name="outputformat" value="kml" /> 
   		<param name="distanceFilter" value="30000.0" /> 
-  		<param name="countsScaleFactor" value="50" />
-  		<param name="distanceFilterCenterNode" value="801030.0" />  
+  		<param name="countsScaleFactor" value="1" />
+  		<param name="distanceFilterCenterNode" value="7.0" />  
 	</module>
 		
 </config>

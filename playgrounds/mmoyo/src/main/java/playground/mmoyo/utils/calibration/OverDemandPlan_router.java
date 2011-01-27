@@ -33,7 +33,7 @@ import playground.mmoyo.utils.PlansMerger;
 
 /**
  *  -reads a base plan 
- *  -routes it with a given number of paramater combinations
+ *  -routes it with a given number of parameter combinations
  *  -creates it over-estimated version (agent add stay-home plan and the agent is cloned) 
  *  -calibrates it if wanted
  */
@@ -48,14 +48,6 @@ public class OverDemandPlan_router {
 		this.config = this.scenario.getConfig();
 		
 		myTransitRouterConfig = new MyTransitRouterConfig();
-		MyTransitRouterConfig myTransitRouterConfig = new MyTransitRouterConfig();
-		myTransitRouterConfig.searchRadius = 600.0;
-		myTransitRouterConfig.extensionRadius = 200.0;
-		myTransitRouterConfig.beelineWalkConnectionDistance = 300.0;
-		myTransitRouterConfig.fragmentPlans = false;
-		myTransitRouterConfig.noCarPlans= true;
-		myTransitRouterConfig.allowDirectWalks= true;
-		myTransitRouterConfig.compressPlan = true;
 	}
 	
 	/**
@@ -79,7 +71,7 @@ public class OverDemandPlan_router {
 			adaptedLauncher.set_betaWalk(Double.parseDouble(strComb2[0]));
 			adaptedLauncher.set_betaDistance(Double.parseDouble(strComb2[1]));
 			adaptedLauncher.set_betaTransfer(Double.parseDouble(strComb2[2]));
-			routedPlanArray[i] = adaptedLauncher.route(myTransitRouterConfig);
+			routedPlanArray[i] = adaptedLauncher.route();
 			adaptedLauncher= null;
 		}
 		

@@ -9,14 +9,17 @@
 	</module>
 	
 	<module name="network">
-		<param name="inputNetworkFile" value="src/main/java/playground/mmoyo/demo/X5/network.xml" />
+		<!-- <param name="inputNetworkFile" value="src/main/java/playground/mmoyo/demo/X5/network.xml" />  -->
+		<param name="inputNetworkFile" value="src/main/java/playground/mmoyo/demo/X5/network.xml"/>
 	</module>
 	
 	<module name="plans">
+		<!-- <param name="inputPlansFile" value="src/main/java/playground/mmoyo/demo/X5/simplePlan1/plansFile.xml" /> -->
 		<param name="inputPlansFile" value="src/main/java/playground/mmoyo/demo/X5/simplePlan1/plansFile.xml" />
 	</module>
 
 	<module name="controler">
+		<!-- <param name="outputDirectory" value="test/output/playground/mmoyo/AdaptedRouterTest" /> -->
 		<param name="outputDirectory" value="test/output/playground/mmoyo/AdaptedRouterTest" />
 		<param name="firstIteration" value="-1" />
 		<param name="lastIteration" value="0" />
@@ -26,38 +29,16 @@
 	<module name="qsim" >
 		<param name="startTime" value="00:00:00" />
 		<param name="endTime" value="30:00:00" />
-		
 		<param name="snapshotperiod" value="00:00:00" />
 		<param name="snapshotFormat"	value = "otfvis"/> 
-		<!-- snapshotStyle: `equidist' (vehicles equidistant on link) or `queue' (vehicles queued at end of link) -->
  		<param name="snapshotStyle"	value = "queue"/> 
-		
 		<param name="flowCapacityFactor" value="0.02" />
 		<param name="storageCapacityFactor" value="0.06" />
-		
 		<param name="stuckTime" value="10.0" />
 		<param name="removeStuckVehicles" value="no" />
-		
-		<!-- Use number of threads > 1 for parallel version using the specified number of threads -->
 		<param name="numberOfThreads" value="1" />
-		
 	</module>
 
-<!-- 	<module name="simulation">
-		<param name="startTime" value="00:00:00" />
-		<param name="endTime" value="22:00:00" />
-		
-		<param name = "snapshotperiod"	value = "00:00:00"/>
- 		<param name = "snapshotFormat"	value = "otfvis"/> 
- 		<param name = "snapshotStyle"	value = "queue"/> 
- 		
- 		<param name = "flowCapacityFactor"	value = "0.1"/>
- 		<param name = "storageCapacityFactor"	value = "0.30"/>
-		
-		<param name="stuckTime" value="10" />
-		<param name="removeStuckVehicles" value="no" />
-	</module> -->
-	
 	<module name="strategy">
 		<param name="maxAgentPlanMemorySize" value="4" /> <!-- 0 means unlimited -->
 
@@ -66,12 +47,6 @@
 	
 		<param name="ModuleProbability_2" value="0.1" />
 		<param name="Module_2" value="ReRoute" />
-	<!--	
-		<param name="ModuleProbability_3" value="0.1" />
-		<param name="Module_3" value="ChangeLegMode" />
--->
-<!-- 		<param name="ModuleProbability_3" value="0.1" />
-		<param name="Module_3" value="TimeAllocationMutator" /> -->
 	</module>
 	
 	<module name="changeLegMode">
@@ -83,7 +58,10 @@
 	</module>
 
 	<module name="transit">
-		<param name="transitScheduleFile" value="src/main/java/playground/mmoyo/demo/X5/simplePlan1/simple1TransitSchedule.xml" />
+		<!--  <param name="transitScheduleFile" value="src/main/java/playground/mmoyo/demo/X5/simplePlan1/simple1TransitSchedule.xml" /> -->
+		<param name="transitScheduleFile" value="src/main/java/playground/mmoyo/demo/X5/simplePlan1/simple1TransitSchedule.xml" />		
+		
+		<!-- <param name="vehiclesFile" value="src/main/java/playground/mmoyo/demo/X5/vehicles.xml" />  -->
 		<param name="vehiclesFile" value="src/main/java/playground/mmoyo/demo/X5/vehicles.xml" />
 		<param name="transitModes" value="pt" />
 	</module>
@@ -205,5 +183,18 @@
   		<param name="distanceFilterCenterNode" value="801030" /> 
   	</module>
 	-->
+
+	<module name="ptRouter">
+		<param name="searchRadius" value="600.0" />
+		<param name="extensionRadius" value="200.0" /> 
+		<param name="beelineWalkConnectionDistance" value="300.0" />
+		<param name="allowDirectWalks" value="true" />
+		<param name="minIniStations" value="2" />
+
+		<param name="walkValue" value="6.0" />
+		<param name="distanceValue" value="0.7" />
+		<param name="transferValue" value="240" />
+		<param name="timeValue" value="6.0" />
+	</module>
 	
 </config>

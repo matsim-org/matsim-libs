@@ -15,9 +15,6 @@ public class MyTransitRouterConfig extends TransitRouterConfig {
 
 	//additional config variables
 	public boolean allowDirectWalks = true;					//if a direct walk has a lower cost than the pt connection
-	public boolean noCarPlans = true;						//if only car plans will be omitted
-	public boolean fragmentPlans = true;					//if routed ptplans will be cut in every connection
-	public boolean compressPlan = true;						//if ouput plans will be compressed in gz format
 	public int minStationsNum= 2; 							//minimal number of stations to find, before start the routing
 	public String scenarioName = null;						//name of scenario or parameter set
 

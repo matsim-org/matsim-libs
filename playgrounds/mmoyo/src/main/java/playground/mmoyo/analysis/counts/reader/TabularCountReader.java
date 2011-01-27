@@ -21,25 +21,18 @@ package playground.mmoyo.analysis.counts.reader;
 
 import java.io.IOException;
 
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.CountsWriter;
-import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
-import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
-import org.xml.sax.SAXException;
+
+import playground.mmoyo.utils.DataLoader;
 
 /**Reads a tabular text with pt counts saved as ANSI. **/
 public class TabularCountReader implements TabularFileHandler {
@@ -54,33 +47,15 @@ public class TabularCountReader implements TabularFileHandler {
 	final String ZERO = "0.0";
 	final String POINT = ".";
 
-	TransitSchedule transitSchedule;
+	private final TransitSchedule transitSchedule;
 
-	public TabularCountReader(final String countName, final String countLayer) {
+	public TabularCountReader(final String countName, final TransitSchedule transitSchedule) {
 		this.tabFileParserConfig = new TabularFileParserConfig();
 		this.tabFileParserConfig.setDelimiterTags(new String[] {"\t"});
+		this.transitSchedule = transitSchedule;
 		counts.setName(countName);
 		counts.setDescription("counts values from BVG 09.2009");
 		counts.setYear(2009);
-	}
-
-	private void setTransitSchedule(final String transitScheddulePath, final String ptNetworkPath){
-		ScenarioImpl scenario = new ScenarioImpl();
-		NetworkImpl network = scenario.getNetwork();
-		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
-		this.transitSchedule = builder.createTransitSchedule();
-
-		/* **************reads the transitSchedule file********* */
-		new MatsimNetworkReader(scenario).readFile(ptNetworkPath);
-		try {
-			new TransitScheduleReaderV1(this.transitSchedule, network, scenario).readFile(transitScheddulePath);
-		} catch (SAXException e){
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e){
-			e.printStackTrace();
-		}
 	}
 
 	@Override
@@ -133,8 +108,8 @@ public class TabularCountReader implements TabularFileHandler {
 
 	public static void main(String[] args) throws IOException {
 		String tabularFile = "../playgrounds/mmoyo/output/@counts/1.txt";           //<-change
-		TabularCountReader countReader = new TabularCountReader("occupancy counts", "layer0") ;   //<-set name
-		countReader.setTransitSchedule("../shared-svn/studies/countries/de/berlin-bvg09/pt/nullfall_berlin_brandenburg/input/pt_transitSchedule.xml.gz", "../shared-svn/studies/countries/de/berlin-bvg09/pt/nullfall_berlin_brandenburg/input/pt_network.xml.gz");
+		TransitSchedule transitSchedule = new DataLoader().readTransitSchedule("../shared-svn/studies/countries/de/berlin-bvg09/pt/nullfall_berlin_brandenburg/input/pt_network.xml.gz", "../shared-svn/studies/countries/de/berlin-bvg09/pt/nullfall_berlin_brandenburg/input/pt_transitSchedule.xml.gz");
+		TabularCountReader countReader = new TabularCountReader("occupancy counts", transitSchedule) ;   //<-set name
 		countReader.readFile(tabularFile);
 		countReader.writeCounts("../playgrounds/mmoyo/output/@counts/counts.xml");   //<-output file name
 		System.out.println("done.");

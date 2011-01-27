@@ -19,8 +19,8 @@ xsi:noNamespaceSchemaLocation="http://matsim.org/files/dtd/counts_v1.xsd"
 		<volume h="12" val="0.00" />
 		<volume h="13" val="0.00" />
 		<volume h="14" val="0.00" />
-		<volume h="15" val="00.00" />
-		<volume h="16" val="50.00" />
+		<volume h="15" val="0.00" />
+		<volume h="16" val="0.00" />
 		<volume h="17" val="0.00" />
 		<volume h="18" val="0.00" />
 		<volume h="19" val="0.00" />
@@ -343,8 +343,8 @@ xsi:noNamespaceSchemaLocation="http://matsim.org/files/dtd/counts_v1.xsd"
 		<volume h="12" val="0.00" />
 		<volume h="13" val="0.00" />
 		<volume h="14" val="0.00" />
-		<volume h="15" val="00.00" />
-		<volume h="16" val="50.00" />
+		<volume h="15" val="0.00" />
+		<volume h="16" val="0.00" />
 		<volume h="17" val="0.00" />
 		<volume h="18" val="0.00" />
 		<volume h="19" val="0.00" />

@@ -61,6 +61,8 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
+//import playground.mmoyo.cadyts_integration.ptBseAsPlanStrategy.analysis.PtBseCountsComparisonAlgorithm;
+//import playground.mmoyo.cadyts_integration.ptBseAsPlanStrategy.analysis.PtBseOccupancyAnalyzer;
 import playground.mmoyo.cadyts_integration.ptBseAsPlanStrategy.analysis.PtBseCountsComparisonAlgorithm;
 import playground.mmoyo.cadyts_integration.ptBseAsPlanStrategy.analysis.PtBseOccupancyAnalyzer;
 import playground.mmoyo.utils.DataLoader;
@@ -86,7 +88,7 @@ public class NewPtBsePlanStrategy implements PlanStrategy,
 	private final static String MODULE_NAME = "ptCounts";
 	private final static String BSE_MOD_NAME = "bse";
 	private MATSimUtilityModificationCalibrator<TransitStopFacility> calibrator = null;
-	private static double countsScaleFactor = 1 ;  // not so great
+	private static double countsScaleFactor /*=1*/;  // not so great
 	private final Counts occupCounts = new Counts();
 	private final Counts boardCounts = new Counts();
 	private final Counts alightCounts = new Counts();
@@ -134,9 +136,11 @@ public class NewPtBsePlanStrategy implements PlanStrategy,
 		}
 		countsScaleFactor = Double.parseDouble(this.controler.getConfig().getParam("ptCounts", "countsScaleFactor"));
 
-
+		controler.getScenario().addScenarioElement(this.occupCounts) ;
 	}
 
+	
+	
 	@Override
 	public void reset(int iteration) {
 		String filename = this.controler.getControlerIO().getIterationFilename(iteration, "linkCostOffsets.xml") ;
@@ -284,7 +288,8 @@ public class NewPtBsePlanStrategy implements PlanStrategy,
 				}
 			}
 
-			matsimCalibrator.setStatisticsFile("calibration-stats.txt");
+			//set statistic file in output directory
+			matsimCalibrator.setStatisticsFile(config.controler().getOutputDirectory() + "calibration-stats.txt");
 
 			// SET countsScale
 			//double countsScaleFactor = config.counts().getCountsScaleFactor(); this is for private autos and we don't have this parameter in config file
@@ -492,6 +497,15 @@ public class NewPtBsePlanStrategy implements PlanStrategy,
 			}
 		}
 	}
-
-
+	
+	public final String getCalibratorSettings() {
+		return	"[BruteForce=" + this.calibrator.getBruteForce() + "]" +
+				"[CenterRegression=" + this.calibrator.getCenterRegression() + "]" +
+				"[FreezeIteration=" + this.calibrator.getFreezeIteration() + "]" +
+				"[MinStddev=" + this.calibrator.getMinStddev(SingleLinkMeasurement.TYPE.FLOW_VEH_H) + "]" +
+				"[PreparatoryIterations=" + this.calibrator.getPreparatoryIterations() + "]" +
+				"[RegressionInertia=" + this.calibrator.getRegressionInertia() + "]" +
+				"[VarianceScale=" + this.calibrator.getVarianceScale() + "]";
+	}
+	
 }

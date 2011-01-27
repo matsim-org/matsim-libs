@@ -1,8 +1,10 @@
 package playground.mmoyo;
 
+import org.junit.Assert;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 
 import playground.mmoyo.ptRouterAdapted.AdaptedTransitRouter;
 import playground.mmoyo.ptRouterAdapted.AdaptedTransitRouterNetworkTravelTimeCost;
@@ -15,36 +17,23 @@ public class AdaptedRouterTest extends MatsimTestCase {
 	public void testEquil() {
 		String configFile = "test/input/playground/mmoyo/AdaptedRouterTest/5x5config.xml";
 		MyTransitRouterConfig myConfig = new MyTransitRouterConfig();
-
-		//variables from superclass
-		myConfig.searchRadius = 600.0;
-		myConfig.extensionRadius = 300.0;
-		myConfig.beelineWalkConnectionDistance = 300.0;
-		myConfig.beelineWalkSpeed = 4.0/3.6;
-		myConfig.marginalUtilityOfTravelTimeWalk = -6.0 / 3600.0;
-		myConfig.marginalUtilityOfTravelTimeTransit = -6.0 / 3600.0;
-		myConfig.marginalUtilityOfTravelDistanceTransit = -0.0;
-		myConfig.costLineSwitch = 60.0 * -myConfig.marginalUtilityOfTravelTimeTransit;
-
-		//variables from instance
-		myConfig.allowDirectWalks= true;
-		myConfig.noCarPlans= true;
-		myConfig.fragmentPlans = false;
-		myConfig.compressPlan = true;
-		myConfig.minStationsNum= 2;
-		myConfig.scenarioName= "test";
-
+		
 		ScenarioImpl scenarioImpl = new DataLoader ().loadScenarioWithTrSchedule(configFile);
 		AdaptedTransitRouterNetworkTravelTimeCost adaptedTravelTimeCost = new AdaptedTransitRouterNetworkTravelTimeCost(myConfig);
-		AdaptedTransitRouter adaptedTransitRouter = new AdaptedTransitRouter(myConfig, scenarioImpl.getTransitSchedule());
+		AdaptedTransitRouter adaptedTransitRouter = new AdaptedTransitRouter(new MyTransitRouterConfig(), scenarioImpl.getTransitSchedule());
 
 		//only transit links without transfer
 		double accumTime=28800;  //8:00am first departure
+		final String msg = "";
 		for (Link link : adaptedTransitRouter.getTransitRouterNetwork().getLinks().values()){
 			double travelCost = adaptedTravelTimeCost.getLinkGeneralizedTravelCost(link, accumTime);
 			double travelTime = adaptedTravelTimeCost.getLinkTravelTime(link, accumTime);
-			assertEquals(travelCost, -travelTime * myConfig.marginalUtilityOfTravelTimeTransit - link.getLength() * myConfig.marginalUtilityOfTravelDistanceTransit);
+			Assert.assertEquals(msg , travelCost, -travelTime * myConfig.marginalUtilityOfTravelTimeTransit - link.getLength() * myConfig.marginalUtilityOfTravelDistanceTransit , MatsimTestUtils.EPSILON);
 			accumTime += travelTime;
 		}
+		
+		//test travel parameter values coming from config file
+		String str_expected = "[beelineWalkConnectionDistance=100.0][beelineWalkSpeed=0.8333333333333333][costLineSwitch=0.1][extensionRadius=200.0][marginalUtilityOfTravelDistanceTransit=-0.0][marginalUtilityOfTravelTimeTransit=-0.0016666666666666668][marginalUtilityOfTravelTimeWalk=-0.0016666666666666668][searchRadius=1000.0]";
+		Assert.assertEquals("travel parameters are different as in config file" , adaptedTransitRouter.toString(), str_expected );
 	}
 }

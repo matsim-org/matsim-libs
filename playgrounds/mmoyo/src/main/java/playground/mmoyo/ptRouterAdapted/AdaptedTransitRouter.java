@@ -182,5 +182,17 @@ public class AdaptedTransitRouter extends TransitRouterImpl {
 		return network;
 	}
 
+	@Override
+	public final String toString() {
+		return 	"[beelineWalkConnectionDistance=" + this.getConfig().beelineWalkConnectionDistance + "]" +
+				"[beelineWalkSpeed=" + this.getConfig().beelineWalkSpeed + "]" +
+				"[costLineSwitch=" + this.getConfig().costLineSwitch + "]" +
+				"[extensionRadius=" + this.getConfig().extensionRadius + "]" +
+				"[marginalUtilityOfTravelDistanceTransit=" + this.getConfig().marginalUtilityOfTravelDistanceTransit + "]" +
+				"[marginalUtilityOfTravelTimeTransit=" + this.getConfig().marginalUtilityOfTravelTimeTransit + "]" +
+				"[marginalUtilityOfTravelTimeWalk=" + this.getConfig().marginalUtilityOfTravelTimeWalk + "]" +
+				"[searchRadius=" + this.getConfig().searchRadius + "]" ;
+	}
+	
 	// the procedures with * were adapted
 }

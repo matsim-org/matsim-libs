@@ -2,14 +2,128 @@
 <!DOCTYPE plans SYSTEM "http://www.matsim.org/files/dtd/plans_v4.dtd">
 <plans>
 	<person id="1">
-	<plan>
-		<act type="h" link="1" x="-25000" y="0" start_time="00:00:00" end_time="06:00:00" />
-		<leg mode="pt">
-		</leg>
-		<act type="w" link="20" x="10000" y="0"  start_time="08:00:00" dur="06:00:00" />
-		<leg mode="pt">
-		</leg>
-		<act type="h" link="1" x="-25000" y="0"  start_time="18:00:00"/>
-	</plan>
-</person>
+
+		<plan selected="yes">
+			<act type="h" link="1" x="-25000.0" y="0.0" start_time="00:00:00" end_time="06:00:00" />
+			<leg mode="transit_walk" trav_time="00:02:00">
+				<route>
+					
+				</route>
+			</leg>
+			<act type="pt interaction" link="1" x="-24900.0" y="0.0" dur="00:00:00" />
+			<leg mode="pt" trav_time="00:20:00">
+				<route>
+					PT1===stop0===Bus6===Bus6.H===stop12 
+				</route>
+			</leg>
+			<act type="pt interaction" link="20" x="9900.0" y="0.0" dur="00:00:00" />
+			<leg mode="transit_walk" trav_time="00:02:00">
+				<route>
+					
+				</route>
+			</leg>
+			<act type="w" link="20" x="10000.0" y="0.0" start_time="08:00:00" dur="06:00:00" />
+			<leg mode="transit_walk" trav_time="00:02:00">
+				<route>
+					
+				</route>
+			</leg>
+			<act type="pt interaction" link="20" x="9900.0" y="0.0" dur="00:00:00" />
+			<leg mode="pt" trav_time="00:58:00">
+				<route>
+					PT1===stop12===Bus3===Bus3.R===stop0 
+				</route>
+			</leg>
+			<act type="pt interaction" link="1" x="-24900.0" y="0.0" dur="00:00:00" />
+			<leg mode="transit_walk" trav_time="00:02:00">
+				<route>
+					
+				</route>
+			</leg>
+			<act type="h" link="1" x="-25000.0" y="0.0" start_time="18:00:00" />
+		</plan>
+
+	<plan selected="no">
+			<act type="h" link="1" x="-25000.0" y="0.0" start_time="00:00:00" end_time="06:00:00" />
+			<leg mode="transit_walk" trav_time="00:02:00">
+				<route>
+					
+				</route>
+			</leg>
+			<act type="pt interaction" link="1" x="-24900.0" y="0.0" dur="00:00:00" />
+			<leg mode="pt" trav_time="00:20:00">
+				<route>
+					PT1===stop0===Bus2===Bus2.H===stop12 
+				</route>
+			</leg>
+			<act type="pt interaction" link="20" x="9900.0" y="0.0" dur="00:00:00" />
+			<leg mode="transit_walk" trav_time="00:02:00">
+				<route>
+					
+				</route>
+			</leg>
+			<act type="w" link="20" x="10000.0" y="0.0" start_time="08:00:00" dur="06:00:00" />
+			<leg mode="transit_walk" trav_time="00:02:00">
+				<route>
+					
+				</route>
+			</leg>
+			<act type="pt interaction" link="20" x="9900.0" y="0.0" dur="00:00:00" />
+			<leg mode="pt" trav_time="00:58:00">
+				<route>
+					PT1===stop12===Bus3===Bus3.R===stop0 
+				</route>
+			</leg>
+			<act type="pt interaction" link="1" x="-24900.0" y="0.0" dur="00:00:00" />
+			<leg mode="transit_walk" trav_time="00:02:00">
+				<route>
+					
+				</route>
+			</leg>
+			<act type="h" link="1" x="-25000.0" y="0.0" start_time="18:00:00" />
+		</plan>
+		
+		<plan selected="no">
+			<act type="h" link="1" x="-25000.0" y="0.0" start_time="00:00:00" end_time="06:00:00" />
+			<leg mode="transit_walk" trav_time="00:02:00">
+				<route>
+					
+				</route>
+			</leg>
+			<act type="pt interaction" link="1" x="-24900.0" y="0.0" dur="00:00:00" />
+			<leg mode="pt" trav_time="00:20:00">
+				<route>
+					PT1===stop0===B-M44===B-M44.101.H===stop12 
+				</route>
+			</leg>
+			<act type="pt interaction" link="20" x="9900.0" y="0.0" dur="00:00:00" />
+			<leg mode="transit_walk" trav_time="00:02:00">
+				<route>
+					
+				</route>
+			</leg>
+			<act type="w" link="20" x="10000.0" y="0.0" start_time="08:00:00" dur="06:00:00" />
+			<leg mode="transit_walk" trav_time="00:02:00">
+				<route>
+					
+				</route>
+			</leg>
+			<act type="pt interaction" link="20" x="9900.0" y="0.0" dur="00:00:00" />
+			<leg mode="pt" trav_time="00:58:00">
+				<route>
+					PT1===stop12===Bus3===Bus3.R===stop0 
+				</route>
+			</leg>
+			<act type="pt interaction" link="1" x="-24900.0" y="0.0" dur="00:00:00" />
+			<leg mode="transit_walk" trav_time="00:02:00">
+				<route>
+					
+				</route>
+			</leg>
+			<act type="h" link="1" x="-25000.0" y="0.0" start_time="18:00:00" />
+		</plan>
+
+
+	</person> 
+	
 </plans>

@@ -53,9 +53,9 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import playground.mmoyo.cadyts_integration.ptBseAsPlanStrategy.analysis.PtBseOccupancyAnalyzer;
-import playground.mmoyo.utils.DataLoader;
 import playground.mmoyo.utils.PtRouteUtill;
 import cadyts.demand.PlanBuilder;
+
 class PtPlanToPlanStepBasedOnEvents implements PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler,
 VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler
 {
@@ -87,9 +87,6 @@ VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler
 		this.net = sc.getNetwork();
 		
 		this.schedule = ((ScenarioImpl) sc).getTransitSchedule() ;
-		
-		//DataLoader loader = new DataLoader();
-		//this.schedule = loader.readTransitSchedule(sc.getConfig().findParam("network", "inputNetworkFile"), sc.getConfig().findParam("transit", "transitScheduleFile"));
 		
 		NET = this.net ;
 		SCHEDULE = this.schedule ;

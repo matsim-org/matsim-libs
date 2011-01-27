@@ -45,14 +45,14 @@ import org.matsim.pt.counts.SimpleWriter;
 import org.xml.sax.SAXException;
 
 /**
- * 
+ *   Collects occupancy data of M44-line stations 
  *
  */
 public class PtBseOccupancyAnalyzer implements PersonEntersVehicleEventHandler, 
 										PersonLeavesVehicleEventHandler, 
 										VehicleArrivesAtFacilityEventHandler,
 										VehicleDepartsAtFacilityEventHandler{ 
-	boolean onlyM44 = true;
+
 	private final int timeBinSize, maxSlotIndex;
 	private final double maxTime;
 	private Map<Id, int[]> occupancies;  //Map< stopFacilityId,value[]>

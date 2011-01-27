@@ -4,110 +4,57 @@
 <transitSchedule>
 
 	<transitStops>
-		<stopFacility id="stop1" x="-24900.0" y="0.0" linkRefId="1" />
-		<stopFacility id="stop2" x="-15000" y="0" linkRefId="1" />
-		<stopFacility id="stop3" x="-865" y="5925" linkRefId="2" />
-		<stopFacility id="stop4" x="-2498" y="4331" linkRefId="3" />
-		<stopFacility id="stop5" x="-3829" y="3215" linkRefId="4" />
-		<stopFacility id="stop6" x="-4698" y="1711" linkRefId="5" />
-		<stopFacility id="stop7" x="-5000" y="0" linkRefId="6" />
-		<stopFacility id="stop8" x="-4698" y="-1711" linkRefId="7" />
-		<stopFacility id="stop9" x="-3829" y="-3215" linkRefId="8" />
-		<stopFacility id="stop10" x="-2498" y="-4331" linkRefId="9" />
-		<stopFacility id="stop11" x="-865" y="-5925" linkRefId="10" />
-		<stopFacility id="stop12" x="0" y="0" linkRefId="15" />
-		<stopFacility id="stop13" x="9900.0" y="0.0" linkRefId="20" />
-		<stopFacility id="stop14" x="5000" y="-10000" linkRefId="21" />
-		<stopFacility id="stop15" x="-20000" y="-10000" linkRefId="22" />
+		<stopFacility id="stop0" x="-24900.0" y="0.0" linkRefId="1" />
+		<stopFacility id="stop1" x="-15000" y="0" linkRefId="1" />
+		<stopFacility id="stop2" x="-865" y="5925" linkRefId="2" />
+		<stopFacility id="stop3" x="-2498" y="4331" linkRefId="3" />
+		<stopFacility id="stop4" x="-3829" y="3215" linkRefId="4" />
+		<stopFacility id="stop5" x="-4698" y="1711" linkRefId="5" />
+		<stopFacility id="stop6" x="-4698.0" y="1711.0" linkRefId="6" />
+		<stopFacility id="stop7" x="-5000.0" y="0.0" linkRefId="7" />
+		<stopFacility id="stop8" x="-4698.0" y="-1711.0" linkRefId="8" />
+		<stopFacility id="stop9" x="-2498" y="-4331" linkRefId="9" />
+		<stopFacility id="stop10" x="-865" y="-5925" linkRefId="10" />
+		<stopFacility id="stop11" x="-865.0" y="-5925.0" linkRefId="20" />
+		<stopFacility id="stop12" x="9900.0" y="0.0" linkRefId="20" />
+		<stopFacility id="stop13" x="5000" y="-10000" linkRefId="21" />
+		<stopFacility id="stop14" x="-20000" y="-10000" linkRefId="22" />
 	</transitStops>
 
-	<transitLine id="Bus1">
-		<transitRoute id="Bus1.H">
-			<description></description>
-			<transportMode>bus</transportMode>
-			<routeProfile>
-				<stop refId="stop1" departureOffset="00:00:00" />
-				<stop refId="stop2" departureOffset="00:05:00" />
-				<stop refId="stop7" departureOffset="00:10:00" />
-				<stop refId="stop12" departureOffset="00:15:00" />
-				<stop refId="stop13" arrivalOffset="00:20:00" />
-			</routeProfile>
-			
-			<route>
-				<link refId="1" />
-				<link refId="6" />
-				<link refId="15" />
-				<link refId="20" />
-			</route>
-
-			<departures>
-				<departure id="H1.1" departureTime="05:50:00" vehicleRefId="tr_0" />
-				<departure id="H1.2" departureTime="06:00:00" vehicleRefId="tr_1" />
-				<departure id="H1.3" departureTime="06:10:00" vehicleRefId="tr_2" />
-				<departure id="H1.4" departureTime="06:20:00" vehicleRefId="tr_3" />
-				<departure id="H1.5" departureTime="08:00:00" vehicleRefId="tr_4" />
-			</departures>
-		</transitRoute>
-	
-		<transitRoute id="Bus1.R">
-			<description></description>
-			<transportMode>bus</transportMode>
-			<routeProfile>
-				<stop refId="stop13" departureOffset="00:00:00" />
-				<stop refId="stop1" arrivalOffset="00:10:00" />
-			</routeProfile>
-			
-			<route>
-				<link refId="20" />
-				<link refId="21" />
-				<link refId="22" />
-				<link refId="23" />
-				<link refId="1" />
-			</route>
-
-			<departures>
-				<departure id="1R.1" departureTime="14:50:00" vehicleRefId="tr_0" />
-				<departure id="1R.2" departureTime="15:00:00" vehicleRefId="tr_1" />
-				<departure id="1R.3" departureTime="15:10:00" vehicleRefId="tr_2" />
-				<departure id="1R.4" departureTime="15:20:00" vehicleRefId="tr_3" />
-			</departures>
-		</transitRoute>
-	</transitLine>
- 	 
- 	<transitLine id="Bus2">
+	<transitLine id="Bus2">
 		<transitRoute id="Bus2.H">
 			<description></description>
 			<transportMode>bus</transportMode>
 			<routeProfile>
-				<stop refId="stop1" departureOffset="00:00:00" />
-				<stop refId="stop2" departureOffset="00:05:00" />
-				<stop refId="stop3" departureOffset="00:10:00" /> <!--the difference-->
-				<stop refId="stop12" departureOffset="00:15:00" />
-				<stop refId="stop13" arrivalOffset="00:20:00" />
+				<stop refId="stop0" departureOffset="00:00:00" />
+				<stop refId="stop1" departureOffset="00:05:00" />
+				<stop refId="stop2" departureOffset="00:10:00" />
+				<stop refId="stop11" departureOffset="00:15:00" />
+				<stop refId="stop12" arrivalOffset="00:20:00" />
 			</routeProfile>
 			
 			<route>
 				<link refId="1" />
-				<link refId="2" />  <!-- the  --> 
-				<link refId="11" /> <!--difference-->
+				<link refId="2" />
+				<link refId="11" />
 				<link refId="20" />
 			</route>
 
 			<departures>
-				<departure id="2H.1" departureTime="05:51:00" vehicleRefId="tr_5" />
-				<departure id="2H.2" departureTime="06:01:00" vehicleRefId="tr_6" />
-				<departure id="2H.3" departureTime="06:11:00" vehicleRefId="tr_7" />
-				<departure id="2H.4" departureTime="06:21:00" vehicleRefId="tr_8" />
-				<departure id="2H.5" departureTime="08:01:00" vehicleRefId="tr_9" />
+				<departure id="B2.1" departureTime="05:50:00" vehicleRefId="tr_0" />
+				<departure id="B2.2" departureTime="06:00:00" vehicleRefId="tr_1" />
+				<departure id="B2.3" departureTime="06:10:00" vehicleRefId="tr_2" />
+				<departure id="B2.4" departureTime="06:20:00" vehicleRefId="tr_3" />
+				<departure id="B2.5" departureTime="08:00:00" vehicleRefId="tr_4" />
 			</departures>
 		</transitRoute>
-
+	
 		<transitRoute id="Bus2.R">
 			<description></description>
 			<transportMode>bus</transportMode>
 			<routeProfile>
-				<stop refId="stop13" departureOffset="00:00:00" />
-				<stop refId="stop1" arrivalOffset="00:10:00" />
+				<stop refId="stop12" departureOffset="00:00:00" />
+				<stop refId="stop0" arrivalOffset="00:10:00" />
 			</routeProfile>
 			
 			<route>
@@ -119,40 +66,39 @@
 			</route>
 
 			<departures>
-				<departure id="2R.1" departureTime="14:50:00" vehicleRefId="tr_5" />
-				<departure id="2R.2" departureTime="15:00:00" vehicleRefId="tr_6" />
-				<departure id="2R.3" departureTime="15:10:00" vehicleRefId="tr_7" />
-				<departure id="2R.4" departureTime="15:20:00" vehicleRefId="tr_8" />
+				<departure id="B2R.1" departureTime="14:50:00" vehicleRefId="tr_0" />
+				<departure id="B2R.2" departureTime="15:00:00" vehicleRefId="tr_1" />
+				<departure id="B2R.3" departureTime="15:10:00" vehicleRefId="tr_2" />
+				<departure id="B2R.4" departureTime="15:20:00" vehicleRefId="tr_3" />
 			</departures>
 		</transitRoute>
 	</transitLine>
- 	
- 	
+ 	 
  	<transitLine id="Bus3">
 		<transitRoute id="Bus3.H">
 			<description></description>
 			<transportMode>bus</transportMode>
 			<routeProfile>
-				<stop refId="stop1" departureOffset="00:00:00" />
-				<stop refId="stop2" departureOffset="00:05:00" />
-				<stop refId="stop4" departureOffset="00:10:00" /> <!--the difference-->
-				<stop refId="stop12" departureOffset="00:15:00" />
-				<stop refId="stop13" arrivalOffset="00:20:00" />
+				<stop refId="stop0" departureOffset="00:00:00" />
+				<stop refId="stop1" departureOffset="00:05:00" />
+				<stop refId="stop3" departureOffset="00:10:00" /> <!--the difference-->
+				<stop refId="stop11" departureOffset="00:15:00" />
+				<stop refId="stop12" arrivalOffset="00:20:00" />
 			</routeProfile>
 			
 			<route>
 				<link refId="1" />
-				<link refId="3" />  <!-- the  --> 
-				<link refId="12" /> <!--difference-->
+				<link refId="3" />  <!-- the  --> <!--difference--> 
+				<link refId="12" /> 
 				<link refId="20" />
 			</route>
 
 			<departures>
-				<departure id="3H.1" departureTime="05:52:00" vehicleRefId="tr_10" />
-				<departure id="3H.2" departureTime="06:02:00" vehicleRefId="tr_11" />
-				<departure id="3H.3" departureTime="06:12:00" vehicleRefId="tr_12" />
-				<departure id="3H.4" departureTime="06:22:00" vehicleRefId="tr_13" />
-				<departure id="3H.5" departureTime="08:02:00" vehicleRefId="tr_14" />
+				<departure id="B3H.1" departureTime="05:50:00" vehicleRefId="tr_5" />
+				<departure id="B3H.2" departureTime="06:00:00" vehicleRefId="tr_6" />
+				<departure id="B3H.3" departureTime="06:10:00" vehicleRefId="tr_7" />
+				<departure id="B3H.4" departureTime="06:20:00" vehicleRefId="tr_8" />
+				<departure id="B3H.5" departureTime="08:00:00" vehicleRefId="tr_9" />
 			</departures>
 		</transitRoute>
 
@@ -160,8 +106,8 @@
 			<description></description>
 			<transportMode>bus</transportMode>
 			<routeProfile>
-				<stop refId="stop13" departureOffset="00:00:00" />
-				<stop refId="stop1" arrivalOffset="00:10:00" />
+				<stop refId="stop12" departureOffset="00:00:00" />
+				<stop refId="stop0" arrivalOffset="00:10:00" />
 			</routeProfile>
 			
 			<route>
@@ -173,24 +119,25 @@
 			</route>
 
 			<departures>
-				<departure id="3R.1" departureTime="14:50:00" vehicleRefId="tr_10" />
-				<departure id="3R.2" departureTime="15:00:00" vehicleRefId="tr_11" />
-				<departure id="3R.3" departureTime="15:10:00" vehicleRefId="tr_12" />
-				<departure id="3R.4" departureTime="15:20:00" vehicleRefId="tr_13" />
+				<departure id="B3R.1" departureTime="14:50:00" vehicleRefId="tr_5" />
+				<departure id="B3R.2" departureTime="15:00:00" vehicleRefId="tr_6" />
+				<departure id="B3R.3" departureTime="15:10:00" vehicleRefId="tr_7" />
+				<departure id="B3R.4" departureTime="15:20:00" vehicleRefId="tr_8" />
 			</departures>
 		</transitRoute>
 	</transitLine>
+ 	
  	
  	<transitLine id="Bus4">
 		<transitRoute id="Bus4.H">
 			<description></description>
 			<transportMode>bus</transportMode>
 			<routeProfile>
-				<stop refId="stop1" departureOffset="00:00:00" />
-				<stop refId="stop2" departureOffset="00:05:00" />
-				<stop refId="stop5" departureOffset="00:10:00" /> <!--the difference-->
-				<stop refId="stop12" departureOffset="00:15:00" />
-				<stop refId="stop13" arrivalOffset="00:20:00" />
+				<stop refId="stop0" departureOffset="00:00:00" />
+				<stop refId="stop1" departureOffset="00:05:00" />
+				<stop refId="stop4" departureOffset="00:10:00" /> <!--the difference-->
+				<stop refId="stop11" departureOffset="00:15:00" />
+				<stop refId="stop12" arrivalOffset="00:20:00" />
 			</routeProfile>
 			
 			<route>
@@ -201,11 +148,11 @@
 			</route>
 
 			<departures>
-				<departure id="4H.1" departureTime="05:53:00" vehicleRefId="tr_15" />
-				<departure id="4H.2" departureTime="06:03:00" vehicleRefId="tr_16" />
-				<departure id="4H.3" departureTime="06:13:00" vehicleRefId="tr_17" />
-				<departure id="4H.4" departureTime="06:23:00" vehicleRefId="tr_18" />
-				<departure id="4H.5" departureTime="08:03:00" vehicleRefId="tr_19" />
+				<departure id="B4.1" departureTime="05:50:00" vehicleRefId="tr_10" />
+				<departure id="B4.2" departureTime="06:00:00" vehicleRefId="tr_11" />
+				<departure id="B4.3" departureTime="06:10:00" vehicleRefId="tr_12" />
+				<departure id="B4.4" departureTime="06:20:00" vehicleRefId="tr_13" />
+				<departure id="B4.5" departureTime="08:00:00" vehicleRefId="tr_14" />
 			</departures>
 		</transitRoute>
 
@@ -213,8 +160,8 @@
 			<description></description>
 			<transportMode>bus</transportMode>
 			<routeProfile>
-				<stop refId="stop13" departureOffset="00:00:00" />
-				<stop refId="stop1" arrivalOffset="00:10:00" />
+				<stop refId="stop12" departureOffset="00:00:00" />
+				<stop refId="stop0" arrivalOffset="00:10:00" />
 			</routeProfile>
 			
 			<route>
@@ -226,24 +173,24 @@
 			</route>
 
 			<departures>
-				<departure id="4R.1" departureTime="14:50:00" vehicleRefId="tr_15" />
-				<departure id="4R.2" departureTime="15:00:00" vehicleRefId="tr_16" />
-				<departure id="4R.3" departureTime="15:10:00" vehicleRefId="tr_17" />
-				<departure id="4R.4" departureTime="15:20:00" vehicleRefId="tr_18" />
+				<departure id="B4R.1" departureTime="14:50:00" vehicleRefId="tr_10" />
+				<departure id="B4R.2" departureTime="15:00:00" vehicleRefId="tr_11" />
+				<departure id="B4R.3" departureTime="15:10:00" vehicleRefId="tr_12" />
+				<departure id="B4R.4" departureTime="15:20:00" vehicleRefId="tr_13" />
 			</departures>
 		</transitRoute>
 	</transitLine>
-	
-	<transitLine id="Bus5">
+ 	
+ 	<transitLine id="Bus5">
 		<transitRoute id="Bus5.H">
 			<description></description>
 			<transportMode>bus</transportMode>
 			<routeProfile>
-				<stop refId="stop1" departureOffset="00:00:00" />
-				<stop refId="stop2" departureOffset="00:05:00" />
-				<stop refId="stop6" departureOffset="00:10:00" /> <!--the difference-->
-				<stop refId="stop12" departureOffset="00:15:00" />
-				<stop refId="stop13" arrivalOffset="00:20:00" />
+				<stop refId="stop0" departureOffset="00:00:00" />
+				<stop refId="stop1" departureOffset="00:05:00" />
+				<stop refId="stop5" departureOffset="00:10:00" /> <!--the difference-->
+				<stop refId="stop11" departureOffset="00:15:00" />
+				<stop refId="stop12" arrivalOffset="00:20:00" />
 			</routeProfile>
 			
 			<route>
@@ -254,11 +201,11 @@
 			</route>
 
 			<departures>
-				<departure id="5H.1" departureTime="05:54:00" vehicleRefId="tr_20" />
-				<departure id="5H.2" departureTime="06:04:00" vehicleRefId="tr_21" />
-				<departure id="5H.3" departureTime="06:14:00" vehicleRefId="tr_22" />
-				<departure id="5H.4" departureTime="06:24:00" vehicleRefId="tr_23" />
-				<departure id="5H.5" departureTime="08:04:00" vehicleRefId="tr_24" />
+				<departure id="B5H.1" departureTime="05:50:00" vehicleRefId="tr_15" />
+				<departure id="B5H.2" departureTime="06:00:00" vehicleRefId="tr_16" />
+				<departure id="B5H.3" departureTime="06:10:00" vehicleRefId="tr_17" />
+				<departure id="B5H.4" departureTime="06:20:00" vehicleRefId="tr_18" />
+				<departure id="B5H.5" departureTime="08:00:00" vehicleRefId="tr_19" />
 			</departures>
 		</transitRoute>
 
@@ -266,8 +213,8 @@
 			<description></description>
 			<transportMode>bus</transportMode>
 			<routeProfile>
-				<stop refId="stop13" departureOffset="00:00:00" />
-				<stop refId="stop1" arrivalOffset="00:10:00" />
+				<stop refId="stop12" departureOffset="00:00:00" />
+				<stop refId="stop0" arrivalOffset="00:10:00" />
 			</routeProfile>
 			
 			<route>
@@ -279,10 +226,10 @@
 			</route>
 
 			<departures>
-				<departure id="5R.1" departureTime="14:50:00" vehicleRefId="tr_20" />
-				<departure id="5R.2" departureTime="15:00:00" vehicleRefId="tr_21" />
-				<departure id="5R.3" departureTime="15:10:00" vehicleRefId="tr_22" />
-				<departure id="5R.4" departureTime="15:20:00" vehicleRefId="tr_23" />
+				<departure id="B5R.1" departureTime="14:50:00" vehicleRefId="tr_15" />
+				<departure id="B5R.2" departureTime="15:00:00" vehicleRefId="tr_16" />
+				<departure id="B5R.3" departureTime="15:10:00" vehicleRefId="tr_17" />
+				<departure id="B5R.4" departureTime="15:20:00" vehicleRefId="tr_18" />
 			</departures>
 		</transitRoute>
 	</transitLine>
@@ -292,11 +239,64 @@
 			<description></description>
 			<transportMode>bus</transportMode>
 			<routeProfile>
-				<stop refId="stop1" departureOffset="00:00:00" />
-				<stop refId="stop2" departureOffset="00:05:00" />
-				<stop refId="stop8" departureOffset="00:10:00" /> <!--the difference-->
-				<stop refId="stop12" departureOffset="00:15:00" />
-				<stop refId="stop13" arrivalOffset="00:20:00" />
+				<stop refId="stop0" departureOffset="00:00:00" />
+				<stop refId="stop1" departureOffset="00:05:00" />
+				<stop refId="stop6" departureOffset="00:10:00" /> <!--the difference-->
+				<stop refId="stop11" departureOffset="00:15:00" />
+				<stop refId="stop12" arrivalOffset="00:20:00" />
+			</routeProfile>
+			
+			<route>
+				<link refId="1" />
+				<link refId="6" />  <!-- the  --> 
+				<link refId="15" /> <!--difference-->
+				<link refId="20" />
+			</route>
+
+			<departures>
+				<departure id="B6H.1" departureTime="05:50:00" vehicleRefId="tr_20" />
+				<departure id="B6H.2" departureTime="06:00:00" vehicleRefId="tr_21" />
+				<departure id="B6H.3" departureTime="06:10:00" vehicleRefId="tr_22" />
+				<departure id="B6H.4" departureTime="06:20:00" vehicleRefId="tr_23" />
+				<departure id="B6H.5" departureTime="08:00:00" vehicleRefId="tr_24" />
+			</departures>
+		</transitRoute>
+
+		<transitRoute id="Bus6.R">
+			<description></description>
+			<transportMode>bus</transportMode>
+			<routeProfile>
+				<stop refId="stop12" departureOffset="00:00:00" />
+				<stop refId="stop0" arrivalOffset="00:10:00" />
+			</routeProfile>
+			
+			<route>
+				<link refId="20" />
+				<link refId="21" />
+				<link refId="22" />
+				<link refId="23" />
+				<link refId="1" />
+			</route>
+
+			<departures>
+				<departure id="B6R.1" departureTime="14:50:00" vehicleRefId="tr_20" />
+				<departure id="B6R.2" departureTime="15:00:00" vehicleRefId="tr_21" />
+				<departure id="B6R.3" departureTime="15:10:00" vehicleRefId="tr_22" />
+				<departure id="B6R.4" departureTime="15:20:00" vehicleRefId="tr_23" />
+			</departures>
+		</transitRoute>
+	</transitLine>
+	
+	<transitLine id="Bus7">
+		<transitRoute id="Bus7.H">
+			<description></description>
+			<transportMode>bus</transportMode>
+			<routeProfile>
+				<stop refId="stop0" departureOffset="00:00:00" />
+				<stop refId="stop1" departureOffset="00:05:00" />
+				<stop refId="stop7" departureOffset="00:10:00" /> <!--the difference-->
+				<stop refId="stop11" departureOffset="00:15:00" />
+				<stop refId="stop12" arrivalOffset="00:20:00" />
 			</routeProfile>
 			
 			<route>
@@ -307,20 +307,20 @@
 			</route>
 
 			<departures>
-				<departure id="6H.1" departureTime="05:55:00" vehicleRefId="tr_25" />
-				<departure id="6H.2" departureTime="06:05:00" vehicleRefId="tr_26" />
-				<departure id="6H.3" departureTime="06:15:00" vehicleRefId="tr_27" />
-				<departure id="6H.4" departureTime="06:25:00" vehicleRefId="tr_28" />
-				<departure id="6H.5" departureTime="08:05:00" vehicleRefId="tr_29" />
+				<departure id="B7H.1" departureTime="05:50:00" vehicleRefId="tr_25" />
+				<departure id="B7H.2" departureTime="06:00:00" vehicleRefId="tr_26" />
+				<departure id="B7H.3" departureTime="06:10:00" vehicleRefId="tr_27" />
+				<departure id="B7H.4" departureTime="06:20:00" vehicleRefId="tr_28" />
+				<departure id="B7H.5" departureTime="08:00:00" vehicleRefId="tr_29" />
 			</departures>
 		</transitRoute>
 
-		<transitRoute id="Bus6.R">
+		<transitRoute id="Bus7.R">
 			<description></description>
 			<transportMode>bus</transportMode>
 			<routeProfile>
-				<stop refId="stop13" departureOffset="00:00:00" />
-				<stop refId="stop1" arrivalOffset="00:10:00" />
+				<stop refId="stop12" departureOffset="00:00:00" />
+				<stop refId="stop0" arrivalOffset="00:10:00" />
 			</routeProfile>
 			
 			<route>
@@ -332,24 +332,24 @@
 			</route>
 
 			<departures>
-				<departure id="6H.1" departureTime="14:50:00" vehicleRefId="tr_25" />
-				<departure id="6H.2" departureTime="15:00:00" vehicleRefId="tr_26" />
-				<departure id="6H.3" departureTime="15:10:00" vehicleRefId="tr_27" />
-				<departure id="6H.4" departureTime="15:20:00" vehicleRefId="tr_28" />
+				<departure id="B7R.1" departureTime="14:50:00" vehicleRefId="tr_25" />
+				<departure id="B7R.2" departureTime="15:00:00" vehicleRefId="tr_26" />
+				<departure id="B7R.3" departureTime="15:10:00" vehicleRefId="tr_27" />
+				<departure id="B7R.4" departureTime="15:20:00" vehicleRefId="tr_28" />
 			</departures>
 		</transitRoute>
 	</transitLine>
 	
- 	<transitLine id="Bus7">
-		<transitRoute id="Bus7.H">
+ 	<transitLine id="Bus8">
+		<transitRoute id="Bus8.H">
 			<description></description>
 			<transportMode>bus</transportMode>
 			<routeProfile>
-				<stop refId="stop1" departureOffset="00:00:00" />
-				<stop refId="stop2" departureOffset="00:05:00" />
-				<stop refId="stop9" departureOffset="00:10:00" /> <!--the difference-->
-				<stop refId="stop12" departureOffset="00:15:00" />
-				<stop refId="stop13" arrivalOffset="00:20:00" />
+				<stop refId="stop0" departureOffset="00:00:00" />
+				<stop refId="stop1" departureOffset="00:05:00" />
+				<stop refId="stop8" departureOffset="00:10:00" /> <!--the difference-->
+				<stop refId="stop11" departureOffset="00:15:00" />
+				<stop refId="stop12" arrivalOffset="00:20:00" />
 			</routeProfile>
 			
 			<route>
@@ -360,20 +360,20 @@
 			</route>
 
 			<departures>
-				<departure id="7H.1" departureTime="05:56:00" vehicleRefId="tr_30" />
-				<departure id="7H.2" departureTime="06:06:00" vehicleRefId="tr_31" />
-				<departure id="7H.3" departureTime="06:16:00" vehicleRefId="tr_32" />
-				<departure id="7H.4" departureTime="06:26:00" vehicleRefId="tr_33" />
-				<departure id="7H.5" departureTime="08:06:00" vehicleRefId="tr_34" />
+				<departure id="B8H.1" departureTime="05:50:00" vehicleRefId="tr_30" />
+				<departure id="B8H.2" departureTime="06:00:00" vehicleRefId="tr_31" />
+				<departure id="B8H.3" departureTime="06:10:00" vehicleRefId="tr_32" />
+				<departure id="B8H.4" departureTime="06:20:00" vehicleRefId="tr_33" />
+				<departure id="B8H.5" departureTime="08:00:00" vehicleRefId="tr_34" />
 			</departures>
 		</transitRoute>
 
-		<transitRoute id="Bus7.R">
+		<transitRoute id="Bus8.R">
 			<description></description>
 			<transportMode>bus</transportMode>
 			<routeProfile>
-				<stop refId="stop13" departureOffset="00:00:00" />
-				<stop refId="stop1" arrivalOffset="00:10:00" />
+				<stop refId="stop12" departureOffset="00:00:00" />
+				<stop refId="stop0" arrivalOffset="00:10:00" />
 			</routeProfile>
 			
 			<route>
@@ -385,24 +385,24 @@
 			</route>
 
 			<departures>
-				<departure id="7H.1" departureTime="14:50:00" vehicleRefId="tr_30" />
-				<departure id="7H.2" departureTime="15:00:00" vehicleRefId="tr_31" />
-				<departure id="7H.3" departureTime="15:10:00" vehicleRefId="tr_32" />
-				<departure id="7H.4" departureTime="15:20:00" vehicleRefId="tr_33" />
+				<departure id="B8R.1" departureTime="14:50:00" vehicleRefId="tr_30" />
+				<departure id="B8R.2" departureTime="15:00:00" vehicleRefId="tr_31" />
+				<departure id="B8R.3" departureTime="15:10:00" vehicleRefId="tr_32" />
+				<departure id="B8R.4" departureTime="15:20:00" vehicleRefId="tr_33" />
 			</departures>
 		</transitRoute>
 	</transitLine>
  	
- 	<transitLine id="Bus8">
-		<transitRoute id="Bus7.H">
+ 	<transitLine id="Bus9">
+		<transitRoute id="Bus9.H">
 			<description></description>
 			<transportMode>bus</transportMode>
 			<routeProfile>
-				<stop refId="stop1" departureOffset="00:00:00" />
-				<stop refId="stop2" departureOffset="00:05:00" />
-				<stop refId="stop10" departureOffset="00:10:00" /> <!--the difference-->
-				<stop refId="stop12" departureOffset="00:15:00" />
-				<stop refId="stop13" arrivalOffset="00:20:00" />
+				<stop refId="stop0" departureOffset="00:00:00" />
+				<stop refId="stop1" departureOffset="00:05:00" />
+				<stop refId="stop9" departureOffset="00:10:00" /> <!--the difference-->
+				<stop refId="stop11" departureOffset="00:15:00" />
+				<stop refId="stop12" arrivalOffset="00:20:00" />
 			</routeProfile>
 			
 			<route>
@@ -413,20 +413,20 @@
 			</route>
 
 			<departures>
-				<departure id="8H.1" departureTime="05:57:00" vehicleRefId="tr_35" />
-				<departure id="8H.2" departureTime="06:07:00" vehicleRefId="tr_36" />
-				<departure id="8H.3" departureTime="06:17:00" vehicleRefId="tr_37" />
-				<departure id="8H.4" departureTime="06:27:00" vehicleRefId="tr_38" />
-				<departure id="8H.5" departureTime="08:07:00" vehicleRefId="tr_39" />
+				<departure id="B9H.1" departureTime="05:50:00" vehicleRefId="tr_35" />
+				<departure id="B9H.2" departureTime="06:00:00" vehicleRefId="tr_36" />
+				<departure id="B9H.3" departureTime="06:10:00" vehicleRefId="tr_37" />
+				<departure id="B9H.4" departureTime="06:20:00" vehicleRefId="tr_38" />
+				<departure id="B9H.5" departureTime="08:00:00" vehicleRefId="tr_39" />
 			</departures>
 		</transitRoute>
 
-		<transitRoute id="Bus8.R">
+		<transitRoute id="Bus9.R">
 			<description></description>
 			<transportMode>bus</transportMode>
 			<routeProfile>
-				<stop refId="stop13" departureOffset="00:00:00" />
-				<stop refId="stop1" arrivalOffset="00:10:00" />
+				<stop refId="stop12" departureOffset="00:00:00" />
+				<stop refId="stop0" arrivalOffset="00:10:00" />
 			</routeProfile>
 			
 			<route>
@@ -438,24 +438,24 @@
 			</route>
 
 			<departures>
-				<departure id="8H.1" departureTime="14:50:00" vehicleRefId="tr_35" />
-				<departure id="8H.2" departureTime="15:00:00" vehicleRefId="tr_36" />
-				<departure id="8H.3" departureTime="15:10:00" vehicleRefId="tr_37" />
-				<departure id="8H.4" departureTime="15:20:00" vehicleRefId="tr_38" />
+				<departure id="B9H.1" departureTime="14:50:00" vehicleRefId="tr_35" />
+				<departure id="B9H.2" departureTime="15:00:00" vehicleRefId="tr_36" />
+				<departure id="B9H.3" departureTime="15:10:00" vehicleRefId="tr_37" />
+				<departure id="B9H.4" departureTime="15:20:00" vehicleRefId="tr_38" />
 			</departures>
 		</transitRoute>
 	</transitLine>
 	
-	<transitLine id="Bus9">
-		<transitRoute id="Bus9.H">
+	<transitLine id="B-M44">
+		<transitRoute id="B-M44.101.H">
 			<description></description>
 			<transportMode>bus</transportMode>
 			<routeProfile>
-				<stop refId="stop1" departureOffset="00:00:00" />
-				<stop refId="stop2" departureOffset="00:05:00" />
-				<stop refId="stop11" departureOffset="00:10:00" /> <!--the difference-->
-				<stop refId="stop12" departureOffset="00:15:00" />
-				<stop refId="stop13" arrivalOffset="00:20:00" />
+				<stop refId="stop0" departureOffset="00:00:00" />
+				<stop refId="stop1" departureOffset="00:05:00" />
+				<stop refId="stop10" departureOffset="00:10:00" /> <!--the difference-->
+				<stop refId="stop11" departureOffset="00:15:00" />
+				<stop refId="stop12" arrivalOffset="00:20:00" />
 			</routeProfile>
 			
 			<route>
@@ -466,20 +466,20 @@
 			</route>
 
 			<departures>
-				<departure id="9H.1" departureTime="05:58:00" vehicleRefId="tr_40" />
-				<departure id="9H.2" departureTime="06:08:00" vehicleRefId="tr_41" />
-				<departure id="9H.3" departureTime="06:18:00" vehicleRefId="tr_42" />
-				<departure id="9H.4" departureTime="06:28:00" vehicleRefId="tr_43" />
-				<departure id="9H.5" departureTime="08:08:00" vehicleRefId="tr_44" />
+				<departure id="M44H.1" departureTime="05:50:00" vehicleRefId="tr_40" />
+				<departure id="M44H.2" departureTime="06:00:00" vehicleRefId="tr_41" />
+				<departure id="M44H.3" departureTime="06:10:00" vehicleRefId="tr_42" />
+				<departure id="M44H.4" departureTime="06:20:00" vehicleRefId="tr_43" />
+				<departure id="M44H.5" departureTime="08:00:00" vehicleRefId="tr_44" />
 			</departures>
 		</transitRoute>
 
-		<transitRoute id="Bus9.R">
+		<transitRoute id="B-M44.101.R">
 			<description></description>
 			<transportMode>bus</transportMode>
 			<routeProfile>
-				<stop refId="stop13" departureOffset="00:00:00" />
-				<stop refId="stop1" arrivalOffset="00:10:00" />
+				<stop refId="stop12" departureOffset="00:00:00" />
+				<stop refId="stop0" arrivalOffset="00:10:00" />
 			</routeProfile>
 			
 			<route>
@@ -491,10 +491,10 @@
 			</route>
 
 			<departures>
-				<departure id="9R.1" departureTime="14:50:00" vehicleRefId="tr_40" />
-				<departure id="9R.2" departureTime="15:00:00" vehicleRefId="tr_41" />
-				<departure id="9R.3" departureTime="15:10:00" vehicleRefId="tr_42" />
-				<departure id="9R.4" departureTime="15:20:00" vehicleRefId="tr_43" />
+				<departure id="M44R.1" departureTime="14:50:00" vehicleRefId="tr_40" />
+				<departure id="M44R.2" departureTime="15:00:00" vehicleRefId="tr_41" />
+				<departure id="M44R.3" departureTime="15:10:00" vehicleRefId="tr_42" />
+				<departure id="M44R.4" departureTime="15:20:00" vehicleRefId="tr_43" />
 			</departures>
 		</transitRoute>
 	</transitLine>
