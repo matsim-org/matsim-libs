@@ -42,6 +42,7 @@ import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.pt.router.TransitActsRemover;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
+import org.matsim.pt.router.TransitRouterImpl;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
@@ -85,7 +86,7 @@ public class RouterTester {
 		}
 		log.info("build transit router...");
 
-		TransitRouter router = new TransitRouter(ts, new TransitRouterConfig());
+		TransitRouterImpl router = new TransitRouterImpl(ts, new TransitRouterConfig());
 
 		PtRouter ptR = new PtRouter(router);
 

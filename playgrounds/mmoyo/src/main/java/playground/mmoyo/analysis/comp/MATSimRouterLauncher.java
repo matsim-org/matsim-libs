@@ -16,7 +16,7 @@ import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.population.algorithms.PlansFilterByLegMode;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.router.PlansCalcTransitRoute;
-import org.matsim.pt.router.TransitRouter;
+import org.matsim.pt.router.TransitRouterImpl;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.xml.sax.SAXException;
 
@@ -44,7 +44,7 @@ public class MATSimRouterLauncher {
 		FreespeedTravelTimeCost timeCostCalculator = new FreespeedTravelTimeCost(scenario.getConfig().charyparNagelScoring());
 		TransitConfigGroup transitConfig = new TransitConfigGroup();
 
-		PlansCalcRoute router = new PlansCalcTransitRoute(scenario.getConfig().plansCalcRoute(), scenario.getNetwork(), timeCostCalculator, timeCostCalculator, dijkstraFactory, transitConfig, new TransitRouter(scenario.getTransitSchedule(), new TransitRouterConfig()));
+		PlansCalcRoute router = new PlansCalcTransitRoute(scenario.getConfig().plansCalcRoute(), scenario.getNetwork(), timeCostCalculator, timeCostCalculator, dijkstraFactory, transitConfig, new TransitRouterImpl(scenario.getTransitSchedule(), new TransitRouterConfig()));
 	
 		Population population = scenario.getPopulation();
 		

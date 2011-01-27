@@ -36,8 +36,11 @@ public class OSM2MATSim {
 	public static void main(final String[] args) {
 
 		NetworkImpl network = NetworkImpl.createNetwork();
-		OsmNetworkReader osmReader = new OsmNetworkReader(network, TransformationFactory.getCoordinateTransformation("WGS84", "DHDN_GK4"), false);
+//		OsmNetworkReader osmReader = new OsmNetworkReader(network, TransformationFactory.getCoordinateTransformation("WGS84", "DHDN_GK4"), false);
+//		OsmNetworkReader osmReader = new OsmNetworkReader(network, TransformationFactory.getCoordinateTransformation("WGS84", "CH1903_LV03"), false);
+		OsmNetworkReader osmReader = new OsmNetworkReader(network, TransformationFactory.getCoordinateTransformation("WGS84", "WGS84"), false);
 		osmReader.setKeepPaths(false);
+		osmReader.setMemoryOptimization(true);
 
 		osmReader.setHighwayDefaults(1, "motorway",      2, 120.0/3.6, 1.0, 2000, true);
 		osmReader.setHighwayDefaults(1, "motorway_link", 1,  80.0/3.6, 1.0, 1500, true);
@@ -63,7 +66,8 @@ public class OSM2MATSim {
 //		osmReader.setHierarchyLayer(52.652, 13.155, 52.37, 13.643, 6);
 //		osmReader.setHierarchyLayer(80, 3, 40, 20, 5);
 		try {
-			osmReader.parse("/data/projects/bvg2010/Daten/20100902_brandenburg.osm");
+			osmReader.parse("/Volumes/Data/Downloads/osm/australia-oceania.osm");
+//			osmReader.parse("/data/projects/bvg2010/Daten/20100902_brandenburg.osm");
 //			osmReader.parse("../mystudies/osmnet/switzerland-20090313.osm");
 //			osmReader.parse("../mystudies/osmnet/zueri-20080410.osm");
 		} catch (SAXException e) {
@@ -73,11 +77,13 @@ public class OSM2MATSim {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		new NetworkWriter(network).write("/data/projects/bvg2010/Daten/20100902_brandenburg.net.xml");
+		new NetworkWriter(network).write("/Volumes/Data/Downloads/osm/australia-network.xml.gz");
+//		new NetworkWriter(network).write("/data/projects/bvg2010/Daten/20100902_brandenburg.net.xml");
 //		new NetworkWriter(network).write("../mystudies/osmnet/switzerland-20090313.xml");
 //		new NetworkWriter(network, "../mystudies/osmnet/zueri-20080410.xml").write();
 		new NetworkCleaner().run(network);
-		new NetworkWriter(network).write("/data/projects/bvg2010/Daten/20100902_brandenburg.clean-net.xml");
+//		new NetworkWriter(network).write("/data/projects/bvg2010/Daten/20100902_brandenburg.clean-net.xml");
+		new NetworkWriter(network).write("/Volumes/Data/Downloads/osm/australia-network-clean1.xml.gz");
 	}
 
 }

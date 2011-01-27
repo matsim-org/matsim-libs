@@ -46,7 +46,7 @@ public class PlansCalcTransitRouteTest extends TestCase {
 		TransitConfigGroup transitConfig = new TransitConfigGroup();
 		PlansCalcRouteConfigGroup routerConfig = new PlansCalcRouteConfigGroup();
 		FreespeedTravelTimeCost ttc = new FreespeedTravelTimeCost(new PlanCalcScoreConfigGroup());
-		PlansCalcTransitRoute router = new PlansCalcTransitRoute(routerConfig, f.network, ttc, ttc, new DijkstraFactory(), transitConfig, new TransitRouter(f.schedule, new TransitRouterConfig()));
+		PlansCalcTransitRoute router = new PlansCalcTransitRoute(routerConfig, f.network, ttc, ttc, new DijkstraFactory(), transitConfig, new TransitRouterImpl(f.schedule, new TransitRouterConfig()));
 
 		Coord fromCoord = f.scenario.createCoord(3800, 5100);
 		Coord toCoord = f.scenario.createCoord(16100, 10050);

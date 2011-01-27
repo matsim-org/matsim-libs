@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2011 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -19,11 +19,25 @@
 
 package org.matsim.pt.router;
 
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
+
 /**
  * @author mrieser
  */
-public interface TransitRouterFactory {
+public class TransitRouterImplFactory implements TransitRouterFactory {
 
-	public abstract TransitRouter createTransitRouter();
+	private final TransitSchedule schedule;
+	private final TransitRouterConfig config;
+	private final TransitRouterNetwork routerNetwork;
 
+	public TransitRouterImplFactory(final TransitSchedule schedule, final TransitRouterConfig config) {
+		this.schedule = schedule;
+		this.config = config;
+		this.routerNetwork = TransitRouterNetwork.createFromSchedule(this.schedule, this.config.beelineWalkConnectionDistance);
+	}
+
+	@Override
+	public TransitRouter createTransitRouter() {
+		return new TransitRouterImpl(this.schedule, this.config, new TransitRouterNetworkTravelTimeCost(this.config), this.routerNetwork);
+	}
 }

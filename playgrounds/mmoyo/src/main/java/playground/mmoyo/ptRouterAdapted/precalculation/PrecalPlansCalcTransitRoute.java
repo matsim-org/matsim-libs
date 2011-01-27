@@ -39,7 +39,7 @@ import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.router.PlansCalcTransitRoute;
-import org.matsim.pt.router.TransitRouter;
+import org.matsim.pt.router.TransitRouterImpl;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
@@ -64,7 +64,7 @@ public class PrecalPlansCalcTransitRoute extends PlansCalcTransitRoute {
 			final PersonalizableTravelCost costCalculator, final PersonalizableTravelTime timeCalculator,
 			final LeastCostPathCalculatorFactory factory, final TransitSchedule schedule,
 			final TransitConfigGroup transitConfig, MyTransitRouterConfig myTransitRouterConfig) {
-		super(config, network, costCalculator, timeCalculator, factory, transitConfig, new TransitRouter(schedule, new TransitRouterConfig()));
+		super(config, network, costCalculator, timeCalculator, factory, transitConfig, new TransitRouterImpl(schedule, new TransitRouterConfig()));
 		this.adaptedTransitRouter = new AdaptedTransitRouter( myTransitRouterConfig, schedule);
 	}
 

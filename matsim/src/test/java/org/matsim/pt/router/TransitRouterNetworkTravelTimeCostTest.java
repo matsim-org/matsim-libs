@@ -32,7 +32,7 @@ public class TransitRouterNetworkTravelTimeCostTest extends TestCase {
 		f.init();
 		TransitRouterConfig conf = new TransitRouterConfig();
 		TransitRouterNetworkTravelTimeCost tc = new TransitRouterNetworkTravelTimeCost(conf);
-		TransitRouter router = new TransitRouter(f.schedule, new TransitRouterConfig());
+		TransitRouterImpl router = new TransitRouterImpl(f.schedule, new TransitRouterConfig());
 		TransitRouterNetwork routerNet = router.getTransitRouterNetwork();
 		// find the link connecting C and D on the blue line
 		TransitRouterNetworkLink testLink = null;
@@ -51,7 +51,7 @@ public class TransitRouterNetworkTravelTimeCostTest extends TestCase {
 		f.init();
 		TransitRouterConfig conf = new TransitRouterConfig();
 		TransitRouterNetworkTravelTimeCost tc = new TransitRouterNetworkTravelTimeCost(conf);
-		TransitRouter router = new TransitRouter(f.schedule, new TransitRouterConfig());
+		TransitRouterImpl router = new TransitRouterImpl(f.schedule, new TransitRouterConfig());
 		TransitRouterNetwork routerNet = router.getTransitRouterNetwork();
 		// find the link connecting C and D on the blue line
 		TransitRouterNetworkLink testLink = null;
@@ -73,7 +73,7 @@ public class TransitRouterNetworkTravelTimeCostTest extends TestCase {
 		f.init();
 		TransitRouterConfig conf = new TransitRouterConfig();
 		TransitRouterNetworkTravelTimeCost tc = new TransitRouterNetworkTravelTimeCost(conf);
-		TransitRouter router = new TransitRouter(f.schedule, new TransitRouterConfig());
+		TransitRouterImpl router = new TransitRouterImpl(f.schedule, new TransitRouterConfig());
 		TransitRouterNetwork routerNet = router.getTransitRouterNetwork();
 		// find the link connecting C and D on the blue line
 		TransitRouterNetworkLink testLink = null;
@@ -97,7 +97,7 @@ public class TransitRouterNetworkTravelTimeCostTest extends TestCase {
 		f.init();
 		TransitRouterConfig conf = new TransitRouterConfig();
 		TransitRouterNetworkTravelTimeCost tc = new TransitRouterNetworkTravelTimeCost(conf);
-		TransitRouter router = new TransitRouter(f.schedule, new TransitRouterConfig());
+		TransitRouterImpl router = new TransitRouterImpl(f.schedule, new TransitRouterConfig());
 		TransitRouterNetwork routerNet = router.getTransitRouterNetwork();
 		// find the link connecting C and D on the blue line
 		TransitRouterNetworkLink testLink = null;

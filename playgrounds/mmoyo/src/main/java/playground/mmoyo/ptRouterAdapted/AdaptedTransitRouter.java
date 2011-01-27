@@ -38,7 +38,7 @@ import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.router.MultiNodeDijkstra.InitialNode;
-import org.matsim.pt.router.TransitRouter;
+import org.matsim.pt.router.TransitRouterImpl;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterNetwork;
 import org.matsim.pt.router.TransitRouterNetworkTravelTimeCost;
@@ -53,7 +53,7 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
  * changes made to the original org.matsim.pt.router.TransitRouter: -stop search -transfer links creation -direct walk optional
  * -uses myTransitRouterConfig Manuel apr10
  */
-public class AdaptedTransitRouter extends TransitRouter {
+public class AdaptedTransitRouter extends TransitRouterImpl {
 
 	public AdaptedTransitRouter(MyTransitRouterConfig myTRConfig, final TransitSchedule schedule) {
 		

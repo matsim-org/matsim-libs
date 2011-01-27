@@ -55,10 +55,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
-import org.matsim.core.events.EventsManagerImpl;
-import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkFalsifier;
@@ -571,87 +568,16 @@ public class MyRuns {
 	}
 
 	public static void someTest(final String[] args) {
-
-//		CoordinateTransformation transformation = new SoldnerBerlinToWGS84();
-//		Coord alexanderplatz = new CoordImpl(25466670/1000.0, 21618520/1000.0);
-//		Coord wgs84 = transformation.transform(alexanderplatz);
-//		System.out.println(wgs84.getX() + " / " + wgs84.getY()); // expected: 13.41 / 52.52
-
-//		Gbl.printSystemInfo();
-//		NetworkLayer network = new NetworkLayer();
-//		new MatsimNetworkReader(network).readFile("/Volumes/Data/VSP/svn/shared-svn/studies/schweiz-ivtch/baseCase/network/ivtch-osm.xml");
-//		System.out.println(network.getCapacityPeriod());
-
-//		Controler controler = new Controler(new String[] {"test/scenarios/berlin/config.xml"});
-//		controler.run();
-
-//		ArrayList<Integer> list = new ArrayList<Integer>();
-//		list.add(new Integer(5));
-//		System.out.println(list.size());
-//		someMethod(list);
-//		System.out.println(list.size());
-
-//		Integer i1 = new Integer(12);
-//		Integer i2 = new Integer(12);
-//		Integer i3 = Integer.valueOf(12);
-//		Integer i4 = Integer.valueOf(12);
-//		System.out.println(i1 == i2);
-//		System.out.println(i1 == i3);
-//		System.out.println(i3 == i4);
-
-		EventsManager events = new EventsManagerImpl();
-		System.out.println("START READ 8m txt " + new Date());
-		new MatsimEventsReader(events).readFile("/Volumes/Data/vis/zrh25pct/60.events-sample8m.txt");
-		System.out.println("STOP READ 8m txt " + new Date());
-
-		events = new EventsManagerImpl();
-		System.out.println("START READ 8m xml.gz " + new Date());
-		new MatsimEventsReader(events).readFile("/Volumes/Data/vis/zrh/100.events-sample8m.xml.gz");
-		System.out.println("STOP READ 8m xml gz " + new Date());
-
-		events = new EventsManagerImpl();
-		System.out.println("START READ 4m xml.gz " + new Date());
-		new MatsimEventsReader(events).readFile("/Volumes/Data/vis/zrh/100.events-sample4m.xml.gz");
-		System.out.println("STOP READ 4m xml gz " + new Date());
-
-		events = new EventsManagerImpl();
-		System.out.println("START READ 4m xml " + new Date());
-		new MatsimEventsReader(events).readFile("/Volumes/Data/vis/zrh/100.events-sample4m.xml");
-		System.out.println("STOP READ 4m xml " + new Date());
+		testVarArgs("hallo", 1, 2, 3, 4);
+		testVarArgs("hello", 1);
+		testVarArgs("hullo");
 	}
 
-	public static void someMethod(final List<Integer> list) {
-//		Config config = new Config();
-//		TravelTimeCalculator traveltime = new TravelTimeCalculator(network, config.travelTimeCalculator());
-//		EventsManager events = new EventsManagerImpl();
-//		events.addHandler(traveltime);
-//		new MatsimEventsReader(events).readFile("0.events.txt.gz");
-//
-//		TravelCost costFunction = new TravelTimeDistanceCostCalculator(traveltime, config.charyparNagelScoring());
-//		Dijkstra router = new Dijkstra(network, costFunction, traveltime);
-//		router.calcLeastCostPath(fromNode, toNode, startTime);
-//
-//		for (Person person : population.getPersons().value()) {
-//			Plan plan = person.getSelectedPlan();
-//			for (PlanElement pe : plan.getPlanElements()) {
-//				if (pe instanceof Leg) {
-//					Leg leg = (Leg) pe;
-//					if (leg.getRoute() instanceof NetworkRoute) {
-//						NetworkRoute route = (NetworkRoute) leg.getRoute();
-//						double currentTime = leg.getDepartureTime();
-//						double traveltime = 0.0;
-//						// TODO handle start link of route
-//						for (Id linkId : route.getLinkIds()) {
-//							double linkTravelTime = linkstats.getLinkTravelTime(linkId, currentTime);
-//							traveltime = traveltime + linkTravelTime;
-//							currentTime = currentTime + linkTravelTime;
-//						}
-//						// TODO handle end link of route
-//					}
-//				}
-//			}
-//		}
-
+	public static void testVarArgs(final String str, final int... as) {
+		System.out.println(str);
+		for (int a : as) {
+			System.out.println(a);
+		}
 	}
 
 	static void writeReadBinaryStuff() throws IOException {
@@ -833,7 +759,7 @@ public class MyRuns {
 //		readCounts(args);
 //		writeKml();
 //		runSimulation();
-		someTest(args);
+//		someTest(args);
 //		try {
 //			writeReadBinaryStuff();
 //		} catch (IOException e) {
@@ -862,11 +788,11 @@ public class MyRuns {
 //				"  free: " + freeMem + "B = " + (freeMem/1024/1024) + "MB  total: " + totalMem + "B = " + (totalMem/1024/1024) + "MB" +
 //				"  max: " + maxMem + "B = " + (maxMem/1024/1024) + "MB");
 
-		//		Scenario scenario = new ScenarioImpl();
+//		Scenario scenario = new ScenarioImpl();
 //		OsmNetworkReader osmReader = new OsmNetworkReader(scenario.getNetwork(), new WGS84toCH1903LV03());
 //		osmReader.setKeepPaths(false);
 //		try {
-//			osmReader.parse("/Users/mrieser/Downloads/switzerland.osm");
+//			osmReader.parse("/Users/cello/Desktop/zurich.osm");
 //		} catch (SAXException e) {
 //			e.printStackTrace();
 //		} catch (ParserConfigurationException e) {
@@ -874,8 +800,22 @@ public class MyRuns {
 //		} catch (IOException e) {
 //			e.printStackTrace();
 //		}
-//		new NetworkWriter(scenario.getNetwork()).writeFile("/Users/mrieser/Downloads/switzerland.xml");
-//		OTFVis.main(new String[]{"/Users/mrieser/Downloads/switzerland.xml"});
+//		new NetworkWriter(scenario.getNetwork()).write("/Users/cello/Desktop/zurich.net.xml");
+
+
+//		System.out.println(Math.atan2(1.0, 0.0));
+//		System.out.println(Math.atan2(1.0, 1.0));
+//		System.out.println(Math.atan2(0.0, 1.0));
+//		System.out.println(Math.atan2(-1.0, 1.0));
+//		System.out.println(Math.atan2(-1.0, 0.0));
+//		System.out.println(Math.atan2(-1.0, -1.0));
+//		System.out.println(Math.atan2(0.0, -1.0));
+//		System.out.println(Math.atan2(1.0, -1.0));
+
+
+//		CoordinateTransformation t = TransformationFactory.getCoordinateTransformation("WGS84", "PROJCS[\"South_Africa_Albers_Equal\",GEOGCS[\"GCS_WGS_1984\",DATUM[\"D_WGS_1984\",SPHEROID[\"WGS_1984\",6378137.0,298.257223563]],PRIMEM[\"Greenwich\",0.0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Albers_Conic_Equal_Area\"],PARAMETER[\"False_Easting\",0.0],PARAMETER[\"False_Northing\",0.0],PARAMETER[\"Central_Meridian\",24.0],PARAMETER[\"Standard_Parallel_1\",-18.0],PARAMETER[\"Standard_Parallel_2\",-32.0],PARAMETER[\"Latitude_Of_Origin\",0.0],UNIT[\"Meter\",1.0]]");
+
+
 
 //		Config config = new Config();
 //		config.addCoreModules();

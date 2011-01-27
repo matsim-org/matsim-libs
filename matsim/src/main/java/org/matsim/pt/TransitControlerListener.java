@@ -22,7 +22,7 @@ package org.matsim.pt;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.pt.router.TransitRouterConfig;
-import org.matsim.pt.router.TransitRouterFactory;
+import org.matsim.pt.router.TransitRouterImplFactory;
 
 /**
  * @author mrieser
@@ -64,7 +64,9 @@ public class TransitControlerListener implements StartupListener {
 		reconstructingUmlaufBuilder.build();
 		event.getControler().getScenario().addScenarioElement( reconstructingUmlaufBuilder ) ;
 
-		event.getControler().setTransitRouterFactory(new TransitRouterFactory(event.getControler().getScenario().getTransitSchedule(), new TransitRouterConfig()));
+		if (event.getControler().getTransitRouterFactory() == null) {
+			event.getControler().setTransitRouterFactory(new TransitRouterImplFactory(event.getControler().getScenario().getTransitSchedule(), new TransitRouterConfig()));
+		}
 
 	}
 
