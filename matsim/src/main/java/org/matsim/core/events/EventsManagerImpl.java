@@ -56,6 +56,8 @@ import org.matsim.core.api.experimental.events.handler.PersonEventHandler;
 import org.matsim.core.events.handler.AgentReplanEventHandler;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.events.handler.EventHandler;
+import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
+import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.core.events.handler.TransitDriverStartsEventHandler;
 
 /**
@@ -245,7 +247,7 @@ public class EventsManagerImpl implements EventsManager {
 				try {
 					info.method.invoke(info.eventHandler, event);
 				} catch (Exception e) {
-					e.printStackTrace();
+					log.error("problem invoking EventHandler " + info.eventHandler.getClass().getCanonicalName() + " for event-class " + info.eventClass.getCanonicalName(), e);
 				}
 			}
 		}
@@ -341,6 +343,12 @@ public class EventsManagerImpl implements EventsManager {
 			return true;
 		} else if (klass == PersonEvent.class) {
 			((PersonEventHandler)handler).handleEvent((PersonEvent)ev);
+			return true;
+		} else if (klass == PersonEntersVehicleEvent.class) {
+			((PersonEntersVehicleEventHandler)handler).handleEvent((PersonEntersVehicleEvent)ev);
+			return true;
+		} else if (klass == PersonLeavesVehicleEvent.class) {
+			((PersonLeavesVehicleEventHandler)handler).handleEvent((PersonLeavesVehicleEvent)ev);
 			return true;
 		}
 		return false;
