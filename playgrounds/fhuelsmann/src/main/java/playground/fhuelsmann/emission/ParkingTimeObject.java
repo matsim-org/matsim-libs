@@ -31,4 +31,12 @@ public class ParkingTimeObject {
 		this.time = time;
 		this.activity=activity;
 	}
+	public void setTimedifference(double timedifference) {
+		// TODO Auto-generated method stub
+		
+	}
+	public double getTimedifference() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
 }
