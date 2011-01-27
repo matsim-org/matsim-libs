@@ -50,7 +50,14 @@ public class CircularAgentInteractionModule implements DynamicForceModule {
 	private double lastQuadUpdate = Double.NEGATIVE_INFINITY;
 	protected Quadtree coordsQuad = new Quadtree();
 
-	protected final Map<Agent2D, List<Coordinate>> neighbors = new HashMap<Agent2D, List<Coordinate>>();
+	//Helbing constants 
+	private static final double Bi=0.08;
+	private static final double Ai=2000;
+	private static final double k = 1.2 * 100000;
+	private static final double kappa = 2.4 * 100000;
+	
+	
+//	protected final Map<Agent2D, List<Coordinate>> neighbors = new HashMap<Agent2D, List<Coordinate>>();
 
 	/**
 	 * @param floor
@@ -70,49 +77,74 @@ public class CircularAgentInteractionModule implements DynamicForceModule {
 	 */
 	@Override
 	public void run(Agent2D agent) {
-		List<Coordinate> neighbors = this.neighbors.get(agent);
-		updateForces(agent, neighbors);
+//		List<Coordinate> neighbors = this.neighbors.get(agent);
+		updateForces(agent);//, neighbors);
 	}
 
 	/**
 	 * @param agent
 	 * @param neighbors
 	 */
-	/* package */void updateForces(Agent2D agent, List<Coordinate> neighbors) {
+	/* package */void updateForces(Agent2D agent) {//, List<Coordinate> neighbors) {
 		double fx = 0;
 		double fy = 0;
 
-		int otherId = 4;
-		for (Coordinate other : neighbors) {
-			if (other.equals(agent.getPosition())) {
+		double minX = agent.getPosition().x - Sim2DConfig.PNeighborhoddRange;
+		double maxX = agent.getPosition().x + Sim2DConfig.PNeighborhoddRange;
+		double minY = agent.getPosition().y - Sim2DConfig.PNeighborhoddRange;
+		double maxY = agent.getPosition().y + Sim2DConfig.PNeighborhoddRange;
+		Envelope e = new Envelope(minX, maxX, minY, maxY);
+		List<Agent2D> l = this.coordsQuad.query(e);
+		
+		int otherId = 10;
+		for (Agent2D other : l) {
+			if (other == agent) {
 				continue;
 			}
 
-			double dist = other.distance(agent.getPosition());
-			if (dist > Sim2DConfig.Bp) {
+			double dist = other.getPosition().distance(agent.getPosition());
+			if (dist > Sim2DConfig.PNeighborhoddRange) {
 				continue;
 			}
-			double dx = (agent.getPosition().x - other.x) / dist;
-			double dy = (agent.getPosition().y - other.y) / dist;
+			double dx = (agent.getPosition().x - other.getPosition().x) / dist;
+			double dy = (agent.getPosition().y - other.getPosition().y) / dist;
 
-			double xc = Sim2DConfig.App * Math.exp((Agent2D.AGENT_DIAMETER - dist) / Sim2DConfig.Bp) * dx;
-			double yc = Sim2DConfig.App * Math.exp((Agent2D.AGENT_DIAMETER - dist) / Sim2DConfig.Bp) * dy;
+			double bounderyDist = Agent2D.AGENT_DIAMETER - dist;
+			double g = bounderyDist > 0 ? bounderyDist : 0;
+			
+			double tanDvx = (other.getVx() - agent.getVx()) * -dx;
+			double tanDvy = (other.getVy() - agent.getVy()) * dy;
+			
+			double tanX = tanDvx * -dx;
+			double tanY = tanDvy * dy;
+			
+			double xc = (Ai * Math.exp((bounderyDist) / Bi) + k*g)* dx+ kappa * g * tanX;
+			double yc = (Ai * Math.exp((bounderyDist) / Bi) + k*g)* dy + kappa * g * tanY;
 
 			fx += xc;
 			fy += yc;
 
 			if (Sim2DConfig.DEBUG) {
-				ArrowEvent arrow = new ArrowEvent(agent.getPerson().getId(), agent.getPosition(), other, 0.2f, 0.2f, 0.2f, otherId++);
+				if (agent.getId().toString().equals("2")) {
+				ArrowEvent arrow = new ArrowEvent(agent.getPerson().getId(), agent.getPosition(), other.getPosition(), 0.2f, 0.2f, 0.2f, otherId++);
 				this.floor.getSim2D().getEventsManager().processEvent(arrow);
+//				
+			
+//				Coordinate cc = new Coordinate(agent.getPosition().x +  tanX,agent.getPosition().y + tanY,0);
+//				ArrowEvent arrow2 = new ArrowEvent(agent.getPerson().getId(), agent.getPosition(), cc, .2f, .2f, .2f, otherId++);
+//				this.floor.getSim2D().getEventsManager().processEvent(arrow2);
+//				System.out.println(tanX + "   " + tanY);
+				}
+
 			}
 
 		}
 
-		fx /= Agent2D.AGENT_WEIGHT * Sim2DConfig.TIME_STEP_SIZE;
-		fy /= Agent2D.AGENT_WEIGHT * Sim2DConfig.TIME_STEP_SIZE;
+//		fx /= Agent2D.AGENT_WEIGHT * Sim2DConfig.TIME_STEP_SIZE;
+//		fy /= Agent2D.AGENT_WEIGHT * Sim2DConfig.TIME_STEP_SIZE;
 
 		if (Sim2DConfig.DEBUG) {
-			ArrowEvent arrow = new ArrowEvent(agent.getPerson().getId(), agent.getPosition(), new Coordinate(agent.getPosition().x + fx / Sim2DConfig.TIME_STEP_SIZE, agent.getPosition().y + fy / Sim2DConfig.TIME_STEP_SIZE, 0), 0.f, 0.f, 0.f, 3);
+			ArrowEvent arrow = new ArrowEvent(agent.getPerson().getId(), agent.getPosition(), new Coordinate(agent.getPosition().x + fx/Sim2DConfig.TIME_STEP_SIZE, agent.getPosition().y + fy/Sim2DConfig.TIME_STEP_SIZE, 0), 0.5f,0.5f, 1.f, 3);
 			this.floor.getSim2D().getEventsManager().processEvent(arrow);
 		}
 
@@ -141,24 +173,24 @@ public class CircularAgentInteractionModule implements DynamicForceModule {
 			this.coordsQuad.insert(e, agent);
 		}
 
-		this.neighbors.clear();
-
-		for (Agent2D agent : this.floor.getAgents()) {
-			double minX = agent.getPosition().x - Sim2DConfig.PNeighborhoddRange;
-			double maxX = agent.getPosition().x + Sim2DConfig.PNeighborhoddRange;
-			double minY = agent.getPosition().y - Sim2DConfig.PNeighborhoddRange;
-			double maxY = agent.getPosition().y + Sim2DConfig.PNeighborhoddRange;
-			Envelope e = new Envelope(minX, maxX, minY, maxY);
-			List<Agent2D> l = this.coordsQuad.query(e);
-			List<Coordinate> n = new ArrayList<Coordinate>();
-			for (Agent2D a2 : l) {
-				if (a2.equals(agent)) {
-					continue;
-				}
-				n.add(a2.getPosition());
-			}
-			this.neighbors.put(agent, n);
-		}
+//		this.neighbors.clear();
+//
+//		for (Agent2D agent : this.floor.getAgents()) {
+//			double minX = agent.getPosition().x - Sim2DConfig.PNeighborhoddRange;
+//			double maxX = agent.getPosition().x + Sim2DConfig.PNeighborhoddRange;
+//			double minY = agent.getPosition().y - Sim2DConfig.PNeighborhoddRange;
+//			double maxY = agent.getPosition().y + Sim2DConfig.PNeighborhoddRange;
+//			Envelope e = new Envelope(minX, maxX, minY, maxY);
+//			List<Agent2D> l = this.coordsQuad.query(e);
+//			List<Coordinate> n = new ArrayList<Coordinate>();
+//			for (Agent2D a2 : l) {
+//				if (a2.equals(agent)) {
+//					continue;
+//				}
+//				n.add(a2.getPosition());
+//			}
+//			this.neighbors.put(agent, n);
+//		}
 
 	}
 

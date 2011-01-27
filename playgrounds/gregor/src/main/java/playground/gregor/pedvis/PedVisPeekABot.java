@@ -24,6 +24,8 @@ import java.util.Iterator;
 
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
@@ -59,8 +61,8 @@ public class PedVisPeekABot implements XYZEventsHandler, AgentDepartureEventHand
 	private String floorShape = null;
 	private int segmentCount = 0;
 	private static final float FLOOR_HEIGHT = 3.5f;
-	float ofX = 0;
-	float ofY = 0;
+	double ofX = 0;
+	double ofY = 0;
 
 	public PedVisPeekABot(double speedUp) {
 		this.speedUp = speedUp;
@@ -68,8 +70,8 @@ public class PedVisPeekABot implements XYZEventsHandler, AgentDepartureEventHand
 	}
 
 	public void setOffsets(double d, double e) {
-		this.ofX = (float) d;
-		this.ofY = (float) e;
+		this.ofX =  d;
+		this.ofY = e;
 	}
 
 	/**
@@ -123,6 +125,17 @@ public class PedVisPeekABot implements XYZEventsHandler, AgentDepartureEventHand
 		// drawSegment(lr.getPointN(lr.getNumPoints()-1), lr.getPointN(0));
 	}
 
+	public void drawNetwork(Network net) {
+		for (Link l : net.getLinks().values()){
+			float fromX = (float)(l.getFromNode().getCoord().getX()-this.ofX);
+			float fromY = (float)(l.getFromNode().getCoord().getY()-this.ofY);
+			float toX = (float)(l.getToNode().getCoord().getX()-this.ofX);
+			float toY = (float)(l.getToNode().getCoord().getY()-this.ofY);
+			this.pc.drawLink(Integer.parseInt(l.getId().toString()), 0, 0, fromX, fromY, toX, toY);
+			
+		}
+	}
+	
 	private void drawSegment(Point pointN1, Point pointN2) {
 		this.pc.initPolygonII(this.segmentCount, 5, .75f, .75f, .75f, 3.f);
 		float x1 = (float) (pointN1.getX() - this.ofX);
@@ -173,7 +186,7 @@ public class PedVisPeekABot implements XYZEventsHandler, AgentDepartureEventHand
 
 	public void handleEvent(XYZAzimuthEvent e) {
 		testWait(e.getTime());
-		this.pc.setBotPositionII(Integer.parseInt(e.getPersonId().toString()), (float) e.getX() - this.ofX, (float) e.getY() - this.ofY, (float) e.getZ(), (float) e.getAzimuth());
+		this.pc.setBotPositionII(Integer.parseInt(e.getPersonId().toString()), (float) (e.getX() - this.ofX), (float) (e.getY() - this.ofY), (float) e.getZ(), (float) e.getAzimuth());
 
 	}
 
@@ -268,17 +281,17 @@ public class PedVisPeekABot implements XYZEventsHandler, AgentDepartureEventHand
 	public void handleEvent(ArrowEvent event) {
 		int arrowId = event.getType();
 		int agentId = Integer.parseInt(event.getPersId().toString());
-		if (agentId != 30) {
+		if (agentId != 2) {
 			return;
 		}
 		float r = event.getR();
 		float g = event.getG();
 		float b = event.getB();
-		float fromX = (float) event.getFrom().x - this.ofX;
-		float fromY = (float) event.getFrom().y - this.ofY;
+		float fromX = (float) (event.getFrom().x - this.ofX);
+		float fromY = (float) (event.getFrom().y - this.ofY);
 		float fromZ = (float) event.getFrom().z;
-		float toX = (float) event.getTo().x - this.ofX;
-		float toY = (float) event.getTo().y - this.ofY;
+		float toX = (float) (event.getTo().x - this.ofX);
+		float toY = (float) (event.getTo().y - this.ofY);
 		float toZ = (float) event.getTo().z;
 
 		this.pc.drawArrowII(arrowId, agentId, r, g, b, fromX, fromY, fromZ, toX, toY, toZ);

@@ -239,7 +239,7 @@ public class Sim2D implements Mobsim {
 			PlanAgent agent = this.activityEndsList.peek();
 			if (agent.getActivityEndTime() <= time) {
 				this.activityEndsList.poll();
-				unregisterAgentAtActivityLocation(agent); // TODO do wie need
+				unregisterAgentAtActivityLocation(agent); // TODO do we need
 				// this??
 				agent.endActivityAndAssumeControl(time);
 				// gives control to agent; comes back via "agentDeparts" or

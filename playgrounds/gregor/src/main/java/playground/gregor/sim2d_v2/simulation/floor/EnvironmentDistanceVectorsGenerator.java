@@ -204,14 +204,14 @@ public class EnvironmentDistanceVectorsGenerator {
 	}
 
 	public static void main(String[] args) throws IOException {
-		String shape = "/home/laemmel/devel/dfg/data/90grad.shp";
+		String shape = "/home/laemmel/devel/dfg/data/testPolygons.shp";
 		Iterator<Feature> fs = ShapeFileReader.readDataFile(shape).getFeatures().iterator();
 		while (fs.hasNext()) {
 			Feature ft = fs.next();
 			Geometry geo = ft.getDefaultGeometry();
 			QuadTree<EnvironmentDistances> tree = new EnvironmentDistanceVectorsGenerator((MultiPolygon) geo).loadDistanceVectors();
 			System.out.println(tree.size());
-			new EnvironmentDistancesWriter().write("/home/laemmel/devel/dfg/data/staticEnvField.xml.gz", tree);
+			new EnvironmentDistancesWriter().write("/home/laemmel/devel/dfg/data/envDistances.xml.gz", tree);
 		}
 	}
 

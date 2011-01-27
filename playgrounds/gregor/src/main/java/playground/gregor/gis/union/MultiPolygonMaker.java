@@ -50,8 +50,8 @@ import com.vividsolutions.jts.geom.Polygon;
 public class MultiPolygonMaker {
 
 	public static void main(String[] args) throws IOException, FactoryRegistryException, SchemaException, IllegalAttributeException {
-		String fileIn = "/home/laemmel/devel/dfg/data/walls.shp";
-		String fileOut = "/home/laemmel/devel/dfg/data/wallsPolygons.shp";
+		String fileIn = "/home/laemmel/devel/dfg/data/test.shp";
+		String fileOut = "/home/laemmel/devel/dfg/data/testPolygons.shp";
 
 		List<Polygon> p = new ArrayList<Polygon>();
 		FeatureSource fs = ShapeFileReader.readDataFile(fileIn);

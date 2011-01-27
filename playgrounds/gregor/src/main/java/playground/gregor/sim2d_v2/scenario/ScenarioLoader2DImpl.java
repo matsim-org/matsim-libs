@@ -149,10 +149,10 @@ public class ScenarioLoader2DImpl extends ScenarioLoaderImpl {
 		}
 
 		this.lsmp = new HashMap<Id, LineString>();
-
+		int idd = 0;
 		while (it.hasNext()) {
 			Feature ft = (Feature) it.next();
-			Id id = new IdImpl((Long) ft.getAttribute("ID"));
+			Id id = new IdImpl(idd++);
 			this.lsmp.put(id, (LineString) ft.getDefaultGeometry().getGeometryN(0));
 
 		}

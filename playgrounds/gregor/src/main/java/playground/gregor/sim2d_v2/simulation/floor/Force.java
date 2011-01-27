@@ -66,9 +66,9 @@ public class Force {
 
 	/* package */void reset() {
 		this.oldFx = this.fx;
-		// this.fx = 0.;
+		this.fx = 0.;
 		this.oldFy = this.fy;
-		// this.fy = 0.;
+		this.fy = 0.;
 	}
 
 }

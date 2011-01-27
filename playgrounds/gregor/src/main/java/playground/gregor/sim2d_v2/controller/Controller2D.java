@@ -41,7 +41,7 @@ public class Controller2D extends Controler {
 		super(args[0]);
 		setOverwriteFiles(true);
 		this.config.addQSimConfigGroup(new QSimConfigGroup());
-		this.config.getQSimConfigGroup().setEndTime(2 * 60);
+		this.config.getQSimConfigGroup().setEndTime(2* 60);
 	}
 
 	@Override
@@ -57,11 +57,12 @@ public class Controller2D extends Controler {
 			// this.loader).setPhantomPopulationEventsFile("/home/laemmel/devel/dfg/events.xml");
 			this.scenarioLoaded = true;
 
-			// this.vis = new PedVisPeekABot(0.2);
-			// Link l = this.network.getLinks().get(new IdImpl(0));
-			// this.vis.setOffsets(l.getCoord().getX(), l.getCoord().getY());
-			// this.vis.setFloorShapeFile(this.sim2dConfig.getFloorShapeFile());
-			// this.events.addHandler(this.vis);
+//			 this.vis = new PedVisPeekABot(1);
+//			 Link l = this.network.getLinks().get(new IdImpl(0));
+//			 this.vis.setOffsets(l.getCoord().getX(), l.getCoord().getY());
+//			 this.vis.setFloorShapeFile(this.sim2dConfig.getFloorShapeFile());
+//			 this.vis.drawNetwork(network);
+//			 this.events.addHandler(this.vis);
 		}
 
 	}

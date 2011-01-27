@@ -58,28 +58,28 @@ public class PhantomForceModule extends CircularAgentInteractionModule implement
 	 */
 	@Override
 	public void run(Agent2D agent) {
-		List<Coordinate> neighbors = this.neighbors.get(agent);
-		updateForces(agent, neighbors);
+//		List<Coordinate> neighbors = this.neighbors.get(agent);
+//		updateForces(agent, neighbors);
 	}
 
 	@Override
 	protected void updateAgentQuadtree() {
-		this.coordsQuad = new Quadtree();
-		for (Coordinate c : this.phantomMgr.getPhatomsList()) {
-			Envelope e = new Envelope(c);
-			this.coordsQuad.insert(e, c);
-		}
-		this.neighbors.clear();
-
-		for (Agent2D agent : this.floor.getAgents()) {
-			double minX = agent.getPosition().x - Sim2DConfig.PNeighborhoddRange;
-			double maxX = agent.getPosition().x + Sim2DConfig.PNeighborhoddRange;
-			double minY = agent.getPosition().y - Sim2DConfig.PNeighborhoddRange;
-			double maxY = agent.getPosition().y + Sim2DConfig.PNeighborhoddRange;
-			Envelope e = new Envelope(minX, maxX, minY, maxY);
-			List l = this.coordsQuad.query(e);
-			this.neighbors.put(agent, l);
-		}
+//		this.coordsQuad = new Quadtree();
+//		for (Coordinate c : this.phantomMgr.getPhatomsList()) {
+//			Envelope e = new Envelope(c);
+//			this.coordsQuad.insert(e, c);
+//		}
+//		this.neighbors.clear();
+//
+//		for (Agent2D agent : this.floor.getAgents()) {
+//			double minX = agent.getPosition().x - Sim2DConfig.PNeighborhoddRange;
+//			double maxX = agent.getPosition().x + Sim2DConfig.PNeighborhoddRange;
+//			double minY = agent.getPosition().y - Sim2DConfig.PNeighborhoddRange;
+//			double maxY = agent.getPosition().y + Sim2DConfig.PNeighborhoddRange;
+//			Envelope e = new Envelope(minX, maxX, minY, maxY);
+//			List l = this.coordsQuad.query(e);
+//			this.neighbors.put(agent, l);
+//		}
 
 	}
 

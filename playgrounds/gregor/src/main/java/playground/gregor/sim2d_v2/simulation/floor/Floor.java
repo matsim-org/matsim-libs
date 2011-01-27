@@ -154,11 +154,12 @@ public class Floor {
 			Coordinate oldPos = agent.getPosition();
 			Coordinate newPos = new Coordinate(oldPos.x + f.getXComponent(), oldPos.y + f.getYComponent(), 0);
 
-			if (Sim2DConfig.DEBUG) {
-				ArrowEvent arrow = new ArrowEvent(agent.getPerson().getId(), agent.getPosition(), new Coordinate(agent.getPosition().x + f.getXComponent() / Sim2DConfig.TIME_STEP_SIZE, agent.getPosition().y + f.getYComponent() / Sim2DConfig.TIME_STEP_SIZE, 0), 0.5f, 0.75f, 1.f, -1);
-				getSim2D().getEventsManager().processEvent(arrow);
-			}
-
+			double vx = f.getXComponent();// / Sim2DConfig.TIME_STEP_SIZE;
+			double vy = f.getYComponent();// / Sim2DConfig.TIME_STEP_SIZE;
+			agent.setCurrentVelocity(vx,vy);
+			
+//			System.out.println("ID:" + agent.getId() + "  velocity:" + Math.sqrt(Math.pow(vx, 2)+Math.pow(vy, 2)) + "    vx:" + vx + "    vy:" + vy + "   " + newPos);
+			
 			boolean endOfLeg = checkForEndOfLinkReached(agent, oldPos, newPos, time);
 			if (endOfLeg) {
 				it.remove();
@@ -171,7 +172,10 @@ public class Floor {
 			getSim2D().getEventsManager().processEvent(e);
 
 			f.reset();
-
+			if (Sim2DConfig.DEBUG) {
+				ArrowEvent arrow = new ArrowEvent(agent.getPerson().getId(), agent.getPosition(), new Coordinate(agent.getPosition().x + vx/ Sim2DConfig.TIME_STEP_SIZE , agent.getPosition().y + vy/ Sim2DConfig.TIME_STEP_SIZE , 0), 0.0f, 1.f, 1.f, 9);
+				getSim2D().getEventsManager().processEvent(arrow);
+			}
 		}
 
 	}
@@ -308,7 +312,11 @@ public class Floor {
 	 */
 	public void addAgent(Agent2D agent) {
 		Activity act = (Activity) agent.getCurrentPlanElement();
-		agent.setPostion(MGC.coord2Coordinate(act.getCoord()));
+		if (act.getCoord() != null) {
+			agent.setPostion(MGC.coord2Coordinate(act.getCoord()));
+		} else {
+			agent.setPostion(MGC.coord2Coordinate(this.scenario.getNetwork().getLinks().get(act.getLinkId()).getCoord()));
+		}
 
 	}
 

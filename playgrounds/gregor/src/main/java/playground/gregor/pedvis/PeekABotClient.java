@@ -62,6 +62,8 @@ public class PeekABotClient {
 	public native void initPolygonII(int id, int numCoords, float r, float g, float b, float height);
 
 	public native void addPolygonCoordII(int id, float x, float y, float z);
+	
+	public native void drawLink(int id, int fromId, int toId, float fromX, float fromY, float toX, float toY);
 
 	/**
 	 * @param arrowId

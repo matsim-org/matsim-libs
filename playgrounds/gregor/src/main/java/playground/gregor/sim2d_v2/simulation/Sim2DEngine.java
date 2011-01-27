@@ -85,6 +85,7 @@ public class Sim2DEngine implements MobsimEngine, Steppable {
 			}
 
 			sim2DTime += Sim2DConfig.TIME_STEP_SIZE;
+//			System.out.println("++++++++++++++++++");
 		}
 	}
 
