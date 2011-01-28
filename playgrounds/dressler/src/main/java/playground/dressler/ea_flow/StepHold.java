@@ -194,4 +194,9 @@ public class StepHold implements PathStep {
 		return s;
 	}
 
+	@Override
+	final public boolean isHoldover() {		
+		return true;
+	}
+
 }

@@ -24,6 +24,9 @@ package playground.dressler.Interval;
 
 //java imports
 import java.util.ArrayList;
+import java.util.Iterator;
+
+import playground.dressler.control.Debug;
 
 /**
  * class representing the flow of an edge in a Time Expanded Network
@@ -33,6 +36,11 @@ import java.util.ArrayList;
 public class EdgeIntervals extends Intervals<EdgeInterval> implements EdgeFlowI {
 
 //**********************************FIELDS*****************************************//
+	
+	/**
+	 * debug flags
+	 */
+	private static int _debug =0;
 	
 	/**
 	 * internal binary search tree holding distinct Intervals
@@ -57,10 +65,7 @@ public class EdgeIntervals extends Intervals<EdgeInterval> implements EdgeFlowI 
 	
 	private boolean _clean;
 	
-	/**
-	 * debug flag
-	 */
-	private static int _debug =0;
+	
 	
 //********************************METHODS******************************************//
 		
@@ -145,7 +150,13 @@ public class EdgeIntervals extends Intervals<EdgeInterval> implements EdgeFlowI 
 		int effectiveStart = Math.max(incoming.getLowBound() + inputoffset, this._whenAvailable.getLowBound());
 		int effectiveEnd = Math.min(incoming.getHighBound() + inputoffset, this._whenAvailable.getHighBound());
 		
-		current = this.getIntervalAt(effectiveStart);
+		//BinTreeIterator<EdgeInterval> iter = new BinTreeIterator<EdgeInterval>(this._tree, effectiveStart);
+		//SkipListIterator<EdgeInterval> iter = new SkipListIterator<EdgeInterval>(this, effectiveStart);
+		Iterator<EdgeInterval> iter = getIteratorAt(effectiveStart); 
+				
+		current = iter.next();
+		//current = this.getIntervalAt(effectiveStart);
+
 
 		while (current.getLowBound() < effectiveEnd) {
 			int flow = current.getFlow();
@@ -175,10 +186,14 @@ public class EdgeIntervals extends Intervals<EdgeInterval> implements EdgeFlowI 
 				}
 			}
 
-			if (this.isLast(current)) {
+			/*if (this.isLast(current)) {
 				break;
 			} 
-			current = this.getIntervalAt(current.getHighBound());
+			current = this.getIntervalAt(current.getHighBound());*/
+
+
+			if (!iter.hasNext()) break;
+			current = iter.next();
 
 		}
 
@@ -243,17 +258,26 @@ public class EdgeIntervals extends Intervals<EdgeInterval> implements EdgeFlowI 
 	public void augment(final int t, final int gamma){
 		_clean = false;
 		
-		if (t<0){
-			throw new IllegalArgumentException("negative time: "+ t);
+		if (Debug.GLOBAL && Debug.INTERVALS_CHECKS) {
+			if (t<0){
+				throw new IllegalArgumentException("negative time: "+ t);
+			}
 		}
+		
 		EdgeInterval i = getIntervalAt(t);
-		if (i.getFlow() + gamma > this._capacity){
-			throw new IllegalArgumentException("too much flow! flow: " + i.getFlow() + " + " +
-					gamma + " > " + this._capacity);
+		
+		if (Debug.GLOBAL && Debug.INTERVALS_CHECKS) {
+			if (i.getFlow() + gamma > this._capacity){
+				throw new IllegalArgumentException("too much flow! flow: " + i.getFlow() + " + " +
+						gamma + " > " + this._capacity);
+			}
 		}
-		if (i.getFlow() + gamma < 0){
-			throw new IllegalArgumentException("negative flow! flow: " + i.getFlow() + " + " +
-					gamma + " < 0");
+		
+		if (Debug.GLOBAL && Debug.INTERVALS_CHECKS) {
+			if (i.getFlow() + gamma < 0){
+				throw new IllegalArgumentException("negative flow! flow: " + i.getFlow() + " + " +
+						gamma + " < 0");
+			}
 		}
 		
 		if(i.getLowBound() < t){
@@ -290,11 +314,11 @@ public class EdgeIntervals extends Intervals<EdgeInterval> implements EdgeFlowI 
 	
 	
 	/**
-	 * setter for debug mode
+	 * setter for debug detail
 	 * @param debug debug mode true is on
 	 */
 	public static void debug(int debug){
-		EdgeIntervals._debug=debug;
+		EdgeIntervals._debug = debug;
 	}
 
 	

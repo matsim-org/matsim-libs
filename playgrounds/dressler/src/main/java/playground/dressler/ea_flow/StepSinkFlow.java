@@ -214,6 +214,12 @@ public class StepSinkFlow implements PathStep {
 		String str = "sink:"+node.getId().toString()+":"+time+":"+forward;
 		return str;
 	}
+
+
+	@Override
+	final public boolean isHoldover() {		
+		return false;
+	}
 		
 }
 

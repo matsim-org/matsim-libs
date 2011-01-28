@@ -718,7 +718,7 @@ public class MultiSourceEAF {
 		int timeStep;
 		double flowFactor;
 
-		int instance = 4;
+		int instance = 3;
 		// 1 = siouxfalls, demand 500
 		// 11 same as above only Manuel and 5s euclid
 		// 2 = swissold, demand 100
@@ -772,7 +772,7 @@ public class MultiSourceEAF {
 			networkfile  = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac_v20080618.xml";
 			uniformDemands = 5; // war 5
 			timeStep = 10; // war 10
-			flowFactor = 1.0;
+			flowFactor = 0.1; // war 1.0, also zu viel, da nur 30k statt 250k personen.
 			sinkid = "en1";
 		} else if (instance == 4) {
 			networkfile  = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac_v20080618.xml";
@@ -1088,8 +1088,8 @@ public class MultiSourceEAF {
 		settings.flowFactor = flowFactor; // default 1.0
 
 		// set additional parameters
-		//settings.TimeHorizon = 2500;
-		//settings.MaxRounds = 20;
+		//settings.TimeHorizon = 800;
+		//settings.MaxRounds = 1;
 		//settings.checkConsistency = 1;
 		//settings.doGarbageCollection = 10; // > 0 generally not such a good idea.
 		settings.minTravelTime = 0;
@@ -1098,10 +1098,10 @@ public class MultiSourceEAF {
 		settings.useImplicitVertexCleanup = true;
 		settings.useShadowFlow = false;				
 		
-		settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_FORWARD;
+		//settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_FORWARD;
 		//settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_MIXED;
-		//settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_REVERSE;
-		settings.queueAlgo = FlowCalculationSettings.QUEUE_GUIDED;
+		settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_REVERSE;
+		settings.queueAlgo = FlowCalculationSettings.QUEUE_BFS;
 		settings.useBucketQueue = true;
 		
 		settings.useRepeatedPaths = true; // not compatible with costs!
@@ -1110,21 +1110,21 @@ public class MultiSourceEAF {
 		settings.trackUnreachableVertices = true && (settings.searchAlgo == FlowCalculationSettings.SEARCHALGO_REVERSE);
 		//settings.sortPathsBeforeAugmenting = true;
 		settings.checkTouchedNodes = false;
-		settings.keepPaths = true; // store paths at all
+		settings.keepPaths = false; // store paths at all
 		settings.unfoldPaths = false; // unfold stored paths into forward paths
 		settings.delaySinkPropagation = true; // propagate sinks (and resulting intervals) only if the search has nothing else to do 
-		settings.quickCutOff = -99; // <0, continue fully,  =0 stop as soon as the first good path is found, > 0 continue a bit (e.g. 0.1 continue for another 10% of the polls so far)
+		settings.quickCutOff = 0.1; // <0, continue fully,  =0 stop as soon as the first good path is found, > 0 continue a bit (e.g. 0.1 continue for another 10% of the polls so far)
 		settings.filterOrigins = false;
 		settings.mapLinksToTEP = true; // remember which path uses an edge at a given time
 		settings.useHoldover = false; //only forward/reverse, no cost, no unwind
 		//settings.whenAvailable = new HashMap<Link, Interval>();
 		//settings.whenAvailable.put(network.getLinks().get(new IdImpl("1")), new Interval(2,3));
 
-		Flow fluss;
-
-
 		/* --------- the actual work starts --------- */
 
+		Flow fluss;
+
+		
 		boolean settingsOkay = settings.prepare();
 		settings.printStatus();
 

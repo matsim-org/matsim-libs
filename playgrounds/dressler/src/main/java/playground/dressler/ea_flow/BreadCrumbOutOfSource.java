@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SimpleTaskQueue.java
+ * BreadCrumbEdgeForward.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,62 +20,57 @@
 
 package playground.dressler.ea_flow;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedList;
+import playground.dressler.control.Debug;
+import playground.dressler.control.FlowCalculationSettings;
 
-import playground.dressler.network.IndexedNodeI;
 
-public class SimpleTaskQueue implements TaskQueue {
-	private int depth = 0;
-	private IndexedNodeI origin = null;
-	private LinkedList<BFTask> _list;
+public class BreadCrumbOutOfSource implements BreadCrumb {	
 	
-	public SimpleTaskQueue(){
-		_list= new LinkedList<BFTask>();
+	private final int t;
+	
+	public BreadCrumbOutOfSource(int t){
+		this.t = t;
 	}
 	
+	/**
+	 * Method returning a String representation of the StepEdge
+	 */
 	@Override
-	public boolean addAll(Collection<? extends BFTask> c) {
-		//return _list.addAll(c);
-		Boolean result = false;
-		for(BFTask task: c){
-			task.depth = this.depth;
-			if (task.origin == null) task.origin = this.origin;
-			result = _list.add(task) || result; // never want a shortcut!		
-		}
-		return result;
-	}
-
-	@Override
-	public Iterator<BFTask> iterator() {
-		return _list.iterator();
-	}
-
-	@Override
-	public boolean add(BFTask task) {
-		task.depth = this.depth;
-		if (task.origin == null) task.origin = this.origin;
-		return _list.add(task);
-	}
-
-	@Override
-	public boolean addAll(TaskQueue tasks) {		
-		boolean result = false;
+	public String toString(){
+		String s;
 		
-		for(BFTask task: tasks){
-			task.depth = this.depth;
-			if (task.origin == null) task.origin = this.origin;
-			result = _list.add(task) || result; // never want a shortcut!
-		}
-		return result;
+		s =  "Out of source @ " + t;
+
+		return s;
 	}
 
 	@Override
-	public BFTask poll() {
-		return _list.poll();
+	public PathStep createPathStepForward(VirtualNode arrival, 
+			FlowCalculationSettings settings) {
+		if (Debug.GLOBAL && Debug.STEP_CHECKS) {
+			if (!(arrival instanceof VirtualSource)) {
+				throw new RuntimeException("Can only step out of source in a source!"); 
+			}
+		}
+		
+		// Arrival is a source, and this was found from the normal node.
+		// This is a residual step to the stored time.		
+		return new StepSourceFlow(arrival.getRealNode(), t, false);
 	}
 
-	
+	@Override
+	public PathStep createPathStepReverse(VirtualNode start,
+			FlowCalculationSettings settings) {
+		if (Debug.GLOBAL && Debug.STEP_CHECKS) {
+			if (!(start instanceof VirtualSource)) {
+				throw new RuntimeException("Can only step out of source in a source!"); 
+			}
+		}
+		
+		// Start is a source, and this was found from outside.
+		// This is a forward step to the stored time.
+		
+		return new StepSourceFlow(start.getRealNode(), t, true);
+	}
+};
 
-}

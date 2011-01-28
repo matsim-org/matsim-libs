@@ -39,7 +39,7 @@ public class VertexIntervals extends Intervals<VertexInterval> {
 	
 	
 	/**
-	 * flag for debug mode
+	 * flags for debug mode
 	 */
 	@SuppressWarnings("unused")
 	private static int _debug = 0;
@@ -61,25 +61,6 @@ public class VertexIntervals extends Intervals<VertexInterval> {
 
 	//------------------------------METHODS-----------------------//
 	
-	/**
-	 * Gives the predecessor Link on the Vertex at time t
-	 * @param t time
-	 * @return flow at t
-	 */
-	public PathStep getPred(int t){
-		return getIntervalAt(t).getPredecessor().copyShiftedToArrival(t);
-	}
-	
-	/**
-	 * Gives the successor Link on the Vertex at time t
-	 * @param t time
-	 * @return flow at t
-	 */
-	public PathStep getSucc(int t){
-		return getIntervalAt(t).getSuccessor().copyShiftedToStart(t);
-	}
-	
-
 	/**
 	 * setter for debug mode
 	 * @param debug debug mode true is on

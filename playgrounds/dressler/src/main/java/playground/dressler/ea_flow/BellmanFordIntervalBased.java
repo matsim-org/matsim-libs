@@ -326,9 +326,8 @@ public class BellmanFordIntervalBased {
 		}
 
 
-		for (IndexedNodeI superSink : this._flow.getSinks()) {
+		for (IndexedNodeI superSink : this._flow.getSinks()) {			
 
-			//VertexIntervalls tolabels = this._labels.get(to);			
 			VertexInterval superSinkLabel = this._labels[superSink.getIndex()].getFirstPossibleForward();
 			if (superSinkLabel == null) {
 				// unreachable sink
@@ -352,10 +351,10 @@ public class BellmanFordIntervalBased {
 				IndexedNodeI realSink = link.getFromNode();
 				// while not strictly necessary, we only want sinks and not just generic predecessors 
 				if (this._settings.getLength(link) == 0) {
-					VertexInterval realSinkIntervall = this._labels[realSink.getIndex()].getIntervalAt(superSinkTime);
+					VertexInterval realSinkInterval = this._labels[realSink.getIndex()].getIntervalAt(superSinkTime);
 					// are we reachable and is there capacity left?
 					// (the capacity does not need to be "infinite" because it will be accounted for in the bottleneck					
-					if(realSinkIntervall.getReachable()) {
+					if(realSinkInterval.getReachable()) {
 						if (this._flow.getFlow(link).getFlowAt(superSinkTime) < this._settings.getCapacity(link)) {
 							realSinksToSendTo.add(realSink);
 							edgesToSuperSink.put(realSink, link);
@@ -369,8 +368,9 @@ public class BellmanFordIntervalBased {
 			}
 
 			if (notasupersink) {
-				// put the supersink in there, because it really has interesting edges coming in
-				// that is, edges that have non-zero length or finite capacity 
+				// well, we tried 
+				realSinksToSendTo = new LinkedList<IndexedNodeI>();
+				// Note: We used to add the supersink, instead of replacing the list with the supersink.
 				realSinksToSendTo.add(superSink);
 			}
 
@@ -378,96 +378,30 @@ public class BellmanFordIntervalBased {
 			
 			for (IndexedNodeI sinkNode : realSinksToSendTo) {
 								
-				IndexedNodeI toNode = sinkNode;
-				int toTime = earliestArrivalTime;		
-				
-				VertexInterval toLabel = this._labels[toNode.getIndex()].getIntervalAt(toTime);
-				
-				// should not happen
-				/*if (toLabel == null) {
-					throw new BFException("Sink cannot be reached at all!");
-				}*/
-				
-				// exactly when we want to arrives
-				
-
 				//start constructing the TimeExpandedPath
-				TimeExpandedPath TEP = new TimeExpandedPath();		
-
-				PathStep pred;
+				TimeExpandedPath path = new TimeExpandedPath();		
 
 				// include the superSink, whenever we start one step too early
-				if (!toNode.equals(superSink)) {				
-					pred = new StepEdge(edgesToSuperSink.get(toNode), toTime, toTime, true);
-					TEP.append(pred);
+				if (!sinkNode.equals(superSink)) {					
 					// step into the sink
-					pred = new StepSinkFlow(superSink, toTime, true);
-					TEP.append(pred);
+					PathStep step = new StepSinkFlow(superSink, earliestArrivalTime, true);
+					path.prepend(step);
+					
+					step = new StepEdge(edgesToSuperSink.get(sinkNode), earliestArrivalTime, earliestArrivalTime, true);
+					path.prepend(step);
 				} else {
 					// step into the sink
-					pred = new StepSinkFlow(sinkNode, toTime, true);
-					TEP.append(pred);
+					PathStep step = new StepSinkFlow(sinkNode, earliestArrivalTime, true);
+					path.prepend(step);								
 				}
 				
+				VirtualNode arrival = new VirtualNormalNode(sinkNode, earliestArrivalTime);
+				LinkedList<PathStep> list = backTrackPredecessor(arrival);
 				
-
-
-				pred = toLabel.getPredecessor();
-
-				while (pred != null) {					
-					
-					// sadly, we treat Holdover differently, because it cannot be shifted properly
-					if (pred instanceof StepHold) {
-						
-						// could probably recycle toLabel from last iteration ...
-						VertexInterval tempi = this._labels[toNode.getIndex()].getIntervalAt(toTime);
-						
-						if (pred.getForward()) {							
-							// set the right arrival time, does not change start time for holdover
-							pred = pred.copyShiftedToArrival(toTime);
-					
-							// go back to just before the label that was reached by holdover														
-							toTime = tempi.getLowBound() - 1;
-							
-							// set the right start time, does not change arrival time for holdover
-							pred = pred.copyShiftedToStart(toTime);					
-						} else {
-							pred = pred.copyShiftedToArrival(toTime);
-							
-							// go forward to the next label							
-							toTime = tempi.getHighBound();
-							
-							// set the right start time, does not change arrival time for holdover
-							pred = pred.copyShiftedToStart(toTime);
-						}
-					} else {
-						pred = pred.copyShiftedToArrival(toTime);
-					}
-					
-					TEP.prepend(pred);			
-
-					toNode = pred.getStartNode().getRealNode();
-					toTime = pred.getStartTime();
-					//TEP.setStartTime(toTime); // really startTime
-
-					if (pred instanceof StepEdge || pred instanceof StepHold) {			  		
-						toLabel = this._labels[toNode.getIndex()].getIntervalAt(toTime);			 
-					} else if (pred instanceof StepSourceFlow) {
-						if (pred.getForward()) {
-							toLabel = this._sourcelabels[toNode.getIndex()];				  
-						} else {
-							toLabel = this._labels[toNode.getIndex()].getIntervalAt(toTime);
-						}					
-					} else {
-						throw new RuntimeException("Unknown instance of PathStep in ConstructRoutes()");
-					}
-					
-					pred = toLabel.getPredecessor();
-
-				}
-
-				//System.out.println("Adding " + TEP);
-				result.add(TEP);
+				path.prepend(list);
+				
+				result.add(path);
+		
 			}
 		}
 		
@@ -484,19 +418,6 @@ public class BellmanFordIntervalBased {
 		if (_debug > 0) {
 			System.out.println("Constructing routes ...");
 		}
-		
-		// DEBUG
-		/*System.out.println("Normal labels:");
-		for (Node node : this._network.getNodes().values()) {
-			System.out.println("Node: " + node.getId());
-			System.out.println(this._labels.get(node));
-		}
-		
-		System.out.println("Source labels:");
-		for (Node node : this._sourcelabels.keySet()) {
-			System.out.println("Source: " + node.getId());
-			System.out.println(this._sourcelabels.get(node));
-		}*/
 		
 		// HashSet does not seem to be deterministic! Don't use it.
 		//Set<TimeExpandedPath> result = new HashSet<TimeExpandedPath>();
@@ -515,78 +436,13 @@ public class BellmanFordIntervalBased {
 				continue;
 			}			
 
-			//start constructing the TimeExpandedPath
-			TimeExpandedPath TEP = new TimeExpandedPath();		
 			
-			IndexedNodeI fromNode = source;
-			VertexInterval fromLabel = sourceLabel;
-
-			PathStep succ;
-
-			succ = fromLabel.getSuccessor();
-			
-			int fromTime = 0; // TODO maybe it's better to leave the sink as late as possible?
-			// if it is an active source, we can leave at any time!
-			// does this help?
-
-			boolean reachedsink = false;
-			while (succ != null) {
-				
-				// treat Holdover differently to avoid stepping just by +- 1 time layer
-				if (succ instanceof StepHold) {
-					VertexInterval tempi = this._labels[fromNode.getIndex()].getIntervalAt(fromTime);
-					
-					if (succ.getForward()) {
-						// set the right start time, does not change arrival time for holdover
-						succ = succ.copyShiftedToStart(fromTime);
-
-						// go to just beyond the label that was reached by holdover														
-						fromTime = tempi.getHighBound();
-						
-						// set the right arrival time, does not change start time for holdover
-						succ = succ.copyShiftedToArrival(fromTime);					
-					} else {
-						succ = succ.copyShiftedToStart(fromTime);
-						
-						// go back to just before this label
-						fromTime = tempi.getLowBound() - 1;
-						
-						succ = succ.copyShiftedToArrival(fromTime);						
-					}								   	
-				} else {
-				  succ = succ.copyShiftedToStart(fromTime);
-				}
-				//System.out.println("succ: " + succ);
-				TEP.append(succ);
-
-				fromNode = succ.getArrivalNode().getRealNode();
-				fromTime = succ.getArrivalTime();
-
-				if (succ instanceof StepEdge || succ instanceof StepHold) {			  		
-					fromLabel = this._labels[fromNode.getIndex()].getIntervalAt(fromTime);			 
-				} else if (succ instanceof StepSourceFlow) {
-					if (succ.getForward()) {
-						fromLabel = this._labels[fromNode.getIndex()].getIntervalAt(fromTime);						
-					} else {
-						fromLabel = this._sourcelabels[fromNode.getIndex()];				  
-					}
-				} else if (succ instanceof StepSinkFlow) {
-					// TODO sinklabels do not exist yet ... but would be a null successor
-					reachedsink = true;
-					break; 					
-				} else {
-					throw new RuntimeException("Unknown instance of PathStep in ConstructRoutes()");
-				}
-				succ = fromLabel.getSuccessor();
-			}
-			
-			// This should always happen if a source is marked reachable at all
-			if (reachedsink) {
-				//System.out.println(TEP);
-				result.add(TEP);
-			} else {
-				System.out.println("Weird. Did not find the sink!!!");
-			}
+			VirtualNode vNode = new VirtualSource(source);
+			List<PathStep> list;
+			list = backTrackSuccessor(vNode);
+			TimeExpandedPath path = new TimeExpandedPath();
+			path.append(list);
+			result.add(path);
 		}
 
 		return result;
@@ -608,8 +464,15 @@ public class BellmanFordIntervalBased {
 		   that are labelled both forward and backwards.
 		   That might take some time ... */
 		
-		List<VertexInterval> intersection = new ArrayList<VertexInterval>(); 
+		/* We need to do this for all kinds of labels: Normal vertices and sources
+		 * (which must empty sources then). 
+		 */
+					
+		//List<VertexInterval> intersection = new ArrayList<VertexInterval>();
+		 
 		
+		int countnormal = 0;
+		// for normal nodes
 		for (IndexedNodeI node : this._network.getNodes()) {
 			VertexIntervals VIs = this._labels[node.getIndex()];
 			if (VIs == null) {
@@ -617,106 +480,205 @@ public class BellmanFordIntervalBased {
 			}
 			
 			VertexInterval current = VIs.getIntervalAt(0);
+			// TODO switch to iterator ...
 			while(!VIs.isLast(current)){
-				if (current.getPredecessor() != null) {
-					// it should be in particular reachable in this case									
-					if (current.getSuccessor() != null) {
-					  intersection.add(current);
-					  break; // we want only the earliest one
-					}											
+				if (current.getPredecessor() != null && current.getSuccessor() != null) {  					 
+					// TODO maybe choose the latest one for less bad interactions?					
+
+					VirtualNode vNode = new VirtualNormalNode(node, current.getLowBound());
+					//VirtualNode vNode = new VirtualNormalNode(node, current.getHighBound() - 1);
+					
+					TimeExpandedPath path = new TimeExpandedPath();
+					path.prepend(backTrackPredecessor(vNode));
+					path.append(backTrackSuccessor(vNode));
+					result.add(path);
+					
+					countnormal++;
+					
+					// let's keep on scanning, doesn't matter much. 
+					// break;
 				} 
-				current = VIs.getNext(current);							
+				current = VIs.getNext(current);					
 			}
 		}
+		
+		// for the sources
+		int countsources = 0;
+		for (IndexedNodeI node : this._network.getNodes()) {
+			if (_settings.isSource(node)) {
+				VertexInterval VI = this._sourcelabels[node.getIndex()];
+							
+				if (VI.getPredecessor() != null && VI.getSuccessor() != null) {  					 
+					VirtualNode vNode = new VirtualSource(node);
+					TimeExpandedPath path = new TimeExpandedPath();
+					path.prepend(backTrackPredecessor(vNode));
+					path.append(backTrackSuccessor(vNode));
+					result.add(path);
+					countsources++;
+				} 							
+			}
+		}
+		//System.out.println("Intersecting intervals: normal nodes " + countnormal + " sources: " + countsources);
+		
 
-		
-		//System.out.println("size of intersection set: " + intersection.size());
-		
-		if (intersection.isEmpty()) {
+		if (result.isEmpty()) {
 			// We didn't find anything. Maybe the reverse search started to early?
 			// Well, let's just do the route construction from forward search
-			
+			System.out.println("defaulting to forward paths");
 			return constructRoutesForward();
+		} else {
+			return result;
 		}
-		
-		
-		
-		for (VertexInterval reachabletwice: intersection) {
-			// the following can only work if the PathSteps stored are shifted correctly!
-			
-			//start constructing the TimeExpandedPath
-			TimeExpandedPath TEP = new TimeExpandedPath();		
-			
-			
-			// first go from the start interval back to the source  
-			PathStep pred = reachabletwice.getPredecessor();
-			
-			// TODO ... if reachabletwice is larger than one unit, one could try to derive
-			// multiple paths through it.
-			int toTime = reachabletwice.getLowBound();
-
-			// include the superSink, whenever we start one step too early
-
-			while (pred != null) {
-				pred = pred.copyShiftedToArrival(toTime);
-				toTime = pred.getStartTime();
-				
-				TEP.prepend(pred);
-
-				IndexedNodeI toNode = pred.getStartNode().getRealNode();
-				VertexInterval toLabel;
-
-				if (pred instanceof StepEdge) {			  		
-					toLabel = this._labels[toNode.getIndex()].getIntervalAt(toTime);			 
-				} else if (pred instanceof StepSourceFlow) {
-					if (pred.getForward()) {
-						toLabel = this._sourcelabels[toNode.getIndex()];				  
-					} else {
-						toLabel = this._labels[toNode.getIndex()].getIntervalAt(toTime);
-					}
-				} else {
-					throw new RuntimeException("Unknown instance of PathStep in ConstructRoutes()");
-				}
-				pred = toLabel.getPredecessor();
-			}
-			
-			// then go from the start interval to the sink
-			
-			PathStep succ = reachabletwice.getSuccessor();
-			int fromTime = reachabletwice.getLowBound();
-
-			while (succ != null) {				
-				succ = succ.copyShiftedToStart(fromTime);
-				//System.out.println("succ: " + succ);
-				TEP.append(succ);
-
-				IndexedNodeI fromNode = succ.getArrivalNode().getRealNode();
-				fromTime = succ.getArrivalTime();
-				
-				VertexInterval fromLabel;
-
-				if (succ instanceof StepEdge) {			  		
-					fromLabel = this._labels[fromNode.getIndex()].getIntervalAt(fromTime);			 
-				} else if (succ instanceof StepSourceFlow) {
-					if (succ.getForward()) {
-						fromLabel = this._labels[fromNode.getIndex()].getIntervalAt(fromTime);						
-					} else {
-						fromLabel = this._sourcelabels[fromNode.getIndex()];				  
-					}
-				} else if (succ instanceof StepSinkFlow) {
-					// TODO sinklabels do not exist yet ... but would be a null successor
-					break; 					
-				} else {
-					throw new RuntimeException("Unknown instance of PathStep in ConstructRoutes()");
-				}
-				succ = fromLabel.getSuccessor();
-			}
-			
-			result.add(TEP);
-		}
-
-		return result;
 	}
+	
+	
+	protected LinkedList<PathStep> backTrackSuccessor(VirtualNode start) {
+				
+		BreadCrumb bc;
+		PathStep succ;
+		VirtualNode vNode;
+		IndexedNodeI fromNode;
+		int fromTime;		
+		VertexInterval fromLabel;
+		
+		LinkedList<PathStep> list = new LinkedList<PathStep>();
+		
+		vNode = start;
+
+		while (true) { // exists on bc == null or if a sink is found			
+			
+			fromNode = vNode.getRealNode();
+			fromTime = vNode.getRealTime();
+			
+			if (vNode instanceof VirtualNormalNode) {
+				fromLabel = this._labels[fromNode.getIndex()].getIntervalAt(fromTime);
+			} else if (vNode instanceof VirtualSource) {
+				fromLabel = this._sourcelabels[fromNode.getIndex()];			
+			} else if (vNode instanceof VirtualSink) {
+				// If we had sink labels (for costs), we maybe could continue.
+				// But here sinks are the end of the search.
+				return list;
+			} else {
+				throw new IllegalArgumentException("Unknown kind of virtual node!");
+			}
+			
+			bc = fromLabel.getSuccessor();
+			
+			if (bc == null) {
+				System.out.println("Backtracking successors did not end in sink. Weird.");
+				return list;
+			}
+			
+			succ = bc.createPathStepReverse(vNode, _settings);
+			
+			// treat Holdover differently to avoid stepping just by +- 1 time layer
+			if (succ instanceof StepHold) {
+				if (true) throw new UnsupportedOperationException("Holdover not supported in reverse search right now");
+				// FIXME
+				VertexInterval tempi = this._labels[fromNode.getIndex()].getIntervalAt(fromTime);
+				
+				if (succ.getForward()) {
+					// set the right start time, does not change arrival time for holdover
+					succ = succ.copyShiftedToStart(fromTime);
+
+					// go to just beyond the label that was reached by holdover														
+					fromTime = tempi.getHighBound();
+					
+					// set the right arrival time, does not change start time for holdover
+					succ = succ.copyShiftedToArrival(fromTime);					
+				} else {
+					succ = succ.copyShiftedToStart(fromTime);
+					
+					// go back to just before this label
+					fromTime = tempi.getLowBound() - 1;
+					
+					succ = succ.copyShiftedToArrival(fromTime);						
+				}								   	
+			}
+			
+			list.addLast(succ);
+
+			vNode = succ.getArrivalNode();
+		}
+	
+	}
+	
+	protected LinkedList<PathStep> backTrackPredecessor(VirtualNode arrival) {
+		//start constructing the TimeExpandedPath
+		LinkedList<PathStep> list = new LinkedList<PathStep>();		
+
+		BreadCrumb bc;
+		PathStep pred;
+		VirtualNode vNode;
+		
+		IndexedNodeI toNode; 
+		int toTime;		
+		VertexInterval toLabel;
+
+		vNode = arrival;
+		
+		
+		while (true) { // exists if a source is found (or if bc == null for other reasons)
+			
+			toNode =  vNode.getRealNode();
+			toTime = vNode.getRealTime();
+			
+			if (vNode instanceof VirtualNormalNode) {
+				toLabel = this._labels[toNode.getIndex()].getIntervalAt(toTime);
+			} else if (vNode instanceof VirtualSource) {
+				toLabel = this._sourcelabels[toNode.getIndex()];			
+			} else if (vNode instanceof VirtualSink) {
+				// if we had sink labels (for costs), we maybe could continue.
+				// But here, sinks should never occur.
+				throw new RuntimeException("Predecessors ended in Sinks! This should not happen!");
+			} else {
+				throw new IllegalArgumentException("Unknown kind of virtual node!");
+			}
+			
+			bc = toLabel.getPredecessor();
+			
+			if (bc == null) {
+				if (!(vNode instanceof VirtualSource)) {
+				  System.out.println("Backtracking predecessors did not end in source. Weird.");
+				}
+				return list;
+			}			
+			
+			pred = bc.createPathStepForward(vNode, _settings);
+			
+			// sadly, we treat Holdover differently, because it cannot be shifted properly
+			if (pred instanceof StepHold) {
+				// FIXME, no Holdover with Breadcrumbs yet! 
+				
+				// could probably recycle toLabel from last iteration ...
+				VertexInterval tempi = this._labels[toNode.getIndex()].getIntervalAt(toTime);
+				
+				if (pred.getForward()) {							
+					// set the right arrival time, does not change start time for holdover
+					pred = pred.copyShiftedToArrival(toTime);
+			
+					// go back to just before the label that was reached by holdover														
+					toTime = tempi.getLowBound() - 1;
+					
+					// set the right start time, does not change arrival time for holdover
+					pred = pred.copyShiftedToStart(toTime);					
+				} else {
+					pred = pred.copyShiftedToArrival(toTime);
+					
+					// go forward to the next label							
+					toTime = tempi.getHighBound();
+					
+					// set the right start time, does not change arrival time for holdover
+					pred = pred.copyShiftedToStart(toTime);
+				}
+			}
+			
+			list.addFirst(pred);
+			
+			vNode = pred.getStartNode();
+		}  
+	}
+	
 	
 	/**
 	 * method for updating the labels of Node to during one iteration of the algorithm
@@ -742,25 +704,40 @@ public class BellmanFordIntervalBased {
 
 			if (!reverse) {
 				// Create predecessor. It is not shifted correctly.
-				PathStep pred;
+				/*PathStep pred;
 				if (original) {
 					pred = new StepEdge(over, 0, this._settings.getLength(over), original);
 				} else {
 					pred = new StepEdge(over, this._settings.getLength(over), 0, original);				
 				}
+				arriveProperties.setPredecessor(pred);*/
+				BreadCrumb pred;
+				if (original) {
+					pred = new BreadCrumbEdgeBackwards(over);
+				} else {
+					pred = new BreadCrumbEdge(over);				
+				}
 				arriveProperties.setPredecessor(pred);
 			} else {
-				// Create successor. It is not shifted correctly.			
-				PathStep succ;
+				BreadCrumb succ;
+				if (original) {
+					succ = new BreadCrumbEdge(over);
+				} else {
+					succ = new BreadCrumbEdgeBackwards(over);				
+				}
+				arriveProperties.setSuccessor(succ);
+				
+				
+				// Create successor. It is not shifted correctly.
+				/*PathStep succ;
 				if (original) {
 					succ = new StepEdge(over, 0, this._settings.getLength(over), original);
 				} else {
 					succ = new StepEdge(over, this._settings.getLength(over), 0, original);				
 				}
-				arriveProperties.setSuccessor(succ);
+				arriveProperties.setSuccessor(succ);*/
 			}
 
-			//this.Tpropagate.onoff();
 			arrive = flowover.propagate(ival, original, reverse, timehorizon);
 			this.Tpropagate.onoff();
 						
@@ -807,7 +784,8 @@ public class BellmanFordIntervalBased {
 		
 		//List<BFTask> queue = new ArrayList<BFTask>();
 		
-		PathStep pred = new StepSourceFlow(v, 0, true);
+		//PathStep pred = new StepSourceFlow(v, 0, true);
+		BreadCrumb pred = new BreadCrumbIntoSource();
 		
 		//Interval i = new Interval(0, this._settings.TimeHorizon);
 		//ArrayList<VertexInterval> changed = this._labels.get(v).setTrueList(i , pred, false);
@@ -816,11 +794,12 @@ public class BellmanFordIntervalBased {
 		arrive.setReachable(true);
 		ArrayList<VertexInterval> changed = this._labels[v.getIndex()].setTrueList(arrive);
 		
-		//this.TinnerQueue.onoff();
+		this.TinnerQueue.onoff();
+		VirtualNormalNode VN = new VirtualNormalNode(v, 0);
 		for(VertexInterval changedintervall : changed){
-			queue.add(new BFTask(new VirtualNormalNode(v, 0), changedintervall, false));
+			queue.add(new BFTask(VN, changedintervall, false));
 		}	
-		//this.TinnerQueue.onoff();
+		this.TinnerQueue.onoff();
 		
 		//return queue;
 	}
@@ -858,8 +837,7 @@ public class BellmanFordIntervalBased {
 			VertexInterval temp = this._labels[v.getIndex()].getIntervalAt(t);
 			
 			if (!temp.getReachable() || temp.getPredecessor() == null) {
-				System.out.println("Node " + v.getId() + " was not reachable or had no predecessor!");
-				return temp;
+				throw new RuntimeException("Node " + v.getId() + " was not reachable or had no predecessor!");
 			}
 			
 			if (temp.isScanned()) {
@@ -942,8 +920,9 @@ public class BellmanFordIntervalBased {
 			if (changed == null) continue;
 
 			this.TinnerQueue.onoff();
+			VirtualNormalNode VN = new VirtualNormalNode(w, 0);
 			for(VertexInterval changedinterval : changed){				
-				queue.add(new BFTask(new VirtualNormalNode(w, 0), changedinterval, false));				
+				queue.add(new BFTask(VN, changedinterval, false));				
 			}
 			this.TinnerQueue.onoff();			
 
@@ -961,8 +940,9 @@ public class BellmanFordIntervalBased {
 			if (changed == null) continue;
 
 			this.TinnerQueue.onoff();
+			VirtualNormalNode VN = new VirtualNormalNode(w, 0);
 			for(VertexInterval changedinterval : changed){				
-				queue.add(new BFTask(new VirtualNormalNode(w, 0), changedinterval, false));				
+				queue.add(new BFTask(VN, changedinterval, false));		
 			}
 			this.TinnerQueue.onoff();
 		}
@@ -986,10 +966,14 @@ public class BellmanFordIntervalBased {
 					
 					
 					queue.add(new BFTask(new VirtualSource(v), temp, false));
-																  
-					StepSourceFlow pred = new StepSourceFlow(v, arrive.getLowBound(), false);
-					VertexInterval sourcelabel = this._sourcelabels[v.getIndex()]; 
-					sourcelabel.setArrivalAttributesForward(pred);
+					
+					VertexInterval sourcelabel = this._sourcelabels[v.getIndex()];
+					
+					//StepSourceFlow pred = new StepSourceFlow(v, arrive.getLowBound(), false);					
+					//sourcelabel.setArrivalAttributesForward(pred);
+					BreadCrumb bc = new BreadCrumbOutOfSource(arrive.getLowBound());
+					sourcelabel.setArrivalAttributesForward(bc);
+					
 				}
 			}
 		}
@@ -1001,6 +985,7 @@ public class BellmanFordIntervalBased {
 	
 	private ArrayList<VertexInterval> relabelHoldover(IndexedNodeI v, Interval inter,boolean original, boolean reverse,
 			int timeHorizon) {
+		if (true) throw new UnsupportedOperationException("Holdover is currently out of service.");
 		
 		VertexIntervals labelto = _labels[v.getIndex()];
 		EdgeFlowI flowover = this._flow.getHoldover(v);
@@ -1021,7 +1006,7 @@ public class BellmanFordIntervalBased {
 				pred = new StepHold(v, inter.getLowBound(), inter.getLowBound()-1, original);
 			}
 
-			arriveProperties.setPredecessor(pred);
+			//arriveProperties.setPredecessor(pred);
 		} else {
 			// Create successor. It is not shifted correctly. Just the information holdover (and original) should be enough, though.
 			
@@ -1033,7 +1018,7 @@ public class BellmanFordIntervalBased {
 				succ = new StepHold(v, inter.getLowBound(), inter.getLowBound()-1, original);
 			}
 
-			arriveProperties.setSuccessor(succ);					
+			//arriveProperties.setSuccessor(succ);					
 		}
 
 
@@ -1120,39 +1105,51 @@ public class BellmanFordIntervalBased {
 
 
 	Pair<TaskQueue, Interval> processNormalNodeReverse(IndexedNodeI v, int t) {
+		TaskQueue queue = new SimpleTaskQueue();
+		Interval i = processNormalNodeReverse(v, t, queue);
+		return new Pair<TaskQueue, Interval>(queue, i);
+	}
+	
+	Interval processNormalNodeReverse(IndexedNodeI v, int t, TaskQueue queue) {
 		
 		Interval inter;
 
+		this.Tpickintervaltime.onoff();
 		if (this._settings.useImplicitVertexCleanup) {
 			Pair<Boolean, Interval> todo = getUnscannedInterSetScanned(v, t, true);
 			inter = todo.second;
 			if (!todo.first) {
 				this._totalnonpolls++;
 				this._roundnonpolls++;
-				return new Pair<TaskQueue, Interval>(null, inter);
+				//return new Pair<TaskQueue, Interval>(null, inter);
+				return inter;
 			}
 		} else {
 			VertexInterval temp = this._labels[v.getIndex()].getIntervalAt(t);
 
 			if (!temp.getReachable() || temp.getSuccessor() == null) {
-				System.out.println("Node " + v.getId() + " was not reachable or had no successor!");
-				return new Pair<TaskQueue, Interval>(null, temp);
+				System.out.println("Node " + v.getId() + " was not reachable or had no successor!");				
+				//return new Pair<TaskQueue, Interval>(null, temp);
+				return temp;
 			}
 
 			if (temp.isScanned()) {
 				// don't scan again ... can happen with vertex cleanup
 				this._totalnonpolls++;
 				this._roundnonpolls++;
-				return new Pair<TaskQueue, Interval>(null, temp);
+				return temp;
+				//return new Pair<TaskQueue, Interval>(null, temp);
 			}
 			temp.setScanned(true);
 			inter = temp;
 		}
+		this.Tpickintervaltime.onoff();
 		
 		
-		// TODO hier weiter!
+		this.Tholdovertime.onoff();
 		if (this._settings.useHoldover) {
 			//System.out.println("No holdover yet in processNormalNodeReverse()!");
+			
 			int max = inter.getHighBound();
 			int min = inter.getLowBound();
 			
@@ -1201,10 +1198,11 @@ public class BellmanFordIntervalBased {
 				inter = tempinter;
 			}
 		}
-		
-		TaskQueue queue = new SimpleTaskQueue();
+		this.Tholdovertime.onoff();
 		
 		// visit neighbors
+		
+		this.Tforwardtime.onoff();
 		
 		// link is incoming edge of v => forward edges have v as successor
 		for (IndexedLinkI link : v.getInLinks()) {
@@ -1214,11 +1212,17 @@ public class BellmanFordIntervalBased {
 			
 			if (changed == null) continue;
 
+			TinnerQueue.onoff();
+			VirtualNormalNode VN = new VirtualNormalNode(w, 0);
 			for(VertexInterval changedinterval : changed){
-				queue.add(new BFTask(new VirtualNormalNode(w, 0), changedinterval, true));
+				queue.add(new BFTask(VN, changedinterval, true));
 			}
+			TinnerQueue.onoff();
 
 		}
+		
+		this.Tforwardtime.onoff();
+		this.Tbackwardtime.onoff();
 		
 		// link is outgoing edge of v => backward edges have v as successor
 		for (IndexedLinkI link : v.getOutLinks()) {					
@@ -1227,15 +1231,18 @@ public class BellmanFordIntervalBased {
 			ArrayList<VertexInterval> changed = relabel(v, inter, w, link, false, true, this._settings.TimeHorizon);
 			
 			if (changed == null) continue;
-			
+
+			TinnerQueue.onoff();
+			VirtualNormalNode VN = new VirtualNormalNode(w, 0);
 			for(VertexInterval changedinterval : changed) {
-				queue.add(new BFTask(new VirtualNormalNode(w, 0), changedinterval, true));
+				queue.add(new BFTask(VN, changedinterval, true));
 			}					
+			TinnerQueue.onoff();
 			
 		}
 		
-		
-
+		this.Tbackwardtime.onoff();
+		this.Temptysourcestime.onoff();
 		// treat sources.
 		// here it does not matter if they are active or not
 		// we can always be reached from them because the links have infinite capacity
@@ -1243,10 +1250,14 @@ public class BellmanFordIntervalBased {
 			// we've found a source, mark it
 			VertexInterval vi = this._sourcelabels[v.getIndex()];
 			
+			/*
 			// maybe we should "leave" the source as late as possible?
 			// no, that does seem to make it a lot worse!
 			PathStep succ = new StepSourceFlow(v, inter.getLowBound(), true);
 			//PathStep succ = new StepSourceFlow(v, inter.getHighBound() - 1, true);
+			 */
+			
+			BreadCrumb succ = new BreadCrumbOutOfSource(inter.getLowBound());
 			
 			if (this._flow.isActiveSource(v)) {
 				// mark it as reachable if it was unreachable 
@@ -1275,11 +1286,19 @@ public class BellmanFordIntervalBased {
 				}
 			}
 		}			
+		this.Temptysourcestime.onoff();
 		
-       return new Pair<TaskQueue, Interval>(queue, inter);	
+       //return new Pair<TaskQueue, Interval>(queue, inter);
+		return inter;
 	}
 	
 	TaskQueue processSinkReverse(IndexedNodeI v, int lastArrival) {
+		TaskQueue queue = new SimpleTaskQueue();
+		processSinkReverse(v, lastArrival, queue);
+		return queue;
+	}
+	
+	void processSinkReverse(IndexedNodeI v, int lastArrival, TaskQueue queue) {
 		// we want to arrive at lastArrival
 		// propagate that to the associated real node
 		
@@ -1293,28 +1312,41 @@ public class BellmanFordIntervalBased {
 		VertexInterval arrive = new VertexInterval(0, lastArrival + 1);
 		//VertexInterval arrive = new VertexInterval(lastArrival, lastArrival + 1);
 		
-		PathStep succ = new StepSinkFlow(v, lastArrival, true);
+		//PathStep succ = new StepSinkFlow(v, lastArrival, true);
+		
+		BreadCrumb succ = new BreadCrumbIntoSink();
 		arrive.setSuccessor(succ);
 		arrive.setReachable(true);
 		
 		ArrayList<VertexInterval> changed = this._labels[v.getIndex()].setTrueList(arrive);
 		
-		TaskQueue queue = new SimpleTaskQueue();
+		//TaskQueue queue = new SimpleTaskQueue();
 		
+		TinnerQueue.onoff();
+		VirtualNormalNode VN = new VirtualNormalNode(v, 0);
 		for(VertexInterval changedintervall : changed){
-			queue.add(new BFTask(new VirtualNormalNode(v, 0), changedintervall, true));
+			queue.add(new BFTask(VN, changedintervall, true));
 		}
+		TinnerQueue.onoff();
 		
-		return queue;
+		//return queue;
+		return;
 	}
 	
 	TaskQueue processSourceReverse(IndexedNodeI v) {
+		TaskQueue queue = new SimpleTaskQueue();
+		processSourceReverse(v, queue);
+		return queue;
+	}
+	
+	void processSourceReverse(IndexedNodeI v, TaskQueue queue) {
 		
 		// active sources are the end of the search				
 		if (this._flow.isActiveSource(v)) {
 			// we have a shortest path
 			_hasPath = true;			
-			return null;
+			//return null;
+			return;
 		}
 		
 		// nonactive sources are just transit nodes, and need to scan residual edges.		
@@ -1324,7 +1356,8 @@ public class BellmanFordIntervalBased {
 		// already scanned or not reachable (neither should occur ...)
 		if (inter.isScanned() || !inter.getReachable()) {
 			System.out.println("Source " + v.getId() + " was already scanned or not reachable ...");
-			return null;
+			//return null;
+			return;
 		}
 		inter.setScanned(true);
 
@@ -1332,19 +1365,24 @@ public class BellmanFordIntervalBased {
 
 		// successor depends on the time, but should get adjusted
 
-		PathStep succ = new StepSourceFlow(v, 0, false);
+		//PathStep succ = new StepSourceFlow(v, 0, false);
+		BreadCrumb succ = new BreadCrumbIntoSource();
+		
 		VertexInterval arriveProperties = new VertexInterval();				
 		arriveProperties.setArrivalAttributesReverse(succ);
 		ArrayList<VertexInterval> changed = this._labels[v.getIndex()].setTrueList(sendBackWhen , arriveProperties);
 
-		if (changed == null) return null;
+		if (changed == null) return;// null;
 		
-		TaskQueue queue = new SimpleTaskQueue();
+		//TaskQueue queue = new SimpleTaskQueue();
 
-		for(VertexInterval changedintervall : changed){
-			queue.add(new BFTask(new VirtualNormalNode(v, 0), changedintervall, true));			
+		TinnerQueue.onoff();
+		VirtualNormalNode VN = new VirtualNormalNode(v, 0); // the time does not matter ...
+		for(VertexInterval changedInterval : changed){
+			queue.add(new BFTask(VN, changedInterval, true));			
 		}
-		return queue;
+		TinnerQueue.onoff();
+		return;// queue;
 	}
 	
 	
@@ -1448,7 +1486,7 @@ public class BellmanFordIntervalBased {
 			}
 			
 			// FIXME experimental ... ignore tasks from sources which already have a path.
-			if (this._originsToIgnore[task.origin.getIndex()]) {
+			if (_settings.filterOrigins && this._originsToIgnore[task.origin.getIndex()]) {
 				//System.out.println("Ignoring a task due to origin!");
 				this._roundnonpolls++;
 				this._totalnonpolls++;
@@ -1517,7 +1555,8 @@ public class BellmanFordIntervalBased {
 				Tsourcetime.onoff();
 				// send out of source v
 				
-				processSourceForward(v, queue); 
+				processSourceForward(v, queue);
+				Tsourcetime.onoff();
 			} else if (task.node instanceof VirtualNormalNode) {
 				Tnormaltime.onoff();
 				if (this._settings.useVertexCleanup) { 			
@@ -1590,9 +1629,9 @@ public class BellmanFordIntervalBased {
 				
 		Tconstructroutetime.onoff();
 		List<TimeExpandedPath> TEPs = null; 
-		try{ 
+		try { 
 			TEPs  = constructRoutesForward();		
-		}catch (BFException e){
+		} catch (BFException e) {
 			System.out.println("stop reason: " + e.getMessage());
 		}
 		Tconstructroutetime.onoff();
@@ -1627,7 +1666,11 @@ public class BellmanFordIntervalBased {
 			  queue = new SimpleTaskQueue();
 			  break;
 		  case FlowCalculationSettings.QUEUE_DFS:
-			  queue = new PriorityTaskQueue(new TaskComparatorReverse());
+			  if (this._settings.useBucketQueue) {
+				  queue = new BucketTaskQueue(new TaskComparatorReverse(lastArrival));
+			  } else {
+				  queue = new PriorityTaskQueue(new TaskComparatorReverse(lastArrival));
+			  }			  
 			  break;
 		  case FlowCalculationSettings.QUEUE_GUIDED:
 		  case FlowCalculationSettings.QUEUE_STATIC:
@@ -1722,27 +1765,15 @@ public class BellmanFordIntervalBased {
 			IndexedNodeI v = task.node.getRealNode();
 			
 			if (task.node instanceof VirtualSink) {
-				
-				TaskQueue tempqueue = processSinkReverse(v, lastArrival); 
-
-				Tqueuetime.onoff();
-				if (tempqueue != null) {
-					queue.addAll(tempqueue);
-				}
-				Tqueuetime.onoff();
-				
+				Tsinktime.onoff();
+				processSinkReverse(v, lastArrival, queue);
+				Tsinktime.onoff();
 			} else 	if (task.node instanceof VirtualSource) {
-
-				TaskQueue tempqueue = processSourceReverse(v); 
-
-				Tqueuetime.onoff();
-				if (tempqueue != null) {
-					queue.addAll(tempqueue);
-				}
-				Tqueuetime.onoff();
-				
+				Tsourcetime.onoff();
+				processSourceReverse(v, queue); 
+				Tsourcetime.onoff();
 			} else if (task.node instanceof VirtualNormalNode) {
-				
+				Tnormaltime.onoff();
 				if (this._settings.useVertexCleanup) { 			
 					// Effectiveness with this implementation is questionable
 					this._vertexGain += _labels[v.getIndex()].cleanup();
@@ -1757,16 +1788,10 @@ public class BellmanFordIntervalBased {
 				
 				int low = task.ival.getLowBound();
 				while (low < task.ival.getHighBound()) {
-					Pair<TaskQueue, Interval> ret = processNormalNodeReverse(v, low); 
-					TaskQueue tempqueue = ret.first;
-
-					Tqueuetime.onoff();
-					if (tempqueue != null) {
-						queue.addAll(tempqueue);
-					}
-					Tqueuetime.onoff();
-					low = ret.second.getHighBound() + 1;
+					Interval ret = processNormalNodeReverse(v, low, queue); 
+					low = ret.getHighBound() + 1;
 				}
+				Tnormaltime.onoff();
 
 			} else {
 				throw new RuntimeException("Unsupported instance of VirtualNode in BellmanFordIntervalBased");
@@ -1785,14 +1810,15 @@ public class BellmanFordIntervalBased {
 		//System.out.println("final labels: \n");
 		//printStatus();
 		
-		boolean foundsome = false; 
+		Tconstructroutetime.onoff(); 
 		List<TimeExpandedPath> TEPs = null; 
 		try{ 
 			TEPs  = constructRoutesReverse();			
-			foundsome = true;
 		} catch (BFException e) {
+			Tconstructroutetime.onoff();
 			System.out.println("stop reason: " + e.getMessage());
 		}
+		Tconstructroutetime.onoff();
 		
 	    return TEPs;
 	
@@ -1816,13 +1842,16 @@ public class BellmanFordIntervalBased {
 		// PriorityQueue seems to be much slower than a regular Breadth First Search
 		// at least the finding of multiple paths seems much more effective with BFS!
 		
+		
+		Tqueuetime.onoff();
 		//TaskComparator taskcomp = new TaskComparator();
 		//Queue<BFTask> queue = new PriorityQueue<BFTask>((1), taskcomp);
 		TaskQueue queue = new SimpleTaskQueue();
 
 		//set fresh labels, initialize queue
-		
-		refreshLabelsMixed(queue);		
+				
+		refreshLabelsMixed(queue);
+		Tqueuetime.onoff();
 		
 		//System.out.println(this._labels);
 		//System.out.println(this._sourcelabels);
@@ -1833,6 +1862,10 @@ public class BellmanFordIntervalBased {
 		// TODO warmstart
 		
 		BFTask task;
+		
+		int finalPoll = Integer.MAX_VALUE / 2;
+		boolean quickCutOffArmed = false;
+		_hasPath = false;
 
 		// main loop
 		//int gain = 0;
@@ -1846,105 +1879,127 @@ public class BellmanFordIntervalBased {
 			this._totalpolls++;			
 			
 			// gets the first task in the queue			
+			Tqueuetime.onoff();
 			task = queue.poll();
+			Tqueuetime.onoff();
+			
 			if (task == null) {
+				break;
+			}
+			
+			if (!quickCutOffArmed &&  _hasPath) {								
+				// now, we could stop ...
+				
+				// do we want to stop after the first path is found?
+				if (this._settings.quickCutOff >= 0.0) {			
+					finalPoll = (int) ((Integer) this._roundpolls * (1.0 + _settings.quickCutOff));
+					quickCutOffArmed = true;
+					if (_debug > 0) {
+						System.out.println("Quickcutoff activated. currentPoll: " + this._roundpolls + " finalPoll: " + finalPoll);
+					}
+					//break;
+				}
+			}
+			
+			if (quickCutOffArmed && this._roundpolls > finalPoll) {
+				if (_debug > 0) {
+					System.out.println("Reached final poll, cutoff!");
+				}
 				break;
 			}
 			
 			IndexedNodeI v = task.node.getRealNode();
 			
 			if (task.reverse) { // do a reverse step
-				if (task.time > cutofftimeReverse) {
-					// the algorithm should never get here?
-					System.out.println("Beyond cut-off time, ignoring.");
-					continue;
-				}
-				
-				
 				if (task.node instanceof VirtualSink) {
-					
-					TaskQueue tempqueue = processSinkReverse(v, lastArrival); 
-
-					if (tempqueue != null) {
-						queue.addAll(tempqueue);
-					}
-					
+					Tsinktime.onoff();
+					processSinkReverse(v, cutofftimeReverse, queue);
+					Tsinktime.onoff();
 				} else 	if (task.node instanceof VirtualSource) {
-					
-					TaskQueue tempqueue = processSourceReverse(v); 
-
-					if (tempqueue != null) {
-						queue.addAll(tempqueue);
-					}
-					
+					Tsourcetime.onoff();
+					processSourceReverse(v, queue); 
+					Tsourcetime.onoff();
 				} else if (task.node instanceof VirtualNormalNode) {
-					
+					Tnormaltime.onoff();
 					if (this._settings.useVertexCleanup) { 			
 						// Effectiveness with this implementation is questionable
 						this._vertexGain += _labels[v.getIndex()].cleanup();
-					}									
+					}
+					
+					if (this._settings.trackUnreachableVertices) {
+						if (task.ival.getHighBound() <= this._unreachable[v.getIndex()]) {
+							//System.out.println("Skipping a task!");
+							continue;
+						}
+					}
 					
 					int low = task.ival.getLowBound();
 					while (low < task.ival.getHighBound()) {
-						Pair<TaskQueue, Interval> ret = processNormalNodeReverse(v, low); 
-						TaskQueue tempqueue = ret.first;
-
-						if (tempqueue != null) {
-							queue.addAll(tempqueue);
-						}
-						low = ret.second.getHighBound() + 1;
+						Interval ret = processNormalNodeReverse(v, low, queue); 
+						low = ret.getHighBound() + 1;
 					}
+					Tnormaltime.onoff();
+
 				} else {
 					throw new RuntimeException("Unsupported instance of VirtualNode in BellmanFordIntervalBased");
 				}
 				
 			} else { // do a forward step
-				if (task.time > cutofftimeForward) {
-					//System.out.println("Ignoring too late task in BFS!");
-					continue;
 
-				}
-				
-				if (this._settings.isSink(v)) {
-					// keep scanning until strictly later to give more sinks a chance to be found!
+				if (this._settings.isSink(v)) {		
+					Tsinktime.onoff();
 					if (this._flow.isActiveSink(v)) {
+
 						if (task.time < cutofftimeForward) {				  
 							cutofftimeForward = task.time;	
 							if (_debug > 0) {
 								System.out.println("Setting new cutoff time: " + cutofftimeForward);
 							}
-						}				
+
+						}
+
+						// do we have a shortest path?
+						if (_haslastcost && task.time == _lastcost) {
+							_hasPath = true;
+
+							//System.out.println("Have shortest path to " + v.getId());
+							//System.out.println("Have shortest path from " + task.origin);
+
+							// FIXME experimental
+							//System.out.println("Ignoring source " + task.origin);
+							if (this._settings.filterOrigins) {
+								this._originsToIgnore[task.origin.getIndex()] = true;
+							}
+						}					
+
 					}
+					Tsinktime.onoff();
 				} else if (task.node instanceof VirtualSource) {
+					Tsourcetime.onoff();
 					// send out of source v
-					TaskQueue tempqueue = processSourceForward(v); 
-					
-					if (tempqueue != null) {
-					  queue.addAll(tempqueue);
-					}
-					
+
+					processSourceForward(v, queue);
+					Tsourcetime.onoff();
 				} else if (task.node instanceof VirtualNormalNode) {
-					
+					Tnormaltime.onoff();
 					if (this._settings.useVertexCleanup) { 			
 						// Effectiveness with this implementation is questionable
 						this._vertexGain += _labels[v.getIndex()].cleanup();
 					}
 
+					// We want to ensure that we really scan all of task.ival .
+					// This does not really matter here, but in the search with cost.
 					int low = task.ival.getLowBound();
 					while (low < task.ival.getHighBound()) {
-						Pair<TaskQueue, Interval> ret = processNormalNodeForward(v, low); 
-						TaskQueue tempqueue = ret.first;
+						Interval ret = processNormalNodeForward(v, low, queue);
 
-						if (tempqueue != null) {
-							queue.addAll(tempqueue);
-						}
-						low = ret.second.getHighBound() + 1;
+						low = ret.getHighBound() + 1;
 					}
-
+					Tnormaltime.onoff();
 				} else {
 					throw new RuntimeException("Unsupported instance of VirtualNode in BellmanFordIntervalBased");
 				}
-							
+
 			}
 			
 			
@@ -1962,18 +2017,16 @@ public class BellmanFordIntervalBased {
 		//printStatus();
 		
 		
-		boolean foundsome = false; 
+		Tconstructroutetime.onoff();
 		List<TimeExpandedPath> TEPs = null; 
 		try{ 
 			TEPs  = constructRoutesMixed();
-			foundsome = true;
 		}catch (BFException e){
 			System.out.println("stop reason: " + e.getMessage());
 		}
-		
-		//System.out.println("Gain from Cleanup: " + gain);
-			
-		  return TEPs;		
+		Tconstructroutetime.onoff();
+	
+	    return TEPs;		
 	}
 	
 	
@@ -1995,6 +2048,7 @@ public class BellmanFordIntervalBased {
 	}
 
 	
+	@SuppressWarnings("unused")
 	private boolean checkAllLabels() {
 		System.out.println("Checking all labels ... ");
 		// check normal links
@@ -2258,6 +2312,7 @@ public class BellmanFordIntervalBased {
 		return allokay;
 	}
 	
+	@SuppressWarnings("unused")
 	private boolean checkAllLabelsReverse() {
 		System.out.println("Checking all labels for reverse search ... ");
 		// check normal links

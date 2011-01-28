@@ -1,11 +1,12 @@
 package playground.dressler.ea_flow;
 
+import playground.dressler.Interval.Interval;
 import playground.dressler.Interval.VertexInterval;
 import playground.dressler.network.IndexedNodeI;
 
 public class BFTask {
 	final public int time;
-	final public VertexInterval ival;
+	final public Interval ival;
 	final public VirtualNode node;
 	final public boolean reverse; 
 	public int depth = 0;
@@ -14,7 +15,7 @@ public class BFTask {
 	
 	BFTask(VirtualNode node, VertexInterval oldival, boolean rev){
 		this.time = oldival.getLowBound();
-		this.ival = oldival.copy(); // we don't want this to be a reference!
+		this.ival = oldival.getIntervalCopy(); // we don't want this to be a reference!
 		this.node = node;
 		this.reverse = rev;
 	}

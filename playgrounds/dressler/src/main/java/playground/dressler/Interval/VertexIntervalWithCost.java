@@ -24,6 +24,7 @@ package playground.dressler.Interval;
 //matsim imports
 // none currently ...
 
+import playground.dressler.ea_flow.BreadCrumb;
 import playground.dressler.ea_flow.PathStep;
 
 // TODO
@@ -168,7 +169,7 @@ public class VertexIntervalWithCost extends VertexInterval {
 	 * Note that this is not suitable for the Reverse search anymore! 
 	 * @param pred which is set as predecessor. It is never shifted anymore.
 	 */	
-	public void setArrivalAttributesForward (final PathStep pred)
+	public void setArrivalAttributesForward (final BreadCrumb pred)
 	{
 		// we might have already scanned this interval
 		// but someone insists on relabelling it.
@@ -182,7 +183,7 @@ public class VertexIntervalWithCost extends VertexInterval {
 	 * This performs no checks at all!
 	 * @param succ which is set as successor. It is never shifted anymore.
 	 */		
-	public void setArrivalAttributesReverse (final PathStep succ)
+	public void setArrivalAttributesReverse (final BreadCrumb succ)
 	{
 		// we might have already scanned this interval
 		// but someone insists on relabelling it.
@@ -243,6 +244,9 @@ public class VertexIntervalWithCost extends VertexInterval {
 	 */
 	@Override
 	public boolean continuedBy(final VertexInterval o) {
+		throw new UnsupportedOperationException("Cannot continue VIs at the moment.");
+		
+		/*
 		// argh.
 		if (!(o instanceof VertexIntervalWithCost)) return super.setArrivalAttributes(o);
 		
@@ -287,6 +291,7 @@ public class VertexIntervalWithCost extends VertexInterval {
 		}
 		
 		return true;
+		*/
 	}
 	
 	
@@ -329,7 +334,7 @@ public class VertexIntervalWithCost extends VertexInterval {
 	
 	
 	@Override
-	public VertexIntervalWithCost copy(){
+	public VertexIntervalWithCost getIntervalCopy(){
 		VertexIntervalWithCost result = new VertexIntervalWithCost(this._l,this._r,this);
 		return result;
 	}

@@ -21,6 +21,8 @@
 
 package playground.dressler.Interval;
 
+import playground.dressler.control.Debug;
+
 
 
 /**
@@ -85,12 +87,13 @@ implements Comparable<Interval>
 	 * 
 	 */
 	public Interval(final int l,final int r){
-		if(legalBounds(l,r)){
-			this._l = l;
-			this._r = r ;
-		}else{
-			throw new IllegalArgumentException("Empty Interval");
+		if (Debug.GLOBAL && Debug.INTERVAL_CHECKS) {
+			if(!legalBounds(l,r)) throw new IllegalArgumentException("Empty Interval");
 		}
+		
+		this._l = l;
+		this._r = r ;
+		
 	}
 	
 //--------------------MODE STUFF---------------------------------------------------//
@@ -168,13 +171,18 @@ implements Comparable<Interval>
 	 * @return an Array of Intervals with the "smaller" one at first
  	 */
 	public Interval[] getSplitedAt(final int t){
-		if(this.isSplittableAt(t)){
-			Interval[] arr = new Interval[2];
-			arr[0]=new Interval(this._l,t);
-			arr[1]=new Interval(t,this._r);
-			return arr;
+		if (Debug.GLOBAL && Debug.INTERVAL_CHECKS) { 
+			if(!(this.isSplittableAt(t))) {
+				throw new IllegalArgumentException(
+						"cant split interval at " + t +
+						" since it ist not an interior piont in the Interval" );
+			}
 		}
-		throw new IllegalArgumentException("cant split interval at " + t +" since it ist not an interior piont in the Interval" );
+		Interval[] arr = new Interval[2];
+		arr[0]=new Interval(this._l,t);
+		arr[1]=new Interval(t,this._r);
+		return arr;
+
 	}
 	
 	/**
@@ -185,12 +193,17 @@ implements Comparable<Interval>
 	 * @return Interval which is the "higher" one
  	 */
 	public Interval splitAt(final int t){
-		if(this.isSplittableAt(t)){
-			Interval i=new Interval(t,this._r);
-			this.setHighBound(t);
-			return i;
+		if (Debug.GLOBAL && Debug.INTERVAL_CHECKS) { 
+			if(!(this.isSplittableAt(t))) {
+				throw new IllegalArgumentException(
+						"cant split interval at " + t +
+						" since it ist not an interior piont in the Interval" );
+			}
 		}
-		throw new IllegalArgumentException("cant split interval at " + t +" since it ist not an interior piont in the Interval " + this );
+		
+		Interval i= new Interval(t,this._r);
+		this.setHighBound(t);
+		return i;		
 	}
 	
 	/**
@@ -230,10 +243,10 @@ implements Comparable<Interval>
  	 * @return true iff refferenced and other interval share a point
 	 */
 	public boolean intersects(final Interval other){
-			if (_r <= other._l) return false;
-			if (_l >= other._r) return false;
-		
-			return true;
+		if (_r <= other._l) return false;
+		if (_l >= other._r) return false;
+
+		return true;
 	}
 
 	
@@ -245,11 +258,12 @@ implements Comparable<Interval>
 	 * and null if the do not intersect
 	 */
 	public Interval Intersection(final Interval other){
-		if(this.intersects(other)){
-			int l = Math.max(this._l, other._l);
-			int r = Math.min(this._r, other._r);
+		int l = Math.max(this._l, other._l);
+		int r = Math.min(this._r, other._r);
+
+		if (l < r)
 			return new Interval(l,r);
-		}
+
 		return null;
 	}
 
@@ -268,8 +282,10 @@ implements Comparable<Interval>
 	 * @param l the _l to set
 	 */
 	public void setLowBound(final int l) {
-		if(!legalBounds(l,this._r)){
-			throw new IllegalArgumentException("illegal lowbound");
+		if (Debug.GLOBAL && Debug.INTERVAL_CHECKS) {
+			if(!legalBounds(l,this._r)){
+				throw new IllegalArgumentException("illegal lowbound");
+			}
 		}
 		this._l = l;
 	}
@@ -287,8 +303,10 @@ implements Comparable<Interval>
 	 * @param r the _r to set
 	 */
 	public void setHighBound(final int r) {
-		if(!legalBounds(this._l,r)){
-			throw new IllegalArgumentException("illegal highbound");
+		if (Debug.GLOBAL && Debug.INTERVAL_CHECKS) {
+			if(!legalBounds(this._l,r)){
+				throw new IllegalArgumentException("illegal highbound");
+			}
 		}
 		this._r = r;
 	}

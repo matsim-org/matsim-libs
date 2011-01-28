@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SimpleTaskQueue.java
+ * BreadCrumbEdgeForward.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,62 +20,44 @@
 
 package playground.dressler.ea_flow;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedList;
+import playground.dressler.control.Debug;
+import playground.dressler.control.FlowCalculationSettings;
 
-import playground.dressler.network.IndexedNodeI;
 
-public class SimpleTaskQueue implements TaskQueue {
-	private int depth = 0;
-	private IndexedNodeI origin = null;
-	private LinkedList<BFTask> _list;
+public class BreadCrumbIntoSource implements BreadCrumb {	
 	
-	public SimpleTaskQueue(){
-		_list= new LinkedList<BFTask>();
-	}
-	
+	/**
+	 * Method returning a String representation of the StepEdge
+	 */
 	@Override
-	public boolean addAll(Collection<? extends BFTask> c) {
-		//return _list.addAll(c);
-		Boolean result = false;
-		for(BFTask task: c){
-			task.depth = this.depth;
-			if (task.origin == null) task.origin = this.origin;
-			result = _list.add(task) || result; // never want a shortcut!		
+	public String toString(){
+		return  "into source";
+	}
+
+	@Override
+	public PathStep createPathStepForward(VirtualNode arrival, FlowCalculationSettings settings) {
+		if (Debug.GLOBAL && Debug.STEP_CHECKS) {
+			if (!(arrival instanceof VirtualNormalNode)) {
+				throw new RuntimeException("Can only step into a source from a normal node!"); 
+			}
 		}
-		return result;
+
+		// Arrival is a normal node that was found from a source.
+		// This is a primal step to arrival.
+		return new StepSourceFlow(arrival.getRealNode(), arrival.getRealTime(), true);
 	}
 
 	@Override
-	public Iterator<BFTask> iterator() {
-		return _list.iterator();
-	}
-
-	@Override
-	public boolean add(BFTask task) {
-		task.depth = this.depth;
-		if (task.origin == null) task.origin = this.origin;
-		return _list.add(task);
-	}
-
-	@Override
-	public boolean addAll(TaskQueue tasks) {		
-		boolean result = false;
-		
-		for(BFTask task: tasks){
-			task.depth = this.depth;
-			if (task.origin == null) task.origin = this.origin;
-			result = _list.add(task) || result; // never want a shortcut!
+	public PathStep createPathStepReverse(VirtualNode start, FlowCalculationSettings settings) {
+		if (Debug.GLOBAL && Debug.STEP_CHECKS) {
+			if (!(start instanceof VirtualNormalNode)) {
+				throw new RuntimeException("Can only step into a source from a normal node!"); 
+			}
 		}
-		return result;
+
+		// Start is a normal node that was found from a source.
+		// This is a residual step into the source
+		return new StepSourceFlow(start.getRealNode(), start.getRealTime(), false);
 	}
+};
 
-	@Override
-	public BFTask poll() {
-		return _list.poll();
-	}
-
-	
-
-}

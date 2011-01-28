@@ -21,9 +21,12 @@
 package playground.dressler.ea_flow;
 
 //java imports
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.ListIterator;
 
 import playground.dressler.network.IndexedNodeI;
@@ -374,9 +377,24 @@ public class TimeExpandedPath {
 		this._steps.addLast(step);
 	}
 	
+	public void append(List<PathStep> steps)
+	{
+		for (PathStep step : steps) 
+			this._steps.addLast(step);
+	}
+	
 	public void prepend(PathStep step)
 	{
 		this._steps.addFirst(step);
+	}
+	
+	public void prepend(LinkedList<PathStep> steps)
+	{
+		Iterator<PathStep >iter = steps.descendingIterator();
+		
+		while (iter.hasNext()) {
+			this._steps.addFirst(iter.next());	
+		}
 	}
 	
 	public void removeLast() {

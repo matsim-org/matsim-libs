@@ -21,6 +21,8 @@
 
 package playground.dressler.Interval;
 
+import playground.dressler.control.Debug;
+
 
 /**
  * @author Manuel Schneider
@@ -38,7 +40,7 @@ public class EdgeInterval extends Interval
 	 * default flow value is 0
 	 */
 	private int _flow =0;
-
+	
 //********************************METHODS******************************************//	
 
 	
@@ -110,12 +112,12 @@ public class EdgeInterval extends Interval
 	 * @param f positive flow value
 	 */
 	public void setFlow(final int f){
-		if(f>=0){
-			this._flow=f;
+		if (Debug.GLOBAL && Debug.INTERVAL_CHECKS) {
+			if (f < 0)
+				throw new IllegalArgumentException("flow is negative");
 		}
-		else{
-			throw new IllegalArgumentException("flow is negative");
-		}
+		
+		this._flow=f;		
 	}
 	
 	/**
@@ -133,17 +135,19 @@ public class EdgeInterval extends Interval
 	 * @param u  nonnegative capacity
 	 */
 	public void setFlow(final int f,final int u){
-		if(u<0){
-			throw new IllegalArgumentException("negative capacity");
+		if (Debug.GLOBAL && Debug.INTERVAL_CHECKS) {
+			if(u<0){
+				throw new IllegalArgumentException("negative capacity");
+			}
+			if (f < 0) {
+				throw new IllegalArgumentException("flow is negative");
+			}
+			if(f > u){
+				throw new IllegalArgumentException("capacity violated");
+			}
 		}
-		if (f < 0) {
-			throw new IllegalArgumentException("flow is negative");
-		}
-		if(f > u){
-			throw new IllegalArgumentException("capacity violated");
-		} else {
-			this._flow = f;
-		}			
+
+		this._flow = f;
 	}
 	
 	/**
@@ -153,7 +157,7 @@ public class EdgeInterval extends Interval
 	 * @param u  nonnegative capacity
 	 */
 	public void augment(final int gamma,final int u){
-		this.setFlow(gamma+this._flow, u);
+		this.setFlow(gamma + this._flow, u);
 	}
 	
 	/**
@@ -185,9 +189,9 @@ public class EdgeInterval extends Interval
 	 */
 	@Override
 	public EdgeInterval splitAt(final int t){
-		Interval j =super.splitAt(t);
+		Interval j = super.splitAt(t);
 		EdgeInterval k = new EdgeInterval(j);
-		k._flow=this._flow;
+		k._flow = this._flow;
 		return k;
 	}
 	

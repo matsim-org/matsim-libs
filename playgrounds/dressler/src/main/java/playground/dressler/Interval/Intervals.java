@@ -20,6 +20,10 @@
 
 package playground.dressler.Interval;
 
+import java.util.Iterator;
+
+import playground.dressler.control.Debug;
+
 public class Intervals<T extends Interval > implements IntervalsInterface<T> {
 //------------------------FIELDS----------------------------------//
 
@@ -34,10 +38,9 @@ public class Intervals<T extends Interval > implements IntervalsInterface<T> {
 	 T _last; 
 	 
 	/**
-	 * flag for debug mode
+	 * flags for debug mode
 	 */
-	@SuppressWarnings("unused")
-	private static int _debug = 0;
+	private static int _debug = 0;	
 	
 	//-----------------------METHODS----------------------------------//
 	//****************************************************************//
@@ -64,11 +67,17 @@ public class Intervals<T extends Interval > implements IntervalsInterface<T> {
 		 * @return Interval  containing t
 		 */
 		public T getIntervalAt(int t){
-			if(t<0){
-				throw new IllegalArgumentException("negative time: "+ t);
+			if (Debug.GLOBAL && Debug.INTERVALS_CHECKS) {
+				if(t<0){
+					throw new IllegalArgumentException("negative time: "+ t);
+				}
 			}
+			
 			T i = (T) _tree.contains(t);
-			if(i==null)throw new IllegalArgumentException("there is no Interval containing "+t);
+			
+			if (Debug.GLOBAL && Debug.INTERVALS_CHECKS) {
+				if (i==null) throw new IllegalArgumentException("there is no Interval containing "+t);
+			}
 			return i;
 		}
 		
@@ -151,7 +160,9 @@ public class Intervals<T extends Interval > implements IntervalsInterface<T> {
 			T j = null;
 			T i = this.getIntervalAt(t);
 			if (i != null){
-				found = true;
+				if (Debug.GLOBAL && Debug.INTERVALS_CHECKS) {
+					found = true;
+				}
 				//update last
 				if(i == _last){
 					j = (T) i.splitAt(t);
@@ -160,11 +171,14 @@ public class Intervals<T extends Interval > implements IntervalsInterface<T> {
 					j = (T) i.splitAt(t);
 				}
 			}
-			if (found){
-				_tree.insert(j);
-				return j;
+			
+			if (Debug.GLOBAL && Debug.INTERVALS_CHECKS) {
+				if (!found)
+					throw new IllegalArgumentException("there is no Interval that can be split at "+t);
 			}
-			else throw new IllegalArgumentException("there is no Interval that can be split at "+t);
+
+			_tree.insert(j);
+			return j;			
 		}
 
 		
@@ -173,7 +187,7 @@ public class Intervals<T extends Interval > implements IntervalsInterface<T> {
 		 * @param debug debug mode true is on
 		 */
 		public static void debug(int debug){
-			Intervals._debug=debug;
+			Intervals._debug = debug;
 		}
 		
 
@@ -190,5 +204,17 @@ public class Intervals<T extends Interval > implements IntervalsInterface<T> {
 				str.append(i.toString()+" \n");
 			}
 			return str.toString();	
+		}
+
+
+		@Override
+		public Iterator<T> getIterator() {
+			return new BinTreeIterator<T>(_tree);			
+		}
+
+
+		@Override
+		public Iterator<T> getIteratorAt(int t) {
+			return new BinTreeIterator<T>(_tree, t);
 		}
 }

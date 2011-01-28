@@ -58,25 +58,6 @@ public class VertexIntervalsWithCost extends VertexIntervals {
 	}
 	
 
-	
-	/**
-	 * Gives the predecessor Link on the Vertex at time t
-	 * @param t time
-	 * @return flow at t
-	 */
-	public PathStep getPred(int t){
-		return getIntervalAt(t).getPredecessor().copyShiftedToArrival(t);
-	}
-	
-	/**
-	 * Gives the successor Link on the Vertex at time t
-	 * @param t time
-	 * @return flow at t
-	 */
-	public PathStep getSucc(int t){
-		return getIntervalAt(t).getSuccessor().copyShiftedToStart(t);
-	}
-	
 
 //------------------------------GETTER-----------------------//
 

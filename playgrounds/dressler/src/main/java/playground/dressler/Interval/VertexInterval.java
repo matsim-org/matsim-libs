@@ -22,6 +22,9 @@
 package playground.dressler.Interval;
 
 //matsim imports
+import javax.sound.sampled.UnsupportedAudioFileException;
+
+import playground.dressler.ea_flow.BreadCrumb;
 import playground.dressler.ea_flow.PathStep;
 
 
@@ -48,10 +51,9 @@ public class VertexInterval extends Interval {
 	 * the times stored in the step are valid for arrival at the low bound if predecessor
 	 * or for departure at the low bound if successor
 	 */
-	//PathStep _breadcrumb=null;
 	
-	PathStep _succ=null;
-	PathStep _pred=null;
+	BreadCrumb _pred = null; // used in forward search
+	BreadCrumb _succ = null; // used in reverse search
 	
 
 //---------------------------METHODS----------------------------//
@@ -79,9 +81,6 @@ public class VertexInterval extends Interval {
 		// dummy values
 		this.reachable = false;
 		this.scanned = false;
-		//this._breadcrumb = null;
-		this._pred = null;
-		this._succ = null;
 	}
 	
 	/**
@@ -91,7 +90,7 @@ public class VertexInterval extends Interval {
 	 * @param r highbound
 	 * @param other Interval to copy settings from
 	 */
-	public VertexInterval(final int l,final int r,final VertexInterval other)
+	public VertexInterval(final int l,final int r, final VertexInterval other)
 	{
 		super(l,r);	
 		this.reachable = other.reachable;
@@ -99,7 +98,6 @@ public class VertexInterval extends Interval {
 		this._pred = other._pred;
 		this._succ = other._succ;
 
-		//this._breadcrumb = other._breadcrumb.copyShiftedToArrival(l);
 	}
 
 	/**
@@ -117,7 +115,7 @@ public class VertexInterval extends Interval {
 		this.reachable = j.reachable;
 		this.scanned = j.scanned;
 		this._pred = j._pred;
-		this._succ = j._succ;		
+		this._succ = j._succ;
 	}
 
 //------------------------Getter Setter----------------------//
@@ -142,15 +140,15 @@ public class VertexInterval extends Interval {
 	 * Setter for the predecessor in a shortest path
 	 * @param pred predesessor vertex
 	 */
-	public void setPredecessor(final PathStep pred){
-		this._pred=pred;
+	public void setPredecessor(final BreadCrumb pred) {
+		this._pred = pred;
 	}
 	
 	/**
 	 * Getter for the predecessor in a shortest path
 	 * @return predecessor vertex 
 	 */
-	public PathStep getPredecessor(){
+	public BreadCrumb getPredecessor(){
 		return this._pred;
 	}
 	
@@ -158,7 +156,7 @@ public class VertexInterval extends Interval {
 	 * Setter for the successor in a shortest path
 	 * @param succ succesor vertex
 	 */
-	public void setSuccessor(final PathStep succ){
+	public void setSuccessor(final BreadCrumb succ){
 		this._succ=succ;
 	}
 	
@@ -166,7 +164,7 @@ public class VertexInterval extends Interval {
 	 * Getter for the successor in a shortest path
 	 * @return successor PathStep 
 	 */
-	public PathStep getSuccessor(){
+	public BreadCrumb getSuccessor(){
 		return this._succ;
 	}
 	
@@ -226,9 +224,10 @@ public class VertexInterval extends Interval {
 	 * @return true iff the intervalls agree on their arrival properties
 	 */
 	public boolean continuedBy(final VertexInterval other) {
-		if (this.scanned != other.scanned) return false;
+		throw new UnsupportedOperationException("Cannot continue VIs at the moment.");
+		/*if (this.scanned != other.scanned) return false;
 		if (this.reachable != other.reachable) return false;
-		
+		 
 		if (this._pred == null) {
 			if (other._pred != null) return false;			
 		} else {
@@ -241,7 +240,7 @@ public class VertexInterval extends Interval {
 		   if (!this._succ.continuedBy(other._succ)) return false;
 		}
 		
-		return true;
+		return true;*/
 	}
 	
 	/**
@@ -250,7 +249,7 @@ public class VertexInterval extends Interval {
 	 * Note that this is not suitable for the Reverse search anymore! 
 	 * @param pred which is set as predecessor. It is never shifted anymore.
 	 */	
-	public void setArrivalAttributesForward (final PathStep pred)
+	public void setArrivalAttributesForward (final BreadCrumb pred)
 	{
 		// we might have already scanned this interval
 		// but someone insists on relabelling it.
@@ -264,7 +263,7 @@ public class VertexInterval extends Interval {
 	 * This performs no checks at all!
 	 * @param succ which is set as successor. It is never shifted anymore.
 	 */		
-	public void setArrivalAttributesReverse (final PathStep succ)
+	public void setArrivalAttributesReverse (final BreadCrumb succ)
 	{
 		// we might have already scanned this interval
 		// but someone insists on relabelling it.
@@ -309,19 +308,11 @@ public class VertexInterval extends Interval {
 		k._pred = this._pred;
 		k._succ = this._succ;
 
-		/*if (this._breadcrumb == null) {
-			k._breadcrumb = null;
-		} else {
-			// should hardly ever occur, if at all.
-		    k._breadcrumb = this._breadcrumb.copyShifted(k.getLowBound() - this.getLowBound());
-		}*/
-		
 		return k;
 	}
 	
-	public VertexInterval copy(){
-		VertexInterval result = new VertexInterval(this._l,this._r,this);
-		return result;
+	public Interval getIntervalCopy(){
+		return new Interval(this._l,this._r);
 	}
 	
 	/**

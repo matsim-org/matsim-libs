@@ -256,6 +256,12 @@ public class StepSourceFlow implements PathStep {
 		String str = "source:"+node.getId().toString()+":"+time+":"+forward;
 		return str;
 	}
+
+
+	@Override
+	final public boolean isHoldover() {		
+		return false;
+	}
 	
 }
 

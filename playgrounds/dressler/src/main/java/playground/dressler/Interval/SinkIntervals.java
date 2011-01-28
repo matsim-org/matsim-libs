@@ -23,6 +23,8 @@ package playground.dressler.Interval;
 
 import java.util.ArrayList;
 
+import playground.dressler.control.Debug;
+
 //java imports
 
 //playground imports
@@ -200,19 +202,26 @@ public class SinkIntervals extends Intervals<EdgeInterval> {
 	 * @param u capcity of the edge
 	 */
 	public void augment(final int t,final int f,final int u){
-		if (t<0){
-			throw new IllegalArgumentException("negative time: "+ t);
-				}
+		if (Debug.GLOBAL && Debug.INTERVALS_CHECKS) {
+			if (t<0){
+				throw new IllegalArgumentException("negative time: "+ t);
+			}
+		}
+		
 		EdgeInterval i = getIntervalAt(t);
-		if (i.getFlow()+f>u){
-			throw new IllegalArgumentException("too much flow! flow: " + i.getFlow() + " + " +
-					f + " > " + u);
-		}
+		
+		if (Debug.GLOBAL && Debug.INTERVALS_CHECKS) {
+			if (i.getFlow()+f>u){
+				throw new IllegalArgumentException("too much flow! flow: " + i.getFlow() + " + " +
+						f + " > " + u);
+			}
 
-		if (i.getFlow()+f<0){
-			throw new IllegalArgumentException("negative flow! flow: " + i.getFlow() + " + " +
-					f + " < 0");
+			if (i.getFlow()+f<0){
+				throw new IllegalArgumentException("negative flow! flow: " + i.getFlow() + " + " +
+						f + " < 0");
+			}
 		}
+		
 		if(i.getLowBound() < t){
 			i= splitAt(t);
 		}

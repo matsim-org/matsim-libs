@@ -241,7 +241,11 @@ public class ShadowEdgeFlow implements EdgeFlowI {
 		int effectiveStart = Math.max(incoming.getLowBound() + inputoffset, this._whenAvailable.getLowBound());
 		int effectiveEnd = Math.min(incoming.getHighBound() + inputoffset, this._whenAvailable.getHighBound());
 
-		current = BI.getIntervalAt(effectiveStart);
+		BinTreeIterator<BinaryInterval> iter = new BinTreeIterator<BinaryInterval>(BI._tree, effectiveStart);
+		//SkipListIterator<BinaryInterval> iter = new SkipListIterator<BinaryInterval>(BI, effectiveStart);
+				
+		current = iter.next();
+		//current = this.getIntervalAt(effectiveStart);
 
 		while (current.getLowBound() < effectiveEnd) {
 			if (current.val) {				
@@ -270,10 +274,14 @@ public class ShadowEdgeFlow implements EdgeFlowI {
 				}
 			}
 
-			if (this.isLast(current)) {
-				break;
-			} 
-			current = BI.getIntervalAt(current.getHighBound());
+			/*if (this.isLast(current)) {
+			break;
+		} 
+		current = this.getIntervalAt(current.getHighBound());*/
+
+
+		if (!iter.hasNext()) break;
+		current = iter.next();
 
 		}
 

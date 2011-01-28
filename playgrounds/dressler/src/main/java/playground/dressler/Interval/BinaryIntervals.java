@@ -22,6 +22,8 @@
 
 package playground.dressler.Interval;
 
+import playground.dressler.control.Debug;
+
 //java imports
 
 /**
@@ -94,8 +96,10 @@ public class BinaryIntervals extends Intervals<BinaryInterval> {
 	 * @param v the new value to set
 	 */
 	public void augment(final int t, final boolean v){
-		if (t<0) {
-			throw new IllegalArgumentException("negative time: "+ t);
+		if (Debug.GLOBAL && Debug.INTERVALS_CHECKS) {
+			if (t<0) {
+				throw new IllegalArgumentException("negative time: "+ t);
+			}
 		}
 		BinaryInterval i = getIntervalAt(t);
 		

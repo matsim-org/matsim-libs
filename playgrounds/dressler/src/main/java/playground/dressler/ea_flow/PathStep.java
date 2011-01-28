@@ -20,6 +20,8 @@
 
 package playground.dressler.ea_flow;
 
+import playground.dressler.control.FlowCalculationSettings;
+
 
 public interface PathStep {	
 
@@ -30,7 +32,7 @@ public interface PathStep {
 	 * @param newStart
 	 * @return a new PathStep
 	 */
-	PathStep copyShiftedToStart(int newStart);
+	PathStep copyShiftedToStart(int newStart);	
 	
 	/**
 	 * Returns a shifted copy of a PathStep.
@@ -39,7 +41,7 @@ public interface PathStep {
 	 * @param newArrival
 	 * @return a new PathStep
 	 */
-	PathStep copyShiftedToArrival(int newArrival);
+	PathStep copyShiftedToArrival(int newArrival);	
 	
 	/**
 	 * Returns a shifted copy of a PathStep.
@@ -132,4 +134,6 @@ public interface PathStep {
 	 * @return true iff they describe the same pathstep. Times are not checked.
 	 */
 	boolean continuedBy(PathStep other);
+	
+	boolean isHoldover();
 }

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SimpleTaskQueue.java
+ * BreadCrumbEdgeForward.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,62 +20,60 @@
 
 package playground.dressler.ea_flow;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedList;
-
+import playground.dressler.control.Debug;
+import playground.dressler.control.FlowCalculationSettings;
+import playground.dressler.network.IndexedLinkI;
 import playground.dressler.network.IndexedNodeI;
 
-public class SimpleTaskQueue implements TaskQueue {
-	private int depth = 0;
-	private IndexedNodeI origin = null;
-	private LinkedList<BFTask> _list;
+
+public class BreadCrumbOutOfSink implements BreadCrumb {	
 	
-	public SimpleTaskQueue(){
-		_list= new LinkedList<BFTask>();
+	final private int t;
+
+	/**
+	 * default Constructor setting the arguments when using a Link 
+	 * @param edge Link used
+	 */
+	public BreadCrumbOutOfSink(int t){
+		this.t = t;
 	}
 	
+	/**
+	 * Method returning a String representation of the StepEdge
+	 */
 	@Override
-	public boolean addAll(Collection<? extends BFTask> c) {
-		//return _list.addAll(c);
-		Boolean result = false;
-		for(BFTask task: c){
-			task.depth = this.depth;
-			if (task.origin == null) task.origin = this.origin;
-			result = _list.add(task) || result; // never want a shortcut!		
+	public String toString(){
+		return  "Out of sink @ " + t;
+	}
+
+	@Override
+	public PathStep createPathStepForward(VirtualNode arrival,
+			FlowCalculationSettings settings) {
+		if (Debug.GLOBAL && Debug.STEP_CHECKS) {
+			if (!(arrival instanceof VirtualSink)) {
+				throw new RuntimeException("Can only arrive at sink when coming from out of sink!"); 
+			}
 		}
-		return result;
-	}
-
-	@Override
-	public Iterator<BFTask> iterator() {
-		return _list.iterator();
-	}
-
-	@Override
-	public boolean add(BFTask task) {
-		task.depth = this.depth;
-		if (task.origin == null) task.origin = this.origin;
-		return _list.add(task);
-	}
-
-	@Override
-	public boolean addAll(TaskQueue tasks) {		
-		boolean result = false;
 		
-		for(BFTask task: tasks){
-			task.depth = this.depth;
-			if (task.origin == null) task.origin = this.origin;
-			result = _list.add(task) || result; // never want a shortcut!
-		}
-		return result;
+		// We are at a sink and were found by a normal node.
+		// This is a primal step starting at the stored time.
+		return new StepSinkFlow(arrival.getRealNode(), t, true);
 	}
 
 	@Override
-	public BFTask poll() {
-		return _list.poll();
+	public PathStep createPathStepReverse(VirtualNode start,
+			FlowCalculationSettings settings) {
+		if (Debug.GLOBAL && Debug.STEP_CHECKS) {
+			if (!(start instanceof VirtualSink)) {
+				throw new RuntimeException("Can only arrive at sink when coming from out of sink!"); 
+			}
+		}
+		
+		// We are at a sink and were found by a normal node.
+		// This is a residual step going into the sink
+		return new StepSinkFlow(start.getRealNode(), start.getRealTime(), false);
 	}
 
-	
 
-}
+};
+

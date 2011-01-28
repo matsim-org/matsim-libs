@@ -6,7 +6,13 @@ import java.util.Comparator;
 /**
  * Compares according to the right end of the interval (if the task has one), not just task.time
  */
-class TaskComparatorReverse implements Comparator<BFTask> {
+class TaskComparatorReverse implements TaskComparatorI {
+	private int offset;
+	
+	public TaskComparatorReverse(int offset) {
+		this.offset = offset;
+	}
+	
 	public int compare(BFTask first, BFTask second) {	
 		if (first.ival != null && second.ival != null) {
 			if (first.ival.getHighBound() > second.ival.getHighBound()) return -1;
@@ -37,11 +43,11 @@ class TaskComparatorReverse implements Comparator<BFTask> {
 			if (first.ival.getHighBound() < second.ival.getHighBound()) return -1;
 			if (first.ival.getHighBound() > second.ival.getHighBound()) return 1;
 			
-			if (first.ival.isScanned() && !second.ival.isScanned()) return -1;
+			/*if (first.ival.isScanned() && !second.ival.isScanned()) return -1;
 			if (!first.ival.isScanned() && second.ival.isScanned()) return 1;
 			
 			if (first.ival.getReachable() && !second.ival.getReachable()) return -1;
-			if (!first.ival.getReachable() && second.ival.getReachable()) return 1;
+			if (!first.ival.getReachable() && second.ival.getReachable()) return 1;*/
 		}
 		
 		// false < true
@@ -50,5 +56,10 @@ class TaskComparatorReverse implements Comparator<BFTask> {
 
 		return first.node.getRealNode().getId().compareTo(second.node.getRealNode().getId());
 
+	}
+
+	@Override
+	public int getValue(BFTask task) {		
+		return offset - task.time;
 	}
 }

@@ -25,11 +25,11 @@ class TaskComparator implements TaskComparatorI {
 			if (first.ival.getHighBound() < second.ival.getHighBound()) return -1;
 			if (first.ival.getHighBound() > second.ival.getHighBound()) return 1;
 			
-			if (first.ival.isScanned() && !second.ival.isScanned()) return -1;
+			/*if (first.ival.isScanned() && !second.ival.isScanned()) return -1;
 			if (!first.ival.isScanned() && second.ival.isScanned()) return 1;
 			
 			if (first.ival.getReachable() && !second.ival.getReachable()) return -1;
-			if (!first.ival.getReachable() && second.ival.getReachable()) return 1;
+			if (!first.ival.getReachable() && second.ival.getReachable()) return 1;*/
 		}
 		
 		// false < true

@@ -20,6 +20,8 @@
 
 package playground.dressler.Interval;
 
+import java.util.Iterator;
+
 public interface IntervalsInterface <T extends Interval> {
 //------------------------FIELDS----------------------------------//
 
@@ -71,6 +73,11 @@ public interface IntervalsInterface <T extends Interval> {
 		 */
 		public int getLastTime();
 
+		/**
+		 * 
+		 */
+		public Iterator<T> getIterator();
+		public Iterator<T> getIteratorAt(int t);
 
 		
 	//------------------------SPLITTING--------------------------------//	

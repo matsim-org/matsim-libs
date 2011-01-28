@@ -260,5 +260,10 @@ public class StepEdge implements PathStep {
 	public int getCost() {		
 		return this.arrivalTime - this.startTime;		
 	}
+
+	@Override
+	final public boolean isHoldover() {
+		return false;
+	}
 };
 

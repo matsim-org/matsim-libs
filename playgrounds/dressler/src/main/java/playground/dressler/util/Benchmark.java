@@ -1,7 +1,5 @@
 package playground.dressler.util;
 
-import java.util.Random;
-
 import playground.dressler.Interval.EdgeInterval;
 import playground.dressler.Interval.EdgeIntervals;
 import playground.dressler.Interval.Interval;
@@ -9,23 +7,27 @@ import playground.dressler.Interval.VertexInterval;
 import playground.dressler.Interval.VertexIntervals;
 
 public class Benchmark {
+
+	//Random rand = new MRandom(42);
 	
 	public static void main(final String[] args) {
 		
 		Benchmark bench = new Benchmark();
 		
 		int timehorizon = 500;
-		int repeat = 50;
+		int repeat = 5000;
 		
-		int retrieve = 1000;
+		int retrieveFactor = 3;
 		
 			
 		System.out.println("Splitting VertexIntervals");
 		CPUTimer timer = new CPUTimer(); 
 		
-		for (int insert = 100; insert  < 20000; insert  *= 2) {
+		for (int insert = 100; insert  < 2000; insert  *= 2) {
+			int retrieve;
+			retrieve = insert * retrieveFactor;
 			
-			timer.onoff();
+			timer.onoff();			
 			for (int j = 0; j < repeat; j++) {				
 			    bench.benchmarkVertexIntervals(insert , retrieve, timehorizon);			    
 			}
@@ -36,7 +38,9 @@ public class Benchmark {
 		timer.newiter();
 		
 		System.out.println("Splitting EdgeIntervals");
-		for (int insert = 100; insert  < 20000; insert  *= 2) {
+		for (int insert = 100; insert  < 2000; insert  *= 2) {
+			int retrieve;
+			retrieve = insert * retrieveFactor;
 			
 			timer.onoff();			
 			for (int j = 0; j < repeat; j++) {
@@ -50,7 +54,9 @@ public class Benchmark {
 		timer.newiter();
 		
 		System.out.println("Augmenting EdgeIntervals");
-		for (int insert = 100; insert  < 20000; insert  *= 2) {
+		for (int insert = 100; insert  < 2000; insert  *= 2) {
+			int retrieve;
+			retrieve = insert * retrieveFactor;
 			
 			timer.onoff();
 			for (int j = 0; j < repeat; j++) {
@@ -66,7 +72,7 @@ public class Benchmark {
 		System.out.println("some more elaborate things ...");
 		{
 			
-			int repeatpadang = 4400; // # of vertices
+			int repeatpadang = 4400 * 100; // # of vertices * repeat
 			int degree = 3; // avg degree
 			
 			timer.onoff();
@@ -81,16 +87,16 @@ public class Benchmark {
 	public void benchmarkVertexIntervals(int insertions, int retrieval, int timehorizon) {
 		
 		VertexIntervals Data = new VertexIntervals(new VertexInterval(0, timehorizon));
-		Random rand = new Random();
+		
 		for (int i = 0; i < insertions; i++) {			
-			int t = rand.nextInt(timehorizon);
+			int t = MyRandom.nextInt(timehorizon);
 			Interval inter = Data.getIntervalAt(t);
 			if (t != inter.getLowBound() && t != inter.getHighBound())
 			  Data.splitAt(t);
 		}		
 		
 		for (int i = 0; i < retrieval; i++) {
-			int t = rand.nextInt(timehorizon);
+			int t = MyRandom.nextInt(timehorizon);
 			Data.getIntervalAt(t);
 		}
 				
@@ -99,16 +105,16 @@ public class Benchmark {
 	public void benchmarkEdgeIntervals(int insertions, int retrieval, int timehorizon) {
 		
 		EdgeIntervals Data = new EdgeIntervals(new EdgeInterval(0, timehorizon), 0, 0, null);
-		Random rand = new Random();
+		
 		for (int i = 0; i < insertions; i++) {			
-			int t = rand.nextInt(timehorizon);
+			int t = MyRandom.nextInt(timehorizon);
 			Interval inter = Data.getIntervalAt(t);
 			if (t != inter.getLowBound() && t != inter.getHighBound())
 			  Data.splitAt(t);
 		}		
 		
 		for (int i = 0; i < retrieval; i++) {
-			int t = rand.nextInt(timehorizon);
+			int t = MyRandom.nextInt(timehorizon);
 			Data.getIntervalAt(t);
 		}
 			
@@ -117,9 +123,9 @@ public class Benchmark {
 	public void benchmarkFlow(int augmentations, int timehorizon) {
 		
 		EdgeIntervals Data = new EdgeIntervals(new EdgeInterval(0, timehorizon), 0, augmentations, null);
-		Random rand = new Random();
+		
 		for (int i = 0; i < augmentations; i++) {			
-			int t = rand.nextInt(timehorizon);
+			int t = MyRandom.nextInt(timehorizon);
 			//int f = Data.getFlowAt(t);
 			Data.augment(t, 1);
 		}		
@@ -130,13 +136,12 @@ public class Benchmark {
 	public void padang(int degree) {
 		int timehorizon = 1700;
 		int polls = 30; // per vertex, on avg
-		int edgeinserts = 52;		
-		Random rand = new Random();
+		int edgeinserts = 52;				
 		
 		// create some flow on an edge
-		EdgeIntervals flow = new EdgeIntervals(new EdgeInterval(0, timehorizon), 0, edgeinserts, null);
+		EdgeIntervals flow = new EdgeIntervals(new EdgeInterval(0, timehorizon), 0, edgeinserts, new Interval(0, timehorizon));
 		for (int i = 0; i < edgeinserts; i++) {
-			int t = rand.nextInt(timehorizon);
+			int t = MyRandom.nextInt(timehorizon);
 			flow.augment(t, 1);
 		}
 
@@ -144,7 +149,7 @@ public class Benchmark {
 		
 		// make an interesting vertex
 		for (int i = 0; i < polls; i++) {
-			int t = rand.nextInt(timehorizon);
+			int t = MyRandom.nextInt(timehorizon);
 			Interval inter = VI.getIntervalAt(t);
 			if (t != inter.getLowBound() && t != inter.getHighBound())
 			  VI.splitAt(t);
@@ -153,10 +158,11 @@ public class Benchmark {
 		// actual polls
 		for (int d = 0; d < degree; d++) {
 			for (int i = 0; i < polls; i++) {
-				int t = rand.nextInt(timehorizon);
+				int t = MyRandom.nextInt(timehorizon);
 				Interval inter = VI.getIntervalAt(t);
 				// do something ... 
-				flow.getIntervalAt(inter.getLowBound());
+				flow.propagate(inter, true, false, timehorizon);
+				//flow.getIntervalAt(inter.getLowBound());
 			}
 		}
 		
