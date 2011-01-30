@@ -1,5 +1,8 @@
 package air;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -64,11 +67,31 @@ public class MATSimAirport {
 		
 		Link linkApron = network.getFactory().createLink(idApron, idApron, idApronEnd);
 		Link linkTaxiIn = network.getFactory().createLink(idTaxiIn, idTaxiIn, idApron);
-		Link linkTaxiOut = network.getFactory().createLink(idTaxiOut, idApron, idTaxiOut);
+		Link linkTaxiOut = network.getFactory().createLink(idTaxiOut, idApronEnd, idTaxiOut);
 		Link linkRunwayIn = network.getFactory().createLink(idRunwayIn, idRunwayIn, idTaxiIn);
 		Link linkRunwayOut = network.getFactory().createLink(idRunwayOut, idTaxiOut, idRunwayOut);
 		
 //		set capacity, freespeed and modes
+		
+		Set<String> allowedModes = new HashSet<String>();
+		allowedModes.add("pt");
+		linkApron.setAllowedModes(allowedModes);
+		linkTaxiIn.setAllowedModes(allowedModes);
+		linkTaxiOut.setAllowedModes(allowedModes);
+		linkRunwayIn.setAllowedModes(allowedModes);
+		linkRunwayOut.setAllowedModes(allowedModes);
+		
+		linkApron.setFreespeed(50.0/3.6);
+		linkTaxiIn.setFreespeed(50.0/3.6);
+		linkTaxiOut.setFreespeed(50.0/3.6);
+		linkRunwayIn.setFreespeed(220.0/3.6);
+		linkRunwayOut.setFreespeed(250.0/3.6);
+		
+		linkApron.setCapacity(50.0);
+		linkTaxiIn.setCapacity(5.0);
+		linkTaxiOut.setCapacity(5.0);
+		linkRunwayIn.setCapacity(1.0);
+		linkRunwayOut.setCapacity(1.0);
 		
 //		add links to network
 				
@@ -77,6 +100,8 @@ public class MATSimAirport {
 		network.addLink(linkTaxiOut);		
 		network.addLink(linkRunwayIn);	
 		network.addLink(linkRunwayOut);
+		
+
 	}
 
 }
