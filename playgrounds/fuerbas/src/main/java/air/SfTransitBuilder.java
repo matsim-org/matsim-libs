@@ -56,8 +56,7 @@ public class SfTransitBuilder {
 		builder.createSchedule("/home/soeren/workspace/OagTest.txt");
 		
 	}
-	
-	
+		
 	
 	public void createSchedule(String inputOagData) throws IOException {
 		
@@ -143,7 +142,7 @@ public class SfTransitBuilder {
 			if (!schedule.getTransitLines().containsKey(transitLineId)) {
 				TransitLine transLine = sf.createTransitLine(transitLineId);
 				schedule.addTransitLine(transLine);
-				transLine.addRoute(transRouteMap.get(transitLineId));	//transit line id zur transit route id machen, damit jede line nur eigene airline enthält
+				transLine.addRoute(transRouteMap.get(transitLineId));	
 			}
 			
 			if (!veh.getVehicleTypes().containsKey(vehTypeId)) {
@@ -151,7 +150,7 @@ public class SfTransitBuilder {
 				VehicleCapacity cap = veh.getFactory().createVehicleCapacity();
 				cap.setSeats(aircraftCapacity);
 				type.setCapacity(cap);
-				veh.getVehicleTypes().put(vehTypeId, type); //map ersetzen, abfrage über das hier, zusätzlich sitzplätze in den typ
+				veh.getVehicleTypes().put(vehTypeId, type); 
 			}
 			
 			veh.getVehicles().put(flightNumber, veh.getFactory().createVehicle(flightNumber, veh.getVehicleTypes().get(vehTypeId)));
