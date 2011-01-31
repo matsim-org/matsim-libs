@@ -47,9 +47,10 @@ public class PopulationMerger {
 	private String midDemandFile = "../../detailedEval/pop/14k-synthetische-personen/plans.xml";
 	private String prognose2025FreightDemandFile = "../../detailedEval/pop/gueterVerkehr/population_gv_bavaria_1pct_wgs84.xml.gz";
 	private String prognose2025CommuterDemandFile = "../../detailedEval/pop/pendlerVerkehr/population_pv_bavaria_1pct_wgs84.xml.gz";
-	private String pendlerstatistikInCommutingDemandFile = "../../detailedEval/pop/pendlerVerkehr/pendlerverkehr_1pct_dhdn_gk4.xml.gz";
+//	private String pendlerstatistikInCommutingDemandFile = "../../detailedEval/pop/pendlerVerkehr/pendlerverkehr_1pct_dhdn_gk4.xml.gz";
+	private String pendlerstatistikInCommutingDemandFile = "../../detailedEval/pop/pendlerVerkehr/inAndOut/pendlerverkehr_1pct_workStartingTimePeak0730_dhdn_gk4.xml.gz";
 	private String outputPath = "../../detailedEval/pop/merged/";
-	private String outputFileName = "mergedPopulation_All_1pct_gk4.xml.gz";
+	private String outputFileName = "mergedPopulation_All_1pct_workStartingTimePeakAllCommuter0730_gk4.xml.gz";
 
 	private PopulationWriter populationWriter;
 	
