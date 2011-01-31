@@ -88,7 +88,7 @@ public class SfAirScheduleBuilder {
 				double durationMinutes = Double.parseDouble(minutes)*60;	//convert flight dur minutes into seconds
 				double durationHours = Double.parseDouble(hours)*3600;
 				double duration = durationHours+durationMinutes;
-				double departureInSec = Double.parseDouble(lineEntries[10].substring(2))*60+Double.parseDouble(lineEntries[10])*3600;
+				double departureInSec = Double.parseDouble(lineEntries[10].substring(2))*60+Double.parseDouble(lineEntries[10].substring(0, 2))*3600;
 				boolean origin = false; boolean destination = false;
 
 			
