@@ -81,7 +81,6 @@ public class SfTransitBuilder {
 		Map<Id, List<TransitRouteStop>> stopListMap = new HashMap<Id, List<TransitRouteStop>>();
 		Map<Id, NetworkRoute> netRouteMap = new HashMap<Id, NetworkRoute>();
 		Map<Id, TransitRoute> transRouteMap = new HashMap<Id, TransitRoute>();
-		Map<Id, VehicleType> vehTypeMap = new HashMap<Id, VehicleType>();
 		
 		while (br.ready()) {
 			
@@ -96,7 +95,7 @@ public class SfTransitBuilder {
 			Id routeId = new IdImpl(origin+destination);	//origin IATA code + destination IATA code
 			Id transitLineId = new IdImpl(transitLine);		//origin IATA code + destination IATA code + airline IATA code
 			Id flightNumber = new IdImpl(lineEntries[2]);	//flight number
-			Id vehTypeId = new IdImpl(lineEntries[5]+lineEntries[6]);	//IATA aircraft code + seats avail
+			Id vehTypeId = new IdImpl(lineEntries[5]+"_"+lineEntries[6]);	//IATA aircraft code + seats avail
 			int aircraftCapacity = Integer.parseInt(lineEntries[6]);
 			List<Id> linkList = new ArrayList<Id>();	//evtl in Map mit Route als key verpacken
 			List<TransitRouteStop> stopList = new ArrayList<TransitRouteStop>();	//evtl in Map mit Route als key verpacken
@@ -126,37 +125,36 @@ public class SfTransitBuilder {
 				linkListMap.put(routeId, linkList);
 			}
 			
-			if (!netRouteMap.containsKey(routeId)) {
+			if (!netRouteMap.containsKey(transitLineId)) {
 				NetworkRoute netRoute = new LinkNetworkRouteImpl(new IdImpl(origin), new IdImpl(destination));		
 				netRoute.setLinkIds(new IdImpl(origin), linkListMap.get(routeId), new IdImpl(destination));
-				netRouteMap.put(routeId, netRoute);
+				netRouteMap.put(transitLineId, netRoute);
 			}			
 			
-			if (!transRouteMap.containsKey(routeId)) {
-				TransitRoute transRoute = sf.createTransitRoute(new IdImpl(origin+destination), netRouteMap.get(routeId), stopListMap.get(routeId), "pt");
-				transRouteMap.put(routeId, transRoute);
+			if (!transRouteMap.containsKey(transitLineId)) {
+				TransitRoute transRoute = sf.createTransitRoute(new IdImpl(origin+destination), netRouteMap.get(transitLineId), stopListMap.get(routeId), "pt");
+				transRouteMap.put(transitLineId, transRoute);
 			}
 						
 			Departure departure = sf.createDeparture(flightNumber, departureTime);
 			departure.setVehicleId(flightNumber);
-			transRouteMap.get(routeId).addDeparture(departure);
+			transRouteMap.get(transitLineId).addDeparture(departure);
 						
 			if (!schedule.getTransitLines().containsKey(transitLineId)) {
 				TransitLine transLine = sf.createTransitLine(transitLineId);
 				schedule.addTransitLine(transLine);
-				transLine.addRoute(transRouteMap.get(routeId));	//transit line id zur transit route id machen, damit jede line nur eigene airline enthält
+				transLine.addRoute(transRouteMap.get(transitLineId));	//transit line id zur transit route id machen, damit jede line nur eigene airline enthält
 			}
 			
-			if (!vehTypeMap.containsKey(vehTypeId)) {
+			if (!veh.getVehicleTypes().containsKey(vehTypeId)) {
 				VehicleType type = veh.getFactory().createVehicleType(vehTypeId);
 				VehicleCapacity cap = veh.getFactory().createVehicleCapacity();
 				cap.setSeats(aircraftCapacity);
 				type.setCapacity(cap);
-				vehTypeMap.put(vehTypeId, type);
 				veh.getVehicleTypes().put(vehTypeId, type); //map ersetzen, abfrage über das hier, zusätzlich sitzplätze in den typ
 			}
 			
-			veh.getVehicles().put(flightNumber, veh.getFactory().createVehicle(flightNumber, vehTypeMap.get(vehTypeId)));
+			veh.getVehicles().put(flightNumber, veh.getFactory().createVehicle(flightNumber, veh.getVehicleTypes().get(vehTypeId)));
 			
 		}
 		
