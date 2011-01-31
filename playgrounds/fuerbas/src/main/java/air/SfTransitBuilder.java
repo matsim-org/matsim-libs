@@ -93,10 +93,10 @@ public class SfTransitBuilder {
 			double departureTime = Double.parseDouble(lineEntries[3]);
 			Id originId = new IdImpl(origin);
 			Id destinationId = new IdImpl(destination);
-			Id routeId = new IdImpl(origin+destination);
-			Id transitLineId = new IdImpl(transitLine);
-			Id flightNumber = new IdImpl(lineEntries[2]);
-			Id vehTypeId = new IdImpl(lineEntries[5]);
+			Id routeId = new IdImpl(origin+destination);	//origin IATA code + destination IATA code
+			Id transitLineId = new IdImpl(transitLine);		//origin IATA code + destination IATA code + airline IATA code
+			Id flightNumber = new IdImpl(lineEntries[2]);	//flight number
+			Id vehTypeId = new IdImpl(lineEntries[5]+lineEntries[6]);	//IATA aircraft code + seats avail
 			int aircraftCapacity = Integer.parseInt(lineEntries[6]);
 			List<Id> linkList = new ArrayList<Id>();	//evtl in Map mit Route als key verpacken
 			List<TransitRouteStop> stopList = new ArrayList<TransitRouteStop>();	//evtl in Map mit Route als key verpacken
@@ -144,7 +144,7 @@ public class SfTransitBuilder {
 			if (!schedule.getTransitLines().containsKey(transitLineId)) {
 				TransitLine transLine = sf.createTransitLine(transitLineId);
 				schedule.addTransitLine(transLine);
-				transLine.addRoute(transRouteMap.get(routeId));
+				transLine.addRoute(transRouteMap.get(routeId));	//transit line id zur transit route id machen, damit jede line nur eigene airline enthält
 			}
 			
 			if (!vehTypeMap.containsKey(vehTypeId)) {
@@ -153,6 +153,7 @@ public class SfTransitBuilder {
 				cap.setSeats(aircraftCapacity);
 				type.setCapacity(cap);
 				vehTypeMap.put(vehTypeId, type);
+				veh.getVehicleTypes().put(vehTypeId, type); //map ersetzen, abfrage über das hier, zusätzlich sitzplätze in den typ
 			}
 			
 			veh.getVehicles().put(flightNumber, veh.getFactory().createVehicle(flightNumber, vehTypeMap.get(vehTypeId)));
