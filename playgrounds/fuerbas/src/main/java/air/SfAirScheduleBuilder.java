@@ -88,6 +88,7 @@ public class SfAirScheduleBuilder {
 				double durationMinutes = Double.parseDouble(minutes)*60;	//convert flight dur minutes into seconds
 				double durationHours = Double.parseDouble(hours)*3600;
 				double duration = durationHours+durationMinutes;
+				double departureInSec = Double.parseDouble(lineEntries[10].substring(2))*60+Double.parseDouble(lineEntries[10])*3600;
 				boolean origin = false; boolean destination = false;
 
 			
@@ -131,8 +132,7 @@ public class SfAirScheduleBuilder {
 									route+"\t"+		//TransitRoute
 									lineEntries[4]+lineEntries[7]+"_"+carrier+"\t"+	//TransitLine
 									lineEntries[0]+lineEntries[1]+"\t"+		//vehicleId
-									lineEntries[10]+"\t"+	//departure time (24h)
-									lineEntries[11]+"\t"+	//arrival time
+									departureInSec+"\t"+	//departure time in seconds
 									this.routes.get(route)+"\t"+	//journey time in seconds)
 									aircraftType+"\t"+	//aircraft type
 									this.aircraftTypes.get(aircraftType)+"\t"+	//seats avail
