@@ -74,17 +74,20 @@ public class ReconstructingUmlaufBuilder implements UmlaufBuilder {
 			createEmptyUmlaeufe();
 			createUmlaufStuecke();
 			log.info("Generating Umlaeufe; if this is extremely slow, try more memory:") ;
-			System.out.flush() ;
 			int cnt = 0 ;
 			for (UmlaufStueck umlaufStueck : umlaufStuecke) {
 				Umlauf umlauf = umlaeufe.get(umlaufStueck.getDeparture().getVehicleId());
 				umlaufInterpolator.addUmlaufStueckToUmlauf(umlaufStueck, umlauf);
 				cnt++ ;
-				if ( cnt%100==0 ) System.out.print('.') ;
-				if ( cnt%10000==0 ) System.out.println();
+				if ( cnt%100==0 ) {
+					System.out.print('.');
+					System.out.flush();
+				}
+				if ( cnt%10000==0 ) {
+					System.out.println();
+					System.out.flush();
+				}
 			}
-			System.out.println() ;
-			System.out.flush() ;
 		}
 		return umlaeufe.values();
 	}
@@ -100,22 +103,24 @@ public class ReconstructingUmlaufBuilder implements UmlaufBuilder {
 	private void createUmlaufStuecke() {
 		this.umlaufStuecke = new ArrayList<UmlaufStueck>();
 		log.info("Generating UmlaufStuecke") ;
-		System.out.flush() ;
 		int cnt = 0 ;
 		for (TransitLine line : transitLines) {
 			for (TransitRoute route : line.getRoutes().values()) {
 				for (Departure departure : route.getDepartures().values()) {
-					UmlaufStueck umlaufStueck = new UmlaufStueck(line, route,
-							departure);
+					UmlaufStueck umlaufStueck = new UmlaufStueck(line, route, departure);
 					umlaufStuecke.add(umlaufStueck);
 					cnt++ ;
-					if ( cnt%100==0 ) System.out.print('.') ;
-					if ( cnt%10000==0 ) System.out.println();
+					if ( cnt%100==0 ) {
+						System.out.print('.');
+						System.out.flush();
+					}
+					if ( cnt%10000==0 ) {
+						System.out.println();
+						System.out.flush();
+					}
 				}
 			}
 		}
-		System.out.println() ;
-		System.out.flush() ;
 		Collections.sort(this.umlaufStuecke, departureTimeComparator);
 	}
 
