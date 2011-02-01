@@ -6,7 +6,6 @@ package playground.mzilske.city2000w;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -38,8 +37,6 @@ import playground.mzilske.freight.CarrierPlan;
 import playground.mzilske.freight.CarrierVehicle;
 import playground.mzilske.freight.Carriers;
 import playground.mzilske.freight.Contract;
-import playground.mzilske.freight.HyperNetworkBuilder;
-import playground.mzilske.freight.Shipment;
 import playground.mzilske.freight.TSPAgentTracker;
 import playground.mzilske.freight.TSPCapabilities;
 import playground.mzilske.freight.TSPContract;
@@ -58,18 +55,18 @@ public class RunChessboard implements StartupListener, ScoringListener, Replanni
 	private static final int GRID_SIZE = 8;
 
 	private static Logger logger = Logger.getLogger(RunChessboard.class);
-	
+
 	private Carriers carriers;
 	private TransportServiceProviders transportServiceProviders;
-	
+
 	private CarrierAgentTracker freightAgentTracker;
 	private TSPAgentTracker tspAgentTracker;
 
 	private ScenarioImpl scenario;
-	
+
 	private static final String NETWORK_FILENAME = "output/grid.xml";
-	
-	
+
+
 	/**
 	 * @param args
 	 */
@@ -77,44 +74,52 @@ public class RunChessboard implements StartupListener, ScoringListener, Replanni
 		RunChessboard runner = new RunChessboard();
 		runner.run();
 	}
-	
+
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		
+
 		Controler controler = event.getControler();
-		
+
 		createCarriers();
 		createTransportServiceProviderWithContracts();
-		
-		
-		
+
+
+
 		tspAgentTracker = new TSPAgentTracker(transportServiceProviders.getTransportServiceProviders());
 		tspAgentTracker.getCostListeners().add(new DefaultLSPShipmentTracker());
-		
-		createCarrierContracts(tspAgentTracker.createCarrierShipments());
-		
-		createCarrierPlans();
-		
-		event.getControler().getScenario().addScenarioElement(carriers);
-		
+
 		CarrierAgentTrackerBuilder freightAgentTrackerBuilder = new CarrierAgentTrackerBuilder();
-		freightAgentTrackerBuilder.setCarriers(controler.getScenario().getScenarioElement(Carriers.class).getCarriers());
+		freightAgentTrackerBuilder.setCarriers(controler.getScenario().getScenarioElement(Carriers.class).getCarriers().values());
 		freightAgentTrackerBuilder.setRouter(controler.createRoutingAlgorithm());
 		freightAgentTrackerBuilder.setNetwork(controler.getNetwork());
 		freightAgentTrackerBuilder.setEventsManager(controler.getEvents());
 		freightAgentTrackerBuilder.addCarrierCostListener(tspAgentTracker);
 		freightAgentTracker = freightAgentTrackerBuilder.build();
 		freightAgentTracker.getShipmentStatusListeners().add(tspAgentTracker);
-		
+
+
+		createTSPPlans();
+
+		giveContractsToCarriers(tspAgentTracker.createCarrierContracts());
+
+		createCarrierPlans();
+
 		City2000WMobsimFactory mobsimFactory = new City2000WMobsimFactory(0, freightAgentTracker);
-		mobsimFactory.setUseOTFVis(true);
+		mobsimFactory.setUseOTFVis(false);
 		event.getControler().setMobsimFactory(mobsimFactory);
-	
-		
+
+
+	}
+
+	private void createTSPPlans() {
+		for (TransportServiceProviderImpl tsp : transportServiceProviders.getTransportServiceProviders()) {
+			createInitialPlans(tsp);
+		}
 	}
 
 	@Override
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
+		freightAgentTracker.createPlanAgents();
 		Controler controler = event.getControler();
 		controler.getEvents().addHandler(freightAgentTracker);
 	}
@@ -131,54 +136,37 @@ public class RunChessboard implements StartupListener, ScoringListener, Replanni
 		freightAgentTracker.calculateCostsScoreCarriersAndInform();
 		logger.info("transportServiceProvider are calculating costs ...");
 		tspAgentTracker.calculateCostsScoreTSPAndInform();
-		
+
 	}
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		logger.info("Reset costs/score of tspAgents");
+		freightAgentTracker.reset(event.getIteration());
 		tspAgentTracker.reset();
 	}
 
 	@Override
 	public void notifyReplanning(ReplanningEvent event) {
-		replanTSP();
-		// replanCarriers();
+
+		createTSPPlans();
+		giveContractsToCarriers(tspAgentTracker.createCarrierContracts());
+
+		replanCarriers();
 	}
 
-	private void replanTSP() {
-		// TODO Auto-generated method stub
-		for (TransportServiceProviderImpl tsp : transportServiceProviders.getTransportServiceProviders()) {
-			List<TSPPlan> plans = (List) tsp.getPlans();
-			TSPPlan selectedPlan = tsp.getSelectedPlan();
-			logger.info("The plan we just used got us "+selectedPlan.getScore()+" points. Now trying the other one.");
-			tsp.setSelectedPlan(plans.get(1 - plans.indexOf(selectedPlan)));
-		}
-	}
 
 	private void replanCarriers() {
-		for(CarrierImpl carrier : carriers.getCarriers()){
-			replan(carrier);
-		}
+		createCarrierPlans();
 	}
 
-	private void replan(CarrierImpl carrier) {
-		SelectedPlanReplicator replanner = new SelectedPlanReplicator();
-		CarrierPlan newPlan = replanner.replan(carrier.getCarrierCapabilities(),carrier.getContracts(),carrier.getSelectedPlan());
-		carrier.getPlans().add(newPlan);
-		carrier.setSelectedPlan(newPlan);
-	}
 
-	private void scoreLogisticServiceProvider() {
-		// do something
-	}	
-	
 
 	private void run(){
 		Config config = new Config();
 		config.addCoreModules();
 		config.controler().setFirstIteration(0);
-		config.controler().setLastIteration(0);
+		config.controler().setLastIteration(100);
 		scenario = new ScenarioImpl(config);
 		readNetwork(NETWORK_FILENAME);
 		Controler controler = new Controler(scenario);
@@ -202,7 +190,7 @@ public class RunChessboard implements StartupListener, ScoringListener, Replanni
 	}
 
 	private void createCarrierPlans() {
-		for(CarrierImpl carrier : carriers.getCarriers()){
+		for(CarrierImpl carrier : carriers.getCarriers().values()){
 			TrivialCarrierPlanBuilder trivialCarrierPlanBuilder = new TrivialCarrierPlanBuilder();
 			CarrierPlan plan = trivialCarrierPlanBuilder.buildPlan(carrier.getCarrierCapabilities(), carrier.getContracts());
 			carrier.getPlans().add(plan);
@@ -210,26 +198,25 @@ public class RunChessboard implements StartupListener, ScoringListener, Replanni
 		}
 	}
 
-	private void createCarrierContracts(Map<Id, List<Shipment>> carrierShipments) {
-		for(Id carrierId : carrierShipments.keySet()){
-			for(CarrierImpl carrier : carriers.getCarriers()){
-				if(carrier.getId().equals(carrierId)){
-					for(Shipment s : carrierShipments.get(carrierId)){
-						carrier.getContracts().add(new Contract(Arrays.asList(s)));
-					} 
-				}
-			}
-		}	
+	private void giveContractsToCarriers(List<Contract> contracts) {
+		for (CarrierImpl carrier : carriers.getCarriers().values()) {
+			carrier.getContracts().clear();
+		}
+		for(Contract contract : contracts) {
+			Map<Id, CarrierImpl> carrierMap = carriers.getCarriers();
+			carrierMap.get(contract.getOffer().getCarrierId()).getContracts().add(contract);
+		}
 	}
 
 	private void createCarriers() {
 		carriers = new Carriers();
 		for (int j = 0; j <= GRID_SIZE; j++) {
 			CarrierImpl carrier = createCarrier(j);
-			carriers.getCarriers().add(carrier);
+			carriers.getCarriers().put(carrier.getId(), carrier);
 		}
 		CarrierImpl vorlaufCarrier = createVorlaufCarrier();
-		carriers.getCarriers().add(vorlaufCarrier);
+		carriers.getCarriers().put(vorlaufCarrier.getId(), vorlaufCarrier);
+		scenario.addScenarioElement(carriers);
 	}
 
 	private CarrierImpl createVorlaufCarrier() {
@@ -237,6 +224,7 @@ public class RunChessboard implements StartupListener, ScoringListener, Replanni
 		CarrierCapabilities cc = new CarrierCapabilities();
 		carrier.setCarrierCapabilities(cc);
 		CarrierVehicle carrierVehicle = new CarrierVehicle(new IdImpl("vorlauf-carrier-vehicle"), new IdImpl("j(2,4)"));
+		carrierVehicle.setCapacity(10);
 		cc.getCarrierVehicles().add(carrierVehicle);
 		return carrier;
 	}
@@ -251,6 +239,7 @@ public class RunChessboard implements StartupListener, ScoringListener, Replanni
 	}
 
 	private void createTransportServiceProviderWithContracts() {
+		transportServiceProviders = new TransportServiceProviders();
 		TransportServiceProviderImpl tsp = new TransportServiceProviderImpl(new IdImpl("guenter"));
 		TSPCapabilities cap = new TSPCapabilities();
 		cap.getTransshipmentCentres().add(new IdImpl("j(2,4)"));
@@ -258,41 +247,23 @@ public class RunChessboard implements StartupListener, ScoringListener, Replanni
 		logger.debug("TransportServiceProvider " + tsp.getId() + " has come into play");
 		printCap(cap);
 		createContracts(tsp);
-		createInitialPlans(tsp);
-		transportServiceProviders = new TransportServiceProviders();
-		transportServiceProviders.getTransportServiceProviders().add(tsp);
-		createHyperNetwork(tsp);
-	}
 
-	private void createHyperNetwork(TransportServiceProviderImpl tsp) {
-		Collection<Id> locations = new HashSet<Id>();
-		for (TSPContract contract : tsp.getContracts()) {
-			for (TSPShipment shipment : contract.getShipments()) {
-				locations.add(shipment.getFrom());
-				locations.add(shipment.getTo());
-			}
-		}
-		
-		HyperNetworkBuilder hnb = new HyperNetworkBuilder(tsp.getTspCapabilities(), locations, carriers);
-		
+		transportServiceProviders.getTransportServiceProviders().add(tsp);
 	}
 
 	private void createInitialPlans(TransportServiceProviderImpl tsp) {
-		// SimpleTSPPlanBuilder tspPlanBuilder = new SimpleTSPPlanBuilder();
-		MinimumDepotDistanceToDestinationTSPPlanBuilder tspPlanBuilder = new MinimumDepotDistanceToDestinationTSPPlanBuilder(scenario.getNetwork());
-		tspPlanBuilder.setCarriers(carriers.getCarriers());
+		createAndSelectAPlan(tsp);
+	}
+
+	private void createAndSelectAPlan(TransportServiceProviderImpl tsp) {
+		CheapestCarrierTSPPlanBuilder tspPlanBuilder = new CheapestCarrierTSPPlanBuilder();
+		tspPlanBuilder.setCarrierAgentTracker(freightAgentTracker);
 		List<Id> emptyList = Collections.emptyList();
 		tspPlanBuilder.setTransshipmentCentres(emptyList);
 		TSPPlan directPlan = tspPlanBuilder.buildPlan(tsp.getContracts(),tsp.getTspCapabilities());
 		printTSPPlan(directPlan);
 		tsp.getPlans().add(directPlan);
 		tsp.setSelectedPlan(directPlan);
-		MinimumDepotDistanceToDestinationTSPPlanBuilder viaPlanBuilder = new MinimumDepotDistanceToDestinationTSPPlanBuilder(scenario.getNetwork());
-		viaPlanBuilder.setTransshipmentCentres(Collections.singletonList(tsp.getTspCapabilities().getTransshipmentCentres().get(0)));
-		viaPlanBuilder.setCarriers(carriers.getCarriers());
-		TSPPlan viaPlan = viaPlanBuilder.buildPlan(tsp.getContracts(), tsp.getTspCapabilities());
-		tsp.getPlans().add(viaPlan);
-		tsp.setSelectedPlan(viaPlan);
 	}
 
 	private void createManyContracts(TransportServiceProviderImpl tsp) {
@@ -306,15 +277,20 @@ public class RunChessboard implements StartupListener, ScoringListener, Replanni
 		logger.debug("he has " + tsp.getContracts().size() + " contracts");
 		printContracts(tsp.getContracts());
 	}
-	
+
 	private void createContracts(TransportServiceProviderImpl tsp) {
-		for (int sourceColumn = 0; sourceColumn <= 0; sourceColumn++) {
-			Id sourceLinkId = makeLinkId(1, sourceColumn);
-			for (int destinationColumn = 0; destinationColumn <= GRID_SIZE; destinationColumn++) {
-				Id destinationLinkId = makeLinkId(GRID_SIZE, destinationColumn);
-				tsp.getContracts().add(createContract(sourceLinkId, destinationLinkId));
-			}
+
+		for (int destinationColumn = 0; destinationColumn <= GRID_SIZE; destinationColumn++) {
+	//	for (int destinationColumn = 0; destinationColumn <= 0; destinationColumn++) {
+			Id sourceLinkId = makeLinkId(GRID_SIZE, destinationColumn);
+			Id destinationLinkId = makeLinkId(1, destinationColumn);
+			tsp.getContracts().add(createContract(sourceLinkId, destinationLinkId));
 		}
+//		for (int destinationColumn = 5; destinationColumn <= 5; destinationColumn++) {
+//			Id sourceLinkId = makeLinkId(1, destinationColumn);
+//			Id destinationLinkId = makeLinkId(GRID_SIZE, destinationColumn);
+//			tsp.getContracts().add(createContract(sourceLinkId, destinationLinkId));
+//		}
 		logger.debug("he has " + tsp.getContracts().size() + " contracts");
 		printContracts(tsp.getContracts());
 	}
@@ -329,7 +305,7 @@ public class RunChessboard implements StartupListener, ScoringListener, Replanni
 		for(TransportChain chain : plan.getChains()){
 			logger.debug(chain);
 		}
-		
+
 	}
 
 	private void printCap(TSPCapabilities cap) {
@@ -337,7 +313,7 @@ public class RunChessboard implements StartupListener, ScoringListener, Replanni
 		for(Id id : cap.getTransshipmentCentres()){
 			logger.debug(id);
 		}
-		
+
 	}
 
 	private void printContracts(Collection<TSPContract> contracts) {
@@ -348,7 +324,7 @@ public class RunChessboard implements StartupListener, ScoringListener, Replanni
 				count++;
 			}
 		}
-		
+
 	}
 
 }

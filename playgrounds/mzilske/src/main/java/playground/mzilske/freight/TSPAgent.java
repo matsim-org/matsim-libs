@@ -7,13 +7,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.collections.Tuple;
 
 
@@ -43,16 +40,16 @@ public class TSPAgent {
 		return shipmentChainMap;
 	}
 
-	List<Tuple<Id,Shipment>> createCarrierShipments(){
+	List<Contract> createCarrierShipments(){
 		clear();
-		List<Tuple<Id,Shipment>> shipments = new ArrayList<Tuple<Id,Shipment>>();
+		List<Contract> shipments = new ArrayList<Contract>();
 		for(TransportChain chain : tsp.getSelectedPlan().getChains()){
 			TransportChainAgent chainAgent = new TransportChainAgent(chain);
 			transportChainAgents.add(chainAgent);
-			List<Tuple<Id,Shipment>> chainShipments = chainAgent.createCarrierShipments();
-			for(Tuple<Id,Shipment> t : chainShipments){
+			List<Contract> chainShipments = chainAgent.createCarrierShipments();
+			for(Contract t : chainShipments){
 				shipments.add(t);
-				shipmentChainMap.put(t.getSecond(), chainAgent);				
+				shipmentChainMap.put(t.getShipment(), chainAgent);				
 			}
 		}
 		return shipments;

@@ -26,10 +26,9 @@ public class TrivialCarrierPlanBuilder {
 			tourBuilder.scheduleStart(vehicleLocation);
 			if (first) {
 				for (Contract contract : contracts) {
-					for (Shipment shipment : contract.getShipments()) {
-						tourBuilder.schedulePickup(shipment);
-						tourBuilder.scheduleDelivery(shipment);
-					}
+					Shipment shipment = contract.getShipment();
+					tourBuilder.schedulePickup(shipment);
+					tourBuilder.scheduleDelivery(shipment);
 				}
 				tourBuilder.scheduleEnd(vehicleLocation);
 				first = false;

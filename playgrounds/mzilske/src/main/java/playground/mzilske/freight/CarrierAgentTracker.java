@@ -41,11 +41,11 @@ public class CarrierAgentTracker implements AgentSource, ActivityEndEventHandler
 	
 	private double sumOfTotalDistance = 0.0;
 	
-	public CarrierAgentTracker(Collection<CarrierImpl> carriers, PlanAlgorithm router) {
+	public CarrierAgentTracker(Collection<CarrierImpl> carriers, PlanAlgorithm router, Network network) {
 		this.carriers = carriers;
 		this.router = router;
+		this.network = network;
 		createCarrierAgents();
-		agents = createPlanAgents();
 	}
 
 	@Override
@@ -53,8 +53,8 @@ public class CarrierAgentTracker implements AgentSource, ActivityEndEventHandler
 		return agents;
 	}
 
-	private List<PlanAgent> createPlanAgents() {
-		List<PlanAgent> agents = new ArrayList<PlanAgent>();
+	public void createPlanAgents() {
+		agents = new ArrayList<PlanAgent>();
 		for (CarrierAgent carrierAgent : carrierAgents) {
 			List<Plan> plans = carrierAgent.createFreightDriverPlans();
 			for (Plan plan : plans) {
@@ -62,16 +62,11 @@ public class CarrierAgentTracker implements AgentSource, ActivityEndEventHandler
 				agents.add(planAgent);
 			}
 		}
-		return agents;
-	}
-
-	public void setNetwork(Network network) {
-		this.network = network;
 	}
 
 	@Override
 	public void reset(int iteration) {
-		
+		sumOfTotalDistance = 0.0;
 	}
 
 	@Override
@@ -96,7 +91,8 @@ public class CarrierAgentTracker implements AgentSource, ActivityEndEventHandler
 			}
 		}
 		sumOfTotalDistance += distance/1000;
-		logger.info("totalDistanceTraveled = " + sumOfTotalDistance + " km");
+		//logger.info("Link Enter: " + linkId + " length: "+distance);
+		// logger.info("totalDistanceTraveled = " + sumOfTotalDistance + " km");
 		
 	}
 
@@ -104,7 +100,7 @@ public class CarrierAgentTracker implements AgentSource, ActivityEndEventHandler
 		//inclusive cost per shipment
 		for(CarrierAgent carrierAgent : carrierAgents){
 			carrierAgent.scoreSelectedPlan();
-			List<Tuple<Shipment,Double>> shipmentCostTuple = carrierAgent.calculateCostsOfSelectedPlanPerShipment();
+			List<Tuple<Shipment,Double>> shipmentCostTuple = carrierAgent.calculateCostsPerShipment();
 			for(Tuple<Shipment,Double> t : shipmentCostTuple){
 				informCostListeners(t.getFirst(),t.getSecond());
 			}
@@ -129,7 +125,8 @@ public class CarrierAgentTracker implements AgentSource, ActivityEndEventHandler
 	private void createCarrierAgents() {
 		for (CarrierImpl carrier : carriers) {
 			CarrierAgent carrierAgent = new CarrierAgent(this, carrier, router);
-			carrierAgent.setCostAllocator(new CostAllocator());
+			carrierAgent.setCostFunction(new SimpleCarrierCostFunction());
+			carrierAgent.setCostAllocator(new CostAllocator(carrier, network));
 			carrierAgents.add(carrierAgent);
 		}
 	}
@@ -144,6 +141,15 @@ public class CarrierAgentTracker implements AgentSource, ActivityEndEventHandler
 		for (ShipmentStatusListener listener: shipmentStatusListeners) {
 			listener.shipmentDelivered(shipment, time);
 		}
+	}
+
+	public Collection<Offer> getOffers(Id linkId, Id linkId2, int shipmentSize) {
+		Collection<Offer> offers = new ArrayList<Offer>();
+		for (CarrierAgent carrierAgent : carrierAgents) {
+			Offer offer = carrierAgent.makeOffer(linkId, linkId2, shipmentSize);
+			offers.add(offer);
+		}
+		return offers;
 	}
 	
 }

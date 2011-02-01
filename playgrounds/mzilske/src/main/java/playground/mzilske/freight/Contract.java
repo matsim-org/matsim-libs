@@ -1,20 +1,23 @@
 package playground.mzilske.freight;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 
 public class Contract {
 	
-	private Collection<Shipment> shipments = new ArrayList<Shipment>();
+	private Shipment shipment;
+	private Offer offer;
 	
-	public Contract(Collection<Shipment> shipments) {
+	public Contract(Shipment shipment, Offer offer) {
 		super();
-		this.shipments = shipments;
+		this.shipment = shipment;
+		this.offer = offer;
 	}
 
-	public Collection<Shipment> getShipments() {
-		return Collections.unmodifiableCollection(shipments);
+	public Shipment getShipment() {
+		return shipment;
+	}
+	
+	public Offer getOffer() {
+		return offer;
 	}
 	
 }

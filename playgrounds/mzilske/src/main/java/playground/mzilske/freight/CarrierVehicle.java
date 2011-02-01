@@ -8,6 +8,8 @@ public class CarrierVehicle {
 	
 	private Id location;
 	
+	private int capacity;
+	
 	public CarrierVehicle(Id vehicleId, Id location) {
 		this.vehicleId = vehicleId;
 		this.location = location;
@@ -19,6 +21,14 @@ public class CarrierVehicle {
 
 	public Id getVehicleId() {
 		return vehicleId;
+	}
+	
+	public int getCapacity() {
+		return capacity;
+	}
+	
+	public void setCapacity(int capacity) {
+		this.capacity = capacity;
 	}
 
 	@Override

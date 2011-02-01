@@ -5,13 +5,13 @@ package playground.mzilske.city2000w;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
@@ -37,7 +37,6 @@ import playground.mzilske.freight.CarrierPlan;
 import playground.mzilske.freight.CarrierVehicle;
 import playground.mzilske.freight.Carriers;
 import playground.mzilske.freight.Contract;
-import playground.mzilske.freight.Shipment;
 import playground.mzilske.freight.TSPAgentTracker;
 import playground.mzilske.freight.TSPCapabilities;
 import playground.mzilske.freight.TSPContract;
@@ -51,61 +50,76 @@ import playground.mzilske.freight.TransportServiceProviders;
  * @author schroeder
  *
  */
-public class RunCarriersAndTSPs implements StartupListener, ScoringListener, ReplanningListener, BeforeMobsimListener, AfterMobsimListener, IterationEndsListener {
+public class RunTagesmaut implements StartupListener, ScoringListener, ReplanningListener, BeforeMobsimListener, AfterMobsimListener, IterationEndsListener {
 
-	private static final String NETWORK_FILENAME = "../../matsim/examples/equil/network.xml";
-	
-	private static Logger logger = Logger.getLogger(RunCarriersAndTSPs.class);
-	
+	private static final int GRID_SIZE = 8;
+
+	private static Logger logger = Logger.getLogger(RunTagesmaut.class);
+
 	private Carriers carriers;
 	private TransportServiceProviders transportServiceProviders;
-	
+
 	private CarrierAgentTracker freightAgentTracker;
 	private TSPAgentTracker tspAgentTracker;
-	
-	
+
+	private ScenarioImpl scenario;
+
+	private static final String NETWORK_FILENAME = "output/grid.xml";
+
+
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		RunCarriersAndTSPs runner = new RunCarriersAndTSPs();
+		RunTagesmaut runner = new RunTagesmaut();
 		runner.run();
 	}
-	
+
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		
+
 		Controler controler = event.getControler();
-		
-		createTransportServiceProviderWithContracts(controler.getNetwork());
-		
-		createCarrier();
-		
+
+		createCarriers();
+		createTransportServiceProviderWithContracts();
+
+
+
 		tspAgentTracker = new TSPAgentTracker(transportServiceProviders.getTransportServiceProviders());
 		tspAgentTracker.getCostListeners().add(new DefaultLSPShipmentTracker());
-		
-		createCarrierContracts(tspAgentTracker.createCarrierShipments());
-		
-		createCarrierPlans();
-		
-		event.getControler().getScenario().addScenarioElement(carriers);
-		
+
 		CarrierAgentTrackerBuilder freightAgentTrackerBuilder = new CarrierAgentTrackerBuilder();
-		freightAgentTrackerBuilder.setCarriers(controler.getScenario().getScenarioElement(Carriers.class).getCarriers());
+		freightAgentTrackerBuilder.setCarriers(controler.getScenario().getScenarioElement(Carriers.class).getCarriers().values());
 		freightAgentTrackerBuilder.setRouter(controler.createRoutingAlgorithm());
 		freightAgentTrackerBuilder.setNetwork(controler.getNetwork());
 		freightAgentTrackerBuilder.setEventsManager(controler.getEvents());
 		freightAgentTrackerBuilder.addCarrierCostListener(tspAgentTracker);
 		freightAgentTracker = freightAgentTrackerBuilder.build();
-		
+		freightAgentTracker.getShipmentStatusListeners().add(tspAgentTracker);
+
+
+		createTSPPlans();
+
+		giveContractsToCarriers(tspAgentTracker.createCarrierContracts());
+
+		createCarrierPlans();
+
 		City2000WMobsimFactory mobsimFactory = new City2000WMobsimFactory(0, freightAgentTracker);
+		mobsimFactory.setUseOTFVis(false);
 		event.getControler().setMobsimFactory(mobsimFactory);
-	
-		
+
+
+	}
+
+	private void createTSPPlans() {
+		for (TransportServiceProviderImpl tsp : transportServiceProviders.getTransportServiceProviders()) {
+			createInitialPlans(tsp);
+		}
 	}
 
 	@Override
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
+		freightAgentTracker.createPlanAgents();
 		Controler controler = event.getControler();
 		controler.getEvents().addHandler(freightAgentTracker);
 	}
@@ -122,45 +136,39 @@ public class RunCarriersAndTSPs implements StartupListener, ScoringListener, Rep
 		freightAgentTracker.calculateCostsScoreCarriersAndInform();
 		logger.info("transportServiceProvider are calculating costs ...");
 		tspAgentTracker.calculateCostsScoreTSPAndInform();
-		
+
 	}
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		logger.info("Reset costs/score of tspAgents");
+		freightAgentTracker.reset(event.getIteration());
 		tspAgentTracker.reset();
 	}
 
 	@Override
 	public void notifyReplanning(ReplanningEvent event) {
+
+		createTSPPlans();
+		giveContractsToCarriers(tspAgentTracker.createCarrierContracts());
+
 		replanCarriers();
 	}
 
+
 	private void replanCarriers() {
-		for(CarrierImpl carrier : carriers.getCarriers()){
-			replan(carrier);
-		}
+		createCarrierPlans();
 	}
 
-	private void replan(CarrierImpl carrier) {
-		SelectedPlanReplicator replanner = new SelectedPlanReplicator();
-		CarrierPlan newPlan = replanner.replan(carrier.getCarrierCapabilities(),carrier.getContracts(),carrier.getSelectedPlan());
-		carrier.getPlans().add(newPlan);
-		carrier.setSelectedPlan(newPlan);
-	}
 
-	private void scoreLogisticServiceProvider() {
-		// do something
-	}	
-	
 
 	private void run(){
 		Config config = new Config();
 		config.addCoreModules();
 		config.controler().setFirstIteration(0);
-		config.controler().setLastIteration(1);
-		ScenarioImpl scenario = new ScenarioImpl(config);
-		new MatsimNetworkReader(scenario).readFile(NETWORK_FILENAME);
+		config.controler().setLastIteration(100);
+		scenario = new ScenarioImpl(config);
+		readNetwork(NETWORK_FILENAME);
 		Controler controler = new Controler(scenario);
 		/*
 		 * muss ich auf 'false' setzen, da er mir sonst eine exception wirft, weil er das matsim-logo nicht finden kann
@@ -173,8 +181,16 @@ public class RunCarriersAndTSPs implements StartupListener, ScoringListener, Rep
 		controler.run();
 	}
 
+	private void readNetwork(String networkFilename) {
+		new MatsimNetworkReader(scenario).readFile(networkFilename);
+	}
+
+	private Id makeLinkId(int i, int j) {
+		return scenario.createId("i("+i+","+j+")");
+	}
+
 	private void createCarrierPlans() {
-		for(CarrierImpl carrier : carriers.getCarriers()){
+		for(CarrierImpl carrier : carriers.getCarriers().values()){
 			TrivialCarrierPlanBuilder trivialCarrierPlanBuilder = new TrivialCarrierPlanBuilder();
 			CarrierPlan plan = trivialCarrierPlanBuilder.buildPlan(carrier.getCarrierCapabilities(), carrier.getContracts());
 			carrier.getPlans().add(plan);
@@ -182,66 +198,97 @@ public class RunCarriersAndTSPs implements StartupListener, ScoringListener, Rep
 		}
 	}
 
-	private void createCarrierContracts(Map<Id, List<Shipment>> carrierShipments) {
-		for(Id id : carrierShipments.keySet()){
-			for(CarrierImpl carrier : carriers.getCarriers()){
-				if(carrier.getId().equals(id)){
-					for(Shipment s : carrierShipments.get(id)){
-						carrier.getContracts().add(new Contract(Arrays.asList(s)));
-					} 
-				}
-			}
-		}	
-		
+	private void giveContractsToCarriers(List<Contract> contracts) {
+		for (CarrierImpl carrier : carriers.getCarriers().values()) {
+			carrier.getContracts().clear();
+		}
+		for(Contract contract : contracts) {
+			Map<Id, CarrierImpl> carrierMap = carriers.getCarriers();
+			carrierMap.get(contract.getOffer().getCarrierId()).getContracts().add(contract);
+		}
 	}
 
-	private void createCarrier() {
-		CarrierImpl c1 = new CarrierImpl(new IdImpl("hans"), new IdImpl("1"));
-		CarrierCapabilities cc = new CarrierCapabilities();
-		c1.setCarrierCapabilities(cc);
-		CarrierVehicle cv_hans_1 = new CarrierVehicle(new IdImpl("hans-erstes-auto"), new IdImpl("1"));
-		CarrierVehicle cv_hans_2 = new CarrierVehicle(new IdImpl("hans-zweites-auto"), new IdImpl("2"));
-		cc.getCarrierVehicles().add(cv_hans_1);
-		cc.getCarrierVehicles().add(cv_hans_2);
-
-
-		CarrierImpl c2 = new CarrierImpl(new IdImpl("ulrich"), new IdImpl("2"));
-		CarrierCapabilities cc2 = new CarrierCapabilities();
-		c2.setCarrierCapabilities(cc2);
-		CarrierVehicle cv_ulrich_1 = new CarrierVehicle(new IdImpl("ulrichs-erstes-auto"), new IdImpl("1"));
-		CarrierVehicle cv_ulrich_2 = new CarrierVehicle(new IdImpl("ulrichs-zweites-auto"), new IdImpl("2"));
-		cc2.getCarrierVehicles().add(cv_ulrich_1);
-		cc2.getCarrierVehicles().add(cv_ulrich_2);
-
+	private void createCarriers() {
 		carriers = new Carriers();
-		carriers.getCarriers().add(c1);
-		carriers.getCarriers().add(c2);
+		CarrierImpl carrier1 = createCarrier(0);
+		carrier1.getCarrierCapabilities().getCarrierVehicles().iterator().next().setCapacity(10);
+		CarrierImpl carrier2 = createCarrier(GRID_SIZE);
+		carriers.getCarriers().put(carrier1.getId(), carrier1);
+		carriers.getCarriers().put(carrier2.getId(), carrier2);
+		scenario.addScenarioElement(carriers);
 	}
 
-	private void createTransportServiceProviderWithContracts(Network network) {
+	
+
+	private CarrierImpl createCarrier(int j) {
+		CarrierImpl carrier = new CarrierImpl(new IdImpl("carrier-"+j), makeLinkId(GRID_SIZE/2, j));
+		CarrierCapabilities cc = new CarrierCapabilities();
+		carrier.setCarrierCapabilities(cc);
+		CarrierVehicle carrierVehicle = new CarrierVehicle(new IdImpl("carrier-"+j+"-vehicle"), makeLinkId(GRID_SIZE/2, j));
+		cc.getCarrierVehicles().add(carrierVehicle);
+		return carrier;
+	}
+
+	private void createTransportServiceProviderWithContracts() {
+		transportServiceProviders = new TransportServiceProviders();
 		TransportServiceProviderImpl tsp = new TransportServiceProviderImpl(new IdImpl("guenter"));
+		TSPCapabilities cap = new TSPCapabilities();
+		cap.getTransshipmentCentres().add(new IdImpl("j(2,4)"));
+		tsp.setTspCapabilities(cap);
 		logger.debug("TransportServiceProvider " + tsp.getId() + " has come into play");
-		tsp.getContracts().add(new TSPContract(Arrays.asList(
-				new TSPShipment(new IdImpl(20), new IdImpl(1), 20,
-						new TSPShipment.TimeWindow(0.0, 24*3600), new TSPShipment.TimeWindow(0.0,24*3600)))));
-		tsp.getContracts().add(new TSPContract(Arrays.asList(
-				new TSPShipment(new IdImpl(12), new IdImpl(20), 15,
-						new TSPShipment.TimeWindow(0.0, 24*3600), new TSPShipment.TimeWindow(0.0,24*3600)))));
+		printCap(cap);
+		createContracts(tsp);
+
+		transportServiceProviders.getTransportServiceProviders().add(tsp);
+	}
+
+	private void createInitialPlans(TransportServiceProviderImpl tsp) {
+		createAndSelectAPlan(tsp);
+	}
+
+	private void createAndSelectAPlan(TransportServiceProviderImpl tsp) {
+		CheapestCarrierTSPPlanBuilder tspPlanBuilder = new CheapestCarrierTSPPlanBuilder();
+		tspPlanBuilder.setCarrierAgentTracker(freightAgentTracker);
+		List<Id> emptyList = Collections.emptyList();
+		tspPlanBuilder.setTransshipmentCentres(emptyList);
+		TSPPlan directPlan = tspPlanBuilder.buildPlan(tsp.getContracts(),tsp.getTspCapabilities());
+		printTSPPlan(directPlan);
+		tsp.getPlans().add(directPlan);
+		tsp.setSelectedPlan(directPlan);
+	}
+
+	private void createManyContracts(TransportServiceProviderImpl tsp) {
+		for (int sourceColumn = 0; sourceColumn <= GRID_SIZE; sourceColumn++) {
+			Id sourceLinkId = makeLinkId(1, sourceColumn);
+			for (int destinationColumn = 0; destinationColumn <= GRID_SIZE; destinationColumn++) {
+				Id destinationLinkId = makeLinkId(GRID_SIZE, destinationColumn);
+				tsp.getContracts().add(createContract(sourceLinkId, destinationLinkId));
+			}
+		}
 		logger.debug("he has " + tsp.getContracts().size() + " contracts");
 		printContracts(tsp.getContracts());
-		TSPCapabilities cap = new TSPCapabilities();
-		cap.getTransshipmentCentres().add(new IdImpl(14));
-		cap.getTransshipmentCentres().add(new IdImpl(18));
-		tsp.setTspCapabilities(cap);
-		printCap(cap);
-		
-		MinimumDepotDistanceToDestinationTSPPlanBuilder tspPlanBuilder = new MinimumDepotDistanceToDestinationTSPPlanBuilder(network);
-		TSPPlan plan = tspPlanBuilder.buildPlan(tsp.getContracts(),tsp.getTspCapabilities());
-		printTSPPlan(plan);
-		tsp.getPlans().add(plan);
-		tsp.setSelectedPlan(plan);
-		transportServiceProviders = new TransportServiceProviders();
-		transportServiceProviders.getTransportServiceProviders().add(tsp);
+	}
+
+	private void createContracts(TransportServiceProviderImpl tsp) {
+
+		for (int destinationColumn = 0; destinationColumn <= GRID_SIZE; destinationColumn++) {
+	//	for (int destinationColumn = 0; destinationColumn <= 0; destinationColumn++) {
+			Id sourceLinkId = makeLinkId(GRID_SIZE, destinationColumn);
+			Id destinationLinkId = makeLinkId(1, destinationColumn);
+			tsp.getContracts().add(createContract(sourceLinkId, destinationLinkId));
+		}
+//		for (int destinationColumn = 5; destinationColumn <= 5; destinationColumn++) {
+//			Id sourceLinkId = makeLinkId(1, destinationColumn);
+//			Id destinationLinkId = makeLinkId(GRID_SIZE, destinationColumn);
+//			tsp.getContracts().add(createContract(sourceLinkId, destinationLinkId));
+//		}
+		logger.debug("he has " + tsp.getContracts().size() + " contracts");
+		printContracts(tsp.getContracts());
+	}
+
+	private TSPContract createContract(Id sourceLinkId, Id destinationLinkId) {
+		TSPContract tspContract = new TSPContract(Arrays.asList(new TSPShipment(sourceLinkId, destinationLinkId, 5, new TSPShipment.TimeWindow(0.0, 24*3600), new TSPShipment.TimeWindow(0.0,24*3600))));
+		return tspContract;
 	}
 
 	private void printTSPPlan(TSPPlan plan) {
@@ -249,7 +296,7 @@ public class RunCarriersAndTSPs implements StartupListener, ScoringListener, Rep
 		for(TransportChain chain : plan.getChains()){
 			logger.debug(chain);
 		}
-		
+
 	}
 
 	private void printCap(TSPCapabilities cap) {
@@ -257,7 +304,7 @@ public class RunCarriersAndTSPs implements StartupListener, ScoringListener, Rep
 		for(Id id : cap.getTransshipmentCentres()){
 			logger.debug(id);
 		}
-		
+
 	}
 
 	private void printContracts(Collection<TSPContract> contracts) {
@@ -268,7 +315,7 @@ public class RunCarriersAndTSPs implements StartupListener, ScoringListener, Rep
 				count++;
 			}
 		}
-		
+
 	}
 
 }

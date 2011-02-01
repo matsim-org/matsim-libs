@@ -33,26 +33,26 @@ public class TransportChainBuilder {
 		this.shipment = shipment;
 	}
 
-	public void scheduleLeg(Id carrierId){
+	public void scheduleLeg(Offer offer){
 		if(!openPickUp){
 			throw new IllegalStateException("No shipment has been picked up. Thus, cannot create a leg.");
 		}
 		if(openLeg){
 			throw new IllegalStateException("Cannot create a leg, because a leg is still open");
 		}
-		ChainLeg leg = createLeg(carrierId);
+		ChainLeg leg = createLeg(offer);
 		chainElements.add(leg);
 		openLeg = true;
 	}
 	
-	public void scheduleLeg(Id carrierId, double duration){
+	public void scheduleLeg(Offer offer, double duration){
 		if(!openPickUp){
 			throw new IllegalStateException("No shipment has been picked up. Thus, cannot create a leg.");
 		}
 		if(openLeg){
 			throw new IllegalStateException("Cannot create a leg, because a leg is still open");
 		}
-		ChainLeg leg = createLeg(carrierId);
+		ChainLeg leg = createLeg(offer);
 		leg.setDuration(duration);
 		chainElements.add(leg);
 		openLeg = true;
@@ -102,8 +102,8 @@ public class TransportChainBuilder {
 		return new TransportChain(shipment,chainElements);
 	}
 
-	private ChainLeg createLeg(Id carrierId) {
-		return new ChainLeg(carrierId);
+	private ChainLeg createLeg(Offer offer) {
+		return new ChainLeg(offer);
 	}
 
 	private PickUp createPickup(TSPShipment shipment, Id location, TimeWindow timeWindow) {
@@ -124,7 +124,7 @@ public class TransportChainBuilder {
 			scheduleDelivery(delivery.getLocation(), delivery.getTimeWindow());
 		} else if (chainElement instanceof ChainLeg) {
 			ChainLeg chainLeg = (ChainLeg) chainElement;
-			scheduleLeg(chainLeg.getCarrierId(), chainLeg.getDuration());
+			scheduleLeg(chainLeg.getAcceptedOffer(), chainLeg.getDuration());
 		}
 	}
 	

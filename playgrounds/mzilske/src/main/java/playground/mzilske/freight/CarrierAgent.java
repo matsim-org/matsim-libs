@@ -26,6 +26,31 @@ import playground.mzilske.freight.Tour.TourElement;
 
 public class CarrierAgent {
 	
+	public class CostTableKey {
+
+		private Id from;
+		private Id to;
+		private int size;
+
+		public CostTableKey(Id from, Id to, int size) {
+			this.from = from;
+			this.to = to;
+			this.size = size;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			CostTableKey other = (CostTableKey) obj;
+			return from.equals(other.from) && to.equals(other.to) && size == other.size;
+		}
+
+		@Override
+		public int hashCode() {
+			return from.hashCode() + to.hashCode() + size;
+		}
+
+	}
+
 	private static final double EPSILON = 0.0001;
 
 	private CarrierImpl carrier;
@@ -43,8 +68,12 @@ public class CarrierAgent {
 	private Map<Id, ScheduledTour> driverTourMap = new HashMap<Id, ScheduledTour>();
 
 	private CarrierAgentTracker tracker;
+
+	private Map<CostTableKey, Double> costTable = new HashMap<CostTableKey, Double>();
 	
 	private static Logger logger = Logger.getLogger(CarrierAgent.class);
+
+	private CarrierCostFunction costFunction;
 	
 	class CarrierDriverAgent {
 		
@@ -54,7 +83,10 @@ public class CarrierAgent {
 		
 		double distance = 0.0;
 
-		CarrierDriverAgent(Id driverId) {
+		private CarrierVehicle carrierVehicle;
+
+		CarrierDriverAgent(Id driverId, CarrierVehicle carrierVehicle) {
+			this.setCarrierVehicle(carrierVehicle);
 			this.driverId = driverId;
 		}
 
@@ -76,8 +108,16 @@ public class CarrierAgent {
 			logger.info(driverId + " sOfDistance=" + this.distance/1000 + "km");
 		}
 		
-		public double getCost(){
+		public double getDistance(){
 			return distance;
+		}
+
+		private void setCarrierVehicle(CarrierVehicle carrierVehicle) {
+			this.carrierVehicle = carrierVehicle;
+		}
+
+		private CarrierVehicle getCarrierVehicle() {
+			return carrierVehicle;
 		}
 		
 	}
@@ -115,7 +155,7 @@ public class CarrierAgent {
 			plan.setPerson(driverPerson);
 			route(plan);
 			plans.add(plan);
-			CarrierDriverAgent carrierDriverAgent = new CarrierDriverAgent(driverId);
+			CarrierDriverAgent carrierDriverAgent = new CarrierDriverAgent(driverId, scheduledTour.getVehicle());
 			carrierDriverAgents.put(driverId, carrierDriverAgent);
 			driverTourMap.put(driverId, scheduledTour);
 		}
@@ -152,23 +192,40 @@ public class CarrierAgent {
 	}
 	
 	private double calculateCost() {
-		double cost = 0;
+		costFunction.init(carrier);
+		double cost = 0.0;
 		for (Id driverId : getDriverIds()) {
-			cost += carrierDriverAgents.get(driverId).getCost();
+			CarrierDriverAgent driver = carrierDriverAgents.get(driverId);
+			cost += costFunction.calculateCost(driver.getCarrierVehicle(), driver.getDistance());
 		}
 		return cost;
 	}
 
-	public List<Tuple<Shipment, Double>> calculateCostsOfSelectedPlanPerShipment() {
+	public List<Tuple<Shipment, Double>> calculateCostsPerShipment() {
 		List<Tuple<Shipment,Double>> listOfCostPerShipment = new ArrayList<Tuple<Shipment,Double>>();
 		for(Id driverId : driverIds){
 			ScheduledTour tour = driverTourMap.get(driverId);
 			logger.debug("allocating cost of driver "+driverId+", carrier "+carrier.getId());
-			List<Tuple<Shipment,Double>> listOfCostPerShipmentPerDriver = costAllocator.allocateCost(tour.getTour().getShipments(), carrierDriverAgents.get(driverId).getCost());
+			costFunction.init(carrier);
+			CarrierDriverAgent carrierDriverAgent = carrierDriverAgents.get(driverId);
+			double cost = costFunction.calculateCost(carrierDriverAgent.getCarrierVehicle(), carrierDriverAgent.getDistance());
+			List<Tuple<Shipment,Double>> listOfCostPerShipmentPerDriver = costAllocator.allocateCost(tour.getTour().getShipments(), cost);
 			listOfCostPerShipment.addAll(listOfCostPerShipmentPerDriver);
 		}
-		assertSum(listOfCostPerShipment, calculateCost());
+		if (! listOfCostPerShipment.isEmpty()) {
+			assertSum(listOfCostPerShipment, calculateCost());
+		}
+		for (Tuple<Shipment,Double> t : listOfCostPerShipment) {
+			memorizeCost(t.getFirst().getFrom(), t.getFirst().getTo(), t.getFirst().getSize(), t.getSecond());
+		}
 		return listOfCostPerShipment;
+	}
+
+	private void memorizeCost(Id from, Id to, int size, Double cost) {
+		CostTableKey key = new CostTableKey(from, to, size);
+		if (!costTable.containsKey(key) || costTable.get(key) > cost) {
+			costTable.put(key, cost);
+		}
 	}
 
 	private void assertSum(List<Tuple<Shipment, Double>> listOfCostPerShipment, double calculateCostOfSelectedPlan) {
@@ -195,6 +252,32 @@ public class CarrierAgent {
 		driverIds.add(id);
 		++nextId;
 		return id;
+	}
+
+	public Offer makeOffer(Id linkId, Id linkId2, int shipmentSize) {
+		Offer offer = new Offer();
+		offer.setCarrierId(carrier.getId());
+		Double memorizedPrice = costTable.get(new CostTableKey(linkId, linkId2, shipmentSize));
+		double price;
+		if (memorizedPrice != null) {
+			price = memorizedPrice;
+			if (Math.random() < 0.05) {
+				double tenPercent = price * 0.1;
+				double verrauscht = Math.random() * tenPercent;
+				price = price + verrauscht * ( Math.random() < 0.5 ? -1 : 1);
+			}
+			System.out.println("Ich bin " + carrier.getId()+". Biete an: " + linkId + " nach " +linkId2 + " für " + price);
+		} else {
+			price = 10000.0 * Math.random();
+			System.out.println("Biete einen zufälligen Preis an, und zwar " + price);
+		}
+		offer.setPrice(price);
+		offer.setDuration(120.0);
+		return offer;
+	}
+
+	void setCostFunction(CarrierCostFunction costFunction) {
+		this.costFunction = costFunction;
 	}
 
 }

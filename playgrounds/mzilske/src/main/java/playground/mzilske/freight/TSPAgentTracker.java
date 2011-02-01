@@ -37,20 +37,11 @@ public class TSPAgentTracker implements CarrierCostListener, ShipmentStatusListe
 		return costListeners;
 	}
 
-	public Map<Id,List<Shipment>> createCarrierShipments(){
-		Map<Id,List<Shipment>> carrierShipments = new HashMap<Id, List<Shipment>>();
+	public List<Contract> createCarrierContracts(){
+		List<Contract> carrierShipments = new ArrayList<Contract>();
 		for(TSPAgent agent : tspAgents){
-			List<Tuple<Id,Shipment>> agentShipments = agent.createCarrierShipments();
-			for(Tuple<Id,Shipment> t : agentShipments){
-				if(carrierShipments.containsKey(t.getFirst())){
-					carrierShipments.get(t.getFirst()).add(t.getSecond());
-				}
-				else{
-					List<Shipment> shipments = new ArrayList<Shipment>();
-					shipments.add(t.getSecond());
-					carrierShipments.put(t.getFirst(), shipments);
-				}								
-			}
+			List<Contract> agentShipments = agent.createCarrierShipments();
+			carrierShipments.addAll(agentShipments);
 		}
 		return carrierShipments;
 	}

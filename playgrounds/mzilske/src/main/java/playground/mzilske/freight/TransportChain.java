@@ -16,7 +16,7 @@ public class TransportChain {
 	}
 	
 	public static class ChainLeg extends ChainElement{
-		private Id carrierId;
+		private Offer carrierId;
 		
 		private double duration;
 		
@@ -28,17 +28,18 @@ public class TransportChain {
 			this.duration = duration;
 		}
 
-		public ChainLeg(Id carrierId){
-			this.carrierId = carrierId;
+		public ChainLeg(Offer offer){
+			this.carrierId = offer;
 		}
 		
-		public Id getCarrierId(){
+		public Offer getAcceptedOffer(){
 			return carrierId;
 		}
 		
 		public String toString(){
 			return "Chose carrier " + carrierId;
 		}
+
 	}
 	
 	public static abstract class ChainActivity extends ChainElement{

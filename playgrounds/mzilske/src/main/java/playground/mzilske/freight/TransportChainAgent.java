@@ -46,13 +46,13 @@ public class TransportChainAgent {
 	 * activities a shipment is created. It is stored in a list with tuples of carrierIds and shipments. 
 	 * @return
 	 */
-	public List<Tuple<Id,Shipment>> createCarrierShipments(){
-		List<Tuple<Id,Shipment>> shipments = new ArrayList<Tuple<Id,Shipment>>();
+	public List<Contract> createCarrierShipments(){
+		List<Contract> shipments = new ArrayList<Contract>();
 		Id from = null;
 		Id to = null;
 		TimeWindow pickUpTimeWindow = null;
 		TimeWindow deliveryTimeWindow = null;
-		Id carrierId = null;
+		Offer acceptedOffer = null;
 		
 		for(ChainElement element : tpChain.getChainElements()){
 			if(element instanceof PickUp){
@@ -67,11 +67,11 @@ public class TransportChainAgent {
 				deliveryTimeWindow = new TimeWindow(delivery.getTimeWindow().getStart(),
 						delivery.getTimeWindow().getEnd());
 				Shipment shipment = createAndRegisterShipment(from,to,tpChain.getShipment().getSize(), pickUpTimeWindow,deliveryTimeWindow);
-				shipments.add(new Tuple<Id,Shipment>(carrierId,shipment));				
+				shipments.add(new Contract(shipment,acceptedOffer));				
 			}
 			if(element instanceof ChainLeg){
 				ChainLeg leg = (ChainLeg)element;
-				carrierId = leg.getCarrierId();
+				acceptedOffer = leg.getAcceptedOffer();
 			}
 		}
 		initIterator();

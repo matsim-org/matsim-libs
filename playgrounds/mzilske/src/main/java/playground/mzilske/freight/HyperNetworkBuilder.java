@@ -1,27 +1,40 @@
 package playground.mzilske.freight;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 public class HyperNetworkBuilder {
-	
+
 	private TSPCapabilities tspCapabilities;
 	private Collection<Id> shipmentLocations;
 	private Network network;
+	private Map<Link, Double> travelTimes = new HashMap<Link, Double>();
+	private TravelTime travelTime = new TravelTime() {
+
+		@Override
+		public double getLinkTravelTime(Link link, double time) {
+			return travelTimes.get(link);
+		}
+		
+	};
 	private Coord nullCoord = new CoordImpl(0,0);
-	private Carriers carriers;
-	
-	public HyperNetworkBuilder(TSPCapabilities tspCapabilities, Collection<Id> shipmentLocations, Carriers carriers) {
+	private CarrierAgentTracker carrierAgentTracker;
+
+	public HyperNetworkBuilder(TSPCapabilities tspCapabilities, Collection<Id> shipmentLocations, CarrierAgentTracker carrierAgentTracker) {
 		this.tspCapabilities = tspCapabilities;
 		this.shipmentLocations = shipmentLocations;
-		this.carriers = carriers;
+		this.carrierAgentTracker = carrierAgentTracker;
 		createCompleteGraph();
 	}
 
@@ -38,15 +51,11 @@ public class HyperNetworkBuilder {
 			for (Id otherTranshipmentCenterId : tspCapabilities.getTransshipmentCentres()) {
 				Id otherTranshipmentCenter = transhipmentCenter(otherTranshipmentCenterId);
 				if (transhipmentCenter.equals(otherTranshipmentCenter)) continue;
-				for (CarrierImpl carrier : carriers.getCarriers()) {
-					addLink(transhipmentCenter, otherTranshipmentCenter, carrier);
-				}
+				addLinks(transhipmentCenter, otherTranshipmentCenter);
 			}
 			for (Id shipmentLocationId : shipmentLocations) {
 				Id shipmentLocation = shipmentLocation(shipmentLocationId);
-				for (CarrierImpl carrier : carriers.getCarriers()) {
-					addLink(transhipmentCenter, shipmentLocation, carrier);
-				}
+				addLinks(transhipmentCenter, shipmentLocation);
 			}
 		}
 		for (Id shipmentLocationId : shipmentLocations) {
@@ -54,34 +63,36 @@ public class HyperNetworkBuilder {
 			for (Id otherShipmentLocationId : shipmentLocations) {
 				Id otherShipmentLocation = shipmentLocation(otherShipmentLocationId);
 				if (shipmentLocation.equals(otherShipmentLocation)) continue;
-				for (CarrierImpl carrier : carriers.getCarriers()) {
-					addLink(shipmentLocation, otherShipmentLocation, carrier);
-				}
+				addLinks(shipmentLocation, otherShipmentLocation);
 			}
 			for (Id transhipmentCenterId : tspCapabilities.getTransshipmentCentres()) {
 				Id transhipmentCenter = transhipmentCenter(transhipmentCenterId);
-				for (CarrierImpl carrier : carriers.getCarriers()) {
-					addLink(shipmentLocation, transhipmentCenter, carrier);
-				}
+				addLinks(shipmentLocation, transhipmentCenter);
 			}
 		}
 	}
 
-	private void addLink(Id transhipmentCenter, Id otherTranshipmentCenter, CarrierImpl carrier) {
-		Id intermediateNode = intermediateNode(transhipmentCenter, carrier, otherTranshipmentCenter);
-		Node node = network.getFactory().createNode(intermediateNode, nullCoord);
-		network.addNode(node);
-		network.addLink(network.getFactory().createLink(link(transhipmentCenter, intermediateNode), 
-				network.getNodes().get(transhipmentCenter), 
-				node));
-		network.addLink(network.getFactory().createLink(link(intermediateNode, otherTranshipmentCenter), 
-				node, 
-				network.getNodes().get(otherTranshipmentCenter)));
-		System.out.println(network.getNodes().size() + "  " + network.getLinks().size());
+	private void addLinks(Id fromNode, Id toNode) {
+		int shipmentSize = 1;
+		Collection<Offer> offers = carrierAgentTracker.getOffers(linkId(fromNode), linkId(toNode), shipmentSize);
+		for (Offer offer : offers) {
+			Id intermediateNode = intermediateNode(fromNode, offer.getCarrierId(), toNode);
+			Node node = network.getFactory().createNode(intermediateNode, nullCoord);
+			network.addNode(node);
+			Link link = network.getFactory().createLink(link(fromNode, intermediateNode), 
+					network.getNodes().get(fromNode), 
+					node);
+			travelTimes.put(link, offer.getDuration());
+			network.addLink(link);
+			network.addLink(network.getFactory().createLink(link(intermediateNode, toNode), 
+					node, 
+					network.getNodes().get(toNode)));
+			System.out.println(network.getNodes().size() + "  " + network.getLinks().size());
+		}
 	}
-	
-	private Id intermediateNode(Id transhipmentCenter, CarrierImpl carrier, Id otherTranshipmentCenter) {
-		return new IdImpl("("+transhipmentCenter.toString()+","+carrier.getId().toString()+","+otherTranshipmentCenter.toString());
+
+	private Id intermediateNode(Id transhipmentCenter, Id carrierId, Id otherTranshipmentCenter) {
+		return new IdImpl("("+transhipmentCenter.toString()+","+carrierId.toString()+","+otherTranshipmentCenter.toString());
 	}
 
 	private Id link(Id transhipmentCenter, Id transhipmentCenter2) {
@@ -96,8 +107,12 @@ public class HyperNetworkBuilder {
 		return new IdImpl("transhipmentCenter_" + transhipmentCenterId.toString());
 	}
 
+	private Id linkId(Id hyperNetworkNodeId) {
+		return new IdImpl(hyperNetworkNodeId.toString().split("_")[1]);
+	}
+
 	private class MyNetwork extends NetworkImpl {
-		
+
 	}
 
 }

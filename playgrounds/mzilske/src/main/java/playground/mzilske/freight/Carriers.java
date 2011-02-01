@@ -1,13 +1,15 @@
 package playground.mzilske.freight;
 
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.matsim.api.core.v01.Id;
 
 public class Carriers {
 
-	private Collection<CarrierImpl> carriers = new ArrayList<CarrierImpl>();
+	private Map<Id, CarrierImpl> carriers = new HashMap<Id, CarrierImpl>();
 	
-	public Collection<CarrierImpl> getCarriers() {
+	public Map<Id, CarrierImpl> getCarriers() {
 		return carriers;
 	}
 	

@@ -51,8 +51,7 @@ public class CarrierAgentTrackerBuilder {
 
 	public CarrierAgentTracker build(){
 		if(carriersInitialized && routerInitialized && networkInitialized && eventsManagerInitialized){
-			CarrierAgentTracker tracker = new CarrierAgentTracker(carriers, router);
-			tracker.setNetwork(network);
+			CarrierAgentTracker tracker = new CarrierAgentTracker(carriers, router, network);
 			for(CarrierCostListener ccl : costListeners){
 				tracker.getCostListeners().add(ccl);
 			}
