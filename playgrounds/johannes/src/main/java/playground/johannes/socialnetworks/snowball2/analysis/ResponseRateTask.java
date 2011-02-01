@@ -27,8 +27,7 @@ import java.util.Map;
 import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.analysis.AnalyzerTask;
 import org.matsim.contrib.sna.snowball.SampledGraph;
-
-import playground.johannes.socialnetworks.survey.ivt2009.analysis.ResponseRate;
+import org.matsim.contrib.sna.snowball.analysis.SnowballStatistics;
 
 /**
  * @author illenberger
@@ -40,14 +39,14 @@ public class ResponseRateTask extends AnalyzerTask {
 	public void analyze(Graph g, Map<String, Double> stats) {
 		SampledGraph graph = (SampledGraph) g;
 		
-		stats.put("responseRate", ResponseRate.responseRate(graph.getVertices()));
+		stats.put("responseRate", SnowballStatistics.getInstance().responseRateTotal(graph.getVertices(), SnowballStatistics.getInstance().lastIteration(graph.getVertices())));
 		
 		if(getOutputDirectory() != null) {
 			try {
 				BufferedWriter writer = new BufferedWriter(new FileWriter(getOutputDirectory() + "responseRates.txt"));
 				writer.write("iteration\tresponseRate");
 				writer.newLine();
-				double[] rate = ResponseRate.responseRatesAccumulated(graph.getVertices());
+				double[] rate = SnowballStatistics.getInstance().responseRateTotal(graph.getVertices());
 				for(int i = 0; i < rate.length; i++) {
 					writer.write(String.valueOf(i));
 					writer.write("\t");

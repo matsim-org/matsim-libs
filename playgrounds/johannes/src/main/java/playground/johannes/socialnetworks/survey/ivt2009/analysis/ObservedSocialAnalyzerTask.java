@@ -20,6 +20,7 @@
 package playground.johannes.socialnetworks.survey.ivt2009.analysis;
 
 import playground.johannes.socialnetworks.graph.social.analysis.AgeTask;
+import playground.johannes.socialnetworks.graph.social.analysis.EducationTask;
 import playground.johannes.socialnetworks.graph.social.analysis.GenderTask;
 import playground.johannes.socialnetworks.graph.social.analysis.SocialAnalyzerTask;
 import playground.johannes.socialnetworks.snowball2.social.analysis.ObservedAge;
@@ -33,6 +34,7 @@ public class ObservedSocialAnalyzerTask extends SocialAnalyzerTask {
 	public ObservedSocialAnalyzerTask() {
 		addTask(new AgeTask(new ObservedAge()));
 		addTask(new GenderTask(new ObservedGender()));
+		addTask(new EducationTask());
 	}
 
 }

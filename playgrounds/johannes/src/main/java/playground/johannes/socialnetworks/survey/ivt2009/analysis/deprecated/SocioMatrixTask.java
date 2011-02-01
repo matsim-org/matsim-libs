@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * StandardAnalyzerTask.java
+ * SocioMatrixTask.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,50 +17,60 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.graph.spatial.analysis;
+package playground.johannes.socialnetworks.survey.ivt2009.analysis.deprecated;
 
+import gnu.trove.TObjectIntHashMap;
+import gnu.trove.TObjectIntIterator;
+
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Map;
+import java.util.List;
+import java.util.Locale;
 
 import org.matsim.contrib.sna.graph.analysis.AnalyzerTask;
-import org.matsim.contrib.sna.graph.analysis.GraphAnalyzer;
-import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
-import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphMLReader;
-
-import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
 
 /**
  * @author illenberger
  *
  */
-public class SpatialAnalyzerTask extends AnalyzerTaskComposite {
+public abstract class SocioMatrixTask extends AnalyzerTask {
 
-	public SpatialAnalyzerTask() {
-		addTask(new DistanceTask());
+	protected void writeDistribution(TObjectIntHashMap<String> distr, String file) throws IOException {
+		BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+		TObjectIntIterator<String> it = distr.iterator();
+		writer.write("attr\tcount");
+		writer.newLine();
+		for(int i = 0; i < distr.size(); i++) {
+			it.advance();
+			writer.write(it.key());
+			writer.write("\t");
+			writer.write(String.valueOf(it.value()));
+			writer.newLine();
+		}
+		writer.close();
 	}
-
-	/**
-	 * @param args
-	 * @throws IOException 
-	 */
-	public static void main(String[] args) throws IOException {
-		SpatialGraphMLReader reader = new SpatialGraphMLReader();
-		SpatialGraph graph = reader.readGraph(args[0]);
+	
+	protected void writeSocioMatrix(double[][] matrix, List<String> values, String file) throws IOException {
+		BufferedWriter writer = new BufferedWriter(new FileWriter(file));
 		
-		String output = null;
-		if(args.length > 1) {
-			output = args[1];
+		for(String value : values) {
+			writer.write("\t");
+			writer.write(value);
+		}
+		writer.newLine();
+		
+		for(int i = 0; i < matrix.length; i++) {
+			writer.write(values.get(i));
+			
+			for(int j = 0; j < matrix.length; j++) {
+				writer.write("\t");
+				writer.write(String.format(Locale.US, "%1$.2f", matrix[i][j]));
+				
+			}
+			writer.newLine();
 		}
 		
-		AnalyzerTask task = new SpatialAnalyzerTask();
-		if(output != null)
-			task.setOutputDirectoy(output);
-		
-		Map<String, Double> stats = GraphAnalyzer.analyze(graph, task);
-		
-		if(output != null)
-			GraphAnalyzer.writeStats(stats, output + "/summary.txt");
-	
+		writer.close();
 	}
-
 }

@@ -19,17 +19,13 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.social.analysis;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
 import playground.johannes.socialnetworks.graph.social.SocialVertex;
 
 /**
  * @author illenberger
  *
  */
-public class Gender {
+public class Gender extends AbstractLinguisticAttribute {
 
 	public static final String MALE = "m";
 	
@@ -42,25 +38,15 @@ public class Gender {
 			instance = new Gender();
 		return instance;
 	}
-	
-	public Map<SocialVertex, String> values(Set<? extends SocialVertex> vertices) {
-		Map<SocialVertex, String> map = new HashMap<SocialVertex, String>(vertices.size());
-		for(SocialVertex v : vertices) {
-			String gender = v.getPerson().getPerson().getSex();
-			if(MALE.equalsIgnoreCase(gender))
-				map.put(v, MALE);
-			else if(FEMALE.equalsIgnoreCase(FEMALE))
-				map.put(v, FEMALE);
-		}
-		return map;
-	}
-	
-	public SocioMatrix<String> countsMatrix(Set<? extends SocialVertex> vertices) {
-		return SocioMatrixBuilder.countsMatrix(this.values(vertices));
-	}
-	
-	public SocioMatrix<String> probaMatrix(Set<? extends SocialVertex> vertices) {
-		Map<SocialVertex, String> values = this.values(vertices);
-		return SocioMatrixBuilder.probaMatrix(values, values);
+
+	@Override
+	protected String attribute(SocialVertex v) {
+		String gender = v.getPerson().getPerson().getSex();
+		if(MALE.equalsIgnoreCase(gender))
+			return MALE;
+		else if(FEMALE.equalsIgnoreCase(gender))
+			return FEMALE;
+		else
+			return null;
 	}
 }

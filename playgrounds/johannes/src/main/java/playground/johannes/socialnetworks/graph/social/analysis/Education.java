@@ -20,17 +20,25 @@
 package playground.johannes.socialnetworks.graph.social.analysis;
 
 import playground.johannes.socialnetworks.graph.social.SocialVertex;
-import playground.johannes.socialnetworks.survey.ivt2009.analysis.SocioMatrixLegacy;
 
 /**
  * @author illenberger
  *
  */
-public class Education extends SocioMatrixLegacy {
+public class Education extends AbstractLinguisticAttribute {
 
+	private static Education instance;
+	
+	public static Education getInstance() {
+		if(instance == null)
+			instance = new Education();
+		
+		return instance;
+	}
+	
 	@Override
-	protected String getAttributeValue(SocialVertex vertex) {
-		return vertex.getPerson().getEducation();
+	protected String attribute(SocialVertex v) {
+		return v.getPerson().getEducation();
 	}
 
 }

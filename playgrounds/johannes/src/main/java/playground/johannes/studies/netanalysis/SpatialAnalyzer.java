@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * CivilStatusTask.java
+ * SptialAnalyzer.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,42 +17,48 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.survey.ivt2009.analysis;
+package playground.johannes.studies.netanalysis;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 
-import org.matsim.contrib.sna.graph.Graph;
+import org.matsim.contrib.sna.graph.analysis.GraphAnalyzer;
+import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
+import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphMLReader;
 
-import playground.johannes.socialnetworks.graph.social.SocialGraph;
+import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
+import playground.johannes.socialnetworks.graph.spatial.analysis.ExtendedSpatialAnalyzerTask;
+import playground.johannes.socialnetworks.graph.spatial.analysis.SpatialAnalyzerTask;
 
 /**
  * @author illenberger
  *
  */
-public class CivilStatusTask extends SocioMatrixTask {
+public class SpatialAnalyzer {
 
-	/* (non-Javadoc)
-	 * @see org.matsim.contrib.sna.graph.analysis.AnalyzerTask#analyze(org.matsim.contrib.sna.graph.Graph, java.util.Map)
+	/**
+	 * @param args
 	 */
-	@Override
-	public void analyze(Graph g, Map<String, Double> stats) {
-		SocialGraph graph = (SocialGraph) g;
-		CivilStatus cstatus = new CivilStatus();
-		double[][] matrix = cstatus.socioMatrix(graph);
-		List<String> values = cstatus.getAttributes();
+	public static void main(String[] args) throws IOException {
+		SpatialGraphMLReader reader = new SpatialGraphMLReader();
+		SpatialGraph graph = reader.readGraph(args[0]);
 		
-		double[][] matrixAvr = cstatus.socioMatrixLocalAvr(graph);
-		
-		try {
-			writeSocioMatrix(matrix, values, getOutputDirectory() + "/cstatus.matrix.txt");
-			writeSocioMatrix(matrixAvr, values, getOutputDirectory() + "/cstatus.matrix.norm2.txt");
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		String output = null;
+		if(args.length > 1) {
+			output = args[1];
 		}
-
+		
+		AnalyzerTaskComposite task = new AnalyzerTaskComposite();
+		task.addTask(new SpatialAnalyzerTask());
+		task.addTask(new ExtendedSpatialAnalyzerTask());
+		if(output != null)
+			task.setOutputDirectoy(output);
+		
+		Map<String, Double> stats = GraphAnalyzer.analyze(graph, task);
+		
+		if(output != null)
+			GraphAnalyzer.writeStats(stats, output + "/summary.txt");
+	
 	}
 
 }

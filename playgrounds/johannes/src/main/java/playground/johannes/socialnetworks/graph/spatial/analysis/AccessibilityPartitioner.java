@@ -84,7 +84,7 @@ public class AccessibilityPartitioner extends ModuleAnalyzerTask<Accessibility> 
 			acc.setDistanceCalculator(new CartesianDistanceCalculator());
 			DescriptivePiStatistics distr = acc.distribution((Set<? extends SpatialVertex>) it.value(), opportunities);
 			try {
-				TDoubleDoubleHashMap hist = Histogram.createHistogram(distr, FixedSampleSizeDiscretizer.create(distr.getValues(), 100));
+				TDoubleDoubleHashMap hist = Histogram.createHistogram(distr, FixedSampleSizeDiscretizer.create(distr.getValues(), 100), true);
 				TXTWriter.writeMap(hist, "d", "p_accept", getOutputDirectory() + "acc_a="+it.key()+".txt");
 //				writeHistograms(distr, 1, false, "acc_a="+it.key());
 			} catch (FileNotFoundException e) {

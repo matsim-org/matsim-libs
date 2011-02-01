@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SocioMatrixTask.java
+ * TopoAnalyzerTask.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,58 +19,38 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.survey.ivt2009.analysis;
 
-import gnu.trove.TObjectIntHashMap;
-import gnu.trove.TObjectIntIterator;
+import org.matsim.contrib.sna.graph.analysis.ComponentsTask;
+import org.matsim.contrib.sna.graph.analysis.DegreeTask;
+import org.matsim.contrib.sna.graph.analysis.GraphSizeTask;
+import org.matsim.contrib.sna.graph.analysis.TransitivityTask;
+import org.matsim.contrib.sna.snowball.analysis.ObservedDegree;
+import org.matsim.contrib.sna.snowball.analysis.ObservedTransitivity;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.List;
-import java.util.Locale;
-
-import org.matsim.contrib.sna.graph.analysis.AnalyzerTask;
+import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
+import playground.johannes.socialnetworks.graph.analysis.PropertyDegreeTask;
 
 /**
  * @author illenberger
  *
  */
-public abstract class SocioMatrixTask extends AnalyzerTask {
+public class ObsTopologyAnalyzerTask extends AnalyzerTaskComposite {
 
-	protected void writeDistribution(TObjectIntHashMap<String> distr, String file) throws IOException {
-		BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-		TObjectIntIterator<String> it = distr.iterator();
-		writer.write("attr\tcount");
-		writer.newLine();
-		for(int i = 0; i < distr.size(); i++) {
-			it.advance();
-			writer.write(it.key());
-			writer.write("\t");
-			writer.write(String.valueOf(it.value()));
-			writer.newLine();
-		}
-		writer.close();
+	public ObsTopologyAnalyzerTask() {
+		addTask(new GraphSizeTask());
+		
+		DegreeTask degreeTask = new DegreeTask();
+		degreeTask.setModule(ObservedDegree.getInstance());
+		addTask(degreeTask);
+		
+		TransitivityTask transitivityTask = new TransitivityTask();
+		transitivityTask.setModule(ObservedTransitivity.getInstance());
+		addTask(transitivityTask);
+		
+		PropertyDegreeTask xDegreeTask = new PropertyDegreeTask();
+		xDegreeTask.setModule(ObservedDegree.getInstance());
+		addTask(xDegreeTask);
+		
+		addTask(new ComponentsTask());
 	}
-	
-	protected void writeSocioMatrix(double[][] matrix, List<String> values, String file) throws IOException {
-		BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-		
-		for(String value : values) {
-			writer.write("\t");
-			writer.write(value);
-		}
-		writer.newLine();
-		
-		for(int i = 0; i < matrix.length; i++) {
-			writer.write(values.get(i));
-			
-			for(int j = 0; j < matrix.length; j++) {
-				writer.write("\t");
-				writer.write(String.format(Locale.US, "%1$.2f", matrix[i][j]));
-				
-			}
-			writer.newLine();
-		}
-		
-		writer.close();
-	}
+
 }

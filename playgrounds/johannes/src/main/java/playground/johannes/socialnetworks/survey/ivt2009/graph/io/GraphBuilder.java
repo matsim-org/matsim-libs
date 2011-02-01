@@ -201,7 +201,7 @@ public class GraphBuilder {
 		/*
 		 * Sociogram
 		 */
-		loadSociogramData(alterReader.getVertices().values(), sqlReader);
+//		loadSociogramData(alterReader.getVertices().values(), sqlReader);
 		
 		logger.info(errLogger.toString());
 		return proj;
@@ -414,19 +414,19 @@ public class GraphBuilder {
 		GraphBuilder builder = new GraphBuilder();
 		
 		ArrayList<String> alterTables = new ArrayList<String>();
-		alterTables.add("/Users/jillenberger/Work/socialnets/data/ivt2009/09-2010/alters1.txt");
-		alterTables.add("/Users/jillenberger/Work/socialnets/data/ivt2009/09-2010/alters2.txt");
+		alterTables.add("/Users/jillenberger/Work/socialnets/data/ivt2009/01-2011/alters1.txt");
+		alterTables.add("/Users/jillenberger/Work/socialnets/data/ivt2009/01-2011/alters2.txt");
 		
 		ArrayList<String> egoTables = new ArrayList<String>();
-		egoTables.add("/Users/jillenberger/Work/socialnets/data/ivt2009/09-2010/egos1.txt");
-		egoTables.add("/Users/jillenberger/Work/socialnets/data/ivt2009/09-2010/egos2.txt");
+		egoTables.add("/Users/jillenberger/Work/socialnets/data/ivt2009/01-2011/egos1.txt");
+//		egoTables.add("/Users/jillenberger/Work/socialnets/data/ivt2009/09-2010/egos2.txt");
 		
 		ArrayList<String> sqlDumps = new ArrayList<String>();
-		sqlDumps.add("/Users/jillenberger/Work/socialnets/data/ivt2009/09-2010/snowball.filter.csv");
+		sqlDumps.add("/Users/jillenberger/Work/socialnets/data/ivt2009/01-2011/snowball.csv");
 		
 		SampledGraphProjection<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge> graph = builder.buildGraph(alterTables, egoTables, sqlDumps);
 		SampledGraphProjMLWriter writer = new SampledGraphProjMLWriter(new SocialSparseGraphMLWriter());
-//		writer.write(graph, "/Users/jillenberger/Work/socialnets/data/ivt2009/09-2010/graph/noH/graph.graphml");
-		writer.write(graph, "/Users/jillenberger/Work/socialnets/data/ivt2009/09-2010/graph/sociogram/graph.graphml");
+		writer.write(graph, "/Users/jillenberger/Work/socialnets/data/ivt2009/01-2011/graph/graph.graphml");
+//		writer.write(graph, "/Users/jillenberger/Work/socialnets/data/ivt2009/09-2010/graph/sociogram/graph.graphml");
 	}
 }

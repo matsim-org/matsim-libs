@@ -23,7 +23,6 @@ import java.util.Set;
 
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
 import org.matsim.contrib.sna.math.DescriptivePiStatistics;
-import org.matsim.contrib.sna.math.Distribution;
 import org.matsim.contrib.sna.snowball.SampledVertex;
 import org.matsim.contrib.sna.snowball.analysis.SnowballPartitions;
 

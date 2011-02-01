@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * FrequencyFilter.java
+ * SpatialAnalyzerTask.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,48 +19,33 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.survey.ivt2009.analysis;
 
-import java.util.HashSet;
 import java.util.Set;
 
-import org.matsim.contrib.sna.graph.Edge;
-import org.matsim.contrib.sna.graph.Graph;
-import org.matsim.contrib.sna.graph.GraphBuilder;
-import org.matsim.contrib.sna.graph.Vertex;
+import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
+import playground.johannes.socialnetworks.graph.spatial.analysis.AcceptanceProbabilityTask;
+import playground.johannes.socialnetworks.graph.spatial.analysis.DistanceTask;
+import playground.johannes.socialnetworks.snowball2.spatial.analysis.ObservedDistance;
 
-import playground.johannes.socialnetworks.graph.analysis.GraphFilter;
-import playground.johannes.socialnetworks.graph.social.SocialEdge;
-import playground.johannes.socialnetworks.graph.social.SocialGraph;
-import playground.johannes.socialnetworks.graph.social.SocialVertex;
+import com.vividsolutions.jts.geom.Point;
 
 /**
  * @author illenberger
  *
  */
-public class FrequencyFilter implements GraphFilter<SocialGraph> {
-
-	private GraphBuilder<SocialGraph, SocialVertex, SocialEdge> builder;
+public class ObsSpatialAnalyzerTask extends AnalyzerTaskComposite {
 	
-	private double threshold;
-	
-	public FrequencyFilter(GraphBuilder<? extends Graph, ? extends Vertex, ? extends Edge> builder, double threshold) {
-		this.builder = (GraphBuilder<SocialGraph, SocialVertex, SocialEdge>) builder;
-		this.threshold = threshold;
+	public ObsSpatialAnalyzerTask(Set<Point> points) {
+		DistanceTask distanceTask = new DistanceTask();
+		distanceTask.setModule(ObservedDistance.getInstance());
+		addTask(distanceTask);
+		
+		AcceptanceProbabilityTask acceptTask = new AcceptanceProbabilityTask(points);
+		acceptTask.setModule(ObservedAcceptanceProbability.getInstance());
+		addTask(acceptTask);
+		
+//		addTask(new AcceptFactorTask(choiceSet));
+//		DegreeDensityTask kRhoTask = new DegreeDensityTask(zones);
+//		kRhoTask.setModule(new ObservedDegree());
+//		addTask(kRhoTask);
 	}
-	
-	@Override
-	public SocialGraph apply(SocialGraph graph) {
-		Set<SocialEdge> remove = new HashSet<SocialEdge>();
-		
-		for(SocialEdge edge : graph.getEdges()) {
-			if(edge.getFrequency() > threshold) {
-				remove.add(edge);
-			}
-		}
-		
-		for(SocialEdge edge : remove)
-			builder.removeEdge(graph, edge);
-		
-		return graph;
-	}
-
 }

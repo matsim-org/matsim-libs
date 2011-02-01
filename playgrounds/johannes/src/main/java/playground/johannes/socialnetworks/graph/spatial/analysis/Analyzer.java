@@ -85,7 +85,7 @@ public class Analyzer {
 			
 			AcceptanceProbability accept = new AcceptanceProbability();
 			DescriptiveStatistics distr = accept.distribution(it.value(), opportunities);
-			TDoubleDoubleHashMap hist = Histogram.createHistogram(distr, new LinearDiscretizer(1000.0));
+			TDoubleDoubleHashMap hist = Histogram.createHistogram(distr, new LinearDiscretizer(1000.0), false);
 			TXTWriter.writeMap(hist, "d", "p", String.format("%1$s/%2$s/p_accept.txt", it.key() , output));
 //			Distribution.writeHistogram(distr.absoluteDistributionLog2(1000), output + "part." + it.key() + "/p_accept.log2.txt");
 //			Distribution.writeHistogram(distr.absoluteDistribution(1000), output + "part." + it.key() + "/p_accept.txt");

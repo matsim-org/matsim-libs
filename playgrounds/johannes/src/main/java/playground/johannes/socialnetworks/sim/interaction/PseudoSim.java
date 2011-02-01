@@ -46,6 +46,7 @@ import org.matsim.core.events.ActivityStartEventImpl;
 import org.matsim.core.events.AgentArrivalEventImpl;
 import org.matsim.core.events.AgentDepartureEventImpl;
 import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.router.util.TravelTime;
 
 /**
@@ -55,6 +56,10 @@ import org.matsim.core.router.util.TravelTime;
 public class PseudoSim {
 
 	private static final Logger logger = Logger.getLogger(PseudoSim.class);
+	
+	private final static double MIN_ACT_DURATION = 1.0;
+	
+	private final static double MIN_LEG_DURATION = 0.0;
 
 	private Queue<Event> eventQueue;
 
@@ -74,29 +79,29 @@ public class PseudoSim {
 					return 0;
 				else {
 					int rank = rank(o1) - rank(o2);
-					if(rank == 0)
+					if (rank == 0)
 						return o1.hashCode() - o2.hashCode();
 					else
 						return rank;
 				}
 			}
 		}
-		
+
 		private int rank(Event event) {
-			if(event instanceof ActivityEndEvent)
+			if (event instanceof ActivityEndEvent)
 				return 1;
-			else if(event instanceof AgentDepartureEvent)
+			else if (event instanceof AgentDepartureEvent)
 				return 2;
-			else if(event instanceof AgentArrivalEvent)
+			else if (event instanceof AgentArrivalEvent)
 				return 3;
-			else if(event instanceof ActivityStartEvent)
+			else if (event instanceof ActivityStartEvent)
 				return 4;
 			else
 				return 5;
 		}
 	};
 
-	public void run(Population population, Network network, TravelTime travelTime, EventsManagerImpl eventManager) {
+	public void run(Population population, Network network, TravelTime linkTravelTimes, EventsManagerImpl eventManager) {
 		this.network = network;
 
 		eventManager.resetHandlers(0);
@@ -117,55 +122,72 @@ public class PseudoSim {
 			}
 
 			if (carMode) {
-				double lastEndTime = 0;
-				for (int i = 0; i < elements.size(); i += 2) {
-					Activity act = (Activity) elements.get(i);
-					double startTime = 0.0;
-					double endTime = act.getEndTime();
+				double prevEndTime = 0;
+				for (int idx = 0; idx < elements.size(); idx += 2) {
+					Activity act = (Activity) elements.get(idx);
+					/*
+					 * Make sure that the activity does not end before the
+					 * previous activity.
+					 */
+					double actEndTime = Math.max(prevEndTime + MIN_ACT_DURATION, act.getEndTime());
 
-					if(Double.isInfinite(endTime)) {
-						endTime = Math.max(lastEndTime + 1, 86400);
-					}
-					
-					if (i > 0) {
-						LinkNetworkRoute route = (LinkNetworkRoute) ((Leg) elements.get(i - 1)).getRoute();
-						double tt = calcRouteTravelTime(route, lastEndTime, travelTime);
-						tt = Math.max(1, tt);
-						startTime = tt + lastEndTime;
-					}
-					
-					endTime = Math.max(startTime + 1, endTime);
-					
-					if(i > 0) {
-						AgentArrivalEvent arrivalEvent = new AgentArrivalEventImpl(startTime, person.getId(), act.getLinkId(), TransportMode.car);
+					if (idx > 0) {
+						/*
+						 * If this is not the first activity, then there must
+						 * exist a leg before.
+						 */
+						LinkNetworkRoute route = (LinkNetworkRoute) ((Leg) elements.get(idx - 1)).getRoute();
+						double travelTime = calcRouteTravelTime(route, prevEndTime, linkTravelTimes);
+						travelTime = Math.max(MIN_LEG_DURATION, travelTime);
+						double arrivalTime = travelTime + prevEndTime;
+						/*
+						 * If act end time is not specified...
+						 */
+						if (Double.isInfinite(actEndTime)) {
+							double duration = ((ActivityImpl) act).getDuration();
+							if(Double.isInfinite(duration)) {
+								/*
+								 * Duration is not specified, set end time to the end of day.
+								 */
+								actEndTime = 86400;
+							} else {
+								actEndTime = arrivalTime + duration; 
+							}
+						}
+						/*
+						 * Make sure that the activity does not end before the
+						 * agent arrives.
+						 */
+						actEndTime = Math.max(arrivalTime + MIN_ACT_DURATION, actEndTime);
+						/*
+						 * Send arrival and activity start events.
+						 */
+						AgentArrivalEvent arrivalEvent = new AgentArrivalEventImpl(arrivalTime, person.getId(),	act.getLinkId(), TransportMode.car);
 						eventQueue.add(arrivalEvent);
+						ActivityEvent startEvent = new ActivityStartEventImpl(arrivalTime, person.getId(), act.getLinkId(), act.getFacilityId(), act.getType());
+						eventQueue.add(startEvent);
 					}
-					ActivityEvent startEvent = new ActivityStartEventImpl(startTime, person.getId(), act.getLinkId(),
-							act.getFacilityId(), act.getType());
-					
-					ActivityEvent endEvent = new ActivityEndEventImpl(endTime, person.getId(), act.getLinkId(), act
-							.getFacilityId(), act.getType());
-					
-					eventQueue.add(startEvent);
-					act.setStartTime(startEvent.getTime());
-					eventQueue.add(endEvent);
-					act.setEndTime(endEvent.getTime());
 
 					
-					if(i < elements.size()-1) {
-						AgentDepartureEvent deparutreEvent = new AgentDepartureEventImpl(endTime, person.getId(), act.getLinkId(), TransportMode.car);
+					if (idx < elements.size() - 1) {
+						/*
+						 * Id this is not the last activity, send activity end and departure events.
+						 */
+						ActivityEvent endEvent = new ActivityEndEventImpl(actEndTime, person.getId(), act.getLinkId(), act.getFacilityId(), act.getType());
+						eventQueue.add(endEvent);
+						AgentDepartureEvent deparutreEvent = new AgentDepartureEventImpl(actEndTime, person.getId(), act.getLinkId(), TransportMode.car);
 						eventQueue.add(deparutreEvent);
 					}
 
-					lastEndTime = endTime;
+					prevEndTime = actEndTime;
 				}
 			}
 		}
 
 		logger.info("Processing events...");
-		
+
 		Event event;
-		while((event = eventQueue.poll()) != null) {
+		while ((event = eventQueue.poll()) != null) {
 			eventManager.processEvent(event);
 		}
 	}

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * IncomeTask.java
+ * ResponseRate.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,43 +17,54 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.survey.ivt2009.analysis;
+package playground.johannes.socialnetworks.survey.ivt2009.analysis.deprecated;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
+import gnu.trove.TIntIntHashMap;
 
-import org.matsim.contrib.sna.graph.Graph;
+import java.util.Set;
 
-import playground.johannes.socialnetworks.graph.social.SocialGraph;
+import org.matsim.contrib.sna.snowball.SampledVertex;
 
 /**
  * @author illenberger
  *
  */
-public class IncomeTask extends SocioMatrixTask {
+public class ResponseRate {
 
-	/* (non-Javadoc)
-	 * @see org.matsim.contrib.sna.graph.analysis.AnalyzerTask#analyze(org.matsim.contrib.sna.graph.Graph, java.util.Map)
-	 */
-	@Override
-	public void analyze(Graph g, Map<String, Double> stats) {
-		SocialGraph graph = (SocialGraph) g;
-		Income income = new Income();
-		double[][] matrix = income.socioMatrix(graph);
-		List<String> values = income.getAttributes();
+	public static double responseRate(Set<? extends SampledVertex> vertices) {
+		double[] rates = responseRatesAccumulated(vertices); 
+		return rates[rates.length - 1];
+	}
+	
+	public static double[] responseRatesAccumulated(Set<? extends SampledVertex> vertices) {
+		TIntIntHashMap sampled = new TIntIntHashMap();
+		TIntIntHashMap detected = new TIntIntHashMap();
+		int maxIt = 0;
 		
-		double[][] matrixAvr = income.socioMatrixLocalAvr(graph);
-		
-		try {
-			writeSocioMatrix(matrix, values, getOutputDirectory() + "/income.matrix.txt");
-			writeSocioMatrix(matrixAvr, values, getOutputDirectory() + "/income.matrix.norm2.txt");
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		for(SampledVertex vertex : vertices) {
+			if(vertex.isDetected()) {
+				detected.adjustOrPutValue(vertex.getIterationDetected(), 1, 1);
+			}
+			if(vertex.isSampled()) {
+				sampled.adjustOrPutValue(vertex.getIterationSampled(), 1, 1);
+				maxIt = Math.max(maxIt, vertex.getIterationSampled());
+			}
 		}
 		
-
+		TIntIntHashMap sampledSum = new TIntIntHashMap();
+		TIntIntHashMap detectedSum = new TIntIntHashMap();
+		for(int i = 0; i <= maxIt; i++) {
+			sampledSum.put(i, sampledSum.get(i-1) + sampled.get(i));
+			detectedSum.put(i, detectedSum.get(i-1) + detected.get(i));
+		}
+		
+		double[] rates = new double[maxIt+1];
+		
+		rates[0] = 1;
+		for(int i = 1; i <= maxIt; i++) {
+			rates[i] = sampledSum.get(i)/(double)detectedSum.get(i-1);
+		}
+		
+		return rates;
 	}
-
 }

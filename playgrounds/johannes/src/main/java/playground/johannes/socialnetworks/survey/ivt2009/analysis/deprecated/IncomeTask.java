@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * StandardAnalyzerTask.java
+ * IncomeTask.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,50 +17,43 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.graph.spatial.analysis;
+package playground.johannes.socialnetworks.survey.ivt2009.analysis.deprecated;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
-import org.matsim.contrib.sna.graph.analysis.AnalyzerTask;
-import org.matsim.contrib.sna.graph.analysis.GraphAnalyzer;
-import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
-import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphMLReader;
+import org.matsim.contrib.sna.graph.Graph;
 
-import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
+import playground.johannes.socialnetworks.graph.social.SocialGraph;
 
 /**
  * @author illenberger
  *
  */
-public class SpatialAnalyzerTask extends AnalyzerTaskComposite {
+public class IncomeTask extends SocioMatrixTask {
 
-	public SpatialAnalyzerTask() {
-		addTask(new DistanceTask());
-	}
-
-	/**
-	 * @param args
-	 * @throws IOException 
+	/* (non-Javadoc)
+	 * @see org.matsim.contrib.sna.graph.analysis.AnalyzerTask#analyze(org.matsim.contrib.sna.graph.Graph, java.util.Map)
 	 */
-	public static void main(String[] args) throws IOException {
-		SpatialGraphMLReader reader = new SpatialGraphMLReader();
-		SpatialGraph graph = reader.readGraph(args[0]);
+	@Override
+	public void analyze(Graph g, Map<String, Double> stats) {
+		SocialGraph graph = (SocialGraph) g;
+		Income income = new Income();
+		double[][] matrix = income.socioMatrix(graph);
+		List<String> values = income.getAttributes();
 		
-		String output = null;
-		if(args.length > 1) {
-			output = args[1];
+		double[][] matrixAvr = income.socioMatrixLocalAvr(graph);
+		
+		try {
+			writeSocioMatrix(matrix, values, getOutputDirectory() + "/income.matrix.txt");
+			writeSocioMatrix(matrixAvr, values, getOutputDirectory() + "/income.matrix.norm2.txt");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		
-		AnalyzerTask task = new SpatialAnalyzerTask();
-		if(output != null)
-			task.setOutputDirectoy(output);
-		
-		Map<String, Double> stats = GraphAnalyzer.analyze(graph, task);
-		
-		if(output != null)
-			GraphAnalyzer.writeStats(stats, output + "/summary.txt");
-	
+
 	}
 
 }

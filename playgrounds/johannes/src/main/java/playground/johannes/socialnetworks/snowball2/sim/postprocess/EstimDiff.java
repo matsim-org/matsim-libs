@@ -111,7 +111,7 @@ public class EstimDiff extends RunLocator<EstimDiffContainer> {
 		SparseGraphMLReader reader = new SparseGraphMLReader();
 		Graph graph = reader.readGraph(graphFile);
 		
-		return Histogram.createHistogram(Degree.getInstance().distribution(graph.getVertices()), new LinearDiscretizer(1.0));
+		return Histogram.createHistogram(Degree.getInstance().distribution(graph.getVertices()), new LinearDiscretizer(1.0), false);
 	}
 
 	@Override

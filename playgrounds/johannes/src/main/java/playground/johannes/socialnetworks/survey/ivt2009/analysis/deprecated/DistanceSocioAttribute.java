@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.survey.ivt2009.analysis;
+package playground.johannes.socialnetworks.survey.ivt2009.analysis.deprecated;
 
 import gnu.trove.TDoubleDoubleHashMap;
 
@@ -86,13 +86,13 @@ public class DistanceSocioAttribute extends AnalyzerTask {
 			stats.put("d_mean_male", distr.mean());
 			
 			DescriptiveStatistics dStats = acc.distribution(vertices, choiceSet);
-			TDoubleDoubleHashMap hist = Histogram.createHistogram(dStats, new LinearDiscretizer(1000.0));
+			TDoubleDoubleHashMap hist = Histogram.createHistogram(dStats, new LinearDiscretizer(1000.0), false);
 			TXTWriter.writeMap(hist, "d", "p", getOutputDirectory()+"/p_acc_male.txt");
 //			Distribution.writeHistogram(dStats.absoluteDistributionLog2(1000), getOutputDirectory()+"/p_acc_male.txt");
 			
 			DescriptiveStatistics kDistr = degree.distribution(vertices);
 			stats.put("k_mean_male", kDistr.getMean());
-			Distribution.writeHistogram(Histogram.createHistogram(kDistr, new LinearDiscretizer(1.0)), getOutputDirectory() + "/k_male.txt");
+			Distribution.writeHistogram(Histogram.createHistogram(kDistr, new LinearDiscretizer(1.0), false), getOutputDirectory() + "/k_male.txt");
 			
 			System.out.println("Male: " + kDistr.getValues().length);
 			/*
@@ -111,44 +111,44 @@ public class DistanceSocioAttribute extends AnalyzerTask {
 			stats.put("d_femean_male", distr.mean());
 			
 			dStats = acc.distribution(vertices, choiceSet);
-			hist = Histogram.createHistogram(dStats, new LinearDiscretizer(1000.0));
+			hist = Histogram.createHistogram(dStats, new LinearDiscretizer(1000.0), false);
 			TXTWriter.writeMap(hist, "d", "p", getOutputDirectory()+"/p_acc_female.txt");
 //			Distribution.writeHistogram(acc.distribution(vertices, choiceSet).absoluteDistributionLog2(1000), getOutputDirectory()+"/p_acc_female.txt");
 			
 			kDistr = degree.distribution(vertices);
 			stats.put("k_mean_female", kDistr.getMean());
-			Distribution.writeHistogram(Histogram.createHistogram(kDistr, new LinearDiscretizer(1.0)), getOutputDirectory() + "/k_female.txt");
+			Distribution.writeHistogram(Histogram.createHistogram(kDistr, new LinearDiscretizer(1.0), false), getOutputDirectory() + "/k_female.txt");
 
 			System.out.println("Female: " + kDistr.getValues().length);
 			/*
 			 * edu
 			 */
-			Education edu = new Education();
-			edu.socioMatrix(graph);
-			for(String att : edu.getAttributes()) {
-				vertices = new HashSet<SocialVertex>();
-				for (SocialVertex vertex : graph.getVertices()) {
-					if (att.equalsIgnoreCase(vertex.getPerson().getEducation()))
-						vertices.add(vertex);
-				}
-
-				stats.put("alpha_edu"+att, ResponseRate.responseRate((Set) vertices));
-				
-				distr = dist.distribution(vertices);
-				Distribution.writeHistogram(distr.absoluteDistributionLog2(1000), getOutputDirectory() + "/d_edu"+att+".txt");
-				stats.put("d_mean_edu"+att, distr.mean());
-			
-				dStats = acc.distribution(vertices, choiceSet);
-				hist = Histogram.createHistogram(dStats, new LinearDiscretizer(1000.0));
-				TXTWriter.writeMap(hist, "d", "p", getOutputDirectory()+"/p_acc_edu"+att+".txt");
-//				Distribution.writeHistogram(acc.distribution(vertices, choiceSet).absoluteDistributionLog2(1000), getOutputDirectory()+"/p_acc_edu"+att+".txt");
-				
-				kDistr = degree.distribution(vertices);
-				stats.put("k_mean_edu"+att, kDistr.getMean());
-				Distribution.writeHistogram(Histogram.createHistogram(kDistr, new LinearDiscretizer(1.0)), getOutputDirectory() + "/k_edu"+att+".txt");
-
-				System.out.println("Edu"+att+": " + kDistr.getValues().length);
-			}
+//			Education edu = new Education();
+//			edu.socioMatrix(graph);
+//			for(String att : edu.getAttributes()) {
+//				vertices = new HashSet<SocialVertex>();
+//				for (SocialVertex vertex : graph.getVertices()) {
+//					if (att.equalsIgnoreCase(vertex.getPerson().getEducation()))
+//						vertices.add(vertex);
+//				}
+//
+//				stats.put("alpha_edu"+att, ResponseRate.responseRate((Set) vertices));
+//				
+//				distr = dist.distribution(vertices);
+//				Distribution.writeHistogram(distr.absoluteDistributionLog2(1000), getOutputDirectory() + "/d_edu"+att+".txt");
+//				stats.put("d_mean_edu"+att, distr.mean());
+//			
+//				dStats = acc.distribution(vertices, choiceSet);
+//				hist = Histogram.createHistogram(dStats, new LinearDiscretizer(1000.0), false);
+//				TXTWriter.writeMap(hist, "d", "p", getOutputDirectory()+"/p_acc_edu"+att+".txt");
+////				Distribution.writeHistogram(acc.distribution(vertices, choiceSet).absoluteDistributionLog2(1000), getOutputDirectory()+"/p_acc_edu"+att+".txt");
+//				
+//				kDistr = degree.distribution(vertices);
+//				stats.put("k_mean_edu"+att, kDistr.getMean());
+//				Distribution.writeHistogram(Histogram.createHistogram(kDistr, new LinearDiscretizer(1.0), false), getOutputDirectory() + "/k_edu"+att+".txt");
+//
+//				System.out.println("Edu"+att+": " + kDistr.getValues().length);
+//			}
 			/*
 			 * income
 			 */
@@ -173,13 +173,13 @@ public class DistanceSocioAttribute extends AnalyzerTask {
 				stats.put("d_mean_income"+att, distr.mean());
 				
 				dStats = acc.distribution(vertices, choiceSet);
-				hist = Histogram.createHistogram(dStats, new LinearDiscretizer(1000.0));
+				hist = Histogram.createHistogram(dStats, new LinearDiscretizer(1000.0), false);
 				TXTWriter.writeMap(hist, "d", "p", getOutputDirectory()+"/p_acc_income"+att+".txt");
 //				Distribution.writeHistogram(acc.distribution(vertices, choiceSet).absoluteDistributionLog2(1000), getOutputDirectory()+"/p_acc_income"+att+".txt");
 				
 				kDistr = degree.distribution(vertices);
 				stats.put("k_mean_income"+att, kDistr.getMean());
-				Distribution.writeHistogram(Histogram.createHistogram(kDistr, discretizer), getOutputDirectory() + "/k_income"+att+".txt");
+				Distribution.writeHistogram(Histogram.createHistogram(kDistr, discretizer, false), getOutputDirectory() + "/k_income"+att+".txt");
 
 				System.out.println("Income"+att+": " + kDistr.getValues().length);
 			}
@@ -206,13 +206,13 @@ public class DistanceSocioAttribute extends AnalyzerTask {
 				stats.put("d_mean_cstatus"+att, distr.mean());
 				
 				dStats = acc.distribution(vertices, choiceSet);
-				hist = Histogram.createHistogram(dStats, new LinearDiscretizer(1000.0));
+				hist = Histogram.createHistogram(dStats, new LinearDiscretizer(1000.0), false);
 				TXTWriter.writeMap(hist, "d", "p", getOutputDirectory()+"/p_acc_cstatus"+att+".txt");
 //				Distribution.writeHistogram(acc.distribution(vertices, choiceSet).absoluteDistributionLog2(1000), getOutputDirectory()+"/p_acc_cstatus"+att+".txt");
 				
 				kDistr = degree.distribution(vertices);
 				stats.put("k_mean_cstatus"+att, kDistr.getMean());
-				Distribution.writeHistogram(Histogram.createHistogram(kDistr, discretizer), getOutputDirectory() + "/k_cstatus"+att+".txt");
+				Distribution.writeHistogram(Histogram.createHistogram(kDistr, discretizer, false), getOutputDirectory() + "/k_cstatus"+att+".txt");
 
 				System.out.println("CivStatus"+att+": " + kDistr.getValues().length);
 			}

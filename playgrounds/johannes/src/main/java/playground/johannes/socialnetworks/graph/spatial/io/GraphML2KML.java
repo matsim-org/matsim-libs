@@ -36,7 +36,7 @@ public class GraphML2KML {
 	 */
 	public static void main(String[] args) {
 		SpatialGraphMLReader reader = new SpatialGraphMLReader();
-		SpatialGraph graph = reader.readGraph("/Users/jillenberger/Work/socialnets/mcmc/output/500000000/graph.graphml");
+		SpatialGraph graph = reader.readGraph("/Volumes/cluster.math.tu-berlin.de/net/ils/jillenberger/socialnets/mcmc/runs/run275/output/5000000000/graph.graphml");
 		
 		SpatialGraphKMLWriter writer = new SpatialGraphKMLWriter();
 		VertexDegreeColorizer colorizer = new VertexDegreeColorizer(graph);
@@ -46,7 +46,7 @@ public class GraphML2KML {
 		writer.setKmlVertexStyle(style);
 		writer.setDrawEdges(false);
 		writer.addKMZWriterListener(style);
-		writer.write(graph, "/Users/jillenberger/Work/socialnets/mcmc/output/500000000/graph.kmz");
+		writer.write(graph, "/Volumes/cluster.math.tu-berlin.de/net/ils/jillenberger/socialnets/mcmc/runs/run275/output/5000000000/graph.kmz");
 		
 		
 

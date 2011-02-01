@@ -24,13 +24,15 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Route;
 
+import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
 import playground.johannes.socialnetworks.gis.DistanceCalculator;
-import playground.johannes.socialnetworks.gis.OrthodromicDistanceCalculator;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -44,17 +46,23 @@ public class TravelDistance {
 
 	private boolean geodesicMode = false;
 
-	private DistanceCalculator distanceCalculator = new OrthodromicDistanceCalculator();
+	private Network network;
+//	private DistanceCalculator distanceCalculator = new OrthodromicDistanceCalculator();
+	private DistanceCalculator distanceCalculator = new CartesianDistanceCalculator();
 
 	private GeometryFactory geoFactory = new GeometryFactory();
 
+	public TravelDistance(Network network) {
+		this.network = network;
+	}
+	
 	public void setGeodesicMode(boolean flag) {
 		this.geodesicMode = flag;
 	}
 	
 	public Map<String, DescriptiveStatistics> statistics(Set<Plan> plans) {
 		Map<String, DescriptiveStatistics> statsMap = new HashMap<String, DescriptiveStatistics>();
-
+		int cnt0 = 0;
 		for (Plan plan : plans) {
 
 			for (int i = 1; i < plan.getPlanElements().size(); i += 2) {
@@ -63,15 +71,19 @@ public class TravelDistance {
 				if (plan.getPlanElements().size() > i + 1) {
 					Activity act = (Activity) plan.getPlanElements().get(i + 1);
 
-					DescriptiveStatistics stats = statsMap.get(act.getType());
+					String type = act.getType().substring(0, 1);
+					DescriptiveStatistics stats = statsMap.get(type);
 					if (stats == null) {
 						stats = new DescriptiveStatistics();
-						statsMap.put(act.getType(), stats);
+						statsMap.put(type, stats);
 					}
 
 					double d = getDistance(plan, i);
-					if(!Double.isNaN(d))
+					if(!Double.isNaN(d)) {
 						stats.addValue(d);
+						if(d==0)
+							cnt0++;
+					}
 				}
 			}
 		}
@@ -84,12 +96,14 @@ public class TravelDistance {
 			Activity start = (Activity) plan.getPlanElements().get(idx - 1);
 			Activity dest = (Activity) plan.getPlanElements().get(idx + 1);
 
-			Point p1 = geoFactory.createPoint(new Coordinate(start.getCoord().getX(), start.getCoord().getY()));
-			p1.setSRID(4326);
-			Point p2 = geoFactory.createPoint(new Coordinate(dest.getCoord().getX(), dest.getCoord().getY()));
-			p2.setSRID(4326);
+			Point p1 = getPoint(start);//geoFactory.createPoint(new Coordinate(start.getCoord().getX(), start.getCoord().getY()));
+//			p1.setSRID(4326);
+			Point p2 = getPoint(dest);//geoFactory.createPoint(new Coordinate(dest.getCoord().getX(), dest.getCoord().getY()));
+//			p2.setSRID(4326);
 
-			return distanceCalculator.distance(p1, p2);
+			double r = distanceCalculator.distance(p1, p2);
+
+			return r;
 		} else {
 			Route route = ((Leg) plan.getPlanElements().get(idx)).getRoute();
 			if (route == null)
@@ -98,5 +112,14 @@ public class TravelDistance {
 				return route.getDistance();
 			}
 		}
+	}
+	
+	private Point getPoint(Activity act) {
+//		if(act.getCoord() != null) {
+//			return geoFactory.createPoint(new Coordinate(act.getCoord().getX(), act.getCoord().getY()));
+//		} else {
+			Coord c = network.getLinks().get(act.getLinkId()).getCoord();
+			return geoFactory.createPoint(new Coordinate(c.getX(), c.getY()));
+//		}
 	}
 }

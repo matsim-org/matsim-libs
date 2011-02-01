@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.snowball2.analysis;
+package playground.johannes.socialnetworks.survey.ivt2009.analysis;
 
 import gnu.trove.TIntArrayList;
 
@@ -84,10 +84,13 @@ public class SeedConnectionTask extends AnalyzerTask {
 		}
 		
 		int nConnects = 0;
+		int total = 0;
 		for(int i = 0; i < connects.length; i++) {
 			for(int j = i+1; j < connects.length; j++) {
-				if(connects[i][j] > 0)
+				if(connects[i][j] > 0) {
+					total += connects[i][j]; 
 					nConnects++;
+				}
 			}
 		}
 		try {
@@ -97,6 +100,7 @@ public class SeedConnectionTask extends AnalyzerTask {
 			e1.printStackTrace();
 		}
 		stats.put(NUM_CONNECTS, new Double(nConnects));
+		stats.put("apl", total/(double)nConnects);
 		
 		if(getOutputDirectory() != null) {
 			try {

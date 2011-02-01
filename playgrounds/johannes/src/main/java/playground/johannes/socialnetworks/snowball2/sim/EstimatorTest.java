@@ -212,7 +212,7 @@ public class EstimatorTest implements SamplerListener {
 		/*
 		 * initialize arrays
 		 */
-		TDoubleDoubleHashMap kHist = Histogram.createHistogram(k_distr, new LinearDiscretizer(1.0));
+		TDoubleDoubleHashMap kHist = Histogram.createHistogram(k_distr, new LinearDiscretizer(1.0), false);
 		TDoubleDoubleHashMap[] pObs_k = new TDoubleDoubleHashMap[maxIteration + 1];
 		TDoubleDoubleHashMap[] wObs_k = new TDoubleDoubleHashMap[maxIteration + 1];
 		TDoubleDoubleHashMap[] pEstim_k = new TDoubleDoubleHashMap[maxIteration + 1];

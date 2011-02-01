@@ -90,7 +90,7 @@ public class FractalDim {
 		DescriptivePiStatistics stats = calcuate(targetPoints, targetPoints, geometry);
 		
 //		TDoubleDoubleHashMap hist = Histogram.createHistogram(stats, new FixedSampleSizeDiscretizer().create(stats.getValues(), 1000));
-		TDoubleDoubleHashMap hist = Histogram.createHistogram(stats, new LinearDiscretizer(1000.0));
+		TDoubleDoubleHashMap hist = Histogram.createHistogram(stats, new LinearDiscretizer(1000.0), false);
 		hist = Histogram.normalize(hist);
 		TXTWriter.writeMap(hist, "d", "n", outFile);
 	}

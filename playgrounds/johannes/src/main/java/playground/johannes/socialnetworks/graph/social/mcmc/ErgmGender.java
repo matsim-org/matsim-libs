@@ -47,7 +47,7 @@ public class ErgmGender extends ErgmTerm {
 		if(Gender.MALE.equalsIgnoreCase(((SocialVertex)y.getVertex(j)).getPerson().getPerson().getSex()))
 			gender_j = 1;
 		
-		return - getTheta() * Math.abs(gender_i - gender_j);
+		return Math.exp(- getTheta() * Math.abs(gender_i - gender_j));
 	}
 
 }

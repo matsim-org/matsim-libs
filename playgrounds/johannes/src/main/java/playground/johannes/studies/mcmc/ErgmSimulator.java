@@ -31,12 +31,14 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.sna.gis.CRSUtils;
+import org.matsim.contrib.sna.graph.generators.ErdosRenyiGenerator;
 import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.xml.sax.SAXException;
 
+import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
 import playground.johannes.socialnetworks.graph.analysis.TopologyAnalyzerTask;
 import playground.johannes.socialnetworks.graph.generators.BarabasiAlbertGenerator;
 import playground.johannes.socialnetworks.graph.mcmc.ConserveDegreeDistribution;
@@ -49,6 +51,7 @@ import playground.johannes.socialnetworks.graph.social.io.SocialGraphMLWriter;
 import playground.johannes.socialnetworks.graph.social.io.SocialSparseVertexPool;
 import playground.johannes.socialnetworks.graph.social.mcmc.ErgmAge;
 import playground.johannes.socialnetworks.graph.social.mcmc.ErgmGender;
+import playground.johannes.socialnetworks.graph.spatial.analysis.ExtendedSpatialAnalyzerTask;
 import playground.johannes.socialnetworks.graph.spatial.analysis.SpatialAnalyzerTask;
 import playground.johannes.socialnetworks.graph.spatial.generators.ErgmLnDistance;
 import playground.johannes.socialnetworks.survey.ivt2009.analysis.AnalyzerTaskArray;
@@ -64,7 +67,7 @@ import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseVerte
  */
 public class ErgmSimulator {
 
-	private static final String MODULE_NAME = "gravityGenerator";
+	private static final String MODULE_NAME = "ergm";
 
 	private static final Logger logger = Logger.getLogger(ErgmSimulator.class);
 	
@@ -92,10 +95,17 @@ public class ErgmSimulator {
 		 * read parameters
 		 */
 		long randomSeed = Long.parseLong(config.getParam("global", "randomSeed"));;
-		long burnin = (long)Double.parseDouble(config.getParam(MODULE_NAME, "burnin"));
+		long iterations = (long)Double.parseDouble(config.getParam(MODULE_NAME, "iterations"));
 		long logInterval = (long)Double.parseDouble(config.getParam(MODULE_NAME, "loginterval"));
 		long sampleInterval = (long)Double.parseDouble(config.getParam(MODULE_NAME, "sampleinterval"));
 		String output = config.getParam(MODULE_NAME, "output");
+		
+		double theta_distance = Double.parseDouble(config.getParam(MODULE_NAME, "theta_distance"));
+		double theta_age = Double.parseDouble(config.getParam(MODULE_NAME, "theta_age"));
+		double theta_gender = Double.parseDouble(config.getParam(MODULE_NAME, "theta_gender"));
+		double theta_triangles = Double.parseDouble(config.getParam(MODULE_NAME, "theta_triangles"));
+		
+		boolean conservePk = Boolean.parseBoolean(config.getParam(MODULE_NAME, "conservePk"));
 		/*
 		 * initialize graph
 		 */
@@ -103,8 +113,7 @@ public class ErgmSimulator {
 		Set<Person> persons = new HashSet<Person>(population.getPersons().values());
 		SocialSparseGraphFactory factory = new SocialSparseVertexPool(persons, CRSUtils.getCRS(21781));
 		SocialSparseGraphBuilder builder = new SocialSparseGraphBuilder(factory);
-		BarabasiAlbertGenerator<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge> generator = new BarabasiAlbertGenerator<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge>(builder);
-		SocialSparseGraph graph = generator.generate(5, 5, persons.size() - 5 , randomSeed);
+		SocialSparseGraph graph = createGraph(config.getParam(MODULE_NAME, "graphtype"), persons, randomSeed, builder);
 		/*
 		 * initialize ergm
 		 */
@@ -112,34 +121,56 @@ public class ErgmSimulator {
 		AdjacencyMatrix<SocialSparseVertex> y = new AdjacencyMatrix<SocialSparseVertex>(graph, true);
 		
 		Ergm ergm = new Ergm();
-		ergm.addComponent(new ErgmLnDistance(y, -1.6));
-		ergm.addComponent(new ErgmAge(-1));
-		ergm.addComponent(new ErgmGender(-1));
-		ergm.addComponent(new ErgmTriangles(2));
+		ergm.addComponent(new ErgmLnDistance(y, theta_distance));
+		ergm.addComponent(new ErgmAge(theta_age));
+		ergm.addComponent(new ErgmGender(theta_gender));
+		ergm.addComponent(new ErgmTriangles(theta_triangles));
 		/*
 		 * initialize sampler
 		 */
 		GibbsEdgeSwitch sampler = new GibbsEdgeSwitch(randomSeed);
+//		GibbsEdgeInsert sampler = new GibbsEdgeInsert(randomSeed);
 		
 		SampleAnalyzer<SocialSparseGraph, SocialSparseEdge, SocialSparseVertex> analyzer = new SampleAnalyzer<SocialSparseGraph, SocialSparseEdge, SocialSparseVertex>(graph, builder, output);
 		analyzer.setAnalysisInterval(sampleInterval);
 		analyzer.setInfoInteraval(logInterval);
-		analyzer.setMaxIteration(burnin);
+		analyzer.setMaxIteration(iterations);
 		analyzer.setWriter(new SocialGraphMLWriter());
 		/*
 		 * initialize analyzer task
 		 */
 		AnalyzerTaskArray array = new AnalyzerTaskArray();
 		array.addAnalyzerTask(new TopologyAnalyzerTask(), "topo");
-		array.addAnalyzerTask(new SpatialAnalyzerTask(), "spatial");
+		AnalyzerTaskComposite spatialTask = new AnalyzerTaskComposite();
+		spatialTask.addTask(new SpatialAnalyzerTask());
+		spatialTask.addTask(new ExtendedSpatialAnalyzerTask());
+		array.addAnalyzerTask(spatialTask, "spatial");
 		array.addAnalyzerTask(new SocialAnalyzerTask(), "social");
 		
 		analyzer.setAnalyzerTask(array);
 		/*
 		 * sample...
 		 */
-		sampler.sample(y, ergm, analyzer, new ConserveDegreeDistribution());
+		if(conservePk)
+			sampler.sample(y, ergm, analyzer, new ConserveDegreeDistribution());
+		else
+			sampler.sample(y, ergm, analyzer);
 		logger.info("Done.");
 	}
 
+	public static SocialSparseGraph createGraph(String type, Set<Person> persons, long randomSeed, SocialSparseGraphBuilder builder) {
+		SocialSparseGraph graph = null;
+		if("ba".equalsIgnoreCase(type)) {
+			BarabasiAlbertGenerator<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge> generator = new BarabasiAlbertGenerator<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge>(builder);
+			graph = generator.generate(5, 5, persons.size() - 5 , randomSeed);
+		} else if("random".equalsIgnoreCase(type)) {
+			ErdosRenyiGenerator<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge> generator = new ErdosRenyiGenerator<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge>(builder);
+			double p = 10/(double)(persons.size() - 1);
+			graph = generator.generate(persons.size(), p, randomSeed);
+		} else {
+			throw new IllegalArgumentException("No graoh type specified!");
+		}
+		
+		return graph;
+	}
 }

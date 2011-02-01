@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SpatialAnalyzerTask.java
+ * CivilStatus.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,40 +17,20 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.survey.ivt2009.analysis;
+package playground.johannes.socialnetworks.survey.ivt2009.analysis.deprecated;
 
-import java.util.Set;
-
-import playground.johannes.socialnetworks.gis.SpatialCostFunction;
-import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
-import playground.johannes.socialnetworks.graph.spatial.analysis.AcceptanceProbabilityTask;
-import playground.johannes.socialnetworks.graph.spatial.analysis.DistanceTask;
-import playground.johannes.socialnetworks.snowball2.spatial.analysis.ObservedDistance;
-
-import com.vividsolutions.jts.geom.Point;
+import playground.johannes.socialnetworks.graph.social.SocialVertex;
+import playground.johannes.socialnetworks.survey.ivt2009.analysis.SocioMatrixLegacy;
 
 /**
  * @author illenberger
  *
  */
-public class SpatialAnalyzerTask extends AnalyzerTaskComposite {
+public class CivilStatus extends SocioMatrixLegacy {
 
-	private Set<Point> points;
-	
-	private SpatialCostFunction costFunction;
-	
-	public SpatialAnalyzerTask() {
-		DistanceTask distanceTask = new DistanceTask();
-		distanceTask.setModule(ObservedDistance.getInstance());
-		addTask(distanceTask);
-		
-		AcceptanceProbabilityTask acceptTask = new AcceptanceProbabilityTask(points);
-		acceptTask.setModule(ObservedAcceptanceProbability.getInstance());
-		addTask(acceptTask);
-		
-//		addTask(new AcceptFactorTask(choiceSet));
-//		DegreeDensityTask kRhoTask = new DegreeDensityTask(zones);
-//		kRhoTask.setModule(new ObservedDegree());
-//		addTask(kRhoTask);
+	@Override
+	protected String getAttributeValue(SocialVertex vertex) {
+		return vertex.getPerson().getCiviStatus();
 	}
+
 }

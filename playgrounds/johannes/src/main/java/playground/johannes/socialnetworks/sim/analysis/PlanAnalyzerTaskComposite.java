@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Income.java
+ * PlanAnalyzerTaskComposite.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,19 +17,25 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.survey.ivt2009.analysis;
+package playground.johannes.socialnetworks.sim.analysis;
 
-import playground.johannes.socialnetworks.graph.social.SocialVertex;
+import java.util.Map;
+import java.util.Set;
+
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.contrib.sna.util.Composite;
 
 /**
  * @author illenberger
  *
  */
-public class Income extends SocioMatrixLegacy {
+public class PlanAnalyzerTaskComposite extends Composite<PlansAnalyzerTask> implements PlansAnalyzerTask {
 
 	@Override
-	protected String getAttributeValue(SocialVertex vertex) {
-		return String.valueOf(vertex.getPerson().getIncome());
+	public void analyze(Set<Plan> plans, Map<String, Double> stats) {
+		for(PlansAnalyzerTask task : components) {
+			task.analyze(plans, stats);
+		}
 	}
 
 }

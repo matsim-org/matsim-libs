@@ -23,21 +23,8 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.sna.gis.ZoneLayer;
-import org.matsim.contrib.sna.math.LinearDiscretizer;
-import org.matsim.contrib.sna.snowball.analysis.ObservedDegree;
 
-import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
-import playground.johannes.socialnetworks.gis.GravityCostFunction;
-import playground.johannes.socialnetworks.gis.SpatialCostFunction;
 import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
-import playground.johannes.socialnetworks.graph.social.analysis.AgeTask;
-import playground.johannes.socialnetworks.graph.social.analysis.SocialAnalyzerTask;
-import playground.johannes.socialnetworks.graph.spatial.analysis.AcceptFactorTask;
-import playground.johannes.socialnetworks.graph.spatial.analysis.AccessibilityPartitioner;
-import playground.johannes.socialnetworks.graph.spatial.analysis.AccessibilityTask;
-import playground.johannes.socialnetworks.graph.spatial.analysis.SpatialPropertyAccessibilityTask;
-import playground.johannes.socialnetworks.graph.spatial.analysis.SpatialPropertyDegreeTask;
-import playground.johannes.socialnetworks.snowball2.social.analysis.ObservedAge;
 
 import com.vividsolutions.jts.geom.Point;
 
@@ -49,36 +36,34 @@ public class ObservedAnalyzerTask extends AnalyzerTaskComposite {
 	
 	public ObservedAnalyzerTask(ZoneLayer zones, Set<Point> choiceSet, Network network) {
 		AnalyzerTaskArray array = new AnalyzerTaskArray();
-		array.addAnalyzerTask(new TopoObsAnalyzerTask(), "topo");
+		array.addAnalyzerTask(new ObsTopologyAnalyzerTask(), "topo");
 		array.addAnalyzerTask(new SnowballAnalyzerTask(), "snowball");
+		array.addAnalyzerTask(new ObsSpatialAnalyzerTask(choiceSet), "spatial");
 		array.addAnalyzerTask(new ObservedSocialAnalyzerTask(), "social");
 		addTask(array);
 		
 		
 		
-		AgeTask age = new AgeTask();
-		age.setModule(new ObservedAge());
-		addTask(age);
-		
-		SpatialCostFunction costFunction = new GravityCostFunction(1.6, 0, new CartesianDistanceCalculator());
-//		Accessibility accessibility = new Accessibility(costFunction, choiceSet);
-		SpatialPropertyDegreeTask spxkTask = new SpatialPropertyDegreeTask(costFunction, choiceSet);
-		spxkTask.setModule(new ObservedDegree());
-		spxkTask.setDiscretizer(new LinearDiscretizer(5.0));
-		addTask(spxkTask);
-		
-		SpatialPropertyAccessibilityTask spxaTask = new SpatialPropertyAccessibilityTask(costFunction, choiceSet);
-		spxaTask.setModule(new ObservedAccessibility());
-		spxaTask.setDiscretizer(new LinearDiscretizer(1.0));
-		addTask(spxaTask);
-		
-		SocialPropertyDegreeTask xkTask = new SocialPropertyDegreeTask();
-		xkTask.setDiscretizer(new LinearDiscretizer(5.0));
-		xkTask.setModule(new ObservedDegree());
-		addTask(xkTask);
-		
-
-		addTask(new AcceptFactorTask(choiceSet));
+//		
+//		SpatialCostFunction costFunction = new GravityCostFunction(1.6, 0, new CartesianDistanceCalculator());
+////		Accessibility accessibility = new Accessibility(costFunction, choiceSet);
+//		SpatialPropertyDegreeTask spxkTask = new SpatialPropertyDegreeTask(costFunction, choiceSet);
+//		spxkTask.setModule(new ObservedDegree());
+//		spxkTask.setDiscretizer(new LinearDiscretizer(5.0));
+//		addTask(spxkTask);
+//		
+//		SpatialPropertyAccessibilityTask spxaTask = new SpatialPropertyAccessibilityTask(costFunction, choiceSet);
+//		spxaTask.setModule(new ObservedAccessibility());
+//		spxaTask.setDiscretizer(new LinearDiscretizer(1.0));
+//		addTask(spxaTask);
+//		
+//		SocialPropertyDegreeTask xkTask = new SocialPropertyDegreeTask();
+//		xkTask.setDiscretizer(new LinearDiscretizer(5.0));
+//		xkTask.setModule(new ObservedDegree());
+//		addTask(xkTask);
+//		
+//
+//		addTask(new AcceptFactorTask(choiceSet));
 //		EdgeCostsTask costs = new EdgeCostsTask(null);
 //		costs.setModule(new ObservedEdgeCosts(new GravityEdgeCostFunction(1.6, 0.0)));
 //		addTask(costs);

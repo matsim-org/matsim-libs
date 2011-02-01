@@ -40,11 +40,11 @@ import org.matsim.contrib.sna.snowball.SampledVertex;
 import org.matsim.contrib.sna.snowball.SampledVertexDecorator;
 
 import playground.johannes.socialnetworks.graph.social.SocialVertex;
-import playground.johannes.socialnetworks.snowball2.analysis.SeedConnectionTask;
 import playground.johannes.socialnetworks.snowball2.social.SocialSampledEdgeDecorator;
 import playground.johannes.socialnetworks.snowball2.social.SocialSampledGraphProjection;
 import playground.johannes.socialnetworks.snowball2.social.SocialSampledVertexDecorator;
 import playground.johannes.socialnetworks.survey.ivt2009.analysis.ApplySeedsFilter;
+import playground.johannes.socialnetworks.survey.ivt2009.analysis.SeedConnectionTask;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseEdge;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseGraph;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseVertex;
@@ -60,7 +60,7 @@ public class VertexTableWriter {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		SocialSampledGraphProjection<SocialSparseGraph,SocialSparseVertex,SocialSparseEdge> graph = GraphReaderFacade.read("/Users/jillenberger/Work/socialnets/data/ivt2009/09-2010/graph/noH/graph.graphml");
+		SocialSampledGraphProjection<SocialSparseGraph,SocialSparseVertex,SocialSparseEdge> graph = GraphReaderFacade.read("/Users/jillenberger/Work/socialnets/data/ivt2009/01-2011/graph/graph.graphml");
 
 		ApplySeedsFilter filter = new ApplySeedsFilter();
 		filter.apply(graph);
@@ -106,7 +106,7 @@ public class VertexTableWriter {
 //		
 //		List<Id> list = new ArrayList<Id>(seedIds);
 		
-		BufferedWriter writer = new BufferedWriter(new FileWriter("/Users/jillenberger/Work/socialnets/data/ivt2009/09-2010/graph/noH/vertexlist.txt"));
+		BufferedWriter writer = new BufferedWriter(new FileWriter("/Users/jillenberger/Work/socialnets/data/ivt2009/01-2011/graph/vertexlist.txt"));
 		writer.write("id\tcolor\tshape");
 		writer.newLine();
 		for(SocialSampledVertexDecorator<SocialSparseVertex> vertex : graph.getVertices()) {
@@ -132,7 +132,7 @@ public class VertexTableWriter {
 	}
 	
 	public void writeEdgeList(SocialSampledGraphProjection<SocialSparseGraph,SocialSparseVertex,SocialSparseEdge> graph) throws IOException {
-		BufferedWriter writer = new BufferedWriter(new FileWriter("/Users/jillenberger/Work/socialnets/data/ivt2009/09-2010/graph/noH/edgelist.txt"));
+		BufferedWriter writer = new BufferedWriter(new FileWriter("/Users/jillenberger/Work/socialnets/data/ivt2009/01-2011/graph/edgelist.txt"));
 		
 		SeedConnectionTask task = new SeedConnectionTask();
 		Map<String, Double> map = new HashMap<String, Double>();

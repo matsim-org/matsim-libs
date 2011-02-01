@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TopoAnalyzerTask.java
+ * FrequencyFilter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,40 +17,50 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.survey.ivt2009.analysis;
+package playground.johannes.socialnetworks.survey.ivt2009.analysis.deprecated;
 
-import org.matsim.contrib.sna.graph.analysis.ComponentsTask;
-import org.matsim.contrib.sna.graph.analysis.DegreeTask;
-import org.matsim.contrib.sna.graph.analysis.TransitivityTask;
-import org.matsim.contrib.sna.snowball.analysis.ObservedDegree;
-import org.matsim.contrib.sna.snowball.analysis.ObservedTransitivity;
+import java.util.HashSet;
+import java.util.Set;
 
-import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
-import playground.johannes.socialnetworks.graph.analysis.PropertyDegreeTask;
-import playground.johannes.socialnetworks.snowball2.analysis.WaveSizeTask;
+import org.matsim.contrib.sna.graph.Edge;
+import org.matsim.contrib.sna.graph.Graph;
+import org.matsim.contrib.sna.graph.GraphBuilder;
+import org.matsim.contrib.sna.graph.Vertex;
+
+import playground.johannes.socialnetworks.graph.analysis.GraphFilter;
+import playground.johannes.socialnetworks.graph.social.SocialEdge;
+import playground.johannes.socialnetworks.graph.social.SocialGraph;
+import playground.johannes.socialnetworks.graph.social.SocialVertex;
 
 /**
  * @author illenberger
  *
  */
-public class TopoObsAnalyzerTask extends AnalyzerTaskComposite {
+public class FrequencyFilter implements GraphFilter<SocialGraph> {
 
-	public TopoObsAnalyzerTask() {
-		addTask(new WaveSizeTask());
+	private GraphBuilder<SocialGraph, SocialVertex, SocialEdge> builder;
+	
+	private double threshold;
+	
+	public FrequencyFilter(GraphBuilder<? extends Graph, ? extends Vertex, ? extends Edge> builder, double threshold) {
+		this.builder = (GraphBuilder<SocialGraph, SocialVertex, SocialEdge>) builder;
+		this.threshold = threshold;
+	}
+	
+	@Override
+	public SocialGraph apply(SocialGraph graph) {
+		Set<SocialEdge> remove = new HashSet<SocialEdge>();
 		
-		DegreeTask degreeTask = new DegreeTask();
-		degreeTask.setModule(ObservedDegree.getInstance());
-		addTask(degreeTask);
+		for(SocialEdge edge : graph.getEdges()) {
+			if(edge.getFrequency() > threshold) {
+				remove.add(edge);
+			}
+		}
 		
-		TransitivityTask transitivityTask = new TransitivityTask();
-		transitivityTask.setModule(ObservedTransitivity.getInstance());
-		addTask(transitivityTask);
+		for(SocialEdge edge : remove)
+			builder.removeEdge(graph, edge);
 		
-		PropertyDegreeTask xDegreeTask = new PropertyDegreeTask();
-		xDegreeTask.setModule(ObservedDegree.getInstance());
-		addTask(xDegreeTask);
-		
-		addTask(new ComponentsTask());
+		return graph;
 	}
 
 }

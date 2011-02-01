@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ResponseRate.java
+ * Income.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,54 +17,20 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.survey.ivt2009.analysis;
+package playground.johannes.socialnetworks.survey.ivt2009.analysis.deprecated;
 
-import gnu.trove.TIntIntHashMap;
-
-import java.util.Set;
-
-import org.matsim.contrib.sna.snowball.SampledVertex;
+import playground.johannes.socialnetworks.graph.social.SocialVertex;
+import playground.johannes.socialnetworks.survey.ivt2009.analysis.SocioMatrixLegacy;
 
 /**
  * @author illenberger
  *
  */
-public class ResponseRate {
+public class Income extends SocioMatrixLegacy {
 
-	public static double responseRate(Set<? extends SampledVertex> vertices) {
-		double[] rates = responseRatesAccumulated(vertices); 
-		return rates[rates.length - 1];
+	@Override
+	protected String getAttributeValue(SocialVertex vertex) {
+		return String.valueOf(vertex.getPerson().getIncome());
 	}
-	
-	public static double[] responseRatesAccumulated(Set<? extends SampledVertex> vertices) {
-		TIntIntHashMap sampled = new TIntIntHashMap();
-		TIntIntHashMap detected = new TIntIntHashMap();
-		int maxIt = 0;
-		
-		for(SampledVertex vertex : vertices) {
-			if(vertex.isDetected()) {
-				detected.adjustOrPutValue(vertex.getIterationDetected(), 1, 1);
-			}
-			if(vertex.isSampled()) {
-				sampled.adjustOrPutValue(vertex.getIterationSampled(), 1, 1);
-				maxIt = Math.max(maxIt, vertex.getIterationSampled());
-			}
-		}
-		
-		TIntIntHashMap sampledSum = new TIntIntHashMap();
-		TIntIntHashMap detectedSum = new TIntIntHashMap();
-		for(int i = 0; i <= maxIt; i++) {
-			sampledSum.put(i, sampledSum.get(i-1) + sampled.get(i));
-			detectedSum.put(i, detectedSum.get(i-1) + detected.get(i));
-		}
-		
-		double[] rates = new double[maxIt+1];
-		
-		rates[0] = 1;
-		for(int i = 1; i <= maxIt; i++) {
-			rates[i] = sampledSum.get(i)/(double)detectedSum.get(i-1);
-		}
-		
-		return rates;
-	}
+
 }

@@ -39,10 +39,12 @@ public class ErgmAge extends ErgmTerm {
 	public <V extends Vertex> double ratio(AdjacencyMatrix<V> y, int i, int j, boolean yIj) {
 		int a1 = ((SocialVertex) y.getVertex(i)).getPerson().getAge();
 		int a2 = ((SocialVertex) y.getVertex(j)).getPerson().getAge();
-		
+		/*
+		 * TODO: need to think about what to with age=0.
+		 */
 		if(a1 > 0)
 			return Math.exp(- getTheta() * Math.abs((a2 - a1)/(double)a1));
 		else
-			return 0;
+			return 1.0;
 	}
 }

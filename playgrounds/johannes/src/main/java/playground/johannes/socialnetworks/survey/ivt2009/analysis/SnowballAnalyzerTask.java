@@ -22,9 +22,9 @@ package playground.johannes.socialnetworks.survey.ivt2009.analysis;
 import org.matsim.contrib.sna.snowball.analysis.ObservedDegree;
 
 import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
+import playground.johannes.socialnetworks.snowball2.analysis.ComponentsSeedTask;
 import playground.johannes.socialnetworks.snowball2.analysis.DegreeIterationTask;
 import playground.johannes.socialnetworks.snowball2.analysis.ResponseRateTask;
-import playground.johannes.socialnetworks.snowball2.analysis.SeedConnectionTask;
 import playground.johannes.socialnetworks.snowball2.analysis.WaveSizeTask;
 
 /**
@@ -35,13 +35,14 @@ public class SnowballAnalyzerTask extends AnalyzerTaskComposite {
 
 	public SnowballAnalyzerTask() {
 		addTask(new WaveSizeTask());
+		addTask(new ResponseRateTask());
 		
 		DegreeIterationTask degreeTask = new DegreeIterationTask();
 		degreeTask.setModule(ObservedDegree.getInstance());
 		addTask(degreeTask);
 		
 		addTask(new SeedConnectionTask());
+		addTask(new ComponentsSeedTask());
 		
-		addTask(new ResponseRateTask());
 	}
 }

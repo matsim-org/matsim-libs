@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * GyrationRadius.java
+ * ExtendedSpatialAnalyzerTask.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,57 +17,45 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.survey.ivt2009.analysis;
+package playground.johannes.socialnetworks.graph.spatial.analysis;
 
-import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
+import java.io.IOException;
+import java.util.Map;
+
+import org.matsim.contrib.sna.graph.analysis.AnalyzerTask;
+import org.matsim.contrib.sna.graph.analysis.GraphAnalyzer;
+import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
+import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphMLReader;
+
+import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
 
 /**
  * @author illenberger
  *
  */
-public class GyrationRadius {
+public class ExtendedSpatialAnalyzerTask extends AnalyzerTaskComposite {
 
-	public double radiusOfGyration(SpatialVertex vertex) {
-		double dsum = 0;
-		
-		
-		double[] cm = centerMass(vertex);
-		double xcm = cm[0];
-		double ycm = cm[1];
-		
-		double dx = vertex.getPoint().getX() - xcm;
-		double dy = vertex.getPoint().getY() - ycm;
-		double d = Math.sqrt(dx*dx + dy*dy);
-		
-		dsum += d;
-		int cnt = 1;
-		for(SpatialVertex neighbor : vertex.getNeighbours()) {
-			if(neighbor.getPoint() != null) {
-			dx = neighbor.getPoint().getX() - xcm;
-			dy = neighbor.getPoint().getY() - ycm;
-			d = (dx*dx + dy*dy);
-			
-			dsum += d;
-			cnt++;
-			}
-		}
-		
-		return Math.sqrt(dsum/(double)cnt);
+	public ExtendedSpatialAnalyzerTask() {
+		addTask(new AcceptanceProbabilityTask());
 	}
 	
-	private double[] centerMass(SpatialVertex vertex) {
-		double xsum = vertex.getPoint().getX();
-		double ysum = vertex.getPoint().getY();
-		double cnt = 1;
-		for(SpatialVertex neighbor : vertex.getNeighbours()) {
-			if(neighbor.getPoint() != null) {
-			xsum += neighbor.getPoint().getX();
-			ysum += neighbor.getPoint().getY();
-			cnt++;
-			}
+	public static void main(String[] args) throws IOException {
+		SpatialGraphMLReader reader = new SpatialGraphMLReader();
+		SpatialGraph graph = reader.readGraph(args[0]);
+		
+		String output = null;
+		if(args.length > 1) {
+			output = args[1];
 		}
 		
+		AnalyzerTask task = new SpatialAnalyzerTask();
+		if(output != null)
+			task.setOutputDirectoy(output);
 		
-		return new double[]{xsum/cnt, ysum/cnt};
+		Map<String, Double> stats = GraphAnalyzer.analyze(graph, task);
+		
+		if(output != null)
+			GraphAnalyzer.writeStats(stats, output + "/summary.txt");
+	
 	}
 }

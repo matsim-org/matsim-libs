@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * StandardAnalyzerTask.java
+ * AbstractLinguisticAttribute.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,50 +17,49 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.graph.spatial.analysis;
+package playground.johannes.socialnetworks.graph.social.analysis;
 
-import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
-import org.matsim.contrib.sna.graph.analysis.AnalyzerTask;
-import org.matsim.contrib.sna.graph.analysis.GraphAnalyzer;
-import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
-import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphMLReader;
+import org.apache.log4j.Logger;
 
-import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
+import playground.johannes.socialnetworks.graph.social.SocialVertex;
 
 /**
  * @author illenberger
  *
  */
-public class SpatialAnalyzerTask extends AnalyzerTaskComposite {
+public abstract class AbstractLinguisticAttribute {
 
-	public SpatialAnalyzerTask() {
-		addTask(new DistanceTask());
-	}
-
-	/**
-	 * @param args
-	 * @throws IOException 
-	 */
-	public static void main(String[] args) throws IOException {
-		SpatialGraphMLReader reader = new SpatialGraphMLReader();
-		SpatialGraph graph = reader.readGraph(args[0]);
-		
-		String output = null;
-		if(args.length > 1) {
-			output = args[1];
-		}
-		
-		AnalyzerTask task = new SpatialAnalyzerTask();
-		if(output != null)
-			task.setOutputDirectoy(output);
-		
-		Map<String, Double> stats = GraphAnalyzer.analyze(graph, task);
-		
-		if(output != null)
-			GraphAnalyzer.writeStats(stats, output + "/summary.txt");
+	private static final Logger logger = Logger.getLogger(AbstractLinguisticAttribute.class);
 	
+	protected abstract String attribute(SocialVertex v);
+	
+	public Map<SocialVertex, String> values(Set<? extends SocialVertex> vertices) {
+		Map<SocialVertex, String> map = new HashMap<SocialVertex, String>(vertices.size());
+		int nullAtts = 0;
+		for(SocialVertex v : vertices) {
+			String att = attribute(v);
+			if(att == null)
+				nullAtts++;
+			else
+				map.put(v, att);
+		}
+	
+		if(nullAtts > 0)
+			logger.debug(String.format("%1$s vertices with null attribute.", nullAtts));
+		
+		return map;
 	}
-
+	
+	public SocioMatrix<String> countsMatrix(Set<? extends SocialVertex> vertices) {
+		return SocioMatrixBuilder.countsMatrix(this.values(vertices));
+	}
+	
+	public SocioMatrix<String> probaMatrix(Set<? extends SocialVertex> vertices) {
+		Map<SocialVertex, String> values = this.values(vertices);
+		return SocioMatrixBuilder.probaMatrix(values, values);
+	}
 }

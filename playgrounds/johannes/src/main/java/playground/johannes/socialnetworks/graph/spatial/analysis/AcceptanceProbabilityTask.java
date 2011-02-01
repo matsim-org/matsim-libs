@@ -19,8 +19,6 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.spatial.analysis;
 
-import gnu.trove.TDoubleDoubleHashMap;
-
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Map;
@@ -30,12 +28,12 @@ import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.graph.analysis.ModuleAnalyzerTask;
+import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
-import org.matsim.contrib.sna.math.Histogram;
 import org.matsim.contrib.sna.math.LinearDiscretizer;
-import org.matsim.contrib.sna.util.TXTWriter;
 
 import playground.johannes.socialnetworks.gis.DistanceCalculator;
+import playground.johannes.socialnetworks.gis.DistanceCalculatorFactory;
 
 import com.vividsolutions.jts.geom.Point;
 
@@ -48,6 +46,8 @@ public class AcceptanceProbabilityTask extends ModuleAnalyzerTask<AcceptanceProb
 	private Set<Point> choiceSet;;
 	
 	private boolean graphAsChoiceSet;
+	
+	private boolean overwriteDistCalc = false;
 	
 	public AcceptanceProbabilityTask() {
 		setModule(new AcceptanceProbability());
@@ -62,6 +62,7 @@ public class AcceptanceProbabilityTask extends ModuleAnalyzerTask<AcceptanceProb
 	
 	public void setDistanceCalculator(DistanceCalculator calculator) {
 		module.setDistanceCalculator(calculator);
+		overwriteDistCalc = true;
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -75,11 +76,13 @@ public class AcceptanceProbabilityTask extends ModuleAnalyzerTask<AcceptanceProb
 					choiceSet.add(((SpatialVertex) vertex).getPoint());
 			}
 			
+			if(!overwriteDistCalc)
+				module.setDistanceCalculator(DistanceCalculatorFactory.createDistanceCalculator(((SpatialGraph)graph).getCoordinateReferenceSysten()));
+			
 			DescriptiveStatistics distr = module.distribution((Set<? extends SpatialVertex>) graph.getVertices(), choiceSet);
 			try {
-				TDoubleDoubleHashMap hist = Histogram.createHistogram(distr, new LinearDiscretizer(1000.0));
-				TXTWriter.writeMap(hist, "d", "p", String.format("%1$s/p_accept.txt", getOutputDirectory()));
-//				writeHistograms(distr, 1000, true, "p_accept");
+				writeHistograms(distr, new LinearDiscretizer(1000.0), "p_accept");				
+				writeHistograms(distr, "p_accept", 500, 100);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

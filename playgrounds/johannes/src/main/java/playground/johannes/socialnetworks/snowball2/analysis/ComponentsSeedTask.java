@@ -17,60 +17,46 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.survey.ivt2009.analysis;
+package playground.johannes.socialnetworks.snowball2.analysis;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
+import gnu.trove.TDoubleDoubleHashMap;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.matsim.contrib.sna.graph.Graph;
-import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.graph.analysis.AnalyzerTask;
 import org.matsim.contrib.sna.graph.analysis.Components;
 import org.matsim.contrib.sna.snowball.SampledVertex;
+import org.matsim.contrib.sna.util.TXTWriter;
 
 /**
  * @author illenberger
  *
  */
-public class ComponentsSize extends AnalyzerTask {
+public class ComponentsSeedTask extends AnalyzerTask {
 
-	/* (non-Javadoc)
-	 * @see org.matsim.contrib.sna.graph.analysis.AnalyzerTask#analyze(org.matsim.contrib.sna.graph.Graph, java.util.Map)
-	 */
 	@Override
 	public void analyze(Graph graph, Map<String, Double> stats) {
-		if (getOutputDirectory() != null) {
-			List<Set<Vertex>> comps = new Components().components(graph);
-			try {
-			BufferedWriter writer = new BufferedWriter(new FileWriter(String.format("%1$s/components.txt", getOutputDirectory())));
-			writer.write("size\tseeds");
-			writer.newLine();
-			for (Set<Vertex> comp : comps) {
-				writer.write(String.valueOf(comp.size()));
-				writer.write("\t");
+		if (outputDirectoryNotNull()) {
+			List<Set<SampledVertex>> comps = new Components().components(graph);
+			TDoubleDoubleHashMap map = new TDoubleDoubleHashMap();
+			
+			for (Set<SampledVertex> component : comps) {
 				int seeds = 0;
-				for(Vertex v : comp) {
-					if(((SampledVertex)v).isSampled()) {
-						if(((SampledVertex)v).getIterationSampled() == 0) {
-							seeds++;
-						}
+				for(SampledVertex v : component) {
+					if(v.isSampled() && v.getIterationSampled() == 0) {
+						seeds++;
 					}
 				}
-				writer.write(String.valueOf(seeds));
-				writer.newLine();
+				map.put(component.size(), seeds);
 			}
-			writer.close();
-//			try {
-//				Distribution.writeHistogram(distr.absoluteDistribution(), String.format("%1$s/components.txt", getOutputDirectory()));
-//			} catch (FileNotFoundException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
+
+			try {
+				TXTWriter.writeMap(map, "size", "seeds", String.format("%1$s/componentSeeds.txt", getOutputDirectory()), true);
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}

@@ -20,21 +20,17 @@
 package playground.johannes.socialnetworks.graph.spatial.analysis;
 
 import gnu.trove.TDoubleDoubleHashMap;
-import gnu.trove.TObjectDoubleHashMap;
 
-import java.util.HashSet;
 import java.util.Set;
 
-import org.matsim.contrib.sna.graph.Vertex;
-import org.matsim.contrib.sna.graph.analysis.VertexProperty;
+import org.apache.log4j.Logger;
 import org.matsim.contrib.sna.graph.spatial.SpatialEdge;
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
 import org.matsim.contrib.sna.math.DescriptivePiStatistics;
 import org.matsim.contrib.sna.math.Discretizer;
-import org.matsim.contrib.sna.math.Distribution;
 import org.matsim.contrib.sna.math.LinearDiscretizer;
+import org.matsim.contrib.sna.util.ProgressLogger;
 
-import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
 import playground.johannes.socialnetworks.gis.DistanceCalculator;
 import playground.johannes.socialnetworks.gis.OrthodromicDistanceCalculator;
 
@@ -46,6 +42,8 @@ import com.vividsolutions.jts.geom.Point;
  */
 public class AcceptanceProbability {
 
+	private static final Logger logger = Logger.getLogger(AcceptanceProbability.class);
+	
 	private Discretizer discretizer = new LinearDiscretizer(1000);
 
 	private DistanceCalculator distanceCalculator = new OrthodromicDistanceCalculator();
@@ -55,92 +53,55 @@ public class AcceptanceProbability {
 	}
 
 	public DescriptivePiStatistics distribution(Set<? extends SpatialVertex> vertices, Set<Point> choiceSet) {
-		// CoordinateReferenceSystem crs =
-		// CRSUtils.getCRS(21781);//DefaultEngineeringCRS.CARTESIAN_2D; FIXME
-
-//		int srid1 = vertices.iterator().next().getPoint().getSRID();
-//		int srid2 = choiceSet.iterator().next().getSRID();
-//
-//		if (srid1 != srid2)
-//			throw new RuntimeException(
-//					"Vertices and points of choice set do not have the same coordinate reference system.");
-
+//		logger.info("Building spatial index...");
+//		SpatialIndex spatialIndex = new Quadtree();
+//		for(Point p : choiceSet) {
+//			spatialIndex.insert(p.getEnvelopeInternal(), p);
+//		}
+		
 		DescriptivePiStatistics distribution = new DescriptivePiStatistics();
-		Set<SpatialEdge> touched = new HashSet<SpatialEdge>();
+//		Set<SpatialEdge> touched = new HashSet<SpatialEdge>();
 
-		// try {
-		// MathTransform t1 = CRS.findMathTransform(CRSUtils.getCRS(srid1),
-		// crs);
-		// MathTransform t2 = CRS.findMathTransform(CRSUtils.getCRS(srid2),
-		// crs);
-
-//		DistanceCalculator calc2 = new CartesianDistanceCalculator();
+		logger.info("Calculating acceptance probability...");
+		ProgressLogger.init(vertices.size(), 1, 5);
 		for (SpatialVertex vertex : vertices) {
 			Point p1 = vertex.getPoint();
-//			if (p1.getSRID() != srid1)
-//				throw new RuntimeException("Vertices do not have the same coordinate reference system.");
-
-			// double p1[] = new double[]{vertex.getPoint().getCoordinate().x,
-			// vertex.getPoint().getCoordinate().y};
-			// t1.transform(p1, 0, p1, 0, 1);
 
 			TDoubleDoubleHashMap n_d = new TDoubleDoubleHashMap();
 			for (Point p2 : choiceSet) {
-
-//				if (p2.getSRID() != srid2)
-//					throw new RuntimeException("Points do not have the same coordinate reference system.");
-
-				// double p2[] = new double[]{p.getCoordinate().x,
-				// p.getCoordinate().y};
-				// t2.transform(p2, 0, p2, 0, 1);
-
-				// double dx = p2[0] - p1[0];
-				// double dy = p2[1] - p1[1];
-				// double d = Math.sqrt(dx*dx + dy*dy);
 				if (p1 != null && p2 != null) {
 					double d = distanceCalculator.distance(p1, p2);
-//					double d = calc2.distance(p1, p2);
 					n_d.adjustOrPutValue(discretizer.discretize(d), 1, 1);
 				}
 			}
 
 			for (int i = 0; i < vertex.getEdges().size(); i++) {
 				SpatialEdge e = vertex.getEdges().get(i);
-				if (touched.add(e)) {
+//				if (touched.add(e)) {
 					SpatialVertex neighbor = e.getOpposite(vertex);
-
-//					if (neighbor.getPoint().getSRID() != srid1)
-//						throw new RuntimeException("Vertices do not have the same coordinate reference system.");
-
-					// double p2[] = new
-					// double[]{neighbor.getPoint().getCoordinate().x,
-					// neighbor.getPoint().getCoordinate().y};
-					// t1.transform(p2, 0, p2, 0, 1);
-					//						
-					// double dx = p2[0] - p1[0];
-					// double dy = p2[1] - p1[1];
-					// double d = Math.sqrt(dx*dx + dy*dy);
 
 					if (p1 != null && neighbor.getPoint() != null) {
 						double d = distanceCalculator.distance(p1, neighbor.getPoint());
 						if(d > 0) {
-//							d = discretizer.discretize(d);
+//							if(!n_d.containsKey(d)) {
+//								Envelope env = new Envelope(p1.getX() - d, p1.getX() + d, p1.getY() - d, p1.getY() + d);
+//								List<Point> points = spatialIndex.query(env);
+//								for (Point p2 : points) {
+//									double d2 = distanceCalculator.distance(p1, p2);
+//									n_d.adjustOrPutValue(discretizer.discretize(d2), 1, 1);
+//								}
+//							}
 							double n = n_d.get(discretizer.discretize(d));
+							
 							if (n > 0)
 								distribution.addValue(d, n);
 						}
 					}
-				}
+//				}
 			}
+			
+			ProgressLogger.step();
 		}
-		// } catch (FactoryException e) {
-		// e.printStackTrace();
-		// return null;
-		// } catch (TransformException e) {
-		// e.printStackTrace();
-		// return null;
-		// }
-
 		return distribution;
 	}
 }
