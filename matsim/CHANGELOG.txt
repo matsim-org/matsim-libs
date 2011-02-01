@@ -20,6 +20,9 @@ Changes:
   - OsmNetworkReader has option to reduce memory consumption, but will run slower (off by default) (r13910)
   - ?
 
+- BugFixes:
+  - Controler ignores any custom-set leastCostPathCalculatorFactory (r14090)
+
 - Other changes for developers:
 
   API-Changes:
