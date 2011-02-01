@@ -30,6 +30,7 @@ import org.apache.log4j.Logger;
 import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.math.Discretizer;
 import org.matsim.contrib.sna.math.Distribution;
+import org.matsim.contrib.sna.math.FixedSampleSizeDiscretizer;
 import org.matsim.contrib.sna.math.Histogram;
 import org.matsim.contrib.sna.util.TXTWriter;
 
@@ -117,11 +118,17 @@ public abstract class AnalyzerTask {
 		}
 	}
 	
+	protected void writeHistograms(DescriptiveStatistics stats, String name, int bins, int minsize) throws IOException {
+		double[] values = stats.getValues();
+		TDoubleDoubleHashMap hist = Histogram.createHistogram(stats, FixedSampleSizeDiscretizer.create(values, minsize, bins), true);
+		TXTWriter.writeMap(hist, name, "p", String.format("%1$s/%2$s.n%3$s.txt", getOutputDirectory(), name, values.length/bins));
+	}
+	
 	protected void writeHistograms(DescriptiveStatistics stats, Discretizer discretizer, String name) throws IOException {
-		TDoubleDoubleHashMap hist = Histogram.createHistogram(stats, discretizer); 
+		TDoubleDoubleHashMap hist = Histogram.createHistogram(stats, discretizer, false); 
 		TXTWriter.writeMap(hist, name, "n", String.format("%1$s/%2$s.txt", output, name));
 		Histogram.normalize(hist);
-		TXTWriter.writeMap(hist, name, "share", String.format("%1$s/%2$s.share.txt", output, name));
+		TXTWriter.writeMap(hist, name, "p", String.format("%1$s/%2$s.share.txt", output, name));
 	}
 	
 	protected boolean outputDirectoryNotNull() {

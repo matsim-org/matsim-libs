@@ -35,11 +35,13 @@ public class FixedSampleSizeDiscretizer {
 
 	/**
 	 * Creates a new discretizer with bin borders defined such that each bin
-	 * would contain approximately contain <tt>minsize</tt> samples from
+	 * would contain approximately contain <tt>size</tt> samples from
 	 * <tt>samples</tt>.
 	 * 
-	 * @param samples an array with samples.
-	 * @param size the number of samples per bin.
+	 * @param samples
+	 *            an array with samples.
+	 * @param size
+	 *            the number of samples per bin.
 	 * @return a new discretizer.
 	 */
 	public static FixedBordersDiscretizer create(double[] samples, int size) {
@@ -69,5 +71,24 @@ public class FixedSampleSizeDiscretizer {
 			borders.add(samples[samples.length - 1]);
 
 		return new FixedBordersDiscretizer(borders.toNativeArray());
+	}
+
+	/**
+	 * Creates a new discretizer with bin borders defined such that samples are
+	 * roughly equally distributed over <tt>bins</tt> number of bins, but at
+	 * least <tt>size</tt> samples per bin.
+	 * 
+	 * @param samples
+	 *            an array with samples.
+	 * @param size
+	 *            the minimum number of samples per bin.
+	 * @param bins
+	 *            the number of bins.
+	 * @return a new discretizer.
+	 */
+	public static FixedBordersDiscretizer create(double[] samples, int size, int bins) {
+		int newsize = samples.length / bins;
+		newsize = Math.max(newsize, size);
+		return create(samples, newsize);
 	}
 }

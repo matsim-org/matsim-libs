@@ -29,6 +29,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Arrays;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 
 /**
@@ -42,6 +43,10 @@ public class TXTWriter {
 	private static final String NA = "NA";
 	
 	public static void writeMap(TDoubleDoubleHashMap map, String keyCol, String valCol, String file) throws IOException {
+		writeMap(map, keyCol, valCol, file, false);
+	}
+	
+	public static void writeMap(TDoubleDoubleHashMap map, String keyCol, String valCol, String file, boolean descending) throws IOException {
 		BufferedWriter writer = new BufferedWriter(new FileWriter(file));
 		
 		writer.write(keyCol);
@@ -51,6 +56,8 @@ public class TXTWriter {
 		
 		double[] keys = map.keys();
 		Arrays.sort(keys);
+		if(descending)
+			ArrayUtils.reverse(keys);
 		
 		for(double key : keys) {
 			writer.write(String.valueOf(key));

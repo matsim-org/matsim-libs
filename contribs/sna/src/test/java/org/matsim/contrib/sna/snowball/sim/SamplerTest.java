@@ -70,7 +70,7 @@ public class SamplerTest extends TestCase {
 			String reference = String.format("%1$s/k.%2$s.txt", TestCaseUtils.getPackageInputDirecoty(getClass()), it);
 			String tmp = String.format("%1$s/k.%2$s.txt", TestCaseUtils.getOutputDirectory(), it);
 
-			TXTWriter.writeMap(Histogram.createHistogram(distr, new LinearDiscretizer(1.0)), "bin", "count", tmp);
+			TXTWriter.writeMap(Histogram.createHistogram(distr, new LinearDiscretizer(1.0), false), "bin", "count", tmp);
 
 			assertEquals(CRCChecksum.getCRCFromFile(reference), CRCChecksum.getCRCFromFile(tmp));
 		}

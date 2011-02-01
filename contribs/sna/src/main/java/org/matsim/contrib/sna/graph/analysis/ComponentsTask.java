@@ -19,10 +19,17 @@
  * *********************************************************************** */
 package org.matsim.contrib.sna.graph.analysis;
 
+import gnu.trove.TDoubleDoubleHashMap;
+
+import java.io.IOException;
 import java.util.Map;
 
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.sna.graph.Graph;
+import org.matsim.contrib.sna.math.Histogram;
+import org.matsim.contrib.sna.math.LinearDiscretizer;
+import org.matsim.contrib.sna.util.TXTWriter;
 
 /**
  * An AnalyzerTask that counts the number of components in a graph.
@@ -54,10 +61,21 @@ public class ComponentsTask extends ModuleAnalyzerTask<Components> {
 	 */
 	@Override
 	public void analyze(Graph graph, Map<String, Double> stats) {
-		int numComponents = module.countComponents(graph);
+		DescriptiveStatistics distr = module.distribution(graph);
+		double numComponents = distr.getN();
 		stats.put(NUM_COMPONENTS, new Double(numComponents));
 
 		logger.info(String.format("%1$s disconnected components.", numComponents));
+		
+		if(outputDirectoryNotNull()) {
+			TDoubleDoubleHashMap hist = Histogram.createHistogram(distr, new LinearDiscretizer(1.0), false);
+			try {
+				TXTWriter.writeMap(hist, "size", "n", String.format("%1$s/components.txt", getOutputDirectory()));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			
+		}
 	}
 
 }

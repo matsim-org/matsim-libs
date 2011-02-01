@@ -29,6 +29,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
@@ -65,9 +66,9 @@ public class Components {
 	 */
 	public <V extends Vertex> List<Set<V>> components(Graph graph) {
 		AdjacencyMatrix<V> y = new AdjacencyMatrix<V>(graph);
-		
+
 		List<TIntArrayList> comps = extractComponents(y);
-		
+
 		List<Set<V>> components = new ArrayList<Set<V>>(comps.size());
 		for (TIntArrayList comp : comps) {
 			Set<V> component = new HashSet<V>();
@@ -76,8 +77,25 @@ public class Components {
 			}
 			components.add(component);
 		}
-		
+
 		return components;
+	}
+
+	/**
+	 * Returns the distribution of the sizes of disconnected components.
+	 * 
+	 * @param graph
+	 *            a graph.
+	 * @return the distribution of the sizes of disconnected components.
+	 */
+	public DescriptiveStatistics distribution(Graph graph) {
+		AdjacencyMatrix<Vertex> y = new AdjacencyMatrix<Vertex>(graph);
+		List<TIntArrayList> components = extractComponents(y);
+		DescriptiveStatistics stats = new DescriptiveStatistics();
+		for (TIntArrayList component : components) {
+			stats.addValue(component.size());
+		}
+		return stats;
 	}
 
 	private List<TIntArrayList> extractComponents(AdjacencyMatrix<?> y) {
@@ -113,7 +131,7 @@ public class Components {
 		});
 
 		Collections.reverse(components);
-		
+
 		return components;
 	}
 }
