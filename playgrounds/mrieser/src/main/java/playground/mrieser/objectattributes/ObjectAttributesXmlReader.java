@@ -34,6 +34,11 @@ import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
+import playground.mrieser.objectattributes.attributeconverters.BooleanConverter;
+import playground.mrieser.objectattributes.attributeconverters.DoubleConverter;
+import playground.mrieser.objectattributes.attributeconverters.IntegerConverter;
+import playground.mrieser.objectattributes.attributeconverters.StringConverter;
+
 /**
  * Reads object attributes from a file. The reader supports attributes of type {@link String},
  * {@link Integer}, {@link Double} and {@link Boolean} out of the box. Other types must be manually
@@ -44,7 +49,7 @@ import org.xml.sax.SAXException;
  */
 public class ObjectAttributesXmlReader extends MatsimXmlParser {
 	private final static Logger log = Logger.getLogger(ObjectAttributesXmlReader.class);
-	private final Map<String, AttributeConverter> converters = new HashMap<String, AttributeConverter>();
+	private final Map<String, AttributeConverter<? extends Object>> converters = new HashMap<String, AttributeConverter<? extends Object>>();
 	private final ObjectAttributes attributes;
 	private boolean readCharacters = false;
 	private String currentObject = null;
@@ -52,13 +57,18 @@ public class ObjectAttributesXmlReader extends MatsimXmlParser {
 	private String currentAttributeClass = null;
 	private long count = 0;
 
+	private static final StringConverter STRING_Converter = new StringConverter();
+	private static final IntegerConverter INTEGER_Converter = new IntegerConverter();
+	private static final DoubleConverter DOUBLE_Converter = new DoubleConverter();
+	private static final BooleanConverter BOOLEAN_Converter = new BooleanConverter();
+
 	public ObjectAttributesXmlReader(final ObjectAttributes attributes) {
 		this.attributes = attributes;
 		super.setValidating(false);
-		this.converters.put(String.class.getCanonicalName(), new StringConverter());
-		this.converters.put(Integer.class.getCanonicalName(), new IntegerConverter());
-		this.converters.put(Double.class.getCanonicalName(), new DoubleConverter());
-		this.converters.put(Boolean.class.getCanonicalName(), new BooleanConverter());
+		this.converters.put(String.class.getCanonicalName(), STRING_Converter);
+		this.converters.put(Integer.class.getCanonicalName(), INTEGER_Converter);
+		this.converters.put(Double.class.getCanonicalName(), DOUBLE_Converter);
+		this.converters.put(Boolean.class.getCanonicalName(), BOOLEAN_Converter);
 	}
 
 	@Override
@@ -107,7 +117,7 @@ public class ObjectAttributesXmlReader extends MatsimXmlParser {
 	 * @param converter
 	 * @return the previously registered converter for this class, or <code>null</code> if none was set before.
 	 */
-	public AttributeConverter putAttributeConverter(final Class<?> clazz, final AttributeConverter converter) {
+	public AttributeConverter<? extends Object> putAttributeConverter(final Class<?> clazz, final AttributeConverter<? extends Object> converter) {
 		return this.converters.put(clazz.getCanonicalName(), converter);
 	}
 
@@ -117,48 +127,8 @@ public class ObjectAttributesXmlReader extends MatsimXmlParser {
 	 * @param clazz
 	 * @return the previously registered converter for this class, of <code>null</code> if none was set.
 	 */
-	public AttributeConverter removeAttributeConverter(final Class<?> clazz) {
+	public AttributeConverter<? extends Object> removeAttributeConverter(final Class<?> clazz) {
 		return this.converters.remove(clazz.getCanonicalName());
-	}
-
-	/**
-	 * Converts a read attribute, given as a string, into a specific object type.
-	 *
-	 * @author mrieser
-	 */
-	public static interface AttributeConverter {
-		public Object convert(final String value);
-	}
-
-	private static class IntegerConverter implements AttributeConverter {
-		@Override
-		public Integer convert(String value) {
-			return Integer.valueOf(value);
-		}
-	}
-	private static class DoubleConverter implements AttributeConverter {
-		@Override
-		public Double convert(String value) {
-			return Double.valueOf(value);
-		}
-	}
-	private static class StringConverter implements AttributeConverter {
-		private final Map<String, String> stringCache = new HashMap<String,  String>(1000);
-		@Override
-		public String convert(String value) {
-			String s = this.stringCache.get(value);
-			if (s == null) {
-				s = new String(value); // copy, in case 'value' was generated as substring from a larger string
-				this.stringCache.put(s, s);
-			}
-			return s;
-		}
-	}
-	private static class BooleanConverter implements AttributeConverter {
-		@Override
-		public Boolean convert(String value) {
-			return Boolean.valueOf(value);
-		}
 	}
 
 }

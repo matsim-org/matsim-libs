@@ -74,12 +74,15 @@ public class ObjectAttributesXmlReaderTest {
 		}
 	}
 
-	public static class MyTupleConverter implements ObjectAttributesXmlReader.AttributeConverter {
+	public static class MyTupleConverter implements AttributeConverter<MyTuple> {
 		@Override
-		public Object convert(String value) {
+		public MyTuple convert(String value) {
 			String[] parts = value.split(",");
 			return new MyTuple(Integer.valueOf(parts[0]), Integer.valueOf(parts[1]));
 		}
-
+		@Override
+		public String convertToObject(MyTuple o) {
+			return o.a + "," + o.b;
+		}
 	}
 }
