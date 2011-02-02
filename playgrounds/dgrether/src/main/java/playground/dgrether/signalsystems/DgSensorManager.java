@@ -33,6 +33,7 @@ import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
+import org.matsim.core.utils.collections.Tuple;
 
 
 /**
@@ -47,6 +48,8 @@ public class DgSensorManager implements LinkEnterEventHandler, LinkLeaveEventHan
 //	private Set<Id> monitoredLinkIds = new HashSet<Id>();
 //	private Map<Id, Double> linkIdNumberOfCarsInDistanceMap = new HashMap<Id, Double>();
 	private Map<Id, DgSensor> linkIdSensorMap = new HashMap<Id, DgSensor>();
+
+private Map<Id, Tuple<Double, Double>> linkFirstSecondDistanceMeterMap = new HashMap<Id, Tuple<Double, Double>>();
 	
 	public DgSensorManager(){}
 	
@@ -57,6 +60,10 @@ public class DgSensorManager implements LinkEnterEventHandler, LinkLeaveEventHan
 		}
 	}
 	
+	/**
+	 * 
+	 * @param distanceMeter the distance in meter from the end of the monitored link
+	 */
 	public void registerNumberOfCarsInDistanceMonitoring(Link link, Double distanceMeter){
 //		this.linkIdNumberOfCarsInDistanceMap.put(link.getId(), distanceMeter);
 		if (!this.linkIdSensorMap.containsKey(link.getId())){
@@ -64,7 +71,26 @@ public class DgSensorManager implements LinkEnterEventHandler, LinkLeaveEventHan
 //			this.monitoredLinkIds.add(link.getId());
 		}
 		this.linkIdSensorMap.get(link.getId()).registerDistanceToMonitor(distanceMeter);
-
+	}
+	
+	public void registerCarsAtDistancePerSecondMonitoring(Link link, Double distanceMeter){
+		double firstDistanceMeter = distanceMeter;
+		double secondDistanceMeter = distanceMeter - link.getFreespeed();
+		if (secondDistanceMeter < 0.0){
+			firstDistanceMeter = link.getFreespeed();
+			secondDistanceMeter = 0.0;
+		}
+		Tuple<Double, Double> tuple = new Tuple<Double, Double>(firstDistanceMeter, secondDistanceMeter);
+		this.linkFirstSecondDistanceMeterMap .put(link.getId(), tuple);
+		this.registerNumberOfCarsInDistanceMonitoring(link, firstDistanceMeter);
+		this.registerNumberOfCarsInDistanceMonitoring(link, secondDistanceMeter);
+	}
+	
+	public int getNumberOfCarsAtDistancePerSecond(Id linkId, Double distanceMeter, double timeSeconds){
+		Tuple<Double, Double> tuple = this.linkFirstSecondDistanceMeterMap.get(linkId);
+		int numberOfCarsFirstDetector = this.getNumberOfCarsInDistance(linkId, tuple.getFirst(), timeSeconds);
+		int numberOfCarsSecondDetector = this.getNumberOfCarsInDistance(linkId, tuple.getSecond(), timeSeconds);
+		return numberOfCarsSecondDetector - numberOfCarsFirstDetector;
 	}
 
 	public int getNumberOfCarsOnLink(Id linkId){

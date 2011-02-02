@@ -48,6 +48,10 @@ public class DgSensor {
 		this.link  = link;
 	}
 	
+	/**
+	 * 
+	 * @param distanceMeter the distance in meter from the end of the monitored link
+	 */
 	public void registerDistanceToMonitor(Double distanceMeter){
 		if (! this.doDistanceMonitoring) {
 			this.enableDistanceMonitoring();
