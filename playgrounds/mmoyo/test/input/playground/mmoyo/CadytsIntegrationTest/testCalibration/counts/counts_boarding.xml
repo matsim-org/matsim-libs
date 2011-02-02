@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<counts xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:noNamespaceSchemaLocation="http://matsim.org/files/dtd/counts_v1.xsd"
+ name="occupancyCounts" desc="counts values for equil net" year="2010"  layer="0" 
+>
+<!-- ====================================================================== -->
+	<count loc_id="stop1" cs_id="stop1" x="-24900.0" y="0.0" >
+		<volume h="1" val="0.00" />
+		<volume h="2" val="0.00" />
+		<volume h="3" val="0.00" />
+		<volume h="4" val="0.00" />
+		<volume h="5" val="0.00" />
+		<volume h="6" val="0.00" />
+		<volume h="7" val="4.00" />
+		<volume h="8" val="0.00" />
+		<volume h="9" val="0.00" />
+		<volume h="10" val="0.00" />
+		<volume h="11" val="0.00" />
+		<volume h="12" val="0.00" />
+		<volume h="13" val="0.00" />
+		<volume h="14" val="0.00" />
+		<volume h="15" val="0.00" />
+		<volume h="16" val="0.00" />
+		<volume h="17" val="0.00" />
+		<volume h="18" val="0.00" />
+		<volume h="19" val="0.00" />
+		<volume h="20" val="0.00" />
+		<volume h="21" val="0.00" />
+		<volume h="22" val="0.00" />
+		<volume h="23" val="0.00" />
+		<volume h="24" val="0.00" />
+	</count>
+
+</counts>
+

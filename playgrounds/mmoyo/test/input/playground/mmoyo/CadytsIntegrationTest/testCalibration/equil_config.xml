@@ -1,0 +1,165 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd"
+  [
+   <!ENTITY INPUTBASE   "test/input/playground/mmoyo/CadytsIntegrationTest/testCalibration/">
+   <!ENTITY OUTPUTBASE	"test/output/playground/mmoyo/CadytsIntegrationTest/testCalibration/">
+   <!ENTITY NETWORK	"matsim/examples/equil/network.xml">
+  ]
+>
+
+  <!-- 
+   <!ENTITY INPUTBASE   "../playgrounds/mmoyo/test/input/playground/mmoyo/CadytsIntegrationTest/testCalibration/">
+   <!ENTITY OUTPUTBASE	"../playgrounds/mmoyo/test/output/playground/mmoyo/CadytsIntegrationTest/testCalibration/">
+   <!ENTITY NETWORK	"../matsim/examples/equil/network.xml">
+   -->
+   
+<config>
+	<module name="global">
+		<param name="randomSeed" value="4711" />
+		<param name="coordinateSystem" value="Atlantis"/>
+	</module>
+	
+	<module name="network">
+		<param name="inputNetworkFile" value="&NETWORK;" />
+	</module>
+	
+	<module name="plans">
+		<param name="inputPlansFile" value="&INPUTBASE;4plans.xml"/>
+	</module>
+
+	<module name="scenario">
+	 	<param name="useTransit" value="true" />
+	 	<param name="useVehicles" value="true" />
+	</module>
+
+	<module name="controler">
+		<param name="outputDirectory" value="&OUTPUTBASE;" />
+		<param name="firstIteration" value="1" />  
+		<param name="lastIteration" value="10" />
+		<param name="writeEventsInterval" value="1" />
+	</module>
+
+	<module name="qsim" >
+		<param name="startTime" value="00:00:00" />
+		<param name="endTime" value="30:00:00" />
+		
+		<param name="snapshotperiod" value="00:00:00" />
+		<param name="snapshotFormat"	value = "otfvis"/> 
+ 		<param name="snapshotStyle"	value = "queue"/> 
+		
+		<param name="flowCapacityFactor" value="0.02" />
+		<param name="storageCapacityFactor" value="0.06" />
+		
+		<param name="stuckTime" value="10.0" />
+		<param name="removeStuckVehicles" value="no" />
+		
+		<param name="numberOfThreads" value="1" />
+	</module>
+	
+	<module name="strategy">
+		<param name="maxAgentPlanMemorySize" value="4" /> <!-- 0 means unlimited -->
+ 		
+		<param name="ModuleProbability_1" value="1.0" />
+		<param name="Module_1" value="playground.mmoyo.cadyts_integration.ptBseAsPlanStrategy.NewPtBsePlanStrategy" />
+	</module>
+	
+	<module name="changeLegMode">
+		<param name="modes" value="car,pt" />
+	</module>
+	
+	<module name="TimeAllocationMutator" >
+		<param name="mutationRange" value="0" />
+	</module>
+
+	<module name="transit">
+		<param name="transitScheduleFile" value="&INPUTBASE;transitSchedule1bus.xml" />
+		<param name="vehiclesFile" value="&INPUTBASE;vehicles.xml"/>
+		<param name="transitModes" value="pt" /> 
+	</module>
+
+	<module name="planCalcScore">
+		<param name="learningRate" value="1.0" />
+		<param name="BrainExpBeta" value="2.0" />
+
+		<param name="lateArrival" value="1e-9" />      <!-- Warning: score function is turned off here -->
+		<param name="earlyDeparture" value="1e-9" />
+		<param name="performing" value="1e-9" />
+		<param name="traveling" value="1e-9" />
+		<param name="travelingPt" value="1e-9" />
+		<param name="travelingWalk" value="1e-9" />
+		<param name="waiting" value="1e-9" />
+
+		<!-- 		
+		<param name="lateArrival" value="-18" />
+		<param name="earlyDeparture" value="-0" />
+		<param name="performing" value="+6" />
+		<param name="traveling" value="-6" />
+		<param name="travelingPt" value="-3" />
+		<param name="travelingWalk" value="-18" />
+		<param name="waiting" value="-0" />
+		-->
+		
+		<param name="activityType_0"            value="h" /> <!-- home -->
+		<param name="activityPriority_0"        value="1" />
+		<param name="activityTypicalDuration_0" value="12:00:00" />
+		<param name="activityMinimalDuration_0" value="08:00:00" />
+	
+		<param name="activityType_1"            value="w" /> <!-- work -->
+		<param name="activityPriority_1"        value="1" />
+		<param name="activityTypicalDuration_1" value="08:00:00" />
+		<param name="activityMinimalDuration_1" value="06:00:00" />
+		<param name="activityOpeningTime_1"     value="07:00:00" />
+		<param name="activityLatestStartTime_1" value="09:00:00" />
+		<param name="activityEarliestEndTime_1" value="" />
+		<param name="activityClosingTime_1"     value="18:00:00" />
+	</module>
+	
+	<module name="vis">
+		<param name="logo"		value = "(c) 2009 TUB-VSP"/>
+		<param name="delay"		value = "200"/>
+		<param name="linkwidthfactor"	value = "15"/>
+		<param name="shownodelabels"	value = "false"/>
+		<param name="showlinklabels"  	value = "true"/>
+	</module>	
+	
+	<module name="bse">
+		<param name="startTime" value="5" />
+		<param name="endTime" value="20" />
+		<param name="regressionInertia" value="0.95"/>
+		<param name="minFlowStddevVehH" value="8.0"/>  <!-- 8,9,10 -->
+		<param name="useBruteForce" value="true"/>
+		<param name="preparatoryIterations" value="1"/>
+		<!-- 
+		<param name="preparatoryIterations" value="20"/>
+		<param name="freezeIteration" value="200" /> 
+		<param name="calibrationMethodSwitch" value="101"/>
+		<param name="maxDraws" value="10" />
+		<param name="proportionalAssignment" value=""/>   ???
+		 -->
+	</module>
+	
+	<module name="ptRouter">
+		<param name="searchRadius" value="600.0" />
+		<param name="extensionRadius" value="200.0" /> 
+		<param name="beelineWalkConnectionDistance" value="300.0" />
+		<param name="allowDirectWalks" value="true" />
+		<param name="minIniStations" value="2" />
+
+		<param name="walkValue" value="6.0" />
+		<param name="distanceValue" value="0.7" />
+		<param name="transferValue" value="240" />
+		<param name="timeValue" value="6.0" />
+	</module>
+	
+	<module name="ptCounts">
+		<param name="inputBoardCountsFile" value="&INPUTBASE;counts/counts_boarding.xml" /> 
+  		<param name="inputOccupancyCountsFile" value="&INPUTBASE;counts/counts_occupancy.xml" />
+  		<param name="inputAlightCountsFile" value="&INPUTBASE;counts/counts_alighting.xml"/> 
+		
+		<param name="outputformat" value="kml" /> 
+  		<param name="distanceFilter" value="30000.0" /> 
+  		<param name="countsScaleFactor" value="1.0" />
+  		<param name="distanceFilterCenterNode" value="7" />  
+	</module>
+		
+</config>
