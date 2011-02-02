@@ -134,4 +134,8 @@ public class DatabasedSignalPlan implements SignalPlan {
 		return this.data.getCycleTime();
 	}
 
+	public SignalPlanData getPlanData(){
+		return this.data;
+	}
+	
 }
