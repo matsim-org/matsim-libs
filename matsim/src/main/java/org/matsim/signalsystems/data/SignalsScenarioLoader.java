@@ -24,6 +24,7 @@ import java.io.IOException;
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.log4j.Logger;
 import org.matsim.core.config.groups.SignalSystemsConfigGroup;
 import org.matsim.signalsystems.MatsimSignalSystemsReader;
 import org.matsim.signalsystems.data.ambertimes.v10.AmberTimesReader10;
@@ -41,6 +42,8 @@ import org.xml.sax.SAXException;
  */
 public class SignalsScenarioLoader {
 
+	private static final Logger log = Logger.getLogger(SignalsScenarioLoader.class);
+	
 	private SignalSystemsConfigGroup signalConfig;
 
 	public SignalsScenarioLoader(SignalSystemsConfigGroup config){
@@ -81,51 +84,68 @@ public class SignalsScenarioLoader {
 				e.printStackTrace();
 			}
 		}
+		else {
+			log.info("Signals: No amber times file set, can't load amber times!");
+		}
 	}
 	
 	private void loadControl(SignalsData data){
-		SignalControlReader20 controlReader = new SignalControlReader20(data.getSignalControlData(), MatsimSignalSystemsReader.SIGNALCONTROL20);
-		try {
-			controlReader.readFile(this.signalConfig.getSignalControlFile());
-		} catch (JAXBException e) {
-			e.printStackTrace();
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
+		if (this.signalConfig.getSignalControlFile() != null){
+			SignalControlReader20 controlReader = new SignalControlReader20(data.getSignalControlData(), MatsimSignalSystemsReader.SIGNALCONTROL20);
+			try {
+				controlReader.readFile(this.signalConfig.getSignalControlFile());
+			} catch (JAXBException e) {
+				e.printStackTrace();
+			} catch (SAXException e) {
+				e.printStackTrace();
+			} catch (ParserConfigurationException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
-		
+		else {
+			log.info("Signals: No signal control file set, can't load signal control data!");
+		}
 	}
 
 	private void loadGroups(SignalsData data) {
-		SignalGroupsReader20 groupsReader = new SignalGroupsReader20(data.getSignalGroupsData(), MatsimSignalSystemsReader.SIGNALGROUPS20);
-		try {
-			groupsReader.readFile(this.signalConfig.getSignalGroupsFile());
-		} catch (JAXBException e) {
-			e.printStackTrace();
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
+		if (this.signalConfig.getSignalGroupsFile() != null){
+			SignalGroupsReader20 groupsReader = new SignalGroupsReader20(data.getSignalGroupsData(), MatsimSignalSystemsReader.SIGNALGROUPS20);
+			try {
+				groupsReader.readFile(this.signalConfig.getSignalGroupsFile());
+			} catch (JAXBException e) {
+				e.printStackTrace();
+			} catch (SAXException e) {
+				e.printStackTrace();
+			} catch (ParserConfigurationException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		else {
+			log.info("Signals: No signal groups file set, can't load signal groups!");
 		}
 	}
 
 	private void loadSystems(SignalsData data){
-		SignalSystemsReader20 systemsReader = new SignalSystemsReader20(data.getSignalSystemsData(), MatsimSignalSystemsReader.SIGNALSYSTEMS20);
-		try {
-			systemsReader.readFile(this.signalConfig.getSignalSystemFile());
-		} catch (JAXBException e) {
-			e.printStackTrace();
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
+		if (this.signalConfig.getSignalSystemFile() != null){
+			SignalSystemsReader20 systemsReader = new SignalSystemsReader20(data.getSignalSystemsData(), MatsimSignalSystemsReader.SIGNALSYSTEMS20);
+			try {
+				systemsReader.readFile(this.signalConfig.getSignalSystemFile());
+			} catch (JAXBException e) {
+				e.printStackTrace();
+			} catch (SAXException e) {
+				e.printStackTrace();
+			} catch (ParserConfigurationException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		else {
+			log.info("Signals: No signal systems file set, can't load signal system base information!");
 		}
 	}
 	
