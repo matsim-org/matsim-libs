@@ -5,10 +5,8 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.api.experimental.ScenarioLoaderFactoryImpl;
@@ -33,13 +31,6 @@ public class PlanRepeater {
 		Person person = new PersonImpl(selectedId);
 		person = population.getPersons().get(selectedId);
 		
-		for (PlanElement pe : person.getSelectedPlan().getPlanElements()){
-			if (pe instanceof Leg) {
-				Leg leg = (Leg)pe;
-				if (leg.getMode().equals(TransportMode.walk))leg.setMode(TransportMode.transit_walk);
-			}
-		}
-		
 		//erase all persons
 		List<Id> idList = new ArrayList<Id>();
 		for (Id id: population.getPersons().keySet())	idList.add(id);
@@ -49,8 +40,10 @@ public class PlanRepeater {
 		for (int i=0 ; i<repetitions ; i++) {
 			Id newId = new IdImpl(selectedId.toString() + SEPARATOR + i);
 			Person personClon = new PersonImpl(newId);
-			personClon.addPlan(person.getSelectedPlan());
-			//personClon.setId(newId);
+			
+			for (Plan plan: person.getPlans()){
+				personClon.addPlan(plan);
+			}
 			population.addPerson(personClon);
 		}
 		
@@ -62,9 +55,9 @@ public class PlanRepeater {
 	}
 	
 	public static void main(String[] args) {
-		String config = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/comparison/BerlinBrandenburg/routed_1x_subset_xy2links_ptplansonly/fragmented/config/config_routedPlans.xml";
-		int repetitions= 200;
-		Id selectedId= new IdImpl("11100153_a");
+		String config = "../playgrounds/mmoyo/test/input/playground/mmoyo/CadytsIntegrationTest/testCalibration/equil_config.xml";
+		int repetitions= 10;
+		Id selectedId= new IdImpl("1");
 		new PlanRepeater(config, repetitions, selectedId);
 	}
 	

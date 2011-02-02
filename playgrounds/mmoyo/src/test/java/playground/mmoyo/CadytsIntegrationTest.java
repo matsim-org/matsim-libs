@@ -29,36 +29,34 @@ import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.Id;
 
-//import org.junit.Ignore;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.Assert;
 
+import playground.mmoyo.analysis.counts.reader.CountsReader;
 import playground.mmoyo.cadyts_integration.ptBseAsPlanStrategy.NewPtBsePlanStrategy;
-import cadyts.interfaces.matsim.MATSimUtilityModificationCalibrator;
 import cadyts.utilities.io.tabularFileParser.TabularFileParser;
 
 public class CadytsIntegrationTest extends MatsimTestCase {
-	
-	private static final MATSimUtilityModificationCalibrator<TransitStopFacility> String = null;
+
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 	@Test
-	@Ignore("not yet fully implemented")
 	public final void testCalibration() {
 		System.out.println("this.getInputDirectory() "      + this.getInputDirectory() );
 		System.out.println("this.getClassInputDirectory() " + this.getClassInputDirectory());
 		System.out.println("this.getOutputDirectory() " + this.getOutputDirectory());
 		
 		//String inputDir = this.getInputDirectory();
-		String inputDir = "../playgrounds/mmoyo/test/input/playground/mmoyo/EquilCalibration/";
+		//String outputDir = this.getOutputDirectory();
+		String inputDir = "../playgrounds/mmoyo/test/input/playground/mmoyo/CadytsIntegrationTest/testCalibration/";
+		String outputDir = "../playgrounds/mmoyo/test/output/playground/mmoyo/CadytsIntegrationTest/testCalibration/";
 		
-		String configFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/calibration/100plans_bestValues_config.xml";
+		String configFile = inputDir + "equil_config.xml";
 		Config config = null;
 		try {
 			config = ConfigUtils.loadConfig(configFile);
@@ -72,25 +70,25 @@ public class CadytsIntegrationTest extends MatsimTestCase {
 
 		//scenario data  test
 		Assert.assertNotNull("config is null" , controler.getConfig());
-		Assert.assertEquals("Diferent number of links in network.", controler.getNetwork().getLinks().size() , 37591 );
-		Assert.assertEquals("Diferent number of nodes in network.", controler.getNetwork().getNodes().size() , 17055 );
+		Assert.assertEquals("Diferent number of links in network.", controler.getNetwork().getLinks().size() , 23 );
+		Assert.assertEquals("Diferent number of nodes in network.", controler.getNetwork().getNodes().size() , 15 );
 		Assert.assertNotNull("Transit schedule is null.", controler.getScenario().getTransitSchedule());
-		Assert.assertEquals("Num. of trLines is wrong.", controler.getScenario().getTransitSchedule().getTransitLines().size() , 329);
-		Assert.assertEquals("Num of facilities in schedule is wrong.", controler.getScenario().getTransitSchedule().getFacilities().size() , 8587);		
+		Assert.assertEquals("Num. of trLines is wrong.", controler.getScenario().getTransitSchedule().getTransitLines().size() , 1);
+		Assert.assertEquals("Num of facilities in schedule is wrong.", controler.getScenario().getTransitSchedule().getFacilities().size() , 5);		
 		Assert.assertNotNull("Population is null.", controler.getScenario().getPopulation());
-		Assert.assertEquals("Num. of persons in population is wrong.", controler.getPopulation().getPersons().size() , 2);
-		Assert.assertEquals("Scale factor is wrong.", controler.getScenario().getConfig().ptCounts().getCountsScaleFactor(), 10.0, MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Num. of persons in population is wrong.", controler.getPopulation().getPersons().size() , 4);
+		Assert.assertEquals("Scale factor is wrong.", controler.getScenario().getConfig().ptCounts().getCountsScaleFactor(), 1.0, MatsimTestUtils.EPSILON);
 		Assert.assertEquals("Distance filter is wrong.", controler.getScenario().getConfig().ptCounts().getDistanceFilter() , 30000.0, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("DistanceFilterCenterNode is wrong.", controler.getScenario().getConfig().ptCounts().getDistanceFilterCenterNode(), "801030.0");
+		Assert.assertEquals("DistanceFilterCenterNode is wrong.", controler.getScenario().getConfig().ptCounts().getDistanceFilterCenterNode(), "7");
 		//counts
-		Assert.assertEquals("Occupancy count file is wrong.", controler.getScenario().getConfig().ptCounts().getOccupancyCountsFileName(), "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/lines344_M44/counts/chen/counts_occupancy_M44.xml");
+		Assert.assertEquals("Occupancy count file is wrong.", controler.getScenario().getConfig().ptCounts().getOccupancyCountsFileName(), inputDir + "counts/counts_occupancy.xml");
 		Counts occupCounts = controler.getScenario().getScenarioElement(org.matsim.counts.Counts.class);
 		controler.getCounts();
-		Count count =  occupCounts.getCount(new IdImpl("792200.5"));
-		Assert.assertEquals("Occupancy counts description is wrong", occupCounts.getDescription(), "counts values from BVG 09.2009");
-		Assert.assertEquals("CsId is wrong.", count.getCsId() , "R S+U Hermannstr. - Hermannstr./Mariendorfer Weg");
-		Assert.assertEquals("Volume of hour 1 is wrong", count.getVolume(1).getValue(), 40.0 , MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Max count volume is wrong.", count.getMaxVolume().getValue(), 559.0 , MatsimTestUtils.EPSILON);
+		Count count =  occupCounts.getCount(new IdImpl("stop1"));
+		Assert.assertEquals("Occupancy counts description is wrong", occupCounts.getDescription(), "counts values for equil net");
+		Assert.assertEquals("CsId is wrong.", count.getCsId() , "stop1");
+		Assert.assertEquals("Volume of hour 4 is wrong", count.getVolume(7).getValue(), 4.0 , MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Max count volume is wrong.", count.getMaxVolume().getValue(), 4.0 , MatsimTestUtils.EPSILON);
 		
 		//test that NewPtBsePlanStrategy is present as replanning strategy
 		List <PlanStrategy> strategyList = controler.getStrategyManager().getStrategies(); 
@@ -110,10 +108,11 @@ public class CadytsIntegrationTest extends MatsimTestCase {
 		
 		//  results  
 		// Test first that the calibrationStatReader works properly 
+		TabularFileParser tabularFileParser = new TabularFileParser();
 		String calibStatFile = inputDir + "input_calibration-stats.txt";
 		CalibrationStatReader calibrationStatReader = new CalibrationStatReader();
 		try {
-			new TabularFileParser().parse(calibStatFile, calibrationStatReader);
+			tabularFileParser.parse(calibStatFile, calibrationStatReader);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -131,19 +130,59 @@ public class CadytsIntegrationTest extends MatsimTestCase {
 		Assert.assertEquals("diferrent Plan_lambda_stddev", statData6.getPlan_lambda_stddev() , "11.356042894952115" );
 		Assert.assertEquals("diferrent Total_ll", statData6.getTotal_ll() , "-8520.428031642501" );
 		
-		//test calibration-stats.txt from calibration
-		String testCalibStatPath = config.controler().getOutputDirectory() + "calibration-stats.txt";
+		//now test calibration-stats.txt from calibration
+		String testCalibStatPath = outputDir + "calibration-stats.txt";
 		calibrationStatReader = new CalibrationStatReader();
-		try {  
-			new TabularFileParser().parse(testCalibStatPath, calibrationStatReader);
+		try {
+			tabularFileParser.parse(testCalibStatPath, calibrationStatReader);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		CalibrationStatReader.StatisticsData outStatData= calibrationStatReader.getCalStatMap().get(Integer.valueOf(6));
+		Assert.assertEquals("diferrent Count_ll", outStatData.getCount_ll() , "-1.546875" );
+		Assert.assertEquals("diferrent Count_ll_pred_err", outStatData.getCount_ll_pred_err() , "9.917082938182276E-8" );
+		Assert.assertEquals("diferrent Link_lambda_avg", outStatData.getLink_lambda_avg() , "0.0013507168476099964" );
+		Assert.assertEquals("diferrent Link_lambda_max", outStatData.getLink_lambda_max() , "0.031434867572002166" );
+		Assert.assertEquals("diferrent Link_lambda_min", outStatData.getLink_lambda_min() , "0.0" );
+		Assert.assertEquals("diferrent Link_lambda_stddev", outStatData.getLink_lambda_stddev() , "0.0058320747961925256" );
+		Assert.assertEquals("diferrent P2p_ll", outStatData.getP2p_ll() , "--" );
+		Assert.assertEquals("diferrent Plan_lambda_avg", outStatData.getPlan_lambda_avg() , "0.04322293912351989" );
+		Assert.assertEquals("diferrent Plan_lambda_max", outStatData.getPlan_lambda_max() , "0.04715229919344063" );
+		Assert.assertEquals("diferrent Plan_lambda_min", outStatData.getPlan_lambda_min() , "0.03929357905359915" );
+		Assert.assertEquals("diferrent Plan_lambda_stddev", outStatData.getPlan_lambda_stddev() , "0.004200662608832472" );
+		Assert.assertEquals("diferrent Total_ll", outStatData.getTotal_ll() , "-1.546875" );
 		
 		//test resulting simulation volumes
-		//TODO first check that calibration is deterministic!!
+		String outCounts = outputDir + "ITERS/it.10/10.simCountCompareOccupancy.txt";
+		CountsReader reader = new CountsReader(outCounts);
+		double[] simValues;
+		double[] realValues;
+		Id stopId;
+		
+		stopId= new IdImpl("stop1");
+		simValues = reader.getRoutValues(stopId, true);
+		realValues= reader.getRoutValues(stopId, false);
+		Assert.assertEquals("Volume of hour 6 is wrong", simValues[6], 4.0 , MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Volume of hour 6 is wrong", realValues[6], 4.0 , MatsimTestUtils.EPSILON);
 
-		//creacion del error graph
+		stopId= new IdImpl("stop2");
+		simValues = reader.getRoutValues(stopId, true);
+		realValues= reader.getRoutValues(stopId, false);
+		Assert.assertEquals("Volume of hour 6 is wrong", simValues[6], 1.0 , MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Volume of hour 6 is wrong", realValues[6], 1.0 , MatsimTestUtils.EPSILON);
+
+		stopId= new IdImpl("stop6");
+		simValues = reader.getRoutValues(stopId, true);
+		realValues= reader.getRoutValues(stopId, false);
+		Assert.assertEquals("Volume of hour 6 is wrong", simValues[6], 2.0 , MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Volume of hour 6 is wrong", realValues[6], 2.0 , MatsimTestUtils.EPSILON);
+
+		stopId= new IdImpl("stop10");
+		simValues = reader.getRoutValues(stopId, true);
+		realValues= reader.getRoutValues(stopId, false);
+		Assert.assertEquals("Volume of hour 6 is wrong", simValues[6], 1.0 , MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Volume of hour 6 is wrong", realValues[6], 1.0 , MatsimTestUtils.EPSILON);
+	
 	}
 
 		

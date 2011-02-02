@@ -55,6 +55,7 @@ public class AdaptedLauncher {
 		
 		// load config values
 		Config cfg = this.scenario.getConfig();
+		myTransitRouterConfig = new MyTransitRouterConfig(); 
 		myTransitRouterConfig.searchRadius = Double.parseDouble(cfg.getParam("ptRouter", "searchRadius")); 
 		myTransitRouterConfig.extensionRadius = Double.parseDouble(cfg.getParam("ptRouter", "extensionRadius")); 
 		myTransitRouterConfig.beelineWalkConnectionDistance = Double.parseDouble(cfg.getParam("ptRouter", "beelineWalkConnectionDistance")); 

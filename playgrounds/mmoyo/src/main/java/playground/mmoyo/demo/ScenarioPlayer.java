@@ -33,8 +33,7 @@ import playground.mmoyo.utils.DataLoader;
 public class ScenarioPlayer {
 
 	public static void play(final ScenarioImpl scenario) {
-		scenario.getConfig().simulation().setSnapshotStyle("queue");
-		
+	
 		final EventsManager events = (new EventsManagerFactoryImpl()).createEventsManager() ;
 		EventWriterXML writer = new EventWriterXML(scenario.getConfig().controler().getOutputDirectory() + "/testEvents.xml");
 		EventWriterTXT writertxt = new EventWriterTXT(scenario.getConfig().controler().getOutputDirectory() + "/testEvents.txt");
@@ -52,9 +51,13 @@ public class ScenarioPlayer {
 	}
 
 	public static void main(final String[] args) {
-		String configFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/calibration/100plans_bestValues_config.xml";//args[0];
-		ScenarioImpl scenario = new DataLoader().loadScenarioWithTrSchedule(configFile);
-		
+		String configFile = null;
+		if (args.length==0){
+			configFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/calibration/100plans_bestValues_config.xml"; 
+		}else{
+			configFile = args[0];
+		}
+		ScenarioImpl scenario = new DataLoader().loadScenario(configFile);
 		play(scenario);
 	}
 
