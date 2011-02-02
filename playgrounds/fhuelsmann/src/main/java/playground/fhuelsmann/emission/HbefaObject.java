@@ -27,7 +27,7 @@ VehCat;Road_Category;IDTS;TS;S (speed);RPA;%stop;mKr;EF_Nox;EF_CO2(rep.);EF_CO2(
 **/
 public class HbefaObject {
 
-	private int Road_Category ;
+	private static int Road_Category ;
 	private String IDTS;
 	private double velocity;
 	private double RPA;

@@ -33,7 +33,7 @@ public class Main {
 
 	
 		String eventsFile = "../../detailedEval/teststrecke/sim/output/20090319/ITERS/it.0/0.events.txt.gz";
-		String netfile ="../../detailedEval/teststrecke/sim/input/network.xml";
+		String netfile ="../../detailedEval/Net/network.xml";
 //		String visumRoadFile = "../../detailedEval/teststrecke/sim/inputEmissions/visumnetzlink.txt";
 		String visumRoadHebefaRoadFile = "../../detailedEval/teststrecke/sim/inputEmissions/road_types.txt";
 		String Hbefa_Traffic = "../../detailedEval/teststrecke/sim/inputEmissions/hbefa_emission_factors_EU3_D.txt";
@@ -49,32 +49,36 @@ public class Main {
 		new MatsimNetworkReader(scenario).readFile(netfile);
 		
 		//create the handler 
-		DataStructureOfSingleEventAttributes handler = new DataStructureOfSingleEventAttributes(network);
-		
+		HbefaTable hbefaTable = new HbefaTable();
+		hbefaTable.makeHabefaTable(Hbefa_Traffic);
+		System.out.println(hbefaTable.getHbefaTableWithSpeedAndEmissionFactor()[15][0].getVelocity());
+		TravelTimeEventHandler handler = new TravelTimeEventHandler(network,hbefaTable.getHbefaTableWithSpeedAndEmissionFactor());
+		LinkAccountAnalyseModul l = handler.getLinkAccountAnalyseModul();
 		//	TravelTimeCalculation handler = new TravelTimeCalculation();
 	
 		
 		//add the handler
 		events.addHandler(handler);
 		
-		hbefaColdTable hbefaColdTable = new hbefaColdTable();
-		hbefaColdTable.makeHbefaColdTable(Hbefa_Cold_Traffic);
-		hbefaColdTable.printHbefaCold();
+	//	hbefaColdTable hbefaColdTable = new hbefaColdTable();
+		//hbefaColdTable.makeHbefaColdTable(Hbefa_Cold_Traffic);
+		//hbefaColdTable.printHbefaCold();
 		
 		
 		//create the reader and read the file
 		MatsimEventsReader matsimEventReader = new MatsimEventsReader(events);
 		
 		matsimEventReader.readFile(eventsFile);
-			
+		l.printTotalEmissionsPerLink();
+	
 		//for cold start emissions 
 		//handler.printTable();
 		//handler.printTable2();
-		ColdEmissionFactor em = 
-			new ColdEmissionFactor(handler.coldDistance,handler.parkingTime,hbefaColdTable.getHbefaColdTable());
+	//	ColdEmissionFactor em = 
+		//	new ColdEmissionFactor(handler.coldDistance,handler.parkingTime,hbefaColdTable.getHbefaColdTable());
 		
-		em.MapForColdEmissionFactor();
-		em.printColdEmissionFactor();
+	//	em.MapForColdEmissionFactor();
+		///em.printColdEmissionFactor();
 		
 	/*
 		
