@@ -32,7 +32,6 @@ import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemData;
 import org.matsim.signalsystems.model.AmberLogic;
 import org.matsim.signalsystems.model.AmberLogicImpl;
 import org.matsim.signalsystems.model.DatabasedSignal;
-import org.matsim.signalsystems.model.DatabasedSignalPlan;
 import org.matsim.signalsystems.model.Signal;
 import org.matsim.signalsystems.model.SignalController;
 import org.matsim.signalsystems.model.SignalGroup;
@@ -99,7 +98,7 @@ public class FromDataBuilder implements SignalSystemsModelBuilder{
 		controller.setSignalSystem(system);
 		system.setSignalSystemController(controller);
 		for (SignalPlanData planData : systemControlData.getSignalPlanData().values()){
-			SignalPlan plan = new DatabasedSignalPlan(planData);
+			SignalPlan plan = this.factory.createSignalPlan(planData);
 			controller.addPlan(plan);
 		}
 	}

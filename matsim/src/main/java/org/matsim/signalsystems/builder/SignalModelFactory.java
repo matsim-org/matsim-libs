@@ -20,8 +20,10 @@
 package org.matsim.signalsystems.builder;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.signalsystems.model.SignalSystem;
+import org.matsim.signalsystems.data.signalcontrol.v20.SignalPlanData;
 import org.matsim.signalsystems.model.SignalController;
+import org.matsim.signalsystems.model.SignalPlan;
+import org.matsim.signalsystems.model.SignalSystem;
 import org.matsim.signalsystems.model.SignalSystemsManager;
 
 
@@ -36,5 +38,7 @@ public interface SignalModelFactory {
 	public SignalSystem createSignalSystem(Id id);
 	
 	public SignalController createSignalSystemController(String controllerIdentifier);
+
+	public SignalPlan createSignalPlan(SignalPlanData planData);
 	
 }

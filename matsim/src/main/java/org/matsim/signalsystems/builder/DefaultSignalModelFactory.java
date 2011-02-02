@@ -21,8 +21,11 @@ package org.matsim.signalsystems.builder;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.signalsystems.data.signalcontrol.v20.SignalPlanData;
+import org.matsim.signalsystems.model.DatabasedSignalPlan;
 import org.matsim.signalsystems.model.DefaultPlanbasedSignalSystemController;
 import org.matsim.signalsystems.model.SignalController;
+import org.matsim.signalsystems.model.SignalPlan;
 import org.matsim.signalsystems.model.SignalSystem;
 import org.matsim.signalsystems.model.SignalSystemImpl;
 import org.matsim.signalsystems.model.SignalSystemsManager;
@@ -56,4 +59,11 @@ public class DefaultSignalModelFactory implements SignalModelFactory {
 		//TODO improve error message and consider creation by class name
 		throw new IllegalArgumentException("Controller " + controllerIdentifier + " not known.");
 	}
+
+	@Override
+	public SignalPlan createSignalPlan(SignalPlanData planData) {
+		return new DatabasedSignalPlan(planData);
+	}
+	
+	
 }
