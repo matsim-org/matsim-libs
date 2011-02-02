@@ -22,7 +22,9 @@ package playground.dgrether.signalsystems.roedergershenson;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.signalsystems.builder.SignalModelFactory;
+import org.matsim.signalsystems.data.signalcontrol.v20.SignalPlanData;
 import org.matsim.signalsystems.model.SignalController;
+import org.matsim.signalsystems.model.SignalPlan;
 import org.matsim.signalsystems.model.SignalSystem;
 import org.matsim.signalsystems.model.SignalSystemsManager;
 
@@ -58,6 +60,11 @@ public class DgGershensonRoederSignalModelFactory implements SignalModelFactory 
 	@Override
 	public SignalSystemsManager createSignalSystemsManager() {
 		return this.delegate.createSignalSystemsManager();
+	}
+
+	@Override
+	public SignalPlan createSignalPlan(SignalPlanData planData) {
+		return this.delegate.createSignalPlan(planData);
 	}
 
 }
