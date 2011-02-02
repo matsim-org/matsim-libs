@@ -306,7 +306,7 @@ public class DgOsmBBJunctionDetectionTools {
 		String baseInDirOsm = DgOsmBBPaths.BASE_IN_DIR;
 		String baseInDirTest = DgOsmBBPaths.BASE_OUT_DIR;
 		
-		boolean test = false;
+		boolean test = true;
 		
 		String baseInDir;
 		if (test){
