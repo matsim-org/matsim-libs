@@ -38,7 +38,6 @@ import org.matsim.lanes.LaneDefinitions;
 import org.matsim.lanes.LaneDefinitionsImpl;
 import org.matsim.lanes.LanesToLinkAssignment;
 import org.matsim.lanes.MatsimLaneDefinitionsReader;
-import org.matsim.lanes.MatsimLaneDefinitionsWriter;
 
 import playground.dgrether.consistency.ConsistencyChecker;
 
@@ -135,7 +134,7 @@ public class LanesConsistencyChecker implements ConsistencyChecker{
 				log.info("    has outlink: " + outLink.getId());
 				if (!linkLanes2LinkIds.contains(outLink.getId())){
 					malformedLinkIds.add(l2l.getLinkId());
-					log.error("The lanes of link " + link.getId() + " do not lead to all of the outlinks of the links toNode. The outlink " + outLink.getId()
+					log.error("The lanes of link " + link.getId() + " do not lead to all of the outlinks of the links toNode " + link.getToNode().getId() + " . The outlink " + outLink.getId()
 					+ " is not reachable from the lanes of this link. ");
 					log.error("");
 					for (Lane lane : l2l.getLanes().values()){
@@ -178,8 +177,8 @@ public class LanesConsistencyChecker implements ConsistencyChecker{
 	public static void main(String[] args) {
 //		String netFile = DgPaths.IVTCHBASE + "baseCase/network/ivtch-osm.xml";
 //		String lanesFile = DgPaths.STUDIESDG + "signalSystemsZh/laneDefinitions.xml";
-		String netFile = "/media/data/work/repos/shared-svn/studies/dgrether/cottbus/Cottbus-BA/scenario-lsa/network.xml";
-		String lanesFile = "/media/data/work/repos/shared-svn/studies/dgrether/cottbus/Cottbus-BA/scenario-lsa/lanes_cottbus_v20_jbol_c.xml";
+		String netFile = "/media/data/work/repos/shared-svn/studies/dgrether/cottbus/Cottbus-BA/network_wo_junctions.xml";
+		String lanesFile = "/media/data/work/repos/shared-svn/studies/dgrether/cottbus/Cottbus-BA/lanes_cottbus_v20_jbol_c_wo_junctions.xml";
 
 		ScenarioImpl scenario = new ScenarioImpl();
 		NetworkImpl net = scenario.getNetwork();
@@ -195,7 +194,7 @@ public class LanesConsistencyChecker implements ConsistencyChecker{
 		lcc.setRemoveMalformed(false);
 		lcc.checkConsistency();
 		
-		MatsimLaneDefinitionsWriter laneWriter = new MatsimLaneDefinitionsWriter(laneDefs);
-		laneWriter.writeFile(lanesFile + ".new.xml");
+//		MatsimLaneDefinitionsWriter laneWriter = new MatsimLaneDefinitionsWriter(laneDefs);
+//		laneWriter.writeFile(lanesFile + ".new.xml");
 	}
 }
