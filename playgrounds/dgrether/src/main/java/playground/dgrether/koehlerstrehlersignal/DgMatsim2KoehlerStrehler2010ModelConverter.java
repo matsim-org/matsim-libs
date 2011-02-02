@@ -64,7 +64,7 @@ import playground.dgrether.koehlerstrehlersignal.data.DgGreen;
 import playground.dgrether.koehlerstrehlersignal.data.DgNetwork;
 import playground.dgrether.koehlerstrehlersignal.data.DgProgram;
 import playground.dgrether.koehlerstrehlersignal.data.DgStreet;
-import playground.dgrether.signalsystems.DgSignalsUtils;
+import playground.dgrether.signalsystems.utils.DgSignalsUtils;
 
 
 /**

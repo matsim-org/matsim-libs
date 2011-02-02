@@ -67,7 +67,7 @@ public class DgKoehlerStrehler2010ScenarioGenerator {
 	
 	private static final Logger log = Logger.getLogger(DgKoehlerStrehler2010ScenarioGenerator.class);
 	
-	private String baseDir = DgPaths.STUDIESDG + "koehlerStrehler2010/scenario4/";
+	private String baseDir = DgPaths.STUDIESDG + "koehlerStrehler2010/scenario5/";
 	
 	private String networkOutfile = baseDir +  "network.xml";
 
@@ -79,10 +79,10 @@ public class DgKoehlerStrehler2010ScenarioGenerator {
 	private Id id12, id21, id23, id32, id34, id43, id45, id54, id56, id65, id27, id72, id78, id87, id85, id58;
 	
 	private int onset1 = 0;
-	private int dropping1 = 27;
-	private int onset2 = 30;
-	private int dropping2 = 57;
-	private int cycle = 60;
+	private int dropping1 = 55;
+	private int onset2 = 60;
+	private int dropping2 = 115;
+	private int cycle = 120;
 	
 	public ScenarioImpl loadScenario(){
 		ScenarioLoader scl = new ScenarioLoaderImpl(baseDir + "config_signals.xml");

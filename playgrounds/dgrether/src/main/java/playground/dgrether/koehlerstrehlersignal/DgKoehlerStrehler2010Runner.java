@@ -58,7 +58,7 @@ public class DgKoehlerStrehler2010Runner {
 
 	public static final String signalsConfigSol800 = DgPaths.STUDIESDG + "koehlerStrehler2010/config_signals_signal_control_solution_figure9_from_matsim_population_800.xml";
 
-	private String configFile = DgPaths.STUDIESDG + "koehlerStrehler2010/scenario4/config_signals_coordinated.xml";
+	private String configFile = DgPaths.STUDIESDG + "koehlerStrehler2010/scenario5/config_signals_coordinated.xml";
 
 	private TTInOutflowEventHandler handler23, handler27, handler54, handler58;
 
