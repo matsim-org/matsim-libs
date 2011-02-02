@@ -35,13 +35,13 @@ public class DgCottbusNet2Shape {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String netFile = "/media/data/work/repos/shared-svn/studies/dgrether/cottbus/Cottbus-BA/scenario-lsa/network.xml";
+		String netFile = "/media/data/work/repos/shared-svn/studies/dgrether/cottbus/Cottbus-BA/network_wo_junctions.xml";
 		ScenarioImpl scenario = new ScenarioImpl();
 		NetworkImpl net = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFile);
 
 		
-		new Links2ESRIShape(net, "/media/data/work/repos/shared-svn/studies/dgrether/cottbus/Cottbus-BA/scenario-lsa/network.shp", "WGS84").write();
+		new Links2ESRIShape(net, "/media/data/work/repos/shared-svn/studies/dgrether/cottbus/Cottbus-BA/network_wo_junctions.shp", "WGS84").write();
 		
 		
 	}
