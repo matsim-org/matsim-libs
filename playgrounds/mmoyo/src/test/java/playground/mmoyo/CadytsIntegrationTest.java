@@ -47,14 +47,14 @@ public class CadytsIntegrationTest extends MatsimTestCase {
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 	@Test
 	public final void testCalibration() {
-		System.out.println("this.getInputDirectory() "      + this.getInputDirectory() );
-		System.out.println("this.getClassInputDirectory() " + this.getClassInputDirectory());
-		System.out.println("this.getOutputDirectory() " + this.getOutputDirectory());
 		
-		//String inputDir = this.getInputDirectory();
-		//String outputDir = this.getOutputDirectory();
-		String inputDir = "../playgrounds/mmoyo/test/input/playground/mmoyo/CadytsIntegrationTest/testCalibration/";
-		String outputDir = "../playgrounds/mmoyo/test/output/playground/mmoyo/CadytsIntegrationTest/testCalibration/";
+		String inputDir = this.getInputDirectory();
+		String outputDir = this.getOutputDirectory();
+		//String inputDir = "../playgrounds/mmoyo/test/input/playground/mmoyo/CadytsIntegrationTest/testCalibration/";
+		//String outputDir = "../playgrounds/mmoyo/test/output/playground/mmoyo/CadytsIntegrationTest/testCalibration/";
+		
+		System.out.println(" Input Dir " + this.getInputDirectory() );
+		System.out.println(" Output Dir " + this.getInputDirectory() );
 		
 		String configFile = inputDir + "equil_config.xml";
 		Config config = null;
