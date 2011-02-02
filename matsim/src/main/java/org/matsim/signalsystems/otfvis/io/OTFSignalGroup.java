@@ -19,8 +19,8 @@
  * *********************************************************************** */
 package org.matsim.signalsystems.otfvis.io;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.matsim.signalsystems.model.SignalGroupState;
 
@@ -32,26 +32,34 @@ import org.matsim.signalsystems.model.SignalGroupState;
 public class OTFSignalGroup {
 
 	private String id;
-	private List<OTFSignal> signalPositions = new ArrayList<OTFSignal>();
+	private Map<String, OTFSignal> signalPositions = new HashMap<String, OTFSignal>();
+	private String systemId;
 	
-	OTFSignalGroup(String id){
+	public OTFSignalGroup(String signalSystemId, String id){
+		this.systemId = signalSystemId;
 		this.id = id;
 	}
 	
-	String getId() {
+	public String getId() {
 		return this.id;
+	}
+	
+	public String getSignalSystemId(){
+		return this.systemId;
 	}
 
 	public void setState(SignalGroupState state) {
-		for (OTFSignal p : this.signalPositions){
+		for (OTFSignal p : this.signalPositions.values()){
 			p.setState(state);
 		}
 	}
 
 	public void addSignal(OTFSignal pos) {
-		this.signalPositions.add(pos);
+		this.signalPositions.put(pos.getId(), pos);
 	}
 
-	
+	public Map<String, OTFSignal> getSignals() {
+		return this.signalPositions;
+	}
 	
 }

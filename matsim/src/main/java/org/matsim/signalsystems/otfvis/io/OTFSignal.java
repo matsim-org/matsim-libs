@@ -35,11 +35,21 @@ public class OTFSignal {
 	private String id;
 	private SignalGroupState state;
 	private List<OTFLinkWLanes> turningMoveRestrictions = null;
+	private String systemId;
 	
-	public OTFSignal(String signalId) {
+	public OTFSignal(String systemId, String signalId) {
+		this.systemId = systemId;
 		this.id = signalId;
 	}
 
+	public String getId(){
+		return this.id;
+	}
+
+	public String getSignalSystemId(){
+		return this.systemId;
+	}
+	
 	public void setState(SignalGroupState state){
 		this.state = state;
 	}

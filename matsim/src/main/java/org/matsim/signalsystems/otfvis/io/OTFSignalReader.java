@@ -54,14 +54,14 @@ public class OTFSignalReader extends OTFLaneReader {
 			int noGroups = in.getInt();
 			for (int j = 0; j < noGroups; j++){
 				String groupId = ByteBufferUtils.getString(in);
-				OTFSignalGroup otfgroup = new OTFSignalGroup(groupId);
+				OTFSignalGroup otfgroup = new OTFSignalGroup(systemId, groupId);
 				otfsystem.addOTFSignalGroup(otfgroup);
 				int noSignals = in.getInt();
 				for (int k = 0; k < noSignals; k++){
 					String signalId = ByteBufferUtils.getString(in);
 					String linkId = ByteBufferUtils.getString(in);
 					OTFLinkWLanes link = this.drawer.getLanesLinkData().get(linkId);
-					OTFSignal signal = new OTFSignal(signalId);
+					OTFSignal signal = new OTFSignal(systemId, signalId);
 					otfgroup.addSignal(signal);
 					int noLanes = in.getInt();
 					if (noLanes == 0){
