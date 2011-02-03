@@ -470,7 +470,7 @@ public class QuadTree<T> implements Serializable {
 	    /**
 	     * Adds a <code>Rect</code> to this <code>Rect</code>.
 	     * The resulting <code>Rect</code> is the union of the two
-	     * rectangles.
+	     * rectangles (i.e. the minimum rectangle that contains the two original rectangles)
 	     * @param  r the specified <code>Rect</code>
 	     */
 	    public Rect union(final Rect r) {
@@ -480,6 +480,9 @@ public class QuadTree<T> implements Serializable {
 					Math.max(this.maxY, r.maxY));
 		    }
 
+	    /**
+	     * Increases the size of the rectangle by scaleX and scaleY.
+	     */
 	    public Rect scale(double scaleX, double scaleY) {
 	    	scaleY *= this.centerY - this.minY;
 	    	scaleX *= this.centerX - this.minX;
