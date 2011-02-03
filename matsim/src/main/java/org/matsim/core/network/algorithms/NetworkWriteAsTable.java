@@ -87,7 +87,7 @@ public class NetworkWriteAsTable implements NetworkRunnable {
 		System.out.println("      capperiod = " + capperiod);
 
 		try {
-			BufferedWriter out_n = IOUtils.getBufferedWriter(this.outdir + "/nodes.txt");
+			BufferedWriter out_n = IOUtils.getBufferedWriter(this.outdir + "/nodes.txt.gz");
 			out_n.write("ID\tX\tY\n");
 			out_n.flush();
 			for (Node n : network.getNodes().values()) {
@@ -97,10 +97,10 @@ public class NetworkWriteAsTable implements NetworkRunnable {
 			out_n.flush();
 			out_n.close();
 
-			BufferedWriter out_l = IOUtils.getBufferedWriter(this.outdir + "/links.txt");
+			BufferedWriter out_l = IOUtils.getBufferedWriter(this.outdir + "/links.txt.gz");
 			out_l.write("ID\tX1\tY1\tX2\tY2\tLENGHT\tFREESPEED\tCAPACITY\tPERMLANES\tMODES\n");
 			out_l.flush();
-			BufferedWriter out_et = IOUtils.getBufferedWriter(this.outdir + "/linksET.txt");
+			BufferedWriter out_et = IOUtils.getBufferedWriter(this.outdir + "/linksET.txt.gz");
 			out_et.write("ID\tFROMID\tTOID\tLENGTH\tSPEED\tCAP\tLANES\tORIGID\tTYPE\tMODES\n");
 			out_et.flush();
 			for (Link l : network.getLinks().values()) {
