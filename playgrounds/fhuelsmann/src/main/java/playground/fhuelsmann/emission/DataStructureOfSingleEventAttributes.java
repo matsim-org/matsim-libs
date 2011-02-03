@@ -92,14 +92,14 @@ AgentArrivalEventHandler,AgentDepartureEventHandler,ActivityEndEventHandler,Acti
 
 	public void handleEvent(LinkEnterEvent event) {
 		String id = event.getPersonId().toString();
-//		Id onelink = event.getLinkId();
-	//	if (onelink.equals(new IdImpl("590000822"))){
+		Id onelink = event.getLinkId();
+		if (onelink.equals(new IdImpl("590000822"))){
 //			System.out.println(onelink);
 			if(id.contains("testVehicle")){
 				this.linkenter.put(event.getPersonId(), event.getTime());
 			}
 		}
-//	}
+	}
 
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
@@ -141,8 +141,8 @@ AgentArrivalEventHandler,AgentDepartureEventHandler,ActivityEndEventHandler,Acti
 	@Override
 	public void handleEvent(ActivityStartEvent event) {
 		String id = event.getPersonId().toString();
-//		Id onelink = event.getLinkId();
-//		if (onelink == new IdImpl("590000822")){
+		Id onelink = event.getLinkId();
+		if (onelink == new IdImpl("590000822")){
 		if(id.contains("testVehicle")){
 		this.activitystart.put(event.getPersonId(), event.getTime());
 		Id personId= event.getPersonId();
@@ -198,7 +198,7 @@ AgentArrivalEventHandler,AgentDepartureEventHandler,ActivityEndEventHandler,Acti
 				parkingTime.put(personId, tempMap);}
 		}
 		}
-//	}
+	}
 
 	public void handleEvent(AgentArrivalEvent event) {
 		String id = event.getPersonId().toString();
@@ -224,8 +224,8 @@ AgentArrivalEventHandler,AgentDepartureEventHandler,ActivityEndEventHandler,Acti
 
 	public void handleEvent(LinkLeaveEvent event) {	
 		String id = event.getPersonId().toString();
-//		Id onelink = event.getLinkId();
-//		if (onelink.equals(new IdImpl("590000822"))){
+		Id onelink = event.getLinkId();
+		if (onelink.equals(new IdImpl("590000822"))){
 				if(id.contains("testVehicle")){
 				Id personId= event.getPersonId();
 				Id linkId = event.getLinkId();
@@ -357,7 +357,7 @@ AgentArrivalEventHandler,AgentDepartureEventHandler,ActivityEndEventHandler,Acti
 			}
 		}
 		}}
-//	}
+	}
 
 	public Map<Id, Map<Integer, DistanceObject>> getCold() {
 		return coldDistance;

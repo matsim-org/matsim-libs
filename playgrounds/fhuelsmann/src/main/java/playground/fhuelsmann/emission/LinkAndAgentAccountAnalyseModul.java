@@ -14,7 +14,7 @@ import java.util.Map.Entry;
 import org.matsim.api.core.v01.Id;
 
 
-public class LinkAccountAnalyseModul implements analyseModul{
+public class LinkAndAgentAccountAnalyseModul implements analyseModul{
 	
 	public  String findHbefaFromVisumRoadType(int roadType){
 
@@ -26,7 +26,8 @@ public class LinkAccountAnalyseModul implements analyseModul{
 	
 	EmissionsPerEvent emissionFactor = new EmissionsPerEvent();
 
-	private Map<Id, double[]> emissions = new TreeMap<Id,double[]>();
+	private Map<Id, double[]> emissionsLink = new TreeMap<Id,double[]>();
+	private Map<Id, double[]> emissionsPerson = new TreeMap<Id,double[]>();
 
 
 @Override
@@ -41,15 +42,15 @@ public class LinkAccountAnalyseModul implements analyseModul{
 				
 		//falls kein LinkId in der Map vorhanden ist
 		
-		if(this.emissions.get(linkId) == null) {
-			this.emissions.put(linkId, inputForEmissions);// in dem Fall muss nichts aufaddiert werden, weil es zum ersten mal Daten eingelesen werden
+		if(this.emissionsLink.get(linkId) == null) {
+			this.emissionsLink.put(linkId, inputForEmissions);// in dem Fall muss nichts aufaddiert werden, weil es zum ersten mal Daten eingelesen werden
 //			System.out.println(this.emissions);
 
 		}
 		else{
 		
 			double [] actualEmissions = new double[13]; // es werden hier die neuen  Daten (nach der Aufsummierung) gespeichert
-			double [] previousEmissions = this.emissions.get(linkId); // oldValue ist die bisherige Summe
+			double [] previousEmissions = this.emissionsLink.get(linkId); // oldValue ist die bisherige Summe
 		
 			for(int i=0; i<12 ; i++){
 			
@@ -59,7 +60,7 @@ public class LinkAccountAnalyseModul implements analyseModul{
 		
 		// put newValue in the Map
 		
-		emissions.put(linkId, actualEmissions);
+		emissionsLink.put(linkId, actualEmissions);
 //		System.out.println(this.emissions);
 		
 		
@@ -67,8 +68,46 @@ public class LinkAccountAnalyseModul implements analyseModul{
 	
 }
 
-// road_Types erstellen
-public void createRoadTypes(String filename){
+@Override
+	public void calculateEmissionsPerPerson(double travelTime, Id personId, double averageSpeed, int roadType, int freeVelocity, double distance, HbefaObject[][] hbefaTable) {
+
+	//linkage between Hbefa road types and Visum road types
+	createRoadTypes("../../detailedEval/teststrecke/sim/inputEmissions/road_types.txt");
+	int Hbefa_road_type = Integer.valueOf(findHbefaFromVisumRoadType(roadType));
+
+	//get emissions calculated per event differentiated by fraction and average speed approach
+	double [] inputForEmissions = emissionFactor.collectInputForEmission(Hbefa_road_type, averageSpeed, distance,hbefaTable);
+			
+	//falls kein LinkId in der Map vorhanden ist
+	
+	if(this.emissionsPerson.get(personId) == null) {
+		this.emissionsPerson.put(personId, inputForEmissions);// in dem Fall muss nichts aufaddiert werden, weil es zum ersten mal Daten eingelesen werden
+//		System.out.println(this.emissions);
+
+	}
+	else{
+	
+		double [] actualEmissions = new double[13]; // es werden hier die neuen  Daten (nach der Aufsummierung) gespeichert
+		double [] previousEmissions = this.emissionsPerson.get(personId); // oldValue ist die bisherige Summe
+	
+		for(int i=0; i<12 ; i++){
+		
+		actualEmissions[i]= previousEmissions[i] + inputForEmissions[i];
+		System.out.println("\n PersonId "+ personId);
+	}
+	
+	// put newValue in the Map
+	
+		emissionsPerson.put(personId, actualEmissions);
+//	System.out.println(this.emissions);
+	
+	
+}
+
+}
+
+	// road_Types erstellen
+	public void createRoadTypes(String filename){
 
 		try{
 
@@ -100,7 +139,7 @@ public void printTotalEmissionsPerLink(){
 	try{ 
 		String result ="";
 	
-		for(Entry<Id, double[]> LinkIdEntry : this.emissions.entrySet())	{
+		for(Entry<Id, double[]> LinkIdEntry : this.emissionsLink.entrySet())	{
 				for(int i=0 ; i<12 ; i++)
 				result+= LinkIdEntry.getKey()+ ";" +i+ ";" + LinkIdEntry.getValue()[i] + "\n";
 				
@@ -130,7 +169,47 @@ public void printTotalEmissionsPerLink(){
 							out.close();
 								}catch (Exception e){//Catch exception if any
 								System.err.println("Error: " + e.getMessage());
-}}}
+}}
+
+public void printTotalEmissionsPerAgent(){
+	
+	try{ 
+		String result ="";
+	
+		for(Entry<Id, double[]> PersonIdEntry : this.emissionsPerson.entrySet())	{
+				for(int i=0 ; i<12 ; i++)
+				result+= PersonIdEntry.getKey()+ ";" +i+ ";" + PersonIdEntry.getValue()[i] + "\n";
+				
+				/*					mKrBasedOnAverageSpeed [0]
+									noxEmissionsBasedOnAverageSpeed [1]
+									co2repEmissionsBasedOnAverageSpeed [2]
+									co2EmissionsBasedOnAverageSpeed [3]
+									no2EmissionsBasedOnAverageSpeed[4]
+									pmEmissionsBasedOnAverageSpeed[5]
+
+									mKrBasedOnFractions[6]
+									noxEmissionsBasedOnFractions[7]
+									co2repEmissionsBasedOnFractions[8]
+									co2EmissionsBasedOnFractions[9]
+									no2EmissionsBasedOnFractions[10]
+									pmEmissionsBasedOnFractions[11] */
+				
+				}
+
+					// Create file 
+					FileWriter fstream = 
+							new FileWriter("../../detailedEval/teststrecke/sim/outputEmissions/emissionsPerAgent.txt");			
+									BufferedWriter out = new BufferedWriter(fstream);
+							out.write("PersonId \t Luftschadstoff \t Emissionen \n"   
+										+ result);
+							//Close the output stream
+							out.close();
+								}catch (Exception e){//Catch exception if any
+								System.err.println("Error: " + e.getMessage());
+					}
+								
+		}
+}
 
 
 		

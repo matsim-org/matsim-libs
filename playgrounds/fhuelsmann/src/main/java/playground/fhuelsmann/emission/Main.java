@@ -33,7 +33,8 @@ public class Main {
 
 	
 		String eventsFile = "../../detailedEval/teststrecke/sim/output/20090319/ITERS/it.0/0.events.txt.gz";
-		String netfile ="../../detailedEval/Net/network.xml";
+//		String netfile ="../../detailedEval/Net/network.xml";
+		String netfile ="../../detailedEval/teststrecke/sim/input/network.xml";
 //		String visumRoadFile = "../../detailedEval/teststrecke/sim/inputEmissions/visumnetzlink.txt";
 //		String visumRoadHebefaRoadFile = "../../detailedEval/teststrecke/sim/inputEmissions/road_types.txt";
 		String Hbefa_Traffic = "../../detailedEval/teststrecke/sim/inputEmissions/hbefa_emission_factors_EU3_D.txt";
@@ -62,7 +63,8 @@ public class Main {
 /*		runs the emission tool by using a modular approach either calculating the emissions per agent or per linkID*/
 		TravelTimeEventHandler handler = new TravelTimeEventHandler(network,hbefaTable.getHbefaTableWithSpeedAndEmissionFactor());
 		
-		LinkAccountAnalyseModul linkAccount = handler.getLinkAccountAnalyseModul();
+		LinkAndAgentAccountAnalyseModul linkAccount = handler.getLinkAndAgentAccountAnalyseModul();
+		
 		
 	
 		
@@ -79,6 +81,9 @@ public class Main {
 		
 		matsimEventReader.readFile(eventsFile);
 		linkAccount.printTotalEmissionsPerLink();
+		linkAccount.printTotalEmissionsPerAgent();
+		
+		
 	
 		//for cold start emissions 
 		//handler.printTable();
