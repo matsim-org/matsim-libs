@@ -39,15 +39,15 @@ public class MATSimAirport {
 		
 //		create Coords for nodes
 		
-		Coord coordApronEnd = new CoordImpl(this.coord.getX(), this.coord.getY()+0.001);			//shifting end of apron by 111 meters in Y direction
+		Coord coordApronEnd = new CoordImpl(this.coord.getX()+0.001, this.coord.getY());			//shifting end of apron by 111 meters in Y direction
 		Coord coordTaxiIn = new CoordImpl(this.coord.getX()-0.001, this.coord.getY()-0.001);		//shifting taxiway
 		Coord coordTaxiOut = new CoordImpl(this.coord.getX()-0.001, this.coord.getY()+0.001);		//shifting taxiway
-		Coord coordRunwayInEnd = new CoordImpl(coordTaxiIn.getX(), coordTaxiIn.getY()-0.01);		//shifting runway
-		Coord coordRunwayOutEnd = new CoordImpl(coordTaxiOut.getX(), coordTaxiIn.getY()-0.01);		//shifting runway
+		Coord coordRunwayInEnd = new CoordImpl(coordTaxiIn.getX()-0.01, coordTaxiIn.getY());		//shifting runway
+		Coord coordRunwayOutEnd = new CoordImpl(coordTaxiOut.getX()-0.01, coordTaxiOut.getY());		//shifting runway
 		
 //		create nodes
 		
-		Node nodeAirport = network.getFactory().createNode(idApron, this.coord);			//central node of any airport	
+		Node nodeAirport = network.getFactory().createNode(this.id, this.coord);			//central node of any airport	
 		Node nodeApron = network.getFactory().createNode(idApronEnd, coordApronEnd);		//end of apron node, apron is used for parking and as transit stop
 		Node nodeTaxiIn = network.getFactory().createNode(idTaxiIn, coordTaxiIn);			//taxiway inbound start = runway inbound end
 		Node nodeTaxiOut = network.getFactory().createNode(idTaxiOut, coordTaxiOut);		//taxiway outbound end = runway outbound start
@@ -64,9 +64,8 @@ public class MATSimAirport {
 		network.addNode(nodeRunwayOut);
 		
 //		create links
-		
-		Link linkApron = network.getFactory().createLink(idApron, idApron, idApronEnd);
-		Link linkTaxiIn = network.getFactory().createLink(idTaxiIn, idTaxiIn, idApron);
+		Link linkApron = network.getFactory().createLink(this.id, this.id, idApronEnd);
+		Link linkTaxiIn = network.getFactory().createLink(idTaxiIn, idTaxiIn, this.id);
 		Link linkTaxiOut = network.getFactory().createLink(idTaxiOut, idApronEnd, idTaxiOut);
 		Link linkRunwayIn = network.getFactory().createLink(idRunwayIn, idRunwayIn, idTaxiIn);
 		Link linkRunwayOut = network.getFactory().createLink(idRunwayOut, idTaxiOut, idRunwayOut);
