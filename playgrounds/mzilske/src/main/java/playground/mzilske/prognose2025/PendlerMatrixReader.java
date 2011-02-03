@@ -35,23 +35,27 @@ public class PendlerMatrixReader {
 
 	private static final Logger log = Logger.getLogger(PendlerMatrixReader.class);
 
-	private static final String PV_MATRIX = "/Users/michaelzilske/workspace/pendler_nach_gemeinden/CD_Pendler_Gemeindeebene_30_06_2009/einpendler-muenchen.csv";
+	//	private static final String PV_EINPENDLERMATRIX = "../../shared-svn/studies/countries/de/pendler_nach_gemeinden/CD_Pendler_Gemeindeebene_30_06_2009/einpendler-muenchen.csv";
+	private static final String PV_EINPENDLERMATRIX = "../../detailedEval/eingangsdaten/Pendlermatrizen/EinpendlerMUC_843_062004.csv";
 
-	private static final String NODES = "/Users/michaelzilske/workspace/prognose_2025/orig/netze/netz-2004/strasse/knoten_wgs84.csv";
+	private static final String PV_AUSPENDLERMATRIX = "../../detailedEval/eingangsdaten/Pendlermatrizen/AuspendlerMUC_843_062004.csv";
+
+	private static final String NODES = "../../shared-svn/studies/countries/de/prognose_2025/orig/netze/netz-2004/strasse/knoten_wgs84.csv";
 
 	private Map<Integer, Zone> zones = new HashMap<Integer, Zone>();
 
-//	private static final String FILENAME = "/Users/michaelzilske/workspace/prognose_2025/demand/naechster_versuch.xml";
-//
-//	private static final String NETWORK_FILENAME = "/Users/michaelzilske/osm/motorway_germany.xml";
-//
-//	private static final String FILTER_FILENAME = "/Users/michaelzilske/workspace/prognose_2025/demand/filter.shp";
+	//	private static final String FILENAME = "/Users/michaelzilske/workspace/prognose_2025/demand/naechster_versuch.xml";
+	//
+	//	private static final String NETWORK_FILENAME = "/Users/michaelzilske/osm/motorway_germany.xml";
+	//
+	//	private static final String FILTER_FILENAME = "/Users/michaelzilske/workspace/prognose_2025/demand/filter.shp";
 
 	private TripFlowSink flowSink;
-	
+
 	public void run() {
 		readNodes();
-		readMatrix();
+		readMatrix(PV_EINPENDLERMATRIX);
+		readMatrix(PV_AUSPENDLERMATRIX);
 		flowSink.complete();
 	}
 
@@ -81,9 +85,12 @@ public class PendlerMatrixReader {
 		}
 	}
 
-	private void readMatrix() {
+	private void readMatrix(final String filename) {
+		System.out.println("======================" + "\n"
+						   + "Start reading " + filename + "\n"
+						   + "======================" + "\n");
 		TabularFileParserConfig tabFileParserConfig = new TabularFileParserConfig();
-		tabFileParserConfig.setFileName(PV_MATRIX);
+		tabFileParserConfig.setFileName(filename);
 		tabFileParserConfig.setDelimiterTags(new String[] {","});
 		try {
 			new TabularFileParser().parse(tabFileParserConfig,
@@ -95,22 +102,56 @@ public class PendlerMatrixReader {
 						return;
 					}
 					Integer quelle = null ;
-					try {
-						quelle = Integer.parseInt(row[2]);
-						int ziel = 9162 ;
-						int workPt = 0 ;
-						int educationPt = 0 ;
-						int workCar = Integer.parseInt(row[4]);
-						int educationCar = 0 ;
-						String label = row[3] ;
-						if ( !label.contains("brige ") && quelle!=ziel ) {
-							process(quelle, ziel, workPt, educationPt, workCar, educationCar);
-						} else {
-							System.out.println( " uebrige? : " + label ) ;
+					Integer ziel = 0;
+					// car market share for commuter work/education trips (taken from "Regionaler Nahverkehrsplan-Fortschreibung, MVV 2007)
+					double carMarketShare = 0.67;
+					// scale factor, since Pendlermatrix only considers "sozialversicherungspflichtige Arbeitnehmer" (taken from GuthEtAl2005)
+					double scaleFactor = 1.29;
+
+					if (filename.equals(PV_EINPENDLERMATRIX)){
+						try {
+							quelle = Integer.parseInt(row[2]);
+							ziel = 9162 ;
+							
+							int totalTrips = (int) (scaleFactor * Integer.parseInt(row[4]));
+							int workPt = (int) ((1 - carMarketShare) * totalTrips) ;
+							int educationPt = 0 ;
+							int workCar = (int) (carMarketShare * totalTrips);
+							int educationCar = 0 ;
+							String label = row[3] ;
+							if ( !label.contains("brige ") && !quelle.equals(ziel)) {
+								process(quelle, ziel, workPt, educationPt, workCar, educationCar);
+							} else {
+								System.out.println( " uebrige? : " + label ) ;
+							}
+						} catch ( Exception ee ) {
+							System.err.println("we are trying to read quelle: " + quelle ) ;
+							//						System.exit(-1) ;
 						}
-					} catch ( Exception ee ) {
-						System.err.println("we are trying to read quelle: " + quelle ) ;
-//						System.exit(-1) ;
+					}
+					else if (filename.equals(PV_AUSPENDLERMATRIX)){
+						try {
+							quelle = 9162;
+							ziel = Integer.parseInt(row[2]);
+
+							int totalTrips = (int) (scaleFactor * Integer.parseInt(row[4]));
+							int workPt = (int) ((1 - carMarketShare) * totalTrips) ;
+							int educationPt = 0 ;
+							int workCar = (int) (carMarketShare * totalTrips);
+							int educationCar = 0 ;
+							String label = row[3] ;
+							if ( !label.contains("brige ") && !quelle.equals(ziel)) {
+								process(quelle, ziel, workPt, educationPt, workCar, educationCar);
+							} else {
+								System.out.println( " uebrige? : " + label ) ;
+							}
+						} catch ( Exception ee ) {
+							System.err.println("we are trying to read quelle: " + quelle ) ;
+							//						System.exit(-1) ;
+						}
+					}
+					else{
+						System.err.println("ATTENTION: check filename!") ;
 					}
 				}
 
@@ -131,7 +172,7 @@ public class PendlerMatrixReader {
 		}
 		return found;
 	}
-	
+
 	private void process(int quelle, int ziel, int workPt, int educationPt, int workCar, int educationCar) {
 		Zone source = zones.get(quelle);
 		Zone sink = zones.get(ziel);
@@ -144,20 +185,27 @@ public class PendlerMatrixReader {
 			return;
 		}
 		int carQuantity = workCar + educationCar ;
+		int ptQuantity = workPt + educationPt;
 		int scaledCarQuantity = scale(carQuantity);
+		int scaledPtQuantity = scale(ptQuantity);
+		
 		if (scaledCarQuantity != 0) {
-			log.info(quelle + "->" + ziel + ": "+scaledCarQuantity);
-			flowSink.process(zones.get(quelle), zones.get(ziel), scaledCarQuantity, TransportMode.car, "work", 0.0);
+			log.info(quelle + "->" + ziel + ": " + scaledCarQuantity + " car trips");
+			flowSink.process(zones.get(quelle), zones.get(ziel), scaledCarQuantity, TransportMode.car, "pvWork", 0.0);
+		}
+		if (scaledPtQuantity != 0){
+			log.info(quelle + "->" + ziel + ": " + scaledPtQuantity + " pt trips");
+			flowSink.process(zones.get(quelle), zones.get(ziel), scaledPtQuantity, TransportMode.pt, "pvWork", 0.0);
 		}
 	}
 
-//	private int getCarQuantity(Zone source, Zone sink, int carWorkTripsPerDay) {
-//		double outWeight = ((double) source.workingPopulation * sink.workplaces) /  ((double) source.workplaces * sink.workingPopulation);
-//		double inWeight = ((double) source.workplaces * sink.workingPopulation) /  ((double) source.workingPopulation * sink.workplaces);
-//		double outShare = outWeight / (inWeight + outWeight);
-//		int amount = (int) (outShare * carWorkTripsPerDay * 0.5);
-//		return amount;
-//	}
+	//	private int getCarQuantity(Zone source, Zone sink, int carWorkTripsPerDay) {
+	//		double outWeight = ((double) source.workingPopulation * sink.workplaces) /  ((double) source.workplaces * sink.workingPopulation);
+	//		double inWeight = ((double) source.workplaces * sink.workingPopulation) /  ((double) source.workingPopulation * sink.workplaces);
+	//		double outShare = outWeight / (inWeight + outWeight);
+	//		int amount = (int) (outShare * carWorkTripsPerDay * 0.5);
+	//		return amount;
+	//	}
 
 	private int scale(int quantityOut) {
 		int scaled = (int) (quantityOut * 0.1 );
@@ -167,5 +215,5 @@ public class PendlerMatrixReader {
 	void setFlowSink(TripFlowSink flowSink) {
 		this.flowSink = flowSink;
 	}
-	
+
 }

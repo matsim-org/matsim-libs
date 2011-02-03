@@ -26,15 +26,15 @@ public abstract class CreateDemand {
 	
 private static final String GV_NETWORK_FILENAME = "/Users/michaelzilske/workspace/prognose_2025/demand/network_cleaned_wgs84.xml.gz";
 	
-	private static final String NETWORK_FILENAME = "/Users/michaelzilske/osm/motorway_germany.xml";
+	private static final String NETWORK_FILENAME = "../../shared-svn/studies/countries/de/prognose_2025/osm_zellen/motorway_germany.xml";
 	
 	private static final String GV_PLANS = "/Users/michaelzilske/workspace/run1061/1061.output_plans.xml.gz";
 	
 	private static final String FILTER_FILENAME = "/Users/michaelzilske/workspace/prognose_2025/demand/filter.shp";
 	
-	private static final String LANDKREISE = "/Users/michaelzilske/workspace/prognose_2025/osm_zellen/landkreise.shp";
+	private static final String LANDKREISE = "../../shared-svn/studies/countries/de/prognose_2025/osm_zellen/landkreise.shp";
 	
-	private static final String OUTPUT_POPULATION_FILENAME = "/Users/michaelzilske/workspace/detailedEval/pop/pendlerVerkehr/pendlerverkehr_10pct_dhdn_gk4.xml.gz";
+	private static final String OUTPUT_POPULATION_FILENAME = "../../detailedEval/pop/pendlerVerkehr/pendlermatrizen/inAndOut/pendlerverkehr_10pct_scaledAndMode_workStartingTimePeak0800Var2h_dhdn_gk4.xml.gz";
 	
 	private static boolean isCoordInShape(Coord linkCoord, Set<Feature> features, GeometryFactory factory) {
 		boolean found = false;
@@ -52,7 +52,7 @@ private static final String GV_NETWORK_FILENAME = "/Users/michaelzilske/workspac
 //		Scenario gvNetwork = new ScenarioImpl();
 //		new MatsimNetworkReader(gvNetwork).readFile(GV_NETWORK_FILENAME);
 		Scenario osmNetwork = new ScenarioImpl();
-//		new MatsimNetworkReader(osmNetwork).readFile(NETWORK_FILENAME);
+		new MatsimNetworkReader(osmNetwork).readFile(NETWORK_FILENAME);
 //		Set<Feature> featuresInShape;
 //		try {
 //			featuresInShape = new ShapeFileReader().readFileAndInitialize(FILTER_FILENAME);
@@ -90,18 +90,19 @@ private static final String GV_NETWORK_FILENAME = "/Users/michaelzilske/workspac
 		
 		PopulationGenerator populationBuilder = new PopulationGenerator();
 		
+		DepartureForWorkTimeOffsetter routerFilter = new DepartureForWorkTimeOffsetter(osmNetwork.getNetwork());
+		
 //		RouterFilter routerFilter = new RouterFilter(osmNetwork.getNetwork());
 //		for (Node node : osmNetwork.getNetwork().getNodes().values()) {
 //			if (isCoordInShape(node.getCoord(), featuresInShape, factory)) {
 //				routerFilter.getInterestingNodeIds().add(node.getId());
 //			}
 //		}
-//		
 		
 //		PV2025MatrixReader pvMatrixReader = new PV2025MatrixReader();
 		PendlerMatrixReader pvMatrixReader = new PendlerMatrixReader();
-		pvMatrixReader.setFlowSink(populationBuilder);
-//		routerFilter.setSink(populationBuilder);
+		pvMatrixReader.setFlowSink(routerFilter);
+		routerFilter.setSink(populationBuilder);
 //		populationBuilder.setSink(personMerger.getSink(1));
 		
 //		personMerger.setSink(personVerschmiererTask);

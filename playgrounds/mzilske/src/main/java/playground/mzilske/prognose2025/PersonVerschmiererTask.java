@@ -1,5 +1,7 @@
 package playground.mzilske.prognose2025;
 
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.population.Activity;
@@ -28,26 +30,45 @@ public class PersonVerschmiererTask implements PersonSinkSource {
 
 	@Override
 	public void complete() {
-		logger.info("Verschmiert: " + verschmiert + "  Nicht verschmiert: " + nichtVerschmiert);
+//		logger.info("Verschmiert: " + verschmiert + "  Nicht verschmiert: " + nichtVerschmiert);
 		sink.complete();
 	}
 
 	@Override
 	public void process(Person person) {
 		Plan plan = person.getPlans().get(0);
-		for (PlanElement planElement : plan.getPlanElements()) {
-			if (planElement instanceof Activity) {
-				ActivityImpl activity = (ActivityImpl) planElement;
-				Coord oldCoord = activity.getCoord();
-				Coord newCoord = verschmierer.shootIntoSameZoneOrLeaveInPlace(oldCoord);
-				if (oldCoord.equals(newCoord)) {
-					++nichtVerschmiert;
-				} else {
-					++verschmiert;
-				}
-				activity.setCoord(newCoord);
-			}
-		}
+		
+		List<PlanElement> planElements = plan.getPlanElements();
+		ActivityImpl home1 = (ActivityImpl) planElements.get(0);
+		ActivityImpl work = (ActivityImpl) planElements.get(2);
+		ActivityImpl home2 = (ActivityImpl) planElements.get(4);
+		
+		Coord oldCoordHome = home1.getCoord();
+		Coord oldCoordWork = work.getCoord();
+		
+		Coord newCoordHome = verschmierer.shootIntoSameZoneOrLeaveInPlace(oldCoordHome);
+		Coord newCoordWork = verschmierer.shootIntoSameZoneOrLeaveInPlace(oldCoordWork);
+
+		home1.setCoord(newCoordHome);
+		work.setCoord(newCoordWork);
+		home2.setCoord(newCoordHome);
+		
+		
+		
+//		for (PlanElement planElement : plan.getPlanElements()) {
+//			if (planElement instanceof Activity) {
+//				ActivityImpl activity = (ActivityImpl) planElement;
+//				Coord oldCoord = activity.getCoord();
+//				Coord newCoord = verschmierer.shootIntoSameZoneOrLeaveInPlace(oldCoord);
+//				if (oldCoord.equals(newCoord)) {
+//					++nichtVerschmiert;
+//				} else {
+//					++verschmiert;
+//				}
+//				
+//				activity.setCoord(newCoord);
+//			}
+//		}
 		sink.process(person);
 	}
 
