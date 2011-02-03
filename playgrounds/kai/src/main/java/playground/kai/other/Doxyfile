@@ -559,23 +559,13 @@ WARN_LOGFILE           =
 # directories like "/usr/src/myproject". Separate the files or directories 
 # with spaces.
 
-INPUT                  = ../../../../playgrounds/mrieser/src/main/java/playground/mrieser \
-                         org/matsim/api \
-                         org/matsim/core \
-                         org/matsim/facilities \
-                         org/matsim/households \
-                         org/matsim/knowledges \
+INPUT                  = org/matsim/api \
                          org/matsim/lanes \
-                         org/matsim/population \
                          org/matsim/pt \
                          org/matsim/ptproject \
-                         org/matsim/roadpricing \
                          org/matsim/run \
                          org/matsim/transitschedule \
-                         org/matsim/vehicles \
-                         org/matsim/vis \
-                         ../../../../playgrounds/christoph/src/main/java/playground/christoph \
-                         ../../../../playgrounds/christoph/src/test/java/playground/christoph
+                         org/matsim/vis
 
 # This tag can be used to specify the character encoding of the source files 
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding, which is 

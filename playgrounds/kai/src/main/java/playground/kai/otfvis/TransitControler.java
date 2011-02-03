@@ -27,7 +27,7 @@ import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.Simulation;
-import org.matsim.pt.qsim.ComplexTransitStopHandlerFactory;
+import org.matsim.pt.qsim.SimpleTransitStopHandlerFactory;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.QSimFactory;
 import org.matsim.vis.otfvis.OTFVisMobsimFeature;
@@ -61,8 +61,8 @@ public class TransitControler {
 		public Simulation createMobsim(Scenario sc, EventsManager eventsManager) {
 			QSim simulation = (QSim) new QSimFactory().createMobsim(sc, eventsManager);
 
-			simulation.getTransitEngine().setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
-//			simulation.getQSimTransitEngine().setTransitStopHandlerFactory(new SimpleTransitStopHandlerFactory());
+//			simulation.getTransitEngine().setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
+			simulation.getTransitEngine().setTransitStopHandlerFactory(new SimpleTransitStopHandlerFactory());
 //			this.events.addHandler(new LogOutputEventHandler());
 
 			if ( useOTFVis ) {
