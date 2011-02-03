@@ -85,6 +85,7 @@ public class SfAirScheduleBuilder {
 				String hours = lineEntries[13].substring(0, 3);
 				String minutes = lineEntries[13].substring(3);
 				String carrier = lineEntries[0];
+				String flightNumber = lineEntries[1];
 				double durationMinutes = Double.parseDouble(minutes)*60;	//convert flight dur minutes into seconds
 				double durationHours = Double.parseDouble(hours)*3600;
 				double duration = durationHours+durationMinutes;
@@ -102,8 +103,10 @@ public class SfAirScheduleBuilder {
 					
 				
 				if (lineEntries[47].contains("O") || lineEntries[43].equalsIgnoreCase("")) {
+					
+						flightNumber = flightNumber.replaceAll(" ", "0");
 								
-						flight=lineEntries[0]+lineEntries[1];
+						flight=carrier+flightNumber;
 						int seatsAvail = Integer.parseInt(lineEntries[23]);
 						String originAirport = lineEntries[4];
 						String destinationAirport = lineEntries[7];
@@ -131,7 +134,7 @@ public class SfAirScheduleBuilder {
 							bwOag.write(
 									route+"\t"+		//TransitRoute
 									lineEntries[4]+lineEntries[7]+"_"+carrier+"\t"+	//TransitLine
-									lineEntries[0]+lineEntries[1]+"\t"+		//vehicleId
+									flight+"\t"+		//vehicleId
 									departureInSec+"\t"+	//departure time in seconds
 									this.routes.get(route)+"\t"+	//journey time in seconds)
 									aircraftType+"\t"+	//aircraft type
