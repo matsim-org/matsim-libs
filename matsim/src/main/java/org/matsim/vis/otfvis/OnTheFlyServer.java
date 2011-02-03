@@ -414,12 +414,26 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 
 	@Override
 	public OTFVisConfigGroup getOTFVisConfig() throws RemoteException {
-		OTFVisConfigGroup otfVis = this.otfVisQueueSimFeature.getVisMobsim().getScenario().getConfig().otfVis();
-		if (otfVis != null) {
-			return otfVis;
-		} else {
-			return new OTFVisConfigGroup();
+		OTFVisConfigGroup otfVisConfig = this.otfVisQueueSimFeature.getVisMobsim().getScenario().getConfig().otfVis();
+		if (otfVisConfig == null) {
+			otfVisConfig = new OTFVisConfigGroup();
 		}
+
+//		log.warn( " otfVisQueueSimFeature: " + this.otfVisQueueSimFeature ) ;
+//		log.warn( " visMobsim: " + this.otfVisQueueSimFeature.getVisMobsim() ) ;
+//		log.warn( " visNetwork: " + this.otfVisQueueSimFeature.getVisMobsim().getVisNetwork() ) ;
+//		log.warn( " network: " + this.otfVisQueueSimFeature.getVisMobsim().getVisNetwork().getNetwork() ) ;
+//		log.warn( " effLaneWidth: " + 
+//				this.otfVisQueueSimFeature.getVisMobsim().getVisNetwork().getNetwork().getEffectiveLaneWidth() ) ;
+
+		double effLaneWidth = this.otfVisQueueSimFeature.getVisMobsim().getVisNetwork().getNetwork().getEffectiveLaneWidth() ;
+		if ( Double.isNaN(effLaneWidth) ) {
+			otfVisConfig.setEffectiveLaneWidth( null ) ;
+		} else {
+			otfVisConfig.setEffectiveLaneWidth( effLaneWidth ) ;
+		}
+
+		return otfVisConfig ;
 	}
 
 }

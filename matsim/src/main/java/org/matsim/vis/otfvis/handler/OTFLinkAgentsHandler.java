@@ -43,16 +43,14 @@ import org.matsim.vis.snapshots.writers.VisLink;
 /**
  * OTFLinkAgentsHandler transfers basic agent data as well as the default data
  * for links. It is not commonly used, but some older mvi files might contain
- * it.
- *
+ * it. [[If this is correct, then only the reader needs to be salvaged.  kai, jan'11]]
  *
  * @author david
  *
  */
 public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
 
-	private static final Logger log = Logger
-			.getLogger(OTFLinkAgentsHandler.class);
+	private static final Logger log = Logger.getLogger(OTFLinkAgentsHandler.class);
 
 	private Class<? extends OTFDataReceiver> agentReceiverClass = null;
 
@@ -66,7 +64,9 @@ public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
 
 		protected static final transient Collection<AgentSnapshotInfo> positions = new ArrayList<AgentSnapshotInfo>();
 
-		protected void writeAllAgents(ByteBuffer out) {
+		/**The API method is writeDynData.  writeDynData calls writeAgent.  kai, jan'11  
+		 */
+		private void writeAllAgents(ByteBuffer out) {
 			// Write additional agent data
 
 			positions.clear();
@@ -107,8 +107,12 @@ public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
 			return new Writer();
 		}
 
-		public void writeAgent(AgentSnapshotInfo pos, ByteBuffer out) {
-			// yyyy there is a very similar method in OTFAgentsListHandler.  with a more robust format, they should be united.  kai, apr'10
+		/**The API method is writeDynData.  writeDynData calls writeAgent.  Could make it "protected", but I don't
+		 * want proliferation of inheritance all over the project.  Still leaving it package-private to allow
+		 * inheritance inside the package.  kai, jan'11  
+		 */
+		private void writeAgent(AgentSnapshotInfo pos, ByteBuffer out) {
+			// making this private; I don't see any reason to make it more public.  kai, jan'11
 
 			String id = pos.getId().toString();
 			ByteBufferUtils.putString(out, id);
@@ -120,7 +124,13 @@ public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
 		}
 	}
 
-	public void readAgent(ByteBuffer in, SceneGraph graph) {
+	/**The API method is readDynData.  readDynData calls readAgent.  Could make it "protected", but I don't
+	 * want proliferation of inheritance all over the project.  Still leaving it package-private to allow
+	 * inheritance inside the package.    kai, jan'11  
+	 */
+	void readAgent(ByteBuffer in, SceneGraph sceneGraph) {
+		// can't make this private since the ReaderV1_1 calls this.  kai, jan'11
+		
 		// yyyy there is a very similar method in OTFAgentsListHandler.  with a more robust format, they should be united.  kai, apr'10
 		// yyyyyy another writer potentially connected to this reader is in OTFQueueSimLinkAgentsWriter
 
@@ -140,7 +150,7 @@ public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
 			return;
 
 		try {
-			OTFDataSimpleAgentReceiver drawer = (org.matsim.vis.otfvis.data.OTFDataSimpleAgentReceiver) graph.newInstance(this.agentReceiverClass);
+			OTFDataSimpleAgentReceiver drawer = (OTFDataSimpleAgentReceiver) sceneGraph.newInstanceOf(this.agentReceiverClass);
 			drawer.setAgent(agInfo);
 			this.agents.add(drawer);
 		} catch (InstantiationException e) {

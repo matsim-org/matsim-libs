@@ -11,11 +11,11 @@ import javax.media.opengl.GL;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.vis.otfvis.data.OTFDataQuadReceiver;
-import org.matsim.vis.otfvis.opengl.drawer.OTFGLDrawableImpl;
+import org.matsim.vis.otfvis.opengl.drawer.OTFGLAbstractDrawableReceiver;
 
 import com.sun.opengl.util.texture.TextureCoords;
 
-public class OGLSimpleQuadDrawer extends OTFGLDrawableImpl implements OTFDataQuadReceiver{
+public class OGLSimpleQuadDrawer extends OTFGLAbstractDrawableReceiver implements OTFDataQuadReceiver{
 
 	    protected final Point2D.Float[] quad = new Point2D.Float[4];
 	    protected float coloridx = 0;
@@ -23,7 +23,10 @@ public class OGLSimpleQuadDrawer extends OTFGLDrawableImpl implements OTFDataQua
 	    protected int nrLanes;
 
 	    public void onDraw( GL gl) {
-	      final Point2D.Float ortho = calcOrtho(this.quad[0].x, this.quad[0].y, this.quad[1].x, this.quad[1].y, nrLanes*OGLSimpleStaticNetLayer.cellWidth_m);
+	      final Point2D.Float ortho = calcOrtho(this.quad[0].x, this.quad[0].y, this.quad[1].x, this.quad[1].y, 
+	    		  nrLanes*OGLSimpleStaticNetLayer.getBasicLaneWidth_m());
+	      // (yy this is where the width of the links for drawing is set)
+	      
 	      this.quad[2] = new Point2D.Float(this.quad[0].x + ortho.x, this.quad[0].y + ortho.y);
 	      this.quad[3] = new Point2D.Float(this.quad[1].x + ortho.x, this.quad[1].y + ortho.y);
 	      //Draw quad
@@ -47,9 +50,10 @@ public class OGLSimpleQuadDrawer extends OTFGLDrawableImpl implements OTFDataQua
 	      linkIds.put(new CoordImpl(middleX , middleY ), idstr);
 	    }
 
-	    public static Point2D.Float calcOrtho(Point2D.Float start, Point2D.Float end){
-	      return calcOrtho(start.x, start.y, end.x, end.y, OGLSimpleStaticNetLayer.cellWidth_m);
-	    }
+//	    public static Point2D.Float calcOrtho(Point2D.Float start, Point2D.Float end){
+//	      return calcOrtho(start.x, start.y, end.x, end.y, OGLSimpleStaticNetLayer.getBasicLineWidth_m());
+//	    }
+	    // never used.  kai, jan'11
 
 	    public static Point2D.Float calcOrtho(double startx, double starty, double endx, double endy, double len){
 	      double dx = endy - starty;

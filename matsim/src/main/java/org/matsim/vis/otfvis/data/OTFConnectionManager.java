@@ -190,7 +190,7 @@ public class OTFConnectionManager implements Cloneable, Serializable {
 		Collection<OTFDataReceiver> receivers = new HashSet<OTFDataReceiver>();
 		for(Class<?> entry : classList) {
 			try {
-				receivers.add(graph.newInstance((Class<? extends OTFDataReceiver>) entry));
+				receivers.add(graph.newInstanceOf((Class<? extends OTFDataReceiver>) entry));
 			} catch (InstantiationException e) {
 				e.printStackTrace();
 			} catch (IllegalAccessException e) {

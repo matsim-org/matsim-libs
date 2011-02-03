@@ -19,8 +19,20 @@ import org.matsim.vis.snapshots.writers.AgentSnapshotInfoFactory;
 
 public class QueryAgentUtils {
 
+	
 
-	public static void buildRoute(Plan plan, QueryAgentPlan.Result result, Id agentId, Network net) {
+	enum Level { ROUTES, PLANELEMENTS } 
+
+	/**
+	 * @param plan
+	 * @param result
+	 * @param agentId
+	 * @param net
+	 * @param level -- level at which plan should be plotted, i.e. if route should be included or not.
+	 */
+	static void buildRoute(Plan plan, QueryAgentPlan.Result result, Id agentId, Network net, Level level) {
+		// reducing visibility to avoid proliferation.  kai, jan'11
+		
 		int count = countLines(plan);
 		if (count == 0)
 			return;
@@ -50,16 +62,22 @@ public class QueryAgentUtils {
 			} else if (o instanceof Leg) {
 				Leg leg = (Leg) o;
 				if (leg.getMode().equals(TransportMode.car)) {
-					Node last = null;
-					for (Id linkId : ((NetworkRoute) leg.getRoute())
-							.getLinkIds()) {
-						Link driven = net.getLinks().get(linkId);
-						Node node = driven.getFromNode();
-						last = driven.getToNode();
-						setCoord(pos++, node.getCoord(), carColor, result);
-					}
-					if (last != null) {
-						setCoord(pos++, last.getCoord(), carColor, result);
+					if ( level==Level.ROUTES ) {
+						Node last = null;
+						for (Id linkId : ((NetworkRoute) leg.getRoute())
+								.getLinkIds()) {
+							Link driven = net.getLinks().get(linkId);
+							Node node = driven.getFromNode();
+							last = driven.getToNode();
+							setCoord(pos++, node.getCoord(), carColor, result);
+						}
+						if (last != null) {
+							setCoord(pos++, last.getCoord(), carColor, result);
+						}
+					} else if ( level==Level.PLANELEMENTS ) {
+						setColor( pos - 1, carColor, result ) ;
+					} else {
+						throw new RuntimeException("should not happen");
 					}
 				} else if (leg.getMode().equals(TransportMode.pt)) {
 					setColor(pos - 1, ptColor, result);

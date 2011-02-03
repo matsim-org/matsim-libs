@@ -30,18 +30,22 @@ import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.data.OTFDataSimpleAgentReceiver;
 import org.matsim.vis.otfvis.gui.OTFVisConfigGroup;
-import org.matsim.vis.otfvis.opengl.drawer.OTFGLDrawableImpl;
+import org.matsim.vis.otfvis.opengl.drawer.OTFGLAbstractDrawableReceiver;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
 
-public class AgentPointDrawer extends OTFGLDrawableImpl implements OTFDataSimpleAgentReceiver {
+/**The AgentPointDrawer ... doesn't draw although it has all the commands.  Instead, it receives agents 
+ * (as declared by its interface but not by its name) and pushes them towards the AgentPointLayer.  
+ * That AgentPointLayer has its own (Array)Drawer.
+ *
+ */
+public class AgentPointDrawer extends OTFGLAbstractDrawableReceiver implements OTFDataSimpleAgentReceiver {
 
 	private final OGLAgentPointLayer oglAgentPointLayer;
 	
-	private static OTFOGLDrawer.FastColorizer colorizer = new OTFOGLDrawer.FastColorizer(
-	new double[] { 0.0, 30., 50.}, new Color[] {
-			Color.RED, Color.YELLOW, Color.GREEN});
+	private static OTFOGLDrawer.FastColorizer redToGreenColorizer = new OTFOGLDrawer.FastColorizer(
+			new double[] { 0.0, 30., 50.}, new Color[] {Color.RED, Color.YELLOW, Color.GREEN});
 
 	AgentPointDrawer(OGLAgentPointLayer oglAgentPointLayer) {
 		this.oglAgentPointLayer = oglAgentPointLayer;
@@ -76,7 +80,7 @@ public class AgentPointDrawer extends OTFGLDrawableImpl implements OTFDataSimple
 		} else {
 		
 			if ( agInfo.getAgentState()==AgentState.PERSON_DRIVING_CAR ) {
-				this.oglAgentPointLayer.addAgent(id, (float)agInfo.getEasting(), (float)agInfo.getNorthing(), colorizer.getColorZeroOne(agInfo.getColorValueBetweenZeroAndOne()), true);
+				this.oglAgentPointLayer.addAgent(id, (float)agInfo.getEasting(), (float)agInfo.getNorthing(), redToGreenColorizer.getColorZeroOne(agInfo.getColorValueBetweenZeroAndOne()), true);
 			} else if ( agInfo.getAgentState()==AgentState.PERSON_AT_ACTIVITY ) {
 				this.oglAgentPointLayer.addAgent(id, (float)agInfo.getEasting(), (float)agInfo.getNorthing(), Color.ORANGE, true);
 			} else if ( agInfo.getAgentState()==AgentState.PERSON_OTHER_MODE ) {

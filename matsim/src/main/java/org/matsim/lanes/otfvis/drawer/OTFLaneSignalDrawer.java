@@ -32,11 +32,11 @@ import org.matsim.lanes.otfvis.io.OTFLinkWLanes;
 import org.matsim.signalsystems.model.SignalGroupState;
 import org.matsim.signalsystems.otfvis.io.OTFSignal;
 import org.matsim.signalsystems.otfvis.io.OTFSignalSystem;
-import org.matsim.vis.otfvis.opengl.drawer.OTFGLDrawableImpl;
+import org.matsim.vis.otfvis.opengl.drawer.OTFGLAbstractDrawableReceiver;
 import org.matsim.vis.otfvis.opengl.layer.OGLSimpleStaticNetLayer;
 
 
-public class OTFLaneSignalDrawer extends OTFGLDrawableImpl {
+public class OTFLaneSignalDrawer extends OTFGLAbstractDrawableReceiver {
 
 	private static final Logger log = Logger.getLogger(OTFLaneSignalDrawer.class);
 	
@@ -62,8 +62,8 @@ public class OTFLaneSignalDrawer extends OTFGLDrawableImpl {
 	@Override
 	public void onDraw(GL gl) {
 		this.gl = gl;
-		if (this.currentCellWidth != OGLSimpleStaticNetLayer.cellWidth_m){
-			this.currentCellWidth = OGLSimpleStaticNetLayer.cellWidth_m;
+		if (this.currentCellWidth != OGLSimpleStaticNetLayer.getBasicLineWidth_m()){
+			this.currentCellWidth = OGLSimpleStaticNetLayer.getBasicLineWidth_m();
 			this.recalculatePositions();
 		}
 		for (OTFLinkWLanes laneLinkData : this.lanesLinkData.values()){
@@ -136,7 +136,7 @@ public class OTFLaneSignalDrawer extends OTFGLDrawableImpl {
 	
 	private void recalculatePositions() {
 		for (OTFLinkWLanes linkData : this.lanesLinkData.values()){
-			double linkWidth = linkData.getNumberOfLanes() * OGLSimpleStaticNetLayer.cellWidth_m;
+			double linkWidth = linkData.getNumberOfLanes() * OGLSimpleStaticNetLayer.getBasicLineWidth_m();
 			linkData.setLinkWidth(linkWidth);
 			double numberOfLinkParts = (2 * linkData.getMaximalAlignment()) + 2;
 			Point2D.Double linkStartCenter = this.calculatePointOnLink(linkData, 0.0, 0.5);

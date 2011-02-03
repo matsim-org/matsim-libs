@@ -11,7 +11,7 @@ import javax.media.opengl.GL;
 import javax.media.opengl.glu.GLU;
 
 import org.matsim.core.gbl.MatsimResource;
-import org.matsim.vis.otfvis.opengl.drawer.OTFGLDrawableImpl;
+import org.matsim.vis.otfvis.opengl.drawer.OTFGLAbstractDrawableReceiver;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.vis.otfvis.opengl.gl.InfoText;
 
@@ -26,7 +26,7 @@ import com.sun.opengl.util.texture.TextureCoords;
  * @author laemmel
  *
  */
-public class OTFScaleBarDrawer extends OTFGLDrawableImpl {
+public class OTFScaleBarDrawer extends OTFGLAbstractDrawableReceiver {
 
 	private TextRenderer textRenderer = null;
 	double[] modelview = new double[16];

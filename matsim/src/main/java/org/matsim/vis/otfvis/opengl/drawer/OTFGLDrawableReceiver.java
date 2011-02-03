@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * OTFDrawable.java
+ * OTFGLDrawable.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,23 +18,27 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.vis.otfvis.gui;
+package org.matsim.vis.otfvis.opengl.drawer;
 
-import org.matsim.vis.otfvis.data.OTFDataReceiver;
+import javax.media.opengl.GL;
+
+import org.matsim.vis.otfvis.gui.OTFDrawableReceiver;
 
 /**
- * Any object that can be drawn on screen will have to implement this interface.
- * Normally these classes will additionally implement OTFData.Recevier.
+ * OTFGLDrawable is the Drawable interface for the OpenGL implementation.
+ * Each element that is drawable on screen must implement this interface.
  *
  * @author dstrippgen
- *
- * <p>
- * Maybe it was not MEANT that way, but the existing OTFDrawable had an invalidate method
- * and thus ALWAYS de-facto extended (duplicated) OTFDataReceiver.  I thus extended it
- * directly from OTFDataReceiver.  kai, jan'10
- * </p>
- *
  */
-public interface OTFDrawable extends OTFDataReceiver {
-	public void draw();
+public interface OTFGLDrawableReceiver extends OTFDrawableReceiver {
+
+	/**Presumably, the machinery calls "draw".  For the OpenGL implementation,
+	 * "draw" always calls "onDraw" and then exits.  So for the OpenGL
+	 * implementation, "onDraw" needs to be implemented in order to obtain
+	 * "draw" functionality. ???
+	 *
+	 * @param gl
+	 */
+	public void onDraw(GL gl);
 }
+

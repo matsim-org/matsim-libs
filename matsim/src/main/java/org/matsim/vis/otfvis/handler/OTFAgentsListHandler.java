@@ -53,6 +53,8 @@ public class OTFAgentsListHandler extends OTFDataReader {
 	protected List<OTFDataSimpleAgentReceiver> agents = new LinkedList<OTFDataSimpleAgentReceiver>();
 
 	static public class Writer extends OTFDataWriter<Void> {
+		// yyyyyy the reason why this whole class works is that other classes have access to the "positions" field
+		// since it is public.  kai, feb'11
 
 		private static final long serialVersionUID = -6368752578878835954L;
 
@@ -71,8 +73,9 @@ public class OTFAgentsListHandler extends OTFDataReader {
 			this.positions.clear();
 		}
 
-		public void writeAgent(AgentSnapshotInfo agInfo, ByteBuffer out) {
-			// there is a very similar method in OTFLinkAgentsHandler.  with a more robust format, they should be united.  kai, apr'10
+		private void writeAgent(AgentSnapshotInfo agInfo, ByteBuffer out) {
+			// making this private; I don't see any reason to make it more public.  kai, jan'11
+			
 			String id = agInfo.getId().toString();
 			ByteBufferUtils.putString(out, id);
 			out.putFloat((float)(agInfo.getEasting() - OTFServerQuad2.offsetEast));
@@ -85,8 +88,10 @@ public class OTFAgentsListHandler extends OTFDataReader {
 	}
 
 	private static AgentState[] al = AgentState.values();
-	public void readAgent(ByteBuffer in, SceneGraph graph) {
-		// there is a very similar method in OTFLinkAgentsHandler.  with a more robust format, they should be united.  kai, apr'10
+
+	private void readAgent(ByteBuffer in, SceneGraph graph) {
+		// making this private; don't see any reason to make it more public.  kai, jan'11  
+		
 		String id = ByteBufferUtils.getString(in);
 		float x = in.getFloat();
 		float y = in.getFloat();
@@ -98,7 +103,7 @@ public class OTFAgentsListHandler extends OTFDataReader {
 		agInfo.setUserDefined( int2 ) ;
 		agInfo.setColorValueBetweenZeroAndOne( float1 ) ;
 		try {
-			OTFDataSimpleAgentReceiver drawer = (OTFDataSimpleAgentReceiver) graph.newInstance(this.agentReceiverClass);
+			OTFDataSimpleAgentReceiver drawer = (OTFDataSimpleAgentReceiver) graph.newInstanceOf(this.agentReceiverClass);
 			drawer.setAgent( agInfo ) ;
 			this.agents.add(drawer);
 		} catch (InstantiationException e) {

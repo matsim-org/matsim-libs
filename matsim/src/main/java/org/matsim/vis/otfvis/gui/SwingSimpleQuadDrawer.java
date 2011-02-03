@@ -64,7 +64,7 @@ public class SwingSimpleQuadDrawer extends OTFSwingDrawable implements OTFDataQu
 
 
 		// Show LinkIds
-		if (OTFClientControl.getInstance().getOTFVisConfig().drawLinkIds()){
+		if (OTFClientControl.getInstance().getOTFVisConfig().isDrawingLinkIds()){
 		    float idSize = 4*OTFClientControl.getInstance().getOTFVisConfig().getLinkWidth();
 		    int fontSize = (int)idSize;
 		    float middleX = (float)(0.5*this.line[0] + (0.5)*this.line[2]);

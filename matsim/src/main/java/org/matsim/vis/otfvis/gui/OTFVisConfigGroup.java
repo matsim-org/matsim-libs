@@ -45,63 +45,66 @@ public class OTFVisConfigGroup extends Module {
 
 	public static final String GROUP_NAME = "otfvis";
 
-  public static final String AGENT_SIZE = "agentSize";
-  public static final String MIDDLE_MOUSE_FUNC = "middleMouseFunc";
-  public static final String LEFT_MOUSE_FUNC = "leftMouseFunc";
-  public static final String RIGHT_MOUSE_FUNC = "rightMouseFunc";
+	public static final String AGENT_SIZE = "agentSize";
+	public static final String MIDDLE_MOUSE_FUNC = "middleMouseFunc";
+	public static final String LEFT_MOUSE_FUNC = "leftMouseFunc";
+	public static final String RIGHT_MOUSE_FUNC = "rightMouseFunc";
 
-  public static final String FILE_VERSION = "fileVersion";
-  public static final String FILE_MINOR_VERSION = "fileMinorVersion";
+	public static final String FILE_VERSION = "fileVersion";
+	public static final String FILE_MINOR_VERSION = "fileMinorVersion";
 
-  public static final String BIG_TIME_STEP = "bigTimeStep";
-  public static final String SHOW_TELEPORTATION = "showTeleportation";
-  public static final String LINK_WIDTH = "linkWidth";
+	public static final String BIG_TIME_STEP = "bigTimeStep";
+	public static final String SHOW_TELEPORTATION = "showTeleportation";
+	public static final String LINK_WIDTH = "linkWidth";
+	
+//	public static final String SHOW_PARKING = "showNonMovingItems" ;
+	// can't set this outside the true preferences dialogue since there is additional mechanics involved.  kai, jan'11
 
-  private  float agentSize = 120.f;
-  private  String middleMouseFunc = "Pan";
-  private  String leftMouseFunc = "Zoom";
-  private  String rightMouseFunc = "Select";
-  private int fileVersion = OTFFileWriter.VERSION;
-  private int fileMinorVersion = OTFFileWriter.MINORVERSION;
+	private  float agentSize = 120.f;
+	private  String middleMouseFunc = "Pan";
+	private  String leftMouseFunc = "Zoom";
+	private  String rightMouseFunc = "Select";
+	private int fileVersion = OTFFileWriter.VERSION;
+	private int fileMinorVersion = OTFFileWriter.MINORVERSION;
 
-  private int bigTimeStep = 600;
-  private String queryType = "agentPlan";
-  private boolean multipleSelect = false;
-  private boolean showParking = false;
-  private Color backgroundColor = new Color(255, 255, 255, 0);
-  private Color networkColor = new Color(128, 128, 128, 200);
-  private float linkWidth = 30;
-  private boolean drawLinkIds = false;
-  private boolean drawTime = false;
-  private boolean drawOverlays = true;
-  private boolean drawTransitFacilities = true;
-  private boolean renderImages = false;
-  private boolean modified = false;
-  private boolean cachingAllowed = true;
-  private int delay_ms = 30;
+	private int bigTimeStep = 600;
+	private String queryType = "agentPlan";
+	private boolean multipleSelect = false;
+	private boolean showParking = false;
+	private Color backgroundColor = new Color(255, 255, 255, 0);
+	private Color networkColor = new Color(128, 128, 128, 200);
+	private float linkWidth = 30;
+	private boolean drawLinkIds = false;
+	private boolean drawTime = false;
+	private boolean drawOverlays = true;
+	private boolean drawTransitFacilities = true;
+	private boolean renderImages = false;
+	private boolean modified = false;
+	private boolean cachingAllowed = true;
+	private int delay_ms = 30;
 
-  private boolean drawScaleBar = false;
-  private boolean showTeleportedAgents = false;
+	private boolean drawScaleBar = false;
+	private boolean showTeleportedAgents = false;
 
-  private final List<ZoomEntry> zooms = new ArrayList<ZoomEntry>();
+	private final List<ZoomEntry> zooms = new ArrayList<ZoomEntry>();
 
-  private boolean scaleQuadTreeRect;
-  
+	private boolean scaleQuadTreeRect;
+
 	// ---
-	
+
 	private static final String COLORING="coloringScheme" ;
-	
+
 	public static final String COLORING_STANDARD = "standard" ;
 	public static final String COLORING_BVG = "bvg" ;
 
 	private String coloring = COLORING_STANDARD ;
-	
+
 	// ---
 
 
-  public OTFVisConfigGroup() {
-    super(GROUP_NAME);
-  }
+	public OTFVisConfigGroup() {
+		super(GROUP_NAME);
+	}
 
 	public List<ZoomEntry> getZooms() {
 		return this.zooms;
@@ -118,7 +121,7 @@ public class OTFVisConfigGroup extends Module {
 		Point3f result = null;
 		for(ZoomEntry entry : this.zooms) {
 			if(entry.getName().equals(zoomName)) {
-			  result = entry.getZoomstart();
+				result = entry.getZoomstart();
 			}
 		}
 		return result;
@@ -134,12 +137,14 @@ public class OTFVisConfigGroup extends Module {
 	 * @param delay_ms the delay_ms to set
 	 */
 	public void setDelay_ms(final int delay_ms) {
+		this.setModified();
 		this.delay_ms = delay_ms;
 	}
 	public boolean isCachingAllowed() {
 		return this.cachingAllowed;
 	}
 	public void setCachingAllowed(final boolean cachingAllowed) {
+		setModified();
 		this.cachingAllowed = cachingAllowed;
 	}
 	/**
@@ -164,6 +169,7 @@ public class OTFVisConfigGroup extends Module {
 
 	@Override
 	public String getValue(final String key) {
+		// for variables that have getters, this is not needed (and should probably be avoided).  kai, jan'11
 		if (AGENT_SIZE.equals(key)) {
 			return Float.toString(getAgentSize());
 		} else if (MIDDLE_MOUSE_FUNC.equals(key)) {
@@ -182,21 +188,27 @@ public class OTFVisConfigGroup extends Module {
 		else if ( COLORING.equalsIgnoreCase(key) )
 			return this.coloring ;
 		else {
-			throw new IllegalArgumentException(key);
+			throw new IllegalArgumentException(key + ".  There may exist a direct getter.");
 		}
 	}
 
 	@Override
 	public void addParam(final String key, final String value) {
+		// this is needed since config file parsing uses it.
+		
 		if (AGENT_SIZE.equals(key)) {
 			this.agentSize = Float.parseFloat(value);
-		} else if (MIDDLE_MOUSE_FUNC.equals(key)) {
+		} 
+		else if (MIDDLE_MOUSE_FUNC.equals(key)) {
 			this.middleMouseFunc = value;
-		} else if (LEFT_MOUSE_FUNC.equals(key)) {
+		} 
+		else if (LEFT_MOUSE_FUNC.equals(key)) {
 			this.leftMouseFunc = value;
-		} else if ( COLORING.equalsIgnoreCase(key) ) {
+		} 
+		else if ( COLORING.equalsIgnoreCase(key) ) {
 			this.setColoringScheme( value ) ;
-		}  else if (RIGHT_MOUSE_FUNC.equals(key)) {
+		}  
+		else if (RIGHT_MOUSE_FUNC.equals(key)) {
 			this.rightMouseFunc = value;
 		}
 		else if (SHOW_TELEPORTATION.equalsIgnoreCase(key)){
@@ -205,6 +217,10 @@ public class OTFVisConfigGroup extends Module {
 		else if (LINK_WIDTH.equalsIgnoreCase(key)){
 			this.linkWidth = Float.parseFloat(value);
 		}
+//		else if ( SHOW_PARKING.equalsIgnoreCase(key) ) {
+//			this.setShowParking( Boolean.parseBoolean(value) ) ;
+//			// can't set this outside the true preferences dialogue since there is additional mechanics involved.  kai, jan'11
+//		}
 		else {
 			throw new IllegalArgumentException(key);
 		}
@@ -212,14 +228,18 @@ public class OTFVisConfigGroup extends Module {
 
 	@Override
 	public final TreeMap<String, String> getParams() {
+		// this is needed for everything since the config dump is based on this.
+		
 		TreeMap<String, String> map = new TreeMap<String, String>();
 		map.put(AGENT_SIZE, getValue(AGENT_SIZE));
 		map.put(LEFT_MOUSE_FUNC, getValue(LEFT_MOUSE_FUNC));
 		map.put(MIDDLE_MOUSE_FUNC, getValue(MIDDLE_MOUSE_FUNC));
 		map.put(RIGHT_MOUSE_FUNC, getValue(RIGHT_MOUSE_FUNC));
-		map.put(SHOW_TELEPORTATION, getValue(SHOW_TELEPORTATION));
+		map.put(SHOW_TELEPORTATION, Boolean.toString( this.isShowTeleportedAgents() ) ) ;
 		map.put(LINK_WIDTH, this.getValue(LINK_WIDTH));
 		map.put(COLORING, getValue(COLORING)) ;
+//		map.put(SHOW_PARKING, Boolean.toString( this.isShowParking() ) ) ;
+		// can't set this outside the true preferences dialogue since there is additional mechanics involved.  kai, jan'11
 
 		return map;
 	}
@@ -231,6 +251,9 @@ public class OTFVisConfigGroup extends Module {
 				+ " rather ungracefully, or displays no agents at all." ) ;
 		map.put(LINK_WIDTH, "The (initial) width of the links of the network. Use positive floating point values.");
 		map.put(COLORING, "coloring scheme for otfvis.  Currently (2010) allowed values: ``standard'', ``bvg''") ;
+//		map.put(SHOW_PARKING, "If non-moving items (e.g. agents at activities, at bus stops, etc.) should be showed.  " +
+//				"May affect all non-moving items.") ;
+		// can't set this outside the true preferences dialogue since there is additional mechanics involved.  kai, jan'11
 		return map ;
 	}
 
@@ -283,7 +306,8 @@ public class OTFVisConfigGroup extends Module {
 	 * @param fileVersion the fileVersion to set
 	 */
 	public void setFileVersion(final int fileVersion) {
-		log.info("File (major) version is: " + fileVersion ) ;
+		this.setModified();
+		log.info("File (major) version setting to: " + fileVersion ) ;
 		this.fileVersion = fileVersion;
 	}
 
@@ -298,7 +322,8 @@ public class OTFVisConfigGroup extends Module {
 	 * @param fileMinorVersion the fileMinorVersion to set
 	 */
 	public void setFileMinorVersion(final int fileMinorVersion) {
-		log.info("File minor version is: " + fileMinorVersion ) ;
+		this.setModified() ;
+		log.info("File minor version set to: " + fileMinorVersion ) ;
 		this.fileMinorVersion = fileMinorVersion;
 	}
 
@@ -328,6 +353,7 @@ public class OTFVisConfigGroup extends Module {
 	 * @param queryType the queryType to set
 	 */
 	public void setQueryType(final String queryType) {
+		setModified() ;
 		this.queryType = queryType;
 	}
 
@@ -342,6 +368,7 @@ public class OTFVisConfigGroup extends Module {
 	 * @param multipleSelect the multipleSelect to set
 	 */
 	public void setMultipleSelect(final boolean multipleSelect) {
+		setModified() ;
 		this.multipleSelect = multipleSelect;
 	}
 
@@ -390,7 +417,7 @@ public class OTFVisConfigGroup extends Module {
 	/**
 	 * @return the drawLinkIds
 	 */
-	public boolean drawLinkIds() {
+	public boolean isDrawingLinkIds() {
 		return this.drawLinkIds;
 	}
 
@@ -441,10 +468,12 @@ public class OTFVisConfigGroup extends Module {
 	}
 
 	public void setShowTeleportedAgents(final boolean showTeleportation){
+		setModified() ;
 		this.showTeleportedAgents = showTeleportation;
 	}
 
 	public void setDrawTransitFacilities(final boolean drawTransitFacilities) {
+		setModified() ;
 		this.drawTransitFacilities = drawTransitFacilities;
 	}
 
@@ -452,19 +481,35 @@ public class OTFVisConfigGroup extends Module {
 		return this.drawTransitFacilities;
 	}
 
-  public boolean isScaleQuadTreeRect() {
-    return this.scaleQuadTreeRect;
-  }
+	public boolean isScaleQuadTreeRect() {
+		return this.scaleQuadTreeRect;
+	}
 
-  public void setScaleQuadTreeRect(final boolean doScale){
-    this.scaleQuadTreeRect = doScale;
-  }
-  
+	public void setScaleQuadTreeRect(final boolean doScale){
+		setModified() ;
+		this.scaleQuadTreeRect = doScale;
+	}
+
 	public String getColoringScheme() {
 		return this.coloring ;
 	}
 	public void setColoringScheme( String value ) {
+		this.setModified() ;
 		this.coloring = value ;
+	}
+
+	/**
+	 * this is here so that the entry can be communicated from the network (which seems to be known only by the
+	 * otfvis server) to the otfvis client.  I am not sure if this is really a hack; might also just make this 
+	 * configurable in the sense that it tries to find a useful value either from network or from config or from
+	 * the saved config.  this is, however, not implemented.  kai, jan'11
+	 */
+	private Double effectiveLaneWidth = null ;
+	public void setEffectiveLaneWidth(Double effectiveLaneWidth) {
+		this.effectiveLaneWidth = effectiveLaneWidth ;
+	}
+	public Double getEffectiveLaneWidth() {
+		return this.effectiveLaneWidth ;
 	}
 
 

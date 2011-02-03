@@ -21,6 +21,8 @@
 package org.matsim.vis.otfvis.opengl.queries;
 
 import java.awt.Color;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.geom.Point2D;
 import java.awt.geom.Point2D.Double;
 import java.io.Serializable;
@@ -31,6 +33,9 @@ import java.util.List;
 import java.util.Map;
 
 import javax.media.opengl.GL;
+import javax.swing.JCheckBox;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -48,6 +53,7 @@ import org.matsim.vis.otfvis.data.OTFServerQuad2;
 import org.matsim.vis.otfvis.data.teleportation.TeleportationVisData;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.interfaces.OTFQuery;
+import org.matsim.vis.otfvis.interfaces.OTFQueryOptions;
 import org.matsim.vis.otfvis.interfaces.OTFQueryResult;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.vis.otfvis.opengl.gl.DrawingUtils;
@@ -66,7 +72,11 @@ import com.sun.opengl.util.BufferUtil;
  * @author dstrippgen
  * @author michaz
  */
-public class QueryAgentPlan extends AbstractQuery {
+public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, ItemListener {
+
+	private static final String INCLUDE_ROUTES = "include routes";
+	
+	private static boolean includeRoutes = true ;
 
 	private static final long serialVersionUID = 1L;
 
@@ -78,6 +88,36 @@ public class QueryAgentPlan extends AbstractQuery {
 	private transient Map<Id, TeleportationVisData> visTeleportationData;
 	private transient VisNetwork net;
 	private transient OTFVisMobsimFeature queueSimulation;
+
+	@Override
+	public void itemStateChanged(ItemEvent e) {
+		System.err.println("itemStateChange ...") ;
+		JCheckBox source = (JCheckBox)e.getItemSelectable();
+		if (source.getText().equals(INCLUDE_ROUTES)) {
+			includeRoutes = !includeRoutes ;
+			System.err.println("changing includRoutes") ;
+		}
+
+	}
+
+	@Override
+	public JComponent getOptionsGUI(JComponent mother) {
+		JPanel com = new JPanel();
+		com.setSize(500, 60);
+		JCheckBox synchBox = null ;
+//		JCheckBox SynchBox = new JCheckBox(ACTSLEGS);
+//		SynchBox.setMnemonic(KeyEvent.VK_M);
+//		SynchBox.setSelected(false);
+//		SynchBox.addItemListener(this);
+//		com.add(SynchBox);
+		synchBox = new JCheckBox(INCLUDE_ROUTES);
+//		synchBox.setMnemonic(KeyEvent.VK_R);
+		synchBox.setSelected(true);
+		synchBox.addItemListener(this);
+		com.add(synchBox);
+
+		return com;
+	}
 
 
 	@Override
@@ -139,7 +179,11 @@ public class QueryAgentPlan extends AbstractQuery {
 							(float) coord.getY(), act.getType()));
 				}
 			}
-			QueryAgentUtils.buildRoute(plan, result, agentId, net.getNetwork());
+			if ( includeRoutes ) {
+				QueryAgentUtils.buildRoute(plan, result, agentId, net.getNetwork(), QueryAgentUtils.Level.ROUTES ); 
+			} else {
+				QueryAgentUtils.buildRoute(plan, result, agentId, net.getNetwork(), QueryAgentUtils.Level.PLANELEMENTS ); 
+			}
 			result.hasPlan = true;
 		} else {
 			log.error("No plan found for id " + this.agentId);

@@ -62,7 +62,13 @@ import org.matsim.vis.snapshots.writers.AgentSnapshotInfoFactory;
 		this.storageCapacityFactor = sc.getConfig().getQSimConfigGroup().getStorageCapFactor();
 		this.cellSize = ((NetworkImpl) sc.getNetwork()).getEffectiveCellSize() ;
 		this.snapshotStyle = sc.getConfig().getQSimConfigGroup().getSnapshotStyle() ;
-//		AgentSnapshotInfoFactory.setLaneWidth( sc.getNetwork().getEffectiveLaneWidth() );
+		
+		double effLaneWidth = sc.getNetwork().getEffectiveLaneWidth() ;
+		if ( Double.isNaN( effLaneWidth ) ) {
+			AgentSnapshotInfoFactory.setLaneWidth( 3.75 ) ; // yyyyyy magic number
+		} else {
+			AgentSnapshotInfoFactory.setLaneWidth( effLaneWidth );
+		}
 	}
 
 	/**

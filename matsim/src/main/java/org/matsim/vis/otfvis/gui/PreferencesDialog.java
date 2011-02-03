@@ -144,7 +144,7 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 			}
 			if((host.getOTFHostConnectionManager().isLiveHost())||((visConfig.getFileVersion()>=1) &&(visConfig.getFileMinorVersion()>=4))) {
 				synchBox = new JCheckBox("show link Ids");
-				synchBox.setSelected(visConfig.drawLinkIds());
+				synchBox.setSelected(visConfig.isDrawingLinkIds());
 				synchBox.addItemListener(this);
 				synchBox.setBounds(10, 40, 200, 31);
 				synchBox.setVisible(true);
@@ -343,7 +343,7 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 			}
 		} else if (source.getText().equals("show link Ids")) {
 			// toggle draw link Ids
-			visConfig.setDrawLinkIds(!visConfig.drawLinkIds());
+			visConfig.setDrawLinkIds(!visConfig.isDrawingLinkIds());
 		} else if (source.getText().equals("show overlays")) {
 			// toggle draw Overlays
 			visConfig.setDrawOverlays(!visConfig.drawOverlays());

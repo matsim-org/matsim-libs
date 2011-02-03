@@ -26,7 +26,7 @@ package org.matsim.vis.otfvis.opengl.drawer;
  * @author dstrippgen
  *
  */
-abstract public class AbstractBackgroundDrawer extends OTFGLDrawableImpl{
+abstract public class AbstractBackgroundDrawer extends OTFGLAbstractDrawableReceiver{
 	protected double offsetEast; 
 	protected double offsetNorth;
 

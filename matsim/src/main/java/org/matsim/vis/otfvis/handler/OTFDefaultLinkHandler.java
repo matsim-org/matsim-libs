@@ -35,8 +35,11 @@ import org.matsim.vis.snapshots.writers.VisLink;
 
 /**
  * OTFDefaultLinkHandler handles the basic IO of a link.
- * It can send the link's coords as static data and the
- * QueueLink.getVisData().getDisplayableTimeCapValue()as dynamic data in float format.
+ * It can send the link's coords as static data.
+ * <p/>
+ * Sending 
+ * QueueLink.getVisData().getDisplayableTimeCapValue() as dynamic data in float format
+ * has been disabled some time ago.
  * 
  * @author david
  *
@@ -44,7 +47,7 @@ import org.matsim.vis.snapshots.writers.VisLink;
 public class OTFDefaultLinkHandler extends OTFDataReader {
 
 	protected OTFDataQuadReceiver quadReceiver = null;
-
+	
 	public OTFDataQuadReceiver getQuadReceiver() {
 		return quadReceiver;
 	}

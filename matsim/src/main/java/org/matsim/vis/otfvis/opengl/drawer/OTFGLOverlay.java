@@ -10,7 +10,7 @@ import org.matsim.vis.otfvis.caching.SceneGraph;
 
 import com.sun.opengl.util.texture.Texture;
 
-class OTFGLOverlay extends OTFGLDrawableImpl {
+class OTFGLOverlay extends OTFGLAbstractDrawableReceiver {
 	private final InputStream texture;
 	private final float relX;
 	private final float relY;
@@ -47,10 +47,17 @@ class OTFGLOverlay extends OTFGLDrawableImpl {
 		gl.glMatrixMode( GL.GL_MODELVIEW);
 		gl.glPushMatrix();
 		gl.glLoadIdentity();
+		
+		if ( gl != getGl() ) {
+			throw new RuntimeException("the `gl's are inconsistent; don't know what this means.  kai, jan'11") ;
+		}
+
 		//drawQuad
 		if(!this.opaque) {
-			getGl().glEnable(GL.GL_BLEND);
-			getGl().glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
+//			getGl().glEnable(GL.GL_BLEND);
+//			getGl().glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
+			gl.glEnable(GL.GL_BLEND);
+			gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
 		}
 
 		this.t.enable();
@@ -64,7 +71,8 @@ class OTFGLOverlay extends OTFGLDrawableImpl {
 		//restore old mode
 		this.t.disable();
 		if(!this.opaque) {
-			getGl().glDisable(GL.GL_BLEND);
+//			getGl().glDisable(GL.GL_BLEND);
+			gl.glDisable(GL.GL_BLEND);
 		}
 		gl.glMatrixMode( GL.GL_MODELVIEW);
 		gl.glPopMatrix();

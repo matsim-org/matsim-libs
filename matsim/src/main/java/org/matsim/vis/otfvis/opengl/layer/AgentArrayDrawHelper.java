@@ -23,7 +23,6 @@
 package org.matsim.vis.otfvis.opengl.layer;
 
 import java.awt.Color;
-import java.awt.geom.Point2D;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.util.Arrays;
@@ -34,8 +33,9 @@ import java.util.Map;
 
 import javax.media.opengl.GL;
 
+import org.apache.log4j.Logger;
 import org.matsim.vis.otfvis.OTFClientControl;
-import org.matsim.vis.otfvis.opengl.drawer.OTFGLDrawableImpl;
+import org.matsim.vis.otfvis.opengl.drawer.OTFGLAbstractDrawableReceiver;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer.AgentDrawer;
 
 import com.sun.opengl.util.BufferUtil;
@@ -43,10 +43,11 @@ import com.sun.opengl.util.texture.Texture;
 
 /**
  * 
- * This is just a helper class for the AgentPointLayer. It lives only for one timestep.
+ * This is a helper class for the AgentPointLayer. It lives only for one timestep.
  *
  */
-public final class AgentArrayDrawer {
+final class AgentArrayDrawHelper {
+	// this is not an official "Drawer" since it does not implement the corresponding interface.  kai, jan'11
 
 	private int count = 0;
 	
@@ -63,78 +64,99 @@ public final class AgentArrayDrawer {
 	private Map<Integer,Integer> id2coord = new HashMap<Integer,Integer>();
 	
 	private Texture texture;
+	
+	private static final Logger log = Logger.getLogger(AgentArrayDrawHelper.class);
 
-	public AgentArrayDrawer() {
-		// Empty constructor
+	AgentArrayDrawHelper() {
 	}
 
 	private void setTexture() {
 		this.texture = AgentDrawer.agentpng;
 	}
 
-	private void setAgentSize() {
+	private static void setAgentSize(GL gl) {
 		float agentSize = OTFClientControl.getInstance().getOTFVisConfig().getAgentSize();
-		if (OTFGLDrawableImpl.getGl().isFunctionAvailable("glPointParameterf")) {
+		if (gl.isFunctionAvailable("glPointParameterf")) {
 			// Query for the max point size supported by the hardware
 			float [] maxSize = {0.0f};
-			OTFGLDrawableImpl.getGl().glGetFloatv( GL.GL_POINT_SIZE_MAX_ARB, FloatBuffer.wrap(maxSize) );
+			gl.glGetFloatv( GL.GL_POINT_SIZE_MAX_ARB, FloatBuffer.wrap(maxSize) );
 			float quadratic[] =  { 0.0f, 0.0001f, 0.000000f };
-			OTFGLDrawableImpl.getGl().glPointParameterfvARB( GL.GL_POINT_DISTANCE_ATTENUATION_ARB, FloatBuffer.wrap(quadratic ));
+			gl.glPointParameterfvARB( GL.GL_POINT_DISTANCE_ATTENUATION_ARB, FloatBuffer.wrap(quadratic ));
 
-			OTFGLDrawableImpl.getGl().glPointSize(agentSize/10.f);
-			OTFGLDrawableImpl.getGl().glPointParameterf(GL.GL_POINT_SIZE_MIN_ARB, 1.f);
-			OTFGLDrawableImpl.getGl().glPointParameterf(GL.GL_POINT_SIZE_MAX_ARB, agentSize*30.f);
+			gl.glPointSize(agentSize/10.f);
+			gl.glPointParameterf(GL.GL_POINT_SIZE_MIN_ARB, 1.f);
+			gl.glPointParameterf(GL.GL_POINT_SIZE_MAX_ARB, agentSize*30.f);
 
 		} else {
-			OTFGLDrawableImpl.getGl().glPointSize(agentSize/10);
+			gl.glPointSize(agentSize/10.f);
 		}
 	}
 
+	private static int infocnt = 0 ;
 	private void drawArray(GL gl) {
+		
+		// testing if the point sprite is available.  Would be good to not do this in every time step ...
+		// ... move to some earlier place in the calling hierarchy.  kai, feb'11
+		if ( infocnt < 1 ) {
+			infocnt++ ;
+			String[] str = {"glDrawArrays", "glVertexPointer", "glColorPointer"} ;
+			for ( int ii=0 ; ii<str.length ; ii++ ) {
+				if ( gl.isFunctionAvailable(str[ii]) ) {
+					log.info( str[ii] + " is available ") ;
+				} else {
+					log.warn( str[ii] + " is NOT available ") ;
+				}
+			}
+		}
+		
 		ByteBuffer colors =  null;
 		FloatBuffer vertex =  null;
 		for(int i = 0; i < this.getPosBuffers().size(); i++) {
 			colors = this.colBuffers.get(i);
 			vertex = this.getPosBuffers().get(i);
-			int remain = i == this.getPosBuffers().size()-1 ? this.count %OGLAgentPointLayer.BUFFERSIZE : OGLAgentPointLayer.BUFFERSIZE; //Math.min(vertex.limit() / 2, count - i*BUFFERSIZE);
+			int remain = i == this.getPosBuffers().size()-1 ? this.count %OGLAgentPointLayer.BUFFERSIZE : OGLAgentPointLayer.BUFFERSIZE; 
+			//Math.min(vertex.limit() / 2, count - i*BUFFERSIZE);
 			colors.position(0);
 			vertex.position(0);
 			gl.glColorPointer (4, GL.GL_UNSIGNED_BYTE, 0, colors);
 			gl.glVertexPointer (2, GL.GL_FLOAT, 0, vertex);
+			
 			gl.glDrawArrays (GL.GL_POINTS, 0, remain);
 		}
 	}
 
-	public int getNearestAgent(Point2D.Double point) {
-		FloatBuffer vertex =  null;
+	// following method does not seem to be used.  kai, jan'11
+	
+//	private int getNearestAgent(Point2D.Double point) {
+//		FloatBuffer vertex =  null;
+//
+//		int idx = 0;
+//		int result = -1;
+//		double mindist = Double.MAX_VALUE;
+//		double dist = 0;
+//
+//		for(int i = 0; i < this.getPosBuffers().size(); i++) {
+//			vertex = this.getPosBuffers().get(i);
+//			vertex.position(0);
+//			while (vertex.hasRemaining() && (idx < this.count)) {
+//				float x = vertex.get();
+//				float y = vertex.get();
+//				// DS We do not need z value here but need to fetch it from buffer!
+//				/*float z = */vertex.get();
+//
+//				// Manhattan dist reicht uns hier
+//				dist = Math.abs(x-point.x) + Math.abs(y-point.y);
+//				if ( dist < mindist) {
+//					mindist = dist;
+//					result = idx;
+//				}
+//				idx++;
+//			}
+//		}
+//		return result;
+//	}
 
-		int idx = 0;
-		int result = -1;
-		double mindist = Double.MAX_VALUE;
-		double dist = 0;
-
-		for(int i = 0; i < this.getPosBuffers().size(); i++) {
-			vertex = this.getPosBuffers().get(i);
-			vertex.position(0);
-			while (vertex.hasRemaining() && (idx < this.count)) {
-				float x = vertex.get();
-				float y = vertex.get();
-				// DS We do not need z value here but need to fetch it from buffer!
-				/*float z = */vertex.get();
-
-				// Manhattan dist reicht uns hier
-				dist = Math.abs(x-point.x) + Math.abs(y-point.y);
-				if ( dist < mindist) {
-					mindist = dist;
-					result = idx;
-				}
-				idx++;
-			}
-		}
-		return result;
-	}
-
-	public void addAgent(char[] id, float startX, float startY, Color mycolor, boolean saveId){
+	 void addAgent(char[] id, float startX, float startY, Color mycolor, boolean saveId){
 		if (this.count % OGLAgentPointLayer.BUFFERSIZE == 0) {
 			this.vertexIN = BufferUtil.newFloatBuffer(OGLAgentPointLayer.BUFFERSIZE*2);
 			this.colorsIN = BufferUtil.newByteBuffer(OGLAgentPointLayer.BUFFERSIZE*4);
@@ -153,19 +175,19 @@ public final class AgentArrayDrawer {
 		this.count++;
 	}
 
-	public Map<Integer,Integer> getId2coord() {
+	Map<Integer,Integer> getId2coord() {
 		return id2coord;
 	}
 
-	public List<FloatBuffer> getPosBuffers() {
+	List<FloatBuffer> getPosBuffers() {
 		return posBuffers;
 	}
 
-	public void draw() {
-		GL gl = OTFGLDrawableImpl.getGl();
+	void draw() {
+		GL gl = OTFGLAbstractDrawableReceiver.getGl();
 		gl.glEnable(GL.GL_POINT_SPRITE);
 		
-		this.setAgentSize();
+		setAgentSize(gl);
 		
 		gl.glEnableClientState (GL.GL_COLOR_ARRAY);
 		gl.glEnableClientState (GL.GL_VERTEX_ARRAY);
@@ -175,7 +197,7 @@ public final class AgentArrayDrawer {
 		//texture = null;
 		// setting the texture to null means that agents are painted using (software-rendered?) squares.  I have made speed
 		// tests and found on my computer (mac powerbook, with "slow" graphics settings) no difference at all between "null"
-		// and a jpg.  So no reason to not use a jpg/png.  kai, apr'10
+		// and a jpg.  But it looks weird w/o some reasonable icon.  kai, jan'11
 		
 		if (this.texture != null) {
 			this.texture.enable();
@@ -183,6 +205,7 @@ public final class AgentArrayDrawer {
 			gl.glTexEnvf(GL.GL_POINT_SPRITE, GL.GL_COORD_REPLACE, GL.GL_TRUE);
 			this.texture.bind();
 		}
+		
 		gl.glDepthMask(false);
 		
 		this.drawArray(gl);

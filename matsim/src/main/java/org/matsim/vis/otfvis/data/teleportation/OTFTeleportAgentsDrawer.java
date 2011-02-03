@@ -27,13 +27,13 @@ import javax.media.opengl.GL;
 
 import org.apache.log4j.Logger;
 import org.matsim.vis.otfvis.OTFClientControl;
-import org.matsim.vis.otfvis.opengl.drawer.OTFGLDrawableImpl;
+import org.matsim.vis.otfvis.opengl.drawer.OTFGLAbstractDrawableReceiver;
 
 /**
  *
  * @author dgrether
  */
-public class OTFTeleportAgentsDrawer extends OTFGLDrawableImpl{
+public class OTFTeleportAgentsDrawer extends OTFGLAbstractDrawableReceiver{
 
 	private static final Logger log = Logger.getLogger(OTFTeleportAgentsDrawer.class);
 

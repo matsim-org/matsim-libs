@@ -41,7 +41,7 @@ import org.matsim.vis.otfvis.data.OTFDataReceiver;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
 import org.matsim.vis.otfvis.data.OTFServerQuad2;
 import org.matsim.vis.otfvis.interfaces.OTFDataReader;
-import org.matsim.vis.otfvis.opengl.drawer.OTFGLDrawableImpl;
+import org.matsim.vis.otfvis.opengl.drawer.OTFGLAbstractDrawableReceiver;
 import org.matsim.vis.otfvis.opengl.gl.DrawingUtils;
 import org.matsim.vis.otfvis.opengl.gl.InfoText;
 import org.matsim.vis.otfvis.opengl.gl.InfoTextContainer;
@@ -147,7 +147,7 @@ public class FacilityDrawer {
 
 	}
 
-	public static class DataDrawer extends OTFGLDrawableImpl {
+	public static class DataDrawer extends OTFGLAbstractDrawableReceiver {
 
 		/*package*/ final List<VisBusStop> stops = new LinkedList<VisBusStop>();
 

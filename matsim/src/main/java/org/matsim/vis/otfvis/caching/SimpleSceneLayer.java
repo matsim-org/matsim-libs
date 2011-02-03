@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.vis.otfvis.data.OTFDataReceiver;
-import org.matsim.vis.otfvis.gui.OTFDrawable;
+import org.matsim.vis.otfvis.gui.OTFDrawableReceiver;
 
 
 /**
@@ -36,16 +36,16 @@ import org.matsim.vis.otfvis.gui.OTFDrawable;
  */
 public class SimpleSceneLayer implements SceneLayer {
 	
-	private final List<OTFDrawable> items = new ArrayList<OTFDrawable>();
+	private final List<OTFDrawableReceiver> items = new ArrayList<OTFDrawableReceiver>();
 
 	@Override
 	public void addItem(OTFDataReceiver item) {
-		items.add((OTFDrawable)item);
+		items.add((OTFDrawableReceiver)item);
 	}
 
 	@Override
 	public void draw() {
-		for(OTFDrawable item : items) item.draw();
+		for(OTFDrawableReceiver item : items) item.draw();
 	}
 	
 	@Override
@@ -61,7 +61,7 @@ public class SimpleSceneLayer implements SceneLayer {
 	}
 
 	@Override
-	public OTFDataReceiver newInstance(Class<? extends OTFDataReceiver> clazz) {
+	public OTFDataReceiver newInstanceOf(Class<? extends OTFDataReceiver> clazz) {
 		try {
 			return clazz.newInstance();
 		} catch (InstantiationException e) {

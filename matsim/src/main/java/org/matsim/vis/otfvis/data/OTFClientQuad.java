@@ -79,6 +79,12 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 		}
 
 		public void execute(final double x, final double y, final OTFDataReader reader) {
+			// I the end, the readers are stored in the leaves of the quad tree, and the "mechanics" will get them out and
+			// feed them into this method here.  
+			// The original filling happens via the quadtree "put" method.  Technically, this is achieved (I think)
+			// by ConvertToClientExecutor in a ServerQuad.  I.e. the writers in the ServerQuad are mirrored by the 
+			// corresponding readers in the ClientQuad.  kai, feb'11
+			
 			try {
 				if (this.readConst)
 					reader.readConstData(this.in);
@@ -171,6 +177,10 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 		this.cachedTimes.clear();
 	}
 
+	/**
+	 * I think that this requests the scene graph for a given time step and for the rectangle that is visible.  
+	 * 	 * "drawer" is the backpointer to the calling method; don't know why it is done in this way.  kai, feb'11
+	 */
 	private SceneGraph getSceneGraphNoCache(final int time, Rect rect, final OTFDrawer drawer) {
 		try {
 			List<Rect> rects = new LinkedList<Rect>();
@@ -182,6 +192,8 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 			}
 
 			SceneGraph cachedResult = this.cachedTimes.get(time);
+			// cachedTimes refers to snapshots that were already rendered at some earlier time (only mvi mode).
+			
 			if(cachedResult != null) {
 				Rect cachedRect = cachedResult.getRect();
 				if((cachedRect == null) || cachedRect.containsOrEquals(rect)) return cachedResult;
@@ -212,6 +224,9 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 			}
 
 			// otherwise this Scenegraph is not useful, so we create a new one
+			//
+			// I don't understand the above comment.  "isLive" means is interactive.  if it is not interactive, there
+			// is no cached result.
 			if(this.host.isLive() == false) {
 				rect = null;
 				cachedResult = null;
@@ -220,11 +235,20 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 			SceneGraph result;
 			if ( cachedResult == null) {
 				SceneGraph result1 = new SceneGraph(rect, time, this.connect, drawer);
+				// (sets up the layers but does not put content)
+				
 				QuadTree.Rect bound2 = this.host.isLive() ? rect : this.top.getBounds();
 				byte[] bbyte;
 				bbyte = this.host.getQuadDynStateBuffer(this.id, bound2);
+				// (seems that this contains the whole time step (in binary form))
+				
 				ByteBuffer in = ByteBuffer.wrap(bbyte);
+				// (converts the byte buffer into an object)
+				
 				this.execute(bound2, new ReadDataExecutor(in, false, result1));
+				// (this is pretty normal, but I still keep forgetting it: The leaves of the QuadTree contain objects of type
+				// OTFDataReader.  The ReadDataExecutor (defined above) uses them to read the data.
+				
 				for(OTFDataReader element : this.additionalElements) {
 					try {
 						element.readDynData(in,result1);
@@ -233,7 +257,10 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 					}
 				}
 				// fill with elements
+				//
+				// I don't understand the wording.  Why does "invalidate" do a "fill with elements"?
 				invalidate(rect, result1);
+				
 				result = result1;
 			} else {
 				result = cachedResult;
@@ -260,6 +287,10 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 		}
 	}
 
+	/**
+	 * I think that this requests the scene graph for a given time step and for the rectangle that is visible.  
+	 * "drawer" is the backpointer to the calling method; don't know why it is done in this way.  kai, feb'11
+	 */
 	public synchronized SceneGraph getSceneGraph(final int time, final Rect rect, final OTFDrawer drawer) {
 		if ((time == -1) && (this.lastGraph != null)) return this.lastGraph;
 		this.lastGraph = getSceneGraphNoCache(time, rect, drawer);

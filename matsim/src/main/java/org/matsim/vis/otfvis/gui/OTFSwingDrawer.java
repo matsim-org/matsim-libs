@@ -42,7 +42,7 @@ import org.matsim.vis.otfvis.interfaces.OTFQueryHandler;
 /**
  * @author david
  */
-abstract class OTFSwingDrawable implements OTFDrawable, OTFDataReceiver{
+abstract class OTFSwingDrawable implements OTFDrawableReceiver, OTFDataReceiver{
 
 	@Override
 	public final void draw() {

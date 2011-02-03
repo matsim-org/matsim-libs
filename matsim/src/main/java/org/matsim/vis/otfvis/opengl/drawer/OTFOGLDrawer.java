@@ -105,6 +105,8 @@ import com.sun.opengl.util.texture.TextureIO;
  * OTFOGLDrawer is responsible for everything that goes on inside the OpenGL context.
  * The main functions are invalidate() and redraw(). The latter will simply redraw a given
  * SceneGraph, whilst invalidate() will update the content.
+ * <p/>
+ * As far as I can see, there is no invalidate().  kai, feb'11
  *
  * @author dstrippgen
  *
@@ -125,9 +127,9 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider {
 	
 	private int lastShot = -1;
 
-	private final List<OTFGLDrawable> overlayItems = new ArrayList<OTFGLDrawable>();
+	private final List<OTFGLDrawableReceiver> overlayItems = new ArrayList<OTFGLDrawableReceiver>();
 
-	private static List<OTFGLDrawable> newItems = new ArrayList<OTFGLDrawable>();
+	private static List<OTFGLDrawableReceiver> newItems = new ArrayList<OTFGLDrawableReceiver>();
 
 	private static volatile GLContext motherContext = null;
 
@@ -338,7 +340,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider {
 				i++;
 			}
 			xymap.put(text, Boolean.TRUE);
-			InfoTextContainer.showTextOnce(linkId, (float)text.getX(), (float)text.getY(), 1.f);
+			InfoTextContainer.showTextOnce(linkId, (float)text.getX(), (float)text.getY(), -0.0005f);
 			this.gl.glColor4f(0.f, 0.2f, 1.f, 0.5f);//Blue
 			this.gl.glLineWidth(2);
 			this.gl.glBegin(GL.GL_LINE_STRIP);
@@ -386,7 +388,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider {
 			this.queryHandler.drawQueries(this);
 		}
 		Map<Coord, String> coordStringPairs = findVisibleLinks();
-		if (OTFClientControl.getInstance().getOTFVisConfig().drawLinkIds()) {
+		if (OTFClientControl.getInstance().getOTFVisConfig().isDrawingLinkIds()) {
 			displayLinkIds(coordStringPairs);
 		}
 		this.gl.glDisable(GL.GL_BLEND);
@@ -401,7 +403,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider {
 		this.mouseMan.drawElements(this.gl);
 
 		if(OTFClientControl.getInstance().getOTFVisConfig().drawOverlays()) {
-			for (OTFGLDrawable item : this.overlayItems) {
+			for (OTFGLDrawableReceiver item : this.overlayItems) {
 				item.draw();
 			}
 		}
@@ -442,7 +444,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider {
 		this.gl.glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		this.mouseMan.init(this.gl);
 		AgentDrawer.agentpng = createTexture(MatsimResource.getAsInputStream("icon18.png"));
-		OTFGLDrawableImpl.setGl(this.gl);
+		OTFGLAbstractDrawableReceiver.setGl(this.gl);
 	}
 
 	@Override

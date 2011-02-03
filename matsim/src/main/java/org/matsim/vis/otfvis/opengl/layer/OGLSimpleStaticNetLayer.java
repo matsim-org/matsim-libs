@@ -30,7 +30,7 @@ import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.caching.SceneLayer;
 import org.matsim.vis.otfvis.data.OTFDataReceiver;
-import org.matsim.vis.otfvis.gui.OTFDrawable;
+import org.matsim.vis.otfvis.gui.OTFDrawableReceiver;
 import org.matsim.vis.otfvis.opengl.drawer.OGLProvider;
 
 
@@ -52,17 +52,17 @@ import org.matsim.vis.otfvis.opengl.drawer.OGLProvider;
  */
 public class OGLSimpleStaticNetLayer implements SceneLayer {
 
-	private final List<OTFDrawable> items = new ArrayList<OTFDrawable>();
+	private final List<OTFDrawableReceiver> items = new ArrayList<OTFDrawableReceiver>();
 	
 	private OGLProvider myDrawer;
 	
 	private static int netDisplList = -1;
 	
-	public static float cellWidth_m = 30.f;
+	private static float basicLineWidth_m = 30.f;
 
 	@Override
 	public void addItem(OTFDataReceiver item) {
-		items.add((OTFDrawable)item);
+		items.add((OTFDrawableReceiver)item);
 	}
 
 	public OGLSimpleStaticNetLayer() {
@@ -95,7 +95,7 @@ public class OGLSimpleStaticNetLayer implements SceneLayer {
 	}
 
 	@Override
-	public OTFDataReceiver newInstance(Class<? extends OTFDataReceiver> clazz) {
+	public OTFDataReceiver newInstanceOf(Class<? extends OTFDataReceiver> clazz) {
 		try {
 			return clazz.newInstance();
 		} catch (InstantiationException e) {
@@ -106,21 +106,38 @@ public class OGLSimpleStaticNetLayer implements SceneLayer {
 	}
 
 	private void checkNetList(GL gl) {
-		List<OTFDrawable> it = items;
+		List<OTFDrawableReceiver> it = items;
 		float cellWidthAct_m = OTFClientControl.getInstance().getOTFVisConfig().getLinkWidth();
-		if (cellWidth_m != cellWidthAct_m){
+		if (getBasicLineWidth_m() != cellWidthAct_m){
 			gl.glDeleteLists(netDisplList, 1);
 			netDisplList = -2;
 		}
 		if (netDisplList < 0) {
-			cellWidth_m = cellWidthAct_m;
+			setBasicLineWidth_m(cellWidthAct_m);
 			netDisplList = gl.glGenLists(1);
 			gl.glNewList(netDisplList, GL.GL_COMPILE);
-			for (OTFDrawable item : it) {
+			for (OTFDrawableReceiver item : it) {
 				item.draw();
 			}
 			gl.glEndList();
 		}
 	}
 
+	public static void setBasicLineWidth_m(float basicLineWidth_m) {
+		OGLSimpleStaticNetLayer.basicLineWidth_m = basicLineWidth_m;
+	}
+
+	public static float getBasicLineWidth_m() {
+		return basicLineWidth_m;
+	}
+	
+	public static float getBasicLaneWidth_m() {
+		Double effectiveLaneWidth = OTFClientControl.getInstance().getOTFVisConfig().getEffectiveLaneWidth() ;
+		if ( effectiveLaneWidth != null ) {
+			return (float) ( basicLineWidth_m * effectiveLaneWidth / 3.75 ) ;
+			// "3.75" seems to make sense in terms of retrofitting
+		}
+		return basicLineWidth_m ;
+	}
+	
 }

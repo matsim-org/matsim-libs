@@ -80,7 +80,7 @@ public class OGLSimpleBackgroundLayer implements SceneLayer {
 	}
 
 	@Override
-	public OTFDataReceiver newInstance(Class<? extends OTFDataReceiver> clazz) {
+	public OTFDataReceiver newInstanceOf(Class<? extends OTFDataReceiver> clazz) {
 		try {
 			return clazz.newInstance();
 		} catch (InstantiationException e) {

@@ -103,12 +103,19 @@ public class SceneGraph {
 		return drawer;
 	}
 
-	public OTFDataReceiver newInstance(Class<? extends OTFDataReceiver> clazz) throws InstantiationException, IllegalAccessException {
+	public OTFDataReceiver newInstanceOf(Class<? extends OTFDataReceiver> clazz) throws InstantiationException, IllegalAccessException {
+		// yyyy imo this should either be a DrawableReceiver, or a Drawer if we keep them separate.  kai, feb'11
 		SceneLayer layer = layers.get(clazz);
-		return layer.newInstance(clazz);
+		return layer.newInstanceOf(clazz);
 	}
 
 	public void addItem(OTFDataReceiver item) {
+		// If I understand this correctly, in theory every point would arrive here essentially as a self-drawing
+		// item.  In practice, this is completely bypassed for the points (=agents), and the layer
+		// handles it by itself.  kai, feb'11
+		
+		// yyyy imo this should either be a DrawableReceiver, or a Drawer if we keep them separate.  kai, feb'11
+		
 		SceneLayer layer = layers.get(item.getClass());
 		layer.addItem(item);
 	}

@@ -42,7 +42,7 @@ public class OGLAgentPointLayer implements SceneLayer {
 
 	final static int BUFFERSIZE = 10000;
 
-	private final AgentArrayDrawer drawer = new AgentArrayDrawer();
+	private final AgentArrayDrawHelper drawer = new AgentArrayDrawHelper();
 	
 	private final AgentPointDrawer pointdrawer = new AgentPointDrawer(this);
 
@@ -64,7 +64,7 @@ public class OGLAgentPointLayer implements SceneLayer {
 	}
 
 	@Override
-	public OTFDataReceiver newInstance(Class<? extends OTFDataReceiver> clazz) {
+	public OTFDataReceiver newInstanceOf(Class<? extends OTFDataReceiver> clazz) {
 		return this.pointdrawer;
 	}
 

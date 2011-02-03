@@ -51,6 +51,10 @@ public interface OTFServerRemote extends Remote {
 
 	public int getLocalTime() throws RemoteException;
 
+	/**
+	 * @return (I think) information if the server is "live" (i.e. has user control) or not.  kai, feb'11
+	 * @throws RemoteException
+	 */
 	public boolean isLive() throws RemoteException;
 
 	public Collection<Double> getTimeSteps() throws RemoteException;

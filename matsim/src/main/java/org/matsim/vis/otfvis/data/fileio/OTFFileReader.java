@@ -210,7 +210,7 @@ public final class OTFFileReader implements OTFServerRemote {
 	public byte[] getQuadDynStateBuffer(final String id, final Rect bounds)
 			throws RemoteException {
 		if (bounds == null) {
-			log.warn("Bounds are ignored but set!");
+			log.warn("Bounds are ignored but set! [[I don't understand what this means here.  kai, feb'11]]");
 		}
 		if (this.actBuffer == null) {
 			byte[] buffer = null;
