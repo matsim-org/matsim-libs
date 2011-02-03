@@ -213,15 +213,15 @@ public class TransitDriverTest extends MatsimTestCase {
 		PassengerAgent agent4 = new FakeAgent(null, stop3);
 		PassengerAgent agent5 = new FakeAgent(null, stop3);
 
-		tracker.addAgentToStop(agent1, stop1);
-		tracker.addAgentToStop(agent2, stop1);
+		tracker.addAgentToStop(agent1, stop1.getId());
+		tracker.addAgentToStop(agent2, stop1.getId());
 		assertEquals(0, queueVehicle.getPassengers().size());
 		assertEquals(stop1, driver.getNextTransitStop());
 		assertTrue(driver.handleTransitStop(stop1, 50) > 0);
 		assertEquals(2, queueVehicle.getPassengers().size());
 		assertEquals("driver must not proceed in stop list when persons entered.",
 				stop1, driver.getNextTransitStop());
-		assertEquals(0, tracker.getAgentsAtStop(stop1).size());
+		assertEquals(0, tracker.getAgentsAtStop(stop1.getId()).size());
 		assertEquals("stop time must be 0 when nobody enters or leaves",
 				0.0, driver.handleTransitStop(stop1, 60), MatsimTestCase.EPSILON);
 		assertEquals(2, queueVehicle.getPassengers().size());
@@ -230,18 +230,18 @@ public class TransitDriverTest extends MatsimTestCase {
 		assertEquals("driver must return same stop again when queried again without handling stop.",
 				stop2, driver.getNextTransitStop());
 
-		tracker.addAgentToStop(agent3, stop2);
+		tracker.addAgentToStop(agent3, stop2.getId());
 		double stoptime1 = driver.handleTransitStop(stop2, 150);
 		assertTrue(stoptime1 > 0);
 		assertEquals(3, queueVehicle.getPassengers().size());
-		assertEquals(0, tracker.getAgentsAtStop(stop2).size());
-		tracker.addAgentToStop(agent4, stop2);
+		assertEquals(0, tracker.getAgentsAtStop(stop2.getId()).size());
+		tracker.addAgentToStop(agent4, stop2.getId());
 		double stoptime2 = driver.handleTransitStop(stop2, 160);
 		assertTrue(stoptime2 > 0);
 		assertEquals(4, queueVehicle.getPassengers().size());
 		assertTrue("The first stoptime should be larger as it contains door-opening/closing times as well. stoptime1=" + stoptime1 + "  stoptime2=" + stoptime2,
 				stoptime1 > stoptime2);
-		tracker.addAgentToStop(agent5, stop2);
+		tracker.addAgentToStop(agent5, stop2.getId());
 		assertEquals("vehicle should have reached capacity, so not more passenger can enter.",
 				0.0, driver.handleTransitStop(stop2, 170), MatsimTestCase.EPSILON);
 	}
@@ -334,7 +334,7 @@ public class TransitDriverTest extends MatsimTestCase {
 		driver.setVehicle(queueVehicle);
 
 		SpyAgent agent = new SpyAgent();
-		tracker.addAgentToStop(agent, stop1);
+		tracker.addAgentToStop(agent, stop1.getId());
 		driver.handleTransitStop(stop1, 50);
 		assertEquals(tLine, agent.offeredLine);
 	}
@@ -425,7 +425,7 @@ public class TransitDriverTest extends MatsimTestCase {
 		driver.setVehicle(queueVehicle);
 
 		PassengerAgent agent1 = new FakeAgent(stop2, stop1);
-		tracker.addAgentToStop(agent1, stop2);
+		tracker.addAgentToStop(agent1, stop2.getId());
 
 		assertEquals(0, queueVehicle.getPassengers().size());
 		assertEquals(stop1, driver.getNextTransitStop());
@@ -458,6 +458,16 @@ public class TransitDriverTest extends MatsimTestCase {
 				TransitRoute transitRoute, List<TransitRouteStop> stopsToCome) {
 			this.offeredLine = line;
 			return false;
+		}
+
+		@Override
+		public Id getId() {
+			return null;
+		}
+
+		@Override
+		public double getWeight() {
+			return 1.0;
 		}
 	}
 

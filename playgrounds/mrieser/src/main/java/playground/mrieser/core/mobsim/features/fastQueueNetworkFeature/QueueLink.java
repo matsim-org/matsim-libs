@@ -256,7 +256,7 @@ import playground.mrieser.core.mobsim.network.api.MobsimLink;
 			}
 			double actionLocation = veh.getDriver().getNextActionOnCurrentLink();
 			if (actionLocation >= 0.0) {
-				veh.getDriver().handleNextAction(this);
+				veh.getDriver().handleNextAction(this, time);
 			} else if (!this.buffer.hasSpace()) {
 				return;
 			} else {

@@ -59,7 +59,7 @@ public class TransitPlanMutateTimeAllocationTest {
 		ActivityImpl ptAct4 = plan.createAndAddActivity(PtConstants.TRANSIT_ACTIVITY_TYPE, new CoordImpl(0, 100));
 		ptAct4.setDuration(0);
 		plan.createAndAddLeg(TransportMode.transit_walk);
-		act = plan.createAndAddActivity("work", new CoordImpl(0, 500));
+		plan.createAndAddActivity("work", new CoordImpl(0, 500));
 
 		TransitPlanMutateTimeAllocation mutator = new TransitPlanMutateTimeAllocation(3600, new Random(2011));
 		mutator.run(plan);

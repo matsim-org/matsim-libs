@@ -286,7 +286,7 @@ public class TransitQueueSimulationTest {
 		simulation.run();
 
 		// check everything
-		assertEquals(1, simulation.getTransitEngine().getAgentTracker().getAgentsAtStop(stop1).size());
+		assertEquals(1, simulation.getTransitEngine().getAgentTracker().getAgentsAtStop(stop1.getId()).size());
 	}
 
 	/**

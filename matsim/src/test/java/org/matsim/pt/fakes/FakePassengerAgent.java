@@ -22,6 +22,7 @@ package org.matsim.pt.fakes;
 
 import java.util.List;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.pt.qsim.PassengerAgent;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -46,6 +47,12 @@ public class FakePassengerAgent implements PassengerAgent {
 		this.exitStop = exitStop;
 	}
 
+	@Override
+	public Id getId() {
+		return null;
+	}
+
+	@Override
 	public boolean getExitAtStop(final TransitStopFacility stop) {
 		return stop == this.exitStop;
 	}
@@ -54,6 +61,11 @@ public class FakePassengerAgent implements PassengerAgent {
 	public boolean getEnterTransitRoute(TransitLine line,
 			TransitRoute transitRoute, List<TransitRouteStop> stopsToCome) {
 		return true;
+	}
+
+	@Override
+	public double getWeight() {
+		return 1.0;
 	}
 
 }

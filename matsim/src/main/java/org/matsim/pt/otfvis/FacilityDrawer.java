@@ -95,7 +95,7 @@ public class FacilityDrawer {
 		@Override
 		public void writeDynData(ByteBuffer out) throws IOException {
 			for (TransitStopFacility facility : this.schedule.getFacilities().values()) {
-				out.putInt(this.agentTracker.getAgentsAtStop(facility).size());
+				out.putInt(this.agentTracker.getAgentsAtStop(facility.getId()).size());
 			}
 		}
 
@@ -164,7 +164,7 @@ public class FacilityDrawer {
 		public void initTexts() {
 			for (VisBusStop stop : this.stops) {
 				if ( stop.linkId!=null ) {
-					stop.stopText = InfoTextContainer.showTextOnce(stop.buildText(), 
+					stop.stopText = InfoTextContainer.showTextOnce(stop.buildText(),
 							(float) stop.x - 100.0f, (float) stop.y + 50.0f, -0.001f); // kai: text size
 					stop.stopText.setLinkId(new IdImpl(stop.linkId));
 				}

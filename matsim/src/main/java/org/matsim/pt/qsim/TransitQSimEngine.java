@@ -123,11 +123,12 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine {
 	@Override
 	public void afterSim() {
 		double now = this.qSim.getSimTimer().getTimeOfDay();
-		for (Entry<TransitStopFacility, List<PassengerAgent>> agentsAtStop : this.agentTracker.getAgentsAtStop().entrySet()) {
+		for (Entry<Id, List<PassengerAgent>> agentsAtStop : this.agentTracker.getAgentsAtStop().entrySet()) {
+			TransitStopFacility stop = this.schedule.getFacilities().get(agentsAtStop.getKey());
 
 			for (PassengerAgent agent : agentsAtStop.getValue()) {
 				this.qSim.getEventsManager().processEvent(
-						new AgentStuckEventImpl(now, ((TransitAgent) agent).getPerson().getId(), agentsAtStop.getKey().getLinkId(), ((TransitAgent) agent).getVehicle().getDriver().getCurrentLeg().getMode()));
+						new AgentStuckEventImpl(now, ((TransitAgent) agent).getPerson().getId(), stop.getLinkId(), ((TransitAgent) agent).getVehicle().getDriver().getCurrentLeg().getMode()));
 
 				this.qSim.getAgentCounter().decLiving();
 				this.qSim.getAgentCounter().incLost();
@@ -214,7 +215,7 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine {
 	// this method is not used anywhere.  kai, nov'10
 
 	private void handleAgentPTDeparture(final PlanAgent planAgent, Id linkId, Leg leg) {
-		// this puts the agent into the transit stop.  
+		// this puts the agent into the transit stop.
 		if (!(leg.getRoute() instanceof ExperimentalTransitRoute)) {
 			log.error("pt-leg has no TransitRoute. Removing agent from simulation. Agent " + planAgent.getId().toString());
 			log.info("route: "
@@ -237,7 +238,7 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine {
 			} else {
 				TransitStopFacility stop = this.schedule.getFacilities().get(route.getAccessStopId());
 				if (stop.getLinkId() == null || stop.getLinkId().equals(linkId)) {
-					this.agentTracker.addAgentToStop((PassengerAgent) planAgent, stop);
+					this.agentTracker.addAgentToStop((PassengerAgent) planAgent, stop.getId());
 					this.getMobsim().registerAgentAtPtWaitLocation(planAgent) ;
 				} else {
 					throw new TransitAgentTriesToTeleportException("Agent "+planAgent.getId() + " tries to enter a transit stop at link "+stop.getLinkId()+" but really is at "+linkId+"!");

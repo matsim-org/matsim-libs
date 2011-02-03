@@ -19,54 +19,50 @@
 
 package playground.mrieser.core.mobsim.impl;
 
-import org.junit.Assert;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
-import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.vehicles.Vehicle;
 
 import playground.mrieser.core.mobsim.api.DriverAgent;
-import playground.mrieser.core.mobsim.network.api.MobsimLink;
+import playground.mrieser.core.mobsim.api.MobsimVehicle;
 
 /**
+ * Implementation of MobsimVehicle which delegates most of the work to a {@link DriverAgent}.
+ *
  * @author mrieser
  */
-public class DefaultSimVehicleTest {
+public class DefaultMobsimVehicle implements MobsimVehicle {
 
-	@Test
-	public void testSetGetDriver() {
-		DefaultSimVehicle vehicle = new DefaultSimVehicle(null);
-		FakeDriverAgent driver = new FakeDriverAgent();
-		Assert.assertNull(vehicle.getDriver());
-		vehicle.setDriver(driver);
-		Assert.assertEquals(driver, vehicle.getDriver());
-		vehicle.setDriver(null);
-		Assert.assertNull(vehicle.getDriver());
+	private final Vehicle vehicle;
+	private DriverAgent driver = null;
+	private final double sizeInEquivalents;
+
+	public DefaultMobsimVehicle(final Vehicle vehicle) {
+		this(vehicle, 1.0);
 	}
 
-	@Test
-	public void testGetSizeInEquivalents() {
-		DefaultSimVehicle vehicle = new DefaultSimVehicle(null);
-		Assert.assertEquals(1.0, vehicle.getSizeInEquivalents(), MatsimTestUtils.EPSILON);
-		vehicle = new DefaultSimVehicle(null, 1.2);
-		Assert.assertEquals(1.2, vehicle.getSizeInEquivalents(), MatsimTestUtils.EPSILON);
-		vehicle = new DefaultSimVehicle(null, 6.0);
-		Assert.assertEquals(6.0, vehicle.getSizeInEquivalents(), MatsimTestUtils.EPSILON);
+	public DefaultMobsimVehicle(final Vehicle vehicle, final double vehicleSizeInEquivalents) {
+		this.vehicle = vehicle;
+		this.sizeInEquivalents = vehicleSizeInEquivalents;
 	}
 
-	/*package*/ static class FakeDriverAgent implements DriverAgent {
-		@Override
-		public Id getNextLinkId() {
-			return null;
-		}
-		@Override
-		public void notifyMoveToNextLink() {
-		}
-		@Override
-		public double getNextActionOnCurrentLink() {
-			return -1.0;
-		}
-		@Override
-		public void handleNextAction(final MobsimLink link) {
-		}
+	@Override
+	public Id getId() {
+		return this.vehicle.getId();
 	}
+
+	@Override
+	public DriverAgent getDriver() {
+		return this.driver;
+	}
+
+	@Override
+	public void setDriver(final DriverAgent driver) {
+		this.driver = driver;
+	}
+
+	@Override
+	public double getSizeInEquivalents() {
+		return this.sizeInEquivalents;
+	}
+
 }

@@ -245,7 +245,7 @@ public class QueueNodeTest {
 			return -1.0;
 		}
 		@Override
-		public void handleNextAction(final MobsimLink link) {
+		public void handleNextAction(final MobsimLink link, final double time) {
 		}
 	}
 

@@ -25,9 +25,9 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.population.routes.NetworkRoute;
 
 import playground.mrieser.core.mobsim.api.DriverAgent;
+import playground.mrieser.core.mobsim.api.MobsimVehicle;
 import playground.mrieser.core.mobsim.api.NewSimEngine;
 import playground.mrieser.core.mobsim.api.PlanAgent;
-import playground.mrieser.core.mobsim.api.MobsimVehicle;
 import playground.mrieser.core.mobsim.network.api.MobsimLink;
 
 public class NetworkRouteDriver implements DriverAgent {
@@ -90,7 +90,7 @@ public class NetworkRouteDriver implements DriverAgent {
 	}
 
 	@Override
-	public void handleNextAction(final MobsimLink link) {
+	public void handleNextAction(final MobsimLink link, final double time) {
 		link.parkVehicle(this.vehicle);
 		this.simEngine.handleAgent(this.agent);
 	}

@@ -156,7 +156,7 @@ public class MyWithinDayMobsimListener implements SimulationListener, Simulation
 
 				// (b) aborting a wait for pt:
 				TransitStopFacility stop = null ;
-				((QSim)mobsim).getTransitEngine().getAgentTracker().removeAgentFromStop((PassengerAgent)withindayAgent, stop) ;
+				((QSim)mobsim).getTransitEngine().getAgentTracker().removeAgentFromStop((PassengerAgent)withindayAgent, stop.getId());
 				// after this, it needs to start something else, e.g.:
 				mobsim.scheduleActivityEnd(withindayAgent) ;
 				// or

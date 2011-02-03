@@ -32,7 +32,7 @@ import org.matsim.vehicles.VehicleTypeImpl;
 import playground.mrieser.core.mobsim.api.DriverAgent;
 import playground.mrieser.core.mobsim.api.MobsimVehicle;
 import playground.mrieser.core.mobsim.fakes.FakeSimEngine;
-import playground.mrieser.core.mobsim.impl.DefaultSimVehicle;
+import playground.mrieser.core.mobsim.impl.DefaultMobsimVehicle;
 import playground.mrieser.core.mobsim.network.api.MobsimLink;
 
 /**
@@ -45,7 +45,7 @@ public class QueueLinkTest {
 		Fixture f = new Fixture();
 
 		Id veh1Id = new IdImpl(11);
-		MobsimVehicle vehicle1 = new DefaultSimVehicle(new VehicleImpl(veh1Id, new VehicleTypeImpl(new IdImpl("1980"))));
+		MobsimVehicle vehicle1 = new DefaultMobsimVehicle(new VehicleImpl(veh1Id, new VehicleTypeImpl(new IdImpl("1980"))));
 
 		Assert.assertNull(f.qlink.getParkedVehicle(veh1Id));
 		f.qlink.insertVehicle(vehicle1, MobsimLink.POSITION_AT_FROM_NODE, MobsimLink.PRIORITY_PARKING);
@@ -53,7 +53,7 @@ public class QueueLinkTest {
 		Assert.assertNull(f.qlink.getParkedVehicle(new IdImpl("1980")));
 
 		Id veh2Id = new IdImpl(5);
-		MobsimVehicle vehicle2 = new DefaultSimVehicle(new VehicleImpl(veh2Id, new VehicleTypeImpl(new IdImpl("1979"))));
+		MobsimVehicle vehicle2 = new DefaultMobsimVehicle(new VehicleImpl(veh2Id, new VehicleTypeImpl(new IdImpl("1979"))));
 
 		Assert.assertNull(f.qlink.getParkedVehicle(veh2Id));
 		f.qlink.insertVehicle(vehicle2, MobsimLink.POSITION_AT_FROM_NODE, MobsimLink.PRIORITY_PARKING);
@@ -67,9 +67,9 @@ public class QueueLinkTest {
 		Fixture f = new Fixture();
 
 		Id veh1Id = new IdImpl(11);
-		MobsimVehicle vehicle1 = new DefaultSimVehicle(new VehicleImpl(veh1Id, new VehicleTypeImpl(new IdImpl("1980"))));
+		MobsimVehicle vehicle1 = new DefaultMobsimVehicle(new VehicleImpl(veh1Id, new VehicleTypeImpl(new IdImpl("1980"))));
 		Id veh2Id = new IdImpl(5);
-		MobsimVehicle vehicle2 = new DefaultSimVehicle(new VehicleImpl(veh2Id, new VehicleTypeImpl(new IdImpl("1979"))));
+		MobsimVehicle vehicle2 = new DefaultMobsimVehicle(new VehicleImpl(veh2Id, new VehicleTypeImpl(new IdImpl("1979"))));
 		f.qlink.insertVehicle(vehicle1, MobsimLink.POSITION_AT_FROM_NODE, MobsimLink.PRIORITY_PARKING);
 		f.qlink.insertVehicle(vehicle2, MobsimLink.POSITION_AT_FROM_NODE, MobsimLink.PRIORITY_PARKING);
 
@@ -97,7 +97,7 @@ public class QueueLinkTest {
 		Fixture f = new Fixture();
 
 		Id veh1Id = new IdImpl(11);
-		MobsimVehicle vehicle1 = new DefaultSimVehicle(new VehicleImpl(veh1Id, new VehicleTypeImpl(new IdImpl("1980"))));
+		MobsimVehicle vehicle1 = new DefaultMobsimVehicle(new VehicleImpl(veh1Id, new VehicleTypeImpl(new IdImpl("1980"))));
 
 		f.engine.setCurrentTime(200);
 		f.qlink.addVehicleFromIntersection(vehicle1);
@@ -114,9 +114,9 @@ public class QueueLinkTest {
 		Fixture f = new Fixture();
 
 		Id veh1Id = new IdImpl(11);
-		MobsimVehicle vehicle1 = new DefaultSimVehicle(new VehicleImpl(veh1Id, new VehicleTypeImpl(new IdImpl("1980"))));
+		MobsimVehicle vehicle1 = new DefaultMobsimVehicle(new VehicleImpl(veh1Id, new VehicleTypeImpl(new IdImpl("1980"))));
 		Id veh2Id = new IdImpl(22);
-		MobsimVehicle vehicle2 = new DefaultSimVehicle(new VehicleImpl(veh2Id, new VehicleTypeImpl(new IdImpl("1980"))));
+		MobsimVehicle vehicle2 = new DefaultMobsimVehicle(new VehicleImpl(veh2Id, new VehicleTypeImpl(new IdImpl("1980"))));
 
 		f.engine.setCurrentTime(200);
 		f.qlink.insertVehicle(vehicle1, MobsimLink.POSITION_AT_TO_NODE, MobsimLink.PRIORITY_AS_SOON_AS_SPACE_AVAILABLE);
@@ -136,7 +136,7 @@ public class QueueLinkTest {
 		Fixture f = new Fixture();
 
 		Id veh1Id = new IdImpl(11);
-		MobsimVehicle vehicle1 = new DefaultSimVehicle(new VehicleImpl(veh1Id, new VehicleTypeImpl(new IdImpl("1980"))));
+		MobsimVehicle vehicle1 = new DefaultMobsimVehicle(new VehicleImpl(veh1Id, new VehicleTypeImpl(new IdImpl("1980"))));
 		vehicle1.setDriver(new FakeDriverAgent());
 
 		f.engine.setCurrentTime(200);
@@ -153,7 +153,7 @@ public class QueueLinkTest {
 		Fixture f = new Fixture();
 
 		Id veh1Id = new IdImpl(11);
-		MobsimVehicle vehicle1 = new DefaultSimVehicle(new VehicleImpl(veh1Id, new VehicleTypeImpl(new IdImpl("1980"))));
+		MobsimVehicle vehicle1 = new DefaultMobsimVehicle(new VehicleImpl(veh1Id, new VehicleTypeImpl(new IdImpl("1980"))));
 		vehicle1.setDriver(new FakeDriverAgent());
 
 		f.engine.setCurrentTime(200);
@@ -178,7 +178,7 @@ public class QueueLinkTest {
 		Fixture f = new Fixture();
 
 		Id veh1Id = new IdImpl(11);
-		MobsimVehicle vehicle1 = new DefaultSimVehicle(new VehicleImpl(veh1Id, new VehicleTypeImpl(new IdImpl("1980"))));
+		MobsimVehicle vehicle1 = new DefaultMobsimVehicle(new VehicleImpl(veh1Id, new VehicleTypeImpl(new IdImpl("1980"))));
 
 		f.engine.setCurrentTime(200);
 		f.qlink.insertVehicle(vehicle1, MobsimLink.POSITION_AT_TO_NODE, MobsimLink.PRIORITY_AS_SOON_AS_SPACE_AVAILABLE);
@@ -192,7 +192,7 @@ public class QueueLinkTest {
 		Fixture f = new Fixture();
 
 		Id veh1Id = new IdImpl(11);
-		MobsimVehicle vehicle1 = new DefaultSimVehicle(new VehicleImpl(veh1Id, new VehicleTypeImpl(new IdImpl("1980"))));
+		MobsimVehicle vehicle1 = new DefaultMobsimVehicle(new VehicleImpl(veh1Id, new VehicleTypeImpl(new IdImpl("1980"))));
 
 		f.engine.setCurrentTime(200);
 		f.qlink.insertVehicle(vehicle1, MobsimLink.POSITION_AT_TO_NODE, MobsimLink.PRIORITY_PARKING);
@@ -206,9 +206,9 @@ public class QueueLinkTest {
 		Fixture f = new Fixture();
 
 		Id veh1Id = new IdImpl(11);
-		MobsimVehicle vehicle1 = new DefaultSimVehicle(new VehicleImpl(veh1Id, new VehicleTypeImpl(new IdImpl("1980"))));
+		MobsimVehicle vehicle1 = new DefaultMobsimVehicle(new VehicleImpl(veh1Id, new VehicleTypeImpl(new IdImpl("1980"))));
 		Id veh2Id = new IdImpl(5);
-		MobsimVehicle vehicle2 = new DefaultSimVehicle(new VehicleImpl(veh2Id, new VehicleTypeImpl(new IdImpl("1979"))));
+		MobsimVehicle vehicle2 = new DefaultMobsimVehicle(new VehicleImpl(veh2Id, new VehicleTypeImpl(new IdImpl("1979"))));
 
 		f.qlink.addVehicleFromIntersection(vehicle1);
 		f.qlink.parkVehicle(vehicle1);
@@ -237,7 +237,7 @@ public class QueueLinkTest {
 		Id[] ids = new Id[vehicles.length];
 		for (int i = 0; i < vehicles.length; i++) {
 			ids[i] = new IdImpl(i);
-			vehicles[i] = new DefaultSimVehicle(new VehicleImpl(ids[i], vehType));
+			vehicles[i] = new DefaultMobsimVehicle(new VehicleImpl(ids[i], vehType));
 			vehicles[i].setDriver(new FakeDriverAgent());
 		}
 
@@ -300,7 +300,7 @@ public class QueueLinkTest {
 			return -1.0;
 		}
 		@Override
-		public void handleNextAction(final MobsimLink link) {
+		public void handleNextAction(final MobsimLink link, final double time) {
 		}
 	}
 

@@ -34,7 +34,7 @@ import org.matsim.vehicles.VehicleTypeImpl;
 import playground.mrieser.core.mobsim.api.MobsimVehicle;
 import playground.mrieser.core.mobsim.fakes.FakeSimEngine;
 import playground.mrieser.core.mobsim.fakes.FakeSimVehicle;
-import playground.mrieser.core.mobsim.impl.DefaultSimVehicle;
+import playground.mrieser.core.mobsim.impl.DefaultMobsimVehicle;
 
 /**
  * @author mrieser
@@ -45,9 +45,9 @@ public class QueueBufferTest {
 	public void testSpaceCapacity() {
 		Fixture f = new Fixture();
 
-		MobsimVehicle veh1 = new DefaultSimVehicle(null);
-		MobsimVehicle veh2 = new DefaultSimVehicle(null);
-		MobsimVehicle veh3 = new DefaultSimVehicle(null);
+		MobsimVehicle veh1 = new DefaultMobsimVehicle(null);
+		MobsimVehicle veh2 = new DefaultMobsimVehicle(null);
+		MobsimVehicle veh3 = new DefaultMobsimVehicle(null);
 
 		QueueBuffer buffer = new QueueBuffer(f.qlink);
 		buffer.setFlowCapacity(2.0);
@@ -81,7 +81,7 @@ public class QueueBufferTest {
 		VehicleType defaultVehicleType = new VehicleTypeImpl(new IdImpl("defaultVehicleType"));
 		MobsimVehicle[] vehicles = new MobsimVehicle[8000];
 		for (int i = 0; i < vehicles.length; i++) {
-			vehicles[i] = new DefaultSimVehicle(new VehicleImpl(new IdImpl(i), defaultVehicleType));
+			vehicles[i] = new DefaultMobsimVehicle(new VehicleImpl(new IdImpl(i), defaultVehicleType));
 		}
 
 		doTestFlowCapacity(360, f, vehicles);

@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mrieser.core.mobsim.impl;
+package playground.mrieser.core.mobsim.transit;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -25,49 +25,46 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.vehicles.VehicleImpl;
-import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.VehicleTypeImpl;
+import org.matsim.pt.qsim.SimpleTransitStopHandlerFactory;
+import org.matsim.pt.qsim.TransitStopHandlerFactory;
+import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.Vehicles;
 
 import playground.mrieser.core.mobsim.api.DepartureHandler;
 import playground.mrieser.core.mobsim.api.DriverAgent;
 import playground.mrieser.core.mobsim.api.NewSimEngine;
 import playground.mrieser.core.mobsim.api.PlanAgent;
-import playground.mrieser.core.mobsim.api.MobsimVehicle;
 import playground.mrieser.core.mobsim.features.NetworkFeature;
 import playground.mrieser.core.mobsim.network.api.MobsimLink;
 
 /**
- * This DepartureHandler assigns departing agents to a vehicle which is placed on
- * the network to be moved around. A vehicle will be created for each agent the first
- * time no vehicle can be found on the departing link. *
- * <br />
- * Requirements / Assumptions of the code:
- * <ul>
- * 	<li>handleDeparture() assumes the currentPlanElement of agents to be of type {@link Leg}</li>
- *  <li>handleDeparture() assumes the route of legs to be of type {@link NetworkRoute}</li>
- * </ul>
- *
  * @author mrieser
  */
-public class CarDepartureHandler implements DepartureHandler {
+public class TransitDriverDepartureHandler implements DepartureHandler {
 
-	private final static Logger log = Logger.getLogger(CarDepartureHandler.class);
+	private final static Logger log = Logger.getLogger(TransitDriverDepartureHandler.class);
 
 	private final NetworkFeature networkFeature;
 	private final NewSimEngine engine;
 	private final Map<Id, Id> vehicleLocations;
-	private final VehicleType defaultVehicleType;
 	private boolean teleportVehicles = false;
+	private final TransitFeature ptFeature;
+	private TransitStopHandlerFactory stopHandlerFactory = new SimpleTransitStopHandlerFactory();
+	private final Vehicles vehicles;
 
-	public CarDepartureHandler(final NewSimEngine engine, final NetworkFeature networkFeature, final Scenario scenario) {
+	public TransitDriverDepartureHandler(final NewSimEngine engine, final NetworkFeature networkFeature, final TransitFeature ptFeature, final Scenario scenario) {
 		this.engine = engine;
 		this.networkFeature = networkFeature;
-		this.vehicleLocations = new HashMap<Id, Id>((int) (scenario.getPopulation().getPersons().size() * 1.4));
-		this.defaultVehicleType = new VehicleTypeImpl(new IdImpl("auto-generated vehicle"));
+		this.ptFeature = ptFeature;
+		this.vehicles = ((ScenarioImpl) scenario).getVehicles();
+		this.vehicleLocations = new HashMap<Id, Id>(10000);
+	}
+
+	public void setTransitStopHandlerFactory(final TransitStopHandlerFactory stopHandlerFactory) {
+		this.stopHandlerFactory = stopHandlerFactory;
 	}
 
 	public void setTeleportVehicles(final boolean teleportVehicles) {
@@ -80,21 +77,27 @@ public class CarDepartureHandler implements DepartureHandler {
 
 	@Override
 	public void handleDeparture(final PlanAgent agent) {
+		if (!(agent instanceof TransitDriverPlanAgent)) {
+			log.error("TransitDriverDepartureHandler only supports agents of type " + TransitDriverPlanAgent.class.getCanonicalName());
+		}
+		TransitDriverPlanAgent driver = (TransitDriverPlanAgent) agent;
+
 		Leg leg = (Leg) agent.getCurrentPlanElement();
 		NetworkRoute route = (NetworkRoute) leg.getRoute();
 
 		MobsimLink link = this.networkFeature.getSimNetwork().getLinks().get(route.getStartLinkId());
-		Id vehId = agent.getPlan().getPerson().getId(); // TODO [MR] use vehicleId instead of personId
-		MobsimVehicle simVehicle = link.getParkedVehicle(vehId);
+		Id vehId = driver.getCurrentUmlaufStueck().getDeparture().getVehicleId();
+		TransitMobsimVehicle simVehicle = (TransitMobsimVehicle) link.getParkedVehicle(vehId);
 		if (simVehicle == null) {
 			Id linkId = this.vehicleLocations.get(vehId);
 			if (linkId == null) {
-				simVehicle = new DefaultMobsimVehicle(new VehicleImpl(vehId, this.defaultVehicleType));
+				Vehicle veh = this.vehicles.getVehicles().get(vehId);
+				simVehicle = new DefaultTransitMobsimVehicle(veh, 5.0, this.stopHandlerFactory.createTransitStopHandler(veh));
 				link.insertVehicle(simVehicle, MobsimLink.POSITION_AT_TO_NODE, MobsimLink.PRIORITY_PARKING);
 			} else if (this.teleportVehicles) {
-				log.warn("Agent departs on link " + route.getStartLinkId() + ", but vehicle is on link " + linkId + ". Teleporting the vehicle.");
+				log.warn("Transit vehicles should depart on link " + route.getStartLinkId() + ", but is on link " + linkId + ". Teleporting the vehicle.");
 				MobsimLink link2 = this.networkFeature.getSimNetwork().getLinks().get(linkId);
-				simVehicle = link2.getParkedVehicle(vehId);
+				simVehicle = (TransitMobsimVehicle) link2.getParkedVehicle(vehId);
 				link2.removeVehicle(simVehicle);
 				link.insertVehicle(simVehicle, MobsimLink.POSITION_AT_TO_NODE, MobsimLink.PRIORITY_PARKING);
 			} else {
@@ -103,15 +106,16 @@ public class CarDepartureHandler implements DepartureHandler {
 			}
 		}
 		this.vehicleLocations.put(vehId, route.getEndLinkId()); // vehicle should show up there later
-		DriverAgent driver = new NetworkRouteDriver(agent, this.engine, route, simVehicle);
-		simVehicle.setDriver(driver);
+		DriverAgent simDriver = new TransitDriverAgent(driver, this.engine, route, simVehicle, this.ptFeature);
+		simVehicle.setDriver(simDriver);
 
-		driver.notifyMoveToNextLink();
-		if (driver.getNextLinkId() == null) {
+		simDriver.notifyMoveToNextLink();
+		if (simDriver.getNextLinkId() == null) {
 			this.engine.handleAgent(agent);
 		} else {
 			link.continueVehicle(simVehicle);
 		}
 	}
+
 
 }

@@ -26,44 +26,46 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.api.core.v01.Id;
 
-
+/**
+ * @author mrieser
+ */
 public class TransitStopAgentTracker {
 
-	private final Map<TransitStopFacility, List<PassengerAgent>> agentsAtStops = new HashMap<TransitStopFacility, List<PassengerAgent>>();
+	private final Map<Id, List<PassengerAgent>> agentsAtStops = new HashMap<Id, List<PassengerAgent>>();
 
-	public void addAgentToStop(final PassengerAgent agent, final TransitStopFacility stop) {
-		if (stop == null) {
+	public void addAgentToStop(final PassengerAgent agent, final Id stopId) {
+		if (stopId == null) {
 			throw new NullPointerException("stop must not be null.");
 		}
-		List<PassengerAgent> agents = this.agentsAtStops.get(stop);
+		List<PassengerAgent> agents = this.agentsAtStops.get(stopId);
 		if (agents == null) {
 			agents = new LinkedList<PassengerAgent>();
-			this.agentsAtStops.put(stop, agents);
+			this.agentsAtStops.put(stopId, agents);
 		}
 		agents.add(agent);
 	}
 
-	public void removeAgentFromStop(final PassengerAgent agent, final TransitStopFacility stop) {
-		if (stop == null) {
-			throw new NullPointerException("stop must not be null.");
+	public void removeAgentFromStop(final PassengerAgent agent, final Id stopId) {
+		if (stopId == null) {
+			throw new NullPointerException("stopId must not be null.");
 		}
-		List<PassengerAgent> agents = this.agentsAtStops.get(stop);
+		List<PassengerAgent> agents = this.agentsAtStops.get(stopId);
 		if (agents != null) {
 			agents.remove(agent);
 		}
 	}
 
-	public List<PassengerAgent> getAgentsAtStop(final TransitStopFacility stop) {
-		List<PassengerAgent> agents = this.agentsAtStops.get(stop);
+	public List<PassengerAgent> getAgentsAtStop(final Id stopId) {
+		List<PassengerAgent> agents = this.agentsAtStops.get(stopId);
 		if (agents == null) {
 			return Collections.emptyList();
 		}
 		return Collections.unmodifiableList(agents);
 	}
-	
-	public Map<TransitStopFacility, List<PassengerAgent>> getAgentsAtStop(){
+
+	public Map<Id, List<PassengerAgent>> getAgentsAtStop() {
 		return this.agentsAtStops;
 	}
 }

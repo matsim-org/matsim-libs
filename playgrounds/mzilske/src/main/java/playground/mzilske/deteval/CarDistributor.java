@@ -37,7 +37,7 @@ import org.matsim.vehicles.Vehicles;
 import playground.mrieser.core.mobsim.api.MobsimVehicle;
 import playground.mrieser.core.mobsim.features.MobsimFeature;
 import playground.mrieser.core.mobsim.features.NetworkFeature;
-import playground.mrieser.core.mobsim.impl.DefaultSimVehicle;
+import playground.mrieser.core.mobsim.impl.DefaultMobsimVehicle;
 import playground.mrieser.core.mobsim.impl.DefaultTimestepSimEngine;
 import playground.mrieser.core.mobsim.network.api.MobsimLink;
 
@@ -76,7 +76,7 @@ public class CarDistributor implements MobsimFeature {
 					Vehicle vehicle = vehicles.getVehicles().get(vehicleId);
 					if (vehicle != null) {
 						MobsimLink link2 = this.networkFeature.getSimNetwork().getLinks().get(linkId);
-						MobsimVehicle simVehicle = new DefaultSimVehicle(vehicle);
+						MobsimVehicle simVehicle = new DefaultMobsimVehicle(vehicle);
 						link2.insertVehicle(simVehicle, MobsimLink.POSITION_AT_TO_NODE, MobsimLink.PRIORITY_PARKING);
 						expectedVehicleLocations.put(simVehicle, link2);
 						logger.info("Parked car for agent " + person.getId() + " at link " + linkId);

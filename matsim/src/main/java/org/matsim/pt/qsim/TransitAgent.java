@@ -42,11 +42,13 @@ public class TransitAgent extends PersonDriverAgentImpl implements PersonDriverP
 		super(p, simulation);
 	}
 
+	@Override
 	public boolean getExitAtStop(final TransitStopFacility stop) {
 		ExperimentalTransitRoute route = (ExperimentalTransitRoute) getCurrentLeg().getRoute();
 		return route.getEgressStopId().equals(stop.getId());
 	}
 
+	@Override
 	public boolean getEnterTransitRoute(final TransitLine line, final TransitRoute transitRoute, final List<TransitRouteStop> stopsToCome) {
 		ExperimentalTransitRoute route = (ExperimentalTransitRoute) getCurrentLeg().getRoute();
 		if (line.getId().equals(route.getLineId())) {
@@ -64,6 +66,11 @@ public class TransitAgent extends PersonDriverAgentImpl implements PersonDriverP
 			}
 		}
 		return false;
+	}
+
+	@Override
+	public double getWeight() {
+		return 1.0;
 	}
 
 }

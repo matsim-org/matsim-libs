@@ -26,8 +26,6 @@ import org.apache.log4j.Logger;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.pt.fakes.FakeAgent;
-import org.matsim.pt.qsim.PassengerAgent;
-import org.matsim.pt.qsim.TransitStopAgentTracker;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
@@ -49,19 +47,19 @@ public class TransitStopAgentTrackerTest extends TestCase {
 		TransitStopFacility stop1 = builder.createTransitStopFacility(new IdImpl(1), new CoordImpl(2, 3), false);
 		TransitStopFacility stop2 = builder.createTransitStopFacility(new IdImpl(2), new CoordImpl(3, 4), false);
 
-		assertFalse(tracker.getAgentsAtStop(stop1).contains(agent1));
-		tracker.addAgentToStop(agent1, stop1);
-		assertTrue(tracker.getAgentsAtStop(stop1).contains(agent1));
-		assertFalse(tracker.getAgentsAtStop(stop2).contains(agent1));
-		assertFalse(tracker.getAgentsAtStop(stop1).contains(agent2));
-		tracker.addAgentToStop(agent2, stop1);
-		assertTrue(tracker.getAgentsAtStop(stop1).contains(agent2));
+		assertFalse(tracker.getAgentsAtStop(stop1.getId()).contains(agent1));
+		tracker.addAgentToStop(agent1, stop1.getId());
+		assertTrue(tracker.getAgentsAtStop(stop1.getId()).contains(agent1));
+		assertFalse(tracker.getAgentsAtStop(stop2.getId()).contains(agent1));
+		assertFalse(tracker.getAgentsAtStop(stop1.getId()).contains(agent2));
+		tracker.addAgentToStop(agent2, stop1.getId());
+		assertTrue(tracker.getAgentsAtStop(stop1.getId()).contains(agent2));
 
-		tracker.addAgentToStop(agent3, stop2);
-		assertFalse(tracker.getAgentsAtStop(stop1).contains(agent3));
-		assertFalse(tracker.getAgentsAtStop(stop2).contains(agent1));
-		assertFalse(tracker.getAgentsAtStop(stop2).contains(agent2));
-		assertTrue(tracker.getAgentsAtStop(stop2).contains(agent3));
+		tracker.addAgentToStop(agent3, stop2.getId());
+		assertFalse(tracker.getAgentsAtStop(stop1.getId()).contains(agent3));
+		assertFalse(tracker.getAgentsAtStop(stop2.getId()).contains(agent1));
+		assertFalse(tracker.getAgentsAtStop(stop2.getId()).contains(agent2));
+		assertTrue(tracker.getAgentsAtStop(stop2.getId()).contains(agent3));
 	}
 
 	public void testRemoveAgent() {
@@ -73,19 +71,19 @@ public class TransitStopAgentTrackerTest extends TestCase {
 		TransitStopFacility stop1 = builder.createTransitStopFacility(new IdImpl(1), new CoordImpl(2, 3), false);
 		TransitStopFacility stop2 = builder.createTransitStopFacility(new IdImpl(2), new CoordImpl(3, 4), false);
 
-		tracker.addAgentToStop(agent1, stop1);
-		tracker.addAgentToStop(agent2, stop1);
-		tracker.addAgentToStop(agent3, stop2);
-		assertEquals(2, tracker.getAgentsAtStop(stop1).size());
-		assertEquals(1, tracker.getAgentsAtStop(stop2).size());
-		assertTrue(tracker.getAgentsAtStop(stop1).contains(agent1));
-		tracker.removeAgentFromStop(agent1, stop1);
-		assertFalse(tracker.getAgentsAtStop(stop1).contains(agent1));
-		assertTrue(tracker.getAgentsAtStop(stop1).contains(agent2));
-		assertTrue(tracker.getAgentsAtStop(stop2).contains(agent3));
-		assertEquals(1, tracker.getAgentsAtStop(stop1).size());
-		tracker.removeAgentFromStop(agent1, stop1); // cannot be removed
-		assertEquals(1, tracker.getAgentsAtStop(stop1).size()); // should stay the same
+		tracker.addAgentToStop(agent1, stop1.getId());
+		tracker.addAgentToStop(agent2, stop1.getId());
+		tracker.addAgentToStop(agent3, stop2.getId());
+		assertEquals(2, tracker.getAgentsAtStop(stop1.getId()).size());
+		assertEquals(1, tracker.getAgentsAtStop(stop2.getId()).size());
+		assertTrue(tracker.getAgentsAtStop(stop1.getId()).contains(agent1));
+		tracker.removeAgentFromStop(agent1, stop1.getId());
+		assertFalse(tracker.getAgentsAtStop(stop1.getId()).contains(agent1));
+		assertTrue(tracker.getAgentsAtStop(stop1.getId()).contains(agent2));
+		assertTrue(tracker.getAgentsAtStop(stop2.getId()).contains(agent3));
+		assertEquals(1, tracker.getAgentsAtStop(stop1.getId()).size());
+		tracker.removeAgentFromStop(agent1, stop1.getId()); // cannot be removed
+		assertEquals(1, tracker.getAgentsAtStop(stop1.getId()).size()); // should stay the same
 	}
 
 	public void testGetAgentsAtStopImmutable() {
@@ -95,16 +93,16 @@ public class TransitStopAgentTrackerTest extends TestCase {
 		TransitStopFacility stop1 = builder.createTransitStopFacility(new IdImpl(1), new CoordImpl(2, 3), false);
 
 		try {
-			tracker.getAgentsAtStop(stop1).add(agent1);
+			tracker.getAgentsAtStop(stop1.getId()).add(agent1);
 			fail("missing exception, empty list should be immutable.");
 		}
 		catch (UnsupportedOperationException e) {
 			log.info("catched expected exception.", e);
 		}
 
-		tracker.addAgentToStop(agent1, stop1);
+		tracker.addAgentToStop(agent1, stop1.getId());
 		try {
-			tracker.getAgentsAtStop(stop1).remove(0);
+			tracker.getAgentsAtStop(stop1.getId()).remove(0);
 			fail("missing exception, non-empty list should be immutable.");
 		}
 		catch (UnsupportedOperationException e) {

@@ -77,6 +77,9 @@ public class DefaultTimestepSimEngine implements TimestepSimEngine {
 
 	@Override
 	public void handleAgent(final PlanAgent agent) {
+		if (agent == null) {
+			log.error("breakpoint");
+		}
 		PlanElement currentPE = agent.getCurrentPlanElement();
 		if (currentPE != null) {
 			// == null could be the case when the agent starts with its first activity

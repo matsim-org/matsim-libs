@@ -27,9 +27,9 @@ import org.matsim.core.events.EventsFactoryImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 
 import playground.mrieser.core.mobsim.api.DriverAgent;
+import playground.mrieser.core.mobsim.api.MobsimVehicle;
 import playground.mrieser.core.mobsim.api.NewSimEngine;
 import playground.mrieser.core.mobsim.api.PlanAgent;
-import playground.mrieser.core.mobsim.api.MobsimVehicle;
 import playground.mrieser.core.mobsim.network.api.MobsimLink;
 
 public class VehicleLeavingNetworkRouteDriver implements DriverAgent {
@@ -92,7 +92,7 @@ public class VehicleLeavingNetworkRouteDriver implements DriverAgent {
 	}
 
 	@Override
-	public void handleNextAction(final MobsimLink link) {
+	public void handleNextAction(final MobsimLink link, final double time) {
 		link.parkVehicle(this.vehicle);
 		EventsManager eventsManager = this.simEngine.getEventsManager();
 		eventsManager.processEvent(((EventsFactoryImpl) eventsManager.getFactory()).createPersonLeavesVehicleEvent(this.simEngine.getCurrentTime(), agent.getPlan().getPerson().getId(), vehicle.getId(), null));

@@ -40,6 +40,6 @@ public interface DriverAgent {
 	 */
 	public double getNextActionOnCurrentLink();
 
-	public void handleNextAction(final MobsimLink link);
+	public void handleNextAction(final MobsimLink link, final double time);
 
 }

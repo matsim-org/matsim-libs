@@ -22,6 +22,7 @@ package org.matsim.pt.qsim;
 
 import java.util.List;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -33,6 +34,8 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
  * @author mrieser
  */
 public interface PassengerAgent extends MobsimAgent {
+
+	public Id getId();
 
 	/**
 	 * Informs a passenger waiting at a stop that a transit line
@@ -55,5 +58,10 @@ public interface PassengerAgent extends MobsimAgent {
 	 * @return <code>true</code> if the passenger wants to exit the vehicle, <code>false</code> otherwise
 	 */
 	public boolean getExitAtStop(final TransitStopFacility stop);
+
+	/**
+	 * @return a statistical weight, how many "real" agents this agent represents, e.g. "5.0" if you simulate a 20%-sample.
+	 */
+	public double getWeight();
 
 }

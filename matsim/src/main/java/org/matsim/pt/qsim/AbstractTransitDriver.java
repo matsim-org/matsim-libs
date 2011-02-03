@@ -236,7 +236,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 	public boolean handlePassengerEntering(final PassengerAgent passenger, final double time) {
 		boolean handled = this.vehicle.addPassenger(passenger);
 		if(handled){
-			this.agentTracker.removeAgentFromStop(passenger, this.currentStop.getStopFacility());
+			this.agentTracker.removeAgentFromStop(passenger, this.currentStop.getStopFacility().getId());
 			this.getSimulation().unregisterAgentAtPtWaitLocation( (PersonAgent) passenger ) ;
 			PersonDriverAgent agent = (PersonDriverAgent) passenger;
 			EventsManager events = this.sim.getEventsManager();
@@ -262,7 +262,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 	private List<PassengerAgent> findPassengersEntering(
 			final TransitStopFacility stop, int freeCapacity) {
 		ArrayList<PassengerAgent> passengersEntering = new ArrayList<PassengerAgent>();
-		for (PassengerAgent agent : this.agentTracker.getAgentsAtStop(stop)) {
+		for (PassengerAgent agent : this.agentTracker.getAgentsAtStop(stop.getId())) {
 			if (freeCapacity == 0) {
 				break;
 			}

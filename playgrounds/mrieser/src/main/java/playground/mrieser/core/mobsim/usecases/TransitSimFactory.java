@@ -31,6 +31,8 @@ import org.matsim.pt.qsim.TransitStopAgentTracker;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.vehicles.Vehicles;
 
+import playground.mrieser.core.mobsim.api.AgentSource;
+import playground.mrieser.core.mobsim.api.DepartureHandler;
 import playground.mrieser.core.mobsim.features.StatusFeature;
 import playground.mrieser.core.mobsim.features.refQueueNetworkFeature.RefQueueNetworkFeature;
 import playground.mrieser.core.mobsim.impl.ActivityHandler;
@@ -42,10 +44,14 @@ import playground.mrieser.core.mobsim.impl.PopulationAgentSource;
 import playground.mrieser.core.mobsim.impl.TeleportationHandler;
 import playground.mrieser.core.mobsim.transit.TransitDepartureHandler;
 import playground.mrieser.core.mobsim.transit.TransitDriverAgentSource;
+import playground.mrieser.core.mobsim.transit.TransitDriverDepartureHandler;
+import playground.mrieser.core.mobsim.transit.TransitFeature;
 
 public class TransitSimFactory implements MobsimFactory {
 
 	private double populationWeight = 1.0;
+
+	private final static String TRANSIT_VEHICLE_LEG_TYPE = "transitVehicleLeg";
 
 	/**
 	 * Sets the weight for agents created from the population.
@@ -63,7 +69,6 @@ public class TransitSimFactory implements MobsimFactory {
 		// setup transit related stuff
 		TransitSchedule schedule = ((ScenarioImpl) scenario).getTransitSchedule();
 		Vehicles transitVehicles = ((ScenarioImpl) scenario).getVehicles();
-		TransitStopAgentTracker agentTracker = new TransitStopAgentTracker();
 
 		// setup mobsim
 		PlanSimulationImpl planSim = new PlanSimulationImpl(scenario);
@@ -73,6 +78,12 @@ public class TransitSimFactory implements MobsimFactory {
 		// setup network
 		RefQueueNetworkFeature netFeature = new RefQueueNetworkFeature(scenario.getNetwork(), engine);
 
+		// setup transit stuff
+		TransitStopAgentTracker agentTracker = new TransitStopAgentTracker();
+		TransitFeature transitFeature = new TransitFeature(agentTracker);
+		AgentSource transitAgentSource = new TransitDriverAgentSource(schedule, transitVehicles, scenario.getNetwork(), agentTracker, TRANSIT_VEHICLE_LEG_TYPE);
+		DepartureHandler transitDriverDepartureHandler = new TransitDriverDepartureHandler(engine, netFeature, transitFeature, scenario);
+
 		// setup PlanElementHandlers
 		ActivityHandler ah = new ActivityHandler(engine);
 		LegHandler lh = new LegHandler(engine);
@@ -81,8 +92,8 @@ public class TransitSimFactory implements MobsimFactory {
 
 		// setup DepartureHandlers
 		lh.setDepartureHandler(TransportMode.car, new CarDepartureHandler(engine, netFeature, scenario));
-		lh.setDepartureHandler(TransportMode.pt, new TransitDepartureHandler(schedule, agentTracker));
-//		lh.setDepartureHandler("transitVehicle", new TransitDriverDepartureHandler(schedule, agentTracker));
+		lh.setDepartureHandler(TransportMode.pt, new TransitDepartureHandler(agentTracker));
+		lh.setDepartureHandler(TRANSIT_VEHICLE_LEG_TYPE, transitDriverDepartureHandler);
 		TeleportationHandler teleporter = new TeleportationHandler(engine);
 		lh.setDepartureHandler(TransportMode.walk, teleporter);
 		lh.setDepartureHandler(TransportMode.transit_walk, teleporter);
@@ -91,13 +102,13 @@ public class TransitSimFactory implements MobsimFactory {
 		// setup features; order is important!
 		planSim.addMobsimFeature(new StatusFeature());
 		planSim.addMobsimFeature(teleporter);
+		planSim.addMobsimFeature(transitFeature);
 		planSim.addMobsimFeature(ah);
-//		planSim.addMobsimFeature(new TransitFeature()); // is this really needed?
 		planSim.addMobsimFeature(netFeature);
 
 		// register agent sources
 		planSim.addAgentSource(new PopulationAgentSource(scenario.getPopulation(), this.populationWeight));
-		planSim.addAgentSource(new TransitDriverAgentSource(schedule, transitVehicles, scenario.getNetwork(), agentTracker));
+		planSim.addAgentSource(transitAgentSource);
 		return planSim;
 	}
 

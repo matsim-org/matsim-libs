@@ -31,10 +31,14 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 /*package*/ class PassengerAgentImpl implements PassengerAgent {
 
+	private final Id id;
 	private final ExperimentalTransitRoute route;
+	private final double weight;
 
-	public PassengerAgentImpl(final ExperimentalTransitRoute route) {
+	public PassengerAgentImpl(final Id id, final ExperimentalTransitRoute route, final double weight) {
+		this.id = id;
 		this.route = route;
+		this.weight = weight;
 	}
 
 	@Override
@@ -58,6 +62,16 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 	@Override
 	public boolean getExitAtStop(TransitStopFacility stop) {
 		return route.getEgressStopId().equals(stop.getId());
+	}
+
+	@Override
+	public Id getId() {
+		return this.id;
+	}
+
+	@Override
+	public double getWeight() {
+		return this.weight;
 	}
 
 }

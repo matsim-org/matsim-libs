@@ -93,7 +93,7 @@ public class FakeAgent implements PersonDriverAgent, PassengerAgent {
 		// As far as I can see, there is never a current Activity. cdobler, nov'10
 		return null;
 	}
-		
+
 	@Override
 	public PlanElement getCurrentPlanElement() {
 		return this.dummyLeg ;
@@ -158,6 +158,11 @@ public class FakeAgent implements PersonDriverAgent, PassengerAgent {
 	@Override
 	public Id getId() {
 		return this.dummyPerson.getId() ;
+	}
+
+	@Override
+	public double getWeight() {
+		return 1.0;
 	}
 
 }
