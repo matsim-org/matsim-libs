@@ -58,20 +58,23 @@ public class LinkTravelTimeAndDistanceExtractor implements
 		if (enteredPersons.containsKey(personId)) {
 			if (enteredPersons.get(personId).getLinkId().toString().equals(
 					linkId.toString())) {
-				LinkEnterEvent enterEvent = enteredPersons.remove(personId);
+
 				cnt++;
 				sumDist += network.getLinks().get(linkId).getLength();/*
 																	 * distance
 																	 * [m]
 																	 */
-				sumTravTime += leaveTime - enterEvent.getTime();/* [s] */
+				sumTravTime += leaveTime
+						- enteredPersons.get(personId).getTime();/* [s] */
 			} else {
 				throw new RuntimeException("This person (Id " + personId
 						+ " ) is still in link (Id "
 						+ enteredPersons.get(personId).getLinkId()
 						+ " )! How could it leave link (Id " + linkId + " )?!");
 			}
+			enteredPersons.remove(personId);
 		}
+
 	}
 
 	public String output() {
