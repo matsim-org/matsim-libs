@@ -10,8 +10,10 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
+import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.events.EventsManagerImpl;
@@ -20,7 +22,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 
 public class LinkTravelTimeAndDistanceExtractor implements
-		LinkEnterEventHandler, LinkLeaveEventHandler {
+		LinkEnterEventHandler, LinkLeaveEventHandler, AgentArrivalEventHandler {
 	private Map<Id/* person */, LinkEnterEvent> enteredPersons = new HashMap<Id, LinkEnterEvent>();
 	private Network network;
 	private int cnt = 0;
@@ -77,6 +79,15 @@ public class LinkTravelTimeAndDistanceExtractor implements
 
 	}
 
+	@Override
+	public void handleEvent(AgentArrivalEvent event) {
+		Id personId = event.getPersonId();
+		if (enteredPersons.containsKey(personId)) {
+			enteredPersons.remove(personId);
+		}
+
+	}
+
 	public String output() {
 		StringBuffer sb = new StringBuffer();
 		sb.append("number of agents:\t");
@@ -128,4 +139,5 @@ public class LinkTravelTimeAndDistanceExtractor implements
 		Gbl.printElapsedTime();
 		System.exit(0);
 	}
+
 }
