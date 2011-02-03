@@ -21,6 +21,7 @@ public class SfMATSimAirport {
 		this.coord=coord;
 	}
 	
+	@SuppressWarnings("deprecation")
 	public void createRunways(Network network) {
 		
 //		Node mit IATA als Zentrales Element, Link mit IATA Code an Node,
@@ -47,7 +48,7 @@ public class SfMATSimAirport {
 		
 //		create nodes
 		
-		Node nodeAirport = network.getFactory().createNode(this.id, this.coord);			//central node of any airport	
+		Node nodeAirport = network.getFactory().createNode(idApron, this.coord);			//central node of any airport	
 		Node nodeApron = network.getFactory().createNode(idApronEnd, coordApronEnd);		//end of apron node, apron is used for parking and as transit stop
 		Node nodeTaxiIn = network.getFactory().createNode(idTaxiIn, coordTaxiIn);			//taxiway inbound start = runway inbound end
 		Node nodeTaxiOut = network.getFactory().createNode(idTaxiOut, coordTaxiOut);		//taxiway outbound end = runway outbound start
@@ -64,8 +65,8 @@ public class SfMATSimAirport {
 		network.addNode(nodeRunwayOut);
 		
 //		create links
-		Link linkApron = network.getFactory().createLink(this.id, this.id, idApronEnd);
-		Link linkTaxiIn = network.getFactory().createLink(idTaxiIn, idTaxiIn, this.id);
+		Link linkApron = network.getFactory().createLink(idApron, idApron, idApronEnd);
+		Link linkTaxiIn = network.getFactory().createLink(idTaxiIn, idTaxiIn, idApron);
 		Link linkTaxiOut = network.getFactory().createLink(idTaxiOut, idApronEnd, idTaxiOut);
 		Link linkRunwayIn = network.getFactory().createLink(idRunwayIn, idRunwayIn, idTaxiIn);
 		Link linkRunwayOut = network.getFactory().createLink(idRunwayOut, idTaxiOut, idRunwayOut);
