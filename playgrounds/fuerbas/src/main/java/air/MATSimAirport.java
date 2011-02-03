@@ -42,8 +42,8 @@ public class MATSimAirport {
 		Coord coordApronEnd = new CoordImpl(this.coord.getX()+0.001, this.coord.getY());			//shifting end of apron by 111 meters in Y direction
 		Coord coordTaxiIn = new CoordImpl(this.coord.getX()-0.001, this.coord.getY()-0.001);		//shifting taxiway
 		Coord coordTaxiOut = new CoordImpl(this.coord.getX()-0.001, this.coord.getY()+0.001);		//shifting taxiway
-		Coord coordRunwayInEnd = new CoordImpl(coordTaxiIn.getX()-0.01, coordTaxiIn.getY());		//shifting runway
-		Coord coordRunwayOutEnd = new CoordImpl(coordTaxiOut.getX()-0.01, coordTaxiOut.getY());		//shifting runway
+		Coord coordRunwayInEnd = new CoordImpl(coordTaxiIn.getX()-0.01, coordTaxiIn.getY()-0.01);		//shifting runway
+		Coord coordRunwayOutEnd = new CoordImpl(coordTaxiOut.getX()-0.01, coordTaxiOut.getY()+0.01);		//shifting runway
 		
 //		create nodes
 		
