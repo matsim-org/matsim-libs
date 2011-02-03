@@ -42,7 +42,7 @@ public class HbefaVisum {
 		this.map = map;
 	}
 
-	public void creatRoadTypes(String filename){
+	public void createRoadTypes(String filename){
 
 			try{
 	

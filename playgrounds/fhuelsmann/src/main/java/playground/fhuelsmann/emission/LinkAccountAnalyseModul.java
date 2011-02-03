@@ -16,7 +16,7 @@ import org.matsim.api.core.v01.Id;
 
 public class LinkAccountAnalyseModul implements analyseModul{
 	
-	public  String findHbefaFromVisum(int roadType){
+	public  String findHbefaFromVisumRoadType(int roadType){
 
 		return this.roadTypes[roadType].getHBEFA_RT_NR();
 	}
@@ -24,48 +24,51 @@ public class LinkAccountAnalyseModul implements analyseModul{
 	
 
 	
-	EmissionFactor emissionFactor = new EmissionFactor();
+	EmissionsPerEvent emissionFactor = new EmissionsPerEvent();
 
 	private Map<Id, double[]> emissions = new TreeMap<Id,double[]>();
 
 
 @Override
-	public void bearbeite(double travelTime, Id linkId, double averageSpeed, int roadType, int freeVelocity, double distance, HbefaObject[][] hbefaTable) {
+	public void calculateEmissionsPerLink(double travelTime, Id linkId, double averageSpeed, int roadType, int freeVelocity, double distance, HbefaObject[][] hbefaTable) {
 	
-	creatRoadTypes("../../detailedEval/teststrecke/sim/inputEmissions/road_types.txt");
-	int Hbefa_road_type = Integer.valueOf(findHbefaFromVisum(roadType));
-	double [] inputForEmission = emissionFactor.collectInputForEmission(Hbefa_road_type, averageSpeed, distance,hbefaTable);
+	//linkage between Hbefa road types and Visum road types
+	createRoadTypes("../../detailedEval/teststrecke/sim/inputEmissions/road_types.txt");
+	int Hbefa_road_type = Integer.valueOf(findHbefaFromVisumRoadType(roadType));
+	
+	//get emissions calculated per event differentiated by fraction and average speed approach
+	double [] inputForEmissions = emissionFactor.collectInputForEmission(Hbefa_road_type, averageSpeed, distance,hbefaTable);
 				
 		//falls kein LinkId in der Map vorhanden ist
 		
 		if(this.emissions.get(linkId) == null) {
-			this.emissions.put(linkId, inputForEmission);// in dem Fall muss nichts aufaddiert werden, weil es zum ersten mal Daten eingelesen werden
-			System.out.println(this.emissions);
+			this.emissions.put(linkId, inputForEmissions);// in dem Fall muss nichts aufaddiert werden, weil es zum ersten mal Daten eingelesen werden
+//			System.out.println(this.emissions);
 
 		}
 		else{
 		
-			double [] newValue = new double[13]; // es werden hier die neuen  Daten (nach der Aufsummierung) gespeichert
-			double [] oldValue = this.emissions.get(linkId); // oldValue ist die bisherige Summe
+			double [] actualEmissions = new double[13]; // es werden hier die neuen  Daten (nach der Aufsummierung) gespeichert
+			double [] previousEmissions = this.emissions.get(linkId); // oldValue ist die bisherige Summe
 		
 			for(int i=0; i<12 ; i++){
 			
-			newValue[i]= oldValue[i] + inputForEmission[i];
-			
+			actualEmissions[i]= previousEmissions[i] + inputForEmissions[i];
+			System.out.println("\n LinkID "+ linkId);
 		}
 		
 		// put newValue in the Map
 		
-		emissions.put(linkId, newValue);
-		System.out.println(this.emissions);
-
+		emissions.put(linkId, actualEmissions);
+//		System.out.println(this.emissions);
+		
 		
 	}
 	
 }
 
 // road_Types erstellen
-public void creatRoadTypes(String filename){
+public void createRoadTypes(String filename){
 
 		try{
 
@@ -101,13 +104,26 @@ public void printTotalEmissionsPerLink(){
 				for(int i=0 ; i<12 ; i++)
 				result+= LinkIdEntry.getKey()+ ";" +i+ ";" + LinkIdEntry.getValue()[i] + "\n";
 				
+				/*					mKrBasedOnAverageSpeed [0]
+									noxEmissionsBasedOnAverageSpeed [1]
+									co2repEmissionsBasedOnAverageSpeed [2]
+									co2EmissionsBasedOnAverageSpeed [3]
+									no2EmissionsBasedOnAverageSpeed[4]
+									pmEmissionsBasedOnAverageSpeed[5]
+
+									mKrBasedOnFractions[6]
+									noxEmissionsBasedOnFractions[7]
+									co2repEmissionsBasedOnFractions[8]
+									co2EmissionsBasedOnFractions[9]
+									no2EmissionsBasedOnFractions[10]
+									pmEmissionsBasedOnFractions[11] */
 				
 				}
 
 					// Create file 
 					FileWriter fstream = 
-							new FileWriter("../../detailedEval/teststrecke/sim/outputEmissions/emissionsPerLink.txt");
-						BufferedWriter out = new BufferedWriter(fstream);
+							new FileWriter("../../detailedEval/teststrecke/sim/outputEmissions/emissionsPerLink.txt");			
+									BufferedWriter out = new BufferedWriter(fstream);
 							out.write("LinkId \t Luftschadstoff \t Emissionen \n"   
 										+ result);
 							//Close the output stream

@@ -55,7 +55,11 @@ public class Main {
 		hbefaTable.makeHabefaTable(Hbefa_Traffic);
 		
 //		System.out.println(hbefaTable.getHbefaTableWithSpeedAndEmissionFactor()[15][0].getVelocity());
+
+/*		runs the emission tool with a data structure that can be sorted by agent and LinkID, not suited for the large scenario*/
 //		DataStructureOfSingleEventAttributes handler = new DataStructureOfSingleEventAttributes(network);
+		
+/*		runs the emission tool by using a modular approach either calculating the emissions per agent or per linkID*/
 		TravelTimeEventHandler handler = new TravelTimeEventHandler(network,hbefaTable.getHbefaTableWithSpeedAndEmissionFactor());
 		
 		LinkAccountAnalyseModul linkAccount = handler.getLinkAccountAnalyseModul();
@@ -85,25 +89,25 @@ public class Main {
 	//	em.MapForColdEmissionFactor();
 		///em.printColdEmissionFactor();
 		
-	/*
+	
 		
-		HbefaTable hbefaTable = new HbefaTable();
-		hbefaTable.makeHabefaTable(Hbefa_Traffic);
+//		HbefaTable hbefaTable = new HbefaTable();
+//		hbefaTable.makeHabefaTable(Hbefa_Traffic);
 		
 //		hbefaColdTable hbefaColdTable = new hbefaColdTable();
 //		hbefaColdTable.makeHbefaColdTable(Hbefa_Cold_Traffic);
 //		hbefaColdTable.printHbefaCold();
-		HbefaVisum hbefaVisum = new HbefaVisum(handler.getTravelTimes());
-		hbefaVisum.creatRoadTypes(visumRoadHebefaRoadFile);
+/*		HbefaVisum hbefaVisum = new HbefaVisum(handler.getTravelTimes());
+		hbefaVisum.createRoadTypes(visumRoadHebefaRoadFile);
 		hbefaVisum.printHbefaVisum();
 		hbefaVisum.createMapWithHbefaRoadTypeNumber();	
 		
 		EmissionFactor emissionFactor = new EmissionFactor(hbefaVisum.map,hbefaTable.getHbefaTableWithSpeedAndEmissionFactor());
 		emissionFactor.createEmissionTables();
 		emissionFactor.createEmissionFile();
-//		emissionFactor.printEmissionTable();
+//		emissionFactor.printEmissionTable();*/
 		
 		
-		*/}
+		}
 	}	
 	

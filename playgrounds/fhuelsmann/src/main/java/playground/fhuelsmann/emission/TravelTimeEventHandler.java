@@ -31,14 +31,10 @@ import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.api.experimental.events.ActivityEndEvent;
-import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
-import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
-import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
@@ -50,7 +46,7 @@ import org.matsim.core.network.LinkImpl;
 
 
 public class TravelTimeEventHandler implements LinkEnterEventHandler,LinkLeaveEventHandler, 
-AgentArrivalEventHandler,AgentDepartureEventHandler,ActivityEndEventHandler,ActivityStartEventHandler {
+AgentArrivalEventHandler,AgentDepartureEventHandler {
 
 
 	private final Network network;
@@ -76,20 +72,8 @@ AgentArrivalEventHandler,AgentDepartureEventHandler,ActivityEndEventHandler,Acti
 	}
 
 	private final Map<Id, Double> linkenter = new TreeMap<Id, Double>();
-	private final Map<Id, Double> activityend = new TreeMap<Id, Double>();
-	private final Map<Id, Double> activitystart = new TreeMap<Id, Double>();
 	private final Map<Id, Double> agentarrival = new TreeMap<Id, Double>();
 	private final Map<Id, Double> agentdeparture = new TreeMap<Id, Double>();
-
-
-
-
-
-	public Map<Id,Map<Integer,DistanceObject>> coldDistance  =
-		new TreeMap<Id,Map<Integer,DistanceObject>>();
-
-	public Map<Id,Map<Integer,ParkingTimeObject>> parkingTime  =
-		new TreeMap<Id,Map<Integer,ParkingTimeObject>>();
 
 
 	public void reset(int iteration) {
@@ -111,132 +95,28 @@ AgentArrivalEventHandler,AgentDepartureEventHandler,ActivityEndEventHandler,Acti
 //		}
 //	}
 
-	@Override
-	public void handleEvent(ActivityEndEvent event) {
-//		String id = event.getPersonId().toString();
-//		if(id.contains("testVehicle")){
-		this.activityend.put(event.getPersonId(), event.getTime());
-		Id personId= event.getPersonId();
-		Id linkId = event.getLinkId();
-
-		// cold start emissions: parking time calculation: time difference between activity start and activity end	
-		LinkImpl link = (LinkImpl) this.network.getLinks().get(linkId);
-
-		if(this.parkingTime.get(personId)!=null){
-
-
-			String temp1 = event.getAttributes().toString();
-			String[] temp2 = temp1.split(",");
-
-			ParkingTimeObject object = 
-				new ParkingTimeObject(event.getPersonId(),event.getTime(),temp2[1].split("=")[1]);
-			this.parkingTime.get(personId).put((parkingTime.get(personId).size()),object );}
-
-		else{
-
-			String temp1 = event.getAttributes().toString();
-			String[] temp2 = temp1.split(",");
-
-			ParkingTimeObject object = 
-				new ParkingTimeObject(event.getPersonId(),event.getTime(),temp2[1].split("=")[1]);
-
-			Map<Integer,ParkingTimeObject> tempMap = 
-				new TreeMap<Integer,ParkingTimeObject>();
-				tempMap.put(0, object);
-				parkingTime.put(personId, tempMap);}
-
-		}
-//	}
-
-	@Override
-	public void handleEvent(ActivityStartEvent event) {
+	public void handleEvent(AgentArrivalEvent event) {
 //		String id = event.getPersonId().toString();
 //		Id onelink = event.getLinkId();
 //		if (onelink == new IdImpl("590000822")){
-//		if(id.contains("testVehicle")){
-		this.activitystart.put(event.getPersonId(), event.getTime());
-		Id personId= event.getPersonId();
-		Id linkId = event.getLinkId();
-
-		//cold start emissions: Distance calculation: Length of links between two activities 
-		LinkImpl link = (LinkImpl) this.network.getLinks().get(linkId);
-
-		if(this.coldDistance.get(personId)!=null){
-
-			String temp1 = event.getAttributes().toString();
-			String[] temp2 = temp1.split(",");
-
-
-			DistanceObject object = 
-				new DistanceObject(temp2[1].split("=")[1],link.getLength(),event.getPersonId(),event.getLinkId());
-			this.coldDistance.get(personId).put((coldDistance.get(personId).size()),object );}
-
-		else{
-			String temp1 = event.getAttributes().toString();
-			String[] temp2 = temp1.split(",");
-
-			DistanceObject object = 
-				new DistanceObject(temp2[1].split("=")[1],link.getLength(),event.getPersonId(),event.getLinkId());
-
-			Map<Integer,DistanceObject> tempMap = 
-				new TreeMap<Integer,DistanceObject>();
-			tempMap.put(0, object);
-			coldDistance.put(personId, tempMap);}
-
-		// cold start emissions: parking time calculation: time difference between activity start and activity end	
-		if(this.parkingTime.get(personId)!=null){
-
-
-			String temp1 = event.getAttributes().toString();
-			String[] temp2 = temp1.split(",");
-
-			ParkingTimeObject object = 
-				new ParkingTimeObject(event.getPersonId(),event.getTime(),temp2[1].split("=")[1]);
-			this.parkingTime.get(personId).put((parkingTime.get(personId).size()),object );}
-
-		else{
-
-			String temp1 = event.getAttributes().toString();
-			String[] temp2 = temp1.split(",");
-
-			ParkingTimeObject object = 
-				new ParkingTimeObject(event.getPersonId(),event.getTime(),temp2[1].split("=")[1]);
-
-			Map<Integer,ParkingTimeObject> tempMap = 
-				new TreeMap<Integer,ParkingTimeObject>();
-				tempMap.put(0, object);
-				parkingTime.put(personId, tempMap);}
+//			if(id.contains("testVehicle")){
+				this.agentarrival.put(event.getPersonId(), event.getTime());
 		}
 //		}
 //	}
 
-	public void handleEvent(AgentArrivalEvent event) {
-//		String id = event.getPersonId().toString();
-		Id onelink = event.getLinkId();
-		if (onelink == new IdImpl("590000822")){
-//			if(id.contains("testVehicle")){
-				this.agentarrival.put(event.getPersonId(), event.getTime());
-			}
-		}
-		
-//	}
-
 	public void handleEvent(AgentDepartureEvent event) {
 //		String id = event.getPersonId().toString();
-		Id onelink = event.getLinkId();
-			if (onelink == new IdImpl("590000822")){
+//		Id onelink = event.getLinkId();
+//			if (onelink == new IdImpl("590000822")){
 //				if(id.contains("testVehicle")){
 					this.agentdeparture.put(event.getPersonId(), event.getTime());
 				}
-		}
+//		}
 //	}
 		
 
-
-
 	public void handleEvent(LinkLeaveEvent event) {	
-	;
-
 //		String id = event.getPersonId().toString();
 //		Id onelink = event.getLinkId();
 //		if (onelink.equals(new IdImpl("590000822"))){
@@ -268,10 +148,8 @@ AgentArrivalEventHandler,AgentDepartureEventHandler,ActivityEndEventHandler,Acti
 
 				this.agentarrival.remove(personId);
 			
-				linkAccountAnalyseModul.bearbeite(travelTime, linkId, averageSpeed,roadType, freeVelocity, distance, HbefaTable);	
+				linkAccountAnalyseModul.calculateEmissionsPerLink(travelTime, linkId, averageSpeed,roadType, freeVelocity, distance, HbefaTable);	
 				}
-		
-
 				
 			// if 	(this.agentarrival.containsKey(personId)) is not the case
 
@@ -283,126 +161,10 @@ AgentArrivalEventHandler,AgentDepartureEventHandler,ActivityEndEventHandler,Acti
 				double averageSpeed=(distance/1000)/(travelTime/3600);
 
 				this.agentarrival.remove(personId);					
-				linkAccountAnalyseModul.bearbeite(travelTime, linkId, averageSpeed,roadType, freeVelocity,distance,HbefaTable);	
+				linkAccountAnalyseModul.calculateEmissionsPerLink(travelTime, linkId, averageSpeed,roadType, freeVelocity,distance,HbefaTable);	
 					
 				}
 			}
-				}
-//	}
-//	}
-
-	public Map<Id, Map<Integer, DistanceObject>> getCold() {
-		return coldDistance;
-	}
-
-	public void setCold(Map<Id, Map<Integer, DistanceObject>> cold) {
-		this.coldDistance = cold;
-	}
-
-
-	//Cold start emissions: Distance calculation
-	public void printTable(){
-
-		String result ="";
-
-		for(Entry<Id, Map<Integer, DistanceObject>> LinkIdEntry : coldDistance.entrySet()){
-			double tempresult=0.0;
-			for (Iterator iter = LinkIdEntry.getValue().
-					entrySet().iterator(); iter.hasNext();) {
-				Map.Entry entry = (Map.Entry) iter.next();
-				DistanceObject value = (DistanceObject)entry.getValue();
-				{
-					try{ 
-						tempresult+=value.getDistance();
-						value.setSumDistance(tempresult);
-						result =  
-							value.getDistance() +
-							"\t \t" + value.getPersonId() +
-							"\t \t" + value.getLinkId() +
-							"\t \t" + value.getActivity() +
-							"\t \t" + value.getSumDistance() +"\n"
-
-							+ result;
-
-					}catch(Exception e){}
-				}
-			}
-
-			try {
-
-				// Create file 
-				FileWriter fstream = 
-					new FileWriter("C:/Users/Elias/matsim/matsim/output/outColdDistance.txt");
-				BufferedWriter out = new BufferedWriter(fstream);
-				out.write("Distance \t  PersonId \t \t \t \t LinkId \t \t Activity \n"   
-						+ result);
-				//Close the output stream
-				out.close();
-			}catch (Exception e){//Catch exception if any
-				System.err.println("Error: " + e.getMessage());
-			}
-
-		}}
-
-
-
-	//Cold start emissions: Parking time calculation
-	public void printTable2(){
-
-		String result ="";
-
-		for(Entry<Id, Map<Integer, ParkingTimeObject>> LinkIdEntry : parkingTime.entrySet()){
-			int count=0;
-			boolean start=false;
-
-			double tempresult=0.0;
-			for (Iterator iter = LinkIdEntry.getValue().
-					entrySet().iterator(); iter.hasNext();) {
-				Map.Entry entry = (Map.Entry) iter.next();
-				ParkingTimeObject value = (ParkingTimeObject)entry.getValue();
-				{
-					try{ 
-						double timedifference=0.0; 
-
-						if (value.getActivity().equals("actstart")) start=true;
-						if (value.getActivity().equals("actend") && start){ 
-							timedifference =  value.getTime() - parkingTime.get((LinkIdEntry.getKey())).get(count-1).getTime() ; 
-							start=false;}
-
-						value.setTimedifference(timedifference);
-						
-						count++;
-						result+=  
-							value.getPersonId() +
-							"\t " +value.getTime() +
-							"\t " + timedifference +
-							"\t  \t \t"+ value.getActivity() +
-							"\n";
-
-					}catch(Exception e){}
-				}
-			}
-
-			try {
-
-				// Create file 
-				FileWriter fstream = 
-					new FileWriter("C:/Users/Elias/matsim/matsim/output/outColdParking.txt");
-				BufferedWriter out = new BufferedWriter(fstream);
-				out.write("PersonId \t  \t \t Time \t \t  TimeDifference \t   Activity\n"   
-						+ result);
-				//Close the output stream
-				out.close();
-			}catch (Exception e){//Catch exception if any
-				System.err.println("Error: " + e.getMessage());
-			}
-
 		}
-
-
-
-	}
-
-
 
 }
