@@ -51,7 +51,7 @@ public class SfAirNetworkBuilder {
 			
 			Coord airportCoord = new CoordImpl(Double.parseDouble(xValue), Double.parseDouble(yValue));
 			
-			new MATSimAirport(new IdImpl(airportCode), airportCoord).createRunways(network);			
+			new SfMATSimAirport(new IdImpl(airportCode), airportCoord).createRunways(network);			
 		}
 		
 		
