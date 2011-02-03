@@ -35,7 +35,7 @@ public class Main {
 		String eventsFile = "../../detailedEval/teststrecke/sim/output/20090319/ITERS/it.0/0.events.txt.gz";
 		String netfile ="../../detailedEval/Net/network.xml";
 //		String visumRoadFile = "../../detailedEval/teststrecke/sim/inputEmissions/visumnetzlink.txt";
-		String visumRoadHebefaRoadFile = "../../detailedEval/teststrecke/sim/inputEmissions/road_types.txt";
+//		String visumRoadHebefaRoadFile = "../../detailedEval/teststrecke/sim/inputEmissions/road_types.txt";
 		String Hbefa_Traffic = "../../detailedEval/teststrecke/sim/inputEmissions/hbefa_emission_factors_EU3_D.txt";
 		String Hbefa_Cold_Traffic = "../../detailedEval/teststrecke/sim/inputEmissions/hbefa_coldstart_emission_factors.txt";
 		
@@ -48,13 +48,18 @@ public class Main {
 		Network network = scenario.getNetwork(); 
 		new MatsimNetworkReader(scenario).readFile(netfile);
 		
+		
+
 		//create the handler 
 		HbefaTable hbefaTable = new HbefaTable();
 		hbefaTable.makeHabefaTable(Hbefa_Traffic);
-		System.out.println(hbefaTable.getHbefaTableWithSpeedAndEmissionFactor()[15][0].getVelocity());
+		
+//		System.out.println(hbefaTable.getHbefaTableWithSpeedAndEmissionFactor()[15][0].getVelocity());
+//		DataStructureOfSingleEventAttributes handler = new DataStructureOfSingleEventAttributes(network);
 		TravelTimeEventHandler handler = new TravelTimeEventHandler(network,hbefaTable.getHbefaTableWithSpeedAndEmissionFactor());
-		LinkAccountAnalyseModul l = handler.getLinkAccountAnalyseModul();
-		//	TravelTimeCalculation handler = new TravelTimeCalculation();
+		
+		LinkAccountAnalyseModul linkAccount = handler.getLinkAccountAnalyseModul();
+		
 	
 		
 		//add the handler
@@ -69,7 +74,7 @@ public class Main {
 		MatsimEventsReader matsimEventReader = new MatsimEventsReader(events);
 		
 		matsimEventReader.readFile(eventsFile);
-		l.printTotalEmissionsPerLink();
+		linkAccount.printTotalEmissionsPerLink();
 	
 		//for cold start emissions 
 		//handler.printTable();
