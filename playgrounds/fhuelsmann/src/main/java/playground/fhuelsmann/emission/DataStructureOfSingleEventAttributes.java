@@ -400,7 +400,7 @@ AgentArrivalEventHandler,AgentDepartureEventHandler,ActivityEndEventHandler,Acti
 
 				// Create file 
 				FileWriter fstream = 
-					new FileWriter("C:/Users/Elias/matsim/matsim/output/outColdDistance.txt");
+					new FileWriter("../../detailedEval/teststrecke/sim/outputEmissions/outColdDistance.txt");
 				BufferedWriter out = new BufferedWriter(fstream);
 				out.write("Distance \t  PersonId \t \t \t \t LinkId \t \t Activity \n"   
 						+ result);
@@ -455,7 +455,7 @@ AgentArrivalEventHandler,AgentDepartureEventHandler,ActivityEndEventHandler,Acti
 
 				// Create file 
 				FileWriter fstream = 
-					new FileWriter("C:/Users/Elias/matsim/matsim/output/outColdParking.txt");
+					new FileWriter("../../detailedEval/teststrecke/sim/outputEmissions/outColdParking.txt");
 				BufferedWriter out = new BufferedWriter(fstream);
 				out.write("PersonId \t  \t \t Time \t \t  TimeDifference \t   Activity\n"   
 						+ result);
