@@ -14,6 +14,8 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
 public class SfAirNetworkBuilder {
 
@@ -27,6 +29,7 @@ public class SfAirNetworkBuilder {
 		String output = "/home/soeren/workspace/testnetzwerk";
 		Set<String> allowedModes = new HashSet<String>();
 		allowedModes.add("pt");
+		allowedModes.add("car");
 
 		NetworkImpl network = NetworkImpl.createNetwork();
 		network.setCapacityPeriod(60.0);		//60 seconds capacity period --> 1 take-off per minute
@@ -34,6 +37,8 @@ public class SfAirNetworkBuilder {
 		BufferedReader brAirports = new BufferedReader(new FileReader(new File("/home/soeren/workspace/OsmTest.txt")));
 		BufferedReader brRoutes = new BufferedReader(new FileReader(new File("/home/soeren/workspace/cityPairs.txt")));
 		
+		CoordinateTransformation coordtransform =
+			TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, "EPSG:3395");
 		
 		while (brAirports.ready()) {
 			String oneLine = brAirports.readLine();
@@ -49,7 +54,8 @@ public class SfAirNetworkBuilder {
 			yValue = yValue.replaceAll("\\[", "");
 			yValue = yValue.replaceAll("\\]", "");
 			
-			Coord airportCoord = new CoordImpl(Double.parseDouble(xValue), Double.parseDouble(yValue));
+			Coord coord = new CoordImpl(Double.parseDouble(xValue), Double.parseDouble(yValue));
+			Coord airportCoord = coordtransform.transform(coord);
 			
 			new SfMATSimAirport(new IdImpl(airportCode), airportCoord).createRunways(network);			
 		}
@@ -61,19 +67,27 @@ public class SfAirNetworkBuilder {
 			double length = Double.parseDouble(lineEntries[1]);
 			String origin = lineEntries[0].substring(0, 3);
 			String destination = lineEntries[0].substring(3, 6);
+			
+			
+			//LÖSCHEN
+//			if ((origin.equalsIgnoreCase("TXL") && destination.equalsIgnoreCase("ZRH")) || (origin.equalsIgnoreCase("ZRH") && destination.equalsIgnoreCase("TXL")) ) {
+			
 			Id originRunway = new IdImpl(origin+"runwayOutbound");
 			Id destinationRunway = new IdImpl(destination+"runwayInbound");
 			Link originToDestination = network.getFactory().createLink(new IdImpl(origin+destination), originRunway, destinationRunway);
 			originToDestination.setAllowedModes(allowedModes);
 			originToDestination.setCapacity(1.0);
 			originToDestination.setFreespeed(750.0/3.6);
-			originToDestination.setLength(length);
+			originToDestination.setLength(length*1000.0);
 			network.addLink(originToDestination);
+			
+//			} // HIER LÖSCHEN
+			
 		}
 		
 
 		
-		new NetworkWriter(network).write(output + ".xml.gz");
+		new NetworkWriter(network).write(output + ".xml");
 		System.out.println("Done! Unprocessed MATSim Network saved as " + output + ".xml");
 		
 		brAirports.close();

@@ -2,7 +2,6 @@ package air;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -13,21 +12,17 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.NetworkFactory;
-import org.matsim.core.api.experimental.ScenarioFactoryImpl;
 import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
-import org.matsim.core.mobsim.jdeqsim.Vehicle;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
-import org.matsim.pt.transitSchedule.TransitLineImpl;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.TransitScheduleWriterV1;
-import org.matsim.pt.transitSchedule.TransitStopFacilityImpl;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -36,12 +31,9 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.VehicleCapacity;
-import org.matsim.vehicles.VehicleCapacityImpl;
 import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.VehicleTypeImpl;
 import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vehicles.Vehicles;
-import org.matsim.vehicles.VehiclesFactory;
 import org.matsim.vehicles.VehiclesImpl;
 
 public class SfTransitBuilder {
@@ -63,11 +55,11 @@ public class SfTransitBuilder {
 		Scenario scen = new ScenarioImpl();	
 		Config config = scen.getConfig();
 		config.network().setInputFile("/home/soeren/workspace/testnetzwerk.xml");
-		scen.getConfig().scenario().setUseTransit(true);
-		scen.getConfig().scenario().setUseVehicles(true);
-		Network network = scen.getNetwork();
 		ScenarioLoader sl = new ScenarioLoaderImpl(scen);		
 		sl.loadScenario();		
+		Network network = scen.getNetwork();
+		scen.getConfig().scenario().setUseTransit(true);
+		scen.getConfig().scenario().setUseVehicles(true);
 		
 		BufferedReader br = new BufferedReader(new FileReader(new File(inputOagData)));
 		
@@ -103,9 +95,11 @@ public class SfTransitBuilder {
 			
 			if (!stopListMap.containsKey(routeId)) {			
 				TransitStopFacility transStopFacil = sf.createTransitStopFacility(originId, network.getNodes().get(originId).getCoord(), false);
+				transStopFacil.setLinkId(originId);
 				TransitRouteStop transStop = sf.createTransitRouteStop(transStopFacil, 0, 0);
 				stopList.add(transStop);				
 				TransitStopFacility transStopFacil2 = sf.createTransitStopFacility(destinationId, network.getNodes().get(destinationId).getCoord(), false);
+				transStopFacil2.setLinkId(destinationId);
 				TransitRouteStop transStop2 = sf.createTransitRouteStop(transStopFacil2, 0, 0);
 				stopList.add(transStop2);	
 				if (!schedule.getFacilities().containsKey(originId)) schedule.addStopFacility(transStopFacil);

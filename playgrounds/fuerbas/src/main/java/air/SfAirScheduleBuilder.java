@@ -117,8 +117,12 @@ public class SfAirScheduleBuilder {
 						String aircraftType = lineEntries[21];
 						int seats = Integer.parseInt(lineEntries[23]);
 						
-
-
+						
+						//HIER LÖSCHEN
+//						if ((originAirport.equalsIgnoreCase("TXL") && destinationAirport.equalsIgnoreCase("ZRH"))
+//								|| (originAirport.equalsIgnoreCase("ZRH") && destinationAirport.equalsIgnoreCase("TXL"))) {
+//							
+							//LÖSCHEN ENDE
 						
 						if (lineEntries[14].contains("2") && !flights.containsKey(flight) && seatsAvail>0 && !originAirport.equalsIgnoreCase(destinationAirport) &&
 												this.airportsInOsm.containsKey(originAirport) && this.airportsInOsm.containsKey(destinationAirport)) {
@@ -149,6 +153,9 @@ public class SfAirScheduleBuilder {
 					}
 				}
 			}
+		
+		
+//		} //HIER LÖSCHEN		
 		
 		lines++;
 		

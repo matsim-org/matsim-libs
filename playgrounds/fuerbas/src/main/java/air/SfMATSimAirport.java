@@ -13,6 +13,8 @@ import org.matsim.core.utils.geometry.CoordImpl;
 
 public class SfMATSimAirport {
 	
+	private static final double runwayLength = 100.0;
+	
 	public Coord coord;
 	public Id id;
 	
@@ -40,11 +42,11 @@ public class SfMATSimAirport {
 		
 //		create Coords for nodes
 		
-		Coord coordApronEnd = new CoordImpl(this.coord.getX()+0.001, this.coord.getY());			//shifting end of apron by 111 meters in Y direction
-		Coord coordTaxiIn = new CoordImpl(this.coord.getX()-0.001, this.coord.getY()-0.001);		//shifting taxiway
-		Coord coordTaxiOut = new CoordImpl(this.coord.getX()-0.001, this.coord.getY()+0.001);		//shifting taxiway
-		Coord coordRunwayInEnd = new CoordImpl(coordTaxiIn.getX()-0.01, coordTaxiIn.getY()-0.01);		//shifting runway
-		Coord coordRunwayOutEnd = new CoordImpl(coordTaxiOut.getX()-0.01, coordTaxiOut.getY()+0.01);		//shifting runway
+		Coord coordApronEnd = new CoordImpl(this.coord.getX()+runwayLength, this.coord.getY());			//shifting end of apron by 111 meters in Y direction
+		Coord coordTaxiIn = new CoordImpl(this.coord.getX()-runwayLength, this.coord.getY()-runwayLength);		//shifting taxiway
+		Coord coordTaxiOut = new CoordImpl(this.coord.getX()-runwayLength, this.coord.getY()+runwayLength);		//shifting taxiway
+		Coord coordRunwayInEnd = new CoordImpl(coordTaxiIn.getX()-runwayLength, coordTaxiIn.getY()-runwayLength);		//shifting runway
+		Coord coordRunwayOutEnd = new CoordImpl(coordTaxiOut.getX()-runwayLength, coordTaxiOut.getY()+runwayLength);		//shifting runway
 		
 //		create nodes
 		
@@ -75,6 +77,7 @@ public class SfMATSimAirport {
 		
 		Set<String> allowedModes = new HashSet<String>();
 		allowedModes.add("pt");
+		allowedModes.add("car");
 		linkApron.setAllowedModes(allowedModes);
 		linkTaxiIn.setAllowedModes(allowedModes);
 		linkTaxiOut.setAllowedModes(allowedModes);
@@ -92,6 +95,13 @@ public class SfMATSimAirport {
 		linkTaxiOut.setCapacity(5.0);
 		linkRunwayIn.setCapacity(1.0);
 		linkRunwayOut.setCapacity(1.0);
+		
+		linkApron.setLength(150.0);
+		linkTaxiIn.setLength(150.0);
+		linkTaxiOut.setLength(150.0);
+		linkRunwayIn.setLength(150.0);
+		linkRunwayOut.setLength(150.0);
+		
 		
 //		add links to network
 				
