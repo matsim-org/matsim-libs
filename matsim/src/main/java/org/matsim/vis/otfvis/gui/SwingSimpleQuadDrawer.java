@@ -32,7 +32,7 @@ import org.matsim.vis.otfvis.data.OTFDataQuadReceiver;
 /***
  * Drawer class for drawing simple quads
  */
-public class SwingSimpleQuadDrawer extends OTFSwingDrawable implements OTFDataQuadReceiver{
+public class SwingSimpleQuadDrawer extends OTFSwingAbstractDrawableReceiver implements OTFDataQuadReceiver{
 	protected final float[] line = new float[5];
 	protected String id = "noId";
 	

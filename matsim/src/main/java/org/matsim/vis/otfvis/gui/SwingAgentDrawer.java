@@ -31,7 +31,7 @@ import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 /***
  * Drawer class for drawing agents
  */
-public class SwingAgentDrawer extends OTFSwingDrawable implements OTFDataSimpleAgentReceiver{
+public class SwingAgentDrawer extends OTFSwingAbstractDrawableReceiver implements OTFDataSimpleAgentReceiver{
 	//Anything above 50km/h should be yellow!
 	private final static ValueColorizer colorizer = new ValueColorizer(
 			new double[] { 0.0, 0.3, 0.5}, new Color[] {

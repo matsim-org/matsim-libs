@@ -42,14 +42,14 @@ import org.matsim.vis.otfvis.interfaces.OTFQueryHandler;
 /**
  * @author david
  */
-abstract class OTFSwingDrawable implements OTFDrawable, OTFDataReceiver{
+abstract class OTFSwingAbstractDrawableReceiver implements OTFDrawable, OTFDataReceiver{
 
 	@Override
 	public final void draw() {
 		onDraw(OTFSwingDrawer.g2d);
 	}
 
-	abstract public void onDraw(Graphics2D g2d);
+	abstract protected void onDraw(Graphics2D g2d);
 
 	@Override
 	public void invalidate(SceneGraph graph) {

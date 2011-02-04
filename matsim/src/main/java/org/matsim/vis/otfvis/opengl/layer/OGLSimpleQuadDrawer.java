@@ -15,6 +15,9 @@ import org.matsim.vis.otfvis.opengl.drawer.OTFGLAbstractDrawableReceiver;
 
 import com.sun.opengl.util.texture.TextureCoords;
 
+/**
+ * This sounds like "quad tree", but I think it is in the sense of "polygon with 4 corners".  kai, feb'11  
+ */
 public class OGLSimpleQuadDrawer extends OTFGLAbstractDrawableReceiver implements OTFDataQuadReceiver{
 
 	    protected final Point2D.Float[] quad = new Point2D.Float[4];
@@ -22,7 +25,8 @@ public class OGLSimpleQuadDrawer extends OTFGLAbstractDrawableReceiver implement
 	    protected char[] id;
 	    protected int nrLanes;
 
-	    public void onDraw( GL gl) {
+	    @Override
+		public void onDraw( GL gl) {
 	      final Point2D.Float ortho = calcOrtho(this.quad[0].x, this.quad[0].y, this.quad[1].x, this.quad[1].y, 
 	    		  nrLanes*OGLSimpleStaticNetLayer.getBasicLaneWidth_m());
 	      // (yy this is where the width of the links for drawing is set)
