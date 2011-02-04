@@ -104,7 +104,13 @@ public class DgSignalsUtils {
 		return nodes;
 	}
 
-	
+	public static SignalGroupSettingsData copySignalGroupSettingsData(final SignalGroupSettingsData signalGroupSettings, final SignalControlDataFactory fac){
+		SignalGroupSettingsData newSettings = fac.createSignalGroupSettingsData(signalGroupSettings.getSignalGroupId());
+		newSettings.setOnset(signalGroupSettings.getOnset());
+		newSettings.setDropping(signalGroupSettings.getDropping());
+		return newSettings;
+	}
+
 	
 	
 	/**
