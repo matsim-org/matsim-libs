@@ -31,7 +31,8 @@ Changes:
   - ScenarioLoaderImpl now also loads transit-related data if transit is enabled in the configuration (r13950)
 
   Non-API Changes:
-  - ?
+  - SignalModelFactory now also has a createSignalPlan(...) method for SignalPlans (r14143)
+  - SignalScenarioLoader is not producing null pointer exceptions anymore if files are not set in config group (r14142)
 
 
 
