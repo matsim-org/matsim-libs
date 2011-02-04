@@ -40,7 +40,7 @@ public class DataPrepare {
 
 	private static final Collection<String> usedIds = new ArrayList<String>();
 	private static final Collection<String> irrelevantIds = Arrays.asList("0", "1", "2", "3", "4", "5", "6", "84", "85", "86", "87", "88", "89", "90", "91", "92", "93", "94", "95", "96", "97", "98", "99");
-	private static final Collection<String> additionalIrrelevantIdsPeriphery = Arrays.asList(/*"37","38","39","40","41","42","43",*/"44", "45","46","47",/*"48",*/"49","50","51","52","53","54","55","56","57","58","59"/*,"60","61","62","63","64","65","66","67","68","69","70","71","72","73"*/,"74","75"/*,"76","77","78","79"*/,"80","81","82","83");
+	private static final Collection<String> additionalIrrelevantIdsPeriphery = Arrays.asList(/*   /*"37","38","39","40","41","42","43",*/   /*"44", "45","46","47",*/   /*"48",*/   /*"49","50","51","52","53","54","55","56","57","58","59"*/   /*,"60","61","62","63","64","65","66","67","68","69","70","71","72","73"*/   /*,"74","75"*/   /*,"76","77","78","79"*/    /*,"80","81","82","83"*/);
 
 	//some speed adaptions based on "OsmTransitMain"
 	private static final Collection<String> innerCity30to40KmhIdsNeedingVmaxChange = Arrays.asList(/*"44",*/   /*"74", "75", "82", "83"*/   /*, "47", "50", "60", "61", "62" */);
@@ -53,7 +53,7 @@ public class DataPrepare {
 	private static String DetailedAreaShape = "../../detailedEval/Net/shapeFromVISUM/Landkreise_umMuenchen_Umrisse.shp";
 
 	// OUTPUT FILES
-	private static String OutNetworkFile = OutPath + "network-86-85-87-84_peripherySimplified.xml";
+	private static String OutNetworkFile = OutPath + "network-86-85-87-84.xml";
 
 	private final ScenarioImpl scenario;
 	private final Config config;
@@ -214,9 +214,6 @@ public class DataPrepare {
 		NetworkImpl network = scenario.getNetwork();
 		log.info("writing network to file.");
 		new NetworkWriter(network).write(OutNetworkFile);
-		
-		LinkImpl link = (LinkImpl) network.getLinks().get(15632);
-		String roadType = link.getType();
 	}
 
 	public static void main(final String[] args) {
