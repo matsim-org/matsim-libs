@@ -219,13 +219,11 @@ public class PlanImpl implements Plan {
 
 	@Override
 	public final void addLeg(final Leg leg) {
-		if (this.actsLegs.size() %2 == 0 ) throw (new IllegalStateException("Error: Tried to insert leg at non-leg position"));
 		this.actsLegs.add(leg);
 	}
 
 	@Override
 	public final void addActivity(final Activity act) {
-		if (this.actsLegs.size() %2 != 0 ) throw (new IllegalStateException("Error: Tried to insert act at non-act position"));
 		this.actsLegs.add(act);
 	}
 
