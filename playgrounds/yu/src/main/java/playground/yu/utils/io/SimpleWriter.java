@@ -19,6 +19,15 @@ import org.matsim.core.utils.io.IOUtils;
  */
 public class SimpleWriter implements Closeable, Flushable {
 	private BufferedWriter writer = null;
+	private static String intermission;
+
+	public static void setIntermission(String intermission) {
+		SimpleWriter.intermission = intermission;
+	}
+
+	public static void appendIntermission(StringBuffer stringBuffer) {
+		stringBuffer.append(intermission);
+	}
 
 	/**
 	 * 
@@ -46,21 +55,23 @@ public class SimpleWriter implements Closeable, Flushable {
 	}
 
 	public void write(char[] c) {
-		if (writer != null)
+		if (writer != null) {
 			try {
 				writer.write(c);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+		}
 	}
 
 	public void write(char c) {
-		if (writer != null)
+		if (writer != null) {
 			try {
 				writer.write(c);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+		}
 	}
 
 	public void write(String s) {
@@ -109,4 +120,5 @@ public class SimpleWriter implements Closeable, Flushable {
 	public void writeln(StringBuffer line) {
 		writeln(line.toString());
 	}
+
 }
