@@ -35,6 +35,7 @@ import javax.media.opengl.GL;
 
 import org.apache.log4j.Logger;
 import org.matsim.vis.otfvis.OTFClientControl;
+import org.matsim.vis.otfvis.opengl.drawer.OTFGLAbstractDrawable;
 import org.matsim.vis.otfvis.opengl.drawer.OTFGLAbstractDrawableReceiver;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer.AgentDrawer;
 
@@ -46,8 +47,7 @@ import com.sun.opengl.util.texture.Texture;
  * This is a helper class for the AgentPointLayer. It lives only for one timestep.
  *
  */
-final class AgentArrayDrawHelper {
-	// this is not an official "Drawer" since it does not implement the corresponding interface.  kai, jan'11
+final class AgentArrayDrawer extends OTFGLAbstractDrawable {
 
 	private int count = 0;
 	
@@ -65,9 +65,9 @@ final class AgentArrayDrawHelper {
 	
 	private Texture texture;
 	
-	private static final Logger log = Logger.getLogger(AgentArrayDrawHelper.class);
+	private static final Logger log = Logger.getLogger(AgentArrayDrawer.class);
 
-	AgentArrayDrawHelper() {
+	AgentArrayDrawer() {
 	}
 
 	private void setTexture() {
@@ -183,8 +183,8 @@ final class AgentArrayDrawHelper {
 		return posBuffers;
 	}
 
-	void draw() {
-		GL gl = OTFGLAbstractDrawableReceiver.getGl();
+	public void onDraw(GL gl) {
+//		GL gl = OTFGLAbstractDrawableReceiver.getGl();
 		gl.glEnable(GL.GL_POINT_SPRITE);
 		
 		setAgentSize(gl);

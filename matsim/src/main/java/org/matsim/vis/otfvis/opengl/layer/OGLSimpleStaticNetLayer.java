@@ -30,7 +30,7 @@ import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.caching.SceneLayer;
 import org.matsim.vis.otfvis.data.OTFDataReceiver;
-import org.matsim.vis.otfvis.gui.OTFDrawableReceiver;
+import org.matsim.vis.otfvis.gui.OTFDrawable;
 import org.matsim.vis.otfvis.opengl.drawer.OGLProvider;
 
 
@@ -52,7 +52,7 @@ import org.matsim.vis.otfvis.opengl.drawer.OGLProvider;
  */
 public class OGLSimpleStaticNetLayer implements SceneLayer {
 
-	private final List<OTFDrawableReceiver> items = new ArrayList<OTFDrawableReceiver>();
+	private final List<OTFDrawable> items = new ArrayList<OTFDrawable>();
 	
 	private OGLProvider myDrawer;
 	
@@ -62,7 +62,7 @@ public class OGLSimpleStaticNetLayer implements SceneLayer {
 
 	@Override
 	public void addItem(OTFDataReceiver item) {
-		items.add((OTFDrawableReceiver)item);
+		items.add((OTFDrawable)item);
 	}
 
 	public OGLSimpleStaticNetLayer() {
@@ -106,7 +106,7 @@ public class OGLSimpleStaticNetLayer implements SceneLayer {
 	}
 
 	private void checkNetList(GL gl) {
-		List<OTFDrawableReceiver> it = items;
+		List<OTFDrawable> it = items;
 		float cellWidthAct_m = OTFClientControl.getInstance().getOTFVisConfig().getLinkWidth();
 		if (getBasicLineWidth_m() != cellWidthAct_m){
 			gl.glDeleteLists(netDisplList, 1);
@@ -116,7 +116,7 @@ public class OGLSimpleStaticNetLayer implements SceneLayer {
 			setBasicLineWidth_m(cellWidthAct_m);
 			netDisplList = gl.glGenLists(1);
 			gl.glNewList(netDisplList, GL.GL_COMPILE);
-			for (OTFDrawableReceiver item : it) {
+			for (OTFDrawable item : it) {
 				item.draw();
 			}
 			gl.glEndList();

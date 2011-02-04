@@ -35,12 +35,13 @@ import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
 
-/**The AgentPointDrawer ... doesn't draw although it has all the commands.  Instead, it receives agents 
+/**
+ * yyyy Despite its name, this is not a Drawer but a Receiver. It receives agents 
  * (as declared by its interface but not by its name) and pushes them towards the AgentPointLayer.  
- * That AgentPointLayer has its own (Array)Drawer.
- *
+ * That AgentPointLayer has its own (Array)Drawer.  The class here cannot be renamed because of the 
+ * ConnectionManager/mvi issue.  kai, feb'11
  */
-public class AgentPointDrawer extends OTFGLAbstractDrawableReceiver implements OTFDataSimpleAgentReceiver {
+public class AgentPointDrawer implements OTFDataSimpleAgentReceiver {
 
 	private final OGLAgentPointLayer oglAgentPointLayer;
 	
@@ -97,11 +98,6 @@ public class AgentPointDrawer extends OTFGLAbstractDrawableReceiver implements O
 
 	@Override
 	public void invalidate(SceneGraph graph) {
-		
-	}
-
-	@Override
-	public void onDraw(GL gl) {
 		
 	}
 

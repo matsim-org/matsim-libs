@@ -50,6 +50,13 @@ import org.matsim.vis.snapshots.writers.VisNode;
  *  a DataReader (e.g. OTFDefaultLinkHandler)
  *  a Visualizer class (e.g. SimpleStaticNetLayer.QuadDrawer)
  *  and possibly a layer this Drawer belongs to (e.g. SimpleStaticNetLayer)
+ *  <p/>
+ *  <ul>
+ *  <li> DataSource -> ByteStream ("Writer")
+ *  <li> ByteStream -> DataSource ("Reader")
+ *  <li> DataSource -> GraphicsObject ("Receiver")
+ *  <li> GraphicsObject -> DrawMechanics ("Layer")
+ *  </ul> 
  *
  * @author dstrippgen
  */

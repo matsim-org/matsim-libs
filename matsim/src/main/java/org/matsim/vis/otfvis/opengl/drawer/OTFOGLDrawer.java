@@ -50,8 +50,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Random;
+import java.util.Map.Entry;
 
 import javax.media.opengl.GL;
 import javax.media.opengl.GLAutoDrawable;
@@ -127,9 +127,9 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider {
 	
 	private int lastShot = -1;
 
-	private final List<OTFGLDrawableReceiver> overlayItems = new ArrayList<OTFGLDrawableReceiver>();
+	private final List<OTFGLAbstractDrawable> overlayItems = new ArrayList<OTFGLAbstractDrawable>();
 
-	private static List<OTFGLDrawableReceiver> newItems = new ArrayList<OTFGLDrawableReceiver>();
+	private static List<OTFGLAbstractDrawable> newItems = new ArrayList<OTFGLAbstractDrawable>();
 
 	private static volatile GLContext motherContext = null;
 
@@ -403,7 +403,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider {
 		this.mouseMan.drawElements(this.gl);
 
 		if(OTFClientControl.getInstance().getOTFVisConfig().drawOverlays()) {
-			for (OTFGLDrawableReceiver item : this.overlayItems) {
+			for (OTFGLAbstractDrawable item : this.overlayItems) {
 				item.draw();
 			}
 		}

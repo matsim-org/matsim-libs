@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * OTFGLDrawable.java
+ * OTFDrawable.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,27 +18,16 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.vis.otfvis.opengl.drawer;
+package org.matsim.vis.otfvis.gui;
 
-import javax.media.opengl.GL;
-
-import org.matsim.vis.otfvis.gui.OTFDrawableReceiver;
 
 /**
- * OTFGLDrawable is the Drawable interface for the OpenGL implementation.
- * Each element that is drawable on screen must implement this interface.
+ * Any object that can be drawn on screen will have to implement this interface.
+ * Normally these classes will additionally implement OTFData.Recevier.
  *
  * @author dstrippgen
+ *
  */
-public interface OTFGLDrawableReceiver extends OTFDrawableReceiver {
-
-	/**Presumably, the machinery calls "draw".  For the OpenGL implementation,
-	 * "draw" always calls "onDraw" and then exits.  So for the OpenGL
-	 * implementation, "onDraw" needs to be implemented in order to obtain
-	 * "draw" functionality. ???
-	 *
-	 * @param gl
-	 */
-	public void onDraw(GL gl);
+public interface OTFDrawable {
+	public void draw();
 }
-

@@ -42,7 +42,7 @@ public class OGLAgentPointLayer implements SceneLayer {
 
 	final static int BUFFERSIZE = 10000;
 
-	private final AgentArrayDrawHelper drawer = new AgentArrayDrawHelper();
+	private final AgentArrayDrawer drawer = new AgentArrayDrawer();
 	
 	private final AgentPointDrawer pointdrawer = new AgentPointDrawer(this);
 
