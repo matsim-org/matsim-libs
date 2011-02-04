@@ -87,7 +87,7 @@ public class ObjectAttributesXmlWriter extends MatsimXmlWriter {
 			// write attributes
 			for (Map.Entry<String, Object> objAttribute : objAttributes.entrySet()) {
 				Class<?> clazz = objAttribute.getValue().getClass();
-				AttributeConverter<?> conv = this.converters.get(clazz);
+				AttributeConverter<?> conv = this.converters.get(clazz.getCanonicalName());
 				if (conv != null) {
 					xmlAttributes.add(super.createTuple(ATTR_ATTRIBUTENAME, objAttribute.getKey()));
 					xmlAttributes.add(super.createTuple(ATTR_ATTRIBUTECLASS, clazz.getCanonicalName()));
