@@ -13,7 +13,8 @@ import org.matsim.core.utils.geometry.CoordImpl;
 
 public class SfMATSimAirport {
 	
-	private static final double runwayLength = 100.0;
+	private static final double runwayLength = 3000.0;
+	private static final double taxiwayLength = 500.0;
 	
 	public Coord coord;
 	public Id id;
@@ -42,11 +43,11 @@ public class SfMATSimAirport {
 		
 //		create Coords for nodes
 		
-		Coord coordApronEnd = new CoordImpl(this.coord.getX()+runwayLength, this.coord.getY());			//shifting end of apron by 111 meters in Y direction
-		Coord coordTaxiIn = new CoordImpl(this.coord.getX()-runwayLength, this.coord.getY()-runwayLength);		//shifting taxiway
-		Coord coordTaxiOut = new CoordImpl(this.coord.getX()-runwayLength, this.coord.getY()+runwayLength);		//shifting taxiway
-		Coord coordRunwayInEnd = new CoordImpl(coordTaxiIn.getX()-runwayLength, coordTaxiIn.getY()-runwayLength);		//shifting runway
-		Coord coordRunwayOutEnd = new CoordImpl(coordTaxiOut.getX()-runwayLength, coordTaxiOut.getY()+runwayLength);		//shifting runway
+		Coord coordApronEnd = new CoordImpl(this.coord.getX()+taxiwayLength, this.coord.getY());			//shifting end of apron
+		Coord coordTaxiIn = new CoordImpl(this.coord.getX()-taxiwayLength, this.coord.getY()-taxiwayLength);		//shifting taxiway
+		Coord coordTaxiOut = new CoordImpl(this.coord.getX()-taxiwayLength, this.coord.getY()+taxiwayLength);		//shifting taxiway
+		Coord coordRunwayInEnd = new CoordImpl(coordTaxiIn.getX()-runwayLength, coordTaxiIn.getY());		//shifting runway
+		Coord coordRunwayOutEnd = new CoordImpl(coordTaxiOut.getX()-runwayLength, coordTaxiOut.getY());		//shifting runway
 		
 //		create nodes
 		
@@ -84,9 +85,9 @@ public class SfMATSimAirport {
 		linkRunwayIn.setAllowedModes(allowedModes);
 		linkRunwayOut.setAllowedModes(allowedModes);
 		
-		linkApron.setFreespeed(50.0/3.6);
-		linkTaxiIn.setFreespeed(50.0/3.6);
-		linkTaxiOut.setFreespeed(50.0/3.6);
+		linkApron.setFreespeed(30.0/3.6);
+		linkTaxiIn.setFreespeed(30.0/3.6);
+		linkTaxiOut.setFreespeed(30.0/3.6);
 		linkRunwayIn.setFreespeed(220.0/3.6);
 		linkRunwayOut.setFreespeed(250.0/3.6);
 		
@@ -96,11 +97,11 @@ public class SfMATSimAirport {
 		linkRunwayIn.setCapacity(1.0);
 		linkRunwayOut.setCapacity(1.0);
 		
-		linkApron.setLength(150.0);
-		linkTaxiIn.setLength(150.0);
-		linkTaxiOut.setLength(150.0);
-		linkRunwayIn.setLength(150.0);
-		linkRunwayOut.setLength(150.0);
+		linkApron.setLength(taxiwayLength);
+		linkTaxiIn.setLength(taxiwayLength);
+		linkTaxiOut.setLength(taxiwayLength);
+		linkRunwayIn.setLength(runwayLength);
+		linkRunwayOut.setLength(runwayLength);
 		
 		
 //		add links to network
