@@ -23,6 +23,7 @@ public class SfAirNetworkBuilder {
 	 * @param args
 	 * @throws IOException 
 	 */
+	@SuppressWarnings("deprecation")
 	public static void main(String[] args) throws IOException {
 		// TODO Auto-generated method stub
 		
@@ -42,8 +43,7 @@ public class SfAirNetworkBuilder {
 		
 		while (brAirports.ready()) {
 			String oneLine = brAirports.readLine();
-			String[] lineEntries = new String[2];
-			lineEntries = oneLine.split("\t");
+			String[] lineEntries = oneLine.split("\t");
 			String airportCode = lineEntries[0];
 			String[] coordinates = new String[2];
 			coordinates = lineEntries[1].split("y");
@@ -64,7 +64,9 @@ public class SfAirNetworkBuilder {
 		while (brRoutes.ready()) {
 			String oneLine = brRoutes.readLine();
 			String[] lineEntries = oneLine.split("\t");
-			double length = Double.parseDouble(lineEntries[1]);
+			double length = Double.parseDouble(lineEntries[1])*1000;	//distance between O&D in meters
+			double flightTime = Double.parseDouble(lineEntries[2])-300.;		//flight time in seconds, assumption: 300secs for taxi/take-off/landing
+			double groundSpeed = length/flightTime;						
 			String origin = lineEntries[0].substring(0, 3);
 			String destination = lineEntries[0].substring(3, 6);
 			
@@ -77,8 +79,8 @@ public class SfAirNetworkBuilder {
 			Link originToDestination = network.getFactory().createLink(new IdImpl(origin+destination), originRunway, destinationRunway);
 			originToDestination.setAllowedModes(allowedModes);
 			originToDestination.setCapacity(1.0);
-			originToDestination.setFreespeed(750.0/3.6);
-			originToDestination.setLength(length*1000.0);
+			originToDestination.setFreespeed(groundSpeed);
+			originToDestination.setLength(length);
 			network.addLink(originToDestination);
 			
 //			} // HIER LÖSCHEN
