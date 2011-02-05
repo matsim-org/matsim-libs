@@ -41,6 +41,7 @@ public class SfAirScheduleBuilder {
 	protected Map<String, Integer> aircraftTypes = new HashMap<String, Integer>();
 	
 	
+	@SuppressWarnings("unchecked")
 	public void filterEurope(String inputOsm, String inputOag, String outputOsm, String outputOag, String outputMissingAirports, String cityPairs, String aircraft) throws IOException, SAXException, ParserConfigurationException {
 		
 		
@@ -179,7 +180,7 @@ public class SfAirScheduleBuilder {
 		Iterator it3 = this.routes.entrySet().iterator();
 	    while (it3.hasNext()) {
 	        Map.Entry pairs = (Map.Entry)it3.next();
-	        bwcityPairs.write(pairs.getKey().toString()+"\t"+this.cityPairDistance.get(pairs.getKey().toString()));
+	        bwcityPairs.write(pairs.getKey().toString()+"\t"+this.cityPairDistance.get(pairs.getKey().toString())+"\t"+this.routes.get(pairs.getKey().toString()));
 	        bwcityPairs.newLine();
 	    }
 	    
