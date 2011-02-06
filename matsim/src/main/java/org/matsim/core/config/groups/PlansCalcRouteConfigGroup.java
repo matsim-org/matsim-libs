@@ -39,11 +39,13 @@ public class PlansCalcRouteConfigGroup extends Module {
 	public static final String GROUP_NAME = "planscalcroute";
 
 	private static final String PT_SPEED_FACTOR = "ptSpeedFactor";
+	private static final String BEELINE_DISTANCE_FACTOR = "beelineDistanceFactor";
 	private static final String WALK_SPEED = "walkSpeed";
 	private static final String BIKE_SPEED = "bikeSpeed";
 	private static final String UNDEFINED_MODE_SPEED = "undefinedModeSpeed";
 
 	private double ptSpeedFactor = 2.0;
+	private double beelineDistanceFactor = 1.3 ;
 
 	private double walkSpeed = 3.0 / 3.6; // 3.0 km/h --> m/s
 
@@ -59,6 +61,8 @@ public class PlansCalcRouteConfigGroup extends Module {
 	public String getValue(final String key) {
 		if (PT_SPEED_FACTOR.equals(key)) {
 			return Double.toString(getPtSpeedFactor());
+		} else if (BEELINE_DISTANCE_FACTOR.equals(key)) {
+				return Double.toString(getBeelineDistanceFactor());
 		} else if (WALK_SPEED.equals(key)) {
 			return Double.toString(getWalkSpeed());
 		} else if (BIKE_SPEED.equals(key)) {
@@ -74,6 +78,8 @@ public class PlansCalcRouteConfigGroup extends Module {
 	public void addParam(final String key, final String value) {
 		if (PT_SPEED_FACTOR.equals(key)) {
 			setPtSpeedFactor(Double.parseDouble(value));
+		} else if (BEELINE_DISTANCE_FACTOR.equals(key)) {
+			setBeelineDistanceFactor(Double.parseDouble(value));
 		} else if (WALK_SPEED.equals(key)) {
 			setWalkSpeed(Double.parseDouble(value));
 		} else if (BIKE_SPEED.equals(key)) {
@@ -90,10 +96,20 @@ public class PlansCalcRouteConfigGroup extends Module {
 	public final Map<String, String> getParams() {
 		Map<String, String> map = super.getParams();
 		super.addParameterToMap(map, PT_SPEED_FACTOR);
+		super.addParameterToMap(map, BEELINE_DISTANCE_FACTOR);
 		super.addParameterToMap(map, WALK_SPEED);
 		super.addParameterToMap(map, BIKE_SPEED);
 		super.addParameterToMap(map, UNDEFINED_MODE_SPEED);
 		return map;
+	}
+	
+	public final Map<String, String> getComments() {
+		Map<String,String> map = super.getComments();
+		map.put(PT_SPEED_FACTOR, "factor with which speeds (and therefore times) from the car freespeed travel time " +
+		"calculation are multiplied in order to obtain the pt travel times.  Default is something like 2") ;
+		map.put(BEELINE_DISTANCE_FACTOR, "factor with which beeline distances (and therefore times) " +
+		"are multiplied in order to obtain an estimate of the network distances/times.  Default is something like 1.3") ;
+		return map ;
 	}
 
 	public double getPtSpeedFactor() {
@@ -126,6 +142,14 @@ public class PlansCalcRouteConfigGroup extends Module {
 
 	public void setPtSpeedFactor(final double ptSpeedFactor) {
 		this.ptSpeedFactor = ptSpeedFactor;
+	}
+
+	public double getBeelineDistanceFactor() {
+		return beelineDistanceFactor;
+	}
+
+	public void setBeelineDistanceFactor(double beelineDistanceFactor) {
+		this.beelineDistanceFactor = beelineDistanceFactor;
 	}
 
 }

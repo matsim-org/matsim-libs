@@ -87,8 +87,8 @@ public class TransitRouterImpl implements TransitRouter {
 		Map<Node, InitialNode> wrappedFromNodes = new LinkedHashMap<Node, InitialNode>();
 		for (TransitRouterNetworkNode node : fromNodes) {
 			double distance = CoordUtils.calcDistance(fromCoord, node.stop.getStopFacility().getCoord());
-			double initialTime = distance / this.config.beelineWalkSpeed;
-			double initialCost = - (initialTime * this.config.marginalUtilityOfTravelTimeWalk);
+			double initialTime = distance / this.config.getBeelineWalkSpeed();
+			double initialCost = - (initialTime * this.config.getMarginalUtilityOfTravelTimeWalk_utl_s());
 			wrappedFromNodes.put(node, new InitialNode(initialCost, initialTime + departureTime));
 		}
 
@@ -103,8 +103,8 @@ public class TransitRouterImpl implements TransitRouter {
 		Map<Node, InitialNode> wrappedToNodes = new LinkedHashMap<Node, InitialNode>();
 		for (TransitRouterNetworkNode node : toNodes) {
 			double distance = CoordUtils.calcDistance(toCoord, node.stop.getStopFacility().getCoord());
-			double initialTime = distance / this.config.beelineWalkSpeed;
-			double initialCost = - (initialTime * this.config.marginalUtilityOfTravelTimeWalk);
+			double initialTime = distance / this.config.getBeelineWalkSpeed();
+			double initialCost = - (initialTime * this.config.getMarginalUtilityOfTravelTimeWalk_utl_s());
 			wrappedToNodes.put(node, new InitialNode(initialCost, initialTime + departureTime));
 		}
 
@@ -115,12 +115,12 @@ public class TransitRouterImpl implements TransitRouter {
 			return null;
 		}
 
-		double directWalkCost = CoordUtils.calcDistance(fromCoord, toCoord) / this.config.beelineWalkSpeed * ( 0 - this.config.marginalUtilityOfTravelTimeWalk);
+		double directWalkCost = CoordUtils.calcDistance(fromCoord, toCoord) / this.config.getBeelineWalkSpeed() * ( 0 - this.config.getMarginalUtilityOfTravelTimeWalk_utl_s());
 		double pathCost = p.travelCost + wrappedFromNodes.get(p.nodes.get(0)).initialCost + wrappedToNodes.get(p.nodes.get(p.nodes.size() - 1)).initialCost;
 		if (directWalkCost < pathCost) {
 			List<Leg> legs = new ArrayList<Leg>();
 			Leg leg = new LegImpl(TransportMode.transit_walk);
-			double walkTime = CoordUtils.calcDistance(fromCoord, toCoord) / this.config.beelineWalkSpeed;
+			double walkTime = CoordUtils.calcDistance(fromCoord, toCoord) / this.config.getBeelineWalkSpeed();
 			Route walkRoute = new GenericRouteImpl(null, null);
 			leg.setRoute(walkRoute);
 			leg.setTravelTime(walkTime);
@@ -175,7 +175,7 @@ public class TransitRouterImpl implements TransitRouter {
 						if (accessStop != egressStop) {
 							if (accessStop != null) {
 								leg = new LegImpl(TransportMode.transit_walk);
-								double walkTime = CoordUtils.calcDistance(accessStop.getCoord(), egressStop.getCoord()) / this.config.beelineWalkSpeed;
+								double walkTime = CoordUtils.calcDistance(accessStop.getCoord(), egressStop.getCoord()) / this.config.getBeelineWalkSpeed();
 								Route walkRoute = new GenericRouteImpl(accessStop.getLinkId(), egressStop.getLinkId());
 								leg.setRoute(walkRoute);
 								leg.setTravelTime(walkTime);
@@ -183,7 +183,7 @@ public class TransitRouterImpl implements TransitRouter {
 								legs.add(leg);
 							} else { // accessStop == null, so it must be the first walk-leg
 								leg = new LegImpl(TransportMode.transit_walk);
-								double walkTime = CoordUtils.calcDistance(fromCoord, egressStop.getCoord()) / this.config.beelineWalkSpeed;
+								double walkTime = CoordUtils.calcDistance(fromCoord, egressStop.getCoord()) / this.config.getBeelineWalkSpeed();
 								leg.setTravelTime(walkTime);
 								time += walkTime;
 								legs.add(leg);
@@ -217,9 +217,9 @@ public class TransitRouterImpl implements TransitRouter {
 			leg = new LegImpl(TransportMode.transit_walk);
 			double walkTime;
 			if (accessStop == null) {
-				walkTime = CoordUtils.calcDistance(fromCoord, toCoord) / this.config.beelineWalkSpeed;
+				walkTime = CoordUtils.calcDistance(fromCoord, toCoord) / this.config.getBeelineWalkSpeed();
 			} else {
-				walkTime = CoordUtils.calcDistance(accessStop.getCoord(), toCoord) / this.config.beelineWalkSpeed;
+				walkTime = CoordUtils.calcDistance(accessStop.getCoord(), toCoord) / this.config.getBeelineWalkSpeed();
 			}
 			leg.setTravelTime(walkTime);
 			legs.add(leg);
@@ -228,7 +228,7 @@ public class TransitRouterImpl implements TransitRouter {
 			// it seems, the agent only walked
 			legs.clear();
 			leg = new LegImpl(TransportMode.transit_walk);
-			double walkTime = CoordUtils.calcDistance(fromCoord, toCoord) / this.config.beelineWalkSpeed;
+			double walkTime = CoordUtils.calcDistance(fromCoord, toCoord) / this.config.getBeelineWalkSpeed();
 			leg.setTravelTime(walkTime);
 			legs.add(leg);
 		}

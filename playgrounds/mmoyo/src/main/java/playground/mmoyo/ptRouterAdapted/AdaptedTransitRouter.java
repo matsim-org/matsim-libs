@@ -77,8 +77,8 @@ public class AdaptedTransitRouter extends TransitRouterImpl {
 		Map<Node, InitialNode> wrappedFromNodes = new LinkedHashMap<Node, InitialNode>();
 		for (TransitRouterNetworkNode node : fromNodes) {
 			double distance = CoordUtils.calcDistance(fromCoord, node.stop.getStopFacility().getCoord());
-			double initialTime = distance / this.getConfig().beelineWalkSpeed;
-			double initialCost = -initialTime * this.getConfig().marginalUtilityOfTravelTimeWalk; // yyyy check sign!!! kai, apr'10
+			double initialTime = distance / this.getConfig().getBeelineWalkSpeed();
+			double initialCost = -initialTime * this.getConfig().getMarginalUtilityOfTravelTimeWalk_utl_s(); // yyyy check sign!!! kai, apr'10
 			wrappedFromNodes.put(node, new InitialNode(initialCost, initialTime + departureTime));
 		}
 
@@ -94,8 +94,8 @@ public class AdaptedTransitRouter extends TransitRouterImpl {
 		Map<Node, InitialNode> wrappedToNodes = new LinkedHashMap<Node, InitialNode>();
 		for (TransitRouterNetworkNode node : toNodes) {
 			double distance = CoordUtils.calcDistance(toCoord, node.stop.getStopFacility().getCoord());
-			double initialTime = distance / this.getConfig().beelineWalkSpeed;
-			double initialCost = -initialTime * this.getConfig().marginalUtilityOfTravelTimeWalk; // yyyy check sign!!! kai, apr'10
+			double initialTime = distance / this.getConfig().getBeelineWalkSpeed();
+			double initialCost = -initialTime * this.getConfig().getMarginalUtilityOfTravelTimeWalk_utl_s(); // yyyy check sign!!! kai, apr'10
 			wrappedToNodes.put(node, new InitialNode(initialCost, initialTime + departureTime));
 		}
 
@@ -108,14 +108,14 @@ public class AdaptedTransitRouter extends TransitRouterImpl {
 
 		// optional direct walk *
 		if (((MyTransitRouterConfig)this.getConfig()).allowDirectWalks) {
-			double directWalkCost = -CoordUtils.calcDistance(fromCoord, toCoord) / this.getConfig().beelineWalkSpeed
-					* this.getConfig().marginalUtilityOfTravelTimeWalk;
+			double directWalkCost = -CoordUtils.calcDistance(fromCoord, toCoord) / this.getConfig().getBeelineWalkSpeed()
+					* this.getConfig().getMarginalUtilityOfTravelTimeWalk_utl_s();
 			double pathCost = p.travelCost + wrappedFromNodes.get(p.nodes.get(0)).initialCost
 					+ wrappedToNodes.get(p.nodes.get(p.nodes.size() - 1)).initialCost;
 			if (directWalkCost < pathCost) {
 				List<Leg> legs = new ArrayList<Leg>();
 				Leg leg = new LegImpl(TransportMode.transit_walk);
-				double walkTime = CoordUtils.calcDistance(fromCoord, toCoord) / this.getConfig().beelineWalkSpeed;
+				double walkTime = CoordUtils.calcDistance(fromCoord, toCoord) / this.getConfig().getBeelineWalkSpeed();
 				Route walkRoute = new GenericRouteImpl(null, null);
 				leg.setRoute(walkRoute);
 				leg.setTravelTime(walkTime);
@@ -185,12 +185,12 @@ public class AdaptedTransitRouter extends TransitRouterImpl {
 	@Override
 	public final String toString() {
 		return 	"[beelineWalkConnectionDistance=" + this.getConfig().beelineWalkConnectionDistance + "]" +
-				"[beelineWalkSpeed=" + this.getConfig().beelineWalkSpeed + "]" +
-				"[costLineSwitch=" + this.getConfig().costLineSwitch + "]" +
+				"[beelineWalkSpeed=" + this.getConfig().getBeelineWalkSpeed() + "]" +
+				"[costLineSwitch=" + this.getConfig().getUtilityOfLineSwitch_utl() + "]" +
 				"[extensionRadius=" + this.getConfig().extensionRadius + "]" +
-				"[marginalUtilityOfTravelDistanceTransit=" + this.getConfig().marginalUtilityOfTravelDistanceTransit + "]" +
-				"[marginalUtilityOfTravelTimeTransit=" + this.getConfig().marginalUtilityOfTravelTimeTransit + "]" +
-				"[marginalUtilityOfTravelTimeWalk=" + this.getConfig().marginalUtilityOfTravelTimeWalk + "]" +
+				"[marginalUtilityOfTravelDistanceTransit=" + this.getConfig().getMarginalUtilityOfTravelDistancePt_utl_m() + "]" +
+				"[marginalUtilityOfTravelTimeTransit=" + this.getConfig().getEffectiveMarginalUtilityOfTravelTimePt_utl_s() + "]" +
+				"[marginalUtilityOfTravelTimeWalk=" + this.getConfig().getMarginalUtilityOfTravelTimeWalk_utl_s() + "]" +
 				"[searchRadius=" + this.getConfig().searchRadius + "]" ;
 	}
 	

@@ -21,6 +21,8 @@
 package org.matsim.pt.router;
 
 import org.matsim.core.api.internal.MatsimParameters;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 
 public class TransitRouterConfig implements MatsimParameters {
 
@@ -45,23 +47,106 @@ public class TransitRouterConfig implements MatsimParameters {
 	/**
 	 * The distance in meters that agents can walk to get from one stop to 
 	 * another stop of a nearby transit line.
+	 * <p/>
+	 * Is this really needed?  If the marg utl of walk is correctly set, this should come out automagically.
+	 * kai, feb'11
 	 */
 	public double beelineWalkConnectionDistance = 100.0;
+
+	// =============================================================================================================================
+	// no more public variables below this line
 	
+	private Double beelineWalkSpeed ;
+	
+	private Double effectiveMarginalUtilityOfTravelTimeWalk_utl_s ;
+	
+	private Double effectiveMarginalUtilityOfTravelTimeTransit_utl_s ;
+	
+	private Double marginalUtilityOfTravelDistanceTransit_utl_m ;
+	
+	private Double utilityOfLineSwitch_utl ;
+
+	// =============================================================================================================================
+	// only setters and getters below this line
+	
+	public TransitRouterConfig() {
+		beelineWalkSpeed = 3.0/3.6;  // presumably, in m/sec.  3.0/3.6 = 3000/3600 = 3km/h.  kai, apr'10
+		
+		effectiveMarginalUtilityOfTravelTimeWalk_utl_s = -6.0 / 3600.0; // in Eu/sec; includes opportunity cost of time.  kai, apr'10
+		
+		effectiveMarginalUtilityOfTravelTimeTransit_utl_s = -6.0 / 3600.0; // in Eu/sec; includes opportunity cost of time.  kai, apr'10
+		
+		marginalUtilityOfTravelDistanceTransit_utl_m = -0.0;    // yyyy presumably, in Eu/m ?????????  so far, not used.  kai, apr'10
+		
+		utilityOfLineSwitch_utl = 60.0 * -this.effectiveMarginalUtilityOfTravelTimeTransit_utl_s; // == 1min travel time in vehicle  // in Eu.  kai, apr'10
+	}
+	
+	public TransitRouterConfig( PlanCalcScoreConfigGroup pcsConfig, PlansCalcRouteConfigGroup pcrConfig ) {
+		// walk:
+		this.beelineWalkSpeed = pcrConfig.getWalkSpeed() / pcrConfig.getBeelineDistanceFactor() ;
+		this.effectiveMarginalUtilityOfTravelTimeWalk_utl_s = pcsConfig.getTravelingWalk_utils_hr()/3600. 
+			- pcsConfig.getPerforming_utils_hr() ;
+		// pt:
+		this.effectiveMarginalUtilityOfTravelTimeTransit_utl_s = pcsConfig.getTravelingPt_utils_hr()/3600. 
+			- pcsConfig.getPerforming_utils_hr() ;
+		this.marginalUtilityOfTravelDistanceTransit_utl_m = pcsConfig.getMarginalUtilityOfMoney()
+			* pcsConfig.getMonetaryDistanceCostRatePt() ;
+		this.utilityOfLineSwitch_utl = pcsConfig.getUtilityOfLineSwitch() ;
+	}
+	
+	public void setUtilityOfLineSwitch_utl(double utilityOfLineSwitch_utl_sec) {
+		this.utilityOfLineSwitch_utl = utilityOfLineSwitch_utl_sec;
+	}
+
+	/**
+	 * The additional utility to be added when an agent switches lines.  Normally negative
+	 * <p/>
+	 * The "_utl" can go as soon as we are confident that there are no more utilities in "Eu".  kai, feb'11
+	 */
+	public double getUtilityOfLineSwitch_utl() {
+		return utilityOfLineSwitch_utl;
+	}
+
+	public void setMarginalUtilityOfTravelTimeWalk_utl_s(double marginalUtilityOfTravelTimeWalk_utl_sec) {
+		this.effectiveMarginalUtilityOfTravelTimeWalk_utl_s = marginalUtilityOfTravelTimeWalk_utl_sec;
+	}
+
+	public double getMarginalUtilityOfTravelTimeWalk_utl_s() {
+		return effectiveMarginalUtilityOfTravelTimeWalk_utl_s;
+	}
+
+	public void setEffectiveMarginalUtilityOfTravelTimePt_utl_s(double marginalUtilityOfTravelTimeTransit_utl_sec) {
+		this.effectiveMarginalUtilityOfTravelTimeTransit_utl_s = marginalUtilityOfTravelTimeTransit_utl_sec;
+	}
+
+	/**
+	 * @return the effective marginal utility of travel time by public transit.  Includes the opportunity cost of time
+	 */
+	public double getEffectiveMarginalUtilityOfTravelTimePt_utl_s() {
+		return effectiveMarginalUtilityOfTravelTimeTransit_utl_s;
+	}
+
+	public void setMarginalUtilityOfTravelDistancePt_utl_m(double marginalUtilityOfTravelDistanceTransit_utl_m) {
+		this.marginalUtilityOfTravelDistanceTransit_utl_m = marginalUtilityOfTravelDistanceTransit_utl_m;
+	}
+
+	/**
+	 * in the config, this is distanceCostRate * margUtlOfMoney.  For the router, the conversion to
+	 * utils seems ok.  kai, feb'11
+	 */
+	public double getMarginalUtilityOfTravelDistancePt_utl_m() {
+		return marginalUtilityOfTravelDistanceTransit_utl_m;
+	}
+
+	public void setBeelineWalkSpeed(double beelineWalkSpeed) {
+		this.beelineWalkSpeed = beelineWalkSpeed;
+	}
+
 	/**
 	 * Walking speed of agents on transfer links, beeline distance.
 	 */
-	public double beelineWalkSpeed = 3.0/3.6;  // presumably, in m/sec.  3.0/3.6 = 3000/3600 = 3km/h.  kai, apr'10
-	
-	public double marginalUtilityOfTravelTimeWalk = -6.0 / 3600.0; // in Eu/sec; includes opportunity cost of time.  kai, apr'10
-	
-	public double marginalUtilityOfTravelTimeTransit = -6.0 / 3600.0; // in Eu/sec; includes opportunity cost of time.  kai, apr'10
-	
-	public double marginalUtilityOfTravelDistanceTransit = -0.0;    // yyyy presumably, in Eu/m ?????????  so far, not used.  kai, apr'10
-	
-	/**
-	 * The additional costs to be added when an agent switches lines.
-	 */
-	public double costLineSwitch = 60.0 * -this.marginalUtilityOfTravelTimeTransit; // == 1min travel time in vehicle  // in Eu.  kai, apr'10
+	public double getBeelineWalkSpeed() {
+		return beelineWalkSpeed;
+	}
 	
 }

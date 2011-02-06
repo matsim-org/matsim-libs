@@ -59,9 +59,9 @@ public class TransitRouterNetworkTravelTimeCost implements TravelTime, TravelMin
 		double cost;
 		if (((TransitRouterNetworkLink) link).route == null) {
 			// it's a transfer link (walk)
-			cost = -getLinkTravelTime(link, time) * this.config.marginalUtilityOfTravelTimeWalk + this.config.costLineSwitch;
+			cost = -getLinkTravelTime(link, time) * this.config.getMarginalUtilityOfTravelTimeWalk_utl_s() + this.config.getUtilityOfLineSwitch_utl();
 		} else {
-			cost = -getLinkTravelTime(link, time) * this.config.marginalUtilityOfTravelTimeTransit - link.getLength() * this.config.marginalUtilityOfTravelDistanceTransit;
+			cost = -getLinkTravelTime(link, time) * this.config.getEffectiveMarginalUtilityOfTravelTimePt_utl_s() - link.getLength() * this.config.getMarginalUtilityOfTravelDistancePt_utl_m();
 		}
 		return cost;
 	}
@@ -71,9 +71,9 @@ public class TransitRouterNetworkTravelTimeCost implements TravelTime, TravelMin
 		double cost;
 		if (((TransitRouterNetworkLink) link).route == null) {
 			// it's a transfer link (walk)
-			cost = -getMinLinkTravelTime(link) * this.config.marginalUtilityOfTravelTimeWalk + this.config.costLineSwitch;
+			cost = -getMinLinkTravelTime(link) * this.config.getMarginalUtilityOfTravelTimeWalk_utl_s() + this.config.getUtilityOfLineSwitch_utl();
 		} else {
-			cost = -getMinLinkTravelTime(link) * this.config.marginalUtilityOfTravelTimeTransit - link.getLength() * this.config.marginalUtilityOfTravelDistanceTransit;
+			cost = -getMinLinkTravelTime(link) * this.config.getEffectiveMarginalUtilityOfTravelTimePt_utl_s() - link.getLength() * this.config.getMarginalUtilityOfTravelDistancePt_utl_m();
 		}
 		return cost;
 	}
@@ -87,7 +87,7 @@ public class TransitRouterNetworkTravelTimeCost implements TravelTime, TravelMin
 		}
 		// different transit routes, so it must be a line switch
 		double distance = CoordUtils.calcDistance(wrapped.fromNode.stop.getStopFacility().getCoord(), wrapped.toNode.stop.getStopFacility().getCoord());
-		double time2 = distance / this.config.beelineWalkSpeed;
+		double time2 = distance / this.config.getBeelineWalkSpeed();
 		return time2;
 	}
 
@@ -117,7 +117,7 @@ public class TransitRouterNetworkTravelTimeCost implements TravelTime, TravelMin
 		}
 		// different transit routes, so it must be a line switch
 		double distance = wrapped.getLength();
-		double time2 = distance / this.config.beelineWalkSpeed;
+		double time2 = distance / this.config.getBeelineWalkSpeed();
 		this.cachedTravelTime = time2;
 		return time2;
 	}

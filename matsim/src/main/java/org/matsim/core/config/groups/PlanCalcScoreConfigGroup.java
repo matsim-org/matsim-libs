@@ -72,6 +72,8 @@ public class PlanCalcScoreConfigGroup extends Module {
 	private static final String MARGINAL_UTL_OF_MONEY = "marginalUtilityOfMoney" ;
 	private static final String MONETARY_DISTANCE_COST_RATE_CAR = "monetaryDistanceCostRateCar" ;
 	private static final String MONETARY_DISTANCE_COST_RATE_PT  = "monetaryDistanceCostRatePt" ;
+	
+	private static final String UTL_OF_LINE_SWITCH = "utilityOfLineSwitch" ;
 
 	private static final String ACTIVITY_TYPE = "activityType_";
 	private static final String ACTIVITY_PRIORITY = "activityPriority_";
@@ -108,6 +110,7 @@ public class PlanCalcScoreConfigGroup extends Module {
 	private double monetaryDistanceCostRateCar = 0.0 ;
 	private double monetaryDistanceCostRatePt = 0.0 ;
 	
+	private double utilityOfLineSwitch = - 1 ;
 
 	private final HashMap<String, ActivityParams> activityTypes = new LinkedHashMap<String, ActivityParams>();
 	private final HashMap<String, ActivityParams> activityTypesByNumber = new HashMap<String, ActivityParams>();
@@ -163,6 +166,8 @@ public class PlanCalcScoreConfigGroup extends Module {
 		}	else if (WAITING.equals(key)) {
 			throw new RuntimeException( GETVALUE_ACCESS_DISABLED ) ;
 //			return Double.toString(getWaiting());
+		}	else if (UTL_OF_LINE_SWITCH.equals(key)) {
+			throw new RuntimeException( GETVALUE_ACCESS_DISABLED ) ;
 		} else if ((key != null) && key.startsWith(ACTIVITY_TYPE)) {
 			ActivityParams actParams = getActivityTypeByNumber(key.substring(ACTIVITY_TYPE.length()), false);
 			return actParams == null ? null : actParams.getType();
@@ -226,6 +231,8 @@ public class PlanCalcScoreConfigGroup extends Module {
 			setMonetaryDistanceCostRatePt( Double.parseDouble(value) ) ;
 		} else if (WAITING.equals(key)) {
 			setWaiting_utils_hr(Double.parseDouble(value));
+		} else if (UTL_OF_LINE_SWITCH.equals(key)) {
+			setUtilityOfLineSwitch(Double.parseDouble(value)) ;
 		} else if ((key != null) && key.startsWith(ACTIVITY_TYPE)) {
 			ActivityParams actParams = getActivityTypeByNumber(key.substring(ACTIVITY_TYPE.length()), true);
 			this.activityTypes.remove(actParams.getType());
@@ -277,6 +284,7 @@ public class PlanCalcScoreConfigGroup extends Module {
 		map.put(MARGINAL_UTL_OF_MONEY, Double.toString( this.getMarginalUtilityOfMoney() ) ) ;
 		map.put(MONETARY_DISTANCE_COST_RATE_CAR, Double.toString( this.getMonetaryDistanceCostRateCar() ) ) ;
 		map.put(MONETARY_DISTANCE_COST_RATE_PT, Double.toString( this.getMonetaryDistanceCostRatePt() ) ) ;
+		map.put(UTL_OF_LINE_SWITCH, Double.toString( this.getUtilityOfLineSwitch() )) ;
 		int index = 0;
 		for(ActivityParams params : this.activityTypes.values()) {
 			String key = Integer.toString(index);
@@ -298,12 +306,12 @@ public class PlanCalcScoreConfigGroup extends Module {
 		Map<String,String> map = super.getComments();
 		map.put(PERFORMING,"[utils/hr] marginal utility of doing an activity.  normally positive.  also the opportunity cost of " +
 				"time if agent is doing nothing.");
-		map.put(TRAVELING, "[utils/hr] utility offset of traveling by car.  normally negative.  this comes on top of the " +
-				"opportunity cost of time") ;
-		map.put(TRAVELING_PT, "[utils/hr] utility offset of traveling by pt.  normally negative.  this comes on top of the " +
-				"opportunity cost of time") ;
-		map.put(TRAVELING_WALK, "[utils/hr] utility offset of traveling by foot.  normally negative.  this comes on top of the " +
-				"opportunity cost of time.  also see marginalUtlOfDistanceWalk") ;
+		map.put(TRAVELING, "[utils/hr] additional marginal utility of traveling by car.  normally negative.  this comes on top " +
+				"of the opportunity cost of time") ;
+		map.put(TRAVELING_PT, "[utils/hr] additional marginal utility offset of traveling by pt.  normally negative.  this comes " +
+				"on top of the opportunity cost of time") ;
+		map.put(TRAVELING_WALK, "[utils/hr] additional marginal utility offset of traveling by foot.  normally negative.  this " +
+				"comes on top of the opportunity cost of time.  also see marginalUtlOfDistanceWalk") ;
 		map.put(LATE_ARRIVAL, "[utils/hr] utility for arriving late (i.e. after the latest start time).  normally negative") ;
 		map.put(EARLY_DEPARTURE, "[utils/hr] utility for departing early (i.e. before the earliest end time).  Probably " +
 				"implemented correctly, but not tested." );
@@ -313,6 +321,8 @@ public class PlanCalcScoreConfigGroup extends Module {
 				"your utl function is estimated") ;
 		map.put(LEARNING_RATE, "new_score = (1-learningRate)*old_score + learningRate * score_from_mobsim.  learning rates " +
 				"close to zero emulate score averaging, but slow down initial convergence") ;
+		
+		map.put(UTL_OF_LINE_SWITCH, "[utils] utility of switching a line (= transfer penalty).  Normally negative") ;
 
 		map.put(MARGINAL_UTL_OF_DISTANCE_CAR, "DON'T USE THIS!  It is not clear if this is in [utils/m] or in [Eu/m]!") ;
 		map.put(MARGINAL_UTL_OF_DISTANCE_PT, "DON'T USE THIS!  It is not clear if this is in [utils/m] or in [Eu/m]!") ;
@@ -617,6 +627,14 @@ public class PlanCalcScoreConfigGroup extends Module {
 
 	public void setMonetaryDistanceCostRatePt(double monetaryDistanceCostRatePt) {
 		this.monetaryDistanceCostRatePt = monetaryDistanceCostRatePt;
+	}
+
+	public Double getUtilityOfLineSwitch() {
+		return utilityOfLineSwitch;
+	}
+
+	public void setUtilityOfLineSwitch(double utilityOfLineSwitch) {
+		this.utilityOfLineSwitch = utilityOfLineSwitch;
 	}
 
 }
