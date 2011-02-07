@@ -49,14 +49,27 @@
 		<param name="numberOfThreads" value="1" />
 	</module>
 	
+	<module name="planscalcroute">
+		<param name="walkSpeed" value="0.8333333333333333"/>
+		<param name="beelineDistanceFactor" value="1.0"/>
+	</module>
+	
 	<module name="planCalcScore">
 		<param name="learningRate" value="1.0" />
 		<param name="BrainExpBeta" value="2.0" />
 
+		<!-- parameters used by pt router  -->
+		<param name="marginalUtilityOfMoney" value="1.0" />
+		<param name="monetaryDistanceCostRatePt" value="-0.0" />
+		<param name="utilityOfLineSwitch" value="-0.4" />
+		<param name="performing" value="-0" />     <!-- used by router  -->
+		<param name="travelingPt" value="-6.0" />   <!-- used by router  -->
+		<param name="travelingWalk" value="-6.0" />  <!-- used by router  -->
+		<!--                          -->
+
+		<param name="traveling" value="-6" />		<!-- used by router  -->
 		<param name="lateArrival" value="-18" />
 		<param name="earlyDeparture" value="-0" />
-		<param name="performing" value="+6" />
-		<param name="traveling" value="-6" />
 		<param name="waiting" value="-0" />
 		
 		<param name="activityType_0"            value="h" /> <!-- home -->
@@ -72,9 +85,11 @@
 		<param name="activityLatestStartTime_1" value="09:00:00" />
 		<param name="activityEarliestEndTime_1" value="" />
 		<param name="activityClosingTime_1"     value="18:00:00" />
-	
-	
-	
+	</module>
+
+	<module name="planscalcroute">
+		<param name="walkSpeed" value="3.0/3.6"/>
+		<param name="beelineDistanceFactor" value="1.0"/>
 	</module>
 	
 	<module name="strategy">

@@ -13,11 +13,16 @@ import playground.mmoyo.utils.DataLoader;
 
 public class AdaptedRouterTest extends MatsimTestCase {
 
-	/*validates that the given transitConfigValues are read from the instance class*/
+	/**validates that the given transitConfigValues are read from the instance class*/
 	public void testEquil() {
-		String configFile = "test/input/playground/mmoyo/AdaptedRouterTest/5x5config.xml";
+	
+		String inputDir = this.getInputDirectory();
+		//String inputDir = "../playgrounds/mmoyo/test/input/playground/mmoyo/AdaptedRouterTest/";
 		
-		ScenarioImpl scenarioImpl = new DataLoader ().loadScenarioWithTrSchedule(configFile);
+		System.out.println(" Input Dir " + this.getInputDirectory());
+		System.out.println(" Output Dir " + this.getOutputDirectory());
+	
+		ScenarioImpl scenarioImpl = new DataLoader().loadScenarioWithTrSchedule(inputDir + "5x5config.xml");
 
 		MyTransitRouterConfig myConfig = new MyTransitRouterConfig( scenarioImpl.getConfig().planCalcScore(),
 				scenarioImpl.getConfig().plansCalcRoute() );
@@ -36,7 +41,7 @@ public class AdaptedRouterTest extends MatsimTestCase {
 		}
 		
 		//test travel parameter values coming from config file
-		String str_expected = "[beelineWalkConnectionDistance=100.0][beelineWalkSpeed=0.8333333333333333][costLineSwitch=0.1][extensionRadius=200.0][marginalUtilityOfTravelDistanceTransit=-0.0][marginalUtilityOfTravelTimeTransit=-0.0016666666666666668][marginalUtilityOfTravelTimeWalk=-0.0016666666666666668][searchRadius=1000.0]";
-		Assert.assertEquals("travel parameters are different as in config file" , adaptedTransitRouter.toString(), str_expected );
+		String str_expected = "[beelineWalkConnectionDistance=100.0][beelineWalkSpeed=0.8333333333333333][costLineSwitch_utl=-0.4][extensionRadius=200.0][marginalUtilityOfTravelDistanceTransit=-0.0][marginalUtilityOfTravelTimeTransit=-0.0016666666666666668][marginalUtilityOfTravelTimeWalk=-0.0016666666666666668][searchRadius=1000.0]";
+		Assert.assertEquals("travel parameters are different as in config file" , str_expected , adaptedTransitRouter.toString());
 	}
 }

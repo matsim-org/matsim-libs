@@ -17,8 +17,8 @@ public class MyTransitRouterConfig extends TransitRouterConfig {
 
 	public MyTransitRouterConfig(PlanCalcScoreConfigGroup pcsConfig, PlansCalcRouteConfigGroup pcrConfig) {
 		super(pcsConfig, pcrConfig);
-		// TODO Auto-generated constructor stub
 	}
+	
 	//additional config variables
 	public boolean allowDirectWalks = true;					//if a direct walk has a lower cost than the pt connection
 	public int minStationsNum= 2; 							//minimal number of stations to find, before start the routing

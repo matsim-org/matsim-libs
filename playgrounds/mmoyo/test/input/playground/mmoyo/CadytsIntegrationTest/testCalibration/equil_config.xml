@@ -3,14 +3,13 @@
   [
    <!ENTITY INPUTBASE   "test/input/playground/mmoyo/CadytsIntegrationTest/testCalibration/">
    <!ENTITY OUTPUTBASE	"test/output/playground/mmoyo/CadytsIntegrationTest/testCalibration/">
-   <!ENTITY NETWORK	"matsim/examples/equil/network.xml">
+
+   <!ENTITY NETWORK	"../matsim/examples/equil/network.xml">
   ]
 >
-
   <!-- 
    <!ENTITY INPUTBASE   "../playgrounds/mmoyo/test/input/playground/mmoyo/CadytsIntegrationTest/testCalibration/">
    <!ENTITY OUTPUTBASE	"../playgrounds/mmoyo/test/output/playground/mmoyo/CadytsIntegrationTest/testCalibration/">
-   <!ENTITY NETWORK	"../matsim/examples/equil/network.xml">
    -->
    
 <config>

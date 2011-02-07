@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.config.Config;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
@@ -184,14 +185,16 @@ public class AdaptedTransitRouter extends TransitRouterImpl {
 
 	@Override
 	public final String toString() {
-		return 	"[beelineWalkConnectionDistance=" + this.getConfig().beelineWalkConnectionDistance + "]" +
-				"[beelineWalkSpeed=" + this.getConfig().getBeelineWalkSpeed() + "]" +
-				"[costLineSwitch=" + this.getConfig().getUtilityOfLineSwitch_utl() + "]" +
-				"[extensionRadius=" + this.getConfig().extensionRadius + "]" +
-				"[marginalUtilityOfTravelDistanceTransit=" + this.getConfig().getMarginalUtilityOfTravelDistancePt_utl_m() + "]" +
-				"[marginalUtilityOfTravelTimeTransit=" + this.getConfig().getEffectiveMarginalUtilityOfTravelTimePt_utl_s() + "]" +
-				"[marginalUtilityOfTravelTimeWalk=" + this.getConfig().getEffectiveMarginalUtilityOfTravelTimeWalk_utl_s() + "]" +
-				"[searchRadius=" + this.getConfig().searchRadius + "]" ;
+		TransitRouterConfig trRoutCfg = this.getConfig();
+
+		return 	"[beelineWalkConnectionDistance=" + trRoutCfg.beelineWalkConnectionDistance + "]" +
+				"[beelineWalkSpeed=" + trRoutCfg.getBeelineWalkSpeed() + "]" +
+				"[costLineSwitch_utl=" + trRoutCfg.getUtilityOfLineSwitch_utl() + "]" +
+				"[extensionRadius=" + trRoutCfg.extensionRadius + "]" +
+				"[marginalUtilityOfTravelDistanceTransit=" + trRoutCfg.getMarginalUtilityOfTravelDistancePt_utl_m() + "]" +
+				"[marginalUtilityOfTravelTimeTransit=" + trRoutCfg.getEffectiveMarginalUtilityOfTravelTimePt_utl_s() + "]" +
+				"[marginalUtilityOfTravelTimeWalk=" + trRoutCfg.getEffectiveMarginalUtilityOfTravelTimeWalk_utl_s() + "]" +
+				"[searchRadius=" + trRoutCfg.searchRadius + "]" ;
 	}
 	
 	// the procedures with * were adapted

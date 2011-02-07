@@ -10,8 +10,10 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.api.experimental.ScenarioLoaderFactoryImpl;
@@ -22,8 +24,36 @@ import playground.mmoyo.utils.FileCompressor;
 
 public class PlanValidator {
 	
+	/**
+	 * returns true if the given population has the uniform sequence act-leg-act
+	 */
+	public boolean hasSecqActLeg(Population population){
+		for(Person person: population.getPersons().values() ){
+			for (Plan plan: person.getPlans()){
+				for (int i=0; i< plan.getPlanElements().size();i++){
+					PlanElement pe =  plan.getPlanElements().get(i);
+					if (i%2==0){
+						if (!(pe instanceof Activity)) {
+							return false;
+						}
+					}else{
+						if (!(pe instanceof Leg)) {
+							return false;
+						}
+					}
+				}
+			}
+		}
+		return true;
+	}
+	
+	
 	/**returns true if first act type is the same as last act type*/
 	public boolean hasSameActType (Plan plan){
+		int a=1,b=2;
+		if (a!=b) { 
+			throw new RuntimeException("this code might not so work, it assumes that the first plan element is an actitivy without validation" );
+		}	
 		Activity firstAct = (Activity) plan.getPlanElements().get(0);
 		Activity lastAct = (Activity) plan.getPlanElements().get(plan.getPlanElements().size()-1);
 		return (firstAct.getType().equals(lastAct.getType()));

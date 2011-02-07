@@ -7,8 +7,10 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
@@ -26,6 +28,7 @@ import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.testcases.MatsimTestCase;
 import org.xml.sax.SAXException;
 
+import playground.mmoyo.Validators.PlanValidator;
 import playground.mmoyo.zz_archive.PTRouter.LogicFactory;
 import playground.mmoyo.zz_archive.PTRouter.LogicIntoPlainTranslator;
 import playground.mmoyo.zz_archive.PTRouter.PTRouter;
@@ -33,7 +36,8 @@ import playground.mmoyo.zz_archive.TransitSimulation.TransitRouteFinder;
 
 /** makes tests with the transit router on the 5x5 scenario*/
 public class PTRouterTest extends MatsimTestCase {
-
+	private PlanValidator planValidator = new PlanValidator();
+	
 	public void testRouter() throws SAXException, ParserConfigurationException, IOException {
 
 		//final String PATH= getInputDirectory();
@@ -92,17 +96,20 @@ public class PTRouterTest extends MatsimTestCase {
 		Person person = population.getPersons().get(new IdImpl("1"));
 		Plan plan = person.getPlans().get(0);
 
-		ActivityImpl act1 = (ActivityImpl)plan.getPlanElements().get(0);
+
+		if (!planValidator.hasSecqActLeg(population)) { 
+			throw new RuntimeException("this may not work, it assumes that the first PlanElement is home!! what about fragmnted plans? or other plans at all?" );
+		}	
+
+  		ActivityImpl act1 = (ActivityImpl)plan.getPlanElements().get(0);
 		ActivityImpl act2 = (ActivityImpl)plan.getPlanElements().get(2);
 
-		/* TODO. repair this
 		List<Leg> legList = transitRouteFinder.calculateRoute (act1, act2, person);
 
 		assertEquals( legList.get(0).getMode() , TransportMode.walk);
 		assertEquals( legList.get(1).getMode() , TransportMode.pt);
 		assertEquals( legList.get(2).getMode() , TransportMode.pt);
 		assertEquals( legList.get(3).getMode() , TransportMode.walk);
-		*/
 	}
 
 }

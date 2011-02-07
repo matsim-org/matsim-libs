@@ -41,6 +41,8 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
+import playground.mmoyo.Validators.PlanValidator;
+
 public class PlanRouteCalculator {
 	///private ConnectionRate connectionRate = new ConnectionRate ();
 	private String outputFile;
@@ -52,6 +54,7 @@ public class PlanRouteCalculator {
 	private Population population;
 	private KroutesCalculator kRoutesCalculator;
 	PlainTimeTable plainTimeTable;
+	private PlanValidator planValidator = new PlanValidator();
 
 	public PlanRouteCalculator(final TransitSchedule transitSchedule, final NetworkImpl net, Map <Id, List<StaticConnection>> connectionMap, Population population, KroutesCalculator kRoutesCalculator){
 		this.transitSchedule = transitSchedule;
@@ -107,6 +110,10 @@ public class PlanRouteCalculator {
 	public void findRoutes(){
 		Population newPopulation = new ScenarioImpl().getPopulation();
 
+		if (!planValidator.hasSecqActLeg(this.population)) { 
+			throw new RuntimeException("this may not work, it assumes that the first PlanElement is home!! what about fragmnted plans? or other plans at all?" );
+		}	
+		
 		for (Person person: population.getPersons().values()) {
 				//if ( true ) {
 				//PersonImpl person = population.getPersons().get(new IdImpl("35420")); // 5636428  2949483

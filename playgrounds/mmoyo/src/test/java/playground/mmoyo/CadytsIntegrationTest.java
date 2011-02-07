@@ -54,7 +54,7 @@ public class CadytsIntegrationTest extends MatsimTestCase {
 		//String outputDir = "../playgrounds/mmoyo/test/output/playground/mmoyo/CadytsIntegrationTest/testCalibration/";
 		
 		System.out.println(" Input Dir " + this.getInputDirectory() );
-		System.out.println(" Output Dir " + this.getInputDirectory() );
+		System.out.println(" Output Dir " + this.getOutputDirectory() );
 		
 		String configFile = inputDir + "equil_config.xml";
 		Config config = null;

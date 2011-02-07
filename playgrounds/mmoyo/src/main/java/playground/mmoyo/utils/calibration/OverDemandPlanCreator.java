@@ -34,6 +34,7 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 
+import playground.mmoyo.Validators.PlanValidator;
 import playground.mmoyo.utils.DataLoader;
 import playground.mmoyo.utils.FirstPlansExtractor;
 
@@ -43,6 +44,7 @@ public class OverDemandPlanCreator {
 	final String SEP = "_";
 	final String home = "home";
 	final String walk = "walk";
+	private PlanValidator planValidator = new PlanValidator();
 	
 	public OverDemandPlanCreator(String planFile){
 		this.population =  new DataLoader().readPopulation(planFile);		
@@ -55,9 +57,14 @@ public class OverDemandPlanCreator {
 	public Population run(int cloneNum, int homePlanNum) {
 		PopulationImpl outPop = new PopulationImpl(new ScenarioImpl());
 
+		if (!planValidator.hasSecqActLeg(this.population)) { 
+			throw new RuntimeException("this may not work, it assumes that the first PlanElement is home!! what about fragmnted plans? or other plans at all?" );
+		}	
+
 		for (Person person : this.population.getPersons().values()) {
 			// create and add "home" plan
 			Plan homePlan = new PlanImpl();
+			
 			Coord homeCoord = ((ActivityImpl) person.getSelectedPlan().getPlanElements().get(0)).getCoord();
 			ActivityImpl homeAct = new ActivityImpl(home, homeCoord);
 			homeAct.setEndTime(3600.0);
