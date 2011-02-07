@@ -16,11 +16,14 @@ public class AdaptedRouterTest extends MatsimTestCase {
 	/*validates that the given transitConfigValues are read from the instance class*/
 	public void testEquil() {
 		String configFile = "test/input/playground/mmoyo/AdaptedRouterTest/5x5config.xml";
-		MyTransitRouterConfig myConfig = new MyTransitRouterConfig();
 		
 		ScenarioImpl scenarioImpl = new DataLoader ().loadScenarioWithTrSchedule(configFile);
+
+		MyTransitRouterConfig myConfig = new MyTransitRouterConfig( scenarioImpl.getConfig().planCalcScore(),
+				scenarioImpl.getConfig().plansCalcRoute() );
+
 		AdaptedTransitRouterNetworkTravelTimeCost adaptedTravelTimeCost = new AdaptedTransitRouterNetworkTravelTimeCost(myConfig);
-		AdaptedTransitRouter adaptedTransitRouter = new AdaptedTransitRouter(new MyTransitRouterConfig(), scenarioImpl.getTransitSchedule());
+		AdaptedTransitRouter adaptedTransitRouter = new AdaptedTransitRouter(myConfig, scenarioImpl.getTransitSchedule());
 
 		//only transit links without transfer
 		double accumTime=28800;  //8:00am first departure

@@ -135,7 +135,7 @@ public class WalkDistanceEstimator {
 		TravelTimeCalculatorFactory ttcf = new TravelTimeCalculatorFactoryImpl();
 		TravelTimeCalculator ttc = ttcf.createTravelTimeCalculator(sAll.getNetwork(), sAll.getConfig().travelTimeCalculator());
 		TravelCostCalculatorFactory tccf = new TravelCostCalculatorFactoryImpl();
-		PersonalizableTravelCost tc = tccf.createTravelCostCalculator(ttc, sAll.getConfig().charyparNagelScoring());
+		PersonalizableTravelCost tc = tccf.createTravelCostCalculator(ttc, sAll.getConfig().planCalcScore());
 		EventsManagerImpl em = new EventsManagerImpl();
 		em.addHandler(ttc);
 		new EventsReaderTXTv1(em).readFile(sb.getIterationEventsFile("100"));

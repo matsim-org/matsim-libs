@@ -215,7 +215,7 @@ public class ChangeLegModeWithParkLocationTest extends MatsimTestCase {
 		ctl.setWriteEventsInterval(0);
 		ctl
 				.setScoringFunctionFactory(new CharyparNagelScoringFunctionFactoryWithWalk(
-						config.charyparNagelScoring(), Double
+						config.planCalcScore(), Double
 								.parseDouble(config.findParam(
 										"changeLegModeWithParkLocation", "offsetWalk"))));
 		ctl.run();
@@ -230,7 +230,7 @@ public class ChangeLegModeWithParkLocationTest extends MatsimTestCase {
 		ctl.setWriteEventsInterval(0);
 		ctl
 				.setScoringFunctionFactory(new CharyparNagelScoringFunctionFactoryWithWalk(
-						config.charyparNagelScoring(), Double
+						config.planCalcScore(), Double
 								.parseDouble(config.findParam(
 										"changeLegModeWithParkLocation", "offsetWalk"))));
 		ctl.run();
@@ -245,7 +245,7 @@ public class ChangeLegModeWithParkLocationTest extends MatsimTestCase {
 		ctl.setWriteEventsInterval(0);
 		ctl
 				.setScoringFunctionFactory(new CharyparNagelScoringFunctionFactoryWithWalk(
-						config.charyparNagelScoring(), Double
+						config.planCalcScore(), Double
 								.parseDouble(config.findParam(
 										"changeLegModeWithParkLocation", "offsetWalk"))));
 		ctl.run();

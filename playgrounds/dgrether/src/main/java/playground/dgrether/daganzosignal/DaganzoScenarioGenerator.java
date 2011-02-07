@@ -382,17 +382,17 @@ public class DaganzoScenarioGenerator {
 		}
 
 		// configure scoring for plans
-		config.charyparNagelScoring().setLateArrival_utils_hr(0.0);
-		config.charyparNagelScoring().setPerforming_utils_hr(0.0);
+		config.planCalcScore().setLateArrival_utils_hr(0.0);
+		config.planCalcScore().setPerforming_utils_hr(0.0);
 		// this is unfortunately not working at all....
 		ActivityParams homeParams = new ActivityParams("h");
 		// homeParams.setOpeningTime(0);
-		config.charyparNagelScoring().addActivityParams(homeParams);
+		config.planCalcScore().addActivityParams(homeParams);
 		// set it with f. strings
-		config.charyparNagelScoring().addParam("activityType_0", "h");
-		config.charyparNagelScoring().addParam("activityTypicalDuration_0",
+		config.planCalcScore().addParam("activityType_0", "h");
+		config.planCalcScore().addParam("activityTypicalDuration_0",
 				"24:00:00");
-		config.charyparNagelScoring().setBrainExpBeta(this.brainExpBeta);
+		config.planCalcScore().setBrainExpBeta(this.brainExpBeta);
 
 		// configure controler
 		config.travelTimeCalculator().setTraveltimeBinSize(ttBinSize);

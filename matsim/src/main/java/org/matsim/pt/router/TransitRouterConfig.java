@@ -24,6 +24,13 @@ import org.matsim.core.api.internal.MatsimParameters;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 
+/**
+ * Design decisions:<ul>
+ * <li>At this point, only those variables that are needed elsewhere (in particular in the scoring) are set from the
+ * config.  All other variables are considered internal computational variables.  kai, feb'11
+ * </ul>
+ *
+ */
 public class TransitRouterConfig implements MatsimParameters {
 
 	/**
@@ -69,17 +76,17 @@ public class TransitRouterConfig implements MatsimParameters {
 	// =============================================================================================================================
 	// only setters and getters below this line
 	
-	public TransitRouterConfig() {
-		beelineWalkSpeed = 3.0/3.6;  // presumably, in m/sec.  3.0/3.6 = 3000/3600 = 3km/h.  kai, apr'10
-		
-		effectiveMarginalUtilityOfTravelTimeWalk_utl_s = -6.0 / 3600.0; // in Eu/sec; includes opportunity cost of time.  kai, apr'10
-		
-		effectiveMarginalUtilityOfTravelTimeTransit_utl_s = -6.0 / 3600.0; // in Eu/sec; includes opportunity cost of time.  kai, apr'10
-		
-		marginalUtilityOfTravelDistanceTransit_utl_m = -0.0;    // yyyy presumably, in Eu/m ?????????  so far, not used.  kai, apr'10
-		
-		utilityOfLineSwitch_utl = 60.0 * -this.effectiveMarginalUtilityOfTravelTimeTransit_utl_s; // == 1min travel time in vehicle  // in Eu.  kai, apr'10
-	}
+//	public TransitRouterConfig() {
+//		beelineWalkSpeed = 3.0/3.6;  // presumably, in m/sec.  3.0/3.6 = 3000/3600 = 3km/h.  kai, apr'10
+//		
+//		effectiveMarginalUtilityOfTravelTimeWalk_utl_s = -6.0 / 3600.0; // in Eu/sec; includes opportunity cost of time.  kai, apr'10
+//		
+//		effectiveMarginalUtilityOfTravelTimeTransit_utl_s = -6.0 / 3600.0; // in Eu/sec; includes opportunity cost of time.  kai, apr'10
+//		
+//		marginalUtilityOfTravelDistanceTransit_utl_m = -0.0;    // yyyy presumably, in Eu/m ?????????  so far, not used.  kai, apr'10
+//		
+//		utilityOfLineSwitch_utl = 60.0 * -this.effectiveMarginalUtilityOfTravelTimeTransit_utl_s; // == 1min travel time in vehicle  // in Eu.  kai, apr'10
+//	}
 	
 	public TransitRouterConfig( PlanCalcScoreConfigGroup pcsConfig, PlansCalcRouteConfigGroup pcrConfig ) {
 		// walk:
@@ -107,11 +114,11 @@ public class TransitRouterConfig implements MatsimParameters {
 		return utilityOfLineSwitch_utl;
 	}
 
-	public void setMarginalUtilityOfTravelTimeWalk_utl_s(double marginalUtilityOfTravelTimeWalk_utl_sec) {
+	public void setEffectiveMarginalUtilityOfTravelTimeWalk_utl_s(double marginalUtilityOfTravelTimeWalk_utl_sec) {
 		this.effectiveMarginalUtilityOfTravelTimeWalk_utl_s = marginalUtilityOfTravelTimeWalk_utl_sec;
 	}
 
-	public double getMarginalUtilityOfTravelTimeWalk_utl_s() {
+	public double getEffectiveMarginalUtilityOfTravelTimeWalk_utl_s() {
 		return effectiveMarginalUtilityOfTravelTimeWalk_utl_s;
 	}
 

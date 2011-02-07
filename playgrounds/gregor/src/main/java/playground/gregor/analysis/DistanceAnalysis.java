@@ -128,8 +128,8 @@ public class DistanceAnalysis {
 		this.network = network;
 		this.envelope  = this.featureSourcePolygon.getBounds();
 
-		FreespeedTravelTimeCost ttCost = new FreespeedTravelTimeCost(config.charyparNagelScoring());
-		this.router = new PlansCalcRoute(config.plansCalcRoute(), network, new TravelTimeDistanceCostCalculator(ttCost, config.charyparNagelScoring()), ttCost, new DijkstraFactory());
+		FreespeedTravelTimeCost ttCost = new FreespeedTravelTimeCost(config.planCalcScore());
+		this.router = new PlansCalcRoute(config.plansCalcRoute(), network, new TravelTimeDistanceCostCalculator(ttCost, config.planCalcScore()), ttCost, new DijkstraFactory());
 		this.geofac = new GeometryFactory();
 
 		initFeatureCollection();

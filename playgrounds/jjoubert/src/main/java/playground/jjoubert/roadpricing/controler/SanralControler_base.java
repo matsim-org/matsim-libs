@@ -48,13 +48,13 @@ public class SanralControler_base {
 		minor.setOpeningTime(0.0);			// 00:00:00
 		minor.setLatestStartTime(86399.0);	// 23:59:59
 		minor.setClosingTime(86399.0);		// 23:59:59
-		config.charyparNagelScoring().addActivityParams(minor);
+		config.planCalcScore().addActivityParams(minor);
 		
 		ActivityParams major = new ActivityParams("major");
 		major.setPriority(1.0);
 		major.setMinimalDuration(0.0);		// 00:00:00
 		major.setTypicalDuration(10800.0);  // 03:00:00
-		config.charyparNagelScoring().addActivityParams(major);	
+		config.planCalcScore().addActivityParams(major);	
 		
 
 		/*

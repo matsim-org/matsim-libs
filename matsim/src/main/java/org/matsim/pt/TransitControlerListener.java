@@ -19,6 +19,8 @@
 
 package org.matsim.pt;
 
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.pt.router.TransitRouterConfig;
@@ -31,6 +33,7 @@ public class TransitControlerListener implements StartupListener {
 
 	@Override
 	public void notifyStartup(final StartupEvent event) {
+		final Scenario scenario = event.getControler().getScenario();
 //		if (event.getControler().getConfig().transit().getTransitScheduleFile() != null) {
 //			try {
 //				new TransitScheduleReaderV1(event.getControler().getScenario().getTransitSchedule(),
@@ -57,15 +60,20 @@ public class TransitControlerListener implements StartupListener {
 //			}
 //		}
 		ReconstructingUmlaufBuilder reconstructingUmlaufBuilder = new ReconstructingUmlaufBuilder(
-				event.getControler().getScenario().getNetwork(),
-				event.getControler().getScenario().getTransitSchedule().getTransitLines().values(),
-				event.getControler().getScenario().getVehicles(),
-				event.getControler().getScenario().getConfig().charyparNagelScoring());
+				scenario.getNetwork(),
+				((ScenarioImpl)scenario).getTransitSchedule().getTransitLines().values(),
+				((ScenarioImpl)scenario).getVehicles(),
+				scenario.getConfig().planCalcScore());
 		reconstructingUmlaufBuilder.build();
-		event.getControler().getScenario().addScenarioElement( reconstructingUmlaufBuilder ) ;
+		scenario.addScenarioElement( reconstructingUmlaufBuilder ) ;
 
 		if (event.getControler().getTransitRouterFactory() == null) {
-			event.getControler().setTransitRouterFactory(new TransitRouterImplFactory(event.getControler().getScenario().getTransitSchedule(), new TransitRouterConfig()));
+			
+			TransitRouterConfig transitRouterConfig = new TransitRouterConfig( scenario.getConfig().planCalcScore()
+					, scenario.getConfig().plansCalcRoute() ) ;
+			
+			event.getControler().setTransitRouterFactory(new TransitRouterImplFactory(
+					((ScenarioImpl)scenario).getTransitSchedule(), transitRouterConfig ));
 		}
 
 	}

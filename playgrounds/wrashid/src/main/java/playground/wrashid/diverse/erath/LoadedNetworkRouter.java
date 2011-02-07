@@ -101,7 +101,7 @@ public class LoadedNetworkRouter {
 		TravelTimeCalculator travelTimeCalculator= Events2TTCalculator.getTravelTimeCalculator(sl.getScenario(), eventsFile);
 		TravelCostCalculatorFactory travelCostCalculatorFactory = new TravelCostCalculatorFactoryImpl();
 		PersonalizableTravelCost travelCostCalculator = travelCostCalculatorFactory.createTravelCostCalculator(travelTimeCalculator, this.config
-				.charyparNagelScoring());
+				.planCalcScore());
 		plans.addAlgorithm(new PlansCalcRoute(this.config.plansCalcRoute(), network, travelCostCalculator, travelTimeCalculator));
 
 		// add algorithm to write out the plans

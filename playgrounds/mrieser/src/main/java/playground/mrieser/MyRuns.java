@@ -350,7 +350,7 @@ public class MyRuns {
 		final PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		population.addAlgorithm(new ActLocationFalsifier(200));
 		population.addAlgorithm(new XY2Links(network));
-		final FreespeedTravelTimeCost timeCostFunction = new FreespeedTravelTimeCost(scenario.getConfig().charyparNagelScoring());
+		final FreespeedTravelTimeCost timeCostFunction = new FreespeedTravelTimeCost(scenario.getConfig().planCalcScore());
 		population.addAlgorithm(new PlansCalcRoute(scenario.getConfig().plansCalcRoute(), network, timeCostFunction, timeCostFunction));
 		population.addAlgorithm(plansWriter);
 		plansReader.readFile(scenario.getConfig().plans().getInputFile());

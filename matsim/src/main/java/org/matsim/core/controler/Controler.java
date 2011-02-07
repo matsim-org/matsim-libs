@@ -391,7 +391,7 @@ public class Controler {
 
 		ActivityParams transitActivityParams = new ActivityParams(PtConstants.TRANSIT_ACTIVITY_TYPE);
 		transitActivityParams.setTypicalDuration(120.0);
-		this.config.charyparNagelScoring().addActivityParams(transitActivityParams);
+		this.config.planCalcScore().addActivityParams(transitActivityParams);
 
 		this.getNetwork().getFactory().setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
 	}
@@ -535,7 +535,7 @@ public class Controler {
 		}
 		if (this.travelCostCalculator == null) {
 			this.travelCostCalculator = this.travelCostCalculatorFactory.createTravelCostCalculator(this.travelTimeCalculator, this.config
-					.charyparNagelScoring());
+					.planCalcScore());
 		}
 		this.events.addHandler(this.travelTimeCalculator);
 
@@ -546,7 +546,7 @@ public class Controler {
 				this.leastCostPathCalculatorFactory = new DijkstraFactory();
 			} else if (this.config.controler().getRoutingAlgorithmType().equals(RoutingAlgorithmType.AStarLandmarks)) {
 				this.leastCostPathCalculatorFactory = new AStarLandmarksFactory(this.network, new FreespeedTravelTimeCost(this.config
-						.charyparNagelScoring()));
+						.planCalcScore()));
 			} else {
 				throw new IllegalStateException("Enumeration Type RoutingAlgorithmType was extended without adaptation of Controler!");
 			}
@@ -739,7 +739,7 @@ public class Controler {
 	 * @return The ScoringFunctionFactory to be used for plans-scoring.
 	 */
 	protected ScoringFunctionFactory loadScoringFunctionFactory() {
-		return new CharyparNagelScoringFunctionFactory(this.config.charyparNagelScoring());
+		return new CharyparNagelScoringFunctionFactory(this.config.planCalcScore());
 	}
 
 	/**
@@ -1012,7 +1012,7 @@ public class Controler {
 	 */
 
 	public final PersonalizableTravelCost createTravelCostCalculator() {
-		return this.travelCostCalculatorFactory.createTravelCostCalculator(this.travelTimeCalculator, this.config.charyparNagelScoring());
+		return this.travelCostCalculatorFactory.createTravelCostCalculator(this.travelTimeCalculator, this.config.planCalcScore());
 	}
 
 	public final PersonalizableTravelTime getTravelTimeCalculator() {

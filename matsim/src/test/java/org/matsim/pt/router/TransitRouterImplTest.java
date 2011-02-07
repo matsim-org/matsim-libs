@@ -50,7 +50,8 @@ public class TransitRouterImplTest extends TestCase {
 	public void testSingleLine() {
 		Fixture f = new Fixture();
 		f.init();
-		TransitRouterConfig config = new TransitRouterConfig();
+		TransitRouterConfig config = new TransitRouterConfig(f.scenario.getConfig().planCalcScore(),
+				f.scenario.getConfig().plansCalcRoute() );
 		TransitRouterImpl router = new TransitRouterImpl(f.schedule, config);
 		Coord fromCoord = f.scenario.createCoord(3800, 5100);
 		Coord toCoord = f.scenario.createCoord(16100, 5050);
@@ -77,7 +78,8 @@ public class TransitRouterImplTest extends TestCase {
 	public void testFromToSameStop() {
 		Fixture f = new Fixture();
 		f.init();
-		TransitRouterConfig config = new TransitRouterConfig();
+		TransitRouterConfig config = new TransitRouterConfig(f.scenario.getConfig().planCalcScore(),
+				f.scenario.getConfig().plansCalcRoute());
 		TransitRouterImpl router = new TransitRouterImpl(f.schedule, config);
 		Coord fromCoord = f.scenario.createCoord(3800, 5100);
 		Coord toCoord = f.scenario.createCoord(4100, 5050);
@@ -95,7 +97,8 @@ public class TransitRouterImplTest extends TestCase {
 	public void testDirectWalkCheaper() {
 		Fixture f = new Fixture();
 		f.init();
-		TransitRouterConfig config = new TransitRouterConfig();
+		TransitRouterConfig config = new TransitRouterConfig(f.scenario.getConfig().planCalcScore(),
+				f.scenario.getConfig().plansCalcRoute());
 		TransitRouterImpl router = new TransitRouterImpl(f.schedule, config);
 		Coord fromCoord = f.scenario.createCoord(4000, 3000);
 		Coord toCoord = f.scenario.createCoord(8000, 3000);
@@ -113,7 +116,8 @@ public class TransitRouterImplTest extends TestCase {
 	public void testSingleLine_DifferentWaitingTime() {
 		Fixture f = new Fixture();
 		f.init();
-		TransitRouterConfig config = new TransitRouterConfig();
+		TransitRouterConfig config = new TransitRouterConfig(f.scenario.getConfig().planCalcScore(),
+				f.scenario.getConfig().plansCalcRoute());
 		TransitRouterImpl router = new TransitRouterImpl(f.schedule, config);
 		Coord fromCoord = f.scenario.createCoord(4000, 5002);
 		Coord toCoord = f.scenario.createCoord(8000, 5002);
@@ -134,7 +138,8 @@ public class TransitRouterImplTest extends TestCase {
 	public void testLineChange() {
 		Fixture f = new Fixture();
 		f.init();
-		TransitRouterConfig config = new TransitRouterConfig();
+		TransitRouterConfig config = new TransitRouterConfig(f.scenario.getConfig().planCalcScore(),
+				f.scenario.getConfig().plansCalcRoute());
 		TransitRouterImpl router = new TransitRouterImpl(f.schedule, config);
 		Coord toCoord = f.scenario.createCoord(16100, 10050);
 		List<Leg> legs = router.calcRoute(f.scenario.createCoord(3800, 5100), toCoord, 6.0*3600);
@@ -168,7 +173,8 @@ public class TransitRouterImplTest extends TestCase {
 	public void testFasterAlternative() {
 		Fixture f = new Fixture();
 		f.init();
-		TransitRouterConfig config = new TransitRouterConfig();
+		TransitRouterConfig config = new TransitRouterConfig(f.scenario.getConfig().planCalcScore(),
+				f.scenario.getConfig().plansCalcRoute());
 		TransitRouterImpl router = new TransitRouterImpl(f.schedule, config);
 		Coord toCoord = f.scenario.createCoord(28100, 4950);
 		List<Leg> legs = router.calcRoute(f.scenario.createCoord(3800, 5100), toCoord, 5.0*3600 + 40.0*60);
@@ -208,7 +214,8 @@ public class TransitRouterImplTest extends TestCase {
 		 */
 		Fixture f = new Fixture();
 		f.init();
-		TransitRouterConfig config = new TransitRouterConfig();
+		TransitRouterConfig config = new TransitRouterConfig(f.scenario.getConfig().planCalcScore(),
+				f.scenario.getConfig().plansCalcRoute());
 		config.setUtilityOfLineSwitch_utl(0);
 		TransitRouterImpl router = new TransitRouterImpl(f.schedule, config);
 		List<Leg> legs = router.calcRoute(f.scenario.createCoord(11900, 5100), f.scenario.createCoord(24100, 4950), 6.0*3600 - 5.0*60);
@@ -233,7 +240,8 @@ public class TransitRouterImplTest extends TestCase {
 	public void testAfterMidnight() {
 		Fixture f = new Fixture();
 		f.init();
-		TransitRouterConfig config = new TransitRouterConfig();
+		TransitRouterConfig config = new TransitRouterConfig(f.scenario.getConfig().planCalcScore(),
+				f.scenario.getConfig().plansCalcRoute());
 		config.setBeelineWalkSpeed(0.1); // something very slow, so the agent does not walk over night
 		TransitRouterImpl router = new TransitRouterImpl(f.schedule, config);
 		Coord toCoord = f.scenario.createCoord(16100, 5050);
@@ -260,7 +268,8 @@ public class TransitRouterImplTest extends TestCase {
 	public void testCoordFarAway() {
 		Fixture f = new Fixture();
 		f.init();
-		TransitRouterImpl router = new TransitRouterImpl(f.schedule, new TransitRouterConfig());
+		TransitRouterImpl router = new TransitRouterImpl(f.schedule, new TransitRouterConfig(f.scenario.getConfig().planCalcScore(),
+				f.scenario.getConfig().plansCalcRoute()));
 		List<Leg> legs = router.calcRoute(f.scenario.createCoord(-2000, 0), f.scenario.createCoord(+42000, 0), 5.5*3600); // should map to stops A and I
 		assertEquals(3, legs.size());
 		assertEquals(TransportMode.transit_walk, legs.get(0).getMode());
@@ -375,7 +384,8 @@ public class TransitRouterImplTest extends TestCase {
 		/*package*/ WalkFixture() {
 			this.scenario = new ScenarioImpl();
 			this.scenario.getConfig().scenario().setUseTransit(true);
-			this.routerConfig = new TransitRouterConfig();
+			this.routerConfig = new TransitRouterConfig(this.scenario.getConfig().planCalcScore(),
+					this.scenario.getConfig().plansCalcRoute());
 			this.routerConfig.searchRadius = 500.0;
 			this.routerConfig.beelineWalkConnectionDistance = 100.0;
 			this.routerConfig.setBeelineWalkSpeed(10.0); // so the agents can walk the distance in 10 seconds

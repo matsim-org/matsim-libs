@@ -107,7 +107,7 @@ public class PrimaryLocationDrawing {
 		HashMap<String,Feature> ftDist = getFeatures(this.districts);
 		ArrayList<Zone> zones = getZones();
 		Population pop = getPopulation(ftDist,zones);
-		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(config.charyparNagelScoring());
+		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(config.planCalcScore());
 		PlansCalcRoute router = new PlansCalcRoute(config.plansCalcRoute(), this.network,timeCostCalc, timeCostCalc, new DijkstraFactory());
 		router.run(pop);
 		new PopulationWriter(pop, this.network).write(this.demandFilename);

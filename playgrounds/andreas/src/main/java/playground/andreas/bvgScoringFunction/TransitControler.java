@@ -82,14 +82,14 @@ public class TransitControler extends Controler {
 			// add "pt interaction" cause controler.init() is called too late and in a protected way
 			ActivityParams transitActivityParams = new ActivityParams(PtConstants.TRANSIT_ACTIVITY_TYPE);
 			transitActivityParams.setTypicalDuration(120.0);
-			config.charyparNagelScoring().addActivityParams(transitActivityParams);
+			config.planCalcScore().addActivityParams(transitActivityParams);
 			
 			// reading the scenario (based on the config):
 			ScenarioLoaderImpl scLoader = new ScenarioLoaderImpl(config) ;
 			ScenarioImpl sc = (ScenarioImpl) scLoader.loadScenario() ;
 			
 			TransitControler tc = new TransitControler(sc);
-			tc.setScoringFunctionFactory(new BvgScoringFunctionFactory(config.charyparNagelScoring(), new BvgScoringFunctionConfigGroup(config), tc.getNetwork()));
+			tc.setScoringFunctionFactory(new BvgScoringFunctionFactory(config.planCalcScore(), new BvgScoringFunctionConfigGroup(config), tc.getNetwork()));
 			
 
 

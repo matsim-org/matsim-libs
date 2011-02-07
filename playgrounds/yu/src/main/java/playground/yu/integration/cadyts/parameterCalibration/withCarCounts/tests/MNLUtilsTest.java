@@ -88,7 +88,7 @@ public class MNLUtilsTest {
 
 		// initialize scoringConfigGroup
 		PlanCalcScoreConfigGroup scoringConfigGroup = config
-				.charyparNagelScoring();
+				.planCalcScore();
 		scoringConfigGroup.setTravelingPt_utils_hr(travelingPt);
 
 		// pop?

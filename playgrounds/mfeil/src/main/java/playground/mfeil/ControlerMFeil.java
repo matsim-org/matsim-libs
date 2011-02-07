@@ -121,7 +121,7 @@ public class ControlerMFeil extends Controler {
 				strategy.addStrategyModule(module);
 			}
 			else if (classname.equals("LocationChoice")) {
-	    	strategy = new PlanStrategyImpl(new ExpBetaPlanSelector(config.charyparNagelScoring()));
+	    	strategy = new PlanStrategyImpl(new ExpBetaPlanSelector(config.planCalcScore()));
 	    	strategy.addStrategyModule(new LocationChoice(this.getNetwork(), this, (this.getScenario()).getKnowledges()));
 	    	strategy.addStrategyModule(new ReRoute(this));
 				strategy.addStrategyModule(new TimeAllocationMutator(config));

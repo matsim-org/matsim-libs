@@ -102,7 +102,7 @@ public class ScenarioLoader2DImpl extends ScenarioLoaderImpl {
 			loadMps();
 			loadLsMp();
 		} else if (!Sim2DConfig.NETWORK_LOADERII) {
-			NetworkLoader loader = new NetworkLoaderImpl(getScenario().getNetwork(), getScenario().getConfig().charyparNagelScoring());
+			NetworkLoader loader = new NetworkLoaderImpl(getScenario().getNetwork(), getScenario().getConfig().planCalcScore());
 			this.mps = loader.getFloors();
 			if (this.mps.size() > 1) {
 				throw new RuntimeException("multiple floors are not supported yet");

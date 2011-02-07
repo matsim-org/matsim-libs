@@ -121,7 +121,7 @@ public class RoutingTest extends MatsimTestCase {
 	private void calcRoute(final RouterProvider provider, final NetworkImpl  network, final Population population, final Config config) {
 		log.info("### calcRoute with router " + provider.getName());
 
-		FreespeedTravelTimeCost calculator = new FreespeedTravelTimeCost(config.charyparNagelScoring());
+		FreespeedTravelTimeCost calculator = new FreespeedTravelTimeCost(config.planCalcScore());
 
 		PlansCalcRoute router = null;
 		router = new PlansCalcRoute(config.plansCalcRoute(), network, calculator, calculator, provider.getFactory(network, calculator, calculator));

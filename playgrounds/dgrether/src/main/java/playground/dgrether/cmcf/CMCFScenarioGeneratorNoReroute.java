@@ -104,15 +104,15 @@ public class CMCFScenarioGeneratorNoReroute {
 		this.config.network().setInputFile(networkFile);
 		this.config.plans().setInputFile(plansOut);
 		// configure scoring for plans
-		this.config.charyparNagelScoring().setLateArrival_utils_hr(0.0);
-		this.config.charyparNagelScoring().setPerforming_utils_hr(6.0);
+		this.config.planCalcScore().setLateArrival_utils_hr(0.0);
+		this.config.planCalcScore().setPerforming_utils_hr(6.0);
 		// this is unfortunately not working at all....
 		ActivityParams homeParams = new ActivityParams("h");
 		// homeParams.setOpeningTime(0);
-		this.config.charyparNagelScoring().addActivityParams(homeParams);
+		this.config.planCalcScore().addActivityParams(homeParams);
 		// set it with f. strings
-		this.config.charyparNagelScoring().addParam("activityType_0", "h");
-		this.config.charyparNagelScoring().addParam("activityTypicalDuration_0",
+		this.config.planCalcScore().addParam("activityType_0", "h");
+		this.config.planCalcScore().addParam("activityTypicalDuration_0",
 				"24:00:00");
 
 		// configure controler

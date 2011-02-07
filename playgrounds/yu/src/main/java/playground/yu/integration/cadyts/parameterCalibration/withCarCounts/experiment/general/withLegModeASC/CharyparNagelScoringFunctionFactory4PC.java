@@ -39,7 +39,7 @@ public class CharyparNagelScoringFunctionFactory4PC extends
 	static double offsetCar, offsetPt, offsetWalk;
 
 	public CharyparNagelScoringFunctionFactory4PC(Config config) {
-		super(config.charyparNagelScoring());
+		super(config.planCalcScore());
 
 		// car
 		String offsetCarStr = config.findParam(

@@ -75,7 +75,7 @@ public class GenerateDemand {
 		System.out.println("Setting up plans objects...done.");
 
 		System.out.println("Setting up person modules...");
-		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(config.charyparNagelScoring());
+		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(config.planCalcScore());
 		plans.addAlgorithm(new PlansCalcRoute(config.plansCalcRoute(), networkLayer, timeCostCalc, timeCostCalc));
 		System.out.println("Setting up person modules...done.");
 

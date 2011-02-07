@@ -51,14 +51,14 @@ public class ExpBetaPlanSelectorTest extends AbstractPlanSelectorTest {
 
 	@Override
 	protected PlanSelector getPlanSelector() {
-		return new ExpBetaPlanSelector(this.config.charyparNagelScoring());
+		return new ExpBetaPlanSelector(this.config.planCalcScore());
 	}
 
 	/**
 	 * Test that plans are selected depending on their weight, use beta = 2.0.
 	 */
 	public void testExpBeta2() {
-		this.config.charyparNagelScoring().setBrainExpBeta(2.0);
+		this.config.planCalcScore().setBrainExpBeta(2.0);
 		PersonImpl person = new PersonImpl(new IdImpl(1));
 		// weight = Math.exp(this.beta * (plan.getScore() - maxScore));
 		PlanImpl plan1 = person.createAndAddPlan(false); // weight: 0.0003.35462627902512
@@ -72,7 +72,7 @@ public class ExpBetaPlanSelectorTest extends AbstractPlanSelectorTest {
 		PlanImpl plan5 = person.createAndAddPlan(false);// weight: 1
 		plan5.setScore(100.0);
 		
-		ExpBetaPlanSelector selector = new ExpBetaPlanSelector(this.config.charyparNagelScoring());
+		ExpBetaPlanSelector selector = new ExpBetaPlanSelector(this.config.planCalcScore());
 		int cnt1 = 0;
 		int cnt2 = 0;
 		int cnt3 = 0;
@@ -110,7 +110,7 @@ public class ExpBetaPlanSelectorTest extends AbstractPlanSelectorTest {
 	 * Test that plans are selected depending on their weight, use beta = 2.0.
 	 */
 	public void testExpBeta1() {
-		this.config.charyparNagelScoring().setBrainExpBeta(1.0);
+		this.config.planCalcScore().setBrainExpBeta(1.0);
 		PersonImpl person = new PersonImpl(new IdImpl(1));
 		// weight = Math.exp(this.beta * (plan.getScore() - maxScore));
 		// weight: 0.018315638888734186
@@ -131,7 +131,7 @@ public class ExpBetaPlanSelectorTest extends AbstractPlanSelectorTest {
 
 		
 		
-		ExpBetaPlanSelector selector = new ExpBetaPlanSelector(this.config.charyparNagelScoring());
+		ExpBetaPlanSelector selector = new ExpBetaPlanSelector(this.config.planCalcScore());
 		int cnt1 = 0;
 		int cnt2 = 0;
 		int cnt3 = 0;
@@ -172,7 +172,7 @@ public class ExpBetaPlanSelectorTest extends AbstractPlanSelectorTest {
 		 */
 		final double EPSILON_R = 1e-7;
 		
-		this.config.charyparNagelScoring().setBrainExpBeta(2.0);
+		this.config.planCalcScore().setBrainExpBeta(2.0);
 		PersonImpl person = new PersonImpl(new IdImpl(1));
 		PlanImpl plan1 = person.createAndAddPlan(false); 
 		plan1.setScore(180.0);
@@ -183,7 +183,7 @@ public class ExpBetaPlanSelectorTest extends AbstractPlanSelectorTest {
 		PlanImpl plan4 = person.createAndAddPlan(false); 
 		plan4.setScore(169.9);
 
-		ExpBetaPlanSelector testee = new ExpBetaPlanSelector(this.config.charyparNagelScoring());
+		ExpBetaPlanSelector testee = new ExpBetaPlanSelector(this.config.planCalcScore());
 		
 		assertEquals(0.2024421, testee.getSelectionProbability(plan1), EPSILON_R);
 		assertEquals(0.2472634, testee.getSelectionProbability(plan2), EPSILON_R);

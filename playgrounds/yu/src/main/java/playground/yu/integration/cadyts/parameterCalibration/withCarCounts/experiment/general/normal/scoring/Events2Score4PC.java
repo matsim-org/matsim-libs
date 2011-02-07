@@ -81,7 +81,7 @@ public abstract class Events2Score4PC extends EventsToScore implements
 
 	public Events2Score4PC(Config config, ScoringFunctionFactory factory,
 			Population population) {
-		super(population, factory, config.charyparNagelScoring()
+		super(population, factory, config.planCalcScore()
 				.getLearningRate());
 		this.config = config;
 		// #####################################
@@ -109,7 +109,7 @@ public abstract class Events2Score4PC extends EventsToScore implements
 		initialAttrNameScaleFactor("offsetPt");
 		initialAttrNameScaleFactor("offsetWalk");
 		// #####################################
-		scoring = config.charyparNagelScoring();
+		scoring = config.planCalcScore();
 		pop = population;
 		maxPlansPerAgent = config.strategy().getMaxAgentPlanMemorySize();
 		sfFactory = factory;

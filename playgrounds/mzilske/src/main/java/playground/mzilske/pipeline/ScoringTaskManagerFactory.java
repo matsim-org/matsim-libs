@@ -9,8 +9,8 @@ public class ScoringTaskManagerFactory extends TaskManagerFactory {
 	@Override
 	public TaskManager createTaskManagerImpl(TaskConfiguration taskConfiguration) {
 		Config config = taskConfiguration.getConfig();
-		ScoringFunctionFactory scoringFunctionFactory = new CharyparNagelScoringFunctionFactory(config.charyparNagelScoring());
-		return new ScoringTaskManager(scoringFunctionFactory, config.charyparNagelScoring().getLearningRate());
+		ScoringFunctionFactory scoringFunctionFactory = new CharyparNagelScoringFunctionFactory(config.planCalcScore());
+		return new ScoringTaskManager(scoringFunctionFactory, config.planCalcScore().getLearningRate());
 	}
 
 }

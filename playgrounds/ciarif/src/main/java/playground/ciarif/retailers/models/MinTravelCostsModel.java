@@ -78,7 +78,7 @@ public class MinTravelCostsModel extends RetailerModelImpl
       {
         Network network = this.controler.getNetwork();
         PersonalizableTravelTime travelTime = this.controler.getTravelTimeCalculator();
-        PersonalizableTravelCost travelCost = this.controler.getTravelCostCalculatorFactory().createTravelCostCalculator(travelTime, this.controler.getConfig().charyparNagelScoring());
+        PersonalizableTravelCost travelCost = this.controler.getTravelCostCalculatorFactory().createTravelCostCalculator(travelTime, this.controler.getConfig().planCalcScore());
 
         LeastCostPathCalculator routeAlgo = this.controler.getLeastCostPathCalculatorFactory().createPathCalculator(network, travelCost, travelTime);
 

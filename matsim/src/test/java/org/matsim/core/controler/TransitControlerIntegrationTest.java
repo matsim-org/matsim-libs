@@ -136,10 +136,10 @@ public class TransitControlerIntegrationTest extends MatsimTestCase {
 
 		ActivityParams params = new ActivityParams("h");
 		params.setTypicalDuration(16.0*3600);
-		config.charyparNagelScoring().addActivityParams(params);
+		config.planCalcScore().addActivityParams(params);
 		params = new ActivityParams("w");
 		params.setTypicalDuration(8.0*3600);
-		config.charyparNagelScoring().addActivityParams(params);
+		config.planCalcScore().addActivityParams(params);
 
 		StrategySettings tam = new StrategySettings(new IdImpl(1));
 		tam.setModuleName("TimeAllocationMutator");

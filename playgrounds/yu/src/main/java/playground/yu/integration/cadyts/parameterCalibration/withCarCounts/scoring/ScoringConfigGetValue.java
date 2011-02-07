@@ -53,7 +53,7 @@ public class ScoringConfigGetValue {
 
 	public static void setConfig(Config config) {
 		ScoringConfigGetValue.config = config;
-		ScoringConfigGetValue.scoringCfgGroup = config.charyparNagelScoring();
+		ScoringConfigGetValue.scoringCfgGroup = config.planCalcScore();
 	}
 
 	/*

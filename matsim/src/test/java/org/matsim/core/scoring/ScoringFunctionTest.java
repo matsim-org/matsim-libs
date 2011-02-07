@@ -52,7 +52,7 @@ public abstract class ScoringFunctionTest extends MatsimTestCase {
 	 * @param config
 	 */
 	protected void setupScoringConfig(final Config config) {
-		PlanCalcScoreConfigGroup scoring = config.charyparNagelScoring();
+		PlanCalcScoreConfigGroup scoring = config.planCalcScore();
 		scoring.setBrainExpBeta(2.0);
 		scoring.setLateArrival_utils_hr(-18.0);
 		scoring.setEarlyDeparture_utils_hr(0.0);

@@ -166,7 +166,7 @@ public class WithinDayControler extends Controler {
 		OnlyTimeDependentTravelCostCalculator travelCost = new OnlyTimeDependentTravelCostCalculator(travelTime);
 
 //		CloneablePlansCalcRoute dijkstraRouter = new CloneablePlansCalcRoute(new PlansCalcRouteConfigGroup(), network, travelCost, travelTime);
-		LeastCostPathCalculatorFactory factory = new AStarLandmarksFactory(this.network, new FreespeedTravelTimeCost(this.config.charyparNagelScoring()));
+		LeastCostPathCalculatorFactory factory = new AStarLandmarksFactory(this.network, new FreespeedTravelTimeCost(this.config.planCalcScore()));
 		AbstractMultithreadedModule router = new ReplanningModule(config, network, travelCost, travelTime, factory);
 
 		this.initialIdentifier = new InitialIdentifierImplFactory(this.sim).createIdentifier();

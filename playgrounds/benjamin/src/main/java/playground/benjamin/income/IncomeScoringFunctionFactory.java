@@ -53,7 +53,7 @@ public class IncomeScoringFunctionFactory implements ScoringFunctionFactory {
 
 	public IncomeScoringFunctionFactory(Config config, PersonHouseholdMapping hhmapping, Network network) {
 		this.config = config;
-		this.configGroup = config.charyparNagelScoring();
+		this.configGroup = config.planCalcScore();
 		this.params = new CharyparNagelScoringParameters(configGroup);
 		this.hhdb = hhmapping;
 		this.network = network;

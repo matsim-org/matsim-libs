@@ -57,7 +57,7 @@ public class LinearInterpolationLegTravelTimeEstimatorTest extends TestCase {
 
 		DepartureDelayAverageCalculator tDepDelayCalc = new DepartureDelayAverageCalculator(network, 900);
 		TravelTimeCalculator linkTravelTimeEstimator = new TravelTimeCalculator(network, config.travelTimeCalculator());
-		PersonalizableTravelCost linkTravelCostEstimator = new TravelTimeDistanceCostCalculator(linkTravelTimeEstimator, config.charyparNagelScoring());
+		PersonalizableTravelCost linkTravelCostEstimator = new TravelTimeDistanceCostCalculator(linkTravelTimeEstimator, config.planCalcScore());
 
 		PlansCalcRoute plansCalcRoute = new PlansCalcRoute(
 				config.plansCalcRoute(),

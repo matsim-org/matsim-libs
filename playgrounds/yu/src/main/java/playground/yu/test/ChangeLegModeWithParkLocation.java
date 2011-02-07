@@ -112,7 +112,7 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 		ctl.setWriteEventsInterval(100);
 		Config config = new ScenarioLoaderImpl(args[0]).getScenario().getConfig();
 		ctl.setScoringFunctionFactory(new CharyparNagelScoringFunctionFactoryWithWalk(
-						config.charyparNagelScoring(), Double.parseDouble(config.findParam("subTourModeChoice", "offsetWalk"))));
+						config.planCalcScore(), Double.parseDouble(config.findParam("subTourModeChoice", "offsetWalk"))));
 		ctl.run();
 	}
 
@@ -649,7 +649,7 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 			manager.setMaxPlansPerAgent(4);
 
 			// ChangeExpBeta
-			PlanStrategyImpl strategy1 = new PlanStrategyImpl(new ExpBetaPlanChanger(this.config.charyparNagelScoring().getBrainExpBeta()));
+			PlanStrategyImpl strategy1 = new PlanStrategyImpl(new ExpBetaPlanChanger(this.config.planCalcScore().getBrainExpBeta()));
 			manager.addStrategy(strategy1, 0.7);
 
 			// ChangeLegModeWithParkLocation

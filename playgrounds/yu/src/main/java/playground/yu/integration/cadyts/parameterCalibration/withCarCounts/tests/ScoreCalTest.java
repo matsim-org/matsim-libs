@@ -287,7 +287,7 @@ public class ScoreCalTest implements AgentArrivalEventHandler,
 
 		Config cf = sc.getConfig();
 		new MatsimConfigReader(cf).readFile(configFilename);
-		PlanCalcScoreConfigGroup scoring = cf.charyparNagelScoring();
+		PlanCalcScoreConfigGroup scoring = cf.planCalcScore();
 
 		// Network net = sc.getNetwork();
 		new MatsimNetworkReader(sc).readFile(netFilename);

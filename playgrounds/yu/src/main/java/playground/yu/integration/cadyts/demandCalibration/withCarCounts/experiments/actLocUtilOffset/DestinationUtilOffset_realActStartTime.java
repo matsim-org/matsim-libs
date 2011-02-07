@@ -228,7 +228,7 @@ public class DestinationUtilOffset_realActStartTime extends
 		ActivityLocationUtilOffsetExtractor aluoe = new DestinationUtilOffset_realActStartTime(
 				net, counts, linkUtilOffsets, arStartTime, arEndTime,
 				lowerLimit, 1000d, new CharyparNagelScoringParameters(config
-						.charyparNagelScoring()));
+						.planCalcScore()));
 
 		EventsManager events = new EventsManagerImpl();
 		// /////////////////////////////////

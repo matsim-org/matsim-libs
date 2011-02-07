@@ -193,11 +193,11 @@ public class BenchmarkV2 {
 
 		ActivityParams actParams = new ActivityParams("home");
 		actParams.setTypicalDuration(8.0 * 3600);
-		c.charyparNagelScoring().addActivityParams(actParams);
+		c.planCalcScore().addActivityParams(actParams);
 
 		actParams = new ActivityParams("work");
 		actParams.setTypicalDuration(8.0 * 3600);
-		c.charyparNagelScoring().addActivityParams(actParams);
+		c.planCalcScore().addActivityParams(actParams);
 
 		c.controler().setOutputDirectory(outputDir + "/sim/");
 

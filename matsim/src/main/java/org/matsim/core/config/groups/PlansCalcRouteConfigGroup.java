@@ -105,7 +105,7 @@ public class PlansCalcRouteConfigGroup extends Module {
 	
 	public final Map<String, String> getComments() {
 		Map<String,String> map = super.getComments();
-		map.put(PT_SPEED_FACTOR, "factor with which speeds (and therefore times) from the car freespeed travel time " +
+		map.put(PT_SPEED_FACTOR, "factor with which times from the car freespeed travel time " +
 		"calculation are multiplied in order to obtain the pt travel times.  Default is something like 2") ;
 		map.put(BEELINE_DISTANCE_FACTOR, "factor with which beeline distances (and therefore times) " +
 		"are multiplied in order to obtain an estimate of the network distances/times.  Default is something like 1.3") ;

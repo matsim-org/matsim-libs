@@ -147,7 +147,7 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine {
 			reconstructingUmlaufBuilder = new ReconstructingUmlaufBuilder(this.qSim.getScenario().getNetwork(),
 					((ScenarioImpl) this.qSim.getScenario()).getTransitSchedule().getTransitLines().values(),
 					((ScenarioImpl) this.qSim.getScenario()).getVehicles(), this.qSim.getScenario().getConfig()
-							.charyparNagelScoring());
+							.planCalcScore());
 		}
 		Collection<Umlauf> umlaeufe = reconstructingUmlaufBuilder.build();
 		for (Umlauf umlauf : umlaeufe) {

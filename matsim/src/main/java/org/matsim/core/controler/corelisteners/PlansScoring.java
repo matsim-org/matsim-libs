@@ -46,7 +46,7 @@ public class PlansScoring implements StartupListener, ScoringListener, Iteration
 	@Override
 	public void notifyStartup(final StartupEvent event) {
 		Controler controler = event.getControler();
-		this.planScorer = new EventsToScore(controler.getPopulation(), controler.getScoringFunctionFactory(), controler.getConfig().charyparNagelScoring().getLearningRate());
+		this.planScorer = new EventsToScore(controler.getPopulation(), controler.getScoringFunctionFactory(), controler.getConfig().planCalcScore().getLearningRate());
 		log.debug("PlanScoring loaded ScoringFunctionFactory");
 		event.getControler().getEvents().addHandler(this.planScorer);
 	}

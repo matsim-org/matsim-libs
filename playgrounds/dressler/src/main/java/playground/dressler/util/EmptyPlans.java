@@ -110,7 +110,7 @@ public class EmptyPlans {
 		Config config = new Config();
 		config.addCoreModules();
 
-		CharyparNagelScoringFunctionFactory factory = new CharyparNagelScoringFunctionFactory(config.charyparNagelScoring());
+		CharyparNagelScoringFunctionFactory factory = new CharyparNagelScoringFunctionFactory(config.planCalcScore());
 		PlansCalcRoute router = new PlansCalcRoute(config.plansCalcRoute(), network, new FakeTravelTimeCost(), new FakeTravelTimeCost());
 		//PlansCalcRoute router = new PlansCalcRouteDijkstra(network, new FakeTravelTimeCost(), new FakeTravelTimeCost(), new FakeTravelTimeCost());
 		for (Person person : population.getPersons().values()) {

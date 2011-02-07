@@ -98,7 +98,7 @@ public class MyZoneToZoneRouter {
 		TravelTimeCalculatorFactory ttcf = new TravelTimeCalculatorFactoryImpl();
 		TravelTimeCalculator travelTimeCalculator = ttcf.createTravelTimeCalculator(scenario.getNetwork(), scenario.getConfig().travelTimeCalculator());
 		TravelCostCalculatorFactory tccf = new TravelCostCalculatorFactoryImpl();
-		PersonalizableTravelCost travelCost = tccf.createTravelCostCalculator(travelTimeCalculator, scenario.getConfig().charyparNagelScoring());
+		PersonalizableTravelCost travelCost = tccf.createTravelCostCalculator(travelTimeCalculator, scenario.getConfig().planCalcScore());
 		
 		EventsManagerImpl em = new EventsManagerImpl();
 		em.addHandler(travelTimeCalculator);

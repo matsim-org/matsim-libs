@@ -51,7 +51,7 @@ public class TRBControler extends Controler {
 	@Override
 	public void run() {
 		TRBScoringFunctionFactory trbScoringFunctionFactory =
-			new TRBScoringFunctionFactory(this.config.charyparNagelScoring(), this);
+			new TRBScoringFunctionFactory(this.config.planCalcScore(), this);
 		this.setScoringFunctionFactory(trbScoringFunctionFactory);
 
 		this.addControlerListener(new FacilitiesLoadCalculator(this.getFacilityPenalties()));

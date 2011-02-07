@@ -119,15 +119,15 @@ public class NetworkDistance {
 		// set the config to only look at distance costs, not travel time costs
 		Config config = new Config();
 		config.addCoreModules();
-		config.charyparNagelScoring().setTraveling_utils_hr(0.0);
+		config.planCalcScore().setTraveling_utils_hr(0.0);
 
 //		config.charyparNagelScoring().setMarginalUtlOfDistanceCar(-0.001); // -1 per kilometer == -0.001 per meter
-		config.charyparNagelScoring().setMonetaryDistanceCostRateCar(-0.001) ;
-		config.charyparNagelScoring().setMarginalUtilityOfMoney(1.) ;
+		config.planCalcScore().setMonetaryDistanceCostRateCar(-0.001) ;
+		config.planCalcScore().setMarginalUtilityOfMoney(1.) ;
 
 		// create the router algorithm
-		TravelTime travelTime = new FreespeedTravelTimeCost(config.charyparNagelScoring());
-		TravelCost linkCosts = new TravelTimeDistanceCostCalculator(travelTime, config.charyparNagelScoring());
+		TravelTime travelTime = new FreespeedTravelTimeCost(config.planCalcScore());
+		TravelCost linkCosts = new TravelTimeDistanceCostCalculator(travelTime, config.planCalcScore());
 		Dijkstra router = new Dijkstra(network, linkCosts, travelTime);
 
 		// we need to transform the coordinate from wgs84 to gk4 for calculating distances

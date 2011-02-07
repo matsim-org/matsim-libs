@@ -416,7 +416,7 @@ public class BseUCControlerListener4linkUtilOffset implements StartupListener,
 
 		// set up a/r-strategy
 		((BseUCStrategyManager) ctl.getStrategyManager()).init(calibrator, ctl
-				.getTravelTimeCalculator(), config.charyparNagelScoring()
+				.getTravelTimeCalculator(), config.planCalcScore()
 				.getBrainExpBeta());
 		// set the max Iteration to Disable new plans generating
 		for (StrategySettings strategySetting : config.strategy()

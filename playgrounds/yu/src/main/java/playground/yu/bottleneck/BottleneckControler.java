@@ -44,7 +44,7 @@ public class BottleneckControler extends Controler {
 		StrategyManager manager = new StrategyManager();
 		manager.setMaxPlansPerAgent(5);
 		//
-		PlanStrategyImpl strategy1 = new PlanStrategyImpl(new ExpBetaPlanSelector(this.config.charyparNagelScoring()));
+		PlanStrategyImpl strategy1 = new PlanStrategyImpl(new ExpBetaPlanSelector(this.config.planCalcScore()));
 		manager.addStrategy(strategy1, 0.95);
 
 		PlanStrategyImpl strategy2 = new PlanStrategyImpl(new RandomPlanSelector());

@@ -252,7 +252,7 @@ public class ScenarioCut {
 		System.out.println("done. " + (new Date()));
 
 		System.out.println("re-initializing initial routes...");
-		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(scenario.getConfig().charyparNagelScoring());
+		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(scenario.getConfig().planCalcScore());
 		ReRouteLandmarks router = new ReRouteLandmarks(scenario.getConfig(), scenario.getNetwork(),timeCostCalc,timeCostCalc,timeCostCalc);
 		router.prepareReplanning();
 		for (Person person : scenario.getPopulation().getPersons().values()) {

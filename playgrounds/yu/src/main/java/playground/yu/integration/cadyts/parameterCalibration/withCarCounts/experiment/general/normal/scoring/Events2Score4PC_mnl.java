@@ -371,7 +371,7 @@ public class Events2Score4PC_mnl extends Events2Score4PC implements
 		attributeCount = Integer.parseInt(config.findParam(
 				PCCtlListener.BSE_CONFIG_MODULE_NAME, "attributeCount"));
 
-		PlanCalcScoreConfigGroup scoring = config.charyparNagelScoring();
+		PlanCalcScoreConfigGroup scoring = config.planCalcScore();
 		double traveling = scoring.getTraveling_utils_hr();
 		double betaStuck = Math.min(Math.min(scoring.getLateArrival_utils_hr(),
 				scoring.getEarlyDeparture_utils_hr()), Math.min(traveling,

@@ -66,7 +66,7 @@ public class RetailersLocationListener
 	public void notifyStartup(StartupEvent event)
   {
     this.controler = event.getControler();
-    FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(this.controler.getConfig().charyparNagelScoring());
+    FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(this.controler.getConfig().planCalcScore());
     this.pcrl = new PlansCalcRoute(this.controler.getConfig().plansCalcRoute(), this.controler.getNetwork(), timeCostCalc, timeCostCalc, new AStarLandmarksFactory(this.controler.getNetwork(), timeCostCalc));
 
     this.facilityIdFile = this.controler.getConfig().findParam("Retailers", "retailers");

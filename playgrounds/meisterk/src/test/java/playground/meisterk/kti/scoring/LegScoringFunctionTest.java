@@ -69,7 +69,7 @@ public class LegScoringFunctionTest extends MatsimTestCase {
 		ktiConfigGroup.setConstCar(-0.6);
 		this.config.addModule(KtiConfigGroup.GROUP_NAME, ktiConfigGroup);
 
-		PlanCalcScoreConfigGroup charyparNagelConfigGroup = this.config.charyparNagelScoring();
+		PlanCalcScoreConfigGroup charyparNagelConfigGroup = this.config.planCalcScore();
 
 //		charyparNagelConfigGroup.setMarginalUtlOfDistancePt(-0.5);
 		charyparNagelConfigGroup.setMonetaryDistanceCostRatePt(-0.5) ;
@@ -169,7 +169,7 @@ public class LegScoringFunctionTest extends MatsimTestCase {
 			((KtiPtRoute) route).setRouteDescription(startLink.getId(), routeDescription, endLink.getId());
 		}
 
-		CharyparNagelScoringParameters charyparNagelParams = new CharyparNagelScoringParameters(config.charyparNagelScoring());
+		CharyparNagelScoringParameters charyparNagelParams = new CharyparNagelScoringParameters(config.planCalcScore());
 		LegScoringFunction testee = new LegScoringFunction(
 				testPlan,
 				charyparNagelParams,

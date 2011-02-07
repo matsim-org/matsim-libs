@@ -221,8 +221,8 @@ public class MATSimConfigObject {
 		actType0.setTypicalDuration(12*60*60);
 		ActivityParams actType1 = new ActivityParams(activityType_1);
 		actType1.setTypicalDuration(8*60*60);
-		config.charyparNagelScoring().addActivityParams( actType0 ); // planCalcScore
-		config.charyparNagelScoring().addActivityParams( actType1 );
+		config.planCalcScore().addActivityParams( actType0 ); // planCalcScore
+		config.planCalcScore().addActivityParams( actType1 );
 		log.info("Setting planCalcScore to config...");
 		
 		// configure strategies for replanning

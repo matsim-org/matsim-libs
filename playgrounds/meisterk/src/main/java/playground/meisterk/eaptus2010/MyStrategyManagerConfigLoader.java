@@ -97,7 +97,7 @@ public class MyStrategyManagerConfigLoader {
 			strategy.addStrategyModule(new ReRouteDijkstra(config, network, travelCostCalc, travelTimeCalc));
 		} else if (name.equals("ReRoute_Landmarks")) {
 			strategy = new PlanStrategyImpl(new RandomPlanSelector());
-			strategy.addStrategyModule(new ReRouteLandmarks(config, network, travelCostCalc, travelTimeCalc, new FreespeedTravelTimeCost(config.charyparNagelScoring())));
+			strategy.addStrategyModule(new ReRouteLandmarks(config, network, travelCostCalc, travelTimeCalc, new FreespeedTravelTimeCost(config.planCalcScore())));
 		} else if (name.equals("TimeAllocationMutator") || name.equals("threaded.TimeAllocationMutator")) {
 			strategy = new PlanStrategyImpl(new RandomPlanSelector());
 			TimeAllocationMutator tam = new TimeAllocationMutator(config);
@@ -107,7 +107,7 @@ public class MyStrategyManagerConfigLoader {
 		} else if (name.equals("TimeAllocationMutator7200_ReRouteLandmarks")) {
 			strategy = new PlanStrategyImpl(new RandomPlanSelector());
 			strategy.addStrategyModule(new TimeAllocationMutator(config, 7200));
-			strategy.addStrategyModule(new ReRouteLandmarks(config, network, travelCostCalc, travelTimeCalc, new FreespeedTravelTimeCost(config.charyparNagelScoring())));
+			strategy.addStrategyModule(new ReRouteLandmarks(config, network, travelCostCalc, travelTimeCalc, new FreespeedTravelTimeCost(config.planCalcScore())));
 		} else if (name.equals("ExternalModule")) {
 			externalCounter++;
 			strategy = new PlanStrategyImpl(new RandomPlanSelector());
@@ -127,11 +127,11 @@ public class MyStrategyManagerConfigLoader {
 		} else if (name.equals("BestScore")) {
 			strategy = new PlanStrategyImpl(new BestPlanSelector());
 		} else if (name.equals("SelectExpBeta")) {
-			strategy = new PlanStrategyImpl(new ExpBetaPlanSelector(config.charyparNagelScoring()));
+			strategy = new PlanStrategyImpl(new ExpBetaPlanSelector(config.planCalcScore()));
 		} else if (name.equals("ChangeExpBeta")) {
-			strategy = new PlanStrategyImpl(new ExpBetaPlanChanger(config.charyparNagelScoring().getBrainExpBeta()));
+			strategy = new PlanStrategyImpl(new ExpBetaPlanChanger(config.planCalcScore().getBrainExpBeta()));
 		} else if (name.equals("ChangeExpBeta2")) {
-			strategy = new PlanStrategyImpl(new ExpBetaPlanChanger2(config.charyparNagelScoring().getBrainExpBeta()));
+			strategy = new PlanStrategyImpl(new ExpBetaPlanChanger2(config.planCalcScore().getBrainExpBeta()));
 		} else if (name.equals("SelectRandom")) {
 			strategy = new PlanStrategyImpl(new RandomPlanSelector());
 		} else if (name.equals("ChangeLegMode")) {
@@ -139,9 +139,9 @@ public class MyStrategyManagerConfigLoader {
 			strategy.addStrategyModule(new ChangeLegMode(config));
 			strategy.addStrategyModule(new ReRoute(controler));
 		} else if (name.equals("SelectPathSizeLogit")) {
-			strategy = new PlanStrategyImpl(new PathSizeLogitSelector(controler.getNetwork(), config.charyparNagelScoring()));
+			strategy = new PlanStrategyImpl(new PathSizeLogitSelector(controler.getNetwork(), config.planCalcScore()));
 		} else if (name.equals("LocationChoice")) {
-			strategy = new PlanStrategyImpl(new ExpBetaPlanSelector(config.charyparNagelScoring()));
+			strategy = new PlanStrategyImpl(new ExpBetaPlanSelector(config.planCalcScore()));
 			strategy.addStrategyModule(new LocationChoice(controler.getNetwork(), controler, (controler.getScenario()).getKnowledges()));
 			strategy.addStrategyModule(new ReRoute(controler));
 			strategy.addStrategyModule(new TimeAllocationMutator(config));

@@ -58,8 +58,8 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 	public void setUp() throws Exception {
 		super.setUp();
 		this.config = loadConfig(null); // required for planCalcScore.beta to be defined
-		config.charyparNagelScoring().setBrainExpBeta(2.0);
-		config.charyparNagelScoring().setPathSizeLogitBeta(2.0);
+		config.planCalcScore().setBrainExpBeta(2.0);
+		config.planCalcScore().setPathSizeLogitBeta(2.0);
 		this.network = null;
 	}
 
@@ -72,7 +72,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 
 	@Override
 	protected PlanSelector getPlanSelector() {
-		return new PathSizeLogitSelector(this.network, this.config.charyparNagelScoring());
+		return new PathSizeLogitSelector(this.network, this.config.planCalcScore());
 	}
 
 	@Override
@@ -287,7 +287,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		p3.setScore(-10.0);
 		person.addPlan(p3);
 
-		PathSizeLogitSelector selector = new PathSizeLogitSelector(network, this.config.charyparNagelScoring());
+		PathSizeLogitSelector selector = new PathSizeLogitSelector(network, this.config.planCalcScore());
 		int cnt1 = 0;
 		int cnt2 = 0;
 		int cnt3 = 0;

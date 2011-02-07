@@ -57,7 +57,7 @@ public class OnePercentBerlin10sTest extends MatsimTestCase {
 		config.simulation().setRemoveStuckVehicles(false);
 		config.simulation().setStuckTime(10.0);
 
-		config.charyparNagelScoring().setLearningRate(1.0);
+		config.planCalcScore().setLearningRate(1.0);
 
 		ScenarioImpl scenario = new ScenarioImpl(config);
 		new MatsimNetworkReader(scenario).readFile(netFileName);

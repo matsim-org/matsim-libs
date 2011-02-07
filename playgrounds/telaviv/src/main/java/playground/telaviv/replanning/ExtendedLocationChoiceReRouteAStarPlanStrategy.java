@@ -57,7 +57,7 @@ public class ExtendedLocationChoiceReRouteAStarPlanStrategy implements PlanStrat
 		
 		planStrategyDelegate = new PlanStrategyImpl(new RandomPlanSelector());
 		planStrategyDelegate.addStrategyModule(new ExtendedLocationChoicePlanModule(scenario, travelTimeCalc));
-		planStrategyDelegate.addStrategyModule(new ReRouteLandmarks(config, network, travelCostCalc, travelTimeCalc, new FreespeedTravelTimeCost(config.charyparNagelScoring())));
+		planStrategyDelegate.addStrategyModule(new ReRouteLandmarks(config, network, travelCostCalc, travelTimeCalc, new FreespeedTravelTimeCost(config.planCalcScore())));
 	}
 	
 	@Override

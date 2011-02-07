@@ -55,7 +55,7 @@ public class CottbusLiveVis {
 		ScenarioImpl scenario = loader.getScenario();
 		
 		((PopulationImpl)scenario.getPopulation()).addAlgorithm(new XY2Links(scenario.getNetwork()));
-		final FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(scenario.getConfig().charyparNagelScoring());
+		final FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(scenario.getConfig().planCalcScore());
 		((PopulationImpl)scenario.getPopulation()).addAlgorithm(new PlansCalcRoute(scenario.getConfig().plansCalcRoute(), scenario.getNetwork(), timeCostCalc, timeCostCalc, new AStarLandmarksFactory(scenario.getNetwork(), timeCostCalc)));
 		((PopulationImpl)scenario.getPopulation()).runAlgorithms();
 		

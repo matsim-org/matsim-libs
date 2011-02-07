@@ -372,7 +372,7 @@ public class ActivityTimeDistribution implements ActivityStartEventHandler,
 		try {
 			atd = new ActivityTimeDistribution(
 					new CharyparNagelScoringParameters(ConfigUtils.loadConfig(
-							configFilename).charyparNagelScoring()));
+							configFilename).planCalcScore()));
 			events.addHandler(atd);
 			new MatsimEventsReader(events).readFile(eventsFilename);
 
@@ -411,7 +411,7 @@ public class ActivityTimeDistribution implements ActivityStartEventHandler,
 
 		ActivityTimeDistribution atd = null;
 		atd = new ActivityTimeDistribution(new CharyparNagelScoringParameters(
-				scenario.getConfig().charyparNagelScoring()),
+				scenario.getConfig().planCalcScore()),
 				DTimeCenterCoords, network, 1000d/* gridLength */);
 		events.addHandler(atd);
 

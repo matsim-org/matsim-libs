@@ -85,8 +85,10 @@ public class RouterTester {
 			e.printStackTrace();
 		}
 		log.info("build transit router...");
+		TransitRouterConfig tRConfig = new TransitRouterConfig( s.getConfig().planCalcScore(), 
+				s.getConfig().plansCalcRoute() ) ;
 
-		TransitRouterImpl router = new TransitRouterImpl(ts, new TransitRouterConfig());
+		TransitRouterImpl router = new TransitRouterImpl(ts, tRConfig);
 
 		PtRouter ptR = new PtRouter(router);
 

@@ -391,7 +391,7 @@ public class BseUCControlerListener implements StartupListener,
 		// set up a/r-strategy
 		((BseUCStrategyManager) controler.getStrategyManager()).init(
 				calibrator, controler.getTravelTimeCalculator(), config
-						.charyparNagelScoring().getBrainExpBeta());
+						.planCalcScore().getBrainExpBeta());
 
 		// prepare resultsContainer
 		resultsContainer = new SimResultsContainerImpl();

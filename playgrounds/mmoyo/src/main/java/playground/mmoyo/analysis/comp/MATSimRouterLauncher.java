@@ -41,10 +41,15 @@ public class MATSimRouterLauncher {
 
 		/**route plans*/
 		DijkstraFactory dijkstraFactory = new DijkstraFactory();
-		FreespeedTravelTimeCost timeCostCalculator = new FreespeedTravelTimeCost(scenario.getConfig().charyparNagelScoring());
+		FreespeedTravelTimeCost timeCostCalculator = new FreespeedTravelTimeCost(scenario.getConfig().planCalcScore());
 		TransitConfigGroup transitConfig = new TransitConfigGroup();
+		
+		TransitRouterConfig tRConfig = new TransitRouterConfig( scenario.getConfig().planCalcScore(), 
+				scenario.getConfig().plansCalcRoute() ) ;
 
-		PlansCalcRoute router = new PlansCalcTransitRoute(scenario.getConfig().plansCalcRoute(), scenario.getNetwork(), timeCostCalculator, timeCostCalculator, dijkstraFactory, transitConfig, new TransitRouterImpl(scenario.getTransitSchedule(), new TransitRouterConfig()));
+		PlansCalcRoute router = new PlansCalcTransitRoute(scenario.getConfig().plansCalcRoute(), scenario.getNetwork(), 
+				timeCostCalculator, timeCostCalculator, dijkstraFactory, transitConfig, 
+				new TransitRouterImpl(scenario.getTransitSchedule(), tRConfig));
 	
 		Population population = scenario.getPopulation();
 		

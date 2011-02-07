@@ -57,7 +57,7 @@ public class MyControlerListener implements ShutdownListener {
 		Controler controler = event.getControler() ;
 
 		TravelTime ttc = controler.getTravelTimeCalculator();
-		SpanningTree st = new SpanningTree(ttc,new TravelTimeDistanceCostCalculator(ttc, controler.getConfig().charyparNagelScoring()));
+		SpanningTree st = new SpanningTree(ttc,new TravelTimeDistanceCostCalculator(ttc, controler.getConfig().planCalcScore()));
 
 		NetworkImpl network = controler.getNetwork() ;
 		double depatureTime = 8.*3600 ;

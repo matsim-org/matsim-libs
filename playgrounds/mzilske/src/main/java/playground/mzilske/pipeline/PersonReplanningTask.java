@@ -95,9 +95,9 @@ public class PersonReplanningTask implements ScenarioSinkSource {
 		} else if (name.equals("BestScore")) {
 			strategy = new PlanStrategyImpl(new BestPlanSelector());
 		} else if (name.equals("SelectExpBeta")) {
-			strategy = new PlanStrategyImpl(new ExpBetaPlanSelector(config.charyparNagelScoring()));
+			strategy = new PlanStrategyImpl(new ExpBetaPlanSelector(config.planCalcScore()));
 		} else if (name.equals("ChangeExpBeta")) {
-			strategy = new PlanStrategyImpl(new ExpBetaPlanChanger(config.charyparNagelScoring().getBrainExpBeta()));
+			strategy = new PlanStrategyImpl(new ExpBetaPlanChanger(config.planCalcScore().getBrainExpBeta()));
 		} else if (name.equals("SelectRandom")) {
 			strategy = new PlanStrategyImpl(new RandomPlanSelector());
 		} else if (name.equals("ChangeLegMode")) {

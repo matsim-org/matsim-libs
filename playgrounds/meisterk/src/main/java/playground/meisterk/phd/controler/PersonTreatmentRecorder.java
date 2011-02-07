@@ -144,7 +144,7 @@ public class PersonTreatmentRecorder implements StartupListener, IterationEndsLi
 		out.print(event.getIteration());
 		out.print(this.getCountsString(personTreatment, memorySize));
 		out.print(this.getScoreDifferencesString(personTreatment));
-		out.print(this.getIsPersonSatisfiedString(personTreatment, c.getConfig().charyparNagelScoring()));
+		out.print(this.getIsPersonSatisfiedString(personTreatment, c.getConfig().planCalcScore()));
 		out.println();
 		
 		log.info("Writing results...done.");

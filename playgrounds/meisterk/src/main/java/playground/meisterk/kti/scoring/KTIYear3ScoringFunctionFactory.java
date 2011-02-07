@@ -45,7 +45,7 @@ public class KTIYear3ScoringFunctionFactory extends org.matsim.core.scoring.char
 			final KtiConfigGroup ktiConfigGroup,
 			final TreeMap<Id, FacilityPenalty> facilityPenalties,
 			final ActivityFacilities facilities) {
-		super(config.charyparNagelScoring());
+		super(config.planCalcScore());
 		this.config = config;
 		this.ktiConfigGroup = ktiConfigGroup;
 		this.facilityPenalties = facilityPenalties;

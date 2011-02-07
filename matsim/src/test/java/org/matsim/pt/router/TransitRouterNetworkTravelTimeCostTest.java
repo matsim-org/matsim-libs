@@ -30,9 +30,10 @@ public class TransitRouterNetworkTravelTimeCostTest extends TestCase {
 	public void testTravelTime() {
 		Fixture f = new Fixture();
 		f.init();
-		TransitRouterConfig conf = new TransitRouterConfig();
+		TransitRouterConfig conf = new TransitRouterConfig(f.scenario.getConfig().planCalcScore(),
+				f.scenario.getConfig().plansCalcRoute());
 		TransitRouterNetworkTravelTimeCost tc = new TransitRouterNetworkTravelTimeCost(conf);
-		TransitRouterImpl router = new TransitRouterImpl(f.schedule, new TransitRouterConfig());
+		TransitRouterImpl router = new TransitRouterImpl(f.schedule, conf);
 		TransitRouterNetwork routerNet = router.getTransitRouterNetwork();
 		// find the link connecting C and D on the blue line
 		TransitRouterNetworkLink testLink = null;
@@ -49,9 +50,10 @@ public class TransitRouterNetworkTravelTimeCostTest extends TestCase {
 	public void testWaitingTime() {
 		Fixture f = new Fixture();
 		f.init();
-		TransitRouterConfig conf = new TransitRouterConfig();
+		TransitRouterConfig conf = new TransitRouterConfig(f.scenario.getConfig().planCalcScore(),
+				f.scenario.getConfig().plansCalcRoute());
 		TransitRouterNetworkTravelTimeCost tc = new TransitRouterNetworkTravelTimeCost(conf);
-		TransitRouterImpl router = new TransitRouterImpl(f.schedule, new TransitRouterConfig());
+		TransitRouterImpl router = new TransitRouterImpl(f.schedule, conf);
 		TransitRouterNetwork routerNet = router.getTransitRouterNetwork();
 		// find the link connecting C and D on the blue line
 		TransitRouterNetworkLink testLink = null;
@@ -71,9 +73,10 @@ public class TransitRouterNetworkTravelTimeCostTest extends TestCase {
 	public void testTravelTimeAfterMidnight() {
 		Fixture f = new Fixture();
 		f.init();
-		TransitRouterConfig conf = new TransitRouterConfig();
+		TransitRouterConfig conf = new TransitRouterConfig(f.scenario.getConfig().planCalcScore(),
+				f.scenario.getConfig().plansCalcRoute());
 		TransitRouterNetworkTravelTimeCost tc = new TransitRouterNetworkTravelTimeCost(conf);
-		TransitRouterImpl router = new TransitRouterImpl(f.schedule, new TransitRouterConfig());
+		TransitRouterImpl router = new TransitRouterImpl(f.schedule, conf);
 		TransitRouterNetwork routerNet = router.getTransitRouterNetwork();
 		// find the link connecting C and D on the blue line
 		TransitRouterNetworkLink testLink = null;
@@ -95,9 +98,10 @@ public class TransitRouterNetworkTravelTimeCostTest extends TestCase {
 	public void testTravelCostLineSwitch() {
 		Fixture f = new Fixture();
 		f.init();
-		TransitRouterConfig conf = new TransitRouterConfig();
+		TransitRouterConfig conf = new TransitRouterConfig(f.scenario.getConfig().planCalcScore(),
+				f.scenario.getConfig().plansCalcRoute());
 		TransitRouterNetworkTravelTimeCost tc = new TransitRouterNetworkTravelTimeCost(conf);
-		TransitRouterImpl router = new TransitRouterImpl(f.schedule, new TransitRouterConfig());
+		TransitRouterImpl router = new TransitRouterImpl(f.schedule, conf);
 		TransitRouterNetwork routerNet = router.getTransitRouterNetwork();
 		// find the link connecting C and D on the blue line
 		TransitRouterNetworkLink testLink = null;

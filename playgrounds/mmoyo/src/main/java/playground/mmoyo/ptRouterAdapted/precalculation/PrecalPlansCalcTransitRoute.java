@@ -64,8 +64,13 @@ public class PrecalPlansCalcTransitRoute extends PlansCalcTransitRoute {
 			final PersonalizableTravelCost costCalculator, final PersonalizableTravelTime timeCalculator,
 			final LeastCostPathCalculatorFactory factory, final TransitSchedule schedule,
 			final TransitConfigGroup transitConfig, MyTransitRouterConfig myTransitRouterConfig) {
-		super(config, network, costCalculator, timeCalculator, factory, transitConfig, new TransitRouterImpl(schedule, new TransitRouterConfig()));
+		super(config, network, costCalculator, timeCalculator, factory, transitConfig, 
+				new TransitRouterImpl(schedule, new TransitRouterConfig(null,null)));
 		this.adaptedTransitRouter = new AdaptedTransitRouter( myTransitRouterConfig, schedule);
+		throw new RuntimeException("this uses the standard TransitRouterConfig in parts of the code, and your " +
+				"own myTransitRouterConfig in other parts of the code, leading to potential inconsistencies. " +
+				"Also makes it impossible to refactor.  Could you please explain your design decisions " +
+				"with comments in the code?  And please talk to me if you need this code here.  Thanks, kai") ;
 	}
 
 	@Override

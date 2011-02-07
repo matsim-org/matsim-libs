@@ -111,7 +111,7 @@ public class PersonTreatmentRecorderTest extends MatsimTestCase {
 		for (int i=0; i<3; i++) {
 			Plan plan = testPerson.getPlans().get(i);
 			((PersonImpl) testPerson).setSelectedPlan(plan);
-			boolean actualJudgement = testee.isPersonSatisfied(testPerson, this.sc.getConfig().charyparNagelScoring());
+			boolean actualJudgement = testee.isPersonSatisfied(testPerson, this.sc.getConfig().planCalcScore());
 			switch(i) {
 			case 0:
 				assertTrue(actualJudgement);
@@ -128,12 +128,12 @@ public class PersonTreatmentRecorderTest extends MatsimTestCase {
 			}
 		}
 
-		this.sc.getConfig().charyparNagelScoring().setBrainExpBeta(9.0);
+		this.sc.getConfig().planCalcScore().setBrainExpBeta(9.0);
 
 		for (int i=0; i<3; i++) {
 			Plan plan = testPerson.getPlans().get(i);
 			((PersonImpl) testPerson).setSelectedPlan(plan);
-			boolean actualJudgement = testee.isPersonSatisfied(testPerson, this.sc.getConfig().charyparNagelScoring());
+			boolean actualJudgement = testee.isPersonSatisfied(testPerson, this.sc.getConfig().planCalcScore());
 			switch(i) {
 			case 0:
 				assertTrue(actualJudgement);
@@ -250,7 +250,7 @@ public class PersonTreatmentRecorderTest extends MatsimTestCase {
 
 	public void testGetIsPersonSatisfiedString() {
 
-		this.sc.getConfig().charyparNagelScoring().setBrainExpBeta(9.0);
+		this.sc.getConfig().planCalcScore().setBrainExpBeta(9.0);
 
 		Map<String, Set<Person>> personTreatment = new TreeMap<String, Set<Person>>();
 
@@ -280,7 +280,7 @@ public class PersonTreatmentRecorderTest extends MatsimTestCase {
 
 		PersonTreatmentRecorder testee =
 			new PersonTreatmentRecorder((PopulationConvergenceConfigGroup) this.sc.getConfig().getModule(PopulationConvergenceConfigGroup.GROUP_NAME));
-		String actualString = testee.getIsPersonSatisfiedString(personTreatment, this.sc.getConfig().charyparNagelScoring());
+		String actualString = testee.getIsPersonSatisfiedString(personTreatment, this.sc.getConfig().planCalcScore());
 		assertEquals("\t0\t0.5\t0.333", actualString);
 
 	}

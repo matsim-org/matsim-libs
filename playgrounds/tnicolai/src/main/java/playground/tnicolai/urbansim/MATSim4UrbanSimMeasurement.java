@@ -201,7 +201,7 @@ public class MATSim4UrbanSimMeasurement extends MATSim4Urbansim {
 
 				TravelTime ttc = controler.getTravelTimeCalculator();
 				//SpanningTree st = new SpanningTree(ttc,new TravelTimeDistanceCostCalculator(ttc));
-				SpanningTree st = new SpanningTree(ttc,new TravelTimeDistanceCostCalculator(ttc, controler.getConfig().charyparNagelScoring()));
+				SpanningTree st = new SpanningTree(ttc,new TravelTimeDistanceCostCalculator(ttc, controler.getConfig().planCalcScore()));
 
 				NetworkImpl network = controler.getNetwork() ;
 				double depatureTime = 8.*3600 ;

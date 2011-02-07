@@ -73,7 +73,7 @@ public class NewStrategyModule implements PlanStrategyModule {
 
 	public NewStrategyModule() {
 		this.timeAllocationMutator = new TimeAllocationMutator(controler.getConfig(), 7200);
-		this.betaExp = new ExpBetaPlanChanger(controler.getConfig().charyparNagelScoring().getBrainExpBeta());
+		this.betaExp = new ExpBetaPlanChanger(controler.getConfig().planCalcScore().getBrainExpBeta());
 		this.reRoute = new ReRoute(controler);
 		this.randomSelector = new RandomPlanSelector();
 

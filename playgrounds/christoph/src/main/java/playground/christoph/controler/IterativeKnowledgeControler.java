@@ -108,7 +108,7 @@ public class IterativeKnowledgeControler extends Controler{
 		/*
 		 * We don't use the knowledge here - the initial routes will be anyway on the shortest path.
 		 */
-		PersonalizableTravelTime travelTime = new FreespeedTravelTimeCost(this.config.charyparNagelScoring());
+		PersonalizableTravelTime travelTime = new FreespeedTravelTimeCost(this.config.planCalcScore());
 		OnlyTimeDependentTravelCostCalculator travelCost = new OnlyTimeDependentTravelCostCalculator(travelTime);
 		PlansCalcRoute dijkstraRouter = new PlansCalcRoute(new PlansCalcRouteConfigGroup(), network, travelCost, travelTime);
 		

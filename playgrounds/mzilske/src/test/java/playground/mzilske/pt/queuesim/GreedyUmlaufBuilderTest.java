@@ -49,7 +49,7 @@ public class GreedyUmlaufBuilderTest {
 		createNetwork();
 		setupSchedule();
 		Collection<TransitLine> transitLines = scenario.getTransitSchedule().getTransitLines().values();
-		UmlaufBuilder umlaufBuilder = new GreedyUmlaufBuilderImpl(new UmlaufInterpolator(scenario.getNetwork(), scenario.getConfig().charyparNagelScoring()), transitLines);
+		UmlaufBuilder umlaufBuilder = new GreedyUmlaufBuilderImpl(new UmlaufInterpolator(scenario.getNetwork(), scenario.getConfig().planCalcScore()), transitLines);
 		Collection<Umlauf> umlaeufe = umlaufBuilder.build();
 	}
 

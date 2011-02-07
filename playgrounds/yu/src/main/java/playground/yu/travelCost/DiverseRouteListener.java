@@ -64,7 +64,7 @@ public class DiverseRouteListener implements IterationStartsListener,
 		int iter = event.getIteration();/* firstIter+1, +2, +3 */
 		if (iter == ctl.getFirstIteration()) {
 			PlanCalcScoreConfigGroup scoringCfg = ctl.getConfig()
-					.charyparNagelScoring();
+					.planCalcScore();
 			scoringCfg.setMonetaryDistanceCostRateCar(-0.00012);
 			ctl
 					.setScoringFunctionFactory(new CharyparNagelScoringFunctionFactory(

@@ -100,7 +100,7 @@ public class TransitControler extends Controler {
 
 		ActivityParams params = new ActivityParams(PtConstants.TRANSIT_ACTIVITY_TYPE);
 		params.setTypicalDuration(120.0);
-		this.config.charyparNagelScoring().addActivityParams(params);
+		this.config.planCalcScore().addActivityParams(params);
 
 		this.getNetwork().getFactory().setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
 

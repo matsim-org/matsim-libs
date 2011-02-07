@@ -55,7 +55,7 @@ public class TransitLiveSimMain {
 				scenario.getNetwork(),
 				scenario.getTransitSchedule().getTransitLines().values(),
 				scenario.getVehicles(),
-				scenario.getConfig().charyparNagelScoring());
+				scenario.getConfig().planCalcScore());
 		reconstructingUmlaufBuilder.build();
 
 		EventsManager events = new EventsManagerImpl();

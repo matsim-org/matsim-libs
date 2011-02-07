@@ -137,7 +137,7 @@ public class PlanomatTest extends MatsimTestCase {
 	private void runATestRun(final PlanomatTestRun testRun) {
 
 		TravelTimeCalculator tTravelEstimator = new TravelTimeCalculator(this.scenario.getNetwork(), this.scenario.getConfig().travelTimeCalculator());
-		PersonalizableTravelCost travelCostEstimator = new TravelTimeDistanceCostCalculator(tTravelEstimator, this.scenario.getConfig().charyparNagelScoring());
+		PersonalizableTravelCost travelCostEstimator = new TravelTimeDistanceCostCalculator(tTravelEstimator, this.scenario.getConfig().planCalcScore());
 		DepartureDelayAverageCalculator depDelayCalc = new DepartureDelayAverageCalculator(this.scenario.getNetwork(), 900);
 
 		EventsManagerImpl events = new EventsManagerImpl();
@@ -152,7 +152,7 @@ public class PlanomatTest extends MatsimTestCase {
 //				this.scenario.getConfig().planomat().getRoutingCapability(),
 //				plansCalcRoute);
 
-		ScoringFunctionFactory scoringFunctionFactory = new CharyparNagelScoringFunctionFactory(this.scenario.getConfig().charyparNagelScoring());
+		ScoringFunctionFactory scoringFunctionFactory = new CharyparNagelScoringFunctionFactory(this.scenario.getConfig().planCalcScore());
 
 		log.info("Testing " + testRun.toString() + "...");
 
@@ -290,7 +290,7 @@ public class PlanomatTest extends MatsimTestCase {
 
 		// init LegTravelTimeEstimator
 		PersonalizableTravelTime tTravelEstimator = new LinearInterpolatingTTCalculator(this.scenario.getNetwork(), 900);
-		PersonalizableTravelCost travelCostEstimator = new TravelTimeDistanceCostCalculator(tTravelEstimator, this.scenario.getConfig().charyparNagelScoring());
+		PersonalizableTravelCost travelCostEstimator = new TravelTimeDistanceCostCalculator(tTravelEstimator, this.scenario.getConfig().planCalcScore());
 		DepartureDelayAverageCalculator depDelayCalc = new DepartureDelayAverageCalculator(this.scenario.getNetwork(), 900);
 
 		PlansCalcRoute plansCalcRoute = new PlansCalcRoute(this.scenario.getConfig().plansCalcRoute(), this.scenario.getNetwork(), travelCostEstimator, tTravelEstimator);

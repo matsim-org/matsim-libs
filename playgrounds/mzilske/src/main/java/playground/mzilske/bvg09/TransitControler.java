@@ -103,7 +103,7 @@ public class TransitControler extends Controler {
 		this.config.controler().setEventsFileFormats(formats);
 		ActivityParams transitActivityParams = new ActivityParams(PtConstants.TRANSIT_ACTIVITY_TYPE);
 		transitActivityParams.setTypicalDuration(120.0);
-		this.config.charyparNagelScoring().addActivityParams(transitActivityParams);
+		this.config.planCalcScore().addActivityParams(transitActivityParams);
 		this.getNetwork().getFactory().setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
 	}
 
@@ -162,9 +162,10 @@ public class TransitControler extends Controler {
 
 	@Override
 	public PlanAlgorithm createRoutingAlgorithm(final PersonalizableTravelCost travelCosts, final PersonalizableTravelTime travelTimes) {
+		TransitRouterConfig trConfig = new TransitRouterConfig( this.config.planCalcScore(), this.config.plansCalcRoute() ) ;
 		return new PlansCalcTransitRoute(this.config.plansCalcRoute(), this.network, travelCosts, travelTimes,
 				this.getLeastCostPathCalculatorFactory(), this.transitConfig,
-				new TransitRouterImpl(this.scenarioData.getTransitSchedule(), new TransitRouterConfig()));
+				new TransitRouterImpl(this.scenarioData.getTransitSchedule(), trConfig) );
 	}
 
 	public static class TransitControlerListener implements StartupListener {
@@ -204,7 +205,7 @@ public class TransitControler extends Controler {
 							.getControler().getScenario()
 							.getTransitSchedule().getTransitLines().values(),
 					event.getControler().getScenario().getVehicles(),
-					event.getControler().getScenario().getConfig().charyparNagelScoring());
+					event.getControler().getScenario().getConfig().planCalcScore());
 			reconstructingUmlaufBuilder.build();
 		}
 

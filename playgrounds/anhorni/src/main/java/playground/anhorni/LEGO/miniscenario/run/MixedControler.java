@@ -54,7 +54,7 @@ public class MixedControler extends Controler {
       }
            
       MixedScoringFunctionFactory mixedScoringFunctionFactory =
-			new MixedScoringFunctionFactory(this.config.charyparNagelScoring(), this, this.configReader);
+			new MixedScoringFunctionFactory(this.config.planCalcScore(), this, this.configReader);
   	
 		this.setScoringFunctionFactory(mixedScoringFunctionFactory);
 		//this.addControlerListener(new FacilitiesLoadCalculator(this.getFacilityPenalties()));

@@ -74,8 +74,8 @@ public class PlanomatModuleTest extends MatsimTestCase {
 
 		EventsManagerImpl emptyEvents = new EventsManagerImpl();
 		TravelTimeCalculator tTravelEstimator = new TravelTimeCalculator(scenario.getNetwork(), config.travelTimeCalculator());
-		ScoringFunctionFactory scoringFunctionFactory = new CharyparNagelScoringFunctionFactory(config.charyparNagelScoring());
-		PersonalizableTravelCost travelCostEstimator = new TravelTimeDistanceCostCalculator(tTravelEstimator, config.charyparNagelScoring());
+		ScoringFunctionFactory scoringFunctionFactory = new CharyparNagelScoringFunctionFactory(config.planCalcScore());
+		PersonalizableTravelCost travelCostEstimator = new TravelTimeDistanceCostCalculator(tTravelEstimator, config.planCalcScore());
 
 		Controler dummyControler = new Controler(this.scenario);
 		dummyControler.setLeastCostPathCalculatorFactory(new DijkstraFactory());

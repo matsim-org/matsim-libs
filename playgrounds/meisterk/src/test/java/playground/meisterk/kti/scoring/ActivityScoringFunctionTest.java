@@ -84,7 +84,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 
 		// generate config
 		Config config = super.loadConfig(null);
-		PlanCalcScoreConfigGroup scoring = config.charyparNagelScoring();
+		PlanCalcScoreConfigGroup scoring = config.planCalcScore();
 		scoring.setBrainExpBeta(2.0);
 		scoring.setLateArrival_utils_hr(0.0);
 		scoring.setEarlyDeparture_utils_hr(-6.0);
@@ -169,7 +169,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 				emptyFacilityPenalties,
 				this.scenario.getActivityFacilities());
 		
-		EventsToScore eventsToScore = new EventsToScore(this.scenario.getPopulation(), factory, this.scenario.getConfig().charyparNagelScoring().getLearningRate());
+		EventsToScore eventsToScore = new EventsToScore(this.scenario.getPopulation(), factory, this.scenario.getConfig().planCalcScore().getLearningRate());
 
 		double commonEndAndStartTime = Time.parseTime("23:40:00");
 		eventsToScore.handleEvent(new ActivityEndEventImpl(commonEndAndStartTime, TEST_PERSON_ID, link.getId(), facilityHome.getId(), ACTIVITY_TYPE_HOME));

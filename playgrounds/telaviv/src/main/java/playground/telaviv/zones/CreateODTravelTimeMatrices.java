@@ -77,7 +77,7 @@ public class CreateODTravelTimeMatrices {
 		this.zoneMapping = zoneMapping;
 		this.travelTime = travelTime;
 		
-		travelCost = (TravelTimeDistanceCostCalculator) new TravelCostCalculatorFactoryImpl().createTravelCostCalculator(travelTime, scenario.getConfig().charyparNagelScoring());	
+		travelCost = (TravelTimeDistanceCostCalculator) new TravelCostCalculatorFactoryImpl().createTravelCostCalculator(travelTime, scenario.getConfig().planCalcScore());	
 		getConnectorNodes();
 	}
 	

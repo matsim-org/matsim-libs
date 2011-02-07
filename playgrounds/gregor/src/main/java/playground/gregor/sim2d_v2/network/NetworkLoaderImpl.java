@@ -574,6 +574,6 @@ public class NetworkLoaderImpl implements NetworkLoader {
 
 	public static void main(String [] args) {
 		ScenarioImpl scenario = new ScenarioImpl();
-		new NetworkLoaderImpl(scenario.getNetwork(), scenario.getConfig().charyparNagelScoring()).loadNetwork();
+		new NetworkLoaderImpl(scenario.getNetwork(), scenario.getConfig().planCalcScore()).loadNetwork();
 	}
 }

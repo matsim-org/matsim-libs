@@ -194,7 +194,7 @@ public class MyRuns {
 			MyControler myControler = new MyControler(args);
 			myControler.setCreateGraphs(false);
 
-			myControler.getConfig().charyparNagelScoring().setLearningRate(learningRate);
+			myControler.getConfig().planCalcScore().setLearningRate(learningRate);
 			myControler.getConfig().controler().setOutputDirectory("output/eaptus2010ForPhDThesis/equil/learningRate_" + Double.toString(learningRate));
 			myControler.run();
 		}
@@ -275,8 +275,8 @@ public class MyRuns {
 							outputDirectory
 							+ "/"
 							+ this.getRunOutputDirectoryName(timingModule, beta, learningRate));
-					testee.getConfig().charyparNagelScoring().setBrainExpBeta(beta);
-					testee.getConfig().charyparNagelScoring().setLearningRate(learningRate);
+					testee.getConfig().planCalcScore().setBrainExpBeta(beta);
+					testee.getConfig().planCalcScore().setLearningRate(learningRate);
 
 					testee.setCreateGraphs(false);
 					testee.setWriteEventsInterval(10);

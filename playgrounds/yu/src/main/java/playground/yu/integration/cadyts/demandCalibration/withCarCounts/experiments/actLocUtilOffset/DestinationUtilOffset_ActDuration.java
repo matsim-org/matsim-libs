@@ -200,7 +200,7 @@ public class DestinationUtilOffset_ActDuration extends
 		ActivityLocationUtilOffsetExtractor aluoe = new DestinationUtilOffset_ActDuration(
 				net, counts, linkUtilOffsets, arStartTime, arEndTime,
 				lowerLimit, 1000d, new CharyparNagelScoringParameters(config
-						.charyparNagelScoring()));
+						.planCalcScore()));
 
 		EventsManager events = new EventsManagerImpl();
 		// /////////////////////////////////

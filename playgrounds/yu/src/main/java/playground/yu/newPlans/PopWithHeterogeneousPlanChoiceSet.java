@@ -70,7 +70,7 @@ public class PopWithHeterogeneousPlanChoiceSet extends Controler {
 
 		if (this.strategyChangerIteration > 0) {
 			PlanStrategyImpl expBetaPlanChanger = new PlanStrategyImpl(
-					new ExpBetaPlanChanger(config.charyparNagelScoring()
+					new ExpBetaPlanChanger(config.planCalcScore()
 							.getBrainExpBeta()));
 			manager.addStrategy(expBetaPlanChanger, 0.0);
 			manager.addChangeRequest(this.strategyChangerIteration,

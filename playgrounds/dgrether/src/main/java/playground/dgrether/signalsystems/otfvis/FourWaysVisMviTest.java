@@ -57,7 +57,7 @@ public class FourWaysVisMviTest {
     conf.plans().setInputFile(popFile);
     ActivityParams a = new ActivityParams("h");
     a.setTypicalDuration(8.0 * 3600.0);
-    conf.charyparNagelScoring().addActivityParams(a);
+    conf.planCalcScore().addActivityParams(a);
     
     conf.addQSimConfigGroup(new QSimConfigGroup());
     conf.getQSimConfigGroup().setSnapshotFormat("otfvis");

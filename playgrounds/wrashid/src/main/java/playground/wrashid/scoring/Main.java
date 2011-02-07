@@ -26,7 +26,7 @@ import org.matsim.core.scoring.charyparNagel.CharyparNagelScoringFunctionFactory
 public class Main {
 	public static void main(String[] args) {
 		Controler controler = new Controler(args);
-		CharyparNagelScoringFunctionFactory factory = new CharyparNagelScoringFunctionFactory(controler.getConfig().charyparNagelScoring());
+		CharyparNagelScoringFunctionFactory factory = new CharyparNagelScoringFunctionFactory(controler.getConfig().planCalcScore());
 		controler.setScoringFunctionFactory(factory);
 		controler.setOverwriteFiles(true);
 		controler.run();

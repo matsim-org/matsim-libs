@@ -90,7 +90,7 @@ public class TimeModeChoicerTest extends MatsimTestCase{
 		DepartureDelayAverageCalculator tDepDelayCalc = new DepartureDelayAverageCalculator(this.scenario_input.getNetwork(), 900);
 
 		TravelTimeCalculator linkTravelTimeEstimator = new TravelTimeCalculator(this.scenario_input.getNetwork(), this.initializer.getControler().getConfig().travelTimeCalculator());
-		PersonalizableTravelCost linkTravelCostEstimator = new TravelTimeDistanceCostCalculator(linkTravelTimeEstimator, this.initializer.getControler().getConfig().charyparNagelScoring());
+		PersonalizableTravelCost linkTravelCostEstimator = new TravelTimeDistanceCostCalculator(linkTravelTimeEstimator, this.initializer.getControler().getConfig().planCalcScore());
 
 		this.router = new PlansCalcRoute(this.initializer.getControler().getConfig().plansCalcRoute(), this.scenario_input.getNetwork(), linkTravelCostEstimator, linkTravelTimeEstimator);
 

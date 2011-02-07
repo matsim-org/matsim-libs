@@ -53,14 +53,14 @@ public class ExpBetaPlanForRemovalSelectorTest extends AbstractPlanSelectorTest 
 
 	@Override
 	protected PlanSelector getPlanSelector() {
-		return new ExpBetaPlanForRemovalSelector(this.config.charyparNagelScoring());
+		return new ExpBetaPlanForRemovalSelector(this.config.planCalcScore());
 	}
 
 	/**
 	 * Test that plans are selected depending on their weight, use beta = 2.0.
 	 */
 	public void testExpBeta2() {
-		this.config.charyparNagelScoring().setBrainExpBeta(2.0);
+		this.config.planCalcScore().setBrainExpBeta(2.0);
 		PersonImpl person = new PersonImpl(new IdImpl(1));
 		// TODO [AH] Update to newest formula
 		// weight = Math.exp(this.beta * 5 * (plan.getScore() / maxScore));
@@ -75,7 +75,7 @@ public class ExpBetaPlanForRemovalSelectorTest extends AbstractPlanSelectorTest 
 		PlanImpl plan5 = person.createAndAddPlan(false);// weight: 22026.465
 		plan5.setScore(100.0);
 
-		PlanSelector selector = new ExpBetaPlanForRemovalSelector(this.config.charyparNagelScoring());
+		PlanSelector selector = new ExpBetaPlanForRemovalSelector(this.config.planCalcScore());
 		int cnt1 = 0;
 		int cnt2 = 0;
 		int cnt3 = 0;
@@ -113,7 +113,7 @@ public class ExpBetaPlanForRemovalSelectorTest extends AbstractPlanSelectorTest 
 	 * Test that plans are selected depending on their weight, use beta = 1.0.
 	 */
 	public void testExpBeta1() {
-		this.config.charyparNagelScoring().setBrainExpBeta(1.0);
+		this.config.planCalcScore().setBrainExpBeta(1.0);
 		PersonImpl person = new PersonImpl(new IdImpl(1));
 		// TODO [AH] update to newest formula
 		// weight = Math.exp(this.beta * (plan.getScore() - maxScore));
@@ -133,7 +133,7 @@ public class ExpBetaPlanForRemovalSelectorTest extends AbstractPlanSelectorTest 
 		PlanImpl plan5 = person.createAndAddPlan(false);
 		plan5.setScore(100.0);
 
-		PlanSelector selector = new ExpBetaPlanForRemovalSelector(this.config.charyparNagelScoring());
+		PlanSelector selector = new ExpBetaPlanForRemovalSelector(this.config.planCalcScore());
 		int cnt1 = 0;
 		int cnt2 = 0;
 		int cnt3 = 0;

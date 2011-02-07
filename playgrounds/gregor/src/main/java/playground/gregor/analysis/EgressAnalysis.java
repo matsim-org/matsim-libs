@@ -102,7 +102,7 @@ public class EgressAnalysis {
 		this.geofac = new GeometryFactory();
 		this.gth = new GTH(this.geofac);
 		this.egressNodes = new HashMap<Id,EgressNode>();
-		FreespeedTravelTimeCost ttCost = new FreespeedTravelTimeCost(config.charyparNagelScoring());
+		FreespeedTravelTimeCost ttCost = new FreespeedTravelTimeCost(config.planCalcScore());
 		this.router = new PlansCalcRoute(config.plansCalcRoute(), network, ttCost, ttCost, new DijkstraFactory());
 		initFeatureCollection();
 		initEgressNodes();

@@ -60,7 +60,7 @@ public class TollTravelCostCalculatorTest extends MatsimTestCase {
 		toll.addLink(scenario.createId("11"));
 		Fixture.createPopulation2(scenario);
 		Population population = scenario.getPopulation();
-		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(config.charyparNagelScoring());
+		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(config.planCalcScore());
 		PersonalizableTravelCost costCalc = new TollTravelCostCalculator(timeCostCalc, toll); // we use freespeedTravelCosts as base costs
 
 		AStarLandmarksFactory routerFactory = new AStarLandmarksFactory(network, timeCostCalc);
@@ -114,7 +114,7 @@ public class TollTravelCostCalculatorTest extends MatsimTestCase {
 		toll.addLink(scenario.createId("11"));
 		Fixture.createPopulation2(scenario);
 		Population population = scenario.getPopulation();
-		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(config.charyparNagelScoring());
+		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(config.planCalcScore());
 		PersonalizableTravelCost costCalc = new TollTravelCostCalculator(timeCostCalc, toll); // we use freespeedTravelCosts as base costs
 
 		AStarLandmarksFactory routerFactory = new AStarLandmarksFactory(network, timeCostCalc);

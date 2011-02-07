@@ -114,15 +114,15 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 	public void testGetLegTravelTimeEstimation() {
 
 //		this.scenario.getConfig().charyparNagelScoring().setMarginalUtlOfDistanceCar(0.0);
-		this.scenario.getConfig().charyparNagelScoring().setMonetaryDistanceCostRateCar(0.0) ;
-		this.scenario.getConfig().charyparNagelScoring().setMarginalUtilityOfMoney(1.) ; 
+		this.scenario.getConfig().planCalcScore().setMonetaryDistanceCostRateCar(0.0) ;
+		this.scenario.getConfig().planCalcScore().setMarginalUtilityOfMoney(1.) ; 
 
 
 		for (PlanomatConfigGroup.SimLegInterpretation simLegInterpretation : PlanomatConfigGroup.SimLegInterpretation.values()) {
 
 			DepartureDelayAverageCalculator tDepDelayCalc = new DepartureDelayAverageCalculator(this.scenario.getNetwork(), TIME_BIN_SIZE);
 			TravelTimeCalculator linkTravelTimeEstimator = new TravelTimeCalculator(this.scenario.getNetwork(), this.config.travelTimeCalculator());
-			PersonalizableTravelCost linkTravelCostEstimator = new TravelTimeDistanceCostCalculator(linkTravelTimeEstimator, this.config.charyparNagelScoring());
+			PersonalizableTravelCost linkTravelCostEstimator = new TravelTimeDistanceCostCalculator(linkTravelTimeEstimator, this.config.planCalcScore());
 
 			PlansCalcRoute plansCalcRoute = new PlansCalcRoute(this.scenario.getConfig().plansCalcRoute(), this.scenario.getNetwork(), linkTravelCostEstimator, linkTravelTimeEstimator);
 
@@ -261,7 +261,7 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 
 		DepartureDelayAverageCalculator tDepDelayCalc = new DepartureDelayAverageCalculator(this.scenario.getNetwork(), TIME_BIN_SIZE);
 		TravelTimeCalculator linkTravelTimeEstimator = new TravelTimeCalculator(this.scenario.getNetwork(), this.config.travelTimeCalculator());
-		PersonalizableTravelCost linkTravelCostEstimator = new TravelTimeDistanceCostCalculator(linkTravelTimeEstimator, this.config.charyparNagelScoring());
+		PersonalizableTravelCost linkTravelCostEstimator = new TravelTimeDistanceCostCalculator(linkTravelTimeEstimator, this.config.planCalcScore());
 
 		PlansCalcRoute plansCalcRoute = new PlansCalcRoute(
 				this.scenario.getConfig().plansCalcRoute(),
@@ -323,7 +323,7 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 
 		DepartureDelayAverageCalculator tDepDelayCalc = new DepartureDelayAverageCalculator(this.scenario.getNetwork(), TIME_BIN_SIZE);
 		TravelTimeCalculator linkTravelTimeEstimator = new TravelTimeCalculator(this.scenario.getNetwork(), this.config.travelTimeCalculator());
-		PersonalizableTravelCost linkTravelCostEstimator = new TravelTimeDistanceCostCalculator(linkTravelTimeEstimator, this.config.charyparNagelScoring());
+		PersonalizableTravelCost linkTravelCostEstimator = new TravelTimeDistanceCostCalculator(linkTravelTimeEstimator, this.config.planCalcScore());
 
 		PlansCalcRoute plansCalcRoute = new PlansCalcRoute(
 				this.scenario.getConfig().plansCalcRoute(),
@@ -408,7 +408,7 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 
 		DepartureDelayAverageCalculator tDepDelayCalc = new DepartureDelayAverageCalculator(this.scenario.getNetwork(), TIME_BIN_SIZE);
 		TravelTimeCalculator linkTravelTimeEstimator = new TravelTimeCalculator(this.scenario.getNetwork(), this.config.travelTimeCalculator());
-		PersonalizableTravelCost linkTravelCostEstimator = new TravelTimeDistanceCostCalculator(linkTravelTimeEstimator, this.config.charyparNagelScoring());
+		PersonalizableTravelCost linkTravelCostEstimator = new TravelTimeDistanceCostCalculator(linkTravelTimeEstimator, this.config.planCalcScore());
 
 		PlansCalcRoute plansCalcRoute = new PlansCalcRoute(
 				this.scenario.getConfig().plansCalcRoute(),

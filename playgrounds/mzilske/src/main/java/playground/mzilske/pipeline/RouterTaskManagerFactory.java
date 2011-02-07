@@ -15,7 +15,7 @@ public class RouterTaskManagerFactory extends TaskManagerFactory {
 		if (config.controler().getRoutingAlgorithmType().equals(RoutingAlgorithmType.Dijkstra)) {
 			leastCostPathCalculatorFactory = new LeastCostPathCalculatorTaskManager(new DijkstraTask(new DijkstraFactory()));
 		} else if (config.controler().getRoutingAlgorithmType().equals(RoutingAlgorithmType.AStarLandmarks)) {
-			leastCostPathCalculatorFactory = new LeastCostPathCalculatorTaskManager(new AStarLandmarksTask(new AStarLandmarksFactory(), new FreespeedTravelTimeCost(config.charyparNagelScoring())));
+			leastCostPathCalculatorFactory = new LeastCostPathCalculatorTaskManager(new AStarLandmarksTask(new AStarLandmarksFactory(), new FreespeedTravelTimeCost(config.planCalcScore())));
 		} else {
 			throw new IllegalStateException("Enumeration Type RoutingAlgorithmType was extended without adaptation of Controler!");
 		}

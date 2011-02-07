@@ -53,7 +53,7 @@ public class PersonAssignToNetwork extends AbstractPersonAlgorithm implements Pl
 	public PersonAssignToNetwork(final NetworkImpl network, final ActivityFacilities facilities, final Config config) {
 		log.info("    init " + this.getClass().getName() + " module...");
 		this.facilities = facilities;
-		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(config.charyparNagelScoring());
+		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(config.planCalcScore());
 		this.router = new PlansCalcRoute(config.plansCalcRoute(), network, timeCostCalc,timeCostCalc, new AStarLandmarksFactory(network, timeCostCalc));
 		log.info("    done.");
 	}

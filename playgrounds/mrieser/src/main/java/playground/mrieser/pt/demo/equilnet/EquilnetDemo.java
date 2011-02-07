@@ -45,16 +45,16 @@ public class EquilnetDemo {
 		config.controler().setEventsFileFormats(EnumSet.of(EventsFileFormat.xml));
 		config.controler().addParam("routingAlgorithmType", "AStarLandmarks");
 
-		config.charyparNagelScoring().addParam("activityType_0", "h");
-		config.charyparNagelScoring().addParam("activityPriority_0", "1");
-		config.charyparNagelScoring().addParam("activityTypicalDuration_0", "12:00:00");
-		config.charyparNagelScoring().addParam("activityMinimalDuration_0", "18:00:00");
+		config.planCalcScore().addParam("activityType_0", "h");
+		config.planCalcScore().addParam("activityPriority_0", "1");
+		config.planCalcScore().addParam("activityTypicalDuration_0", "12:00:00");
+		config.planCalcScore().addParam("activityMinimalDuration_0", "18:00:00");
 
-		config.charyparNagelScoring().addParam("activityType_1", "w");
-		config.charyparNagelScoring().addParam("activityPriority_1", "1");
-		config.charyparNagelScoring().addParam("activityTypicalDuration_1", "08:00:00");
-		config.charyparNagelScoring().addParam("activityMinimalDuration_1", "06:00:00");
-		config.charyparNagelScoring().addParam("activityOpeningTime_1", "07:00:00");
+		config.planCalcScore().addParam("activityType_1", "w");
+		config.planCalcScore().addParam("activityPriority_1", "1");
+		config.planCalcScore().addParam("activityTypicalDuration_1", "08:00:00");
+		config.planCalcScore().addParam("activityMinimalDuration_1", "06:00:00");
+		config.planCalcScore().addParam("activityOpeningTime_1", "07:00:00");
 
 		config.simulation().setEndTime(30.0*3600);
 

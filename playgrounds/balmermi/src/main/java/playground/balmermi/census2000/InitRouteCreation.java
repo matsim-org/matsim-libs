@@ -65,7 +65,7 @@ public class InitRouteCreation {
 
 		System.out.println("  adding person modules... ");
 		plans.addAlgorithm(new XY2Links(network));
-		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(config.charyparNagelScoring());
+		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(config.planCalcScore());
 		plans.addAlgorithm(new PlansCalcRoute(config.plansCalcRoute(), network, timeCostCalc, timeCostCalc));
 		System.out.println("  done.");
 

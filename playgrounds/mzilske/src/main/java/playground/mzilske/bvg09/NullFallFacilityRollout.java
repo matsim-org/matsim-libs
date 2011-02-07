@@ -340,7 +340,7 @@ public class NullFallFacilityRollout {
 
 	private void buildUmlaeufe() {
 		Collection<TransitLine> transitLines = outScenario.getTransitSchedule().getTransitLines().values();
-		GreedyUmlaufBuilderImpl greedyUmlaufBuilder = new GreedyUmlaufBuilderImpl(new UmlaufInterpolator(outScenario.getNetwork(), outScenario.getConfig().charyparNagelScoring()), transitLines);
+		GreedyUmlaufBuilderImpl greedyUmlaufBuilder = new GreedyUmlaufBuilderImpl(new UmlaufInterpolator(outScenario.getNetwork(), outScenario.getConfig().planCalcScore()), transitLines);
 		umlaeufe = greedyUmlaufBuilder.build();
 
 		VehiclesFactory vb = outScenario.getVehicles().getFactory();

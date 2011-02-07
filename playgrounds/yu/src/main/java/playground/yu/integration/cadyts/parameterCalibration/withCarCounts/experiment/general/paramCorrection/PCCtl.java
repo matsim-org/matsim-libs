@@ -94,7 +94,7 @@ public class PCCtl extends BseParamCalibrationControler {
 	@Override
 	protected StrategyManager loadStrategyManager() {
 		StrategyManager manager = new PCStrMn(network, getFirstIteration(),
-				config.charyparNagelScoring().getBrainExpBeta(), Integer
+				config.planCalcScore().getBrainExpBeta(), Integer
 						.parseInt(config.findParam(
 								PCCtlListener.BSE_CONFIG_MODULE_NAME,
 								"parameterDimension"/*
@@ -131,7 +131,7 @@ public class PCCtl extends BseParamCalibrationControler {
 			if (module.equals("ChangeExpBeta")) {
 				// ChangeExpBeta
 				PlanStrategy changeExpBeta = new PlanStrategyImpl(
-						new ExpBetaPlanChanger(config.charyparNagelScoring()
+						new ExpBetaPlanChanger(config.planCalcScore()
 								.getBrainExpBeta()));
 				manager.addStrategy(changeExpBeta, 0.0);
 				manager.addChangeRequest(getFirstIteration()
@@ -140,7 +140,7 @@ public class PCCtl extends BseParamCalibrationControler {
 			} else if (module.equals("SelectExpBeta")) {
 				// SelectExpBeta
 				PlanStrategy selectExpBeta = new PlanStrategyImpl(
-						new ExpBetaPlanSelector(config.charyparNagelScoring()));
+						new ExpBetaPlanSelector(config.planCalcScore()));
 				manager.addStrategy(selectExpBeta, 0.0);
 				manager.addChangeRequest(getFirstIteration()
 						+ manager.getMaxPlansPerAgent() + 1/* 505 */,

@@ -8,7 +8,7 @@ public class CharyparNagelScoringFunctionAccumulatorTest extends CharyparNagelSc
 	@Override
 	protected ScoringFunction getScoringFunctionInstance(final PlanImpl somePlan) {
 
-		CharyparNagelScoringFunctionFactory charyparNagelScoringFunctionFactory = new CharyparNagelScoringFunctionFactory(this.config.charyparNagelScoring());
+		CharyparNagelScoringFunctionFactory charyparNagelScoringFunctionFactory = new CharyparNagelScoringFunctionFactory(this.config.planCalcScore());
 
 		return charyparNagelScoringFunctionFactory.createNewScoringFunction(somePlan);
 	}

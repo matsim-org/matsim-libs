@@ -175,11 +175,13 @@ public class DataPrepare {
 		}
 
 		DijkstraFactory dijkstraFactory = new DijkstraFactory();
-		FreespeedTravelTimeCost timeCostCalculator = new FreespeedTravelTimeCost(this.scenario.getConfig().charyparNagelScoring());
+		FreespeedTravelTimeCost timeCostCalculator = new FreespeedTravelTimeCost(this.scenario.getConfig().planCalcScore());
 		TransitConfigGroup transitConfig = new TransitConfigGroup();
+		TransitRouterConfig tRConfig = new TransitRouterConfig( this.scenario.getConfig().planCalcScore(), 
+				this.scenario.getConfig().plansCalcRoute() ) ;
 		PlansCalcTransitRoute router = new PlansCalcTransitRoute(this.scenario.getConfig().plansCalcRoute(),
 				this.scenario.getNetwork(), timeCostCalculator, timeCostCalculator, dijkstraFactory,
-				transitConfig, new TransitRouterImpl(this.scenario.getTransitSchedule(), new TransitRouterConfig()));
+				transitConfig, new TransitRouterImpl(this.scenario.getTransitSchedule(), tRConfig ));
 		log.info("start pt-router");
 		router.run(pop);
 		log.info("write routed plans out.");
@@ -187,7 +189,10 @@ public class DataPrepare {
 	}
 
 	protected void visualizeRouterNetwork() {
-		TransitRouterImpl router = new TransitRouterImpl(this.scenario.getTransitSchedule(), new TransitRouterConfig());
+		TransitRouterConfig tRConfig = new TransitRouterConfig( this.scenario.getConfig().planCalcScore(), 
+				this.scenario.getConfig().plansCalcRoute() ) ;
+
+		TransitRouterImpl router = new TransitRouterImpl(this.scenario.getTransitSchedule(), tRConfig );
 		Network routerNet = router.getTransitRouterNetwork();
 
 		log.info("create vis network");

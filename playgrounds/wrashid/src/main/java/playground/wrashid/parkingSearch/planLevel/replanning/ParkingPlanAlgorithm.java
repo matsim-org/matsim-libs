@@ -236,7 +236,7 @@ public class ParkingPlanAlgorithm implements PlanAlgorithm {
 	private static PlansCalcRoute getRoutingAlgorithm(Controler controler) {
 		PersonalizableTravelTime travelTime = controler.getTravelTimeCalculator();
 		PersonalizableTravelCost travelCost = controler.getTravelCostCalculatorFactory().createTravelCostCalculator(travelTime,
-				controler.getConfig().charyparNagelScoring());
+				controler.getConfig().planCalcScore());
 
 		LeastCostPathCalculatorFactory leastCostFactory = controler.getLeastCostPathCalculatorFactory();
 

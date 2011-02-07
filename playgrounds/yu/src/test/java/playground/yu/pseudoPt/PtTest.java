@@ -58,7 +58,7 @@ public class PtTest extends MatsimTestCase {
 
 		@Override
 		public void notifyIterationEnds(final IterationEndsEvent event) {
-			double betaPt = event.getControler().getConfig().charyparNagelScoring().getTravelingPt_utils_hr();
+			double betaPt = event.getControler().getConfig().planCalcScore().getTravelingPt_utils_hr();
 			int iteration = event.getIteration();
 			if (iteration % 10 == 0) {
 				pc.resetCnt();

@@ -131,7 +131,7 @@ public class ControlerTest {
 		ActivityParams actParams = new ActivityParams("h");
 		actParams.setTypicalDuration(8*3600);
 		actParams.setPriority(1.0);
-		config.charyparNagelScoring().addActivityParams(actParams);
+		config.planCalcScore().addActivityParams(actParams);
 		// - define iterations
 		config.controler().setLastIteration(0);
 		// - make sure we don't use threads, as they are not deterministic
@@ -250,7 +250,7 @@ public class ControlerTest {
 		ActivityParams actParams = new ActivityParams("h");
 		actParams.setTypicalDuration(8*3600);
 		actParams.setPriority(1.0);
-		config.charyparNagelScoring().addActivityParams(actParams);
+		config.planCalcScore().addActivityParams(actParams);
 		// - define iterations
 		config.controler().setLastIteration(0);
 		// - make sure we don't use threads, as they are not deterministic
@@ -321,7 +321,7 @@ public class ControlerTest {
 		ActivityParams actParams = new ActivityParams("h");
 		actParams.setTypicalDuration(8*3600);
 		actParams.setPriority(1.0);
-		config.charyparNagelScoring().addActivityParams(actParams);
+		config.planCalcScore().addActivityParams(actParams);
 		// - define iterations
 		config.controler().setLastIteration(0);
 		// - make sure we don't use threads, as they are not deterministic

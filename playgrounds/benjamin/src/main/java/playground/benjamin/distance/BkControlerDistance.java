@@ -47,7 +47,7 @@ public class BkControlerDistance extends BkControler {
 
 	@Override
 	protected ScoringFunctionFactory loadScoringFunctionFactory() {
-		return new BkScoringFunctionFactory(this.config.charyparNagelScoring());
+		return new BkScoringFunctionFactory(this.config.planCalcScore());
 	}
 
 	

@@ -58,7 +58,7 @@ public abstract class CharyparNagelScoringFunctionTest extends ScoringFunctionTe
 	public void setUp() throws Exception {
 		super.setUp();
 		this.config = loadConfig(null);
-		PlanCalcScoreConfigGroup scoring = this.config.charyparNagelScoring();
+		PlanCalcScoreConfigGroup scoring = this.config.planCalcScore();
 		scoring.setBrainExpBeta(2.0);
 		scoring.setLateArrival_utils_hr(0.0);
 		scoring.setEarlyDeparture_utils_hr(0.0);
@@ -176,12 +176,12 @@ public abstract class CharyparNagelScoringFunctionTest extends ScoringFunctionTe
 	}
 
 	public void testTraveling() {
-		this.config.charyparNagelScoring().setTraveling_utils_hr(-6.0);
+		this.config.planCalcScore().setTraveling_utils_hr(-6.0);
 		assertEquals(-3.0, calcScore(), EPSILON);
 	}
 
 	public void testTravelingPt() {
-		this.config.charyparNagelScoring().setTravelingPt_utils_hr(-9.0);
+		this.config.planCalcScore().setTravelingPt_utils_hr(-9.0);
 		assertEquals(-2.25, calcScore(), EPSILON);
 	}
 
@@ -193,12 +193,12 @@ public abstract class CharyparNagelScoringFunctionTest extends ScoringFunctionTe
 		double zeroUtilDurW = getZeroUtilDuration_h(8.0, 1.0);
 		double zeroUtilDurH = getZeroUtilDuration_h(16.0, 1.0);
 
-		this.config.charyparNagelScoring().setPerforming_utils_hr(perf);
+		this.config.planCalcScore().setPerforming_utils_hr(perf);
 		assertEquals(perf * 8.0 * Math.log(8.5 / zeroUtilDurW)
 				+ perf * 16.0 * Math.log(14.75 / zeroUtilDurH), calcScore(), EPSILON);
 
 		perf = +3.0;
-		this.config.charyparNagelScoring().setPerforming_utils_hr(perf);
+		this.config.planCalcScore().setPerforming_utils_hr(perf);
 		assertEquals(perf * 8.0 * Math.log(8.5 / zeroUtilDurW)
 				+ perf * 16.0 * Math.log(14.75 / zeroUtilDurH), calcScore(), EPSILON);
 	}
@@ -208,10 +208,10 @@ public abstract class CharyparNagelScoringFunctionTest extends ScoringFunctionTe
 	 */
 	public void testOpeningTime() {
 		double perf = +6.0;
-		this.config.charyparNagelScoring().setPerforming_utils_hr(perf);
+		this.config.planCalcScore().setPerforming_utils_hr(perf);
 		double initialScore = calcScore();
 
-		ActivityParams wParams = this.config.charyparNagelScoring().getActivityParams("w");
+		ActivityParams wParams = this.config.planCalcScore().getActivityParams("w");
 		wParams.setOpeningTime(8*3600.0); // now the agent arrives 30min early and has to wait
 		double score = calcScore();
 
@@ -224,10 +224,10 @@ public abstract class CharyparNagelScoringFunctionTest extends ScoringFunctionTe
 	 */
 	public void testClosingTime() {
 		double perf = +6.0;
-		this.config.charyparNagelScoring().setPerforming_utils_hr(perf);
+		this.config.planCalcScore().setPerforming_utils_hr(perf);
 		double initialScore = calcScore();
 
-		ActivityParams wParams = this.config.charyparNagelScoring().getActivityParams("w");
+		ActivityParams wParams = this.config.planCalcScore().getActivityParams("w");
 		wParams.setClosingTime(15*3600.0); // now the agent stays 1h too long
 		double score = calcScore();
 
@@ -241,12 +241,12 @@ public abstract class CharyparNagelScoringFunctionTest extends ScoringFunctionTe
 	public void testOpeningClosingTime() {
 		double perf = +6.0;
 		double zeroUtilDurH = getZeroUtilDuration_h(16.0, 1.0);
-		this.config.charyparNagelScoring().setPerforming_utils_hr(perf);
+		this.config.planCalcScore().setPerforming_utils_hr(perf);
 		double initialScore = calcScore();
 
 		// test1: agents has to wait before and after
 
-		ActivityParams wParams = this.config.charyparNagelScoring().getActivityParams("w");
+		ActivityParams wParams = this.config.planCalcScore().getActivityParams("w");
 		wParams.setOpeningTime( 8*3600.0); // the agent arrives 30min early
 		wParams.setClosingTime(15*3600.0); // the agent stays 1h too long
 		double score = calcScore();
@@ -276,9 +276,9 @@ public abstract class CharyparNagelScoringFunctionTest extends ScoringFunctionTe
 	 */
 	public void testWaitingTime() {
 		double waiting = -10.0;
-		this.config.charyparNagelScoring().setWaiting_utils_hr(waiting);
+		this.config.planCalcScore().setWaiting_utils_hr(waiting);
 
-		ActivityParams wParams = this.config.charyparNagelScoring().getActivityParams("w");
+		ActivityParams wParams = this.config.planCalcScore().getActivityParams("w");
 		wParams.setOpeningTime( 8*3600.0); // the agent arrives 30min early
 		wParams.setClosingTime(15*3600.0); // the agent stays 1h too long
 
@@ -291,9 +291,9 @@ public abstract class CharyparNagelScoringFunctionTest extends ScoringFunctionTe
 	 */
 	public void testEarlyDeparture() {
 		double disutility = -10.0;
-		this.config.charyparNagelScoring().setEarlyDeparture_utils_hr(disutility);
+		this.config.planCalcScore().setEarlyDeparture_utils_hr(disutility);
 
-		ActivityParams wParams = this.config.charyparNagelScoring().getActivityParams("w");
+		ActivityParams wParams = this.config.planCalcScore().getActivityParams("w");
 		wParams.setEarliestEndTime(16.75 * 3600.0); // require the agent to work until 16:45
 
 		// the agent left 45mins too early
@@ -305,9 +305,9 @@ public abstract class CharyparNagelScoringFunctionTest extends ScoringFunctionTe
 	 */
 	public void testMinimumDuration() {
 		double disutility = -10.0;
-		this.config.charyparNagelScoring().setEarlyDeparture_utils_hr(disutility);
+		this.config.planCalcScore().setEarlyDeparture_utils_hr(disutility);
 
-		ActivityParams wParams = this.config.charyparNagelScoring().getActivityParams("w");
+		ActivityParams wParams = this.config.planCalcScore().getActivityParams("w");
 		wParams.setMinimalDuration(10 * 3600.0); // require the agent to be 10 hours at work
 
 		// the agent left 1.5h too early
@@ -319,9 +319,9 @@ public abstract class CharyparNagelScoringFunctionTest extends ScoringFunctionTe
 	 */
 	public void testLateArrival() {
 		double disutility = -10.0;
-		this.config.charyparNagelScoring().setLateArrival_utils_hr(disutility);
+		this.config.planCalcScore().setLateArrival_utils_hr(disutility);
 
-		ActivityParams wParams = this.config.charyparNagelScoring().getActivityParams("w");
+		ActivityParams wParams = this.config.planCalcScore().getActivityParams("w");
 		wParams.setLatestStartTime(7 * 3600.0); // agent should start at 7 o'clock
 
 		// the agent arrived 30mins late
@@ -334,8 +334,8 @@ public abstract class CharyparNagelScoringFunctionTest extends ScoringFunctionTe
 	 */
 	public void testStuckPenalty() {
 		// test 1 where late arrival has the biggest impact
-		this.config.charyparNagelScoring().setLateArrival_utils_hr(-18.0);
-		this.config.charyparNagelScoring().setTraveling_utils_hr(-6.0);
+		this.config.planCalcScore().setLateArrival_utils_hr(-18.0);
+		this.config.planCalcScore().setTraveling_utils_hr(-6.0);
 
 		ScoringFunction testee = getScoringFunctionInstance(this.plan);
 		testee.endActivity(07*3600);
@@ -351,8 +351,8 @@ public abstract class CharyparNagelScoringFunctionTest extends ScoringFunctionTe
 		assertEquals(24 * -18.0 - 6.0 * 0.50, testee.getScore(), EPSILON); // stuck penalty + 30min traveling
 
 		// test 2 where traveling has the biggest impact
-		this.config.charyparNagelScoring().setLateArrival_utils_hr(-3.0);
-		this.config.charyparNagelScoring().setTraveling_utils_hr(-6.0);
+		this.config.planCalcScore().setLateArrival_utils_hr(-3.0);
+		this.config.planCalcScore().setTraveling_utils_hr(-6.0);
 
 		testee = getScoringFunctionInstance(this.plan);
 		testee.endActivity(07*3600);
@@ -371,11 +371,11 @@ public abstract class CharyparNagelScoringFunctionTest extends ScoringFunctionTe
 	public void testMarginalUtilityOfDistance() {
 
 //		this.config.charyparNagelScoring().setMarginalUtlOfDistanceCar(-0.00001);
-		this.config.charyparNagelScoring().setMonetaryDistanceCostRateCar(-0.00001) ;
-		this.config.charyparNagelScoring().setMarginalUtilityOfMoney(1.);
+		this.config.planCalcScore().setMonetaryDistanceCostRateCar(-0.00001) ;
+		this.config.planCalcScore().setMarginalUtilityOfMoney(1.);
 		
 //		this.config.charyparNagelScoring().setMarginalUtlOfDistancePt(-0.00001);
-		this.config.charyparNagelScoring().setMonetaryDistanceCostRatePt(-0.00001) ;
+		this.config.planCalcScore().setMonetaryDistanceCostRatePt(-0.00001) ;
 		
 		assertEquals(-0.45, calcScore(), EPSILON);
 	}
@@ -389,10 +389,10 @@ public abstract class CharyparNagelScoringFunctionTest extends ScoringFunctionTe
 
 		PlanCalcScoreConfigGroup.ActivityParams params = new PlanCalcScoreConfigGroup.ActivityParams("h2");
 		params.setTypicalDuration(8*3600);
-		this.config.charyparNagelScoring().addActivityParams(params);
+		this.config.planCalcScore().addActivityParams(params);
 
 		double perf = +6.0;
-		this.config.charyparNagelScoring().setPerforming_utils_hr(perf);
+		this.config.planCalcScore().setPerforming_utils_hr(perf);
 		double zeroUtilDurW = getZeroUtilDuration_h(8.0, 1.0);
 		double zeroUtilDurH = getZeroUtilDuration_h(16.0, 1.0);
 		double zeroUtilDurH2 = getZeroUtilDuration_h(8.0, 1.0);

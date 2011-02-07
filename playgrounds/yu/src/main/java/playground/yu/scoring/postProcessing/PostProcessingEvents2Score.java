@@ -62,7 +62,7 @@ public class PostProcessingEvents2Score {
 			EventsManager events = new EventsManagerImpl();
 
 			CharyparNagelScoringFunctionFactoryWithDetailedLegScoreRecord scoringFactory = new CharyparNagelScoringFunctionFactoryWithDetailedLegScoreRecord(
-					scenario.getConfig().charyparNagelScoring());
+					scenario.getConfig().planCalcScore());
 			EventsToScore events2score = new EventsToScore(pop, scoringFactory);
 			events.addHandler(events2score);
 			new MatsimEventsReader(events).readFile(eventsFilename);

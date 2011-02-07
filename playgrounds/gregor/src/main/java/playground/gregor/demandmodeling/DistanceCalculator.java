@@ -163,7 +163,7 @@ public class DistanceCalculator {
 		new MatsimNetworkReader(scenario).readFile(netfile);
 		log.info("done.");
 
-		new DistanceCalculator(network,infile,outfile, scenario.getConfig().charyparNagelScoring()).run();
+		new DistanceCalculator(network,infile,outfile, scenario.getConfig().planCalcScore()).run();
 
 	}
 

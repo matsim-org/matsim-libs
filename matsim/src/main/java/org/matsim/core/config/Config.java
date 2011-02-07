@@ -379,7 +379,7 @@ public class Config {
 		return this.counts;
 	}
 
-	public final PlanCalcScoreConfigGroup charyparNagelScoring() {
+	public final PlanCalcScoreConfigGroup planCalcScore() {
 		return this.charyparNagelScoring;
 	}
 

@@ -52,7 +52,7 @@ public class PlansScoring4PC_mnl extends PlansScoring4PC implements
 		planScorer = new Events2Score4TravPerf_mnl(createMultinomialLogit(config), ctl
 				.getScoringFunctionFactory(), ctl.getPopulation(), config
 				.strategy().getMaxAgentPlanMemorySize(), config
-				.charyparNagelScoring());
+				.planCalcScore());
 
 		log.debug(
 				"DummyPlansScoring4PC_mnl loaded ScoringFunctionFactory");
@@ -64,7 +64,7 @@ public class PlansScoring4PC_mnl extends PlansScoring4PC implements
 		attributeCount = Integer.parseInt(config.findParam("bse",
 				"attributeCount"));
 		PlanCalcScoreConfigGroup scoringCfg = config
-				.charyparNagelScoring();
+				.planCalcScore();
 		double traveling = scoringCfg.getTraveling_utils_hr(), //
 		travelingPt = scoringCfg.getTravelingPt_utils_hr(), //
 		performing = scoringCfg.getPerforming_utils_hr(), //

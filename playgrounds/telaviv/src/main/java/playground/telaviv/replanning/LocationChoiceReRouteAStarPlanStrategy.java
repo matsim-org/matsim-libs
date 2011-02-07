@@ -57,7 +57,7 @@ public class LocationChoiceReRouteAStarPlanStrategy implements PlanStrategy {
 		
 		planStrategyDelegate = new PlanStrategyImpl(new RandomPlanSelector());
 		planStrategyDelegate.addStrategyModule(new LocationChoicePlanModule(scenario));
-		planStrategyDelegate.addStrategyModule(new ReRouteLandmarks(config, network, travelCostCalc, travelTimeCalc, new FreespeedTravelTimeCost(config.charyparNagelScoring())));
+		planStrategyDelegate.addStrategyModule(new ReRouteLandmarks(config, network, travelCostCalc, travelTimeCalc, new FreespeedTravelTimeCost(config.planCalcScore())));
 	}
 	
 	@Override

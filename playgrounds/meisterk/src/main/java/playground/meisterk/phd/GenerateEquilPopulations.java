@@ -95,8 +95,8 @@ public class GenerateEquilPopulations {
 
 		EventsManagerImpl emptyEvents = new EventsManagerImpl();
 		TravelTimeCalculator tTravelEstimator = new TravelTimeCalculator(scenario.getNetwork(), config.travelTimeCalculator());
-		ScoringFunctionFactory scoringFunctionFactory = new CharyparNagelScoringFunctionFactory(config.charyparNagelScoring());
-		PersonalizableTravelCost travelCostEstimator = new TravelTimeDistanceCostCalculator(tTravelEstimator, config.charyparNagelScoring());
+		ScoringFunctionFactory scoringFunctionFactory = new CharyparNagelScoringFunctionFactory(config.planCalcScore());
+		PersonalizableTravelCost travelCostEstimator = new TravelTimeDistanceCostCalculator(tTravelEstimator, config.planCalcScore());
 
 		Controler dummyControler = new Controler(scenario);
 		dummyControler.setLeastCostPathCalculatorFactory(new DijkstraFactory());
@@ -163,7 +163,7 @@ public class GenerateEquilPopulations {
 		TravelCostCalculatorFactory travelCostCalculatorFactory = new TravelCostCalculatorFactoryImpl();
 		PersonalizableTravelCost travelCostCalculator = travelCostCalculatorFactory.createTravelCostCalculator(
 				travelTimeCalculator,
-				scenario.getConfig().charyparNagelScoring());
+				scenario.getConfig().planCalcScore());
 
 		ReRouteDijkstra router = new ReRouteDijkstra(
 				scenario.getConfig(),

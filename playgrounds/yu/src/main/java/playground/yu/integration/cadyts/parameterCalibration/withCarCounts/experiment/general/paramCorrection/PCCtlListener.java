@@ -144,7 +144,7 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 	private void setInitialParametersInCalibrator(Config config) {
 		ScoringConfigGetValue.setConfig(config);
 		PlanCalcScoreConfigGroup scoringCfg = config
-				.charyparNagelScoring();
+				.planCalcScore();
 
 		Vector initialParams = new Vector(paramDim);
 		for (int i = 0; i < initialParams.size(); i++) {
@@ -538,7 +538,7 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 			Vector params = ((ChoiceParameterCalibrator<Link>) calibrator)
 					.getParameters();
 			PlanCalcScoreConfigGroup scoringCfg = config
-					.charyparNagelScoring();
+					.planCalcScore();
 
 			// VERY IMPORTANT #########################################
 

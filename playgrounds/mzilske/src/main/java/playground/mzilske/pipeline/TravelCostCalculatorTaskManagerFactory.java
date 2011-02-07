@@ -10,7 +10,7 @@ public class TravelCostCalculatorTaskManagerFactory extends TaskManagerFactory {
 	public TaskManager createTaskManagerImpl(TaskConfiguration taskConfiguration) {
 		Config config = taskConfiguration.getConfig();
 		TravelCostCalculatorFactory factory = new TravelCostCalculatorFactoryImpl();
-		TravelCostCalculatorTask task = new TravelCostCalculatorTask(factory, config.charyparNagelScoring());
+		TravelCostCalculatorTask task = new TravelCostCalculatorTask(factory, config.planCalcScore());
 		TravelCostCalculatorTaskManager travelCostCalculatorTaskManager = new TravelCostCalculatorTaskManager(task);
 		return travelCostCalculatorTaskManager;
 	}

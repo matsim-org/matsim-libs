@@ -63,7 +63,7 @@ public class PlansCalcAreaTollRouteTest extends MatsimTestCase {
 
 		Fixture.createPopulation2(scenario);
 		Population population = scenario.getPopulation();
-		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(config.charyparNagelScoring());
+		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(config.planCalcScore());
 
 		AStarLandmarksFactory factory = new AStarLandmarksFactory(network, timeCostCalc);
 
@@ -117,7 +117,7 @@ public class PlansCalcAreaTollRouteTest extends MatsimTestCase {
 
 		Fixture.createPopulation2(scenario);
 		Population population = scenario.getPopulation();
-		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(config.charyparNagelScoring());
+		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(config.planCalcScore());
 
 		AStarLandmarksFactory factory = new AStarLandmarksFactory(network, timeCostCalc);
 
@@ -149,7 +149,7 @@ public class PlansCalcAreaTollRouteTest extends MatsimTestCase {
 
 		Fixture.createPopulation2(scenario);
 		Population population = scenario.getPopulation();
-		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(config.charyparNagelScoring());
+		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(config.planCalcScore());
 
 		AStarLandmarksFactory factory = new AStarLandmarksFactory(network, timeCostCalc);
 
@@ -177,7 +177,7 @@ public class PlansCalcAreaTollRouteTest extends MatsimTestCase {
 
 		Fixture.createPopulation2(scenario);
 		Population population = scenario.getPopulation();
-		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(config.charyparNagelScoring());
+		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(config.planCalcScore());
 
 		AStarLandmarksFactory factory = new AStarLandmarksFactory(network, timeCostCalc);
 

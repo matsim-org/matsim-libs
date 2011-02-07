@@ -65,8 +65,8 @@ public class KtiTravelTimeDistanceCostCalculatorTest extends MatsimTestCase {
 		ktiConfigGroup.setDistanceCostCar(5.0);
 
 //		config.charyparNagelScoring().setMarginalUtlOfDistanceCar(-0.5);
-		config.charyparNagelScoring().setMonetaryDistanceCostRateCar(-0.5) ;
-		config.charyparNagelScoring().setMarginalUtilityOfMoney(1.) ;
+		config.planCalcScore().setMonetaryDistanceCostRateCar(-0.5) ;
+		config.planCalcScore().setMarginalUtilityOfMoney(1.) ;
 
 		TravelTimeCalculatorFactory travelTimeCalculatorFactory = new TravelTimeCalculatorFactoryImpl();
 		TravelTimeCalculator travelTimeCalculator = travelTimeCalculatorFactory.createTravelTimeCalculator(
@@ -80,7 +80,7 @@ public class KtiTravelTimeDistanceCostCalculatorTest extends MatsimTestCase {
 		this.testee =
 			(KtiTravelTimeDistanceCostCalculator) costCalculatorFactory.createTravelCostCalculator(
 					travelTimeCalculator,
-					config.charyparNagelScoring());
+					config.planCalcScore());
 
 
 	}

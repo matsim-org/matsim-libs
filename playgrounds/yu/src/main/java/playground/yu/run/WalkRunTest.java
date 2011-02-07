@@ -34,7 +34,7 @@ public class WalkRunTest {
 			final Controler controler = new Controler(config);
 			controler
 					.setScoringFunctionFactory(new CharyparNagelScoringFunctionFactoryWithWalk(
-							config.charyparNagelScoring(), config
+							config.planCalcScore(), config
 									.vspExperimental().getOffsetWalk()));
 			// controler.addControlerListener(new MZComparisonListener());
 			controler.setWriteEventsInterval(100);

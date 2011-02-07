@@ -43,7 +43,7 @@ public class LCControler extends Controler {
     @Override
     protected void setUp() {
       super.setUp();
-      this.scoringFunctionFactory = new LocationChoiceScoringFunctionFactory(this.config.charyparNagelScoring(), this.facilityPenalties, this.getFacilities());
+      this.scoringFunctionFactory = new LocationChoiceScoringFunctionFactory(this.config.planCalcScore(), this.facilityPenalties, this.getFacilities());
     }
  
     public static void main (final String[] args) { 

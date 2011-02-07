@@ -55,7 +55,8 @@ public class AdaptedLauncher {
 		
 		// load config values
 		Config cfg = this.scenario.getConfig();
-		myTransitRouterConfig = new MyTransitRouterConfig(); 
+		myTransitRouterConfig = new MyTransitRouterConfig(this.scenario.getConfig().planCalcScore(),
+				this.scenario.getConfig().plansCalcRoute() ); 
 		myTransitRouterConfig.searchRadius = Double.parseDouble(cfg.getParam("ptRouter", "searchRadius")); 
 		myTransitRouterConfig.extensionRadius = Double.parseDouble(cfg.getParam("ptRouter", "extensionRadius")); 
 		myTransitRouterConfig.beelineWalkConnectionDistance = Double.parseDouble(cfg.getParam("ptRouter", "beelineWalkConnectionDistance")); 
@@ -75,7 +76,7 @@ public class AdaptedLauncher {
 		this.betaTransfer= 	Math.round(this.betaTransfer*100)/100.0;
 
 		//set margin utility values
-		myTransitRouterConfig.setMarginalUtilityOfTravelTimeWalk_utl_s(-this.betaWalk     / 3600.0);
+		myTransitRouterConfig.setEffectiveMarginalUtilityOfTravelTimeWalk_utl_s(-this.betaWalk     / 3600.0);
 		myTransitRouterConfig.setMarginalUtilityOfTravelDistancePt_utl_m(-this.betaDistance / 1000.0);
 		myTransitRouterConfig.setUtilityOfLineSwitch_utl(this.betaTransfer * -myTransitRouterConfig.getEffectiveMarginalUtilityOfTravelTimePt_utl_s());
 
@@ -90,7 +91,7 @@ public class AdaptedLauncher {
 		
 		//route
 		DijkstraFactory dijkstraFactory = new DijkstraFactory();
-		FreespeedTravelTimeCost freespeedTravelTimeCost = new FreespeedTravelTimeCost(scenario.getConfig().charyparNagelScoring());
+		FreespeedTravelTimeCost freespeedTravelTimeCost = new FreespeedTravelTimeCost(scenario.getConfig().planCalcScore());
 		TransitConfigGroup transitConfig = new TransitConfigGroup();
 
 		// yy The following comes from PlansCalcRoute; in consequence, one can configure the car router attributes.  In addition, one can configure _some_

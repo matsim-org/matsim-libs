@@ -87,7 +87,7 @@ public class RetailersSequentialLocationListener implements StartupListener, Ite
 
 		this.controler = event.getControler();
 		this.controlerFacilities = controler.getFacilities().getFacilities();
-		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(controler.getConfig().charyparNagelScoring());
+		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(controler.getConfig().planCalcScore());
 		pcrl = new PlansCalcRoute(controler.getConfig().plansCalcRoute(), controler.getNetwork(),timeCostCalc, timeCostCalc, new AStarLandmarksFactory(controler.getNetwork(), timeCostCalc));
 		
 		// Make a table with all shop activities listed  

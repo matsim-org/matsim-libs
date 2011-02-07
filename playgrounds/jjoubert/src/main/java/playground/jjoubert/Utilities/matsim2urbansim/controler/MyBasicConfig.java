@@ -62,18 +62,18 @@ public class MyBasicConfig {
 		config.simulation().setStorageCapFactor(1.0);
 
 		// PlanCalcScore
-		config.charyparNagelScoring().setLearningRate(1.0);
-		config.charyparNagelScoring().setBrainExpBeta(2.0);
-		config.charyparNagelScoring().setLateArrival_utils_hr(-18.0);
-		config.charyparNagelScoring().setEarlyDeparture_utils_hr(-18.0);
-		config.charyparNagelScoring().setPerforming_utils_hr(6.0);
-		config.charyparNagelScoring().setTraveling_utils_hr(-6.0);
+		config.planCalcScore().setLearningRate(1.0);
+		config.planCalcScore().setBrainExpBeta(2.0);
+		config.planCalcScore().setLateArrival_utils_hr(-18.0);
+		config.planCalcScore().setEarlyDeparture_utils_hr(-18.0);
+		config.planCalcScore().setPerforming_utils_hr(6.0);
+		config.planCalcScore().setTraveling_utils_hr(-6.0);
 		//---------------------------------------------------------------------
 		ActivityParams home = new ActivityParams("home");
 		home.setPriority(1.0);
 		home.setMinimalDuration(28800); // 8 hours
 		home.setTypicalDuration(43200); // 12 hours
-		config.charyparNagelScoring().addActivityParams(home);
+		config.planCalcScore().addActivityParams(home);
 		//---------------------------------------------------------------------
 		ActivityParams work = new ActivityParams("work");
 		work.setPriority(1.0);
@@ -82,7 +82,7 @@ public class MyBasicConfig {
 		work.setOpeningTime(25200);		// 07:00:00
 		work.setLatestStartTime(32400); // 09:00:00
 		work.setClosingTime(64800);		// 18:00:00
-		config.charyparNagelScoring().addActivityParams(work);
+		config.planCalcScore().addActivityParams(work);
 		//---------------------------------------------------------------------
 
 		// Strategy.
