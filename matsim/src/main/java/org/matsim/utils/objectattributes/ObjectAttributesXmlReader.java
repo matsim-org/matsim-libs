@@ -17,27 +17,28 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mrieser.objectattributes;
+package org.matsim.utils.objectattributes;
 
-import static playground.mrieser.objectattributes.ObjectAttributesXmlWriter.ATTR_ATTRIBUTECLASS;
-import static playground.mrieser.objectattributes.ObjectAttributesXmlWriter.ATTR_ATTRIBUTENAME;
-import static playground.mrieser.objectattributes.ObjectAttributesXmlWriter.ATTR_OBJECTID;
-import static playground.mrieser.objectattributes.ObjectAttributesXmlWriter.TAG_ATTRIBUTE;
-import static playground.mrieser.objectattributes.ObjectAttributesXmlWriter.TAG_OBJECT;
+import static org.matsim.utils.objectattributes.ObjectAttributesXmlWriter.ATTR_ATTRIBUTECLASS;
+import static org.matsim.utils.objectattributes.ObjectAttributesXmlWriter.ATTR_ATTRIBUTENAME;
+import static org.matsim.utils.objectattributes.ObjectAttributesXmlWriter.ATTR_OBJECTID;
+import static org.matsim.utils.objectattributes.ObjectAttributesXmlWriter.TAG_ATTRIBUTE;
+import static org.matsim.utils.objectattributes.ObjectAttributesXmlWriter.TAG_OBJECT;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.io.MatsimXmlParser;
+import org.matsim.utils.objectattributes.attributeconverters.BooleanConverter;
+import org.matsim.utils.objectattributes.attributeconverters.DoubleConverter;
+import org.matsim.utils.objectattributes.attributeconverters.IntegerConverter;
+import org.matsim.utils.objectattributes.attributeconverters.StringConverter;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
-
-import playground.mrieser.objectattributes.attributeconverters.BooleanConverter;
-import playground.mrieser.objectattributes.attributeconverters.DoubleConverter;
-import playground.mrieser.objectattributes.attributeconverters.IntegerConverter;
-import playground.mrieser.objectattributes.attributeconverters.StringConverter;
 
 /**
  * Reads object attributes from a file. The reader supports attributes of type {@link String},
@@ -61,6 +62,8 @@ public class ObjectAttributesXmlReader extends MatsimXmlParser {
 	private static final IntegerConverter INTEGER_Converter = new IntegerConverter();
 	private static final DoubleConverter DOUBLE_Converter = new DoubleConverter();
 	private static final BooleanConverter BOOLEAN_Converter = new BooleanConverter();
+
+	private final Set<String> missingConverters = new HashSet<String>();
 
 	public ObjectAttributesXmlReader(final ObjectAttributes attributes) {
 		this.attributes = attributes;
@@ -86,8 +89,15 @@ public class ObjectAttributesXmlReader extends MatsimXmlParser {
 	public void endTag(String name, String content, Stack<String> context) {
 		if (TAG_ATTRIBUTE.equals(name)) {
 			this.readCharacters = false;
-			Object o = this.converters.get(this.currentAttributeClass).convert(content);
-			this.attributes.putAttribute(this.currentObject, this.currentAttribute, o);
+			AttributeConverter<?> c = this.converters.get(this.currentAttributeClass);
+			if (c == null) {
+				if (missingConverters.add(this.currentAttributeClass)) {
+					log.warn("No AttributeConverter found for class " + this.currentAttributeClass + ". Not all attribute values can be read.");
+				}
+			} else {
+				Object o = this.converters.get(this.currentAttributeClass).convert(content);
+				this.attributes.putAttribute(this.currentObject, this.currentAttribute, o);
+			}
 		} else if (TAG_OBJECT.equals(name)) {
 			if (this.count % 100000 == 0) {
 				log.info("reading object #" + this.count);

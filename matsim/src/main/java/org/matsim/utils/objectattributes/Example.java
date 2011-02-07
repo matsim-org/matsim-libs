@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mrieser.objectattributes;
+package org.matsim.utils.objectattributes;
 
 import java.util.ArrayList;
 import java.util.List;

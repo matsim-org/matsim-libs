@@ -17,21 +17,31 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mrieser.objectattributes.attributeconverters;
+package org.matsim.utils.objectattributes.attributeconverters;
 
-import playground.mrieser.objectattributes.AttributeConverter;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.matsim.utils.objectattributes.AttributeConverter;
+
 
 /**
  * @author mrieser
  */
-public class BooleanConverter implements AttributeConverter<Boolean> {
+public class StringConverter implements AttributeConverter<String> {
+	private final Map<String, String> stringCache = new HashMap<String,  String>(1000);
 	@Override
-	public Boolean convert(String value) {
-		return Boolean.valueOf(value);
+	public String convert(String value) {
+		String s = this.stringCache.get(value);
+		if (s == null) {
+			s = new String(value); // copy, in case 'value' was generated as substring from a larger string
+			this.stringCache.put(s, s);
+		}
+		return s;
 	}
 
 	@Override
-	public String convertToObject(Boolean b) {
-		return b.toString();
+	public String convertToObject(String o) {
+		return o;
 	}
 }

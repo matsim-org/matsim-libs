@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mrieser.objectattributes;
+package org.matsim.utils.objectattributes;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -31,11 +31,10 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.MatsimXmlWriter;
-
-import playground.mrieser.objectattributes.attributeconverters.BooleanConverter;
-import playground.mrieser.objectattributes.attributeconverters.DoubleConverter;
-import playground.mrieser.objectattributes.attributeconverters.IntegerConverter;
-import playground.mrieser.objectattributes.attributeconverters.StringConverter;
+import org.matsim.utils.objectattributes.attributeconverters.BooleanConverter;
+import org.matsim.utils.objectattributes.attributeconverters.DoubleConverter;
+import org.matsim.utils.objectattributes.attributeconverters.IntegerConverter;
+import org.matsim.utils.objectattributes.attributeconverters.StringConverter;
 
 /**
  * Writes object attributes to a file.
@@ -73,6 +72,7 @@ public class ObjectAttributesXmlWriter extends MatsimXmlWriter {
 	public void writeFile(final String filename) throws IOException {
 		openFile(filename);
 		writeXmlHead();
+		writeDoctype(TAG_OBJECT_ATTRIBUTES, "http://matsim.org/files/dtd/objectattributes_v1.dtd");
 		writeStartTag(TAG_OBJECT_ATTRIBUTES, null);
 		List<Tuple<String, String>> xmlAttributes = new LinkedList<Tuple<String, String>>();
 		for (Map.Entry<String, Map<String, Object>> entry : this.attributes.attributes.entrySet()) {
@@ -96,9 +96,8 @@ public class ObjectAttributesXmlWriter extends MatsimXmlWriter {
 					writeContent(objAttribute.getValue().toString(), false);
 					writeEndTag(TAG_ATTRIBUTE);
 				} else {
-					if (!missingConverters.contains(clazz)) {
-						missingConverters.add(clazz);
-						log.info("No AttributeConverter found for class " + clazz.getCanonicalName() + ". Not all attribute values will be written.");
+					if (missingConverters.add(clazz)) {
+						log.warn("No AttributeConverter found for class " + clazz.getCanonicalName() + ". Not all attribute values will be written.");
 					}
 				}
 			}

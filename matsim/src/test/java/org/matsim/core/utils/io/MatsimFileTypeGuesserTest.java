@@ -141,7 +141,22 @@ public class MatsimFileTypeGuesserTest {
 		assertEquals("http://www.matsim.org/files/dtd/vehicleDefinitions_v1.0.xsd", g.getSystemId());
 	}
 
-	// TODO needs more test for Households, Transims-Veh, OTFVis, ...
+	@Test
+	public void testObjectAttributesV1XML_withDtd() throws IOException {
+		MatsimFileTypeGuesser g = new MatsimFileTypeGuesser("test/input/org/matsim/utils/objectattributes/objectattributes_withDtd_v1.xml");
+		assertEquals(MatsimFileTypeGuesser.FileType.ObjectAttributes, g.getGuessedFileType());
+		assertNull(g.getPublicId());
+		assertNotNull(g.getSystemId());
+		assertEquals("http://matsim.org/files/dtd/objectattributes_v1.dtd", g.getSystemId());
+	}
+
+	@Test
+	public void testObjectAttributesV1XML_withoutDtd() throws IOException {
+		MatsimFileTypeGuesser g = new MatsimFileTypeGuesser("test/input/org/matsim/utils/objectattributes/objectattributes_withoutDtd_v1.xml");
+		assertEquals(MatsimFileTypeGuesser.FileType.ObjectAttributes, g.getGuessedFileType());
+		assertNull(g.getPublicId());
+		assertNull(g.getSystemId());
+	}
 
 	@Test
 	public void testNotExistant() {

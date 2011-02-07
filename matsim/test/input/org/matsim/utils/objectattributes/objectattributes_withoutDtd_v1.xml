@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<objectAttributes>
+	<object id="one">
+		<attribute name="a" class="java.lang.String">foobar</attribute>
+	</object>
+	<object id="two">
+		<attribute name="b" class="java.lang.Boolean">true</attribute>
+		<attribute name="ccc" class="java.lang.Integer">42</attribute>
+	</object>
+</objectAttributes>

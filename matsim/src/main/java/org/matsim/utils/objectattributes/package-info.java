@@ -3,4 +3,4 @@
  *
  * An example usage can be seen in {@link Example}.
  */
-package playground.mrieser.objectattributes;
+package org.matsim.utils.objectattributes;

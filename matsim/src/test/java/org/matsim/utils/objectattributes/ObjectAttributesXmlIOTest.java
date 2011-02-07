@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mrieser.objectattributes;
+package org.matsim.utils.objectattributes;
 
 import java.io.IOException;
 
@@ -27,6 +27,9 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.utils.objectattributes.ObjectAttributes;
+import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
+import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 import org.xml.sax.SAXException;
 
 /**

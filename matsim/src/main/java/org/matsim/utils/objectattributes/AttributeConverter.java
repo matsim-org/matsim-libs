@@ -1,4 +1,4 @@
-package playground.mrieser.objectattributes;
+package org.matsim.utils.objectattributes;
 
 /**
  * Converts an attribute to a String (for being written out) or from a String

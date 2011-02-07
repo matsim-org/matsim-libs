@@ -47,7 +47,7 @@ public class MatsimFileTypeGuesser extends DefaultHandler {
 	 */
 	public enum FileType {Config, Network, Facilities, Population, World,
 		Counts, Events, Households, TransimsVehicle, OTFVis, SignalSystems, LaneDefinitions, SignalSystemConfigs,
-		TransitSchedule, Vehicles}
+		TransitSchedule, Vehicles, ObjectAttributes}
 
 	public static final String SYSTEMIDNOTFOUNDMESSAGE = "System Id of xml document couldn't be detected. " +
 	"Make sure that you try to read a xml document with a valid header. " +
@@ -87,6 +87,8 @@ public class MatsimFileTypeGuesser extends DefaultHandler {
 					this.fileType = FileType.Vehicles;
 				} else if (shortSystemId.startsWith("transitSchedule_")) {
 					this.fileType = FileType.TransitSchedule;
+				} else if (shortSystemId.startsWith("objectattributes_")) {
+					this.fileType = FileType.ObjectAttributes;
 				}
 			}
 
@@ -160,6 +162,8 @@ public class MatsimFileTypeGuesser extends DefaultHandler {
 					this.fileType = FileType.Counts;
 				} else if ("transitSchedule".equals(e.rootTag)) {
 					this.fileType = FileType.TransitSchedule;
+				} else if ("objectAttributes".equals(e.rootTag)) {
+					this.fileType = FileType.ObjectAttributes;
 				} else {
 					log.warn("got unexpected rootTag: " + e.rootTag);
 				}

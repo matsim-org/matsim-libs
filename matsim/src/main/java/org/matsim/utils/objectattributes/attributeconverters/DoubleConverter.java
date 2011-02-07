@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,23 +17,21 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mrieser.objectattributes;
+package org.matsim.utils.objectattributes.attributeconverters;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.matsim.utils.objectattributes.AttributeConverter;
 
 /**
  * @author mrieser
  */
-public class ObjectAttributesTest {
+public class DoubleConverter implements AttributeConverter<Double> {
+	@Override
+	public Double convert(String value) {
+		return Double.valueOf(value);
+	}
 
-	@Test
-	public void testPutGet() {
-		ObjectAttributes linkAttributes = new ObjectAttributes();
-		Assert.assertNull(linkAttributes.getAttribute("1", "osm:roadtype"));
-		Assert.assertNull(linkAttributes.putAttribute("1", "osm:roadtype", "trunk"));
-		Assert.assertEquals("trunk", linkAttributes.getAttribute("1", "osm:roadtype"));
-		Assert.assertEquals("trunk", linkAttributes.putAttribute("1", "osm:roadtype", "motorway"));
-		Assert.assertEquals("motorway", linkAttributes.getAttribute("1", "osm:roadtype"));
+	@Override
+	public String convertToObject(Double o) {
+		return o.toString();
 	}
 }

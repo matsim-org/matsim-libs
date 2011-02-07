@@ -17,21 +17,21 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mrieser.objectattributes.attributeconverters;
+package org.matsim.utils.objectattributes.attributeconverters;
 
-import playground.mrieser.objectattributes.AttributeConverter;
+import org.matsim.utils.objectattributes.AttributeConverter;
 
 /**
  * @author mrieser
  */
-public class DoubleConverter implements AttributeConverter<Double> {
+public class IntegerConverter implements AttributeConverter<Integer> {
 	@Override
-	public Double convert(String value) {
-		return Double.valueOf(value);
+	public Integer convert(String value) {
+		return Integer.valueOf(value);
 	}
 
-	@Override
-	public String convertToObject(Double o) {
+@Override
+	public String convertToObject(Integer o) {
 		return o.toString();
 	}
 }
