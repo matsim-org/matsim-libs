@@ -29,7 +29,8 @@ public class BkVis {
 //===========================================================================================================		
 //		Für den mvi-modus:
 //			String otffile = "../../detailedEval/teststrecke/sim/output/20090707/ITERS/it.0/0.otfvis.mvi";
-			String otffile = "../../detailedEval/testRuns/output/All/v0-default/run2/ITERS/it.100/100.otfvis.mvi";
+			String otffile = "../../detailedEval/testRuns/output/10pct/run2/it.100/100.otfvis.mvi";
+//			String otffile = "../../detailedEval/Net/network-86-85-87-84_peripherySimplified.xml";
 //			String otffile = "../../matsim/output/singleIteration/ITERS/it.0/0.otfvis.mvi";
 //			String otffile = BkPaths.RUNSSVN + "run749/it.2000/749.2000.Zurich.otfvis.mvi";
 //			String otffile = BkPaths.RUNSSVN + "run953/it.1000/953.1000.events.mvi";
