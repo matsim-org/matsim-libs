@@ -36,7 +36,6 @@ import javax.media.opengl.GL;
 import org.apache.log4j.Logger;
 import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.opengl.drawer.OTFGLAbstractDrawable;
-import org.matsim.vis.otfvis.opengl.drawer.OTFGLAbstractDrawableReceiver;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer.AgentDrawer;
 
 import com.sun.opengl.util.BufferUtil;
@@ -50,21 +49,21 @@ import com.sun.opengl.util.texture.Texture;
 final class AgentArrayDrawer extends OTFGLAbstractDrawable {
 
 	private int count = 0;
-	
+
 	private static int alpha =200;
 
 	private ByteBuffer colorsIN = null;
-	
+
 	private FloatBuffer vertexIN = null;
 
 	private List<FloatBuffer> posBuffers = new LinkedList<FloatBuffer>();
-	
+
 	private List<ByteBuffer> colBuffers= new LinkedList<ByteBuffer>();
 
 	private Map<Integer,Integer> id2coord = new HashMap<Integer,Integer>();
-	
+
 	private Texture texture;
-	
+
 	private static final Logger log = Logger.getLogger(AgentArrayDrawer.class);
 
 	AgentArrayDrawer() {
@@ -94,7 +93,7 @@ final class AgentArrayDrawer extends OTFGLAbstractDrawable {
 
 	private static int infocnt = 0 ;
 	private void drawArray(GL gl) {
-		
+
 		// testing if the point sprite is available.  Would be good to not do this in every time step ...
 		// ... move to some earlier place in the calling hierarchy.  kai, feb'11
 		if ( infocnt < 1 ) {
@@ -108,55 +107,22 @@ final class AgentArrayDrawer extends OTFGLAbstractDrawable {
 				}
 			}
 		}
-		
+
 		ByteBuffer colors =  null;
 		FloatBuffer vertex =  null;
 		for(int i = 0; i < this.getPosBuffers().size(); i++) {
 			colors = this.colBuffers.get(i);
 			vertex = this.getPosBuffers().get(i);
 			int remain = i == this.getPosBuffers().size()-1 ? this.count %OGLAgentPointLayer.BUFFERSIZE : OGLAgentPointLayer.BUFFERSIZE; 
-			//Math.min(vertex.limit() / 2, count - i*BUFFERSIZE);
 			colors.position(0);
 			vertex.position(0);
 			gl.glColorPointer (4, GL.GL_UNSIGNED_BYTE, 0, colors);
 			gl.glVertexPointer (2, GL.GL_FLOAT, 0, vertex);
-			
 			gl.glDrawArrays (GL.GL_POINTS, 0, remain);
 		}
 	}
 
-	// following method does not seem to be used.  kai, jan'11
-	
-//	private int getNearestAgent(Point2D.Double point) {
-//		FloatBuffer vertex =  null;
-//
-//		int idx = 0;
-//		int result = -1;
-//		double mindist = Double.MAX_VALUE;
-//		double dist = 0;
-//
-//		for(int i = 0; i < this.getPosBuffers().size(); i++) {
-//			vertex = this.getPosBuffers().get(i);
-//			vertex.position(0);
-//			while (vertex.hasRemaining() && (idx < this.count)) {
-//				float x = vertex.get();
-//				float y = vertex.get();
-//				// DS We do not need z value here but need to fetch it from buffer!
-//				/*float z = */vertex.get();
-//
-//				// Manhattan dist reicht uns hier
-//				dist = Math.abs(x-point.x) + Math.abs(y-point.y);
-//				if ( dist < mindist) {
-//					mindist = dist;
-//					result = idx;
-//				}
-//				idx++;
-//			}
-//		}
-//		return result;
-//	}
-
-	 void addAgent(char[] id, float startX, float startY, Color mycolor, boolean saveId){
+	void addAgent(char[] id, float startX, float startY, Color mycolor, boolean saveId){
 		if (this.count % OGLAgentPointLayer.BUFFERSIZE == 0) {
 			this.vertexIN = BufferUtil.newFloatBuffer(OGLAgentPointLayer.BUFFERSIZE*2);
 			this.colorsIN = BufferUtil.newByteBuffer(OGLAgentPointLayer.BUFFERSIZE*4);
@@ -184,38 +150,37 @@ final class AgentArrayDrawer extends OTFGLAbstractDrawable {
 	}
 
 	public void onDraw(GL gl) {
-//		GL gl = OTFGLAbstractDrawableReceiver.getGl();
 		gl.glEnable(GL.GL_POINT_SPRITE);
-		
+
 		setAgentSize(gl);
-		
+
 		gl.glEnableClientState (GL.GL_COLOR_ARRAY);
 		gl.glEnableClientState (GL.GL_VERTEX_ARRAY);
-		
+
 		this.setTexture();
-		
+
 		//texture = null;
 		// setting the texture to null means that agents are painted using (software-rendered?) squares.  I have made speed
 		// tests and found on my computer (mac powerbook, with "slow" graphics settings) no difference at all between "null"
 		// and a jpg.  But it looks weird w/o some reasonable icon.  kai, jan'11
-		
+
 		if (this.texture != null) {
 			this.texture.enable();
 			gl.glEnable(GL.GL_TEXTURE_2D);
 			gl.glTexEnvf(GL.GL_POINT_SPRITE, GL.GL_COORD_REPLACE, GL.GL_TRUE);
 			this.texture.bind();
 		}
-		
+
 		gl.glDepthMask(false);
-		
+
 		this.drawArray(gl);
-		
+
 		gl.glDisableClientState (GL.GL_COLOR_ARRAY);
 		gl.glDisableClientState (GL.GL_VERTEX_ARRAY);
 		if (this.texture != null ) {
 			this.texture.disable();
 		}
-		
+
 		gl.glDisable(GL.GL_POINT_SPRITE);
 	}
 
