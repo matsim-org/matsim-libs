@@ -131,7 +131,7 @@ public class DgSylviaPreprocessData {
 	private SignalControlData convertSignalControlData(final SignalControlData controlData){
 		SignalControlData cd = new SignalControlDataImpl();
 		for (SignalSystemControllerData  controllerData: controlData.getSignalSystemControllerDataBySystemId().values()){
-			if (this.signalSystemIds.contains(controllerData.getSignalSystemId())){
+			if ( this.signalSystemIds.contains(controllerData.getSignalSystemId())){
 				cd.addSignalSystemControllerData(controllerData);
 			}
 			else {
@@ -241,25 +241,30 @@ public class DgSylviaPreprocessData {
 						settings.setDropping(settings.getDropping() - shift);
 					}
 				}
-				else { //handle overlapping phases
+				else { //handle overlapping phases -> shift phase 
 					Collection<IntergreenConstraint> intergreenConstraints = this.calculateIntergreenConstraints(lastPhase, phase);
-					int phaseOn = sylviaPhase.getPhaseStartSecond();
-					int phaseOff = sylviaPhase.getPhaseEndSecond();
+					int phaseOn = sylviaPhase.getPhaseEndSecond();
+					int phaseOff = 0;
 					for (IntergreenConstraint ic : intergreenConstraints){
 						SignalGroupSettingsData sylviaSettings = sylviaPhase.getSignalGroupSettingsByGroupId().get(ic.onSettingsId);
 						SignalGroupSettingsData lastSylviaSettings = lastSylviaPhase.getSignalGroupSettingsByGroupId().get(ic.droppingSettingsId);
 						int greenTime = sylviaSettings.getDropping() - sylviaSettings.getOnset();
 						int on = lastSylviaSettings.getDropping() + ic.intergreen;
 						int off = on + greenTime;
+						log.error("settings " + sylviaSettings.getSignalGroupId() + " green time : " + greenTime + " intergreen constraint: " + ic.intergreen + " to group id " + ic.droppingSettingsId + " on " + on + " off " + off);
 						sylviaSettings.setOnset(on);
+						sylviaSettings.setDropping(off);
 						if (on < phaseOn)
 							phaseOn = on;
-						sylviaSettings.setDropping(off);
 						if (off > phaseOff)
 							phaseOff = off;
 					}
+					log.error("shiftet phase to " + phaseOn + " - " + phaseOff);
 					sylviaPhase.setPhaseStartSecond(phaseOn);
 					sylviaPhase.setPhaseEndSecond(phaseOff);
+					for (SignalGroupSettingsData settings : sylviaPhase.getSignalGroupSettingsByGroupId().values()){
+						settings.setDropping(sylviaPhase.getPhaseEndSecond());
+					}
 				}
 			}
 			lastPhaseOff = phase.getPhaseEndSecond();
