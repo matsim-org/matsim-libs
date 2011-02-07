@@ -26,7 +26,6 @@ import java.util.Map;
 
 import javax.media.opengl.GL;
 
-import org.apache.log4j.Logger;
 import org.matsim.lanes.otfvis.io.OTFLane;
 import org.matsim.lanes.otfvis.io.OTFLinkWLanes;
 import org.matsim.signalsystems.model.SignalGroupState;
@@ -38,7 +37,9 @@ import org.matsim.vis.otfvis.opengl.layer.OGLSimpleStaticNetLayer;
 
 public class OTFLaneSignalDrawer extends OTFGLAbstractDrawableReceiver {
 
-	private static final Logger log = Logger.getLogger(OTFLaneSignalDrawer.class);
+//	private static final Logger log = Logger.getLogger(OTFLaneSignalDrawer.class);
+	
+	private static final int glListName = 2342;
 	
 	private static final double zCoord = 1.0;
 	private static final double quadSizeLinkEnd = 6.0;
@@ -48,80 +49,108 @@ public class OTFLaneSignalDrawer extends OTFGLAbstractDrawableReceiver {
 
 	private Map<String, OTFLinkWLanes> lanesLinkData =  new HashMap<String, OTFLinkWLanes>();
 	
-//	private double linkWidth;
-
-
 	private Map<String, OTFSignalSystem> signalSystems = new HashMap<String, OTFSignalSystem>();
 
-	private GL gl;
-	
-	private enum Color {LINKSTART, LANECOLOR, GREEN, REDYELLOW, YELLOW, RED};
+	private enum Color {LANECOLOR, GREEN, REDYELLOW, YELLOW, RED};
 	
 	private double currentCellWidth = java.lang.Double.NEGATIVE_INFINITY;
 	
+	private int glNetList = -1;
+	
 	@Override
 	public void onDraw(GL gl) {
-		this.gl = gl;
-		if (this.currentCellWidth != OGLSimpleStaticNetLayer.getBasicLineWidth_m()){
-			this.currentCellWidth = OGLSimpleStaticNetLayer.getBasicLineWidth_m();
+		if (this.currentCellWidth != OGLSimpleStaticNetLayer.getBasicLaneWidth_m()){
+			this.currentCellWidth = OGLSimpleStaticNetLayer.getBasicLaneWidth_m();
 			this.recalculatePositions();
+			gl.glDeleteLists(this.glNetList, 1);
+			this.glNetList = -1;
 		}
+		if (this.glNetList < 0){
+			this.updateNetList(gl);
+		}
+		gl.glCallList(this.glNetList);
+		
 		for (OTFLinkWLanes laneLinkData : this.lanesLinkData.values()){
-			this.drawLink(laneLinkData);
+			this.drawLinkEndsAndSignals(gl, laneLinkData);
 		}
+	}
+	
+	private void updateNetList(GL gl){
+		this.glNetList = gl.glGenLists(glListName);
+		gl.glNewList(this.glNetList, GL.GL_COMPILE);
+		for (OTFLinkWLanes laneLinkData : this.lanesLinkData.values()){
+			this.drawLink(gl, laneLinkData);
+		}
+		gl.glEndList();
 	}
 	
 
-	private void drawLink(OTFLinkWLanes link){
-		//draw a rect around linkStart
-		this.setColor(Color.LINKSTART);
-		this.drawQuad(link.getLinkStartCenterPoint(), quadSizeLinkStart);
-		
+	private void drawLinkEndsAndSignals(GL gl, OTFLinkWLanes link) {
 		if (link.getLaneData() != null) {
 			for (OTFLane ld : link.getLaneData().values()){
-				this.setColor(Color.LANECOLOR);
-				this.drawLane(ld, link);
+				if (ld.getSignals() != null){
+					this.drawSignals(gl, ld.getSignals(), ld.getEndPoint(), link.getLinkOrthogonalVector(), ld.getToLinks());
+				}
+				else {
+					this.setColor(gl, Color.LANECOLOR);
+					this.drawLaneEnd(gl, ld);
+					this.drawToLinks(gl, ld.getEndPoint(), ld.getToLinks());
+				}
 			}
 		}
-		else {
-			this.setColor(Color.LINKSTART);
-			this.drawVertex(link.getLinkStartCenterPoint(), link.getLinkEndCenterPoint(), (float) (link.getNumberOfLanes() * 2));
+		else { //link end without lanes
 			if (link.getSignals() != null){
-				this.drawSignals(link.getSignals(), link.getLinkEndCenterPoint(), link.getLinkOrthogonalVector(), link.getToLinks());
+				this.drawSignals(gl, link.getSignals(), link.getLinkEndCenterPoint(), link.getLinkOrthogonalVector(), link.getToLinks());
 			}
 			else {
-				this.drawQuad(link.getLinkEndCenterPoint(), quadSizeLinkEnd);
+				this.setColor(gl, Color.LANECOLOR);
+				this.drawQuad(gl, link.getLinkEndCenterPoint(), quadSizeLinkEnd);
 			}
 		}
 	}
+
+
+	private void drawLink(GL gl, OTFLinkWLanes link){
+		//draw a rect around linkStart
+		this.setColor(gl, Color.LANECOLOR);
+		this.drawQuad(gl, link.getLinkStartCenterPoint(), quadSizeLinkStart);
+		if (link.getLaneData() != null) { //draw the lanes
+			for (OTFLane ld : link.getLaneData().values()){
+				this.drawLane(gl, ld, link);
+			}
+		}
+		else { //draw the link
+			this.drawVertex(gl, link.getLinkStartCenterPoint(), link.getLinkEndCenterPoint(), (float) (link.getNumberOfLanes() * 2));
+		}
+	}
 	
-	private void drawSignals(List<OTFSignal> signals, Point2D.Double point, Point2D.Double ortho, List<OTFLinkWLanes> toLinks){
+	private void drawSignals(GL gl, List<OTFSignal> signals, Point2D.Double point, Point2D.Double ortho, List<OTFLinkWLanes> toLinks){
 		double dist = signals.size() - 1;
 		Point2D.Double startPoint = this.calcPoint(point, ortho, (quadSizeLinkEnd * -dist));
 		int i = 0;
 		for (OTFSignal signal : signals){
 			i++;
 			if (SignalGroupState.GREEN.equals(signal.getSignalGroupState())) {
-				setColor(Color.GREEN);
+				setColor(gl, Color.GREEN);
 			}
 			else if (SignalGroupState.RED.equals(signal.getSignalGroupState())) {
-				this.setColor(Color.RED);
+				this.setColor(gl, Color.RED);
 			}
 			else if (SignalGroupState.REDYELLOW.equals(signal.getSignalGroupState())) {
-				this.setColor(Color.REDYELLOW);
+				this.setColor(gl, Color.REDYELLOW);
 			}
 			else if (SignalGroupState.YELLOW.equals(signal.getSignalGroupState())) {
-				this.setColor(Color.YELLOW);
+				this.setColor(gl, Color.YELLOW);
 			}
 			else if (SignalGroupState.OFF.equals(signal.getSignalGroupState())){
-				this.setColor(Color.LANECOLOR);
+				this.setColor(gl, Color.LANECOLOR);
 			}
-			this.drawQuad(startPoint, quadSizeLinkEnd);
+			this.drawQuad(gl, startPoint, quadSizeLinkEnd);
 			if (!(signal.getTurningMoveRestrictions() == null || signal.getTurningMoveRestrictions().isEmpty())){
-				this.drawToLinks(startPoint, signal.getTurningMoveRestrictions());
+				this.drawToLinks(gl, startPoint, signal.getTurningMoveRestrictions());
 			}
 			else{
-				this.drawToLinks(startPoint, toLinks);
+				this.drawToLinks(gl, startPoint, toLinks);
 			}
 			startPoint = this.calcPoint(point, ortho, (quadSizeLinkEnd * i));
 		}
@@ -159,41 +188,37 @@ public class OTFLaneSignalDrawer extends OTFGLAbstractDrawableReceiver {
 		}
 	}
 
-
-	private void drawLane(OTFLane ld, OTFLinkWLanes laneLinkData){
-		//draw lane start
-		this.setColor(Color.LANECOLOR);
-		this.drawQuad(ld.getStartPoint(), quadSizeLaneStart);
-		//draw line between lane start point and lane end point
-		this.drawVertex(ld.getStartPoint(), ld.getEndPoint(), ((float)ld.getNumberOfLanes()* 2));
-		
-		if (ld.getSignals() != null){
-			this.drawSignals(ld.getSignals(), ld.getEndPoint(), laneLinkData.getLinkOrthogonalVector(), ld.getToLinks());
-		}
-		else {
-			//draw lane end
-			this.setColor(Color.LANECOLOR);
-			this.drawQuad(ld.getEndPoint(), quadSizeLaneEnd);
-			if (!(ld.getToLanes() == null || ld.getToLanes().isEmpty())){
-				for (OTFLane toLane : ld.getToLanes()){
-					this.drawVertex(ld.getEndPoint(), toLane.getStartPoint(), 1.0f);
-				}
+	private void drawLaneEnd(GL gl, OTFLane ld){
+		this.setColor(gl, Color.LANECOLOR);
+		this.drawQuad(gl, ld.getEndPoint(), quadSizeLaneEnd);
+		if (!(ld.getToLanes() == null || ld.getToLanes().isEmpty())){
+			for (OTFLane toLane : ld.getToLanes()){
+				this.drawVertex(gl, ld.getEndPoint(), toLane.getStartPoint(), 1.0f);
 			}
-			this.drawToLinks(ld.getEndPoint(), ld.getToLinks());
 		}
+		
+	}
+	
+
+	private void drawLane(GL gl, OTFLane ld, OTFLinkWLanes laneLinkData){
+		//draw lane start
+		this.setColor(gl, Color.LANECOLOR);
+		this.drawQuad(gl, ld.getStartPoint(), quadSizeLaneStart);
+		//draw line between lane start point and lane end point
+		this.drawVertex(gl, ld.getStartPoint(), ld.getEndPoint(), ((float)ld.getNumberOfLanes()* 2));
 	}
 
 	
-	private void drawToLinks(Point2D.Double fromPoint, List<OTFLinkWLanes> toLinks) {
+	private void drawToLinks(GL gl, Point2D.Double fromPoint, List<OTFLinkWLanes> toLinks) {
 		if (!(toLinks == null || toLinks.isEmpty())){
 			for (OTFLinkWLanes toLink : toLinks){
-				this.drawVertex(fromPoint, toLink.getLinkStartCenterPoint(), 1.0f);
+				this.drawVertex(gl, fromPoint, toLink.getLinkStartCenterPoint(), 1.0f);
 			}
 		}
 	}
 
 
-	private void drawVertex(Point2D.Double startPoint, Point2D.Double endPoint, float lineWidth){
+	private void drawVertex(GL gl, Point2D.Double startPoint, Point2D.Double endPoint, float lineWidth){
 		gl.glLineWidth(lineWidth);
 		gl.glBegin(GL.GL_LINES);
 		gl.glVertex3d(startPoint.x, startPoint.y , zCoord);
@@ -201,7 +226,7 @@ public class OTFLaneSignalDrawer extends OTFGLAbstractDrawableReceiver {
 		gl.glEnd();
 	}
 	
-	private void drawQuad(Point2D.Double point, double quadSize){
+	private void drawQuad(GL gl, Point2D.Double point, double quadSize){
 		gl.glBegin(GL.GL_QUADS);
 		gl.glVertex3d(point.x - quadSize, point.y - quadSize, zCoord);
 		gl.glVertex3d(point.x - quadSize, point.y + quadSize, zCoord);
@@ -221,7 +246,7 @@ public class OTFLaneSignalDrawer extends OTFGLAbstractDrawableReceiver {
 		return this.calcPoint(lenghtPoint, laneLinkData.getLinkOrthogonalVector(), horizontalFraction * laneLinkData.getLinkWidth());
 	}
 	
-	private void setColor(Color color){
+	private void setColor(GL gl, Color color){
 		switch (color) {
 			case GREEN:
 				gl.glColor3d(0.0, 1.0, 0.0);
@@ -236,9 +261,6 @@ public class OTFLaneSignalDrawer extends OTFGLAbstractDrawableReceiver {
 				gl.glColor3d(1.0, 1.0, 0.0);
 				break;
 			case LANECOLOR:
-				gl.glColor3d(1.0, 1.0, 0.8);
-				break;
-			case LINKSTART:
 				gl.glColor3d(1.0, 1.0, 0.8);
 				break;
 			default:
