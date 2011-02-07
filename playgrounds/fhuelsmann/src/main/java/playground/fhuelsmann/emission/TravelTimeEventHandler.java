@@ -131,8 +131,8 @@ AgentArrivalEventHandler,AgentDepartureEventHandler {
 		LinkImpl link = (LinkImpl) this.network.getLinks().get(linkId);
 		double distance = link.getLength();
 		
-		String roadTypes = link.getType();
-		int roadType = Integer.parseInt(roadTypes);
+		String roadTypePerLink = link.getType();
+		int roadType = Integer.parseInt(roadTypePerLink);
 		int freeVelocity = (int) link.getFreespeed();
 //		int roadType= 55;
 //		System.out.print("roadType"+roadType);
