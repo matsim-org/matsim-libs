@@ -280,7 +280,7 @@ public class EmissionsPerEvent {
 			
 			
 		} else {	
-			System.out.println("+++++++++++"+Hbefa_road_type);
+			
 			
 
 			double vf =HbefaTable[Hbefa_road_type][0].getVelocity();

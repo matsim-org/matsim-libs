@@ -49,7 +49,7 @@ public class LinkAndAgentAccountAnalyseModul implements analyseModul{
 		}
 		else{
 		
-			double [] actualEmissions = new double[13]; // es werden hier die neuen  Daten (nach der Aufsummierung) gespeichert
+			double [] actualEmissions = new double[12]; // es werden hier die neuen  Daten (nach der Aufsummierung) gespeichert
 			double [] previousEmissions = this.emissionsLink.get(linkId); // oldValue ist die bisherige Summe
 		
 			for(int i=0; i<12 ; i++){
@@ -87,13 +87,13 @@ public class LinkAndAgentAccountAnalyseModul implements analyseModul{
 	}
 	else{
 	
-		double [] actualEmissions = new double[13]; // es werden hier die neuen  Daten (nach der Aufsummierung) gespeichert
+		double [] actualEmissions = new double[12]; // es werden hier die neuen  Daten (nach der Aufsummierung) gespeichert
 		double [] previousEmissions = this.emissionsPerson.get(personId); // oldValue ist die bisherige Summe
 	
 		for(int i=0; i<12 ; i++){
 		
 		actualEmissions[i]= previousEmissions[i] + inputForEmissions[i];
-		System.out.println("\n PersonId "+ personId);
+		
 	}
 	
 	// put newValue in the Map
@@ -172,13 +172,13 @@ public void printTotalEmissionsPerLink(){
 }}
 
 public void printTotalEmissionsPerAgent(){
-	
+	System.out.println("+++++++++++++++");
 	try{ 
-		String result ="";
+		String result2 ="";
 	
 		for(Entry<Id, double[]> PersonIdEntry : this.emissionsPerson.entrySet())	{
 				for(int i=0 ; i<12 ; i++)
-				result+= PersonIdEntry.getKey()+ ";" +i+ ";" + PersonIdEntry.getValue()[i] + "\n";
+				result2+= PersonIdEntry.getKey()+ ";" +i+ ";" + PersonIdEntry.getValue()[i] + "\n";
 				
 				/*					mKrBasedOnAverageSpeed [0]
 									noxEmissionsBasedOnAverageSpeed [1]
@@ -201,10 +201,11 @@ public void printTotalEmissionsPerAgent(){
 							new FileWriter("../../detailedEval/teststrecke/sim/outputEmissions/emissionsPerAgent.txt");			
 									BufferedWriter out = new BufferedWriter(fstream);
 							out.write("PersonId \t Luftschadstoff \t Emissionen \n"   
-										+ result);
+										+ result2);
 							//Close the output stream
 							out.close();
-								}catch (Exception e){//Catch exception if any
+								}
+							catch (Exception e){//Catch exception if any
 								System.err.println("Error: " + e.getMessage());
 					}
 								

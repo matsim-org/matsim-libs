@@ -32,9 +32,12 @@ public class Main {
 	public static void main (String[] args) throws Exception{
 
 	
-		String eventsFile = "../../detailedEval/teststrecke/sim/output/20090319/ITERS/it.0/0.events.txt.gz";
-//		String netfile ="../../detailedEval/Net/network.xml";
-		String netfile ="../../detailedEval/teststrecke/sim/input/network.xml";
+//		String eventsFile = "../../detailedEval/teststrecke/sim/output/20090317/ITERS/it.0/0.events.txt.gz";
+//		String eventsFile = "../../detailedEval/testRuns/output/100.events.txt.gz";
+		String eventsFile ="../../detailedEval/testRuns/output/run8/ITERS/it.0/0.events.txt.gz";
+		String netfile ="../../detailedEval/testRuns/output/run8/output_network.xml.gz";
+//		String netfile ="../../detailedEval/Net/network-86-85-87-84.xml";
+//		String netfile ="../../detailedEval/teststrecke/sim/input/network.xml";
 //		String visumRoadFile = "../../detailedEval/teststrecke/sim/inputEmissions/visumnetzlink.txt";
 //		String visumRoadHebefaRoadFile = "../../detailedEval/teststrecke/sim/inputEmissions/road_types.txt";
 		String Hbefa_Traffic = "../../detailedEval/teststrecke/sim/inputEmissions/hbefa_emission_factors_EU3_D.txt";
@@ -66,6 +69,7 @@ public class Main {
 		LinkAndAgentAccountAnalyseModul linkAccount = handler.getLinkAndAgentAccountAnalyseModul();
 		
 		
+//		TimeAndDistanceEventHandler handler = new TimeAndDistanceEventHandler(network,hbefaTable.getHbefaTableWithSpeedAndEmissionFactor());
 	
 		
 		//add the handler
@@ -82,6 +86,9 @@ public class Main {
 		matsimEventReader.readFile(eventsFile);
 		linkAccount.printTotalEmissionsPerLink();
 		linkAccount.printTotalEmissionsPerAgent();
+		
+	
+		
 		
 		
 	
