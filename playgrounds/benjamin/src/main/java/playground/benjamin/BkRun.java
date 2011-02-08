@@ -32,7 +32,7 @@ import org.matsim.core.controler.Controler;
  * @author benjamin
  *
  */
-public class BkGo {
+public class BkRun {
 	
 	static String baseDirectory = "../../detailedEval/teststrecke/sim/";
 	

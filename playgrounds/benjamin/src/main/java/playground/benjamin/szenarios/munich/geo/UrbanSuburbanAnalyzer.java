@@ -27,7 +27,7 @@ import org.apache.log4j.Logger;
  */
 public class UrbanSuburbanAnalyzer {
 	
-	private static final Logger log = Logger.getLogger(UrbanSuburbanAnalyzer.class);
+	private static final Logger logger = Logger.getLogger(UrbanSuburbanAnalyzer.class);
 
 	public static void main(String[] args) {
 		UrbanSuburbanAnalyzer usa = new UrbanSuburbanAnalyzer();
