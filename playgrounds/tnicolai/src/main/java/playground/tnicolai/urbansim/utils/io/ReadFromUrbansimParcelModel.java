@@ -107,10 +107,12 @@ public class ReadFromUrbansimParcelModel {
 				// create a facility (within the parcels) object at this coordinate with the correspondent parcel ID
 				ActivityFacilityImpl facility = parcels.createFacility(parcel_ID,coord);
 				facility.setDesc( Constants.FACILITY_DESCRIPTION ) ;
-
+				
 				// get zone ID
 				long zoneIdAsLong = (long) Double.parseDouble( parts[ indexZoneID ] );
 				zone_ID = new ZoneId( zoneIdAsLong );
+
+				facility.getCustomAttributes().put(Constants.ZONE_ID, zone_ID ) ;
 
 				// the pseudoZones (HashMap) is a temporary data structure to create zones.
 				// this intermediate step is needed to make sure that every zone id just exists once.

@@ -8,12 +8,19 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.core.router.util.TravelTime;
@@ -62,11 +69,38 @@ public class MyControlerListener implements ShutdownListener {
 		NetworkImpl network = controler.getNetwork() ;
 		double depatureTime = 8.*3600 ;
 		st.setDepartureTime(depatureTime);
+		
+		Scenario sc = controler.getScenario() ;
 
 		
 		try {
 			BufferedWriter travelDataWriter = IOUtils.getBufferedWriter( travelDataPath );
 			BufferedWriter zonesWriter = IOUtils.getBufferedWriter( zonesPath );
+
+			log.info("Computing zone2zone trip numbers ...") ;
+			// yyyy might make even more sense to do this via events.  kai, feb'11
+			for ( Person person : sc.getPopulation().getPersons().values() ) {
+				Plan plan = person.getSelectedPlan() ;
+				int cnt = 0 ;
+				String lastZoneId = null ;
+				for ( PlanElement pe : plan.getPlanElements() ) {
+					if ( pe instanceof Activity ) {
+						Activity act = (Activity) pe ;
+						ActivityFacility fac = ((ScenarioImpl)sc).getActivityFacilities().getFacilities().get( act.getFacilityId() ) ;
+						String zone_ID = ((Id) fac.getCustomAttributes().get(Constants.ZONE_ID)).toString() ;
+						if (cnt < 1 ) {
+							cnt++ ;
+						} else {
+//							originDestinationMatrix.addTrip( lastZoneId, zone_ID ) ;
+							// see PtPlanToPlanStepBasedOnEvents.addPersonToVehicleContainer (or zone coordinate addition)
+						}
+						lastZoneId = zone_ID ;
+					}
+				}
+					
+			}
+			
+			log.info("DONE with computing zone2zone trip numbers ...") ;
 
 			log.info("Computing and writing travel_data" ) ;
 			// log.warn("Can't feed floats to urbansim; am thus feeding ints for the ttime.") ;
@@ -74,6 +108,7 @@ public class MyControlerListener implements ShutdownListener {
 
 			// Travel Data Header
 			travelDataWriter.write ( "from_zone_id:i4,to_zone_id:i4,single_vehicle_to_work_travel_cost:f4,am_single_vehicle_to_work_travel_time:f4" ) ; 
+			Logger.getLogger(this.getClass()).error( "add new fields" ) ;
 			travelDataWriter.newLine();
 			
 			// Zone Header (workplace asseccibility)
@@ -129,7 +164,10 @@ public class MyControlerListener implements ShutdownListener {
 					travelDataWriter.write ( fromZone.getId().toString()	//origin zone id
 							+ "," + toZone.getId().toString()				//destination zone id
 							+ "," + ttime 									//tcost
-							+ "," + ttime ) ;								//ttimes
+							+ "," + ttime 									//ttimes
+							+ "," + ttime*10.								// walk ttimes
+							+ "," + "1"										// number of trips; yyyyyy replace by actual count 
+							);		
 					travelDataWriter.newLine();
 					
 					// frome here workplace accessibility computation
