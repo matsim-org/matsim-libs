@@ -22,6 +22,7 @@ package playground.dgrether.signalsystems.sylvia;
 import org.apache.log4j.Logger;
 import org.matsim.core.controler.Controler;
 
+import playground.dgrether.DgPaths;
 import playground.dgrether.signalsystems.sylvia.controler.DgSylviaControlerListenerFactory;
 
 
@@ -42,7 +43,7 @@ public class SylviaMain {
 		if (args == null || args.length == 0){
 			log.info("No args given, running local config...");
 			args2 = new String[1];
-			args2[0] = "/media/data/work/repos/shared-svn/studies/dgrether/cottbus/sylvia/cottbus_sylvia_config.xml";
+			args2[0] = DgPaths.REPOS + "shared-svn/studies/dgrether/cottbus/sylvia/cottbus_sylvia_config.xml";
 		}
 		else {
 			args2 = args;

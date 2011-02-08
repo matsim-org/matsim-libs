@@ -25,6 +25,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
@@ -50,13 +51,18 @@ public class DgSensorManager implements LinkEnterEventHandler, LinkLeaveEventHan
 	private Map<Id, DgSensor> linkIdSensorMap = new HashMap<Id, DgSensor>();
 
 private Map<Id, Tuple<Double, Double>> linkFirstSecondDistanceMeterMap = new HashMap<Id, Tuple<Double, Double>>();
+
+private Network network;
 	
-	public DgSensorManager(){}
+	public DgSensorManager(Network network){
+		this.network = network;
+	}
 	
-	public void registerNumberOfCarsMonitoring(Link link){
+	public void registerNumberOfCarsMonitoring(Id linkId){
 //		this.monitoredLinkIds.add(link.getId());
-		if (!this.linkIdSensorMap.containsKey(link.getId())){
-			this.linkIdSensorMap.put(link.getId(), new DgSensor(link));
+		if (!this.linkIdSensorMap.containsKey(linkId)){
+			Link link = this.network.getLinks().get(linkId);
+			this.linkIdSensorMap.put(linkId, new DgSensor(link));
 		}
 	}
 	
@@ -64,17 +70,19 @@ private Map<Id, Tuple<Double, Double>> linkFirstSecondDistanceMeterMap = new Has
 	 * 
 	 * @param distanceMeter the distance in meter from the end of the monitored link
 	 */
-	public void registerNumberOfCarsInDistanceMonitoring(Link link, Double distanceMeter){
+	public void registerNumberOfCarsInDistanceMonitoring(Id linkId, Double distanceMeter){
 //		this.linkIdNumberOfCarsInDistanceMap.put(link.getId(), distanceMeter);
-		if (!this.linkIdSensorMap.containsKey(link.getId())){
+		if (!this.linkIdSensorMap.containsKey(linkId)){
+			Link link = this.network.getLinks().get(linkId);
 			this.linkIdSensorMap.put(link.getId(), new DgSensor(link));
 //			this.monitoredLinkIds.add(link.getId());
 		}
-		this.linkIdSensorMap.get(link.getId()).registerDistanceToMonitor(distanceMeter);
+		this.linkIdSensorMap.get(linkId).registerDistanceToMonitor(distanceMeter);
 	}
 	
-	public void registerCarsAtDistancePerSecondMonitoring(Link link, Double distanceMeter){
+	public void registerCarsAtDistancePerSecondMonitoring(Id linkId, Double distanceMeter){
 		double firstDistanceMeter = distanceMeter;
+		Link link = this.network.getLinks().get(linkId);
 		double secondDistanceMeter = distanceMeter - link.getFreespeed();
 		if (secondDistanceMeter < 0.0){
 			firstDistanceMeter = link.getFreespeed();
@@ -82,8 +90,8 @@ private Map<Id, Tuple<Double, Double>> linkFirstSecondDistanceMeterMap = new Has
 		}
 		Tuple<Double, Double> tuple = new Tuple<Double, Double>(firstDistanceMeter, secondDistanceMeter);
 		this.linkFirstSecondDistanceMeterMap .put(link.getId(), tuple);
-		this.registerNumberOfCarsInDistanceMonitoring(link, firstDistanceMeter);
-		this.registerNumberOfCarsInDistanceMonitoring(link, secondDistanceMeter);
+		this.registerNumberOfCarsInDistanceMonitoring(linkId, firstDistanceMeter);
+		this.registerNumberOfCarsInDistanceMonitoring(linkId, secondDistanceMeter);
 	}
 	
 	public int getNumberOfCarsAtDistancePerSecond(Id linkId, Double distanceMeter, double timeSeconds){
@@ -138,7 +146,8 @@ private Map<Id, Tuple<Double, Double>> linkFirstSecondDistanceMeterMap = new Has
 	
 	@Override
 	public void reset(int iteration) {
-		//TODO 
+		this.linkIdSensorMap.clear();
+		this.linkFirstSecondDistanceMeterMap.clear();
 	}
 
 	

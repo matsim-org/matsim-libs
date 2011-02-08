@@ -61,7 +61,7 @@ public class DgRoederGershensonControllerListener implements SignalsControllerLi
 
 		
 		//TODO init gershenson controller and sensor manager here
-		DgSensorManager sensorManager = new DgSensorManager();
+		DgSensorManager sensorManager = new DgSensorManager(scenario.getNetwork());
 		event.getControler().getEvents().addHandler(sensorManager);
 		for (SignalSystem ss : this.signalManager.getSignalSystems().values()){
 			if (ss.getSignalController() instanceof DgRoederGershensonController){

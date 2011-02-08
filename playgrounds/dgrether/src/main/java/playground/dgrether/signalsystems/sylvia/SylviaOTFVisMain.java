@@ -19,6 +19,23 @@
  * *********************************************************************** */
 package playground.dgrether.signalsystems.sylvia;
 
+import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.core.api.experimental.ScenarioLoader;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.ptproject.qsim.QSim;
+import org.matsim.signalsystems.builder.DefaultSignalModelFactory;
+import org.matsim.signalsystems.builder.FromDataBuilder;
+import org.matsim.signalsystems.data.SignalsData;
+import org.matsim.signalsystems.mobsim.QSimSignalEngine;
+import org.matsim.signalsystems.mobsim.SignalEngine;
+import org.matsim.signalsystems.model.SignalSystemsManager;
+import org.matsim.vis.otfvis.OTFVisMobsimFeature;
+
+import playground.dgrether.signalsystems.DgSensorManager;
+import playground.dgrether.signalsystems.sylvia.model.DgSylviaSignalModelFactory;
+
 
 
 /**
@@ -27,16 +44,42 @@ package playground.dgrether.signalsystems.sylvia;
  */
 public class SylviaOTFVisMain {
 
-	public void playCottbus(){
+	public void playCottbus(String configFileName){
+		ScenarioLoader loader = new ScenarioLoaderImpl(configFileName);
+		ScenarioImpl scenario = (ScenarioImpl) loader.loadScenario();
+		this.playCottbus(scenario);
+	}	
+	
+	public void playCottbus(ScenarioImpl scenario){
+		EventsManager events = new EventsManagerImpl();
+		scenario.getConfig().otfVis().setAgentSize(40.0f);
+		SignalsData signalsData = scenario.getScenarioElement(SignalsData.class);
+
+		DgSensorManager sensorManager = new DgSensorManager(scenario.getNetwork());
+		events.addHandler(sensorManager);
+		
+		FromDataBuilder modelBuilder = new FromDataBuilder(signalsData, 
+				new DgSylviaSignalModelFactory(new DefaultSignalModelFactory(), sensorManager) , events);
+		SignalSystemsManager signalManager = modelBuilder.createAndInitializeSignalSystemsManager();
 		
 		
+		SignalEngine engine = new QSimSignalEngine(signalManager);
+		QSim otfVisQSim = new QSim(scenario, events);
+		otfVisQSim.addQueueSimulationListeners(engine);
+		OTFVisMobsimFeature qSimFeature = new OTFVisMobsimFeature(otfVisQSim);
+		otfVisQSim.addFeature(qSimFeature);
 		
+		QSim client = otfVisQSim;
+		client.run();
+
 	}
 	
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		SylviaOTFVisMain sylviaMain = new SylviaOTFVisMain();
+		sylviaMain.playCottbus("/media/data/work/repos/shared-svn/studies/dgrether/cottbus/sylvia/cottbus_sylvia_config.xml");
 	}
 
 }

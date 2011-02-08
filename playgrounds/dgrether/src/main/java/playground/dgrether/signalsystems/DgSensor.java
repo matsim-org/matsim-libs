@@ -22,6 +22,7 @@ package playground.dgrether.signalsystems;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
@@ -35,6 +36,8 @@ import org.matsim.core.api.experimental.events.LinkLeaveEvent;
  *
  */
 public class DgSensor {
+	
+	private static final Logger log = Logger.getLogger(DgSensor.class);
 	
 	private Link link = null;
 	public int agentsOnLink = 0;
@@ -117,14 +120,25 @@ public class DgSensor {
 	public void handleEvent(AgentWait2LinkEvent event) {
 		this.agentsOnLink++;
 		if (this.doDistanceMonitoring){
-			double arrivalTime = this.personIdArrivalEventMap.remove(event.getPersonId()).getTime();
-			double actTime = event.getTime() - arrivalTime;
-			for (Double distance : this.distanceMeterCarLocatorMap.keySet()){
-				 Map<Id, CarLocator> inActPersonIdCarLocatorMap = this.inActivityDistanceCarLocatorMap.get(distance);
-				 CarLocator cl = inActPersonIdCarLocatorMap.remove(event.getPersonId());
-				 cl.setEarliestTimeInDistance(cl.getEarliestTimeInDistance() + actTime);
-				 Map<Id, CarLocator> personIdCarLocatorMap = this.distanceMeterCarLocatorMap.get(distance);
-				 personIdCarLocatorMap.put(event.getPersonId(), cl);
+			if (! this.personIdArrivalEventMap.containsKey(event.getPersonId())){ // the person leaves his first act on this link --> add a car locator
+//				log.debug("wait2link at: " + event.getTime() + " person: "+ event.getPersonId() + " link: " + event.getLinkId());
+				for (Double distance : this.distanceMeterCarLocatorMap.keySet()){
+					Map<Id, CarLocator> personIdCarLocatorMap = this.distanceMeterCarLocatorMap.get(distance);
+					//as the position now is not clear, assume enter time was freespeed travel time ago
+					double fs_tt = this.link.getLength() / this.link.getFreespeed();
+					personIdCarLocatorMap.put(event.getPersonId(), new CarLocator(this.link, event.getTime() - fs_tt, distance));
+				}				
+			}
+			else {
+				double arrivalTime = this.personIdArrivalEventMap.remove(event.getPersonId()).getTime();
+				double actTime = event.getTime() - arrivalTime;
+				for (Double distance : this.distanceMeterCarLocatorMap.keySet()){
+					Map<Id, CarLocator> inActPersonIdCarLocatorMap = this.inActivityDistanceCarLocatorMap.get(distance);
+					CarLocator cl = inActPersonIdCarLocatorMap.remove(event.getPersonId());
+					cl.setEarliestTimeInDistance(cl.getEarliestTimeInDistance() + actTime);
+					Map<Id, CarLocator> personIdCarLocatorMap = this.distanceMeterCarLocatorMap.get(distance);
+					personIdCarLocatorMap.put(event.getPersonId(), cl);
+				}
 			}
 		}
 	}

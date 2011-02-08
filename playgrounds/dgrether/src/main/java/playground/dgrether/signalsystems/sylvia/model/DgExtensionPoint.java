@@ -50,6 +50,10 @@ public class DgExtensionPoint {
 	public Set<Id> getSignalGroupIds() {
 		return this.signalGroupIds ;
 	}
+	
+	public void addSignalGroupId(Id signalGroupId){
+		this.signalGroupIds.add(signalGroupId);
+	}
 
 	public int getMaxGreenTime(Id signalGroupId) {
 		return this.maxGreenTimes.get(signalGroupId);

@@ -145,6 +145,18 @@ public class DgSignalsUtils {
 		}
 		return signalizedLinksPerSystem;
 	}
+	
+	public static Set<Id> calculateSignalizedLinks4SignalGroup(SignalSystemData system, SignalGroupData signalGroup){
+		Set<Id> linkIds = new HashSet<Id>();
+		if (!system.getId().equals(signalGroup.getSignalSystemId())){
+			throw new IllegalArgumentException("System Id: " + system.getId() + " is not equal to signal group Id: " + signalGroup.getId());
+		}
+		for (Id signalId : signalGroup.getSignalIds()){
+			SignalData signal = system.getSignalData().get(signalId);
+			linkIds.add(signal.getLinkId());
+		}
+		return linkIds;
+	}
 
 	
 	
@@ -157,5 +169,17 @@ public class DgSignalsUtils {
 		return true;
 	}
 	
+	public static int calculateGreenTimeSeconds(SignalGroupSettingsData settings, int cylceTimeSeconds){
+		int on = settings.getOnset();
+		int off = settings.getDropping();
+		int green = 0;
+		if (on < off){
+			green = off - on;
+		}
+		else {
+			green = off + cylceTimeSeconds - on;
+		}
+		return green;
+	}
 	
 }

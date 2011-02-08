@@ -46,13 +46,15 @@ public class DgSylviaSignalControlerListener implements SignalsControllerListene
 		ShutdownListener {
 
 	private SignalSystemsManager signalManager;
+	private DgSensorManager sensorManager;
 
+	
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		ScenarioImpl scenario = event.getControler().getScenario();
 		SignalsData signalsData = scenario.getScenarioElement(SignalsData.class);
 		
-		DgSensorManager sensorManager = new DgSensorManager();
+		this.sensorManager = new DgSensorManager(event.getControler().getScenario().getNetwork());
 		event.getControler().getEvents().addHandler(sensorManager);
 		
 		FromDataBuilder modelBuilder = new FromDataBuilder(signalsData, 
@@ -61,14 +63,13 @@ public class DgSylviaSignalControlerListener implements SignalsControllerListene
 		
 		SignalEngine engine = new QSimSignalEngine(this.signalManager);
 		event.getControler().getQueueSimulationListener().add(engine);
-
-		
 	}
 
 
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
 		this.signalManager.resetModel(event.getIteration());
+		this.sensorManager.reset(event.getIteration());
 	}
 
 	@Override

@@ -75,7 +75,7 @@ public class DgSylviaPreprocessData {
 	
 	public DgSylviaPreprocessData(){
 //			this.signalSystemIds.add(new IdImpl(1));
-//			this.signalSystemIds.add(new IdImpl(17));
+			this.signalSystemIds.add(new IdImpl(17));
 //			this.signalSystemIds.add(new IdImpl(18));
 //			this.signalSystemIds.add(new IdImpl(28));
 //			this.signalSystemIds.add(new IdImpl(12));
@@ -131,7 +131,7 @@ public class DgSylviaPreprocessData {
 	private SignalControlData convertSignalControlData(final SignalControlData controlData){
 		SignalControlData cd = new SignalControlDataImpl();
 		for (SignalSystemControllerData  controllerData: controlData.getSignalSystemControllerDataBySystemId().values()){
-			if ( this.signalSystemIds.contains(controllerData.getSignalSystemId())){
+			if (! this.signalSystemIds.contains(controllerData.getSignalSystemId())){
 				cd.addSignalSystemControllerData(controllerData);
 			}
 			else {
@@ -151,7 +151,7 @@ public class DgSylviaPreprocessData {
 	}
 	
 	
-	private Phase createSylviaPhase(final Phase phase, final SignalControlDataFactory factory){
+	private DgPhase createSylviaPhase(final DgPhase phase, final SignalControlDataFactory factory){
 		log.error("creating sylvia phase...");
 		final int on = phase.getPhaseStartSecond();
 		List<SignalGroupSettingsData> alltimeGreenSettings = new ArrayList<SignalGroupSettingsData>();
@@ -194,7 +194,7 @@ public class DgSylviaPreprocessData {
 		else {
 			off = currentShortOff;
 		}
-		Phase newPhase = new Phase(on, off);
+		DgPhase newPhase = new DgPhase(on, off);
 		//create all time green settings
 		for (SignalGroupSettingsData settings : alltimeGreenSettings){
 			SignalGroupSettingsData shortSettings = DgSignalsUtils.copySignalGroupSettingsData(settings, factory);
@@ -215,30 +215,36 @@ public class DgSylviaPreprocessData {
 		groupSettingsList.addAll(newPlan.getSignalGroupSettingsDataByGroupId().values());
 		//filter allGreenSettings
 		Set<SignalGroupSettingsData> allGreenSettings = this.removeAllGreenSignalGroupSettings(groupSettingsList, fixedTimePlan.getCycleTime());
-		List<Phase> phases = this.calculateSortedPhases(groupSettingsList);
-		List<Phase> sylviaPhases = new ArrayList<Phase>();
+		List<DgPhase> phases = this.calculateSortedPhases(groupSettingsList);
+		List<DgPhase> sylviaPhases = new ArrayList<DgPhase>();
 		
-		int phaseStart  = -1;
+		int phaseStart  = 0;
 		int lastPhaseOff = 0;
 		for (int i = 0; i < phases.size(); i++){
-			Phase phase = phases.get(i);
-			Phase sylviaPhase = this.createSylviaPhase(phase, factory);
+			System.out.println();
+			log.error("Processing phase: " + (i+1) + " of " + phases.size());
+			DgPhase phase = phases.get(i);
+			DgPhase sylviaPhase = this.createSylviaPhase(phase, factory);
 			if (i == 0){ //this should be the first phase of the cylce
 				phaseStart = phase.getPhaseStartSecond();
 			}
 			else {
-				Phase lastPhase = phases.get(i - 1);
-				Phase lastSylviaPhase = sylviaPhases.get(sylviaPhases.size()-1);
+				DgPhase lastPhase = phases.get(i - 1);
+				DgPhase lastSylviaPhase = sylviaPhases.get(i - 1);
+				log.error("last phase end: " + lastSylviaPhase.getPhaseEndSecond());
 				int intergreen = phase.getPhaseStartSecond() - lastPhase.getPhaseEndSecond();
-				log.error("intergreen: " + intergreen + " due to " + phase.getPhaseStartSecond() + " last phase end: " + lastPhase.getPhaseEndSecond());
+				log.error("intergreen: " + intergreen + " due to phase start at " + phase.getPhaseStartSecond() + " last phase end: " + lastPhase.getPhaseEndSecond());
 				if (intergreen >= 0){ //phases are not overlapping
+					log.info("phase not overlapping...");
 					phaseStart = lastSylviaPhase.getPhaseEndSecond() + intergreen;
 					int shift = sylviaPhase.getPhaseStartSecond() - phaseStart;
-					sylviaPhase.setPhaseStartSecond(sylviaPhase.on - shift);
-					sylviaPhase.setPhaseEndSecond(sylviaPhase.off - shift);
+					log.error("shift of not overlapping phase : " + shift);
+					sylviaPhase.setPhaseStartSecond(sylviaPhase.getPhaseStartSecond() - shift);
+					sylviaPhase.setPhaseEndSecond(sylviaPhase.getPhaseEndSecond() - shift);
 					for (SignalGroupSettingsData settings : sylviaPhase.getSignalGroupSettingsByGroupId().values()){
 						settings.setOnset(settings.getOnset() - shift);
 						settings.setDropping(settings.getDropping() - shift);
+						log.info("  ...modified settings of phase: " + settings.getSignalGroupId() + " on:  " + settings.getOnset() + " off: " + settings.getDropping());
 					}
 				}
 				else { //handle overlapping phases -> shift phase 
@@ -274,7 +280,7 @@ public class DgSylviaPreprocessData {
 		int lastIntergreen = fixedTimePlan.getCycleTime() - lastPhaseOff;
 		int lastSylviaPhaseOff = 0;
 		newPlan.getSignalGroupSettingsDataByGroupId().clear();
-		for (Phase p : sylviaPhases){
+		for (DgPhase p : sylviaPhases){
 			this.addPhaseToPlan(p, newPlan);
 			lastSylviaPhaseOff = p.getPhaseEndSecond();
 		}
@@ -299,7 +305,7 @@ public class DgSylviaPreprocessData {
 	 * calculates the time that should be between two phases that overlap in time
 	 * @return 
 	 */
-	private Collection<IntergreenConstraint> calculateIntergreenConstraints(Phase lastPhase, Phase phase) {
+	private Collection<IntergreenConstraint> calculateIntergreenConstraints(DgPhase lastPhase, DgPhase phase) {
 		Map<SignalGroupSettingsData, IntergreenConstraint> map = new HashMap<SignalGroupSettingsData, IntergreenConstraint>();
 		IntergreenConstraint ic = null;
 		int intergreen; 
@@ -322,7 +328,7 @@ public class DgSylviaPreprocessData {
 		
 	
 
-	private List<SignalGroupSettingsData> calculateSettingsShorterThanPhase(Phase phase){
+	private List<SignalGroupSettingsData> calculateSettingsShorterThanPhase(DgPhase phase){
 		List<SignalGroupSettingsData> settingsList  = new ArrayList<SignalGroupSettingsData>();
 		//get all group settings that are shorter than the phase
 		for (SignalGroupSettingsData settings : phase.getSignalGroupSettingsByGroupId().values()){
@@ -335,7 +341,7 @@ public class DgSylviaPreprocessData {
 	}
 	
 
-	private void addPhaseToPlan(Phase p, SignalPlanData newPlan){
+	private void addPhaseToPlan(DgPhase p, SignalPlanData newPlan){
 		for (SignalGroupSettingsData settings : p.getSignalGroupSettingsByGroupId().values()){
 			newPlan.addSignalGroupSettings(settings);
 		}
@@ -347,8 +353,8 @@ public class DgSylviaPreprocessData {
 	 *   - starts together with others at a time t
 	 *   - starts after t but ends at the same time as the groups starting at t
 	 */
-	private List<Phase> calculateSortedPhases(final List<SignalGroupSettingsData> groupSettingsList) {
-		List<Phase> phases = new ArrayList<Phase>();
+	private List<DgPhase> calculateSortedPhases(final List<SignalGroupSettingsData> groupSettingsList) {
+		List<DgPhase> phases = new ArrayList<DgPhase>();
 		//make a copy
 		ArrayList<SignalGroupSettingsData> settingsList = new ArrayList<SignalGroupSettingsData>();
 		settingsList.addAll(groupSettingsList);
@@ -379,7 +385,7 @@ public class DgSylviaPreprocessData {
 			SignalGroupSettingsData lastDropSettings = this.getLastDroppingSettings(sameOnsetSettings); 
 			int phaseOn = lastDropSettings.getOnset();
 			int phaseDrop = lastDropSettings.getDropping();
-			Phase phase = new Phase(phaseOn, phaseDrop);
+			DgPhase phase = new DgPhase(phaseOn, phaseDrop);
 			phases.add(phase);
 			Set<SignalGroupSettingsData> sameDroppingSettings = droppingSettingsMap.get(phaseDrop);
 			//check semantics and add to phase
@@ -425,59 +431,6 @@ public class DgSylviaPreprocessData {
 
 
 
-	private static final class Phase {
-		
-		private static final Logger log = Logger.getLogger(DgSylviaPreprocessData.Phase.class);
-		private Integer on = null;
-		private Integer off = null;
-		private Map<Id, SignalGroupSettingsData> signalGroupSettingsByGroupId = new HashMap<Id, SignalGroupSettingsData>();
-		
-//		private boolean mixedPhase = false;
-		
-		public Phase(Integer phaseOn, Integer phaseDrop) {
-			log.debug("created phase from " + phaseOn + " to " + phaseDrop);
-			this.on = phaseOn;
-			this.off = phaseDrop;
-		}
-
-		public void setPhaseStartSecond(Integer on){
-			this.on = on;
-		}
-		
-		public void setPhaseEndSecond(Integer off){
-			this.off = off;
-		}
-		
-		public Integer getPhaseStartSecond(){
-			return this.on;
-		}
-		
-		public Integer getPhaseEndSecond(){
-			return this.off;
-		}
-		
-//		public boolean isMixedPhase(){
-//			return this.mixedPhase;
-//		}
-		
-		public void addSignalGroupSettingsData(SignalGroupSettingsData settings) {
-			log.debug("  adding settings to phase: " + settings.getSignalGroupId() + " on: " + settings.getOnset() + " drop " + settings.getDropping());
-			if (settings.getOnset() < this.on || settings.getDropping() > off){
-				throw new IllegalStateException("SignalGroupSettings longer than phase length!");
-			}
-//			else if (settings.getOnset() != this.on || settings.getDropping() != off){
-//				this.mixedPhase = true;
-//			}
-			this.signalGroupSettingsByGroupId.put(settings.getSignalGroupId(), settings);
-		}
-		
-		public Map<Id, SignalGroupSettingsData> getSignalGroupSettingsByGroupId(){
-			return this.signalGroupSettingsByGroupId;
-		}
-		
-	}
-
-	
 	private Set<SignalGroupSettingsData> removeAllGreenSignalGroupSettings(List<SignalGroupSettingsData> groupSettingsList, Integer cycleTime){
 		Set<SignalGroupSettingsData> allGreenSettings = new HashSet<SignalGroupSettingsData>();
 		ListIterator<SignalGroupSettingsData> it = groupSettingsList.listIterator();
