@@ -40,11 +40,14 @@ public class SylviaMainBatch {
 	 */
 	public static void main(String[] args) {
 		String baseDirectory = DgPaths.REPOS;
-		if (args != null && args.length > 0){
+		String config = "";
+		config = baseDirectory + "shared-svn/studies/dgrether/cottbus/sylvia/cottbus_sylvia_config.xml";
+		if (args != null && args.length == 2){
 			baseDirectory = args[0];
+			config = args[1];
+			log.info("Running CottbusMainBatch with base directory: " + baseDirectory + " and config: " + config);
 		}
-		log.info("Running CottbusMainBatch with base directory: " + baseDirectory);
-		String config = baseDirectory + "shared-svn/studies/dgrether/cottbus/sylvia/cottbus_sylvia_config.xml";
+
 		
 		String fixedTimeSignals = baseDirectory + "shared-svn/studies/dgrether/cottbus/Cottbus-BA/scenario-lsa/signalControlCottbusT90_v2.0_jb_ba_removed.xml";
 		String sylviaSignals = baseDirectory + "shared-svn/studies/dgrether/cottbus/sylvia/signal_control_sylvia.xml";
