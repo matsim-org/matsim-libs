@@ -28,8 +28,12 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.utils.customize.Customizable;
+import org.matsim.utils.customize.CustomizableImpl;
 
 public class ActivityFacilityImpl implements ActivityFacility {
+	
+	private Customizable customizableDelegate;
 
 	private final Map<String, ActivityOption> activities = new TreeMap<String, ActivityOption>();
 
@@ -101,6 +105,14 @@ public class ActivityFacilityImpl implements ActivityFacility {
 	@Override
 	public Id getId() {
 		return this.id;
+	}
+
+	@Override
+	public Map<String, Object> getCustomAttributes() {
+		if (this.customizableDelegate == null) {
+			this.customizableDelegate = new CustomizableImpl();
+		}
+		return this.customizableDelegate.getCustomAttributes();
 	}
 
 }

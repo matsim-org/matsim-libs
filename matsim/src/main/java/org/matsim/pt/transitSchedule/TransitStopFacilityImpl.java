@@ -20,9 +20,13 @@
 
 package org.matsim.pt.transitSchedule;
 
+import java.util.Map;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.utils.customize.Customizable;
+import org.matsim.utils.customize.CustomizableImpl;
 
 /**
  * A facility (infrastructure) describing a public transport stop.
@@ -30,13 +34,14 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
  * @author mrieser
  */
 public class TransitStopFacilityImpl implements TransitStopFacility {
-
+	
 	private final Id id;
 	private Id stopPostAreaId;
 	private final Coord coord;
 	private Id linkId = null;
 	private final boolean isBlockingLane;
 	private String name = null;
+	private Customizable customizableDelegate;
 
 	protected TransitStopFacilityImpl(final Id id, final Coord coord, final boolean isBlockingLane) {
 		this.id = id;
@@ -94,5 +99,14 @@ public class TransitStopFacilityImpl implements TransitStopFacility {
 	public void setStopPostAreaId(Id stopPostAreaId) {
 		this.stopPostAreaId = stopPostAreaId;
 	}
+	
+	@Override
+	public Map<String, Object> getCustomAttributes() {
+		if (this.customizableDelegate == null) {
+			this.customizableDelegate = new CustomizableImpl();
+		}
+		return this.customizableDelegate.getCustomAttributes();
+	}
+
 
 }
