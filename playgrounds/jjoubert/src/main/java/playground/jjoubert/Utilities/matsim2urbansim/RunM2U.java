@@ -59,11 +59,11 @@ public class RunM2U {
 			throw new RuntimeException("Incorrect number of arguments provided.");
 		}
 		
-		CarTimeEstimator cte = new CarTimeEstimator(args[0], args[1], args[2], args[3]);
+		CarTimeEstimator cte = new CarTimeEstimator();
 		/*
 		 * TODO Check if the output file is not maybe open.
 		 */
-		File f = new File(cte.sb.getTravelDataFilename());
+		File f = new File(args[7]);
 		if(f.exists() && !f.canWrite()){
 			log.warn("Can not write to " + f.getAbsolutePath());
 			throw new RuntimeException("Ensure that file is not open in another application.");
@@ -72,7 +72,7 @@ public class RunM2U {
 		 * First get the private car travel time. Once I have this, I simply 
 		 * can convert it to public transport travel times. 
 		 */
-		cte.estimateCarTime(args[4], args[5], false);
+		cte.estimateCarTime(args[0], args[1], args[2], args[3], args[4], args[5], args[6], null, false);
 		DenseDoubleMatrix2D odMatrix = cte.getOdMatrix();
 		List<MyZone> zones = cte.getZones();
 		
@@ -81,7 +81,7 @@ public class RunM2U {
 		 */
 		Scenario sPt = new ScenarioImpl();
 		MatsimNetworkReader nr = new MatsimNetworkReader(sPt);
-		nr.readFile(cte.sb.getPtNetworkFilename());
+//TODO		nr.readFile(cte.sb.getPtNetworkFilename());
 		
 		/*
 		 * Calculate, for each zone, the distance to the closest transit node.
@@ -108,7 +108,7 @@ public class RunM2U {
 		 */
 		MyConverter mc = new MyConverter(args[1]);
 		try {
-			BufferedWriter bw = IOUtils.getBufferedWriter(cte.sb.getTravelDataFilename());
+			BufferedWriter bw = IOUtils.getBufferedWriter(args[7]);
 			try{
 				bw.write("fromZone,toZone,carTime,walkTo,ptTime,walkFrom");
 				bw.newLine();

@@ -25,6 +25,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -54,9 +55,9 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
+import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PreProcessDijkstra;
-import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactory;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
@@ -98,7 +99,7 @@ public class MyZoneToZoneRouter {
 		TravelTimeCalculatorFactory ttcf = new TravelTimeCalculatorFactoryImpl();
 		TravelTimeCalculator travelTimeCalculator = ttcf.createTravelTimeCalculator(scenario.getNetwork(), scenario.getConfig().travelTimeCalculator());
 		TravelCostCalculatorFactory tccf = new TravelCostCalculatorFactoryImpl();
-		PersonalizableTravelCost travelCost = tccf.createTravelCostCalculator(travelTimeCalculator, scenario.getConfig().planCalcScore());
+		PersonalizableTravelCost travelCost = tccf.createTravelCostCalculator(travelTimeCalculator, scenario.getConfig().charyparNagelScoring());
 		
 		EventsManagerImpl em = new EventsManagerImpl();
 		em.addHandler(travelTimeCalculator);
@@ -114,6 +115,11 @@ public class MyZoneToZoneRouter {
 	}
 	
 	public boolean processZones(DenseDoubleMatrix2D matrix, Map<Id,Double> linkstats){
+		/* Create a list of zone Ids with links within them. This list will be 
+		 * used to generate the intra-zonal travel time for those zones without
+		 * any links by taking the mode of this list. */
+		List<Double> iztt = new ArrayList<Double>();
+		
 		log.info("Processing zone-to-zone travel times.");
 		this.odMatrix = matrix;
 		GeometryFactory gf = new GeometryFactory();
@@ -158,8 +164,9 @@ public class MyZoneToZoneRouter {
 						}
 						if(count != 0){
 							odMatrix.set(row, col, tt / ((double) count) );
+							iztt.add(tt / ((double) count));
 						} else{
-							log.error("Could not find any links within zone " + zone.getId());
+							log.warn("   Could not find any links within zone " + zone.getId());
 						}
 					} else{
 						/*=====================================================
@@ -174,7 +181,8 @@ public class MyZoneToZoneRouter {
 						Point tp = zones.get(col).getCentroid();
 						Coord tc = new CoordImpl(tp.getX(), tp.getY());
 						Node tn = ni.getNearestNode(tc); 
-						Path p = router.calcLeastCostPath(fn, tn, 21600);
+						
+						Path p = router.calcLeastCostPath(fn, tn, 25200); /* Use 07:00:00 */
 						if(p != null){
 							odMatrix.set(row, col, p.travelTime);
 						} else{
@@ -190,6 +198,22 @@ public class MyZoneToZoneRouter {
 				}
 			}
 		}
+		
+		/* ====================================================================
+		 * Now reprocess those diagonals that didn't have any links within them. 
+		 * --------------------------------------------------------------------*/
+		double intraZonalTravelTime = 5.0;
+		if(iztt.size() > 0){
+			/* Sort the intra-zonal travel time list. */
+			Collections.sort(iztt);
+			intraZonalTravelTime = iztt.get(Math.min(0, ((int)Math.round(iztt.size()))-1) );
+		}
+		for(int row = 0; row < odMatrix.rows(); row++){
+			if(odMatrix.get(row, row) == Double.POSITIVE_INFINITY){
+				odMatrix.set(row, row, intraZonalTravelTime);
+			}
+		}
+		
 		log.info(String.format("   matrix entries completed: %d (Done)", counter));
 
 		// There should now be NO more null-entries.

@@ -34,7 +34,7 @@ import cern.colt.matrix.impl.DenseDoubleMatrix2D;
 
 public class CarTimeEstimator {
 	private final static Logger log = Logger.getLogger(CarTimeEstimator.class);
-	public M2UStringbuilder sb;
+//	public M2UStringbuilder sb;
 	private DenseDoubleMatrix2D odMatrix;
 	private List<MyZone> zones;
 	private Map<Id, Integer> mapZoneIdToListEntry;
@@ -46,8 +46,8 @@ public class CarTimeEstimator {
 	 * travel-time matrix for private cars. It is required that a successful 
 	 * MATSim is available since the following input data is required:
 	 * <ul>
-	 * 	<li> an <code>output_network.xml.gz</code> file describing the network used;
-	 * 	<li> an <code>output_plans.xml.gz</code> file describing the agent plans used;
+	 * 	<li> a <code>*.network.xml.gz</code> file describing the network used;
+	 * 	<li> the <code>*.plans.xml.gz</code> file of the last iteration;
 	 * 	<li> the <code>*.linkstats.txt</code> file of the last iteration (<b><i>Note: file must be unzipped</i></b>); and
 	 * 	<li> the <code>*.events.txt.gz</code> file of the last iteration that 
 	 * 		is used to build the travel time data required for the routing algorithm.
@@ -57,8 +57,8 @@ public class CarTimeEstimator {
 	 * 
 	 * @author jwjoubert
 	 */
-	public CarTimeEstimator(String root, String studyAreaName, String version, String percentage) {
-		sb = new M2UStringbuilder(root, studyAreaName, version, percentage);
+	public CarTimeEstimator() {
+//		sb = new M2UStringbuilder(root, studyAreaName, version, percentage);
 	}
 
 	
@@ -77,28 +77,58 @@ public class CarTimeEstimator {
 	 * 	<li> the specific hours (from link statistics file) to use, e.g. "6-7";
 	 * </ol>
 	 */
+	/**
+	 * Implements the private car drive time estimator. 
+	 * @param args The following arguments are required, and in the following 
+	 * 		  order:
+	 * <ol>
+	 * 	<li> <b>network</b> absolute path of the network to be used;
+	 * <br><br>The following files should be from the same MATSim run that used 
+	 * 	the network provided in the first argument:<br><br>
+	 *  <li> <b>linkstats</b> absolute path of the linkstats file to use (should
+	 *  		be associated with the network provided in the previous argument);
+	 *  <li> <b>population</b> absolute path of the population (plans) file;
+	 *  <li> <b>events</b> absolute path of the events file;  
+	 *  <br><br>
+	 *  <li> <b>shapefile</b> absolute path of the zonal shapefile for which the
+	 *  		inter-zonal travel time must be estimated;
+	 *  <li> <b>idField</b> the field number that must be used as zone Id: known 
+	 *  		values are:
+	 *  	<ul>
+	 *  		<li> eThekwini: <code>eThekwini_TZ_UTM.shp</code>, field value "1";
+	 *  		<li> Nelson Mandela Bay: <code>NMBM_Zone_SA-Albers.shp</code>, 
+	 *  			field value "6";
+	 *    	</ul>
+	 *    <li> <b>hour</b> the hour for which travel time must be estimated, for 
+	 *    		example "6-7";
+	 *    <li> <b>output</b> absolute path of the comma-separated file to which 
+	 *    		travel time estimations are written.
+	 * </ol>
+	 */
 	public static void main(String[] args){
 		CarTimeEstimator cte = null;
 		long tNow = System.currentTimeMillis();
-		int numberOfArguments = 6;
+		int numberOfArguments = 8;
 		if(args.length != numberOfArguments){
 			throw new RuntimeException("Incorrect number of arguments provided.");
 		} else{
-			cte = new CarTimeEstimator(args[0], args[1], args[2], args[3]);
+			cte = new CarTimeEstimator();
 		}
-		boolean empties = cte.estimateCarTime(args[4], args[5], true);
+		boolean empties = cte.estimateCarTime(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], true);
 		
 		String result = empties ? "Unsuccessful" : "Successful";
 		double time = (double)(System.currentTimeMillis() - tNow)/1000.0;
 		log.info("----------------------------------------------------------");
 		log.info(String.format("Process complete for %s (%s)", args[1], result));
 		log.info("----------------------------------------------------------");
-		log.info(String.format("            Time taken: %04.2fs",time));
-		log.info("                  Root: " + args[0]);
-		log.info("               Version: " + args[2]);
-		log.info("           Sample size: " + args[3] + "%");
-		log.info(" MATSim iteration used: " + args[4]);
-		log.info("                 Hours: " + args[5]);
+		log.info(String.format("        Time taken: %04.2fs",time));
+		log.info("           Network: " + args[0]);
+		log.info("         Linkstats: " + args[1]);
+		log.info("        Population: " + args[2]);
+		log.info("            Events: " + args[3]);
+		log.info("             Zones: " + args[4] + " (Field " + args[5] + ")");
+		log.info("             Hours: " + args[6]);
+		log.info(" Output written to: " + args[7]);
 		log.info("==========================================================");
 	}
 	
@@ -120,24 +150,33 @@ public class CarTimeEstimator {
 	 * @param iteration the specific MATSim iteration that must be used; 
 	 * @param hours the specific hours that must be used from the 
 	 * 		  <code>linkstats</code> file;
-	 * @param write indicating if then output must be written to file.
+	 * @param write indicating if the output must be written to file.
 	 */
-	public boolean estimateCarTime(String iteration, String hours, boolean write){
+	public boolean estimateCarTime(
+			String networkFilename, 
+			String linkstatsFilename,
+			String plansFilename, 
+			String eventsFilename,
+			String zoneShapefile, 
+			String zoneIdField, 
+			String hours, 
+			String outputFilename,
+			boolean write){
 		/*
 		 * Phase 1: calculate actual travel times from MATSim output.
 		 */
 		// 1a. Read the transportation zones. 
-		MyZoneReader r = new MyZoneReader(sb.getTransportZoneShapefile());
-		r.readZones(sb.getIdField());
+		MyZoneReader r = new MyZoneReader(zoneShapefile);
+		r.readZones(Integer.parseInt(zoneIdField));
 		zones = r.getZoneList();
 		// 1b. Create new scenario.
 		Scenario s = new ScenarioImpl();
 		// 1c. Read the network.
 		MatsimNetworkReader nr = new MatsimNetworkReader(s);
-		nr.readFile(sb.getEmmeNetworkFilename());
+		nr.readFile(networkFilename);
 		// 1d. Read plans file.
 		MatsimPopulationReader mpr = new MatsimPopulationReader(s);
-		mpr.readFile(sb.getPlansFile());
+		mpr.readFile(plansFilename);
 		// 1e. Process plans.
 		MyPlansProcessor mpp = new MyPlansProcessor(s, zones);
 		mpp.processPlans();
@@ -147,13 +186,13 @@ public class CarTimeEstimator {
 		 * Phase 2: calculate missing intra- and inter-zonal travel times.
 		 */
 		// 2a. Read link statistics.
-		MyLinkStatsReader mlsr = new MyLinkStatsReader(sb.getIterationLinkstatsFile(iteration));
+		MyLinkStatsReader mlsr = new MyLinkStatsReader(linkstatsFilename);
 		Map<Id,Double> linkstats = mlsr.readSingleHour(hours);
 		// 2b. Prepare zone-to-zone travel time.
 		MyZoneToZoneRouter mzzr = new MyZoneToZoneRouter(s, zones);
 		mapZoneIdToListEntry = mzzr.getZoneToMatrixMap();
 		mapListEntryToZoneId = mzzr.getMatrixToZoneMap();
-		mzzr.prepareTravelTimeData(sb.getIterationEventsFile(iteration));
+		mzzr.prepareTravelTimeData(eventsFilename);
 		// 2c. Do zone-to-zone calculations. 
 		boolean empties = mzzr.processZones(partialMatrix, linkstats);
 
@@ -170,7 +209,7 @@ public class CarTimeEstimator {
 		 */
 		if(write){
 //			mzzr.writeOdMatrixToDbf(sb.getDbfOutputFile(), odMatrix);
-			mzzr.writeOdMatrixToCsv(sb.getCsvOutputFile(), odMatrix);
+			mzzr.writeOdMatrixToCsv(outputFilename, odMatrix);
 		}
 		
 		return empties;	
