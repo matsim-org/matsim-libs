@@ -44,13 +44,13 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 public class PopulationMerger {
 
 	private String networkFile = "../../detailedEval/Net/network-86-85-87-84.xml";
-	private String midDemandFile = "../../detailedEval/pop/14k-synthetische-personen/plans.xml";
-	private String prognose2025FreightDemandFile = "../../detailedEval/pop/gueterVerkehr/population_gv_bavaria_1pct_wgs84.xml.gz";
-	private String prognose2025CommuterDemandFile = "../../detailedEval/pop/pendlerVerkehr/population_pv_bavaria_1pct_wgs84.xml.gz";
+	private String midDemandFile = "../../detailedEval/pop/140k-synthetische-personen/plans.xml";
+	private String prognose2025FreightDemandFile = "../../detailedEval/pop/gueterVerkehr/population_gv_bavaria_10pct_wgs84.xml.gz";
+	private String prognose2025CommuterDemandFile = "../../detailedEval/pop/pendlerVerkehr/population_pv_bavaria_10pct_wgs84.xml.gz";
 //	private String pendlerstatistikInCommutingDemandFile = "../../detailedEval/pop/pendlerVerkehr/pendlermatrizen/onlyIn/pendlerverkehr_1pct_dhdn_gk4.xml.gz";
-	private String pendlerstatistikCommutingDemandFile = "../../detailedEval/pop/pendlerVerkehr/pendlermatrizen/inAndOut/pendlerverkehr_1pct_scaledAndMode_workStartingTimePeak0730_dhdn_gk4.xml.gz";
+	private String pendlerstatistikCommutingDemandFile = "../../detailedEval/pop/pendlerVerkehr/pendlermatrizen/inAndOut/pendlerverkehr_10pct_scaledAndMode_workStartingTimePeak0800Var2h_dhdn_gk4.xml.gz";
 	private String outputPath = "../../detailedEval/pop/merged/";
-	private String outputFileName = "mergedPopulation_All_1pct_scaledAndMode_workStartingTimePeakAllCommuter0730_gk4.xml.gz";
+	private String outputFileName = "mergedPopulation_All_10pct_scaledAndMode_workStartingTimePeakAllCommuter0800Var2h_gk4.xml.gz";
 
 	private PopulationWriter populationWriter;
 	
