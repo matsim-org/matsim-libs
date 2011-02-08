@@ -228,7 +228,7 @@ public class TransitRouterImplTest extends TestCase {
 		assertEquals(f.blueLine.getId(), ((ExperimentalTransitRoute) legs.get(3).getRoute()).getLineId());
 		assertEquals(TransportMode.transit_walk, legs.get(4).getMode());
 
-		config.setUtilityOfLineSwitch_utl(300.0 * -config.getEffectiveMarginalUtilityOfTravelTimePt_utl_s()); // corresponds to 5 minutes transit travel time
+		config.setUtilityOfLineSwitch_utl(300.0 * config.getEffectiveMarginalUtilityOfTravelTimePt_utl_s()); // corresponds to 5 minutes transit travel time
 		legs = router.calcRoute(f.scenario.createCoord(11900, 5100), f.scenario.createCoord(24100, 4950), 6.0*3600 - 5.0*60);
 		assertEquals(3, legs.size());
 		assertEquals(TransportMode.transit_walk, legs.get(0).getMode());
