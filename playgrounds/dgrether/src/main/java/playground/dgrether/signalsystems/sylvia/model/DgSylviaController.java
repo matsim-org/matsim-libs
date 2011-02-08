@@ -117,7 +117,7 @@ public class DgSylviaController implements SignalController {
 //		log.info("time: " + timeSeconds + " sylvia timer: " + this.secondInSylviaCycle + " fixed-time timer: " + this.secondInFixedTimeCycle);
 		int secondInFixedTimeCycle = (int) (timeSeconds % this.activeSylviaPlan.getFixedTimeCycle());
 		if (secondInFixedTimeCycle == 0){
-			log.error("Reset cycle timers at " + timeSeconds + " sylvia timer: " + this.secondInSylviaCycle + " sylvia cycle: " + this.activeSylviaPlan.getCycleTime());
+//			log.error("Reset cycle timers at " + timeSeconds + " sylvia timer: " + this.secondInSylviaCycle + " sylvia cycle: " + this.activeSylviaPlan.getCycleTime());
 			this.initCylce();
 		}
 		
