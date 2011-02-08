@@ -189,7 +189,7 @@ public class AdaptedTransitRouter extends TransitRouterImpl {
 
 		return 	"[beelineWalkConnectionDistance=" + trRoutCfg.beelineWalkConnectionDistance + "]" +
 				"[beelineWalkSpeed=" + trRoutCfg.getBeelineWalkSpeed() + "]" +
-				"[costLineSwitch_utl=" + trRoutCfg.getUtilityOfLineSwitch_utl() + "]" +
+				"[costLineSwitch_utl=" + (-trRoutCfg.getUtilityOfLineSwitch_utl()) + "]" +
 				"[extensionRadius=" + trRoutCfg.extensionRadius + "]" +
 				"[marginalUtilityOfTravelDistanceTransit=" + trRoutCfg.getMarginalUtilityOfTravelDistancePt_utl_m() + "]" +
 				"[marginalUtilityOfTravelTimeTransit=" + trRoutCfg.getEffectiveMarginalUtilityOfTravelTimePt_utl_s() + "]" +

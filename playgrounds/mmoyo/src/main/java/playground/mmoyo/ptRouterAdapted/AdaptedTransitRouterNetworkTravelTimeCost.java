@@ -43,7 +43,8 @@ public class AdaptedTransitRouterNetworkTravelTimeCost extends TransitRouterNetw
 		double cost;
 		if (((TransitRouterNetworkLink) link).getRoute() == null) {
 			// transfer link
-			cost = -getLinkTravelTime(link, time) * this.myConfig.getEffectiveMarginalUtilityOfTravelTimeWalk_utl_s() + this.myConfig.getUtilityOfLineSwitch_utl();
+//			cost = -getLinkTravelTime(link, time) * this.myConfig.getEffectiveMarginalUtilityOfTravelTimeWalk_utl_s() + this.myConfig.getUtilityOfLineSwitch_utl();
+			cost = -getLinkTravelTime(link, time) * this.myConfig.getEffectiveMarginalUtilityOfTravelTimeWalk_utl_s() - this.myConfig.getUtilityOfLineSwitch_utl();
 		} else {
 			//pt link
 			cost = -getLinkTravelTime(link, time) * this.myConfig.getEffectiveMarginalUtilityOfTravelTimePt_utl_s() - link.getLength() * this.myConfig.getMarginalUtilityOfTravelDistancePt_utl_m();

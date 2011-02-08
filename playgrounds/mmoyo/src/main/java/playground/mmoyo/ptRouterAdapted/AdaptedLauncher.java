@@ -78,7 +78,8 @@ public class AdaptedLauncher {
 		//set margin utility values
 		myTransitRouterConfig.setEffectiveMarginalUtilityOfTravelTimeWalk_utl_s(-this.betaWalk     / 3600.0);
 		myTransitRouterConfig.setMarginalUtilityOfTravelDistancePt_utl_m(-this.betaDistance / 1000.0);
-		myTransitRouterConfig.setUtilityOfLineSwitch_utl(this.betaTransfer * -myTransitRouterConfig.getEffectiveMarginalUtilityOfTravelTimePt_utl_s());
+//		myTransitRouterConfig.setUtilityOfLineSwitch_utl(this.betaTransfer * -myTransitRouterConfig.getEffectiveMarginalUtilityOfTravelTimePt_utl_s());
+		myTransitRouterConfig.setUtilityOfLineSwitch_utl(this.betaTransfer * myTransitRouterConfig.getEffectiveMarginalUtilityOfTravelTimePt_utl_s());
 
 		myTransitRouterConfig.scenarioName = strWalk + this.betaWalk + sep+ strDist + this.betaDistance + sep +  strTr + this.betaTransfer ;
 		System.out.println (routing  + myTransitRouterConfig.scenarioName);
