@@ -107,7 +107,7 @@ public class AdaptedLauncher {
 		adaptedPlansCalcTransitRoute.run(pop);
 
 		if (this.fragmentPlans){
-			new PlanFragmenter().run(pop);					
+			pop = new PlanFragmenter().run(pop);					
 		}
 
 		//write routed plan

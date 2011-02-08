@@ -1,13 +1,13 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd"
   [
-   <!ENTITY INPUTBASE   "../playgrounds/mmoyo/src/main/java/playground/mmoyo/demo/X5/">
-   <!ENTITY OUTPUTBASE	"../playgrounds/mmoyo/test/output/playground/mmoyo/AdaptedRouterTest/">
+   <!ENTITY INPUTBASE   "src/main/java/playground/mmoyo/demo/X5/">
+   <!ENTITY OUTPUTBASE	"test/output/playground/mmoyo/AdaptedRouterTest/">
   ]
 >
 
 <!-- 
- 	<!ENTITY INPUTBASE   "../playgrounds/mmoyo/src/main/java/playground/mmoyo/demo/X5/">
+   <!ENTITY INPUTBASE   "../playgrounds/mmoyo/src/main/java/playground/mmoyo/demo/X5/">
    <!ENTITY OUTPUTBASE	"../playgrounds/mmoyo/test/output/playground/mmoyo/AdaptedRouterTest/">
 
    <!ENTITY INPUTBASE   "src/main/java/playground/mmoyo/demo/X5/">

@@ -40,11 +40,12 @@ public class PTRouterTest extends MatsimTestCase {
 	
 	public void testRouter() throws SAXException, ParserConfigurationException, IOException {
 
-		//final String PATH= getInputDirectory();
-		final String PATH="src/main/java/playground/mmoyo/demo/X5/transfer_det/";
-		final String NETWORK = "src/main/java/playground/mmoyo/demo/X5/network.xml";
-		final String TRANSITSCHEDULE= PATH + "simple1TransitSchedule.xml";
-		final String PLANFILE = PATH +  "output_plans.xml";
+		final String PATH="src/main/java/playground/mmoyo/demo/X5/";
+		//final String PATH= "../playgrounds/mmoyo/src/main/java/playground/mmoyo/demo/X5/";
+		
+		final String NETWORK = PATH + "network.xml";
+		final String TRANSITSCHEDULE= PATH + "transfer_det/simple1TransitSchedule.xml";
+		final String PLANFILE = PATH +  "transfer_det/output_plans.xml";
 
 		/* read transit schedule, plain net create logic elements */
 		ScenarioImpl scenario = new ScenarioImpl();
@@ -96,20 +97,6 @@ public class PTRouterTest extends MatsimTestCase {
 		Person person = population.getPersons().get(new IdImpl("1"));
 		Plan plan = person.getPlans().get(0);
 
-
-		if (!planValidator.hasSecqActLeg(population)) { 
-			throw new RuntimeException("this may not work, it assumes that the first PlanElement is home!! what about fragmnted plans? or other plans at all?" );
-		}	
-
-  		ActivityImpl act1 = (ActivityImpl)plan.getPlanElements().get(0);
-		ActivityImpl act2 = (ActivityImpl)plan.getPlanElements().get(2);
-
-		List<Leg> legList = transitRouteFinder.calculateRoute (act1, act2, person);
-
-		assertEquals( legList.get(0).getMode() , TransportMode.walk);
-		assertEquals( legList.get(1).getMode() , TransportMode.pt);
-		assertEquals( legList.get(2).getMode() , TransportMode.pt);
-		assertEquals( legList.get(3).getMode() , TransportMode.walk);
 	}
 
 }

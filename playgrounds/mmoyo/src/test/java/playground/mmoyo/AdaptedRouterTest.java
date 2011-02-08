@@ -41,7 +41,7 @@ public class AdaptedRouterTest extends MatsimTestCase {
 		}
 		
 		//test travel parameter values coming from config file
-		String str_expected = "[beelineWalkConnectionDistance=100.0][beelineWalkSpeed=0.8333333333333333][costLineSwitch_utl=-0.4][extensionRadius=200.0][marginalUtilityOfTravelDistanceTransit=-0.0][marginalUtilityOfTravelTimeTransit=-0.0016666666666666668][marginalUtilityOfTravelTimeWalk=-0.0016666666666666668][searchRadius=1000.0]";
+		String str_expected = "[beelineWalkConnectionDistance=100.0][beelineWalkSpeed=0.8333333333333333][costLineSwitch_utl=0.4][extensionRadius=200.0][marginalUtilityOfTravelDistanceTransit=-0.0][marginalUtilityOfTravelTimeTransit=-0.0016666666666666668][marginalUtilityOfTravelTimeWalk=-0.0016666666666666668][searchRadius=1000.0]";
 		Assert.assertEquals("travel parameters are different as in config file" , str_expected , adaptedTransitRouter.toString());
 	}
 }
