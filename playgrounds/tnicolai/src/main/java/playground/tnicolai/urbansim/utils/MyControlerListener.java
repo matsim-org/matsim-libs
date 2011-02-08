@@ -138,7 +138,13 @@ public class MyControlerListener implements ShutdownListener {
 				
 				// initialize accessibility for origin (from) zone
 				double accessibility 	= 0.;
+
+				double beta_per_hr = sc.getConfig().planCalcScore().getTraveling_utils_hr() - sc.getConfig().planCalcScore().getPerforming_utils_hr() ;
+				// check if there is something in here.  -12?
+
 				double beta 			= -12/3600.; // -1 is too large
+
+				
 				double minTravelTime 	= Double.MAX_VALUE;
 
 				for ( ActivityFacility toZone : zones.getFacilities().values() ) {
