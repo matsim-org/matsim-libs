@@ -48,7 +48,7 @@ public class DgCottbusPreprocessPlans {
 		ScenarioLoader loader = new ScenarioLoaderImpl(conf);
 		Scenario scenario = loader.loadScenario();
 		((PopulationImpl) scenario.getPopulation()).addAlgorithm(new XY2Links((NetworkImpl) scenario.getNetwork()));
-		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(scenario.getConfig().charyparNagelScoring());
+		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(scenario.getConfig().planCalcScore());
 		((PopulationImpl) scenario.getPopulation()).addAlgorithm(new PlansCalcRoute(scenario.getConfig().plansCalcRoute(), scenario.getNetwork(), timeCostCalc, timeCostCalc, new DijkstraFactory()));
 		((PopulationImpl) scenario.getPopulation()).runAlgorithms();
 		PopulationWriter writer = new PopulationWriter(scenario.getPopulation(), scenario.getNetwork());
