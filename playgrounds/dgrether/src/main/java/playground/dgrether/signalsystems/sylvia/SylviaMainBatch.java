@@ -77,6 +77,7 @@ public class SylviaMainBatch {
 			
 			//sylvia control
 			analysis = new DgCottbusSylviaAnalysisControlerListener();
+			outputDirectory = outputDirBase;
 			outputDirectory = controler.getConfig().controler().getOutputDirectory();
 			baseConfig.controler().setOutputDirectory(outputDirectory + "sylvia-control_scale_"+ scale + "/");
 			baseConfig.plans().setInputFile( footballPlansBase + scale + ".xml.gz");
