@@ -68,7 +68,7 @@ public class SylviaMainBatch {
 			baseConfig.controler().setOutputDirectory(outputDirectory + "fixed-time-control_scale_"+scale);
 			baseConfig.plans().setInputFile( footballPlansBase + scale + ".xml.gz");
 			baseConfig.signalSystems().setSignalControlFile(fixedTimeSignals);
-			Controler controler = new Controler(configFilename);
+			Controler controler = new Controler(baseConfig);
 			controler.addControlerListener(analysis);
 			controler.setOverwriteFiles(true);
 			controler.run();
@@ -80,7 +80,7 @@ public class SylviaMainBatch {
 			baseConfig.plans().setInputFile( footballPlansBase + scale + ".xml.gz");
 			baseConfig.signalSystems().setSignalControlFile(sylviaSignals);
 
-			controler = new Controler(configFilename);
+			controler = new Controler(baseConfig);
 			controler.setSignalsControllerListenerFactory(new DgSylviaControlerListenerFactory());
 			controler.addControlerListener(analysis);
 			controler.setOverwriteFiles(true);
