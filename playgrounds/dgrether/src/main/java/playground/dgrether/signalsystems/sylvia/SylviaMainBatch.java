@@ -19,11 +19,19 @@
  * *********************************************************************** */
 package playground.dgrether.signalsystems.sylvia;
 
+import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.utils.io.IOUtils;
 
 import playground.dgrether.DgPaths;
 import playground.dgrether.signalsystems.sylvia.controler.DgSylviaControlerListenerFactory;
@@ -40,8 +48,10 @@ public class SylviaMainBatch {
 	
 	/**
 	 * @param args
+	 * @throws IOException 
+	 * @throws FileNotFoundException 
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws FileNotFoundException, IOException {
 		String baseDirectory = DgPaths.REPOS;
 		String configFilename = "";
 		configFilename = baseDirectory + "shared-svn/studies/dgrether/cottbus/sylvia/cottbus_sylvia_config.xml";
@@ -63,29 +73,54 @@ public class SylviaMainBatch {
 
 		String outputDirBase = baseConfig.controler().getOutputDirectory();
 		
+		Map<Integer, Double> fixedtimeScale2AverageTTMap = new HashMap<Integer, Double>();
+		Map<Integer, Double> sylviaScale2AverageTTMap = new HashMap<Integer, Double>();
+		
 		for (int scale = 0; scale <= 100; scale = scale + 5){
 			//fixed time control
 			DgCottbusSylviaAnalysisControlerListener analysis = new DgCottbusSylviaAnalysisControlerListener();
 			baseConfig.controler().setOutputDirectory(outputDirBase + "fixed-time-control_scale_"+scale + "/");
 			baseConfig.plans().setInputFile( footballPlansBase + scale + ".xml.gz");
 			baseConfig.signalSystems().setSignalControlFile(fixedTimeSignals);
+			baseConfig.controler().setRunId("ft_" + scale);
 			Controler controler = new Controler(baseConfig);
 			controler.addControlerListener(analysis);
 			controler.setOverwriteFiles(true);
 			controler.run();
+			fixedtimeScale2AverageTTMap.put(scale, analysis.getAverageTravelTime());
 			
 			//sylvia control
 			analysis = new DgCottbusSylviaAnalysisControlerListener();
 			baseConfig.controler().setOutputDirectory(outputDirBase + "sylvia-control_scale_"+ scale + "/");
 			baseConfig.plans().setInputFile( footballPlansBase + scale + ".xml.gz");
 			baseConfig.signalSystems().setSignalControlFile(sylviaSignals);
-
+			baseConfig.controler().setRunId("sv_" + scale);
+			
 			controler = new Controler(baseConfig);
 			controler.setSignalsControllerListenerFactory(new DgSylviaControlerListenerFactory());
 			controler.addControlerListener(analysis);
 			controler.setOverwriteFiles(true);
 			controler.run();
+			sylviaScale2AverageTTMap.put(scale, analysis.getAverageTravelTime());
 		}
+		
+		writeAverageTT(fixedtimeScale2AverageTTMap, outputDirBase + "fixed_time_avg_tt.txt");
+		writeAverageTT(sylviaScale2AverageTTMap, outputDirBase + "sylvia_avg_tt.txt");
 	}
 
+	private static void writeAverageTT(Map<Integer, Double> map, String filename) throws FileNotFoundException, IOException{
+		BufferedWriter writer = IOUtils.getBufferedWriter(filename);
+		writer.write("Football fans %" + "\t" + "Average travel time");
+		writer.newLine();
+		for (Entry<Integer, Double> e : map.entrySet()){
+			writer.write(e.getKey().toString() + "\t" + e.getValue().toString());
+			writer.newLine();
+		}
+		writer.close();
+	}
+	
+
 }
+
+
+

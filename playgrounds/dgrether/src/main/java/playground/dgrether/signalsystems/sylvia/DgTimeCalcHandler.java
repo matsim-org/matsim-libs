@@ -176,8 +176,8 @@ public class DgTimeCalcHandler implements LinkEnterEventHandler, LinkLeaveEventH
 		this.exportMaptoCVS(this.arrivaltimestofbcb, filename);
 		filename = outdir + iteration + ".arrivalTimesToSPN_CB.csv";
 		this.exportMaptoCVS(this.arrivaltimestofbspn, filename);
+		
 		filename = outdir + iteration + ".latestArrivals.csv";
-
 		this.exportLatestArrivals(filename);
 	}
 

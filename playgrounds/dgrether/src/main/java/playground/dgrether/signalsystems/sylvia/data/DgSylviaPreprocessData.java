@@ -69,14 +69,14 @@ public class DgSylviaPreprocessData {
 
 	public static final String SYLVIA_PREFIX = "sylvia_plan_";
 
-	private int minGreenSeconds = 7; //see RILSA pp. 28
+	private int minGreenSeconds = 4; //see RILSA pp. 28
 
 	private Set<Id> signalSystemIds = new HashSet<Id>();
 	
 	public DgSylviaPreprocessData(){
-//			this.signalSystemIds.add(new IdImpl(1));
+			this.signalSystemIds.add(new IdImpl(1));
 			this.signalSystemIds.add(new IdImpl(17));
-//			this.signalSystemIds.add(new IdImpl(18));
+			this.signalSystemIds.add(new IdImpl(18));
 //			this.signalSystemIds.add(new IdImpl(28));
 //			this.signalSystemIds.add(new IdImpl(12));
 //			this.signalSystemIds.add(new IdImpl(14));
