@@ -77,16 +77,22 @@ public class DgCottbusSylviaAnalysisControlerListener implements StartupListener
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent e) {
+		log.info("Analysis of run id: " + e.getControler().getConfig().controler().getRunId());
 		log.info("Agents that passed an adaptive signal system (1,17 or 18) at least once: "
 				+ this.timeCalcHandler.getPassedAgents());
 		log.info("Average TravelTime for Agents that passed an adaptive signal at least once: "+this.timeCalcHandler.getAverageAdaptiveTravelTime());
-		log.info("Average TT of all Agents" +this.timeCalcHandler.getAverageTravelTime() ); 
+		log.info("Average TT of all Agents " + this.timeCalcHandler.getAverageTravelTime()); 
 		log.info("Latest arrival time at stadium for Agents coming from Cottbus: "+this.timeCalcHandler.getLatestArrivalCBSDF());
 		log.info("Latest arrival time at stadium for Agents coming from SPN: "+this.timeCalcHandler.getLatestArrivalSPNSDF());
-		log.info("Latest home time for agents going from stadium to Cottbus"+this.timeCalcHandler.getLatestArrivalSDFCB());
-		log.info("Latest home time for agents going from stadium to SPN"+this.timeCalcHandler.getLatestArrivalSDFSPN());
+		log.info("Latest home time for agents going from stadium to Cottbus: "+this.timeCalcHandler.getLatestArrivalSDFCB());
+		log.info("Latest home time for agents going from stadium to SPN: "+this.timeCalcHandler.getLatestArrivalSDFSPN());
 
 		this.timeCalcHandler.exportArrivalTime(e.getIteration(), e.getControler().getConfig().controler().getOutputDirectory());
+	}
+	
+	
+	public double getAverageTravelTime(){
+		return this.timeCalcHandler.getAverageTravelTime();
 	}
 
 	@Override
