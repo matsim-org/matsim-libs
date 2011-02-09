@@ -20,6 +20,9 @@
 package playground.dgrether.signalsystems.sylvia;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.controler.Controler;
 
 import playground.dgrether.DgPaths;
@@ -40,12 +43,12 @@ public class SylviaMainBatch {
 	 */
 	public static void main(String[] args) {
 		String baseDirectory = DgPaths.REPOS;
-		String config = "";
-		config = baseDirectory + "shared-svn/studies/dgrether/cottbus/sylvia/cottbus_sylvia_config.xml";
+		String configFilename = "";
+		configFilename = baseDirectory + "shared-svn/studies/dgrether/cottbus/sylvia/cottbus_sylvia_config.xml";
 		if (args != null && args.length == 2){
 			baseDirectory = args[0];
-			config = args[1];
-			log.info("Running CottbusMainBatch with base directory: " + baseDirectory + " and config: " + config);
+			configFilename = args[1];
+			log.info("Running CottbusMainBatch with base directory: " + baseDirectory + " and config: " + configFilename);
 		}
 
 		
@@ -54,26 +57,30 @@ public class SylviaMainBatch {
 		
 		String footballPlansBase = baseDirectory + "shared-svn/studies/dgrether/cottbus/Cottbus-BA/planswithfb/output_plans_";
 		
+		Config baseConfig = new ScenarioImpl().getConfig();
+		MatsimConfigReader confReader = new MatsimConfigReader(baseConfig);
+		confReader.readFile(configFilename);
 
 		for (int scale = 0; scale <= 100; scale = scale + 5){
 			//fixed time control
 			DgCottbusSylviaAnalysisControlerListener analysis = new DgCottbusSylviaAnalysisControlerListener();
-			Controler controler = new Controler(config);
-			String outputDirectory = controler.getConfig().controler().getOutputDirectory();
-			controler.getConfig().controler().setOutputDirectory(outputDirectory + "fixed-time-control_scale_"+scale);
-			controler.getConfig().plans().setInputFile( footballPlansBase + scale + ".xml.gz");
-			controler.getConfig().signalSystems().setSignalControlFile(fixedTimeSignals);
+			String outputDirectory = baseConfig.controler().getOutputDirectory();
+			baseConfig.controler().setOutputDirectory(outputDirectory + "fixed-time-control_scale_"+scale);
+			baseConfig.plans().setInputFile( footballPlansBase + scale + ".xml.gz");
+			baseConfig.signalSystems().setSignalControlFile(fixedTimeSignals);
+			Controler controler = new Controler(configFilename);
 			controler.addControlerListener(analysis);
 			controler.setOverwriteFiles(true);
 			controler.run();
 			
 			//sylvia control
 			analysis = new DgCottbusSylviaAnalysisControlerListener();
-			controler = new Controler(config);
 			outputDirectory = controler.getConfig().controler().getOutputDirectory();
-			controler.getConfig().controler().setOutputDirectory(outputDirectory + "sylvia-control_scale_"+scale);
-			controler.getConfig().plans().setInputFile( footballPlansBase + scale + ".xml.gz");
-			controler.getConfig().signalSystems().setSignalControlFile(sylviaSignals);
+			baseConfig.controler().setOutputDirectory(outputDirectory + "sylvia-control_scale_"+scale);
+			baseConfig.plans().setInputFile( footballPlansBase + scale + ".xml.gz");
+			baseConfig.signalSystems().setSignalControlFile(sylviaSignals);
+
+			controler = new Controler(configFilename);
 			controler.setSignalsControllerListenerFactory(new DgSylviaControlerListenerFactory());
 			controler.addControlerListener(analysis);
 			controler.setOverwriteFiles(true);
