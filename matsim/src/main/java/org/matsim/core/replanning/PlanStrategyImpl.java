@@ -75,6 +75,8 @@ public final class PlanStrategyImpl implements PlanStrategy {
 		}
 		return this.modules.size() + 1; // we also have to count "firstModule", thus +1
 	}
+	
+	private static int wrnCnt = 0 ;
 
 	/* (non-Javadoc)
 	 * @see org.matsim.core.replanning.PlanStrategy#run(org.matsim.api.core.v01.population.Person)
@@ -101,7 +103,7 @@ public final class PlanStrategyImpl implements PlanStrategy {
 			plan = ((PersonImpl) person).copySelectedPlan();
 			// (this makes, as a side effect, the _new_ plan selected)
 			
-			// add that new plan to the agent's plans:
+			// add new plan to container that contains the plans that are handled by this PlanStrategy:
 			this.plans.add(plan);
 
 			// start working on this new plan:
