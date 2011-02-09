@@ -1,3 +1,23 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * FhEmissions.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ *                                                                         
+ * *********************************************************************** */
 package playground.fhuelsmann.emission;
 
 import java.io.BufferedReader;
@@ -40,17 +60,17 @@ public class LinkAndAgentAccountAnalyseModul implements analyseModul{
 	//get emissions calculated per event differentiated by fraction and average speed approach
 	double [] inputForEmissions = emissionFactor.collectInputForEmission(Hbefa_road_type, averageSpeed, distance,hbefaTable);
 				
-		//falls kein LinkId in der Map vorhanden ist
+		//if no link in the map
 		
 		if(this.emissionsLink.get(linkId) == null) {
-			this.emissionsLink.put(linkId, inputForEmissions);// in dem Fall muss nichts aufaddiert werden, weil es zum ersten mal Daten eingelesen werden
+			this.emissionsLink.put(linkId, inputForEmissions);// data is read for the first time, doesn't need to be summed up per link
 //			System.out.println(this.emissions);
 
 		}
 		else{
 		
-			double [] actualEmissions = new double[12]; // es werden hier die neuen  Daten (nach der Aufsummierung) gespeichert
-			double [] previousEmissions = this.emissionsLink.get(linkId); // oldValue ist die bisherige Summe
+			double [] actualEmissions = new double[12]; // new data is saved after summation
+			double [] previousEmissions = this.emissionsLink.get(linkId); // oldValue is the previous sum
 		
 			for(int i=0; i<12 ; i++){
 			
@@ -78,17 +98,17 @@ public class LinkAndAgentAccountAnalyseModul implements analyseModul{
 	//get emissions calculated per event differentiated by fraction and average speed approach
 	double [] inputForEmissions = emissionFactor.collectInputForEmission(Hbefa_road_type, averageSpeed, distance,hbefaTable);
 			
-	//falls kein LinkId in der Map vorhanden ist
+	//if no link in the map
 	
 	if(this.emissionsPerson.get(personId) == null) {
-		this.emissionsPerson.put(personId, inputForEmissions);// in dem Fall muss nichts aufaddiert werden, weil es zum ersten mal Daten eingelesen werden
+		this.emissionsPerson.put(personId, inputForEmissions);// data is read for the first time, doesn't need to be summed up per link
 //		System.out.println(this.emissions);
 
 	}
 	else{
 	
-		double [] actualEmissions = new double[12]; // es werden hier die neuen  Daten (nach der Aufsummierung) gespeichert
-		double [] previousEmissions = this.emissionsPerson.get(personId); // oldValue ist die bisherige Summe
+		double [] actualEmissions = new double[12]; // new data is saved after summation
+		double [] previousEmissions = this.emissionsPerson.get(personId); //oldValue is the previous sum
 	
 		for(int i=0; i<12 ; i++){
 		
