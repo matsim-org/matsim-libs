@@ -61,11 +61,13 @@ public class SylviaMainBatch {
 		MatsimConfigReader confReader = new MatsimConfigReader(baseConfig);
 		confReader.readFile(configFilename);
 
+		String outputDirBase = baseConfig.controler().getOutputDirectory();
+		
 		for (int scale = 0; scale <= 100; scale = scale + 5){
 			//fixed time control
 			DgCottbusSylviaAnalysisControlerListener analysis = new DgCottbusSylviaAnalysisControlerListener();
-			String outputDirectory = baseConfig.controler().getOutputDirectory();
-			baseConfig.controler().setOutputDirectory(outputDirectory + "fixed-time-control_scale_"+scale);
+			String outputDirectory = outputDirBase;
+			baseConfig.controler().setOutputDirectory(outputDirectory + "fixed-time-control_scale_"+scale + "/");
 			baseConfig.plans().setInputFile( footballPlansBase + scale + ".xml.gz");
 			baseConfig.signalSystems().setSignalControlFile(fixedTimeSignals);
 			Controler controler = new Controler(baseConfig);
@@ -76,7 +78,7 @@ public class SylviaMainBatch {
 			//sylvia control
 			analysis = new DgCottbusSylviaAnalysisControlerListener();
 			outputDirectory = controler.getConfig().controler().getOutputDirectory();
-			baseConfig.controler().setOutputDirectory(outputDirectory + "sylvia-control_scale_"+scale);
+			baseConfig.controler().setOutputDirectory(outputDirectory + "sylvia-control_scale_"+ scale + "/");
 			baseConfig.plans().setInputFile( footballPlansBase + scale + ".xml.gz");
 			baseConfig.signalSystems().setSignalControlFile(sylviaSignals);
 
