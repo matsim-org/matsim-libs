@@ -48,9 +48,9 @@ import com.vividsolutions.jts.geom.Point;
  *
  */
 public class UrbanSuburbanAnalyzer {
-	
+
 	private static final Logger logger = Logger.getLogger(UrbanSuburbanAnalyzer.class);
-	
+
 	// INPUT
 	private static String runDirectory = "../../detailedEval/testRuns/output/1pct/v0-default/run7/";
 	private static String shapeDirectory = "../../detailedEval/Net/shapeFromVISUM/urbanSuburban/";
@@ -58,22 +58,22 @@ public class UrbanSuburbanAnalyzer {
 	private static String plansFile = runDirectory + "output_plans.xml.gz";
 	private static String urbanShapeFile = shapeDirectory + "urbanAreas.shp";
 	private static String suburbanShapeFile = shapeDirectory + "suburbanAreas.shp";
-	
+
 	// OUTPUT
 	private static String outputPath = runDirectory + "urbanSuburban/";
-	
+
 	//===
 	private final Scenario scenario;
-	
-	
+
+
 	public UrbanSuburbanAnalyzer(){
 		this.scenario = new ScenarioFactoryImpl().createScenario();
 	}
-	
-//	public UrbanSuburbanAnalyzer(Scenario scenario){
-//		this.scenario = scenario;
-//	}
-	
+
+	//	public UrbanSuburbanAnalyzer(Scenario scenario){
+	//		this.scenario = scenario;
+	//	}
+
 	public static void main(String[] args) {
 		UrbanSuburbanAnalyzer usa = new UrbanSuburbanAnalyzer();
 		usa.run(args);
@@ -83,28 +83,40 @@ public class UrbanSuburbanAnalyzer {
 		loadScenario();
 		Set<Feature> urbanShape = readShape(urbanShapeFile);
 		Set<Feature> suburbanShape = readShape(suburbanShapeFile);
-		
+
 		Population population = scenario.getPopulation();
 		Population urbanPop = getRelevantPopulation(population, urbanShape);
 		Population suburbanPop = getRelevantPopulation(population, suburbanShape);
-		
+
 		calculateModalSplitForArea(urbanPop);
 		calculateModalSplitForArea(suburbanPop);
 	}
 
 	private void calculateModalSplitForArea(Population population) {
-		
+		for(Person person : population.getPersons().values()){
+			
+		}
 	}
 
 	private Population getRelevantPopulation(Population population,	Set<Feature> featuresInShape) {
 		ScenarioImpl emptyScenario = new ScenarioImpl();
 		Population filteredPopulation = new PopulationImpl(emptyScenario);
 		for(Person person : population.getPersons().values()){
-			if(isPersonInShape(person, featuresInShape)){
-				filteredPopulation.addPerson(person);
+			if(isPersonFromMID(person)){
+				if(isPersonInShape(person, featuresInShape)){
+					filteredPopulation.addPerson(person);
+				}
 			}
 		}
 		return filteredPopulation;
+	}
+
+	private boolean isPersonFromMID(Person person) {
+		boolean isFromMID = false;
+		if(!person.getId().toString().contains("gv_") && !person.getId().toString().contains("pv_")){
+			isFromMID = true;
+		}
+		return isFromMID;
 	}
 
 	private boolean isPersonInShape(Person person, Set<Feature> featuresInShape) {
