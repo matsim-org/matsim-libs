@@ -66,8 +66,7 @@ public class SylviaMainBatch {
 		for (int scale = 0; scale <= 100; scale = scale + 5){
 			//fixed time control
 			DgCottbusSylviaAnalysisControlerListener analysis = new DgCottbusSylviaAnalysisControlerListener();
-			String outputDirectory = outputDirBase;
-			baseConfig.controler().setOutputDirectory(outputDirectory + "fixed-time-control_scale_"+scale + "/");
+			baseConfig.controler().setOutputDirectory(outputDirBase + "fixed-time-control_scale_"+scale + "/");
 			baseConfig.plans().setInputFile( footballPlansBase + scale + ".xml.gz");
 			baseConfig.signalSystems().setSignalControlFile(fixedTimeSignals);
 			Controler controler = new Controler(baseConfig);
@@ -77,9 +76,7 @@ public class SylviaMainBatch {
 			
 			//sylvia control
 			analysis = new DgCottbusSylviaAnalysisControlerListener();
-			outputDirectory = outputDirBase;
-			outputDirectory = controler.getConfig().controler().getOutputDirectory();
-			baseConfig.controler().setOutputDirectory(outputDirectory + "sylvia-control_scale_"+ scale + "/");
+			baseConfig.controler().setOutputDirectory(outputDirBase + "sylvia-control_scale_"+ scale + "/");
 			baseConfig.plans().setInputFile( footballPlansBase + scale + ".xml.gz");
 			baseConfig.signalSystems().setSignalControlFile(sylviaSignals);
 
