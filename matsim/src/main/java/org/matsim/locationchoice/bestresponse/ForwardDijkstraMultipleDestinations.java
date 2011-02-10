@@ -34,11 +34,11 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.PseudoRemovePriorityQueue;
 import org.matsim.core.utils.misc.Time;
 
-public class ForwardDijkstraMiltipleDestinations extends Dijkstra {
+public class ForwardDijkstraMultipleDestinations extends Dijkstra {
 	
 	protected Map<Id, Double> distances;
 	
-	public ForwardDijkstraMiltipleDestinations(Network network, TravelCost costFunction, TravelTime timeFunction) {
+	public ForwardDijkstraMultipleDestinations(Network network, TravelCost costFunction, TravelTime timeFunction) {
 		super(network, costFunction, timeFunction);
 		distances = new HashMap<Id, Double>();
 	}
