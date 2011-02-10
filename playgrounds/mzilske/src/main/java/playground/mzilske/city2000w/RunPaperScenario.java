@@ -196,10 +196,10 @@ public class RunPaperScenario implements StartupListener, ScoringListener, Repla
 		for(CarrierImpl carrier : carriers.getCarriers().values()){
 //			TrivialCarrierPlanBuilder trivialCarrierPlanBuilder = new TrivialCarrierPlanBuilder();
 //			CarrierPlan plan = trivialCarrierPlanBuilder.buildPlan(carrier.getCarrierCapabilities(), carrier.getContracts());
-			VRPCarrierPlanBuilder vrpCarrierPlanBuilder = new VRPCarrierPlanBuilder(scenario.getNetwork());
-			CarrierPlan plan = vrpCarrierPlanBuilder.buildPlan(carrier.getCarrierCapabilities(), carrier.getContracts());
-			carrier.getPlans().add(plan);
-			carrier.setSelectedPlan(plan);
+//			VRPCarrierPlanBuilder vrpCarrierPlanBuilder = new VRPCarrierPlanBuilder(scenario.getNetwork());
+//			CarrierPlan plan = vrpCarrierPlanBuilder.buildPlan(carrier.getCarrierCapabilities(), carrier.getContracts());
+//			carrier.getPlans().add(plan);
+//			carrier.setSelectedPlan(plan);
 		}
 	}
 
