@@ -22,6 +22,8 @@ public class TransportServiceProviderImpl {
 	
 	private TSPCapabilities tspCapabilities;
 	
+	private TSPKnowledge knowledge;
+	
 	private Collection<TSPContract> contracts = new ArrayList<TSPContract>();
 	
 	public TransportServiceProviderImpl(Id id) {
@@ -57,6 +59,14 @@ public class TransportServiceProviderImpl {
 		this.tspCapabilities = tspCapabilities;
 	}
 	
+	public void setKnowledge(TSPKnowledge knowledge) {
+		this.knowledge = knowledge;
+	}
+
+	public TSPKnowledge getKnowledge() {
+		return knowledge;
+	}
+
 	public String toString(){
 		return "[id="+id+"][numberOfPlans="+plans.size()+"]";
 	}
