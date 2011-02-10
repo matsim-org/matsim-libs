@@ -156,4 +156,14 @@ public class TransportChainAgent {
 		}
 	}
 	
+	public double getFees(){
+		double costs = 0.0;
+		for(ChainElement e : tpChain.getChainElements()){
+			if(e instanceof ChainLeg){
+				costs += ((ChainLeg) e).getAcceptedOffer().getPrice();
+			}
+		}
+		return costs;
+	}
+	
 }

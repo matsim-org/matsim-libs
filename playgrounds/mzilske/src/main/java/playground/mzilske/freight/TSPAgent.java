@@ -94,10 +94,23 @@ public class TSPAgent {
 	}
 
 	public void scoreSelectedPlan() {
-		double cost = calculateCost();
-		tsp.getSelectedPlan().setScore(cost * (-1));
+		double sumOfFees = calculateFees();
+		double opportunityCosts = calculateOpportunityCosts();
+		//tsp.getSelectedPlan().setScore(cost * (-1));
 	}
 	
+	private double calculateOpportunityCosts() {
+		return 0;
+	}
+
+	private double calculateFees() {
+		double cost = 0.0;
+		for(TransportChainAgent tca : transportChainAgents){
+			cost += tca.getFees();
+		}
+		return cost;
+	}
+
 	private double calculateCost() {
 		double cost = 0.0;
 		for(Tuple<TSPShipment,Double> t : calculateCostsOfSelectedPlanPerShipment()) {
