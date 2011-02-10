@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 
@@ -12,6 +14,7 @@ import playground.mzilske.freight.CarrierAgentTracker;
 import playground.mzilske.freight.Offer;
 import playground.mzilske.freight.TSPCapabilities;
 import playground.mzilske.freight.TSPContract;
+import playground.mzilske.freight.TSPKnowledge;
 import playground.mzilske.freight.TSPPlan;
 import playground.mzilske.freight.TSPShipment;
 import playground.mzilske.freight.TSPShipment.TimeWindow;
@@ -33,7 +36,7 @@ public class CheapestCarrierWithVorlaufTSPPlanBuilder {
 		this.transshipmentCentres = transshipmentCentres;
 	}
 
-	public TSPPlan buildPlan(Collection<TSPContract> contracts, TSPCapabilities tspCapabilities) {
+	public TSPPlan buildPlan(Collection<TSPContract> contracts, TSPCapabilities tspCapabilities, TSPKnowledge tspKnowledge) {
 		Collection<TransportChain> chains = new ArrayList<TransportChain>();
 		for(TSPContract c : contracts){
 			for(TSPShipment s : c.getShipments()){
@@ -41,14 +44,16 @@ public class CheapestCarrierWithVorlaufTSPPlanBuilder {
 				TransportChainBuilder chainBuilder = new TransportChainBuilder(s);
 				chainBuilder.schedulePickup(fromLocation, s.getPickUpTimeWindow());
 				for (Id transshipmentCentre : transshipmentCentres) { 
-					Offer acceptedOffer = pickOffer(fromLocation, transshipmentCentre, s.getSize());
+					Offer acceptedOffer = pickKnownOffer(fromLocation, transshipmentCentre, s.getSize(), tspKnowledge);
+					
+//					Offer acceptedOffer = pickOffer(fromLocation, transshipmentCentre, s.getSize());
 					chainBuilder.scheduleLeg(acceptedOffer);
 					chainBuilder.scheduleDelivery(transshipmentCentre, new TimeWindow(0.0,24*3600));
-					chainBuilder.schedulePickup(transshipmentCentre, new TimeWindow(1400,24*3600)); // works
+					chainBuilder.schedulePickup(transshipmentCentre, new TimeWindow(240,24*3600)); // works
 					// chainBuilder.schedulePickup(transshipmentCentre, new TimeWindow(120,24*3600)); // too early
 					fromLocation = transshipmentCentre;
 				}
-				Offer acceptedOffer = pickOffer(fromLocation, s.getTo(), s.getSize());
+				Offer acceptedOffer = pickUnknownOffer(fromLocation, s.getTo(), s.getSize(), tspKnowledge);
 				chainBuilder.scheduleLeg(acceptedOffer);
 				chainBuilder.scheduleDelivery(s.getTo(),s.getDeliveryTimeWindow());
 				chains.add(chainBuilder.build());
@@ -58,8 +63,47 @@ public class CheapestCarrierWithVorlaufTSPPlanBuilder {
 		return plan;
 	}
 
-	private Offer pickOffer(Id sourceLinkId, Id destinationLinkId, int size) {
+	private Offer pickKnownOffer(Id sourceLinkId, Id destinationLinkId, int size, TSPKnowledge tspKnowledge) {
 		ArrayList<Offer> offers = new ArrayList<Offer>(carrierAgentTracker.getOffers(sourceLinkId, destinationLinkId, size));
+		boolean offerFound = false;
+		Offer cheapestKnownOffer = null;
+		for(Offer o : offers){
+			if(tspKnowledge.getKnownCarriers().contains(o.getCarrierId())){
+				offerFound = true;
+				if(cheapestKnownOffer == null){
+					cheapestKnownOffer = o;
+				}
+				else if(o.getPrice() < cheapestKnownOffer.getPrice()){
+					cheapestKnownOffer = o;
+				}
+			}
+		}
+		if(offerFound){
+			return cheapestKnownOffer;
+		}
+		else{
+			sortOffers(offers);
+			return offers.get(0);
+		}
+	}
+
+	private Offer pickUnknownOffer(Id sourceLinkId, Id destinationLinkId, int size, TSPKnowledge tspKnowledge) {
+		ArrayList<Offer> offers = new ArrayList<Offer>(carrierAgentTracker.getOffers(sourceLinkId, destinationLinkId, size));
+		Offer cheapestUnknownOffer = null;
+		for(Offer o : offers){
+			if(!tspKnowledge.getKnownCarriers().contains(o.getCarrierId())){
+				if(cheapestUnknownOffer == null){
+					cheapestUnknownOffer = o;
+				}
+				else if(o.getPrice() < cheapestUnknownOffer.getPrice()){
+					cheapestUnknownOffer = o;
+				}
+			}
+		}
+		return cheapestUnknownOffer;
+	}
+
+	private void sortOffers(ArrayList<Offer> offers) {
 		Collections.sort(offers, new Comparator<Offer>() {
 
 			@Override
@@ -68,8 +112,6 @@ public class CheapestCarrierWithVorlaufTSPPlanBuilder {
 			}
 			
 		});
-		Offer bestOffer = offers.get(0);
-		return bestOffer;
 	}
 	
 

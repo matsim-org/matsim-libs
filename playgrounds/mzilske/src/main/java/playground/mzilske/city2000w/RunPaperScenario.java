@@ -40,6 +40,7 @@ import playground.mzilske.freight.Contract;
 import playground.mzilske.freight.TSPAgentTracker;
 import playground.mzilske.freight.TSPCapabilities;
 import playground.mzilske.freight.TSPContract;
+import playground.mzilske.freight.TSPKnowledge;
 import playground.mzilske.freight.TSPPlan;
 import playground.mzilske.freight.TSPShipment;
 import playground.mzilske.freight.TransportChain;
@@ -191,10 +192,10 @@ public class RunPaperScenario implements StartupListener, ScoringListener, Repla
 
 	private void createCarrierPlans() {
 		for(CarrierImpl carrier : carriers.getCarriers().values()){
-			TrivialCarrierPlanBuilder trivialCarrierPlanBuilder = new TrivialCarrierPlanBuilder();
-			CarrierPlan plan = trivialCarrierPlanBuilder.buildPlan(carrier.getCarrierCapabilities(), carrier.getContracts());
-//			VRPCarrierPlanBuilder vrpCarrierPlanBuilder = new VRPCarrierPlanBuilder(scenario.getNetwork());
-//			CarrierPlan plan = vrpCarrierPlanBuilder.buildPlan(carrier.getCarrierCapabilities(), carrier.getContracts());
+//			TrivialCarrierPlanBuilder trivialCarrierPlanBuilder = new TrivialCarrierPlanBuilder();
+//			CarrierPlan plan = trivialCarrierPlanBuilder.buildPlan(carrier.getCarrierCapabilities(), carrier.getContracts());
+			VRPCarrierPlanBuilder vrpCarrierPlanBuilder = new VRPCarrierPlanBuilder(scenario.getNetwork());
+			CarrierPlan plan = vrpCarrierPlanBuilder.buildPlan(carrier.getCarrierCapabilities(), carrier.getContracts());
 			carrier.getPlans().add(plan);
 			carrier.setSelectedPlan(plan);
 		}
@@ -218,13 +219,23 @@ public class RunPaperScenario implements StartupListener, ScoringListener, Repla
 		CarrierImpl carrier2 = createCarrier(GRID_SIZE,30);
 		carriers.getCarriers().put(carrier2.getId(), carrier2);
 		
-		CarrierImpl carrier3 = createCarrier(1,30);
+		CarrierImpl carrier3 = createVorlaufCarrier(1,30,"vorlauf");
 		carriers.getCarriers().put(carrier3.getId(), carrier3);
 		
 		scenario.addScenarioElement(carriers);
 	}
 
 	
+
+	private CarrierImpl createVorlaufCarrier(int locationIndex, int vehicleCapacity, String name) {
+		CarrierImpl carrier = new CarrierImpl(new IdImpl(name), makeLinkId(GRID_SIZE/2, locationIndex));
+		CarrierCapabilities cc = new CarrierCapabilities();
+		carrier.setCarrierCapabilities(cc);
+		CarrierVehicle carrierVehicle = new CarrierVehicle(new IdImpl("carrier-"+name+"-vehicle"), makeLinkId(GRID_SIZE/2, locationIndex));
+		carrierVehicle.setCapacity(vehicleCapacity);
+		cc.getCarrierVehicles().add(carrierVehicle);
+		return carrier;
+	}
 
 	private CarrierImpl createCarrier(int locationIndex, int vehicleCapacity) {
 		CarrierImpl carrier = new CarrierImpl(new IdImpl("carrier-"+locationIndex), makeLinkId(GRID_SIZE/2, locationIndex));
@@ -242,10 +253,12 @@ public class RunPaperScenario implements StartupListener, ScoringListener, Repla
 		TSPCapabilities cap = new TSPCapabilities();
 		cap.getTransshipmentCentres().add(new IdImpl("j(8,4)"));
 		tsp.setTspCapabilities(cap);
+		TSPKnowledge knowledge = new TSPKnowledge();
+		knowledge.getKnownCarriers().add(scenario.createId("vorlauf"));
+		tsp.setKnowledge(knowledge);
 		logger.debug("TransportServiceProvider " + tsp.getId() + " has come into play");
 		printCap(cap);
 		createContracts(tsp);
-
 		transportServiceProviders.getTransportServiceProviders().add(tsp);
 	}
 
@@ -254,19 +267,19 @@ public class RunPaperScenario implements StartupListener, ScoringListener, Repla
 	}
 
 	private void createAndSelectAPlan(TransportServiceProviderImpl tsp) {
-		CheapestCarrierTSPPlanBuilder tspPlanBuilder = new CheapestCarrierTSPPlanBuilder();
+		CheapestCarrierWithVorlaufTSPPlanBuilder tspPlanBuilder = new CheapestCarrierWithVorlaufTSPPlanBuilder();
 		tspPlanBuilder.setCarrierAgentTracker(freightAgentTracker);
 		List<Id> emptyList = Collections.emptyList();
 		tspPlanBuilder.setTransshipmentCentres(emptyList);
-		TSPPlan directPlan = tspPlanBuilder.buildPlan(tsp.getContracts(),tsp.getTspCapabilities());
+		TSPPlan directPlan = tspPlanBuilder.buildPlan(tsp.getContracts(),tsp.getTspCapabilities(),tsp.getKnowledge());
 		printTSPPlan(directPlan);
 		tsp.getPlans().add(directPlan);
 		tsp.setSelectedPlan(directPlan);
 		
-		CheapestCarrierTSPPlanBuilder logisticCentrePlanBuilder = new CheapestCarrierTSPPlanBuilder();
+		CheapestCarrierWithVorlaufTSPPlanBuilder logisticCentrePlanBuilder = new CheapestCarrierWithVorlaufTSPPlanBuilder();
 		logisticCentrePlanBuilder.setCarrierAgentTracker(freightAgentTracker);
 		logisticCentrePlanBuilder.setTransshipmentCentres(tsp.getTspCapabilities().getTransshipmentCentres());
-		TSPPlan logCentrePlan = logisticCentrePlanBuilder.buildPlan(tsp.getContracts(),tsp.getTspCapabilities());
+		TSPPlan logCentrePlan = logisticCentrePlanBuilder.buildPlan(tsp.getContracts(),tsp.getTspCapabilities(), tsp.getKnowledge());
 		tsp.getPlans().add(logCentrePlan);
 		tsp.setSelectedPlan(logCentrePlan);
 	}
