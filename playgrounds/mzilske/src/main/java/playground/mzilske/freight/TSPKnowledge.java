@@ -9,7 +9,7 @@ public class TSPKnowledge {
 	
 	private Set<Id> knownCarriers = new HashSet<Id>();
 
-	Set<Id> getKnownCarriers() {
+	public Set<Id> getKnownCarriers() {
 		return knownCarriers;
 	}
 
