@@ -29,6 +29,8 @@ import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.network.MatsimNetworkReader;
 
+import city2000w.VRPCarrierPlanBuilder;
+
 import playground.mzilske.freight.CarrierAgentTracker;
 import playground.mzilske.freight.CarrierAgentTrackerBuilder;
 import playground.mzilske.freight.CarrierCapabilities;
