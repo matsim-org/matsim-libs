@@ -118,5 +118,8 @@
 			<scope>system</scope>
 			<systemPath>${basedir}/lib/tagtransform.jar</systemPath>
 		</dependency>
+		
 	</dependencies>
+	<modules>
+	</modules>
 </project>

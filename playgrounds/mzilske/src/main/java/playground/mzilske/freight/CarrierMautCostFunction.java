@@ -1,6 +1,6 @@
 package playground.mzilske.freight;
 
-public class SimpleCarrierCostFunction implements CarrierCostFunction {
+public class CarrierMautCostFunction implements CarrierCostFunction {
 	
 	private CarrierImpl carrier;
 	

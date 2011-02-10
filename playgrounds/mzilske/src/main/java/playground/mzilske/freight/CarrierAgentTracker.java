@@ -125,7 +125,7 @@ public class CarrierAgentTracker implements AgentSource, ActivityEndEventHandler
 	private void createCarrierAgents() {
 		for (CarrierImpl carrier : carriers) {
 			CarrierAgent carrierAgent = new CarrierAgent(this, carrier, router);
-			carrierAgent.setCostFunction(new SimpleCarrierCostFunction());
+			carrierAgent.setCostFunction(new CarrierDistanceCostFunction());
 			carrierAgent.setCostAllocator(new CostAllocator(carrier, network));
 			carrierAgents.add(carrierAgent);
 		}
