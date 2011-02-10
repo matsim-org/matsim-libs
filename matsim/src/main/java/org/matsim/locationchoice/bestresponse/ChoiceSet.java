@@ -96,7 +96,7 @@ public class ChoiceSet {
 		Activity act = (Activity) plan.getPlanElements().get(actlegIndex);
 		
 		LeastCostPathCalculator leastCostPathCalculator = 
-			new FullNetworkDijkstraFactory().createPathCalculator(network, travelCost, travelTime);
+			new DijkstraMultipleDestinatonsFactory().createPathCalculator(network, travelCost, travelTime);
 		
 		Activity previousActivity = ((PlanImpl)plan).getPreviousActivity(((PlanImpl)plan).
 				getPreviousLeg((ActivityImpl)act));
@@ -104,7 +104,7 @@ public class ChoiceSet {
 		Node fromNode = network.getLinks().get(previousActivity.getLinkId()).getToNode();
 		double startTime = previousActivity.getEndTime();
 		
-		((FullNetworkDijkstra)leastCostPathCalculator).calcLeastCostTree(fromNode, startTime);
+		((ForwardDijkstraMiltipleDestinations)leastCostPathCalculator).calcLeastCostTree(fromNode, startTime);
 		
 		NavigableMap<Double,Id> map = new TreeMap<Double,Id>();						
 		// if no epsilons are used!

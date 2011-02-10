@@ -26,10 +26,21 @@ import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 
-public class FullNetworkDijkstraFactory implements LeastCostPathCalculatorFactory {
+public class DijkstraMultipleDestinatonsFactory implements LeastCostPathCalculatorFactory {
 
+	private String type = "forward";
+
+	public void setType(String type) {
+		this.type = type;
+	}
+	
 	@Override
 	public LeastCostPathCalculator createPathCalculator(Network network, TravelCost travelCosts, TravelTime travelTimes) {
-		return new FullNetworkDijkstra(network, travelCosts, travelTimes);
+		if (type.equals("forward")) {
+			return new ForwardDijkstraMiltipleDestinations(network, travelCosts, travelTimes);
+		}
+		else {
+			return new BackwardDijkstraMultipleDestinations(network, travelCosts, travelTimes);
+		}
 	}
 }
