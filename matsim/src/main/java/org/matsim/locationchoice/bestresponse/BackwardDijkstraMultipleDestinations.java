@@ -72,7 +72,7 @@ public class BackwardDijkstraMultipleDestinations extends Dijkstra {
 	@Override
 	public Path calcLeastCostPath(final Node fromNode, final Node toNode, final double startTime) {
 
-		log.info("fromNode: " + fromNode.getId() + " toNode: " + toNode.getId());
+		//log.info("fromNode: " + fromNode.getId() + " toNode: " + toNode.getId());
 		
 		double arrivalTime = 0;
 		augmentIterationId();
@@ -101,8 +101,8 @@ public class BackwardDijkstraMultipleDestinations extends Dijkstra {
 		arrivalTime = toNodeData.getTime();
 		// bw: -1.0 * times as we are going backwards (startTime > arrivalTime)
 		
-		log.info("arrivalTime " + arrivalTime / 60.0);
-		log.info("this.estimatedStartTime " + this.estimatedStartTime / 60.0);
+		//log.info("arrivalTime " + arrivalTime / 60.0);
+		//log.info("this.estimatedStartTime " + this.estimatedStartTime / 60.0);
 		
 		Path path = new Path(nodes, links, -1.0 * (arrivalTime - this.estimatedStartTime), toNodeData.getCost());
 
@@ -197,7 +197,7 @@ public class BackwardDijkstraMultipleDestinations extends Dijkstra {
 			final Link outLink) {		
 		data.visit(outLink, cost, time, this.iterationID);
 		
-		if (outLink != null) log.info("OutLink: " + outLink.getId()+ " Node " + n.getId() + " costs " + cost + " time " + time/60.0); 
+		//if (outLink != null) log.info("OutLink: " + outLink.getId()+ " Node " + n.getId() + " costs " + cost + " time " + time/60.0); 
 		
 		pendingNodes.add(n, getPriority(data));
 	}

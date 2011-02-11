@@ -72,8 +72,8 @@ public class PlanTimesAdapter {
 							Path p = this.leastCostPathCalculatorForward.calcLeastCostPath(fromNode, toNode, previousActivity.getEndTime());
 							legTravelTime = p.travelTime;
 							
-							log.info("planElementIndex: " + planElementIndex + "------------");
-							log.info("	Forward travel time: " + legTravelTime / 60.0);
+							//log.info("planElementIndex: " + planElementIndex + "------------");
+							//log.info("	Forward travel time: " + legTravelTime / 60.0);
 							
 						}
 						else if (planElementIndex == (actlegIndex + 2)) {
@@ -85,7 +85,7 @@ public class PlanTimesAdapter {
 																					
 							Path p = this.leastCostPathCalculatorBackward.calcLeastCostPath(fromNode, toNode, -1.0);
 							legTravelTime = p.travelTime;
-							log.info("	Backward travel time: " + legTravelTime / 60.0);
+							//log.info("	Backward travel time: " + legTravelTime / 60.0);
 						}
 						else {
 							//use travel times from last iteration for efficiency reasons
