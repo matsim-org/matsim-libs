@@ -359,6 +359,7 @@ public class MultiSourceEAF {
 		int lastcost = Integer.MAX_VALUE;
 		boolean haslastcost = false;
 		int failedSearches = 0;
+		int collectedPaths = 0;
 
 		boolean tryReverse;
 		boolean usedForwardSearch = false;
@@ -403,7 +404,7 @@ public class MultiSourceEAF {
 			Tsearch.onoff();
 			switch (settings.searchAlgo) {
 	            case FlowCalculationSettings.SEARCHALGO_FORWARD: {
-	            	result = routingAlgo.doCalculationsForward();
+	            	result = routingAlgo.doCalculationsForward(lasttime);
 	            	lastForward = lasttime;
 	            	break;
 	            }
@@ -415,7 +416,7 @@ public class MultiSourceEAF {
 	    				result = routingAlgo.doCalculationsReverse(lasttime);
 	    				usedForwardSearch = false;
 	    			} else {
-	    			    result = routingAlgo.doCalculationsForward();
+	    			    result = routingAlgo.doCalculationsForward(lasttime);
 	    			    usedForwardSearch = true;
 	    			}
 	            	break;
@@ -442,7 +443,8 @@ public class MultiSourceEAF {
 			int zeroaugment = 0;
 			int goodaugment = 0;
 
-
+			boolean arrivalChanged = false;
+			
 			if (result == null || result.isEmpty()){
 				// keep track of our success
 				haslastcost = false;
@@ -457,7 +459,8 @@ public class MultiSourceEAF {
 					}
 					// we should try forward next time to determine new arrvivaltime
 					lasttime += 1; // guess new time
-
+					arrivalChanged = true;
+					
 					trySuccessfulPaths = true; // before we do the forward search, we can simply repeat paths!
 				} else {
 					// forward or mixed search didn't find anything
@@ -474,7 +477,8 @@ public class MultiSourceEAF {
 					
 					if (path.getArrival() > lasttime) {
 						// time has increased!
-
+						arrivalChanged = true;
+						
 						lasttime = path.getArrival();
 
 						// recall the list of successful paths and add them first!
@@ -522,6 +526,7 @@ public class MultiSourceEAF {
 					int augment = fluss.augment(path);
 					
 					if (augment > 0) {
+						collectedPaths++;
 						tempstr += tempstr2;
 						tempstr += "augmented " + augment + " (reused path)\n";
 						//System.out.println("augmented " + augment + "\n");
@@ -551,57 +556,63 @@ public class MultiSourceEAF {
 				}
 			}
 			Trepeatedpaths.onoff();
-
-
-			/* sort the paths first by the number of steps used!
+			
+			// do we want to add the paths we found or maybe discard them?
+			// also discard forward paths in reverse search, since forceCorrectArrival doesn't do anything in reverse search anyway ...
+			if (settings.forceCorrectArrival && (arrivalChanged || usedForwardSearch)) {				 
+				System.out.println("Discarding " + result.size() + " paths because of forceCorrectArrival!");					
+			} else {
+				/* sort the paths first by the number of steps used!
 			  helps a little for mixed search ...
 			 and a lot for reverse search.
 			 none for forward? maybe because all paths are augmented anyway */
-			if (result != null && !result.isEmpty()) {
-				if (settings.sortPathsBeforeAugmenting) {
-					Collections.sort(result, new Comparator<TimeExpandedPath>() {
-						public int compare(TimeExpandedPath first, TimeExpandedPath second) {
-							int v1 = first.getPathSteps().size();
-							int v2 = second.getPathSteps().size();
-							if (v1 > v2) {
-								return 1;
-							} else if (v1 == v2) {
-								return 0;
-							} else {
-								return -1;
+				if (result != null && !result.isEmpty()) {
+					if (settings.sortPathsBeforeAugmenting) {
+						Collections.sort(result, new Comparator<TimeExpandedPath>() {
+							public int compare(TimeExpandedPath first, TimeExpandedPath second) {
+								int v1 = first.getPathSteps().size();
+								int v2 = second.getPathSteps().size();
+								if (v1 > v2) {
+									return 1;
+								} else if (v1 == v2) {
+									return 0;
+								} else {
+									return -1;
+								}
+
 							}
-
-						}
-					});
-				}
-			}
-
-			// BIG DEBUG
-			//System.out.println(result);
-			
-			if (result != null && !result.isEmpty()) {
-				for(TimeExpandedPath path : result){
-					String tempstr2 = "";
-
-					tempstr2 = path.toString() + "\n";
-					
-					int augment = fluss.augment(path);
-										
-					if (augment > 0) {
-						tempstr += tempstr2;
-						tempstr += "augmented " + augment + "\n";
-
-						// remember this path for the next timelayer
-						successfulPaths.addLast(path); // keep the order
-
-						goodaugment += 1;
-						totalsizeaugmented += path.getPathSteps().size();
-					} else {
-						zeroaugment += 1;
+						});
 					}
-					// BIG DEBUG
-					// augment only the first path
-					//break;
+				}
+
+				// BIG DEBUG
+				//System.out.println(result);
+
+				if (result != null && !result.isEmpty()) {
+					for(TimeExpandedPath path : result){
+						String tempstr2 = "";
+
+						tempstr2 = path.toString() + "\n";
+
+						int augment = fluss.augment(path);
+
+						if (augment > 0) {
+							collectedPaths++;
+							tempstr += tempstr2;
+							tempstr += "augmented " + augment + "\n";
+
+							// remember this path for the next timelayer
+							successfulPaths.addLast(path); // keep the order
+
+							goodaugment += 1;
+							totalsizeaugmented += path.getPathSteps().size();
+						} else {
+							zeroaugment += 1;
+						}
+						// BIG DEBUG
+						// augment only the first path
+						//break;
+					}
 				}
 			}
 
@@ -659,6 +670,7 @@ public class MultiSourceEAF {
 
 				//System.out.println("removed on the fly:" + VertexIntervalls.rem);
 				System.out.println("last path: " + tempstr);
+				System.out.println("collected paths: " + collectedPaths);
 				System.out.println(routingAlgo.measure());
 				System.out.println(fluss.measure());
 				System.out.println();				
@@ -674,6 +686,7 @@ public class MultiSourceEAF {
 		System.out.println("CleanUp got rid of " + EdgeGain + " edge intervalls so far.");
 		//System.out.println("removed on the fly:" + VertexIntervalls.rem);
 		System.out.println("last path: " + tempstr);
+		System.out.println("collected paths: " + collectedPaths);
 		System.out.println(routingAlgo.measure());
 		System.out.println(fluss.measure());
 		System.out.println();
@@ -716,9 +729,10 @@ public class MultiSourceEAF {
 
 		// Rounding is now done according to timestep and flowFactor!
 		int timeStep;
-		double flowFactor;
+		double scaleCapacity = 1.0;
+		double scaleDemands = 1.0;
 
-		int instance = 3;
+		int instance = 48;
 		// 1 = siouxfalls, demand 500
 		// 11 same as above only Manuel and 5s euclid
 		// 2 = swissold, demand 100
@@ -740,106 +754,107 @@ public class MultiSourceEAF {
 		if (instance == 1) {
 			networkfile  = "/homes/combi/dressler/V/code/meine_EA/siouxfalls_network.xml";
 			uniformDemands = 500;
-			timeStep = 10;
-			flowFactor = 1.0;
+			timeStep = 10; // war 10
+			scaleCapacity = 1.0;
+			scaleDemands = 1.0;
 			sinkid = "supersink";
 		}else if (instance == 11) {
 			networkfile  = "/Users/manuel/testdata/siouxfalls_network_5s_euclid.xml";
 			uniformDemands = 10;
 			timeStep = 5;
-			flowFactor = 1.0;
+			scaleCapacity = 1.0;
 			sinkid = "supersink";
 		}else if (instance == 111) {
 			networkfile  = "/home/manuel/Dokumente/Advest/testdata/siouxfalls_network_5s_euclid.xml";
 			uniformDemands = 10;
 			timeStep = 5;
-			flowFactor = 1.0;
+			scaleCapacity = 1.0;
 			sinkid = "supersink";
 		}else if (instance == 12) {
 			networkfile  = "/Users/manuel/testdata/simple/elfen_net.xml";
 			//uniformDemands = 30;
 			plansfile ="/Users/manuel/testdata/simple/elfen_1_plan.xml";
 			timeStep = 1;
-			flowFactor = 1.0;
+			scaleCapacity = 1.0;
 			sinkid = "en1";}
 		else if (instance == 2) {
 			networkfile = "/homes/combi/Projects/ADVEST/testcases/meine_EA/swissold_network_5s.xml";
 			uniformDemands = 10; // war 100
 			timeStep = 10; 
-			flowFactor = 1.0; 
+			scaleCapacity = 1.0; 
 			sinkid = "en1";
 		} else if (instance == 3) {
 			networkfile  = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac_v20080618.xml";
 			uniformDemands = 5; // war 5
 			timeStep = 10; // war 10
-			flowFactor = 0.1; // war 1.0, also zu viel, da nur 30k statt 250k personen.
+			scaleCapacity = 0.1; // war 1.0, also zu viel, da nur 30k statt 250k personen.
 			sinkid = "en1";
 		} else if (instance == 4) {
 			networkfile  = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac_v20080618.xml";
 			plansfile = "/homes/combi/Projects/ADVEST/padang/plans/padang_plans_v20080618_reduced_10p.xml.gz";
 			timeStep = 10;
-			flowFactor = 0.1;
+			scaleCapacity = 0.1;
 			sinkid = "en1";
 		} else if (instance == 41) {
 			networkfile  = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac_v20080618.xml";
 			plansfile = "/homes/combi/Projects/ADVEST/padang/plans/padang_plans_v20080618_reduced.xml.gz";
-			timeStep = 1;
-			flowFactor = 1.0;
+			timeStep = 1; // war 1
 			sinkid = "en1";
 		} else if (instance == 42) {
 			networkfile  = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac_v20100317.xml.gz";
 			plansfile = "/homes/combi/Projects/ADVEST/padang/plans/padang_plans_v20100317.xml.gz";
 			timeStep = 10; // war 10
-			flowFactor = 1.0;
+			scaleCapacity = 1.0; // war 1.0
+			scaleDemands = 1.0; // war 1.0
 			sinkid = "en1";
 			//shelterfile = "/homes/combi/Projects/ADVEST/padang/network/shelter_info_v20100317";
 		} else if (instance == 4200) {
 			// wie 42, aber als .dat-Datei
 			simplenetworkfile = "/homes/combi/dressler/V/code/meine_EA/padang_v2010_10s_no_shelters.dat";
 			timeStep = 1;
-			flowFactor = 1.0;
+			scaleCapacity = 1.0;
 		} else if (instance == 43) {
 			networkfile  = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac_v20100317.xml.gz";
 			plansfile = "/homes/combi/Projects/ADVEST/padang/plans/padang_plans_v20100317.xml.gz";
 			timeStep = 10;
-			flowFactor = 1.0;
+			scaleCapacity = 1.0;
 			sinkid = "en1";
 			shelterfile = "/homes/combi/Projects/ADVEST/padang/network/shelter_info_v20100317";
 		} else if (instance == 44) {
 			networkfile  = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac_v20100317.xml.gz";
 			plansfile = "/homes/combi/Projects/ADVEST/padang/plans/padang_plans_v20100317.xml.gz";
 			timeStep = 5; 
-			flowFactor = 1.0;
+			scaleCapacity = 1.0;
 			sinkid = "en1";
 		} else if (instance == 45) {
 			networkfile  = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac_v20100317.xml.gz";
 			plansfile = "/homes/combi/Projects/ADVEST/padang/plans/padang_plans_v20100317.xml.gz";
 			timeStep = 1;
-			flowFactor = 1.0;
+			scaleCapacity = 1.0;
 			sinkid = "en1";			
 		} else if (instance == 4500) {
 			// wie 45, aber als .dat-Datei
 			simplenetworkfile = "/homes/combi/dressler/V/code/meine_EA/padang_v2010_1s_no_shelters.dat";
 			timeStep = 1;
-			flowFactor = 1.0;
+			scaleCapacity = 1.0;
 		} else if (instance == 421) {
 			networkfile  = "/Users/manuel/testdata/padang/network/padang_net_evac_v20100317.xml.gz";
 			plansfile = "/Users/manuel/testdata/padang/plans/padang_plans_v20100317.xml.gz";
 			timeStep = 2;
-			flowFactor = 1.0;
+			scaleCapacity = 1.0;
 			sinkid = "en1";
 			shelterfile = "/Users/manuel/testdata/padang/network/shelter_info_v20100317";
 		} else if (instance == 431) {
 			networkfile  = "/Users/manuel/testdata/padang/network/padang_net_evac_v20100317.xml.gz";
 			plansfile = "/Users/manuel/testdata/padang/plans/padang_plans_v20100317.xml.gz";
 			timeStep = 10;
-			flowFactor = 1.0;
+			scaleCapacity = 1.0;
 			sinkid = "en1";
 		} else if (instance == 441) {
 			networkfile  = "/Users/manuel/testdata/padang/network/padang_net_evac_v20100317.xml.gz";
 			plansfile = "/Users/manuel/testdata/padang/plans/padang_plans_v20100317.xml.gz";
 			timeStep = 5;
-			flowFactor = 1.0;
+			scaleCapacity = 1.0;
 			sinkid = "en1";
 		} else if (instance == 48) {
 			networkfile  = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac_v20100317.xml.gz";
@@ -849,7 +864,7 @@ public class MultiSourceEAF {
 			// oder mit 5 Minuten Wellenangst:
 			// changeeventsoffset = 3 * 3600 + 300;
 			timeStep = 1;
-			flowFactor = 1.0;
+			scaleCapacity = 1.0;
 			sinkid = "en1";
 		} else if (instance == 49) {
 			networkfile  = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac_v20100317.xml.gz";
@@ -857,24 +872,24 @@ public class MultiSourceEAF {
 			changeeventsfile = "/homes/combi/Projects/ADVEST/padang/network/change_events_v20100317.xml.gz";
 			changeeventsoffset = 3 * 3600; // starts at 3:00:00
 			timeStep = 10;
-			flowFactor = 1.0;
+			scaleCapacity = 1.0;
 			sinkid = "en1";
 		} else if (instance == 5) {
 			simplenetworkfile = "/homes/combi/dressler/V/code/meine_EA/probeevakuierung.zet.dat";
 			timeStep = 1;
-			flowFactor = 1.0;
+			scaleCapacity = 1.0;
 		} else if (instance == 1024) {
 			networkfile  = "/homes/combi/dressler/V/code/meine_EA/xmas_network.xml";
 			plansfile =  "/homes/combi/dressler/V/code/meine_EA/xmas_plans.xml";
 			uniformDemands = 1;
 			timeStep = 60;
-			flowFactor = 1.0;
+			scaleCapacity = 1.0;
 			sinkid = "5_Nordpol";
 		} else if (instance == 6) {
 			networkfile  = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac_v20100317.xml.gz";
 			plansfile = "/homes/combi/Projects/ADVEST/padang/plans/padang_plans_v20100317.xml.gz";
 			timeStep = 50; 
-			flowFactor = 1.0;
+			scaleCapacity = 1.0;
 			sinkid = "en1";
 		} else {
 			// custom instance
@@ -932,7 +947,7 @@ public class MultiSourceEAF {
 
 
 			timeStep = 1;
-			flowFactor = 1.0;
+			scaleCapacity = 1.0;
 
 			//String sinkid = "supersink"; //siouxfalls, problem
 			sinkid = "en1";  //padang, line, swissold .. en1 fuer forward
@@ -1085,10 +1100,11 @@ public class MultiSourceEAF {
 		
 		settings.supersink = settings.getNetwork().getIndexedNode(sink);
 		settings.timeStep = timeStep; // default 1
-		settings.flowFactor = flowFactor; // default 1.0
+		settings.scaleCapacity = scaleCapacity; // default 1.0
+		settings.scaleDemands = scaleDemands; // default 1.0
 
 		// set additional parameters
-		//settings.TimeHorizon = 800;
+		//settings.TimeHorizon = 1000;
 		//settings.MaxRounds = 1;
 		//settings.checkConsistency = 1;
 		//settings.doGarbageCollection = 10; // > 0 generally not such a good idea.
@@ -1098,13 +1114,21 @@ public class MultiSourceEAF {
 		settings.useImplicitVertexCleanup = true;
 		settings.useShadowFlow = false;				
 		
-		//settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_FORWARD;
+		settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_FORWARD;
 		//settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_MIXED;
-		settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_REVERSE;
-		settings.queueAlgo = FlowCalculationSettings.QUEUE_BFS;
+		//settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_REVERSE;
+		
+		//settings.queueAlgo = FlowCalculationSettings.QUEUE_BFS;
+		//settings.queueAlgo = FlowCalculationSettings.QUEUE_DFS;
+		//settings.queueAlgo = FlowCalculationSettings.QUEUE_GUIDED;
+		//settings.queueAlgo = FlowCalculationSettings.QUEUE_STATIC;
+		settings.queueAlgo = FlowCalculationSettings.QUEUE_SEEKER;
+		
 		settings.useBucketQueue = true;
 		
 		settings.useRepeatedPaths = true; // not compatible with costs!
+		settings.forceCorrectArrival = false;
+		
 		settings.retryReverse = 1; // 1 = try one time step later with reverse search if no path was found.
 		// track unreachable vertices only works in REVERSE (with forward in between), and wastes time otherwise
 		settings.trackUnreachableVertices = true && (settings.searchAlgo == FlowCalculationSettings.SEARCHALGO_REVERSE);
@@ -1114,7 +1138,7 @@ public class MultiSourceEAF {
 		settings.unfoldPaths = false; // unfold stored paths into forward paths
 		settings.delaySinkPropagation = true; // propagate sinks (and resulting intervals) only if the search has nothing else to do 
 		settings.quickCutOff = 0.1; // <0, continue fully,  =0 stop as soon as the first good path is found, > 0 continue a bit (e.g. 0.1 continue for another 10% of the polls so far)
-		settings.filterOrigins = false;
+		settings.filterOrigins = true;
 		settings.mapLinksToTEP = true; // remember which path uses an edge at a given time
 		settings.useHoldover = false; //only forward/reverse, no cost, no unwind
 		//settings.whenAvailable = new HashMap<Link, Interval>();
@@ -1166,7 +1190,7 @@ public class MultiSourceEAF {
 		}
 
 		System.out.println("Total cost: " + totalcost);
-		System.out.println("Collected " + fluss.getPaths().size() + " paths.");
+		System.out.println("Stored " + fluss.getPaths().size() + " paths.");
 
 		System.out.println(fluss.arrivalsToString());
 		System.out.println(fluss.arrivalPatternToString());
@@ -1212,7 +1236,7 @@ public class MultiSourceEAF {
 		}
 
 		System.out.println("Total cost: " + totalcost2);
-		System.out.println("Collected " + fluss.getPaths().size() + " paths.");
+		System.out.println("Stored " + fluss.getPaths().size() + " paths.");
 
 		System.out.println(fluss.arrivalsToString());
 		System.out.println(fluss.arrivalPatternToString());

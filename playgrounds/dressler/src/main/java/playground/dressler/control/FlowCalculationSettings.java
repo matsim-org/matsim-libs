@@ -50,10 +50,12 @@ public class FlowCalculationSettings {
 	public static final int QUEUE_DFS = 1;
 	public static final int QUEUE_GUIDED = 2;
 	public static final int QUEUE_STATIC = 3;
+	public static final int QUEUE_SEEKER = 4;
 
 	/* default scaling parameters */
 	public double timeStep = 1;
-	public double flowFactor = 1.0;
+	public double scaleCapacity = 1.0; // factor to scale the capacities
+	public double scaleDemands = 1.0; // factor to scale the demands
 	public int minTravelTime = 0; //set to 1 to avoid edges with time 0 after scaling! 
 	public double addTravelTime = 0.0; //this is added to the travel times before conversion!
 
@@ -85,6 +87,8 @@ public class FlowCalculationSettings {
 	public boolean useHoldover = false; // allow holdover at all nodes
 	public boolean useHoldoverCapacities = false;// limit holdover on each node
 
+	public boolean forceCorrectArrival = false; // discard paths found when the arrival time differed from the expected time. 
+	
 	public boolean trackUnreachableVertices = true && (searchAlgo == FlowCalculationSettings.SEARCHALGO_REVERSE);; // only works in REVERSE, wastes time otherwise
 	public int retryReverse = 0; // how often to retry a failed reverse search with one step later (before forward is used)
 	
@@ -236,7 +240,8 @@ public class FlowCalculationSettings {
 		}
 
 		scaleParameters();
-
+		scaleDemands();
+		
 		if (this.supersink != null) {
 			int totaldemand = 0;
 			int overrideerrors = 0;
@@ -266,6 +271,18 @@ public class FlowCalculationSettings {
 
 		return true;
 	}
+
+	// simply scales all demands according to scaleDemands
+	private void scaleDemands() {	
+		for (IndexedNodeI node : this._network.getNodes()) {
+			Integer i = this._demands[node.getIndex()];
+			if (i != null) {				
+				i = (int) Math.round(i * this.scaleDemands);
+				this._demands[node.getIndex()] = i;
+			}
+		}		
+	}
+
 
 	private void scaleParameters() {
 		this._capacities = new int[nlinks];
@@ -303,7 +320,7 @@ public class FlowCalculationSettings {
 			this._lengths[link.getIndex()] = newTravelTime;
 
 
-			double exactCapacity = link.getMatsimLink().getCapacity() * this.timeStep * this.flowFactor / capperiod;
+			double exactCapacity = link.getMatsimLink().getCapacity() * this.timeStep * this.scaleCapacity / capperiod;
 			long newcapacity = Math.round(exactCapacity);
 
 			// no one uses that much capacity for real ...
@@ -335,7 +352,7 @@ public class FlowCalculationSettings {
 		// find all sources
 		for (IndexedNodeI node : this._network.getNodes()) {
 			Integer i = this._demands[node.getIndex()];
-			if (i != null) {
+			if (i != null) {				
 				if (i > 0) {
 					this._totaldemandsources += i;
 					this._numsources++;
@@ -374,7 +391,8 @@ public class FlowCalculationSettings {
 		System.out.println("Use holdover: " + this.useHoldover);
 		System.out.println(" finite holdover capacity: " + this.useHoldoverCapacities);
 		System.out.println("Timestep: " + this.timeStep);
-		System.out.println("FlowFactor: " + this.flowFactor);
+		System.out.println("ScaleCapacity: " + this.scaleCapacity);
+		System.out.println("ScaleDemands: " + this.scaleDemands + " (already included above)");
 		
 		System.out.println("Max Rounds: " + this.MaxRounds);
 		System.out.println("Min Travel Time : " + this.minTravelTime);
@@ -404,10 +422,13 @@ public class FlowCalculationSettings {
 			  System.out.println("simple BFS");
 			  break;
 		  case FlowCalculationSettings.QUEUE_DFS:
-			  System.out.println("totime-based DFS");
+			  System.out.println("lowbound-based DFS");
 			  break;
 		  case FlowCalculationSettings.QUEUE_GUIDED:
 			  System.out.println("guided search");
+			  break;
+		  case FlowCalculationSettings.QUEUE_SEEKER:
+			  System.out.println("seeking search");
 			  break;
 		  default:
 			  System.out.println("Unkown (" + this.queueAlgo +")");
@@ -424,6 +445,7 @@ public class FlowCalculationSettings {
 		System.out.println("Use implicit vertex cleanup: " + this.useImplicitVertexCleanup);
 		System.out.println("Use Shadow Flow: " + this.useShadowFlow);
 		System.out.println("Use repeated paths: " + this.useRepeatedPaths);
+		System.out.println("Force correct arrival times: " + this.forceCorrectArrival);
 		System.out.println("Sort paths before augmenting: " + this.sortPathsBeforeAugmenting);
 		System.out.println("Use touched nodes hashmaps: " + this.checkTouchedNodes);
 		System.out.println("Keep paths at all: " + this.keepPaths);
@@ -1443,8 +1465,10 @@ public class FlowCalculationSettings {
     		
     	    if (s.equals("--timestep")) {
     	    	timeStep = Double.parseDouble(t);
-    	    } else if (s.equals("--flowfactor")) {
-    	    	flowFactor = Double.parseDouble(t);
+    	    } else if (s.equals("--scalecapacity")) {
+    	    	scaleCapacity = Double.parseDouble(t);
+    	    } else if (s.equals("--scaledemands")) {
+    	    	scaleDemands = Double.parseDouble(t);
     	    } else if (s.equals("--mintraveltime")) {
     	    	minTravelTime  = Integer.parseInt(t);
     	    } else if (s.equals("--addtraveltime")) {
@@ -1497,6 +1521,8 @@ public class FlowCalculationSettings {
     	    	filterOrigins = Boolean.parseBoolean(t);
     	    } else if (s.equals("--usebucketqueue")) {
     	    	useBucketQueue = Boolean.parseBoolean(t);
+    	    } else if (s.equals("--forcecorrectarrival")) {
+    	    	forceCorrectArrival = Boolean.parseBoolean(t);    	    	
     	    } else {
     	    	error += "Unknown option: " + s + "\n";
     	    }
@@ -1507,7 +1533,8 @@ public class FlowCalculationSettings {
     public String writeConfig() {
     	String s = "";
     	s += "--timestep\n" + timeStep + "\n";
-    	s += "--flowfactor\n" + flowFactor + "\n";
+    	s += "--scalecapacity\n" + scaleCapacity + "\n";
+    	s += "--scaledemands\n" + scaleDemands + "\n";
     	s += "--mintraveltime\n" + minTravelTime + "\n"; 
     	s += "--addtraveltime\n" + addTravelTime + "\n";
 
@@ -1537,6 +1564,8 @@ public class FlowCalculationSettings {
     	s += "--useholdover\n" + useHoldover + "\n";
     	s += "--useholdovercapacities\n" + useHoldoverCapacities + "\n";
 
+    	s += "--forcecorrectarrival\n" + forceCorrectArrival + "\n";
+    	
     	s += "--trackunreachable\n" + trackUnreachableVertices + "\n";
     	s += "--retryreverse\n" + retryReverse + "\n";
     	return s;

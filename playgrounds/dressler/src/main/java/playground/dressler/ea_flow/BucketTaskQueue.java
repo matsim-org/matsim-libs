@@ -76,8 +76,8 @@ public class BucketTaskQueue implements TaskQueue {
 		
 		int val = taskcomp.getValue(task);
 		
-		if (val < 0) {
-			System.out.println("negative value in task");
+		if (val < 0) {			
+			System.out.println("negative value " + val + " in task");
 			throw new IllegalArgumentException("Negative value in task!");
 		}
 		

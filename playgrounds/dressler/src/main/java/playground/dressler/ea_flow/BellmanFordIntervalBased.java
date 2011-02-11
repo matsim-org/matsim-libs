@@ -1391,7 +1391,7 @@ public class BellmanFordIntervalBased {
 	 * main bellman ford algorithm calculating a shortest TimeExpandedPath
 	 * @return maybe multiple TimeExpandedPath from active source(s) to the sink if it exists
 	 */
-	public List<TimeExpandedPath> doCalculationsForward() {
+	public List<TimeExpandedPath> doCalculationsForward(int guessedArrival) {
 	
 		if (_debug > 0) {
 		  System.out.println("Running BellmanFord in Forward mode.");
@@ -1417,6 +1417,7 @@ public class BellmanFordIntervalBased {
 			  break;
 		  case FlowCalculationSettings.QUEUE_GUIDED:
 		  case FlowCalculationSettings.QUEUE_STATIC:
+		  case FlowCalculationSettings.QUEUE_SEEKER:
 			  
 			  // computing the distances is only needed once, because sinks always remain active
 			  if (this._distforward == null) {				  
@@ -1429,8 +1430,12 @@ public class BellmanFordIntervalBased {
 			  TaskComparatorI taskcomp;
 			  if (this._settings.queueAlgo == FlowCalculationSettings.QUEUE_GUIDED) {
 				 taskcomp = new TaskComparatorGuided(this._distforward);  
-			  } else {
+			  } else if (this._settings.queueAlgo == FlowCalculationSettings.QUEUE_STATIC) {
 				 taskcomp = new TaskComparatorStaticGuide(this._distforward);
+			  } else if (this._settings.queueAlgo == FlowCalculationSettings.QUEUE_SEEKER) {
+				  taskcomp = new TaskComparatorDistanceSeeking(this._distforward, guessedArrival);
+			  } else {
+				  throw new RuntimeException("Unsupported Queue Algo!");
 			  }
 			  
 			  if (this._settings.useBucketQueue) {
@@ -2692,7 +2697,8 @@ public class BellmanFordIntervalBased {
 		this.Tbackwardtime.newiter();
 		this.TinnerQueue.newiter();
 		this.Temptysourcestime.newiter();
-		this.Tupdatesinkstime.newiter(); 
+		this.Tupdatesinkstime.newiter();
+		this.Tholdovertime.newiter();
 		this.Tsourcetime.newiter();
 		this.Tsinktime.newiter();
 		this.Tconstructroutetime.newiter(); 
