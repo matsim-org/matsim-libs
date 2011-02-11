@@ -40,6 +40,8 @@ public class BackwardDijkstraMultipleDestinations extends Dijkstra {
 	private int iterationID = Integer.MIN_VALUE + 1;
 	private Node deadEndEntryNode;
 	private final boolean pruneDeadEnds;
+	
+	private double estimatedStartTime = 0.0;
 
 	public BackwardDijkstraMultipleDestinations(final Network network, final TravelCost costFunction, final TravelTime timeFunction) {
 		this(network, costFunction, timeFunction, null);
@@ -66,10 +68,12 @@ public class BackwardDijkstraMultipleDestinations extends Dijkstra {
 			this.pruneDeadEnds = false;
 		}
 	}
-
+	
 	@Override
 	public Path calcLeastCostPath(final Node fromNode, final Node toNode, final double startTime) {
 
+		log.info("fromNode: " + fromNode.getId() + " toNode: " + toNode.getId());
+		
 		double arrivalTime = 0;
 		augmentIterationId();
 		
@@ -84,11 +88,11 @@ public class BackwardDijkstraMultipleDestinations extends Dijkstra {
 		nodes.add(0, toNode);
 		Link tmpLink = getData(toNode).getPrevLink();
 		if (tmpLink != null) {
-			//bw: from Node is ok, we only need to change the from and to link below
-			while (tmpLink.getFromNode() != fromNode) {
+			//bw: from changed to "toNode"
+			while (tmpLink.getToNode() != fromNode) {
 				links.add(0, tmpLink);
-				nodes.add(0, tmpLink.getFromNode());
-				tmpLink = getData(tmpLink.getFromNode()).getPrevLink();
+				nodes.add(0, tmpLink.getToNode());
+				tmpLink = getData(tmpLink.getToNode()).getPrevLink();				
 			}
 			links.add(0, tmpLink);
 			nodes.add(0, tmpLink.getFromNode());
@@ -96,7 +100,11 @@ public class BackwardDijkstraMultipleDestinations extends Dijkstra {
 		DijkstraNodeData toNodeData = getData(toNode);
 		arrivalTime = toNodeData.getTime();
 		// bw: -1.0 * times as we are going backwards (startTime > arrivalTime)
-		Path path = new Path(nodes, links, -1.0 * (arrivalTime - startTime), toNodeData.getCost());
+		
+		log.info("arrivalTime " + arrivalTime / 60.0);
+		log.info("this.estimatedStartTime " + this.estimatedStartTime / 60.0);
+		
+		Path path = new Path(nodes, links, -1.0 * (arrivalTime - this.estimatedStartTime), toNodeData.getCost());
 
 		return path;
 	}
@@ -108,7 +116,7 @@ public class BackwardDijkstraMultipleDestinations extends Dijkstra {
 		PseudoRemovePriorityQueue<Node> pendingNodes = new PseudoRemovePriorityQueue<Node>(500);
 		// initFromNode
 		DijkstraNodeData data = getData(fromNode);
-		visitNode(fromNode, data, pendingNodes, startTime, 0, null);
+		visitNode(fromNode, data, pendingNodes, this.estimatedStartTime, 0, null);
 
 		while (true) {
 			Node outNode = pendingNodes.poll();
@@ -145,8 +153,12 @@ public class BackwardDijkstraMultipleDestinations extends Dijkstra {
 			}
 		} else { // this.pruneDeadEnds == false
 			// bw: changed from "getOutLinks" to "getInLinks"
+			//log.info("outNode: "  + outNode.getId());
 			for (Link l : outNode.getInLinks().values()) {
 				if (canPassLink(l)) {
+					//log.info("	inLink: "  + l.getId());
+					// bw: changed from "getToNode"
+					//log.info("		fromNode: " + l.getFromNode().getId());
 					addToPendingNodes(l, l.getFromNode(), pendingNodes, currTime, currCost, toNode);
 				}
 			}
@@ -182,8 +194,19 @@ public class BackwardDijkstraMultipleDestinations extends Dijkstra {
 
 	protected void visitNode(final Node n, final DijkstraNodeData data,
 			final PseudoRemovePriorityQueue<Node> pendingNodes, final double time, final double cost,
-			final Link outLink) {
+			final Link outLink) {		
 		data.visit(outLink, cost, time, this.iterationID);
+		
+		if (outLink != null) log.info("OutLink: " + outLink.getId()+ " Node " + n.getId() + " costs " + cost + " time " + time/60.0); 
+		
 		pendingNodes.add(n, getPriority(data));
+	}
+
+	public double getEstimatedStartTime() {
+		return estimatedStartTime;
+	}
+
+	public void setEstimatedStartTime(double estimatedStartTime) {
+		this.estimatedStartTime = estimatedStartTime;
 	}
 }

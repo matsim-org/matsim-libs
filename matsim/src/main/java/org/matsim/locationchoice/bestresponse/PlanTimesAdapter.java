@@ -1,5 +1,6 @@
 package org.matsim.locationchoice.bestresponse;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -22,13 +23,17 @@ public class PlanTimesAdapter {
 	// 1: local routing
 	// 2: no routing (distance-based approximation)
 	private int approximationLevel = 0; 
-	private LeastCostPathCalculator leastCostPathCalculator = null;
+	private LeastCostPathCalculator leastCostPathCalculatorForward = null;
+	private LeastCostPathCalculator leastCostPathCalculatorBackward = null;
 	private Network network;
 	private Config config;
+	
+	private static final Logger log = Logger.getLogger(PlanTimesAdapter.class);
 		
-	public PlanTimesAdapter(int approximationLevel, LeastCostPathCalculator leastCostPathCalculator, Network network, Config config) {
+	public PlanTimesAdapter(int approximationLevel, LeastCostPathCalculator leastCostPathCalculatorForward, LeastCostPathCalculator leastCostPathCalculatorBackward, Network network, Config config) {
 		this.approximationLevel = approximationLevel;
-		this.leastCostPathCalculator = leastCostPathCalculator;
+		this.leastCostPathCalculatorForward = leastCostPathCalculatorForward;
+		this.leastCostPathCalculatorBackward = leastCostPathCalculatorBackward;
 		this.network = network;
 		this.config = config;
 	}
@@ -64,12 +69,23 @@ public class PlanTimesAdapter {
 							Node fromNode = network.getLinks().get(previousActivity.getLinkId()).getToNode();
 							Node toNode = network.getLinks().get(actToMove.getLinkId()).getToNode();
 							
-							Path p = this.leastCostPathCalculator.calcLeastCostPath(fromNode, toNode, previousActivity.getEndTime());
+							Path p = this.leastCostPathCalculatorForward.calcLeastCostPath(fromNode, toNode, previousActivity.getEndTime());
 							legTravelTime = p.travelTime;
+							
+							log.info("planElementIndex: " + planElementIndex + "------------");
+							log.info("	Forward travel time: " + legTravelTime / 60.0);
+							
 						}
-						//adapt travel times: actToMove -> actPost
 						else if (planElementIndex == (actlegIndex + 2)) {
-							legTravelTime = getTravelTimeApproximation((PlanImpl)plan, (ActivityImpl)pe);
+							//adapt travel times: actToMove -> actPost
+							// replaced approximation: legTravelTime = getTravelTimeApproximation((PlanImpl)plan, (ActivityImpl)pe);
+							
+							Node fromNode = network.getLinks().get(((ActivityImpl)pe).getLinkId()).getToNode();
+							Node toNode = network.getLinks().get(actToMove.getLinkId()).getToNode();
+																					
+							Path p = this.leastCostPathCalculatorBackward.calcLeastCostPath(fromNode, toNode, -1.0);
+							legTravelTime = p.travelTime;
+							log.info("	Backward travel time: " + legTravelTime / 60.0);
 						}
 						else {
 							//use travel times from last iteration for efficiency reasons
@@ -126,11 +142,20 @@ public class PlanTimesAdapter {
 	}
 
 	public LeastCostPathCalculator getLeastCostPathCalculator() {
-		return leastCostPathCalculator;
+		return leastCostPathCalculatorForward;
 	}
 
 	public void setLeastCostPathCalculator(
 			LeastCostPathCalculator leastCostPathCalculator) {
-		this.leastCostPathCalculator = leastCostPathCalculator;
+		this.leastCostPathCalculatorForward = leastCostPathCalculator;
+	}
+
+	public LeastCostPathCalculator getLeastCostPathCalculatorBackward() {
+		return leastCostPathCalculatorBackward;
+	}
+
+	public void setLeastCostPathCalculatorBackward(
+			LeastCostPathCalculator leastCostPathCalculatorBackward) {
+		this.leastCostPathCalculatorBackward = leastCostPathCalculatorBackward;
 	}
 }

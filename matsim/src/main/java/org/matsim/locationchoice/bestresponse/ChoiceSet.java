@@ -95,16 +95,23 @@ public class ChoiceSet {
 		
 		Activity act = (Activity) plan.getPlanElements().get(actlegIndex);
 		
-		LeastCostPathCalculator leastCostPathCalculator = 
-			new DijkstraMultipleDestinationsFactory().createPathCalculator(network, travelCost, travelTime);
-		
+		DijkstraMultipleDestinationsFactory dijkstraFactory = new DijkstraMultipleDestinationsFactory();
+		LeastCostPathCalculator leastCostPathCalculatorForward = dijkstraFactory.createPathCalculator(network, travelCost, travelTime);
+				
 		Activity previousActivity = ((PlanImpl)plan).getPreviousActivity(((PlanImpl)plan).
 				getPreviousLeg((ActivityImpl)act));
-		
 		Node fromNode = network.getLinks().get(previousActivity.getLinkId()).getToNode();
-		double startTime = previousActivity.getEndTime();
+		((ForwardDijkstraMultipleDestinations)leastCostPathCalculatorForward).calcLeastCostTree(fromNode, previousActivity.getEndTime());
 		
-		((ForwardDijkstraMultipleDestinations)leastCostPathCalculator).calcLeastCostTree(fromNode, startTime);
+		dijkstraFactory.setType("backward");
+		LeastCostPathCalculator leastCostPathCalculatorBackward = dijkstraFactory.createPathCalculator(network, travelCost, travelTime);
+		((BackwardDijkstraMultipleDestinations)leastCostPathCalculatorBackward).setEstimatedStartTime(act.getEndTime());
+		
+		// TODO: adapt startTime here: --------------------------------------------------
+		Activity nextActivity = ((PlanImpl)plan).getNextActivity(((PlanImpl)plan).
+				getNextLeg((ActivityImpl)act));
+		fromNode = network.getLinks().get(nextActivity.getLinkId()).getToNode();
+		((BackwardDijkstraMultipleDestinations)leastCostPathCalculatorBackward).calcLeastCostTree(fromNode, -1.0);
 		
 		NavigableMap<Double,Id> map = new TreeMap<Double,Id>();						
 		// if no epsilons are used!
@@ -121,7 +128,7 @@ public class ChoiceSet {
 			PlanImpl planTmp = new PlanImpl();
 			planTmp.copyPlan(plan);
 			this.adaptAndScoreTimes((PlanImpl)plan,  actlegIndex,  planTmp, scoringFunction,
-					leastCostPathCalculator, this.approximationLevel);
+					leastCostPathCalculatorForward, leastCostPathCalculatorBackward, this.approximationLevel);
 			scoringFunction.finish();
 			double score = scoringFunction.getScore();
 									
@@ -190,8 +197,8 @@ public class ChoiceSet {
 	}
 			
 	public void adaptAndScoreTimes(PlanImpl plan, int actlegIndex, PlanImpl planTmp, ScoringFunctionAccumulator scoringFunction, 
-			LeastCostPathCalculator leastCostPathCalculator, int approximationLevel) {
-		PlanTimesAdapter adapter = new PlanTimesAdapter(approximationLevel, leastCostPathCalculator, this.network, this.config);
+			LeastCostPathCalculator leastCostPathCalculatorForward, LeastCostPathCalculator leastCostPathCalculatorBackward, int approximationLevel) {
+		PlanTimesAdapter adapter = new PlanTimesAdapter(approximationLevel, leastCostPathCalculatorForward, leastCostPathCalculatorBackward, this.network, this.config);
 		adapter.adaptAndScoreTimes(plan, actlegIndex, planTmp, scoringFunction, router);
 	}
 }

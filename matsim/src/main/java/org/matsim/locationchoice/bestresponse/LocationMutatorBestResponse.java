@@ -199,8 +199,8 @@ public class LocationMutatorBestResponse extends LocationMutatorwChoiceSet {
 		scoringFunction.reset();
 		
 		if (Boolean.parseBoolean(this.controler.getConfig().locationchoice().getTravelTimes())) {
-			// plan, actToMove, actlegIndex, planTmp, scoringFunction, leastCostPathCalculator, approximationLevel
-			cs.adaptAndScoreTimes((PlanImpl) plan, 0, planTmp, scoringFunction, null, 0);	
+			// plan, actToMove, actlegIndex, planTmp, scoringFunction, leastCostPathCalculatorForward, leastCostPathCalculatorBackward, approximationLevel
+			cs.adaptAndScoreTimes((PlanImpl) plan, 0, planTmp, scoringFunction, null, null, 0);	
 		}
 		scoringFunction.finish();
 		double score = scoringFunction.getScore();
