@@ -22,10 +22,10 @@ package playground.benjamin.szenarios.munich.geo;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.geotools.feature.Feature;
@@ -36,13 +36,11 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.ScenarioFactoryImpl;
 import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.config.Config;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.gis.ShapeFileReader;
@@ -50,7 +48,6 @@ import org.matsim.core.utils.gis.ShapeFileReader;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Point;
 
 /**
  * @author benjamin
@@ -96,19 +93,48 @@ public class UrbanSuburbanAnalyzer {
 		Population population = scenario.getPopulation();
 		Population urbanPop = getRelevantPopulation(population, urbanShape);
 		Population suburbanPop = getRelevantPopulation(population, suburbanShape);
-
-		Map<String, Integer> urbanModalSplit = calculateModalSplitForArea(urbanPop);
-		Map<String, Integer> suburbanModalSplit = calculateModalSplitForArea(suburbanPop);
 		
-		writeModalSplit(urbanModalSplit);
-		writeModalSplit(suburbanModalSplit);
+		urbanPop.setName("urbanPop");
+		suburbanPop.setName("suburbanPop");
+		
+		Map<String, Integer> urbanMode2NoOfLegs = calculateNoOfLegsPerMode(urbanPop);
+		Map<String, Integer> suburbanMode2NoOfLegs = calculateNoOfLegsPerMode(suburbanPop);
+		Integer urbanTotalLegs = calculateTotalLegs(urbanPop);
+		Integer suburbanTotalLegs = calculateTotalLegs(suburbanPop);
+		
+		writeInformation(urbanPop, urbanMode2NoOfLegs, urbanTotalLegs);
+		writeInformation(suburbanPop, suburbanMode2NoOfLegs, suburbanTotalLegs);
 	}
 
-	private void writeModalSplit(Map<String, Integer> mode2share) {
-		System.out.println(mode2share);
+	private void writeInformation(Population population, Map<String, Integer> mode2NoOfLegs, Integer totalLegs) {
+		
+		String name = population.getName();
+		int size = population.getPersons().size();
+		
+		System.out.println("==================================================================");
+		System.out.println(name + " consists of " + size + " persons that execute " + totalLegs + " Legs.");
+		System.out.println("==================================================================");
+		for(Entry<String, Integer> entry : mode2NoOfLegs.entrySet()){
+			Double modeShare = (double) entry.getValue() / (double) totalLegs;
+			System.out.println(entry.getKey() + "\t" + "noOfLegs: " + entry.getValue() + "\t" + "modeShare: " + modeShare * 100 + " %");
+		}
+		System.out.println("==================================================================" + "\n");
 	}
 
-	private Map<String, Integer> calculateModalSplitForArea(Population population) {
+	private Integer calculateTotalLegs(Population population) {
+		Integer totalLegs = 0;
+		for(Person person : population.getPersons().values()){
+			List<PlanElement> planElements = person.getSelectedPlan().getPlanElements();
+			for(PlanElement pe : planElements){
+				if(pe instanceof Leg){
+					totalLegs++;
+				}
+			}
+		}
+		return totalLegs;
+	}
+
+	private Map<String, Integer> calculateNoOfLegsPerMode(Population population) {
 		Map<String, Integer> mode2share = new HashMap<String, Integer>();
 		List<String> transportModes = new ArrayList<String>();
 
@@ -120,9 +146,9 @@ public class UrbanSuburbanAnalyzer {
 		transportModes.add("undefined");
 
 		for(String transportMode : transportModes){
-			Integer numberOfLegs = 0;
-			numberOfLegs = calculateNoOfLegs(transportMode, population);
-			mode2share.put(transportMode, numberOfLegs);
+			Integer transportModeLegs = 0;
+			transportModeLegs = calculateNoOfLegs(transportMode, population);
+			mode2share.put(transportMode, transportModeLegs);
 		}
 		return mode2share;
 	}
@@ -135,7 +161,7 @@ public class UrbanSuburbanAnalyzer {
 				if(pe instanceof Leg){
 					String mode = ((Leg) pe).getMode();
 					if(transportMode.equals(mode)){
-						noOfLegs = noOfLegs + 1;
+						noOfLegs++;
 					}
 				}
 			}
