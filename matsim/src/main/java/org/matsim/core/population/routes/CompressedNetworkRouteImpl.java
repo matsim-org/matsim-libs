@@ -144,7 +144,10 @@ public class CompressedNetworkRouteImpl extends AbstractRoute implements Network
 					if (equalFromTo) {
 						foundFromLink = true;
 					}
-					break; // we found the end, stop looping
+					if (foundFromLink) {
+						// only break if from is also found, as endLink could be part of a loop/circle
+						break; // we found start and end, stop looping
+					}
 				}
 				if (collectLinks) {
 					newLinkIds.add(linkId);

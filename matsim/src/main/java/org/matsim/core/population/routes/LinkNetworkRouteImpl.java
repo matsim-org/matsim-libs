@@ -73,13 +73,14 @@ public class LinkNetworkRouteImpl extends AbstractRoute implements NetworkRoute,
 
 		if (fromLinkId.equals(this.getStartLinkId())) {
 			fromIndex = 0;
-		} else if (fromLinkId.equals(this.getEndLinkId())) {
-			fromIndex = this.route.size();
 		} else {
 			for (int i = 0, n = this.route.size(); (i < n) && (fromIndex < 0); i++) {
 				if (fromLinkId.equals(this.route.get(i))) {
 					fromIndex = i+1;
 				}
+			}
+			if (fromIndex < 0 && fromLinkId.equals(this.getEndLinkId())) {
+				fromIndex = this.route.size();
 			}
 			if (fromIndex < 0) {
 				throw new IllegalArgumentException("Cannot create subroute because fromLinkId is not part of the route.");
@@ -88,13 +89,14 @@ public class LinkNetworkRouteImpl extends AbstractRoute implements NetworkRoute,
 
 		if (fromLinkId.equals(toLinkId)) {
 			toIndex = fromIndex - 1;
-		} else if (toLinkId.equals(this.getEndLinkId())) {
-			toIndex = this.route.size();
 		} else {
 			for (int i = fromIndex, n = this.route.size(); (i < n) && (toIndex < 0); i++) {
 				if (toLinkId.equals(this.route.get(i))) {
 					toIndex = i;
 				}
+			}
+			if (toIndex < 0 && toLinkId.equals(this.getEndLinkId())) {
+				toIndex = this.route.size();
 			}
 			if (toIndex < 0) {
 				throw new IllegalArgumentException("Cannot create subroute because toLinkId is not part of the route.");
