@@ -87,42 +87,43 @@ AgentArrivalEventHandler,AgentDepartureEventHandler {
 	}
 
 	public void handleEvent(LinkEnterEvent event) {
-//		String id = event.getPersonId().toString();
+		String id = event.getPersonId().toString();
 //		Id onelink = event.getLinkId();
 //		if (onelink.equals(new IdImpl("590000822"))){
 //			System.out.println(onelink);
-//			if(id.contains("testVehicle")){
+			if(id.contains("testVehicle")){
 				this.linkenter.put(event.getPersonId(), event.getTime());
 			}
-//		}
+		}
 //	}
 
 	public void handleEvent(AgentArrivalEvent event) {
-//		String id = event.getPersonId().toString();
+		String id = event.getPersonId().toString();
 //		Id onelink = event.getLinkId();
 //		if (onelink == new IdImpl("590000822")){
-//		if(id.contains("testVehicle")){
+		if(id.contains("testVehicle")){
 				this.agentarrival.put(event.getPersonId(), event.getTime());
 		}
-//		}
+		}
 //	}
 
 	public void handleEvent(AgentDepartureEvent event) {
-//		String id = event.getPersonId().toString();
+		String id = event.getPersonId().toString();
 //		Id onelink = event.getLinkId();
 //			if (onelink == new IdImpl("590000822")){
-//				if(id.contains("testVehicle")){
+				if(id.contains("testVehicle")){
 					this.agentdeparture.put(event.getPersonId(), event.getTime());
 				}
-//		}
+		}
 //	}
 		
 
 	public void handleEvent(LinkLeaveEvent event) {	
-//		String id = event.getPersonId().toString();
+		try{
+		String id = event.getPersonId().toString();
 //		Id onelink = event.getLinkId();
 //		if (onelink.equals(new IdImpl("590000822"))){
-//				if(id.contains("testVehicle")){
+				if(id.contains("testVehicle")){
 				Id personId= event.getPersonId();
 				Id linkId = event.getLinkId();
 
@@ -130,7 +131,6 @@ AgentArrivalEventHandler,AgentDepartureEventHandler {
 
 		LinkImpl link = (LinkImpl) this.network.getLinks().get(linkId);
 		double distance = link.getLength();
-		
 		String roadTypePerLink = link.getType();
 		int roadType = Integer.parseInt(roadTypePerLink);
 		int freeVelocity = (int) link.getFreespeed();
@@ -166,7 +166,7 @@ AgentArrivalEventHandler,AgentDepartureEventHandler {
 				double travelTime = event.getTime() - enterTime;
 				double averageSpeed=(distance/1000)/(travelTime/3600);
 
-				this.agentarrival.remove(personId);	
+		//		this.agentarrival.remove(personId);	
 				
 				linkAndAgentAccountAnalyseModul.calculateEmissionsPerLink(travelTime, linkId, averageSpeed,roadType, freeVelocity, distance, HbefaTable);	
 				
@@ -176,7 +176,12 @@ AgentArrivalEventHandler,AgentDepartureEventHandler {
 				}
 			}
 		}
-	
 		}
-//	}
+		catch (NumberFormatException e){
+		      System.err.println("Error: roadtype missing");
+		    }
+		}
+	
+	
+}
 //}

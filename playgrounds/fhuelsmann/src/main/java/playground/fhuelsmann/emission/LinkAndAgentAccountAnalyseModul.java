@@ -70,7 +70,7 @@ public class LinkAndAgentAccountAnalyseModul implements analyseModul{
 		else{
 		
 			double [] actualEmissions = new double[12]; // new data is saved after summation
-			double [] previousEmissions = this.emissionsLink.get(linkId); // oldValue is the previous sum
+			double [] previousEmissions = this.emissionsLink.get(linkId); // previousEmissions is the previous sum
 		
 			for(int i=0; i<12 ; i++){
 			

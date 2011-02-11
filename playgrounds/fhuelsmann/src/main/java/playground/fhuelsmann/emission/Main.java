@@ -32,16 +32,16 @@ public class Main {
 	public static void main (String[] args) throws Exception{
 
 	
-//		String eventsFile = "../../detailedEval/teststrecke/sim/output/20090317/ITERS/it.0/0.events.txt.gz";
+		String eventsFile = "../../detailedEval/teststrecke/sim/output/20090317/ITERS/it.0/0.events.txt.gz";
 //		String eventsFile = "../../detailedEval/testRuns/output/100.events.txt.gz";
-		String eventsFile ="../../detailedEval/testRuns/output/run8/ITERS/it.0/0.events.txt.gz";
-		String netfile ="../../detailedEval/testRuns/output/run8/output_network.xml.gz";
+//		String eventsFile ="../../detailedEval/testRuns/output/run8/ITERS/it.0/0.events.txt.gz";
+//		String netfile ="../../detailedEval/testRuns/output/run8/output_network.xml.gz";
 //		String netfile ="../../detailedEval/Net/network-86-85-87-84.xml";
-//		String netfile ="../../detailedEval/teststrecke/sim/input/network.xml";
+		String netfile ="../../detailedEval/teststrecke/sim/input/network.xml";
 //		String visumRoadFile = "../../detailedEval/teststrecke/sim/inputEmissions/visumnetzlink.txt";
 //		String visumRoadHebefaRoadFile = "../../detailedEval/teststrecke/sim/inputEmissions/road_types.txt";
 		String Hbefa_Traffic = "../../detailedEval/teststrecke/sim/inputEmissions/hbefa_emission_factors_EU3_D.txt";
-		String Hbefa_Cold_Traffic = "../../detailedEval/teststrecke/sim/inputEmissions/hbefa_coldstart_emission_factors.txt";
+//		String Hbefa_Cold_Traffic = "../../detailedEval/teststrecke/sim/inputEmissions/hbefa_coldstart_emission_factors.txt";
 		
 		
 		//create an event object
@@ -67,7 +67,7 @@ public class Main {
 		TravelTimeEventHandler handler = new TravelTimeEventHandler(network,hbefaTable.getHbefaTableWithSpeedAndEmissionFactor());
 		
 		LinkAndAgentAccountAnalyseModul linkAccount = handler.getLinkAndAgentAccountAnalyseModul();
-		
+		//LinkAndAgentAccountAnalyseModul linkAccount = new LinkAndAgentAccountAnalyseModul();
 		
 //		TimeAndDistanceEventHandler handler = new TimeAndDistanceEventHandler(network,hbefaTable.getHbefaTableWithSpeedAndEmissionFactor());
 	
