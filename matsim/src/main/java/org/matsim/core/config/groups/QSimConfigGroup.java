@@ -47,6 +47,7 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 	private static final String NUMBER_OF_THREADS = "numberOfThreads";
 	private static final String TRAFFIC_DYNAMICS = "trafficDynamics" ;
 	private static final String SIM_STARTTIME_INTERPRETATION = "simStarttimeInterpretation" ;
+	private static final String VEHICLE_BEHAVIOR = "vehicleBehavior";
 
 	public static final String SNAPSHOT_EQUI_DIST = "equiDist" ;
 	public static final String SNAPSHOT_AS_QUEUE = "queue" ;
@@ -56,6 +57,10 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 
 	public static final String MAX_OF_STARTTIME_AND_EARLIEST_ACTIVITY_END = "maxOfStarttimeAndEarliestActivityEnd" ;
 	public static final String ONLY_USE_STARTTIME = "onlyUseStarttime" ;
+	
+	public static final String VEHICLE_BEHAVIOR_TELEPORT = "teleport";
+	public static final String VEHICLE_BEHAVIOR_WAIT = "wait";
+	public static final String VEHICLE_BEHAVIOR_EXCEPTION = "exception";
 
 	private double startTime = Time.UNDEFINED_TIME;
 	private double endTime = Time.UNDEFINED_TIME;
@@ -70,6 +75,7 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 	private int numberOfThreads = 1;
 	private String trafficDynamics = TRAFF_DYN_QUEUE ;
 	private String simStarttimeInterpretation = MAX_OF_STARTTIME_AND_EARLIEST_ACTIVITY_END ;
+	private String vehicleBehavior = VEHICLE_BEHAVIOR_TELEPORT;
 
 	public QSimConfigGroup() {
 		super(GROUP_NAME);
@@ -103,7 +109,9 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 			setTrafficDynamics(value) ;
 		} else if (SIM_STARTTIME_INTERPRETATION.equals(key)) {
 			setSimStarttimeInterpretation(value) ;
-		}	else {
+		} else if (VEHICLE_BEHAVIOR.equals(key)) {
+			setVehicleBehavior(value);
+		} else {
 			throw new IllegalArgumentException(key);
 		}
 	}
@@ -112,35 +120,6 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 	@Override
 	public final String getValue(final String key) {
 		throw new RuntimeException("Please don't use `getValue' for QSimConfigGroup; use direct getters instead.  kai, dec'10") ;
-//		if (START_TIME.equals(key)) {
-//			return Time.writeTime(getStartTime());
-//		} else if (END_TIME.equals(key)) {
-//			return Time.writeTime(getEndTime());
-//		} else if (TIME_STEP_SIZE.equals(key)) {
-//			return Time.writeTime(getTimeStepSize());
-//		} else if (SNAPSHOT_PERIOD.equals(key)) {
-//			return Time.writeTime(getSnapshotPeriod());
-//		} else if (SNAPSHOT_FORMAT.equals(key)) {
-//			return getSnapshotFormat();
-//		} else if (SNAPSHOT_STYLE.equals(key)) {
-//			return getSnapshotStyle();
-//		} else if (FLOW_CAPACITY_FACTOR.equals(key)) {
-//			return Double.toString(getFlowCapFactor());
-//		} else if (STORAGE_CAPACITY_FACTOR.equals(key)) {
-//			return Double.toString(getStorageCapFactor());
-//		} else if (STUCK_TIME.equals(key)) {
-//			return Double.toString(getStuckTime());
-//		} else if (REMOVE_STUCK_VEHICLES.equals(key)) {
-//			return (isRemoveStuckVehicles() ? "true" : "false");
-//		} else if (NUMBER_OF_THREADS.equals(key)) {
-//		  return String.valueOf(this.getNumberOfThreads());
-//		} else if (TRAFFIC_DYNAMICS.equals(key)) {
-//			return getTrafficDynamics() ;
-//		} else if (SIM_STARTTIME_INTERPRETATION.equals(key)) {
-//			return this.getSimStarttimeInterpretation() ;
-//		}	else {
-//			throw new IllegalArgumentException(key);
-//		}
 	}
 
 	@Override
@@ -321,6 +300,14 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 			log.warn("The simStarttimeInterpretation '" + str + "' is not one of the known ones. "
 					+ "See comment in config dump in log file for allowed styles.") ;
 		}
+	}
+
+	public void setVehicleBehavior(String value) {
+		this.vehicleBehavior = value;
+	}
+	
+	public String getVehicleBehavior() {
+		return this.vehicleBehavior;
 	}
 
 }

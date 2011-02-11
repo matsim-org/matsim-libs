@@ -22,6 +22,7 @@ package org.matsim.ptproject.qsim.qnetsimengine;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -29,7 +30,9 @@ import java.util.Queue;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.events.AgentStuckEventImpl;
 import org.matsim.core.events.AgentWait2LinkEventImpl;
 import org.matsim.core.events.LinkEnterEventImpl;
@@ -40,6 +43,7 @@ import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.qsim.TransitQLaneFeature;
 import org.matsim.ptproject.qsim.QSim;
@@ -322,12 +326,12 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 	 *          The current time.
 	 */
 	protected void moveLaneToBuffer(final double now) {
-		QVehicle veh;
+		QVehicleImpl veh;
 
 		this.transitQueueLaneFeature.beforeMoveLaneToBuffer(now);
 
 		// handle regular traffic
-		while ((veh = this.vehQueue.peek()) != null) {
+		while ((veh = ((QVehicleImpl) this.vehQueue.peek())) != null) {
 			if (veh.getEarliestLinkExitTime() > now){
 				return;
 			}
@@ -340,6 +344,7 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 				if ((this.getLink().getId().equals(driver.getDestinationLinkId())) && (driver.chooseNextLinkId() == null)) {
 					driver.endLegAndAssumeControl(now);
 					this.addParkedVehicle(veh);
+					this.makeAvailableToNextDriver(veh, now);
 					// remove _after_ processing the arrival to keep link active
 					this.vehQueue.poll();
 					this.usedStorageCapacity -= veh.getSizeInEquivalents();
@@ -368,6 +373,43 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 				}
 			}
 		} // end while
+	}
+
+	private void makeAvailableToNextDriver(QVehicleImpl veh, double now) {
+		Iterator<PlanAgent> i = additionalAgentsOnLink.values().iterator();
+		while (i.hasNext()) {
+			PlanAgent agent = i.next();
+			Leg currentLeg = agent.getCurrentLeg();
+			if (currentLeg != null && currentLeg.getMode().equals(TransportMode.car)) {
+				// We are not in an activity, but in a car leg, and we are an "additional agent".
+				// This currently means that we are waiting for our car to become available.
+				// So our current route must be a NetworkRoute.
+				NetworkRoute route = (NetworkRoute) currentLeg.getRoute();
+				Id requiredVehicleId = route.getVehicleId();
+				if (requiredVehicleId == null) {
+					requiredVehicleId = agent.getId();
+				}
+				if (veh.getId().equals(requiredVehicleId)) {
+					i.remove();
+					this.letAgentDepartWithVehicle((PersonDriverAgent) agent, veh, now);
+					return;
+				} 
+			}
+		}
+	}
+
+	@Override
+	void letAgentDepartWithVehicle(PersonDriverAgent agent, QVehicleImpl vehicle, double now) {
+		vehicle.setDriver(agent);
+		NetworkRoute route = (NetworkRoute) agent.getCurrentLeg().getRoute();
+		if ((route.getEndLinkId().equals(link.getId())) && (agent.chooseNextLinkId() == null)) {
+			// yyyy this should be handled at person level, not vehicle level.  kai, feb'10
+
+			agent.endLegAndAssumeControl(now);
+			this.addParkedVehicle(vehicle);
+		} else {
+			this.addDepartingVehicle(vehicle);
+		}
 	}
 
 	/**

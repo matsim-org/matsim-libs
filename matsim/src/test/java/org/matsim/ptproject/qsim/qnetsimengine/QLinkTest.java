@@ -100,11 +100,9 @@ public class QLinkTest extends MatsimTestCase {
 		Fixture f = new Fixture();
 		Id id1 = new IdImpl("1");
 
-		QSim qsim = new QSim(f.scenario, new EventsManagerImpl());
-
-		QVehicle veh = new QVehicleImpl(f.basicVehicle);
+		QVehicleImpl veh = new QVehicleImpl(f.basicVehicle);
 		PersonImpl p = new PersonImpl(new IdImpl(23));
-		veh.setDriver(new PersonDriverAgentImpl(p, qsim));
+		veh.setDriver(new PersonDriverAgentImpl(p, f.sim));
 
 		// start test, check initial conditions
 		assertTrue(f.qlink1.bufferIsEmpty());
@@ -146,11 +144,9 @@ public class QLinkTest extends MatsimTestCase {
 		Fixture f = new Fixture();
 		Id id1 = new IdImpl("1");
 
-		QSim qsim = new QSim(f.scenario, new EventsManagerImpl());
-
-		QVehicle veh = new QVehicleImpl(f.basicVehicle);
+		QVehicleImpl veh = new QVehicleImpl(f.basicVehicle);
 		PersonImpl p = new PersonImpl(new IdImpl(42));
-		veh.setDriver(new PersonDriverAgentImpl(p, qsim));
+		veh.setDriver(new PersonDriverAgentImpl(p, f.sim));
 
 		// start test, check initial conditions
 		assertTrue(f.qlink1.bufferIsEmpty());
@@ -181,29 +177,30 @@ public class QLinkTest extends MatsimTestCase {
 		Fixture f = new Fixture();
 		Id id1 = new IdImpl("1");
 
-		QSim qsim = new QSim(f.scenario, new EventsManagerImpl());
 
-		QVehicle veh = new QVehicleImpl(f.basicVehicle);
+		QVehicleImpl veh = new QVehicleImpl(f.basicVehicle);
 		PersonImpl pers = new PersonImpl(new IdImpl(80));
 		Plan plan = new PlanImpl();
 		pers.addPlan(plan);
 		plan.addActivity(new ActivityImpl("home", f.link1.getId()));
 		Leg leg = new LegImpl(TransportMode.car);
-		leg.setRoute(new LinkNetworkRouteImpl(f.link1.getId(), f.link2.getId()));
+		LinkNetworkRouteImpl route = new LinkNetworkRouteImpl(f.link1.getId(), f.link2.getId());
+		route.setVehicleId(f.basicVehicle.getId());
+		leg.setRoute(route);
 		plan.addLeg(leg);
 		plan.addActivity(new ActivityImpl("work", f.link2.getId()));
-		PersonDriverAgentImpl driver = new PersonDriverAgentImpl(pers, qsim);
+		PersonDriverAgentImpl driver = new PersonDriverAgentImpl(pers, f.sim);
 		driver.initializeAndCheckIfAlive();
 		veh.setDriver(driver);
 		driver.setVehicle(veh);
-		driver.endActivityAndAssumeControl(0);
+		f.qlink1.addParkedVehicle(veh);
 
 		// start test, check initial conditions
 		assertTrue(f.qlink1.bufferIsEmpty());
 		assertEquals(0, f.qlink1.vehOnLinkCount());
-		assertEquals(0, f.qlink1.getAllVehicles().size());
+		assertEquals(1, f.qlink1.getAllVehicles().size());
 
-		f.qlink1.addDepartingVehicle(veh);
+		driver.endActivityAndAssumeControl(0);
 		assertTrue(f.qlink1.bufferIsEmpty());
 		assertEquals(0, f.qlink1.vehOnLinkCount());
 		assertEquals("vehicle not found in waiting list.", veh, f.qlink1.getVehicle(id1));
@@ -231,9 +228,9 @@ public class QLinkTest extends MatsimTestCase {
 	 * @author mrieser
 	 */
 	public void testBuffer() {
-	  Config conf = super.loadConfig(null);
-	  ScenarioImpl scenario = new ScenarioImpl(conf);
-	  conf.addQSimConfigGroup(new QSimConfigGroup());
+		Config conf = super.loadConfig(null);
+		ScenarioImpl scenario = new ScenarioImpl(conf);
+		conf.addQSimConfigGroup(new QSimConfigGroup());
 
 		NetworkImpl network = scenario.getNetwork();
 		network.setCapacityPeriod(1.0);
@@ -311,14 +308,13 @@ public class QLinkTest extends MatsimTestCase {
 	public void testStorageSpaceDifferentVehicleSizes() {
 		Fixture f = new Fixture();
 		PersonImpl p = new PersonImpl(new IdImpl(5));
-		QSim qsim = new QSim(f.scenario, new EventsManagerImpl());
 
 		VehicleType vehType = new VehicleTypeImpl(new IdImpl("defaultVehicleType"));
-		QVehicle veh1 = new QVehicleImpl(new VehicleImpl(new IdImpl(1), vehType));
-		veh1.setDriver(new PersonDriverAgentImpl(p, qsim));
-		QVehicle veh25 = new QVehicleImpl(new VehicleImpl(new IdImpl(2), vehType), 2.5);
+		QVehicleImpl veh1 = new QVehicleImpl(new VehicleImpl(new IdImpl(1), vehType));
+		veh1.setDriver(new PersonDriverAgentImpl(p, f.sim));
+		QVehicleImpl veh25 = new QVehicleImpl(new VehicleImpl(new IdImpl(2), vehType), 2.5);
 		veh25.setDriver(new PersonDriverAgentImpl(p, null));
-		QVehicle veh5 = new QVehicleImpl(new VehicleImpl(new IdImpl(3), vehType), 5);
+		QVehicleImpl veh5 = new QVehicleImpl(new VehicleImpl(new IdImpl(3), vehType), 5);
 		veh5.setDriver(new PersonDriverAgentImpl(p, null));
 
 		assertEquals("wrong initial storage capacity.", 10.0, f.qlink2.getSpaceCap(), EPSILON);
@@ -363,6 +359,7 @@ public class QLinkTest extends MatsimTestCase {
 		/*package*/ final QLinkImpl qlink1;
 		/*package*/ final QLinkImpl qlink2;
 		/*package*/ final Vehicle basicVehicle;
+		/*package*/ final QSim sim;
 
 		/*package*/ Fixture() {
 			this.scenario = new ScenarioImpl();
@@ -374,7 +371,7 @@ public class QLinkTest extends MatsimTestCase {
 			Node node3 = network.createAndAddNode(new IdImpl("3"), new CoordImpl(1001, 0));
 			this.link1 = network.createAndAddLink(new IdImpl("1"), node1, node2, 1.0, 1.0, 3600.0, 1.0);
 			this.link2 = network.createAndAddLink(new IdImpl("2"), node2, node3, 10 * 7.5, 2.0 * 7.5, 3600.0, 1.0);
-			QSim sim = new QSim(scenario, new EventsManagerImpl());
+			sim = new QSim(scenario, new EventsManagerImpl());
 			this.queueNetwork = sim.getNetsimNetwork();
 			this.qlink1 = (QLinkImpl) this.queueNetwork.getNetsimLink(new IdImpl("1"));
 			this.qlink2 = (QLinkImpl) this.queueNetwork.getNetsimLink(new IdImpl("2"));

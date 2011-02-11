@@ -32,18 +32,26 @@ import org.matsim.ptproject.qsim.interfaces.DepartureHandler;
 
 public class CarDepartureHandler implements DepartureHandler {
 
+	/*
+	 * What to do when some agent wants to drive their vehicle but it isn't there.
+	 * Either teleport it to the agent's location (no matter what!), or have the agent wait
+	 * for the car to arrive, or throw an exception.
+	 */
+	public static enum VehicleBehavior { TELEPORT, WAIT_UNTIL_IT_COMES_ALONG, EXCEPTION };
+	
 	private static Logger log = Logger.getLogger(CarDepartureHandler.class);
 
 	private final QSim queueSimulation;
 
-	private boolean teleportVehicles = true;
-
 	private int cntTeleportVehicle = 0;
 
-	public CarDepartureHandler(QSim queueSimulation) {
+	private VehicleBehavior vehicleBehavior;
+	
+	public CarDepartureHandler(QSim queueSimulation, VehicleBehavior vehicleBehavior) {
 		// yyyy I don't understand why we need to explicitly instantiate this in the qsim; seems to me that this should come for 
 		// free from the netsim engine (i.e. the engines should provide their departure handlers).  kai, aug'10
 		this.queueSimulation = queueSimulation;
+		this.vehicleBehavior = vehicleBehavior;
 	}
 
 	@Override
@@ -66,49 +74,39 @@ public class CarDepartureHandler implements DepartureHandler {
 			vehicleId = agent.getPerson().getId(); // backwards-compatibility
 		}
 		QLinkInternalI qlink = (QLinkInternalI) queueSimulation.getNetsimNetwork().getNetsimLink(linkId);
-		QVehicle vehicle = qlink.removeParkedVehicle(vehicleId);
-		if ((vehicle == null) && (teleportVehicles) && (agent instanceof PersonDriverAgentImpl)) {
-			// try to fix it somehow
-			vehicle = ((PersonDriverAgentImpl) agent).getVehicle();
-			if (vehicle.getCurrentLink() != null) {
-				if (cntTeleportVehicle < 9) {
-					cntTeleportVehicle++;
-					log.info("teleport vehicle " + vehicle.getId() + " from link " + vehicle.getCurrentLink().getId() + " to link " + linkId);
-					if (cntTeleportVehicle == 9) {
-						log.info("No more occurrences of teleported vehicles will be reported.");
-					}
-				}
-				QLinkInternalI qlinkOld = (QLinkInternalI) queueSimulation.getNetsimNetwork().getNetsimLink(vehicle.getCurrentLink().getId());
-				qlinkOld.removeParkedVehicle(vehicle.getId());
-			}
-		}
+		QVehicleImpl vehicle = (QVehicleImpl) qlink.removeParkedVehicle(vehicleId);
 		if (vehicle == null) {
-			throw new RuntimeException("vehicle not available for agent " + agent.getPerson().getId() + " on link " + linkId);
-		}
-		vehicle.setDriver(agent);
-
-		if ((route.getEndLinkId().equals(linkId)) && (agent.chooseNextLinkId() == null)) {
-			// yyyy this should be handled at person level, not vehicle level.  kai, feb'10
-
-			agent.endLegAndAssumeControl(now);
-			qlink.addParkedVehicle(vehicle);
+			if (vehicleBehavior == VehicleBehavior.TELEPORT && agent instanceof PersonDriverAgentImpl) {
+				vehicle = findVehicle(vehicleId);
+				teleportVehicleTo(vehicle, linkId);
+				qlink.letAgentDepartWithVehicle(agent, vehicle, now);
+			} else if (vehicleBehavior == VehicleBehavior.WAIT_UNTIL_IT_COMES_ALONG) {
+				// While we are waiting for our car
+				qlink.registerAgentOnLink(agent);
+			} else {
+				throw new RuntimeException("vehicle not available for agent " + agent.getPerson().getId() + " on link " + linkId);
+			}
 		} else {
-			qlink.addDepartingVehicle(vehicle);
+			qlink.letAgentDepartWithVehicle(agent, vehicle, now);
 		}
 	}
 
-	/** Specifies whether the simulation should track vehicle usage and throw an Exception
-	 * if an agent tries to use a car on a link where the car is not available, or not.
-	 * Set <code>teleportVehicles</code> to <code>true</code> if agents always have a
-	 * vehicle available. If the requested vehicle is parked somewhere else, the vehicle
-	 * will be teleported to wherever it is requested to for usage. Set to <code>false</code>
-	 * will generate an Exception in the case when an tries to depart with a car on link
-	 * where the car is not parked.
-	 *
-	 * @param teleportVehicles
-	 */
-	public void setTeleportVehicles(final boolean teleportVehicles) {
-		this.teleportVehicles = teleportVehicles;
+	private void teleportVehicleTo(QVehicleImpl vehicle, Id linkId) {
+		if (vehicle.getCurrentLink() != null) {
+			if (cntTeleportVehicle < 9) {
+				cntTeleportVehicle++;
+				log.info("teleport vehicle " + vehicle.getId() + " from link " + vehicle.getCurrentLink().getId() + " to link " + linkId);
+				if (cntTeleportVehicle == 9) {
+					log.info("No more occurrences of teleported vehicles will be reported.");
+				}
+			}
+			QLinkInternalI qlinkOld = (QLinkInternalI) queueSimulation.getNetsimNetwork().getNetsimLink(vehicle.getCurrentLink().getId());
+			qlinkOld.removeParkedVehicle(vehicle.getId());
+		}
+	}
+
+	private QVehicleImpl findVehicle(Id vehicleId) {
+		return queueSimulation.getVehicles().get(vehicleId);
 	}
 
 }

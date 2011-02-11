@@ -654,6 +654,7 @@ public class ParallelQSimTest extends TestCase {
 	 */
 	public void testVehicleTeleportationFalse() {
 		Fixture f = new Fixture();
+		f.scenario.getConfig().getQSimConfigGroup().setVehicleBehavior(QSimConfigGroup.VEHICLE_BEHAVIOR_EXCEPTION);
 		PersonImpl person = new PersonImpl(new IdImpl(1));
 		PlanImpl plan = person.createAndAddPlan(true);
 		ActivityImpl a1 = plan.createAndAddActivity("h", f.link1.getId());
@@ -682,7 +683,6 @@ public class ParallelQSimTest extends TestCase {
 
 		/* run parallelQSim */
 		QSim sim = new ParallelQSimulation(f.scenario, synchronizedEvents);
-		sim.setTeleportVehicles(false);
 		try {
 			sim.run();
 			fail("expected RuntimeException, but there was none.");

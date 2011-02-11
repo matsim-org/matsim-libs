@@ -24,7 +24,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.concurrent.PriorityBlockingQueue;
@@ -79,8 +81,8 @@ import org.matsim.ptproject.qsim.qnetsimengine.CarDepartureHandler;
 import org.matsim.ptproject.qsim.qnetsimengine.DefaultQNetworkFactory;
 import org.matsim.ptproject.qsim.qnetsimengine.DefaultQSimEngineFactory;
 import org.matsim.ptproject.qsim.qnetsimengine.QLanesNetworkFactory;
-import org.matsim.ptproject.qsim.qnetsimengine.QVehicle;
 import org.matsim.ptproject.qsim.qnetsimengine.QVehicleImpl;
+import org.matsim.ptproject.qsim.qnetsimengine.CarDepartureHandler.VehicleBehavior;
 import org.matsim.vehicles.VehicleImpl;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleTypeImpl;
@@ -112,8 +114,6 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 	private double infoTime = 0;
 	private static final int INFO_PERIOD = 3600;
 
-
-//	private QNetwork network;
 	private EventsManager events = null;
 
 	private NetsimEngine netEngine = null;
@@ -129,7 +129,7 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 	/**
 	 * Includes all agents that have transportation modes unknown to
 	 * the QueueSimulation (i.e. != "car") or have two activities on the same link
- 	 */
+	 */
 	private final Queue<Tuple<Double, PlanAgent>> teleportationList =
 		new PriorityQueue<Tuple<Double, PlanAgent>>(30, new TeleportationArrivalTimeComparator());
 
@@ -146,19 +146,14 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 	private AgentFactory agentFactory;
 	private SimulationListenerManager listenerManager;
 	private Scenario scenario = null;
-
-//	private final List<MobsimFeature> queueSimulationFeatures = new ArrayList<MobsimFeature>();
 	private final List<DepartureHandler> departureHandlers = new ArrayList<DepartureHandler>();
-
 	private Integer iterationNumber = null;
 	private ControlerIO controlerIO;
 	private QSimSnapshotWriterManager snapshotManager = new QSimSnapshotWriterManager();
-
 	private TransitQSimEngine transitEngine;
-
 	private AgentCounterI agentCounter;
-
 	private Collection<MobsimAgent> agents = new ArrayList<MobsimAgent>();
+	private final Map<Id, QVehicleImpl> vehicles = new HashMap<Id, QVehicleImpl>();
 
 	// everything above this line is private and should remain private.  pls contact me if this is in your way.  kai, oct'10
 	// ============================================================================================================================
@@ -247,12 +242,13 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 
 		this.initSimTimer();
 
-		this.snapshotPeriod = (int) this.scenario.getConfig().getQSimConfigGroup().getSnapshotPeriod();
+		QSimConfigGroup qSimConfigGroup = this.scenario.getConfig().getQSimConfigGroup();
+		this.snapshotPeriod = (int) qSimConfigGroup.getSnapshotPeriod();
 		this.infoTime = Math.floor(this.simTimer.getSimStartTime() / INFO_PERIOD) * INFO_PERIOD; // infoTime may be < simStartTime, this ensures to print out the info at the very first timestep already
 		this.snapshotTime = Math.floor(this.simTimer.getSimStartTime() / this.snapshotPeriod) * this.snapshotPeriod;
-
+		
 		// Initialize Snapshot file
-		this.snapshotPeriod = (int) this.scenario.getConfig().getQSimConfigGroup().getSnapshotPeriod();
+		this.snapshotPeriod = (int) qSimConfigGroup.getSnapshotPeriod();
 		this.snapshotManager.createSnapshotwriter(this.netEngine.getQNetwork(), this.scenario, this.snapshotPeriod, this.iterationNumber, this.controlerIO);
 		if (this.snapshotTime < this.simTimer.getSimStartTime()) {
 			this.snapshotTime += this.snapshotPeriod;
@@ -265,6 +261,7 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 	}
 
 	private static int vehWrnCnt = 0 ;
+
 	protected void createAgents() {
 		if (this.scenario.getPopulation() == null) {
 			throw new RuntimeException("No valid Population found (plans == null)");
@@ -272,7 +269,7 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 		VehicleType defaultVehicleType = new VehicleTypeImpl(new IdImpl("defaultVehicleType"));
 		for (Person p : this.scenario.getPopulation().getPersons().values()) {
 			PersonAgent agent = this.agentFactory.createPersonAgent(p);
-			QVehicle veh = null ;
+			QVehicleImpl veh = null ;
 			if ( agent instanceof PersonDriverAgent ) {
 				if ( vehWrnCnt < 1 ) {
 					log.warn( "QSim generates default vehicles; not sure what that does to vehicle files; needs to be checked.  kai, nov'10" ) ;
@@ -280,9 +277,9 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 					vehWrnCnt++ ;
 				}
 				veh = new QVehicleImpl(new VehicleImpl(agent.getPerson().getId(), defaultVehicleType));
-				//not needed in new agent class
 				veh.setDriver((PersonDriverAgent)agent); // this line is currently only needed for OTFVis to show parked vehicles
 				((DriverAgent)agent).setVehicle(veh);
+				vehicles.put(veh.getId(), veh);
 			}
 			agents.add(agent);
 			if (agent.initializeAndCheckIfAlive()) {
@@ -330,7 +327,7 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 		for (PlanAgent agent : this.activityEndsList) {
 			if ( agent instanceof UmlaufDriver ) {
 				log.error( "this does not terminate correctly for UmlaufDrivers; needs to be " +
-						"fixed but for the time being we skip the next couple of lines.  kai, dec'10") ;
+				"fixed but for the time being we skip the next couple of lines.  kai, dec'10") ;
 			} else {
 				if (agent.getDestinationLinkId() != null) {
 					events.processEvent(events.getFactory().
@@ -386,9 +383,6 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 			doSnapshot(time);
 		}
 
-//		for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) {
-//			queueSimulationFeature.afterAfterSimStep(time);
-//		}
 		return (this.agentCounter.isLiving() && (this.stopTime > time));
 	}
 
@@ -444,7 +438,6 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 	private void registerAgentAtActivityLocation(final PlanAgent agent) {
 		// if the "activities" engine were separate, this would need to be public.  kai, aug'10
 		if (agent instanceof PersonDriverAgentImpl) { // yyyyyy is this necessary?
-//			DefaultPersonDriverAgent pa = (DefaultPersonDriverAgent) agent;
 			PlanElement pe = agent.getCurrentPlanElement();
 			if (pe instanceof Leg) {
 				throw new RuntimeException();
@@ -470,7 +463,6 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 
 	private void unregisterAgentAtActivityLocation(final PlanAgent agent) {
 		if (agent instanceof PersonDriverAgentImpl) { // yyyy but why is this needed?
-//			DefaultPersonDriverAgent pa = (DefaultPersonDriverAgent) agent;
 			PlanElement pe = agent.getCurrentPlanElement();
 			if (pe instanceof Leg) {
 				throw new RuntimeException();
@@ -524,7 +516,7 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 	public final void arrangeAgentDeparture(final PlanAgent agent) {
 		double now = this.getSimTimer().getTimeOfDay() ;
 		Leg leg = agent.getCurrentLeg();
-//		Route route = leg.getRoute();
+		//		Route route = leg.getRoute();
 		String mode = leg.getMode();
 		Id linkId = agent.getCurrentLinkId() ;
 		events.processEvent(events.getFactory().createAgentDepartureEvent(now, agent.getId(), linkId, mode ));
@@ -596,26 +588,6 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 
 		if (sc.getConfig().multiModal().isMultiModalSimulationEnabled()) {
 
-			/*
-			 * Create a MultiModalTravelTime Calculator. It is passed over the the MultiModalQNetwork which
-			 * needs it to estimate the TravelTimes of the NonCarModes.
-			 * If the Controller uses a TravelTimeCalculatorWithBuffer (which is strongly recommended), a
-			 * BufferedTravelTime Object is created and set as TravelTimeCalculator in the MultiModalTravelTimeCost
-			 * Object.
-			 */
-//			MultiModalTravelTimeCost multiModalTravelTime = new MultiModalTravelTimeCost(sc.getConfig().plansCalcRoute(), sc.getConfig().multiModal());
-
-//			TravelTime travelTime = ((MultiModalMobsimFactory)simEngineFac).getTravelTime();
-//
-//			if (travelTime instanceof TravelTimeCalculatorWithBuffer) {
-//				BufferedTravelTime bufferedTravelTime = new BufferedTravelTime((TravelTimeCalculatorWithBuffer) travelTime);
-//				bufferedTravelTime.setScaleFactor(1.25);
-//				multiModalTravelTime.setTravelTime(bufferedTravelTime);
-//			} else {
-//				log.warn("TravelTime is not instance of TravelTimeCalculatorWithBuffer!");
-//				log.warn("No BufferedTravelTime Object could be created. Using FreeSpeedTravelTimes instead.");
-//			}
-
 			// create MultiModalSimEngine
 			multiModalEngine = new MultiModalSimEngineFactory().createMultiModalSimEngine(this);
 
@@ -625,7 +597,18 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 
 		this.agentFactory = new DefaultAgentFactory(this);
 
-		this.carDepartureHandler = new CarDepartureHandler(this);
+		QSimConfigGroup qSimConfigGroup = this.scenario.getConfig().getQSimConfigGroup();
+		VehicleBehavior vehicleBehavior;
+		if (qSimConfigGroup.getVehicleBehavior().equals(QSimConfigGroup.VEHICLE_BEHAVIOR_EXCEPTION)) {
+			vehicleBehavior = VehicleBehavior.EXCEPTION;
+		} else if (qSimConfigGroup.getVehicleBehavior().equals(QSimConfigGroup.VEHICLE_BEHAVIOR_TELEPORT)) {
+			vehicleBehavior = VehicleBehavior.TELEPORT;
+		} else if (qSimConfigGroup.getVehicleBehavior().equals(QSimConfigGroup.VEHICLE_BEHAVIOR_WAIT)) {
+			vehicleBehavior = VehicleBehavior.WAIT_UNTIL_IT_COMES_ALONG;
+		} else {
+			throw new RuntimeException("Unknown vehicle behavior option.");
+		}
+		this.carDepartureHandler = new CarDepartureHandler(this, vehicleBehavior);
 		addDepartureHandler(this.carDepartureHandler);
 
 		if (sc.getConfig().scenario().isUseTransit()){
@@ -639,8 +622,9 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 
 
 	private void initSimTimer() {
-		Double startTime = this.scenario.getConfig().getQSimConfigGroup().getStartTime();
-		this.stopTime = this.scenario.getConfig().getQSimConfigGroup().getEndTime();
+		QSimConfigGroup qSimConfigGroup = this.scenario.getConfig().getQSimConfigGroup();
+		Double startTime = qSimConfigGroup.getStartTime();
+		this.stopTime = qSimConfigGroup.getEndTime();
 		if (startTime == Time.UNDEFINED_TIME) {
 			startTime = 0.0;
 		}
@@ -648,19 +632,16 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 			this.stopTime = Double.MAX_VALUE;
 		}
 
-//		this.simTimer.setSimStartTime(24*3600);
-//		this.simTimer.setTime(startTime);
-
 		double simStartTime = 0;
 		if ( QSimConfigGroup.MAX_OF_STARTTIME_AND_EARLIEST_ACTIVITY_END.equals(
-				this.scenario.getConfig().getQSimConfigGroup().getSimStarttimeInterpretation() ) ) {
+				qSimConfigGroup.getSimStarttimeInterpretation() ) ) {
 			PlanAgent firstAgent = this.activityEndsList.peek();
 			if (firstAgent != null) {
 				// set sim start time to config-value ONLY if this is LATER than the first plans starttime
 				simStartTime = Math.floor(Math.max(startTime, firstAgent.getActivityEndTime()));
 			}
 		} else if ( QSimConfigGroup.ONLY_USE_STARTTIME.equals(
-				this.scenario.getConfig().getQSimConfigGroup().getSimStarttimeInterpretation() ) ) {
+				qSimConfigGroup.getSimStarttimeInterpretation() ) ) {
 			simStartTime = startTime ;
 		} else {
 			throw new RuntimeException( "unkonwn starttimeInterpretation; aborting ...") ;
@@ -722,24 +703,10 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 
 	@Override
 	public final EventsManager getEventsManager(){
-		  return events;
-		}
-
-	/** Specifies whether the simulation should track vehicle usage and throw an Exception
-	 * if an agent tries to use a car on a link where the car is not available, or not.
-	 * Set <code>teleportVehicles</code> to <code>true</code> if agents always have a
-	 * vehicle available. If the requested vehicle is parked somewhere else, the vehicle
-	 * will be teleported to wherever it is requested to for usage. Set to <code>false</code>
-	 * will generate an Exception in the case when an tries to depart with a car on link
-	 * where the car is not parked.
-	 *
-	 * @param teleportVehicles
-	 */
-	@Deprecated // I don't think that something that has so obvious access to config (via scenario) should also be separately
-	// configurable.  (But we do not all agree on this.)  kai, oct'10
-	/*package*/ void setTeleportVehicles(final boolean teleportVehicles) {
-		this.carDepartureHandler.setTeleportVehicles(teleportVehicles);
+		return events;
 	}
+
+
 
 	@Override
 	public final NetsimNetwork getNetsimNetwork() {
@@ -767,13 +734,12 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 	@Override
 	@Deprecated // if you think you need to use this, ask kai.  aug'10
 	public final void addFeature(final VisMobsimFeature queueSimulationFeature) {
-//		this.queueSimulationFeatures.add(queueSimulationFeature);
 		this.addQueueSimulationListeners(queueSimulationFeature);
 		this.getEventsManager().addHandler(queueSimulationFeature) ;
 	}
 
 
-	 Integer getIterationNumber() {
+	Integer getIterationNumber() {
 		return this.iterationNumber;
 	}
 
@@ -784,17 +750,13 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 	}
 
 	public final NetsimEngine getNetsimEngine() {
-	  return this.netEngine;
+		return this.netEngine;
 	}
 
 	@Override
 	public final void addSnapshotWriter(SnapshotWriter snapshotWriter) {
 		this.snapshotManager.addSnapshotWriter(snapshotWriter);
 	}
-
-//	public double getStuckTime(){
-//		return this.stuckTime;
-//	}
 
 	@Override
 	public final AgentCounterI getAgentCounter(){
@@ -838,6 +800,8 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 		// changed this to unmodifiable in oct'10.  kai
 	}
 
-
+	public Map<Id, QVehicleImpl> getVehicles() {
+		return Collections.unmodifiableMap( this.vehicles ) ;
+	}
 
 }
