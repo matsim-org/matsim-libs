@@ -71,44 +71,20 @@ public class BackwardDijkstraMultipleDestinations extends Dijkstra {
 	public Path calcLeastCostPath(final Node fromNode, final Node toNode, final double startTime) {
 
 		double arrivalTime = 0;
-		boolean stillSearching = true;
-
 		augmentIterationId();
-
+		
 		if (this.pruneDeadEnds == true) {
 			this.deadEndEntryNode = getPreProcessData(toNode).getDeadEndEntryNode();
 		}
-
-		PseudoRemovePriorityQueue<Node> pendingNodes = new PseudoRemovePriorityQueue<Node>(500);
 		
-		// initFromNode
-		DijkstraNodeData data = getData(fromNode);
-		visitNode(fromNode, data, pendingNodes, startTime, 0, null);
-
-		while (stillSearching) {
-			Node outNode = pendingNodes.poll();
-
-			if (outNode == null) {
-				log.warn("No route was found from node " + fromNode.getId() + " to node " + toNode.getId());
-				return null;
-			}
-
-			if (outNode == toNode) {
-				stillSearching = false;
-				DijkstraNodeData outData = getData(outNode);
-				arrivalTime = outData.getTime();
-			} else {
-				relaxNode(outNode, toNode, pendingNodes);
-			}
-		}
-
-		// now construct the path
+		// now construct the path, traversing backwards 
 		ArrayList<Node> nodes = new ArrayList<Node>();
 		ArrayList<Link> links = new ArrayList<Link>();
 
 		nodes.add(0, toNode);
 		Link tmpLink = getData(toNode).getPrevLink();
 		if (tmpLink != null) {
+			//bw: from Node is ok, we only need to change the from and to link below
 			while (tmpLink.getFromNode() != fromNode) {
 				links.add(0, tmpLink);
 				nodes.add(0, tmpLink.getFromNode());
@@ -117,11 +93,28 @@ public class BackwardDijkstraMultipleDestinations extends Dijkstra {
 			links.add(0, tmpLink);
 			nodes.add(0, tmpLink.getFromNode());
 		}
-
 		DijkstraNodeData toNodeData = getData(toNode);
-		Path path = new Path(nodes, links, arrivalTime - startTime, toNodeData.getCost());
+		arrivalTime = toNodeData.getTime();
+		// bw: -1.0 * times as we are going backwards (startTime > arrivalTime)
+		Path path = new Path(nodes, links, -1.0 * (arrivalTime - startTime), toNodeData.getCost());
 
 		return path;
+	}
+	
+	public void calcLeastCostTree(Node fromNode, double startTime) {
+
+		augmentIterationId();
+
+		PseudoRemovePriorityQueue<Node> pendingNodes = new PseudoRemovePriorityQueue<Node>(500);
+		// initFromNode
+		DijkstraNodeData data = getData(fromNode);
+		visitNode(fromNode, data, pendingNodes, startTime, 0, null);
+
+		while (true) {
+			Node outNode = pendingNodes.poll();
+			if (outNode == null) return;
+			relaxNode(outNode, null, pendingNodes);
+		}
 	}
 
 	protected void relaxNode(final Node outNode, final Node toNode, final PseudoRemovePriorityQueue<Node> pendingNodes) {
@@ -131,9 +124,11 @@ public class BackwardDijkstraMultipleDestinations extends Dijkstra {
 		double currCost = outData.getCost();
 		if (this.pruneDeadEnds) {
 			PreProcessDijkstra.DeadEndData ddOutData = getPreProcessData(outNode);
-			for (Link l : outNode.getOutLinks().values()) {
+			// bw: changed from "getOutLinks" to "getInLinks"
+			for (Link l : outNode.getInLinks().values()) {
 				if (canPassLink(l)) {
-					Node n = l.getToNode();
+					// bw: changed from "getToNode"
+					Node n = l.getFromNode();
 					PreProcessDijkstra.DeadEndData ddData = getPreProcessData(n);
 
 					/* IF the current node n is not in a dead end
@@ -149,9 +144,10 @@ public class BackwardDijkstraMultipleDestinations extends Dijkstra {
 				}
 			}
 		} else { // this.pruneDeadEnds == false
-			for (Link l : outNode.getOutLinks().values()) {
+			// bw: changed from "getOutLinks" to "getInLinks"
+			for (Link l : outNode.getInLinks().values()) {
 				if (canPassLink(l)) {
-					addToPendingNodes(l, l.getToNode(), pendingNodes, currTime, currCost, toNode);
+					addToPendingNodes(l, l.getFromNode(), pendingNodes, currTime, currCost, toNode);
 				}
 			}
 		}
@@ -161,7 +157,8 @@ public class BackwardDijkstraMultipleDestinations extends Dijkstra {
 			final PseudoRemovePriorityQueue<Node> pendingNodes, final double currTime,
 			final double currCost, final Node toNode) {
 
-		double travelTime = this.timeFunction.getLinkTravelTime(l, currTime);
+		// bw: travel time has to be negative while costs are still positive
+		double travelTime = -1.0 * this.timeFunction.getLinkTravelTime(l, currTime);
 		double travelCost = this.costFunction.getLinkGeneralizedTravelCost(l, currTime);
 		DijkstraNodeData data = getData(n);
 		double nCost = data.getCost();

@@ -32,7 +32,6 @@ import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.PseudoRemovePriorityQueue;
-import org.matsim.core.utils.misc.Time;
 
 public class ForwardDijkstraMultipleDestinations extends Dijkstra {
 	
@@ -63,25 +62,23 @@ public class ForwardDijkstraMultipleDestinations extends Dijkstra {
 			links.add(0, tmpLink);
 			nodes.add(0, tmpLink.getFromNode());
 		}
-
+		// arrival time was not ok in earlier versions!
 		DijkstraNodeData toNodeData = getData(toNode);
+		arrivalTime = toNodeData.getTime();
 		Path path = new Path(nodes, links, arrivalTime - startTime, toNodeData.getCost());
 
 		return path;
 	}
-	
-	public void calcLeastCostTrees() {
-		for (Node fromNode : this.network.getNodes().values()) {
-			calcLeastCostTree(fromNode, Time.UNDEFINED_TIME);
-		}
-	}
-	
+		
 	public void calcLeastCostTree(Node fromNode, double startTime) {
 
 		augmentIterationId();
 
 		PseudoRemovePriorityQueue<Node> pendingNodes = new PseudoRemovePriorityQueue<Node>(500);
-		initFromNode(fromNode, null, startTime, pendingNodes);
+		
+		//initFromNode
+		DijkstraNodeData data = getData(fromNode);
+		visitNode(fromNode, data, pendingNodes, startTime, 0, null);
 
 		while (true) {
 			Node outNode = pendingNodes.poll();
@@ -90,11 +87,5 @@ public class ForwardDijkstraMultipleDestinations extends Dijkstra {
 
 			relaxNode(outNode, null, pendingNodes);
 		}
-	}
-	
-	/*package*/ void initFromNode(final Node fromNode, final Node toNode, final double startTime,
-			final PseudoRemovePriorityQueue<Node> pendingNodes) {
-		DijkstraNodeData data = getData(fromNode);
-		visitNode(fromNode, data, pendingNodes, startTime, 0, null);
 	}
 }
