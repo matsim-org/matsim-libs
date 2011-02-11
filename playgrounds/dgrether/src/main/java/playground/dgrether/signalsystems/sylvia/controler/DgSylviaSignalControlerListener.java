@@ -55,6 +55,7 @@ public class DgSylviaSignalControlerListener implements SignalsControllerListene
 		SignalsData signalsData = scenario.getScenarioElement(SignalsData.class);
 		
 		this.sensorManager = new DgSensorManager(event.getControler().getScenario().getNetwork());
+		this.sensorManager.setLaneDefinitions(scenario.getLaneDefinitions());
 		event.getControler().getEvents().addHandler(sensorManager);
 		
 		FromDataBuilder modelBuilder = new FromDataBuilder(signalsData, 

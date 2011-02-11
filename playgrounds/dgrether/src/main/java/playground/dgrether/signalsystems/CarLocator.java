@@ -57,6 +57,7 @@ public class CarLocator {
 
 	private void calculateEarliestTimeInDistance (double enterTime, double d, Link link){
 		this.earliestTimeInDistance = enterTime + ((link.getLength() - d) / link.getFreespeed(enterTime));		
+		log.debug("link " + link.getId() + " enterTime: " + enterTime + " earliest time " + this.earliestTimeInDistance +  " distance " + d);
 	}
 	
 	private double checkDistance(double linkLength, double distance) {

@@ -35,6 +35,7 @@ import org.matsim.vis.otfvis.OTFVisMobsimFeature;
 
 import playground.dgrether.signalsystems.DgSensorManager;
 import playground.dgrether.signalsystems.sylvia.model.DgSylviaSignalModelFactory;
+import playground.dgrether.utils.DgOTFVisUtils;
 
 
 
@@ -51,11 +52,14 @@ public class SylviaOTFVisMain {
 	}	
 	
 	public void playCottbus(ScenarioImpl scenario){
+		DgOTFVisUtils.preparePopulation4Simulation(scenario);
+		
 		EventsManager events = new EventsManagerImpl();
 		scenario.getConfig().otfVis().setAgentSize(40.0f);
 		SignalsData signalsData = scenario.getScenarioElement(SignalsData.class);
 
 		DgSensorManager sensorManager = new DgSensorManager(scenario.getNetwork());
+		sensorManager.setLaneDefinitions(scenario.getLaneDefinitions());
 		events.addHandler(sensorManager);
 		
 		FromDataBuilder modelBuilder = new FromDataBuilder(signalsData, 
@@ -74,6 +78,9 @@ public class SylviaOTFVisMain {
 
 	}
 	
+
+
+
 	/**
 	 * @param args
 	 */

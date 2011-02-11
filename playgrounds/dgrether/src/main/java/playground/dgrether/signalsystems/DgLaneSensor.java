@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DgExtensionPoint
+ * DgLaneSensor
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,60 +17,41 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.signalsystems.sylvia.model;
+package playground.dgrether.signalsystems;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
-import org.matsim.api.core.v01.Id;
-import org.matsim.signalsystems.data.signalsystems.v20.SignalData;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.events.LaneEnterEvent;
+import org.matsim.core.events.LaneLeaveEvent;
+import org.matsim.lanes.Lane;
 
 
 /**
- * Has no idea about the sensors as it should be a datastructure
- * but might have an idea about the links of the signal groups
  * @author dgrether
  *
  */
-public class DgExtensionPoint {
+public class DgLaneSensor {
 
-	private Map<Id, Integer> maxGreenTimes = new HashMap<Id, Integer>();
-	private int secondInPlan;
-	private Set<Id> signalGroupIds = new HashSet<Id>();
-	private Set<SignalData> signals = new HashSet<SignalData>();
+	private Link link;
+	private Lane lane;
+	private int agentsOnLink = 0;
 
-	public DgExtensionPoint(int secondInPlan){
-		this.secondInPlan = secondInPlan;
-	}
-	
-	public int getSecondInPlan(){
-		return this.secondInPlan;
-	}
-	
-	public Set<Id> getSignalGroupIds() {
-		return this.signalGroupIds ;
-	}
-	
-	public void addSignalGroupId(Id signalGroupId){
-		this.signalGroupIds.add(signalGroupId);
+	public DgLaneSensor(Link link, Lane lane) {
+		this.link = link;
+		this.lane = lane;
 	}
 
-	public int getMaxGreenTime(Id signalGroupId) {
-		return this.maxGreenTimes.get(signalGroupId);
-	}
-	
-	public void setMaxGreenTime(Id signalGroupId, int maxGreenTime){
-		this.maxGreenTimes.put(signalGroupId, maxGreenTime);
+	public void handleEvent(LaneLeaveEvent event) {
+		this.agentsOnLink--;
 	}
 
-	public void addSignals(Set<SignalData> signals) {
-		this.signals .addAll(signals);
+	public void handleEvent(LaneEnterEvent event) {
+		this.agentsOnLink++;
+	}
+
+	public int getNumberOfCarsOnLink() {
+		return this.agentsOnLink;
 	}
 	
-	public Set<SignalData> getSignals(){
-		return this.signals;
-	}
+	
 
 }

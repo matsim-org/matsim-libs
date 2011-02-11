@@ -19,6 +19,7 @@
 
 package playground.dgrether.signalsystems.sylvia;
 
+import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Collections;
@@ -41,17 +42,18 @@ import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.LaneEnterEvent;
 import org.matsim.core.events.handler.LaneEnterEventHandler;
+import org.matsim.core.utils.io.IOUtils;
 
 public class DgTimeCalcHandler implements LinkEnterEventHandler, LinkLeaveEventHandler,
 		AgentArrivalEventHandler, AgentDepartureEventHandler, LaneEnterEventHandler {
 
 	private static final Logger log = Logger.getLogger(DgTimeCalcHandler.class);
 
-	private Map<Id, Double> arrivaltimestofbspn;
-	private Map<Id, Double> arrivaltimestofbcb;
+	private Map<Id, Double> arrivaltimesSPN2FB;
+	private Map<Id, Double> arrivaltimesCB2FB;
 
-	private Map<Id, Double> arrivaltimesfromfbspn;
-	private Map<Id, Double> arrivaltimesfromfbcb;
+	private Map<Id, Double> arrivaltimesFB2SPN;
+	private Map<Id, Double> arrivaltimesFB2CB;
 	private Map<Id, Double> ttmap;
 	private Set<Id> carsPassed;
 	private Set<Id> wannabeadaptiveLanes;
@@ -72,14 +74,14 @@ public class DgTimeCalcHandler implements LinkEnterEventHandler, LinkLeaveEventH
 	public void reset(int iteration) {
 		this.ttmap = new TreeMap<Id, Double>();
 		this.carsPassed = new HashSet<Id>();
-		this.arrivaltimesfromfbcb = new TreeMap<Id, Double>();
-		this.arrivaltimesfromfbspn = new TreeMap<Id, Double>();
-		this.arrivaltimestofbcb = new TreeMap<Id, Double>();
-		this.arrivaltimestofbspn = new TreeMap<Id, Double>();
-		this.arrivaltimesfromfbcb.put(new IdImpl(0), 0.0);
-		this.arrivaltimestofbspn.put(new IdImpl(0), 0.0);
-		this.arrivaltimestofbcb.put(new IdImpl(0), 0.0);
-		this.arrivaltimesfromfbspn.put(new IdImpl(0), 0.0);
+		this.arrivaltimesFB2CB = new TreeMap<Id, Double>();
+		this.arrivaltimesFB2SPN = new TreeMap<Id, Double>();
+		this.arrivaltimesCB2FB = new TreeMap<Id, Double>();
+		this.arrivaltimesSPN2FB = new TreeMap<Id, Double>();
+		this.arrivaltimesFB2CB.put(new IdImpl(0), 0.0);
+		this.arrivaltimesSPN2FB.put(new IdImpl(0), 0.0);
+		this.arrivaltimesCB2FB.put(new IdImpl(0), 0.0);
+		this.arrivaltimesFB2SPN.put(new IdImpl(0), 0.0);
 	}
 
 	@Override
@@ -94,23 +96,23 @@ public class DgTimeCalcHandler implements LinkEnterEventHandler, LinkLeaveEventH
 
 		this.ttmap.put(event.getPersonId(), agentTt + event.getTime());
 		if (event.getPersonId().toString().endsWith("SPN_SDF")) {
-			Double tr = this.arrivaltimestofbspn.get(event.getPersonId());
+			Double tr = this.arrivaltimesSPN2FB.get(event.getPersonId());
 
 			if (tr == null) {
-				this.arrivaltimestofbspn.put(event.getPersonId(), event.getTime());
+				this.arrivaltimesSPN2FB.put(event.getPersonId(), event.getTime());
 			}
 			else {
-				this.arrivaltimesfromfbspn.put(event.getPersonId(), event.getTime());
+				this.arrivaltimesFB2SPN.put(event.getPersonId(), event.getTime());
 
 			}
 		}
 		if (event.getPersonId().toString().endsWith("CB_SDF")) {
-			Double tr = this.arrivaltimestofbcb.get(event.getPersonId());
+			Double tr = this.arrivaltimesCB2FB.get(event.getPersonId());
 			if (tr == null) {
-				this.arrivaltimestofbcb.put(event.getPersonId(), event.getTime());
+				this.arrivaltimesCB2FB.put(event.getPersonId(), event.getTime());
 			}
 			else {
-				this.arrivaltimesfromfbcb.put(event.getPersonId(), event.getTime());
+				this.arrivaltimesFB2CB.put(event.getPersonId(), event.getTime());
 
 			}
 		}
@@ -169,29 +171,33 @@ public class DgTimeCalcHandler implements LinkEnterEventHandler, LinkLeaveEventH
 
 	public void exportArrivalTime(int iteration, String outdir) {
 		String filename = outdir + iteration + ".arrivalTimesFromFB_CB.csv";
-		this.exportMaptoCVS(this.arrivaltimesfromfbcb, filename);
+		this.exportMaptoCVS(this.arrivaltimesFB2CB, filename);
 		filename = outdir + iteration + ".arrivalTimesFromFB_SPN.csv";
-		this.exportMaptoCVS(this.arrivaltimesfromfbspn, filename);
-		filename = outdir + iteration + ".arrivalTimesToFB_CB.csv";
-		this.exportMaptoCVS(this.arrivaltimestofbcb, filename);
-		filename = outdir + iteration + ".arrivalTimesToSPN_CB.csv";
-		this.exportMaptoCVS(this.arrivaltimestofbspn, filename);
+		this.exportMaptoCVS(this.arrivaltimesFB2SPN, filename);
+		filename = outdir + iteration + ".arrivalTimes_CB_FB.csv";
+		this.exportMaptoCVS(this.arrivaltimesCB2FB, filename);
+		filename = outdir + iteration + ".arrivalTimes_SPN_FB.csv";
+		this.exportMaptoCVS(this.arrivaltimesSPN2FB, filename);
 		
 		filename = outdir + iteration + ".latestArrivals.csv";
 		this.exportLatestArrivals(filename);
 	}
 
 	private void exportLatestArrivals(String filename) {
+		
+		
 		try {
-			FileWriter writer = new FileWriter(filename);
-			writer.append(Collections.max(this.arrivaltimestofbcb.values()) + ";"
-					+ Collections.max(this.arrivaltimestofbspn.values()) + ";"
-					+ Collections.max(this.arrivaltimesfromfbcb.values()) + ";"
-					+ Collections.max(this.arrivaltimesfromfbspn.values()) + ";\n");
+			BufferedWriter writer = IOUtils.getBufferedWriter(filename);
+			writer.append("CB2FB;" + "SPN2FB;" + "FB2CB;" + "FB2SPN;");
+			writer.newLine();
+			
+			writer.append(Collections.max(this.arrivaltimesCB2FB.values()) + ";"
+					+ Collections.max(this.arrivaltimesSPN2FB.values()) + ";"
+					+ Collections.max(this.arrivaltimesFB2CB.values()) + ";"
+					+ Collections.max(this.arrivaltimesFB2SPN.values()) + ";");
 			writer.flush();
 			writer.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -215,22 +221,22 @@ public class DgTimeCalcHandler implements LinkEnterEventHandler, LinkLeaveEventH
 	}
 
 	public double getLatestArrivalCBSDF() {
-		return Collections.max(this.arrivaltimestofbcb.values()).doubleValue();
+		return Collections.max(this.arrivaltimesCB2FB.values()).doubleValue();
 
 	}
 
 	public double getLatestArrivalSPNSDF() {
-		return Collections.max(this.arrivaltimestofbspn.values()).doubleValue();
+		return Collections.max(this.arrivaltimesSPN2FB.values()).doubleValue();
 
 	}
 
 	public double getLatestArrivalSDFCB() {
-		return Collections.max(this.arrivaltimesfromfbcb.values()).doubleValue();
+		return Collections.max(this.arrivaltimesFB2CB.values()).doubleValue();
 
 	}
 
 	public double getLatestArrivalSDFSPN() {
-		return Collections.max(this.arrivaltimesfromfbspn.values()).doubleValue();
+		return Collections.max(this.arrivaltimesFB2SPN.values()).doubleValue();
 
 	}
 

@@ -34,7 +34,13 @@ import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
+import org.matsim.core.events.LaneEnterEvent;
+import org.matsim.core.events.LaneLeaveEvent;
+import org.matsim.core.events.handler.LaneEnterEventHandler;
+import org.matsim.core.events.handler.LaneLeaveEventHandler;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.lanes.Lane;
+import org.matsim.lanes.LaneDefinitions;
 
 
 /**
@@ -42,7 +48,7 @@ import org.matsim.core.utils.collections.Tuple;
  *
  */
 public class DgSensorManager implements LinkEnterEventHandler, LinkLeaveEventHandler, 
-	AgentArrivalEventHandler, AgentWait2LinkEventHandler{
+	AgentArrivalEventHandler, AgentWait2LinkEventHandler, LaneEnterEventHandler, LaneLeaveEventHandler{
 
 	private static final Logger log = Logger.getLogger(DgSensorManager.class);
 	
@@ -50,9 +56,13 @@ public class DgSensorManager implements LinkEnterEventHandler, LinkLeaveEventHan
 //	private Map<Id, Double> linkIdNumberOfCarsInDistanceMap = new HashMap<Id, Double>();
 	private Map<Id, DgSensor> linkIdSensorMap = new HashMap<Id, DgSensor>();
 
-private Map<Id, Tuple<Double, Double>> linkFirstSecondDistanceMeterMap = new HashMap<Id, Tuple<Double, Double>>();
+	private Map<Id, Map<Id, DgLaneSensor>> linkIdLaneIdSensorMap = new HashMap<Id, Map<Id, DgLaneSensor>>();
+	
+	private Map<Id, Tuple<Double, Double>> linkFirstSecondDistanceMeterMap = new HashMap<Id, Tuple<Double, Double>>();
 
-private Network network;
+	private Network network;
+
+	private LaneDefinitions laneDefinitions = null;
 	
 	public DgSensorManager(Network network){
 		this.network = network;
@@ -62,6 +72,9 @@ private Network network;
 //		this.monitoredLinkIds.add(link.getId());
 		if (!this.linkIdSensorMap.containsKey(linkId)){
 			Link link = this.network.getLinks().get(linkId);
+			if (link == null){
+				throw new IllegalStateException("Link with Id " + linkId + " is not in the network, can't register sensor");
+			}
 			this.linkIdSensorMap.put(linkId, new DgSensor(link));
 		}
 	}
@@ -74,21 +87,46 @@ private Network network;
 //		this.linkIdNumberOfCarsInDistanceMap.put(link.getId(), distanceMeter);
 		if (!this.linkIdSensorMap.containsKey(linkId)){
 			Link link = this.network.getLinks().get(linkId);
+			if (link == null){
+				throw new IllegalStateException("Link with Id " + linkId + " is not in the network, can't register sensor");
+			}
 			this.linkIdSensorMap.put(link.getId(), new DgSensor(link));
 //			this.monitoredLinkIds.add(link.getId());
 		}
 		this.linkIdSensorMap.get(linkId).registerDistanceToMonitor(distanceMeter);
 	}
 	
+	public void registerNumberOfCarsMonitoringOnLane(Id linkId, Id laneId) {
+		Link link = this.network.getLinks().get(linkId);
+		if (link == null){
+			throw new IllegalStateException("Link with Id " + linkId + " is not in the network, can't register sensor");
+		}
+		if (this.laneDefinitions == null || this.laneDefinitions.getLanesToLinkAssignments().get(linkId) == null ||
+				this.laneDefinitions.getLanesToLinkAssignments().get(linkId).getLanes().get(laneId) == null) {
+			throw new IllegalStateException("No data found for lane  " + laneId + " on link  " + linkId + " is not in the network, can't register sensor");
+		}
+		if (! this.linkIdLaneIdSensorMap.containsKey(linkId)){
+			this.linkIdLaneIdSensorMap.put(linkId, new HashMap<Id, DgLaneSensor>());
+		}
+		if (! this.linkIdLaneIdSensorMap.get(linkId).containsKey(laneId)){
+			Lane lane = this.laneDefinitions.getLanesToLinkAssignments().get(linkId).getLanes().get(laneId);
+			this.linkIdLaneIdSensorMap.get(linkId).put(laneId, new DgLaneSensor(link, lane));
+		}
+	
+	}
+
+	
 	public void registerCarsAtDistancePerSecondMonitoring(Id linkId, Double distanceMeter){
 		double firstDistanceMeter = distanceMeter;
 		Link link = this.network.getLinks().get(linkId);
-		double secondDistanceMeter = distanceMeter - link.getFreespeed();
+		double secondDistanceMeter = distanceMeter -  2 * link.getFreespeed();
+		//TODO could also exceed link length
 		if (secondDistanceMeter < 0.0){
-			firstDistanceMeter = link.getFreespeed();
+			firstDistanceMeter = 2* link.getFreespeed();
 			secondDistanceMeter = 0.0;
 		}
 		Tuple<Double, Double> tuple = new Tuple<Double, Double>(firstDistanceMeter, secondDistanceMeter);
+		log.error("Link " + linkId + " first pos: " + tuple.getFirst() + " second pos: " + tuple.getSecond() + " length " + link.getLength());
 		this.linkFirstSecondDistanceMeterMap .put(link.getId(), tuple);
 		this.registerNumberOfCarsInDistanceMonitoring(linkId, firstDistanceMeter);
 		this.registerNumberOfCarsInDistanceMonitoring(linkId, secondDistanceMeter);
@@ -98,7 +136,9 @@ private Network network;
 		Tuple<Double, Double> tuple = this.linkFirstSecondDistanceMeterMap.get(linkId);
 		int numberOfCarsFirstDetector = this.getNumberOfCarsInDistance(linkId, tuple.getFirst(), timeSeconds);
 		int numberOfCarsSecondDetector = this.getNumberOfCarsInDistance(linkId, tuple.getSecond(), timeSeconds);
-		return numberOfCarsSecondDetector - numberOfCarsFirstDetector;
+		log.error("Link " + linkId + " first pos: " + tuple.getFirst() + " second pos: " + tuple.getSecond());
+		log.error("NumberOfCars SecondDetector: " + numberOfCarsSecondDetector + " first detector: " + numberOfCarsFirstDetector);
+		return numberOfCarsFirstDetector - numberOfCarsSecondDetector  ;
 	}
 
 	public int getNumberOfCarsOnLink(Id linkId){
@@ -107,6 +147,18 @@ private Network network;
 		}
 		return this.linkIdSensorMap.get(linkId).getNumberOfCarsOnLink();
 	}
+	
+	public int getNumberOfCarsOnLane(Id linkId, Id laneId) {
+		if (!this.linkIdLaneIdSensorMap.containsKey(linkId)){
+			throw new IllegalStateException("No sensor on link " + linkId + "! Register measurement for this link by calling one of the 'register...' methods of this class first.");
+		}
+		Map<Id, DgLaneSensor> map = this.linkIdLaneIdSensorMap.get(linkId);
+		if (map == null || !map.containsKey(laneId)){
+			throw new IllegalStateException("No sensor on lane " + laneId + " of link " + linkId + "! Register measurement for this link lane pair!");
+		}
+		return map.get(laneId).getNumberOfCarsOnLink();
+	}
+
 	
 	public int getNumberOfCarsInDistance(Id linkId, Double distanceMeter, double timeSeconds){
 		if (!this.linkIdSensorMap.containsKey(linkId)){
@@ -148,6 +200,30 @@ private Network network;
 	public void reset(int iteration) {
 		this.linkIdSensorMap.clear();
 		this.linkFirstSecondDistanceMeterMap.clear();
+	}
+
+	public void setLaneDefinitions(LaneDefinitions laneDefinitions) {
+		this.laneDefinitions  = laneDefinitions;
+	}
+
+	@Override
+	public void handleEvent(LaneLeaveEvent event) {
+		if (this.linkIdLaneIdSensorMap.containsKey(event.getLinkId())){
+			Map<Id, DgLaneSensor> map = this.linkIdLaneIdSensorMap.get(event.getLinkId());
+			if (map.containsKey(event.getLaneId())){
+				map.get(event.getLaneId()).handleEvent(event);
+			}
+		}
+	}
+
+	@Override
+	public void handleEvent(LaneEnterEvent event) {
+		if (this.linkIdLaneIdSensorMap.containsKey(event.getLinkId())){
+			Map<Id, DgLaneSensor> map = this.linkIdLaneIdSensorMap.get(event.getLinkId());
+			if (map.containsKey(event.getLaneId())){
+				map.get(event.getLaneId()).handleEvent(event);
+			}
+		}
 	}
 
 	

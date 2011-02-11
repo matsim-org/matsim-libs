@@ -127,6 +127,17 @@ public class DgSignalsUtils {
 		return null; 
 	}
 	
+	public static Set<SignalData> getSignalDataOfSignalGroup(SignalSystemData signalSystem, SignalGroupData signalGroup) {
+		Set<SignalData> signalSet = new HashSet<SignalData>();
+		if (!signalSystem.getId().equals(signalGroup.getSignalSystemId())){
+			throw new IllegalArgumentException("System Id: " + signalSystem.getId() + " is not equal to signal group Id: " + signalGroup.getId());
+		}
+		for (Id signalId : signalGroup.getSignalIds()){
+			SignalData signal = signalSystem.getSignalData().get(signalId);
+			signalSet.add(signal);
+		}
+		return signalSet;
+	}
 	
 	/**
 	 * @param signalSystemsData 
@@ -146,7 +157,7 @@ public class DgSignalsUtils {
 		return signalizedLinksPerSystem;
 	}
 	
-	public static Set<Id> calculateSignalizedLinks4SignalGroup(SignalSystemData system, SignalGroupData signalGroup){
+	public static Set<Id> calculateSignalizedLinkIds4SignalGroup(SignalSystemData system, SignalGroupData signalGroup){
 		Set<Id> linkIds = new HashSet<Id>();
 		if (!system.getId().equals(signalGroup.getSignalSystemId())){
 			throw new IllegalArgumentException("System Id: " + system.getId() + " is not equal to signal group Id: " + signalGroup.getId());

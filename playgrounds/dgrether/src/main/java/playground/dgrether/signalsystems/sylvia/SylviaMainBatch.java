@@ -25,6 +25,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
@@ -109,10 +111,12 @@ public class SylviaMainBatch {
 	}
 
 	private static void writeAverageTT(Map<Integer, Double> map, String filename) throws FileNotFoundException, IOException{
+		SortedMap<Integer, Double> sorted = new TreeMap<Integer, Double>();
+		sorted.putAll(map);
 		BufferedWriter writer = IOUtils.getBufferedWriter(filename);
 		writer.write("Football fans %" + "\t" + "Average travel time");
 		writer.newLine();
-		for (Entry<Integer, Double> e : map.entrySet()){
+		for (Entry<Integer, Double> e : sorted.entrySet()){
 			writer.write(e.getKey().toString() + "\t" + e.getValue().toString());
 			writer.newLine();
 		}

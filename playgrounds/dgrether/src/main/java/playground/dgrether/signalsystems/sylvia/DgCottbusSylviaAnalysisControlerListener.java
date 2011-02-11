@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package playground.dgrether.signalsystems.sylvia;
 
-import java.io.FileWriter;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.Map.Entry;
 
@@ -34,6 +34,7 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.signalsystems.model.SignalGroupState;
 
 import playground.dgrether.signalsystems.analysis.DgSignalGreenSplitHandler;
@@ -105,23 +106,21 @@ public class DgCottbusSylviaAnalysisControlerListener implements StartupListener
 
 	private void writeSignalStats(String outputDirectory){
 		try {
-			FileWriter fw = new FileWriter(outputDirectory +"signal_statistic.csv");
+			BufferedWriter writer = IOUtils.getBufferedWriter(outputDirectory +"signal_statistic.csv");
+			
 			for (Id ssid : signalGreenSplitHandler.getSystemIdAnalysisDataMap().keySet()) {
-				for (Entry<Id, DgSignalGroupAnalysisData> entry : signalGreenSplitHandler
-						.getSystemIdAnalysisDataMap().get(ssid)
-						.getSystemGroupAnalysisDataMap().entrySet()) {
+				for (Entry<Id, DgSignalGroupAnalysisData> entry : signalGreenSplitHandler.getSystemIdAnalysisDataMap().get(ssid).getSystemGroupAnalysisDataMap().entrySet()) {
 					// logg.info("for signalgroup: "+entry.getKey());
-					for (Entry<SignalGroupState, Double> ee : entry
-							.getValue().getStateTimeMap().entrySet()) {
+					for (Entry<SignalGroupState, Double> ee : entry.getValue().getStateTimeMap().entrySet()) {
 						// logg.info(ee.getKey()+": "+ee.getValue());
-						fw.append(ssid + ";" + entry.getKey() + ";"
+						writer.append(ssid + ";" + entry.getKey() + ";"
 								+ ee.getKey() + ";" + ee.getValue()+";\n");
 
 					}
 				}
 			}				
-			fw.flush();
-			fw.close();
+			writer.flush();
+			writer.close();
 			log.info("Wrote signalsystemstats.");
 		} catch (IOException e){
 			e.printStackTrace();

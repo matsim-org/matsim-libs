@@ -19,8 +19,8 @@
  * *********************************************************************** */
 package playground.dgrether.signalsystems.sylvia.model;
 
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalGroupSettingsData;
 import org.matsim.signalsystems.data.signalgroups.v20.SignalGroupData;
+import org.matsim.signalsystems.data.signalsystems.v20.SignalData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemData;
 import org.matsim.signalsystems.model.DatabasedSignalPlan;
 import org.matsim.signalsystems.model.SignalController;
@@ -51,7 +52,7 @@ public class DgSylviaController implements SignalController {
 	
 	public final static String CONTROLLER_IDENTIFIER = "SylviaSignalControl";
 
-	private final static double SENSOR_DISTANCE = 30.0;
+	private final static double SENSOR_DISTANCE = 10.0;
 	
 	private final static double GAP_SECONDS = 5.0;
 	
@@ -91,12 +92,11 @@ public class DgSylviaController implements SignalController {
 	}
 	
 	private void init() {
-		this.lastTimeStepSensorRecordsMap = new HashMap<Double, SensorRecord>();
 		this.currentExtensionPoint = null;
 		this.activeSylviaPlan = null;
 		this.extensionActive = false;
 		this.forcedExtensionActive = false;
-		this.lastTimeStepSensorRecordsMap.clear();
+		this.lastTimeStepSensorRecordsMap = null;
 		this.greenGroupId2OnsetMap = new HashMap<Id, Double>();
 		this.links4extensionPointMap = new HashMap<DgExtensionPoint, List<Id>>();
 		this.extensionPointMap = new HashMap<Integer, DgExtensionPoint>();
@@ -117,7 +117,7 @@ public class DgSylviaController implements SignalController {
 	public void updateState(double timeSeconds) {
 		this.secondInCycle++;
 		//TODO check sylvia timer reset
-//		log.info("time: " + timeSeconds + " sylvia timer: " + this.secondInSylviaCycle + " fixed-time timer: " + this.secondInCycle);
+		log.info("time: " + timeSeconds + " sylvia timer: " + this.secondInSylviaCycle + " fixed-time timer: " + this.secondInCycle + " ext time: " + this.extensionTime + " of " + this.activeSylviaPlan.getMaxExtensionTime());
 		int secondInFixedTimeCycle = (int) (timeSeconds % this.activeSylviaPlan.getFixedTimeCycle());
 //		if (secondInFixedTimeCycle == 0){
 		if (this.secondInSylviaCycle == this.activeSylviaPlan.getCycleTime()){
@@ -133,8 +133,9 @@ public class DgSylviaController implements SignalController {
 			return;
 		}
 		else if (this.extensionActive){
+			this.extensionTime++;
 //			log.debug("time: " + timeSeconds + " extension active: " +  this.currentExtensionPoint.getSecondInPlan());
-			if (! this.checkExtensionCondition(timeSeconds)) {
+			if (! this.checkExtensionCondition(timeSeconds, this.currentExtensionPoint)) {
 				this.stopExtension();
 			}
 			return;
@@ -142,7 +143,7 @@ public class DgSylviaController implements SignalController {
 		else {
 			this.secondInSylviaCycle++;
 //			log.info("time: " + timeSeconds + " sylvia timer: " + this.secondInSylviaCycle + " fixed-time timer: " + this.secondInCycle);
-//			log.info("sylvia timer: " + this.secondInSylviaCycle);
+			log.info("sylvia timer: " + this.secondInSylviaCycle);
 			//check for forced extension trigger
 			if (this.forcedExtensionPointMap.containsKey(this.secondInSylviaCycle)){
 				if (this.checkForcedExtensionCondition()){
@@ -154,7 +155,7 @@ public class DgSylviaController implements SignalController {
 			else if (this.extensionPointMap.containsKey(this.secondInSylviaCycle)){
 //				log.debug("Found Extension point at " + this.secondInSylviaCycle);
 				this.currentExtensionPoint = this.extensionPointMap.get(this.secondInSylviaCycle);
-				if (this.checkExtensionCondition(timeSeconds)){
+				if (this.checkExtensionCondition(timeSeconds, this.currentExtensionPoint)){
 					this.extensionActive = true;
 					return;
 				}
@@ -204,22 +205,22 @@ public class DgSylviaController implements SignalController {
 		return false;
 	}
 	
-	private boolean checkExtensionCondition(double timeSeconds){
+	private boolean checkExtensionCondition(double timeSeconds, DgExtensionPoint extensionPoint){
 		if (this.isExtensionTimeLeft()) {
 			//check if there is some green time left of one of the groups is over its maximal green time
 			boolean greenTimeLeft = true;
 //			log.error("green groups: " + this.greenGroupId2OnsetMap.size());
-			for (Id signalGroupId : this.currentExtensionPoint.getSignalGroupIds()){
+			for (Id signalGroupId : extensionPoint.getSignalGroupIds()){
 //				if (this.greenGroupId2OnsetMap.containsKey(signalGroupId)){ // as the group may be not green yet 
-					if (! this.isGreenTimeLeft(timeSeconds, signalGroupId, this.currentExtensionPoint.getMaxGreenTime(signalGroupId))){
+					if (! this.isGreenTimeLeft(timeSeconds, signalGroupId, extensionPoint.getMaxGreenTime(signalGroupId))){
 						greenTimeLeft = false;
 					}
 //				}
 			}
 			//if there is green time left check traffic state
 			if (greenTimeLeft){
-				this.monitorTrafficConditions(timeSeconds);
-				return this.checkTrafficConditions(timeSeconds);
+//				this.monitorTrafficConditions(timeSeconds, extensionPoint);
+				return this.checkTrafficConditions(timeSeconds, extensionPoint);
 			}
 		}
 		return false;
@@ -228,7 +229,7 @@ public class DgSylviaController implements SignalController {
 	
 
 	
-	private void monitorTrafficConditions(double timeSeconds){
+	private void monitorTrafficConditions(double timeSeconds, DgExtensionPoint extensionPoint){
 		//we measure the first time in this extension
 		if (this.lastTimeStepSensorRecordsMap == null) {
 			this.lastTimeStepSensorRecordsMap = new HashMap<Double, SensorRecord>();
@@ -238,14 +239,39 @@ public class DgSylviaController implements SignalController {
 		}
 		SensorRecord sensorRecord = new SensorRecord();
 		this.lastTimeStepSensorRecordsMap.put(timeSeconds, sensorRecord);
-		for (Id linkId : this.links4extensionPointMap.get(this.currentExtensionPoint)){
+		for (Id linkId : this.links4extensionPointMap.get(extensionPoint)){
 			Integer noCars = this.sensorManager.getNumberOfCarsAtDistancePerSecond(linkId, SENSOR_DISTANCE, timeSeconds);
+			log.error("Link " + linkId + " noCarsAtSecond " + noCars + " noCarsOnLink: " + this.sensorManager.getNumberOfCarsOnLink(linkId));
 			sensorRecord.linkIdNoCarsMap.put(linkId, noCars);
 		}
 		
 	}
+
+	private boolean checkTrafficConditions(double timeSeconds, DgExtensionPoint extensionPoint){
+		log.debug("check traffic conditions:  ");
+		int noCars = 0;
+		for (SignalData signal : extensionPoint.getSignals()){
+			if (signal.getLaneIds() == null || signal.getLaneIds().isEmpty()){
+				noCars = this.sensorManager.getNumberOfCarsInDistance(signal.getLinkId(), SENSOR_DISTANCE, timeSeconds);
+				if (noCars > 0){
+					log.debug(" Dehnung Aktiv!!");
+					return true;
+				}
+			}
+			else {
+				for (Id laneId : signal.getLaneIds()){
+					noCars = this.sensorManager.getNumberOfCarsOnLane(signal.getLinkId(), laneId);
+					if (noCars > 0){
+						log.debug(" Dehnung Aktiv!!");
+						return true;
+					}
+				}
+			}
+		}		
+		return false;
+	}
 	
-	private boolean checkTrafficConditions(double timeSeconds){
+	private boolean checkTrafficConditionsOld(double timeSeconds, DgExtensionPoint extensionPoint){
 		//we have not enough measures to check for the specified gap
 		if (this.lastTimeStepSensorRecordsMap.size() < GAP_SECONDS) {
 			return true;
@@ -254,11 +280,11 @@ public class DgSylviaController implements SignalController {
 		//there are GAP_SECONDS many measures
 		for (double t = timeSeconds - GAP_SECONDS + 1; t <= timeSeconds; t++){
 			SensorRecord gapSensorRecord = this.lastTimeStepSensorRecordsMap.get(t);
-			for (Id linkId : this.links4extensionPointMap.get(this.currentExtensionPoint)){
-//				log.error("time: " + timeSeconds + " linkId: " + linkId + " gapSensorRecord: " + gapSensorRecord);
+			for (Id linkId : this.links4extensionPointMap.get(extensionPoint)){
 				int noCars = gapSensorRecord.linkIdNoCarsMap.get(linkId);
+				log.error("time: " + t + " linkId: " + linkId + " gapSensorRecord: " + noCars);
 				if (noCars > 0){
-					log.debug("  Zeitlücke unterschritten!");
+					log.debug("  Zeitlücke unterschritten, Dehnung Aktiv!!");
 					return true;
 				}
 			}
@@ -365,19 +391,49 @@ public class DgSylviaController implements SignalController {
 	
 	private void initializeSensoring(){
 		for (DgExtensionPoint extPoint : this.extensionPointMap.values()){
-			List<Id> linkIdList = new ArrayList<Id>();
+			Set<SignalData> extPointSignals = new HashSet<SignalData>();
 			for (Id signalGroupId : extPoint.getSignalGroupIds()){
 				SignalSystemData systemData = this.system.getSignalSystemsManager().getSignalsData().getSignalSystemsData().getSignalSystemData().get(this.system.getId());
 				SignalGroupData signalGroup = this.system.getSignalSystemsManager().getSignalsData().getSignalGroupsData().getSignalGroupDataBySystemId(systemData.getId()).get(signalGroupId);
-				Set<Id> linkIds = DgSignalsUtils.calculateSignalizedLinks4SignalGroup(systemData, signalGroup);
-				linkIdList.addAll(linkIds);
+				Set<SignalData> signals = DgSignalsUtils.getSignalDataOfSignalGroup(systemData, signalGroup);
+				extPointSignals.addAll(signals);
 			}
-			for (Id linkId : linkIdList){
-				this.sensorManager.registerCarsAtDistancePerSecondMonitoring(linkId, SENSOR_DISTANCE);
+			extPoint.addSignals(extPointSignals);
+			for (SignalData signal : extPointSignals){
+				if (signal.getLaneIds() == null || signal.getLaneIds().isEmpty()){
+					this.sensorManager.registerCarsAtDistancePerSecondMonitoring(signal.getLinkId(), SENSOR_DISTANCE);
+				}
+				else {
+					for (Id laneId : signal.getLaneIds()){
+						//TODO check this part again
+						this.sensorManager.registerNumberOfCarsMonitoringOnLane(signal.getLinkId(), laneId);
+					}
+				}
 			}
-			this.links4extensionPointMap.put(extPoint, linkIdList);
+			//TODO change this
+//			this.links4extensionPointMap.put(extPoint, linkIdList);
 		}
 	}
 	
+	/**
+	 * Calculates link ids and lane ids that are grouped to the signal group given as argument.
+	 * If a signal is directly on a link 
+	 */
+	private Map<Id, Set<Id>> calculateSignalizedLinkAndLaneIds4SignalGroup(SignalSystemData signalSystem, SignalGroupData signalGroup){
+		Map<Id, Set<Id>> linkId2LaneIdMap = new HashMap<Id, Set<Id>>();
+		if (!signalSystem.getId().equals(signalGroup.getSignalSystemId())){
+			throw new IllegalArgumentException("System Id: " + signalSystem.getId() + " is not equal to signal group Id: " + signalGroup.getId());
+		}
+		for (Id signalId : signalGroup.getSignalIds()){
+			SignalData signal = signalSystem.getSignalData().get(signalId);
+			if (signal.getLaneIds() == null || signal.getLaneIds().isEmpty()){
+					linkId2LaneIdMap.put(signal.getLinkId(), null);
+			}
+			else {
+				linkId2LaneIdMap.put(signal.getLinkId(), signal.getLaneIds());
+			}
+		}
+		return linkId2LaneIdMap;
+	}
 	
 }
