@@ -27,7 +27,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelMinCost;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkLink;
 import org.matsim.pt.transitSchedule.api.Departure;
@@ -88,8 +87,7 @@ public class TransitRouterNetworkTravelTimeCost implements TravelTime, TravelMin
 			return arrivalOffset - wrapped.fromNode.stop.getDepartureOffset();
 		}
 		// different transit routes, so it must be a line switch
-		double distance = CoordUtils.calcDistance(wrapped.fromNode.stop.getStopFacility().getCoord(), wrapped.toNode.stop.getStopFacility().getCoord());
-		double time2 = distance / this.config.getBeelineWalkSpeed();
+		double time2 = wrapped.getLength() / this.config.getBeelineWalkSpeed();
 		return time2;
 	}
 
