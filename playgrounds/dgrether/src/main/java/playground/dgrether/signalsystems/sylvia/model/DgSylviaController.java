@@ -117,7 +117,7 @@ public class DgSylviaController implements SignalController {
 	public void updateState(double timeSeconds) {
 		this.secondInCycle++;
 		//TODO check sylvia timer reset
-		log.info("time: " + timeSeconds + " sylvia timer: " + this.secondInSylviaCycle + " fixed-time timer: " + this.secondInCycle + " ext time: " + this.extensionTime + " of " + this.activeSylviaPlan.getMaxExtensionTime());
+//		log.info("time: " + timeSeconds + " sylvia timer: " + this.secondInSylviaCycle + " fixed-time timer: " + this.secondInCycle + " ext time: " + this.extensionTime + " of " + this.activeSylviaPlan.getMaxExtensionTime());
 		int secondInFixedTimeCycle = (int) (timeSeconds % this.activeSylviaPlan.getFixedTimeCycle());
 //		if (secondInFixedTimeCycle == 0){
 		if (this.secondInSylviaCycle == this.activeSylviaPlan.getCycleTime()){
@@ -143,7 +143,7 @@ public class DgSylviaController implements SignalController {
 		else {
 			this.secondInSylviaCycle++;
 //			log.info("time: " + timeSeconds + " sylvia timer: " + this.secondInSylviaCycle + " fixed-time timer: " + this.secondInCycle);
-			log.info("sylvia timer: " + this.secondInSylviaCycle);
+//			log.info("sylvia timer: " + this.secondInSylviaCycle);
 			//check for forced extension trigger
 			if (this.forcedExtensionPointMap.containsKey(this.secondInSylviaCycle)){
 				if (this.checkForcedExtensionCondition()){
@@ -248,13 +248,13 @@ public class DgSylviaController implements SignalController {
 	}
 
 	private boolean checkTrafficConditions(double timeSeconds, DgExtensionPoint extensionPoint){
-		log.debug("check traffic conditions:  ");
+//		log.debug("check traffic conditions:  ");
 		int noCars = 0;
 		for (SignalData signal : extensionPoint.getSignals()){
 			if (signal.getLaneIds() == null || signal.getLaneIds().isEmpty()){
 				noCars = this.sensorManager.getNumberOfCarsInDistance(signal.getLinkId(), SENSOR_DISTANCE, timeSeconds);
 				if (noCars > 0){
-					log.debug(" Dehnung Aktiv!!");
+//					log.debug(" Dehnung Aktiv!!");
 					return true;
 				}
 			}
@@ -262,7 +262,7 @@ public class DgSylviaController implements SignalController {
 				for (Id laneId : signal.getLaneIds()){
 					noCars = this.sensorManager.getNumberOfCarsOnLane(signal.getLinkId(), laneId);
 					if (noCars > 0){
-						log.debug(" Dehnung Aktiv!!");
+//						log.debug(" Dehnung Aktiv!!");
 						return true;
 					}
 				}
