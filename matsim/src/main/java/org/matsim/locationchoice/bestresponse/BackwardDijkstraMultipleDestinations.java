@@ -72,7 +72,7 @@ public class BackwardDijkstraMultipleDestinations extends Dijkstra {
 	@Override
 	public Path calcLeastCostPath(final Node fromNode, final Node toNode, final double startTime) {
 
-		//log.info("fromNode: " + fromNode.getId() + " toNode: " + toNode.getId());
+		log.info("fromNode: " + fromNode.getId() + " toNode: " + toNode.getId());
 		
 		double arrivalTime = 0;
 		augmentIterationId();
@@ -100,11 +100,14 @@ public class BackwardDijkstraMultipleDestinations extends Dijkstra {
 		DijkstraNodeData toNodeData = getData(toNode);
 		arrivalTime = toNodeData.getTime();
 		// bw: -1.0 * times as we are going backwards (startTime > arrivalTime)
+		// if arrivalTime < 0 we are in the next day. Set travel time very high
 		
-		//log.info("arrivalTime " + arrivalTime / 60.0);
-		//log.info("this.estimatedStartTime " + this.estimatedStartTime / 60.0);
+		double travelTime = Double.MAX_VALUE;
+		if (arrivalTime > 0) {
+			travelTime = -1.0 * (arrivalTime - this.estimatedStartTime);
+		}
 		
-		Path path = new Path(nodes, links, -1.0 * (arrivalTime - this.estimatedStartTime), toNodeData.getCost());
+		Path path = new Path(nodes, links, travelTime, toNodeData.getCost());
 
 		return path;
 	}
@@ -166,12 +169,23 @@ public class BackwardDijkstraMultipleDestinations extends Dijkstra {
 	}
 
 	protected boolean addToPendingNodes(final Link l, final Node n,
-			final PseudoRemovePriorityQueue<Node> pendingNodes, final double currTime,
+			final PseudoRemovePriorityQueue<Node> pendingNodes, double currTime,
 			final double currCost, final Node toNode) {
 
 		// bw: travel time has to be negative while costs are still positive
-		double travelTime = -1.0 * this.timeFunction.getLinkTravelTime(l, currTime);
-		double travelCost = this.costFunction.getLinkGeneralizedTravelCost(l, currTime);
+		// But we have a problem if current time is negative. Use previous day instead! 
+		double travelTime = 0.0;
+		double travelCost = 0.0;
+		if (currTime < 0) {
+			double timeMod = 24.0 * 3600.0 - Math.abs(currTime % (24.0 * 3600.0));
+			travelTime = -1.0 * this.timeFunction.getLinkTravelTime(l, timeMod);
+			travelCost = this.costFunction.getLinkGeneralizedTravelCost(l, timeMod);			
+		}
+		else {
+			travelTime = -1.0 * this.timeFunction.getLinkTravelTime(l, currTime);
+			travelCost = this.costFunction.getLinkGeneralizedTravelCost(l, currTime);
+		}		
+		
 		DijkstraNodeData data = getData(n);
 		double nCost = data.getCost();
 		if (!data.isVisited(this.iterationID)) {
