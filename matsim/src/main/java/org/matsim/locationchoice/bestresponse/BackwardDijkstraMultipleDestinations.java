@@ -103,7 +103,7 @@ public class BackwardDijkstraMultipleDestinations extends Dijkstra {
 		// if arrivalTime < 0 we are in the next day. Set travel time very high
 		
 		double travelTime = Double.MAX_VALUE;
-		if (arrivalTime > 0) {
+		if (arrivalTime > 0 && arrivalTime < this.estimatedStartTime) {
 			travelTime = -1.0 * (arrivalTime - this.estimatedStartTime);
 		}
 		
