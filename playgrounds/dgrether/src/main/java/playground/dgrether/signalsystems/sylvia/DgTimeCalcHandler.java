@@ -65,12 +65,6 @@ public class DgTimeCalcHandler implements LinkEnterEventHandler, LinkLeaveEventH
 	}
 
 	@Override
-	public void handleEvent(LinkEnterEvent event) {
-		Double agentTt = this.ttmap.get(event.getPersonId());
-		this.ttmap.put(event.getPersonId(), agentTt - event.getTime());
-	}
-
-	@Override
 	public void reset(int iteration) {
 		this.ttmap = new TreeMap<Id, Double>();
 		this.carsPassed = new HashSet<Id>();
@@ -85,6 +79,12 @@ public class DgTimeCalcHandler implements LinkEnterEventHandler, LinkLeaveEventH
 	}
 
 	@Override
+	public void handleEvent(LinkEnterEvent event) {
+		Double agentTt = this.ttmap.get(event.getPersonId());
+		this.ttmap.put(event.getPersonId(), agentTt - event.getTime());
+	}
+
+	@Override
 	public void handleEvent(LinkLeaveEvent event) {
 		Double agentTt = this.ttmap.get(event.getPersonId());
 		this.ttmap.put(event.getPersonId(), agentTt + event.getTime());
@@ -93,17 +93,15 @@ public class DgTimeCalcHandler implements LinkEnterEventHandler, LinkLeaveEventH
 	@Override
 	public void handleEvent(AgentArrivalEvent event) {
 		Double agentTt = this.ttmap.get(event.getPersonId());
-
 		this.ttmap.put(event.getPersonId(), agentTt + event.getTime());
+	
 		if (event.getPersonId().toString().endsWith("SPN_SDF")) {
 			Double tr = this.arrivaltimesSPN2FB.get(event.getPersonId());
-
 			if (tr == null) {
 				this.arrivaltimesSPN2FB.put(event.getPersonId(), event.getTime());
 			}
 			else {
 				this.arrivaltimesFB2SPN.put(event.getPersonId(), event.getTime());
-
 			}
 		}
 		if (event.getPersonId().toString().endsWith("CB_SDF")) {
@@ -116,7 +114,6 @@ public class DgTimeCalcHandler implements LinkEnterEventHandler, LinkLeaveEventH
 
 			}
 		}
-
 	}
 
 	@Override
@@ -124,13 +121,10 @@ public class DgTimeCalcHandler implements LinkEnterEventHandler, LinkLeaveEventH
 		Double agentTt = this.ttmap.get(event.getPersonId());
 		if (agentTt == null) {
 			this.ttmap.put(event.getPersonId(), 0 - event.getTime());
-
 		}
 		else {
 			this.ttmap.put(event.getPersonId(), agentTt - event.getTime());
-
 		}
-
 	}
 
 	public Map<Id, Double> getTtmap() {
@@ -184,8 +178,6 @@ public class DgTimeCalcHandler implements LinkEnterEventHandler, LinkLeaveEventH
 	}
 
 	private void exportLatestArrivals(String filename) {
-		
-		
 		try {
 			BufferedWriter writer = IOUtils.getBufferedWriter(filename);
 			writer.append("CB2FB;" + "SPN2FB;" + "FB2CB;" + "FB2SPN;");
@@ -261,6 +253,5 @@ public class DgTimeCalcHandler implements LinkEnterEventHandler, LinkLeaveEventH
 		}
 		att = att / this.getPassedAgents();
 		return att.intValue();
-
 	}
 }
