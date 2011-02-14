@@ -321,9 +321,10 @@ public class DijkstraWithTightTurnPenalty implements
 									.getDeadEndEntryNode().getId()) {
 						// V-----------TESTS-----------V
 						if (prevLink != null) {
-							currCost *= getTightTurnFactor(prevLink
+							double factor = getTightTurnFactor(prevLink
 									.getFromNode().getCoord(), n.getCoord(),
 									outNode.getCoord());
+							currCost *= factor;
 						}
 						// A-----------TESTS-----------A
 						addToPendingNodes(l, n, pendingNodes, currTime,
@@ -338,8 +339,10 @@ public class DijkstraWithTightTurnPenalty implements
 					Node n = l.getToNode();
 
 					if (prevLink != null) {
-						currCost *= getTightTurnFactor(prevLink.getFromNode()
-								.getCoord(), n.getCoord(), outNode.getCoord());
+						double factor = getTightTurnFactor(prevLink
+								.getFromNode().getCoord(), n.getCoord(),
+								outNode.getCoord());
+						currCost *= factor;
 					}
 					// A-----------TESTS-----------A
 					addToPendingNodes(l, n, pendingNodes, currTime, currCost,
@@ -351,7 +354,7 @@ public class DijkstraWithTightTurnPenalty implements
 
 	protected double getTightTurnFactor(Coord fromCoord, Coord nextCoord,
 			Coord outCoord) {
-		return (3d - SimpleTrigonometric.getCosineCFrom3Coords(fromCoord,
+		return (3d + SimpleTrigonometric.getCosineCFrom3Coords(fromCoord,
 				nextCoord, outCoord)) / 2d;
 	}
 

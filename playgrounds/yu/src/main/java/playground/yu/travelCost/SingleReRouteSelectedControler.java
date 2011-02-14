@@ -28,6 +28,7 @@ import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
 
 import playground.yu.replanning.StrategyManagerWithRouteComparison;
+import playground.yu.replanning.TightTurnPenaltyControlerListener;
 
 /**
  * @author yu
@@ -38,9 +39,9 @@ public class SingleReRouteSelectedControler extends Controler {
 	/**
 	 * @param args
 	 */
-	public SingleReRouteSelectedControler(String arg, double A, double B) {
+	public SingleReRouteSelectedControler(String arg) {
 		super(arg);
-		addControlerListener(new SingleReRouteSelectedListener(A, B));
+
 	}
 
 	@Override
@@ -53,13 +54,33 @@ public class SingleReRouteSelectedControler extends Controler {
 		return manager;
 	}
 
-	public static void main(String[] args) {
+	/*
+	 * program arguments: ../matsimTests/diverseRoutes/A1B0.xml
+	 * ../matsimTests/diverseRoutes/A2_3B1.xml
+	 * ../matsimTests/diverseRoutes/A1_3B2.xml
+	 * ../matsimTests/diverseRoutes/A0B3.xml
+	 */
+	public static void travelTimeCostWeight(String[] args) {
 		for (int i = 0; i <= 3; i++) {
-			Controler controler = new SingleReRouteSelectedControler(args[i],
-					(double) (3 - i) / (double) 3, i);
+			Controler controler = new SingleReRouteSelectedControler(args[i]);
+			controler.addControlerListener(new SingleReRouteSelectedListener(
+					(double) (3 - i) / (double) 3, i));
 			controler.setWriteEventsInterval(0);
 			controler.setOverwriteFiles(true);
 			controler.run();
 		}
+	}
+
+	public static void tightTurnPenalty(String[] args) {
+		Controler controler = new SingleReRouteSelectedControler(args[0]);
+		controler.addControlerListener(new TightTurnPenaltyControlerListener());
+		controler.setWriteEventsInterval(0);
+		controler.setOverwriteFiles(true);
+		controler.run();
+	}
+
+	public static void main(String[] args) {
+		// travelTimeCostWeight(args);
+		tightTurnPenalty(args);
 	}
 }
