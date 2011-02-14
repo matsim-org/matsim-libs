@@ -71,6 +71,7 @@ public class SingleReRouteSelectedControler extends Controler {
 		}
 	}
 
+	/* ../matsimTests/diverseRoutes/tightTurnPenalty.xml */
 	public static void tightTurnPenalty(String[] args) {
 		Controler controler = new SingleReRouteSelectedControler(args[0]);
 		controler.addControlerListener(new TightTurnPenaltyControlerListener());
@@ -79,8 +80,18 @@ public class SingleReRouteSelectedControler extends Controler {
 		controler.run();
 	}
 
+	public static void capacityWeightedTravelTimeCost(String[] args) {
+		Controler controler = new SingleReRouteSelectedControler(args[0]);
+		controler
+				.addControlerListener(new LinkCapacityWeightedTravelCostListener());
+		controler.setWriteEventsInterval(0);
+		controler.setOverwriteFiles(true);
+		controler.run();
+	}
+
 	public static void main(String[] args) {
 		// travelTimeCostWeight(args);
-		tightTurnPenalty(args);
+		// tightTurnPenalty(args);
+		capacityWeightedTravelTimeCost(args);
 	}
 }
