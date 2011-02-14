@@ -155,9 +155,11 @@ public class FlowCalculationSettings {
 		}
 	}
 	
-	public void setWhenAvailable(HashMap<Id, Interval> whenAvailable) {
+	
+	
+	public void setWhenAvailable(HashMap<Id, Interval> whenAvailable, double timestep, double offset) {
 		this._whenAvailable = new Interval[nlinks];
-		
+
 		for (int i = 0; i < _whenAvailable.length; i++) {
 			_whenAvailable[i] = new Interval(0, this.TimeHorizon);
 		}
@@ -165,7 +167,10 @@ public class FlowCalculationSettings {
 		if (whenAvailable != null) {
 			for (Id linkId: whenAvailable.keySet()) {
 				Link link = _matsimNetwork.getLinks().get(linkId);
-				this._whenAvailable[_network.getIndex(link)] = whenAvailable.get(link.getId());
+				Interval tmp = whenAvailable.get(link.getId());
+				int l =  (int) Math.round((tmp.getLowBound() + offset) / timestep);
+				int r = (int) Math.round((tmp.getHighBound() + offset) / timestep);
+				this._whenAvailable[_network.getIndex(link)] = new Interval(l,r);
 			}
 		}
 	}
@@ -266,7 +271,11 @@ public class FlowCalculationSettings {
 		}
 
 		prepareDemands();
-
+		
+		if (this._whenAvailable == null) {
+			setWhenAvailable(null, 1.0, 0.0);
+		}
+		
 		this._ready = true;
 
 		return true;
@@ -450,7 +459,7 @@ public class FlowCalculationSettings {
 		System.out.println("Use touched nodes hashmaps: " + this.checkTouchedNodes);
 		System.out.println("Keep paths at all: " + this.keepPaths);
 		System.out.println("Unfold stored paths: " + this.unfoldPaths);
-		System.out.println(" Remeber which paths use an edge: "+ this.mapLinksToTEP);
+		System.out.println(" Remember which paths use an edge: "+ this.mapLinksToTEP);
 		System.out.println("Check consistency every: " + this.checkConsistency + " rounds (0 = off)");
 		System.out.println("Garbage collection every: " + this.doGarbageCollection + " rounds (0 = off)");
 

@@ -871,7 +871,7 @@ public class MultiSourceEAF {
 			plansfile = "/homes/combi/Projects/ADVEST/padang/plans/padang_plans_v20100317.xml.gz";
 			changeeventsfile = "/homes/combi/Projects/ADVEST/padang/network/change_events_v20100317.xml.gz";
 			changeeventsoffset = 3 * 3600; // starts at 3:00:00
-			timeStep = 10;
+			timeStep = 10; // whenAvailable will get adjusted by the method reading the changeevents.
 			scaleCapacity = 1.0;
 			sinkid = "en1";
 		} else if (instance == 5) {
@@ -1096,7 +1096,6 @@ public class MultiSourceEAF {
 		settings = new FlowCalculationSettings();
 		settings.setNetwork(network);
 		settings.setDemands(demands);
-		settings.setWhenAvailable(whenAvailable);
 		
 		settings.supersink = settings.getNetwork().getIndexedNode(sink);
 		settings.timeStep = timeStep; // default 1
@@ -1105,6 +1104,9 @@ public class MultiSourceEAF {
 
 		// set additional parameters
 		//settings.TimeHorizon = 1000;
+		
+		settings.setWhenAvailable(whenAvailable, 1.0, 0); // changeevents are already scaled!
+		
 		//settings.MaxRounds = 1;
 		//settings.checkConsistency = 1;
 		//settings.doGarbageCollection = 10; // > 0 generally not such a good idea.

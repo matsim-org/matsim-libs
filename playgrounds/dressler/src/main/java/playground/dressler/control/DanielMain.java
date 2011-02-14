@@ -57,7 +57,10 @@ public class DanielMain {
 		String sinkid = null;
 		String simplenetworkfile = null;		
 		String imageBaseName = null;
+		String writeProblem = null;
+		boolean costonsinks = false;
 		boolean writeflow = false;
+		boolean noflow = false;
 		int uniformDemands = 0;
 		int goBackHowMany = 0;
 		
@@ -164,6 +167,18 @@ public class DanielMain {
 						argsokay= false;
 						error += "--writeflow requires an argument (boolean)\n";
 					}
+				}  else if (s.equals("--noflow")) {
+					noflow = true;
+				} else if (s.equals("--writeproblem")) {
+					i++;
+					if (i < args.length) {
+						writeProblem = args[i];
+					} else {
+						argsokay= false;
+						error += "--writeproblem requires an argument (lp, simple, net, dimacs, lodyfa)\n";
+					}
+				}  else if (s.equals("--costonsinks")) {
+					costonsinks = true;
 				} else if (s.equals("--help")) {
 					argsokay= false;
 					error += "Possible command line options\n";
@@ -173,15 +188,13 @@ public class DanielMain {
 					error += "--plans filename\n";
 					error += "--sinkid string\n";
 					error += "--uniform int\n";
-					error += "* Scaling * \n";
-					error += "--timehorizon int\n";
-					error += "--timestep double\n";
-					error += "--flowfactor double\n";
-					error += "* Output * \n";
+					error += "* Scaling, search Settings *\n";
+					error += "--config filenameyet\n";
+					error += "* Output * \n";	
+					error += "--noflow \n";
 					error += "--outputplans filename\n";
 					error += "--imagebasename truncated filename\n";
-					error += "* Search Settings *\n";
-					error += "--config filenameyet\n";
+					error += "--writeproblem {lp, simple, net, dimacs, lodyfa}\n";
 					error += "* and many more ... *\n";
 				} else {
 					String options;
@@ -297,93 +310,108 @@ public class DanielMain {
 			return;
 		}
 
+		if (writeProblem != null) {
+			if (writeProblem.equals("lp")) settings.writeLP();
+			else if (writeProblem.equals("simple")) settings.writeSimpleNetwork(true); // new format
+			else if (writeProblem.equals("net")) settings.writeNET(costonsinks);
+			else if (writeProblem.equals("lodyfa")) settings.writeLodyfa();
+			else if (writeProblem.equals("dimacs")) settings.writeDIMACS(costonsinks);
+			else {
+				System.out.println("Unknown problem format '" + writeProblem + "'\n");
+			}
+		}
+		
 		Flow fluss;
 
-		fluss = MultiSourceEAF.calcEAFlow(settings, null);
-		
-		//fluss.writePathflow(false);
+		if (!noflow) {
+			fluss = MultiSourceEAF.calcEAFlow(settings, null);
 
-		/* --------- the actual work is done --------- */
-		
+			//fluss.writePathflow(false);
 
-		// basic statistics before decomposition
-		
-		int[] arrivals = fluss.arrivals();
-		long totalcost = 0;
-		for (int i = 0; i < arrivals.length; i++) {
-			totalcost += i*arrivals[i];
-		}
+			/* --------- the actual work is done --------- */
 
-		System.out.println("Total cost: " + totalcost);
-		System.out.println("Collected " + fluss.getPaths().size() + " paths.");
-		
-		// decompose the flow
-		Flow reconstructedFlow = new Flow(settings);
-		CPUTimer Tdecompose = new CPUTimer("Path Decomposition");
-		CPUTimer Treconstruct = new CPUTimer("Flow Reconstruction");
-		
-		Tdecompose.onoff();
-		LinkedList<TimeExpandedPath> decomp = fluss.doPathDecomposition(); 
-		Tdecompose.onoff();
-		
-		Treconstruct.onoff();
-		if( decomp !=null) {
-			System.out.println("reconstructing flow");			
-			for (TimeExpandedPath path : decomp) {
-				reconstructedFlow.augment(path,path.getFlow());
+
+			// basic statistics before decomposition
+
+			int[] arrivals = fluss.arrivals();
+			long totalcost = 0;
+			for (int i = 0; i < arrivals.length; i++) {
+				totalcost += i*arrivals[i];
 			}
-			reconstructedFlow.cleanUp();
-		}		
-		Treconstruct.onoff();
-		
-		fluss = reconstructedFlow;
-		
-		System.out.println("== After decomposition & reconstruction ==");
-		System.out.println(Tdecompose);
-		System.out.println(Treconstruct);
-		
-		int[] arrivals2 = fluss.arrivals();
-		long totalcost2 = 0;
-		for (int i = 0; i < arrivals2.length; i++) {
-			totalcost2 += i*arrivals2[i];
-		}
 
-		System.out.println("Total cost: " + totalcost2);
-		System.out.println("Collected " + fluss.getPaths().size() + " paths.");
+			System.out.println("Total cost: " + totalcost);
+			System.out.println("Collected " + fluss.getPaths().size() + " paths.");
 
-		System.out.println(fluss.arrivalsToString());
-		System.out.println(fluss.arrivalPatternToString());
-		System.out.println("unsatisfied demands:");
-		for (IndexedNodeI node : fluss.getSources()){
-			int demand = fluss.getDemands()[node.getIndex()];
-			if (demand > 0) {
-				// this can be a lot of text				
-				System.out.println("node:" + node.getId().toString()+ " demand:" + demand);
+			// decompose the flow
+			Flow reconstructedFlow = new Flow(settings);
+			CPUTimer Tdecompose = new CPUTimer("Path Decomposition");
+			CPUTimer Treconstruct = new CPUTimer("Flow Reconstruction");
+
+			Tdecompose.onoff();
+			LinkedList<TimeExpandedPath> decomp = fluss.doPathDecomposition(); 
+			Tdecompose.onoff();
+
+			Treconstruct.onoff();
+			if( decomp !=null) {
+				System.out.println("reconstructing flow");			
+				for (TimeExpandedPath path : decomp) {
+					reconstructedFlow.augment(path,path.getFlow());
+				}
+				reconstructedFlow.cleanUp();
+			}		
+			Treconstruct.onoff();
+
+			fluss = reconstructedFlow;
+
+			System.out.println("== After decomposition & reconstruction ==");
+			System.out.println(Tdecompose);
+			System.out.println(Treconstruct);
+
+			int[] arrivals2 = fluss.arrivals();
+			long totalcost2 = 0;
+			for (int i = 0; i < arrivals2.length; i++) {
+				totalcost2 += i*arrivals2[i];
 			}
-		}
-		
-		if (writeflow) {			
-			System.out.println(fluss.writePathflow(false));
-		}
-		
-		if (outplansfile != null) {
-			PopulationCreator popcreator = new PopulationCreator(settings);
-			
-			// fix the final link
-			popcreator.autoFixSink(new IdImpl("en2"));			
-			
-			Population output = popcreator.createPopulation(fluss.getPaths(), scenario);
-			new PopulationWriter(output, network).write(outplansfile);
-		}
 
-		// statistics
-		if (imageBaseName != null) {
-			Partitioner partitioner = new Partitioner(settings);
-			partitioner.goBackHowMany = goBackHowMany; 
-			partitioner.determineStatistics(fluss.getPaths());
-			//partitioner.printStatistics();
+			System.out.println("Total cost: " + totalcost2);
+			System.out.println("Collected " + fluss.getPaths().size() + " paths.");
 
-			partitioner.drawStatistics(imageBaseName, 2000, 2000);
+			System.out.println(fluss.arrivalsToString());
+			System.out.println(fluss.arrivalPatternToString());
+			System.out.println("unsatisfied demands:");
+			for (IndexedNodeI node : fluss.getSources()){
+				int demand = fluss.getDemands()[node.getIndex()];
+				if (demand > 0) {
+					// this can be a lot of text				
+					System.out.println("node:" + node.getId().toString()+ " demand:" + demand);
+				}
+			}
+
+			if (writeflow) {			
+				System.out.println(fluss.writePathflow(false));
+			}
+
+			if (outplansfile != null) {
+				PopulationCreator popcreator = new PopulationCreator(settings);
+
+				// fix the final link
+				popcreator.autoFixSink(new IdImpl("en2"));			
+
+				Population output = popcreator.createPopulation(fluss.getPaths(), scenario);
+				new PopulationWriter(output, network).write(outplansfile);
+			}
+
+			// statistics
+			if (imageBaseName != null) {
+				Partitioner partitioner = new Partitioner(settings);
+				partitioner.goBackHowMany = goBackHowMany; 
+				partitioner.determineStatistics(fluss.getPaths());
+				//partitioner.printStatistics();
+
+				partitioner.drawStatistics(imageBaseName, 2000, 2000);
+			}
+		} else {
+			System.out.println("No flow computed.");
 		}
 		
 		
