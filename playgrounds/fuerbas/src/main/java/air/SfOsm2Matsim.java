@@ -17,7 +17,7 @@ public class SfOsm2Matsim {
 	public static void main(String[] args) {
 
 
-		OsmAerowayParser osmReader = new OsmAerowayParser(TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84,
+		SfOsmAerowayParser osmReader = new SfOsmAerowayParser(TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84,
 						TransformationFactory.WGS84));
 
 		String input = args[0];				// OSM Input File

@@ -45,7 +45,7 @@ public class SfAirScheduleBuilder {
 	public void filterEurope(String inputOsm, String inputOag, String outputOsm, String outputOag, String outputMissingAirports, String cityPairs, String aircraft) throws IOException, SAXException, ParserConfigurationException {
 		
 		
-		OsmAerowayParser osmReader = new OsmAerowayParser(TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84,
+		SfOsmAerowayParser osmReader = new SfOsmAerowayParser(TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84,
 				TransformationFactory.WGS84));
 		osmReader.parse(inputOsm);
 		
@@ -95,8 +95,8 @@ public class SfAirScheduleBuilder {
 
 			
 				for (int ii=0; ii<euroCountries.length; ii++) {
-					if (originCountry.contains(euroCountries[ii])) origin=true;
-					if (destinationCountry.contains(euroCountries[ii])) destination=true;
+					if (originCountry.equalsIgnoreCase(euroCountries[ii])) origin=true;
+					if (destinationCountry.equalsIgnoreCase(euroCountries[ii])) destination=true;
 				}
 			
 			
@@ -105,8 +105,7 @@ public class SfAirScheduleBuilder {
 				
 				if (lineEntries[47].contains("O") || lineEntries[43].equalsIgnoreCase("")) {
 					
-						flightNumber = flightNumber.replaceAll(" ", "0");
-								
+						flightNumber = flightNumber.replaceAll(" ", "0");		
 						flight=carrier+flightNumber;
 						int seatsAvail = Integer.parseInt(lineEntries[23]);
 						String originAirport = lineEntries[4];

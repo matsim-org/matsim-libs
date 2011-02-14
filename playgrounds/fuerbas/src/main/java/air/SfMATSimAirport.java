@@ -13,8 +13,8 @@ import org.matsim.core.utils.geometry.CoordImpl;
 
 public class SfMATSimAirport {
 	
-	private static final double runwayLength = 3000.0;
-	private static final double taxiwayLength = 500.0;
+	private static final double runwayLength = 450.0;
+	private static final double taxiwayLength = 200.0;
 	
 	public Coord coord;
 	public Id id;
@@ -27,11 +27,7 @@ public class SfMATSimAirport {
 	@SuppressWarnings("deprecation")
 	public void createRunways(Network network) {
 		
-//		Node mit IATA als Zentrales Element, Link mit IATA Code an Node,
-//		Taxiway von IATA zu Runway_outbound und Runway_inbound
-//		Runway_inbound, Runway_outbound
-//		coord.getX und coord.getY gibt double, dann addieren 0.001 = 111m
-		
+	
 //		create Ids for nodes and links
 		
 		Id idApron = this.id;													//Id for apron link and central airport node
@@ -43,7 +39,7 @@ public class SfMATSimAirport {
 		
 //		create Coords for nodes
 		
-		Coord coordApronEnd = new CoordImpl(this.coord.getX()+taxiwayLength, this.coord.getY());			//shifting end of apron
+		Coord coordApronEnd = new CoordImpl(this.coord.getX(), this.coord.getY()+taxiwayLength);			//shifting end of apron
 		Coord coordTaxiIn = new CoordImpl(this.coord.getX()-taxiwayLength, this.coord.getY()-taxiwayLength);		//shifting taxiway
 		Coord coordTaxiOut = new CoordImpl(this.coord.getX()-taxiwayLength, this.coord.getY()+taxiwayLength);		//shifting taxiway
 		Coord coordRunwayInEnd = new CoordImpl(coordTaxiIn.getX()-runwayLength, coordTaxiIn.getY());		//shifting runway
@@ -91,11 +87,11 @@ public class SfMATSimAirport {
 		linkRunwayIn.setFreespeed(220.0/3.6);
 		linkRunwayOut.setFreespeed(250.0/3.6);
 		
-		linkApron.setCapacity(50.0);
-		linkTaxiIn.setCapacity(5.0);
-		linkTaxiOut.setCapacity(5.0);
-		linkRunwayIn.setCapacity(1.0);
-		linkRunwayOut.setCapacity(1.0);
+		linkApron.setCapacity(1.);
+		linkTaxiIn.setCapacity(1./10.);
+		linkTaxiOut.setCapacity(1./10.);
+		linkRunwayIn.setCapacity(1./60.);
+		linkRunwayOut.setCapacity(1./60.);
 		
 		linkApron.setLength(taxiwayLength);
 		linkTaxiIn.setLength(taxiwayLength);

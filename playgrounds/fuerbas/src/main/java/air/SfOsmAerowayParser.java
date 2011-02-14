@@ -23,13 +23,13 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 
-public class OsmAerowayParser extends MatsimXmlParser {
+public class SfOsmAerowayParser extends MatsimXmlParser {
 	
 	private final CoordinateTransformation transform;
 	private OsmNode currentNode;
 	protected Map<String, Coord> airports = new HashMap<String, Coord>();
 
-	public OsmAerowayParser(final CoordinateTransformation transform) {
+	public SfOsmAerowayParser(final CoordinateTransformation transform) {
 		this.transform = transform;
 		this.setValidating(false);
 	}
@@ -75,7 +75,7 @@ public class OsmAerowayParser extends MatsimXmlParser {
 	
 	private void parse(final String osmFilename, final InputStream stream) throws SAXException, ParserConfigurationException, IOException {
 		
-		OsmAerowayParser parser = new OsmAerowayParser(transform);
+		SfOsmAerowayParser parser = new SfOsmAerowayParser(transform);
 		if (stream != null) {
 			parser.parse(new InputSource(stream));
 		} else {

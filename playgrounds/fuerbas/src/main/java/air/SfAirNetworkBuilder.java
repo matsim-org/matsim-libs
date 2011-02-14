@@ -33,7 +33,7 @@ public class SfAirNetworkBuilder {
 		allowedModes.add("car");
 
 		NetworkImpl network = NetworkImpl.createNetwork();
-		network.setCapacityPeriod(60.0);		//60 seconds capacity period --> 1 take-off per minute
+		network.setCapacityPeriod(1.0);		//capacity period set to one second to allow storage capacity = 1 for runway with runway length of 450 meters and 1/60 flow capacity
 		
 		BufferedReader brAirports = new BufferedReader(new FileReader(new File("/home/soeren/workspace/OsmTest.txt")));
 		BufferedReader brRoutes = new BufferedReader(new FileReader(new File("/home/soeren/workspace/cityPairs.txt")));
