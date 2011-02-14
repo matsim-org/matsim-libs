@@ -34,7 +34,7 @@ import org.matsim.core.utils.misc.ConfigUtils;
 /**
  * @author mrieser
  */
-public class UseCase4_OptimizedCarSim {
+public class UseCase4_OptimizedCarMobsim {
 
 	public static void main(final String[] args) {
 

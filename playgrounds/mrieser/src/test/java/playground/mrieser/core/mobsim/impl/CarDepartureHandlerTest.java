@@ -45,7 +45,7 @@ import org.matsim.testcases.utils.LogCounter;
 import playground.mrieser.core.mobsim.api.PlanAgent;
 import playground.mrieser.core.mobsim.api.PlanElementHandler;
 import playground.mrieser.core.mobsim.api.MobsimVehicle;
-import playground.mrieser.core.mobsim.api.TimestepSimEngine;
+import playground.mrieser.core.mobsim.api.TimestepMobsimEngine;
 import playground.mrieser.core.mobsim.fakes.FakeSimVehicle;
 import playground.mrieser.core.mobsim.features.NetworkFeature;
 import playground.mrieser.core.mobsim.features.refQueueNetworkFeature.RefQueueNetworkFeature;
@@ -366,8 +366,8 @@ public class CarDepartureHandlerTest {
 		public final Id[] ids = new Id[10];
 		public final Scenario scenario;
 		public final NetworkFeature networkFeature;
-		public final TimestepSimEngine simEngine;
-		public final PlanSimulationImpl sim;
+		public final TimestepMobsimEngine simEngine;
+		public final PlanMobsimImpl sim;
 
 		public Fixture() {
 			this.scenario = new ScenarioImpl();
@@ -391,7 +391,7 @@ public class CarDepartureHandlerTest {
 			network.addLink(setLinkAttributes(netFactory.createLink(this.ids[4], this.ids[4], this.ids[5]), 500.0, 3600.0, 10.0, 1));
 
 			EventsManager events = new EventsManagerImpl();
-			this.sim = new PlanSimulationImpl(this.scenario);
+			this.sim = new PlanMobsimImpl(this.scenario);
 			this.simEngine = new DefaultTimestepSimEngine(this.sim, events);
 			this.networkFeature = new RefQueueNetworkFeature(network, this.simEngine);
 		}

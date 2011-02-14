@@ -40,7 +40,7 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import playground.mrieser.core.mobsim.api.DriverAgent;
-import playground.mrieser.core.mobsim.api.NewSimEngine;
+import playground.mrieser.core.mobsim.api.NewMobsimEngine;
 import playground.mrieser.core.mobsim.api.PlanAgent;
 import playground.mrieser.core.mobsim.network.api.MobsimLink;
 
@@ -50,7 +50,7 @@ public class TransitDriverAgent implements DriverAgent, PassengerAccessEgress {
 
 	private final PlanAgent agent;
 	private final TransitMobsimVehicle vehicle;
-	private final NewSimEngine simEngine;
+	private final NewMobsimEngine simEngine;
 	private Id currentLinkId = null;
 	private final Id[] linkIds;
 	private int nextLinkIndex = 0;
@@ -63,7 +63,7 @@ public class TransitDriverAgent implements DriverAgent, PassengerAccessEgress {
 	private final TransitRoute route;
 	private final TransitFeature ptFeature;
 
-	public TransitDriverAgent(final TransitDriverPlanAgent agent, final NewSimEngine simEngine, final NetworkRoute route, final TransitMobsimVehicle vehicle, final TransitFeature ptFeature) {
+	public TransitDriverAgent(final TransitDriverPlanAgent agent, final NewMobsimEngine simEngine, final NetworkRoute route, final TransitMobsimVehicle vehicle, final TransitFeature ptFeature) {
 		this.agent = agent;
 		this.simEngine = simEngine;
 		this.vehicle = vehicle;

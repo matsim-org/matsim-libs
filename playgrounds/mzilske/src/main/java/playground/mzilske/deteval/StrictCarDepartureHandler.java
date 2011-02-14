@@ -30,7 +30,7 @@ import org.matsim.core.population.routes.NetworkRoute;
 
 import playground.mrieser.core.mobsim.api.DepartureHandler;
 import playground.mrieser.core.mobsim.api.DriverAgent;
-import playground.mrieser.core.mobsim.api.NewSimEngine;
+import playground.mrieser.core.mobsim.api.NewMobsimEngine;
 import playground.mrieser.core.mobsim.api.PlanAgent;
 import playground.mrieser.core.mobsim.api.MobsimVehicle;
 import playground.mrieser.core.mobsim.features.NetworkFeature;
@@ -41,9 +41,9 @@ public class StrictCarDepartureHandler implements DepartureHandler {
 	private final static Logger log = Logger.getLogger(StrictCarDepartureHandler.class);
 
 	private final NetworkFeature networkFeature;
-	private final NewSimEngine engine;
+	private final NewMobsimEngine engine;
 
-	public StrictCarDepartureHandler(final NewSimEngine engine, final NetworkFeature networkFeature, final Scenario scenario) {
+	public StrictCarDepartureHandler(final NewMobsimEngine engine, final NetworkFeature networkFeature, final Scenario scenario) {
 		this.engine = engine;
 		this.networkFeature = networkFeature;
 	}

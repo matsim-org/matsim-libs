@@ -36,7 +36,7 @@ import playground.mrieser.core.mobsim.impl.ActivityHandler;
 import playground.mrieser.core.mobsim.impl.CarDepartureHandler;
 import playground.mrieser.core.mobsim.impl.DefaultTimestepSimEngine;
 import playground.mrieser.core.mobsim.impl.LegHandler;
-import playground.mrieser.core.mobsim.impl.PlanSimulationImpl;
+import playground.mrieser.core.mobsim.impl.PlanMobsimImpl;
 import playground.mrieser.core.mobsim.impl.PopulationAgentSource;
 import playground.mrieser.core.mobsim.network.api.MobsimLink;
 import playground.mrieser.core.mobsim.network.api.MobsimNetwork;
@@ -54,7 +54,7 @@ public class IntegrationTest {
 		EventsManager events = new EventsManagerImpl();
 
 		/* setup start */
-		PlanSimulationImpl planSim = new PlanSimulationImpl(f.scenario);
+		PlanMobsimImpl planSim = new PlanMobsimImpl(f.scenario);
 		DefaultTimestepSimEngine engine = new DefaultTimestepSimEngine(planSim, events);
 		planSim.setMobsimEngine(engine);
 
@@ -94,7 +94,7 @@ public class IntegrationTest {
 		EventsManager events = new EventsManagerImpl();
 
 		/* setup start */
-		PlanSimulationImpl planSim = new PlanSimulationImpl(f.scenario);
+		PlanMobsimImpl planSim = new PlanMobsimImpl(f.scenario);
 		DefaultTimestepSimEngine engine = new DefaultTimestepSimEngine(planSim, events);
 		planSim.setMobsimEngine(engine);
 
@@ -135,7 +135,7 @@ public class IntegrationTest {
 		events.addHandler(new EventsLogger());
 
 		/* setup start */
-		PlanSimulationImpl planSim = new PlanSimulationImpl(f.scenario);
+		PlanMobsimImpl planSim = new PlanMobsimImpl(f.scenario);
 		DefaultTimestepSimEngine engine = new DefaultTimestepSimEngine(planSim, events);
 		planSim.setMobsimEngine(engine);
 

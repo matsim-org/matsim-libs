@@ -24,7 +24,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 
-import playground.mrieser.core.mobsim.api.TimestepSimEngine;
+import playground.mrieser.core.mobsim.api.TimestepMobsimEngine;
 import playground.mrieser.core.mobsim.network.api.MobsimNetwork;
 
 /**
@@ -32,7 +32,7 @@ import playground.mrieser.core.mobsim.network.api.MobsimNetwork;
  */
 /*package*/ class QueueNetwork implements MobsimNetwork {
 
-	protected final TimestepSimEngine simEngine;
+	protected final TimestepMobsimEngine simEngine;
 	private final Map<Id, QueueLink> links;
 	private final Map<Id, QueueNode> nodes;
 	private double storageCapFactor = 1.0;
@@ -42,7 +42,7 @@ import playground.mrieser.core.mobsim.network.api.MobsimNetwork;
 	private final Operator operator;
 	private boolean simStarted = false;
 
-	public QueueNetwork(final TimestepSimEngine simEngine, final Operator operator) {
+	public QueueNetwork(final TimestepMobsimEngine simEngine, final Operator operator) {
 		this.simEngine = simEngine;
 		this.operator = operator;
 		this.links = new LinkedHashMap<Id, QueueLink>();

@@ -39,7 +39,7 @@ import playground.mrieser.core.mobsim.impl.ActivityHandler;
 import playground.mrieser.core.mobsim.impl.CarDepartureHandler;
 import playground.mrieser.core.mobsim.impl.DefaultTimestepSimEngine;
 import playground.mrieser.core.mobsim.impl.LegHandler;
-import playground.mrieser.core.mobsim.impl.PlanSimulationImpl;
+import playground.mrieser.core.mobsim.impl.PlanMobsimImpl;
 import playground.mrieser.core.mobsim.impl.PopulationAgentSource;
 import playground.mrieser.core.mobsim.impl.TeleportationHandler;
 import playground.mrieser.core.mobsim.transit.TransitDepartureHandler;
@@ -47,9 +47,11 @@ import playground.mrieser.core.mobsim.transit.TransitDriverAgentSource;
 import playground.mrieser.core.mobsim.transit.TransitDriverDepartureHandler;
 import playground.mrieser.core.mobsim.transit.TransitFeature;
 
-public class TransitSimFactory implements MobsimFactory {
+public class TransitMobsimFactory implements MobsimFactory {
 
 	private double populationWeight = 1.0;
+
+	private double mobsimStopTime = Double.POSITIVE_INFINITY;
 
 	private final static String TRANSIT_VEHICLE_LEG_TYPE = "transitVehicleLeg";
 
@@ -64,6 +66,18 @@ public class TransitSimFactory implements MobsimFactory {
 		this.populationWeight = populationWeight;
 	}
 
+	/**
+	 * Sets a time at which the mobsim will stop its execution, no matter
+	 * if all agents have completed their plans or not. Initially set to
+	 * {@link Double#POSITIVE_INFINITY}.
+	 *
+	 * @param stopTime
+	 */
+	public void setMobsimStopTime(final double stopTime) {
+		this.mobsimStopTime = stopTime;
+	}
+
+
 	@Override
 	public Simulation createMobsim(Scenario scenario, EventsManager eventsManager) {
 		// setup transit related stuff
@@ -71,8 +85,9 @@ public class TransitSimFactory implements MobsimFactory {
 		Vehicles transitVehicles = ((ScenarioImpl) scenario).getVehicles();
 
 		// setup mobsim
-		PlanSimulationImpl planSim = new PlanSimulationImpl(scenario);
+		PlanMobsimImpl planSim = new PlanMobsimImpl(scenario);
 		DefaultTimestepSimEngine engine = new DefaultTimestepSimEngine(planSim, eventsManager);
+		engine.setStopTime(this.mobsimStopTime);
 		planSim.setMobsimEngine(engine);
 
 		// setup network

@@ -22,27 +22,26 @@ package playground.mrieser.core.mobsim.impl;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.EventsManager;
 
 import playground.mrieser.core.mobsim.api.DepartureHandler;
-import playground.mrieser.core.mobsim.api.NewSimEngine;
+import playground.mrieser.core.mobsim.api.MobsimKeepAlive;
+import playground.mrieser.core.mobsim.api.NewMobsimEngine;
 import playground.mrieser.core.mobsim.api.PlanAgent;
 import playground.mrieser.core.mobsim.api.PlanElementHandler;
-import playground.mrieser.core.mobsim.api.MobsimKeepAlive;
 
 /**
  * @author mrieser
  */
 public class LegHandler implements PlanElementHandler, MobsimKeepAlive {
 
-	private final NewSimEngine simEngine;
+	private final NewMobsimEngine simEngine;
 	private final ConcurrentHashMap<String, DepartureHandler> departureHandlers = new ConcurrentHashMap<String, DepartureHandler>();
 	private AtomicInteger onRoute = new AtomicInteger(0);
 
-	public LegHandler(final NewSimEngine simEngine) {
+	public LegHandler(final NewMobsimEngine simEngine) {
 		this.simEngine = simEngine;
 		this.simEngine.addKeepAlive(this);
 	}
@@ -52,20 +51,10 @@ public class LegHandler implements PlanElementHandler, MobsimKeepAlive {
 		Leg leg = (Leg) agent.getCurrentPlanElement();
 		EventsManager em = this.simEngine.getEventsManager();
 
-		// find departure link id
-		// TODO [MR] improve this, or remove this information from event
-		Activity prevActivity = null;
-		for (PlanElement pe : agent.getPlan().getPlanElements()) {
-			if (pe instanceof Activity) {
-				prevActivity = (Activity) pe;
-			}
-			if (pe == leg) {
-				break;
-			}
-		}
+		Id linkId = leg.getRoute().getStartLinkId();
 
 		// generate event
-		em.processEvent(em.getFactory().createAgentDepartureEvent(this.simEngine.getCurrentTime(), agent.getPlan().getPerson().getId(), prevActivity.getLinkId(), leg.getMode()));
+		em.processEvent(em.getFactory().createAgentDepartureEvent(this.simEngine.getCurrentTime(), agent.getPlan().getPerson().getId(), linkId, leg.getMode()));
 
 		// process departure
 		DepartureHandler depHandler = getDepartureHandler(leg.getMode());
@@ -82,24 +71,10 @@ public class LegHandler implements PlanElementHandler, MobsimKeepAlive {
 		Leg leg = (Leg) agent.getCurrentPlanElement();
 		EventsManager em = this.simEngine.getEventsManager();
 
-		// find departure link id
-		// TODO [MR] improve this, or remove this information from event
-		boolean breakAtNextActivity = false;
-		Activity nextActivity = null;
-		for (PlanElement pe : agent.getPlan().getPlanElements()) {
-			if (pe instanceof Activity) {
-				nextActivity = (Activity) pe;
-				if (breakAtNextActivity) {
-					break;
-				}
-			}
-			if (pe == leg) {
-				breakAtNextActivity = true;
-			}
-		}
+		Id linkId = leg.getRoute().getEndLinkId();
 
 		// generate event
-		em.processEvent(em.getFactory().createAgentArrivalEvent(this.simEngine.getCurrentTime(), agent.getPlan().getPerson().getId(), nextActivity.getLinkId(), leg.getMode()));
+		em.processEvent(em.getFactory().createAgentArrivalEvent(this.simEngine.getCurrentTime(), agent.getPlan().getPerson().getId(), linkId, leg.getMode()));
 	}
 
 	public DepartureHandler setDepartureHandler(final String mode, final DepartureHandler handler) {

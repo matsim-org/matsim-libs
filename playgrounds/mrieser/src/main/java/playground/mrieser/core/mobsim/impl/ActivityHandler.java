@@ -28,7 +28,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.misc.Time;
 
-import playground.mrieser.core.mobsim.api.NewSimEngine;
+import playground.mrieser.core.mobsim.api.NewMobsimEngine;
 import playground.mrieser.core.mobsim.api.PlanAgent;
 import playground.mrieser.core.mobsim.api.PlanElementHandler;
 import playground.mrieser.core.mobsim.api.MobsimKeepAlive;
@@ -41,11 +41,11 @@ public class ActivityHandler implements PlanElementHandler, MobsimFeature, Mobsi
 
 	private final static Logger log = Logger.getLogger(ActivityHandler.class);
 
-	private final NewSimEngine simEngine;
+	private final NewMobsimEngine simEngine;
 	private final PriorityBlockingQueue<ActivityData> activityEndsList = new PriorityBlockingQueue<ActivityData>(500);
 	private boolean useActivityDurations = true;
 
-	public ActivityHandler(final NewSimEngine simEngine) {
+	public ActivityHandler(final NewMobsimEngine simEngine) {
 		this.simEngine = simEngine;
 		this.simEngine.addKeepAlive(this);
 	}

@@ -221,15 +221,21 @@ import playground.mrieser.core.mobsim.network.api.MobsimLink;
 	}
 
 	private void moveWaitToBuffer(final double time) {
-		while (this.buffer.hasSpace()) {
-			MobsimVehicle vehicle = this.waitingList.poll();
-			if (vehicle == null) {
-				return;
+		MobsimVehicle vehicle;
+		while ((vehicle = this.waitingList.peek()) != null) {
+			double actionLocation = vehicle.getDriver().getNextActionOnCurrentLink();
+			if (actionLocation >= 0.0) {
+				vehicle.getDriver().handleNextAction(this, time);
+			} else {
+				if (this.buffer.hasSpace()) {
+					this.waitingList.poll();
+					this.network.simEngine.getEventsManager().processEvent(
+							new AgentWait2LinkEventImpl(time, vehicle.getId(), this.link.getId()));
+					this.buffer.addVehicle(vehicle, time);
+				} else {
+					return;
+				}
 			}
-
-			this.network.simEngine.getEventsManager().processEvent(
-					new AgentWait2LinkEventImpl(time, vehicle.getId(), this.link.getId()));
-			this.buffer.addVehicle(vehicle, time);
 		}
 	}
 

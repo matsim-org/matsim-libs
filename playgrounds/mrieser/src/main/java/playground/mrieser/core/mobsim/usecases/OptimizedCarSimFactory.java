@@ -35,7 +35,7 @@ import playground.mrieser.core.mobsim.impl.ActivityHandler;
 import playground.mrieser.core.mobsim.impl.CarDepartureHandler;
 import playground.mrieser.core.mobsim.impl.DefaultTimestepSimEngine;
 import playground.mrieser.core.mobsim.impl.LegHandler;
-import playground.mrieser.core.mobsim.impl.PlanSimulationImpl;
+import playground.mrieser.core.mobsim.impl.PlanMobsimImpl;
 import playground.mrieser.core.mobsim.impl.PopulationAgentSource;
 import playground.mrieser.core.mobsim.impl.TeleportationHandler;
 import playground.mrieser.core.mobsim.network.api.VisNetwork;
@@ -89,7 +89,7 @@ public class OptimizedCarSimFactory implements MobsimFactory {
 	@Override
 	public Simulation createMobsim(final Scenario scenario, final EventsManager eventsManager) {
 
-		PlanSimulationImpl planSim = new PlanSimulationImpl(scenario);
+		PlanMobsimImpl planSim = new PlanMobsimImpl(scenario);
 		DefaultTimestepSimEngine engine = new DefaultTimestepSimEngine(planSim, eventsManager);
 		engine.setStopTime(this.mobsimStopTime);
 		planSim.setMobsimEngine(engine);

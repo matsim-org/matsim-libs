@@ -22,7 +22,7 @@ package playground.mrieser.core.mobsim.api;
 /**
  * @author mrieser
  */
-public interface TimestepSimEngine extends NewSimEngine {
+public interface TimestepMobsimEngine extends NewMobsimEngine {
 
 	public abstract double getTimestepSize();
 

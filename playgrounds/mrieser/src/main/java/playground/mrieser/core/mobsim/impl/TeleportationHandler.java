@@ -29,7 +29,7 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
 
 import playground.mrieser.core.mobsim.api.DepartureHandler;
-import playground.mrieser.core.mobsim.api.NewSimEngine;
+import playground.mrieser.core.mobsim.api.NewMobsimEngine;
 import playground.mrieser.core.mobsim.api.PlanAgent;
 import playground.mrieser.core.mobsim.api.MobsimKeepAlive;
 import playground.mrieser.core.mobsim.features.MobsimFeature;
@@ -41,11 +41,11 @@ public class TeleportationHandler implements DepartureHandler, MobsimFeature, Mo
 
 	private final static Logger log = Logger.getLogger(TeleportationHandler.class);
 
-	private final NewSimEngine simEngine;
+	private final NewMobsimEngine simEngine;
 	private final PriorityQueue<Tuple<Double, PlanAgent>> teleportationList = new PriorityQueue<Tuple<Double, PlanAgent>>(30, new TeleportationArrivalTimeComparator());
 	private double defaultTeleportationTime = Time.UNDEFINED_TIME;
 
-	public TeleportationHandler(final NewSimEngine simEngine) {
+	public TeleportationHandler(final NewMobsimEngine simEngine) {
 		this.simEngine = simEngine;
 		this.simEngine.addKeepAlive(this);
 	}

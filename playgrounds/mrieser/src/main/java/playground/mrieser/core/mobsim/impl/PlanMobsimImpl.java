@@ -29,32 +29,32 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.mobsim.framework.Simulation;
 
 import playground.mrieser.core.mobsim.api.AgentSource;
-import playground.mrieser.core.mobsim.api.NewSimEngine;
+import playground.mrieser.core.mobsim.api.NewMobsimEngine;
 import playground.mrieser.core.mobsim.api.PlanAgent;
 import playground.mrieser.core.mobsim.api.PlanElementHandler;
-import playground.mrieser.core.mobsim.api.PlanSimulation;
+import playground.mrieser.core.mobsim.api.PlanMobsim;
 import playground.mrieser.core.mobsim.features.MobsimFeature;
 import playground.mrieser.core.mobsim.utils.ClassBasedMap;
 
 /**
  * @author mrieser
  */
-public class PlanSimulationImpl implements PlanSimulation, Simulation { // TODO [MR] remove Simulation, only for backwards compability
+public class PlanMobsimImpl implements PlanMobsim, Simulation { // TODO [MR] remove Simulation, only for backwards compability
 
-	private final static Logger log = Logger.getLogger(PlanSimulationImpl.class);
+	private final static Logger log = Logger.getLogger(PlanMobsimImpl.class);
 
 	private final Scenario scenario;
-	private NewSimEngine simEngine = null;
+	private NewMobsimEngine simEngine = null;
 	private final ClassBasedMap<PlanElement, PlanElementHandler> peHandlers = new ClassBasedMap<PlanElement, PlanElementHandler>();
 	private final LinkedList<MobsimFeature> simFeatures = new LinkedList<MobsimFeature>();
 	private final LinkedList<AgentSource> agentSources = new LinkedList<AgentSource>();
 
-	public PlanSimulationImpl(final Scenario scenario) {
+	public PlanMobsimImpl(final Scenario scenario) {
 		this.scenario = scenario;
 	}
 
 	@Override
-	public void setMobsimEngine(final NewSimEngine simEngine) {
+	public void setMobsimEngine(final NewMobsimEngine simEngine) {
 		this.simEngine = simEngine;
 	}
 

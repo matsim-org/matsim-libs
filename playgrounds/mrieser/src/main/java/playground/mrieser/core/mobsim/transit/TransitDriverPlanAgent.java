@@ -24,7 +24,9 @@ import java.util.Iterator;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.pt.Umlauf;
 import org.matsim.pt.UmlaufStueckI;
@@ -52,6 +54,7 @@ import playground.mrieser.core.mobsim.api.PlanAgent;
 		this.umlaufIterator = this.umlauf.getUmlaufStuecke().iterator();
 
 		this.plan = new PlanImpl();
+		this.plan.setPerson(new PersonImpl(new IdImpl("pt_"+umlauf.getId()+"_line_"+umlauf.getLineId())));
 		for (UmlaufStueckI stage : umlauf.getUmlaufStuecke()) {
 			Leg leg = new LegImpl(transitMode);
 			leg.setRoute(stage.getCarRoute());

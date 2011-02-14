@@ -21,7 +21,7 @@ package playground.mrieser.core.mobsim.features.fastQueueNetworkFeature;
 
 import org.matsim.api.core.v01.network.Network;
 
-import playground.mrieser.core.mobsim.api.TimestepSimEngine;
+import playground.mrieser.core.mobsim.api.TimestepMobsimEngine;
 import playground.mrieser.core.mobsim.features.NetworkFeature;
 import playground.mrieser.core.mobsim.network.api.MobsimNetwork;
 import playground.mrieser.core.mobsim.network.api.VisNetwork;
@@ -31,11 +31,11 @@ public class FastQueueNetworkFeature implements NetworkFeature {
 	private final QueueNetwork network;
 	private volatile VisNetwork visNetwork;
 
-	public FastQueueNetworkFeature(final Network network, final TimestepSimEngine simEngine) {
+	public FastQueueNetworkFeature(final Network network, final TimestepMobsimEngine simEngine) {
 		this.network = QueueNetworkCreator.createQueueNetwork(network, simEngine, new SingleCPUOperator());
 	}
 
-	public FastQueueNetworkFeature(final Network network, final TimestepSimEngine simEngine, final int nOfThreads) {
+	public FastQueueNetworkFeature(final Network network, final TimestepMobsimEngine simEngine, final int nOfThreads) {
 		ParallelOperator operator = new ParallelOperator(nOfThreads);
 		this.network = QueueNetworkCreator.createQueueNetwork(network, simEngine, operator);
 		operator.setQueueNetwork(this.network);

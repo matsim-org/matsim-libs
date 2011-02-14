@@ -28,11 +28,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.pt.ReconstructingUmlaufBuilder;
 import org.matsim.pt.Umlauf;
-import org.matsim.pt.qsim.TransitQVehicle;
 import org.matsim.pt.qsim.TransitStopAgentTracker;
-import org.matsim.pt.transitSchedule.api.Departure;
-import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.Vehicles;
@@ -73,33 +69,6 @@ public class TransitDriverAgentSource implements AgentSource {
 			if (!umlauf.getUmlaufStuecke().isEmpty()) {
 				PlanAgent driver = createAndScheduleVehicleAndDriver(umlauf, basicVehicle);
 				drivers.add(driver);
-			}
-		}
-		return drivers;
-	}
-
-	private Collection<PlanAgent> createVehiclesAndDriversWithoutUmlaeufe(TransitSchedule schedule) {
-		Collection<PlanAgent> drivers = new ArrayList<PlanAgent>();
-		for (TransitLine line : schedule.getTransitLines().values()) {
-			for (TransitRoute route : line.getRoutes().values()) {
-				for (Departure departure : route.getDepartures().values()) {
-					if (departure.getVehicleId() == null) {
-						throw new NullPointerException("no vehicle id set for departure " + departure.getId() + " in route " + route.getId() + " from line " + line.getId());
-					}
-					Vehicle v = this.transitVehicles.getVehicles().get(departure.getVehicleId());
-					TransitQVehicle veh = new TransitQVehicle(v, 5); // TODO [MR] hard-coded vehicle size
-//					TransitDriver driver = new TransitDriver(line, route, departure, agentTracker, this.qSim);
-//					veh.setDriver(driver);
-//					veh.setStopHandler(this.stopHandlerFactory.createTransitStopHandler(veh.getVehicle()));
-//					driver.setVehicle(veh);
-//					NetsimLink qlink = this.qSim.getNetsimNetwork().getNetsimLinks().get(driver.getCurrentLeg().getRoute().getStartLinkId());
-					// yyyyyy this could, in principle, also be a method mobsim.addVehicle( ..., linkId), and then the qnetwork
-					// would not need to be exposed at all.  kai, may'10
-//					qlink.addParkedVehicle(veh);
-//					this.qSim.scheduleActivityEnd(driver);
-//					this.qSim.getAgentCounter().incLiving();
-//					drivers.add(driver);
-				}
 			}
 		}
 		return drivers;

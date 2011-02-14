@@ -29,16 +29,16 @@ import org.matsim.core.population.LegImpl;
 
 import playground.mrieser.core.mobsim.api.PlanAgent;
 import playground.mrieser.core.mobsim.api.PlanElementHandler;
-import playground.mrieser.core.mobsim.impl.PlanSimulationImpl;
+import playground.mrieser.core.mobsim.impl.PlanMobsimImpl;
 
 /**
  * @author mrieser
  */
-public class PlanSimulationImplTest {
+public class PlanMobsimImplTest {
 
 	@Test
 	public void testSetGetPlanElementHandler_Interfaces() {
-		PlanSimulationImpl sim = new PlanSimulationImpl(null);
+		PlanMobsimImpl sim = new PlanMobsimImpl(null);
 		Assert.assertNull(sim.getPlanElementHandler(PlanElement.class));
 		Assert.assertNull(sim.getPlanElementHandler(Activity.class));
 		Assert.assertNull(sim.getPlanElementHandler(Leg.class));
@@ -59,7 +59,7 @@ public class PlanSimulationImplTest {
 
 	@Test
 	public void testSetGetPlanElementHandler_Implementations() {
-		PlanSimulationImpl sim = new PlanSimulationImpl(null);
+		PlanMobsimImpl sim = new PlanMobsimImpl(null);
 		Assert.assertNull(sim.getPlanElementHandler(Activity.class));
 		Assert.assertNull(sim.getPlanElementHandler(Leg.class));
 
@@ -77,7 +77,7 @@ public class PlanSimulationImplTest {
 
 	@Test
 	public void testRemovePlanElementHandler() {
-		PlanSimulationImpl sim = new PlanSimulationImpl(null);
+		PlanMobsimImpl sim = new PlanMobsimImpl(null);
 		CountingPlanElementHandler actHandler = new CountingPlanElementHandler();
 		CountingPlanElementHandler legHandler = new CountingPlanElementHandler();
 
@@ -97,7 +97,7 @@ public class PlanSimulationImplTest {
 
 	@Test
 	public void testSetPlanElementHandler_replace() {
-		PlanSimulationImpl sim = new PlanSimulationImpl(null);
+		PlanMobsimImpl sim = new PlanMobsimImpl(null);
 		CountingPlanElementHandler actHandler1 = new CountingPlanElementHandler();
 		CountingPlanElementHandler actHandler2 = new CountingPlanElementHandler();
 		CountingPlanElementHandler legHandler = new CountingPlanElementHandler();

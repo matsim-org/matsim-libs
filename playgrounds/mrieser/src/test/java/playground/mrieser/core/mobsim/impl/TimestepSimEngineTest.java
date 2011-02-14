@@ -33,7 +33,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.mrieser.core.mobsim.api.PlanAgent;
 import playground.mrieser.core.mobsim.api.PlanElementHandler;
-import playground.mrieser.core.mobsim.api.PlanSimulation;
+import playground.mrieser.core.mobsim.api.PlanMobsim;
 
 /**
  * @author mrieser
@@ -52,7 +52,7 @@ public class TimestepSimEngineTest {
 		plan.addActivity(new ActivityImpl("home", c));
 		PlanAgent agent = new DefaultPlanAgent(plan, 1.0);
 
-		PlanSimulation planSim = new PlanSimulationImpl(null);
+		PlanMobsim planSim = new PlanMobsimImpl(null);
 		DefaultTimestepSimEngine engine = new DefaultTimestepSimEngine(planSim, null);
 		CountingPlanElementHandler actHandler = new CountingPlanElementHandler();
 		CountingPlanElementHandler legHandler = new CountingPlanElementHandler();
@@ -101,7 +101,7 @@ public class TimestepSimEngineTest {
 		plan2.addActivity(new ActivityImpl("home", c));
 		PlanAgent agent2 = new DefaultPlanAgent(plan2, 1.0);
 
-		PlanSimulation planSim = new PlanSimulationImpl(null);
+		PlanMobsim planSim = new PlanMobsimImpl(null);
 		DefaultTimestepSimEngine engine = new DefaultTimestepSimEngine(planSim, null);
 		CountingPlanElementHandler actHandler = new CountingPlanElementHandler();
 		CountingPlanElementHandler legHandler = new CountingPlanElementHandler();

@@ -28,14 +28,16 @@ import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.Simulation;
 
 import playground.mrieser.core.mobsim.features.StatusFeature;
+import playground.mrieser.core.mobsim.features.refQueueNetworkFeature.RefQueueNetworkFeature;
 import playground.mrieser.core.mobsim.impl.ActivityHandler;
+import playground.mrieser.core.mobsim.impl.CarDepartureHandler;
 import playground.mrieser.core.mobsim.impl.DefaultTimestepSimEngine;
 import playground.mrieser.core.mobsim.impl.LegHandler;
-import playground.mrieser.core.mobsim.impl.PlanSimulationImpl;
+import playground.mrieser.core.mobsim.impl.PlanMobsimImpl;
 import playground.mrieser.core.mobsim.impl.PopulationAgentSource;
 import playground.mrieser.core.mobsim.impl.TeleportationHandler;
 
-public class TeleportOnlySimFactory implements MobsimFactory {
+public class RefMobsimFactory implements MobsimFactory {
 
 	private double populationWeight = 1.0;
 
@@ -51,15 +53,15 @@ public class TeleportOnlySimFactory implements MobsimFactory {
 	}
 
 	@Override
-	public Simulation createMobsim(Scenario sc, EventsManager eventsManager) {
+	public Simulation createMobsim(final Scenario scenario, final EventsManager eventsManager) {
 
-		PlanSimulationImpl planSim = new PlanSimulationImpl(sc);
-
+		PlanMobsimImpl planSim = new PlanMobsimImpl(scenario);
 		DefaultTimestepSimEngine engine = new DefaultTimestepSimEngine(planSim, eventsManager);
 		planSim.setMobsimEngine(engine);
 
-		// setup features; order is important!
-		planSim.addMobsimFeature(new StatusFeature());
+		// setup network
+		RefQueueNetworkFeature netFeature = new RefQueueNetworkFeature(scenario.getNetwork(), engine);
+//		SimNetwork simNetwork = netFeature.getSimNetwork();
 
 		// setup PlanElementHandlers
 		ActivityHandler ah = new ActivityHandler(engine);
@@ -67,20 +69,24 @@ public class TeleportOnlySimFactory implements MobsimFactory {
 		planSim.setPlanElementHandler(Activity.class, ah);
 		planSim.setPlanElementHandler(Leg.class, lh);
 
-		planSim.addMobsimFeature(ah); // how should a user now ah is a simfeature, bug lh not?
-
 		// setup DepartureHandlers
+		CarDepartureHandler carHandler = new CarDepartureHandler(engine, netFeature, scenario);
+		carHandler.setTeleportVehicles(true);
+		lh.setDepartureHandler(TransportMode.car, carHandler);
 		TeleportationHandler teleporter = new TeleportationHandler(engine);
-		teleporter.setDefaultTeleportationTime(180); // this should usually not be set! TODO [MR] remove line
-		planSim.addMobsimFeature(teleporter); // how should a user now teleporter is a simfeature?
-		lh.setDepartureHandler(TransportMode.car, teleporter);
 		lh.setDepartureHandler(TransportMode.pt, teleporter);
 		lh.setDepartureHandler(TransportMode.walk, teleporter);
 		lh.setDepartureHandler(TransportMode.bike, teleporter);
-		lh.setDepartureHandler("undefined", teleporter);
+		lh.setDepartureHandler(TransportMode.ride, teleporter);
+
+		// register all features at the end in the right order
+		planSim.addMobsimFeature(new StatusFeature());
+		planSim.addMobsimFeature(teleporter); // how should a user know teleporter is a simfeature?
+		planSim.addMobsimFeature(ah); // how should a user know ah is a simfeature, bug lh not?
+		planSim.addMobsimFeature(netFeature); // order of features is important!
 
 		// register agent sources
-		planSim.addAgentSource(new PopulationAgentSource(sc.getPopulation(), this.populationWeight));
+		planSim.addAgentSource(new PopulationAgentSource(scenario.getPopulation(), this.populationWeight));
 
 		return planSim;
 	}

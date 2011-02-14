@@ -34,7 +34,7 @@ import org.matsim.vehicles.VehicleTypeImpl;
 
 import playground.mrieser.core.mobsim.api.DepartureHandler;
 import playground.mrieser.core.mobsim.api.DriverAgent;
-import playground.mrieser.core.mobsim.api.NewSimEngine;
+import playground.mrieser.core.mobsim.api.NewMobsimEngine;
 import playground.mrieser.core.mobsim.api.PlanAgent;
 import playground.mrieser.core.mobsim.api.MobsimVehicle;
 import playground.mrieser.core.mobsim.features.NetworkFeature;
@@ -58,12 +58,12 @@ public class CarDepartureHandler implements DepartureHandler {
 	private final static Logger log = Logger.getLogger(CarDepartureHandler.class);
 
 	private final NetworkFeature networkFeature;
-	private final NewSimEngine engine;
+	private final NewMobsimEngine engine;
 	private final Map<Id, Id> vehicleLocations;
 	private final VehicleType defaultVehicleType;
 	private boolean teleportVehicles = false;
 
-	public CarDepartureHandler(final NewSimEngine engine, final NetworkFeature networkFeature, final Scenario scenario) {
+	public CarDepartureHandler(final NewMobsimEngine engine, final NetworkFeature networkFeature, final Scenario scenario) {
 		this.engine = engine;
 		this.networkFeature = networkFeature;
 		this.vehicleLocations = new HashMap<Id, Id>((int) (scenario.getPopulation().getPersons().size() * 1.4));

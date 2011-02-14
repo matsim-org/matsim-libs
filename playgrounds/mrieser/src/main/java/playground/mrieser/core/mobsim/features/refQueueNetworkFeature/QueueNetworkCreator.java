@@ -24,7 +24,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.gbl.MatsimRandom;
 
-import playground.mrieser.core.mobsim.api.TimestepSimEngine;
+import playground.mrieser.core.mobsim.api.TimestepMobsimEngine;
 import playground.mrieser.core.mobsim.network.api.MobsimNetwork;
 
 /**
@@ -32,7 +32,7 @@ import playground.mrieser.core.mobsim.network.api.MobsimNetwork;
  */
 /*package*/ abstract class QueueNetworkCreator {
 
-	public static MobsimNetwork createQueueNetwork(final Network network, final TimestepSimEngine simEngine) {
+	public static MobsimNetwork createQueueNetwork(final Network network, final TimestepMobsimEngine simEngine) {
 		QueueNetwork qnet = new QueueNetwork(simEngine);
 
 		for (Link link : network.getLinks().values()) {

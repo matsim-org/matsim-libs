@@ -56,7 +56,7 @@ public class UseCase1_Teleportation {
 
 		/* **************************************************************** */
 
-		Simulation sim = new TeleportOnlySimFactory().createMobsim(scenario, events);
+		Simulation sim = new TeleportOnlyMobsimFactory().createMobsim(scenario, events);
 		sim.run(); // replace with PlanSimulation.runMobsim();
 
 		/* **************************************************************** */

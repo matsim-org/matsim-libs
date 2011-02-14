@@ -35,7 +35,7 @@ import org.matsim.vehicles.Vehicles;
 
 import playground.mrieser.core.mobsim.api.DepartureHandler;
 import playground.mrieser.core.mobsim.api.DriverAgent;
-import playground.mrieser.core.mobsim.api.NewSimEngine;
+import playground.mrieser.core.mobsim.api.NewMobsimEngine;
 import playground.mrieser.core.mobsim.api.PlanAgent;
 import playground.mrieser.core.mobsim.features.NetworkFeature;
 import playground.mrieser.core.mobsim.network.api.MobsimLink;
@@ -48,14 +48,14 @@ public class TransitDriverDepartureHandler implements DepartureHandler {
 	private final static Logger log = Logger.getLogger(TransitDriverDepartureHandler.class);
 
 	private final NetworkFeature networkFeature;
-	private final NewSimEngine engine;
+	private final NewMobsimEngine engine;
 	private final Map<Id, Id> vehicleLocations;
 	private boolean teleportVehicles = false;
 	private final TransitFeature ptFeature;
 	private TransitStopHandlerFactory stopHandlerFactory = new SimpleTransitStopHandlerFactory();
 	private final Vehicles vehicles;
 
-	public TransitDriverDepartureHandler(final NewSimEngine engine, final NetworkFeature networkFeature, final TransitFeature ptFeature, final Scenario scenario) {
+	public TransitDriverDepartureHandler(final NewMobsimEngine engine, final NetworkFeature networkFeature, final TransitFeature ptFeature, final Scenario scenario) {
 		this.engine = engine;
 		this.networkFeature = networkFeature;
 		this.ptFeature = ptFeature;

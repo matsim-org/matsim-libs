@@ -19,38 +19,26 @@
 
 package playground.mrieser.core.mobsim.api;
 
-import java.util.List;
-
-import org.matsim.api.core.v01.population.PlanElement;
-
-import playground.mrieser.core.mobsim.features.MobsimFeature;
+import org.matsim.core.api.experimental.events.EventsManager;
 
 /**
  * @author mrieser
  */
-public interface PlanSimulation {
+public interface NewMobsimEngine {
+
+	public EventsManager getEventsManager();
+
+	public double getCurrentTime();
 
 	/**
-	 * Sets the {@link PlanElementHandler} for the given class <tt>klass</tt> of {@link PlanElement}s.
+	 * Handles the agent by ending its current plan element and starting its next plan element.
 	 *
-	 * @param klass
-	 * @param handler
-	 * @return the previous <tt>PlanElementHandler</tt> associated with <tt>klass</tt>, or
-   *         <tt>null</tt> if there was not yet any <tt>PlanElementHandler</tt> registered for <tt>klass</tt>.
+	 * @param agent
 	 */
-	public PlanElementHandler setPlanElementHandler(final Class<? extends PlanElement> klass, final PlanElementHandler handler);
+	public void handleAgent(final PlanAgent agent);
 
-	public PlanElementHandler removePlanElementHandler(final Class<? extends PlanElement> klass);
+	public void runSim();
 
-	public PlanElementHandler getPlanElementHandler(final Class<? extends PlanElement> klass);
+	public void addKeepAlive(final MobsimKeepAlive keepAlive);
 
-	public void setMobsimEngine(final NewSimEngine engine);
-
-	public void runMobsim();
-
-	public void addMobsimFeature(final MobsimFeature feature);
-
-	public void addAgentSource(final AgentSource agentSource);
-
-	public List<MobsimFeature> getMobsimFeatures();
 }

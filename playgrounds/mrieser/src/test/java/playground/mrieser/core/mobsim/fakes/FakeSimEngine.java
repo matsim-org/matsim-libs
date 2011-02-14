@@ -24,14 +24,14 @@ import org.matsim.core.events.EventsManagerImpl;
 
 import playground.mrieser.core.mobsim.api.PlanAgent;
 import playground.mrieser.core.mobsim.api.MobsimKeepAlive;
-import playground.mrieser.core.mobsim.api.TimestepSimEngine;
+import playground.mrieser.core.mobsim.api.TimestepMobsimEngine;
 
 /**
  * Fake implementation of a SimEngine for test purposes.
  *
  * @author mrieser
  */
-public class FakeSimEngine implements TimestepSimEngine {
+public class FakeSimEngine implements TimestepMobsimEngine {
 	private final EventsManager em = new EventsManagerImpl();
 	private double time;
 	public int countHandleAgent = 0;

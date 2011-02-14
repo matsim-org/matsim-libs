@@ -21,7 +21,7 @@ package playground.mrieser.core.mobsim.features.refQueueNetworkFeature;
 
 import org.matsim.api.core.v01.network.Network;
 
-import playground.mrieser.core.mobsim.api.TimestepSimEngine;
+import playground.mrieser.core.mobsim.api.TimestepMobsimEngine;
 import playground.mrieser.core.mobsim.features.NetworkFeature;
 import playground.mrieser.core.mobsim.network.api.MobsimNetwork;
 
@@ -29,7 +29,7 @@ public class RefQueueNetworkFeature implements NetworkFeature {
 
 	private final MobsimNetwork network;
 
-	public RefQueueNetworkFeature(final Network network, final TimestepSimEngine simEngine) {
+	public RefQueueNetworkFeature(final Network network, final TimestepMobsimEngine simEngine) {
 		this.network = QueueNetworkCreator.createQueueNetwork(network, simEngine);
 	}
 

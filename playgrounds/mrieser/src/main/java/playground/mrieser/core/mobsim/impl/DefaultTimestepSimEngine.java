@@ -30,26 +30,26 @@ import org.matsim.core.utils.misc.Time;
 import playground.mrieser.core.mobsim.api.MobsimKeepAlive;
 import playground.mrieser.core.mobsim.api.PlanAgent;
 import playground.mrieser.core.mobsim.api.PlanElementHandler;
-import playground.mrieser.core.mobsim.api.PlanSimulation;
-import playground.mrieser.core.mobsim.api.TimestepSimEngine;
+import playground.mrieser.core.mobsim.api.PlanMobsim;
+import playground.mrieser.core.mobsim.api.TimestepMobsimEngine;
 import playground.mrieser.core.mobsim.features.MobsimFeature;
 
-public class DefaultTimestepSimEngine implements TimestepSimEngine {
+public class DefaultTimestepSimEngine implements TimestepMobsimEngine {
 
 	private final static Logger log = Logger.getLogger(DefaultTimestepSimEngine.class);
 
-	private final PlanSimulation sim;
+	private final PlanMobsim sim;
 	private final EventsManager events;
 	private double time;
 	private final double timeStepSize;
 	private final List<MobsimKeepAlive> aliveKeepers = new LinkedList<MobsimKeepAlive>();
 	private double stopTime = Double.POSITIVE_INFINITY;
 
-	public DefaultTimestepSimEngine(final PlanSimulation sim, final EventsManager events) {
+	public DefaultTimestepSimEngine(final PlanMobsim sim, final EventsManager events) {
 		this(sim, events, 1.0);
 	}
 
-	public DefaultTimestepSimEngine(final PlanSimulation sim, final EventsManager events, final double timeStepSize) {
+	public DefaultTimestepSimEngine(final PlanMobsim sim, final EventsManager events, final double timeStepSize) {
 		this.sim = sim;
 		this.events = events;
 		this.timeStepSize = timeStepSize;

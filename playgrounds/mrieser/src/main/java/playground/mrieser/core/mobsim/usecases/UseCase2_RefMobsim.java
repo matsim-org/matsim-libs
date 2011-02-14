@@ -26,47 +26,43 @@ import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsManagerImpl;
-import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.mobsim.framework.Simulation;
-import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.misc.ConfigUtils;
-import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 
 /**
  * @author mrieser
  */
-public class UseCase3_TransitSim {
+public class UseCase2_RefMobsim {
 
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 
-		String prefix = "../../matsim/";
+		String prefix = "../../MATSim/";
 
 		// load data
 		Config config;
 		try {
-			config = ConfigUtils.loadConfig(prefix + "examples/pt-tutorial/0.config.xml");
+			config = ConfigUtils.loadConfig(prefix + "test/scenarios/berlin/config.xml");
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
+//		config.plans().setInputFile("test/scenarios/equil/plans1.xml");
+//		config.plans().setInputFile("test/scenarios/berlin/plans_hwh_sample.xml");
 		ConfigUtils.modifyFilePaths(config, prefix);
-
 		ScenarioLoader loader = new ScenarioLoaderImpl(config);
-
-		((NetworkFactoryImpl) loader.getScenario().getNetwork().getFactory()).setRouteFactory("pt", new ExperimentalTransitRouteFactory());
-
 		Scenario scenario = loader.loadScenario();
+		System.out.println("# persons: " + scenario.getPopulation().getPersons().size());
 		EventsManager events = new EventsManagerImpl();
-		EventWriterXML ew = new EventWriterXML("testEvents.xml");
-		events.addHandler(ew);
-
+//		EventWriterXML ew;
 		/* **************************************************************** */
 
-		Simulation sim = new TransitSimFactory().createMobsim(scenario, events);
+//		ew = new EventWriterXML("testEventsNewBln.xml");
+//		events.addHandler(ew);
+		Simulation sim = new RefMobsimFactory().createMobsim(scenario, events);
 		sim.run(); // replace with PlanSimulation.runMobsim();
 
 		/* **************************************************************** */
 
-		ew.closeFile();
+//		ew.closeFile();
 	}
 }

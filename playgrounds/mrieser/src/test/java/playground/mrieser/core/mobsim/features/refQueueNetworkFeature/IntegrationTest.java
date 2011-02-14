@@ -44,7 +44,7 @@ import playground.mrieser.core.mobsim.impl.ActivityHandler;
 import playground.mrieser.core.mobsim.impl.CarDepartureHandler;
 import playground.mrieser.core.mobsim.impl.DefaultTimestepSimEngine;
 import playground.mrieser.core.mobsim.impl.LegHandler;
-import playground.mrieser.core.mobsim.impl.PlanSimulationImpl;
+import playground.mrieser.core.mobsim.impl.PlanMobsimImpl;
 import playground.mrieser.core.mobsim.impl.PopulationAgentSource;
 import playground.mrieser.core.mobsim.integration.Fixture;
 
@@ -60,7 +60,7 @@ public class IntegrationTest {
 		events.addHandler(eventsCollector);
 
 		/* setup start */
-		PlanSimulationImpl planSim = new PlanSimulationImpl(f.scenario);
+		PlanMobsimImpl planSim = new PlanMobsimImpl(f.scenario);
 		DefaultTimestepSimEngine engine = new DefaultTimestepSimEngine(planSim, events);
 		planSim.setMobsimEngine(engine);
 		engine.setStopTime(7.0 * 3600 + 10);

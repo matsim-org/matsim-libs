@@ -24,14 +24,14 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.gbl.MatsimRandom;
 
-import playground.mrieser.core.mobsim.api.TimestepSimEngine;
+import playground.mrieser.core.mobsim.api.TimestepMobsimEngine;
 
 /**
  * @author mrieser
  */
 /*package*/ abstract class QueueNetworkCreator {
 
-	public static QueueNetwork createQueueNetwork(final Network network, final TimestepSimEngine simEngine, final Operator operator) {
+	public static QueueNetwork createQueueNetwork(final Network network, final TimestepMobsimEngine simEngine, final Operator operator) {
 		QueueNetwork qnet = new QueueNetwork(simEngine, operator);
 
 		for (Link link : network.getLinks().values()) {

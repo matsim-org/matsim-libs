@@ -27,8 +27,8 @@ import org.matsim.ptproject.qsim.ParallelQSimFactory;
 import org.matsim.ptproject.qsim.QSimFactory;
 
 import playground.mrieser.core.mobsim.usecases.OptimizedCarSimFactory;
-import playground.mrieser.core.mobsim.usecases.RefSimFactory;
-import playground.mrieser.core.mobsim.usecases.TeleportOnlySimFactory;
+import playground.mrieser.core.mobsim.usecases.RefMobsimFactory;
+import playground.mrieser.core.mobsim.usecases.TeleportOnlyMobsimFactory;
 
 public class Controller {
 
@@ -36,10 +36,10 @@ public class Controller {
 		MobsimFactory mobsimFactory = null;
 		int shiftBy = 0;
 		if ("-teleportOnly".equals(args[0])) {
-			mobsimFactory = new TeleportOnlySimFactory();
+			mobsimFactory = new TeleportOnlyMobsimFactory();
 			shiftBy = 1;
 		} else if ("-refSim".equals(args[0])) {
-			mobsimFactory = new RefSimFactory();
+			mobsimFactory = new RefMobsimFactory();
 			shiftBy = 1;
 		} else if ("-fastCarSim".equals(args[0])) {
 			int numberOfThreads = Integer.parseInt(args[1]);
