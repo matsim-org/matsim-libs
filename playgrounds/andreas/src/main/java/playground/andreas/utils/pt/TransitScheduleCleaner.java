@@ -104,7 +104,9 @@ public class TransitScheduleCleaner {
 		}
 		
 		for (TransitStopFacility stopFacitlity : transitSchedule.getFacilities().values()) {
-			network.getLinks().get(stopFacitlity.getLinkId()).getAllowedModes().add(TransportMode.pt);
+			Set<String> allowedModes = new TreeSet<String>(network.getLinks().get(stopFacitlity.getLinkId()).getAllowedModes());
+			allowedModes.add(TransportMode.pt);
+			network.getLinks().get(stopFacitlity.getLinkId()).setAllowedModes(allowedModes);
 		}
 		
 		for (TransitLine transitLine : transitSchedule.getTransitLines().values()) {
@@ -113,17 +115,17 @@ public class TransitScheduleCleaner {
 				
 				Set<String> allowedModes;
 				
-				allowedModes = network.getLinks().get(route.getStartLinkId()).getAllowedModes();
+				allowedModes = new TreeSet<String>(network.getLinks().get(route.getStartLinkId()).getAllowedModes());
 				allowedModes.add(TransportMode.pt);				
 				network.getLinks().get(route.getStartLinkId()).setAllowedModes(allowedModes);
 				
 				for (Id linkId : route.getLinkIds()) {
-					allowedModes = network.getLinks().get(linkId).getAllowedModes();
+					allowedModes = new TreeSet<String>(network.getLinks().get(linkId).getAllowedModes());
 					allowedModes.add(TransportMode.pt);
 					network.getLinks().get(linkId).setAllowedModes(allowedModes);
 				}
 				
-				allowedModes = network.getLinks().get(route.getEndLinkId()).getAllowedModes();
+				allowedModes = new TreeSet<String>(network.getLinks().get(route.getEndLinkId()).getAllowedModes());
 				allowedModes.add(TransportMode.pt);				
 				network.getLinks().get(route.getEndLinkId()).setAllowedModes(allowedModes);
 			}

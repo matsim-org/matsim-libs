@@ -25,7 +25,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -50,6 +52,7 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
+import org.matsim.counts.CountsReaderMatsimV1;
 import org.matsim.counts.CountsWriter;
 import org.matsim.counts.Volume;
 import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
@@ -79,6 +82,7 @@ public class PTCountsNetworkSimplifier {
 
 	private String netInFile;
 	private String scheduleInFile;
+	private String vehiclesInFile;
 	private String netOutFile;
 	private String scheduleOutFile;
 	private Set<Integer> nodeTypesToMerge = new TreeSet<Integer>();
@@ -86,25 +90,62 @@ public class PTCountsNetworkSimplifier {
 	private Counts inCounts;
 	private Counts outCounts = new Counts();
 	private String countsOutFile;
+	
+	private boolean usePT;
 
 	private TreeSet<String> linksBlockedByFacility = new TreeSet<String>();
+	private Set<String> additionalLinksBlockedBySomething;
 
-	public PTCountsNetworkSimplifier(String netInFile, String scheduleInFile, String netOutFile, String scheduleOutFile, HashMap<String,String> shortNameMap, Counts counts, String countsOutFile){
+	public PTCountsNetworkSimplifier(String netInFile, String scheduleInFile, String netOutFile, String scheduleOutFile, HashMap<String,String> shortNameMap, String inCounts, String countsOutFile, String vehiclesInFile, Set<String> linksBlocked){
 		this.netInFile = netInFile;
+		
+		if(scheduleInFile == null){
+			this.usePT = false;
+		} else {
+			this.usePT = true;
+		}
 		this.scheduleInFile = scheduleInFile;
 		this.netOutFile = netOutFile;
 		this.scheduleOutFile = scheduleOutFile;
 		this.shortNameMap = shortNameMap;
-		this.inCounts = counts;
+		
+		if(inCounts == null){
+			this.inCounts = null;
+		} else {
+			this.inCounts = new Counts();
+			CountsReaderMatsimV1 countsReader = new CountsReaderMatsimV1(this.inCounts);
+			try {
+				countsReader.parse(inCounts);
+			} catch (SAXException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (ParserConfigurationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+//		this.inCounts = counts;
 		this.countsOutFile = countsOutFile;
+		this.vehiclesInFile = vehiclesInFile;
 
 		// set some nonsense, cause writer allows for empty fields, but reader complains
 		this.outCounts.setYear(2009);
 		this.outCounts.setName("hab ich nicht");
+		
+		this.additionalLinksBlockedBySomething = linksBlocked;
+		
+//		// add additional links blocked by something
+//		for (String idString : linksBlocked) {
+//			this.linksBlockedByFacility.add(idString);
+//		}
 	}
 
 	public static void main(String[] args) {
-		PTCountsNetworkSimplifier simplifier = new PTCountsNetworkSimplifier("e:/_out/osm/transit-network_bb_subway.xml", "e:/_out/osm/osm_transitSchedule_subway.xml", "e:/_out/osm/transit-network_bb_subway_simplified_merged.xml", "e:/_out/osm/osm_transitSchedule_subway_merged.xml", null, null, null);
+		PTCountsNetworkSimplifier simplifier = new PTCountsNetworkSimplifier("f:/simplifyTest/net.xml", "f:/simplifyTest/transitSchedule.xml", "f:/simplifyTest/_out/net_simplified_merged.xml", "f:/simplifyTest/_out/transitSchedule_subway_merged.xml", null, null, null, "f:/simplifyTest/vehicles.xml", new TreeSet<String>());
 		Set<Integer> nodeTypesToMerge = new TreeSet<Integer>();
 		nodeTypesToMerge.add(new Integer(4));
 		nodeTypesToMerge.add(new Integer(5));
@@ -123,49 +164,78 @@ public class PTCountsNetworkSimplifier {
 
 		ScenarioImpl osmScenario = new ScenarioImpl();
 		Config osmConfig = osmScenario.getConfig();
-		osmConfig.scenario().setUseTransit(true);
-		osmConfig.scenario().setUseVehicles(true);
+		if(this.usePT){
+			osmConfig.scenario().setUseTransit(true);
+			osmConfig.scenario().setUseVehicles(true);
+			osmConfig.transit().setTransitScheduleFile(this.scheduleInFile);
+			osmConfig.transit().setVehiclesFile(this.vehiclesInFile);
+		}
 		osmConfig.network().setInputFile(this.netInFile);
+
 		ScenarioLoaderImpl osmLoader = new ScenarioLoaderImpl(osmScenario);
 		osmLoader.loadScenario();
 
-		log.info("Reading " + this.scheduleInFile);
-		try {
-			new TransitScheduleReaderV1(osmScenario.getTransitSchedule(), osmScenario.getNetwork(), osmScenario).readFile(this.scheduleInFile);
-		} catch (SAXException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+//		log.info("Reading " + this.scheduleInFile);
+//		try {
+//			new TransitScheduleReaderV1(osmScenario.getTransitSchedule(), osmScenario.getNetwork()).readFile(this.scheduleInFile);
+//		} catch (SAXException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		} catch (ParserConfigurationException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//		
+////		log.info("Reading " + this.scheduleInFile);
+////		try {
+////			new TransitScheduleReaderV1(osmScenario.getTransitSchedule(), osmScenario.getNetwork()).readFile(this.scheduleInFile);
+////		} catch (SAXException e) {
+////			// TODO Auto-generated catch block
+////			e.printStackTrace();
+////		} catch (ParserConfigurationException e) {
+////			// TODO Auto-generated catch block
+////			e.printStackTrace();
+////		} catch (IOException e) {
+////			// TODO Auto-generated catch block
+////			e.printStackTrace();
+////		}
 
-		log.info("Running cleaner first...");
-		TransitScheduleCleaner.removeAllRoutesWithMissingLinksFromSchedule(osmScenario.getTransitSchedule(), this.network);
-		TransitScheduleCleaner.removeEmptyLines(osmScenario.getTransitSchedule());
-		TransitScheduleCleaner.removeStopsNotUsed(osmScenario.getTransitSchedule());
-		this.network = TransitScheduleCleaner.removeAllPtTagsFromNetwork(this.network);
-		this.network = TransitScheduleCleaner.tagTransitLinksInNetwork(this.transitSchedule, this.network);
+		if(this.usePT){
+			log.info("Running cleaner first...");
+			TransitScheduleCleaner.removeAllRoutesWithMissingLinksFromSchedule(osmScenario.getTransitSchedule(), this.network);
+			TransitScheduleCleaner.removeEmptyLines(osmScenario.getTransitSchedule());
+			TransitScheduleCleaner.removeStopsNotUsed(osmScenario.getTransitSchedule());
+			this.network = TransitScheduleCleaner.removeAllPtTagsFromNetwork(this.network);
+			this.network = TransitScheduleCleaner.tagTransitLinksInNetwork(osmScenario.getTransitSchedule(), this.network);
+		}
+		
 //		TransitScheduleCleaner.removeRoutesAndStopsOfLinesWithMissingLinksInNetwork(osmScenario.getTransitSchedule(), this.network);
 		log.info("Running simplifier...");
 		run(this.network, osmScenario.getTransitSchedule());
 		log.info("Running cleaner for the second time...");
-		TransitScheduleCleaner.removeAllRoutesWithMissingLinksFromSchedule(osmScenario.getTransitSchedule(), this.network);
-		TransitScheduleCleaner.removeEmptyLines(osmScenario.getTransitSchedule());
-		TransitScheduleCleaner.removeStopsNotUsed(osmScenario.getTransitSchedule());
-
+		
+		if(this.usePT){
+			TransitScheduleCleaner.removeAllRoutesWithMissingLinksFromSchedule(osmScenario.getTransitSchedule(), this.network);
+			TransitScheduleCleaner.removeEmptyLines(osmScenario.getTransitSchedule());
+			TransitScheduleCleaner.removeStopsNotUsed(osmScenario.getTransitSchedule());
+		}
+		
 		log.info("Writing network to " + this.netOutFile);
-		new NetworkWriter(this.network).write(this.netOutFile);
+		new NetworkWriter(this.network).write(this.netOutFile + "_not_cleaned.xml");
 		try {
-			log.info("Writing transit schedule to " + this.scheduleOutFile);
-			new TransitScheduleWriter(osmScenario.getTransitSchedule()).writeFile(this.scheduleOutFile);
-			log.info("Writing counts file to " + this.countsOutFile);
-			new CountsWriter(this.outCounts).write(this.countsOutFile);
+			if(this.usePT){
+				log.info("Writing transit schedule to " + this.scheduleOutFile);
+				new TransitScheduleWriter(osmScenario.getTransitSchedule()).writeFile(this.scheduleOutFile);
+			}
+			if(this.inCounts != null){
+				log.info("Writing counts file to " + this.countsOutFile);
+				new CountsWriter(this.outCounts).write(this.countsOutFile);
+			}
 			log.info("Running network cleaner... Result may not be consistent with countsfile");
-			new NetworkCleaner().run(this.netOutFile, this.netOutFile + "_cl.xml");
+			new NetworkCleaner().run(this.netOutFile, this.netOutFile);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -189,12 +259,37 @@ public class PTCountsNetworkSimplifier {
 
 		NetworkCalcTopoType nodeTopo = new NetworkCalcTopoType();
 		nodeTopo.run(this.network);
-		registerLinksBlockedByTransitStopFacility();
+		
+		// Register the back link for each link on a node to be processed
+		Map<String, String> link2BackLinkMap = new TreeMap<String, String>();
+		for (Node node : this.network.getNodes().values()) {
+			if(this.nodeTypesToMerge.contains(Integer.valueOf(nodeTopo.getTopoType(node)))){
+				for (Link inLink : node.getInLinks().values()) {
+					for (Link outLink : node.getOutLinks().values()) {
+						if(outLink.getToNode().equals(inLink.getFromNode())){
+							link2BackLinkMap.put(inLink.getId().toString(), outLink.getId().toString());
+						}
+					}
+				}
+			}
+		}
+		
+		if(this.usePT){
+			registerLinksBlockedByTransitStopFacility();
+		}
+		
+		if(this.inCounts != null){
+			registerLinksBlockedByCountStation();
+		}
+
+		if(this.additionalLinksBlockedBySomething != null){
+			registerLinksBlockedByAnythingElse();
+		}
 
 		for (Node node : this.network.getNodes().values()) {
 
 			// check, if node is marked as count station, if so add it and move counts data to outCounts
-			checkNodeIsMarkedAsCountStation(node);
+//			checkNodeIsMarkedAsCountStation(node);
 
 			nodesProcessed++;
 			if(nextMessageAt == nodesProcessed){
@@ -219,6 +314,19 @@ public class PTCountsNetworkSimplifier {
 							if(!outLink.getToNode().equals(inLink.getFromNode())){
 
 								if(!this.linksBlockedByFacility.contains(inLink.getId().toString()) && !this.linksBlockedByFacility.contains(outLink.getId().toString())){
+									
+//									check, whether links are back links of each other +/- 15 degrees
+									if(link2BackLinkMap.containsKey(inLink.getId().toString())){
+										if(outLink.getId().toString().contains(link2BackLinkMap.get(inLink.getId().toString()))){
+											continue;
+										}
+									}
+									
+									if(link2BackLinkMap.containsKey(outLink.getId().toString())){
+										if(inLink.getId().toString().contains(link2BackLinkMap.get(outLink.getId().toString()))){
+											continue;
+										}
+									}
 
 									Link link = null;
 
@@ -288,6 +396,8 @@ public class PTCountsNetworkSimplifier {
 										}
 									}
 
+								} else {
+//									log.info("inLink " + inLink.getId().toString() + " and outLink " + outLink.getId().toString() + " will not be touched");
 								}
 							}
 						}
@@ -306,6 +416,23 @@ public class PTCountsNetworkSimplifier {
 		log.info("  resulting network contains " + this.network.getNodes().size() + " nodes and " +
 				this.network.getLinks().size() + " links.");
 		log.info("done.");
+	}
+
+	private void registerLinksBlockedByCountStation() {
+		for (Node node : this.network.getNodes().values()) {
+			this.checkNodeIsMarkedAsCountStation(node);
+		}		
+	}
+
+	private void registerLinksBlockedByAnythingElse() {
+		// add additional links blocked by something
+		int i = 0;
+		for (String idString : this.additionalLinksBlockedBySomething) {
+			this.linksBlockedByFacility.add(idString);
+			i++;
+		}
+		log.info("Marked " + i + " links blocked by anything");
+		this.additionalLinksBlockedBySomething = null;
 	}
 
 	private void registerLinksBlockedByTransitStopFacility() {
@@ -360,8 +487,10 @@ public class PTCountsNetworkSimplifier {
 				} else {
 					// count station was already processed and moved to outCounts
 				}
+			} else {
+				log.warn("Count station " + this.shortNameMap.get(node.getId().toString()) + " is registerd to node " + node.getId().toString() + " which has " + node.getInLinks().size() + " inLinks and " + node.getOutLinks().size() + " outLinks. Can only map one to one. Removing count station from counts data.");
 			}
-		}
+		} 
 
 		// everything worked fine, check if a link was blocked
 		if(linkToBlock != null){
