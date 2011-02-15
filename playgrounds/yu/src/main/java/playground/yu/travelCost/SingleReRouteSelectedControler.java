@@ -110,11 +110,21 @@ public class SingleReRouteSelectedControler extends Controler {
 		controler.run();
 	}
 
+	/* ../matsimTests/diverseRoutes/speedWeighted.xml */
+	public static void speedWeightedTravelTimeCost(String[] args) {
+		Controler controler = new SingleReRouteSelectedControler(args[0]);
+		controler.addControlerListener(new SpeedWeightedTravelCostListener());
+		controler.setWriteEventsInterval(0);
+		controler.setOverwriteFiles(true);
+		controler.run();
+	}
+
 	public static void main(String[] args) {
 		// travelTimeCostWeight(args);
 		// tightTurnPenalty(args);
 		// capacityWeightedTravelTimeCost(args);
 		// capacitySquareWeightedTravelTimeCost(args);
-		capacitySqrtWeightedTravelTimeCost(args);
+		// capacitySqrtWeightedTravelTimeCost(args);
+		speedWeightedTravelTimeCost(args);
 	}
 }
