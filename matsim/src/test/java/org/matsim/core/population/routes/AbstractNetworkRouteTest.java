@@ -393,6 +393,25 @@ public abstract class AbstractNetworkRouteTest {
 	}
 
 	@Test
+	public void testGetSubRoute_CircleAtStart() {
+		NetworkImpl network = createTestNetwork();
+		network.createAndAddLink(new IdImpl(-3),
+				network.getNodes().get(new IdImpl(4)), network.getNodes().get(new IdImpl(3)),
+				1000.0, 100.0, 3600.0, 1);
+		Id id13 = new IdImpl("13");
+		Id id15 = new IdImpl("15");
+		NetworkRoute route = getNetworkRouteInstance(id13, id15, network);
+		route.setLinkIds(id13, NetworkUtils.getLinkIds("-24 -3 23 13 14"), id15);
+
+		NetworkRoute subRoute = route.getSubRoute(id13, id15);
+		List<Id> linkIds = subRoute.getLinkIds();
+		Assert.assertEquals("number of links in subRoute.", 1, linkIds.size());
+		Assert.assertEquals("wrong link.", new IdImpl("14"), subRoute.getLinkIds().get(0));
+		Assert.assertEquals("wrong start link.", id13, subRoute.getStartLinkId());
+		Assert.assertEquals("wrong end link.", id15, subRoute.getEndLinkId());
+	}
+
+	@Test
 	public void testStartAndEndOnSameLinks_setLinks() {
 		NetworkImpl network = createTestNetwork();
 		Id link = new IdImpl("3");

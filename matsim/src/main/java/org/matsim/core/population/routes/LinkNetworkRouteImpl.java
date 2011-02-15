@@ -91,6 +91,9 @@ public class LinkNetworkRouteImpl extends AbstractRoute implements NetworkRoute,
 			toIndex = fromIndex - 1;
 		} else {
 			for (int i = fromIndex, n = this.route.size(); (i < n) && (toIndex < 0); i++) {
+				if (fromLinkId.equals(this.route.get(i))) {
+					fromIndex = i+1; // in case of a loop, cut it short
+				}
 				if (toLinkId.equals(this.route.get(i))) {
 					toIndex = i;
 				}
