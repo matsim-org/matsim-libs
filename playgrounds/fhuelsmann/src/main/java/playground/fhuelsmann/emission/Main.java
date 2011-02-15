@@ -36,7 +36,7 @@ public class Main {
 		// INPUT
 		String runDirectory = "../../detailedEval/testRuns/output/1pct/v0-default/run6/";
 		String eventsFile = runDirectory + "ITERS/it.10/10.events.txt.gz";
-		String netfile = "../../detailedEval/network-86-85-87-84.xml";
+		String netfile = "../../detailedEval/Net/network-86-85-87-84.xml";
 		//		String netfile = runDirectory + "output_network.xml.gz";
 		
 		//		String visumRoadHebefaRoadFile = "../../detailedEval/teststrecke/sim/inputEmissions/road_types.txt";
