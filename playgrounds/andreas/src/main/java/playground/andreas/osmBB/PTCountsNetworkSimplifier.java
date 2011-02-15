@@ -25,9 +25,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.TreeSet;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -221,20 +219,7 @@ public class PTCountsNetworkSimplifier {
 
 		NetworkCalcTopoType nodeTopo = new NetworkCalcTopoType();
 		nodeTopo.run(this.network);
-		
-		// Register the back link for each link on a node to be processed
-		Map<String, String> link2BackLinkMap = new TreeMap<String, String>();
-		for (Node node : this.network.getNodes().values()) {
-			if(this.nodeTypesToMerge.contains(Integer.valueOf(nodeTopo.getTopoType(node)))){
-				for (Link inLink : node.getInLinks().values()) {
-					for (Link outLink : node.getOutLinks().values()) {
-						if(outLink.getToNode().equals(inLink.getFromNode())){
-							link2BackLinkMap.put(inLink.getId().toString(), outLink.getId().toString());
-						}
-					}
-				}
-			}
-		}
+		nodeTopo = new NetworkCalcTopoType(); // save memory
 		
 		if(this.usePT){
 			registerLinksBlockedByTransitStopFacility();
@@ -272,18 +257,6 @@ public class PTCountsNetworkSimplifier {
 							if(!outLink.getToNode().equals(inLink.getFromNode())){
 
 								if(!this.linksBlockedByFacility.contains(inLink.getId().toString()) && !this.linksBlockedByFacility.contains(outLink.getId().toString())){
-									
-									if(link2BackLinkMap.containsKey(inLink.getId().toString())){
-										if(outLink.getId().toString().contains(link2BackLinkMap.get(inLink.getId().toString()))){
-											continue;
-										}
-									}
-									
-									if(link2BackLinkMap.containsKey(outLink.getId().toString())){
-										if(inLink.getId().toString().contains(link2BackLinkMap.get(outLink.getId().toString()))){
-											continue;
-										}
-									}
 
 									Link link = null;
 
