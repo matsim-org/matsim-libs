@@ -42,11 +42,11 @@ AgentArrivalEventHandler,AgentDepartureEventHandler {
 
 	private LinkAndAgentAccountAnalysisModule linkAndAgentAccountAnalysisModule = new LinkAndAgentAccountAnalysisModule();
 
-	public LinkAndAgentAccountAnalysisModule getLinkAndAgentAccountAnalyseModul() {
+	public LinkAndAgentAccountAnalysisModule getLinkAndAgentAccountAnalyisModule() {
 		return linkAndAgentAccountAnalysisModule;
 	}
 
-	public void setLinkAndAgentAccountAnalyseModul(LinkAndAgentAccountAnalysisModule linkAndAgentAccountAnalysisModule) {
+	public void setLinkAndAgentAccountAnalyisModule(LinkAndAgentAccountAnalysisModule linkAndAgentAccountAnalysisModule) {
 		this.linkAndAgentAccountAnalysisModule = linkAndAgentAccountAnalysisModule;
 	}
 

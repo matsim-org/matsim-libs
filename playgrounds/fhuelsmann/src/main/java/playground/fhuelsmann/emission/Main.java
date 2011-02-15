@@ -29,6 +29,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
+
 public class Main {
 
 	public static void main (String[] args) throws Exception{
@@ -54,7 +55,7 @@ public class Main {
 
 		// ?? was passiert hier ??
 		HbefaTable hbefaTable = new HbefaTable();
-		hbefaTable.makeHabefaTable(hbefaEmissionFactors);
+		hbefaTable.makeHbefaTable(hbefaEmissionFactors);
 
 		//hbefaColdTable hbefaColdTable = new hbefaColdTable();
 		//hbefaColdTable.makeHbefaColdTable(Hbefa_Cold_Traffic);
@@ -63,7 +64,7 @@ public class Main {
 		//create the handler 
 		TravelTimeEventHandler handler = new TravelTimeEventHandler(network,hbefaTable.getHbefaTableWithSpeedAndEmissionFactor());
 
-		LinkAndAgentAccountAnalysisModule linkAndAgentAccount = handler.getLinkAndAgentAccountAnalyseModul();
+		LinkAndAgentAccountAnalysisModule linkAndAgentAccount = handler.getLinkAndAgentAccountAnalyisModule();
 		//		LinkAndAgentAccountAnalyseModul linkAccount = new LinkAndAgentAccountAnalyseModul();
 
 		//add the handler

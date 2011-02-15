@@ -44,7 +44,7 @@ public class HbefaTable {
 		return HbefaTable;}
 
 
-	public void makeHabefaTable(String filename){
+	public void makeHbefaTable(String filename){
 		try{
 
 			FileInputStream fstream = new FileInputStream(filename);
