@@ -47,6 +47,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.pt.PtConstants;
 import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.OTFVisMobsimFeature;
 import org.matsim.vis.otfvis.data.OTFServerQuad2;
@@ -95,7 +96,7 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 		JCheckBox source = (JCheckBox)e.getItemSelectable();
 		if (source.getText().equals(INCLUDE_ROUTES)) {
 			includeRoutes = !includeRoutes ;
-			System.err.println("changing includRoutes") ;
+			System.err.println("changing includeRoutes") ;
 		}
 
 	}
@@ -169,6 +170,9 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 			for (PlanElement e : plan.getPlanElements()) {
 				if (e instanceof Activity) {
 					Activity act = (Activity) e;
+					if ( !includeRoutes && PtConstants.TRANSIT_ACTIVITY_TYPE.equals(act.getType()) ) {
+						continue ; // skip
+					}
 					Coord coord = act.getCoord();
 					if (coord == null) {
 						Link link = net.getVisLinks().get(act.getLinkId())

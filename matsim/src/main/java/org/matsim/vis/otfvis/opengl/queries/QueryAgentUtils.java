@@ -3,6 +3,8 @@ package org.matsim.vis.otfvis.opengl.queries;
 import java.awt.Color;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+import org.jfree.util.Log;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -14,14 +16,17 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.pt.PtConstants;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfoFactory;
 
 public class QueryAgentUtils {
 
-	
+	private static final Logger log = Logger.getLogger(QueryAgentUtils.class);
+
 
 	enum Level { ROUTES, PLANELEMENTS } 
+	static private Level myLevel ;
 
 	/**
 	 * @param plan
@@ -32,6 +37,8 @@ public class QueryAgentUtils {
 	 */
 	static void buildRoute(Plan plan, QueryAgentPlan.Result result, Id agentId, Network net, Level level) {
 		// reducing visibility to avoid proliferation.  kai, jan'11
+		
+		myLevel = level ;
 		
 		int count = countLines(plan);
 		if (count == 0)
@@ -49,23 +56,36 @@ public class QueryAgentUtils {
 
 		for (Object o : plan.getPlanElements()) {
 			if (o instanceof Activity) {
-				Color col = actColor;
 				Activity act = (Activity) o;
+				if ( myLevel==Level.PLANELEMENTS && PtConstants.TRANSIT_ACTIVITY_TYPE.equals( act.getType() ) ) {
+					continue ; // skip
+				}
 				Coord coord = act.getCoord();
 				if (coord == null) {
-					assert (net != null);
+					if ( net==null ) {
+						log.info("no net info; not drawing activity location ") ;
+						continue ;
+					}
 					Link link = net.getLinks().get(act.getLinkId());
+					if ( link==null ) {
+						log.info("can't find link with given id in net; not drawing activity location") ;
+						continue ;
+					}
 					AgentSnapshotInfo pi = AgentSnapshotInfoFactory.staticCreateAgentSnapshotInfo(agentId, link);
+					if ( pi.getEasting()==0. && pi.getNorthing()==0. ) {
+						log.info("both coordinates are zero; this is implausible; not drawing activity location") ;
+						continue ;
+					}
 					coord = new CoordImpl(pi.getEasting(), pi.getNorthing());
+					log.info( " east: " + pi.getEasting() + " north: " + pi.getNorthing() );
 				}
-				setCoord(pos++, coord, col, result);
+				setCoord(pos++, coord, actColor, result);
 			} else if (o instanceof Leg) {
 				Leg leg = (Leg) o;
 				if (leg.getMode().equals(TransportMode.car)) {
 					if ( level==Level.ROUTES ) {
 						Node last = null;
-						for (Id linkId : ((NetworkRoute) leg.getRoute())
-								.getLinkIds()) {
+						for (Id linkId : ((NetworkRoute) leg.getRoute()).getLinkIds()) {
 							Link driven = net.getLinks().get(linkId);
 							Node node = driven.getFromNode();
 							last = driven.getToNode();
@@ -110,12 +130,18 @@ public class QueryAgentUtils {
 		int count = 0;
 		for (Object o : plan.getPlanElements()) {
 			if (o instanceof Activity) {
+				Activity act = (Activity) o ;
+				if ( myLevel==Level.PLANELEMENTS && PtConstants.TRANSIT_ACTIVITY_TYPE.equals( act.getType() ) ) {
+					continue ; // skip
+				}
 				count++;
 			} else if (o instanceof Leg) {
+				if ( myLevel==Level.PLANELEMENTS ) {
+					continue ; // skip
+				}
 				Leg leg = (Leg) o;
 				if (leg.getMode().equals(TransportMode.car)) {
-					List<Id> route = ((NetworkRoute) leg.getRoute())
-							.getLinkIds();
+					List<Id> route = ((NetworkRoute) leg.getRoute()).getLinkIds();
 					count += route.size();
 					if (route.size() != 0)
 						count++; // add last position if there is a path
