@@ -7,7 +7,6 @@ import java.util.TreeSet;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.counts.Counts;
 import org.matsim.counts.CountsReaderMatsimV1;
@@ -15,12 +14,6 @@ import org.xml.sax.SAXException;
 
 import playground.andreas.fcd.Fcd;
 import playground.andreas.osmBB.osm2counts.Osm2Counts;
-import playground.droeder.osm.ResizeLinksByCount4;
-//import playground.droeder.osm.ResizeLinksByCount2;
-//import playground.droeder.osm.ResizeLinksByCount3;
-//import playground.droeder.osm.ResizeLinksByCount4;
-//import playground.droeder.osm.ResizeLinksByCount2;
-//import playground.droeder.osm.ResizeLinksByCount3;
 import playground.mzilske.osm.OsmPrepare;
 import playground.mzilske.osm.OsmTransitMain;
 
@@ -70,13 +63,7 @@ public class PTCountsOsm2Matsim {
 				
 		OsmTransitMain osmTransitMain = new OsmTransitMain(filteredOsmFile, TransformationFactory.WGS84, TransformationFactory.DHDN_GK4, outDir + outName + "_network.xml", outDir + outName + "_schedule.xml", outDir + outName + "_vehicles.xml");
 		osmTransitMain.convertOsm2Matsim(transitFilter);
-		
-//		ResizeLinksByCount2 r = new ResizeLinksByCount2(outDir + outName + "_network.xml", counts, shortNameMap, new Double(1.1));
-//		r.run(outDir + outName + "_network_resized.xml");
-		
-//		ResizeLinksByCount3 r = new ResizeLinksByCount3(outDir + outName + "_network.xml", counts, shortNameMap, 1.0);
-//		r.run(outDir + outName + "_network_resized.xml");
-		
+
 //		ResizeLinksByCount4 r = new ResizeLinksByCount4(outDir + outName + "_network.xml", counts, shortNameMap, 1.0);
 //		r.run(outDir + outName + "_network_resized.xml");
 		
@@ -88,10 +75,7 @@ public class PTCountsOsm2Matsim {
 		nodeTypesToMerge.add(new Integer(5));
 		ptCountNetSimplifier.setNodesToMerge(nodeTypesToMerge);
 		ptCountNetSimplifier.setMergeLinkStats(false);
-		ptCountNetSimplifier.simplifyPTNetwork();
-		
-
-		
+		ptCountNetSimplifier.simplifyPTNetwork();		
 	}
 
 }

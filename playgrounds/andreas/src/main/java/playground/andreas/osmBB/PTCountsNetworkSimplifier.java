@@ -128,7 +128,6 @@ public class PTCountsNetworkSimplifier {
 			}
 		}
 		
-//		this.inCounts = counts;
 		this.countsOutFile = countsOutFile;
 		this.vehiclesInFile = vehiclesInFile;
 
@@ -137,11 +136,6 @@ public class PTCountsNetworkSimplifier {
 		this.outCounts.setName("hab ich nicht");
 		
 		this.additionalLinksBlockedBySomething = linksBlocked;
-		
-//		// add additional links blocked by something
-//		for (String idString : linksBlocked) {
-//			this.linksBlockedByFacility.add(idString);
-//		}
 	}
 
 	public static void main(String[] args) {
@@ -171,37 +165,8 @@ public class PTCountsNetworkSimplifier {
 			osmConfig.transit().setVehiclesFile(this.vehiclesInFile);
 		}
 		osmConfig.network().setInputFile(this.netInFile);
-
 		ScenarioLoaderImpl osmLoader = new ScenarioLoaderImpl(osmScenario);
 		osmLoader.loadScenario();
-
-//		log.info("Reading " + this.scheduleInFile);
-//		try {
-//			new TransitScheduleReaderV1(osmScenario.getTransitSchedule(), osmScenario.getNetwork()).readFile(this.scheduleInFile);
-//		} catch (SAXException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		} catch (ParserConfigurationException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//		
-////		log.info("Reading " + this.scheduleInFile);
-////		try {
-////			new TransitScheduleReaderV1(osmScenario.getTransitSchedule(), osmScenario.getNetwork()).readFile(this.scheduleInFile);
-////		} catch (SAXException e) {
-////			// TODO Auto-generated catch block
-////			e.printStackTrace();
-////		} catch (ParserConfigurationException e) {
-////			// TODO Auto-generated catch block
-////			e.printStackTrace();
-////		} catch (IOException e) {
-////			// TODO Auto-generated catch block
-////			e.printStackTrace();
-////		}
 
 		if(this.usePT){
 			log.info("Running cleaner first...");
@@ -212,7 +177,6 @@ public class PTCountsNetworkSimplifier {
 			this.network = TransitScheduleCleaner.tagTransitLinksInNetwork(osmScenario.getTransitSchedule(), this.network);
 		}
 		
-//		TransitScheduleCleaner.removeRoutesAndStopsOfLinesWithMissingLinksInNetwork(osmScenario.getTransitSchedule(), this.network);
 		log.info("Running simplifier...");
 		run(this.network, osmScenario.getTransitSchedule());
 		log.info("Running cleaner for the second time...");
@@ -287,10 +251,6 @@ public class PTCountsNetworkSimplifier {
 		}
 
 		for (Node node : this.network.getNodes().values()) {
-
-			// check, if node is marked as count station, if so add it and move counts data to outCounts
-//			checkNodeIsMarkedAsCountStation(node);
-
 			nodesProcessed++;
 			if(nextMessageAt == nodesProcessed){
 				log.info(nodesProcessed + " nodes processed so far");
@@ -315,7 +275,6 @@ public class PTCountsNetworkSimplifier {
 
 								if(!this.linksBlockedByFacility.contains(inLink.getId().toString()) && !this.linksBlockedByFacility.contains(outLink.getId().toString())){
 									
-//									check, whether links are back links of each other +/- 15 degrees
 									if(link2BackLinkMap.containsKey(inLink.getId().toString())){
 										if(outLink.getId().toString().contains(link2BackLinkMap.get(inLink.getId().toString()))){
 											continue;
