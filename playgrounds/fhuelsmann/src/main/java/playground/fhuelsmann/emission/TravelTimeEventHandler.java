@@ -19,15 +19,8 @@ package playground.fhuelsmann.emission;
  *                                                                         *
  * *********************************************************************** */
 
-
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
@@ -39,35 +32,24 @@ import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
-
-
-
 
 public class TravelTimeEventHandler implements LinkEnterEventHandler,LinkLeaveEventHandler, 
 AgentArrivalEventHandler,AgentDepartureEventHandler {
 
-
 	private final Network network;
 	private  HbefaObject[][] HbefaTable;
 
-	
-	
 	private LinkAndAgentAccountAnalyseModul linkAndAgentAccountAnalyseModul = new LinkAndAgentAccountAnalyseModul();
-	
-
 
 	public LinkAndAgentAccountAnalyseModul getLinkAndAgentAccountAnalyseModul() {
 		return linkAndAgentAccountAnalyseModul;
 	}
 
-	public void setLinkAndAgentAccountAnalyseModul(
-			LinkAndAgentAccountAnalyseModul linkAndAgentAccountAnalyseModul) {
+	public void setLinkAndAgentAccountAnalyseModul(LinkAndAgentAccountAnalyseModul linkAndAgentAccountAnalyseModul) {
 		this.linkAndAgentAccountAnalyseModul = linkAndAgentAccountAnalyseModul;
 	}
-	
-	
+
 	public TravelTimeEventHandler(final Network network,HbefaObject[][] HbefaTable) {
 		this.HbefaTable = HbefaTable;
 		this.network = network;
@@ -77,111 +59,87 @@ AgentArrivalEventHandler,AgentDepartureEventHandler {
 	private final Map<Id, Double> agentarrival = new TreeMap<Id, Double>();
 	private final Map<Id, Double> agentdeparture = new TreeMap<Id, Double>();
 
-
 	public void reset(int iteration) {
 
-		this.linkenter.clear();
-		this.agentarrival.clear();
-		this.agentdeparture.clear();
-		System.out.println("reset...");
 	}
 
 	public void handleEvent(LinkEnterEvent event) {
-		String id = event.getPersonId().toString();
-//		Id onelink = event.getLinkId();
-//		if (onelink.equals(new IdImpl("590000822"))){
-//			System.out.println(onelink);
-			if(id.contains("testVehicle")){
-				this.linkenter.put(event.getPersonId(), event.getTime());
-			}
-		}
-//	}
+		//		String id = event.getPersonId().toString();
+		//		Id onelink = event.getLinkId();
+		//		if (onelink.equals(new IdImpl("590000822"))){
+		//			System.out.println(onelink);
+		//			if(id.contains("testVehicle")){
+		this.linkenter.put(event.getPersonId(), event.getTime());
+		//			}
+	}
+	//	}
 
 	public void handleEvent(AgentArrivalEvent event) {
-		String id = event.getPersonId().toString();
-//		Id onelink = event.getLinkId();
-//		if (onelink == new IdImpl("590000822")){
-		if(id.contains("testVehicle")){
-				this.agentarrival.put(event.getPersonId(), event.getTime());
-		}
-		}
-//	}
+		//		String id = event.getPersonId().toString();
+		//		Id onelink = event.getLinkId();
+		//		if (onelink == new IdImpl("590000822")){
+		//		if(id.contains("testVehicle")){
+		this.agentarrival.put(event.getPersonId(), event.getTime());
+		//		}
+	}
+	//	}
 
 	public void handleEvent(AgentDepartureEvent event) {
-		String id = event.getPersonId().toString();
-//		Id onelink = event.getLinkId();
-//			if (onelink == new IdImpl("590000822")){
-				if(id.contains("testVehicle")){
-					this.agentdeparture.put(event.getPersonId(), event.getTime());
-				}
-		}
-//	}
-		
+		//		String id = event.getPersonId().toString();
+		//		Id onelink = event.getLinkId();
+		//			if (onelink == new IdImpl("590000822")){
+		//				if(id.contains("testVehicle")){
+		this.agentdeparture.put(event.getPersonId(), event.getTime());
+		//				}
+	}
+	//	}
 
 	public void handleEvent(LinkLeaveEvent event) {	
-		try{
-		String id = event.getPersonId().toString();
-//		Id onelink = event.getLinkId();
-//		if (onelink.equals(new IdImpl("590000822"))){
-				if(id.contains("testVehicle")){
-				Id personId= event.getPersonId();
-				Id linkId = event.getLinkId();
 
-		//get attributes of the network per link
-
+		//		String id = event.getPersonId().toString();
+		//		Id onelink = event.getLinkId();
+		//			if (onelink.equals(new IdImpl("590000822"))){
+		//				if(id.contains("testVehicle")){
+		Id personId= event.getPersonId();
+		Id linkId = event.getLinkId();
 		LinkImpl link = (LinkImpl) this.network.getLinks().get(linkId);
-		double distance = link.getLength();
-		String roadTypePerLink = link.getType();
-		int roadType = Integer.parseInt(roadTypePerLink);
-		int freeVelocity = (int) link.getFreespeed();
-//		int roadType= 55;
-//		System.out.print("roadType"+roadType);
+		Double distance = link.getLength();
+		Double freeVelocity = link.getFreespeed();
 
-	
+		String roadTypeString = link.getType();
+		Integer roadType = null;
+		try{
+			roadType = Integer.parseInt(roadTypeString);
+		}
+		catch (NumberFormatException e){
+			System.err.println("Error: roadtype missing");
+		}
+
 		if (this.linkenter.containsKey(event.getPersonId())) {						
-			//with activity
+			// link with activity
 			if (this.agentarrival.containsKey(personId)) {
-
 				double enterTime = this.linkenter.get(personId);
 				double arrivalTime = this.agentarrival.get(personId);
 				double departureTime = this.agentdeparture.get(personId);
 
-				double travelTime = event.getTime() - enterTime -departureTime+ arrivalTime;
+				double travelTime = event.getTime() - enterTime - departureTime + arrivalTime;
 				double averageSpeed=(distance/1000)/(travelTime/3600);
 
 				this.agentarrival.remove(personId);
-			
+
 				linkAndAgentAccountAnalyseModul.calculateEmissionsPerLink(travelTime, linkId, averageSpeed,roadType, freeVelocity, distance, HbefaTable);	
-				
-				
 				linkAndAgentAccountAnalyseModul.calculateEmissionsPerPerson(travelTime, personId, averageSpeed,roadType, freeVelocity, distance, HbefaTable);	
-				}
-			
-			// if 	(this.agentarrival.containsKey(personId)) is not the case
-
-			else { // without activity
-
-
+			}
+			// if (this.agentarrival.containsKey(personId)) is not the case (link without activity)
+			else {
 				double enterTime = this.linkenter.get(personId);
 				double travelTime = event.getTime() - enterTime;
 				double averageSpeed=(distance/1000)/(travelTime/3600);
 
-		//		this.agentarrival.remove(personId);	
-				
 				linkAndAgentAccountAnalyseModul.calculateEmissionsPerLink(travelTime, linkId, averageSpeed,roadType, freeVelocity, distance, HbefaTable);	
-				
-				
 				linkAndAgentAccountAnalyseModul.calculateEmissionsPerPerson(travelTime, personId, averageSpeed,roadType, freeVelocity, distance, HbefaTable);
-					
-				}
 			}
 		}
-		}
-		catch (NumberFormatException e){
-		      System.err.println("Error: roadtype missing");
-		    }
-		}
-	
-	
+		//		}
+	}
 }
-//}
