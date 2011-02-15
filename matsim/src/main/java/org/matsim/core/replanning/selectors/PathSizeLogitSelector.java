@@ -44,7 +44,7 @@ import org.matsim.core.utils.misc.RouteUtils;
  *
  * @author laemmel
   */
-public class PathSizeLogitSelector implements PlanSelector {
+public final class PathSizeLogitSelector implements PlanSelector {
 
 	private final double beta;
 	private final double tau;
@@ -59,7 +59,7 @@ public class PathSizeLogitSelector implements PlanSelector {
 		this.network = network;
 	}
 
-	public Plan selectPlan(final Person person) {
+	public final Plan selectPlan(final Person person) {
 
 		// First check if there are any unscored plans
 		Plan selectedPlan = ((PersonImpl) person).getRandomUnscoredPlan();
@@ -89,7 +89,7 @@ public class PathSizeLogitSelector implements PlanSelector {
 	}
 
 	//updates the path size logit weights
-	private void calcPSLWeights(final List<? extends Plan> plans, final WeightsContainer wc) {
+	public final void calcPSLWeights(final List<? extends Plan> plans, final WeightsContainer wc) {
 
 		wc.maxScore = Double.NEGATIVE_INFINITY;
 
@@ -162,11 +162,11 @@ public class PathSizeLogitSelector implements PlanSelector {
 		wc.sumWeights = sumweight;
 	}
 
-	private static class WeightsContainer {
-		protected double[] weights;
-		protected double sumWeights;
-		protected double maxScore;
-		protected WeightsContainer(final List<? extends Plan> plans) {
+	public static class WeightsContainer {
+		public double[] weights;
+		public double sumWeights;
+		public double maxScore;
+		public WeightsContainer(final List<? extends Plan> plans) {
 			this.weights = new double[plans.size()];
 		}
 	}
