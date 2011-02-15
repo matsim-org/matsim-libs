@@ -50,8 +50,7 @@ public class DiverseRouteListener implements IterationStartsListener,
 		int firstIter = ctl.getFirstIteration();
 		ctl
 				.setTravelCostCalculatorFactory(new ParameterizedTravelCostCalculatorFactoryImpl(
-						1d - (iter - firstIter - 1) / 3d/* A -> travelTime */,
-						0d + (iter - firstIter - 1) / 3d/* B -> travelDistance */));
+						1d - (iter - firstIter - 1) / 3d/* A -> travelTime */));
 	}
 
 	/**
@@ -65,7 +64,7 @@ public class DiverseRouteListener implements IterationStartsListener,
 		if (iter == ctl.getFirstIteration()) {
 			PlanCalcScoreConfigGroup scoringCfg = ctl.getConfig()
 					.planCalcScore();
-			scoringCfg.setMonetaryDistanceCostRateCar(-0.00012);
+			scoringCfg.setMonetaryDistanceCostRateCar(-0.00012 * 3d);
 			ctl
 					.setScoringFunctionFactory(new CharyparNagelScoringFunctionFactory(
 							scoringCfg));

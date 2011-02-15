@@ -64,7 +64,7 @@ public class SingleReRouteSelectedControler extends Controler {
 		for (int i = 0; i <= 3; i++) {
 			Controler controler = new SingleReRouteSelectedControler(args[i]);
 			controler.addControlerListener(new SingleReRouteSelectedListener(
-					(double) (3 - i) / (double) 3, i));
+					(double) (3 - i) / (double) 3));
 			controler.setWriteEventsInterval(0);
 			controler.setOverwriteFiles(true);
 			controler.run();
@@ -80,6 +80,7 @@ public class SingleReRouteSelectedControler extends Controler {
 		controler.run();
 	}
 
+	/* ../matsimTests/diverseRoutes/capacityWeighted.xml */
 	public static void capacityWeightedTravelTimeCost(String[] args) {
 		Controler controler = new SingleReRouteSelectedControler(args[0]);
 		controler
@@ -89,9 +90,20 @@ public class SingleReRouteSelectedControler extends Controler {
 		controler.run();
 	}
 
+	/* ../matsimTests/diverseRoutes/capacitySquareWeighted.xml */
+	public static void capacitySquareWeightedTravelTimeCost(String[] args) {
+		Controler controler = new SingleReRouteSelectedControler(args[0]);
+		controler
+				.addControlerListener(new LinkCapacitySquareWeightedTravelCostListener());
+		controler.setWriteEventsInterval(0);
+		controler.setOverwriteFiles(true);
+		controler.run();
+	}
+
 	public static void main(String[] args) {
 		// travelTimeCostWeight(args);
 		// tightTurnPenalty(args);
-		capacityWeightedTravelTimeCost(args);
+		// capacityWeightedTravelTimeCost(args);
+		capacitySquareWeightedTravelTimeCost(args);
 	}
 }

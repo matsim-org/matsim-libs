@@ -42,22 +42,28 @@ import org.matsim.core.router.util.TravelTime;
  * @author yu
  * 
  */
-public class LinkCapacityWeightedTravelCostListener implements
+public class LinkCapacitySquareWeightedTravelCostListener implements
 		IterationStartsListener {
-	public static class LinkCapacityWeightedTravelCostCalculatorFactoryImpl
+	public static class LinkCapacitySquareWeightedTravelCostCalculatorFactoryImpl
 			implements TravelCostCalculatorFactory {
 
 		public PersonalizableTravelCost createTravelCostCalculator(
 				PersonalizableTravelTime timeCalculator,
 				PlanCalcScoreConfigGroup cnScoringGroup) {
-			return new LinkCapacityWeightedTravelTimeCostCalculator(
+			return new LinkCapacitySquareWeightedTravelTimeCostCalculator(
 					timeCalculator);
 		}
 
 	}
 
-	public static class LinkCapacityWeightedTravelTimeCostCalculator implements
-			TravelMinCost, PersonalizableTravelCost {
+	/**
+	 * weigh travel time by 1/cap^2
+	 * 
+	 * @author yu
+	 * 
+	 */
+	public static class LinkCapacitySquareWeightedTravelTimeCostCalculator
+			implements TravelMinCost, PersonalizableTravelCost {
 
 		protected final TravelTime timeCalculator;
 
@@ -65,7 +71,7 @@ public class LinkCapacityWeightedTravelCostListener implements
 
 		// private final double marginalUtlOfDistance;
 
-		public LinkCapacityWeightedTravelTimeCostCalculator(
+		public LinkCapacitySquareWeightedTravelTimeCostCalculator(
 				final TravelTime timeCalculator
 		// , PlanCalcScoreConfigGroup cnScoringGroup
 		) {
@@ -95,9 +101,10 @@ public class LinkCapacityWeightedTravelCostListener implements
 				final double time) {
 			double travelTime = timeCalculator.getLinkTravelTime(link, time);
 			// if (marginalUtlOfDistance == 0.0) {
+			double capacity = link.getCapacity(time);
 			return travelTime
 			// * travelCostFactor
-					/ link.getCapacity(time);
+					/ capacity / capacity;
 			// }
 			// return travelTime * travelCostFactor - marginalUtlOfDistance
 			// * link.getLength();
@@ -106,9 +113,10 @@ public class LinkCapacityWeightedTravelCostListener implements
 		@Override
 		public double getLinkMinimumTravelCost(final Link link) {
 			// if (marginalUtlOfDistance == 0.0) {
+			double capacity = link.getCapacity();
 			return link.getLength() / link.getFreespeed()
 			// * travelCostFactor
-					/ link.getCapacity();
+					/ capacity / capacity;
 			// }
 			// return link.getLength() / link.getFreespeed() * travelCostFactor
 			// - marginalUtlOfDistance * link.getLength();
@@ -126,34 +134,8 @@ public class LinkCapacityWeightedTravelCostListener implements
 		Controler ctl = event.getControler();
 		if (event.getIteration() > ctl.getFirstIteration()) {
 			ctl
-					.setTravelCostCalculatorFactory(new LinkCapacityWeightedTravelCostCalculatorFactoryImpl());
+					.setTravelCostCalculatorFactory(new LinkCapacitySquareWeightedTravelCostCalculatorFactoryImpl());
 		}
 	}
-
-	// /**
-	// * changes the value of monetaryDistanceCostRateCar from default value 0
-	// to
-	// * -0.00012 by the end of the first iteration
-	// */
-	// @Override
-	// public void notifyIterationEnds(IterationEndsEvent event) {
-	// Controler ctl = event.getControler();
-	// int iter = event.getIteration();/* firstIter+1, +2, +3 */
-	// if (iter == ctl.getFirstIteration()) {
-	// PlanCalcScoreConfigGroup scoringCfg = ctl.getConfig().planCalcScore();
-	// scoringCfg.setMonetaryDistanceCostRateCar(-0.00012);
-	// ctl
-	// .setScoringFunctionFactory(new CharyparNagelScoringFunctionFactory(
-	// scoringCfg));
-	// }
-	// }
-
-	// public static void main(String[] args) {
-	// Controler controler = new ControlerWithRemoveOldestPlan(args);
-	// controler.addControlerListener(new SingleReRouteSelectedListener());
-	// controler.setWriteEventsInterval(0);
-	// controler.setCreateGraphs(false);
-	// controler.run();
-	// }
 
 }

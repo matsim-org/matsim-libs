@@ -40,11 +40,10 @@ import org.matsim.core.scoring.charyparNagel.CharyparNagelScoringFunctionFactory
  */
 public class SingleReRouteSelectedListener implements IterationStartsListener,
 		IterationEndsListener {
-	private double A, B;
+	private double A;
 
-	public SingleReRouteSelectedListener(double A, double B) {
+	public SingleReRouteSelectedListener(double A) {
 		this.A = A;
-		this.B = B;
 	}
 
 	@Override
@@ -53,7 +52,7 @@ public class SingleReRouteSelectedListener implements IterationStartsListener,
 		if (event.getIteration() > ctl.getFirstIteration()) {
 			ctl
 					.setTravelCostCalculatorFactory(new ParameterizedTravelCostCalculatorFactoryImpl(
-							A/* travelTime */, B/* travelDistance */));
+							A/* travelTime */));
 		}
 	}
 
@@ -66,7 +65,8 @@ public class SingleReRouteSelectedListener implements IterationStartsListener,
 		Controler ctl = event.getControler();
 		int iter = event.getIteration();/* firstIter+1, +2, +3 */
 		if (iter == ctl.getFirstIteration()) {
-			PlanCalcScoreConfigGroup scoringCfg = ctl.getConfig().planCalcScore();
+			PlanCalcScoreConfigGroup scoringCfg = ctl.getConfig()
+					.planCalcScore();
 			scoringCfg.setMonetaryDistanceCostRateCar(-0.00012);
 			ctl
 					.setScoringFunctionFactory(new CharyparNagelScoringFunctionFactory(
