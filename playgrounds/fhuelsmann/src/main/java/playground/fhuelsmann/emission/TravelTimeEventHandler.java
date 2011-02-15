@@ -40,14 +40,14 @@ AgentArrivalEventHandler,AgentDepartureEventHandler {
 	private final Network network;
 	private  HbefaObject[][] HbefaTable;
 
-	private LinkAndAgentAccountAnalyseModul linkAndAgentAccountAnalyseModul = new LinkAndAgentAccountAnalyseModul();
+	private LinkAndAgentAccountAnalysisModule linkAndAgentAccountAnalysisModule = new LinkAndAgentAccountAnalysisModule();
 
-	public LinkAndAgentAccountAnalyseModul getLinkAndAgentAccountAnalyseModul() {
-		return linkAndAgentAccountAnalyseModul;
+	public LinkAndAgentAccountAnalysisModule getLinkAndAgentAccountAnalyseModul() {
+		return linkAndAgentAccountAnalysisModule;
 	}
 
-	public void setLinkAndAgentAccountAnalyseModul(LinkAndAgentAccountAnalyseModul linkAndAgentAccountAnalyseModul) {
-		this.linkAndAgentAccountAnalyseModul = linkAndAgentAccountAnalyseModul;
+	public void setLinkAndAgentAccountAnalyseModul(LinkAndAgentAccountAnalysisModule linkAndAgentAccountAnalysisModule) {
+		this.linkAndAgentAccountAnalysisModule = linkAndAgentAccountAnalysisModule;
 	}
 
 	public TravelTimeEventHandler(final Network network,HbefaObject[][] HbefaTable) {
@@ -127,8 +127,8 @@ AgentArrivalEventHandler,AgentDepartureEventHandler {
 
 				this.agentarrival.remove(personId);
 
-				linkAndAgentAccountAnalyseModul.calculateEmissionsPerLink(travelTime, linkId, averageSpeed,roadType, freeVelocity, distance, HbefaTable);	
-				linkAndAgentAccountAnalyseModul.calculateEmissionsPerPerson(travelTime, personId, averageSpeed,roadType, freeVelocity, distance, HbefaTable);	
+				linkAndAgentAccountAnalysisModule.calculateEmissionsPerLink(travelTime, linkId, averageSpeed,roadType, freeVelocity, distance, HbefaTable);	
+				linkAndAgentAccountAnalysisModule.calculateEmissionsPerPerson(travelTime, personId, averageSpeed,roadType, freeVelocity, distance, HbefaTable);	
 			}
 			// if (this.agentarrival.containsKey(personId)) is not the case (link without activity)
 			else {
@@ -136,8 +136,8 @@ AgentArrivalEventHandler,AgentDepartureEventHandler {
 				double travelTime = event.getTime() - enterTime;
 				double averageSpeed=(distance/1000)/(travelTime/3600);
 
-				linkAndAgentAccountAnalyseModul.calculateEmissionsPerLink(travelTime, linkId, averageSpeed,roadType, freeVelocity, distance, HbefaTable);	
-				linkAndAgentAccountAnalyseModul.calculateEmissionsPerPerson(travelTime, personId, averageSpeed,roadType, freeVelocity, distance, HbefaTable);
+				linkAndAgentAccountAnalysisModule.calculateEmissionsPerLink(travelTime, linkId, averageSpeed,roadType, freeVelocity, distance, HbefaTable);	
+				linkAndAgentAccountAnalysisModule.calculateEmissionsPerPerson(travelTime, personId, averageSpeed,roadType, freeVelocity, distance, HbefaTable);
 			}
 		}
 		//		}

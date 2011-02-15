@@ -23,7 +23,7 @@ package playground.fhuelsmann.emission;
 import org.matsim.api.core.v01.Id;
 
 
-public interface analyseModul {
+public interface AnalysisModule {
 	
 	public void calculateEmissionsPerPerson(final double travelTime, final Id personId, final double averageSpeed, final int roadType, final double freeVelocity, final double distance,HbefaObject[][] hbefaTable);
 	

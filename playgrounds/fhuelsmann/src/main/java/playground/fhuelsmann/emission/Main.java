@@ -63,7 +63,7 @@ public class Main {
 		//create the handler 
 		TravelTimeEventHandler handler = new TravelTimeEventHandler(network,hbefaTable.getHbefaTableWithSpeedAndEmissionFactor());
 
-		LinkAndAgentAccountAnalyseModul linkAndAgentAccount = handler.getLinkAndAgentAccountAnalyseModul();
+		LinkAndAgentAccountAnalysisModule linkAndAgentAccount = handler.getLinkAndAgentAccountAnalyseModul();
 		//		LinkAndAgentAccountAnalyseModul linkAccount = new LinkAndAgentAccountAnalyseModul();
 
 		//add the handler

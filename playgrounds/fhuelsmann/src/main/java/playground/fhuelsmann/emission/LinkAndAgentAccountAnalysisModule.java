@@ -32,7 +32,7 @@ import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Id;
 
-public class LinkAndAgentAccountAnalyseModul implements analyseModul{
+public class LinkAndAgentAccountAnalysisModule implements AnalysisModule{
 
 	public  String findHbefaFromVisumRoadType(int roadType){
 		return this.roadTypes[roadType].getHBEFA_RT_NR();
