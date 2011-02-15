@@ -245,7 +245,7 @@ public class PTCountsNetworkSimplifierTest {
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(outNetwork);
 		
-		Assert.assertEquals(27, network.getLinks().size());
+		Assert.assertEquals(29, network.getLinks().size());
 		Assert.assertEquals(16, network.getNodes().size());
 		
 		Assert.assertNotNull(network.getLinks().get(new IdImpl("1101_1102")));
@@ -299,7 +299,7 @@ public class PTCountsNetworkSimplifierTest {
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(outNetwork);
 		
-		Assert.assertEquals(31, network.getLinks().size());
+		Assert.assertEquals(32, network.getLinks().size());
 		Assert.assertEquals(18, network.getNodes().size());
 		
 		Assert.assertNotNull(network.getLinks().get(new IdImpl("1101_1102")));
@@ -313,7 +313,7 @@ public class PTCountsNetworkSimplifierTest {
 		Assert.assertNotNull(network.getLinks().get(new IdImpl("1204_1203")));
 		Assert.assertNotNull(network.getLinks().get(new IdImpl("1314_1313")));
 		
-		Assert.assertNull(network.getLinks().get(new IdImpl("1203_1202")));
+		Assert.assertNull(network.getLinks().get(new IdImpl("1202_1201")));
 	}
 	
 }
