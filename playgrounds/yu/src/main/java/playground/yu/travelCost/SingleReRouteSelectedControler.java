@@ -139,6 +139,17 @@ public class SingleReRouteSelectedControler extends Controler {
 		controler.run();
 	}
 
+	/* ../matsimTests/diverseRoutes/speedCapacitySqrtCombiWeighted.xml */
+	public static void speedCapacitySqrtCombiWeightedTravelTimeCost(
+			String[] args) {
+		Controler controler = new SingleReRouteSelectedControler(args[0]);
+		controler
+				.addControlerListener(new SpeedCapacitySqrtCombiWeightedTravelCostListener());
+		controler.setWriteEventsInterval(0);
+		controler.setOverwriteFiles(true);
+		controler.run();
+	}
+
 	public static void main(String[] args) {
 		// travelTimeCostWeight(args);
 		// tightTurnPenalty(args);
@@ -147,6 +158,7 @@ public class SingleReRouteSelectedControler extends Controler {
 		// capacitySqrtWeightedTravelTimeCost(args);
 		// speedWeightedTravelTimeCost(args);
 		// speedSquareWeightedTravelTimeCost(args);
-		speedSqrtWeightedTravelTimeCost(args);
+//		speedSqrtWeightedTravelTimeCost(args);
+		speedCapacitySqrtCombiWeightedTravelTimeCost(args);
 	}
 }
