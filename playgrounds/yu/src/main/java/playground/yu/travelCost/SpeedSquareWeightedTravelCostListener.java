@@ -42,14 +42,16 @@ import org.matsim.core.router.util.TravelTime;
  * @author yu
  * 
  */
-public class SpeedSquareWeightedTravelCostListener implements IterationStartsListener {
-	public static class SpeedSquareWeightedTravelCostCalculatorFactoryImpl implements
-			TravelCostCalculatorFactory {
+public class SpeedSquareWeightedTravelCostListener implements
+		IterationStartsListener {
+	public static class SpeedSquareWeightedTravelCostCalculatorFactoryImpl
+			implements TravelCostCalculatorFactory {
 
 		public PersonalizableTravelCost createTravelCostCalculator(
 				PersonalizableTravelTime timeCalculator,
 				PlanCalcScoreConfigGroup cnScoringGroup) {
-			return new SpeedSquareWeightedTravelTimeCostCalculator(timeCalculator);
+			return new SpeedSquareWeightedTravelTimeCostCalculator(
+					timeCalculator);
 		}
 
 	}
@@ -94,7 +96,8 @@ public class SpeedSquareWeightedTravelCostListener implements IterationStartsLis
 			double travelTime = timeCalculator.getLinkTravelTime(link, time);
 			// if (marginalUtlOfDistance == 0.0) {
 			return travelTime
-			// * travelCostFactor
+					// * travelCostFactor
+					/ (link.getLength() / travelTime)
 					/ (link.getLength() / travelTime);
 			// }
 			// return travelTime * travelCostFactor - marginalUtlOfDistance
@@ -106,7 +109,7 @@ public class SpeedSquareWeightedTravelCostListener implements IterationStartsLis
 			// if (marginalUtlOfDistance == 0.0) {
 			return link.getLength() / link.getFreespeed()
 			// * travelCostFactor
-					/ link.getFreespeed();
+					/ link.getFreespeed() / link.getFreespeed();
 			// }
 			// return link.getLength() / link.getFreespeed() * travelCostFactor
 			// - marginalUtlOfDistance * link.getLength();
