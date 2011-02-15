@@ -36,7 +36,9 @@ public class Main {
 		// INPUT
 		String runDirectory = "../../detailedEval/testRuns/output/1pct/v0-default/run6/";
 		String eventsFile = runDirectory + "ITERS/it.10/10.events.txt.gz";
-		String netfile = runDirectory + "output_network.xml.gz";
+		String netfile = "../../detailedEval/network-86-85-87-84.xml";
+		//		String netfile = runDirectory + "output_network.xml.gz";
+		
 		//		String visumRoadHebefaRoadFile = "../../detailedEval/teststrecke/sim/inputEmissions/road_types.txt";
 		String hbefaEmissionFactors = "../../detailedEval/teststrecke/sim/inputEmissions/hbefa_emission_factors_EU3_D.txt";
 		//		String Hbefa_Cold_Traffic = "../../detailedEval/teststrecke/sim/inputEmissions/hbefa_coldstart_emission_factors.txt";
