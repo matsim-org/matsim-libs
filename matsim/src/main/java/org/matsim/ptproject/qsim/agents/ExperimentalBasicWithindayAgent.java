@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.ptproject.qsim.interfaces.Mobsim;
 
 /**This class is an attempt to provide access to the internals of DefaultPersonDriverAgent
@@ -35,8 +36,19 @@ import org.matsim.ptproject.qsim.interfaces.Mobsim;
  */
 public class ExperimentalBasicWithindayAgent extends PersonDriverAgentImpl implements WithinDayAgent {
 
+	private Plan executedPlan;
+	
 	public ExperimentalBasicWithindayAgent(Person p, Mobsim simulation) {
 		super(p, simulation);
+		
+		/*
+		 * Create a copy of the person's selected plan.
+		 * Notice that the executedPlan has a pointer to the person that is
+		 * simulated with this Agent but is NOT added to the person's list of plans!
+		 * The simulation should still score the person's selected plan. 
+		 */
+		executedPlan = new PlanImpl(p);
+		((PlanImpl)executedPlan).copyPlan(p.getSelectedPlan());
 	}
 
 //	public final List<PlanElement> getModifiablePlanElements() {
@@ -75,6 +87,12 @@ public class ExperimentalBasicWithindayAgent extends PersonDriverAgentImpl imple
 	}
 
 	@Override
+	public Plan getExecutedPlan() {
+		return executedPlan;
+	}
+	
+	@Override
+	//yyyy suggest merging with getExecutedPlan(). cdobler, feb'10
 	public final Plan getModifiablePlan() {
 		// yyyy for the time being, this returns the Person's selected plan, but this should be changed. kai, nov'10
 		return this.person.getSelectedPlan();

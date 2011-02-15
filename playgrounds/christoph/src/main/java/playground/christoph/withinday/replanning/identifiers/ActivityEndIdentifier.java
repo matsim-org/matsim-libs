@@ -30,7 +30,6 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.mobsim.framework.PersonAgent;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.ptproject.qsim.agents.WithinDayAgent;
 
@@ -69,12 +68,11 @@ public class ActivityEndIdentifier extends DuringActivityIdentifier {
 			 * Additionally check some special cases (next Leg on the same Link,
 			 * next Activity with duration 0)
 			 */
-			// get person and selected plan
-			PersonImpl person = (PersonImpl)withinDayPersonAgent.getPerson();
-			PlanImpl selectedPlan = (PlanImpl)person.getSelectedPlan(); 
+			// get executed plan
+			PlanImpl executedPlan = (PlanImpl)withinDayPersonAgent.getExecutedPlan();
 			
 			// If we don't have a selected plan
-			if (selectedPlan == null) {
+			if (executedPlan == null) {
 				continue;
 			}
 			
@@ -90,12 +88,12 @@ public class ActivityEndIdentifier extends DuringActivityIdentifier {
 				currentActivity = (Activity) currentPlanElement;
 			} else continue;
 			
-			nextLeg = selectedPlan.getNextLeg(currentActivity);
+			nextLeg = executedPlan.getNextLeg(currentActivity);
 			if (nextLeg == null) {
 				continue;
 			}
 			
-			nextActivity = selectedPlan.getNextActivity(nextLeg);
+			nextActivity = executedPlan.getNextActivity(nextLeg);
 			
 			/*
 			 * By default we replan the leg after the current Activity, but there are
@@ -117,12 +115,12 @@ public class ActivityEndIdentifier extends DuringActivityIdentifier {
 					break;
 				}				
 			
-				nextLeg = selectedPlan.getNextLeg(nextActivity);
+				nextLeg = executedPlan.getNextLeg(nextActivity);
 				if (nextLeg == null) {
 					removeAgent = true;
 					break;
 				}
-				nextActivity = selectedPlan.getNextActivity(nextLeg);
+				nextActivity = executedPlan.getNextActivity(nextLeg);
 			}
 			
 			/*

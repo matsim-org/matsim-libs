@@ -35,12 +35,10 @@ public class ReplannerOldPeople extends WithinDayDuringActivityReplanner {
 		// If we don't have a valid personAgent (only extra security)
 		if (withinDayAgent == null) return false;
 			
-		Person person = withinDayAgent.getPerson();
-		PlanImpl selectedPlan = (PlanImpl)person.getSelectedPlan(); 
-		
-		// If we don't have a selected plan
-		// (only extra security)
-		if (selectedPlan == null) return false;
+		PlanImpl executedPlan = (PlanImpl)withinDayAgent.getExecutedPlan();
+
+		// If we don't have an executed plan
+		if (executedPlan == null) return false;
 		
 		Activity currentActivity;
 		/*
@@ -53,21 +51,21 @@ public class ReplannerOldPeople extends WithinDayDuringActivityReplanner {
 		
 		// modify plan (the agent wants to perform an additional work activity at link 22 before going home
 		// therefore the agent needs to create new route and re-routing for the rest of the plan.
-		Leg homeLeg = selectedPlan.getNextLeg(currentActivity);
-		Activity homeAct = selectedPlan.getNextActivity(homeLeg);
-		int homeLegIndex = selectedPlan.getActLegIndex(homeLeg);
+		Leg homeLeg = executedPlan.getNextLeg(currentActivity);
+		Activity homeAct = executedPlan.getNextActivity(homeLeg);
+		int homeLegIndex = executedPlan.getActLegIndex(homeLeg);
 		
 		ActivityImpl newWorkAct = new ActivityImpl("w", this.scenario.createId("22"));
 		newWorkAct.setDuration(3600);
 		
 		LegImpl legToNewWork = new LegImpl(TransportMode.car);
 		
-		int legToNewWorkIndex = selectedPlan.getActLegIndex(currentActivity) + 1;
-		selectedPlan.insertLegAct(legToNewWorkIndex, legToNewWork, newWorkAct);
+		int legToNewWorkIndex = executedPlan.getActLegIndex(currentActivity) + 1;
+		executedPlan.insertLegAct(legToNewWorkIndex, legToNewWork, newWorkAct);
 		
 		// replan the new Legs
-		new EditRoutes().replanFutureLegRoute(selectedPlan, legToNewWorkIndex, routeAlgo);
-		new EditRoutes().replanFutureLegRoute(selectedPlan, homeLegIndex, routeAlgo);
+		new EditRoutes().replanFutureLegRoute(executedPlan, legToNewWorkIndex, routeAlgo);
+		new EditRoutes().replanFutureLegRoute(executedPlan, homeLegIndex, routeAlgo);
 				
 		return true;
 	}

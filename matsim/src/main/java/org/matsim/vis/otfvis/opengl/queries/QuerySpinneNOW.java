@@ -24,7 +24,7 @@ public class QuerySpinneNOW extends QuerySpinne {
 		List<Plan> actPersons = new ArrayList<Plan>();
 		VisLink link = net.getVisLinks().get(queryLinkId);
 		Collection<? extends VisVehicle> vehs = link.getAllVehicles();
-		for( VisVehicle veh : vehs) actPersons.add(veh.getDriver().getPerson().getSelectedPlan());
+		for( VisVehicle veh : vehs) actPersons.add(veh.getDriver().getExecutedPlan());
 		
 		return actPersons;
 	}

@@ -22,8 +22,7 @@ package playground.christoph.withinday.replanning.replanners;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.ptproject.qsim.agents.WithinDayAgent;
 
 import playground.christoph.withinday.replanning.replanners.NextLegReplanner;
@@ -67,20 +66,18 @@ public class NextLegReplanner extends WithinDayDuringActivityReplanner {
 		// If we don't have a valid personAgent
 		if (withinDayAgent == null) return false;
 				
-		Person person = withinDayAgent.getPerson();
-		PlanImpl selectedPlan = (PlanImpl)person.getSelectedPlan(); 
+		Plan executedPlan = withinDayAgent.getExecutedPlan(); 
 		
-		// If we don't have a selected plan
-		if (selectedPlan == null) return false;
-		
-		
+		// If we don't have an executed plan
+		if (executedPlan == null) return false;
+				
 		/*
 		 *  Get the index of the current PlanElement
 		 */
 		int currentPlanElementIndex = withinDayAgent.getCurrentPlanElementIndex();
 				
 		// new Route for next Leg
-		new EditRoutes().replanFutureLegRoute(selectedPlan, currentPlanElementIndex + 1, routeAlgo);
+		new EditRoutes().replanFutureLegRoute(executedPlan, currentPlanElementIndex + 1, routeAlgo);
 
 //		// create ReplanningEvent
 //		QSim.getEvents().processEvent(new ExtendedAgentReplanEventImpl(time, person.getId(), (NetworkRouteWRefs)alternativeRoute, (NetworkRouteWRefs)originalRoute));

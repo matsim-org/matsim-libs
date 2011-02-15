@@ -29,15 +29,14 @@ public class ReplannerYoungPeople extends WithinDayDuringLegReplanner {
 		// If we don't have a valid personAgent
 		if (withinDayAgent == null) return false;
 
-		Person person = withinDayAgent.getPerson();
-		PlanImpl selectedPlan = (PlanImpl)person.getSelectedPlan();
+		PlanImpl executedPlan = (PlanImpl)withinDayAgent.getExecutedPlan();
 
-		// If we don't have a selected plan
-		if (selectedPlan == null) return false;
+		// If we don't have an executed plan
+		if (executedPlan == null) return false;
 
 		Leg currentLeg = withinDayAgent.getCurrentLeg();
 		int currentLegIndex = withinDayAgent.getCurrentPlanElementIndex();
-		Activity nextActivity = selectedPlan.getNextActivity(currentLeg);
+		Activity nextActivity = executedPlan.getNextActivity(currentLeg);
 
 		// If it is not a car Leg we don't replan it.
 		if (!currentLeg.getMode().equals(TransportMode.car)) return false;
@@ -46,7 +45,7 @@ public class ReplannerYoungPeople extends WithinDayDuringLegReplanner {
 		newWorkAct.setDuration(3600);
 
 		// Replace Activity
-		new ReplacePlanElements().replaceActivity(selectedPlan, nextActivity, newWorkAct);
+		new ReplacePlanElements().replaceActivity(executedPlan, nextActivity, newWorkAct);
 		
 		/*
 		 *  Replan Routes
@@ -54,12 +53,12 @@ public class ReplannerYoungPeople extends WithinDayDuringLegReplanner {
 		int currentPlanElementIndex =  withinDayAgent.getCurrentPlanElementIndex();
 		
 		// new Route for current Leg
-		new EditRoutes().replanCurrentLegRoute(selectedPlan, currentLegIndex, currentPlanElementIndex, routeAlgo, scenario.getNetwork(), time);
+		new EditRoutes().replanCurrentLegRoute(executedPlan, currentLegIndex, currentPlanElementIndex, routeAlgo, scenario.getNetwork(), time);
 		
 		// new Route for next Leg
-		Leg homeLeg = selectedPlan.getNextLeg(newWorkAct);
-		int homeLegIndex = selectedPlan.getPlanElements().indexOf(homeLeg);
-		new EditRoutes().replanFutureLegRoute(selectedPlan, homeLegIndex, routeAlgo);
+		Leg homeLeg = executedPlan.getNextLeg(newWorkAct);
+		int homeLegIndex = executedPlan.getPlanElements().indexOf(homeLeg);
+		new EditRoutes().replanFutureLegRoute(executedPlan, homeLegIndex, routeAlgo);
 		
 		// finally reset the cached Values of the PersonAgent - they may have changed!
 		withinDayAgent.resetCaches();

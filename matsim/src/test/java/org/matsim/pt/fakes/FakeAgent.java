@@ -27,11 +27,13 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.pt.qsim.PassengerAgent;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
@@ -165,4 +167,8 @@ public class FakeAgent implements PersonDriverAgent, PassengerAgent {
 		return 1.0;
 	}
 
+	@Override
+	public Plan getExecutedPlan() {
+		return PopulationUtils.unmodifiablePlan(this.dummyPerson.getSelectedPlan());
+	}
 }

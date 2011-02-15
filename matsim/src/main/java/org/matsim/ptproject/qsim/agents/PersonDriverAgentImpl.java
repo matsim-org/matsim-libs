@@ -402,7 +402,7 @@ public class PersonDriverAgentImpl implements PersonDriverAgent {
 	 * @return list of {@link ActivityImpl}s and {@link LegImpl}s of this agent's plan
 	 */
 	private final List<PlanElement> getPlanElements() {
-		return Collections.unmodifiableList( this.getPlan().getPlanElements() ) ;
+		return Collections.unmodifiableList( this.getExecutedPlan().getPlanElements() ) ;
 	}
 
 	public final Mobsim getMobsim(){
@@ -484,8 +484,19 @@ public class PersonDriverAgentImpl implements PersonDriverAgent {
 		return this.person.getId();
 	}
 
-	public final Plan getPlan() {
-		return PopulationUtils.unmodifiablePlan( this.person.getSelectedPlan() ) ;
+	/*
+	 *  Might be merged with getExecutedPlan().
+	 *  Seems to be used only by getCurrentPlanElement() - trying to replace it with
+	 *  calls to getExecutedPlan().
+	 *  cdobler, feb'11
+	 */
+//	public final Plan getPlan() {
+//		return PopulationUtils.unmodifiablePlan( this.person.getSelectedPlan() ) ;
+//	}
+
+	@Override
+	public Plan getExecutedPlan() {
+		return PopulationUtils.unmodifiablePlan(this.person.getSelectedPlan());
 	}
 
 }

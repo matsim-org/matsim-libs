@@ -60,11 +60,10 @@ public class ExtendCurrentActivityReplanner extends WithinDayDuringActivityRepla
 			withinDayPersonAgent = (WithinDayPersonAgent) withinDayAgent;
 		}
 	
-		PersonImpl person = (PersonImpl)withinDayPersonAgent.getPerson();
-		PlanImpl selectedPlan = (PlanImpl)person.getSelectedPlan(); 
-		
-		// If we don't have a selected plan
-		if (selectedPlan == null) return false;
+		PlanImpl executedPlan = (PlanImpl)withinDayAgent.getExecutedPlan();
+
+		// If we don't have an executed plan
+		if (executedPlan == null) return false;
 		
 		Activity currentActivity;
 
@@ -93,10 +92,10 @@ public class ExtendCurrentActivityReplanner extends WithinDayDuringActivityRepla
 		currentActivity.setEndTime(Time.UNDEFINED_TIME);
 				
 		// Remove all legs and activities after the current activity.
-		int currentActivityIndex = selectedPlan.getActLegIndex(currentActivity);
+		int currentActivityIndex = executedPlan.getActLegIndex(currentActivity);
 		
-		while (selectedPlan.getPlanElements().size() - 1 > currentActivityIndex) {
-			selectedPlan.removeActivity(selectedPlan.getPlanElements().size() - 1);
+		while (executedPlan.getPlanElements().size() - 1 > currentActivityIndex) {
+			executedPlan.removeActivity(executedPlan.getPlanElements().size() - 1);
 		}
 	
 		/*

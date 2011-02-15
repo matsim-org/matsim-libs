@@ -31,6 +31,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.transitSchedule.api.Departure;
@@ -141,6 +142,11 @@ public class TransitDriver extends AbstractTransitDriver {
 	@Override
 	public PlanElement getNextPlanElement() {
 		throw new UnsupportedOperationException() ;
+	}
+
+	@Override
+	public Plan getExecutedPlan() {
+		return PopulationUtils.unmodifiablePlan(this.getPerson().getSelectedPlan());
 	}
 
 }

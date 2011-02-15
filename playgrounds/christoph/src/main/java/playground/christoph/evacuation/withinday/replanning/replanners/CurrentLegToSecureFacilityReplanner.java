@@ -82,15 +82,14 @@ public class CurrentLegToSecureFacilityReplanner extends WithinDayDuringLegRepla
 			withinDayPersonAgent = (WithinDayPersonAgent) withinDayAgent;
 		}
 
-		PersonImpl person = (PersonImpl)withinDayPersonAgent.getPerson();
-		PlanImpl selectedPlan = (PlanImpl)person.getSelectedPlan();
+		PlanImpl executedPlan = (PlanImpl)withinDayAgent.getExecutedPlan();
 
-		// If we don't have a selected plan
-		if (selectedPlan == null) return false;
+		// If we don't have an executed plan
+		if (executedPlan == null) return false;
 
 		int currentLegIndex = withinDayAgent.getCurrentPlanElementIndex();
 		Leg currentLeg = withinDayAgent.getCurrentLeg();
-		Activity nextActivity = selectedPlan.getNextActivity(currentLeg);
+		Activity nextActivity = executedPlan.getNextActivity(currentLeg);
 		
 		// If it is not a car Leg we don't replan it.
 //		if (!currentLeg.getMode().equals(TransportMode.car)) return false;
@@ -104,7 +103,7 @@ public class CurrentLegToSecureFacilityReplanner extends WithinDayDuringLegRepla
 		 * we only have to replace that Activity.
 		 */
 		if (currentLeg.getRoute().getEndLinkId().equals(currentLink.getId())) {
-			rescueActivity = nextActivityAtCurrentLink(currentLink, selectedPlan, nextActivity);
+			rescueActivity = nextActivityAtCurrentLink(currentLink, executedPlan, nextActivity);
 		}
 		
 		else {
@@ -124,18 +123,18 @@ public class CurrentLegToSecureFacilityReplanner extends WithinDayDuringLegRepla
 			Coord rescueCoord = ((ScenarioImpl)scenario).getActivityFacilities().getFacilities().get(scenario.createId(idString)).getCoord();
 			((ActivityImpl)rescueActivity).setCoord(rescueCoord);
 			
-			new ReplacePlanElements().replaceActivity(selectedPlan, nextActivity, rescueActivity);
+			new ReplacePlanElements().replaceActivity(executedPlan, nextActivity, rescueActivity);
 			
 			int currentLinkIndex = withinDayAgent.getCurrentRouteLinkIdIndex();
 			// new Route for current Leg
-			new EditRoutes().replanCurrentLegRoute(selectedPlan, currentLegIndex, currentLinkIndex, routeAlgo, scenario.getNetwork(), time);
+			new EditRoutes().replanCurrentLegRoute(executedPlan, currentLegIndex, currentLinkIndex, routeAlgo, scenario.getNetwork(), time);
 		}
 		
 		// Remove all legs and activities after the next activity.
-		int nextActivityIndex = selectedPlan.getActLegIndex(rescueActivity);
+		int nextActivityIndex = executedPlan.getActLegIndex(rescueActivity);
 		
-		while (selectedPlan.getPlanElements().size() - 1 > nextActivityIndex) {
-			selectedPlan.removeActivity(selectedPlan.getPlanElements().size() - 1);
+		while (executedPlan.getPlanElements().size() - 1 > nextActivityIndex) {
+			executedPlan.removeActivity(executedPlan.getPlanElements().size() - 1);
 		}
 		
 		// Finally reset the cached Values of the PersonAgent - they may have changed!

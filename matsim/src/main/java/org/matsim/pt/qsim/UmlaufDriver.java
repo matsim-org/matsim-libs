@@ -33,6 +33,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.Umlauf;
@@ -208,6 +209,11 @@ public class UmlaufDriver extends AbstractTransitDriver {
 	@Override
 	public double getActivityEndTime() {
 		return this.departureTime;
+	}
+	
+	@Override
+	public Plan getExecutedPlan() {
+		return PopulationUtils.unmodifiablePlan(this.getPerson().getSelectedPlan());
 	}
 
 }

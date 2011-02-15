@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 
 /**Design decisions:<ul>
@@ -152,4 +153,13 @@ public interface PlanAgent extends NetworkAgent, Identifiable {
 	 */
 	public boolean initializeAndCheckIfAlive();
 	
+	/**
+	 * Design thoughts:<ul>
+	 * <li> yyyy Many methods call PersonAgent.getPerson.getSelectedPlan(). This method should replace
+	 * all those calls. This might be useful, for multiple reasons.<br>
+	 * E.g. an unmodifyable plan could be returned or a copy of the selected plan, which then could
+	 * be edited by a within day replanning module.  cdobler, feb'11
+	 * </ul>
+	 */
+	public Plan getExecutedPlan();
 }

@@ -29,12 +29,12 @@ import org.matsim.core.mobsim.framework.PersonAgent;
  */
 public interface WithinDayAgent extends PersonAgent {
 	
-	public void resetCaches() ;
+	public void resetCaches();
 
 	public Integer getCurrentPlanElementIndex();
 
 	public Integer getCurrentRouteLinkIdIndex();
 	
-	public Plan getModifiablePlan() ;
+	public Plan getModifiablePlan();
 
 }

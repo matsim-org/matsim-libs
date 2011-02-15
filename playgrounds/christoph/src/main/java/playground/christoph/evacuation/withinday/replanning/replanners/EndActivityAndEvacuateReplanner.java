@@ -57,11 +57,10 @@ public class EndActivityAndEvacuateReplanner extends WithinDayDuringActivityRepl
 		// If we don't have a valid PersonAgent
 		if (withinDayAgent == null) return false;
 	
-		Person person = withinDayAgent.getPerson();
-		PlanImpl selectedPlan = (PlanImpl)person.getSelectedPlan(); 
-		
-		// If we don't have a selected plan
-		if (selectedPlan == null) return false;
+		PlanImpl executedPlan = (PlanImpl)withinDayAgent.getExecutedPlan();
+
+		// If we don't have an executed plan
+		if (executedPlan == null) return false;
 		
 		Activity currentActivity;
 		
@@ -84,14 +83,14 @@ public class EndActivityAndEvacuateReplanner extends WithinDayDuringActivityRepl
 		currentActivity.setEndTime(this.time);
 
 		// get the index of the currently performed activity in the selected plan
-		int currentActivityIndex = selectedPlan.getActLegIndex(currentActivity);
+		int currentActivityIndex = executedPlan.getActLegIndex(currentActivity);
 
 		// identify the TransportMode for the rescueLeg
-		String transportMode = identifyTransportMode(currentActivityIndex, selectedPlan);
+		String transportMode = identifyTransportMode(currentActivityIndex, executedPlan);
 		
 		// Remove all legs and activities after the current activity.
-		while (selectedPlan.getPlanElements().size() - 1 > currentActivityIndex) {
-			selectedPlan.removeActivity(selectedPlan.getPlanElements().size() - 1);
+		while (executedPlan.getPlanElements().size() - 1 > currentActivityIndex) {
+			executedPlan.removeActivity(executedPlan.getPlanElements().size() - 1);
 		}
 		
 		PopulationFactory factory = scenario.getPopulation().getFactory();
@@ -112,11 +111,11 @@ public class EndActivityAndEvacuateReplanner extends WithinDayDuringActivityRepl
 		Leg legToRescue = factory.createLeg(transportMode);
 			
 		// add new activity
-		int position = selectedPlan.getActLegIndex(currentActivity) + 1;
-		selectedPlan.insertLegAct(position, legToRescue, rescueActivity);
+		int position = executedPlan.getActLegIndex(currentActivity) + 1;
+		executedPlan.insertLegAct(position, legToRescue, rescueActivity);
 			
 		// calculate route for the leg to the rescue facility
-		new EditRoutes().replanFutureLegRoute(selectedPlan, position, routeAlgo);
+		new EditRoutes().replanFutureLegRoute(executedPlan, position, routeAlgo);
 
 		/*
 		 * Reschedule the currently performed Activity in the Mobsim - there

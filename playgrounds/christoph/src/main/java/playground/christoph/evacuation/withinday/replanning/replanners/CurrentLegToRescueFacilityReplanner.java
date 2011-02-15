@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.misc.Time;
@@ -62,15 +63,14 @@ public class CurrentLegToRescueFacilityReplanner extends WithinDayDuringLegRepla
 			withinDayPersonAgent = (WithinDayPersonAgent) withinDayAgent;
 		}
 
-		Person person = withinDayPersonAgent.getPerson();
-		PlanImpl selectedPlan = (PlanImpl)person.getSelectedPlan();
+		PlanImpl executedPlan = (PlanImpl)withinDayAgent.getExecutedPlan();
 
-		// If we don't have a selected plan
-		if (selectedPlan == null) return false;
+		// If we don't have an executed plan
+		if (executedPlan == null) return false;
 
 		int currentLegIndex = withinDayAgent.getCurrentPlanElementIndex();
 		int currentLinkIndex = withinDayAgent.getCurrentRouteLinkIdIndex();
-		Activity nextActivity = (Activity) selectedPlan.getPlanElements().get(withinDayAgent.getCurrentPlanElementIndex() + 1);
+		Activity nextActivity = (Activity) executedPlan.getPlanElements().get(withinDayAgent.getCurrentPlanElementIndex() + 1);
 				
 		// If it is not a car Leg we don't replan it.
 //		if (!currentLeg.getMode().equals(TransportMode.car)) return false;
@@ -95,17 +95,17 @@ public class CurrentLegToRescueFacilityReplanner extends WithinDayDuringLegRepla
 			nextActivity.setEndTime(this.time);
 			
 			// Remove all legs and activities after the next activity.
-			int nextActivityIndex = selectedPlan.getActLegIndex(nextActivity);
+			int nextActivityIndex = executedPlan.getActLegIndex(nextActivity);
 			
-			while (selectedPlan.getPlanElements().size() - 1 > nextActivityIndex) {
-				selectedPlan.removeActivity(selectedPlan.getPlanElements().size() - 1);
+			while (executedPlan.getPlanElements().size() - 1 > nextActivityIndex) {
+				executedPlan.removeActivity(executedPlan.getPlanElements().size() - 1);
 			}
 			
-			Leg newLeg = selectedPlan.createAndAddLeg(TransportMode.car);
-			int position = selectedPlan.getPlanElements().size() - 1; 
-			selectedPlan.addActivity(rescueActivity);
+			Leg newLeg = executedPlan.createAndAddLeg(TransportMode.car);
+			int position = executedPlan.getPlanElements().size() - 1; 
+			executedPlan.addActivity(rescueActivity);
 			
-			new EditRoutes().replanFutureLegRoute(selectedPlan, position, routeAlgo);
+			new EditRoutes().replanFutureLegRoute(executedPlan, position, routeAlgo);
 		}
 		
 		else {
@@ -116,17 +116,17 @@ public class CurrentLegToRescueFacilityReplanner extends WithinDayDuringLegRepla
 //			((ActivityImpl)rescueActivity).setFacilityId(scenario.createId("rescueFacility"));
 //			rescueActivity.setEndTime(Time.UNDEFINED_TIME);
 			
-			new ReplacePlanElements().replaceActivity(selectedPlan, nextActivity, rescueActivity);
+			new ReplacePlanElements().replaceActivity(executedPlan, nextActivity, rescueActivity);
 			
 			// new Route for current Leg
-			new EditRoutes().replanCurrentLegRoute(selectedPlan, currentLegIndex, currentLinkIndex, routeAlgo, scenario.getNetwork(), time);
+			new EditRoutes().replanCurrentLegRoute(executedPlan, currentLegIndex, currentLinkIndex, routeAlgo, scenario.getNetwork(), time);
 			
 			// Remove all legs and activities after the next activity.
-			int nextActivityIndex = selectedPlan.getActLegIndex(rescueActivity);
+			int nextActivityIndex = executedPlan.getActLegIndex(rescueActivity);
 			
-			while (selectedPlan.getPlanElements().size() - 1 > nextActivityIndex)
+			while (executedPlan.getPlanElements().size() - 1 > nextActivityIndex)
 			{
-				selectedPlan.removeActivity(selectedPlan.getPlanElements().size() - 1);
+				executedPlan.removeActivity(executedPlan.getPlanElements().size() - 1);
 			}
 			
 			// Finally reset the cached Values of the PersonAgent - they may have changed!

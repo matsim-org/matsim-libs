@@ -22,7 +22,6 @@ package playground.christoph.withinday.replanning.replanners;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.ptproject.qsim.agents.WithinDayAgent;
 
@@ -68,11 +67,10 @@ public class CurrentLegReplanner extends WithinDayDuringLegReplanner {
 		// If we don't have a valid PersonAgent
 		if (withinDayAgent == null) return false;
 
-		Person person = withinDayAgent.getPerson();
-		Plan selectedPlan = person.getSelectedPlan();
+		Plan executedPlan = withinDayAgent.getExecutedPlan();
 
-		// If we don't have a selected plan
-		if (selectedPlan == null) return false;
+		// If we don't have an executed plan
+		if (executedPlan == null) return false;
 
 
 		// If it is not a car Leg we don't replan it.
@@ -82,7 +80,7 @@ public class CurrentLegReplanner extends WithinDayDuringLegReplanner {
 		int currentLinkIndex = withinDayAgent.getCurrentRouteLinkIdIndex();
 		
 		// new Route for current Leg
-		new EditRoutes().replanCurrentLegRoute(selectedPlan, currentLegIndex, currentLinkIndex, routeAlgo, scenario.getNetwork(), time);
+		new EditRoutes().replanCurrentLegRoute(executedPlan, currentLegIndex, currentLinkIndex, routeAlgo, scenario.getNetwork(), time);
 
 		// Finally reset the cached Values of the PersonAgent - they may have changed!
 		withinDayAgent.resetCaches();
