@@ -46,7 +46,6 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.network.algorithms.NetworkCalcTopoType;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
@@ -55,7 +54,6 @@ import org.matsim.counts.Counts;
 import org.matsim.counts.CountsReaderMatsimV1;
 import org.matsim.counts.CountsWriter;
 import org.matsim.counts.Volume;
-import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
@@ -199,7 +197,7 @@ public class PTCountsNetworkSimplifier {
 				new CountsWriter(this.outCounts).write(this.countsOutFile);
 			}
 			log.info("Running network cleaner... Result may not be consistent with countsfile");
-			new NetworkCleaner().run(this.netOutFile, this.netOutFile);
+			new NetworkCleaner().run(this.netOutFile + "_not_cleaned.xml", this.netOutFile);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -257,7 +255,7 @@ public class PTCountsNetworkSimplifier {
 				nextMessageAt = 2 * nodesProcessed;
 			}
 
-			if(this.nodeTypesToMerge.contains(Integer.valueOf(nodeTopo.getTopoType(node)))){
+			if(this.nodeTypesToMerge.contains(Integer.valueOf(nodeTopo.run(node)))){
 
 				List<Link> iLinks = new ArrayList<Link> (node.getInLinks().values());
 
