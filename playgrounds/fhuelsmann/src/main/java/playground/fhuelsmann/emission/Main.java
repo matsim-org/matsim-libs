@@ -39,9 +39,10 @@ public class Main {
 		String eventsFile = runDirectory + "ITERS/it.10/10.events.txt.gz";
 		String netFile = "../../detailedEval/Net/network-86-85-87-84.xml";
 		//		String netfile = runDirectory + "output_network.xml.gz";
-		
+
 		String visum2hbefaRoadTypeFile = "../../detailedEval/teststrecke/sim/inputEmissions/road_types.txt";
-		String hbefaEmissionFactorsFile = "../../detailedEval/teststrecke/sim/inputEmissions/hbefa_emission_factors_EU3_D.txt";
+		String hbefaGasolineEmissionFactorsFile = "";
+		String hbefaDieselEmissionFactorsFile = "../../detailedEval/teststrecke/sim/inputEmissions/hbefa_emission_factors_EU3_D.txt";
 		//		String Hbefa_Cold_Traffic = "../../detailedEval/teststrecke/sim/inputEmissions/hbefa_coldstart_emission_factors.txt";
 
 
@@ -55,8 +56,9 @@ public class Main {
 
 		// ?? was passiert hier ??
 		HbefaTable hbefaTable = new HbefaTable();
-		hbefaTable.makeHbefaTable(hbefaEmissionFactorsFile);
-		
+		hbefaTable.makeHbefaTable(hbefaGasolineEmissionFactorsFile);
+		//		hbefaTable.makeHbefaTable(hbefaDieselEmissionFactorsFile);
+
 		VisumObject[] roadTypes = new VisumObject[100];
 		EmissionsPerEvent emissionFactor = new EmissionsPerEvent();
 
@@ -66,7 +68,7 @@ public class Main {
 
 		LinkAndAgentAccountAnalysisModule linkAndAgentAccount = new LinkAndAgentAccountAnalysisModule(roadTypes, emissionFactor);
 		linkAndAgentAccount.createRoadTypes(visum2hbefaRoadTypeFile);
-		
+
 		//create the handler 
 		TravelTimeEventHandler handler = new TravelTimeEventHandler(network, hbefaTable.getHbefaTableWithSpeedAndEmissionFactor(), linkAndAgentAccount);
 

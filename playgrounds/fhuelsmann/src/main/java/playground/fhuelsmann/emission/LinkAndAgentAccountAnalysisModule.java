@@ -35,7 +35,7 @@ import org.matsim.api.core.v01.Id;
 public class LinkAndAgentAccountAnalysisModule implements AnalysisModule{
 
 	private VisumObject[] roadTypes = null;
-	EmissionsPerEvent emissionFactor = null;
+	private EmissionsPerEvent emissionFactor = null;
 
 	private Map<Id, double[]> linkId2emissionsInGrammPerType = new TreeMap<Id,double[]>();
 	private Map<Id, double[]> personId2emissionsInGrammPerType = new TreeMap<Id,double[]>();
