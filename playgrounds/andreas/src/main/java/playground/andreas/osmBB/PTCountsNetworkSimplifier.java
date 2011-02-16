@@ -195,6 +195,7 @@ public class PTCountsNetworkSimplifier {
 				new CountsWriter(this.outCounts).write(this.countsOutFile);
 			}
 			log.info("Running network cleaner... Result may not be consistent with countsfile");
+			scenario = null; this.network = null; osmScenario = null; osmConfig = null; osmLoader = null;
 			new NetworkCleaner().run(this.netOutFile + "_not_cleaned.xml", this.netOutFile);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

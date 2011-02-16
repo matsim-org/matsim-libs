@@ -52,6 +52,7 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -70,8 +71,10 @@ public class Fcd {
 	private LinkedList<FcdEvent> fcdEventsList;
 	private CoordinateTransformation coordTransform = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.DHDN_GK4);
 	private Set<String> linksUsed = new TreeSet<String>();
+	private double minDistanceBetweenTwoActs;
 	
-	public Fcd(String netInFile, String fcdEventsInFile) {
+	public Fcd(String netInFile, String fcdEventsInFile, double minDistanceBetweenTwoActs) {
+		this.minDistanceBetweenTwoActs = minDistanceBetweenTwoActs;
 		try {
 			log.info("Reading fcd network file...");
 			this.networkMap = ReadFcdNetwork.readFcdNetwork(netInFile);
@@ -86,7 +89,7 @@ public class Fcd {
 		}
 	}
 	
-	public static Set<String> readFcdReturningLinkIdsUsed(String fcdNetInFile, String fcdEventsInFile, String outDir, String matsimNetwork){
+	public static Set<String> readFcdReturningLinkIdsUsed(String fcdNetInFile, String fcdEventsInFile, String outDir, String matsimNetwork, double minDistanceBetweenTwoActs){
 		ScenarioImpl sc = new ScenarioImpl();
 		NetworkReaderMatsimV1 reader = new NetworkReaderMatsimV1(sc);
 		try {
@@ -102,7 +105,7 @@ public class Fcd {
 			e.printStackTrace();
 		}
 		
-		Fcd fcd = new Fcd(fcdNetInFile, fcdEventsInFile);
+		Fcd fcd = new Fcd(fcdNetInFile, fcdEventsInFile, minDistanceBetweenTwoActs);
 		fcd.writeNetworkFromEvents(outDir + "fcd_netFromEvents.xml.gz");
 		fcd.writeSimplePlansFromEvents(outDir + "fcd_simplePlans.xml.gz");
 		fcd.writeComplexPlansFromEvents(outDir + "fcd_complexPlans.xml.gz", sc.getNetwork());
@@ -136,7 +139,7 @@ public class Fcd {
 			e.printStackTrace();
 		}
 		
-		Fcd fcd = new Fcd(netInFile, fcdEventsInFile);
+		Fcd fcd = new Fcd(netInFile, fcdEventsInFile, 0.0);
 		fcd.writeNetworkFromEvents(netOutFile);
 		fcd.writeSimplePlansFromEvents(plansOutFile);
 		fcd.writeComplexPlansFromEvents(plansOutFile + ".complex.xml", sc.getNetwork());
@@ -226,6 +229,13 @@ public class Fcd {
 			if(link == lastLink){
 				lastEvent = currentEvent;
 				continue;
+			}
+			
+			if(lastLink != null){
+				if(CoordUtils.calcDistance(link.getCoord(), lastLink.getCoord()) < this.minDistanceBetweenTwoActs){
+					lastEvent = currentEvent;
+					continue;
+				}
 			}
 			
 			lastLink = link;

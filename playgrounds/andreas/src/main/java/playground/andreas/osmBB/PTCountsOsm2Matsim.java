@@ -15,7 +15,6 @@ import org.xml.sax.SAXException;
 import playground.andreas.fcd.Fcd;
 import playground.andreas.osmBB.osm2counts.Osm2Counts;
 import playground.mzilske.osm.OsmPrepare;
-import playground.mzilske.osm.OsmTransitMain;
 
 public class PTCountsOsm2Matsim {
 	
@@ -35,17 +34,20 @@ public class PTCountsOsm2Matsim {
 		String filteredOsmFile = outDir + outName + ".osm";
 		
 //		String[] streetFilter = new String[]{"motorway","motorway_link","trunk","trunk_link","primary","primary_link","secondary","tertiary","minor","unclassified","residential","living_street"};
-		String[] streetFilter = new String[]{"motorway","motorway_link","trunk","trunk_link","primary","primary_link","secondary","tertiary"};
+		String[] streetFilter = new String[]{"motorway","motorway_link","trunk","trunk_link","primary","primary_link","secondary","tertiary","residential","living_street"};
 		
 //		String[] transitFilter = new String[]{"ferry", "subway", "light_rail", "tram", "train", "bus", "trolleybus"};
 		String[] transitFilter = new String[]{"fsfsfgsg"};
 		
 		OsmPrepare osmPrepare = new OsmPrepare(osmRepository + osmFile, filteredOsmFile, streetFilter, transitFilter);
 		osmPrepare.prepareOsm();
+		osmPrepare = null;
 		
 		Osm2Counts osm2Counts = new Osm2Counts(filteredOsmFile);
 		osm2Counts.prepareOsm();
 		HashMap<String, String> shortNameMap = osm2Counts.getShortNameMap();
+		osm2Counts = null;
+		
 		Counts counts = new Counts();
 		CountsReaderMatsimV1 countsReader = new CountsReaderMatsimV1(counts);
 		try {
@@ -63,11 +65,14 @@ public class PTCountsOsm2Matsim {
 				
 		OsmTransitMain osmTransitMain = new OsmTransitMain(filteredOsmFile, TransformationFactory.WGS84, TransformationFactory.DHDN_GK4, outDir + outName + "_network.xml", outDir + outName + "_schedule.xml", outDir + outName + "_vehicles.xml");
 		osmTransitMain.convertOsm2Matsim(transitFilter);
+		osmTransitMain = null;
 
 //		ResizeLinksByCount4 r = new ResizeLinksByCount4(outDir + outName + "_network.xml", counts, shortNameMap, 1.0);
 //		r.run(outDir + outName + "_network_resized.xml");
+//		r = null;
+		counts = null;
 		
-		Set<String> linksBlocked = Fcd.readFcdReturningLinkIdsUsed(fcdNetInFile, fcdEventsInFile, outDir, outDir + outName + "_network_resized.xml");
+		Set<String> linksBlocked = Fcd.readFcdReturningLinkIdsUsed(fcdNetInFile, fcdEventsInFile, outDir, outDir + outName + "_network_resized.xml", 500.0);
 		
 		PTCountsNetworkSimplifier ptCountNetSimplifier = new PTCountsNetworkSimplifier(outDir + outName + "_network_resized.xml", outDir + outName + "_schedule.xml", outDir + outName + "_network_merged.xml", outDir + outName + "_schedule_merged.xml", shortNameMap, countsFile, countsOutFile, outDir + "transitVehicles.xml.gz", linksBlocked);
 		Set<Integer> nodeTypesToMerge = new TreeSet<Integer>();
