@@ -524,34 +524,34 @@ public class FlowCalculationSettings {
 		System.out.println("% generated from matsim data");
         System.out.println("N " + this._network.getNodes().size());
         System.out.println("TIME " + this.TimeHorizon);
-        HashMap<Node,Integer> newNodeNames = new HashMap<Node,Integer>();
-        //find maximal id
-        int max = 0;
+        
+        // remap the vertices to numbers 0 .. getNodes().size() - 1
+        
+        HashMap<IndexedNodeI,Integer> newNodeNames = new HashMap<IndexedNodeI,Integer>();
+        boolean[] usedNumber = new boolean[this._network.getNodes().size()];
+        
         for (IndexedNodeI node : this._network.getNodes()) {
         	try {
-        		int i = Integer.parseInt(node.getMatsimNode().getId().toString());
-        		if (i > 0) 	newNodeNames.put(node.getMatsimNode(),i);
-        		if (i > max) max = i;
-        	} catch (Exception except) {
-
-        	}
-        }
-        //find negative ids
-        for (IndexedNodeI node : this._network.getNodes()) {
-        	try {
-        		int i = Integer.parseInt(node.getMatsimNode().getId().toString());
-        		if (i <= 0) {
-        		  max += 1;
-            	  newNodeNames.put(node.getMatsimNode(), max);
-            	  System.out.println("% node " + max + " was '" + node.getMatsimNode().getId()+ "'");
+        		int i = Integer.parseInt(node.getId().toString());
+        		if (i >= 0 && i < this._network.getNodes().size()) {
+        			newNodeNames.put(node,i);
+        			usedNumber[i] = true;
         		}
         	} catch (Exception except) {
-        		max += 1;
-        		newNodeNames.put(node.getMatsimNode(), max);
-        		System.out.println("% node " + max + " was '" + node.getMatsimNode().getId()+ "'");
 
         	}
         }
+
+        int findNextFree = 0;
+        for (IndexedNodeI node : this._network.getNodes()) {     	
+        	if (!newNodeNames.containsKey(node)) {
+        		while (usedNumber[findNextFree]) findNextFree++;
+        		newNodeNames.put(node, findNextFree);
+        		usedNumber[findNextFree] = true;
+        		System.out.println("% Node " + findNextFree  + " was " + node.getId() + "\n");
+        	}
+        }
+        
         //write nodes
         for (IndexedNodeI node : this._network.getNodes()) {
         	int d = 0;
@@ -1553,7 +1553,7 @@ public class FlowCalculationSettings {
     	s += "--usesinkcapacities\n" + useSinkCapacities + "\n";
     	s += "--searchalgo\n" + searchAlgo + "\n";
         s += "--queuealgo\n" + queueAlgo + "\n";
-        s += "--usebucketqueue" + useBucketQueue + "\n";
+        s += "--usebucketqueue\n" + useBucketQueue + "\n";
     	s += "--usevertexcleanup\n" + useVertexCleanup + "\n";
     	
     	s += "--useimplicitvertexcleanup\n" + useImplicitVertexCleanup + "\n";

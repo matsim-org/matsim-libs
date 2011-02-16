@@ -275,12 +275,13 @@ public class NetGenMain {
 		//String outputfileMATSIM = null;
 		
 		//outputfileDAT = "/homes/combi/dressler/V/code/grids/test.dat";
-		outputfileDAT = "/homes/combi/dressler/V/code/grids/";
+		//outputfileDAT = "/homes/combi/dressler/V/code/grids/";
+		outputfileDAT = "/home/daniel/tmp/toskywalker/test.dat";
 		
 		NetGenParams params = new NetGenParams();
 						
-		params.xdim = 50;
-		params.ydim = 20;
+		params.xdim = 20;
+		params.ydim = 10;
 //		params.capmean = 3;
 //		params.capvariance = params.capmean / 2;
 //		params.lengthmean = 20;
@@ -288,7 +289,7 @@ public class NetGenMain {
 		params.randseed = 214;
         params.numbersources = 20;
         params.numbersinks = 1;
-		params.totalsupply = 10000;
+		params.totalsupply = 100;
 		
 		if (outputfileDAT.charAt(outputfileDAT.length() - 1) == '/') {
 			// only a directory, add default name

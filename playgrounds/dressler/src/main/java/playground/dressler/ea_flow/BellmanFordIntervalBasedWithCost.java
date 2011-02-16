@@ -63,6 +63,7 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 	 */
 	public BellmanFordIntervalBasedWithCost(FlowCalculationSettings settings, Flow flow) {
 		super(settings, flow);
+		throw new UnsupportedOperationException("With costs is currently disabled!");
 	}
 //
 //	/**

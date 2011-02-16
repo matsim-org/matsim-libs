@@ -3,6 +3,8 @@ package playground.dressler.util;
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;
 
+import playground.dressler.control.Debug;
+
 public class CPUTimer {	
 	ThreadMXBean bean;
 	
@@ -77,7 +79,10 @@ public class CPUTimer {
 		 */
 		
 		//return bean.getCurrentThreadCpuTime(); // FIXME stupid JVM or stupid Linux.
-		return System.currentTimeMillis() * 1000000L;
+		 // even the currentTimeMillis is slow on some systems ...
+		
+		if (Debug.TIMERS) return System.currentTimeMillis() * 1000000L;
+		return 0;
 	}
 	 
 	/** Get user time in nanoseconds. */

@@ -25,15 +25,20 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PopulationWriter;
 
+import playground.dressler.Interval.Interval;
 import playground.dressler.ea_flow.Flow;
 import playground.dressler.ea_flow.TimeExpandedPath;
 import playground.dressler.network.IndexedNodeI;
@@ -58,11 +63,15 @@ public class DanielMain {
 		String simplenetworkfile = null;		
 		String imageBaseName = null;
 		String writeProblem = null;
+		String changeEventsFile = null;
+		double changeEventsOffset = 0.0;
 		boolean costonsinks = false;
 		boolean writeflow = false;
 		boolean noflow = false;
 		int uniformDemands = 0;
 		int goBackHowMany = 0;
+		HashMap<Id, Interval> whenAvailable = new HashMap<Id, Interval>();
+		
 		
 		FlowCalculationSettings settings = new FlowCalculationSettings();
 		
@@ -142,6 +151,22 @@ public class DanielMain {
 						argsokay= false;
 						error += "--outputplans requires an argument (filename)\n";
 					}
+				}  else if (s.equals("--changeeventsfile")) {
+					i++;
+					if (i < args.length) {
+						changeEventsFile= args[i];
+					} else {
+						argsokay= false;
+						error += "--changeeventsfile requires an argument (filename)\n";
+					}
+				}  else if (s.equals("--changeeventsoffset")) {
+					i++;
+					if (i < args.length) {
+						changeEventsOffset= Double.parseDouble(args[i]);
+					} else {
+						argsokay= false;
+						error += "--changeeventsoffset requires an argument (double)\n";
+					}
 				}  else if (s.equals("--imagebasename")) {
 					i++;
 					if (i < args.length) {
@@ -188,6 +213,8 @@ public class DanielMain {
 					error += "--plans filename\n";
 					error += "--sinkid string\n";
 					error += "--uniform int\n";
+					error += "--changeeventsfile file\n";
+					error += "--changeeventsoffset double\n";
 					error += "* Scaling, search Settings *\n";
 					error += "--config filenameyet\n";
 					error += "* Output * \n";	
@@ -250,6 +277,31 @@ public class DanielMain {
 				e.printStackTrace();
 			}
 		}
+		
+		// read changeevents
+		if (changeEventsFile != null) {
+			List<NetworkChangeEvent> changeEvents = null; 
+			
+			try {
+			  changeEvents = MultiSourceEAF.readChangeEvents(network, changeEventsFile);
+			} catch (Exception e) {
+				e.printStackTrace();
+				return;
+			}
+			for (NetworkChangeEvent event : changeEvents) {
+				int roundedtime = (int) Math.round(event.getStartTime() - changeEventsOffset);
+				roundedtime = (int) Math.round(roundedtime / settings.timeStep);
+				if (roundedtime <= 0) {
+					System.out.println("Warning! ChangeEvents delete a link entirely! The link will be available at the first time step, though.");
+					roundedtime = 1; // FIXME is this necessary?
+				}
+				for (Link link : event.getLinks()) {				
+				  Interval i = new Interval(0, roundedtime);
+				  whenAvailable.put(link.getId(), i);
+				  //System.out.println(roundedtime + " " + link.getId());
+				}
+			}						
+		}
 
 		
 		//read demands
@@ -293,8 +345,11 @@ public class DanielMain {
 
 		settings.setNetwork(network);
 		settings.setDemands(demands);
-		settings.supersink = settings.getNetwork().getIndexedNode(sink.getId());
+		if (sink != null)
+			settings.supersink = settings.getNetwork().getIndexedNode(sink.getId());
 
+		settings.setWhenAvailable(whenAvailable, 1.0, 0.0);
+		
 		System.out.println("Finished reading input.");
 		
 		/* --------- the actual work starts --------- */

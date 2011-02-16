@@ -185,7 +185,7 @@ public class MultiSourceEAF {
 	}
 	
 	
-	private static List<NetworkChangeEvent> readChangeEvents(final NetworkImpl network, final String filename) throws IOException{
+	static List<NetworkChangeEvent> readChangeEvents(final NetworkImpl network, final String filename) throws IOException{
 		NetworkChangeEventsParser parser = new NetworkChangeEventsParser(network);
 		try {
 			parser.parse(filename);
