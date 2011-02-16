@@ -37,11 +37,11 @@ public class Main {
 		// INPUT
 		String runDirectory = "../../detailedEval/testRuns/output/1pct/v0-default/run6/";
 		String eventsFile = runDirectory + "ITERS/it.10/10.events.txt.gz";
-		String netfile = "../../detailedEval/Net/network-86-85-87-84.xml";
+		String netFile = "../../detailedEval/Net/network-86-85-87-84.xml";
 		//		String netfile = runDirectory + "output_network.xml.gz";
 		
-		//		String visumRoadHebefaRoadFile = "../../detailedEval/teststrecke/sim/inputEmissions/road_types.txt";
-		String hbefaEmissionFactors = "../../detailedEval/teststrecke/sim/inputEmissions/hbefa_emission_factors_EU3_D.txt";
+		String visum2hbefaRoadTypeFile = "../../detailedEval/teststrecke/sim/inputEmissions/road_types.txt";
+		String hbefaEmissionFactorsFile = "../../detailedEval/teststrecke/sim/inputEmissions/hbefa_emission_factors_EU3_D.txt";
 		//		String Hbefa_Cold_Traffic = "../../detailedEval/teststrecke/sim/inputEmissions/hbefa_coldstart_emission_factors.txt";
 
 
@@ -51,21 +51,24 @@ public class Main {
 		// instancing the scenario
 		ScenarioImpl scenario = new ScenarioImpl();
 		Network network = scenario.getNetwork(); 
-		new MatsimNetworkReader(scenario).readFile(netfile);
+		new MatsimNetworkReader(scenario).readFile(netFile);
 
 		// ?? was passiert hier ??
 		HbefaTable hbefaTable = new HbefaTable();
-		hbefaTable.makeHbefaTable(hbefaEmissionFactors);
+		hbefaTable.makeHbefaTable(hbefaEmissionFactorsFile);
+		
+		VisumObject[] roadTypes = new VisumObject[100];
+		EmissionsPerEvent emissionFactor = new EmissionsPerEvent();
 
 		//hbefaColdTable hbefaColdTable = new hbefaColdTable();
 		//hbefaColdTable.makeHbefaColdTable(Hbefa_Cold_Traffic);
 		//hbefaColdTable.printHbefaCold();
 
+		LinkAndAgentAccountAnalysisModule linkAndAgentAccount = new LinkAndAgentAccountAnalysisModule(roadTypes, emissionFactor);
+		linkAndAgentAccount.createRoadTypes(visum2hbefaRoadTypeFile);
+		
 		//create the handler 
-		TravelTimeEventHandler handler = new TravelTimeEventHandler(network,hbefaTable.getHbefaTableWithSpeedAndEmissionFactor());
-
-		LinkAndAgentAccountAnalysisModule linkAndAgentAccount = handler.getLinkAndAgentAccountAnalyisModule();
-		//		LinkAndAgentAccountAnalyseModul linkAccount = new LinkAndAgentAccountAnalyseModul();
+		TravelTimeEventHandler handler = new TravelTimeEventHandler(network, hbefaTable.getHbefaTableWithSpeedAndEmissionFactor(), linkAndAgentAccount);
 
 		//add the handler
 		events.addHandler(handler);
@@ -79,23 +82,13 @@ public class Main {
 		linkAndAgentAccount.printTotalEmissionTable(linkId2emissionsInGrammPerType, runDirectory + "emissionsPerLink.txt");
 		linkAndAgentAccount.printTotalEmissionTable(personId2emissionsInGrammPerType, runDirectory + "emissionsPerPerson.txt");
 
-		//for cold start emissions 
+		////for cold start emissions 
 		//handler.printTable();
 		//handler.printTable2();
-		//	ColdEmissionFactor em = 
-		//	new ColdEmissionFactor(handler.coldDistance,handler.parkingTime,hbefaColdTable.getHbefaColdTable());
-
+		//ColdEmissionFactor em = new ColdEmissionFactor(handler.coldDistance,handler.parkingTime,hbefaColdTable.getHbefaColdTable());
 		//em.MapForColdEmissionFactor();
 		//em.printColdEmissionFactor();
 
-
-
-		//		HbefaTable hbefaTable = new HbefaTable();
-		//		hbefaTable.makeHabefaTable(Hbefa_Traffic);
-
-		//		hbefaColdTable hbefaColdTable = new hbefaColdTable();
-		//		hbefaColdTable.makeHbefaColdTable(Hbefa_Cold_Traffic);
-		//		hbefaColdTable.printHbefaCold();
 		/*		HbefaVisum hbefaVisum = new HbefaVisum(handler.getTravelTimes());
 		hbefaVisum.createRoadTypes(visumRoadHebefaRoadFile);
 		hbefaVisum.printHbefaVisum();

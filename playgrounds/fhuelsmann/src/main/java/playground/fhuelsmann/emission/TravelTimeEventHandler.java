@@ -34,25 +34,16 @@ import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.network.LinkImpl;
 
-public class TravelTimeEventHandler implements LinkEnterEventHandler,LinkLeaveEventHandler, 
-AgentArrivalEventHandler,AgentDepartureEventHandler {
+public class TravelTimeEventHandler implements LinkEnterEventHandler,LinkLeaveEventHandler, AgentArrivalEventHandler,AgentDepartureEventHandler {
 
-	private final Network network;
-	private  HbefaObject[][] HbefaTable;
+	private Network network = null;
+	private HbefaObject[][] hbefaTable = null;
+	private AnalysisModule linkAndAgentAccountAnalysisModule = null;
 
-	private LinkAndAgentAccountAnalysisModule linkAndAgentAccountAnalysisModule = new LinkAndAgentAccountAnalysisModule();
-
-	public LinkAndAgentAccountAnalysisModule getLinkAndAgentAccountAnalyisModule() {
-		return linkAndAgentAccountAnalysisModule;
-	}
-
-	public void setLinkAndAgentAccountAnalyisModule(LinkAndAgentAccountAnalysisModule linkAndAgentAccountAnalysisModule) {
-		this.linkAndAgentAccountAnalysisModule = linkAndAgentAccountAnalysisModule;
-	}
-
-	public TravelTimeEventHandler(final Network network,HbefaObject[][] HbefaTable) {
-		this.HbefaTable = HbefaTable;
+	public TravelTimeEventHandler(final Network network, HbefaObject[][] hbefaTable, AnalysisModule linkAndAgentAccountAnalysisModule) {
 		this.network = network;
+		this.hbefaTable = hbefaTable;
+		this.linkAndAgentAccountAnalysisModule = linkAndAgentAccountAnalysisModule;
 	}
 
 	private final Map<Id, Double> linkenter = new TreeMap<Id, Double>();
@@ -127,8 +118,8 @@ AgentArrivalEventHandler,AgentDepartureEventHandler {
 
 				this.agentarrival.remove(personId);
 
-				linkAndAgentAccountAnalysisModule.calculateEmissionsPerLink(travelTime, linkId, averageSpeed,roadType, freeVelocity, distance, HbefaTable);	
-				linkAndAgentAccountAnalysisModule.calculateEmissionsPerPerson(travelTime, personId, averageSpeed,roadType, freeVelocity, distance, HbefaTable);	
+				linkAndAgentAccountAnalysisModule.calculateEmissionsPerLink(travelTime, linkId, averageSpeed,roadType, freeVelocity, distance, hbefaTable);	
+				linkAndAgentAccountAnalysisModule.calculateEmissionsPerPerson(travelTime, personId, averageSpeed,roadType, freeVelocity, distance, hbefaTable);	
 			}
 			// if (this.agentarrival.containsKey(personId)) is not the case (link without activity)
 			else {
@@ -136,8 +127,8 @@ AgentArrivalEventHandler,AgentDepartureEventHandler {
 				double travelTime = event.getTime() - enterTime;
 				double averageSpeed=(distance/1000)/(travelTime/3600);
 
-				linkAndAgentAccountAnalysisModule.calculateEmissionsPerLink(travelTime, linkId, averageSpeed,roadType, freeVelocity, distance, HbefaTable);	
-				linkAndAgentAccountAnalysisModule.calculateEmissionsPerPerson(travelTime, personId, averageSpeed,roadType, freeVelocity, distance, HbefaTable);
+				linkAndAgentAccountAnalysisModule.calculateEmissionsPerLink(travelTime, linkId, averageSpeed,roadType, freeVelocity, distance, hbefaTable);	
+				linkAndAgentAccountAnalysisModule.calculateEmissionsPerPerson(travelTime, personId, averageSpeed,roadType, freeVelocity, distance, hbefaTable);
 			}
 		}
 		//		}
