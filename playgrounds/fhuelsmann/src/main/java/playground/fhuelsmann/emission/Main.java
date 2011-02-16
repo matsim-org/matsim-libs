@@ -56,8 +56,8 @@ public class Main {
 
 		// ?? was passiert hier ??
 		HbefaTable hbefaTable = new HbefaTable();
-		hbefaTable.makeHbefaTable(hbefaGasolineEmissionFactorsFile);
-		//		hbefaTable.makeHbefaTable(hbefaDieselEmissionFactorsFile);
+		//		hbefaTable.makeHbefaTable(hbefaGasolineEmissionFactorsFile);
+		hbefaTable.makeHbefaTable(hbefaDieselEmissionFactorsFile);
 
 		VisumObject[] roadTypes = new VisumObject[100];
 		EmissionsPerEvent emissionFactor = new EmissionsPerEvent();
