@@ -31,21 +31,21 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
 
 /**
- * writes new Plansfile, in which every person will has 2 plans, one with type
- * "iv" and the other with type "oev", whose leg mode will be "pt" and who will
- * have only a blank <Route></Rout>
- *
+ * writes a new Plansfile, in which every person will only have ONE {@code Plan}
+ * , that also is the selected Plan of the old Plan.
+ * 
  * @author ychen
- *
+ * 
  */
 public class SelectedPlans extends NewPopulation {
 	/**
 	 * Constructor, writes file-head
-	 *
+	 * 
 	 * @param plans
 	 *            - a Plans Object, which derives from MATSim plansfile
 	 */
-	public SelectedPlans(final Network network, Population plans, String filename) {
+	public SelectedPlans(final Network network, Population plans,
+			String filename) {
 		super(network, plans, filename);
 	}
 
@@ -58,17 +58,28 @@ public class SelectedPlans extends NewPopulation {
 	}
 
 	public static void main(final String[] args) {
-		final String netFilename = "../data/schweiz/input/ch.xml";
-		final String plansFilename = "../data/schweiz/input/459.100.plans.xml.gz";
+
+		String netFilename, populationFilename, outputPopulationFilename;
+		if (args.length == 3) {
+			netFilename = args[0];
+			populationFilename = args[1];
+			outputPopulationFilename = args[2];
+		} else {
+			netFilename = "../data/schweiz/input/ch.xml";
+			populationFilename = "../data/schweiz/input/459.100.plans.xml.gz";
+			outputPopulationFilename = "dummy";
+		}
+
 		ScenarioImpl scenario = new ScenarioImpl();
 		NetworkImpl network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFilename);
 
 		Population population = scenario.getPopulation();
 		PopulationReader plansReader = new MatsimPopulationReader(scenario);
-		plansReader.readFile(plansFilename);
+		plansReader.readFile(populationFilename);
 
-		SelectedPlans sp = new SelectedPlans(network, population, null);//scenario.getConfig().plans().getOutputFile());
+		SelectedPlans sp = new SelectedPlans(network, population,
+				outputPopulationFilename);
 		sp.run(population);
 		sp.writeEndPlans();
 	}

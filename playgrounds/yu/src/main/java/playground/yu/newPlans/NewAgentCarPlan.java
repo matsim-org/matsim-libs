@@ -39,10 +39,10 @@ import playground.yu.analysis.PlanModeJudger;
 /**
  * writes new Plansfile, in which every person will has 2 plans, one with type
  * "iv" and the other with type "oev", whose leg mode will be "pt" and who will
- * have only a blank <Route></Rout>
- *
+ * have only a blank {@code Route}
+ * 
  * @author ychen
- *
+ * 
  */
 public class NewAgentCarPlan extends NewPopulation implements PlanAlgorithm {
 	private Person person = null;
@@ -50,29 +50,31 @@ public class NewAgentCarPlan extends NewPopulation implements PlanAlgorithm {
 
 	/**
 	 * Constructor, writes file-head
-	 *
+	 * 
 	 * @param network
 	 * @param plans
 	 *            - a Plans Object, which derives from MATSim plansfile
 	 */
-	public NewAgentCarPlan(final Network network, final Population plans, final String filename) {
+	public NewAgentCarPlan(final Network network, final Population plans,
+			final String filename) {
 		super(network, plans, filename);
 	}
 
 	@Override
 	public void run(final Person person) {
 		this.person = person;
-		this.plans.clear();
-		this.plans.addAll(person.getPlans());
-		for (Plan p : this.plans) {
+		plans.clear();
+		plans.addAll(person.getPlans());
+		for (Plan p : plans) {
 			run(p);
 		}
-		this.pw.writePerson(person);
+		pw.writePerson(person);
 	}
 
 	public void run(final Plan plan) {
-		if (!PlanModeJudger.useCar(plan))
-			((PersonImpl) this.person).removePlan(plan);
+		if (!PlanModeJudger.useCar(plan)) {
+			((PersonImpl) person).removePlan(plan);
+		}
 	}
 
 	public static void main(final String[] args) {

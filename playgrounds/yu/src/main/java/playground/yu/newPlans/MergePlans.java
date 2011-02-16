@@ -30,8 +30,10 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
 /**
+ * merge populations with different agents
+ * 
  * @author ychen
- *
+ * 
  */
 public class MergePlans {
 	public static class CopyPlans extends AbstractPersonAlgorithm {
@@ -43,7 +45,7 @@ public class MergePlans {
 
 		@Override
 		public void run(final Person person) {
-			this.writer.writePerson(person);
+			writer.writePerson(person);
 		}
 	}
 
@@ -58,8 +60,9 @@ public class MergePlans {
 
 		@Override
 		public void run(final Person person) {
-			if (Integer.parseInt(person.getId().toString()) >= this.lower_limit)
+			if (Integer.parseInt(person.getId().toString()) >= lower_limit) {
 				super.run(person);
+			}
 		}
 	}
 
