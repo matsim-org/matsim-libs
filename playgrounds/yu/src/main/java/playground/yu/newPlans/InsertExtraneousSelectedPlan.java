@@ -39,51 +39,43 @@ import org.matsim.core.population.MatsimPopulationReader;
  * @author yu
  * 
  */
-public class InsertExtraneousSelectedPlans extends NewPopulation {
-	private Population[] extraneousPopulations;
+public class InsertExtraneousSelectedPlan extends NewPopulation {
+	private Population extraneousPopulation;
 
-	public InsertExtraneousSelectedPlans(Network network,
-			Population population, Population[] extraneousPopulations,
-			String outputPopfilename) {
+	public InsertExtraneousSelectedPlan(Network network, Population population,
+			Population extraneousPopulation, String outputPopfilename) {
 		super(network, population, outputPopfilename);
-		this.extraneousPopulations = extraneousPopulations;
+		this.extraneousPopulation = extraneousPopulation;
 	}
 
 	public void beforeWritePersonHook(Person person) {
 		Id personId = person.getId();
-		for (Population extraneousPopulation : extraneousPopulations) {
-			Person extraneousPerson = extraneousPopulation.getPersons().get(
-					personId);
+		Person extraneousPerson = extraneousPopulation.getPersons().get(
+				personId);
 
-			if (extraneousPerson != null) {
-				person.addPlan(extraneousPerson.getSelectedPlan());
-			} else {
-				Logger
-						.getLogger("INSERT_EXTRANEOUS_PLAN")
-						.warning(
-								"Person\t"
-										+ person.getId()
-										+ "\tdoes NOT exist in the extraneous population!");
-			}
+		if (extraneousPerson != null) {
+			person.addPlan(extraneousPerson.getSelectedPlan());
+		} else {
+			Logger.getLogger("INSERT_EXTRANEOUS_PLAN").warning(
+					"Person\t" + person.getId()
+							+ "\tdoes NOT exist in the extraneous population!");
 		}
 	}
 
-	public static void onePlusN(String[] args) {
-		String netFilename, populationFilename, extraneousPopulationFilenames[], outputPopulationFilename;
-		int extraneousPopSize = 2;
-		if (args.length > 4) {
+	/**
+	 * @param args
+	 */
+	public static void onePlus1(String[] args) {
+		String netFilename, populationFilename, extraneousPopulationFilename, outputPopulationFilename;
+		if (args.length == 4) {
 			netFilename = args[0];
 			populationFilename = args[1];
-			extraneousPopSize = args.length - 2 - 2 + 1;
-			extraneousPopulationFilenames = new String[extraneousPopSize];
-			for (int i = 0; i < extraneousPopSize; i++) {
-				extraneousPopulationFilenames[i] = args[2 + i];
-			}
-			outputPopulationFilename = args[args.length - 1];
+			extraneousPopulationFilename = args[2];
+			outputPopulationFilename = args[3];
 		} else {
 			netFilename = "../data/schweiz/input/ch.xml";
 			populationFilename = "../data/schweiz/input/459.100.plans.xml.gz";
-			extraneousPopulationFilenames = new String[] { "dummy", "dummy" };
+			extraneousPopulationFilename = "dummy";
 			outputPopulationFilename = "dummy";
 		}
 
@@ -94,23 +86,15 @@ public class InsertExtraneousSelectedPlans extends NewPopulation {
 		Network network = scenario.getNetwork();
 		Population population = scenario.getPopulation();
 
-		Population[] extraneousPopulations = new Population[extraneousPopSize];
-		int idx = 0;
-		for (String extraneousPopulationFilename : extraneousPopulationFilenames) {
-			Scenario extraneousScenario = new ScenarioImpl();
-			((ScenarioImpl) extraneousScenario)
-					.setNetwork((NetworkImpl) network);
-			new MatsimPopulationReader(extraneousScenario)
-					.readFile(extraneousPopulationFilename);
-			extraneousPopulations[idx] = extraneousScenario.getPopulation();
-			idx++;
-		}
-		InsertExtraneousSelectedPlans iesp = new InsertExtraneousSelectedPlans(
-				network, population, extraneousPopulations,
+		Scenario extraneousScenario = new ScenarioImpl();
+		((ScenarioImpl) extraneousScenario).setNetwork((NetworkImpl) network);
+		new MatsimPopulationReader(extraneousScenario)
+				.readFile(extraneousPopulationFilename);
+
+		InsertExtraneousSelectedPlan iesp = new InsertExtraneousSelectedPlan(
+				network, population, extraneousScenario.getPopulation(),
 				outputPopulationFilename);
-
 		iesp.run(population);
-
 		iesp.writeEndPlans();
 	}
 
@@ -118,6 +102,6 @@ public class InsertExtraneousSelectedPlans extends NewPopulation {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		onePlusN(args);
+		onePlus1(args);
 	}
 }
