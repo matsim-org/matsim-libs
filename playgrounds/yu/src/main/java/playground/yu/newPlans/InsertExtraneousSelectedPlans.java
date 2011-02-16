@@ -89,14 +89,14 @@ public class InsertExtraneousSelectedPlans extends NewPopulation {
 
 		Scenario extraneousScenario = new ScenarioImpl();
 		((ScenarioImpl) extraneousScenario).setNetwork((NetworkImpl) network);
-		new MatsimPopulationReader(scenario)
+		new MatsimPopulationReader(extraneousScenario)
 				.readFile(extraneousPopulationFilename);
 
-		InsertExtraneousSelectedPlans sp = new InsertExtraneousSelectedPlans(
+		InsertExtraneousSelectedPlans iesp = new InsertExtraneousSelectedPlans(
 				network, population, extraneousScenario.getPopulation(),
 				outputPopulationFilename);
-		sp.run(population);
-		sp.writeEndPlans();
+		iesp.run(population);
+		iesp.writeEndPlans();
 	}
 
 }
