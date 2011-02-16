@@ -24,6 +24,7 @@
 package playground.yu.newPlans;
 
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -35,13 +36,26 @@ public abstract class NewPopulation extends AbstractPersonAlgorithm {
 	protected PopulationWriter pw;
 	protected Network net;
 
-	public NewPopulation(final Network network, final Population population, final String filename) {
-		this.net = network;
-		this.pw = new PopulationWriter(population, network);
-		this.pw.writeStartPlans(filename);
+	public NewPopulation(final Network network, final Population population,
+			final String filename) {
+		net = network;
+		pw = new PopulationWriter(population, network);
+		pw.writeStartPlans(filename);
+	}
+
+	public void run(Person person) {
+		beforeWritePersonHook(person);
+		pw.writePerson(person);
+	}
+
+	/**this method should be overridden by subclasses
+	 * @param person
+	 */
+	protected void beforeWritePersonHook(Person person) {
+//dummy empty
 	}
 
 	public void writeEndPlans() {
-		this.pw.writeEndPlans();
+		pw.writeEndPlans();
 	}
 }

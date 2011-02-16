@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * MergePlans.java
+ * MergePopulations.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -35,7 +35,7 @@ import org.matsim.population.algorithms.AbstractPersonAlgorithm;
  * @author ychen
  * 
  */
-public class MergePlans {
+public class MergePopulations {
 	public static class CopyPlans extends AbstractPersonAlgorithm {
 		private final PopulationWriter writer;
 
