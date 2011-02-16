@@ -48,6 +48,7 @@ public class SfTransitBuilder {
 	}
 		
 	
+	@SuppressWarnings("deprecation")
 	public void createSchedule(String inputOagData) throws IOException {
 		
 		Scenario scen = new ScenarioImpl();	
@@ -79,6 +80,7 @@ public class SfTransitBuilder {
 			String destination = lineEntries[0].substring(3, 6);
 			String transitLine = lineEntries[1];
 			double departureTime = Double.parseDouble(lineEntries[3]);
+			double travelTime = Double.parseDouble(lineEntries[4]);
 			Id originId = new IdImpl(origin);
 			Id destinationId = new IdImpl(destination);
 			Id routeId = new IdImpl(origin+destination);	//origin IATA code + destination IATA code
@@ -119,6 +121,7 @@ public class SfTransitBuilder {
 			if (!netRouteMap.containsKey(transitLineId)) {
 				NetworkRoute netRoute = new LinkNetworkRouteImpl(new IdImpl(origin), new IdImpl(destination));		
 				netRoute.setLinkIds(new IdImpl(origin), linkListMap.get(routeId), new IdImpl(destination));
+				netRoute.setTravelTime(travelTime);		//funktioniert nicht, ist ja auch deprecated...
 				netRouteMap.put(transitLineId, netRoute);
 			}			
 			
