@@ -17,20 +17,22 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
+import playground.andreas.osmBB.extended.TransitScheduleImpl;
+
 public class TransitScheduleCleaner {
 	
 	private static final Logger log = Logger.getLogger(TransitScheduleCleaner.class);
 	
 	public static TransitSchedule removeEmptyLines(TransitSchedule transitSchedule){
 		
-		log.info("Removing empty lines");
-		
-		printStatistic(transitSchedule);
+		log.info("Removing empty lines");		
+		TransitSchedule tS = TransitScheduleCleaner.makeTransitScheduleModifiable(transitSchedule);
+		printStatistic(tS);
 		
 		List<Id> linesToRemove = new LinkedList<Id>();
 		
-		for (Id lineId : transitSchedule.getTransitLines().keySet()) {
-			if(transitSchedule.getTransitLines().get(lineId).getRoutes().size() == 0){
+		for (Id lineId : tS.getTransitLines().keySet()) {
+			if(tS.getTransitLines().get(lineId).getRoutes().size() == 0){
 				linesToRemove.add(lineId);
 			}
 		}
@@ -38,25 +40,26 @@ public class TransitScheduleCleaner {
 		StringBuffer sB = new StringBuffer();
 		
 		for (Id lineId : linesToRemove) {
-			transitSchedule.getTransitLines().remove(lineId);
+			tS.getTransitLines().remove(lineId);
 			sB.append(lineId + ", ");
 		}
 		
-		printStatistic(transitSchedule);
+		printStatistic(tS);
 		log.info("Removed " + linesToRemove.size() + " lines from transitSchedule: " + sB.toString());	
 		
-		return transitSchedule;
+		return tS;
 	}
 	
 	public static TransitSchedule removeStopsNotUsed(TransitSchedule transitSchedule){
 		
 		log.info("Removing stops not used");
-		printStatistic(transitSchedule);
+		TransitSchedule tS = TransitScheduleCleaner.makeTransitScheduleModifiable(transitSchedule);
+		printStatistic(tS);
 		
 		Set<Id> stopsInUse = new TreeSet<Id>();
 		Set<Id> stopsToBeRemoved = new TreeSet<Id>();
 		
-		for (TransitLine transitLine : transitSchedule.getTransitLines().values()) {
+		for (TransitLine transitLine : tS.getTransitLines().values()) {
 			for (TransitRoute transitRoute : transitLine.getRoutes().values()) {
 				for (TransitRouteStop stop : transitRoute.getStops()) {
 					stopsInUse.add(stop.getStopFacility().getId());
@@ -64,7 +67,7 @@ public class TransitScheduleCleaner {
 			}
 		}
 		
-		for (TransitStopFacility transitStopFacility : transitSchedule.getFacilities().values()) {
+		for (TransitStopFacility transitStopFacility : tS.getFacilities().values()) {
 			if(!stopsInUse.contains(transitStopFacility.getId())){
 				stopsToBeRemoved.add(transitStopFacility.getId());
 			}
@@ -73,14 +76,14 @@ public class TransitScheduleCleaner {
 		StringBuffer sB = new StringBuffer();
 		
 		for (Id transitStopFacilityId : stopsToBeRemoved) {
-			transitSchedule.getFacilities().remove(transitStopFacilityId);
+			tS.getFacilities().remove(transitStopFacilityId);
 			sB.append(transitStopFacilityId.toString() + ", ");
 		}
 		
-		printStatistic(transitSchedule);
+		printStatistic(tS);
 		log.info("Removed " + stopsToBeRemoved.size() + " stops from transitSchedule: " + sB.toString());	
 		
-		return transitSchedule;
+		return tS;
 	}
 	
 	
@@ -164,11 +167,12 @@ public class TransitScheduleCleaner {
 
 	public static TransitSchedule removeAllRoutesWithMissingLinksFromSchedule(TransitSchedule transitSchedule, Network network){
 		log.info("Removing stops and routes with missing links from the schedule");
-		printStatistic(transitSchedule);
+		TransitSchedule tS = TransitScheduleCleaner.makeTransitScheduleModifiable(transitSchedule);
+		printStatistic(tS);
 		int removedRoutes = 0;
 		
 		// Remove routes with missing links
-		for (TransitLine transitLine : transitSchedule.getTransitLines().values()) {
+		for (TransitLine transitLine : tS.getTransitLines().values()) {
 			
 			TreeSet<TransitRoute> transitRouteToBeRemoved = new TreeSet<TransitRoute>();
 			
@@ -209,10 +213,22 @@ public class TransitScheduleCleaner {
 		}
 		
 		log.info("Removed " + removedRoutes + " routes due to missing links or stops");
-		printStatistic(transitSchedule);
+		printStatistic(tS);
 				
-		return transitSchedule;
+		return tS;
 	}
 	
-	
+	private static TransitSchedule makeTransitScheduleModifiable(TransitSchedule transitSchedule){
+		TransitSchedule tS = new TransitScheduleImpl(transitSchedule.getFactory());
+		
+		for (TransitStopFacility stop : transitSchedule.getFacilities().values()) {
+			tS.addStopFacility(stop);			
+		}
+		
+		for (TransitLine line : transitSchedule.getTransitLines().values()) {
+			tS.addTransitLine(line);
+		}
+		
+		return tS;
+	}
 }
