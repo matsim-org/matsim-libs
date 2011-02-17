@@ -119,8 +119,7 @@ public class PathSizeFromPlanChoiceSet {
 			}
 		}
 
-		return pathLength > 0 ? result / pathLength : 1d / paths
-				.size();
+		return pathLength > 0 ? result / pathLength : -1d;
 	}
 
 	protected int getUsingLinkCount(Id linkId, int legIndex) {

@@ -28,8 +28,12 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -56,12 +60,33 @@ public class PathSizeFromPopulationSummary extends AbstractPersonAlgorithm {
 
 	@Override
 	public void run(Person person) {
-		PathSizeFromPlanChoiceSet psfpcs = new PathSizeFromPlanChoiceSet(
-				network, person.getPlans());
-		minPSs.add(psfpcs.getMinPathSize());
-		maxPSs.add(psfpcs.getMaxPathSize());
-		avgPSs.add(psfpcs.getAvgPathSize());
-		allPSs.addAll(psfpcs.getAllPathSizes());
+		if (hasCarLeg(person)) {
+			PathSizeFromPlanChoiceSet psfpcs = new PathSizeFromPlanChoiceSet(
+					network, person.getPlans());
+			minPSs.add(psfpcs.getMinPathSize());
+			maxPSs.add(psfpcs.getMaxPathSize());
+			avgPSs.add(psfpcs.getAvgPathSize());
+			allPSs.addAll(psfpcs.getAllPathSizes());
+		}
+	}
+
+	/**
+	 * judge, whether there is car Leg in Plans of person
+	 * 
+	 * @param person
+	 * @return
+	 */
+	private boolean hasCarLeg(Person person) {
+		for (Plan plan : person.getPlans()) {
+			for (PlanElement pe : plan.getPlanElements()) {
+				if (pe instanceof Leg) {
+					if (((Leg) pe).getMode().equals(TransportMode.car)) {
+						return true;
+					}
+				}
+			}
+		}
+		return false;
 	}
 
 	public void output(String outputFilenameBase) {
