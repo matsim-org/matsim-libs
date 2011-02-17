@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * FreeSpeedTravelTimeCalculatorFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,31 +18,28 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.christoph.withinday.network;
+package playground.christoph.withinday.trafficmonitoring;
 
-import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.api.internal.MatsimFactory;
 
-/*
- * 
- * TODO: Get rid of this. I would suggest via Customizable. cdobler, feb'11
- */
-public class WithinDayLinkImpl extends LinkImpl {
+public class TravelTimeCollectorFactory implements MatsimFactory {
 
-	private double travelTime;
-
-	protected WithinDayLinkImpl(Id id, Node from, Node to, Network network,
-			double length, double freespeed, double capacity, double lanes) {
-		super(id, from, to, network, length, freespeed, capacity, lanes);
+	public TravelTimeCollector createFreeSpeedTravelTimeCalculator(final Scenario scenario) {
+		return new TravelTimeCollector(scenario, TravelTimeCollectorFactory.getNextId());
 	}
-
-	public double getTravelTime() {
-		return travelTime;
+	
+	public TravelTimeCollector createFreeSpeedTravelTimeCalculator(final Network network, int numThreads) {
+		return new TravelTimeCollector(network, numThreads, TravelTimeCollectorFactory.getNextId());
 	}
-
-	public void setTravelTime(double travelTime) {
-		this.travelTime = travelTime;
+	
+	/*
+	 * Each TravelTimeCollector gets a unique Id.
+	 */
+	private static int idCount = 0;
+	private synchronized static int getNextId() {
+		idCount++;
+		return idCount;
 	}
 }

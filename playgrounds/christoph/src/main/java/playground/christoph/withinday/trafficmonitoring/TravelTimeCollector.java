@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.christoph.withinday.replanning.replanners.tools;
+package playground.christoph.withinday.trafficmonitoring;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,6 +30,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CyclicBarrier;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
@@ -55,16 +56,36 @@ import org.matsim.core.utils.misc.Time;
 
 import playground.christoph.withinday.network.WithinDayLinkImpl;
 
+/**
+ * Collects link travel times over a given time span (storedTravelTimesBinSize) and
+ * calculates an average travel time over this time span.
+ * 
+ * TODO: 
+ * - take transport mode for multi-modal simulations into account
+ *   Extend link enter / leave events with transport mode field or use a
+ *   lookup table in this class.
+ * - make storedTravelTimesBinSize configurable (e.g. via config)
+ * - get rid of WithinDayLinkImpl, would suggest via Customizable
+ * 
+ * @author cdobler
+ */
 public class TravelTimeCollector implements PersonalizableTravelTime, AgentStuckEventHandler,
 	LinkEnterEventHandler, LinkLeaveEventHandler,
 	AgentArrivalEventHandler, AgentDepartureEventHandler, SimulationInitializedListener,
 	SimulationBeforeSimStepListener, SimulationAfterSimStepListener {
 
-	private Network network;
+	/*
+	 * If multiple TravelTimeCollectors are used, each of them get its unique Id.
+	 * This will be needed, if the travel times are attached to the Links via a
+	 * Customizable attribute. The key of that attribute will then contain the Id
+	 * of its corresponding TravelTimeCollector.
+	 */
+	private final int id;
 
+	private Network network;
+	
 	// Trips with no Activity on the current Link
 	private Map<Id, TripBin> regularActiveTrips;	// PersonId
-
 	private Map<Id, TravelTimeInfo> travelTimeInfos;	// LinkId
 
 	/*
@@ -73,21 +94,32 @@ public class TravelTimeCollector implements PersonalizableTravelTime, AgentStuck
 	private CyclicBarrier startBarrier;
 	private CyclicBarrier endBarrier;
 	private UpdateMeanTravelTimesThread[] updateMeanTravelTimesThreads;
-	private int numOfThreads = 6;
-
-
-	public TravelTimeCollector(Network network) {
-		this.network = network;
-
-		init();
+	private final int numOfThreads;
+	
+	// use the factory
+	/*package*/ TravelTimeCollector(Scenario scenario, int id) {
+		/* 
+		 * The parallelization should scale almost linear, therefore 
+		 * we do use the number of available threads accoring to the
+		 * config file.
+		 */
+		this(scenario.getNetwork(), scenario.getConfig().global().getNumberOfThreads(), id);
 	}
 
+	// use the factory
+	/*package*/ TravelTimeCollector(Network network, int numOfThreads, int id) {
+		this.network = network;
+		this.numOfThreads = numOfThreads;
+		this.id = id;
+		
+		init();
+	}
+	
 	private void init() {
 		regularActiveTrips = new HashMap<Id, TripBin>();
 		travelTimeInfos = new ConcurrentHashMap<Id, TravelTimeInfo>();
 
-		for (Link link : this.network.getLinks().values())
-		{
+		for (Link link : this.network.getLinks().values()) {
 			TravelTimeInfo travelTimeInfo = new TravelTimeInfo();
 			travelTimeInfos.put(link.getId(), travelTimeInfo);
 		}
@@ -101,19 +133,19 @@ public class TravelTimeCollector implements PersonalizableTravelTime, AgentStuck
 
 	@Override
 	public void reset(int iteration) {
-		// Nothing to do here...
+		init();
 	}
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		Id linkId = event.getLinkId();
+//		Id linkId = event.getLinkId();
 		Id personId = event.getPersonId();
 		double time = event.getTime();
 
 		TripBin tripBin = new TripBin();
 		tripBin.enterTime = time;
-		tripBin.personId = personId;
-		tripBin.linkId = linkId;
+//		tripBin.personId = personId;
+//		tripBin.linkId = linkId;
 
 		this.regularActiveTrips.put(personId, tripBin);
 	}
@@ -177,13 +209,12 @@ public class TravelTimeCollector implements PersonalizableTravelTime, AgentStuck
 		}
 
 		// Now initialize the Parallel Update Threads
-		initParallelThreads(this.numOfThreads);
+		initParallelThreads();
 	}
 
 	// Add Link TravelTimes
 	@Override
 	public void notifySimulationAfterSimStep(SimulationAfterSimStepEvent e) {
-
 	}
 
 	// Update Link TravelTimes
@@ -199,8 +230,8 @@ public class TravelTimeCollector implements PersonalizableTravelTime, AgentStuck
 	}
 
 	private class TripBin {
-		Id personId;
-		Id linkId;
+//		Id personId;
+//		Id linkId;
 		double enterTime;
 		double leaveTime;
 
@@ -284,8 +315,7 @@ public class TravelTimeCollector implements PersonalizableTravelTime, AgentStuck
 		return parallelArrays;
 	}
 
-	private void initParallelThreads(int numOfThreads) {
-		this.numOfThreads = numOfThreads;
+	private void initParallelThreads() {
 
 		this.startBarrier = new CyclicBarrier(numOfThreads + 1);
 		this.endBarrier = new CyclicBarrier(numOfThreads + 1);
@@ -390,8 +420,7 @@ public class TravelTimeCollector implements PersonalizableTravelTime, AgentStuck
 
 			// first remove old TravelTimes
 			Iterator<TripBin> iter = tripBins.iterator();
-			while (iter.hasNext())
-			{
+			while (iter.hasNext()) {
 				TripBin tripBin = iter.next();
 				if (tripBin.leaveTime + this.storedTravelTimesBinSize < time) {
 					double travelTime = tripBin.leaveTime - tripBin.enterTime;

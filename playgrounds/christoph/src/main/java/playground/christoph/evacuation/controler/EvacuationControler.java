@@ -79,12 +79,14 @@ import playground.christoph.withinday.replanning.replanners.CurrentLegReplannerF
 import playground.christoph.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
 import playground.christoph.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
 import playground.christoph.withinday.replanning.replanners.interfaces.WithinDayInitialReplanner;
-import playground.christoph.withinday.replanning.replanners.tools.TravelTimeCollector;
 import playground.christoph.withinday.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
 import playground.christoph.withinday.scoring.OnlyTimeDependentScoringFunctionFactory;
+import playground.christoph.withinday.trafficmonitoring.TravelTimeCollector;
+import playground.christoph.withinday.trafficmonitoring.TravelTimeCollectorFactory;
 
 /*
- * The Path to a Config File is needed as Argument to run the
+ * Theimport playground.christoph.withinday.trafficmonitoring.TravelTimeCollector;
+ Path to a Config File is needed as Argument to run the
  * Simulation.
  *
  * By default "../matsim/test/scenarios/berlin/config.xml" should work.
@@ -207,7 +209,7 @@ public class EvacuationControler extends MultiModalControler {
 		}
 		// within day
 		else {
-			travelTime = new TravelTimeCollector(network);
+			travelTime = new TravelTimeCollectorFactory().createFreeSpeedTravelTimeCalculator(this.scenarioData);
 			foqsl.addQueueSimulationBeforeSimStepListener((TravelTimeCollector) travelTime);	// for TravelTimeCollector
 			foqsl.addQueueSimulationAfterSimStepListener((TravelTimeCollector) travelTime);	// for TravelTimeCollector
 			this.events.addHandler((TravelTimeCollector) travelTime);	// for TravelTimeCollector

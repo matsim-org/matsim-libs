@@ -41,11 +41,13 @@ import playground.christoph.withinday.replanning.modules.ReplanningModule;
 import playground.christoph.withinday.replanning.replanners.CurrentLegReplannerFactory;
 import playground.christoph.withinday.replanning.replanners.InitialReplannerFactory;
 import playground.christoph.withinday.replanning.replanners.NextLegReplannerFactory;
-import playground.christoph.withinday.replanning.replanners.tools.TravelTimeCollector;
 import playground.christoph.withinday.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
+import playground.christoph.withinday.trafficmonitoring.TravelTimeCollector;
+import playground.christoph.withinday.trafficmonitoring.TravelTimeCollectorFactory;
 
 /**
- * This Controler should give an Example what is needed to run
+ * Thimport playground.christoph.withinday.trafficmonitoring.TravelTimeCollector;
+is Controler should give an Example what is needed to run
  * Simulations with WithinDayReplanning and respecting the 
  * Knowledge of the Agents.
  * 
@@ -122,7 +124,7 @@ public class WithinDayKnowledgeControler extends WithinDayControler {
 //				travelCostWrapper, travelTime);
 		
 		
-		travelTime = new TravelTimeCollector(network);
+		travelTime = new TravelTimeCollectorFactory().createFreeSpeedTravelTimeCalculator(this.scenarioData);
 		foqsl.addQueueSimulationBeforeSimStepListener((TravelTimeCollector)travelTime);	// for TravelTimeCollector
 		foqsl.addQueueSimulationAfterSimStepListener((TravelTimeCollector)travelTime);	// for TravelTimeCollector
 		this.events.addHandler((TravelTimeCollector)travelTime);	// for TravelTimeCollector

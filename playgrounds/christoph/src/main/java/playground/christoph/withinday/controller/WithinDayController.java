@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * WithinDayControler.java
+ * WithinDayController.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -69,12 +69,14 @@ import playground.christoph.withinday.replanning.replanners.NextLegReplannerFact
 import playground.christoph.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
 import playground.christoph.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
 import playground.christoph.withinday.replanning.replanners.interfaces.WithinDayInitialReplanner;
-import playground.christoph.withinday.replanning.replanners.tools.TravelTimeCollector;
 import playground.christoph.withinday.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
 import playground.christoph.withinday.scoring.OnlyTimeDependentScoringFunctionFactory;
+import playground.christoph.withinday.trafficmonitoring.TravelTimeCollector;
+import playground.christoph.withinday.trafficmonitoring.TravelTimeCollectorFactory;
 
 /**
- * This Controller should give an Example what is needed to run
+ * Thimport playground.christoph.withinday.trafficmonitoring.TravelTimeCollector;
+is Controller should give an Example what is needed to run
  * Simulations with WithinDayReplanning.
  * 
  * The Path to a Config File is needed as Argument to run the
@@ -87,7 +89,7 @@ import playground.christoph.withinday.scoring.OnlyTimeDependentScoringFunctionFa
  * 
  * @author Christoph Dobler
  */
-public class WithinDayControler extends Controler {
+public class WithinDayController extends Controler {
 
 	/*
 	 * Define the Probability that an Agent uses the
@@ -119,16 +121,16 @@ public class WithinDayControler extends Controler {
 	protected WithinDayQSim sim;
 	protected FixedOrderQueueSimulationListener foqsl = new FixedOrderQueueSimulationListener();
 
-	private static final Logger log = Logger.getLogger(WithinDayControler.class);
+	private static final Logger log = Logger.getLogger(WithinDayController.class);
 
-	public WithinDayControler(String[] args) {
+	public WithinDayController(String[] args) {
 		super(args);
 
 		setConstructorParameters();
 	}
 
 	// only for Batch Runs
-	public WithinDayControler(Config config) {
+	public WithinDayController(Config config) {
 		super(config);
 
 		setConstructorParameters();
@@ -152,7 +154,7 @@ public class WithinDayControler extends Controler {
 	 */
 	protected void initReplanningRouter() {
 
-		travelTime = new TravelTimeCollector(network);
+		travelTime = new TravelTimeCollectorFactory().createFreeSpeedTravelTimeCalculator(this.scenarioData);
 		foqsl.addQueueSimulationInitializedListener((TravelTimeCollector)travelTime);	// for TravelTimeCollector
 		foqsl.addQueueSimulationBeforeSimStepListener((TravelTimeCollector)travelTime);	// for TravelTimeCollector
 		foqsl.addQueueSimulationAfterSimStepListener((TravelTimeCollector)travelTime);	// for TravelTimeCollector
@@ -255,7 +257,7 @@ public class WithinDayControler extends Controler {
 
 	public static class ReplanningFlagInitializer implements SimulationInitializedListener {
 
-		protected WithinDayControler withinDayControler;
+		protected WithinDayController withinDayControler;
 		protected Map<Id, WithinDayPersonAgent> withinDayPersonAgents;
 
 		protected int noReplanningCounter = 0;
@@ -263,7 +265,7 @@ public class WithinDayControler extends Controler {
 		protected int actEndReplanningCounter = 0;
 		protected int leaveLinkReplanningCounter = 0;
 
-		public ReplanningFlagInitializer(WithinDayControler controler) {
+		public ReplanningFlagInitializer(WithinDayController controler) {
 			this.withinDayControler = controler;
 		}
 
@@ -362,9 +364,9 @@ public class WithinDayControler extends Controler {
 			System.out.println("Usage: Controler config-file [dtd-file]");
 			System.out.println();
 		} else {
-			final WithinDayControler controler = new WithinDayControler(args);
-			controler.setOverwriteFiles(true);
-			controler.run();
+			final WithinDayController controller = new WithinDayController(args);
+			controller.setOverwriteFiles(true);
+			controller.run();
 		}
 		System.exit(0);
 	}

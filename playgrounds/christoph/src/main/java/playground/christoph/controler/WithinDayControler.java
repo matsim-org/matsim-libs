@@ -69,12 +69,14 @@ import playground.christoph.withinday.replanning.replanners.NextLegReplannerFact
 import playground.christoph.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
 import playground.christoph.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
 import playground.christoph.withinday.replanning.replanners.interfaces.WithinDayInitialReplanner;
-import playground.christoph.withinday.replanning.replanners.tools.TravelTimeCollector;
 import playground.christoph.withinday.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
 import playground.christoph.withinday.scoring.OnlyTimeDependentScoringFunctionFactory;
+import playground.christoph.withinday.trafficmonitoring.TravelTimeCollector;
+import playground.christoph.withinday.trafficmonitoring.TravelTimeCollectorFactory;
 
 /**
- * This Controler should give an Example what is needed to run
+ * Thimport playground.christoph.withinday.trafficmonitoring.TravelTimeCollector;
+is Controler should give an Example what is needed to run
  * Simulations with WithinDayReplanning.
  * 
  * The Path to a Config File is needed as Argument to run the
@@ -153,7 +155,7 @@ public class WithinDayControler extends Controler {
 	 */
 	protected void initReplanningRouter() {
 
-		travelTime = new TravelTimeCollector(network);
+		travelTime = new TravelTimeCollectorFactory().createFreeSpeedTravelTimeCalculator(this.scenarioData);
 		foqsl.addQueueSimulationInitializedListener((TravelTimeCollector)travelTime);	// for TravelTimeCollector
 		foqsl.addQueueSimulationBeforeSimStepListener((TravelTimeCollector)travelTime);	// for TravelTimeCollector
 		foqsl.addQueueSimulationAfterSimStepListener((TravelTimeCollector)travelTime);	// for TravelTimeCollector
