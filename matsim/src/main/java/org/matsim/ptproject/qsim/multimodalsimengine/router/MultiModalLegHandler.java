@@ -30,7 +30,6 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.config.groups.MultiModalConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
@@ -65,22 +64,18 @@ public class MultiModalLegHandler implements LegRouter {
 	private IntermodalLeastCostPathCalculator ptRouteAlgo;
 	private IntermodalLeastCostPathCalculator rideRouteAlgo;
 	
-	private MultiModalConfigGroup multiModalGroup;
 	private LeastCostPathCalculatorFactory factory;
 	private Network network;
 
-	public MultiModalLegHandler(final MultiModalConfigGroup multiModalGroup, final Network network,
-			final PersonalizableTravelTime timeCalculator, LeastCostPathCalculatorFactory factory) {
+	public MultiModalLegHandler(final Network network, final PersonalizableTravelTime timeCalculator, LeastCostPathCalculatorFactory factory) {
 		
-		this.multiModalGroup = multiModalGroup;
 		this.network = network;
 		this.factory = factory;
 		initRouteAlgos(network, timeCalculator);
 	}
 
-	public MultiModalLegHandler(final MultiModalConfigGroup multiModalGroup,
-			final Network network, final PersonalizableTravelTime timeCalculator) {
-		this(multiModalGroup, network, timeCalculator, new DijkstraFactory());
+	public MultiModalLegHandler(final Network network, final PersonalizableTravelTime timeCalculator) {
+		this(network, timeCalculator, new DijkstraFactory());
 	}
 	
 	@Override
@@ -105,7 +100,7 @@ public class MultiModalLegHandler implements LegRouter {
 		/*
 		 * Walk
 		 */
-		MultiModalTravelTimeCost walkTravelTimeCost = new MultiModalTravelTimeCost(this.configGroup, this.multiModalGroup, TransportMode.walk);
+		MultiModalTravelTimeCost walkTravelTimeCost = new MultiModalTravelTimeCost(this.configGroup, TransportMode.walk);
 		walkRouteAlgo = (IntermodalLeastCostPathCalculator)factory.createPathCalculator(network, walkTravelTimeCost, walkTravelTimeCost);
 			
 		Set<String> walkModeRestrictions = new TreeSet<String>();
@@ -117,7 +112,7 @@ public class MultiModalLegHandler implements LegRouter {
 		/*
 		 * Bike
 		 */
-		MultiModalTravelTimeCost bikeTravelTimeCost = new MultiModalTravelTimeCost(this.configGroup, this.multiModalGroup, TransportMode.bike);
+		MultiModalTravelTimeCost bikeTravelTimeCost = new MultiModalTravelTimeCost(this.configGroup, TransportMode.bike);
 		bikeRouteAlgo = (IntermodalLeastCostPathCalculator)factory.createPathCalculator(network, bikeTravelTimeCost, bikeTravelTimeCost);
 		
 		/*
@@ -136,7 +131,7 @@ public class MultiModalLegHandler implements LegRouter {
 		 * If possible, we use "real" TravelTimes from previous iterations - if not,
 		 * freeSpeedTravelTimes are used.
 		 */
-		MultiModalTravelTimeCost ptTravelTimeCost = new MultiModalTravelTimeCost(this.configGroup, this.multiModalGroup, TransportMode.pt);
+		MultiModalTravelTimeCost ptTravelTimeCost = new MultiModalTravelTimeCost(this.configGroup, TransportMode.pt);
 		if (travelTime instanceof TravelTimeCalculatorWithBuffer) {
 			BufferedTravelTime bufferedTravelTime = new BufferedTravelTime((TravelTimeCalculatorWithBuffer) travelTime);
 			ptTravelTimeCost.setTravelTime(bufferedTravelTime);
@@ -165,7 +160,7 @@ public class MultiModalLegHandler implements LegRouter {
 		 * If possible, we use "real" TravelTimes from previous iterations - if not,
 		 * freeSpeedTravelTimes are used.
 		 */
-		MultiModalTravelTimeCost rideTravelTimeCost = new MultiModalTravelTimeCost(this.configGroup, this.multiModalGroup, TransportMode.ride);
+		MultiModalTravelTimeCost rideTravelTimeCost = new MultiModalTravelTimeCost(this.configGroup, TransportMode.ride);
 		if (travelTime instanceof TravelTimeCalculatorWithBuffer) {
 			BufferedTravelTime bufferedTravelTime = new BufferedTravelTime((TravelTimeCalculatorWithBuffer) travelTime);
 			rideTravelTimeCost.setTravelTime(bufferedTravelTime);

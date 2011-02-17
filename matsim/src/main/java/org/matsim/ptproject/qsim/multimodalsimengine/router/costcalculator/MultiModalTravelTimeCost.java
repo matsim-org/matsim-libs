@@ -23,7 +23,6 @@ package org.matsim.ptproject.qsim.multimodalsimengine.router.costcalculator;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.config.groups.MultiModalConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.router.util.PersonalizableTravelCost;
@@ -43,13 +42,13 @@ public class MultiModalTravelTimeCost implements MultiModalTravelTime, Personali
 	 * calls to getModalLinkTravelTime(...) will use the speed of the
 	 * given TransportMode.
 	 */
-	public MultiModalTravelTimeCost(PlansCalcRouteConfigGroup plansCalcGroup, MultiModalConfigGroup multiModalGroup) {
-		this(plansCalcGroup, multiModalGroup, TransportMode.walk);
+	public MultiModalTravelTimeCost(PlansCalcRouteConfigGroup plansCalcGroup) {
+		this(plansCalcGroup, TransportMode.walk);
 	}
 
-	public MultiModalTravelTimeCost(PlansCalcRouteConfigGroup plansCalcGroup, MultiModalConfigGroup multiModalGroup, String transportMode) {
+	public MultiModalTravelTimeCost(PlansCalcRouteConfigGroup plansCalcGroup, String transportMode) {
 		this.plansCalcGroup = plansCalcGroup;
-		this.ptScaleFactor = multiModalGroup.getPtScaleFactor();
+		this.ptScaleFactor = plansCalcGroup.getPtSpeedFactor();
 		
 		if (transportMode.equals(TransportMode.bike)) speed = plansCalcGroup.getBikeSpeed();
 		else if (transportMode.equals(TransportMode.walk)) speed = plansCalcGroup.getWalkSpeed();

@@ -38,7 +38,6 @@ public class MultiModalConfigGroup extends Module {
 	private static final String CUTOFF_VALUE_FOR_NON_MOTORIZED_MODES  = "cuttoffValueForNonCarModes";
 	private static final String DROP_NON_CAR_ROUTES = "dropNonCarRoutes";
 	private static final String ENSURE_ACTIVITY_REACHABILITY = "ensureActivityReachability";
-	private static final String PT_SCALE_FACTOR = "ptScaleFactor";
 
 	private boolean multiModalSimulationEnabled = false;
 	private int numberOfThreads = 1;
@@ -47,7 +46,6 @@ public class MultiModalConfigGroup extends Module {
 	private double cuttoffValueForNonMotorizedModes = 80/3.6;	// 80km/h -> m/s
 	private boolean dropNonCarRoutes = false;
 	private boolean ensureActivityReachability = false;
-	private double ptScaleFactor = 1.25;
 
 	public MultiModalConfigGroup() {
 		super(GROUP_NAME);
@@ -69,8 +67,6 @@ public class MultiModalConfigGroup extends Module {
 			setDropNonCarRoutes(Boolean.parseBoolean(value.trim()));
 		} else if (ENSURE_ACTIVITY_REACHABILITY.equals(key)) {
 			setEnsureActivityReachability(Boolean.parseBoolean(value.trim()));
-		} else if (PT_SCALE_FACTOR.equals(key)) {
-			setPtScaleFactor(Double.parseDouble(value));
 		} else {
 			throw new IllegalArgumentException(key);
 		}
@@ -92,8 +88,6 @@ public class MultiModalConfigGroup extends Module {
 			return Boolean.toString(isDropNonCarRoutes());
 		} else if (ENSURE_ACTIVITY_REACHABILITY.equals(key)) {
 			return Boolean.toString(isEnsureActivityReachability());
-		} else if (PT_SCALE_FACTOR.equals(key)) {
-			return Double.toString(getPtScaleFactor());
 		} else {
 			throw new IllegalArgumentException(key);
 		}
@@ -108,7 +102,6 @@ public class MultiModalConfigGroup extends Module {
 		map.put(CREATE_MULTI_MODAL_NETWORK, getValue(CREATE_MULTI_MODAL_NETWORK));
 		map.put(CUTOFF_VALUE_FOR_NON_MOTORIZED_MODES, getValue(CUTOFF_VALUE_FOR_NON_MOTORIZED_MODES));
 		map.put(DROP_NON_CAR_ROUTES, getValue(DROP_NON_CAR_ROUTES));
-		map.put(PT_SCALE_FACTOR, getValue(PT_SCALE_FACTOR));
 		return map;
 	}
 	
@@ -118,7 +111,6 @@ public class MultiModalConfigGroup extends Module {
 		map.put(NUMBER_OF_THREADS, "Use number of threads > 1 for parallel version using the specified number of threads.");
 		map.put(CREATE_MULTI_MODAL_NETWORK, "Use this, if your network is not multi modal. Links with free speeds that are lower than the specified cutoff value will be usable for walk and bike trips.");
 		map.put(CUTOFF_VALUE_FOR_NON_MOTORIZED_MODES, "Only used, if createMultiModalNetwork is enabled (set value in m/s).");
-		map.put(PT_SCALE_FACTOR, "Scale factor that is used to calculate PT travel times (PT travel time = car travel time * scale factor).");
 		return map;
 	}
 	
@@ -177,13 +169,5 @@ public class MultiModalConfigGroup extends Module {
 
 	public boolean isEnsureActivityReachability() {
 		return this.ensureActivityReachability;
-	}
-	
-	public void setPtScaleFactor(final double scaleFactor) {
-		this.ptScaleFactor = scaleFactor;
-	}
-
-	public double getPtScaleFactor() {
-		return this.ptScaleFactor;
 	}
 }

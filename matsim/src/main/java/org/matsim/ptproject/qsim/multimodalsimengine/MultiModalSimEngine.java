@@ -56,8 +56,7 @@ public class MultiModalSimEngine implements MobsimEngine, NetworkElementActivato
 //		linksToActivate = new ArrayList<MultiModalQLinkExtension>();
 //		nodesToActivate = new ArrayList<MultiModalQNodeExtension>();
 		
-		multiModalTravelTime = new MultiModalTravelTimeCost(qSim.getScenario().getConfig().plansCalcRoute(), 
-				qSim.getScenario().getConfig().multiModal());
+		multiModalTravelTime = new MultiModalTravelTimeCost(qSim.getScenario().getConfig().plansCalcRoute());
 	}
 	
 	@Override

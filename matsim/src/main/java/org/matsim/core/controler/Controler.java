@@ -1094,8 +1094,8 @@ public class Controler {
 			PlansCalcRoute plansCalcRoute = new PlansCalcRoute(this.config.plansCalcRoute(), this.network, travelCosts,
 					travelTimes, this.getLeastCostPathCalculatorFactory());
 
-			MultiModalLegHandler multiModalLegHandler = new MultiModalLegHandler(this.config.multiModal(), this.network,
-					travelTimes, this.getLeastCostPathCalculatorFactory());
+			MultiModalLegHandler multiModalLegHandler = new MultiModalLegHandler(this.network, travelTimes, 
+					this.getLeastCostPathCalculatorFactory());
 
 			for (String mode : CollectionUtils.stringToArray(this.config.multiModal().getSimulatedModes())) {
 				plansCalcRoute.addLegHandler(mode, multiModalLegHandler);
