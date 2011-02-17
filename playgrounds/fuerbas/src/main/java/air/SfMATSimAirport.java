@@ -88,10 +88,10 @@ public class SfMATSimAirport {
 		linkRunwayOut.setFreespeed(250.0/3.6);
 		
 		linkApron.setCapacity(1.);
-		linkTaxiIn.setCapacity(3./80.);
-		linkTaxiIn.setNumberOfLanes(0.44);
+		linkTaxiIn.setCapacity(1./60.);
+		linkTaxiIn.setNumberOfLanes(2.25);
 		linkTaxiOut.setCapacity(1.);
-		linkTaxiOut.setNumberOfLanes(0.44);
+		linkTaxiOut.setNumberOfLanes(2.25);
 		linkRunwayIn.setCapacity(1.);
 		linkRunwayOut.setCapacity(1./60.);
 		
