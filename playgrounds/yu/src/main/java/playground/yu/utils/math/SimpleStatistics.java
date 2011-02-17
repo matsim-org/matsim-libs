@@ -79,11 +79,11 @@ public class SimpleStatistics {
 
 	// max
 	public static double max(double[] array, int firstIdx, int lastIdx) {
-		double min = array[firstIdx];
+		double max = array[firstIdx];
 		for (int i = firstIdx + 1; i <= lastIdx; i++) {
-			min = Math.max(min, array[i]);
+			max = Math.max(max, array[i]);
 		}
-		return min;
+		return max;
 	}
 
 	public static double max(double[] array) {

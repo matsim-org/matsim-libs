@@ -71,21 +71,21 @@ public class InsertExtraneousSelectedPlans extends NewPopulation {
 	public static void onePlusN(String[] args) {
 		String netFilename, populationFilename, extraneousPopulationFilenames[], outputPopulationFilename;
 		int extraneousPopSize = 2;
-		if (args.length > 4) {
-			netFilename = args[0];
-			populationFilename = args[1];
-			extraneousPopSize = args.length - 2 - 2 + 1;
-			extraneousPopulationFilenames = new String[extraneousPopSize];
-			for (int i = 0; i < extraneousPopSize; i++) {
-				extraneousPopulationFilenames[i] = args[2 + i];
-			}
-			outputPopulationFilename = args[args.length - 1];
-		} else {
-			netFilename = "../data/schweiz/input/ch.xml";
-			populationFilename = "../data/schweiz/input/459.100.plans.xml.gz";
-			extraneousPopulationFilenames = new String[] { "dummy", "dummy" };
-			outputPopulationFilename = "dummy";
+		// if (args.length > 4) {
+		netFilename = args[0];
+		populationFilename = args[1];
+		extraneousPopSize = args.length - 2 - 2 + 1;
+		extraneousPopulationFilenames = new String[extraneousPopSize];
+		for (int i = 0; i < extraneousPopSize; i++) {
+			extraneousPopulationFilenames[i] = args[2 + i];
 		}
+		outputPopulationFilename = args[args.length - 1];
+		// } else {
+		// netFilename = "../data/schweiz/input/ch.xml";
+		// populationFilename = "../data/schweiz/input/459.100.plans.xml.gz";
+		// extraneousPopulationFilenames = new String[] { "dummy", "dummy" };
+		// outputPopulationFilename = "dummy";
+		// }
 
 		Scenario scenario = new ScenarioImpl();
 		new MatsimNetworkReader(scenario).readFile(netFilename);
