@@ -95,24 +95,28 @@ public class PathSizeFromPopulationSummary extends AbstractPersonAlgorithm {
 				"Distribution of minimal path-sizes in choice set",
 				"path-size (0, 1.0]", "frequency of path-size");
 		minDc.write(outputFilenameBase + "minPS.log");
+		minDc.writePercent(outputFilenameBase + "minPSpercent.log");
 
 		DistributionCreator maxDc = new DistributionCreator(maxPSs, 0.01);
 		maxDc.createChartPercent(outputFilenameBase + "maxPS.png",
 				"Distribution of maximal path-sizes in choice set",
 				"path-size (0, 1.0]", "frequency of path-size");
 		maxDc.write(outputFilenameBase + "maxPS.log");
+		maxDc.writePercent(outputFilenameBase + "maxPSpercent.log");
 
 		DistributionCreator avgDc = new DistributionCreator(avgPSs, 0.01);
 		avgDc.createChartPercent(outputFilenameBase + "avgPS.png",
 				"Distribution of average path-sizes in choice set",
 				"path-size (0, 1.0]", "frequency of path-size");
 		avgDc.write(outputFilenameBase + "avgPS.log");
+		avgDc.writePercent(outputFilenameBase + "avgPSpercent.log");
 
 		DistributionCreator allDc = new DistributionCreator(allPSs, 0.01);
 		allDc.createChartPercent(outputFilenameBase + "allPS.png",
 				"Distribution of all path-sizes in choice set",
 				"path-size (0, 1.0]", "frequency of path-size");
 		allDc.write(outputFilenameBase + "allPS.log");
+		allDc.writePercent(outputFilenameBase + "allPSpercent.log");
 
 		System.out.println("avg. of minPS\t" + SimpleStatistics.average(minPSs)
 				+ "\navg. of maxPS\t" + SimpleStatistics.average(maxPSs)
