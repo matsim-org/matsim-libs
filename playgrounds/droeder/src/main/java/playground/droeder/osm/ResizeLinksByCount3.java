@@ -1,57 +1,43 @@
 package playground.droeder.osm;
 
-import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
-import org.matsim.counts.CountsReaderMatsimV1;
-import org.matsim.counts.CountsWriter;
-import org.matsim.counts.Volume;
-import org.xml.sax.SAXException;
-
-import playground.andreas.osmBB.osm2counts.Osm2Counts;
 
 public class ResizeLinksByCount3 extends AbstractResizeLinksByCount{
 	
 	private static final Logger log = Logger.getLogger(ResizeLinksByCount3.class);
 	
-	public static void main(String[] args){
-		String countsFile = "d:/VSP/output/osm_bb/Di-Do_counts.xml";
-		String filteredOsmFile = "d:/VSP/output/osm_bb/counts.osm";
-		String networkFile = "d:/VSP/output/osm_bb/counts_network.xml";
-		
-		Osm2Counts osm2Counts = new Osm2Counts(filteredOsmFile);
-		osm2Counts.prepareOsm();
-		HashMap<String, String> shortNameMap = osm2Counts.getShortNameMap();
-		Counts counts = new Counts();
-		CountsReaderMatsimV1 countsReader = new CountsReaderMatsimV1(counts);
-		try {
-			countsReader.parse(countsFile);
-		} catch (SAXException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		ResizeLinksByCount3 r = new ResizeLinksByCount3(networkFile, counts, shortNameMap, 1.0);
-		r.run("d:/VSP/output/osm_bb/network_resized.xml");
-	}
+//	public static void main(String[] args){
+//		String countsFile = "d:/VSP/output/osm_bb/Di-Do_counts.xml";
+//		String filteredOsmFile = "d:/VSP/output/osm_bb/counts.osm";
+//		String networkFile = "d:/VSP/output/osm_bb/counts_network.xml";
+//		
+//		Osm2Counts osm2Counts = new Osm2Counts(filteredOsmFile);
+//		osm2Counts.prepareOsm();
+//		HashMap<String, String> shortNameMap = osm2Counts.getShortNameMap();
+//		Counts counts = new Counts();
+//		CountsReaderMatsimV1 countsReader = new CountsReaderMatsimV1(counts);
+//		try {
+//			countsReader.parse(countsFile);
+//		} catch (SAXException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		} catch (ParserConfigurationException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//		
+//		ResizeLinksByCount3 r = new ResizeLinksByCount3(networkFile, counts, shortNameMap, 1.0);
+//		r.run("d:/VSP/output/osm_bb/network_resized.xml");
+//	}
 
 
 	
