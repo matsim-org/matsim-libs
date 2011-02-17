@@ -47,9 +47,9 @@ import playground.christoph.network.util.SubNetworkTools;
 import playground.christoph.router.costcalculators.KnowledgeTravelCostWrapper;
 import playground.christoph.router.costcalculators.KnowledgeTravelTimeCalculator;
 import playground.christoph.router.costcalculators.KnowledgeTravelTimeWrapper;
-import playground.christoph.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
 import playground.christoph.router.util.CloningDijkstraFactory;
 import playground.christoph.router.util.KnowledgeTools;
+import playground.christoph.withinday.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
 
 public class TestSubNetwork {
 

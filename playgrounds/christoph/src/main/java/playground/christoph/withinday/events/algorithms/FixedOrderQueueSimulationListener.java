@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.christoph.events.algorithms;
+package playground.christoph.withinday.events.algorithms;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,6 +54,9 @@ public class FixedOrderQueueSimulationListener implements SimulationInitializedL
 		simulationBeforeCleanupListener = new ArrayList<SimulationBeforeCleanupListener>();
 	}
 
+	/**
+	 * Adds the SimulationListener to all ListenerLists that it supports.
+	 */
 	public void addQueueSimulationListener(SimulationListener listener) {
 		if (listener instanceof SimulationInitializedListener) {
 			addQueueSimulationInitializedListener((SimulationInitializedListener) listener);
@@ -68,7 +71,24 @@ public class FixedOrderQueueSimulationListener implements SimulationInitializedL
 			addQueueSimulationBeforeCleanupListener((SimulationBeforeCleanupListener) listener);
 		}
 	}
-
+	
+	/**
+	 * Removes the SimulationListener from all ListenerLists that it supports.
+	 */
+	public void removeQueueSimulationListener(SimulationListener listener) {
+		if (listener instanceof SimulationInitializedListener) {
+			removeQueueSimulationInitializedListener((SimulationInitializedListener) listener);
+		}
+		if (listener instanceof SimulationBeforeSimStepListener) {
+			removeQueueSimulationBeforeSimStepListener((SimulationBeforeSimStepListener) listener);
+		}
+		if (listener instanceof SimulationAfterSimStepListener) {
+			removeQueueSimulationAfterSimStepListener((SimulationAfterSimStepListener) listener);
+		}
+		if (listener instanceof SimulationBeforeCleanupListener) {
+			removeQueueSimulationBeforeCleanupListener((SimulationBeforeCleanupListener) listener);
+		}
+	}
 	
 	public void addQueueSimulationInitializedListener(SimulationInitializedListener listener) {
 		simulationInitializedListener.add(listener);

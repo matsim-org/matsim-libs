@@ -40,9 +40,9 @@ import org.matsim.core.router.util.TravelCost;
 
 import playground.christoph.knowledge.container.dbtools.DBConnectionTool;
 import playground.christoph.knowledge.nodeselection.DijkstraForSelectNodes;
-import playground.christoph.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
 import playground.christoph.tools.ByteArrayConverter;
 import playground.christoph.tools.Zipper;
+import playground.christoph.withinday.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
 
 /*
  * Creates two Maps for each Node of a given Network:

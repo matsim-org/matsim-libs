@@ -54,6 +54,7 @@ import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.misc.Counter;
 
 import playground.christoph.netherlands.zones.SpecialZones;
+import playground.christoph.withinday.trafficmonitoring.FreeSpeedTravelTimeCalculator;
 
 public class CalculateTravelTimes {
 
@@ -150,7 +151,7 @@ public class CalculateTravelTimes {
 	
 	private void initCalulators() throws Exception {
 		if (useFreeSpeedTravelTime) {
-			travelTime = new FreeSpeedTravelTime();
+			travelTime = new FreeSpeedTravelTimeCalculator();
 		}
 		else {
 			travelTime = new TravelTimeCalculator(scenario.getNetwork(), scenario.getConfig().travelTimeCalculator());
@@ -290,13 +291,7 @@ public class CalculateTravelTimes {
 			}
 		}
 	}
-	
-	public class FreeSpeedTravelTime implements TravelTime {
-		public double getLinkTravelTime(Link link, double time) {
-			return link.getLength() / link.getFreespeed();
-		}		
-	}
-	
+		
 	public class FreeSpeedTravelCost implements PersonalizableTravelCost, TravelMinCost {
 		private TravelTime travelTime;
 		

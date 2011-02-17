@@ -26,7 +26,7 @@ import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.util.DijkstraFactory;
 
 import playground.christoph.controler.WithinDayControler;
-import playground.christoph.events.algorithms.FixedOrderQueueSimulationListener;
+import playground.christoph.withinday.events.algorithms.FixedOrderQueueSimulationListener;
 import playground.christoph.withinday.mobsim.DuringActivityReplanningModule;
 import playground.christoph.withinday.mobsim.DuringLegReplanningModule;
 import playground.christoph.withinday.mobsim.InitialReplanningModule;

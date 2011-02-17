@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.christoph.router.costcalculators;
+package playground.christoph.withinday.router.costcalculators;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
@@ -28,6 +28,13 @@ import org.matsim.core.router.util.TravelMinCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.misc.Time;
 
+import playground.christoph.withinday.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
+import playground.christoph.withinday.trafficmonitoring.FreeSpeedTravelTimeCalculator;
+
+/**
+ *  A Travel Cost Calculator that uses the travel times as travel costs.
+ * @author cdobler
+ */
 public class OnlyTimeDependentTravelCostCalculator implements TravelMinCost, PersonalizableTravelCost {
 
 	private static final Logger log = Logger.getLogger(OnlyTimeDependentTravelCostCalculator.class);
@@ -35,26 +42,22 @@ public class OnlyTimeDependentTravelCostCalculator implements TravelMinCost, Per
 	protected final TravelTime timeCalculator;
 
 	public OnlyTimeDependentTravelCostCalculator(final TravelTime timeCalculator) {
-		this.timeCalculator = timeCalculator;
-		if (timeCalculator == null) log.warn("TimeCalculator is null so FreeSpeedTravelTimes will be calculated!");
+		if (timeCalculator == null) {
+			log.warn("TimeCalculator is null so FreeSpeedTravelTimes will be calculated!");
+			this.timeCalculator = new FreeSpeedTravelTimeCalculator();
+		} else this.timeCalculator = timeCalculator;
 	}
 
 	public double getLinkGeneralizedTravelCost(final Link link, final double time) {
-		if (timeCalculator != null) {
-			double travelTime = this.timeCalculator.getLinkTravelTime(link, time);
-			return travelTime;
-		} else {
-			return link.getLength()/link.getFreespeed(time);
-		}
+		return this.timeCalculator.getLinkTravelTime(link, time);
 	}
 
 	public double getLinkMinimumTravelCost(final Link link) {
-		double TravelTime = this.timeCalculator.getLinkTravelTime(link, Time.UNDEFINED_TIME);
-		return TravelTime;
+		return this.timeCalculator.getLinkTravelTime(link, Time.UNDEFINED_TIME);
 	}
 	
 	@Override
 	public void setPerson(Person person) {
-		// TODO Auto-generated method stub	
+		// nothing to do here
 	}
 }

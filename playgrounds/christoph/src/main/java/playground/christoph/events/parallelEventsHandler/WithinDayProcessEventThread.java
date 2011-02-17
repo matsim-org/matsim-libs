@@ -30,6 +30,10 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.parallelEventsHandler.LastEventOfIteration;
 import org.matsim.core.gbl.Gbl;
 
+import playground.christoph.withinday.events.parallelEventsHandler.LastEventOfSimStep;
+
+import playground.christoph.withinday.events.parallelEventsHandler.LastEventOfSimStep;
+
 /**
  * The wrapper around the Events class for allowing parallelization.
  * Adaption of Rashid Waraich implementation. Now use a LinkedBlockingQueue instead

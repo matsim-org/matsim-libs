@@ -26,7 +26,6 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.events.parallelEventsHandler.ParallelEventsManagerImpl;
 import org.matsim.core.gbl.MatsimRandom;
@@ -41,7 +40,6 @@ import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.PersonalizableTravelTime;
-import org.matsim.core.router.util.TravelTime;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.multimodalsimengine.MultiModalControler;
 import org.matsim.ptproject.qsim.multimodalsimengine.MultiModalMobsimFactory;
@@ -59,10 +57,8 @@ import playground.christoph.evacuation.withinday.replanning.replanners.CurrentLe
 import playground.christoph.evacuation.withinday.replanning.replanners.CurrentLegToSecureFacilityReplannerFactory;
 import playground.christoph.evacuation.withinday.replanning.replanners.EndActivityAndEvacuateReplannerFactory;
 import playground.christoph.evacuation.withinday.replanning.replanners.ExtendCurrentActivityReplannerFactory;
-import playground.christoph.events.algorithms.FixedOrderQueueSimulationListener;
-import playground.christoph.events.parallelEventsHandler.SimStepParallelEventsManagerImpl;
-import playground.christoph.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
-import playground.christoph.scoring.OnlyTimeDependentScoringFunctionFactory;
+import playground.christoph.withinday.events.algorithms.FixedOrderQueueSimulationListener;
+import playground.christoph.withinday.events.parallelEventsHandler.SimStepParallelEventsManagerImpl;
 import playground.christoph.withinday.mobsim.DuringActivityReplanningModule;
 import playground.christoph.withinday.mobsim.DuringLegReplanningModule;
 import playground.christoph.withinday.mobsim.InitialReplanningModule;
@@ -84,6 +80,8 @@ import playground.christoph.withinday.replanning.replanners.interfaces.WithinDay
 import playground.christoph.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
 import playground.christoph.withinday.replanning.replanners.interfaces.WithinDayInitialReplanner;
 import playground.christoph.withinday.replanning.replanners.tools.TravelTimeCollector;
+import playground.christoph.withinday.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
+import playground.christoph.withinday.scoring.OnlyTimeDependentScoringFunctionFactory;
 
 /*
  * The Path to a Config File is needed as Argument to run the
@@ -488,16 +486,4 @@ public class EvacuationControler extends MultiModalControler {
 		System.exit(0);
 	}
 
-	public static class FreeSpeedTravelTime implements TravelTime, Cloneable {
-
-		@Override
-		public double getLinkTravelTime(Link link, double time) {
-			return link.getFreespeed(time);
-		}
-
-		@Override
-		public FreeSpeedTravelTime clone() {
-			return new FreeSpeedTravelTime();
-		}
-	}
 }

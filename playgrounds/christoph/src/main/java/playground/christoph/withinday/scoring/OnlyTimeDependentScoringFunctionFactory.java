@@ -18,14 +18,17 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.christoph.scoring;
+package playground.christoph.withinday.scoring;
 
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 
+import playground.christoph.withinday.scoring.OnlyTimeDependentScoringFunction;
+
 /**
- * @author Christoph Dobler
+ * Returns a Scoring Function that only respects the travel time.
+ * @author cdobler
  */
 public class OnlyTimeDependentScoringFunctionFactory implements ScoringFunctionFactory {
 	

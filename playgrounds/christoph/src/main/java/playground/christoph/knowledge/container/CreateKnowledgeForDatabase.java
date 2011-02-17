@@ -42,7 +42,7 @@ import playground.christoph.knowledge.nodeselection.SelectNodesCircular;
 import playground.christoph.knowledge.nodeselection.SelectNodesDijkstra;
 import playground.christoph.network.MyLinkFactoryImpl;
 import playground.christoph.network.MyLinkImpl;
-import playground.christoph.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
+import playground.christoph.withinday.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
 
 /*
  * The following Parameters have to be set:

@@ -54,8 +54,8 @@ import org.matsim.core.utils.misc.Time;
 import playground.christoph.knowledge.nodeselection.DijkstraForSelectNodes;
 import playground.christoph.network.MyLinkFactoryImpl;
 import playground.christoph.network.MyLinkImpl;
-import playground.christoph.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
 import playground.christoph.router.util.KnowledgeTools;
+import playground.christoph.withinday.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
 
 /*
  * Creates Knowledge Entries for multiple CostFactors in a single Iteration,

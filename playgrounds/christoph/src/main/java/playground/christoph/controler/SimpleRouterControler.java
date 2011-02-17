@@ -27,7 +27,6 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
@@ -42,7 +41,6 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.ptproject.qsim.QSim;
 
-import playground.christoph.events.algorithms.FixedOrderQueueSimulationListener;
 import playground.christoph.knowledge.container.MapKnowledgeDB;
 import playground.christoph.knowledge.nodeselection.SelectNodes;
 import playground.christoph.router.CompassRoute;
@@ -50,9 +48,8 @@ import playground.christoph.router.RandomCompassRoute;
 import playground.christoph.router.RandomDijkstraRoute;
 import playground.christoph.router.RandomRoute;
 import playground.christoph.router.TabuRoute;
-import playground.christoph.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
 import playground.christoph.router.util.SimpleRouterFactory;
-import playground.christoph.scoring.OnlyTimeDependentScoringFunctionFactory;
+import playground.christoph.withinday.events.algorithms.FixedOrderQueueSimulationListener;
 import playground.christoph.withinday.mobsim.InitialReplanningModule;
 import playground.christoph.withinday.mobsim.ReplanningManager;
 import playground.christoph.withinday.mobsim.WithinDayPersonAgent;
@@ -63,6 +60,9 @@ import playground.christoph.withinday.replanning.modules.ReplanningModule;
 import playground.christoph.withinday.replanning.parallel.ParallelInitialReplanner;
 import playground.christoph.withinday.replanning.replanners.InitialReplannerFactory;
 import playground.christoph.withinday.replanning.replanners.interfaces.WithinDayInitialReplanner;
+import playground.christoph.withinday.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
+import playground.christoph.withinday.scoring.OnlyTimeDependentScoringFunctionFactory;
+import playground.christoph.withinday.trafficmonitoring.FreeSpeedTravelTimeCalculator;
 
 /**
  * This Controler should give an Example what is needed to run
@@ -130,7 +130,7 @@ public class SimpleRouterControler extends Controler {
 	/*
 	 * TravelTime and TravelCost for the Dijkstra Router
 	 */
-	protected TravelTime dijkstraTravelTime = new FreeSpeedTravelTime();
+	protected TravelTime dijkstraTravelTime = new FreeSpeedTravelTimeCalculator();
 	protected PersonalizableTravelCost dijkstraTravelCost = new OnlyTimeDependentTravelCostCalculator(dijkstraTravelTime);
 //	protected PersonalizableTravelCost dijkstraTravelCost = new OnlyDistanceDependentTravelCostCalculator();
 
@@ -422,18 +422,5 @@ public class SimpleRouterControler extends Controler {
 			controler.run();
 		}
 		System.exit(0);
-	}
-
-	public static class FreeSpeedTravelTime implements TravelTime, Cloneable {
-
-		@Override
-		public double getLinkTravelTime(Link link, double time) {
-			return link.getFreespeed(time);
-		}
-
-		@Override
-		public FreeSpeedTravelTime clone() {
-			return new FreeSpeedTravelTime();
-		}
 	}
 }

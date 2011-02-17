@@ -32,6 +32,8 @@ import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Counter;
 
+import playground.christoph.withinday.trafficmonitoring.FreeSpeedTravelTimeCalculator;
+
 public class CalculateTravelTimes {
 
 	final private static Logger log = Logger.getLogger(CalculateTravelTimes.class);
@@ -83,7 +85,7 @@ public class CalculateTravelTimes {
 	}
 	
 	private void initCalulators() {
-		travelTime = new FreeSpeedTravelTime();
+		travelTime = new FreeSpeedTravelTimeCalculator();
 		travelCost = new FreeSpeedTravelCost(travelTime);
 		leastCostPathCalculator = new AStarLandmarksFactory(scenario.getNetwork(), (FreeSpeedTravelCost)travelCost).createPathCalculator(scenario.getNetwork(), travelCost, travelTime);
 	}
@@ -283,13 +285,7 @@ public class CalculateTravelTimes {
 		Coord coord1903;
 		Coord coordWGS84;
 	}
-	
-	public class FreeSpeedTravelTime implements TravelTime {
-		public double getLinkTravelTime(Link link, double time) {
-			return link.getLength() / link.getFreespeed();
-		}		
-	}
-	
+		
 	public class FreeSpeedTravelCost implements PersonalizableTravelCost, TravelMinCost {
 		private TravelTime travelTime;
 		

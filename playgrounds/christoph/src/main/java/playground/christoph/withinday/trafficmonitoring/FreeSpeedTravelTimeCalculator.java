@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * WithinDayAgentFactory.java
+ * FreeSpeedTravelTimeCalculator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,30 +18,25 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.christoph.withinday.mobsim;
+package playground.christoph.withinday.trafficmonitoring;
 
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.mobsim.framework.PersonDriverAgent;
-import org.matsim.ptproject.qsim.agents.AgentFactory;
-import org.matsim.ptproject.qsim.interfaces.Mobsim;
+import org.matsim.core.router.util.PersonalizableTravelTime;
 
-/*
- * Creates WithinDayPersonAgents instead of PersonAgents.
- * They are able to reset their cachedNextLink what is
- * necessary when doing LeaveLinkReplanning.
+/**
+ * Calculates and returns the FreeSpeedTravelTime on a link at the given time.
+ * @author cdobler
  */
-public class WithinDayAgentFactory implements AgentFactory {
-	
-	protected final Mobsim simulation;
-	
-	public WithinDayAgentFactory(final Mobsim simulation) {
-		this.simulation = simulation;
+public class FreeSpeedTravelTimeCalculator implements PersonalizableTravelTime {
+
+	@Override
+	public double getLinkTravelTime(Link link, double time) {
+		return link.getLength() / link.getFreespeed(time);
 	}
 
 	@Override
-	public PersonDriverAgent createPersonAgent(final Person p) {
-		WithinDayPersonAgent agent = new WithinDayPersonAgent(p, this.simulation);
-		return agent;
+	public void setPerson(Person person) {
+		// nothing to do here
 	}
-	
 }

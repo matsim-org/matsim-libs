@@ -36,7 +36,7 @@ import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.agents.AgentFactory;
 import org.matsim.ptproject.qsim.interfaces.Mobsim;
 
-import playground.christoph.events.algorithms.FixedOrderQueueSimulationListener;
+import playground.christoph.withinday.events.algorithms.FixedOrderQueueSimulationListener;
 import playground.christoph.withinday.mobsim.DuringActivityReplanningModule;
 import playground.christoph.withinday.mobsim.DuringLegReplanningModule;
 import playground.christoph.withinday.mobsim.InitialReplanningModule;

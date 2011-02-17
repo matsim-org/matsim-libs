@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.christoph.controler;
+package playground.christoph.withinday.controller;
 
 import java.util.Map;
 import java.util.Random;
@@ -74,7 +74,7 @@ import playground.christoph.withinday.router.costcalculators.OnlyTimeDependentTr
 import playground.christoph.withinday.scoring.OnlyTimeDependentScoringFunctionFactory;
 
 /**
- * This Controler should give an Example what is needed to run
+ * This Controller should give an Example what is needed to run
  * Simulations with WithinDayReplanning.
  * 
  * The Path to a Config File is needed as Argument to run the
@@ -140,7 +140,6 @@ public class WithinDayControler extends Controler {
 		 * TravelTime or VehicleCount.
 		 * This is needed to be able to use a LinkVehiclesCounter.
 		 */
-//		this.getNetwork().getFactory().setLinkFactory(new MyLinkFactoryImpl());
 		this.getNetwork().getFactory().setLinkFactory(new WithinDayLinkFactoryImpl());
 
 		// Use a Scoring Function, that only scores the travel times!
@@ -159,11 +158,8 @@ public class WithinDayControler extends Controler {
 		foqsl.addQueueSimulationAfterSimStepListener((TravelTimeCollector)travelTime);	// for TravelTimeCollector
 		this.events.addHandler((TravelTimeCollector)travelTime);	// for TravelTimeCollector
 
-//		travelTime = new FreeSpeedTravelTime();
-
 		OnlyTimeDependentTravelCostCalculator travelCost = new OnlyTimeDependentTravelCostCalculator(travelTime);
 
-//		CloneablePlansCalcRoute dijkstraRouter = new CloneablePlansCalcRoute(new PlansCalcRouteConfigGroup(), network, travelCost, travelTime);
 		LeastCostPathCalculatorFactory factory = new AStarLandmarksFactory(this.network, new FreespeedTravelTimeCost(this.config.planCalcScore()));
 		AbstractMultithreadedModule router = new ReplanningModule(config, network, travelCost, travelTime, factory);
 
@@ -172,8 +168,6 @@ public class WithinDayControler extends Controler {
 		this.initialReplanner.addAgentsToReplanIdentifier(this.initialIdentifier);
 		this.parallelInitialReplanner.addWithinDayReplanner(this.initialReplanner);
 
-//		ActivityReplanningMap activityReplanningMap = new ActivityReplanningMap(this.getEvents(), this.getQueueSimulationListener());
-//		ActivityReplanningMap activityReplanningMap = new ActivityReplanningMap(this.getEvents(), sim);
 		ActivityReplanningMap activityReplanningMap = new ActivityReplanningMap(this.getEvents());
 		foqsl.addQueueSimulationListener(activityReplanningMap);
 		this.duringActivityIdentifier = new ActivityEndIdentifierFactory(activityReplanningMap).createIdentifier();
@@ -181,8 +175,6 @@ public class WithinDayControler extends Controler {
 		this.duringActivityReplanner.addAgentsToReplanIdentifier(this.duringActivityIdentifier);
 		this.parallelActEndReplanner.addWithinDayReplanner(this.duringActivityReplanner);
 
-//		LinkReplanningMap linkReplanningMap = new LinkReplanningMap(this.getEvents(), this.getQueueSimulationListener());
-//		LinkReplanningMap linkReplanningMap = new LinkReplanningMap(this.getEvents(), sim);
 		LinkReplanningMap linkReplanningMap = new LinkReplanningMap(this.getEvents());
 		foqsl.addQueueSimulationListener(linkReplanningMap);
 		this.duringLegIdentifier = new LeaveLinkIdentifierFactory(linkReplanningMap).createIdentifier();
@@ -376,5 +368,5 @@ public class WithinDayControler extends Controler {
 		}
 		System.exit(0);
 	}
-
+	
 }

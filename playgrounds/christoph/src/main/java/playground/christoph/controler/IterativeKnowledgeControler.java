@@ -40,8 +40,8 @@ import playground.christoph.knowledge.container.MapKnowledgeDB;
 import playground.christoph.network.SubNetwork;
 import playground.christoph.network.util.SubNetworkCreator;
 import playground.christoph.router.costcalculators.KnowledgeTravelCostWrapper;
-import playground.christoph.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
-import playground.christoph.scoring.OnlyTimeDependentScoringFunctionFactory;
+import playground.christoph.withinday.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
+import playground.christoph.withinday.scoring.OnlyTimeDependentScoringFunctionFactory;
 
 public class IterativeKnowledgeControler extends Controler{
 

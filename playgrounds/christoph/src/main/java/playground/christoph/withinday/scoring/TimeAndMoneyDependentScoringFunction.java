@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * OnlyTimeDependentScoringFunction.java
+ * TimeAndMoneyDependentScoringFunction.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,19 +18,23 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.christoph.scoring;
+package playground.christoph.withinday.scoring;
 
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.events.AgentMoneyEventImpl;
 import org.matsim.core.scoring.ScoringFunction;
 
-public class OnlyTimeDependentScoringFunction implements ScoringFunction {
+/**
+ * A Scoring Function that only respects the travel time and money events.
+ * @author cdobler
+ */
+public class TimeAndMoneyDependentScoringFunction implements ScoringFunction {
 	
 	private double score;
 	private double startTime;
 	
-	public OnlyTimeDependentScoringFunction() {
+	public TimeAndMoneyDependentScoringFunction() {
 	}
 	
 	/**
@@ -40,8 +44,7 @@ public class OnlyTimeDependentScoringFunction implements ScoringFunction {
 	 * @param act The activity the agent starts. Can be used to get the activity
 	 * type, exact location, facility, opening times and other information.
 	 */
-	public void startActivity(final double time, final Activity activity) {
-		
+	public void startActivity(final double time, final Activity activity) {	
 	}
 
 	/**
@@ -51,7 +54,6 @@ public class OnlyTimeDependentScoringFunction implements ScoringFunction {
 	 * activity.
 	 */
 	public void endActivity(final double time) {
-		
 	}
 
 	/**
@@ -87,7 +89,6 @@ public class OnlyTimeDependentScoringFunction implements ScoringFunction {
 	 * simulation.
 	 */
 	public void agentStuck(final double time) {
-		
 	}
 
 	/**
@@ -107,7 +108,6 @@ public class OnlyTimeDependentScoringFunction implements ScoringFunction {
 	 * be written to the plan!
 	 */
 	public void finish() {
-		
 	}
 
 	/**
@@ -127,5 +127,4 @@ public class OnlyTimeDependentScoringFunction implements ScoringFunction {
 	public void reset() {		
 		score = 0.0;
 	}
-	
 }

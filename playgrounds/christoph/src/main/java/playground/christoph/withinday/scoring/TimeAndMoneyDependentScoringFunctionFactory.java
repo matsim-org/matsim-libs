@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * LastEventOfSimStep.java
+ * TimeAndMoneyDependentScoringFunction.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,26 +18,22 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.christoph.events.parallelEventsHandler;
+package playground.christoph.withinday.scoring;
 
-import org.matsim.core.events.EventImpl;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.scoring.ScoringFunction;
+import org.matsim.core.scoring.ScoringFunctionFactory;
 
 /**
- * Special event needed for synchronizing the threads.
- *
- * @author christoph dobler
+ * Returns a Scoring Function that only respects the travel time and money events.
+ * @author cdobler
  */
-public class LastEventOfSimStep extends EventImpl {
-
-	public static final String EVENT_TYPE = "simstepend";
+public class TimeAndMoneyDependentScoringFunctionFactory implements ScoringFunctionFactory {
 	
-	public LastEventOfSimStep(final double time) {
-		super(time);
+	public ScoringFunction createNewScoringFunction(Plan plan) {
+		return new TimeAndMoneyDependentScoringFunction();
 	}
-
-	@Override
-	public String getEventType() {
-		return EVENT_TYPE;
-	}
-
 }
+
+
+

@@ -31,7 +31,6 @@ import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 
 import playground.christoph.knowledge.container.MapKnowledgeDB;
-import playground.christoph.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
 import playground.christoph.router.costcalculators.SubNetworkDijkstraTravelCostWrapper;
 import playground.christoph.withinday.replanning.identifiers.ActivityEndIdentifierFactory;
 import playground.christoph.withinday.replanning.identifiers.InitialIdentifierImplFactory;
@@ -43,6 +42,7 @@ import playground.christoph.withinday.replanning.replanners.CurrentLegReplannerF
 import playground.christoph.withinday.replanning.replanners.InitialReplannerFactory;
 import playground.christoph.withinday.replanning.replanners.NextLegReplannerFactory;
 import playground.christoph.withinday.replanning.replanners.tools.TravelTimeCollector;
+import playground.christoph.withinday.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
 
 /**
  * This Controler should give an Example what is needed to run

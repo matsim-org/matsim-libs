@@ -21,7 +21,7 @@ import org.matsim.core.population.MatsimPopulationReader;
 
 import playground.christoph.knowledge.container.dbtools.DBConnectionTool;
 import playground.christoph.knowledge.nodeselection.SelectNodesDijkstra;
-import playground.christoph.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
+import playground.christoph.withinday.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
 
 public class TestCellKnowledge {
 

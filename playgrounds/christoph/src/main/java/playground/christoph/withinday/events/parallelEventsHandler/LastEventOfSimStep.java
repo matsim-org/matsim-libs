@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * WithinDayAgentFactory.java
+ * LastEventOfSimStep.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,30 +18,26 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.christoph.withinday.mobsim;
+package playground.christoph.withinday.events.parallelEventsHandler;
 
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.mobsim.framework.PersonDriverAgent;
-import org.matsim.ptproject.qsim.agents.AgentFactory;
-import org.matsim.ptproject.qsim.interfaces.Mobsim;
+import org.matsim.core.events.EventImpl;
 
-/*
- * Creates WithinDayPersonAgents instead of PersonAgents.
- * They are able to reset their cachedNextLink what is
- * necessary when doing LeaveLinkReplanning.
+/**
+ * Special event needed for synchronizing the threads at the end of each simstep.
+ *
+ * @author christoph dobler
  */
-public class WithinDayAgentFactory implements AgentFactory {
+public class LastEventOfSimStep extends EventImpl {
+
+	public static final String EVENT_TYPE = "simstepend";
 	
-	protected final Mobsim simulation;
-	
-	public WithinDayAgentFactory(final Mobsim simulation) {
-		this.simulation = simulation;
+	public LastEventOfSimStep(final double time) {
+		super(time);
 	}
 
 	@Override
-	public PersonDriverAgent createPersonAgent(final Person p) {
-		WithinDayPersonAgent agent = new WithinDayPersonAgent(p, this.simulation);
-		return agent;
+	public String getEventType() {
+		return EVENT_TYPE;
 	}
-	
+
 }

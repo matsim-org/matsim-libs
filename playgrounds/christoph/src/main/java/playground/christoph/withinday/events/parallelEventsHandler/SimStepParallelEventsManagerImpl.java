@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.christoph.events.parallelEventsHandler;
+package playground.christoph.withinday.events.parallelEventsHandler;
 
 import java.util.Queue;
 import java.util.concurrent.BrokenBarrierException;
@@ -36,7 +36,7 @@ import org.matsim.core.mobsim.framework.events.SimulationAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationAfterSimStepListener;
 
 /**
- * An EventsHandler that handles all occuring Events in a separate Thread.
+ * An EventsHandler that handles all occurring Events in a separate Thread.
  * When a Time Step of the QSim ends, all Events that have been created
  * in that Time Step are processed before the simulation can go on.
  * This is necessary e.g. when using Within Day Replanning.
