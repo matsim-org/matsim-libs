@@ -257,26 +257,26 @@ public class EmissionsPerEvent {
 			//Nox
 			outPut[1] = 0; // 	noxEmissionsBasedOnAverageSpeed 
 			//CO2 rep -fossiler Anteil
-			outPut[2] =  0; // co2repEmissionsBasedOnAverageSpeed 
+//			outPut[2] =  0; // co2repEmissionsBasedOnAverageSpeed 
 			//CO2 Total
-			outPut[3] = 0;// co2EmissionsBasedOnAverageSpeed 
+			outPut[2] = 0;// co2EmissionsBasedOnAverageSpeed 
 			//NO2
-			outPut[4] =  0; //no2EmissionsBasedOnAverageSpeed
+			outPut[3] =  0; //no2EmissionsBasedOnAverageSpeed
 			//PM
-			outPut[5] = 0; //pmEmissionsBasedOnAverageSpeed
+			outPut[4] = 0; //pmEmissionsBasedOnAverageSpeed
 
 			//mKr
-			outPut[6] = 0; //  mKrBasedOnFractions
+			outPut[5] = 0; //  mKrBasedOnFractions
 			//NOx
-			outPut[7]  =0; //noxEmissionsBasedOnFractions
+			outPut[6]  =0; //noxEmissionsBasedOnFractions
 			//CO2 rep -fossiler Anteil
-			outPut[8]  =0; //co2repEmissionsBasedOnFractions
+//			outPut[7]  =0; //co2repEmissionsBasedOnFractions
 			//CO2 total
-			outPut[9] = 0; //co2EmissionsBasedOnFractions
+			outPut[7] = 0; //co2EmissionsBasedOnFractions
 			//NO2
-			outPut[10] = 0; //no2EmissionsBasedOnFractions
+			outPut[8] = 0; //no2EmissionsBasedOnFractions
 			//PM
-			outPut[11] = 0; //pmEmissionsBasedOnFractions
+			outPut[9] = 0; //pmEmissionsBasedOnFractions
 			
 			
 		} else {	
@@ -335,29 +335,29 @@ public class EmissionsPerEvent {
 			//Nox
 			outPut[1] =  emissionFactorAndEmissions[1]; // 	noxEmissionsBasedOnAverageSpeed 
 			//CO2 rep -fossiler Anteil
-			outPut[2] =  emissionFactorAndEmissions[2]; // co2repEmissionsBasedOnAverageSpeed 
+//			outPut[2] =  emissionFactorAndEmissions[2]; // co2repEmissionsBasedOnAverageSpeed 
 			//CO2 Total
-			outPut[3] =  emissionFactorAndEmissions[3];// co2EmissionsBasedOnAverageSpeed 
+			outPut[2] =  emissionFactorAndEmissions[3];// co2EmissionsBasedOnAverageSpeed 
 			//NO2
-			outPut[4] =  emissionFactorAndEmissions[4]; //no2EmissionsBasedOnAverageSpeed
+			outPut[3] =  emissionFactorAndEmissions[4]; //no2EmissionsBasedOnAverageSpeed
 			//PM
-			outPut[5] =  emissionFactorAndEmissions[5]; //pmEmissionsBasedOnAverageSpeed
+			outPut[4] =  emissionFactorAndEmissions[5]; //pmEmissionsBasedOnAverageSpeed
 
 			//call of function double output
 			double [] fractions=  emissionFreeFlowFractionCalculate(vij,li,
 					EFc, EFf,vc,/*freeVelocity,*/vf, noxf, noxc,co2rf,co2rc,co2tf,co2tc,no2f,no2c,pmf,pmc);
 			//mKr
-			outPut[6] =fractions[0]; //  mKrBasedOnFractions
+			outPut[5] =fractions[0]; //  mKrBasedOnFractions
 			//NOx
-			outPut[7]  =fractions [1]; //noxEmissionsBasedOnFractions
+			outPut[6]  =fractions [1]; //noxEmissionsBasedOnFractions
 			//CO2 rep -fossiler Anteil
-			outPut[8]  =fractions [2]; //co2repEmissionsBasedOnFractions
+//			outPut[8]  =fractions [2]; //co2repEmissionsBasedOnFractions
 			//CO2 total
-			outPut[9] = fractions [3]; //co2EmissionsBasedOnFractions
+			outPut[7] = fractions [3]; //co2EmissionsBasedOnFractions
 			//NO2
-			outPut[10] = fractions [4]; //no2EmissionsBasedOnFractions
+			outPut[8] = fractions [4]; //no2EmissionsBasedOnFractions
 			//PM
-			outPut[11] = fractions [5]; //pmEmissionsBasedOnFractions
+			outPut[9] = fractions [5]; //pmEmissionsBasedOnFractions
 			
 			
 			

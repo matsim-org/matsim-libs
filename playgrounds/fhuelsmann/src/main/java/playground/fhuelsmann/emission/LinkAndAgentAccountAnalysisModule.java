@@ -42,17 +42,15 @@ public class LinkAndAgentAccountAnalysisModule implements AnalysisModule{
 	/* the arrays double[] are going to be filled with:
 			massOfFluelBasedOnAverageSpeed [0]
 			noxEmissionsBasedOnAverageSpeed [1]
-			co2repEmissionsBasedOnAverageSpeed [2]
-			co2EmissionsBasedOnAverageSpeed [3]
-			no2EmissionsBasedOnAverageSpeed[4]
-			pmEmissionsBasedOnAverageSpeed[5]
+			co2EmissionsBasedOnAverageSpeed [2]
+			no2EmissionsBasedOnAverageSpeed[3]
+			pmEmissionsBasedOnAverageSpeed[4]
 		
-			massOfFluelBasedOnFractions[6]
-			noxEmissionsBasedOnFractions[7]
-			co2repEmissionsBasedOnFractions[8]
-			co2EmissionsBasedOnFractions[9]
-			no2EmissionsBasedOnFractions[10]
-			pmEmissionsBasedOnFractions[11] */
+			massOfFluelBasedOnFractions[5]
+			noxEmissionsBasedOnFractions[6]
+			co2EmissionsBasedOnFractions[7]
+			no2EmissionsBasedOnFractions[8]
+			pmEmissionsBasedOnFractions[9] */
 
 	public LinkAndAgentAccountAnalysisModule(VisumObject[] roadTypes, EmissionsPerEvent emissionFactor) {
 		this.roadTypes = roadTypes;
@@ -77,7 +75,7 @@ public class LinkAndAgentAccountAnalysisModule implements AnalysisModule{
 			this.linkId2emissionsInGrammPerType.put(linkId, inputForEmissions);// data is read for the first time, doesn't need to be summed up per link
 		}
 		else{
-			double [] actualEmissions = new double[12]; // new data is saved after summation
+			double [] actualEmissions = new double[10]; // new data is saved after summation
 			double [] previousEmissions = this.linkId2emissionsInGrammPerType.get(linkId); // previousEmissions is the previous sum
 
 			for(int i = 0; i < actualEmissions.length ; i++){
@@ -102,7 +100,7 @@ public class LinkAndAgentAccountAnalysisModule implements AnalysisModule{
 			this.personId2emissionsInGrammPerType.put(personId, inputForEmissions);// data is read for the first time, doesn't need to be summed up per link
 		}
 		else{
-			double [] actualEmissions = new double[12]; // new data is saved after summation
+			double [] actualEmissions = new double[10]; // new data is saved after summation
 			double [] previousEmissions = this.personId2emissionsInGrammPerType.get(personId); //oldValue is the previous sum
 
 			for(int i = 0; i < actualEmissions.length ; i++){
