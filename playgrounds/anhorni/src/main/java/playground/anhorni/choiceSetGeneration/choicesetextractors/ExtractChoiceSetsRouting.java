@@ -116,9 +116,11 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 
 		//--------------------------------------------------
 		ActivityImpl fromAct1 = new org.matsim.core.population.ActivityImpl(toAct0.getType(), toAct0.getLinkId());
+		
+		// TODO: rethink "getMaximumDuration". Which duration do I really need here?
+		// changed for cleaner refactoring.
 		double endTime = choiceSet.getTrip().getBeforeShoppingAct().getEndTime() 
-		+ travelTimeBeforeShopping 
-		+ DeprecatedStaticMethod.calculateSomeDuration(choiceSet.getTrip().getShoppingAct());
+		+ travelTimeBeforeShopping + choiceSet.getTrip().getShoppingAct().getMaximumDuration();
 		fromAct1.setEndTime(endTime);
 		fromAct1.setCoord(toAct0.getCoord());
 
