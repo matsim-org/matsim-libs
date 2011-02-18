@@ -42,7 +42,7 @@ public class Main {
 
 		String visum2hbefaRoadTypeFile = "../../detailedEval/teststrecke/sim/inputEmissions/road_types.txt";
 		String hbefaGasolineEmissionFactorsFile = "";
-		String hbefaDieselEmissionFactorsFile = "../../detailedEval/teststrecke/sim/inputEmissions/hbefa_emission_factors_urban_rural_MW.txt";
+		String hbefaDieselEmissionFactorsFile = "../../detailedEval/testRuns/input/inputEmissions/hbefa_emission_factors_urban_rural_MW.txt";
 		//		String Hbefa_Cold_Traffic = "../../detailedEval/teststrecke/sim/inputEmissions/hbefa_coldstart_emission_factors.txt";
 
 
