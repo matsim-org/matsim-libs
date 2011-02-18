@@ -35,14 +35,14 @@ public class Main {
 	public static void main (String[] args) throws Exception{
 
 		// INPUT
-		String runDirectory = "../../detailedEval/testRuns/output/1pct/v0-default/run6/";
-		String eventsFile = runDirectory + "ITERS/it.10/10.events.txt.gz";
+		String runDirectory = "../../detailedEval/testRuns/output/run8/";
+		String eventsFile = runDirectory + "ITERS/it.0/0.events.txt.gz";
 		String netFile = "../../detailedEval/Net/network-86-85-87-84.xml";
 		//		String netfile = runDirectory + "output_network.xml.gz";
 
 		String visum2hbefaRoadTypeFile = "../../detailedEval/teststrecke/sim/inputEmissions/road_types.txt";
 		String hbefaGasolineEmissionFactorsFile = "";
-		String hbefaDieselEmissionFactorsFile = "../../detailedEval/teststrecke/sim/inputEmissions/hbefa_emission_factors_EU3_D.txt";
+		String hbefaDieselEmissionFactorsFile = "../../detailedEval/teststrecke/sim/inputEmissions/hbefa_emission_factors_urban_rural_MW.txt";
 		//		String Hbefa_Cold_Traffic = "../../detailedEval/teststrecke/sim/inputEmissions/hbefa_coldstart_emission_factors.txt";
 
 

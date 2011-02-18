@@ -36,7 +36,7 @@ public class HbefaTable {
 	 *  [1][3]1;12.75674725;0.710567832
 	 **/
 
-	private final HbefaObject [] [] hbefaTable = new HbefaObject [21][4];
+	private final HbefaObject [] [] hbefaTable = new HbefaObject [59][4];
 
 	public HbefaObject[][] getHbefaTableWithSpeedAndEmissionFactor() {
 		return hbefaTable;}
