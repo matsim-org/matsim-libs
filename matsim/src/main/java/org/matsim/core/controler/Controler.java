@@ -28,7 +28,9 @@ import java.io.StringWriter;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -55,6 +57,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.config.consistency.ConfigConsistencyCheckerImpl;
+import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
@@ -124,7 +127,6 @@ import org.matsim.pt.counts.PtCountControlerListener;
 import org.matsim.pt.router.PlansCalcTransitRoute;
 import org.matsim.pt.router.TransitRouterFactory;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
-import org.matsim.ptproject.qsim.ParallelQSimFactory;
 import org.matsim.ptproject.qsim.QSimFactory;
 import org.matsim.ptproject.qsim.multimodalsimengine.MultiModalMobsimFactory;
 import org.matsim.ptproject.qsim.multimodalsimengine.router.MultiModalLegHandler;
@@ -245,6 +247,7 @@ public class Controler {
 	private ControlerIO controlerIO;
 
 	private MobsimFactory mobsimFactory = null;
+	private Map<String, MobsimFactory> mobsimFactories = new HashMap<String, MobsimFactory>();
 
 	private SignalsControllerListenerFactory signalsFactory = new DefaultSignalsControllerListenerFactory();
 	private TransitRouterFactory transitRouterFactory = null;
@@ -328,6 +331,12 @@ public class Controler {
 		this.network = this.scenarioData.getNetwork();
 		this.population = this.scenarioData.getPopulation();
 		Runtime.getRuntime().addShutdownHook(this.shutdownHook);
+
+		// register default mobsim factories
+		this.addMobsimFactory("qsim", new QSimFactory());
+		this.addMobsimFactory("queueSimulation", new QueueSimulationFactory());
+		this.addMobsimFactory("jdeqsim", new JDEQSimulationFactory());
+		this.addMobsimFactory("multimodalQSim", new MultiModalMobsimFactory(new QSimFactory(), this));
 	}
 
 	/**
@@ -871,9 +880,14 @@ public class Controler {
 	 * ===================================================================
 	 */
 
-	protected void runMobSim() {
-		if ( this.config.simulation()==null || this.config.simulation().getExternalExe() == null) {
-			Simulation simulation = this.getMobsimFactory().createMobsim(this.getScenario(), this.getEvents());
+	/*package*/ Simulation getNewMobsim() {
+		String mobsim = this.config.controler().getMobsim();
+		if (mobsim != null) {
+			MobsimFactory f = this.mobsimFactories.get(mobsim);
+			if (f == null) {
+				throw new IllegalArgumentException("There is no MobsimFactory registered for the name " + mobsim);
+			}
+			Simulation simulation = f.createMobsim(this.getScenario(), this.getEvents());
 			if (simulation instanceof IOSimulation){
 				((IOSimulation)simulation).setControlerIO(this.getControlerIO());
 				((IOSimulation)simulation).setIterationNumber(this.getIterationNumber());
@@ -883,13 +897,33 @@ public class Controler {
 					((ObservableSimulation)simulation).addQueueSimulationListeners(l);
 				}
 			}
-			simulation.run();
+			return simulation;
 		} else {
-			ExternalMobsim sim = new ExternalMobsim(this.scenarioData, this.events);
-			sim.setControlerIO(this.controlerIO);
-			sim.setIterationNumber(this.getIterationNumber());
-			sim.run();
+			log.warn("Please specify which mobsim should be used in the configuration (see module 'controler', parameter 'mobsim'). Now trying to detect which mobsim to use from other parameters...");
+			if ( this.config.simulation()==null || this.config.simulation().getExternalExe() == null) {
+				Simulation simulation = this.getMobsimFactory().createMobsim(this.getScenario(), this.getEvents());
+				if (simulation instanceof IOSimulation){
+					((IOSimulation)simulation).setControlerIO(this.getControlerIO());
+					((IOSimulation)simulation).setIterationNumber(this.getIterationNumber());
+				}
+				if (simulation instanceof ObservableSimulation){
+					for (SimulationListener l : this.getQueueSimulationListener()) {
+						((ObservableSimulation)simulation).addQueueSimulationListeners(l);
+					}
+				}
+				return simulation;
+			} else {
+				ExternalMobsim sim = new ExternalMobsim(this.scenarioData, this.events);
+				sim.setControlerIO(this.controlerIO);
+				sim.setIterationNumber(this.getIterationNumber());
+				return sim;
+			}
 		}
+	}
+
+	protected void runMobSim() {
+		Simulation sim = getNewMobsim();
+		sim.run();
 	}
 
 	/*
@@ -1094,7 +1128,7 @@ public class Controler {
 			PlansCalcRoute plansCalcRoute = new PlansCalcRoute(this.config.plansCalcRoute(), this.network, travelCosts,
 					travelTimes, this.getLeastCostPathCalculatorFactory());
 
-			MultiModalLegHandler multiModalLegHandler = new MultiModalLegHandler(this.network, travelTimes, 
+			MultiModalLegHandler multiModalLegHandler = new MultiModalLegHandler(this.network, travelTimes,
 					this.getLeastCostPathCalculatorFactory());
 
 			for (String mode : CollectionUtils.stringToArray(this.config.multiModal().getSimulatedModes())) {
@@ -1207,15 +1241,21 @@ public class Controler {
 		@Override
 		public void notifyStartup(StartupEvent event) {
 			if (event.getControler().getMobsimFactory() == null) {
+
+				String mobsim = event.getControler().config.controler().getMobsim();
+				if (mobsim != null) {
+					MobsimFactory f = event.getControler().mobsimFactories.get(mobsim);
+					if (f == null) {
+						log.warn("There is no MobsimFactory registered for the name " + mobsim);
+					}
+				} else {
+					log.warn("Please specify which mobsim should be used in the configuration (see module 'controler', parameter 'mobsim'). Now trying to detect which mobsim to use from other parameters...");
+				}
+
 				Config c = event.getControler().getScenario().getConfig();
 				QSimConfigGroup conf = (QSimConfigGroup) c.getModule(QSimConfigGroup.GROUP_NAME);
 				if (conf != null) {
-					if (conf.getNumberOfThreads() > 1) {
-						event.getControler().setMobsimFactory(new ParallelQSimFactory());
-					}
-					else {
-						event.getControler().setMobsimFactory(new QSimFactory());
-					}
+					event.getControler().setMobsimFactory(new QSimFactory());
 
 					/*
 					 * cdobler:
@@ -1303,6 +1343,19 @@ public class Controler {
 
 	public void setMobsimFactory(MobsimFactory mobsimFactory) {
 		this.mobsimFactory = mobsimFactory;
+	}
+
+	/**
+	 * Register a {@link MobsimFactory} with a given name.
+	 *
+	 * @param mobsimName
+	 * @param mobsimFactory
+	 * @return the mobsim factory previously registered with that name, or <code>null</code> if none was registered before with that name
+	 *
+	 * @see ControlerConfigGroup#getMobsim()
+	 */
+	public MobsimFactory addMobsimFactory(final String mobsimName, final MobsimFactory mobsimFactory) {
+		return this.mobsimFactories.put(mobsimName, mobsimFactory);
 	}
 
 	public SignalsControllerListenerFactory getSignalsControllerListenerFactory() {

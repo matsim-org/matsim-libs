@@ -23,7 +23,6 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.queuesim.QueueSimulationFactory;
-import org.matsim.ptproject.qsim.ParallelQSimFactory;
 import org.matsim.ptproject.qsim.QSimFactory;
 
 import playground.mrieser.core.mobsim.usecases.OptimizedCarSimFactory;
@@ -48,9 +47,6 @@ public class Controller {
 			shiftBy = 2;
 		} else if ("-qsim".equals(args[0])) {
 			mobsimFactory = new QSimFactory();
-			shiftBy = 1;
-		} else if ("-pqsim".equals(args[0])) {
-			mobsimFactory = new ParallelQSimFactory();
 			shiftBy = 1;
 		} else if ("-queuesim".equals(args[0])) {
 			mobsimFactory = new QueueSimulationFactory();

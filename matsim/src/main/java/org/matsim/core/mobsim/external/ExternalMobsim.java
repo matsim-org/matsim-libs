@@ -39,13 +39,14 @@ import org.matsim.core.config.Module;
 import org.matsim.core.controler.ControlerIO;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.mobsim.framework.Simulation;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.PopulationWriterHandler;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.ExeRunner;
 
-public class ExternalMobsim {
+public class ExternalMobsim implements Simulation {
 
 	private static final String CONFIG_MODULE = "simulation";
 
@@ -78,6 +79,7 @@ public class ExternalMobsim {
 		this.executable = this.scenario.getConfig().getParam(CONFIG_MODULE, "externalExe");
 	}
 
+	@Override
 	public void run() {
 		String iterationPlansFile = this.controlerIO.getIterationFilename(this.iterationNumber, this.plansFileName);
 		String iterationEventsFile = this.controlerIO.getIterationFilename(this.iterationNumber, this.eventsFileName);

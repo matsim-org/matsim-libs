@@ -26,7 +26,8 @@ import org.junit.Test;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
-import org.matsim.ptproject.qsim.ParallelQSimFactory;
+import org.matsim.ptproject.qsim.ParallelQSimulation;
+import org.matsim.ptproject.qsim.QSimFactory;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -52,12 +53,14 @@ public class ParallelQSimIntegrationTest {
 
 	/*package*/ static class ParallelQSimTestController extends Controler {
 		/*package*/ int callCounter = 0;
-		public ParallelQSimTestController(Config config) {
+		public ParallelQSimTestController(final Config config) {
 			super(config);
 		}
 		@Override
 		protected void runMobSim() {
-			Assert.assertTrue(this.getMobsimFactory() instanceof ParallelQSimFactory);
+			Assert.assertTrue(this.getMobsimFactory() instanceof QSimFactory);
+			Assert.assertTrue(this.getMobsimFactory().createMobsim(
+					this.getScenario(), this.getEvents()) instanceof ParallelQSimulation);
 			this.callCounter++;
 		}
 	}

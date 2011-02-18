@@ -46,27 +46,42 @@ public class ConfigConsistencyCheckerImpl implements ConfigConsistencyChecker {
 		this.checkSignalSystemConfiguration(config);
 		this.checkTransitReplanningConfiguration(config);
 		this.checkMobsimSelection(config) ;
+		this.checkMultimodalMobsim(config);
 	}
-	
+
 	private void checkMobsimSelection(Config config) {
+		if (config.controler().getMobsim() == null) {
+			log.warn("You should specify which mobsim is to used in the configuration (controler.mobsim).");
+		}
 		if ( config.simulation()!=null ) {
 			if ( config.getQSimConfigGroup()!=null ) {
 				log.warn("have both `simulation' and `qsim' config groups; presumably both are defined in" +
 						" the config file; removing the `simulation' config group; in future versions, this" +
 						" may become a fatal error") ;
 				config.removeModule( SimulationConfigGroup.GROUP_NAME ) ;
-			} else if ( config.getModule("JDEQSim")!=null ) { 
+			} else if ( config.getModule("JDEQSim")!=null ) {
 				log.warn("have both `simulation' and `JDEQSim' config groups; presumably both are defined in" +
 						" the config file; removing the `simulation' config group; in future versions, this" +
 						" may become a fatal error") ;
 				config.removeModule( SimulationConfigGroup.GROUP_NAME ) ;
 			}
 		}
-		if ( config.getQSimConfigGroup()!=null && config.getModule("JDEQSim")!=null ) { 
+		if ( config.getQSimConfigGroup()!=null && config.getModule("JDEQSim")!=null ) {
 			log.warn("have both `qsim' and `JDEQSim' config groups; presumably both are defined in" +
 					" the config file; removing the `qsim' config group; in future versions, this" +
 					" may become a fatal error") ;
 			config.removeModule( QSimConfigGroup.GROUP_NAME ) ;
+		}
+	}
+
+	private void checkMultimodalMobsim(Config c) {
+		if ("multimodalQSim".equals(c.controler().getMobsim()) && (!c.multiModal().isMultiModalSimulationEnabled())) {
+			log.error("A multimodal mobsim should be used according to controler.mobsim, but the multimodal-simulation feature is not enabled in multimodal.multiModalSimulationEnabled.");
+		}
+		if (c.multiModal().isMultiModalSimulationEnabled() && (c.controler().getMobsim() != null)) {
+			if (!"multimodalQSim".equals(c.controler().getMobsim())) {
+				log.error("multimodal-simulation is activated in the multimodal configuration, but no multimodal-supporting mobsim is definied in the controler configuration.");
+			}
 		}
 	}
 
