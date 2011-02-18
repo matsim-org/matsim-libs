@@ -49,18 +49,19 @@ public class AvgSpeed2QGIS implements X2QGIS {
 		}
 		for (int i = 0; i < 24; i++) {
 			Map<Id, Double> aSpeeds = speeds.get(i);
-			if (aSpeeds != null)
-				for (Link link : (net.getLinks()).values()) {
+			if (aSpeeds != null) {
+				for (Link link : net.getLinks().values()) {
 					Id linkId = link.getId();
 					aSpeeds.put(linkId, clas.getAvgSpeed(linkId, i * 3600.0));
 				}
-			else
-				for (Link link : (net.getLinks()).values()) {
+			} else {
+				for (Link link : net.getLinks().values()) {
 					Id linkId = link.getId();
 					aSpeeds = new HashMap<Id, Double>();
 					aSpeeds.put(linkId, clas.getAvgSpeed(linkId, i * 3600.0));
 					speeds.add(i, aSpeeds);
 				}
+			}
 		}
 		return speeds;
 	}
@@ -69,9 +70,20 @@ public class AvgSpeed2QGIS implements X2QGIS {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		MATSimNet2QGIS mn2q = new MATSimNet2QGIS(
-				"../integration-demandCalibration1.0.1/test/input/calibration/CalibrationTest/testLogLikelihood/network.xml",
-				ch1903);
+		String networkFilename, eventsFilename, shapeFilename, crs;
+		if (args.length == 0) {
+			networkFilename = "../integration-demandCalibration1.0.1/test/input/calibration/CalibrationTest/testLogLikelihood/network.xml";
+			eventsFilename = "../integration-demandCalibration1.0.1/test/output/prepare/ITERS/it.300/300.events.txt.gz";
+			shapeFilename = "../integration-demandCalibration1.0.1/test/output/prepare/ITERS/it.300/300.events.avgSpeed.shp";
+			crs = ch1903;
+
+		} else {
+			networkFilename = args[0];
+			eventsFilename = args[1];
+			shapeFilename = args[2];
+			crs = args[3];
+		}
+		MATSimNet2QGIS mn2q = new MATSimNet2QGIS(networkFilename, crs);
 		/*
 		 * ///////////////////////////////////////////////////////////////
 		 * Traffic Volumes and MATSim-network to Shp-file // *
@@ -79,16 +91,12 @@ public class AvgSpeed2QGIS implements X2QGIS {
 		 */
 		Network net = mn2q.getNetwork();
 		CalcLinksAvgSpeed clas = new CalcLinksAvgSpeed(net);
-		mn2q
-				.readEvents(
-						"../integration-demandCalibration1.0.1/test/output/prepare/ITERS/it.300/300.events.txt.gz",
-						new EventHandler[] { clas });
+		mn2q.readEvents(eventsFilename, new EventHandler[] { clas });
 		List<Map<Id, Double>> speeds = createSpeeds(net, clas);
 		for (int i = 0; i < 24; i++) {
 			mn2q.addParameter("aS" + i + "-" + (i + 1) + "h", Double.class,
 					speeds.get(i));
 		}
-		mn2q
-				.writeShapeFile("../integration-demandCalibration1.0.1/test/output/prepare/ITERS/it.300/300.events.avgSpeed.shp");
+		mn2q.writeShapeFile(shapeFilename);
 	}
 }

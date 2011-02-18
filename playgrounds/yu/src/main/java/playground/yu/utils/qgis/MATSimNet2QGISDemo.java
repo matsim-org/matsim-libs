@@ -59,11 +59,16 @@ public class MATSimNet2QGISDemo implements X2QGIS {
 		// String netfile = "../berlin data/network.xml";
 		// String outputFileLs = "../berlin data/Links.shp";
 		// String outputFileP = "../berlin data/Polygon.shp";
-
-		String netfile = "../matsim/test/scenarios/chessboard/network.xml";
-		String outputFileLs = "../matsimTests/locationChoice/chessboard/Links.shp";
-		String outputFileP = "../matsimTests/locationChoice/chessboard/Polygon.shp";
-
+		String netfile, outputFileLs, outputFileP;
+		if (args.length == 0) {
+			netfile = "../matsim/test/scenarios/chessboard/network.xml";
+			outputFileLs = "../matsimTests/locationChoice/chessboard/Links.shp";
+			outputFileP = "../matsimTests/locationChoice/chessboard/Polygon.shp";
+		} else {
+			netfile = args[0];
+			outputFileLs = args[1];
+			outputFileP = args[2];
+		}
 		// String coordinateSys = ch1903;
 		String coordinateSys = "DHDN_GK4";
 		// String coordinateSys = "Atlantis";
