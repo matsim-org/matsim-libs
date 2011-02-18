@@ -10,7 +10,7 @@ import org.matsim.core.gbl.Gbl;
 public class CountsCompareReader {
 	
 	private final static Logger log = Logger.getLogger(CountsCompareReader.class);
-	String countsCompareFile = "input/counts/countscompare.txt";
+	String countsCompareFile = "../../matsim/input/counts/countscompare.txt";
 	private Stations stations;
 	
 	public CountsCompareReader(Stations stations) {
@@ -20,7 +20,7 @@ public class CountsCompareReader {
 	private String readNetworkName() {
 		String networkName = null;
 		try {
-			FileReader fileReader = new FileReader("input/counts/networkName.txt");
+			FileReader fileReader = new FileReader("../../matsim/input/counts/networkName.txt");
 			BufferedReader bufferedReader = new BufferedReader(fileReader);	
 			
 			String curr_line;
@@ -50,7 +50,8 @@ public class CountsCompareReader {
 				
 				String linkId = entries[0].trim();
 				int hour = Integer.parseInt(entries[1].trim()) - 1;
-				double matsimVol = Double.parseDouble( entries[2].trim());
+				String matsimVolString = entries[2].trim().replaceAll(",", "");
+				double matsimVol = Double.parseDouble(matsimVolString);
 				
 				if (!stations.addSimValforLinkId(networkName, linkId, hour, matsimVol)) {
 //					log.error("Error with: " + linkId + "\thour:" + hour);

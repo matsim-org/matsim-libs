@@ -15,7 +15,6 @@ public class RawCount {
 	String direction;
 	String linkidTeleatlas;
 	String linkidNavteq;
-	String linkidAre;
 	String linkidIVTCH;
 	
 	CoordImpl coord;
@@ -89,14 +88,6 @@ public class RawCount {
 
 	public void setLinkidNavteq(String linkidNavteq) {
 		this.linkidNavteq = linkidNavteq;
-	}
-
-	public String getLinkidAre() {
-		return linkidAre;
-	}
-
-	public void setLinkidAre(String linkidAre) {
-		this.linkidAre = linkidAre;
 	}
 
 	public String getLinkidIVTCH() {

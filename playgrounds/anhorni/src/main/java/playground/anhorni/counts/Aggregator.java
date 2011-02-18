@@ -24,9 +24,9 @@ public class Aggregator {
 		0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 		
 	
-	public void aggregate(TreeMap<Integer, List<Double>> volumes) {
+	public void aggregate(TreeMap<Integer, List<Double>> volumes, boolean removeOutliers) {
 		this.volumes = volumes;		
-		this.removeOutliers();
+		if (removeOutliers) this.removeOutliers();
 		this.avg();
 		this.standarddev();
 		this.median();	

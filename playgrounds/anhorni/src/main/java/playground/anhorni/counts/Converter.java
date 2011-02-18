@@ -9,13 +9,10 @@ import org.matsim.counts.Counts;
 
 public class Converter {
 	
-	Counts countsAre = new Counts();
 	Counts countsIVTCH = new Counts();
 	Counts countsNavteq = new Counts();
 	Counts countsTeleatlas = new Counts();
-	
-//	private final static Logger log = Logger.getLogger(Converter.class);
-	
+		
 	public void convert(List<CountStation> incounts) {
 		
 		Iterator<CountStation> countStation_it = incounts.iterator();
@@ -25,11 +22,7 @@ public class Converter {
 			this.createCounts(countStation, countsIVTCH, 
 					new IdImpl(countStation.getLink1().getLinkidIVTCH()),
 					new IdImpl(countStation.getLink2().getLinkidIVTCH()));
-			
-			this.createCounts(countStation, countsAre, 
-					new IdImpl(countStation.getLink1().getLinkidAre()),
-					new IdImpl(countStation.getLink2().getLinkidAre()));
-						
+									
 			this.createCounts(countStation, countsNavteq, 
 					new IdImpl(countStation.getLink1().getLinkidNavteq()),
 					new IdImpl(countStation.getLink2().getLinkidNavteq()));
@@ -66,14 +59,6 @@ public class Converter {
 				count1.createVolume(i+1, countStation.getLink2().getAggregator().getAvg()[i]);
 			}
 		}
-	}
-
-	public Counts getCountsAre() {
-		return countsAre;
-	}
-
-	public void setCountsAre(Counts countsAre) {
-		this.countsAre = countsAre;
 	}
 
 	public Counts getCountsIVTCH() {

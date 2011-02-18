@@ -38,16 +38,16 @@ public class CountStation {
 		return false;
 	}
 	
-	public void filter(DateFilter filter) {
+	public void filter(TimeFilter filter) {
 		this.counts = filter.filter(this.counts);
 	}
 	public void addCount(RawCount count) {
 		this.counts.add(count);
 	}		
 	// aggregate 0..24
-	public void aggregate() {
-		this.link1.aggregate();
-		this.link2.aggregate();	
+	public void aggregate(boolean removeOutliers) {
+		this.link1.aggregate(removeOutliers);
+		this.link2.aggregate(removeOutliers);	
 	}	
 	public List<RawCount> getCounts() {
 		return counts;

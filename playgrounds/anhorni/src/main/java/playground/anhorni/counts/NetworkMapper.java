@@ -14,7 +14,6 @@ import org.matsim.core.utils.geometry.CoordImpl;
 
 public class NetworkMapper {
 	
-	private final static Logger log = Logger.getLogger(NetworkMapper.class);
 	private List<CountStation> countStations = new Vector<CountStation>();
 	
 	public void map(TreeMap<String, Vector<RawCount>> rawCounts, final String mappingFile) {
@@ -73,7 +72,6 @@ public class NetworkMapper {
 				String direction = entries[2].trim();
 				String linkidTeleatlas = entries[4].trim();
 				String linkidNavteq = entries[5].trim();
-				String linkidAre = entries[6].trim();
 				String linkidIVTCH = entries[7].trim();
 				
 				String xs = entries[8].trim();
@@ -83,7 +81,7 @@ public class NetworkMapper {
 				if (ys.equals("-")) ys = "-1";
 				CoordImpl coord = new CoordImpl(xs, ys);
 				
-				LinkInfo link = new LinkInfo(direction, linkidTeleatlas, linkidNavteq, linkidAre, linkidIVTCH);
+				LinkInfo link = new LinkInfo(direction, linkidTeleatlas, linkidNavteq, linkidIVTCH);
 				String id = dataset + nr;
 
 				if (!stationsTree.containsKey(id)) {

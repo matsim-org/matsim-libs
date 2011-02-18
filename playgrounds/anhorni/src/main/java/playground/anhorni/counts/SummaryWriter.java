@@ -5,18 +5,24 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.Iterator;
 
+import org.apache.log4j.Logger;
 import org.matsim.core.utils.charts.LineChart;
 import org.matsim.core.utils.io.IOUtils;
 
 public class SummaryWriter {
 	
-	//private final static Logger log = Logger.getLogger(SummaryWriter.class);
+	private final static Logger log = Logger.getLogger(SummaryWriter.class);
+	private boolean writeForSpecificArea = false;
 	
-	public void write(Stations stations, String outpath) {
+	public void write(Stations stations, String outpath, boolean writeForSpecificArea) {
+		this.writeForSpecificArea = writeForSpecificArea;
+		
 		this.writeRelative(stations, outpath);
 		this.writeAbsoluteDifference(stations, outpath);
 		this.writeAbsolute(stations, outpath);
 		this.writeStats(stations, outpath);
+		this.writeStdDevBoxPlotsAbsolute(stations, outpath);
+		this.writeVolumesBoxPlotsAbsolute(stations, outpath);
 	}
 	
 	public void writeRelative(Stations stations, String outpath) {	
@@ -31,14 +37,22 @@ public class SummaryWriter {
 
 			double [] rel_StandardDev = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
 					0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-						
+		
+			int counter = 0;
+			int nextMsg = 1;
 			int numberOfStations = 0;
 			Iterator<CountStation> stations_it = stations.getCountStations().iterator();
 			while (stations_it.hasNext()) {
 				CountStation station = stations_it.next();
+				counter++;
+				
+				if (counter % nextMsg == 0) {
+					nextMsg *= 2;
+					log.info(" 			station # " + counter);
+				}
 				
 				// if station is not in region -> no sim vals
-				if (station.getLink1().getSimVals().size() == 0 || station.getLink2().getSimVals().size() == 0) continue;
+				if ((station.getLink1().getSimVals().size() == 0 || station.getLink2().getSimVals().size() == 0) && writeForSpecificArea) continue;
 				numberOfStations++;
 				
 				for (int hour = 0; hour < 24; hour++) {		
@@ -93,7 +107,7 @@ public class SummaryWriter {
 				CountStation station = stations_it.next();
 				
 				// if station is not in region -> no sim vals
-				if (station.getLink1().getSimVals().size() == 0 || station.getLink2().getSimVals().size() == 0) continue;
+				if ((station.getLink1().getSimVals().size() == 0 || station.getLink2().getSimVals().size() == 0) && writeForSpecificArea) continue;
 				numberOfStations++;
 				
 				for (int hour = 0; hour < 24; hour++) {		
@@ -160,7 +174,7 @@ public class SummaryWriter {
 				CountStation station = stations_it.next();
 				
 				// if station is not in region -> no sim vals
-				if (station.getLink1().getSimVals().size() == 0 || station.getLink2().getSimVals().size() == 0) continue;
+				if ((station.getLink1().getSimVals().size() == 0 || station.getLink2().getSimVals().size() == 0) && writeForSpecificArea) continue;
 				numberOfStations++;
 				
 				for (int hour = 0; hour < 24; hour++) {		
@@ -223,18 +237,123 @@ public class SummaryWriter {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public void writeStdDevBoxPlotsAbsolute(Stations stations, String outpath) {	
+		String header = "Station\tLink\tHour 0\tHour 1 ...\n";
+		try {
+			BufferedWriter out = IOUtils.getBufferedWriter(outpath + "stdDevsAbsolute.txt");
+			BufferedWriter outScaled = IOUtils.getBufferedWriter(outpath + "stdDevsScaled.txt");
+			out.write(header);			
+			outScaled.write(header);
+			DecimalFormat formatter = new DecimalFormat("0.0");
+			
+			StdDevBoxPlot boxPlotAbsolute = new StdDevBoxPlot("Standard Deviations Absolute", "Hour", "Standard Deviations [veh]");
+			StdDevBoxPlot boxPlotScaled = new StdDevBoxPlot("Standard Deviations Relative","Hour", "Standard Deviations [%]");
+											
+			int numberOfStations = 0;
+			Iterator<CountStation> stations_it = stations.getCountStations().iterator();
+			while (stations_it.hasNext()) {
+				CountStation station = stations_it.next();
+				
+				// if station is not in region -> no sim vals
+				if ((station.getLink1().getSimVals().size() == 0 || station.getLink2().getSimVals().size() == 0) && writeForSpecificArea) continue;
+				numberOfStations++;
+				
+				out.write(station.getId() + "\t" + "Link 1\t" ); outScaled.write(station.getId() + "\t" + "Link 1\t" );
+				for (int hour = 0; hour < 24; hour++) {	
+					double v = station.getLink1().getAggregator().getStandarddev()[hour];
+					out.write(formatter.format(v) + "\t");
+					boxPlotAbsolute.addHourlyData(hour, v);
+					
+					double relV = 100 * v / station.getLink1().getAggregator().getAvg()[hour];
+					outScaled.write(formatter.format(relV) + "\t");
+					boxPlotScaled.addHourlyData(hour, relV);
+				}
+				out.write("\n"); outScaled.write("\n");
+				out.write(station.getId() + "\t" + "Link 2\t" ); outScaled.write(station.getId() + "\t" + "Link 2\t" );
+				for (int hour = 0; hour < 24; hour++) {	
+					double v = station.getLink2().getAggregator().getStandarddev()[hour];
+					out.write(formatter.format(v) + "\t");
+					boxPlotAbsolute.addHourlyData(hour, v);
+					
+					double relV = 100 * v / station.getLink2().getAggregator().getAvg()[hour];
+					outScaled.write(formatter.format(relV) + "\t");
+					boxPlotScaled.addHourlyData(hour, relV);
+				}
+				out.write("\n"); outScaled.write("\n");
+			}
+			outScaled.flush();
+			out.flush();
+			outScaled.close();
+			out.close();
+			
+			boxPlotAbsolute.saveAsPng(outpath + "stdDevsAbsolute.png", 1000, 800);
+			log.info("Boxplot written to: " + outpath + "stdDevsAbsolute.png"); 
+			
+			boxPlotScaled.saveAsPng(outpath + "stdDevsScaled.png", 1000, 800);
+			log.info("Boxplot written to: " + outpath + "stdDevsScaled.png"); 
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}	
+	
+	public void writeVolumesBoxPlotsAbsolute(Stations stations, String outpath) {	
+		String header = "Station\tLink\tHour 0\tHour 1 ...\n";
+		try {
+			BufferedWriter out = IOUtils.getBufferedWriter(outpath + "volumesAbsolute.txt");
+			out.write(header);			
+			DecimalFormat formatter = new DecimalFormat("0.0");
+			
+			StdDevBoxPlot boxPlotAbsolute = new StdDevBoxPlot("Volumes Absolute", "hour", "Volumes Absolute [veh]");
+											
+			int numberOfStations = 0;
+			Iterator<CountStation> stations_it = stations.getCountStations().iterator();
+			while (stations_it.hasNext()) {
+				CountStation station = stations_it.next();
+				
+				// if station is not in region -> no sim vals
+				if ((station.getLink1().getSimVals().size() == 0 || station.getLink2().getSimVals().size() == 0) && writeForSpecificArea) continue;
+				numberOfStations++;
+				
+				out.write(station.getId() + "\t" + "Link 1\t" );
+				for (int hour = 0; hour < 24; hour++) {	
+					double v = station.getLink1().getAggregator().getAvg()[hour];
+					out.write(formatter.format(v) + "\t");
+					boxPlotAbsolute.addHourlyData(hour, v);
+				}
+				out.write("\n");
+				out.write(station.getId() + "\t" + "Link 2\t" );
+				for (int hour = 0; hour < 24; hour++) {	
+					double v = station.getLink2().getAggregator().getAvg()[hour];
+					out.write(formatter.format(v) + "\t");
+					boxPlotAbsolute.addHourlyData(hour, v);
+				}
+				out.write("\n");
+			}
+			out.flush();
+			out.close();
+			
+			boxPlotAbsolute.saveAsPng(outpath + "volumesAbsolute.png", 1000, 800);
+			log.info("Boxplot written to: " + outpath + "volumesAbsolute.png"); 
+		
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}	
 
 	public void writeStats(Stations stations, String outpath) {	
 		try {
 			BufferedWriter out = IOUtils.getBufferedWriter(outpath + "Stats.txt");					
 			Iterator<CountStation> stations_it = stations.getCountStations().iterator();
+			out.write("Station: " + "\t" + "number of entries for hour i (i.e. days)" +"\n");
 			while (stations_it.hasNext()) {
 				CountStation station = stations_it.next();
 								
-				//for (int hour = 0; hour < 24; hour++) {	
-					out.write("Station: " + station.getId() + ":\t" + station.getLink1().getAggregator().getSize(0) +"\n");
-				//}
+				for (int hour = 0; hour < 24; hour++) {	
+					out.write(station.getId() + "\t" + " hour " + hour + "\t" + station.getLink1().getAggregator().getSize(hour) +"\n");
+				}
+				out.write("---\n");
 			}			
 			out.flush();		
 			out.close();	

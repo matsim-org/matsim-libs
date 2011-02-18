@@ -6,12 +6,22 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
-public class DateFilter {
+public class TimeFilter {
 	
 	GregorianCalendar calendar = new GregorianCalendar();
 	//private final static Logger log = Logger.getLogger(DateFilter.class);
 	
-	public List<RawCount> filter(List<RawCount> rawCounts) {		
+	String dayFilter = "MOFRI";
+	
+	public String getDayFilter() {
+		return dayFilter;
+	}
+
+	public void setDayFilter(String dayFilter) {
+		this.dayFilter = dayFilter;
+	}
+
+	public List<RawCount> filter(List<RawCount> rawCounts) {
 		List<RawCount> filteredRawCounts = new Vector<RawCount>();	
 		Iterator<RawCount> rawCount_it = rawCounts.iterator();
 		while (rawCount_it.hasNext()) {
@@ -19,12 +29,12 @@ public class DateFilter {
 		
 			// filter DI-DO
 			// filter summer holidays
-			// filter public holidays			
-//			if (this.isDIDO(rawCount) && !this.inSummerHolidays(rawCount) && !this.isPublicHoliday(rawCount)) {
-//				filteredRawCounts.add(rawCount);	
-//			}
+			// filter public holidays
+			if (dayFilter.equals("DIDO") && this.isDIDO(rawCount) && !this.inSummerHolidays(rawCount) && !this.isPublicHoliday(rawCount)) {
+				filteredRawCounts.add(rawCount);	
+			}
 			
-			if (this.isMOFRI(rawCount) && !this.inSummerHolidays(rawCount) && !this.isPublicHoliday(rawCount)) {
+			if (this.dayFilter.equals("MOFRI") && this.isMOFRI(rawCount) && !this.inSummerHolidays(rawCount) && !this.isPublicHoliday(rawCount)) {
 				filteredRawCounts.add(rawCount);	
 			}
 			

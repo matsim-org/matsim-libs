@@ -4,12 +4,8 @@ import java.util.List;
 import java.util.TreeMap;
 import java.util.Vector;
 
-import org.apache.log4j.Logger;
-
 public class LinkInfo {
-	
-	private final static Logger log = Logger.getLogger(LinkInfo.class);
-	
+		
 	private TreeMap<String, String> ids = new TreeMap<String, String>();
 	private TreeMap<Integer, List<Double>> yearCountVals = new TreeMap<Integer, List<Double>>();
 	private TreeMap<Integer, Double> simVals =  new TreeMap<Integer, Double>();
@@ -17,9 +13,8 @@ public class LinkInfo {
 	private Aggregator aggregator = new Aggregator();
 	
 	public LinkInfo(String direction, String linkidTeleatlas,
-			String linkidNavteq, String linkidAre, String linkidIVTCH) {	
+			String linkidNavteq, String linkidIVTCH) {	
 		this.ids.put("teleatlas", linkidTeleatlas);
-		this.ids.put("are", linkidAre);
 		this.ids.put("navteq", linkidNavteq);
 		this.ids.put("ivtch", linkidIVTCH);
 	}
@@ -55,8 +50,8 @@ public class LinkInfo {
 		this.yearCountVals.get(hour).add(count);
 	}
 	
-	public void aggregate() {
-		this.aggregator.aggregate(this.yearCountVals);
+	public void aggregate(boolean removeOutliers) {
+		this.aggregator.aggregate(this.yearCountVals, removeOutliers);
 	}
 	
 	public String getLinkidTeleatlas() {
@@ -65,10 +60,6 @@ public class LinkInfo {
 
 	public String getLinkidNavteq() {
 		return this.ids.get("navteq");
-	}
-
-	public String getLinkidAre() {
-		return this.ids.get("are");
 	}
 
 	public String getLinkidIVTCH() {
@@ -88,7 +79,8 @@ public class LinkInfo {
 	}
 	
 	public double getSimVal(int hour) {
-		return this.simVals.get(hour);
+		if (this.simVals.get(hour) == null) return -1.0;
+		else return this.simVals.get(hour);
 	}
 
 	public TreeMap<Integer, Double> getSimVals() {
