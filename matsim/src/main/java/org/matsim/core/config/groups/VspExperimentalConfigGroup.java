@@ -101,8 +101,9 @@ public class VspExperimentalConfigGroup extends Module {
 		/* if (USE_ACTIVITY_DURATIONS.equalsIgnoreCase(key)) {
 			return Boolean.toString(this.isUseActivityDurations());
 		} else */ 
-		if (ACTIVITY_DURATION_INTERPRETATION.equalsIgnoreCase(key))
-			return this.getActivityDurationInterpretation() ;
+		if (ACTIVITY_DURATION_INTERPRETATION.equalsIgnoreCase(key)) 
+			throw new RuntimeException(" use direct getter; aborting ... " ) ;
+//			return this.getActivityDurationInterpretation() ;
 		else if ( COLORING.equalsIgnoreCase(key) )
 			return this.coloring ;
 		else if (INPUT_MZ05_FILE.equalsIgnoreCase(key))
