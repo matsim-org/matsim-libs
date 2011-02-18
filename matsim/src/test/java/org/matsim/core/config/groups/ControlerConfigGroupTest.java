@@ -23,11 +23,11 @@ package org.matsim.core.config.groups;
 import java.util.EnumSet;
 import java.util.Set;
 
-import junit.framework.TestCase;
-
+import org.junit.Assert;
+import org.junit.Test;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 
-public class ControlerConfigGroupTest extends TestCase {
+public class ControlerConfigGroupTest {
 
 	/**
 	 * Ensure that the events-file-format is correctly stored
@@ -35,49 +35,77 @@ public class ControlerConfigGroupTest extends TestCase {
 	 *
 	 * @author mrieser
 	 */
+	@Test
 	public void testEventsFileFormat() {
 		ControlerConfigGroup cg = new ControlerConfigGroup();
 		Set<EventsFileFormat> formats;
 		// test initial value
 		formats = cg.getEventsFileFormats();
-		assertEquals(1, formats.size());
-		assertTrue(formats.contains(EventsFileFormat.txt));
-		assertEquals("txt", cg.getValue(ControlerConfigGroup.EVENTS_FILE_FORMAT));
+		Assert.assertEquals(1, formats.size());
+		Assert.assertTrue(formats.contains(EventsFileFormat.txt));
+		Assert.assertEquals("txt", cg.getValue(ControlerConfigGroup.EVENTS_FILE_FORMAT));
 		// test setting with setEventsFileFormat
 		cg.setEventsFileFormats(EnumSet.of(EventsFileFormat.txt, EventsFileFormat.xml));
 		formats = cg.getEventsFileFormats();
-		assertEquals(2, formats.size());
-		assertTrue(formats.contains(EventsFileFormat.txt));
-		assertTrue(formats.contains(EventsFileFormat.xml));
-		assertEquals("txt,xml", cg.getValue(ControlerConfigGroup.EVENTS_FILE_FORMAT));
+		Assert.assertEquals(2, formats.size());
+		Assert.assertTrue(formats.contains(EventsFileFormat.txt));
+		Assert.assertTrue(formats.contains(EventsFileFormat.xml));
+		Assert.assertEquals("txt,xml", cg.getValue(ControlerConfigGroup.EVENTS_FILE_FORMAT));
 		// test setting to none
 		cg.setEventsFileFormats(EnumSet.noneOf(EventsFileFormat.class));
 		formats = cg.getEventsFileFormats();
-		assertEquals(0, formats.size());
-		assertEquals("", cg.getValue(ControlerConfigGroup.EVENTS_FILE_FORMAT));
+		Assert.assertEquals(0, formats.size());
+		Assert.assertEquals("", cg.getValue(ControlerConfigGroup.EVENTS_FILE_FORMAT));
 		// test setting with addParam
 		cg.addParam(ControlerConfigGroup.EVENTS_FILE_FORMAT, "xml,txt");
 		formats = cg.getEventsFileFormats();
-		assertEquals(2, formats.size());
-		assertTrue(formats.contains(EventsFileFormat.xml));
-		assertTrue(formats.contains(EventsFileFormat.txt));
-		assertEquals("txt,xml", cg.getValue(ControlerConfigGroup.EVENTS_FILE_FORMAT));
+		Assert.assertEquals(2, formats.size());
+		Assert.assertTrue(formats.contains(EventsFileFormat.xml));
+		Assert.assertTrue(formats.contains(EventsFileFormat.txt));
+		Assert.assertEquals("txt,xml", cg.getValue(ControlerConfigGroup.EVENTS_FILE_FORMAT));
 		// test setting to none
 		cg.addParam(ControlerConfigGroup.EVENTS_FILE_FORMAT, "");
 		formats = cg.getEventsFileFormats();
-		assertEquals(0, formats.size());
-		assertEquals("", cg.getValue(ControlerConfigGroup.EVENTS_FILE_FORMAT));
+		Assert.assertEquals(0, formats.size());
+		Assert.assertEquals("", cg.getValue(ControlerConfigGroup.EVENTS_FILE_FORMAT));
 		// test setting with non-conform formatting
 		cg.addParam(ControlerConfigGroup.EVENTS_FILE_FORMAT, " txt\t, xml\t\t  ");
 		formats = cg.getEventsFileFormats();
-		assertEquals(2, formats.size());
-		assertTrue(formats.contains(EventsFileFormat.txt));
-		assertTrue(formats.contains(EventsFileFormat.xml));
-		assertEquals("txt,xml", cg.getValue(ControlerConfigGroup.EVENTS_FILE_FORMAT));
+		Assert.assertEquals(2, formats.size());
+		Assert.assertTrue(formats.contains(EventsFileFormat.txt));
+		Assert.assertTrue(formats.contains(EventsFileFormat.xml));
+		Assert.assertEquals("txt,xml", cg.getValue(ControlerConfigGroup.EVENTS_FILE_FORMAT));
 		// test setting to non-conform none
 		cg.addParam(ControlerConfigGroup.EVENTS_FILE_FORMAT, "  \t ");
 		formats = cg.getEventsFileFormats();
-		assertEquals(0, formats.size());
-		assertEquals("", cg.getValue(ControlerConfigGroup.EVENTS_FILE_FORMAT));
+		Assert.assertEquals(0, formats.size());
+		Assert.assertEquals("", cg.getValue(ControlerConfigGroup.EVENTS_FILE_FORMAT));
 	}
+
+	/**
+	 * Ensure that the events-file-format is correctly stored
+	 * and returned with the different setters and getters.
+	 *
+	 * @author mrieser
+	 */
+	@Test
+	public void testMobsim() {
+		ControlerConfigGroup cg = new ControlerConfigGroup();
+		// test initial value
+		Assert.assertNull(cg.getMobsim());
+		Assert.assertNull(cg.getValue(ControlerConfigGroup.MOBSIM));
+		// test setting with setMobsim
+		cg.setMobsim("qsim");
+		Assert.assertEquals("qsim", cg.getMobsim());
+		Assert.assertEquals("qsim", cg.getValue(ControlerConfigGroup.MOBSIM));
+		// test setting to null
+		cg.setMobsim(null);
+		Assert.assertNull(cg.getMobsim());
+		Assert.assertNull(cg.getValue(ControlerConfigGroup.MOBSIM));
+		// test setting with addParam
+		cg.addParam(ControlerConfigGroup.MOBSIM, "queueSimulation");
+		Assert.assertEquals("queueSimulation", cg.getMobsim());
+		Assert.assertEquals("queueSimulation", cg.getValue(ControlerConfigGroup.MOBSIM));
+	}
+
 }
