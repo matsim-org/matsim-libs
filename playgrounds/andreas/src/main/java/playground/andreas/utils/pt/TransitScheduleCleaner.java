@@ -218,6 +218,24 @@ public class TransitScheduleCleaner {
 		return tS;
 	}
 	
+	public static TransitSchedule removeAllLines(TransitSchedule transitSchedule){
+		
+		log.info("Removing all transit lines");
+		TransitSchedule tS = TransitScheduleCleaner.makeTransitScheduleModifiable(transitSchedule);
+		printStatistic(tS);
+		
+		Set<Id> lineIds = new TreeSet<Id>(tS.getTransitLines().keySet());
+		
+		for (Id id : lineIds) {
+			tS.getTransitLines().remove(id);
+		}
+		
+		printStatistic(tS);
+		log.info("Removed " + lineIds.size() + " lines from transitSchedule.");
+		
+		return tS;
+	}
+	
 	private static TransitSchedule makeTransitScheduleModifiable(TransitSchedule transitSchedule){
 		TransitSchedule tS = new TransitScheduleImpl(transitSchedule.getFactory());
 		
