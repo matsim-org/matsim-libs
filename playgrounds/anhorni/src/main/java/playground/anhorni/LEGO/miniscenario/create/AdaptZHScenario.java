@@ -145,7 +145,7 @@ public class AdaptZHScenario {
 					if (act.getEndTime()== Time.UNDEFINED_TIME) {
 						Leg previousLeg = ((PlanImpl)plan).getPreviousLeg(act);
 						Activity previousAct = ((PlanImpl)plan).getPreviousActivity(previousLeg);
-						double endTime = previousAct.getEndTime() + previousLeg.getTravelTime() + act.getDuration();
+						double endTime = previousAct.getEndTime() + previousLeg.getTravelTime() + act.getMaximumDuration();
 						act.setEndTime(endTime);
 					}
 										

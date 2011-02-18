@@ -215,7 +215,7 @@ public class PopulationReaderMatsimV1 extends MatsimXmlParser implements
 			throw new IllegalArgumentException("Either the coords or the link must be specified for an Act.");
 		}
 		act.setStartTime(Time.parseTime(atts.getValue("start_time")));
-		act.setDuration(Time.parseTime(atts.getValue("dur")));
+		act.setMaximumDuration(Time.parseTime(atts.getValue("dur")));
 		act.setEndTime(Time.parseTime(atts.getValue("end_time")));
 
 		if (this.routeNodes != null) {

@@ -308,7 +308,7 @@ public class PersonDriverAgentImpl implements PersonDriverAgent {
 		double now = this.getMobsim().getSimTimer().getTimeOfDay() ;
 		ActivityImpl act = (ActivityImpl) tmpAct ; // since we need the duration.  kai, aug'10
 
-		if ( act.getDuration() == Time.UNDEFINED_TIME && (act.getEndTime() == Time.UNDEFINED_TIME)) {
+		if ( act.getMaximumDuration() == Time.UNDEFINED_TIME && (act.getEndTime() == Time.UNDEFINED_TIME)) {
 			// yyyy does this make sense?  below there is at least one execution path where this should lead to an exception.  kai, oct'10
 			this.activityEndTime = Double.POSITIVE_INFINITY ;
 			return ;
@@ -319,12 +319,12 @@ public class PersonDriverAgentImpl implements PersonDriverAgent {
 		if ( this.simulation.getScenario().getConfig().vspExperimental().getActivityDurationInterpretation()
 				.equals(VspExperimentalConfigGroup.MIN_OF_DURATION_AND_END_TIME) ) {
 			// person stays at the activity either until its duration is over or until its end time, whatever comes first
-			if (act.getDuration() == Time.UNDEFINED_TIME) {
+			if (act.getMaximumDuration() == Time.UNDEFINED_TIME) {
 				departure = act.getEndTime();
 			} else if (act.getEndTime() == Time.UNDEFINED_TIME) {
-				departure = now + act.getDuration();
+				departure = now + act.getMaximumDuration();
 			} else {
-				departure = Math.min(act.getEndTime(), now + act.getDuration());
+				departure = Math.min(act.getEndTime(), now + act.getMaximumDuration());
 			}
 		} else if ( this.simulation.getScenario().getConfig().vspExperimental().getActivityDurationInterpretation()
 				.equals(VspExperimentalConfigGroup.END_TIME_ONLY ) ) {
@@ -338,8 +338,8 @@ public class PersonDriverAgentImpl implements PersonDriverAgent {
 			// In fact, as of now I think that _this_ should be the default behavior.  kai, aug'10
 			if ( act.getEndTime() != Time.UNDEFINED_TIME ) {
 				departure = act.getEndTime();
-			} else if ( act.getDuration() != Time.UNDEFINED_TIME ) {
-				departure = now + act.getDuration() ;
+			} else if ( act.getMaximumDuration() != Time.UNDEFINED_TIME ) {
+				departure = now + act.getMaximumDuration() ;
 			} else {
 				throw new IllegalStateException("neither activity end time nor activity duration defined; don't know what to do. personId: " + this.getPerson().getId());
 			}

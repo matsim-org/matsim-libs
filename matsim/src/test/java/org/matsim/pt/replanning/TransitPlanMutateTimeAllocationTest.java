@@ -45,28 +45,28 @@ public class TransitPlanMutateTimeAllocationTest {
 		act.setEndTime(8.0 * 3600);
 		plan.createAndAddLeg(TransportMode.transit_walk);
 		ActivityImpl ptAct1 = plan.createAndAddActivity(PtConstants.TRANSIT_ACTIVITY_TYPE, new CoordImpl(0, 100));
-		ptAct1.setDuration(0);
+		ptAct1.setMaximumDuration(0);
 		plan.createAndAddLeg(TransportMode.pt);
 		ActivityImpl ptAct2 = plan.createAndAddActivity(PtConstants.TRANSIT_ACTIVITY_TYPE, new CoordImpl(0, 100));
-		ptAct2.setDuration(0);
+		ptAct2.setMaximumDuration(0);
 		plan.createAndAddLeg(TransportMode.transit_walk);
 		act = plan.createAndAddActivity("work", new CoordImpl(0, 500));
 		act.setEndTime(16*3600);
 		plan.createAndAddLeg(TransportMode.transit_walk);
 		ActivityImpl ptAct3 = plan.createAndAddActivity(PtConstants.TRANSIT_ACTIVITY_TYPE, new CoordImpl(0, 100));
-		ptAct3.setDuration(0);
+		ptAct3.setMaximumDuration(0);
 		plan.createAndAddLeg(TransportMode.pt);
 		ActivityImpl ptAct4 = plan.createAndAddActivity(PtConstants.TRANSIT_ACTIVITY_TYPE, new CoordImpl(0, 100));
-		ptAct4.setDuration(0);
+		ptAct4.setMaximumDuration(0);
 		plan.createAndAddLeg(TransportMode.transit_walk);
 		plan.createAndAddActivity("work", new CoordImpl(0, 500));
 
 		TransitPlanMutateTimeAllocation mutator = new TransitPlanMutateTimeAllocation(3600, new Random(2011));
 		mutator.run(plan);
 
-		Assert.assertEquals(0.0, ptAct1.getDuration(), 1e-8);
-		Assert.assertEquals(0.0, ptAct2.getDuration(), 1e-8);
-		Assert.assertEquals(0.0, ptAct3.getDuration(), 1e-8);
-		Assert.assertEquals(0.0, ptAct4.getDuration(), 1e-8);
+		Assert.assertEquals(0.0, ptAct1.getMaximumDuration(), 1e-8);
+		Assert.assertEquals(0.0, ptAct2.getMaximumDuration(), 1e-8);
+		Assert.assertEquals(0.0, ptAct3.getMaximumDuration(), 1e-8);
+		Assert.assertEquals(0.0, ptAct4.getMaximumDuration(), 1e-8);
 	}
 }

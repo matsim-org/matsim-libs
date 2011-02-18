@@ -99,7 +99,7 @@ public class ActivityHandlerTest {
 	@Test
 	public void testDoSimStep_withDuration_useDuration() {
 		Fixture f = new Fixture();
-		((ActivityImpl) f.workAct).setDuration(8.0 * 3600);
+		((ActivityImpl) f.workAct).setMaximumDuration(8.0 * 3600);
 		FakeSimEngine engine = new FakeSimEngine();
 		ActivityHandler ah = new ActivityHandler(engine);
 		ah.setUseActivityDurations(true);
@@ -155,7 +155,7 @@ public class ActivityHandlerTest {
 	@Test
 	public void testDoSimStep_withDuration_ignoreDuration() {
 		Fixture f = new Fixture();
-		((ActivityImpl) f.workAct).setDuration(8.0 * 3600);
+		((ActivityImpl) f.workAct).setMaximumDuration(8.0 * 3600);
 		FakeSimEngine engine = new FakeSimEngine();
 		ActivityHandler ah = new ActivityHandler(engine);
 		ah.setUseActivityDurations(false);

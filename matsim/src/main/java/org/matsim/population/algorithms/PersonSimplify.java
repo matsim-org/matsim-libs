@@ -86,26 +86,26 @@ public class PersonSimplify extends AbstractPersonAlgorithm {
 			for (int j=2; j<acts_legs.size()-2; j+=2) {
 				ActivityImpl act = (ActivityImpl)acts_legs.get(j);
 				if (act.getType().equals("h")) {
-					if (act.getDuration() < 3*3600) { act.setDuration((int)(1.5*3600)); }
-					else { act.setDuration(5*3600); }
+					if (act.getMaximumDuration() < 3*3600) { act.setMaximumDuration((int)(1.5*3600)); }
+					else { act.setMaximumDuration(5*3600); }
 				}
 				else if (act.getType().equals("w")) {
-					if (act.getDuration() < 3*3600) { act.setDuration(2*3600); }
-					else if (act.getDuration() < 7*3600) { act.setDuration(4*3600); }
-					else { act.setDuration(8*3600); }
+					if (act.getMaximumDuration() < 3*3600) { act.setMaximumDuration(2*3600); }
+					else if (act.getMaximumDuration() < 7*3600) { act.setMaximumDuration(4*3600); }
+					else { act.setMaximumDuration(8*3600); }
 				}
 				else if (act.getType().equals("e")) {
-					if (act.getDuration() < 3*3600) { act.setDuration(2*3600); }
-					else if (act.getDuration() < 5*3600) { act.setDuration(4*3600); }
-					else { act.setDuration(8*3600); }
+					if (act.getMaximumDuration() < 3*3600) { act.setMaximumDuration(2*3600); }
+					else if (act.getMaximumDuration() < 5*3600) { act.setMaximumDuration(4*3600); }
+					else { act.setMaximumDuration(8*3600); }
 				}
 				else if (act.getType().equals("s")) {
-					if (act.getDuration() < 2*3600) { act.setDuration(1*3600); }
-					else { act.setDuration(4*3600); }
+					if (act.getMaximumDuration() < 2*3600) { act.setMaximumDuration(1*3600); }
+					else { act.setMaximumDuration(4*3600); }
 				}
 				else if (act.getType().equals("l")) {
-					if (act.getDuration() < 3*3600) { act.setDuration(2*3600); }
-					else { act.setDuration(5*3600); }
+					if (act.getMaximumDuration() < 3*3600) { act.setMaximumDuration(2*3600); }
+					else { act.setMaximumDuration(5*3600); }
 				}
 				else {
 					Gbl.errorMsg("[something is wrong]");

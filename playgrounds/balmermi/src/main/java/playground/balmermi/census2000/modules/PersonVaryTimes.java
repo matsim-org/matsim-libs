@@ -73,12 +73,12 @@ public class PersonVaryTimes extends AbstractPersonAlgorithm implements PlanAlgo
 				ActivityImpl act = (ActivityImpl)acts_legs.get(i);
 				if (i == 0) { // first act
 					act.setStartTime(0.0);
-					act.setDuration(act.getDuration()+bias);
+					act.setMaximumDuration(act.getMaximumDuration()+bias);
 					act.setEndTime(act.getEndTime()+bias);
 				}
 				else if (i == acts_legs.size()-1) { // last act
 					act.setStartTime(act.getStartTime()+bias);
-					act.setDuration(Time.UNDEFINED_TIME);
+					act.setMaximumDuration(Time.UNDEFINED_TIME);
 					act.setEndTime(Time.UNDEFINED_TIME);
 				}
 				else { // in between acts

@@ -83,11 +83,11 @@ public class PersonAdaptPlanAndCreateFacilities extends AbstractPersonAlgorithm 
 				// set times
 				a.setStartTime(time);
 				if (a.getEndTime() != Time.UNDEFINED_TIME) {
-					a.setDuration(a.getEndTime()-a.getStartTime());
+					a.setMaximumDuration(a.getEndTime()-a.getStartTime());
 					time = a.getEndTime();
 				}
-				else if (a.getDuration() != Time.UNDEFINED_TIME) {
-					a.setEndTime(a.getStartTime()+a.getDuration());
+				else if (a.getMaximumDuration() != Time.UNDEFINED_TIME) {
+					a.setEndTime(a.getStartTime()+a.getMaximumDuration());
 					time = a.getEndTime();
 				}
 				

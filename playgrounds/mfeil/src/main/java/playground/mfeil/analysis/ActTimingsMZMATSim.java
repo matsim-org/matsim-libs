@@ -34,8 +34,10 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.ActivityImpl;
+import static org.matsim.core.population.ActivityImpl.*;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.utils.deprecated.DeprecatedStaticMethod;
 
 import playground.mfeil.AgentsAttributesAdder;
 
@@ -133,28 +135,28 @@ public class ActTimingsMZMATSim {
 					}
 					else {
 						if (act.getType().startsWith("h")) {
-							durationInnerHome+=weight*act.calculateDuration();
-							duration += act.calculateDuration();
+							durationInnerHome+=weight*DeprecatedStaticMethod.calculateSomeDuration(act);
+							duration += DeprecatedStaticMethod.calculateSomeDuration(act);
 							counterInnerHome+=weight;
 						}
 						else if (act.getType().startsWith("w")) {
-							durationWork+=weight*act.calculateDuration();
-							duration += act.calculateDuration();
+							durationWork+=weight*DeprecatedStaticMethod.calculateSomeDuration(act);
+							duration += DeprecatedStaticMethod.calculateSomeDuration(act);
 							counterWork+=weight;
 						}
 						else if (act.getType().startsWith("e")) {
-							durationEducation+=weight*act.calculateDuration();
-							duration += act.calculateDuration();
+							durationEducation+=weight*DeprecatedStaticMethod.calculateSomeDuration(act);
+							duration += DeprecatedStaticMethod.calculateSomeDuration(act);
 							counterEducation+=weight;
 						}
 						else if (act.getType().startsWith("l")) {
-							durationLeisure+=weight*act.calculateDuration();
-							duration += act.calculateDuration();
+							durationLeisure+=weight*DeprecatedStaticMethod.calculateSomeDuration(act);
+							duration += DeprecatedStaticMethod.calculateSomeDuration(act);
 							counterLeisure+=weight;
 						}
 						else if (act.getType().startsWith("s")) {
-							durationShop+=weight*act.calculateDuration();
-							duration += act.calculateDuration();
+							durationShop+=weight*DeprecatedStaticMethod.calculateSomeDuration(act);
+							duration += DeprecatedStaticMethod.calculateSomeDuration(act);
 							counterShop+=weight;
 						}
 						else log.warn("Unknown act type in person's "+person.getId()+" plan at position "+i+"!");

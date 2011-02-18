@@ -130,7 +130,7 @@ public class ActivityDurationAnalyser {
 			double dur, startTime, endTime;
 //			System.out.println("Processing activity type: " + actList.get(0).getType());
 			for (ActivityImpl act : actList) {
-				dur = act.getDuration();
+				dur = act.getMaximumDuration();
 				ActivityParams actParams = this.config.planCalcScore().getActivityParams(act.getType());
 				if (!(Double.isInfinite(dur) || Double.isNaN(dur))) {
 					if (act.getStartTime() < actParams.getOpeningTime()) {

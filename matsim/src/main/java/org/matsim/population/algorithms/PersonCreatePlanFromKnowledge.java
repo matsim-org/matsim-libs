@@ -55,7 +55,7 @@ public class PersonCreatePlanFromKnowledge extends AbstractPersonAlgorithm {
 		ActivityImpl a = p.createAndAddActivity("home", home_facility.getCoord());
 		a.setLinkId(home_facility.getLinkId());
 		a.setStartTime(0.0);
-		a.setDuration(time);
+		a.setMaximumDuration(time);
 		a.setEndTime(time);
 		a.setFacilityId(home_facility.getId());
 		LegImpl l = p.createAndAddLeg(TransportMode.car);
@@ -74,7 +74,7 @@ public class PersonCreatePlanFromKnowledge extends AbstractPersonAlgorithm {
 			a = p.createAndAddActivity(act.getType(),f.getCoord());
 			a.setLinkId(f.getLinkId());
 			a.setStartTime(time);
-			a.setDuration(dur);
+			a.setMaximumDuration(dur);
 			a.setEndTime(time + dur);
 			a.setFacilityId(f.getId());
 			time += dur;
@@ -89,7 +89,7 @@ public class PersonCreatePlanFromKnowledge extends AbstractPersonAlgorithm {
 		a.setLinkId(home_facility.getLinkId());
 		a.setStartTime(time);
 		a.setEndTime(24*3600);
-		a.setDuration(24*3600 - time);
+		a.setMaximumDuration(24*3600 - time);
 		a.setFacilityId(home_facility.getId());
 	}
 }

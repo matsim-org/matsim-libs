@@ -56,7 +56,7 @@ public class ReplannerOldPeople extends WithinDayDuringActivityReplanner {
 		int homeLegIndex = executedPlan.getActLegIndex(homeLeg);
 		
 		ActivityImpl newWorkAct = new ActivityImpl("w", this.scenario.createId("22"));
-		newWorkAct.setDuration(3600);
+		newWorkAct.setMaximumDuration(3600);
 		
 		LegImpl legToNewWork = new LegImpl(TransportMode.car);
 		

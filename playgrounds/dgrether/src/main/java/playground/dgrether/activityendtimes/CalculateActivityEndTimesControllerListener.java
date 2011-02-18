@@ -53,7 +53,7 @@ public class CalculateActivityEndTimesControllerListener implements StartupListe
 					if (pe instanceof Activity){
 						Activity a = (Activity)pe;
 						if (it.hasNext() && (a.getEndTime() == Time.UNDEFINED_TIME)) {
-							if ((((ActivityImpl)a).getDuration() == Time.UNDEFINED_TIME)){
+							if ((((ActivityImpl)a).getMaximumDuration() == Time.UNDEFINED_TIME)){
 								log.warn("neither endtime nor duration set in plan of person id " + person.getId() + " Cannot calculate activity endtime!");
 								continue;
 							}
@@ -61,7 +61,7 @@ public class CalculateActivityEndTimesControllerListener implements StartupListe
 								log.warn("neither starttime nor duration set in plan of person id " + person.getId() + " Cannot calculate activity endtime!");
 								continue;
 							}
-							a.setEndTime(a.getStartTime() + ((ActivityImpl)a).getDuration());
+							a.setEndTime(a.getStartTime() + ((ActivityImpl)a).getMaximumDuration());
 						}
 					}
 				}

@@ -154,7 +154,7 @@ public class PlanSimplifyForDebug extends AbstractPersonAlgorithm {
 		int time = 6 * 3600 + (int) (MatsimRandom.getRandom().nextDouble() * 3600 * 3);
 		act.setStartTime(0);
 		act.setEndTime(time);
-		act.setDuration(time);
+		act.setMaximumDuration(time);
 
 		LegImpl leg = (LegImpl) plan.getPlanElements().get(1);
 		leg.setDepartureTime(time);
@@ -164,7 +164,7 @@ public class PlanSimplifyForDebug extends AbstractPersonAlgorithm {
 		act = (ActivityImpl) plan.getPlanElements().get(2);
 		act.setStartTime(time);
 		act.setEndTime(24 * 3600);
-		act.setDuration(8 * 3600);
+		act.setMaximumDuration(8 * 3600);
 		// set endTime to 24h, not time+8h, so agents are not forced to leave
 		// work
 		// before duration is over when they arrived late
@@ -177,7 +177,7 @@ public class PlanSimplifyForDebug extends AbstractPersonAlgorithm {
 		act = (ActivityImpl) plan.getPlanElements().get(4);
 		act.setStartTime(time + 8 * 3600);
 		act.setEndTime(24 * 3600);
-		act.setDuration(16 * 3600 - time);
+		act.setMaximumDuration(16 * 3600 - time);
 	}
 
 	private void restoreRoutes(final PlanImpl plan) {

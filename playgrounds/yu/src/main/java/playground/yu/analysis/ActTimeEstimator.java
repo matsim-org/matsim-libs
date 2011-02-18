@@ -92,7 +92,7 @@ public class ActTimeEstimator extends AbstractPersonAlgorithm {
 					adc = new ActDurCounter();
 					this.actDurs.put(actType, adc);
 				}
-				adc.add(a.getDuration());
+				adc.add(a.getMaximumDuration());
 				ActStartTimeCounter astc = this.actStarts.get(actType);
 				if (astc == null) {
 					astc = new ActStartTimeCounter();

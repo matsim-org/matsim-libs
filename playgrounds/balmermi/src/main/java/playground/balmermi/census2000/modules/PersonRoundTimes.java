@@ -69,7 +69,7 @@ public class PersonRoundTimes extends AbstractPersonAlgorithm implements PlanAlg
 		int index = 0;
 		for (int i=0; i<acts_legs.size()-2; i=i+2) {
 			ActivityImpl act = (ActivityImpl)acts_legs.get(i);
-			durs[index] = act.getDuration();
+			durs[index] = act.getMaximumDuration();
 			index++;
 		}
 
@@ -119,7 +119,7 @@ public class PersonRoundTimes extends AbstractPersonAlgorithm implements PlanAlg
 
 			// durations
 			act.setStartTime(plan_dur);
-			act.setDuration(dur);
+			act.setMaximumDuration(dur);
 			plan_dur += dur;
 			act.setEndTime(plan_dur);
 			leg.setDepartureTime(plan_dur);
@@ -138,7 +138,7 @@ public class PersonRoundTimes extends AbstractPersonAlgorithm implements PlanAlg
 		
 		ActivityImpl last_act = (ActivityImpl)acts_legs.get(acts_legs.size()-1);
 		last_act.setStartTime(plan_dur);
-		last_act.setDuration(Time.UNDEFINED_TIME);
+		last_act.setMaximumDuration(Time.UNDEFINED_TIME);
 		last_act.setEndTime(Time.UNDEFINED_TIME);
 		last_act.setType(((ActivityImpl)acts_legs.get(0)).getType());
 	}

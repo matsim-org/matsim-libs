@@ -210,7 +210,7 @@ public class PersonAgent implements DriverAgent {
 		/* schedule a departure if either duration or endtime is set of the activity.
 		 * Otherwise, the agent will just stay at this activity for ever...
 		 */
-		if ((act.getDuration() == Time.UNDEFINED_TIME) && (act.getEndTime() == Time.UNDEFINED_TIME)) {
+		if ((act.getMaximumDuration() == Time.UNDEFINED_TIME) && (act.getEndTime() == Time.UNDEFINED_TIME)) {
 			setDepartureTime(Double.POSITIVE_INFINITY);
 		} else {
 
@@ -219,12 +219,12 @@ public class PersonAgent implements DriverAgent {
 			if (this.simulation.isUseActivityDurations()) {
 				/* The person leaves the activity either 'actDur' later or
 				 * when the end is defined of the activity, whatever comes first. */
-				if (act.getDuration() == Time.UNDEFINED_TIME) {
+				if (act.getMaximumDuration() == Time.UNDEFINED_TIME) {
 					departure = act.getEndTime();
 				} else if (act.getEndTime() == Time.UNDEFINED_TIME) {
-					departure = now + act.getDuration();
+					departure = now + act.getMaximumDuration();
 				} else {
-					departure = Math.min(act.getEndTime(), now + act.getDuration());
+					departure = Math.min(act.getEndTime(), now + act.getMaximumDuration());
 				}
 			}
 			else {

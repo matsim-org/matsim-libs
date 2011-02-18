@@ -34,7 +34,9 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.population.ActivityImpl;
+import static org.matsim.core.population.ActivityImpl.*;
 import org.matsim.core.population.LegImpl;
+import org.matsim.utils.deprecated.DeprecatedStaticMethod;
 
 
 /**
@@ -393,11 +395,11 @@ public class MDSAM {
 		double leisure = 0;
 		double shop = 0;
 		for (int k=0;k<plan.getPlanElements().size();k+=2){
-			if (((ActivityImpl)(plan.getPlanElements().get(k))).getType().startsWith("h")) home+=((ActivityImpl)(plan.getPlanElements().get(k))).calculateDuration();
-			else if (((ActivityImpl)(plan.getPlanElements().get(k))).getType().startsWith("w")) work+=((ActivityImpl)(plan.getPlanElements().get(k))).calculateDuration();
-			else if (((ActivityImpl)(plan.getPlanElements().get(k))).getType().startsWith("e")) education+=((ActivityImpl)(plan.getPlanElements().get(k))).calculateDuration();
-			else if (((ActivityImpl)(plan.getPlanElements().get(k))).getType().startsWith("l")) leisure+=((ActivityImpl)(plan.getPlanElements().get(k))).calculateDuration();
-			else if (((ActivityImpl)(plan.getPlanElements().get(k))).getType().startsWith("s")) shop+=((ActivityImpl)(plan.getPlanElements().get(k))).calculateDuration();
+			if (((ActivityImpl)(plan.getPlanElements().get(k))).getType().startsWith("h")) home+=DeprecatedStaticMethod.calculateSomeDuration(((ActivityImpl)(plan.getPlanElements().get(k))));
+			else if (((ActivityImpl)(plan.getPlanElements().get(k))).getType().startsWith("w")) work+=DeprecatedStaticMethod.calculateSomeDuration(((ActivityImpl)(plan.getPlanElements().get(k))));
+			else if (((ActivityImpl)(plan.getPlanElements().get(k))).getType().startsWith("e")) education+=DeprecatedStaticMethod.calculateSomeDuration(((ActivityImpl)(plan.getPlanElements().get(k))));
+			else if (((ActivityImpl)(plan.getPlanElements().get(k))).getType().startsWith("l")) leisure+=DeprecatedStaticMethod.calculateSomeDuration(((ActivityImpl)(plan.getPlanElements().get(k))));
+			else if (((ActivityImpl)(plan.getPlanElements().get(k))).getType().startsWith("s")) shop+=DeprecatedStaticMethod.calculateSomeDuration(((ActivityImpl)(plan.getPlanElements().get(k))));
 			else log.warn("Unknown act type for person "+plan.getPerson().getId());
 		}
 		double[] timings = new double[5];

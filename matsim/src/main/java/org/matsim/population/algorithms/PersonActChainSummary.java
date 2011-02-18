@@ -103,7 +103,7 @@ public class PersonActChainSummary extends AbstractPersonAlgorithm {
 		double dur_sum = 0;
 		for (int a = 2; a < plan.getPlanElements().size()-2; a += 2) {
 			ActivityImpl act = (ActivityImpl)plan.getPlanElements().get(a);
-			double dur = act.getDuration();
+			double dur = act.getMaximumDuration();
 			dur_sum += dur;
 			int j = (int)(dur/3600);
 			if (j<0) { Gbl.errorMsg("[person_id=" + person.getId() +"; j=" + j + " something is wrong]"); }

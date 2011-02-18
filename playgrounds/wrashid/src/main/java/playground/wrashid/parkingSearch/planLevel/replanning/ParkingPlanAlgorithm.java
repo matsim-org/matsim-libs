@@ -228,7 +228,7 @@ public class ParkingPlanAlgorithm implements PlanAlgorithm {
 		ActivityImpl newParkingActivity = new ActivityImpl("parking", newParking.getCoord());
 		newParkingActivity.setFacilityId(newParking.getId());
 		newParkingActivity.setLinkId(network.getNearestLink(newParking.getCoord()).getId());
-		newParkingActivity.setDuration(parkingActivityDuration);
+		newParkingActivity.setMaximumDuration(parkingActivityDuration);
 
 		return newParkingActivity;
 	}

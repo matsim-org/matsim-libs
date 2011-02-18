@@ -43,7 +43,7 @@ public class YoungPeopleReplanner extends WithinDayDuringLegReplanner {
 		if (!currentLeg.getMode().equals(TransportMode.car)) return false;
 		
 		ActivityImpl newWorkAct = new ActivityImpl("w", this.scenario.createId("22"));
-		newWorkAct.setDuration(3600);
+		newWorkAct.setMaximumDuration(3600);
 
 		// Replace Activity
 		new ReplacePlanElements().replaceActivity(executedPlan, nextActivity, newWorkAct);

@@ -163,7 +163,7 @@ public class RandomPlansGenerator {
 			//create work act
 			a = plan.createAndAddActivity("h", workCoord);
 			a.setLinkId(lWork.getId());
-			a.setDuration(this.workDuration);
+			a.setMaximumDuration(this.workDuration);
 
 			//finally add person to population instance
 			pop.addPerson(person);

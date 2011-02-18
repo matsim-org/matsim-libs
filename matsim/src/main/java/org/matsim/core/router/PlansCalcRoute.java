@@ -209,7 +209,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 
 					double endTime = fromAct.getEndTime();
 					double startTime = fromAct.getStartTime();
-					double dur = (fromAct instanceof ActivityImpl ? ((ActivityImpl) fromAct).getDuration() : Time.UNDEFINED_TIME);
+					double dur = (fromAct instanceof ActivityImpl ? ((ActivityImpl) fromAct).getMaximumDuration() : Time.UNDEFINED_TIME);
 					if (endTime != Time.UNDEFINED_TIME) {
 						// use fromAct.endTime as time for routing
 						now = endTime;

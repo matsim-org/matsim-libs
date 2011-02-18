@@ -146,7 +146,7 @@ public class MyWithinDayMobsimListener2 implements SimulationListener, Simulatio
 		
 		Id linkId = mobsim.getScenario().createId("22") ;
 		Activity newAct = mobsim.getScenario().getPopulation().getFactory().createActivityFromLinkId("w", linkId ) ;
-		((ActivityImpl)newAct).setDuration(3600);
+		((ActivityImpl)newAct).setMaximumDuration(3600);
 		
 		planElements.set( planElementsIndex+1, newAct ) ;
 		

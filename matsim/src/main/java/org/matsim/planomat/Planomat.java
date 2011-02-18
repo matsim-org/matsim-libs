@@ -249,7 +249,7 @@ public class Planomat implements PlanAlgorithm {
 			}
 			now = Math.max(oldNow + 1.0, now);
 			if (action.equals(StepThroughPlanAction.WRITE_BACK)) {
-				((ActivityImpl) origin).setDuration(now - oldNow);
+				((ActivityImpl) origin).setMaximumDuration(now - oldNow);
 				origin.setEndTime(now);
 			}
 			///////////////////////////////////////////////////////////////////////////////////////////

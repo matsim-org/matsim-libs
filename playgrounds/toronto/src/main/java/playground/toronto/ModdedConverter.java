@@ -163,7 +163,7 @@ public class ModdedConverter {
 						this.tmpType = tabs[7];
 						ActivityImpl act = ((PlanImpl) pl).createAndAddActivity(tabs[4], tmpCoord);
 						act.setEndTime(convertTime(tabs[3]));
-						act.setDuration(dur);
+						act.setMaximumDuration(dur);
 					} else {
 						// it is a new person
 						// finish the person from the line before, add final trip

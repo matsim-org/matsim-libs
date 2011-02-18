@@ -157,7 +157,7 @@ public class CommonMATSimUtilities {
 
 		plan.createAndAddLeg(TransportMode.car);
 		act = plan.createAndAddActivity( Constants.ACT_WORK, workCoord );
-		((ActivityImpl) act).setDuration( 8.*3600. ) ;
+		((ActivityImpl) act).setMaximumDuration( 8.*3600. ) ;
 
 		plan.createAndAddLeg(TransportMode.car) ;
 		plan.createAndAddActivity( Constants.ACT_HOME, homeCoord );

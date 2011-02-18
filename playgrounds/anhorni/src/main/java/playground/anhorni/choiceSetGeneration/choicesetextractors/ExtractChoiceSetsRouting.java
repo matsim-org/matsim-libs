@@ -37,6 +37,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.PlansCalcRoute;
+import org.matsim.utils.deprecated.DeprecatedStaticMethod;
 
 import playground.anhorni.choiceSetGeneration.helper.ChoiceSet;
 import playground.anhorni.choiceSetGeneration.helper.SpanningTree;
@@ -115,9 +116,9 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 
 		//--------------------------------------------------
 		ActivityImpl fromAct1 = new org.matsim.core.population.ActivityImpl(toAct0.getType(), toAct0.getLinkId());
-		double endTime = choiceSet.getTrip().getBeforeShoppingAct().getEndTime() +
-		travelTimeBeforeShopping +
-		choiceSet.getTrip().getShoppingAct().calculateDuration();
+		double endTime = choiceSet.getTrip().getBeforeShoppingAct().getEndTime() 
+		+ travelTimeBeforeShopping 
+		+ DeprecatedStaticMethod.calculateSomeDuration(choiceSet.getTrip().getShoppingAct());
 		fromAct1.setEndTime(endTime);
 		fromAct1.setCoord(toAct0.getCoord());
 

@@ -251,7 +251,7 @@ public class AnalyzePlans {
 					final ActivityImpl act = (ActivityImpl)actslegs.get(j);
 					if (act.getType().startsWith(type)) {
 						out.write(person.getId().toString() + "\t" +
-								String.valueOf(act.getDuration()) + "\t" +
+								String.valueOf(act.getMaximumDuration()) + "\t" +
 								((PersonImpl) person).getDesires().getActivityDuration(type));
 						out.newLine();
 

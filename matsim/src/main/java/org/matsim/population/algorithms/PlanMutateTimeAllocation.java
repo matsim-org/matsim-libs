@@ -71,7 +71,7 @@ public class PlanMutateTimeAllocation implements PlanAlgorithm {
 					// mutate the end time of the first activity
 					act.setEndTime(mutateTime(act.getEndTime()));
 					// calculate resulting duration
-					act.setDuration(act.getEndTime() - act.getStartTime());
+					act.setMaximumDuration(act.getEndTime() - act.getStartTime());
 					// move now pointer
 					now += act.getEndTime();
 
@@ -81,10 +81,10 @@ public class PlanMutateTimeAllocation implements PlanAlgorithm {
 					// assume that there will be no delay between arrival time and activity start time
 					act.setStartTime(now);
 					if (this.useActivityDurations) {
-						if (act.getDuration() != Time.UNDEFINED_TIME) {
+						if (act.getMaximumDuration() != Time.UNDEFINED_TIME) {
 							// mutate the durations of all 'middle' activities
-							act.setDuration(mutateTime(act.getDuration()));
-							now += act.getDuration();
+							act.setMaximumDuration(mutateTime(act.getMaximumDuration()));
+							now += act.getMaximumDuration();
 							// set end time accordingly
 							act.setEndTime(now);
 						} else {
@@ -113,7 +113,7 @@ public class PlanMutateTimeAllocation implements PlanAlgorithm {
 					// assume that there will be no delay between arrival time and activity start time
 					act.setStartTime(now);
 					// invalidate duration and end time because the plan will be interpreted 24 hour wrap-around
-					act.setDuration(Time.UNDEFINED_TIME);
+					act.setMaximumDuration(Time.UNDEFINED_TIME);
 					act.setEndTime(Time.UNDEFINED_TIME);
 
 				}

@@ -90,7 +90,7 @@ public class PlanGeneratorWithParkingActivities {
 		ActivityImpl newParkingActivity = new ActivityImpl("parking", parkingFacility.getCoord());
 		newParkingActivity.setFacilityId(parkingFacility.getId());
 		newParkingActivity.setLinkId(network.getNearestLink(parkingFacility.getCoord()).getId());
-		newParkingActivity.setDuration(parkingActivityDuration);
+		newParkingActivity.setMaximumDuration(parkingActivityDuration);
 
 		planElements.add(index, newParkingActivity);
 	}

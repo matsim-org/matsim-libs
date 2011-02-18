@@ -163,12 +163,12 @@ public class MMoyoPlansCalcTransitRoute extends PlansCalcRoute {
 
 									ExperimentalTransitRoute tRoute = (ExperimentalTransitRoute) leg2.getRoute();   //
 									ActivityImpl act = new ActivityImpl(TRANSIT_ACTIVITY_TYPE, this.schedule.getFacilities().get(tRoute.getAccessStopId()).getCoord(), tRoute.getStartLinkId());
-									act.setDuration(0.0);
+									act.setMaximumDuration(0.0);
 									planElements.add(i, act);
 									nextCoord = this.schedule.getFacilities().get(tRoute.getEgressStopId()).getCoord();
 								} else { // walk legs don't have a coord, use the coord from the last egress point
 									ActivityImpl act = new ActivityImpl(TRANSIT_ACTIVITY_TYPE, nextCoord, leg2.getRoute().getStartLinkId());
-									act.setDuration(0.0);
+									act.setMaximumDuration(0.0);
 									planElements.add(i, act);
 									leg2.setMode(TransportMode.transit_walk);
 									//TODO:  set route distance

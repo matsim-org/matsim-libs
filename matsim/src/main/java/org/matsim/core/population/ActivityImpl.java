@@ -68,7 +68,7 @@ public class ActivityImpl implements Activity {
 		this.linkId = act.getLinkId();
 		this.setStartTime(act.getStartTime());
 		this.setEndTime(act.getEndTime());
-		this.setDuration(act.getDuration());
+		this.setMaximumDuration(act.getMaximumDuration());
 		this.setFacilityId(act.getFacilityId());
 	}
 
@@ -142,49 +142,11 @@ public class ActivityImpl implements Activity {
 				"[endTime=" + Time.writeTime(this.getEndTime()) + "]";
 	}
 
-
-
-	/**
-	 * This method calculates the duration of the activity from the start and endtimes if set.
-	 * If neither end nor starttime is set, but the duration is stored in the attribute of the
-	 * class the duration is returned.
-	 * If only start time is set, assume this is the last activity of the day.
-	 * If only the end time is set, assume this is the first activity of the day.
-	 * If the duration could neither be calculated nor the act.dur attribute is set to a value
-	 * not equal to Time.UNDEFINED_TIME an exception is thrown.
-	 * @return the duration in seconds
-	 * @deprecated define algo with activity_end_time.  kn, jun09
-	 */
-	@Deprecated
-	public double calculateDuration() {
-		if ((this.getStartTime() == Time.UNDEFINED_TIME) && (this.getEndTime() == Time.UNDEFINED_TIME)) {
-			if (this.getDuration() != Time.UNDEFINED_TIME) {
-				return this.getDuration();
-			}
-			throw new IllegalArgumentException("No valid time set to calculate duration of activity: StartTime: " + this.getStartTime() + " EndTime : " + this.getEndTime()+ " Duration: " + this.getDuration());
-		}
-		//if only start time is set, assume this is the last activity of the day
-		else if ((this.getStartTime() != Time.UNDEFINED_TIME) && (this.getEndTime() == Time.UNDEFINED_TIME)) {
-			return Time.MIDNIGHT - this.getStartTime();
-		}
-		//if only the end time is set, assume this is the first activity of the day
-		else if ((this.getStartTime() == Time.UNDEFINED_TIME) && (this.getEndTime() != Time.UNDEFINED_TIME)) {
-			return this.getEndTime();
-		}
-		else {
-			return this.getEndTime() - this.getStartTime();
-		}
-	}
-
-	/** @deprecated define algo with activity_end_time.  kn, jun09 */
-	@Deprecated
-	public double getDuration() {
+	public double getMaximumDuration() {
 		return this.dur;
 	}
 
-	/** @deprecated define algo with activity_end_time.  kn, jun09 */
-	@Deprecated
-	public void setDuration(final double dur) {
+	public void setMaximumDuration(final double dur) {
 		this.dur = dur;
 	}
 

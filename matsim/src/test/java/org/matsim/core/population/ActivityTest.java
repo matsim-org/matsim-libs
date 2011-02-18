@@ -22,6 +22,9 @@ package org.matsim.core.population;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.utils.deprecated.DeprecatedStaticMethod;
+
+import static org.matsim.core.population.ActivityImpl.* ;
 
 /**
  * Test for convenience methods of Act.
@@ -33,27 +36,27 @@ public class ActivityTest extends MatsimTestCase {
 	public void testCalculateDuration() {
 		ActivityImpl testee = new ActivityImpl("h", new CoordImpl(0, 0));
 		testee.setStartTime(0.0);
-		testee.setDuration(0.0);
+		testee.setMaximumDuration(0.0);
 		testee.setEndTime(0.0);
 
 		assertNotNull(testee);
-		assertEquals(0.0, testee.calculateDuration(), EPSILON);
+		assertEquals(0.0, DeprecatedStaticMethod.calculateSomeDuration(testee), EPSILON);
 		testee.setEndTime(5.5 * 3600.0);
-		assertEquals(5.5 * 3600.0, testee.calculateDuration(), EPSILON);
+		assertEquals(5.5 * 3600.0, DeprecatedStaticMethod.calculateSomeDuration(testee), EPSILON);
 		testee.setStartTime(Time.UNDEFINED_TIME);
-		assertEquals(5.5 * 3600.0, testee.calculateDuration(), EPSILON);
+		assertEquals(5.5 * 3600.0, DeprecatedStaticMethod.calculateSomeDuration(testee), EPSILON);
 		testee.setEndTime(Time.UNDEFINED_TIME);
-		assertEquals(0.0, testee.calculateDuration(), EPSILON);
-		testee.setDuration(Time.UNDEFINED_TIME);
+		assertEquals(0.0, DeprecatedStaticMethod.calculateSomeDuration(testee), EPSILON);
+		testee.setMaximumDuration(Time.UNDEFINED_TIME);
 		Exception e = null;
 		try {
-			testee.calculateDuration();
+			DeprecatedStaticMethod.calculateSomeDuration(testee);
 		} catch (RuntimeException ex) {
 			e = ex;
 		}
 		assertNotNull(e);
 		testee.setStartTime(17 * 3600.0);
-		assertEquals(7 * 3600.0, testee.calculateDuration(), EPSILON);
+		assertEquals(7 * 3600.0, DeprecatedStaticMethod.calculateSomeDuration(testee), EPSILON);
 	}
 
 }

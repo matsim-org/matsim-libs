@@ -245,7 +245,7 @@ public abstract class ParkingScoringFunction {
 				.getParkingOccupancyMaintainer().getParkingArrivalDepartureLog().get(plan.getPerson().getId()));
 
 		double score = getScore(targetActivity, parkingFacilityId, parkingTimeInfo, plan.getPerson().getId(),
-				arrivalParkingAct.getDuration(), departureParkingAct.getDuration(), plan, delta, forRanking);
+				arrivalParkingAct.getMaximumDuration(), departureParkingAct.getMaximumDuration(), plan, delta, forRanking);
 
 		return score;
 	}

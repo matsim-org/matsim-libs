@@ -303,9 +303,9 @@ public class PopulationWriterHandlerImplV4 implements PopulationWriterHandler {
 		}
 		if (act instanceof ActivityImpl){
 			ActivityImpl a = (ActivityImpl)act;
-			if (a.getDuration() != Time.UNDEFINED_TIME) {
+			if (a.getMaximumDuration() != Time.UNDEFINED_TIME) {
 				out.write(" dur=\"");
-				out.write(Time.writeTime(a.getDuration()));
+				out.write(Time.writeTime(a.getMaximumDuration()));
 				out.write("\"");
 			}
 		}

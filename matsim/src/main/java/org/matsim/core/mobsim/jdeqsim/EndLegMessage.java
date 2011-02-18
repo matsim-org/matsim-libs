@@ -68,8 +68,8 @@ public class EndLegMessage extends EventMessage {
 			double actDurBasedDepartureTime = Double.MAX_VALUE;
 			double actEndTimeBasedDepartureTime = Double.MAX_VALUE;
 
-			if (currentAct.getDuration() != Time.UNDEFINED_TIME) {
-				actDurBasedDepartureTime = getMessageArrivalTime() + currentAct.getDuration();
+			if (currentAct.getMaximumDuration() != Time.UNDEFINED_TIME) {
+				actDurBasedDepartureTime = getMessageArrivalTime() + currentAct.getMaximumDuration();
 			}
 
 			if (currentAct.getEndTime() != Time.UNDEFINED_TIME) {

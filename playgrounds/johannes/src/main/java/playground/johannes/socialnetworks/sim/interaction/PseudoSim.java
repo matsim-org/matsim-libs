@@ -144,7 +144,7 @@ public class PseudoSim {
 						 * If act end time is not specified...
 						 */
 						if (Double.isInfinite(actEndTime)) {
-							double duration = ((ActivityImpl) act).getDuration();
+							double duration = ((ActivityImpl) act).getMaximumDuration();
 							if(Double.isInfinite(duration)) {
 								/*
 								 * Duration is not specified, set end time to the end of day.

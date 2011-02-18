@@ -71,7 +71,7 @@ public class PersonCalcTimes extends AbstractPersonAlgorithm {
 
 					if (j == 0) {
 						act.setStartTime(0);
-						act.setDuration(act.getEndTime());
+						act.setMaximumDuration(act.getEndTime());
 					}
 					else if (j == acts_legs.size()-1) {
 						double time = leg.getArrivalTime();
@@ -80,11 +80,11 @@ public class PersonCalcTimes extends AbstractPersonAlgorithm {
 							time = 24*3600;
 						}
 						act.setEndTime(time);
-						act.setDuration(time - act.getStartTime());
+						act.setMaximumDuration(time - act.getStartTime());
 					}
 					else {
 						act.setStartTime(leg.getArrivalTime());
-						act.setEndTime(act.getStartTime()+act.getDuration());
+						act.setEndTime(act.getStartTime()+act.getMaximumDuration());
 					}
 				}
 				else {

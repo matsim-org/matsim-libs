@@ -189,7 +189,7 @@ public class Emme2ExternalTripsCreator {
 		 */
 		activity = (ActivityImpl) populationFactory.createActivityFromLinkId("tta", originLinkId);
 		activity.setStartTime(0.0);
-		activity.setDuration(departureTime);
+		activity.setMaximumDuration(departureTime);
 		activity.setEndTime(departureTime);
 		activityFacility = getActivityFacilityByLinkId(originLinkId);
 		activity.setFacilityId(activityFacility.getId());

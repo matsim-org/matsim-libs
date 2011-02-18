@@ -138,12 +138,12 @@ public class PlanToPlanStep {
 			}
 
 			// advance time
-			if (toAct.getDuration() != Time.UNDEFINED_TIME
+			if (toAct.getMaximumDuration() != Time.UNDEFINED_TIME
 					&& toAct.getEndTime() != Time.UNDEFINED_TIME) {
-				time = Math.max(time, Math.min(time + toAct.getDuration(),
+				time = Math.max(time, Math.min(time + toAct.getMaximumDuration(),
 						toAct.getEndTime()));
-			} else if (toAct.getDuration() != Time.UNDEFINED_TIME) {
-				time += toAct.getDuration();
+			} else if (toAct.getMaximumDuration() != Time.UNDEFINED_TIME) {
+				time += toAct.getMaximumDuration();
 			} else {
 				time = Math.max(time, toAct.getEndTime());
 			}

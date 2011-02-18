@@ -214,8 +214,8 @@ public abstract class Utils {
 		ActivityImpl actTemp = (ActivityImpl) act;
 		while (actTemp != null && !actTemp.getType().startsWith("h")) {
 			actTemp = (ActivityImpl) plan.getPreviousActivity(plan.getPreviousLeg(actTemp));
-			if (actTemp.getDuration() > maxActDur && !actTemp.getType().startsWith("h")) {
-				maxActDur = actTemp.getDuration();
+			if (actTemp.getMaximumDuration() > maxActDur && !actTemp.getType().startsWith("h")) {
+				maxActDur = actTemp.getMaximumDuration();
 				longestActivity = actTemp.getType();
 			}
 		}

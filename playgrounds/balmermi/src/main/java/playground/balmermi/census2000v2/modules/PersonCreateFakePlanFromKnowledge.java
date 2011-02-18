@@ -100,7 +100,7 @@ public class PersonCreateFakePlanFromKnowledge extends AbstractPersonAlgorithm {
 				ActivityImpl act = ((PlanImpl) p).createAndAddActivity(home.getType(),home.getFacility().getCoord());
 				act.setStartTime(0);
 				act.setEndTime(24*3600);
-				act.setDuration(24*3600);
+				act.setMaximumDuration(24*3600);
 				act.setFacilityId(home.getFacility().getId());
 			}
 			else {
@@ -112,7 +112,7 @@ public class PersonCreateFakePlanFromKnowledge extends AbstractPersonAlgorithm {
 				ActivityImpl act = ((PlanImpl) p).createAndAddActivity(home.getType(),home.getFacility().getCoord());
 				act.setStartTime(start_time);
 				act.setEndTime(end_time);
-				act.setDuration(end_time);
+				act.setMaximumDuration(end_time);
 				act.setFacilityId(home.getFacility().getId());
 				LegImpl leg = ((PlanImpl) p).createAndAddLeg(TransportMode.car);
 				leg.setDepartureTime(end_time);
@@ -128,7 +128,7 @@ public class PersonCreateFakePlanFromKnowledge extends AbstractPersonAlgorithm {
 					act = ((PlanImpl) p).createAndAddActivity(work.getType(),work.getFacility().getCoord());
 					act.setStartTime(start_time);
 					act.setEndTime(end_time);
-					act.setDuration(end_time-start_time);
+					act.setMaximumDuration(end_time-start_time);
 					act.setFacilityId(work.getFacility().getId());
 					LegImpl leg2 = ((PlanImpl) p).createAndAddLeg(TransportMode.car);
 					leg2.setDepartureTime(end_time);
@@ -145,7 +145,7 @@ public class PersonCreateFakePlanFromKnowledge extends AbstractPersonAlgorithm {
 					act = ((PlanImpl) p).createAndAddActivity(educ.getType(),educ.getFacility().getCoord());
 					act.setStartTime(start_time);
 					act.setEndTime(end_time);
-					act.setDuration(end_time-start_time);
+					act.setMaximumDuration(end_time-start_time);
 					act.setFacilityId(educ.getFacility().getId());
 					LegImpl leg2 = ((PlanImpl) p).createAndAddLeg(TransportMode.car);
 					leg2.setDepartureTime(end_time);
@@ -159,7 +159,7 @@ public class PersonCreateFakePlanFromKnowledge extends AbstractPersonAlgorithm {
 				act = ((PlanImpl) p).createAndAddActivity(home.getType(),home.getFacility().getCoord());
 				act.setStartTime(start_time);
 				act.setEndTime(end_time);
-				act.setDuration(end_time-start_time);
+				act.setMaximumDuration(end_time-start_time);
 				act.setFacilityId(home.getFacility().getId());
 			}
 		}

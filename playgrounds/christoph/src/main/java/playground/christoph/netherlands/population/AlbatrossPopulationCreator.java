@@ -146,7 +146,7 @@ public class AlbatrossPopulationCreator {
 		// if the activity ends before "27:00" (End of the day in Albatross) there is a next activity
 		double endTime = getTime(albatrossPerson.ET.get(0));
 		if (endTime != 27 * 3600){
-			activity.setDuration(endTime);
+			activity.setMaximumDuration(endTime);
 			activity.setEndTime(endTime);
 		}
 		activity.setFacilityId(homeFacility.getId());
@@ -184,13 +184,13 @@ public class AlbatrossPopulationCreator {
 			// if the activity ends before "27:00" (End of the day in Albatross) there is a next activity
 			double et = getTime(albatrossPerson.ET.get(i));
 			if (et != 27 * 3600){
-				activity.setDuration(et - activity.getStartTime());
+				activity.setMaximumDuration(et - activity.getStartTime());
 				activity.setEndTime(et);
 			}
 			activity.setFacilityId(facility.getId());
 			activity.setCoord(facility.getCoord());
 			// if it is not a home activity
-			if (albatrossPerson.ATYPE.get(i) != 9 && activity.getDuration() > 0.0) desires.accumulateActivityDuration(activity.getType(), activity.getDuration());
+			if (albatrossPerson.ATYPE.get(i) != 9 && activity.getMaximumDuration() > 0.0) desires.accumulateActivityDuration(activity.getType(), activity.getMaximumDuration());
 			plan.addActivity(activity);
 		}	
 

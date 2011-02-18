@@ -123,7 +123,7 @@ public class AddParkingsToPlans {
 		ActivityImpl parkingActivity = new ActivityImpl(activity);
 
 		parkingActivity.setType(activityType);
-		parkingActivity.setDuration(parkingActivityDuration);
+		parkingActivity.setMaximumDuration(parkingActivityDuration);
 		parkingActivity.setFacilityId(new IdImpl("facility_" + activity.getLinkId().toString()));
 
 		return parkingActivity;

@@ -187,8 +187,8 @@ public class PopulationWriterHandlerImplV0 implements PopulationWriterHandler {
 			out.write(" start_time=\"" + Time.writeTime(act.getStartTime()) + "\"");
 		if (act instanceof ActivityImpl){
 			ActivityImpl a = (ActivityImpl)act;
-			if (a.getDuration() != Time.UNDEFINED_TIME)
-				out.write(" dur=\"" + Time.writeTime(a.getDuration()) + "\"");
+			if (a.getMaximumDuration() != Time.UNDEFINED_TIME)
+				out.write(" dur=\"" + Time.writeTime(a.getMaximumDuration()) + "\"");
 		}
 		if (act.getEndTime() != Integer.MIN_VALUE)
 			out.write(" end_time=\"" + Time.writeTime(act.getEndTime()) + "\"");

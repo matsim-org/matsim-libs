@@ -232,7 +232,7 @@ public class PersonDistributeActChains extends AbstractPersonAlgorithm implement
 					ActivityImpl a = plan.createAndAddActivity(type, new CoordImpl(0.0,0.0));
 					a.setStartTime(start_time);
 					a.setEndTime(end_time);
-					a.setDuration(dur);
+					a.setMaximumDuration(dur);
 					LegImpl l = plan.createAndAddLeg("undefined");
 					l.setArrivalTime(end_time);
 					l.setTravelTime(0);

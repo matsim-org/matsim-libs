@@ -67,6 +67,9 @@ public double getStartTime();
 public void setStartTime(double seconds);
 // TODO kn not clear what this means (see above). --> remove for next version?
 
+public double getMaximumDuration() ;
+public void setMaximumDuration(double seconds) ;
+
 /**
  * @return the if of the link to which the activity is attached.  This may start as zero, but
  * is usually set automatically by the control(l)er before the zeroth iteration.

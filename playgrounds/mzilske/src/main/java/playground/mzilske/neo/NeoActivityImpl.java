@@ -77,4 +77,16 @@ public class NeoActivityImpl implements Activity {
 		throw new RuntimeException();
 	}
 
+	@Override
+	public double getMaximumDuration() {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException() ;
+	}
+
+	@Override
+	public void setMaximumDuration(double seconds) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException() ;
+	}
+
 }

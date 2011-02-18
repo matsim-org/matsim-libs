@@ -110,7 +110,7 @@ public class VisualizeTransitPlans {
 						ActivityImpl act = (ActivityImpl) pe;
 						ActivityImpl visAct = (ActivityImpl) pb.createActivityFromCoord(act.getType(), act.getCoord());
 						visAct.setStartTime(act.getStartTime());
-						visAct.setDuration((act).getDuration());
+						visAct.setMaximumDuration((act).getMaximumDuration());
 						visAct.setEndTime(act.getEndTime());
 						visAct.setLinkId(this.visScenario.getNetwork().getNearestLink(act.getCoord()).getId());
 						visPlan.addActivity(visAct);

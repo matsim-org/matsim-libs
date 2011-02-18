@@ -65,7 +65,7 @@ public class ActivityTypeDetector extends AbstractPersonAlgorithm implements
 				String actType = act.getType();
 				if ((!actType.equals("H")) && (!actType.equals("W"))) {
 					// duration
-					double dur = act.getDuration();
+					double dur = act.getMaximumDuration();
 
 					Double shortestDur = shortestDurs.get(actType);
 					if (shortestDur != null && shortestDur <= dur) {

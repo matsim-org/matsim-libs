@@ -139,7 +139,7 @@ public class PlanScoreForecaster4onlyTravPt {
 			if (departTime < 0) {
 				ActivityImpl oldPreAct = (ActivityImpl) oldSelected
 						.getPreviousActivity(oldLeg);
-				departTime = oldPreAct.getStartTime() + oldPreAct.getDuration();
+				departTime = oldPreAct.getStartTime() + oldPreAct.getMaximumDuration();
 			}
 		}
 		if (departTime < 0) {
@@ -211,7 +211,7 @@ public class PlanScoreForecaster4onlyTravPt {
 				act.setStartTime(actStartTime);
 			}
 		if (actEndTime == Double.NEGATIVE_INFINITY)
-			actEndTime = act.getStartTime() + act.getDuration();
+			actEndTime = act.getStartTime() + act.getMaximumDuration();
 		else if (nextLeg != null) {
 			actEndTime = nextLeg.getDepartureTime();
 			if (actEndTime < 0 && oldSelected != null) {

@@ -114,17 +114,17 @@ public class ActivityHandler implements PlanElementHandler, MobsimFeature, Mobsi
 
 		if (this.useActivityDurations) {
 			ActivityImpl a = (ActivityImpl) act;
-			if ((a.getDuration() == Time.UNDEFINED_TIME) && (a.getEndTime() == Time.UNDEFINED_TIME)) {
+			if ((a.getMaximumDuration() == Time.UNDEFINED_TIME) && (a.getEndTime() == Time.UNDEFINED_TIME)) {
 				return Time.UNDEFINED_TIME;
 			}
 			/* The person leaves the activity either 'actDur' later or
 			 * when the end is defined of the activity, whatever comes first. */
-			if (a.getDuration() == Time.UNDEFINED_TIME) {
+			if (a.getMaximumDuration() == Time.UNDEFINED_TIME) {
 				departure = act.getEndTime();
 			} else if (act.getEndTime() == Time.UNDEFINED_TIME) {
-				departure = now + a.getDuration();
+				departure = now + a.getMaximumDuration();
 			} else {
-				departure = Math.min(act.getEndTime(), now + a.getDuration());
+				departure = Math.min(act.getEndTime(), now + a.getMaximumDuration());
 			}
 		} else {
 			if (act.getEndTime() == Time.UNDEFINED_TIME) {

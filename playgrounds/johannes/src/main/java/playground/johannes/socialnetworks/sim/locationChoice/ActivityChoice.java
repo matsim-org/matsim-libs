@@ -105,7 +105,7 @@ public class ActivityChoice implements PlanStrategyModule {
 		((ActivityImpl)newAct).setLinkId(destLinkId);
 		
 		if(Double.isInfinite(act.getEndTime())) {
-			act.setEndTime(act.getStartTime() + ((ActivityImpl) act).getDuration());
+			act.setEndTime(act.getStartTime() + ((ActivityImpl) act).getMaximumDuration());
 		}
 		newAct.setEndTime(act.getEndTime());
 		

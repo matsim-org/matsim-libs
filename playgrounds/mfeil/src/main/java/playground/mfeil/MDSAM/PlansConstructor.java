@@ -50,6 +50,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
+import static org.matsim.core.population.ActivityImpl.*;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
@@ -63,6 +64,7 @@ import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
 import org.matsim.locationchoice.constrained.ManageSubchains;
 import org.matsim.locationchoice.constrained.SubChain;
 import org.matsim.population.algorithms.XY2Links;
+import org.matsim.utils.deprecated.DeprecatedStaticMethod;
 
 import playground.mfeil.AgentsAttributesAdder;
 import playground.mfeil.analysis.ASPActivityChainsModes;
@@ -257,7 +259,7 @@ public class PlansConstructor implements PlanStrategyModule{
 					((ActivityImpl)(plan.getPlanElements().get(j))).setStartTime(((LegImpl)(plan.getPlanElements().get(j-1))).getArrivalTime());
 					if (j!=plan.getPlanElements().size()-1){
 						((ActivityImpl)(plan.getPlanElements().get(j))).setEndTime(java.lang.Math.max(((ActivityImpl)(plan.getPlanElements().get(j))).getStartTime()+1, ((ActivityImpl)(plan.getPlanElements().get(j))).getEndTime()));
-						((ActivityImpl)(plan.getPlanElements().get(j))).setDuration(((ActivityImpl)(plan.getPlanElements().get(j))).getEndTime()-((ActivityImpl)(plan.getPlanElements().get(j))).getStartTime());
+						((ActivityImpl)(plan.getPlanElements().get(j))).setMaximumDuration(((ActivityImpl)(plan.getPlanElements().get(j))).getEndTime()-((ActivityImpl)(plan.getPlanElements().get(j))).getStartTime());
 					}
 				}
 			}
@@ -280,7 +282,7 @@ public class PlansConstructor implements PlanStrategyModule{
 						((ActivityImpl)(plan.getPlanElements().get(j))).setStartTime(((LegImpl)(plan.getPlanElements().get(j-1))).getArrivalTime());
 						if (j!=plan.getPlanElements().size()-1){
 							((ActivityImpl)(plan.getPlanElements().get(j))).setEndTime(java.lang.Math.max(((ActivityImpl)(plan.getPlanElements().get(j))).getStartTime()+1, ((ActivityImpl)(plan.getPlanElements().get(j))).getEndTime()));
-							((ActivityImpl)(plan.getPlanElements().get(j))).setDuration(((ActivityImpl)(plan.getPlanElements().get(j))).getEndTime()-((ActivityImpl)(plan.getPlanElements().get(j))).getStartTime());
+							((ActivityImpl)(plan.getPlanElements().get(j))).setMaximumDuration(((ActivityImpl)(plan.getPlanElements().get(j))).getEndTime()-((ActivityImpl)(plan.getPlanElements().get(j))).getStartTime());
 						}
 					}
 				}
@@ -465,7 +467,7 @@ public class PlansConstructor implements PlanStrategyModule{
 						if (j%2==0) {
 							ActivityImpl act = new ActivityImpl((ActivityImpl)this.actChains.get(i).get(j));
 							if (/*j!=0 && */j!=this.actChains.get(i).size()-1) {
-								act.setEndTime(MatsimRandom.getRandom().nextDouble()*act.getDuration()*2+act.getStartTime());
+								act.setEndTime(MatsimRandom.getRandom().nextDouble()*act.getMaximumDuration()*2+act.getStartTime());
 								if ((j!=0) && !act.getType().equalsIgnoreCase("h")) {
 									this.modifyLocationCoord(act);
 								}
@@ -494,7 +496,7 @@ public class PlansConstructor implements PlanStrategyModule{
 							((ActivityImpl)(plan.getPlanElements().get(j))).setStartTime(((LegImpl)(plan.getPlanElements().get(j-1))).getArrivalTime());
 							if (j!=plan.getPlanElements().size()-1){
 								((ActivityImpl)(plan.getPlanElements().get(j))).setEndTime(java.lang.Math.max(((ActivityImpl)(plan.getPlanElements().get(j))).getStartTime()+1, ((ActivityImpl)(plan.getPlanElements().get(j))).getEndTime()));
-								((ActivityImpl)(plan.getPlanElements().get(j))).setDuration(((ActivityImpl)(plan.getPlanElements().get(j))).getEndTime()-((ActivityImpl)(plan.getPlanElements().get(j))).getStartTime());
+								((ActivityImpl)(plan.getPlanElements().get(j))).setMaximumDuration(((ActivityImpl)(plan.getPlanElements().get(j))).getEndTime()-((ActivityImpl)(plan.getPlanElements().get(j))).getStartTime());
 							}
 						}
 					}
@@ -542,7 +544,7 @@ public class PlansConstructor implements PlanStrategyModule{
 							ActivityImpl act = new ActivityImpl((ActivityImpl)this.actChains.get(position).get(j));
 							//Timing
 							if (j!=this.actChains.get(position).size()-1) {
-								act.setEndTime(MatsimRandom.getRandom().nextDouble()*act.getDuration()*2+act.getStartTime());
+								act.setEndTime(MatsimRandom.getRandom().nextDouble()*act.getMaximumDuration()*2+act.getStartTime());
 							}
 							//Location if "primary"
 							if (act.getType().equalsIgnoreCase("w") || act.getType().equalsIgnoreCase("e") || act.getType().equalsIgnoreCase("h") || act.getType().equalsIgnoreCase("h_inner")){
@@ -592,7 +594,7 @@ public class PlansConstructor implements PlanStrategyModule{
 							if (j!=0)((Activity)(plan.getPlanElements().get(j))).setStartTime(((LegImpl)(plan.getPlanElements().get(j-1))).getArrivalTime());
 							if (j!=plan.getPlanElements().size()-1){
 								((Activity)(plan.getPlanElements().get(j))).setEndTime(java.lang.Math.max(((ActivityImpl)(plan.getPlanElements().get(j))).getStartTime()+1, ((Activity)(plan.getPlanElements().get(j))).getEndTime()));
-								((ActivityImpl)(plan.getPlanElements().get(j))).setDuration(((Activity)(plan.getPlanElements().get(j))).getEndTime()-((Activity)(plan.getPlanElements().get(j))).getStartTime());
+								((ActivityImpl)(plan.getPlanElements().get(j))).setMaximumDuration(((Activity)(plan.getPlanElements().get(j))).getEndTime()-((Activity)(plan.getPlanElements().get(j))).getStartTime());
 							}
 						}
 					}
@@ -736,7 +738,7 @@ public class PlansConstructor implements PlanStrategyModule{
 							for (int j=2;j<plan.getPlanElements().size()-2;j+=2){
 								if (((ActivityImpl)(planFirstPerson.getPlanElements().get(i))).getType().equals(((ActivityImpl)(plan.getPlanElements().get(j))).getType()) &&
 										!takenPositions.contains(j)){
-									stream.print(((ActivityImpl)(plan.getPlanElements().get(j))).calculateDuration()/3600+"\t");
+									stream.print(DeprecatedStaticMethod.calculateSomeDuration(((ActivityImpl)(plan.getPlanElements().get(j))))/3600+"\t");
 									takenPositions.add(j);
 									break;
 								}
@@ -1356,7 +1358,7 @@ public class PlansConstructor implements PlanStrategyModule{
 					// Old version with fixed act/mode chain
 					for (int i=1;i<plan.getPlanElements().size()-1;i++){
 						if (i%2==0) {
-							stream.print(((ActivityImpl)(plan.getPlanElements().get(i))).calculateDuration()/3600+"\t");
+							stream.print(DeprecatedStaticMethod.calculateSomeDuration(((ActivityImpl)(plan.getPlanElements().get(i))))/3600+"\t");
 							if (((ActivityImpl)(plan.getPlanElements().get(i))).getType().equals(((ActivityImpl)(plan.getPlanElements().get(i-2))).getType())) stream.print("1\t");
 							else stream.print("0\t");
 						}
@@ -1447,7 +1449,7 @@ public class PlansConstructor implements PlanStrategyModule{
 					for (int j=2;j<planToBeWritten.size()-2;j+=2){
 						if (((ActivityImpl)(referencePlan.get(i))).getType().equals(((ActivityImpl)(planToBeWritten.get(j))).getType()) &&
 								!takenPositions.contains(j)){
-							stream.print(((ActivityImpl)(planToBeWritten.get(j))).calculateDuration()/3600+"\t");
+							stream.print(DeprecatedStaticMethod.calculateSomeDuration(((ActivityImpl)(planToBeWritten.get(j))))/3600+"\t");
 							counter++;
 							takenPositions.add(j);
 							found = true;

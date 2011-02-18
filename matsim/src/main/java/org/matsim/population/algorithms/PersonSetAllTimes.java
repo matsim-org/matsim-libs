@@ -61,13 +61,13 @@ public class PersonSetAllTimes extends AbstractPersonAlgorithm {
 																					 EARLIEST_ENDTIME + 1);
 					act.setEndTime(endtime);
 					act.setStartTime(Time.UNDEFINED_TIME);
-					act.setDuration(Time.UNDEFINED_TIME);
+					act.setMaximumDuration(Time.UNDEFINED_TIME);
 
 					prev_endtime = act.getEndTime();
 				}
 				else if (j == plan.getPlanElements().size()-1) {
 					act.setStartTime(Time.UNDEFINED_TIME);
-					act.setDuration(Time.UNDEFINED_TIME);
+					act.setMaximumDuration(Time.UNDEFINED_TIME);
 					act.setEndTime(Time.UNDEFINED_TIME);
 				}
 				else {
@@ -85,38 +85,38 @@ public class PersonSetAllTimes extends AbstractPersonAlgorithm {
 
 				if (act.getType().equals("w")) {
 					if (w_cnt == 0) { throw new RuntimeException("HAE?: w_cnt=0"); }
-					else if (w_cnt == 1) { act.setDuration(W_DUR); act.setType("w1"); }
-					else if (w_cnt == 2) { act.setDuration(W_DUR/2); act.setType("w2");}
+					else if (w_cnt == 1) { act.setMaximumDuration(W_DUR); act.setType("w1"); }
+					else if (w_cnt == 2) { act.setMaximumDuration(W_DUR/2); act.setType("w2");}
 					else { throw new RuntimeException("HAE?: w_cnt>2"); }
 				}
 				else if (act.getType().equals("e")) {
 					if (e_cnt == 0) { throw new RuntimeException("HAE?: e_cnt=0"); }
-					else if (e_cnt == 1) { act.setDuration(E_DUR); act.setType("e1");}
-					else if (e_cnt == 2) { act.setDuration(E_DUR/2); act.setType("e2");}
+					else if (e_cnt == 1) { act.setMaximumDuration(E_DUR); act.setType("e1");}
+					else if (e_cnt == 2) { act.setMaximumDuration(E_DUR/2); act.setType("e2");}
 					else { throw new RuntimeException("HAE?: e_cnt>2"); }
 				}
 				else if (act.getType().equals("l")) {
 					if ((w_cnt > 0) || (e_cnt > 0)) {
-						act.setDuration(L_DUR_SHORT); act.setType("l");
+						act.setMaximumDuration(L_DUR_SHORT); act.setType("l");
 					}
 					else {
 						if (l_cnt == 0) { throw new RuntimeException("HAE?: l_cnt=0"); }
-						else if (l_cnt == 1) { act.setDuration(L_DUR_LONG); act.setType("l1"); }
-						else if (l_cnt == 2) { act.setDuration(L_DUR_LONG/2); act.setType("l2"); }
+						else if (l_cnt == 1) { act.setMaximumDuration(L_DUR_LONG); act.setType("l1"); }
+						else if (l_cnt == 2) { act.setMaximumDuration(L_DUR_LONG/2); act.setType("l2"); }
 						else { throw new RuntimeException("HAE?: l_cnt>2"); }
 					}
 				}
 				else if (act.getType().equals("s")) {
 					if ((w_cnt > 0) || (e_cnt > 0)) {
-						act.setDuration(L_DUR_SHORT); act.setType("s");
+						act.setMaximumDuration(L_DUR_SHORT); act.setType("s");
 					}
 					else if (l_cnt > 0) {
-						act.setDuration(S_DUR_SHORT);
+						act.setMaximumDuration(S_DUR_SHORT);
 					}
 					else {
 						if (s_cnt == 0) { throw new RuntimeException("HAE?: s_cnt=0"); }
-						else if (s_cnt == 1) { act.setDuration(S_DUR_LONG); act.setType("s1"); }
-						else if (s_cnt == 2) { act.setDuration(S_DUR_LONG/2); act.setType("s2"); }
+						else if (s_cnt == 1) { act.setMaximumDuration(S_DUR_LONG); act.setType("s1"); }
+						else if (s_cnt == 2) { act.setMaximumDuration(S_DUR_LONG/2); act.setType("s2"); }
 						else { throw new RuntimeException("HAE?: s_cnt>2"); }
 					}
 				}
@@ -128,14 +128,14 @@ public class PersonSetAllTimes extends AbstractPersonAlgorithm {
 
 				if (j == 0) {
 					act.setStartTime(0);
-					act.setDuration(act.getEndTime());
+					act.setMaximumDuration(act.getEndTime());
 				}
 				else if (j == plan.getPlanElements().size()-1) {
 					act.setStartTime(prev_endtime);
 				}
 				else {
 					act.setStartTime(prev_endtime);
-					act.setEndTime(act.getStartTime()+act.getDuration());
+					act.setEndTime(act.getStartTime()+act.getMaximumDuration());
 					prev_endtime = act.getEndTime();
 				}
 			}

@@ -77,7 +77,7 @@ public class ActivityRandomizer {
 							
 							Activity newAct = factory.createActivityFromLinkId(act.getType(), newDest.getId());
 							if(Double.isInfinite(act.getEndTime())) {
-								act.setEndTime(act.getStartTime() + ((ActivityImpl) act).getDuration());
+								act.setEndTime(act.getStartTime() + ((ActivityImpl) act).getMaximumDuration());
 							}
 							newAct.setEndTime(act.getEndTime());
 							

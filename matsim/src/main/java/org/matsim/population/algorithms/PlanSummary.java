@@ -124,7 +124,7 @@ public class PlanSummary extends AbstractPersonAlgorithm implements PlanAlgorith
 			this.actCnt++;
 			ActivityImpl act = (ActivityImpl)actsLegs.get(j);
 			String actType = act.getType();
-			double dur = act.getDuration();
+			double dur = act.getMaximumDuration();
 			int idx = getActTypeIndex(actType);
 			if ((idx >= 0) && (dur >= 0)) {
 				this.actTypeCnt[idx]++;

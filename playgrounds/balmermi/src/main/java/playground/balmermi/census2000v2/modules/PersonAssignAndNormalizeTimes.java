@@ -67,16 +67,16 @@ public class PersonAssignAndNormalizeTimes extends AbstractPersonAlgorithm imple
 				ActivityImpl a = (ActivityImpl)p.getPlanElements().get(i);
 				if (prev_ttime == Time.UNDEFINED_TIME) { Gbl.errorMsg("That must not happen!"); }
 				double dur = prev_ttime;
-				a.setStartTime(tod); a.setDuration(dur); a.setEndTime(tod+dur);
+				a.setStartTime(tod); a.setMaximumDuration(dur); a.setEndTime(tod+dur);
 				prev_ttime = Time.UNDEFINED_TIME;
 			}
 			else if (i % 2 == 0) { // in between acts
 				ActivityImpl a = (ActivityImpl)p.getPlanElements().get(i);
-				double dur = a.getDuration();
+				double dur = a.getMaximumDuration();
 				if (prev_ttime == Time.UNDEFINED_TIME) { Gbl.errorMsg("That must not happen!"); }
 				dur += prev_ttime;
 				if (dur < 5*60.0) { dur = 5*60.0; } // NOTE: Sometimes the mz act duration is 0 sec.
-				a.setStartTime(tod); a.setDuration(dur); a.setEndTime(tod+dur);
+				a.setStartTime(tod); a.setMaximumDuration(dur); a.setEndTime(tod+dur);
 				tod = a.getEndTime();
 				prev_ttime = Time.UNDEFINED_TIME;
 			}
@@ -93,15 +93,15 @@ public class PersonAssignAndNormalizeTimes extends AbstractPersonAlgorithm imple
 	private final void normalizeTimes(Plan p) {
 		if (p.getPlanElements().size() == 1) {
 			ActivityImpl a = (ActivityImpl)p.getPlanElements().get(0);
-			a.setStartTime(0.0); a.setDuration(Time.MIDNIGHT); a.setEndTime(Time.MIDNIGHT);
+			a.setStartTime(0.0); a.setMaximumDuration(Time.MIDNIGHT); a.setEndTime(Time.MIDNIGHT);
 			return;
 		}
 		double home_dur = ((ActivityImpl)p.getPlanElements().get(0)).getEndTime();
 		double othr_dur = 0.0;
-		for (int i=2; i<p.getPlanElements().size()-2; i=i+2) { othr_dur += ((ActivityImpl)p.getPlanElements().get(i)).getDuration(); }
+		for (int i=2; i<p.getPlanElements().size()-2; i=i+2) { othr_dur += ((ActivityImpl)p.getPlanElements().get(i)).getMaximumDuration(); }
 		if (othr_dur <= (Time.MIDNIGHT - HOME_MIN)) {
 			ActivityImpl a = (ActivityImpl)p.getPlanElements().get(p.getPlanElements().size()-1);
-			a.setDuration(Time.UNDEFINED_TIME); a.setEndTime(Time.UNDEFINED_TIME);
+			a.setMaximumDuration(Time.UNDEFINED_TIME); a.setEndTime(Time.UNDEFINED_TIME);
 			return;
 		}
 		
@@ -111,13 +111,13 @@ public class PersonAssignAndNormalizeTimes extends AbstractPersonAlgorithm imple
 		for (int i=1; i<p.getPlanElements().size(); i++) {
 			if (i == p.getPlanElements().size()-1) {
 				ActivityImpl a = (ActivityImpl)p.getPlanElements().get(i);
-				a.setStartTime(tod); a.setDuration(Time.UNDEFINED_TIME); a.setEndTime(Time.UNDEFINED_TIME);
+				a.setStartTime(tod); a.setMaximumDuration(Time.UNDEFINED_TIME); a.setEndTime(Time.UNDEFINED_TIME);
 			}
 			else if (i % 2 == 0) {
 				ActivityImpl a = (ActivityImpl)p.getPlanElements().get(i);
 				a.setStartTime(tod);
-				a.setDuration((Time.MIDNIGHT - HOME_MIN)*a.getDuration()/othr_dur);
-				a.setEndTime(tod+a.getDuration());
+				a.setMaximumDuration((Time.MIDNIGHT - HOME_MIN)*a.getMaximumDuration()/othr_dur);
+				a.setEndTime(tod+a.getMaximumDuration());
 				tod = a.getEndTime();
 			}
 			else {
@@ -134,9 +134,9 @@ public class PersonAssignAndNormalizeTimes extends AbstractPersonAlgorithm imple
 		double othr_dur = 0.0;
 		for (int i=2; i<p.getPlanElements().size()-2; i=i+2) {
 			ActivityImpl a = (ActivityImpl)p.getPlanElements().get(i);
-			if (a.getDuration() <= 0.0) { log.fatal("pid="+p.getPerson().getId()+": That must not happen!"); }
-			d.accumulateActivityDuration(a.getType(),a.getDuration());
-			othr_dur += a.getDuration();
+			if (a.getMaximumDuration() <= 0.0) { log.fatal("pid="+p.getPerson().getId()+": That must not happen!"); }
+			d.accumulateActivityDuration(a.getType(),a.getMaximumDuration());
+			othr_dur += a.getMaximumDuration();
 		}
 		double home_dur = Time.MIDNIGHT - othr_dur;
 		if (home_dur <= 0.0) { Gbl.errorMsg("pid="+p.getPerson().getId()+": That must not happen!"); }
@@ -158,12 +158,12 @@ public class PersonAssignAndNormalizeTimes extends AbstractPersonAlgorithm imple
 				ActivityImpl act = (ActivityImpl)acts_legs.get(i);
 				if (i == 0) { // first act
 					act.setStartTime(0.0);
-					act.setDuration(act.getDuration()+bias);
+					act.setMaximumDuration(act.getMaximumDuration()+bias);
 					act.setEndTime(act.getEndTime()+bias);
 				}
 				else if (i == acts_legs.size()-1) { // last act
 					act.setStartTime(act.getStartTime()+bias);
-					act.setDuration(Time.UNDEFINED_TIME);
+					act.setMaximumDuration(Time.UNDEFINED_TIME);
 					act.setEndTime(Time.UNDEFINED_TIME);
 				}
 				else { // in between acts

@@ -132,7 +132,7 @@ public class Converter {
 
 			ActivityImpl act = ((PlanImpl) pl).createAndAddActivity(tabs[7], tmpCoord);
 			act.setEndTime(convertTime(tabs[3]));
-			act.setDuration(dur);
+			act.setMaximumDuration(dur);
 
 		} else {
 			// it is a new person

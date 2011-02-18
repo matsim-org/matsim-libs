@@ -513,7 +513,7 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 				// When removing act from plan with 3 acts, reduce to 24h of "home"
 				this.removeAct(1, basePlan);
 				this.removeAct(0, basePlan);
-				((ActivityImpl)(basePlan.getPlanElements().get(0))).setDuration(86400);
+				((ActivityImpl)(basePlan.getPlanElements().get(0))).setMaximumDuration(86400);
 				((ActivityImpl)(basePlan.getPlanElements().get(0))).setStartTime(0);
 				((ActivityImpl)(basePlan.getPlanElements().get(0))).setEndTime(86400);
 				positions[3]++;
@@ -607,7 +607,7 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 					// When removing act from plan with 3 acts, reduce to 24h of "home"
 					this.removeAct(1, basePlan);
 					this.removeAct(0, basePlan);
-					((ActivityImpl)(basePlan.getPlanElements().get(0))).setDuration(86400);
+					((ActivityImpl)(basePlan.getPlanElements().get(0))).setMaximumDuration(86400);
 					((ActivityImpl)(basePlan.getPlanElements().get(0))).setStartTime(0);
 					((ActivityImpl)(basePlan.getPlanElements().get(0))).setEndTime(86400);
 					positions[3]++;
@@ -692,13 +692,13 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 
 			List<PlanElement> actslegs = basePlan.getPlanElements();
 
-			((ActivityImpl)actslegs.get(0)).setDuration(12*3600);
+			((ActivityImpl)actslegs.get(0)).setMaximumDuration(12*3600);
 			((ActivityImpl)actslegs.get(0)).setEndTime(12*3600);
 
 			// Plan should have either one or three acts
 			// First add a second home act, allow for 1h of travelling
 			ActivityImpl actHelp = new ActivityImpl ((ActivityImpl)(actslegs.get((0))));
-			actHelp.setDuration(11*3600);
+			actHelp.setMaximumDuration(11*3600);
 			actHelp.setEndTime(24*3600);
 			actHelp.setStartTime(13*3600);
 
@@ -727,7 +727,7 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 			if (position[0] == 1){ // first loop, reduce to 1 "home" act
 				actsToBeAdded[1] = (int)(MatsimRandom.getRandom().nextDouble()* actTypes.size()); // define first actsToBeAdded position for second loop onwards
 				this.removeAct(0, basePlan);
-				((ActivityImpl)basePlan.getPlanElements().get(0)).setDuration(24*3600);
+				((ActivityImpl)basePlan.getPlanElements().get(0)).setMaximumDuration(24*3600);
 				((ActivityImpl)basePlan.getPlanElements().get(0)).setStartTime(0);
 				((ActivityImpl)basePlan.getPlanElements().get(0)).setEndTime(24*3600);
 				position[0]++;
@@ -1000,13 +1000,13 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 		ActivityImpl actHelp;
 		if (!(actTypes.get(actToBeAdded[position]).equalsIgnoreCase("home"))){ // copy activity before the gap
 			actHelp = new ActivityImpl ((ActivityImpl)(actslegs.get(position*2-2)));
-			actHelp.setDuration(0);
+			actHelp.setMaximumDuration(0);
 			actHelp.setEndTime(((LegImpl)(actslegs.get(position*2-1))).getDepartureTime());
 			actHelp.setStartTime(((LegImpl)(actslegs.get(position*2-1))).getDepartureTime());
 		}
 		else { // copy first activity = home activity to ensure home is always primary
 			actHelp = new ActivityImpl ((ActivityImpl)(actslegs.get((0))));
-			actHelp.setDuration(0);
+			actHelp.setMaximumDuration(0);
 			actHelp.setEndTime(((LegImpl)(actslegs.get(position*2-1))).getDepartureTime());
 			actHelp.setStartTime(((LegImpl)(actslegs.get(position*2-1))).getDepartureTime());
 			insertion[1] = true;
