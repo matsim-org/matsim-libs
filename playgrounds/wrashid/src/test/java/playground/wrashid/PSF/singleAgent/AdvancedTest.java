@@ -141,7 +141,7 @@ public class AdvancedTest extends MatsimTestCase {
 		ChargeLog chargeLogOfAgentOne = chargingTimesOfAgentOne.getChargingTimes().get(0);
 
 		// after the first charge, the battery should be full
-		assertEquals(ParametersPSF.getDefaultMaxBatteryCapacity(),chargeLogOfAgentOne.getEndSOC());
+		assertEquals(ParametersPSF.getDefaultMaxBatteryCapacity(),chargeLogOfAgentOne.getEndSOC(),0.1);
 
 		assertEquals(22989,chargeLogOfAgentOne.getStartChargingTime(),  1);
 		assertEquals(23104,chargeLogOfAgentOne.getEndChargingTime(),  1);
@@ -157,7 +157,7 @@ public class AdvancedTest extends MatsimTestCase {
 
 		// the agent should charge twice.
 		assertEquals(2, chargingTimesOfAgentOne.getChargingTimes().size());
-	}
+	} 
 
 	/*
 	 * The vehicle must charge during work, because else he will not reach home.
