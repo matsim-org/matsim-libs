@@ -40,7 +40,7 @@ public class Main {
 		String netFile = "../../detailedEval/Net/network-86-85-87-84.xml";
 		//		String netfile = runDirectory + "output_network.xml.gz";
 
-		String visum2hbefaRoadTypeFile = "../../detailedEval/teststrecke/sim/inputEmissions/road_types.txt";
+		String visum2hbefaRoadTypeFile = "../../detailedEval/testRuns/input/inputEmissions/road_types.txt";
 		String hbefaGasolineEmissionFactorsFile = "";
 		String hbefaDieselEmissionFactorsFile = "../../detailedEval/testRuns/input/inputEmissions/hbefa_emission_factors_urban_rural_MW.txt";
 		//		String Hbefa_Cold_Traffic = "../../detailedEval/teststrecke/sim/inputEmissions/hbefa_coldstart_emission_factors.txt";
