@@ -52,9 +52,6 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Polygon;
 
-/**
- * @author yu
- */
 public class RouteCompare2QGIS extends Route2QGIS {
 	private final static Logger log = Logger.getLogger(RouteCompare2QGIS.class);
 	private final Map<List<Id>, Integer> routeCountersB;
@@ -72,8 +69,7 @@ public class RouteCompare2QGIS extends Route2QGIS {
 	protected void initFeatureType() {
 		AttributeType[] attrRoute = new AttributeType[6];
 		attrRoute[0] = DefaultAttributeTypeFactory.newAttributeType(
-				"MultiPolygon", MultiPolygon.class, true, null, null, this
-						.getCrs());
+				"MultiPolygon", MultiPolygon.class, true, null, null, getCrs());
 		attrRoute[1] = AttributeTypeFactory.newAttributeType("DIFF_B-A",
 				Double.class);
 		attrRoute[2] = AttributeTypeFactory.newAttributeType("DIFF_SIGN",
@@ -85,7 +81,7 @@ public class RouteCompare2QGIS extends Route2QGIS {
 		attrRoute[5] = AttributeTypeFactory.newAttributeType("(B-A)/A",
 				Double.class);
 		try {
-			this.setFeatureTypeRoute(FeatureTypeBuilder.newFeatureType(
+			setFeatureTypeRoute(FeatureTypeBuilder.newFeatureType(
 					attrRoute, "route"));
 		} catch (FactoryRegistryException e) {
 			e.printStackTrace();
@@ -96,15 +92,17 @@ public class RouteCompare2QGIS extends Route2QGIS {
 
 	@Override
 	protected Feature getRouteFeature(final List<Id> routeLinkIds) {
-		Integer routeFlowsA = this.routeCounters.get(routeLinkIds);
-		Integer routeFlowsB = this.routeCountersB.get(routeLinkIds);
+		Integer routeFlowsA = routeCounters.get(routeLinkIds);
+		Integer routeFlowsB = routeCountersB.get(routeLinkIds);
 		if (routeFlowsA != null || routeFlowsB != null) {
-			if (routeFlowsA == null)
+			if (routeFlowsA == null) {
 				routeFlowsA = 0;
-			if (routeFlowsB == null)
+			}
+			if (routeFlowsB == null) {
 				routeFlowsB = 0;
+			}
 			if ((routeFlowsA.intValue() > 1 || routeFlowsB.intValue() > 1)
-					&& (routeFlowsA.intValue() != routeFlowsB.intValue())) {
+					&& routeFlowsA.intValue() != routeFlowsB.intValue()) {
 				Coordinate[] coordinates = new Coordinate[(routeLinkIds.size() + 1) * 2 + 1];
 				Double diff = routeFlowsB.doubleValue()
 						- routeFlowsA.doubleValue();
@@ -146,12 +144,13 @@ public class RouteCompare2QGIS extends Route2QGIS {
 	protected void writeRoutes() throws IOException {
 		ArrayList<Feature> fts = new ArrayList<Feature>();
 		Set<List<Id>> totalKeys = new HashSet<List<Id>>();
-		totalKeys.addAll(this.routeCounters.keySet());
-		totalKeys.addAll(this.routeCountersB.keySet());
+		totalKeys.addAll(routeCounters.keySet());
+		totalKeys.addAll(routeCountersB.keySet());
 		for (List<Id> routeLinkIds : totalKeys) {
 			Feature ft = getRouteFeature(routeLinkIds);
-			if (ft != null)
+			if (ft != null) {
 				fts.add(ft);
+			}
 		}
 		ShapeFileWriter.writeGeometries(fts, getOutputDir() + "/routes.shp");
 	}

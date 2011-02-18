@@ -59,6 +59,8 @@ import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Polygon;
 
 /**
+ * show the quotient (speed/freespeed) in QGIS map
+ * 
  * @author yu
  * 
  */
@@ -74,7 +76,7 @@ public class SpeedLevel2QGIS extends MATSimNet2QGIS {
 				CoordinateReferenceSystem crs, Set<Id> linkIds) {
 			super(network, crs);
 			this.linkIds = linkIds;
-			this.geofac = new GeometryFactory();
+			geofac = new GeometryFactory();
 			features = new ArrayList<Feature>();
 			AttributeType geom = DefaultAttributeTypeFactory.newAttributeType(
 					"MultiPolygon", MultiPolygon.class, true, null, null, crs);
@@ -89,15 +91,16 @@ public class SpeedLevel2QGIS extends MATSimNet2QGIS {
 		@Override
 		public Collection<Feature> getFeatures() throws SchemaException,
 				NumberFormatException, IllegalAttributeException {
-			for (int i = 0; i < attrTypes.size(); i++)
+			for (int i = 0; i < attrTypes.size(); i++) {
 				defaultFeatureTypeFactory.addType(attrTypes.get(i));
+			}
 			FeatureType ftRoad = defaultFeatureTypeFactory.getFeatureType();
 			for (Id linkId : linkIds) {
 				Link link = network.getLinks().get(linkId);
 				LinearRing lr = getLinearRing(link);
-				Polygon p = new Polygon(lr, null, this.geofac);
+				Polygon p = new Polygon(lr, null, geofac);
 				MultiPolygon mp = new MultiPolygon(new Polygon[] { p },
-						this.geofac);
+						geofac);
 				int size = 2 + parameters.size();
 				Object[] o = new Object[size];
 				o[0] = mp;
@@ -116,8 +119,9 @@ public class SpeedLevel2QGIS extends MATSimNet2QGIS {
 	public static List<Map<Id, Double>> createSpeedLevels(
 			Collection<Id> linkIds, CalcLinksAvgSpeed clas, Network network) {
 		List<Map<Id, Double>> speeds = new ArrayList<Map<Id, Double>>(24);
-		for (int i = 0; i < 24; i++)
+		for (int i = 0; i < 24; i++) {
 			speeds.add(i, null);
+		}
 
 		for (Id linkId : linkIds) {
 			for (int i = 0; i < 24; i++) {

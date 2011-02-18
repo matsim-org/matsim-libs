@@ -53,14 +53,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Polygon;
 
-/**
- * This class is a copy of main() from
- * org.matsim.utils.gis.matsim2esri.plans.SelectedPlans2ESRIShape of Mr.
- * Laemmeland can convert a MATSim-population to a QGIS .shp-file (acts or legs)
- * 
- * @author ychen
- * 
- */
+
 public class Route2QGIS extends SelectedPlans2ESRIShapeChanged implements
 		X2QGIS {
 	private final static Logger log = Logger.getLogger(Route2QGIS.class);

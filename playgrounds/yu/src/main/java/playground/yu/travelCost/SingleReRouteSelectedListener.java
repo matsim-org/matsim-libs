@@ -67,7 +67,7 @@ public class SingleReRouteSelectedListener implements IterationStartsListener,
 		if (iter == ctl.getFirstIteration()) {
 			PlanCalcScoreConfigGroup scoringCfg = ctl.getConfig()
 					.planCalcScore();
-			scoringCfg.setMonetaryDistanceCostRateCar(-0.00012);
+			scoringCfg.setMonetaryDistanceCostRateCar(-0.00036);
 			ctl
 					.setScoringFunctionFactory(new CharyparNagelScoringFunctionFactory(
 							scoringCfg));

@@ -71,6 +71,20 @@ public class SingleReRouteSelectedControler extends Controler {
 		}
 	}
 
+	/*
+	 * program arguments: ../matsimTests/diverseRoutes/A1B0.xml
+	 * ../matsimTests/diverseRoutes/A2_3B1.xml
+	 * ../matsimTests/diverseRoutes/A1_3B2.xml
+	 * ../matsimTests/diverseRoutes/A0B3.xml
+	 */
+	public static void distance(String[] args) {
+		Controler controler = new SingleReRouteSelectedControler(args[0]);
+		controler.addControlerListener(new SingleReRouteSelectedListener(0d));
+		controler.setWriteEventsInterval(1);
+		controler.setOverwriteFiles(true);
+		controler.run();
+	}
+
 	/* ../matsimTests/diverseRoutes/tightTurnPenalty.xml */
 	public static void tightTurnPenalty(String[] args) {
 		Controler controler = new SingleReRouteSelectedControler(args[0]);
@@ -158,7 +172,8 @@ public class SingleReRouteSelectedControler extends Controler {
 		// capacitySqrtWeightedTravelTimeCost(args);
 		// speedWeightedTravelTimeCost(args);
 		// speedSquareWeightedTravelTimeCost(args);
-//		speedSqrtWeightedTravelTimeCost(args);
-		speedCapacitySqrtCombiWeightedTravelTimeCost(args);
+		// speedSqrtWeightedTravelTimeCost(args);
+		// speedCapacitySqrtCombiWeightedTravelTimeCost(args);
+		distance(args);
 	}
 }
