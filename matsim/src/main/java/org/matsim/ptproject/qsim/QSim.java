@@ -172,8 +172,10 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 	// ============================================================================================================================
 	// "run" method:
 
+	private boolean locked = false ;
 	@Override
 	public final void run() {
+		this.locked = true ;
 		prepareSim();
 		this.listenerManager.fireQueueSimulationInitializedEvent();
 		//do iterations
@@ -200,25 +202,45 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 	// "prepareSim":
 
 	// setters that should reasonably be called between constructor and "prepareSim" (triggered by "run"):
+	
+	// yy my current intuition is that those should be set in a factory, and the factory should pass them as immutable
+	// into the QSim.  But I can't change into that direction because the TransitEngine changes the AgentFactory fairly
+	// late in the initialization sequence ...
 
 	public final void setMultiModalSimEngine(MultiModalSimEngine multiModalEngine) {
-		this.multiModalEngine = multiModalEngine;
+		if ( !locked ) {
+			this.multiModalEngine = multiModalEngine;
+		} else {
+			throw new RuntimeException("too late to set multiModalSimEngine; aborting ...") ;
+		}
 	}
 
 	@Override
 	public void setAgentFactory(final AgentFactory fac) {
 		// not final since WithindayQSim overrides (essentially: disables) it.  kai, nov'10
-		this.agentFactory = fac;
+		if ( !locked ) { 
+			this.agentFactory = fac;
+		} else {
+			throw new RuntimeException("too late to set agent factory; aborting ...") ;
+		}
 	}
 
 	@Override
 	public final void setControlerIO(final ControlerIO controlerIO) {
-		this.controlerIO = controlerIO;
+		if ( !locked ) {
+			this.controlerIO = controlerIO;
+		} else {
+			throw new RuntimeException("too late to set controlerIO; aborting ...") ;
+		}
 	}
 
 	@Override
 	public final void setIterationNumber(final Integer iterationNumber) {
-		this.iterationNumber = iterationNumber;
+		if ( !locked ) {
+			this.iterationNumber = iterationNumber;
+		} else {
+			throw new RuntimeException("too late to set iterationNumber; aborting ...") ;
+		}
 	}
 
 	// prepareSim and related:
