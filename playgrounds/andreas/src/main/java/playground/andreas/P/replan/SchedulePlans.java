@@ -41,13 +41,6 @@ public class SchedulePlans {
 		this.plans = new LinkedList<Tuple<TransitLine, Double>>();
 	}
 	
-	class CompareTransitPlans<T> implements Comparator<Tuple<TransitLine, Double>>{
-		@Override
-		public int compare(Tuple<TransitLine, Double> line1, Tuple<TransitLine, Double> line2) {
-			return line1.getSecond().compareTo(line2.getSecond());
-		}		
-	}
-
 	public void addTransitPlan(TransitLine line, Double score) {
 		if(line.getId().toString().equalsIgnoreCase(this.agentId.toString())){
 			if(this.plans.size() == this.numberOfPlans){
@@ -74,6 +67,13 @@ public class SchedulePlans {
 			return this.plans.getLast().getFirst();
 		} else {
 			return null;
+		}		
+	}
+
+	class CompareTransitPlans<T> implements Comparator<Tuple<TransitLine, Double>>{
+		@Override
+		public int compare(Tuple<TransitLine, Double> line1, Tuple<TransitLine, Double> line2) {
+			return line1.getSecond().compareTo(line2.getSecond());
 		}		
 	}
 

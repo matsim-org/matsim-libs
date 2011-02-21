@@ -62,7 +62,7 @@ public class ReplanTimeSchedule {
 			
 			inSchedule = TransitScheduleCleaner.removeAllLines(inSchedule);
 			
-			for (SchedulePlans plan : population.values()) {
+			for (SchedulePlans plan : this.population.values()) {
 				if(plan.getBestPlan() != null){
 					inSchedule.addTransitLine(plan.getBestPlan());
 				} else {

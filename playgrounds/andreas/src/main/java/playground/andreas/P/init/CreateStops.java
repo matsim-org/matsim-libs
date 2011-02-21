@@ -38,6 +38,12 @@ public class CreateStops {
 	
 	private TransitSchedule transitSchedule;
 	
+	public static TransitSchedule createStops(NetworkImpl network, double gridDistance, Coord minXY, Coord maxXY){
+		CreateStops cS = new CreateStops(network, gridDistance, minXY, maxXY);
+		cS.run();
+		return cS.getTransitSchedule();
+	}
+
 	public CreateStops(NetworkImpl net, double gridDistance, Coord minXY, Coord maxXY) {
 		this.net = net;
 		this.gridDistance = gridDistance;
@@ -45,12 +51,6 @@ public class CreateStops {
 		this.maxXY = maxXY;		
 	}
 
-	public static TransitSchedule createStops(NetworkImpl network, double gridDistance, Coord minXY, Coord maxXY){
-		CreateStops cS = new CreateStops(network, gridDistance, minXY, maxXY);
-		cS.run();
-		return cS.getTransitSchedule();
-	}
-	
 	private void run(){
 		this.transitSchedule = new TransitScheduleImpl(new TransitScheduleFactoryImpl());
 		int stopsAdded = 0;

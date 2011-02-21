@@ -45,12 +45,12 @@ public class ScorePlansHandler implements TransitDriverStartsEventHandler, Perso
 	TreeMap<Id, ScoreContainer> personId2ScoreMap = new TreeMap<Id, ScoreContainer>();
 	
 	
-	public TreeMap<Id, ScoreContainer> getPersonId2ScoreMap() {
-		return this.personId2ScoreMap;
-	}
-
 	public ScorePlansHandler(Network net){
 		this.net = net;
+	}
+
+	public TreeMap<Id, ScoreContainer> getPersonId2ScoreMap() {
+		return this.personId2ScoreMap;
 	}
 
 	@Override
@@ -84,8 +84,6 @@ public class ScorePlansHandler implements TransitDriverStartsEventHandler, Perso
 			this.personId2ScoreMap.get(event.getPersonId()).handleLinkTravelled(this.net.getLinks().get(event.getLinkId()));
 		}
 	}
-
-
 
 	class ScoreContainer {
 		Id driverId;

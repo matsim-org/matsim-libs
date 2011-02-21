@@ -65,16 +65,13 @@ public class CreateInitialTimeSchedule {
 	private int numberOfAgents;
 	
 	public static void createInitialTimeSchedule(PConfigGroup pConfig){
-		
-		String transitScheduleOutFile = pConfig.getCurrentOutputBase() + "transitSchedule.xml";
-		String vehiclesOutFile  = pConfig.getCurrentOutputBase() + "transitVehicles.xml";
 		Coord minXY = new CoordImpl(pConfig.getMinX(), pConfig.getMinY());
 		Coord maxXY = new CoordImpl(pConfig.getMaxX(), pConfig.getMaxY());
 		
-		CreateInitialTimeSchedule cITS = new CreateInitialTimeSchedule(pConfig.getNetwork(), transitScheduleOutFile, vehiclesOutFile, pConfig.getGridDistance(), minXY, maxXY, pConfig.getNumberOfAgents());
+		CreateInitialTimeSchedule cITS = new CreateInitialTimeSchedule(pConfig.getNetwork(), pConfig.getGridDistance(), minXY, maxXY, pConfig.getNumberOfAgents());
 		cITS.run();
-		cITS.writeTransitSchedule(transitScheduleOutFile);
-		cITS.writeVehicles(vehiclesOutFile);
+		cITS.writeTransitSchedule(pConfig.getCurrentOutputBase() + "transitSchedule.xml");
+		cITS.writeVehicles(pConfig.getCurrentOutputBase() + "transitVehicles.xml");
 	}
 	
 	public static TransitLine createSingleTransitLine(NetworkImpl net, TransitSchedule transitSchedule, Id driverId){
@@ -82,47 +79,7 @@ public class CreateInitialTimeSchedule {
 		return cITS.createSingleTransitLine(driverId);
 	}
 
-	private void writeVehicles(String vehiclesOutFile) {
-		VehiclesFactory vehFactory = this.veh.getFactory();
-		VehicleType vehType = vehFactory.createVehicleType(new IdImpl("defaultTransitVehicleType"));
-		VehicleCapacity capacity = new VehicleCapacityImpl();
-		capacity.setSeats(Integer.valueOf(8));
-		capacity.setStandingRoom(Integer.valueOf(0));
-		vehType.setCapacity(capacity);
-		this.veh.getVehicleTypes().put(vehType.getId(), vehType);
-
-		for (TransitLine line : this.tS.getTransitLines().values()) {
-			for (TransitRoute route : line.getRoutes().values()) {
-				for (Departure departure : route.getDepartures().values()) {
-					Vehicle vehicle = vehFactory.createVehicle(departure.getVehicleId(), vehType);
-					this.veh.getVehicles().put(vehicle.getId(), vehicle);
-				}
-			}
-		}
-		
-		VehicleWriterV1 writer = new VehicleWriterV1(this.veh);
-		try {
-			writer.writeFile(vehiclesOutFile);
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}		
-	}
-
-	private void writeTransitSchedule(String transitScheduleOutFile) {
-		TransitScheduleWriterV1 writer = new TransitScheduleWriterV1(this.tS);
-		try {
-			writer.write(transitScheduleOutFile);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-
-	public CreateInitialTimeSchedule(String networkInFile, String transitScheduleOutFile, String vehiclesOutFile, double gridDistance, Coord minXY, Coord maxXY, int numberOfAgents) {
+	public CreateInitialTimeSchedule(String networkInFile, double gridDistance, Coord minXY, Coord maxXY, int numberOfAgents) {
 		ScenarioImpl sc = new ScenarioImpl();
 		MatsimNetworkReader netReader = new MatsimNetworkReader(sc);
 		netReader.readFile(networkInFile);		
@@ -139,48 +96,46 @@ public class CreateInitialTimeSchedule {
 	}
 
 	private void run() {
-
-
 		for (int i = 0; i < this.numberOfAgents; i++) {
 			
 			// initialize
 			Id driverId = new IdImpl("free_" + i);
 			this.tS.addTransitLine(createSingleTransitLine(driverId));
+		}
+	}
+
+	public TransitLine createSingleTransitLine(Id driverId){
+		// initialize
+		TransitLine line = this.tS.getFactory().createTransitLine(driverId);			
+		TransitStopFacility startStop = getRandomTransitStop();			
+		TransitStopFacility endStop = getRandomTransitStop();
+		
+		TransitRoute transitRoute_H = createRoute(new IdImpl(driverId + "_H"), startStop, endStop);
+		TransitRoute transitRoute_R = createRoute(new IdImpl(driverId + "_R"), endStop, startStop);
+		
+		// register route
+		line.addRoute(transitRoute_H);
+		line.addRoute(transitRoute_R);
+		
+		// add departures
+		int n = 0;
+		for (double j = 0.0; j < 24 * 3600; ) {
+			Departure departure = this.tS.getFactory().createDeparture(new IdImpl(n), j);
+			departure.setVehicleId(driverId);
+			transitRoute_H.addDeparture(departure);
+			j += transitRoute_H.getStop(endStop).getDepartureOffset() + 5 *60;
+			n++;
 			
-//			TransitLine line = this.tS.getFactory().createTransitLine(driverId);			
-//			TransitStopFacility startStop = getRandomTransitStop();			
-//			TransitStopFacility endStop = getRandomTransitStop();
-//			
-//			TransitRoute transitRoute_H = createRoute(new IdImpl(driverId + "_H"), startStop, endStop);
-//			TransitRoute transitRoute_R = createRoute(new IdImpl(driverId + "_R"), endStop, startStop);
-//			
-//			// register route
-//			line.addRoute(transitRoute_H);
-//			line.addRoute(transitRoute_R);
-//			
-//			// register line
-//			this.tS.addTransitLine(line);
-//			
-//			// add departures
-//			int n = 0;
-//			for (double j = 0.0; j < 24 * 3600; ) {
-//				Departure departure = this.tS.getFactory().createDeparture(new IdImpl(n), j);
-//				departure.setVehicleId(driverId);
-//				transitRoute_H.addDeparture(departure);
-//				j += transitRoute_H.getStop(endStop).getDepartureOffset() + 5 *60;
-//				n++;
-//				
-//				departure = this.tS.getFactory().createDeparture(new IdImpl(n), j);
-//				departure.setVehicleId(driverId);
-//				transitRoute_R.addDeparture(departure);
-//				j += transitRoute_R.getStop(startStop).getDepartureOffset() + 5 *60;
-//				n++;
-//			}
-			
+			departure = this.tS.getFactory().createDeparture(new IdImpl(n), j);
+			departure.setVehicleId(driverId);
+			transitRoute_R.addDeparture(departure);
+			j += transitRoute_R.getStop(startStop).getDepartureOffset() + 5 *60;
+			n++;
 		}
 		
+		return line;
 	}
-	
+
 	private TransitRoute createRoute(Id routeID, TransitStopFacility startStop, TransitStopFacility endStop){
 		
 		FreespeedTravelTimeCost tC = new FreespeedTravelTimeCost(-6.0, 0.0, 0.0);
@@ -226,38 +181,46 @@ public class CreateInitialTimeSchedule {
 		return transitRoute;
 	}
 	
-	public TransitLine createSingleTransitLine(Id driverId){
-		// initialize
-		TransitLine line = this.tS.getFactory().createTransitLine(driverId);			
-		TransitStopFacility startStop = getRandomTransitStop();			
-		TransitStopFacility endStop = getRandomTransitStop();
-		
-		TransitRoute transitRoute_H = createRoute(new IdImpl(driverId + "_H"), startStop, endStop);
-		TransitRoute transitRoute_R = createRoute(new IdImpl(driverId + "_R"), endStop, startStop);
-		
-		// register route
-		line.addRoute(transitRoute_H);
-		line.addRoute(transitRoute_R);
-		
-		// add departures
-		int n = 0;
-		for (double j = 0.0; j < 24 * 3600; ) {
-			Departure departure = this.tS.getFactory().createDeparture(new IdImpl(n), j);
-			departure.setVehicleId(driverId);
-			transitRoute_H.addDeparture(departure);
-			j += transitRoute_H.getStop(endStop).getDepartureOffset() + 5 *60;
-			n++;
-			
-			departure = this.tS.getFactory().createDeparture(new IdImpl(n), j);
-			departure.setVehicleId(driverId);
-			transitRoute_R.addDeparture(departure);
-			j += transitRoute_R.getStop(startStop).getDepartureOffset() + 5 *60;
-			n++;
+	private void writeVehicles(String vehiclesOutFile) {
+		VehiclesFactory vehFactory = this.veh.getFactory();
+		VehicleType vehType = vehFactory.createVehicleType(new IdImpl("defaultTransitVehicleType"));
+		VehicleCapacity capacity = new VehicleCapacityImpl();
+		capacity.setSeats(Integer.valueOf(8));
+		capacity.setStandingRoom(Integer.valueOf(0));
+		vehType.setCapacity(capacity);
+		this.veh.getVehicleTypes().put(vehType.getId(), vehType);
+	
+		for (TransitLine line : this.tS.getTransitLines().values()) {
+			for (TransitRoute route : line.getRoutes().values()) {
+				for (Departure departure : route.getDepartures().values()) {
+					Vehicle vehicle = vehFactory.createVehicle(departure.getVehicleId(), vehType);
+					this.veh.getVehicles().put(vehicle.getId(), vehicle);
+				}
+			}
 		}
 		
-		return line;
+		VehicleWriterV1 writer = new VehicleWriterV1(this.veh);
+		try {
+			writer.writeFile(vehiclesOutFile);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}		
 	}
-	
+
+	private void writeTransitSchedule(String transitScheduleOutFile) {
+		TransitScheduleWriterV1 writer = new TransitScheduleWriterV1(this.tS);
+		try {
+			writer.write(transitScheduleOutFile);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
 	private TransitStopFacility getRandomTransitStop(){
 		int i = this.tS.getFacilities().size();
 		for (TransitStopFacility stop : this.tS.getFacilities().values()) {

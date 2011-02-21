@@ -19,7 +19,6 @@
 
 package playground.andreas.P.init;
 
-import java.io.File;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -186,8 +185,6 @@ public class PConfigGroup extends Module{
 	@Override
 	public final Map<String, String> getComments() {
 		Map<String,String> map = super.getComments();
-		
-		String offsetDefaultMessage = "[unit_of_money/leg] money needed in order to start a trip (leg)";
 		
 		map.put(GRID_DISTANCE, "Distance between two stops in cartesian coordinate system");
 		map.put(MIN_X, "min x coordinate for served area");
