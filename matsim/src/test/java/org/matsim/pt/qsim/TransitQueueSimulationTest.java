@@ -61,7 +61,7 @@ import org.matsim.core.events.TransitDriverStartsEvent;
 import org.matsim.core.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.events.handler.BasicEventHandler;
-import org.matsim.core.mobsim.framework.PlanAgent;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
@@ -205,9 +205,9 @@ public class TransitQueueSimulationTest {
 
 		scenario.getConfig().addSimulationConfigGroup(new SimulationConfigGroup() ) ;
 		scenario.getConfig().simulation().setEndTime(1.0*3600); // prevent running the actual simulation
-		TestCreateAgentsSimulation sim = new TestCreateAgentsSimulation(scenario, new EventsManagerImpl());
+		QSim sim = new QSim(scenario, new EventsManagerImpl());
 		sim.run();
-		List<PlanAgent> agents = sim.createdAgents;
+		List<MobsimAgent> agents = new ArrayList<MobsimAgent>(sim.getAgents());
 		assertEquals(5, agents.size());
 		assertTrue(agents.get(0) instanceof TransitDriverAgent);
 		assertEquals(6.0*3600, ((TransitDriverAgent) agents.get(0)).getActivityEndTime(), MatsimTestCase.EPSILON);
@@ -215,18 +215,6 @@ public class TransitQueueSimulationTest {
 		assertEquals(8.0*3600, ((TransitDriverAgent) agents.get(2)).getActivityEndTime(), MatsimTestCase.EPSILON);
 		assertEquals(8.5*3600, ((TransitDriverAgent) agents.get(3)).getActivityEndTime(), MatsimTestCase.EPSILON);
 		assertEquals(9.0*3600, ((TransitDriverAgent) agents.get(4)).getActivityEndTime(), MatsimTestCase.EPSILON);
-	}
-
-	protected static class TestCreateAgentsSimulation extends QSim {
-		public final List<PlanAgent> createdAgents = new ArrayList<PlanAgent>();
-		public TestCreateAgentsSimulation(final ScenarioImpl scenario, final EventsManagerImpl events) {
-			super(scenario, events);
-		}
-		@Override
-		protected void createAgents() {
-			super.createAgents();
-			this.createdAgents.addAll(super.getActivityEndsList() );
-		}
 	}
 
 	/**
@@ -536,9 +524,7 @@ public class TransitQueueSimulationTest {
 		 * Create one custom Driver to assert conditions
 		 */
 		@Override
-		protected void createAgents() {
-			super.createAgents();
-
+		protected void createAdditionalAgents() {
 			this.driver = new SpyDriver(this.line, this.route, this.departure, this.getTransitEngine().getAgentTracker(), this);
 
 			VehicleType vehicleType = new VehicleTypeImpl(new IdImpl("transitVehicleType"));

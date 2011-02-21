@@ -90,7 +90,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 	}
 
 	@Override
-	public boolean initializeAndCheckIfAlive() {
+	public void initialize() {
 		throw new UnsupportedOperationException("not sure what this means here because I don't know if a AbstractTransitDriver can be `beyond' life") ;
 	}
 

@@ -749,7 +749,7 @@ public class ParallelQSimTest extends TestCase {
 
 		sim.getSimTimer().setTime(100.0);
 		PersonDriverAgentImpl agent = new PersonDriverAgentImpl(person, sim);
-		agent.initializeAndCheckIfAlive();
+		agent.initialize();
 		agent.endActivityAndAssumeControl(100.0);
 		sim.getSimTimer().setTime(101.0);
 		sim.doSimStep(101.0); // agent should be moved to qlink2.buffer

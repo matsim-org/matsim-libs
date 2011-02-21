@@ -146,12 +146,8 @@ public interface PlanAgent extends NetworkAgent, Identifiable {
 	 * Design thoughts:<ul>
 	 * <li> yyyy I don't like this "initialize" method that one can easily forget to call.
 	 * And I am confident that one can do without it.  kai, may'10
-	 * <li> The "checkIfAlive" is there since an agent can have no leg (staying at first activity all day), in which case
-	 * the agent is essentially ignored by the mobsim.  (This is how I found it; not so great since it causes problems
-	 * with the scoring.)
-	 * </ul>
 	 */
-	public boolean initializeAndCheckIfAlive();
+	public void initialize();
 	
 	/**
 	 * Design thoughts:<ul>

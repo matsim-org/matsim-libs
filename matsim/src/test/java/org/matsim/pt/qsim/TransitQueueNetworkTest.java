@@ -1065,7 +1065,7 @@ public class TransitQueueNetworkTest extends TestCase {
 			PersonDriverAgentImpl nDriver = new PersonDriverAgentImpl(person, qsim);
 			this.normalVehicle.setDriver(nDriver);
 			nDriver.setVehicle(this.normalVehicle);
-			nDriver.initializeAndCheckIfAlive();
+			nDriver.initialize();
 			nDriver.endActivityAndAssumeControl(100);
 
 			if (stop2 != null) {
@@ -1091,7 +1091,7 @@ public class TransitQueueNetworkTest extends TestCase {
 				PersonDriverAgentImpl nDriver2 = new PersonDriverAgentImpl(person2, qsim);
 				this.normalVehicle2.setDriver(nDriver2);
 				nDriver2.setVehicle(this.normalVehicle);
-				nDriver2.initializeAndCheckIfAlive();
+				nDriver2.initialize();
 			} else {
 				this.normalVehicle2 = null;
 			}

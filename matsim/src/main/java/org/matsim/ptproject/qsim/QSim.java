@@ -81,6 +81,7 @@ import org.matsim.ptproject.qsim.qnetsimengine.CarDepartureHandler;
 import org.matsim.ptproject.qsim.qnetsimengine.DefaultQNetworkFactory;
 import org.matsim.ptproject.qsim.qnetsimengine.DefaultQSimEngineFactory;
 import org.matsim.ptproject.qsim.qnetsimengine.QLanesNetworkFactory;
+import org.matsim.ptproject.qsim.qnetsimengine.QVehicle;
 import org.matsim.ptproject.qsim.qnetsimengine.QVehicleImpl;
 import org.matsim.ptproject.qsim.qnetsimengine.CarDepartureHandler.VehicleBehavior;
 import org.matsim.vehicles.VehicleImpl;
@@ -202,7 +203,7 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 	// "prepareSim":
 
 	// setters that should reasonably be called between constructor and "prepareSim" (triggered by "run"):
-	
+
 	// yy my current intuition is that those should be set in a factory, and the factory should pass them as immutable
 	// into the QSim.  But I can't change into that direction because the TransitEngine changes the AgentFactory fairly
 	// late in the initialization sequence ...
@@ -261,6 +262,9 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 		}
 
 		createAgents();
+		createVehicles();
+		createTransitDrivers();
+		createAdditionalAgents();
 
 		this.initSimTimer();
 
@@ -268,7 +272,7 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 		this.snapshotPeriod = (int) qSimConfigGroup.getSnapshotPeriod();
 		this.infoTime = Math.floor(this.simTimer.getSimStartTime() / INFO_PERIOD) * INFO_PERIOD; // infoTime may be < simStartTime, this ensures to print out the info at the very first timestep already
 		this.snapshotTime = Math.floor(this.simTimer.getSimStartTime() / this.snapshotPeriod) * this.snapshotPeriod;
-		
+
 		// Initialize Snapshot file
 		this.snapshotPeriod = (int) qSimConfigGroup.getSnapshotPeriod();
 		this.snapshotManager.createSnapshotwriter(this.netEngine.getQNetwork(), this.scenario, this.snapshotPeriod, this.iterationNumber, this.controlerIO);
@@ -282,42 +286,61 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 		}
 	}
 
+	protected void createAdditionalAgents() {
+		
+		// Empty for inheritance. (only one test)
+		
+	}
+
+	private void createVehicles() {
+		VehicleType defaultVehicleType = new VehicleTypeImpl(new IdImpl("defaultVehicleType"));
+		for (MobsimAgent agent : agents) {
+			if ( agent instanceof PersonDriverAgent ) {
+				createAndAddDefaultVehicle((PersonAgent) agent, defaultVehicleType);
+				parkVehicleOnInitialLink((PersonAgent) agent);
+			}
+		}
+	}
+
 	private static int vehWrnCnt = 0 ;
 
-	protected void createAgents() {
+	private void createAgents() {
 		if (this.scenario.getPopulation() == null) {
 			throw new RuntimeException("No valid Population found (plans == null)");
 		}
-		VehicleType defaultVehicleType = new VehicleTypeImpl(new IdImpl("defaultVehicleType"));
 		for (Person p : this.scenario.getPopulation().getPersons().values()) {
 			PersonAgent agent = this.agentFactory.createPersonAgent(p);
-			QVehicleImpl veh = null ;
-			if ( agent instanceof PersonDriverAgent ) {
-				if ( vehWrnCnt < 1 ) {
-					log.warn( "QSim generates default vehicles; not sure what that does to vehicle files; needs to be checked.  kai, nov'10" ) ;
-					log.warn( Gbl.ONLYONCE ) ;
-					vehWrnCnt++ ;
-				}
-				veh = new QVehicleImpl(new VehicleImpl(agent.getPerson().getId(), defaultVehicleType));
-				veh.setDriver((PersonDriverAgent)agent); // this line is currently only needed for OTFVis to show parked vehicles
-				((DriverAgent)agent).setVehicle(veh);
-				vehicles.put(veh.getId(), veh);
-			}
 			agents.add(agent);
-			if (agent.initializeAndCheckIfAlive()) {
-				if ( agent instanceof PersonDriverAgent ) {
-					NetsimLink qlink = this.netEngine.getQNetwork().getNetsimLink(((PersonDriverAgent)agent).getCurrentLinkId());
-					qlink.addParkedVehicle(veh);
-				}
-			}
+			agent.initialize();
 		}
+	}
 
+	private void createTransitDrivers() {
 		if (this.transitEngine != null){
 			Collection<PlanAgent> a = this.transitEngine.createAdditionalAgents();
 			this.transitAgents = a;
 			agents.addAll(a);
 		}
+	}
 
+	private void parkVehicleOnInitialLink(PersonAgent agent) {
+		QVehicle veh = ((PersonDriverAgent) agent).getVehicle();
+		NetsimLink qlink = this.netEngine.getQNetwork().getNetsimLink(((PersonDriverAgent)agent).getCurrentLinkId());
+		qlink.addParkedVehicle(veh);
+	}
+
+	private void createAndAddDefaultVehicle(PersonAgent agent, VehicleType defaultVehicleType) {
+		QVehicleImpl veh = null ;
+		if ( vehWrnCnt < 1 ) {
+			log.warn( "QSim generates default vehicles; not sure what that does to vehicle files; needs to be checked.  kai, nov'10" ) ;
+			log.warn( Gbl.ONLYONCE ) ;
+			vehWrnCnt++ ;
+		}
+		VehicleImpl vehicle = new VehicleImpl(agent.getPerson().getId(), defaultVehicleType);
+		veh = new QVehicleImpl(vehicle);
+		veh.setDriver((PersonDriverAgent)agent); // this line is currently only needed for OTFVis to show parked vehicles
+		((DriverAgent)agent).setVehicle(veh);
+		vehicles.put(veh.getId(), veh);
 	}
 
 

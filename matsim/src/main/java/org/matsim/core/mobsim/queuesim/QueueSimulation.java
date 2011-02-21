@@ -147,7 +147,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 	private Integer iterationNumber = null;
 	private ControlerIO controlerIO;
 
-//	private final List<MobsimFeature> queueSimulationFeatures = new ArrayList<MobsimFeature>() ;
+	//	private final List<MobsimFeature> queueSimulationFeatures = new ArrayList<MobsimFeature>() ;
 	private AgentCounterI agentCounter = new AgentCounter() ;
 	private MobsimTimerI simTimer ;
 
@@ -168,18 +168,18 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 		if ( this.config.getModule(SimulationConfigGroup.GROUP_NAME) == null ) {
 			log.warn("Started QueueSimulation without a `simulation' config module.  Presumably due to removing " +
 					"`simulation' from the core modules in nov/dec'10.  Add simulation config module before calling QueueSimulation " +
-					"creational method to avoid this warning.  kai, dec'10");
+			"creational method to avoid this warning.  kai, dec'10");
 			this.config.addSimulationConfigGroup(new SimulationConfigGroup()) ;
 		}
 
 		this.listenerManager = new SimulationListenerManager(this);
-//		AbstractSimulation.reset(this.config.simulation().getStuckTime());
+		//		AbstractSimulation.reset(this.config.simulation().getStuckTime());
 
-//		this.agentCounter.setLiving(0);
-//		this.agentCounter.setLost(0);
+		//		this.agentCounter.setLiving(0);
+		//		this.agentCounter.setLost(0);
 		this.agentCounter.reset();
 
-//		SimulationTimer.resetStatic(this.config.simulation().getTimeStepSize());
+		//		SimulationTimer.resetStatic(this.config.simulation().getTimeStepSize());
 		simTimer = StaticFactoriesContainer.createSimulationTimer(this.config.simulation().getTimeStepSize()) ;
 
 		setEvents(events);
@@ -215,7 +215,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 		boolean cont = true;
 		while (cont) {
 
-//			double time = this.simTimer.getTimeOfDayStatic();
+			//			double time = this.simTimer.getTimeOfDayStatic();
 			double time = simTimer.getTimeOfDay() ;
 
 			beforeSimStep(time);
@@ -243,28 +243,14 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 		for (Person p : this.population.getPersons().values()) {
 			PersonDriverAgent agent = this.agentFactory.createPersonAgent(p);
 			agents.add( agent ) ;
-
 			QVehicle veh = StaticFactoriesContainer.createQueueVehicle(new VehicleImpl(agent.getPerson().getId(), defaultVehicleType));
 			//not needed in new agent class
 			veh.setDriver(agent); // this line is currently only needed for OTFVis to show parked vehicles
 			agent.setVehicle(veh);
-
-			if ( agent.initializeAndCheckIfAlive()) {
-				QueueLink qlink = this.network.getQueueLink(agent.getCurrentLinkId());
-				qlink.addParkedVehicle(veh);
-			}
+			agent.initialize();
+			QueueLink qlink = this.network.getQueueLink(agent.getCurrentLinkId());
+			qlink.addParkedVehicle(veh);
 		}
-
-
-//		for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) {
-//			for (PersonAgent agent : agents) {
-//				queueSimulationFeature.agentCreated(agent);
-//			}
-//		}
-//		for (PersonAgent agent : agents) {
-//			QueueSimulation.events.processEvent( new AgentCreationEventImpl( Time.UNDEFINED_TIME, agent.getPerson().getId(), null, null )) ;
-//		}
-
 
 	}
 
@@ -355,9 +341,9 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 
 		prepareNetworkChangeEventsQueue();
 
-//		for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) {
-//			queueSimulationFeature.afterPrepareSim();
-//		}
+		//		for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) {
+		//			queueSimulationFeature.afterPrepareSim();
+		//		}
 	}
 
 
@@ -365,13 +351,13 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 	 * Close any files, etc.
 	 */
 	protected void cleanupSim() {
-//		for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) {
-//			queueSimulationFeature.beforeCleanupSim();
-//		}
+		//		for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) {
+		//			queueSimulationFeature.beforeCleanupSim();
+		//		}
 
 		this.simEngine.afterSim();
 
-//		double now = this.simTimer.getTimeOfDayStatic();
+		//		double now = this.simTimer.getTimeOfDayStatic();
 		double now = this.simTimer.getTimeOfDay();
 
 		for (Tuple<Double, PlanAgent> entry : this.teleportationList) {
@@ -429,9 +415,9 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 			this.snapshotTime += this.snapshotPeriod;
 			doSnapshot(time);
 		}
-//		for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) {
-//			queueSimulationFeature.afterAfterSimStep(time);
-//		}
+		//		for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) {
+		//			queueSimulationFeature.afterAfterSimStep(time);
+		//		}
 	}
 
 	private void doSnapshot(final double time) {
@@ -462,18 +448,18 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 	}
 
 	protected void handleUnknownLegMode(double now, final PlanAgent planAgent) {
-//		Id startLinkId = agent.getCurrentLeg().getRoute().getStartLinkId() ;
-//		Leg leg = agent.getCurrentLeg() ;
+		//		Id startLinkId = agent.getCurrentLeg().getRoute().getStartLinkId() ;
+		//		Leg leg = agent.getCurrentLeg() ;
 
-//		Link     currentLink = this.scenario.getNetwork().getLinks().get(startLinkId) ;
-//		Link destinationLink = this.scenario.getNetwork().getLinks().get(agent.getDestinationLinkId()) ;
+		//		Link     currentLink = this.scenario.getNetwork().getLinks().get(startLinkId) ;
+		//		Link destinationLink = this.scenario.getNetwork().getLinks().get(agent.getDestinationLinkId()) ;
 
 
-//		for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) {
-//			queueSimulationFeature.beforeHandleUnknownLegMode(now, agent, currentLink, destinationLink ) ;
-//		}
+		//		for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) {
+		//			queueSimulationFeature.beforeHandleUnknownLegMode(now, agent, currentLink, destinationLink ) ;
+		//		}
 
-//		double arrivalTime = this.simTimer.getTimeOfDayStatic() + agent.getCurrentLeg().getTravelTime();
+		//		double arrivalTime = this.simTimer.getTimeOfDayStatic() + agent.getCurrentLeg().getTravelTime();
 		double arrivalTime = this.simTimer.getTimeOfDay() + planAgent.getCurrentLeg().getTravelTime();
 
 		this.teleportationList.add(new Tuple<Double, PlanAgent>(arrivalTime, planAgent));
@@ -614,17 +600,17 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 		this.teleportVehicles = teleportVehicles;
 	}
 
-//	private static class TeleportationArrivalTimeComparator implements Comparator<Tuple<Double, PersonDriverAgent>>, Serializable {
-//		private static final long serialVersionUID = 1L;
-//		@Override
-//		public int compare(final Tuple<Double, PersonDriverAgent> o1, final Tuple<Double, PersonDriverAgent> o2) {
-//			int ret = o1.getFirst().compareTo(o2.getFirst()); // first compare time information
-//			if (ret == 0) {
-//				ret = o2.getSecond().getPerson().getId().compareTo(o1.getSecond().getPerson().getId()); // if they're equal, compare the Ids: the one with the larger Id should be first
-//			}
-//			return ret;
-//		}
-//	}
+	//	private static class TeleportationArrivalTimeComparator implements Comparator<Tuple<Double, PersonDriverAgent>>, Serializable {
+	//		private static final long serialVersionUID = 1L;
+	//		@Override
+	//		public int compare(final Tuple<Double, PersonDriverAgent> o1, final Tuple<Double, PersonDriverAgent> o2) {
+	//			int ret = o1.getFirst().compareTo(o2.getFirst()); // first compare time information
+	//			if (ret == 0) {
+	//				ret = o2.getSecond().getPerson().getId().compareTo(o1.getSecond().getPerson().getId()); // if they're equal, compare the Ids: the one with the larger Id should be first
+	//			}
+	//			return ret;
+	//		}
+	//	}
 
 	QueueNetwork getQueueNetwork() {
 		return this.network;
@@ -635,10 +621,10 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 		return this.network ;
 	}
 
-//	@Override
-//	public CapacityInformationNetwork getCapacityInformationNetwork() {
-//		return this.network ;
-//	}
+	//	@Override
+	//	public CapacityInformationNetwork getCapacityInformationNetwork() {
+	//		return this.network ;
+	//	}
 
 	@Override
 	public Scenario getScenario() {
@@ -677,7 +663,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 
 	@Override
 	public void addFeature(VisMobsimFeature queueSimulationFeature) {
-//		this.queueSimulationFeatures.add( queueSimulationFeature ) ;
+		//		this.queueSimulationFeatures.add( queueSimulationFeature ) ;
 		this.addQueueSimulationListeners(queueSimulationFeature);
 		this.getEventsManager().addHandler(queueSimulationFeature) ;
 		throw new UnsupportedOperationException("not tested") ;

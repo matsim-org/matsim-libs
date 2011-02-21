@@ -669,7 +669,7 @@ public class QueueSimulationTest extends TestCase {
 
 		sim.getSimTimer().setTime(100.0);
 		PersonDriverAgent agent = StaticFactoriesContainer.createQueuePersonAgent(person, sim);
-		agent.initializeAndCheckIfAlive();
+		agent.initialize();
 		agent.endActivityAndAssumeControl(100.0);
 
 		sim.getSimTimer().setTime(101.0);

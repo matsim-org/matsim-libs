@@ -320,10 +320,9 @@ public class Sim2D implements Mobsim {
 		for (Person p : this.scenario.getPopulation().getPersons().values()) {
 			PersonDriverAgentImpl agent = this.agentFactory.createPersonAgent(p);
 			this.agents.add(agent);
-			if (agent.initializeAndCheckIfAlive()) {
-				Floor floor = this.sim2DEngine.getFloor(agent.getCurrentLinkId());
-				floor.addAgent((Agent2D) agent);
-			}
+			agent.initialize();
+			Floor floor = this.sim2DEngine.getFloor(agent.getCurrentLinkId());
+			floor.addAgent((Agent2D) agent);
 		}
 
 	}

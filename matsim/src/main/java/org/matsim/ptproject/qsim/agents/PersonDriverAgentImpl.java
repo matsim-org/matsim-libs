@@ -92,7 +92,7 @@ public class PersonDriverAgentImpl implements PersonDriverAgent {
 	// other
 
 	@Override
-	public final boolean initializeAndCheckIfAlive() {
+	public final void initialize() {
 		List<? extends PlanElement> planElements = this.getPlanElements();
 		this.currentPlanElementIndex = 0;
 		Activity firstAct = (Activity) planElements.get(0);
@@ -103,9 +103,7 @@ public class PersonDriverAgentImpl implements PersonDriverAgent {
 			this.activityEndTime = actEndTime ;
 			this.simulation.scheduleActivityEnd(this);
 			this.simulation.getAgentCounter().incLiving();
-			return true;
 		}
-		return false; // the agent has no leg, so nothing more to do
 	}
 
 	// -----------------------------------------------------------------------------------------------------------------------------

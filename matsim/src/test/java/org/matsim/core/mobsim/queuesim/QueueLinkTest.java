@@ -123,7 +123,7 @@ public class QueueLinkTest extends MatsimTestCase {
 		plan.addLeg(leg);
 		plan.addActivity(new ActivityImpl("work", f.link2.getId()));
 		PersonDriverAgent driver = StaticFactoriesContainer.createQueuePersonAgent(p, f.qSim);
-		driver.initializeAndCheckIfAlive();
+		driver.initialize();
 		veh.setDriver(driver);
 		driver.setVehicle(veh);
 		driver.endActivityAndAssumeControl(0);
@@ -180,7 +180,7 @@ public class QueueLinkTest extends MatsimTestCase {
 		plan.addLeg(leg);
 		plan.addActivity(new ActivityImpl("work", f.link2.getId()));
 		PersonDriverAgent driver = StaticFactoriesContainer.createQueuePersonAgent(p, qsim);
-		driver.initializeAndCheckIfAlive();
+		driver.initialize();
 		veh.setDriver(driver);
 		driver.setVehicle(veh);
 		driver.endActivityAndAssumeControl(0);
@@ -226,7 +226,7 @@ public class QueueLinkTest extends MatsimTestCase {
 		plan.addLeg(leg);
 		plan.addActivity(new ActivityImpl("work", f.link2.getId()));
 		PersonDriverAgent driver = StaticFactoriesContainer.createQueuePersonAgent(p, qsim);
-		driver.initializeAndCheckIfAlive();
+		driver.initialize();
 		veh.setDriver(driver);
 		driver.setVehicle(veh);
 		driver.endActivityAndAssumeControl(0);
@@ -296,13 +296,13 @@ public class QueueLinkTest extends MatsimTestCase {
 		PersonDriverAgent pa1 = StaticFactoriesContainer.createQueuePersonAgent(p, qsim);
 		v1.setDriver(pa1);
 		pa1.setVehicle(v1);
-		pa1.initializeAndCheckIfAlive();
+		pa1.initialize();
 
 		QVehicle v2 = StaticFactoriesContainer.createQueueVehicle(new VehicleImpl(new IdImpl("2"), new VehicleTypeImpl(new IdImpl("defaultVehicleType"))));
 		PersonDriverAgent pa2 = StaticFactoriesContainer.createQueuePersonAgent(p, qsim);
 		v2.setDriver(pa2);
 		pa2.setVehicle(v2);
-		pa2.initializeAndCheckIfAlive();
+		pa2.initialize();
 
 		// start test
 		assertTrue(qlink.bufferIsEmpty());

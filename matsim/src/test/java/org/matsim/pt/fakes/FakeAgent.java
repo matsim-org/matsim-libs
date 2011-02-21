@@ -139,8 +139,8 @@ public class FakeAgent implements PersonDriverAgent, PassengerAgent {
 	}
 
 	@Override
-	public boolean initializeAndCheckIfAlive() {
-		return true ;
+	public void initialize() {
+		
 	}
 
 	@Override
