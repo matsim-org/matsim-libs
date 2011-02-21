@@ -137,7 +137,7 @@ public class SfAirScheduleBuilder {
 									route+"_"+carrier+"\t"+								//TransitLine
 									flightDesignator+"\t"+								//vehicleId
 									departureInSec+"\t"+								//departure time in seconds
-									this.routes.get(route)+"\t"+						//journey time in seconds)
+									this.routes.get(route)+"\t"+						//journey time in seconds
 									aircraftType+"\t"+									//aircraft type
 									seatsAvail+"\t"+			//seats avail
 									flightDistance);									//distance in km
@@ -161,7 +161,7 @@ public class SfAirScheduleBuilder {
 		Iterator it = this.airportsInOag.entrySet().iterator();
 	    while (it.hasNext()) {
 	        Map.Entry pairs = (Map.Entry)it.next();
-	        bwOsm.write(pairs.getKey().toString()+"\t"+pairs.getValue().toString());
+	        bwOsm.write(pairs.getKey().toString()+"\t"+osmReader.airports.get(pairs.getKey()).getX()+"\t"+osmReader.airports.get(pairs.getKey()).getY());
 	        this.missingAirports.remove(pairs.getKey().toString());
 	        bwOsm.newLine();
 	    }

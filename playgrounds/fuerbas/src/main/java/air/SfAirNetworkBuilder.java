@@ -45,16 +45,9 @@ public class SfAirNetworkBuilder {
 			String oneLine = brAirports.readLine();
 			String[] lineEntries = oneLine.split("\t");
 			String airportCode = lineEntries[0];
-			String[] coordinates = new String[2];
-			coordinates = lineEntries[1].split("y");
-			String xValue = coordinates[0].substring(3);
-			String yValue = coordinates[1].substring(1);
-			xValue = xValue.replaceAll("\\]", "");
-			xValue = xValue.replaceAll("\\[", "");
-			yValue = yValue.replaceAll("\\[", "");
-			yValue = yValue.replaceAll("\\]", "");
-			
-			Coord coord = new CoordImpl(Double.parseDouble(xValue), Double.parseDouble(yValue));
+			double xValue = Double.parseDouble(lineEntries[1]);
+			double yValue = Double.parseDouble(lineEntries[2]);		
+			Coord coord = new CoordImpl(xValue, yValue);
 			Coord airportCoord = coordtransform.transform(coord);
 			
 			new SfMatsimAirport(new IdImpl(airportCode), airportCoord).createRunways(network);			
@@ -76,7 +69,7 @@ public class SfAirNetworkBuilder {
 			
 			Id originRunway = new IdImpl(origin+"runwayOutbound");
 			Id destinationRunway = new IdImpl(destination+"runwayInbound");
-			Link originToDestination = network.getFactory().createLink(new IdImpl(origin+destination), originRunway, destinationRunway);
+			Link originToDestination = network.getFactory().createLink(new IdImpl(origin+destination), network.getNodes().get(originRunway), network.getNodes().get(destinationRunway));
 			originToDestination.setAllowedModes(allowedModes);
 			originToDestination.setCapacity(1.0);
 			originToDestination.setFreespeed(groundSpeed);
