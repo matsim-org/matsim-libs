@@ -34,19 +34,23 @@ public class CreateScenario {
 	private ConfigReader configReader = new ConfigReader();
 	private RandomFromVarDistr rnd;
 	
-	private long seed = 109877L;
+	private long seed;
 	private String outPath = "src/main/java/playground/anhorni/input/LEGO/";
 		
 	public static void main(final String[] args) {
-		CreateScenario scenarioCreator = new CreateScenario();		
+		CreateScenario scenarioCreator = new CreateScenario();	
+		scenarioCreator.init();	
+		scenarioCreator.setSeedFromConfig();
 		scenarioCreator.run();			
 		log.info("Scenario creation finished \n ----------------------------------------------------");
 	}
 	
-	public void run() {
-		configReader.read();	
+	public void init() {
+		configReader.read();			
 		rnd = new RandomFromVarDistr();
-		rnd.setSeed(this.seed);
+	}
+	
+	public void run() {
 		this.create();
 	}
 	
@@ -67,6 +71,12 @@ public class CreateScenario {
 
 	public void setSeed(long seed) {
 		this.seed = seed;
+		rnd.setSeed(this.seed);
+	}
+	
+	public void setSeedFromConfig() {
+		this.seed = configReader.getRandomSeed();
+		rnd.setSeed(this.seed);
 	}
 
 	public void setOutPath(String outPath) {

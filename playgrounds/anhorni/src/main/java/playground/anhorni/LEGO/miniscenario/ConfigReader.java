@@ -45,6 +45,7 @@ public class ConfigReader {
 	private double actScoreOffset = 0.0;
 	private int analysisPopulationOffset = 0;
 	private boolean linearDistanceUtility = true;	
+	private long randomSeed = 109877L;
  		
 	private final static Logger log = Logger.getLogger(ConfigReader.class);
 	       
@@ -123,7 +124,12 @@ public class ConfigReader {
           line = bufferedReader.readLine();
           parts = line.split("\t");
           this.linearDistanceUtility = Boolean.parseBoolean(parts[1]);
-          log.info("linearDistanceUtility: " + linearDistanceUtility);              
+          log.info("linearDistanceUtility: " + linearDistanceUtility);
+          
+          line = bufferedReader.readLine();
+          parts = line.split("\t");
+          this.randomSeed = Long.parseLong(parts[1], 10);
+          log.info("randomSeed: " + Long.valueOf(randomSeed));           
         } // end try
         catch (IOException e) {
         	e.printStackTrace();
@@ -188,5 +194,13 @@ public class ConfigReader {
 
 	public boolean isLinearDistanceUtility() {
 		return linearDistanceUtility;
+	}
+
+	public long getRandomSeed() {
+		return randomSeed;
+	}
+
+	public void setRandomSeed(long randomSeed) {
+		this.randomSeed = randomSeed;
 	}
 }

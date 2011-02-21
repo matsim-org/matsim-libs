@@ -59,7 +59,8 @@ public class AdaptZHScenario {
 	private final static Logger log = Logger.getLogger(AdaptZHScenario.class);
 	private ScenarioImpl scenario = new ScenarioImpl();
 	private String outputFolder = "src/main/java/playground/anhorni/output/zh10Pct/";
-	private long seed = 109877L;
+	
+	private long seed;
 		
 	public static void main(final String[] args) {		
 		String networkFilePath="src/main/java/playground/anhorni/input/zh10Pct/network.xml";
@@ -87,6 +88,8 @@ public class AdaptZHScenario {
 	private void run() {	
 		ConfigReader configReader = new ConfigReader();
 		configReader.read();
+		
+		this.seed = configReader.getRandomSeed();
 		
 		ScenarioImpl scenario = new ScenarioLoaderImpl("src/main/java/playground/anhorni/input/zh10Pct/config.xml").getScenario();
 		Config config = scenario.getConfig();
