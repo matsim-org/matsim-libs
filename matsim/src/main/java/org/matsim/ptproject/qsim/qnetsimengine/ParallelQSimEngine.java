@@ -67,6 +67,8 @@ class ParallelQSimEngine extends QSimEngineImpl {
 
 	ParallelQSimEngine(final QSim sim, final Random random) {
 		super(sim, random);
+		// (DepartureHander does not need to be added here since it is added in the "super" c'tor)
+		
 		this.numOfThreads = this.getMobsim().getScenario().getConfig().getQSimConfigGroup().getNumberOfThreads();
 	}
 
@@ -311,7 +313,7 @@ class ParallelQSimEngine extends QSimEngineImpl {
 					
 					// set activator for links
 					for (Link outLink : node.getNode().getOutLinks().values()) {
-						QLinkInternalI qLink = this.getQNetwork().getNetsimLink(outLink.getId());
+						QLinkInternalI qLink = this.getNetsimNetwork().getNetsimLink(outLink.getId());
 						// removing qsim as "person in the middle".  not fully sure if this is the same in the parallel impl.  kai, oct'10
 						qLink.setQSimEngine(this.engines[thread]);
 					}
@@ -329,7 +331,7 @@ class ParallelQSimEngine extends QSimEngineImpl {
 					
 					// set activator for links
 					for (Link outLink : node.getNode().getOutLinks().values()) {
-						QLinkInternalI qLink = this.getQNetwork().getNetsimLink(outLink.getId());
+						QLinkInternalI qLink = this.getNetsimNetwork().getNetsimLink(outLink.getId());
 						// removing qsim as "person in the middle".  not fully sure if this is the same in the parallel impl.  kai, oct'10
 						qLink.setQSimEngine(this.engines[thread]);
 					}

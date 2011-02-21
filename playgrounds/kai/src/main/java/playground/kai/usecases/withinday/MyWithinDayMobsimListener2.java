@@ -43,7 +43,7 @@ import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.ptproject.qsim.agents.ExperimentalBasicWithindayAgent;
-import org.matsim.ptproject.qsim.interfaces.Mobsim;
+import org.matsim.ptproject.qsim.interfaces.Netsim;
 import org.matsim.ptproject.qsim.interfaces.NetsimLink;
 import org.matsim.ptproject.qsim.qnetsimengine.QVehicle;
 
@@ -70,7 +70,7 @@ public class MyWithinDayMobsimListener2 implements SimulationListener, Simulatio
 	@Override
 	public void notifySimulationBeforeSimStep(SimulationBeforeSimStepEvent event) {
 		
-		Mobsim mobsim = (Mobsim) event.getQueueSimulation() ;
+		Netsim mobsim = (Netsim) event.getQueueSimulation() ;
 		this.scenario = mobsim.getScenario();
 
 		Collection<PersonAgent> agentsToReplan = getAgentsToReplan( mobsim ) ; 
@@ -83,7 +83,7 @@ public class MyWithinDayMobsimListener2 implements SimulationListener, Simulatio
 		}
 	}
 	
-	private List<PersonAgent> getAgentsToReplan(Mobsim mobsim ) {
+	private List<PersonAgent> getAgentsToReplan(Netsim mobsim ) {
 
 		List<PersonAgent> set = new ArrayList<PersonAgent>();
 
@@ -108,7 +108,7 @@ public class MyWithinDayMobsimListener2 implements SimulationListener, Simulatio
 
 	}
 
-	private boolean doReplanning(PersonAgent personAgent, Mobsim mobsim ) {
+	private boolean doReplanning(PersonAgent personAgent, Netsim mobsim ) {
 		double now = mobsim.getSimTimer().getTimeOfDay() ;
 		
 		// preconditions:

@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,17 +17,16 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.pt.qsim;
+package org.matsim.ptproject.qsim.interfaces;
 
-import org.matsim.core.api.internal.MatsimFactory;
-import org.matsim.pt.Umlauf;
-import org.matsim.ptproject.qsim.interfaces.Netsim;
 
-/**
- * @author aneumann
+/**Mobsim could, at least in theory, also operate without a network (e.g. based on activities with
+ * coordinates).  Netsim has a NetsimNetwork.
+ * 
+ * @author nagel
  */
-public interface AbstractTransitDriverFactory extends MatsimFactory {
+public interface Netsim extends Mobsim {
 
-	public AbstractTransitDriver createTransitDriver(Umlauf umlauf, TransitStopAgentTracker thisAgentTrackerVehicle, Netsim qSim);
-
+	NetsimNetwork getNetsimNetwork();
+	
 }

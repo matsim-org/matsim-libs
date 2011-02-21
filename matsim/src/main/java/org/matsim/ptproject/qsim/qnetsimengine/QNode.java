@@ -82,7 +82,7 @@ public class QNode implements NetsimNode {
 	/*package*/ void init() {
 		int i = 0;
 		for (Link l : this.node.getInLinks().values()) {
-			this.inLinksArrayCache[i] = this.simEngine.getQNetwork().getNetsimLinks().get(l.getId());
+			this.inLinksArrayCache[i] = this.simEngine.getNetsimNetwork().getNetsimLinks().get(l.getId());
 			// yyyy changed simEngine.getQSim.getQNetwork to simEngine.getQNetwork.  Not sure if this is the same in parallel
 			// implementations.  kai, oct'10
 			i++;
@@ -223,7 +223,7 @@ public class QNode implements NetsimNode {
     }
     // veh has to move over node
     if (nextLinkId != null) {
-      QLinkInternalI nextQueueLink = this.simEngine.getQNetwork().getNetsimLinks().get(nextLinkId);
+      QLinkInternalI nextQueueLink = this.simEngine.getNetsimNetwork().getNetsimLinks().get(nextLinkId);
       Link nextLink = nextQueueLink.getLink();
       this.checkNextLinkSemantics(currentLink, nextLink, veh);
       if (nextQueueLink.hasSpace()) {

@@ -21,13 +21,13 @@ package org.matsim.ptproject.qsim.agents;
 
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
-import org.matsim.ptproject.qsim.interfaces.Mobsim;
+import org.matsim.ptproject.qsim.interfaces.Netsim;
 
 public final class ExperimentalBasicWithindayAgentFactory implements AgentFactory {
 
-	private final Mobsim simulation;
+	private final Netsim simulation;
 
-	public ExperimentalBasicWithindayAgentFactory(final Mobsim simulation) {
+	public ExperimentalBasicWithindayAgentFactory(final Netsim simulation) {
 		this.simulation = simulation;
 	}
 

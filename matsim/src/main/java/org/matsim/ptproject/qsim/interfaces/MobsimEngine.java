@@ -28,7 +28,7 @@ public interface MobsimEngine {
    *
    * @return the QSim instance
    */
-  public Mobsim getMobsim();
+  public Netsim getMobsim();
   /**
    * called in a predefined Order when the simulation is started
    */

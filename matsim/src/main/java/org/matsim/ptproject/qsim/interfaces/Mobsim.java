@@ -1,9 +1,10 @@
 /* *********************************************************************** *
- * project: org.matsim.*
+ * project: matsim
+ * Mobsim.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -90,7 +91,6 @@ import org.matsim.ptproject.qsim.agents.AgentFactory;
  *
  */
 public interface Mobsim extends IOSimulation, ObservableSimulation {
-
 	void arrangeAgentDeparture(PlanAgent planAgent);
 
 	EventsManager getEventsManager();
@@ -120,8 +120,6 @@ public interface Mobsim extends IOSimulation, ObservableSimulation {
 
 	MobsimTimerI getSimTimer();
 
-	NetsimNetwork getNetsimNetwork();
-	
 	Collection<PlanAgent> getActivityEndsList() ;
 	
 	/**Registering and unregistering agents on links for visualization.  
@@ -133,6 +131,7 @@ public interface Mobsim extends IOSimulation, ObservableSimulation {
 	 * 	 */
 	void registerAgentAtPtWaitLocation( final PlanAgent planAgent ) ;
 	void unregisterAgentAtPtWaitLocation( final PlanAgent planAgent ) ;
+
 
 
 }

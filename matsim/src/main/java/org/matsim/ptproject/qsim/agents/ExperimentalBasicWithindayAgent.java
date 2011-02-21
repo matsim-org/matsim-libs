@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.ptproject.qsim.interfaces.Mobsim;
+import org.matsim.ptproject.qsim.interfaces.Netsim;
 
 /**This class is an attempt to provide access to the internals of DefaultPersonDriverAgent
  * in a way that it can be used for within-day replanning.
@@ -38,7 +38,7 @@ public class ExperimentalBasicWithindayAgent extends PersonDriverAgentImpl imple
 
 	private Plan executedPlan;
 	
-	public ExperimentalBasicWithindayAgent(Person p, Mobsim simulation) {
+	public ExperimentalBasicWithindayAgent(Person p, Netsim simulation) {
 		super(p, simulation);
 		
 		/*

@@ -30,7 +30,7 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.ptproject.qsim.agents.PersonDriverAgentImpl;
-import org.matsim.ptproject.qsim.interfaces.Mobsim;
+import org.matsim.ptproject.qsim.interfaces.Netsim;
 
 
 /**
@@ -38,7 +38,7 @@ import org.matsim.ptproject.qsim.interfaces.Mobsim;
  */
 public class TransitAgent extends PersonDriverAgentImpl implements PersonDriverPassengerAgent {
 
-	public TransitAgent(final Person p, final Mobsim simulation) {
+	public TransitAgent(final Person p, final Netsim simulation) {
 		super(p, simulation);
 	}
 

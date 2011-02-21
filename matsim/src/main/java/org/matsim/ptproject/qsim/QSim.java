@@ -68,8 +68,8 @@ import org.matsim.ptproject.qsim.helpers.MobsimTimer;
 import org.matsim.ptproject.qsim.interfaces.AcceptsVisMobsimFeatures;
 import org.matsim.ptproject.qsim.interfaces.AgentCounterI;
 import org.matsim.ptproject.qsim.interfaces.DepartureHandler;
-import org.matsim.ptproject.qsim.interfaces.Mobsim;
 import org.matsim.ptproject.qsim.interfaces.MobsimTimerI;
+import org.matsim.ptproject.qsim.interfaces.Netsim;
 import org.matsim.ptproject.qsim.interfaces.NetsimEngine;
 import org.matsim.ptproject.qsim.interfaces.NetsimEngineFactory;
 import org.matsim.ptproject.qsim.interfaces.NetsimLink;
@@ -77,13 +77,11 @@ import org.matsim.ptproject.qsim.interfaces.NetsimNetwork;
 import org.matsim.ptproject.qsim.multimodalsimengine.MultiModalDepartureHandler;
 import org.matsim.ptproject.qsim.multimodalsimengine.MultiModalSimEngine;
 import org.matsim.ptproject.qsim.multimodalsimengine.MultiModalSimEngineFactory;
-import org.matsim.ptproject.qsim.qnetsimengine.CarDepartureHandler;
 import org.matsim.ptproject.qsim.qnetsimengine.DefaultQNetworkFactory;
 import org.matsim.ptproject.qsim.qnetsimengine.DefaultQSimEngineFactory;
 import org.matsim.ptproject.qsim.qnetsimengine.QLanesNetworkFactory;
 import org.matsim.ptproject.qsim.qnetsimengine.QVehicle;
 import org.matsim.ptproject.qsim.qnetsimengine.QVehicleImpl;
-import org.matsim.ptproject.qsim.qnetsimengine.CarDepartureHandler.VehicleBehavior;
 import org.matsim.vehicles.VehicleImpl;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleTypeImpl;
@@ -103,7 +101,7 @@ import org.matsim.vis.snapshots.writers.VisNetwork;
  * @author dgrether
  * @author knagel
  */
-public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
+public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Netsim {
 
 	final private static Logger log = Logger.getLogger(QSim.class);
 
@@ -115,13 +113,11 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 	private double infoTime = 0;
 	private static final int INFO_PERIOD = 3600;
 
-	private EventsManager events = null;
+	private final EventsManager events ;
 
-	private NetsimEngine netEngine = null;
+	private final NetsimEngine netEngine ;
 	private NetworkChangeEventsEngine changeEventsEngine = null;
 	private MultiModalSimEngine multiModalEngine = null;
-
-	private CarDepartureHandler carDepartureHandler;
 
 	private MobsimTimerI simTimer;
 
@@ -145,8 +141,8 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 	private final Date realWorldStarttime = new Date();
 	private double stopTime = 100*3600;
 	private AgentFactory agentFactory;
-	private SimulationListenerManager listenerManager;
-	private Scenario scenario = null;
+	private final SimulationListenerManager listenerManager;
+	private final Scenario scenario ;
 	private final List<DepartureHandler> departureHandlers = new ArrayList<DepartureHandler>();
 	private Integer iterationNumber = null;
 	private ControlerIO controlerIO;
@@ -164,10 +160,69 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 		this(scenario, events, new DefaultQSimEngineFactory());
 	}
 
-	protected QSim(final Scenario sc, final EventsManager events, final NetsimEngineFactory simEngineFac){
+	protected QSim(final Scenario sc, final EventsManager events, final NetsimEngineFactory netsimEngFactory){
 		this.scenario = sc;
 		this.events = events;
-		init(simEngineFac);
+		log.info("Using QSim...");
+		this.listenerManager = new SimulationListenerManager(this);
+		this.agentCounter = new AgentCounter();
+		this.simTimer = new MobsimTimer(sc.getConfig().getQSimConfigGroup().getTimeStepSize());
+		
+		// create the NetworkEngine ...
+		this.netEngine = netsimEngFactory.createQSimEngine(this, MatsimRandom.getRandom());
+		this.addDepartureHandler( this.netEngine.getDepartureHandler() ) ;
+		
+		// create the QNetwork ...
+		NetsimNetwork network = null ;
+		if (sc.getConfig().scenario().isUseLanes()) {
+			if (((ScenarioImpl)sc).getLaneDefinitions() == null) {
+				throw new IllegalStateException("Lane definitions have to be set if feature is enabled!");
+			}
+			log.info("Lanes enabled...");
+			network = DefaultQNetworkFactory.createQNetwork(this, new QLanesNetworkFactory(new DefaultQNetworkFactory(),
+					((ScenarioImpl)sc).getLaneDefinitions()));
+			// yyyyyy the above is now a hack; replace by non-static factory method.  kai, feb'11
+		}
+		else {
+//			network = DefaultQNetworkFactory.staticCreateQNetwork(this);
+			network = this.netEngine.getNetsimNetworkFactory().createNetsimNetwork(this) ;
+		}
+		// overall, one could wonder why this is not done inside the NetsimEngine.  kai, feb'11
+		// well, we may want to see the construction explicitly as long as we use factories (and not builders).  kai, feb'11
+		
+		// then tell the QNetwork to use the netsimEngine (this also creates qlinks and qnodes)
+		// yyyy feels a bit weird to me ...  kai, feb'11
+		network.initialize(this.netEngine);
+		
+		
+		// configuring signalSystems:
+		if (sc.getConfig().scenario().isUseSignalSystems()) {
+			log.info("Signals enabled...");
+			// ... but not clear where this is actually configured??  Maybe drop completely from here??  kai, feb'11
+		}
+		
+		// configuring multiModalEngine ...
+		if (sc.getConfig().multiModal().isMultiModalSimulationEnabled()) {
+		
+			// create MultiModalSimEngine
+			multiModalEngine = new MultiModalSimEngineFactory().createMultiModalSimEngine(this);
+		
+			// add MultiModalDepartureHandler
+			this.addDepartureHandler(new MultiModalDepartureHandler(this, multiModalEngine, scenario.getConfig().multiModal()));
+
+		}
+		
+		// set the agent factory.  might be better to have this in the c'tor, but difficult to do as long
+		// as the transitEngine changes the AgentFactory.  kai, feb'11
+		this.agentFactory = new DefaultAgentFactory(this);
+		
+		// configuring transit (this changes the agent factory as a side effect).
+		if (sc.getConfig().scenario().isUseTransit()){
+			this.transitEngine = new TransitQSimEngine(this);
+			this.addDepartureHandler(this.transitEngine);
+			// why is there not addition of pt to non teleported modes here?  kai, jun'10
+			// done in TransitQSimEngine.  kai, jun'10
+		}
 	}
 
 	// ============================================================================================================================
@@ -196,7 +251,7 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 		cleanupSim(time);
 
 		//delete reference to clear memory
-		this.listenerManager = null;
+//		this.listenerManager = null;
 	}
 
 	// ============================================================================================================================
@@ -208,13 +263,15 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 	// into the QSim.  But I can't change into that direction because the TransitEngine changes the AgentFactory fairly
 	// late in the initialization sequence ...
 
-	public final void setMultiModalSimEngine(MultiModalSimEngine multiModalEngine) {
-		if ( !locked ) {
-			this.multiModalEngine = multiModalEngine;
-		} else {
-			throw new RuntimeException("too late to set multiModalSimEngine; aborting ...") ;
-		}
-	}
+//	public final void setMultiModalSimEngine(MultiModalSimEngine multiModalEngine) {
+//		if ( !locked ) {
+//			this.multiModalEngine = multiModalEngine;
+//		} else {
+//			throw new RuntimeException("too late to set multiModalSimEngine; aborting ...") ;
+//		}
+//	}
+// this is never used, and it is not clear to me how it should be used given the initialization sequence
+	// (in particular the departure handlers).  kai, feb'11
 
 	@Override
 	public void setAgentFactory(final AgentFactory fac) {
@@ -275,7 +332,7 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 
 		// Initialize Snapshot file
 		this.snapshotPeriod = (int) qSimConfigGroup.getSnapshotPeriod();
-		this.snapshotManager.createSnapshotwriter(this.netEngine.getQNetwork(), this.scenario, this.snapshotPeriod, this.iterationNumber, this.controlerIO);
+		this.snapshotManager.createSnapshotwriter(this.netEngine.getNetsimNetwork(), this.scenario, this.snapshotPeriod, this.iterationNumber, this.controlerIO);
 		if (this.snapshotTime < this.simTimer.getSimStartTime()) {
 			this.snapshotTime += this.snapshotPeriod;
 		}
@@ -325,7 +382,7 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 
 	private void parkVehicleOnInitialLink(PersonAgent agent) {
 		QVehicle veh = ((PersonDriverAgent) agent).getVehicle();
-		NetsimLink qlink = this.netEngine.getQNetwork().getNetsimLink(((PersonDriverAgent)agent).getCurrentLinkId());
+		NetsimLink qlink = this.netEngine.getNetsimNetwork().getNetsimLink(((PersonDriverAgent)agent).getCurrentLinkId());
 		qlink.addParkedVehicle(veh);
 	}
 
@@ -386,8 +443,8 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 			writer.finish();
 		}
 
-		this.netEngine = null;
-		this.events = null; // delete events object to free events handlers, if they are nowhere else referenced
+//		this.netEngine = null;
+//		this.events = null; // delete events object to free events handlers, if they are nowhere else referenced
 	}
 
 	protected void beforeSimStep() {
@@ -489,7 +546,7 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 			} else {
 				Activity act = (Activity) pe;
 				Id linkId = act.getLinkId();
-				NetsimLink qLink = this.netEngine.getQNetwork().getNetsimLink(linkId);
+				NetsimLink qLink = this.netEngine.getNetsimNetwork().getNetsimLink(linkId);
 				qLink.registerAgentOnLink(agent);
 			}
 		}
@@ -501,7 +558,7 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 		if (planAgent instanceof PersonDriverAgentImpl) { // yyyy but why is this needed?  Does the driver get registered?
 			Leg leg = (Leg) planAgent.getCurrentPlanElement() ;
 			Id linkId = leg.getRoute().getStartLinkId();
-			NetsimLink qLink = this.netEngine.getQNetwork().getNetsimLink(linkId) ;
+			NetsimLink qLink = this.netEngine.getNetsimNetwork().getNetsimLink(linkId) ;
 			qLink.registerAgentOnLink( planAgent ) ;
 		}
 	}
@@ -514,7 +571,7 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 			} else {
 				Activity act = (Activity) pe;
 				Id linkId = act.getLinkId();
-				NetsimLink qLink = this.netEngine.getQNetwork().getNetsimLink(linkId);
+				NetsimLink qLink = this.netEngine.getNetsimNetwork().getNetsimLink(linkId);
 				qLink.unregisterAgentOnLink(agent);
 			}
 		}
@@ -526,7 +583,7 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 		if (planAgent instanceof PersonDriverAgentImpl) { // yyyy but why is this needed?
 			Leg leg = (Leg) planAgent.getCurrentPlanElement() ;
 			Id linkId = leg.getRoute().getStartLinkId();
-			NetsimLink qLink = this.netEngine.getQNetwork().getNetsimLink(linkId) ;
+			NetsimLink qLink = this.netEngine.getNetsimNetwork().getNetsimLink(linkId) ;
 			qLink.unregisterAgentOnLink( planAgent ) ;
 		}
 	}
@@ -593,78 +650,6 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 	// ############################################################################################################################
 	// private methods
 	// ############################################################################################################################
-
-	/**
-	 * extended constructor method that can also be after assignments of another constructor
-	 * <p/>
-	 * Definitely needs to be strongly protected (e.g. private) since c'tor should not call non-protected methods. kai, aug'10
-	 * @param simEngineFac
-	 */
-	private void init(NetsimEngineFactory simEngineFac){
-		log.info("Using QSim...");
-		Scenario sc = this.getScenario() ;
-		this.listenerManager = new SimulationListenerManager(this);
-		this.agentCounter = new AgentCounter();
-		this.simTimer = new MobsimTimer(sc.getConfig().getQSimConfigGroup().getTimeStepSize());
-
-		// create the NetworkEngine ...
-		this.netEngine = simEngineFac.createQSimEngine(this, MatsimRandom.getRandom());
-
-		// create the QNetwork ...
-		NetsimNetwork network = null ;
-		if (sc.getConfig().scenario().isUseLanes()) {
-			if (((ScenarioImpl)sc).getLaneDefinitions() == null) {
-				throw new IllegalStateException("Lane definitions have to be set if feature is enabled!");
-			}
-			log.info("Lanes enabled...");
-			network = DefaultQNetworkFactory.createQNetwork(this, new QLanesNetworkFactory(new DefaultQNetworkFactory(),
-					((ScenarioImpl)sc).getLaneDefinitions()));
-		}
-		else {
-			network = DefaultQNetworkFactory.createQNetwork(this);
-		}
-
-		// then tell the QNetwork to use the simEngine (this also creates qlinks and qnodes)
-		network.initialize(this.netEngine);
-
-		if (sc.getConfig().scenario().isUseSignalSystems()) {
-			log.info("Signals enabled...");
-		}
-
-		if (sc.getConfig().multiModal().isMultiModalSimulationEnabled()) {
-
-			// create MultiModalSimEngine
-			multiModalEngine = new MultiModalSimEngineFactory().createMultiModalSimEngine(this);
-
-			// add MultiModalDepartureHandler
-			this.addDepartureHandler(new MultiModalDepartureHandler(this, multiModalEngine, scenario.getConfig().multiModal()));
-		}
-
-		this.agentFactory = new DefaultAgentFactory(this);
-
-		QSimConfigGroup qSimConfigGroup = this.scenario.getConfig().getQSimConfigGroup();
-		VehicleBehavior vehicleBehavior;
-		if (qSimConfigGroup.getVehicleBehavior().equals(QSimConfigGroup.VEHICLE_BEHAVIOR_EXCEPTION)) {
-			vehicleBehavior = VehicleBehavior.EXCEPTION;
-		} else if (qSimConfigGroup.getVehicleBehavior().equals(QSimConfigGroup.VEHICLE_BEHAVIOR_TELEPORT)) {
-			vehicleBehavior = VehicleBehavior.TELEPORT;
-		} else if (qSimConfigGroup.getVehicleBehavior().equals(QSimConfigGroup.VEHICLE_BEHAVIOR_WAIT)) {
-			vehicleBehavior = VehicleBehavior.WAIT_UNTIL_IT_COMES_ALONG;
-		} else {
-			throw new RuntimeException("Unknown vehicle behavior option.");
-		}
-		this.carDepartureHandler = new CarDepartureHandler(this, vehicleBehavior);
-		addDepartureHandler(this.carDepartureHandler);
-
-		if (sc.getConfig().scenario().isUseTransit()){
-			this.transitEngine = new TransitQSimEngine(this);
-			this.addDepartureHandler(this.transitEngine);
-			// why is there not addition of pt to non teleported modes here?  kai, jun'10
-			// done in TransitQSimEngine.  kai, jun'10
-		}
-
-	}
-
 
 	private void initSimTimer() {
 		QSimConfigGroup qSimConfigGroup = this.scenario.getConfig().getQSimConfigGroup();
@@ -756,7 +741,7 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 	@Override
 	public final NetsimNetwork getNetsimNetwork() {
 		if ( this.netEngine != null ) {
-			return this.netEngine.getQNetwork() ;
+			return this.netEngine.getNetsimNetwork() ;
 		} else {
 			return null ;
 		}
@@ -764,7 +749,7 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 
 	@Override
 	public final VisNetwork getVisNetwork() {
-		return this.netEngine.getQNetwork() ;
+		return this.netEngine.getNetsimNetwork() ;
 	}
 
 	@Override
@@ -808,7 +793,11 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
 		return this.agentCounter;
 	}
 
-	public final void addDepartureHandler(final DepartureHandler departureHandler) {
+	protected final void addDepartureHandler(final DepartureHandler departureHandler) {
+		// either the engines add the departure handlers themselves, then this function needs to be public
+		// (and part of the interface)
+		// or the engines do not add the departure handlers themselves, but it is done explicitly in the NetsimImpl
+		// and then it is sufficient that this is protected (if inheritance is desired, otherwise package or private).
 		this.departureHandlers.add(departureHandler);
 	}
 

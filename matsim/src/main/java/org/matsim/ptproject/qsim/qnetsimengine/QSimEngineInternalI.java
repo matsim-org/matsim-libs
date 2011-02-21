@@ -33,7 +33,7 @@ abstract class QSimEngineInternalI extends NetElementActivator implements Netsim
 	
 	/** internally, we provide the full QNetwork */
 	@Override
-	abstract public QNetwork getQNetwork() ;
+	abstract public QNetwork getNetsimNetwork() ;
 
 	/** internally, we provide the full QSim */
 	@Override

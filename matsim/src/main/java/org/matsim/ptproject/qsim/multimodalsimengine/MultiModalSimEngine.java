@@ -30,13 +30,13 @@ import org.matsim.core.mobsim.framework.Steppable;
 import org.matsim.ptproject.qsim.interfaces.MobsimEngine;
 import org.matsim.ptproject.qsim.interfaces.NetsimLink;
 import org.matsim.ptproject.qsim.interfaces.NetsimNode;
-import org.matsim.ptproject.qsim.interfaces.Mobsim;
+import org.matsim.ptproject.qsim.interfaces.Netsim;
 import org.matsim.ptproject.qsim.multimodalsimengine.router.costcalculator.MultiModalTravelTime;
 import org.matsim.ptproject.qsim.multimodalsimengine.router.costcalculator.MultiModalTravelTimeCost;
 
 public class MultiModalSimEngine implements MobsimEngine, NetworkElementActivator, Steppable {
 
-	/*package*/ Mobsim qSim;
+	/*package*/ Netsim qSim;
 	/*package*/ MultiModalTravelTime multiModalTravelTime;
 	/*package*/ List<MultiModalQLinkExtension> allLinks = null;
 	/*package*/ List<MultiModalQLinkExtension> activeLinks;
@@ -46,7 +46,7 @@ public class MultiModalSimEngine implements MobsimEngine, NetworkElementActivato
 //	/*package*/ List<MultiModalQLinkExtension> linksToActivate;
 //	/*package*/ List<MultiModalQNodeExtension> nodesToActivate;
 
-	/*package*/ MultiModalSimEngine(Mobsim qSim) {
+	/*package*/ MultiModalSimEngine(Netsim qSim) {
 		this.qSim = qSim;
 		
 		activeLinks = new ArrayList<MultiModalQLinkExtension>();
@@ -60,7 +60,7 @@ public class MultiModalSimEngine implements MobsimEngine, NetworkElementActivato
 	}
 	
 	@Override
-	public Mobsim getMobsim() {
+	public Netsim getMobsim() {
 		return qSim;
 	}
 

@@ -26,7 +26,7 @@ import java.util.concurrent.CyclicBarrier;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.ptproject.qsim.interfaces.NetsimLink;
 import org.matsim.ptproject.qsim.interfaces.NetsimNode;
-import org.matsim.ptproject.qsim.interfaces.Mobsim;
+import org.matsim.ptproject.qsim.interfaces.Netsim;
 
 class ParallelMultiModalSimEngine extends MultiModalSimEngine {
 	
@@ -39,7 +39,7 @@ class ParallelMultiModalSimEngine extends MultiModalSimEngine {
 	private CyclicBarrier reactivateLinksBarrier;
 	private CyclicBarrier endBarrier;
 
-	ParallelMultiModalSimEngine(Mobsim sim) {
+	ParallelMultiModalSimEngine(Netsim sim) {
 		super(sim);
 		this.numOfThreads = this.getMobsim().getScenario().getConfig().getQSimConfigGroup().getNumberOfThreads();
 	}

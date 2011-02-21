@@ -22,7 +22,7 @@ package org.matsim.ptproject.qsim.qnetsimengine;
 import java.util.Random;
 
 import org.matsim.ptproject.qsim.QSim;
-import org.matsim.ptproject.qsim.interfaces.Mobsim;
+import org.matsim.ptproject.qsim.interfaces.Netsim;
 import org.matsim.ptproject.qsim.interfaces.NetsimEngine;
 import org.matsim.ptproject.qsim.interfaces.NetsimEngineFactory;
 
@@ -34,7 +34,7 @@ import org.matsim.ptproject.qsim.interfaces.NetsimEngineFactory;
 public class ParallelQSimEngineFactory implements NetsimEngineFactory {
 
 	@Override
-	public NetsimEngine createQSimEngine(Mobsim sim, Random random) {
+	public NetsimEngine createQSimEngine(Netsim sim, Random random) {
 		return new ParallelQSimEngine( (QSim) sim, random);
 	}
 

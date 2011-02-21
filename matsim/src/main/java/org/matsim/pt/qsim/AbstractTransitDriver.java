@@ -43,7 +43,7 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.ptproject.qsim.agents.PersonDriverAgentImpl;
-import org.matsim.ptproject.qsim.interfaces.Mobsim;
+import org.matsim.ptproject.qsim.interfaces.Netsim;
 import org.matsim.ptproject.qsim.qnetsimengine.QVehicle;
 
 public abstract class AbstractTransitDriver implements TransitDriverAgent, PassengerAccessEgress {
@@ -55,7 +55,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 	private int nextLinkIndex = 0;
 	private final TransitStopAgentTracker agentTracker;
 	private Person dummyPerson;
-	protected final Mobsim sim;
+	protected final Netsim sim;
 	private TransitRouteStop currentStop = null;
 	protected TransitRouteStop nextStop;
 	private ListIterator<TransitRouteStop> stopIterator;
@@ -69,7 +69,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 	@Override
 	public abstract double getActivityEndTime();
 
-	public AbstractTransitDriver(Mobsim sim, TransitStopAgentTracker agentTracker2) {
+	public AbstractTransitDriver(Netsim sim, TransitStopAgentTracker agentTracker2) {
 		super();
 		this.sim = sim;
 		this.agentTracker = agentTracker2;
@@ -160,7 +160,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 	public void notifyTeleportToLink(final Id linkId) {
 	}
 
-	Mobsim getSimulation(){
+	Netsim getSimulation(){
 		return this.sim;
 	}
 

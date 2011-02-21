@@ -46,7 +46,7 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.ptproject.qsim.interfaces.DepartureHandler;
-import org.matsim.ptproject.qsim.interfaces.Mobsim;
+import org.matsim.ptproject.qsim.interfaces.Netsim;
 import org.matsim.ptproject.qsim.interfaces.MobsimEngine;
 import org.matsim.ptproject.qsim.interfaces.NetsimLink;
 import org.matsim.vehicles.Vehicle;
@@ -71,7 +71,7 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine {
 
 	private static Logger log = Logger.getLogger(TransitQSimEngine.class);
 
-	private Mobsim qSim;
+	private Netsim qSim;
 
 	private TransitSchedule schedule = null;
 
@@ -85,7 +85,7 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine {
 
 	private AbstractTransitDriverFactory transitDriverFactory = new UmlaufDriverFactory();
 
-	public TransitQSimEngine(Mobsim queueSimulation) {
+	public TransitQSimEngine(Netsim queueSimulation) {
 		this.qSim = queueSimulation;
 		this.schedule = ((ScenarioImpl) queueSimulation.getScenario()).getTransitSchedule();
 		this.agentTracker = new TransitStopAgentTracker();
@@ -99,7 +99,7 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine {
 
 
 	@Override
-	public Mobsim getMobsim() {
+	public Netsim getMobsim() {
 		return this.qSim;
 	}
 

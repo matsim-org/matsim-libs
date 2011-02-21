@@ -32,7 +32,7 @@ import org.matsim.ptproject.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.ptproject.qsim.agents.ExperimentalBasicWithindayAgent;
 import org.matsim.ptproject.qsim.interfaces.NetsimLink;
 import org.matsim.ptproject.qsim.interfaces.NetsimNetwork;
-import org.matsim.ptproject.qsim.interfaces.Mobsim;
+import org.matsim.ptproject.qsim.interfaces.Netsim;
 
 
 /**
@@ -44,7 +44,7 @@ public class DgWithindayQPersonAgent extends ExperimentalBasicWithindayAgent {
 	private static final Logger log = Logger.getLogger(DgWithindayQPersonAgent.class);
 	private Random random;
 
-	public DgWithindayQPersonAgent(Person p, Mobsim simulation, Random r) {
+	public DgWithindayQPersonAgent(Person p, Netsim simulation, Random r) {
 		super(p, simulation);
 		random = r;
 	}

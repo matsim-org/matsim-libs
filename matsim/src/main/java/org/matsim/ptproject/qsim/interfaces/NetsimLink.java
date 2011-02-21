@@ -64,7 +64,7 @@ public interface NetsimLink extends Customizable, VisLink {
 	//	######################
 	// ok:
 	
-	public Mobsim getMobsim() ;
+	public Netsim getMobsim() ;
 
 
 	/**

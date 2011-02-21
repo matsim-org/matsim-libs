@@ -26,7 +26,7 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.SynchronizedEventsManagerImpl;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.pt.qsim.ComplexTransitStopHandlerFactory;
-import org.matsim.ptproject.qsim.interfaces.Mobsim;
+import org.matsim.ptproject.qsim.interfaces.Netsim;
 
 
 /**The MobsimFactory is necessary so that something can be passed to the controler which instantiates this.
@@ -40,7 +40,7 @@ public class QSimFactory implements MobsimFactory {
 	private final static Logger log = Logger.getLogger(QSimFactory.class);
 
 	@Override
-	public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
+	public Netsim createMobsim(Scenario sc, EventsManager eventsManager) {
 		if (sc.getConfig().getQSimConfigGroup() == null) {
 			throw new NullPointerException("There is no configuration set for the QSim. Please add the module 'qsim' to your config file.");
 		}

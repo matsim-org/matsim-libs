@@ -31,6 +31,10 @@ import java.util.concurrent.CyclicBarrier;
 
 import org.matsim.core.gbl.Gbl;
 import org.matsim.ptproject.qsim.QSim;
+import org.matsim.ptproject.qsim.interfaces.DepartureHandler;
+import org.matsim.ptproject.qsim.interfaces.NetsimLink;
+import org.matsim.ptproject.qsim.interfaces.NetsimNetworkFactory;
+import org.matsim.ptproject.qsim.interfaces.NetsimNode;
 
 public class QSimEngineRunner extends QSimEngineInternalI implements Runnable {
 
@@ -245,8 +249,19 @@ public class QSimEngineRunner extends QSimEngineInternalI implements Runnable {
 	}
 
 	@Override
-	public QNetwork getQNetwork() {
+	public QNetwork getNetsimNetwork() {
 		throw new UnsupportedOperationException("should never be called this way since this is just the runner");
+	}
+
+	@Override
+	public NetsimNetworkFactory<QNode,QLinkInternalI> getNetsimNetworkFactory() {
+		return new DefaultQNetworkFactory() ;
+	}
+
+	@Override
+	public DepartureHandler getDepartureHandler() {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException() ;
 	}
 
 }

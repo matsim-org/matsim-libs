@@ -28,7 +28,7 @@ import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.agents.ExperimentalBasicWithindayAgentFactory;
-import org.matsim.ptproject.qsim.interfaces.Mobsim;
+import org.matsim.ptproject.qsim.interfaces.Netsim;
 
 /**
  * @author nagel
@@ -51,7 +51,7 @@ public class MyMobsimFactory implements MobsimFactory {
 	@Override
 	public Simulation createMobsim(Scenario sc, EventsManager events) {
 
-		Mobsim mobsim = new QSim( sc, events ) ;
+		Netsim mobsim = new QSim( sc, events ) ;
 
 		if ( replanningType.equals( ReplanningType.general ) ) {
 			mobsim.addQueueSimulationListeners(new MyWithinDayMobsimListener(this.travCostCalc,this.travTimeCalc)) ;

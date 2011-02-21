@@ -43,7 +43,7 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.ptproject.qsim.QSim;
-import org.matsim.ptproject.qsim.interfaces.Mobsim;
+import org.matsim.ptproject.qsim.interfaces.Netsim;
 import org.matsim.ptproject.qsim.qnetsimengine.QVehicle;
 
 /**
@@ -63,7 +63,7 @@ public class PersonDriverAgentImpl implements PersonDriverAgent {
 
 	Id cachedNextLinkId = null;
 
-	private final Mobsim simulation;
+	private final Netsim simulation;
 
 	private double activityEndTime = Time.UNDEFINED_TIME;
 
@@ -81,7 +81,7 @@ public class PersonDriverAgentImpl implements PersonDriverAgent {
 	// ============================================================================================================================
 	// c'tor
 
-	public PersonDriverAgentImpl(final Person p, final Mobsim simulation) {
+	public PersonDriverAgentImpl(final Person p, final Netsim simulation) {
 		// yyyy this should, in my opinion, be protected since there is an interface.  kai, oct'10
 
 		this.person = p;
@@ -403,7 +403,7 @@ public class PersonDriverAgentImpl implements PersonDriverAgent {
 		return Collections.unmodifiableList( this.getExecutedPlan().getPlanElements() ) ;
 	}
 
-	public final Mobsim getMobsim(){
+	public final Netsim getMobsim(){
 		return this.simulation;
 	}
 

@@ -28,5 +28,5 @@ import java.util.Random;
  */
 public interface NetsimEngineFactory {
 	
-	public NetsimEngine createQSimEngine(final Mobsim sim, final Random random);
+	public NetsimEngine createQSimEngine(final Netsim sim, final Random random);
 }

@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.AgentStuckEventImpl;
-import org.matsim.ptproject.qsim.interfaces.Mobsim;
+import org.matsim.ptproject.qsim.interfaces.Netsim;
 import org.matsim.ptproject.qsim.qnetsimengine.QVehicle;
 import org.matsim.vis.snapshots.writers.VisData;
 import org.matsim.vis.snapshots.writers.VisNode;
@@ -119,7 +119,7 @@ class QueueNode implements VisNode {
 			}
 
 			// check if veh is stuck!
-			Mobsim qSim = this.queueNetwork.getMobsim() ;
+			Netsim qSim = this.queueNetwork.getMobsim() ;
 			Scenario sc = qSim.getScenario() ;
 			Config config = sc.getConfig() ;
 

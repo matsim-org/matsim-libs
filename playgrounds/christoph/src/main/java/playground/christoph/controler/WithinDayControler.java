@@ -39,7 +39,7 @@ import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.PersonalizableTravelTime;
-import org.matsim.ptproject.qsim.interfaces.Mobsim;
+import org.matsim.ptproject.qsim.interfaces.Netsim;
 
 import playground.christoph.withinday.events.algorithms.FixedOrderQueueSimulationListener;
 import playground.christoph.withinday.events.parallelEventsHandler.SimStepParallelEventsManagerImpl;
@@ -279,7 +279,7 @@ public class WithinDayControler extends Controler {
 
 		@Override
 		public void notifySimulationInitialized(SimulationInitializedEvent e) {
-			collectAgents((Mobsim) e.getQueueSimulation());
+			collectAgents((Netsim) e.getQueueSimulation());
 			setReplanningFlags();
 		}
 
@@ -346,7 +346,7 @@ public class WithinDayControler extends Controler {
 			log.info(leaveLinkReplanningCounter + " persons replan their plans at each node (" + leaveLinkReplanningCounter / numPersons * 100.0 + "%)");
 		}
 
-		protected void collectAgents(Mobsim sim) {
+		protected void collectAgents(Netsim sim) {
 			this.withinDayPersonAgents = new TreeMap<Id, WithinDayPersonAgent>();
 
 			for (MobsimAgent mobsimAgent : ((WithinDayQSim) sim).getAgents()) {

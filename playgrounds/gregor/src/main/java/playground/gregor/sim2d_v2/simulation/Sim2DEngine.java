@@ -29,7 +29,7 @@ import java.util.Map.Entry;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.framework.Steppable;
-import org.matsim.ptproject.qsim.interfaces.Mobsim;
+import org.matsim.ptproject.qsim.interfaces.Netsim;
 import org.matsim.ptproject.qsim.interfaces.MobsimEngine;
 
 import com.vividsolutions.jts.geom.MultiPolygon;
@@ -132,7 +132,7 @@ public class Sim2DEngine implements MobsimEngine, Steppable {
 	 * @see org.matsim.ptproject.qsim.interfaces.SimEngine#getQSim()
 	 */
 	@Override
-	public Mobsim getMobsim() {
+	public Netsim getMobsim() {
 		return this.sim;
 	}
 

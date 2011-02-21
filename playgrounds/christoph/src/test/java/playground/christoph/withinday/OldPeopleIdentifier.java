@@ -8,13 +8,13 @@ import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.ptproject.qsim.agents.WithinDayAgent;
-import org.matsim.ptproject.qsim.interfaces.Mobsim;
+import org.matsim.ptproject.qsim.interfaces.Netsim;
 
 import playground.christoph.withinday.replanning.identifiers.interfaces.DuringActivityIdentifier;
 
 public class OldPeopleIdentifier extends DuringActivityIdentifier {
 
-	private Mobsim mobsim;
+	private Netsim mobsim;
 
 	@Override
 	public Set<WithinDayAgent> getAgentsToReplan(double time, Id withinDayReplannerId) {
@@ -38,7 +38,7 @@ public class OldPeopleIdentifier extends DuringActivityIdentifier {
 		return set;
 	}
 
-	/*package*/ OldPeopleIdentifier(Mobsim mobsim) {
+	/*package*/ OldPeopleIdentifier(Netsim mobsim) {
 		this.mobsim = mobsim;
 	}
 

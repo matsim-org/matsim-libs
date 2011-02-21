@@ -50,7 +50,7 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.interfaces.NetsimLink;
-import org.matsim.ptproject.qsim.interfaces.Mobsim;
+import org.matsim.ptproject.qsim.interfaces.Netsim;
 import org.matsim.ptproject.qsim.interfaces.NetsimNetwork;
 
 /**
@@ -102,7 +102,7 @@ public class LinkReplanningMap implements LinkEnterEventHandler,
 		init();
 	}
 	
-	public LinkReplanningMap(EventsManager eventsManager, Mobsim sim) {
+	public LinkReplanningMap(EventsManager eventsManager, Netsim sim) {
 		eventsManager.addHandler(this);
 		sim.addQueueSimulationListeners(this);
 		init();
@@ -115,7 +115,7 @@ public class LinkReplanningMap implements LinkEnterEventHandler,
 	@Override
 	public void notifySimulationInitialized(SimulationInitializedEvent e) {
 
-		Mobsim sim = (Mobsim) e.getQueueSimulation();
+		Netsim sim = (Netsim) e.getQueueSimulation();
 
 		// Update Reference to QNetwork
 		this.netsimNetwork = sim.getNetsimNetwork();

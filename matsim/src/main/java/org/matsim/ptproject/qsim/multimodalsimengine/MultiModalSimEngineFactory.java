@@ -24,14 +24,14 @@ import org.apache.log4j.Logger;
 import org.matsim.ptproject.qsim.interfaces.NetsimLink;
 import org.matsim.ptproject.qsim.interfaces.NetsimNetwork;
 import org.matsim.ptproject.qsim.interfaces.NetsimNode;
-import org.matsim.ptproject.qsim.interfaces.Mobsim;
+import org.matsim.ptproject.qsim.interfaces.Netsim;
 import org.matsim.ptproject.qsim.qnetsimengine.QNode;
 
 public class MultiModalSimEngineFactory {
 
 	final private static Logger log = Logger.getLogger(MultiModalSimEngineFactory.class);
 	
-	public MultiModalSimEngine createMultiModalSimEngine(Mobsim sim) {
+	public MultiModalSimEngine createMultiModalSimEngine(Netsim sim) {
 		
 		MultiModalSimEngine simEngine;
 		

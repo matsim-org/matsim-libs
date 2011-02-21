@@ -32,7 +32,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationListener;
-import org.matsim.ptproject.qsim.interfaces.Mobsim;
+import org.matsim.ptproject.qsim.interfaces.Netsim;
 
 import playground.christoph.withinday.replanning.identifiers.interfaces.AgentsToReplanIdentifier;
 import playground.christoph.withinday.replanning.replanners.interfaces.WithinDayReplanner;
@@ -169,7 +169,7 @@ public abstract class ParallelReplanner<T extends WithinDayReplanner<? extends A
 	public final void notifySimulationInitialized(SimulationInitializedEvent e) {
 
 		for (ReplanningThread replanningThread : this.replanningThreads) {
-			replanningThread.setAgentCounter(((Mobsim) e.getQueueSimulation()).getAgentCounter());
+			replanningThread.setAgentCounter(((Netsim) e.getQueueSimulation()).getAgentCounter());
 		}
 	}
 	

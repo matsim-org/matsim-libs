@@ -22,7 +22,7 @@ package playground.gregor.sim2d_v2.simulation;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.ptproject.qsim.agents.PersonDriverAgentImpl;
-import org.matsim.ptproject.qsim.interfaces.Mobsim;
+import org.matsim.ptproject.qsim.interfaces.Netsim;
 
 import playground.gregor.sim2d_v2.simulation.floor.Force;
 
@@ -48,7 +48,7 @@ public class Agent2D extends PersonDriverAgentImpl {
 	 * @param p
 	 * @param sim2d
 	 */
-	public Agent2D(Person p, Mobsim sim2d) {
+	public Agent2D(Person p, Netsim sim2d) {
 		super(p, sim2d);
 
 		// TODO think about this

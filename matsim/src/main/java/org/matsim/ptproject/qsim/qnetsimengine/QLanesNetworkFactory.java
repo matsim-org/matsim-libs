@@ -23,6 +23,8 @@ package org.matsim.ptproject.qsim.qnetsimengine;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.lanes.LaneDefinitions;
+import org.matsim.ptproject.qsim.interfaces.Netsim;
+import org.matsim.ptproject.qsim.interfaces.NetsimNetwork;
 import org.matsim.ptproject.qsim.interfaces.NetsimNetworkFactory;
 import org.matsim.ptproject.qsim.interfaces.NetsimEngine;
 
@@ -53,6 +55,13 @@ public class QLanesNetworkFactory implements NetsimNetworkFactory<QNode, QLinkIn
 	@Override
 	public QNode createNetsimNode(Node node, NetsimEngine simEngine) {
 		return this.delegate.createNetsimNode(node, simEngine);
+	}
+
+	@Override
+	public NetsimNetwork createNetsimNetwork(Netsim mobsim) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException() ;
+		// yyyyyy this works via hack (using a static method in QSim).  Should be fixed ...
 	}
 
 }

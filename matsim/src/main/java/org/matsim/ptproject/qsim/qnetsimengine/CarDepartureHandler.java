@@ -30,7 +30,7 @@ import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.ptproject.qsim.interfaces.DepartureHandler;
 
-public class CarDepartureHandler implements DepartureHandler {
+class CarDepartureHandler implements DepartureHandler {
 
 	/*
 	 * What to do when some agent wants to drive their vehicle but it isn't there.
@@ -47,9 +47,10 @@ public class CarDepartureHandler implements DepartureHandler {
 
 	private VehicleBehavior vehicleBehavior;
 	
-	public CarDepartureHandler(QSim queueSimulation, VehicleBehavior vehicleBehavior) {
+	CarDepartureHandler(QSim queueSimulation, VehicleBehavior vehicleBehavior) {
 		// yyyy I don't understand why we need to explicitly instantiate this in the qsim; seems to me that this should come for 
 		// free from the netsim engine (i.e. the engines should provide their departure handlers).  kai, aug'10
+		// seems to be resolved now.  kai, feb'11
 		this.queueSimulation = queueSimulation;
 		this.vehicleBehavior = vehicleBehavior;
 	}

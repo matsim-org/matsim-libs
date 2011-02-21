@@ -8,14 +8,14 @@ import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.ptproject.qsim.agents.WithinDayAgent;
 import org.matsim.ptproject.qsim.interfaces.NetsimLink;
-import org.matsim.ptproject.qsim.interfaces.Mobsim;
+import org.matsim.ptproject.qsim.interfaces.Netsim;
 import org.matsim.ptproject.qsim.qnetsimengine.QVehicle;
 
 import playground.christoph.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
 
 public class YoungPeopleIdentifier extends DuringLegIdentifier {
 
-	private Mobsim queueSim;
+	private Netsim queueSim;
 
 	@Override
 	public Set<WithinDayAgent> getAgentsToReplan(double time, Id withinDayReplannerId) {
@@ -45,7 +45,7 @@ public class YoungPeopleIdentifier extends DuringLegIdentifier {
 		return set;
 	}
 	
-	YoungPeopleIdentifier(Mobsim queueSim) {
+	YoungPeopleIdentifier(Netsim queueSim) {
 		this.queueSim = queueSim;
 	}
 }

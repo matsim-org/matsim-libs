@@ -28,7 +28,11 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Random;
 
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.ptproject.qsim.QSim;
+import org.matsim.ptproject.qsim.interfaces.DepartureHandler;
+import org.matsim.ptproject.qsim.interfaces.NetsimNetworkFactory;
+import org.matsim.ptproject.qsim.qnetsimengine.CarDepartureHandler.VehicleBehavior;
 
 /**
  * Coordinates the movement of vehicles on the links and the nodes.
@@ -80,12 +84,29 @@ public class QSimEngineImpl extends QSimEngineInternalI {
 	private final AgentSnapshotInfoBuilder positionInfoBuilder;
 	private QNetwork qNetwork;
 	private final double stucktimeCache;
+	private final DepartureHandler dpHandler ;
 
 	public QSimEngineImpl(final QSim sim, final Random random) {
 		this.random = random;
 		this.qsim = sim;
 		this.positionInfoBuilder = new AgentSnapshotInfoBuilder( sim.getScenario() );
 		this.stucktimeCache = sim.getScenario().getConfig().getQSimConfigGroup().getStuckTime();
+		
+		// configuring the car departure hander (including the vehicle behavior)
+		QSimConfigGroup qSimConfigGroup = this.qsim.getScenario().getConfig().getQSimConfigGroup();
+		VehicleBehavior vehicleBehavior;
+		if (qSimConfigGroup.getVehicleBehavior().equals(QSimConfigGroup.VEHICLE_BEHAVIOR_EXCEPTION)) {
+			vehicleBehavior = VehicleBehavior.EXCEPTION;
+		} else if (qSimConfigGroup.getVehicleBehavior().equals(QSimConfigGroup.VEHICLE_BEHAVIOR_TELEPORT)) {
+			vehicleBehavior = VehicleBehavior.TELEPORT;
+		} else if (qSimConfigGroup.getVehicleBehavior().equals(QSimConfigGroup.VEHICLE_BEHAVIOR_WAIT)) {
+			vehicleBehavior = VehicleBehavior.WAIT_UNTIL_IT_COMES_ALONG;
+		} else {
+			throw new RuntimeException("Unknown vehicle behavior option.");
+		}
+		dpHandler = new CarDepartureHandler(this.qsim, vehicleBehavior);
+		
+		// yyyyyy I am quite sceptic if the following should stay since it does not work.  kai, feb'11
 		if ( "queue".equals( sim.getScenario().getConfig().getQSimConfigGroup().getTrafficDynamics() ) ) {
 			QLinkImpl.HOLES=false ;
 		} else if ( "withHolesExperimental".equals( sim.getScenario().getConfig().getQSimConfigGroup().getTrafficDynamics() ) ) {
@@ -98,8 +119,8 @@ public class QSimEngineImpl extends QSimEngineInternalI {
 
 	@Override
 	public void onPrepareSim() {
-		this.allLinks = new ArrayList<QLinkInternalI>(this.getQNetwork().getNetsimLinks().values());
-		this.allNodes = new ArrayList<QNode>(this.getQNetwork().getNetsimNodes().values());
+		this.allLinks = new ArrayList<QLinkInternalI>(this.getNetsimNetwork().getNetsimLinks().values());
+		this.allNodes = new ArrayList<QNode>(this.getNetsimNetwork().getNetsimNodes().values());
 		if (useNodeArray) {
 			this.simNodesArray = this.qsim.getNetsimNetwork().getNetsimNodes().values().toArray(new QNode[this.qsim.getNetsimNetwork().getNetsimNodes().values().size()]);
 			//dg[april08] as the order of nodes has an influence on the simulation
@@ -247,7 +268,7 @@ public class QSimEngineImpl extends QSimEngineInternalI {
 	}
 
 	@Override
-	public QNetwork getQNetwork() {
+	public QNetwork getNetsimNetwork() {
 		return this.qNetwork ;
 	}
 
@@ -256,6 +277,16 @@ public class QSimEngineImpl extends QSimEngineInternalI {
 	 */
 	double getStuckTime() {
 		return this.stucktimeCache ;
+	}
+
+	@Override
+	public NetsimNetworkFactory<QNode, QLinkInternalI> getNetsimNetworkFactory() {
+		return new DefaultQNetworkFactory() ;
+	}
+
+	@Override
+	public DepartureHandler getDepartureHandler() {
+		return dpHandler;
 	}
 
 }

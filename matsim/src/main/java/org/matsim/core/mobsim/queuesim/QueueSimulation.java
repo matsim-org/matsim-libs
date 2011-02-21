@@ -65,7 +65,7 @@ import org.matsim.ptproject.qsim.comparators.TeleportationArrivalTimeComparator;
 import org.matsim.ptproject.qsim.helpers.AgentCounter;
 import org.matsim.ptproject.qsim.interfaces.AcceptsVisMobsimFeatures;
 import org.matsim.ptproject.qsim.interfaces.AgentCounterI;
-import org.matsim.ptproject.qsim.interfaces.Mobsim;
+import org.matsim.ptproject.qsim.interfaces.Netsim;
 import org.matsim.ptproject.qsim.interfaces.MobsimTimerI;
 import org.matsim.ptproject.qsim.interfaces.NetsimNetwork;
 import org.matsim.ptproject.qsim.qnetsimengine.QVehicle;
@@ -92,7 +92,7 @@ import org.matsim.vis.snapshots.writers.VisNetwork;
  * @author mrieser
  * @author dgrether
  */
-public class QueueSimulation implements IOSimulation, ObservableSimulation, VisMobsim, AcceptsVisMobsimFeatures, Mobsim {
+public class QueueSimulation implements IOSimulation, ObservableSimulation, VisMobsim, AcceptsVisMobsimFeatures, Netsim {
 	// yyyy not sure if I want this public but something has to give for integration with OTFVis.  kai, may'10
 
 	private int snapshotPeriod = 0;

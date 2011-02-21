@@ -22,7 +22,7 @@ package playground.gregor.sim2d_v2.simulation;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.internal.MatsimFactory;
 import org.matsim.ptproject.qsim.agents.PersonDriverAgentImpl;
-import org.matsim.ptproject.qsim.interfaces.Mobsim;
+import org.matsim.ptproject.qsim.interfaces.Netsim;
 
 /**
  * @author laemmel
@@ -30,9 +30,9 @@ import org.matsim.ptproject.qsim.interfaces.Mobsim;
  */
 public class Agent2DFactory implements MatsimFactory {
 
-	private final Mobsim sim;
+	private final Netsim sim;
 
-	public Agent2DFactory(Mobsim sim) {
+	public Agent2DFactory(Netsim sim) {
 		this.sim = sim;
 	}
 

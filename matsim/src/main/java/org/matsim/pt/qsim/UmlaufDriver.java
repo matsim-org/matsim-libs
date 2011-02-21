@@ -41,7 +41,7 @@ import org.matsim.pt.UmlaufStueckI;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.ptproject.qsim.interfaces.Mobsim;
+import org.matsim.ptproject.qsim.interfaces.Netsim;
 
 
 /**
@@ -89,7 +89,7 @@ public class UmlaufDriver extends AbstractTransitDriver {
 
 	public UmlaufDriver(Umlauf umlauf,
 			String transportMode,
-			TransitStopAgentTracker thisAgentTracker, Mobsim transitQueueSimulation) {
+			TransitStopAgentTracker thisAgentTracker, Netsim transitQueueSimulation) {
 		super(transitQueueSimulation, thisAgentTracker);
 		this.umlauf = umlauf;
 		this.iUmlaufStueck = this.umlauf.getUmlaufStuecke().iterator();

@@ -20,16 +20,16 @@
 
 package playground.christoph.withinday2;
 
-import org.matsim.ptproject.qsim.interfaces.Mobsim;
+import org.matsim.ptproject.qsim.interfaces.Netsim;
 
 import playground.christoph.withinday.replanning.identifiers.interfaces.DuringActivityIdentifier;
 import playground.christoph.withinday.replanning.identifiers.interfaces.DuringActivityIdentifierFactory;
 
 public class OldPeopleIdentifierFactory implements DuringActivityIdentifierFactory {
 
-	private Mobsim mobsim;
+	private Netsim mobsim;
 	
-	public OldPeopleIdentifierFactory(Mobsim mobsim) {
+	public OldPeopleIdentifierFactory(Netsim mobsim) {
 		this.mobsim = mobsim;
 	}
 	

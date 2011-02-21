@@ -31,5 +31,7 @@ public interface NetsimNetworkFactory<QN extends NetsimNode, QL extends NetsimLi
 	public QN createNetsimNode(Node node, NetsimEngine simEngine);
 
 	public QL createNetsimLink(Link link, NetsimEngine simEngine, QN queueNode);
+	
+	public NetsimNetwork createNetsimNetwork( Netsim mobsim ) ;
 
 }

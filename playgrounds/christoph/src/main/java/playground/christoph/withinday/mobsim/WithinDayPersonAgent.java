@@ -22,13 +22,13 @@ package playground.christoph.withinday.mobsim;
 
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.ptproject.qsim.agents.ExperimentalBasicWithindayAgent;
-import org.matsim.ptproject.qsim.interfaces.Mobsim;
+import org.matsim.ptproject.qsim.interfaces.Netsim;
 
 public class WithinDayPersonAgent extends ExperimentalBasicWithindayAgent {
 	
 	private ReplannerAdministrator replannerAdministrator;
 	
-	public WithinDayPersonAgent(Person p, Mobsim simulation) {
+	public WithinDayPersonAgent(Person p, Netsim simulation) {
 		super(p, simulation);
 		this.replannerAdministrator = new ReplannerAdministrator();
 	}

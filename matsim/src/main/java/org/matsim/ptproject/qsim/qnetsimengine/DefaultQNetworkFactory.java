@@ -22,9 +22,10 @@ package org.matsim.ptproject.qsim.qnetsimengine;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.ptproject.qsim.QSim;
-import org.matsim.ptproject.qsim.interfaces.NetsimNetworkFactory;
-import org.matsim.ptproject.qsim.interfaces.NetsimNetwork;
+import org.matsim.ptproject.qsim.interfaces.Netsim;
 import org.matsim.ptproject.qsim.interfaces.NetsimEngine;
+import org.matsim.ptproject.qsim.interfaces.NetsimNetwork;
+import org.matsim.ptproject.qsim.interfaces.NetsimNetworkFactory;
 
 
 /**
@@ -47,8 +48,13 @@ public final class DefaultQNetworkFactory implements NetsimNetworkFactory<QNode,
 		return new QNetwork(qs, factory);
 	}
 
-	public static NetsimNetwork createQNetwork(QSim qs) {
-		return new QNetwork(qs);
+//	public static NetsimNetwork staticCreateQNetwork(QSim qs) {
+//		return new QNetwork(qs);
+//	}
+	
+	public NetsimNetwork createNetsimNetwork( Netsim mobsim ) {
+		QSim qsim = (QSim) mobsim ; // cast needs to be ok in order to make this work
+		return new QNetwork( qsim ) ;
 	}
 
 }

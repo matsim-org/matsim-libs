@@ -23,7 +23,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.framework.events.SimulationBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
-import org.matsim.ptproject.qsim.interfaces.Mobsim;
+import org.matsim.ptproject.qsim.interfaces.Netsim;
 import org.matsim.ptproject.qsim.interfaces.NetsimLink;
 import org.matsim.ptproject.qsim.interfaces.NetsimNetwork;
 import org.matsim.ptproject.qsim.qnetsimengine.QLane;
@@ -50,7 +50,7 @@ public class QSimSignalEngine implements SignalEngine {
 
 	@Override
 	public void notifySimulationInitialized(SimulationInitializedEvent e) {
-		this.initializeSignalizedItems(((Mobsim)e.getQueueSimulation()));
+		this.initializeSignalizedItems(((Netsim)e.getQueueSimulation()));
 	}
 
 
@@ -59,7 +59,7 @@ public class QSimSignalEngine implements SignalEngine {
 		this.signalManager.requestControlUpdate(e.getSimulationTime());
 	}
 	
-	private void initializeSignalizedItems(Mobsim qSim) {
+	private void initializeSignalizedItems(Netsim qSim) {
 		NetsimNetwork net = qSim.getNetsimNetwork();
 		for (SignalSystem system : this.signalManager.getSignalSystems().values()){
 			for (Signal signal : system.getSignals().values()){

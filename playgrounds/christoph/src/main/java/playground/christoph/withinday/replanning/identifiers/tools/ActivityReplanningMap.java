@@ -45,7 +45,7 @@ import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationAfterSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
 import org.matsim.ptproject.qsim.QSim;
-import org.matsim.ptproject.qsim.interfaces.Mobsim;
+import org.matsim.ptproject.qsim.interfaces.Netsim;
 
 /*
  * This Module is used by a NextLegReplanner. It calculates the time
@@ -97,7 +97,7 @@ public class ActivityReplanningMap implements AgentStuckEventHandler,
 		init();
 	}
 	
-	public ActivityReplanningMap(EventsManager eventsManager, Mobsim mobsim) {
+	public ActivityReplanningMap(EventsManager eventsManager, Netsim mobsim) {
 		eventsManager.addHandler(this);
 		mobsim.addQueueSimulationListeners(this);
 		init();
@@ -120,7 +120,7 @@ public class ActivityReplanningMap implements AgentStuckEventHandler,
 	@Override
 	public void notifySimulationInitialized(SimulationInitializedEvent e) {
 		
-		Mobsim sim = (Mobsim) e.getQueueSimulation();
+		Netsim sim = (Netsim) e.getQueueSimulation();
 
 		personAgentMapping = new HashMap<Id, PersonAgent>();
 
