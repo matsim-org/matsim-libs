@@ -23,7 +23,6 @@ public class SfAirNetworkBuilder {
 	 * @param args
 	 * @throws IOException 
 	 */
-	@SuppressWarnings("deprecation")
 	public static void main(String[] args) throws IOException {
 		// TODO Auto-generated method stub
 		
