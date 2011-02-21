@@ -35,6 +35,7 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.xml.sax.SAXException;
 
 import playground.andreas.P.init.CreateInitialTimeSchedule;
+import playground.andreas.P.init.PConfigGroup;
 import playground.andreas.osmBB.extended.TransitScheduleImpl;
 import playground.andreas.utils.pt.TransitScheduleCleaner;
 
@@ -42,16 +43,18 @@ public class ReplanTimeSchedule {
 	
 	private TreeMap<Id, SchedulePlans> population = new TreeMap<Id, SchedulePlans>();
 	
-	public void replan(NetworkImpl net, String eventsFile, String transitScheduleInFile, String transitScheduleOutFile, int numberOfPlans){
+	public void replan(PConfigGroup pConfig, NetworkImpl net){
+		
+		String eventsFile = pConfig.getCurrentOutputBase() + "ITERS/it.0/0.events.xml.gz";
 		
 		try {
 			TransitSchedule inSchedule = new TransitScheduleImpl(new TransitScheduleFactoryImpl());
-			new TransitScheduleReaderV1(inSchedule, net).readFile(transitScheduleInFile);			
+			new TransitScheduleReaderV1(inSchedule, net).readFile(pConfig.getCurrentOutputBase() + "transitSchedule.xml");			
 			TreeMap<Id, Double> scores = ScorePlans.scorePlans(eventsFile, net);
 			
 			for (Entry<Id, TransitLine> entry : inSchedule.getTransitLines().entrySet()) {
 				if(this.population.get(entry.getKey()) == null){
-					this.population.put(entry.getKey(), new SchedulePlans(entry.getKey(), numberOfPlans));
+					this.population.put(entry.getKey(), new SchedulePlans(entry.getKey(), pConfig.getNumberOfPlans()));
 				}
 				
 				this.population.get(entry.getKey()).addTransitPlan(entry.getValue(), scores.get(entry.getKey()));
@@ -66,7 +69,7 @@ public class ReplanTimeSchedule {
 					inSchedule.addTransitLine(CreateInitialTimeSchedule.createSingleTransitLine(net, inSchedule, plan.getAgentId()));
 				}				
 			}			
-			new TransitScheduleWriterV1(inSchedule).write(transitScheduleOutFile);
+			new TransitScheduleWriterV1(inSchedule).write(pConfig.getNextOutputBase() + "transitSchedule.xml");
 			
 		} catch (SAXException e) {
 			// TODO Auto-generated catch block

@@ -39,6 +39,7 @@ import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
+import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.pt.transitSchedule.TransitScheduleWriterV1;
 import org.matsim.pt.transitSchedule.api.Departure;
@@ -63,8 +64,14 @@ public class CreateInitialTimeSchedule {
 	private TransitSchedule tS;
 	private int numberOfAgents;
 	
-	public static void createInitialTimeSchedule(String networkInFile, String transitScheduleOutFile, String vehiclesOutFile, int gridDistance, Coord minXY, Coord maxXY, int numberOfAgents){
-		CreateInitialTimeSchedule cITS = new CreateInitialTimeSchedule(networkInFile, transitScheduleOutFile, vehiclesOutFile, gridDistance, minXY, maxXY, numberOfAgents);
+	public static void createInitialTimeSchedule(PConfigGroup pConfig){
+		
+		String transitScheduleOutFile = pConfig.getCurrentOutputBase() + "transitSchedule.xml";
+		String vehiclesOutFile  = pConfig.getCurrentOutputBase() + "transitVehicles.xml";
+		Coord minXY = new CoordImpl(pConfig.getMinX(), pConfig.getMinY());
+		Coord maxXY = new CoordImpl(pConfig.getMaxX(), pConfig.getMaxY());
+		
+		CreateInitialTimeSchedule cITS = new CreateInitialTimeSchedule(pConfig.getNetwork(), transitScheduleOutFile, vehiclesOutFile, pConfig.getGridDistance(), minXY, maxXY, pConfig.getNumberOfAgents());
 		cITS.run();
 		cITS.writeTransitSchedule(transitScheduleOutFile);
 		cITS.writeVehicles(vehiclesOutFile);
@@ -115,7 +122,7 @@ public class CreateInitialTimeSchedule {
 		}
 	}
 
-	public CreateInitialTimeSchedule(String networkInFile, String transitScheduleOutFile, String vehiclesOutFile, int gridDistance, Coord minXY, Coord maxXY, int numberOfAgents) {
+	public CreateInitialTimeSchedule(String networkInFile, String transitScheduleOutFile, String vehiclesOutFile, double gridDistance, Coord minXY, Coord maxXY, int numberOfAgents) {
 		ScenarioImpl sc = new ScenarioImpl();
 		MatsimNetworkReader netReader = new MatsimNetworkReader(sc);
 		netReader.readFile(networkInFile);		

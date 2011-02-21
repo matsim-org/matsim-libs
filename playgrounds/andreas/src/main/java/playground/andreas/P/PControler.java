@@ -20,10 +20,12 @@ import org.matsim.pt.transitSchedule.TransitScheduleWriterV1;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.QSimFactory;
+import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vis.otfvis.OTFVisMobsimFeature;
 
 import playground.andreas.P.init.CreateInitialTimeSchedule;
 import playground.andreas.P.init.CreateStops;
+import playground.andreas.P.init.PConfigGroup;
 import playground.andreas.P.replan.ReplanTimeSchedule;
 import playground.andreas.bvgScoringFunction.BvgScoringFunctionConfigGroup;
 import playground.andreas.bvgScoringFunction.BvgScoringFunctionFactory;
@@ -85,26 +87,28 @@ public class PControler extends Controler {
 		
 		try {
 			
-			String baseDir = "F:/pTest/";
-			
 			for (int i = 0; i < 10; i++) {
-				
-				// create output dir
-				String outPutBase = baseDir + "_out/" + "it." + i + "/"; 
-
-				String transitScheduleOutFile = outPutBase + "transitSchedule.xml";
-				String vehiclesOutFile  = baseDir + "_in/"+ "transitVehicles.xml";
 				
 				// reading the config file:
 				config = ConfigUtils.loadConfig(configFile);
-				config.setParam("transit", "transitScheduleFile", transitScheduleOutFile);
+				
+				String currentOutputBase = config.getParam("controler", "outputDirectory") + "it." + i + "/";
+				String nextOutputBase = config.getParam("controler", "outputDirectory") + "it." + (i+1) + "/";
+				
+				PConfigGroup pConfig = new PConfigGroup(config);
+				pConfig.setCurrentOutPutBase(currentOutputBase);
+				pConfig.setNextOutPutBase(nextOutputBase);				
+				
+				String transitScheduleOutFile = pConfig.getCurrentOutputBase() + "transitSchedule.xml";
+				config.setParam("transit", "transitScheduleFile", transitScheduleOutFile);				
+				config.setParam("controler", "outputDirectory", currentOutputBase);
+				String vehiclesOutFile  = pConfig.getCurrentOutputBase() + "transitVehicles.xml";
 				config.setParam("transit", "vehiclesFile", vehiclesOutFile);
-				config.setParam("controler", "outputDirectory", outPutBase);
 				
 				if(i == 0) {
-					File outDir = new File(outPutBase);
-					outDir.mkdir();
-					CreateInitialTimeSchedule.createInitialTimeSchedule(config.getParam("network", "inputNetworkFile"), transitScheduleOutFile, vehiclesOutFile, 1500, new CoordImpl(0, 0), new CoordImpl(6000, 6000), 100);
+					File currentOutDir = new File(currentOutputBase);
+					currentOutDir.mkdir();
+					CreateInitialTimeSchedule.createInitialTimeSchedule(pConfig);
 				}
 				
 				// reading the scenario (based on the config):
@@ -120,10 +124,12 @@ public class PControler extends Controler {
 //				tc.setCreateGraphs(false);
 				tc.run();
 				
-				File outDir = new File(baseDir + "_out/" + "it." + (i+1) + "/");
-				outDir.mkdir();
+				File nextOutDir = new File(pConfig.getNextOutputBase());
+				nextOutDir.mkdir();
 				ReplanTimeSchedule replanTS = new ReplanTimeSchedule();
-				replanTS.replan(sc.getNetwork(), outPutBase + "ITERS/it.0/0.events.xml.gz", transitScheduleOutFile, baseDir + "_out/" + "it." + (i+1) + "/"  + "transitSchedule.xml", 4);
+				replanTS.replan(pConfig, sc.getNetwork());
+				
+				new VehicleWriterV1(sc.getVehicles()).writeFile(pConfig.getNextOutputBase() + "transitVehicles.xml");
 			}
 			
 		} catch (IOException e) {

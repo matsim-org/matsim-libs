@@ -32,20 +32,20 @@ import playground.andreas.osmBB.extended.TransitScheduleImpl;
 public class CreateStops {
 	
 	private final NetworkImpl net;
-	private final int gridDistance;
+	private final double gridDistance;
 	private final Coord minXY;
 	private final Coord maxXY;
 	
 	private TransitSchedule transitSchedule;
 	
-	public CreateStops(NetworkImpl net, int gridDistance, Coord minXY, Coord maxXY) {
+	public CreateStops(NetworkImpl net, double gridDistance, Coord minXY, Coord maxXY) {
 		this.net = net;
 		this.gridDistance = gridDistance;
 		this.minXY = minXY;
 		this.maxXY = maxXY;		
 	}
 
-	public static TransitSchedule createStops(NetworkImpl network, int gridDistance, Coord minXY, Coord maxXY){
+	public static TransitSchedule createStops(NetworkImpl network, double gridDistance, Coord minXY, Coord maxXY){
 		CreateStops cS = new CreateStops(network, gridDistance, minXY, maxXY);
 		cS.run();
 		return cS.getTransitSchedule();
