@@ -29,7 +29,7 @@ public class SfAirScheduleBuilder {
 		SfAirScheduleBuilder builder = new SfAirScheduleBuilder();
 		builder.filterEurope("/home/soeren/workspace/airports.osm", "/home/soeren/Downloads/OAGSEP09.CSV", 
 				"/home/soeren/workspace/OsmTest.txt", "/home/soeren/workspace/OagTest.txt", "/home/soeren/workspace/missingAirports.txt", 
-				"/home/soeren/workspace/cityPairs.txt", "/home/soeren/workspace/aircraft.txt");
+				"/home/soeren/workspace/cityPairs.txt");
 
 	}
 	
@@ -38,11 +38,10 @@ public class SfAirScheduleBuilder {
 	protected Map<String, Double> routes = new HashMap<String, Double>();
 	protected Map<String, Integer> missingAirports = new HashMap<String, Integer>();
 	protected Map<String, Double> cityPairDistance = new HashMap<String, Double>();
-	protected Map<String, Integer> aircraftTypes = new HashMap<String, Integer>();
 	
 	
 	@SuppressWarnings("unchecked")
-	public void filterEurope(String inputOsm, String inputOag, String outputOsm, String outputOag, String outputMissingAirports, String cityPairs, String aircraft) throws IOException, SAXException, ParserConfigurationException {
+	public void filterEurope(String inputOsm, String inputOag, String outputOsm, String outputOag, String outputMissingAirports, String cityPairs) throws IOException, SAXException, ParserConfigurationException {
 		
 		
 		SfOsmAerowayParser osmReader = new SfOsmAerowayParser(TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84,
@@ -63,9 +62,7 @@ public class SfAirScheduleBuilder {
 		BufferedWriter bwOsm = new BufferedWriter(new FileWriter(new File(outputOsm)));
 		BufferedWriter bwMissing = new BufferedWriter(new FileWriter(new File(outputMissingAirports)));
 		BufferedWriter bwcityPairs = new BufferedWriter(new FileWriter(new File(cityPairs)));
-		BufferedWriter bwAircraft = new BufferedWriter(new FileWriter(new File(aircraft)));
 		Map<String, String> flights = new HashMap<String, String>();
-		String flight = "";
 		int lines = 0;
 
 		
@@ -83,14 +80,6 @@ public class SfAirScheduleBuilder {
 			
 				String originCountry = lineEntries[6];
 				String destinationCountry = lineEntries[9];
-				String hours = lineEntries[13].substring(0, 3);
-				String minutes = lineEntries[13].substring(3);
-				String carrier = lineEntries[0];
-				String flightNumber = lineEntries[1];
-				double durationMinutes = Double.parseDouble(minutes)*60;	//convert flight dur minutes into seconds
-				double durationHours = Double.parseDouble(hours)*3600;
-				double duration = durationHours+durationMinutes;
-				double departureInSec = Double.parseDouble(lineEntries[10].substring(2))*60+Double.parseDouble(lineEntries[10].substring(0, 2))*3600;
 				boolean origin = false; boolean destination = false;
 
 			
@@ -105,17 +94,27 @@ public class SfAirScheduleBuilder {
 				
 				if (lineEntries[47].contains("O") || lineEntries[43].equalsIgnoreCase("")) {
 					
-						flightNumber = flightNumber.replaceAll(" ", "0");		
-						flight=carrier+flightNumber;
-						int seatsAvail = Integer.parseInt(lineEntries[23]);
+						String hours = lineEntries[13].substring(0, 3);
+						String minutes = lineEntries[13].substring(3);				
+						double durationMinutes = Double.parseDouble(minutes)*60;	//convert flight dur minutes into seconds
+						double durationHours = Double.parseDouble(hours)*3600;
+						double duration = durationHours+durationMinutes;
+						double departureInSec = Double.parseDouble(lineEntries[10].substring(2))*60+Double.parseDouble(lineEntries[10].substring(0, 2))*3600;
+						
+						String carrier = lineEntries[0];
+						String flightNumber = lineEntries[1].replaceAll(" ", "0");
+						String flightDesignator = carrier+flightNumber;
+							
 						String originAirport = lineEntries[4];
 						String destinationAirport = lineEntries[7];
+						String route = originAirport+destinationAirport;
+						double flightDistance = Integer.parseInt(lineEntries[42])*1.609344;	//statute miles to kilometers
+
 						this.missingAirports.put(originAirport, 1);
 						this.missingAirports.put(destinationAirport, 1);
-						String route = lineEntries[4]+lineEntries[7];
-						Double flightDistance = Integer.parseInt(lineEntries[42])*1.609344;	//statute miles to kilometers
+
 						String aircraftType = lineEntries[21];
-						int seats = Integer.parseInt(lineEntries[23]);
+						int seatsAvail = Integer.parseInt(lineEntries[23]);
 						
 						
 						//HIER LÖSCHEN
@@ -124,27 +123,25 @@ public class SfAirScheduleBuilder {
 //							
 							//LÖSCHEN ENDE
 						
-						if (lineEntries[14].contains("2") && !flights.containsKey(flight) && seatsAvail>0 && !originAirport.equalsIgnoreCase(destinationAirport) &&
+						if (lineEntries[14].contains("2") && !flights.containsKey(flightDesignator) && seatsAvail>0 && !originAirport.equalsIgnoreCase(destinationAirport) &&
 												this.airportsInOsm.containsKey(originAirport) && this.airportsInOsm.containsKey(destinationAirport)) {
 							
 							if (!this.routes.containsKey(route)) {
 								this.routes.put(route, duration);
 							}
 							
-							if (!this.aircraftTypes.containsKey(aircraftType)) this.aircraftTypes.put(aircraftType, seats);
-
 							this.cityPairDistance.put(route, flightDistance);
 							
 							bwOag.write(
-									route+"\t"+		//TransitRoute
-									lineEntries[4]+lineEntries[7]+"_"+carrier+"\t"+	//TransitLine
-									flight+"\t"+		//vehicleId
-									departureInSec+"\t"+	//departure time in seconds
-									this.routes.get(route)+"\t"+	//journey time in seconds)
-									aircraftType+"\t"+	//aircraft type
-									this.aircraftTypes.get(aircraftType)+"\t"+	//seats avail
-									flightDistance);		//distance in km
-							flights.put(flight, "");
+									route+"\t"+											//TransitRoute
+									route+"_"+carrier+"\t"+								//TransitLine
+									flightDesignator+"\t"+								//vehicleId
+									departureInSec+"\t"+								//departure time in seconds
+									this.routes.get(route)+"\t"+						//journey time in seconds)
+									aircraftType+"\t"+									//aircraft type
+									seatsAvail+"\t"+			//seats avail
+									flightDistance);									//distance in km
+							flights.put(flightDesignator, "");
 							bwOag.newLine();
 							counter++;
 							this.airportsInOag.put(originAirport, this.airportsInOsm.get(originAirport));
@@ -183,13 +180,7 @@ public class SfAirScheduleBuilder {
 	        bwcityPairs.newLine();
 	    }
 	    
-		Iterator it4 = this.aircraftTypes.entrySet().iterator();
-	    while (it4.hasNext()) {
-	        Map.Entry pairs = (Map.Entry)it4.next();
-	        bwAircraft.write(pairs.getKey().toString()+"\t"+pairs.getValue().toString());
-	        bwAircraft.newLine();
-	    }
-	    
+    
 	    System.out.println("Anzahl der Airports: "+this.airportsInOag.size());
 	    System.out.println("Anzahl der City Pairs: "+this.routes.size());
 	    System.out.println("Anzahl der Flüge: "+counter);
@@ -201,8 +192,6 @@ public class SfAirScheduleBuilder {
 		bwMissing.close();
 		bwcityPairs.flush();
 		bwcityPairs.close();
-		bwAircraft.flush();
-		bwAircraft.close();
 		br.close();
 		bwOag.flush();
 		bwOag.close();
