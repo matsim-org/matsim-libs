@@ -24,7 +24,6 @@ public class SfMatsimAirport {
 		this.coord=coord;
 	}
 	
-	@SuppressWarnings("deprecation")
 	public void createRunways(Network network) {
 		
 	
@@ -64,11 +63,11 @@ public class SfMatsimAirport {
 		network.addNode(nodeRunwayOut);
 		
 //		create links
-		Link linkApron = network.getFactory().createLink(idApron, idApron, idApronEnd);
-		Link linkTaxiIn = network.getFactory().createLink(idTaxiIn, idTaxiIn, idApron);
-		Link linkTaxiOut = network.getFactory().createLink(idTaxiOut, idApronEnd, idTaxiOut);
-		Link linkRunwayIn = network.getFactory().createLink(idRunwayIn, idRunwayIn, idTaxiIn);
-		Link linkRunwayOut = network.getFactory().createLink(idRunwayOut, idTaxiOut, idRunwayOut);
+		Link linkApron = network.getFactory().createLink(idApron, nodeAirport, nodeApron);
+		Link linkTaxiIn = network.getFactory().createLink(idTaxiIn, nodeTaxiIn, nodeAirport);
+		Link linkTaxiOut = network.getFactory().createLink(idTaxiOut, nodeApron, nodeTaxiOut);
+		Link linkRunwayIn = network.getFactory().createLink(idRunwayIn, nodeRunwayIn, nodeTaxiIn);
+		Link linkRunwayOut = network.getFactory().createLink(idRunwayOut, nodeTaxiOut, nodeRunwayOut);
 		
 //		set capacity, freespeed and modes
 		
