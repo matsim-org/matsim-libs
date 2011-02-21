@@ -91,8 +91,7 @@ public class AdaptZHScenario {
 		
 		this.seed = configReader.getRandomSeed();
 		
-		ScenarioImpl scenario = new ScenarioLoaderImpl("src/main/java/playground/anhorni/input/zh10Pct/config.xml").getScenario();
-		Config config = scenario.getConfig();
+		Config config = (new ScenarioLoaderImpl("src/main/java/playground/anhorni/input/zh10Pct/config.xml").getScenario()).getConfig();
 		
 		log.info("Handling heterogeneity ...");		
 		RandomFromVarDistr rnd = new RandomFromVarDistr();
