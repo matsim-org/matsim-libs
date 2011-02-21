@@ -94,13 +94,12 @@ public class AdaptZHScenario {
 		ScenarioImpl scenario = new ScenarioLoaderImpl("src/main/java/playground/anhorni/input/zh10Pct/config.xml").getScenario();
 		Config config = scenario.getConfig();
 		
-		log.info("Handling heterogeneity ...");
-		
+		log.info("Handling heterogeneity ...");		
 		RandomFromVarDistr rnd = new RandomFromVarDistr();
 		rnd.setSeed(this.seed);
-		
 		HandleUnobservedHeterogeneity hhandler = new HandleUnobservedHeterogeneity(this.scenario, configReader, rnd, config);
 		hhandler.assign(); 
+		
 		log.info("Adding opening times to facilities ...");
 		this.addOpeningTimes();
 		log.info("Adapting plans ...");

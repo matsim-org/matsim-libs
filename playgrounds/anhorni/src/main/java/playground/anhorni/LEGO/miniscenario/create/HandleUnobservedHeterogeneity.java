@@ -104,46 +104,46 @@ public class HandleUnobservedHeterogeneity {
 		}
 	}
 	
-	public void computeLargestEpsilon(ScenarioImpl scenario, String type) {	
-		int counter = 0;
-		int nextMsg = 1;
-		
-		DestinationChoiceScoring scorer = new DestinationChoiceScoring(new Random(), this.scenario.getActivityFacilities(), configReader, this.config);	
-		log.info("Computing max epsilons for type: " + type + "...");
-		log.info(scenario.getActivityFacilities().getFacilitiesForActivityType(type).size() + " " + type + " facilities");
-		
-		TreeMap<Id, ActivityFacility> typedFacilities = scenario.getActivityFacilities().getFacilitiesForActivityType(type);
-		
-		for (Person p : scenario.getPopulation().getPersons().values()) {
-			//ceck if plan contains activity of type
-			boolean typeInPlan = false;
-			for (PlanElement pe : p.getSelectedPlan().getPlanElements()) {
-				if (pe instanceof Activity) {
-					if (((Activity) pe).getType().startsWith(type)) typeInPlan = true;
-				}
-			}
-			
-			double maxEpsilon = 0.0;
-			if (typeInPlan) {
-				for (Facility f : typedFacilities.values()) {
-					ActivityImpl act = new ActivityImpl(type, new IdImpl(1));
-					act.setFacilityId(f.getId());
-					double epsilon = scorer.getDestinationScore((PlanImpl)p.getSelectedPlan(), act, false);
-					
-					if (epsilon > maxEpsilon) {
-						maxEpsilon = epsilon;
-					}
-				}
-			}
-			counter++;
-			if (counter % nextMsg == 0) {
-				nextMsg *= 2;
-				log.info(" person # " + counter);
-			}
-			
-			String desiresDesc = ((PersonImpl)p).getDesires().getDesc();
-			((PersonImpl)p).getDesires().setDesc(desiresDesc + "_" + maxEpsilon);
-		}
-	}
+//	public void computeLargestEpsilon(ScenarioImpl scenario, String type) {	
+//		int counter = 0;
+//		int nextMsg = 1;
+//		
+//		DestinationChoiceScoring scorer = new DestinationChoiceScoring(new Random(), this.scenario.getActivityFacilities(), configReader, this.config);	
+//		log.info("Computing max epsilons for type: " + type + "...");
+//		log.info(scenario.getActivityFacilities().getFacilitiesForActivityType(type).size() + " " + type + " facilities");
+//		
+//		TreeMap<Id, ActivityFacility> typedFacilities = scenario.getActivityFacilities().getFacilitiesForActivityType(type);
+//		
+//		for (Person p : scenario.getPopulation().getPersons().values()) {
+//			//ceck if plan contains activity of type
+//			boolean typeInPlan = false;
+//			for (PlanElement pe : p.getSelectedPlan().getPlanElements()) {
+//				if (pe instanceof Activity) {
+//					if (((Activity) pe).getType().startsWith(type)) typeInPlan = true;
+//				}
+//			}
+//			
+//			double maxEpsilon = 0.0;
+//			if (typeInPlan) {
+//				for (Facility f : typedFacilities.values()) {
+//					ActivityImpl act = new ActivityImpl(type, new IdImpl(1));
+//					act.setFacilityId(f.getId());
+//					double epsilon = scorer.getDestinationScore((PlanImpl)p.getSelectedPlan(), act, false);
+//					
+//					if (epsilon > maxEpsilon) {
+//						maxEpsilon = epsilon;
+//					}
+//				}
+//			}
+//			counter++;
+//			if (counter % nextMsg == 0) {
+//				nextMsg *= 2;
+//				log.info(" person # " + counter);
+//			}
+//			
+//			String desiresDesc = ((PersonImpl)p).getDesires().getDesc();
+//			((PersonImpl)p).getDesires().setDesc(desiresDesc + "_" + maxEpsilon);
+//		}
+//	}
 }	
 
