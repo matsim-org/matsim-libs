@@ -17,6 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
 package playground.christoph.knowledge.container;
 
 import java.io.IOException;
@@ -50,12 +51,12 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.withinday.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
 
 import playground.christoph.knowledge.nodeselection.DijkstraForSelectNodes;
 import playground.christoph.network.MyLinkFactoryImpl;
 import playground.christoph.network.MyLinkImpl;
 import playground.christoph.router.util.KnowledgeTools;
-import playground.christoph.withinday.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
 
 /*
  * Creates Knowledge Entries for multiple CostFactors in a single Iteration,

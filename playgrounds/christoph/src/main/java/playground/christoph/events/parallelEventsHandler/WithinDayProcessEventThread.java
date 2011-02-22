@@ -29,17 +29,12 @@ import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.parallelEventsHandler.LastEventOfIteration;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.withinday.events.parallelEventsHandler.LastEventOfSimStep;
 
-import playground.christoph.withinday.events.parallelEventsHandler.LastEventOfSimStep;
-
-import playground.christoph.withinday.events.parallelEventsHandler.LastEventOfSimStep;
-
-/**
- * The wrapper around the Events class for allowing parallelization.
- * Adaption of Rashid Waraich implementation. Now use a LinkedBlockingQueue instead
+/* Alternative implementation. Now use a LinkedBlockingQueue instead
  * of busy waiting. 
  *
- * @author Christoph Dobler
+ * @author cdobler
  */
 public class WithinDayProcessEventThread implements Runnable {
 	private ArrayList<Event> preInputBuffer = null;

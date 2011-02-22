@@ -10,8 +10,7 @@ import org.matsim.ptproject.qsim.agents.WithinDayAgent;
 import org.matsim.ptproject.qsim.interfaces.NetsimLink;
 import org.matsim.ptproject.qsim.interfaces.Netsim;
 import org.matsim.ptproject.qsim.qnetsimengine.QVehicle;
-
-import playground.christoph.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
+import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
 
 public class YoungPeopleIdentifier extends DuringLegIdentifier {
 

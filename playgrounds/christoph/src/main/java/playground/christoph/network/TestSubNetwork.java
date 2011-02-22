@@ -38,6 +38,7 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.interfaces.NetsimNetwork;
+import org.matsim.withinday.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
 
 import playground.christoph.knowledge.container.MapKnowledgeDB;
 import playground.christoph.knowledge.container.NodeKnowledge;
@@ -49,10 +50,9 @@ import playground.christoph.router.costcalculators.KnowledgeTravelTimeCalculator
 import playground.christoph.router.costcalculators.KnowledgeTravelTimeWrapper;
 import playground.christoph.router.util.CloningDijkstraFactory;
 import playground.christoph.router.util.KnowledgeTools;
-import playground.christoph.withinday.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
 
 public class TestSubNetwork {
-
+	
 	private final static Logger log = Logger.getLogger(TestSubNetwork.class);
 
 	private final ScenarioImpl scenario;

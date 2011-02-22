@@ -37,15 +37,15 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.util.TravelCost;
+import org.matsim.withinday.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
 
 import playground.christoph.knowledge.container.dbtools.DBConnectionTool;
 import playground.christoph.knowledge.nodeselection.DijkstraForSelectNodes;
 import playground.christoph.tools.ByteArrayConverter;
 import playground.christoph.tools.Zipper;
-import playground.christoph.withinday.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
 
 /*
- * Creates two Maps for each Node of a given Network:
+ * Calculates two Maps for each Node of a given Network:
  * - one containing the travel costs to all nodes traveling forwards
  * - one containing the travel costs to all nodes traveling backwards 
  */

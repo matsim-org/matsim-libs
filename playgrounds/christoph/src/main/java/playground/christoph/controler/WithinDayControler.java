@@ -41,38 +41,38 @@ import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.ptproject.qsim.interfaces.Netsim;
 
-import playground.christoph.withinday.events.algorithms.FixedOrderQueueSimulationListener;
-import playground.christoph.withinday.events.parallelEventsHandler.SimStepParallelEventsManagerImpl;
-import playground.christoph.withinday.mobsim.DuringActivityReplanningModule;
-import playground.christoph.withinday.mobsim.DuringLegReplanningModule;
-import playground.christoph.withinday.mobsim.InitialReplanningModule;
-import playground.christoph.withinday.mobsim.ReplanningManager;
-import playground.christoph.withinday.mobsim.WithinDayPersonAgent;
-import playground.christoph.withinday.mobsim.WithinDayQSim;
-import playground.christoph.withinday.mobsim.WithinDayQSimFactory;
-import playground.christoph.withinday.network.WithinDayLinkFactoryImpl;
-import playground.christoph.withinday.replanning.identifiers.ActivityEndIdentifierFactory;
-import playground.christoph.withinday.replanning.identifiers.InitialIdentifierImplFactory;
-import playground.christoph.withinday.replanning.identifiers.LeaveLinkIdentifierFactory;
-import playground.christoph.withinday.replanning.identifiers.interfaces.DuringActivityIdentifier;
-import playground.christoph.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
-import playground.christoph.withinday.replanning.identifiers.interfaces.InitialIdentifier;
-import playground.christoph.withinday.replanning.identifiers.tools.ActivityReplanningMap;
-import playground.christoph.withinday.replanning.identifiers.tools.LinkReplanningMap;
-import playground.christoph.withinday.replanning.modules.ReplanningModule;
-import playground.christoph.withinday.replanning.parallel.ParallelDuringActivityReplanner;
-import playground.christoph.withinday.replanning.parallel.ParallelDuringLegReplanner;
-import playground.christoph.withinday.replanning.parallel.ParallelInitialReplanner;
-import playground.christoph.withinday.replanning.replanners.CurrentLegReplannerFactory;
-import playground.christoph.withinday.replanning.replanners.InitialReplannerFactory;
-import playground.christoph.withinday.replanning.replanners.NextLegReplannerFactory;
-import playground.christoph.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
-import playground.christoph.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
-import playground.christoph.withinday.replanning.replanners.interfaces.WithinDayInitialReplanner;
-import playground.christoph.withinday.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
-import playground.christoph.withinday.scoring.OnlyTimeDependentScoringFunctionFactory;
-import playground.christoph.withinday.trafficmonitoring.TravelTimeCollector;
-import playground.christoph.withinday.trafficmonitoring.TravelTimeCollectorFactory;
+import org.matsim.withinday.events.algorithms.FixedOrderQueueSimulationListener;
+import org.matsim.withinday.events.parallelEventsHandler.SimStepParallelEventsManagerImpl;
+import org.matsim.withinday.mobsim.DuringActivityReplanningModule;
+import org.matsim.withinday.mobsim.DuringLegReplanningModule;
+import org.matsim.withinday.mobsim.InitialReplanningModule;
+import org.matsim.withinday.mobsim.ReplanningManager;
+import org.matsim.withinday.mobsim.WithinDayPersonAgent;
+import org.matsim.withinday.mobsim.WithinDayQSim;
+import org.matsim.withinday.mobsim.WithinDayQSimFactory;
+import org.matsim.withinday.network.WithinDayLinkFactoryImpl;
+import org.matsim.withinday.replanning.identifiers.ActivityEndIdentifierFactory;
+import org.matsim.withinday.replanning.identifiers.InitialIdentifierImplFactory;
+import org.matsim.withinday.replanning.identifiers.LeaveLinkIdentifierFactory;
+import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIdentifier;
+import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
+import org.matsim.withinday.replanning.identifiers.interfaces.InitialIdentifier;
+import org.matsim.withinday.replanning.identifiers.tools.ActivityReplanningMap;
+import org.matsim.withinday.replanning.identifiers.tools.LinkReplanningMap;
+import org.matsim.withinday.replanning.modules.ReplanningModule;
+import org.matsim.withinday.replanning.parallel.ParallelDuringActivityReplanner;
+import org.matsim.withinday.replanning.parallel.ParallelDuringLegReplanner;
+import org.matsim.withinday.replanning.parallel.ParallelInitialReplanner;
+import org.matsim.withinday.replanning.replanners.CurrentLegReplannerFactory;
+import org.matsim.withinday.replanning.replanners.InitialReplannerFactory;
+import org.matsim.withinday.replanning.replanners.NextLegReplannerFactory;
+import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
+import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
+import org.matsim.withinday.replanning.replanners.interfaces.WithinDayInitialReplanner;
+import org.matsim.withinday.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
+import org.matsim.withinday.scoring.OnlyTimeDependentScoringFunctionFactory;
+import org.matsim.withinday.trafficmonitoring.TravelTimeCollector;
+import org.matsim.withinday.trafficmonitoring.TravelTimeCollectorFactory;
 
 /**
  * Thimport playground.christoph.withinday.trafficmonitoring.TravelTimeCollector;
@@ -142,7 +142,6 @@ public class WithinDayControler extends Controler {
 		 * TravelTime or VehicleCount.
 		 * This is needed to be able to use a LinkVehiclesCounter.
 		 */
-//		this.getNetwork().getFactory().setLinkFactory(new MyLinkFactoryImpl());
 		this.getNetwork().getFactory().setLinkFactory(new WithinDayLinkFactoryImpl());
 
 		// Use a Scoring Function, that only scores the travel times!

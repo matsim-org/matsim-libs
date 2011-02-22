@@ -46,8 +46,8 @@ import org.matsim.ptproject.qsim.agents.ExperimentalBasicWithindayAgent;
 import org.matsim.ptproject.qsim.interfaces.Netsim;
 import org.matsim.ptproject.qsim.interfaces.NetsimLink;
 import org.matsim.ptproject.qsim.qnetsimengine.QVehicle;
+import org.matsim.withinday.utils.EditRoutes;
 
-import playground.christoph.withinday.utils.EditRoutes;
 
 /**
  * @author nagel

@@ -40,6 +40,20 @@ import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.ptproject.qsim.QSim;
+import org.matsim.withinday.events.algorithms.FixedOrderQueueSimulationListener;
+import org.matsim.withinday.mobsim.InitialReplanningModule;
+import org.matsim.withinday.mobsim.ReplanningManager;
+import org.matsim.withinday.mobsim.WithinDayPersonAgent;
+import org.matsim.withinday.mobsim.WithinDayQSim;
+import org.matsim.withinday.replanning.identifiers.InitialIdentifierImplFactory;
+import org.matsim.withinday.replanning.identifiers.interfaces.InitialIdentifier;
+import org.matsim.withinday.replanning.modules.ReplanningModule;
+import org.matsim.withinday.replanning.parallel.ParallelInitialReplanner;
+import org.matsim.withinday.replanning.replanners.InitialReplannerFactory;
+import org.matsim.withinday.replanning.replanners.interfaces.WithinDayInitialReplanner;
+import org.matsim.withinday.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
+import org.matsim.withinday.scoring.OnlyTimeDependentScoringFunctionFactory;
+import org.matsim.withinday.trafficmonitoring.FreeSpeedTravelTimeCalculator;
 
 import playground.christoph.knowledge.container.MapKnowledgeDB;
 import playground.christoph.knowledge.nodeselection.SelectNodes;
@@ -49,20 +63,6 @@ import playground.christoph.router.RandomDijkstraRoute;
 import playground.christoph.router.RandomRoute;
 import playground.christoph.router.TabuRoute;
 import playground.christoph.router.util.SimpleRouterFactory;
-import playground.christoph.withinday.events.algorithms.FixedOrderQueueSimulationListener;
-import playground.christoph.withinday.mobsim.InitialReplanningModule;
-import playground.christoph.withinday.mobsim.ReplanningManager;
-import playground.christoph.withinday.mobsim.WithinDayPersonAgent;
-import playground.christoph.withinday.mobsim.WithinDayQSim;
-import playground.christoph.withinday.replanning.identifiers.InitialIdentifierImplFactory;
-import playground.christoph.withinday.replanning.identifiers.interfaces.InitialIdentifier;
-import playground.christoph.withinday.replanning.modules.ReplanningModule;
-import playground.christoph.withinday.replanning.parallel.ParallelInitialReplanner;
-import playground.christoph.withinday.replanning.replanners.InitialReplannerFactory;
-import playground.christoph.withinday.replanning.replanners.interfaces.WithinDayInitialReplanner;
-import playground.christoph.withinday.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
-import playground.christoph.withinday.scoring.OnlyTimeDependentScoringFunctionFactory;
-import playground.christoph.withinday.trafficmonitoring.FreeSpeedTravelTimeCalculator;
 
 /**
  * This Controler should give an Example what is needed to run
@@ -180,7 +180,7 @@ public class SimpleRouterControler extends Controler {
 
 	/*
 	 * New Routers for the Replanning are used instead of using the controler's.
-	 * By doing this every person can use a personalised Router.
+	 * By doing this every person can use a personalized Router.
 	 */
 	protected void initReplanningRouter() {
 

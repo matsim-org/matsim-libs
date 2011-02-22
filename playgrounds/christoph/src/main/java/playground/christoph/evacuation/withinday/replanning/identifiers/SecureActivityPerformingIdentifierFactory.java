@@ -21,10 +21,9 @@
 package playground.christoph.evacuation.withinday.replanning.identifiers;
 
 import org.matsim.api.core.v01.Coord;
-
-import playground.christoph.withinday.replanning.identifiers.interfaces.DuringActivityIdentifier;
-import playground.christoph.withinday.replanning.identifiers.interfaces.DuringActivityIdentifierFactory;
-import playground.christoph.withinday.replanning.identifiers.tools.ActivityReplanningMap;
+import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIdentifier;
+import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIdentifierFactory;
+import org.matsim.withinday.replanning.identifiers.tools.ActivityReplanningMap;
 
 public class SecureActivityPerformingIdentifierFactory implements DuringActivityIdentifierFactory {
 

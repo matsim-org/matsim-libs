@@ -21,9 +21,8 @@
 package playground.christoph.withinday;
 
 import org.matsim.ptproject.qsim.interfaces.Netsim;
-
-import playground.christoph.withinday.replanning.identifiers.interfaces.DuringActivityIdentifier;
-import playground.christoph.withinday.replanning.identifiers.interfaces.DuringActivityIdentifierFactory;
+import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIdentifier;
+import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIdentifierFactory;
 
 public class OldPeopleIdentifierFactory implements DuringActivityIdentifierFactory {
 

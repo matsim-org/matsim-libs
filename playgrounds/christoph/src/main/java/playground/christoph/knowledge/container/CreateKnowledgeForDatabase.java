@@ -17,6 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
 package playground.christoph.knowledge.container;
 
 import java.util.ArrayList;
@@ -35,6 +36,7 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.withinday.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
 
 import playground.christoph.knowledge.nodeselection.ParallelCreateKnownNodesMap;
 import playground.christoph.knowledge.nodeselection.SelectNodes;
@@ -42,9 +44,8 @@ import playground.christoph.knowledge.nodeselection.SelectNodesCircular;
 import playground.christoph.knowledge.nodeselection.SelectNodesDijkstra;
 import playground.christoph.network.MyLinkFactoryImpl;
 import playground.christoph.network.MyLinkImpl;
-import playground.christoph.withinday.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
 
-/*
+/* 
  * The following Parameters have to be set:
  * - the scenario that should be used
  * - the number of parallel threads

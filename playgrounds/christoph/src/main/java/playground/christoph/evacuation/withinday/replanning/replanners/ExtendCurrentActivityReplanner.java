@@ -25,14 +25,12 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.ptproject.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.ptproject.qsim.agents.WithinDayAgent;
-
-import playground.christoph.withinday.mobsim.WithinDayPersonAgent;
-import playground.christoph.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
+import org.matsim.withinday.mobsim.WithinDayPersonAgent;
+import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
 
 /*
  * Persons who use this replanner perform an activity at a "save" place

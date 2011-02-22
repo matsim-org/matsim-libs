@@ -12,7 +12,7 @@ import org.matsim.core.network.NetworkImpl;
 
 public class CellNetworkMapping {
 
-	private final static Logger log = Logger.getLogger(TestCellKnowledge.class);
+	private final static Logger log = Logger.getLogger(CellNetworkMapping.class);
 
 	private NetworkImpl network;
 	private Map <Node, Cell> nodesMapping;

@@ -30,18 +30,17 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.ptproject.qsim.agents.WithinDayAgent;
+import org.matsim.withinday.mobsim.WithinDayPersonAgent;
+import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
+import org.matsim.withinday.utils.EditRoutes;
+import org.matsim.withinday.utils.ReplacePlanElements;
 
 import playground.christoph.evacuation.config.EvacuationConfig;
 import playground.christoph.evacuation.withinday.replanning.replanners.CurrentLegToSecureFacilityReplanner;
-import playground.christoph.withinday.mobsim.WithinDayPersonAgent;
-import playground.christoph.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
-import playground.christoph.withinday.utils.EditRoutes;
-import playground.christoph.withinday.utils.ReplacePlanElements;
 
 /*
  * If an Agent performs a Leg in the secure area (or at least the

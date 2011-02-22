@@ -28,7 +28,6 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
@@ -38,10 +37,10 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.ptproject.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.ptproject.qsim.agents.ExperimentalBasicWithindayAgent;
 import org.matsim.ptproject.qsim.agents.WithinDayAgent;
+import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
+import org.matsim.withinday.utils.EditRoutes;
 
 import playground.christoph.evacuation.withinday.replanning.replanners.EndActivityAndEvacuateReplanner;
-import playground.christoph.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
-import playground.christoph.withinday.utils.EditRoutes;
 
 public class EndActivityAndEvacuateReplanner extends WithinDayDuringActivityReplanner {
 	

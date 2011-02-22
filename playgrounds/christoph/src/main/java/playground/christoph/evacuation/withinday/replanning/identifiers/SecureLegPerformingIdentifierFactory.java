@@ -22,10 +22,9 @@ package playground.christoph.evacuation.withinday.replanning.identifiers;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Network;
-
-import playground.christoph.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
-import playground.christoph.withinday.replanning.identifiers.interfaces.DuringLegIdentifierFactory;
-import playground.christoph.withinday.replanning.identifiers.tools.LinkReplanningMap;
+import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
+import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifierFactory;
+import org.matsim.withinday.replanning.identifiers.tools.LinkReplanningMap;
 
 public class SecureLegPerformingIdentifierFactory implements DuringLegIdentifierFactory {
 

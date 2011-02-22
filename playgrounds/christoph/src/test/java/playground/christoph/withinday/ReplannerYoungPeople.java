@@ -5,14 +5,12 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.ptproject.qsim.agents.WithinDayAgent;
-
-import playground.christoph.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
-import playground.christoph.withinday.utils.EditRoutes;
-import playground.christoph.withinday.utils.ReplacePlanElements;
+import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
+import org.matsim.withinday.utils.EditRoutes;
+import org.matsim.withinday.utils.ReplacePlanElements;
 
 public class ReplannerYoungPeople extends WithinDayDuringLegReplanner {
 

@@ -24,20 +24,20 @@ import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.util.DijkstraFactory;
+import org.matsim.withinday.events.algorithms.FixedOrderQueueSimulationListener;
+import org.matsim.withinday.mobsim.DuringActivityReplanningModule;
+import org.matsim.withinday.mobsim.DuringLegReplanningModule;
+import org.matsim.withinday.mobsim.InitialReplanningModule;
+import org.matsim.withinday.mobsim.ReplanningManager;
+import org.matsim.withinday.mobsim.WithinDayQSim;
+import org.matsim.withinday.replanning.modules.ReplanningModule;
+import org.matsim.withinday.replanning.parallel.ParallelDuringActivityReplanner;
+import org.matsim.withinday.replanning.parallel.ParallelDuringLegReplanner;
+import org.matsim.withinday.replanning.parallel.ParallelInitialReplanner;
+import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
+import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
 
 import playground.christoph.controler.WithinDayControler;
-import playground.christoph.withinday.events.algorithms.FixedOrderQueueSimulationListener;
-import playground.christoph.withinday.mobsim.DuringActivityReplanningModule;
-import playground.christoph.withinday.mobsim.DuringLegReplanningModule;
-import playground.christoph.withinday.mobsim.InitialReplanningModule;
-import playground.christoph.withinday.mobsim.ReplanningManager;
-import playground.christoph.withinday.mobsim.WithinDayQSim;
-import playground.christoph.withinday.replanning.modules.ReplanningModule;
-import playground.christoph.withinday.replanning.parallel.ParallelDuringActivityReplanner;
-import playground.christoph.withinday.replanning.parallel.ParallelDuringLegReplanner;
-import playground.christoph.withinday.replanning.parallel.ParallelInitialReplanner;
-import playground.christoph.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
-import playground.christoph.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
 
 class MyWithinDayControler extends Controler {
 

@@ -33,11 +33,11 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.ptproject.qsim.agents.WithinDayAgent;
+import org.matsim.withinday.mobsim.WithinDayPersonAgent;
+import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIdentifier;
+import org.matsim.withinday.replanning.identifiers.tools.ActivityReplanningMap;
 
 import playground.christoph.evacuation.config.EvacuationConfig;
-import playground.christoph.withinday.mobsim.WithinDayPersonAgent;
-import playground.christoph.withinday.replanning.identifiers.interfaces.DuringActivityIdentifier;
-import playground.christoph.withinday.replanning.identifiers.tools.ActivityReplanningMap;
 
 public class SecureActivityPerformingIdentifier extends DuringActivityIdentifier {
 

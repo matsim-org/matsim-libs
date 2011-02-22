@@ -9,8 +9,7 @@ import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.ptproject.qsim.agents.WithinDayAgent;
 import org.matsim.ptproject.qsim.interfaces.Netsim;
-
-import playground.christoph.withinday.replanning.identifiers.interfaces.DuringActivityIdentifier;
+import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIdentifier;
 
 public class OldPeopleIdentifier extends DuringActivityIdentifier {
 

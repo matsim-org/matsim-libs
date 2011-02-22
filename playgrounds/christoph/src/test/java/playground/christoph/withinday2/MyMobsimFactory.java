@@ -35,19 +35,18 @@ import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.agents.AgentFactory;
 import org.matsim.ptproject.qsim.interfaces.Netsim;
-
-import playground.christoph.withinday.events.algorithms.FixedOrderQueueSimulationListener;
-import playground.christoph.withinday.mobsim.DuringActivityReplanningModule;
-import playground.christoph.withinday.mobsim.DuringLegReplanningModule;
-import playground.christoph.withinday.mobsim.InitialReplanningModule;
-import playground.christoph.withinday.mobsim.ReplanningManager;
-import playground.christoph.withinday.mobsim.WithinDayAgentFactory;
-import playground.christoph.withinday.replanning.modules.ReplanningModule;
-import playground.christoph.withinday.replanning.parallel.ParallelDuringActivityReplanner;
-import playground.christoph.withinday.replanning.parallel.ParallelDuringLegReplanner;
-import playground.christoph.withinday.replanning.parallel.ParallelInitialReplanner;
-import playground.christoph.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
-import playground.christoph.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
+import org.matsim.withinday.events.algorithms.FixedOrderQueueSimulationListener;
+import org.matsim.withinday.mobsim.DuringActivityReplanningModule;
+import org.matsim.withinday.mobsim.DuringLegReplanningModule;
+import org.matsim.withinday.mobsim.InitialReplanningModule;
+import org.matsim.withinday.mobsim.ReplanningManager;
+import org.matsim.withinday.mobsim.WithinDayAgentFactory;
+import org.matsim.withinday.replanning.modules.ReplanningModule;
+import org.matsim.withinday.replanning.parallel.ParallelDuringActivityReplanner;
+import org.matsim.withinday.replanning.parallel.ParallelDuringLegReplanner;
+import org.matsim.withinday.replanning.parallel.ParallelInitialReplanner;
+import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
+import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
 
 /**
  * @author nagel

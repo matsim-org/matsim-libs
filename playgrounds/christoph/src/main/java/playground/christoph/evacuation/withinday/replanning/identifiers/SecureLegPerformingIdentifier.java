@@ -32,11 +32,11 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.ptproject.qsim.agents.WithinDayAgent;
+import org.matsim.withinday.mobsim.WithinDayPersonAgent;
+import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
+import org.matsim.withinday.replanning.identifiers.tools.LinkReplanningMap;
 
 import playground.christoph.evacuation.config.EvacuationConfig;
-import playground.christoph.withinday.mobsim.WithinDayPersonAgent;
-import playground.christoph.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
-import playground.christoph.withinday.replanning.identifiers.tools.LinkReplanningMap;
 
 public class SecureLegPerformingIdentifier extends DuringLegIdentifier {
 	

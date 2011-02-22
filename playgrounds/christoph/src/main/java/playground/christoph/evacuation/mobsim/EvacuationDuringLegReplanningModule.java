@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -20,9 +20,10 @@
 
 package playground.christoph.evacuation.mobsim;
 
+import org.matsim.withinday.mobsim.DuringLegReplanningModule;
+import org.matsim.withinday.replanning.parallel.ParallelDuringLegReplanner;
+
 import playground.christoph.evacuation.config.EvacuationConfig;
-import playground.christoph.withinday.mobsim.DuringLegReplanningModule;
-import playground.christoph.withinday.replanning.parallel.ParallelDuringLegReplanner;
 
 public class EvacuationDuringLegReplanningModule extends DuringLegReplanningModule {
 	

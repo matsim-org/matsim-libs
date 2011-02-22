@@ -23,9 +23,8 @@ package playground.christoph.evacuation.withinday.replanning.replanners;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.ptproject.qsim.interfaces.AgentCounterI;
-
-import playground.christoph.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
-import playground.christoph.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
+import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
+import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
 
 public class CurrentLegToSecureFacilityReplannerFactory extends WithinDayDuringLegReplannerFactory {
 

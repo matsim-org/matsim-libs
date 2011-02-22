@@ -21,9 +21,8 @@
 package playground.christoph.withinday2;
 
 import org.matsim.ptproject.qsim.interfaces.Netsim;
-
-import playground.christoph.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
-import playground.christoph.withinday.replanning.identifiers.interfaces.DuringLegIdentifierFactory;
+import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
+import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifierFactory;
 
 public class YoungPeopleIdentifierFactory implements DuringLegIdentifierFactory {
 
