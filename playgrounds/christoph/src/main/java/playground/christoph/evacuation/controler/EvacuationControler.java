@@ -28,35 +28,33 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.events.parallelEventsHandler.ParallelEventsManagerImpl;
+import org.matsim.core.events.parallelEventsHandler.SimStepParallelEventsManagerImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
+import org.matsim.core.mobsim.framework.listeners.FixedOrderSimulationListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
+import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
 import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.PersonalizableTravelTime;
+import org.matsim.core.scoring.OnlyTimeDependentScoringFunctionFactory;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.multimodalsimengine.MultiModalControler;
 import org.matsim.ptproject.qsim.multimodalsimengine.MultiModalMobsimFactory;
 import org.matsim.ptproject.qsim.multimodalsimengine.router.costcalculator.BufferedTravelTime;
 import org.matsim.ptproject.qsim.multimodalsimengine.router.costcalculator.TravelTimeCalculatorWithBuffer;
-import org.matsim.withinday.events.algorithms.FixedOrderQueueSimulationListener;
-import org.matsim.withinday.events.parallelEventsHandler.SimStepParallelEventsManagerImpl;
 import org.matsim.withinday.mobsim.DuringActivityReplanningModule;
 import org.matsim.withinday.mobsim.DuringLegReplanningModule;
 import org.matsim.withinday.mobsim.InitialReplanningModule;
 import org.matsim.withinday.mobsim.ReplanningManager;
 import org.matsim.withinday.mobsim.WithinDayPersonAgent;
 import org.matsim.withinday.mobsim.WithinDayQSim;
-import org.matsim.withinday.mobsim.WithinDayQSimFactory;
-import org.matsim.withinday.network.WithinDayLinkFactoryImpl;
-import org.matsim.withinday.replanning.identifiers.ActivityEndIdentifierFactory;
-import org.matsim.withinday.replanning.identifiers.InitialIdentifierImplFactory;
 import org.matsim.withinday.replanning.identifiers.LeaveLinkIdentifierFactory;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIdentifier;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
@@ -68,13 +66,9 @@ import org.matsim.withinday.replanning.parallel.ParallelDuringActivityReplanner;
 import org.matsim.withinday.replanning.parallel.ParallelDuringLegReplanner;
 import org.matsim.withinday.replanning.parallel.ParallelInitialReplanner;
 import org.matsim.withinday.replanning.replanners.CurrentLegReplannerFactory;
-import org.matsim.withinday.replanning.replanners.InitialReplannerFactory;
-import org.matsim.withinday.replanning.replanners.NextLegReplannerFactory;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayInitialReplanner;
-import org.matsim.withinday.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
-import org.matsim.withinday.scoring.OnlyTimeDependentScoringFunctionFactory;
 import org.matsim.withinday.trafficmonitoring.TravelTimeCollector;
 import org.matsim.withinday.trafficmonitoring.TravelTimeCollectorFactory;
 
@@ -157,9 +151,9 @@ public class EvacuationControler extends MultiModalControler {
 
 	protected ReplanningManager replanningManager;
 	protected WithinDayQSim sim;
-	protected FixedOrderQueueSimulationListener foqsl = new FixedOrderQueueSimulationListener();
-
-	private static final Logger log = Logger.getLogger(EvacuationControler.class);
+	protected FixedOrderSimulationListener fosl;
+	
+	static final Logger log = Logger.getLogger(EvacuationControler.class);
 
 	public EvacuationControler(String[] args) {
 		super(args);
@@ -216,8 +210,8 @@ public class EvacuationControler extends MultiModalControler {
 		// within day
 		else {
 			travelTime = new TravelTimeCollectorFactory().createFreeSpeedTravelTimeCalculator(this.scenarioData);
-			foqsl.addQueueSimulationBeforeSimStepListener((TravelTimeCollector) travelTime);	// for TravelTimeCollector
-			foqsl.addQueueSimulationAfterSimStepListener((TravelTimeCollector) travelTime);	// for TravelTimeCollector
+			fosl.addSimulationBeforeSimStepListener((TravelTimeCollector) travelTime);	// for TravelTimeCollector
+			fosl.addSimulationAfterSimStepListener((TravelTimeCollector) travelTime);	// for TravelTimeCollector
 			this.events.addHandler((TravelTimeCollector) travelTime);	// for TravelTimeCollector
 		}
 
@@ -241,7 +235,7 @@ public class EvacuationControler extends MultiModalControler {
 //		ActivityReplanningMap activityReplanningMap = new ActivityReplanningMap(this.getEvents(), this.getQueueSimulationListener());
 //		ActivityReplanningMap activityReplanningMap = new ActivityReplanningMap(this.getEvents(), sim);
 		ActivityReplanningMap activityReplanningMap = new ActivityReplanningMap(this.getEvents());
-		foqsl.addQueueSimulationListener(activityReplanningMap);
+		fosl.addSimulationListener(activityReplanningMap);
 
 		this.duringSecureActivityIdentifier = new SecureActivityPerformingIdentifierFactory(activityReplanningMap, EvacuationConfig.centerCoord, EvacuationConfig.innerRadius).createIdentifier();
 		this.duringSecureActivityReplanner = new ExtendCurrentActivityReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
@@ -261,7 +255,7 @@ public class EvacuationControler extends MultiModalControler {
 //		LinkReplanningMap linkReplanningMap = new LinkReplanningMap(this.getEvents(), this.getQueueSimulationListener());
 //		LinkReplanningMap linkReplanningMap = new LinkReplanningMap(this.getEvents(), sim);
 		LinkReplanningMap linkReplanningMap = new LinkReplanningMap(this.getEvents());
-		foqsl.addQueueSimulationListener(linkReplanningMap);
+		fosl.addSimulationListener(linkReplanningMap);
 
 		this.duringSecureLegIdentifier = new SecureLegPerformingIdentifierFactory(linkReplanningMap, network, EvacuationConfig.centerCoord, EvacuationConfig.innerRadius).createIdentifier();
 		this.duringSecureLegReplanner = new CurrentLegToSecureFacilityReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
@@ -310,7 +304,7 @@ public class EvacuationControler extends MultiModalControler {
 		if (this.events instanceof ParallelEventsManagerImpl) {
 			log.info("Replacing ParallelEventsManagerImpl with SimStepParallelEventsManagerImpl. This is needed for Within-Day Replanning.");
 			SimStepParallelEventsManagerImpl manager = new SimStepParallelEventsManagerImpl();
-			this.foqsl.addQueueSimulationAfterSimStepListener(manager);
+			this.fosl.addSimulationAfterSimStepListener(manager);
 			this.events = manager;
 		}
 		
@@ -319,16 +313,16 @@ public class EvacuationControler extends MultiModalControler {
 		createHandlersAndListeners();
 
 		ReplanningFlagInitializer rfi = new ReplanningFlagInitializer(this);
-		foqsl.addQueueSimulationInitializedListener(rfi);
+		fosl.addSimulationInitializedListener(rfi);
 
 		/*
 		 * Use a FixedOrderQueueSimulationListener to bundle the Listeners and
 		 * ensure that they are started in the needed order.
 		 */
-		foqsl.addQueueSimulationInitializedListener(replanningManager);
-		foqsl.addQueueSimulationBeforeSimStepListener(replanningManager);
+		fosl.addSimulationInitializedListener(replanningManager);
+		fosl.addSimulationBeforeSimStepListener(replanningManager);
 
-		this.getQueueSimulationListener().add(foqsl);
+		this.getQueueSimulationListener().add(fosl);
 
 		log.info("Initialize Parallel Replanning Modules");
 		initParallelReplanningModules();

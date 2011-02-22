@@ -22,9 +22,9 @@ package playground.christoph.withinday;
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.mobsim.framework.listeners.FixedOrderSimulationListener;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.util.DijkstraFactory;
-import org.matsim.withinday.events.algorithms.FixedOrderQueueSimulationListener;
 import org.matsim.withinday.mobsim.DuringActivityReplanningModule;
 import org.matsim.withinday.mobsim.DuringLegReplanningModule;
 import org.matsim.withinday.mobsim.InitialReplanningModule;
@@ -156,10 +156,10 @@ class MyWithinDayControler extends Controler {
 
 		// Use a FixedOrderQueueSimulationListener to bundle the Listeners and
 		// ensure that they are started in the needed order.
-		FixedOrderQueueSimulationListener foqsl = new FixedOrderQueueSimulationListener();
-		foqsl.addQueueSimulationInitializedListener(replanningManager);
-		foqsl.addQueueSimulationBeforeSimStepListener(replanningManager);
-		sim.addQueueSimulationListeners(foqsl);
+		FixedOrderSimulationListener fosl = new FixedOrderSimulationListener();
+		fosl.addSimulationInitializedListener(replanningManager);
+		fosl.addSimulationBeforeSimStepListener(replanningManager);
+		sim.addQueueSimulationListeners(fosl);
 		// essentially, can just imagine the replanningManager as a regular MobsimListener
 
 		log.info("Initialize Parallel Replanning Modules");

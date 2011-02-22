@@ -32,11 +32,11 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
+import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
-import org.matsim.withinday.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
-import org.matsim.withinday.scoring.OnlyTimeDependentScoringFunctionFactory;
+import org.matsim.core.scoring.OnlyTimeDependentScoringFunctionFactory;
 
 import playground.christoph.knowledge.container.MapKnowledgeDB;
 import playground.christoph.network.SubNetwork;

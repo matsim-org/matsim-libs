@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.Simulation;
+import org.matsim.core.mobsim.framework.listeners.FixedOrderSimulationListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationListener;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.util.DijkstraFactory;
@@ -35,7 +36,6 @@ import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.agents.AgentFactory;
 import org.matsim.ptproject.qsim.interfaces.Netsim;
-import org.matsim.withinday.events.algorithms.FixedOrderQueueSimulationListener;
 import org.matsim.withinday.mobsim.DuringActivityReplanningModule;
 import org.matsim.withinday.mobsim.DuringLegReplanningModule;
 import org.matsim.withinday.mobsim.InitialReplanningModule;
@@ -69,7 +69,6 @@ public class MyMobsimFactory implements MobsimFactory {
 	public Simulation createMobsim(Scenario sc, EventsManager eventsManager) {
 		int numReplanningThreads = 1;
 
-
 		Netsim mobsim = new QSim( sc, eventsManager ) ;
 
 		AgentFactory agentFactory = new WithinDayAgentFactory( mobsim ) ;
@@ -79,10 +78,10 @@ public class MyMobsimFactory implements MobsimFactory {
 
 		// Use a FixedOrderQueueSimulationListener to bundle the Listeners and
 		// ensure that they are started in the needed order.
-		FixedOrderQueueSimulationListener foqsl = new FixedOrderQueueSimulationListener();
-		foqsl.addQueueSimulationInitializedListener(replanningManager);
-		foqsl.addQueueSimulationBeforeSimStepListener(replanningManager);
-		mobsim.addQueueSimulationListeners(foqsl);
+		FixedOrderSimulationListener fosl = new FixedOrderSimulationListener();
+		fosl.addSimulationInitializedListener(replanningManager);
+		fosl.addSimulationBeforeSimStepListener(replanningManager);
+		mobsim.addQueueSimulationListeners(fosl);
 		// (essentially, can just imagine the replanningManager as a regular MobsimListener)
 
 		List<SimulationListener> simulationListenerList = new ArrayList<SimulationListener>() ;

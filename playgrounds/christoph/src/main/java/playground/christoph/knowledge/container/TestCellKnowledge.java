@@ -38,8 +38,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.withinday.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
-
+import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
 import playground.christoph.knowledge.container.dbtools.DBConnectionTool;
 import playground.christoph.knowledge.nodeselection.SelectNodesDijkstra;
 

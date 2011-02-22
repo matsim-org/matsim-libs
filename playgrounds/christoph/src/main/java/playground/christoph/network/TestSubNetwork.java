@@ -36,9 +36,9 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.router.PlansCalcRoute;
+import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.interfaces.NetsimNetwork;
-import org.matsim.withinday.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
 
 import playground.christoph.knowledge.container.MapKnowledgeDB;
 import playground.christoph.knowledge.container.NodeKnowledge;
@@ -124,7 +124,7 @@ public class TestSubNetwork {
 	}
 
 	private void initReplanner() {
-	  QSim sim = new QSim(this.scenario, new EventsManagerImpl());
+		QSim sim = new QSim(this.scenario, new EventsManagerImpl());
 		qNetwork = sim.getNetsimNetwork();
 
 		travelTime = new KnowledgeTravelTimeCalculator(qNetwork);

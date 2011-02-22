@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
+import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
 import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.withinday.replanning.identifiers.ActivityEndIdentifierFactory;
@@ -38,7 +39,6 @@ import org.matsim.withinday.replanning.modules.ReplanningModule;
 import org.matsim.withinday.replanning.replanners.CurrentLegReplannerFactory;
 import org.matsim.withinday.replanning.replanners.InitialReplannerFactory;
 import org.matsim.withinday.replanning.replanners.NextLegReplannerFactory;
-import org.matsim.withinday.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
 import org.matsim.withinday.trafficmonitoring.TravelTimeCollector;
 import org.matsim.withinday.trafficmonitoring.TravelTimeCollectorFactory;
 
@@ -125,8 +125,8 @@ public class WithinDayKnowledgeControler extends WithinDayControler {
 		
 		
 		travelTime = new TravelTimeCollectorFactory().createFreeSpeedTravelTimeCalculator(this.scenarioData);
-		foqsl.addQueueSimulationBeforeSimStepListener((TravelTimeCollector)travelTime);	// for TravelTimeCollector
-		foqsl.addQueueSimulationAfterSimStepListener((TravelTimeCollector)travelTime);	// for TravelTimeCollector
+		fosl.addSimulationBeforeSimStepListener((TravelTimeCollector)travelTime);	// for TravelTimeCollector
+		fosl.addSimulationAfterSimStepListener((TravelTimeCollector)travelTime);	// for TravelTimeCollector
 		this.events.addHandler((TravelTimeCollector)travelTime);	// for TravelTimeCollector
 				
 		OnlyTimeDependentTravelCostCalculator travelCost = new OnlyTimeDependentTravelCostCalculator(travelTime);
@@ -143,14 +143,14 @@ public class WithinDayKnowledgeControler extends WithinDayControler {
 		this.parallelInitialReplanner.addWithinDayReplanner(this.initialReplanner);	
 		
 		ActivityReplanningMap activityReplanningMap = new ActivityReplanningMap(this.getEvents());
-		foqsl.addQueueSimulationListener(activityReplanningMap);
+		fosl.addSimulationListener(activityReplanningMap);
 		this.duringActivityIdentifier = new ActivityEndIdentifierFactory(activityReplanningMap).createIdentifier();
 		this.duringActivityReplanner = new NextLegReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
 		this.duringActivityReplanner.addAgentsToReplanIdentifier(this.duringActivityIdentifier);
 		this.parallelActEndReplanner.addWithinDayReplanner(this.duringActivityReplanner);
 		
 		LinkReplanningMap linkReplanningMap = new LinkReplanningMap(this.getEvents());
-		foqsl.addQueueSimulationListener(linkReplanningMap);
+		fosl.addSimulationListener(linkReplanningMap);
 		this.duringLegIdentifier = new LeaveLinkIdentifierFactory(linkReplanningMap).createIdentifier();
 		this.duringLegReplanner = new CurrentLegReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
 		this.duringLegReplanner.addAgentsToReplanIdentifier(this.duringLegIdentifier);

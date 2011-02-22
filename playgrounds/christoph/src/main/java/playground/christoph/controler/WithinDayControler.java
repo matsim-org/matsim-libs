@@ -29,20 +29,21 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.parallelEventsHandler.ParallelEventsManagerImpl;
+import org.matsim.core.events.parallelEventsHandler.SimStepParallelEventsManagerImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
+import org.matsim.core.mobsim.framework.listeners.FixedOrderSimulationListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
+import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
 import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.PersonalizableTravelTime;
+import org.matsim.core.scoring.OnlyTimeDependentScoringFunctionFactory;
 import org.matsim.ptproject.qsim.interfaces.Netsim;
-
-import org.matsim.withinday.events.algorithms.FixedOrderQueueSimulationListener;
-import org.matsim.withinday.events.parallelEventsHandler.SimStepParallelEventsManagerImpl;
 import org.matsim.withinday.mobsim.DuringActivityReplanningModule;
 import org.matsim.withinday.mobsim.DuringLegReplanningModule;
 import org.matsim.withinday.mobsim.InitialReplanningModule;
@@ -69,8 +70,6 @@ import org.matsim.withinday.replanning.replanners.NextLegReplannerFactory;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayInitialReplanner;
-import org.matsim.withinday.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
-import org.matsim.withinday.scoring.OnlyTimeDependentScoringFunctionFactory;
 import org.matsim.withinday.trafficmonitoring.TravelTimeCollector;
 import org.matsim.withinday.trafficmonitoring.TravelTimeCollectorFactory;
 
@@ -119,9 +118,9 @@ public class WithinDayControler extends Controler {
 
 	protected ReplanningManager replanningManager;
 	protected WithinDayQSim sim;
-	protected FixedOrderQueueSimulationListener foqsl = new FixedOrderQueueSimulationListener();
-
-	private static final Logger log = Logger.getLogger(WithinDayControler.class);
+	protected FixedOrderSimulationListener fosl;
+	
+	static final Logger log = Logger.getLogger(WithinDayControler.class);
 
 	public WithinDayControler(String[] args) {
 		super(args);
@@ -155,9 +154,9 @@ public class WithinDayControler extends Controler {
 	protected void initReplanningRouter() {
 
 		travelTime = new TravelTimeCollectorFactory().createFreeSpeedTravelTimeCalculator(this.scenarioData);
-		foqsl.addQueueSimulationInitializedListener((TravelTimeCollector)travelTime);	// for TravelTimeCollector
-		foqsl.addQueueSimulationBeforeSimStepListener((TravelTimeCollector)travelTime);	// for TravelTimeCollector
-		foqsl.addQueueSimulationAfterSimStepListener((TravelTimeCollector)travelTime);	// for TravelTimeCollector
+		fosl.addSimulationInitializedListener((TravelTimeCollector)travelTime);	// for TravelTimeCollector
+		fosl.addSimulationBeforeSimStepListener((TravelTimeCollector)travelTime);	// for TravelTimeCollector
+		fosl.addSimulationAfterSimStepListener((TravelTimeCollector)travelTime);	// for TravelTimeCollector
 		this.events.addHandler((TravelTimeCollector)travelTime);	// for TravelTimeCollector
 
 //		travelTime = new FreeSpeedTravelTime();
@@ -176,7 +175,7 @@ public class WithinDayControler extends Controler {
 //		ActivityReplanningMap activityReplanningMap = new ActivityReplanningMap(this.getEvents(), this.getQueueSimulationListener());
 //		ActivityReplanningMap activityReplanningMap = new ActivityReplanningMap(this.getEvents(), sim);
 		ActivityReplanningMap activityReplanningMap = new ActivityReplanningMap(this.getEvents());
-		foqsl.addQueueSimulationListener(activityReplanningMap);
+		fosl.addSimulationListener(activityReplanningMap);
 		this.duringActivityIdentifier = new ActivityEndIdentifierFactory(activityReplanningMap).createIdentifier();
 		this.duringActivityReplanner = new NextLegReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
 		this.duringActivityReplanner.addAgentsToReplanIdentifier(this.duringActivityIdentifier);
@@ -185,7 +184,7 @@ public class WithinDayControler extends Controler {
 //		LinkReplanningMap linkReplanningMap = new LinkReplanningMap(this.getEvents(), this.getQueueSimulationListener());
 //		LinkReplanningMap linkReplanningMap = new LinkReplanningMap(this.getEvents(), sim);
 		LinkReplanningMap linkReplanningMap = new LinkReplanningMap(this.getEvents());
-		foqsl.addQueueSimulationListener(linkReplanningMap);
+		fosl.addSimulationListener(linkReplanningMap);
 		this.duringLegIdentifier = new LeaveLinkIdentifierFactory(linkReplanningMap).createIdentifier();
 		this.duringLegReplanner = new CurrentLegReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
 		this.duringLegReplanner.addAgentsToReplanIdentifier(this.duringLegIdentifier);
@@ -220,7 +219,7 @@ public class WithinDayControler extends Controler {
 		if (this.events instanceof ParallelEventsManagerImpl) {
 			log.info("Replacing ParallelEventsManagerImpl with SimStepParallelEventsManagerImpl. This is needed for Within-Day Replanning.");
 			SimStepParallelEventsManagerImpl manager = new SimStepParallelEventsManagerImpl();
-			this.foqsl.addQueueSimulationAfterSimStepListener(manager);
+			this.fosl.addSimulationAfterSimStepListener(manager);
 			this.events = manager;
 		}
 		
@@ -234,16 +233,16 @@ public class WithinDayControler extends Controler {
 		sim = new WithinDayQSimFactory().createMobsim(this.scenarioData, this.events);
 
 		ReplanningFlagInitializer rfi = new ReplanningFlagInitializer(this);
-		foqsl.addQueueSimulationInitializedListener(rfi);
+		fosl.addSimulationInitializedListener(rfi);
 
 		/*
 		 * Use a FixedOrderQueueSimulationListener to bundle the Listeners and
 		 * ensure that they are started in the needed order.
 		 */
-		foqsl.addQueueSimulationInitializedListener(replanningManager);
-		foqsl.addQueueSimulationBeforeSimStepListener(replanningManager);
+		fosl.addSimulationInitializedListener(replanningManager);
+		fosl.addSimulationBeforeSimStepListener(replanningManager);
 
-		sim.addQueueSimulationListeners(foqsl);
+		sim.addQueueSimulationListeners(fosl);
 		
 		log.info("Initialize Parallel Replanning Modules");
 		initParallelReplanningModules();

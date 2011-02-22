@@ -34,13 +34,16 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
+import org.matsim.core.mobsim.framework.listeners.FixedOrderSimulationListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
+import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.scoring.OnlyTimeDependentScoringFunctionFactory;
+import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.ptproject.qsim.QSim;
-import org.matsim.withinday.events.algorithms.FixedOrderQueueSimulationListener;
 import org.matsim.withinday.mobsim.InitialReplanningModule;
 import org.matsim.withinday.mobsim.ReplanningManager;
 import org.matsim.withinday.mobsim.WithinDayPersonAgent;
@@ -51,9 +54,6 @@ import org.matsim.withinday.replanning.modules.ReplanningModule;
 import org.matsim.withinday.replanning.parallel.ParallelInitialReplanner;
 import org.matsim.withinday.replanning.replanners.InitialReplannerFactory;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayInitialReplanner;
-import org.matsim.withinday.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
-import org.matsim.withinday.scoring.OnlyTimeDependentScoringFunctionFactory;
-import org.matsim.withinday.trafficmonitoring.FreeSpeedTravelTimeCalculator;
 
 import playground.christoph.knowledge.container.MapKnowledgeDB;
 import playground.christoph.knowledge.nodeselection.SelectNodes;
@@ -126,10 +126,8 @@ public class SimpleRouterControler extends Controler {
 	protected WithinDayInitialReplanner randomCompassReplanner;
 	protected WithinDayInitialReplanner randomDijkstraReplanner;
 
-	protected FixedOrderQueueSimulationListener foqsl = new FixedOrderQueueSimulationListener();
-	/*
-	 * TravelTime and TravelCost for the Dijkstra Router
-	 */
+	protected FixedOrderSimulationListener fosl;
+		
 	protected TravelTime dijkstraTravelTime = new FreeSpeedTravelTimeCalculator();
 	protected PersonalizableTravelCost dijkstraTravelCost = new OnlyTimeDependentTravelCostCalculator(dijkstraTravelTime);
 //	protected PersonalizableTravelCost dijkstraTravelCost = new OnlyDistanceDependentTravelCostCalculator();
@@ -236,16 +234,16 @@ public class SimpleRouterControler extends Controler {
 	protected void runMobSim() {
 		sim = new WithinDayQSim(this.scenarioData, this.events);
 //		sim.addQueueSimulationListeners(replanningManager);
-		sim.addQueueSimulationListeners(foqsl);
+		sim.addQueueSimulationListeners(fosl);
 
 		/*
 		 * Use a FixedOrderQueueSimulationListener to bundle the Listeners and
 		 * ensure that they are started in the needed order.
 		 */
 		ReplanningFlagInitializer rfi = new ReplanningFlagInitializer(this);
-		foqsl.addQueueSimulationInitializedListener(rfi);
-		foqsl.addQueueSimulationInitializedListener(replanningManager);
-		foqsl.addQueueSimulationBeforeSimStepListener(replanningManager);
+		fosl.addSimulationInitializedListener(rfi);
+		fosl.addSimulationInitializedListener(replanningManager);
+		fosl.addSimulationBeforeSimStepListener(replanningManager);
 
 
 		if (useKnowledge) {

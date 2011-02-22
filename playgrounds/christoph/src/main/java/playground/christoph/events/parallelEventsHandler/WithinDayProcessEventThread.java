@@ -28,10 +28,11 @@ import java.util.concurrent.LinkedBlockingQueue;
 import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.parallelEventsHandler.LastEventOfIteration;
+import org.matsim.core.events.parallelEventsHandler.LastEventOfSimStep;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.withinday.events.parallelEventsHandler.LastEventOfSimStep;
 
-/* Alternative implementation. Now use a LinkedBlockingQueue instead
+/* 
+ * Alternative implementation. Now use a LinkedBlockingQueue instead
  * of busy waiting. 
  *
  * @author cdobler
