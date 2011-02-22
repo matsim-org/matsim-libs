@@ -1156,8 +1156,20 @@ public class FlowCalculationSettings {
         	}
         }
         
-        for (IndexedLinkI link : this._network.getLinks()) {
-        	totalArcs += this.TimeHorizon - getLength(link);
+        for (IndexedLinkI link : this._network.getLinks()) {        	
+        	int low = 0;
+        	int high = this.TimeHorizon - getLength(link);
+        	if (this._whenAvailable != null) {
+        		Interval when = null;
+        		when = this.getWhenAvailable(link);
+        		if (when != null) {
+        			low = Math.max(low, when.getLowBound());
+        			high = Math.min(high, when.getHighBound());
+        		}
+        	}
+        	
+        	if (low < high)        	
+        		totalArcs += high - low;
         }
         
 
@@ -1179,8 +1191,8 @@ public class FlowCalculationSettings {
         	if (this._whenAvailable != null) {
         		when = getWhenAvailable(link);
         		if (when != null) {
-        			low = when.getLowBound();
-        			high = when.getHighBound();
+        			low = Math.max(low, when.getLowBound());
+        			high = Math.min(high, when.getHighBound());
         		}
         	}
 
