@@ -57,7 +57,7 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 
 	public static final String MAX_OF_STARTTIME_AND_EARLIEST_ACTIVITY_END = "maxOfStarttimeAndEarliestActivityEnd" ;
 	public static final String ONLY_USE_STARTTIME = "onlyUseStarttime" ;
-	
+
 	public static final String VEHICLE_BEHAVIOR_TELEPORT = "teleport";
 	public static final String VEHICLE_BEHAVIOR_WAIT = "wait";
 	public static final String VEHICLE_BEHAVIOR_EXCEPTION = "exception";
@@ -138,6 +138,7 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 		map.put(NUMBER_OF_THREADS, String.valueOf(getNumberOfThreads()));
 		map.put(TRAFFIC_DYNAMICS, getTrafficDynamics());
 		map.put(SIM_STARTTIME_INTERPRETATION, getSimStarttimeInterpretation());
+		map.put(VEHICLE_BEHAVIOR, getVehicleBehavior());
 		return map;
 	}
 
@@ -161,6 +162,7 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 		map.put(SIM_STARTTIME_INTERPRETATION, "`"
 				+ MAX_OF_STARTTIME_AND_EARLIEST_ACTIVITY_END + "' (default behavior) or `"
 				+ ONLY_USE_STARTTIME + "'" ) ;
+		map.put(VEHICLE_BEHAVIOR, "Defines what happens if an agent wants to depart, but the specified vehicle is not available. One of: " + VEHICLE_BEHAVIOR_TELEPORT + ", " + VEHICLE_BEHAVIOR_WAIT + ", " + VEHICLE_BEHAVIOR_EXCEPTION);
 		return map ;
 	}
 	/* direct access */
@@ -305,7 +307,7 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 	public void setVehicleBehavior(String value) {
 		this.vehicleBehavior = value;
 	}
-	
+
 	public String getVehicleBehavior() {
 		return this.vehicleBehavior;
 	}
