@@ -22,6 +22,7 @@ package playground.droeder;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -38,7 +39,7 @@ public class DaFileReader {
 	public static Set<String[]> readFileContent(String inFile, String splitByExpr, boolean hasHeader){
 		
 		boolean first = hasHeader;
-		Set<String[]> lines = new TreeSet<String[]>();
+		Set<String[]> lines = new LinkedHashSet<String[]>();
 		
 		String line;
 		try {
