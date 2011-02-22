@@ -29,8 +29,8 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.vehicles.VehicleImpl;
 import org.matsim.vehicles.VehicleTypeImpl;
 
-import playground.mrieser.core.mobsim.api.DriverAgent;
 import playground.mrieser.core.mobsim.api.MobsimVehicle;
+import playground.mrieser.core.mobsim.fakes.FakeDriverAgent;
 import playground.mrieser.core.mobsim.fakes.FakeSimEngine;
 import playground.mrieser.core.mobsim.impl.DefaultMobsimVehicle;
 import playground.mrieser.core.mobsim.network.api.MobsimLink;
@@ -115,8 +115,10 @@ public class QueueLinkTest {
 
 		Id veh1Id = new IdImpl(11);
 		MobsimVehicle vehicle1 = new DefaultMobsimVehicle(new VehicleImpl(veh1Id, new VehicleTypeImpl(new IdImpl("1980"))));
+		vehicle1.setDriver(new FakeDriverAgent());
 		Id veh2Id = new IdImpl(22);
 		MobsimVehicle vehicle2 = new DefaultMobsimVehicle(new VehicleImpl(veh2Id, new VehicleTypeImpl(new IdImpl("1980"))));
+		vehicle2.setDriver(new FakeDriverAgent());
 
 		f.engine.setCurrentTime(200);
 		f.qlink.insertVehicle(vehicle1, MobsimLink.POSITION_AT_TO_NODE, MobsimLink.PRIORITY_AS_SOON_AS_SPACE_AVAILABLE);
@@ -179,6 +181,7 @@ public class QueueLinkTest {
 
 		Id veh1Id = new IdImpl(11);
 		MobsimVehicle vehicle1 = new DefaultMobsimVehicle(new VehicleImpl(veh1Id, new VehicleTypeImpl(new IdImpl("1980"))));
+		vehicle1.setDriver(new FakeDriverAgent());
 
 		f.engine.setCurrentTime(200);
 		f.qlink.insertVehicle(vehicle1, MobsimLink.POSITION_AT_TO_NODE, MobsimLink.PRIORITY_AS_SOON_AS_SPACE_AVAILABLE);
@@ -284,23 +287,6 @@ public class QueueLinkTest {
 			this.engine = new FakeSimEngine();
 			this.qnet = new QueueNetwork(this.engine);
 			this.qlink = new QueueLink(this.link, this.qnet);
-		}
-	}
-
-	/*package*/ static class FakeDriverAgent implements DriverAgent {
-		@Override
-		public Id getNextLinkId() {
-			return null;
-		}
-		@Override
-		public void notifyMoveToNextLink() {
-		}
-		@Override
-		public double getNextActionOnCurrentLink() {
-			return -1.0;
-		}
-		@Override
-		public void handleNextAction(final MobsimLink link, final double time) {
 		}
 	}
 

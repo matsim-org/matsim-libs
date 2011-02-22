@@ -32,6 +32,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.utils.EventsCollector;
 
@@ -129,6 +130,7 @@ public class LegHandlerTest {
 			this.plan1.addActivity(act);
 
 			this.firstLeg = new LegImpl(TransportMode.car);
+			this.firstLeg.setRoute(new LinkNetworkRouteImpl(new IdImpl("1"), new IdImpl("2")));
 			this.plan1.addLeg(this.firstLeg);
 
 			act = new ActivityImpl("work", c);
@@ -136,6 +138,7 @@ public class LegHandlerTest {
 			this.plan1.addActivity(act);
 
 			this.secondLeg = new LegImpl(TransportMode.car);
+			this.secondLeg.setRoute(new LinkNetworkRouteImpl(new IdImpl("2"), new IdImpl("1")));
 			this.plan1.addLeg(this.secondLeg);
 
 			act = new ActivityImpl("work", c);

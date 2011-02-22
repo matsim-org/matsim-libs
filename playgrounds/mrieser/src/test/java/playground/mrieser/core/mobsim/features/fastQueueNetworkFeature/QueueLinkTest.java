@@ -32,8 +32,8 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.vehicles.VehicleImpl;
 import org.matsim.vehicles.VehicleTypeImpl;
 
-import playground.mrieser.core.mobsim.api.DriverAgent;
 import playground.mrieser.core.mobsim.api.MobsimVehicle;
+import playground.mrieser.core.mobsim.fakes.FakeDriverAgent;
 import playground.mrieser.core.mobsim.fakes.FakeSimEngine;
 import playground.mrieser.core.mobsim.impl.DefaultMobsimVehicle;
 import playground.mrieser.core.mobsim.network.api.MobsimLink;
@@ -284,10 +284,11 @@ public class QueueLinkTest {
 
 		/*package*/ Fixture() {
 			this.net = NetworkImpl.createNetwork();
+			Node node1 = this.net.getFactory().createNode(new IdImpl(1), new CoordImpl(0, 0));
 			Node node2 = this.net.getFactory().createNode(new IdImpl(2), new CoordImpl(1000, 0));
-			this.net.addNode(this.net.getFactory().createNode(new IdImpl(1), new CoordImpl(0, 0)));
+			this.net.addNode(node1);
 			this.net.addNode(node2);
-			this.link = this.net.getFactory().createLink(new IdImpl(5), new IdImpl(1), new IdImpl(2));
+			this.link = this.net.getFactory().createLink(new IdImpl(5), node1, node2);
 			this.link.setLength(1000);
 			this.link.setFreespeed(10);
 			this.link.setCapacity(3600.0);
@@ -302,23 +303,6 @@ public class QueueLinkTest {
 			this.qnode = new QueueNode(node2, this.qnet, this.operator, new Random(1980));
 			this.qnet.addNode(this.qnode);
 			this.qlink.buffer.init();
-		}
-	}
-
-	/*package*/ static class FakeDriverAgent implements DriverAgent {
-		@Override
-		public Id getNextLinkId() {
-			return null;
-		}
-		@Override
-		public void notifyMoveToNextLink() {
-		}
-		@Override
-		public double getNextActionOnCurrentLink() {
-			return -1.0;
-		}
-		@Override
-		public void handleNextAction(final MobsimLink link, final double time) {
 		}
 	}
 
