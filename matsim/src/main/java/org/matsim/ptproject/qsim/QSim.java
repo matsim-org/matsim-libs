@@ -229,8 +229,10 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Netsim {
 	// "run" method:
 
 	private boolean locked = false ;
+
+	//TODO could be final without Sim2D dg, feb 2011
 	@Override
-	public final void run() {
+	public void run() {
 		this.locked = true ;
 		prepareSim();
 		this.listenerManager.fireQueueSimulationInitializedEvent();
@@ -306,7 +308,8 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Netsim {
 	/**
 	 * Prepare the simulation and get all the settings from the configuration.
 	 */
-	protected final void prepareSim() {
+	 //TODO could be final without Sim2D dg, feb 2011
+	protected void prepareSim() {
 		if (events == null) {
 			throw new RuntimeException("No valid Events Object (events == null)");
 		}
@@ -404,7 +407,8 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Netsim {
 	/**
 	 * Close any files, etc.
 	 */
-	protected final void cleanupSim(final double seconds) {
+	 	 //TODO could be final without Sim2D dg, feb 2011
+	protected void cleanupSim(final double seconds) {
 		if (this.transitEngine != null) { // yyyy do after features
 			this.transitEngine.afterSim();
 		}
@@ -458,7 +462,8 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Netsim {
 	 * @param time the current time in seconds after midnight
 	 * @return true if the simulation needs to continue
 	 */
-	protected final boolean doSimStep(final double time) { // do not overwrite in inheritance.
+	 	 //TODO could be final without Sim2D dg, feb 2011
+	protected boolean doSimStep(final double time) { // do not overwrite in inheritance.
 		// (network) change events engine:
 		if ( this.changeEventsEngine != null ) {
 			this.changeEventsEngine.doSimStep(time);
@@ -515,7 +520,8 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Netsim {
 	 * @see PersonDriverAgent#getActivityEndTime()
 	 */
 	@Override
-	public final void scheduleActivityEnd(final PlanAgent agent) {
+	//TODO could be final without Sim2D dg, feb 2011
+	public void scheduleActivityEnd(final PlanAgent agent) {
 		this.activityEndsList.add(agent);
 		registerAgentAtActivityLocation(agent);
 	}
@@ -615,7 +621,8 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Netsim {
 	// Now a PlanAgent, which makes more sense (I think). kai, nov'10
 	// yy Since this is now by force a PlanAgent, one could replace arrangeAgentDeparture and
 	// scheduleActivityEnd by joint startPlanElement.  kai, nov'10
-	public final void arrangeAgentDeparture(final PlanAgent agent) {
+	//TODO could be final without Sim2D dg, feb 2011
+	public void arrangeAgentDeparture(final PlanAgent agent) {
 		double now = this.getSimTimer().getTimeOfDay() ;
 		Leg leg = agent.getCurrentLeg();
 		//		Route route = leg.getRoute();
@@ -768,8 +775,8 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Netsim {
 		this.getEventsManager().addHandler(queueSimulationFeature) ;
 	}
 
-
-	Integer getIterationNumber() {
+//TODO could be final without Sim2D dg, feb 2011
+	protected Integer getIterationNumber() {
 		return this.iterationNumber;
 	}
 
@@ -788,8 +795,9 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Netsim {
 		this.snapshotManager.addSnapshotWriter(snapshotWriter);
 	}
 
+//TODO could be final without Sim2D dg, feb 2011
 	@Override
-	public final AgentCounterI getAgentCounter(){
+	public AgentCounterI getAgentCounter(){
 		return this.agentCounter;
 	}
 
