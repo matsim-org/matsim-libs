@@ -23,11 +23,18 @@ package playground.wrashid.PSF2.chargingSchemes;
 import java.util.HashMap;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
+import org.matsim.core.api.experimental.events.AgentArrivalEvent;
+import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
 import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
+import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 
 import playground.wrashid.PSF.ParametersPSF;
 import playground.wrashid.PSF.energy.charging.ChargingTimes;
@@ -36,75 +43,140 @@ import playground.wrashid.PSF2.vehicle.vehicleFleet.Vehicle;
 import playground.wrashid.lib.DebugLib;
 import playground.wrashid.lib.GeneralLib;
 import playground.wrashid.lib.obj.TwoHashMapsConcatenated;
+
 /**
  * 
  * There is a race condition between two handlers: LinkEnergyConsumptionTracker
- * and ActivityIntervalTracker. Therefore use just one thread when using parallelEventHandling.
+ * and ActivityIntervalTracker. Therefore use just one thread when using
+ * parallelEventHandling.
+ * 
+ * content: assume, we have a activity chain like:
+ * a1-walk-a2-car-a3-walk-a4-walk-a5-car-a6-walk-a1
+ * 
+ * then, we need to report the following activity time intervals: 1.) start-a3
+ * to end-a5 2.) start-a6 to end-a2
+ * 
+ * TODO: with introduction of parking activities, that parking activity should
+ * be ignored for checking of activity type, but the activity start event should
+ * be passed on, as it is used for the location information. 
  * 
  * @author wrashid
- *
  */
-public class ActivityIntervalTracker_NonParallelizableHandler implements ActivityStartEventHandler, ActivityEndEventHandler{
+public class ActivityIntervalTracker_NonParallelizableHandler implements ActivityStartEventHandler, AgentArrivalEventHandler,
+		AgentDepartureEventHandler, LinkEnterEventHandler {
 
-	// personId, activityStartTime
-	HashMap<Id,ActivityEndEvent> endTimeOfFirstActivity=new HashMap<Id, ActivityEndEvent>();
+	// personId, time
+	HashMap<Id, Double> timeOfFirstCarDeparture;
+
+	// personid, transportation mode
+	HashMap<Id, String> mostRecentLegMode;
+
+	// personId, activity type
+	HashMap<Id, ActivityStartEvent> firstActivityAfterParkingCar;
 	
-	// personId,linkId,activityStartTime
-	TwoHashMapsConcatenated<Id,Id,Double> activityStartTime=new TwoHashMapsConcatenated<Id, Id, Double>();
+	// personId, using car
+	HashMap<Id, Boolean> stillBeforeFristEnterLinkEvent;
+
+	// personId, time
+	HashMap<Id, Double> timeOfMostRecentDeparture;
 	
 	@Override
 	public void reset(int iteration) {
-		endTimeOfFirstActivity=new HashMap<Id, ActivityEndEvent>();
-		
-		activityStartTime=new TwoHashMapsConcatenated<Id, Id, Double>();
-		
-		ParametersPSF2.chargingTimes=new HashMap<Id, ChargingTimes>();
-	}
-	
-	
-	
+		timeOfFirstCarDeparture = new HashMap<Id, Double>();
 
-	public void handleLastActivity(){
-		for (ActivityEndEvent event:endTimeOfFirstActivity.values()){
-			
-			if (!ParametersPSF2.isChargingPossibleAtActivityLocation(event.getActType())){
-				return;
-			}
-			
-			Vehicle vehicle=ParametersPSF2.vehicles.getValue(event.getPersonId());
-			
-			Double actStartTime=activityStartTime.get(event.getPersonId(), event.getLinkId());
-			ParametersPSF2.energyStateMaintainer.chargeVehicle(vehicle, actStartTime, ParametersPSF.getFacilityChargingPowerMapper().getChargingPower(event.getFacilityId()), event);
-		}
+		mostRecentLegMode = new HashMap<Id, String>();
+
+		firstActivityAfterParkingCar = new HashMap<Id, ActivityStartEvent>();
+
+		ParametersPSF2.chargingTimes = new HashMap<Id, ChargingTimes>();
+		
+		stillBeforeFristEnterLinkEvent=new HashMap<Id, Boolean>();
+		
+		timeOfMostRecentDeparture=new HashMap<Id, Double>();
 	}
-	
-	
+
+	public void handleLastParkingActivityOfDay() {
+		for (ActivityStartEvent activityStartEvent : firstActivityAfterParkingCar.values()) {
+			Id personId = activityStartEvent.getPersonId();
+
+			if (isChargingPossible(activityStartEvent)) {
+				double departureTime = timeOfFirstCarDeparture.get(personId);
+				chargeVehicle(personId, departureTime);
+			}
+		}
+
+	}
+
 	@Override
-	public void handleEvent(ActivityEndEvent event) {
+	public void handleEvent(AgentArrivalEvent event) {
 		
-		if (!ParametersPSF2.isChargingPossibleAtActivityLocation(event.getActType())){
-			return;
-		}
-		
-		
-		Vehicle vehicle=ParametersPSF2.vehicles.getValue(event.getPersonId());
-		
-		Double actStartTime=activityStartTime.get(event.getPersonId(), event.getLinkId());
-		if (actStartTime!=null){
-			ParametersPSF2.energyStateMaintainer.chargeVehicle(vehicle, actStartTime, ParametersPSF.getFacilityChargingPowerMapper().getChargingPower(event.getFacilityId()), event);
-		} else {
-			endTimeOfFirstActivity.put(event.getPersonId(), event);
-		}
+
 	}
 
 	@Override
 	public void handleEvent(ActivityStartEvent event) {
+		if (mostRecentTransportationModeWasCar(event.getPersonId())) {
+			firstActivityAfterParkingCar.put(event.getPersonId(), event);
+		}
+	}
+
+	private boolean mostRecentTransportationModeWasCar(Id personId) {
+		if (mostRecentLegMode.containsKey(personId)){
+			return mostRecentLegMode.get(personId).equals(TransportMode.car);
+		} 
+		return  false; 
+	}
+
+	@Override
+	public void handleEvent(AgentDepartureEvent event) {
 		
 		
+		timeOfMostRecentDeparture.put(event.getPersonId(), event.getTime());
 		
-		activityStartTime.put(event.getPersonId(), event.getLinkId(), event.getTime());
+		initializeLegModeDetection(event); 
+	}
+
+	private void initializeLegModeDetection(AgentDepartureEvent event) {
+		stillBeforeFristEnterLinkEvent.put(event.getPersonId(), true);
 		
-		throw new Error("we do not check here, if the last leg was really a car trip or not!!!!!");
+		mostRecentLegMode.put(event.getPersonId(), "unknown");
+	}
+
+	private void chargeVehicle(Id personId, double departureTime) {
+		ActivityStartEvent activityStartEvent = firstActivityAfterParkingCar.get(personId);
+		Vehicle vehicle = ParametersPSF2.vehicles.getValue(personId);
+		Double actStartTime = activityStartEvent.getTime();
+
+		ParametersPSF2.energyStateMaintainer.chargeVehicle(vehicle, actStartTime, departureTime, ParametersPSF
+				.getFacilityChargingPowerMapper().getChargingPower(activityStartEvent.getFacilityId()), activityStartEvent
+				.getLinkId(), activityStartEvent.getFacilityId());
+	}
+
+	private boolean isChargingPossible(ActivityStartEvent activityStartEvent) {
+		return ParametersPSF2.isChargingPossibleAtActivityLocation(activityStartEvent.getActType());
+	}
+
+	private boolean isFirstDepartureOfDayWithCar(Id personId) {
+		return !timeOfFirstCarDeparture.containsKey(personId);
+	}
+
+	@Override
+	public void handleEvent(LinkEnterEvent event) {
+		if (stillBeforeFristEnterLinkEvent.get(event.getPersonId())){
+			Id personId = event.getPersonId();
+			ActivityStartEvent activityStartEvent = firstActivityAfterParkingCar.get(personId);
+
+			double departureTime = timeOfMostRecentDeparture.get(personId);
+			
+			if (isFirstDepartureOfDayWithCar(personId)) {
+				timeOfFirstCarDeparture.put(personId, departureTime);
+			} else if (isChargingPossible(activityStartEvent)) {
+				chargeVehicle(personId, departureTime);
+			}
+			stillBeforeFristEnterLinkEvent.put(event.getPersonId(), false);
+			
+			mostRecentLegMode.put(event.getPersonId(), "car");
+		}
 	}
 
 }

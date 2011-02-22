@@ -29,7 +29,7 @@ public class ChargingAfterSimListener implements AfterMobsimListener {
 
 	@Override
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
-		ParametersPSF2.activityIntervalTracker.handleLastActivity();		
+		ParametersPSF2.activityIntervalTracker.handleLastParkingActivityOfDay();		
 	}
 
 }

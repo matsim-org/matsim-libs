@@ -20,6 +20,7 @@
 
 package playground.wrashid.PSF2.chargingSchemes.dumbCharging;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
 
@@ -46,10 +47,9 @@ public class ARTEMISEnergyStateMaintainer_StartChargingUponArrival extends Energ
 		
 	}
 
-	public void chargeVehicle(Vehicle vehicle, double arrivalTime, double plugSizeInWatt, ActivityEndEvent event) {
+	public void chargeVehicle(Vehicle vehicle, double arrivalTime, double departureTime, double plugSizeInWatt, Id linkId, Id facilityId) {
 			if (vehicle instanceof PlugInHybridElectricVehicle || vehicle instanceof ElectricVehicle) {
 				PlugInHybridElectricVehicle phev = (PlugInHybridElectricVehicle) vehicle;
-				double departureTime = event.getTime();
 				double chargingDuration;
 
 				double maxChargingAvailableInJoule = GeneralLib.getIntervalDuration(arrivalTime, departureTime) * plugSizeInWatt;
@@ -60,7 +60,7 @@ public class ARTEMISEnergyStateMaintainer_StartChargingUponArrival extends Energ
 					} else {
 						chargingDuration = maxChargingAvailableInJoule / plugSizeInWatt;
 					}
-					phev.centralizedCharging(arrivalTime, chargingDuration, plugSizeInWatt, event);
+					phev.centralizedCharging(arrivalTime, chargingDuration, plugSizeInWatt, linkId, facilityId);
 				}
 			}
 	}
