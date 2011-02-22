@@ -1,9 +1,0 @@
-For starting a run only based on a given event file (for dumb charging without feedback), 
-use the following configuration:
-
-- before you can run playground.wrashid.PSF2.chargingSchemes.dumbCharging.testEventFileBased(), 
-you need to change the content of the input config file (test/input/playground/wrashid/PSF2/chargingSchemes/dumbCharging/config-event-file-based.xml)
-as follows:
-	- adapt the plans, facilities and input plans file. facilities file only needed, if used for scenario.
-	- also set the property: main.inputEventsForSimulationPath
-	- actually the rest of the content of this file is ignored (should be just run 1 iteraion! => else need to adapt it)

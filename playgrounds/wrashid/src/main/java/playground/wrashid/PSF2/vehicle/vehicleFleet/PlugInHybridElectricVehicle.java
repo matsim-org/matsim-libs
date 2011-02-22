@@ -39,13 +39,13 @@ public class PlugInHybridElectricVehicle extends Vehicle {
 	private double batterySizeInJoule;
 	private double batteryMinThresholdInJoule;
 	private double currentBatteryChargeInJoule;
-	
+
 	protected double electricEnergyUseInJouleDuringDayForDriving;
-	
+
 	public PlugInHybridElectricVehicle(EnergyStateMaintainer energyStateMaintainer, Id vehicleClassId) {
 		super(energyStateMaintainer, vehicleClassId);
 	}
-	
+
 	public PlugInHybridElectricVehicle(Id vehicleClassId) {
 		super(vehicleClassId);
 	}
@@ -53,60 +53,61 @@ public class PlugInHybridElectricVehicle extends Vehicle {
 	@Override
 	public void updateEnergyState(double energyConsumptionOnLinkInJoule) {
 		logEnergyConsumption(energyConsumptionOnLinkInJoule);
-		
-		if (getAvailbleBatteryCharge()>=energyConsumptionOnLinkInJoule){
+
+		if (getAvailbleBatteryCharge() >= energyConsumptionOnLinkInJoule) {
 			processElectricityUsage(energyConsumptionOnLinkInJoule);
-		} else if (getAvailbleBatteryCharge()>0){
+		} else if (getAvailbleBatteryCharge() > 0) {
 			processElectricityUsage(getAvailbleBatteryCharge());
 		}
 	}
-	
-	private void processElectricityUsage(double energyConsumptionInJoule){
-		electricEnergyUseInJouleDuringDayForDriving+=energyConsumptionInJoule;
+
+	private void processElectricityUsage(double energyConsumptionInJoule) {
+		electricEnergyUseInJouleDuringDayForDriving += energyConsumptionInJoule;
 		setCurrentBatteryChargeInJoule(getCurrentBatteryChargeInJoule() - energyConsumptionInJoule);
-		
-		if (getCurrentBatteryChargeInJoule()<0){
+
+		if (getCurrentBatteryChargeInJoule() < 0) {
 			DebugLib.stopSystemAndReportInconsistency();
 		}
 	}
-	
-	private double getAvailbleBatteryCharge(){
-		return getCurrentBatteryChargeInJoule()-getBatteryMinThresholdInJoule();
+
+	private double getAvailbleBatteryCharge() {
+		return getCurrentBatteryChargeInJoule() - getBatteryMinThresholdInJoule();
 	}
 
-	public double getRequiredBatteryCharge(){
+	public double getRequiredBatteryCharge() {
 		return getBatterySizeInJoule() - getCurrentBatteryChargeInJoule();
 	}
 
-	
-	private void chargeVehicle(double energyConsumptionInJoule){
+	private void chargeVehicle(double energyConsumptionInJoule) {
 		setCurrentBatteryChargeInJoule(getCurrentBatteryChargeInJoule() + energyConsumptionInJoule);
-		
-		if (getCurrentBatteryChargeInJoule()>getBatterySizeInJoule() && !MathLib.equals(getCurrentBatteryChargeInJoule(), getBatterySizeInJoule(), 0.1)){
+
+		if (getCurrentBatteryChargeInJoule() > getBatterySizeInJoule()
+				&& !MathLib.equals(getCurrentBatteryChargeInJoule(), getBatterySizeInJoule(), 0.1)) {
 			DebugLib.stopSystemAndReportInconsistency();
 		}
 	}
-	
-	public void centralizedCharging(double arrivalTime, double chargingDuration, double plugSizeInWatt, ActivityEndEvent event) {
-		double chargeInJoule=chargingDuration*plugSizeInWatt;
-		
-		logChargingTime(arrivalTime, chargingDuration, chargeInJoule, event);
-		
+
+	public void centralizedCharging(double arrivalTime, double chargingDuration, double plugSizeInWatt, Id linkId, Id facilityId) {
+		double chargeInJoule = chargingDuration * plugSizeInWatt;
+
+		logChargingTime(arrivalTime, chargingDuration, chargeInJoule, linkId, facilityId);
+
 		chargeVehicle(chargeInJoule);
 	}
 
-	private void logChargingTime(double arrivalTime, double chargingDuration, double chargeInJoule, ActivityEndEvent event) {
-		Id personId=ParametersPSF2.vehicles.getKey(this);
-		double endChargingTime=GeneralLib.projectTimeWithin24Hours(arrivalTime+chargingDuration);
-		if (event==null){
-			System.out.println();
-		}
+	private void logChargingTime(double arrivalTime, double chargingDuration, double chargeInJoule, Id linkId, Id facilityId) {
+		Id personId = ParametersPSF2.vehicles.getKey(this);
+		double endChargingTime = GeneralLib.projectTimeWithin24Hours(arrivalTime + chargingDuration);
 		
-		if (ParametersPSF2.chargingTimes.get(personId)==null){
+
+		if (ParametersPSF2.chargingTimes.get(personId) == null) {
 			ParametersPSF2.chargingTimes.put(personId, new ChargingTimes());
 		}
-		
-		ParametersPSF2.chargingTimes.get(personId).addChargeLog(new ChargeLog(event.getLinkId(), GeneralLib.projectTimeWithin24Hours(arrivalTime), endChargingTime, getCurrentBatteryChargeInJoule(), getCurrentBatteryChargeInJoule()+chargeInJoule, event.getFacilityId()));
+
+		ParametersPSF2.chargingTimes.get(personId)
+				.addChargeLog(
+						new ChargeLog(linkId, GeneralLib.projectTimeWithin24Hours(arrivalTime), endChargingTime,
+								getCurrentBatteryChargeInJoule(), getCurrentBatteryChargeInJoule() + chargeInJoule, linkId));
 	}
 
 	public void setBatterySizeInJoule(double batterySizeInJoule) {
@@ -132,5 +133,5 @@ public class PlugInHybridElectricVehicle extends Vehicle {
 	public double getCurrentBatteryChargeInJoule() {
 		return currentBatteryChargeInJoule;
 	}
-	
+
 }

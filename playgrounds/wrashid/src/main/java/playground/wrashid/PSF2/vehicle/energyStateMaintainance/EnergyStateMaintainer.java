@@ -20,6 +20,7 @@
 
 package playground.wrashid.PSF2.vehicle.energyStateMaintainance;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
 
@@ -32,7 +33,7 @@ public abstract class EnergyStateMaintainer {
 
 	public abstract void processVehicleEnergyState(Vehicle vehicle, double timeSpendOnLink, Link link);
 
-	public abstract void chargeVehicle(Vehicle vehicle,double arrivalTime, double departureTime, ActivityEndEvent event);
+	public abstract void chargeVehicle(Vehicle vehicle, double arrivalTime, double departureTime, double plugSizeInWatt, Id linkId, Id facilityId);
 	
 	public EnergyStateMaintainer(EnergyConsumptionTable energyConsumptionTable){
 		this.energyConsumptionTable = energyConsumptionTable;

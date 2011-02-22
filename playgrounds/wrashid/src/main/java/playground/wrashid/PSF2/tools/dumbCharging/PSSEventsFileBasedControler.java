@@ -18,8 +18,29 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.wrashid.PSF2.pssControler;
+package playground.wrashid.PSF2.tools.dumbCharging;
 
+import playground.wrashid.PSF2.chargingSchemes.dumbCharging.EventsBasedDumbChargingMain;
+
+/**
+ *  As a template config file, use:
+	test/input/playground/wrashid/PSF2/chargingSchemes/dumbCharging/config-event-file-based.xml
+	
+	adapt that file as follows:
+	- adapt the plans, facilities and network file. facilities file only needed, if used for scenario.
+	- also set the property: main.inputEventsForSimulationPath (path to events file)
+	- actually the rest of the content of this file is ignored (should be just run 1 iteraion! => else need to adapt it)
+	
+ * @author wrashid
+ *
+ */
 public class PSSEventsFileBasedControler {
 
+	
+	
+	public static void main(String[] args) {
+		EventsBasedDumbChargingMain.runEventsBasedPSSControler("test/input/playground/wrashid/PSF2/chargingSchemes/dumbCharging/config-event-file-based.xml");
+	}
+	
+	
 }
