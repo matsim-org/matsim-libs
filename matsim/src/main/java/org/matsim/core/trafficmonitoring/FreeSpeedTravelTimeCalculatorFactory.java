@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.withinday.trafficmonitoring;
+package org.matsim.core.trafficmonitoring;
 
 import org.matsim.core.api.internal.MatsimFactory;
 

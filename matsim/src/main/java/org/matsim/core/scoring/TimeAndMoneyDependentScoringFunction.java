@@ -18,12 +18,11 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.withinday.scoring;
+package org.matsim.core.scoring;
 
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.events.AgentMoneyEventImpl;
-import org.matsim.core.scoring.ScoringFunction;
 
 /**
  * A Scoring Function that only respects the travel time and money events.

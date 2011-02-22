@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.withinday.events.algorithms;
+package org.matsim.core.mobsim.framework.listeners;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,18 +27,16 @@ import org.matsim.core.mobsim.framework.events.SimulationAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.events.SimulationBeforeCleanupEvent;
 import org.matsim.core.mobsim.framework.events.SimulationBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
-import org.matsim.core.mobsim.framework.listeners.SimulationAfterSimStepListener;
-import org.matsim.core.mobsim.framework.listeners.SimulationBeforeCleanupListener;
-import org.matsim.core.mobsim.framework.listeners.SimulationBeforeSimStepListener;
-import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
-import org.matsim.core.mobsim.framework.listeners.SimulationListener;
 
-/*
- * To avoid problems with the order of some QueueSimulationListeners we
- * collect them and execute them in a fixed, given order. Even something
- * like ParallelListenerHandling should not able to break the order.
+/**
+ * To avoid problems with the order of some SimulationListeners, this
+ * class can be used execute them in a fixed order. Even something like 
+ * ParallelListenerHandling (which is not available yet) should not able 
+ * to break the order.
+ * 
+ * @author cdobler
  */
-public class FixedOrderQueueSimulationListener implements SimulationInitializedListener,
+public class FixedOrderSimulationListener implements SimulationInitializedListener,
 	SimulationBeforeSimStepListener, SimulationAfterSimStepListener,
 	SimulationBeforeCleanupListener {
 
@@ -47,7 +45,7 @@ public class FixedOrderQueueSimulationListener implements SimulationInitializedL
 	List<SimulationAfterSimStepListener> simulationAfterSimStepListener;
 	List<SimulationBeforeCleanupListener> simulationBeforeCleanupListener;
 
-	public FixedOrderQueueSimulationListener() {
+	public FixedOrderSimulationListener() {
 		simulationInitializedListener = new ArrayList<SimulationInitializedListener>();
 		simulationBeforeSimStepListener = new ArrayList<SimulationBeforeSimStepListener>();
 		simulationAfterSimStepListener = new ArrayList<SimulationAfterSimStepListener>();
@@ -57,44 +55,44 @@ public class FixedOrderQueueSimulationListener implements SimulationInitializedL
 	/**
 	 * Adds the SimulationListener to all ListenerLists that it supports.
 	 */
-	public void addQueueSimulationListener(SimulationListener listener) {
+	public void addSimulationListener(SimulationListener listener) {
 		if (listener instanceof SimulationInitializedListener) {
-			addQueueSimulationInitializedListener((SimulationInitializedListener) listener);
+			addSimulationInitializedListener((SimulationInitializedListener) listener);
 		}
 		if (listener instanceof SimulationBeforeSimStepListener) {
-			addQueueSimulationBeforeSimStepListener((SimulationBeforeSimStepListener) listener);
+			addSimulationBeforeSimStepListener((SimulationBeforeSimStepListener) listener);
 		}
 		if (listener instanceof SimulationAfterSimStepListener) {
-			addQueueSimulationAfterSimStepListener((SimulationAfterSimStepListener) listener);
+			addSimulationAfterSimStepListener((SimulationAfterSimStepListener) listener);
 		}
 		if (listener instanceof SimulationBeforeCleanupListener) {
-			addQueueSimulationBeforeCleanupListener((SimulationBeforeCleanupListener) listener);
+			addSimulationBeforeCleanupListener((SimulationBeforeCleanupListener) listener);
 		}
 	}
 	
 	/**
 	 * Removes the SimulationListener from all ListenerLists that it supports.
 	 */
-	public void removeQueueSimulationListener(SimulationListener listener) {
+	public void removeSimulationListener(SimulationListener listener) {
 		if (listener instanceof SimulationInitializedListener) {
-			removeQueueSimulationInitializedListener((SimulationInitializedListener) listener);
+			removeSimulationInitializedListener((SimulationInitializedListener) listener);
 		}
 		if (listener instanceof SimulationBeforeSimStepListener) {
-			removeQueueSimulationBeforeSimStepListener((SimulationBeforeSimStepListener) listener);
+			removeSimulationBeforeSimStepListener((SimulationBeforeSimStepListener) listener);
 		}
 		if (listener instanceof SimulationAfterSimStepListener) {
-			removeQueueSimulationAfterSimStepListener((SimulationAfterSimStepListener) listener);
+			removeSimulationAfterSimStepListener((SimulationAfterSimStepListener) listener);
 		}
 		if (listener instanceof SimulationBeforeCleanupListener) {
-			removeQueueSimulationBeforeCleanupListener((SimulationBeforeCleanupListener) listener);
+			removeSimulationBeforeCleanupListener((SimulationBeforeCleanupListener) listener);
 		}
 	}
 	
-	public void addQueueSimulationInitializedListener(SimulationInitializedListener listener) {
+	public void addSimulationInitializedListener(SimulationInitializedListener listener) {
 		simulationInitializedListener.add(listener);
 	}
 
-	public void removeQueueSimulationInitializedListener(SimulationInitializedListener listener) {
+	public void removeSimulationInitializedListener(SimulationInitializedListener listener) {
 		simulationInitializedListener.remove(listener);
 	}
 
@@ -105,11 +103,11 @@ public class FixedOrderQueueSimulationListener implements SimulationInitializedL
 		}
 	}
 
-	public void addQueueSimulationBeforeSimStepListener(SimulationBeforeSimStepListener listener) {
+	public void addSimulationBeforeSimStepListener(SimulationBeforeSimStepListener listener) {
 		simulationBeforeSimStepListener.add(listener);
 	}
 
-	public void removeQueueSimulationBeforeSimStepListener(SimulationBeforeSimStepListener listener) {
+	public void removeSimulationBeforeSimStepListener(SimulationBeforeSimStepListener listener) {
 		simulationBeforeSimStepListener.remove(listener);
 	}
 
@@ -120,11 +118,11 @@ public class FixedOrderQueueSimulationListener implements SimulationInitializedL
 		}
 	}
 
-	public void addQueueSimulationAfterSimStepListener(SimulationAfterSimStepListener listener) {
+	public void addSimulationAfterSimStepListener(SimulationAfterSimStepListener listener) {
 		simulationAfterSimStepListener.add(listener);
 	}
 
-	public void removeQueueSimulationAfterSimStepListener(SimulationAfterSimStepListener listener) {
+	public void removeSimulationAfterSimStepListener(SimulationAfterSimStepListener listener) {
 		simulationAfterSimStepListener.remove(listener);
 	}
 
@@ -135,11 +133,11 @@ public class FixedOrderQueueSimulationListener implements SimulationInitializedL
 		}
 	}
 
-	public void addQueueSimulationBeforeCleanupListener(SimulationBeforeCleanupListener listener) {
+	public void addSimulationBeforeCleanupListener(SimulationBeforeCleanupListener listener) {
 		simulationBeforeCleanupListener.add(listener);
 	}
 
-	public void removeQueueSimulationBeforeCleanupListener(SimulationBeforeCleanupListener listener) {
+	public void removeSimulationBeforeCleanupListener(SimulationBeforeCleanupListener listener) {
 		simulationBeforeCleanupListener.remove(listener);
 	}
 

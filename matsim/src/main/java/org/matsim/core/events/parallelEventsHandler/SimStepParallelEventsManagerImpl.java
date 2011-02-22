@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.withinday.events.parallelEventsHandler;
+package org.matsim.core.events.parallelEventsHandler;
 
 import java.util.Queue;
 import java.util.concurrent.BrokenBarrierException;
@@ -30,7 +30,6 @@ import org.matsim.core.api.experimental.events.EventsFactory;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.events.parallelEventsHandler.LastEventOfIteration;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.events.SimulationAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationAfterSimStepListener;

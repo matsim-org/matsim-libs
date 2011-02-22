@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * FreeSpeedTravelTimeCalculator.java
+ * OnlyTimeDependentScoringFunctionFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,25 +18,22 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.withinday.trafficmonitoring;
+package org.matsim.core.scoring;
 
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.router.util.PersonalizableTravelTime;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.scoring.OnlyTimeDependentScoringFunction;
+
 
 /**
- * Calculates and returns the FreeSpeedTravelTime on a link at the given time.
+ * Returns a Scoring Function that only respects the travel time.
  * @author cdobler
  */
-public class FreeSpeedTravelTimeCalculator implements PersonalizableTravelTime {
-
-	@Override
-	public double getLinkTravelTime(Link link, double time) {
-		return link.getLength() / link.getFreespeed(time);
-	}
-
-	@Override
-	public void setPerson(Person person) {
-		// nothing to do here
+public class OnlyTimeDependentScoringFunctionFactory implements ScoringFunctionFactory {
+	
+	public ScoringFunction createNewScoringFunction(Plan plan) {
+		return new OnlyTimeDependentScoringFunction();
 	}
 }
+
+
+
