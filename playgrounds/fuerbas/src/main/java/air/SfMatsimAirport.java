@@ -11,7 +11,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
-public class SfMatsimAirportNew {
+public class SfMatsimAirport {
 	
 	private static final double runwayLength = 450.0;
 	private static final double taxiwayLength = 200.0;
@@ -19,7 +19,7 @@ public class SfMatsimAirportNew {
 	public Coord coord;
 	public Id id;
 	
-	public SfMatsimAirportNew(Id id, Coord coord) {
+	public SfMatsimAirport(Id id, Coord coord) {
 		this.id=id;
 		this.coord=coord;
 	}
