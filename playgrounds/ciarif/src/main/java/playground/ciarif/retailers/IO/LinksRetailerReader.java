@@ -177,6 +177,9 @@ public class LinksRetailerReader
     else if (ratioCriteria.equals("one")) {
       referenceRatio = 1.0D;
     }
+    else if (ratioCriteria.equals("random")){
+    	referenceRatio = 0.0D;
+    }
     else {
       throw new RuntimeException("The criteria to choose the available links has not been set");
     }
@@ -216,7 +219,7 @@ public class LinksRetailerReader
         log.info("The ratio persons/shopsCapacity of the link " + link.getId() + " is: " + ratio);
         log.info("The number of shops around the link " + link.getId() + " is: " + numberShops);
 
-        if (attempts < numberLinks) {
+        if (attempts < numberLinks & referenceRatio>0) {
           if ((((ratio > referenceRatio) ? 1 : 0) & ((numberPersons > 50.0D) ? 1 : 0) ) != 0 & numberShops<3)
           {
             this.freeLinks.put(link.getId(), link);
@@ -224,6 +227,12 @@ public class LinksRetailerReader
             log.info("free links are" + this.freeLinks.keySet());
             this.allLinks.put(link.getId(), link);
           }
+        }
+        else if(referenceRatio==0){
+        	this.freeLinks.put(link.getId(), link);
+            log.info("the link " + link.getId() + " has been added to the free links");
+            log.info("free links are" + this.freeLinks.keySet());
+            this.allLinks.put(link.getId(), link);
         }
         else {
           this.freeLinks.put(link.getId(), link);

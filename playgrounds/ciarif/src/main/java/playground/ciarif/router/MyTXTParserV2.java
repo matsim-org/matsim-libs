@@ -67,8 +67,8 @@ public class MyTXTParserV2 {
 	private Charset charset = Charset.forName("ISO-8859-1");
 	//private Charset charset = Charset.forName("UTF-8");
 	
-	private File inFile = new File("../matsim/input/inputBeispiel.txt");
-	private File outFile = new File("../matsim/output/outputBeispiel.txt");
+	private File inFile = new File("../../matsim/input/input.txt");
+	private File outFile = new File("../../matsim/output/output.txt");
 	//private String shapeFile = "../../matsim/mysimulations/snowball/G1K08.shp";
 	
 //	private File inFile = new File("infile.csv");
