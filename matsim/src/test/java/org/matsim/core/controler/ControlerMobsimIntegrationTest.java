@@ -142,11 +142,7 @@ public class ControlerMobsimIntegrationTest {
 		Simulation getNewMobsim() {
 			// remember the created sim, but return a dummy
 			this.sim = super.getNewMobsim();
-			return new Simulation() {
-				@Override
-				public void run() {
-				}
-			};
+			return new FakeSimulation();
 		}
 	}
 
@@ -157,12 +153,13 @@ public class ControlerMobsimIntegrationTest {
 		@Override
 		public Simulation createMobsim(Scenario sc, EventsManager eventsManager) {
 			this.callCount++;
-			return new Simulation() {
-				@Override
-				public void run() {
-				}
-			};
+			return new FakeSimulation();
 		}
+	}
 
+	private static class FakeSimulation implements Simulation {
+		@Override
+		public void run() {
+		}
 	}
 }
