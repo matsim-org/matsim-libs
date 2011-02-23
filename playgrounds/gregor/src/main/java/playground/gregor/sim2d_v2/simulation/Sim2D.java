@@ -33,14 +33,17 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.controler.ControlerIO;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
+import org.matsim.core.mobsim.framework.listeners.SimulationListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationListenerManager;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.agents.AgentFactory;
 import org.matsim.ptproject.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.ptproject.qsim.comparators.PlanAgentDepartureTimeComparator;
@@ -48,6 +51,9 @@ import org.matsim.ptproject.qsim.helpers.AgentCounter;
 import org.matsim.ptproject.qsim.helpers.MobsimTimer;
 import org.matsim.ptproject.qsim.interfaces.AgentCounterI;
 import org.matsim.ptproject.qsim.interfaces.DepartureHandler;
+import org.matsim.ptproject.qsim.interfaces.MobsimTimerI;
+import org.matsim.ptproject.qsim.interfaces.Netsim;
+import org.matsim.ptproject.qsim.interfaces.NetsimNetwork;
 
 import playground.gregor.sim2d_v2.scenario.Scenario2DImpl;
 import playground.gregor.sim2d_v2.simulation.floor.Floor;
@@ -60,12 +66,12 @@ import playground.gregor.sim2d_v2.simulation.floor.Floor;
  * @author laemmel
  * 
  */
-public class Sim2D extends QSim {
+public class Sim2D implements Netsim {
 
 	private static final Logger log = Logger.getLogger(Sim2D.class);
 
-//	private EventsManagerImpl events;
-//	private final Scenario2DImpl scenario;
+	private EventsManagerImpl events;
+	private final Scenario2DImpl scenario;
 
 	private MobsimTimer simTimer;
 
@@ -88,6 +94,8 @@ public class Sim2D extends QSim {
 
 	private final Date realWorldStarttime = new Date();
 
+	private Integer iterationNumber = null;
+
 	private final List<DepartureHandler> departureHandlers = new ArrayList<DepartureHandler>();
 
 	public Sim2D(EventsManagerImpl events, Scenario2DImpl scenario2DData) {
@@ -99,9 +107,8 @@ public class Sim2D extends QSim {
 	 * @param scenario2dData
 	 */
 	public Sim2D(EventsManagerImpl events, Scenario2DImpl scenario2DData, DefaultSim2DEngineFactory factory) {
-		super( scenario2DData, events ) ;
-//		this.events = events;
-//		this.scenario = scenario2DData;
+		this.events = events;
+		this.scenario = scenario2DData;
 		init(factory);
 	}
 
@@ -125,6 +132,30 @@ public class Sim2D extends QSim {
 
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.matsim.core.mobsim.framework.IOSimulation#setControlerIO(org.matsim
+	 * .core.controler.ControlerIO)
+	 */
+	@Override
+	public void setControlerIO(ControlerIO cio) {
+		// TODO Auto-generated method stub
+
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.matsim.core.mobsim.framework.IOSimulation#setIterationNumber(java
+	 * .lang.Integer)
+	 */
+	@Override
+	public void setIterationNumber(Integer iterationNumber) {
+		this.iterationNumber = iterationNumber;
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -159,8 +190,7 @@ public class Sim2D extends QSim {
 	/**
 	 * @param time
 	 */
-	@Override
-	protected void cleanupSim(double time) {
+	private void cleanupSim(double time) {
 		if (this.sim2DEngine != null) {
 			this.sim2DEngine.afterSim();
 		}
@@ -168,12 +198,12 @@ public class Sim2D extends QSim {
 		double now = this.simTimer.getTimeOfDay();
 		for (PlanAgent agent : this.activityEndsList) {
 			if (agent.getDestinationLinkId() != null) {
-				this.getEventsManager().processEvent(this.getEventsManager().getFactory().createAgentStuckEvent(now, agent.getId(), agent.getDestinationLinkId(), null));
+				this.events.processEvent(this.events.getFactory().createAgentStuckEvent(now, agent.getId(), agent.getDestinationLinkId(), null));
 			}
 		}
 		this.activityEndsList.clear();
 		this.sim2DEngine = null;
-//		this.events = null; // delete events object to free events handlers, if
+		this.events = null; // delete events object to free events handlers, if
 		// they are nowhere else referenced
 	}
 
@@ -188,8 +218,7 @@ public class Sim2D extends QSim {
 	 * @param time
 	 * @return
 	 */
-	@Override
-	protected boolean doSimStep(double time) {
+	private boolean doSimStep(double time) {
 		// "facilities" "engine":
 		handleActivityEnds(time);
 
@@ -240,9 +269,8 @@ public class Sim2D extends QSim {
 	/**
 	 * 
 	 */
-	@Override
-	protected void prepareSim() {
-		if (this.getEventsManager() == null) {
+	private void prepareSim() {
+		if (this.events == null) {
 			throw new RuntimeException("No valid Events Object (events == null)");
 		}
 		if (this.sim2DEngine != null) {
@@ -262,8 +290,8 @@ public class Sim2D extends QSim {
 	 * 
 	 */
 	private void initSimTimer() {
-		double startTime = this.getScenario().getConfig().getQSimConfigGroup().getStartTime();
-		this.stopTime = this.getScenario().getConfig().getQSimConfigGroup().getEndTime();
+		double startTime = this.scenario.getConfig().getQSimConfigGroup().getStartTime();
+		this.stopTime = this.scenario.getConfig().getQSimConfigGroup().getEndTime();
 		if (startTime == Time.UNDEFINED_TIME)
 			startTime = 0.0;
 		if ((this.stopTime == Time.UNDEFINED_TIME) || (this.stopTime == 0))
@@ -285,11 +313,11 @@ public class Sim2D extends QSim {
 	/**
 	 * 
 	 */
-	protected void createAgents() {
-		if (this.getScenario().getPopulation() == null) {
+	private void createAgents() {
+		if (this.scenario.getPopulation() == null) {
 			throw new RuntimeException("No valid Population found (plans == null)");
 		}
-		for (Person p : this.getScenario().getPopulation().getPersons().values()) {
+		for (Person p : this.scenario.getPopulation().getPersons().values()) {
 			PersonDriverAgentImpl agent = this.agentFactory.createPersonAgent(p);
 			this.agents.add(agent);
 			agent.initialize();
@@ -313,7 +341,7 @@ public class Sim2D extends QSim {
 		// Route route = leg.getRoute();
 		String mode = leg.getMode();
 		Id linkId = agent.getCurrentLinkId() ;
-		this.getEventsManager().processEvent(this.getEventsManager().getFactory().createAgentDepartureEvent(now, agent.getId(), linkId, mode));
+		this.events.processEvent(this.events.getFactory().createAgentDepartureEvent(now, agent.getId(), linkId, mode));
 		if (handleKnownLegModeDeparture(now, agent, linkId, leg)) {
 			return;
 		} else {
@@ -355,26 +383,35 @@ public class Sim2D extends QSim {
 		return this.agentCounter;
 	}
 
-//	/*
-//	 * (non-Javadoc)
-//	 * 
-//	 * @see org.matsim.ptproject.qsim.interfaces.QSimI#getEventsManager()
-//	 */
-//	@Override
-//	public EventsManager getEventsManager() {
-//		return this.events;
-//	}
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.matsim.ptproject.qsim.interfaces.QSimI#getEventsManager()
+	 */
+	@Override
+	public EventsManager getEventsManager() {
+		return this.events;
+	}
 
-//	/*
-//	 * (non-Javadoc)
-//	 * 
-//	 * @see org.matsim.ptproject.qsim.interfaces.QSimI#getScenario()
-//	 */
-//	@Override
-//	public Scenario getScenario() {
-//		return this.scenario;
-//	}
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.matsim.ptproject.qsim.interfaces.QSimI#getScenario()
+	 */
+	@Override
+	public Scenario getScenario() {
+		return this.scenario;
+	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.matsim.ptproject.qsim.interfaces.QSimI#getSimTimer()
+	 */
+	@Override
+	public MobsimTimerI getSimTimer() {
+		return this.simTimer;
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -438,10 +475,44 @@ public class Sim2D extends QSim {
 			Date endtime = new Date();
 			long diffreal = (endtime.getTime() - this.realWorldStarttime.getTime()) / 1000;
 			double diffsim = time - this.simTimer.getSimStartTime();
-			log.info("SIMULATION (NEW QSim) AT " + Time.writeTime(time) + " (it." + this.getIterationNumber() + "): #Veh=" + this.agentCounter.getLiving() + " lost=" + this.agentCounter.getLost() + " simT=" + diffsim + "s realT=" + (diffreal) + "s; (s/r): " + (diffsim / (diffreal + Double.MIN_VALUE)));
+			log.info("SIMULATION (NEW QSim) AT " + Time.writeTime(time) + " (it." + this.iterationNumber + "): #Veh=" + this.agentCounter.getLiving() + " lost=" + this.agentCounter.getLost() + " simT=" + diffsim + "s realT=" + (diffreal) + "s; (s/r): " + (diffsim / (diffreal + Double.MIN_VALUE)));
 
 			Gbl.printMemoryUsage();
 		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.matsim.ptproject.qsim.interfaces.QSimI#registerAgentAtPtWaitLocation
+	 * (org.matsim.core.mobsim.framework.PersonAgent)
+	 */
+	@Override
+	public void registerAgentAtPtWaitLocation(PlanAgent planAgent) {
+		throw new RuntimeException("not implemented");
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.matsim.ptproject.qsim.interfaces.QSimI#unregisterAgentAtPtWaitLocation
+	 * (org.matsim.core.mobsim.framework.PersonAgent)
+	 */
+	@Override
+	public void unregisterAgentAtPtWaitLocation(PlanAgent planAgent) {
+		throw new RuntimeException("not implemented");
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.matsim.ptproject.qsim.interfaces.QSimI#getQNetwork()
+	 */
+	@Override
+	public NetsimNetwork getNetsimNetwork() {
+		throw new RuntimeException("not implemented");
 	}
 
 	/**
@@ -452,6 +523,39 @@ public class Sim2D extends QSim {
 
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.matsim.ptproject.qsim.interfaces.QSimI#getActivityEndsList()
+	 */
+	@Override
+	public Collection<PlanAgent> getActivityEndsList() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.matsim.ptproject.qsim.interfaces.QSimI#rescheduleActivityEnd(org.
+	 * matsim.core.mobsim.framework.PersonAgent, double, double)
+	 */
+	@Override
+	public void rescheduleActivityEnd(PersonAgent agent, double oldTime, double newTime) {
+		throw new RuntimeException("not implemented");
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @seeorg.matsim.core.mobsim.framework.ObservableSimulation#
+	 * addQueueSimulationListeners
+	 * (org.matsim.core.mobsim.framework.listeners.SimulationListener)
+	 */
+	@Override
+	public void addQueueSimulationListeners(SimulationListener listener) {
+		throw new RuntimeException("not implemented");
+	}
 
 }
