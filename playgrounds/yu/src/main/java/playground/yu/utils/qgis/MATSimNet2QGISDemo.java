@@ -60,14 +60,17 @@ public class MATSimNet2QGISDemo implements X2QGIS {
 		// String outputFileLs = "../berlin data/Links.shp";
 		// String outputFileP = "../berlin data/Polygon.shp";
 		String netfile, outputFileLs, outputFileP;
+		double width;
 		if (args.length == 0) {
 			netfile = "../matsim/test/scenarios/chessboard/network.xml";
 			outputFileLs = "../matsimTests/locationChoice/chessboard/Links.shp";
 			outputFileP = "../matsimTests/locationChoice/chessboard/Polygon.shp";
+			width = 10d;
 		} else {
 			netfile = args[0];
 			outputFileLs = args[1];
 			outputFileP = args[2];
+			width = Double.parseDouble(args[3]);
 		}
 		// String coordinateSys = ch1903;
 		String coordinateSys = "DHDN_GK4";
@@ -90,7 +93,7 @@ public class MATSimNet2QGISDemo implements X2QGIS {
 		new Links2ESRIShape(network, outputFileLs, builder).write();
 
 		CoordinateReferenceSystem crs = MGC.getCRS(coordinateSys);
-		builder.setWidthCoefficient(10);
+		builder.setWidthCoefficient(width);
 		builder.setFeatureGeneratorPrototype(PolygonFeatureGenerator.class);
 		builder.setWidthCalculatorPrototype(CapacityBasedWidthCalculator.class);
 		builder.setCoordinateReferenceSystem(crs);
