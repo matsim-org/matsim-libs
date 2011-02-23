@@ -24,7 +24,13 @@ public class SfAirNetworkBuilder {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		// TODO Auto-generated method stub
+
+		SfAirNetworkBuilder builder = new SfAirNetworkBuilder();
+		builder.createNetwork();
+		
+	}
+	
+	public void createNetwork() throws IOException {
 		
 		String output = "/home/soeren/workspace/testnetzwerk";
 		Set<String> allowedModes = new HashSet<String>();
@@ -79,16 +85,12 @@ public class SfAirNetworkBuilder {
 //			} // HIER LÖSCHEN
 			
 		}
-		
-
-		
+			
 		new NetworkWriter(network).write(output + ".xml");
 		System.out.println("Done! Unprocessed MATSim Network saved as " + output + ".xml");
 		
 		brAirports.close();
 		brRoutes.close();
-		
-		
 	}
 
 }
