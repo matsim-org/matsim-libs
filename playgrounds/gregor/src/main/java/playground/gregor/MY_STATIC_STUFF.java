@@ -27,7 +27,7 @@ public class MY_STATIC_STUFF {
 
 	public final static String OUTPUTS = "../../../../outputs/";
 	
-	public static final String SVN_ROOT ="/home/laemmel/arbeit/svn";
+	public static final String SVN_ROOT ="/Users/laemmel/svn/";
 	public static final String SHARED_SVN ="shared-svn";
 	
 //	public static final String SVN_ROOT ="/net/ils/";
