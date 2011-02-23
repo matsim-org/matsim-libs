@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package playground.droeder.Journal2MATSim2Journal;
 
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -26,6 +27,8 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -54,9 +57,12 @@ import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.run.Controler;
+import org.xml.sax.SAXException;
 
 import playground.droeder.DaFileReader;
 import playground.droeder.DaPaths;
+
+// TODO refactor cap of Network/Vehicles and vehicleEnterTimes
 
 /**
  * @author droeder
@@ -66,7 +72,7 @@ public class Journal2Matsim2Journal {
 	private static final Logger log = Logger
 			.getLogger(Journal2Matsim2Journal.class);
 	
-	private static String homeDir = DaPaths.OUTPUT + "journals/";
+	private static final String INPUTDIR = DaPaths.OUTPUT + "journals/";
 	
 	private String inFile = null;
 	private String networkFile = null;
@@ -74,7 +80,7 @@ public class Journal2Matsim2Journal {
 	private String schedule = null;
 	private String vehicles = null;
 	private String configFile = null;
-	private String dir = null;
+	private String outDir = null;
 	private String splitByExpr = null;
 	
 	private double startTime = Double.MAX_VALUE;
@@ -89,8 +95,8 @@ public class Journal2Matsim2Journal {
 	private final String ACT_2 = "other";
 	
 	public static void main(String[] args){
-		Journal2Matsim2Journal j = new Journal2Matsim2Journal(homeDir + "dummy.csv", ";", true);
-		j.run(homeDir + "multimodalnetwork.xml", homeDir + "transitVehicles.xml", homeDir + "transitSchedule.xml", DaPaths.OUTPUT + "journals/");
+		Journal2Matsim2Journal j = new Journal2Matsim2Journal(INPUTDIR + "dummy.csv", ";", true);
+		j.run(INPUTDIR + "multimodalnetwork.xml", INPUTDIR + "transitVehicles.xml", INPUTDIR + "transitSchedule.xml", DaPaths.OUTPUT + "journals/");
 		
 	}
 	
@@ -101,20 +107,22 @@ public class Journal2Matsim2Journal {
 	}
 	
 	public void run(String networkFile, String vehicles, String schedule, String outputDirectory){
-		this.dir = outputDirectory;
+		this.outDir = outputDirectory;
 		this.networkFile = networkFile;
 		this.schedule = schedule;
 		this.vehicles = vehicles;
-		this.plansUnrouted = this.dir + "plans_unrouted.xml";
-		this.configFile = this.dir + "config.xml";
+		this.plansUnrouted = this.outDir + "plans_unrouted.xml";
+		this.configFile = this.outDir + "config.xml";
 
-		this.readJournal();
-		this.sortWaysByPerson();
-		this.generatePlans();
+//		this.readJournal();
+//		this.sortWaysByPerson();
+//		this.generatePlans();
+//		
+//		this.createAndWriteConfig();
+//		
+//		this.runMobSim();
 		
-		this.createAndWriteConfig();
-		
-		this.runMobSim();
+		this.analyzeEventsFile();
 		
 //		this.writeNewJournal();
 	}
@@ -174,7 +182,7 @@ public class Journal2Matsim2Journal {
 				tripEndTime = Double.valueOf(way[184]);
 				
 				
-				// TODO remove randomizer, it's just for Test
+				// TODO remove randomizer, it's just for the test
 				startCoord = new CoordImpl(Math.random()* 4000, Math.random() * 4000);
 				endCoord = new CoordImpl(Math.random()* 4000, Math.random() * 4000);
 //				startCoord = new CoordImpl(way[24], way[25]);
@@ -273,7 +281,7 @@ public class Journal2Matsim2Journal {
 		
 		c.controler().setFirstIteration(0);
 		c.controler().setLastIteration(0);
-		c.controler().setOutputDirectory(this.dir);
+		c.controler().setOutputDirectory(this.outDir);
 			Set<EventsFileFormat> eventsFormat = new TreeSet<EventsFileFormat>();
 			eventsFormat.add(EventsFileFormat.xml);
 			c.controler().setEventsFileFormats(eventsFormat);
@@ -311,9 +319,6 @@ public class Journal2Matsim2Journal {
 	}
 
 	private void runMobSim() {
-		
-		Scenario sc = new ScenarioLoaderImpl(this.configFile).loadScenario();
-		
 		Controler c = new Controler(this.configFile);
 		c.setOverwriteFiles(true);
 		c.run();
@@ -325,7 +330,20 @@ public class Journal2Matsim2Journal {
 		TripDurationHandler handler = new TripDurationHandler();
 		events.addHandler(handler);
 		
-		new EventsReaderXMLv1(events);
+		try {
+			new EventsReaderXMLv1(events).parse(this.outDir + "ITERS/it.0/0.events.xml.gz");
+		} catch (SAXException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ParserConfigurationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
 	}
 	
 	private void writeNewJournal() {
