@@ -93,14 +93,14 @@ public class EvacuationController extends Controler {
 		this.config.scenario().setUseLanes(true);
 		this.config.addQSimConfigGroup(new QSimConfigGroup());
 		
-		if (this.config.travelTimeCalculator().getTravelTimeCalculatorType().equals("TravelTimeCalculatorMSAHashMap")){
-			setTravelTimeCalculatorFactory(new MSATravelTimeCalculatorFactory());
-		}
+
 	}
 
 	@Override
 	protected void setUp() {
-
+		if (this.config.travelTimeCalculator().getTravelTimeCalculatorType().equals("TravelTimeCalculatorMSAHashMap")){
+			setTravelTimeCalculatorFactory(new MSATravelTimeCalculatorFactory());
+		}
 		super.setUp();
 		
 		if (this.ec.isLoadShelters() && this.sc == null) {
