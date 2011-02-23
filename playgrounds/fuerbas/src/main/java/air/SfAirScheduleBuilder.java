@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.math.*;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -30,7 +31,6 @@ public class SfAirScheduleBuilder {
 		builder.filterEurope("/home/soeren/workspace/airports.osm", "/home/soeren/Downloads/OAGSEP09.CSV", 
 				"/home/soeren/workspace/OsmTest.txt", "/home/soeren/workspace/OagTest.txt", "/home/soeren/workspace/missingAirports.txt", 
 				"/home/soeren/workspace/cityPairs.txt");
-
 	}
 	
 	protected Map<String, Coord> airportsInOsm = new HashMap<String, Coord>();
@@ -42,8 +42,7 @@ public class SfAirScheduleBuilder {
 	
 	@SuppressWarnings("unchecked")
 	public void filterEurope(String inputOsm, String inputOag, String outputOsm, String outputOag, String outputMissingAirports, String cityPairs) throws IOException, SAXException, ParserConfigurationException {
-		
-		
+			
 		SfOsmAerowayParser osmReader = new SfOsmAerowayParser(TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84,
 				TransformationFactory.WGS84));
 		osmReader.parse(inputOsm);
@@ -107,7 +106,7 @@ public class SfAirScheduleBuilder {
 							
 						String originAirport = lineEntries[4];
 						String destinationAirport = lineEntries[7];
-						String route = originAirport+destinationAirport;
+						String route = originAirport+"_"+destinationAirport;
 						double flightDistance = Integer.parseInt(lineEntries[42])*1.609344;	//statute miles to kilometers
 
 						this.missingAirports.put(originAirport, 1);
@@ -156,6 +155,7 @@ public class SfAirScheduleBuilder {
 		
 		lines++;
 		
+	
 		}
 		
 		Iterator it = this.airportsInOag.entrySet().iterator();

@@ -75,8 +75,9 @@ public class SfTransitBuilder {
 			
 			String oneLine = br.readLine();
 			String[] lineEntries = oneLine.split("\t");
-			String origin = lineEntries[0].substring(0, 3);
-			String destination = lineEntries[0].substring(3, 6);
+			String[] airportCodes = lineEntries[0].split("_");
+			String origin = airportCodes[0];
+			String destination = airportCodes[1];
 			String transitLine = lineEntries[1];
 			double departureTime = Double.parseDouble(lineEntries[3]);
 			Id originId = new IdImpl(origin);

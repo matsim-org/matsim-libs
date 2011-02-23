@@ -56,11 +56,12 @@ public class SfAirNetworkBuilder {
 		while (brRoutes.ready()) {
 			String oneLine = brRoutes.readLine();
 			String[] lineEntries = oneLine.split("\t");
+			String[] airportCodes = lineEntries[0].split("_");
 			double length = Double.parseDouble(lineEntries[1])*1000;	//distance between O&D in meters
 			double flightTime = Double.parseDouble(lineEntries[2])-300.;		//flight time in seconds, assumption: 300secs for taxi/take-off/landing
 			double groundSpeed = length/flightTime;						
-			String origin = lineEntries[0].substring(0, 3);
-			String destination = lineEntries[0].substring(3, 6);
+			String origin = airportCodes[0];
+			String destination = airportCodes[1];
 			
 			
 			//LÖSCHEN

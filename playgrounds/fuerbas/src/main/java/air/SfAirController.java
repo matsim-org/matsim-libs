@@ -1,6 +1,7 @@
 package air;
 
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.listener.ControlerListener;
 
 public class SfAirController {
 
@@ -12,8 +13,12 @@ public class SfAirController {
 
 		Controler con = new Controler(args);		//args: configfile
 		con.setOverwriteFiles(true);
+		ControlerListener lis = new SfFlightTimeControlerListener();
+		con.addControlerListener(lis);
 		con.run();
-		
+	
 	}
+	
+
 
 }
