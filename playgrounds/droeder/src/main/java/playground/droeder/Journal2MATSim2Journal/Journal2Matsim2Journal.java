@@ -19,12 +19,13 @@
  * *********************************************************************** */
 package playground.droeder.Journal2MATSim2Journal;
 
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -37,9 +38,22 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
+import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
+import org.matsim.core.config.groups.GlobalConfigGroup;
+import org.matsim.core.config.groups.NetworkConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.PlansConfigGroup;
+import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.config.groups.StrategyConfigGroup;
+import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.pt.config.TransitConfigGroup;
+import org.matsim.run.Controler;
 
 import playground.droeder.DaFileReader;
 import playground.droeder.DaPaths;
@@ -63,14 +77,20 @@ public class Journal2Matsim2Journal {
 	private String dir = null;
 	private String splitByExpr = null;
 	
+	private double startTime = Double.MAX_VALUE;
+	
 	private boolean hasHeader;
 	
 	private Set<String[]> inFileContent;
 	private Map<String, Set<String[]>> person2ways;
 	
+	private final String ACT_0 = "home";
+	private final String ACT_1 = "work";
+	private final String ACT_2 = "other";
+	
 	public static void main(String[] args){
 		Journal2Matsim2Journal j = new Journal2Matsim2Journal(homeDir + "dummy.csv", ";", true);
-		j.run(homeDir + "multimodalnetwork.xml", homeDir + "transitVehicles.xml", homeDir + "transitSchedule", DaPaths.OUTPUT + "journals/");
+		j.run(homeDir + "multimodalnetwork.xml", homeDir + "transitVehicles.xml", homeDir + "transitSchedule.xml", DaPaths.OUTPUT + "journals/");
 		
 	}
 	
@@ -87,13 +107,15 @@ public class Journal2Matsim2Journal {
 		this.vehicles = vehicles;
 		this.plansUnrouted = this.dir + "plans_unrouted.xml";
 		this.configFile = this.dir + "config.xml";
-		
+
 		this.readJournal();
-		this.sortWays();
+		this.sortWaysByPerson();
 		this.generatePlans();
 		
-		createScenario();
-//		this.runMobSim();
+		this.createAndWriteConfig();
+		
+		this.runMobSim();
+		
 //		this.writeNewJournal();
 	}
 
@@ -102,8 +124,8 @@ public class Journal2Matsim2Journal {
 		this.inFileContent = DaFileReader.readFileContent(this.inFile, this.splitByExpr, this.hasHeader);
 	}
 	
-	private void sortWays() {
-		this.person2ways = new HashMap<String, Set<String[]>>();
+	private void sortWaysByPerson() {
+		this.person2ways = new TreeMap<String, Set<String[]>>();
 		String id;
 		for(String[] way : this.inFileContent){
 			id = way[2];
@@ -131,8 +153,8 @@ public class Journal2Matsim2Journal {
 		Coord endCoord;
 		String type;
 		
-		double startTime;
-		double endTime;
+		double tripStartTime;
+		double tripEndTime;
 
 		for(Entry<String, Set<String[]>> e : this.person2ways.entrySet()){
 			personCar = fac.createPerson(sc.createId(e.getKey() + "_" + TransportMode.car.toString()));
@@ -147,53 +169,88 @@ public class Journal2Matsim2Journal {
 			do{
 				way = it.next();
 				
-				startTime = Double.valueOf(way[27]);
-				endTime = Double.valueOf(way[184]);
-				
-				startCoord = new CoordImpl(way[24], way[25]);
-				endCoord = new CoordImpl(way[182], way[183]);
+				tripStartTime = Double.valueOf(way[27]);
+					if(this.startTime > tripStartTime) this.startTime = tripStartTime;
+				tripEndTime = Double.valueOf(way[184]);
 				
 				
-				//add first 
-				if(planCar.getPlanElements().size() == 0){				
-					// TODO get Type from file
-					type = "test";
-					addActivity(planCar, startCoord, startTime, fac, type);
-					addActivity(planPt, startCoord, startTime, fac, type);
+				// TODO remove randomizer, it's just for Test
+				startCoord = new CoordImpl(Math.random()* 4000, Math.random() * 4000);
+				endCoord = new CoordImpl(Math.random()* 4000, Math.random() * 4000);
+//				startCoord = new CoordImpl(way[24], way[25]);
+//				endCoord = new CoordImpl(way[182], way[183]);
+				
+				
+				//add first planelement
+				if(planCar.getPlanElements().size() == 0){		
+					// TODO doesn't work
+					if(way[17] == ("1")) {
+						type = this.ACT_0;
+					}else{
+						type = this.ACT_2;
+					}
+					addActivity(planCar, startCoord, null, tripStartTime, fac, type);
+					addActivity(planPt, startCoord, null, tripStartTime, fac, type);
 				}
-				// check last activity, must be an activity
+				// check last planelement, must be an activity
 				else if(planCar.getPlanElements().get(planCar.getPlanElements().size()-1) instanceof Leg){
 					addPerson = false;
-					log.error("Person ID " + e.getKey() + " was not added, because of a missing planElement!"); 
 					break;
 				}
+				// if not first activity and not leg add startTime of the current trip to the former activity
+				else{
+					((Activity) planCar.getPlanElements().get(planCar.getPlanElements().size() - 1)).setEndTime(tripStartTime);
+					((Activity) planPt.getPlanElements().get(planPt.getPlanElements().size() - 1)).setEndTime(tripStartTime);
+				}
 				
-				addLeg(planCar, startTime, TransportMode.car, fac);
-				addLeg(planPt, startTime, TransportMode.pt, fac);
+				addLeg(planCar, tripStartTime, TransportMode.car, fac);
+				addLeg(planPt, tripStartTime, TransportMode.pt, fac);
 				
-				// TODO get Type from file
-				type = "test";
-				addActivity(planCar, endCoord, endTime, fac, type);
-				addActivity(planPt, endCoord, endTime, fac, type);
+				// TODO doesn't work
+				if(way[175] == ("1")){
+					type = this.ACT_0;
+				}else if(way[28] == ("1")){
+					type = this.ACT_1;
+				}else{
+					type = this.ACT_2;
+				}
+				addActivity(planCar, endCoord, tripEndTime, null, fac, type);
+				addActivity(planPt, endCoord, tripEndTime, null, fac, type);
 				
 			}while(it.hasNext());
 			
+			//handle Last Activity
+			((Activity) planCar.getPlanElements().get(planCar.getPlanElements().size() - 1)).setEndTime(tripEndTime * 1.1);
+			((Activity) planPt.getPlanElements().get(planPt.getPlanElements().size() - 1)).setEndTime(tripEndTime * 1.1);
+			
+			// add only if all ways have an start and endtime
 			if(addPerson){
 				personCar.addPlan(planCar);
 				sc.getPopulation().addPerson(personCar);
 				
 				personPt.addPlan(planPt);
 				sc.getPopulation().addPerson(personPt);
+			}else{
+				log.error("Person ID " + e.getKey() + " was not added, because of a missing start- or endtime!"); 
 			}
 		}
 		
-		new PopulationWriter(sc.getPopulation(), null).writeV4(plansUnrouted);
+		new PopulationWriter(sc.getPopulation(),null).writeV4(plansUnrouted);
 	}
 
-	private void addActivity(Plan plan, Coord c, double time, PopulationFactory fac, String type) {
+	private void addActivity(Plan plan, Coord c, Double startTime, Double endTime, PopulationFactory fac, String type) {
 		Activity a = fac.createActivityFromCoord(type, c);
-		a.setStartTime(time);
-//		a.setEndTime(time);
+		
+		if(startTime == null){
+			a.setStartTime(endTime * 0.9);
+		}else{
+			a.setStartTime(startTime);
+		}
+		
+		if(!(endTime == null)){
+			a.setEndTime(endTime);
+		}
+		
 		plan.addActivity(a);
 	}
 	
@@ -203,77 +260,74 @@ public class Journal2Matsim2Journal {
 		plan.addLeg(l);
 	}
 
-	
-	/**
-	 * 
-	 */
-	private void createScenario() {
-//		Scenario sc = new ScenarioLoaderImpl(this.homeDir + "config_0.xml").loadScenario();
-//		
-//		sc.getConfig().controler().setFirstIteration(0);
-//		sc.getConfig().controler().setLastIteration(0);
-//		sc.getConfig().controler().setOutputDirectory(this.dir);
-//
-//		sc.getConfig().network().setInputFile(this.networkFile);
-//		new ScenarioLoaderImpl(sc).loadNetwork();
-//		
-//		sc.getConfig().plans().setInputFile(this.plansUnrouted);
-//		new ScenarioLoaderImpl(sc).loadPopulation();
-//		
-//		
-//		new ConfigWriter(sc.getConfig()).write(this.configFile);
+	private void createAndWriteConfig() {
+		Scenario s = new ScenarioImpl();
+		Config c = s.getConfig();
+		
+		c.getModule(GlobalConfigGroup.GROUP_NAME).addParam("coordinateSystem", "Atlantis");
+		c.getModule(GlobalConfigGroup.GROUP_NAME).addParam("randomSeed", "4711");
+		
+		c.getModule(NetworkConfigGroup.GROUP_NAME).addParam("inputNetworkFile", this.networkFile);
+		
+		c.getModule(PlansConfigGroup.GROUP_NAME).addParam("inputPlansFile", this.plansUnrouted);
+		
+		c.controler().setFirstIteration(0);
+		c.controler().setLastIteration(0);
+		c.controler().setOutputDirectory(this.dir);
+			Set<EventsFileFormat> eventsFormat = new TreeSet<EventsFileFormat>();
+			eventsFormat.add(EventsFileFormat.xml);
+			c.controler().setEventsFileFormats(eventsFormat);
+		c.controler().setMobsim(QSimConfigGroup.GROUP_NAME);
 		
 		
-//		Scenario s = new ScenarioLoaderImpl("./src/main/java/playground/droeder/Journal2MATSim2Journal/config.xml");
-//		Config c = s.getConfig();
+		c.addQSimConfigGroup(new QSimConfigGroup());
+		c.getQSimConfigGroup().setStartTime(this.startTime);
+		c.getQSimConfigGroup().setEndTime(108000);
+		c.getQSimConfigGroup().setSnapshotPeriod(0);
+		c.getQSimConfigGroup().setSnapshotFormat("otfvis");
+		
+		c.getModule(StrategyConfigGroup.GROUP_NAME).addParam("maxAgentPlanMemorySize", "1");
+		c.getModule(StrategyConfigGroup.GROUP_NAME).addParam("ModuleProbability_1", "1");
+		c.getModule(StrategyConfigGroup.GROUP_NAME).addParam("Module_1", "BestScore");
+		
+		c.getModule(PlanCalcScoreConfigGroup.GROUP_NAME).addParam("activityType_0"  , this.ACT_0);
+		c.getModule(PlanCalcScoreConfigGroup.GROUP_NAME).addParam("activityTypicalDuration_0"  , "12:00:00");
+		
+		c.getModule(PlanCalcScoreConfigGroup.GROUP_NAME).addParam("activityType_1"  , this.ACT_1);
+		c.getModule(PlanCalcScoreConfigGroup.GROUP_NAME).addParam("activityTypicalDuration_1"  , "08:00:00");
+		
+		c.getModule(PlanCalcScoreConfigGroup.GROUP_NAME).addParam("activityType_2"  , this.ACT_2);
+		c.getModule(PlanCalcScoreConfigGroup.GROUP_NAME).addParam("activityTypicalDuration_2"  , "01:00:00");
 		
 		
-//		c.addModule(GlobalConfigGroup.GROUP_NAME, new GlobalConfigGroup());
-//		c.getModule(GlobalConfigGroup.GROUP_NAME).addParam("coordinateSystem", "Atlantis");
-//		c.getModule(GlobalConfigGroup.GROUP_NAME).addParam("randomSeed", "4711");
-//		
-//		c.addModule(NetworkConfigGroup.GROUP_NAME, new NetworkConfigGroup());
-//		c.getModule(NetworkConfigGroup.GROUP_NAME).addParam("inputNetworkFile", this.networkFile);
-//		
-//		c.addModule(PlansConfigGroup.GROUP_NAME, new PlansConfigGroup());
-//		c.getModule(PlansConfigGroup.GROUP_NAME).addParam("inputPlansFile", this.plansUnrouted);
-
-//		c.controler().setFirstIteration(0);
-//		c.controler().setLastIteration(0);
-//		c.controler().setOutputDirectory(this.dir);
-//			Set<EventsFileFormat> eventsFormat = new TreeSet<EventsFileFormat>();
-//			eventsFormat.add(EventsFileFormat.xml);
-//		c.controler().setEventsFileFormats(eventsFormat);
+		c.getModule(TransitConfigGroup.GROUP_NAME).addParam("transitScheduleFile", this.schedule);
+		c.getModule(TransitConfigGroup.GROUP_NAME).addParam("vehiclesFile", this.vehicles);
+		c.getModule(TransitConfigGroup.GROUP_NAME).addParam("transitModes", "pt");
 		
-//		c.addModule(QSimConfigGroup.GROUP_NAME, new QSimConfigGroup());
-//		c.getModule(QSimConfigGroup.GROUP_NAME).addParam("startTime", "00:00:00");
-//		c.getModule(QSimConfigGroup.GROUP_NAME).addParam("endTime", "30:00:00");
-//		c.getModule(QSimConfigGroup.GROUP_NAME).addParam("snapshotperiod", "00:00:00");
-//		c.getModule(QSimConfigGroup.GROUP_NAME).addParam("snapshotFormat", "otfvis");
+		c.scenario().setUseTransit(true);
+		c.scenario().setUseVehicles(true);
 		
-//		c.strategy().setMaxAgentPlanMemorySize(1);
-//		c.strategy().addParam("ModuleProbability_1", "1");
-//		c.strategy().addParam("Module_1", "Best_Score");
-//		
-//		c.getModule("transit").addParam("transitScheduleFile", this.schedule);
-//		c.getModule("transit").addParam("vehiclesFile", this.vehicles);
-//		c.getModule("transit").addParam("transitModes", "pt");
-		
-		
-//		new ConfigWriter(c).write(this.configFile);
+		new ConfigWriter(c).write(this.configFile);
 	}
-	
-	/**
-	 * 
-	 */
+
 	private void runMobSim() {
-		// TODO Auto-generated method stub
 		
+		Scenario sc = new ScenarioLoaderImpl(this.configFile).loadScenario();
+		
+		Controler c = new Controler(this.configFile);
+		c.setOverwriteFiles(true);
+		c.run();
 	}
 
-	/**
-	 * 
-	 */
+	
+	private void analyzeEventsFile(){
+		EventsManager events = new EventsManagerImpl();
+		TripDurationHandler handler = new TripDurationHandler();
+		events.addHandler(handler);
+		
+		new EventsReaderXMLv1(events);
+	}
+	
 	private void writeNewJournal() {
 		// TODO Auto-generated method stub
 		
