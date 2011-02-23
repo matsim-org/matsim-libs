@@ -79,20 +79,20 @@ public class DrivingForceModule implements ForceModule {
 	@Override
 	public void run(Agent2D agent) {
 		Coordinate d = this.drivingDirections.get(agent.getCurrentLinkId());
-		double driveX = d.x * Sim2DConfig.TIME_STEP_SIZE * agent.getDesiredVelocity();
-		double driveY = d.y * Sim2DConfig.TIME_STEP_SIZE * agent.getDesiredVelocity();
+		double driveX = d.x  * agent.getDesiredVelocity();
+		double driveY = d.y * agent.getDesiredVelocity();
 
 
-		double dx = Agent2D.AGENT_WEIGHT *(driveX - agent.getForce().getOldXComponent())/Sim2DConfig.tau;
-		double dy = Agent2D.AGENT_WEIGHT *(driveY - agent.getForce().getOldYComponent())/Sim2DConfig.tau;
+		double dx = Agent2D.AGENT_WEIGHT *(driveX - agent.getForce().getVx())/Sim2DConfig.tau;
+		double dy = Agent2D.AGENT_WEIGHT *(driveY - agent.getForce().getVy())/Sim2DConfig.tau;
 
-		if (Sim2DConfig.DEBUG) {
-			ArrowEvent arrow = new ArrowEvent(agent.getPerson().getId(), agent.getPosition(), new Coordinate(agent.getPosition().x + driveX/Sim2DConfig.TIME_STEP_SIZE , agent.getPosition().y + driveY/Sim2DConfig.TIME_STEP_SIZE , 0), 0.f, 1.f, 0.f, 1);
-			this.floor.getSim2D().getEventsManager().processEvent(arrow);
-		}
+//		if (Sim2DConfig.DEBUG) {
+//			ArrowEvent arrow = new ArrowEvent(agent.getPerson().getId(), agent.getPosition(), new Coordinate(agent.getPosition().x + dx , agent.getPosition().y + dy , 0), 0.f, 1.f, 0.f, 1);
+//			this.floor.getSim2D().getEventsManager().processEvent(arrow);
+//		}
 
-		agent.getForce().incrementX(driveX);
-		agent.getForce().incrementY(driveY);
+		agent.getForce().incrementX(dx);
+		agent.getForce().incrementY(dy);
 
 	}
 

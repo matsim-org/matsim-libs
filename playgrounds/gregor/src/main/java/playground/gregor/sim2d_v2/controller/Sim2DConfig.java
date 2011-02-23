@@ -24,19 +24,19 @@ package playground.gregor.sim2d_v2.controller;
 public class Sim2DConfig {
 
 	public static double STATIC_FORCE_RESOLUTION = .05;
-	public static final double TIME_STEP_SIZE =  1. / 25;
+	public static final double TIME_STEP_SIZE =  1. /25;
 
-	public static final double Bpath = 1.5;
+	public static final double Bpath = .5;
 	public static final double PSqrSensingRange = 100;
-	public static final double PNeighborhoddRange = 5;
+	public static final double PNeighborhoddRange = 10;
 
 	public static final double Bp = 5;
 	public static final double MaxWallSensingRange = 5;// wall
 	public static final double Bw = 0.5;// wall
 	public static final double App = 10.;
-	public static final double Apath =10.;
+	public static final double Apath =1000. * TIME_STEP_SIZE;
 	public static final double Apw = 30.;
-	public static final double tau = .5;// / TIME_STEP_SIZE;
+	public static final double tau = 1; //1./ TIME_STEP_SIZE;
 	public static final double B_PATH = 3;
 
 	public static final boolean LOAD_STATIC_ENV_FIELD_FROM_FILE = true;
@@ -47,5 +47,6 @@ public class Sim2DConfig {
 
 	public static final double NEIGHBORHOOD_UPDATE = 1;
 	public static final boolean DEBUG = false;
+	public static final boolean XYZEvents = true;
 
 }

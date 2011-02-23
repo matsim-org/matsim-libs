@@ -41,7 +41,7 @@ public class EnvironmentForceModule implements ForceModule {
 
 	//Helbing constants 
 	private static final double Bi=0.08;
-	private static final double Ai=250;
+	private static final double Ai=1130;
 	private static final double k = 1.2 * 100000;
 	private static final double kappa = 2.4 * 100000;
 
@@ -67,6 +67,7 @@ public class EnvironmentForceModule implements ForceModule {
 		double fx = 0;
 		double fy = 0;
 		int envId = 100;
+
 		ForceLocation fl = this.sff.getForceLocationWithin(agent.getPosition(), Sim2DConfig.STATIC_FORCE_RESOLUTION + 0.01);
 		if (fl == null) {
 			return;
@@ -80,7 +81,7 @@ public class EnvironmentForceModule implements ForceModule {
 			double dx =(agent.getPosition().x - obj.x) / dist;
 			double dy =(agent.getPosition().y - obj.y) / dist;
 
-			double bounderyDist = Agent2D.AGENT_DIAMETER/2 - dist;
+			double bounderyDist = Agent2D.AGENT_DIAMETER/4 - dist;
 			double g = bounderyDist > 0 ? bounderyDist : 0;
 
 			double tanDvx = (- agent.getVx()) * dx;
@@ -95,25 +96,18 @@ public class EnvironmentForceModule implements ForceModule {
 			fx += xc;
 			fy += yc;
 
-			if (Sim2DConfig.DEBUG) {
-				if (agent.getId().toString().equals("2")) {
-					ArrowEvent arrow = new ArrowEvent(agent.getPerson().getId(), agent.getPosition(), obj, 0.9f, 0.7f, 0.2f, envId++);
-					this.floor.getSim2D().getEventsManager().processEvent(arrow);
-					//				
-
-					Coordinate cc = new Coordinate(agent.getPosition().x +  tanX,agent.getPosition().y + tanY,0);
-					ArrowEvent arrow2 = new ArrowEvent(agent.getPerson().getId(), agent.getPosition(), cc, .7f, .2f, .9f, envId++);
-					this.floor.getSim2D().getEventsManager().processEvent(arrow2);
-					System.out.println(tanX + "   " + tanY);
-				}
-
-			}
 		}
 
-		if (Sim2DConfig.DEBUG) {
-			ArrowEvent arrow = new ArrowEvent(agent.getPerson().getId(), agent.getPosition(), new Coordinate(agent.getPosition().x + fx/Sim2DConfig.TIME_STEP_SIZE, agent.getPosition().y + fy/Sim2DConfig.TIME_STEP_SIZE, 0), 1.f, 0.f, 1.f, 2);
-			this.floor.getSim2D().getEventsManager().processEvent(arrow);
-		}
+//		if (Sim2DConfig.DEBUG) {
+//			ArrowEvent arrow = new ArrowEvent(agent.getPerson().getId(), agent.getPosition(), new Coordinate(agent.getPosition().x + fx/Sim2DConfig.TIME_STEP_SIZE, agent.getPosition().y + fy/Sim2DConfig.TIME_STEP_SIZE, 0), 1.f, 0.f, 1.f, 2);
+//			this.floor.getSim2D().getEventsManager().processEvent(arrow);
+//		}
+//		
+//		if (agent.getId().toString().equals("2")) {
+//			System.out.println(Math.sqrt(Math.pow(fx, 2)+Math.pow(fy, 2))/Sim2DConfig.TIME_STEP_SIZE);
+//			int iii = 3;
+//			iii++;
+//		}
 		agent.getForce().incrementX(fx);
 		agent.getForce().incrementY(fy);
 

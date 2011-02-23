@@ -50,7 +50,6 @@ public class Sim2DEngine implements MobsimEngine, Steppable {
 	private final Sim2D sim;
 
 	private final Map<Id, Floor> linkIdFloorMapping = new HashMap<Id, Floor>();
-	private PhantomManager phantomMgr = null;
 
 	/**
 	 * @param sim
@@ -77,9 +76,6 @@ public class Sim2DEngine implements MobsimEngine, Steppable {
 	public void doSimStep(double time) {
 		double sim2DTime = time;
 		while (sim2DTime < time + this.scenario.getConfig().getQSimConfigGroup().getTimeStepSize()) {
-			if (this.phantomMgr != null) {
-				this.phantomMgr.update(sim2DTime);
-			}
 			for (Floor floor : this.floors) {
 				floor.move(sim2DTime);
 			}
@@ -106,15 +102,9 @@ public class Sim2DEngine implements MobsimEngine, Steppable {
 	 */
 	@Override
 	public void onPrepareSim() {
-		if (this.scenario.getPhantomPopulation() != null) {
-			this.phantomMgr = new PhantomManager(this.scenario, this.sim);
-		}
 
 		for (Entry<MultiPolygon, List<Link>> e : this.scenario.getFloorLinkMapping().entrySet()) {
 			Floor f = new Floor(this.scenario, e.getValue(), this.sim);
-			if (this.phantomMgr != null) {
-				f.addPhantomManager(this.phantomMgr);
-			}
 			this.floors.add(f);
 			for (Link l : e.getValue()) {
 				if (this.linkIdFloorMapping.get(l.getId()) != null) {

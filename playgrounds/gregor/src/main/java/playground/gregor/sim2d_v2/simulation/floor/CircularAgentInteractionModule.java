@@ -124,29 +124,29 @@ public class CircularAgentInteractionModule implements DynamicForceModule {
 			fx += xc;
 			fy += yc;
 
-			if (Sim2DConfig.DEBUG) {
-				if (agent.getId().toString().equals("2")) {
-				ArrowEvent arrow = new ArrowEvent(agent.getPerson().getId(), agent.getPosition(), other.getPosition(), 0.2f, 0.2f, 0.2f, otherId++);
-				this.floor.getSim2D().getEventsManager().processEvent(arrow);
-//				
-			
-//				Coordinate cc = new Coordinate(agent.getPosition().x +  tanX,agent.getPosition().y + tanY,0);
-//				ArrowEvent arrow2 = new ArrowEvent(agent.getPerson().getId(), agent.getPosition(), cc, .2f, .2f, .2f, otherId++);
-//				this.floor.getSim2D().getEventsManager().processEvent(arrow2);
-//				System.out.println(tanX + "   " + tanY);
-				}
-
-			}
+//			if (Sim2DConfig.DEBUG) {
+//				if (agent.getId().toString().equals("0")) {
+//				ArrowEvent arrow = new ArrowEvent(agent.getPerson().getId(), agent.getPosition(), other.getPosition(), 0.2f, 0.2f, 0.2f, otherId++);
+//				this.floor.getSim2D().getEventsManager().processEvent(arrow);
+////				
+//			
+////				Coordinate cc = new Coordinate(agent.getPosition().x +  tanX,agent.getPosition().y + tanY,0);
+////				ArrowEvent arrow2 = new ArrowEvent(agent.getPerson().getId(), agent.getPosition(), cc, .2f, .2f, .2f, otherId++);
+////				this.floor.getSim2D().getEventsManager().processEvent(arrow2);
+////				System.out.println(tanX + "   " + tanY);
+//				}
+//
+//			}
 
 		}
 
 //		fx /= Agent2D.AGENT_WEIGHT * Sim2DConfig.TIME_STEP_SIZE;
 //		fy /= Agent2D.AGENT_WEIGHT * Sim2DConfig.TIME_STEP_SIZE;
 
-		if (Sim2DConfig.DEBUG) {
-			ArrowEvent arrow = new ArrowEvent(agent.getPerson().getId(), agent.getPosition(), new Coordinate(agent.getPosition().x + fx/Sim2DConfig.TIME_STEP_SIZE, agent.getPosition().y + fy/Sim2DConfig.TIME_STEP_SIZE, 0), 0.5f,0.5f, 1.f, 3);
-			this.floor.getSim2D().getEventsManager().processEvent(arrow);
-		}
+//		if (Sim2DConfig.DEBUG) {
+//			ArrowEvent arrow = new ArrowEvent(agent.getPerson().getId(), agent.getPosition(), new Coordinate(agent.getPosition().x + fx, agent.getPosition().y + fy, 0), 0.5f,0.5f, 1.f, 3);
+//			this.floor.getSim2D().getEventsManager().processEvent(arrow);
+//		}
 
 		agent.getForce().incrementX(fx);
 		agent.getForce().incrementY(fy);

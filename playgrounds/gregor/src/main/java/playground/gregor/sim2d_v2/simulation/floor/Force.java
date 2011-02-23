@@ -19,16 +19,22 @@
  * *********************************************************************** */
 package playground.gregor.sim2d_v2.simulation.floor;
 
+import playground.gregor.sim2d_v2.controller.Sim2DConfig;
+import playground.gregor.sim2d_v2.simulation.Agent2D;
+
 /**
  * @author laemmel
  * 
  */
 public class Force {
-	private double fx;
-	private double fy;
+	private double fx = 0;
+	private double fy = 0;
+	
+	private double vx = 0;
+	private double vy = 0;
 
-	private double oldFx;
-	private double oldFy;
+//	private double oldFx;
+//	private double oldFy;
 
 	// double fz;
 
@@ -56,19 +62,39 @@ public class Force {
 		this.fy += incrfy;
 	}
 
-	/* package */double getOldXComponent() {
-		return this.oldFx;
+//	/* package */double getOldXComponent() {
+//		return this.oldFx;
+//	}
+//
+//	/* package */double getOldYComponent() {
+//		return this.oldFy;
+//	}
+
+	
+	public double getVx() {
+		return this.vx;
+	}
+	
+	public double getVy() {
+		return this.vy;
+	}
+	
+	public void setVx(double vx) {
+		this.vx = vx;
+	}
+	
+	public void setVy(double vy) {
+		this.vy = vy;
+	}
+	
+	
+	public void update() {
+		this.vx += fx*Sim2DConfig.TIME_STEP_SIZE/Agent2D.AGENT_WEIGHT;
+		this.vy += fy*Sim2DConfig.TIME_STEP_SIZE/Agent2D.AGENT_WEIGHT;
+		this.fx = 0;
+		this.fy = 0;
 	}
 
-	/* package */double getOldYComponent() {
-		return this.oldFy;
-	}
 
-	/* package */void reset() {
-		this.oldFx = this.fx;
-		this.fx = 0.;
-		this.oldFy = this.fy;
-		this.fy = 0.;
-	}
 
 }

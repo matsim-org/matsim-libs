@@ -44,7 +44,6 @@ public class Scenario2DImpl extends ScenarioImpl {
 	private Map<MultiPolygon, List<Link>> mps;
 	private StaticForceField sff;
 	private HashMap<Id, LineString> lsmp;
-	private Queue<Event> phantomPopulation = null;
 
 	/**
 	 * @param config
@@ -102,19 +101,5 @@ public class Scenario2DImpl extends ScenarioImpl {
 		return this.mps;
 	}
 
-	/**
-	 * @param phantomPopulation2
-	 */
-	public void setPhantomPopulation(Queue<Event> phantomPopulation2) {
-		this.phantomPopulation = phantomPopulation2;
-
-	}
-
-	/**
-	 * @return the phantomPopulation
-	 */
-	public Queue<Event> getPhantomPopulation() {
-		return this.phantomPopulation;
-	}
 
 }

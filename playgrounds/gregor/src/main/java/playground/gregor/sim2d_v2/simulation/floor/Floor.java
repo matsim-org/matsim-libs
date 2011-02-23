@@ -29,6 +29,8 @@ import java.util.Set;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.core.events.LinkEnterEventImpl;
+import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -41,7 +43,6 @@ import playground.gregor.sim2d_v2.events.XYZAzimuthEventImpl;
 import playground.gregor.sim2d_v2.events.debug.ArrowEvent;
 import playground.gregor.sim2d_v2.scenario.Scenario2DImpl;
 import playground.gregor.sim2d_v2.simulation.Agent2D;
-import playground.gregor.sim2d_v2.simulation.PhantomManager;
 import playground.gregor.sim2d_v2.simulation.Sim2D;
 
 /**
@@ -71,9 +72,8 @@ public class Floor {
 	private HashMap<Id, LineString> finishLines;
 
 	private final GeometryFactory geofac = new GeometryFactory();
-	private PhantomManager phantomMgr = null;
 
-	private final boolean ms = true;
+	private final boolean ms = false;
 
 	public Floor(Scenario2DImpl scenario, List<Link> list, Sim2D sim) {
 		this.scenario = scenario;
@@ -86,13 +86,13 @@ public class Floor {
 	 * 
 	 */
 	public void init() {
-		this.dynamicForceModules.add(new CircularAgentInteractionModule(this, this.scenario));
-		if (this.phantomMgr != null) {
-			this.dynamicForceModules.add(new PhantomForceModule(this, this.scenario, this.phantomMgr));
-		}
+//		this.dynamicForceModules.add(new CircularAgentInteractionModule(this, this.scenario));
+		//		
+		this.dynamicForceModules.add(new  CollisionPredictionAgentInteractionModule(this, scenario));
 
 		this.forceModules.add(new DrivingForceModule(this, this.scenario));
 		this.forceModules.add(new EnvironmentForceModule(this, this.scenario));
+//		this.forceModules.add(new CollisionPredictionEnvironmentForceModule(this, this.scenario));
 		this.forceModules.add(new PathForceModule(this, this.scenario));
 
 		for (ForceModule m : this.forceModules) {
@@ -152,14 +152,20 @@ public class Floor {
 			Agent2D agent = it.next();
 			Force f = agent.getForce();
 			Coordinate oldPos = agent.getPosition();
-			Coordinate newPos = new Coordinate(oldPos.x + f.getXComponent(), oldPos.y + f.getYComponent(), 0);
 
-			double vx = f.getXComponent();// / Sim2DConfig.TIME_STEP_SIZE;
-			double vy = f.getYComponent();// / Sim2DConfig.TIME_STEP_SIZE;
+			f.update();
+			validateVelocity(f);
+
+			double vx = f.getVx();
+			double vy = f.getVy();
+
+
+			Coordinate newPos = new Coordinate(oldPos.x + f.getVx()* Sim2DConfig.TIME_STEP_SIZE, oldPos.y + f.getVy()* Sim2DConfig.TIME_STEP_SIZE, 0);
+
 			agent.setCurrentVelocity(vx,vy);
-			
-//			System.out.println("ID:" + agent.getId() + "  velocity:" + Math.sqrt(Math.pow(vx, 2)+Math.pow(vy, 2)) + "    vx:" + vx + "    vy:" + vy + "   " + newPos);
-			
+
+			//			System.out.println("ID:" + agent.getId() + "  velocity:" + Math.sqrt(Math.pow(vx, 2)+Math.pow(vy, 2)) + "    vx:" + vx + "    vy:" + vy + "   " + newPos);
+
 			boolean endOfLeg = checkForEndOfLinkReached(agent, oldPos, newPos, time);
 			if (endOfLeg) {
 				it.remove();
@@ -168,14 +174,25 @@ public class Floor {
 
 			double azimuth = getAzimuth(oldPos, newPos);
 			agent.moveToPostion(newPos);
-			XYZAzimuthEvent e = new XYZAzimuthEventImpl(agent.getPerson().getId(), agent.getPosition(), azimuth, time);
-			getSim2D().getEventsManager().processEvent(e);
 
-			f.reset();
-			if (Sim2DConfig.DEBUG) {
-				ArrowEvent arrow = new ArrowEvent(agent.getPerson().getId(), agent.getPosition(), new Coordinate(agent.getPosition().x + vx/ Sim2DConfig.TIME_STEP_SIZE , agent.getPosition().y + vy/ Sim2DConfig.TIME_STEP_SIZE , 0), 0.0f, 1.f, 1.f, 9);
-				getSim2D().getEventsManager().processEvent(arrow);
+			if (Sim2DConfig.XYZEvents) {
+				XYZAzimuthEvent e = new XYZAzimuthEventImpl(agent.getPerson().getId(), agent.getPosition(), azimuth, time);
+				getSim2D().getEventsManager().processEvent(e);
 			}
+			//			if (Sim2DConfig.DEBUG) {
+			//				ArrowEvent arrow = new ArrowEvent(agent.getPerson().getId(), agent.getPosition(), new Coordinate(agent.getPosition().x + vx , agent.getPosition().y + vy , 0), 0.0f, 1.f, 1.f, 9);
+			//				getSim2D().getEventsManager().processEvent(arrow);
+			//			}
+		}
+
+	}
+
+	private void validateVelocity(Force f) {
+		double v = Math.sqrt(Math.pow(f.getVx(), 2)+Math.pow(f.getVy(), 2));
+		if (v > 2) {
+			double scale = 2/v;
+			f.setVx(f.getVx()*scale);
+			f.setVy(f.getVy()*scale);
 		}
 
 	}
@@ -189,6 +206,9 @@ public class Floor {
 		LineString finishLine = this.finishLines.get(agent.getCurrentLinkId());
 		LineString trajectory = this.geofac.createLineString(new Coordinate[] { oldPos, newPos });
 		if (trajectory.crosses(finishLine)) {
+			LinkLeaveEventImpl e = new LinkLeaveEventImpl(time, agent.getId(), agent.getCurrentLinkId());
+			this.sim2D.getEventsManager().processEvent(e);
+
 			Id id = agent.chooseNextLinkId();
 
 			// end of route
@@ -198,6 +218,8 @@ public class Floor {
 
 			} else {
 				agent.notifyMoveOverNode();
+				LinkEnterEventImpl e2 = new LinkEnterEventImpl(time, agent.getId(), agent.getCurrentLinkId());
+				this.sim2D.getEventsManager().processEvent(e2);
 			}
 		}
 
@@ -244,16 +266,31 @@ public class Floor {
 
 				for (ForceModule m : this.dynamicForceModules) {
 					m.run(agent);
+
+					//					if (Sim2DConfig.DEBUG) {
+					//						Force f = agent.getForce();
+					//						double dv = Math.sqrt(Math.pow(f.getXComponent(), 2)+Math.pow(f.getYComponent(), 2));
+					//						if (dv*Sim2DConfig.TIME_STEP_SIZE > 2 ) {
+					//							System.out.println("dv" + dv);
+					//						}
+					//					}
 				}
 				for (ForceModule m : this.forceModules) {
 					m.run(agent);
+					//					if (Sim2DConfig.DEBUG) {
+					//						Force f = agent.getForce();
+					//						double dv = Math.sqrt(Math.pow(f.getXComponent(), 2)+Math.pow(f.getYComponent(), 2));
+					//						if (dv*Sim2DConfig.TIME_STEP_SIZE > 2 ) {
+					//							System.out.println("dv" + dv);
+					//						}
+					//					}
 				}
 			}
 		}
 
-		for (Agent2D agent : this.agents) {
-			validateForce(agent);
-		}
+//				for (Agent2D agent : this.agents) {
+//					validateForce(agent);
+//				}
 	}
 
 	/**
@@ -290,14 +327,14 @@ public class Floor {
 
 	}
 
-	private void validateForce(Agent2D agent) {
-		Force force = agent.getForce();
-		double norm = Math.sqrt(Math.pow(force.getXComponent(), 2) + Math.pow(force.getYComponent(), 2));
-		if (norm > agent.getDesiredVelocity() * Sim2DConfig.TIME_STEP_SIZE) {
-			force.setXComponent(force.getXComponent() * ((agent.getDesiredVelocity() * Sim2DConfig.TIME_STEP_SIZE) / norm));
-			force.setYComponent(force.getYComponent() * ((agent.getDesiredVelocity() * Sim2DConfig.TIME_STEP_SIZE) / norm));
-		}
-	}
+	//	private void validateForce(Agent2D agent) {
+	//		Force force = agent.getForce();
+	//		double norm = Math.sqrt(Math.pow(force.getXComponent(), 2) + Math.pow(force.getYComponent(), 2));
+	//		if (norm > agent.getDesiredVelocity() ) {
+	//			force.setXComponent(force.getXComponent() * ((agent.getDesiredVelocity() ) / norm));
+	//			force.setYComponent(force.getYComponent() * ((agent.getDesiredVelocity() ) / norm));
+	//		}
+	//	}
 
 	/**
 	 * 
@@ -346,13 +383,6 @@ public class Floor {
 		return this.links;
 	}
 
-	/**
-	 * @param phantomMgr
-	 */
-	public void addPhantomManager(PhantomManager phantomMgr) {
-		this.phantomMgr = phantomMgr;
-
-	}
 
 	/**
 	 * @return the sim2D

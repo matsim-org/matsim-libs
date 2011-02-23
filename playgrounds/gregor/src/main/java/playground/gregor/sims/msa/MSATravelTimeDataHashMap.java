@@ -33,10 +33,10 @@ public class MSATravelTimeDataHashMap extends TravelTimeDataHashMap {
 	private final Map<Integer,Double> msaTravelTimes;
 	private int msaIt = 0;
 
-	public MSATravelTimeDataHashMap(Link link, int binSize) {
+	public MSATravelTimeDataHashMap(Link link, int binSize, Map<Integer,Double> msaTravelTimes) {
 		super(link);
 		this.binSize = binSize;
-		this.msaTravelTimes = new ConcurrentHashMap<Integer,Double>();
+		this.msaTravelTimes = msaTravelTimes;
 	}
 
 
@@ -48,6 +48,10 @@ public class MSATravelTimeDataHashMap extends TravelTimeDataHashMap {
 			double time = getTimeFromSlotIdx(e.getKey());
 			double newTime = Math.min(super.link.getLength()/0.01,super.getTravelTime(e.getKey(), time));
 			double oldTime = e.getValue();
+			if (newTime != oldTime) {
+				int iii =0;
+				iii++;
+			}
 			e.setValue(oldCoef * oldTime + newCoef * newTime);
 		}
 		this.msaIt++;

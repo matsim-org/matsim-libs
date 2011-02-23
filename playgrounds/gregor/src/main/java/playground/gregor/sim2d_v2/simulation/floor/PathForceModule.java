@@ -95,23 +95,36 @@ public class PathForceModule implements ForceModule {
 		Coordinate fromNode = this.fromCoords.get(agent.getCurrentLinkId());
 
 		double hypotenuse = agent.getPosition().distance(fromNode);
+
+		
 		double pathDist = MGC.xy2Point(agent.getPosition().x, agent.getPosition().y).distance(this.linkGeos.get(agent.getCurrentLinkId()));
 		double scale = Math.sqrt(Math.pow(hypotenuse, 2) - Math.pow(pathDist, 2));
 
 		double deltaX = (fromNode.x - agent.getPosition().x) + drivingDir.x * scale;
 		double deltaY = (fromNode.y - agent.getPosition().y) + drivingDir.y * scale;
-
-		double f = Math.exp(pathDist / Sim2DConfig.Bpath);
-		deltaX *= f / pathDist;
-		deltaY *= f / pathDist;
-
-		deltaX = Sim2DConfig.Apath * deltaX / Agent2D.AGENT_WEIGHT * Sim2DConfig.TIME_STEP_SIZE;
-		deltaY = Sim2DConfig.Apath * deltaY / Agent2D.AGENT_WEIGHT * Sim2DConfig.TIME_STEP_SIZE;
-
-		if (Sim2DConfig.DEBUG) {
-			ArrowEvent arrow = new ArrowEvent(agent.getPerson().getId(), agent.getPosition(), new Coordinate(agent.getPosition().x + deltaX / Sim2DConfig.TIME_STEP_SIZE, agent.getPosition().y + deltaY / Sim2DConfig.TIME_STEP_SIZE, 0), 1.f, 0.f, 0.f, 0);
+		if (Sim2DConfig.DEBUG && agent.getPerson().getId().toString().equals("0")) {
+			ArrowEvent arrow = new ArrowEvent(agent.getPerson().getId(), agent.getPosition(), new Coordinate(agent.getPosition().x + deltaX, agent.getPosition().y + deltaY, 0), 1.f, 0.f, 0.f, 0);
 			this.floor.getSim2D().getEventsManager().processEvent(arrow);
+			System.out.println("pathDist=" + pathDist + " Math.sqrt..."+ Math.sqrt(deltaX*deltaX + deltaY*deltaY));
+			
 		}
+//		double driveX = deltaX * agent.getDesiredVelocity();
+//		double driveY = deltaY * agent.getDesiredVelocity();
+//		
+//		double dx = Agent2D.AGENT_WEIGHT *(driveX - agent.getForce().getVx())/Sim2DConfig.tau;
+//		double dy = Agent2D.AGENT_WEIGHT *(driveY - agent.getForce().getVy())/Sim2DConfig.tau;
+//		
+//		if (pathDist < Sim2DConfig.Bpath/4) {
+//			return;
+//		}
+		
+		double f = Math.exp(pathDist / Sim2DConfig.Bpath);
+		deltaX *= f;// / pathDist;
+		deltaY *= f;// / pathDist;
+
+		deltaX = Sim2DConfig.Apath * deltaX/ Agent2D.AGENT_WEIGHT;// * Sim2DConfig.TIME_STEP_SIZE;
+		deltaY = Sim2DConfig.Apath * deltaY/ Agent2D.AGENT_WEIGHT;// * Sim2DConfig.TIME_STEP_SIZE;
+
 
 		agent.getForce().incrementX(deltaX);
 		agent.getForce().incrementY(deltaY);

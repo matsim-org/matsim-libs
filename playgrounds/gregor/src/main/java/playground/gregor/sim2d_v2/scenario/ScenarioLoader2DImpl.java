@@ -237,9 +237,5 @@ public class ScenarioLoader2DImpl extends ScenarioLoaderImpl {
 		// new StaticForceFieldToShape(this.sff).createShp();
 	}
 
-	public void setPhantomPopulationEventsFile(String file) {
-		this.phantomPopulation = new PhantomPopulationLoader(file).getPhantomPopulation();
-		this.scenarioData.setPhantomPopulation(this.phantomPopulation);
-	}
 
 }

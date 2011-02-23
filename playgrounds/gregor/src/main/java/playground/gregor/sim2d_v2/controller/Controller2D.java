@@ -19,8 +19,6 @@
  * *********************************************************************** */
 package playground.gregor.sim2d_v2.controller;
 
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Module;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
@@ -41,7 +39,8 @@ public class Controller2D extends Controler {
 		super(args[0]);
 		setOverwriteFiles(true);
 		this.config.addQSimConfigGroup(new QSimConfigGroup());
-		this.config.getQSimConfigGroup().setEndTime(2* 60);
+		this.config.getQSimConfigGroup().setEndTime(9*3600 + 5* 30);
+//		setTravelTimeCalculatorFactory(new MSATravelTimeCalculatorFactory());
 	}
 
 	@Override
@@ -66,6 +65,7 @@ public class Controller2D extends Controler {
 		}
 
 	}
+	
 
 	/**
 	 * 
@@ -94,7 +94,15 @@ public class Controller2D extends Controler {
 		// this.events.addHandler(writer);
 
 		Sim2D sim = new Sim2D(this.events, this.scenario2DData);
-
+//
+//		if (this.getIterationNumber() == 0) {
+//		 this.vis = new PedVisPeekABot(1);
+//		 Link l = this.network.getLinks().get(new IdImpl(1));
+//		 this.vis.setOffsets(l.getCoord().getX(), l.getCoord().getY());
+//		 this.vis.setFloorShapeFile(this.sim2dConfig.getFloorShapeFile());
+//		 this.vis.drawNetwork(network);
+//		 this.events.addHandler(this.vis);
+//		}
 		// }
 		sim.run();
 		// writer.closeFile();

@@ -20,10 +20,13 @@
 package playground.gregor.pedvis;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
@@ -63,6 +66,8 @@ public class PedVisPeekABot implements XYZEventsHandler, AgentDepartureEventHand
 	private static final float FLOOR_HEIGHT = 3.5f;
 	double ofX = 0;
 	double ofY = 0;
+	
+	private Map<Id,Double> az = new HashMap<Id,Double>();
 
 	public PedVisPeekABot(double speedUp) {
 		this.speedUp = speedUp;
@@ -186,8 +191,14 @@ public class PedVisPeekABot implements XYZEventsHandler, AgentDepartureEventHand
 
 	public void handleEvent(XYZAzimuthEvent e) {
 		testWait(e.getTime());
-		this.pc.setBotPositionII(Integer.parseInt(e.getPersonId().toString()), (float) (e.getX() - this.ofX), (float) (e.getY() - this.ofY), (float) e.getZ(), (float) e.getAzimuth());
+		Double oldAz = this.az.get(e.getPersonId());
+		if (oldAz == null) {
+			oldAz = 0.;
+		}
+		
+		this.pc.setBotPositionII(Integer.parseInt(e.getPersonId().toString()), (float) (e.getX() - this.ofX), (float) (e.getY() - this.ofY), (float) e.getZ(), (float) ((oldAz + e.getAzimuth())/2));
 
+		this.az.put(e.getPersonId(), e.getAzimuth());
 	}
 
 	/**
@@ -245,7 +256,7 @@ public class PedVisPeekABot implements XYZEventsHandler, AgentDepartureEventHand
 		MatsimRandom.getRandom().nextDouble();
 		MatsimRandom.getRandom().nextDouble();
 		b = MatsimRandom.getRandom().nextFloat();
-		if (Integer.parseInt(e.getPersonId().toString()) < 0) {
+		if (Integer.parseInt(e.getPersonId().toString()) < 240) {
 			r = 1.f;
 		} else if (Integer.parseInt(e.getPersonId().toString()) == 0) {
 			b = 1.f;
@@ -281,7 +292,7 @@ public class PedVisPeekABot implements XYZEventsHandler, AgentDepartureEventHand
 	public void handleEvent(ArrowEvent event) {
 		int arrowId = event.getType();
 		int agentId = Integer.parseInt(event.getPersId().toString());
-		if (agentId != 2) {
+		if (agentId != 1) {
 			return;
 		}
 		float r = event.getR();
@@ -289,10 +300,10 @@ public class PedVisPeekABot implements XYZEventsHandler, AgentDepartureEventHand
 		float b = event.getB();
 		float fromX = (float) (event.getFrom().x - this.ofX);
 		float fromY = (float) (event.getFrom().y - this.ofY);
-		float fromZ = (float) event.getFrom().z;
+		float fromZ = (float) 0;//event.getFrom().z;
 		float toX = (float) (event.getTo().x - this.ofX);
 		float toY = (float) (event.getTo().y - this.ofY);
-		float toZ = (float) event.getTo().z;
+		float toZ = (float) 0; //event.getTo().z;
 
 		this.pc.drawArrowII(arrowId, agentId, r, g, b, fromX, fromY, fromZ, toX, toY, toZ);
 	}

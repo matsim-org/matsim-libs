@@ -19,6 +19,9 @@
  * *********************************************************************** */
 package playground.gregor.sims.msa;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.trafficmonitoring.TravelTimeData;
@@ -29,6 +32,8 @@ public class MSATravelTimeDataHashMapFactory implements TravelTimeDataFactory {
 	
 	private final Network network;
 	private final int binSize;
+	
+	private Map<Id, HashMap<Integer,Double>> msaTT = new HashMap<Id, HashMap<Integer,Double>>();
 
 	public MSATravelTimeDataHashMapFactory(Network network, int binSize) {
 		this.network = network;
@@ -37,7 +42,12 @@ public class MSATravelTimeDataHashMapFactory implements TravelTimeDataFactory {
 
 	@Override
 	public TravelTimeData createTravelTimeData(Id linkId) {
-		return new MSATravelTimeDataHashMap(this.network.getLinks().get(linkId),this.binSize);
+		HashMap<Integer, Double> lmsa = this.msaTT.get(linkId);
+		if (lmsa == null) {
+			lmsa = new HashMap<Integer, Double>();
+			this.msaTT.put(linkId, lmsa);
+		}
+		return new MSATravelTimeDataHashMap(this.network.getLinks().get(linkId),this.binSize, lmsa);
 	}
 
 }
