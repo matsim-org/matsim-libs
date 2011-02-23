@@ -20,8 +20,10 @@
 
 package playground.wrashid.PSF2.pluggable;
 
+import java.util.LinkedList;
+
+import org.junit.Ignore;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.testcases.MatsimTestCase;
@@ -45,6 +47,59 @@ public class ParkingTimesTest extends MatsimTestCase {
 		parkingTimesPlugin.closeLastAndFirstParkingIntervals();
 		
 		assertEquals(2, parkingTimesPlugin.getParkingTimeIntervals().get(new IdImpl(1)).size());
+		assertEquals(22500, parkingTimesPlugin.getParkingTimeIntervals().get(new IdImpl(1)).get(0).getArrivalTime(),1.0);
+		assertEquals(35700, parkingTimesPlugin.getParkingTimeIntervals().get(new IdImpl(1)).get(0).getDepartureTime(),1.0);
+		assertEquals(38040, parkingTimesPlugin.getParkingTimeIntervals().get(new IdImpl(1)).get(1).getArrivalTime(),1.0);
+		assertEquals(21600, parkingTimesPlugin.getParkingTimeIntervals().get(new IdImpl(1)).get(1).getDepartureTime(),1.0);
+	}
+	
+	public void testWithParkingLocationsFilterHome(){
+		String eventsFile="test/input/playground/wrashid/PSF2/pluggable/0.events.txt.gz";
+		EventsManagerImpl events = new EventsManagerImpl();
+
+		ParkingTimesPlugin parkingTimesPlugin = new ParkingTimesPlugin();
+		
+		LinkedList<String> actTypesFilter=new LinkedList<String>();
+		actTypesFilter.add("h");
+		parkingTimesPlugin.setActTypesFilter(actTypesFilter);
+		
+		events.addHandler(parkingTimesPlugin);
+		
+		EventsReaderTXTv1 reader = new EventsReaderTXTv1(events);
+		
+		reader.readFile(eventsFile);
+		
+		parkingTimesPlugin.closeLastAndFirstParkingIntervals();
+		
+		assertEquals(1, parkingTimesPlugin.getParkingTimeIntervals().get(new IdImpl(1)).size());
+		assertEquals("h", parkingTimesPlugin.getParkingTimeIntervals().get(new IdImpl(1)).getFirst().getActTypeOfFirstActDuringParking());
+		assertEquals(38040, parkingTimesPlugin.getParkingTimeIntervals().get(new IdImpl(1)).get(0).getArrivalTime(),1.0);
+		assertEquals(21600, parkingTimesPlugin.getParkingTimeIntervals().get(new IdImpl(1)).get(0).getDepartureTime(),1.0);
+	}
+	
+	
+	public void testWithParkingLocationsFilterWork(){
+		String eventsFile="test/input/playground/wrashid/PSF2/pluggable/0.events.txt.gz";
+		EventsManagerImpl events = new EventsManagerImpl();
+
+		ParkingTimesPlugin parkingTimesPlugin = new ParkingTimesPlugin();
+		
+		LinkedList<String> actTypesFilter=new LinkedList<String>();
+		actTypesFilter.add("w");
+		parkingTimesPlugin.setActTypesFilter(actTypesFilter);
+		
+		events.addHandler(parkingTimesPlugin);
+		
+		EventsReaderTXTv1 reader = new EventsReaderTXTv1(events);
+		
+		reader.readFile(eventsFile);
+		
+		parkingTimesPlugin.closeLastAndFirstParkingIntervals();
+		
+		assertEquals(1, parkingTimesPlugin.getParkingTimeIntervals().get(new IdImpl(1)).size());
+		assertEquals("w", parkingTimesPlugin.getParkingTimeIntervals().get(new IdImpl(1)).getFirst().getActTypeOfFirstActDuringParking());
+		assertEquals(22500, parkingTimesPlugin.getParkingTimeIntervals().get(new IdImpl(1)).get(0).getArrivalTime(),1.0);
+		assertEquals(35700, parkingTimesPlugin.getParkingTimeIntervals().get(new IdImpl(1)).get(0).getDepartureTime(),1.0);
 	}
 	
 }
