@@ -19,55 +19,82 @@ package playground.fhuelsmann.emission;
  *                                                                         *
  * *********************************************************************** */
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.Map.Entry;
 
+import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.experimental.ScenarioFactoryImpl;
+import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
 
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 
 public class Main {
 
+	// INPUT
+	private static String runDirectory = "../../detailedEval/testRuns/output/10pct/run6/";
+	private static String eventsFile = runDirectory + "ITERS/it.1000/1000.events.txt.gz";
+	//		private static String netFile = "../../detailedEval/Net/network-86-85-87-84_simplified.xml";
+	private static String netFile = runDirectory + "output_network.xml.gz";
+	private static String plansFile = runDirectory + "output_plans.xml.gz";
+
+	//	private static String runDirectory = "../../detailedEval/testRuns/output/1pct/v0-default/run8/";
+	//	private static String eventsFile = runDirectory + "ITERS/it.10/10.events.txt.gz";
+	//	private static String netFile = "../../detailedEval/Net/network-86-85-87-84_simplified.xml";
+	//	private static String plansFile = runDirectory + "output_plans.xml.gz";
+
+	private static String visum2hbefaRoadTypeFile = "../../detailedEval/testRuns/input/inputEmissions/road_types.txt";
+	private static String hbefaDieselEmissionFactorsFile = "../../detailedEval/testRuns/input/inputEmissions/hbefa_emission_factors_urban_rural_MW.txt";
+
+	private static String shapeDirectory = "../../detailedEval/Net/shapeFromVISUM/urbanSuburban/";
+	private static String urbanShapeFile = shapeDirectory + "urbanAreas.shp";
+	private static String suburbanShapeFile = shapeDirectory + "suburbanAreas.shp";
+
+	private final Scenario scenario;
+
+	public Main(){
+		this.scenario = new ScenarioFactoryImpl().createScenario();
+	}
+
 	public static void main (String[] args) throws Exception{
+		Main main = new Main();
+		main.run(args);
+	}
 
-		// INPUT
-		String runDirectory = "../../detailedEval/testRuns/output/run8/";
-		String eventsFile = runDirectory + "ITERS/it.0/0.events.txt.gz";
-		String netFile = "../../detailedEval/Net/network-86-85-87-84.xml";
-		//		String netfile = runDirectory + "output_network.xml.gz";
+	private void run(String[] args) {
 
-		String visum2hbefaRoadTypeFile = "../../detailedEval/testRuns/input/inputEmissions/road_types.txt";
-		String hbefaGasolineEmissionFactorsFile = "";
-		String hbefaDieselEmissionFactorsFile = "../../detailedEval/testRuns/input/inputEmissions/hbefa_emission_factors_urban_rural_MW.txt";
-		//		String Hbefa_Cold_Traffic = "../../detailedEval/teststrecke/sim/inputEmissions/hbefa_coldstart_emission_factors.txt";
-
-
-		//create an event object
-		EventsManager events = new EventsManagerImpl();	
-
-		// instancing the scenario
-		ScenarioImpl scenario = new ScenarioImpl();
-		Network network = scenario.getNetwork(); 
-		new MatsimNetworkReader(scenario).readFile(netFile);
+		// load the scenario
+		loadScenario();
+		Network network = scenario.getNetwork();
+		Population population = scenario.getPopulation();
 
 		// ?? was passiert hier ??
 		HbefaTable hbefaTable = new HbefaTable();
-		//		hbefaTable.makeHbefaTable(hbefaGasolineEmissionFactorsFile);
 		hbefaTable.makeHbefaTable(hbefaDieselEmissionFactorsFile);
 
 		VisumObject[] roadTypes = new VisumObject[100];
 		EmissionsPerEvent emissionFactor = new EmissionsPerEvent();
 
-		//hbefaColdTable hbefaColdTable = new hbefaColdTable();
-		//hbefaColdTable.makeHbefaColdTable(Hbefa_Cold_Traffic);
-		//hbefaColdTable.printHbefaCold();
-
 		LinkAndAgentAccountAnalysisModule linkAndAgentAccount = new LinkAndAgentAccountAnalysisModule(roadTypes, emissionFactor);
 		linkAndAgentAccount.createRoadTypes(visum2hbefaRoadTypeFile);
+
+		//create an event object
+		EventsManager events = new EventsManagerImpl();	
 
 		//create the handler 
 		TravelTimeEventHandler handler = new TravelTimeEventHandler(network, hbefaTable.getHbefaTableWithSpeedAndEmissionFactor(), linkAndAgentAccount);
@@ -84,22 +111,55 @@ public class Main {
 		linkAndAgentAccount.printTotalEmissionTable(linkId2emissionsInGrammPerType, runDirectory + "emissionsPerLink.txt");
 		linkAndAgentAccount.printTotalEmissionTable(personId2emissionsInGrammPerType, runDirectory + "emissionsPerPerson.txt");
 
-		////for cold start emissions 
-		//handler.printTable();
-		//handler.printTable2();
-		//ColdEmissionFactor em = new ColdEmissionFactor(handler.coldDistance,handler.parkingTime,hbefaColdTable.getHbefaColdTable());
-		//em.MapForColdEmissionFactor();
-		//em.printColdEmissionFactor();
+		UrbanSuburbanAnalyzer usa = new UrbanSuburbanAnalyzer(scenario);
+		Set<Feature> urbanShape = usa.readShape(urbanShapeFile);
+		Population urbanPop = usa.getRelevantPopulation(population, urbanShape);
+		Set<Feature> suburbanShape = usa.readShape(suburbanShapeFile);
+		Population suburbanPop = usa.getRelevantPopulation(population, suburbanShape);
 
-		/*		HbefaVisum hbefaVisum = new HbefaVisum(handler.getTravelTimes());
-		hbefaVisum.createRoadTypes(visumRoadHebefaRoadFile);
-		hbefaVisum.printHbefaVisum();
-		hbefaVisum.createMapWithHbefaRoadTypeNumber();	
+		List<Double> emissionType2AvgEmissionsUrbanArea = calculateAvgEmissionsPerTypeAndArea(urbanPop, personId2emissionsInGrammPerType);
+		List<Double> emissionType2AvgEmissionsSuburbanArea = calculateAvgEmissionsPerTypeAndArea(suburbanPop, personId2emissionsInGrammPerType);
 
-		EmissionFactor emissionFactor = new EmissionFactor(hbefaVisum.map,hbefaTable.getHbefaTableWithSpeedAndEmissionFactor());
-		emissionFactor.createEmissionTables();
-		emissionFactor.createEmissionFile();
-		emissionFactor.printEmissionTable();*/
+		System.out.println(emissionType2AvgEmissionsUrbanArea);
+		System.out.println(emissionType2AvgEmissionsSuburbanArea);
+	}
+
+	private List<Double> calculateAvgEmissionsPerTypeAndArea(Population population, Map<Id, double[]> personId2emissionsInGrammPerType) {
+		List<Double> emissionType2AvgEmissionsUrbanArea = new ArrayList<Double>();
+		double totalCo2 = 0.0;
+		double totalPM = 0.0;
+		double totalNox = 0.0;
+		double totalNo2 = 0.0;
+
+		double populationSize = 1.0; //population.getPersons().size();
+
+		for(Entry<Id, double[]> entry: personId2emissionsInGrammPerType.entrySet()){
+			Id personId = entry.getKey();
+			if(population.getPersons().containsKey(personId)){
+				double co2 = entry.getValue()[7];
+				double pm = entry.getValue()[9];
+				double nox = entry.getValue()[6];
+				double no2 = entry.getValue()[8];
+
+				totalCo2 = totalCo2 + co2;
+				totalPM = totalPM + pm;
+				totalNox = totalNox + nox;
+				totalNo2 = totalNo2 + no2;
+			}
+		}
+		emissionType2AvgEmissionsUrbanArea.add(totalCo2 / populationSize);
+		emissionType2AvgEmissionsUrbanArea.add(totalPM / populationSize);
+		emissionType2AvgEmissionsUrbanArea.add(totalNox / populationSize);
+		emissionType2AvgEmissionsUrbanArea.add(totalNo2 / populationSize);
+		return emissionType2AvgEmissionsUrbanArea;
+	}
+
+	private void loadScenario() {
+		Config config = scenario.getConfig();
+		config.network().setInputFile(netFile);
+		config.plans().setInputFile(plansFile);
+		ScenarioLoader scenarioLoader = new ScenarioLoaderImpl(scenario) ;
+		scenarioLoader.loadScenario() ;
 	}
 }	
 
