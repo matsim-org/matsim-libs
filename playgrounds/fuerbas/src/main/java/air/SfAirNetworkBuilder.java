@@ -64,7 +64,7 @@ public class SfAirNetworkBuilder {
 			String[] lineEntries = oneLine.split("\t");
 			String[] airportCodes = lineEntries[0].split("_");
 			double length = Double.parseDouble(lineEntries[1])*1000;	//distance between O&D in meters
-			double flightTime = Double.parseDouble(lineEntries[2])-300.;		//flight time in seconds, assumption: 300secs for taxi/take-off/landing
+			double flightTime = Double.parseDouble(lineEntries[2])-600.;		//flight time in seconds, assumption: 300secs for taxi/take-off/landing
 			double groundSpeed = length/flightTime;						
 			String origin = airportCodes[0];
 			String destination = airportCodes[1];

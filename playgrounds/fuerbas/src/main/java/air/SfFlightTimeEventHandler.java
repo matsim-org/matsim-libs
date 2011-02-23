@@ -12,15 +12,15 @@ import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandle
 public class SfFlightTimeEventHandler implements AgentArrivalEventHandler,
 		AgentDepartureEventHandler {
 	
-	public Map<Id, Double> arrivalTime = new HashMap<Id, Double>();
-	public Map<Id, Double> departureTime = new HashMap<Id, Double>();
-	public Map<Id, Double> flightTime = new HashMap<Id, Double>();
+	public Map<Id, Double> arrivalTime;
+	public Map<Id, Double> departureTime;
+	public Map<Id, Double> flightTime;
 
 
 	public SfFlightTimeEventHandler() {
-		this.arrivalTime = null;
-		this.departureTime = null;
-		this.flightTime = null;
+		this.arrivalTime = new HashMap<Id, Double>();
+		this.departureTime = new HashMap<Id, Double>();
+		this.flightTime = new HashMap<Id, Double>();
 	}
 
 	@Override
