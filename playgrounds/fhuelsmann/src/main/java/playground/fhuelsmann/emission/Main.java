@@ -111,11 +111,11 @@ public class Main {
 		linkAndAgentAccount.printTotalEmissionTable(linkId2emissionsInGrammPerType, runDirectory + "emissionsPerLink.txt");
 		linkAndAgentAccount.printTotalEmissionTable(personId2emissionsInGrammPerType, runDirectory + "emissionsPerPerson.txt");
 
-		UrbanSuburbanAnalyzer usa = new UrbanSuburbanAnalyzer(scenario);
-		Set<Feature> urbanShape = usa.readShape(urbanShapeFile);
-		Population urbanPop = usa.getRelevantPopulation(population, urbanShape);
-		Set<Feature> suburbanShape = usa.readShape(suburbanShapeFile);
-		Population suburbanPop = usa.getRelevantPopulation(population, suburbanShape);
+		PersonFilter filter = new PersonFilter();
+		Set<Feature> urbanShape = filter.readShape(urbanShapeFile);
+		Population urbanPop = filter.getRelevantPopulation(population, urbanShape);
+		Set<Feature> suburbanShape = filter.readShape(suburbanShapeFile);
+		Population suburbanPop = filter.getRelevantPopulation(population, suburbanShape);
 
 		List<Double> emissionType2AvgEmissionsUrbanArea = calculateAvgEmissionsPerTypeAndArea(urbanPop, personId2emissionsInGrammPerType);
 		List<Double> emissionType2AvgEmissionsSuburbanArea = calculateAvgEmissionsPerTypeAndArea(suburbanPop, personId2emissionsInGrammPerType);
