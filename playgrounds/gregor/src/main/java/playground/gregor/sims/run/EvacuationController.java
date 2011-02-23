@@ -59,6 +59,7 @@ import org.matsim.signalsystems.model.SignalSystemsManager;
 import playground.gregor.sims.config.ShelterConfigGroup;
 import playground.gregor.sims.config.ShelterConfigGroup.InitialAssignment;
 import playground.gregor.sims.config.ShelterConfigGroup.Version;
+import playground.gregor.sims.msa.MSATravelTimeCalculatorFactory;
 import playground.gregor.sims.shelters.assignment.EvacuationShelterNetLoaderForShelterAllocation;
 import playground.gregor.sims.shelters.assignment.GreedyShelterAllocator;
 import playground.gregor.sims.shelters.assignment.RandomShelterAllocator;
@@ -91,13 +92,17 @@ public class EvacuationController extends Controler {
 		this.config.scenario().setUseSignalSystems(false);
 		this.config.scenario().setUseLanes(true);
 		this.config.addQSimConfigGroup(new QSimConfigGroup());
+		
+		if (this.config.travelTimeCalculator().getTravelTimeCalculatorType().equals("TravelTimeCalculatorMSAHashMap")){
+			setTravelTimeCalculatorFactory(new MSATravelTimeCalculatorFactory());
+		}
 	}
 
 	@Override
 	protected void setUp() {
 
 		super.setUp();
-
+		
 		if (this.ec.isLoadShelters() && this.sc == null) {
 			loadShelterSignalSystems();
 		}
