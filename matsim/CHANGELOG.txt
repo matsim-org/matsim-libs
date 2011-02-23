@@ -18,6 +18,8 @@ Changes:
   - transit router got faster (r13753, r13765) and uses less memory during parallel replanning (r13765)
   - Swing-OTFVis now shows vehicles in different colors instead of just gray (r13751)
   - OsmNetworkReader has option to reduce memory consumption, but will run slower (off by default) (r13910)
+  - selection, which mobsim should be used, simplified by specific config-parameter (controler.mobsim) (r14325)
+  - new population file format: population_v5 (r14369)
   - ?
 
 - BugFixes:
@@ -31,8 +33,10 @@ Changes:
   - ScenarioLoaderImpl now also loads transit-related data if transit is enabled in the configuration (r13950)
 
   Non-API Changes:
+  - ObjectAttributes: utility data structure to manage additional attributes for existing objects (r14189)
   - SignalModelFactory now also has a createSignalPlan(...) method for SignalPlans (r14143)
   - SignalScenarioLoader is not producing null pointer exceptions anymore if files are not set in config group (r14142)
+  - improved withinday-package available (r14364)
 
 
 
