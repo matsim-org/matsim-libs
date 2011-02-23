@@ -60,7 +60,7 @@ import playground.wrashid.lib.obj.LinkedListValueHashMap;
  */
 
 public class ParkingTimesPlugin implements AgentWait2LinkEventHandler, AgentArrivalEventHandler, LinkEnterEventHandler,
-		 ActivityStartEventHandler {
+		ActivityStartEventHandler {
 
 	// agent Id, linked list of parkingInterval
 	LinkedListValueHashMap<Id, ParkingIntervalInfo> parkingTimeIntervals;
@@ -145,7 +145,13 @@ public class ParkingTimesPlugin implements AgentWait2LinkEventHandler, AgentArri
 	}
 
 	private void updateDepartureTimeInfo(AgentWait2LinkEvent event) {
+
 		ParkingIntervalInfo lastParkingInterval = parkingTimeIntervals.get(event.getPersonId()).getLast();
+
+		// don't overwrite previous values!
+		if (lastParkingInterval.getDepartureTime() > 0) {
+			return;
+		}
 		lastParkingInterval.setDepartureTime(event.getTime());
 	}
 
@@ -179,11 +185,10 @@ public class ParkingTimesPlugin implements AgentWait2LinkEventHandler, AgentArri
 		updateDepartureTimeInfo(event);
 	}
 
-	
-
 	private void setActTypeOfParkingInterval(ActivityStartEvent event) {
 		LinkedList<ParkingIntervalInfo> parkingIntervalsOfCurrentAgent = parkingTimeIntervals.get(event.getPersonId());
-		if (parkingIntervalsOfCurrentAgent.getLast().getActTypeOfFirstActDuringParking() == null && parkingIntervalsOfCurrentAgent.getLast().getDepartureTime()<0) {
+		if (parkingIntervalsOfCurrentAgent.getLast().getActTypeOfFirstActDuringParking() == null
+				&& parkingIntervalsOfCurrentAgent.getLast().getDepartureTime() < 0) {
 			if (actTypesFilter == null || actTypesFilter.contains(event.getActType())) {
 				parkingIntervalsOfCurrentAgent.getLast().setActTypeOfFirstActDuringParking(event.getActType());
 			} else {
