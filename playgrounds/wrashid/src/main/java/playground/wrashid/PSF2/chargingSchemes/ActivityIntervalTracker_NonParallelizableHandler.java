@@ -190,7 +190,7 @@ public class ActivityIntervalTracker_NonParallelizableHandler implements Activit
 	}
 
 	private boolean isPHEV(Id personId) {
-		if (ParametersPSF2.phevAgents.contains(personId)) {
+		if (ParametersPSF2.phevAgents==null || ParametersPSF2.phevAgents.contains(personId)) {
 			return true;
 		}
 		return false;
