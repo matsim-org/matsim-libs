@@ -24,8 +24,19 @@ import org.matsim.api.core.v01.Id;
 
 public class ParkingIntervalInfo {
 
-	private double arrivalTime;
-	private double departureTime;
+	private double arrivalTime=-1.0;
+	private double departureTime=-1.0;
+	private String actTypeOfFirstActDuringParking;
+	
+
+	public String getActTypeOfFirstActDuringParking() {
+		return actTypeOfFirstActDuringParking;
+	}
+
+	public void setActTypeOfFirstActDuringParking(String actTypeOfFirstActDuringParking) {
+		this.actTypeOfFirstActDuringParking = actTypeOfFirstActDuringParking;
+	}
+
 	private Id linkId;
 	
 	public void setArrivalTime(double arrivalTime) {

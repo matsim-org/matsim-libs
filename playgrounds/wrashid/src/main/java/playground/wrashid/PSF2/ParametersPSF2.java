@@ -48,7 +48,7 @@ public class ParametersPSF2 {
 	
 	public static HashMap<Id, ChargingTimes> chargingTimes;
 
-
+	public static LinkedList<Id> phevAgents=null;
 
 	public static EnergyConsumptionTable energyConsumptionTable;
 

@@ -20,27 +20,65 @@
 
 package playground.wrashid.PSF2.tools.dumbCharging;
 
-import playground.wrashid.PSF2.chargingSchemes.dumbCharging.EventsBasedDumbChargingMain;
+import java.util.LinkedList;
+import java.util.Random;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.StartupListener;
+
+import playground.wrashid.PSF2.ParametersPSF2;
+import playground.wrashid.PSF2.chargingSchemes.dumbCharging.PSSControlerDumbCharging;
 
 /**
- *  As a template config file, use:
-	test/input/playground/wrashid/PSF2/chargingSchemes/dumbCharging/config-event-file-based.xml
-	
-	adapt that file as follows:
-	- adapt the plans, facilities and network file. facilities file only needed, if used for scenario.
-	- also set the property: main.inputEventsForSimulationPath (path to events file)
-	- actually the rest of the content of this file is ignored (should be just run 1 iteraion! => else need to adapt it)
-	
+ * As a template config file, use:
+ * test/input/playground/wrashid/PSF2/chargingSchemes
+ * /dumbCharging/config-event-file-based.xml
+ * 
+ * adapt that file as follows: - adapt the plans, facilities and network file.
+ * facilities file only needed, if used for scenario. - also set the property:
+ * main.inputEventsForSimulationPath (path to events file) - actually the rest
+ * of the content of this file is ignored (should be just run 1 iteraion! =>
+ * else need to adapt it)
+ * 
  * @author wrashid
- *
+ * 
  */
 public class PSSEventsFileBasedControler {
 
-	
-	
 	public static void main(String[] args) {
-		EventsBasedDumbChargingMain.runEventsBasedPSSControler("test/input/playground/wrashid/PSF2/chargingSchemes/dumbCharging/config-event-file-based.xml");
+
+		final double percentageOfPHEVs = 100;
+		String configFile = "test/input/playground/wrashid/PSF2/chargingSchemes/dumbCharging/config-event-file-based.xml";
+
+		// TODO: here we could also add some filter later...
+
+		PSSControlerDumbCharging pssControlerDumbCharging = new PSSControlerDumbCharging(configFile, null);
+
+		pssControlerDumbCharging.prepareMATSimIterations();
+		Controler controler = pssControlerDumbCharging.getControler();
+
+		controler.addControlerListener(new StartupListener() {
+
+			@Override
+			public void notifyStartup(StartupEvent event) {
+				ParametersPSF2.phevAgents = new LinkedList<Id>();
+
+				Controler ctrl = event.getControler();
+
+				Random rand = new Random();
+
+				for (Id personId : ctrl.getPopulation().getPersons().keySet()) {
+					if (percentageOfPHEVs / 100 > rand.nextDouble()) {
+						ParametersPSF2.phevAgents.add(personId);
+					}
+				}
+
+			}
+		});
+
+		pssControlerDumbCharging.runControler();
 	}
-	
-	
+
 }

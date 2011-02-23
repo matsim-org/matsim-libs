@@ -68,8 +68,12 @@ public class PSSControlerDumbCharging extends PSSControler {
 		super(configFilePath, parameterPSFMutator);
 	}
 
-	public void runMATSimIterations() {
-
+	
+	public Controler getControler(){
+		return controler;
+	}
+	
+	public void prepareMATSimIterations(){
 		// use the right Controler (read parameter
 		Config config = new Config();
 		MatsimConfigReader reader = new MatsimConfigReader(config);
@@ -102,8 +106,17 @@ public class PSSControlerDumbCharging extends PSSControler {
 				ParametersPSF2.getPSFGeneralLog().writeFileAndCloseStream();
 			}
 		});
-
+	}
+	
+	public void runControler(){
 		controler.run();
+	}
+	
+	public void runMATSimIterations() {
+
+		prepareMATSimIterations();
+
+		runControler();
 
 	}
 

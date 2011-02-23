@@ -58,12 +58,12 @@ import playground.wrashid.lib.obj.TwoHashMapsConcatenated;
  * 
  * TODO: with introduction of parking activities, that parking activity should
  * be ignored for checking of activity type, but the activity start event should
- * be passed on, as it is used for the location information. 
+ * be passed on, as it is used for the location information.
  * 
  * @author wrashid
  */
-public class ActivityIntervalTracker_NonParallelizableHandler implements ActivityStartEventHandler, AgentArrivalEventHandler,
-		AgentDepartureEventHandler, LinkEnterEventHandler {
+public class ActivityIntervalTracker_NonParallelizableHandler implements ActivityStartEventHandler, AgentDepartureEventHandler,
+		LinkEnterEventHandler {
 
 	// personId, time
 	HashMap<Id, Double> timeOfFirstCarDeparture;
@@ -73,13 +73,13 @@ public class ActivityIntervalTracker_NonParallelizableHandler implements Activit
 
 	// personId, activity type
 	HashMap<Id, ActivityStartEvent> firstActivityAfterParkingCar;
-	
+
 	// personId, using car
 	HashMap<Id, Boolean> stillBeforeFristEnterLinkEvent;
 
 	// personId, time
 	HashMap<Id, Double> timeOfMostRecentDeparture;
-	
+
 	@Override
 	public void reset(int iteration) {
 		timeOfFirstCarDeparture = new HashMap<Id, Double>();
@@ -89,10 +89,10 @@ public class ActivityIntervalTracker_NonParallelizableHandler implements Activit
 		firstActivityAfterParkingCar = new HashMap<Id, ActivityStartEvent>();
 
 		ParametersPSF2.chargingTimes = new HashMap<Id, ChargingTimes>();
-		
-		stillBeforeFristEnterLinkEvent=new HashMap<Id, Boolean>();
-		
-		timeOfMostRecentDeparture=new HashMap<Id, Double>();
+
+		stillBeforeFristEnterLinkEvent = new HashMap<Id, Boolean>();
+
+		timeOfMostRecentDeparture = new HashMap<Id, Double>();
 	}
 
 	public void handleLastParkingActivityOfDay() {
@@ -108,37 +108,41 @@ public class ActivityIntervalTracker_NonParallelizableHandler implements Activit
 	}
 
 	@Override
-	public void handleEvent(AgentArrivalEvent event) {
-		
-
-	}
-
-	@Override
 	public void handleEvent(ActivityStartEvent event) {
-		if (mostRecentTransportationModeWasCar(event.getPersonId())) {
+		Id personId = event.getPersonId();
+
+		if (!isPHEV(personId)) {
+			return;
+		}
+
+		if (mostRecentTransportationModeWasCar(personId)) {
 			firstActivityAfterParkingCar.put(event.getPersonId(), event);
 		}
 	}
 
 	private boolean mostRecentTransportationModeWasCar(Id personId) {
-		if (mostRecentLegMode.containsKey(personId)){
+		if (mostRecentLegMode.containsKey(personId)) {
 			return mostRecentLegMode.get(personId).equals(TransportMode.car);
-		} 
-		return  false; 
+		}
+		return false;
 	}
 
 	@Override
 	public void handleEvent(AgentDepartureEvent event) {
-		
-		
-		timeOfMostRecentDeparture.put(event.getPersonId(), event.getTime());
-		
-		initializeLegModeDetection(event); 
+		Id personId = event.getPersonId();
+
+		if (!isPHEV(personId)) {
+			return;
+		}
+
+		timeOfMostRecentDeparture.put(personId, event.getTime());
+
+		initializeLegModeDetection(event);
 	}
 
 	private void initializeLegModeDetection(AgentDepartureEvent event) {
 		stillBeforeFristEnterLinkEvent.put(event.getPersonId(), true);
-		
+
 		mostRecentLegMode.put(event.getPersonId(), "unknown");
 	}
 
@@ -162,21 +166,34 @@ public class ActivityIntervalTracker_NonParallelizableHandler implements Activit
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		if (stillBeforeFristEnterLinkEvent.get(event.getPersonId())){
-			Id personId = event.getPersonId();
+		Id personId = event.getPersonId();
+
+		if (!isPHEV(personId)) {
+			return;
+		}
+
+		if (stillBeforeFristEnterLinkEvent.get(personId)) {
+
 			ActivityStartEvent activityStartEvent = firstActivityAfterParkingCar.get(personId);
 
 			double departureTime = timeOfMostRecentDeparture.get(personId);
-			
+
 			if (isFirstDepartureOfDayWithCar(personId)) {
 				timeOfFirstCarDeparture.put(personId, departureTime);
 			} else if (isChargingPossible(activityStartEvent)) {
 				chargeVehicle(personId, departureTime);
 			}
 			stillBeforeFristEnterLinkEvent.put(event.getPersonId(), false);
-			
+
 			mostRecentLegMode.put(event.getPersonId(), "car");
 		}
+	}
+
+	private boolean isPHEV(Id personId) {
+		if (ParametersPSF2.phevAgents.contains(personId)) {
+			return true;
+		}
+		return false;
 	}
 
 }
