@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007, 2008 by the members listed in the COPYING,  *
+ * copyright       : (C) 2007, 2011 by the members listed in the COPYING,  *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -22,24 +22,16 @@ package org.matsim.core.population;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.internal.MatsimWriter;
-import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.io.MatsimXmlWriter;
-import org.matsim.knowledges.KnowledgeImpl;
 import org.matsim.knowledges.Knowledges;
-import org.matsim.population.Desires;
 import org.matsim.population.algorithms.PersonAlgorithm;
 
 public class PopulationWriter extends MatsimXmlWriter implements MatsimWriter, PersonAlgorithm {
@@ -83,9 +75,10 @@ public class PopulationWriter extends MatsimXmlWriter implements MatsimWriter, P
 		this.handler = new PopulationWriterHandlerImplV4(this.network);
 	}
 
-	public PopulationWriter(final Population pop, final Network network, final Knowledges knowledges2) {
+	public PopulationWriter(final Population pop, final Network network, final Knowledges knowledges) {
 		this(pop, network);
-		this.knowledges = knowledges2;
+		this.knowledges = knowledges;
+		this.handler = new PopulationWriterHandlerImplV4(this.network, this.knowledges);
 	}
 
 	public void startStreaming(final String filename) {
@@ -131,99 +124,11 @@ public class PopulationWriter extends MatsimXmlWriter implements MatsimWriter, P
 	}
 
 	public final void writePerson(final Person person) {
-		//	 write only the defined fraction
-		if ((this.write_person_fraction < 1.0) && (MatsimRandom.getRandom().nextDouble() >= this.write_person_fraction)) {
-			return;
-		}
 		try {
-			this.handler.startPerson(person,this.writer);
-			if (person instanceof PersonImpl) {
-				PersonImpl p = (PersonImpl)person;
-				// travelcards
-				if (p.getTravelcards() != null) {
-					Iterator<String> t_it = p.getTravelcards().iterator();
-					while (t_it.hasNext()) {
-						String t = t_it.next();
-						this.handler.startTravelCard(t,this.writer);
-						this.handler.endTravelCard(this.writer);
-					}
-				}
-				// desires
-				if (p.getDesires() != null) {
-					Desires d = p.getDesires();
-					this.handler.startDesires(d,this.writer);
-					if (d.getActivityDurations() != null) {
-						for (String act_type : d.getActivityDurations().keySet()) {
-							this.handler.startActDur(act_type,d.getActivityDurations().get(act_type),this.writer);
-							this.handler.endActDur(this.writer);
-						}
-					}
-					this.handler.endDesires(this.writer);
-				}
-				// knowledge
-				if ((this.knowledges != null) && (this.knowledges.getKnowledgesByPersonId().get(p.getId()) != null)) {
-					KnowledgeImpl k = this.knowledges.getKnowledgesByPersonId().get(p.getId());
-					this.handler.startKnowledge(k, this.writer);
-					// activities
-					Iterator<String> at_it = k.getActivityTypes().iterator();
-					while (at_it.hasNext()) {
-						String act_type = at_it.next();
-						this.handler.startActivity(act_type,this.writer);
-						// locations (primary)
-						for (ActivityOptionImpl a : k.getActivities(act_type,true)) {
-							this.handler.startPrimaryLocation(a,this.writer);
-							this.handler.endPrimaryLocation(this.writer);
-						}
-						// locations (secondary)
-						for (ActivityOptionImpl a : k.getActivities(act_type,false)) {
-							this.handler.startSecondaryLocation(a,this.writer);
-							this.handler.endSecondaryLocation(this.writer);
-						}
-//					Iterator<Activity> a_it = k.getActivities(act_type).iterator();
-//					while (a_it.hasNext()) {
-//						Facility f = a_it.next().getFacility();
-//						this.handler.startLocation(f,this.writer);
-//						/* TODOx [balmermi] Here, usually capacity and opentimes
-//						 * are also written. But since it is now already defined by the facilities
-//						 * there is no need to write it. the act type and the facilitiy id
-//						 * is enough. (well... i think) */
-//						this.handler.endLocation(this.writer);
-//					}
-						this.handler.endActivity(this.writer);
-					}
-					this.handler.endKnowledge(this.writer);
-				}
-
-
-
+			if ((this.write_person_fraction < 1.0) && (MatsimRandom.getRandom().nextDouble() >= this.write_person_fraction)) {
+				return;
 			}
-			// plans
-			for (Plan plan : person.getPlans()) {
-				this.handler.startPlan(plan, this.writer);
-				// act/leg
-				for (Object pe : plan.getPlanElements()) {
-					if (pe instanceof Activity) {
-						Activity act = (Activity) pe;
-						this.handler.startAct(act, this.writer);
-						this.handler.endAct(this.writer);
-					}
-					else if (pe instanceof Leg) {
-						Leg leg = (Leg) pe;
-						this.handler.startLeg(leg, this.writer);
-						// route
-						Route route = leg.getRoute();
-						if (route != null) {
-							this.handler.startRoute(route, this.writer);
-							this.handler.endRoute(this.writer);
-						}
-						this.handler.endLeg(this.writer);
-					}
-				}
-				this.handler.endPlan(this.writer);
-			}
-			this.handler.endPerson(this.writer);
-			this.handler.writeSeparator(this.writer);
-			this.writer.flush();
+			this.handler.writePerson(person, this.writer);
 		}
 		catch (IOException e) {
 			Gbl.errorMsg(e);
@@ -252,21 +157,14 @@ public class PopulationWriter extends MatsimXmlWriter implements MatsimWriter, P
 
 
 	/**
-	 * Writes all plans to the file. If plans-streaming is on, this will end the writing and close the file.
+	 * Writes all plans to the file.
 	 */
 	@Override
 	public void write(final String filename) {
-//		if ((this.population instanceof PopulationImpl) && (((PopulationImpl) this.population).isStreaming())) {
-//			log.info("PlansStreaming is on -- plans already written, just closing file if it's open.");
-//			if (this.fileOpened) {
-//				writeEndPlans();
-//			}
-//		} else {
-			this.writeStartPlans(filename);
-			this.writePersons();
-			this.writeEndPlans();
-//		}
-			log.info("Population written to: " + filename);
+		this.writeStartPlans(filename);
+		this.writePersons();
+		this.writeEndPlans();
+		log.info("Population written to: " + filename);
 	}
 
 	public void writeFileV0(final String filename) {
@@ -279,15 +177,10 @@ public class PopulationWriter extends MatsimXmlWriter implements MatsimWriter, P
 		write(filename);
 	}
 
-//	/**
-//	 * Writes all plans to the file.
-//	 *
-//	 * @param filename path to the file.
-//	 */
-//	public void writeFile(final String filename){
-//		write(filename);
-//		log.info("Population written to: " + filename);
-//	}
+	public void writeFileV5(final String filename) {
+		this.handler = new PopulationWriterHandlerImplV5();
+		write(filename);
+	}
 
 	public PopulationWriterHandler getHandler() {
 		return this.handler;

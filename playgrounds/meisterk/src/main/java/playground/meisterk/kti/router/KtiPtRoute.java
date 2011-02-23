@@ -83,6 +83,11 @@ public class KtiPtRoute extends GenericRouteImpl {
 	}
 
 	@Override
+	public String getRouteType() {
+		return "ktiPtRoute";
+	}
+
+	@Override
 	public void setRouteDescription(
 			Id startLinkId,
 			String routeDescription,

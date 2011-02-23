@@ -40,12 +40,13 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.population.AbstractPopulationWriterHandler;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.population.PopulationWriterHandler;
+import org.matsim.core.population.PopulationWriterHandlerImplV4;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.ExeRunner;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -78,7 +79,7 @@ public class ExternalModule implements PlanStrategyModule {
 	/** holds a personId and the reference to the person for reloading the plans later */
 	private final TreeMap<Id, Person> persons = new TreeMap<Id, Person>();
 	protected PopulationWriter plansWriter = null;
-	private PopulationWriterHandler handler = null;
+	private AbstractPopulationWriterHandler handler = null;
 	private BufferedWriter writer = null;
 	private final Scenario scenario;
 	protected Config extConfig;
@@ -98,6 +99,7 @@ public class ExternalModule implements PlanStrategyModule {
 		this.scenario = scenario;
 	}
 
+	@Override
 	public void prepareReplanning() {
 		String filename = this.outFileRoot + this.moduleId + ExternalInFileName;
 		PopulationImpl pop = (PopulationImpl) new ScenarioImpl().getPopulation();
@@ -106,10 +108,12 @@ public class ExternalModule implements PlanStrategyModule {
 
 		this.persons.clear();
 		this.plansWriter.writeStartPlans(filename);
-		this.handler = this.plansWriter.getHandler();
+		this.handler = new PopulationWriterHandlerImplV4(this.scenario.getNetwork());
+		this.plansWriter.setWriterHandler(this.handler);
 		this.writer = this.plansWriter.getWriter();
 	}
 
+	@Override
 	public void handlePlan(final Plan plan) {
 		Person person = plan.getPerson();
 		this.persons.put(person.getId(), person);
@@ -148,6 +152,7 @@ public class ExternalModule implements PlanStrategyModule {
 		}
 	}
 
+	@Override
 	public void finishReplanning() {
 		this.plansWriter.writeEndPlans();
 		if (this.persons.size() == 0) {

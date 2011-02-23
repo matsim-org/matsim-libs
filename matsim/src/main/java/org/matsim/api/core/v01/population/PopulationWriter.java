@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007, 2011 by the members listed in the COPYING,  *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -25,7 +25,6 @@ import org.matsim.core.api.internal.MatsimWriter;
 
 /**
  * @author nagel
- *
  */
 public class PopulationWriter implements MatsimWriter {
 
@@ -40,6 +39,7 @@ public class PopulationWriter implements MatsimWriter {
 	/**
 	 * Writes the population in the most current format (currently plans_v4.dtd).
 	 */
+	@Override
 	public void write(final String filename) {
 		writeV4(filename);
 	}
@@ -51,6 +51,15 @@ public class PopulationWriter implements MatsimWriter {
 	 */
 	public void writeV4(final String filename) {
 		new org.matsim.core.population.PopulationWriter(this.population, this.network).writeFileV4(filename);
+	}
+
+	/**
+	 * Writes the population in the format of population_v5.dtd
+	 *
+	 * @param filename
+	 */
+	public void writeV5(final String filename) {
+		new org.matsim.core.population.PopulationWriter(this.population, this.network).writeFileV5(filename);
 	}
 
 }

@@ -36,14 +36,21 @@ public class GenericRouteImpl extends AbstractRoute implements GenericRoute, Clo
 		return (GenericRouteImpl) super.clone();
 	}
 
+	@Override
 	public String getRouteDescription() {
 		return this.routeDescription;
 	}
 
+	@Override
 	public void setRouteDescription(final Id startLinkId, final String routeDescription, final Id endLinkId) {
 		setStartLinkId(startLinkId);
 		this.routeDescription = routeDescription;
 		setEndLinkId(endLinkId);
+	}
+
+	@Override
+	public String getRouteType() {
+		return "generic";
 	}
 
 }

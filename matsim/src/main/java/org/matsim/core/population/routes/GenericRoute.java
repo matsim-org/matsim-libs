@@ -33,4 +33,6 @@ public interface GenericRoute extends RouteWRefs {
 
 	public String getRouteDescription();
 
+	public String getRouteType();
+
 }

@@ -40,7 +40,7 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.knowledges.KnowledgeImpl;
 import org.matsim.population.Desires;
 
-public class PopulationWriterHandlerImplV0 implements PopulationWriterHandler {
+public class PopulationWriterHandlerImplV0 extends AbstractPopulationWriterHandler {
 
 	private final Network network;
 
@@ -54,6 +54,7 @@ public class PopulationWriterHandlerImplV0 implements PopulationWriterHandler {
 	//
 	//////////////////////////////////////////////////////////////////////
 
+	@Override
 	public void writeHeaderAndStartElement(BufferedWriter out) throws IOException {
 		out.write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
 		out.write("<!DOCTYPE plans SYSTEM \"" + MatsimXmlWriter.DEFAULT_DTD_LOCATION + "plans_v0.dtd\">\n\n");
@@ -63,10 +64,12 @@ public class PopulationWriterHandlerImplV0 implements PopulationWriterHandler {
 	// <plans ... > ... </plans>
 	//////////////////////////////////////////////////////////////////////
 
+	@Override
 	public void startPlans(final Population plans, final BufferedWriter out) throws IOException {
 		out.write("<plans>\n\n");
 	}
 
+	@Override
 	public void endPlans(final BufferedWriter out) throws IOException {
 		out.write("</plans>\n");
 	}
@@ -75,12 +78,14 @@ public class PopulationWriterHandlerImplV0 implements PopulationWriterHandler {
 	// <person ... > ... </person>
 	//////////////////////////////////////////////////////////////////////
 
+	@Override
 	public void startPerson(final Person person, final BufferedWriter out) throws IOException {
 		out.write("\t<person");
 		out.write(" id=\"" + person.getId() + "\"");
 		out.write(">\n");
 	}
 
+	@Override
 	public void endPerson(final BufferedWriter out) throws IOException {
 		out.write("\t</person>\n\n");
 	}
@@ -89,9 +94,11 @@ public class PopulationWriterHandlerImplV0 implements PopulationWriterHandler {
 	// <travelcard ... />
 	//////////////////////////////////////////////////////////////////////
 
+	@Override
 	public void startTravelCard(final String travelcard, final BufferedWriter out) throws IOException {
 	}
 
+	@Override
 	public void endTravelCard(final BufferedWriter out) throws IOException {
 	}
 
@@ -99,9 +106,11 @@ public class PopulationWriterHandlerImplV0 implements PopulationWriterHandler {
 	// <desires ... > ... </desires>
 	//////////////////////////////////////////////////////////////////////
 
+	@Override
 	public void startDesires(final Desires desires, final BufferedWriter out) throws IOException {
 	}
 
+	@Override
 	public void endDesires(final BufferedWriter out) throws IOException {
 	}
 
@@ -109,9 +118,11 @@ public class PopulationWriterHandlerImplV0 implements PopulationWriterHandler {
 	// <actDur ... />
 	//////////////////////////////////////////////////////////////////////
 
+	@Override
 	public void startActDur(final String act_type, final double dur, final BufferedWriter out) throws IOException {
 	}
 
+	@Override
 	public void endActDur(final BufferedWriter out) throws IOException {
 	}
 
@@ -119,9 +130,11 @@ public class PopulationWriterHandlerImplV0 implements PopulationWriterHandler {
 	// <knowledge ... > ... </knowledge>
 	//////////////////////////////////////////////////////////////////////
 
+	@Override
 	public void startKnowledge(final KnowledgeImpl knowledge, final BufferedWriter out) throws IOException {
 	}
 
+	@Override
 	public void endKnowledge(final BufferedWriter out) throws IOException {
 	}
 
@@ -129,9 +142,11 @@ public class PopulationWriterHandlerImplV0 implements PopulationWriterHandler {
 	// <activity ... > ... </activity>
 	//////////////////////////////////////////////////////////////////////
 
+	@Override
 	public void startActivity(final String act_type, final BufferedWriter out) throws IOException {
 	}
 
+	@Override
 	public void endActivity(final BufferedWriter out) throws IOException {
 	}
 
@@ -139,15 +154,19 @@ public class PopulationWriterHandlerImplV0 implements PopulationWriterHandler {
 	// <location ... > ... </location>
 	//////////////////////////////////////////////////////////////////////
 
+	@Override
 	public void startPrimaryLocation(final ActivityOptionImpl activity, final BufferedWriter out) throws IOException {
 	}
 
+	@Override
 	public void endPrimaryLocation(final BufferedWriter out) throws IOException {
 	}
 
+	@Override
 	public void startSecondaryLocation(final ActivityOptionImpl activity, final BufferedWriter out) throws IOException {
 	}
 
+	@Override
 	public void endSecondaryLocation(final BufferedWriter out) throws IOException {
 	}
 
@@ -155,6 +174,7 @@ public class PopulationWriterHandlerImplV0 implements PopulationWriterHandler {
 	// <plan ... > ... </plan>
 	//////////////////////////////////////////////////////////////////////
 
+	@Override
 	public void startPlan(final Plan plan, final BufferedWriter out) throws IOException {
 		out.write("\t\t<plan");
 		if (plan.getScore() != null)
@@ -166,6 +186,7 @@ public class PopulationWriterHandlerImplV0 implements PopulationWriterHandler {
 		out.write(">\n");
 	}
 
+	@Override
 	public void endPlan(final BufferedWriter out) throws IOException {
 		out.write("\t\t</plan>\n\n");
 	}
@@ -174,6 +195,7 @@ public class PopulationWriterHandlerImplV0 implements PopulationWriterHandler {
 	// <act ... > ... </act>
 	//////////////////////////////////////////////////////////////////////
 
+	@Override
 	public void startAct(final Activity act, final BufferedWriter out) throws IOException {
 		out.write("\t\t\t<act");
 		out.write(" type=\"" + act.getType() + "\"");
@@ -193,9 +215,9 @@ public class PopulationWriterHandlerImplV0 implements PopulationWriterHandler {
 		if (act.getEndTime() != Integer.MIN_VALUE)
 			out.write(" end_time=\"" + Time.writeTime(act.getEndTime()) + "\"");
 		out.write(" />\n");
-//		Gbl.debugMsg(DEBUG_LEVEL,this.getClass(),"startRoute(...)","there's no 'zone' info at the moment!");
 	}
 
+	@Override
 	public void endAct(final BufferedWriter out) throws IOException {
 	}
 
@@ -203,6 +225,7 @@ public class PopulationWriterHandlerImplV0 implements PopulationWriterHandler {
 	// <leg ... > ... </leg>
 	//////////////////////////////////////////////////////////////////////
 
+	@Override
 	public void startLeg(final Leg leg, final BufferedWriter out) throws IOException {
 		out.write("\t\t\t<leg");
 		out.write(" mode=\"" + leg.getMode() + "\"");
@@ -218,6 +241,7 @@ public class PopulationWriterHandlerImplV0 implements PopulationWriterHandler {
 		out.write(">\n");
 	}
 
+	@Override
 	public void endLeg(final BufferedWriter out) throws IOException {
 		out.write("\t\t\t</leg>\n");
 	}
@@ -226,6 +250,7 @@ public class PopulationWriterHandlerImplV0 implements PopulationWriterHandler {
 	// <route ... > ... </route>
 	//////////////////////////////////////////////////////////////////////
 
+	@Override
 	public void startRoute(final Route route, final BufferedWriter out) throws IOException {
 		out.write("\t\t\t\t<route>");
 
@@ -238,6 +263,7 @@ public class PopulationWriterHandlerImplV0 implements PopulationWriterHandler {
 		}
 	}
 
+	@Override
 	public void endRoute(final BufferedWriter out) throws IOException {
 		out.write("</route>\n");
 	}
@@ -246,6 +272,7 @@ public class PopulationWriterHandlerImplV0 implements PopulationWriterHandler {
 	// <!-- ============ ... ========== -->
 	//////////////////////////////////////////////////////////////////////
 
+	@Override
 	public void writeSeparator(final BufferedWriter out) throws IOException {
 		out.write("<!-- =================================================" +
 							"===================== -->\n\n");

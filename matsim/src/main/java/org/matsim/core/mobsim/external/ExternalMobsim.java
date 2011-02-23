@@ -40,9 +40,10 @@ import org.matsim.core.controler.ControlerIO;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.Simulation;
+import org.matsim.core.population.AbstractPopulationWriterHandler;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.population.PopulationWriterHandler;
+import org.matsim.core.population.PopulationWriterHandlerImplV4;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.ExeRunner;
 
@@ -129,7 +130,8 @@ public class ExternalMobsim implements Simulation {
 		PopulationImpl pop = (PopulationImpl) new ScenarioImpl().getPopulation();
 		pop.setIsStreaming(true);
 		PopulationWriter plansWriter = new PopulationWriter(pop, this.scenario.getNetwork());
-		PopulationWriterHandler handler = plansWriter.getHandler();
+		AbstractPopulationWriterHandler handler = new PopulationWriterHandlerImplV4(this.scenario.getNetwork());
+		plansWriter.setWriterHandler(handler);
 		plansWriter.writeStartPlans(iterationPlansFile);
 		BufferedWriter writer = plansWriter.getWriter();
 		for (Person person : this.scenario.getPopulation().getPersons().values()) {

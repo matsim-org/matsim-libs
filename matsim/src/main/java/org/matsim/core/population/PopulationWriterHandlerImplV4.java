@@ -38,13 +38,19 @@ import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.knowledges.KnowledgeImpl;
+import org.matsim.knowledges.Knowledges;
 import org.matsim.population.Desires;
 
-public class PopulationWriterHandlerImplV4 implements PopulationWriterHandler {
+public class PopulationWriterHandlerImplV4 extends AbstractPopulationWriterHandler {
 
 	private final Network network;
 
 	public PopulationWriterHandlerImplV4(final Network network) {
+		this.network = network;
+	}
+
+	public PopulationWriterHandlerImplV4(final Network network, final Knowledges knowledges) {
+		super(knowledges);
 		this.network = network;
 	}
 
@@ -385,7 +391,7 @@ public class PopulationWriterHandlerImplV4 implements PopulationWriterHandler {
 			String rd = ((GenericRoute) route).getRouteDescription();
 			if (rd != null) {
 				out.write(rd);
-				out.write(" "); // TODO [MR] remove again, this is at the moment only to maintain binary compatibility
+				out.write(" "); // this is at the moment only to maintain binary compatibility
 			}
 		}
 		out.write("\n");

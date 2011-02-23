@@ -38,6 +38,7 @@ import org.matsim.signalsystems.MatsimSignalSystemsReader;
  */
 public class MatsimFileTypeGuesserTest {
 
+
 	private final static Logger log = Logger.getLogger(MatsimFileTypeGuesserTest.class);
 
 	@Test
@@ -62,6 +63,14 @@ public class MatsimFileTypeGuesserTest {
 		assertEquals(MatsimFileTypeGuesser.FileType.Population, g.getGuessedFileType());
 		assertNull(g.getPublicId());
 		assertEquals("http://www.matsim.org/files/dtd/plans_v4.dtd", g.getSystemId());
+	}
+
+	@Test
+	public void testPopulationV5Dtd() throws IOException {
+		MatsimFileTypeGuesser g = new MatsimFileTypeGuesser("test/input/org/matsim/core/utils/io/MatsimFileTypeGuesserTest/population_v5_example.xml");
+		assertEquals(MatsimFileTypeGuesser.FileType.Population, g.getGuessedFileType());
+		assertNull(g.getPublicId());
+		assertEquals("http://www.matsim.org/files/dtd/population_v5.dtd", g.getSystemId());
 	}
 
 	@Test

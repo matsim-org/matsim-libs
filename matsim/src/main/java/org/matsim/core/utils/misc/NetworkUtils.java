@@ -121,6 +121,12 @@ public class NetworkUtils {
 		return linksList;
 	}
 
+	/**
+	 * Splits the given string at whitespace (one or more space, tab, newline) into single pieces, which are interpreted as ids.
+	 *
+	 * @param links
+	 * @return
+	 */
 	public static List<Id> getLinkIds(final String links) {
 		if (links == null) {
 			return new ArrayList<Id>(0);

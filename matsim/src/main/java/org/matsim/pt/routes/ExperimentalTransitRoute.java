@@ -106,4 +106,8 @@ public class ExperimentalTransitRoute extends GenericRouteImpl {
 		return str;
 	}
 
+	@Override
+	public String getRouteType() {
+		return "experimentalPt1";
+	}
 }
