@@ -20,8 +20,10 @@
 
 package playground.wrashid.PSF2.chargingSchemes.dumbCharging;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -35,16 +37,10 @@ import playground.wrashid.PSF2.chargingSchemes.dumbCharging.PSSControlerDumbChar
 public class IntegrationTest extends MatsimTestCase {
 
 	public void testBasic(){
-		
-		
-		
 		LinkedList<String> allowedChargingLocations=new LinkedList<String>();
 		
 		allowedChargingLocations.add("home");
 		allowedChargingLocations.add("work");
-		
-		
-		ParametersPSF2.setChargingLocationFilter(null);
 		
 		ParametersPSF2.setChargingLocationFilter(allowedChargingLocations);
 		
@@ -60,7 +56,6 @@ public class IntegrationTest extends MatsimTestCase {
 		assertEquals(10*3600*1000.0, chargingTimesForAgent253.getFirst() .getEndSOC());
 		
 		ParametersPSF2.setChargingLocationFilter(null);
-		
 	}
 	
 	public void testEventFileBased(){
@@ -76,8 +71,54 @@ public class IntegrationTest extends MatsimTestCase {
 		assertEquals(10*3600*1000.0, chargingTimesForAgent1.getLast().getEndSOC());
 	}
 	
+	private void performSingleAgentRun(){
+		PSSControler pssControler=new PSSControlerDumbCharging("test/input/playground/wrashid/PSF2/chargingSchemes/dumbCharging/config-event-file-based-OneAgent.xml", null);
+		pssControler.runMATSimIterations();
+	}
+	
+	public void testEventFileBasedOneAgent(){
+		performSingleAgentRun();
+		
+		LinkedList<ChargeLog> chargingTimesForAgent1 = ParametersPSF2.chargingTimes.get(new IdImpl(1)).getChargingTimes();
+		assertEquals(2, chargingTimesForAgent1.size());
+		
+		assertEquals(22500, chargingTimesForAgent1.get(0).getStartChargingTime(),1.0);
+		assertEquals(38040, chargingTimesForAgent1.get(1).getStartChargingTime(),1.0);
+		
+		assertEquals(10*3600*1000.0, chargingTimesForAgent1.getLast().getEndSOC());
+	}
+	
+	public void testEventFileBasedOneAgentLocationFilterHome(){
+		addLocationFilter("h");
+		performSingleAgentRun();
+		
+		LinkedList<ChargeLog> chargingTimesForAgent1 = ParametersPSF2.chargingTimes.get(new IdImpl(1)).getChargingTimes();
+		assertEquals(1, chargingTimesForAgent1.size());
+		
+		assertEquals(38040, chargingTimesForAgent1.get(0).getStartChargingTime(),1.0);
+		
+		assertEquals(10*3600*1000.0, chargingTimesForAgent1.getLast().getEndSOC());
+	}
 	
 	
 	
-	
+	public void testEventFileBasedOneAgentLocationFilterWork(){
+		addLocationFilter("w");
+		performSingleAgentRun();
+		
+		LinkedList<ChargeLog> chargingTimesForAgent1 = ParametersPSF2.chargingTimes.get(new IdImpl(1)).getChargingTimes();
+		assertEquals(1, chargingTimesForAgent1.size());
+		
+		assertEquals(22500, chargingTimesForAgent1.get(0).getStartChargingTime(),1.0);
+		
+		assertEquals(10*3600*1000.0, chargingTimesForAgent1.getLast().getEndSOC());
+	}
+
+	private void addLocationFilter(String locationType) {
+		LinkedList<String> allowedChargingLocations=new LinkedList<String>();
+		
+		allowedChargingLocations.add(locationType);
+		
+		ParametersPSF2.setChargingLocationFilter(allowedChargingLocations);
+	}
 }
