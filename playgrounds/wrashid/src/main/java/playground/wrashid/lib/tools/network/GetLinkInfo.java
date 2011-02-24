@@ -28,8 +28,8 @@ import playground.wrashid.lib.GeneralLib;
 public class GetLinkInfo {
 
 	public static void main(String[] args) {
-		String networkFilePath="H:/data/experiments/ARTEMIS/zh/dumb charging/output/output_network.xml.gz";
-		String linkIdString="17560001856956FT";
+		String networkFilePath="H:/data/experiments/ARTEMIS/zh/dumb charging/output/run2/output_network.xml.gz";
+		String linkIdString="17560001607380FT-1";
 		
 		NetworkImpl network = GeneralLib.readNetwork(networkFilePath);
 		

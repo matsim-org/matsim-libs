@@ -17,13 +17,12 @@ import playground.wrashid.lib.tools.kml.Color;
 public class FindLinksInSurroundingsOfCoordinate {
 
 	public static void main(String[] args) {
-		String inputNetworkPath="H:/data/experiments/ARTEMIS/zh/dumb charging/output/output_network.xml.gz";
-		Coord coordInFocus=new CoordImpl(683702, 247854);
+		String inputNetworkPath="H:/data/experiments/ARTEMIS/zh/dumb charging/output/run2/output_network.xml.gz";
+		Coord coordInFocus=new CoordImpl(683912, 247663);
 		double maxDistanceInMeters=1000;
-		String outputFilePath="H:/data/experiments/ARTEMIS/zh/dumb charging/output/analysis/surroundingLinks-17560001856956FT.kml";
+		String outputFilePath="H:/data/experiments/ARTEMIS/zh/dumb charging/output/run2/anlysis/surroundingLinks-17560001607380FT-1.kml";
 		
 		BasicPointVisualizer basicPointVisualizer=new BasicPointVisualizer();
-		
 		
 		NetworkImpl network= GeneralLib.readNetwork(inputNetworkPath);
 		

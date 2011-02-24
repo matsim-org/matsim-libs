@@ -1,6 +1,7 @@
 package playground.wrashid.lib.obj;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 
 import playground.wrashid.lib.GeneralLib;
 
@@ -68,6 +69,17 @@ public class DoubleValueHashMap<KeyClass> {
 			}
 		}	
 		return maxKey;
+	}
+	
+	public LinkedList<KeyClass> getKeysWithHigherValueThanThresholdValue(double thresholdValue){
+		LinkedList<KeyClass> result = new LinkedList<KeyClass>();
+		for (KeyClass key:hm.keySet()){
+			double curValue=hm.get(key);
+			if (curValue>thresholdValue){
+				result.add(key);
+			}
+		}
+		return result;
 	}
 
 	// TODO: write test

@@ -673,4 +673,10 @@ public class GeneralLib {
 		}	
 	}
 	
+	public static void printLinkedListToConsole(LinkedList list){
+		for (Object value:list){
+			System.out.println(value);
+		}	
+	}
+	
 }

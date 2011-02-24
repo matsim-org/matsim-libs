@@ -47,7 +47,6 @@ public class ParametersPSF2 {
 	
 	public static HashMap<Id, ChargingTimes> chargingTimes;
 
-	public static LinkedList<Id> phevAgents=null;
 
 	public static EnergyConsumptionTable energyConsumptionTable;
 
@@ -104,10 +103,5 @@ public class ParametersPSF2 {
 		iterationLogObject=iterationLog;
 	}
 	
-	public static boolean isPHEV(Id personId) {
-		if (ParametersPSF2.phevAgents==null || ParametersPSF2.phevAgents.contains(personId)) {
-			return true;
-		}
-		return false;
-	}
+	
 }

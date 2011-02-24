@@ -18,9 +18,8 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.wrashid.PSF2.tools.chargingLog;
+package playground.wrashid.PSF2.tools.chargingLog.sum;
 
-import org.omg.CORBA.DoubleHolder;
 
 import playground.wrashid.lib.DebugLib;
 import playground.wrashid.lib.GeneralLib;
@@ -30,7 +29,17 @@ import playground.wrashid.lib.obj.StringMatrix;
 public class EnergyConsumptionPerLink {
 
 	public static void main(String[] args) {
-		String chargingLogFileNamePath="A:/data/PSS/input/chargingLog.txt";
+		String chargingLogFileNamePath="H:/data/experiments/ARTEMIS/zh/dumb charging/output/run2/ITERS/it.0/0.chargingLog.txt";
+		DoubleValueHashMap<String> energyConsumptionPerLink = readChargingLog(chargingLogFileNamePath);
+		
+		System.out.println("linkId\tenergyConsumption");
+		energyConsumptionPerLink.printToConsole();
+		
+		System.out.println("link with highest energyConsumption: " + energyConsumptionPerLink.getKeyForMaxValue());
+		
+	}
+
+	public static DoubleValueHashMap<String> readChargingLog(String chargingLogFileNamePath) {
 		StringMatrix matrix=GeneralLib.readStringMatrix(chargingLogFileNamePath);
 		DoubleValueHashMap<String> energyConsumptionPerLink=new DoubleValueHashMap<String>();
 		
@@ -46,12 +55,7 @@ public class EnergyConsumptionPerLink {
 			
 			energyConsumptionPerLink.incrementBy(linkId, energyCharged);			
 		}
-		
-		System.out.println("linkId\tenergyConsumption");
-		energyConsumptionPerLink.printToConsole();
-		
-		System.out.println("link with highest energyConsumption: " + energyConsumptionPerLink.getKeyForMaxValue());
-		
+		return energyConsumptionPerLink;
 	}
 	
 }

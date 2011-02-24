@@ -36,40 +36,30 @@ import playground.wrashid.lib.tools.kml.Color;
 public class VisualizeSetOfLinksInNetwork {
 
 	public static void main(String[] args) {
-		String inputNetworkPath="H:/data/experiments/ARTEMIS/zh/dumb charging/output/output_network.xml.gz";
-		Coord coordInFocus=new CoordImpl(683702, 247854);
-		double maxDistanceInMeters=1000;
-		String outputFilePath="H:/data/experiments/ARTEMIS/zh/dumb charging/output/analysis/linksOfHub434.kml";
+		String inputNetworkPath="H:/data/experiments/ARTEMIS/zh/dumb charging/output/run2/output_network.xml.gz";
+		String outputFilePath="H:/data/experiments/ARTEMIS/zh/dumb charging/output/run2/analysis/linksWithEnergyConsumpHigherThanThreshholdValue.kml";
 		
 		LinkedList<Id> selectedLinks=new LinkedList<Id>();
 		
-		selectedLinks.add(new IdImpl("17560002212733FT"));
-		selectedLinks.add(new IdImpl("17560001549600FT"));
-		selectedLinks.add(new IdImpl("17560000111914TF"));
-		selectedLinks.add(new IdImpl("17560000111914FT"));
-		selectedLinks.add(new IdImpl("17560000111902FT"));
-		selectedLinks.add(new IdImpl("17560002212733TF"));
-		selectedLinks.add(new IdImpl("17560001549600TF"));
-		selectedLinks.add(new IdImpl("17560002154618TF"));
-		selectedLinks.add(new IdImpl("17560002154618FT"));
-		selectedLinks.add(new IdImpl("17560002192318FT"));
-		selectedLinks.add(new IdImpl("17560002192318TF"));
-		selectedLinks.add(new IdImpl("17560002213717TF"));
-		selectedLinks.add(new IdImpl("17560000111903TF"));
-		selectedLinks.add(new IdImpl("17560000108024FT"));
-		selectedLinks.add(new IdImpl("17560001856956TF"));
-		selectedLinks.add(new IdImpl("17560000108024TF"));
-		selectedLinks.add(new IdImpl("17560001856959FT"));
-		selectedLinks.add(new IdImpl("17560000108019FT"));
-		selectedLinks.add(new IdImpl("17560001856959TF"));
-		selectedLinks.add(new IdImpl("17560002213717FT"));
+		selectedLinks.add(new IdImpl("17560000662724TF"));
+		selectedLinks.add(new IdImpl("17560002226916TF"));
+		selectedLinks.add(new IdImpl("17560000114875TF"));
+		selectedLinks.add(new IdImpl("17560000082333TF"));
+		selectedLinks.add(new IdImpl("17560002149918FT"));
+		selectedLinks.add(new IdImpl("17560000368213FT"));
+		selectedLinks.add(new IdImpl("17560002188272FT"));
 		selectedLinks.add(new IdImpl("17560001856956FT"));
-		selectedLinks.add(new IdImpl("17560000108019TF"));
-		selectedLinks.add(new IdImpl("17560002162150FT"));
-		selectedLinks.add(new IdImpl("17560002161834TF"));
-		selectedLinks.add(new IdImpl("17560002162150TF"));
-		selectedLinks.add(new IdImpl("17560000111903FT"));
-		selectedLinks.add(new IdImpl("17560000111902TF"));
+		selectedLinks.add(new IdImpl("17560001229496TF"));
+		selectedLinks.add(new IdImpl("17560001363425TF"));
+		selectedLinks.add(new IdImpl("17560001607380FT-1"));
+		selectedLinks.add(new IdImpl("17560000045386TF"));
+		selectedLinks.add(new IdImpl("17560000109095TF"));
+		selectedLinks.add(new IdImpl("17560001227588FT"));
+		selectedLinks.add(new IdImpl("17560000043382FT"));
+		selectedLinks.add(new IdImpl("17560000105015FT"));
+		selectedLinks.add(new IdImpl("17560000109323TF"));
+		selectedLinks.add(new IdImpl("17560001594646FT"));
+		selectedLinks.add(new IdImpl("17560001380278TF"));
 		
 		BasicPointVisualizer basicPointVisualizer=new BasicPointVisualizer();
 		

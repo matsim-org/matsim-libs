@@ -57,9 +57,7 @@ public class LinkEnergyConsumptionTracker_NonParallelizableHandler implements Li
 	public void handleEvent(LinkLeaveEvent event) {
 		Id personId = event.getPersonId();
 
-		if (!ParametersPSF2.isPHEV(personId)) {
-			return;
-		}
+		
 
 		Link link = ParametersPSF2.controler.getNetwork().getLinks().get(event.getLinkId());
 		Vehicle vehicle = ParametersPSF2.vehicles.getValue(event.getPersonId());
@@ -75,9 +73,7 @@ public class LinkEnergyConsumptionTracker_NonParallelizableHandler implements Li
 	public void handleEvent(LinkEnterEvent event) {
 		Id personId = event.getPersonId();
 
-		if (!ParametersPSF2.isPHEV(personId)) {
-			return;
-		}
+		
 		
 		linkEntranceTime.put(event.getPersonId(), event.getLinkId(), event.getTime());
 	}

@@ -111,9 +111,7 @@ public class ActivityIntervalTracker_NonParallelizableHandler implements Activit
 	public void handleEvent(ActivityStartEvent event) {
 		Id personId = event.getPersonId();
 
-		if (!ParametersPSF2.isPHEV(personId)) {
-			return;
-		}
+		
 
 		if (mostRecentTransportationModeWasCar(personId)) {
 			firstActivityAfterParkingCar.put(event.getPersonId(), event);
@@ -131,9 +129,7 @@ public class ActivityIntervalTracker_NonParallelizableHandler implements Activit
 	public void handleEvent(AgentDepartureEvent event) {
 		Id personId = event.getPersonId();
 
-		if (!ParametersPSF2.isPHEV(personId)) {
-			return;
-		}
+		
 
 		timeOfMostRecentDeparture.put(personId, event.getTime());
 
@@ -168,9 +164,7 @@ public class ActivityIntervalTracker_NonParallelizableHandler implements Activit
 	public void handleEvent(LinkEnterEvent event) {
 		Id personId = event.getPersonId();
 
-		if (!ParametersPSF2.isPHEV(personId)) {
-			return;
-		}
+		
 
 		if (stillBeforeFristEnterLinkEvent.get(personId)) {
 

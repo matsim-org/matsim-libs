@@ -75,6 +75,13 @@ public class PSSEventsFileBasedControler {
 
 		controler.setWriteEventsInterval(0);
 		
+		//addPHEVSampleFilter_Deprecated_use_EventsFilterSamplingInstead(controler);
+
+		pssControlerDumbCharging.runControler();
+	}
+
+	/*
+	private static void addPHEVSampleFilter_Deprecated_use_EventsFilterSamplingInstead(Controler controler) {
 		controler.addControlerListener(new StartupListener() {
 
 			@Override
@@ -104,8 +111,6 @@ public class PSSEventsFileBasedControler {
 
 			}
 		});
-
-		pssControlerDumbCharging.runControler();
 	}
-
+*/
 }
