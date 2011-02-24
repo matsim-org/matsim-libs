@@ -20,6 +20,7 @@
 package playground.droeder.Journal2MATSim2Journal;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -32,6 +33,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
@@ -41,7 +43,9 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.api.experimental.events.PersonEvent;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
@@ -53,7 +57,6 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderXMLv1;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.run.Controler;
@@ -88,7 +91,10 @@ public class Journal2Matsim2Journal {
 	private boolean hasHeader;
 	
 	private Set<String[]> inFileContent;
-	private Map<String, Set<String[]>> person2ways;
+	private Map<String, Set<String[]>> person2waysOld;
+	private Map<Id, Set<PersonEvent>> person2Event;
+	private Map<String, Set<Set<PersonEvent>>> car2TripEvents;
+	private Map<String, Set<Set<PersonEvent>>> pt2TripEvents;
 	
 	private final String ACT_0 = "home";
 	private final String ACT_1 = "work";
@@ -96,7 +102,7 @@ public class Journal2Matsim2Journal {
 	
 	public static void main(String[] args){
 		Journal2Matsim2Journal j = new Journal2Matsim2Journal(INPUTDIR + "dummy.csv", ";", true);
-		j.run(INPUTDIR + "multimodalnetwork.xml", INPUTDIR + "transitVehicles.xml", INPUTDIR + "transitSchedule.xml", DaPaths.OUTPUT + "journals/");
+		j.run(INPUTDIR + "multimodalnetwork.xml", INPUTDIR + "transitVehicles.xml", INPUTDIR + "transitSchedule.xml", INPUTDIR);
 		
 	}
 	
@@ -120,9 +126,10 @@ public class Journal2Matsim2Journal {
 //		
 //		this.createAndWriteConfig();
 //		
-//		this.runMobSim();
+//		this.runQSim();
 		
-		this.analyzeEventsFile();
+		this.readEventsFile();
+		this.getTripsByModeFromEvents();
 		
 //		this.writeNewJournal();
 	}
@@ -133,16 +140,16 @@ public class Journal2Matsim2Journal {
 	}
 	
 	private void sortWaysByPerson() {
-		this.person2ways = new TreeMap<String, Set<String[]>>();
+		this.person2waysOld = new TreeMap<String, Set<String[]>>();
 		String id;
 		for(String[] way : this.inFileContent){
 			id = way[2];
 			
-			if(this.person2ways.containsKey(id)&& !(way[23].equals("9999999")) && !(way[181].equals("9999999"))){
-				this.person2ways.get(id).add(way);
+			if(this.person2waysOld.containsKey(id)&& !(way[23].equals("9999999")) && !(way[181].equals("9999999"))){
+				this.person2waysOld.get(id).add(way);
 			}else if(!(way[23].equals("9999999")) && !(way[181].equals("9999999"))){
-				this.person2ways.put(id, new LinkedHashSet<String[]>());
-				this.person2ways.get(id).add(way);
+				this.person2waysOld.put(id, new LinkedHashSet<String[]>());
+				this.person2waysOld.get(id).add(way);
 			}else{
 				log.error("wayId " + way[1] + "not processed, because no coordinates are given!"); 
 			}
@@ -164,7 +171,7 @@ public class Journal2Matsim2Journal {
 		double tripStartTime;
 		double tripEndTime;
 
-		for(Entry<String, Set<String[]>> e : this.person2ways.entrySet()){
+		for(Entry<String, Set<String[]>> e : this.person2waysOld.entrySet()){
 			personCar = fac.createPerson(sc.createId(e.getKey() + "_" + TransportMode.car.toString()));
 			planCar = fac.createPlan(); 
 				
@@ -318,14 +325,14 @@ public class Journal2Matsim2Journal {
 		new ConfigWriter(c).write(this.configFile);
 	}
 
-	private void runMobSim() {
+	private void runQSim() {
 		Controler c = new Controler(this.configFile);
 		c.setOverwriteFiles(true);
 		c.run();
 	}
 
 	
-	private void analyzeEventsFile(){
+	private void readEventsFile(){
 		EventsManager events = new EventsManagerImpl();
 		TripDurationHandler handler = new TripDurationHandler();
 		events.addHandler(handler);
@@ -333,16 +340,76 @@ public class Journal2Matsim2Journal {
 		try {
 			new EventsReaderXMLv1(events).parse(this.outDir + "ITERS/it.0/0.events.xml.gz");
 		} catch (SAXException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (ParserConfigurationException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
+		this.person2Event = handler.getId2Event();
+	}
+	
+	private void getTripsByModeFromEvents(){
+		Map<Id, Set<Set<PersonEvent>>> person2trips = new HashMap<Id, Set<Set<PersonEvent>>>();
+		
+		for(Entry<Id, Set<PersonEvent>> entry : this.person2Event.entrySet()){
+			boolean start = true;
+			person2trips.put(entry.getKey(), new LinkedHashSet<Set<PersonEvent>>());
+			Set<PersonEvent> temp = null;
+			for(PersonEvent e : entry.getValue()){
+				if(start){
+					temp = new LinkedHashSet<PersonEvent>();
+					start = false;
+				}
+				temp.add(e);
+				
+				if(e instanceof ActivityStartEvent && !((ActivityStartEvent)e).getActType().equals("pt interaction")){
+					start = true;
+					person2trips.get(entry.getKey()).add(temp);
+				}
+			}
+		}
+		
+		this.car2TripEvents = new HashMap<String, Set<Set<PersonEvent>>>();
+		this.pt2TripEvents = new HashMap<String, Set<Set<PersonEvent>>>();
+		
+		for(Entry<Id, Set<Set<PersonEvent>>> e : person2trips.entrySet()){
+			String[] id = e.getKey().toString().split("_");
+			
+			if(id[1].equals("pt")){
+				this.pt2TripEvents.put(id[0], e.getValue());
+			}else{
+				this.car2TripEvents.put(id[0], e.getValue());
+			}
+		}
+		
+//		for(Entry<String, Set<Set<PersonEvent>>> e : this.car2TripEvents.entrySet()){
+//			System.out.println(e.getKey());
+//			for(Set<PersonEvent> set : e.getValue()){
+//				for(PersonEvent ev: set){
+//					System.out.println(ev);
+//				}
+//				System.out.println();
+//			}
+//			System.out.println();
+//			System.out.println();
+//		}
+//		
+//		for(Entry<String, Set<Set<PersonEvent>>> e : this.pt2TripEvents.entrySet()){
+//			System.out.println(e.getKey());
+//			for(Set<PersonEvent> set : e.getValue()){
+//				for(PersonEvent ev: set){
+//					System.out.println(ev);
+//				}
+//				System.out.println();
+//			}
+//			System.out.println();
+//			System.out.println();
+//		}
+	}
+	
+	private void analyzeEvents(){
 		
 	}
 	
