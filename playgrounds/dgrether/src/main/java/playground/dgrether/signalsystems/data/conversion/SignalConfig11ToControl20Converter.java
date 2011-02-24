@@ -37,15 +37,15 @@ import org.matsim.jaxb.amberTimes10.XMLAmberTimesType.XMLRedAmber;
 import org.matsim.jaxb.signalcontrol20.ObjectFactory;
 import org.matsim.jaxb.signalcontrol20.XMLSignalControl;
 import org.matsim.jaxb.signalcontrol20.XMLSignalGroupSettingsType;
-import org.matsim.jaxb.signalcontrol20.XMLSignalPlanType;
-import org.matsim.jaxb.signalcontrol20.XMLSignalSystemControllerType;
-import org.matsim.jaxb.signalcontrol20.XMLSignalSystemType;
 import org.matsim.jaxb.signalcontrol20.XMLSignalGroupSettingsType.XMLDropping;
 import org.matsim.jaxb.signalcontrol20.XMLSignalGroupSettingsType.XMLOnset;
+import org.matsim.jaxb.signalcontrol20.XMLSignalPlanType;
 import org.matsim.jaxb.signalcontrol20.XMLSignalPlanType.XMLCycleTime;
 import org.matsim.jaxb.signalcontrol20.XMLSignalPlanType.XMLOffset;
 import org.matsim.jaxb.signalcontrol20.XMLSignalPlanType.XMLStart;
 import org.matsim.jaxb.signalcontrol20.XMLSignalPlanType.XMLStop;
+import org.matsim.jaxb.signalcontrol20.XMLSignalSystemControllerType;
+import org.matsim.jaxb.signalcontrol20.XMLSignalSystemType;
 import org.matsim.jaxb.signalsystemsconfig11.XMLAdaptivePlanbasedSignalSystemControlInfoType;
 import org.matsim.jaxb.signalsystemsconfig11.XMLAdaptiveSignalSystemControlInfoType;
 import org.matsim.jaxb.signalsystemsconfig11.XMLPlanbasedSignalSystemControlInfoType;
@@ -53,7 +53,6 @@ import org.matsim.jaxb.signalsystemsconfig11.XMLSignalSystemConfig;
 import org.matsim.jaxb.signalsystemsconfig11.XMLSignalSystemConfigurationType;
 import org.matsim.jaxb.signalsystemsconfig11.XMLSignalSystemControlInfoType;
 import org.matsim.jaxb.signalsystemsconfig11.XMLSignalSystemPlanType;
-import org.matsim.signalsystems.MatsimSignalSystemConfigurationsReader;
 import org.matsim.signalsystems.SignalSystemConfigurationsReader11;
 import org.matsim.signalsystems.data.ambertimes.v10.AmberTimesWriter10;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalControlWriter20;
@@ -92,7 +91,7 @@ public class SignalConfig11ToControl20Converter {
 	}
 
 	private XMLSignalSystemConfig readSignalConfigs11(String signalConfigs11) {
-		SignalSystemConfigurationsReader11 reader = new SignalSystemConfigurationsReader11(MatsimSignalSystemConfigurationsReader.SIGNALSYSTEMSCONFIG11);
+		SignalSystemConfigurationsReader11 reader = new SignalSystemConfigurationsReader11("http://www.matsim.org/files/dtd/signalSystemsConfig_v1.1.xsd");
 		XMLSignalSystemConfig xmlSignalControl = null;
 		try {
 			xmlSignalControl = reader.readSignalSystemConfig11File(signalConfigs11);
