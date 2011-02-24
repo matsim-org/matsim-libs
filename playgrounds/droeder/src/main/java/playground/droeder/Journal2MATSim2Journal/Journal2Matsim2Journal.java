@@ -129,7 +129,7 @@ public class Journal2Matsim2Journal {
 //		this.runQSim();
 		
 		this.readEventsFile();
-		this.getTripsByModeFromEvents();
+		this.sortTripEventsByMode();
 		
 //		this.writeNewJournal();
 	}
@@ -350,7 +350,7 @@ public class Journal2Matsim2Journal {
 		this.person2Event = handler.getId2Event();
 	}
 	
-	private void getTripsByModeFromEvents(){
+	private void sortTripEventsByMode(){
 		Map<Id, Set<Set<PersonEvent>>> person2trips = new HashMap<Id, Set<Set<PersonEvent>>>();
 		
 		for(Entry<Id, Set<PersonEvent>> entry : this.person2Event.entrySet()){
