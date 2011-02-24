@@ -169,7 +169,7 @@ public class PSSControlerDumbCharging extends PSSControler {
 
 		controler.addControlerListener(new StartupListener() {
 			public void notifyStartup(StartupEvent event) {
-				ParametersPSF2.initVehicleFleet(event.getControler());
+				
 				ParametersPSF2.setPSFGeneralLog(new GeneralLogObject(event.getControler().getControlerIO()
 						.getOutputFilename("PSFGeneralLog.txt")));
 				
@@ -183,6 +183,8 @@ public class PSSControlerDumbCharging extends PSSControler {
 				
 				ParametersPSF2.energyStateMaintainer = new ARTEMISEnergyStateMaintainer_StartChargingUponArrival(
 						ParametersPSF2.energyConsumptionTable);
+				
+				ParametersPSF2.initVehicleFleet(event.getControler());
 			}
 		});
 
