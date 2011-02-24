@@ -28,7 +28,7 @@ public class SfAirScheduleBuilder {
 		
 		SfAirScheduleBuilder builder = new SfAirScheduleBuilder();
 		builder.filterEurope("/home/soeren/workspace/airports.osm", "/home/soeren/Downloads/OAGSEP09.CSV", 
-				"/home/soeren/workspace/OsmTest.txt", "/home/soeren/workspace/OagTest.txt", "/home/soeren/workspace/missingAirports.txt", 
+				"/home/soeren/workspace/osmEuroAirports.txt", "/home/soeren/workspace/oagEuroFlights.txt", "/home/soeren/workspace/missingAirports.txt", 
 				"/home/soeren/workspace/cityPairs.txt");
 	}
 	

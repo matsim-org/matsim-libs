@@ -32,7 +32,7 @@ public class SfAirNetworkBuilder {
 	
 	public void createNetwork() throws IOException {
 		
-		String output = "/home/soeren/workspace/testnetzwerk";
+		String output = "/home/soeren/workspace/euroAirNetwork";
 		Set<String> allowedModes = new HashSet<String>();
 		allowedModes.add("pt");
 		allowedModes.add("car");
@@ -40,7 +40,7 @@ public class SfAirNetworkBuilder {
 		NetworkImpl network = NetworkImpl.createNetwork();
 		network.setCapacityPeriod(1.0);		//capacity period set to one second to allow storage capacity = 1 for runway with runway length of 450 meters and 1/60 flow capacity
 		
-		BufferedReader brAirports = new BufferedReader(new FileReader(new File("/home/soeren/workspace/OsmTest.txt")));
+		BufferedReader brAirports = new BufferedReader(new FileReader(new File("/home/soeren/workspace/osmEuroAirports.txt")));
 		BufferedReader brRoutes = new BufferedReader(new FileReader(new File("/home/soeren/workspace/cityPairs.txt")));
 		
 		CoordinateTransformation coordtransform =

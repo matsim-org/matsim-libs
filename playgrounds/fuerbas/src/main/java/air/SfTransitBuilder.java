@@ -43,16 +43,15 @@ public class SfTransitBuilder {
 	public static void main(String[] args) throws IOException {
 
 		SfTransitBuilder builder = new SfTransitBuilder();
-		builder.createSchedule("/home/soeren/workspace/OagTest.txt");
+		builder.createSchedule("/home/soeren/workspace/oagEuroFlights.txt");
 		
 	}
 		
-	
 	public void createSchedule(String inputOagData) throws IOException {
 		
 		Scenario scen = new ScenarioImpl();	
 		Config config = scen.getConfig();
-		config.network().setInputFile("/home/soeren/workspace/testnetzwerk.xml");
+		config.network().setInputFile("/home/soeren/workspace/euroAirNetwork.xml");
 		ScenarioLoader sl = new ScenarioLoaderImpl(scen);		
 		sl.loadScenario();		
 		Network network = scen.getNetwork();
@@ -151,14 +150,12 @@ public class SfTransitBuilder {
 		}
 		
 		TransitScheduleWriterV1 scheduleWriter = new TransitScheduleWriterV1(schedule);
-		scheduleWriter.write("/home/soeren/workspace/testschedule.xml");
+		scheduleWriter.write("/home/soeren/workspace/euroFlightSchedule.xml");
 		
 		VehicleWriterV1 vehicleWriter = new VehicleWriterV1(veh);
-		vehicleWriter.writeFile("/home/soeren/workspace/testvehicles.xml");
-		
-		
+		vehicleWriter.writeFile("/home/soeren/workspace/euroFlightVehicles.xml");
+			
 	}
 
-	
 
 }
