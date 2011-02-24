@@ -73,13 +73,16 @@ public class DgSylviaPreprocessData {
 
 	private Set<Id> signalSystemIds = new HashSet<Id>();
 	
+	private boolean createAll = true;
+	
 	public DgSylviaPreprocessData(){
-			this.signalSystemIds.add(new IdImpl(1));
-			this.signalSystemIds.add(new IdImpl(17));
-			this.signalSystemIds.add(new IdImpl(18));
+//			this.signalSystemIds.add(new IdImpl(1));
+//			this.signalSystemIds.add(new IdImpl(17));
+//			this.signalSystemIds.add(new IdImpl(18));
 //			this.signalSystemIds.add(new IdImpl(28));
 //			this.signalSystemIds.add(new IdImpl(12));
 //			this.signalSystemIds.add(new IdImpl(14));
+		this.signalSystemIds.add(new IdImpl(8));
 	}
 
 
@@ -131,7 +134,7 @@ public class DgSylviaPreprocessData {
 	private SignalControlData convertSignalControlData(final SignalControlData controlData){
 		SignalControlData cd = new SignalControlDataImpl();
 		for (SignalSystemControllerData  controllerData: controlData.getSignalSystemControllerDataBySystemId().values()){
-			if (! this.signalSystemIds.contains(controllerData.getSignalSystemId())){
+			if (! this.createAll  && ! this.signalSystemIds.contains(controllerData.getSignalSystemId())){
 				cd.addSignalSystemControllerData(controllerData);
 			}
 			else {
@@ -223,7 +226,7 @@ public class DgSylviaPreprocessData {
 		for (int i = 0; i < phases.size(); i++){
 			System.out.println();
 			log.error("Processing phase: " + (i+1) + " of " + phases.size());
-			DgPhase phase = phases.get(i);
+			final DgPhase phase = phases.get(i); // this phase is not modified
 			DgPhase sylviaPhase = this.createSylviaPhase(phase, factory);
 			if (i == 0){ //this should be the first phase of the cylce
 				phaseStart = phase.getPhaseStartSecond();
@@ -248,28 +251,35 @@ public class DgSylviaPreprocessData {
 					}
 				}
 				else { //handle overlapping phases -> shift phase 
+					log.error("phases overlap...");
 					Collection<IntergreenConstraint> intergreenConstraints = this.calculateIntergreenConstraints(lastPhase, phase);
-					int phaseOn = sylviaPhase.getPhaseEndSecond();
-					int phaseOff = 0;
-					for (IntergreenConstraint ic : intergreenConstraints){
-						SignalGroupSettingsData sylviaSettings = sylviaPhase.getSignalGroupSettingsByGroupId().get(ic.onSettingsId);
-						SignalGroupSettingsData lastSylviaSettings = lastSylviaPhase.getSignalGroupSettingsByGroupId().get(ic.droppingSettingsId);
-						int greenTime = sylviaSettings.getDropping() - sylviaSettings.getOnset();
-						int on = lastSylviaSettings.getDropping() + ic.intergreen;
-						int off = on + greenTime;
-						log.error("settings " + sylviaSettings.getSignalGroupId() + " green time : " + greenTime + " intergreen constraint: " + ic.intergreen + " to group id " + ic.droppingSettingsId + " on " + on + " off " + off);
-						sylviaSettings.setOnset(on);
-						sylviaSettings.setDropping(off);
-						if (on < phaseOn)
-							phaseOn = on;
-						if (off > phaseOff)
-							phaseOff = off;
+					log.error("intergreen constraints: " + intergreenConstraints);
+					if (! intergreenConstraints.isEmpty()){
+						int phaseOn = sylviaPhase.getPhaseEndSecond(); //initialize with maximal value
+						int phaseOff = 0;
+						for (IntergreenConstraint ic : intergreenConstraints){
+							SignalGroupSettingsData sylviaSettings = sylviaPhase.getSignalGroupSettingsByGroupId().get(ic.onSettingsId);
+							SignalGroupSettingsData lastSylviaSettings = lastSylviaPhase.getSignalGroupSettingsByGroupId().get(ic.droppingSettingsId);
+							int greenTime = sylviaSettings.getDropping() - sylviaSettings.getOnset();
+							int on = lastSylviaSettings.getDropping() + ic.intergreen;
+							int off = on + greenTime;
+							log.error("settings " + sylviaSettings.getSignalGroupId() + " green time : " + greenTime + " intergreen constraint: " + ic.intergreen + " to group id " + ic.droppingSettingsId + " on " + on + " off " + off);
+							sylviaSettings.setOnset(on);
+							sylviaSettings.setDropping(off);
+							if (on < phaseOn)
+								phaseOn = on;
+							if (off > phaseOff)
+								phaseOff = off;
+						}
+						log.error("shiftet phase to " + phaseOn + " - " + phaseOff);
+						sylviaPhase.setPhaseStartSecond(phaseOn);
+						sylviaPhase.setPhaseEndSecond(phaseOff);
+						for (SignalGroupSettingsData settings : sylviaPhase.getSignalGroupSettingsByGroupId().values()){
+							settings.setDropping(sylviaPhase.getPhaseEndSecond());
+						}
 					}
-					log.error("shiftet phase to " + phaseOn + " - " + phaseOff);
-					sylviaPhase.setPhaseStartSecond(phaseOn);
-					sylviaPhase.setPhaseEndSecond(phaseOff);
-					for (SignalGroupSettingsData settings : sylviaPhase.getSignalGroupSettingsByGroupId().values()){
-						settings.setDropping(sylviaPhase.getPhaseEndSecond());
+					else { //phases overlap but there are no positive intergreen constaints -> all groups start meanwhile last phase is active and end afterwards
+						//do nothing
 					}
 				}
 			}
@@ -312,6 +322,7 @@ public class DgSylviaPreprocessData {
 		for (SignalGroupSettingsData settings : phase.getSignalGroupSettingsByGroupId().values()){
 			for (SignalGroupSettingsData lastSettings : lastPhase.getSignalGroupSettingsByGroupId().values()){
 				intergreen = settings.getOnset() - lastSettings.getDropping();
+				log.error("intergreen: " + intergreen);
 				if (intergreen >= 0){
 					if ((! map.containsKey(settings)) || map.get(settings).intergreen > intergreen){
 						ic = new IntergreenConstraint();
@@ -456,10 +467,14 @@ public class DgSylviaPreprocessData {
 	 * @throws JAXBException 
 	 */
 	public static void main(String[] args) throws JAXBException, SAXException, ParserConfigurationException, IOException {
-		String signalControlFile = DgPaths.REPOS + "shared-svn/studies/dgrether/cottbus/Cottbus-BA/scenario-lsa/signalControlCottbusT90_v2.0_jb_ba_removed.xml";
-		String signalControlOutFile = DgPaths.REPOS + "shared-svn/studies/dgrether/cottbus/sylvia/signal_control_sylvia.xml";
-		String signalGroupsFile = DgPaths.REPOS + "shared-svn/studies/dgrether/cottbus/Cottbus-BA/signalGroupsCottbusByNodes_v2.0.xml";
-		String signalGroupsOutFile = DgPaths.REPOS + "shared-svn/studies/dgrether/cottbus/sylvia/signal_groups_sylvia.xml";
+//		String signalControlFile = DgPaths.REPOS + "shared-svn/studies/dgrether/cottbus/Cottbus-BA/scenario-lsa/signalControlCottbusT90_v2.0_jb_ba_removed.xml";
+//		String signalControlOutFile = DgPaths.REPOS + "shared-svn/studies/dgrether/cottbus/sylvia/signal_control_sylvia.xml";
+//		String signalGroupsFile = DgPaths.REPOS + "shared-svn/studies/dgrether/cottbus/Cottbus-BA/signalGroupsCottbusByNodes_v2.0.xml";
+//		String signalGroupsOutFile = DgPaths.REPOS + "shared-svn/studies/dgrether/cottbus/sylvia/signal_groups_sylvia.xml";
+		String signalControlFile = DgPaths.REPOS + "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/signal_control.xml";
+		String signalControlOutFile = DgPaths.REPOS + "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/signal_control_sylvia.xml";
+		String signalGroupsFile = DgPaths.REPOS + "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/signal_groups.xml";
+		String signalGroupsOutFile = DgPaths.REPOS + "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/signal_groups_sylvia.xml";
 		new DgSylviaPreprocessData().convertFixedTimePlansToSylviaBasePlans(signalControlFile, signalControlOutFile, signalGroupsFile, signalGroupsOutFile);
 	}
 

@@ -194,6 +194,7 @@ public class DgSylviaController implements SignalController {
 	}
 	
 	private boolean isGreenTimeLeft(double timeSeconds, Id groupId, int maxGreenTime){
+//		log.error("system id : " + this.system.getId() + " group: " + groupId);
 		int greenTime = (int) (timeSeconds - this.greenGroupId2OnsetMap.get(groupId));
 		return greenTime < maxGreenTime;
 	}
@@ -251,6 +252,7 @@ public class DgSylviaController implements SignalController {
 //		log.debug("check traffic conditions:  ");
 		int noCars = 0;
 		for (SignalData signal : extensionPoint.getSignals()){
+//			log.error("system id : " + this.system.getId() + " signal: " + signal.getId());
 			if (signal.getLaneIds() == null || signal.getLaneIds().isEmpty()){
 				noCars = this.sensorManager.getNumberOfCarsInDistance(signal.getLinkId(), SENSOR_DISTANCE, timeSeconds);
 				if (noCars > 0){
@@ -401,11 +403,12 @@ public class DgSylviaController implements SignalController {
 			extPoint.addSignals(extPointSignals);
 			for (SignalData signal : extPointSignals){
 				if (signal.getLaneIds() == null || signal.getLaneIds().isEmpty()){
-					this.sensorManager.registerCarsAtDistancePerSecondMonitoring(signal.getLinkId(), SENSOR_DISTANCE);
+//					log.error("system: " + this.system.getId() + " signal: " + signal.getId() + " has no lanes...");
+					this.sensorManager.registerNumberOfCarsInDistanceMonitoring(signal.getLinkId(), SENSOR_DISTANCE);
 				}
 				else {
 					for (Id laneId : signal.getLaneIds()){
-						//TODO check this part again
+						//TODO check this part again concerning implementation of CarsOnLaneHandler
 						this.sensorManager.registerNumberOfCarsMonitoringOnLane(signal.getLinkId(), laneId);
 					}
 				}
