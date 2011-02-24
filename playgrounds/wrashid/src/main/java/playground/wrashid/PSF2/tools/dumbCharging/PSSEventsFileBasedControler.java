@@ -50,7 +50,18 @@ public class PSSEventsFileBasedControler {
 	public static void main(String[] args) {
 
 		final double percentageOfPHEVs = 1;
-		String configFile = "test/input/playground/wrashid/PSF2/chargingSchemes/dumbCharging/config-event-file-based.xml";
+		String configFile=null;
+		if (args.length>0){
+			configFile = args[0];
+		} else {
+			System.err.println("config file not specified as argument!");
+			
+			System.exit(0);
+			
+			//configFile = "test/input/playground/wrashid/PSF2/chargingSchemes/dumbCharging/config-event-file-based.xml";
+		}
+		
+		
 
 		// TODO: here we could also add some filter later...
 

@@ -160,9 +160,8 @@ public class PSSControlerDumbCharging extends PSSControler {
 
 	private static void initializeParametersPSF2(Controler controler) {
 		ParametersPSF2.fleetInitializer = new ChargingFleetInitializer();
-		ParametersPSF2.energyConsumptionTable = new EnergyConsumptionTable(ParametersPSF2.pathToEnergyConsumptionTable);
-		ParametersPSF2.energyStateMaintainer = new ARTEMISEnergyStateMaintainer_StartChargingUponArrival(
-				ParametersPSF2.energyConsumptionTable);
+		
+		
 		ParametersPSF2.chargingTimes = new HashMap<Id, ChargingTimes>();
 
 		ParametersPSF2.controler = controler;
@@ -173,6 +172,17 @@ public class PSSControlerDumbCharging extends PSSControler {
 				ParametersPSF2.initVehicleFleet(event.getControler());
 				ParametersPSF2.setPSFGeneralLog(new GeneralLogObject(event.getControler().getControlerIO()
 						.getOutputFilename("PSFGeneralLog.txt")));
+				
+				String pathToEnergyConsumptionTable = event.getControler().getConfig().getParam("PSF", "pathToEnergyConsumptionTable");
+				
+				if (pathToEnergyConsumptionTable!=null){
+					ParametersPSF2.pathToEnergyConsumptionTable=pathToEnergyConsumptionTable;
+				}
+				
+				ParametersPSF2.energyConsumptionTable = new EnergyConsumptionTable(ParametersPSF2.pathToEnergyConsumptionTable);
+				
+				ParametersPSF2.energyStateMaintainer = new ARTEMISEnergyStateMaintainer_StartChargingUponArrival(
+						ParametersPSF2.energyConsumptionTable);
 			}
 		});
 
