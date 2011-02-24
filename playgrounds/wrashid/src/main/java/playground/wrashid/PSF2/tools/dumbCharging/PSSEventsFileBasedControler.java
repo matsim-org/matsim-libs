@@ -49,7 +49,10 @@ public class PSSEventsFileBasedControler {
 
 	public static void main(String[] args) {
 
-		final double percentageOfPHEVs = 1;
+		
+		
+		
+		
 		String configFile=null;
 		if (args.length>0){
 			configFile = args[0];
@@ -76,11 +79,20 @@ public class PSSEventsFileBasedControler {
 
 			@Override
 			public void notifyStartup(StartupEvent event) {
+				double percentageOfPHEVs=100;
+				String paramName="PHEVsAsPercentageOfWholePopulation";
+				try{
+					String str=	event.getControler().getConfig().getParam("PSF", paramName);
+					percentageOfPHEVs=Integer.parseInt(str);
+				} catch (Exception e) {
+					e.printStackTrace();
+					System.err.println("config parameter missing in module PSF: " + paramName);
+					System.exit(0);
+				}
+				
 				ParametersPSF2.phevAgents = new LinkedList<Id>();
 
 				Controler ctrl = event.getControler();
-				
-				
 
 				Random rand = new Random();
 
