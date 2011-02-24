@@ -43,7 +43,7 @@ public class SylviaMain {
 		if (args == null || args.length == 0){
 			log.info("No args given, running local config...");
 			args2 = new String[1];
-			args2[0] = DgPaths.REPOS + "shared-svn/studies/dgrether/cottbus/sylvia/cottbus_sylvia_config.xml";
+			args2[0] = DgPaths.REPOS + "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/config.xml";
 		}
 		else {
 			args2 = args;

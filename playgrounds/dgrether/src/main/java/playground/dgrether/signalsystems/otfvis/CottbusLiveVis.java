@@ -39,7 +39,7 @@ public class CottbusLiveVis {
 //	private String config = inputDir + "cottbusConfig.xml";
 	private static final String oldCottbusConfig = inputDir + "originaldaten/config_dg_livevis.xml";
 	
-	public static final  String newCottbusConfig = inputDir + "Cottbus-BA/scenario-lsa/cottbusConfigLiveVis.xml";
+	public static final  String newCottbusConfig = inputDir + "cottbus_feb_fix/config.xml";
 
 	private void run() {
 		String config = newCottbusConfig;

@@ -20,8 +20,10 @@
 package playground.dgrether.signalsystems.cottbus;
 
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.core.api.experimental.network.NetworkWriter;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.utils.gis.matsim2esri.network.Links2ESRIShape;
 
 
@@ -35,15 +37,16 @@ public class DgCottbusNet2Shape {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String netFile = "/media/data/work/repos/shared-svn/studies/dgrether/cottbus/Cottbus-BA/network_wo_junctions.xml";
+		String netFile = "/media/data/work/repos/shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/network.xml.gz";
 		ScenarioImpl scenario = new ScenarioImpl();
 		NetworkImpl net = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFile);
 
-		
-		new Links2ESRIShape(net, "/media/data/work/repos/shared-svn/studies/dgrether/cottbus/Cottbus-BA/network_wo_junctions.shp", "WGS84").write();
-		
-		
+		NetworkCleaner nc = new NetworkCleaner();
+		nc.run(net);
+		NetworkWriter writer = new NetworkWriter(net);
+		writer.write(netFile);
+		new Links2ESRIShape(net, "/media/data/work/repos/shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/shp/network.shp", "WGS84").write();
 	}
 
 }
