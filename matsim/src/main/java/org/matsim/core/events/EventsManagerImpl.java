@@ -20,9 +20,9 @@
 
 package org.matsim.core.events;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -143,15 +143,15 @@ public class EventsManagerImpl implements EventsManager {
 
 	@Override
 	public void addHandler (final EventHandler handler) {
-		Map<Class<?>, Object> addedHandlers = new HashMap<Class<?>, Object>();
+		Set<Class<?>> addedHandlers = new HashSet<Class<?>>();
 		Class<?> test = handler.getClass();
 		log.info("adding Event-Handler: " + test.getName());
 		while (test != Object.class) {
 			for (Class<?> theInterface: test.getInterfaces()) {
-				if (!handler.equals(addedHandlers.get(theInterface))) {
+				if (!addedHandlers.contains(theInterface)) {
 					log.info("  " + theInterface.getName());
 					addHandlerInterfaces(handler, theInterface);
-					addedHandlers.put(theInterface, handler);
+					addedHandlers.add(theInterface);
 				}
 			}
 			test = test.getSuperclass();
@@ -219,7 +219,7 @@ public class EventsManagerImpl implements EventsManager {
 		// nothing to do in this implementation
 	}
 
-	public void addHandlerInterfaces(final EventHandler handler, final Class<?> handlerClass) {
+	private void addHandlerInterfaces(final EventHandler handler, final Class<?> handlerClass) {
 		Method[] classmethods = handlerClass.getMethods();
 		for (Method method : classmethods) {
 			if (method.getName().equals("handleEvent")) {
@@ -246,8 +246,12 @@ public class EventsManagerImpl implements EventsManager {
 				}
 				try {
 					info.method.invoke(info.eventHandler, event);
-				} catch (Exception e) {
-					log.error("problem invoking EventHandler " + info.eventHandler.getClass().getCanonicalName() + " for event-class " + info.eventClass.getCanonicalName(), e);
+				} catch (IllegalArgumentException e) {
+					throw new RuntimeException("problem invoking EventHandler " + info.eventHandler.getClass().getCanonicalName() + " for event-class " + info.eventClass.getCanonicalName(), e);
+				} catch (IllegalAccessException e) {
+					throw new RuntimeException("problem invoking EventHandler " + info.eventHandler.getClass().getCanonicalName() + " for event-class " + info.eventClass.getCanonicalName(), e);
+				} catch (InvocationTargetException e) {
+					throw new RuntimeException("problem invoking EventHandler " + info.eventHandler.getClass().getCanonicalName() + " for event-class " + info.eventClass.getCanonicalName(), e);
 				}
 			}
 		}
