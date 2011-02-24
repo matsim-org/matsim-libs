@@ -49,7 +49,7 @@ public class PSSEventsFileBasedControler {
 
 	public static void main(String[] args) {
 
-		final double percentageOfPHEVs = 100;
+		final double percentageOfPHEVs = 1;
 		String configFile = "test/input/playground/wrashid/PSF2/chargingSchemes/dumbCharging/config-event-file-based.xml";
 
 		// TODO: here we could also add some filter later...
@@ -59,6 +59,8 @@ public class PSSEventsFileBasedControler {
 		pssControlerDumbCharging.prepareMATSimIterations();
 		Controler controler = pssControlerDumbCharging.getControler();
 
+		controler.setWriteEventsInterval(0);
+		
 		controler.addControlerListener(new StartupListener() {
 
 			@Override
@@ -66,6 +68,8 @@ public class PSSEventsFileBasedControler {
 				ParametersPSF2.phevAgents = new LinkedList<Id>();
 
 				Controler ctrl = event.getControler();
+				
+				
 
 				Random rand = new Random();
 

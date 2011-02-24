@@ -111,7 +111,7 @@ public class ActivityIntervalTracker_NonParallelizableHandler implements Activit
 	public void handleEvent(ActivityStartEvent event) {
 		Id personId = event.getPersonId();
 
-		if (!isPHEV(personId)) {
+		if (!ParametersPSF2.isPHEV(personId)) {
 			return;
 		}
 
@@ -131,7 +131,7 @@ public class ActivityIntervalTracker_NonParallelizableHandler implements Activit
 	public void handleEvent(AgentDepartureEvent event) {
 		Id personId = event.getPersonId();
 
-		if (!isPHEV(personId)) {
+		if (!ParametersPSF2.isPHEV(personId)) {
 			return;
 		}
 
@@ -168,7 +168,7 @@ public class ActivityIntervalTracker_NonParallelizableHandler implements Activit
 	public void handleEvent(LinkEnterEvent event) {
 		Id personId = event.getPersonId();
 
-		if (!isPHEV(personId)) {
+		if (!ParametersPSF2.isPHEV(personId)) {
 			return;
 		}
 
@@ -189,11 +189,6 @@ public class ActivityIntervalTracker_NonParallelizableHandler implements Activit
 		}
 	}
 
-	private boolean isPHEV(Id personId) {
-		if (ParametersPSF2.phevAgents==null || ParametersPSF2.phevAgents.contains(personId)) {
-			return true;
-		}
-		return false;
-	}
+	
 
 }

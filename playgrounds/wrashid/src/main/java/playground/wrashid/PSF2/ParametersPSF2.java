@@ -104,4 +104,11 @@ public class ParametersPSF2 {
 	public static void setPSFIterationLog(GeneralLogObject iterationLog) {
 		iterationLogObject=iterationLog;
 	}
+	
+	public static boolean isPHEV(Id personId) {
+		if (ParametersPSF2.phevAgents==null || ParametersPSF2.phevAgents.contains(personId)) {
+			return true;
+		}
+		return false;
+	}
 }

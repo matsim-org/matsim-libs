@@ -37,13 +37,13 @@ import playground.wrashid.lib.obj.TwoHashMapsConcatenated;
 
 /**
  * There is a race condition between two handlers: LinkEnergyConsumptionTracker
- * and ActivityIntervalTracker. Therefore use just one thread when using parallelEventHandling
+ * and ActivityIntervalTracker. Therefore use just one thread when using
+ * parallelEventHandling
  * 
  * @author wrashid
  * 
  */
-public class LinkEnergyConsumptionTracker_NonParallelizableHandler implements LinkEnterEventHandler, LinkLeaveEventHandler,
-		AgentWait2LinkEventHandler {
+public class LinkEnergyConsumptionTracker_NonParallelizableHandler implements LinkEnterEventHandler, LinkLeaveEventHandler {
 
 	// personId,linkId,timeOfLinkEnterance
 	TwoHashMapsConcatenated<Id, Id, Double> linkEntranceTime = new TwoHashMapsConcatenated<Id, Id, Double>();
@@ -54,12 +54,12 @@ public class LinkEnergyConsumptionTracker_NonParallelizableHandler implements Li
 	}
 
 	@Override
-	public void handleEvent(AgentWait2LinkEvent event) {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
 	public void handleEvent(LinkLeaveEvent event) {
+		Id personId = event.getPersonId();
+
+		if (!ParametersPSF2.isPHEV(personId)) {
+			return;
+		}
 
 		Link link = ParametersPSF2.controler.getNetwork().getLinks().get(event.getLinkId());
 		Vehicle vehicle = ParametersPSF2.vehicles.getValue(event.getPersonId());
@@ -73,6 +73,12 @@ public class LinkEnergyConsumptionTracker_NonParallelizableHandler implements Li
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
+		Id personId = event.getPersonId();
+
+		if (!ParametersPSF2.isPHEV(personId)) {
+			return;
+		}
+		
 		linkEntranceTime.put(event.getPersonId(), event.getLinkId(), event.getTime());
 	}
 
