@@ -46,7 +46,7 @@ public class MatsimFileTypeGuesser extends DefaultHandler {
 	 * This enum only informs about the correct container, not about the version of the input file.
 	 */
 	public enum FileType {Config, Network, Facilities, Population, World,
-		Counts, Events, Households, TransimsVehicle, OTFVis, SignalSystems, LaneDefinitions, SignalSystemConfigs,
+		Counts, Events, Households, TransimsVehicle, OTFVis, SignalSystems, LaneDefinitions, SignalGroups, SignalControl, AmberTimes,
 		TransitSchedule, Vehicles, ObjectAttributes}
 
 	public static final String SYSTEMIDNOTFOUNDMESSAGE = "System Id of xml document couldn't be detected. " +
@@ -150,13 +150,13 @@ public class MatsimFileTypeGuesser extends DefaultHandler {
 					this.fileType = FileType.Events;
 				} else if ("lightSignalSystems".equals(e.rootTag)) {
 					this.fileType = FileType.SignalSystems;
-				}	else if ("lightSignalSystemConfiguration".equals(e.rootTag)) {
-					this.fileType = FileType.SignalSystemConfigs;
+				}	else if ("signalGroups".equals(e.rootTag)) {
+					this.fileType = FileType.SignalGroups;
 				} else if ("signalSystems".equals(e.rootTag)) {
 					this.fileType = FileType.SignalSystems;
-				}	else if ("signalSystemConfig".equals(e.rootTag)) {
-					this.fileType = FileType.SignalSystemConfigs;
-				}	else if ("laneDefinitions".equals(e.rootTag)) {
+				} else if ("signalControl".equals(e.rootTag)) {
+					this.fileType = FileType.SignalControl;
+				} else if ("laneDefinitions".equals(e.rootTag)) {
 					this.fileType = FileType.LaneDefinitions;
 				}	else if ("counts".equals(e.rootTag)) {
 					this.fileType = FileType.Counts;

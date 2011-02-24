@@ -37,6 +37,7 @@ Changes:
   - SignalModelFactory now also has a createSignalPlan(...) method for SignalPlans (r14143)
   - SignalScenarioLoader is not producing null pointer exceptions anymore if files are not set in config group (r14142)
   - improved withinday-package available (r14364)
+  - deprecated class MatsimSignalSystemConfigurationReader is no longer available, constants can be found in MatsimSignalSystemsReader 
 
 
 

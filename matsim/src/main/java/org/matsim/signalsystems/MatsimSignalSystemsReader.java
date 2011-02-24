@@ -21,7 +21,7 @@ package org.matsim.signalsystems;
 
 
 /**
- *
+ * A place for constants to xml schemata
  * @author dgrether
  */
 public class MatsimSignalSystemsReader {
