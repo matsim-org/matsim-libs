@@ -59,6 +59,8 @@ import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.core.events.handler.TransitDriverStartsEventHandler;
+import org.matsim.core.events.handler.VehicleArrivesAtFacilityEventHandler;
+import org.matsim.core.events.handler.VehicleDepartsAtFacilityEventHandler;
 
 /**
  * EventHandling
@@ -308,7 +310,6 @@ public class EventsManagerImpl implements EventsManager {
 
 	// this method is purely for performance reasons and need not be implemented
 	private boolean callHandlerFast(final Class<?> klass, final Event ev, final EventHandler handler) {
-
 		if (klass == LinkLeaveEvent.class) {
 				((LinkLeaveEventHandler)handler).handleEvent((LinkLeaveEvent)ev);
 				return true;
@@ -342,17 +343,23 @@ public class EventsManagerImpl implements EventsManager {
 		} else if (klass == AgentReplanEventImpl.class) {
 			((AgentReplanEventHandler)handler).handleEvent((AgentReplanEventImpl)ev);
 			return true;
-		} else if (klass == Event.class) {
-			((BasicEventHandler)handler).handleEvent(ev);
-			return true;
-		} else if (klass == PersonEvent.class) {
-			((PersonEventHandler)handler).handleEvent((PersonEvent)ev);
-			return true;
 		} else if (klass == PersonEntersVehicleEvent.class) {
 			((PersonEntersVehicleEventHandler)handler).handleEvent((PersonEntersVehicleEvent)ev);
 			return true;
 		} else if (klass == PersonLeavesVehicleEvent.class) {
 			((PersonLeavesVehicleEventHandler)handler).handleEvent((PersonLeavesVehicleEvent)ev);
+			return true;
+		} else if (klass == VehicleDepartsAtFacilityEvent.class) {
+			((VehicleDepartsAtFacilityEventHandler) handler).handleEvent((VehicleDepartsAtFacilityEvent) ev);
+			return true;
+		} else if (klass == VehicleArrivesAtFacilityEvent.class) {
+			((VehicleArrivesAtFacilityEventHandler) handler).handleEvent((VehicleArrivesAtFacilityEvent) ev);
+			return true;
+		} else if (klass == Event.class) {
+			((BasicEventHandler)handler).handleEvent(ev);
+			return true;
+		} else if (klass == PersonEvent.class) {
+			((PersonEventHandler)handler).handleEvent((PersonEvent)ev);
 			return true;
 		}
 		return false;
