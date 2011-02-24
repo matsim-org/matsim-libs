@@ -110,8 +110,7 @@
 		<param name="main.chargingMode" value="moderateCharging" />
 		<param name="main.chargingPriceScalingFactor" value="0.1" />
 		 <param name="main.chargingPriceBlurFactor" value="-3.0" /> 
-		
-		
+		<param name="pathToEnergyConsumptionTable" value="test/input/playground/wrashid/PSF2/vehicle/energyConsumption/VehicleEnergyConsumptionRegressionTable.txt" /> 
 	</module>
 
 </config>
