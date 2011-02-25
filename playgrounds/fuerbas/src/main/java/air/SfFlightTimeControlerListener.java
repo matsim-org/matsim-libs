@@ -48,7 +48,7 @@ public class SfFlightTimeControlerListener implements StartupListener, Iteration
 		try {
 			String filename = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "statistic.csv");
 			BufferedWriter writer = IOUtils.getBufferedWriter(filename);
-			String header = "PersonId" + SEPARATOR + "Arrival Time";
+			String header = "FlightNumber" + SEPARATOR + "ArrivalTime";
 			writer.write(header);
 			writer.newLine();
 				
