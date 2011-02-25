@@ -77,11 +77,12 @@ public class SfTransitBuilder {
 			String[] airportCodes = lineEntries[0].split("_");
 			String origin = airportCodes[0];
 			String destination = airportCodes[1];
+			String transitRoute = lineEntries[0];
 			String transitLine = lineEntries[1];
 			double departureTime = Double.parseDouble(lineEntries[3]);
 			Id originId = new IdImpl(origin);
 			Id destinationId = new IdImpl(destination);
-			Id routeId = new IdImpl(origin+destination);	//origin IATA code + destination IATA code
+			Id routeId = new IdImpl(transitRoute);	//origin IATA code + destination IATA code
 			Id transitLineId = new IdImpl(transitLine);		//origin IATA code + destination IATA code + airline IATA code
 			Id flightNumber = new IdImpl(lineEntries[2]);	//flight number
 			Id vehTypeId = new IdImpl(lineEntries[5]+"_"+lineEntries[6]);	//IATA aircraft code + seats avail
@@ -123,7 +124,7 @@ public class SfTransitBuilder {
 			}			
 			
 			if (!transRouteMap.containsKey(transitLineId)) {
-				TransitRoute transRoute = sf.createTransitRoute(new IdImpl(origin+destination), netRouteMap.get(transitLineId), stopListMap.get(routeId), "pt");
+				TransitRoute transRoute = sf.createTransitRoute(new IdImpl(transitRoute), netRouteMap.get(transitLineId), stopListMap.get(routeId), "pt");
 				transRouteMap.put(transitLineId, transRoute);
 			}
 						

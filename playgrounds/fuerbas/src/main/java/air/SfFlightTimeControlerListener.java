@@ -54,11 +54,10 @@ public class SfFlightTimeControlerListener implements StartupListener, Iteration
 				
 			for (Entry<Id, Double> entry : this.flightTimeHandler.returnArrival().entrySet()) {
 						StringBuilder line = new StringBuilder();
-						line.append(entry.getKey());
+						String[] keyEntries = entry.getKey().toString().split("_");	//extracting flight number from personId
+						line.append(keyEntries[1]);	//flight number
 						line.append(SEPARATOR);
-						line.append(entry.getKey());
-						line.append(SEPARATOR);
-						line.append(entry.getValue());
+						line.append(entry.getValue());	//arrival time
 						writer.append(line.toString());
 						writer.newLine();
 					}						
