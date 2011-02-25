@@ -146,9 +146,9 @@ public class MinimizeV_CWeightedTimeListener implements IterationStartsListener 
 		if (event.getIteration() > ctl.getFirstIteration()) {
 			ctl
 					.setTravelCostCalculatorFactory(new MinimizeV_CWeightedTimeTravelCostCalculatorFactoryImpl(
-							ctl.getVolumes(), ctl.getConfig().simulation()
-									.getFlowCapFactor(), ctl.getNetwork()
-									.getCapacityPeriod()));
+							ctl.getVolumes(), ctl.getConfig()
+									.getQSimConfigGroup().getFlowCapFactor(),
+							ctl.getNetwork().getCapacityPeriod()));
 		}
 	}
 
