@@ -23,6 +23,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -43,7 +45,10 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
+import org.matsim.core.api.experimental.events.AgentArrivalEvent;
+import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.PersonEvent;
 import org.matsim.core.config.Config;
@@ -64,6 +69,7 @@ import org.xml.sax.SAXException;
 
 import playground.droeder.DaFileReader;
 import playground.droeder.DaPaths;
+
 
 // TODO refactor cap of Network/Vehicles and vehicleEnterTimes
 
@@ -88,13 +94,15 @@ public class Journal2Matsim2Journal {
 	
 	private double startTime = Double.MAX_VALUE;
 	
-	private boolean hasHeader;
-	
+	private boolean inFileHasHeader;
+	private String[] inFileHeader;
 	private Set<String[]> inFileContent;
+	
+	
 	private Map<String, Set<String[]>> person2waysOld;
 	private Map<Id, Set<PersonEvent>> person2Event;
-	private Map<String, Set<Set<PersonEvent>>> car2TripEvents;
-	private Map<String, Set<Set<PersonEvent>>> pt2TripEvents;
+	private Map<String, Set<List<PersonEvent>>> carId2TripEvents;
+	private Map<String, Set<List<PersonEvent>>> ptId2TripEvents;
 	
 	private final String ACT_0 = "home";
 	private final String ACT_1 = "work";
@@ -109,7 +117,7 @@ public class Journal2Matsim2Journal {
 	public Journal2Matsim2Journal(String journalFile, String splitByExpr, boolean hasHeader){
 		this.inFile = journalFile;
 		this.splitByExpr = splitByExpr;
-		this.hasHeader = hasHeader;
+		this.inFileHasHeader = hasHeader;
 	}
 	
 	public void run(String networkFile, String vehicles, String schedule, String outputDirectory){
@@ -130,13 +138,15 @@ public class Journal2Matsim2Journal {
 		
 		this.readEventsFile();
 		this.sortTripEventsByMode();
+		this.analyzeEvents();
 		
 //		this.writeNewJournal();
 	}
 
 
 	private void readJournal() {
-		this.inFileContent = DaFileReader.readFileContent(this.inFile, this.splitByExpr, this.hasHeader);
+		this.inFileHeader = DaFileReader.readFileHeader(this.inFile, this.splitByExpr);
+		this.inFileContent = DaFileReader.readFileContent(this.inFile, this.splitByExpr, this.inFileHasHeader);
 	}
 	
 	private void sortWaysByPerson() {
@@ -151,7 +161,7 @@ public class Journal2Matsim2Journal {
 				this.person2waysOld.put(id, new LinkedHashSet<String[]>());
 				this.person2waysOld.get(id).add(way);
 			}else{
-				log.error("wayId " + way[1] + "not processed, because no coordinates are given!"); 
+				log.error("wayId " + way[1] + "not processed, because no coordinates are given for origin and/or destination!"); 
 			}
 		}
 	}
@@ -351,43 +361,43 @@ public class Journal2Matsim2Journal {
 	}
 	
 	private void sortTripEventsByMode(){
-		Map<Id, Set<Set<PersonEvent>>> person2trips = new HashMap<Id, Set<Set<PersonEvent>>>();
+		this.carId2TripEvents = new HashMap<String, Set<List<PersonEvent>>>();
+		this.ptId2TripEvents = new HashMap<String, Set<List<PersonEvent>>>();
 		
 		for(Entry<Id, Set<PersonEvent>> entry : this.person2Event.entrySet()){
 			boolean start = true;
-			person2trips.put(entry.getKey(), new LinkedHashSet<Set<PersonEvent>>());
-			Set<PersonEvent> temp = null;
+			String[] id = entry.getKey().toString().split("_");
+			
+			if(id[1].equals("pt")){
+				this.ptId2TripEvents.put(id[0], new LinkedHashSet<List<PersonEvent>>());
+			}else{
+				this.carId2TripEvents.put(id[0], new LinkedHashSet<List<PersonEvent>>());
+			}
+			
+			List<PersonEvent> temp = null;
 			for(PersonEvent e : entry.getValue()){
 				if(start){
-					temp = new LinkedHashSet<PersonEvent>();
+					temp = new LinkedList<PersonEvent>();
 					start = false;
 				}
 				temp.add(e);
 				
 				if(e instanceof ActivityStartEvent && !((ActivityStartEvent)e).getActType().equals("pt interaction")){
 					start = true;
-					person2trips.get(entry.getKey()).add(temp);
+					if(id[1].equals("pt")){
+						this.ptId2TripEvents.get(id[0]).add(temp);
+					}else{
+						this.carId2TripEvents.get(id[0]).add(temp);
+					}
 				}
 			}
 		}
 		
-		this.car2TripEvents = new HashMap<String, Set<Set<PersonEvent>>>();
-		this.pt2TripEvents = new HashMap<String, Set<Set<PersonEvent>>>();
 		
-		for(Entry<Id, Set<Set<PersonEvent>>> e : person2trips.entrySet()){
-			String[] id = e.getKey().toString().split("_");
-			
-			if(id[1].equals("pt")){
-				this.pt2TripEvents.put(id[0], e.getValue());
-			}else{
-				this.car2TripEvents.put(id[0], e.getValue());
-			}
-		}
-		
-//		for(Entry<String, Set<Set<PersonEvent>>> e : this.car2TripEvents.entrySet()){
+//		for(Entry<String, Set<List<PersonEvent>>> e : this.carId2TripEvents.entrySet()){
 //			System.out.println(e.getKey());
-//			for(Set<PersonEvent> set : e.getValue()){
-//				for(PersonEvent ev: set){
+//			for(List<PersonEvent> list : e.getValue()){
+//				for(PersonEvent ev: list){
 //					System.out.println(ev);
 //				}
 //				System.out.println();
@@ -396,10 +406,10 @@ public class Journal2Matsim2Journal {
 //			System.out.println();
 //		}
 //		
-//		for(Entry<String, Set<Set<PersonEvent>>> e : this.pt2TripEvents.entrySet()){
+//		for(Entry<String, Set<List<PersonEvent>>> e : this.ptId2TripEvents.entrySet()){
 //			System.out.println(e.getKey());
-//			for(Set<PersonEvent> set : e.getValue()){
-//				for(PersonEvent ev: set){
+//			for(List<PersonEvent> list : e.getValue()){
+//				for(PersonEvent ev: list){
 //					System.out.println(ev);
 //				}
 //				System.out.println();
@@ -410,14 +420,72 @@ public class Journal2Matsim2Journal {
 	}
 	
 	private void analyzeEvents(){
+		double travelTime, transitTime, waitingTime;
 		
+		for(Entry<String, Set<List<PersonEvent>>> e :this.carId2TripEvents.entrySet()){
+			
+			
+			
+			// get TravelTime for car
+			for(List<PersonEvent> list : e.getValue()){
+				travelTime = 0;
+				travelTime = ((LinkedList<PersonEvent>) list).getLast().getTime() - ((LinkedList<PersonEvent>) list).getFirst().getTime();
+				System.out.print(travelTime + "\t");
+			}
+			
+			
+			// get times for pt
+			for(List<PersonEvent> list : this.ptId2TripEvents.get(e.getKey())){
+				travelTime = 0;
+				transitTime = 0;
+				waitingTime = 0;
+
+				travelTime = ((LinkedList<PersonEvent>) list).getLast().getTime() - ((LinkedList<PersonEvent>) list).getFirst().getTime();
+				
+				for(PersonEvent pe : list){
+					if(pe instanceof ActivityStartEvent){
+						if(((ActivityStartEvent) pe).getActType().equals("pt interaction")){
+							waitingTime = waitingTime - pe.getTime();
+						}
+					}else if (pe instanceof ActivityEndEvent){
+						if(((ActivityEndEvent) pe).getActType().equals("pt interaction")){
+							waitingTime = waitingTime + pe.getTime();
+						}
+					}else if (pe instanceof AgentDepartureEvent){
+						if(((AgentDepartureEvent)pe).getLegMode().equals(TransportMode.transit_walk)){
+							transitTime = transitTime - pe.getTime();
+						}
+					}else if (pe instanceof AgentArrivalEvent){
+						if(((AgentArrivalEvent)pe).getLegMode().equals(TransportMode.transit_walk)){
+							transitTime = transitTime + pe.getTime();
+						}
+					}
+				}
+				System.out.print(travelTime + "\t");
+				System.out.print(waitingTime + "\t");
+				System.out.print(transitTime + "\t");
+			}
+			System.out.println();
+		}
 	}
 	
 	private void writeNewJournal() {
 		// TODO Auto-generated method stub
 		
 	}
-	
-	
+}
 
+class Trip{
+	
+	public Trip(String[] oldTrip){
+
+	}
+	
+	public void setPtTime(double travelTime, double transitTime, double waitingTime){
+		
+	}
+	
+	public void setCarTime(double travelTime){
+		
+	}
 }
