@@ -21,16 +21,14 @@ package playground.johannes.socialnetworks.graph.social.analysis;
 
 import gnu.trove.TDoubleObjectHashMap;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.apache.log4j.Logger;
 import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.analysis.ModuleAnalyzerTask;
-import org.matsim.contrib.sna.math.Distribution;
+import org.matsim.contrib.sna.math.LinearDiscretizer;
 import org.matsim.contrib.sna.util.TXTWriter;
 
 import playground.johannes.socialnetworks.graph.social.SocialEdge;
@@ -42,54 +40,45 @@ import playground.johannes.socialnetworks.graph.social.SocialVertex;
  */
 public class AgeTask extends ModuleAnalyzerTask<Age> {
 
-	private static final Logger logger = Logger.getLogger(AgeTask.class);
-	
-	public static final String AGE_MEAN = "age_mean";
-	
-	public static final String AGE_MIN = "age_min";
-	
-	public static final String AGE_MAX = "age_max";
-	
-	public static final String AGE_CORRELATION = "r_age";
-	
 	public AgeTask() {
+		setKey("age");
 		setModule(new Age());
 	}
 	
 	public AgeTask(Age module) {
+		setKey("age");
 		setModule(module);
 	}
 	
-	@SuppressWarnings("unchecked")
+	
 	@Override
 	public void analyze(Graph graph, Map<String, Double> stats) {
-		Age age = module;
-		Distribution distr = age.distribution((Set<? extends SocialVertex>) graph.getVertices());
+	}
 
-		double age_min = distr.min();
-		double age_max = distr.max();
-		double age_mean = distr.mean();
-		double r_age = age.correlationCoefficient((Set<? extends SocialEdge>) graph.getEdges());
+	@SuppressWarnings("unchecked")
+	@Override
+	public void analyzeStats(Graph graph, Map<String, DescriptiveStatistics> statsMap) {
+		DescriptiveStatistics stats = module.statistics(graph.getVertices());
+		statsMap.put(key, stats);
+		printStats(stats, key);
 		
-		logger.info(String.format("Mean age = %1$.4f, min age = %2$s, max age = %3$s, r_age = %4$s.", age_mean, age_min, age_max, r_age));
-		stats.put(AGE_MIN, age_min);
-		stats.put(AGE_MAX, age_max);
-		stats.put(AGE_MEAN, age_mean);
-		stats.put(AGE_CORRELATION, r_age);
-		
-		if(getOutputDirectory() != null) {
+		if(outputDirectoryNotNull()) {
 			try {
-				writeHistograms(distr, 1, false, "age.txt");
-				TXTWriter.writeMap(age.correlation((Set<? extends SocialVertex>) graph.getVertices()), "age", "age_mean", getOutputDirectory() + "/age_age.mean.txt");
-				
+				writeHistograms(stats, new LinearDiscretizer(1.0), key, false);
+			
+				TXTWriter.writeMap(module.correlation((Set<? extends SocialVertex>) graph.getVertices()), "age", "age_mean", getOutputDirectory() + "/age_age.mean.txt");
+			
 				TDoubleObjectHashMap<DescriptiveStatistics> stat = module.boxplot((Set<? extends SocialVertex>) graph.getVertices());
 				TXTWriter.writeBoxplotStats(stat, getOutputDirectory() + "age_age.table.txt");
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
+		
+		stats = new DescriptiveStatistics();
+		stats.addValue(module.correlationCoefficient((Set<? extends SocialEdge>) graph.getEdges()));
+		statsMap.put("r_" + key, stats);
+		printStats(stats, "r_" + key);
 	}
 
 }

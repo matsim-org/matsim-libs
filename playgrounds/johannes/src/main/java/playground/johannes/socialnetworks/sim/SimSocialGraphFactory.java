@@ -22,6 +22,7 @@ package playground.johannes.socialnetworks.sim;
 import org.matsim.contrib.sna.graph.GraphFactory;
 
 import playground.johannes.socialnetworks.graph.social.SocialPerson;
+import visad.data.netcdf.UnsupportedOperationException;
 
 /**
  * @author illenberger
@@ -47,6 +48,21 @@ public class SimSocialGraphFactory implements GraphFactory<SimSocialGraph, SimSo
 	
 	public SimSocialVertex createVertex(SocialPerson person) {
 		return new SimSocialVertex(person);
+	}
+
+	@Override
+	public SimSocialGraph copyGraph(SimSocialGraph graph) {
+		throw new UnsupportedOperationException("Seems like someone is using this method...");
+	}
+
+	@Override
+	public SimSocialVertex copyVertex(SimSocialVertex vertex) {
+		throw new UnsupportedOperationException("Seems like someone is using this method...");
+	}
+
+	@Override
+	public SimSocialEdge copyEdge(SimSocialEdge edge) {
+		throw new UnsupportedOperationException("Seems like someone is using this method...");
 	}
 
 }

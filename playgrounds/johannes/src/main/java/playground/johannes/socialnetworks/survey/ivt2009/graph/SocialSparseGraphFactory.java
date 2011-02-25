@@ -25,6 +25,7 @@ import org.matsim.contrib.sna.graph.GraphFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.johannes.socialnetworks.graph.social.SocialPerson;
+import visad.data.netcdf.UnsupportedOperationException;
 
 import com.vividsolutions.jts.geom.Point;
 
@@ -64,6 +65,21 @@ public class SocialSparseGraphFactory implements GraphFactory<SocialSparseGraph,
 		if(point != null)
 			point.setSRID(SRID);
 		return new SocialSparseVertex(person, point);
+	}
+
+	@Override
+	public SocialSparseGraph copyGraph(SocialSparseGraph graph) {
+		throw new UnsupportedOperationException("Seems like someone is using this method...");
+	}
+
+	@Override
+	public SocialSparseVertex copyVertex(SocialSparseVertex vertex) {
+		throw new UnsupportedOperationException("Seems like someone is using this method...");
+	}
+
+	@Override
+	public SocialSparseEdge copyEdge(SocialSparseEdge edge) {
+		throw new UnsupportedOperationException("Seems like someone is using this method...");
 	}
 
 }

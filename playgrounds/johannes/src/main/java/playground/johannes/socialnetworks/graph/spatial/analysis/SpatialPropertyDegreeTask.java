@@ -24,6 +24,7 @@ import gnu.trove.TDoubleObjectHashMap;
 import gnu.trove.TObjectDoubleHashMap;
 
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -58,6 +59,7 @@ public class SpatialPropertyDegreeTask extends ModuleAnalyzerTask<Degree> {
 	public SpatialPropertyDegreeTask(SpatialCostFunction costFunction, Set<Point> points) {
 		this.costFunction = costFunction;
 		this.opportunities = points;
+		setModule(Degree.getInstance());
 	}
 	
 	public void setDiscretizer(Discretizer discretizer) {
@@ -69,6 +71,13 @@ public class SpatialPropertyDegreeTask extends ModuleAnalyzerTask<Degree> {
 		if(outputDirectoryNotNull()) {
 			try {
 				SpatialGraph graph = (SpatialGraph) g;
+				
+				if(opportunities == null) {
+					opportunities = new HashSet<Point>();
+					for(SpatialVertex vertex : graph.getVertices())
+						opportunities.add(vertex.getPoint());
+				}
+				
 				/*
 				 * distance-degree correlation
 				 */
@@ -90,11 +99,11 @@ public class SpatialPropertyDegreeTask extends ModuleAnalyzerTask<Degree> {
 				/*
 				 * accessibility-degree correlation
 				 */
-				yVals = Accessibility.getInstance().values(graph.getVertices(), costFunction, opportunities);
-				correl = VertexPropertyCorrelation.mean(yVals, kVals, discretizer);
-				TXTWriter.writeMap(correl, "k", "A", getOutputDirectory() + "A_k.mean.txt");
-				stat = VertexPropertyCorrelation.statistics(yVals, kVals, discretizer);
-				TXTWriter.writeStatistics(stat, "k", getOutputDirectory() + "A_k.stats.txt");
+//				yVals = Accessibility.getInstance().values(graph.getVertices(), costFunction, opportunities);
+//				correl = VertexPropertyCorrelation.mean(yVals, kVals, discretizer);
+//				TXTWriter.writeMap(correl, "k", "A", getOutputDirectory() + "A_k.mean.txt");
+//				stat = VertexPropertyCorrelation.statistics(yVals, kVals, discretizer);
+//				TXTWriter.writeStatistics(stat, "k", getOutputDirectory() + "A_k.stats.txt");
 				
 			} catch (IOException e) {
 				e.printStackTrace();

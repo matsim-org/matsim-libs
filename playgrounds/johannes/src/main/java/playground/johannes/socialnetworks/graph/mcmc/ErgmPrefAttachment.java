@@ -36,7 +36,7 @@ public class ErgmPrefAttachment implements EnsembleProbability {
 		
 		int k_plus = k_minus + 1;
 		
-		return Math.exp(-k_minus + k_plus);
+		return Math.exp(-0.1* Math.log(k_plus));
 	}
 
 }

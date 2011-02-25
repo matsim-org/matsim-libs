@@ -26,6 +26,7 @@ import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
 import org.matsim.contrib.sna.math.Discretizer;
 import org.matsim.contrib.sna.math.LinearDiscretizer;
+import org.matsim.contrib.sna.util.ProgressLogger;
 
 import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
 import playground.johannes.socialnetworks.gis.DistanceCalculator;
@@ -53,7 +54,7 @@ public class EdgePowerLawDistance implements EdgeProbabilityFunction {
 	public EdgePowerLawDistance(AdjacencyMatrix<? extends SpatialVertex> y, double gamma, double mExpect) {
 		this.y = y;
 		this.gamma = gamma;
-		discretizer = new LinearDiscretizer(500.0);
+		discretizer = new LinearDiscretizer(1.0);
 		distanceCalculator = new CartesianDistanceCalculator();
 //		
 //		konst = 1;
@@ -68,6 +69,7 @@ public class EdgePowerLawDistance implements EdgeProbabilityFunction {
 //		konst = 1;
 		
 		logger.info("Calculating norm constants...");
+		ProgressLogger.init(y.getVertexCount(), 1, 5);
 		for(int i = 0; i < y.getVertexCount(); i++) {
 			double sum = 0;
 			for(int j = 0; j < y.getVertexCount(); j++) {
@@ -81,7 +83,8 @@ public class EdgePowerLawDistance implements EdgeProbabilityFunction {
 			else if(Double.isNaN(sum))
 				logger.warn("NaN");
 			
-			konsts.put(i, 1/sum);
+			konsts.put(i, 5000/sum);
+			ProgressLogger.step();
 		}
 	}
 	
@@ -89,7 +92,7 @@ public class EdgePowerLawDistance implements EdgeProbabilityFunction {
 	public double probability(int i, int j) {
 		double d = distanceCalculator.distance(y.getVertex(i).getPoint(), y.getVertex(j).getPoint());
 		d = discretizer.index(d);
-//		d = Math.max(1.0, d);
+		d = Math.max(1.0, d);
 		
 		return konsts.get(i) * Math.pow(d, gamma);
 	}

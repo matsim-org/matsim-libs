@@ -49,29 +49,34 @@ public class GibbsEdgeInsert extends AbstractGibbsSampler {
 
 	public <V extends Vertex> boolean step(AdjacencyMatrix<V> m, EnsembleProbability ensembleProba) {
 		boolean accept = false;
+		random.nextInt(m.getVertexCount());
 		int i = random.nextInt(m.getVertexCount());
+		random.nextInt(m.getVertexCount());
 		int j = random.nextInt(m.getVertexCount());
 		
 		if(i != j) {
 			boolean y_ij = m.getEdge(i, j);
 			double p = 1 / (1 + ensembleProba.ratio(m, i, j, y_ij));
 			
+			random.nextDouble();
 			if(random.nextDouble() <= p) {
 				/*
 				 * Switch or leave the edge on.
 				 */
 				if(!y_ij) {
 					m.addEdge(i, j);
-					accept = true;
+					
 				}
+				accept = true;
 			} else {
 				/*
 				 * Switch or leave the edge off.
 				 */
 				if(y_ij) {
 					m.removeEdge(i, j);
-					accept = true;
+					
 				}
+				accept = false;
 			}
 		}
 		

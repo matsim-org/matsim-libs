@@ -26,6 +26,7 @@ import playground.johannes.socialnetworks.graph.spatial.analysis.AcceptanceProba
 import playground.johannes.socialnetworks.graph.spatial.analysis.DistanceTask;
 import playground.johannes.socialnetworks.snowball2.spatial.analysis.ObservedDistance;
 
+import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
 
 /**
@@ -34,7 +35,7 @@ import com.vividsolutions.jts.geom.Point;
  */
 public class ObsSpatialAnalyzerTask extends AnalyzerTaskComposite {
 	
-	public ObsSpatialAnalyzerTask(Set<Point> points) {
+	public ObsSpatialAnalyzerTask(Set<Point> points, Geometry boundary) {
 		DistanceTask distanceTask = new DistanceTask();
 		distanceTask.setModule(ObservedDistance.getInstance());
 		addTask(distanceTask);
@@ -42,6 +43,31 @@ public class ObsSpatialAnalyzerTask extends AnalyzerTaskComposite {
 		AcceptanceProbabilityTask acceptTask = new AcceptanceProbabilityTask(points);
 		acceptTask.setModule(ObservedAcceptanceProbability.getInstance());
 		addTask(acceptTask);
+		
+//		AcceptancePropaCategoryTask t = new AcceptancePropaCategoryTask();
+//		t.setBoundary(boundary);
+//		t.setDestinations(points);
+//		addTask(t);
+//		
+//		PropConstAccessibilityTask t = new PropConstAccessibilityTask();
+//		t.setTargets(points);
+//		addTask(t);
+		
+//		DegreeNormConstantTask kcTask = new DegreeNormConstantTask();
+//		ObservedNormConstant norm = new ObservedNormConstant();
+//		norm.setDestinations(points);
+//		kcTask.setModule(norm);
+//		addTask(kcTask);
+		
+//		GravityCostFunction func = new GravityCostFunction(1.6, 0, new CartesianDistanceCalculator());
+//////		
+//		SpatialPropertyDegreeTask xkTask = new SpatialPropertyDegreeTask(func, points);
+//		xkTask.setModule(new ObservedDegree());
+//		xkTask.setDiscretizer(new LinearDiscretizer(5.0));
+//		addTask(xkTask);
+//		NormConstAcceptPropConstTask t = new NormConstAcceptPropConstTask();
+//		t.setDestinations(points);
+//		addTask(t);
 		
 //		addTask(new AcceptFactorTask(choiceSet));
 //		DegreeDensityTask kRhoTask = new DegreeDensityTask(zones);

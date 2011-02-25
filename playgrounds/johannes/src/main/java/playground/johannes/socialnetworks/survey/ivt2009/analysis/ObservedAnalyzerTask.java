@@ -24,8 +24,10 @@ import java.util.Set;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.sna.gis.ZoneLayer;
 
+import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskArray;
 import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
 
+import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
 
 /**
@@ -34,11 +36,11 @@ import com.vividsolutions.jts.geom.Point;
  */
 public class ObservedAnalyzerTask extends AnalyzerTaskComposite {
 	
-	public ObservedAnalyzerTask(ZoneLayer zones, Set<Point> choiceSet, Network network) {
+	public ObservedAnalyzerTask(ZoneLayer zones, Set<Point> choiceSet, Network network, Geometry boundary) {
 		AnalyzerTaskArray array = new AnalyzerTaskArray();
 		array.addAnalyzerTask(new ObsTopologyAnalyzerTask(), "topo");
 		array.addAnalyzerTask(new SnowballAnalyzerTask(), "snowball");
-		array.addAnalyzerTask(new ObsSpatialAnalyzerTask(choiceSet), "spatial");
+		array.addAnalyzerTask(new ObsSpatialAnalyzerTask(choiceSet, boundary), "spatial");
 		array.addAnalyzerTask(new ObservedSocialAnalyzerTask(), "social");
 		addTask(array);
 		

@@ -36,7 +36,10 @@ import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
 public class SpatialAnalyzerTask extends AnalyzerTaskComposite {
 
 	public SpatialAnalyzerTask() {
-		addTask(new DistanceTask());
+		addTask(new EdgeLengthTask());
+		addTask(new EdgeLengthSumTask());
+		addTask(new EdgeLengthMeanTask());
+		addTask(new EdgeLengthMedianTask());
 	}
 
 	/**

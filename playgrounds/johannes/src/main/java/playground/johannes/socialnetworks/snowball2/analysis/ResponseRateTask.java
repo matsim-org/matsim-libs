@@ -43,7 +43,7 @@ public class ResponseRateTask extends AnalyzerTask {
 		
 		if(getOutputDirectory() != null) {
 			try {
-				BufferedWriter writer = new BufferedWriter(new FileWriter(getOutputDirectory() + "responseRates.txt"));
+				BufferedWriter writer = new BufferedWriter(new FileWriter(getOutputDirectory() + "/responseRates.txt"));
 				writer.write("iteration\tresponseRate");
 				writer.newLine();
 				double[] rate = SnowballStatistics.getInstance().responseRateTotal(graph.getVertices());

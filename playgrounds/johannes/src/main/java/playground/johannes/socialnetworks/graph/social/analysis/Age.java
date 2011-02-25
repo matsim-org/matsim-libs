@@ -29,8 +29,7 @@ import java.util.Set;
 import org.apache.commons.math.stat.correlation.PearsonsCorrelation;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.sna.graph.Vertex;
-import org.matsim.contrib.sna.graph.analysis.VertexProperty;
-import org.matsim.contrib.sna.math.Distribution;
+import org.matsim.contrib.sna.graph.analysis.AbstractVertexProperty;
 import org.matsim.contrib.sna.math.LinearDiscretizer;
 
 import playground.johannes.socialnetworks.graph.social.SocialEdge;
@@ -41,7 +40,7 @@ import playground.johannes.socialnetworks.statistics.Correlations;
  * @author illenberger
  *
  */
-public class Age implements VertexProperty {
+public class Age extends AbstractVertexProperty {
 
 	private static Age instance;
 	
@@ -51,16 +50,16 @@ public class Age implements VertexProperty {
 		return instance;
 	}
 	
-	public Distribution distribution(Set<? extends SocialVertex> vertices) {
-		Distribution distr = new Distribution();
-		for(SocialVertex vertex : vertices) {
-			int age = vertex.getPerson().getAge();
-			if(age > -1)
-				distr.add(age);
-		}
-		
-		return distr;
-	}
+//	public DescriptiveStatistics statistics(Set<? extends Vertex> vertices) {
+//		DescriptiveStatistics distr = new DescriptiveStatistics();
+//		for(Vertex vertex : vertices) {
+//			int age = ((SocialVertex) vertex).getPerson().getAge();
+//			if(age > -1)
+//				distr.addValue(age);
+//		}
+//		
+//		return distr;
+//	}
 	
 	public TObjectDoubleHashMap<Vertex> values(Set<? extends Vertex> vertices) {
 		TObjectDoubleHashMap<Vertex> values = new TObjectDoubleHashMap<Vertex>();
@@ -100,13 +99,19 @@ public class Age implements VertexProperty {
 		for(SocialEdge edge : edges) {
 			double a1 = edge.getVertices().getFirst().getPerson().getAge();
 			double a2 = edge.getVertices().getSecond().getPerson().getAge();
-			if(a1 > 0 && a2 > 0) {
+			if(a1 > -1 && a2 > -1) {
 				values1.add(a1);
 				values2.add(a2);
+				
+				values1.add(a2);
+				values2.add(a1);
 			}
 		}
 
-		return new PearsonsCorrelation().correlation(values1.toNativeArray(), values2.toNativeArray());
+		if(values1.isEmpty())
+			return Double.NaN;
+		else
+			return new PearsonsCorrelation().correlation(values1.toNativeArray(), values2.toNativeArray());
 	}
 	
 	public TDoubleObjectHashMap<DescriptiveStatistics> boxplot(Set<? extends SocialVertex> vertices) {

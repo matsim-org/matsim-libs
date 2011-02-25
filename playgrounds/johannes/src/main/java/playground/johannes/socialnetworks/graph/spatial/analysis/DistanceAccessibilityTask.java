@@ -68,7 +68,7 @@ public class DistanceAccessibilityTask extends ModuleAnalyzerTask<Distance> {
 			 * mean distance
 			 */
 			TObjectDoubleHashMap<SpatialVertex> distMap = module.vertexMean((Set<? extends SpatialVertex>) graph.getVertices());
-			TObjectDoubleHashMap<SpatialVertex> accessMap = new Accessibility().values((Set<? extends SpatialVertex>) graph.getVertices(), costFunction, opportunities);
+			TObjectDoubleHashMap<SpatialVertex> accessMap = new LogAccessibility().values((Set<? extends SpatialVertex>) graph.getVertices(), costFunction, opportunities);
 			
 			double[] accessValues = new double[distMap.size()];
 			double[] dValues = new double[distMap.size()];

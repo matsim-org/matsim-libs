@@ -19,6 +19,13 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.social.analysis;
 
+import gnu.trove.TDoubleArrayList;
+
+import java.util.Set;
+
+import org.apache.commons.math.stat.correlation.PearsonsCorrelation;
+
+import playground.johannes.socialnetworks.graph.social.SocialEdge;
 import playground.johannes.socialnetworks.graph.social.SocialVertex;
 
 /**
@@ -48,5 +55,33 @@ public class Gender extends AbstractLinguisticAttribute {
 			return FEMALE;
 		else
 			return null;
+	}
+	
+	public double correlation(Set<? extends SocialEdge> edges) {
+		TDoubleArrayList values1 = new TDoubleArrayList(2 * edges.size());
+		TDoubleArrayList values2 = new TDoubleArrayList(2 * edges.size());
+		
+		for(SocialEdge edge : edges) {
+			String g1 = edge.getVertices().getFirst().getPerson().getPerson().getSex();
+			String g2 = edge.getVertices().getSecond().getPerson().getPerson().getSex();
+			
+			if(g1 != null && g2 != null) {
+				int val1 = 0;
+				if(g1.equalsIgnoreCase(FEMALE))
+					val1 = 1;
+				
+				int val2 = 0;
+				if(g2.equalsIgnoreCase(FEMALE))
+					val2 = 1;
+				
+				values1.add(val1);
+				values2.add(val2);
+				
+				values1.add(val2);
+				values2.add(val1);
+			}
+		}
+		
+		return new PearsonsCorrelation().correlation(values1.toNativeArray(), values2.toNativeArray());
 	}
 }

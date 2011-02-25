@@ -24,7 +24,7 @@ import gnu.trove.TObjectDoubleHashMap;
 import java.io.IOException;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.analysis.ModuleAnalyzerTask;
 import org.matsim.contrib.sna.util.TXTWriter;
@@ -37,8 +37,6 @@ import playground.johannes.socialnetworks.graph.social.SocialVertex;
  *
  */
 public class GenderTask extends ModuleAnalyzerTask<Gender> {
-
-	private static final Logger logger = Logger.getLogger(GenderTask.class);
 	
 	public GenderTask() {
 		setModule(Gender.getInstance());
@@ -50,14 +48,32 @@ public class GenderTask extends ModuleAnalyzerTask<Gender> {
 	
 	@Override
 	public void analyze(Graph g, Map<String, Double> stats) {
+	}
+
+	@Override
+	public void analyzeStats(Graph g, Map<String, DescriptiveStatistics> statsMap) {
 		SocialGraph graph = (SocialGraph) g;
 		
 		Map<SocialVertex, String> values = module.values(graph.getVertices());
 		TObjectDoubleHashMap<String> hist = LinguisticHistogram.create(values.values());
-		double male = hist.get(Gender.MALE);
-		double female = hist.get(Gender.FEMALE);
-	
-		logger.info(String.format("male = %1$s, female = %2$s.", male, female));
+		
+		DescriptiveStatistics male = new DescriptiveStatistics();
+		male.addValue(hist.get(Gender.MALE));
+		String key = "n_male";
+		statsMap.put(key, male);
+		printStats(male, key);
+		
+		DescriptiveStatistics female = new DescriptiveStatistics();
+		female.addValue(hist.get(Gender.FEMALE));
+		key = "n_female";
+		statsMap.put(key, female);
+		printStats(female, key);
+		
+		DescriptiveStatistics r = new DescriptiveStatistics();
+		r.addValue(module.correlation(graph.getEdges()));
+		key = "r_gender";
+		statsMap.put(key, r);
+		printStats(r, key);
 		
 		if(outputDirectoryNotNull()) {
 			try {

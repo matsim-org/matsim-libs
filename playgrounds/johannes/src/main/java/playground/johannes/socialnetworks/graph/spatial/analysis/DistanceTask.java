@@ -30,7 +30,9 @@ import org.apache.log4j.Logger;
 import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.analysis.ModuleAnalyzerTask;
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
+import org.matsim.contrib.sna.math.Discretizer;
 import org.matsim.contrib.sna.math.Distribution;
+import org.matsim.contrib.sna.math.LinearDiscretizer;
 
 
 /**
@@ -72,20 +74,22 @@ public class DistanceTask extends ModuleAnalyzerTask<Distance> {
 	@SuppressWarnings("unchecked")
 	@Override
 	public void analyze(Graph graph, Map<String, Double> stats) {
-			Distribution distr = module.distribution((Set<? extends SpatialVertex>) graph.getVertices());
-			double d_mean = distr.mean();
-			double d_max = distr.max();
-			double d_min = distr.min();
+			DescriptiveStatistics distr2 = module.statistics((Set<? extends SpatialVertex>) graph.getVertices());
+			double d_mean = distr2.getMean();
+			double d_max = distr2.getMax();
+			double d_min = distr2.getMin();
 			stats.put(MEAN_EDGE_LENGTH, d_mean);
 			stats.put(MAX_EDGE_LENGTH, d_max);
 			stats.put(MIN_EDGE_LENGTH, d_min);
-			stats.put(MEDIAN_EDGE_LENGTH, StatUtils.percentile(distr.getValues(), 50));
+			stats.put(MEDIAN_EDGE_LENGTH, StatUtils.percentile(distr2.getValues(), 50));
 
 			logger.info(String.format("d_mean = %1$.4f, d_max = %2$.4f, d_min = %3$.4f", d_mean, d_max, d_min));
 			
+			Discretizer discretizer = new LinearDiscretizer(1000.0);
 			if(getOutputDirectory() != null) {
 				try {
-					writeHistograms(distr, 1000.0, true, "d");
+					writeHistograms(distr2, discretizer, "d", false);
+					writeHistograms(distr2, "d", 500, 100);
 				} catch (FileNotFoundException e) {
 					e.printStackTrace();
 				} catch (IOException e) {
@@ -93,7 +97,7 @@ public class DistanceTask extends ModuleAnalyzerTask<Distance> {
 				}
 			}
 			
-			distr = module.vertexMeanDistribution((Set<? extends SpatialVertex>) graph.getVertices());
+			Distribution distr = module.vertexMeanDistribution((Set<? extends SpatialVertex>) graph.getVertices());
 			double d_i_mean = distr.mean();
 			double d_i_max = distr.max();
 			double d_i_min = distr.min();

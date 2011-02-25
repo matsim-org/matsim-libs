@@ -26,9 +26,13 @@ import org.matsim.contrib.sna.graph.analysis.GraphAnalyzer;
 import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
 import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphMLReader;
 
+import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
+import playground.johannes.socialnetworks.gis.GravityCostFunction;
 import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
+import playground.johannes.socialnetworks.graph.spatial.analysis.DegreeAccessibilityTask;
 import playground.johannes.socialnetworks.graph.spatial.analysis.ExtendedSpatialAnalyzerTask;
 import playground.johannes.socialnetworks.graph.spatial.analysis.SpatialAnalyzerTask;
+import playground.johannes.socialnetworks.graph.spatial.analysis.SpatialPropertyDegreeTask;
 
 /**
  * @author illenberger
@@ -49,8 +53,14 @@ public class SpatialAnalyzer {
 		}
 		
 		AnalyzerTaskComposite task = new AnalyzerTaskComposite();
-		task.addTask(new SpatialAnalyzerTask());
+//		task.addTask(new SpatialAnalyzerTask());
 		task.addTask(new ExtendedSpatialAnalyzerTask());
+		
+		SpatialPropertyDegreeTask xkTask = new SpatialPropertyDegreeTask(new GravityCostFunction(1.6, 0, new CartesianDistanceCalculator()), null);
+		task.addTask(xkTask);
+		
+//		task.addTask(new DegreeNormConstantTask());
+		
 		if(output != null)
 			task.setOutputDirectoy(output);
 		

@@ -23,7 +23,6 @@ import gnu.trove.TDoubleArrayList;
 import gnu.trove.TObjectDoubleHashMap;
 
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.math.stat.StatUtils;
@@ -45,6 +44,14 @@ public class Distance {
 		if(instance == null)
 			instance = new Distance();
 		return instance;
+	}
+	
+	public DescriptiveStatistics statistics(Set<? extends SpatialVertex> vertices) {
+		DescriptiveStatistics stats = new DescriptiveStatistics();
+		for(double val : distribution(vertices).getValues()) {
+			stats.addValue(val);
+		}
+		return stats;
 	}
 	
 	public Distribution distribution(Set<? extends SpatialVertex> vertices) {

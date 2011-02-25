@@ -57,6 +57,7 @@ import playground.johannes.socialnetworks.sim.interaction.PseudoSim;
 import playground.johannes.socialnetworks.sim.locationChoice.ActivityChoice;
 import playground.johannes.socialnetworks.sim.locationChoice.ActivityRandomizer;
 import playground.johannes.socialnetworks.sim.locationChoice.ChoiceSet;
+import playground.johannes.socialnetworks.sim.locationChoice.NegatedGibbsPlanSelector;
 
 /**
  * @author illenberger
@@ -117,7 +118,7 @@ public class Simulator {
 		
 		
 		strategyManager = new StrategyManager();
-//		strategyManager.setPlanSelectorForRemoval(new NegatedGibbsPlanSelector(1.0, random));
+		strategyManager.setPlanSelectorForRemoval(new NegatedGibbsPlanSelector(1.0, random));
 		strategyManager.setMaxPlansPerAgent(1);
 		PlanStrategy keepSelected = new PlanStrategyImpl(new KeepSelected());
 		
@@ -139,9 +140,9 @@ public class Simulator {
 //		strategyManager.addStrategy(keepSelected, 1.0);
 		strategyManager.addStrategy(changeLocation, 1.0);
 		
-		logger.info("Randomizing leisure activities...");
-		ActivityRandomizer randomizer = new ActivityRandomizer(network, random, population.getFactory(), router);
-		randomizer.randomize(population);
+//		logger.info("Randomizing leisure activities...");
+//		ActivityRandomizer randomizer = new ActivityRandomizer(network, random, population.getFactory(), router);
+//		randomizer.randomize(population);
 		
 	}
 	
@@ -149,10 +150,13 @@ public class Simulator {
 		PopulationWriter writer = new PopulationWriter(population, network);
 		writer.write(String.format("%1$s/%2$s.plans.xml", output, "initial"));
 		
-		for(int i = 0; i < iterations; i++) {
-			logger.info(String.format("Simulating iteration %1$s...", i));
-			step();
-			if(i % 1 == 0) {
+		scorer.reset(0);
+		pseudoSim.run(population, network, travelTime, eventManager);
+		scorer.finish();
+		
+		for(int i = 1; i < iterations; i++) {
+			logger.info("Analyzing...");
+			if(i > 0 && i % 1 == 0) {
 				writer.write(String.format("%1$s/%2$s.plans.xml", output, i));
 				String outDir = String.format("%1$s/analysis/%2$s/", output, i);
 				new File(outDir).mkdirs();
@@ -161,7 +165,7 @@ public class Simulator {
 				PlanAnalyzerTaskComposite composite = new PlanAnalyzerTaskComposite();
 				composite.addComponent(task);
 				composite.addComponent(locTask);
-				Map<String, Double> map = PlansAnalyzer.analyzeSelectedPlans(population, composite);
+				Map<String, Double> map = PlansAnalyzer.analyzeUnselectedPlans(population, composite);
 				try {
 					PlansAnalyzer.write(map, outDir + "summary.txt");
 				} catch (IOException e) {
@@ -169,6 +173,9 @@ public class Simulator {
 					e.printStackTrace();
 				}
 			}
+			logger.info(String.format("Simulating iteration %1$s...", i));
+			step();
+			
 		}
 	}
 	

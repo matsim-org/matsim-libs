@@ -108,7 +108,7 @@ public class WaveSizeTask extends AnalyzerTask {
 			try {
 				write(sampled, getOutputDirectory() + "/sampled.txt");
 				write(detected, getOutputDirectory() + "/detected.txt");
-				write(sampledEdges, getOutputDirectory() + "sampled_edges.txt");
+				write(sampledEdges, getOutputDirectory() + "/sampled_edges.txt");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

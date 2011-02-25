@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.spatial.analysis;
 
+import gnu.trove.TDoubleArrayList;
 import gnu.trove.TDoubleDoubleHashMap;
 
 import java.util.Set;
@@ -28,6 +29,8 @@ import org.matsim.contrib.sna.graph.spatial.SpatialEdge;
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
 import org.matsim.contrib.sna.math.DescriptivePiStatistics;
 import org.matsim.contrib.sna.math.Discretizer;
+import org.matsim.contrib.sna.math.FixedSampleSizeDiscretizer;
+import org.matsim.contrib.sna.math.Histogram;
 import org.matsim.contrib.sna.math.LinearDiscretizer;
 import org.matsim.contrib.sna.util.ProgressLogger;
 
@@ -44,7 +47,7 @@ public class AcceptanceProbability {
 
 	private static final Logger logger = Logger.getLogger(AcceptanceProbability.class);
 	
-	private Discretizer discretizer = new LinearDiscretizer(1000);
+//	private Discretizer discretizer = new LinearDiscretizer(1000);
 
 	private DistanceCalculator distanceCalculator = new OrthodromicDistanceCalculator();
 
@@ -66,21 +69,26 @@ public class AcceptanceProbability {
 		ProgressLogger.init(vertices.size(), 1, 5);
 		for (SpatialVertex vertex : vertices) {
 			Point p1 = vertex.getPoint();
-
-			TDoubleDoubleHashMap n_d = new TDoubleDoubleHashMap();
+			if(p1 != null) {
+//			TDoubleDoubleHashMap n_d = new TDoubleDoubleHashMap();
+			TDoubleArrayList ds = new TDoubleArrayList(choiceSet.size());
 			for (Point p2 : choiceSet) {
-				if (p1 != null && p2 != null) {
-					double d = distanceCalculator.distance(p1, p2);
-					n_d.adjustOrPutValue(discretizer.discretize(d), 1, 1);
+				if (p2 != null) {
+//					double d = distanceCalculator.distance(p1, p2);
+//					n_d.adjustOrPutValue(discretizer.discretize(d), 1, 1);
+					ds.add(distanceCalculator.distance(p1, p2));
 				}
 			}
+			double[] dArray = ds.toNativeArray();
+			Discretizer discretizer = FixedSampleSizeDiscretizer.create(dArray, 100, 500);
+			TDoubleDoubleHashMap n_d = Histogram.createHistogram(dArray, discretizer, true);
 
 			for (int i = 0; i < vertex.getEdges().size(); i++) {
 				SpatialEdge e = vertex.getEdges().get(i);
 //				if (touched.add(e)) {
 					SpatialVertex neighbor = e.getOpposite(vertex);
 
-					if (p1 != null && neighbor.getPoint() != null) {
+					if (neighbor.getPoint() != null) {
 						double d = distanceCalculator.distance(p1, neighbor.getPoint());
 						if(d > 0) {
 //							if(!n_d.containsKey(d)) {
@@ -97,7 +105,7 @@ public class AcceptanceProbability {
 								distribution.addValue(d, n);
 						}
 					}
-//				}
+				}
 			}
 			
 			ProgressLogger.step();

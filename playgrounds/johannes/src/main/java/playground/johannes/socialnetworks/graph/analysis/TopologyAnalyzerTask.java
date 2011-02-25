@@ -42,7 +42,7 @@ public class TopologyAnalyzerTask extends AnalyzerTaskComposite {
 		addTask(new GraphSizeTask());
 		addTask(new DegreeTask());
 		addTask(new TransitivityTask());
-		addTask(new ComponentsTask());
+//		addTask(new ComponentsTask());
 	}
 
 	public static void main(String args[]) throws IOException {

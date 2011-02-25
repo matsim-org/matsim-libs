@@ -81,8 +81,8 @@ public class AcceptanceProbabilityTask extends ModuleAnalyzerTask<AcceptanceProb
 			
 			DescriptiveStatistics distr = module.distribution((Set<? extends SpatialVertex>) graph.getVertices(), choiceSet);
 			try {
-				writeHistograms(distr, new LinearDiscretizer(1000.0), "p_accept");				
-				writeHistograms(distr, "p_accept", 500, 100);
+				writeHistograms(distr, new LinearDiscretizer(1000.0), "p_accept", false);				
+				writeHistograms(distr, "p_accept", 500, 200);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

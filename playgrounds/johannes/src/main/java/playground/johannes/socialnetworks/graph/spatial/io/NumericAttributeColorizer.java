@@ -53,6 +53,7 @@ public class NumericAttributeColorizer implements Colorizable {
 			max = Math.max(max, it.value());
 			min = Math.min(min, it.value());
 		}
+		max=3;
 	}
 	
 	public void setLogscale(boolean logscale) {
@@ -65,9 +66,7 @@ public class NumericAttributeColorizer implements Colorizable {
 	
 	protected double getValue(Object object) {
 		double r = values.get(object);
-//		if(r == 0)
-//			throw new IllegalArgumentException();
-		
+
 		return r;
 	}
 	

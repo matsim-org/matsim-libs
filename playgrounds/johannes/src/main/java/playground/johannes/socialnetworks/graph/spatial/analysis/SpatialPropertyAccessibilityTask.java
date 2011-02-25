@@ -48,7 +48,7 @@ import com.vividsolutions.jts.geom.Point;
  * @author illenberger
  * 
  */
-public class SpatialPropertyAccessibilityTask extends ModuleAnalyzerTask<Accessibility> {
+public class SpatialPropertyAccessibilityTask extends ModuleAnalyzerTask<LogAccessibility> {
 
 	private Discretizer discretizer = new DummyDiscretizer();
 

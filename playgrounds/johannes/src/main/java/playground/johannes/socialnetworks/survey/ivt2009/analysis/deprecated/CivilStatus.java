@@ -20,7 +20,6 @@
 package playground.johannes.socialnetworks.survey.ivt2009.analysis.deprecated;
 
 import playground.johannes.socialnetworks.graph.social.SocialVertex;
-import playground.johannes.socialnetworks.survey.ivt2009.analysis.SocioMatrixLegacy;
 
 /**
  * @author illenberger

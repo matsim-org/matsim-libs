@@ -43,7 +43,6 @@ import org.matsim.contrib.sna.snowball.analysis.ObservedTransitivity;
 import org.matsim.contrib.sna.snowball.analysis.PiEstimator;
 import org.matsim.contrib.sna.snowball.analysis.SimplePiEstimator;
 import org.matsim.contrib.sna.snowball.sim.IntervalSampleAnalyzer;
-import org.matsim.contrib.sna.snowball.sim.IterationSampleAnalyzer;
 import org.matsim.contrib.sna.snowball.sim.Sampler;
 import org.matsim.contrib.sna.snowball.sim.SamplerListenerComposite;
 import org.matsim.core.config.Config;
@@ -111,8 +110,8 @@ public class Loader {
 		 */
 //		final int interval = Integer.parseInt(config.getParam(MODULENAME, "interval"));
 		IntervalSampleAnalyzer intervalAnalyzer = new IntervalSampleAnalyzer(analyzers, estimators, output);
-		IterationSampleAnalyzer iterationAnalyzer = new IterationSampleAnalyzer(analyzers, estimators, output);
-//		FinalSampleAnalyzer completeAnalyzer = new FinalSampleAnalyzer(analyzers, estimatorSet, output);
+//		IterationSampleAnalyzer iterationAnalyzer = new IterationSampleAnalyzer(analyzers, estimators, output);
+//		FinalSampleAnalyzer completeAnalyzer = new FinalSampleAnalyzer(analyzers, estimators, output);
 //		ConnectionSampleAnalyzer connectionAnalyzer = new ConnectionSampleAnalyzer(numSeeds, analyzers, output);
 		/*
 		 * Init sampler listener.
@@ -130,13 +129,15 @@ public class Loader {
 		 * Add analyzers to listener.
 		 */
 		listeners.addComponent(intervalAnalyzer);
-		listeners.addComponent(iterationAnalyzer);
+//		listeners.addComponent(iterationAnalyzer);
 //		listeners.addComponent(completeAnalyzer);
 //		listeners.addComponent(connectionAnalyzer);
+//		listeners.addComponent(new DegreeGrowth(output));
+//		listeners.addComponent(new DegreeShare(output));
 		/*
 		 * Init and run sampler.
 		 */
-		Sampler<Graph, Vertex, Edge> sampler = new Sampler<Graph, Vertex, Edge>();
+		Sampler<Graph, Vertex, Edge> sampler = new Sampler<Graph, Vertex, Edge>(randomSeed);
 		sampler.setSeedGenerator(seedGenerator);
 		sampler.setResponseGenerator(reponseGenerator);
 		sampler.setListener(listeners);
@@ -176,7 +177,7 @@ public class Loader {
 		
 		tasks.addTask(new ResponseRateTask());
 		
-//		analyzers.put("obs", tasks);
+		analyzers.put("obs", tasks);
 		/*
 		 * observed 2
 		 */

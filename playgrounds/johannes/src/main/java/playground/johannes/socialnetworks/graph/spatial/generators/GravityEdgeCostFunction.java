@@ -31,14 +31,6 @@ import playground.johannes.socialnetworks.gis.OrthodromicDistanceCalculator;
  */
 public class GravityEdgeCostFunction implements EdgeCostFunction {
 
-//	private final double gamma;
-//	
-//	private final double constant;
-//	
-//	private Discretizer discretizer;
-//	
-//	private DistanceCalculator calculator;
-	
 	private GravityCostFunction delegate;
 	
 	public GravityEdgeCostFunction(double gamma, double constant) {
@@ -47,17 +39,10 @@ public class GravityEdgeCostFunction implements EdgeCostFunction {
 	
 	public GravityEdgeCostFunction(double gamma, double constant, DistanceCalculator calculator) {
 		delegate = new GravityCostFunction(gamma, constant, calculator);
-//		this.gamma = gamma;
-//		this.constant = constant;
-//		discretizer = new LinearDiscretizer(1000.0);
-//		this.calculator = calculator;
 	}
 	
 	@Override
 	public double edgeCost(SpatialVertex vi, SpatialVertex vj) {
-//		double d = Math.max(1.0, discretizer.discretize(calculator.distance(vi.getPoint(), vj.getPoint())));
-//		
-//		return gamma * Math.log(d) + constant;
 		return delegate.costs(vi.getPoint(), vj.getPoint());
 	}
 

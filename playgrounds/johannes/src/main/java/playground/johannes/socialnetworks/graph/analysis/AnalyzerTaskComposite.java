@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.analysis.AnalyzerTask;
 
@@ -53,6 +54,12 @@ public class AnalyzerTaskComposite extends AnalyzerTask {
 	public void analyze(Graph graph, Map<String, Double> stats) {
 		for(AnalyzerTask task : tasks)
 			task.analyze(graph, stats);
+	}
+
+	@Override
+	public void analyzeStats(Graph graph, Map<String, DescriptiveStatistics> statsMap) {
+		for(AnalyzerTask task : tasks)
+			task.analyzeStats(graph, statsMap);
 	}
 
 }

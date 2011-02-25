@@ -29,8 +29,10 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.contrib.sna.gis.CRSUtils;
 import org.matsim.contrib.sna.gis.ZoneLayer;
 import org.matsim.contrib.sna.graph.Graph;
+import org.matsim.contrib.sna.graph.GraphBuilder;
 import org.matsim.contrib.sna.graph.analysis.AnalyzerTask;
 import org.matsim.contrib.sna.graph.analysis.GraphAnalyzer;
+import org.matsim.contrib.sna.graph.spatial.SpatialEdge;
 import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
 import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraph;
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
@@ -43,8 +45,10 @@ import org.matsim.core.network.MatsimNetworkReader;
 
 import playground.johannes.socialnetworks.gis.io.FeatureSHP;
 import playground.johannes.socialnetworks.gis.io.ZoneLayerSHP;
+import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskArray;
+import playground.johannes.socialnetworks.graph.analysis.FilteredAnalyzerTask;
 import playground.johannes.socialnetworks.graph.analysis.GraphFilter;
-import playground.johannes.socialnetworks.graph.spatial.analysis.GraphClippingFilter;
+import playground.johannes.socialnetworks.graph.spatial.analysis.SpatialFilter;
 import playground.johannes.socialnetworks.graph.spatial.io.Population2SpatialGraph;
 import playground.johannes.socialnetworks.snowball2.social.SocialSampledGraphProjection;
 import playground.johannes.socialnetworks.snowball2.social.SocialSampledGraphProjectionBuilder;
@@ -108,12 +112,12 @@ public class SnowballAnalyzer {
 		}
 		
 		graph.getDelegate().transformToCRS(CRSUtils.getCRS(21781));
-		GraphFilter<SpatialGraph> filter = new GraphClippingFilter(new SocialSparseGraphBuilder(graph.getDelegate().getCoordinateReferenceSysten()), chBorder);
-		filter.apply(graph.getDelegate());
-		SampledGraphProjectionBuilder<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge> builder = new SampledGraphProjectionBuilder<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge>();
-		builder.synchronize(graph);
+//		GraphFilter<SpatialGraph> filter = new GraphClippingFilter(new SocialSparseGraphBuilder(graph.getDelegate().getCoordinateReferenceSysten()), chBorder);
+//		filter.apply(graph.getDelegate());
+//		SampledGraphProjectionBuilder<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge> builder = new SampledGraphProjectionBuilder<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge>();
+//		builder.synchronize(graph);
 		
-		obsTask = new ObservedAnalyzerTask(zones, choiceSet, scenario.getNetwork());
+		obsTask = new ObservedAnalyzerTask(zones, choiceSet, scenario.getNetwork(), chBorder);
 		estimTask = new EstimatedAnalyzerTask(graph);
 		
 		analyze(graph, output);
@@ -135,8 +139,7 @@ public class SnowballAnalyzer {
 		
 		FilteredAnalyzerTask task = new FilteredAnalyzerTask(obsEstim);
 		task.addFilter(new DefaultFilter(), "full");
-//		task.addFilter(new FrequencyFilter(builder, 0), "freqOnly0");
-		
+//		task.addFilter(new SpatialFilter((GraphBuilder<? extends SpatialGraph, ? extends SpatialVertex, ? extends SpatialEdge>) builder, chBorder), "ch");
 		
 		
 		return task;
@@ -155,11 +158,9 @@ public class SnowballAnalyzer {
 			
 			AnalyzerTask itTask = createIterationTask();
 			FilteredAnalyzerTask task = new FilteredAnalyzerTask(itTask);
-			for(int i = 0; i <= it; i++) {
-//				SampledGraphFilter filter = new SampledGraphFilter(builder, i);
-				SampledGraphProjFilter<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge> filter =
-					new SampledGraphProjFilter<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge>(i);
-				filter.setBuilder(builder);
+			task.addFilter(new DefaultFilter(), "plain");
+			for(int i = 3; i <= it; i++) {
+				SampledGraphFilter filter = new SampledGraphFilter(builder, i);
 				task.addFilter(filter, String.format("it.%1$s", i));
 			}
 			task.setOutputDirectoy(output);

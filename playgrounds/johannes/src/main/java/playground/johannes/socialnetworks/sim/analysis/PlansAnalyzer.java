@@ -40,8 +40,13 @@ public class PlansAnalyzer {
 
 	public static Map<String, Double> analyze(Set<Plan> plans, PlansAnalyzerTask task) {
 		Map<String, Double> stats = new HashMap<String, Double>();
-		task.analyze(plans, stats);
+		if(plans.isEmpty()) {
+			System.err.println("No plans to analyze.");
+		} else {
+			task.analyze(plans, stats);
+		}
 		return stats;
+		
 	}
 	
 	public static Map<String, Double> analyzeSelectedPlans(Population population, PlansAnalyzerTask task) {
@@ -51,6 +56,19 @@ public class PlansAnalyzer {
 			Plan plan = person.getSelectedPlan();
 			if(plan != null)
 				plans.add(plan);
+		}
+		
+		return analyze(plans, task);
+	}
+	
+	public static Map<String, Double> analyzeUnselectedPlans(Population population, PlansAnalyzerTask task) {
+		Set<Plan> plans = new HashSet<Plan>();
+		
+		for(Person person : population.getPersons().values()) {
+			for(Plan plan : person.getPlans()) {
+				if(!plan.isSelected())
+					plans.add(plan);
+			}
 		}
 		
 		return analyze(plans, task);

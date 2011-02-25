@@ -33,7 +33,7 @@ import java.util.Set;
 import org.geotools.feature.Feature;
 import org.matsim.contrib.sna.gis.CRSUtils;
 import org.matsim.contrib.sna.graph.Vertex;
-import org.matsim.contrib.sna.graph.analysis.VertexProperty;
+import org.matsim.contrib.sna.graph.analysis.AbstractVertexProperty;
 import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
 import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraph;
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
@@ -51,7 +51,7 @@ import playground.johannes.socialnetworks.graph.analysis.GraphFilter;
 import playground.johannes.socialnetworks.graph.spatial.io.KMLVertexPropertyWriter;
 import playground.johannes.socialnetworks.graph.spatial.io.Population2SpatialGraph;
 import playground.johannes.socialnetworks.snowball2.social.SocialSampledGraphProjection;
-import playground.johannes.socialnetworks.survey.ivt2009.analysis.ObservedAccessibility;
+import playground.johannes.socialnetworks.survey.ivt2009.analysis.ObservedLogAccessibility;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseEdge;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseGraph;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseGraphBuilder;
@@ -65,7 +65,7 @@ import com.vividsolutions.jts.geom.Point;
  * @author illenberger
  *
  */
-public class AcceptanceProbaConst implements VertexProperty {
+public class AcceptanceProbaConst extends AbstractVertexProperty {
 
 	private DistanceCalculator distanceCalculator = new CartesianDistanceCalculator();
 	
@@ -78,7 +78,7 @@ public class AcceptanceProbaConst implements VertexProperty {
 	 */
 	@Override
 	public TObjectDoubleHashMap<Vertex> values(Set<? extends Vertex> vertices) {
-		ObservedAccessibility access = new ObservedAccessibility();
+		ObservedLogAccessibility access = new ObservedLogAccessibility();
 		GravityCostFunction function = new GravityCostFunction(1.6, 0.0, distanceCalculator);
 		TObjectDoubleHashMap<SpatialVertex> values = access.values((Set<? extends SpatialVertex>) vertices, function, points);
 		
@@ -143,7 +143,7 @@ public class AcceptanceProbaConst implements VertexProperty {
 		Feature feature = FeatureSHP.readFeatures("/Users/jillenberger/Work/socialnets/data/schweiz/complete/zones/G1L08.shp").iterator().next();
 		Geometry geometry = feature.getDefaultGeometry();
 		geometry.setSRID(21781);
-		GraphFilter<SpatialGraph> filter = new GraphClippingFilter(new SocialSparseGraphBuilder(g.getDelegate().getCoordinateReferenceSysten()), geometry);
+		GraphFilter<SpatialGraph> filter = new SpatialFilter(new SocialSparseGraphBuilder(g.getDelegate().getCoordinateReferenceSysten()), geometry);
 		filter.apply(g.getDelegate());
 		SampledGraphProjectionBuilder<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge> builder = new SampledGraphProjectionBuilder<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge>();
 		builder.synchronize(g);
