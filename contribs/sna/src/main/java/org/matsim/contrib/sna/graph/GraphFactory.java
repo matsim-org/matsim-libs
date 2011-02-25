@@ -49,4 +49,11 @@ public interface GraphFactory<G extends Graph, V extends Vertex, E extends Edge>
 	 * @return an orphaned edge.
 	 */
 	public E createEdge();
+	
+	public G copyGraph(G graph);
+	
+	public V copyVertex(V vertex);
+	
+	public E copyEdge(E edge);
+	
 }

@@ -77,7 +77,7 @@ public class FinalSampleAnalyzer extends SampleAnalyzer {
 	@Override
 	public void endSampling(Sampler<?, ?, ?> sampler) {
 		File file = makeDirectories(String.format("%1$s/%2$s", getRootDirectory(), DIR_NAME));
-		analyze(sampler.getSampledGraph(), file.getAbsolutePath());
+		analyze(sampler.getSampledGraph(), file.getAbsolutePath());		
 	}
 
 }

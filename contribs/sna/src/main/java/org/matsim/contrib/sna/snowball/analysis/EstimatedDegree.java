@@ -117,42 +117,71 @@ public class EstimatedDegree extends Degree {
 		SampledGraph graph = (SampledGraph) g;
 		int iteration = SnowballStatistics.getInstance().lastIteration(graph.getVertices());
 		
-		double M = 0;
-
-		double t_ij = 0;
-		double t_ii = 0;
-		double t_jj = 0;
-		double t_i = 0;
-		double t_j = 0;
-
-		for (SampledEdge edge : graph.getEdges()) {
-			SampledVertex v_i = edge.getVertices().getFirst();
-			SampledVertex v_j = edge.getVertices().getSecond();
-
+		double product = 0;
+		double sum = 0;
+		double squareSum = 0;
+		double M_hat = 0;
+		for (SampledEdge e : graph.getEdges()) {
+			SampledVertex v_i = e.getVertices().getFirst();
+			SampledVertex v_j = e.getVertices().getSecond();
 			if (v_i.isSampled() && v_j.isSampled()) {
 				double p_i = piEstimator.probability(v_i, iteration - 1);
 				double p_j = piEstimator.probability(v_j, iteration - 1);
 				if (p_i > 0 && p_j > 0) {
 					double p = (p_i + p_j) - (p_i * p_j);
-					double k_i = v_i.getNeighbours().size();
-					double k_j = v_j.getNeighbours().size();
-
-					M += 1 / p;
-
-					t_ij += k_i * k_j / p;
-					t_ii += k_i * k_i / p;
-					t_jj += k_j * k_j / p;
-					t_i += k_i / p;
-					t_j += k_j / p;
+					
+					int k_i = v_i.getEdges().size();
+					int k_j = v_j.getEdges().size();
+					
+					sum += 0.5 * (k_i + k_j) / p;
+					squareSum += 0.5 * (Math.pow(k_i, 2) + Math.pow(k_j, 2))/p;
+					product += k_i * k_j/p;
+					
+					M_hat += 1/p;
 				}
 			}
+			
 		}
 
-		double S_ij = (1 / (M - 1) * t_ij) - (1 / (M * (M - 1)) * t_i * t_j);
-		double S_ii = (1 / (M - 1) * t_ii) - (1 / (M * (M - 1)) * t_i * t_i);
-		double S_jj = (1 / (M - 1) * t_jj) - (1 / (M * (M - 1)) * t_j * t_j);
-
-		return S_ij / (Math.sqrt(S_ii) * Math.sqrt(S_jj));
+		double norm = 1 / M_hat;
+		return ((norm * product) - Math.pow(norm * sum, 2)) / ((norm * squareSum) - Math.pow(norm * sum, 2));
+		
+//		double M = 0;
+//
+//		double t_ij = 0;
+//		double t_ii = 0;
+//		double t_jj = 0;
+//		double t_i = 0;
+//		double t_j = 0;
+//
+//		for (SampledEdge edge : graph.getEdges()) {
+//			SampledVertex v_i = edge.getVertices().getFirst();
+//			SampledVertex v_j = edge.getVertices().getSecond();
+//
+//			if (v_i.isSampled() && v_j.isSampled()) {
+//				double p_i = piEstimator.probability(v_i, iteration - 1);
+//				double p_j = piEstimator.probability(v_j, iteration - 1);
+//				if (p_i > 0 && p_j > 0) {
+//					double p = (p_i + p_j) - (p_i * p_j);
+//					double k_i = v_i.getNeighbours().size();
+//					double k_j = v_j.getNeighbours().size();
+//
+//					M += 1 / p;
+//
+//					t_ij += k_i * k_j / p;
+//					t_ii += k_i * k_i / p;
+//					t_jj += k_j * k_j / p;
+//					t_i += k_i / p;
+//					t_j += k_j / p;
+//				}
+//			}
+//		}
+//
+//		double S_ij = (1 / (M - 1) * t_ij) - (1 / (M * (M - 1)) * t_i * t_j);
+//		double S_ii = (1 / (M - 1) * t_ii) - (1 / (M * (M - 1)) * t_i * t_i);
+//		double S_jj = (1 / (M - 1) * t_jj) - (1 / (M * (M - 1)) * t_j * t_j);
+//
+//		return S_ij / (Math.sqrt(S_ii) * Math.sqrt(S_jj));
 	}
 
 }

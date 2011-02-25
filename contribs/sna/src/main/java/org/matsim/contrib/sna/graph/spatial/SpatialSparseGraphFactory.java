@@ -24,6 +24,8 @@ import org.matsim.contrib.sna.gis.CRSUtils;
 import org.matsim.contrib.sna.graph.GraphFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
+import visad.data.netcdf.UnsupportedOperationException;
+
 
 import com.vividsolutions.jts.geom.Point;
 
@@ -89,6 +91,21 @@ public class SpatialSparseGraphFactory implements GraphFactory<SpatialSparseGrap
 		if(point != null)
 			point.setSRID(SRID);
 		return new SpatialSparseVertex(point);
+	}
+
+	@Override
+	public SpatialSparseGraph copyGraph(SpatialSparseGraph graph) {
+		throw new UnsupportedOperationException("Seems like someone is using this method...");
+	}
+
+	@Override
+	public SpatialSparseVertex copyVertex(SpatialSparseVertex vertex) {
+		throw new UnsupportedOperationException("Seems like someone is using this method...");
+	}
+
+	@Override
+	public SpatialSparseEdge copyEdge(SpatialSparseEdge edge) {
+		throw new UnsupportedOperationException("Seems like someone is using this method...");
 	}
 
 }

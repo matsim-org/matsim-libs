@@ -19,28 +19,44 @@
  * *********************************************************************** */
 package org.matsim.contrib.sna.math;
 
+import org.apache.commons.math.stat.StatUtils;
 
 /**
  * A discretizer with bin of equal width.
  * 
  * @author illenberger
- *
+ * 
  */
 public class LinearDiscretizer implements Discretizer {
 
 	private final double binwidth;
-	
+
 	/**
 	 * Creates a new discretizer.
 	 * 
-	 * @param binwidth the bin width.
+	 * @param binwidth
+	 *            the bin width.
 	 */
 	public LinearDiscretizer(double binwidth) {
 		this.binwidth = binwidth;
 	}
-	
+
 	/**
-	 * @param value a value.
+	 * Creates a new discretizer with bin width calculated such that
+	 * <tt>values</tt> would be descretized to <tt>bins</tt> categories.
+	 * 
+	 * @param values an array of values.
+	 * @param bins the number of bins.
+	 */
+	public LinearDiscretizer(double[] values, int bins) {
+		double min = StatUtils.min(values);
+		double max = StatUtils.max(values);
+		this.binwidth = Math.abs(max - min) / (double) bins;
+	}
+
+	/**
+	 * @param value
+	 *            a value.
 	 * @return rounds <tt>value</tt> up to the upper bin border.
 	 */
 	@Override
@@ -49,7 +65,8 @@ public class LinearDiscretizer implements Discretizer {
 	}
 
 	/**
-	 * @param value a value.
+	 * @param value
+	 *            a value.
 	 * @return the bin width.
 	 */
 	@Override
@@ -62,7 +79,7 @@ public class LinearDiscretizer implements Discretizer {
 	 */
 	@Override
 	public double index(double value) {
-		return Math.ceil(value/binwidth);
+		return Math.ceil(value / binwidth);
 	}
 
 }

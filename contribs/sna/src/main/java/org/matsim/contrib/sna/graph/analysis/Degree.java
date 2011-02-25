@@ -35,7 +35,7 @@ import org.matsim.contrib.sna.graph.Vertex;
  * @author illenberger
  * 
  */
-public class Degree implements VertexProperty {
+public class Degree extends AbstractVertexProperty {
 
 	private static Degree instance;
 	
@@ -92,18 +92,18 @@ public class Degree implements VertexProperty {
 		double squareSum = 0;
 
 		for (Edge e : graph.getEdges()) {
-			Vertex v1 = e.getVertices().getFirst();
-			Vertex v2 = e.getVertices().getSecond();
-			int d_v1 = v1.getEdges().size();
-			int d_v2 = v2.getEdges().size();
+			Vertex v_i = e.getVertices().getFirst();
+			Vertex v_j = e.getVertices().getSecond();
+			
+			int k_i = v_i.getEdges().size();
+			int k_j = v_j.getEdges().size();
 
-			sum += 0.5 * (d_v1 + d_v2);
-			squareSum += 0.5 * (Math.pow(d_v1, 2) + Math.pow(d_v2, 2));
-			product += d_v1 * d_v2;
+			sum += 0.5 * (k_i + k_j);
+			squareSum += 0.5 * (Math.pow(k_i, 2) + Math.pow(k_j, 2));
+			product += k_i * k_j;
 		}
 
 		double norm = 1 / (double) graph.getEdges().size();
 		return ((norm * product) - Math.pow(norm * sum, 2)) / ((norm * squareSum) - Math.pow(norm * sum, 2));
 	}
-
 }

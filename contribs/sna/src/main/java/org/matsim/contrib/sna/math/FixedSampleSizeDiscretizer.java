@@ -61,7 +61,7 @@ public class FixedSampleSizeDiscretizer {
 		int binsize = 0;
 		for (int i = 0; i < keys.length; i++) {
 			binsize += hist.get(keys[i]);
-			if (binsize >= size) {
+			if (binsize >= size && i > 0) {
 				borders.add(keys[i]);
 				binsize = 0;
 			}

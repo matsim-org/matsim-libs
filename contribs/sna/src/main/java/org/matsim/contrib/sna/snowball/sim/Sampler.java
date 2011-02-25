@@ -19,8 +19,10 @@
  * *********************************************************************** */
 package org.matsim.contrib.sna.snowball.sim;
 
-import java.util.LinkedHashSet;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -38,6 +40,8 @@ import org.matsim.contrib.sna.snowball.SampledGraphProjection;
 import org.matsim.contrib.sna.snowball.SampledGraphProjectionBuilder;
 import org.matsim.contrib.sna.snowball.SampledVertexDecorator;
 import org.matsim.core.utils.collections.Tuple;
+
+import visad.data.netcdf.UnsupportedOperationException;
 
 
 /**
@@ -65,6 +69,16 @@ public class Sampler<G extends Graph, V extends Vertex, E extends Edge> {
 	private int iteration;
 
 	private int numSampledVertices;
+	
+	private final Random random;
+	
+	public Sampler(long randomSeed) {
+		random = new Random(randomSeed);
+	}
+	
+	public Sampler() {
+		random = new Random();
+	}
 
 	/**
 	 * Sets the vertex filter to determine the seed vertices.
@@ -136,14 +150,15 @@ public class Sampler<G extends Graph, V extends Vertex, E extends Edge> {
 	 * @param graph The graph to sample.
 	 */
 	public void run(G graph) {
-		Set<TaggedVertex> recruits = init(graph);
+		List<TaggedVertex> recruits = init(graph);
 		/*
 		 * loop until no recruits are available
 		 */
 		while (!recruits.isEmpty()) {
 			logger.info(String.format("Sampling iteration %1$s.", iteration));
 
-			Set<TaggedVertex> newRecruits = new LinkedHashSet<TaggedVertex>();
+			List<TaggedVertex> newRecruits = new LinkedList<TaggedVertex>();
+			Collections.shuffle(recruits, random);
 			for (TaggedVertex vertex : recruits) {
 				if (!listener.beforeSampling(this, vertex.getProjection()))
 					return;
@@ -172,7 +187,7 @@ public class Sampler<G extends Graph, V extends Vertex, E extends Edge> {
 	}
 
 	@SuppressWarnings("unchecked")
-	private Set<TaggedVertex> init(G graph) {
+	private List<TaggedVertex> init(G graph) {
 		iteration = 0;
 		numSampledVertices = 0;
 		/*
@@ -205,7 +220,7 @@ public class Sampler<G extends Graph, V extends Vertex, E extends Edge> {
 		 * draw the seed vertices
 		 */
 		Set<V> seeds = (Set<V>) seedGenerator.apply(responsive);
-		Set<TaggedVertex> taggedSeeds = new LinkedHashSet<TaggedVertex>();
+		List<TaggedVertex> taggedSeeds = new LinkedList<TaggedVertex>();
 		for (V vertex : seeds) {
 			TaggedVertex taggedVertex = taggedGraph.getVertex(vertex);
 			SampledVertexDecorator<V> sampledVertex = builder.addVertex(sampledGraph, vertex);
@@ -219,7 +234,7 @@ public class Sampler<G extends Graph, V extends Vertex, E extends Edge> {
 		return taggedSeeds;
 	}
 
-	private void expand(TaggedVertex vertex, Set<TaggedVertex> recruits) {
+	private void expand(TaggedVertex vertex, List<TaggedVertex> recruits) {
 		/*
 		 * sample vertex
 		 */
@@ -368,6 +383,21 @@ public class Sampler<G extends Graph, V extends Vertex, E extends Edge> {
 		@Override
 		public TaggedVertex createVertex(V delegate) {
 			return new TaggedVertex(delegate);
+		}
+
+		@Override
+		public TaggedGraph copyGraph(TaggedGraph graph) {
+			throw new UnsupportedOperationException("Seems like someone is using this method...");
+		}
+
+		@Override
+		public TaggedVertex copyVertex(TaggedVertex vertex) {
+			throw new UnsupportedOperationException("Seems like someone is using this method...");
+		}
+
+		@Override
+		public TaggedEdge copyEdge(TaggedEdge edge) {
+			throw new UnsupportedOperationException("Seems like someone is using this method...");
 		}
 
 	}

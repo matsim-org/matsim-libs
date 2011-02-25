@@ -24,6 +24,8 @@ import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.GraphProjectionFactory;
 import org.matsim.contrib.sna.graph.Vertex;
 
+import visad.data.netcdf.UnsupportedOperationException;
+
 /**
  * A sampled graph projection factory is responsible for instantiating new
  * sampled graph projections, vertex decorators and edge decorators. It does not
@@ -77,6 +79,21 @@ public class SampledGraphProjectionFactory<G extends Graph, V extends Vertex, E 
 	@Override
 	public SampledVertexDecorator<V> createVertex(V delegate) {
 		return new SampledVertexDecorator<V>(delegate);
+	}
+
+	@Override
+	public SampledGraphProjection<G, V, E> copyGraph(SampledGraphProjection<G, V, E> graph) {
+		throw new UnsupportedOperationException("There is currently no need to implement this mehtod.");
+	}
+
+	@Override
+	public SampledVertexDecorator<V> copyVertex(SampledVertexDecorator<V> vertex) {
+		throw new UnsupportedOperationException("There is currently no need to implement this mehtod.");
+	}
+
+	@Override
+	public SampledEdgeDecorator<E> copyEdge(SampledEdgeDecorator<E> edge) {
+		throw new UnsupportedOperationException("There is currently no need to implement this mehtod.");
 	}
 
 }

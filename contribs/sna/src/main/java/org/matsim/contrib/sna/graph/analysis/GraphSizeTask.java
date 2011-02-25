@@ -21,7 +21,7 @@ package org.matsim.contrib.sna.graph.analysis;
 
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.sna.graph.Graph;
 
 /**
@@ -32,7 +32,7 @@ import org.matsim.contrib.sna.graph.Graph;
  */
 public class GraphSizeTask extends AnalyzerTask {
 
-	private static final Logger logger = Logger.getLogger(GraphSizeTask.class);
+//	private static final Logger logger = Logger.getLogger(GraphSizeTask.class);
 
 	public static final String NUM_VERTICES = "n_vertex";
 
@@ -48,11 +48,24 @@ public class GraphSizeTask extends AnalyzerTask {
 	 */
 	@Override
 	public void analyze(Graph graph, Map<String, Double> stats) {
-		int n_vertex = graph.getVertices().size();
-		int n_edge = graph.getEdges().size();
-		stats.put(NUM_VERTICES, new Double(n_vertex));
-		stats.put(NUM_EDGES, new Double(n_edge));
-		logger.info(String.format("%1$s = %2$s, %3$s = %4$s", NUM_VERTICES, n_vertex, NUM_EDGES, n_edge));
+//		int n_vertex = graph.getVertices().size();
+//		int n_edge = graph.getEdges().size();
+//		stats.put(NUM_VERTICES, new Double(n_vertex));
+//		stats.put(NUM_EDGES, new Double(n_edge));
+//		logger.info(String.format("%1$s = %2$s, %3$s = %4$s", NUM_VERTICES, n_vertex, NUM_EDGES, n_edge));
+	}
+
+	@Override
+	public void analyzeStats(Graph graph, Map<String, DescriptiveStatistics> statsMap) {
+		DescriptiveStatistics stats = new DescriptiveStatistics();
+		stats.addValue(graph.getVertices().size());
+		statsMap.put(NUM_VERTICES, stats);
+		printStats(stats, NUM_VERTICES);
+		
+		stats = new DescriptiveStatistics();
+		stats.addValue(graph.getEdges().size());
+		statsMap.put(NUM_EDGES, stats);
+		printStats(stats, NUM_EDGES);
 	}
 
 }

@@ -45,12 +45,13 @@ public class TransitivityTask extends ModuleAnalyzerTask<Transitivity> {
 	public static final String MAX_LOCAL_CLUSTERING = "c_local_max";
 
 	public static final String GLOBAL_CLUSTERING_COEFFICIENT = "c_global";
-
+	
 	/**
 	 * Creates a new TransitivityTask with an instance of {@link Transitivity}
 	 * used for analysis.
 	 */
 	public TransitivityTask() {
+		setKey("c");
 		setModule(Transitivity.getInstance());
 	}
 
@@ -85,7 +86,7 @@ public class TransitivityTask extends ModuleAnalyzerTask<Transitivity> {
 
 		if (getOutputDirectory() != null) {
 			try {
-				writeHistograms(distr, new LinearDiscretizer(0.05), "c_local");
+				writeHistograms(distr, new LinearDiscretizer(0.05), "c_local", false);
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
@@ -94,4 +95,26 @@ public class TransitivityTask extends ModuleAnalyzerTask<Transitivity> {
 		}
 	}
 
+	public void analyzeStats(Graph graph, Map<String, DescriptiveStatistics> statsMap) {
+		String subKey = key + "_local";
+		
+		DescriptiveStatistics stats = module.statistics(graph.getVertices());
+		printStats(stats, subKey);
+		statsMap.put(subKey, stats);
+		
+		if(outputDirectoryNotNull()) {
+			try {
+				writeHistograms(stats, new LinearDiscretizer(0.05), subKey, false);
+				writeHistograms(stats, subKey, 100, 20);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		subKey = key + "_global";
+		stats = new DescriptiveStatistics();
+		stats.addValue(module.globalClusteringCoefficient(graph));
+		printStats(stats, subKey);
+		statsMap.put(subKey, stats);
+	}
 }

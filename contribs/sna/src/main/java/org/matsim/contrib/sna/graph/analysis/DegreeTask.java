@@ -51,6 +51,7 @@ public class DegreeTask extends ModuleAnalyzerTask<Degree> {
 	 * analysis.
 	 */
 	public DegreeTask() {
+		setKey("k");
 		setModule(Degree.getInstance());
 	}
 
@@ -81,16 +82,36 @@ public class DegreeTask extends ModuleAnalyzerTask<Degree> {
 
 		if (outputDirectoryNotNull()) {
 			try {
-				writeHistograms(distr, new LinearDiscretizer(1.0), "k");
-				writeHistograms(distr, new LinearDiscretizer(5.0), "k_5");
-//				writeHistograms(distr, 1.0, false, "k");
-//				writeHistograms(distr, 5.0, false, "k_5");
+				writeHistograms(distr, new LinearDiscretizer(1.0), "k", false);
+				writeHistograms(distr, new LinearDiscretizer(5.0), "k_5", false);
+				writeHistograms(distr, "k", 17, 1);
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
+	}
+
+	@Override
+	public void analyzeStats(Graph graph, Map<String, DescriptiveStatistics> statsMap) {
+		DescriptiveStatistics stats = module.statistics(graph.getVertices());
+		printStats(stats, key);
+		statsMap.put(key, stats);
+		if (outputDirectoryNotNull()) {
+			try {
+				writeHistograms(stats, new LinearDiscretizer(1.0), key, false);
+				writeHistograms(stats, new LinearDiscretizer(5.0), key + "_5", false);
+				writeHistograms(stats, key, 100, 20);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		stats = new DescriptiveStatistics();
+		stats.addValue(module.assortativity(graph));
+		statsMap.put("r_"+key, stats);
+		printStats(stats, "r_"+key);
 	}
 
 }

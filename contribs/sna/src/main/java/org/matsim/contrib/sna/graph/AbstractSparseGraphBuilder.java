@@ -19,6 +19,9 @@
  * *********************************************************************** */
 package org.matsim.contrib.sna.graph;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.matsim.core.utils.collections.Tuple;
 
 /**
@@ -179,4 +182,28 @@ public abstract class AbstractSparseGraphBuilder <G extends SparseGraph, V exten
 		}
 	}
 
+	/*
+	 * UNTESTED!
+	 */
+	@SuppressWarnings("unchecked")
+	public G copyGraph(G graph) {
+		G newGraph = factory.copyGraph(graph);
+		
+		Map<SparseVertex, V> vertexMapping = new HashMap<SparseVertex, V>();
+		
+		for(SparseVertex vertex : graph.getVertices()) {
+			V newVertex = factory.copyVertex((V) vertex);
+			vertexMapping.put(vertex, newVertex);
+			insertVertex(newGraph, newVertex);
+		}
+		
+		for(SparseEdge edge : graph.getEdges()) {
+			V vertex1 = vertexMapping.get(edge.getVertices().getFirst());
+			V vertex2 = vertexMapping.get(edge.getVertices().getSecond());
+			E newEdge = factory.copyEdge((E) edge);
+			insertEdge(newGraph, vertex1, vertex2, newEdge);
+		}
+		
+		return newGraph;
+	}
 }

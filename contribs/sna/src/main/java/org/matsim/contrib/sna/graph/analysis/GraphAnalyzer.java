@@ -26,6 +26,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.sna.graph.Graph;
 
 /**
@@ -52,6 +53,11 @@ public class GraphAnalyzer {
 		return stats;
 	}
 
+	public static Map<String, DescriptiveStatistics> analyzeStats(Graph graph, AnalyzerTask task) {
+		Map<String, DescriptiveStatistics> statsMap = new LinkedHashMap<String, DescriptiveStatistics>();
+		task.analyzeStats(graph, statsMap);
+		return statsMap;
+	}
 	/**
 	 * Applies the analyzer task on a graph and writes the results into
 	 * <tt>output/summary.txt</tt>.
@@ -70,6 +76,9 @@ public class GraphAnalyzer {
 		task.setOutputDirectoy(output);
 		Map<String, Double> stats = analyze(graph, task);
 		writeStats(stats, String.format("%1$s/summary.txt", output));
+		
+		Map<String, DescriptiveStatistics> statsMap = analyzeStats(graph, task);
+		writeStatistics(statsMap, String.format("%1$s/statistics.txt", output));
 	}
 
 	/**
@@ -92,6 +101,31 @@ public class GraphAnalyzer {
 			writer.write(entry.getValue().toString());
 			writer.newLine();
 		}
+		writer.close();
+	}
+	
+	public static void writeStatistics(Map<String, DescriptiveStatistics> statsMap, String filename) throws IOException {
+		BufferedWriter writer = new BufferedWriter(new FileWriter(filename));
+		
+		writer.write("property\tmean\tmin\tmax\tmedian\tN\tvar");
+		writer.newLine();
+		for(Entry<String, DescriptiveStatistics> entry : statsMap.entrySet()) {
+			writer.write(entry.getKey());
+			writer.write("\t");
+			writer.write(String.valueOf(entry.getValue().getMean()));
+			writer.write("\t");
+			writer.write(String.valueOf(entry.getValue().getMin()));
+			writer.write("\t");
+			writer.write(String.valueOf(entry.getValue().getMax()));
+			writer.write("\t");
+			writer.write(String.valueOf(entry.getValue().getPercentile(50)));
+			writer.write("\t");
+			writer.write(String.valueOf(entry.getValue().getN()));
+			writer.write("\t");
+			writer.write(String.valueOf(entry.getValue().getVariance()));
+			writer.newLine();
+		}
+		
 		writer.close();
 	}
 }

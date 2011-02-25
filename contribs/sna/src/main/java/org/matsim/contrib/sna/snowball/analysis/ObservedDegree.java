@@ -19,17 +19,16 @@
  * *********************************************************************** */
 package org.matsim.contrib.sna.snowball.analysis;
 
-import gnu.trove.TDoubleArrayList;
 import gnu.trove.TObjectDoubleHashMap;
 
 import java.util.Set;
 
-import org.apache.commons.math.stat.correlation.PearsonsCorrelation;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.matsim.contrib.sna.graph.Edge;
 import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.graph.analysis.Degree;
+import org.matsim.contrib.sna.snowball.SampledEdge;
+import org.matsim.contrib.sna.snowball.SampledGraph;
 import org.matsim.contrib.sna.snowball.SampledVertex;
 
 /**
@@ -78,8 +77,6 @@ public class ObservedDegree extends Degree {
 	/**
 	 * Calculated the Pearson correlation coefficient of the degrees on either
 	 * end of all sampled edges, i.e., edges where both vertices are sampled.
-	 * Note: This implementation is different form the one in the super class
-	 * (due to the estimation technique).
 	 * 
 	 * @param graph
 	 *            a sampled graph
@@ -87,25 +84,56 @@ public class ObservedDegree extends Degree {
 	 *         of all sampled edges.
 	 */
 	@Override
-	public double assortativity(Graph graph) {
-		TDoubleArrayList values1 = new TDoubleArrayList();
-		TDoubleArrayList values2 = new TDoubleArrayList();
-		for (Edge e : graph.getEdges()) {
-			SampledVertex v1 = (SampledVertex) e.getVertices().getFirst();
-			SampledVertex v2 = (SampledVertex) e.getVertices().getSecond();
-			if (v1.isSampled() && v2.isSampled()) {
-				int d_v1 = v1.getEdges().size();
-				int d_v2 = v2.getEdges().size();
+	public double assortativity(Graph g) {
+		SampledGraph graph = (SampledGraph) g;
 
-				values1.add(d_v1);
-				values2.add(d_v2);
+		double product = 0;
+		double sum = 0;
+		double squareSum = 0;
+		double M = 0;
+		
+		for (SampledEdge e : graph.getEdges()) {
+			SampledVertex v_i = e.getVertices().getFirst();
+			SampledVertex v_j = e.getVertices().getSecond();
+			if (v_i.isSampled() && v_j.isSampled()) {
+				int k_i = v_i.getEdges().size();
+				int k_j = v_j.getEdges().size();
+
+				sum += 0.5 * (k_i + k_j);
+				squareSum += 0.5 * (Math.pow(k_i, 2) + Math.pow(k_j, 2));
+				product += k_i * k_j;
+				
+				M++;
 			}
 		}
 
-		if (values1.size() > 0) {
-			return new PearsonsCorrelation().correlation(values1.toNativeArray(), values2.toNativeArray());
-		} else
-			return 0;
+		double norm = 1 / M;
+		return ((norm * product) - Math.pow(norm * sum, 2)) / ((norm * squareSum) - Math.pow(norm * sum, 2));
+		
+//		TDoubleArrayList values1 = new TDoubleArrayList();
+//		TDoubleArrayList values2 = new TDoubleArrayList();
+//		for (Edge e : graph.getEdges()) {
+//			SampledVertex v1 = (SampledVertex) e.getVertices().getFirst();
+//			SampledVertex v2 = (SampledVertex) e.getVertices().getSecond();
+//			if (v1.isSampled() && v2.isSampled()) {
+//				int d_v1 = v1.getEdges().size();
+//				int d_v2 = v2.getEdges().size();
+//
+//				values1.add(d_v1);
+//				values2.add(d_v2);
+//			}
+//		}
+//
+//		if (values1.size() > 0) {
+//			return new PearsonsCorrelation().correlation(values1.toNativeArray(), values2.toNativeArray());
+//		} else
+//			return 0;
 	}
+
+//	@SuppressWarnings("unchecked")
+//	@Override
+//	public DescriptiveStatistics statistics(Set<? extends Vertex> vertices) {
+//		return super.statistics(SnowballPartitions.createSampledPartition((Set<SampledVertex>) vertices));
+//	}
 
 }

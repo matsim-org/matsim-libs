@@ -60,5 +60,11 @@ public interface GraphProjectionFactory<G2 extends Graph, V2 extends Vertex, E2 
 	 * @return an orphaned edge decorator.
 	 */
 	public E createEdge(E2 delegate);
+
+	public G copyGraph(G graph);
+	
+	public V copyVertex(V vertex);
+	
+	public E copyEdge(E edge);
 	
 }

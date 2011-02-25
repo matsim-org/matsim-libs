@@ -331,6 +331,7 @@ public class SpatialGraphKMLWriter {
 		Set<SpatialEdge> processedEdges = new HashSet<SpatialEdge>();
 
 		for (SpatialVertex v : vertices) {
+			if(v.getPoint() != null) {
 			try {
 				if (drawVertices) {
 					/*
@@ -357,6 +358,7 @@ public class SpatialGraphKMLWriter {
 						if (processedEdges.add(e)) {
 							LineStringType kmlLineString = kmlFactory.createLineStringType();
 							SpatialVertex v2 = e.getOpposite(v);
+							if(v2.getPoint() != null) {
 							double[] points = new double[] { v.getPoint().getCoordinate().x,
 									v.getPoint().getCoordinate().y, v2.getPoint().getCoordinate().x,
 									v2.getPoint().getCoordinate().y };
@@ -371,11 +373,13 @@ public class SpatialGraphKMLWriter {
 								kmlEdgeDetail.addDetail(kmlPlacemark, e);
 
 							kmlFolder.getAbstractFeatureGroup().add(kmlFactory.createPlacemark(kmlPlacemark));
+							}
 						}
 					}
 				}
 			} catch (TransformException e) {
 				e.printStackTrace();
+			}
 			}
 		}
 

@@ -45,6 +45,15 @@ public class GraphProjectionBuilder<G2 extends Graph, V2 extends Vertex, E2 exte
 		this.factory = factory;
 	}
 
+	@Override
+	protected GraphFactory<G, V, E> getFactory() {
+		throw new UnsupportedOperationException("Use getProjectionFactory() instead!");
+	}
+
+	protected GraphProjectionFactory<G2, V2, E2, G, V, E> getProjectionFactory() {
+		return factory;
+	}
+	
 	/**
 	 * @throws {@link UnsupportedOperationException}. Use
 	 *         {@link #addEdge(GraphProjection, VertexDecorator, VertexDecorator, Edge)

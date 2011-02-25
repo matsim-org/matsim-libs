@@ -40,8 +40,8 @@ public class ProgressLogger {
 	
 	public static void init(int max, int minorTick, int majorTick) {
 		maxVal = max;
-		minorTickVal = (int) Math.floor(max/100.0 * minorTick);
-		majorTickVal = (int) Math.floor(max/100.0 * majorTick);
+		minorTickVal = (int) Math.ceil(max/100.0 * minorTick);
+		majorTickVal = (int) Math.ceil(max/100.0 * majorTick);
 		counter = 0;
 		System.out.print("\tProgress: 0%");
 	}
@@ -56,5 +56,9 @@ public class ProgressLogger {
 		if(counter == maxVal) {
 			System.out.println();
 		}
+	}
+	
+	public static void termiante() {
+		System.out.println(NumberFormat.getPercentInstance().format(counter/(double)maxVal));
 	}
 }

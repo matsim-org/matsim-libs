@@ -41,6 +41,8 @@ import org.matsim.contrib.sna.snowball.analysis.PiEstimator;
  */
 public class IntervalSampleAnalyzer extends SampleAnalyzer {
 
+	private int prevN = 0;
+	
 	/**
 	 * @see {@link SampleAnalyzer#SampleAnalyzer(Map, Collection, String)}
 	 */
@@ -62,16 +64,19 @@ public class IntervalSampleAnalyzer extends SampleAnalyzer {
 	@Override
 	public boolean afterSampling(Sampler<?, ?, ?> sampler, SampledVertexDecorator<?> vertex) {
 		int n = sampler.getNumSampledVertices();
-		if (n < 1000) {
-			if (n % 100 == 0)
-				dump(sampler);
-		} else if (n < 10000) {
-			if (n % 1000 == 0)
-				dump(sampler);
-		} else {
-			if (n % 10000 == 0)
-				dump(sampler);
+		if (n > prevN) {
+			if (n < 1000) {
+				if (n % 100 == 0)
+					dump(sampler);
+			} else if (n < 10000) {
+				if (n % 1000 == 0)
+					dump(sampler);
+			} else {
+				if (n % 10000 == 0)
+					dump(sampler);
+			}
 		}
+		prevN = n;
 		return true;
 	}
 

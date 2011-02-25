@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package org.matsim.contrib.sna.graph;
 
+import visad.data.netcdf.UnsupportedOperationException;
+
 
 /**
  * Implementation of GraphFactory to creates instances of SparseGraph,
@@ -55,6 +57,21 @@ public class SparseGraphFactory implements
 	 */
 	public SparseEdge createEdge() {
 		return new SparseEdge();
+	}
+
+	@Override
+	public SparseGraph copyGraph(SparseGraph graph) {
+		throw new UnsupportedOperationException("Seems like someone is using this method...");
+	}
+
+	@Override
+	public SparseVertex copyVertex(SparseVertex vertex) {
+		throw new UnsupportedOperationException("Seems like someone is using this method...");
+	}
+
+	@Override
+	public SparseEdge copyEdge(SparseEdge edge) {
+		throw new UnsupportedOperationException("Seems like someone is using this method...");
 	}
 
 }

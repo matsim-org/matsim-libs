@@ -46,11 +46,11 @@ public class Histogram {
 	 * @return a double-double map where the key denotes the bin and the value
 	 *         the bin height.
 	 */
-	public static TDoubleDoubleHashMap createHistogram(DescriptiveStatistics stats, Discretizer discretizer, boolean normalize) {
+	public static TDoubleDoubleHashMap createHistogram(DescriptiveStatistics stats, Discretizer discretizer, boolean reweight) {
 		if (stats instanceof DescriptivePiStatistics)
-			return createHistogram((DescriptivePiStatistics) stats, discretizer, normalize);
+			return createHistogram((DescriptivePiStatistics) stats, discretizer, reweight);
 		else
-			return createHistogram(stats.getValues(), discretizer, normalize);
+			return createHistogram(stats.getValues(), discretizer, reweight);
 	}
 
 	/**
@@ -65,14 +65,14 @@ public class Histogram {
 	 * @return a double-double map where the key denotes the bin and the value
 	 *         the bin height.
 	 */
-	public static TDoubleDoubleHashMap createHistogram(DescriptivePiStatistics stats, Discretizer discretizer, boolean normalize) {
+	public static TDoubleDoubleHashMap createHistogram(DescriptivePiStatistics stats, Discretizer discretizer, boolean reweight) {
 		double[] piValues = stats.getPiValues();
 		double[] weights = new double[piValues.length];
 		for (int i = 0; i < piValues.length; i++) {
 			weights[i] = 1 / piValues[i];
 		}
 
-		return createHistogram(stats.getValues(), weights, discretizer, normalize);
+		return createHistogram(stats.getValues(), weights, discretizer, reweight);
 	}
 
 	/**
@@ -86,10 +86,10 @@ public class Histogram {
 	 * @return a double-double map where the key denotes the bin and the value
 	 *         the bin height.
 	 */
-	public static TDoubleDoubleHashMap createHistogram(double[] values, Discretizer discretizer, boolean normalize) {
+	public static TDoubleDoubleHashMap createHistogram(double[] values, Discretizer discretizer, boolean reweight) {
 		double[] weights = new double[values.length];
 		Arrays.fill(weights, 1.0);
-		return createHistogram(values, weights, discretizer, normalize);
+		return createHistogram(values, weights, discretizer, reweight);
 	}
 
 	/**
@@ -102,21 +102,20 @@ public class Histogram {
 	 *            the weights
 	 * @param discretizer
 	 *            a discretizer
+	 * @param reweight TODO
 	 * @return a double-double map where the key denotes the bin and the value
 	 *         the bin height.
 	 */
-	public static TDoubleDoubleHashMap createHistogram(double[] values, double[] weights, Discretizer discretizer, boolean normalize) {
+	public static TDoubleDoubleHashMap createHistogram(double[] values, double[] weights, Discretizer discretizer, boolean reweight) {
 		TDoubleDoubleHashMap histogram = new TDoubleDoubleHashMap();
 		for (int i = 0; i < values.length; i++) {
 			double bin = discretizer.discretize(values[i]);
 			double weight = weights[i];
-			if(normalize)
+			if(reweight)
 				weight = weights[i] / discretizer.binWidth(values[i]);
 			
 			histogram.adjustOrPutValue(bin, weight, weight);
 		}
-		if(normalize)
-			normalize(histogram);
 		
 		return histogram;
 	}

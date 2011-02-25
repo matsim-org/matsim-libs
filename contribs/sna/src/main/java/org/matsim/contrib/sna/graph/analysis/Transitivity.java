@@ -38,7 +38,7 @@ import org.matsim.contrib.sna.graph.Vertex;
  * @author illenberger
  * 
  */
-public class Transitivity implements VertexProperty {
+public class Transitivity extends AbstractVertexProperty {
 
 	private static Transitivity instance;
 	

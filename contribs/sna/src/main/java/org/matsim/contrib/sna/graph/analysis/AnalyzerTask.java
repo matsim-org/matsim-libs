@@ -80,7 +80,16 @@ public abstract class AnalyzerTask {
 	 *            a map where the results of the analysis are stored.
 	 */
 	abstract public void analyze(Graph graph, Map<String, Double> stats);
+	
+	public void analyzeStats(Graph graph, Map<String, DescriptiveStatistics> statsMap) {
+		
+	}
 
+	protected void printStats(DescriptiveStatistics stats, String key) {
+		logger.info(String.format("Statistics for property %1$s:\n\tmean = %2$.4f, min = %3$.4f, max = %4$.4f, N = %5$s, Var = %6$.4f", 
+				key, stats.getMean(), stats.getMin(), stats.getMax(), stats.getN(), stats.getVariance()));
+	}
+	
 	/**
 	 * Creates a histogram out of a distribution and writes it into a text file.
 	 * 
@@ -113,20 +122,30 @@ public abstract class AnalyzerTask {
 			Distribution.writeHistogram(distr.normalizedDistribution(distr.absoluteDistributionLog2(binsize)), String
 					.format("%1$s/%2$s.share.log2.txt", output, name));
 			
-			Distribution.writeHistogram(distr.normalizedDistribution(distr.absoluteDistributionFixed(100)), String
-					.format("%1$s/%2$s.share.fixed.txt", output, name));
+			if (distr.getValues().length > 0) {
+				Distribution.writeHistogram(distr.normalizedDistribution(distr.absoluteDistributionFixed(100)),
+						String.format("%1$s/%2$s.share.fixed.txt", output, name));
+			} else {
+				logger.warn("Cannot create historgram. No sampled.");
+			}
+		
 		}
 	}
 	
 	protected void writeHistograms(DescriptiveStatistics stats, String name, int bins, int minsize) throws IOException {
 		double[] values = stats.getValues();
+		if(values.length > 0) {
 		TDoubleDoubleHashMap hist = Histogram.createHistogram(stats, FixedSampleSizeDiscretizer.create(values, minsize, bins), true);
+		Histogram.normalize(hist);
 		TXTWriter.writeMap(hist, name, "p", String.format("%1$s/%2$s.n%3$s.txt", getOutputDirectory(), name, values.length/bins));
+		} else {
+			logger.warn("Cannot create histogram. No samples.");
+		}
 	}
 	
-	protected void writeHistograms(DescriptiveStatistics stats, Discretizer discretizer, String name) throws IOException {
-		TDoubleDoubleHashMap hist = Histogram.createHistogram(stats, discretizer, false); 
-		TXTWriter.writeMap(hist, name, "n", String.format("%1$s/%2$s.txt", output, name));
+	protected void writeHistograms(DescriptiveStatistics stats, Discretizer discretizer, String name, boolean reweight) throws IOException {
+		TDoubleDoubleHashMap hist = Histogram.createHistogram(stats, discretizer, reweight);
+		TXTWriter.writeMap(hist, name, "n", String.format("%1$s/%2$s.txt", output, name)); 
 		Histogram.normalize(hist);
 		TXTWriter.writeMap(hist, name, "p", String.format("%1$s/%2$s.share.txt", output, name));
 	}

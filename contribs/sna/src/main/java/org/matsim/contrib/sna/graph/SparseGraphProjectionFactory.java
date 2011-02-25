@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package org.matsim.contrib.sna.graph;
 
+import visad.data.netcdf.UnsupportedOperationException;
+
 
 /**
  * Implementation of GraphProjectionFactory to create instances of GraphProjection,
@@ -60,6 +62,21 @@ public class SparseGraphProjectionFactory<G extends Graph, V extends Vertex, E e
 	 */
 	public VertexDecorator<V> createVertex(V delegate) {
 		return new VertexDecorator<V>(delegate);
+	}
+
+	@Override
+	public GraphProjection<G, V, E> copyGraph(GraphProjection<G, V, E> graph) {
+		throw new UnsupportedOperationException("Seems like someone is using this method...");
+	}
+
+	@Override
+	public VertexDecorator<V> copyVertex(VertexDecorator<V> vertex) {
+		throw new UnsupportedOperationException("Seems like someone is using this method...");
+	}
+
+	@Override
+	public EdgeDecorator<E> copyEdge(EdgeDecorator<E> edge) {
+		throw new UnsupportedOperationException("Seems like someone is using this method...");
 	}
 
 }

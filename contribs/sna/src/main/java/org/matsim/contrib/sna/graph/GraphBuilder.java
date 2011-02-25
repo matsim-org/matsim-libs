@@ -88,4 +88,7 @@ public interface GraphBuilder <G extends Graph, V extends Vertex, E extends Edge
 	 *         would violate the definition of the underlying graph.
 	 */
 	public boolean removeEdge(G graph, E edge);
+	
+	public G copyGraph(G graph);
+	
 }

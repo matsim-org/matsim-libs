@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ModuleAnalyzerTask.java
+ * AbstractVertexProperty.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -19,32 +19,33 @@
  * *********************************************************************** */
 package org.matsim.contrib.sna.graph.analysis;
 
+import gnu.trove.TObjectDoubleHashMap;
+import gnu.trove.TObjectDoubleIterator;
 
+import java.util.Set;
+
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.matsim.contrib.sna.graph.Vertex;
 
 /**
- * An AnalyzerTask that uses a specific module (such as {@link Degree} or
- * {@link Transitivity} for analysis.
- * 
- * @author illenberger
- * 
+ * @author jillenberger
+ *
  */
-public abstract class ModuleAnalyzerTask<T> extends AnalyzerTask {
-	
-	protected T module;
-	
-	protected String key;
-	
-	/**
-	 * Sets the module to be used for analysis.
-	 * 
-	 * @param module
-	 *            a object that features the functionality for analysis.
-	 */
-	public void setModule(T module) {
-		this.module = module;
+public abstract class AbstractVertexProperty implements VertexProperty {
+
+	@Override
+	public DescriptiveStatistics statistics(Set<? extends Vertex> vertices) {
+		DescriptiveStatistics stats = new DescriptiveStatistics();
+		
+		TObjectDoubleHashMap<Vertex> values = values(vertices);
+		TObjectDoubleIterator<Vertex> it = values.iterator();
+		
+		for(int i = 0; i < values.size(); i++) {
+			it.advance();
+			stats.addValue(it.value());
+		}
+		
+		return stats;
 	}
-	
-	public void setKey(String key) {
-		this.key = key;
-	}
+
 }

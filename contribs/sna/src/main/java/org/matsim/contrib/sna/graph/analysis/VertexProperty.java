@@ -23,6 +23,7 @@ import gnu.trove.TObjectDoubleHashMap;
 
 import java.util.Set;
 
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.sna.graph.Vertex;
 
 /**
@@ -32,5 +33,7 @@ import org.matsim.contrib.sna.graph.Vertex;
 public interface VertexProperty {
 
 	public TObjectDoubleHashMap<Vertex> values(Set<? extends Vertex> vertices);
+	
+	public DescriptiveStatistics statistics(Set<? extends Vertex> vertices);
 	
 }

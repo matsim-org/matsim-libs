@@ -177,7 +177,10 @@ public class SnowballStatistics {
 	 *         <tt>iteration</tt>.
 	 */
 	public double responseRateTotal(Set<? extends SampledVertex> vertices, int iteration) {
-		return numVerticesSampledTotal(vertices)[iteration]/(double)numVerticesDetectedTotal(vertices)[iteration];
+		if(iteration == 0)
+			return 1.0;
+		else
+			return numVerticesSampledTotal(vertices)[iteration]/(double)numVerticesDetectedTotal(vertices)[iteration - 1];
 	}
 	
 	/**
