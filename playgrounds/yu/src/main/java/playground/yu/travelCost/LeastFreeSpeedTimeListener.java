@@ -29,6 +29,7 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
@@ -42,33 +43,33 @@ import org.matsim.core.router.util.TravelTime;
  * @author yu
  * 
  */
-public class SpeedSqrtWeightedTravelCostListener implements
+public class LeastFreeSpeedTimeListener implements
 		IterationStartsListener {
-	public static class SpeedSqrtWeightedTravelCostCalculatorFactoryImpl
+	public static class LeastFreeSpeedTravelTimeTravelCostCalculatorFactoryImpl
 			implements TravelCostCalculatorFactory {
 
 		public PersonalizableTravelCost createTravelCostCalculator(
 				PersonalizableTravelTime timeCalculator,
 				PlanCalcScoreConfigGroup cnScoringGroup) {
-			return new SpeedSqrtWeightedTravelTimeCostCalculator(timeCalculator);
+			return new LeastFreeSpeedTravelTimeCostCalculator(timeCalculator);
 		}
 
 	}
 
-	public static class SpeedSqrtWeightedTravelTimeCostCalculator implements
+	public static class LeastFreeSpeedTravelTimeCostCalculator implements
 			TravelMinCost, PersonalizableTravelCost {
 
-		protected final TravelTime timeCalculator;
+		// protected final TravelTime timeCalculator;
 
 		// private final double travelCostFactor;
 
 		// private final double marginalUtlOfDistance;
 
-		public SpeedSqrtWeightedTravelTimeCostCalculator(
+		public LeastFreeSpeedTravelTimeCostCalculator(
 				final TravelTime timeCalculator
 		// , PlanCalcScoreConfigGroup cnScoringGroup
 		) {
-			this.timeCalculator = timeCalculator;
+			// this.timeCalculator = timeCalculator;
 			/*
 			 * Usually, the travel-utility should be negative (it's a
 			 * disutility) but the cost should be positive. Thus negate the
@@ -77,8 +78,7 @@ public class SpeedSqrtWeightedTravelCostListener implements
 			// travelCostFactor = -cnScoringGroup.getTraveling_utils_hr() /
 			// 3600d +
 			// cnScoringGroup
-			// .getPerforming_utils_hr() / 3600d
-			;
+			// .getPerforming_utils_hr() / 3600d ;
 
 			// this.marginalUtlOfDistance =
 			// cnScoringGroup.getMarginalUtlOfDistanceCar();
@@ -92,11 +92,12 @@ public class SpeedSqrtWeightedTravelCostListener implements
 		@Override
 		public double getLinkGeneralizedTravelCost(final Link link,
 				final double time) {
-			double travelTime = timeCalculator.getLinkTravelTime(link, time);
-			// if (marginalUtlOfDistance == 0.0) {
-			return travelTime
-			// * travelCostFactor
-					/ Math.sqrt(link.getLength() / travelTime);
+			return ((LinkImpl) link).getFreespeedTravelTime();
+			// double travelTime = timeCalculator.getLinkTravelTime(link, time);
+			// // if (marginalUtlOfDistance == 0.0) {
+			// return travelTime
+			// // * travelCostFactor
+			// / link.getCapacity(time);
 			// }
 			// return travelTime * travelCostFactor - marginalUtlOfDistance
 			// * link.getLength();
@@ -104,10 +105,11 @@ public class SpeedSqrtWeightedTravelCostListener implements
 
 		@Override
 		public double getLinkMinimumTravelCost(final Link link) {
+			return ((LinkImpl) link).getFreespeedTravelTime();
 			// if (marginalUtlOfDistance == 0.0) {
-			return link.getLength() / link.getFreespeed()
-			// * travelCostFactor
-					/ Math.sqrt(link.getFreespeed());
+			// return link.getLength() / link.getFreespeed()
+			// // * travelCostFactor
+			// / link.getCapacity();
 			// }
 			// return link.getLength() / link.getFreespeed() * travelCostFactor
 			// - marginalUtlOfDistance * link.getLength();
@@ -125,34 +127,17 @@ public class SpeedSqrtWeightedTravelCostListener implements
 		Controler ctl = event.getControler();
 		if (event.getIteration() > ctl.getFirstIteration()) {
 			ctl
-					.setTravelCostCalculatorFactory(new SpeedSqrtWeightedTravelCostCalculatorFactoryImpl());
+					.setTravelCostCalculatorFactory(new LeastFreeSpeedTravelTimeTravelCostCalculatorFactoryImpl());
 		}
 	}
 
-	// /**
-	// * changes the value of monetaryDistanceCostRateCar from default value 0
-	// to
-	// * -0.00012 by the end of the first iteration
-	// */
-	// @Override
-	// public void notifyIterationEnds(IterationEndsEvent event) {
-	// Controler ctl = event.getControler();
-	// int iter = event.getIteration();/* firstIter+1, +2, +3 */
-	// if (iter == ctl.getFirstIteration()) {
-	// PlanCalcScoreConfigGroup scoringCfg = ctl.getConfig().planCalcScore();
-	// scoringCfg.setMonetaryDistanceCostRateCar(-0.00012);
-	// ctl
-	// .setScoringFunctionFactory(new CharyparNagelScoringFunctionFactory(
-	// scoringCfg));
-	// }
-	// }
-
-	// public static void main(String[] args) {
-	// Controler controler = new ControlerWithRemoveOldestPlan(args);
-	// controler.addControlerListener(new SingleReRouteSelectedListener());
-	// controler.setWriteEventsInterval(0);
-	// controler.setCreateGraphs(false);
-	// controler.run();
-	// }
+	public static void main(String[] args) {
+		Controler controler = new SingleReRouteSelectedControler(args[0]);
+		controler
+				.addControlerListener(new LeastFreeSpeedTimeListener());
+		controler.setWriteEventsInterval(1);
+		controler.setOverwriteFiles(true);
+		controler.run();
+	}
 
 }

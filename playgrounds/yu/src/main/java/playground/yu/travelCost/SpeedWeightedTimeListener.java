@@ -42,28 +42,20 @@ import org.matsim.core.router.util.TravelTime;
  * @author yu
  * 
  */
-public class LinkCapacitySquareWeightedTravelCostListener implements
-		IterationStartsListener {
-	public static class LinkCapacitySquareWeightedTravelCostCalculatorFactoryImpl
-			implements TravelCostCalculatorFactory {
+public class SpeedWeightedTimeListener implements IterationStartsListener {
+	public static class SpeedWeightedTravelCostCalculatorFactoryImpl implements
+			TravelCostCalculatorFactory {
 
 		public PersonalizableTravelCost createTravelCostCalculator(
 				PersonalizableTravelTime timeCalculator,
 				PlanCalcScoreConfigGroup cnScoringGroup) {
-			return new LinkCapacitySquareWeightedTravelTimeCostCalculator(
-					timeCalculator);
+			return new SpeedWeightedTravelTimeCostCalculator(timeCalculator);
 		}
 
 	}
 
-	/**
-	 * weigh travel time by 1/cap^2
-	 * 
-	 * @author yu
-	 * 
-	 */
-	public static class LinkCapacitySquareWeightedTravelTimeCostCalculator
-			implements TravelMinCost, PersonalizableTravelCost {
+	public static class SpeedWeightedTravelTimeCostCalculator implements
+			TravelMinCost, PersonalizableTravelCost {
 
 		protected final TravelTime timeCalculator;
 
@@ -71,7 +63,7 @@ public class LinkCapacitySquareWeightedTravelCostListener implements
 
 		// private final double marginalUtlOfDistance;
 
-		public LinkCapacitySquareWeightedTravelTimeCostCalculator(
+		public SpeedWeightedTravelTimeCostCalculator(
 				final TravelTime timeCalculator
 		// , PlanCalcScoreConfigGroup cnScoringGroup
 		) {
@@ -101,10 +93,9 @@ public class LinkCapacitySquareWeightedTravelCostListener implements
 				final double time) {
 			double travelTime = timeCalculator.getLinkTravelTime(link, time);
 			// if (marginalUtlOfDistance == 0.0) {
-			double capacity = link.getCapacity(time);
 			return travelTime
 			// * travelCostFactor
-					/ capacity / capacity;
+					/ (link.getLength() / travelTime);
 			// }
 			// return travelTime * travelCostFactor - marginalUtlOfDistance
 			// * link.getLength();
@@ -113,10 +104,9 @@ public class LinkCapacitySquareWeightedTravelCostListener implements
 		@Override
 		public double getLinkMinimumTravelCost(final Link link) {
 			// if (marginalUtlOfDistance == 0.0) {
-			double capacity = link.getCapacity();
 			return link.getLength() / link.getFreespeed()
 			// * travelCostFactor
-					/ capacity / capacity;
+					/ link.getFreespeed();
 			// }
 			// return link.getLength() / link.getFreespeed() * travelCostFactor
 			// - marginalUtlOfDistance * link.getLength();
@@ -134,8 +124,34 @@ public class LinkCapacitySquareWeightedTravelCostListener implements
 		Controler ctl = event.getControler();
 		if (event.getIteration() > ctl.getFirstIteration()) {
 			ctl
-					.setTravelCostCalculatorFactory(new LinkCapacitySquareWeightedTravelCostCalculatorFactoryImpl());
+					.setTravelCostCalculatorFactory(new SpeedWeightedTravelCostCalculatorFactoryImpl());
 		}
 	}
+
+	// /**
+	// * changes the value of monetaryDistanceCostRateCar from default value 0
+	// to
+	// * -0.00012 by the end of the first iteration
+	// */
+	// @Override
+	// public void notifyIterationEnds(IterationEndsEvent event) {
+	// Controler ctl = event.getControler();
+	// int iter = event.getIteration();/* firstIter+1, +2, +3 */
+	// if (iter == ctl.getFirstIteration()) {
+	// PlanCalcScoreConfigGroup scoringCfg = ctl.getConfig().planCalcScore();
+	// scoringCfg.setMonetaryDistanceCostRateCar(-0.00012);
+	// ctl
+	// .setScoringFunctionFactory(new CharyparNagelScoringFunctionFactory(
+	// scoringCfg));
+	// }
+	// }
+
+	// public static void main(String[] args) {
+	// Controler controler = new ControlerWithRemoveOldestPlan(args);
+	// controler.addControlerListener(new SingleReRouteSelectedListener());
+	// controler.setWriteEventsInterval(0);
+	// controler.setCreateGraphs(false);
+	// controler.run();
+	// }
 
 }

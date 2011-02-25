@@ -98,7 +98,7 @@ public class SingleReRouteSelectedControler extends Controler {
 	public static void capacityWeightedTravelTimeCost(String[] args) {
 		Controler controler = new SingleReRouteSelectedControler(args[0]);
 		controler
-				.addControlerListener(new LinkCapacityWeightedTravelCostListener());
+				.addControlerListener(new LinkCapacityWeightedTimeListener());
 		controler.setWriteEventsInterval(0);
 		controler.setOverwriteFiles(true);
 		controler.run();
@@ -108,7 +108,7 @@ public class SingleReRouteSelectedControler extends Controler {
 	public static void capacitySquareWeightedTravelTimeCost(String[] args) {
 		Controler controler = new SingleReRouteSelectedControler(args[0]);
 		controler
-				.addControlerListener(new LinkCapacitySquareWeightedTravelCostListener());
+				.addControlerListener(new LinkCapacitySquareWeightedTimeListener());
 		controler.setWriteEventsInterval(0);
 		controler.setOverwriteFiles(true);
 		controler.run();
@@ -118,7 +118,7 @@ public class SingleReRouteSelectedControler extends Controler {
 	public static void capacitySqrtWeightedTravelTimeCost(String[] args) {
 		Controler controler = new SingleReRouteSelectedControler(args[0]);
 		controler
-				.addControlerListener(new LinkCapacitySqrtWeightedTravelCostListener());
+				.addControlerListener(new LinkCapacitySqrtWeightedTimeListener());
 		controler.setWriteEventsInterval(0);
 		controler.setOverwriteFiles(true);
 		controler.run();
@@ -127,7 +127,7 @@ public class SingleReRouteSelectedControler extends Controler {
 	/* ../matsimTests/diverseRoutes/speedWeighted.xml */
 	public static void speedWeightedTravelTimeCost(String[] args) {
 		Controler controler = new SingleReRouteSelectedControler(args[0]);
-		controler.addControlerListener(new SpeedWeightedTravelCostListener());
+		controler.addControlerListener(new SpeedWeightedTimeListener());
 		controler.setWriteEventsInterval(0);
 		controler.setOverwriteFiles(true);
 		controler.run();
@@ -137,7 +137,7 @@ public class SingleReRouteSelectedControler extends Controler {
 	public static void speedSquareWeightedTravelTimeCost(String[] args) {
 		Controler controler = new SingleReRouteSelectedControler(args[0]);
 		controler
-				.addControlerListener(new SpeedSquareWeightedTravelCostListener());
+				.addControlerListener(new SpeedSquareWeightedTimeListener());
 		controler.setWriteEventsInterval(0);
 		controler.setOverwriteFiles(true);
 		controler.run();
@@ -147,7 +147,7 @@ public class SingleReRouteSelectedControler extends Controler {
 	public static void speedSqrtWeightedTravelTimeCost(String[] args) {
 		Controler controler = new SingleReRouteSelectedControler(args[0]);
 		controler
-				.addControlerListener(new SpeedSqrtWeightedTravelCostListener());
+				.addControlerListener(new SpeedSqrtWeightedTimeListener());
 		controler.setWriteEventsInterval(0);
 		controler.setOverwriteFiles(true);
 		controler.run();
@@ -158,7 +158,7 @@ public class SingleReRouteSelectedControler extends Controler {
 			String[] args) {
 		Controler controler = new SingleReRouteSelectedControler(args[0]);
 		controler
-				.addControlerListener(new SpeedCapacitySqrtCombiWeightedTravelCostListener());
+				.addControlerListener(new SpeedCapacitySqrtCombiWeightedTimeListener());
 		controler.setWriteEventsInterval(0);
 		controler.setOverwriteFiles(true);
 		controler.run();

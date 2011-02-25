@@ -42,21 +42,20 @@ import org.matsim.core.router.util.TravelTime;
  * @author yu
  * 
  */
-public class SpeedSquareWeightedTravelCostListener implements
+public class SpeedSqrtWeightedTimeListener implements
 		IterationStartsListener {
-	public static class SpeedSquareWeightedTravelCostCalculatorFactoryImpl
+	public static class SpeedSqrtWeightedTravelCostCalculatorFactoryImpl
 			implements TravelCostCalculatorFactory {
 
 		public PersonalizableTravelCost createTravelCostCalculator(
 				PersonalizableTravelTime timeCalculator,
 				PlanCalcScoreConfigGroup cnScoringGroup) {
-			return new SpeedSquareWeightedTravelTimeCostCalculator(
-					timeCalculator);
+			return new SpeedSqrtWeightedTravelTimeCostCalculator(timeCalculator);
 		}
 
 	}
 
-	public static class SpeedSquareWeightedTravelTimeCostCalculator implements
+	public static class SpeedSqrtWeightedTravelTimeCostCalculator implements
 			TravelMinCost, PersonalizableTravelCost {
 
 		protected final TravelTime timeCalculator;
@@ -65,7 +64,7 @@ public class SpeedSquareWeightedTravelCostListener implements
 
 		// private final double marginalUtlOfDistance;
 
-		public SpeedSquareWeightedTravelTimeCostCalculator(
+		public SpeedSqrtWeightedTravelTimeCostCalculator(
 				final TravelTime timeCalculator
 		// , PlanCalcScoreConfigGroup cnScoringGroup
 		) {
@@ -96,9 +95,8 @@ public class SpeedSquareWeightedTravelCostListener implements
 			double travelTime = timeCalculator.getLinkTravelTime(link, time);
 			// if (marginalUtlOfDistance == 0.0) {
 			return travelTime
-					// * travelCostFactor
-					/ (link.getLength() / travelTime)
-					/ (link.getLength() / travelTime);
+			// * travelCostFactor
+					/ Math.sqrt(link.getLength() / travelTime);
 			// }
 			// return travelTime * travelCostFactor - marginalUtlOfDistance
 			// * link.getLength();
@@ -109,7 +107,7 @@ public class SpeedSquareWeightedTravelCostListener implements
 			// if (marginalUtlOfDistance == 0.0) {
 			return link.getLength() / link.getFreespeed()
 			// * travelCostFactor
-					/ link.getFreespeed() / link.getFreespeed();
+					/ Math.sqrt(link.getFreespeed());
 			// }
 			// return link.getLength() / link.getFreespeed() * travelCostFactor
 			// - marginalUtlOfDistance * link.getLength();
@@ -127,7 +125,7 @@ public class SpeedSquareWeightedTravelCostListener implements
 		Controler ctl = event.getControler();
 		if (event.getIteration() > ctl.getFirstIteration()) {
 			ctl
-					.setTravelCostCalculatorFactory(new SpeedSquareWeightedTravelCostCalculatorFactoryImpl());
+					.setTravelCostCalculatorFactory(new SpeedSqrtWeightedTravelCostCalculatorFactoryImpl());
 		}
 	}
 
