@@ -22,21 +22,29 @@ package org.matsim.core.network;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeSet;
 
+import org.apache.log4j.Logger;
+import org.junit.Assert;
+import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.network.LinkImpl.HashSetCache;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.testcases.MatsimTestCase;
 
-public class LinkImplTest extends MatsimTestCase {
+public class LinkImplTest {
+
+	private final static Logger log = Logger.getLogger(LinkImplTest.class);
+	private static final double EPSILON = 1e-7;
 
 	/** Tests the method {@link LinkImpl#calcDistance(Coord)}.
 	 *
 	 * @author mrieser
 	 **/
+	@Test
 	public void testCalcDistance() {
 		/* create a sample network:
 		 *
@@ -67,96 +75,97 @@ public class LinkImplTest extends MatsimTestCase {
 		// do the following cases for each link
 
 		// case 1: point is orthogonal next to link.fromNode, test both sides of link
-		assertEquals(10.0, link1.calcDistance(new CoordImpl(10.0, 0.0)), EPSILON);
-		assertEquals(12.5, link1.calcDistance(new CoordImpl(-12.5, 0.0)), EPSILON);
-		assertEquals(Math.sqrt(2*65.4*65.4), link2.calcDistance(new CoordImpl(65.4, 1000.0-65.4)), EPSILON);
-		assertEquals(Math.sqrt(2*76.5*76.5), link2.calcDistance(new CoordImpl(-76.5, 1000.0+76.5)), EPSILON);
-		assertEquals(123.987, link3.calcDistance(new CoordImpl(1000.0, 2000.0-123.987)), EPSILON);
-		assertEquals(23.87, link3.calcDistance(new CoordImpl(1000.0, 2000.0+23.87)), EPSILON);
-		assertEquals(Math.sqrt(32.4*32.4*1.25), link4.calcDistance(new CoordImpl(2000.0+32.4, 2000-32.4/2.0)), EPSILON);
-		assertEquals(Math.sqrt(56.8*56.8*1.25), link4.calcDistance(new CoordImpl(2000.0-56.8, 2000+56.8/2.0)), EPSILON);
+		Assert.assertEquals(10.0, link1.calcDistance(new CoordImpl(10.0, 0.0)), EPSILON);
+		Assert.assertEquals(12.5, link1.calcDistance(new CoordImpl(-12.5, 0.0)), EPSILON);
+		Assert.assertEquals(Math.sqrt(2*65.4*65.4), link2.calcDistance(new CoordImpl(65.4, 1000.0-65.4)), EPSILON);
+		Assert.assertEquals(Math.sqrt(2*76.5*76.5), link2.calcDistance(new CoordImpl(-76.5, 1000.0+76.5)), EPSILON);
+		Assert.assertEquals(123.987, link3.calcDistance(new CoordImpl(1000.0, 2000.0-123.987)), EPSILON);
+		Assert.assertEquals(23.87, link3.calcDistance(new CoordImpl(1000.0, 2000.0+23.87)), EPSILON);
+		Assert.assertEquals(Math.sqrt(32.4*32.4*1.25), link4.calcDistance(new CoordImpl(2000.0+32.4, 2000-32.4/2.0)), EPSILON);
+		Assert.assertEquals(Math.sqrt(56.8*56.8*1.25), link4.calcDistance(new CoordImpl(2000.0-56.8, 2000+56.8/2.0)), EPSILON);
 
 		// case 2: point is behind link, but exactly on extension of the link's line
-		assertEquals(15.0, link1.calcDistance(new CoordImpl(0.0, -15.0)), EPSILON);
-		assertEquals(Math.sqrt(50.0), link2.calcDistance(new CoordImpl(-5.0, 995.0)), EPSILON);
-		assertEquals(12.35, link3.calcDistance(new CoordImpl(987.65, 2000.0)), EPSILON);
-		assertEquals(Math.sqrt(250.0*250.0 + 500.0*500.0), link4.calcDistance(new CoordImpl(2250.0, 2500.0)), EPSILON);
+		Assert.assertEquals(15.0, link1.calcDistance(new CoordImpl(0.0, -15.0)), EPSILON);
+		Assert.assertEquals(Math.sqrt(50.0), link2.calcDistance(new CoordImpl(-5.0, 995.0)), EPSILON);
+		Assert.assertEquals(12.35, link3.calcDistance(new CoordImpl(987.65, 2000.0)), EPSILON);
+		Assert.assertEquals(Math.sqrt(250.0*250.0 + 500.0*500.0), link4.calcDistance(new CoordImpl(2250.0, 2500.0)), EPSILON);
 
 		// case 3: point is behind and on the side of link, test both sides of link
-		assertEquals(Math.sqrt(325.0), link1.calcDistance(new CoordImpl(10.0, -15.0)), EPSILON);
-		assertEquals(Math.sqrt(625.0), link1.calcDistance(new CoordImpl(-15.0, -20.0)), EPSILON);
-		assertEquals(50.5, link2.calcDistance(new CoordImpl(0.0, 949.5)), EPSILON);
-		assertEquals(51.5, link2.calcDistance(new CoordImpl(-51.5, 1000.0)), EPSILON);
-		assertEquals(Math.sqrt(1300.0), link3.calcDistance(new CoordImpl(970.0, 1980.0)), EPSILON);
-		assertEquals(Math.sqrt(1300.0), link3.calcDistance(new CoordImpl(980.0, 2030.0)), EPSILON);
-		assertEquals(145.7, link4.calcDistance(new CoordImpl(2000.0, 2145.7)), EPSILON);
-		assertEquals(89.0, link4.calcDistance(new CoordImpl(2089.0, 2000.0)), EPSILON);
+		Assert.assertEquals(Math.sqrt(325.0), link1.calcDistance(new CoordImpl(10.0, -15.0)), EPSILON);
+		Assert.assertEquals(Math.sqrt(625.0), link1.calcDistance(new CoordImpl(-15.0, -20.0)), EPSILON);
+		Assert.assertEquals(50.5, link2.calcDistance(new CoordImpl(0.0, 949.5)), EPSILON);
+		Assert.assertEquals(51.5, link2.calcDistance(new CoordImpl(-51.5, 1000.0)), EPSILON);
+		Assert.assertEquals(Math.sqrt(1300.0), link3.calcDistance(new CoordImpl(970.0, 1980.0)), EPSILON);
+		Assert.assertEquals(Math.sqrt(1300.0), link3.calcDistance(new CoordImpl(980.0, 2030.0)), EPSILON);
+		Assert.assertEquals(145.7, link4.calcDistance(new CoordImpl(2000.0, 2145.7)), EPSILON);
+		Assert.assertEquals(89.0, link4.calcDistance(new CoordImpl(2089.0, 2000.0)), EPSILON);
 
 		// case 4: point is orthogonal next to link.toNode, test both sides of link
-		assertEquals(5.0, link1.calcDistance(new CoordImpl(-5.0, 1000.0)), EPSILON);
-		assertEquals(7.5, link1.calcDistance(new CoordImpl(7.5, 1000.0)), EPSILON);
-		assertEquals(Math.sqrt(2*234.5*234.5), link2.calcDistance(new CoordImpl(1234.5, 2000.0-234.5)), EPSILON);
-		assertEquals(Math.sqrt(2*11.1*11.1), link2.calcDistance(new CoordImpl(1000.0-11.1, 2000.0+11.1)), EPSILON);
-		assertEquals(43.3, link3.calcDistance(new CoordImpl(2000.0, 1956.7)), EPSILON);
-		assertEquals(10.3, link3.calcDistance(new CoordImpl(2000.0, 2010.3)), EPSILON);
-		assertEquals(Math.sqrt(44.4*44.4*1.25), link4.calcDistance(new CoordImpl(1000-44.4, +22.2)), EPSILON);
-		assertEquals(Math.sqrt(66.6*66.6*1.25), link4.calcDistance(new CoordImpl(1000+66.6, -33.3)), EPSILON);
+		Assert.assertEquals(5.0, link1.calcDistance(new CoordImpl(-5.0, 1000.0)), EPSILON);
+		Assert.assertEquals(7.5, link1.calcDistance(new CoordImpl(7.5, 1000.0)), EPSILON);
+		Assert.assertEquals(Math.sqrt(2*234.5*234.5), link2.calcDistance(new CoordImpl(1234.5, 2000.0-234.5)), EPSILON);
+		Assert.assertEquals(Math.sqrt(2*11.1*11.1), link2.calcDistance(new CoordImpl(1000.0-11.1, 2000.0+11.1)), EPSILON);
+		Assert.assertEquals(43.3, link3.calcDistance(new CoordImpl(2000.0, 1956.7)), EPSILON);
+		Assert.assertEquals(10.3, link3.calcDistance(new CoordImpl(2000.0, 2010.3)), EPSILON);
+		Assert.assertEquals(Math.sqrt(44.4*44.4*1.25), link4.calcDistance(new CoordImpl(1000-44.4, +22.2)), EPSILON);
+		Assert.assertEquals(Math.sqrt(66.6*66.6*1.25), link4.calcDistance(new CoordImpl(1000+66.6, -33.3)), EPSILON);
 
 		// case 5: point is in front of link, but exactly on extension of the link's line
-		assertEquals(23.4, link1.calcDistance(new CoordImpl(0, 1023.4)), EPSILON);
-		assertEquals(Math.sqrt(200.0), link2.calcDistance(new CoordImpl(1010, 2010.0)), EPSILON);
-		assertEquals(987.6, link3.calcDistance(new CoordImpl(2987.6, 2000.0)), EPSILON);
-		assertEquals(Math.sqrt(250.0*250.0 + 500.0*500.0), link4.calcDistance(new CoordImpl(750.0, -500.0)), EPSILON);
+		Assert.assertEquals(23.4, link1.calcDistance(new CoordImpl(0, 1023.4)), EPSILON);
+		Assert.assertEquals(Math.sqrt(200.0), link2.calcDistance(new CoordImpl(1010, 2010.0)), EPSILON);
+		Assert.assertEquals(987.6, link3.calcDistance(new CoordImpl(2987.6, 2000.0)), EPSILON);
+		Assert.assertEquals(Math.sqrt(250.0*250.0 + 500.0*500.0), link4.calcDistance(new CoordImpl(750.0, -500.0)), EPSILON);
 
 		// case 6: point is in front of link and on side of link, test both sides of link
-		assertEquals(5.0, link1.calcDistance(new CoordImpl(-3.0, 1004.0)), EPSILON);
-		assertEquals(Math.sqrt(113.0), link1.calcDistance(new CoordImpl(8.0, 1007.0)), EPSILON);
-		assertEquals(Math.sqrt(100.0*100.0+50.0*50.0), link2.calcDistance(new CoordImpl(1100.0, 2050.0)), EPSILON);
-		assertEquals(Math.sqrt(50.0*50.0+100.0*100.0), link2.calcDistance(new CoordImpl(1050.0, 2100.0)), EPSILON);
-		assertEquals(Math.sqrt(100.0*100.0+50.0*50.0), link3.calcDistance(new CoordImpl(2100.0, 2050.0)), EPSILON);
-		assertEquals(Math.sqrt(50.0*50.0+100.0*100.0), link3.calcDistance(new CoordImpl(2050.0, 1900.0)), EPSILON);
-		assertEquals(50.0, link4.calcDistance(new CoordImpl(1000.0, -50.0)), EPSILON);
-		assertEquals(49.0, link4.calcDistance(new CoordImpl(951.0, 0.0)), EPSILON);
+		Assert.assertEquals(5.0, link1.calcDistance(new CoordImpl(-3.0, 1004.0)), EPSILON);
+		Assert.assertEquals(Math.sqrt(113.0), link1.calcDistance(new CoordImpl(8.0, 1007.0)), EPSILON);
+		Assert.assertEquals(Math.sqrt(100.0*100.0+50.0*50.0), link2.calcDistance(new CoordImpl(1100.0, 2050.0)), EPSILON);
+		Assert.assertEquals(Math.sqrt(50.0*50.0+100.0*100.0), link2.calcDistance(new CoordImpl(1050.0, 2100.0)), EPSILON);
+		Assert.assertEquals(Math.sqrt(100.0*100.0+50.0*50.0), link3.calcDistance(new CoordImpl(2100.0, 2050.0)), EPSILON);
+		Assert.assertEquals(Math.sqrt(50.0*50.0+100.0*100.0), link3.calcDistance(new CoordImpl(2050.0, 1900.0)), EPSILON);
+		Assert.assertEquals(50.0, link4.calcDistance(new CoordImpl(1000.0, -50.0)), EPSILON);
+		Assert.assertEquals(49.0, link4.calcDistance(new CoordImpl(951.0, 0.0)), EPSILON);
 
 		// case 7: point is on the side of link, between from- and to-Node, test both sides of link
-		assertEquals(42.0, link1.calcDistance(new CoordImpl(-42.0, 987.65)), EPSILON);
-		assertEquals(123.4, link1.calcDistance(new CoordImpl(123.4, 98.765)), EPSILON);
-		assertEquals(Math.sqrt(2*125.0*125.0), link2.calcDistance(new CoordImpl(500.0, 1250.0)), EPSILON);
-		assertEquals(Math.sqrt(2*250.0*250.0), link2.calcDistance(new CoordImpl(500.0, 2000.0)), EPSILON);
-		assertEquals(658.3, link3.calcDistance(new CoordImpl(1234.5, 2000.0-658.3)), EPSILON);
-		assertEquals(422.1, link3.calcDistance(new CoordImpl(1846.3, 2422.1)), EPSILON);
-		assertEquals(Math.sqrt(250.0*250.0+125.0*125.0), link4.calcDistance(new CoordImpl(2000.0, 1375.0)), EPSILON);
-		assertEquals(Math.sqrt(500.0*500.0+250.0*250.0), link4.calcDistance(new CoordImpl(1000.0, 1250.0)), EPSILON);
+		Assert.assertEquals(42.0, link1.calcDistance(new CoordImpl(-42.0, 987.65)), EPSILON);
+		Assert.assertEquals(123.4, link1.calcDistance(new CoordImpl(123.4, 98.765)), EPSILON);
+		Assert.assertEquals(Math.sqrt(2*125.0*125.0), link2.calcDistance(new CoordImpl(500.0, 1250.0)), EPSILON);
+		Assert.assertEquals(Math.sqrt(2*250.0*250.0), link2.calcDistance(new CoordImpl(500.0, 2000.0)), EPSILON);
+		Assert.assertEquals(658.3, link3.calcDistance(new CoordImpl(1234.5, 2000.0-658.3)), EPSILON);
+		Assert.assertEquals(422.1, link3.calcDistance(new CoordImpl(1846.3, 2422.1)), EPSILON);
+		Assert.assertEquals(Math.sqrt(250.0*250.0+125.0*125.0), link4.calcDistance(new CoordImpl(2000.0, 1375.0)), EPSILON);
+		Assert.assertEquals(Math.sqrt(500.0*500.0+250.0*250.0), link4.calcDistance(new CoordImpl(1000.0, 1250.0)), EPSILON);
 
 		// case 8: point is *on* the link (exactly on fromnode, exactly on tonode, exactly between somewhere)
-		assertEquals("point = link1.fromNode", 0.0, link1.calcDistance(link1.getFromNode().getCoord()), EPSILON);
-		assertEquals("point = link1.toNode", 0.0, link1.calcDistance(link1.getToNode().getCoord()), EPSILON);
-		assertEquals("point on link1", 0.0, link1.calcDistance(new CoordImpl(0.0, 135.79)), EPSILON);
+		Assert.assertEquals("point = link1.fromNode", 0.0, link1.calcDistance(link1.getFromNode().getCoord()), EPSILON);
+		Assert.assertEquals("point = link1.toNode", 0.0, link1.calcDistance(link1.getToNode().getCoord()), EPSILON);
+		Assert.assertEquals("point on link1", 0.0, link1.calcDistance(new CoordImpl(0.0, 135.79)), EPSILON);
 
-		assertEquals("point = link2.fromNode", 0.0, link2.calcDistance(link2.getFromNode().getCoord()), EPSILON);
-		assertEquals("point = link2.toNode", 0.0, link2.calcDistance(link2.getToNode().getCoord()), EPSILON);
-		assertEquals("point on link2", 0.0, link2.calcDistance(new CoordImpl(65.43, 1065.43)), EPSILON);
+		Assert.assertEquals("point = link2.fromNode", 0.0, link2.calcDistance(link2.getFromNode().getCoord()), EPSILON);
+		Assert.assertEquals("point = link2.toNode", 0.0, link2.calcDistance(link2.getToNode().getCoord()), EPSILON);
+		Assert.assertEquals("point on link2", 0.0, link2.calcDistance(new CoordImpl(65.43, 1065.43)), EPSILON);
 
-		assertEquals("point = link3.fromNode", 0.0, link3.calcDistance(link3.getFromNode().getCoord()), EPSILON);
-		assertEquals("point = link3.toNode", 0.0, link3.calcDistance(link3.getToNode().getCoord()), EPSILON);
-		assertEquals("point on link3", 0.0, link3.calcDistance(new CoordImpl(1234.5678, 2000.0)), EPSILON);
+		Assert.assertEquals("point = link3.fromNode", 0.0, link3.calcDistance(link3.getFromNode().getCoord()), EPSILON);
+		Assert.assertEquals("point = link3.toNode", 0.0, link3.calcDistance(link3.getToNode().getCoord()), EPSILON);
+		Assert.assertEquals("point on link3", 0.0, link3.calcDistance(new CoordImpl(1234.5678, 2000.0)), EPSILON);
 
-		assertEquals("point = link4.fromNode", 0.0, link4.calcDistance(link4.getFromNode().getCoord()), EPSILON);
-		assertEquals("point = link4.toNode", 0.0, link4.calcDistance(link4.getToNode().getCoord()), EPSILON);
-		assertEquals("point on link4", 0.0, link4.calcDistance(new CoordImpl(1750.0, 1500.0)), EPSILON);
+		Assert.assertEquals("point = link4.fromNode", 0.0, link4.calcDistance(link4.getFromNode().getCoord()), EPSILON);
+		Assert.assertEquals("point = link4.toNode", 0.0, link4.calcDistance(link4.getToNode().getCoord()), EPSILON);
+		Assert.assertEquals("point on link4", 0.0, link4.calcDistance(new CoordImpl(1750.0, 1500.0)), EPSILON);
 	}
 
+	@Test
 	public void testSetAttributes() {
 		NetworkImpl network = NetworkImpl.createNetwork();
 		network.setCapacityPeriod(3600.0);
 		Node node1 = network.createAndAddNode(new IdImpl(1), new CoordImpl(0, 0));
 		Node node2 = network.createAndAddNode(new IdImpl(2), new CoordImpl(50, 50));
 		LinkImpl link1 = (LinkImpl) network.createAndAddLink(new IdImpl(1), node1, node2, 500.0, 10.0, 1000.0, 1.0);
-		assertEquals("wrong freespeed traveltime.", 50.0, link1.getFreespeedTravelTime(), EPSILON);
+		Assert.assertEquals("wrong freespeed traveltime.", 50.0, link1.getFreespeedTravelTime(), EPSILON);
 		link1.setLength(1000.0);
-		assertEquals("wrong freespeed traveltime.", 100.0, link1.getFreespeedTravelTime(), EPSILON);
+		Assert.assertEquals("wrong freespeed traveltime.", 100.0, link1.getFreespeedTravelTime(), EPSILON);
 		link1.setFreespeed(20.0);
-		assertEquals("wrong freespeed traveltime.", 50.0, link1.getFreespeedTravelTime(), EPSILON);
+		Assert.assertEquals("wrong freespeed traveltime.", 50.0, link1.getFreespeedTravelTime(), EPSILON);
 	}
 
 	/**
@@ -164,6 +173,7 @@ public class LinkImplTest extends MatsimTestCase {
 	 *
 	 * @author mrieser
 	 */
+	@Test
 	public void testAllowedModes() {
 		NetworkImpl network = NetworkImpl.createNetwork();
 		Node n1 = network.createAndAddNode(new IdImpl(1), new CoordImpl(0, 0));
@@ -172,13 +182,13 @@ public class LinkImplTest extends MatsimTestCase {
 
 		// test default
 		Set<String> modes = l.getAllowedModes();
-		assertEquals("wrong number of default entries.", 1, modes.size());
-		assertTrue("wrong default.", modes.contains(TransportMode.car));
+		Assert.assertEquals("wrong number of default entries.", 1, modes.size());
+		Assert.assertTrue("wrong default.", modes.contains(TransportMode.car));
 
 		// test set/get empty list
 		l.setAllowedModes(new HashSet<String>());
 		modes = l.getAllowedModes();
-		assertEquals("wrong number of allowed modes.", 0, modes.size());
+		Assert.assertEquals("wrong number of allowed modes.", 0, modes.size());
 
 		// test set/get list with entries
 		modes = new HashSet<String>();
@@ -187,10 +197,125 @@ public class LinkImplTest extends MatsimTestCase {
 		modes.add(TransportMode.bike);
 		l.setAllowedModes(modes);
 		modes = l.getAllowedModes();
-		assertEquals("wrong number of allowed modes", 3, modes.size());
-		assertTrue(modes.contains(TransportMode.walk));
-		assertTrue(modes.contains(TransportMode.car));
-		assertTrue(modes.contains(TransportMode.bike));
+		Assert.assertEquals("wrong number of allowed modes", 3, modes.size());
+		Assert.assertTrue(modes.contains(TransportMode.walk));
+		Assert.assertTrue(modes.contains(TransportMode.car));
+		Assert.assertTrue(modes.contains(TransportMode.bike));
+	}
+
+	/**
+	 * @author mrieser
+	 */
+	@Test
+	public void testHashSetCache_get_unmodifiable() {
+		Set<String> s1 = new TreeSet<String>();
+		s1.add("A");
+		s1.add("B");
+
+		Set<String> s = HashSetCache.get(s1);
+		Assert.assertTrue(s != s1);
+		Assert.assertEquals(2, s.size());
+		Assert.assertTrue(s.contains("A"));
+		Assert.assertTrue(s.contains("B"));
+		Assert.assertFalse(s.contains("C"));
+		Assert.assertFalse(s.contains("D"));
+		try {
+			s.add("D");
+			Assert.fail("Expected Exception, but got none");
+		} catch (UnsupportedOperationException e) {
+			log.info("catched expected exception.", e);
+		}
+
+		s1.add("C");
+		Assert.assertEquals("the returned set must be independent of the given, original set.", 2, s.size());
+	}
+
+	/**
+	 * @author mrieser
+	 */
+	@Test
+	public void testHashSetCache_get_null() {
+		Set<String> s = HashSetCache.get((Set<String>) null);
+		Assert.assertNull(s);
+	}
+
+	/**
+	 * @author mrieser
+	 */
+	@Test
+	public void testHashSetCache_get_emptySet() {
+		Set<String> s = HashSetCache.get(new TreeSet<String>());
+		Assert.assertNotNull(s);
+		Assert.assertEquals(0, s.size());
+	}
+
+	/**
+	 * @author mrieser
+	 */
+	@Test
+	public void testHashSetCache_get() {
+		Set<String> s1 = new TreeSet<String>();
+		s1.add("A");
+		s1.add("B");
+		Set<String> s2 = new HashSet<String>();
+		s2.add("A");
+		s2.add("B");
+		Set<String> s3 = new HashSet<String>();
+		s3.add("C");
+		s3.add("B");
+		Set<String> s4 = new HashSet<String>();
+		s4.add("A");
+
+		Set<String> s_1 = HashSetCache.get(s1);
+		Assert.assertTrue(s_1 != s1);
+		Assert.assertEquals(2, s_1.size());
+		Assert.assertTrue(s_1.contains("A"));
+		Assert.assertTrue(s_1.contains("B"));
+		Assert.assertFalse(s_1.contains("C"));
+		Assert.assertFalse(s_1.contains("D"));
+
+		Set<String> s_2 = HashSetCache.get(s2);
+		Assert.assertTrue(s_1 == s_2);
+
+		Set<String> s_3 = HashSetCache.get(s3);
+		Assert.assertTrue(s_3 != s3);
+		Assert.assertEquals(2, s_3.size());
+		Assert.assertFalse(s_3.contains("A"));
+		Assert.assertTrue(s_3.contains("B"));
+		Assert.assertTrue(s_3.contains("C"));
+		Assert.assertFalse(s_3.contains("D"));
+
+		Set<String> s_4 = HashSetCache.get(s4);
+		Assert.assertTrue(s_4 != s4);
+		Assert.assertEquals(1, s_4.size());
+	}
+
+	/**
+	 * @author mrieser
+	 */
+	@Test
+	public void testHashSetCache_get_identicalObjects() {
+		Set<String> s1 = new TreeSet<String>();
+		s1.add("A");
+		s1.add("B");
+		Set<String> s2 = new HashSet<String>();
+		s2.add("A");
+		s2.add("B");
+		Set<String> s3 = new HashSet<String>();
+		s3.add("C");
+		s3.add("B");
+		s3.add("A");
+
+		Set<String> s_1 = HashSetCache.get(s1);
+		Assert.assertTrue(s_1 != s1);
+		Assert.assertEquals(2, s_1.size());
+
+		Set<String> s_2 = HashSetCache.get(s2);
+		Assert.assertTrue(s_1 == s_2);
+
+		Set<String> s_3 = HashSetCache.get(s3);
+		Assert.assertTrue(s_3 != s3);
+		Assert.assertEquals(3, s_3.size());
 	}
 
 }

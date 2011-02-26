@@ -22,9 +22,13 @@ package org.matsim.core.network;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -56,8 +60,7 @@ public class LinkImpl implements Link {
 	protected double capacity = Double.NaN;
 	protected double nofLanes = Double.NaN;
 
-	private final HashSet<String> allowedModes = new HashSet<String>();
-	private final Set<String> allowedModesSafe = Collections.unmodifiableSet(this.allowedModes);
+	private Set<String> allowedModes = HashSetCache.get(new HashSet<String>());
 
 	private double flowCapacity;
 
@@ -80,14 +83,19 @@ public class LinkImpl implements Link {
 	private static int maxLengthWarnCnt = 1;
 	private static int maxLoopWarnCnt = 1;
 
-
+	private static final Set<String> DEFAULT_ALLOWED_MODES;
+	static {
+		Set<String> set = new HashSet<String>();
+		set.add(TransportMode.car);
+		DEFAULT_ALLOWED_MODES = HashSetCache.get(set);
+	}
 
 	protected LinkImpl(final Id id, final Node from, final Node to, final Network network, final double length, final double freespeed, final double capacity, final double lanes) {
 		this.id = id;
 		this.network = network;
 		this.from = from;
 		this.to = to;
-		this.allowedModes.add(TransportMode.car);
+		this.allowedModes = DEFAULT_ALLOWED_MODES;
 		this.setLength(length);
 		//for the eventual time variant attributes don't call the setter as it must be overwritten in TimeVariantLinkImpl
 		//and thus causes problems during object initialization, dg nov 2010
@@ -102,7 +110,7 @@ public class LinkImpl implements Link {
 		if (this.from.equals(this.to) && (loopWarnCnt < maxLoopWarnCnt)) {
 			loopWarnCnt++ ;
 			log.warn("[from=to=" + this.to + " link is a loop]");
-			if ( loopWarnCnt == maxLoopWarnCnt ) 
+			if ( loopWarnCnt == maxLoopWarnCnt )
 				log.warn(Gbl.FUTURE_SUPPRESSED ) ;
 		}
 	}
@@ -152,7 +160,7 @@ public class LinkImpl implements Link {
 		if ((this.getLength() <= 0.0) && (lengthWarnCnt < maxLengthWarnCnt)) {
 			lengthWarnCnt++;
 			log.warn("[length=" + this.length + " of link id " + this.getId() + " may cause problems]");
-			if ( lengthWarnCnt == maxLengthWarnCnt ) 
+			if ( lengthWarnCnt == maxLengthWarnCnt )
 				log.warn(Gbl.FUTURE_SUPPRESSED) ;
 		}
 	}
@@ -310,13 +318,12 @@ public class LinkImpl implements Link {
 
 	@Override
 	public final Set<String> getAllowedModes() {
-		return this.allowedModesSafe;
+		return this.allowedModes;
 	}
 
 	@Override
 	public final void setAllowedModes(final Set<String> modes) {
-		this.allowedModes.clear();
-		this.allowedModes.addAll(modes);
+		this.allowedModes = HashSetCache.get(modes);
 	}
 
 	public final void setOrigId(final String id) {
@@ -362,4 +369,44 @@ public class LinkImpl implements Link {
 		return network;
 	}
 
+	/*package*/ abstract static class HashSetCache {
+		private final static Map<Integer, List<Set<?>>> cache = new ConcurrentHashMap<Integer, List<Set<?>>>();
+		public static <T> Set<T> get(final Set<T> set) {
+			if (set == null) {
+				return null;
+			}
+			int size = set.size();
+			List<Set<?>> list = cache.get(size);
+			if (list == null) {
+				list = new ArrayList<Set<?>>(4);
+				cache.put(size, list);
+				HashSet<T> set2 = new HashSet<T>(set);
+				Set<T> set3 = Collections.unmodifiableSet(set2);
+				list.add(set3);
+				return set3;
+			}
+			for (Set<?> s : list) {
+				if (equalSets(set, s)) {
+					return (Set<T>) s;
+				}
+			}
+			// not yet in cache
+			HashSet<T> set2 = new HashSet<T>(set);
+			Set<T> set3 = Collections.unmodifiableSet(set2);
+			list.add(set3);
+			return set3;
+		}
+
+		private static boolean equalSets(final Set<?> set1, final Set<?> set2) {
+			if (set1.size() != set2.size()) {
+				return false;
+			}
+			for (Object o : set1) {
+				if (!set2.contains(o)) {
+					return false;
+				}
+			}
+			return true;
+		}
+	}
 }
