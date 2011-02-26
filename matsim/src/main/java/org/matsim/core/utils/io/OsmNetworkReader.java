@@ -84,9 +84,18 @@ public class OsmNetworkReader {
 
 	private final static Logger log = Logger.getLogger(OsmNetworkReader.class);
 
+	private static String TAG_LANES = "lanes";
+	private static String TAG_HIGHWAY = "highway";
+	private static String TAG_MAXSPEED = "maxspeed";
+	private static String TAG_JUNCTION = "junction";
+	private static String TAG_ONEWAY = "oneway";
+	private static String[] ALL_TAGS = new String[] {TAG_LANES, TAG_HIGHWAY, TAG_MAXSPEED, TAG_JUNCTION, TAG_ONEWAY};
+
 	private final Map<String, OsmNode> nodes = new HashMap<String, OsmNode>();
 	private final Map<String, OsmWay> ways = new HashMap<String, OsmWay>();
 	private final Set<String> unknownHighways = new HashSet<String>();
+	private final Set<String> unknownMaxspeedTags = new HashSet<String>();
+	private final Set<String> unknownLanesTags = new HashSet<String>();
 	private long id = 0;
 	private final Map<String, OsmHighwayDefaults> highwayDefaults = new HashMap<String, OsmHighwayDefaults>();
 	private final NetworkImpl network;
@@ -308,7 +317,7 @@ public class OsmNetworkReader {
 
 		// check which nodes are used
 		for (OsmWay way : this.ways.values()) {
-			String highway = way.tags.get("highway");
+			String highway = way.tags.get(TAG_HIGHWAY);
 			if ((highway != null) && (this.highwayDefaults.containsKey(highway))) {
 				// check to which level a way belongs
 				way.hierarchy = this.highwayDefaults.get(highway).hierarchy;
@@ -344,7 +353,7 @@ public class OsmNetworkReader {
 			}
 			// verify we did not mark nodes as unused that build a loop
 			for (OsmWay way : this.ways.values()) {
-				String highway = way.tags.get("highway");
+				String highway = way.tags.get(TAG_HIGHWAY);
 				if ((highway != null) && (this.highwayDefaults.containsKey(highway))) {
 					int prevRealNodeIndex = 0;
 					OsmNode prevRealNode = this.nodes.get(way.nodes.get(prevRealNodeIndex));
@@ -385,7 +394,7 @@ public class OsmNetworkReader {
 		// create the links
 		this.id = 1;
 		for (OsmWay way : this.ways.values()) {
-			String highway = way.tags.get("highway");
+			String highway = way.tags.get(TAG_HIGHWAY);
 			if (highway != null) {
 				OsmNode fromNode = this.nodes.get(way.nodes.get(0));
 				double length = 0.0;
@@ -421,10 +430,14 @@ public class OsmNetworkReader {
 				}
 			}
 		}
+
+		// free up memory
+		this.nodes.clear();
+		this.ways.clear();
 	}
 
 	private void createLink(final NetworkImpl network, final OsmWay way, final OsmNode fromNode, final OsmNode toNode, final double length) {
-		String highway = way.tags.get("highway");
+		String highway = way.tags.get(TAG_HIGHWAY);
 
 		// load defaults
 		OsmHighwayDefaults defaults = this.highwayDefaults.get(highway);
@@ -443,14 +456,14 @@ public class OsmNetworkReader {
 
 		// check if there are tags that overwrite defaults
 		// - check tag "junction"
-		if ("roundabout".equals(way.tags.get("junction"))) {
+		if ("roundabout".equals(way.tags.get(TAG_JUNCTION))) {
 			// if "junction" is not set in tags, get() returns null and equals() evaluates to false
 			oneway = true;
 		}
 
 		// check tag "oneway"
-		if (way.tags.containsKey("oneway")) {
-			String onewayTag = way.tags.get("oneway");
+		String onewayTag = way.tags.get(TAG_ONEWAY);
+		if (onewayTag != null) {
 			if ("yes".equals(onewayTag)) {
 				oneway = true;
 			} else if ("true".equals(onewayTag)) {
@@ -473,27 +486,36 @@ public class OsmNetworkReader {
 			}
 		}
 
-		if (way.tags.containsKey("maxspeed")) {
+		String maxspeedTag = way.tags.get(TAG_MAXSPEED);
+		if (maxspeedTag != null) {
 			try {
-				double maxspeed = Double.parseDouble(way.tags.get("maxspeed"));
+				double maxspeed = Double.parseDouble(maxspeedTag);
 				if (maxspeed < freespeed) {
 					// freespeed doesn't always mean it's the maximum speed allowed.
 					// thus only correct freespeed if maxspeed is lower than freespeed.
 					freespeed = maxspeed;
 				}
 			} catch (NumberFormatException e) {
-				log.warn("Could not parse freespeed tag:" + e.getMessage() + ". Ignoring it.");
+				if (!this.unknownMaxspeedTags.contains(maxspeedTag)) {
+					this.unknownMaxspeedTags.add(maxspeedTag);
+					log.warn("Could not parse maxspeed tag:" + e.getMessage() + ". Ignoring it.");
+				}
 			}
 		}
 
 		// check tag "lanes"
-		if (way.tags.containsKey("lanes")) {
+		String lanesTag = way.tags.get(TAG_LANES);
+		if (lanesTag != null) {
 			try {
-				if(Double.parseDouble(way.tags.get("lanes")) > 0){
-					nofLanes = Double.parseDouble(way.tags.get("lanes"));
+				double tmp = Double.parseDouble(lanesTag);
+				if (tmp > 0) {
+					nofLanes = tmp;
 				}
 			} catch (Exception e) {
-				log.warn("Could not parse lanes tag:" + e.getMessage() + ". Ignoring it.");
+				if (!this.unknownLanesTags.contains(lanesTag)) {
+					this.unknownLanesTags.add(lanesTag);
+					log.warn("Could not parse lanes tag:" + e.getMessage() + ". Ignoring it.");
+				}
 			}
 		}
 
@@ -556,8 +578,8 @@ public class OsmNetworkReader {
 
 	private static class OsmWay {
 		public final long id;
-		public final List<String> nodes = new ArrayList<String>();
-		public final Map<String, String> tags = new HashMap<String, String>();
+		public final List<String> nodes = new ArrayList<String>(4);
+		public final Map<String, String> tags = new HashMap<String, String>(4);
 		public int hierarchy = -1;
 
 		public OsmWay(final long id) {
@@ -647,7 +669,13 @@ public class OsmNetworkReader {
 				}
 			} else if ("tag".equals(name)) {
 				if (this.currentWay != null) {
-					this.currentWay.tags.put(StringCache.get(atts.getValue("k")), StringCache.get(atts.getValue("v")));
+					String key = StringCache.get(atts.getValue("k"));
+					for (String tag : ALL_TAGS) {
+						if (tag.equals(key)) {
+							this.currentWay.tags.put(key, StringCache.get(atts.getValue("v")));
+							break;
+						}
+					}
 				}
 			}
 		}
@@ -656,18 +684,11 @@ public class OsmNetworkReader {
 		public void endTag(final String name, final String content, final Stack<String> context) {
 			if ("way".equals(name)) {
 				boolean used = false;
-				OsmHighwayDefaults osmHighwayDefaults = highwayDefaults.get(this.currentWay.tags.get("highway"));
+				OsmHighwayDefaults osmHighwayDefaults = highwayDefaults.get(this.currentWay.tags.get(TAG_HIGHWAY));
 				if (osmHighwayDefaults != null) {
 					int hierarchy = osmHighwayDefaults.hierarchy;
 					this.currentWay.hierarchy = hierarchy;
 					if (hierarchyLayers.isEmpty()) {
-//						for (String nodeId : this.currentWay.nodes) {
-//							OsmNode node = nodes.get(nodeId);
-//							if(node != null) {
-//								used = true;
-//								break;
-//							}
-//						}
 						used = true;
 					}
 					if (this.collectNodes) {
