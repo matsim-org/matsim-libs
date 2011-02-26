@@ -20,6 +20,7 @@ Changes:
   - OsmNetworkReader has option to reduce memory consumption, but will run slower (off by default) (r13910)
   - selection, which mobsim should be used, simplified by specific config-parameter (controler.mobsim) (r14325)
   - new population file format: population_v5 (r14369)
+  - Networks now need about 25% less memory to load (r14418) 
   - ?
 
 - BugFixes:
