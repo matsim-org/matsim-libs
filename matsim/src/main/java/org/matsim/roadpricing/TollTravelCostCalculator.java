@@ -49,6 +49,7 @@ public class TollTravelCostCalculator implements PersonalizableTravelCost {
 
 	}
 
+	@Override
 	public double getLinkGeneralizedTravelCost(final Link link, final double time) {
 		double baseCost = this.costHandler.getLinkGeneralizedTravelCost(link, time);
 		double tollCost = this.tollCostHandler.getTollCost(link, time);
@@ -60,6 +61,7 @@ public class TollTravelCostCalculator implements PersonalizableTravelCost {
 	}
 
 	/*package*/ class DistanceTollCostBehaviour implements TollRouterBehaviour {
+		@Override
 		public double getTollCost(final Link link, final double time) {
 			Cost cost = TollTravelCostCalculator.this.scheme.getLinkCost(link.getId(), time);
 			if (cost == null) {
@@ -70,6 +72,7 @@ public class TollTravelCostCalculator implements PersonalizableTravelCost {
 	}
 
 	/*package*/ class AreaTollCostBehaviour implements TollRouterBehaviour {
+		@Override
 		public double getTollCost(final Link link, final double time) {
 			RoadPricingScheme.Cost cost = TollTravelCostCalculator.this.scheme.getLinkCost(link.getId(), time);
 			if (cost == null) {
@@ -83,6 +86,7 @@ public class TollTravelCostCalculator implements PersonalizableTravelCost {
 	}
 
 	/*package*/ class CordonTollCostBehaviour implements TollRouterBehaviour {
+		@Override
 		public double getTollCost(final Link link, final double time) {
 			RoadPricingScheme.Cost cost = TollTravelCostCalculator.this.scheme.getLinkCost(link.getId(), time);
 			if (cost == null) {

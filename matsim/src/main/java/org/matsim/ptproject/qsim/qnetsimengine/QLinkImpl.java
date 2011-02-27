@@ -623,6 +623,7 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 	 * @return Returns the maximum number of vehicles that can be placed on the
 	 *         link at a time.
 	 */
+	@Override
 	/*package*/ double getStorageCapacity() {
 		return this.storageCapacity;
 	}
@@ -821,10 +822,12 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 	static class Hole implements QItem {
 		private double earliestLinkEndTime ;
 
+		@Override
 		public double getEarliestLinkExitTime() {
 			return earliestLinkEndTime;
 		}
 
+		@Override
 		public void setEarliestLinkExitTime(double earliestLinkEndTime) {
 			this.earliestLinkEndTime = earliestLinkEndTime;
 		}

@@ -59,22 +59,27 @@ public class CoordImpl implements Serializable, Coord {
 		return Math.sqrt((xDiff*xDiff) + (yDiff*yDiff));
 	}
 
+	@Override
 	public double getX() {
 		return this.x;
 	}
 
+	@Override
 	public double getY() {
 		return this.y;
 	}
 
+	@Override
 	public void setX(final double x) {
 		this.x = x;
 	}
 
+	@Override
 	public void setY(final double y) {
 		this.y = y;
 	}
 
+	@Override
 	public void setXY(final double x, final double y) {
 		this.x = x;
 		this.y = y;

@@ -80,6 +80,7 @@ public class LineStringBasedFeatureGenerator implements FeatureGenerator{
 	}
 
 
+	@Override
 	public Feature getFeature(final Link link) {
 		double width = this.widthCalculator.getWidth(link);
 		LineString ls = this.geofac.createLineString(new Coordinate[] {MGC.coord2Coordinate(link.getFromNode().getCoord()),

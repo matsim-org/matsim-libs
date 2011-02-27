@@ -32,18 +32,22 @@ public class EngineInformationImpl implements EngineInformation {
 		this.setGasConsumption(literPerMeter);
 	}
 
+	@Override
 	public FuelType getFuelType() {
 		return this.fuelType;
 	}
 
+	@Override
 	public double getGasConsumption() {
 		return this.gasConsumption;
 	}
 
+	@Override
 	public void setFuelType(FuelType fueltype) {
 		this.fuelType = fueltype;
 	}
 
+	@Override
 	public void setGasConsumption(double literPerMeter) {
 		this.gasConsumption = literPerMeter ;
 	}

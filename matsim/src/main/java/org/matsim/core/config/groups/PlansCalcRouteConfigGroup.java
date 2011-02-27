@@ -103,6 +103,7 @@ public class PlansCalcRouteConfigGroup extends Module {
 		return map;
 	}
 	
+	@Override
 	public final Map<String, String> getComments() {
 		Map<String,String> map = super.getComments();
 		map.put(PT_SPEED_FACTOR, "factor with which times from the car freespeed travel time " +

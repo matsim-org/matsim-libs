@@ -46,6 +46,7 @@ public abstract class MatsimJaxbXmlWriter implements MatsimWriter {
 	/**
 	 * Might not work with .gz files if the Writer given to the marshaller is not closed after marshalling. Dg June2010
 	 */
+	@Override
 	public abstract void write(String filename);
 	
 }

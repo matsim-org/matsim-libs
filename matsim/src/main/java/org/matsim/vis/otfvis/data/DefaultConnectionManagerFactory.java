@@ -37,6 +37,7 @@ public class DefaultConnectionManagerFactory implements OTFConnectionManagerFact
 	/**
 	 * @see org.matsim.vis.otfvis.data.OTFConnectionManagerFactory#createConnectionManager()
 	 */
+	@Override
 	public OTFConnectionManager createConnectionManager(){
 		OTFConnectionManager connect = new OTFConnectionManager();
 		connect.connectQLinkToWriter(OTFLinkLanesAgentsNoParkingHandler.Writer.class);

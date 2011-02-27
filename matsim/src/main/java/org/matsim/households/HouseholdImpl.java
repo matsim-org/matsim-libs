@@ -37,18 +37,22 @@ public class HouseholdImpl implements Household {
 		this.id = id;
 	}
 
+	@Override
 	public Id getId() {
 		return this.id;
 	}
 
+	@Override
 	public Income getIncome() {
 		return this.income;
 	}
 
+	@Override
 	public List<Id> getMemberIds() {
 		return this.memberIds;
 	}
 
+	@Override
 	public List<Id> getVehicleIds() {
 		return this.vehicleDefinitionIds;
 	}
@@ -57,6 +61,7 @@ public class HouseholdImpl implements Household {
 		this.memberIds = memberIds;
 	}
 
+	@Override
 	public void setIncome(Income income) {
 		this.income = income;
 	}

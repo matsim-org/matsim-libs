@@ -31,6 +31,7 @@ import org.matsim.core.api.internal.MatsimToplevelContainer;
  */
 public interface AmberTimesData extends MatsimToplevelContainer {
 	
+	@Override
 	public AmberTimesDataFactory getFactory();
 	
 	public Double getDefaultAmberTimeGreen();

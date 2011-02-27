@@ -18,22 +18,27 @@ public class UmlaufStueck implements UmlaufStueckI {
 		this.departure = departure;
 	}
 
+	@Override
 	public TransitLine getLine() {
 		return line;
 	}
 
+	@Override
 	public TransitRoute getRoute() {
 		return route;
 	}
 
+	@Override
 	public Departure getDeparture() {
 		return departure;
 	}
 
+	@Override
 	public NetworkRoute getCarRoute() {
 		return route.getRoute();
 	}
 
+	@Override
 	public boolean isFahrt() {
 		return true;
 	}

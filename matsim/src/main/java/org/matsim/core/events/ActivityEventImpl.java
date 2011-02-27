@@ -54,14 +54,17 @@ abstract class ActivityEventImpl extends PersonEventImpl implements ActivityEven
 		return attr;
 	}
 
+	@Override
 	public String getActType() {
 		return this.acttype;
 	}
 
+	@Override
 	public Id getLinkId() {
 		return this.linkId;
 	}
 
+	@Override
 	public Id getFacilityId() {
 		return this.facilityId;
 	}

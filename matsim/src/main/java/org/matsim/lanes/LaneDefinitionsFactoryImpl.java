@@ -31,12 +31,14 @@ public class LaneDefinitionsFactoryImpl implements LaneDefinitionsFactory {
 	/**
 	 * @see org.matsim.lanes.LaneDefinitionsFactory#createLanesToLinkAssignment(org.matsim.api.core.v01.Id)
 	 */
+	@Override
 	public LanesToLinkAssignment createLanesToLinkAssignment(Id linkIdReference) {
 		return new LanesToLinkAssignmentImpl(linkIdReference);
 	}
 	/**
 	 * @see org.matsim.lanes.LaneDefinitionsFactory#createLane(org.matsim.api.core.v01.Id)
 	 */
+	@Override
 	public Lane createLane(Id id) {
 		return new LaneImpl(id);
 	}

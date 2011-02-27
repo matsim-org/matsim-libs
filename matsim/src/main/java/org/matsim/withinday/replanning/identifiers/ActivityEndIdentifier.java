@@ -46,6 +46,7 @@ public class ActivityEndIdentifier extends DuringActivityIdentifier {
 		this.activityReplanningMap = activityReplanningMap;
 	}
 	
+	@Override
 	public Set<WithinDayAgent> getAgentsToReplan(double time, Id withinDayReplannerId) {
 		List<PersonAgent> activityPerformingAgents = activityReplanningMap.getReplanningDriverAgents(time);
 

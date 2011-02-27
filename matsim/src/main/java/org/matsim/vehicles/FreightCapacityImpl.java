@@ -27,10 +27,12 @@ public class FreightCapacityImpl implements FreightCapacity {
 
 	private double volume;
 	
+	@Override
 	public void setVolume(double cubicMeters) {
 		this.volume = cubicMeters;
 	}
 	
+	@Override
 	public double getVolume() {
 		return this.volume;
 	}

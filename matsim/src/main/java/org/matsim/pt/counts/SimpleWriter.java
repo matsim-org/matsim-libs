@@ -91,6 +91,7 @@ public class SimpleWriter implements Closeable, Flushable {
 		write('\n');
 	}
 
+	@Override
 	public void close() {
 		try {
 			writer.close();
@@ -99,6 +100,7 @@ public class SimpleWriter implements Closeable, Flushable {
 		}
 	}
 
+	@Override
 	public void flush() {
 		try {
 			writer.flush();

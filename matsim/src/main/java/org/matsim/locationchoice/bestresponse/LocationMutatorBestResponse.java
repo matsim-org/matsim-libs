@@ -163,7 +163,7 @@ public class LocationMutatorBestResponse extends LocationMutatorwChoiceSet {
 	
 	private void setLocation(ActivityImpl act, Id facilityId) {
 		act.setFacilityId(facilityId);
-		act.setLinkId((Id)((NetworkImpl) this.network).getNearestLink(this.facilities.getFacilities().get(facilityId).getCoord()).getId());
+		act.setLinkId(((NetworkImpl) this.network).getNearestLink(this.facilities.getFacilities().get(facilityId).getCoord()).getId());
    		act.setCoord(this.facilities.getFacilities().get(facilityId).getCoord());
 	}
 	

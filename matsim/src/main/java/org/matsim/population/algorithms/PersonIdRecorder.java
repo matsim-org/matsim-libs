@@ -39,6 +39,7 @@ public class PersonIdRecorder extends AbstractPersonAlgorithm implements PlanAlg
 		ids.add(person.getId());	
 }
 
+	@Override
 	public void run(Plan plan) {
 		this.run(plan.getPerson());
 	}

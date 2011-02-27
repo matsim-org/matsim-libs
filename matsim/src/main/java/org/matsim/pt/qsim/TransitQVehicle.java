@@ -46,6 +46,7 @@ public class TransitQVehicle extends QVehicleImpl implements TransitVehicle {
 				(capacity.getStandingRoom() == null ? 0 : capacity.getStandingRoom().intValue() )- 1; //the driver takes also the seat
 	}
 
+	@Override
 	public boolean addPassenger(final PassengerAgent passenger) {
 		if (this.passengers.size() < this.passengerCapacity) {
 			return this.passengers.add(passenger);
@@ -53,14 +54,17 @@ public class TransitQVehicle extends QVehicleImpl implements TransitVehicle {
 		return false;
 	}
 
+	@Override
 	public int getPassengerCapacity() {
 		return this.passengerCapacity;
 	}
 
+	@Override
 	public Collection<PassengerAgent> getPassengers() {
 		return Collections.unmodifiableList(this.passengers);
 	}
 
+	@Override
 	public boolean removePassenger(final PassengerAgent passenger) {
 		boolean removed = this.passengers.remove(passenger);
 		return removed;
@@ -70,6 +74,7 @@ public class TransitQVehicle extends QVehicleImpl implements TransitVehicle {
 		this.stopHandler = stopHandler;
 	}
 
+	@Override
 	public TransitStopHandler getStopHandler() {
 		return this.stopHandler;
 	}

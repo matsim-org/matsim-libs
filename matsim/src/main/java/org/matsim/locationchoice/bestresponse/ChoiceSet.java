@@ -99,7 +99,7 @@ public class ChoiceSet {
 		LeastCostPathCalculator leastCostPathCalculatorForward = dijkstraFactory.createPathCalculator(network, travelCost, travelTime);
 				
 		Activity previousActivity = ((PlanImpl)plan).getPreviousActivity(((PlanImpl)plan).
-				getPreviousLeg((ActivityImpl)act));
+				getPreviousLeg(act));
 		Node fromNode = network.getLinks().get(previousActivity.getLinkId()).getToNode();
 		((ForwardDijkstraMultipleDestinations)leastCostPathCalculatorForward).calcLeastCostTree(fromNode, previousActivity.getEndTime());
 		
@@ -109,7 +109,7 @@ public class ChoiceSet {
 		
 		// TODO: adapt startTime here: --------------------------------------------------
 		Activity nextActivity = ((PlanImpl)plan).getNextActivity(((PlanImpl)plan).
-				getNextLeg((ActivityImpl)act));
+				getNextLeg(act));
 		fromNode = network.getLinks().get(nextActivity.getLinkId()).getToNode();
 		((BackwardDijkstraMultipleDestinations)leastCostPathCalculatorBackward).calcLeastCostTree(fromNode, -1.0);
 		
@@ -122,7 +122,7 @@ public class ChoiceSet {
 			// tentatively set 
 			((ActivityImpl)act).setFacilityId(destinationId);
 			((ActivityImpl)act).setCoord(facilities.getFacilities().get(destinationId).getCoord());
-			((ActivityImpl)act).setLinkId((Id)((NetworkImpl) this.network).getNearestLink(facilities.getFacilities().get(destinationId).getCoord()).getId());
+			((ActivityImpl)act).setLinkId(((NetworkImpl) this.network).getNearestLink(facilities.getFacilities().get(destinationId).getCoord()).getId());
 			
 			scoringFunction.reset();
 			PlanImpl planTmp = new PlanImpl();

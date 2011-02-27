@@ -43,10 +43,12 @@ public class TransitLineImpl implements TransitLine {
 		this.lineId = id;
 	}
 
+	@Override
 	public Id getId() {
 		return this.lineId;
 	}
 
+	@Override
 	public void addRoute(final TransitRoute transitRoute) {
 		final Id id = transitRoute.getId();
 		if (this.transitRoutes.containsKey(id)) {
@@ -55,10 +57,12 @@ public class TransitLineImpl implements TransitLine {
 		this.transitRoutes.put(id, transitRoute);
 	}
 
+	@Override
 	public Map<Id, TransitRoute> getRoutes() {
 		return Collections.unmodifiableMap(this.transitRoutes);
 	}
 
+	@Override
 	public boolean removeRoute(final TransitRoute route) {
 		return null != this.transitRoutes.remove(route.getId());
 	}

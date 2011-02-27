@@ -22,5 +22,6 @@ package org.matsim.withinday.replanning.identifiers.interfaces;
 
 public interface DuringActivityIdentifierFactory extends IdentifierFactory {
 
+	@Override
 	public DuringActivityIdentifier createIdentifier();
 }

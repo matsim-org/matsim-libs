@@ -32,6 +32,7 @@ public class PtOccupancyCountComparisonAlgorithm extends
 		super(oa, counts, net, countsScaleFactor);
 	}
 
+	@Override
 	protected int[] getVolumesForStop(Id stopId) {
 		return this.oa.getOccupancyVolumesForStop(stopId);
 	}

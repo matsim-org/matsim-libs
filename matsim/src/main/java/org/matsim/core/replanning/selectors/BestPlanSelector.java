@@ -33,6 +33,7 @@ public class BestPlanSelector implements PlanSelector {
 	/**
 	 * selects the plan with the highest score from the person
 	 */
+	@Override
 	public Plan selectPlan(final Person person) {
 
 		double maxScore = Double.NEGATIVE_INFINITY;

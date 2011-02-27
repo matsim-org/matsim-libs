@@ -256,6 +256,7 @@ public class PreProcessLandmarks extends PreProcessEuclidean {
 			this.landmarkIndex = landmarkIndex;
 		}
 
+		@Override
 		public int compare(final Node n1, final Node n2) {
 
 			double c1 = ((LandmarksData) this.roleData.get(n1)).getToLandmarkTravelTime(this.landmarkIndex);

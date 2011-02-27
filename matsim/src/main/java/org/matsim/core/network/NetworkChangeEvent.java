@@ -193,6 +193,7 @@ public class NetworkChangeEvent {
 
 	public static class StartTimeComparator implements Comparator<NetworkChangeEvent>, Serializable {
 		private static final long serialVersionUID = 1L;
+		@Override
 		public int compare(NetworkChangeEvent o1, NetworkChangeEvent o2) {
 			return Double.compare(o1.getStartTime(), o2.getStartTime());
 		}

@@ -46,6 +46,7 @@ public class AStarLandmarksFactory implements LeastCostPathCalculatorFactory {
 		}
 	}
 	
+	@Override
 	public LeastCostPathCalculator createPathCalculator(Network network,
 			TravelCost travelCosts, TravelTime travelTimes) {
 		return new AStarLandmarks(network, this.preProcessData, travelCosts, travelTimes);

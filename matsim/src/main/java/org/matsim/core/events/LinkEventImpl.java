@@ -43,6 +43,7 @@ public abstract class LinkEventImpl extends PersonEventImpl implements LinkEvent
 		return attr;
 	}
 
+	@Override
 	public Id getLinkId() {
 		return this.linkId;
 	}

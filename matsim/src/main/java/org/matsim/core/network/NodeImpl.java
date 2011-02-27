@@ -86,6 +86,7 @@ public class NodeImpl implements Node {
 	}
 
 	private static int cnt2 = 0 ;
+	@Override
 	public final boolean addInLink(Link inlink) {
 		Id linkid = inlink.getId();
 		if (this.inlinks.containsKey(linkid)) {
@@ -101,6 +102,7 @@ public class NodeImpl implements Node {
 	}
 
 	private static int cnt = 0 ;
+	@Override
 	public final boolean addOutLink(Link outlink) {
 		Id linkid = outlink.getId();
 		if (this.outlinks.containsKey(linkid)) {
@@ -178,18 +180,22 @@ public class NodeImpl implements Node {
 		return nodes;
 	}
 
+	@Override
 	public Map<Id, ? extends Link> getInLinks() {
 		return this.inlinks;
 	}
 
+	@Override
 	public Map<Id, ? extends Link> getOutLinks() {
 		return this.outlinks;
 	}
 
+	@Override
 	public Coord getCoord() {
 		return this.coord;
 	}
 
+	@Override
 	public Id getId() {
 		return this.id;
 	}

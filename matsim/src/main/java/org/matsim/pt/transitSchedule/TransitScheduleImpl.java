@@ -48,6 +48,7 @@ public class TransitScheduleImpl implements TransitSchedule {
 		this.factory = builder;
 	}
 
+	@Override
 	public void addTransitLine(final TransitLine line) {
 		final Id id = line.getId();
 		if (this.transitLines.containsKey(id)) {
@@ -56,6 +57,7 @@ public class TransitScheduleImpl implements TransitSchedule {
 		this.transitLines.put(id, line);
 	}
 	
+	@Override
 	public void addStopFacility(final TransitStopFacility stop) {
 		final Id id = stop.getId();
 		if (this.stopFacilities.containsKey(id)) {
@@ -64,14 +66,17 @@ public class TransitScheduleImpl implements TransitSchedule {
 		this.stopFacilities.put(id, stop);
 	}
 
+	@Override
 	public Map<Id, TransitLine> getTransitLines() {
 		return Collections.unmodifiableMap(this.transitLines);
 	}
 	
+	@Override
 	public Map<Id, TransitStopFacility> getFacilities() {
 		return Collections.unmodifiableMap(this.stopFacilities);
 	}
 	
+	@Override
 	public TransitScheduleFactory getFactory() {
 		return this.factory;
 	}

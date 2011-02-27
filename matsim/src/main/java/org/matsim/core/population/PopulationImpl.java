@@ -66,6 +66,7 @@ public class PopulationImpl implements Population {
 	// add methods
 	//////////////////////////////////////////////////////////////////////
 
+	@Override
 	public final void addPerson(final Person p) {
 		// validation
 		if (this.getPersons().containsKey(p.getId())) {
@@ -143,6 +144,7 @@ public class PopulationImpl implements Population {
 	//////////////////////////////////////////////////////////////////////
 
 
+	@Override
 	public final Map<Id, ? extends Person> getPersons() {
 		return persons ;
 	}
@@ -171,16 +173,19 @@ public class PopulationImpl implements Population {
 		log.info(" person # " + this.counter);
 	}
 
+	@Override
 	public PopulationFactory getFactory() {
 		return this.pb;
 	}
 	
 	private String name ;
 
+	@Override
 	public String getName() {
 		return this.name ;
 	}
 
+	@Override
 	public void setName(String name) {
 		this.name = name ;
 	}

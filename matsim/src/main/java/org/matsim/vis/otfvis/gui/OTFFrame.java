@@ -93,7 +93,8 @@ public class OTFFrame extends JFrame {
 				});
 				optionPane.addPropertyChangeListener(
 				    new PropertyChangeListener() {
-				        public void propertyChange(PropertyChangeEvent e) {
+				        @Override
+								public void propertyChange(PropertyChangeEvent e) {
 				            String prop = e.getPropertyName();
 
 				            if (dialog.isVisible()

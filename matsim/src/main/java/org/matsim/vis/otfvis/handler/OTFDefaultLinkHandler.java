@@ -76,6 +76,7 @@ public class OTFDefaultLinkHandler extends OTFDataReader {
 			out.putFloat((float)0.) ; // yy this should be fixed in the binary channel but I am not sure if it is worth it.  kai, apr'10
 		}
 
+		@Override
 		public OTFDataWriter<VisLink> getWriter() {
 			return new Writer();
 		}

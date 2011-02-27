@@ -44,6 +44,7 @@ public class KnowledgesImpl implements Knowledges {
 	/**
 	 * @see org.matsim.knowledges.Knowledges#getKnowledgesByPersonId()
 	 */
+	@Override
 	public Map<Id, KnowledgeImpl> getKnowledgesByPersonId() {
 		return this.knowledgeByPersonId;
 	}
@@ -51,6 +52,7 @@ public class KnowledgesImpl implements Knowledges {
 	/**
 	 * @see org.matsim.knowledges.Knowledges#getFactory()
 	 */
+	@Override
 	public KnowledgesFactory getFactory(){
 		return this.factory;
 	}

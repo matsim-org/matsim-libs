@@ -34,6 +34,7 @@ public interface SignalData extends Identifiable {
 	/**
 	 * @return the Id of the Signal 
 	 */
+	@Override
 	public Id getId();
 	/**
 	 * @return the Id of the Link the signal is located on.

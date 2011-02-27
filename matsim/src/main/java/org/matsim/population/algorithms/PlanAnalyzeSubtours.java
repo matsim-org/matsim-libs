@@ -54,6 +54,7 @@ public class PlanAnalyzeSubtours implements PlanAlgorithm {
 	private List<Integer> lastIndexOfSubtours;
 	private TripStructureAnalysisLayerOption tripStructureAnalysisLayer = TripStructureAnalysisLayerOption.facility;
 
+	@Override
 	public void run(final Plan plan) {
 		this.locationIds = new ArrayList<Id>();
 		this.subTours = new ArrayList<List<PlanElement>>();

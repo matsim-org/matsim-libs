@@ -24,7 +24,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.ptproject.qsim.agents.WithinDayAgent;
-import org.matsim.withinday.replanning.replanners.NextLegReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
 import org.matsim.withinday.utils.EditRoutes;
 
@@ -36,11 +35,11 @@ import org.matsim.withinday.utils.EditRoutes;
  */
 
 public class NextLegReplanner extends WithinDayDuringActivityReplanner {
-		
+
 	/*package*/ NextLegReplanner(Id id, Scenario scenario) {
 		super(id, scenario);
 	}
-	
+
 	/*
 	 * Idea:
 	 * MATSim Routers create Routes for complete plans.
@@ -48,10 +47,10 @@ public class NextLegReplanner extends WithinDayDuringActivityReplanner {
 	 * a new Plan that contains only this Route. This Plan is replanned by sending it
 	 * to the Router.
 	 *
-	 * Attention! The Replanner is started when the Activity of a Person ends and the Vehicle 
-	 * is added to the Waiting List of its QueueLink. That means that a Person replans 
+	 * Attention! The Replanner is started when the Activity of a Person ends and the Vehicle
+	 * is added to the Waiting List of its QueueLink. That means that a Person replans
 	 * his Route at time A but enters the QueueLink at time B.
-	 * A short example: If all Persons of a network end their Activities at the same time 
+	 * A short example: If all Persons of a network end their Activities at the same time
 	 * and have the same Start- and Endpoints of their Routes they will all use the same
 	 * route (if they use the same router). If they would replan their routes when they really
 	 * Enter the QueueLink this would not happen because the enter times would be different
@@ -59,29 +58,29 @@ public class NextLegReplanner extends WithinDayDuringActivityReplanner {
 	 * of such a functionality would be a problem due to the structure of MATSim...
 	 */
 	@Override
-	public boolean doReplanning(WithinDayAgent withinDayAgent) {		
+	public boolean doReplanning(WithinDayAgent withinDayAgent) {
 		// If we don't have a valid Replanner.
 		if (this.routeAlgo == null) return false;
-		
+
 		// If we don't have a valid personAgent
 		if (withinDayAgent == null) return false;
-				
-		Plan executedPlan = withinDayAgent.getExecutedPlan(); 
-		
+
+		Plan executedPlan = withinDayAgent.getExecutedPlan();
+
 		// If we don't have an executed plan
 		if (executedPlan == null) return false;
-				
+
 		/*
 		 *  Get the index of the current PlanElement
 		 */
 		int currentPlanElementIndex = withinDayAgent.getCurrentPlanElementIndex();
-				
+
 		// new Route for next Leg
 		new EditRoutes().replanFutureLegRoute(executedPlan, currentPlanElementIndex + 1, routeAlgo);
 
 //		// create ReplanningEvent
 //		QSim.getEvents().processEvent(new ExtendedAgentReplanEventImpl(time, person.getId(), (NetworkRouteWRefs)alternativeRoute, (NetworkRouteWRefs)originalRoute));
-				
+
 		return true;
 	}
 

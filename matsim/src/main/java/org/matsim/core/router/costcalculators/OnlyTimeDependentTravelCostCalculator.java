@@ -48,10 +48,12 @@ public class OnlyTimeDependentTravelCostCalculator implements TravelMinCost, Per
 		} else this.timeCalculator = timeCalculator;
 	}
 
+	@Override
 	public double getLinkGeneralizedTravelCost(final Link link, final double time) {
 		return this.timeCalculator.getLinkTravelTime(link, time);
 	}
 
+	@Override
 	public double getLinkMinimumTravelCost(final Link link) {
 		return this.timeCalculator.getLinkTravelTime(link, Time.UNDEFINED_TIME);
 	}

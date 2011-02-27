@@ -58,8 +58,10 @@ public interface TransitVehicle extends QVehicle {
 	/**
 	 * @return the <code>BasicVehicle</code> that this simulation vehicle represents
 	 */
+	@Override
 	public Vehicle getVehicle();
 
+	@Override
 	public PersonDriverAgent getDriver();
 	
 	public TransitStopHandler getStopHandler();

@@ -29,6 +29,7 @@ import org.matsim.households.Income.IncomePeriod;
  */
 public class HouseholdsFactoryImpl implements HouseholdsFactory {
 
+	@Override
 	public HouseholdImpl createHousehold(Id householdId) {
 		HouseholdImpl hh = new HouseholdImpl(householdId);
 		hh.setMemberIds(new ArrayList<Id>());
@@ -36,6 +37,7 @@ public class HouseholdsFactoryImpl implements HouseholdsFactory {
 		return hh;
 	}
 	
+	@Override
 	public Income createIncome(double income, IncomePeriod period) {
 		return new IncomeImpl(income, period);
 	}

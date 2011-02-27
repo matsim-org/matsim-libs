@@ -47,10 +47,12 @@ public class TravelTimeDataHashMap implements TravelTimeData {
 //		resetTravelTimes();
 	}
 
+	@Override
 	public void resetTravelTimes() {
 		this.travelTimes.clear();
 	}
 
+	@Override
 	public void addTravelTime(final int timeSlice, final double traveltime) {
 		TimeStruct curr = this.travelTimes.get(IntegerCache.getInteger(timeSlice));
 		if (curr != null) {
@@ -61,6 +63,7 @@ public class TravelTimeDataHashMap implements TravelTimeData {
 		}
 	}
 
+	@Override
 	public double getTravelTime(final int timeSlice, final double now) {
 
 		TimeStruct ts = this.travelTimes.get(IntegerCache.getInteger(timeSlice));

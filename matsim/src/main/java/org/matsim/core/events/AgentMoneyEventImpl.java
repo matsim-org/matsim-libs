@@ -67,6 +67,7 @@ public final class AgentMoneyEventImpl extends PersonEventImpl implements AgentM
 		return attr;
 	}
 
+	@Override
 	public double getAmount() {
 		return this.amount;
 	}

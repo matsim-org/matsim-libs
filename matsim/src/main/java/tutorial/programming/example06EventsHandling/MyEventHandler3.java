@@ -29,10 +29,12 @@ public class MyEventHandler3 implements LinkEnterEventHandler {
 		return (int)time/3600;
 	}
 
+	@Override
 	public void reset(int iteration) {
 		this.volumeLink6 = new double[24];
 	}
 
+	@Override
 	public void handleEvent(LinkEnterEvent event) {
 		if (event.getLinkId().equals(new IdImpl("6"))) {
 			this.volumeLink6[getSlot(event.getTime())]++;

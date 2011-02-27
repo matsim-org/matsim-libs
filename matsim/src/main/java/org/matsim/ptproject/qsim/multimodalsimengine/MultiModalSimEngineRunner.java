@@ -67,7 +67,8 @@ public class MultiModalSimEngineRunner extends MultiModalSimEngine implements Ru
 	 * By doing so we ensure, that no Links to activate are added to another Thread
 	 * which is still processing its List.
 	 */
-	/*package*/ void reactivateLinks() {
+	/*package*/ @Override
+	void reactivateLinks() {
 		try {
 			super.reactivateLinks();
 			reactivateLinksBarrier.await();
@@ -83,7 +84,8 @@ public class MultiModalSimEngineRunner extends MultiModalSimEngine implements Ru
 	 * By doing so we ensure, that no Nodes to activate are added to another Thread
 	 * which is still processing its List.
 	 */
-	/*package*/ void reactivateNodes() {
+	/*package*/ @Override
+	void reactivateNodes() {
 		try {
 			super.reactivateNodes();
 			reactivateNodesBarrier.await();

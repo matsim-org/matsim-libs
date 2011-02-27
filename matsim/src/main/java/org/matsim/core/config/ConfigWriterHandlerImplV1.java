@@ -30,10 +30,12 @@ public class ConfigWriterHandlerImplV1 implements ConfigWriterHandler {
 	// <config ... > ... </config>
 	//////////////////////////////////////////////////////////////////////
 
+	@Override
 	public void startConfig(final Config config, final BufferedWriter out) throws IOException {
 		out.write("<config>\n\n");
 	}
 
+	@Override
 	public void endConfig(final BufferedWriter out) throws IOException {
 		out.write("</config>\n");
 	}
@@ -42,6 +44,7 @@ public class ConfigWriterHandlerImplV1 implements ConfigWriterHandler {
 // <module ... > ... </module>
 //////////////////////////////////////////////////////////////////////
 
+	@Override
 	public void writeModule(final Module module, final BufferedWriter out) throws IOException {
 		Map<String, String> params = module.getParams();
 		Map<String, String> comments = module.getComments();
@@ -62,6 +65,7 @@ public class ConfigWriterHandlerImplV1 implements ConfigWriterHandler {
 	// <!-- ============ ... ========== -->
 	//////////////////////////////////////////////////////////////////////
 
+	@Override
 	public void writeSeparator(final BufferedWriter out) throws IOException {
 		out.write("<!-- =================================================" +
 							"===================== -->\n\n");

@@ -56,6 +56,7 @@ public class CalcAverageTolledTripLength implements LinkEnterEventHandler, Agent
 		this.agentDistance = new TreeMap<Id, Double>();
 	}
 
+	@Override
 	public void handleEvent(final LinkEnterEvent event) {
 		
 		// getting the (monetary? generalized?) cost of the link
@@ -84,6 +85,7 @@ public class CalcAverageTolledTripLength implements LinkEnterEventHandler, Agent
 		}
 	}
 
+	@Override
 	public void handleEvent(final AgentArrivalEvent event) {
 		// at arrival of the agent ...
 		
@@ -102,6 +104,7 @@ public class CalcAverageTolledTripLength implements LinkEnterEventHandler, Agent
 //		this.cntTrips++;
 	}
 
+	@Override
 	public void reset(final int iteration) {
 		this.sumLength = 0.0;
 		this.cntTrips = 0;

@@ -21,6 +21,7 @@ public class ComparableEvent implements Comparable<ComparableEvent> {
 	}
 
 	// for events with same time stamp: leave < arrival < departure < enter
+	@Override
 	public int compareTo(ComparableEvent otherEvent) {
 		if (event.getTime()<otherEvent.getEvent().getTime()){
 			return -1;

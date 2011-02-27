@@ -54,15 +54,18 @@ public class LinkTravelTimeCounter implements LinkEnterEventHandler, LinkLeaveEv
 		events.addHandler(instance);
 	}
 
+	@Override
 	public void handleEvent(final LinkEnterEvent event) {
 		this.enterEvents.put(event.getPersonId(), Double.valueOf(event.getTime()));
 	}
 
+	@Override
 	public void reset(final int iteration) {
 		this.enterEvents.clear();
 		this.travelTimes.clear();
 	}
 
+	@Override
 	public void handleEvent(final LinkLeaveEvent event) {
 		Double startTime = this.enterEvents.get(event.getPersonId());
 		if (startTime != null) {
@@ -70,6 +73,7 @@ public class LinkTravelTimeCounter implements LinkEnterEventHandler, LinkLeaveEv
 		}
 	}
 
+	@Override
 	public void handleEvent(final AgentArrivalEvent event) {
 		this.enterEvents.remove(event.getPersonId());
 	}

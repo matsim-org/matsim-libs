@@ -39,6 +39,7 @@ public class PlanCollectFromAlgorithm implements PlanAlgorithm {
 	 * Just collects all plans in a set.
 	 * @see org.matsim.population.algorithms.PlanAlgorithm#run(org.matsim.core.population.PlanImpl)
 	 */
+	@Override
 	public void run(Plan plan) {
 		this.plans.add(plan);
 	}

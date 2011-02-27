@@ -49,54 +49,67 @@ public class VehicleTypeImpl implements VehicleType {
 		this.id = typeId;
 	}
 
+	@Override
 	public void setCapacity(VehicleCapacity capacity) {
 		this.capacity = capacity;
 	}
 
+	@Override
 	public void setDescription(String desc) {
 		this.description = desc;
 	}
 
+	@Override
 	public void setEngineInformation(EngineInformation engineInformation) {
 		this.engineInformation = engineInformation;
 	}
 
+	@Override
 	public void setLength(double length) {
 		this.length = length;
 	}
 
+	@Override
 	public void setMaximumVelocity(double meterPerSecond) {
 		this.maxVelocity = meterPerSecond;
 	}
 
+	@Override
 	public void setWidth(double width) {
 		this.width = width;
 	}
 	
+	@Override
 	public double getWidth() {
 		return width;
 	}
 
+	@Override
 	public double getMaximumVelocity() {
 		return maxVelocity;
 	}
 
+	@Override
 	public double getLength() {
 		return length;
 	}
 
+	@Override
 	public EngineInformation getEngineInformation() {
 		return engineInformation;
 	}
 
+	@Override
 	public String getDescription() {
 		return description;
 	}
 
+	@Override
 	public VehicleCapacity getCapacity() {
 		return capacity;
 	}
 
+	@Override
 	public Id getId() {
 		return id;
 	}

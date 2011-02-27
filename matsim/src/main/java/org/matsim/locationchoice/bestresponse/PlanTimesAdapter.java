@@ -57,13 +57,13 @@ public class PlanTimesAdapter {
 					double legTravelTime = 0.0;
 					if (approximationLevel == 0) {
 						legTravelTime = this.computeTravelTime(plan.getPerson(),
-							((PlanImpl)plan).getPreviousActivity(((PlanImpl)plan).getPreviousLeg((ActivityImpl)pe)), 
+							(plan).getPreviousActivity((plan).getPreviousLeg((ActivityImpl)pe)), 
 							(ActivityImpl)pe, router);
 					}
 					else if (approximationLevel == 1){
 						if (planElementIndex == actlegIndex) {
 							// adapt travel times: actPre -> actToMove
-							Activity previousActivity = ((PlanImpl)plan).getPreviousActivity(((PlanImpl)plan).
+							Activity previousActivity = (plan).getPreviousActivity((plan).
 									getPreviousLeg((ActivityImpl)pe));
 							
 							Node fromNode = network.getLinks().get(previousActivity.getLinkId()).getToNode();
@@ -89,20 +89,20 @@ public class PlanTimesAdapter {
 						}
 						else {
 							//use travel times from last iteration for efficiency reasons
-							legTravelTime = ((PlanImpl)plan).getPreviousLeg((Activity)pe).getTravelTime();
+							legTravelTime = (plan).getPreviousLeg((Activity)pe).getTravelTime();
 						}
 					}
 					else if (approximationLevel == 2) {
 						if (planElementIndex ==  actlegIndex || planElementIndex == (actlegIndex + 2)) {
-							legTravelTime = getTravelTimeApproximation((PlanImpl)plan, (ActivityImpl)pe);
+							legTravelTime = getTravelTimeApproximation(plan, (ActivityImpl)pe);
 						}
 						else {
 							//use travel times from last iteration for efficiency reasons
-							legTravelTime = ((PlanImpl)plan).getPreviousLeg((Activity)pe).getTravelTime();
+							legTravelTime = (plan).getPreviousLeg((Activity)pe).getTravelTime();
 						}
 					}
 					
-					LegImpl previousLegPlan = (LegImpl) ((PlanImpl)plan).getPreviousLeg((ActivityImpl)pe);
+					LegImpl previousLegPlan = (LegImpl) (plan).getPreviousLeg((ActivityImpl)pe);
 					double actDur = ((ActivityImpl)pe).getEndTime() - (previousLegPlan.getDepartureTime() + previousLegPlan.getTravelTime());
 										
 					// set new leg travel time, departure time and arrival time

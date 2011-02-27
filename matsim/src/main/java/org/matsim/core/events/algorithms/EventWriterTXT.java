@@ -72,6 +72,7 @@ public class EventWriterTXT implements EventWriter, ActivityEndEventHandler, Act
 		init(filename);
 	}
 
+	@Override
 	public void closeFile() {
 		if (this.out != null) {
 			try {
@@ -107,6 +108,7 @@ public class EventWriterTXT implements EventWriter, ActivityEndEventHandler, Act
 		}
 	}
 
+	@Override
 	public void reset(final int iter) {
 		closeFile();
 	}
@@ -153,38 +155,47 @@ public class EventWriterTXT implements EventWriter, ActivityEndEventHandler, Act
 		return this.timeString;
 	}
 
+	@Override
 	public void handleEvent(ActivityEndEvent event) {
 		writeLine(event.getTime(), event.getPersonId(), event.getLinkId(), 8, ActivityEndEventImpl.EVENT_TYPE + " " + event.getActType());
 	}
 
+	@Override
 	public void handleEvent(ActivityStartEvent event) {
 		writeLine(event.getTime(), event.getPersonId(), event.getLinkId(), 7, ActivityStartEventImpl.EVENT_TYPE + " " + event.getActType());
 	}
 
+	@Override
 	public void handleEvent(AgentArrivalEvent event) {
 		writeLine(event.getTime(), event.getPersonId(), event.getLinkId(), 0, AgentArrivalEventImpl.EVENT_TYPE);
 	}
 
+	@Override
 	public void handleEvent(AgentDepartureEvent event) {
 		writeLine(event.getTime(), event.getPersonId(), event.getLinkId(), 6, AgentDepartureEventImpl.EVENT_TYPE);
 	}
 	
+	@Override
 	public void handleEvent(AgentStuckEvent event) {
 		writeLine(event.getTime(), event.getPersonId(), event.getLinkId(), 3, AgentStuckEventImpl.EVENT_TYPE);
 	}
 
+	@Override
 	public void handleEvent(AgentMoneyEvent event) {
 		writeLine(event.getTime(), event.getPersonId(), null, 9, AgentMoneyEventImpl.EVENT_TYPE + "\t" + event.getAmount());
 	}
 
+	@Override
 	public void handleEvent(AgentWait2LinkEvent event) {
 		writeLine(event.getTime(), event.getPersonId(), event.getLinkId(), 4, AgentWait2LinkEventImpl.EVENT_TYPE);
 	}
 
+	@Override
 	public void handleEvent(LinkEnterEvent event) {
 		writeLine(event.getTime(), event.getPersonId(), event.getLinkId(), 5, LinkEnterEventImpl.EVENT_TYPE);
 	}
 
+	@Override
 	public void handleEvent(LinkLeaveEvent event) {
 		writeLine(event.getTime(), event.getPersonId(), event.getLinkId(), 2, LinkLeaveEventImpl.EVENT_TYPE);
 	}

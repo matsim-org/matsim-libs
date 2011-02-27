@@ -80,6 +80,7 @@ import org.matsim.vis.snapshots.writers.VisNode;
 		}
 	}
 
+	@Override
 	public Network getNetwork() {
 		return this.networkLayer;
 	}
@@ -109,10 +110,12 @@ import org.matsim.vis.snapshots.writers.VisNode;
 		return Collections.unmodifiableMap(this.queuenodes);
 	}
 
+	@Override
 	public Map<Id,? extends VisLink> getVisLinks() {
 		return Collections.unmodifiableMap( this.queuelinks ) ;
 	}
 
+	@Override
 	public Map<Id,? extends VisNode> getVisNodes() {
 		return Collections.unmodifiableMap( this.queuenodes);
 	}

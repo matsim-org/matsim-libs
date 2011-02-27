@@ -40,6 +40,7 @@ public class TravelCostsInvertedNetProxy implements TravelCost {
 		this.travelCosts = travelCosts;
 	}
 
+	@Override
 	public double getLinkGeneralizedTravelCost(Link link, double time) {
 		//as we have no turning move travel costs defined
 		//the fromLink is sufficient to calculate travelCosts

@@ -41,6 +41,7 @@ public class KnowledgesFactoryImpl implements KnowledgesFactory {
 	 * This method is not always creating an object. If already one exists
 	 * for the given personId the existing object will be returned.
 	 */
+	@Override
 	public KnowledgeImpl createKnowledge(Id personId, String desc) {
 		if (!this.knowledge.getKnowledgesByPersonId().containsKey(personId)){
 			KnowledgeImpl k = new KnowledgeImpl();

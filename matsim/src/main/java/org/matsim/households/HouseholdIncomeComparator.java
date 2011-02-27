@@ -32,6 +32,7 @@ public class HouseholdIncomeComparator implements Comparator<Household>, Seriali
 
 	private static final long serialVersionUID = 1L;
 
+	@Override
 	public int compare(Household o1, Household o2) {
 		if (o1.getIncome().getIncomePeriod() != o2.getIncome().getIncomePeriod()){
 			throw new IllegalArgumentException("Can only compare Households with incomes in "

@@ -51,28 +51,34 @@ public class LaneImpl implements Lane {
 	/**
 	 * @param number
 	 */
+	@Override
 	public void setNumberOfRepresentedLanes(double number) {
 		this.numberOfRepresentedLanes = number;
 	}
 
+	@Override
 	public void setStartsAtMeterFromLinkEnd(double meter) {
 		this.startsAtMeterFromLinkEnd = meter;
 	}
 
+	@Override
 	public Id getId() {
 		return id;
 	}
 
 	
+	@Override
 	public double getNumberOfRepresentedLanes() {
 		return numberOfRepresentedLanes;
 	}
 
 	
+	@Override
 	public double getStartsAtMeterFromLinkEnd() {
 		return startsAtMeterFromLinkEnd;
 	}
 
+	@Override
 	public void addToLinkId(Id id) {
 		if (this.toLinkIds == null) {
 			this.toLinkIds = new ArrayList<Id>();
@@ -80,10 +86,12 @@ public class LaneImpl implements Lane {
 		this.toLinkIds.add(id);
 	}
 	
+	@Override
 	public List<Id> getToLinkIds() {
 		return this.toLinkIds;
 	}
 	
+	@Override
 	public void addToLaneId(Id id) {
 		if (this.toLaneIds == null) {
 			this.toLaneIds = new ArrayList<Id>();
@@ -91,14 +99,17 @@ public class LaneImpl implements Lane {
 		this.toLaneIds.add(id);
 	}
 	
+	@Override
 	public List<Id> getToLaneIds() {
 		return this.toLaneIds;
 	}
 	
+	@Override
 	public int getAlignment() {
 		return alignment;
 	}
 	
+	@Override
 	public void setAlignment(int alignment) {
 		this.alignment = alignment;
 	}

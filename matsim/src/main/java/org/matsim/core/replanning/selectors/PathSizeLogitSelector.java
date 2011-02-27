@@ -59,6 +59,7 @@ public final class PathSizeLogitSelector implements PlanSelector {
 		this.network = network;
 	}
 
+	@Override
 	public final Plan selectPlan(final Person person) {
 
 		// First check if there are any unscored plans

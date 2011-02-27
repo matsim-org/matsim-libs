@@ -48,6 +48,7 @@ public abstract class OTFGLAbstractDrawable implements OTFDrawable {
 	// depends on the fact that the infrastructure behind the SceneLayers is NOT taken down in every time step.  This seems
 	// to be achieved by static variables such as this one.  kai, jan'11
 
+	@Override
 	public final void draw() {
 		// Make sure onDraw is called only once per object	// this comment may have had something to do with the isValid, which 
 															// did not work (I think).  kai, feb'11

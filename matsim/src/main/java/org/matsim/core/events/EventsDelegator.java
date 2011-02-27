@@ -52,21 +52,25 @@ public class EventsDelegator extends EventsManagerImpl{
 		this.events = new ConcurrentLinkedQueue<Event>();
 	}
 	
+	@Override
 	public void addHandler(EventHandler handler)
 	{
 		this.eventsManager.addHandler(handler);
 	}
 
+	@Override
 	public EventsFactory getFactory()
 	{
 		return this.eventsManager.getFactory();
 	}
 
+	@Override
 	public void processEvent(Event event)
 	{
 		this.events.add(event);
 	}
 
+	@Override
 	public void removeHandler(EventHandler handler)
 	{
 		this.eventsManager.removeHandler(handler);

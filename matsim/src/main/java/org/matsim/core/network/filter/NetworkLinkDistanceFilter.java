@@ -48,6 +48,7 @@ public class NetworkLinkDistanceFilter implements NetworkLinkFilter {
 	 * @return <code>true</true> if the Link is not farther away than the
 	 * distance specified by the distance filter from the center node of the filter.
 	 */	
+	@Override
 	public boolean judgeLink(Link l) {
 		double dist = CoordUtils.calcDistance(l.getCoord(), this.distanceFilterNode.getCoord());
 		return dist < this.distanceFilter;

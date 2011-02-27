@@ -46,6 +46,7 @@ public class ExpBetaPlanSelector implements PlanSelector {
 	/**
 	 * @return Returns a random plan from the person, random but according to its weight.
 	 */
+	@Override
 	public Plan selectPlan(final Person person) {
 
 		// get the weights of all plans

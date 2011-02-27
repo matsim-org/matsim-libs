@@ -62,6 +62,7 @@ public class PtBiasErrorGraph extends CountsGraph {
 		this.chartTitle = chartTitle;
 	}
 
+	@Override
 	public JFreeChart createChart(final int nbr) {
 		DefaultCategoryDataset dataset0 = new DefaultCategoryDataset();
 		DefaultCategoryDataset dataset1 = new DefaultCategoryDataset();

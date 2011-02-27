@@ -65,6 +65,7 @@ public class IdImpl implements Id, Serializable {
 		return this.id.compareTo(o.id);
 	}
 
+	@Override
 	public int compareTo(final Id id) {
 		return this.id.compareTo(id.toString());
 	}

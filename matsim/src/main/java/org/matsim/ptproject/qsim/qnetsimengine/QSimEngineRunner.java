@@ -32,9 +32,7 @@ import java.util.concurrent.CyclicBarrier;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.interfaces.DepartureHandler;
-import org.matsim.ptproject.qsim.interfaces.NetsimLink;
 import org.matsim.ptproject.qsim.interfaces.NetsimNetworkFactory;
-import org.matsim.ptproject.qsim.interfaces.NetsimNode;
 
 public class QSimEngineRunner extends QSimEngineInternalI implements Runnable {
 

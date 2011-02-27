@@ -61,6 +61,7 @@ public class CalcLegTimes implements AgentDepartureEventHandler, AgentArrivalEve
 		this.population = population;
 	}
 
+	@Override
 	public void handleEvent(final AgentDepartureEvent event) {
 		this.agentDepartures.put(event.getPersonId(), event.getTime());
 		Integer cnt = this.agentLegs.get(event.getPersonId());
@@ -71,6 +72,7 @@ public class CalcLegTimes implements AgentDepartureEventHandler, AgentArrivalEve
 		}
 	}
 
+	@Override
 	public void handleEvent(final AgentArrivalEvent event) {
 		Double depTime = this.agentDepartures.remove(event.getPersonId());
 		Person agent = this.population.getPersons().get(event.getPersonId());
@@ -97,6 +99,7 @@ public class CalcLegTimes implements AgentDepartureEventHandler, AgentArrivalEve
 		}
 	}
 
+	@Override
 	public void reset(final int iteration) {
 		this.agentDepartures.clear();
 		this.agentLegs.clear();

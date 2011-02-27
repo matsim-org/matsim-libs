@@ -40,6 +40,7 @@ public class VolumesCounter implements LinkEnterEventHandler {
 
 	private static Integer ONE = Integer.valueOf(1);
 	
+	@Override
 	public void handleEvent(LinkEnterEvent event) {
 		Integer volume = this.links.get(event.getLinkId());
 		if (volume == null) {
@@ -50,6 +51,7 @@ public class VolumesCounter implements LinkEnterEventHandler {
 		this.links.put(event.getLinkId(), volume);
 	}
 
+	@Override
 	public void reset(int iteration) {
 		this.links.clear();
 	}

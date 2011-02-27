@@ -58,6 +58,7 @@ public class CountSimComparisonImpl implements CountSimComparison {
 	 * @see org.matsim.counts.CountSimComparison#calculateRelativeError() return
 	 *      signed rel error
 	 */
+	@Override
 	public double calculateRelativeError() {
 		double count = this.getCountValue();
 		double sim = this.getSimulationValue();
@@ -73,6 +74,7 @@ public class CountSimComparisonImpl implements CountSimComparison {
 	/**
 	 * @see org.matsim.counts.CountSimComparison#getCountValue()
 	 */
+	@Override
 	public double getCountValue() {
 		return this.countValue;
 	}
@@ -80,6 +82,7 @@ public class CountSimComparisonImpl implements CountSimComparison {
 	/**
 	 * @see org.matsim.counts.CountSimComparison#getHour()
 	 */
+	@Override
 	public int getHour() {
 		return this.hour;
 	}
@@ -87,6 +90,7 @@ public class CountSimComparisonImpl implements CountSimComparison {
 	/**
 	 * @see org.matsim.counts.CountSimComparison#getId()
 	 */
+	@Override
 	public Id getId() {
 		return this.id;
 	}
@@ -94,6 +98,7 @@ public class CountSimComparisonImpl implements CountSimComparison {
 	/**
 	 * @see org.matsim.counts.CountSimComparison#getSimulationValue()
 	 */
+	@Override
 	public double getSimulationValue() {
 		return this.simulationValue;
 	}

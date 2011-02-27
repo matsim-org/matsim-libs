@@ -35,6 +35,7 @@ public class PlanCalcType extends AbstractPersonAlgorithm implements PlanAlgorit
 		}
 	}
 
+	@Override
 	public void run(Plan plan) {
 		boolean hasCar = false;
 		boolean hasPt = false;

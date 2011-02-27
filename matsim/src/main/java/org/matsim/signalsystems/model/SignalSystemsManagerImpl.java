@@ -62,6 +62,7 @@ public class SignalSystemsManagerImpl implements SignalSystemsManager {
 		}
 	}
 
+	@Override
 	public AmberLogic getAmberLogic(){
 		return this.amberLogic;
 	}
@@ -92,6 +93,7 @@ public class SignalSystemsManagerImpl implements SignalSystemsManager {
 		return this.signalSystems;
 	}
 	
+	@Override
 	public void setSignalsData(SignalsData signalsData){
 		this.signalData = signalsData;
 	}

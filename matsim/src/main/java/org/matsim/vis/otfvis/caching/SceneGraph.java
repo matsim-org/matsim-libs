@@ -47,6 +47,7 @@ class LayerDrawingOrderComparator implements Comparator<SceneLayer>, Serializabl
 
 	private static final long serialVersionUID = 1L;
 
+	@Override
 	public int compare(SceneLayer o1, SceneLayer o2) {
 		int diff = (int)Math.signum(o1.getDrawOrder() - o2.getDrawOrder());
 		return diff;

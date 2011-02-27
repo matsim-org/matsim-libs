@@ -42,6 +42,7 @@ public class OpeningTimeImpl implements OpeningTime {
 	//
 	//////////////////////////////////////////////////////////////////////
 
+	@Override
 	public int compareTo(OpeningTime other) {
 		// two functionalities in one:
 		// 1. the earlier start_time comes before the other. If they're the same,
@@ -124,16 +125,19 @@ public class OpeningTimeImpl implements OpeningTime {
 	// set methods
 	//////////////////////////////////////////////////////////////////////
 
+	@Override
 	public final void setStartTime(final double start_time) {
 		this.startTime = start_time;
 		this.acceptTimes();
 	}
 
+	@Override
 	public final void setEndTime(final double end_time) {
 		this.endTime = end_time;
 		this.acceptTimes();
 	}
 	
+	@Override
 	public void setDay(DayType day) {
 		this.day = day;
 	}
@@ -142,14 +146,17 @@ public class OpeningTimeImpl implements OpeningTime {
 	// get methods
 	//////////////////////////////////////////////////////////////////////
 
+	@Override
 	public final DayType getDay() {
 		return this.day;
 	}
 
+	@Override
 	public final double getStartTime() {
 		return this.startTime;
 	}
 
+	@Override
 	public final double getEndTime() {
 		return this.endTime;
 	}

@@ -43,6 +43,7 @@ public class OTFTeleportAgentsDrawer extends OTFGLAbstractDrawableReceiver{
   	log.info("acitvated OTFTeleportAgentsDrawer...");
   }
 
+	@Override
 	public void onDraw(GL gl) {
 		float agentSize = OTFClientControl.getInstance().getOTFVisConfig().getAgentSize();
 		gl.glColor3d(0.0, 0.0, 1.0);

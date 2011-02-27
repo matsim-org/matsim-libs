@@ -43,6 +43,7 @@ public class TravelTimeDataArray implements TravelTimeData {
 		resetTravelTimes();
 	}
 
+	@Override
 	public void resetTravelTimes() {
 		for (int i = 0; i < this.timeSum.length; i++) {
 			this.timeSum[i] = 0.0;
@@ -51,6 +52,7 @@ public class TravelTimeDataArray implements TravelTimeData {
 		}
 	}
 
+	@Override
 	public void addTravelTime(final int timeSlot, final double traveltime) {
 		double sum = this.timeSum[timeSlot];
 		int cnt = this.timeCnt[timeSlot];
@@ -61,6 +63,7 @@ public class TravelTimeDataArray implements TravelTimeData {
 		this.travelTimes[timeSlot] = -1.0; // initialize with negative value
 	}
 
+	@Override
 	public double getTravelTime(final int timeSlot, final double now) {
 		double ttime = this.travelTimes[timeSlot];
 		if (ttime >= 0.0) return ttime; // negative values are invalid.

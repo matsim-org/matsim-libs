@@ -18,14 +18,17 @@ public class UmlaufImpl implements Umlauf {
 		this.id = id;
 	}
 
+	@Override
 	public List<UmlaufStueckI> getUmlaufStuecke() {
 		return umlaufStuecke;
 	}
 
+	@Override
 	public Id getId() {
 		return this.id;
 	}
 	
+	@Override
 	public void setVehicleId(final Id vehicleId) {
 		this.vehicleId = vehicleId;
 		for (UmlaufStueckI umlaufStueck : umlaufStuecke) {
@@ -35,10 +38,12 @@ public class UmlaufImpl implements Umlauf {
 		}
 	}
 
+	@Override
 	public Id getVehicleId() {
 		return this.vehicleId;
 	}
 
+	@Override
 	public Id getLineId() {
 		return getLineId(getUmlaufStuecke());
 	}

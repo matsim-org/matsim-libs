@@ -86,6 +86,7 @@ public class ArgumentParser implements Iterable<String> {
 	/**
 	 * Returns an iterator over all single options and arguments.
 	 */
+	@Override
 	public Iterator<String> iterator() {
 		return this.args.iterator();
 	}

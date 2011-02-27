@@ -92,7 +92,8 @@ public class CollectDrawLinkId {
       this.linkIdMap = map;
     }
     
-    public void execute(double x, double y, OTFDataReader reader)  {
+    @Override
+		public void execute(double x, double y, OTFDataReader reader)  {
       if(reader instanceof OTFDefaultLinkHandler) {
         OTFDataQuadReceiver quadReceiver = ((OTFDefaultLinkHandler) reader).getQuadReceiver();
         if (quadReceiver != null && quadReceiver instanceof OGLSimpleQuadDrawer){

@@ -271,6 +271,7 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 
 	}
 
+	@Override
 	public void stateChanged(final ChangeEvent e) {
 		if (e.getSource() == this.agentSizeSlider) {
 			this.visConfig.setAgentSize(this.agentSizeSlider.getValue());
@@ -291,6 +292,7 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 
 	
 
+	@Override
 	public void actionPerformed(final ActionEvent e) {
 		if (e.getSource() instanceof JComboBox) {
 			JComboBox cb = (JComboBox) e.getSource();
@@ -327,6 +329,7 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 		}
 	}
 
+	@Override
 	public void itemStateChanged(ItemEvent e) {
 		JCheckBox source = (JCheckBox)e.getItemSelectable();
 		if (source.getText().equals("show non-moving items")) {

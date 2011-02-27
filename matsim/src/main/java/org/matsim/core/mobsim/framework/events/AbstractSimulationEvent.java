@@ -40,6 +40,7 @@ public abstract class AbstractSimulationEvent<T extends Simulation> implements
 	/**
 	 * @see org.matsim.core.mobsim.framework.events.SimulationEvent#getQueueSimulation()
 	 */
+	@Override
 	public T getQueueSimulation() {
 		return this.queuesim;
 	}

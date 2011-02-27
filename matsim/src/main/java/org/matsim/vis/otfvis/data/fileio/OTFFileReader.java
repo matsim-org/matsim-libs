@@ -133,14 +133,17 @@ public final class OTFFileReader implements OTFServerRemote {
 		System.out.println("Nr of timesteps: " + this.timesteps.size());
 	}
 
+	@Override
 	public int getLocalTime() throws RemoteException {
 		return (int) this.nextTime;
 	}
 
+	@Override
 	public boolean isLive() {
 		return false;
 	}
 
+	@Override
 	public OTFServerQuadI getQuad(final String id, final OTFConnectionManager connect) throws RemoteException {
 		log.info("reading quad from file...");
 		OTFServerQuadI quad = readQuad();
@@ -190,6 +193,7 @@ public final class OTFFileReader implements OTFServerRemote {
 		}
 	}
 
+	@Override
 	public byte[] getQuadConstStateBuffer(final String id)
 	throws RemoteException {
 		byte[] buffer = null;
@@ -207,6 +211,7 @@ public final class OTFFileReader implements OTFServerRemote {
 		return buffer;
 	}
 
+	@Override
 	public byte[] getQuadDynStateBuffer(final String id, final Rect bounds)
 			throws RemoteException {
 		if (bounds == null) {
@@ -259,6 +264,7 @@ public final class OTFFileReader implements OTFServerRemote {
 		}
 	}
 
+	@Override
 	public boolean requestNewTime(final int time, final TimePreference searchDirection) throws RemoteException {
 		double lastTime = -1;
 		double foundTime = -1;
@@ -287,6 +293,7 @@ public final class OTFFileReader implements OTFServerRemote {
 		return true;
 	}
 
+	@Override
 	public Collection<Double> getTimeSteps() {
 		return this.timesteps.keySet();
 	}

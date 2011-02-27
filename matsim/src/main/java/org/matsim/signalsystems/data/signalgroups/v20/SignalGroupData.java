@@ -33,6 +33,7 @@ public interface SignalGroupData extends Identifiable{
 	
 	public Id getSignalSystemId();
 	
+	@Override
 	public Id getId();
 	
 	public void addSignalId(Id signalId);

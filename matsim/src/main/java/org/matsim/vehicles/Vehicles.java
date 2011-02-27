@@ -35,6 +35,7 @@ public interface Vehicles extends MatsimToplevelContainer {
 	
 	public Map<Id, Vehicle> getVehicles();
 	
+	@Override
 	public VehiclesFactory getFactory();
 	
 }

@@ -49,18 +49,21 @@ public class LinkQueueStats implements LinkEnterEventHandler, LinkLeaveEventHand
 		this.linkId = linkId;
 	}
 
+	@Override
 	public void handleEvent(LinkEnterEvent event) {
 		if (event.getLinkId().equals(this.linkId)) {
 			enterTimes.add(event.getTime());
 		}
 	}
 
+	@Override
 	public void handleEvent(LinkLeaveEvent event) {
 		if (event.getLinkId().equals(this.linkId)) {
 			leaveTimes.add(event.getTime());
 		}
 	}
 
+	@Override
 	public void reset(int iteration) {
 		enterTimes.clear();
 		leaveTimes.clear();

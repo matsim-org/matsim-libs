@@ -41,14 +41,17 @@ public class VehicleArrivesAtFacilityEventImpl extends EventImpl implements
 		this.delay = delay;
 	}
 	
+	@Override
 	public double getDelay() {
 		return this.delay;
 	}
 
+	@Override
 	public Id getFacilityId() {
 		return this.facilityId;
 	}
 
+	@Override
 	public Id getVehicleId() {
 		return this.vehicleId;
 	}

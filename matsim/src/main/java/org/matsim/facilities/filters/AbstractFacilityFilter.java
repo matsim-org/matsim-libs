@@ -28,6 +28,7 @@ public abstract class AbstractFacilityFilter implements FacilityAlgorithm, Facil
 	protected FacilityAlgorithm nextAlgorithm = null;
 	private int count = 0;
 
+	@Override
 	public void run(final ActivityFacility facility) {
 		if (judge(facility)) {
 			count();
@@ -35,10 +36,12 @@ public abstract class AbstractFacilityFilter implements FacilityAlgorithm, Facil
 		}
 	}
 
+	@Override
 	public void count() {
 		this.count++;
 	}
 
+	@Override
 	public int getCount() {
 		return this.count;
 	}

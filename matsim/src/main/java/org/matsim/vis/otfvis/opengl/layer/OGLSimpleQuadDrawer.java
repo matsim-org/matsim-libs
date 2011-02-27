@@ -70,21 +70,25 @@ public class OGLSimpleQuadDrawer extends OTFGLAbstractDrawableReceiver implement
 	      return new Point2D.Float((float)dx,(float)dy);
 	    }
 
-	    public void setQuad(float startX, float startY, float endX, float endY) {
+	    @Override
+			public void setQuad(float startX, float startY, float endX, float endY) {
 	      setQuad(startX, startY,endX, endY, 1);
 	    }
 
-	    public void setQuad(float startX, float startY, float endX, float endY, int nrLanes) {
+	    @Override
+			public void setQuad(float startX, float startY, float endX, float endY, int nrLanes) {
 	      this.quad[0] = new Point2D.Float(startX, startY);
 	      this.quad[1] = new Point2D.Float(endX, endY);
 	      this.nrLanes = nrLanes;
 	    }
 
-	    public void setColor(float coloridx) {
+	    @Override
+			public void setColor(float coloridx) {
 	      this.coloridx = coloridx;
 	    }
 
-	    public void setId(char[] id) {
+	    @Override
+			public void setId(char[] id) {
 	      this.id = id;
 	    }
 	  }

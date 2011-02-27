@@ -44,6 +44,7 @@ public class CountsWriter extends MatsimXmlWriter implements MatsimWriter {
 		this.handler = new CountsWriterHandlerImplV1();
 	}
 
+	@Override
 	public final void write(final String filename) {
 		try {
 			openFile(filename);
@@ -96,6 +97,7 @@ public class CountsWriter extends MatsimXmlWriter implements MatsimWriter {
 	static class VolumeComparator implements Comparator<Volume>, Serializable {
 		private static final long serialVersionUID = 1L;
 
+		@Override
 		public int compare(final Volume v1, final Volume v2) {
 			return Double.compare(v1.getHour(), v2.getHour());
 		}
@@ -104,6 +106,7 @@ public class CountsWriter extends MatsimXmlWriter implements MatsimWriter {
 	static class CountComparator implements Comparator<Count>, Serializable {
 		private static final long serialVersionUID = 1L;
 
+		@Override
 		public int compare(final Count c1, final Count c2) {
 			
 			// This seemed to be intended for a rather special case with a rather special

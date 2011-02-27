@@ -251,6 +251,7 @@ public class KnowledgeImpl implements Knowledge<ActivityOptionImpl> {
 	 * Returns all {@link ActivityOptionImpl Activities}.
 	 * @return The list of {@link ActivityOptionImpl Activities}. The list may be empty.
 	 */
+	@Override
 	public final ArrayList<ActivityOptionImpl> getActivities() {
 		if (activities == null) { return new ArrayList<ActivityOptionImpl>(0); }
 		ArrayList<ActivityOptionImpl> acts = new ArrayList<ActivityOptionImpl>(activities.size());

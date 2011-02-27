@@ -29,6 +29,7 @@ import org.matsim.vis.otfvis.data.OTFConnectionManagerFactory;
  */
 public class OTFFileWriterQueueSimConnectionManagerFactory implements OTFConnectionManagerFactory{
 
+	@Override
 	public OTFConnectionManager createConnectionManager() {
 		OTFConnectionManager c = new OTFConnectionManager();
 		c.connectQueueLinkToWriter(OTFQueueSimLinkAgentsWriter.class);

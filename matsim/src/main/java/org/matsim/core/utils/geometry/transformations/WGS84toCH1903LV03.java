@@ -35,6 +35,7 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
  */
 public class WGS84toCH1903LV03 implements CoordinateTransformation {
 
+	@Override
 	public Coord transform(Coord coord) {
 
 		double lonNorm = (coord.getX() * 3600 - 26782.5) / 10000;

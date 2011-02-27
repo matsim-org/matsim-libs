@@ -77,6 +77,7 @@ import org.matsim.core.config.Config;
 		//dg[april08] as the order of nodes has an influence on the simulation
 		//results they are sorted to avoid indeterministic simulations
 		Arrays.sort(this.simNodesArray, new Comparator<QueueNode>() {
+			@Override
 			public int compare(final QueueNode o1, final QueueNode o2) {
 				return o1.getNode().getId().compareTo(o2.getNode().getId());
 			}

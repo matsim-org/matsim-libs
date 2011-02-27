@@ -71,11 +71,13 @@ public class CalcPaidToll implements LinkEnterEventHandler, AgentWait2LinkEventH
 		}
 	}
 
+	@Override
 	public void handleEvent(final LinkEnterEvent event) {
 		Link link = this.network.getLinks().get(event.getLinkId());
 		this.handler.handleEvent(event, link);
 	}
 
+	@Override
 	public void handleEvent(final AgentWait2LinkEvent event) {
 		Link link = this.network.getLinks().get(event.getLinkId());
 		this.handler.handleEvent(event, link);
@@ -98,6 +100,7 @@ public class CalcPaidToll implements LinkEnterEventHandler, AgentWait2LinkEventH
 		}
 	}
 
+	@Override
 	public void reset(final int iteration) {
 		this.agents.clear();
 	}
@@ -155,6 +158,7 @@ public class CalcPaidToll implements LinkEnterEventHandler, AgentWait2LinkEventH
 	 * as it may have paid already when arriving on the link.
 	 */
 	class DistanceTollBehaviour implements TollBehaviourI {
+		@Override
 		public void handleEvent(final PersonEvent event, final Link link) {
 			if (event instanceof AgentWait2LinkEventImpl) {
 				/* we do not handle wait2link-events for distance toll, because the agent
@@ -179,6 +183,7 @@ public class CalcPaidToll implements LinkEnterEventHandler, AgentWait2LinkEventH
 	/** Handles the calculation of the area toll. Whenever the agent is seen on
 	 * one of the tolled link, the constant toll amount has to be paid once. */
 	class AreaTollBehaviour implements TollBehaviourI {
+		@Override
 		public void handleEvent(final PersonEvent event, final Link link) {
 			Cost cost = CalcPaidToll.this.scheme.getLinkCost(link.getId(), event.getTime());
 			if (cost != null) {
@@ -197,6 +202,7 @@ public class CalcPaidToll implements LinkEnterEventHandler, AgentWait2LinkEventH
 	 * crosses the cordon from the outside to the inside.
 	 */
 	class CordonTollBehaviour implements TollBehaviourI {
+		@Override
 		public void handleEvent(final PersonEvent event, final Link link) {
 			Cost cost = CalcPaidToll.this.scheme.getLinkCost(link.getId(), event.getTime());
 			if (cost != null) {

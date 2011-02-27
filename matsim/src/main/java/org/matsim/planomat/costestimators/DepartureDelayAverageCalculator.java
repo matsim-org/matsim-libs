@@ -130,11 +130,13 @@ public class DepartureDelayAverageCalculator implements AgentDepartureEventHandl
 		return this.linkData.get(linkId);
 	}
 
+	@Override
 	public void handleEvent(AgentDepartureEvent event) {
 		DepartureEvent depEvent = new DepartureEvent(event.getPersonId());
 		this.departureEventsTimes.put(depEvent, event.getTime());
 	}
 
+	@Override
 	public void handleEvent(LinkLeaveEvent event) {
 		DepartureEvent removeMe = new DepartureEvent(event.getPersonId());
 		Double departureTime = departureEventsTimes.remove(removeMe);
@@ -158,6 +160,7 @@ public class DepartureDelayAverageCalculator implements AgentDepartureEventHandl
 		this.departureEventsTimes.clear();
 	}
 
+	@Override
 	public void reset(int iteration) {
 		resetDepartureDelays();
 	}

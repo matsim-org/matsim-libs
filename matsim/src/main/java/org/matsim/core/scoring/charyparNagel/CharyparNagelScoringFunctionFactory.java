@@ -53,6 +53,7 @@ public class CharyparNagelScoringFunctionFactory implements ScoringFunctionFacto
 	 * @param plan
 	 * @return new ScoringFunction
 	 */
+	@Override
 	public ScoringFunction createNewScoringFunction(Plan plan) {
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 		scoringFunctionAccumulator.addScoringFunction(new ActivityScoringFunction(plan, params));

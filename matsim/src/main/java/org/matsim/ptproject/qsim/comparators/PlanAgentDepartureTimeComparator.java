@@ -38,6 +38,7 @@ public class PlanAgentDepartureTimeComparator implements Comparator<PlanAgent>, 
 
 	private static final long serialVersionUID = 1L;
 
+	@Override
 	public int compare(PlanAgent agent1, PlanAgent agent2) {
 		int cmp = Double.compare(agent1.getActivityEndTime(), agent2.getActivityEndTime());
 		if (cmp == 0) {

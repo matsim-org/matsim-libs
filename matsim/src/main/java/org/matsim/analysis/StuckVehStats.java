@@ -50,10 +50,12 @@ public class StuckVehStats implements AgentDepartureEventHandler, AgentStuckEven
 		reset(-1);
 	}
 
+	@Override
 	public void handleEvent(AgentDepartureEvent event) {
 		this.depTimes.put(event.getPersonId(), event.getTime());
 	}
 
+	@Override
 	public void handleEvent(AgentWait2LinkEvent event) {
 		this.wait2linkTimes.put(event.getPersonId(), event.getTime());
 		Double depTime = this.depTimes.get(event.getPersonId());
@@ -64,6 +66,7 @@ public class StuckVehStats implements AgentDepartureEventHandler, AgentStuckEven
 		}
 	}
 
+	@Override
 	public void handleEvent(AgentStuckEvent event) {
 		ArrayList<Double> times = this.stuckLinkTimes.get(event.getLinkId());
 		if (times == null) {
@@ -92,6 +95,7 @@ public class StuckVehStats implements AgentDepartureEventHandler, AgentStuckEven
 	}
 
 
+	@Override
 	public void reset(int iteration) {
 		for (int i = 0; i < this.stuckTimes.length; i++) {
 			this.stuckTimes[i] = 0;

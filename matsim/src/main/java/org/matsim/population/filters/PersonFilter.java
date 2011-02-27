@@ -42,6 +42,7 @@ public interface PersonFilter extends Filter, PersonAlgorithm {
 	 *
 	 * @param person person to be handled
 	 */
+	@Override
 	void run(Person person);
 
 }

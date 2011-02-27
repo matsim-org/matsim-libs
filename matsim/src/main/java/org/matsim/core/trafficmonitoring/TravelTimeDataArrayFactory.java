@@ -33,6 +33,7 @@ public class TravelTimeDataArrayFactory implements TravelTimeDataFactory {
 		this.numSlots = numSlots;
 	}
 	
+	@Override
 	public TravelTimeData createTravelTimeData(Id linkId) {
 		return new TravelTimeDataArray(this.network.getLinks().get(linkId), this.numSlots);
 	}

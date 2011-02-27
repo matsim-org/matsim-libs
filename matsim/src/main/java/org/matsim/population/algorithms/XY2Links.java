@@ -52,6 +52,7 @@ public class XY2Links extends AbstractPersonAlgorithm implements PlanAlgorithm {
 	}
 
 	/** Assigns links to each activity in the plan. */
+	@Override
 	public void run(final Plan plan) {
 		processPlan(plan);
 	}

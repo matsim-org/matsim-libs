@@ -119,14 +119,17 @@ public final class QueryAgentId extends AbstractQuery {
 
 		public List<String> agentIds = new ArrayList<String>();
 
+		@Override
 		public void remove() {
 
 		}
 
+		@Override
 		public boolean isAlive() {
 			return false;
 		}
 
+		@Override
 		public void draw(OTFDrawer drawer) {
 
 		}

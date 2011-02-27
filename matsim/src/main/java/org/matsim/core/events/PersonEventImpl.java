@@ -46,6 +46,7 @@ public abstract class PersonEventImpl extends EventImpl implements PersonEvent {
 		return attr;
 	}
 
+	@Override
 	public Id getPersonId() {
 		return this.personId;
 	}

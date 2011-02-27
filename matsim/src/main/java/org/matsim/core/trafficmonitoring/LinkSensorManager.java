@@ -71,6 +71,7 @@ public class LinkSensorManager implements LinkLeaveEventHandler {
 	/**
 	 * For each LinkLeaveEvent the corresponding traffic count value is incremented.
 	 */
+	@Override
 	public void handleEvent(final LinkLeaveEvent event) {
 		if (this.linkCountMap.containsKey(event.getLinkId())) {
 			int i = this.linkCountMap.get(event.getLinkId()).intValue();
@@ -83,6 +84,7 @@ public class LinkSensorManager implements LinkLeaveEventHandler {
 	 * Resets traffic count data for all links to zero
 	 * @see org.matsim.core.events.handler.EventHandler#reset(int)
 	 */
+	@Override
 	public void reset(final int iteration) {
 
 		for (Id id : this.linkCountMap.keySet()) {

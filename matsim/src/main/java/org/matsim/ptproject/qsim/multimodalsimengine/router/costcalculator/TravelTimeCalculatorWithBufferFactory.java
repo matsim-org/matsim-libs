@@ -27,6 +27,7 @@ import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactory;
 
 public class TravelTimeCalculatorWithBufferFactory implements TravelTimeCalculatorFactory {
 
+	@Override
 	public TravelTimeCalculator createTravelTimeCalculator(Network network, TravelTimeCalculatorConfigGroup group) {
 		return new TravelTimeCalculatorWithBuffer(network, group);
 	}

@@ -31,6 +31,7 @@ import org.matsim.core.api.internal.MatsimToplevelContainer;
  */
 public interface SignalControlData extends MatsimToplevelContainer {
 	
+	@Override
 	public SignalControlDataFactory getFactory();
 	
 	public Map<Id, SignalSystemControllerData> getSignalSystemControllerDataBySystemId();

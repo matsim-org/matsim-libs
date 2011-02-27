@@ -51,6 +51,7 @@ public class LocationChoiceScoringFunctionFactory implements ScoringFunctionFact
 		this.facilities = facilities;
 	}
 	
+	@Override
 	public ScoringFunction createNewScoringFunction(final Plan plan) {
 		
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();

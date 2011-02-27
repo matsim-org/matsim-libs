@@ -126,6 +126,7 @@ public class FromToSummary extends AbstractPersonAlgorithm implements PlanAlgori
 		System.out.println("Total number of trips: " + stringArray.size());
 	}
 
+	@Override
 	public void run(Plan plan) {
 		List<PlanElement> actslegs = plan.getPlanElements();
 		Activity fromAct = (Activity) actslegs.get(0);
@@ -289,6 +290,7 @@ public class FromToSummary extends AbstractPersonAlgorithm implements PlanAlgori
 
 		private static final long serialVersionUID = 1L;
 
+		@Override
 		public int compare(NodePair n1, NodePair n2) {
 			Node n1First = n1.getFirst();
 			Node n1Second = n1.getSecond();

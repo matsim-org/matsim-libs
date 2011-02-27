@@ -36,6 +36,7 @@ public class AStarEuclideanFactory implements LeastCostPathCalculatorFactory {
 		}
 	}
 
+	@Override
 	public LeastCostPathCalculator createPathCalculator(Network network,
 			TravelCost travelCosts, TravelTime travelTimes) {
 		return new AStarEuclidean(network, this.preProcessData, travelCosts, travelTimes, 1);

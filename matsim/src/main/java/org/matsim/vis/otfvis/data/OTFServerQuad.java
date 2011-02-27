@@ -61,6 +61,7 @@ public class OTFServerQuad extends QuadTree<OTFDataWriter> implements OTFServerQ
 			this.connect = connect2;
 			this.client = client;
 		}
+		@Override
 		@SuppressWarnings("unchecked")
 		public void execute(double x, double y, OTFDataWriter writer)  {
 			Collection<Class<OTFDataReader>> readerClasses = this.connect.getReadersForWriter(writer.getClass());
@@ -86,6 +87,7 @@ public class OTFServerQuad extends QuadTree<OTFDataWriter> implements OTFServerQ
 			this.out = out;
 			this.writeConst = writeConst;
 		}
+		@Override
 		public void execute(double xx, double yy, OTFDataWriter writer)  {
 			try {
 				if (this.writeConst) writer.writeConstData(this.out);
@@ -103,6 +105,7 @@ public class OTFServerQuad extends QuadTree<OTFDataWriter> implements OTFServerQ
 			q = newNet;
 		}
 
+		@Override
 		public void execute(double x, double y, OTFDataWriter writer)  {
 			Object src = writer.getSrc();
 			if(src instanceof VisLink) {
@@ -316,6 +319,7 @@ public class OTFServerQuad extends QuadTree<OTFDataWriter> implements OTFServerQ
 				new ReplaceSourceExecutor(newNet));
 	}
 
+	@Override
 	public void initQuadTree(OTFConnectionManager connect) {
 		this.fillQuadTree(connect);
 	}

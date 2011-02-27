@@ -57,6 +57,7 @@ public class QueryAgentEvents extends AbstractQuery implements PersonEventHandle
 		private String agentId;
 		private List<String> newEventStrings = new ArrayList<String>();
 		
+		@Override
 		public void draw(OTFDrawer drawer) {
 			for(String eventString : newEventStrings) {
 				logger.info(agentId + ": " + eventString);
@@ -116,6 +117,7 @@ public class QueryAgentEvents extends AbstractQuery implements PersonEventHandle
 		return result;
 	}
 
+	@Override
 	public void setId(String id) {
 		this.agentId = new IdImpl(id);
 	}

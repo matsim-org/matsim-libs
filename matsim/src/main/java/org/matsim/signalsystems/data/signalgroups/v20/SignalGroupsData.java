@@ -31,6 +31,7 @@ import org.matsim.core.api.internal.MatsimToplevelContainer;
  */
 public interface SignalGroupsData extends MatsimToplevelContainer {
 
+	@Override
 	public SignalGroupsDataFactory getFactory();
 	
 	public Map<Id, SignalGroupData> getSignalGroupDataBySystemId(Id signalSystemId);

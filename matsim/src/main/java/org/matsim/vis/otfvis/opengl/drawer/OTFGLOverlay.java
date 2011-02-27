@@ -26,6 +26,7 @@ class OTFGLOverlay extends OTFGLAbstractDrawableReceiver {
 		this.opaque = opaque;
 	}
 
+	@Override
 	public void onDraw(GL gl) {
 		if(this.t == null) {
 			this.t = OTFOGLDrawer.createTexture(this.texture);

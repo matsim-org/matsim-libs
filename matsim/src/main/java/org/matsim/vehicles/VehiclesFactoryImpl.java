@@ -31,27 +31,32 @@ public class VehiclesFactoryImpl implements VehiclesFactory {
 	public VehiclesFactoryImpl() {
 	}
 
+	@Override
 	public Vehicle createVehicle(Id id, VehicleType type) {
 		Vehicle veh = new VehicleImpl(id, type);
 		return veh;
 	}
 	
+	@Override
 	public VehicleType createVehicleType(Id typeId) {
 			VehicleType veh = new VehicleTypeImpl(typeId);
 			return veh;
 	}
 
 
+	@Override
 	public VehicleCapacity createVehicleCapacity() {
 		return new VehicleCapacityImpl();
 	}
 
 
+	@Override
 	public FreightCapacity createFreigthCapacity() {
 		return new FreightCapacityImpl();
 	}
 
 
+	@Override
 	public EngineInformation createEngineInformation(FuelType fuelType,
 			double gasConsumption) {
 			return new EngineInformationImpl(fuelType, gasConsumption);

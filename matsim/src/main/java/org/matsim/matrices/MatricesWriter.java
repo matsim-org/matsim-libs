@@ -54,6 +54,7 @@ public class MatricesWriter extends MatsimXmlWriter implements MatsimWriter {
 	// write methods
 	//////////////////////////////////////////////////////////////////////
 
+	@Override
 	public final void write(final String filename) {
 		try {
 			openFile(filename);

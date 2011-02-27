@@ -18,6 +18,7 @@ public class ClassCountExecutor implements Executor<OTFDataReader> {
 		return this.count;
 	}
 
+	@Override
 	public void execute(final double x, final double y, final OTFDataReader reader) {
 		if (this.targetClass.isAssignableFrom(reader.getClass())) this.count++;
 	}

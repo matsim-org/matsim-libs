@@ -71,6 +71,7 @@ public class OGLSimpleBackgroundLayer implements SceneLayer {
 		}
 	}
 
+	@Override
 	public int getDrawOrder() {
 		return 0;
 	}

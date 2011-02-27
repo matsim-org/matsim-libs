@@ -36,6 +36,7 @@ public abstract class EventImpl implements Event {
 		this.time = time;
 	}
 
+	@Override
 	public Map<String, String> getAttributes() {
 		Map<String, String> attr = new LinkedHashMap<String, String>();
 		attr.put(ATTRIBUTE_TIME, Double.toString(this.time));
@@ -46,6 +47,7 @@ public abstract class EventImpl implements Event {
 	/** @return a unique, descriptive name for this event type, used to identify event types in files. */
 	abstract public String getEventType();
 
+	@Override
 	public double getTime() {
 		return this.time;
 	}

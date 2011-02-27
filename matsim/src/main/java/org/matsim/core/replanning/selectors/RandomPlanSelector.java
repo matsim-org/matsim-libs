@@ -36,6 +36,7 @@ public class RandomPlanSelector implements PlanSelector {
 	 * Choose a random plan from the person and return it.
 	 * @return The newly selected plan for this person; <code>null</code> if the person has no plans.
 	 */
+	@Override
 	public Plan selectPlan(final Person person) {
 		return ((PersonImpl) person).getRandomPlan();
 	}

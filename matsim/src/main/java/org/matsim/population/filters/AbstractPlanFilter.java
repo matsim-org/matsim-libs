@@ -28,8 +28,10 @@ public abstract class AbstractPlanFilter implements PlanFilter, PlanAlgorithm {
 	protected PlanAlgorithm nextAlgorithm = null;
 	private int count = 0;
 
+	@Override
 	abstract public boolean judge(Plan plan);
 
+	@Override
 	public void run(final Plan plan) {
 		if (judge(plan)) {
 			count();
@@ -37,10 +39,12 @@ public abstract class AbstractPlanFilter implements PlanFilter, PlanAlgorithm {
 		}
 	}
 
+	@Override
 	public void count() {
 		this.count++;
 	}
 
+	@Override
 	public int getCount() {
 		return this.count;
 	}

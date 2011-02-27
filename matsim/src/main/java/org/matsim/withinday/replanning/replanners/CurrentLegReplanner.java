@@ -24,7 +24,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.ptproject.qsim.agents.WithinDayAgent;
-import org.matsim.withinday.replanning.replanners.CurrentLegReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
 import org.matsim.withinday.utils.EditRoutes;
 
@@ -60,7 +59,7 @@ public class CurrentLegReplanner extends WithinDayDuringLegReplanner {
 	 */
 	@Override
 	public boolean doReplanning(WithinDayAgent withinDayAgent) {
-		
+
 		// If we don't have a valid Replanner.
 		if (this.routeAlgo == null) return false;
 
@@ -78,13 +77,13 @@ public class CurrentLegReplanner extends WithinDayDuringLegReplanner {
 
 		int currentLegIndex = withinDayAgent.getCurrentPlanElementIndex();
 		int currentLinkIndex = withinDayAgent.getCurrentRouteLinkIdIndex();
-		
+
 		// new Route for current Leg
 		new EditRoutes().replanCurrentLegRoute(executedPlan, currentLegIndex, currentLinkIndex, routeAlgo, scenario.getNetwork(), time);
 
 		// Finally reset the cached Values of the PersonAgent - they may have changed!
 		withinDayAgent.resetCaches();
-		
+
 //		// create ReplanningEvent
 //		QSim.getEvents().processEvent(new ExtendedAgentReplanEventImpl(time, person.getId(), newRoute, route));
 

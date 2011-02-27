@@ -53,6 +53,7 @@ public class CalcAverageTripLength extends AbstractPersonAlgorithm implements Pl
 		this.run(person.getSelectedPlan());
 	}
 
+	@Override
 	public void run(final Plan plan) {
 		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof Leg) {

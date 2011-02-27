@@ -58,12 +58,14 @@ public class PlansFileSnapshotWriter implements SnapshotWriter {
 		this.network = network;
 	}
 
+	@Override
 	public void beginSnapshot(final double time) {
 		this.plans = new ScenarioImpl().getPopulation();
 		this.filename = this.filePrefix + Time.writeTime(time, "-") + "." + this.fileSuffix;
 		this.currenttime = time;
 	}
 
+	@Override
 	public void endSnapshot() {
 		writePlans();
 		this.plans = null;
@@ -78,6 +80,7 @@ public class PlansFileSnapshotWriter implements SnapshotWriter {
 		new PopulationWriter(this.plans, this.network).write(this.filename);
 	}
 
+	@Override
 	public void addAgent(final AgentSnapshotInfo position) {
 		PersonImpl pers = new PersonImpl(position.getId());
 
@@ -94,6 +97,7 @@ public class PlansFileSnapshotWriter implements SnapshotWriter {
 		this.plans.addPerson(pers);
 	}
 
+	@Override
 	public void finish() {
 	}
 

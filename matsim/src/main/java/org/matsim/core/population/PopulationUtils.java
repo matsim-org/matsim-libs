@@ -56,38 +56,47 @@ public class PopulationUtils {
 			delegate = plan ;
 		}
 
+		@Override
 		public void addActivity(Activity act) {
 			throw new UnsupportedOperationException() ;
 		}
 
+		@Override
 		public void addLeg(Leg leg) {
 			throw new UnsupportedOperationException() ;
 		}
 
+		@Override
 		public Map<String, Object> getCustomAttributes() {
 			return delegate.getCustomAttributes();
 		}
 
+		@Override
 		public Person getPerson() {
 			return delegate.getPerson();
 		}
 
+		@Override
 		public List<PlanElement> getPlanElements() {
 			return Collections.unmodifiableList( delegate.getPlanElements() );
 		}
 
+		@Override
 		public Double getScore() {
 			return delegate.getScore();
 		}
 
+		@Override
 		public boolean isSelected() {
 			return delegate.isSelected();
 		}
 
+		@Override
 		public void setPerson(Person person) {
 			throw new UnsupportedOperationException() ;
 		}
 
+		@Override
 		public void setScore(Double score) {
 			throw new UnsupportedOperationException() ;
 		}

@@ -64,6 +64,7 @@ public class CustomizableImpl implements Customizable {
 	 * @see Customizable
 	 * @return map for storing custom attributes
 	 */
+	@Override
 	public final Map<String,Object> getCustomAttributes() {
 		if (this.custom_attributes == null) {
 			this.custom_attributes = new HashMap<String,Object>();

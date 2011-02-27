@@ -31,6 +31,7 @@ public class FreespeedBasedWidthCalculator implements WidthCalculator {
 		this.widthCoefficient = coef;
 	}
 
+	@Override
 	public double getWidth(final Link link) {
 		return link.getFreespeed() * this.widthCoefficient;
 	}

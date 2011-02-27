@@ -143,7 +143,7 @@ public class FacilityLoad {
 	public int timeBinIndex(double time) {
 		int lastBinIndex = this.numberOfTimeBins-1;
 		int numberOfBinsPerHour = this.numberOfTimeBins/24;
-		int secondsPerBin = (int)3600/numberOfBinsPerHour;
+		int secondsPerBin = 3600/numberOfBinsPerHour;
 		return Math.min(lastBinIndex, (int)(time/secondsPerBin));
 	}
 }

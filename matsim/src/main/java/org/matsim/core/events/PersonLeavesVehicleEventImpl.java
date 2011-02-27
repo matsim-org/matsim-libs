@@ -57,6 +57,7 @@ public class PersonLeavesVehicleEventImpl extends PersonEventImpl implements Per
 		return EVENT_TYPE;
 	}
 	
+	@Override
 	public Id getVehicleId() {
 		return this.vehicleId;
 	}

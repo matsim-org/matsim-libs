@@ -122,6 +122,7 @@ public class BackwardDijkstraMultipleDestinations extends Dijkstra {
 		}
 	}
 
+	@Override
 	protected void relaxNode(final Node outNode, final Node toNode, final PseudoRemovePriorityQueue<Node> pendingNodes) {
 
 		DijkstraNodeData outData = getData(outNode);
@@ -162,6 +163,7 @@ public class BackwardDijkstraMultipleDestinations extends Dijkstra {
 		}
 	}
 
+	@Override
 	protected boolean addToPendingNodes(final Link l, final Node n,
 			final PseudoRemovePriorityQueue<Node> pendingNodes, double currTime,
 			final double currCost, final Node toNode) {
@@ -200,6 +202,7 @@ public class BackwardDijkstraMultipleDestinations extends Dijkstra {
 		return false;
 	}
 
+	@Override
 	protected void visitNode(final Node n, final DijkstraNodeData data,
 			final PseudoRemovePriorityQueue<Node> pendingNodes, final double time, final double cost,
 			final Link outLink) {		

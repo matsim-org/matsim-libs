@@ -105,6 +105,7 @@ public class TravelTimeCalculator
 		this.reset(0);
 	}
 
+	@Override
 	public void handleEvent(final LinkEnterEvent e) {
 		LinkEnterEvent oldEvent = this.linkEnterEvents.remove(e.getPersonId());
 		if ((oldEvent != null) && this.calculateLinkToLinkTravelTimes) {
@@ -116,6 +117,7 @@ public class TravelTimeCalculator
 		this.linkEnterEvents.put(e.getPersonId(), e);
 	}
 
+	@Override
 	public void handleEvent(final LinkLeaveEvent e) {
 		if (this.calculateLinkTravelTimes) {
 			LinkEnterEvent oldEvent = this.linkEnterEvents.get(e.getPersonId());
@@ -127,6 +129,7 @@ public class TravelTimeCalculator
 		}
 	}
 
+	@Override
 	public void handleEvent(final AgentArrivalEvent event) {
 		/* remove EnterEvents from list when an agent arrives.
 		 * otherwise, the activity duration would counted as travel time, when the
@@ -134,6 +137,7 @@ public class TravelTimeCalculator
 		this.linkEnterEvents.remove(event.getPersonId());
 	}
 
+	@Override
 	public void handleEvent(AgentStuckEvent event) {
 		LinkEnterEvent e = this.linkEnterEvents.remove(event.getPersonId());
 		if (e != null) {
@@ -177,6 +181,7 @@ public class TravelTimeCalculator
         "if calculation is switched off by config option!");
 	}
 	
+	@Override
 	public double getLinkTravelTime(final Link link, final double time) {
 	  return this.getLinkTravelTime(link.getId(), time);
 	}
@@ -193,10 +198,12 @@ public class TravelTimeCalculator
     return this.aggregator.getTravelTime(data.ttData, time);
 	}
 	
+	@Override
 	public double getLinkToLinkTravelTime(Link fromLink, Link toLink, double time) {
 	  return this.getLinkToLinkTravelTime(fromLink.getId(), toLink.getId(), time);
 	}
 
+	@Override
 	public void reset(int iteration) {
 		if (this.calculateLinkTravelTimes) {
 			for (DataContainer data : this.linkData.values()){

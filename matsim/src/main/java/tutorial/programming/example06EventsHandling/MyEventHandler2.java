@@ -31,22 +31,27 @@ public class MyEventHandler2 implements LinkEnterEventHandler,
 		return this.travelTime / this.popSize;
 	}
 
+	@Override
 	public void reset(int iteration) {
 		this.travelTime = 0.0;
 	}
 
+	@Override
 	public void handleEvent(LinkEnterEvent event) {
 		this.travelTime -= event.getTime();
 	}
 
+	@Override
 	public void handleEvent(LinkLeaveEvent event) {
 		this.travelTime += event.getTime();
 	}
 
+	@Override
 	public void handleEvent(AgentArrivalEvent event) {
 		this.travelTime += event.getTime();
 	}
 
+	@Override
 	public void handleEvent(AgentDepartureEvent event) {
 		this.travelTime -= event.getTime();
 	}

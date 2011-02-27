@@ -69,12 +69,14 @@ public class SignalSystemImpl implements SignalSystem {
 		this.controller = controller;
 	}
 	
+	@Override
 	public void scheduleDropping(double timeSeconds, Id signalGroupId){
 //		log.debug("dropping  at time " + timeSeconds + " of  group " + signalGroupId);
 		Set<SignalGroupStateChangeRequest> rqs = this.manager.getAmberLogic().processDropping(timeSeconds, this.getId(), signalGroupId);
 		requests.addAll(rqs);
 	}
 	
+	@Override
 	public void scheduleOnset(double timeSeconds, Id signalGroupId){
 //		log.debug("onset at time " + timeSeconds + " of  group " + signalGroupId);
 		if (this.stateLogic != null){
@@ -127,6 +129,7 @@ public class SignalSystemImpl implements SignalSystem {
 		this.signalGroups.put(group.getId(), group);
 	}
 	
+	@Override
 	public Map<Id, SignalGroup> getSignalGroups(){
 		return this.signalGroups;
 	}

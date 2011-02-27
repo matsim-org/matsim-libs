@@ -41,38 +41,47 @@ public class OTFSwingDrawerContainer extends JPanel implements OTFDrawer {
 		this.mouseMan = handi;
 	}
 	
+	@Override
 	public void clearCache() {
 		delegate.clearCache();
 	}
 
+	@Override
 	public Component getComponent() {
 		return this;
 	}
 
+	@Override
 	public OTFClientQuad getQuad() {
 		return delegate.getQuad();
 	}
 
+	@Override
 	public float getScale() {
 		return delegate.getScale();
 	}
 
+	@Override
 	public void handleClick(Double point, int mouseButton, MouseEvent e) {
 		delegate.handleClick(point, mouseButton, e);
 	}
 
+	@Override
 	public void handleClick(Rectangle currentRect, int button) {
 		delegate.handleClick(currentRect, button);
 	}
 
+	@Override
 	public void redraw() {
 		delegate.repaint();
 	}
 
+	@Override
 	public void setQueryHandler(OTFQueryHandler queryHandler) {
 		delegate.setQueryHandler(queryHandler);
 	}
 
+	@Override
 	public void setScale(float scale) {
 		this.networkScrollPane.scaleNetwork(scale);
 		this.delegate.hostControlBar.updateScaleLabel();

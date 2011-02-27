@@ -64,12 +64,12 @@ public class PlansDefineKnowledge {
 		for (Person p : plans.getPersons().values()) {
 			KnowledgeImpl k = this.knowledges.getFactory().createKnowledge(p.getId(), "created by " + this.getClass().getName());
 			int index = MatsimRandom.getRandom().nextInt(home_acts.size());
-			k.addActivityOption((ActivityOptionImpl) home_acts.get(index),true);
+			k.addActivityOption(home_acts.get(index),true);
 			index = MatsimRandom.getRandom().nextInt(work_acts.size());
-			k.addActivityOption((ActivityOptionImpl) work_acts.get(index),true);
+			k.addActivityOption(work_acts.get(index),true);
 			for (int i=0; i<4; i++) {
 				index = MatsimRandom.getRandom().nextInt(other_acts.size());
-				k.addActivityOption((ActivityOptionImpl) other_acts.get(index),false);
+				k.addActivityOption(other_acts.get(index),false);
 			}
 		}
 

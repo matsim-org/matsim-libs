@@ -159,6 +159,7 @@ public final class QueryAgentPlan extends AbstractQuery {
 
 		private boolean calcOffset = true;
 
+		@Override
 		public void draw(OTFDrawer drawer) {
 			if (drawer instanceof OTFOGLDrawer) {
 				drawWithGLDrawer((OTFOGLDrawer) drawer);

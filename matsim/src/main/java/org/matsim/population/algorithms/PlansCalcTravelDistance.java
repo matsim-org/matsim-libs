@@ -75,6 +75,7 @@ public class PlansCalcTravelDistance extends AbstractPersonAlgorithm implements 
 		}
 	}
 
+	@Override
 	public void run(final Plan plan) {
 		try {
 			handlePlan(plan);

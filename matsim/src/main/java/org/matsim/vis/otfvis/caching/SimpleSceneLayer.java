@@ -56,6 +56,7 @@ public class SimpleSceneLayer implements SceneLayer {
 	public void init(SceneGraph graph, boolean initConstData) {
 	}
 
+	@Override
 	public int getDrawOrder() {
 		return 100;
 	}

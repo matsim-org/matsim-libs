@@ -40,18 +40,22 @@ public class DepartureImpl implements Departure {
 		this.departureTime = departureTime;
 	}
 
+	@Override
 	public Id getId() {
 		return this.id;
 	}
 
+	@Override
 	public double getDepartureTime() {
 		return this.departureTime;
 	}
 
+	@Override
 	public void setVehicleId(final Id vehicleId) {
 		this.vehicleId = vehicleId;
 	}
 
+	@Override
 	public Id getVehicleId() {
 		return this.vehicleId;
 	}

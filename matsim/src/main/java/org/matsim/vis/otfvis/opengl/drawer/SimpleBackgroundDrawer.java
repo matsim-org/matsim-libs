@@ -45,6 +45,7 @@ public class SimpleBackgroundDrawer extends AbstractBackgroundDrawer {
 		this.name = picturePath;
 	}
 
+	@Override
 	public void onDraw(final GL gl) {
 		if (this.picture == null) this.picture = OTFOGLDrawer.createTexture(this.name);
 		if (this.picture == null) return;

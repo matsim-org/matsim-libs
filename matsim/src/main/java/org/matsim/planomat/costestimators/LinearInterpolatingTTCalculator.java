@@ -209,15 +209,18 @@ implements LinkEnterEventHandler, LinkLeaveEventHandler, AgentArrivalEventHandle
 	}
 
 
+	@Override
 	public void reset(final int iteration) {
 		resetTravelTimes();
 	}
 
+	@Override
 	public void handleEvent(final LinkEnterEvent event) {
 		EnterEvent e = new EnterEvent(event.getLinkId(), event.getPersonId());
 		this.enterEvents.put(e, event.getTime());
 	}
 
+	@Override
 	public void handleEvent(final LinkLeaveEvent event) {
 		EnterEvent e = new EnterEvent(event.getLinkId(), event.getPersonId());
 		Double starttime = this.enterEvents.remove(e);
@@ -230,6 +233,7 @@ implements LinkEnterEventHandler, LinkLeaveEventHandler, AgentArrivalEventHandle
 		}
 	}
 
+	@Override
 	public void handleEvent(final AgentArrivalEvent event) {
 		// remove EnterEvents from list when an agent arrives.
 		// otherwise, the activity duration would counted as travel time, when the
@@ -239,6 +243,7 @@ implements LinkEnterEventHandler, LinkLeaveEventHandler, AgentArrivalEventHandle
 	}
 
 
+	@Override
 	public double getLinkTravelTime(final Link link, final double time) {
 		return getTravelTimeRole(link.getId()).getTravelTime(time);
 	}

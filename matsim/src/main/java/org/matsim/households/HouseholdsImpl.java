@@ -41,10 +41,12 @@ public class HouseholdsImpl implements Households{
 		this.factory = new HouseholdsFactoryImpl();
 	}
 	
+	@Override
 	public HouseholdsFactory getFactory() {
 		return this.factory;
 	}
 
+	@Override
 	public Map<Id, Household> getHouseholds() {
 		return this.households;
 	}

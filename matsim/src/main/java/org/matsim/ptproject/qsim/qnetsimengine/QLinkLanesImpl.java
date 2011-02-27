@@ -292,6 +292,7 @@ public class QLinkLanesImpl extends QLinkInternalI {
 		}
 	}
 
+	@Override
 	public void addParkedVehicle(QVehicle vehicle) {
 		this.parkedVehicles.put(vehicle.getId(), vehicle);
 		vehicle.setCurrentLink(this.link);
@@ -306,6 +307,7 @@ public class QLinkLanesImpl extends QLinkInternalI {
 		return this.parkedVehicles.remove(vehicleId);
 	}
 
+	@Override
 	public void addDepartingVehicle(QVehicle vehicle) {
 		this.waitingList.add(vehicle);
 		this.activateLink();
@@ -375,12 +377,14 @@ public class QLinkLanesImpl extends QLinkInternalI {
 		return this.originalLane.hasSpace();
 	}
 
+	@Override
 	public void recalcTimeVariantAttributes(double time) {
 		for (QLane ql : this.queueLanes){
 			ql.recalcTimeVariantAttributes(time);
 		}
 	}
 
+	@Override
 	public QVehicle getVehicle(Id vehicleId) {
 		QVehicle ret = getParkedVehicle(vehicleId);
 		if (ret != null) {
@@ -440,10 +444,12 @@ public class QLinkLanesImpl extends QLinkInternalI {
 		return count;
 	}
 
+	@Override
 	public Link getLink() {
 		return this.link;
 	}
 
+	@Override
 	public QNode getToQueueNode() {
 		return this.toQueueNode;
 	}
@@ -486,6 +492,7 @@ public class QLinkLanesImpl extends QLinkInternalI {
 		return this.queueLanes;
 	}
 
+	@Override
 	public VisData getVisData() {
 		return this.visdata;
 	}
@@ -512,6 +519,7 @@ public class QLinkLanesImpl extends QLinkInternalI {
 	 */
 	class VisDataImpl implements VisData {
 
+		@Override
 		public Collection<AgentSnapshotInfo> getVehiclePositions( final Collection<AgentSnapshotInfo> positions) {
 
 			AgentSnapshotInfoBuilder agentSnapshotInfoBuilder = QLinkLanesImpl.this.getQSimEngine().getAgentSnapshotInfoBuilder();

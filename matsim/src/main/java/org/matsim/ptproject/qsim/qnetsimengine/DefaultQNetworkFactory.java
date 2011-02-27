@@ -33,6 +33,7 @@ import org.matsim.ptproject.qsim.interfaces.NetsimNetworkFactory;
  */
 public final class DefaultQNetworkFactory implements NetsimNetworkFactory<QNode, QLinkInternalI> {
 
+	@Override
 	public QLinkInternalI createNetsimLink(final Link link, final NetsimEngine simEngine, final QNode toQueueNode) {
 		return new QLinkImpl(link, simEngine, toQueueNode);
 	}
@@ -40,6 +41,7 @@ public final class DefaultQNetworkFactory implements NetsimNetworkFactory<QNode,
 	/**
 	 * @see org.matsim.core.mobsim.queuesim.QueueNetworkFactory#createNetsimNode(org.matsim.core.network.NodeImpl, org.matsim.core.mobsim.queuesim.QueueNetwork)
 	 */
+	@Override
 	public QNode createNetsimNode(final Node node, NetsimEngine simEngine) {
 		return new QNode(node, simEngine);
 	}
@@ -52,6 +54,7 @@ public final class DefaultQNetworkFactory implements NetsimNetworkFactory<QNode,
 //		return new QNetwork(qs);
 //	}
 	
+	@Override
 	public NetsimNetwork createNetsimNetwork( Netsim mobsim ) {
 		QSim qsim = (QSim) mobsim ; // cast needs to be ok in order to make this work
 		return new QNetwork( qsim ) ;

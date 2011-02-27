@@ -50,6 +50,7 @@ public abstract class Message implements Comparable<Message> {
 	 * The comparison is done according to the message arrival Time. If the time
 	 * is equal of two messages, then the priority of the messages is compared
 	 */
+	@Override
 	public int compareTo(Message otherMessage) {
 		if (messageArrivalTime > otherMessage.messageArrivalTime) {
 			return 1;

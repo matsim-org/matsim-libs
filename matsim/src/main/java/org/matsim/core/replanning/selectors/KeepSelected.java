@@ -33,6 +33,7 @@ public class KeepSelected implements PlanSelector {
 	/**
 	 * returns the already selected plan for this person
 	 */
+	@Override
 	public Plan selectPlan(Person person) {
 		return person.getSelectedPlan();
 	}

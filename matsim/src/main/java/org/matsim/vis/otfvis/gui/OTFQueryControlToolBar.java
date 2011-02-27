@@ -127,6 +127,7 @@ public class OTFQueryControlToolBar extends JToolBar implements ActionListener, 
 		pane.addTab("Query", panel);
 	}
 
+	@Override
 	public void actionPerformed(ActionEvent e) {
 		OTFVisConfigGroup cfg = this.config;
 		String command = e.getActionCommand();
@@ -160,6 +161,7 @@ public class OTFQueryControlToolBar extends JToolBar implements ActionListener, 
 		}
 	}
 
+	@Override
 	public void itemStateChanged(ItemEvent e) {
 		JCheckBox source = (JCheckBox)e.getItemSelectable();
 		if (source.getText().equals("multiple select")) {

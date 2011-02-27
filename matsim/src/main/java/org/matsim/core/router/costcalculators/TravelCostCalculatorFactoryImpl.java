@@ -30,6 +30,7 @@ import org.matsim.core.router.util.PersonalizableTravelTime;
  */
 public class TravelCostCalculatorFactoryImpl implements TravelCostCalculatorFactory {
 
+	@Override
 	public PersonalizableTravelCost createTravelCostCalculator(PersonalizableTravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
 		return new TravelTimeDistanceCostCalculator(timeCalculator, cnScoringGroup);
 	}

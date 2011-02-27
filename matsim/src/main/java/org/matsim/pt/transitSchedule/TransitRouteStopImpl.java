@@ -43,26 +43,32 @@ public class TransitRouteStopImpl implements TransitRouteStop {
 		this.arrivalOffset = arrivalDelay;
 	}
 
+	@Override
 	public TransitStopFacility getStopFacility() {
 		return this.stop;
 	}
 
+	@Override
 	public void setStopFacility(final TransitStopFacility stopFacility) {
 		this.stop = stopFacility;
 	}
 
+	@Override
 	public double getDepartureOffset() {
 		return this.departureOffset;
 	}
 
+	@Override
 	public double getArrivalOffset() {
 		return this.arrivalOffset;
 	}
 
+	@Override
 	public boolean isAwaitDepartureTime() {
 		return this.awaitDepartureTime;
 	}
 
+	@Override
 	public void setAwaitDepartureTime(final boolean awaitDepartureTime) {
 		this.awaitDepartureTime = awaitDepartureTime;
 	}

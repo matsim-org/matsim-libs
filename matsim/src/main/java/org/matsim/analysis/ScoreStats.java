@@ -84,6 +84,7 @@ public class ScoreStats implements StartupListener, IterationEndsListener, Shutd
 		this.out.write("ITERATION\tavg. EXECUTED\tavg. WORST\tavg. AVG\tavg. BEST\n");
 	}
 
+	@Override
 	public void notifyStartup(final StartupEvent event) {
 		Controler controler = event.getControler();
 		this.minIteration = controler.getFirstIteration();
@@ -93,6 +94,7 @@ public class ScoreStats implements StartupListener, IterationEndsListener, Shutd
 		this.history = new double[4][iterations+1];
 	}
 
+	@Override
 	public void notifyIterationEnds(final IterationEndsEvent event) {
 		double sumScoreWorst = 0.0;
 		double sumScoreBest = 0.0;
@@ -218,6 +220,7 @@ public class ScoreStats implements StartupListener, IterationEndsListener, Shutd
 		}
 	}
 
+	@Override
 	public void notifyShutdown(final ShutdownEvent controlerShudownEvent) {
 		try {
 			this.out.close();

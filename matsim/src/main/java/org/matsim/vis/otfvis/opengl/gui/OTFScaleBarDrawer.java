@@ -52,6 +52,7 @@ public class OTFScaleBarDrawer extends OTFGLAbstractDrawableReceiver {
 		InfoText.setRenderer(this.textRenderer);
 	}
 	
+	@Override
 	public void onDraw(GL gl) {
 		if (this.back == null){
 			this.back = OTFOGLDrawer.createTexture(MatsimResource.getAsInputStream(this.bg));

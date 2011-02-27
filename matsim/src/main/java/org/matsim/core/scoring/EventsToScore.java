@@ -92,6 +92,7 @@ public class EventsToScore implements AgentArrivalEventHandler, AgentDepartureEv
 		return 1 + index.intValue();
 	}
 
+	@Override
 	public void handleEvent(final AgentDepartureEvent event) {
 		Tuple<Plan, ScoringFunction> data = getScoringDataForAgent(event.getPersonId());
 		if (data != null) {
@@ -100,6 +101,7 @@ public class EventsToScore implements AgentArrivalEventHandler, AgentDepartureEv
 		}
 	}
 
+	@Override
 	public void handleEvent(final AgentArrivalEvent event) {
 		ScoringFunction sf = getScoringFunctionForAgent(event.getPersonId());
 		if (sf != null) {
@@ -107,6 +109,7 @@ public class EventsToScore implements AgentArrivalEventHandler, AgentDepartureEv
 		}
 	}
 
+	@Override
 	public void handleEvent(final AgentStuckEvent event) {
 		ScoringFunction sf = getScoringFunctionForAgent(event.getPersonId());
 		if (sf != null) {
@@ -114,6 +117,7 @@ public class EventsToScore implements AgentArrivalEventHandler, AgentDepartureEv
 		}
 	}
 
+	@Override
 	public void handleEvent(final AgentMoneyEvent event) {
 		ScoringFunction sf = getScoringFunctionForAgent(event.getPersonId());
 		if (sf != null) {
@@ -121,6 +125,7 @@ public class EventsToScore implements AgentArrivalEventHandler, AgentDepartureEv
 		}
 	}
 
+	@Override
 	public void handleEvent(final ActivityStartEvent event) {
 		Tuple<Plan, ScoringFunction> data = getScoringDataForAgent(event.getPersonId());
 		if (data != null) {
@@ -129,6 +134,7 @@ public class EventsToScore implements AgentArrivalEventHandler, AgentDepartureEv
 		}
 	}
 
+	@Override
 	public void handleEvent(final ActivityEndEvent event) {
 		ScoringFunction sf = getScoringFunctionForAgent(event.getPersonId());
 		if (sf != null) {
@@ -186,6 +192,7 @@ public class EventsToScore implements AgentArrivalEventHandler, AgentDepartureEv
 		return data.getSecond().getScore();
 	}
 
+	@Override
 	public void reset(final int iteration) {
 		this.agentScorers.clear();
 		this.agentPlanElementIndex.clear();

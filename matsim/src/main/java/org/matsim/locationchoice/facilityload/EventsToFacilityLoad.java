@@ -67,6 +67,7 @@ public class EventsToFacilityLoad implements ActivityStartEventHandler, Activity
 	 * Add an arrival event in "FacilityLoad" for every start of an activity
 	 * Home activities are excluded.
 	 */
+	@Override
 	public void handleEvent(final ActivityStartEvent event) {
 		if (!(event.getActType().startsWith("h") || event.getActType().startsWith("tta"))) {
 			Id facilityId = event.getFacilityId();
@@ -78,6 +79,7 @@ public class EventsToFacilityLoad implements ActivityStartEventHandler, Activity
 	 * Add a departure event in "FacilityLoad" for every ending of an activity
 	 * Home activities are excluded
 	 */
+	@Override
 	public void handleEvent(final ActivityEndEvent event) {
 		if (!(event.getActType().startsWith("h") || event.getActType().startsWith("tta"))) {
 			Id facilityId = event.getFacilityId();
@@ -94,6 +96,7 @@ public class EventsToFacilityLoad implements ActivityStartEventHandler, Activity
 		log.info("EventsToFacilityLoad finished");
 	}
 
+	@Override
 	public void reset(final int iteration) {
 		log.info("Not really resetting anything here.");
 	}

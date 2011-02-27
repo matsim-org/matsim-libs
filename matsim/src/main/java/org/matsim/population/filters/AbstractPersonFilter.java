@@ -29,8 +29,10 @@ public abstract class AbstractPersonFilter implements PersonAlgorithm, PersonFil
 	protected PersonAlgorithm nextAlgorithm = null;
 	private int count = 0;
 	
+	@Override
 	abstract public boolean judge(Person person);
 
+	@Override
 	public void run(Person person) {
 		if (judge(person)) {
 			count();
@@ -38,10 +40,12 @@ public abstract class AbstractPersonFilter implements PersonAlgorithm, PersonFil
 		}	
 	}
 
+	@Override
 	public void count() {
 		this.count++;
 	}
 
+	@Override
 	public int getCount() {
 		return this.count;
 	}

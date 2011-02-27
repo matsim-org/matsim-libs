@@ -68,6 +68,7 @@ public class GK4toWGS84 implements CoordinateTransformation {
 		(1097 * Math.pow(e1, 4) / 512)
 	};
 
+	@Override
 	public Coord transform(final Coord coord) {
 
 		double easting = coord.getX();

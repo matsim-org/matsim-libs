@@ -41,6 +41,7 @@ public interface TransitSchedule extends MatsimToplevelContainer {
 
 	public abstract Map<Id, TransitStopFacility> getFacilities();
 	
+	@Override
 	public abstract TransitScheduleFactory getFactory();
 
 }

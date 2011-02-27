@@ -34,6 +34,7 @@ public interface Knowledges extends MatsimToplevelContainer {
 
 	public Map<Id, KnowledgeImpl> getKnowledgesByPersonId();
 
+	@Override
 	public KnowledgesFactory getFactory();
 
 }

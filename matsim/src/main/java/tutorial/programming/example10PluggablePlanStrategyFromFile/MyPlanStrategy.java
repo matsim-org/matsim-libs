@@ -56,30 +56,37 @@ public class MyPlanStrategy implements PlanStrategy {
 		
 	}
 
+	@Override
 	public void addStrategyModule(PlanStrategyModule module) {
 		planStrategyDelegate.addStrategyModule(module);
 	}
 
+	@Override
 	public void finish() {
 		planStrategyDelegate.finish();
 	}
 
+	@Override
 	public int getNumberOfStrategyModules() {
 		return planStrategyDelegate.getNumberOfStrategyModules();
 	}
 
+	@Override
 	public PlanSelector getPlanSelector() {
 		return planStrategyDelegate.getPlanSelector();
 	}
 
+	@Override
 	public void init() {
 		planStrategyDelegate.init();
 	}
 
+	@Override
 	public void run(Person person) {
 		planStrategyDelegate.run(person);
 	}
 
+	@Override
 	public String toString() {
 		return planStrategyDelegate.toString();
 	}

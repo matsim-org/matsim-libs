@@ -43,6 +43,7 @@ public class TravelTimesInvertedNetProxy implements TravelTime {
 	/**
 	 * @see org.matsim.core.router.util.TravelTime#getLinkTravelTime(Link, double)
 	 */
+	@Override
 	public double getLinkTravelTime(Link link, double time) {
 		Link fromLink = this.originalNetwork.getLinks().get(link.getFromNode().getId());
 		Link toLink = this.originalNetwork.getLinks().get(link.getToNode().getId());

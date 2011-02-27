@@ -90,6 +90,7 @@ public class TransitLoad implements VehicleArrivesAtFacilityEventHandler, Vehicl
 		si.arrivalTime = event.getTime();
 	}
 
+	@Override
 	public void handleEvent(VehicleDepartsAtFacilityEvent event) {
 		Id stopId = this.vehicleFacilityMap.remove(event.getVehicleId());
 		if (this.vehicleData == null) {

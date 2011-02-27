@@ -149,6 +149,7 @@ public class OTFFileWriter implements SnapshotWriter {
 		}
 	}
 
+	@Override
 	public void beginSnapshot(final double time) {
 		if (!this.isOpen)
 			open();
@@ -183,12 +184,15 @@ public class OTFFileWriter implements SnapshotWriter {
 		this.zos.closeEntry();
 	}
 
+	@Override
 	public void addAgent(final AgentSnapshotInfo position) {
 		// Do nothing
 	}
 
+	@Override
 	public void endSnapshot() {}
 
+	@Override
 	public void finish() {
 		close();
 	}

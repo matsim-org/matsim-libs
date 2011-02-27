@@ -44,19 +44,23 @@ public class AgentStuckScoringFunction implements AgentStuckScoring, BasicScorin
 		this.reset();
 	}
 
+	@Override
 	public void reset() {
 		this.score = INITIAL_SCORE;
 	}
 
+	@Override
 	public void agentStuck(final double time) {
 
 		this.score += getStuckPenalty();
 	}
 
+	@Override
 	public void finish() {
 
 	}
 
+	@Override
 	public double getScore() {
 		return this.score;
 	}

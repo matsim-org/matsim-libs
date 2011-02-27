@@ -45,18 +45,22 @@ public class MoneyScoringFunction implements MoneyScoring, BasicScoring {
 
 	}
 
+	@Override
 	public void reset() {
 		this.score = INITIAL_SCORE;
 	}
 
+	@Override
 	public void addMoney(final double amount) {
 		this.score += amount * this.params.marginalUtilityOfMoney ; // linear mapping of money to score
 	}
 
+	@Override
 	public void finish() {
 
 	}
 
+	@Override
 	public double getScore() {
 		return this.score;
 	}

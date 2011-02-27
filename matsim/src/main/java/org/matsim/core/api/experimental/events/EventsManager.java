@@ -6,6 +6,7 @@ import org.matsim.core.events.handler.EventHandler;
 
 public interface EventsManager extends MatsimToplevelContainer {
 
+	@Override
 	public EventsFactory getFactory();
 
 	public void processEvent(final Event event);

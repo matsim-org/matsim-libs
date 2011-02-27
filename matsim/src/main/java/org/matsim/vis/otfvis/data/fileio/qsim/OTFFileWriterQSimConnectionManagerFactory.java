@@ -31,6 +31,7 @@ import org.matsim.vis.otfvis.handler.OTFLinkLanesAgentsNoParkingHandler;
  */
 public class OTFFileWriterQSimConnectionManagerFactory implements OTFConnectionManagerFactory{
 
+	@Override
 	public OTFConnectionManager createConnectionManager() {
 		OTFConnectionManager c = new OTFConnectionManager();
 		c.connectQLinkToWriter(OTFLinkLanesAgentsNoParkingHandler.Writer.class);

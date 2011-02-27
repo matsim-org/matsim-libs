@@ -6,6 +6,7 @@ import org.matsim.vis.snapshots.writers.VisNode;
 
 public interface NetsimNode extends Customizable, VisNode {
 
+	@Override
 	public Node getNode();
 
 }

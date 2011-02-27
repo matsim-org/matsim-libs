@@ -13,22 +13,27 @@ public class Wenden implements UmlaufStueckI {
 		this.route = route;
 	}
 
+	@Override
 	public Departure getDeparture() {
 		return null;
 	}
 
+	@Override
 	public TransitLine getLine() {
 		return null;
 	}
 
+	@Override
 	public TransitRoute getRoute() {
 		return null;
 	}
 
+	@Override
 	public NetworkRoute getCarRoute() {
 		return route;
 	}
 
+	@Override
 	public boolean isFahrt() {
 		return false;
 	}

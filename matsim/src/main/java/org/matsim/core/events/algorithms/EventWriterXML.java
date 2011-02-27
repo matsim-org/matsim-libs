@@ -35,6 +35,7 @@ public class EventWriterXML implements EventWriter, BasicEventHandler {
 		init(filename);
 	}
 
+	@Override
 	public void closeFile() {
 		if (this.out != null)
 			try {
@@ -57,10 +58,12 @@ public class EventWriterXML implements EventWriter, BasicEventHandler {
 		}
 	}
 
+	@Override
 	public void reset(final int iter) {
 		closeFile();
 	}
 
+	@Override
 	public void handleEvent(final Event event) {
 		StringBuilder eventXML = new StringBuilder("\t<event ");
 		Map<String, String> attr = event.getAttributes();

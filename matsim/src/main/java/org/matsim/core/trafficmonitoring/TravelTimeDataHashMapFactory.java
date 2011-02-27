@@ -31,6 +31,7 @@ public class TravelTimeDataHashMapFactory implements TravelTimeDataFactory {
 		this.network = network;
 	}
 	
+	@Override
 	public TravelTimeData createTravelTimeData(Id linkId) {
 		return new TravelTimeDataHashMap(this.network.getLinks().get(linkId));
 	}

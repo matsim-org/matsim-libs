@@ -31,7 +31,6 @@ import org.matsim.pt.qsim.ComplexTransitStopHandlerFactory;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.QSimFactory;
 import org.matsim.vis.otfvis.OTFVisMobsimFeature;
-import org.matsim.vis.otfvis.gui.OTFVisConfigGroup;
 
 public class TransitControler {
 

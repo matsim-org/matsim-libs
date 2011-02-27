@@ -129,6 +129,7 @@ public abstract class ParallelPersonAlgorithmRunner {
 			this.persons.add(person);
 		}
 
+		@Override
 		public void run() {
 			for (Person person : this.persons) {
 				this.personAlgo.run(person);

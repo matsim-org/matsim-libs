@@ -43,42 +43,49 @@ public class ScoringFunctionAccumulator implements ScoringFunction {
 	private ArrayList<LegScoring> legScoringFunctions = new ArrayList<LegScoring>();
 	private ArrayList<AgentStuckScoring> agentStuckScoringFunctions = new ArrayList<AgentStuckScoring>();
 
+	@Override
 	public void addMoney(double amount) {
 		for (MoneyScoring moneyScoringFunction : moneyScoringFunctions) {
 			moneyScoringFunction.addMoney(amount);
 		}
 	}
 
+	@Override
 	public void agentStuck(double time) {
 		for (AgentStuckScoring agentStuckScoringFunction : agentStuckScoringFunctions) {
 			agentStuckScoringFunction.agentStuck(time);
 		}
 	}
 
+	@Override
 	public void startActivity(double time, Activity act) {
 		for (ActivityScoring activityScoringFunction : activityScoringFunctions) {
 			activityScoringFunction.startActivity(time, act);
 		}
 	}
 
+	@Override
 	public void endActivity(double time) {
 		for (ActivityScoring activityScoringFunction : activityScoringFunctions) {
 			activityScoringFunction.endActivity(time);
 		}
 	}
 
+	@Override
 	public void startLeg(double time, Leg leg) {
 		for (LegScoring legScoringFunction : legScoringFunctions) {
 			legScoringFunction.startLeg(time, leg);
 		}
 	}
 
+	@Override
 	public void endLeg(double time) {
 		for (LegScoring legScoringFunction : legScoringFunctions) {
 			legScoringFunction.endLeg(time);
 		}
 	}
 
+	@Override
 	public void finish() {
 		for (BasicScoring basicScoringFunction : basicScoringFunctions) {
 			basicScoringFunction.finish();
@@ -88,6 +95,7 @@ public class ScoringFunctionAccumulator implements ScoringFunction {
 	/**
 	 * Add the score of all functions.
 	 */
+	@Override
 	public double getScore() {
 		double score = 0.0;
 		for (BasicScoring basicScoringFunction : basicScoringFunctions) {
@@ -97,6 +105,7 @@ public class ScoringFunctionAccumulator implements ScoringFunction {
 		return score;
 	}
 
+	@Override
 	public void reset() {
 		for (BasicScoring basicScoringFunction : basicScoringFunctions) {
 			basicScoringFunction.reset();

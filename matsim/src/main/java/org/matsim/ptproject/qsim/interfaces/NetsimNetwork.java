@@ -32,6 +32,7 @@ import org.matsim.vis.snapshots.writers.VisNetwork;
 public interface NetsimNetwork extends VisNetwork {
 	// yyyy "extends VisNetwork" possibly a temporary fix
 
+	@Override
 	Network getNetwork();
 
 	Map<Id, ? extends NetsimLink> getNetsimLinks();

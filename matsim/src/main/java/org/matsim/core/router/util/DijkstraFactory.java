@@ -35,6 +35,7 @@ public class DijkstraFactory implements LeastCostPathCalculatorFactory {
 		this.preProcessData = preProcessData;
 	}
 
+	@Override
 	public LeastCostPathCalculator createPathCalculator(final Network network, final TravelCost travelCosts, final TravelTime travelTimes) {
 		if (this.preProcessData == null) {
 			return new Dijkstra(network, travelCosts, travelTimes);

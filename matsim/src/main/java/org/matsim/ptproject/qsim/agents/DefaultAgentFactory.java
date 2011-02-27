@@ -35,6 +35,7 @@ public class DefaultAgentFactory implements AgentFactory {
 		this.simulation = simulation;
 	}
 
+	@Override
 	public PersonDriverAgent createPersonAgent(final Person p) {
 		PersonDriverAgent agent = new PersonDriverAgentImpl(p, this.simulation);
 		return agent;

@@ -58,14 +58,17 @@ public class QueryLinkId extends AbstractQuery {
 
 		public Map<CoordImpl, String> linkIds = new HashMap<CoordImpl, String>();
 
+		@Override
 		public void remove() {
 
 		}
 		
+		@Override
 		public boolean isAlive() {
 			return false;
 		}
 
+		@Override
 		public void draw(OTFDrawer drawer) {
 
 		}
@@ -110,6 +113,7 @@ public class QueryLinkId extends AbstractQuery {
 			cellWidth = OTFClientControl.getInstance().getOTFVisConfig().getLinkWidth();
 		}
 		
+		@Override
 		public void execute(double x, double y, OTFDataWriter writer)  {
 			Object src = writer.getSrc();
 			if(src instanceof VisLink) {
@@ -142,6 +146,7 @@ public class QueryLinkId extends AbstractQuery {
 		}
 	}
 	
+	@Override
 	public void installQuery(OTFVisMobsimFeature queueSimulation, EventsManager events, OTFServerQuad2 quad) {
 		this.result = new Result();
 		// just look in a certain region around the actual point, 
@@ -158,10 +163,12 @@ public class QueryLinkId extends AbstractQuery {
 		quad.execute(rect, new AddIdStringExecutor(width == 0));
 	}
 
+	@Override
 	public Type getType() {
 		return OTFQuery.Type.OTHER;
 	}
 
+	@Override
 	public void setId(String id) {
 	}
 

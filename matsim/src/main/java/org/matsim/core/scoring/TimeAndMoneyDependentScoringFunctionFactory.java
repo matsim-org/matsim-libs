@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.population.Plan;
  */
 public class TimeAndMoneyDependentScoringFunctionFactory implements ScoringFunctionFactory {
 	
+	@Override
 	public ScoringFunction createNewScoringFunction(Plan plan) {
 		return new TimeAndMoneyDependentScoringFunction();
 	}

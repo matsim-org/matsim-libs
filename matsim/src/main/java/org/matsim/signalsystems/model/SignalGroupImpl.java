@@ -39,6 +39,7 @@ public class SignalGroupImpl implements SignalGroup {
 		this.id = id;
 	}
 	
+	@Override
 	public Id getId(){
 		return this.id;
 	}

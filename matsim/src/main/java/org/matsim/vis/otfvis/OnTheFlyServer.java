@@ -247,6 +247,7 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 		}
 	}
 
+	@Override
 	public boolean requestNewTime(final int time, final TimePreference searchDirection) throws RemoteException {
 		if( ((searchDirection == TimePreference.RESTART) && (time < localTime))) { 
 			doStep(time);
@@ -282,6 +283,7 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 		}
 	}
 
+	@Override
 	public void pause()  throws RemoteException{
 		synchronized (updateFinished) {
 			if (status == Status.PLAY) {
@@ -303,6 +305,7 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 		}
 	}
 
+	@Override
 	public void play()  throws RemoteException{
 		synchronized(paused) {
 			status = Status.PLAY;
@@ -311,14 +314,17 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 	}
 
 
+	@Override
 	public int getLocalTime() throws RemoteException {
 		return localTime;
 	}
 
+	@Override
 	public boolean isLive() {
 		return true;
 	}
 
+	@Override
 	public OTFServerQuadI getQuad(String id, OTFConnectionManager connect) throws RemoteException {
 		if (quads.containsKey(id)) {
 			return quads.get(id);
@@ -339,6 +345,7 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 		OTFLinkAgentsHandler.showParked = !OTFLinkAgentsHandler.showParked;
 	}
 
+	@Override
 	public byte[] getQuadConstStateBuffer(String id) throws RemoteException {
 		synchronized (buf) {
 			byte[] result;
@@ -352,6 +359,7 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 		}
 	}
 
+	@Override
 	public byte[] getQuadDynStateBuffer(final String id, final QuadTree.Rect bounds) throws RemoteException {
 		Callable<byte[]> callable = new Callable<byte[]>() {
 
@@ -381,6 +389,7 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 
 	}
 
+	@Override
 	public OTFQueryRemote answerQuery(AbstractQuery query) throws RemoteException {
 		OTFServerQuad2 quad = quads.values().iterator().next();
 		query.installQuery(otfVisQueueSimFeature, events, quad);
@@ -398,6 +407,7 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 		activeQueries.clear();
 	}
 
+	@Override
 	public Collection<Double> getTimeSteps() throws RemoteException {
 		// There are no timesteps implemented here right now, so we return null instead
 		return null;

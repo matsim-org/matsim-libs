@@ -41,5 +41,6 @@ public abstract class AbstractPersonAlgorithm implements PersonAlgorithm {
 		log.info("done running algorithm.");
 	}
 
+	@Override
 	public abstract void run(Person person);
 }

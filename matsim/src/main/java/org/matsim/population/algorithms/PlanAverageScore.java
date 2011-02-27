@@ -41,6 +41,7 @@ public class PlanAverageScore extends AbstractPersonAlgorithm implements PlanAlg
 		}
 	}
 	
+	@Override
 	public final void run(Plan plan) {
 		Double score = plan.getScore();
 

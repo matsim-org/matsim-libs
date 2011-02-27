@@ -50,46 +50,57 @@ public class QVehicleImpl implements QVehicle {
 		this.basicVehicle = basicVehicle;
 	}
 
+	@Override
 	public double getLinkEnterTime() {
 		return this.linkEnterTime;
 	}
 	
+	@Override
 	public void setLinkEnterTime(final double time) {
 		this.linkEnterTime = time;
 	}
 	
+	@Override
 	public double getEarliestLinkExitTime() {
 		return this.earliestLinkExitTime;
 	}
 
+	@Override
 	public void setEarliestLinkExitTime(final double time) {
 		this.earliestLinkExitTime = time;
 	}
 
+	@Override
 	public Link getCurrentLink() {
 		return this.currentLink;
 	}
 	
+	@Override
 	public void setCurrentLink(final Link link) {
 		this.currentLink = link;
 	}
 
+	@Override
 	public PersonDriverAgent getDriver() {
 		return this.driver;
 	}
 
+	@Override
 	public void setDriver(final PersonDriverAgent driver) {
 		this.driver = driver;
 	}
 
+	@Override
 	public Id getId() {
 		return this.id;
 	}
 	
+	@Override
 	public double getSizeInEquivalents() {
 		return this.sizeInEquivalents;
 	}
 
+	@Override
 	public Vehicle getVehicle() {
 		return this.basicVehicle;
 	}

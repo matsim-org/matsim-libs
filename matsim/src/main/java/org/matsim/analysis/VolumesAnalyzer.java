@@ -48,6 +48,7 @@ public class VolumesAnalyzer implements LinkLeaveEventHandler {
 		this.links = new HashMap<Id, int[]>((int) (network.getLinks().size() * 1.1), 0.95f);
 	}
 
+	@Override
 	public void handleEvent(final LinkLeaveEvent event) {
 		int[] volumes = this.links.get(event.getLinkId());
 		if (volumes == null) {
@@ -81,6 +82,7 @@ public class VolumesAnalyzer implements LinkLeaveEventHandler {
 		return this.links.keySet();
 	}
 
+	@Override
 	public void reset(final int iteration) {
 		this.links.clear();
 	}

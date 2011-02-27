@@ -78,6 +78,7 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 			this.graph = graph;
 		}
 
+		@Override
 		public void execute(final double x, final double y, final OTFDataReader reader) {
 			// I the end, the readers are stored in the leaves of the quad tree, and the "mechanics" will get them out and
 			// feed them into this method here.  
@@ -103,6 +104,7 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 			this.sceneGraph = aSceneGraph;
 		}
 
+		@Override
 		public void execute(final double x, final double y, final OTFDataReader reader) {
 			reader.invalidate(this.sceneGraph);
 		}

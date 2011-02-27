@@ -41,6 +41,7 @@ public class NetworkWriter extends MatsimXmlWriter implements MatsimWriter {
 		this.network = network;
 	}
 
+	@Override
 	public void write(final String filename) {
 		log.info("Writing network to file: " + filename  + "...");
 		// always write out in newest version, currently v1

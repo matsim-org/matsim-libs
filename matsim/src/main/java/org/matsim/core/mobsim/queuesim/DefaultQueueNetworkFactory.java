@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.network.Node;
  */
 /*package*/ final class DefaultQueueNetworkFactory implements QueueNetworkFactory<QueueNode, QueueLink> {
 
+	@Override
 	public QueueLink createQueueLink(final Link link, final QueueNetwork queueNetwork, final QueueNode toQueueNode) {
 		return new QueueLink(link, queueNetwork, toQueueNode);
 	}
@@ -34,6 +35,7 @@ import org.matsim.api.core.v01.network.Node;
 	/**
 	 * @see org.matsim.core.mobsim.queuesim.QueueNetworkFactory#createQueueNode(org.matsim.core.network.NodeImpl, org.matsim.core.mobsim.queuesim.QueueNetwork)
 	 */
+	@Override
 	public QueueNode createQueueNode(final Node node, final QueueNetwork queueNetwork) {
 		return new QueueNode(node, queueNetwork);
 	}

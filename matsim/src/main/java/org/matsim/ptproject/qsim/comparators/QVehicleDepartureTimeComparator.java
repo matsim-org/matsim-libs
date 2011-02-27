@@ -37,6 +37,7 @@ public class QVehicleDepartureTimeComparator implements Comparator<QVehicle>,
 
 	private static final long serialVersionUID = 1L;
 
+	@Override
 	public int compare(final QVehicle veh1, final QVehicle veh2) {
 		if (veh1.getDriver().getActivityEndTime() > veh2.getDriver().getActivityEndTime())
 			return 1;

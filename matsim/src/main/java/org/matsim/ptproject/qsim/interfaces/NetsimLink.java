@@ -72,6 +72,7 @@ public interface NetsimLink extends Customizable, VisLink {
 	 */
 	public double getSpaceCap();
 
+	@Override
 	public Link getLink();
 	// (underlying data)
 
@@ -81,6 +82,7 @@ public interface NetsimLink extends Customizable, VisLink {
 	public QVehicle getVehicle(Id vehicleId);
 	// not terribly efficient, but a possible method also for general mobsims
 
+	@Override
 	public Collection<QVehicle> getAllVehicles();
 	// not terribly efficient, but a possible method also for general mobsims
 

@@ -142,10 +142,12 @@ public class ActivityImpl implements Activity {
 				"[endTime=" + Time.writeTime(this.getEndTime()) + "]";
 	}
 
+	@Override
 	public double getMaximumDuration() {
 		return this.dur;
 	}
 
+	@Override
 	public void setMaximumDuration(final double dur) {
 		this.dur = dur;
 	}

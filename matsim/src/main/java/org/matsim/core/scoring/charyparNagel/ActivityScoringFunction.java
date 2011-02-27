@@ -70,6 +70,7 @@ public class ActivityScoringFunction implements ActivityScoring, BasicScoring {
 		this.lastActIndex = this.plan.getPlanElements().size() - 1;
 	}
 
+	@Override
 	public void reset() {
 		this.lastTime = INITIAL_LAST_TIME;
 		this.index = INITIAL_INDEX;
@@ -77,21 +78,25 @@ public class ActivityScoringFunction implements ActivityScoring, BasicScoring {
 		this.score = INITIAL_SCORE;
 	}
 
+	@Override
 	public void startActivity(final double time, final Activity act) {
 		this.lastTime = time;
 	}
 
+	@Override
 	public void endActivity(final double time) {
 		handleAct(time);
 		this.lastTime = time;
 	}
 
+	@Override
 	public void finish() {
 		if (this.index == this.lastActIndex) {
 			handleAct(24*3600); // handle the last act
 		}
 	}
 
+	@Override
 	public double getScore() {
 		return this.score;
 	}

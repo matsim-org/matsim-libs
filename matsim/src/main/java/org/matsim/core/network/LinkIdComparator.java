@@ -36,6 +36,7 @@ public class LinkIdComparator implements Comparator<Link>, Serializable {
 
 	private static final long serialVersionUID = 1L;
 
+	@Override
 	public int compare(final Link o1, final Link o2) {
 		return o1.getId().compareTo(o2.getId());
 	}

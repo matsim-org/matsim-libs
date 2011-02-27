@@ -43,5 +43,6 @@ public interface FacilityFilter extends FacilityAlgorithm, Filter {
 	 *
 	 * @param facility
 	 */
+	@Override
 	void run(ActivityFacility facility);
 }

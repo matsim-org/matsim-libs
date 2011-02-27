@@ -34,10 +34,12 @@ public class LaneDefinitionsImpl implements LaneDefinitions {
 
 	private final LaneDefinitionsFactory builder = new LaneDefinitionsFactoryImpl();
 
+	@Override
 	public SortedMap<Id, LanesToLinkAssignment> getLanesToLinkAssignments() {
 		return this.lanesToLinkAssignments;
 	}
 
+	@Override
 	public void addLanesToLinkAssignment(LanesToLinkAssignment assignment) {
 		if (this.lanesToLinkAssignments == null) {
 			this.lanesToLinkAssignments = new TreeMap<Id, LanesToLinkAssignment>();
@@ -45,6 +47,7 @@ public class LaneDefinitionsImpl implements LaneDefinitions {
 		this.lanesToLinkAssignments.put(assignment.getLinkId(), assignment);
 	}
 
+	@Override
 	public LaneDefinitionsFactory getFactory(){
 		return this.builder;
 	}

@@ -149,6 +149,7 @@ final class AgentArrayDrawer extends OTFGLAbstractDrawable {
 		return posBuffers;
 	}
 
+	@Override
 	public void onDraw(GL gl) {
 		gl.glEnable(GL.GL_POINT_SPRITE);
 

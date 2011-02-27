@@ -38,6 +38,7 @@ public class PersonAgentDepartureTimeComparator implements Comparator<PersonAgen
 
 	private static final long serialVersionUID = 1L;
 
+	@Override
 	public int compare(PersonAgent agent1, PersonAgent agent2) {
 		int cmp = Double.compare(agent1.getActivityEndTime(), agent2.getActivityEndTime());
 		if (cmp == 0) {

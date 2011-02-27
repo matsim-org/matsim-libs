@@ -68,6 +68,7 @@ public abstract class OTFServerQuad2 extends QuadTree<OTFDataWriter> implements 
 	 * This method should be abstract as it has to be overwritten in subclasses.
 	 * Due to deserialization backwards compatibility this is not possible. dg dez 09
 	 */
+	@Override
 	public abstract void initQuadTree(final OTFConnectionManager connect);
 
 
@@ -110,10 +111,12 @@ public abstract class OTFServerQuad2 extends QuadTree<OTFDataWriter> implements 
 	}
 
 
+	@Override
 	public void addAdditionalElement(OTFDataWriter element) {
 		this.additionalElements.add(element);
 	}
 
+	@Override
 	public OTFClientQuad convertToClient(String id, final OTFServerRemote host, final OTFConnectionManager connect) {
 		final OTFClientQuad client = new OTFClientQuad(id, host, 0.,0., this.easting, this.northing);
 		client.offsetEast = this.minEasting;
@@ -141,6 +144,7 @@ public abstract class OTFServerQuad2 extends QuadTree<OTFDataWriter> implements 
 		return client;
 	}
 
+	@Override
 	public void writeConstData(ByteBuffer out) {
 
 		for (OTFDataWriter element : this.values()) {
@@ -160,6 +164,7 @@ public abstract class OTFServerQuad2 extends QuadTree<OTFDataWriter> implements 
 		}
 	}
 
+	@Override
 	public void writeDynData(QuadTree.Rect bounds, ByteBuffer out) {
 
 		this.execute(bounds, new WriteDataExecutor(out,false));
@@ -203,6 +208,7 @@ public abstract class OTFServerQuad2 extends QuadTree<OTFDataWriter> implements 
 			this.connect = connect2;
 			this.client = client;
 		}
+		@Override
 		@SuppressWarnings("unchecked")
 		public void execute(double x, double y, OTFDataWriter writer)  {
 			Collection<Class<?>> readerClasses = this.connect.getToEntries(writer.getClass());
@@ -228,6 +234,7 @@ public abstract class OTFServerQuad2 extends QuadTree<OTFDataWriter> implements 
 			this.out = out;
 			this.writeConst = writeConst;
 		}
+		@Override
 		public void execute(double x, double y, OTFDataWriter writer)  {
 			try {
 				if (this.writeConst) writer.writeConstData(this.out);

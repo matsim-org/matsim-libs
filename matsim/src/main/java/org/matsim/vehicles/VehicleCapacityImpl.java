@@ -29,26 +29,32 @@ public class VehicleCapacityImpl implements VehicleCapacity {
 	private Integer standingRoom = null;
 	private FreightCapacity freightCap = null;
 	
+	@Override
 	public FreightCapacity getFreightCapacity() {
 		return freightCap;
 	}
 
+	@Override
 	public Integer getSeats() {
 		return seats;
 	}
 
+	@Override
 	public Integer getStandingRoom() {
 		return standingRoom;
 	}
 
+	@Override
 	public void setFreightCapacity(FreightCapacity freightCap) {
 		this.freightCap = freightCap;
 	}
 
+	@Override
 	public void setSeats(Integer seats) {
 		this.seats = seats;
 	}
 
+	@Override
 	public void setStandingRoom(Integer standingRoom) {
 		this.standingRoom = standingRoom;
 	}

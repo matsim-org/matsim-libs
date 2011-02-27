@@ -43,6 +43,7 @@ public class TimeAndMoneyDependentScoringFunction implements ScoringFunction {
 	 * @param act The activity the agent starts. Can be used to get the activity
 	 * type, exact location, facility, opening times and other information.
 	 */
+	@Override
 	public void startActivity(final double time, final Activity activity) {	
 	}
 
@@ -52,6 +53,7 @@ public class TimeAndMoneyDependentScoringFunction implements ScoringFunction {
 	 * @param time The time at which the agent stops performing the current
 	 * activity.
 	 */
+	@Override
 	public void endActivity(final double time) {
 	}
 
@@ -62,6 +64,7 @@ public class TimeAndMoneyDependentScoringFunction implements ScoringFunction {
 	 * @param leg The leg the agent starts. Can be used to get leg mode and other
 	 * information about the leg.
 	 */
+	@Override
 	public void startLeg(double time, Leg leg) {
 		startTime = time;
 	}
@@ -73,6 +76,7 @@ public class TimeAndMoneyDependentScoringFunction implements ScoringFunction {
 	 * 
 	 * @param time The time at which the current leg ends.
 	 */
+	@Override
 	public void endLeg(double time) {
 		score = score - (time - startTime);
 		startTime = Double.NaN;
@@ -87,6 +91,7 @@ public class TimeAndMoneyDependentScoringFunction implements ScoringFunction {
 	 * @param time The time at which the agent got stuck and was removed from the
 	 * simulation.
 	 */
+	@Override
 	public void agentStuck(final double time) {
 	}
 
@@ -97,6 +102,7 @@ public class TimeAndMoneyDependentScoringFunction implements ScoringFunction {
 	 *
 	 * @param amount amount to be added to the agent's score
 	 */
+	@Override
 	public void addMoney(final double amount) {
 		this.score += amount;
 	}
@@ -106,6 +112,7 @@ public class TimeAndMoneyDependentScoringFunction implements ScoringFunction {
 	 * and that the final score should be calculated.  But the score must <b>not</b>
 	 * be written to the plan!
 	 */
+	@Override
 	public void finish() {
 	}
 
@@ -114,6 +121,7 @@ public class TimeAndMoneyDependentScoringFunction implements ScoringFunction {
 
 	 * @return the score
 	 */
+	@Override
 	public double getScore() {
 		return score;
 	}
@@ -123,6 +131,7 @@ public class TimeAndMoneyDependentScoringFunction implements ScoringFunction {
 	 * functions in order to re-score the same plan object with different
 	 * time information.
 	 */
+	@Override
 	public void reset() {		
 		score = 0.0;
 	}

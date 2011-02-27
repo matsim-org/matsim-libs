@@ -35,18 +35,22 @@ public class IncomeImpl implements Income {
 		this.income = income;
 	}
 	
+	@Override
 	public String getCurrency() {
 		return this.currency;
 	}
 
+	@Override
 	public double getIncome() {
 		return this.income;
 	}
 
+	@Override
 	public IncomePeriod getIncomePeriod() {
 		return this.period;
 	}
 
+	@Override
 	public void setCurrency(String currency) {
 		this.currency = currency;
 	}

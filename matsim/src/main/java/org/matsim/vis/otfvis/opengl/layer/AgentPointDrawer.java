@@ -24,13 +24,10 @@ package org.matsim.vis.otfvis.opengl.layer;
 
 import java.awt.Color;
 
-import javax.media.opengl.GL;
-
 import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.data.OTFDataSimpleAgentReceiver;
 import org.matsim.vis.otfvis.gui.OTFVisConfigGroup;
-import org.matsim.vis.otfvis.opengl.drawer.OTFGLAbstractDrawableReceiver;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;

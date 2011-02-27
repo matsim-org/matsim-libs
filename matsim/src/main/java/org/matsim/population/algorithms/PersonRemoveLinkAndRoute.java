@@ -35,6 +35,7 @@ public class PersonRemoveLinkAndRoute extends AbstractPersonAlgorithm implements
 		}
 	}
 
+	@Override
 	public void run(final Plan plan) {
 		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof ActivityImpl) {

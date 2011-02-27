@@ -91,12 +91,14 @@ public class OTFQueryControl implements OTFQueryHandler {
 		this.hostControlBar = handler;
 	}
 
+	@Override
 	synchronized public void handleIdQuery(String id, String queryName) {
 		AbstractQuery query = createQuery(queryName);
 		query.setId(id);
 		createQuery(query);
 	}
 
+	@Override
 	public void handleClick(String viewId, Point2D.Double point, int mouseButton) {
 		Rectangle2D.Double origRect = new Rectangle2D.Double(point.x, point.y,
 				0, 0);
@@ -105,6 +107,7 @@ public class OTFQueryControl implements OTFQueryHandler {
 			handleClick(viewId, origRect, mouseButton);
 	}
 
+	@Override
 	synchronized public void removeQueries() {
 		if(this.hostControlBar.getOTFHostConnectionManager().isLiveHost()) {
 			try {
@@ -121,12 +124,14 @@ public class OTFQueryControl implements OTFQueryHandler {
 		hostControlBar.redrawDrawers();
 	}
 
+	@Override
 	synchronized public void drawQueries(OTFDrawer drawer) {
 		for (OTFQueryResult queryResult : this.queryEntries.values()) {
 			queryResult.draw(drawer);
 		}
 	}
 
+	@Override
 	public void handleClick(String viewId, Rectangle2D.Double origRect, int mouseButton) {
 		if (mouseButton == 3) {
 			removeQueries();
@@ -154,6 +159,7 @@ public class OTFQueryControl implements OTFQueryHandler {
 		}
 	}
 
+	@Override
 	synchronized public void updateQueries() {
 		for (Map.Entry<OTFQueryRemote, OTFQueryResult> queryItem : queryEntries.entrySet()) {
 			OTFQueryResult queryResult = queryItem.getValue();
@@ -182,6 +188,7 @@ public class OTFQueryControl implements OTFQueryHandler {
 		return queryResult;
 	}
 	
+	@Override
 	public OTFQueryRemote doQuery(final AbstractQuery query) {
 		try {
 			if(this.hostControlBar.getOTFHostConnectionManager().isLiveHost()) {
@@ -240,6 +247,7 @@ public class OTFQueryControl implements OTFQueryHandler {
 	}
 
 	public class MyIdResolver implements IdResolver {
+		@Override
 		public List<String> resolveId(Double origRect) {
 			QueryAgentId.Result agentIdQuery = (QueryAgentId.Result) createQuery(new QueryAgentId(origRect));
 			if ((agentIdQuery != null) && (agentIdQuery.agentIds.size() != 0)) {

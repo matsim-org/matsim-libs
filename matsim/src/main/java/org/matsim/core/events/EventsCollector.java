@@ -123,6 +123,7 @@ public class EventsCollector extends EventsManagerImpl implements SimulationAfte
 	 * We process all collected Events of a SimStep after the
 	 * SimStep has been simulated.
 	 */
+	@Override
 	public void notifySimulationAfterSimStep(SimulationAfterSimStepEvent e)
 	{
 		Event event = null;

@@ -43,6 +43,7 @@ public class ActivityOptionImpl implements ActivityOption {
 		if (this.facility == null) { Gbl.errorMsg("facility=null not allowed!"); }
 	}
 
+	@Override
 	public void addOpeningTime(OpeningTime opentime) {
 		DayType day = opentime.getDay();
 		if (!this.opentimes.containsKey(day)) {
@@ -92,6 +93,7 @@ public class ActivityOptionImpl implements ActivityOption {
 		}
 	}
 
+	@Override
 	public final void setCapacity(Double capacity) {
 		if (capacity < 0) {
 			throw new NumberFormatException("A capacity of an activity must be >= 0.");
@@ -103,6 +105,7 @@ public class ActivityOptionImpl implements ActivityOption {
 		this.opentimes = opentimes;
 	}
 
+	@Override
 	public final String getType() {
 		return this.type;
 	}

@@ -102,6 +102,7 @@ public class SimpleBackgroundFeatureDrawer extends AbstractBackgroundDrawer impl
 
 
 
+	@Override
 	public void onDraw(final GL gl) {
 		
 		for(OTFFeature feature : featureList) {

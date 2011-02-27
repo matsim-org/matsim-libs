@@ -115,6 +115,7 @@ public class KmlSnapshotWriter implements SnapshotWriter {
 
 	}
 
+	@Override
 	public void beginSnapshot(final double time) {
 		this.time = time;
 		
@@ -133,6 +134,7 @@ public class KmlSnapshotWriter implements SnapshotWriter {
 		this.timeKml.setAbstractFeatureGroup(kmlObjectFactory.createDocument(this.timeDoc));
 	}
 
+	@Override
 	public void endSnapshot() {
 		String filename = "data/time_" + this.time + ".kml";
 		this.writer.writeLinkedKml(filename, this.timeKml);
@@ -156,6 +158,7 @@ public class KmlSnapshotWriter implements SnapshotWriter {
 		this.timeDoc = null;
 	}
 
+	@Override
 	public void addAgent(final AgentSnapshotInfo position) {
 
 		//drop all parking vehicles
@@ -169,6 +172,7 @@ public class KmlSnapshotWriter implements SnapshotWriter {
 		this.timeGeometry.getAbstractGeometryGroup().add(kmlObjectFactory.createPoint(point));
 	}
 
+	@Override
 	public void finish() {
 		// change timestamps to timespans
 		String lastTimeS = null;

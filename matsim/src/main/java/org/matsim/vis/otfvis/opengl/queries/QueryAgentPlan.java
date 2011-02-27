@@ -215,6 +215,7 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 
 		private boolean calcOffset = true;
 
+		@Override
 		public void draw(OTFDrawer drawer) {
 			if (drawer instanceof OTFOGLDrawer) {
 				drawWithGLDrawer((OTFOGLDrawer) drawer);

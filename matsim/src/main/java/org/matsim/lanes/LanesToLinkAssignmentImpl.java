@@ -37,14 +37,17 @@ public class LanesToLinkAssignmentImpl implements LanesToLinkAssignment {
 		this.linkId = linkId;
 	}
 
+	@Override
 	public void addLane(Lane lane) {
 		this.lanes.put(lane.getId(), lane);
 	}
 
+	@Override
 	public Id getLinkId() {
 		return linkId;
 	}
 
+	@Override
 	public SortedMap<Id, Lane> getLanes() {
 		return this.lanes;
 	}

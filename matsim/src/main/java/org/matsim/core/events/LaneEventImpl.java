@@ -51,6 +51,7 @@ public abstract class LaneEventImpl extends LinkEventImpl implements LaneEvent {
 		return attr;
 	}
 
+	@Override
 	public Id getLaneId() {
 		return this.laneId;
 	}

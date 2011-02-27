@@ -41,6 +41,7 @@ public class SignalGroupStateChangedEventImpl extends EventImpl implements Signa
 		this.newState = newState;
 	}
 
+	@Override
 	public SignalGroupState getNewState() {
 		return this.newState;
 	}
@@ -61,11 +62,13 @@ public class SignalGroupStateChangedEventImpl extends EventImpl implements Signa
 	}
 
 	
+	@Override
 	public Id getSignalGroupId() {
 		return signalGroupId;
 	}
 
 	
+	@Override
 	public Id getSignalSystemId() {
 		return signalSystemId;
 	}

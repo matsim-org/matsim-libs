@@ -35,6 +35,7 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
  */
 public class CH1903LV03toWGS84 implements CoordinateTransformation {
 
+	@Override
 	public Coord transform(Coord coord) {
 		
 		/* Important Note: in the Swiss Grid, y describes easting and x describes 
