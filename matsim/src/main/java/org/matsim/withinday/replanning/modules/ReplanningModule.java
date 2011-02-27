@@ -20,6 +20,8 @@
 
 package org.matsim.withinday.replanning.modules;
 
+import java.util.Locale;
+
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
@@ -38,34 +40,34 @@ public class ReplanningModule extends AbstractMultithreadedModule {
 	protected PersonalizableTravelCost costCalculator;
 	protected PersonalizableTravelTime timeCalculator;
 	protected LeastCostPathCalculatorFactory factory;
-	
-	public ReplanningModule(Config config, Network network, 
-			PersonalizableTravelCost costCalculator, PersonalizableTravelTime timeCalculator, 
+
+	public ReplanningModule(Config config, Network network,
+			PersonalizableTravelCost costCalculator, PersonalizableTravelTime timeCalculator,
 			LeastCostPathCalculatorFactory factory) {
 		super(config.global());
-		
+
 		this.config = config;
 		this.network = network;
 		this.costCalculator = costCalculator;
 		this.timeCalculator = timeCalculator;
 		this.factory = factory;
 	}
-	
+
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
-		
+
 		PlansCalcRoute plansCalcRoute = new PlansCalcRoute(config.plansCalcRoute(), network, costCalculator, timeCalculator, factory);
-				
-		if (config.multiModal().isMultiModalSimulationEnabled()) {			
+
+		if (config.multiModal().isMultiModalSimulationEnabled()) {
 			MultiModalLegHandler multiModalLegHandler = new MultiModalLegHandler(this.network, timeCalculator, factory);
-			
-			String simulatedModes = this.config.multiModal().getSimulatedModes().toLowerCase();
+
+			String simulatedModes = this.config.multiModal().getSimulatedModes().toLowerCase(Locale.ROOT);
 			if (simulatedModes.contains(TransportMode.walk)) plansCalcRoute.addLegHandler(TransportMode.walk, multiModalLegHandler);
 			if (simulatedModes.contains(TransportMode.bike)) plansCalcRoute.addLegHandler(TransportMode.bike, multiModalLegHandler);
 			if (simulatedModes.contains(TransportMode.ride)) plansCalcRoute.addLegHandler(TransportMode.ride, multiModalLegHandler);
 			if (simulatedModes.contains(TransportMode.pt)) plansCalcRoute.addLegHandler(TransportMode.pt, multiModalLegHandler);
 		}
-		
+
 		return plansCalcRoute;
 	}
 }

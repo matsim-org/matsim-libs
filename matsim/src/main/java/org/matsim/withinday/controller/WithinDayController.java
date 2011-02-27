@@ -78,15 +78,15 @@ import org.matsim.withinday.trafficmonitoring.TravelTimeCollectorFactory;
  * Thimport playground.christoph.withinday.trafficmonitoring.TravelTimeCollector;
 is Controller should give an Example what is needed to run
  * Simulations with WithinDayReplanning.
- * 
+ *
  * The Path to a Config File is needed as Argument to run the
  * Simulation.
- * 
+ *
  * Additional Parameters have to be set in the WithinDayControler
  * Class. Here we just add the Knowledge Component.
- * 
+ *
  * By default "test/scenarios/berlin/config.xml" should work.
- * 
+ *
  * @author Christoph Dobler
  */
 public class WithinDayController extends Controler {
@@ -216,10 +216,10 @@ public class WithinDayController extends Controler {
 			this.fosl.addSimulationAfterSimStepListener(manager);
 			this.events = manager;
 		}
-		
+
 		super.setUp();
 	}
-	
+
 	@Override
 	protected void runMobSim() {
 		createHandlersAndListeners();
@@ -237,7 +237,7 @@ public class WithinDayController extends Controler {
 		fosl.addSimulationBeforeSimStepListener(replanningManager);
 
 		sim.addQueueSimulationListeners(fosl);
-		
+
 		log.info("Initialize Parallel Replanning Modules");
 		initParallelReplanningModules();
 
@@ -365,10 +365,9 @@ public class WithinDayController extends Controler {
 			System.out.println();
 		} else {
 			final WithinDayController controller = new WithinDayController(args);
-			controller.setOverwriteFiles(true);
 			controller.run();
 		}
 		System.exit(0);
 	}
-	
+
 }

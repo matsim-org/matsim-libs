@@ -96,7 +96,6 @@ public class MultiModalControler extends Controler {
 			System.out.println();
 		} else {
 			final Controler controler = new MultiModalControler(args);
-			controler.setOverwriteFiles(true);
 			controler.run();
 		}
 		System.exit(0);

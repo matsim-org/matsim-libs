@@ -59,14 +59,14 @@ import org.matsim.withinday.network.WithinDayLinkImpl;
 /**
  * Collects link travel times over a given time span (storedTravelTimesBinSize) and
  * calculates an average travel time over this time span.
- * 
- * TODO: 
+ *
+ * TODO:
  * - take transport mode for multi-modal simulations into account
  *   Extend link enter / leave events with transport mode field or use a
  *   lookup table in this class.
  * - make storedTravelTimesBinSize configurable (e.g. via config)
  * - get rid of WithinDayLinkImpl, would suggest via Customizable
- * 
+ *
  * @author cdobler
  */
 public class TravelTimeCollector implements PersonalizableTravelTime, AgentStuckEventHandler,
@@ -74,16 +74,16 @@ public class TravelTimeCollector implements PersonalizableTravelTime, AgentStuck
 	AgentArrivalEventHandler, AgentDepartureEventHandler, SimulationInitializedListener,
 	SimulationBeforeSimStepListener, SimulationAfterSimStepListener {
 
-	/*
-	 * If multiple TravelTimeCollectors are used, each of them get its unique Id.
-	 * This will be needed, if the travel times are attached to the Links via a
-	 * Customizable attribute. The key of that attribute will then contain the Id
-	 * of its corresponding TravelTimeCollector.
-	 */
-	private final int id;
+//	/*
+//	 * If multiple TravelTimeCollectors are used, each of them get its unique Id.
+//	 * This will be needed, if the travel times are attached to the Links via a
+//	 * Customizable attribute. The key of that attribute will then contain the Id
+//	 * of its corresponding TravelTimeCollector.
+//	 */
+//	private final int id;
 
 	private Network network;
-	
+
 	// Trips with no Activity on the current Link
 	private Map<Id, TripBin> regularActiveTrips;	// PersonId
 	private Map<Id, TravelTimeInfo> travelTimeInfos;	// LinkId
@@ -95,11 +95,11 @@ public class TravelTimeCollector implements PersonalizableTravelTime, AgentStuck
 	private CyclicBarrier endBarrier;
 	private UpdateMeanTravelTimesThread[] updateMeanTravelTimesThreads;
 	private final int numOfThreads;
-	
+
 	// use the factory
 	/*package*/ TravelTimeCollector(Scenario scenario, int id) {
-		/* 
-		 * The parallelization should scale almost linear, therefore 
+		/*
+		 * The parallelization should scale almost linear, therefore
 		 * we do use the number of available threads accoring to the
 		 * config file.
 		 */
@@ -110,11 +110,11 @@ public class TravelTimeCollector implements PersonalizableTravelTime, AgentStuck
 	/*package*/ TravelTimeCollector(Network network, int numOfThreads, int id) {
 		this.network = network;
 		this.numOfThreads = numOfThreads;
-		this.id = id;
-		
+//		this.id = id;
+
 		init();
 	}
-	
+
 	private void init() {
 		regularActiveTrips = new HashMap<Id, TripBin>();
 		travelTimeInfos = new ConcurrentHashMap<Id, TravelTimeInfo>();
@@ -138,14 +138,11 @@ public class TravelTimeCollector implements PersonalizableTravelTime, AgentStuck
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-//		Id linkId = event.getLinkId();
 		Id personId = event.getPersonId();
 		double time = event.getTime();
 
 		TripBin tripBin = new TripBin();
 		tripBin.enterTime = time;
-//		tripBin.personId = personId;
-//		tripBin.linkId = linkId;
 
 		this.regularActiveTrips.put(personId, tripBin);
 	}
@@ -223,23 +220,20 @@ public class TravelTimeCollector implements PersonalizableTravelTime, AgentStuck
 		// parallel Execution
 		this.run(e.getSimulationTime());
 	}
-	
+
 	@Override
 	public void setPerson(Person person) {
 		// nothing to do here
 	}
 
-	private class TripBin {
-//		Id personId;
-//		Id linkId;
+	private static class TripBin {
 		double enterTime;
 		double leaveTime;
 
 	}
 
-	private class TravelTimeInfo {
+	private static class TravelTimeInfo {
 		WithinDayLinkImpl link;
-//		double travelTime;
 		List<TripBin> tripBins = new ArrayList<TripBin>();
 
 		int addedTrips = 0;
