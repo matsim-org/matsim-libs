@@ -44,7 +44,7 @@ public class MSATravelTimeDataHashMapFactory implements TravelTimeDataFactory {
 	public TravelTimeData createTravelTimeData(Id linkId) {
 		HashMap<Integer, Double> lmsa = this.msaTT.get(linkId);
 		if (lmsa == null) {
-			lmsa = new HashMap<Integer, Double>();
+			lmsa = new HashMap<Integer, Double>(7200/this.binSize);
 			this.msaTT.put(linkId, lmsa);
 		}
 		return new MSATravelTimeDataHashMap(this.network.getLinks().get(linkId),this.binSize, lmsa);
