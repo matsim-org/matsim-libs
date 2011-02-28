@@ -28,7 +28,7 @@ import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
 
 import playground.yu.replanning.StrategyManagerWithRouteComparison;
-import playground.yu.replanning.TightTurnPenaltyControlerListener;
+import playground.yu.replanning.reRoute.tightTurnPenalty.TightTurnPenaltyControlerListener;
 
 /**
  * @author yu

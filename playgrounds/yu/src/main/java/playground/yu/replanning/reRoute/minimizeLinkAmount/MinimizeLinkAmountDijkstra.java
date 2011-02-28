@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DijkstraWithTightTurnPenalty.java
+ * MinimizeLinkAmountDijkstra.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,14 +18,13 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.yu.replanning;
+package playground.yu.replanning.reRoute.minimizeLinkAmount;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -36,20 +35,17 @@ import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.PseudoRemovePriorityQueue;
 
-import playground.yu.utils.math.SimpleTrigonometric;
-
 /**
- * Implementation of <a href=
- * "http://en.wikipedia.org/wiki/DijkstraWithTightTurnPenalty%27s_algorithm"
- * >DijkstraWithTightTurnPenalty's shortest-path algorithm</a> on a
- * time-dependent network with arbitrary non-negative cost functions (e.g.
- * negative link cost are not allowed). So 'shortest' in our context actually
- * means 'least-cost'.
+ * Implementation of <a
+ * href="http://en.wikipedia.org/wiki/MinimizeLinkAmountDijkstra%27s_algorithm">MinimizeLinkAmountDijkstra's
+ * shortest-path algorithm</a> on a time-dependent network with arbitrary
+ * non-negative cost functions (e.g. negative link cost are not allowed). So
+ * 'shortest' in our context actually means 'least-cost'.
  * 
  * <p>
  * For every router, there exists a class which computes some preprocessing data
  * and is passed to the router class constructor in order to accelerate the
- * routing procedure. The one used for DijkstraWithTightTurnPenalty is
+ * routing procedure. The one used for MinimizeLinkAmountDijkstra is
  * {@link org.matsim.core.router.util.PreProcessDijkstra}.
  * </p>
  * <br>
@@ -59,15 +55,15 @@ import playground.yu.utils.math.SimpleTrigonometric;
  * <code>PreProcessDijkstra preProcessData = new PreProcessDijkstra();<br>
  * preProcessData.run(network);<br>
  * TravelCost costFunction = ...<br>
- * LeastCostPathCalculator routingAlgo = new DijkstraWithTightTurnPenalty(network, costFunction, preProcessData);<br>
+ * LeastCostPathCalculator routingAlgo = new MinimizeLinkAmountDijkstra(network, costFunction, preProcessData);<br>
  * routingAlgo.calcLeastCostPath(fromNode, toNode, startTime);</code>
  * </p>
  * <p>
- * If you don't want to preprocess the network, you can invoke
- * DijkstraWithTightTurnPenalty as follows:
+ * If you don't want to preprocess the network, you can invoke MinimizeLinkAmountDijkstra as
+ * follows:
  * </p>
  * <p>
- * <code> LeastCostPathCalculator routingAlgo = new DijkstraWithTightTurnPenalty(network, costFunction);</code>
+ * <code> LeastCostPathCalculator routingAlgo = new MinimizeLinkAmountDijkstra(network, costFunction);</code>
  * </p>
  * 
  * @see org.matsim.core.router.util.PreProcessDijkstra
@@ -76,11 +72,9 @@ import playground.yu.utils.math.SimpleTrigonometric;
  * @author lnicolas
  * @author mrieser
  */
-public class DijkstraWithTightTurnPenalty implements
-		IntermodalLeastCostPathCalculator {
+public class MinimizeLinkAmountDijkstra implements IntermodalLeastCostPathCalculator {
 
-	private final static Logger log = Logger
-			.getLogger(DijkstraWithTightTurnPenalty.class);
+	private final static Logger log = Logger.getLogger(MinimizeLinkAmountDijkstra.class);
 
 	/**
 	 * The network on which we find routes.
@@ -138,8 +132,8 @@ public class DijkstraWithTightTurnPenalty implements
 	 * @param timeFunction
 	 *            Determines the travel time on links.
 	 */
-	public DijkstraWithTightTurnPenalty(final Network network,
-			final TravelCost costFunction, final TravelTime timeFunction) {
+	public MinimizeLinkAmountDijkstra(final Network network, final TravelCost costFunction,
+			final TravelTime timeFunction) {
 		this(network, costFunction, timeFunction, null);
 	}
 
@@ -155,8 +149,8 @@ public class DijkstraWithTightTurnPenalty implements
 	 * @param preProcessData
 	 *            The pre processing data used during the routing phase.
 	 */
-	public DijkstraWithTightTurnPenalty(final Network network,
-			final TravelCost costFunction, final TravelTime timeFunction,
+	public MinimizeLinkAmountDijkstra(final Network network, final TravelCost costFunction,
+			final TravelTime timeFunction,
 			final PreProcessDijkstra preProcessData) {
 
 		this.network = network;
@@ -171,7 +165,7 @@ public class DijkstraWithTightTurnPenalty implements
 			if (preProcessData.containsData() == false) {
 				pruneDeadEnds = false;
 				log
-						.warn("The preprocessing data provided to router class DijkstraWithTightTurnPenalty contains no data! Please execute its run(...) method first!");
+						.warn("The preprocessing data provided to router class MinimizeLinkAmountDijkstra contains no data! Please execute its run(...) method first!");
 				log.warn("Running without dead-end pruning.");
 			} else {
 				pruneDeadEnds = true;
@@ -298,9 +292,6 @@ public class DijkstraWithTightTurnPenalty implements
 		DijkstraNodeData outData = getData(outNode);
 		double currTime = outData.getTime();
 		double currCost = outData.getCost();
-		// V-----------TESTS-----------V
-		Link prevLink = outData.getPrevLink();
-		// A-----------TESTS-----------A
 		if (pruneDeadEnds) {
 			PreProcessDijkstra.DeadEndData ddOutData = getPreProcessData(outNode);
 			for (Link l : outNode.getOutLinks().values()) {
@@ -319,14 +310,6 @@ public class DijkstraWithTightTurnPenalty implements
 							|| deadEndEntryNode != null
 							&& deadEndEntryNode.getId() == ddData
 									.getDeadEndEntryNode().getId()) {
-						// V-----------TESTS-----------V
-						if (prevLink != null) {
-							double factor = getTightTurnFactor(prevLink
-									.getFromNode().getCoord(), n.getCoord(),
-									outNode.getCoord());
-							currCost *= factor;
-						}
-						// A-----------TESTS-----------A
 						addToPendingNodes(l, n, pendingNodes, currTime,
 								currCost, toNode);
 					}
@@ -335,27 +318,11 @@ public class DijkstraWithTightTurnPenalty implements
 		} else { // this.pruneDeadEnds == false
 			for (Link l : outNode.getOutLinks().values()) {
 				if (canPassLink(l)) {
-					// V-----------TESTS-----------V
-					Node n = l.getToNode();
-
-					if (prevLink != null) {
-						double factor = getTightTurnFactor(prevLink
-								.getFromNode().getCoord(), n.getCoord(),
-								outNode.getCoord());
-						currCost *= factor;
-					}
-					// A-----------TESTS-----------A
-					addToPendingNodes(l, n, pendingNodes, currTime, currCost,
-							toNode);
+					addToPendingNodes(l, l.getToNode(), pendingNodes, currTime,
+							currCost, toNode);
 				}
 			}
 		}
-	}
-
-	protected double getTightTurnFactor(Coord fromCoord, Coord nextCoord,
-			Coord outCoord) {
-		return (3d + SimpleTrigonometric.getCosineCFrom3Coords(fromCoord,
-				nextCoord, outCoord)) / 2d;
 	}
 
 	/**
@@ -386,12 +353,18 @@ public class DijkstraWithTightTurnPenalty implements
 				currTime);
 		DijkstraNodeData data = getData(n);
 		double nCost = data.getCost();
+
+		double totalCost = currCost + travelCost;
+		if (totalCost == 0d) {
+			totalCost += 1d;
+		}
+
 		if (!data.isVisited(getIterationId())) {
-			visitNode(n, data, pendingNodes, currTime + travelTime, currCost
-					+ travelCost, l);
+			visitNode(n, data, pendingNodes, currTime + travelTime, totalCost,
+					l);
 			return true;
 		}
-		double totalCost = currCost + travelCost;
+		// double totalCost = currCost + travelCost;
 		if (totalCost < nCost) {
 			revisitNode(n, data, pendingNodes, currTime + travelTime,
 					totalCost, l);
@@ -532,7 +505,7 @@ public class DijkstraWithTightTurnPenalty implements
 
 	/**
 	 * A data structure to store temporarily information used by the
-	 * DijkstraWithTightTurnPenalty-algorithm.
+	 * MinimizeLinkAmountDijkstra-algorithm.
 	 */
 	protected static class DijkstraNodeData {
 

@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DijkstraWithTightTurnPenaltyFactory.java
+ * TightTurnPenaltyControlerListener.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,37 +18,29 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.yu.replanning;
+/**
+ * 
+ */
+package playground.yu.replanning.reRoute.tightTurnPenalty;
 
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.router.util.LeastCostPathCalculator;
-import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.PreProcessDijkstra;
-import org.matsim.core.router.util.TravelCost;
-import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.events.IterationStartsEvent;
+import org.matsim.core.controler.listener.IterationStartsListener;
 
-public class DijkstraWithTightTurnPenaltyFactory implements
-		LeastCostPathCalculatorFactory {
+/**
+ * @author yu
+ * 
+ */
+public class TightTurnPenaltyControlerListener implements
+		IterationStartsListener {
 
-	private final PreProcessDijkstra preProcessData;
-
-	public DijkstraWithTightTurnPenaltyFactory() {
-		preProcessData = null;
-	}
-
-	public DijkstraWithTightTurnPenaltyFactory(
-			final PreProcessDijkstra preProcessData) {
-		this.preProcessData = preProcessData;
-	}
-
-	public LeastCostPathCalculator createPathCalculator(final Network network,
-			final TravelCost travelCosts, final TravelTime travelTimes) {
-		if (preProcessData == null) {
-			return new DijkstraWithTightTurnPenalty(network, travelCosts,
-					travelTimes);
+	@Override
+	public void notifyIterationStarts(IterationStartsEvent event) {
+		Controler ctl = event.getControler();
+		if (event.getIteration() > ctl.getFirstIteration()) {
+			ctl
+					.setLeastCostPathCalculatorFactory(new DijkstraWithTightTurnPenaltyFactory());
 		}
-		return new DijkstraWithTightTurnPenalty(network, travelCosts,
-				travelTimes, preProcessData);
 	}
 
 }
