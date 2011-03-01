@@ -47,7 +47,7 @@ public class StrategyManager {
 	private final ArrayList<Double> weights = new ArrayList<Double>();
 	private double totalWeights = 0.0;
 	private int maxPlansPerAgent = 0;
-	
+
 	private PlanSelector removalPlanSelector = new WorstPlanForRemovalSelector();
 
 	private final TreeMap<Integer, Map<PlanStrategy, Double>> changeRequests =
@@ -115,11 +115,11 @@ public class StrategyManager {
 		handleChangeRequests(iteration);
 		run(population);
 	}
-	
+
 	protected void beforePopulationRunHook( Population population ) {
 		// left empty for inheritance
 	}
-	
+
 	protected void beforeStrategyRunHook( Person person, PlanStrategy strategy ) {
 		// left empty for inheritance
 	}
@@ -132,61 +132,61 @@ public class StrategyManager {
 	 */
 	public final void run( final Population population) {
 		beforePopulationRunHook( population ) ;
-		
+
 		// initialize all strategies
 		for (PlanStrategy strategy : this.strategies) {
 			strategy.init();
 		}
-		
+
 		// then go through the population and ...
 		for (Person person : population.getPersons().values()) {
-			
+
 			// ... reduce the number of plans to the allowed maximum (in evol comp lang this is "selection")
 			if ((this.maxPlansPerAgent > 0) && (person.getPlans().size() > this.maxPlansPerAgent)) {
 				removePlans((PersonImpl) person, this.maxPlansPerAgent);
 			}
-			
+
 			// ... choose the strategy to be used for this person (in evol comp lang this would be the choice of the mutation operator)
-			PlanStrategy strategy = this.chooseStrategy();
-			
+			PlanStrategy strategy = this.chooseStrategy(person);
+
 			beforeStrategyRunHook( person, strategy ) ;
-			
+
 			// ... and run the strategy:
 			if (strategy != null) {
 				strategy.run(person);
 			} else {
 				Gbl.errorMsg("No strategy found!");
 			}
-			
+
 			afterStrategyRunHook( person, strategy ) ;
 		}
-		
+
 		// finally make sure all strategies have finished there work
 		for (PlanStrategy strategy : this.strategies) {
 			strategy.finish();
 		}
-		
+
 		afterRunHook( population ) ;
 	}
-	
+
 	protected void afterStrategyRunHook( Person person, PlanStrategy strategy ) {
 		// left empty for inheritance
 	}
-	
+
 	protected void afterRunHook( Population population ) {
 		// left empty for inheritance
 	}
-	
+
 	/**This is a hook into "removePlans", called after an individual plan has been removed.  This is usually needed in derived
 	 * methods that keep a "shadow" plans registry.  Note that this is called after every plan, not at the end of the
 	 * "removePlanS" method.  kai, sep'10
-	 * 
+	 *
 	 * @param the plan that is to be removed
 	 */
 	protected void afterRemovePlanHook( Plan plan ) {
 		// left empty for inheritance.  kai, sep'10
 	}
-	
+
 	private final void removePlans(final PersonImpl person, final int maxNumberOfPlans) {
 		while (person.getPlans().size() > maxNumberOfPlans) {
 			Plan plan = this.removalPlanSelector.selectPlan(person);
@@ -215,9 +215,10 @@ public class StrategyManager {
 	/**
 	 * chooses a (weight-influenced) random strategy
 	 *
+	 * @param person The person for which the strategy should be chosen
 	 * @return the chosen strategy
 	 */
-	private final PlanStrategy chooseStrategy() {
+	public PlanStrategy chooseStrategy(final Person person) {
 		double rnd = MatsimRandom.getRandom().nextDouble() * this.totalWeights;
 
 		double sum = 0.0;
@@ -241,7 +242,7 @@ public class StrategyManager {
 	public final void setMaxPlansPerAgent(final int maxPlansPerAgent) {
 		this.maxPlansPerAgent = maxPlansPerAgent;
 	}
-	
+
 	public final int getMaxPlansPerAgent() {
 		return this.maxPlansPerAgent;
 	}
@@ -263,14 +264,14 @@ public class StrategyManager {
 		}
 		iterationRequests.put(strategy, Double.valueOf(newWeight));
 	}
-	
+
 	/**
 	 * Sets a plan selector to be used for choosing plans for removal, if they
-	 * have more plans than the specified maximum. This defaults to 
-	 * {@link WorstPlanForRemovalSelector}. 
-	 * 
+	 * have more plans than the specified maximum. This defaults to
+	 * {@link WorstPlanForRemovalSelector}.
+	 *
 	 * @param planSelector
-	 * 
+	 *
 	 * @see #setMaxPlansPerAgent(int)
 	 */
 	public final void setPlanSelectorForRemoval(final PlanSelector planSelector) {
@@ -281,5 +282,5 @@ public class StrategyManager {
 		return Collections.unmodifiableList(this.strategies);
 	}
 
-	
+
 }
