@@ -146,14 +146,17 @@ public class Journal2Matsim2Journal {
 
 
 	private void readJournal() {
+		log.info("read infile");
 		this.fileHeader = new Trip(DaFileReader.readFileHeader(this.inFile, this.splitByExpr));
 		this.fileHeader.setPtTime("travelTimePT", "transitTimePT", "waitingTimePT");
 		this.fileHeader.setCarTime("carTime");
 		
 		this.inFileContent = DaFileReader.readFileContent(this.inFile, this.splitByExpr, this.inFileHasHeader);
+		log.info("done...");
 	}
 	
 	private void sortWaysByPerson() {
+		log.info("sort ways by person");
 		this.person2ways = new TreeMap<String, List<Trip>>();
 		String id;
 		for(String[] way : this.inFileContent){
@@ -168,10 +171,12 @@ public class Journal2Matsim2Journal {
 				log.error("wayId " + way[1] + "not processed, because no coordinates are given for origin and/or destination!"); 
 			}
 		}
+		log.info("done");
 	}
 	
 	
 	private void generatePlans(){
+		log.info("generate plans");
 		Scenario sc = new ScenarioImpl();
 		PopulationFactory fac = sc.getPopulation().getFactory();
 		Person personCar;
@@ -260,7 +265,7 @@ public class Journal2Matsim2Journal {
 				log.error("Person ID " + e.getKey() + " was not added, because of a missing start- or endtime!"); 
 			}
 		}
-		
+		log.info("done");
 		new PopulationWriter(sc.getPopulation(),null).writeV4(plansUnrouted);
 	}
 
@@ -362,6 +367,7 @@ public class Journal2Matsim2Journal {
 	}
 	
 	private void sortTripEventsByMode(){
+		log.info("sort events by trip and mode");
 		this.carId2TripEvents = new HashMap<String, Set<List<PersonEvent>>>();
 		this.ptId2TripEvents = new HashMap<String, Set<List<PersonEvent>>>();
 		
@@ -397,9 +403,11 @@ public class Journal2Matsim2Journal {
 				}
 			}
 		}
+		log.info("done...");
 	}
 	
 	private void analyzeEvents(){
+		log.info("analyze events");
 		double travelTime, transitTime, waitingTime;
 		int i;
 		
@@ -444,13 +452,15 @@ public class Journal2Matsim2Journal {
 				this.person2ways.get(e.getKey()).get(i).setPtTime(travelTime, transitTime, waitingTime);
 				i++;
 			}
-			System.out.println();
 		}
+		log.info("done...");
 	}
 	
 	private void writeNewJournal() {
+		String outdir = this.outDir + "MATSim_journal.csv";
+		log.info("write new journal");
 		try {
-			BufferedWriter writer = IOUtils.getBufferedWriter(this.outDir + "MATSim_journal.csv");
+			BufferedWriter writer = IOUtils.getBufferedWriter(outdir);
 			
 			for(String s : this.fileHeader.getAll()){
 				writer.write(s + ";");
@@ -466,6 +476,8 @@ public class Journal2Matsim2Journal {
 				}
 			}
 			writer.close();
+			
+			log.info("journal written to " + outdir + "...");
 			
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
