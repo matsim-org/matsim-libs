@@ -27,21 +27,20 @@ import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.core.scoring.charyparNagel.ActivityScoringFunction;
 import org.matsim.core.scoring.charyparNagel.AgentStuckScoringFunction;
 import org.matsim.core.scoring.charyparNagel.LegScoringFunction;
 import org.matsim.core.scoring.charyparNagel.MoneyScoringFunction;
 
 /**
  * Scoring function accumulator using {@link BvgLegScoringFunction} instead of {@link LegScoringFunction}
- * 
+ *
  * @author aneumann
  *
  */
 public class BvgScoringFunctionFactory implements ScoringFunctionFactory {
-	
+
 	private static final Logger log = Logger.getLogger(BvgScoringFunctionFactory.class);
-	
+
 	private final CharyparNagelScoringParameters charyparNagelConfigParameters;
 	private final BvgScoringFunctionParameters bvgParameters;
 	private final NetworkImpl network;
@@ -52,11 +51,11 @@ public class BvgScoringFunctionFactory implements ScoringFunctionFactory {
 		this.network = network;
 		log.info("...constructed.");
 	}
-	
+
 	@Override
 	public ScoringFunction createNewScoringFunction(Plan plan) {
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
-		scoringFunctionAccumulator.addScoringFunction(new ActivityScoringFunction(plan, this.charyparNagelConfigParameters));
+		scoringFunctionAccumulator.addScoringFunction(new BvgActivityScoringFunction(plan, this.charyparNagelConfigParameters));
 		scoringFunctionAccumulator.addScoringFunction(new BvgLegScoringFunction(plan, this.charyparNagelConfigParameters, this.bvgParameters, this.network));
 		scoringFunctionAccumulator.addScoringFunction(new MoneyScoringFunction(this.charyparNagelConfigParameters));
 		scoringFunctionAccumulator.addScoringFunction(new AgentStuckScoringFunction(this.charyparNagelConfigParameters));
