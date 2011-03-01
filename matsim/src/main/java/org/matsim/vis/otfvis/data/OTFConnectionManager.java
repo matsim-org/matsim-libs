@@ -32,7 +32,6 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.caching.SceneLayer;
-import org.matsim.vis.otfvis.data.fileio.queuesim.OTFQueueSimLinkAgentsWriter;
 import org.matsim.vis.otfvis.interfaces.OTFDataReader;
 import org.matsim.vis.snapshots.writers.VisLink;
 import org.matsim.vis.snapshots.writers.VisNode;
@@ -130,7 +129,7 @@ public class OTFConnectionManager implements Cloneable, Serializable {
 		connections.add(entry);
 	}
 
-	public void connectQueueLinkToWriter(Class<? extends OTFQueueSimLinkAgentsWriter> writer) {
+	public void connectQueueLinkToWriter(Class<? extends OTFDataWriter<? extends VisLink>> writer) {
 		Entry entry = new Entry(VisLink.class, writer);
 		connections.add(entry);
 	}

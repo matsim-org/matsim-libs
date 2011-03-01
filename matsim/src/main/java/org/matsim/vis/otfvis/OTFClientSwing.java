@@ -26,7 +26,6 @@ import java.rmi.RemoteException;
 
 import org.matsim.vis.otfvis.caching.SimpleSceneLayer;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
-import org.matsim.vis.otfvis.data.fileio.queuesim.OTFQueueSimLinkAgentsWriter;
 import org.matsim.vis.otfvis.gui.OTFSwingDrawerContainer;
 import org.matsim.vis.otfvis.gui.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.gui.SwingAgentDrawer;
@@ -60,33 +59,25 @@ public class OTFClientSwing extends OTFClient {
 	 */
 	public OTFClientSwing(String url) {
 		super(url);
-		/*
-		 * If I got it right: The following entries to the connection manager are really needed to
-		 * get otfvis running with the current matsim version. The other entries added
-		 * below are needed in terms of backward compatibility to older versions only. (dg, nov 09)
-		 */
-		this.connectionManager.connectQLinkToWriter(OTFLinkLanesAgentsNoParkingHandler.Writer.class);
-		this.connectionManager.connectQueueLinkToWriter(OTFQueueSimLinkAgentsWriter.class);
 
-		this.connectionManager.connectWriterToReader(OTFQueueSimLinkAgentsWriter.class, OTFLinkLanesAgentsNoParkingHandler.class);
+		this.connectionManager.connectQLinkToWriter(OTFLinkLanesAgentsNoParkingHandler.Writer.class);
+		this.connectionManager.connectQueueLinkToWriter(OTFLinkAgentsHandler.Writer.class);
+
 		this.connectionManager.connectWriterToReader(OTFLinkLanesAgentsNoParkingHandler.Writer.class, OTFLinkLanesAgentsNoParkingHandler.class);
 		this.connectionManager.connectWriterToReader(OTFAgentsListHandler.Writer.class, OTFAgentsListHandler.class);
-
-		/*
-		 * Only needed for backward compatibility, see comment above (dg, nov 09)
-		 */
 		this.connectionManager.connectWriterToReader(OTFDefaultLinkHandler.Writer.class, OTFDefaultLinkHandler.class);
 		this.connectionManager.connectWriterToReader(OTFLinkAgentsHandler.Writer.class, OTFLinkAgentsHandler.class);
 		this.connectionManager.connectWriterToReader(OTFLinkAgentsNoParkingHandler.Writer.class, OTFLinkAgentsHandler.class);
 		this.connectionManager.connectWriterToReader(OTFDefaultNodeHandler.Writer.class, OTFDefaultNodeHandler.class);
-
 		
 		this.connectionManager.connectReaderToReceiver(OTFLinkLanesAgentsNoParkingHandler.class, SwingSimpleQuadDrawer.class);
+		this.connectionManager.connectReaderToReceiver(OTFLinkAgentsHandler.class, SwingSimpleQuadDrawer.class);
 		this.connectionManager.connectReaderToReceiver(OTFLinkLanesAgentsNoParkingHandler.class, SwingAgentDrawer.class);
+		this.connectionManager.connectReaderToReceiver(OTFLinkAgentsHandler.class, SwingAgentDrawer.class);
 		this.connectionManager.connectReaderToReceiver(OTFAgentsListHandler.class, SwingAgentDrawer.class);
+		
 		this.connectionManager.connectReceiverToLayer(SwingSimpleQuadDrawer.class, SimpleSceneLayer.class);
 		this.connectionManager.connectReceiverToLayer(SwingAgentDrawer.class, SimpleSceneLayer.class);
-
 	}
 
 	@Override

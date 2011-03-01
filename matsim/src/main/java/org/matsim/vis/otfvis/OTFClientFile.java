@@ -25,7 +25,6 @@ import java.rmi.RemoteException;
 
 import org.matsim.vis.otfvis.data.OTFClientQuad;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
-import org.matsim.vis.otfvis.data.fileio.queuesim.OTFQueueSimLinkAgentsWriter;
 import org.matsim.vis.otfvis.gui.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
 import org.matsim.vis.otfvis.handler.OTFDefaultLinkHandler;
@@ -57,50 +56,25 @@ public class OTFClientFile extends OTFClient {
 
 	public OTFClientFile( String filename) {
 		super("file:" + filename);
-		/*
-		 * If I got it right: The following entries to the connection manager are really needed to
-		 * get otfvis running with the current matsim version. The other entries added
-		 * below are needed in terms of backward compatibility to older versions only. (dg, nov 09)
-		 */
-		this.connect.connectQLinkToWriter(OTFLinkLanesAgentsNoParkingHandler.Writer.class);
-		this.connect.connectQueueLinkToWriter(OTFQueueSimLinkAgentsWriter.class);
-		
-		this.connect.connectWriterToReader(OTFQueueSimLinkAgentsWriter.class, OTFLinkLanesAgentsNoParkingHandler.class);
-		this.connect.connectWriterToReader(OTFLinkLanesAgentsNoParkingHandler.Writer.class, OTFLinkLanesAgentsNoParkingHandler.class);
-		this.connect.connectWriterToReader(OTFAgentsListHandler.Writer.class,  OTFAgentsListHandler.class);
-		
-		this.connect.connectReaderToReceiver(OTFLinkLanesAgentsNoParkingHandler.class, OGLSimpleQuadDrawer.class);
-		this.connect.connectReaderToReceiver(OTFLinkLanesAgentsNoParkingHandler.class, AgentPointDrawer.class);
-		this.connect.connectReaderToReceiver(OTFAgentsListHandler.class,  AgentPointDrawer.class);
-		
-		
-		this.connect.connectReceiverToLayer(OGLSimpleQuadDrawer.class, OGLSimpleStaticNetLayer.class);		
-		this.connect.connectReceiverToLayer(AgentPointDrawer.class, OGLAgentPointLayer.class);
 
-		/*
-		 * Only needed for backward compatibility, see comment above (dg, nov 09)
-		 */
+		this.connect.connectQLinkToWriter(OTFLinkLanesAgentsNoParkingHandler.Writer.class);
+		this.connect.connectQueueLinkToWriter(OTFLinkAgentsHandler.Writer.class);
+		
+		this.connect.connectWriterToReader(OTFLinkLanesAgentsNoParkingHandler.Writer.class, OTFLinkLanesAgentsNoParkingHandler.class);
+		this.connect.connectWriterToReader(OTFAgentsListHandler.Writer.class, OTFAgentsListHandler.class);
 		this.connect.connectWriterToReader(OTFDefaultLinkHandler.Writer.class, OTFDefaultLinkHandler.class);
 		this.connect.connectWriterToReader(OTFLinkAgentsHandler.Writer.class, OTFLinkAgentsHandler.class);
 		this.connect.connectWriterToReader(OTFLinkAgentsNoParkingHandler.Writer.class, OTFLinkAgentsHandler.class);
 		this.connect.connectWriterToReader(OTFDefaultNodeHandler.Writer.class, OTFDefaultNodeHandler.class);
-
-	}
-
-	protected OTFClientQuad getRightDrawerComponent() throws RemoteException {
-		OTFConnectionManager connectR = this.connect.clone();
-		// those lines are from my point of view not really needed dg dez 09
-		// yes, they are. michaz mar 10 :-(
-		connectR.remove(OTFLinkAgentsHandler.class);
-		connectR.connectReaderToReceiver(OTFLinkAgentsHandler.class,  OGLSimpleQuadDrawer.class);
-		connectR.connectReaderToReceiver(OTFLinkLanesAgentsNoParkingHandler.class, OGLSimpleQuadDrawer.class);
-		connectR.connectReceiverToLayer(OGLSimpleQuadDrawer.class, OGLSimpleStaticNetLayer.class);
-		connectR.connectReaderToReceiver(OTFLinkAgentsHandler.class,  AgentPointDrawer.class);
-		connectR.connectReaderToReceiver(OTFLinkLanesAgentsNoParkingHandler.class,  AgentPointDrawer.class);
-		connectR.connectReceiverToLayer(AgentPointDrawer.class, OGLAgentPointLayer.class);
-		//end dg dez 09
-		OTFClientQuad clientQ2 = createNewView(null, connectR, this.hostControlBar.getOTFHostConnectionManager());
-		return clientQ2;
+		
+		this.connect.connectReaderToReceiver(OTFLinkLanesAgentsNoParkingHandler.class, OGLSimpleQuadDrawer.class);
+		this.connect.connectReaderToReceiver(OTFLinkLanesAgentsNoParkingHandler.class, AgentPointDrawer.class);
+		this.connect.connectReaderToReceiver(OTFAgentsListHandler.class, AgentPointDrawer.class);
+		this.connect.connectReaderToReceiver(OTFLinkAgentsHandler.class, OGLSimpleQuadDrawer.class);
+		this.connect.connectReaderToReceiver(OTFLinkAgentsHandler.class, AgentPointDrawer.class);
+		
+		this.connect.connectReceiverToLayer(OGLSimpleQuadDrawer.class, OGLSimpleStaticNetLayer.class);		
+		this.connect.connectReceiverToLayer(AgentPointDrawer.class, OGLAgentPointLayer.class);
 	}
 
 	@Override
@@ -109,7 +83,8 @@ public class OTFClientFile extends OTFClient {
 			OTFTimeLine timeLine = new OTFTimeLine("time", hostControlBar.getOTFHostControl());
 			frame.getContentPane().add(timeLine, BorderLayout.SOUTH);
 			hostControlBar.addDrawer("timeline", timeLine);
-			OTFDrawer mainDrawer = new OTFOGLDrawer(this.getRightDrawerComponent(), hostControlBar);
+			OTFClientQuad clientQ2 = createNewView(null, this.connect, this.hostControlBar.getOTFHostConnectionManager());
+			OTFDrawer mainDrawer = new OTFOGLDrawer(clientQ2, hostControlBar);
 			return mainDrawer;
 		} catch (RemoteException e) {
 			e.printStackTrace();
@@ -127,6 +102,5 @@ public class OTFClientFile extends OTFClient {
 			throw new RuntimeException();
 		}
 	}
-
 
 }
