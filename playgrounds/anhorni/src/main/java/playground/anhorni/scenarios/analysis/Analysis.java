@@ -12,7 +12,7 @@ import org.matsim.core.utils.charts.XYScatterChart;
 public class Analysis {
 	
 	private int id = -1;
-	private String outpath = "";
+	private String outpath;
 	private int numberOfLocations = -1;
 	
 	private Vector<RandomRun> randomRuns = new Vector<RandomRun>();
@@ -95,7 +95,7 @@ public class Analysis {
 				XYScatterChart chart = new XYScatterChart("loc_" + locIndex + "_analysis_" + this.id, "Number of sample runs used to build average", "Mean");
 				chart.addSeries("", x, singleLocMeanExpenditures);
 				
-				String dir = this.outpath + "/output/random/" + "loc_" + locIndex + "/";
+				String dir = this.outpath + "/output/PLOC/3towns/random/" + "loc_" + locIndex + "/";
 				new File(dir).mkdir();
 				
 				chart.saveAsPng(dir + "analysis_" + this.id + ".png" , 1000, 500);

@@ -26,7 +26,7 @@ import java.io.IOException;
 
 public class ConfigReader {
 	
-	private String configFile = "src/main/java/playground/anhorni/scenarios/3towns/input/config.txt";
+	private String configFile = "src/main/java/playground/anhorni/input/PLOC/3towns/config.txt";
 	
 	private int populationSize = -1;
 	private int numberOfCityShoppingLocs = -1;

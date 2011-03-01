@@ -73,9 +73,9 @@ public class CityShoppingCalculator implements ShutdownListener {
 				
 		try {
 			
-			String outputPath = "src/main/java/playground/anhorni/scenarios/3towns/output/";
+			String outputPath = "src/main/java/playground/anhorni/output/PLOC/3towns/";
 			if (runId.contains("random")) {
-				outputPath = "src/main/java/playground/anhorni/scenarios/3towns/output/random/";
+				outputPath = "src/main/java/playground/anhorni/output/PLOC/3towns/random/";
 				new File(outputPath).mkdir();
 			}
 

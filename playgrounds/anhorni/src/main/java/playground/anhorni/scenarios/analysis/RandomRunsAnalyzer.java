@@ -38,7 +38,7 @@ import org.matsim.core.utils.charts.XYScatterChart;
 import playground.anhorni.scenarios.ConfigReader;
 
 public class RandomRunsAnalyzer {
-	private String path = "";
+	private String path;
 //	private BufferedWriter bufferedWriter = null;	
 	private int numberOfRandomRuns = -1;
 	private int numberOfCityShoppingLocs = -1;
@@ -58,17 +58,12 @@ public class RandomRunsAnalyzer {
 	private void init() {
 		myConfigReader = new ConfigReader();
 		myConfigReader.read();
-		String superPath = myConfigReader.getPath() + "output/super_cityShopping.txt";
 		int superPopulationSize = (int)(1.0 / myConfigReader.getShopShare()) * myConfigReader.getNumberOfCityShoppingLocs();
 		
 		try {
-			  BufferedReader bufferedReader = new BufferedReader(new FileReader(superPath));
-			  String line = bufferedReader.readLine(); // skip header
-			  line = bufferedReader.readLine();
-			  String parts[] = line.split("\t");
-			  this.superValuePerLocation = Double.parseDouble(parts[0]) / superPopulationSize;
+			  this.superValuePerLocation = 0.0;
 		  
-			  BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(myConfigReader.getPath() +  "output/superPopSize.txt"));			
+			  BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(myConfigReader.getPath() +  "output/PLOC/3towns/superPopSize.txt"));			
 			  bufferedWriter.write("Super population size: " + superPopulationSize);
 			  bufferedWriter.flush();
 			  bufferedWriter.close();
@@ -96,7 +91,7 @@ public class RandomRunsAnalyzer {
     	Vector<RandomRun> randomRuns = new Vector<RandomRun>();
     	
 		try {
-			  BufferedReader bufferedReader = new BufferedReader(new FileReader(path + "output/random_summary_cityShopping.txt"));
+			  BufferedReader bufferedReader = new BufferedReader(new FileReader(path + "output/PLOC/3towns/random_summary_cityShopping.txt"));
 			  String line = bufferedReader.readLine(); // skip header
 			  for (int j = 0; j < this.numberOfRandomRuns; j++) {
 				  RandomRun randomRun = new RandomRun(j, numberOfCityShoppingLocs);
@@ -136,7 +131,7 @@ public class RandomRunsAnalyzer {
 		try {
 		
 		for (int locIndex = 0; locIndex < this.numberOfCityShoppingLocs; locIndex++) {
-			String dir = this.path + "/output/random/" + "loc_" + locIndex + "/";
+			String dir = this.path + "/output/PLOC/3towns/random/" + "loc_" + locIndex + "/";
 			XYScatterChart chart = new XYScatterChart("loc_" + locIndex, "Number of sample runs used to build average", "Deviation from Mean_n [%]");
 			
 			bufferedWriter = new BufferedWriter(new FileWriter(dir +  "summary.txt"));			
@@ -189,7 +184,7 @@ public class RandomRunsAnalyzer {
     			superVal = "_abs";
     		}
     		
-    		plot.saveAsPng("src/main/java/playground/anhorni/scenarios/3towns/output/random/loc_" + locIndex + "/" + myConfigReader.getRunId() + superVal + ".png", 1500, 700);  		
+    		plot.saveAsPng("src/main/java/playground/anhorni/output/PLOC/3towns/random/loc_" + locIndex + "/" + myConfigReader.getRunId() + superVal + ".png", 1500, 700);  		
     	}	
     }
 }

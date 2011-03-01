@@ -52,7 +52,7 @@ public class PlansAnalyzer {
 		
 		try { 		
 		    bufferedWriter = new BufferedWriter(new FileWriter(
-		    		path + "/input/plans/plansAnalysis.txt")); 
+		    		path + "/input/PLOC/3towns/plans/plansAnalysis.txt")); 
 		    bufferedWriter.write("Population\t");
 		    for (int i = 0; i < this.numberOfCityShoppingLocs; i++) {
 		    	 bufferedWriter.write("loc_" + i + "\t");

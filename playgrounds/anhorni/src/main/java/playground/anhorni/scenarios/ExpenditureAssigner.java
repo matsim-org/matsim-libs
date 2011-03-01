@@ -53,7 +53,7 @@ public class ExpenditureAssigner {
 		}
 		
 		try {           
-            bufferedWriter = new BufferedWriter(new FileWriter(path + "output/population_expenditures.txt"));           
+            bufferedWriter = new BufferedWriter(new FileWriter(path + "output/PLOC/3towns/population_expenditures.txt"));           
         } catch (FileNotFoundException ex) {
             ex.printStackTrace();
         } catch (IOException ex) {

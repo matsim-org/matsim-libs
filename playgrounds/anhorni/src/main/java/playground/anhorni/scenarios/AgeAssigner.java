@@ -33,7 +33,7 @@ public class AgeAssigner {
 	private int numberOfTowns = 0;
 	private int years [][];
 	private static int numberOfAgeCategories = 10; 
-	private static String path = "src/main/java/playground/anhorni/scenarios/3towns/";
+	private static String path = "src/main/java/playground/anhorni/output/PLOC/3towns/";
 	private BufferedWriter bufferedWriter = null;	
 	private final static Logger log = Logger.getLogger(AgeAssigner.class);
 	
@@ -54,7 +54,7 @@ public class AgeAssigner {
 			}
 		}		
 		try {           
-            bufferedWriter = new BufferedWriter(new FileWriter(path + "output/population_ages.txt"));           
+            bufferedWriter = new BufferedWriter(new FileWriter(path + "population_ages.txt"));           
         } catch (FileNotFoundException ex) {
             ex.printStackTrace();
         } catch (IOException ex) {

@@ -29,7 +29,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 public class SummaryWriter {
-	private String path = "src/main/java/playground/anhorni/scenarios/3towns/";
+	private String path = "src/main/java/playground/anhorni/";
 	private BufferedWriter bufferedWriter = null;	
 	private int numberOfRandomRuns = -1;
 	private int numberOfCityShoppingLocs = -1;
@@ -50,8 +50,8 @@ public class SummaryWriter {
     	this.sum = new double[numberOfRandomRuns]; 
     	
     	try {
-    		new File(path + "output/random/").mkdir();
-            bufferedWriter = new BufferedWriter(new FileWriter(path + "output/random_summary_cityShopping.txt"));           
+    		new File(path + "output/PLOC/3towns/random/").mkdir();
+            bufferedWriter = new BufferedWriter(new FileWriter(path + "output/PLOC/3towns/random_summary_cityShopping.txt"));           
         } catch (FileNotFoundException ex) {
             ex.printStackTrace();
         } catch (IOException ex) {
@@ -138,7 +138,7 @@ public class SummaryWriter {
     	double sumPerRun = 0;
     	
         try {
-          BufferedReader bufferedReader = new BufferedReader(new FileReader(path + "/output/random/" + runIndex + "_random_cityShopping.txt"));
+          BufferedReader bufferedReader = new BufferedReader(new FileReader(path + "output/PLOC/3towns/random/" + runIndex + "_random_cityShopping.txt"));
           String line = bufferedReader.readLine(); // skip header
           line = bufferedReader.readLine();
           String parts[] = line.split("\t");

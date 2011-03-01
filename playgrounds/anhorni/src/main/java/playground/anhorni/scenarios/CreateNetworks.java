@@ -19,6 +19,7 @@
 
 package playground.anhorni.scenarios;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -26,12 +27,12 @@ import org.matsim.core.network.NetworkWriter;
 
 public class CreateNetworks {
 	private ScenarioImpl scenario = new ScenarioImpl();
-	
-	ConfigReader configReader = new ConfigReader();
+	private final static Logger log = Logger.getLogger(CreateNetworks.class);
+	private ConfigReader configReader = new ConfigReader();
 			
 	public void create(int populationSize, boolean sup) {
 		configReader.read();
-		String networkfilePath = configReader.getPath() + "/input/network.xml";
+		String networkfilePath = configReader.getPath() + "/input/PLOC/3towns/network.xml";
 		new MatsimNetworkReader(scenario).readFile(networkfilePath);
 		
 		this.scaleNetwork(populationSize);
@@ -46,11 +47,6 @@ public class CreateNetworks {
 	}
 		
 	private void write(int populationSize, boolean sup) {
-		if (sup) {
-			new NetworkWriter(scenario.getNetwork()).write(configReader.getPath() + "/input/networks/super_network.xml");
-		}
-		else {
-			new NetworkWriter(scenario.getNetwork()).write(configReader.getPath() + "/input/networks/" + populationSize + "_network.xml");
-		}
+		new NetworkWriter(scenario.getNetwork()).write(configReader.getPath() + "/input/PLOC/3towns/networks/" + populationSize + "_network.xml");
 	}
 }
