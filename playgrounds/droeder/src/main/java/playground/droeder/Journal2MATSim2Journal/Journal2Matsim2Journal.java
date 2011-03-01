@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -101,6 +102,7 @@ public class Journal2Matsim2Journal {
 	
 	
 	private Map<String, List<Trip>> person2ways;
+	private Map<String, List<Trip>> person2waysUnrouted;
 	private Map<Id, Set<PersonEvent>> person2Event;
 	private Map<String, Set<List<PersonEvent>>> carId2TripEvents;
 	private Map<String, Set<List<PersonEvent>>> ptId2TripEvents;
@@ -158,6 +160,7 @@ public class Journal2Matsim2Journal {
 	private void sortWaysByPerson() {
 		log.info("sort ways by person");
 		this.person2ways = new TreeMap<String, List<Trip>>();
+		this.person2waysUnrouted = new TreeMap<String, List<Trip>>();
 		String id;
 		for(String[] way : this.inFileContent){
 			id = way[2];
@@ -168,6 +171,13 @@ public class Journal2Matsim2Journal {
 				this.person2ways.put(id, new LinkedList<Trip>());
 				this.person2ways.get(id).add(new Trip(way));
 			}else{
+				if(this.person2waysUnrouted.containsKey(id)){
+					this.person2waysUnrouted.get(id).add(new Trip(way));
+				}else{
+					this.person2waysUnrouted.put(id, new LinkedList<Trip>());
+					this.person2waysUnrouted.get(id).add(new Trip(way));
+				}
+				
 				log.error("wayId " + way[1] + "not processed, because no coordinates are given for origin and/or destination!"); 
 			}
 		}
@@ -197,7 +207,7 @@ public class Journal2Matsim2Journal {
 			personPt = fac.createPerson(sc.createId(e.getKey() + "_" + TransportMode.pt.toString()));
 			planPt = fac.createPlan();
 			
-			List<String> way;
+			SortedMap<Integer, String> way;
 			Iterator<Trip> it = e.getValue().iterator();
 			boolean addPerson = true;
 			do{
@@ -457,27 +467,24 @@ public class Journal2Matsim2Journal {
 	}
 	
 	private void writeNewJournal() {
-		String outdir = this.outDir + "MATSim_journal.csv";
+		String outFile = this.outDir + "MATSim_journal.csv";
 		log.info("write new journal");
+		
 		try {
-			BufferedWriter writer = IOUtils.getBufferedWriter(outdir);
+			BufferedWriter writer = IOUtils.getBufferedWriter(outFile);
 			
-			for(String s : this.fileHeader.getAll()){
-				writer.write(s + ";");
-			}
-			writer.newLine();
-			
-			for(List<Trip> l : this.person2ways.values()){
-				for(Trip t : l){
-					for(String s : t.getAll()){
-						writer.write(s + ";");
-					}
-					writer.newLine();
+			for(Entry<Integer, Trip> t : this.preProcessForWriting().entrySet()){
+				System.out.print(t.getKey() + "\t");
+				for(String s : t.getValue().getAll().values()){
+					writer.write(s + ";");
+					System.out.print(s + "\t");
 				}
+				System.out.println();
+				writer.newLine();
 			}
-			writer.close();
 			
-			log.info("journal written to " + outdir + "...");
+			writer.close();
+			log.info("journal written to " + outFile + "...");
 			
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -485,50 +492,103 @@ public class Journal2Matsim2Journal {
 			e.printStackTrace();
 		}
 		
+		
+		
+//		try {
+//			BufferedWriter writer = IOUtils.getBufferedWriter(outdir);
+//			
+//			for(String s : this.fileHeader.getAll().values()){
+//				writer.write(s + ";");
+//			}
+//			writer.newLine();
+//			
+//			for(List<Trip> l : this.person2ways.values()){
+//				for(Trip t : l){
+//					for(String s : t.getAll().values()){
+//						writer.write(s + ";");
+//					}
+//					writer.newLine();
+//				}
+//			}
+//			writer.close();
+//			
+//			log.info("journal written to " + outdir + "...");
+//			
+//		} catch (FileNotFoundException e) {
+//			e.printStackTrace();
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+		
+	}
+
+	private SortedMap<Integer, Trip> preProcessForWriting() {
+		SortedMap<Integer, Trip> trips = new TreeMap<Integer, Trip>();
+		trips.put(0, this.fileHeader);
+		
+		for(List<Trip> l: person2ways.values()){
+			for(Trip t : l){
+				trips.put(Integer.valueOf(t.getElement(1)+1),t);
+			}
+		}
+		for(List<Trip> l: person2waysUnrouted.values()){
+			for(Trip t : l){
+				trips.put(Integer.valueOf(t.getElement(1)+1),t);
+			}
+		}
+		
+		return trips; 
 	}
 }
 
 class Trip{
 	
-	private List<String> values;
+	private SortedMap<Integer, String> values;
 	private int oldSize;
 	
 	public Trip(String[] oldTrip){
 		this.oldSize = oldTrip.length;
-		this.values = new LinkedList<String>();
+		this.values = new TreeMap<Integer, String>();
 		
 		for(int i = 0; i < oldTrip.length; i++){
-			this.values.add(i, oldTrip[i]);
+			this.values.put(i, oldTrip[i]);
 		}
-		for(int i = 0; i < 4; i++){
-			this.values.add("");
+	}
+	
+	public Trip(String[] oldTrip, boolean toRoot){
+		this.values = new TreeMap<Integer, String>();
+		
+		for(int i = 0; i < oldTrip.length; i++){
+			this.values.put(i, oldTrip[i]);
 		}
+		this.setPtTime(9999999, 9999999, 9999999);
+		this.setCarTime(9999999);
 	}
 	
 	public void setPtTime(double travelTime, double transitTime, double waitingTime){
-		this.values.add(this.oldSize, String.valueOf(travelTime));
-		this.values.add(this.oldSize+1, String.valueOf(transitTime));
-		this.values.add(this.oldSize+2, String.valueOf(waitingTime));
+		this.values.put(this.oldSize, String.valueOf(travelTime));
+		this.values.put(this.oldSize+1, String.valueOf(transitTime));
+		this.values.put(this.oldSize+2, String.valueOf(waitingTime));
 	}
 	
 	public void setPtTime(String travelTime, String transitTime, String waitingTime){
-		this.values.add(this.oldSize, travelTime);
-		this.values.add(this.oldSize+1, transitTime);
-		this.values.add(this.oldSize+2, waitingTime);
+		this.values.put(this.oldSize, travelTime);
+		this.values.put(this.oldSize+1, transitTime);
+		this.values.put(this.oldSize+2, waitingTime);
 	}
 	
 	public void setCarTime(double travelTime){
-		this.values.add(this.oldSize+3, String.valueOf(travelTime));
+		this.values.put(this.oldSize+3, String.valueOf(travelTime));
 	}
 	public void setCarTime(String travelTime){
-		this.values.add(this.oldSize+3, travelTime);
+		this.values.put(this.oldSize+3, travelTime);
 	}
 	
 	public String getElement(int index){
 		return this.values.get(index);
 	}
 	
-	public List<String >getAll(){
+	public SortedMap<Integer, String> getAll(){
 		return this.values;
 	}
 }
