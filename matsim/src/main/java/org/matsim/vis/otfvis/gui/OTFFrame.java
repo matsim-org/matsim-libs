@@ -79,7 +79,7 @@ public class OTFFrame extends JFrame {
 		if(OTFClientControl.getInstance().getOTFVisConfig().isModified()) {
 			final JDialog dialog = new JDialog((JFrame)null, "Preferences are unsaved and modified...", true);
 			final JOptionPane optionPane = new JOptionPane(
-				    "There are potenially unsaved changes in Preferences.\nQuit anyway?",
+				    "There are potentially unsaved changes in Preferences.\nQuit anyway?",
 				    JOptionPane.QUESTION_MESSAGE,
 				    JOptionPane.YES_NO_OPTION);
 			dialog.setContentPane(optionPane);
