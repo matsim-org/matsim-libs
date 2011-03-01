@@ -136,7 +136,12 @@ public class EventsManagerImpl implements EventsManager {
 			this.nextCounterMsg *= 2;
 			printEventsCount();
 		}
-		computeEvent(event);
+		try {
+			computeEvent(event);
+		} catch (NullPointerException e) {
+			e.printStackTrace(); // print the stack trace here, as it seems to be lost in the later process until it gets catched.
+			throw e;
+		}
 	}
 
 	public void printEventsCount() {
