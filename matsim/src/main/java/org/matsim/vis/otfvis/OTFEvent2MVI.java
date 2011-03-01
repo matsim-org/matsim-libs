@@ -22,6 +22,8 @@ package org.matsim.vis.otfvis;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
 
 import org.matsim.core.config.Config;
 import org.matsim.run.Events2Snapshot;
@@ -44,14 +46,18 @@ public class OTFEvent2MVI extends OTFFileWriter {
 	
 	private final String eventFileName;
 
-	private final OTFAgentsListHandler.Writer writer = new OTFAgentsListHandler.Writer();
+	private final OTFAgentsListHandler.Writer writer;
 
 	private VisNetwork network;
+
+	private Collection<AgentSnapshotInfo> positions = new ArrayList<AgentSnapshotInfo>();
 
 	public OTFEvent2MVI(VisNetwork net, String eventFileName, String outFileName, double interval_s) {
 		super(interval_s, new OTFQSimServerQuadBuilder(net), outFileName, new OTFFileWriterQSimConnectionManagerFactory());
 		this.network = net;
 		this.eventFileName = eventFileName;
+		this.writer = new OTFAgentsListHandler.Writer();
+		this.writer.setSrc(this.positions );
 	}
 
 	@Override
@@ -63,12 +69,8 @@ public class OTFEvent2MVI extends OTFFileWriter {
 
 	public void convert(final Config config) {
 		open();
-
-//		config.simulation().setSnapshotFormat("none");
-//		config.simulation().setSnapshotPeriod(this.interval_s);
 		config.getQSimConfigGroup().setSnapshotFormat("none");
 		config.getQSimConfigGroup().setSnapshotPeriod(this.interval_s);
-
 		Events2Snapshot app = new Events2Snapshot();
 		app.addExternalSnapshotWriter(this);
 		app.run(new File(this.eventFileName), config, this.network.getNetwork());
@@ -79,12 +81,12 @@ public class OTFEvent2MVI extends OTFFileWriter {
 	public void addAgent(AgentSnapshotInfo position) {
 		//drop all parking vehicles
 		if (position.getAgentState() == AgentSnapshotInfo.AgentState.PERSON_AT_ACTIVITY) return;
-		this.writer.positions.add( position );
+		this.positions.add( position );
 	}
 
 	@Override
 	public void beginSnapshot(double time) {
-		this.writer.positions.clear();
+		this.positions.clear();
 		this.lastTime = time;
 	}
 

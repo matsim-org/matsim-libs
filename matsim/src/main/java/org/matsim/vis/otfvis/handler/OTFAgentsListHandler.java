@@ -52,25 +52,23 @@ public class OTFAgentsListHandler extends OTFDataReader {
 
 	protected List<OTFDataSimpleAgentReceiver> agents = new LinkedList<OTFDataSimpleAgentReceiver>();
 
-	static public class Writer extends OTFDataWriter<Void> {
+	static public class Writer extends OTFDataWriter<Collection<? extends AgentSnapshotInfo>> {
 		// yyyyyy the reason why this whole class works is that other classes have access to the "positions" field
 		// since it is public.  kai, feb'11
 
 		private static final long serialVersionUID = -6368752578878835954L;
 
-		public transient Collection<AgentSnapshotInfo> positions = new ArrayList<AgentSnapshotInfo>();
-
 		@Override
 		public void writeConstData(ByteBuffer out) throws IOException {
+			
 		}
 
 		@Override
 		public void writeDynData(ByteBuffer out) throws IOException {
-			out.putInt(this.positions.size());
-			for (AgentSnapshotInfo pos : this.positions) {
+			out.putInt(src.size());
+			for (AgentSnapshotInfo pos : this.src) {
 				writeAgent(pos, out);
 			}
-			this.positions.clear();
 		}
 
 		private void writeAgent(AgentSnapshotInfo agInfo, ByteBuffer out) {

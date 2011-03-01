@@ -41,7 +41,7 @@ public final class EventsCollectingServer implements OTFServerRemote {
 
 	private Network network;
 	
-	private final OTFAgentsListHandler.Writer agentWriter = new OTFAgentsListHandler.Writer();
+	private final OTFAgentsListHandler.Writer agentWriter;
 	
 	private MyQuadTree quadTree;
 	
@@ -56,6 +56,8 @@ public final class EventsCollectingServer implements OTFServerRemote {
 	private MovieDatabase db;
 
 	private File tempFile;
+
+	private Collection<AgentSnapshotInfo> positions = new ArrayList<AgentSnapshotInfo>();
 
 	private class MyQuadTree extends OTFServerQuad2 {
 
@@ -111,6 +113,8 @@ public final class EventsCollectingServer implements OTFServerRemote {
 	}
 	
 	public EventsCollectingServer(Network network, EventsManager eventsManager, double snapshotPeriod, MobsimConfigGroupI simulationConfigGroup) {
+		agentWriter = new OTFAgentsListHandler.Writer();
+		agentWriter.setSrc(positions);
 		this.network = network;
 		QueuelessSnapshotGenerator snapshotGenerator = new QueuelessSnapshotGenerator(network, (int) snapshotPeriod); 
 		SnapshotReceiver snapshotReceiver = new SnapshotReceiver();
@@ -165,9 +169,9 @@ public final class EventsCollectingServer implements OTFServerRemote {
 	public byte[] getQuadDynStateBuffer(String id, Rect bounds) throws RemoteException {
 		byte[] result;
 		byteBuffer.position(0);
-		agentWriter.positions.clear();
+		positions.clear();
 		if (nextTimeStep != null) {
-			agentWriter.positions.addAll(nextTimeStep.agentPositions);
+			positions.addAll(nextTimeStep.agentPositions);
 		}
 		quadTree.writeDynData(bounds, byteBuffer);
 		int pos = byteBuffer.position();

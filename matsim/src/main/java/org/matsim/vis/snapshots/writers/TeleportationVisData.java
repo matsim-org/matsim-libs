@@ -17,11 +17,10 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.vis.otfvis.data.teleportation;
+package org.matsim.vis.snapshots.writers;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 
 /**
  *

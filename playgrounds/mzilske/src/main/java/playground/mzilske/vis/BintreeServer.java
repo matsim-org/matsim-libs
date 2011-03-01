@@ -43,7 +43,7 @@ public final class BintreeServer implements OTFServerRemote {
 
 	private Network network;
 	
-	private final OTFAgentsListHandler.Writer agentWriter = new OTFAgentsListHandler.Writer();
+	private final OTFAgentsListHandler.Writer agentWriter;
 	
 	private MyQuadTree quadTree;
 	
@@ -60,6 +60,8 @@ public final class BintreeServer implements OTFServerRemote {
 	private double lastTime = 86400.0;
 
 	private TreeSet<Double> timeSteps;
+	
+	private Collection<AgentSnapshotInfo> positions = new ArrayList<AgentSnapshotInfo>();
 
 	private class MyQuadTree extends OTFServerQuad2 {
 
@@ -89,6 +91,8 @@ public final class BintreeServer implements OTFServerRemote {
 	
 	public BintreeServer(Network network, EventsManager eventsManager, double snapshotPeriod, MobsimConfigGroupI simulationConfigGroup) {
 		this.network = network;
+		agentWriter = new OTFAgentsListHandler.Writer();
+		agentWriter.setSrc(positions);
 		bintreeGenerator = new BintreeGenerator(network);
 		quadTree = new MyQuadTree();
 		quadTree.initQuadTree();
@@ -143,9 +147,9 @@ public final class BintreeServer implements OTFServerRemote {
 	public byte[] getQuadDynStateBuffer(String id, Rect bounds) throws RemoteException {
 		byte[] result;
 		byteBuffer.position(0);
-		agentWriter.positions.clear();
+		this.positions.clear();
 		if (nextTimeStep != null) {
-			agentWriter.positions.addAll(nextTimeStep.agentPositions);
+			this.positions.addAll(nextTimeStep.agentPositions);
 		}
 		quadTree.writeDynData(bounds, byteBuffer);
 		int pos = byteBuffer.position();

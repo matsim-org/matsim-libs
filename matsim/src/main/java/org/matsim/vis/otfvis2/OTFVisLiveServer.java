@@ -34,7 +34,7 @@ public final class OTFVisLiveServer implements OTFLiveServerRemote {
 
 	private QueryServer queryServer;
 
-	private final OTFAgentsListHandler.Writer agentWriter = new OTFAgentsListHandler.Writer();
+	private final OTFAgentsListHandler.Writer agentWriter;
 
 	private MyQuadTree quadTree;
 
@@ -55,6 +55,8 @@ public final class OTFVisLiveServer implements OTFLiveServerRemote {
 	private SnapshotGenerator snapshotGenerator;
 
 	private Map<Id, Plan> plans;
+
+	private Collection<AgentSnapshotInfo> positions = new ArrayList<AgentSnapshotInfo>();
 
 	private final class CurrentTimeStepView implements SimulationViewForQueries {
 
@@ -153,6 +155,8 @@ public final class OTFVisLiveServer implements OTFLiveServerRemote {
 
 	public OTFVisLiveServer(Scenario scenario, EventsManager eventsManager) {
 		this.scenario = scenario;
+		this.agentWriter = new OTFAgentsListHandler.Writer();
+		this.agentWriter.setSrc(this.positions );
 		this.snapshotReceiver = new SnapshotReceiver();
 		this.quadTree = new MyQuadTree();
 		this.quadTree.initQuadTree();
@@ -224,9 +228,9 @@ public final class OTFVisLiveServer implements OTFLiveServerRemote {
 	throws RemoteException {
 		byte[] result;
 		byteBuffer.position(0);
-		agentWriter.positions.clear();
+		this.positions.clear();
 		if (nextTimeStep != null) {
-			agentWriter.positions.addAll(nextTimeStep.agentPositions);
+			this.positions.addAll(nextTimeStep.agentPositions);
 		}
 		quadTree.writeDynData(bounds, byteBuffer);
 		int pos = byteBuffer.position();

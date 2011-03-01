@@ -55,11 +55,9 @@ import org.matsim.signalsystems.otfvis.io.SignalGroupStateChangeTracker;
 import org.matsim.vis.otfvis.caching.SimpleSceneLayer;
 import org.matsim.vis.otfvis.data.DefaultConnectionManagerFactory;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
-import org.matsim.vis.otfvis.data.teleportation.OTFTeleportAgentsDataReader;
-import org.matsim.vis.otfvis.data.teleportation.OTFTeleportAgentsDataWriter;
-import org.matsim.vis.otfvis.data.teleportation.OTFTeleportAgentsDrawer;
-import org.matsim.vis.otfvis.data.teleportation.OTFTeleportAgentsLayer;
-import org.matsim.vis.otfvis.data.teleportation.TeleportationVisData;
+import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
+import org.matsim.vis.otfvis.opengl.layer.AgentPointDrawer;
+import org.matsim.vis.snapshots.writers.TeleportationVisData;
 import org.matsim.vis.snapshots.writers.VisMobsim;
 import org.matsim.vis.snapshots.writers.VisMobsimFeature;
 
@@ -76,7 +74,7 @@ SimulationInitializedListener, SimulationAfterSimStepListener, SimulationBeforeC
 
 	private OTFConnectionManager connectionManager = new DefaultConnectionManagerFactory().createConnectionManager();
 
-	private OTFTeleportAgentsDataWriter teleportationWriter;
+	private OTFAgentsListHandler.Writer teleportationWriter;
 
 	private VisMobsim queueSimulation;
 
@@ -113,18 +111,15 @@ SimulationInitializedListener, SimulationAfterSimStepListener, SimulationBeforeC
 			// new DefaultConnectionManagerFactory().createConnectionManager() above.  kai, aug'10
 
 			if (this.doVisualizeTeleportedAgents) {
-				this.teleportationWriter = new OTFTeleportAgentsDataWriter();
+				this.teleportationWriter = new OTFAgentsListHandler.Writer();
+				this.teleportationWriter.setSrc(visTeleportationData.values());
 				this.otfServer.addAdditionalElement(this.teleportationWriter);
 				this.connectionManager.connectWriterToReader(
-						OTFTeleportAgentsDataWriter.class,
-						OTFTeleportAgentsDataReader.class);
+						OTFAgentsListHandler.Writer.class,
+						OTFAgentsListHandler.class);
 				this.connectionManager.connectReaderToReceiver(
-						OTFTeleportAgentsDataReader.class,
-						OTFTeleportAgentsDrawer.class);
-				this.connectionManager.connectReceiverToLayer(
-						OTFTeleportAgentsDrawer.class,
-						OTFTeleportAgentsLayer.class);
-
+						OTFAgentsListHandler.class,
+						AgentPointDrawer.class);
 			}
 			if (config.scenario().isUseTransit()) {
 				this.otfServer.addAdditionalElement(new FacilityDrawer.DataWriter_v1_0(
@@ -215,7 +210,6 @@ SimulationInitializedListener, SimulationAfterSimStepListener, SimulationBeforeC
 
 	private void visualizeTeleportedAgents(double time) {
 		if (this.doVisualizeTeleportedAgents) {
-			this.teleportationWriter.setSrc(this.visTeleportationData);
 			for (TeleportationVisData teleportationVisData : visTeleportationData.values()) {
 				teleportationVisData.calculatePosition(time);
 			}
