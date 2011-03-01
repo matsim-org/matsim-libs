@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * MinimizeLeftTurnsControlerListener.java
+ * LeftTurnIdentifier.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -21,26 +21,48 @@
 /**
  * 
  */
-package playground.yu.replanning.reRoute.tightTurnPenalty;
+package playground.yu.utils;
 
-import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.events.IterationStartsEvent;
-import org.matsim.core.controler.listener.IterationStartsListener;
+import java.util.TreeMap;
+
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.signalsystems.CalculateAngle;
 
 /**
+ * based on {@code org.matsim.signalsystems.CalculateAngle}
+ * 
  * @author yu
  * 
  */
-public class TightTurnPenaltyControlerListener implements
-		IterationStartsListener {
-
-	@Override
-	public void notifyIterationStarts(IterationStartsEvent event) {
-		Controler ctl = event.getControler();
-		if (event.getIteration() > ctl.getFirstIteration()) {
-			ctl
-					.setLeastCostPathCalculatorFactory(new DijkstraWithTightTurnPenaltyFactory());
+public class LeftTurnIdentifier {
+	public static boolean turnLeft(Link inLink, Link outLink) {
+		if (outLink.getToNode().equals(inLink.getFromNode())) {
+			/* U-Turn (size==0) */
+			return true;
 		}
-	}
 
+		TreeMap<Double, Link> outLinksSortedByAngle = CalculateAngle
+				.getOutLinksSortedByAngle(inLink);
+		int realOutLinksSize = outLinksSortedByAngle.size();
+		if (realOutLinksSize == 1) {
+			/* NOT intersection */
+			return false;
+		} else if (realOutLinksSize > 1) {
+			Double zeroAngle = 0d;
+			if (!outLinksSortedByAngle.containsKey(zeroAngle)) {
+				/* without straight link */
+				Double lowerKey = outLinksSortedByAngle.lowerKey(zeroAngle);
+
+				return outLinksSortedByAngle.headMap(
+						lowerKey,
+						Math.abs(lowerKey) > Math.abs(outLinksSortedByAngle
+								.higherKey(zeroAngle))).containsValue(outLink);
+				/* ">"- inclusive, "<=" - exclusive */
+			} else {
+				return outLinksSortedByAngle.headMap(zeroAngle).containsValue(
+						outLink/* ,false strict exclusive 0 */);
+			}
+		}
+		return false;
+	}
 }

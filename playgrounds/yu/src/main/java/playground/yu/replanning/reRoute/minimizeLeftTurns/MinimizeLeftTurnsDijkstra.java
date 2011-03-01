@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * MinimizeLinkAmountDijkstra.java
+ * MinimizeLeftTurnsDijkstra.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.yu.replanning.reRoute.minimizeLinkAmount;
+package playground.yu.replanning.reRoute.minimizeLeftTurns;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -35,17 +35,19 @@ import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.PseudoRemovePriorityQueue;
 
+import playground.yu.utils.LeftTurnIdentifier;
+
 /**
- * Implementation of <a href=
- * "http://en.wikipedia.org/wiki/MinimizeLinkAmountDijkstra%27s_algorithm"
- * >MinimizeLinkAmountDijkstra's shortest-path algorithm</a> on a time-dependent
+ * Implementation of <a
+ * href="http://en.wikipedia.org/wiki/MinimizeLeftTurnsDijkstra%27s_algorithm"
+ * >MinimizeLeftTurnsDijkstra's shortest-path algorithm</a> on a time-dependent
  * network with arbitrary non-negative cost functions (e.g. negative link cost
  * are not allowed). So 'shortest' in our context actually means 'least-cost'.
  * 
  * <p>
  * For every router, there exists a class which computes some preprocessing data
  * and is passed to the router class constructor in order to accelerate the
- * routing procedure. The one used for MinimizeLinkAmountDijkstra is
+ * routing procedure. The one used for MinimizeLeftTurnsDijkstra is
  * {@link org.matsim.core.router.util.PreProcessDijkstra}.
  * </p>
  * <br>
@@ -55,15 +57,15 @@ import org.matsim.core.utils.collections.PseudoRemovePriorityQueue;
  * <code>PreProcessDijkstra preProcessData = new PreProcessDijkstra();<br>
  * preProcessData.run(network);<br>
  * TravelCost costFunction = ...<br>
- * LeastCostPathCalculator routingAlgo = new MinimizeLinkAmountDijkstra(network, costFunction, preProcessData);<br>
+ * LeastCostPathCalculator routingAlgo = new MinimizeLeftTurnsDijkstra(network, costFunction, preProcessData);<br>
  * routingAlgo.calcLeastCostPath(fromNode, toNode, startTime);</code>
  * </p>
  * <p>
  * If you don't want to preprocess the network, you can invoke
- * MinimizeLinkAmountDijkstra as follows:
+ * MinimizeLeftTurnsDijkstra as follows:
  * </p>
  * <p>
- * <code> LeastCostPathCalculator routingAlgo = new MinimizeLinkAmountDijkstra(network, costFunction);</code>
+ * <code> LeastCostPathCalculator routingAlgo = new MinimizeLeftTurnsDijkstra(network, costFunction);</code>
  * </p>
  * 
  * @see org.matsim.core.router.util.PreProcessDijkstra
@@ -72,11 +74,11 @@ import org.matsim.core.utils.collections.PseudoRemovePriorityQueue;
  * @author lnicolas
  * @author mrieser
  */
-public class MinimizeLinkAmountDijkstra implements
+public class MinimizeLeftTurnsDijkstra implements
 		IntermodalLeastCostPathCalculator {
 
 	private final static Logger log = Logger
-			.getLogger(MinimizeLinkAmountDijkstra.class);
+			.getLogger(MinimizeLeftTurnsDijkstra.class);
 
 	/**
 	 * The network on which we find routes.
@@ -134,7 +136,7 @@ public class MinimizeLinkAmountDijkstra implements
 	 * @param timeFunction
 	 *            Determines the travel time on links.
 	 */
-	public MinimizeLinkAmountDijkstra(final Network network,
+	public MinimizeLeftTurnsDijkstra(final Network network,
 			final TravelCost costFunction, final TravelTime timeFunction) {
 		this(network, costFunction, timeFunction, null);
 	}
@@ -151,7 +153,7 @@ public class MinimizeLinkAmountDijkstra implements
 	 * @param preProcessData
 	 *            The pre processing data used during the routing phase.
 	 */
-	public MinimizeLinkAmountDijkstra(final Network network,
+	public MinimizeLeftTurnsDijkstra(final Network network,
 			final TravelCost costFunction, final TravelTime timeFunction,
 			final PreProcessDijkstra preProcessData) {
 
@@ -167,7 +169,7 @@ public class MinimizeLinkAmountDijkstra implements
 			if (preProcessData.containsData() == false) {
 				pruneDeadEnds = false;
 				log
-						.warn("The preprocessing data provided to router class MinimizeLinkAmountDijkstra contains no data! Please execute its run(...) method first!");
+						.warn("The preprocessing data provided to router class MinimizeLeftTurnsDijkstra contains no data! Please execute its run(...) method first!");
 				log.warn("Running without dead-end pruning.");
 			} else {
 				pruneDeadEnds = true;
@@ -294,11 +296,14 @@ public class MinimizeLinkAmountDijkstra implements
 		DijkstraNodeData outData = getData(outNode);
 		double currTime = outData.getTime();
 		double currCost = outData.getCost();
+		// V-----------TESTS-----------V
+		Link prevLink = outData.getPrevLink();
+		// A-----------TESTS-----------A
 		if (pruneDeadEnds) {
 			PreProcessDijkstra.DeadEndData ddOutData = getPreProcessData(outNode);
-			for (Link l : outNode.getOutLinks().values()) {
-				if (canPassLink(l)) {
-					Node n = l.getToNode();
+			for (Link outLink : outNode.getOutLinks().values()) {
+				if (canPassLink(outLink)) {
+					Node n = outLink.getToNode();
 					PreProcessDijkstra.DeadEndData ddData = getPreProcessData(n);
 
 					/*
@@ -312,16 +317,30 @@ public class MinimizeLinkAmountDijkstra implements
 							|| deadEndEntryNode != null
 							&& deadEndEntryNode.getId() == ddData
 									.getDeadEndEntryNode().getId()) {
-						addToPendingNodes(l, n, pendingNodes, currTime,
+						// V-----------TESTS-----------V
+						if (prevLink != null) {
+							if (LeftTurnIdentifier.turnLeft(prevLink, outLink)) {
+								currCost *= 2d;
+							}
+						}
+						// A-----------TESTS-----------A
+						addToPendingNodes(outLink, n, pendingNodes, currTime,
 								currCost, toNode);
 					}
 				}
 			}
 		} else { // this.pruneDeadEnds == false
-			for (Link l : outNode.getOutLinks().values()) {
-				if (canPassLink(l)) {
-					addToPendingNodes(l, l.getToNode(), pendingNodes, currTime,
-							currCost, toNode);
+			for (Link outLink : outNode.getOutLinks().values()) {
+				if (canPassLink(outLink)) {
+					// V-----------TESTS-----------V
+					if (prevLink != null) {
+						if (LeftTurnIdentifier.turnLeft(prevLink, outLink)) {
+							currCost *= 2d;
+						}
+					}
+					// A-----------TESTS-----------A
+					addToPendingNodes(outLink, outLink.getToNode(),
+							pendingNodes, currTime, currCost, toNode);
 				}
 			}
 		}
@@ -355,18 +374,15 @@ public class MinimizeLinkAmountDijkstra implements
 				currTime);
 		DijkstraNodeData data = getData(n);
 		double nCost = data.getCost();
-		// V-----------TESTS-----------V
+
 		double totalCost = currCost + travelCost;
-		if (totalCost == 0d) {
-			totalCost += 1d;
-		}
-		// A-----------TESTS-----------A
+
 		if (!data.isVisited(getIterationId())) {
 			visitNode(n, data, pendingNodes, currTime + travelTime, totalCost,
 					l);
 			return true;
 		}
-		// double totalCost = currCost + travelCost;
+
 		if (totalCost < nCost) {
 			revisitNode(n, data, pendingNodes, currTime + travelTime,
 					totalCost, l);
@@ -507,7 +523,7 @@ public class MinimizeLinkAmountDijkstra implements
 
 	/**
 	 * A data structure to store temporarily information used by the
-	 * MinimizeLinkAmountDijkstra-algorithm.
+	 * MinimizeLeftTurnsDijkstra-algorithm.
 	 */
 	protected static class DijkstraNodeData {
 

@@ -136,7 +136,7 @@ public class PCStrMn extends BseParamCalibrationStrategyManager implements
 					 * "SelectExpBeta" can still be written in configfile
 					 */
 				}
-			} else {// ***********iter<=maxPlanPerAgent+1************
+			} else {// ***********iter-firstIter<=maxPlanPerAgent+1************
 				if (iter - firstIter == 1) {
 					/*
 					 * shuffle the Plan Choice Set, to avoid chaotic network

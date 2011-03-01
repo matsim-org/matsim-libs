@@ -303,9 +303,9 @@ public class DijkstraWithTightTurnPenalty implements
 		// A-----------TESTS-----------A
 		if (pruneDeadEnds) {
 			PreProcessDijkstra.DeadEndData ddOutData = getPreProcessData(outNode);
-			for (Link l : outNode.getOutLinks().values()) {
-				if (canPassLink(l)) {
-					Node n = l.getToNode();
+			for (Link outLink : outNode.getOutLinks().values()) {
+				if (canPassLink(outLink)) {
+					Node n = outLink.getToNode();
 					PreProcessDijkstra.DeadEndData ddData = getPreProcessData(n);
 
 					/*
@@ -327,16 +327,16 @@ public class DijkstraWithTightTurnPenalty implements
 							currCost *= factor;
 						}
 						// A-----------TESTS-----------A
-						addToPendingNodes(l, n, pendingNodes, currTime,
+						addToPendingNodes(outLink, n, pendingNodes, currTime,
 								currCost, toNode);
 					}
 				}
 			}
 		} else { // this.pruneDeadEnds == false
-			for (Link l : outNode.getOutLinks().values()) {
-				if (canPassLink(l)) {
+			for (Link outLink : outNode.getOutLinks().values()) {
+				if (canPassLink(outLink)) {
 					// V-----------TESTS-----------V
-					Node n = l.getToNode();
+					Node n = outLink.getToNode();
 
 					if (prevLink != null) {
 						double factor = getTightTurnFactor(prevLink
@@ -345,8 +345,8 @@ public class DijkstraWithTightTurnPenalty implements
 						currCost *= factor;
 					}
 					// A-----------TESTS-----------A
-					addToPendingNodes(l, n, pendingNodes, currTime, currCost,
-							toNode);
+					addToPendingNodes(outLink, n, pendingNodes, currTime,
+							currCost, toNode);
 				}
 			}
 		}

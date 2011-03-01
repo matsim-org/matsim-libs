@@ -21,17 +21,19 @@
 /**
  * 
  */
-package playground.yu.replanning.reRoute.tightTurnPenalty;
+package playground.yu.replanning.reRoute.minimizeLeftTurns;
 
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 
+import playground.yu.travelCost.SingleReRouteSelectedControler;
+
 /**
  * @author yu
  * 
  */
-public class TightTurnPenaltyControlerListener implements
+public class MinimizeLeftTurnsControlerListener implements
 		IterationStartsListener {
 
 	@Override
@@ -39,8 +41,16 @@ public class TightTurnPenaltyControlerListener implements
 		Controler ctl = event.getControler();
 		if (event.getIteration() > ctl.getFirstIteration()) {
 			ctl
-					.setLeastCostPathCalculatorFactory(new DijkstraWithTightTurnPenaltyFactory());
+					.setLeastCostPathCalculatorFactory(new MinimizeLeftTurnsDijkstraFactory());
 		}
 	}
 
+	public static void main(String[] args) {
+		Controler controler = new SingleReRouteSelectedControler(args[0]);
+		controler
+				.addControlerListener(new MinimizeLeftTurnsControlerListener());
+		controler.setWriteEventsInterval(1);
+		controler.setOverwriteFiles(true);
+		controler.run();
+	}
 }
