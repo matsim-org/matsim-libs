@@ -30,13 +30,13 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.TravelMinCost;
-import org.matsim.core.utils.misc.Time;
+import org.matsim.core.router.util.TravelTime;
 
-import playground.yu.replanning.reRoute.minimizeLinkAmount.MinimizeLinkAmountDijkstraFactory;
 import playground.yu.utils.NotAnIntersection;
 
 /**
@@ -53,29 +53,40 @@ public class MinimizeLinkAmountListener implements IterationStartsListener {
 		public PersonalizableTravelCost createTravelCostCalculator(
 				PersonalizableTravelTime timeCalculator,
 				PlanCalcScoreConfigGroup cnScoringGroup) {
-			return new MinimizeLinkAmountTravelCostCalculator();
+			return new MinimizeLinkAmountTravelCostCalculator(timeCalculator);
 		}
 
 	}
 
 	public static class MinimizeLinkAmountTravelCostCalculator implements
 			TravelMinCost, PersonalizableTravelCost {
+		protected final TravelTime timeCalculator;
+
+		public MinimizeLinkAmountTravelCostCalculator(TravelTime timeCalculator) {
+			this.timeCalculator = timeCalculator;
+		}
 
 		@Override
 		public double getLinkGeneralizedTravelCost(final Link link,
 				final double time) {
-			double cost = 0d;
+			double cost = timeCalculator.getLinkTravelTime(link, time);
 			Node from = link.getFromNode();
 			if (!NotAnIntersection.notAnIntersection(from)) {
 				// recognize a real intersection
-				cost += 1d;
+				cost *= 2d;
 			}
 			return cost;
 		}
 
 		@Override
 		public double getLinkMinimumTravelCost(final Link link) {
-			return getLinkGeneralizedTravelCost(link, Time.UNDEFINED_TIME);
+			double cost = ((LinkImpl) link).getFreespeedTravelTime();
+			Node from = link.getFromNode();
+			if (!NotAnIntersection.notAnIntersection(from)) {
+				// recognize a real intersection
+				cost *= 2d;
+			}
+			return cost;
 		}
 
 		@Override
@@ -91,8 +102,7 @@ public class MinimizeLinkAmountListener implements IterationStartsListener {
 		if (event.getIteration() > ctl.getFirstIteration()) {
 			ctl
 					.setTravelCostCalculatorFactory(new MinimizeLinkAmountTravelCostCalculatorFactoryImpl());
-			ctl
-					.setLeastCostPathCalculatorFactory(new MinimizeLinkAmountDijkstraFactory());
+
 		}
 	}
 
