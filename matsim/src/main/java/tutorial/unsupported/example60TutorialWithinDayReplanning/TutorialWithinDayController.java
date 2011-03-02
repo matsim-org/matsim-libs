@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * WithinDayController.java
+ * TutorialWithinDayController.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,21 +18,20 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.withinday.controller;
+package tutorial.unsupported.example60TutorialWithinDayReplanning;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.config.Config;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.events.parallelEventsHandler.ParallelEventsManagerImpl;
 import org.matsim.core.events.parallelEventsHandler.SimStepParallelEventsManagerImpl;
 import org.matsim.core.mobsim.framework.listeners.FixedOrderSimulationListener;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
-import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
-import org.matsim.core.router.util.AStarLandmarksFactory;
+import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.scoring.OnlyTimeDependentScoringFunctionFactory;
+import org.matsim.evacuation.run.EvacuationQSimControler;
+import org.matsim.withinday.controller.ReplanningFlagInitializer;
 import org.matsim.withinday.mobsim.DuringActivityReplanningModule;
 import org.matsim.withinday.mobsim.DuringLegReplanningModule;
 import org.matsim.withinday.mobsim.InitialReplanningModule;
@@ -61,115 +60,127 @@ import org.matsim.withinday.replanning.replanners.interfaces.WithinDayInitialRep
 import org.matsim.withinday.trafficmonitoring.TravelTimeCollector;
 import org.matsim.withinday.trafficmonitoring.TravelTimeCollectorFactory;
 
-
 /**
- * Thimport playground.christoph.withinday.trafficmonitoring.TravelTimeCollector;
-is Controller should give an Example what is needed to run
- * Simulations with WithinDayReplanning.
- *
- * The Path to a Config File is needed as Argument to run the
- * Simulation.
- *
- * Additional Parameters have to be set in the WithinDayControler
- * Class. Here we just add the Knowledge Component.
- *
- * By default "test/scenarios/berlin/config.xml" should work.
- *
- * @author Christoph Dobler
+ * This class should give an example what is needed to run
+ * simulations with WithinDayReplanning.
+ * 
+ * The Path to a config file is needed as argument to run the
+ * simulation.
+ * 
+ * By default
+ * "./examples/evacuation-tutorial/withinDayEvacuationConf.xml"
+ * should work.
+ * 
+ * @author cdobler
  */
-public class WithinDayController extends Controler {
-
-	/*
-	 * Define the Probability that an Agent uses the
-	 * Replanning Strategy. It is possible to assign
-	 * multiple Strategies to the Agents.
+public class TutorialWithinDayController extends EvacuationQSimControler {
+	
+	/**
+	 * Define the probability that an Agent uses the replanning 
+	 * strategy. It is possible to assign multiple strategies 
+	 * to the agents.
 	 */
 	private double pInitialReplanning = 0.0;
-	private double pDuringActivityReplanning = 1.0;
-	private double pDuringLegReplanning = 1.0;
+	private double pDuringActivityReplanning = 0.0;
+	private double pDuringLegReplanning = 0.0;
 
-	/*
-	 * How many parallel Threads shall do the Replanning.
+	/**
+	 * Define the objects that are needed for the replanning.
 	 */
-	protected int numReplanningThreads = 2;
+	private ParallelInitialReplanner parallelInitialReplanner;
+	private ParallelDuringActivityReplanner parallelActEndReplanner;
+	private ParallelDuringLegReplanner parallelLeaveLinkReplanner;
+	private InitialIdentifier initialIdentifier;
+	private DuringActivityIdentifier duringActivityIdentifier;
+	private DuringLegIdentifier duringLegIdentifier;
+	private WithinDayInitialReplanner initialReplanner;
+	private WithinDayDuringActivityReplanner duringActivityReplanner;
+	private WithinDayDuringLegReplanner duringLegReplanner;
 
-	protected PersonalizableTravelTime travelTime;
+	private ReplanningManager replanningManager;
+	private ReplanningFlagInitializer rfi;
+	private WithinDayQSim sim;
+	private FixedOrderSimulationListener fosl = new FixedOrderSimulationListener();
 
-	protected ParallelInitialReplanner parallelInitialReplanner;
-	protected ParallelDuringActivityReplanner parallelActEndReplanner;
-	protected ParallelDuringLegReplanner parallelLeaveLinkReplanner;
-	protected InitialIdentifier initialIdentifier;
-	protected DuringActivityIdentifier duringActivityIdentifier;
-	protected DuringLegIdentifier duringLegIdentifier;
-	protected WithinDayInitialReplanner initialReplanner;
-	protected WithinDayDuringActivityReplanner duringActivityReplanner;
-	protected WithinDayDuringLegReplanner duringLegReplanner;
+	private static final Logger log = Logger.getLogger(TutorialWithinDayController.class);
 
-	protected ReplanningManager replanningManager;
-	protected ReplanningFlagInitializer rfi;
-	protected WithinDayQSim sim;
-	protected FixedOrderSimulationListener fosl = new FixedOrderSimulationListener();
-
-	private static final Logger log = Logger.getLogger(WithinDayController.class);
-
-	public WithinDayController(String[] args) {
+	public TutorialWithinDayController(String[] args) {
 		super(args);
 
 		setConstructorParameters();
 	}
 
-	// only for Batch Runs
-	public WithinDayController(Config config) {
-		super(config);
-
-		setConstructorParameters();
-	}
-
+	/**
+	 * Use some factories, that have additional within day replanning
+	 * capabilities.
+	 */
 	private void setConstructorParameters() {
-		/*
-		 * Use MyLinkImpl. They can carry some additional Information like their
-		 * TravelTime or VehicleCount.
-		 * This is needed to be able to use a LinkVehiclesCounter.
+		/**
+		 * Use WithinDayLinkImpls. They can carry some additional information
+		 * like their current TravelTime.
 		 */
 		this.getNetwork().getFactory().setLinkFactory(new WithinDayLinkFactoryImpl());
 
-		// Use a Scoring Function, that only scores the travel times!
+		/**
+		 * Use a Scoring Function, that only scores the travel times!
+		 */
 		this.setScoringFunctionFactory(new OnlyTimeDependentScoringFunctionFactory());
 	}
 
-	/*
-	 * New Routers for the Replanning are used instead of using the controler's.
-	 * By doing this every person can use a personalised Router.
+	/**
+	 * Initialize the within day replanning modules.
 	 */
-	protected void initReplanningRouter() {
+	private void initReplanningModules() {
+		/**
+		 * Create and initialize the travel time calculator which is used by
+		 * the replanning modules.
+		 * Here we use a TravelTimeCollector which collects the travel times for
+		 * each link and returns the average travel time from the past few minutes.
+		 * It has to be registered as SimulationListener and as an EventsHandler.
+		 */
+		PersonalizableTravelTime travelTime = new TravelTimeCollectorFactory().createFreeSpeedTravelTimeCalculator(this.scenarioData);
+		fosl.addSimulationListener((TravelTimeCollector)travelTime);
+		this.events.addHandler((TravelTimeCollector)travelTime);
 
-		travelTime = new TravelTimeCollectorFactory().createFreeSpeedTravelTimeCalculator(this.scenarioData);
-		fosl.addSimulationInitializedListener((TravelTimeCollector)travelTime);	// for TravelTimeCollector
-		fosl.addSimulationBeforeSimStepListener((TravelTimeCollector)travelTime);	// for TravelTimeCollector
-		fosl.addSimulationAfterSimStepListener((TravelTimeCollector)travelTime);	// for TravelTimeCollector
-		this.events.addHandler((TravelTimeCollector)travelTime);	// for TravelTimeCollector
-
+		/**
+		 * Create and initialize a travel cost calculator which takes the travel
+		 * times as travel costs.
+		 */
 		OnlyTimeDependentTravelCostCalculator travelCost = new OnlyTimeDependentTravelCostCalculator(travelTime);
 
-		LeastCostPathCalculatorFactory factory = new AStarLandmarksFactory(this.network, new FreespeedTravelTimeCost(this.config.planCalcScore()));
+		/**
+		 * Create a within day replanning module which is based on an
+		 * AbstractMultithreadedModule.
+		 */
+		LeastCostPathCalculatorFactory factory = new DijkstraFactory();
 		AbstractMultithreadedModule router = new ReplanningModule(config, network, travelCost, travelTime, factory);
-
+		
+		/**
+		 * Create and initialize an ActivityReplanningMap and a LinkReplanningMap.
+		 * They identify, when an agent is going to end an activity and when an
+		 * agent might be able to leave a link.
+		 */
+		ActivityReplanningMap activityReplanningMap = new ActivityReplanningMap(this.getEvents());
+		fosl.addSimulationListener(activityReplanningMap);
+		LinkReplanningMap linkReplanningMap = new LinkReplanningMap(this.getEvents());
+		fosl.addSimulationListener(linkReplanningMap);
+		
+		/**
+		 * Create and identify the within day replanners and identifiers which select
+		 * the agents that should adapt their plans.
+		 */
 		this.initialIdentifier = new InitialIdentifierImplFactory(this.sim).createIdentifier();
 		this.initialReplanner = new InitialReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
 		this.initialReplanner.addAgentsToReplanIdentifier(this.initialIdentifier);
 		this.parallelInitialReplanner.addWithinDayReplanner(this.initialReplanner);
 		this.rfi.addInitialReplanner(this.initialReplanner.getId(), this.pInitialReplanning);
 		
-		ActivityReplanningMap activityReplanningMap = new ActivityReplanningMap(this.getEvents());
-		fosl.addSimulationListener(activityReplanningMap);
 		this.duringActivityIdentifier = new ActivityEndIdentifierFactory(activityReplanningMap).createIdentifier();
 		this.duringActivityReplanner = new NextLegReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
 		this.duringActivityReplanner.addAgentsToReplanIdentifier(this.duringActivityIdentifier);
 		this.parallelActEndReplanner.addWithinDayReplanner(this.duringActivityReplanner);
 		this.rfi.addDuringActivityReplanner(this.duringActivityReplanner.getId(), this.pDuringActivityReplanning);
 		
-		LinkReplanningMap linkReplanningMap = new LinkReplanningMap(this.getEvents());
-		fosl.addSimulationListener(linkReplanningMap);
 		this.duringLegIdentifier = new LeaveLinkIdentifierFactory(linkReplanningMap).createIdentifier();
 		this.duringLegReplanner = new CurrentLegReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
 		this.duringLegReplanner.addAgentsToReplanIdentifier(this.duringLegIdentifier);
@@ -177,10 +188,17 @@ public class WithinDayController extends Controler {
 		this.rfi.addDuringLegReplanner(this.duringLegReplanner.getId(), this.pDuringLegReplanning);
 	}
 
-	/*
+	/**
 	 * Initializes the ParallelReplannerModules
 	 */
-	protected void initParallelReplanningModules() {
+	private void initParallelReplanningModules() {
+		
+		/**
+		 * Use the same number of parallel threads for the within day replanning
+		 * as for the between-iterations replanning.
+		 */
+		int numReplanningThreads = this.config.global().getNumberOfThreads();
+		
 		this.parallelInitialReplanner = new ParallelInitialReplanner(numReplanningThreads, this);
 		this.parallelActEndReplanner = new ParallelDuringActivityReplanner(numReplanningThreads, this);
 		this.parallelLeaveLinkReplanner = new ParallelDuringLegReplanner(numReplanningThreads, this);
@@ -189,8 +207,14 @@ public class WithinDayController extends Controler {
 	@Override
 	protected void setUp() {
 		/*
-		 * SimStepParallelEventsManagerImpl might be moved to org.matsim.
-		 * Then this piece of code could be placed in the controller.
+		 * This piece of code might be moved to the controler.
+		 * 
+		 * Parallel events handling cannot be used with within day replanning, because
+		 * it does not ensure that all events are processed, when the replanning
+		 * modules are executed. Therefore we use a SimStepParallelEventsManagerImpl 
+		 * instead. It is an extended version of a parallel events handler which
+		 * ensures that all events are handled before the simulation can continue with
+		 * a next time step.
 		 */
 		if (this.events instanceof ParallelEventsManagerImpl) {
 			log.info("Replacing ParallelEventsManagerImpl with SimStepParallelEventsManagerImpl. This is needed for Within-Day Replanning.");
@@ -198,10 +222,10 @@ public class WithinDayController extends Controler {
 			this.fosl.addSimulationAfterSimStepListener(manager);
 			this.events = manager;
 		}
-
+		
 		super.setUp();
 	}
-
+	
 	@Override
 	protected void runMobSim() {
 		/*
@@ -220,12 +244,12 @@ public class WithinDayController extends Controler {
 		fosl.addSimulationListener(replanningManager);
 		rfi = new ReplanningFlagInitializer(replanningManager);
 		fosl.addSimulationListener(rfi);
-
+		
 		log.info("Initialize Parallel Replanning Modules");
 		initParallelReplanningModules();
 
 		log.info("Initialize Replanning Routers");
-		initReplanningRouter();
+		initReplanningModules();
 
 		InitialReplanningModule initialReplanningModule = new InitialReplanningModule(parallelInitialReplanner);
 		DuringActivityReplanningModule actEndReplanning = new DuringActivityReplanningModule(parallelActEndReplanner);
@@ -250,10 +274,11 @@ public class WithinDayController extends Controler {
 			System.out.println("Usage: Controler config-file [dtd-file]");
 			System.out.println();
 		} else {
-			final WithinDayController controller = new WithinDayController(args);
+			final TutorialWithinDayController controller = new TutorialWithinDayController(args);
+			controller.setOverwriteFiles(true);
 			controller.run();
 		}
 		System.exit(0);
 	}
-
+	
 }

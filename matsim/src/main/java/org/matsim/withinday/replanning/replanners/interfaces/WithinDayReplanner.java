@@ -36,7 +36,6 @@ import org.matsim.ptproject.qsim.interfaces.AgentCounterI;
 import org.matsim.withinday.replanning.identifiers.interfaces.AgentsToReplanIdentifier;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayReplanner;
 
-
 /*
  *	Each WithinDayReplanner needs one or more AgentsToReplanIdentifier
  *	which identifies Agents that need a Replanning of their scheduled

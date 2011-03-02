@@ -26,6 +26,14 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 
+/**
+ * A ReplannerAdministrator is used to define which within day replanners
+ * should be used by a WithinDayPersonAgent. Replanners that should be used
+ * can be added or removed by their Id. Each replanner can only be added
+ * once. 
+ * 
+ * @author cdobler
+ */
 public class ReplannerAdministrator {
 	
 	// If I am understanding this correctly, the replanners that are added in the following are not actively used as instances,
