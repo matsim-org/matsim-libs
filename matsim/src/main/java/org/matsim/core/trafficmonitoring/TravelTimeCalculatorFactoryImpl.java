@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TravelTimeCalculatorBuilder
+ * TravelTimeCalculatorFactoryImpl
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,11 +17,11 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
 package org.matsim.core.trafficmonitoring;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
-
 
 /**
  * @author dgrether
@@ -45,14 +45,22 @@ public class TravelTimeCalculatorFactoryImpl implements TravelTimeCalculatorFact
 		}
 		
 		// set travelTimeAggregator
+		AbstractTravelTimeAggregator travelTimeAggregator;
 		if ("optimistic".equals(group.getTravelTimeAggregatorType())) {
-			calculator.setTravelTimeAggregator(new OptimisticTravelTimeAggregator(calculator.numSlots, calculator.timeSlice));
+			travelTimeAggregator = new OptimisticTravelTimeAggregator(calculator.numSlots, calculator.timeSlice);
+			calculator.setTravelTimeAggregator(travelTimeAggregator);
 		} else if ("experimental_LastMile".equals(group.getTravelTimeAggregatorType())) {
-			calculator.setTravelTimeAggregator(new PessimisticTravelTimeAggregator(calculator.numSlots, calculator.timeSlice));
+			travelTimeAggregator = new PessimisticTravelTimeAggregator(calculator.numSlots, calculator.timeSlice);
+			calculator.setTravelTimeAggregator(travelTimeAggregator);
 			log.warn("Using experimental TravelTimeAggregator! \nIf this was not intended please remove the travelTimeAggregator entry in the controler section in your config.xml!");
 		} else {
 			throw new RuntimeException(group.getTravelTimeAggregatorType() + " is unknown!");
 		}
+
+		//TODO: make this configurable via the config file
+		TravelTimeGetter travelTimeGetter = new AveragingTravelTimeGetter();	// by default
+//		TravelTimeGetter travelTimeGetter = new LinearInterpolatingTravelTimeGetter(calculator.getNumSlots(), calculator.getTimeSlice());
+		travelTimeAggregator.setTravelTimeGetter(travelTimeGetter);
 		
 		return calculator;
 	}

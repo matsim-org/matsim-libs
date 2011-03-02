@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TravelTimeAggregator.java
+ * AbstractTravelTimeAggregator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -24,13 +24,19 @@ public abstract class AbstractTravelTimeAggregator {
 
 	private final int travelTimeBinSize;
 	private final int numSlots;
-
+	private TravelTimeGetter travelTimeGetter;
 
 	public AbstractTravelTimeAggregator(int numSlots, int travelTimeBinSize) {
 		this.numSlots = numSlots;
 		this.travelTimeBinSize = travelTimeBinSize;
+
+		this.setTravelTimeGetter(new AveragingTravelTimeGetter()); // by default
 	}
 	
+	public void setTravelTimeGetter(TravelTimeGetter travelTimeGetter) {
+		this.travelTimeGetter = travelTimeGetter;
+		travelTimeGetter.setTravelTimeAggregator(this);
+	}
 	
 	protected int getTimeSlotIndex(final double time) {
 		int slice = ((int) time)/this.travelTimeBinSize;
@@ -38,24 +44,16 @@ public abstract class AbstractTravelTimeAggregator {
 		return slice;
 	}
 
-
 	protected abstract void addTravelTime(TravelTimeData travelTimeRole, double enterTime,
 			double leaveTime);
-
 
 	public void addStuckEventTravelTime(TravelTimeData travelTimeRole,
 			double enterTime, double stuckEventTime) {
 		//here is the right place to handle StuckEvents (just overwrite this method) 
 	}
 	
-
 	protected double getTravelTime(TravelTimeData travelTimeRole, double time) {
-		final int timeSlot = getTimeSlotIndex(time);
-		return travelTimeRole.getTravelTime(timeSlot, time);
+		return travelTimeGetter.getTravelTime(travelTimeRole, time);
 	}
-
-
-
-		
 
 }

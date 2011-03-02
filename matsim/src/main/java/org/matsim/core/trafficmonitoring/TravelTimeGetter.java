@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * OptimisticTravelTimeAggregator.java
+ * TravelTimeGetter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -20,18 +20,9 @@
 
 package org.matsim.core.trafficmonitoring;
 
-public class OptimisticTravelTimeAggregator extends AbstractTravelTimeAggregator {
+public interface TravelTimeGetter {
 
-	public OptimisticTravelTimeAggregator(int numSlots, int travelTimeBinSize) {
-		super(numSlots, travelTimeBinSize);
-	}
-
-	@Override
-	protected void addTravelTime(TravelTimeData travelTimeRole,
-			double enterTime, double leaveTime) {
-
-		final int timeSlot = getTimeSlotIndex(enterTime);
-		travelTimeRole.addTravelTime(timeSlot, leaveTime - enterTime);	
-	}
-
+	public void setTravelTimeAggregator(AbstractTravelTimeAggregator travelTimeAggregator);
+	
+	public double getTravelTime(TravelTimeData travelTimeRole, double time);
 }
