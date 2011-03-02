@@ -52,11 +52,18 @@ public class LeftTurnIdentifier {
 			if (!outLinksSortedByAngle.containsKey(zeroAngle)) {
 				/* without straight link */
 				Double lowerKey = outLinksSortedByAngle.lowerKey(zeroAngle);
-
-				return outLinksSortedByAngle.headMap(
-						lowerKey,
-						Math.abs(lowerKey) > Math.abs(outLinksSortedByAngle
-								.higherKey(zeroAngle))).containsValue(outLink);
+				Double higherKey = outLinksSortedByAngle.higherKey(zeroAngle);
+				if (lowerKey == null) {
+					/* no left turns */
+					return false;
+				} else if (higherKey == null) {
+					/* no right turns */
+					return outLinksSortedByAngle.headMap(lowerKey)
+							.containsValue(outLink);
+				}
+				return outLinksSortedByAngle.headMap(lowerKey,
+						Math.abs(lowerKey) > Math.abs(higherKey))
+						.containsValue(outLink);
 				/* ">"- inclusive, "<=" - exclusive */
 			} else {
 				return outLinksSortedByAngle.headMap(zeroAngle).containsValue(
