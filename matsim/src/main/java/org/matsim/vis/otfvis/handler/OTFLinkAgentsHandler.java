@@ -70,7 +70,6 @@ public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
 			// Write additional agent data
 
 			positions.clear();
-//			this.src.getVisData().getVehiclePositions(this.src.getQSimEngine().getQSim().getSimTimer().getTimeOfDay(), positions);
 			this.src.getVisData().getVehiclePositions( positions);
 
 			if (showParked) {
@@ -129,10 +128,7 @@ public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
 	 * inheritance inside the package.    kai, jan'11  
 	 */
 	void readAgent(ByteBuffer in, SceneGraph sceneGraph) {
-		// can't make this private since the ReaderV1_1 calls this.  kai, jan'11
-		
 		// yyyy there is a very similar method in OTFAgentsListHandler.  with a more robust format, they should be united.  kai, apr'10
-		// yyyyyy another writer potentially connected to this reader is in OTFQueueSimLinkAgentsWriter
 
 		String id = ByteBufferUtils.getString(in);
 		float x = in.getFloat();
@@ -164,7 +160,6 @@ public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
 
 	@Override
 	public void readDynData(ByteBuffer in, SceneGraph graph) throws IOException {
-		// yyyyyy another writer potentially connected to this reader is in OTFQueueSimLinkAgentsWriter
 		super.readDynData(in, graph);
 
 		// read additional agent data
@@ -193,19 +188,4 @@ public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
 			agent.invalidate(graph);
 	}
 
-	/***
-	 * PREVIOUS VERSION of the reader
-	 *
-	 * @author dstrippgen
-	 */
-	public static final class ReaderV1_1 extends OTFLinkAgentsHandler {
-		@Override
-		public void readDynData(ByteBuffer in, SceneGraph graph)
-				throws IOException {
-			this.agents.clear();
-			int count = in.getInt();
-			for (int i = 0; i < count; i++)
-				readAgent(in, graph);
-		}
-	}
 }

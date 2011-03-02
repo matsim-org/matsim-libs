@@ -22,7 +22,7 @@ package org.matsim.vis.otfvis.data.fileio.qsim;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.OTFConnectionManagerFactory;
 import org.matsim.vis.otfvis.handler.OTFDefaultNodeHandler;
-import org.matsim.vis.otfvis.handler.OTFLinkLanesAgentsNoParkingHandler;
+import org.matsim.vis.otfvis.handler.OTFLinkAgentsHandler;
 
 
 /**
@@ -34,7 +34,7 @@ public class OTFFileWriterQSimConnectionManagerFactory implements OTFConnectionM
 	@Override
 	public OTFConnectionManager createConnectionManager() {
 		OTFConnectionManager c = new OTFConnectionManager();
-		c.connectQLinkToWriter(OTFLinkLanesAgentsNoParkingHandler.Writer.class);
+		c.connectQLinkToWriter(OTFLinkAgentsHandler.Writer.class);
 		c.connectQNodeToWriter(OTFDefaultNodeHandler.Writer.class);
 		return c;
 	}

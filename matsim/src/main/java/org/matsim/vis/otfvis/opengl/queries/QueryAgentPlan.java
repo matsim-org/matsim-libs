@@ -30,7 +30,6 @@ import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import javax.media.opengl.GL;
 import javax.swing.JCheckBox;
@@ -61,7 +60,6 @@ import org.matsim.vis.otfvis.opengl.gl.InfoText;
 import org.matsim.vis.otfvis.opengl.gl.InfoTextContainer;
 import org.matsim.vis.otfvis.opengl.layer.AgentPointDrawer;
 import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer;
-import org.matsim.vis.snapshots.writers.TeleportationVisData;
 import org.matsim.vis.snapshots.writers.VisNetwork;
 
 import com.sun.opengl.util.BufferUtil;
@@ -76,7 +74,7 @@ import com.sun.opengl.util.BufferUtil;
 public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, ItemListener {
 
 	private static final String INCLUDE_ROUTES = "include routes";
-	
+
 	private static boolean includeRoutes = true ;
 
 	private static final long serialVersionUID = 1L;
@@ -86,9 +84,8 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 	private Id agentId;
 
 	private transient Result result;
-	private transient Map<Id, TeleportationVisData> visTeleportationData;
+
 	private transient VisNetwork net;
-	private transient OTFVisMobsimFeature queueSimulation;
 
 	@Override
 	public void itemStateChanged(ItemEvent e) {
@@ -105,47 +102,17 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 	public JComponent getOptionsGUI(JComponent mother) {
 		JPanel com = new JPanel();
 		com.setSize(500, 60);
-		JCheckBox synchBox = null ;
-//		JCheckBox SynchBox = new JCheckBox(ACTSLEGS);
-//		SynchBox.setMnemonic(KeyEvent.VK_M);
-//		SynchBox.setSelected(false);
-//		SynchBox.addItemListener(this);
-//		com.add(SynchBox);
-		synchBox = new JCheckBox(INCLUDE_ROUTES);
-//		synchBox.setMnemonic(KeyEvent.VK_R);
+		JCheckBox synchBox = new JCheckBox(INCLUDE_ROUTES);
 		synchBox.setSelected(true);
 		synchBox.addItemListener(this);
 		com.add(synchBox);
-
 		return com;
 	}
 
-
 	@Override
 	public OTFQueryResult query() {
-		TeleportationVisData teleportationVisData = visTeleportationData.get(agentId);
-		if (teleportationVisData != null) {
-			double x = teleportationVisData.getEasting() - OTFServerQuad2.offsetEast;
-			double y = teleportationVisData.getNorthing() - OTFServerQuad2.offsetNorth;
-			result.teleportingAgentPosition = new Point2D.Double(x, y);
-			log.debug("Agent teleporting: "+x+" "+y);
-		} else {
-			result.teleportingAgentPosition = null;
-		}
-//		queryActivityStatus();
 		return result;
 	}
-
-//	private void queryActivityStatus() {
-//		Integer currentActivityNumber = queueSimulation.getCurrentActivityNumbers().get(this.agentId);
-//		if (currentActivityNumber != null) {
-//			result.activityFinished = 0;
-//			result.activityNr = currentActivityNumber/2;
-//			log.debug("Agent is in activity " + result.activityNr);
-//		} else {
-//			result.activityNr = -1;
-//		}
-//	}
 
 	@Override
 	public Type getType() {
@@ -159,9 +126,7 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 
 	@Override
 	public void installQuery(OTFVisMobsimFeature queueSimulation, EventsManager events, OTFServerQuad2 quad) {
-		this.queueSimulation = queueSimulation;
 		this.net = queueSimulation.getVisMobsim().getVisNetwork();
-		this.visTeleportationData = queueSimulation.getVisTeleportationData();
 		result = new Result();
 		result.agentId = this.agentId.toString();
 		Person person = queueSimulation.findPersonAgent(this.agentId);
@@ -175,8 +140,7 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 					}
 					Coord coord = act.getCoord();
 					if (coord == null) {
-						Link link = net.getVisLinks().get(act.getLinkId())
-								.getLink();
+						Link link = net.getVisLinks().get(act.getLinkId()).getLink();
 						coord = link.getCoord();
 					}
 					result.acts.add(new MyInfoText((float) coord.getX(),
@@ -202,7 +166,6 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 
 		/*package*/ String agentId;
 		/*package*/ boolean hasPlan = false;
-		/*package*/ Point2D.Double teleportingAgentPosition = null;
 		protected float[] vertex = null;
 		protected byte[] colors = null;
 		private transient FloatBuffer vert;
@@ -234,9 +197,6 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 			}
 			OGLAgentPointLayer layer = (OGLAgentPointLayer) drawer.getActGraph().getLayer(AgentPointDrawer.class);
 			Point2D.Double pos = tryToFindAgentPosition(layer);
-			if (pos == null) {
-				pos = teleportingAgentPosition;
-			}
 			if (pos != null) {
 				// We know where the agent is, so we draw stuff around them.
 				drawArrowFromAgentToTextLabel(pos, gl);
@@ -283,7 +243,7 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 
 		private float getLineWidth() {
 			return OTFClientControl.getInstance().getOTFVisConfig()
-					.getLinkWidth();
+			.getLinkWidth();
 		}
 
 		private void drawArrowFromAgentToTextLabel(Point2D.Double pos, GL gl) {

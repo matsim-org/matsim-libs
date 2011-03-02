@@ -24,6 +24,8 @@ import java.awt.geom.Point2D;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
+import org.matsim.core.utils.misc.ByteBufferUtils;
+import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.data.OTFDataQuadReceiver;
 import org.matsim.vis.otfvis.data.OTFDataReceiver;
@@ -47,7 +49,7 @@ import org.matsim.vis.snapshots.writers.VisLink;
 public class OTFDefaultLinkHandler extends OTFDataReader {
 
 	protected OTFDataQuadReceiver quadReceiver = null;
-	
+
 	public OTFDataQuadReceiver getQuadReceiver() {
 		return quadReceiver;
 	}
@@ -58,21 +60,23 @@ public class OTFDefaultLinkHandler extends OTFDataReader {
 
 		@Override
 		public void writeConstData(ByteBuffer out) throws IOException {
-		//subtract minEasting/Northing somehow!
+			String id = this.src.getLink().getId().toString();
+			ByteBufferUtils.putString(out, id);
+			//subtract minEasting/Northing somehow!
 			Point2D.Double.Double linkStart = new Point2D.Double.Double(this.src.getLink().getFromNode().getCoord().getX() - OTFServerQuad2.offsetEast, 
 					this.src.getLink().getFromNode().getCoord().getY() - OTFServerQuad2.offsetNorth);
 			Point2D.Double.Double linkEnd = new Point2D.Double.Double(this.src.getLink().getToNode().getCoord().getX() - OTFServerQuad2.offsetEast,
 					this.src.getLink().getToNode().getCoord().getY() - OTFServerQuad2.offsetNorth);
-			
+
 			out.putFloat((float) linkStart.x); 
 			out.putFloat((float) linkStart.y);
 			out.putFloat((float) linkEnd.x); 
 			out.putFloat((float) linkEnd.y);
+			out.putInt(NetworkUtils.getNumberOfLanesAsInt(0, this.src.getLink()));
 		}
 
 		@Override
 		public void writeDynData(ByteBuffer out) throws IOException {
-//			out.putFloat((float)this.src.getVisData().getDisplayableTimeCapValue(this.src.getQSimEngine().getQSim().getSimTimer().getTimeOfDay()));
 			out.putFloat((float)0.) ; // yy this should be fixed in the binary channel but I am not sure if it is worth it.  kai, apr'10
 		}
 
@@ -84,13 +88,14 @@ public class OTFDefaultLinkHandler extends OTFDataReader {
 
 	@Override
 	public void readDynData(ByteBuffer in, SceneGraph graph) throws IOException {
-		// yyyyyy another writer potentially connected to this reader is in OTFQueueSimLinkAgentsWriter
 		this.quadReceiver.setColor(in.getFloat());
 	}
 
 	@Override
 	public void readConstData(ByteBuffer in) throws IOException {
-		this.quadReceiver.setQuad(in.getFloat(), in.getFloat(),in.getFloat(), in.getFloat());
+		String id = ByteBufferUtils.getString(in);
+		this.quadReceiver.setQuad(in.getFloat(), in.getFloat(),in.getFloat(), in.getFloat(), in.getInt());
+		this.quadReceiver.setId(id.toCharArray());
 	}
 
 	@Override
@@ -105,16 +110,5 @@ public class OTFDefaultLinkHandler extends OTFDataReader {
 		this.quadReceiver.invalidate(graph);
 	}
 
-
-	// Previous version of the reader
-	public static final class ReaderV1_1 extends OTFDefaultLinkHandler {
-		
-		@Override
-		public void readDynData(ByteBuffer in, SceneGraph graph) throws IOException {
-			
-		}
-		
-	}
-	
 }
 

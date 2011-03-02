@@ -30,8 +30,6 @@ import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
 import org.matsim.vis.otfvis.handler.OTFDefaultLinkHandler;
 import org.matsim.vis.otfvis.handler.OTFDefaultNodeHandler;
 import org.matsim.vis.otfvis.handler.OTFLinkAgentsHandler;
-import org.matsim.vis.otfvis.handler.OTFLinkAgentsNoParkingHandler;
-import org.matsim.vis.otfvis.handler.OTFLinkLanesAgentsNoParkingHandler;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.vis.otfvis.opengl.gui.OTFTimeLine;
@@ -57,18 +55,14 @@ public class OTFClientFile extends OTFClient {
 	public OTFClientFile( String filename) {
 		super("file:" + filename);
 
-		this.connect.connectQLinkToWriter(OTFLinkLanesAgentsNoParkingHandler.Writer.class);
+		this.connect.connectQLinkToWriter(OTFLinkAgentsHandler.Writer.class);
 		this.connect.connectQueueLinkToWriter(OTFLinkAgentsHandler.Writer.class);
 		
-		this.connect.connectWriterToReader(OTFLinkLanesAgentsNoParkingHandler.Writer.class, OTFLinkLanesAgentsNoParkingHandler.class);
 		this.connect.connectWriterToReader(OTFAgentsListHandler.Writer.class, OTFAgentsListHandler.class);
 		this.connect.connectWriterToReader(OTFDefaultLinkHandler.Writer.class, OTFDefaultLinkHandler.class);
 		this.connect.connectWriterToReader(OTFLinkAgentsHandler.Writer.class, OTFLinkAgentsHandler.class);
-		this.connect.connectWriterToReader(OTFLinkAgentsNoParkingHandler.Writer.class, OTFLinkAgentsHandler.class);
 		this.connect.connectWriterToReader(OTFDefaultNodeHandler.Writer.class, OTFDefaultNodeHandler.class);
 		
-		this.connect.connectReaderToReceiver(OTFLinkLanesAgentsNoParkingHandler.class, OGLSimpleQuadDrawer.class);
-		this.connect.connectReaderToReceiver(OTFLinkLanesAgentsNoParkingHandler.class, AgentPointDrawer.class);
 		this.connect.connectReaderToReceiver(OTFAgentsListHandler.class, AgentPointDrawer.class);
 		this.connect.connectReaderToReceiver(OTFLinkAgentsHandler.class, OGLSimpleQuadDrawer.class);
 		this.connect.connectReaderToReceiver(OTFLinkAgentsHandler.class, AgentPointDrawer.class);

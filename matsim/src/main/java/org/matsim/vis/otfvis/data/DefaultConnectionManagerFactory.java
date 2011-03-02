@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package org.matsim.vis.otfvis.data;
 
-import org.matsim.vis.otfvis.handler.OTFLinkLanesAgentsNoParkingHandler;
+import org.matsim.vis.otfvis.handler.OTFLinkAgentsHandler;
 import org.matsim.vis.otfvis.opengl.layer.AgentPointDrawer;
 import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer;
 import org.matsim.vis.otfvis.opengl.layer.OGLSimpleQuadDrawer;
@@ -40,11 +40,11 @@ public class DefaultConnectionManagerFactory implements OTFConnectionManagerFact
 	@Override
 	public OTFConnectionManager createConnectionManager(){
 		OTFConnectionManager connect = new OTFConnectionManager();
-		connect.connectQLinkToWriter(OTFLinkLanesAgentsNoParkingHandler.Writer.class);
-		connect.connectWriterToReader(OTFLinkLanesAgentsNoParkingHandler.Writer.class, OTFLinkLanesAgentsNoParkingHandler.class);
-		connect.connectReaderToReceiver(OTFLinkLanesAgentsNoParkingHandler.class, OGLSimpleQuadDrawer.class);
+		connect.connectQLinkToWriter(OTFLinkAgentsHandler.Writer.class);
+		connect.connectWriterToReader(OTFLinkAgentsHandler.Writer.class, OTFLinkAgentsHandler.class);
+		connect.connectReaderToReceiver(OTFLinkAgentsHandler.class, OGLSimpleQuadDrawer.class);
 		connect.connectReceiverToLayer(OGLSimpleQuadDrawer.class, OGLSimpleStaticNetLayer.class);
-		connect.connectReaderToReceiver(OTFLinkLanesAgentsNoParkingHandler.class, AgentPointDrawer.class);
+		connect.connectReaderToReceiver(OTFLinkAgentsHandler.class, AgentPointDrawer.class);
 		connect.connectReceiverToLayer(AgentPointDrawer.class, OGLAgentPointLayer.class);
 		return connect;
 	}

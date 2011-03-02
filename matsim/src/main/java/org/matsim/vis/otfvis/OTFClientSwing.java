@@ -34,8 +34,6 @@ import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
 import org.matsim.vis.otfvis.handler.OTFDefaultLinkHandler;
 import org.matsim.vis.otfvis.handler.OTFDefaultNodeHandler;
 import org.matsim.vis.otfvis.handler.OTFLinkAgentsHandler;
-import org.matsim.vis.otfvis.handler.OTFLinkAgentsNoParkingHandler;
-import org.matsim.vis.otfvis.handler.OTFLinkLanesAgentsNoParkingHandler;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.opengl.gui.OTFTimeLine;
 import org.matsim.vis.otfvis.opengl.gui.SettingsSaver;
@@ -60,19 +58,15 @@ public class OTFClientSwing extends OTFClient {
 	public OTFClientSwing(String url) {
 		super(url);
 
-		this.connectionManager.connectQLinkToWriter(OTFLinkLanesAgentsNoParkingHandler.Writer.class);
+		this.connectionManager.connectQLinkToWriter(OTFLinkAgentsHandler.Writer.class);
 		this.connectionManager.connectQueueLinkToWriter(OTFLinkAgentsHandler.Writer.class);
 
-		this.connectionManager.connectWriterToReader(OTFLinkLanesAgentsNoParkingHandler.Writer.class, OTFLinkLanesAgentsNoParkingHandler.class);
 		this.connectionManager.connectWriterToReader(OTFAgentsListHandler.Writer.class, OTFAgentsListHandler.class);
 		this.connectionManager.connectWriterToReader(OTFDefaultLinkHandler.Writer.class, OTFDefaultLinkHandler.class);
 		this.connectionManager.connectWriterToReader(OTFLinkAgentsHandler.Writer.class, OTFLinkAgentsHandler.class);
-		this.connectionManager.connectWriterToReader(OTFLinkAgentsNoParkingHandler.Writer.class, OTFLinkAgentsHandler.class);
 		this.connectionManager.connectWriterToReader(OTFDefaultNodeHandler.Writer.class, OTFDefaultNodeHandler.class);
 		
-		this.connectionManager.connectReaderToReceiver(OTFLinkLanesAgentsNoParkingHandler.class, SwingSimpleQuadDrawer.class);
 		this.connectionManager.connectReaderToReceiver(OTFLinkAgentsHandler.class, SwingSimpleQuadDrawer.class);
-		this.connectionManager.connectReaderToReceiver(OTFLinkLanesAgentsNoParkingHandler.class, SwingAgentDrawer.class);
 		this.connectionManager.connectReaderToReceiver(OTFLinkAgentsHandler.class, SwingAgentDrawer.class);
 		this.connectionManager.connectReaderToReceiver(OTFAgentsListHandler.class, SwingAgentDrawer.class);
 		
