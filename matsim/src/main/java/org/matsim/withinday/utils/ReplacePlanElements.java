@@ -24,14 +24,17 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 
-/*
+/**
  * Only the PlanElements are changed - further Steps
  * like updating the Routes of the previous and next Leg
  * have to be done elsewhere.
+ * 
+ * @author cdobler
  */
 public class ReplacePlanElements {
 
 	public boolean replaceActivity(Plan plan, Activity oldActivity, Activity newActivity) {
+		if (plan == null) return false;
 		if (oldActivity == null) return false;
 		if (newActivity == null) return false;
 		
@@ -58,6 +61,7 @@ public class ReplacePlanElements {
 	}
 	
 	public boolean replaceLeg(Plan plan, Leg oldLeg, Leg newLeg) {
+		if (plan == null) return false;
 		if (oldLeg == null) return false;
 		if (newLeg == null) return false;
 		
