@@ -123,11 +123,7 @@ public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
 		}
 	}
 
-	/**The API method is readDynData.  readDynData calls readAgent.  Could make it "protected", but I don't
-	 * want proliferation of inheritance all over the project.  Still leaving it package-private to allow
-	 * inheritance inside the package.    kai, jan'11  
-	 */
-	void readAgent(ByteBuffer in, SceneGraph sceneGraph) {
+	private void readAgent(ByteBuffer in, SceneGraph sceneGraph) {
 		// yyyy there is a very similar method in OTFAgentsListHandler.  with a more robust format, they should be united.  kai, apr'10
 
 		String id = ByteBufferUtils.getString(in);
@@ -166,8 +162,9 @@ public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
 		this.agents.clear();
 
 		int count = in.getInt();
-		for (int i = 0; i < count; i++)
+		for (int i = 0; i < count; i++) {
 			readAgent(in, graph);
+		}
 	}
 
 	@Override
@@ -184,8 +181,9 @@ public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
 	public void invalidate(SceneGraph graph) {
 		super.invalidate(graph);
 		// invalidate agent receivers
-		for (OTFDataSimpleAgentReceiver agent : this.agents)
+		for (OTFDataSimpleAgentReceiver agent : this.agents) {
 			agent.invalidate(graph);
+		}
 	}
 
 }

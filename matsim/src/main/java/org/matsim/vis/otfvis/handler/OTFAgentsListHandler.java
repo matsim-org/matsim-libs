@@ -22,7 +22,6 @@ package org.matsim.vis.otfvis.handler;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -36,8 +35,8 @@ import org.matsim.vis.otfvis.data.OTFDataWriter;
 import org.matsim.vis.otfvis.data.OTFServerQuad2;
 import org.matsim.vis.otfvis.interfaces.OTFDataReader;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
-import org.matsim.vis.snapshots.writers.AgentSnapshotInfoFactory;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
+import org.matsim.vis.snapshots.writers.AgentSnapshotInfoFactory;
 
 /**
  * OTFAgentsListHandler is responsible for the IO of the
@@ -48,13 +47,11 @@ import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
  */
 public class OTFAgentsListHandler extends OTFDataReader {
 
-	protected Class agentReceiverClass = null;
+	private Class<? extends OTFDataSimpleAgentReceiver> agentReceiverClass = null;
 
-	protected List<OTFDataSimpleAgentReceiver> agents = new LinkedList<OTFDataSimpleAgentReceiver>();
+	private List<OTFDataSimpleAgentReceiver> agents = new LinkedList<OTFDataSimpleAgentReceiver>();
 
 	static public class Writer extends OTFDataWriter<Collection<? extends AgentSnapshotInfo>> {
-		// yyyyyy the reason why this whole class works is that other classes have access to the "positions" field
-		// since it is public.  kai, feb'11
 
 		private static final long serialVersionUID = -6368752578878835954L;
 
@@ -72,8 +69,6 @@ public class OTFAgentsListHandler extends OTFDataReader {
 		}
 
 		private void writeAgent(AgentSnapshotInfo agInfo, ByteBuffer out) {
-			// making this private; I don't see any reason to make it more public.  kai, jan'11
-			
 			String id = agInfo.getId().toString();
 			ByteBufferUtils.putString(out, id);
 			out.putFloat((float)(agInfo.getEasting() - OTFServerQuad2.offsetEast));
@@ -88,8 +83,6 @@ public class OTFAgentsListHandler extends OTFDataReader {
 	private static AgentState[] al = AgentState.values();
 
 	private void readAgent(ByteBuffer in, SceneGraph graph) {
-		// making this private; don't see any reason to make it more public.  kai, jan'11  
-		
 		String id = ByteBufferUtils.getString(in);
 		float x = in.getFloat();
 		float y = in.getFloat();
@@ -120,12 +113,14 @@ public class OTFAgentsListHandler extends OTFDataReader {
 
 	@Override
 	public void readConstData(ByteBuffer in) throws IOException {
+		
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void connect(OTFDataReceiver receiver) {
-		if (receiver  instanceof OTFDataSimpleAgentReceiver) {
-			this.agentReceiverClass = receiver.getClass();
+		if (receiver instanceof OTFDataSimpleAgentReceiver) {
+			this.agentReceiverClass = (Class<? extends OTFDataSimpleAgentReceiver>) receiver.getClass();
 		}
 	}
 

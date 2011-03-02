@@ -68,8 +68,6 @@ SimulationInitializedListener, SimulationAfterSimStepListener, SimulationBeforeC
 
 	protected OnTheFlyServer otfServer = null;
 
-	private boolean ownServer = true;
-
 	private boolean doVisualizeTeleportedAgents = false;
 
 	private OTFConnectionManager connectionManager = new DefaultConnectionManagerFactory().createConnectionManager();
@@ -86,11 +84,6 @@ SimulationInitializedListener, SimulationAfterSimStepListener, SimulationBeforeC
 		this.queueSimulation = queueSimulation;
 	}
 
-	/*package*/ void setServer(OnTheFlyServer server) {
-		this.otfServer = server;
-		ownServer = false;
-	}
-
 	@Override
 	public void notifySimulationInitialized(SimulationInitializedEvent ev) {
 		log.info("receiving simulationInitializedEvent") ;
@@ -101,79 +94,73 @@ SimulationInitializedListener, SimulationAfterSimStepListener, SimulationBeforeC
 			}
 		}
 
-		if (ownServer) {
-			Config config = this.queueSimulation.getScenario().getConfig();
-			UUID idOne = UUID.randomUUID();
-			this.otfServer = OnTheFlyServer.createInstance("OTFServer_" + idOne.toString(), queueSimulation.getEventsManager());
-			this.otfServer.setSimulation(this);
+		Config config = this.queueSimulation.getScenario().getConfig();
+		UUID idOne = UUID.randomUUID();
+		this.otfServer = OnTheFlyServer.createInstance("OTFServer_" + idOne.toString(), queueSimulation.getEventsManager());
+		this.otfServer.setSimulation(this);
 
-			// the "connect" statements for the regular links are called by
-			// new DefaultConnectionManagerFactory().createConnectionManager() above.  kai, aug'10
+		// the "connect" statements for the regular links are called by
+		// new DefaultConnectionManagerFactory().createConnectionManager() above.  kai, aug'10
 
-			if (this.doVisualizeTeleportedAgents) {
-				this.teleportationWriter = new OTFAgentsListHandler.Writer();
-				this.teleportationWriter.setSrc(visTeleportationData.values());
-				this.otfServer.addAdditionalElement(this.teleportationWriter);
-				this.connectionManager.connectWriterToReader(
-						OTFAgentsListHandler.Writer.class,
-						OTFAgentsListHandler.class);
-				this.connectionManager.connectReaderToReceiver(
-						OTFAgentsListHandler.class,
-						AgentPointDrawer.class);
-			}
-			if (config.scenario().isUseTransit()) {
-				this.otfServer.addAdditionalElement(new FacilityDrawer.DataWriter_v1_0(
-						queueSimulation.getVisNetwork().getNetwork(),
-						((ScenarioImpl) queueSimulation.getScenario()).getTransitSchedule(),
-						((QSim) queueSimulation).getTransitEngine().getAgentTracker()
-				));
-				this.connectionManager.connectWriterToReader(
-						FacilityDrawer.DataWriter_v1_0.class,
-						FacilityDrawer.DataReader_v1_0.class);
-				this.connectionManager.connectReaderToReceiver(
-						FacilityDrawer.DataReader_v1_0.class,
-						FacilityDrawer.DataDrawer.class);
-				this.connectionManager.connectReceiverToLayer(FacilityDrawer.DataDrawer.class, SimpleSceneLayer.class);
-			}
-			if (config.scenario().isUseLanes() && (!config.scenario().isUseSignalSystems())) {
-				this.otfServer.addAdditionalElement(new OTFLaneWriter(this.queueSimulation.getVisNetwork(), ((ScenarioImpl) this.queueSimulation.getScenario()).getLaneDefinitions()));
-				this.connectionManager.connectWriterToReader(OTFLaneWriter.class, OTFLaneReader.class);
-				this.connectionManager.connectReaderToReceiver(OTFLaneReader.class, OTFLaneSignalDrawer.class);
-				this.connectionManager.connectReceiverToLayer(OTFLaneSignalDrawer.class, SimpleSceneLayer.class);
-				config.otfVis().setScaleQuadTreeRect(true);
-			} 
-			else if (config.scenario().isUseSignalSystems()) {
-				SignalGroupStateChangeTracker signalTracker = new SignalGroupStateChangeTracker();
-				this.queueSimulation.getEventsManager().addHandler(signalTracker);
-				SignalsData signalsData = this.queueSimulation.getScenario().getScenarioElement(SignalsData.class);
-				LaneDefinitions laneDefs = ((ScenarioImpl)this.queueSimulation.getScenario()).getLaneDefinitions();
-				SignalSystemsData systemsData = signalsData.getSignalSystemsData();
-				SignalGroupsData groupsData = signalsData.getSignalGroupsData();
-				this.otfServer.addAdditionalElement(new OTFSignalWriter(this.queueSimulation.getVisNetwork(), laneDefs, systemsData, groupsData , signalTracker));
-				this.connectionManager.connectWriterToReader(OTFSignalWriter.class, OTFSignalReader.class);
-				this.connectionManager.connectReaderToReceiver(OTFSignalReader.class, OTFLaneSignalDrawer.class);
-				this.connectionManager.connectReceiverToLayer(OTFLaneSignalDrawer.class, SimpleSceneLayer.class);
-				config.otfVis().setScaleQuadTreeRect(true);
-			}
+		if (this.doVisualizeTeleportedAgents) {
+			this.teleportationWriter = new OTFAgentsListHandler.Writer();
+			this.teleportationWriter.setSrc(visTeleportationData.values());
+			this.otfServer.addAdditionalElement(this.teleportationWriter);
+			this.connectionManager.connectWriterToReader(
+					OTFAgentsListHandler.Writer.class,
+					OTFAgentsListHandler.class);
+			this.connectionManager.connectReaderToReceiver(
+					OTFAgentsListHandler.class,
+					AgentPointDrawer.class);
+		}
+		if (config.scenario().isUseTransit()) {
+			this.otfServer.addAdditionalElement(new FacilityDrawer.DataWriter_v1_0(
+					queueSimulation.getVisNetwork().getNetwork(),
+					((ScenarioImpl) queueSimulation.getScenario()).getTransitSchedule(),
+					((QSim) queueSimulation).getTransitEngine().getAgentTracker()
+			));
+			this.connectionManager.connectWriterToReader(
+					FacilityDrawer.DataWriter_v1_0.class,
+					FacilityDrawer.DataReader_v1_0.class);
+			this.connectionManager.connectReaderToReceiver(
+					FacilityDrawer.DataReader_v1_0.class,
+					FacilityDrawer.DataDrawer.class);
+			this.connectionManager.connectReceiverToLayer(FacilityDrawer.DataDrawer.class, SimpleSceneLayer.class);
+		}
+		if (config.scenario().isUseLanes() && (!config.scenario().isUseSignalSystems())) {
+			this.otfServer.addAdditionalElement(new OTFLaneWriter(this.queueSimulation.getVisNetwork(), ((ScenarioImpl) this.queueSimulation.getScenario()).getLaneDefinitions()));
+			this.connectionManager.connectWriterToReader(OTFLaneWriter.class, OTFLaneReader.class);
+			this.connectionManager.connectReaderToReceiver(OTFLaneReader.class, OTFLaneSignalDrawer.class);
+			this.connectionManager.connectReceiverToLayer(OTFLaneSignalDrawer.class, SimpleSceneLayer.class);
+			config.otfVis().setScaleQuadTreeRect(true);
+		} 
+		else if (config.scenario().isUseSignalSystems()) {
+			SignalGroupStateChangeTracker signalTracker = new SignalGroupStateChangeTracker();
+			this.queueSimulation.getEventsManager().addHandler(signalTracker);
+			SignalsData signalsData = this.queueSimulation.getScenario().getScenarioElement(SignalsData.class);
+			LaneDefinitions laneDefs = ((ScenarioImpl)this.queueSimulation.getScenario()).getLaneDefinitions();
+			SignalSystemsData systemsData = signalsData.getSignalSystemsData();
+			SignalGroupsData groupsData = signalsData.getSignalGroupsData();
+			this.otfServer.addAdditionalElement(new OTFSignalWriter(this.queueSimulation.getVisNetwork(), laneDefs, systemsData, groupsData , signalTracker));
+			this.connectionManager.connectWriterToReader(OTFSignalWriter.class, OTFSignalReader.class);
+			this.connectionManager.connectReaderToReceiver(OTFSignalReader.class, OTFLaneSignalDrawer.class);
+			this.connectionManager.connectReceiverToLayer(OTFLaneSignalDrawer.class, SimpleSceneLayer.class);
+			config.otfVis().setScaleQuadTreeRect(true);
+		}
 
-			OTFClientLive client = null;
-			client = new OTFClientLive("rmi:127.0.0.1:4019:OTFServer_" + idOne.toString(), this.connectionManager);
-			new Thread(client).start();
+		OTFClientLive client = new OTFClientLive("rmi:127.0.0.1:4019:OTFServer_" + idOne.toString(), this.connectionManager);
+		new Thread(client).start();
 
-			try {
-				this.otfServer.pause();
-			} catch (RemoteException e) {
-				e.printStackTrace();
-			}
+		try {
+			this.otfServer.pause();
+		} catch (RemoteException e) {
+			e.printStackTrace();
 		}
 	}
 
 	@Override
 	public void notifySimulationBeforeCleanup( SimulationBeforeCleanupEvent ev ) {
-		if(ownServer) {
-			this.otfServer.cleanup();
-		}
-		this.otfServer = null;
+		this.otfServer.cleanup();
 	}
 
 	@Override

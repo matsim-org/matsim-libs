@@ -25,7 +25,7 @@ package org.matsim.vis.otfvis.data;
 
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 
-public interface OTFDataSimpleAgentReceiver extends OTFDataReceiver{
+public interface OTFDataSimpleAgentReceiver extends OTFDataReceiver {
 	
 	public void setAgent( AgentSnapshotInfo agInfo ) ;
 
