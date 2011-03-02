@@ -37,6 +37,7 @@ import org.matsim.core.router.util.TravelMinCost;
 import org.matsim.core.utils.misc.Time;
 
 import playground.yu.replanning.reRoute.minimizeLinkAmount.MinimizeLinkAmountDijkstraFactory;
+import playground.yu.utils.NotAnIntersection;
 
 /**
  * switch TravelCostCalculatorFactory evetually also PersonalizableTravelCost
@@ -65,7 +66,7 @@ public class MinimizeLinkAmountListener implements IterationStartsListener {
 				final double time) {
 			double cost = 0d;
 			Node from = link.getFromNode();
-			if (from.getInLinks().size() > 2 || from.getOutLinks().size() > 2) {
+			if (!NotAnIntersection.notAnIntersection(from)) {
 				// recognize a real intersection
 				cost += 1d;
 			}
