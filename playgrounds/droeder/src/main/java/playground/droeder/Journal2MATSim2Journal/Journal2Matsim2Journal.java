@@ -172,7 +172,10 @@ public class Journal2Matsim2Journal {
 				this.person2ways.get(id).add(new Trip(way));
 			}else{
 				if(this.person2waysUnrouted.containsKey(id)){
-					this.person2waysUnrouted.get(id).add(new Trip(way));
+					Trip temp = new Trip(way);
+					temp.setCarTime(9999999);
+					temp.setPtTime(9999999, 9999999, 9999999);
+					this.person2waysUnrouted.get(id).add(temp);
 				}else{
 					this.person2waysUnrouted.put(id, new LinkedList<Trip>());
 					Trip temp = new Trip(way);
