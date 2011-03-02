@@ -175,7 +175,10 @@ public class Journal2Matsim2Journal {
 					this.person2waysUnrouted.get(id).add(new Trip(way));
 				}else{
 					this.person2waysUnrouted.put(id, new LinkedList<Trip>());
-					this.person2waysUnrouted.get(id).add(new Trip(way));
+					Trip temp = new Trip(way);
+					temp.setCarTime(9999999);
+					temp.setPtTime(9999999, 9999999, 9999999);
+					this.person2waysUnrouted.get(id).add(temp);
 				}
 				
 				log.error("wayId " + way[1] + "not processed, because no coordinates are given for origin and/or destination!"); 
