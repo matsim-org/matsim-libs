@@ -52,15 +52,15 @@ public class Create3TownsDemand {
 	private static String path = "src/main/java/playground/anhorni/";
 
 	private int populationSize = -1;
-	private int numberOfCityShoppingLocs = -1;
+	private int numberOfCityShoppingLocs = 3;
 	private double shopShare = 0.0;
 	private int numberOfPersonStrata = -1;	// excluding destination choice
+	
 	//expenditure for home towns
 	private double [] mu = {	0.0, 	0.0};
 	private double [] sigma = {	0.0,	0.0};
 
 	private ExpenditureAssigner expenditureAssigner = null;
-	private AgeAssigner ageAssigner = null;
 	private SinglePlanGenerator singlePlanGenerator = null;
 	ConfigReader configReader = new ConfigReader();
 
@@ -84,9 +84,7 @@ public class Create3TownsDemand {
 		this.numberOfPersonStrata = configReader.getNumberOfPersonStrata();
 		this.mu = configReader.getMu();
 		this.sigma = configReader.getSigma();
-
 		this.expenditureAssigner = new ExpenditureAssigner(this.numberOfPersonStrata, this.mu, this.sigma, path);
-		this.ageAssigner = new AgeAssigner(this.populationSize, Create3TownsDemand.numberOfHomeTowns);
 		this.singlePlanGenerator = new SinglePlanGenerator(Create3TownsDemand.shopCityLinkIds);
 
 		new MatsimNetworkReader(scenarioWriteOut).readFile(networkfilePath);
@@ -96,7 +94,10 @@ public class Create3TownsDemand {
 	private void run() {
 		Random rnd = new Random(109876L);
 		PlansAnalyzer analyzer = new PlansAnalyzer(path, this.numberOfCityShoppingLocs, Create3TownsDemand.shopCityLinkIds);
-		this.generatePopulation();
+		
+		GeneratePopulation populationGenerator = new GeneratePopulation();
+		populationGenerator.generatePopulation(numberOfCityShoppingLocs, expenditureAssigner, staticPopulation, 
+				false, offset);
 
 		List<Integer> keyList = new Vector<Integer>();
 		for (Id id : this.staticPopulation.getPersons().keySet()) {
@@ -113,28 +114,7 @@ public class Create3TownsDemand {
 			scenarioWriteOut.getPopulation().getPersons().clear();
 		}
 		expenditureAssigner.finalize();
-		ageAssigner.finalize();
 		analyzer.finalize();
-	}
-
-	private void generatePopulation() {
-		for (int i = 0; i < populationSize; i++) {
-			PersonImpl p = new PersonImpl(new IdImpl(offset + i));
-
-			int townId = 0;
-			if (i >= (populationSize / numberOfHomeTowns)) {
-				townId = 1;
-			}
-			p.getCustomAttributes().put("townId", townId);
-			ageAssigner.assignAge(p);
-			if (this.sigma[0] > 0.000001) {
-				expenditureAssigner.assignExpenditureGaussian(p);
-			}
-			else {
-				expenditureAssigner.assignExpenditureFixed(p);
-			}
-			this.staticPopulation.addPerson(p);
-		}
 	}
 
 	private void generateRandomPlans(List<Integer> keyList) {
