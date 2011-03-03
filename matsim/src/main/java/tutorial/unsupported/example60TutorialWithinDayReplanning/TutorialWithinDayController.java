@@ -138,7 +138,7 @@ public class TutorialWithinDayController extends EvacuationQSimControler {
 		 * each link and returns the average travel time from the past few minutes.
 		 * It has to be registered as SimulationListener and as an EventsHandler.
 		 */
-		PersonalizableTravelTime travelTime = new TravelTimeCollectorFactory().createFreeSpeedTravelTimeCalculator(this.scenarioData);
+		PersonalizableTravelTime travelTime = new TravelTimeCollectorFactory().createTravelTimeCollector(this.scenarioData);
 		fosl.addSimulationListener((TravelTimeCollector)travelTime);
 		this.events.addHandler((TravelTimeCollector)travelTime);
 
