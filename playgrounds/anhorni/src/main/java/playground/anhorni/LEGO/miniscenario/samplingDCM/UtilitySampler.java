@@ -57,14 +57,14 @@ public class UtilitySampler {
 	private void init() {
 		configReader.read();	
 		
-		ScenarioImpl scenario = new ScenarioLoaderImpl(configReader.getPath() + "input/config.xml").getScenario();
+		ScenarioImpl scenario = new ScenarioLoaderImpl(configReader.getPath() + "/config.xml").getScenario();
 		this.config = scenario.getConfig();
 		
 		this.rnd = new Random(4711);
 		MatsimPopulationReader populationReader = new MatsimPopulationReader(this.scenario);
-		populationReader.readFile(this.configReader.getPath() + "input/plans.xml");
-		new MatsimNetworkReader(this.scenario).readFile(this.configReader.getPath() + "input/network.xml");
-		new MatsimFacilitiesReader(this.scenario).readFile(this.configReader.getPath() + "input/facilities.xml");
+		populationReader.readFile(this.configReader.getPath() + "/plans.xml");
+		new MatsimNetworkReader(this.scenario).readFile(this.configReader.getPath() + "/network.xml");
+		new MatsimFacilitiesReader(this.scenario).readFile(this.configReader.getPath() + "/facilities.xml");
 	}
 
 	private void run() {	
@@ -127,7 +127,7 @@ public class UtilitySampler {
 			shopBins.addVal(shopDistance, 1.0);	
 			scoreBins.addVal(plan.getScore(), 1.0);
 		}
-		shopBins.plotBinnedDistribution(configReader.getPath() + "output/dcm_sampling_", "#", "m");
-		scoreBins.plotBinnedDistribution(configReader.getPath() + "output/dcm_sampling_", "#", "[utils]");
+		shopBins.plotBinnedDistribution(configReader.getPath() + "../../output/LEGO/dcm_sampling_", "#", "m");
+		scoreBins.plotBinnedDistribution(configReader.getPath() + "../../output/dcm_sampling_", "#", "[utils]");
 	}
 }
