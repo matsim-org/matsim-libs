@@ -26,11 +26,11 @@ import org.matsim.core.api.internal.MatsimFactory;
 
 public class TravelTimeCollectorFactory implements MatsimFactory {
 
-	public TravelTimeCollector createFreeSpeedTravelTimeCalculator(final Scenario scenario) {
+	public TravelTimeCollector createTravelTimeCollector(final Scenario scenario) {
 		return new TravelTimeCollector(scenario, TravelTimeCollectorFactory.getNextId());
 	}
 	
-	public TravelTimeCollector createFreeSpeedTravelTimeCalculator(final Network network, int numThreads) {
+	public TravelTimeCollector createTravelTimeCollector(final Network network, int numThreads) {
 		return new TravelTimeCollector(network, numThreads, TravelTimeCollectorFactory.getNextId());
 	}
 	
