@@ -128,6 +128,6 @@ public class UtilitySampler {
 			scoreBins.addVal(plan.getScore(), 1.0);
 		}
 		shopBins.plotBinnedDistribution(configReader.getPath() + "../../output/LEGO/dcm_sampling_", "#", "m");
-		scoreBins.plotBinnedDistribution(configReader.getPath() + "../../output/dcm_sampling_", "#", "[utils]");
+		scoreBins.plotBinnedDistribution(configReader.getPath() + "../../output/LEGO/dcm_sampling_", "#", "[utils]");
 	}
 }
