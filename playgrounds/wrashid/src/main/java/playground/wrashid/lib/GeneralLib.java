@@ -57,6 +57,9 @@ import playground.wrashid.lib.obj.list.Lists;
 
 public class GeneralLib {
 
+	
+	public static String eclipseLocalTempPath="C:/eTmp";
+	
 	/*
 	 * Reads the population from the plans file.
 	 * 
