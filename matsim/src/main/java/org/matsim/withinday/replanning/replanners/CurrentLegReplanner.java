@@ -79,7 +79,7 @@ public class CurrentLegReplanner extends WithinDayDuringLegReplanner {
 		int currentLinkIndex = withinDayAgent.getCurrentRouteLinkIdIndex();
 
 		// new Route for current Leg
-		new EditRoutes().replanCurrentLegRoute(executedPlan, currentLegIndex, currentLinkIndex, routeAlgo, scenario.getNetwork(), time);
+		new EditRoutes().replanCurrentLegRoute(executedPlan, currentLegIndex, currentLinkIndex, routeAlgo, time);
 
 		// Finally reset the cached Values of the PersonAgent - they may have changed!
 		withinDayAgent.resetCaches();

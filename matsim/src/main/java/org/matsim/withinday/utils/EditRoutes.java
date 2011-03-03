@@ -144,7 +144,7 @@ public class EditRoutes {
 	 * The currentNodeIndex has to Point to the next Node
 	 * (which is the endNode of the current Link)
 	 */
-	public boolean replanCurrentLegRoute(Plan plan, int legPlanElementIndex, int currentLinkIndex, PlanAlgorithm planAlgorithm, Network network, double time) {
+	public boolean replanCurrentLegRoute(Plan plan, int legPlanElementIndex, int currentLinkIndex, PlanAlgorithm planAlgorithm, double time) {
 		if (plan == null) return false;
 		if (planAlgorithm == null) return false; 
 

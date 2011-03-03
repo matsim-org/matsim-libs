@@ -126,7 +126,7 @@ public class CurrentLegToSecureFacilityReplanner extends WithinDayDuringLegRepla
 			
 			int currentLinkIndex = withinDayAgent.getCurrentRouteLinkIdIndex();
 			// new Route for current Leg
-			new EditRoutes().replanCurrentLegRoute(executedPlan, currentLegIndex, currentLinkIndex, routeAlgo, scenario.getNetwork(), time);
+			new EditRoutes().replanCurrentLegRoute(executedPlan, currentLegIndex, currentLinkIndex, routeAlgo, time);
 		}
 		
 		// Remove all legs and activities after the next activity.

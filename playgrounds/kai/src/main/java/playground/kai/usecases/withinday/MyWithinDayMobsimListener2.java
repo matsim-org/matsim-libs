@@ -155,8 +155,7 @@ public class MyWithinDayMobsimListener2 implements SimulationListener, Simulatio
 		// EditRoutes at this point only works for car routes
 		
 		// new Route for current Leg.
-		new EditRoutes().replanCurrentLegRoute(plan, planElementsIndex, 
-				withindayAgent.getCurrentRouteLinkIdIndex(), routeAlgo, this.scenario.getNetwork(), now) ;
+		new EditRoutes().replanCurrentLegRoute(plan, planElementsIndex, withindayAgent.getCurrentRouteLinkIdIndex(), routeAlgo, now) ;
 		
 		// the route _from_ the modified activity also needs to be replanned:
 		new EditRoutes().replanFutureLegRoute(plan, planElementsIndex+1, routeAlgo);

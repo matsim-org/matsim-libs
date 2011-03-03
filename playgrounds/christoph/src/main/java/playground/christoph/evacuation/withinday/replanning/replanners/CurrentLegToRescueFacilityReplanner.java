@@ -117,7 +117,7 @@ public class CurrentLegToRescueFacilityReplanner extends WithinDayDuringLegRepla
 			new ReplacePlanElements().replaceActivity(executedPlan, nextActivity, rescueActivity);
 			
 			// new Route for current Leg
-			new EditRoutes().replanCurrentLegRoute(executedPlan, currentLegIndex, currentLinkIndex, routeAlgo, scenario.getNetwork(), time);
+			new EditRoutes().replanCurrentLegRoute(executedPlan, currentLegIndex, currentLinkIndex, routeAlgo, time);
 			
 			// Remove all legs and activities after the next activity.
 			int nextActivityIndex = executedPlan.getActLegIndex(rescueActivity);
