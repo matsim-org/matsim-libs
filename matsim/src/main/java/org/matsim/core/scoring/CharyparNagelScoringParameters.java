@@ -33,6 +33,7 @@ public class CharyparNagelScoringParameters implements MatsimParameters {
 	public final double marginalUtilityOfEarlyDeparture_s;
 	public final double marginalUtilityOfTraveling_s;
 	public final double marginalUtilityOfTravelingPT_s; // public transport
+	public final double marginalUtilityOfTravelingBike_s;
 	public final double marginalUtilityOfTravelingWalk_s;
 	public final double marginalUtilityOfPerforming_s;
 
@@ -52,13 +53,14 @@ public class CharyparNagelScoringParameters implements MatsimParameters {
 
 	/** True if at least one of marginal utilities for performing, waiting, being late or leaving early is not equal to 0. */
 	public final boolean scoreActs;
-	
+
 	public CharyparNagelScoringParameters(final PlanCalcScoreConfigGroup config) {
 		marginalUtilityOfWaiting_s = config.getWaiting_utils_hr() / 3600.0;
 		marginalUtilityOfLateArrival_s = config.getLateArrival_utils_hr() / 3600.0;
 		marginalUtilityOfEarlyDeparture_s = config.getEarlyDeparture_utils_hr() / 3600.0;
 		marginalUtilityOfTraveling_s = config.getTraveling_utils_hr() / 3600.0;
 		marginalUtilityOfTravelingPT_s = config.getTravelingPt_utils_hr() / 3600.0;
+		marginalUtilityOfTravelingBike_s = config.getTravelingBike_utils_hr() / 3600.0;
 		marginalUtilityOfTravelingWalk_s = config.getTravelingWalk_utils_hr() / 3600.0;
 		marginalUtilityOfPerforming_s = config.getPerforming_utils_hr() / 3600.0;
 
@@ -66,7 +68,7 @@ public class CharyparNagelScoringParameters implements MatsimParameters {
 		marginalUtilityOfDistancePt_m = config.getMonetaryDistanceCostRatePt() * config.getMarginalUtilityOfMoney() ;
 
 		marginalUtilityOfDistanceWalk_m = config.getMarginalUtlOfDistanceWalk();
-		
+
 		monetaryDistanceCostRateCar = config.getMonetaryDistanceCostRateCar() ;
 		monetaryDistanceCostRatePt = config.getMonetaryDistanceCostRatePt();
 		marginalUtilityOfMoney = config.getMarginalUtilityOfMoney() ;
@@ -79,7 +81,7 @@ public class CharyparNagelScoringParameters implements MatsimParameters {
 		scoreActs = marginalUtilityOfPerforming_s != 0 || marginalUtilityOfWaiting_s != 0 ||
 				marginalUtilityOfLateArrival_s != 0 || marginalUtilityOfEarlyDeparture_s != 0;
 
-	
+
 		for (ActivityParams params : config.getActivityParams()) {
 			String type = params.getType();
 			double priority = params.getPriority();
@@ -104,5 +106,5 @@ public class CharyparNagelScoringParameters implements MatsimParameters {
 		}
 
 	}
-	
+
 }

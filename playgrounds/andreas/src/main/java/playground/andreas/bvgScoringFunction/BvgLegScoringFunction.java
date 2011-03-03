@@ -32,20 +32,20 @@ import org.matsim.core.scoring.interfaces.BasicScoring;
 import org.matsim.core.scoring.interfaces.LegScoring;
 
 /**
- * 
+ *
  * Scoring function featuring offsets and distance costs for the modes car, pt, ride, bike, walk and transit_walk
- * 
+ *
  * @author aneumann roughly based on {@link LegScoringFunction}
- * 
+ *
  */
 public class BvgLegScoringFunction implements LegScoring, BasicScoring {
 
 	private final static Logger log = Logger.getLogger(BvgLegScoringFunction.class);
 
 	protected final Plan plan;
-	
+
 	private NetworkImpl network;
-	
+
 	protected double score;
 	private double lastTime;
 	private int index; // the current position in plan.actslegs
@@ -99,7 +99,7 @@ public class BvgLegScoringFunction implements LegScoring, BasicScoring {
 	private static int distanceWrnCnt = 0;
 
 	protected double calcLegScore(final double departureTime, final double arrivalTime, final Leg leg) {
-		
+
 		/*
 		 * we only as for the route when we have to calculate a distance cost,
 		 * because route.getDist() may calculate the distance if not yet
@@ -108,15 +108,15 @@ public class BvgLegScoringFunction implements LegScoring, BasicScoring {
 		double dist = 0.0; // distance in meters
 		double travelTime = arrivalTime - departureTime; // traveltime in seconds
 		double tmpScore = 0.0;
-		
+
 
 		if (TransportMode.car.equals(leg.getMode())) {
-			
+
 			if (this.charyparNagelParameters.monetaryDistanceCostRateCar != 0.0) {
-				
+
 				dist = leg.getRoute().getDistance(); // Should be RouteUtils.calcDistance(route, network)
 				dist += this.network.getLinks().get(leg.getRoute().getEndLinkId()).getLength();
-				
+
 				if (distanceWrnCnt < 1) {
 					/*
 					 * TODO the route-distance does not contain the length of
@@ -136,104 +136,104 @@ public class BvgLegScoringFunction implements LegScoring, BasicScoring {
 					distanceWrnCnt++;
 				}
 			}
-			
+
 			// add travel time related part
 			tmpScore += travelTime * this.charyparNagelParameters.marginalUtilityOfTraveling_s;
-			
+
 			// add distance related part
 			tmpScore += dist * this.charyparNagelParameters.monetaryDistanceCostRateCar * this.charyparNagelParameters.marginalUtilityOfMoney;
-			
+
 			// add offset for using car mode
 			tmpScore += this.bvgParameters.offsetCar * this.bvgParameters.betaOffsetCar * this.charyparNagelParameters.marginalUtilityOfMoney;
-			
+
 		} else if (TransportMode.pt.equals(leg.getMode())) {
-			
+
 			if (this.charyparNagelParameters.monetaryDistanceCostRatePt != 0.0) {
 				// Should be ok, since pt legs are handled in a different way
 				dist = leg.getRoute().getDistance();
 			}
-			
+
 			// add travel time related part
 			tmpScore += travelTime * this.charyparNagelParameters.marginalUtilityOfTravelingPT_s;
-			
-			// add distance related part, as of jan 2011 transit_walk and pt distance is not set  
+
+			// add distance related part, as of jan 2011 transit_walk and pt distance is not set
 			if(!Double.isNaN(dist)){
 				tmpScore += dist * this.charyparNagelParameters.monetaryDistanceCostRatePt * this.charyparNagelParameters.marginalUtilityOfMoney;
 			}
-			
+
 			// add offset for using pt mode
 			tmpScore += this.bvgParameters.offsetPt * this.bvgParameters.betaOffsetPt * this.charyparNagelParameters.marginalUtilityOfMoney;
 
 		} else if (TransportMode.ride.equals(leg.getMode())) {
-			
+
 			if (this.bvgParameters.monetaryDistanceCostRateRide != 0.0) {
 				// Should be ok, since ride legs are handled in a different way
 				dist = leg.getRoute().getDistance();
 			}
-			
+
 			// add travel time related part
 			tmpScore += travelTime * this.charyparNagelParameters.marginalUtilityOfTraveling_s;
-			
+
 			// add distance related part
 			tmpScore += dist * this.bvgParameters.monetaryDistanceCostRateRide * this.charyparNagelParameters.marginalUtilityOfMoney;
-			
+
 			// add offset for using ride mode
 			tmpScore += this.bvgParameters.offsetRide * this.bvgParameters.betaOffsetRide * this.charyparNagelParameters.marginalUtilityOfMoney;
-			
+
 		} else if (TransportMode.bike.equals(leg.getMode())) {
-			
+
 			if (this.bvgParameters.monetaryDistanceCostRateBike != 0.0) {
 				// Should be ok, since bike legs are handled in a different way
 				dist = leg.getRoute().getDistance();
 			}
-			
+
 			// add travel time related part
-			tmpScore += travelTime * this.charyparNagelParameters.marginalUtilityOfTraveling_s;
-			
+			tmpScore += travelTime * this.charyparNagelParameters.marginalUtilityOfTravelingBike_s;
+
 			// add distance related part
 			tmpScore += dist * this.bvgParameters.monetaryDistanceCostRateBike * this.charyparNagelParameters.marginalUtilityOfMoney;
-			
+
 			// add offset for using bike mode
 			tmpScore += this.bvgParameters.offsetBike * this.bvgParameters.betaOffsetBike * this.charyparNagelParameters.marginalUtilityOfMoney;
-			
+
 		} else if (TransportMode.walk.equals(leg.getMode())) {
-			
+
 			if (this.bvgParameters.monetaryDistanceCostRateWalk != 0.0) {
 				// Should be ok, since walk legs are handled in a different way
 				dist = leg.getRoute().getDistance();
 			}
-			
+
 			// add travel time related part
 			tmpScore += travelTime * this.charyparNagelParameters.marginalUtilityOfTravelingWalk_s;
-			
+
 			// add distance related part
 			tmpScore += dist * this.bvgParameters.monetaryDistanceCostRateWalk * this.charyparNagelParameters.marginalUtilityOfMoney;
-			
+
 			// add offset for using walk mode
 			tmpScore += this.bvgParameters.offsetWalk * this.bvgParameters.betaOffsetWalk * this.charyparNagelParameters.marginalUtilityOfMoney;
-			
+
 		} else if (TransportMode.transit_walk.equals(leg.getMode())) {
-			
+
 			if (this.bvgParameters.monetaryDistanceCostRateWalk != 0.0) {
 				// Should be ok, since bike legs are handled in a different way
 				dist = leg.getRoute().getDistance();
 			}
-			
+
 			// add travel time related part
 			tmpScore += travelTime * this.charyparNagelParameters.marginalUtilityOfTravelingWalk_s;
-			
-			// add distance related part, as of jan 2011 transit_walk and pt distance is not set  
+
+			// add distance related part, as of jan 2011 transit_walk and pt distance is not set
 			if(!Double.isNaN(dist)){
 				tmpScore += dist * this.bvgParameters.monetaryDistanceCostRateWalk * this.charyparNagelParameters.marginalUtilityOfMoney;
 			}
-			
+
 			// add offset for using walk mode
 			tmpScore += this.bvgParameters.offsetWalk * this.bvgParameters.betaOffsetWalk * this.charyparNagelParameters.marginalUtilityOfMoney;
-			
+
 		} else {
-			
+
 			log.error("The mode " + leg.getMode() + " is not implemented, yet. Please stick to the following modes: " + TransportMode.car + ", " + TransportMode.pt + ", " + TransportMode.ride + ", " + TransportMode.bike + ", " + TransportMode.walk + " and " + TransportMode.transit_walk);
-			
+
 		}
 
 		return tmpScore;

@@ -135,6 +135,8 @@ public class LegScoringFunction implements LegScoring, BasicScoring {
 				dist = leg.getRoute().getDistance();
 			}
 			tmpScore += travelTime * this.params.marginalUtilityOfTravelingWalk_s + this.params.marginalUtilityOfDistanceWalk_m * dist;
+		} else if (TransportMode.bike.equals(leg.getMode())) {
+			tmpScore += travelTime * this.params.marginalUtilityOfTravelingBike_s;
 		} else {
 			if (this.params.marginalUtilityOfDistanceCar_m != 0.0) {
 				dist = leg.getRoute().getDistance();

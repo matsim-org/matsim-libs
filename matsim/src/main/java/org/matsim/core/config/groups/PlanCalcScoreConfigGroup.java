@@ -58,6 +58,7 @@ public class PlanCalcScoreConfigGroup extends Module {
 	private static final String PERFORMING = "performing";
 	private static final String TRAVELING = "traveling";
 	private static final String TRAVELING_PT = "travelingPt";
+	private static final String TRAVELING_BIKE = "travelingBike";
 	private static final String TRAVELING_WALK = "travelingWalk";
 	private static final String WAITING  = "waiting";
 
@@ -68,11 +69,11 @@ public class PlanCalcScoreConfigGroup extends Module {
 	private static final String MARGINAL_UTL_OF_DISTANCE_PT = "marginalUtlOfDistancePt";
 
 	private static final String MARGINAL_UTL_OF_DISTANCE_WALK = "marginalUtlOfDistanceWalk";
-	
+
 	private static final String MARGINAL_UTL_OF_MONEY = "marginalUtilityOfMoney" ;
 	private static final String MONETARY_DISTANCE_COST_RATE_CAR = "monetaryDistanceCostRateCar" ;
 	private static final String MONETARY_DISTANCE_COST_RATE_PT  = "monetaryDistanceCostRatePt" ;
-	
+
 	private static final String UTL_OF_LINE_SWITCH = "utilityOfLineSwitch" ;
 
 	private static final String ACTIVITY_TYPE = "activityType_";
@@ -97,6 +98,7 @@ public class PlanCalcScoreConfigGroup extends Module {
 	private double traveling = -6.0;
 	private double travelingPt = -6.0;
 	private double travelingWalk = -6.0;
+	private double travelingBike = -6.0;
 
 //	@Deprecated // this will eventually be removed from core matsim; please find other ways to use this.  kai/benjamin, oct/10
 //	private double marginalUtlOfDistanceCar = 0.0;
@@ -105,11 +107,11 @@ public class PlanCalcScoreConfigGroup extends Module {
 	private double marginalUtlOfDistanceWalk = 0.0;
 
 	private double waiting = -0.0;
-	
+
 	private double marginalUtilityOfMoney = 1.0 ;
 	private double monetaryDistanceCostRateCar = 0.0 ;
 	private double monetaryDistanceCostRatePt = 0.0 ;
-	
+
 	private double utilityOfLineSwitch = - 1 ;
 
 	private final HashMap<String, ActivityParams> activityTypes = new LinkedHashMap<String, ActivityParams>();
@@ -217,6 +219,8 @@ public class PlanCalcScoreConfigGroup extends Module {
 			setTravelingPt_utils_hr(Double.parseDouble(value));
 		} else if (TRAVELING_WALK.equals(key)) {
 			setTravelingWalk_utils_hr(Double.parseDouble(value));
+		} else if (TRAVELING_BIKE.equals(key)) {
+			setTravelingBike_utils_hr(Double.parseDouble(value));
 		} else if (MARGINAL_UTL_OF_DISTANCE_CAR.equals(key)){
 			setMarginalUtlOfDistanceCar(Double.parseDouble(value));
 		} else if (MARGINAL_UTL_OF_DISTANCE_PT.equals(key)){
@@ -270,13 +274,14 @@ public class PlanCalcScoreConfigGroup extends Module {
 
 		map.put(LEARNING_RATE, Double.toString(this.getLearningRate()) );
 		map.put(BRAIN_EXP_BETA, Double.toString(this.getBrainExpBeta()) );
-		map.put(PATH_SIZE_LOGIT_BETA, Double.toString(this.getPathSizeLogitBeta()) ); 
+		map.put(PATH_SIZE_LOGIT_BETA, Double.toString(this.getPathSizeLogitBeta()) );
 		map.put(LATE_ARRIVAL, Double.toString(this.getLateArrival_utils_hr()) );
 		map.put(EARLY_DEPARTURE, Double.toString(this.getEarlyDeparture_utils_hr()) );
 		map.put(PERFORMING, Double.toString(this.getPerforming_utils_hr()) );
 		map.put(TRAVELING, Double.toString(this.getTraveling_utils_hr()) );
 		map.put(TRAVELING_PT, Double.toString(this.getTravelingPt_utils_hr()));
 		map.put(TRAVELING_WALK, Double.toString(this.getTravelingWalk_utils_hr()));
+		map.put(TRAVELING_BIKE, Double.toString(this.getTravelingBike_utils_hr()));
 		map.put(WAITING, Double.toString(this.getWaiting_utils_hr()));
 //		map.put(MARGINAL_UTL_OF_DISTANCE_CAR, Double.toString(this.getMarginalUtlOfDistanceCar()));
 //		map.put(MARGINAL_UTL_OF_DISTANCE_PT, Double.toString(this.getMarginalUtlOfDistancePt()));
@@ -321,14 +326,14 @@ public class PlanCalcScoreConfigGroup extends Module {
 				"your utl function is estimated") ;
 		map.put(LEARNING_RATE, "new_score = (1-learningRate)*old_score + learningRate * score_from_mobsim.  learning rates " +
 				"close to zero emulate score averaging, but slow down initial convergence") ;
-		
+
 		map.put(UTL_OF_LINE_SWITCH, "[utils] utility of switching a line (= transfer penalty).  Normally negative") ;
 
 		map.put(MARGINAL_UTL_OF_DISTANCE_CAR, "DON'T USE THIS!  It is not clear if this is in [utils/m] or in [Eu/m]!") ;
 		map.put(MARGINAL_UTL_OF_DISTANCE_PT, "DON'T USE THIS!  It is not clear if this is in [utils/m] or in [Eu/m]!") ;
 		map.put(MARGINAL_UTL_OF_DISTANCE_WALK, "DISCOURAGED! [utils/m] utility of walking per m, normally negative.  this is " +
 				"on top of the time (dis)utility.  It is discouraged to use this but in some cases it may make sense.") ;
-		
+
 		map.put(MARGINAL_UTL_OF_MONEY, "[utils/unit_of_money] conversion of money (e.g. toll, distance cost) into utils" ) ;
 		map.put(MONETARY_DISTANCE_COST_RATE_CAR, "[unit_of_money/m] conversion of car distance into money" ) ;
 		map.put(MONETARY_DISTANCE_COST_RATE_PT, "[unit_of_money/m] conversion of pt distance into money" );
@@ -438,6 +443,13 @@ public class PlanCalcScoreConfigGroup extends Module {
 	}
 	public void setTravelingPt_utils_hr(final double travelingPt) {
 		this.travelingPt = travelingPt;
+	}
+
+	public double getTravelingBike_utils_hr() {
+		return this.travelingBike;
+	}
+	public void setTravelingBike_utils_hr(final double travelingBike) {
+		this.travelingBike = travelingBike;
 	}
 
 	public double getTravelingWalk_utils_hr() {
