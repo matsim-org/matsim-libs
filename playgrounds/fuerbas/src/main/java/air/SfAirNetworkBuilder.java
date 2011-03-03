@@ -32,7 +32,11 @@ public class SfAirNetworkBuilder {
 	
 	public void createNetwork() throws IOException {
 		
+		int airportcounter = 0;
+		int linkcounter = 0;
+		
 		String output = "/home/soeren/workspace/euroAirNetwork";
+//		String output = "/home/soeren/workspace/germanAirNetwork";
 		Set<String> allowedModes = new HashSet<String>();
 		allowedModes.add("pt");
 		allowedModes.add("car");
@@ -42,6 +46,9 @@ public class SfAirNetworkBuilder {
 		
 		BufferedReader brAirports = new BufferedReader(new FileReader(new File("/home/soeren/workspace/osmEuroAirports.txt")));
 		BufferedReader brRoutes = new BufferedReader(new FileReader(new File("/home/soeren/workspace/cityPairs.txt")));
+		
+//		BufferedReader brAirports = new BufferedReader(new FileReader(new File("/home/soeren/workspace/osmGermanAirports.txt")));
+//		BufferedReader brRoutes = new BufferedReader(new FileReader(new File("/home/soeren/workspace/cityPairsGermany.txt")));
 		
 		CoordinateTransformation coordtransform =
 			TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, "EPSG:3395");
@@ -55,6 +62,8 @@ public class SfAirNetworkBuilder {
 			Coord coord = new CoordImpl(xValue, yValue);
 			Coord airportCoord = coordtransform.transform(coord);
 			
+			airportcounter++;
+			
 			new SfMatsimAirport(new IdImpl(airportCode), airportCoord).createRunways(network);			
 		}
 		
@@ -64,7 +73,7 @@ public class SfAirNetworkBuilder {
 			String[] lineEntries = oneLine.split("\t");
 			String[] airportCodes = lineEntries[0].split("_");
 			double length = Double.parseDouble(lineEntries[1])*1000;	//distance between O&D in meters
-			double flightTime = Double.parseDouble(lineEntries[2])-600.;		//flight time in seconds, assumption: 300secs for taxi/take-off/landing
+			double flightTime = Double.parseDouble(lineEntries[2])-600.;		//flight time in seconds, assumption: 600secs for taxi/take-off/landing
 			double groundSpeed = length/flightTime;						
 			String origin = airportCodes[0];
 			String destination = airportCodes[1];
@@ -82,12 +91,17 @@ public class SfAirNetworkBuilder {
 			originToDestination.setLength(length);
 			network.addLink(originToDestination);
 			
+			linkcounter++;
+			
 //			} // HIER LÖSCHEN
 			
 		}
 			
 		new NetworkWriter(network).write(output + ".xml");
 		System.out.println("Done! Unprocessed MATSim Network saved as " + output + ".xml");
+		
+		System.out.println("Anzahl Flughäfen: "+airportcounter);
+		System.out.println("Anzahl Links: "+linkcounter);
 		
 		brAirports.close();
 		brRoutes.close();

@@ -18,7 +18,7 @@ public class DgNet2Shape {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String netFile = "/home/soeren/workspace/testnetzwerk.xml";
+		String netFile = "/home/soeren/workspace/germanAirNetwork.xml";
 		ScenarioImpl scenario = new ScenarioImpl();
 		NetworkImpl net = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFile);
@@ -40,7 +40,7 @@ public class DgNet2Shape {
 		};
 		
 		
-		new Links2ESRIShape(net, "/home/soeren/workspace/network.shp", builder).write();
+		new Links2ESRIShape(net, "/home/soeren/workspace/networkDE.shp", builder).write();
 
 	}
 

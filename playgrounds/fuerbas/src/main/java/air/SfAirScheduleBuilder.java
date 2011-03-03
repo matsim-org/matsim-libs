@@ -27,9 +27,16 @@ public class SfAirScheduleBuilder {
 	public static void main(String[] args) throws IOException, SAXException, ParserConfigurationException {
 		
 		SfAirScheduleBuilder builder = new SfAirScheduleBuilder();
+		
 		builder.filterEurope("/home/soeren/workspace/airports.osm", "/home/soeren/Downloads/OAGSEP09.CSV", 
 				"/home/soeren/workspace/osmEuroAirports.txt", "/home/soeren/workspace/oagEuroFlights.txt", "/home/soeren/workspace/missingAirports.txt", 
 				"/home/soeren/workspace/cityPairs.txt");
+		
+		//GERMAN AIR TRAFFIC ONLY BELOW
+		
+//		builder.filterEurope("/home/soeren/workspace/airports.osm", "/home/soeren/Downloads/OAGSEP09.CSV", 
+//				"/home/soeren/workspace/osmGermanAirports.txt", "/home/soeren/workspace/oagGermanFlights.txt", "/home/soeren/workspace/missingGermanAirports.txt", 
+//				"/home/soeren/workspace/cityPairsGermany.txt");
 	}
 	
 	protected Map<String, Coord> airportsInOsm = new HashMap<String, Coord>();
@@ -46,7 +53,7 @@ public class SfAirScheduleBuilder {
 				TransformationFactory.WGS84));
 		osmReader.parse(inputOsm);
 		
-		long counter = 0;
+		int counter = 0;
 		
 		this.airportsInOsm = osmReader.airports;
 		
@@ -54,6 +61,8 @@ public class SfAirScheduleBuilder {
 				"DE","DK","EE","ES","FI","FO","FR","GB","GI","GE","GG","GR","HR","HU","IE","IM","IS","IT",
 				"JE","KZ","LI","LT","LU","LV","MC","MD","ME","MK","MT","NL","NO","PL","PT","RO","RS", 
 				"RU","SE","SI","SJ","SK","SM","TR","UA","VA" };
+		
+//		String[] euroCountries = {"DE"};		//GERMAN NETWORK
 		
 		BufferedReader br = new BufferedReader(new FileReader(new File(inputOag)));
 		BufferedWriter bwOag = new BufferedWriter(new FileWriter(new File(outputOag)));
@@ -168,7 +177,7 @@ public class SfAirScheduleBuilder {
 		Iterator it2 = this.missingAirports.entrySet().iterator();
 	    while (it2.hasNext()) {
 	        Map.Entry pairs = (Map.Entry)it2.next();
-	        bwMissing.write(pairs.toString());
+	        bwMissing.write(pairs.getKey().toString());
 	        bwMissing.newLine();
 	    }
 	    
