@@ -31,7 +31,7 @@ import java.util.Map.Entry;
 import org.matsim.api.core.v01.Id;
 
 
-public class hbefaColdTable {
+public class HbefaColdTable {
 
 	/**
 	

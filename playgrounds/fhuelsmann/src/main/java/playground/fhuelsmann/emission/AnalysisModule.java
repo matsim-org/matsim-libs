@@ -29,5 +29,5 @@ public interface AnalysisModule {
 	
 	public void calculateEmissionsPerLink(final double travelTime, final Id linkId, final double averageSpeed, final int roadType, final double freeVelocity, final double distance,HbefaObject[][] hbefaTable);
 	
-//	public void calculateColdEmissionsPerLink(final double activityTime, final Id personId,HbefaObject[][] hbefaTable);
+
 }
