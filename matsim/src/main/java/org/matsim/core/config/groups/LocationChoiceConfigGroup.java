@@ -231,7 +231,7 @@ public class LocationChoiceConfigGroup extends Module {
 		} else if (ALGO.equals(key)) {
 			setAlgorithm(value);
 		} else if (TT_APPROX_LEVEL.equals(key)) {
-			if (!(value.equals("0") || value.equals("1") || value.equals("1"))) {
+			if (!(value.equals("0") || value.equals("1") || value.equals("2"))) {
 				log.warn("set travel time approximation level to 0, 1 or 2. Set to default value '0' now (no approximation)");
 			}
 			else {
