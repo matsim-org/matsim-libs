@@ -124,7 +124,7 @@ public class WithinDayKnowledgeControler extends WithinDayControler {
 //				travelCostWrapper, travelTime);
 		
 		
-		travelTime = new TravelTimeCollectorFactory().createFreeSpeedTravelTimeCalculator(this.scenarioData);
+		travelTime = new TravelTimeCollectorFactory().createTravelTimeCollector(this.scenarioData);
 		fosl.addSimulationBeforeSimStepListener((TravelTimeCollector)travelTime);	// for TravelTimeCollector
 		fosl.addSimulationAfterSimStepListener((TravelTimeCollector)travelTime);	// for TravelTimeCollector
 		this.events.addHandler((TravelTimeCollector)travelTime);	// for TravelTimeCollector

@@ -153,7 +153,7 @@ public class WithinDayControler extends Controler {
 	 */
 	protected void initReplanningRouter() {
 
-		travelTime = new TravelTimeCollectorFactory().createFreeSpeedTravelTimeCalculator(this.scenarioData);
+		travelTime = new TravelTimeCollectorFactory().createTravelTimeCollector(this.scenarioData);
 		fosl.addSimulationInitializedListener((TravelTimeCollector)travelTime);	// for TravelTimeCollector
 		fosl.addSimulationBeforeSimStepListener((TravelTimeCollector)travelTime);	// for TravelTimeCollector
 		fosl.addSimulationAfterSimStepListener((TravelTimeCollector)travelTime);	// for TravelTimeCollector
