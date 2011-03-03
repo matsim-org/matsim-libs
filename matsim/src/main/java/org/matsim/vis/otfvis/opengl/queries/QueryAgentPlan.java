@@ -87,6 +87,8 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 
 	private transient VisNetwork net;
 
+	private OTFVisMobsimFeature otfVisMobsimFeature;
+
 	@Override
 	public void itemStateChanged(ItemEvent e) {
 		System.err.println("itemStateChange ...") ;
@@ -126,11 +128,13 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 
 	@Override
 	public void installQuery(OTFVisMobsimFeature queueSimulation, EventsManager events, OTFServerQuad2 quad) {
+		this.otfVisMobsimFeature = queueSimulation;
 		this.net = queueSimulation.getVisMobsim().getVisNetwork();
 		result = new Result();
 		result.agentId = this.agentId.toString();
 		Person person = queueSimulation.findPersonAgent(this.agentId);
 		if (person != null) {
+			queueSimulation.addTrackedAgent(this.agentId);
 			Plan plan = person.getSelectedPlan();
 			for (PlanElement e : plan.getPlanElements()) {
 				if (e instanceof Activity) {
@@ -156,6 +160,11 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 		} else {
 			log.error("No plan found for id " + this.agentId);
 		}
+	}
+
+	@Override
+	public void uninstall() {
+		otfVisMobsimFeature.removeTrackedAgent(this.agentId);
 	}
 
 	public static class Result implements OTFQueryResult {

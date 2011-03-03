@@ -62,19 +62,26 @@ public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
 
 		private static final long serialVersionUID = -7916541567386865404L;
 
-		protected static final transient Collection<AgentSnapshotInfo> positions = new ArrayList<AgentSnapshotInfo>();
-
-		/**The API method is writeDynData.  writeDynData calls writeAgent.  kai, jan'11  
+		/** 
+		 * Hui, warum ist das denn statisch? Damit nicht fuer jeden Writer und damit fuer jeden Link eine eigene
+		 * Collection angelegt wird, die ohnehin fuer jeden Link geleert und wieder gefuellt wird, nehme ich an.
+		 * Das ist ein bisschen gefaehrlich, weil man ja denken koennte, dass so ein linkspezifischer Writer eventuell
+		 * threadsafe und damit parallelisierbar sein koennte.
+		 * 
+		 * michaz feb 2011
 		 */
-		private void writeAllAgents(ByteBuffer out) {
-			// Write additional agent data
+		private static final transient Collection<AgentSnapshotInfo> positions = new ArrayList<AgentSnapshotInfo>();
+
+		@Override
+		public void writeDynData(ByteBuffer out) throws IOException {
+			super.writeDynData(out);
 
 			positions.clear();
 			this.src.getVisData().getVehiclePositions( positions);
-
+			
 			if (showParked) {
 				out.putInt(positions.size());
-
+			
 				for (AgentSnapshotInfo pos : positions) {
 					writeAgent(pos, out);
 				}
@@ -85,20 +92,12 @@ public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
 						valid++;
 				}
 				out.putInt(valid);
-
+			
 				for (AgentSnapshotInfo pos : positions) {
 					if (pos.getAgentState() != AgentState.PERSON_AT_ACTIVITY)
 						writeAgent(pos, out);
 				}
 			}
-
-		}
-
-		@Override
-		public void writeDynData(ByteBuffer out) throws IOException {
-			super.writeDynData(out);
-
-			writeAllAgents(out);
 		}
 
 		@Override

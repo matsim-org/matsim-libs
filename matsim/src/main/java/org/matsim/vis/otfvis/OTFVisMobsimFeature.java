@@ -20,8 +20,11 @@
 package org.matsim.vis.otfvis;
 
 import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import org.apache.log4j.Logger;
@@ -57,7 +60,9 @@ import org.matsim.vis.otfvis.data.DefaultConnectionManagerFactory;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
 import org.matsim.vis.otfvis.opengl.layer.AgentPointDrawer;
+import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 import org.matsim.vis.snapshots.writers.TeleportationVisData;
+import org.matsim.vis.snapshots.writers.VisLink;
 import org.matsim.vis.snapshots.writers.VisMobsim;
 import org.matsim.vis.snapshots.writers.VisMobsimFeature;
 
@@ -76,21 +81,49 @@ SimulationInitializedListener, SimulationAfterSimStepListener, SimulationBeforeC
 
 	private VisMobsim queueSimulation;
 
-	private final LinkedHashMap<Id, TeleportationVisData> visTeleportationData = new LinkedHashMap<Id, TeleportationVisData>();
+	/** 
+	 * These are agents which are being teleported right now.
+	 * This always has to be maintained, even if "show teleported agents" is off. Because the user might select an agent while
+	 * it is teleporting and then of course it doesn't appear if this map doesn't have it.
+	 * On the other hand, the interpolated coordinates are still only updated when we are interested in them, so the
+	 * performance should be OK, I think.
+	 * michaz feb 11
+	 * 
+	 */
+	private final LinkedHashMap<Id, TeleportationVisData> teleportationData = new LinkedHashMap<Id, TeleportationVisData>();
 
-	private final LinkedHashMap<Id, Person> agents = new LinkedHashMap<Id, Person>();
+	/**
+	 * These are agents which should be visualised in addition to the agents which are visualised by the links themselves.
+	 * This is used
+	 * - for teleporting agents
+	 * - for agents tracked by a query, because we want to always see them, no matter if the link decides that 
+	 *   they should not be visualised (e.g. because "show parked cars" is switched off or something).
+	 * michaz feb 11
+	 */
+	private final LinkedHashMap<Id, AgentSnapshotInfo> visData = new LinkedHashMap<Id, AgentSnapshotInfo>();
+
+	private final LinkedHashMap<Id, PersonAgent> agents = new LinkedHashMap<Id, PersonAgent>();
+
+	private final Set<Id> trackedAgents = new HashSet<Id>();
 
 	public OTFVisMobsimFeature(VisMobsim queueSimulation) {
 		this.queueSimulation = queueSimulation;
 	}
 
+	/*
+	 * TODO: Erzeugung des Servers hier rausschmeissen. In eine statische Factory in OnTheFlyServer
+	 * verlegen. Der Server muss damit extern erzeugt und dieser Klasse im Konstruktor 
+	 * uebergeben werden. Der Client muss ebenfalls extern erzeugt und gestartet werden.
+	 * Und zwar unabhaengig davon. Das ist gerade der Witz am Client-Server-Prinzip.
+	 * michaz feb 11
+	 */
 	@Override
 	public void notifySimulationInitialized(SimulationInitializedEvent ev) {
 		log.info("receiving simulationInitializedEvent") ;
 		for ( MobsimAgent mag : this.queueSimulation.getAgents() ) {
 			if ( mag instanceof PersonAgent ) {
 				PersonAgent pag = (PersonAgent) mag ;
-				agents.put( pag.getPerson().getId(), pag.getPerson() ) ;
+				agents.put( pag.getPerson().getId(), pag) ;
 			}
 		}
 
@@ -102,17 +135,16 @@ SimulationInitializedListener, SimulationAfterSimStepListener, SimulationBeforeC
 		// the "connect" statements for the regular links are called by
 		// new DefaultConnectionManagerFactory().createConnectionManager() above.  kai, aug'10
 
-		if (this.doVisualizeTeleportedAgents) {
-			this.teleportationWriter = new OTFAgentsListHandler.Writer();
-			this.teleportationWriter.setSrc(visTeleportationData.values());
-			this.otfServer.addAdditionalElement(this.teleportationWriter);
-			this.connectionManager.connectWriterToReader(
-					OTFAgentsListHandler.Writer.class,
-					OTFAgentsListHandler.class);
-			this.connectionManager.connectReaderToReceiver(
-					OTFAgentsListHandler.class,
-					AgentPointDrawer.class);
-		}
+		this.teleportationWriter = new OTFAgentsListHandler.Writer();
+		this.teleportationWriter.setSrc(visData.values());
+		this.otfServer.addAdditionalElement(this.teleportationWriter);
+		this.connectionManager.connectWriterToReader(
+				OTFAgentsListHandler.Writer.class,
+				OTFAgentsListHandler.class);
+		this.connectionManager.connectReaderToReceiver(
+				OTFAgentsListHandler.class,
+				AgentPointDrawer.class);
+
 		if (config.scenario().isUseTransit()) {
 			this.otfServer.addAdditionalElement(new FacilityDrawer.DataWriter_v1_0(
 					queueSimulation.getVisNetwork().getNetwork(),
@@ -133,8 +165,7 @@ SimulationInitializedListener, SimulationAfterSimStepListener, SimulationBeforeC
 			this.connectionManager.connectReaderToReceiver(OTFLaneReader.class, OTFLaneSignalDrawer.class);
 			this.connectionManager.connectReceiverToLayer(OTFLaneSignalDrawer.class, SimpleSceneLayer.class);
 			config.otfVis().setScaleQuadTreeRect(true);
-		} 
-		else if (config.scenario().isUseSignalSystems()) {
+		} else if (config.scenario().isUseSignalSystems()) {
 			SignalGroupStateChangeTracker signalTracker = new SignalGroupStateChangeTracker();
 			this.queueSimulation.getEventsManager().addHandler(signalTracker);
 			SignalsData signalsData = this.queueSimulation.getScenario().getScenarioElement(SignalsData.class);
@@ -165,14 +196,35 @@ SimulationInitializedListener, SimulationAfterSimStepListener, SimulationBeforeC
 
 	@Override
 	public void handleEvent( AgentArrivalEvent ev ) {
-		this.visTeleportationData.remove( ev.getPersonId() ) ;
+		this.teleportationData.remove(ev.getPersonId());
 	}
 
 	@Override
 	public void notifySimulationAfterSimStep(SimulationAfterSimStepEvent event) {
 		double time = event.getSimulationTime() ;
-		this.visualizeTeleportedAgents(time);
+		this.updateTeleportedAgents(time);
+		this.visualizeTrackedAndTeleportingAgents();
 		this.otfServer.updateStatus(time);
+	}
+
+	private void visualizeTrackedAndTeleportingAgents() {
+		visData.clear();
+		for (TeleportationVisData agentInfo : teleportationData.values()) {
+			if (this.doVisualizeTeleportedAgents || trackedAgents.contains(agentInfo.getId())) {
+				this.visData.put(agentInfo.getId(), agentInfo);
+			}
+		}
+		for (Id personId : trackedAgents) {
+			Collection<AgentSnapshotInfo> positions = new ArrayList<AgentSnapshotInfo>();
+			PersonAgent agent = agents.get(personId);
+			VisLink visLink = queueSimulation.getVisNetwork().getVisLinks().get(agent.getCurrentLinkId());
+			visLink.getVisData().getVehiclePositions(positions);
+			for (AgentSnapshotInfo position : positions) {
+				if (position.getId().equals(personId)) {
+					this.visData.put(position.getId(), position);
+				}
+			}
+		}
 	}
 
 	@Override
@@ -180,6 +232,7 @@ SimulationInitializedListener, SimulationAfterSimStepListener, SimulationBeforeC
 		throw new UnsupportedOperationException("although it would be nice to have and should not be that difficult, at this point"
 				+ " live mode does not support iterations. kai, aug'10" ) ;
 	}
+
 	@Override
 	public void handleEvent( AdditionalTeleportationDepartureEvent ev ) {
 		/*
@@ -192,12 +245,13 @@ SimulationInitializedListener, SimulationAfterSimStepListener, SimulationBeforeC
 		Link currLink = this.getVisMobsim().getScenario().getNetwork().getLinks().get( ev.getLinkId() ) ;
 		Link destLink = this.getVisMobsim().getScenario().getNetwork().getLinks().get( ev.getDestinationLinkId() ) ;
 		double travTime = ev.getTravelTime() ;
-		this.visTeleportationData.put( agentId , new TeleportationVisData( now, agentId, currLink, destLink, travTime ) );
+		TeleportationVisData agentInfo = new TeleportationVisData( now, agentId, currLink, destLink, travTime );
+		this.teleportationData.put( agentId , agentInfo );
 	}
 
-	private void visualizeTeleportedAgents(double time) {
-		if (this.doVisualizeTeleportedAgents) {
-			for (TeleportationVisData teleportationVisData : visTeleportationData.values()) {
+	private void updateTeleportedAgents(double time) {
+		for (TeleportationVisData teleportationVisData : teleportationData.values()) {
+			if (this.doVisualizeTeleportedAgents || trackedAgents.contains(teleportationVisData.getId())) {
 				teleportationVisData.calculatePosition(time);
 			}
 		}
@@ -211,21 +265,26 @@ SimulationInitializedListener, SimulationAfterSimStepListener, SimulationBeforeC
 		this.doVisualizeTeleportedAgents = active;
 	}
 
+	public void removeTrackedAgent(Id id) {
+		trackedAgents.remove(id);
+	}
+
 	@Override
 	public VisMobsim getVisMobsim() {
 		return queueSimulation;
 	}
 
-	public Map<Id, TeleportationVisData> getVisTeleportationData() {
-		return visTeleportationData;
-	}
-
 	public Person findPersonAgent(Id agentId) {
-		Person person = agents.get(agentId);
-		if (person != null) {
+		PersonAgent personAgent = agents.get(agentId);
+		if (personAgent != null) {
+			Person person = personAgent.getPerson();
 			return person ;
 		}
 		return null;
+	}
+
+	public void addTrackedAgent(Id agentId) {
+		trackedAgents.add(agentId);
 	}
 
 }

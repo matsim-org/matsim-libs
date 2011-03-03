@@ -68,6 +68,8 @@ public class TransitDriver extends AbstractTransitDriver {
 		plan.addActivity(startActivity);
 		plan.addLeg(leg);
 		plan.addActivity(endActiity);
+		driver.addPlan(plan);
+		driver.setSelectedPlan(plan);
 		this.currentLeg = leg;
 		this.departureTime = departure.getDepartureTime();
 		this.transitLine = line;

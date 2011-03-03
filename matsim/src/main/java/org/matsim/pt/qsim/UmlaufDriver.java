@@ -25,7 +25,6 @@ import java.util.ListIterator;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.basic.v01.IdImpl;
@@ -93,13 +92,14 @@ public class UmlaufDriver extends AbstractTransitDriver {
 		super(transitQueueSimulation, thisAgentTracker);
 		this.umlauf = umlauf;
 		this.iUmlaufStueck = this.umlauf.getUmlaufStuecke().iterator();
-		Person driverPerson = new PersonImpl(new IdImpl("pt_"+umlauf.getId()+"_line_"+umlauf.getLineId())); // we use the non-wrapped route for efficiency, but the leg has to return the wrapped one.
+		PersonImpl driverPerson = new PersonImpl(new IdImpl("pt_"+umlauf.getId()+"_line_"+umlauf.getLineId())); // we use the non-wrapped route for efficiency, but the leg has to return the wrapped one.
 		PlanBuilder planBuilder = new PlanBuilder();
 		for (UmlaufStueckI umlaufStueck : umlauf.getUmlaufStuecke()) {
 			planBuilder.addTrip(getWrappedCarRoute(umlaufStueck.getCarRoute()), transportMode);
 		}
 		Plan plan = planBuilder.build();
 		driverPerson.addPlan(plan);
+		driverPerson.setSelectedPlan(plan);
 		setDriver(driverPerson);
 		iPlanElement = plan.getPlanElements().listIterator();
 		this.currentPlanElement = iPlanElement.next();
