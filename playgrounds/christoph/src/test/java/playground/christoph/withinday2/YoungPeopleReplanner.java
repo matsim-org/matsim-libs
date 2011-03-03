@@ -54,7 +54,7 @@ public class YoungPeopleReplanner extends WithinDayDuringLegReplanner {
 		
 		// new Route for current Leg
 		int currentLegIndex = executedPlan.getActLegIndex(currentLeg);
-		new EditRoutes().replanCurrentLegRoute(executedPlan, currentLegIndex, currentLinkIndex, routeAlgo, scenario.getNetwork(), time);
+		new EditRoutes().replanCurrentLegRoute(executedPlan, currentLegIndex, currentLinkIndex, routeAlgo, time);
 		
 		// new Route for next Leg
 		Leg homeLeg = executedPlan.getNextLeg(newWorkAct);
