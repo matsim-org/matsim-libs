@@ -18,6 +18,16 @@ public class CarrierImpl {
 	private Collection<Contract> contracts = new ArrayList<Contract>();
 
 	private CarrierCapabilities carrierCapabilities;
+	
+	private CarrierKnowledge knowledge;
+
+	public CarrierKnowledge getKnowledge() {
+		return knowledge;
+	}
+
+	public void setKnowledge(CarrierKnowledge knowledge) {
+		this.knowledge = knowledge;
+	}
 
 	public CarrierImpl(Id id, Id depotLinkId) {
 		super();

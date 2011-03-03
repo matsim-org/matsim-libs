@@ -25,5 +25,9 @@ public class TSPPlan {
 		return chains;
 	}
 	
+	public String toString(){
+		return "nOChains " + chains.size() + ", nOLegs " + chains.iterator().next().getChainTriples().size();
+	}
+	
 	
 }

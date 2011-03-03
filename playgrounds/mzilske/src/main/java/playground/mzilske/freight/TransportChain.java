@@ -137,6 +137,35 @@ public class TransportChain {
 		}
 	}
 	
+	public static class ChainTriple {
+		private ChainActivity firstActivity;
+		
+		private ChainLeg leg;
+		
+		private ChainActivity secondActivity;
+
+		public ChainTriple(ChainActivity firstActivity, ChainLeg leg, ChainActivity secondActivity) {
+			super();
+			this.firstActivity = firstActivity;
+			this.leg = leg;
+			this.secondActivity = secondActivity;
+		}
+
+		public ChainActivity getFirstActivity() {
+			return firstActivity;
+		}
+
+		public ChainLeg getLeg() {
+			return leg;
+		}
+
+		public ChainActivity getSecondActivity() {
+			return secondActivity;
+		}
+		
+		
+	}
+	
 	private Collection<ChainElement> chainElements;
 
 	private TSPShipment shipment;
@@ -168,6 +197,28 @@ public class TransportChain {
 			}
 		}
 		return Collections.unmodifiableCollection(activities);
+	}
+	
+	public Collection<ChainTriple> getChainTriples(){
+		Collection<ChainTriple> triples = new ArrayList<ChainTriple>();
+		PickUp pickup = null;
+		ChainLeg leg = null;
+		Delivery delivery = null;
+		for(ChainElement e : chainElements){
+			if(e instanceof PickUp){
+				pickup = (PickUp)e;
+				continue;
+			}
+			if(e instanceof ChainLeg){
+				leg = (ChainLeg)e;
+			}
+			if(e instanceof Delivery){
+				delivery = (Delivery)e;
+				ChainTriple triple = new ChainTriple(pickup, leg, delivery);
+				triples.add(triple);
+			}
+		}
+		return Collections.unmodifiableCollection(triples);
 	}
 
 	public TSPShipment getShipment() {

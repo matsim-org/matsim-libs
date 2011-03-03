@@ -15,4 +15,9 @@ public class CarrierDistanceCostFunction implements CarrierCostFunction{
 		return distance;
 	}
 
+	@Override
+	public double calculateCost(CarrierVehicle carrierVehicle, double distance, double time) {
+		return distance;
+	}
+
 }

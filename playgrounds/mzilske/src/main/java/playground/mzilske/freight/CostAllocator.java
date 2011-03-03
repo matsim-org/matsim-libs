@@ -32,7 +32,6 @@ public class CostAllocator {
 			totalBeeLineDistance += beeLineDistance(s) + depotToStart(s) + endToDepot(s);
 			totalSizeTimesDistance += s.getSize() * (beeLineDistance(s) + depotToStart(s) + endToDepot(s));
 		}
-		logger.debug("totSize="+totalSize+"  "+"costs="+costs);
 		for(Shipment s : shipments){
 			double shipmentCost = (((double) s.getSize() * (beeLineDistance(s)+ depotToStart(s) + endToDepot(s))) / totalSizeTimesDistance)*costs;
 			shipmentCostTuples.add(new Tuple<Shipment,Double>(s,shipmentCost));

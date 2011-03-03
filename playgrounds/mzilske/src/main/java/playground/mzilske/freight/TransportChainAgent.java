@@ -139,12 +139,11 @@ public class TransportChainAgent {
 	}
 
 	private void checkShipmentDeliveryTime(Shipment shipment, double time) {
-	
 		
 	}
 
 	public int getNumberOfStopps() {
-		int nOfStopps = getTpChain().getChainElements().size()/3 - 1;
+		int nOfStopps = getTpChain().getChainTriples().size() - 1;
 		return nOfStopps;
 	}
 

@@ -17,11 +17,11 @@ public class Shipment {
 			this.end = end;
 		}
 
-		double getStart() {
+		public double getStart() {
 			return start;
 		}
 
-		double getEnd() {
+		public double getEnd() {
 			return end;
 		}
 		
@@ -58,11 +58,11 @@ public class Shipment {
 		return size;
 	}
 
-	TimeWindow getPickupTimeWindow() {
+	public TimeWindow getPickupTimeWindow() {
 		return pickupTimeWindow;
 	}
 
-	TimeWindow getDeliveryTimeWindow() {
+	public TimeWindow getDeliveryTimeWindow() {
 		return deliveryTimeWindow;
 	}
 

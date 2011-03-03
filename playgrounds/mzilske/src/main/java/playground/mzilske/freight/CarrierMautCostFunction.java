@@ -20,4 +20,12 @@ public class CarrierMautCostFunction implements CarrierCostFunction {
 		this.carrier = carrier;		
 	}
 
+
+	@Override
+	public double calculateCost(CarrierVehicle carrierVehicle, double distance,
+			double time) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
 }

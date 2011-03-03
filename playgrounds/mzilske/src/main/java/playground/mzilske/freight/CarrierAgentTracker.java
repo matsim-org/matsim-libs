@@ -9,8 +9,10 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
+import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
+import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -19,7 +21,7 @@ import playground.mrieser.core.mobsim.api.AgentSource;
 import playground.mrieser.core.mobsim.api.PlanAgent;
 import playground.mrieser.core.mobsim.impl.DefaultPlanAgent;
 
-public class CarrierAgentTracker implements AgentSource, ActivityEndEventHandler, LinkEnterEventHandler {
+public class CarrierAgentTracker implements AgentSource, ActivityEndEventHandler, LinkEnterEventHandler, ActivityStartEventHandler {
 	
 	private static Logger logger = Logger.getLogger(CarrierAgentTracker.class);
 	
@@ -75,7 +77,7 @@ public class CarrierAgentTracker implements AgentSource, ActivityEndEventHandler
 		String activityType = event.getActType();
 		for (CarrierAgent carrierAgent : carrierAgents) {
 			if (carrierAgent.getDriverIds().contains(personId)) {
-				carrierAgent.activityOccurs(personId, activityType, event.getTime());
+				carrierAgent.activityEndOccurs(personId, activityType, event.getTime());
 			}
 		}
 	}
@@ -91,8 +93,20 @@ public class CarrierAgentTracker implements AgentSource, ActivityEndEventHandler
 			}
 		}
 		sumOfTotalDistance += distance/1000;
-		//logger.info("Link Enter: " + linkId + " length: "+distance);
+		logger.info("Link Enter: " + linkId + " CarrierId=" + event.getPersonId() + " length="+ distance);
 		// logger.info("totalDistanceTraveled = " + sumOfTotalDistance + " km");
+		
+	}
+
+	@Override
+	public void handleEvent(ActivityStartEvent event) {
+		Id personId = event.getPersonId();
+		String activityType = event.getActType();
+		for (CarrierAgent carrierAgent : carrierAgents) {
+			if (carrierAgent.getDriverIds().contains(personId)) {
+				carrierAgent.activityStartOccurs(personId, activityType, event.getTime());
+			}
+		}
 		
 	}
 
@@ -125,8 +139,10 @@ public class CarrierAgentTracker implements AgentSource, ActivityEndEventHandler
 	private void createCarrierAgents() {
 		for (CarrierImpl carrier : carriers) {
 			CarrierAgent carrierAgent = new CarrierAgent(this, carrier, router);
-			carrierAgent.setCostFunction(new CarrierDistanceCostFunction());
+			carrierAgent.setCostFunction(new CarrierTimeDistanceCostFunction());
 			carrierAgent.setCostAllocator(new CostAllocator(carrier, network));
+			carrierAgent.setOfferMaker(new OfferMaker(carrier, network, new CarrierTimeDistanceCostFunction()));
+			carrierAgent.setNetwork(network);
 			carrierAgents.add(carrierAgent);
 		}
 	}
@@ -147,7 +163,12 @@ public class CarrierAgentTracker implements AgentSource, ActivityEndEventHandler
 		Collection<Offer> offers = new ArrayList<Offer>();
 		for (CarrierAgent carrierAgent : carrierAgents) {
 			Offer offer = carrierAgent.makeOffer(linkId, linkId2, shipmentSize);
-			offers.add(offer);
+			if(offer instanceof NoOffer){
+				continue;
+			}
+			else {
+				offers.add(offer);
+			}
 		}
 		return offers;
 	}

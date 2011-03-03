@@ -24,18 +24,19 @@ public class TSPAgent {
 	
 	public static class CostParameter{
 		public static double transshipmentHandlingCost_per_unit = 0.0;
+		public static double transshipmentCost = 25;
 	}
 	
 	private TransportServiceProviderImpl tsp;
 	
+	private Collection<TransportChainAgent> transportChainAgents = new ArrayList<TransportChainAgent>();
+
+	private Map<Shipment,TransportChainAgent> shipmentChainMap = new HashMap<Shipment, TransportChainAgent>();
+
 	public TSPAgent(TransportServiceProviderImpl tsp){
 		this.tsp = tsp;
 	}
 	
-	private Collection<TransportChainAgent> transportChainAgents = new ArrayList<TransportChainAgent>();
-	
-	private Map<Shipment,TransportChainAgent> shipmentChainMap = new HashMap<Shipment, TransportChainAgent>();
-
 	Map<Shipment, TransportChainAgent> getShipmentChainMap() {
 		return shipmentChainMap;
 	}
@@ -62,7 +63,6 @@ public class TSPAgent {
 	
 	public void reset(){
 		for(TransportChainAgent tca : transportChainAgents){
-			logger.info("reset tca");
 			tca.reset();
 		}
 	}
@@ -94,27 +94,26 @@ public class TSPAgent {
 	}
 
 	public void scoreSelectedPlan() {
-		double sumOfFees = calculateFees();
+		double sumOfFees = calculateFeesAndTransshipmentCosts();
 		double opportunityCosts = calculateOpportunityCosts();
-		//tsp.getSelectedPlan().setScore(cost * (-1));
+		double otherCosts = calculateOtherCosts();
+		tsp.getSelectedPlan().setScore((sumOfFees + opportunityCosts + otherCosts) * (-1));
 	}
 	
+	private double calculateOtherCosts() {
+		double cost = 0.0;
+		
+		return 0;
+	}
+
 	private double calculateOpportunityCosts() {
 		return 0;
 	}
 
-	private double calculateFees() {
+	private double calculateFeesAndTransshipmentCosts() {
 		double cost = 0.0;
 		for(TransportChainAgent tca : transportChainAgents){
-			cost += tca.getFees();
-		}
-		return cost;
-	}
-
-	private double calculateCost() {
-		double cost = 0.0;
-		for(Tuple<TSPShipment,Double> t : calculateCostsOfSelectedPlanPerShipment()) {
-			cost += t.getSecond();
+			cost += tca.getFees() + tca.getNumberOfStopps()*CostParameter.transshipmentCost;
 		}
 		return cost;
 	}

@@ -5,5 +5,7 @@ public interface CarrierCostFunction {
 	void init(CarrierImpl carrier);
 	
 	double calculateCost(CarrierVehicle carrierVehicle, double distance);
+	
+	double calculateCost(CarrierVehicle carrierVehicle, double distance, double time);
 
 }

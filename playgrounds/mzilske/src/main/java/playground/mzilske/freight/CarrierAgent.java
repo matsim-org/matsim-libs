@@ -10,6 +10,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -74,7 +75,15 @@ public class CarrierAgent {
 	private static Logger logger = Logger.getLogger(CarrierAgent.class);
 
 	private CarrierCostFunction costFunction;
+
+	private Network network;
+
+	private OfferMaker offerMaker;
 	
+	void setOfferMaker(OfferMaker offerMaker) {
+		this.offerMaker = offerMaker;
+	}
+
 	class CarrierDriverAgent {
 		
 		private int activityCounter = 0;
@@ -82,6 +91,11 @@ public class CarrierAgent {
 		private Id driverId;
 		
 		double distance = 0.0;
+		
+		double time = 0.0;
+		
+		double startTime = 0.0;
+		
 
 		private CarrierVehicle carrierVehicle;
 
@@ -90,8 +104,11 @@ public class CarrierAgent {
 			this.driverId = driverId;
 		}
 
-		public void activityOccurs(String activityType, double time) {
+		public void activityEndOccurs(String activityType, double time) {
 			Tour tour = driverTourMap.get(driverId).getTour();
+			if (FreightConstants.START.equals(activityType)){
+				startTime = time;
+			}
 			if (FreightConstants.PICKUP.equals(activityType)) {
 				TourElement tourElement = tour.getTourElements().get(activityCounter);
 				tracker.notifyPickup(tourElement.getShipment(), time);
@@ -103,9 +120,15 @@ public class CarrierAgent {
 			}
 		}
 
+		public void activityStartOccurs(String activityType, double time) {
+			if(FreightConstants.END.equals(activityType)){
+				time += time - startTime;
+			}
+			
+		}
+
 		public void tellDistance(double distance) {
 			this.distance += distance;
-			logger.info(driverId + " sOfDistance=" + this.distance/1000 + "km");
 		}
 		
 		public double getDistance(){
@@ -119,6 +142,16 @@ public class CarrierAgent {
 		private CarrierVehicle getCarrierVehicle() {
 			return carrierVehicle;
 		}
+
+		public void tellTraveltime(double time) {
+			this.time += time;
+		}
+
+		double getTime() {
+			return time;
+		}
+		
+		
 		
 	}
 
@@ -134,21 +167,18 @@ public class CarrierAgent {
 		for (ScheduledTour scheduledTour : carrier.getSelectedPlan().getScheduledTours()) {
 			Plan plan = new PlanImpl();
 			Activity startActivity = new ActivityImpl(FreightConstants.START, scheduledTour.getVehicle().getLocation());
-			logger.info("startActivity: " + startActivity);
 			startActivity.setEndTime(scheduledTour.getDeparture());
 			plan.addActivity(startActivity);
 			Leg startLeg = new LegImpl(TransportMode.car);
 			plan.addLeg(startLeg);
 			for (TourElement tourElement : scheduledTour.getTour().getTourElements()) {
 				Activity tourElementActivity = new ActivityImpl(tourElement.getActivityType(), tourElement.getLocation());
-				logger.info("tourActivity: " + tourElementActivity);
 				((ActivityImpl) tourElementActivity).setEndTime(tourElement.getTimeWindow().getStart());
 				plan.addActivity(tourElementActivity);
 				Leg leg = new LegImpl(TransportMode.car);
 				plan.addLeg(leg);
 			}
 			Activity endActivity = new ActivityImpl(FreightConstants.END, scheduledTour.getVehicle().getLocation());
-			logger.info("EndActivity: " + endActivity);
 			plan.addActivity(endActivity);
 			Id driverId = createDriverId();
 			Person driverPerson = createDriverPerson(driverId);
@@ -178,12 +208,22 @@ public class CarrierAgent {
 		return Collections.unmodifiableCollection(driverIds);
 	}
 
-	public void activityOccurs(Id personId, String activityType, double time) {
-		carrierDriverAgents.get(personId).activityOccurs(activityType, time);
+	public void activityStartOccurs(Id personId, String activityType, double time) {
+		carrierDriverAgents.get(personId).activityStartOccurs(activityType, time);
+		logger.info("driver had a start of an activity " + activityType + ", time=" + time);
+	}
+
+	public void activityEndOccurs(Id personId, String activityType, double time) {
+		carrierDriverAgents.get(personId).activityEndOccurs(activityType, time);
+		logger.info("driver had an end of an activity " + activityType + ", time=" + time);
 	}
 	
 	public void tellDistance(Id personId, double distance) {
 		carrierDriverAgents.get(personId).tellDistance(distance);
+	}
+	
+	public void tellTraveltime(Id personId, double time){
+		carrierDriverAgents.get(personId).tellTraveltime(time);
 	}
 
 	public void scoreSelectedPlan() {
@@ -196,19 +236,19 @@ public class CarrierAgent {
 		double cost = 0.0;
 		for (Id driverId : getDriverIds()) {
 			CarrierDriverAgent driver = carrierDriverAgents.get(driverId);
-			cost += costFunction.calculateCost(driver.getCarrierVehicle(), driver.getDistance());
+			cost += costFunction.calculateCost(driver.getCarrierVehicle(), driver.getDistance(), driver.getTime());
 		}
 		return cost;
 	}
 
 	public List<Tuple<Shipment, Double>> calculateCostsPerShipment() {
+		logger.info("carrierId="+carrier.getId());
 		List<Tuple<Shipment,Double>> listOfCostPerShipment = new ArrayList<Tuple<Shipment,Double>>();
 		for(Id driverId : driverIds){
 			ScheduledTour tour = driverTourMap.get(driverId);
-			logger.debug("allocating cost of driver "+driverId+", carrier "+carrier.getId());
 			costFunction.init(carrier);
 			CarrierDriverAgent carrierDriverAgent = carrierDriverAgents.get(driverId);
-			double cost = costFunction.calculateCost(carrierDriverAgent.getCarrierVehicle(), carrierDriverAgent.getDistance());
+			double cost = costFunction.calculateCost(carrierDriverAgent.getCarrierVehicle(), carrierDriverAgent.getDistance(), carrierDriverAgent.getTime());
 			List<Tuple<Shipment,Double>> listOfCostPerShipmentPerDriver = costAllocator.allocateCost(tour.getTour().getShipments(), cost);
 			listOfCostPerShipment.addAll(listOfCostPerShipmentPerDriver);
 		}
@@ -217,14 +257,24 @@ public class CarrierAgent {
 		}
 		for (Tuple<Shipment,Double> t : listOfCostPerShipment) {
 			memorizeCost(t.getFirst().getFrom(), t.getFirst().getTo(), t.getFirst().getSize(), t.getSecond());
+			logger.info("Ich bin carrier " + carrier.getId() + " and memorize the cost of shipment="+t.getFirst()+", cost="+t.getSecond());
 		}
 		return listOfCostPerShipment;
 	}
 
 	private void memorizeCost(Id from, Id to, int size, Double cost) {
 		CostTableKey key = new CostTableKey(from, to, size);
-		if (!costTable.containsKey(key) || costTable.get(key) > cost) {
+		if(!costTable.containsKey(key)){
 			costTable.put(key, cost);
+		}
+		else{
+			if(costTable.get(key) > cost){
+				costTable.put(key, cost);
+			}
+//			double oldCost = costTable.get(key);
+//			double learningRate = 0.5;
+//			double newCost = learningRate*cost + (1-learningRate)*oldCost;
+//			costTable.put(key, newCost);
 		}
 	}
 
@@ -255,29 +305,30 @@ public class CarrierAgent {
 	}
 
 	public Offer makeOffer(Id linkId, Id linkId2, int shipmentSize) {
+		if(requestIsNoGo(linkId,linkId2)){
+			return new NoOffer();
+		}
 		Offer offer = new Offer();
 		offer.setCarrierId(carrier.getId());
 		Double memorizedPrice = costTable.get(new CostTableKey(linkId, linkId2, shipmentSize));
-		double price;
-		if (memorizedPrice != null) {
-			price = memorizedPrice;
-			if (Math.random() < 0.05) {
-				double tenPercent = price * 0.1;
-				double verrauscht = Math.random() * tenPercent;
-				price = price + verrauscht * ( Math.random() < 0.5 ? -1 : 1);
-			}
-			System.out.println("Ich bin " + carrier.getId()+". Biete an: " + linkId + " nach " +linkId2 + " für " + price);
-		} else {
-			price = 10000.0 * Math.random();
-			System.out.println("Biete einen zufälligen Preis an, und zwar " + price);
+		return offerMaker.getOffer(linkId,linkId2,shipmentSize,memorizedPrice);
+	}
+
+	private boolean requestIsNoGo(Id linkId, Id linkId2) {
+		
+		if(carrier.getKnowledge().getNoGoLocations().contains(linkId2) || carrier.getKnowledge().getNoGoLocations().contains(linkId)){
+			return true;
 		}
-		offer.setPrice(price);
-		offer.setDuration(120.0);
-		return offer;
+		return false;
 	}
 
 	void setCostFunction(CarrierCostFunction costFunction) {
 		this.costFunction = costFunction;
+	}
+
+	public void setNetwork(Network network) {
+		this.network = network;
+		
 	}
 
 }
