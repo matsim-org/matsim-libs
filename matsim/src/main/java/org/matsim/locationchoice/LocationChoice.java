@@ -136,10 +136,7 @@ public class LocationChoice extends AbstractMultithreadedModule {
 
 
 	@Override
-	public PlanAlgorithm getPlanAlgoInstance() {
-		
-		MatsimRandom.reset();
-		
+	public PlanAlgorithm getPlanAlgoInstance() {		
 		// this is the way location choice should be configured ...
 		String algorithm = this.controler.getConfig().locationchoice().getAlgorithm();
 		if (!algorithm.equals("null")) {
