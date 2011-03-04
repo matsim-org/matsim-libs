@@ -180,6 +180,9 @@ public class LinkReplanningMap implements LinkEnterEventHandler,
 		replanningMap.remove(event.getPersonId());
 	}
 
+	/*
+	 * returns a List of Agents who might need a replanning
+	 */
 	public synchronized List<PersonAgent> getReplanningAgents(double time) {
 		// using the ArrayList is just a Workaround...
 		ArrayList<PersonAgent> agentsToReplanLeaveLink = new ArrayList<PersonAgent>();
@@ -209,7 +212,7 @@ public class LinkReplanningMap implements LinkEnterEventHandler,
 	}
 
 	/*
-	 * Returns a List of all Agents, that are currently performing an Activity.
+	 * Returns a List of all Agents, that are currently performing a Leg.
 	 */
 	public synchronized List<PersonAgent> getLegPerformingAgents() {
 		ArrayList<PersonAgent> legPerformingAgents = new ArrayList<PersonAgent>();

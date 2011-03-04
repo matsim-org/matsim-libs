@@ -208,6 +208,10 @@ public class ActivityReplanningMap implements AgentStuckEventHandler,
 		return activityPerformingAgents;
 	}
 
+	/*
+	 * TODO: find a better name
+	 * Returns a List of all agents that are going to end their activity right now
+	 */
 	public synchronized List<PersonAgent> getReplanningDriverAgents(double time) {
 		ArrayList<PersonAgent> personAgentsToReplanActivityEnd = new ArrayList<PersonAgent>();
 
