@@ -92,13 +92,21 @@ public class DestinationChoiceScoring {
 		double kf = Double.parseDouble(((ActivityFacilityImpl)facility).getDesc());
 		double kp = Double.parseDouble(person.getDesires().getDesc().split("_")[1]);
 		
-		long seed = (long) ((kp + kf) * Math.pow(2.0, 40));
+		/* long seed = (long) ((kp + kf) * Math.pow(2.0, 40)); 
+		/* This was not a good solution.
+		/* Multiply (kp x kf) with 100 such that we have a certain spread of the seed.
+		/* Var(kp)=Var(kf)=0.5; Var(kp+kf)= 1.0, no upper limit for Gumbel. */
+				
+		// I use now the uniform distribution for the generation of the k-values:
+		// kp= [0..1] kf=[0..1]
+		long seed = (long) ((kp * kf) * Long.MAX_VALUE);
 		rnd.setSeed(seed);
 				
-		for (int i = 0; i < 5; i++) {
-			rnd.nextGaussian();
-		}
 		if (configReader.isGumbel()) {
+			// take a few draws to come to the "chaotic region"
+			for (int i = 0; i < 5; i++) {
+				rnd.nextDouble();
+			}
 			double uniform = rnd.nextDouble();
 			// interval MUST be ]0,1[
 			while (uniform == 0.0 || uniform == 1.0) {
@@ -108,7 +116,11 @@ public class DestinationChoiceScoring {
 			//scale to sigma^2 = 1.0: sigma_gumbel = PI / sqrt(6.0)
 			return (r * Math.sqrt(6.0) / Math.PI);	
 		}
-		else {	
+		else {
+			// take a few draws to come to the "chaotic region"
+			for (int i = 0; i < 5; i++) {
+				rnd.nextGaussian();
+			}
 			return rnd.nextGaussian();	
 		}
 	}

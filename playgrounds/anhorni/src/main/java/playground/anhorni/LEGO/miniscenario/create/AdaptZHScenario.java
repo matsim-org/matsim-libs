@@ -67,17 +67,13 @@ public class AdaptZHScenario {
 		String facilitiesFilePath="src/main/java/playground/anhorni/input/zh10Pct/facilities_original.xml.gz";
 		String plansFilePath="src/main/java/playground/anhorni/input/zh10Pct/plans_original.xml.gz";
 
-		AdaptZHScenario plansCreator=new AdaptZHScenario(Long.parseLong(args[0]));
+		AdaptZHScenario plansCreator=new AdaptZHScenario();
 		plansCreator.init(plansFilePath, networkFilePath, facilitiesFilePath);
 		
 		plansCreator.run();			
 		log.info("Adaptation finished -----------------------------------------");
 	}
-	
-	public AdaptZHScenario(long seed) {
-		this.seed = seed;
-	}
-	
+		
 	private void init(final String plansFilePath, final String networkFilePath, final String facilitiesFilePath) {
 		new MatsimNetworkReader(scenario).readFile(networkFilePath);		
 		new FacilitiesReaderMatsimV1(scenario).readFile(facilitiesFilePath);
