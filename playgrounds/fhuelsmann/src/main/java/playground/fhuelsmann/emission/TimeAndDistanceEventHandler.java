@@ -75,11 +75,7 @@ ActivityEndEventHandler,ActivityStartEventHandler{
 	private  Map<Id, Double> startTime = new TreeMap<Id, Double>();
 
 	
-	public Map<Id,Map<Integer,DistanceObject>> coldDistance  =
-		new TreeMap<Id,Map<Integer,DistanceObject>>();
-
-	public Map<Id,Map<Integer,ParkingTimeObject>> parkingTime  =
-		new TreeMap<Id,Map<Integer,ParkingTimeObject>>();
+	
 
 	public void reset(int iteration) {
 
@@ -110,12 +106,19 @@ ActivityEndEventHandler,ActivityStartEventHandler{
 		if (this.accumulate.containsKey(personId) && this.startTime.containsKey(personId)){
 		
 			
-			double actEnd = this.activityend.get(personId);// EndTime
-			double actDuration =  actEnd - this.startTime.get(personId);
+//			double actEnd = this.activityend.get(personId);// EndTime
+	//		double actDuration =  actEnd - this.startTime.get(personId);
 			try {
-				double TotalDistance =  this.accumulate.get(personId) + distance;
+				double TotalDistance =  this.accumulate.get(personId);//without Distance of LinkID of startact
+
+				//String id = event.getPersonId().toString();
+//				if(id.contains("557446.1#1898"))				
+//					System.out.println("TotalDistance" +TotalDistance);
+	
+				double actDuration = this.startTime.get(personId);
+				double actStart= event.getTime();
 				this.coldstartAnalyseModul.calculateColdEmissionsPerLink(personId, actDuration, TotalDistance, this.hbefaColdTable);
-				//System.out.println("personId "+ personId + " actEnd " +actEnd+ " actDuration " + actDuration+ " Distance " + TotalDistance );
+	//		System.out.println("personId "+ personId + " actStart " +actStart+ " actDuration " + actDuration+ " Distance " + TotalDistance );
 				this.accumulate.remove(personId);
 			} catch (IOException e) {
 					// TODO Auto-generated catch block
@@ -133,9 +136,20 @@ ActivityEndEventHandler,ActivityStartEventHandler{
 	
 	
 	public void handleEvent(ActivityEndEvent  event) {
-	
+		Id personId= event.getPersonId();
+		Id linkId = event.getLinkId();
 		this.activityend.put(event.getPersonId(), event.getTime());
+		
+		if (this.startTime.containsKey(personId)){
+		double actstart = this.activitystart.get(personId);// EndTime
+		double actDuration = event.getTime() - actstart;
+		this.startTime.put(personId, actDuration);
 
+		//		String id = event.getPersonId().toString();
+//		if(id.contains("557446.1#1898"))	
+//			System.out.println("startTime" +event.getTime()+"actDuration" + actDuration);
+		}
+		
 	}
 	
 	
@@ -153,12 +167,10 @@ ActivityEndEventHandler,ActivityStartEventHandler{
 			
 			double oldValue = this.accumulate.get(personId);
 			this.accumulate.put(personId, oldValue + distance);
-			//System.out.println(personId);
-			//String id = event.getPersonId().toString();
-		//	if(id.contains("557568.2#8771"))
-				
 			
-			//System.out.println(event.getLinkId()+"   "+distance);
+//		String id = event.getPersonId().toString();
+//		if(id.contains("557446.1#1898"))		
+//			System.out.println(event.getLinkId()+"   "+distance);
 		
 		}else {
 			this.accumulate.put(personId, distance);
