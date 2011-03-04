@@ -20,6 +20,7 @@
 
 package org.matsim.core.replanning.modules;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.MatsimRandom;
@@ -47,16 +48,21 @@ import org.matsim.population.algorithms.PlanAlgorithm;
  */
 public class ChangeLegMode extends AbstractMultithreadedModule {
 
+	private final static Logger log = Logger.getLogger(ChangeLegMode.class);
+
 	/*package*/ final static String CONFIG_MODULE = "changeLegMode";
 	/*package*/ final static String CONFIG_PARAM_MODES = "modes";
+	/*package*/ final static String CONFIG_PARAM_IGNORECARAVAILABILITY = "ignoreCarAvailability";
 
 	private String[] availableModes = new String[] { TransportMode.car, TransportMode.pt };
+	private boolean ignoreCarAvailability = true;
 
 	public ChangeLegMode(final Config config) {
 		super(config.global().getNumberOfThreads());
 
 		// try to get the modes from the "changeLegMode" module of the config file
 		String modes = config.findParam(CONFIG_MODULE, CONFIG_PARAM_MODES);
+		String ignorance = config.findParam(CONFIG_MODULE, CONFIG_PARAM_IGNORECARAVAILABILITY);
 
 		// if there was anything in there, replace the default availableModes by the entries in the config file:
 		if (modes != null) {
@@ -67,11 +73,18 @@ public class ChangeLegMode extends AbstractMultithreadedModule {
 			}
 		}
 
+		if (ignorance != null) {
+			this.ignoreCarAvailability = Boolean.parseBoolean(ignorance);
+			log.info("using ignoreCarAvailability from configuration: " + this.ignoreCarAvailability);
+		}
+
 	}
 
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
-		return new ChooseRandomLegMode(this.availableModes, MatsimRandom.getLocalInstance());
+		ChooseRandomLegMode algo = new ChooseRandomLegMode(this.availableModes, MatsimRandom.getLocalInstance());
+		algo.setIgnoreCarAvailability(this.ignoreCarAvailability);
+		return algo;
 	}
 
 }

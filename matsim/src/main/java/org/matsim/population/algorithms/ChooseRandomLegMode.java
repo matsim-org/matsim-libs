@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.population.PersonImpl;
 
 /**
  * Changes the transportation mode of all legs in a plan to a randomly chosen
@@ -39,6 +40,7 @@ import org.matsim.core.gbl.MatsimRandom;
 public class ChooseRandomLegMode implements PlanAlgorithm {
 
 	private final String[] possibleModes;
+	private boolean ignoreCarAvailability = true;
 
 	private final Random rng;
 
@@ -54,17 +56,42 @@ public class ChooseRandomLegMode implements PlanAlgorithm {
 		new PlanAnalyzeSubtours();
 	}
 
+	public void setIgnoreCarAvailability(boolean ignoreCarAvailability) {
+		this.ignoreCarAvailability = ignoreCarAvailability;
+	}
+
 	@Override
 	public void run(final Plan plan) {
 		List<PlanElement> tour = plan.getPlanElements();
-		changeToRandomLegMode(tour);
+		changeToRandomLegMode(tour, plan);
 	}
 
-	private void changeToRandomLegMode(List<PlanElement> tour) {
+	private void changeToRandomLegMode(List<PlanElement> tour, Plan plan) {
 		if (tour.size() > 1) {
+			boolean forbidCar = false;
+			if (!this.ignoreCarAvailability) {
+				String carAvail = ((PersonImpl) plan.getPerson()).getCarAvail();
+				if ("never".equals(carAvail)) {
+					forbidCar = true;
+				}
+			}
+
 			final String currentMode = getTransportMode(tour);
-			int newModeIdx = chooseModeOtherThan(currentMode);
-			String newMode = this.possibleModes[newModeIdx];
+
+			String newMode = currentMode;
+			while (true) {
+				int newModeIdx = chooseModeOtherThan(currentMode);
+				newMode = this.possibleModes[newModeIdx];
+				if (!(forbidCar && TransportMode.car.equals(newMode))) {
+					break;
+				} else {
+					if (this.possibleModes.length == 2) {
+						newMode = currentMode; // there is no other mode available
+						break;
+					}
+				}
+			}
+
 			changeLegModeTo(tour, newMode);
 		}
 	}

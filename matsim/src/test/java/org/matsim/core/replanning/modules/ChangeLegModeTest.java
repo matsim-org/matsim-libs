@@ -23,9 +23,12 @@ package org.matsim.core.replanning.modules;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
@@ -34,6 +37,8 @@ import org.matsim.testcases.MatsimTestCase;
  * @author mrieser
  */
 public class ChangeLegModeTest extends MatsimTestCase {
+
+	private final static Logger log = Logger.getLogger(ChangeLegModeTest.class);
 
 	public void testDefaultModes() {
 		Config config = loadConfig(null);
@@ -52,6 +57,36 @@ public class ChangeLegModeTest extends MatsimTestCase {
 		final ChangeLegMode module = new ChangeLegMode(config);
 		final String[] modes = new String[] {TransportMode.car, TransportMode.pt, TransportMode.bike, TransportMode.walk};
 		runTest(module, modes);
+	}
+
+	public void testWithConfig_withoutIgnoreCarAvailability() {
+		Config config = loadConfig(null);
+		config.global().setNumberOfThreads(0);
+		config.setParam(ChangeLegMode.CONFIG_MODULE, ChangeLegMode.CONFIG_PARAM_MODES, "car,pt,walk");
+		config.setParam(ChangeLegMode.CONFIG_MODULE, ChangeLegMode.CONFIG_PARAM_IGNORECARAVAILABILITY, "false");
+
+		final ChangeLegMode module = new ChangeLegMode(config);
+		final String[] modes = new String[] {TransportMode.car, TransportMode.pt, TransportMode.walk};
+
+		module.prepareReplanning();
+		PersonImpl person = new PersonImpl(new IdImpl(1));
+		person.setCarAvail("never");
+		PlanImpl plan = new org.matsim.core.population.PlanImpl(person);
+		plan.createAndAddActivity("home", new CoordImpl(0, 0));
+		Leg leg = plan.createAndAddLeg(TransportMode.pt);
+		plan.createAndAddActivity("work", new CoordImpl(0, 0));
+
+		HashMap<String, Integer> counter = new HashMap<String, Integer>();
+		for (String mode : modes) {
+			counter.put(mode, Integer.valueOf(0));
+		}
+
+		for (int i = 0; i < 100; i++) {
+			module.handlePlan(plan);
+			Integer count = counter.get(leg.getMode());
+			counter.put(leg.getMode(), Integer.valueOf(count.intValue() + 1));
+		}
+		assertEquals(0, counter.get("car").intValue());
 	}
 
 	private void runTest(final ChangeLegMode module, final String[] possibleModes) {
