@@ -41,10 +41,7 @@ public class MixedScoringFunctionFactory extends org.matsim.core.scoring.charypa
 		this.configReader = configReader;
 	}
 
-	public ScoringFunction createNewScoringFunction(Plan plan) {
-		
-		MatsimRandom.reset();
-		
+	public ScoringFunction createNewScoringFunction(Plan plan) {		
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 		
 		this.scoringFunction = new MixedActivityScoringFunction((PlanImpl)plan, super.getParams(), this.controler.getFacilities(), 
