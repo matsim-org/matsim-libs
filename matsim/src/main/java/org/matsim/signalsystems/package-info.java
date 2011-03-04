@@ -69,11 +69,11 @@
  * An example of an adaptive SignalControll implementation can be found in the package 
  * playground.dgrether.signalsystems.roedergershenson in the playground project. 
  * 
- *  @see org.matsim.signalsystems.data.package-info.java
- *  @see org.matsim.signalsystems.model.package-info.java
- *  @see org.matsim.signalsystems.builder.package-info.java
- *  @see org.matsim.signalsystems.mobsim.package-info.java
- *  @see org.matsim.signalsystems.controler.package-info.java
+ *  @see org.matsim.signalsystems.data.package-info
+ *  @see org.matsim.signalsystems.model.package-info
+ *  @see org.matsim.signalsystems.builder.package-info
+ *  @see org.matsim.signalsystems.mobsim.package-info
+ *  @see org.matsim.signalsystems.controler.package-info
  *  
  *  
  * <h2>Package Maintainer(s):</h2>
