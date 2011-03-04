@@ -2,7 +2,8 @@ package org.matsim.locationchoice.bestresponse;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.NavigableMap;
+import java.util.Map.Entry;
+import java.util.SortedMap;
 import java.util.Random;
 import java.util.TreeMap;
 import java.util.Vector;
@@ -26,7 +27,7 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
 
 public class ChoiceSet {
-	
+		
 	// *************************************
 	private final double exponent = 3.0;
 	private int numberOfAlternatives = 30;
@@ -81,15 +82,22 @@ public class ChoiceSet {
 			Coord coordPre, Coord coordPost, ActivityFacilities facilities, Random random, 
 			ScoringFunctionAccumulator scoringFunction, Plan plan, TravelTime travelTime, TravelCost travelCost) {
 				
-		NavigableMap<Double, Id> map = this.createChoiceSet(actlegIndex, person, coordPre, coordPost, facilities, scoringFunction, plan, travelTime, travelCost);
+		SortedMap<Double, Id> map = this.createChoiceSet(actlegIndex, person, coordPre, coordPost, facilities, scoringFunction, plan, travelTime, travelCost);
 		
 		// score 0 is included as random range = 0.0d (inclusive) to 1.0d (exclusive)
 		// TODO: Do I have to modify the seed here by the iteration number (i.e., do we in every iteration chose the same value)?
 		double randomScore = random.nextDouble();
-		return map.higherEntry(randomScore - 0.00001).getValue();
+		
+		Id id = map.get(map.firstKey());
+		for (Entry<Double, Id> entry : map.entrySet()) {
+	        if (entry.getKey() > randomScore + 0.000000000000000001) {
+	        	id = entry.getValue();
+	        }
+	    }
+		return id;
 	}
 	
-	private NavigableMap<Double,Id> createChoiceSet(int actlegIndex, Person person,
+	private SortedMap<Double,Id> createChoiceSet(int actlegIndex, Person person,
 			Coord coordPre, Coord coordPost, ActivityFacilities facilities, ScoringFunctionAccumulator scoringFunction,
 			Plan plan, TravelTime travelTime, TravelCost travelCost) {
 		
@@ -113,7 +121,7 @@ public class ChoiceSet {
 		fromNode = network.getLinks().get(nextActivity.getLinkId()).getToNode();
 		((BackwardDijkstraMultipleDestinations)leastCostPathCalculatorBackward).calcLeastCostTree(fromNode, -1.0);
 		
-		NavigableMap<Double,Id> map = new TreeMap<Double,Id>();						
+		TreeMap<Double,Id> map = new TreeMap<Double,Id>(java.util.Collections.reverseOrder());						
 		// if no epsilons are used!
 		double largestValue = -1.0 * Double.MAX_VALUE;
 		Id facilityIdWithLargestScore = act.getFacilityId();
@@ -143,7 +151,7 @@ public class ChoiceSet {
 		
 		// find the sum of the scores to normalize scores
 		double totalScore = this.getTotalScore(map, (largestValue < 0.0));
-		NavigableMap<Double,Id> mapCorrected = this.generateReducedChoiceSet(map, totalScore, (largestValue < 0.0));
+		SortedMap<Double,Id> mapCorrected = this.generateReducedChoiceSet(map, totalScore, (largestValue < 0.0));
 				
 		// score 0 is included as random range = 0.0d (inclusive) to 1.0d (exclusive)
 		// TODO: Do I have to modify the seed here by the iteration number (i.e., do we in every iteration chose the same value)?
@@ -157,10 +165,10 @@ public class ChoiceSet {
 		}
 	}
 	
-	private double getTotalScore(NavigableMap<Double,Id> map, boolean negativeLargestValue) {
+	private double getTotalScore(TreeMap<Double,Id> map, boolean negativeLargestValue) {
 		int n = 0;
 		double totalScore = 0.0;
-		for (Double key : map.descendingKeySet()) {
+		for (Double key : map.keySet()) {
 			if (n >= numberOfAlternatives) break;			
 			double score = Math.pow(key, exponent);
 			if (negativeLargestValue) {
@@ -175,11 +183,11 @@ public class ChoiceSet {
 		return totalScore;
 	}
 	
-	private NavigableMap<Double,Id> generateReducedChoiceSet(NavigableMap<Double,Id> map, double totalScore, boolean negativeLargestValue) {
-		NavigableMap<Double,Id> mapNormalized = new TreeMap<Double,Id>();
+	private TreeMap<Double,Id> generateReducedChoiceSet(SortedMap<Double,Id> map, double totalScore, boolean negativeLargestValue) {
+		TreeMap<Double,Id> mapNormalized = new TreeMap<Double,Id>(java.util.Collections.reverseOrder());
 		int n = 0;
 		double sumScore = 0.0;
-		for (Double key : map.descendingKeySet()) {
+		for (Double key : map.keySet()) {
 			if (n >= numberOfAlternatives) break;
 			double score = Math.pow(key, exponent);
 			
