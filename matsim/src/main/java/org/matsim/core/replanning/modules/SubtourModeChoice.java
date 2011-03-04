@@ -77,15 +77,18 @@ public class SubtourModeChoice extends AbstractMultithreadedModule {
 	}
 	
 	private PermissibleModesCalculator permissibleModesCalculator;
+	
 	private String[] chainBasedModes;
+	
+	private String[] modes;
 	
 	public SubtourModeChoice(final Config config) {
 		super(config.global().getNumberOfThreads());
-		String modes = config.findParam(CONFIG_MODULE, CONFIG_PARAM_MODES);
+		String configModes = config.findParam(CONFIG_MODULE, CONFIG_PARAM_MODES);
 		String chainBasedModes = config.findParam(CONFIG_MODULE, CONFIG_PARAM_CHAINBASEDMODES);
-		String[] availableModes = explodeModesWithDefaults(modes, DEFAULT_AVAILABLE_MODES);
+		this.modes = explodeModesWithDefaults(configModes, DEFAULT_AVAILABLE_MODES);
 		this.chainBasedModes = explodeModesWithDefaults(chainBasedModes, DEFAULT_CHAIN_BASED_MODES);
-		this.permissibleModesCalculator = new AllowTheseModesForEveryone(availableModes);
+		this.permissibleModesCalculator = new AllowTheseModesForEveryone(this.modes);
 	}
 
 	private String[] explodeModesWithDefaults(String modes, String[] defaults) {
@@ -104,7 +107,7 @@ public class SubtourModeChoice extends AbstractMultithreadedModule {
 
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
-		ChooseRandomLegModeForSubtour chooseRandomLegMode = new ChooseRandomLegModeForSubtour(this.permissibleModesCalculator, this.chainBasedModes, MatsimRandom.getLocalInstance());
+		ChooseRandomLegModeForSubtour chooseRandomLegMode = new ChooseRandomLegModeForSubtour(this.permissibleModesCalculator, this.modes, this.chainBasedModes, MatsimRandom.getLocalInstance());
 		chooseRandomLegMode.setTripStructureAnalysisLayer(TripStructureAnalysisLayerOption.link);
 		return chooseRandomLegMode;
 	}

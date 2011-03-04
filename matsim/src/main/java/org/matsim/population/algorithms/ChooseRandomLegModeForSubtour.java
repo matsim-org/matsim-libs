@@ -55,6 +55,8 @@ public class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 		String newTransportMode;
 	}
 
+	private Collection<String> modes;
+
 	private final Collection<String> chainBasedModes;
 
 	private final Random rng;
@@ -69,8 +71,9 @@ public class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 	
 	private Plan plan;
 
-	public ChooseRandomLegModeForSubtour(final PermissibleModesCalculator permissibleModesCalculator, String[] chainBasedModes, final Random rng) {
+	public ChooseRandomLegModeForSubtour(final PermissibleModesCalculator permissibleModesCalculator, String[] modes, String[] chainBasedModes, final Random rng) {
 		this.permissibleModesCalculator = permissibleModesCalculator;
+		this.modes = Arrays.asList(modes);
 		this.chainBasedModes = Arrays.asList(chainBasedModes);
 		this.rng = rng;
 		this.planAnalyzeSubtours = new PlanAnalyzeSubtours();
@@ -109,6 +112,9 @@ public class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 				continue;
 			}
 			List<PlanElement> subTour = planAnalyzeSubtours.getSubtours().get(subTourIndex);
+			if (containsUnknownMode(subTour)) {
+				continue;
+			}
 			Set<String> usableChainBasedModes = new HashSet<String>();
 			Id subtourStartLocation;
 			if (tripStructureAnalysisLayer == TripStructureAnalysisLayerOption.link) {
@@ -151,6 +157,18 @@ public class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 			}
 		}
 		return choiceSet;
+	}
+
+	private boolean containsUnknownMode(List<PlanElement> subTour) {
+		for (PlanElement planElement : subTour) {
+			if (planElement instanceof Leg) {
+				Leg leg = (Leg) planElement;
+				if (!modes.contains(leg.getMode())) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	private boolean isMassConserving(List<PlanElement> subTour) {
