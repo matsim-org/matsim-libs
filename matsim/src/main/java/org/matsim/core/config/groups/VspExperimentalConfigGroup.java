@@ -98,23 +98,7 @@ public class VspExperimentalConfigGroup extends Module {
 
 	@Override
 	public String getValue(final String key) {
-		/* if (USE_ACTIVITY_DURATIONS.equalsIgnoreCase(key)) {
-			return Boolean.toString(this.isUseActivityDurations());
-		} else */ 
-		if (ACTIVITY_DURATION_INTERPRETATION.equalsIgnoreCase(key)) 
-			throw new RuntimeException(" use direct getter; aborting ... " ) ;
-//			return this.getActivityDurationInterpretation() ;
-		else if ( COLORING.equalsIgnoreCase(key) )
-			return this.coloring ;
-		else if (INPUT_MZ05_FILE.equalsIgnoreCase(key))
-			return this.getInputMZ05File();
-		else if (MODES_FOR_SUBTOURMODECHOICE.equalsIgnoreCase(key))
-			return this.getModesForSubTourModeChoice();
-		else if (CHAIN_BASED_MODES.equalsIgnoreCase(key))
-			return this.getChainBasedModes();
-		else if (OFFSET_WALK.equalsIgnoreCase(key))
-			return Double.toString(this.getOffsetWalk());
-		throw new IllegalArgumentException(key);
+		throw new RuntimeException(" use direct getter; aborting ... " ) ;
 	}
 
 	@Override
@@ -136,8 +120,11 @@ public class VspExperimentalConfigGroup extends Module {
 			this.setModesForSubTourModeChoice(value);
 		else if (CHAIN_BASED_MODES.equalsIgnoreCase(key))
 			this.setChainBasedModes(value);
-		else if (OFFSET_WALK.equalsIgnoreCase(key))
-			this.setOffsetWalk(Double.parseDouble(value));
+		else if (OFFSET_WALK.equalsIgnoreCase(key)) {
+//			this.setOffsetWalk(Double.parseDouble(value));
+			throw new RuntimeException( "offsetWalk in vspExperimentalConfigGroup is no longer; use the (alternative-specific) " +
+					"constants in planCalcScore.  Aborting since you need to fix this ..." ) ;
+		}
 		else {
 			throw new IllegalArgumentException(key);
 		}
@@ -149,14 +136,14 @@ public class VspExperimentalConfigGroup extends Module {
 //		map.put(USE_ACTIVITY_DURATIONS, isUseActivityDurations() );
 		map.put(ACTIVITY_DURATION_INTERPRETATION, getActivityDurationInterpretation()) ;
 
-		map.put(INPUT_MZ05_FILE, getValue(INPUT_MZ05_FILE));
+		map.put(INPUT_MZ05_FILE, this.getInputMZ05File() ) ;
 
-		map.put(MODES_FOR_SUBTOURMODECHOICE, getValue(MODES_FOR_SUBTOURMODECHOICE));
-		map.put(CHAIN_BASED_MODES, getValue(CHAIN_BASED_MODES));
+		map.put(MODES_FOR_SUBTOURMODECHOICE, this.getModesForSubTourModeChoice() ) ;
+		map.put(CHAIN_BASED_MODES, this.getChainBasedModes() );
 
-		map.put(OFFSET_WALK, getValue(OFFSET_WALK));
+//		map.put(OFFSET_WALK, Double.toString( this.getOffsetWalk() ) );
 		
-		map.put(COLORING, getValue(COLORING)) ;
+		map.put(COLORING, this.getChainBasedModes() ) ;
 		return map;
 	}
 
@@ -199,13 +186,13 @@ public class VspExperimentalConfigGroup extends Module {
 		this.chainBasedModes = chainBasedModes;
 	}
 
-	public double getOffsetWalk() {
-		return this.offsetWalk;
-	}
+//	public double getOffsetWalk() {
+//		return this.offsetWalk;
+//	}
 
-	public void setOffsetWalk(final double offsetWalk) {
-		this.offsetWalk = offsetWalk;
-	}
+//	public void setOffsetWalk(final double offsetWalk) {
+//		this.offsetWalk = offsetWalk;
+//	}
 
 	public String getActivityDurationInterpretation() {
 		return activityDurationInterpretation;

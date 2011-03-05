@@ -41,7 +41,8 @@ public class PlansDumping implements BeforeMobsimListener {
 	@Override
 	public void notifyBeforeMobsim(final BeforeMobsimEvent event) {
 		Controler controler = event.getControler();
-		if ((event.getIteration() % 10 == 0) || (event.getIteration() == (controler.getFirstIteration() + 1))) {
+		if ((event.getIteration() % controler.getWritePlansInterval() == 0) 
+				|| (event.getIteration() == (controler.getFirstIteration() + 1))) {
 			controler.stopwatch.beginOperation("dump all plans");
 			log.info("dumping plans...");
 			new PopulationWriter(controler.getPopulation(), controler.getNetwork(), controler.getScenario().getKnowledges())

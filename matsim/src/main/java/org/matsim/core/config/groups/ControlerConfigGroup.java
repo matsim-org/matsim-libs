@@ -47,6 +47,7 @@ public class ControlerConfigGroup extends Module {
 	private static final String LINKTOLINK_ROUTING_ENABLED = "enableLinkToLinkRouting";
 	/*package*/ static final String EVENTS_FILE_FORMAT = "eventsFileFormat";
 	private static final String WRITE_EVENTS_INTERVAL = "writeEventsInterval";
+	private static final String WRITE_PLANS_INTERVAL = "writeEventsInterval";
 	/*package*/ static final String MOBSIM = "mobsim";
 
 	private String outputDirectory = "./output";
@@ -61,6 +62,7 @@ public class ControlerConfigGroup extends Module {
 	private Set<EventsFileFormat> eventsFileFormats = Collections.unmodifiableSet(EnumSet.of(EventsFileFormat.txt));
 
 	private int writeEventsInterval=1;
+	private int writePlansInterval=1;
 
 	private String mobsim = null;
 
@@ -94,7 +96,8 @@ public class ControlerConfigGroup extends Module {
 			}
 			return str.toString();
 		} else if (WRITE_EVENTS_INTERVAL.equals(key)) {
-			return Integer.toString(getWriteEventsInterval());
+			throw new RuntimeException("use direct getter.  Aborting ..." ) ;
+//			return Integer.toString(getWriteEventsInterval());
 		} else if (MOBSIM.equals(key)) {
 			return getMobsim();
 		} else {
@@ -138,6 +141,8 @@ public class ControlerConfigGroup extends Module {
 			this.eventsFileFormats = formats;
 		} else if (WRITE_EVENTS_INTERVAL.equals(key)) {
 			setWriteEventsInterval(Integer.parseInt(value));
+		} else if (WRITE_PLANS_INTERVAL.equals(key)) {
+			setWritePlansInterval(Integer.parseInt(value));
 		} else if (MOBSIM.equals(key)) {
 			setMobsim(value);
 		} else {
@@ -155,7 +160,8 @@ public class ControlerConfigGroup extends Module {
 		map.put(RUNID, getValue(RUNID));
 		map.put(LINKTOLINK_ROUTING_ENABLED, Boolean.toString(this.isLinkToLinkRoutingEnabled()));
 		map.put(EVENTS_FILE_FORMAT, getValue(EVENTS_FILE_FORMAT));
-		map.put(WRITE_EVENTS_INTERVAL, getValue(WRITE_EVENTS_INTERVAL));
+		map.put(WRITE_EVENTS_INTERVAL, Integer.toString(this.getWriteEventsInterval()) );
+		map.put(WRITE_PLANS_INTERVAL, Integer.toString(this.getWritePlansInterval()) );
 		map.put(MOBSIM, getValue(MOBSIM));
 		return map;
 	}
@@ -166,7 +172,10 @@ public class ControlerConfigGroup extends Module {
 		map.put(ROUTINGALGORITHM_TYPE, "The type of routing (least cost path) algorithm used, may have the values: " + RoutingAlgorithmType.Dijkstra + " or " + RoutingAlgorithmType.AStarLandmarks);
 		map.put(RUNID, "An identifier for the current run which is used as prefix for output files and mentioned in output xml files etc.");
 		map.put(EVENTS_FILE_FORMAT, "Specifies the file format for writing events. Currently supported: txt, xml. Multiple values can be specified separated by commas (',').");
-		map.put(WRITE_EVENTS_INTERVAL, "iterationNumber % writeEventsInterval == 0 defines in which iterations events are written to a file. `0' disables events writing completely.");
+		map.put(WRITE_EVENTS_INTERVAL, "iterationNumber % writeEventsInterval == 0 defines in which iterations events are written " +
+				"to a file. `0' disables events writing completely.");
+		map.put(WRITE_PLANS_INTERVAL, "iterationNumber % writePlansInterval == 0 defines (hopefully) in which iterations plans are " +
+				"written to a file. `0' disables plans writing completely.  Some plans in early iterations are always written");
 		map.put(MOBSIM, "Defines which mobility simulation will be used. Currently supported: queueSimulation, qsim, jdeqsim, multimodalQSim");
 		return map;
 	}
@@ -243,5 +252,13 @@ public class ControlerConfigGroup extends Module {
 
 	public void setMobsim(String mobsim) {
 		this.mobsim = mobsim;
+	}
+
+	public int getWritePlansInterval() {
+		return writePlansInterval;
+	}
+
+	public void setWritePlansInterval(int writePlansInterval) {
+		this.writePlansInterval = writePlansInterval;
 	}
 }

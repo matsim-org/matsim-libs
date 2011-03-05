@@ -178,11 +178,15 @@ public abstract class CharyparNagelScoringFunctionTest extends ScoringFunctionTe
 	public void testTraveling() {
 		this.config.planCalcScore().setTraveling_utils_hr(-6.0);
 		assertEquals(-3.0, calcScore(), EPSILON);
+		this.config.planCalcScore().setConstantCar(-6.0) ;
+		assertEquals(-9.0, calcScore(), EPSILON);
 	}
 
 	public void testTravelingPt() {
 		this.config.planCalcScore().setTravelingPt_utils_hr(-9.0);
 		assertEquals(-2.25, calcScore(), EPSILON);
+		this.config.planCalcScore().setConstantPt(-3.0) ;
+		assertEquals(-5.25, calcScore(), EPSILON);
 	}
 
 	/**

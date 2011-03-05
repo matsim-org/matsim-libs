@@ -58,11 +58,12 @@ import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.config.consistency.ConfigConsistencyCheckerImpl;
 import org.matsim.core.config.groups.ControlerConfigGroup;
+import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.config.groups.SimulationConfigGroup;
+import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.controler.corelisteners.EventsHandling;
 import org.matsim.core.controler.corelisteners.LegHistogramListener;
 import org.matsim.core.controler.corelisteners.PlansDumping;
@@ -117,6 +118,7 @@ import org.matsim.counts.Counts;
 import org.matsim.households.HouseholdsWriterV10;
 import org.matsim.lanes.LaneDefinitionsWriter20;
 import org.matsim.locationchoice.facilityload.FacilityPenalty;
+import org.matsim.population.VspPlansCleaner;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
 import org.matsim.population.algorithms.PersonPrepareForSim;
@@ -197,6 +199,7 @@ public class Controler {
 	 * completely.
 	 */
 	/* package */int writeEventsInterval = -1;
+	/* package */int writePlansInterval = -1;
 
 	/* default analyses */
 	/* package */CalcLinkStats linkStats = null;
@@ -642,6 +645,9 @@ public class Controler {
 		if (this.writeEventsInterval == -1) {
 			this.writeEventsInterval = this.config.controler().getWriteEventsInterval();
 		}
+		if ( this.writePlansInterval == -1 ) {
+			this.writePlansInterval = this.config.controler().getWritePlansInterval();
+		}
 	}
 
 	/**Design decisions:<ul>
@@ -837,6 +843,12 @@ public class Controler {
 		if (this.config.scenario().isUseSignalSystems()){
 			addControlerListener(this.signalsFactory.createSignalsControllerListener());
 		}
+		
+		if ( ! config.vspExperimental().getActivityDurationInterpretation()
+				.equals(VspExperimentalConfigGroup.MIN_OF_DURATION_AND_END_TIME) ) {
+			addControlerListener( new VspPlansCleaner() ) ;
+		}
+
 	}
 
 	private void addPtCountControlerListener() {
@@ -1372,6 +1384,10 @@ public class Controler {
 
 	public void setTransitRouterFactory(TransitRouterFactory transitRouterFactory) {
 		this.transitRouterFactory = transitRouterFactory;
+	}
+
+	public int getWritePlansInterval() {
+		return writePlansInterval;
 	}
 
 }

@@ -61,6 +61,12 @@ public class PlanCalcScoreConfigGroup extends Module {
 	private static final String TRAVELING_BIKE = "travelingBike";
 	private static final String TRAVELING_WALK = "travelingWalk";
 	private static final String WAITING  = "waiting";
+	
+	private static final String CONSTANT_CAR = "constantCar" ;
+	private static final String CONSTANT_BIKE = "constantBike" ;
+	private static final String CONSTANT_WALK = "constantWalk" ;
+	private static final String CONSTANT_PT = "constantPt" ;
+	
 
 	@Deprecated // this will eventually be removed from core matsim; please find other ways to use this.  kai/benjamin, oct/10
 	private static final String MARGINAL_UTL_OF_DISTANCE_CAR = "marginalUtlOfDistanceCar";
@@ -99,7 +105,12 @@ public class PlanCalcScoreConfigGroup extends Module {
 	private double travelingPt = -6.0;
 	private double travelingWalk = -6.0;
 	private double travelingBike = -6.0;
-
+	
+	private double constantCar  = 0. ; // "0." for backwards compatibility
+	private double constantWalk = 0. ; //  
+	private double constantPt   = 0. ;
+	private double constantBike = 0. ;
+	
 //	@Deprecated // this will eventually be removed from core matsim; please find other ways to use this.  kai/benjamin, oct/10
 //	private double marginalUtlOfDistanceCar = 0.0;
 //	@Deprecated // this will eventually be removed from core matsim; please find other ways to use this.  kai/benjamin, oct/10
@@ -117,60 +128,9 @@ public class PlanCalcScoreConfigGroup extends Module {
 	private final HashMap<String, ActivityParams> activityTypes = new LinkedHashMap<String, ActivityParams>();
 	private final HashMap<String, ActivityParams> activityTypesByNumber = new HashMap<String, ActivityParams>();
 
-	private static String GETVALUE_ACCESS_DISABLED="getValue access disabled for scoring function params; pls use direct getters.  kai, nov'10" ;
 	@Override
 	public String getValue(final String key) {
-		if (LEARNING_RATE.equals(key)) {
-			throw new RuntimeException( GETVALUE_ACCESS_DISABLED ) ;
-//			return Double.toString(getLearningRate());
-		} else if (BRAIN_EXP_BETA.equals(key)) {
-			throw new RuntimeException( GETVALUE_ACCESS_DISABLED ) ;
-//			return Double.toString(getBrainExpBeta());
-		} else if (PATH_SIZE_LOGIT_BETA.equals(key)) {
-			throw new RuntimeException( GETVALUE_ACCESS_DISABLED ) ;
-//			return Double.toString(getPathSizeLogitBeta());
-		} else if (LATE_ARRIVAL.equals(key)) {
-			throw new RuntimeException( GETVALUE_ACCESS_DISABLED ) ;
-//			return Double.toString(getLateArrival());
-		} else if (EARLY_DEPARTURE.equals(key)) {
-			throw new RuntimeException( GETVALUE_ACCESS_DISABLED ) ;
-//			return Double.toString(getEarlyDeparture());
-		} else if (PERFORMING.equals(key)) {
-			throw new RuntimeException( GETVALUE_ACCESS_DISABLED ) ;
-//			return Double.toString(getPerforming());
-		} else if (TRAVELING.equals(key)) {
-			throw new RuntimeException( GETVALUE_ACCESS_DISABLED ) ;
-//			return Double.toString(getTraveling());
-		} else if (TRAVELING_PT.equals(key)) {
-			throw new RuntimeException( GETVALUE_ACCESS_DISABLED ) ;
-//			return Double.toString(getTravelingPt());
-		} else if (TRAVELING_WALK.equals(key)) {
-			throw new RuntimeException( GETVALUE_ACCESS_DISABLED ) ;
-//			return Double.toString(getTravelingWalk());
-		} else if (MARGINAL_UTL_OF_DISTANCE_CAR.equals(key)){
-			throw new RuntimeException( GETVALUE_ACCESS_DISABLED ) ;
-//			return Double.toString(this.getMarginalUtlOfDistanceCar());
-		} else if (MARGINAL_UTL_OF_DISTANCE_PT.equals(key)){
-			throw new RuntimeException( GETVALUE_ACCESS_DISABLED ) ;
-//			return Double.toString(this.getMarginalUtlOfDistancePt());
-		} else if (MARGINAL_UTL_OF_DISTANCE_WALK.equals(key)){
-			throw new RuntimeException( GETVALUE_ACCESS_DISABLED ) ;
-//			return Double.toString(this.getMarginalUtlOfDistanceWalk());
-		} else if ( MARGINAL_UTL_OF_MONEY.equals(key) ) {
-			throw new RuntimeException( GETVALUE_ACCESS_DISABLED ) ;
-//			return Double.toString( this.getMarginalUtilityOfMoney() ) ;
-		} else if ( MONETARY_DISTANCE_COST_RATE_CAR.equals(key) ) {
-			throw new RuntimeException( GETVALUE_ACCESS_DISABLED ) ;
-//			return Double.toString( this.getMonetaryDistanceCostRateCar() ) ;
-		} else if ( MONETARY_DISTANCE_COST_RATE_PT.equals(key) ) {
-			throw new RuntimeException( GETVALUE_ACCESS_DISABLED ) ;
-//			return Double.toString( this.getMonetaryDistanceCostRatePt() ) ;
-		}	else if (WAITING.equals(key)) {
-			throw new RuntimeException( GETVALUE_ACCESS_DISABLED ) ;
-//			return Double.toString(getWaiting());
-		}	else if (UTL_OF_LINE_SWITCH.equals(key)) {
-			throw new RuntimeException( GETVALUE_ACCESS_DISABLED ) ;
-		} else if ((key != null) && key.startsWith(ACTIVITY_TYPE)) {
+		if ((key != null) && key.startsWith(ACTIVITY_TYPE)) {
 			ActivityParams actParams = getActivityTypeByNumber(key.substring(ACTIVITY_TYPE.length()), false);
 			return actParams == null ? null : actParams.getType();
 		} else if ((key != null) && key.startsWith(ACTIVITY_PRIORITY)) {
@@ -195,7 +155,7 @@ public class PlanCalcScoreConfigGroup extends Module {
 			ActivityParams actParams = getActivityTypeByNumber(key.substring(ACTIVITY_CLOSING_TIME.length()), false);
 			return Time.writeTime(actParams.getClosingTime());
 		} else {
-			throw new IllegalArgumentException(key);
+			throw new IllegalArgumentException(key); // probably use direct getter?  kai, mar'11
 		}
 	}
 
@@ -237,6 +197,14 @@ public class PlanCalcScoreConfigGroup extends Module {
 			setWaiting_utils_hr(Double.parseDouble(value));
 		} else if (UTL_OF_LINE_SWITCH.equals(key)) {
 			setUtilityOfLineSwitch(Double.parseDouble(value)) ;
+		} else if ( CONSTANT_CAR.equals(key)) {
+			this.setConstantCar(Double.parseDouble(value)) ;
+		} else if ( CONSTANT_WALK.equals(key)) {
+			this.setConstantWalk(Double.parseDouble(value)) ;
+		} else if ( CONSTANT_PT.equals(key)) {
+			this.setConstantPt(Double.parseDouble(value)) ;
+		} else if ( CONSTANT_BIKE.equals(key)) {
+			this.setConstantBike(Double.parseDouble(value)) ;
 		} else if ((key != null) && key.startsWith(ACTIVITY_TYPE)) {
 			ActivityParams actParams = getActivityTypeByNumber(key.substring(ACTIVITY_TYPE.length()), true);
 			this.activityTypes.remove(actParams.getType());
@@ -290,6 +258,10 @@ public class PlanCalcScoreConfigGroup extends Module {
 		map.put(MONETARY_DISTANCE_COST_RATE_CAR, Double.toString( this.getMonetaryDistanceCostRateCar() ) ) ;
 		map.put(MONETARY_DISTANCE_COST_RATE_PT, Double.toString( this.getMonetaryDistanceCostRatePt() ) ) ;
 		map.put(UTL_OF_LINE_SWITCH, Double.toString( this.getUtilityOfLineSwitch() )) ;
+		map.put(CONSTANT_CAR, Double.toString( this.getConstantCar() )) ;
+		map.put(CONSTANT_WALK, Double.toString( this.getConstantWalk() )) ;
+		map.put(CONSTANT_BIKE, Double.toString( this.getConstantBike() )) ;
+		map.put(CONSTANT_PT, Double.toString( this.getConstantPt() )) ;
 		int index = 0;
 		for(ActivityParams params : this.activityTypes.values()) {
 			String key = Integer.toString(index);
@@ -337,6 +309,15 @@ public class PlanCalcScoreConfigGroup extends Module {
 		map.put(MARGINAL_UTL_OF_MONEY, "[utils/unit_of_money] conversion of money (e.g. toll, distance cost) into utils" ) ;
 		map.put(MONETARY_DISTANCE_COST_RATE_CAR, "[unit_of_money/m] conversion of car distance into money" ) ;
 		map.put(MONETARY_DISTANCE_COST_RATE_PT, "[unit_of_money/m] conversion of pt distance into money" );
+		
+		map.put(CONSTANT_CAR, "[utils] alternative-specific constant for car.  no guarantee that this is used anywhere. " +
+		"default=0 to be backwards compatible for the time being" ) ;
+		map.put(CONSTANT_WALK, "[utils] alternative-specific constant for walk.  no guarantee that this is used anywhere. " +
+		"default=0 to be backwards compatible for the time being" ) ;
+		map.put(CONSTANT_PT, "[utils] alternative-specific constant for pt.  no guarantee that this is used anywhere. " +
+		"default=0 to be backwards compatible for the time being" ) ;
+		map.put(CONSTANT_BIKE, "[utils] alternative-specific constant for bike.  no guarantee that this is used anywhere. " +
+		"default=0 to be backwards compatible for the time being" ) ;
 
 		return map ;
 	}
@@ -647,6 +628,38 @@ public class PlanCalcScoreConfigGroup extends Module {
 
 	public void setUtilityOfLineSwitch(double utilityOfLineSwitch) {
 		this.utilityOfLineSwitch = utilityOfLineSwitch;
+	}
+
+	public double getConstantCar() {
+		return constantCar;
+	}
+
+	public void setConstantCar(double constantCar) {
+		this.constantCar = constantCar;
+	}
+
+	public double getConstantWalk() {
+		return constantWalk;
+	}
+
+	public void setConstantWalk(double constantWalk) {
+		this.constantWalk = constantWalk;
+	}
+
+	public double getConstantPt() {
+		return constantPt;
+	}
+
+	public void setConstantPt(double constantPt) {
+		this.constantPt = constantPt;
+	}
+
+	public double getConstantBike() {
+		return constantBike;
+	}
+
+	public void setConstantBike(double constantBike) {
+		this.constantBike = constantBike;
 	}
 
 }
