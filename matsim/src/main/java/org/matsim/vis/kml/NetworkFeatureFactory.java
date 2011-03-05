@@ -35,6 +35,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.core.api.internal.MatsimFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.misc.RouteUtils;
@@ -43,7 +44,7 @@ import org.matsim.core.utils.misc.Time;
 /**
  * @author dgrether
  */
-public class NetworkFeatureFactory {
+public class NetworkFeatureFactory implements MatsimFactory {
 
 	private static final Logger log = Logger.getLogger(NetworkFeatureFactory.class);
 

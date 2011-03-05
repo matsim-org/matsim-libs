@@ -27,6 +27,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.core.api.internal.MatsimSomeReader;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -37,7 +38,7 @@ import org.xml.sax.SAXException;
  *
  * @author mrieser
  */
-public class MatsimFacilitiesReader extends MatsimXmlParser {
+public class MatsimFacilitiesReader extends MatsimXmlParser implements MatsimSomeReader {
 	/* Why is this suddenly a "Matsim"FacilitiesReader and not just a Facilities reader to be consistent with all other 
 	 * naming conventions?  kai, jan09
 	 * because all other readers in Matsim are also called Matsim*Reader,

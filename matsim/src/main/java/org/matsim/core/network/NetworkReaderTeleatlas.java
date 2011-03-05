@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.api.internal.MatsimSomeReader;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.gis.ShapeFileReader;
@@ -48,7 +49,7 @@ import com.vividsolutions.jts.geom.Coordinate;
  *
  * @author balmermi
  */
-public class NetworkReaderTeleatlas {
+public class NetworkReaderTeleatlas implements MatsimSomeReader {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables

@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.internal.MatsimSomeWriter;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.MatsimXmlWriter;
@@ -42,7 +43,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
  *
  * @author mrieser
  */
-public class TransitScheduleWriterV1 extends MatsimXmlWriter {
+public class TransitScheduleWriterV1 extends MatsimXmlWriter implements MatsimSomeWriter {
 
 
 	private final TransitSchedule schedule;

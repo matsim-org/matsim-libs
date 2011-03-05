@@ -35,6 +35,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.api.internal.MatsimComparator;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 /**
@@ -286,7 +287,7 @@ public class FromToSummary extends AbstractPersonAlgorithm implements PlanAlgori
 	 * @author lnicolas
 	 * Compares two NodePairs.
 	 */
-	static class NodePairComparator implements Comparator<NodePair>, Serializable {
+	static class NodePairComparator implements Comparator<NodePair>, Serializable, MatsimComparator {
 
 		private static final long serialVersionUID = 1L;
 

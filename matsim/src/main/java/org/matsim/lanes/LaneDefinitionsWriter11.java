@@ -29,6 +29,7 @@ import javax.xml.bind.Marshaller;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.internal.MatsimSomeWriter;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.MatsimJaxbXmlWriter;
 import org.matsim.jaxb.lanedefinitions11.ObjectFactory;
@@ -42,7 +43,7 @@ import org.matsim.jaxb.lanedefinitions11.XMLLanesToLinkAssignmentType;
  * @author dgrether
  *
  */
-public class LaneDefinitionsWriter11 extends MatsimJaxbXmlWriter {
+public class LaneDefinitionsWriter11 extends MatsimJaxbXmlWriter implements MatsimSomeWriter {
 
 	private static final Logger log = Logger
 			.getLogger(LaneDefinitionsWriter11.class);

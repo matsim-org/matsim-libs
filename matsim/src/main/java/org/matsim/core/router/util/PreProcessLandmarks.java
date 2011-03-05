@@ -31,6 +31,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.api.internal.MatsimComparator;
 
 /**
  * Pre-processes a given network, gathering information which can be used by
@@ -247,7 +248,7 @@ public class PreProcessLandmarks extends PreProcessEuclidean {
 	 *
 	 * @author lnicolas
 	 */
-	static class LandmarksTravelTimeComparator implements Comparator<Node> {
+	static class LandmarksTravelTimeComparator implements Comparator<Node>, MatsimComparator {
 		private final Map<Node, DeadEndData> roleData;
 		private final int landmarkIndex;
 

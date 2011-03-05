@@ -30,6 +30,7 @@ import java.util.TreeMap;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.internal.MatsimManager;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PersonImpl;
@@ -41,7 +42,7 @@ import org.matsim.core.replanning.selectors.WorstPlanForRemovalSelector;
  *
  * @author mrieser
  */
-public class StrategyManager {
+public class StrategyManager implements MatsimManager {
 
 	private final ArrayList<PlanStrategy> strategies = new ArrayList<PlanStrategy>();
 	private final ArrayList<Double> weights = new ArrayList<Double>();

@@ -165,6 +165,11 @@ public class LinkImpl implements Link {
 		}
 	}
 
+	/**
+	 * Given that this calculates a scalar product, this may indeed calculate the orthogonal projection.  
+	 * But it does not say so, and I have no time to go through the exact calculation in detail.  Maybe somebody
+	 * else can figure it out and document it here.  kai, mar'11
+	 */
 	public final double calcDistance(final Coord coord) {
 		// yyyy should, in my view, call the generalized utils method. kai, jul09
 		Coord fc = this.from.getCoord();

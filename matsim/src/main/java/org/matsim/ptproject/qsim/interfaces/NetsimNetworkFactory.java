@@ -21,12 +21,13 @@ package org.matsim.ptproject.qsim.interfaces;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.api.internal.MatsimFactory;
 
 
 /**
  * @author dgrether
  */
-public interface NetsimNetworkFactory<QN extends NetsimNode, QL extends NetsimLink> {
+public interface NetsimNetworkFactory<QN extends NetsimNode, QL extends NetsimLink> extends MatsimFactory {
 
 	public QN createNetsimNode(Node node, NetsimEngine simEngine);
 

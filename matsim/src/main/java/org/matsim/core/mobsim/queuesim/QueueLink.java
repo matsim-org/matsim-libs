@@ -30,6 +30,7 @@ import java.util.Queue;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.api.internal.MatsimNetworkObject;
 import org.matsim.core.events.AgentStuckEventImpl;
 import org.matsim.core.events.AgentWait2LinkEventImpl;
 import org.matsim.core.events.LinkEnterEventImpl;
@@ -51,7 +52,7 @@ import org.matsim.vis.snapshots.writers.VisVehicle;
  * @author dgrether
  * @author mrieser
  */
-class QueueLink implements VisLink {
+class QueueLink implements VisLink, MatsimNetworkObject {
 
 	final private static Logger log = Logger.getLogger(QueueLink.class);
 

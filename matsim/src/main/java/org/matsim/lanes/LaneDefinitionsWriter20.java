@@ -30,6 +30,7 @@ import javax.xml.crypto.MarshalException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.internal.MatsimSomeWriter;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.MatsimJaxbXmlWriter;
 import org.matsim.jaxb.lanedefinitions20.ObjectFactory;
@@ -43,7 +44,7 @@ import org.matsim.jaxb.lanedefinitions20.XMLLanesToLinkAssignmentType;
  * @author dgrether
  *
  */
-public class LaneDefinitionsWriter20 extends MatsimJaxbXmlWriter {
+public class LaneDefinitionsWriter20 extends MatsimJaxbXmlWriter implements MatsimSomeWriter {
 
 	private static final Logger log = Logger
 			.getLogger(LaneDefinitionsWriter20.class);

@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package org.matsim.lanes;
 
+import org.matsim.core.api.internal.MatsimSomeWriter;
 import org.matsim.core.utils.io.MatsimJaxbXmlWriter;
 
 
@@ -29,7 +30,7 @@ import org.matsim.core.utils.io.MatsimJaxbXmlWriter;
  * @author dgrether
  *
  */
-public class MatsimLaneDefinitionsWriter {
+public class MatsimLaneDefinitionsWriter implements MatsimSomeWriter {
 	
 	private MatsimJaxbXmlWriter writerDelegate;
 	 

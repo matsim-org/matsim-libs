@@ -23,13 +23,14 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.api.internal.MatsimNetworkObject;
 import org.matsim.vis.snapshots.writers.VisNetwork;
 
 /**
  * @author nagel
  *
  */
-public interface NetsimNetwork extends VisNetwork {
+public interface NetsimNetwork extends VisNetwork, MatsimNetworkObject {
 	// yyyy "extends VisNetwork" possibly a temporary fix
 
 	@Override

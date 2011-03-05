@@ -22,6 +22,7 @@ package org.matsim.core.controler;
 
 import javax.swing.event.EventListenerList;
 
+import org.matsim.core.api.internal.MatsimManager;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -45,7 +46,7 @@ import org.matsim.core.controler.listener.StartupListener;
  * 
  * @author dgrether
  */
-public final class ControlerListenerManager {
+public final class ControlerListenerManager implements MatsimManager {
 
 	private Controler controler;
 	/** The swing event listener list to manage ControlerListeners efficiently. First list manages core listeners

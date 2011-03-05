@@ -21,12 +21,14 @@ package org.matsim.ptproject.qsim.interfaces;
 
 import java.util.Random;
 
+import org.matsim.core.api.internal.MatsimFactory;
+
 
 /**
  * @author dgrether
  *
  */
-public interface NetsimEngineFactory {
+public interface NetsimEngineFactory extends MatsimFactory {
 	
 	public NetsimEngine createQSimEngine(final Netsim sim, final Random random);
 }

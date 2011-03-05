@@ -31,6 +31,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.api.internal.MatsimComparator;
 import org.matsim.core.events.AgentStuckEventImpl;
 import org.matsim.ptproject.qsim.interfaces.NetsimEngine;
 import org.matsim.ptproject.qsim.interfaces.NetsimLink;
@@ -268,7 +269,7 @@ public class QNode implements NetsimNode {
   }
 
 
-	protected static class QueueLinkIdComparator implements Comparator<NetsimLink>, Serializable {
+	protected static class QueueLinkIdComparator implements Comparator<NetsimLink>, Serializable, MatsimComparator {
 		private static final long serialVersionUID = 1L;
 		@Override
 		public int compare(final NetsimLink o1, final NetsimLink o2) {

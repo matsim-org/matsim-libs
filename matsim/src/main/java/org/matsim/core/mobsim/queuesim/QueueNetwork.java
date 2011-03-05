@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.api.internal.MatsimNetworkObject;
 import org.matsim.ptproject.qsim.interfaces.Netsim;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 import org.matsim.vis.snapshots.writers.VisLink;
@@ -43,7 +44,7 @@ import org.matsim.vis.snapshots.writers.VisNode;
  * @author mrieser
  * @author dgrether
  */
- class QueueNetwork implements VisNetwork {
+ class QueueNetwork implements VisNetwork, MatsimNetworkObject {
 	private Netsim qSim = null ; // QueueNetwork can exist without qSim, so this is not enforced.
 
 	private final Map<Id, QueueLink> queuelinks;

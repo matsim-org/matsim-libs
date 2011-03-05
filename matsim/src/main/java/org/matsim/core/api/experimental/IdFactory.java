@@ -20,11 +20,12 @@
 package org.matsim.core.api.experimental;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.internal.MatsimFactory;
 
 /**
  * @author mrieser
  */
-public interface IdFactory {
+public interface IdFactory extends MatsimFactory {
 
 	public Id createId(final String id);
 

@@ -23,7 +23,9 @@ import java.io.IOException;
 
 import net.opengis.kml._2.StyleType;
 
-public interface NetworkKmlStyleFactory {
+import org.matsim.core.api.internal.MatsimFactory;
+
+public interface NetworkKmlStyleFactory extends MatsimFactory {
 
 	public abstract StyleType createDefaultNetworkNodeStyle() throws IOException;
 

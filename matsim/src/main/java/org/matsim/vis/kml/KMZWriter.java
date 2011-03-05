@@ -42,6 +42,7 @@ import net.opengis.kml._2.ObjectFactory;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.matsim.core.api.internal.MatsimSomeWriter;
 
 /**
  * A writer for complex keyhole markup files used by Google Earth. It supports
@@ -51,7 +52,7 @@ import org.apache.log4j.Logger;
  * @author mrieser
  *
  */
-public class KMZWriter {
+public class KMZWriter implements MatsimSomeWriter {
 
 	private static final Logger log = Logger.getLogger(KMZWriter.class);
 

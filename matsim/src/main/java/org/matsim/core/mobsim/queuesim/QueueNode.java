@@ -30,6 +30,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.api.internal.MatsimComparator;
+import org.matsim.core.api.internal.MatsimNetworkObject;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.AgentStuckEventImpl;
 import org.matsim.ptproject.qsim.interfaces.Netsim;
@@ -40,7 +42,7 @@ import org.matsim.vis.snapshots.writers.VisNode;
 /**
  * Represents a node in the QueueSimulation.
  */
-class QueueNode implements VisNode {
+class QueueNode implements VisNode, MatsimNetworkObject {
 
 	private static final Logger log = Logger.getLogger(QueueNode.class);
 
@@ -228,7 +230,7 @@ class QueueNode implements VisNode {
 		}
 	}
 
-	protected static class QueueLinkIdComparator implements Comparator<QueueLink>, Serializable {
+	protected static class QueueLinkIdComparator implements Comparator<QueueLink>, Serializable, MatsimComparator {
 		private static final long serialVersionUID = 1L;
 		@Override
 		public int compare(final QueueLink o1, final QueueLink o2) {

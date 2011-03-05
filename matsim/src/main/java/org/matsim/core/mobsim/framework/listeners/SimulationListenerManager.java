@@ -23,6 +23,7 @@ package org.matsim.core.mobsim.framework.listeners;
 import javax.swing.event.EventListenerList;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.api.internal.MatsimManager;
 import org.matsim.core.mobsim.framework.Simulation;
 import org.matsim.core.mobsim.framework.events.SimulationAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.events.SimulationAfterSimStepEventImpl;
@@ -40,7 +41,7 @@ import org.matsim.core.utils.misc.ClassUtils;
  *
  * @author dgrether
  */
-public class SimulationListenerManager {
+public class SimulationListenerManager implements MatsimManager {
 
 	private final static Logger log = Logger.getLogger(SimulationListenerManager.class);
 

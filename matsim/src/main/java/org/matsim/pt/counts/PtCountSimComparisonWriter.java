@@ -25,10 +25,11 @@ package org.matsim.pt.counts;
 
 import java.util.List;
 
+import org.matsim.core.api.internal.MatsimSomeWriter;
 import org.matsim.counts.CountSimComparison;
 import org.matsim.counts.algorithms.CountSimComparisonTimeFilter;
 
-public abstract class PtCountSimComparisonWriter {
+public abstract class PtCountSimComparisonWriter implements MatsimSomeWriter {
 	public enum PtCountsType {
 		Boarding, Alighting, Occupancy
 	};

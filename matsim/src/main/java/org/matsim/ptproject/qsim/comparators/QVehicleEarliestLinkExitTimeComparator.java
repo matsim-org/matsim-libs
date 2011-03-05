@@ -23,6 +23,7 @@ package org.matsim.ptproject.qsim.comparators;
 import java.io.Serializable;
 import java.util.Comparator;
 
+import org.matsim.core.api.internal.MatsimComparator;
 import org.matsim.ptproject.qsim.qnetsimengine.QVehicle;
 
 
@@ -33,7 +34,7 @@ import org.matsim.ptproject.qsim.qnetsimengine.QVehicle;
  * according to their departure time
  */
 public class QVehicleEarliestLinkExitTimeComparator implements Comparator<QVehicle>,
-		Serializable {
+		Serializable, MatsimComparator {
 
 	private static final long serialVersionUID = 1L;
 

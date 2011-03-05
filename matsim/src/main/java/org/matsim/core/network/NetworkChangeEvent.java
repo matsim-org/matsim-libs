@@ -28,6 +28,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.api.internal.MatsimComparator;
 
 /**
  * A container class for events that represent time-variant changes for link
@@ -191,7 +192,7 @@ public class NetworkChangeEvent {
 		this.lanesChange = lanesChange;
 	}
 
-	public static class StartTimeComparator implements Comparator<NetworkChangeEvent>, Serializable {
+	public static class StartTimeComparator implements Comparator<NetworkChangeEvent>, Serializable, MatsimComparator {
 		private static final long serialVersionUID = 1L;
 		@Override
 		public int compare(NetworkChangeEvent o1, NetworkChangeEvent o2) {

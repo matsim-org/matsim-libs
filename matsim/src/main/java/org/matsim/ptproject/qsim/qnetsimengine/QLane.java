@@ -33,6 +33,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.internal.MatsimComparator;
 import org.matsim.core.events.AgentStuckEventImpl;
 import org.matsim.core.events.LaneEnterEventImpl;
 import org.matsim.core.events.LaneLeaveEventImpl;
@@ -707,7 +708,7 @@ public final class QLane extends VisLane implements SignalizeableItem {
 		}
 	}
 	
-	static class FromLinkEndComparator implements Comparator<QLane>, Serializable {
+	static class FromLinkEndComparator implements Comparator<QLane>, Serializable, MatsimComparator {
 		private static final long serialVersionUID = 1L;
 		@Override
 		public int compare(final QLane o1, final QLane o2) {

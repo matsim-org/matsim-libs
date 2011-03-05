@@ -19,10 +19,12 @@
 
 package org.matsim.pt.router;
 
+import org.matsim.core.api.internal.MatsimFactory;
+
 /**
  * @author mrieser
  */
-public interface TransitRouterFactory {
+public interface TransitRouterFactory extends MatsimFactory {
 
 	public abstract TransitRouter createTransitRouter();
 

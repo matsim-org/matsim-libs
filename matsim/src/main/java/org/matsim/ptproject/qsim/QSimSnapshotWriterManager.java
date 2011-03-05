@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.api.internal.MatsimManager;
 import org.matsim.core.controler.ControlerIO;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.ptproject.qsim.interfaces.NetsimNetwork;
@@ -41,7 +42,7 @@ import org.matsim.vis.snapshots.writers.TransimsSnapshotWriter;
  * @author dgrether
  *
  */
- class QSimSnapshotWriterManager {
+ class QSimSnapshotWriterManager implements MatsimManager {
   
   private static final Logger log = Logger
       .getLogger(QSimSnapshotWriterManager.class);

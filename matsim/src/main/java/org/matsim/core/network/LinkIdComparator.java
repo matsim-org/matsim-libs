@@ -24,6 +24,7 @@ import java.io.Serializable;
 import java.util.Comparator;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.api.internal.MatsimComparator;
 
 
 /**
@@ -32,7 +33,7 @@ import org.matsim.api.core.v01.network.Link;
  *
  * @author mrieser
  */
-public class LinkIdComparator implements Comparator<Link>, Serializable {
+public class LinkIdComparator implements Comparator<Link>, Serializable, MatsimComparator {
 
 	private static final long serialVersionUID = 1L;
 

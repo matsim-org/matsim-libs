@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.IdFactory;
+import org.matsim.core.api.internal.MatsimSomeReader;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -53,7 +54,7 @@ import org.xml.sax.SAXException;
  *
  * @author mrieser
  */
-public class TransitScheduleReaderV1 extends MatsimXmlParser {
+public class TransitScheduleReaderV1 extends MatsimXmlParser implements MatsimSomeReader {
 
 	private final TransitSchedule schedule;
 	private final Network network;

@@ -22,6 +22,8 @@ package org.matsim.core.api.internal;
 
 /**
  * marker interface.  Don't use.  kai, oct'09
+ * <p/>
+ * This is Matsim"Some"Reader since there is no consistent syntax (read, readFile, ...).
  * 
  * @author nagel
  *

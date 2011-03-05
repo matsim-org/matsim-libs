@@ -23,6 +23,7 @@ package org.matsim.ptproject.qsim.comparators;
 import java.io.Serializable;
 import java.util.Comparator;
 
+import org.matsim.core.api.internal.MatsimComparator;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
 
@@ -34,7 +35,7 @@ import org.matsim.core.mobsim.framework.PlanAgent;
  * 
  * @see PersonDriverAgent#getActivityEndTime()
  */
-public class PlanAgentDepartureTimeComparator implements Comparator<PlanAgent>, Serializable {
+public class PlanAgentDepartureTimeComparator implements Comparator<PlanAgent>, Serializable, MatsimComparator {
 
 	private static final long serialVersionUID = 1L;
 

@@ -32,6 +32,7 @@ import java.util.Queue;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.api.internal.MatsimComparator;
 import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.network.NetworkImpl;
@@ -40,8 +41,8 @@ import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.qsim.TransitQLaneFeature;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
-import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfoFactory;
+import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
 
 /**
  * A builder for AgentSnapshotInfo objects that can be used by links with queue logic
@@ -140,7 +141,7 @@ import org.matsim.vis.snapshots.writers.AgentSnapshotInfoFactory;
 
 	}
 
-	/*package*/ static class TupleDoubleComparator implements Comparator<Tuple<Double, QItem>>, Serializable {
+	/*package*/ static class TupleDoubleComparator implements Comparator<Tuple<Double, QItem>>, Serializable, MatsimComparator {
 
 		private static final long serialVersionUID = 1L;
 

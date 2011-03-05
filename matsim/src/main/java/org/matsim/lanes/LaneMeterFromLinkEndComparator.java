@@ -22,12 +22,14 @@ package org.matsim.lanes;
 import java.io.Serializable;
 import java.util.Comparator;
 
+import org.matsim.core.api.internal.MatsimComparator;
+
 /**
  * Comparator which implements a comparision function for the Lane.getStartsAtMeterFromLinkEnd()
  * attribute.
  * @author dgrether
  */
-public class LaneMeterFromLinkEndComparator implements Comparator<Lane>, Serializable {
+public class LaneMeterFromLinkEndComparator implements Comparator<Lane>, Serializable, MatsimComparator {
 
 	private static final long serialVersionUID = 1L;
 

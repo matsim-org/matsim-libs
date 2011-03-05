@@ -23,10 +23,11 @@ package org.matsim.ptproject.qsim.comparators;
 import java.io.Serializable;
 import java.util.Comparator;
 
+import org.matsim.core.api.internal.MatsimComparator;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.utils.collections.Tuple;
 
-public class TeleportationArrivalTimeComparator implements Comparator<Tuple<Double, PlanAgent>>, Serializable {
+public class TeleportationArrivalTimeComparator implements Comparator<Tuple<Double, PlanAgent>>, Serializable, MatsimComparator {
 	private static final long serialVersionUID = 1L;
 	@Override
 	public int compare(final Tuple<Double, PlanAgent> o1, final Tuple<Double, PlanAgent> o2) {

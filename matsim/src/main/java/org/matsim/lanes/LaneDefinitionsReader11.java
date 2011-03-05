@@ -28,6 +28,7 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.api.internal.MatsimSomeReader;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.MatsimJaxbXmlParser;
@@ -45,7 +46,7 @@ import org.xml.sax.SAXException;
  * @author dgrether
  *
  */
-public class LaneDefinitionsReader11 extends MatsimJaxbXmlParser {
+public class LaneDefinitionsReader11 extends MatsimJaxbXmlParser implements MatsimSomeReader {
 
 	private static final Logger log = Logger
 			.getLogger(LaneDefinitionsReader11.class);

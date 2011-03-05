@@ -21,13 +21,14 @@
 package org.matsim.ptproject.qsim.multimodalsimengine;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.api.internal.MatsimFactory;
+import org.matsim.ptproject.qsim.interfaces.Netsim;
 import org.matsim.ptproject.qsim.interfaces.NetsimLink;
 import org.matsim.ptproject.qsim.interfaces.NetsimNetwork;
 import org.matsim.ptproject.qsim.interfaces.NetsimNode;
-import org.matsim.ptproject.qsim.interfaces.Netsim;
 import org.matsim.ptproject.qsim.qnetsimengine.QNode;
 
-public class MultiModalSimEngineFactory {
+public class MultiModalSimEngineFactory implements MatsimFactory {
 
 	final private static Logger log = Logger.getLogger(MultiModalSimEngineFactory.class);
 	
