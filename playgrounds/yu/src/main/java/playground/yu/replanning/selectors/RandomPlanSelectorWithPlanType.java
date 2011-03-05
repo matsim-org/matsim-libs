@@ -34,7 +34,7 @@ public class RandomPlanSelectorWithPlanType implements PlanSelector {
 	@Override
 	public Plan selectPlan(Person person) {
 		// hashmap that returns "Integer" count for given plans type:
-		HashMap<PlanImpl.Type, Integer> typeCounts = new HashMap<PlanImpl.Type, Integer>();
+		HashMap<String, Integer> typeCounts = new HashMap<String, Integer>();
 		// count how many plans per type an agent has:
 		List<Plan> plans = (List<Plan>) person.getPlans();
 		for (Plan plan : plans) {

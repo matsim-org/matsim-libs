@@ -66,9 +66,9 @@ public class PlanToPlanStep {
 					+ person.getPlans().indexOf(plan));
 		}
 		// /////////////////////////////////////////////
-		PlanImpl.Type planType = plan.getType();
+		String planType = plan.getType();
 		if (planType != null) {
-			if (PlanImpl.Type.PT.equals(planType)) {
+			if (PlanImpl.DeprecatedConstants.PT.equals(planType)) {
 				if (!foundPT) {
 					System.out.println("BSE: found a PT plan");
 					foundPT = true;

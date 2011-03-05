@@ -100,21 +100,21 @@ public class ModeActivityDurationAnalyser {
 					try {
 						durTemp = DeprecatedStaticMethod.calculateSomeDuration(act);
 						if (act.getType().equalsIgnoreCase("h")) {
-							if (((PlanImpl) p).getType().equals(PlanImpl.Type.CAR)) {
+							if (((PlanImpl) p).getType().equals(PlanImpl.DeprecatedConstants.CAR)) {
 								homeActivityDurationsCar += durTemp;
 								homeActivityCarCount++;
 							}
-							else if (((PlanImpl) p).getType().equals(PlanImpl.Type.PT)){
+							else if (((PlanImpl) p).getType().equals(PlanImpl.DeprecatedConstants.PT)){
 								homeActivityDurationsNonCar += durTemp;
 								homeActivityNonCarCount++;
 							}
 						}
 						else if (act.getType().equalsIgnoreCase("w")) {
-							if (((PlanImpl) p).getType().equals(PlanImpl.Type.CAR)) {
+							if (((PlanImpl) p).getType().equals(PlanImpl.DeprecatedConstants.CAR)) {
 								workActivityDurationsCar += durTemp;
 								workActivityCarCount++;
 							}
-							else if (((PlanImpl) p).getType().equals(PlanImpl.Type.PT)){
+							else if (((PlanImpl) p).getType().equals(PlanImpl.DeprecatedConstants.PT)){
 								workActivityDurationsNonCar += durTemp;
 								workActivityNonCarCount++;
 							}

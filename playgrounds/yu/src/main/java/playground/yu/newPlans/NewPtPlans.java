@@ -37,7 +37,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PlanImpl.Type;
+import org.matsim.core.population.PlanImpl.DeprecatedConstants;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.yu.analysis.PlanModeJudger;
@@ -76,9 +76,9 @@ public class NewPtPlans extends NewPopulation implements PlanAlgorithm {
 
 	public void run(Plan plan) {
 		if (PlanModeJudger.useCar(plan))
-			((PlanImpl) plan).setType(Type.CAR);
+			((PlanImpl) plan).setType(DeprecatedConstants.CAR);
 		PlanImpl ptPlan = new PlanImpl(person);
-		ptPlan.setType(Type.PT);
+		ptPlan.setType(DeprecatedConstants.PT);
 		// Plan walkPlan = new PlanImpl(person);
 		List<PlanElement> actsLegs = plan.getPlanElements();
 		for (int i = 0; i < actsLegs.size(); i++) {

@@ -80,10 +80,10 @@ public class DgAvgDeltaUtilsModeQuantilesChart implements DgXYChart {
 			xLoc = quantile /this.nQuantiles;
 			xLoc*=100.0;
 			DgModeSwitchPlanTypeAnalyzer modeSwitchAnalysis = new DgModeSwitchPlanTypeAnalyzer(p, runId1, runId2);
-			DgAnalysisPopulation car2carPop = modeSwitchAnalysis.getPersonsForModeSwitch(new Tuple(PlanImpl.Type.CAR, PlanImpl.Type.CAR));
-			DgAnalysisPopulation pt2ptPop = modeSwitchAnalysis.getPersonsForModeSwitch(new Tuple(PlanImpl.Type.PT, PlanImpl.Type.PT));
-			DgAnalysisPopulation pt2carPop = modeSwitchAnalysis.getPersonsForModeSwitch(new Tuple(PlanImpl.Type.PT, PlanImpl.Type.CAR));
-			DgAnalysisPopulation car2ptPop = modeSwitchAnalysis.getPersonsForModeSwitch(new Tuple(PlanImpl.Type.CAR, PlanImpl.Type.PT));
+			DgAnalysisPopulation car2carPop = modeSwitchAnalysis.getPersonsForModeSwitch(new Tuple(PlanImpl.DeprecatedConstants.CAR, PlanImpl.DeprecatedConstants.CAR));
+			DgAnalysisPopulation pt2ptPop = modeSwitchAnalysis.getPersonsForModeSwitch(new Tuple(PlanImpl.DeprecatedConstants.PT, PlanImpl.DeprecatedConstants.PT));
+			DgAnalysisPopulation pt2carPop = modeSwitchAnalysis.getPersonsForModeSwitch(new Tuple(PlanImpl.DeprecatedConstants.PT, PlanImpl.DeprecatedConstants.CAR));
+			DgAnalysisPopulation car2ptPop = modeSwitchAnalysis.getPersonsForModeSwitch(new Tuple(PlanImpl.DeprecatedConstants.CAR, PlanImpl.DeprecatedConstants.PT));
 			if ((car2carPop  != null) && (car2carPop.getPersonData().size() >= threshold)) {
 				avgUtil = car2carPop.calcAverageScoreDifference(runId1, runId2);
 				car2carSeries.add(xLoc, avgUtil);

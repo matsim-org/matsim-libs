@@ -88,7 +88,7 @@ public class DgAnalysisPopulation {
 	public int calculateNumberOfCarPlans(Id runId) {
 		int carplans = 0;
 		for (DgPersonData d : table.values()) {
-			if (((PlanImpl) d.getPlanData().get(runId).getPlan()).getType().equals(PlanImpl.Type.CAR)){
+			if (((PlanImpl) d.getPlanData().get(runId).getPlan()).getType().equals(PlanImpl.DeprecatedConstants.CAR)){
 				carplans++;
 			}
 		}

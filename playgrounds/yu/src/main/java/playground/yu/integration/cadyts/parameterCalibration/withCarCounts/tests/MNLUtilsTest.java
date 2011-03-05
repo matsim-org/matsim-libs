@@ -41,7 +41,7 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PlanImpl.Type;
+import org.matsim.core.population.PlanImpl.DeprecatedConstants;
 
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.scoring.CharyparNagelScoringFunctionFactory4PC;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.scoring.Events2Score4TravPerfStuck_mnl;
@@ -121,7 +121,7 @@ public class MNLUtilsTest {
 		int n = 0;
 		for (Person person : pop.getPersons().values()) {
 			Plan selectedPlan = person.getSelectedPlan();
-			if (((PlanImpl) selectedPlan).getType().equals(Type.CAR)) {
+			if (((PlanImpl) selectedPlan).getType().equals(DeprecatedConstants.CAR)) {
 				n++;
 				double matsimScore = selectedScores.get(person.getId());
 

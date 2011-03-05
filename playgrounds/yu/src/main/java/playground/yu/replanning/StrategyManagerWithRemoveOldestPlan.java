@@ -45,7 +45,7 @@ public class StrategyManagerWithRemoveOldestPlan extends StrategyManager {
 
 		@Override
 		public Plan selectPlan(Person person) {
-			HashMap<PlanImpl.Type, Integer> typeCounts = new HashMap<PlanImpl.Type, Integer>();
+			HashMap<String, Integer> typeCounts = new HashMap<String, Integer>();
 
 			List<? extends Plan> plans = person.getPlans();
 			// initialize list of types

@@ -140,21 +140,21 @@ public class EventModeActivityDurationAnalyser {
 				this.durTemp = event.getTime() - startEvent.getTime();
 			}
 			if (event.getActType().equalsIgnoreCase("h")) {
-				if (((PlanImpl) p).getType().equals(PlanImpl.Type.CAR)) {
+				if (((PlanImpl) p).getType().equals(PlanImpl.DeprecatedConstants.CAR)) {
 					this.homeActivityDurationsCar += this.durTemp;
 					this.homeActivityCarCount++;
 				}
-				else if (((PlanImpl) p).getType().equals(PlanImpl.Type.PT)){
+				else if (((PlanImpl) p).getType().equals(PlanImpl.DeprecatedConstants.PT)){
 					this.homeActivityDurationsNonCar += this.durTemp;
 					this.homeActivityNonCarCount++;
 				}
 			}
 			else if (event.getActType().equalsIgnoreCase("w")) {
-				if (((PlanImpl) p).getType().equals(PlanImpl.Type.CAR)) {
+				if (((PlanImpl) p).getType().equals(PlanImpl.DeprecatedConstants.CAR)) {
 					this.workActivityDurationsCar += this.durTemp;
 					this.workActivityCarCount++;
 				}
-				else if (((PlanImpl) p).getType().equals(PlanImpl.Type.PT)){
+				else if (((PlanImpl) p).getType().equals(PlanImpl.DeprecatedConstants.PT)){
 					this.workActivityDurationsNonCar += this.durTemp;
 					this.workActivityNonCarCount++;
 				}
@@ -166,10 +166,10 @@ public class EventModeActivityDurationAnalyser {
 			this.eventMap.put(new IdImpl(event.getPersonId().toString()), event);
 			Plan p = this.plans.getPersons().get(new IdImpl(event.getPersonId().toString())).getSelectedPlan();
 			if (event.getActType().equalsIgnoreCase("w")) {
-				if (((PlanImpl) p).getType().equals(PlanImpl.Type.PT)) {
+				if (((PlanImpl) p).getType().equals(PlanImpl.DeprecatedConstants.PT)) {
 					this.ptStartTimeMap.incrementValue(event.getTime());
 				}
-				else if (((PlanImpl) p).getType().equals(PlanImpl.Type.CAR)) {
+				else if (((PlanImpl) p).getType().equals(PlanImpl.DeprecatedConstants.CAR)) {
 					this.carStartTimeMap.incrementValue(event.getTime());
 			  }
 			}

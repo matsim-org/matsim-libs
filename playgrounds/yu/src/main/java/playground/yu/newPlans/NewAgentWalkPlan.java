@@ -69,7 +69,7 @@ public class NewAgentWalkPlan extends NewPopulation {
 				if (PlanModeJudger.usePt(pl)) {
 					PlanImpl walkPlan = new org.matsim.core.population.PlanImpl(
 							person);
-					walkPlan.setType(PlanImpl.Type.WALK);
+					walkPlan.setType(PlanImpl.DeprecatedConstants.WALK);
 					List actsLegs = pl.getPlanElements();
 					for (int i = 0; i < actsLegs.size(); i++) {
 						Object o = actsLegs.get(i);

@@ -24,7 +24,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PlanImpl.Type;
+import org.matsim.core.population.PlanImpl.DeprecatedConstants;
 import org.matsim.core.utils.collections.Tuple;
 
 
@@ -36,11 +36,11 @@ public class DgModeSwitchPlanTypeAnalyzer {
 	
 	private DgAnalysisPopulation pop;
 	
-	private Map<Tuple<Type, Type>, DgAnalysisPopulation> classifiedPops;
+	private Map<Tuple<String, String>, DgAnalysisPopulation> classifiedPops;
 
 	public DgModeSwitchPlanTypeAnalyzer(DgAnalysisPopulation ana, Id runId1, Id runId2){
 		this.pop = ana;
-		this.classifiedPops = new HashMap<Tuple<Type, Type>, DgAnalysisPopulation>();
+		this.classifiedPops = new HashMap<Tuple<String, String>, DgAnalysisPopulation>();
 		this.classifyPopulationByPlanType(runId1, runId2);
 	}
 	
@@ -49,7 +49,8 @@ public class DgModeSwitchPlanTypeAnalyzer {
 			DgPlanData planDataRun1 = d.getPlanData().get(runId1);
 			DgPlanData planDataRun2 = d.getPlanData().get(runId2);
 
-			Tuple<Type, Type> modeSwitchTuple = new Tuple<Type, Type>(((PlanImpl) planDataRun1.getPlan()).getType(), ((PlanImpl) planDataRun2.getPlan()).getType());
+			Tuple<String, String> modeSwitchTuple = new Tuple<String, String>(((PlanImpl) planDataRun1.getPlan()).getType(), 
+					((PlanImpl) planDataRun2.getPlan()).getType());
 
 			DgAnalysisPopulation p = this.classifiedPops.get(modeSwitchTuple);
 			if (p == null){
@@ -60,7 +61,7 @@ public class DgModeSwitchPlanTypeAnalyzer {
 		}
 	}
 	
-	public DgAnalysisPopulation getPersonsForModeSwitch(Tuple<PlanImpl.Type, PlanImpl.Type> modes) {
+	public DgAnalysisPopulation getPersonsForModeSwitch(Tuple<PlanImpl.DeprecatedConstants, PlanImpl.DeprecatedConstants> modes) {
 		return this.classifiedPops.get(modes);
 	}
 	

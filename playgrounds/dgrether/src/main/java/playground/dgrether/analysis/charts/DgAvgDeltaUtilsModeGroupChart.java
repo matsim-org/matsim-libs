@@ -51,10 +51,10 @@ public class DgAvgDeltaUtilsModeGroupChart extends DgAvgDeltaUtilsGroupChart {
 	@Override
 	protected XYSeriesCollection createDatasets(Id runId1, Id runId2) {
 		DgModeSwitchPlanTypeAnalyzer modeSwitchAnalysis = new DgModeSwitchPlanTypeAnalyzer(this.ana, runId1, runId2);
-		DgAnalysisPopulation car2carPop = modeSwitchAnalysis.getPersonsForModeSwitch(new Tuple(PlanImpl.Type.CAR, PlanImpl.Type.CAR));
-		DgAnalysisPopulation pt2ptPop = modeSwitchAnalysis.getPersonsForModeSwitch(new Tuple(PlanImpl.Type.PT, PlanImpl.Type.PT));
-		DgAnalysisPopulation pt2carPop = modeSwitchAnalysis.getPersonsForModeSwitch(new Tuple(PlanImpl.Type.PT, PlanImpl.Type.CAR));
-		DgAnalysisPopulation car2ptPop = modeSwitchAnalysis.getPersonsForModeSwitch(new Tuple(PlanImpl.Type.CAR, PlanImpl.Type.PT));
+		DgAnalysisPopulation car2carPop = modeSwitchAnalysis.getPersonsForModeSwitch(new Tuple(PlanImpl.DeprecatedConstants.CAR, PlanImpl.DeprecatedConstants.CAR));
+		DgAnalysisPopulation pt2ptPop = modeSwitchAnalysis.getPersonsForModeSwitch(new Tuple(PlanImpl.DeprecatedConstants.PT, PlanImpl.DeprecatedConstants.PT));
+		DgAnalysisPopulation pt2carPop = modeSwitchAnalysis.getPersonsForModeSwitch(new Tuple(PlanImpl.DeprecatedConstants.PT, PlanImpl.DeprecatedConstants.CAR));
+		DgAnalysisPopulation car2ptPop = modeSwitchAnalysis.getPersonsForModeSwitch(new Tuple(PlanImpl.DeprecatedConstants.CAR, PlanImpl.DeprecatedConstants.PT));
 		XYSeriesCollection ds = new XYSeriesCollection();
 		ds.addSeries(this.createXYSeries("Mean "+  '\u0394' + "Utility Car2Car", car2carPop, runId1, runId2).getFirst());
 		ds.addSeries(this.createXYSeries("Mean "+  '\u0394' + "Utility Pt2Pt", pt2ptPop, runId1, runId2).getFirst());

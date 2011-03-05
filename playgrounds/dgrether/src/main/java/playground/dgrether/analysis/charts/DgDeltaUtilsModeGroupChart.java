@@ -33,7 +33,7 @@ import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PlanImpl.Type;
+import org.matsim.core.population.PlanImpl.DeprecatedConstants;
 import org.matsim.core.utils.collections.Tuple;
 
 import playground.dgrether.analysis.charts.interfaces.DgChart;
@@ -79,16 +79,16 @@ public class DgDeltaUtilsModeGroupChart implements DgChart {
 			Double scoreDiff = planDataRun2.getScore() - planDataRun1.getScore();
 			Tuple<Double, Double> t = new Tuple<Double, Double>(100.0*i/size, scoreDiff);
 			
-			if (((PlanImpl) planDataRun1.getPlan()).getType().equals(Type.CAR) && ((PlanImpl) planDataRun2.getPlan()).getType().equals(Type.CAR)) {
+			if (((PlanImpl) planDataRun1.getPlan()).getType().equals(DeprecatedConstants.CAR) && ((PlanImpl) planDataRun2.getPlan()).getType().equals(DeprecatedConstants.CAR)) {
 				valuesCarCar.add(t);
 			}
-			else if (((PlanImpl) planDataRun1.getPlan()).getType().equals(Type.PT) && ((PlanImpl) planDataRun2.getPlan()).getType().equals(Type.PT)) {
+			else if (((PlanImpl) planDataRun1.getPlan()).getType().equals(DeprecatedConstants.PT) && ((PlanImpl) planDataRun2.getPlan()).getType().equals(DeprecatedConstants.PT)) {
 				valuesPtPt.add(t);
 			}
-			else if (((PlanImpl) planDataRun1.getPlan()).getType().equals(Type.PT) && ((PlanImpl) planDataRun2.getPlan()).getType().equals(Type.CAR)) {
+			else if (((PlanImpl) planDataRun1.getPlan()).getType().equals(DeprecatedConstants.PT) && ((PlanImpl) planDataRun2.getPlan()).getType().equals(DeprecatedConstants.CAR)) {
 				valuesPtCar.add(t);
 			}
-			else if (((PlanImpl) planDataRun1.getPlan()).getType().equals(Type.CAR) && ((PlanImpl) planDataRun2.getPlan()).getType().equals(Type.PT)){
+			else if (((PlanImpl) planDataRun1.getPlan()).getType().equals(DeprecatedConstants.CAR) && ((PlanImpl) planDataRun2.getPlan()).getType().equals(DeprecatedConstants.PT)){
 				valuesCarPt.add(t);
 			}
 		}
