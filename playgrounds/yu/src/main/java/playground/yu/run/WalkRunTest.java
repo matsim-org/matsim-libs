@@ -35,7 +35,8 @@ public class WalkRunTest {
 			controler
 					.setScoringFunctionFactory(new CharyparNagelScoringFunctionFactoryWithWalk(
 							config.planCalcScore(), config
-									.vspExperimental().getOffsetWalk()));
+//									.vspExperimental().getOffsetWalk()));
+							.planCalcScore().getConstantWalk())) ;
 			// controler.addControlerListener(new MZComparisonListener());
 			controler.setWriteEventsInterval(100);
 			controler.setOverwriteFiles(true);

@@ -109,7 +109,8 @@ public class SubTourModeChoicePlanStrategy implements PlanStrategy {
 			controler
 					.setScoringFunctionFactory(new CharyparNagelScoringFunctionFactoryWithWalk(
 							config.planCalcScore(), config
-									.vspExperimental().getOffsetWalk()));
+//									.vspExperimental().getOffsetWalk()));
+							.planCalcScore().getConstantWalk() )) ;
 			// controler.addControlerListener(new MZComparisonListener());
 			controler.setWriteEventsInterval(Integer.parseInt(args[1]));
 			controler.setCreateGraphs(Boolean.parseBoolean(args[2]));
