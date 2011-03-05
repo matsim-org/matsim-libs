@@ -58,13 +58,13 @@ public abstract class QLinkInternalI extends VisLane implements NetsimLink {
 	public Map<String, Object> getCustomAttributes() {
 		return customAttributes;
 	}
-	
+
 	/**
 	 * modifying the return type ...
 	 */
 	@Override
 	public abstract QSim getMobsim() ;
 
-	abstract void letAgentDepartWithVehicle(PersonDriverAgent agent, QVehicleImpl vehicle, double now);
-	
+	abstract void letAgentDepartWithVehicle(PersonDriverAgent agent, QVehicle vehicle, double now);
+
 }

@@ -96,12 +96,13 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 
 	@Override
 	public Id chooseNextLinkId() {
-		List<Id> linkIds = getCarRoute().getLinkIds();
+		NetworkRoute netR = getCarRoute();
+		List<Id> linkIds = netR.getLinkIds();
 		if (this.nextLinkIndex < linkIds.size()) {
 			return linkIds.get(this.nextLinkIndex);
 		}
 		if (this.nextLinkIndex == linkIds.size()) {
-			return getCarRoute().getEndLinkId();
+			return netR.getEndLinkId();
 		}
 		return null;
 	}

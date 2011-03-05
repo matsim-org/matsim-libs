@@ -45,6 +45,7 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.pt.qsim.TransitDriverAgent;
 import org.matsim.pt.qsim.TransitQLaneFeature;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.interfaces.NetsimEngine;
@@ -219,7 +220,7 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 		departureTime = now + this.freespeedTravelTime + ( veh.getEarliestLinkExitTime() - Math.floor(veh.getEarliestLinkExitTime()) );
 		// yyyy freespeedTravelTime may be Inf, in which case the vehicle never leaves, even if the time-variant link
 		// is reset to a non-zero speed.  kai, nov'10
-		
+
 		/* It's a QueueLane that is directly connected to a QueueNode,
 		 * so we have to floor the freeLinkTravelTime in order the get the same
 		 * results compared to the old mobSim */
@@ -344,7 +345,7 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 				if ((this.getLink().getId().equals(driver.getDestinationLinkId())) && (driver.chooseNextLinkId() == null)) {
 					driver.endLegAndAssumeControl(now);
 					this.addParkedVehicle(veh);
-					this.makeAvailableToNextDriver(veh, now);
+					this.makeVehicleAvailableToNextDriver(veh, now);
 					// remove _after_ processing the arrival to keep link active
 					this.vehQueue.poll();
 					this.usedStorageCapacity -= veh.getSizeInEquivalents();
@@ -362,6 +363,31 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 					return;
 				}
 
+				if (driver instanceof TransitDriverAgent) {
+					TransitDriverAgent trDriver = (TransitDriverAgent) driver;
+					Id nextLinkId = trDriver.chooseNextLinkId();
+					if (nextLinkId == null || nextLinkId.equals(trDriver.getCurrentLinkId())) {
+						// special case: transit drivers can specify the next link being the current link
+						// this can happen when a transit-lines route leads over exactly one link
+						// normally, vehicles would not even drive on that link, but transit vehicles must
+						// "drive" on that link in order to handle the stops on that link
+						// so allow them to return some non-null link id in chooseNextLink() in order to be
+						// placed on the link, and here we'll remove them again if needed...
+						// ugly hack, but I didn't find a nicer solution sadly... mrieser, 5mar2011
+						driver.endLegAndAssumeControl(now);
+						this.addParkedVehicle(veh);
+						this.makeVehicleAvailableToNextDriver(veh, now);
+						// remove _after_ processing the arrival to keep link active
+						this.vehQueue.poll();
+						this.usedStorageCapacity -= veh.getSizeInEquivalents();
+						if ( HOLES ) {
+							Hole hole = new Hole() ;
+							hole.setEarliestLinkExitTime( now + this.link.getLength()*3600./15./1000. ) ;
+							holes.add( hole ) ;
+						}
+						continue;
+					}
+				}
 				addToBuffer(veh, now);
 				this.vehQueue.poll();
 				this.usedStorageCapacity -= veh.getSizeInEquivalents();
@@ -375,7 +401,7 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 		} // end while
 	}
 
-	private void makeAvailableToNextDriver(QVehicleImpl veh, double now) {
+	private void makeVehicleAvailableToNextDriver(QVehicle veh, double now) {
 		Iterator<PlanAgent> i = additionalAgentsOnLink.values().iterator();
 		while (i.hasNext()) {
 			PlanAgent agent = i.next();
@@ -393,13 +419,13 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 					i.remove();
 					this.letAgentDepartWithVehicle((PersonDriverAgent) agent, veh, now);
 					return;
-				} 
+				}
 			}
 		}
 	}
 
 	@Override
-	void letAgentDepartWithVehicle(PersonDriverAgent agent, QVehicleImpl vehicle, double now) {
+	void letAgentDepartWithVehicle(PersonDriverAgent agent, QVehicle vehicle, double now) {
 		vehicle.setDriver(agent);
 		NetworkRoute route = (NetworkRoute) agent.getCurrentLeg().getRoute();
 		if ((route.getEndLinkId().equals(link.getId())) && (agent.chooseNextLinkId() == null)) {
@@ -430,6 +456,36 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 			boolean handled = this.transitQueueLaneFeature.handleMoveWaitToBuffer(now, veh);
 
 			if (!handled) {
+
+
+				if (veh.getDriver() instanceof TransitDriverAgent) {
+					TransitDriverAgent trDriver = (TransitDriverAgent) veh.getDriver();
+					Id nextLinkId = trDriver.chooseNextLinkId();
+					if (nextLinkId == null || nextLinkId.equals(trDriver.getCurrentLinkId())) {
+						// special case: transit drivers can specify the next link being the current link
+						// this can happen when a transit-lines route leads over exactly one link
+						// normally, vehicles would not even drive on that link, but transit vehicles must
+						// "drive" on that link in order to handle the stops on that link
+						// so allow them to return some non-null link id in chooseNextLink() in order to be
+						// placed on the link, and here we'll remove them again if needed...
+						// ugly hack, but I didn't find a nicer solution sadly... mrieser, 5mar2011
+						trDriver.endLegAndAssumeControl(now);
+						this.addParkedVehicle(veh);
+						this.makeVehicleAvailableToNextDriver(veh, now);
+						// remove _after_ processing the arrival to keep link active
+						this.vehQueue.poll();
+						this.usedStorageCapacity -= veh.getSizeInEquivalents();
+						if ( HOLES ) {
+							Hole hole = new Hole() ;
+							hole.setEarliestLinkExitTime( now + this.link.getLength()*3600./15./1000. ) ;
+							holes.add( hole ) ;
+						}
+						continue;
+					}
+				}
+
+
+
 				addToBuffer(veh, now);
 			}
 		}
@@ -511,10 +567,10 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 		double tempStorageCapacity = this.freespeedTravelTime * this.flowCapacityPerTimeStep;
 		// yy note: freespeedTravelTime may be Inf.  In this case, storageCapacity will also be set to Inf.  This can still be
 		// interpreted, but it means that the link will act as an infinite sink.  kai, nov'10
-		
+
 		if (this.storageCapacity < tempStorageCapacity) {
 			if (spaceCapWarningCount <= 10) {
-				log.warn("Link " + this.getLink().getId() + " too small: enlarge storage capcity from: " + this.storageCapacity 
+				log.warn("Link " + this.getLink().getId() + " too small: enlarge storage capcity from: " + this.storageCapacity
 						+ " Vehicles to: " + tempStorageCapacity + " Vehicles.  This is not fatal, but modifies the traffic flow dynamics.");
 				if (spaceCapWarningCount == 10) {
 					log.warn("Additional warnings of this type are suppressed.");
@@ -528,7 +584,7 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 			// yyyy number of initial holes (= max number of vehicles on link given bottleneck spillback) is, in fact, dicated
 			// by the bottleneck flow capacity, together with the fundamental diagram. :-(  kai, ???'10
 			//
-			// Alternative would be to have link entry capacity constraint.  This, however, does not work so well with the 
+			// Alternative would be to have link entry capacity constraint.  This, however, does not work so well with the
 			// current "parallel" logic, where capacity constraints are modeled only on the link.  kai, nov'10
 			double bnFlowCap_s = ((LinkImpl)this.link).getFlowCapacity() ;
 
@@ -538,12 +594,12 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 			if ( congestedDensity_veh_m > 10. ) {
 				if ( congDensWarnCnt2 < 1 ) {
 					congDensWarnCnt2++ ;
-					log.warn("congestedDensity_veh_m very large: " + congestedDensity_veh_m 
+					log.warn("congestedDensity_veh_m very large: " + congestedDensity_veh_m
 							+ "; does this make sense?  Setting to 10 veh/m (which is still a lot but who knows). "
 							+ "Definitely can't have it at Inf." ) ;
 				}
 			}
-			
+
 			// congestedDensity is in veh/m.  If this is less than something reasonable (e.g. 1veh/50m) or even negative,
 			// then this means that the link has not enough storageCapacity (essentially not enough lanes) to transport the given
 			// flow capacity.  Will increase the storageCapacity accordingly:

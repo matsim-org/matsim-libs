@@ -159,7 +159,7 @@ public class QLinkLanesImpl extends QLinkInternalI {
 	 * @param toNode
 	 * @see NetsimLink#createLanes(List)
 	 */
-	 QLinkLanesImpl(final Link link2, NetsimEngine engine, 
+	 QLinkLanesImpl(final Link link2, NetsimEngine engine,
 			final QNode toNode, Map<Id, Lane> laneMap) {
 		this.link = link2;
 		this.toQueueNode = toNode;
@@ -185,7 +185,7 @@ public class QLinkLanesImpl extends QLinkInternalI {
 		List<QLane> laneList = new LinkedList<QLane>();
 		Lane firstLane = sortedLanes.remove(0);
 		if (firstLane.getStartsAtMeterFromLinkEnd() != this.link.getLength()) {
-			throw new IllegalStateException("First Lane Id " + firstLane.getId() + " on Link Id " + this.link.getId() + 
+			throw new IllegalStateException("First Lane Id " + firstLane.getId() + " on Link Id " + this.link.getId() +
 			"isn't starting at the beginning of the link!");
 		}
 		this.originalLane = new QLane(this, firstLane, true);
@@ -214,14 +214,14 @@ public class QLinkLanesImpl extends QLinkInternalI {
 				laneLength = lastQLane.getLaneData().getStartsAtMeterFromLinkEnd() - nextMetersFromLinkEnd;
 				lastQLane.setEndsAtMetersFromLinkEnd(nextMetersFromLinkEnd);
 			}
-			//there are no subsequent lanes 
+			//there are no subsequent lanes
 			else {
 				laneLength = lastQLane.getLaneData().getStartsAtMeterFromLinkEnd();
 				lastQLane.setEndsAtMetersFromLinkEnd(0.0);
 				this.toNodeQueueLanes.add(lastQLane);
 			}
 			lastQLane.setLaneLength(laneLength);
-		}		
+		}
 
 		//fill toLinks
 		while (!laneStack.isEmpty()){
@@ -241,7 +241,7 @@ public class QLinkLanesImpl extends QLinkInternalI {
 			}
 			qLane.finishInitialization();
 		}
-		
+
 		Collections.sort(this.queueLanes, QLinkLanesImpl.fromLinkEndComparator);
 	}
 
@@ -409,7 +409,7 @@ public class QLinkLanesImpl extends QLinkInternalI {
 		ret.addAll(this.parkedVehicles.values());
 		return ret ;
 	}
-	
+
 	@Override
 	public final Collection<QVehicle> getAllNonParkedVehicles() {
 		Collection<QVehicle> ret = new ArrayList<QVehicle>(this.waitingList);
@@ -470,7 +470,7 @@ public class QLinkLanesImpl extends QLinkInternalI {
 	QSimEngineImpl getQSimEngine(){
 		return this.qsimEngine;
 	}
-	
+
 	@Override
 	public QSim getMobsim() {
 		return this.qsimEngine.getMobsim();
@@ -582,7 +582,7 @@ public class QLinkLanesImpl extends QLinkInternalI {
 		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException() ;
 	}
-	
+
 	@Override
 	double getInverseSimulatedFlowCapacity() {
 		// TODO Auto-generated method stub
@@ -612,7 +612,7 @@ public class QLinkLanesImpl extends QLinkInternalI {
 
 
 	@Override
-	void letAgentDepartWithVehicle(PersonDriverAgent agent, QVehicleImpl vehicle, double now) {
+	void letAgentDepartWithVehicle(PersonDriverAgent agent, QVehicle vehicle, double now) {
 		vehicle.setDriver(agent);
 		NetworkRoute route = (NetworkRoute) agent.getCurrentLeg().getRoute();
 		if ((route.getEndLinkId().equals(link.getId())) && (agent.chooseNextLinkId() == null)) {

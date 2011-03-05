@@ -51,7 +51,7 @@ public class TransitQLaneFeature {
 
 	private final NetsimLink queueLane;
 
-	public TransitQLaneFeature(NetsimLink queueLane) {
+	public TransitQLaneFeature(final NetsimLink queueLane) {
 		this.queueLane = queueLane;
 	}
 
@@ -90,28 +90,27 @@ public class TransitQLaneFeature {
 			// add all departing transit vehicles at the front of the vehQueue
 			ListIterator<QVehicle> iter = departingTransitVehicles.listIterator(departingTransitVehicles.size());
 			while (iter.hasPrevious()) {
-				queueLane.getVehQueue().addFirst(iter.previous());
+				this.queueLane.getVehQueue().addFirst(iter.previous());
 			}
 		}
 	}
 
-	public boolean handleMoveLaneToBuffer(final double now, QVehicle veh,
-			PersonDriverAgent driver) {
+	public boolean handleMoveLaneToBuffer(final double now, final QVehicle veh,
+			final PersonDriverAgent driver) {
 		boolean handled = false;
 		// handle transit driver if necessary
 		if (driver instanceof TransitDriverAgent) {
 			TransitDriverAgent transitDriver = (TransitDriverAgent) veh.getDriver();
 			TransitStopFacility stop = transitDriver.getNextTransitStop();
-			if ((stop != null) && (stop.getLinkId().equals(queueLane.getLink().getId()))) {
+			if ((stop != null) && (stop.getLinkId().equals(this.queueLane.getLink().getId()))) {
 				double delay = transitDriver.handleTransitStop(stop, now);
 				if (delay > 0.0) {
-					
+
 					veh.setEarliestLinkExitTime(now + delay);
 					// (if the vehicle is not removed from the queue in the following lines, then this will effectively block the lane
-					// kai, aug'10)
-					
+
 					if (!stop.getIsBlockingLane()) {
-						queueLane.getVehQueue().poll(); // remove the bus from the queue
+						this.queueLane.getVehQueue().poll(); // remove the bus from the queue
 						this.transitVehicleStopQueue.add(veh); // and add it to the stop queue
 					}
 				}
@@ -124,20 +123,21 @@ public class TransitQLaneFeature {
 		return handled;
 	}
 
-	public boolean handleMoveWaitToBuffer(final double now, QVehicle veh) {
+	public boolean handleMoveWaitToBuffer(final double now, final QVehicle veh) {
 		if (veh.getDriver() instanceof TransitDriverAgent) {
-			// yyyy The way I understand the code, this can only happen at the start of a pt run, when the vehicle
-			// with the driver enters the traffic for the first time.  In contrast, pt vehicles at stops
-			// are handled via a separate data structure ("transitVehicleStopQueue") --???  kai, nov'09
 			TransitDriverAgent driver = (TransitDriverAgent) veh.getDriver();
-			TransitStopFacility stop = driver.getNextTransitStop();
-			if ((stop != null) && (stop.getLinkId().equals(queueLane.getLink().getId()))) {
-				double delay = driver.handleTransitStop(stop, now);
-				if (delay > 0.0) {
-					veh.setEarliestLinkExitTime(now + delay);
-					// add it to the stop queue, can do this as the waitQueue is also non-blocking anyway
-					this.transitVehicleStopQueue.add(veh);
-					return true;
+			while (true) {
+				TransitStopFacility stop = driver.getNextTransitStop();
+				if ((stop != null) && (stop.getLinkId().equals(this.queueLane.getLink().getId()))) {
+					double delay = driver.handleTransitStop(stop, now);
+					if (delay > 0.0) {
+						veh.setEarliestLinkExitTime(now + delay);
+						// add it to the stop queue, can do this as the waitQueue is also non-blocking anyway
+						this.transitVehicleStopQueue.add(veh);
+						return true;
+					}
+				} else {
+					return false;
 				}
 			}
 		}
@@ -173,7 +173,7 @@ public class TransitQLaneFeature {
 					if ( !it.hasPrevious() ) {
 						last = true ;
 					}
-					AgentSnapshotInfo passengerPosition = AgentSnapshotInfoFactory.staticCreateAgentSnapshotInfo(passenger.getPerson().getId(), queueLane.getLink(), cnt2); // for the time being, same position as facilities
+					AgentSnapshotInfo passengerPosition = AgentSnapshotInfoFactory.staticCreateAgentSnapshotInfo(passenger.getPerson().getId(), this.queueLane.getLink(), cnt2); // for the time being, same position as facilities
 					if ( passenger.getPerson().getId().toString().startsWith("pt")) {
 						passengerPosition.setAgentState(AgentState.TRANSIT_DRIVER);
 					} else if (last) {
@@ -190,7 +190,7 @@ public class TransitQLaneFeature {
 		}
 	}
 
-	public List<PersonAgent> getPassengers(QVehicle queueVehicle) {
+	public List<PersonAgent> getPassengers(final QVehicle queueVehicle) {
 		// yyyy warum macht diese Methode Sinn?  TransitVehicle.getPassengers() gibt doch
 		// bereits eine Collection<PersonAgent> zurück.  Dann braucht das Umkopieren hier doch
 		// bloss Zeit?  kai, feb'10

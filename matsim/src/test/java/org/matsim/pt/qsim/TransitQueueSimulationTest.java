@@ -117,9 +117,9 @@ public class TransitQueueSimulationTest {
 		network.addNode(node1);
 		network.addNode(node2);
 		network.addNode(node3);
-		Link link1 = network.getFactory().createLink(scenario.createId("1"), node1.getId(), node2.getId());
+		Link link1 = network.getFactory().createLink(scenario.createId("1"), node1, node2);
 		setDefaultLinkAttributes(link1);
-		Link link2 = network.getFactory().createLink(scenario.createId("2"), node2.getId(), node3.getId());
+		Link link2 = network.getFactory().createLink(scenario.createId("2"), node2, node3);
 		setDefaultLinkAttributes(link2);
 		network.addLink(link1);
 		network.addLink(link2);
@@ -233,7 +233,7 @@ public class TransitQueueSimulationTest {
 		Node node2 = network.getFactory().createNode(scenario.createId("2"), scenario.createCoord(1000, 0));
 		network.addNode(node1);
 		network.addNode(node2);
-		Link link = network.getFactory().createLink(scenario.createId("1"), node1.getId(), node2.getId());
+		Link link = network.getFactory().createLink(scenario.createId("1"), node1, node2);
 		setDefaultLinkAttributes(link);
 		network.addLink(link);
 
@@ -297,8 +297,8 @@ public class TransitQueueSimulationTest {
 		network.addNode(node1);
 		network.addNode(node2);
 		network.addNode(node3);
-		Link link1 = network.getFactory().createLink(scenario.createId("1"), node1.getId(), node2.getId());
-		Link link2 = network.getFactory().createLink(scenario.createId("2"), node2.getId(), node3.getId());
+		Link link1 = network.getFactory().createLink(scenario.createId("1"), node1, node2);
+		Link link2 = network.getFactory().createLink(scenario.createId("2"), node2, node3);
 		setDefaultLinkAttributes(link1);
 		network.addLink(link1);
 		setDefaultLinkAttributes(link2);
@@ -370,11 +370,11 @@ public class TransitQueueSimulationTest {
 		network.addNode(node4);
 		network.addNode(node5);
 		network.addNode(node6);
-		Link link1 = network.getFactory().createLink(scenario.createId("1"), node1.getId(), node2.getId());
-		Link link2 = network.getFactory().createLink(scenario.createId("2"), node2.getId(), node3.getId());
-		Link link3 = network.getFactory().createLink(scenario.createId("3"), node3.getId(), node4.getId());
-		Link link4 = network.getFactory().createLink(scenario.createId("4"), node4.getId(), node5.getId());
-		Link link5 = network.getFactory().createLink(scenario.createId("5"), node5.getId(), node6.getId());
+		Link link1 = network.getFactory().createLink(scenario.createId("1"), node1, node2);
+		Link link2 = network.getFactory().createLink(scenario.createId("2"), node2, node3);
+		Link link3 = network.getFactory().createLink(scenario.createId("3"), node3, node4);
+		Link link4 = network.getFactory().createLink(scenario.createId("4"), node4, node5);
+		Link link5 = network.getFactory().createLink(scenario.createId("5"), node5, node6);
 		setDefaultLinkAttributes(link1);
 		setDefaultLinkAttributes(link2);
 		setDefaultLinkAttributes(link3);
@@ -593,11 +593,11 @@ public class TransitQueueSimulationTest {
 		network.getNodes().put(node1.getId(), node1);
 		network.getNodes().put(node2.getId(), node2);
 		network.getNodes().put(node3.getId(), node3);
-		Link link1 = network.getFactory().createLink(scenario.createId("1"), node1.getId(), node2.getId());
+		Link link1 = network.getFactory().createLink(scenario.createId("1"), node1, node2);
 		link1.setFreespeed(10.0);
 		link1.setCapacity(2000.0);
 		link1.setLength(1000.0);
-		Link link2 = network.getFactory().createLink(scenario.createId("2"), node2.getId(), node3.getId());
+		Link link2 = network.getFactory().createLink(scenario.createId("2"), node2, node3);
 		link2.setFreespeed(10.0);
 		link2.setCapacity(2000.0);
 		link2.setLength(1000.0);
@@ -657,16 +657,16 @@ public class TransitQueueSimulationTest {
 
 		@Override
 		public void handleEvent(final Event event) {
-			if (firstEvent == null) {
-				firstEvent = event;
+			if (this.firstEvent == null) {
+				this.firstEvent = event;
 			}
-			lastEvent = event;
+			this.lastEvent = event;
 		}
 
 		@Override
 		public void reset(final int iteration) {
-			firstEvent = null;
-			lastEvent = null;
+			this.firstEvent = null;
+			this.lastEvent = null;
 		}
 	}
 
