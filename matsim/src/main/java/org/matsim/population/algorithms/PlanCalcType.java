@@ -52,11 +52,11 @@ public class PlanCalcType extends AbstractPersonAlgorithm implements PlanAlgorit
 			else if (leg.getMode().equals(TransportMode.walk)) hasWalk = true;
 		}
 
-		if (hasCar) ((PlanImpl) plan).setType(PlanImpl.Type.CAR);
-		else if (hasPt) ((PlanImpl) plan).setType(PlanImpl.Type.PT);
-		else if (hasRide) ((PlanImpl) plan).setType(PlanImpl.Type.RIDE);
-		else if (hasBike) ((PlanImpl) plan).setType(PlanImpl.Type.BIKE);
-		else if (hasWalk) ((PlanImpl) plan).setType(PlanImpl.Type.WALK);
+		if (hasCar) ((PlanImpl) plan).setType(PlanImpl.DeprecatedConstants.CAR);
+		else if (hasPt) ((PlanImpl) plan).setType(PlanImpl.DeprecatedConstants.PT);
+		else if (hasRide) ((PlanImpl) plan).setType(PlanImpl.DeprecatedConstants.RIDE);
+		else if (hasBike) ((PlanImpl) plan).setType(PlanImpl.DeprecatedConstants.BIKE);
+		else if (hasWalk) ((PlanImpl) plan).setType(PlanImpl.DeprecatedConstants.WALK);
 		else ((PlanImpl) plan).setType(null);
 	}
 }

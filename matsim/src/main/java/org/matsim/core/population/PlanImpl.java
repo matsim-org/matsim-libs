@@ -38,22 +38,41 @@ import org.matsim.utils.customize.Customizable;
 import org.matsim.utils.customize.CustomizableImpl;
 
 public class PlanImpl implements Plan {
-	/**
-	 * @deprecated use Leg.Mode instead
-	 *
-	 * But do not remove: minimally, kai is of the opinion that a plan type, with the consequence
-	 * that the last plan of a certain type is never removed, is extremely useful and should remain
-	 * there.  kai, dec'10
+//	/**
+//	 * @deprecated use Leg.Mode instead
+//	 *
+//	 * But do not remove: minimally, kai is of the opinion that a plan type, with the consequence
+//	 * that the last plan of a certain type is never removed, is extremely useful and should remain
+//	 * there.  kai, dec'10
+//	 */
+//	@Deprecated
+//	public enum Type { CAR, PT, RIDE, BIKE, WALK, UNDEFINED}
+	
+	/**Plan(Impl).getType is still there, but now returns a String.  That String can be used in arbitrary, user-defined
+	 * ways; matsim will, however, make sure that the last plan of a given type is not removed.  The constants here are just
+	 * leftovers from the conversion from PlanImpl.Type to String.  They should not be used since they are not useful
+	 * for inter-modal plans; you should rely on Leg.getMode() instead.  kai, mar'11
+	 * <p/>
+	 * yyyy this class presumably should be removed eventually.  kai, mar'11
+	 * 
+	 * @author nagel
 	 */
 	@Deprecated
-	public enum Type { CAR, PT, RIDE, BIKE, WALK, UNDEFINED}
+	public static class DeprecatedConstants {
+		public static final String CAR = "car" ;
+		public static final String PT = "pt" ;
+		public static final String RIDE = "ride" ;
+		public static final String BIKE = "bike" ;
+		public static final String WALK = "walk" ;
+		public static final String UNDEFINED = "undefined" ;
+	}
 
 	protected ArrayList<PlanElement> actsLegs = new ArrayList<PlanElement>();
 
 	private Double score = null;
 	private Person person = null;
 
-	private PlanImpl.Type type = null;
+	private String type = null;
 
 	private final static Logger log = Logger.getLogger(PlanImpl.class);
 
@@ -204,11 +223,17 @@ public class PlanImpl implements Plan {
 		this.score = score;
 	}
 
-	public PlanImpl.Type getType() {
+	/**
+	 * yy Since this now has a defined useage (last plan of given "type" is never removed), this may be elevated into the
+	 * api.  Might be called "label" instead of "type", though???  kai, mar'11
+	 */
+	@Deprecated
+	public String getType() {
 		return this.type;
 	}
 
-	public void setType(PlanImpl.Type type) {
+	@Deprecated
+	public void setType(String type) {
 		this.type = type;
 	}
 

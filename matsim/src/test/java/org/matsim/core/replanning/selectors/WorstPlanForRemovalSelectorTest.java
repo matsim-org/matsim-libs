@@ -101,12 +101,12 @@ public class WorstPlanForRemovalSelectorTest extends AbstractPlanSelectorTest {
 		PlanImpl plan6 = new org.matsim.core.population.PlanImpl(person);
 		plan6.setScore(21.0);
 
-		plan1.setType(PlanImpl.Type.CAR);
-		plan2.setType(PlanImpl.Type.PT);
-		plan3.setType(PlanImpl.Type.CAR);
-		plan4.setType(PlanImpl.Type.PT);
-		plan5.setType(PlanImpl.Type.CAR);
-		plan6.setType(PlanImpl.Type.PT);
+		plan1.setType(PlanImpl.DeprecatedConstants.CAR);
+		plan2.setType(PlanImpl.DeprecatedConstants.PT);
+		plan3.setType(PlanImpl.DeprecatedConstants.CAR);
+		plan4.setType(PlanImpl.DeprecatedConstants.PT);
+		plan5.setType(PlanImpl.DeprecatedConstants.CAR);
+		plan6.setType(PlanImpl.DeprecatedConstants.PT);
 		person.addPlan(plan1);
 		person.addPlan(plan2);
 		person.addPlan(plan3);

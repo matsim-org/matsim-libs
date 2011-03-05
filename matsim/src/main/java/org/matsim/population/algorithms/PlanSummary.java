@@ -53,7 +53,7 @@ public class PlanSummary extends AbstractPersonAlgorithm implements PlanAlgorith
 	private final double[] actTypeDurations;
 	private final String[] legModes;
 	private final int[] legModeCnt;
-	private HashMap<PlanImpl.Type, Integer> planTypes = new HashMap<PlanImpl.Type, Integer>();
+	private HashMap<String, Integer> planTypes = new HashMap<String, Integer>();
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
@@ -211,7 +211,7 @@ public class PlanSummary extends AbstractPersonAlgorithm implements PlanAlgorith
 		}
 		// plan types summary
 		System.out.println("\nplan types:");
-		for (PlanImpl.Type type : this.planTypes.keySet()) {
+		for (String type : this.planTypes.keySet()) {
 			System.out.println(type + " : " + this.planTypes.get(type));
 		}
 		System.out.println("----------------------------------------");

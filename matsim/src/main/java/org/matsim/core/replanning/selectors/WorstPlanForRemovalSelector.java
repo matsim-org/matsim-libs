@@ -43,7 +43,7 @@ public class WorstPlanForRemovalSelector implements PlanSelector {
 	public Plan selectPlan(Person person) {
 
 		// hashmap that returns "Integer" count for given plans type:
-		HashMap<PlanImpl.Type, Integer> typeCounts = new HashMap<PlanImpl.Type, Integer>();
+		HashMap<String, Integer> typeCounts = new HashMap<String, Integer>();
 
 		// count how many plans per type an agent has:
 		for (Plan plan : person.getPlans()) {

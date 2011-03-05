@@ -262,7 +262,7 @@ public class PopulationWriterHandlerImplV4 extends AbstractPopulationWriterHandl
 			out.write(" selected=\"no\"");
 		if (plan instanceof PlanImpl){
 			PlanImpl p = (PlanImpl)plan;
-			if ((p.getType() != null) && (p.getType() != PlanImpl.Type.UNDEFINED)) {
+			if ((p.getType() != null) && (p.getType() != PlanImpl.DeprecatedConstants.UNDEFINED)) {
 				out.write(" type=\"");
 				out.write(p.getType().toString());
 				out.write("\"");
