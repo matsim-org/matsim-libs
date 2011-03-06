@@ -83,7 +83,7 @@ public class ControlerConfigGroupTest {
 	}
 
 	/**
-	 * Ensure that the events-file-format is correctly stored
+	 * Ensure that the mobsim-selector is correctly stored
 	 * and returned with the different setters and getters.
 	 *
 	 * @author mrieser
@@ -106,6 +106,25 @@ public class ControlerConfigGroupTest {
 		cg.addParam(ControlerConfigGroup.MOBSIM, "queueSimulation");
 		Assert.assertEquals("queueSimulation", cg.getMobsim());
 		Assert.assertEquals("queueSimulation", cg.getValue(ControlerConfigGroup.MOBSIM));
+	}
+
+	/**
+	 * Ensure that the write-plans-interval value is correctly stored
+	 * and returned with the different setters and getters.
+	 *
+	 * @author mrieser
+	 */
+	@Test
+	public void testWritePlansInterval() {
+		ControlerConfigGroup cg = new ControlerConfigGroup();
+		// test initial value
+		Assert.assertEquals(10, cg.getWritePlansInterval());
+		// test setting with setMobsim
+		cg.setWritePlansInterval(4);
+		Assert.assertEquals(4, cg.getWritePlansInterval());
+		// test setting with addParam
+		cg.addParam("writePlansInterval", "2");
+		Assert.assertEquals(2, cg.getWritePlansInterval());
 	}
 
 }

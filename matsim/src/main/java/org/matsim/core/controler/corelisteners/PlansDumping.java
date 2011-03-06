@@ -21,6 +21,7 @@
 package org.matsim.core.controler.corelisteners;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
@@ -28,9 +29,10 @@ import org.matsim.core.population.PopulationWriter;
 
 /**
  * {@link org.matsim.core.controler.listener.ControlerListener} that dumps the
- * complete plans every 10th iteration as well as in the first iteration,
- * just in case someone might check that the replanning worked correctly in
- * the first iteration.
+ * complete plans regularly at the start of an iteration
+ * ({@link ControlerConfigGroup#getWritePlansInterval()} as well as in the first
+ * iteration, just in case someone might check that the replanning worked
+ * correctly in the first iteration.
  *
  * @author mrieser
  */
@@ -41,7 +43,7 @@ public class PlansDumping implements BeforeMobsimListener {
 	@Override
 	public void notifyBeforeMobsim(final BeforeMobsimEvent event) {
 		Controler controler = event.getControler();
-		if ((event.getIteration() % controler.getWritePlansInterval() == 0) 
+		if ((controler.getWritePlansInterval() > 0) && ((event.getIteration() % controler.getWritePlansInterval() == 0))
 				|| (event.getIteration() == (controler.getFirstIteration() + 1))) {
 			controler.stopwatch.beginOperation("dump all plans");
 			log.info("dumping plans...");

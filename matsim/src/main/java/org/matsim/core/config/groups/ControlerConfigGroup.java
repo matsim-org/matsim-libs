@@ -47,7 +47,7 @@ public class ControlerConfigGroup extends Module {
 	private static final String LINKTOLINK_ROUTING_ENABLED = "enableLinkToLinkRouting";
 	/*package*/ static final String EVENTS_FILE_FORMAT = "eventsFileFormat";
 	private static final String WRITE_EVENTS_INTERVAL = "writeEventsInterval";
-	private static final String WRITE_PLANS_INTERVAL = "writeEventsInterval";
+	private static final String WRITE_PLANS_INTERVAL = "writePlansInterval";
 	/*package*/ static final String MOBSIM = "mobsim";
 
 	private String outputDirectory = "./output";
@@ -62,7 +62,7 @@ public class ControlerConfigGroup extends Module {
 	private Set<EventsFileFormat> eventsFileFormats = Collections.unmodifiableSet(EnumSet.of(EventsFileFormat.txt));
 
 	private int writeEventsInterval=1;
-	private int writePlansInterval=1;
+	private int writePlansInterval=10;
 
 	private String mobsim = null;
 
@@ -250,15 +250,15 @@ public class ControlerConfigGroup extends Module {
 		return this.mobsim;
 	}
 
-	public void setMobsim(String mobsim) {
+	public void setMobsim(final String mobsim) {
 		this.mobsim = mobsim;
 	}
 
 	public int getWritePlansInterval() {
-		return writePlansInterval;
+		return this.writePlansInterval;
 	}
 
-	public void setWritePlansInterval(int writePlansInterval) {
+	public void setWritePlansInterval(final int writePlansInterval) {
 		this.writePlansInterval = writePlansInterval;
 	}
 }
