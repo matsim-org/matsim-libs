@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * WithinDayQSim.java
+ * WithinDayQSimFactoryTest.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -21,40 +21,41 @@
 package org.matsim.withinday.mobsim;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.SynchronizedEventsManagerImpl;
 import org.matsim.ptproject.qsim.QSim;
-import org.matsim.ptproject.qsim.agents.AgentFactory;
-import org.matsim.ptproject.qsim.interfaces.NetsimEngineFactory;
-import org.matsim.ptproject.qsim.qnetsimengine.DefaultQSimEngineFactory;
+import org.matsim.ptproject.qsim.agents.DefaultAgentFactory;
+import org.matsim.ptproject.qsim.qnetsimengine.QSimEngineImpl;
+import org.matsim.testcases.MatsimTestCase;
 
-/*
- * This extended QSim contains some methods that
- * are needed for the WithinDay Replanning Modules.
- * 
- * Some other methods are used for the Knowledge Modules. They
- * should be separated somewhen but at the moment this seems
- * to be difficult so they remain here for now...
- */
-public class WithinDayQSim extends QSim {
-	
-	public WithinDayQSim(final Scenario scenario, final EventsManager events) {
-		this(scenario, events, new DefaultQSimEngineFactory());
-	}
-	
-	public WithinDayQSim(final Scenario scenario, final EventsManager events, NetsimEngineFactory factory) {
-		super(scenario, events, factory);
+public class WithinDayQSimFactoryTest extends MatsimTestCase {
+				
+	/**
+	 * @author cdobler
+	 */
+	public void testCreateMobsim() {
 		
-		// use WithinDayAgentFactory that creates WithinDayPersonAgents who can reset their chachedNextLink
-		WithinDayAgentFactory agentFactory = new WithinDayAgentFactory(this);
-		super.setAgentFactory(agentFactory);
-	}
-	
-	@Override
-	public void setAgentFactory(AgentFactory factory) {
-		if (factory instanceof WithinDayAgentFactory) {
-			super.setAgentFactory(factory);
-		}
-		else throw new RuntimeException("Please use a WithinDayAgentFactory!");
-	}
+				Scenario scenario = new ScenarioImpl();
+		EventsManager eventsManager = new EventsManagerImpl();
 
+		QSimConfigGroup qSimConfig = new QSimConfigGroup();
+		scenario.getConfig().addQSimConfigGroup(qSimConfig);
+				
+		QSim sim = null;
+		
+		// number of threads is 1, therefore we expect a non-parallel WithinDayQSim
+		qSimConfig.setNumberOfThreads(1);
+		sim = new WithinDayQSimFactory().createMobsim(scenario, eventsManager);
+		assertTrue(sim.getNetsimEngine().getClass().equals(QSimEngineImpl.class));
+		assertTrue(sim.getEventsManager().getClass().equals(EventsManagerImpl.class));
+		
+		// number of threads is 1, therefore we expect a parallel WithinDayQSim
+		qSimConfig.setNumberOfThreads(2);
+		sim = new WithinDayQSimFactory().createMobsim(scenario, eventsManager);
+		assertFalse(sim.getNetsimEngine().getClass().equals(QSimEngineImpl.class));
+		assertTrue(sim.getEventsManager().getClass().equals(SynchronizedEventsManagerImpl.class));
+	}
 }

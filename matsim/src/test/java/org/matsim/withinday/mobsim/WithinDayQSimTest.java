@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * WithinDayQSim.java
+ * WithinDayQSimTest.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,41 +20,44 @@
 
 package org.matsim.withinday.mobsim;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.agents.AgentFactory;
-import org.matsim.ptproject.qsim.interfaces.NetsimEngineFactory;
-import org.matsim.ptproject.qsim.qnetsimengine.DefaultQSimEngineFactory;
+import org.matsim.ptproject.qsim.agents.DefaultAgentFactory;
+import org.matsim.testcases.MatsimTestCase;
 
-/*
- * This extended QSim contains some methods that
- * are needed for the WithinDay Replanning Modules.
- * 
- * Some other methods are used for the Knowledge Modules. They
- * should be separated somewhen but at the moment this seems
- * to be difficult so they remain here for now...
- */
-public class WithinDayQSim extends QSim {
+public class WithinDayQSimTest extends MatsimTestCase {
 	
-	public WithinDayQSim(final Scenario scenario, final EventsManager events) {
-		this(scenario, events, new DefaultQSimEngineFactory());
-	}
-	
-	public WithinDayQSim(final Scenario scenario, final EventsManager events, NetsimEngineFactory factory) {
-		super(scenario, events, factory);
+	static private final Logger log = Logger.getLogger(WithinDayQSimTest.class);
+			
+	/**
+	 * @author cdobler
+	 */
+	public void testSetAgentFactory() {
 		
-		// use WithinDayAgentFactory that creates WithinDayPersonAgents who can reset their chachedNextLink
-		WithinDayAgentFactory agentFactory = new WithinDayAgentFactory(this);
-		super.setAgentFactory(agentFactory);
-	}
-	
-	@Override
-	public void setAgentFactory(AgentFactory factory) {
-		if (factory instanceof WithinDayAgentFactory) {
-			super.setAgentFactory(factory);
-		}
-		else throw new RuntimeException("Please use a WithinDayAgentFactory!");
-	}
+		Scenario scenario = new ScenarioImpl();
+		EventsManager eventsManager = new EventsManagerImpl();
 
+		QSimConfigGroup qSimConfig = new QSimConfigGroup();
+		scenario.getConfig().addQSimConfigGroup(qSimConfig);
+		
+		QSim sim = new WithinDayQSim(scenario, eventsManager);
+	
+		// using a DefaultAgentFactory should cause a RuntimeException
+		try {
+			AgentFactory factory = new DefaultAgentFactory(sim);
+			sim.setAgentFactory(factory);
+			fail("expected RuntimeException");
+		} catch (RuntimeException e) {
+			log.debug("catched expected exception", e);
+		}
+
+		// using a WithinDayAgentFactory should be fine
+		sim.setAgentFactory(new WithinDayAgentFactory(sim));
+	}
 }
