@@ -121,7 +121,8 @@ public class ChoiceSet {
 		fromNode = network.getLinks().get(nextActivity.getLinkId()).getToNode();
 		((BackwardDijkstraMultipleDestinations)leastCostPathCalculatorBackward).calcLeastCostTree(fromNode, -1.0);
 		
-		TreeMap<Double,Id> map = new TreeMap<Double,Id>(java.util.Collections.reverseOrder());						
+		// Handling duplicates. This was may the source for (small) random fluctuations
+		List<ScoredAlternative> list = new Vector<ScoredAlternative>();						
 		// if no epsilons are used!
 		double largestValue = -1.0 * Double.MAX_VALUE;
 		Id facilityIdWithLargestScore = act.getFacilityId();
@@ -144,14 +145,12 @@ public class ChoiceSet {
 				largestValue = score;
 				facilityIdWithLargestScore = destinationId;
 			}
-			map.put(score, destinationId);
-		}
-		// Sorting not necessary as TreeMap is sorted already
-		// keys in ascending order by default -> descendingKeySet
-		
+			list.add(new ScoredAlternative(score, destinationId));
+		}	
 		// find the sum of the scores to normalize scores
-		double totalScore = this.getTotalScore(map, (largestValue < 0.0));
-		SortedMap<Double,Id> mapCorrected = this.generateReducedChoiceSet(map, totalScore, (largestValue < 0.0));
+		Collections.sort(list);
+		double totalScore = this.getTotalScore(list, (largestValue < 0.0));
+		SortedMap<Double,Id> mapCorrected = this.generateReducedChoiceSet(list, totalScore, (largestValue < 0.0));
 				
 		// score 0 is included as random range = 0.0d (inclusive) to 1.0d (exclusive)
 		// TODO: Do I have to modify the seed here by the iteration number (i.e., do we in every iteration chose the same value)?
@@ -165,12 +164,12 @@ public class ChoiceSet {
 		}
 	}
 	
-	private double getTotalScore(TreeMap<Double,Id> map, boolean negativeLargestValue) {
+	private double getTotalScore(List<ScoredAlternative> list, boolean negativeLargestValue) {
 		int n = 0;
 		double totalScore = 0.0;
-		for (Double key : map.keySet()) {
+		for (ScoredAlternative sa : list) {
 			if (n >= numberOfAlternatives) break;			
-			double score = Math.pow(key, exponent);
+			double score = Math.pow(sa.getScore(), exponent);
 			if (negativeLargestValue) {
 				// if we only have negative values -> change sign of score
 				score *= -1.0;
@@ -183,13 +182,13 @@ public class ChoiceSet {
 		return totalScore;
 	}
 	
-	private TreeMap<Double,Id> generateReducedChoiceSet(SortedMap<Double,Id> map, double totalScore, boolean negativeLargestValue) {
+	private TreeMap<Double,Id> generateReducedChoiceSet(List<ScoredAlternative> list, double totalScore, boolean negativeLargestValue) {
 		TreeMap<Double,Id> mapNormalized = new TreeMap<Double,Id>(java.util.Collections.reverseOrder());
 		int n = 0;
 		double sumScore = 0.0;
-		for (Double key : map.keySet()) {
+		for (ScoredAlternative sa : list) {
 			if (n >= numberOfAlternatives) break;
-			double score = Math.pow(key, exponent);
+			double score = Math.pow(sa.getScore(), exponent);
 			
 			if (negativeLargestValue) {
 				// if we only have negative values -> change sign of score
@@ -197,7 +196,7 @@ public class ChoiceSet {
 			}			
 			if (score > 0.0) {
 				sumScore += (score / totalScore);				
-				mapNormalized.put(sumScore , map.get(key));
+				mapNormalized.put(sumScore , sa.getAlternativeId());
 			}
 			n++;	
 		}
