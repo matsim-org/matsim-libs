@@ -56,7 +56,7 @@ public class ChooseRandomLegMode implements PlanAlgorithm {
 		new PlanAnalyzeSubtours();
 	}
 
-	public void setIgnoreCarAvailability(boolean ignoreCarAvailability) {
+	public void setIgnoreCarAvailability(final boolean ignoreCarAvailability) {
 		this.ignoreCarAvailability = ignoreCarAvailability;
 	}
 
@@ -66,7 +66,7 @@ public class ChooseRandomLegMode implements PlanAlgorithm {
 		changeToRandomLegMode(tour, plan);
 	}
 
-	private void changeToRandomLegMode(List<PlanElement> tour, Plan plan) {
+	private void changeToRandomLegMode(final List<PlanElement> tour, final Plan plan) {
 		if (tour.size() > 1) {
 			boolean forbidCar = false;
 			if (!this.ignoreCarAvailability) {
@@ -78,7 +78,7 @@ public class ChooseRandomLegMode implements PlanAlgorithm {
 
 			final String currentMode = getTransportMode(tour);
 
-			String newMode = currentMode;
+			String newMode;
 			while (true) {
 				int newModeIdx = chooseModeOtherThan(currentMode);
 				newMode = this.possibleModes[newModeIdx];

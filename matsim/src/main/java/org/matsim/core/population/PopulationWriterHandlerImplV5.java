@@ -58,7 +58,7 @@ public class PopulationWriterHandlerImplV5 implements PopulationWriterHandler {
 	}
 
 	@Override
-	public void writePerson(Person person, BufferedWriter out) throws IOException {
+	public void writePerson(final Person person, final BufferedWriter out) throws IOException {
 		this.startPerson(person, out);
 		for (Plan plan : person.getPlans()) {
 			this.startPlan(plan, out);
@@ -144,9 +144,9 @@ public class PopulationWriterHandlerImplV5 implements PopulationWriterHandler {
 			out.write(" selected=\"no\"");
 		if (plan instanceof PlanImpl){
 			PlanImpl p = (PlanImpl)plan;
-			if ((p.getType() != null) && (p.getType() != PlanImpl.DeprecatedConstants.UNDEFINED)) {
+			if ((p.getType() != null) && (!p.getType().equals(PlanImpl.DeprecatedConstants.UNDEFINED))) {
 				out.write(" type=\"");
-				out.write(p.getType().toString());
+				out.write(p.getType());
 				out.write("\"");
 			}
 		}
