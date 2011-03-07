@@ -2,6 +2,7 @@ package playground.wrashid.lib.obj;
 
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Set;
 
 import playground.wrashid.lib.GeneralLib;
 
@@ -16,6 +17,10 @@ import playground.wrashid.lib.GeneralLib;
 public class DoubleValueHashMap<KeyClass> {
 
 	private HashMap<KeyClass, Double> hm = new HashMap<KeyClass, Double>();
+	
+	public Set<KeyClass> keySet(){
+		return hm.keySet();
+	}
 	
 	public double get(KeyClass id) {
 		if (!hm.containsKey(id)) {

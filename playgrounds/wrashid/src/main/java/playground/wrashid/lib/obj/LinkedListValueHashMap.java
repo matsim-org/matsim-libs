@@ -25,6 +25,10 @@ public class LinkedListValueHashMap<KeyClass,ValueClass> {
 	}
 	
 	public KeyClass getKey(ValueClass value){
+		if (hashMapBackPointer.size()==0){
+			throw new Error("use method putAndSetBackPointer(...) for insertion instead of put(...)!");
+		}
+		
 		return hashMapBackPointer.get(value);
 	}
 	
