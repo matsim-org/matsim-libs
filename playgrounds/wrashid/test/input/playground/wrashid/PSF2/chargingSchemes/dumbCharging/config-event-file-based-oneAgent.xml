@@ -114,7 +114,7 @@
 		 <param name="main.chargingPriceBlurFactor" value="-3.0" /> 
 		<param name="pathToEnergyConsumptionTable" value="test/input/playground/wrashid/PSF2/vehicle/energyConsumption/VehicleEnergyConsumptionRegressionTable.txt" /> 
 		<param name="PHEVsAsPercentageOfWholePopulation" value="100" />
-		67108864
+		
 	</module>
 
 </config>

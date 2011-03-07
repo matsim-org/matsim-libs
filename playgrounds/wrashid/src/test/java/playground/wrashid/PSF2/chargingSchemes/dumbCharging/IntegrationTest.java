@@ -44,7 +44,7 @@ public class IntegrationTest extends MatsimTestCase {
 		
 		ParametersPSF2.setChargingLocationFilter(allowedChargingLocations);
 		
-		PSSControler pssControler=new PSSControlerDumbCharging("test/input/playground/wrashid/PSF2/chargingSchemes/dumbCharging/config.xml", null);
+		PSSControler pssControler=new PSSControlerDumbCharging( getPackageInputDirectory() + "config.xml", null);
 		pssControler.runMATSimIterations();
 		
 		LinkedList<ChargeLog> chargingTimesForAgent255 = ParametersPSF2.chargingTimes.get(new IdImpl(255)).getChargingTimes();
@@ -59,7 +59,7 @@ public class IntegrationTest extends MatsimTestCase {
 	}
 	
 	public void testEventFileBased(){
-		PSSControler pssControler=new PSSControlerDumbCharging("test/input/playground/wrashid/PSF2/chargingSchemes/dumbCharging/config-event-file-based.xml", null);
+		PSSControler pssControler=new PSSControlerDumbCharging(getPackageInputDirectory() +  "config-event-file-based.xml", null);
 		pssControler.runMATSimIterations();
 		
 		LinkedList<ChargeLog> chargingTimesForAgent1 = ParametersPSF2.chargingTimes.get(new IdImpl(1)).getChargingTimes();
@@ -72,7 +72,7 @@ public class IntegrationTest extends MatsimTestCase {
 	}
 	
 	private void performSingleAgentRun(){
-		PSSControler pssControler=new PSSControlerDumbCharging("test/input/playground/wrashid/PSF2/chargingSchemes/dumbCharging/config-event-file-based-OneAgent.xml", null);
+		PSSControler pssControler=new PSSControlerDumbCharging(getPackageInputDirectory() + "config-event-file-based-OneAgent.xml", null);
 		pssControler.runMATSimIterations();
 	}
 	
