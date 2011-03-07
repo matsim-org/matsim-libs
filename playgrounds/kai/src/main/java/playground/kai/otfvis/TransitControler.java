@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.Simulation;
@@ -43,6 +44,8 @@ public class TransitControler {
 		config.scenario().setUseTransit(true);
 		config.scenario().setUseVehicles(true);
 		config.otfVis().setColoringScheme( OTFVisConfigGroup.COLORING_BVG ) ;
+		
+		config.getQSimConfigGroup().setVehicleBehavior( QSimConfigGroup.VEHICLE_BEHAVIOR_TELEPORT ) ;
 		
 		Controler tc = new Controler(config) ;
 		
@@ -64,7 +67,7 @@ public class TransitControler {
 //			simulation.getTransitEngine().setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
 			simulation.getTransitEngine().setTransitStopHandlerFactory(new SimpleTransitStopHandlerFactory());
 //			this.events.addHandler(new LogOutputEventHandler());
-
+			
 			if ( useOTFVis ) {
 				// otfvis configuration.  There is more you can do here than via file!
 				final OTFVisConfigGroup otfVisConfig = simulation.getScenario().getConfig().otfVis();
