@@ -37,10 +37,9 @@ public class VisualizeFacilitiesOfACertainType {
 	 */
 	public static void main(String[] args) {
 		
-		String basePath="H:/data/cvs/ivt/studies/switzerland/";
-		String facilititiesPath = basePath + "facilities/facilities.zrhCutC.xml.gz";
-		String activityTypeFilter="education_higher";
-		String outputKmlFile="H:/data/experiments/ARTEMIS/zh/dumb charging/output/analysis/higherEduFacilities.kml";
+		String facilititiesPath = "C:/data/My Dropbox/ETH/Projekte/Parkplätze/data zürich/facilities/output/garage_facilities_ohne öffnungszeiten.xml";
+		String activityTypeFilter="parking";
+		String outputKmlFile=GeneralLib.eclipseLocalTempPath + "/facilities.kml";
 		
 		ActivityFacilitiesImpl facilities = GeneralLib.readActivityFacilities(facilititiesPath);
 		

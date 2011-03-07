@@ -67,11 +67,6 @@ public class SampleEvents {
 			DebugLib.stopSystemAndReportInconsistency("please use other constructor!!!");
 		}
 
-		// TODO: whenever new agent detected, decide if want to write events for
-		// that agent (using random variable) or move agent to set of agents,
-		// for which we do not want to
-		// write events.
-
 		public EventsFilter(String filename, double sampleFraction) {
 			super(filename);
 			this.sampleFraction = sampleFraction;
