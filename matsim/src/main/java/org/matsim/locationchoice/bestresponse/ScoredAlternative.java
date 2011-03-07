@@ -25,14 +25,14 @@ public class ScoredAlternative implements Comparable<ScoredAlternative> {
 		this.alternativeId = alternativeId;
 	}
 
-	/* positive – this object is greater than o
-	   zero – this object equals to o
-	   negative – this object is less than o
-	   */
+	/* 
+	 * Compare keys (double scores). 
+	 * If the scores are identical, additionally use id to sort such that deterministic order is ensured
+	 */
 	@Override
 	public int compareTo(ScoredAlternative o) {
-		if (this.score > o.score) return 1;
-		else if (this.score < o.score) return -1;
-		else return 0;
+		if (this.score > o.getScore()) return 1;
+		else if (this.score < o.getScore()) return -1;
+		else return this.alternativeId.compareTo(o.getAlternativeId());
 	}
 }
