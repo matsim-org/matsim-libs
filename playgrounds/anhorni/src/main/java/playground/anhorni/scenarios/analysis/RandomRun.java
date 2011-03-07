@@ -4,9 +4,9 @@ public class RandomRun {
 	private int id;
 	private double expendituresPerLocation[];
 	
-	public RandomRun(int id, int numberOfCityShoppingLocs){
+	public RandomRun(int id, int numberOfShoppingLocs){
 		this.id = id;
-		this.expendituresPerLocation = new double[numberOfCityShoppingLocs];
+		this.expendituresPerLocation = new double[numberOfShoppingLocs];
 	}
 	
 	public void addExpenditure(int locIndex, double expenditure) {

@@ -52,31 +52,19 @@ public class ConfigReader {
           line = bufferedReader.readLine();
           parts = line.split("\t");
           this.populationSize = Integer.parseInt(parts[1]);
+                             
+          mu = new double[2];
+          sigma = new double[2];
           
           line = bufferedReader.readLine();
           parts = line.split("\t");
-          this.numberOfCityShoppingLocs = Integer.parseInt(parts[1]);
-          
-          line = bufferedReader.readLine();
-          parts = line.split("\t");
-          this.shopShare = Double.parseDouble(parts[1]);
-          
-          line = bufferedReader.readLine();
-          parts = line.split("\t");
-          this.numberOfPersonStrata = Integer.parseInt(parts[1]);
-          
-          mu = new double[numberOfPersonStrata/2];
-          sigma = new double[numberOfPersonStrata/2];
-          
-          line = bufferedReader.readLine();
-          parts = line.split("\t");
-          for (int i = 0; i < numberOfPersonStrata/2; i++) {
+          for (int i = 0; i < 2; i++) {
         	  this.mu[i] = Double.parseDouble(parts[i + 1]);
           }
           
           line = bufferedReader.readLine();
           parts = line.split("\t");
-          for (int i = 0; i < numberOfPersonStrata/2; i++) {
+          for (int i = 0; i < 2; i++) {
         	  this.sigma[i] = Double.parseDouble(parts[i + 1]);
           } 
           

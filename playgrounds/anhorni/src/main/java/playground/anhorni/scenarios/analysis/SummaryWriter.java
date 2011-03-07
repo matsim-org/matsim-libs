@@ -22,8 +22,6 @@ package playground.anhorni.scenarios.analysis;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -31,138 +29,106 @@ import java.io.IOException;
 public class SummaryWriter {
 	private String path = "src/main/java/playground/anhorni/";
 	private BufferedWriter bufferedWriter = null;	
-	private int numberOfRandomRuns = -1;
-	private int numberOfCityShoppingLocs = -1;
+	private int numberOfRandomRuns;
+	private int shoppingFacilities[] = {1, 2, 5, 6, 7};
 	
-	private double expenditures[][];
-	private double sum[];
-		
-	public SummaryWriter(int numberOfCityShoppingLocs, String outpath, int numberOfRandomRuns) {
-		this.numberOfCityShoppingLocs = numberOfCityShoppingLocs;
+	private double expendituresPerRunPerDayPerHourPerFacility[][][][];
+	private double avgExpendituresPerHourPerFacility[][];
+	private double sigmaExpendituresPerHourPerFacility[][];
+			
+	public SummaryWriter(String outpath, int numberOfRandomRuns) {
 		this.numberOfRandomRuns = numberOfRandomRuns;
 		this.path = outpath;
-		this.init();
 	}
-
-    private void init() { 
-    	
-    	this.expenditures = new double[numberOfCityShoppingLocs][numberOfRandomRuns];
-    	this.sum = new double[numberOfRandomRuns]; 
-    	
-    	try {
-    		new File(path + "output/PLOC/3towns/random/").mkdir();
-            bufferedWriter = new BufferedWriter(new FileWriter(path + "output/PLOC/3towns/random_summary_cityShopping.txt"));           
-        } catch (FileNotFoundException ex) {
-            ex.printStackTrace();
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        } 
-        try {
-			bufferedWriter.write("config\t");
-			for (int i = 0; i < numberOfCityShoppingLocs; i++) {
-	        	bufferedWriter.write("loc_" + i + "\t");
-	        }
-	        bufferedWriter.write("sum\t");
-	        bufferedWriter.newLine();
-		} catch (IOException e) {
-			e.printStackTrace();
+   
+    public void run() {
+    	this.readRD();
+    	this.calculateMeans();
+    	this.calculateStdDevOfExpenditures();
+    	this.write2Summary();
+    }
+    
+    private void calculateStdDevOfExpenditures() {
+    	this.sigmaExpendituresPerHourPerFacility = new double[24][shoppingFacilities.length];
+    	for (int h = 0; h < 24; h++) {
+		    for (int i = 0; i < shoppingFacilities.length; i++) {
+		    	for (int day = 0; day < 5; day++) {
+		    		for (int runIndex = 0; runIndex < numberOfRandomRuns; runIndex++) {
+		    			sigmaExpendituresPerHourPerFacility[h][i] += Math.sqrt(
+		    					Math.pow(
+		    							expendituresPerRunPerDayPerHourPerFacility[runIndex][day][h][i]
+		    							- avgExpendituresPerHourPerFacility[h][i], 2.0
+		    							)
+		    							/ 
+		    							(this.numberOfRandomRuns * 5)
+		    																	);
+		    		}
+		    	}
+		    }       
 		}
     }
     
-    public void finish() {
-    	try {
-    		double mean[] = new double [numberOfCityShoppingLocs];
-    		double diffSumSquare[] = new double [numberOfCityShoppingLocs];
-    		double sigma[] = new double [numberOfCityShoppingLocs];
-    		double sumExpenditure[] = new double [numberOfCityShoppingLocs];
-    		    		   
-    		for (int j = 0; j < numberOfCityShoppingLocs; j++) {
-	    		for (int i = 0; i < numberOfRandomRuns; i++) {
-	    			sumExpenditure[j] += expenditures[j][i];
-	    		}
-	    		mean[j] = sumExpenditure[j] / numberOfRandomRuns;
-    		}
-    		for (int j = 0; j < numberOfCityShoppingLocs; j++) {
-	    		for (int i = 0; i < numberOfRandomRuns; i++) {
-	    			diffSumSquare[j] += Math.pow((expenditures[j][i] - mean[j]), 2.0);
-	    		}
-	    		sigma[j] = Math.sqrt(diffSumSquare[j] / (numberOfRandomRuns - 1));
-    		}
-    		
-    		double meanAllRuns = 0;
-    		for (int i = 0; i < this.numberOfRandomRuns; i++) {
-    			meanAllRuns += this.sum[i];
-    		}
-    		meanAllRuns /= this.numberOfRandomRuns;
-    		
-    		double diffSumSquareAll = 0;
-    		for (int i = 0; i < this.numberOfRandomRuns; i++) {
-    			diffSumSquareAll += Math.pow((this.sum[i] - meanAllRuns), 2.0);
-    		}
-    		double sigmaAllRuns = Math.sqrt(diffSumSquareAll / numberOfRandomRuns);
-    		
-    		// output --------------------------------:
-    		
-    		
-    		bufferedWriter.newLine();
-    		bufferedWriter.append("Mean:\t");
-    		for (int j = 0; j < numberOfCityShoppingLocs; j++) {
-    			bufferedWriter.append(mean[j] + "\t");
-    		}
-    		bufferedWriter.append(String.valueOf(meanAllRuns));
-    		bufferedWriter.newLine();
-    		
-    		bufferedWriter.append("Sigma:\t");
-    		for (int j = 0; j < numberOfCityShoppingLocs; j++) {
-    			bufferedWriter.append(sigma[j] + "\t");
-    		}
-    		bufferedWriter.append(String.valueOf(sigmaAllRuns));
-    		bufferedWriter.newLine();
-    		bufferedWriter.append("Sigma [%]\t");
-    		for (int j = 0; j < numberOfCityShoppingLocs; j++) {
-    			bufferedWriter.append(sigma[j] / mean[j] * 100 + "\t");
-    		}
-    		bufferedWriter.append(String.valueOf(sigmaAllRuns / meanAllRuns * 100));
-            if (bufferedWriter != null) {
-                bufferedWriter.flush();
-                bufferedWriter.close();
-            }
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
+    private void calculateMeans() {	
+    	this.avgExpendituresPerHourPerFacility = new double[24][shoppingFacilities.length];
+		for (int h = 0; h < 24; h++) {
+		    for (int i = 0; i < shoppingFacilities.length; i++) {
+		    	for (int day = 0; day < 5; day++) {
+		    		for (int runIndex = 0; runIndex < numberOfRandomRuns; runIndex++) {
+		    			avgExpendituresPerHourPerFacility[h][i] += expendituresPerRunPerDayPerHourPerFacility[runIndex][day][h][i] /
+		    			(this.numberOfRandomRuns * 5);
+		    		}
+		    	}
+		    }       
+		}
     }
-         
-    public void write2Summary(int runIndex) {
-    	
-    	double expen[] = new double[numberOfCityShoppingLocs];
-    	double sumPerRun = 0;
-    	
-        try {
-          BufferedReader bufferedReader = new BufferedReader(new FileReader(path + "output/PLOC/3towns/random/" + runIndex + "_random_cityShopping.txt"));
-          String line = bufferedReader.readLine(); // skip header
-          line = bufferedReader.readLine();
-          String parts[] = line.split("\t");
-          for (int i = 0; i < numberOfCityShoppingLocs; i++) {
-        	  expen[i] = Double.parseDouble(parts[i]);
-        	  this.expenditures[i][runIndex] = expen[i];
-          }          
+    
+    private void readRD() {
+    	this.expendituresPerRunPerDayPerHourPerFacility = new double[this.numberOfRandomRuns][5][24][shoppingFacilities.length];
+    	try {
+        	for (int runIndex = 0; runIndex < numberOfRandomRuns; runIndex++) {
+        		for (int day = 0; day < 5; day++) {
+					BufferedReader bufferedReader = new BufferedReader(new FileReader(path + "output/PLOC/3towns/R" + runIndex + "D" + day + "_shoppingPerRunDay.txt"));
+					String line = bufferedReader.readLine(); // skip header
+					for (int h = 0; h < 24; h++) {
+					    line = bufferedReader.readLine();
+					    String parts[] = line.split("\t");
+					    for (int i = 1; i < shoppingFacilities.length; i++)
+					    	expendituresPerRunPerDayPerHourPerFacility[runIndex][day][h][i-1] = Double.parseDouble(parts[i]);
+						}
+					}
+        	}        
         } // end try
         catch (IOException e) {
         	e.printStackTrace();
         }
-
-    	try {  
-    		bufferedWriter.append("config_" + runIndex + "\t");
-    		for (int i = 0; i < numberOfCityShoppingLocs; i++) {
-    			bufferedWriter.append(expen[i] + "\t");
-    			sumPerRun += expen[i];
-    		}
-    		sum[runIndex] = sumPerRun;
-    		bufferedWriter.append(String.valueOf(sumPerRun));
-            bufferedWriter.newLine();
-            bufferedWriter.flush();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }     	
+    }
+         
+    public void write2Summary() {
+		try {
+			bufferedWriter = new BufferedWriter(new FileWriter(path + "output/PLOC/3towns/ExpendituresPerHourPerFacility.txt")); 
+			bufferedWriter.write("Hour\t");
+			for (int i = 0; i < shoppingFacilities.length; i++) {
+				bufferedWriter.append("f" + shoppingFacilities[i] + "_avg" + "\t" +
+						"f" + shoppingFacilities[i] + "_sigma" + "\t" +
+						"f" + shoppingFacilities[i] + "_sigma[%]" + 
+								"\t");
+			}
+			bufferedWriter.newLine();
+			
+			for (int h = 0; h < 24; h++) {
+				bufferedWriter.write(h + "\t");
+				for (int i = 0; i < shoppingFacilities.length; i++) {
+					bufferedWriter.write(avgExpendituresPerHourPerFacility[h][i] +"\t");
+					bufferedWriter.write(sigmaExpendituresPerHourPerFacility[h][i] + "\t");
+					bufferedWriter.write(100.0* sigmaExpendituresPerHourPerFacility[h][i] / avgExpendituresPerHourPerFacility[h][i] + "\t");
+				}
+				bufferedWriter.newLine();
+			}
+		    bufferedWriter.flush();
+		    bufferedWriter.close();
+		} 
+		catch (IOException e) {
+			e.printStackTrace();
+			}
     }
 }

@@ -57,21 +57,7 @@ public class RandomRunsAnalyzer {
 	
 	private void init() {
 		myConfigReader = new ConfigReader();
-		myConfigReader.read();
-		int superPopulationSize = (int)(1.0 / myConfigReader.getShopShare()) * myConfigReader.getNumberOfCityShoppingLocs();
-		
-		try {
-			  this.superValuePerLocation = 0.0;
-		  
-			  BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(myConfigReader.getPath() +  "output/PLOC/3towns/superPopSize.txt"));			
-			  bufferedWriter.write("Super population size: " + superPopulationSize);
-			  bufferedWriter.flush();
-			  bufferedWriter.close();
-		} // end try
-	    catch (IOException e) {
-	    	e.printStackTrace();
-	}
-			  
+		myConfigReader.read();		  
 	}
 	
 	 public void run(int numberOfAnalysis) {		 
@@ -91,7 +77,7 @@ public class RandomRunsAnalyzer {
     	Vector<RandomRun> randomRuns = new Vector<RandomRun>();
     	
 		try {
-			  BufferedReader bufferedReader = new BufferedReader(new FileReader(path + "output/PLOC/3towns/random_summary_cityShopping.txt"));
+			  BufferedReader bufferedReader = new BufferedReader(new FileReader(path + "output/PLOC/3towns/summaryShopping.txt"));
 			  String line = bufferedReader.readLine(); // skip header
 			  for (int j = 0; j < this.numberOfRandomRuns; j++) {
 				  RandomRun randomRun = new RandomRun(j, numberOfCityShoppingLocs);
@@ -131,7 +117,7 @@ public class RandomRunsAnalyzer {
 		try {
 		
 		for (int locIndex = 0; locIndex < this.numberOfCityShoppingLocs; locIndex++) {
-			String dir = this.path + "/output/PLOC/3towns/random/" + "loc_" + locIndex + "/";
+			String dir = this.path + "/output/PLOC/3towns/loc_" + locIndex + "/";
 			XYScatterChart chart = new XYScatterChart("loc_" + locIndex, "Number of sample runs used to build average", "Deviation from Mean_n [%]");
 			
 			bufferedWriter = new BufferedWriter(new FileWriter(dir +  "summary.txt"));			

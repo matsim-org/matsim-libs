@@ -19,7 +19,6 @@
 
 package playground.anhorni.scenarios;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -27,7 +26,6 @@ import org.matsim.core.network.NetworkWriter;
 
 public class CreateNetworks {
 	private ScenarioImpl scenario = new ScenarioImpl();
-	private final static Logger log = Logger.getLogger(CreateNetworks.class);
 	private ConfigReader configReader = new ConfigReader();
 			
 	public void create(int populationSize, boolean sup) {

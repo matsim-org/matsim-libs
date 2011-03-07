@@ -34,28 +34,23 @@ import org.matsim.core.population.PopulationImpl;
 
 public class PlansAnalyzer {
 	private String path = "";
-	private int numberOfCityShoppingLocs = -1;
-	private int shopCityLinkIds[];
+	private int shoppingFacilities[] = {1, 2, 5, 6, 7};
 	
 	private int [] visitsCounter;
 	private BufferedWriter bufferedWriter = null;
 			
-	public PlansAnalyzer(String outpath, int numberOfCityShoppingLocs, int [] shopCityLinkIds) {
-		this.numberOfCityShoppingLocs = numberOfCityShoppingLocs;
-		this.shopCityLinkIds = shopCityLinkIds;
+	public PlansAnalyzer(String outpath) {
 		this.path = outpath;
 		this.init();
 	}
 	
 	private void init() {
 		this.reset();
-		
 		try { 		
-		    bufferedWriter = new BufferedWriter(new FileWriter(
-		    		path + "/input/PLOC/3towns/plans/plansAnalysis.txt")); 
+		    bufferedWriter = new BufferedWriter(new FileWriter(path + "/input/PLOC/3towns/plans/plansAnalysis.txt")); 
 		    bufferedWriter.write("Population\t");
-		    for (int i = 0; i < this.numberOfCityShoppingLocs; i++) {
-		    	 bufferedWriter.write("loc_" + i + "\t");
+		    for (int i = 0; i < shoppingFacilities.length; i++) {
+		    	 bufferedWriter.write("loc_" + shoppingFacilities[i] + "\t");
 		    }
 		    bufferedWriter.newLine();
 		    
@@ -75,11 +70,11 @@ public class PlansAnalyzer {
 	}
 	
 	private void reset() {
-		this.visitsCounter = new int[numberOfCityShoppingLocs];
+		this.visitsCounter = new int[shoppingFacilities.length];
     }
 	
 	private void add2VisitsCounter(Id id) {
-		int index = ArrayUtils.indexOf(shopCityLinkIds, Integer.parseInt(id.toString()));
+		int index = ArrayUtils.indexOf(shoppingFacilities, Integer.parseInt(id.toString()));
 		this.visitsCounter[index]++;
 	}
 	
@@ -88,8 +83,8 @@ public class PlansAnalyzer {
 				final List<? extends PlanElement> actslegs = p.getSelectedPlan().getPlanElements();
 				for (int j = 0; j < actslegs.size(); j=j+2) {
 					ActivityImpl act = (ActivityImpl)actslegs.get(j);					
-					if (act.getType().equals("sc")) {
-						this.add2VisitsCounter(act.getLinkId());
+					if (act.getType().equals("s")) {
+						this.add2VisitsCounter(act.getFacilityId());
 					}	
 				}
 			}

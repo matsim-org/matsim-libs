@@ -21,7 +21,6 @@
 package playground.anhorni.scenarios.analysis;
 
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
@@ -32,25 +31,23 @@ import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.io.IOUtils;
 
 
-public class CityShoppingCalculator implements ShutdownListener {
+public class ShoppingCalculator implements ShutdownListener {
 	
-	private int numberOfCityShoppingLocations = -1;
-	private double expenditurePerLocation[];
-	private int shopCityLinkIds[];
+	private double expenditurePerFacilityPerHour[][];
+	private int shoppingFacilities[] = {1, 2, 5, 6, 7};
 
 	public void notifyShutdown(ShutdownEvent event) {
 		this.evaluate(event);
 		this.printStatistics(event);
 	}
 	
-	public CityShoppingCalculator(int numberOfCityShoppingLocations, int shopCityLinkIds []) {
-		this.numberOfCityShoppingLocations = numberOfCityShoppingLocations;
-		this.shopCityLinkIds = shopCityLinkIds;
-		this.expenditurePerLocation = new double[numberOfCityShoppingLocations];
+	public ShoppingCalculator() {
+		this.expenditurePerFacilityPerHour = new double[shoppingFacilities.length][24];
 	}
 	
 	private void evaluate(ShutdownEvent event) {
@@ -59,10 +56,14 @@ public class CityShoppingCalculator implements ShutdownListener {
 			final List<? extends PlanElement> actslegs = p.getSelectedPlan().getPlanElements();
 			for (int j = 0; j < actslegs.size(); j=j+2) {
 				ActivityImpl act = (ActivityImpl)actslegs.get(j);
-				if (act.getType().equals("sc")) {
-					shopLocIndex = ArrayUtils.indexOf(this.shopCityLinkIds, Integer.parseInt(act.getLinkId().toString()));
+				if (act.getType().equals("s")) {
+					shopLocIndex = ArrayUtils.indexOf(this.shoppingFacilities, Integer.parseInt(act.getFacilityId().toString()));
 					double expenditure = Double.parseDouble(((PersonImpl)(p)).getDesires().getDesc());
-					this.expenditurePerLocation[shopLocIndex] += expenditure;
+					
+					double arrivalTime = ((LegImpl)actslegs.get(j-1)).getArrivalTime();
+					
+					int startTime = (int) (((arrivalTime) / 3600.0) % 24);
+					this.expenditurePerFacilityPerHour[shopLocIndex][startTime] += expenditure;
 				}	
 			}
 		}
@@ -74,19 +75,28 @@ public class CityShoppingCalculator implements ShutdownListener {
 		try {
 			
 			String outputPath = "src/main/java/playground/anhorni/output/PLOC/3towns/";
-			if (runId.contains("random")) {
-				outputPath = "src/main/java/playground/anhorni/output/PLOC/3towns/random/";
-				new File(outputPath).mkdir();
-			}
-
 			final BufferedWriter out =
-				IOUtils.getBufferedWriter(outputPath + runId + "_cityShopping.txt");
-			for (int i = 0; i < this.numberOfCityShoppingLocations; i++) {
-				out.append("loc_" + i + "\t");
+				IOUtils.getBufferedWriter(outputPath + runId + "_shoppingPerRunDay.txt");
+			out.write("Hour\t");
+			for (int i = 0; i < this.shoppingFacilities.length; i++) {
+				out.append("facility_" + shoppingFacilities[i] + "\t");
 			}
-			out.newLine();				
-			for (int i = 0; i < this.numberOfCityShoppingLocations; i++) {
-				out.write(String.valueOf(expenditurePerLocation[i]) + "\t");	
+			out.write("sum\n");
+			double sumPerFacility[] = new double[shoppingFacilities.length];
+			
+			for (int h = 0; h < 24; h++) {
+				out.write(h + "\t");
+				double sumPerHour = 0.0;
+				for (int i = 0; i < this.shoppingFacilities.length; i++) {
+					out.write(String.valueOf(expenditurePerFacilityPerHour[i][h]) + "\t");
+					sumPerHour += expenditurePerFacilityPerHour[i][h];
+					sumPerFacility[i] += expenditurePerFacilityPerHour[i][h];
+				}
+				out.write(sumPerHour + "\n");
+			}
+			out.write("sum\t");
+			for (int i = 0; i < this.shoppingFacilities.length; i++) {
+				out.write(sumPerFacility[i] + "\t");
 			}
 			out.flush();
 			out.close();

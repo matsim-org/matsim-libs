@@ -22,23 +22,22 @@ package playground.anhorni.scenarios;
 
 import org.matsim.core.controler.Controler;
 
-import playground.anhorni.scenarios.analysis.CityShoppingCalculator;
+import playground.anhorni.scenarios.analysis.ShoppingCalculator;
 
 public class SingleRunControler extends Controler {
-	private int shopCityLinkIds[] = {21, 23, 25, 27, 29, 31, 33, 35, 37, 39};
 		
 	public SingleRunControler(final String[] args) {
 		super(args);	
 	}
-
-
+	
     public static void main (final String[] args) { 
     	SingleRunControler controler = new SingleRunControler(args);
-    	controler.setOverwriteFiles(true);
     	controler.run();
     }
     
-    public void setNumberOfCityShoppingLocations(int numberOfCityShoppingLocations) {
-    	this.addControlerListener(new CityShoppingCalculator(numberOfCityShoppingLocations, shopCityLinkIds));
+    public void run() {
+    	super.setOverwriteFiles(true);
+    	super.addControlerListener(new ShoppingCalculator());
+    	super.run();
     }
 }
