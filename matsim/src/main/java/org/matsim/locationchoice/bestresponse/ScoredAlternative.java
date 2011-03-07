@@ -31,8 +31,14 @@ public class ScoredAlternative implements Comparable<ScoredAlternative> {
 	 */
 	@Override
 	public int compareTo(ScoredAlternative o) {
-		if (this.score > o.getScore()) return 1;
-		else if (this.score < o.getScore()) return -1;
-		else return this.alternativeId.compareTo(o.getAlternativeId());
+		// numerics
+		double epsilon = 0.000001;
+		if (Math.abs(this.score - o.getScore()) > epsilon) {
+			if (this.score > o.getScore()) return 1;
+			else return -1;
+		}		
+		else {
+			return this.alternativeId.compareTo(o.getAlternativeId());
+		}
 	}
 }
