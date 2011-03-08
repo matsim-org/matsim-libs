@@ -1,0 +1,13 @@
+T_GBL	VEH_ID	LEG_NR	LINK_ID	FROM_NODE_ID	EVENT_FLAG	DESCRIPTION
+21600	2		1	0	8	actend h
+21600	2		1	0	6	departure
+22500	2		20	0	0	arrival
+22500	2		20	0	7	actstart w
+23100	2		20	0	8	actend w
+23100	2		20	0	6	departure
+23100	2		20	0	0	arrival
+23100	2		20	0	7	actstart w
+35700	2		20	0	8	actend w
+35700	2		20	0	6	departure
+38040	2		1	0	0	arrival
+38040	2		1	0	7	actstart h
