@@ -20,6 +20,8 @@
 
 package playground.wrashid.lib.tools.facility;
 
+import java.util.Random;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
@@ -37,26 +39,33 @@ public class VisualizeFacilitiesOfACertainType {
 	 */
 	public static void main(String[] args) {
 		
-		String facilititiesPath = "C:/data/My Dropbox/ETH/Projekte/Parkplätze/data zürich/facilities/output/garage_facilities_ohne öffnungszeiten.xml";
-		String activityTypeFilter="parking";
+		String facilititiesPath = "H:/data/experiments/ARTEMIS/output/run10/output_facilities.xml.gz";
+		String activityTypeFilter=null; 
+		double scalingPercentage=0.01; // 1.0 means 100%
 		String outputKmlFile=GeneralLib.eclipseLocalTempPath + "/facilities.kml";
 		
 		ActivityFacilitiesImpl facilities = GeneralLib.readActivityFacilities(facilititiesPath);
 		
 		BasicPointVisualizer basicPointVisualizer=new BasicPointVisualizer();
 		
+		Random rand=new Random();
 		
 		for (Id facilityId:facilities.getFacilities().keySet()){
 			ActivityFacilityImpl facility=(ActivityFacilityImpl) facilities.getFacilities().get(facilityId);
 			
-			if (facility.getActivityOptions().containsKey(activityTypeFilter)){
-				FacilityLib.printActivityFacilityImpl(facility);
-				basicPointVisualizer.addPointCoordinate(facility.getCoord(), FacilityLib.getActivityFacilityImplStringForKml(facility) ,Color.GREEN);
+			if (activityTypeFilter==null || facility.getActivityOptions().containsKey(activityTypeFilter)){
+				//FacilityLib.printActivityFacilityImpl(facility);
+				if (shouldBePartOfSampling(scalingPercentage, rand)){
+					basicPointVisualizer.addPointCoordinate(facility.getCoord(), FacilityLib.getActivityFacilityImplStringForKml(facility) ,Color.GREEN);
+				}
 			}
 		}
 		
 		basicPointVisualizer.write(outputKmlFile);
-		
+	}
+
+	private static boolean shouldBePartOfSampling(double scalingPercentage, Random rand) {
+		return rand.nextDouble()<scalingPercentage;
 	}
 
 }
