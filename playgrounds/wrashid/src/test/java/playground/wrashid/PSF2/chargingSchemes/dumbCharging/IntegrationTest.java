@@ -42,7 +42,7 @@ public class IntegrationTest extends MatsimTestCase {
 		allowedChargingLocations.add("home");
 		allowedChargingLocations.add("work");
 		
-		ParametersPSF2.setChargingLocationFilter(allowedChargingLocations);
+		ParametersPSF2.setAllowedChargingLocations(allowedChargingLocations);
 		
 		PSSControler pssControler=new PSSControlerDumbCharging( getPackageInputDirectory() + "config.xml", null);
 		pssControler.runMATSimIterations();
@@ -55,7 +55,7 @@ public class IntegrationTest extends MatsimTestCase {
 		assertEquals(2, chargingTimesForAgent255.size());
 		assertEquals(10*3600*1000.0, chargingTimesForAgent253.getFirst() .getEndSOC());
 		
-		ParametersPSF2.setChargingLocationFilter(null);
+		ParametersPSF2.setAllowedChargingLocations(null);
 	}
 	
 	public void testEventFileBased(){
@@ -119,6 +119,6 @@ public class IntegrationTest extends MatsimTestCase {
 		
 		allowedChargingLocations.add(locationType);
 		
-		ParametersPSF2.setChargingLocationFilter(allowedChargingLocations);
+		ParametersPSF2.setAllowedChargingLocations(allowedChargingLocations);
 	}
 }
