@@ -33,10 +33,9 @@ import playground.wrashid.lib.tools.kml.Color;
 public class FacilityCapacitiesPerActivityType {
 
 	public static void main(String[] args) {
-		String basePath="H:/data/cvs/ivt/studies/switzerland/";
-		String facilititiesPath = basePath + "facilities/facilities.zrhCutC.xml.gz";
+		String facilitiesPath = "H:/data/experiments/ARTEMIS/output/run10/output_facilities.xml.gz";
 
-		ActivityFacilitiesImpl facilities = GeneralLib.readActivityFacilities(facilititiesPath);
+		ActivityFacilitiesImpl facilities = GeneralLib.readActivityFacilities(facilitiesPath);
 		
 		DoubleValueHashMap<String> activityTypeCapacities=new DoubleValueHashMap<String>();
 		
