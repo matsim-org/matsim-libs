@@ -139,7 +139,7 @@ public class LinkAndAgentAccountAnalysisModule implements AnalysisModule{
 			String idEmissionTypeAndGramm = null;
 			FileWriter fstream = new FileWriter(outputFile);			
 			BufferedWriter out = new BufferedWriter(fstream);
-			out.write("Id \t Luftschadstoff \t Emissionen \n");   
+			out.write("Id \t AirPollutant \t WarmEmissions \n");   
 
 			for(Entry<Id, double[]> personIdEntry : id2emissionsInGrammPerType.entrySet()){
 				for(Integer i = 0 ; i < personIdEntry.getValue().length ; i++){

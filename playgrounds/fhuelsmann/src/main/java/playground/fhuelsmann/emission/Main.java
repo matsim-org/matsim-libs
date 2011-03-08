@@ -60,7 +60,7 @@ public class Main {
 
 	private static String visum2hbefaRoadTypeFile = "../../detailedEval/testRuns/input/inputEmissions/road_types.txt";
 	private static String hbefaDieselEmissionFactorsFile = "../../detailedEval/testRuns/input/inputEmissions/hbefa_emission_factors_urban_rural_MW.txt";
-	private static String hbefaColdEmissionFactorsFile = "../../detailedEval/teststrecke/sim/inputEmissions/hbefa_coldstart_emission_factors.txt";
+	private static String hbefaColdEmissionFactorsFile = "../../detailedEval/testRuns/input/inputEmissions/hbefa_coldstart_emission_factors.txt";
 
 	private static String shapeDirectory = "../../detailedEval/Net/shapeFromVISUM/urbanSuburban/";
 	private static String urbanShapeFile = shapeDirectory + "urbanAreas.shp";
@@ -116,14 +116,17 @@ public class Main {
 		MatsimEventsReader matsimEventReader = new MatsimEventsReader(events);
 		matsimEventReader.readFile(eventsFile);
 		
-		coldstartAccount.printColdEmissions();
 		
-
+		//warm emissions
 		Map<Id, double[]> linkId2emissionsInGrammPerType = linkAndAgentAccount.getTotalEmissionsPerLink();
 		Map<Id, double[]> personId2emissionsInGrammPerType = linkAndAgentAccount.getTotalEmissionsPerPerson();
 		linkAndAgentAccount.printTotalEmissionTable(linkId2emissionsInGrammPerType, runDirectory + "emissionsPerLink.txt");
 		linkAndAgentAccount.printTotalEmissionTable(personId2emissionsInGrammPerType, runDirectory + "emissionsPerPerson.txt");
+		
+		//coldstart emissions
+		coldstartAccount.printColdEmissions(runDirectory + "coldemissionsPerPerson.txt");
 
+		//further processing of emissions
 		PersonFilter filter = new PersonFilter();
 		Set<Feature> urbanShape = filter.readShape(urbanShapeFile);
 		Population urbanPop = filter.getRelevantPopulation(population, urbanShape);
@@ -135,7 +138,10 @@ public class Main {
 
 //		System.out.println(emissionType2AvgEmissionsUrbanArea);
 //		System.out.println(emissionType2AvgEmissionsSuburbanArea);
+		
 	}
+	
+
 
 	private List<Double> calculateAvgEmissionsPerTypeAndArea(Population population, Map<Id, double[]> personId2emissionsInGrammPerType) {
 		List<Double> emissionType2AvgEmissionsUrbanArea = new ArrayList<Double>();

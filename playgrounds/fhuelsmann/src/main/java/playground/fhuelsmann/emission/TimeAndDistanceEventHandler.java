@@ -71,8 +71,8 @@ ActivityEndEventHandler,ActivityStartEventHandler{
 	private final Map<Id, Double> activitystart = new TreeMap<Id, Double>();
 	
 	private  Map<Id, Double> accumulate = new TreeMap<Id, Double>();
-	
-	private  Map<Id, Double> startTime = new TreeMap<Id, Double>();
+	private  Map<Id, Double> activityDuration = new TreeMap<Id, Double>();
+
 
 	
 	
@@ -94,70 +94,82 @@ ActivityEndEventHandler,ActivityStartEventHandler{
 	@Override
 	public void handleEvent(ActivityStartEvent event) {
 
-		Id personId= event.getPersonId();
+
+		Id personId= event.getPersonId();	
 		Id linkId = event.getLinkId();
 		
 		this.activitystart.put(event.getPersonId(), event.getTime());
-		
+					
 		LinkImpl link = (LinkImpl) this.network.getLinks().get(linkId);
 		double distance = link.getLength();
 		
-			
-		if (this.accumulate.containsKey(personId) && this.startTime.containsKey(personId)){
-		
-			
-//			double actEnd = this.activityend.get(personId);// EndTime
-	//		double actDuration =  actEnd - this.startTime.get(personId);
-			try {
-				double TotalDistance =  this.accumulate.get(personId);//without Distance of LinkID of startact
 
-				//String id = event.getPersonId().toString();
-//				if(id.contains("557446.1#1898"))				
-//					System.out.println("TotalDistance" +TotalDistance);
-	
-				double actDuration = this.startTime.get(personId);
+		if (this.accumulate.containsKey(personId) && this.activityDuration.containsKey(personId)){
+
+			try {
+				double TotalDistance =  this.accumulate.get(personId);//without Distance of LinkID of startact; one link is counted too much
+				double actDuration = this.activityDuration.get(personId);
+				
+//				String id = event.getPersonId().toString();
+//				if(id.contains("569253.3#11147"))	
+//				System.out.println("TotalDistance " +TotalDistance + " actDuration " + actDuration);
+				
 				double actStart= event.getTime();
 				this.coldstartAnalyseModul.calculateColdEmissionsPerLink(personId, actDuration, TotalDistance, this.hbefaColdTable);
-	//		System.out.println("personId "+ personId + " actStart " +actStart+ " actDuration " + actDuration+ " Distance " + TotalDistance );
+//				System.out.println("personId "+ personId + " actStart " +actStart+ " actDuration " + actDuration+ " Distance " + TotalDistance );
+				
 				this.accumulate.remove(personId);
+			
 			} catch (IOException e) {
 					// TODO Auto-generated catch block
 				e.printStackTrace();
 			}	
 			
+		}
+		else {
+			// System.out.println("count1    "+count1++);
 
-		}else {
-			
 			this.accumulate.put(personId, distance);
-			this.startTime.put(personId, event.getTime());
-			}	
+			this.activityDuration.put(personId, event.getTime());
+			
+			double TotalDistance =  this.accumulate.get(personId);//without Distance of LinkID of startact; one link is counted too much
+			double actDuration = this.activityDuration.get(personId);
+			
+			try {
+				this.coldstartAnalyseModul.calculateColdEmissionsPerLink(personId, actDuration, TotalDistance, this.hbefaColdTable);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}	
 		
 	}
 	
 	
 	public void handleEvent(ActivityEndEvent  event) {
+		
 		Id personId= event.getPersonId();
 		Id linkId = event.getLinkId();
+	
 		this.activityend.put(event.getPersonId(), event.getTime());
 		
-		if (this.startTime.containsKey(personId)){
+		if (this.activityDuration.containsKey(personId)){
 		double actstart = this.activitystart.get(personId);// EndTime
 		double actDuration = event.getTime() - actstart;
-		this.startTime.put(personId, actDuration);
+		this.activityDuration.put(personId, actDuration);
 
-		//		String id = event.getPersonId().toString();
-//		if(id.contains("557446.1#1898"))	
+//		String id = event.getPersonId().toString();
+//		if(id.contains("569253.3#11147"))	
 //			System.out.println("startTime" +event.getTime()+"actDuration" + actDuration);
 		}
-		
 	}
 	
 	
 	public void handleEvent(LinkLeaveEvent event) {	
-	  
+		
 		Id personId= event.getPersonId();
 		Id linkId = event.getLinkId();
-					
+
 		this.linkleave.put(event.getPersonId(), event.getTime());
 				
 		LinkImpl link = (LinkImpl) this.network.getLinks().get(linkId);
@@ -169,10 +181,11 @@ ActivityEndEventHandler,ActivityStartEventHandler{
 			this.accumulate.put(personId, oldValue + distance);
 			
 //		String id = event.getPersonId().toString();
-//		if(id.contains("557446.1#1898"))		
+//		if(id.contains("569253.3#11147"))		
 //			System.out.println(event.getLinkId()+"   "+distance);
 		
-		}else {
+		}
+		else {
 			this.accumulate.put(personId, distance);
 		}
 	}
