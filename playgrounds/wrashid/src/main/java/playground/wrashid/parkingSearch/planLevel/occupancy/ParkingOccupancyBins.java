@@ -28,6 +28,16 @@ public class ParkingOccupancyBins {
 			occupancy[i] = 0;
 		}
 	}
+	
+	public int getPeakOccupanyOfDay(){
+		int peakOccupancy=0;
+		for (int i = 0; i < 96; i++) {
+			if (peakOccupancy<occupancy[i]){
+				peakOccupancy=occupancy[i];
+			}
+		}
+		return peakOccupancy;
+	}
 
 	public int getOccupancy(double time) {
 		int binIndex = getBinIndex(time);
