@@ -28,10 +28,10 @@
  * A code example for signalsystems demand generation code can be found in the
  * playground.dgrether.koehlerstrehlersignal.DgKoehlerStrehler2010ScenarioGenerator class.
  * 
- *  @see org.matsim.signalsystems.data.signalsystems.v20.package-info.java
- *  @see org.matsim.signalsystems.data.signalgroups.v20.package-info.java
- *  @see org.matsim.signalsystems.data.signalcontrol.v20.package-info.java
- *  @see org.matsim.signalsystems.data.ambertimes.v10.package-info.java
+ *  @see org.matsim.signalsystems.data.signalsystems.v20
+ *  @see org.matsim.signalsystems.data.signalgroups.v20
+ *  @see org.matsim.signalsystems.data.signalcontrol.v20
+ *  @see org.matsim.signalsystems.data.ambertimes.v10
  * <h2>Package Maintainer(s):</h2>
  * <ul>
  *   <li>Dominik Grether</li>
