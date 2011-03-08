@@ -7,6 +7,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.network.NetworkImpl;
 
+import playground.wrashid.artemis.hubs.LinkHubMapping;
 import playground.wrashid.lib.GeneralLib;
 import playground.wrashid.lib.obj.DoubleValueHashMap;
 import playground.wrashid.lib.obj.LinkedListValueHashMap;
@@ -14,7 +15,12 @@ import playground.wrashid.lib.obj.StringMatrix;
 
 public class RegressionModel {
 
+	private static LinkHubMapping linkHubMapping;
+	
 	public static void main(String[] args) {
+		String linkHubMappingTable = "C:/eTmp/run10/linkHub_orig.mappingTable.txt";
+		linkHubMapping=new LinkHubMapping(linkHubMappingTable);
+		
 		DoubleValueHashMap<Id> numberOfKilometersOfStreetsPerHub = getNumberOfKilometersStreetPerHub();
 		
 		DoubleValueHashMap<Id> numberOfStreetParkingsPerHub = getNumberOfStreetParkingsPerHub();
@@ -57,7 +63,7 @@ public class RegressionModel {
 		DoubleValueHashMap<Id> numberOfParkingsPerHub = new DoubleValueHashMap<Id>();
 		
 		for (ActivityFacility parkingGarage:garageParkingFacilities.getFacilities().values()){
-			numberOfParkingsPerHub.incrementBy(LinkHubMapping.getHubIdForLinkId(network.getNearestLink(parkingGarage.getCoord()).getId()),parkingGarage.getActivityOptions().get("parking").getCapacity());
+			numberOfParkingsPerHub.incrementBy(linkHubMapping.getHubIdForLinkId(network.getNearestLink(parkingGarage.getCoord()).getId()),parkingGarage.getActivityOptions().get("parking").getCapacity());
 		}
 		return numberOfParkingsPerHub;
 	}
@@ -77,7 +83,7 @@ public class RegressionModel {
 		
 		for (Link link:network.getLinks().values()){
 			if (isNotHighwayOrCountryRoad(link)){
-				numberOfKilometersOfStreetsInHub.incrementBy(LinkHubMapping.getHubIdForLinkId(link.getId()),link.getLength()/1000);
+				numberOfKilometersOfStreetsInHub.incrementBy(linkHubMapping.getHubIdForLinkId(link.getId()),link.getLength()/1000);
 			}
 		}
 		return numberOfKilometersOfStreetsInHub;
@@ -95,31 +101,6 @@ public class RegressionModel {
 	}
 
 
-	private static class LinkHubMapping {
-		static StringMatrix matrix;
-		static LinkedListValueHashMap<Id, Id> hubIdLinkIdMapping;
-		static {
-			String linkHubMappingTable = "C:/eTmp/run10/linkHub_orig.mappingTable.txt";
-			matrix = GeneralLib.readStringMatrix(linkHubMappingTable);
-
-			hubIdLinkIdMapping = new LinkedListValueHashMap<Id, Id>();
-
-			for (int i = 1; i < matrix.getNumberOfRows(); i++) {
-				String hubId = matrix.getString(i, 0);
-				String linkId = matrix.getString(i, 1);
-				hubIdLinkIdMapping.putAndSetBackPointer(new IdImpl(hubId), new IdImpl(linkId));
-			}
-		}
-
-		public static Id getHubIdForLinkId(Id linkId) {
-			return hubIdLinkIdMapping.getKey(linkId);
-		}
-
-		public static Id getLinkIdForHubId(Id hubId) {
-			return hubIdLinkIdMapping.getValue(hubId);
-
-		}
-
-	}
+	
 
 }
