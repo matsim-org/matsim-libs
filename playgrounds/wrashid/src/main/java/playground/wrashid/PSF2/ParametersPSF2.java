@@ -71,7 +71,7 @@ public class ParametersPSF2 {
 		ParametersPSF2.vehicles=ParametersPSF2.fleetInitializer.getVehicles(controler.getPopulation().getPersons().keySet(), ParametersPSF2.energyStateMaintainer);
 	};
 	
-	public static void setChargingLocationFilter(LinkedList<String> allowedChargingLocations){
+	public static void setAllowedChargingLocations(LinkedList<String> allowedChargingLocations){
 		ParametersPSF2.allowedChargingLocations=allowedChargingLocations;
 	}
 	

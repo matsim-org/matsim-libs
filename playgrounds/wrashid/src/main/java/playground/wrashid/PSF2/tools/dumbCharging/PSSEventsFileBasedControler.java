@@ -65,6 +65,8 @@ public class PSSEventsFileBasedControler {
 		}
 		
 		
+		
+		
 
 		// TODO: here we could also add some filter later...
 
@@ -73,11 +75,51 @@ public class PSSEventsFileBasedControler {
 		pssControlerDumbCharging.prepareMATSimIterations();
 		Controler controler = pssControlerDumbCharging.getControler();
 
+		addControlerHandlerForReadingAllowedChargingLocationsParameter(controler);
+		
 		controler.setWriteEventsInterval(0);
 		
 		//addPHEVSampleFilter_Deprecated_use_EventsFilterSamplingInstead(controler);
 
 		pssControlerDumbCharging.runControler();
+	}
+
+	private static void addControlerHandlerForReadingAllowedChargingLocationsParameter(Controler controler) {
+		controler.addControlerListener(new StartupListener() {
+
+			@Override
+			public void notifyStartup(StartupEvent event) {
+				LinkedList<String> allowedChargingLocations=new LinkedList<String>();
+				
+				
+				String paramName="ParametersPSF2.allowedChargingLocations";
+				try{
+					String str=	event.getControler().getConfig().getParam("PSF", paramName);
+					
+					String[] activityLocations=str.split(",");
+					
+					for (String actLocation:activityLocations){
+						actLocation=actLocation.trim();
+						if (actLocation!=""){
+							allowedChargingLocations.add(actLocation);
+						}
+					}
+					
+					if (allowedChargingLocations.size()>0){
+						ParametersPSF2.setAllowedChargingLocations(allowedChargingLocations);
+					} else {
+						ParametersPSF2.setAllowedChargingLocations(null);
+					}
+					
+				} catch (Exception e) {
+					e.printStackTrace();
+					System.err.println("config parameter missing in module PSF: " + paramName);
+					System.exit(0);
+				}
+				
+			}
+		});
+		
 	}
 
 	/*
