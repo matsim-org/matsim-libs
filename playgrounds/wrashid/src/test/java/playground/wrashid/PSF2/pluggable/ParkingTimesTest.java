@@ -33,7 +33,33 @@ import playground.wrashid.PSF2.pluggable.parkingTimes.ParkingTimesPlugin;
 public class ParkingTimesTest extends MatsimTestCase {
 
 	public void testBasic(){
-		String eventsFile="test/input/playground/wrashid/PSF2/pluggable/0.events.txt.gz";
+		String eventsFile=getPackageInputDirectory() + "0.events.txt.gz";
+		ParkingTimesPlugin parkingTimesPlugin = getParkintTimes(eventsFile);
+		
+		assertEquals(2, parkingTimesPlugin.getParkingTimeIntervals().get(new IdImpl(1)).size());
+		assertEquals(22500, parkingTimesPlugin.getParkingTimeIntervals().get(new IdImpl(1)).get(0).getArrivalTime(),1.0);
+		assertEquals(35700, parkingTimesPlugin.getParkingTimeIntervals().get(new IdImpl(1)).get(0).getDepartureTime(),1.0);
+		assertEquals(38040, parkingTimesPlugin.getParkingTimeIntervals().get(new IdImpl(1)).get(1).getArrivalTime(),1.0);
+		assertEquals(21600, parkingTimesPlugin.getParkingTimeIntervals().get(new IdImpl(1)).get(1).getDepartureTime(),1.0);
+	}
+	
+	public void testAgent2HasNoCarLegs(){
+		String eventsFile=getPackageInputDirectory() +"agent2HasNoCarLeg.events.txt";
+		ParkingTimesPlugin parkingTimesPlugin = getParkintTimes(eventsFile);
+		
+		assertEquals(0, parkingTimesPlugin.getParkingTimeIntervals().get(new IdImpl(2)).size());
+	}
+	
+	public void testAgent2UsesCarNotAsModeForFirstLeg(){
+		String eventsFile=getPackageInputDirectory() +"agent2UsesCarNotAsModeForFirstLeg.events.txt";
+		ParkingTimesPlugin parkingTimesPlugin = getParkintTimes(eventsFile);
+		
+		assertEquals(1, parkingTimesPlugin.getParkingTimeIntervals().get(new IdImpl(2)).size());
+		assertEquals(38040, parkingTimesPlugin.getParkingTimeIntervals().get(new IdImpl(2)).get(0).getArrivalTime(),1.0);
+		assertEquals(35700, parkingTimesPlugin.getParkingTimeIntervals().get(new IdImpl(2)).get(0).getDepartureTime(),1.0);
+	}
+	
+	private ParkingTimesPlugin getParkintTimes(String eventsFile) {
 		EventsManagerImpl events = new EventsManagerImpl();
 
 		ParkingTimesPlugin parkingTimesPlugin = new ParkingTimesPlugin();
@@ -45,16 +71,11 @@ public class ParkingTimesTest extends MatsimTestCase {
 		reader.readFile(eventsFile);
 		
 		parkingTimesPlugin.closeLastAndFirstParkingIntervals();
-		
-		assertEquals(2, parkingTimesPlugin.getParkingTimeIntervals().get(new IdImpl(1)).size());
-		assertEquals(22500, parkingTimesPlugin.getParkingTimeIntervals().get(new IdImpl(1)).get(0).getArrivalTime(),1.0);
-		assertEquals(35700, parkingTimesPlugin.getParkingTimeIntervals().get(new IdImpl(1)).get(0).getDepartureTime(),1.0);
-		assertEquals(38040, parkingTimesPlugin.getParkingTimeIntervals().get(new IdImpl(1)).get(1).getArrivalTime(),1.0);
-		assertEquals(21600, parkingTimesPlugin.getParkingTimeIntervals().get(new IdImpl(1)).get(1).getDepartureTime(),1.0);
+		return parkingTimesPlugin;
 	}
 	
 	public void testWithParkingLocationsFilterHome(){
-		String eventsFile="test/input/playground/wrashid/PSF2/pluggable/0.events.txt.gz";
+		String eventsFile=getPackageInputDirectory() +"0.events.txt.gz";
 		EventsManagerImpl events = new EventsManagerImpl();
 
 		ParkingTimesPlugin parkingTimesPlugin = new ParkingTimesPlugin();
@@ -79,7 +100,7 @@ public class ParkingTimesTest extends MatsimTestCase {
 	
 	
 	public void testWithParkingLocationsFilterWork(){
-		String eventsFile="test/input/playground/wrashid/PSF2/pluggable/0.events.txt.gz";
+		String eventsFile=getPackageInputDirectory() +"0.events.txt.gz";
 		EventsManagerImpl events = new EventsManagerImpl();
 
 		ParkingTimesPlugin parkingTimesPlugin = new ParkingTimesPlugin();
