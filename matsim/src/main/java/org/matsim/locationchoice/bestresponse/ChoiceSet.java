@@ -3,7 +3,6 @@ package org.matsim.locationchoice.bestresponse;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.SortedMap;
 import java.util.Random;
 import java.util.TreeMap;
 import java.util.Vector;
@@ -82,7 +81,7 @@ public class ChoiceSet {
 			Coord coordPre, Coord coordPost, ActivityFacilities facilities, Random random, 
 			ScoringFunctionAccumulator scoringFunction, Plan plan, TravelTime travelTime, TravelCost travelCost) {
 				
-		SortedMap<Double, Id> map = this.createChoiceSet(actlegIndex, person, coordPre, coordPost, facilities, scoringFunction, plan, travelTime, travelCost);
+		TreeMap<Double, Id> map = this.createChoiceSet(actlegIndex, person, coordPre, coordPost, facilities, scoringFunction, plan, travelTime, travelCost);
 		
 		// score 0 is included as random range = 0.0d (inclusive) to 1.0d (exclusive)
 		// TODO: Do I have to modify the seed here by the iteration number (i.e., do we in every iteration chose the same value)?
@@ -97,7 +96,7 @@ public class ChoiceSet {
 		return id;
 	}
 	
-	private SortedMap<Double,Id> createChoiceSet(int actlegIndex, Person person,
+	private TreeMap<Double,Id> createChoiceSet(int actlegIndex, Person person,
 			Coord coordPre, Coord coordPost, ActivityFacilities facilities, ScoringFunctionAccumulator scoringFunction,
 			Plan plan, TravelTime travelTime, TravelCost travelCost) {
 		
@@ -150,7 +149,7 @@ public class ChoiceSet {
 		// find the sum of the scores to normalize scores
 		Collections.sort(list);
 		double totalScore = this.getTotalScore(list, (largestValue < 0.0));
-		SortedMap<Double,Id> mapCorrected = this.generateReducedChoiceSet(list, totalScore, (largestValue < 0.0));
+		TreeMap<Double,Id> mapCorrected = this.generateReducedChoiceSet(list, totalScore, (largestValue < 0.0));
 				
 		// score 0 is included as random range = 0.0d (inclusive) to 1.0d (exclusive)
 		// TODO: Do I have to modify the seed here by the iteration number (i.e., do we in every iteration chose the same value)?

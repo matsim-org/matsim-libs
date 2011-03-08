@@ -27,15 +27,17 @@ public class ScoredAlternative implements Comparable<ScoredAlternative> {
 
 	/* 
 	 * Compare keys (double scores). 
-	 * If the scores are identical, additionally use id to sort such that deterministic order is ensured
+	 * If the scores are identical, additionally use the 'alternatives' id's to sort such that deterministic order is ensured
 	 */
 	@Override
 	public int compareTo(ScoredAlternative o) {
 		// numerics
 		double epsilon = 0.000001;
+		
+		// reverse order:
 		if (Math.abs(this.score - o.getScore()) > epsilon) {
-			if (this.score > o.getScore()) return 1;
-			else return -1;
+			if (this.score > o.getScore()) return -1;
+			else return +1;
 		}		
 		else {
 			return this.alternativeId.compareTo(o.getAlternativeId());
