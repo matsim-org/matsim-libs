@@ -46,13 +46,6 @@ import playground.wrashid.lib.obj.LinkedListValueHashMap;
 /**
  * 
  * 
- * 
- * ATTENTION: This class provides not filter for activity types => TODO: add
- * this filter also (e.g. using setter)
- * 
- * TODO: add act type to parkingIntervalInfo
- * 
- * 
  * The first/last parking is at the last position in the list.
  * 
  * @author wrashid
@@ -95,12 +88,16 @@ public class ParkingTimesPlugin implements AgentWait2LinkEventHandler, AgentArri
 
 	public void closeLastAndFirstParkingIntervals() {
 		for (Id personId : parkingTimeIntervals.getKeySet()) {
+			if (parkingTimeIntervals.get(personId).size()==0){
+				return;
+			}
+			
 			ParkingIntervalInfo firstParkingInterval = parkingTimeIntervals.get(personId).getFirst();
 			ParkingIntervalInfo lastParkingInterval = parkingTimeIntervals.get(personId).getLast();
 
 			if (!isLastParkingOfDayFilteredOut(lastParkingInterval)) {
 				lastParkingInterval.setDepartureTime(firstParkingInterval.getDepartureTime());
-				checkFirstLastLinkConsistency(firstParkingInterval.getLinkId(), lastParkingInterval.getLinkId());
+	//			checkFirstLastLinkConsistency(firstParkingInterval.getLinkId(), lastParkingInterval.getLinkId());
 			}
 
 			parkingTimeIntervals.get(personId).removeFirst();
@@ -131,7 +128,7 @@ public class ParkingTimesPlugin implements AgentWait2LinkEventHandler, AgentArri
 
 			parkingTimeIntervals.put(event.getPersonId(), parkingIntervalInfo);
 
-			resetLastLinkEntered(event.getPersonId());
+	//		resetLastLinkEntered(event.getPersonId());
 		}
 	}
 
@@ -146,6 +143,10 @@ public class ParkingTimesPlugin implements AgentWait2LinkEventHandler, AgentArri
 
 	private void updateDepartureTimeInfo(AgentWait2LinkEvent event) {
 
+		if (parkingTimeIntervals.get(event.getPersonId()).size()==0){
+			System.out.println();
+		}
+		
 		ParkingIntervalInfo lastParkingInterval = parkingTimeIntervals.get(event.getPersonId()).getLast();
 
 		// don't overwrite previous values!
@@ -155,11 +156,6 @@ public class ParkingTimesPlugin implements AgentWait2LinkEventHandler, AgentArri
 		lastParkingInterval.setDepartureTime(event.getTime());
 	}
 
-	private void checkLinkConsistency(ParkingIntervalInfo lastParkingInterval, Id linkId) {
-		if (!lastParkingInterval.getLinkId().equals(linkId)) {
-			DebugLib.stopSystemAndReportInconsistency();
-		}
-	}
 
 	private void initializeParkingTimeIntervalsForPerson(Id personId, Id linkId) {
 		ParkingIntervalInfo parkingIntervalInfo = new ParkingIntervalInfo();
@@ -186,14 +182,20 @@ public class ParkingTimesPlugin implements AgentWait2LinkEventHandler, AgentArri
 	}
 
 	private void setActTypeOfParkingInterval(ActivityStartEvent event) {
-		LinkedList<ParkingIntervalInfo> parkingIntervalsOfCurrentAgent = parkingTimeIntervals.get(event.getPersonId());
-		if (parkingIntervalsOfCurrentAgent.getLast().getActTypeOfFirstActDuringParking() == null
-				&& parkingIntervalsOfCurrentAgent.getLast().getDepartureTime() < 0) {
+		
+	//	if (parkingIntervalsOfCurrentAgent.size()>0 && parkingIntervalsOfCurrentAgent.getLast().getActTypeOfFirstActDuringParking() == null
+		//		&& parkingIntervalsOfCurrentAgent.getLast().getDepartureTime() < 0) {
+		if (isValidArrivalEventWithCar(event.getPersonId(), event.getLinkId())) {
+		
+			LinkedList<ParkingIntervalInfo> parkingIntervalsOfCurrentAgent = parkingTimeIntervals.get(event.getPersonId());
+			
 			if (actTypesFilter == null || actTypesFilter.contains(event.getActType())) {
 				parkingIntervalsOfCurrentAgent.getLast().setActTypeOfFirstActDuringParking(event.getActType());
 			} else {
 				parkingIntervalsOfCurrentAgent.removeLast();
 			}
+			
+			resetLastLinkEntered(event.getPersonId());
 		}
 	}
 
