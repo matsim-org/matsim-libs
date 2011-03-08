@@ -1,5 +1,9 @@
 package playground.wrashid.artemis.parking;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
@@ -28,10 +32,27 @@ public class RegressionModel {
 		DoubleValueHashMap<Id> numberOfGarageParkingsPerHub = getNumberOfGarageParkingsPerHub();
 		
 		
+		printParkingSupplyStatistics(numberOfKilometersOfStreetsPerHub, numberOfStreetParkingsPerHub,
+				numberOfGarageParkingsPerHub);
+	}
+
+
+
+
+	private static void printParkingSupplyStatistics(DoubleValueHashMap<Id> numberOfKilometersOfStreetsPerHub,
+			DoubleValueHashMap<Id> numberOfStreetParkingsPerHub, DoubleValueHashMap<Id> numberOfGarageParkingsPerHub) {
 		System.out.println("hubId\tnumberOfKilometersOfStreetsPerHub\tnumberOfStreetParkingsPerHub\tnumberOfGarageParkingsPerHub");
-		for (Id hubId:numberOfKilometersOfStreetsPerHub.keySet()){
-			System.out.println(hubId + "\t" + numberOfKilometersOfStreetsPerHub.get(hubId) + "\t" +  numberOfStreetParkingsPerHub.get(hubId)  + "\t" + numberOfGarageParkingsPerHub.get(hubId));
+		
+		List<Id> hubIds = playground.wrashid.lib.obj.Collections.getSortedKeySet(linkHubMapping.getHubs());
+
+		for (Id hubId:hubIds){
+			double nuberOfKilometersOfStreet=numberOfKilometersOfStreetsPerHub.keySet().contains(hubId)?numberOfKilometersOfStreetsPerHub.get(hubId):0;
+			double numberOfStreetParkings=numberOfStreetParkingsPerHub.keySet().contains(hubId)?numberOfStreetParkingsPerHub.get(hubId):0;
+			double numberOfGarageParkings=numberOfGarageParkingsPerHub.keySet().contains(hubId)?numberOfGarageParkingsPerHub.get(hubId):0;
+			
+			System.out.println(hubId + "\t" + nuberOfKilometersOfStreet + "\t" +  numberOfStreetParkings  + "\t" + numberOfGarageParkings);
 		}
+		
 	}
 
 	 

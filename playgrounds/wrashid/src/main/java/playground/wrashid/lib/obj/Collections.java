@@ -1,6 +1,8 @@
 package playground.wrashid.lib.obj;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 public class Collections {
 
@@ -15,5 +17,13 @@ public class Collections {
 		
 		return doubleArray;
 	}
+	
+	public static List getSortedKeySet(Collection keySet){
+		List keys = new ArrayList(keySet); 
+		keys.remove(null);
+		java.util.Collections.sort(keys);
+		return keys;
+	}
+	
 	
 }

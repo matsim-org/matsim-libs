@@ -1,5 +1,7 @@
 package playground.wrashid.artemis.hubs;
 
+import java.util.Collection;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 
@@ -10,6 +12,11 @@ import playground.wrashid.lib.obj.StringMatrix;
 public class LinkHubMapping {
 	StringMatrix matrix;
 	LinkedListValueHashMap<Id, Id> hubIdLinkIdMapping;
+	
+	public Collection<Id> getHubs(){
+		return hubIdLinkIdMapping.getKeySet();
+	}
+	
 	public LinkHubMapping(String linkHubMappingTable) {
 		matrix = GeneralLib.readStringMatrix(linkHubMappingTable);
 

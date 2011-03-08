@@ -2,6 +2,7 @@ package playground.wrashid.artemis.parking;
 
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.events.EventsManagerImpl;
@@ -40,8 +41,21 @@ public class PeakParkingDemandPerHub {
 		
 		accumulateHubParkingOccupancyStatistics(linkHubMapping, hubIdParkingOccupancies, parkingTimesPlugin);
 		
+		printPeakOccupancyStatistics(hubIdParkingOccupancies, linkHubMapping);
+	}
+
+	private static void printPeakOccupancyStatistics(HashMap<Id, ParkingOccupancyBins> hubIdParkingOccupancies, LinkHubMapping linkHubMapping) {
 		System.out.println("hubId\tpeakParkingOccupancy");
-		GeneralLib.printHashmapToConsole(hubIdParkingOccupancies);
+		
+		List<Id> hubIds = playground.wrashid.lib.obj.Collections.getSortedKeySet(linkHubMapping.getHubs());
+		
+		for (Id hubId:hubIds){
+			int peakOccupancy=0;
+			if (hubIdParkingOccupancies.containsKey(hubId)){
+				peakOccupancy=hubIdParkingOccupancies.get(hubId).getPeakOccupanyOfDay();
+			}
+			System.out.println(hubId.toString() +"\t"+peakOccupancy);
+		}
 	}
 
 	private static void accumulateHubParkingOccupancyStatistics(LinkHubMapping linkHubMapping,

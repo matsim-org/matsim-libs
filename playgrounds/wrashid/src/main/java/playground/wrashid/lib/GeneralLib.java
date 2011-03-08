@@ -11,8 +11,10 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.StringTokenizer;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -672,9 +674,15 @@ public class GeneralLib {
 	 */
 	public static void printHashmapToConsole(HashMap hm){
 		for (Object key:hm.keySet()){
-			System.out.println(key.toString() +"\t"+hm.get(key));
+			if (key==null){
+				System.out.println("null" +"\t"+hm.get(key));
+			} else {
+				System.out.println(key.toString() +"\t"+hm.get(key));
+			}
 		}	
 	}
+	
+	
 	
 	public static void printLinkedListToConsole(LinkedList list){
 		for (Object value:list){
