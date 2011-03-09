@@ -39,12 +39,22 @@ public class ScenarioLoaderAlternatives {
 			config.scenario().isUseVehicles();
 			
 			ScenarioLoader scl = new ScenarioLoaderImpl( config ) ;
-			
 			Scenario sc = scl.loadScenario() ;
 			
 			Controler ctrl = new Controler( (ScenarioImpl) sc ) ; // besser mit "Scenario"
 			
 		}
+		
+		// discussed 9mar2011
+//		{
+//			Config config = ConfigUtils.loadConfig( filename ) ;
+//			
+//			Scenario sc = ScenarioUtils.loadScenario( config ) ;
+//			
+//			Controler ctrl = new Controler(sc) ;
+//			ctrl.setOverwriteFiles(true ;)
+//			ctrl.run();
+//		}
 		
 //		// option 4
 //		{
