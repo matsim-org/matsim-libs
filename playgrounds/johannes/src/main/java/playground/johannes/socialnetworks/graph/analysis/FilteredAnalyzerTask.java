@@ -25,6 +25,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.log4j.Logger;
 import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.analysis.AnalyzerTask;
 import org.matsim.contrib.sna.graph.analysis.GraphAnalyzer;
@@ -36,6 +37,8 @@ import org.matsim.contrib.sna.graph.analysis.GraphAnalyzer;
  */
 public class FilteredAnalyzerTask extends AnalyzerTask {
 
+	private static final Logger logger = Logger.getLogger(FilteredAnalyzerTask.class);
+	
 	private AnalyzerTask analyzer;
 	
 	private Map<String, GraphFilter<Graph>> filters;
@@ -52,9 +55,12 @@ public class FilteredAnalyzerTask extends AnalyzerTask {
 	@Override
 	public void analyze(Graph graph, Map<String, Double> stats) {
 		for(Entry<String, GraphFilter<Graph>> entry : filters.entrySet()) {
+			logger.info(String.format("Applying filter \"%1$s\"...", entry.getKey()));
+			
 			Graph filteredGraph = entry.getValue().apply(graph);
 			String output = String.format("%1$s/%2$s", getOutputDirectory(), entry.getKey());
 			new File(output).mkdirs();
+			
 			try {
 				GraphAnalyzer.analyze(filteredGraph, analyzer, output);
 			} catch (IOException e) {

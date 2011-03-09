@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ObservedSocialAnalyzerTask.java
+ * ZoneLayerKMLWriter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,35 +17,55 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.survey.ivt2009.analysis;
+package playground.johannes.socialnetworks.gis.io;
 
-import playground.johannes.socialnetworks.gis.GravityCostFunction;
-import playground.johannes.socialnetworks.gis.SpatialCostFunction;
-import playground.johannes.socialnetworks.graph.social.analysis.AgeAccessibilityTask;
-import playground.johannes.socialnetworks.graph.social.analysis.AgeTask;
-import playground.johannes.socialnetworks.graph.social.analysis.EducationTask;
-import playground.johannes.socialnetworks.graph.social.analysis.GenderAccessibilityTask;
-import playground.johannes.socialnetworks.graph.social.analysis.GenderTask;
-import playground.johannes.socialnetworks.graph.social.analysis.SocialAnalyzerTask;
-import playground.johannes.socialnetworks.graph.spatial.analysis.Accessibility;
-import playground.johannes.socialnetworks.snowball2.social.analysis.ObservedAge;
+import gnu.trove.TObjectDoubleHashMap;
+
+import java.util.HashSet;
+import java.util.Set;
+
+import org.matsim.contrib.sna.gis.Zone;
+import org.matsim.contrib.sna.gis.ZoneLayer;
+import org.matsim.contrib.sna.graph.spatial.io.Colorizable;
+
+import playground.johannes.socialnetworks.graph.spatial.io.NumericAttributeColorizer;
+
+import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * @author illenberger
  *
  */
-public class ObservedSocialAnalyzerTask extends SocialAnalyzerTask {
+public class ZoneLayerKMLWriter {
 
-	public ObservedSocialAnalyzerTask() {
-		addTask(new AgeTask(new ObservedAge()));
-		addTask(new GenderTask(new ObservedGender()));
-		addTask(new EducationTask());
-		
-		SpatialCostFunction function = new GravityCostFunction(1.6, 0);
-		Accessibility access = new Accessibility(function);
-		
-		addTask(new AgeAccessibilityTask(access));
-		addTask(new GenderAccessibilityTask(access));
+	private Colorizable colorizer;
+	
+	public void setColorizer(Colorizable colorizer) {
+		this.colorizer = colorizer;
 	}
-
+	
+	public void writeWithColor(ZoneLayer<Double> layer, String filename) {
+		TObjectDoubleHashMap<Geometry> colors = new TObjectDoubleHashMap<Geometry>();
+		
+		for(Zone<Double> zone : layer.getZones()) {
+			if(zone.getAttribute() != null)
+				colors.put(zone.getGeometry(), zone.getAttribute());
+		}
+		
+		colorizer = new NumericAttributeColorizer(colors);
+		
+		write(layer, filename);
+	}
+	
+	public void write(ZoneLayer<?> layer, String filename) {
+		Set<Geometry> geometries = new HashSet<Geometry>();
+		
+		for(Zone<?> zone : layer.getZones()) {
+			geometries.add(zone.getGeometry());
+		}
+		
+		FeatureKMLWriter writer = new FeatureKMLWriter();
+		writer.setColorizable(colorizer);
+		writer.write(geometries, filename);
+	}
 }

@@ -31,8 +31,8 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Route;
 
-import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
 import playground.johannes.socialnetworks.gis.DistanceCalculator;
+import playground.johannes.socialnetworks.gis.OrthodromicDistanceCalculator;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -47,8 +47,8 @@ public class TravelDistance {
 	private boolean geodesicMode = false;
 
 	private Network network;
-//	private DistanceCalculator distanceCalculator = new OrthodromicDistanceCalculator();
-	private DistanceCalculator distanceCalculator = new CartesianDistanceCalculator();
+	private DistanceCalculator distanceCalculator = new OrthodromicDistanceCalculator();
+//	private DistanceCalculator distanceCalculator = new CartesianDistanceCalculator();
 
 	private GeometryFactory geoFactory = new GeometryFactory();
 
@@ -79,7 +79,7 @@ public class TravelDistance {
 					}
 
 					double d = getDistance(plan, i);
-					if(!Double.isNaN(d)) {
+					if(!Double.isNaN(d) && d > 0) {
 						stats.addValue(d);
 						if(d==0)
 							cnt0++;
@@ -97,9 +97,9 @@ public class TravelDistance {
 			Activity dest = (Activity) plan.getPlanElements().get(idx + 1);
 
 			Point p1 = getPoint(start);//geoFactory.createPoint(new Coordinate(start.getCoord().getX(), start.getCoord().getY()));
-//			p1.setSRID(4326);
+			p1.setSRID(4326);
 			Point p2 = getPoint(dest);//geoFactory.createPoint(new Coordinate(dest.getCoord().getX(), dest.getCoord().getY()));
-//			p2.setSRID(4326);
+			p2.setSRID(4326);
 
 			double r = distanceCalculator.distance(p1, p2);
 
@@ -115,11 +115,11 @@ public class TravelDistance {
 	}
 	
 	private Point getPoint(Activity act) {
-//		if(act.getCoord() != null) {
-//			return geoFactory.createPoint(new Coordinate(act.getCoord().getX(), act.getCoord().getY()));
-//		} else {
+		if(act.getCoord() != null) {
+			return geoFactory.createPoint(new Coordinate(act.getCoord().getX(), act.getCoord().getY()));
+		} else {
 			Coord c = network.getLinks().get(act.getLinkId()).getCoord();
 			return geoFactory.createPoint(new Coordinate(c.getX(), c.getY()));
-//		}
+		}
 	}
 }

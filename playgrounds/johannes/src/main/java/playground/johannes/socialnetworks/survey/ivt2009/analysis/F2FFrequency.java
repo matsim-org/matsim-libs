@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * GravityCostFunction.java
+ * F2FFrequency.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,53 +17,42 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.gis;
+package playground.johannes.socialnetworks.survey.ivt2009.analysis;
 
-import org.matsim.contrib.sna.gis.CRSUtils;
-import org.matsim.contrib.sna.math.Discretizer;
-import org.matsim.contrib.sna.math.LinearDiscretizer;
+import gnu.trove.TObjectDoubleHashMap;
 
+import java.util.Set;
 
-import com.vividsolutions.jts.geom.Point;
+import org.matsim.contrib.sna.graph.Edge;
+
+import playground.johannes.socialnetworks.graph.analysis.AbstractEdgeProperty;
+import playground.johannes.socialnetworks.graph.social.SocialEdge;
 
 /**
  * @author illenberger
  *
  */
-public class GravityCostFunction implements SpatialCostFunction {
+public class F2FFrequency extends AbstractEdgeProperty {
 
-	private final double gamma;
+	private static F2FFrequency instance;
 	
-	private final double constant;
-	
-	private Discretizer discretizer;
-	
-	private DistanceCalculator calculator;
-	
-	public GravityCostFunction(double gamma, double constant) {
-		this(gamma, constant, null);
-	}
-	
-	public GravityCostFunction(double gamma, double constant, DistanceCalculator calculator) {
-		this.gamma = gamma;
-		this.constant = constant;
-		discretizer = new LinearDiscretizer(1000.0);
-		this.calculator = calculator;
-	}
-	
-	public void setDiscretizer(Discretizer discretizer) {
-		this.discretizer = discretizer;
+	public static F2FFrequency getInstance() {
+		if(instance == null)
+			instance = new F2FFrequency();
+		
+		return instance;
 	}
 	
 	@Override
-	public double costs(Point p1, Point p2) {
-		if(calculator == null) {
-			calculator = DistanceCalculatorFactory.createDistanceCalculator(CRSUtils.getCRS(p1.getSRID()));
+	public TObjectDoubleHashMap<Edge> values(Set<? extends Edge> edges) {
+		Set<SocialEdge> socialEdges = (Set<SocialEdge>) edges;
+		
+		TObjectDoubleHashMap<Edge> values = new TObjectDoubleHashMap<Edge>();
+		for(SocialEdge edge : socialEdges) {
+			values.put(edge, edge.getFrequency());
 		}
 		
-		double d = Math.max(1.0, discretizer.index(calculator.distance(p1, p2)));
-		
-		return gamma * Math.log(d) + constant;
+		return values;
 	}
 
 }

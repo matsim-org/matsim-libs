@@ -20,7 +20,6 @@
 package playground.johannes.studies.gis;
 
 import gnu.trove.TDoubleDoubleHashMap;
-import gnu.trove.TIntObjectHashMap;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -43,7 +42,6 @@ import org.matsim.contrib.sna.util.TXTWriter;
 
 import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
 import playground.johannes.socialnetworks.gis.DistanceCalculator;
-import playground.johannes.socialnetworks.gis.Geometries;
 import playground.johannes.socialnetworks.gis.io.FeatureSHP;
 import playground.johannes.socialnetworks.graph.spatial.io.Population2SpatialGraph;
 import playground.johannes.socialnetworks.snowball2.social.SocialSampledGraphProjection;
@@ -67,20 +65,20 @@ public class FractalDim {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		String pointFile = args[0];
-//		String pointFile = "/Users/jillenberger/Work/socialnets/data/schweiz/complete/plans/plans.0.01.xml";
-		String polyFile = args[1];
-//		String polyFile = "/Users/jillenberger/Work/socialnets/data/schweiz/complete/zones/G1L08.shp";
-		String outFile = args[2];
-//		String outFile = "/Users/jillenberger/Work/socialnets/spatialchoice/fdim.ego-point.fixed.txt";
-		String egoFile = args[3];
-//		String egoFile = "/Users/jillenberger/Work/socialnets/data/ivt2009/01-2011/graph/graph.graphml";
+//		String pointFile = args[0];
+		String pointFile = "/Users/jillenberger/Work/socialnets/data/schweiz/complete/plans/plans.0.005.xml";
+//		String polyFile = args[1];
+		String polyFile = "/Users/jillenberger/Work/socialnets/data/schweiz/complete/zones/G1L08.shp";
+//		String outFile = args[2];
+		String outFile = "/Users/jillenberger/Work/socialnets/spatialchoice/fdim.ego-point.fixed.txt";
+//		String egoFile = args[3];
+		String egoFile = "/Users/jillenberger/Work/socialnets/data/ivt2009/01-2011/graph/graph.graphml";
 		
 		Set<Point> targetPoints = new HashSet<Point>();
 		SpatialSparseGraph graph2 = new Population2SpatialGraph(CRSUtils.getCRS(21781)).read(pointFile);
 
 		for(SpatialVertex v : graph2.getVertices()) {	
-//			if(Math.random() < 0.1)
+//			if(Math.random() < 0.5)
 				targetPoints.add(v.getPoint());
 		}
 
@@ -97,8 +95,9 @@ public class FractalDim {
 				startPoints.add(v.getPoint());
 		
 		DescriptivePiStatistics stats = calcuate(startPoints, targetPoints, geometry);
+//		DescriptivePiStatistics stats = calcuate(targetPoints, targetPoints, geometry);
 		
-		TDoubleDoubleHashMap hist = Histogram.createHistogram(stats, FixedSampleSizeDiscretizer.create(stats.getValues(), 100, 2000), true);
+		TDoubleDoubleHashMap hist = Histogram.createHistogram(stats, FixedSampleSizeDiscretizer.create(stats.getValues(), 100, 1000), true);
 //		TDoubleDoubleHashMap hist = Histogram.createHistogram(stats, new LinearDiscretizer(1000.0), false);
 		TXTWriter.writeMap(hist, "d", "n", outFile);
 	}
@@ -106,24 +105,36 @@ public class FractalDim {
 	public static DescriptivePiStatistics calcuate(Set<Point> startPoints, Set<Point> targetPoints, Geometry boundary) {
 		DescriptivePiStatistics stats = new DescriptivePiStatistics();
 		DistanceCalculator dCalc = new CartesianDistanceCalculator();
-//		Discretizer discretizer = new LinearDiscretizer(1000.0);
+		Discretizer discretizer = new LinearDiscretizer(1000.0);
 //		Discretizer pointDiscretizer = new LinearDiscretizer(100.0);
-		int cnt = 0;
+//		int cnt = 0;
 		
 		
-		List<Point> startList = new ArrayList<Point>(startPoints);
+//		List<Point> startList = new ArrayList<Point>(startPoints);
 		
-//		int N = startList.size() * (startList.size() - 1) /2;
+//		int N = startList.size() * (startList.size() - 1);
 		int N = startPoints.size() * targetPoints.size();
 //		
 		ProgressLogger.init(N, 1, 5);
-		Point lastPoint = startList.get(0);
+		
+//		Point lastPoint = startList.get(0);
 //		for(int i = 0; i < startList.size(); i++) {
 //			Point p1 = startList.get(i);
+		for(Point p1 : startPoints) {			
+			double a = 0;
+//			for(int j = 0; j < startList.size(); j++) {
+//				Point p2 = startList.get(j);
+			for(Point p2 : targetPoints) {
+				double d = dCalc.distance(p1, p2);
+				d = discretizer.index(d);
+				d = Math.max(d, 1);
+				a += Math.pow(d, -1.5);
+			}
+		
 //			TIntObjectHashMap<Geometry> geoCache = new TIntObjectHashMap<Geometry>();
-		for(Point p1 : startPoints) {
-			if(boundary.contains(p1)) {
-//			for(int j = i+1; j < startList.size(); j++) {
+
+//			if(boundary.contains(p1)) {
+//			for(int j = 0; j < startList.size(); j++) {
 //				Point p2 = startList.get(j);
 			for(Point p2 : targetPoints) {
 				double d = dCalc.distance(p1, p2);
@@ -146,7 +157,7 @@ public class FractalDim {
 //				double a_inner = boundary.intersection(inner).getArea()/(1000.0*1000.0);
 //				double a = a_outer - a_inner;
 //				stats.addValue(d, a);
-				stats.addValue(d, 1);
+				stats.addValue(d, a);
 				
 //				cnt++;
 //				
@@ -155,7 +166,7 @@ public class FractalDim {
 				ProgressLogger.step();
 			}
 			
-			}
+//			}
 			
 		}
 		

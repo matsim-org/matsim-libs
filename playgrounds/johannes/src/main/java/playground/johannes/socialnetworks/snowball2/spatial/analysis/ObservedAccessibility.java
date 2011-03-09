@@ -25,6 +25,7 @@ import java.util.Set;
 
 import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
+import org.matsim.contrib.sna.snowball.analysis.SnowballPartitions;
 
 import playground.johannes.socialnetworks.gis.SpatialCostFunction;
 import playground.johannes.socialnetworks.graph.spatial.analysis.Accessibility;
@@ -44,6 +45,6 @@ public class ObservedAccessibility extends Accessibility {
 	public TObjectDoubleHashMap<Vertex> values(Set<? extends Vertex> vertices) {
 		@SuppressWarnings("unchecked")
 		Set<SpatialSampledVertexDecorator<SpatialVertex>> spatialVertices = (Set<SpatialSampledVertexDecorator<SpatialVertex>>)vertices;
-		return super.values(spatialVertices);
+		return super.values(SnowballPartitions.createSampledPartition(spatialVertices));
 	}
 }

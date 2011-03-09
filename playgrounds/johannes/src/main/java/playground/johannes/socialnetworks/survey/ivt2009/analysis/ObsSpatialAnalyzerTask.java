@@ -21,9 +21,14 @@ package playground.johannes.socialnetworks.survey.ivt2009.analysis;
 
 import java.util.Set;
 
+import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
+import playground.johannes.socialnetworks.gis.GravityCostFunction;
 import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
 import playground.johannes.socialnetworks.graph.spatial.analysis.AcceptanceProbabilityTask;
+import playground.johannes.socialnetworks.graph.spatial.analysis.Accessibility;
 import playground.johannes.socialnetworks.graph.spatial.analysis.DistanceTask;
+import playground.johannes.socialnetworks.graph.spatial.analysis.EdgeLengthAccessibilityTask;
+import playground.johannes.socialnetworks.snowball2.spatial.analysis.ObservedAccessibility;
 import playground.johannes.socialnetworks.snowball2.spatial.analysis.ObservedDistance;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -40,9 +45,15 @@ public class ObsSpatialAnalyzerTask extends AnalyzerTaskComposite {
 		distanceTask.setModule(ObservedDistance.getInstance());
 		addTask(distanceTask);
 		
-		AcceptanceProbabilityTask acceptTask = new AcceptanceProbabilityTask(points);
-		acceptTask.setModule(ObservedAcceptanceProbability.getInstance());
-		addTask(acceptTask);
+//		AcceptanceProbabilityTask acceptTask = new AcceptanceProbabilityTask(points);
+//		acceptTask.setModule(ObservedAcceptanceProbability.getInstance());
+//		addTask(acceptTask);
+		
+		Accessibility access = new Accessibility(new GravityCostFunction(1.6, 0));
+		access.setTargets(points);
+		addTask(new EdgeLengthAccessibilityTask(access));
+		
+		addTask(new TripTask());
 		
 //		AcceptancePropaCategoryTask t = new AcceptancePropaCategoryTask();
 //		t.setBoundary(boundary);

@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * GravityCostFunction.java
+ * PropertyGridKMLWriter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,53 +17,34 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.gis;
+package playground.johannes.studies.netanalysis;
 
-import org.matsim.contrib.sna.gis.CRSUtils;
-import org.matsim.contrib.sna.math.Discretizer;
-import org.matsim.contrib.sna.math.LinearDiscretizer;
+import org.matsim.contrib.sna.gis.ZoneLayer;
 
-
-import com.vividsolutions.jts.geom.Point;
+import playground.johannes.socialnetworks.gis.io.ZoneLayerKMLWriter;
+import playground.johannes.socialnetworks.graph.social.SocialGraph;
+import playground.johannes.socialnetworks.graph.social.analysis.Age;
+import playground.johannes.socialnetworks.graph.social.analysis.GenderNumeric;
+import playground.johannes.socialnetworks.survey.ivt2009.analysis.VertexPropertyGrid;
+import playground.johannes.socialnetworks.survey.ivt2009.graph.io.SocialSparseGraphMLReader;
 
 /**
  * @author illenberger
  *
  */
-public class GravityCostFunction implements SpatialCostFunction {
+public class PropertyGridKMLWriter {
 
-	private final double gamma;
-	
-	private final double constant;
-	
-	private Discretizer discretizer;
-	
-	private DistanceCalculator calculator;
-	
-	public GravityCostFunction(double gamma, double constant) {
-		this(gamma, constant, null);
-	}
-	
-	public GravityCostFunction(double gamma, double constant, DistanceCalculator calculator) {
-		this.gamma = gamma;
-		this.constant = constant;
-		discretizer = new LinearDiscretizer(1000.0);
-		this.calculator = calculator;
-	}
-	
-	public void setDiscretizer(Discretizer discretizer) {
-		this.discretizer = discretizer;
-	}
-	
-	@Override
-	public double costs(Point p1, Point p2) {
-		if(calculator == null) {
-			calculator = DistanceCalculatorFactory.createDistanceCalculator(CRSUtils.getCRS(p1.getSRID()));
-		}
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		SocialSparseGraphMLReader reader = new SocialSparseGraphMLReader();
+		SocialGraph graph = reader.readGraph(args[0]);
 		
-		double d = Math.max(1.0, discretizer.index(calculator.distance(p1, p2)));
+		ZoneLayer<Double> layer = VertexPropertyGrid.createMeanGrid(graph.getVertices(), GenderNumeric.getInstance());
 		
-		return gamma * Math.log(d) + constant;
+		ZoneLayerKMLWriter writer = new ZoneLayerKMLWriter();
+		writer.writeWithColor(layer, args[1]);
 	}
 
 }

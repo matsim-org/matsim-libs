@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * EdgeLengthMean.java
+ * GenderNumeric.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,70 +17,47 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.graph.spatial.analysis;
+package playground.johannes.socialnetworks.graph.social.analysis;
 
 import gnu.trove.TObjectDoubleHashMap;
 
 import java.util.Set;
 
-import org.matsim.contrib.sna.gis.CRSUtils;
 import org.matsim.contrib.sna.graph.Vertex;
-import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
+import org.matsim.contrib.sna.graph.analysis.AbstractVertexProperty;
 
-import playground.johannes.socialnetworks.gis.DistanceCalculatorFactory;
+import playground.johannes.socialnetworks.graph.social.SocialVertex;
 
 /**
  * @author illenberger
  *
  */
-public class EdgeLengthMean extends AbstractSpatialProperty {
+public class GenderNumeric extends AbstractVertexProperty {
 
-	private static EdgeLengthMean instance;
+	private static GenderNumeric instance;
 	
-	public static EdgeLengthMean getInstance() {
+	public static GenderNumeric getInstance() {
 		if(instance == null)
-			instance = new EdgeLengthMean();
+			instance = new GenderNumeric();
 		
 		return instance;
 	}
 	
 	@Override
 	public TObjectDoubleHashMap<Vertex> values(Set<? extends Vertex> vertices) {
-		@SuppressWarnings("unchecked")
-		Set<? extends SpatialVertex> spatialVertices = (Set<? extends SpatialVertex>) vertices;
-
-		TObjectDoubleHashMap<Vertex> values = new TObjectDoubleHashMap<Vertex>();
-
-		for (SpatialVertex vertex : spatialVertices) {
-			if (vertex.getPoint() != null) {
-				double mean = edgeLengthMean(vertex);
-				if(!Double.isNaN(mean))
-					values.put(vertex, mean);
-			}
+		TObjectDoubleHashMap<Vertex> values = new TObjectDoubleHashMap<Vertex>(vertices.size());
+		
+		for(Vertex vertex : vertices) {
+			String gender = ((SocialVertex)vertex).getPerson().getPerson().getSex();
+			
+			if(Gender.FEMALE.equalsIgnoreCase(gender))
+				values.put(vertex, 1.0);
+			else if(Gender.MALE.equalsIgnoreCase(gender))
+				values.put(vertex, 0.0);
+			
 		}
 		
 		return values;
 	}
 
-	private double edgeLengthMean(SpatialVertex vertex) {
-		if (calculator == null) {
-			calculator = DistanceCalculatorFactory.createDistanceCalculator(CRSUtils.getCRS(vertex.getPoint().getSRID()));
-		}
-		
-		double sum = 0;
-		int cnt = 0;
-		
-		for (SpatialVertex neighbor : vertex.getNeighbours()) {
-			if (neighbor.getPoint() != null) {
-				if (vertex.getPoint().getSRID() == neighbor.getPoint().getSRID()) {
-					sum += calculator.distance(vertex.getPoint(), neighbor.getPoint());
-					cnt++;
-				} else {
-					throw new RuntimeException("Points do not share the same coordinate reference system.");
-				}
-			}
-		}
-		
-		return sum/(double)cnt;
-	}
 }

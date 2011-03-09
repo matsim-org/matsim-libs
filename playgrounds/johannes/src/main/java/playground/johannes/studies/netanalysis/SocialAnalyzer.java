@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SptialAnalyzer.java
+ * SocialAnalyzer.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -22,57 +22,43 @@ package playground.johannes.studies.netanalysis;
 import java.io.IOException;
 
 import org.matsim.contrib.sna.graph.analysis.GraphAnalyzer;
-import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
-import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphMLReader;
 
 import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
 import playground.johannes.socialnetworks.gis.GravityCostFunction;
 import playground.johannes.socialnetworks.gis.SpatialCostFunction;
 import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
-import playground.johannes.socialnetworks.graph.spatial.analysis.AcceptancePropaCategoryTask;
+import playground.johannes.socialnetworks.graph.social.SocialGraph;
+import playground.johannes.socialnetworks.graph.social.analysis.AgeAccessibilityTask;
 import playground.johannes.socialnetworks.graph.spatial.analysis.Accessibility;
+import playground.johannes.socialnetworks.survey.ivt2009.graph.io.SocialSparseGraphMLReader;
 
 /**
  * @author illenberger
  *
  */
-public class SpatialAnalyzer {
+public class SocialAnalyzer {
 
 	/**
 	 * @param args
+	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		SpatialGraphMLReader reader = new SpatialGraphMLReader();
-		SpatialGraph graph = reader.readGraph(args[0]);
+		SocialSparseGraphMLReader reader = new SocialSparseGraphMLReader();
+		SocialGraph graph = reader.readGraph(args[0]);
 		
 		String output = null;
 		if(args.length > 1) {
 			output = args[1];
 		}
 		
-		SpatialCostFunction func = new GravityCostFunction(1.5, 0, new CartesianDistanceCalculator());
+		SpatialCostFunction func = new GravityCostFunction(1.6, 0, new CartesianDistanceCalculator());
 		
 		AnalyzerTaskComposite task = new AnalyzerTaskComposite();
-//		task.addTask(new SpatialAnalyzerTask());
-//		task.addTask(new ExtendedSpatialAnalyzerTask());
-//		task.addTask(new AgeAccessibilityTask(func));
-		
-		Accessibility access = new Accessibility(func);
-		task.addTask(new AcceptancePropaCategoryTask(access));
-		
-//		SpatialPropertyDegreeTask xkTask = new SpatialPropertyDegreeTask(func, null);
-//		task.addTask(xkTask);
-		
-//		task.addTask(new DegreeNormConstantTask());
-		
-		if(output != null)
-			task.setOutputDirectoy(output);
-		
+		task.addTask(new AgeAccessibilityTask(new Accessibility(func)));
+				
 		GraphAnalyzer.analyze(graph, task, output);
 		
-//		if(output != null)
-//			GraphAnalyzer.writeStats(stats, output + "/summary.txt");
-	
+
 	}
 
 }

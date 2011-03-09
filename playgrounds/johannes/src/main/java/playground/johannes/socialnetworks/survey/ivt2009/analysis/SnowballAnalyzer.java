@@ -138,8 +138,8 @@ public class SnowballAnalyzer {
 		AnalyzerTask obsEstim = createObsEstimTask();
 		
 		FilteredAnalyzerTask task = new FilteredAnalyzerTask(obsEstim);
-		task.addFilter(new DefaultFilter(), "full");
-//		task.addFilter(new SpatialFilter((GraphBuilder<? extends SpatialGraph, ? extends SpatialVertex, ? extends SpatialEdge>) builder, chBorder), "ch");
+//		task.addFilter(new DefaultFilter(), "full");
+		task.addFilter(new SpatialFilter((GraphBuilder) builder, chBorder), "ch");
 		
 		
 		return task;
@@ -159,10 +159,10 @@ public class SnowballAnalyzer {
 			AnalyzerTask itTask = createIterationTask();
 			FilteredAnalyzerTask task = new FilteredAnalyzerTask(itTask);
 			task.addFilter(new DefaultFilter(), "plain");
-			for(int i = 3; i <= it; i++) {
-				SampledGraphFilter filter = new SampledGraphFilter(builder, i);
-				task.addFilter(filter, String.format("it.%1$s", i));
-			}
+//			for(int i = 3; i <= it; i++) {
+//				SampledGraphFilter filter = new SampledGraphFilter(builder, i);
+//				task.addFilter(filter, String.format("it.%1$s", i));
+//			}
 			task.setOutputDirectoy(output);
 			
 			GraphAnalyzer.analyze(graph, task, output);

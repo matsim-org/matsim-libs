@@ -27,6 +27,8 @@ import org.matsim.contrib.sna.graph.analysis.GraphAnalyzer;
 import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
 import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphMLReader;
 
+import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
+import playground.johannes.socialnetworks.gis.GravityCostFunction;
 import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
 
 /**
@@ -36,7 +38,9 @@ import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
 public class ExtendedSpatialAnalyzerTask extends AnalyzerTaskComposite {
 
 	public ExtendedSpatialAnalyzerTask() {
-		addTask(new AcceptanceProbabilityTask());
+//		addTask(new AcceptanceProbabilityTask());
+		Accessibility access = new Accessibility(new GravityCostFunction(1.6, 0, new CartesianDistanceCalculator()));
+		addTask(new EdgeLengthAccessibilityTask(access));
 	}
 	
 	public static void main(String[] args) throws IOException {
@@ -48,7 +52,7 @@ public class ExtendedSpatialAnalyzerTask extends AnalyzerTaskComposite {
 			output = args[1];
 		}
 		
-		AnalyzerTask task = new SpatialAnalyzerTask();
+		AnalyzerTask task = new ExtendedSpatialAnalyzerTask();
 		if(output != null)
 			task.setOutputDirectoy(output);
 		

@@ -62,7 +62,7 @@ public class TravelDistanceTask implements PlansAnalyzerTask {
 		
 		for(Entry<String, DescriptiveStatistics> entry : statsMap.entrySet()) {
 			stats.put(TRAVEL_DISTANCE_PREFIX + entry.getKey(), entry.getValue().getMean());
-			TDoubleDoubleHashMap hist = Histogram.createHistogram(entry.getValue(), FixedSampleSizeDiscretizer.create(entry.getValue().getValues(), 100), true);
+			TDoubleDoubleHashMap hist = Histogram.createHistogram(entry.getValue(), FixedSampleSizeDiscretizer.create(entry.getValue().getValues(), 1, 50), true);
 //			TDoubleDoubleHashMap hist = Histogram.createHistogram(entry.getValue(), new LinLogDiscretizer(500.0, 2));
 			hist.remove(0.0);
 			Histogram.normalize(hist);
@@ -79,6 +79,8 @@ public class TravelDistanceTask implements PlansAnalyzerTask {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+			
+			
 		}
 		
 		distance.setGeodesicMode(true);
@@ -87,7 +89,7 @@ public class TravelDistanceTask implements PlansAnalyzerTask {
 		for(Entry<String, DescriptiveStatistics> entry : statsMap.entrySet()) {
 			stats.put(TRAVEL_DISTANCE_PREFIX + "geo_" + entry.getKey(), entry.getValue().getMean());
 //			TDoubleDoubleHashMap hist = Histogram.createHistogram(entry.getValue(), new LinLogDiscretizer(500.0, 2));
-			TDoubleDoubleHashMap hist = Histogram.createHistogram(entry.getValue(), FixedSampleSizeDiscretizer.create(entry.getValue().getValues(), 100), true);
+			TDoubleDoubleHashMap hist = Histogram.createHistogram(entry.getValue(), FixedSampleSizeDiscretizer.create(entry.getValue().getValues(), 1, 50), true);
 			hist.remove(0.0);
 			Histogram.normalize(hist);
 			try {
@@ -103,6 +105,7 @@ public class TravelDistanceTask implements PlansAnalyzerTask {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+			System.err.println("Num trips: " + entry.getKey() +" = "+entry.getValue().getN());
 		}
 	}
 
@@ -114,10 +117,10 @@ public class TravelDistanceTask implements PlansAnalyzerTask {
 		netReader.readFile("/Volumes/cluster.math.tu-berlin.de/net/ils2/jillenberger/locationChoice/data/ivtch.xml");
 		
 		MatsimPopulationReader reader = new MatsimPopulationReader(scenario);
-		reader.readFile("/Users/jillenberger/Work/socialnets/locationChoice/output/3.plans.xml");
+		reader.readFile("/Users/jillenberger/Work/socialnets/data/schweiz/mz2005/rawdata/plans.xml");
 		
-		TravelDistanceTask task = new TravelDistanceTask(scenario.getNetwork(), "/Users/jillenberger/Work/socialnets/locationChoice/output/3.analysis/");
+		TravelDistanceTask task = new TravelDistanceTask(scenario.getNetwork(), "/Users/jillenberger/Work/socialnets/data/schweiz/mz2005/rawdata/analysis/");
 		Map<String, Double> stats = PlansAnalyzer.analyzeSelectedPlans(scenario.getPopulation(), task);
-		PlansAnalyzer.write(stats, "/Users/jillenberger/Work/socialnets/locationChoice/output/3.analysis/stats.txt");
+//		PlansAnalyzer.write(stats, "/Users/jillenberger/Work/socialnets/locationChoice/output/3.analysis/stats.txt");
 	}
 }

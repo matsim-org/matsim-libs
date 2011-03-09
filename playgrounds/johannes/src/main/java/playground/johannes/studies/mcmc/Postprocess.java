@@ -41,10 +41,12 @@ public class Postprocess {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		String rootDir = "/Volumes/cluster.math.tu-berlin.de/net/ils/jillenberger/socialnets/mcmc/runs/run300/";
-		String statsPath = "10000000000/social/statistics.txt";
-		String key = "r_age";
-		String thetaKey = "theta_age";
+		String rootDir = "/Volumes/cluster.math.tu-berlin.de/net/ils/jillenberger/socialnets/mcmc/runs/run307/";
+		String statsPath = "20000000000/social/statistics.txt";
+//		String key = "r_age";
+		String key = "r_gender";
+//		String thetaKey = "theta_age";
+		String thetaKey = "theta_gender";
 		
 		TDoubleDoubleHashMap values = new TDoubleDoubleHashMap();
 		
