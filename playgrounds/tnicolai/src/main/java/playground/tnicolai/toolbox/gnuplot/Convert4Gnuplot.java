@@ -44,8 +44,7 @@ import playground.tnicolai.urbansim.utils.io.filter.TabFilter;
 public class Convert4Gnuplot {
 	// sample arguments
 //	/Users/thomas/Documents/SVN_Studies/tnicolai/cupum/Data/Ferry_Scenario/run_33.2010_12_26_09_30/indicators/ /Users/thomas/Documents/SVN_Studies/tnicolai/cupum/Data/Highway_Scenario/run_32.2010_12_25_13_45/indicators/ 908
-	
-// /Users/thomas/Development/opus_home/data/psrc_parcel_cupum_preliminary/runs/run_3.2011_01_17_09_37/indicators 908
+
 	
 	private static String source1;
 	private static File[] fileList1;
@@ -53,6 +52,7 @@ public class Convert4Gnuplot {
 	private static File[] fileList2;
 	
 	private static int zone_id;
+	private static int zone_id_tmp;
 	
 	private static boolean isSingleDataSet = true;
 	
@@ -66,8 +66,20 @@ public class Convert4Gnuplot {
 	public static void main(String args[]){
 		try {
 			System.out.println("Starting Convert4Gnuplot");
+			
+//			String[] myArgs = new String[]{"/Users/thomas/Development/opus_home/data/psrc_parcel_cupum_preliminary/runs/run_3.2011_01_17_09_37/indicators", "908"};
 
-			init(args);
+			// multi, mit worklogsum, mit ELCM
+//			String[] myArgs = new String[]{"/Users/thomas/Documents/SVN_Studies/tnicolai/cupum/Indicators/ferry_mit_worklogsum_mitELCM", "/Users/thomas/Documents/SVN_Studies/tnicolai/cupum/Indicators/highway_mit_worklogsum_mitELCM", "908"};
+//			String[] myArgs = new String[]{"/Users/thomas/Documents/SVN_Studies/tnicolai/cupum/Indicators/ferry_accessibility_indicators", "/Users/thomas/Documents/SVN_Studies/tnicolai/cupum/Indicators/highway_accessibility_indicators", "908"};
+			
+			
+//			String[] myArgs = new String[]{"/Users/thomas/Documents/SVN_Studies/tnicolai/cupum/Indicators/highway_low_cap_accessibility_indicators", "908"};		
+//			String[] myArgs = new String[]{"/Users/thomas/Documents/SVN_Studies/tnicolai/cupum/Indicators/highway_accessibility_indicators", "908"};		
+			String[] myArgs = new String[]{"/Users/thomas/Documents/SVN_Studies/tnicolai/cupum/Indicators/ferry_accessibility_indicators", "908"};		
+			
+//			init(args);
+			init(myArgs);
 			System.out.println("Starting queue process ...");
 			if(isSingleDataSet)
 				queueSingleDataSet();
@@ -114,6 +126,8 @@ public class Convert4Gnuplot {
 		}		
 		else
 			zone_id = Integer.parseInt(args[1]);
+		
+		zone_id_tmp = zone_id;
 
 		System.out.println("... finished init.");
 	}
@@ -209,6 +223,10 @@ public class Convert4Gnuplot {
 			String destinationPNG = source.replace(".tab", ".png");
 			String destinationDAT = source.replace(".tab", ".dat");
 			
+			System.out.println("Processing : " + source);
+			
+			checkAndRestoreZoneID(source);
+			
 			BufferedReader br = IOUtils.getBufferedReader(source);
 			// BufferedWriter and StringBuffer for gnuplot olny 
 			BufferedWriter bw = IOUtils.getBufferedWriter(destinationDAT);
@@ -247,7 +265,7 @@ public class Convert4Gnuplot {
 				}
 			}
 			// create JFreeChart
-			writeChartSingleDataSet(destinationPNG, title, xAxisLabel, yAxisLable, series, xAxis, yAxis);
+			// writeChartSingleDataSet(destinationPNG, title, xAxisLabel, yAxisLable, series, xAxis, yAxis);
 			// create gnuplot dat
 			System.out.println("Writing gnuplot dat: " + destinationDAT);
 			bw.write(content.toString());
@@ -283,6 +301,10 @@ public class Convert4Gnuplot {
 			String destination1DAT = source1.replace(".tab", ".dat");
 			String destination2PNG = source2.replace(".tab", ".png");
 			String destination2DAT = source2.replace(".tab", ".dat");
+			
+			System.out.println("Processing : " + source1 + " and " + source2);
+			
+			checkAndRestoreZoneID(source1);
 			
 			BufferedReader br1 = IOUtils.getBufferedReader(source1);
 			BufferedReader br2 = IOUtils.getBufferedReader(source2);
@@ -363,7 +385,7 @@ public class Convert4Gnuplot {
 				}
 			}
 			if(foundZoneID1 && foundZoneID2){
-				writeChartMultipleDataSet(destination1PNG, destination2PNG, title, xAxisLabel, yAxisLable, series1, series2, xAxis1, xAxis2, yAxis1, yAxis2);
+//				writeChartMultipleDataSet(destination1PNG, destination2PNG, title, xAxisLabel, yAxisLable, series1, series2, xAxis1, xAxis2, yAxis1, yAxis2);
 				// create gnuplot dat
 				System.out.println("Writing gnuplot dat: " + destination1DAT);
 				bw1.write(content1.toString());
@@ -379,6 +401,21 @@ public class Convert4Gnuplot {
 			bw1.close();
 			bw2.close();
 		}
+	}
+	
+	private static void checkAndRestoreZoneID(String source){
+		
+		// restore zone id
+		if(zone_id != zone_id_tmp){
+			zone_id = zone_id_tmp;
+			System.out.println("Restoring zone_id (id = " + zone_id + ")...");
+		}
+		// check for indicator tables containing only one row
+		if( (source != null) && (source.endsWith("total_units__total_units.tab") || source.endsWith("total_office_units__total_office_units.tab"))){
+			System.out.println("Switching zone id from " + zone_id + " to 1 for table " + source);
+			zone_id = 1;
+		}
+		
 	}
 	
 	/**
