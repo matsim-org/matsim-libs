@@ -27,6 +27,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
@@ -41,6 +42,7 @@ import org.matsim.households.HouseholdsReaderV10;
 import org.matsim.lanes.LaneDefinitions;
 import org.matsim.lanes.LaneDefinitionsV11ToV20Conversion;
 import org.matsim.lanes.MatsimLaneDefinitionsReader;
+import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.signalsystems.data.SignalsScenarioLoader;
 import org.matsim.vehicles.VehicleReaderV1;
@@ -110,13 +112,20 @@ public class ScenarioLoaderImpl implements ScenarioLoader {
 		if (this.config.scenario().isUseTransit()) {
 			this.loadTransit();
 		}
+		if (this.config.scenario().isUseVehicles()) {
+			this.loadVehicles();
+		}
 		if (this.config.scenario().isUseLanes()) {
 			this.loadLanes();
 		}
 		if (this.config.scenario().isUseSignalSystems()){
-			this.scenario.addScenarioElement(new SignalsScenarioLoader(this.config.signalSystems()).loadSignalsData());
+			this.loadSignalSystems();
 		}
 		return getScenario();
+	}
+
+	private void loadSignalSystems() {
+		this.scenario.addScenarioElement(new SignalsScenarioLoader(this.config.signalSystems()).loadSignalsData());
 	}
 
 	/**
@@ -131,6 +140,9 @@ public class ScenarioLoaderImpl implements ScenarioLoader {
 			if (this.config.network().isTimeVariantNetwork()) {
 				log.info("use TimeVariantLinks in NetworkFactory.");
 				network.getFactory().setLinkFactory(new TimeVariantLinkFactory());
+			}
+			if (this.config.scenario().isUseTransit()) {
+				network.getFactory().setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
 			}
 			try {
 				new MatsimNetworkReader(this.scenario).parse(networkFileName);
@@ -169,6 +181,9 @@ public class ScenarioLoaderImpl implements ScenarioLoader {
 		} catch (ParserConfigurationException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	private void loadVehicles() {
 		new VehicleReaderV1(this.getScenario().getVehicles()).readFile(this.config.transit().getVehiclesFile());
 	}
 
@@ -214,7 +229,6 @@ public class ScenarioLoaderImpl implements ScenarioLoader {
 			}
 	}
 
-	@SuppressWarnings("deprecation")
 	public void loadActivityFacilities() {
 		if ((this.config.facilities() != null) && (this.config.facilities().getInputFile() != null)) {
 			String facilitiesFileName = this.config.facilities().getInputFile();
