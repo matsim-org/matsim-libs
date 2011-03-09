@@ -29,7 +29,7 @@ import playground.wrashid.lib.obj.StringMatrix;
 public class EnergyConsumptionPerLink {
 
 	public static void main(String[] args) {
-		String chargingLogFileNamePath="H:/data/experiments/ARTEMIS/zh/dumb charging/output/run5/ITERS/it.0/0.chargingLog.txt";
+		String chargingLogFileNamePath="H:/data/experiments/ARTEMIS/zh/dumb charging/output/run7/ITERS/it.0/0.chargingLog.txt";
 		DoubleValueHashMap<String> energyConsumptionPerLink = readChargingLog(chargingLogFileNamePath);
 		
 		System.out.println("linkId\tenergyConsumption");
