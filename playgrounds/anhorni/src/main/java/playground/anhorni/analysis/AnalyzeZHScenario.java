@@ -1,10 +1,7 @@
 package playground.anhorni.analysis;
 
-import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.Vector;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
