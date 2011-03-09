@@ -133,10 +133,10 @@ public class JAXBUnmaschal {
 			je.printStackTrace();
 			return false;
 		}
-		catch(SAXException se){
-			se.printStackTrace();
-			return false;
-		}
+//		catch(SAXException se){
+//			se.printStackTrace();
+//			return false;
+//		}
 		catch(IOException ioe){
 			ioe.printStackTrace();
 			return false;

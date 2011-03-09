@@ -16,6 +16,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
@@ -25,6 +26,8 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.matrices.Entry;
+import org.matsim.matrices.Matrix;
 
 import playground.tnicolai.urbansim.constants.Constants;
 import playground.toronto.ttimematrix.SpanningTree;
@@ -55,12 +58,14 @@ public class MyControlerListener implements ShutdownListener {
 	}
 	
 	/**
-	 *	calculating und dumping zone2zone impeadences and workplace accessibility 
+	 *	calculating and dumping the following outcomes:
+	 *  - zone2zone impedances including travel times, travel costs and am walk time
+	 *  - logsum computation of workplace accessibility
 	 */
 	public void notifyShutdown(ShutdownEvent event) {
 		log.info("Entering notifyShutdown ..." ) ;
 
-		// get the calling controler:
+		// get the calling controller:
 		Controler controler = event.getControler() ;
 
 		TravelTime ttc = controler.getTravelTimeCalculator();
@@ -71,47 +76,25 @@ public class MyControlerListener implements ShutdownListener {
 		st.setDepartureTime(depatureTime);
 		
 		Scenario sc = controler.getScenario() ;
-
+		// od-trip matrix (zonal based)
+		Matrix originDestinationMatrix = new Matrix("tripMatrix", "Zone to Zone origin destination trip matrix");
 		
 		try {
 			BufferedWriter travelDataWriter = IOUtils.getBufferedWriter( travelDataPath );
 			BufferedWriter zonesWriter = IOUtils.getBufferedWriter( zonesPath );
 
-			log.info("Computing zone2zone trip numbers ...") ;
-			// yyyy might make even more sense to do this via events.  kai, feb'11
-			for ( Person person : sc.getPopulation().getPersons().values() ) {
-				Plan plan = person.getSelectedPlan() ;
-				int cnt = 0 ;
-				String lastZoneId = null ;
-				for ( PlanElement pe : plan.getPlanElements() ) {
-					if ( pe instanceof Activity ) {
-						Activity act = (Activity) pe ;
-						ActivityFacility fac = ((ScenarioImpl)sc).getActivityFacilities().getFacilities().get( act.getFacilityId() ) ;
-						String zone_ID = ((Id) fac.getCustomAttributes().get(Constants.ZONE_ID)).toString() ;
-						if (cnt < 1 ) {
-							cnt++ ;
-						} else {
-//							originDestinationMatrix.addTrip( lastZoneId, zone_ID ) ;
-							// see PtPlanToPlanStepBasedOnEvents.addPersonToVehicleContainer (or zone coordinate addition)
-						}
-						lastZoneId = zone_ID ;
-					}
-				}
-					
-			}
-			
-			log.info("DONE with computing zone2zone trip numbers ...") ;
+			computeZoneToZoneTrips(sc, originDestinationMatrix);
 
 			log.info("Computing and writing travel_data" ) ;
 			// log.warn("Can't feed floats to urbansim; am thus feeding ints for the ttime.") ;
 			// solved 3dec08 by travis
 
 			// Travel Data Header
-			travelDataWriter.write ( "from_zone_id:i4,to_zone_id:i4,single_vehicle_to_work_travel_cost:f4,am_single_vehicle_to_work_travel_time:f4" ) ; 
-			Logger.getLogger(this.getClass()).error( "add new fields" ) ;
+			travelDataWriter.write ( "from_zone_id:i4,to_zone_id:i4,single_vehicle_to_work_travel_cost:f4,am_single_vehicle_to_work_travel_time:f4,am_walk_time_in_minutes:f4" ) ; 
+			Logger.getLogger(this.getClass()).error( "add new fields" ) ; // remove when all travel data attributes are updated...
 			travelDataWriter.newLine();
 			
-			// Zone Header (workplace asseccibility)
+			// Zone Header (workplace accessibility)
 			zonesWriter.write( "zone_id:i4,workplace_accessibility:f4") ;
 			zonesWriter.newLine();
 			
@@ -120,9 +103,9 @@ public class MyControlerListener implements ShutdownListener {
 			long cnt = 0; 
 			long percentDone = 0;
 			
-			// main for loop, dumping out zone2zone impeadances (travel times) and workplace accsessibility in two seperate files
+			// main for loop, dumping out zone2zone impedances (travel times) and workplace accessibility in two seperate files
 			for ( ActivityFacility fromZone : zones.getFacilities().values() ) {
-				// pogressbar
+				// progressbar
 				if ( (int) (100.*cnt/zones.getFacilities().size()) > percentDone ) {
 					percentDone++ ; System.out.print('=') ;
 				}
@@ -139,11 +122,9 @@ public class MyControlerListener implements ShutdownListener {
 				// initialize accessibility for origin (from) zone
 				double accessibility 	= 0.;
 
+				// beta per hr should be -12 (by default configuration
 				double beta_per_hr = sc.getConfig().planCalcScore().getTraveling_utils_hr() - sc.getConfig().planCalcScore().getPerforming_utils_hr() ;
-				// check if there is something in here.  -12?
-
-				double beta 			= -12/3600.; // -1 is too large
-
+				double beta 			= beta_per_hr/3600.; // get utility per second
 				
 				double minTravelTime 	= Double.MAX_VALUE;
 
@@ -171,8 +152,7 @@ public class MyControlerListener implements ShutdownListener {
 							+ "," + toZone.getId().toString()				//destination zone id
 							+ "," + ttime 									//tcost
 							+ "," + ttime 									//ttimes
-							+ "," + ttime*10.								// walk ttimes
-							+ "," + "1"										// number of trips; yyyyyy replace by actual count 
+							+ "," + ttime*10.								//walk ttimes
 							);		
 					travelDataWriter.newLine();
 					
@@ -197,7 +177,7 @@ public class MyControlerListener implements ShutdownListener {
 				// add in zone accessibility (same zone computation)
 				if(numberOfWorkplacesPerZone.get(fromZone.getId()) != null){ // skipping zones no workplaces
 					long weight = numberOfWorkplacesPerZone.get(fromZone.getId()).counter;
-					double costFunction = Math.exp( beta * (minTravelTime / 2) ); // tnicolai : see above comutation of cost function ...
+					double costFunction = Math.exp( beta * (minTravelTime / 2) ); // tnicolai : see above computation of cost function ...
 					accessibility += weight * costFunction;
 				}
 				
@@ -206,7 +186,7 @@ public class MyControlerListener implements ShutdownListener {
 				zonesWriter.newLine();
 				
 			}
-			// finish pograess bar
+			// finish progress bar
 			System.out.println();
 			// flush and close writers
 			travelDataWriter.flush();
@@ -225,6 +205,54 @@ public class MyControlerListener implements ShutdownListener {
 		}
 
 		log.info("... done with notifyShutdown.") ;
+	}
+	
+	/**
+	 * goes through all person ant their plans and stores their trips into a matrix
+	 * 
+	 * @param sc
+	 * @param originDestinationMatrix
+	 */
+	private void computeZoneToZoneTrips(Scenario sc, Matrix originDestinationMatrix){
+		log.info("Computing zone2zone trip numbers ...") ;
+		// yyyy might make even more sense to do this via events.  kai, feb'11
+		Entry matrixEntry = null;
+			
+		for ( Person person : sc.getPopulation().getPersons().values() ) {
+			Plan plan = person.getSelectedPlan() ;
+			int cnt = 0 ;
+			String lastZoneId = null ;
+			for ( PlanElement pe : plan.getPlanElements() ) {
+				if ( pe instanceof Activity ) {
+					Activity act = (Activity) pe;
+					Id id = act.getFacilityId();
+					if( id == null) // that person plan doesn't contain activity, continue with next person
+						continue;
+					
+					Map<Id, ActivityFacility> allFacilities = ((ScenarioImpl)sc).getActivityFacilities().getFacilities();
+					
+					ActivityFacility fac = allFacilities.get(id);
+//					ActivityFacility fac = ((ScenarioImpl)sc).getActivityFacilities().getFacilities().get( act.getFacilityId() ) ;
+					String zone_ID = ((Id) fac.getCustomAttributes().get(Constants.ZONE_ID)).toString() ;
+					if (cnt < 1 ) { 
+						cnt++ ;
+					} else {
+						matrixEntry = originDestinationMatrix.getEntry(new IdImpl(lastZoneId), new IdImpl(zone_ID));
+						if(matrixEntry != null){
+							double value = matrixEntry.getValue();
+							originDestinationMatrix.setEntry(new IdImpl(lastZoneId), new IdImpl(zone_ID), value+1.);
+						}
+						else	
+							originDestinationMatrix.createEntry(new IdImpl(lastZoneId), new IdImpl(zone_ID), 1.);
+						// see PtPlanToPlanStepBasedOnEvents.addPersonToVehicleContainer (or zone coordinate addition)
+					}
+					lastZoneId = zone_ID ;
+				}
+			}
+				
+		}
+		
+		log.info("DONE with computing zone2zone trip numbers ...") ;
 	}
 
 }

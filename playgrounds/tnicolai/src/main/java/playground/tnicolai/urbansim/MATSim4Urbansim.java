@@ -93,8 +93,8 @@ public class MATSim4Urbansim {
 		ActivityFacilitiesImpl facilities = new ActivityFacilitiesImpl("urbansim locations (gridcells _or_ parcels _or_ ...)");
 		ActivityFacilitiesImpl zones      = new ActivityFacilitiesImpl("urbansim zones");
 		
-		ReadUrbansimParcelModel(readFromUrbansim, facilities, zones);
-		Population newPopulation = ReadUrbansimPersons(readFromUrbansim, facilities, network);
+		readUrbansimParcelModel(readFromUrbansim, facilities, zones);
+		Population newPopulation = readUrbansimPersons(readFromUrbansim, facilities, network);
 		Map<Id,WorkplaceObject> numberOfWorkplacesPerZone = ReadUrbansimJobs(readFromUrbansim);
 
 		log.info("### DONE with demand generation from urbansim ###") ;
@@ -102,7 +102,7 @@ public class MATSim4Urbansim {
 		// set population in scenario
 		scenario.setPopulation(newPopulation);
 
-		runControler(zones, numberOfWorkplacesPerZone);
+		runControler(zones, numberOfWorkplacesPerZone, network);
 	}
 	
 	/**
@@ -112,7 +112,7 @@ public class MATSim4Urbansim {
 	 * @param facilities
 	 * @param zones
 	 */
-	protected void ReadUrbansimParcelModel(ReadFromUrbansimParcelModel readFromUrbansim, ActivityFacilitiesImpl facilities, ActivityFacilitiesImpl zones){
+	protected void readUrbansimParcelModel(ReadFromUrbansimParcelModel readFromUrbansim, ActivityFacilitiesImpl facilities, ActivityFacilitiesImpl zones){
 
 		readFromUrbansim.readFacilities(facilities, zones);
 		// write the facilities from the urbansim parcel model as a compressed locations.xml file into the temporary directory as input for ???
@@ -127,7 +127,7 @@ public class MATSim4Urbansim {
 	 * @param network
 	 * @return
 	 */
-	protected Population ReadUrbansimPersons(ReadFromUrbansimParcelModel readFromUrbansim, ActivityFacilitiesImpl facilities, NetworkImpl network){
+	protected Population readUrbansimPersons(ReadFromUrbansimParcelModel readFromUrbansim, ActivityFacilitiesImpl facilities, NetworkImpl network){
 		// read urbansim population (these are simply those entities that have the person, home and work ID)
 		Population oldPopulation = null;
 		if ( config.plans().getInputFile() != null ) {
@@ -149,7 +149,7 @@ public class MATSim4Urbansim {
 		oldPopulation=null;
 		System.gc();
 		
-		// tnicolai : diabeld only for debugging reasons. Activate again!!!
+		// tnicolai : disabled only for debugging reasons. Activate again!!!
 		// new PopulationWriter(newPopulation,network).write( Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + "pop.xml.gz" );
 		
 		return newPopulation;
@@ -170,7 +170,7 @@ public class MATSim4Urbansim {
 	 * run simulation
 	 * @param zones
 	 */
-	protected void runControler( ActivityFacilitiesImpl zones, Map<Id,WorkplaceObject> numberOfWorkplacesPerZone ){
+	protected void runControler( ActivityFacilitiesImpl zones, Map<Id,WorkplaceObject> numberOfWorkplacesPerZone, NetworkImpl network ){
 		Controler controler = new Controler(scenario);
 		controler.setOverwriteFiles(true);	// sets, whether output files are overwritten
 		controler.setCreateGraphs(false);	// sets, whether output Graphs are created
@@ -178,12 +178,48 @@ public class MATSim4Urbansim {
 		// The following lines register what should be done _after_ the iterations were run:
 		controler.addControlerListener( new MyControlerListener( zones, numberOfWorkplacesPerZone ) );
 		
+		// tnicolai todo: count number of cars per h on a link
+		// write ControlerListener that implements AfterMobsimListener (notifyAfterMobsim)
+		// get VolumeLinkAnalyzer by "event.getControler.getVolume... and run getVolumesForLink. that returns an int array with the number of cars per hour on an specific link 
+		// see also http://matsim.org/docs/controler
+		
+		
 		// run the iterations, including the post-processing:
 		controler.run() ;
 	}
 	
+//	/**
+//	 * 
+//	 * @param controler
+//	 */
+//	protected void setStrategies(Controler controler, NetworkImpl network){
+//		
+//		StrategyManager manager = controler.getStrategyManager();
+//		manager = new StrategyManager();
+//		
+//		PlanStrategy changeExpBeta = new PlanStrategyImpl(new ExpBetaPlanChanger(config.planCalcScore().getBrainExpBeta()));
+//		manager.addStrategy(changeExpBeta, 0.8);
+//		
+//		PlanStrategy reroute = new PlanStrategyImpl(new RandomPlanSelector());
+//		reroute.addStrategyModule(new ReRouteDijkstra(config, network, controler.createTravelCostCalculator(), controler.getTravelTimeCalculator()));
+//		manager.addStrategy(reroute, 0.1);
+//		manager.addChangeRequest(100, reroute, 0.);
+//		
+//		PlanStrategy timeAllocationMutator = new PlanStrategyImpl(new RandomPlanSelector());
+//		TimeAllocationMutator tam = new TimeAllocationMutator(config);
+//		timeAllocationMutator.addStrategyModule(tam);
+//		manager.addStrategy(timeAllocationMutator, 0.1);
+//		manager.addChangeRequest(100, timeAllocationMutator, 0.);
+//		
+////		StrategyManagerConfigLoader.load(controler, manager);
+//		
+//		
+//		if(controler.getStrategyManager() == null)
+//			log.error("No Strategies available!!!");
+//	}
+	
 	/**
-	 * verifying if args argument contains a vaild path. 
+	 * verifying if args argument contains a valid path. 
 	 * @param args
 	 */
 	private void isValidPath(String args[]){

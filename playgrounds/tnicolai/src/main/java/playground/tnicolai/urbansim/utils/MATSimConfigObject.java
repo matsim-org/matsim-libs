@@ -221,16 +221,32 @@ public class MATSimConfigObject {
 		actType0.setTypicalDuration(12*60*60);
 		ActivityParams actType1 = new ActivityParams(activityType_1);
 		actType1.setTypicalDuration(8*60*60);
+		actType1.setOpeningTime(7*3600);		// tnicolai: make configurable
+		actType1.setLatestStartTime(9*3600);	// tnicolai: make configurable
 		config.planCalcScore().addActivityParams( actType0 ); // planCalcScore
 		config.planCalcScore().addActivityParams( actType1 );
 		log.info("Setting planCalcScore to config...");
 		
-		// configure strategies for replanning
-		config.strategy().setMaxAgentPlanMemorySize(4);
-		StrategyConfigGroup.StrategySettings selectExp = new StrategyConfigGroup.StrategySettings(IdFactory.get(1));
-		selectExp.setModuleName("ReRoute_Dijkstra");
-		selectExp.setProbability(1.0);
-		config.strategy().addStrategySettings(selectExp);
+		// configure strategies for re-planning tnicolai: make configurable
+		config.strategy().setMaxAgentPlanMemorySize(5);
+		
+		StrategyConfigGroup.StrategySettings timeAlocationMutator = new StrategyConfigGroup.StrategySettings(IdFactory.get(1));
+		timeAlocationMutator.setModuleName("TimeAllocationMutator");
+		timeAlocationMutator.setProbability(0.1);
+		timeAlocationMutator.setDisableAfter(100);
+		config.strategy().addStrategySettings(timeAlocationMutator);
+		
+		StrategyConfigGroup.StrategySettings changeExpBeta = new StrategyConfigGroup.StrategySettings(IdFactory.get(2));
+		changeExpBeta.setModuleName("ChangeExpBeta");
+		changeExpBeta.setProbability(0.9);
+		config.strategy().addStrategySettings(changeExpBeta);
+		
+		StrategyConfigGroup.StrategySettings reroute = new StrategyConfigGroup.StrategySettings(IdFactory.get(3));
+		reroute.setModuleName("ReRoute_Dijkstra");
+		reroute.setProbability(0.1);
+		reroute.setDisableAfter(100);
+		config.strategy().addStrategySettings(reroute);
+		
 		log.info("Setting strategy to config...");
 		
 		// init loader

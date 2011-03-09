@@ -96,7 +96,7 @@ public class MATSim4UrbanSimMeasurement extends MATSim4Urbansim {
 		}
 	}
 	
-	protected Population ReadUrbansimPersons(ReadFromUrbansimParcelModel readFromUrbansim, ActivityFacilitiesImpl facilities, NetworkImpl network){
+	protected Population readUrbansimPersons(ReadFromUrbansimParcelModel readFromUrbansim, ActivityFacilitiesImpl facilities, NetworkImpl network){
 		// read urbansim population (these are simply those entities that have the person, home and work ID)
 		Population oldPopulation = null;
 		Population newPopulation = null;
