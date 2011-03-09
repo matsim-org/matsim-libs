@@ -19,8 +19,8 @@
  * *********************************************************************** */
 
 package playground.anhorni.scenarios;
+
 import org.apache.log4j.Logger;
-import playground.anhorni.scenarios.analysis.RandomRunsAnalyzer;
 import playground.anhorni.scenarios.analysis.SummaryWriter;
 
 public class MultiplerunsControler {
@@ -55,14 +55,16 @@ public class MultiplerunsControler {
 	    		controler = new SingleRunControler(config);	    		    			        	              	
 	        	controler.run();
     		}
-    	}	    	
-    	summaryWriter.run();
-    	
+    	}
     	log.info("Create analysis ...");
     	
-    	RandomRunsAnalyzer analyzer = new RandomRunsAnalyzer(
-    			configReader.getNumberOfCityShoppingLocs(), MultiplerunsControler.path, numberOfRandomRuns);
-    	analyzer.run(configReader.getNumberOfAnalyses());
+    	summaryWriter.run();
+    	
+    	
+    	
+//    	RandomRunsAnalyzer analyzer = new RandomRunsAnalyzer(
+//    			configReader.getNumberOfCityShoppingLocs(), MultiplerunsControler.path, numberOfRandomRuns);
+//    	analyzer.run(configReader.getNumberOfAnalyses());
     	
     	log.info("All runs finished ******************************");
     }

@@ -25,16 +25,22 @@ import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.DecimalFormat;
+import java.util.Vector;
+
+import org.apache.log4j.Logger;
 
 public class SummaryWriter {
+	private final static Logger log = Logger.getLogger(SummaryWriter.class);
 	private String path = "src/main/java/playground/anhorni/";
 	private BufferedWriter bufferedWriter = null;	
 	private int numberOfRandomRuns;
 	private int shoppingFacilities[] = {1, 2, 5, 6, 7};
 	
-	private double expendituresPerRunPerDayPerHourPerFacility[][][][];
-	private double avgExpendituresPerHourPerFacility[][];
-	private double sigmaExpendituresPerHourPerFacility[][];
+	private double avgExpendituresPerFacilityPerHour[][];
+	private double sigmaExpendituresPerFacilityPerHour[][];
+	
+	private Vector<Run> runs = new Vector<Run>();
 			
 	public SummaryWriter(String outpath, int numberOfRandomRuns) {
 		this.numberOfRandomRuns = numberOfRandomRuns;
@@ -46,18 +52,67 @@ public class SummaryWriter {
     	this.calculateMeans();
     	this.calculateStdDevOfExpenditures();
     	this.write2Summary();
+    	
+    	log.info("Create single ensemble analyses");
+    	RunsEnsemble runsEnsemble = new RunsEnsemble(0, path + "output/PLOC/3towns/", shoppingFacilities.length);
+    	for (Run run : this.runs) {
+    		runsEnsemble.addRandomRun(run);
+    	}
+    	try {
+			runsEnsemble.write();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		log.info("Create multiple ensemble analyses");
+		MultipleEnsemblesAnalyzer analyzer = new MultipleEnsemblesAnalyzer(path, this.runs);
+		analyzer.run();		
     }
     
+    private void readRD() {
+		try {
+			for (int runIndex = 0; runIndex < numberOfRandomRuns; runIndex++) {
+				Run run = new Run(runIndex, shoppingFacilities.length);
+				for (int day = 0; day < 5; day++) {
+					BufferedReader bufferedReader = new BufferedReader(new FileReader(path + "output/PLOC/3towns/R" + runIndex + "D" + day + "_shoppingPerRunDay.txt"));
+					String line = bufferedReader.readLine(); // skip header
+					for (int hour = 0; hour < 24; hour++) {
+						line = bufferedReader.readLine();
+						String parts[] = line.split("\t");
+						for (int facIndex = 0; facIndex < shoppingFacilities.length; facIndex++) {
+							run.addExpenditure(facIndex, day, hour, Double.parseDouble(parts[facIndex + 1]));
+						}
+					}
+				}
+				this.runs.add(run);
+			}		
+		} // end try
+		catch (IOException e) {
+			e.printStackTrace();
+		}
+    }
+    
+    private void calculateMeans() {	
+    	this.avgExpendituresPerFacilityPerHour = new double[shoppingFacilities.length][24];
+		for (int hour = 0; hour < 24; hour++) {
+		    for (int facIndex = 0; facIndex < shoppingFacilities.length; facIndex++) {
+		    		for (Run run: this.runs) {
+		    			avgExpendituresPerFacilityPerHour[facIndex][hour] += run.getAverageHourlyExpenditures(facIndex, hour) /
+		    			(this.numberOfRandomRuns);
+		    		}
+		    }       
+		}
+    }
+     
     private void calculateStdDevOfExpenditures() {
-    	this.sigmaExpendituresPerHourPerFacility = new double[24][shoppingFacilities.length];
-    	for (int h = 0; h < 24; h++) {
-		    for (int i = 0; i < shoppingFacilities.length; i++) {
+    	this.sigmaExpendituresPerFacilityPerHour = new double[shoppingFacilities.length][24];
+    	for (int hour = 0; hour < 24; hour++) {
+		    for (int facIndex = 0; facIndex < shoppingFacilities.length; facIndex++) {
 		    	for (int day = 0; day < 5; day++) {
-		    		for (int runIndex = 0; runIndex < numberOfRandomRuns; runIndex++) {
-		    			sigmaExpendituresPerHourPerFacility[h][i] += Math.sqrt(
+		    		for (Run run: this.runs) {
+		    			sigmaExpendituresPerFacilityPerHour[facIndex][hour] += Math.sqrt(
 		    					Math.pow(
-		    							expendituresPerRunPerDayPerHourPerFacility[runIndex][day][h][i]
-		    							- avgExpendituresPerHourPerFacility[h][i], 2.0
+		    							run.getExpenditure(facIndex, day, hour)
+		    							- avgExpendituresPerFacilityPerHour[facIndex][hour], 2.0
 		    							)
 		    							/ 
 		    							(this.numberOfRandomRuns * 5)
@@ -67,45 +122,11 @@ public class SummaryWriter {
 		    }       
 		}
     }
-    
-    private void calculateMeans() {	
-    	this.avgExpendituresPerHourPerFacility = new double[24][shoppingFacilities.length];
-		for (int h = 0; h < 24; h++) {
-		    for (int i = 0; i < shoppingFacilities.length; i++) {
-		    	for (int day = 0; day < 5; day++) {
-		    		for (int runIndex = 0; runIndex < numberOfRandomRuns; runIndex++) {
-		    			avgExpendituresPerHourPerFacility[h][i] += expendituresPerRunPerDayPerHourPerFacility[runIndex][day][h][i] /
-		    			(this.numberOfRandomRuns * 5);
-		    		}
-		    	}
-		    }       
-		}
-    }
-    
-    private void readRD() {
-    	this.expendituresPerRunPerDayPerHourPerFacility = new double[this.numberOfRandomRuns][5][24][shoppingFacilities.length];
-    	try {
-        	for (int runIndex = 0; runIndex < numberOfRandomRuns; runIndex++) {
-        		for (int day = 0; day < 5; day++) {
-					BufferedReader bufferedReader = new BufferedReader(new FileReader(path + "output/PLOC/3towns/R" + runIndex + "D" + day + "_shoppingPerRunDay.txt"));
-					String line = bufferedReader.readLine(); // skip header
-					for (int h = 0; h < 24; h++) {
-					    line = bufferedReader.readLine();
-					    String parts[] = line.split("\t");
-					    for (int i = 1; i < shoppingFacilities.length; i++)
-					    	expendituresPerRunPerDayPerHourPerFacility[runIndex][day][h][i-1] = Double.parseDouble(parts[i]);
-						}
-					}
-        	}        
-        } // end try
-        catch (IOException e) {
-        	e.printStackTrace();
-        }
-    }
          
     public void write2Summary() {
+    	DecimalFormat formatter = new DecimalFormat("0.00");
 		try {
-			bufferedWriter = new BufferedWriter(new FileWriter(path + "output/PLOC/3towns/ExpendituresPerHourPerFacility.txt")); 
+			bufferedWriter = new BufferedWriter(new FileWriter(path + "output/PLOC/3towns/AllRunsExpendituresPerHourPerFacility.txt")); 
 			bufferedWriter.write("Hour\t");
 			for (int i = 0; i < shoppingFacilities.length; i++) {
 				bufferedWriter.append("f" + shoppingFacilities[i] + "_avg" + "\t" +
@@ -118,9 +139,9 @@ public class SummaryWriter {
 			for (int h = 0; h < 24; h++) {
 				bufferedWriter.write(h + "\t");
 				for (int i = 0; i < shoppingFacilities.length; i++) {
-					bufferedWriter.write(avgExpendituresPerHourPerFacility[h][i] +"\t");
-					bufferedWriter.write(sigmaExpendituresPerHourPerFacility[h][i] + "\t");
-					bufferedWriter.write(100.0* sigmaExpendituresPerHourPerFacility[h][i] / avgExpendituresPerHourPerFacility[h][i] + "\t");
+					bufferedWriter.write(formatter.format(avgExpendituresPerFacilityPerHour[i][h]) +"\t");
+					bufferedWriter.write(formatter.format(sigmaExpendituresPerFacilityPerHour[i][h]) + "\t");
+					bufferedWriter.write(formatter.format(100.0* sigmaExpendituresPerFacilityPerHour[i][h] / avgExpendituresPerFacilityPerHour[i][h]) + "\t");
 				}
 				bufferedWriter.newLine();
 			}
@@ -130,5 +151,5 @@ public class SummaryWriter {
 		catch (IOException e) {
 			e.printStackTrace();
 			}
-    }
+    }    
 }

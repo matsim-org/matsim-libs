@@ -25,9 +25,6 @@ import java.awt.Font;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.TreeMap;
-import java.util.Vector;
-
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.CategoryAxis;
@@ -37,54 +34,29 @@ import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.renderer.category.BoxAndWhiskerRenderer;
 import org.jfree.data.statistics.DefaultBoxAndWhiskerCategoryDataset;
 
-public class EnsembleAnalysisBoxPlot {
+public class RunsEnsembleBoxPlot {
 	
 	private JFreeChart chart_;
-	private int numberOfRandomRuns = -1;
-	private TreeMap<Integer, Vector<Double>> valuesPerNumberOfSamples = new TreeMap<Integer, Vector<Double>>();
-	private String runId ="";
+	private String chartTitle;
+	private DefaultBoxAndWhiskerCategoryDataset dataset;
 
-	public EnsembleAnalysisBoxPlot(final TreeMap<Integer, Vector<Double>> valuesPerNumberOfSamples, final String chartTitle,
-			int numberOfRandomRuns, int locIndex, String runId) {
-		
-		this.valuesPerNumberOfSamples = valuesPerNumberOfSamples;
-		this.numberOfRandomRuns = numberOfRandomRuns;
-		this.runId = runId;
+	public RunsEnsembleBoxPlot(final String chartTitle) {
+		dataset = new DefaultBoxAndWhiskerCategoryDataset();
+		this.chartTitle = chartTitle;	
+	}
+	
+	public void addHourlySeries(ArrayList<Double> hourlyExpenditures, int hour) {
+		dataset.add(hourlyExpenditures, "Expenditures", Integer.toString(hour));
 	}
 
-	public JFreeChart createChart() {
-		DefaultBoxAndWhiskerCategoryDataset dataset = new DefaultBoxAndWhiskerCategoryDataset();
-			
-		ArrayList<Double>[] lists = new ArrayList[numberOfRandomRuns];
+	public JFreeChart createChart() {	
+		String title = chartTitle;
 		
-		// init
-		for (int i = 0; i < numberOfRandomRuns; i++) {
-			lists[i] = new ArrayList<Double>();
-		}
-
-		//int numberOfAnalyses = 0;
-		int sampleIndex = 0;
-		for (Vector<Double> el : this.valuesPerNumberOfSamples.values()) {	
-			for (double val : el) {
-				lists[sampleIndex].add(val);
-			}
-			//numberOfAnalyses = el.size();
-			sampleIndex++;
-		}
-
-		// add the collected values to the graph / dataset
-		for (int i = 0; i < numberOfRandomRuns; i++) {
-			if ((i + 1) % 5 == 0) {
-				dataset.add(lists[i], "Deviation From Ref Val", Integer.toString(i + 1));
-			}
-		}
-		String title = this.runId;
-		
-		final CategoryAxis xAxis = new CategoryAxis("Number of random runs used for averaging");
+		final CategoryAxis xAxis = new CategoryAxis("Hour");
 		xAxis.setTickLabelFont(new Font("SansSerif", Font.PLAIN, 10));
 		xAxis.setCategoryLabelPositions(CategoryLabelPositions.UP_45);
 		
-		final NumberAxis yAxis = new NumberAxis("Deviation from mean_n [%]");
+		final NumberAxis yAxis = new NumberAxis("Expenditures Average[days][runs]");
 		yAxis.setAutoRangeIncludesZero(true);
 
 		final BoxAndWhiskerRenderer renderer = new BoxAndWhiskerRenderer();
