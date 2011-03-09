@@ -72,7 +72,7 @@ public class IntegrationTest extends MatsimTestCase {
 	}
 	
 	private void performSingleAgentRun(){
-		PSSControler pssControler=new PSSControlerDumbCharging(getPackageInputDirectory() + "config-event-file-based-OneAgent.xml", null);
+		PSSControler pssControler=new PSSControlerDumbCharging(getPackageInputDirectory() + "config-event-file-based-oneAgent.xml", null);
 		pssControler.runMATSimIterations();
 	}
 	
