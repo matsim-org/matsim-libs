@@ -37,8 +37,12 @@ public class ColdstartAnalyseModul implements AnalysisModuleCold{
 			
 				double coldEfOtherAct = hbefaColdTable.getHbefaColdTable().get(component.getKey()).get(dis).get(time).getColdEF();	
 				
-				double coldEfNight = hbefaColdTable.getHbefaColdTable().get(component.getKey()).get(initDis).get(nightTime).getColdEF();
 				
+				double coldEfNight=0.0;
+				
+				if(!personId.toString().contains("gv_") && !personId.toString().contains("pv_"))
+				 coldEfNight = hbefaColdTable.getHbefaColdTable().get(component.getKey()).get(initDis).get(nightTime).getColdEF();
+								
 				if(this.coldEmissionsPerson.get(personId) == null){
 					
 					 Map<String,Double> tempMap = new TreeMap<String,Double>();
@@ -63,6 +67,18 @@ public class ColdstartAnalyseModul implements AnalysisModuleCold{
 	
 	
 	
+public Map<Id, Map<String, Double>> getColdEmissionsPerson() {
+		return coldEmissionsPerson;
+	}
+
+
+	public void setColdEmissionsPerson(
+			Map<Id, Map<String, Double>> coldEmissionsPerson) {
+		this.coldEmissionsPerson = coldEmissionsPerson;
+	}
+
+
+
 public void printColdEmissions(String outputFile){
 		
 	try{
