@@ -242,14 +242,14 @@ public class Controler {
 			shutdown(true);
 		}
 	};
-	
+
 	private TravelTimeCalculatorFactory travelTimeCalculatorFactory = new TravelTimeCalculatorFactoryImpl();
 
 	private TravelCostCalculatorFactory travelCostCalculatorFactory = new TravelCostCalculatorFactoryImpl();
 	private ControlerIO controlerIO;
 
 	private MobsimFactory mobsimFactory = null;
-	private Map<String, MobsimFactory> mobsimFactories = new HashMap<String, MobsimFactory>();
+	private final Map<String, MobsimFactory> mobsimFactories = new HashMap<String, MobsimFactory>();
 
 	private SignalsControllerListenerFactory signalsFactory = new DefaultSignalsControllerListenerFactory();
 	private TransitRouterFactory transitRouterFactory = null;
@@ -384,7 +384,7 @@ public class Controler {
 
 		// set Route Factories
 		LinkNetworkRouteFactory factory = new LinkNetworkRouteFactory();
-		for (String mode : CollectionUtils.stringToArray(config.multiModal().getSimulatedModes())) {
+		for (String mode : CollectionUtils.stringToArray(this.config.multiModal().getSimulatedModes())) {
 			this.getNetwork().getFactory().setRouteFactory(mode, factory);
 		}
 	}
@@ -535,7 +535,7 @@ public class Controler {
 	 * scenario data (network, population) is read.
 	 */
 	protected void setUp() {
-		if (config.multiModal().isMultiModalSimulationEnabled()) multiModalSetUp();
+		if (this.config.multiModal().isMultiModalSimulationEnabled()) multiModalSetUp();
 
 		if (this.travelTimeCalculator == null) {
 			this.travelTimeCalculator = this.travelTimeCalculatorFactory.createTravelTimeCalculator(this.network, this.config
@@ -584,19 +584,19 @@ public class Controler {
 	}
 
 	private void multiModalSetUp() {
-		if (config.multiModal().isCreateMultiModalNetwork()) {
+		if (this.config.multiModal().isCreateMultiModalNetwork()) {
 			log.info("Creating multi modal network.");
-			new MultiModalNetworkCreator(config.multiModal()).run(scenarioData.getNetwork());
+			new MultiModalNetworkCreator(this.config.multiModal()).run(this.scenarioData.getNetwork());
 		}
 
-		if (config.multiModal().isEnsureActivityReachability()) {
+		if (this.config.multiModal().isEnsureActivityReachability()) {
 			log.info("Relocating activities that cannot be reached by the transport modes of their from- and/or to-legs...");
-			new EnsureActivityReachability(this.scenarioData).run(scenarioData.getPopulation());
+			new EnsureActivityReachability(this.scenarioData).run(this.scenarioData.getPopulation());
 		}
 
-		if (config.multiModal().isDropNonCarRoutes()) {
+		if (this.config.multiModal().isDropNonCarRoutes()) {
 			log.info("Dropping existing routes of modes which are simulated with the multi modal mobsim.");
-			new NonCarRouteDropper(config.multiModal()).run(scenarioData.getPopulation());
+			new NonCarRouteDropper(this.config.multiModal()).run(this.scenarioData.getPopulation());
 		}
 	}
 
@@ -654,7 +654,7 @@ public class Controler {
 	 * </ul>
 	 * @param message the message that is written just before the config dump
 	 */
-	private void checkConfigConsistencyAndWriteToLog( String message ) {
+	private void checkConfigConsistencyAndWriteToLog( final String message ) {
 		log.info("Checking consistency of config...");
 		this.config.checkConsistency();
 		log.info( message );
@@ -665,22 +665,22 @@ public class Controler {
 	}
 
 	private final void setUpOutputDir() {
-		outputPath = this.config.controler().getOutputDirectory();
-		if (outputPath.endsWith("/")) {
-			outputPath = outputPath.substring(0, outputPath.length() - 1);
+		this.outputPath = this.config.controler().getOutputDirectory();
+		if (this.outputPath.endsWith("/")) {
+			this.outputPath = this.outputPath.substring(0, this.outputPath.length() - 1);
 		}
 		if (this.config.controler().getRunId() != null) {
-			this.controlerIO =  new ControlerIO(outputPath, this.scenarioData.createId(this.config.controler().getRunId()));
+			this.controlerIO =  new ControlerIO(this.outputPath, this.scenarioData.createId(this.config.controler().getRunId()));
 		}
 		else {
-			this.controlerIO =  new ControlerIO(outputPath);
+			this.controlerIO =  new ControlerIO(this.outputPath);
 		}
 
 		// make the tmp directory
-		File outputDir = new File(outputPath);
+		File outputDir = new File(this.outputPath);
 		if (outputDir.exists()) {
 			if (outputDir.isFile()) {
-				throw new RuntimeException("Cannot create output directory. " + outputPath
+				throw new RuntimeException("Cannot create output directory. " + this.outputPath
 						+ " is a file and cannot be replaced by a directory.");
 			}
 			if (outputDir.list().length > 0) {
@@ -688,7 +688,7 @@ public class Controler {
 					System.out.flush();
 					log.warn("###########################################################");
 					log.warn("### THE CONTROLER WILL OVERWRITE FILES IN:");
-					log.warn("### " + outputPath);
+					log.warn("### " + this.outputPath);
 					log.warn("###########################################################");
 					System.err.flush() ;
 				} else {
@@ -696,13 +696,13 @@ public class Controler {
 					// files!
 					throw new RuntimeException(
 							"The output directory "
-							+ outputPath
+							+ this.outputPath
 							+ " exists already but has files in it! Please delete its content or the directory and start again. We will not delete or overwrite any existing files.");
 				}
 			}
 		} else {
 			if (!outputDir.mkdirs()) {
-				throw new RuntimeException("The output directory path " + outputPath
+				throw new RuntimeException("The output directory path " + this.outputPath
 						+ " could not be created. Check pathname and permissions!");
 			}
 		}
@@ -711,9 +711,9 @@ public class Controler {
 		if (!tmpDir.mkdir() && !tmpDir.exists()) {
 			throw new RuntimeException("The tmp directory " + this.controlerIO.getTempPath() + " could not be created.");
 		}
-		File itersDir = new File(outputPath + "/" + DIRECTORY_ITERS);
+		File itersDir = new File(this.outputPath + "/" + DIRECTORY_ITERS);
 		if (!itersDir.mkdir() && !itersDir.exists()) {
-			throw new RuntimeException("The iterations directory " + (outputPath + "/" + DIRECTORY_ITERS)
+			throw new RuntimeException("The iterations directory " + (this.outputPath + "/" + DIRECTORY_ITERS)
 					+ " could not be created.");
 		}
 	}
@@ -829,7 +829,7 @@ public class Controler {
 
 		if (this.config.scenario().isUseTransit()) {
 			addControlerListener(new TransitControlerListener());
-			if (config.ptCounts().getAlightCountsFileName() != null) {
+			if (this.config.ptCounts().getAlightCountsFileName() != null) {
 				// only works when all three files are defined!  kai, oct'10
 				addPtCountControlerListener();
 			}
@@ -838,8 +838,8 @@ public class Controler {
 		if (this.config.scenario().isUseSignalSystems()){
 			addControlerListener(this.signalsFactory.createSignalsControllerListener());
 		}
-		
-		if ( ! config.vspExperimental().getActivityDurationInterpretation()
+
+		if ( ! this.config.vspExperimental().getActivityDurationInterpretation()
 				.equals(VspExperimentalConfigGroup.MIN_OF_DURATION_AND_END_TIME) ) {
 			addControlerListener( new VspPlansCleaner() ) ;
 		}
@@ -853,7 +853,7 @@ public class Controler {
 //		OccupancyAnalyzer occupancyAnalyzer = new OccupancyAnalyzer(3600, 24 * 3600 - 1);
 		log.info("Using pt counts.");
 //		addControlerListener(new OccupancyAnalyzerListener(occupancyAnalyzer));
-		addControlerListener(new PtCountControlerListener(config));
+		addControlerListener(new PtCountControlerListener(this.config));
 	}
 
 	/**
@@ -888,6 +888,11 @@ public class Controler {
 	 */
 
 	/*package*/ Simulation getNewMobsim() {
+		if (this.mobsimFactory != null) {
+			Simulation simulation = this.mobsimFactory.createMobsim(this.getScenario(), this.getEvents());
+			enrichSimulation(simulation);
+			return simulation;
+		}
 		String mobsim = this.config.controler().getMobsim();
 		if (mobsim != null) {
 			MobsimFactory f = this.mobsimFactories.get(mobsim);
@@ -895,35 +900,31 @@ public class Controler {
 				throw new IllegalArgumentException("There is no MobsimFactory registered for the name " + mobsim);
 			}
 			Simulation simulation = f.createMobsim(this.getScenario(), this.getEvents());
-			if (simulation instanceof IOSimulation){
-				((IOSimulation)simulation).setControlerIO(this.getControlerIO());
-				((IOSimulation)simulation).setIterationNumber(this.getIterationNumber());
-			}
-			if (simulation instanceof ObservableSimulation){
-				for (SimulationListener l : this.getQueueSimulationListener()) {
-					((ObservableSimulation)simulation).addQueueSimulationListeners(l);
-				}
-			}
+			enrichSimulation(simulation);
 			return simulation;
 		} else {
 			log.warn("Please specify which mobsim should be used in the configuration (see module 'controler', parameter 'mobsim'). Now trying to detect which mobsim to use from other parameters...");
 			if ( this.config.simulation()==null || this.config.simulation().getExternalExe() == null) {
 				Simulation simulation = this.getMobsimFactory().createMobsim(this.getScenario(), this.getEvents());
-				if (simulation instanceof IOSimulation){
-					((IOSimulation)simulation).setControlerIO(this.getControlerIO());
-					((IOSimulation)simulation).setIterationNumber(this.getIterationNumber());
-				}
-				if (simulation instanceof ObservableSimulation){
-					for (SimulationListener l : this.getQueueSimulationListener()) {
-						((ObservableSimulation)simulation).addQueueSimulationListeners(l);
-					}
-				}
+				enrichSimulation(simulation);
 				return simulation;
 			} else {
 				ExternalMobsim sim = new ExternalMobsim(this.scenarioData, this.events);
 				sim.setControlerIO(this.controlerIO);
 				sim.setIterationNumber(this.getIterationNumber());
 				return sim;
+			}
+		}
+	}
+
+	private void enrichSimulation(final Simulation simulation) {
+		if (simulation instanceof IOSimulation){
+			((IOSimulation)simulation).setControlerIO(this.getControlerIO());
+			((IOSimulation)simulation).setIterationNumber(this.getIterationNumber());
+		}
+		if (simulation instanceof ObservableSimulation){
+			for (SimulationListener l : this.getQueueSimulationListener()) {
+				((ObservableSimulation)simulation).addQueueSimulationListeners(l);
 			}
 		}
 	}
@@ -1246,7 +1247,7 @@ public class Controler {
 		}
 
 		@Override
-		public void notifyStartup(StartupEvent event) {
+		public void notifyStartup(final StartupEvent event) {
 			if (event.getControler().getMobsimFactory() == null) {
 
 				String mobsim = event.getControler().config.controler().getMobsim();
@@ -1257,35 +1258,35 @@ public class Controler {
 					}
 				} else {
 					log.warn("Please specify which mobsim should be used in the configuration (see module 'controler', parameter 'mobsim'). Now trying to detect which mobsim to use from other parameters...");
+
+					Config c = event.getControler().getScenario().getConfig();
+					QSimConfigGroup conf = (QSimConfigGroup) c.getModule(QSimConfigGroup.GROUP_NAME);
+					if (conf != null) {
+						event.getControler().setMobsimFactory(new QSimFactory());
+
+						/*
+						 * cdobler:
+						 * If a multi modal simulation should be run, we use a MultiModalMobsimFactory
+						 * which is only a wrapper. It hands over the TravelTimeCalculator to the
+						 * MultiModalSimEngine.
+						 * I do not like this - but at the moment I see no better way to do so...
+						 */
+						if (c.multiModal().isMultiModalSimulationEnabled()) {
+							MobsimFactory factory = event.getControler().getMobsimFactory();
+							MobsimFactory multiModalFactory = new MultiModalMobsimFactory(factory, event.getControler().getTravelTimeCalculator());
+							event.getControler().setMobsimFactory(multiModalFactory);
+						}
+					} else if (c.getModule("JDEQSim") != null) {
+						event.getControler().setMobsimFactory(new JDEQSimulationFactory());
+					} else if ( c.getModule(SimulationConfigGroup.GROUP_NAME) != null ) {
+						event.getControler().setMobsimFactory(new QueueSimulationFactory());
+					} else {
+						log.warn("There is no configuration for a mobility simulation in the config. The Controler " +
+						"uses the default `Simulation'.  Add a (possibly empty) `Simulation' module to your config file " +
+						"to avoid this warning");
+						c.addSimulationConfigGroup(new SimulationConfigGroup()) ;
+						event.getControler().setMobsimFactory(new QueueSimulationFactory());
 				}
-
-				Config c = event.getControler().getScenario().getConfig();
-				QSimConfigGroup conf = (QSimConfigGroup) c.getModule(QSimConfigGroup.GROUP_NAME);
-				if (conf != null) {
-					event.getControler().setMobsimFactory(new QSimFactory());
-
-					/*
-					 * cdobler:
-					 * If a multi modal simulation should be run, we use a MultiModalMobsimFactory
-					 * which is only a wrapper. It hands over the TravelTimeCalculator to the
-					 * MultiModalSimEngine.
-					 * I do not like this - but at the moment I see no better way to do so...
-					 */
-					if (c.multiModal().isMultiModalSimulationEnabled()) {
-						MobsimFactory factory = event.getControler().getMobsimFactory();
-						MobsimFactory multiModalFactory = new MultiModalMobsimFactory(factory, event.getControler().getTravelTimeCalculator());
-						event.getControler().setMobsimFactory(multiModalFactory);
-					}
-				} else if (c.getModule("JDEQSim") != null) {
-					event.getControler().setMobsimFactory(new JDEQSimulationFactory());
-				} else if ( c.getModule(SimulationConfigGroup.GROUP_NAME) != null ) {
-					event.getControler().setMobsimFactory(new QueueSimulationFactory());
-				} else {
-					log.warn("There is no configuration for a mobility simulation in the config. The Controler " +
-					"uses the default `Simulation'.  Add a (possibly empty) `Simulation' module to your config file " +
-					"to avoid this warning");
-					c.addSimulationConfigGroup(new SimulationConfigGroup()) ;
-					event.getControler().setMobsimFactory(new QueueSimulationFactory());
 				}
 			}
 		}
@@ -1317,7 +1318,7 @@ public class Controler {
 	}
 
 
-	public void setTravelTimeCalculatorFactory(TravelTimeCalculatorFactory travelTimeCalculatorFactory) {
+	public void setTravelTimeCalculatorFactory(final TravelTimeCalculatorFactory travelTimeCalculatorFactory) {
 		this.travelTimeCalculatorFactory = travelTimeCalculatorFactory;
 	}
 
@@ -1327,7 +1328,7 @@ public class Controler {
 	}
 
 
-	public void setTravelCostCalculatorFactory(TravelCostCalculatorFactory travelCostCalculatorFactory) {
+	public void setTravelCostCalculatorFactory(final TravelCostCalculatorFactory travelCostCalculatorFactory) {
 		this.travelCostCalculatorFactory = travelCostCalculatorFactory;
 	}
 
@@ -1348,7 +1349,7 @@ public class Controler {
 		return this.mobsimFactory;
 	}
 
-	public void setMobsimFactory(MobsimFactory mobsimFactory) {
+	public void setMobsimFactory(final MobsimFactory mobsimFactory) {
 		this.mobsimFactory = mobsimFactory;
 	}
 
@@ -1366,10 +1367,10 @@ public class Controler {
 	}
 
 	public SignalsControllerListenerFactory getSignalsControllerListenerFactory() {
-		return signalsFactory;
+		return this.signalsFactory;
 	}
 
-	public void setSignalsControllerListenerFactory(SignalsControllerListenerFactory signalsFactory) {
+	public void setSignalsControllerListenerFactory(final SignalsControllerListenerFactory signalsFactory) {
 		this.signalsFactory = signalsFactory;
 	}
 
@@ -1377,12 +1378,12 @@ public class Controler {
 		return this.transitRouterFactory;
 	}
 
-	public void setTransitRouterFactory(TransitRouterFactory transitRouterFactory) {
+	public void setTransitRouterFactory(final TransitRouterFactory transitRouterFactory) {
 		this.transitRouterFactory = transitRouterFactory;
 	}
 
 	public int getWritePlansInterval() {
-		return writePlansInterval;
+		return this.writePlansInterval;
 	}
 
 }

@@ -25,6 +25,7 @@
 		<param name="firstIteration" value="0" />
 		<param name="lastIteration" value="50" />
 		<param name="eventsFileFormat" value="xml" />
+		<param name="mobsim" value="qsim" />
 	</module>
 
 	<module name="qsim">

@@ -88,7 +88,7 @@ public class ControlerMobsimIntegrationTest {
 		FakeControler c = new FakeControler(cfg);
 		c.setCreateGraphs(false);
 		c.run();
-		Assert.assertTrue(c.sim instanceof JDEQSimulation);
+		Assert.assertTrue("sim is of wrong type " + c.sim.getClass().getCanonicalName(), c.sim instanceof JDEQSimulation);
 	}
 
 	@Test
@@ -151,7 +151,7 @@ public class ControlerMobsimIntegrationTest {
 		/*package*/ int callCount = 0;
 
 		@Override
-		public Simulation createMobsim(Scenario sc, EventsManager eventsManager) {
+		public Simulation createMobsim(final Scenario sc, final EventsManager eventsManager) {
 			this.callCount++;
 			return new FakeSimulation();
 		}

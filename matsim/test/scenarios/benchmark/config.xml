@@ -22,6 +22,7 @@
 		<param name="lastIteration" value="20" />
 		<param name="writeEventsInterval" value="5" />
 		<param name= "routingAlgorithmType" value="Dijkstra" />
+		<param name="mobsim" value="queueSimulation" />
 	</module>
 
 	<module name="simulation">

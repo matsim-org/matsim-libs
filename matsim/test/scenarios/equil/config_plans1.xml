@@ -24,6 +24,7 @@
 		<param name="firstIteration" value="0" />
 		<param name="lastIteration" value="10" />
 		<param name= "writeEventsInterval" value="4" />
+		<param name="mobsim" value="queueSimulation" />
 	</module>
 
 	<module name="simulation">
