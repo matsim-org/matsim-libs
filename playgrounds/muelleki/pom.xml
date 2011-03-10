@@ -6,7 +6,7 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>playground</groupId>
-  <artifactId>kmueller</artifactId>
-  <name>kmueller</name>
+  <artifactId>muelleki</artifactId>
+  <name>muelleki</name>
   <version>0.2.0-SNAPSHOT</version>
 </project>
