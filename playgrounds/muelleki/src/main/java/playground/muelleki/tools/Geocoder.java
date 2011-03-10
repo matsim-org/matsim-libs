@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.regex.*;
 
 public class Geocoder {
 	private final static String ENCODING = "UTF-8";
@@ -43,10 +44,11 @@ public class Geocoder {
 
 		@Override
 		public String toString () { 
-			return "Lat: "+lat+", Lon: "+lon; 
+			return lat+"\t"+lon; 
 		}
 	}
 	
+
 	public static Location getLocation (String address) throws IOException {
 		BufferedReader in = new BufferedReader (new InputStreamReader (new URL ("http://maps.google.com/maps/geo?q="+URLEncoder.encode (address, ENCODING)+"&output=csv&key="+KEY).openStream ()));
 		String line;
@@ -75,6 +77,14 @@ public class Geocoder {
 	}
 
 	public static void main (String[] argv) throws Exception {
-		System.out.println (Geocoder.getLocation ("Zürich"));
+		BufferedReader in = new BufferedReader (new InputStreamReader (System.in));
+		String line;
+		Pattern pattern = Pattern.compile("([^\t]*).*");
+		while ((line = in.readLine ()) != null) {
+			Matcher matcher = pattern.matcher(line);
+			matcher.matches();
+			System.out.printf ("%s\t%s\n", line, Geocoder.getLocation (matcher.group(1)));
+			Thread.sleep(300);
+		}
 	}
 }
