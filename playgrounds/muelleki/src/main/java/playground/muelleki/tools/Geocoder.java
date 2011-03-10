@@ -64,13 +64,11 @@ public class Geocoder {
 	     * as its error detail message.
 	     */
 	    public TooManyQueriesException() {
-		super(_desc);
+	    	super(_desc);
 	    }
 
 	    /**
-	     * Constructs an {@code TooManyQueriesException} with the specified cause and a
-	     * detail message of {@code (cause==null ? null : cause.toString())}
-	     * (which typically contains the class and detail message of {@code cause}).
+	     * Constructs an {@code TooManyQueriesException} with the specified cause.
 	     * This constructor is useful for IO exceptions that are little more
 	     * than wrappers for other throwables.
 	     *
