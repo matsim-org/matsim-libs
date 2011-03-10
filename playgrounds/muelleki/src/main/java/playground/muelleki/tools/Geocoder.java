@@ -31,6 +31,8 @@ import java.util.regex.*;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
 public class Geocoder {
 	private final static String ENCODING = "UTF-8";
@@ -120,6 +122,8 @@ public class Geocoder {
 		else
 			in = new BufferedReader (new InputStreamReader (System.in));
 		
+		CoordinateTransformation tr = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.CH1903_LV03_GT);
+		
 		String line;
 		Pattern pattern = Pattern.compile("([^\t]*).*");
 		while ((line = in.readLine ()) != null) {
@@ -138,7 +142,9 @@ public class Geocoder {
 				break;
 			}
 			
-			System.out.printf (Locale.US, "%s\t%f\t%f\n", line, loc.getX(), loc.getY());
+			Coord loct = tr.transform(loc);
+			
+			System.out.printf (Locale.US, "%s\t%f\t%f\t%f\t%f\n", line, loc.getX(), loc.getY(), loct.getX(), loct.getY());
 			Thread.sleep(300);
 		}
 	}
