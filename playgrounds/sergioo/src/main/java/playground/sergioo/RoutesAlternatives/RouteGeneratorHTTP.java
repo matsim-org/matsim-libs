@@ -14,8 +14,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import junit.framework.TestCase;
-
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.ParseException;
@@ -38,7 +36,7 @@ import playground.sergioo.AddressLocator.Location;
 /**
  * Hello world!
  */
-public class RouteGeneratorHTTP extends TestCase {
+public class RouteGeneratorHTTP {
 	
 	//Constants
 	private static final String HTTP_SCHEME = "http";

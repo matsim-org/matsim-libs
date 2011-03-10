@@ -17,8 +17,6 @@ import org.apache.http.message.BasicNameValuePair;
 
 import playground.sergioo.AddressLocator.BadAddressException;
 
-import junit.framework.TestCase;
-
 import com.gargoylesoftware.htmlunit.ElementNotFoundException;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlElement;
@@ -29,7 +27,7 @@ import com.gargoylesoftware.htmlunit.html.HtmlPage;
 /**
  * Hello world!
  */
-public class RouteGeneratorHTML extends TestCase {
+public class RouteGeneratorHTML {
 	
 	//Constants
 	private static final String HTTP_SCHEME = "http";
