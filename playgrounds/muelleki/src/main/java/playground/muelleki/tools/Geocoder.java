@@ -48,6 +48,43 @@ public class Geocoder {
 		}
 	}
 	
+	public static class TooManyQueriesException extends IOException {
+
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -2893388603747747668L;
+		
+		private static final String _desc = "Too many queries";
+		
+
+	    /**
+	     * Constructs an {@code IOException} with {@code null}
+	     * as its error detail message.
+	     */
+	    public TooManyQueriesException() {
+		super(_desc);
+	    }
+
+	    /**
+	     * Constructs an {@code TooManyQueriesException} with the specified cause and a
+	     * detail message of {@code (cause==null ? null : cause.toString())}
+	     * (which typically contains the class and detail message of {@code cause}).
+	     * This constructor is useful for IO exceptions that are little more
+	     * than wrappers for other throwables.
+	     *
+	     * @param cause
+	     *        The cause (which is saved for later retrieval by the
+	     *        {@link #getCause()} method).  (A null value is permitted,
+	     *        and indicates that the cause is nonexistent or unknown.)
+	     *
+	     * @since 1.6
+	     */
+	    public TooManyQueriesException(Throwable cause) {
+	        super(_desc, cause);
+	    }
+	}
+	
 
 	public static Location getLocation (String address) throws IOException {
 		BufferedReader in = new BufferedReader (new InputStreamReader (new URL ("http://maps.google.com/maps/geo?q="+URLEncoder.encode (address, ENCODING)+"&output=csv&key="+KEY).openStream ()));
@@ -70,7 +107,7 @@ public class Geocoder {
 				case 603: throw new IOException ("Legal problem");
 				case 604: throw new IOException ("No route");
 				case 610: throw new IOException ("Bad key");
-				case 620: throw new IOException ("Too many queries");
+				case 620: throw new TooManyQueriesException();
 			}
 		}
 		return location;
@@ -83,7 +120,19 @@ public class Geocoder {
 		while ((line = in.readLine ()) != null) {
 			Matcher matcher = pattern.matcher(line);
 			matcher.matches();
-			System.out.printf ("%s\t%s\n", line, Geocoder.getLocation (matcher.group(1)));
+			Location loc = null;
+
+			do {
+				try {
+					loc = Geocoder.getLocation (matcher.group(1));
+				}
+				catch (TooManyQueriesException e) {
+					Thread.sleep(60000);
+				}
+			}
+			while (loc == null);
+			
+			System.out.printf ("%s\t%s\n", line, loc);
 			Thread.sleep(300);
 		}
 	}
