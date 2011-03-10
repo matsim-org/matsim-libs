@@ -35,11 +35,11 @@ public class Geocoder {
 
 	
 	public static class Location {
-		public String lon, lat;
+		public double lat, lon;
 
 		private Location (String lat, String lon) {
-			this.lon = lon;
-			this.lat = lat;
+			this.lat = Double.parseDouble(lat);
+			this.lon = Double.parseDouble(lon);
 		}
 
 		@Override
