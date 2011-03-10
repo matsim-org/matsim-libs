@@ -26,9 +26,11 @@ import java.io.InputStreamReader;
 import java.io.FileInputStream;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.Date;
 import java.util.Locale;
 import java.util.regex.*;
 
+import org.apache.commons.lang.time.DateUtils;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -144,7 +146,7 @@ public class Geocoder {
 			
 			Coord loct = tr.transform(loc);
 			
-			System.out.printf (Locale.US, "%s\t%f\t%f\t%f\t%f\n", line, loc.getX(), loc.getY(), loct.getX(), loct.getY());
+			System.out.printf (Locale.US, "%s\t%f\t%f\t%f\t%f\t%tc\n", line, loc.getX(), loc.getY(), loct.getX(), loct.getY(), new Date());
 			Thread.sleep(300);
 		}
 	}
