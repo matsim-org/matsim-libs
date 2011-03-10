@@ -26,7 +26,11 @@ import java.io.InputStreamReader;
 import java.io.FileInputStream;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.Locale;
 import java.util.regex.*;
+
+import org.matsim.api.core.v01.Coord;
+import org.matsim.core.utils.geometry.CoordImpl;
 
 public class Geocoder {
 	private final static String ENCODING = "UTF-8";
@@ -34,20 +38,6 @@ public class Geocoder {
 	// Google Maps key for localhost
 	private final static String KEY = "ABQIAAAAnfs7bKE82qgb3Zc2YyS-oBT2yXp_ZAY8_ufC3CFXhHIE1NvwkxSySz_REpPq-4WZA27OwgbtyR3VcA";
 
-	
-	public static class Location {
-		public double lat, lon;
-
-		private Location (double lat, double lon) {
-			this.lat = lat;
-			this.lon = lon;
-		}
-
-		@Override
-		public String toString () { 
-			return lat+"\t"+lon; 
-		}
-	}
 	
 	public static class TooManyQueriesException extends IOException {
 
@@ -87,10 +77,10 @@ public class Geocoder {
 	// Format: 200,6,42.730070,-73.690570
 	private static Pattern _googleApiReply = Pattern.compile("([0-9]+),[0-9],([0-9.+-]+),([0-9.+-]+)");
 
-	public static Location getLocation (String address) throws IOException {
+	public static Coord getLocation (String address) throws IOException {
 		BufferedReader in = new BufferedReader (new InputStreamReader (new URL ("http://maps.google.com/maps/geo?q="+URLEncoder.encode (address, ENCODING)+"&output=csv&key="+KEY).openStream ()));
 		String line;
-		Location location = null;
+		Coord location = null;
 		int statusCode = -1;
 		
 		while ((line = in.readLine ()) != null) {
@@ -103,7 +93,7 @@ public class Geocoder {
 			String lat = m.group(2);
 			String lon = m.group(3);
 			if (statusCode == 200) { 
-				location = new Location (Double.parseDouble(lon), Double.parseDouble(lat));
+				location = new CoordImpl (Double.parseDouble(lon), Double.parseDouble(lat));
 				break;
 			}
 		}
@@ -135,7 +125,7 @@ public class Geocoder {
 		while ((line = in.readLine ()) != null) {
 			Matcher matcher = pattern.matcher(line);
 			matcher.matches();
-			Location loc = null;
+			Coord loc = null;
 
 			while (true) {
 				try {
@@ -148,7 +138,7 @@ public class Geocoder {
 				break;
 			}
 			
-			System.out.printf ("%s\t%s\n", line, loc);
+			System.out.printf (Locale.US, "%s\t%f\t%f\n", line, loc.getX(), loc.getY());
 			Thread.sleep(300);
 		}
 	}
