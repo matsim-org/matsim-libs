@@ -23,7 +23,6 @@
  */
 package playground.yu.newPlans;
 
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
@@ -32,6 +31,9 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.population.algorithms.PlanMutateTimeAllocation;
 
 /**
@@ -42,7 +44,7 @@ public class PlansMutateTimeAllocation {
 
 	public static void main(String[] args) {
 
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		NetworkImpl network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario)
 				.readFile("D:/fromNB04/wm/Toronto/toronto/networks/changedNetworkWithManeuvers/network.xml");

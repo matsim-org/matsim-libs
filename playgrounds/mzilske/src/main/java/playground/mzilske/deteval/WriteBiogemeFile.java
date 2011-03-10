@@ -9,14 +9,16 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.population.PopulationReaderMatsimV4;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.households.Households;
 import org.matsim.households.HouseholdsImpl;
 import org.matsim.households.HouseholdsReaderV10;
@@ -44,9 +46,9 @@ public class WriteBiogemeFile {
 	
 	private static final int D_W08 = 49; // Wegstrecke in km
 
-	private Scenario scenarioWithSurveyData = new ScenarioImpl();
+	private Scenario scenarioWithSurveyData = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 	
-	private Scenario scenarioWithRoutedPlans = new ScenarioImpl();
+	private Scenario scenarioWithRoutedPlans = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 	private Households households = new HouseholdsImpl();
 

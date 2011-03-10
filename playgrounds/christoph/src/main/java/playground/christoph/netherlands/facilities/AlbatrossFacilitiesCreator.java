@@ -32,7 +32,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
@@ -42,7 +41,10 @@ import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 import playground.christoph.netherlands.zones.GetZoneConnectors;
 
@@ -63,7 +65,7 @@ public class AlbatrossFacilitiesCreator {
 	private double capacity = 1000000.0;
 	
 	public static void main(String[] args) throws Exception {
-		Scenario scenario = new ScenarioImpl();
+		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario).readFile(networkFile);
 		new AlbatrossFacilitiesCreator(scenario);	
 	}

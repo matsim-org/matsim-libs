@@ -20,7 +20,6 @@
 
 package org.matsim.examples;
 
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.algorithms.EventWriterTXT;
@@ -29,6 +28,8 @@ import org.matsim.core.mobsim.queuesim.QueueSimulationFactory;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -43,7 +44,7 @@ public class EquilTest extends MatsimTestCase {
 		String eventsFileName = getOutputDirectory() + "events.txt";
 		String referenceFileName = getInputDirectory() + "events.txt.gz";
 
-		ScenarioImpl scenario = new ScenarioImpl(c);
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(c);
 
 		new MatsimNetworkReader(scenario).readFile(netFileName);
 

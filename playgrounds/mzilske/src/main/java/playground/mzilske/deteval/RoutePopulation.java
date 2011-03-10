@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.NetworkImpl;
@@ -37,6 +36,7 @@ import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
 import org.matsim.core.utils.misc.ArgumentParser;
@@ -91,7 +91,7 @@ public class RoutePopulation {
 
 	public void run(final String[] args) {
 		parseArguments(args);
-		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(this.configfile);
+		ScenarioLoaderImpl sl = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(this.configfile);
 		sl.loadNetwork();
 		scenario = sl.getScenario();
 		final NetworkImpl network = scenario.getNetwork();

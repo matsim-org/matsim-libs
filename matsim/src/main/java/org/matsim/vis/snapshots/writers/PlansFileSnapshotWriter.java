@@ -20,14 +20,16 @@
 
 package org.matsim.vis.snapshots.writers;
 
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.core.utils.misc.Time;
 
 /**
@@ -60,7 +62,7 @@ public class PlansFileSnapshotWriter implements SnapshotWriter {
 
 	@Override
 	public void beginSnapshot(final double time) {
-		this.plans = new ScenarioImpl().getPopulation();
+		this.plans = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
 		this.filename = this.filePrefix + Time.writeTime(time, "-") + "." + this.fileSuffix;
 		this.currenttime = time;
 	}

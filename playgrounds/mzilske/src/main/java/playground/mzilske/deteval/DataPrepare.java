@@ -12,7 +12,6 @@ import org.apache.log4j.Logger;
 import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
@@ -20,8 +19,11 @@ import org.matsim.core.config.Config;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.visum.VisumNetwork;
 import org.matsim.visum.VisumNetwork.EdgeType;
 import org.matsim.visum.VisumNetworkReader;
@@ -60,7 +62,7 @@ public class DataPrepare {
 	private VisumNetwork visumNetwork;
 
 	public DataPrepare() {
-		this.scenario = new ScenarioImpl();
+		this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		this.config = this.scenario.getConfig();
 	}
 

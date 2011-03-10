@@ -20,12 +20,14 @@
 package playground.johannes.socialnetworks.graph.social.io;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.johannes.socialnetworks.graph.social.SocialPerson;
@@ -42,7 +44,7 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 public class Population2SocialGraph {
 
 	public SocialSparseGraph read(String filename, CoordinateReferenceSystem crs) {
-		Scenario scenario = new ScenarioImpl();
+		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		MatsimPopulationReader popReader = new MatsimPopulationReader(scenario);
 		popReader.readFile(filename);
 		Population populatio = scenario.getPopulation();

@@ -21,9 +21,11 @@
 package playground.anhorni.locationchoice.preprocess.facilities.facilitiescreation.fromBZ;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 /**
  * Generates the facilities file for all of Switzerland from the Swiss
@@ -83,7 +85,7 @@ public class FacilitiesProductionKTI {
 		
 		log.info("Adding and running facilities algorithms...");
 		new FacilitiesAllActivitiesFTE(ktiYear).run(facilities);
-		AddOpentimes addOpentimes = new AddOpentimes(new ScenarioImpl());
+		AddOpentimes addOpentimes = new AddOpentimes(((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())));
 		addOpentimes.init();
 		addOpentimes.run(facilities);
 //		new FacilitiesRandomizeHectareCoordinates().run(facilities);

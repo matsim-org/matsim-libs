@@ -27,12 +27,14 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -89,7 +91,7 @@ public class NetworkRouteDistanceCalculatorTest {
 		protected final NetworkRouteDistanceCalculator distCalc;
 
 		protected Fixture() {
-			this.scenario = new ScenarioImpl();
+			this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 			this.network = this.scenario.getNetwork();
 			this.distCalc = new NetworkRouteDistanceCalculator(this.network);
 			NetworkFactory nf = this.network.getFactory();

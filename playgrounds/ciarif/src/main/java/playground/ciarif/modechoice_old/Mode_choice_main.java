@@ -22,7 +22,6 @@ package playground.ciarif.modechoice_old;
 
 import java.io.IOException;
 
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
@@ -31,6 +30,8 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.NetworkCalcTopoType;
 import org.matsim.core.network.algorithms.NetworkSummary;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.knowledges.KnowledgesImpl;
@@ -51,7 +52,7 @@ public class Mode_choice_main {
 
 		System.out.println("TEST RUN 01:");
 
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		World world = null;
 		final ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
 		System.out.println("  reading world xml file... ");

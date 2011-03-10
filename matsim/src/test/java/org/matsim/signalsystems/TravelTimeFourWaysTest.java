@@ -24,15 +24,17 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.SignalSystemsConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.algorithms.EventWriterXML;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.CRCChecksum;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.signalsystems.builder.FromDataBuilder;
 import org.matsim.signalsystems.data.SignalsData;
@@ -54,7 +56,7 @@ public class TravelTimeFourWaysTest {
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
 	
 	private Scenario createTestScenario(){
-		Scenario scenario = new ScenarioImpl();
+		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Config conf = scenario.getConfig();
 		conf.network().setInputFile(this.testUtils.getClassInputDirectory() + "network.xml.gz");
 		String laneDefinitions = this.testUtils.getClassInputDirectory()

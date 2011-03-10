@@ -40,7 +40,7 @@ public class DenverStarter {
 	public static void main(String[] args) {
 		String configFile = DgPaths.STUDIESDG + "denver/dgConfig.xml";
 		
-		ScenarioLoaderImpl scl = new ScenarioLoaderImpl(configFile);
+		ScenarioLoaderImpl scl = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(configFile);
 		Scenario sc = scl.loadScenario();
 		EventsManagerImpl e = new EventsManagerImpl();
 		QSim otfVisQSim = new QSim(sc, e);

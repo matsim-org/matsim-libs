@@ -26,7 +26,6 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
@@ -42,6 +41,8 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.charts.BarChart;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.core.utils.misc.Time;
@@ -82,14 +83,9 @@ public class EventModeActivityDurationAnalyser {
 
 	public EventModeActivityDurationAnalyser() {
 
-		try {
-			this.config = ConfigUtils.loadConfig(CONFIGFILE);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-//		config = Gbl.createConfig(null);
+		this.config = ConfigUtils.loadConfig(CONFIGFILE);
 
-		ScenarioImpl scenario = new ScenarioImpl(config);
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 
 		NetworkImpl net = scenario.getNetwork();
 		MatsimNetworkReader reader = new MatsimNetworkReader(scenario);

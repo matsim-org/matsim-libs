@@ -31,7 +31,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
@@ -41,6 +40,9 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.population.PopulationReaderMatsimV4;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.population.algorithms.XY2Links;
 import org.xml.sax.SAXException;
 
@@ -86,7 +88,7 @@ public class SampleFromCommercialPlans {
 			throw new IllegalArgumentException("Incorrect number of arguments.");
 		}
 		
-		Scenario sNew = new ScenarioImpl();
+		Scenario sNew = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		PopulationFactory pf = sNew.getPopulation().getFactory();
 		// Network.
 		NetworkReaderMatsimV1 nr = new NetworkReaderMatsimV1(sNew);
@@ -107,7 +109,7 @@ public class SampleFromCommercialPlans {
 		List<Scenario> listSc = new ArrayList<Scenario>(10);
 		for(int i = 1; i <= 10; i++){
 			String filename = root + "plansGauteng5000_Sample" + i + ".xml";
-			Scenario s = new ScenarioImpl();
+			Scenario s = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 			PopulationReaderMatsimV4 pr = new PopulationReaderMatsimV4(s);
 			try {
 				pr.parse(filename);
@@ -164,7 +166,7 @@ public class SampleFromCommercialPlans {
 		
 		if(carFile != null){
 			log.info("Combining car and commercial vehicles.");
-			Scenario car = new ScenarioImpl();
+			Scenario car = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 			PopulationReaderMatsimV4 pr = new PopulationReaderMatsimV4(car);
 			try {
 				pr.parse(carFile);

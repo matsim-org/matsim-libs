@@ -31,13 +31,15 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
 import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 import playground.christoph.knowledge.container.dbtools.DBConnectionTool;
 import playground.christoph.knowledge.nodeselection.DijkstraForSelectNodes;
@@ -88,7 +90,7 @@ public class CreateDijkstraSpanningTrees {
 		new DatabaseConfig().createTable("forwardTable");
 		new DatabaseConfig().createTable("backwardTable");
 		
-		Scenario scenario = new ScenarioImpl();
+		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario).readFile("mysimulations/switzerland/input/network.xml");
 				
 		log.info("Loading Network ... done");

@@ -1,11 +1,11 @@
 package playground.mmoyo.utils;
 
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.api.experimental.ScenarioLoader;
-import org.matsim.core.api.experimental.ScenarioLoaderFactoryImpl;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioLoader;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.population.algorithms.PlansFilterByLegMode;
 
 
@@ -29,7 +29,7 @@ public class CarPlansRemover {
 
 		CarPlansRemover carPlansRemover = new CarPlansRemover();
 		for (byte i=0; i<configs.length; i++ ){
-			ScenarioLoader sl = new ScenarioLoaderFactoryImpl().createScenarioLoader(configs[i]);
+			ScenarioLoaderImpl sl = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(configs[i]);
 			ScenarioImpl scenario = (ScenarioImpl) sl.loadScenario();
 			
 			scenario.setPopulation(new PlanFragmenter().run(scenario.getPopulation()));

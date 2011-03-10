@@ -27,7 +27,6 @@ import java.util.TreeMap;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -48,6 +47,9 @@ import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.PopulationWriterHandlerImplV4;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.core.utils.misc.ExeRunner;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PersonCalcTimes;
@@ -102,7 +104,7 @@ public class ExternalModule implements PlanStrategyModule {
 	@Override
 	public void prepareReplanning() {
 		String filename = this.outFileRoot + this.moduleId + ExternalInFileName;
-		PopulationImpl pop = (PopulationImpl) new ScenarioImpl().getPopulation();
+		PopulationImpl pop = (PopulationImpl) ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
 		pop.setIsStreaming(true);
 		this.plansWriter = new PopulationWriter(pop, scenario.getNetwork());
 
@@ -201,7 +203,7 @@ public class ExternalModule implements PlanStrategyModule {
 	}
 
 	private void reReadPlans() {
-		Population plans = new ScenarioImpl().getPopulation();
+		Population plans = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
 		PopulationReader plansReader = getPlansReader(plans);
 		plansReader.readFile(this.outFileRoot + this.moduleId + ExternalOutFileName);
 		new PersonCalcTimes().run(plans);

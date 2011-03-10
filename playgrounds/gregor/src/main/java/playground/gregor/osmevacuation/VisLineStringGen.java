@@ -19,8 +19,10 @@
  * *********************************************************************** */
 package playground.gregor.osmevacuation;
 
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 public class VisLineStringGen {
 	
@@ -37,7 +39,7 @@ public class VisLineStringGen {
 	}
 
 	private void run() {
-		ScenarioImpl sc = new ScenarioImpl();
+		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(sc).readFile(this.network);
 		buildLsQuad();
 		

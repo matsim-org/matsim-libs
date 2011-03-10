@@ -31,7 +31,6 @@ import org.apache.log4j.Logger;
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Population;
@@ -42,7 +41,10 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 import playground.fabrice.primloc.CumulativeDistribution;
 import playground.jjoubert.CommercialTraffic.Chain;
@@ -121,7 +123,7 @@ public class MyCommercialDemandGeneratorOld {
 
 		for(int sampleNumber = 1; sampleNumber <= numberOfSamples; sampleNumber++){
 			// Initiate the population builder
-			ScenarioImpl sc = new ScenarioImpl();
+			ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 			Population population = sc.getPopulation();
 			PopulationFactory pb = population.getFactory();
 

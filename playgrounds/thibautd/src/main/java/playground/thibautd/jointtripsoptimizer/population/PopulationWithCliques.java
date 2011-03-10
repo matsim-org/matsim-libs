@@ -28,9 +28,9 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 
-import org.matsim.api.core.v01.ScenarioImpl;
 
 import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.scenario.ScenarioImpl;
 
 /**
  * @author thibautd

@@ -1,11 +1,13 @@
 package playground.mmoyo.utils;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 /**chops up a population file in a given number of smaller files*/
 public class PopSplitter {
@@ -18,7 +20,7 @@ public class PopSplitter {
 		Population inputPop = sc.getPopulation();
 		
 		int i=1;
-		ScenarioImpl tempScenario =new ScenarioImpl();
+		ScenarioImpl tempScenario =(ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		PopulationImpl newPopulation = new PopulationImpl(tempScenario);
 		int size = inputPop.getPersons().size();
 		for (Person person : inputPop.getPersons().values()) {
@@ -32,7 +34,7 @@ public class PopSplitter {
 				
 				log.info(writting + i);
 				
-				tempScenario =new ScenarioImpl();
+				tempScenario =(ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 				newPopulation = new PopulationImpl(tempScenario);
 			}
 			i++;

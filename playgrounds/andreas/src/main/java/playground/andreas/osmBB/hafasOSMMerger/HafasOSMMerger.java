@@ -9,9 +9,11 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.pt.transitSchedule.TransitScheduleImpl;
 import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -134,7 +136,7 @@ public class HafasOSMMerger {
 
 	private void importHafasSchedule() {
 
-		this.hafasScenario = new ScenarioImpl();
+		this.hafasScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		this.hafasConfig = this.hafasScenario.getConfig();
 		this.hafasConfig.scenario().setUseTransit(true);
 		this.hafasConfig.scenario().setUseVehicles(true);
@@ -142,7 +144,7 @@ public class HafasOSMMerger {
 		ScenarioLoaderImpl hafasLoader = new ScenarioLoaderImpl(this.hafasScenario);
 		hafasLoader.loadScenario();
 
-		this.osmScenario = new ScenarioImpl();
+		this.osmScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		this.osmConfig = this.osmScenario.getConfig();
 		this.osmConfig.scenario().setUseTransit(true);
 		this.osmConfig.scenario().setUseVehicles(true);

@@ -24,13 +24,15 @@
 package playground.tnicolai.urbansim.utils;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 import playground.tnicolai.urbansim.com.matsim.config.ConfigType;
 import playground.tnicolai.urbansim.com.matsim.config.Matsim4UrbansimType;
@@ -202,7 +204,7 @@ public class MATSimConfigObject {
 	 */
 	private static void createAndInitializeConfigObject(){
 		
-		scenario = new ScenarioImpl();
+		scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		config = scenario.getConfig();
 
 		NetworkConfigGroup networkCG = (NetworkConfigGroup) config.getModule(NetworkConfigGroup.GROUP_NAME);

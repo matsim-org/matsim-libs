@@ -24,14 +24,16 @@ import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
 import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandler;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 public class EventsWait2LinkTest {
 	public static class EventsWait2Link implements AgentWait2LinkEventHandler {
@@ -84,7 +86,7 @@ public class EventsWait2LinkTest {
 		final String eventsFilename = "../runs/run266/100.events.txt.gz";
 		final String outputFilename = "../runs/run266/Wait2Link.events.txt.gz";
 
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario).readFile(netFilename);
 
 		EventsManagerImpl events = new EventsManagerImpl();

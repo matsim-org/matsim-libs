@@ -19,12 +19,12 @@
 
 package playground.anhorni.LEGO.miniscenario.create;
 
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.scenario.ScenarioImpl;
 
 import playground.anhorni.LEGO.miniscenario.ConfigReader;
 import playground.anhorni.random.RandomFromVarDistr;

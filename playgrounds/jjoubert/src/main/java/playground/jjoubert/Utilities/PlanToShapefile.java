@@ -25,10 +25,12 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.utils.gis.matsim2esri.plans.SelectedPlans2ESRIShape;
 import org.xml.sax.SAXException;
 
@@ -50,7 +52,7 @@ public class PlanToShapefile {
 		} else{
 			throw new IllegalArgumentException("Need four arguments.");
 		}
-		Scenario s = new ScenarioImpl();
+		Scenario s = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		MatsimNetworkReader nr = new MatsimNetworkReader(s);
 		MatsimPopulationReader pr = new MatsimPopulationReader(s);
 		try {

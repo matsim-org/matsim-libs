@@ -37,6 +37,9 @@ import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -54,7 +57,7 @@ public class DemandGenerationTest extends MatsimTestCase {
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
-		this.sc = new ScenarioImpl();
+		this.sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		for (int i = 1; i <= 6; i++){
 			ids.add(sc.createId(Integer.toString(i)));
 		}
@@ -147,7 +150,7 @@ public class DemandGenerationTest extends MatsimTestCase {
 
 
 		//read population again, now the code gets really ugly, dirty and worth to refactor...
-		Scenario scenario = new ScenarioImpl();
+		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Population population  = scenario.getPopulation();
 		Network network =scenario.getNetwork();
 		//this is really ugly...

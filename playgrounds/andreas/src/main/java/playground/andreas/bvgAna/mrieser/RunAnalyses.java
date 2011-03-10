@@ -40,7 +40,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
@@ -61,8 +60,11 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.population.algorithms.PersonFilterSelectedPlan;
@@ -93,7 +95,7 @@ public class RunAnalyses {
 	private final static String transitScheduleFilename = "/Volumes/Data/projects/bvg2010/runs/2010-11-21-run01/transitSchedule.oevnet.xml.gz";
 	private final static String transitVehiclesFilename = "/Volumes/Data/projects/bvg2010/runs/2010-11-21-run01/transitVehicles_bvg_2005.xml.gz";
 
-	private final Scenario scenario = new ScenarioImpl();
+	private final Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 	public void readNetwork() {
 		new MatsimNetworkReader(this.scenario).readFile(networkFilename);
@@ -105,7 +107,7 @@ public class RunAnalyses {
 	}
 
 	public void extractSelectedPlansOnly() {
-		Scenario s = new ScenarioImpl();
+		Scenario s = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(s).readFile(networkFilename);
 		PopulationImpl pop = (PopulationImpl) s.getPopulation();
 		pop.setIsStreaming(true);

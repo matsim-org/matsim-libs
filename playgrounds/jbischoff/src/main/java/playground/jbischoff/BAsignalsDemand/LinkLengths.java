@@ -22,7 +22,6 @@ package playground.jbischoff.BAsignalsDemand;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -33,7 +32,6 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.lanes.Lane;
@@ -63,7 +61,7 @@ public class LinkLengths {
 		List<Id> fl = new ArrayList<Id>();
 		fr = new FileReader(new File (filename));
 		br = new BufferedReader(fr);
-		ScenarioLoader loader = new ScenarioLoaderImpl(config);
+		ScenarioLoaderImpl loader = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(config);
 		Scenario scenario = loader.loadScenario();
 		
 		String line = null;

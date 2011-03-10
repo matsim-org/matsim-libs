@@ -4,7 +4,6 @@
 package playground.yu.utils.qgis;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
@@ -13,6 +12,9 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 import playground.yu.analysis.PlanModeJudger;
 import playground.yu.utils.io.SimpleWriter;
@@ -98,7 +100,7 @@ public class ModeWithNewAttributeTextLayer4QGIS extends ModeTextLayer4QGIS {
 		final String plansFilename = "../matsimTests/timeAllocationMutatorTest/it.100/100.plans.xml.gz";
 		final String textFilename = "../matsimTests/timeAllocationMutatorTest/it.100/mode_1.endTime.txt";
 
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario).readFile(netFilename);
 
 		Population population = scenario.getPopulation();

@@ -23,10 +23,10 @@ import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.xml.sax.SAXException;
@@ -57,7 +57,7 @@ public class Sim2DOTFSnapshotGenerator {
 
 	public Sim2DOTFSnapshotGenerator() {
 
-		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(RUNS_SVN + "/output_config.xml.gz");
+		ScenarioLoaderImpl sl = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(RUNS_SVN + "/output_config.xml.gz");
 
 		this.scenario = sl.getScenario();
 		this.scenario.getConfig().network().setInputFile(RUNS_SVN + "/output_network.xml.gz");

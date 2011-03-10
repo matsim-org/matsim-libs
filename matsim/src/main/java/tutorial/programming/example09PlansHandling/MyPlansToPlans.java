@@ -23,8 +23,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.api.experimental.ScenarioLoader;
-import org.matsim.core.api.experimental.ScenarioLoaderFactoryImpl;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.population.algorithms.PlansFilterByLegMode;
 import org.matsim.population.algorithms.PlansFilterByLegMode.FilterType;
 
@@ -34,8 +33,7 @@ import org.matsim.population.algorithms.PlansFilterByLegMode.FilterType;
 public class MyPlansToPlans {
 
 	public void run(final String[] args) {
-		ScenarioLoader sl = (new ScenarioLoaderFactoryImpl()).createScenarioLoader(
-				"examples/tutorial/multipleIterations.xml") ;
+		ScenarioLoaderImpl sl = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed("examples/tutorial/multipleIterations.xml") ;
 		Scenario sc = sl.loadScenario() ;
 		Population pop = sc.getPopulation();
 

@@ -26,11 +26,8 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -38,6 +35,7 @@ import org.matsim.core.network.NetworkChangeEventsParser;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.TimeVariantLinkFactory;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.households.HouseholdsReaderV10;
 import org.matsim.lanes.LaneDefinitions;
 import org.matsim.lanes.LaneDefinitionsV11ToV20Conversion;
@@ -57,52 +55,74 @@ import org.xml.sax.SAXException;
  * of the scenario assuming that required parts are already
  * loaded or created by the user.
  *
- * @see org.matsim.api.core.v01.ScenarioImpl
+ * @see org.matsim.core.scenario.ScenarioImpl
  *
  * @author dgrether
  */
-public class ScenarioLoaderImpl implements ScenarioLoader {
+public class ScenarioLoaderImpl {
 
 	private static final Logger log = Logger.getLogger(ScenarioLoaderImpl.class);
 
+	
+	static Scenario loadScenario(Config config) {
+		ScenarioLoaderImpl scenarioLoader = new ScenarioLoaderImpl(config);
+		Scenario scenario = scenarioLoader.loadScenario();
+		return scenario;
+	}
+
+	static void loadScenario(Scenario scenario) {
+		ScenarioLoaderImpl scenarioLoader = new ScenarioLoaderImpl(scenario);
+		scenarioLoader.loadScenario();
+	}
+
+	/**
+	 * @deprecated  This used to be a constructor with a global side effect, which is absolutely evil.
+	 *				Please just load the Scenario with ScenarioUtils.loadScenario instead.
+	 */
+	@Deprecated
+	public static ScenarioLoaderImpl createScenarioLoaderImplAndResetRandomSeed(String configFilename) {
+		Config config = ConfigUtils.loadConfig(configFilename);
+		MatsimRandom.reset(config.global().getRandomSeed());
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		return new ScenarioLoaderImpl(scenario);
+	}
+
 	private final Config config;
 
-	private final Scenario scenario;
+	private final ScenarioImpl scenario;
 
 	public ScenarioLoaderImpl(Config config) {
 		this.config = config;
-		this.scenario = new ScenarioImpl(this.config);
+		this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(this.config);
 	}
 
 	public ScenarioLoaderImpl(Scenario scenario) {
-		this.scenario = scenario;
+		this.scenario = (ScenarioImpl) scenario;
 		this.config = this.scenario.getConfig();
 	}
 
-	public ScenarioLoaderImpl(String configFilename) {
-		this.scenario = new ScenarioImpl();
-		this.config = this.scenario.getConfig();
-		MatsimConfigReader reader = new MatsimConfigReader(this.config);
-		reader.readFile(configFilename);
-		MatsimRandom.reset(config.global().getRandomSeed());
-	}
-
-	@Override
+	
+	/**
+	 * @deprecated  Please use the static calls in ScenarioUtils instead.
+	 * 
+	 */
+	@Deprecated
 	public ScenarioImpl getScenario() {
-		return (ScenarioImpl)this.scenario;
+		return this.scenario;
 	}
 
 	/**
 	 * Loads all mandatory Scenario elements and
 	 * if activated in config's scenario module/group
 	 * optional elements.
+	 * @deprecated  Please use the static calls in ScenarioUtils instead.
 	 * @return the Scenario
 	 */
-	@Override
+	@Deprecated
 	public Scenario loadScenario() {
-	  String currentDir = new File("tmp").getAbsolutePath();
-	  currentDir = currentDir.substring(0, currentDir.length() - 3);
-	  log.info("loading scenario from base directory: " + currentDir);
+		String currentDir = new File("tmp").getAbsolutePath();
+		currentDir = currentDir.substring(0, currentDir.length() - 3);
+		log.info("loading scenario from base directory: " + currentDir);
 		this.loadNetwork();
 		this.loadActivityFacilities();
 		this.loadPopulation();
@@ -124,13 +144,14 @@ public class ScenarioLoaderImpl implements ScenarioLoader {
 		return getScenario();
 	}
 
-	private void loadSignalSystems() {
-		this.scenario.addScenarioElement(new SignalsScenarioLoader(this.config.signalSystems()).loadSignalsData());
-	}
-
 	/**
 	 * Loads the network into the scenario of this class
+	 * 
+	 * @deprecated  Please use the static calls in ScenarioUtils to load a scenario.
+	 * 				If you want only a network, use the MatsimNetworkReader directly.
+	 * 
 	 */
+	@Deprecated
 	public void loadNetwork() {
 		String networkFileName = null;
 		if ((this.config.network() != null) && (this.config.network().getInputFile() != null)) {
@@ -170,65 +191,12 @@ public class ScenarioLoaderImpl implements ScenarioLoader {
 		}
 	}
 
-
-	private void loadTransit() {
-		try {
-			new TransitScheduleReader(this.scenario).readFile(this.config.transit().getTransitScheduleFile());
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		} catch (SAXException e) {
-			throw new RuntimeException(e);
-		} catch (ParserConfigurationException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	private void loadVehicles() {
-		new VehicleReaderV1(this.getScenario().getVehicles()).readFile(this.config.transit().getVehiclesFile());
-	}
-
-
-	private void loadHouseholds() {
-			if ((this.getScenario().getHouseholds() != null) && (this.config.households() != null) && (this.config.households().getInputFile() != null) ) {
-				String hhFileName = this.config.households().getInputFile();
-				log.info("loading households from " + hhFileName);
-				try {
-					new HouseholdsReaderV10(this.getScenario().getHouseholds()).parse(hhFileName);
-				} catch (SAXException e) {
-					throw new RuntimeException(e);
-				} catch (ParserConfigurationException e) {
-					throw new RuntimeException(e);
-				} catch (IOException e) {
-					throw new RuntimeException(e);
-				}
-				log.info("households loaded.");
-			}
-			else {
-				log.info("no households file set in config or feature disabled, not able to load anything");
-			}
-	}
-
-	private void loadLanes() {
-			LaneDefinitions laneDefinitions;
-			if ((this.getScenario().getLaneDefinitions() != null)
-					&& (this.config.network().getLaneDefinitionsFile() != null)) {
-				laneDefinitions = this.getScenario().getLaneDefinitions();
-				MatsimLaneDefinitionsReader reader = new MatsimLaneDefinitionsReader(laneDefinitions);
-				reader.readFile(this.config.network().getLaneDefinitionsFile());
-				this.getScenario().addScenarioElement(laneDefinitions);
-				if (!MatsimLaneDefinitionsReader.SCHEMALOCATIONV20.equals(reader.getLastReadFileFormat())){
-					log.warn("No laneDefinitions_v2.0 file specified in scenario. Trying to convert the v1.1 format to " +
-							"the v2.0 format. For details see LaneDefinitionsV11ToV20Conversion.java.");
-					LaneDefinitionsV11ToV20Conversion conversion = new LaneDefinitionsV11ToV20Conversion();
-					laneDefinitions = conversion.convertTo20(laneDefinitions, scenario.getNetwork());
-					this.getScenario().setLaneDefinitions(laneDefinitions);
-				}
-			}
-			else {
-				log.info("no lane definition file set in config or feature disabled, not able to load anything");
-			}
-	}
-
+	/**
+	 * @deprecated  Please use the static calls in ScenarioUtils to load a scenario.
+	 * 				If you want only Facilities, use the MatsimFacilitiesReader directly.
+	 * 
+	 */
+	@Deprecated
 	public void loadActivityFacilities() {
 		if ((this.config.facilities() != null) && (this.config.facilities().getInputFile() != null)) {
 			String facilitiesFileName = this.config.facilities().getInputFile();
@@ -244,6 +212,12 @@ public class ScenarioLoaderImpl implements ScenarioLoader {
 		}
 	}
 
+	/**
+	 * @deprecated  Please use the static calls in ScenarioUtils to load a scenario.
+	 * 				If you want only a Population, use the MatsimPopulationReader directly.
+	 * 
+	 */
+	@Deprecated
 	public void loadPopulation() {
 		// make sure that world, facilities and network are loaded as well
 		if ((this.config.plans() != null) && (this.config.plans().getInputFile() != null)) {
@@ -262,6 +236,67 @@ public class ScenarioLoaderImpl implements ScenarioLoader {
 		else {
 			log.info("no population file set in config, not able to load population");
 		}
+	}
+
+	private void loadHouseholds() {
+		if ((this.getScenario().getHouseholds() != null) && (this.config.households() != null) && (this.config.households().getInputFile() != null) ) {
+			String hhFileName = this.config.households().getInputFile();
+			log.info("loading households from " + hhFileName);
+			try {
+				new HouseholdsReaderV10(this.getScenario().getHouseholds()).parse(hhFileName);
+			} catch (SAXException e) {
+				throw new RuntimeException(e);
+			} catch (ParserConfigurationException e) {
+				throw new RuntimeException(e);
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+			log.info("households loaded.");
+		}
+		else {
+			log.info("no households file set in config or feature disabled, not able to load anything");
+		}
+	}
+
+	private void loadTransit() {
+		try {
+			new TransitScheduleReader(this.scenario).readFile(this.config.transit().getTransitScheduleFile());
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		} catch (SAXException e) {
+			throw new RuntimeException(e);
+		} catch (ParserConfigurationException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	private void loadVehicles() {
+		new VehicleReaderV1(this.getScenario().getVehicles()).readFile(this.config.transit().getVehiclesFile());
+	}
+
+	private void loadLanes() {
+		LaneDefinitions laneDefinitions;
+		if ((this.getScenario().getLaneDefinitions() != null)
+				&& (this.config.network().getLaneDefinitionsFile() != null)) {
+			laneDefinitions = this.getScenario().getLaneDefinitions();
+			MatsimLaneDefinitionsReader reader = new MatsimLaneDefinitionsReader(laneDefinitions);
+			reader.readFile(this.config.network().getLaneDefinitionsFile());
+			this.getScenario().addScenarioElement(laneDefinitions);
+			if (!MatsimLaneDefinitionsReader.SCHEMALOCATIONV20.equals(reader.getLastReadFileFormat())){
+				log.warn("No laneDefinitions_v2.0 file specified in scenario. Trying to convert the v1.1 format to " +
+				"the v2.0 format. For details see LaneDefinitionsV11ToV20Conversion.java.");
+				LaneDefinitionsV11ToV20Conversion conversion = new LaneDefinitionsV11ToV20Conversion();
+				laneDefinitions = conversion.convertTo20(laneDefinitions, scenario.getNetwork());
+				this.getScenario().setLaneDefinitions(laneDefinitions);
+			}
+		}
+		else {
+			log.info("no lane definition file set in config or feature disabled, not able to load anything");
+		}
+	}
+
+	private void loadSignalSystems() {
+		this.scenario.addScenarioElement(new SignalsScenarioLoader(this.config.signalSystems()).loadSignalsData());
 	}
 
 }

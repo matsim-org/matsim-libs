@@ -35,7 +35,6 @@ import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
@@ -49,9 +48,12 @@ import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelMinCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculator;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.core.utils.misc.Counter;
 
 import playground.christoph.netherlands.zones.SpecialZones;
@@ -95,26 +97,26 @@ public class CalculateTravelTimes {
 		CalculateTravelTimes calculateTravelTimes = null;
 		
 		// empty network
-		calculateTravelTimes = new CalculateTravelTimes(new ScenarioImpl());
+		calculateTravelTimes = new CalculateTravelTimes(((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())));
 		calculateTravelTimes.outFile = outFileEmpty;
 		calculateTravelTimes.calculateTravelTimes();
 		
 		// morning peak
-		calculateTravelTimes = new CalculateTravelTimes(new ScenarioImpl());
+		calculateTravelTimes = new CalculateTravelTimes(((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())));
 		calculateTravelTimes.outFile = outFileMorning;
 		calculateTravelTimes.startTime = morningPeak - meanTripTravelTime / 2;
 		calculateTravelTimes.useFreeSpeedTravelTime = false;
 		calculateTravelTimes.calculateTravelTimes();
 
 		// midday peak
-		calculateTravelTimes = new CalculateTravelTimes(new ScenarioImpl());
+		calculateTravelTimes = new CalculateTravelTimes(((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())));
 		calculateTravelTimes.outFile = outFileMidday;
 		calculateTravelTimes.startTime = midDay - meanTripTravelTime / 2;
 		calculateTravelTimes.useFreeSpeedTravelTime = false;
 		calculateTravelTimes.calculateTravelTimes();
 
 		// evening peak
-		calculateTravelTimes = new CalculateTravelTimes(new ScenarioImpl());
+		calculateTravelTimes = new CalculateTravelTimes(((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())));
 		calculateTravelTimes.outFile = outFileEvening;
 		calculateTravelTimes.startTime = eveningPeak - meanTripTravelTime / 2;
 		calculateTravelTimes.useFreeSpeedTravelTime = false;

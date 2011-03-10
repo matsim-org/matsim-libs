@@ -19,13 +19,13 @@
  * *********************************************************************** */
 package playground.dgrether.signalsystems.roedergershenson;
 
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.signalsystems.builder.DefaultSignalModelFactory;
 import org.matsim.signalsystems.builder.FromDataBuilder;
 import org.matsim.signalsystems.controler.SignalsControllerListener;

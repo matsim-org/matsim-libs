@@ -25,13 +25,15 @@ import java.util.Collections;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -87,7 +89,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 	private final TransitStopFacility[] stopFacilities = new TransitStopFacility[24];
 
 	public Fixture() {
-		this.scenario = new ScenarioImpl();
+		this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		this.config = this.scenario.getConfig();
 		this.config.scenario().setUseTransit(true);
 		this.network = this.scenario.getNetwork();

@@ -28,7 +28,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
@@ -39,6 +38,9 @@ import org.matsim.core.mobsim.queuesim.QueueSimulationFactory;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 /**
  * counts Agents in network for every timeBin
@@ -110,7 +112,7 @@ public class TraVolCnter implements LinkEnterEventHandler,
 		final String netFilename = "./equil/equil_net.xml";
 		final String plansFilename = "./equil/equil_plans.xml";
 
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario).readFile(netFilename);
 
 		PopulationReader plansReader = new MatsimPopulationReader(scenario);

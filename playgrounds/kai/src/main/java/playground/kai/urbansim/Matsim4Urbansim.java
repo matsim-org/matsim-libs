@@ -1,7 +1,6 @@
 package playground.kai.urbansim;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
@@ -10,7 +9,10 @@ import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 /**
  * Class that is meant to interface with urbansim.  As of nov08, only working for the urbansim "parcel"
@@ -64,7 +66,7 @@ public class Matsim4Urbansim {
 		}
 
 		// parse the config arguments so we have a config.  generate scenario data from this
-		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(args[0]);
+		ScenarioLoaderImpl loader = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(args[0]);
 		Config config = loader.getScenario().getConfig();
 		loader.loadScenario();
 		ScenarioImpl scenarioData = loader.getScenario();
@@ -103,7 +105,7 @@ public class Matsim4Urbansim {
 			oldPop=null ;
 		}
 
-		Population newPop = new ScenarioImpl().getPopulation();
+		Population newPop = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
 		// read urbansim persons.  Generates hwh acts as side effect
 		readFromUrbansim.readPersons( oldPop, newPop, facilities, network, samplingRate ) ;
 		oldPop=null ;

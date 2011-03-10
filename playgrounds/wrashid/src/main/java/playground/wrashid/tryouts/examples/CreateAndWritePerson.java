@@ -3,11 +3,13 @@ package playground.wrashid.tryouts.examples;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 public class CreateAndWritePerson {
 
@@ -19,7 +21,7 @@ public class CreateAndWritePerson {
 	*/
 
 	public static void main(String[] args) {
-		Scenario sc=new ScenarioImpl();
+		Scenario sc=(ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 
 		createAndWritePerson();
@@ -29,7 +31,7 @@ public class CreateAndWritePerson {
 	 *
 	 */
 	public static void createAndWritePerson(){
-		Scenario sc=new ScenarioImpl();
+		Scenario sc=(ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Id nodeId1= sc.createId("nodeId1");
 		Id nodeId2= sc.createId("nodeId2");
 		Id linkId= sc.createId("linkId");
@@ -54,7 +56,7 @@ public class CreateAndWritePerson {
 	}
 
 	public static void missingAPIFunctions(){
-		Scenario sc=new ScenarioImpl();
+		Scenario sc=(ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		// reader for population is missing
 		// reader, writer for network are missing

@@ -41,11 +41,13 @@ import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.transformations.GeotoolsTransformation;
 import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -63,7 +65,7 @@ public class CountsCompareToSHP {
 	private static String networkFile = "../../matsim/mysimulations/telaviv/input/network.xml";
 	private static String shpFile = "../../matsim/mysimulations/telaviv/output_JDEQSim/ITERS/it.100/100.countscompare.shp";
 	
-	private Scenario scenario = new ScenarioImpl();
+	private Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 	private Map<String, List<Line>> counts;
 	
 	public static void main(String[] args) throws Exception {

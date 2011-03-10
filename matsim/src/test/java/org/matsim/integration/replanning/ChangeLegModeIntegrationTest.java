@@ -20,7 +20,6 @@
 
 package org.matsim.integration.replanning;
 
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
@@ -38,6 +37,8 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
 import org.matsim.core.router.util.DijkstraFactory;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -49,7 +50,7 @@ public class ChangeLegModeIntegrationTest extends MatsimTestCase {
 	public void testStrategyManagerConfigLoaderIntegration() {
 		// setup config
 		final Config config = loadConfig(null);
-		ScenarioImpl scenario = new ScenarioImpl(config);
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		final StrategySettings strategySettings = new StrategySettings(new IdImpl("1"));
 		strategySettings.setModuleName("ChangeLegMode");
 		strategySettings.setProbability(1.0);

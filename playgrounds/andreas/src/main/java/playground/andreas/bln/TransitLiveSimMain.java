@@ -4,14 +4,15 @@ import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.config.groups.MobsimConfigGroupI;
 import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.ReconstructingUmlaufBuilder;
 import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.ptproject.qsim.QSim;
@@ -33,7 +34,7 @@ public class TransitLiveSimMain {
 		new MatsimConfigReader(config).readFile(configFilename);
 		config.scenario().setUseTransit(true);
 		config.scenario().setUseVehicles(true);
-		ScenarioImpl scenario = new ScenarioImpl(config);
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		scenario = (ScenarioImpl) new ScenarioLoaderImpl(scenario).loadScenario();
 
         try {

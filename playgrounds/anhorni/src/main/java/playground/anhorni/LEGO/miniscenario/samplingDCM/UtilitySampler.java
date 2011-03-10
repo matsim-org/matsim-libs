@@ -22,7 +22,6 @@ package playground.anhorni.LEGO.miniscenario.samplingDCM;
 import java.util.Random;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
@@ -31,8 +30,11 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 import playground.anhorni.LEGO.miniscenario.ConfigReader;
 import playground.anhorni.LEGO.miniscenario.run.scoring.DestinationChoiceScoring;
@@ -41,7 +43,7 @@ import playground.anhorni.analysis.Bins;
 public class UtilitySampler {
 
 	private final static Logger log = Logger.getLogger(UtilitySampler.class);
-	private ScenarioImpl scenario = new ScenarioImpl();	
+	private ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());	
 	private ConfigReader configReader = new ConfigReader();
 	private Config config;
 	private Random rnd;
@@ -57,7 +59,7 @@ public class UtilitySampler {
 	private void init() {
 		configReader.read();	
 		
-		ScenarioImpl scenario = new ScenarioLoaderImpl(configReader.getPath() + "/config.xml").getScenario();
+		ScenarioImpl scenario = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(configReader.getPath() + "/config.xml").getScenario();
 		this.config = scenario.getConfig();
 		
 		this.rnd = new Random(4711);

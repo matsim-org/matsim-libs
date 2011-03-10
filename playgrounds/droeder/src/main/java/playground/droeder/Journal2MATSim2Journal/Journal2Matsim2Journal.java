@@ -40,7 +40,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -65,8 +64,11 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderXMLv1;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.run.Controler;
 import org.xml.sax.SAXException;
@@ -193,7 +195,7 @@ public class Journal2Matsim2Journal {
 	
 	private void generatePlans(){
 		log.info("generate plans");
-		Scenario sc = new ScenarioImpl();
+		Scenario sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		PopulationFactory fac = sc.getPopulation().getFactory();
 		Person personCar;
 		Person personPt;
@@ -308,7 +310,7 @@ public class Journal2Matsim2Journal {
 	}
 
 	private void createAndWriteConfig() {
-		Scenario s = new ScenarioImpl();
+		Scenario s = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Config c = s.getConfig();
 		
 		c.getModule(GlobalConfigGroup.GROUP_NAME).addParam("coordinateSystem", "Atlantis");

@@ -29,7 +29,6 @@ import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
@@ -44,7 +43,10 @@ import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.misc.ConfigUtils;
 /**
  *
  * @author Manuel Schneider
@@ -94,7 +96,7 @@ public class CMCFtoEvacConverter {
 
 	@SuppressWarnings("unchecked")
 	public static Population readCMCFDemands(String filename, NetworkImpl network, boolean coordinates) throws JDOMException, IOException{
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario.setNetwork(network);
 		Population result = scenario.getPopulation();
 		PopulationFactory pb = result.getFactory() ;

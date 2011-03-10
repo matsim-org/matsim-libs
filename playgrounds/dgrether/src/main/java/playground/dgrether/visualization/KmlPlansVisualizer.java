@@ -31,13 +31,14 @@ import net.opengis.kml._2.ObjectFactory;
 import net.opengis.kml._2.ScreenOverlayType;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.population.algorithms.PlanCollectFromAlgorithm;
@@ -76,7 +77,7 @@ public class KmlPlansVisualizer {
 		Config conf = new Config();
 		MatsimConfigReader reader = new MatsimConfigReader(conf);
 		reader.readFile(config);
-		scenario = new ScenarioImpl(conf);
+		scenario = (ScenarioImpl) ScenarioUtils.createScenario(conf);
 		new ScenarioLoaderImpl(conf).loadScenario();
 		this.linkTuples = linkTuples;
 	}

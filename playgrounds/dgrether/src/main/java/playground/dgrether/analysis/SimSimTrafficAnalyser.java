@@ -23,11 +23,13 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.analysis.CalcLinkStats;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.counts.ComparisonErrorStatsCalculator;
 import org.matsim.counts.CountSimComparison;
 import org.matsim.counts.CountSimComparisonImpl;
@@ -59,7 +61,7 @@ public class SimSimTrafficAnalyser {
 
 	private void loadData(String networkFile, String linkAttributes1, String linkAttributes2) {
 
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().addCoreModules();
 		scenario.getConfig().network().setInputFile(networkFile);
 		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(scenario);

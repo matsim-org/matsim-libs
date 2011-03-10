@@ -20,14 +20,16 @@
 package playground.anhorni.analysis.microcensus.planbased;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 import playground.anhorni.analysis.Bins;
 
@@ -67,7 +69,7 @@ public class AnalyzeMicrocensus {
 	}
 	
 	private void init(String mode, String plansFilePath) {
-		scenario = new ScenarioImpl();
+		scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		this.mode = mode;
 		this.distanceDistribution = new Bins(500.0, 40000.0, type + "_trips_mc_" + this.mode);
 		this.distanceDistributionHomeBased = new Bins(500.0, 40000.0, type +  "_trips_mc_home-based_" + this.mode);

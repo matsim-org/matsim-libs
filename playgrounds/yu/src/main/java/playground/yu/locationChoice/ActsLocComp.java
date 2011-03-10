@@ -30,7 +30,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -39,6 +38,9 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -118,7 +120,7 @@ public class ActsLocComp {
 		String popFileB = args[3];
 		String outputFile = args[4];
 		// senario A
-		ScenarioImpl scenarioA = new ScenarioImpl();
+		ScenarioImpl scenarioA = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		new MatsimNetworkReader(scenarioA).readFile(netFile);
 
@@ -131,7 +133,7 @@ public class ActsLocComp {
 		alrA.run(popA);
 
 		// scenario B
-		ScenarioImpl scenarioB = new ScenarioImpl();
+		ScenarioImpl scenarioB = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		scenarioB.setNetwork(scenarioA.getNetwork());
 

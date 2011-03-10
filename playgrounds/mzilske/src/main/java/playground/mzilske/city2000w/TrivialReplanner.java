@@ -12,8 +12,8 @@ import playground.mzilske.freight.CarrierPlan;
 import playground.mzilske.freight.Contract;
 import playground.mzilske.freight.ScheduledTour;
 import playground.mzilske.freight.Shipment;
-import playground.mzilske.freight.TourBuilder;
 import playground.mzilske.freight.Tour.TourElement;
+import playground.mzilske.freight.TourBuilder;
 
 public class TrivialReplanner {
 

@@ -57,7 +57,6 @@ import net.opengis.kml._2.TimeSpanType;
 
 import org.apache.commons.io.FileUtils;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -71,6 +70,8 @@ import org.matsim.core.facilities.OpeningTime.DayType;
 import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimResource;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
 import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03;
@@ -1449,7 +1450,7 @@ public class ShopsOf2005ToFacilities {
 
 	private static void shopsToTXT(Config config) {
 
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		ActivityFacilitiesImpl shopsOf2005 = scenario.getActivityFacilities();
 		shopsOf2005.setName("shopsOf2005");
 		ArrayList<String> txtLines = new ArrayList<String>();
@@ -1608,7 +1609,7 @@ public class ShopsOf2005ToFacilities {
 
 		ActivityFacilitiesImpl facilities = null;
 		for (int dataSetIndex : new int[]{SHOPS_OF_2005/*, SHOPS_FROM_ENTERPRISE_CENSUS*/}) {
-			ScenarioImpl scenario = new ScenarioImpl();
+			ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 			facilities = scenario.getActivityFacilities();
 			facilities.setName(shopsNames.get(Integer.valueOf(dataSetIndex)));
 
@@ -1713,7 +1714,7 @@ public class ShopsOf2005ToFacilities {
 
 	private static void applyOpentimesToEnterpriseCensus(Config config) {
 
-		ScenarioImpl scenario = new ScenarioImpl(config);
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		ActivityFacilitiesImpl facilities_input = scenario.getActivityFacilities();
 		facilities_input.setName("Switzerland based on Enterprise census 2000.");
 

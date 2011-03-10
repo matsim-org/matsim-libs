@@ -25,8 +25,8 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.internal.MatsimSomeReader;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser;
 import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
 import org.xml.sax.SAXException;

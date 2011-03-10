@@ -46,7 +46,7 @@ public class NewIdPlan extends NewPopulation {
 	}
 
 	public static void main(final String[] args) {
-		Scenario scenario = new ScenarioLoaderImpl(args[0]).loadScenario();
+		Scenario scenario = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(args[0]).loadScenario();
 
 		NewIdPlan nip = new NewIdPlan(scenario.getNetwork(), scenario.getPopulation(), null);//scenario.getConfig().plans().getOutputFile());
 		nip.run(scenario.getPopulation());

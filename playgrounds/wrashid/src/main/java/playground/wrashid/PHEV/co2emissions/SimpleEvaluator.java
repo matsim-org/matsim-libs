@@ -12,7 +12,7 @@ public class SimpleEvaluator {
 		args=new String[1];
 		args[0]="C:\\data\\SandboxCVS\\ivt\\studies\\triangle\\config\\config.xml";
 		
-		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(args[0]);
+		ScenarioLoaderImpl sl = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(args[0]);
 		sl.loadNetwork();
 		Network network = sl.getScenario().getNetwork();
 		

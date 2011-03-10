@@ -20,13 +20,14 @@
 package playground.kai.plansToPlans;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.api.experimental.ScenarioLoader;
-import org.matsim.core.api.experimental.ScenarioLoaderFactoryImpl;
 import org.matsim.core.config.Config;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 /**
  * @author kn after mrieser
@@ -63,9 +64,7 @@ public class MyPlansToPlans {
 //		plans.printPlansCount();
 //		plansWriter.closeStreaming();
 
-		ScenarioLoader sl = (new ScenarioLoaderFactoryImpl()).createScenarioLoader(
-//		"/Users/nagel/shared-svn/projects/detailedEval/teststrecke/sim/output/20090707/output_config.xml" ) ;
-				"otfvis-config.xml" ) ;
+		ScenarioLoaderImpl sl = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed("otfvis-config.xml") ;
 		Scenario sc = sl.loadScenario() ;
 		Population pop = sc.getPopulation();
 
@@ -84,7 +83,7 @@ public class MyPlansToPlans {
 
 		
 		
-		Scenario newScen = new ScenarioImpl() ;
+		Scenario newScen = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig()) ;
 		Population newPop = newScen.getPopulation() ;
 		for ( Person person : pop.getPersons().values() ) {
 			if ( Math.random() < 0.1 ) 

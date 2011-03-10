@@ -32,10 +32,12 @@ import javax.swing.JPanel;
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.xml.sax.SAXException;
 
 import playground.rost.controller.vismodule.VisModuleContainerImpl;
@@ -132,7 +134,7 @@ public class BlockGUI extends AbstractBasicMapGUIImpl {
 	public static BlockGUI createBlocksAndShowGUI()
 	{
 		// TODO Auto-generated method stub
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		NetworkImpl network = scenario.getNetwork();
 		NetworkReaderMatsimV1 nReader = new NetworkReaderMatsimV1(scenario);
 		try {

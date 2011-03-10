@@ -27,7 +27,6 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
@@ -46,6 +45,8 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -110,7 +111,7 @@ public class ChooseRandomLegModeForSubtourTest extends MatsimTestCase {
 
 	public void testSubTourMutationNetworkBased() {
 		Config config = loadConfig(CONFIGFILE);
-		Scenario scenario = new ScenarioImpl(config);
+		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
 		TripStructureAnalysisLayerOption tripStructureAnalysisLayer = PlanomatConfigGroup.TripStructureAnalysisLayerOption.link;
@@ -122,7 +123,7 @@ public class ChooseRandomLegModeForSubtourTest extends MatsimTestCase {
 
 	public void testSubTourMutationFacilitiesBased() {
 		Config config = loadConfig(CONFIGFILE);
-		ScenarioImpl scenario = new ScenarioImpl(config);
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
 		new MatsimFacilitiesReader(scenario).readFile(config.facilities().getInputFile());
 		TripStructureAnalysisLayerOption tripStructureAnalysisLayer = PlanomatConfigGroup.TripStructureAnalysisLayerOption.facility;
@@ -134,7 +135,7 @@ public class ChooseRandomLegModeForSubtourTest extends MatsimTestCase {
 
 	public void testCarDoesntTeleportFromHome() {
 		Config config = loadConfig(CONFIGFILE);
-		Scenario scenario = new ScenarioImpl(config);
+		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
 		config.planomat().setTripStructureAnalysisLayer(PlanomatConfigGroup.TripStructureAnalysisLayerOption.link);

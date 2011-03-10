@@ -20,7 +20,6 @@
 package playground.andreas.utils.pop;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -33,9 +32,12 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 /**
  * Change the coords of a given plan for every person, except the original one.
@@ -124,7 +126,7 @@ public class ShuffleCoords extends NewPopulation {
 	public static void main(final String[] args) {
 		Gbl.startMeasurement();
 
-		ScenarioImpl sc = new ScenarioImpl();
+		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		String networkFile = "./bb_cl.xml.gz";
 		String inPlansFile = "./plan_korridor_50x.xml.gz";

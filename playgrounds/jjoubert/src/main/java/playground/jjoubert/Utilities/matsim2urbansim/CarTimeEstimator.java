@@ -26,9 +26,11 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 import cern.colt.matrix.impl.DenseDoubleMatrix2D;
 
@@ -170,7 +172,7 @@ public class CarTimeEstimator {
 		r.readZones(Integer.parseInt(zoneIdField));
 		zones = r.getZoneList();
 		// 1b. Create new scenario.
-		Scenario s = new ScenarioImpl();
+		Scenario s = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		// 1c. Read the network.
 		MatsimNetworkReader nr = new MatsimNetworkReader(s);
 		nr.readFile(networkFilename);

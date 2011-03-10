@@ -29,7 +29,6 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -43,7 +42,10 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.utils.EventsCollector;
 import org.xml.sax.SAXException;
@@ -55,7 +57,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 
 	public final void testTravelTimeCalculator_Array_Optimistic() throws IOException {
 		String compareFile = getClassInputDirectory() + "link10_ttimes.txt";
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		int endTime = 30*3600;
 		int binSize = 15*60;
@@ -67,7 +69,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 
 	public final void testTravelTimeCalculator_HashMap_Optimistic() throws IOException {
 		String compareFile = getClassInputDirectory() + "link10_ttimes.txt";
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		int endTime = 30*3600;
 		int binSize = 15*60;
@@ -79,7 +81,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 
 	public final void testTravelTimeCalculator_HashMap_Pessimistic() throws IOException {
 		String compareFile = getClassInputDirectory() + "link10_ttimes_pessimistic.txt";
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		int endTime = 12*3600;
 		int binSize = 1*60;
@@ -163,7 +165,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 	 * @author mrieser
 	 */
 	public void testLongTravelTimeInEmptySlot() {
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		NetworkImpl network = scenario.getNetwork();
 		network.setCapacityPeriod(3600.0);
@@ -215,7 +217,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		String eventsFilename = getClassInputDirectory() + "link10_events.txt";
 		String networkFile = "test/scenarios/equil/network.xml";
 
-		Scenario scenario = new ScenarioImpl();
+		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Config config = scenario.getConfig();
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).parse(networkFile);

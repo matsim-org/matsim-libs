@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
@@ -18,7 +17,10 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.transformations.GK4toWGS84;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 import playground.andreas.utils.ana.acts2kml.KMLActsWriter;
 import playground.andreas.utils.pop.NewPopulation;
@@ -139,7 +141,7 @@ public class FilterPersonActs extends NewPopulation {
 			String kmzOutputDir, String kmzOutputFile){
 		Gbl.startMeasurement();
 
-		ScenarioImpl sc = new ScenarioImpl();
+		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		NetworkImpl net = sc.getNetwork();
 		new MatsimNetworkReader(sc).readFile(networkFile);

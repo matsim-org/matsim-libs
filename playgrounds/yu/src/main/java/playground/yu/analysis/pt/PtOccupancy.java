@@ -12,7 +12,6 @@ import java.util.Map.Entry;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
@@ -21,6 +20,9 @@ import org.matsim.core.events.PersonLeavesVehicleEvent;
 import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -218,7 +220,7 @@ public class PtOccupancy implements PersonEntersVehicleEventHandler,
 		String scheduleFilename = "../berlin-bvg09/pt/m2_schedule_delay/transitSchedule.xml";
 		String netFilename = "../berlin-bvg09/pt/m2_schedule_delay/net.xml";
 
-		ScenarioImpl s = new ScenarioImpl();
+		ScenarioImpl s = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		s.getConfig().scenario().setUseTransit(true);
 
 		new MatsimNetworkReader(s).readFile(netFilename);

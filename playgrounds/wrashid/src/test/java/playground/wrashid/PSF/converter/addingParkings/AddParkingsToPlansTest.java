@@ -1,12 +1,14 @@
 package playground.wrashid.PSF.converter.addingParkings;
 
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.testcases.MatsimTestCase;
 
 public class AddParkingsToPlansTest extends MatsimTestCase {
@@ -15,7 +17,7 @@ public class AddParkingsToPlansTest extends MatsimTestCase {
 		String basePathOfTestData=getPackageInputDirectory();
 		String networkFile = "test/scenarios/berlin/network.xml.gz";
 		
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario).readFile(networkFile);
 		new MatsimPopulationReader(scenario).readFile(basePathOfTestData + "plans5.xml");
 		

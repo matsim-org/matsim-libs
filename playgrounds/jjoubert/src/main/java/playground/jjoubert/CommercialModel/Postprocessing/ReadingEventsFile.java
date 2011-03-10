@@ -25,11 +25,13 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 import playground.jjoubert.CommercialModel.Listeners.MyCommercialActivityDensityWriter;
 
@@ -44,7 +46,7 @@ public class ReadingEventsFile {
 		try {
 			bw = new BufferedWriter(new FileWriter(new File( outputCommercialActivityDensityFilename )));
 			try{
-				ScenarioImpl scenario = new ScenarioImpl();
+				ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 				NetworkImpl nl = scenario.getNetwork();
 				MatsimNetworkReader nr = new MatsimNetworkReader(scenario);
 				nr.readFile(networkFilename);

@@ -6,13 +6,15 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 import playground.mmoyo.Validators.PlanValidator;
 
@@ -23,7 +25,7 @@ public class FirstPlansExtractor {
 	private boolean selectBuslines = false;  //select only plans with pt legs that have the mentioned transit routes.
 
 	public Population run(Population pop){
-		ScenarioImpl tempScenario =new ScenarioImpl();
+		ScenarioImpl tempScenario =(ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		PopulationImpl outputPopulation = new PopulationImpl(tempScenario);
 		
 		if(selectBuslines){
@@ -57,7 +59,7 @@ public class FirstPlansExtractor {
 			configFile= "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/calibration/100plans_bestValues_config.xml";
 		}
 		
-		ScenarioLoaderImpl scenarioLoader = new ScenarioLoaderImpl(configFile);
+		ScenarioLoaderImpl scenarioLoader = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(configFile);
 		ScenarioImpl scenario = scenarioLoader.getScenario();
 		scenarioLoader.loadScenario();
 		

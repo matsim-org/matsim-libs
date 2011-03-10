@@ -21,7 +21,6 @@
 package playground.yu.newPlans;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
@@ -30,6 +29,9 @@ import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 /**
  * writes new Plansfile, in which every person will has 2 plans, one with type
@@ -67,7 +69,7 @@ public class NewSmallPlan extends NewPopulation {
 		// // "../data/ivtch/make10pctPlans.xml"
 		// "input/make10pctPlans.xml").loadScenario().getConfig();
 
-		Scenario s = new ScenarioImpl();
+		Scenario s = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		NetworkImpl network = (NetworkImpl) s.getNetwork();
 		new MatsimNetworkReader(s).readFile(netFilename);

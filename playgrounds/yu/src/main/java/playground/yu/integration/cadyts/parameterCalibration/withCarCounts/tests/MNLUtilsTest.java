@@ -28,7 +28,6 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
@@ -42,6 +41,9 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PlanImpl.DeprecatedConstants;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.scoring.CharyparNagelScoringFunctionFactory4PC;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.scoring.Events2Score4TravPerfStuck_mnl;
@@ -58,7 +60,7 @@ public class MNLUtilsTest {
 
 		double travelingPt = -3d;
 
-		Scenario scenario = new ScenarioImpl();
+		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		Config config = scenario.getConfig();
 		new MatsimConfigReader(config).readFile(configFilename);

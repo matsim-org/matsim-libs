@@ -20,13 +20,15 @@
 
 package playground.yu.newPlans;
 
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
 /**
@@ -87,11 +89,11 @@ public class MergePopulations {
 
 		final int lower_limit = 1000000000;
 
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		NetworkImpl network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFilename);
 
-		ScenarioImpl scenarioA = new ScenarioImpl();
+		ScenarioImpl scenarioA = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenarioA.setNetwork(network);
 		PopulationImpl plansA = (PopulationImpl) scenarioA.getPopulation();
 		plansA.setIsStreaming(true);
@@ -100,7 +102,7 @@ public class MergePopulations {
 		new MatsimPopulationReader(scenarioA).readFile(plansFilenameA);
 		new CopyPlans(pw).run(plansA);
 
-		ScenarioImpl scenarioB = new ScenarioImpl();
+		ScenarioImpl scenarioB = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenarioB.setNetwork(network);
 		PopulationImpl plansB = (PopulationImpl) scenarioB.getPopulation();
 		plansB.setIsStreaming(true);

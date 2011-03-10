@@ -48,8 +48,7 @@ import org.matsim.analysis.ScoreStats;
 import org.matsim.analysis.TravelDistanceStats;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
@@ -58,12 +57,12 @@ import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.config.consistency.ConfigConsistencyCheckerImpl;
 import org.matsim.core.config.groups.ControlerConfigGroup;
-import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.config.groups.SimulationConfigGroup;
-import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.config.groups.SimulationConfigGroup;
+import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.corelisteners.EventsHandling;
 import org.matsim.core.controler.corelisteners.LegHistogramListener;
 import org.matsim.core.controler.corelisteners.PlansDumping;
@@ -104,7 +103,8 @@ import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorInvertedNetProxyFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.charyparNagel.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
@@ -113,6 +113,7 @@ import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.io.CollectLogMessagesAppender;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.counts.CountControlerListener;
 import org.matsim.counts.Counts;
 import org.matsim.households.HouseholdsWriterV10;
@@ -128,7 +129,6 @@ import org.matsim.pt.TransitControlerListener;
 import org.matsim.pt.counts.PtCountControlerListener;
 import org.matsim.pt.router.PlansCalcTransitRoute;
 import org.matsim.pt.router.TransitRouterFactory;
-import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.ptproject.qsim.QSimFactory;
 import org.matsim.ptproject.qsim.multimodalsimengine.MultiModalMobsimFactory;
 import org.matsim.ptproject.qsim.multimodalsimengine.router.MultiModalLegHandler;
@@ -242,8 +242,7 @@ public class Controler {
 			shutdown(true);
 		}
 	};
-	protected ScenarioLoaderImpl loader;
-
+	
 	private TravelTimeCalculatorFactory travelTimeCalculatorFactory = new TravelTimeCalculatorFactoryImpl();
 
 	private TravelCostCalculatorFactory travelCostCalculatorFactory = new TravelCostCalculatorFactoryImpl();
@@ -298,11 +297,11 @@ public class Controler {
 		this(null, null, config, null);
 	}
 
-	public Controler(final ScenarioImpl scenario) {
+	public Controler(final Scenario scenario) {
 		this(null, null, null, scenario);
 	}
 
-	private Controler(final String configFileName, final String dtdFileName, final Config config, final ScenarioImpl scenario) {
+	private Controler(final String configFileName, final String dtdFileName, final Config config, final Scenario scenario) {
 		// catch logs before doing something
 		this.collectLogMessagesAppender = new CollectLogMessagesAppender();
 		Logger.getRootLogger().addAppender(this.collectLogMessagesAppender);
@@ -315,7 +314,7 @@ public class Controler {
 		// now do other stuff
 		if (scenario != null) {
 			this.scenarioLoaded = true;
-			this.scenarioData = scenario;
+			this.scenarioData = (ScenarioImpl) scenario;
 			this.config = scenario.getConfig();
 		} else {
 			if (configFileName == null) {
@@ -325,11 +324,10 @@ public class Controler {
 				}
 				this.config = config;
 			} else {
-				this.config = new Config();
-				this.config.addCoreModules();
+				this.config = ConfigUtils.createConfig();
 				this.config.addConfigConsistencyChecker(new ConfigConsistencyCheckerImpl());
 			}
-			this.scenarioData = new ScenarioImpl(this.config);
+			this.scenarioData = (ScenarioImpl) ScenarioUtils.createScenario(this.config);
 		}
 		this.network = this.scenarioData.getNetwork();
 		this.population = this.scenarioData.getPopulation();
@@ -726,8 +724,7 @@ public class Controler {
 	 */
 	protected void loadData() {
 		if (!this.scenarioLoaded) {
-			this.loader = new ScenarioLoaderImpl(this.scenarioData);
-			this.loader.loadScenario();
+			ScenarioUtils.loadScenario(this.scenarioData);
 			this.network = this.scenarioData.getNetwork();
 			this.population = this.scenarioData.getPopulation();
 			this.scenarioLoaded = true;

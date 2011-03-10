@@ -5,7 +5,6 @@ package playground.yu.removeOldestPlan;
 
 import java.util.List;
 
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
@@ -15,6 +14,9 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.testcases.MatsimTestCase;
 
 import playground.yu.replanning.StrategyManagerWithRemoveOldestPlan;
@@ -55,7 +57,7 @@ public class StrategyManagerRemoveOldestPlanTest extends MatsimTestCase {
 			plans[i] = p.createAndAddPlan(false);
 			plans[i].setScore(Double.valueOf(i * 10));
 		}
-		Population pop = new ScenarioImpl().getPopulation();
+		Population pop = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
 		pop.addPerson(p);
 		{
 			// run with default settings

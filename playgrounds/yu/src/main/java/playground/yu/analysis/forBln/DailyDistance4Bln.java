@@ -20,7 +20,6 @@
 package playground.yu.analysis.forBln;
 
 import org.jfree.chart.plot.PlotOrientation;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
@@ -31,8 +30,11 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.roadpricing.RoadPricingScheme;
 
 import playground.yu.analysis.DailyDistance;
@@ -623,7 +625,7 @@ public class DailyDistance4Bln extends DailyDistance implements Analysis4Bln {
 
 		// Gbl.createConfig(null);
 
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario).readFile(netFilename);
 
 		// RoadPricingReaderXMLv1 tollReader = new

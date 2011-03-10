@@ -41,11 +41,7 @@ public class Z_Launcher {
 		}
 
 		Config config = null;
-		try {
-			config = ConfigUtils.loadConfig(configFile);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		config = ConfigUtils.loadConfig(configFile);
 
 		final Controler controler = new Controler(config);
 		controler.setOverwriteFiles(true);

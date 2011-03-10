@@ -3,9 +3,11 @@ package playground.wrashid.parkingSearch.planLevel;
 import java.util.LinkedList;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.testcases.MatsimTestCase;
 
 import playground.wrashid.parkingSearch.planLevel.init.ParkingRoot;
@@ -18,7 +20,7 @@ import playground.wrashid.parkingSearch.planLevel.scenario.BaseNonControlerScena
 public class LinkFacilityAssociationTest extends MatsimTestCase {
 
 	public void testGeneralFacility() {
-		ScenarioImpl sc = new ScenarioImpl();
+		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		NetworkImpl net = BaseNonControlerScenario.loadNetwork(sc);
 
@@ -52,7 +54,7 @@ public class LinkFacilityAssociationTest extends MatsimTestCase {
 	}
 
 	public void testParkingFacility() {
-		ScenarioImpl sc = new ScenarioImpl();
+		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		NetworkImpl net = BaseNonControlerScenario.loadNetwork(sc);
 

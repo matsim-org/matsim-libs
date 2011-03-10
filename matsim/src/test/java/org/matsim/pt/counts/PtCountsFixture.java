@@ -65,7 +65,7 @@ public abstract class PtCountsFixture {
 	public void setUp() {
 		String configFile = "test/input/org/matsim/pt/counts/config.xml";
 
-		this.scenario = new ScenarioLoaderImpl(configFile).getScenario();
+		this.scenario = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(configFile).getScenario();
 		config = scenario.getConfig();
 
 		new MatsimCountsReader(this.counts).readFile(config.findParam(MODULE_NAME, countFileParamName));

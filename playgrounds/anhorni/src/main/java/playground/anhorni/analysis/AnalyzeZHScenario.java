@@ -2,22 +2,25 @@ package playground.anhorni.analysis;
 
 import java.util.Set;
 import java.util.TreeSet;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NodeImpl;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 public class AnalyzeZHScenario {
 	
 	private final static Logger log = Logger.getLogger(AnalyzeZHScenario.class);
 	private static String path = "src/main/java/playground/anhorni/";
 	
-	private ScenarioImpl scenario = new ScenarioImpl();
+	private ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 	private String networkfilePath = path + "input/ZH/network.xml";
 	private String facilitiesfilePath = path + "input/ZH/facilities.xml.gz";
 	

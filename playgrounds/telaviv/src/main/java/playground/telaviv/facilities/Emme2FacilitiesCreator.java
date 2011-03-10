@@ -35,7 +35,6 @@ import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
@@ -47,8 +46,11 @@ import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 import playground.telaviv.zones.Emme2Zone;
 import playground.telaviv.zones.ZoneMapping;
@@ -72,7 +74,7 @@ public class Emme2FacilitiesCreator {
 	private int[] validLinkTypes = new int[] { 2, 3, 4, 5, 6, 9 };
 	
 	public static void main(String[] args) {
-		Scenario scenario = new ScenarioImpl();
+		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario).readFile(networkFile);
 		Emme2FacilitiesCreator facilitiesCreator = new Emme2FacilitiesCreator(scenario);
 		

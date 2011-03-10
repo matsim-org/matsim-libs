@@ -31,7 +31,6 @@ import net.opengis.kml._2.ObjectFactory;
 import net.opengis.kml._2.ScreenOverlayType;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
@@ -47,11 +46,14 @@ import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.core.utils.misc.StringUtils;
 import org.matsim.vis.kml.KMZWriter;
@@ -66,7 +68,7 @@ public class NetworkDistance {
 	private final static String networkKmzFilename = "../mystudies/yalcin/berlin_wipnet.kmz";
 
 	public static void exportNetwork() {
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		NetworkImpl network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(networkFilename);
 
@@ -102,7 +104,7 @@ public class NetworkDistance {
 	}
 
 	public static void convertNetwork() {
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		NetworkImpl network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(networkFilename);
 
@@ -112,7 +114,7 @@ public class NetworkDistance {
 	}
 
 	public static void findDistances() {
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		NetworkImpl network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(wgs84NetworkFilename);
 

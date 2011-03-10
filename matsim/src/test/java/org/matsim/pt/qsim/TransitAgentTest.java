@@ -25,7 +25,6 @@ import java.util.Collections;
 
 import junit.framework.TestCase;
 
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
@@ -37,7 +36,10 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.pt.qsim.TransitAgent;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
@@ -55,7 +57,7 @@ import org.matsim.ptproject.qsim.QSim;
 public class TransitAgentTest extends TestCase {
 
 	public void testAcceptLineRoute() {
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().addQSimConfigGroup(new QSimConfigGroup());
 		
 		NetworkImpl network = scenario.getNetwork();
@@ -99,7 +101,7 @@ public class TransitAgentTest extends TestCase {
 	}
 
 	public void testArriveAtStop() {
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().addQSimConfigGroup(new QSimConfigGroup());
 		
 		NetworkImpl network = scenario.getNetwork();

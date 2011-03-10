@@ -19,10 +19,7 @@
 
 package playground.mrieser.core.mobsim.usecases;
 
-import java.io.IOException;
-
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsManagerImpl;
@@ -42,13 +39,9 @@ public class UseCase1_Teleportation {
 
 		// load data
 		Config config;
-		try {
-			config = ConfigUtils.loadConfig(prefix + "test/scenarios/equil/config.xml");
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+		config = ConfigUtils.loadConfig(prefix + "test/scenarios/equil/config.xml");
 		ConfigUtils.modifyFilePaths(config, prefix);
-		ScenarioLoader loader = new ScenarioLoaderImpl(config);
+		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(config);
 		Scenario scenario = loader.loadScenario();
 		EventsManager events = new EventsManagerImpl();
 		EventWriterXML ew = new EventWriterXML("testEvents.xml");

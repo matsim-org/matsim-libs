@@ -20,7 +20,6 @@
 
 package playground.balmermi.census2000;
 
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
@@ -30,6 +29,7 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.matrices.Matrices;
 import org.matsim.matrices.MatricesWriter;
@@ -65,7 +65,7 @@ public class InitDemandCreation {
 
 		System.out.println("MATSim-IIDM: create initial demand based on census2000 data.");
 
-		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(args[0]);
+		ScenarioLoaderImpl sl = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(args[0]);
 		ScenarioImpl scenario = sl.getScenario();
 		Config config = scenario.getConfig();
 		World world = new World();

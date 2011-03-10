@@ -28,7 +28,6 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
@@ -40,6 +39,9 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -137,7 +139,7 @@ public class PathSizeSummaryFrom2Populations extends AbstractPersonAlgorithm
 	public static void main(String[] args) {
 		String networkFilename = args[0], referencePopulationFilename = args[1], currentPopulationFilename = args[2], outputFilenameBase = args[3];
 
-		Scenario referenceScenario = new ScenarioImpl();
+		Scenario referenceScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(referenceScenario).readFile(networkFilename);
 		new MatsimPopulationReader(referenceScenario)
 				.readFile(referencePopulationFilename);
@@ -149,7 +151,7 @@ public class PathSizeSummaryFrom2Populations extends AbstractPersonAlgorithm
 		Network network = referenceScenario.getNetwork();
 		PathSizeFrom2Routes.setNetwork(network);
 
-		Scenario currentScenario = new ScenarioImpl();
+		Scenario currentScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		((ScenarioImpl) currentScenario).setNetwork((NetworkImpl) network);
 		// new MatsimNetworkReader(currentScenario).readFile(networkFilename);
 		new MatsimPopulationReader(currentScenario)

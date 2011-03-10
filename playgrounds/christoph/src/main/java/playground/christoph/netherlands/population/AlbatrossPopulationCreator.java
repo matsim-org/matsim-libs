@@ -28,7 +28,6 @@ import java.util.Map.Entry;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
@@ -40,6 +39,9 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.population.Desires;
 
 import playground.christoph.netherlands.zones.GetZoneConnectors;
@@ -62,7 +64,7 @@ public class AlbatrossPopulationCreator {
 	private Random random = new Random(123456);
 
 	public static void main(String[] args) throws Exception {
-		new AlbatrossPopulationCreator(new ScenarioImpl());
+		new AlbatrossPopulationCreator(((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())));
 	}
 
 	public AlbatrossPopulationCreator(Scenario scenario) throws Exception {

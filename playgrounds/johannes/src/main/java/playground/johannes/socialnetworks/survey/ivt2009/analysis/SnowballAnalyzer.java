@@ -25,7 +25,6 @@ import java.util.Set;
 
 import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.contrib.sna.gis.CRSUtils;
 import org.matsim.contrib.sna.gis.ZoneLayer;
 import org.matsim.contrib.sna.graph.Graph;
@@ -42,6 +41,9 @@ import org.matsim.contrib.sna.snowball.SampledVertex;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReaderMatsimV1;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 import playground.johannes.socialnetworks.gis.io.FeatureSHP;
 import playground.johannes.socialnetworks.gis.io.ZoneLayerSHP;
@@ -91,7 +93,7 @@ public class SnowballAnalyzer {
 		try {
 		graph = GraphReaderFacade.read(config.getParam(MODULE_NAME, "graphfile"));
 		
-		Scenario scenario = new ScenarioImpl();
+		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		MatsimNetworkReader netReader = new MatsimNetworkReader(scenario);
 //		netReader.readFile(config.getParam(MODULE_NAME, "networkfile"));
 	

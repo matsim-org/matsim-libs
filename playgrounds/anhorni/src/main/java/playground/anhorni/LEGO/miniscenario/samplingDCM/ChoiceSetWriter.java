@@ -5,7 +5,6 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
@@ -13,7 +12,10 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 
@@ -40,7 +42,7 @@ public class ChoiceSetWriter {
 	
 	private void init(String plansFilePath, String facilitiesFilePath, String networkFilePath, String outPath) {
 		this.outPath = outPath;
-		this.scenario = new ScenarioImpl();
+		this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		
 		new MatsimNetworkReader(this.scenario).readFile(networkFilePath);		
 		new FacilitiesReaderMatsimV1(this.scenario).readFile(facilitiesFilePath);

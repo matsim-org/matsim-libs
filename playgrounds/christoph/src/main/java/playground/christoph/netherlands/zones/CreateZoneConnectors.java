@@ -36,7 +36,6 @@ import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
@@ -44,12 +43,15 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.KmlNetworkWriter;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.GeotoolsTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.vis.kml.KMZWriter;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -81,7 +83,7 @@ public class CreateZoneConnectors {
 	
 	public CreateZoneConnectors() throws Exception {
 		
-		this.scenario = new ScenarioImpl();
+		this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario).readFile(networkInFile);
 		CoordinateTransformation coordinateTransformation = new IdentityTransformation();
 						

@@ -35,7 +35,6 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
@@ -45,10 +44,13 @@ import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.gregor.gis.helper.GTH;
@@ -244,7 +246,7 @@ public class NetworkClearanceAnalysis {
 		String network = "../../inputs/networks/padang_net_evac_v20080618.xml";
 		String outfile = INPUT_BASE + "output_100m_so/analysis/runComp.shp";
 
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		NetworkImpl net = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(network);
 

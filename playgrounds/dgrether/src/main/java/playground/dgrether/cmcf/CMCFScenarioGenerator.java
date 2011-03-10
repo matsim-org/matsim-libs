@@ -21,7 +21,6 @@
 package playground.dgrether.cmcf;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Population;
@@ -36,6 +35,9 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.RouteUtils;
 
@@ -149,7 +151,7 @@ public class CMCFScenarioGenerator {
 			plansOut = plans1Out;
 			configOut = config1Out;
 		}
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		this.config = scenario.getConfig();
 
 		this.network = scenario.getNetwork();
@@ -157,7 +159,7 @@ public class CMCFScenarioGenerator {
 	}
 
 	private void createPlans() throws Exception {
-		this.plans = new ScenarioImpl().getPopulation();
+		this.plans = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
 		int firstHomeEndTime = 0;//6 * 3600;
 		int homeEndTime = firstHomeEndTime;
 		Link l1 = this.network.getLinks().get(IdFactory.get(1));

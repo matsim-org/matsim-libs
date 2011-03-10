@@ -29,12 +29,14 @@ import junit.framework.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.algorithms.NetworkCleaner;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.xml.sax.SAXException;
 
@@ -49,7 +51,7 @@ public class OsmNetworkReaderTest {
 	public void testConversion() throws SAXException, ParserConfigurationException, IOException {
 		String filename = this.utils.getClassInputDirectory() + "adliswil.osm.gz";
 
-		Scenario sc = new ScenarioImpl();
+		Scenario sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network net = sc.getNetwork();
 
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.CH1903_LV03);
@@ -68,7 +70,7 @@ public class OsmNetworkReaderTest {
 	public void testConversionWithDetails() throws SAXException, ParserConfigurationException, IOException {
 		String filename = this.utils.getClassInputDirectory() + "adliswil.osm.gz";
 
-		Scenario sc = new ScenarioImpl();
+		Scenario sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network net = sc.getNetwork();
 
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.CH1903_LV03);
@@ -89,7 +91,7 @@ public class OsmNetworkReaderTest {
 	public void testConversionWithDetails_witMemoryOptimized() throws SAXException, ParserConfigurationException, IOException {
 		String filename = this.utils.getClassInputDirectory() + "adliswil.osm.gz";
 
-		Scenario sc = new ScenarioImpl();
+		Scenario sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network net = sc.getNetwork();
 
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.CH1903_LV03);
@@ -111,7 +113,7 @@ public class OsmNetworkReaderTest {
 	public void testConversionWithSettings() throws SAXException, ParserConfigurationException, IOException {
 		String filename = this.utils.getClassInputDirectory() + "adliswil.osm.gz";
 
-		Scenario sc = new ScenarioImpl();
+		Scenario sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network net = sc.getNetwork();
 
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.CH1903_LV03);
@@ -132,7 +134,7 @@ public class OsmNetworkReaderTest {
 	public void testConversionWithSettings_withMemoryOptimization() throws SAXException, ParserConfigurationException, IOException {
 		String filename = this.utils.getClassInputDirectory() + "adliswil.osm.gz";
 
-		Scenario sc = new ScenarioImpl();
+		Scenario sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network net = sc.getNetwork();
 
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.CH1903_LV03);
@@ -153,7 +155,7 @@ public class OsmNetworkReaderTest {
 	public void testConversionWithSettingsAndDetails() throws SAXException, ParserConfigurationException, IOException {
 		String filename = this.utils.getClassInputDirectory() + "adliswil.osm.gz";
 
-		Scenario sc = new ScenarioImpl();
+		Scenario sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network net = sc.getNetwork();
 
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.CH1903_LV03);
@@ -172,7 +174,7 @@ public class OsmNetworkReaderTest {
 
 	@Test
 	public void testConversion_MissingNodeRef() throws SAXException, ParserConfigurationException, IOException {
-		Scenario sc = new ScenarioImpl();
+		Scenario sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network net = sc.getNetwork();
 		CoordinateTransformation ct = new IdentityTransformation();
 

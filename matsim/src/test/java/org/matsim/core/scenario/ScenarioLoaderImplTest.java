@@ -23,8 +23,6 @@ import junit.framework.Assert;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -36,7 +34,7 @@ public class ScenarioLoaderImplTest {
 
 	@Test
 	public void testLoadScenario_loadTransitData() {
-		ScenarioLoader sl = new ScenarioLoaderImpl(util.getClassInputDirectory() + "transitConfig.xml");
+		ScenarioLoaderImpl sl = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(util.getClassInputDirectory() + "transitConfig.xml");
 		Assert.assertEquals(0, ((ScenarioImpl) sl.getScenario()).getTransitSchedule().getTransitLines().size());
 		Assert.assertEquals(0, ((ScenarioImpl) sl.getScenario()).getTransitSchedule().getFacilities().size());
 		sl.loadScenario();

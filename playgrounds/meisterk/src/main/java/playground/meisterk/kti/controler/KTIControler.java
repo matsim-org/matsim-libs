@@ -51,8 +51,8 @@ public class KTIControler extends Controler {
 	@Override
 	protected void loadData() {
 		if (!this.scenarioLoaded) {
-			this.loader = new KtiScenarioLoaderImpl(this.scenarioData, this.plansCalcRouteKtiInfo, this.ktiConfigGroup);
-			this.loader.loadScenario();
+			KtiScenarioLoaderImpl loader = new KtiScenarioLoaderImpl(this.scenarioData, this.plansCalcRouteKtiInfo, this.ktiConfigGroup);
+			loader.loadScenario();
 			this.network = this.scenarioData.getNetwork();
 			this.population = this.scenarioData.getPopulation();
 			this.scenarioLoaded = true;

@@ -28,7 +28,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -39,10 +38,13 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.network.algorithms.NetworkWriteAsTable;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.core.utils.misc.Counter;
 
 import playground.balmermi.modules.NetworkDoubleLinks;
@@ -487,7 +489,7 @@ public class TeleatlasConverter45v101 {
 		Gbl.printMemoryUsage();
 
 		log.info("start conversion...");
-		Scenario scenario = new ScenarioImpl();
+		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		TeleatlasConverter45v101 converter = new TeleatlasConverter45v101(scenario, data);
 		converter.setCoordinateTransformation(new WGS84toCH1903LV03());
 		converter.convertToNetwork();

@@ -25,7 +25,6 @@ import net.opengis.kml._2.ObjectFactory;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
@@ -45,12 +44,15 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
 import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03;
 import org.matsim.core.utils.io.OsmNetworkReader;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.vis.kml.KMZWriter;
 import org.xml.sax.SAXException;
 
@@ -68,7 +70,7 @@ public class GeneralLib {
 	 * Note: use the other method with the same name, if this poses problems.
 	 */
 	public static Scenario readScenario(String plansFile, String networkFile) {
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Population population = scenario.getPopulation();
 
 		NetworkImpl network = scenario.getNetwork();
@@ -85,7 +87,7 @@ public class GeneralLib {
 	 * 
 	 */
 	public static Scenario readScenario(String plansFile, String networkFile, String facilititiesPath) {
-		ScenarioImpl sc = new ScenarioImpl();
+		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		sc.getConfig().setParam("plans", "inputPlansFile", plansFile);
 		sc.getConfig().setParam("network", "inputNetworkFile", networkFile);
@@ -102,7 +104,7 @@ public class GeneralLib {
 	 * Reads the network from the network file.
 	 */
 	public static NetworkImpl readNetwork(String networkFile) {
-		ScenarioImpl sc = new ScenarioImpl();
+		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		sc.getConfig().setParam("network", "inputNetworkFile", networkFile);
 
@@ -132,7 +134,7 @@ public class GeneralLib {
 	 * @return
 	 */
 	public static ActivityFacilitiesImpl readActivityFacilities(String facilitiesFile) {
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
 		new MatsimFacilitiesReader(scenario).readFile(facilitiesFile);
 		return facilities;
@@ -619,7 +621,7 @@ public class GeneralLib {
 	}
 	
 	public static Network convertOsmNetworkToMATSimNetwork(String osmNetworkFile) throws SAXException, ParserConfigurationException, IOException{
-		Scenario sc = new ScenarioImpl();
+		Scenario sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network net = sc.getNetwork();
 
 		CoordinateTransformation ct = new WGS84toCH1903LV03();

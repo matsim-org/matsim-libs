@@ -4,10 +4,10 @@ import java.util.Random;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.anhorni.LEGO.miniscenario.ConfigReader;

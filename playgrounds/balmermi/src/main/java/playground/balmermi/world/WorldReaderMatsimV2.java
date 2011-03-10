@@ -23,8 +23,8 @@ package playground.balmermi.world;
 import java.util.Stack;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 

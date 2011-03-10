@@ -22,9 +22,9 @@ package org.matsim.integration.pt;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.testcases.MatsimTestUtils;
 
 public class TransitIntegrationTest {

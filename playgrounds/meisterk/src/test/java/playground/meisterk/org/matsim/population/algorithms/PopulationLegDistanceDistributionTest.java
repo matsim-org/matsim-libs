@@ -23,7 +23,6 @@ package playground.meisterk.org.matsim.population.algorithms;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
 
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
@@ -35,8 +34,11 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.CRCChecksum;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.testcases.MatsimTestCase;
 
 import playground.meisterk.org.matsim.population.algorithms.AbstractClassifiedFrequencyAnalysis.CrosstabFormat;
@@ -52,7 +54,7 @@ public class PopulationLegDistanceDistributionTest extends MatsimTestCase {
 		1000000};
 
 	public void testGenerationDistribution() {
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		NetworkImpl testNetwork = scenario.getNetwork();
 		Node node1 = testNetwork.createAndAddNode(new IdImpl("1"), new CoordImpl(0.0, 0.0));
 		Node node2 = testNetwork.createAndAddNode(new IdImpl("2"), new CoordImpl(500.0, 500.0));

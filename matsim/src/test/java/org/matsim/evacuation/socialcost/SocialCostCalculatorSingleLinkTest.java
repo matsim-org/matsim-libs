@@ -8,7 +8,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import junit.framework.TestCase;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.AgentMoneyEvent;
 import org.matsim.core.api.experimental.events.handler.AgentMoneyEventHandler;
@@ -20,6 +19,9 @@ import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 public class SocialCostCalculatorSingleLinkTest extends TestCase {
 
@@ -266,7 +268,7 @@ public class SocialCostCalculatorSingleLinkTest extends TestCase {
 		/* package */LinkImpl link0;
 
 		public Fixture() {
-			this.sc = new ScenarioImpl();
+			this.sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 			this.network = this.sc.getNetwork();
 
 			this.agents = new ArrayList<Vehicle>();

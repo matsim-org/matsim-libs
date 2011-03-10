@@ -21,11 +21,11 @@
 package playground.meisterk.phd;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -49,8 +49,8 @@ public class GenerateEquilPopulationsTest extends MatsimTestCase {
 	protected void setUp() throws Exception {
 		super.setUp();
 		Config config = super.loadConfig(this.getClassInputDirectory() + "config.xml");
-		this.scenario = new ScenarioImpl(config);
-		ScenarioLoader loader = new ScenarioLoaderImpl(this.scenario);
+		this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(this.scenario);
 		loader.loadScenario();
 	}
 

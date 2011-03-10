@@ -26,7 +26,6 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
@@ -37,6 +36,9 @@ import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.run.OTFVis;
 
 import playground.mmoyo.utils.DataLoader;
@@ -60,7 +62,7 @@ public class FindAgentRejectNearStop {
 		Coord stopCoord = scn.getTransitSchedule().getFacilities().get(stopId).getCoord();
 
 		//Create a new population where persons will be stored 
-		ScenarioImpl tempScenario =new ScenarioImpl();
+		ScenarioImpl tempScenario =(ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		PopulationImpl outputPopulation = new PopulationImpl(tempScenario);
 		
 		//create set of nodes coordinates around the station

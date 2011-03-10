@@ -170,7 +170,7 @@ public class DpDurWriter implements AgentDepartureEventHandler,
 	}
 
 	public static void main(String[] args) {
-		Config config = new ScenarioLoaderImpl(args[0]).loadScenario().getConfig();
+		Config config = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(args[0]).loadScenario().getConfig();
 		DpDurWriter ddw = new DpDurWriter("DpDurMatrix.txt");
 
 		EventsManagerImpl events = new EventsManagerImpl();

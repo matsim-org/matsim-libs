@@ -27,11 +27,13 @@ import junit.framework.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 /**
  * @author mrieser
@@ -43,7 +45,7 @@ public class TransportModeNetworkFilterTest {
 		final Fixture f = new Fixture();
 		TransportModeNetworkFilter filter = new TransportModeNetworkFilter(f.scenario.getNetwork());
 
-		Network subNetwork = new ScenarioImpl().getNetwork();
+		Network subNetwork = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getNetwork();
 		filter.filter(subNetwork, createHashSet(TransportMode.car));
 		Assert.assertEquals("wrong number of nodes.", 13, subNetwork.getNodes().size());
 		Assert.assertEquals("wrong number of links", 14, subNetwork.getLinks().size());
@@ -82,7 +84,7 @@ public class TransportModeNetworkFilterTest {
 		Assert.assertEquals(1, subNetwork.getNodes().get(f.ids[7]).getOutLinks().size());
 		Assert.assertNotNull(subNetwork.getNodes().get(f.ids[7]).getOutLinks().get(f.ids[7]));
 
-		subNetwork = new ScenarioImpl().getNetwork();
+		subNetwork = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getNetwork();
 		filter.filter(subNetwork, createHashSet(TransportMode.bike));
 		Assert.assertEquals("wrong number of nodes.", 9, subNetwork.getNodes().size());
 		Assert.assertEquals("wrong number of links", 8, subNetwork.getLinks().size());
@@ -107,7 +109,7 @@ public class TransportModeNetworkFilterTest {
 		Assert.assertEquals(1, subNetwork.getNodes().get(f.ids[4]).getOutLinks().size());
 		Assert.assertNotNull(subNetwork.getNodes().get(f.ids[4]).getOutLinks().get(f.ids[4]));
 
-		subNetwork = new ScenarioImpl().getNetwork();
+		subNetwork = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getNetwork();
 		filter.filter(subNetwork, createHashSet(TransportMode.walk));
 		Assert.assertEquals("wrong number of nodes.", 5, subNetwork.getNodes().size());
 		Assert.assertEquals("wrong number of links", 4, subNetwork.getLinks().size());
@@ -135,7 +137,7 @@ public class TransportModeNetworkFilterTest {
 		final Fixture f = new Fixture();
 		TransportModeNetworkFilter filter = new TransportModeNetworkFilter(f.scenario.getNetwork());
 
-		Network subNetwork = new ScenarioImpl().getNetwork();
+		Network subNetwork = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getNetwork();
 		filter.filter(subNetwork, createHashSet(TransportMode.car, TransportMode.bike));
 		Assert.assertEquals("wrong number of nodes.", 13, subNetwork.getNodes().size());
 		Assert.assertEquals("wrong number of links", 15, subNetwork.getLinks().size());
@@ -175,7 +177,7 @@ public class TransportModeNetworkFilterTest {
 		Assert.assertEquals(1, subNetwork.getNodes().get(f.ids[10]).getInLinks().size());
 		Assert.assertNotNull(subNetwork.getNodes().get(f.ids[10]).getInLinks().get(f.ids[9]));
 
-		subNetwork = new ScenarioImpl().getNetwork();
+		subNetwork = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getNetwork();
 		filter.filter(subNetwork, createHashSet(TransportMode.bike, TransportMode.walk));
 		Assert.assertEquals("wrong number of nodes.", 9, subNetwork.getNodes().size());
 		Assert.assertEquals("wrong number of links", 10, subNetwork.getLinks().size());
@@ -216,7 +218,7 @@ public class TransportModeNetworkFilterTest {
 		final Fixture f = new Fixture();
 		TransportModeNetworkFilter filter = new TransportModeNetworkFilter(f.scenario.getNetwork());
 
-		Network subNetwork = new ScenarioImpl().getNetwork();
+		Network subNetwork = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getNetwork();
 		filter.filter(subNetwork, new HashSet<String>());
 		Assert.assertEquals("wrong number of nodes.", 0, subNetwork.getNodes().size());
 		Assert.assertEquals("wrong number of links", 0, subNetwork.getLinks().size());
@@ -227,7 +229,7 @@ public class TransportModeNetworkFilterTest {
 		final Fixture f = new Fixture();
 		TransportModeNetworkFilter filter = new TransportModeNetworkFilter(f.scenario.getNetwork());
 
-		Network subNetwork = new ScenarioImpl().getNetwork();
+		Network subNetwork = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getNetwork();
 		filter.filter(subNetwork, createHashSet(TransportMode.walk, TransportMode.pt, "motorbike"));
 		Assert.assertEquals("wrong number of nodes.", 5, subNetwork.getNodes().size());
 		Assert.assertEquals("wrong number of links", 4, subNetwork.getLinks().size());
@@ -255,7 +257,7 @@ public class TransportModeNetworkFilterTest {
 		final Fixture f = new Fixture();
 		TransportModeNetworkFilter filter = new TransportModeNetworkFilter(f.scenario.getNetwork());
 
-		Network subNetwork = new ScenarioImpl().getNetwork();
+		Network subNetwork = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getNetwork();
 		filter.filter(subNetwork, createHashSet(TransportMode.pt, "motorbike"));
 		Assert.assertEquals("wrong number of nodes.", 0, subNetwork.getNodes().size());
 		Assert.assertEquals("wrong number of links", 0, subNetwork.getLinks().size());
@@ -288,7 +290,7 @@ public class TransportModeNetworkFilterTest {
 	 * @author mrieser
 	 */
 	private static class Fixture {
-		/*package*/ final Scenario scenario = new ScenarioImpl();
+		/*package*/ final Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		/*package*/ final Id[] ids = new Id[17];
 		/*package*/ final Set<String> modesC = createHashSet(TransportMode.car);
 		/*package*/ final Set<String> modesCB = createHashSet(TransportMode.car, TransportMode.bike);

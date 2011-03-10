@@ -19,10 +19,7 @@
 
 package playground.mrieser.core.mobsim.usecases;
 
-import java.io.IOException;
-
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsManagerImpl;
@@ -44,14 +41,10 @@ public class UseCase3_TransitMobsim {
 
 		// load data
 		Config config;
-		try {
-			config = ConfigUtils.loadConfig(prefix + "examples/pt-tutorial/0.config.xml");
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+		config = ConfigUtils.loadConfig(prefix + "examples/pt-tutorial/0.config.xml");
 		ConfigUtils.modifyFilePaths(config, prefix);
 
-		ScenarioLoader loader = new ScenarioLoaderImpl(config);
+		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(config);
 
 		((NetworkFactoryImpl) loader.getScenario().getNetwork().getFactory()).setRouteFactory("pt", new ExperimentalTransitRouteFactory());
 

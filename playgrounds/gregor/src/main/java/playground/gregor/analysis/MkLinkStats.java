@@ -21,11 +21,11 @@ package playground.gregor.analysis;
 
 import org.matsim.analysis.CalcLinkStats;
 import org.matsim.analysis.VolumesAnalyzer;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
@@ -39,7 +39,7 @@ public class MkLinkStats {
 		String eventsFile = outDir + "/ITERS/it." + it + "/" + it + ".events.txt.gz";
 		String stats =  outDir + "/ITERS/it." + it + "/" + it + ".linkstats.txt.gz";
 		
-		ScenarioImpl scenario = new ScenarioLoaderImpl(outDir + "/output_config.xml.gz").getScenario();
+		ScenarioImpl scenario = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(outDir + "/output_config.xml.gz").getScenario();
 		
 		NetworkImpl netzzz = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(net);

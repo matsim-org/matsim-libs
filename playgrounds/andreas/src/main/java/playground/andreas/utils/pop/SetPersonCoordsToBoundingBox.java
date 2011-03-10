@@ -2,7 +2,6 @@ package playground.andreas.utils.pop;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -14,7 +13,10 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 /**
  * Filter persons, not using a specific TransportMode.
@@ -94,7 +96,7 @@ public class SetPersonCoordsToBoundingBox extends NewPopulation {
 	public static void main(final String[] args) {
 		Gbl.startMeasurement();
 
-		ScenarioImpl sc = new ScenarioImpl();
+		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		String networkFile = "D:/Berlin/BVG/berlin-bvg09/net/miv_small/m44_344_small_ba.xml.gz";
 		String inPlansFile = "D:/Berlin/BVG/berlin-bvg09/pop/baseplan_900s_subset.xml.gz";

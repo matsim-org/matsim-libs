@@ -24,17 +24,15 @@ import java.util.HashMap;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.api.experimental.ScenarioFactoryImpl;
-import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.config.Config;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
-
-import playground.benjamin.analysis.BkAnalysis;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 public class TravelDistanceHandler implements LinkLeaveEventHandler, LinkEnterEventHandler {
 	
@@ -52,11 +50,12 @@ public class TravelDistanceHandler implements LinkLeaveEventHandler, LinkEnterEv
 	}
 	
 	public void createHandlerScenario() {
-		Scenario scen = new ScenarioFactoryImpl().createScenario();
+		Config config1 = ConfigUtils.createConfig();
+		Scenario scen = (ScenarioImpl) ScenarioUtils.createScenario(config1);
 		Config config = scen.getConfig();
 		config.network().setInputFile(networkfile);
 		config.plans().setInputFile(plansfile);
-		ScenarioLoader sl = new ScenarioLoaderImpl(scen);
+		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(scen);
 		sl.loadScenario();
 		network = scen.getNetwork();
 	}

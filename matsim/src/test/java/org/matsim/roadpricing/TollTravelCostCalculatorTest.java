@@ -20,7 +20,6 @@
 
 package org.matsim.roadpricing;
 
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -37,6 +36,9 @@ import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PreProcessLandmarks;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.roadpricing.RoadPricingScheme.Cost;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -50,7 +52,7 @@ public class TollTravelCostCalculatorTest extends MatsimTestCase {
 
 	public void testDistanceTollRouter() {
 		Config config = loadConfig(null);
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Fixture.createNetwork2(scenario);
 		NetworkImpl network = scenario.getNetwork();
 		// a basic toll where only the morning hours are tolled
@@ -104,7 +106,7 @@ public class TollTravelCostCalculatorTest extends MatsimTestCase {
 
 	public void testCordonTollRouter() {
 		Config config = loadConfig(null);
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Fixture.createNetwork2(scenario);
 		NetworkImpl network = scenario.getNetwork();
 		// a basic toll where only the morning hours are tolled

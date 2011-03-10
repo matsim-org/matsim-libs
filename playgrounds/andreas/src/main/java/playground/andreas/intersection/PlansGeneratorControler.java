@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.util.LinkedList;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Population;
@@ -34,6 +33,8 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.ConfigUtils;
 
@@ -61,7 +62,7 @@ public class PlansGeneratorControler extends Controler {
 	private Population generate4wPersons(){
 
 		int numberOfPlans = 1;
-		Population pop = new ScenarioImpl().getPopulation();
+		Population pop = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
 		log.info("  generating plans... ");
 
 		for (int i = 0; i < 314; i++) {
@@ -125,7 +126,7 @@ public class PlansGeneratorControler extends Controler {
 		final int agentsPerDest = 1;
 		int numberOfPlans = 1;
 
-		Population pop = new ScenarioImpl().getPopulation();
+		Population pop = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
 		log.info("  generating plans... ");
 
 		LinkedList <Link> fromLinks = new LinkedList<Link>();
@@ -183,17 +184,13 @@ public class PlansGeneratorControler extends Controler {
 
 	public static void main(final String[] args) {
 
-		try {
-			Config config;
-			config = ConfigUtils.loadConfig("./src/playground/andreas/intersection/test/data/bottleneck/config.xml");
-			final PlansGeneratorControler controler = new PlansGeneratorControler(config);
-			controler.setOverwriteFiles(true);
-			controler.setWriteEventsInterval(1);
+		Config config;
+		config = ConfigUtils.loadConfig("./src/playground/andreas/intersection/test/data/bottleneck/config.xml");
+		final PlansGeneratorControler controler = new PlansGeneratorControler(config);
+		controler.setOverwriteFiles(true);
+		controler.setWriteEventsInterval(1);
 
-			controler.run();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		controler.run();
 
 	}
 

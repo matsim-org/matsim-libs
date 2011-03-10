@@ -27,9 +27,11 @@ import java.util.Iterator;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.CRCChecksum;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.testcases.MatsimTestCase;
 import org.xml.sax.SAXException;
 
@@ -55,7 +57,7 @@ public class RoadPricingIOTest extends MatsimTestCase {
 		final Id id2 = new IdImpl(2);
 		final Id id3 = new IdImpl(3);
 
-		ScenarioImpl scenario = new ScenarioImpl(loadConfig(null));
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(loadConfig(null));
 		scenario.getConfig().scenario().setUseRoadpricing(true);
 		Fixture.createNetwork1(scenario);
 		// first, read the scheme from file
@@ -102,7 +104,7 @@ public class RoadPricingIOTest extends MatsimTestCase {
 		 * than the written one. Thus, read this file again and write it again and
 		 * compare them.
 		 */
-		scenario = new ScenarioImpl();
+		scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
     scenario.getConfig().scenario().setUseRoadpricing(true);
     RoadPricingScheme scheme2 = scenario.getRoadPricingScheme();
 		RoadPricingReaderXMLv1 reader2 = new RoadPricingReaderXMLv1(scheme2);

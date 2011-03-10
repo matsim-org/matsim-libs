@@ -36,12 +36,10 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.api.experimental.network.NetworkWriter;
 import org.matsim.core.facilities.ActivityFacilityImpl;
@@ -50,6 +48,7 @@ import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.network.KmlNetworkWriter;
 import org.matsim.core.network.LinkImpl;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
@@ -91,7 +90,7 @@ public class AddExitLinksToNetwork {
 	public static void main(String[] args) {
 		if (args.length != 2) return;
 		
-		ScenarioLoader sl = new ScenarioLoaderImpl(args[0]);
+		ScenarioLoaderImpl sl = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(args[0]);
 		Scenario scenario = sl.loadScenario();
 		
 		AddExitLinksToNetwork addExitLinksToNetwork = new AddExitLinksToNetwork(scenario);

@@ -2,7 +2,6 @@ package playground.christoph.population;
 
 import java.io.IOException;
 
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -19,6 +18,8 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 
 
 /*
@@ -52,7 +53,7 @@ public class PlansLinkReferenceDumping {
 			throw new RuntimeException(e);
 		}
 //		Gbl.setConfig(config);
-		ScenarioImpl scenario = new ScenarioImpl(config);
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 
 		
 		NetworkImpl network = scenario.getNetwork();

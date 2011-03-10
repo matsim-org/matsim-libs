@@ -21,11 +21,13 @@
 package org.matsim.utils.gis.matsim2esri.network;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.misc.CRCChecksum;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.testcases.MatsimTestCase;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -38,7 +40,7 @@ public class Network2ESRIShapeTest extends MatsimTestCase  {
 		String outputFileP = getOutputDirectory() + "./network.shp";
 		String ref = getInputDirectory() + "./network.shp";
 
-		Scenario scenario = new ScenarioImpl();
+		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().global().setCoordinateSystem("DHDN_GK4");
 
 		final Network network = scenario.getNetwork();
@@ -64,7 +66,7 @@ public class Network2ESRIShapeTest extends MatsimTestCase  {
 		String outputFileP = getOutputDirectory() + "./network.shp";
 		String ref = getInputDirectory() + "./network.shp";
 
-		Scenario scenario = new ScenarioImpl();
+		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().global().setCoordinateSystem("DHDN_GK4");
 
 		final Network network = scenario.getNetwork();
@@ -88,7 +90,7 @@ public class Network2ESRIShapeTest extends MatsimTestCase  {
 		String outputFileP = getOutputDirectory() + "./network.shp";
 		String ref = getInputDirectory() + "./network.shp";
 
-		Scenario scenario = new ScenarioImpl();
+		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().global().setCoordinateSystem("DHDN_GK4");
 
 		final Network network = scenario.getNetwork();
@@ -114,7 +116,7 @@ public class Network2ESRIShapeTest extends MatsimTestCase  {
 		String refShp = getInputDirectory() + "./network.shp";
 //		String refDbf = getInputDirectory() + "./network.dbf";
 
-		Scenario scenario = new ScenarioImpl();
+		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().global().setCoordinateSystem("DHDN_GK4");
 
 		final Network network = scenario.getNetwork();
@@ -146,7 +148,7 @@ public class Network2ESRIShapeTest extends MatsimTestCase  {
 		String refShp = getInputDirectory() + "./network.shp";
 //		String refDbf = getInputDirectory() + "./network.dbf";
 
-		Scenario scenario = new ScenarioImpl();
+		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 //		scenario.getConfig().global().setCoordinateSystem("DHDN_GK4");
 
 		final Network network = scenario.getNetwork();

@@ -2,7 +2,6 @@ package playground.wrashid.parkingSearch.planLevel.initDemand;
 
 import java.util.List;
 
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -16,6 +15,9 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 import playground.wrashid.lib.GeneralLib;
 import playground.wrashid.parkingSearch.planLevel.ranking.ClosestParkingMatrix;
@@ -31,7 +33,7 @@ public class PlanGeneratorWithParkingActivities {
 	}
 
 	public PlanGeneratorWithParkingActivities(String inputPlansFilePath, String networkFilePath, String facilitiesFilePath) {
-		scenario = new ScenarioImpl();
+		scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		new MatsimFacilitiesReader(scenario).readFile(facilitiesFilePath);
 

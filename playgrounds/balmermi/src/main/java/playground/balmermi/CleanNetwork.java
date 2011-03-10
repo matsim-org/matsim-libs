@@ -23,7 +23,6 @@ package playground.balmermi;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.gbl.Gbl;
@@ -35,6 +34,9 @@ import org.matsim.core.network.algorithms.NetworkAdaptLength;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.network.algorithms.NetworkWriteAsTable;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 import playground.balmermi.modules.NetworkDoubleLinks;
 
@@ -46,7 +48,7 @@ public class CleanNetwork {
 
 	public static void cleanNetwork(final String[] args) {
 
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario).readFile(args[0]);
 		
 //		NetworkImpl subNetwork = new ScenarioImpl().getNetwork();

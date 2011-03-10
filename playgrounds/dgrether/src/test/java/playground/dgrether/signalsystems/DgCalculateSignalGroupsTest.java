@@ -32,16 +32,17 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.SignalSystemsConfigGroup;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.lanes.Lane;
 import org.matsim.lanes.LaneDefinitions;
 import org.matsim.lanes.LaneDefinitionsFactory;
@@ -77,7 +78,7 @@ public class DgCalculateSignalGroupsTest {
 	
 	@Test
 	public void test3WayCrossing1Signal(){
-		Scenario sc = new ScenarioImpl();
+		Scenario sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		this.create3WayNetwork(sc);
 		SignalSystemsData signalSystems = new SignalSystemsDataImpl();
 		this.create1SignalOn3WayCrossing(signalSystems);
@@ -106,7 +107,7 @@ public class DgCalculateSignalGroupsTest {
 
 	@Test
 	public void test3WayCrossingManySignals(){
-		ScenarioImpl sc = new ScenarioImpl();
+		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		this.create3WayNetwork(sc);
 		this.createLanesFor3WayNetwork(sc);
 		SignalSystemsData signalSystems = new SignalSystemsDataImpl();
@@ -156,7 +157,7 @@ public class DgCalculateSignalGroupsTest {
 
 	@Test
 	public void test4WayCrossing1Signal(){
-		Scenario scenario = new ScenarioImpl();
+		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Config conf = scenario.getConfig();
 		File f = new File("a");
 		System.err.println(f.getAbsolutePath());
@@ -164,7 +165,7 @@ public class DgCalculateSignalGroupsTest {
 		String inputDirectory = this.testUtils.getClassInputDirectory();
 		conf.network().setInputFile(inputDirectory + "network.xml.gz");
 
-		ScenarioLoader loader = new ScenarioLoaderImpl(scenario);
+		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(scenario);
 		loader.loadScenario();
 		
 		SignalSystemsData signalSystems = new SignalSystemsDataImpl();
@@ -221,7 +222,7 @@ public class DgCalculateSignalGroupsTest {
 
 	@Test
 	public void test4WayCrossingManySignals() throws JAXBException, SAXException, ParserConfigurationException, IOException{
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Config conf = scenario.getConfig();
 		//network
 		String inputDirectory = this.testUtils.getClassInputDirectory();

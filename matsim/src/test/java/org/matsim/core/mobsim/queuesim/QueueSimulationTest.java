@@ -31,7 +31,6 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
@@ -67,6 +66,9 @@ import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.ptproject.qsim.qnetsimengine.QVehicle;
 import org.matsim.testcases.MatsimTestCase;
@@ -954,7 +956,7 @@ public class QueueSimulationTest extends TestCase {
 	}
 
 	public void testStartAndEndTime() {
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Config config = scenario.getConfig();
 
 		// build simple network with 1 link
@@ -1013,7 +1015,7 @@ public class QueueSimulationTest extends TestCase {
 	 * @author mrieser
 	 */
 	public void testCleanupSim_EarlyEnd() {
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Config config = scenario.getConfig();
 
 		double simEndTime = 8.0*3600;
@@ -1164,7 +1166,7 @@ public class QueueSimulationTest extends TestCase {
 		final ArrayList<Id> linkIds2;
 
 		public Fixture() {
-			this.scenario = new ScenarioImpl();
+			this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 			this.config = scenario.getConfig();
 			this.config.addSimulationConfigGroup(new SimulationConfigGroup()) ;
 			this.config.simulation().setFlowCapFactor(1.0);

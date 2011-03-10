@@ -24,7 +24,6 @@ import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
 import org.geotools.feature.Feature;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -34,8 +33,11 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.core.utils.misc.RouteUtils;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -81,7 +83,7 @@ public class SelectedLegs2QGIS extends SelectedPlans2ESRIShapeChanged {
 		final String populationFilename = "../runs_SVN/run674/it.1000/1000.plans.xml.gz";
 		final String networkFilename = "../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml";
 		final String outputDir = "../runs_SVN/run674/it.1000/1000.analysis/";
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		NetworkImpl network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(networkFilename);
 

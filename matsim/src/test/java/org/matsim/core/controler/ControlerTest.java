@@ -36,7 +36,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -58,6 +57,8 @@ import org.matsim.core.mobsim.framework.Simulation;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -177,7 +178,7 @@ public class ControlerTest {
 		final Config config = utils.loadConfig(null);
 		config.controler().setLastIteration(0);
 
-		ScenarioImpl scenario = new ScenarioImpl(config);
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		// create a very simple network with one link only and an empty population
 		Network network = scenario.getNetwork();
 		Node node1 = network.getFactory().createNode(new IdImpl(1), new CoordImpl(0, 0));
@@ -615,7 +616,7 @@ public class ControlerTest {
 		Link link3 = null;
 
 		protected Fixture(final Config config) {
-			this.scenario = new ScenarioImpl(config);
+			this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 			this.network = scenario.getNetwork();
 
 			/* Create a simple network with 4 nodes and 3 links:

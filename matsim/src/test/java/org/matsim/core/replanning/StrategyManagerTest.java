@@ -20,7 +20,6 @@
 
 package org.matsim.core.replanning;
 
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
@@ -31,6 +30,9 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.testcases.MatsimTestCase;
 
 public class StrategyManagerTest extends MatsimTestCase {
@@ -44,7 +46,7 @@ public class StrategyManagerTest extends MatsimTestCase {
 	 */
 	public void testChangeRequests() {
 
-		Population population = new ScenarioImpl().getPopulation();
+		Population population = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
 		for (int i = 0; i < 1000; i++) {
 			PersonImpl p = new PersonImpl(new IdImpl(i));
 			population.addPerson(p);
@@ -124,7 +126,7 @@ public class StrategyManagerTest extends MatsimTestCase {
 	 */
 	public void testRemoveStrategy() {
 
-		Population population = new ScenarioImpl().getPopulation();
+		Population population = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
 		for (int i = 0; i < 100; i++) {
 			PersonImpl p = new PersonImpl(new IdImpl(i));
 			population.addPerson(p);
@@ -181,7 +183,7 @@ public class StrategyManagerTest extends MatsimTestCase {
 	 */
 	public void testOptimisticBehavior() {
 
-		Population population = new ScenarioImpl().getPopulation();
+		Population population = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
 		PersonImpl person = null;
 		PlanImpl[] plans = new PlanImpl[10];
 		// create a person with 4 unscored plans
@@ -240,7 +242,7 @@ public class StrategyManagerTest extends MatsimTestCase {
 			plans[i] = p.createAndAddPlan(false);
 			plans[i].setScore(Double.valueOf(i*10));
 		}
-		Population pop = new ScenarioImpl().getPopulation();
+		Population pop = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
 		pop.addPerson(p);
 
 		// run with default settings

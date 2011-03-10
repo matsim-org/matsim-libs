@@ -20,7 +20,6 @@
 
 package org.matsim.core.population;
 
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -32,18 +31,21 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.testcases.MatsimTestCase;
 
 public class PopulationWriterHandlerImplV4Test extends MatsimTestCase {
 
 	public void testWriteGenericRoute() {
-		ScenarioImpl scenario = new ScenarioImpl(super.loadConfig(null));
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(super.loadConfig(null));
 		NetworkImpl network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile("test/scenarios/equil/network.xml");
 		Link link1 = network.getLinks().get(new IdImpl(1));
 		Link link2 = network.getLinks().get(new IdImpl(2));
 
-		ScenarioImpl tmpScenario = new ScenarioImpl();
+		ScenarioImpl tmpScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		tmpScenario.setNetwork(network);
 		Population pop = tmpScenario.getPopulation();
 		PopulationFactory pb = pop.getFactory();

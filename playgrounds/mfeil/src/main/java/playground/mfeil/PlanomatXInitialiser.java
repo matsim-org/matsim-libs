@@ -19,10 +19,10 @@
  * *********************************************************************** */
 package playground.mfeil;
 
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;

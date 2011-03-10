@@ -3,7 +3,6 @@ package playground.wrashid.PSF.converter.addingParkings;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
@@ -13,6 +12,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
+import org.matsim.core.scenario.ScenarioImpl;
 
 /**
  * add parking to plans (leg + activities)

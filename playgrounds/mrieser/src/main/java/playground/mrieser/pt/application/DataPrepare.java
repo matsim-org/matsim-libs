@@ -24,7 +24,6 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -39,6 +38,9 @@ import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.DijkstraFactory;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.router.PlansCalcTransitRoute;
 import org.matsim.pt.router.TransitRouterImpl;
@@ -80,7 +82,7 @@ public class DataPrepare {
 	private final Config config;
 
 	public DataPrepare() {
-		this.scenario = new ScenarioImpl();
+		this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		this.config = this.scenario.getConfig();
 	}
 
@@ -144,9 +146,9 @@ public class DataPrepare {
 	}
 
 	protected void mergeNetworks() {
-		ScenarioImpl transitScenario = new ScenarioImpl();
+		ScenarioImpl transitScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		NetworkImpl transitNetwork = transitScenario.getNetwork();
-		ScenarioImpl streetScenario = new ScenarioImpl();
+		ScenarioImpl streetScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		NetworkImpl streetNetwork = streetScenario.getNetwork();
 		try {
 			new MatsimNetworkReader(transitScenario).parse(TRANSIT_NETWORK_FILE);
@@ -196,7 +198,7 @@ public class DataPrepare {
 		Network routerNet = router.getTransitRouterNetwork();
 
 		log.info("create vis network");
-		ScenarioImpl visScenario = new ScenarioImpl();
+		ScenarioImpl visScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network visNet = visScenario.getNetwork();
 
 		for (Node node : routerNet.getNodes().values()) {

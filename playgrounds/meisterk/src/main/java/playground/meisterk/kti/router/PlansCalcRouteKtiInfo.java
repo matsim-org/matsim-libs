@@ -25,8 +25,10 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.matrices.Matrices;
 import org.matsim.matrices.Matrix;
 import org.matsim.visum.VisumMatrixReader;
@@ -57,7 +59,7 @@ public class PlansCalcRouteKtiInfo {
 		}
 
 		// municipality layer from world file
-		ScenarioImpl localScenario = new ScenarioImpl();
+		ScenarioImpl localScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		this.localWorld = new World();
 		try {
 			new MatsimWorldReader(localScenario, localWorld).parse(ktiConfigGroup.getWorldInputFilename());

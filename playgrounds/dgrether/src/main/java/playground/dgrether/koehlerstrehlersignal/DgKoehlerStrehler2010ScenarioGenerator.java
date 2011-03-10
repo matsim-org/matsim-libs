@@ -25,15 +25,16 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
-import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.api.experimental.network.NetworkWriter;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.lanes.Lane;
 import org.matsim.lanes.LaneDefinitions;
 import org.matsim.lanes.LaneDefinitionsFactory;
@@ -85,7 +86,7 @@ public class DgKoehlerStrehler2010ScenarioGenerator {
 	private int cycle = 120;
 	
 	public ScenarioImpl loadScenario(){
-		ScenarioLoader scl = new ScenarioLoaderImpl(baseDir + "config_signals.xml");
+		ScenarioLoaderImpl scl = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(baseDir + "config_signals.xml");
 		ScenarioImpl sc = (ScenarioImpl) scl.loadScenario();
 		SignalsScenarioLoader signalsLoader = new SignalsScenarioLoader(sc.getConfig().signalSystems());
 		SignalsData signals = signalsLoader.loadSignalsData();
@@ -95,7 +96,7 @@ public class DgKoehlerStrehler2010ScenarioGenerator {
 	
 	private void createScenario() {
 		this.initIds();
-		Scenario sc = new ScenarioImpl();
+		Scenario sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		sc.getConfig().scenario().setUseLanes(true);
 		//network
 		Network net = this.createNetwork(sc);

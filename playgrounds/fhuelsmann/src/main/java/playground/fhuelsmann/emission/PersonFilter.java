@@ -25,12 +25,14 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -49,7 +51,7 @@ public class PersonFilter {
 	}
 
 	Population getRelevantPopulation(Population population,	Set<Feature> featuresInShape) {
-		ScenarioImpl emptyScenario = new ScenarioImpl();
+		ScenarioImpl emptyScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Population filteredPopulation = new PopulationImpl(emptyScenario);
 		for(Person person : population.getPersons().values()){
 			if(isPersonFromMID(person)){

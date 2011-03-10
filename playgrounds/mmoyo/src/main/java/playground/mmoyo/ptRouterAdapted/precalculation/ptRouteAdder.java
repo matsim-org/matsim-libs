@@ -30,12 +30,14 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 import playground.mmoyo.utils.DataLoader;
 
@@ -54,7 +56,7 @@ public class ptRouteAdder {
 		
 		DataLoader loader= new DataLoader ();
 		Population basePop = loader.readPopulation(basePopfile); 
-		Population newPop= new ScenarioImpl().getPopulation();
+		Population newPop= ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
 		
 		PlanPTRoutesComparator planPTRoutesComparator = new PlanPTRoutesComparator();
 		

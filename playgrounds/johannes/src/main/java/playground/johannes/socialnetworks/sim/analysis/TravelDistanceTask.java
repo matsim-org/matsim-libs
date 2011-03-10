@@ -28,7 +28,6 @@ import java.util.Set;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.sna.math.FixedSampleSizeDiscretizer;
@@ -37,6 +36,9 @@ import org.matsim.contrib.sna.math.LinearDiscretizer;
 import org.matsim.contrib.sna.util.TXTWriter;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 /**
  * @author illenberger
@@ -111,7 +113,7 @@ public class TravelDistanceTask implements PlansAnalyzerTask {
 
 	
 	public static void main(String args[]) throws IOException {
-		Scenario scenario = new ScenarioImpl();
+		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		
 		MatsimNetworkReader netReader = new MatsimNetworkReader(scenario);
 		netReader.readFile("/Volumes/cluster.math.tu-berlin.de/net/ils2/jillenberger/locationChoice/data/ivtch.xml");

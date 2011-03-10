@@ -8,7 +8,6 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
@@ -20,6 +19,9 @@ import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 public class LinkTravelTimeAndDistanceExtractor implements
 		LinkEnterEventHandler, LinkLeaveEventHandler, AgentArrivalEventHandler {
@@ -120,7 +122,7 @@ public class LinkTravelTimeAndDistanceExtractor implements
 
 		Gbl.startMeasurement();
 
-		Scenario scenario = new ScenarioImpl();
+		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		new MatsimNetworkReader(scenario).readFile(netFilename);
 

@@ -62,7 +62,7 @@ public class DgOTFVis {
 
 	
 	public void playAndRouteConfig(String config){
-		Scenario sc = new ScenarioLoaderImpl(config).loadScenario();
+		Scenario sc = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(config).loadScenario();
 		DgOTFVisUtils.locateAndRoutePopulation(sc);
 		this.playScenario(sc);
 	}

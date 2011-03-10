@@ -40,7 +40,6 @@ import org.geotools.feature.SchemaException;
 import org.geotools.referencing.factory.GeotoolsFactory;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
@@ -48,6 +47,9 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CRSFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -139,20 +141,20 @@ public class PlanScoreAnalysis {
 	}
 
 	private void doAnalysis() {
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		NetworkImpl net = scenario.getNetwork();
 		MatsimNetworkReader netReader = new MatsimNetworkReader(scenario);
 		netReader.readFile(NETWORK);
 //		Gbl.getWorld().setNetworkLayer(net);
 //		Gbl.getWorld().complete();
 
-		ScenarioImpl scenario1 = new ScenarioImpl();
+		ScenarioImpl scenario1 = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario1.setNetwork(net);
 		Population plans = scenario1.getPopulation();
 		new MatsimPopulationReader(scenario1).readFile(PLANS);
 
 
-		ScenarioImpl scenario2 = new ScenarioImpl();
+		ScenarioImpl scenario2 = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario2.setNetwork(net);
 		Population plans2 = scenario2.getPopulation();
 		new MatsimPopulationReader(scenario2).readFile(PLANS2);

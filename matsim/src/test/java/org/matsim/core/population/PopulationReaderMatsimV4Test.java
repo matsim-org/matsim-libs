@@ -27,7 +27,6 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -39,7 +38,10 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.MatsimXmlParser;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.testcases.utils.AttributesBuilder;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -55,7 +57,7 @@ public class PopulationReaderMatsimV4Test {
 	 */
 	@Test
 	public void testReadRoute() throws SAXException, ParserConfigurationException, IOException {
-		final ScenarioImpl scenario = new ScenarioImpl();
+		final ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		final Network network = scenario.getNetwork();
 		final Population population = scenario.getPopulation();
 		new MatsimNetworkReader(scenario).parse("test/scenarios/equil/network.xml");
@@ -148,7 +150,7 @@ public class PopulationReaderMatsimV4Test {
 	 */
 	@Test
 	public void testReadRouteWithoutActivityLinks() {
-		final ScenarioImpl scenario = new ScenarioImpl();
+		final ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		final Population population = scenario.getPopulation();
 
 		PopulationReaderMatsimV4 parser = new PopulationReaderMatsimV4(scenario);
@@ -182,7 +184,7 @@ public class PopulationReaderMatsimV4Test {
 	 */
 	@Test
 	public void testReadActivity() {
-		final ScenarioImpl scenario = new ScenarioImpl();
+		final ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		final NetworkImpl network = scenario.getNetwork();
 		Node node1 = network.createAndAddNode(scenario.createId("1"), scenario.createCoord(0, 0));
 		Node node2 = network.createAndAddNode(scenario.createId("2"), scenario.createCoord(0, 1000));

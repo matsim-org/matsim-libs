@@ -24,11 +24,13 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.CountsWriter;
@@ -48,14 +50,14 @@ public class CountsIdUpdater {
 
 		int cnt = 0;
 
-		ScenarioImpl oldScenario = new ScenarioImpl();
+		ScenarioImpl oldScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		NetworkImpl oldNet = oldScenario.getNetwork();
 		new MatsimNetworkReader(oldScenario).readFile(oldNetFile);
 
 		Counts oldCounts = new Counts();
 		new MatsimCountsReader(oldCounts).readFile(oldCountsFile);
 
-		ScenarioImpl newScenario = new ScenarioImpl();
+		ScenarioImpl newScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		NetworkImpl newNet = newScenario.getNetwork();
 		new MatsimNetworkReader(newScenario).readFile(newNetFile);
 

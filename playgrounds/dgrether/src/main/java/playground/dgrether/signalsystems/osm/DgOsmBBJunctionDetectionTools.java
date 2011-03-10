@@ -35,14 +35,16 @@ import org.apache.log4j.Logger;
 import org.geotools.referencing.GeodeticCalculator;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.network.NetworkWriter;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.algorithms.NetworkCalcTopoType;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.openstreetmap.osmosis.core.domain.v0_6.Node;
 import org.openstreetmap.osmosis.core.filter.v0_6.TagFilter;
@@ -140,7 +142,7 @@ public class DgOsmBBJunctionDetectionTools {
 	private Network createMatsimNetwork(String osmFile){
 		// get a Matsim Network
 		// read the file again as NetworkSink modifies the data and the Entities are read-only if a EntityTee is used
-		Scenario sc = new ScenarioImpl();
+		Scenario sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		NetworkSink networkGenerator = createAndInitNetworkSink(sc, TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.WGS84));
 		TagFilter transitRelationsFilter = createTransitRelationsFilter();
 		TagFilter transitWaysFilter = createTransitWaysFilter();

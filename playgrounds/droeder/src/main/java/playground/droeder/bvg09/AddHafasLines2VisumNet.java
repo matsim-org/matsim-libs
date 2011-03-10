@@ -33,7 +33,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
@@ -47,6 +46,9 @@ import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -96,8 +98,8 @@ public class AddHafasLines2VisumNet {
 
 
 	public AddHafasLines2VisumNet(){
-		this.visumSc = new ScenarioImpl();
-		this.hafasSc = new ScenarioImpl();
+		this.visumSc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		this.hafasSc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		visumSc.getConfig().scenario().setUseTransit(true);
 		readSchedule(VISUMTRANSITFILE, visumSc);
@@ -111,7 +113,7 @@ public class AddHafasLines2VisumNet {
 
 		this.createHafasLineIdsFromVisum();
 
-		newSc = new ScenarioImpl();
+		newSc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		newSc.getConfig().scenario().setUseTransit(true);
 		finalTransitFactory = newSc.getTransitSchedule().getFactory();
 		finalTransitSchedule = finalTransitFactory.createTransitSchedule();

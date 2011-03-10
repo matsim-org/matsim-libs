@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.AgentMoneyEvent;
 import org.matsim.core.api.experimental.events.handler.AgentMoneyEventHandler;
@@ -14,6 +13,9 @@ import org.matsim.core.config.Module;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.evacuation.config.EvacuationConfigGroup;
 import org.matsim.evacuation.flooding.FloodingReader;
@@ -23,7 +25,7 @@ public class RiskCostFromFloodingDataTest extends MatsimTestCase {
 
 	public void testRiskCostFromFloodingData() {
 		String config = getInputDirectory() + "config.xml";
-		ScenarioImpl sc = new ScenarioImpl();
+		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new ConfigReaderMatsimV1(sc.getConfig()).readFile(config);
 		Module m = sc.getConfig().getModule("evacuation");
 		EvacuationConfigGroup ec = new EvacuationConfigGroup(m);

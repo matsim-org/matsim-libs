@@ -28,12 +28,14 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
 
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 /**
  * @author Daniel Dressler, Manuel Schneider
@@ -109,7 +111,7 @@ public class ConfluentFlowNetwork {
 
 	public static NetworkImpl roundNetwork(String filename, int newcap, double flowCapacityFactor, double lengthFactor){
 		//read network
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		NetworkImpl network = scenario.getNetwork();
 		MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario);
 		networkReader.readFile(filename);

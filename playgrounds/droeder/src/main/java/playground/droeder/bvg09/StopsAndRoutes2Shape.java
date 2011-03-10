@@ -14,10 +14,12 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.geotools.feature.FeatureType;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
@@ -73,12 +75,12 @@ public class StopsAndRoutes2Shape{
 	}
 	
 	public StopsAndRoutes2Shape() {
-		vSc = new ScenarioImpl();
+		vSc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		vSc.getConfig().scenario().setUseTransit(true);
 		this.readSchedule(VISUMSCHEDULEFILE, vSc);
 		this.readNetwork(VISUMNETWORK, vSc);
 		
-		hSc = new ScenarioImpl();
+		hSc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		hSc.getConfig().scenario().setUseTransit(true);
 		this.readSchedule(HAFASSCHEDULEFILE, hSc);
 		

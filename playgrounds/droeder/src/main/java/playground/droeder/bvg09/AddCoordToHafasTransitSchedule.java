@@ -30,10 +30,12 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
@@ -56,7 +58,7 @@ public class AddCoordToHafasTransitSchedule {
 	private static String INFILENAME = DaPaths.OUTPUT + "bvg09/transitSchedule-HAFAS.xml";
 	private static String OUTFILENAME = DaPaths.OUTPUT + "bvg09/transitSchedule-HAFAS-Coord.xml";
 	
-	private ScenarioImpl sc = new ScenarioImpl();
+	private ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 	private Map<Id, Coord> facilityCoord = new HashMap<Id, Coord>();
 	
 	public void addCoord(){

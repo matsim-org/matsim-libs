@@ -29,7 +29,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -39,6 +38,9 @@ import org.matsim.contrib.sna.math.Discretizer;
 import org.matsim.contrib.sna.math.Distribution;
 import org.matsim.contrib.sna.math.LinearDiscretizer;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 
 /**
@@ -52,7 +54,7 @@ public class TravelTimeDistance {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		Scenario scenario = new ScenarioImpl();
+		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		MatsimPopulationReader reader = new MatsimPopulationReader(scenario);
 		reader.readFile("/Users/jillenberger/Work/socialnets/data/schweiz/mz2005/rawdata/plans.xml");
 		

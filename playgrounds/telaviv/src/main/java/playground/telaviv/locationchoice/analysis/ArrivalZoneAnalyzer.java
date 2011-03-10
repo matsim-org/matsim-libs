@@ -32,7 +32,6 @@ import org.apache.log4j.Logger;
 import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
@@ -42,8 +41,11 @@ import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 import playground.telaviv.zones.ZoneMapping;
 
@@ -84,7 +86,7 @@ public class ArrivalZoneAnalyzer implements AgentArrivalEventHandler {
 	private Map<Integer, Map<Integer, Integer>> educationArrivals;	// Map<ZoneId, Map<Hour, ArrivalCount>>
 		
 	public static void main(String[] args) {
-		Scenario scenario = new ScenarioImpl();
+		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		
 		// load network
 		new MatsimNetworkReader(scenario).readFile(networkFile);

@@ -20,7 +20,6 @@
 
 package playground.balmermi.datapuls;
 
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.gbl.Gbl;
@@ -28,6 +27,9 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 import playground.balmermi.datapuls.modules.PersonAdaptPlanAndCreateFacilities;
 
@@ -55,7 +57,7 @@ public class CBPopulationPreparation {
 	public static void main(String[] args) {
 		if (args.length != 3) { printUsage(); return; }
 
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		final PopulationImpl population = (PopulationImpl) scenario.getPopulation();
 		population.setIsStreaming(true);
 		PopulationReader plansReader = new MatsimPopulationReader(scenario);

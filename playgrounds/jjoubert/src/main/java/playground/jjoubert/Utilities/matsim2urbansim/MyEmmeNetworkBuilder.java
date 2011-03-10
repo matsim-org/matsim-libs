@@ -26,13 +26,15 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 /**
  * Reads node and link DBF files (that have been converted to TAB-delimited 
@@ -129,7 +131,7 @@ public class MyEmmeNetworkBuilder {
 	}
 
 	public MyEmmeNetworkBuilder() {
-		scenario = new ScenarioImpl();
+		scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		nodeFile = null;
 		linkFile = null;
 		networkFile = null;

@@ -24,7 +24,6 @@ package playground.duncan.archive;
 
 import java.io.PrintWriter;
 
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.controler.Controler;
@@ -35,6 +34,7 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.locationchoice.LocationMutator;
@@ -52,7 +52,7 @@ public class ConnectHomesAndWorkplaces {
 		} else {
 			configFile = args[0] ;
 		}
-		ScenarioImpl scenario = new ScenarioLoaderImpl(configFile).getScenario();
+		ScenarioImpl scenario = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(configFile).getScenario();
 
 		this.config = scenario.getConfig();
 		ConfigWriter configwriter = new ConfigWriter(this.config);

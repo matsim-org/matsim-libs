@@ -19,11 +19,12 @@
 
 package playground.wrashid.PSF.converter.addingParkings;
 
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestCase;
 
 public class TestConfig4 extends MatsimTestCase {
@@ -35,7 +36,7 @@ public class TestConfig4 extends MatsimTestCase {
 		String configFilePath=basePathOfTestData + "config4.xml";
 		Config config = loadConfig(configFilePath);
 
-		ScenarioImpl scenario = new ScenarioImpl(config);
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		new MatsimNetworkReader(scenario).readFile(networkFile);
 		new MatsimPopulationReader(scenario).readFile(basePathOfTestData + "plans2.xml");
 

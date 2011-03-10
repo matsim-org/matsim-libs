@@ -21,11 +21,13 @@
 package playground.balmermi;
 
 import org.matsim.analysis.LegHistogram;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 public class EventsHandling {
 
@@ -51,7 +53,7 @@ public class EventsHandling {
 		Gbl.startMeasurement();
 		Gbl.printElapsedTime();
 
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		handlingEvents(300, scenario.getConfig());
 

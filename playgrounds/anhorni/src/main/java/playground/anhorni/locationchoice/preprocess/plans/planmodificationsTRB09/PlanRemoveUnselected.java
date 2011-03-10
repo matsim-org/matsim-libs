@@ -1,7 +1,6 @@
 package playground.anhorni.locationchoice.preprocess.plans.planmodificationsTRB09;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
@@ -12,6 +11,9 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.core.utils.misc.Counter;
 
 public class PlanRemoveUnselected {
@@ -63,7 +65,7 @@ public class PlanRemoveUnselected {
 	private void init(final String plansfilePath, final String networkfilePath,
 			final String facilitiesfilePath, final String worldfilePath) {
 
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		this.network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(networkfilePath);

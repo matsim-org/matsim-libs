@@ -21,7 +21,6 @@
 package org.matsim.roadpricing;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
@@ -31,6 +30,8 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.AStarLandmarksFactory;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.roadpricing.RoadPricingScheme.Cost;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -46,7 +47,7 @@ public class PlansCalcAreaTollRouteTest extends MatsimTestCase {
 	 */
 	public void testBestAlternatives() {
 		Config config = loadConfig(null);
-		ScenarioImpl scenario = new ScenarioImpl(config);
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		Fixture.createNetwork2(scenario);
 		NetworkImpl network = scenario.getNetwork();
 
@@ -105,7 +106,7 @@ public class PlansCalcAreaTollRouteTest extends MatsimTestCase {
 	 */
 	public void testTolledActLink() {
 		Config config = loadConfig(null);
-		ScenarioImpl scenario = new ScenarioImpl(config);
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		Fixture.createNetwork2(scenario);
 		NetworkImpl network = scenario.getNetwork();
 
@@ -136,7 +137,7 @@ public class PlansCalcAreaTollRouteTest extends MatsimTestCase {
 	 */
 	public void testAllAlternativesTolled() {
 		Config config = loadConfig(null);
-		ScenarioImpl scenario = new ScenarioImpl(config);
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		Fixture.createNetwork2(scenario);
 		NetworkImpl network = scenario.getNetwork();
 
@@ -164,7 +165,7 @@ public class PlansCalcAreaTollRouteTest extends MatsimTestCase {
 
 	public void testOutsideTollTime() {
 		Config config = loadConfig(null);
-		ScenarioImpl scenario = new ScenarioImpl(config);
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		Fixture.createNetwork2(scenario);
 		NetworkImpl network = scenario.getNetwork();
 

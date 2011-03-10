@@ -3,7 +3,6 @@ package playground.anhorni.locationchoice.preprocess.plans.modifications;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -14,6 +13,9 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationReader;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 public class AddBorderCrossingTraffic {
 
@@ -26,7 +28,7 @@ public class AddBorderCrossingTraffic {
 	}
 
 	private void init(NetworkImpl network) {
-		ScenarioImpl oldScenario = new ScenarioImpl();
+		ScenarioImpl oldScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		oldScenario.setNetwork(network);
 		this.oldPlans = oldScenario.getPopulation();
 		final PopulationReader plansReader = new MatsimPopulationReader(oldScenario);

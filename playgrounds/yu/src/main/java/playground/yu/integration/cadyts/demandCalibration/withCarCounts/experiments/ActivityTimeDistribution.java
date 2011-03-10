@@ -30,7 +30,6 @@ import java.util.Set;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
@@ -40,6 +39,8 @@ import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ActivityUtilityParameters;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.utils.collections.Tuple;
@@ -369,18 +370,13 @@ public class ActivityTimeDistribution implements ActivityStartEventHandler,
 		EventsManager events = new EventsManagerImpl();
 
 		ActivityTimeDistribution atd = null;
-		try {
-			atd = new ActivityTimeDistribution(
-					new CharyparNagelScoringParameters(ConfigUtils.loadConfig(
-							configFilename).planCalcScore()));
-			events.addHandler(atd);
-			new MatsimEventsReader(events).readFile(eventsFilename);
+		atd = new ActivityTimeDistribution(
+				new CharyparNagelScoringParameters(ConfigUtils.loadConfig(
+						configFilename).planCalcScore()));
+		events.addHandler(atd);
+		new MatsimEventsReader(events).readFile(eventsFilename);
 
-			atd.output(outputFilenameBase, interval);
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		atd.output(outputFilenameBase, interval);
 
 	}
 
@@ -392,8 +388,8 @@ public class ActivityTimeDistribution implements ActivityStartEventHandler,
 		String gridFilenameBase = "../integration-demandCalibration/test/DestinationUtilOffset2/1000.destUtiloffset.";// +"??.grid.log";
 		double interval = 600;
 		int arStartTime = 7, arEndTime = 20;
-		Scenario scenario = new ScenarioImpl(ConfigUtils
-				.loadConfig(configFilename));
+		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils
+		.loadConfig(configFilename));
 
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(networkFilename);

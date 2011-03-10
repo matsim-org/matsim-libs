@@ -20,7 +20,6 @@
 
 package org.matsim.core.replanning.modules;
 
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
@@ -34,6 +33,8 @@ import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.charyparNagel.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
@@ -50,7 +51,7 @@ public class PlanomatModuleTest extends MatsimTestCase {
 		super.setUp();
 		Config config = super.loadConfig(this.getClassInputDirectory() + "config.xml");
 
-		this.scenario = new ScenarioImpl(config);
+		this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 	}
 
 	public void testGenerateRandomDemand() {

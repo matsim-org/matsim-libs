@@ -5,17 +5,19 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 public class NetworkReadExample {
 
 	public static void main(String[] args) {
 		//getFilteredEquilNetLinks();
 	}
 	public static Map<Id,Link> getNetworkLinks(String networkFile, Coord center, double radius){ //read network
-		ScenarioImpl scenanrioImpl = new ScenarioImpl(); // create a new scenario object
+		ScenarioImpl scenanrioImpl = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig()); // create a new scenario object
 
 		new MatsimNetworkReader(scenanrioImpl).readFile(networkFile);//matsim function, need scenario object for reading
 		// read the network file

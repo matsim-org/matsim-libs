@@ -21,7 +21,6 @@
 package playground.anhorni.analysis;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -29,14 +28,18 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.misc.ConfigUtils;
+
 import playground.anhorni.analysis.Bins;
 
 
 public class CalculatePlanTravelStatsDiscretionaryActs {
 	private Bins shopBins;
 	private Bins leisureBins;
-	private ScenarioImpl scenario = new ScenarioImpl();
+	private ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 	private String outPath;
 	private int analysisPopulationOffset = 0;
 	private final static Logger log = Logger.getLogger(CalculatePlanTravelStatsDiscretionaryActs.class);

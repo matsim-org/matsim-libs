@@ -16,7 +16,7 @@ import org.matsim.core.scenario.ScenarioLoaderImpl;
 public class EquilPlans1Test extends AbstractJDEQSimTest {
 
 	public void test_EmptyCarRoute() {
-		Scenario scenario = new ScenarioLoaderImpl("test/scenarios/equil/config_plans1.xml").loadScenario();
+		Scenario scenario = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed("test/scenarios/equil/config_plans1.xml").loadScenario();
 		this.runJDEQSim(scenario);
 		
 		assertEquals(1, eventsByPerson.size());

@@ -27,10 +27,12 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 public class PTCountsNetworkSimplifierTest {
 	
@@ -64,7 +66,7 @@ public class PTCountsNetworkSimplifierTest {
 		ptCountNetSimplifier.setMergeLinkStats(false);
 		ptCountNetSimplifier.simplifyPTNetwork();
 		
-		Scenario scenario = new ScenarioImpl();
+		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(outNetwork);
 		
@@ -102,7 +104,7 @@ public class PTCountsNetworkSimplifierTest {
 		ptCountNetSimplifier.setMergeLinkStats(false);
 		ptCountNetSimplifier.simplifyPTNetwork();
 		
-		Scenario scenario = new ScenarioImpl();
+		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(outNetwork);
 		
@@ -148,7 +150,7 @@ public class PTCountsNetworkSimplifierTest {
 		ptCountNetSimplifier.setMergeLinkStats(false);
 		ptCountNetSimplifier.simplifyPTNetwork();
 		
-		Scenario scenario = new ScenarioImpl();
+		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(outNetwork);
 		
@@ -192,7 +194,7 @@ public class PTCountsNetworkSimplifierTest {
 		ptCountNetSimplifier.setMergeLinkStats(false);
 		ptCountNetSimplifier.simplifyPTNetwork();
 		
-		Scenario scenario = new ScenarioImpl();
+		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(outNetwork);
 		
@@ -241,7 +243,7 @@ public class PTCountsNetworkSimplifierTest {
 		ptCountNetSimplifier.setMergeLinkStats(false);
 		ptCountNetSimplifier.simplifyPTNetwork();
 		
-		Scenario scenario = new ScenarioImpl();
+		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(outNetwork);
 		
@@ -295,7 +297,7 @@ public class PTCountsNetworkSimplifierTest {
 		ptCountNetSimplifier.setMergeLinkStats(false);
 		ptCountNetSimplifier.simplifyPTNetwork();
 		
-		Scenario scenario = new ScenarioImpl();
+		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(outNetwork);
 		

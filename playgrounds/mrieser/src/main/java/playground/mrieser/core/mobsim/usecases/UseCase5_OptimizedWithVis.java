@@ -19,11 +19,8 @@
 
 package playground.mrieser.core.mobsim.usecases;
 
-import java.io.IOException;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsManagerImpl;
@@ -45,13 +42,9 @@ public class UseCase5_OptimizedWithVis {
 
 		// load data
 		Config config;
-		try {
-			config = ConfigUtils.loadConfig(prefix + "test/scenarios/berlin/config.xml");
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+		config = ConfigUtils.loadConfig(prefix + "test/scenarios/berlin/config.xml");
 		ConfigUtils.modifyFilePaths(config, prefix);
-		ScenarioLoader loader = new ScenarioLoaderImpl(config);
+		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(config);
 		Scenario scenario = loader.loadScenario();
 		System.out.println("# persons: " + scenario.getPopulation().getPersons().size());
 		EventsManager events = new EventsManagerImpl();

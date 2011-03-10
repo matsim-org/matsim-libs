@@ -19,10 +19,9 @@
  * *********************************************************************** */
 package playground.dgrether.signalsystems.roedergershenson;
 
-import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.signalsystems.builder.DefaultSignalModelFactory;
@@ -49,7 +48,7 @@ public class DgGershensonRoederLiveVisStarter {
 	public void runCottbus(){
 		EventsManager events = new EventsManagerImpl();
 		String conf = DgKoehlerStrehler2010Runner.signalsConfigFileGershenson;
-		ScenarioLoader loader = new ScenarioLoaderImpl(conf);
+		ScenarioLoaderImpl loader = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(conf);
 		ScenarioImpl scenario = (ScenarioImpl) loader.loadScenario();
 		scenario.getConfig().otfVis().setAgentSize(40.0f);
 		SignalsData signalsData = scenario.getScenarioElement(SignalsData.class);

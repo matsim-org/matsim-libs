@@ -24,15 +24,17 @@ import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCleaner;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.OsmNetworkReader;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.xml.sax.SAXException;
 
 public class MyNetworkGenerator {
@@ -59,7 +61,7 @@ public class MyNetworkGenerator {
 		new NetworkCleaner().run(net);
 		new NetworkWriter(net).write("/Users/johanwjoubert/Desktop/Temp/network.xml");
 
-		Config c = new ScenarioImpl().getConfig();
+		Config c = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getConfig();
 		c.global().setCoordinateSystem(UTM35S);
 
 		// TODO Sort out these errors: Cannot instatiate FeatureGeneratorBuilder.

@@ -43,7 +43,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
@@ -57,7 +56,10 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.counts.Counts;
 import org.matsim.counts.MatsimCountsReader;
 
@@ -445,7 +447,7 @@ public class PopLinksTimeBinsMatrixCreatorTest implements LinkLeaveEventHandler 
 		// linkUtilityOffsetFilename =
 		// "../matsim-bse/old_runs/um1/ITERS/it.1000/linkIdTimeBinX.log";
 
-		Scenario scenario = new ScenarioImpl();
+		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(networkFilename);

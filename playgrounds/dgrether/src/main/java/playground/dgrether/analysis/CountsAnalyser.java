@@ -25,10 +25,10 @@ import java.util.List;
 import java.util.Locale;
 
 import org.matsim.analysis.CalcLinkStats;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.counts.ComparisonErrorStatsCalculator;
@@ -141,7 +141,7 @@ public class CountsAnalyser {
 	 * @throws Exception
 	 */
 	private void readConfig(final String configFile) throws Exception {
-		ScenarioImpl scenario = new ScenarioLoaderImpl(configFile).getScenario();
+		ScenarioImpl scenario = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(configFile).getScenario();
 		Config config = scenario.getConfig();
 		System.out.println("  reading counts xml file... ");
 		MatsimCountsReader counts_parser = new MatsimCountsReader(counts);

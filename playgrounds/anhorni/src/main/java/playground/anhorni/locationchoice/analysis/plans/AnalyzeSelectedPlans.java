@@ -23,7 +23,6 @@ package playground.anhorni.locationchoice.analysis.plans;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -37,11 +36,14 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 public class AnalyzeSelectedPlans {
 
-	private final ScenarioImpl scenario = new ScenarioImpl();
+	private final ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 	private final Population plans = scenario.getPopulation();
 	private final ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
 	private final NetworkImpl network = scenario.getNetwork();

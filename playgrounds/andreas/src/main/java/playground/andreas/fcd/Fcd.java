@@ -34,7 +34,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
@@ -51,11 +50,14 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.utils.gis.matsim2esri.network.FeatureGenerator;
 import org.matsim.utils.gis.matsim2esri.network.FeatureGeneratorBuilder;
 import org.matsim.utils.gis.matsim2esri.network.LineStringBasedFeatureGenerator;
@@ -90,7 +92,7 @@ public class Fcd {
 	}
 	
 	public static Set<String> readFcdReturningLinkIdsUsed(String fcdNetInFile, String fcdEventsInFile, String outDir, String matsimNetwork, double minDistanceBetweenTwoActs){
-		ScenarioImpl sc = new ScenarioImpl();
+		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		NetworkReaderMatsimV1 reader = new NetworkReaderMatsimV1(sc);
 		try {
 			reader.parse(matsimNetwork);
@@ -124,7 +126,7 @@ public class Fcd {
 		String matsimNetwork = "D:\\Berlin\\DLR_FCD\\20110207_Analysis\\counts_network.xml";
 		String linksUsed = "D:\\Berlin\\DLR_FCD\\20110207_Analysis\\linksUsed.txt";
 		
-		ScenarioImpl sc = new ScenarioImpl();
+		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		NetworkReaderMatsimV1 reader = new NetworkReaderMatsimV1(sc);
 		try {
 			reader.parse(matsimNetwork);
@@ -165,7 +167,7 @@ public class Fcd {
 	private void writeSimplePlansFromEvents(String plansOutFile) {
 		log.info("Creating plans from fcd events...");
 		int numberOfPlans = 1;
-		Population pop = new PopulationImpl(new ScenarioImpl());
+		Population pop = new PopulationImpl(((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())));
 		
 		FcdEvent lastEvent = null;
 		Person currentPerson = null;
@@ -202,7 +204,7 @@ public class Fcd {
 		
 		log.info("...done");
 		
-		PopulationWriter writer = new PopulationWriter(pop, new ScenarioImpl().getNetwork());
+		PopulationWriter writer = new PopulationWriter(pop, ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getNetwork());
 		writer.write(plansOutFile);
 		log.info(pop.getPersons().size() + " plans written to " + plansOutFile);
 	}
@@ -210,7 +212,7 @@ public class Fcd {
 	private void writeComplexPlansFromEvents(String plansOutFile, NetworkImpl net) {
 		log.info("Creating plans from fcd events...");
 		int numberOfPlans = 1;
-		Population pop = new PopulationImpl(new ScenarioImpl());
+		Population pop = new PopulationImpl(((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())));
 		
 		FcdEvent lastEvent = null;
 		Person currentPerson = null;
@@ -272,7 +274,7 @@ public class Fcd {
 		
 		log.info("...done");
 		
-		PopulationWriter writer = new PopulationWriter(pop, new ScenarioImpl().getNetwork());
+		PopulationWriter writer = new PopulationWriter(pop, ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getNetwork());
 		writer.write(plansOutFile);
 		log.info(pop.getPersons().size() + " plans written to " + plansOutFile);
 	}

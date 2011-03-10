@@ -22,7 +22,6 @@ package org.matsim.run;
 
 import java.io.File;
 
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -39,6 +38,9 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -58,12 +60,12 @@ public class InitRoutesTest extends MatsimTestCase {
 		final String CONFIG_FILE = getOutputDirectory() + "config.xml";
 
 		// prepare data like world and network
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		NetworkImpl network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).parse(NETWORK_FILE);
 
 		// create one person with missing link in act
-		Population population = new ScenarioImpl().getPopulation();
+		Population population = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
 		PersonImpl person = new PersonImpl(new IdImpl("1"));
 		population.addPerson(person);
 		PlanImpl plan = person.createAndAddPlan(true);

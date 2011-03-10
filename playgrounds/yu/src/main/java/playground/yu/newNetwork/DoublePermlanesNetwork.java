@@ -23,10 +23,12 @@
  */
 package playground.yu.newNetwork;
 
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 /**
  * @author yu
@@ -55,7 +57,7 @@ public class DoublePermlanesNetwork {
 		final String inputNetFilename = "../schweiz-ivtch/network/ivtch-changed-wu.xml";
 		final String outputNetFilename = "../schweiz-ivtch/tmp/ivtch-changed-wu.xml";
 
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		NetworkImpl network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(inputNetFilename);
 		new NetworkWriter(network).write(outputNetFilename);

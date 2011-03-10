@@ -25,7 +25,6 @@ import java.util.Map;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
@@ -33,6 +32,7 @@ import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -44,8 +44,8 @@ public class TravelTimeTest {
 	@Test
 	public void testEquilOneAgent() {
 		Map<Id, Map<Id, Double>> agentTravelTimes = new HashMap<Id, Map<Id, Double>>();
-		ScenarioLoaderImpl sl = new ScenarioLoaderImpl("test/scenarios/equil/config.xml");
-		ScenarioImpl data = sl.getScenario();
+		ScenarioLoaderImpl sl = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed("test/scenarios/equil/config.xml");
+		ScenarioImpl data = (ScenarioImpl) sl.getScenario();
 		Config conf = data.getConfig();
 
 		String popFileName = "test/scenarios/equil/plans1.xml";
@@ -70,7 +70,7 @@ public class TravelTimeTest {
 	@Test
 	public void testEquilTwoAgents() {
 		Map<Id, Map<Id, Double>> agentTravelTimes = new HashMap<Id, Map<Id, Double>>();
-		ScenarioLoaderImpl sl = new ScenarioLoaderImpl("test/scenarios/equil/config.xml");
+		ScenarioLoaderImpl sl = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed("test/scenarios/equil/config.xml");
 		ScenarioImpl data = sl.getScenario();
 		Config conf = data.getConfig();
 

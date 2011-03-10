@@ -7,10 +7,12 @@ import java.io.IOException;
 import java.util.TreeMap;
 import java.util.Map.Entry;
 
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 public class ScaleFactorToChangeEvent {
 	
@@ -63,7 +65,7 @@ public class ScaleFactorToChangeEvent {
 	}
 	
 	private NetworkImpl readNetwork(String networkFile){
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		MatsimNetworkReader matsimNetReader = new MatsimNetworkReader(scenario);
 		matsimNetReader.readFile(networkFile);
 		return scenario.getNetwork();

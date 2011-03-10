@@ -1,10 +1,12 @@
 package playground.mmoyo.utils;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 /**
  * Converts an agent in a population file
@@ -22,7 +24,7 @@ public class Plan2Population {
 		if (scenario.getNetwork()==null){
 			throw new NullPointerException("The network could not be found in the scenario" );
 		}
-		PopulationImpl outputPopulation = new PopulationImpl(new ScenarioImpl());
+		PopulationImpl outputPopulation = new PopulationImpl(((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())));
 		outputPopulation.addPerson(this.scenario.getPopulation().getPersons().get(new IdImpl(strPersonId)));
 		PopulationWriter popwriter = new PopulationWriter(outputPopulation, this.scenario.getNetwork());
 		popwriter.write(scenario.getConfig().controler().getOutputDirectory() + "/person_" + strPersonId + ".xml");

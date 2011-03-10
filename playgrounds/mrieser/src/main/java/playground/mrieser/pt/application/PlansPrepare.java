@@ -25,7 +25,6 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
@@ -36,8 +35,11 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.population.algorithms.PlansFilterByLegMode;
 import org.matsim.population.algorithms.PlansFilterByLegMode.FilterType;
 import org.matsim.population.filters.PersonIntersectAreaFilter;
@@ -59,7 +61,7 @@ public class PlansPrepare {
 	private static final Logger log = Logger.getLogger(PlansPrepare.class);
 
 	public PlansPrepare() {
-		this.scenario = new ScenarioImpl();
+		this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 	}
 
 	public void loadNetwork(final String filename) {
@@ -91,7 +93,7 @@ public class PlansPrepare {
 		log.info("creating diluted dpopulation:");
 		log.info("  input-file:  " + fromFile);
 		log.info("  output-file: " + toFile);
-		PopulationImpl pop = (PopulationImpl) new ScenarioImpl().getPopulation();
+		PopulationImpl pop = (PopulationImpl) ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
 		pop.setIsStreaming(true);
 
 		PopulationWriter writer = new PopulationWriter(pop, this.scenario.getNetwork());
@@ -110,7 +112,7 @@ public class PlansPrepare {
 	}
 
 	public void createSamplePopulation(final String fromFile, final String toFile, final double percentage) {
-		PopulationImpl pop = (PopulationImpl) new ScenarioImpl().getPopulation();
+		PopulationImpl pop = (PopulationImpl) ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
 		pop.setIsStreaming(true);
 		final PopulationWriter plansWriter = new PopulationWriter(pop, this.scenario.getNetwork(), percentage);
 		plansWriter.startStreaming(toFile);
@@ -128,7 +130,7 @@ public class PlansPrepare {
 
 	public void filterMode(final String fromFile, final String toFile, final String mode) {
 
-		Population pop = new ScenarioImpl().getPopulation();
+		Population pop = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
 
 		log.info("reading plans from file: " + fromFile);
 		new MatsimPopulationReader(new PseudoScenario(this.scenario, pop)).readFile(fromFile);

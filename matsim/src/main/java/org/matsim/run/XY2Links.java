@@ -22,14 +22,18 @@ package org.matsim.run;
 
 import java.util.Iterator;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ArgumentParser;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 /**
  * Assigns each activity in each plan of each person in the population a link
@@ -97,7 +101,11 @@ public class XY2Links {
 	 */
 	public void run(final String[] args) {
 		parseArguments(args);
-		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(this.configfile);
+		Scenario scenario;
+		Config config1 = ConfigUtils.loadConfig(this.configfile);
+		MatsimRandom.reset(config1.global().getRandomSeed());
+		scenario = ScenarioUtils.createScenario(config1);
+		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(scenario);
 		sl.loadNetwork();
 		NetworkImpl network = sl.getScenario().getNetwork();
 		this.config = sl.getScenario().getConfig();

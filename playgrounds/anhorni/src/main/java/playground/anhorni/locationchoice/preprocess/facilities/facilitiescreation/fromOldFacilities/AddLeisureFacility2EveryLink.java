@@ -2,7 +2,6 @@ package playground.anhorni.locationchoice.preprocess.facilities.facilitiescreati
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
@@ -13,10 +12,13 @@ import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.facilities.OpeningTime.DayType;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 public class AddLeisureFacility2EveryLink {
 	
-	private final ScenarioImpl scenario = new ScenarioImpl();
+	private final ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 	private final static Logger log = Logger.getLogger(AddLeisureFacility2EveryLink.class);
 		
 	public static void main(final String[] args) {

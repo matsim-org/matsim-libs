@@ -30,7 +30,6 @@ import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.BasicLocation;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.BasicLocations;
@@ -45,6 +44,9 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.testcases.MatsimTestCase;
 
 import playground.meisterk.org.matsim.config.groups.MeisterkConfigGroup;
@@ -79,7 +81,7 @@ public class PlanAnalyzeTourModeChoiceSetTest extends MatsimTestCase {
 
 		// load data
 		log.info("Reading facilities xml file...");
-		ScenarioImpl scenario = new ScenarioImpl(this.config);
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(this.config);
 		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
 		new MatsimFacilitiesReader(scenario).readFile(this.config.facilities().getInputFile());
 		log.info("Reading facilities xml file...done.");
@@ -93,7 +95,7 @@ public class PlanAnalyzeTourModeChoiceSetTest extends MatsimTestCase {
 
 		// load data
 		log.info("Reading network xml file...");
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		NetworkImpl network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(this.config.network().getInputFile());
 		log.info("Reading network xml file...done.");
@@ -410,7 +412,7 @@ public class PlanAnalyzeTourModeChoiceSetTest extends MatsimTestCase {
 
 		// load data
 		log.info("Reading network xml file...");
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		NetworkImpl network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(this.config.network().getInputFile());
 		log.info("Reading network xml file...done.");

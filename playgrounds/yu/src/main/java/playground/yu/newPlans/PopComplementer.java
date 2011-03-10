@@ -24,7 +24,6 @@
 package playground.yu.newPlans;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
@@ -32,6 +31,9 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 /**
  * complements the {@code Population}, that each has less than maxPlansPerAgents
@@ -72,7 +74,7 @@ public class PopComplementer extends NewPopulation {
 		String oldPopFilename = "../../matsim/output/equil/output_plans.xml.gz";
 		String newPopFilename = "../../matsim/output/equil/output_4plans.xml.gz";
 
-		Scenario s = new ScenarioImpl();
+		Scenario s = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		NetworkImpl net = (NetworkImpl) s.getNetwork();
 		new MatsimNetworkReader(s).readFile(netFilename);

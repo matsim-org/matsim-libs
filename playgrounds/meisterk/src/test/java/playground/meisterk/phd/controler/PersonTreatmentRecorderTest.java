@@ -26,13 +26,15 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.testcases.MatsimTestCase;
 
 import playground.meisterk.phd.config.PopulationConvergenceConfigGroup;
@@ -47,7 +49,7 @@ public class PersonTreatmentRecorderTest extends MatsimTestCase {
 	protected void setUp() throws Exception {
 		super.setUp();
 
-		this.sc = new ScenarioImpl();
+		this.sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		PopulationConvergenceConfigGroup populationConvergenceConfigGroup = new PopulationConvergenceConfigGroup();
 		this.sc.getConfig().addModule(PopulationConvergenceConfigGroup.GROUP_NAME, populationConvergenceConfigGroup);

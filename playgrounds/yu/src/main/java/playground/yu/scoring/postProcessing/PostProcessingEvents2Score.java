@@ -23,7 +23,6 @@ package playground.yu.scoring.postProcessing;
 import java.io.IOException;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -32,6 +31,8 @@ import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.EventsToScore;
 import org.matsim.core.utils.misc.ConfigUtils;
 
@@ -49,26 +50,22 @@ public class PostProcessingEvents2Score {
 		String eventsFilename = "/net/ils/chen/matsim-bse/outputs/4SE_DC/raiseTRB/ITERS/it.1000/1000.events.txt.gz";
 		String chartFilenameBase = "/net/ils/chen/matsim-bse/outputs/4SE_DC/raiseTRB/ITERS/it.1000/1000.departTime_travelTime.";
 
-		try {
-			Config config = ConfigUtils.loadConfig(configFilename);
-			Scenario scenario = new ScenarioImpl(config);
+		Config config = ConfigUtils.loadConfig(configFilename);
+		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 
-			Network net = scenario.getNetwork();
-			new MatsimNetworkReader(scenario).readFile(netFilename);
+		Network net = scenario.getNetwork();
+		new MatsimNetworkReader(scenario).readFile(netFilename);
 
-			Population pop = scenario.getPopulation();
-			new MatsimPopulationReader(scenario).readFile(popFilename);
+		Population pop = scenario.getPopulation();
+		new MatsimPopulationReader(scenario).readFile(popFilename);
 
-			EventsManager events = new EventsManagerImpl();
+		EventsManager events = new EventsManagerImpl();
 
-			CharyparNagelScoringFunctionFactoryWithDetailedLegScoreRecord scoringFactory = new CharyparNagelScoringFunctionFactoryWithDetailedLegScoreRecord(
-					scenario.getConfig().planCalcScore());
-			EventsToScore events2score = new EventsToScore(pop, scoringFactory);
-			events.addHandler(events2score);
-			new MatsimEventsReader(events).readFile(eventsFilename);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		CharyparNagelScoringFunctionFactoryWithDetailedLegScoreRecord scoringFactory = new CharyparNagelScoringFunctionFactoryWithDetailedLegScoreRecord(
+				scenario.getConfig().planCalcScore());
+		EventsToScore events2score = new EventsToScore(pop, scoringFactory);
+		events.addHandler(events2score);
+		new MatsimEventsReader(events).readFile(eventsFilename);
 
 		LegScoringFunctionWithDetailedRecord.createChart(chartFilenameBase);
 	}

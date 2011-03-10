@@ -53,7 +53,7 @@ public class CottbusController {
 		//NetVis.main(visargs);
 		
 		// visualization via OTFVis
-		ScenarioLoaderImpl scl = new ScenarioLoaderImpl(config);
+		ScenarioLoaderImpl scl = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(config);
 		Scenario sc = scl.loadScenario();
 		sc.getConfig().addQSimConfigGroup(new QSimConfigGroup());
 		EventsManagerImpl e = new EventsManagerImpl();

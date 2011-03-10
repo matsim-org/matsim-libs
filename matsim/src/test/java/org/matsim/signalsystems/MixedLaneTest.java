@@ -27,7 +27,6 @@ import junit.framework.TestCase;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -46,6 +45,9 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.lanes.Lane;
 import org.matsim.lanes.LaneDefinitions;
 import org.matsim.lanes.LaneDefinitionsFactory;
@@ -81,7 +83,7 @@ public class MixedLaneTest extends TestCase {
 	}
 
 	private void initScenario() {
-		this.sc = new ScenarioImpl();
+		this.sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		this.c = this.sc.getConfig();
 		this.c.addQSimConfigGroup(new QSimConfigGroup());
 		this.c.addCoreModules();

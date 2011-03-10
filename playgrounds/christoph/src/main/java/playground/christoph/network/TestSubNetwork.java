@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
@@ -37,6 +36,8 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.interfaces.NetsimNetwork;
 
@@ -80,7 +81,7 @@ public class TestSubNetwork {
 		dbct.connect();
 
 		loadConfig();
-		this.scenario = new ScenarioImpl(this.config);
+		this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(this.config);
 		loadNetwork();
 		loadPopulation();
 

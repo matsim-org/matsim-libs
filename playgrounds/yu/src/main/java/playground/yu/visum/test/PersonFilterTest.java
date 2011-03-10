@@ -19,14 +19,15 @@
 
 package playground.yu.visum.test;
 
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.yu.visum.filter.ActTypeFilter;
 import playground.yu.visum.filter.DepTimeFilter;
@@ -42,7 +43,7 @@ public class PersonFilterTest {
 	public static void testRunIDandActTypeundDepTimeFilter(Config config) {
 
 		System.out.println("TEST RUN ---FilterTest---:");
-		ScenarioImpl scenario = new ScenarioImpl(config);
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		// reading all available input
 
 		System.out.println("  reading network xml file... ");
@@ -96,7 +97,7 @@ public class PersonFilterTest {
 	 */
 	public static void main(final String[] args) throws Exception {
 		Gbl.startMeasurement();
-		Config config = new ScenarioLoaderImpl(args[0]).loadScenario().getConfig();
+		Config config = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(args[0]).loadScenario().getConfig();
 		testRunIDandActTypeundDepTimeFilter(config);
 		Gbl.printElapsedTime();
 	}

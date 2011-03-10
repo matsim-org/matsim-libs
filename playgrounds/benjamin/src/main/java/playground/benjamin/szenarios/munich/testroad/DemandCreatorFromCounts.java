@@ -30,7 +30,6 @@ import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -38,8 +37,11 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.population.algorithms.PlanMutateTimeAllocation;
 
 import playground.benjamin.dataprepare.CheckingTabularFileHandler;
@@ -86,7 +88,7 @@ public class DemandCreatorFromCounts {
 	}
 
 	private static void addTestVehicle(Population population, String inflowTimesFile) {
-		Scenario sc = new ScenarioImpl();
+		Scenario sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		List<Integer> inflowTimes = getTestVehicleInflowTimes(inflowTimesFile);
 		for(int time : inflowTimes){
@@ -162,7 +164,7 @@ public class DemandCreatorFromCounts {
 	}
 
 	private static Population generatePopulation(String laneFile1, String laneFile2) {
-		Scenario sc = new ScenarioImpl();
+		Scenario sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Population population = sc.getPopulation();
 
 		SortedMap<Integer, Double> endTime2NoOfVehiclesLane1 = getEndTime2NoOfVehicles(laneFile1);

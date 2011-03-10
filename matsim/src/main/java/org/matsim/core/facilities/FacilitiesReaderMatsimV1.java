@@ -27,8 +27,8 @@ import java.util.Stack;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.facilities.OpeningTime.DayType;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.Time;
 import org.xml.sax.Attributes;

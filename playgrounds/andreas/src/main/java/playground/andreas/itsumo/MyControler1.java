@@ -24,7 +24,6 @@ import java.io.File;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -40,6 +39,7 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.NetworkUtils;
@@ -340,9 +340,9 @@ public class MyControler1 extends Controler {
 
 		ScenarioLoaderImpl sl;
 		if ( args.length==0 ) {
-			sl = new ScenarioLoaderImpl("./examples/itsumo-sesam-scenario/config.xml");
+			sl = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed("./examples/itsumo-sesam-scenario/config.xml");
 		} else {
-			sl = new ScenarioLoaderImpl(args[0]);
+			sl = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(args[0]);
 		}
 		ScenarioImpl scenario = sl.getScenario();
 

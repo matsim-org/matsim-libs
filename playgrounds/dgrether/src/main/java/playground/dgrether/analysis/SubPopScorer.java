@@ -56,7 +56,7 @@ public class SubPopScorer {
 
 
 	public SubPopScorer(final String config, final List<String> linkIds) {
-		this.scenario = new ScenarioLoaderImpl(config);
+		this.scenario = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(config);
 		this.scenario.loadScenario();
 		this.linkIds = linkIds;
 		Set<Id> idSet = filterPlans(this.scenario.getScenario().getPopulation());

@@ -28,13 +28,13 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Module;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.events.EventsReaderXMLv1;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.gis.ShapeFileReader;
@@ -83,7 +83,7 @@ public class OTFSnapshotGenerator {
 	public OTFSnapshotGenerator() {
 
 		this.lsFile = SHARED_SVN + "/countries/id/padang/gis/network_v20080618/d_ls.shp";
-		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(RUNS_SVN + "/output_config.xml.gz");
+		ScenarioLoaderImpl sl = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(RUNS_SVN + "/output_config.xml.gz");
 
 		this.scenario = sl.getScenario();
 		Module m = this.scenario.getConfig().getModule("evacuation");

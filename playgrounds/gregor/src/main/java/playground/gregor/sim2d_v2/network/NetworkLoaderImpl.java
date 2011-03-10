@@ -43,7 +43,6 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -54,11 +53,14 @@ import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.utils.gis.matsim2esri.network.FeatureGeneratorBuilderImpl;
 import org.matsim.utils.gis.matsim2esri.network.LanesBasedWidthCalculator;
 import org.matsim.utils.gis.matsim2esri.network.LineStringBasedFeatureGenerator;
@@ -162,7 +164,7 @@ public class NetworkLoaderImpl implements NetworkLoader {
 		new NetworkCleaner().run(this.network);
 
 		if (DEBUG) {
-			ScenarioImpl scenario = new ScenarioImpl();
+			ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 			scenario.getConfig().global().setCoordinateSystem("WGS84_UTM33N");
 			//		CoordinateReferenceSystem crs = MGC.getCRS("WGS84_UTM33N");
 			FeatureGeneratorBuilderImpl builder = new FeatureGeneratorBuilderImpl(this.network, "WGS84_UTM33N");
@@ -573,7 +575,7 @@ public class NetworkLoaderImpl implements NetworkLoader {
 	}
 
 	public static void main(String [] args) {
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new NetworkLoaderImpl(scenario.getNetwork(), scenario.getConfig().planCalcScore()).loadNetwork();
 	}
 }

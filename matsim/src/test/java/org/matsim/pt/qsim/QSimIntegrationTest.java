@@ -8,7 +8,6 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -26,6 +25,9 @@ import org.matsim.core.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.population.PopulationReaderMatsimV4;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.ptproject.qsim.QSim;
@@ -319,7 +321,7 @@ public class QSimIntegrationTest {
 		public final ScenarioImpl scenario;
 		public Fixture() throws SAXException, ParserConfigurationException, IOException {
 			// setup: config
-			this.scenario = new ScenarioImpl();
+			this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 			this.scenario.getConfig().scenario().setUseTransit(true);
 			this.scenario.getConfig().scenario().setUseVehicles(true);
 			this.scenario.getConfig().addQSimConfigGroup(new QSimConfigGroup());

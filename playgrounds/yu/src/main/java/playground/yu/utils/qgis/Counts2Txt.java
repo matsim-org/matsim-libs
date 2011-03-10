@@ -25,9 +25,11 @@ package playground.yu.utils.qgis;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.MatsimCountsReader;
@@ -50,7 +52,7 @@ public class Counts2Txt {
 		countsFilename = "../integration-demandCalibration1.0.1/test/input/calibration/CalibrationTest/testLogLikelihood/counts1k.xml", //
 		outputFilename = "../integration-demandCalibration1.0.1/test/input/calibration/CalibrationTest/testLogLikelihood/counts1k.txt";
 
-		Scenario snr = new ScenarioImpl();
+		Scenario snr = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network net = snr.getNetwork();
 		new MatsimNetworkReader(snr).readFile(networkFilename);
 

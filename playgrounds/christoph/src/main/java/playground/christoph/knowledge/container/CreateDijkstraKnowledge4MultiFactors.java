@@ -32,7 +32,6 @@ import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -51,6 +50,9 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
 import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.core.utils.misc.Time;
 
 import playground.christoph.knowledge.nodeselection.DijkstraForSelectNodes;
@@ -123,7 +125,7 @@ public class CreateDijkstraKnowledge4MultiFactors {
 
 	public CreateDijkstraKnowledge4MultiFactors()
 	{
-		this.scenario = new ScenarioImpl();
+		this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		loadNetwork();
 		if (facilitiesFile != null) loadFacilities();
 		loadPopulation();

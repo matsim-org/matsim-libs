@@ -3,11 +3,11 @@ package playground.kai.test;
 import java.io.IOException;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 
 
@@ -38,7 +38,7 @@ public class ScenarioLoaderAlternatives {
 			
 			config.scenario().isUseVehicles();
 			
-			ScenarioLoader scl = new ScenarioLoaderImpl( config ) ;
+			ScenarioLoaderImpl scl = new ScenarioLoaderImpl( config ) ;
 			Scenario sc = scl.loadScenario() ;
 			
 			Controler ctrl = new Controler( (ScenarioImpl) sc ) ; // besser mit "Scenario"
@@ -46,15 +46,16 @@ public class ScenarioLoaderAlternatives {
 		}
 		
 		// discussed 9mar2011
-//		{
-//			Config config = ConfigUtils.loadConfig( filename ) ;
-//			
-//			Scenario sc = ScenarioUtils.loadScenario( config ) ;
-//			
-//			Controler ctrl = new Controler(sc) ;
-//			ctrl.setOverwriteFiles(true ;)
-//			ctrl.run();
-//		}
+		{
+			String filename = "config.xml";
+			Config config = ConfigUtils.loadConfig( filename ) ;
+			
+			Scenario sc = ScenarioUtils.loadScenario( config ) ;
+			
+			Controler ctrl = new Controler(sc) ;
+			ctrl.setOverwriteFiles(true);
+			ctrl.run();
+		}
 		
 //		// option 4
 //		{

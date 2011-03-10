@@ -20,9 +20,11 @@
 package playground.anhorni.LEGO.miniscenario.create;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 import playground.anhorni.LEGO.miniscenario.ConfigReader;
 import playground.anhorni.random.RandomFromVarDistr;
@@ -30,7 +32,7 @@ import playground.anhorni.random.RandomFromVarDistr;
 public class CreateScenario {
 
 	private final static Logger log = Logger.getLogger(CreateScenario.class);
-	private ScenarioImpl scenario = new ScenarioImpl();	
+	private ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());	
 	private ConfigReader configReader = new ConfigReader();
 	private RandomFromVarDistr rnd;
 	
@@ -58,7 +60,7 @@ public class CreateScenario {
 		CreateNetwork networkCreator = new CreateNetwork();
 		networkCreator.createNetwork(this.scenario, this.configReader);
 		
-		ScenarioImpl scenario = new ScenarioLoaderImpl(configReader.getPath() + "config.xml").getScenario();
+		ScenarioImpl scenario = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(configReader.getPath() + "config.xml").getScenario();
 		Config config = scenario.getConfig();
 				
 		CreatePopulation populationCreator = new CreatePopulation();

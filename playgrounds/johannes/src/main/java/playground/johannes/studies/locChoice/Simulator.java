@@ -25,7 +25,6 @@ import java.util.Map;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -46,8 +45,11 @@ import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.EventsToScore;
 import org.matsim.core.scoring.charyparNagel.CharyparNagelScoringFunctionFactory;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 import playground.johannes.socialnetworks.sim.analysis.NearestLocation;
 import playground.johannes.socialnetworks.sim.analysis.PlanAnalyzerTaskComposite;
@@ -91,7 +93,7 @@ public class Simulator {
 		MatsimConfigReader creader = new MatsimConfigReader(config);
 		creader.readFile(args[0]);
 		
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		MatsimNetworkReader netReader = new MatsimNetworkReader(scenario);
 		netReader.readFile(config.getParam("network", "inputNetworkFile"));
 		MatsimPopulationReader reader = new MatsimPopulationReader(scenario);

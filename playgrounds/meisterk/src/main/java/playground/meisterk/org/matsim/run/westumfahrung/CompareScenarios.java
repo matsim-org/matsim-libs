@@ -33,7 +33,6 @@ import org.apache.log4j.Logger;
 import org.matsim.analysis.CalcAverageTripLength;
 import org.matsim.analysis.CalcLegTimes;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -46,6 +45,9 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.PersonIdRecorder;
 import org.matsim.population.algorithms.PlanAverageScore;
@@ -157,7 +159,7 @@ public class CompareScenarios {
 
 	private void run(final String[] args) {
 
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Config config = scenario.getConfig();
 
 		log.info("Processing command line parameters...");
@@ -344,7 +346,7 @@ public class CompareScenarios {
 
 		for (String scenarioName : this.scenarioNames) {
 
-			ScenarioImpl scenario = new ScenarioImpl();
+			ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 			NetworkImpl network = scenario.getNetwork();
 			new MatsimNetworkReader(scenario).readFile(this.networkInputFilenames.get(scenarioName));
 			scenarioNetworks.put(scenarioName, network);
@@ -418,7 +420,7 @@ public class CompareScenarios {
 			ArrayList<CaseStudyResult> results = new ArrayList<CaseStudyResult>();
 			for (String scenarioName : this.scenarioNames) {
 
-				ScenarioImpl subScenario = new ScenarioImpl();
+				ScenarioImpl subScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 				subScenario.setNetwork(scenarioNetworks.get(scenarioName));
 				Population plansSubPop = subScenario.getPopulation();
 				switch(analysis.intValue()) {

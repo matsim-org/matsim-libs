@@ -25,7 +25,6 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
@@ -50,6 +49,8 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.RouteFactory;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.EventsToScore;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
@@ -104,7 +105,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		config.addModule(KtiConfigGroup.GROUP_NAME, this.ktiConfigGroup);
 
 		// generate scenario
-		this.scenario = new ScenarioImpl(config);
+		this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 
 		// generate person
 		PersonImpl person = new PersonImpl(TEST_PERSON_ID);

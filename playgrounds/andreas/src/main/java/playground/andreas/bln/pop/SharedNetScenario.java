@@ -3,10 +3,10 @@ package playground.andreas.bln.pop;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
+import org.matsim.core.scenario.ScenarioImpl;
 
 /**
  * Provides a real scenario, but exchanges the population.

@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
@@ -13,6 +12,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 
 /**reads a multi-modal network and eliminates agents outside the street network area*/
@@ -74,7 +74,7 @@ public class PopulationFilter {
 		//String configFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/comparison/NullFallAlles/configRouted.xml";
 		String configFile = args[0];
 		
-		ScenarioLoaderImpl scenarioLoader = new ScenarioLoaderImpl(configFile);
+		ScenarioLoaderImpl scenarioLoader = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(configFile);
 		ScenarioImpl scenario = scenarioLoader.getScenario();
 		scenarioLoader.loadScenario();
 		PopulationFilter populationFilter = new PopulationFilter();

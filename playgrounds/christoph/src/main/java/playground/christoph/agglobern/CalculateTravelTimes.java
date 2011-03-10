@@ -37,7 +37,6 @@ import java.util.Map.Entry;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -49,8 +48,11 @@ import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelMinCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculator;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.core.utils.misc.Counter;
 
 
@@ -77,7 +79,7 @@ public class CalculateTravelTimes {
 	private double connectorSpeed = 45 / 3.6;	// 45 km/h to reach the network
 	
 	public static void main(String[] args) throws Exception {
-		new CalculateTravelTimes(new ScenarioImpl());
+		new CalculateTravelTimes(((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())));
 	}
 	
 	public CalculateTravelTimes(Scenario scenario) throws IOException {

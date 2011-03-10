@@ -86,7 +86,7 @@ public class CountsAnalyser {
 	}
 
 	private void readConfig(final String configFile) throws Exception {
-		this.scenario = new ScenarioLoaderImpl(configFile).getScenario();
+		this.scenario = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(configFile).getScenario();
 		Config config = this.scenario.getConfig();
 		System.out.println("  reading counts xml file... ");
 		MatsimCountsReader counts_parser = new MatsimCountsReader(this.counts);

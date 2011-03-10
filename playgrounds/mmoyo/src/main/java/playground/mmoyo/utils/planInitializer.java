@@ -20,15 +20,17 @@
 
 package playground.mmoyo.utils;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 	
 /**
  * Selected and unselected plans are converted into new initial plans, each new one becomes a numeric suffix. 
@@ -43,7 +45,7 @@ public class planInitializer {
 	}
 	
 	public void run (){
-		PopulationImpl initPopulation = new PopulationImpl(new ScenarioImpl());
+		PopulationImpl initPopulation = new PopulationImpl(((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())));
 		
 		final String SEPARATOR ="_";
 		for (Person person : this.scenario.getPopulation().getPersons().values()){

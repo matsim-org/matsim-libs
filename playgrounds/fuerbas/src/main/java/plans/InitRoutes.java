@@ -111,7 +111,7 @@ public class InitRoutes {
 
 	public void run(final String[] args) {
 		parseArguments(args);
-		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(this.configfile);
+		ScenarioLoaderImpl sl = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(this.configfile);
 		sl.loadNetwork();
 		Network network = sl.getScenario().getNetwork();
 		this.config = sl.getScenario().getConfig();

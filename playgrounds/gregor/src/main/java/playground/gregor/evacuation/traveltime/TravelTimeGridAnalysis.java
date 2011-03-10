@@ -22,9 +22,9 @@ package playground.gregor.evacuation.traveltime;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 
 import playground.gregor.gis.helper.GTH;
@@ -43,7 +43,7 @@ public class TravelTimeGridAnalysis {
 	public static void main(String [] args) {
 		
 		
-		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(SVN + "/output_config.xml.gz");
+		ScenarioLoaderImpl sl = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(SVN + "/output_config.xml.gz");
 		
 		ScenarioImpl scenario = sl.getScenario();
 		scenario.getConfig().network().setInputFile(SVN + "/output_network.xml.gz");

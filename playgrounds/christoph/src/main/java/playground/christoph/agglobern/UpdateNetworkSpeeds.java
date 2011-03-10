@@ -45,7 +45,6 @@ import org.geotools.feature.FeatureTypeBuilder;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -54,11 +53,14 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCleaner;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.GeotoolsTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.vis.kml.KMZWriter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -97,7 +99,7 @@ public class UpdateNetworkSpeeds {
 	
 	
 	public static void main(String[] args) throws Exception {
-		new UpdateNetworkSpeeds(new ScenarioImpl());
+		new UpdateNetworkSpeeds(((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())));
 	}
 	
 	public UpdateNetworkSpeeds(Scenario scenario) throws Exception {

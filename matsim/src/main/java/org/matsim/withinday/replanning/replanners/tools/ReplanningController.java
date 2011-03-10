@@ -26,7 +26,9 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.withinday.replanning.identifiers.interfaces.AgentsToReplanIdentifier;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIdentifier;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
@@ -45,7 +47,7 @@ public class ReplanningController {
 	private Set<WithinDayReplanner<DuringActivityIdentifier>> duringActivityReplanners;
 
 	public ReplanningController() {
-		this.scenario = new ScenarioImpl();
+		this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		init();
 	}
 

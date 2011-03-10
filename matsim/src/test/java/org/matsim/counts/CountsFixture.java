@@ -45,7 +45,7 @@ public class CountsFixture {
 	public void setUp() {
 		String configFile = "test/input/org/matsim/counts/config.xml";
 
-		this.scenario = new ScenarioLoaderImpl(configFile).getScenario();
+		this.scenario = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(configFile).getScenario();
 		Config config = scenario.getConfig();
 
 		MatsimCountsReader counts_parser = new MatsimCountsReader(this.counts);

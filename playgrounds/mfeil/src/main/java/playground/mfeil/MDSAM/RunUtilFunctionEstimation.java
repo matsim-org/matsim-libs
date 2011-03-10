@@ -21,10 +21,12 @@
 package playground.mfeil.MDSAM;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 public class RunUtilFunctionEstimation {
 	
@@ -72,7 +74,7 @@ public class RunUtilFunctionEstimation {
 		// if incomeBoxCox is set to yes, travelCost must be yes, too.
 		if (incomeBoxCox.equals("yes")) travelCost = "yes";
 
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario).readFile(networkFilename);
 		new MatsimFacilitiesReader(scenario).readFile(facilitiesFilename);
 		new MatsimPopulationReader(scenario).readFile(populationFilename);

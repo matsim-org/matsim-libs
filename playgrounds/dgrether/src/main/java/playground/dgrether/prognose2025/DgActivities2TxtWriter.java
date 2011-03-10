@@ -23,14 +23,16 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 import playground.dgrether.DgPaths;
 
@@ -68,7 +70,7 @@ public class DgActivities2TxtWriter {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		Scenario scenario = new ScenarioImpl();
+		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		MatsimPopulationReader reader = new MatsimPopulationReader(scenario);
 		reader.readFile(DgPaths.REPOS
 				+ "shared-svn/studies/countries/de/prognose_2025/demand/population_pv_1pct.xml");

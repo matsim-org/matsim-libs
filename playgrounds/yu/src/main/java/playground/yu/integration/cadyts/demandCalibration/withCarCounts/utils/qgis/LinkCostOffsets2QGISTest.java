@@ -27,12 +27,14 @@ import java.util.Set;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.counts.Counts;
 import org.matsim.counts.MatsimCountsReader;
 
@@ -74,7 +76,7 @@ public class LinkCostOffsets2QGISTest {
 		int arStartTime = 9/* 7 */;
 		int arEndTime = /* 20 */9;
 
-		Scenario sc = new ScenarioImpl();
+		Scenario sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		Network net = sc.getNetwork();
 		new MatsimNetworkReader(sc).readFile(netFilename);

@@ -20,7 +20,6 @@
 package playground.anhorni.scenarios;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.MatsimConfigReader;
@@ -28,6 +27,9 @@ import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 import java.io.File;
 import java.util.Random;
@@ -36,7 +38,7 @@ public class Create3TownsDemand {
 
 	private final static Logger log = Logger.getLogger(Create3TownsDemand.class);
 	private NetworkImpl network = null;
-	private ScenarioImpl scenarioWriteOut = new ScenarioImpl();
+	private ScenarioImpl scenarioWriteOut = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 	private PopulationImpl staticPopulation = new PopulationImpl(scenarioWriteOut);
 	private static int offset = 100000;
 	private long seed = 109876L;

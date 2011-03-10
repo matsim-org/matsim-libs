@@ -7,7 +7,6 @@ import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
@@ -18,10 +17,14 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
+
 import playground.ciarif.retailers.utils.ActivityDifferentiator;
 
 public class AssignGroceryShop {
-	private final ScenarioImpl scenario = new ScenarioImpl();
+	private final ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 	private final Population plans = scenario.getPopulation();
 	private final ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
 	private final NetworkImpl network = scenario.getNetwork();

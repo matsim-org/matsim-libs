@@ -25,10 +25,11 @@ import java.util.Map;
 import java.util.Queue;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.config.Config;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 import playground.gregor.sim2d_v2.simulation.floor.StaticForceField;
 
@@ -53,6 +54,7 @@ public class Scenario2DImpl extends ScenarioImpl {
 	}
 
 	public Scenario2DImpl() {
+		super(ConfigUtils.createConfig());
 		throw new RuntimeException("Do not try to call this constructor!!");
 	}
 

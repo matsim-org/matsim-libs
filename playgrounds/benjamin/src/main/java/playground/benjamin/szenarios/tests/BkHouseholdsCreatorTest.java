@@ -23,11 +23,13 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.households.Household;
 import org.matsim.households.Households;
 import org.matsim.households.HouseholdsFactory;
@@ -48,7 +50,7 @@ public class BkHouseholdsCreatorTest {
 
 
 	public static void createHHForTestCase() throws FileNotFoundException, IOException {
-    ScenarioImpl sc = new ScenarioImpl();
+    ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
     Id id1 = sc.createId("1");
     Id id2 = sc.createId("2");
     Households hhs = sc.getHouseholds();
@@ -74,7 +76,7 @@ public class BkHouseholdsCreatorTest {
 		String plansFile = outdir + "plans.xml";
 		String networkFile =outdir + "../oneRouteNoModeTest/network.xml";
 
-		ScenarioImpl sc = new ScenarioImpl();
+		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		MatsimNetworkReader netreader = new MatsimNetworkReader(sc);
 		netreader.readFile(networkFile);
 

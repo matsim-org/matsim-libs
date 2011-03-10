@@ -98,28 +98,23 @@ public class SubTourModeChoicePlanStrategy implements PlanStrategy {
 	}
 
 	public static void main(String[] args) {
-		try {
-			Config config = ConfigUtils.loadConfig(args[0]);
-			Controler controler = new Controler(config);
-			/* <module name="strategy">
-			 * 	<param name="maxAgentPlanMemorySize" value="x" /> <!-- 0 means unlimited -->
-			 * 	<param name="ModuleProbability_y" value="0.1" />
-			 * 	<param name="Module_y" value="playground.yu.test.SubTourModeChoicePlanStrategy" />
-			 * </module>*/
-			controler
-					.setScoringFunctionFactory(new CharyparNagelScoringFunctionFactoryWithWalk(
-							config.planCalcScore(), config
+		Config config = ConfigUtils.loadConfig(args[0]);
+		Controler controler = new Controler(config);
+		/* <module name="strategy">
+		 * 	<param name="maxAgentPlanMemorySize" value="x" /> <!-- 0 means unlimited -->
+		 * 	<param name="ModuleProbability_y" value="0.1" />
+		 * 	<param name="Module_y" value="playground.yu.test.SubTourModeChoicePlanStrategy" />
+		 * </module>*/
+		controler
+				.setScoringFunctionFactory(new CharyparNagelScoringFunctionFactoryWithWalk(
+						config.planCalcScore(), config
 //									.vspExperimental().getOffsetWalk()));
-							.planCalcScore().getConstantWalk() )) ;
-			// controler.addControlerListener(new MZComparisonListener());
-			controler.setWriteEventsInterval(Integer.parseInt(args[1]));
-			controler.setCreateGraphs(Boolean.parseBoolean(args[2]));
-			controler.setOverwriteFiles(true);
-			controler.run();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+						.planCalcScore().getConstantWalk() )) ;
+		// controler.addControlerListener(new MZComparisonListener());
+		controler.setWriteEventsInterval(Integer.parseInt(args[1]));
+		controler.setCreateGraphs(Boolean.parseBoolean(args[2]));
+		controler.setOverwriteFiles(true);
+		controler.run();
 
 	}
 }

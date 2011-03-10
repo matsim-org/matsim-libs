@@ -176,15 +176,11 @@ public class PCCtl extends BseParamCalibrationControler {
 
 	/** @param args */
 	public static void main(final String[] args) {
-		try {
-			Config config = ConfigUtils.loadConfig(args[0]);
-			Controler ctl = new PCCtl(config);
-			ctl.setCreateGraphs(false);
-			ctl.setOverwriteFiles(true);
-			ctl.run();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		Config config = ConfigUtils.loadConfig(args[0]);
+		Controler ctl = new PCCtl(config);
+		ctl.setCreateGraphs(false);
+		ctl.setOverwriteFiles(true);
+		ctl.run();
 
 	}
 }

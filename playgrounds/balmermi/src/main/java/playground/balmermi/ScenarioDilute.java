@@ -27,7 +27,6 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
@@ -37,6 +36,7 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -77,7 +77,7 @@ public class ScenarioDilute {
 	public static void main(String[] args) {
 		if (args.length != 1) { printUsage(); return; }
 
-		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(args[0]);
+		ScenarioLoaderImpl sl = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(args[0]);
 		ScenarioImpl sc = sl.getScenario();
 
 		System.out.println("loading facilities...");

@@ -2,7 +2,6 @@ package playground.mzilske.vis;
 
 import java.lang.reflect.InvocationTargetException;
 
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.groups.MobsimConfigGroupI;
 import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
@@ -10,6 +9,9 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.SnapshotGenerator;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.vis.otfvis.gui.OTFHostConnectionManager;
 import org.matsim.vis.otfvis2.OTFVisClient;
 import org.matsim.vis.otfvis2.OTFVisLiveServer;
@@ -33,7 +35,7 @@ public class LivePopulationFromDiskMain {
 		
 		double snapshotPeriod = 60;
 		MobsimConfigGroupI simulationConfigGroup = new SimulationConfigGroup();
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		
 		scenario.setPopulation(new PopulationOnDisk(scenario, DirectoryUtils.createTempDirectory()));
 		

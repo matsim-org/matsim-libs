@@ -1,8 +1,8 @@
 package playground.mmoyo;
 
 import org.junit.Assert;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.MatsimTestUtils;
 

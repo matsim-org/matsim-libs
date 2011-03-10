@@ -21,9 +21,10 @@ package playground.thibautd.jointtripsoptimizer.population;
 
 import org.apache.log4j.Logger;
 
-import org.matsim.api.core.v01.ScenarioImpl;
 
 import org.matsim.core.config.Config;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 /**
  * @author thibautd
@@ -40,7 +41,7 @@ public class ScenarioWithCliques extends ScenarioImpl {
 	 * =========================================================================
 	 */
 	public ScenarioWithCliques() {
-		super();
+		super(ConfigUtils.createConfig());
 		super.setPopulation(new PopulationWithCliques(this));
 		this.cliques = new PopulationOfCliques(this);
 	}

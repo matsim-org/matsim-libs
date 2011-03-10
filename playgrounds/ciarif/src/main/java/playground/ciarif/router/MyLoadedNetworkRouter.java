@@ -81,7 +81,7 @@ public class MyLoadedNetworkRouter {
 		String outputPlansFile=rootPathOut + "outputPlanFileX.xml";
 
 		parseArguments(args);
-		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(this.configfile);
+		ScenarioLoaderImpl sl = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(this.configfile);
 		sl.loadNetwork();
 		NetworkImpl network = sl.getScenario().getNetwork();
 		this.config = sl.getScenario().getConfig();

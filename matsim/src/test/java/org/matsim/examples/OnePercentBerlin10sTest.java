@@ -21,7 +21,6 @@
 package org.matsim.examples;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
@@ -31,6 +30,8 @@ import org.matsim.core.mobsim.framework.Simulation;
 import org.matsim.core.mobsim.queuesim.QueueSimulationFactory;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -59,7 +60,7 @@ public class OnePercentBerlin10sTest extends MatsimTestCase {
 
 		config.planCalcScore().setLearningRate(1.0);
 
-		ScenarioImpl scenario = new ScenarioImpl(config);
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		new MatsimNetworkReader(scenario).readFile(netFileName);
 
 		new MatsimPopulationReader(scenario).readFile(popFileName);

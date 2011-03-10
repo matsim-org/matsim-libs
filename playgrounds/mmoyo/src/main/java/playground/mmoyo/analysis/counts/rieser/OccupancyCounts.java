@@ -8,12 +8,12 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
@@ -45,7 +45,7 @@ public class OccupancyCounts {
 		String transitRouteStrId1 = args[2];
 		String transitRouteStrId2 = args[3];
 
-		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(configFile);
+		ScenarioLoaderImpl sl = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(configFile);
 		ScenarioImpl scenario = sl.getScenario();
 
 		NetworkImpl network = scenario.getNetwork();

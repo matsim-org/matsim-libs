@@ -24,8 +24,6 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -34,6 +32,7 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 
@@ -71,7 +70,7 @@ public class DaganzoRunner {
 		else {
 			conf = configFile;
 		}
-		ScenarioLoader scenarioLoader = new ScenarioLoaderImpl(conf);
+		ScenarioLoaderImpl scenarioLoader = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(conf);
 		ScenarioImpl scenario = (ScenarioImpl) scenarioLoader.loadScenario();
 		
 //		if (scenario.getConfig().signalSystems().getSignalSystemConfigFile() == null){

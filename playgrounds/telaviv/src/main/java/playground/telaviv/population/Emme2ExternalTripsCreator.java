@@ -27,7 +27,6 @@ import java.util.Random;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -42,6 +41,9 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.population.Desires;
 
 public class Emme2ExternalTripsCreator {
@@ -96,7 +98,7 @@ public class Emme2ExternalTripsCreator {
 	 */
 	
 	public static void main(String[] args) {
-		new Emme2ExternalTripsCreator(new ScenarioImpl());
+		new Emme2ExternalTripsCreator(((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())));
 	}
 	
 	public Emme2ExternalTripsCreator(Scenario scenario) {		

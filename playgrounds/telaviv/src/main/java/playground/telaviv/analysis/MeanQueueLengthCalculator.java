@@ -35,7 +35,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
@@ -53,7 +52,10 @@ import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 public class MeanQueueLengthCalculator implements LinkEnterEventHandler, LinkLeaveEventHandler, 
 	AgentArrivalEventHandler, AgentDepartureEventHandler, AgentStuckEventHandler {
@@ -80,7 +82,7 @@ public class MeanQueueLengthCalculator implements LinkEnterEventHandler, LinkLea
 	}
 	
 	public MeanQueueLengthCalculator() throws Exception {
-		scenario = new ScenarioImpl();
+		scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario).readFile(networkFile);
 		
 		linkInfos = new HashMap<Id, LinkInfo>();

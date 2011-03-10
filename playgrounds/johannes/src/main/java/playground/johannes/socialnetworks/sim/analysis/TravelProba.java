@@ -27,7 +27,6 @@ import gnu.trove.TDoubleDoubleHashMap;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -39,6 +38,9 @@ import org.matsim.contrib.sna.math.Discretizer;
 import org.matsim.contrib.sna.math.Distribution;
 import org.matsim.contrib.sna.math.LinearDiscretizer;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
@@ -58,7 +60,7 @@ import com.vividsolutions.jts.geom.Point;
 public class TravelProba {
 
 	public static void main(String args[]) throws TransformException, FileNotFoundException, IOException {
-		Scenario scenario = new ScenarioImpl();
+		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		MatsimPopulationReader reader = new MatsimPopulationReader(scenario);
 		reader.readFile("/Users/jillenberger/Work/work/socialnets/data/schweiz/mz2005/rawdata/plans.xml");
 

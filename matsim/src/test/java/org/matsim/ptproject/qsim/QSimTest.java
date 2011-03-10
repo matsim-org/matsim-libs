@@ -32,7 +32,6 @@ import org.junit.Test;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
@@ -71,7 +70,10 @@ import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.ptproject.qsim.agents.PersonDriverAgentImpl;
@@ -1037,7 +1039,7 @@ public class QSimTest {
 
 	@Test
 	public void testStartAndEndTime() {
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Config config = scenario.getConfig();
     config.addQSimConfigGroup(new QSimConfigGroup());
 
@@ -1098,7 +1100,7 @@ public class QSimTest {
 	 */
 	@Test
 	public void testCleanupSim_EarlyEnd() {
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Config config = scenario.getConfig();
 
 		double simEndTime = 8.0*3600;
@@ -1250,7 +1252,7 @@ public class QSimTest {
 		final ArrayList<Id> linkIds2;
 
 		public Fixture() {
-			this.scenario = new ScenarioImpl();
+			this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 			this.config = scenario.getConfig();
 			this.config.addQSimConfigGroup(new QSimConfigGroup());
 			this.config.getQSimConfigGroup().setFlowCapFactor(1.0);

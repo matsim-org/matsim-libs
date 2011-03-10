@@ -21,7 +21,6 @@
 package playground.balmermi.census2000v2;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -31,7 +30,10 @@ import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.knowledges.Knowledges;
 
 import playground.balmermi.census2000.data.Municipalities;
@@ -64,7 +66,7 @@ public class IIDMGeneration {
 
 		log.info("MATSim-DB: create iidm.");
 
-		ScenarioImpl scenario = new ScenarioLoaderImpl(args[0]).getScenario();
+		ScenarioImpl scenario = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(args[0]).getScenario();
 		Config config = scenario.getConfig();
 		World world = new World();
 
@@ -149,7 +151,7 @@ public class IIDMGeneration {
 		//////////////////////////////////////////////////////////////////////
 
 		log.info("  reding mz plans xml file... ");
-		ScenarioImpl mzScenario = new ScenarioImpl();
+		ScenarioImpl mzScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Population mz_pop = mzScenario.getPopulation();
 		new MatsimPopulationReader(mzScenario).readFile(indir+"/mz.plans.xml.gz");
 		log.info("  done.");

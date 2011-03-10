@@ -35,11 +35,13 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -216,14 +218,14 @@ public class ReadFromUrbansimParcelModelTest extends MatsimTestCase{
 		readFromUrbansim.readFacilities(facilities, zones);
 		
 		
-		Population newPopulation = new ScenarioImpl().getPopulation();
+		Population newPopulation = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
 		
 		// read urbansim persons. Generates hwh acts as side effect
 		readFromUrbansim.readPersons( null, newPopulation, facilities, null, sampleRate );
 		
 		if(enableOldPopulation){ // only for testing purposes 
 			Population oldPopulation = newPopulation;
-			newPopulation = new ScenarioImpl().getPopulation(); // re-initializing
+			newPopulation = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation(); // re-initializing
 			readFromUrbansim.readPersons( oldPopulation, newPopulation, facilities, null, sampleRate );
 			
 			// determine result

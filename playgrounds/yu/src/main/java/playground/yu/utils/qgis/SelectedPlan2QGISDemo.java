@@ -23,11 +23,13 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.geotools.referencing.CRS;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.utils.gis.matsim2esri.plans.SelectedPlans2ESRIShape;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -58,7 +60,7 @@ public class SelectedPlan2QGISDemo implements X2QGIS {
 		// final String outputDir = "output/bvg";
 		final String outputDir = "output/bse";
 
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		NetworkImpl network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(networkFilename);
 

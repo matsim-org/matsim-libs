@@ -11,7 +11,6 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
@@ -28,14 +27,13 @@ import org.matsim.core.controler.listener.ReplanningListener;
 import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.network.MatsimNetworkReader;
-
-//import city2000w.VRPCarrierPlanBuilder;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.mzilske.freight.CarrierAgentTracker;
 import playground.mzilske.freight.CarrierAgentTrackerBuilder;
 import playground.mzilske.freight.CarrierCapabilities;
 import playground.mzilske.freight.CarrierImpl;
-import playground.mzilske.freight.CarrierPlan;
 import playground.mzilske.freight.CarrierVehicle;
 import playground.mzilske.freight.Carriers;
 import playground.mzilske.freight.Contract;
@@ -170,7 +168,7 @@ public class RunPaperScenario implements StartupListener, ScoringListener, Repla
 		config.addCoreModules();
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(1);
-		scenario = new ScenarioImpl(config);
+		scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		readNetwork(NETWORK_FILENAME);
 		Controler controler = new Controler(scenario);
 		/*

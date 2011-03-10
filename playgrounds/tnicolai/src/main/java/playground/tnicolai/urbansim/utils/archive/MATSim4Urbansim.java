@@ -36,7 +36,6 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
@@ -45,6 +44,9 @@ import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.xml.sax.SAXException;
 
 import playground.tnicolai.urbansim.com.matsim.config.MatsimConfigType;
@@ -130,7 +132,7 @@ public class MATSim4Urbansim {
 			oldPopulation = null;
 		}
 
-		Population newPopulation = new ScenarioImpl().getPopulation();
+		Population newPopulation = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
 		// read urbansim persons.  Generates hwh acts as side effect
 		readFromUrbansim.readPersons( oldPopulation, newPopulation, facilities, network, MATSimConfigObject.getSampeRate() ) ;
 		oldPopulation=null ;

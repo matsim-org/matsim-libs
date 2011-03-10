@@ -20,8 +20,9 @@
 
 package org.matsim.core.facilities;
 
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.examples.TriangleScenario;
 import org.matsim.facilities.algorithms.FacilitiesCalcMinDist;
@@ -67,7 +68,7 @@ public class FacilitiesParserWriterTest extends MatsimTestCase {
 
 	
 		System.out.println("  reading facilites xml file independent of the world...");
-		ScenarioImpl scenario = new ScenarioImpl(this.config);
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(this.config);
 		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
 		new MatsimFacilitiesReader(scenario).readFile(this.config.facilities().getInputFile());
 		System.out.println("  done.");
@@ -86,7 +87,7 @@ public class FacilitiesParserWriterTest extends MatsimTestCase {
 	public void testParserWriter2() {
 		System.out.println("running testParserWriter2()...");
 
-		ScenarioImpl scenario = new ScenarioImpl(this.config);
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(this.config);
 	
 		System.out.println("  reading facilites xml file as a layer of the world...");
 		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
@@ -107,7 +108,7 @@ public class FacilitiesParserWriterTest extends MatsimTestCase {
 	public void testParserWriter3() {
 		System.out.println("running testParserWriter3()...");
 
-		ScenarioImpl scenario = new ScenarioImpl(this.config);
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(this.config);
 
 		System.out.println("  reading facilites xml file as a layer of the world...");
 		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
@@ -128,7 +129,7 @@ public class FacilitiesParserWriterTest extends MatsimTestCase {
 	public void testParserWriter4() {
 		System.out.println("running testParserWriter4()...");
 
-		ScenarioImpl scenario = new ScenarioImpl(this.config);
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(this.config);
 
 		System.out.println("  reading facilites xml file as a layer of the world...");
 		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();

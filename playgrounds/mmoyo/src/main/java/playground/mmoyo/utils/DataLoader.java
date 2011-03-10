@@ -5,14 +5,16 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.counts.Counts;
 import org.matsim.counts.MatsimCountsReader;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
@@ -50,7 +52,7 @@ public class DataLoader {
 	}
 
 	public TransitSchedule readTransitSchedule(final String networkFile, final String transitScheduleFile) {
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		MatsimNetworkReader matsimNetReader = new MatsimNetworkReader(scenario);
 		matsimNetReader.readFile(networkFile);
 		TransitSchedule schedule = readTransitSchedule(scenario.getNetwork(), transitScheduleFile);
@@ -78,7 +80,7 @@ public class DataLoader {
 	}
 
 	public NetworkImpl readNetwork (final String networkFile){
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		MatsimNetworkReader matsimNetReader = new MatsimNetworkReader(scenario);
 		matsimNetReader.readFile(networkFile);
 		NetworkImpl network = scenario.getNetwork(); 
@@ -88,7 +90,7 @@ public class DataLoader {
 	}
 
 	public Population readPopulation(final String populationFile){
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		PopulationReader popReader = new MatsimPopulationReader(scenario);
 		popReader.readFile(populationFile);
 		Population population = scenario.getPopulation();
@@ -98,7 +100,7 @@ public class DataLoader {
 	}
 
 	public ScenarioImpl readNetwork_Population(String networkFile, String populationFile) {
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		PopulationReader popReader = new MatsimPopulationReader(scenario);
 		popReader.readFile(populationFile);
 
@@ -108,7 +110,7 @@ public class DataLoader {
 	}
 
 	public ScenarioImpl loadScenario (final String configFile){
-		ScenarioLoaderImpl scenarioLoader = new ScenarioLoaderImpl(configFile);
+		ScenarioLoaderImpl scenarioLoader = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(configFile);
 		scenarioLoader.loadScenario();
 		return scenarioLoader.getScenario();
 	}

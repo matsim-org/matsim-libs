@@ -25,11 +25,13 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.xml.sax.SAXException;
 
 public class IAConverter {
@@ -46,7 +48,7 @@ public class IAConverter {
 
 	public static void main(String[] args) throws SAXException, ParserConfigurationException, IOException {
 		log.info("start conversion");
-		Scenario s = new ScenarioImpl();
+		Scenario s = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(s).parse(IN_NETWORK);
 
 		new IANetworkWriter().write(s.getNetwork(), OUT_LINKS);

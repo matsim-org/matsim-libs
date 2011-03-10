@@ -25,7 +25,6 @@ import java.io.IOException;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -39,7 +38,10 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationReader;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 /**
  * Creates a table
@@ -104,10 +106,10 @@ public class CreateSelectedPlansTables {
 	}
 
 	private void init(final String networkPath) {
-		this.scenario = new ScenarioImpl();
+		this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
-		this.plans0=new ScenarioImpl().getPopulation();
-		this.plans1=new ScenarioImpl().getPopulation();
+		this.plans0=((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
+		this.plans1=((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
 
 		System.out.println("  reading the network...");
 		new MatsimNetworkReader(this.scenario).readFile(networkPath);
@@ -316,6 +318,7 @@ public class CreateSelectedPlansTables {
 		private final Population myPopulation;
 
 		public PseudoScenario(final ScenarioImpl scenario, final Population population) {
+			super(ConfigUtils.createConfig());
 			this.scenario = scenario;
 			this.myPopulation = population;
 		}

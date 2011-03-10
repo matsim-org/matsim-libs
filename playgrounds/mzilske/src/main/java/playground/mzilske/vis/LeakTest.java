@@ -4,13 +4,15 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.MobsimConfigGroupI;
 import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 public class LeakTest {
 	
@@ -34,7 +36,7 @@ public class LeakTest {
 		
 		double snapshotPeriod = 60;
 		MobsimConfigGroupI simulationConfigGroup = new SimulationConfigGroup();
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		
 		scenario.setPopulation(new PopulationOnDisk((ScenarioImpl) scenario, DirectoryUtils.createTempDirectory()));
 		

@@ -21,13 +21,15 @@
 package org.matsim.population;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationReaderMatsimV4;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.CRCChecksum;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -42,7 +44,7 @@ public class DesiresTest extends MatsimTestCase {
 		log.info("running testReadWriteDesires()... ");
 
 		log.info("  creating single person with desires... ");
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Population pop = scenario.getPopulation();
 		PersonImpl p = new PersonImpl(new IdImpl(0));
 		pop.addPerson(p);
@@ -59,7 +61,7 @@ public class DesiresTest extends MatsimTestCase {
 		log.info("  done.");
 
 		log.info("  clean up population...");
-		scenario = new ScenarioImpl();
+		scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		pop = scenario.getPopulation();
 		log.info("  done.");
 

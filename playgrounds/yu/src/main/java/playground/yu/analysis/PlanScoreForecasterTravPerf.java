@@ -27,7 +27,6 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
@@ -51,8 +50,11 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 import playground.yu.utils.DebugTools;
 
@@ -273,7 +275,7 @@ public class PlanScoreForecasterTravPerf {
 		eventsFilename = "../integration-parameterCalibration/test/matsim/outputReplanning/ITERS/it.100/100.events.txt.gz", //
 		popFilename = "../integration-parameterCalibration/test/matsim/outputReplanning/output_plans.xml.gz";
 
-		Scenario sc = new ScenarioImpl();
+		Scenario sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		Config cf = sc.getConfig();
 		new MatsimConfigReader(cf).readFile(configFilename);

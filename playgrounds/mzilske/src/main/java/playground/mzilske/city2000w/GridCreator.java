@@ -6,13 +6,14 @@ package playground.mzilske.city2000w;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 
 /**
  * @author schroeder
@@ -29,7 +30,7 @@ public class GridCreator {
 	private void createGrid(int size) {
 		Config config = new Config();
 		config.addCoreModules();
-		scenario = new ScenarioImpl(config);
+		scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		Network network = scenario.getNetwork();
 		for (int i = 0; i <= size; i++) {
 			for (int j = 0; j <= size; j++) {

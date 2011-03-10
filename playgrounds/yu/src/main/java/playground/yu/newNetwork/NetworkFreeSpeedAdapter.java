@@ -23,11 +23,13 @@
  */
 package playground.yu.newNetwork;
 
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 /**
  * this class will remove the nodes from network, who don't have incidents
@@ -43,7 +45,7 @@ public class NetworkFreeSpeedAdapter {
 		final String outputNetFilename = "output/Toronto/connector_netclean_freeSpeed_modified.xml.gz";
 		// String logFilename = "output/Toronto/FreeSpeedAdaptor.log";
 
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		NetworkImpl network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(inputNetFilename);
 

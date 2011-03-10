@@ -2,7 +2,6 @@ package playground.wrashid.parkingSearch.planLevel.initDemand;
 
 import java.util.HashMap;
 
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
@@ -10,6 +9,9 @@ import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 /**
  * Add parking facilities to each road according to their length (at least on per road).
@@ -25,7 +27,7 @@ public class MainPerLinkParkingFacilityGenerator {
 
 	public static void main(String[] args) {
 
-		ScenarioImpl sc = new ScenarioImpl();
+		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		String networkFile = "C:\\data\\workspace\\playgrounds\\wrashid\\test\\scenarios\\berlin\\network.xml.gz";
 		String facilitiesPath = "C:\\data\\workspace\\playgrounds\\wrashid\\test\\scenarios\\berlin\\parkingFacilities.xml.gz";

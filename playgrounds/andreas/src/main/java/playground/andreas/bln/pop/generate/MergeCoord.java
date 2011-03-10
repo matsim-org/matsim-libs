@@ -28,7 +28,6 @@ import java.util.HashMap;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -39,6 +38,8 @@ import org.matsim.core.config.Config;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.ConfigUtils;
 
@@ -179,7 +180,7 @@ public class MergeCoord {
 		int changed = 0;
 		int tripNonWalking = 0;
 
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		log.info("Start reading file " + plansFilename);
 		new MatsimNetworkReader(scenario).readFile(networkFilename);
 
@@ -257,7 +258,7 @@ public class MergeCoord {
 		int unchanged = 0;
 		int changed = 0;
 
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		log.info("Start reading file " + plansFilename);
 		new MatsimNetworkReader(scenario).readFile(networkFilename);
 

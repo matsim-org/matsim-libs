@@ -27,9 +27,11 @@ import java.util.List;
 
 import org.matsim.analysis.CalcLinkStats;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.counts.CountSimComparison;
 import org.matsim.counts.Counts;
 import org.matsim.counts.MatsimCountsReader;
@@ -55,7 +57,7 @@ public class RebuildCountSimRealPerHourFromLinkStats2Txt {
 		double countsScaleFactor = 10d, distanceFilter = 30000d;
 		String distanceFilterCenterNodeId = "2531";
 
-		Scenario scenario = new ScenarioImpl();
+		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		new MatsimNetworkReader(scenario).readFile(networkFilename);
 		Network network = scenario.getNetwork();

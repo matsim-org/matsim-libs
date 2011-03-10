@@ -7,15 +7,17 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -85,7 +87,7 @@ public class CreateNetworkFromShape {
 	}
 
 	private void createNetwork() {
-		this.sc = new ScenarioImpl();
+		this.sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		this.net = sc.getNetwork();
 		this.netFac = this.net.getFactory();
 		Geometry g;

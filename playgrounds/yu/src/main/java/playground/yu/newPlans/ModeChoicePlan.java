@@ -106,7 +106,7 @@ public class ModeChoicePlan extends NewPopulation {
 	 * @param args
 	 */
 	public static void main(final String[] args) {
-		Scenario scenario = new ScenarioLoaderImpl(args[0]).loadScenario();
+		Scenario scenario = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(args[0]).loadScenario();
 
 		ModeChoicePlan mcp = new ModeChoicePlan(scenario.getNetwork(), scenario.getPopulation(), null);//scenario.getConfig().plans().getOutputFile());
 		mcp.run(scenario.getPopulation());

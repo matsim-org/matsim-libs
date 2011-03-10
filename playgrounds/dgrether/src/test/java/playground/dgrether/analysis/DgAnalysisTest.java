@@ -21,11 +21,13 @@ package playground.dgrether.analysis;
 
 import java.io.File;
 
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.testcases.MatsimTestCase;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -49,7 +51,7 @@ public class DgAnalysisTest extends MatsimTestCase {
 		String netFilename = "test/scenarios/equil/network.xml";
 		String plansFilename = "test/scenarios/equil/plans100.xml";
 		String runId = "testRun23";
-		ScenarioImpl sc = new ScenarioImpl();
+		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Config config = sc.getConfig();
 		config.network().setInputFile(netFilename);
 		config.plans().setInputFile(plansFilename);

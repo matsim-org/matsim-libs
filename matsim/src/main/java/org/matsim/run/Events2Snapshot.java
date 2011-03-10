@@ -21,16 +21,21 @@
 package org.matsim.run;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Iterator;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.SnapshotGenerator;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.ArgumentParser;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.vis.snapshots.writers.KmlSnapshotWriter;
 import org.matsim.vis.snapshots.writers.PlansFileSnapshotWriter;
 import org.matsim.vis.snapshots.writers.SnapshotWriter;
@@ -108,7 +113,12 @@ public class Events2Snapshot {
 	 */
 	public void run(final String[] args) {
 		parseArguments(args);
-		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(this.configfile);
+		Scenario scenario;
+		Config config1 = ConfigUtils.loadConfig(this.configfile);
+		MatsimRandom.reset(config1.global().getRandomSeed());
+		scenario = ScenarioUtils.createScenario(config1);
+
+		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(scenario);
 		this.config = sl.getScenario().getConfig();
 
 		if (this.config.simulation().getSnapshotPeriod() <= 0.0) {
@@ -194,7 +204,7 @@ public class Events2Snapshot {
 	private void loadSnapshotWriters(final String outputDir) {
 
 		if (this.writer != null) {
-		  this.visualizer.addSnapshotWriter(this.writer);
+			this.visualizer.addSnapshotWriter(this.writer);
 		}
 
 		String snapshotFormat = this.config.getQSimConfigGroup().getSnapshotFormat();

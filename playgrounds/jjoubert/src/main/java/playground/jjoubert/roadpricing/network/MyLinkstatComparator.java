@@ -33,11 +33,13 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkReaderMatsimV1;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.xml.sax.SAXException;
 
 public class MyLinkstatComparator {
@@ -74,7 +76,7 @@ public class MyLinkstatComparator {
 		String outputFile = null;
 		Double threshold = null;
 		Integer minimumLanes = null;
-		Scenario sc = new ScenarioImpl();
+		Scenario sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		
 		MyLinkstatComparator mlc = null;
 		if(args.length != 7){

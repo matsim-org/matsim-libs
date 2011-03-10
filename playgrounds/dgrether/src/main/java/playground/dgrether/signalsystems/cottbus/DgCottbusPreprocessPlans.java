@@ -21,7 +21,6 @@ package playground.dgrether.signalsystems.cottbus;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.router.PlansCalcRoute;
@@ -45,7 +44,7 @@ public class DgCottbusPreprocessPlans {
 	public static void main(String[] args) {
 		String conf = DgPaths.REPOS + "shared-svn/studies/dgrether/cottbus/sylvia/cottbus_sylvia_config.xml";
 		String popOutFile = DgPaths.REPOS + "shared-svn/studies/dgrether/cottbus/Cottbus-BA/cb-plans_usual_0.2_routed.xml.gz";
-		ScenarioLoader loader = new ScenarioLoaderImpl(conf);
+		ScenarioLoaderImpl loader = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(conf);
 		Scenario scenario = loader.loadScenario();
 		((PopulationImpl) scenario.getPopulation()).addAlgorithm(new XY2Links((NetworkImpl) scenario.getNetwork()));
 		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(scenario.getConfig().planCalcScore());

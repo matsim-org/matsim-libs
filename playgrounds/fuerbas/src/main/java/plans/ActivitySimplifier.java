@@ -66,7 +66,7 @@ public class ActivitySimplifier {
 	
 	public void run(final String[] args) {
 		parseArguments(args);
-		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(this.configfile);
+		ScenarioLoaderImpl sl = (ScenarioLoaderImpl) ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(this.configfile);
 		sl.loadNetwork();
 		sl.loadPopulation();
 		NetworkImpl network = sl.getScenario().getNetwork();

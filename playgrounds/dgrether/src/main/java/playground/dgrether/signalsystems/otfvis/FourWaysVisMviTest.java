@@ -19,11 +19,13 @@
  * *********************************************************************** */
 package playground.dgrether.signalsystems.otfvis;
 
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.run.OTFVis;
 
 import playground.dgrether.DgPaths;
@@ -51,7 +53,7 @@ public class FourWaysVisMviTest {
 		String signalGroupsFile = TESTINPUTDIR + "testSignalGroups_v2.0.xml";
 		String signalControlFile = TESTINPUTDIR + "testSignalControl_v2.0.xml";
     
-    ScenarioImpl scenario = new ScenarioImpl();
+    ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
     Config conf = scenario.getConfig();
     conf.network().setInputFile(netFile);
     conf.plans().setInputFile(popFile);

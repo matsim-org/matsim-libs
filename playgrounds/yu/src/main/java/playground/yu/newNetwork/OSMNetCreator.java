@@ -22,13 +22,15 @@ package playground.yu.newNetwork;
 
 import java.util.Set;
 
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 import playground.yu.analysis.NetworkLinkIdsInCircle;
 import playground.yu.utils.io.OSMPatchPaser;
@@ -67,7 +69,7 @@ public class OSMNetCreator {
 		final String outputNetFilename = "../schweiz-ivtch/network/ivtch-osm.xml";
 		// final String outputNetFilename = "test/yu/utils/ivtch-osm.1.3.xml";
 
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		NetworkImpl network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFilename);
 		// (1) -----------links in Circle---------------------------

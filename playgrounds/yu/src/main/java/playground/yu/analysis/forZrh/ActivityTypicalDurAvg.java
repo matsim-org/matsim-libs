@@ -30,7 +30,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -38,6 +37,9 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -105,7 +107,7 @@ public class ActivityTypicalDurAvg extends AbstractPersonAlgorithm implements
 		String networkFilename = "../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml", //
 		populationFilename = "../runs-svn/run1300/ITERS/it.1000/1000.plans.xml.gz";
 
-		Scenario scenario = new ScenarioImpl();
+		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		// Network network=scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(networkFilename);

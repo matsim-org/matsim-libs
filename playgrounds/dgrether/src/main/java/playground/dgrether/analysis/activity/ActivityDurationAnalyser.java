@@ -24,7 +24,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -34,6 +33,8 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.roadpricing.RoadPricingScheme;
 
@@ -76,15 +77,9 @@ public class ActivityDurationAnalyser {
 	private RoadPricingScheme roadPricingScheme;
 
 	public ActivityDurationAnalyser() {
-		//set config
-		try {
-			this.config = ConfigUtils.loadConfig(configfile);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-//		config = Gbl.createConfig(null);
+		this.config = ConfigUtils.loadConfig(configfile);
 
-		ScenarioImpl scenario = new ScenarioImpl(this.config);
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(this.config);
 		//reading network
 //		NetworkLayer net = scenario.getNetwork();
 		MatsimNetworkReader reader = new MatsimNetworkReader(scenario);

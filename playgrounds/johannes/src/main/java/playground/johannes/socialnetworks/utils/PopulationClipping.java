@@ -45,7 +45,7 @@ public class PopulationClipping {
 	private static final String MODULE_NAME = "populationClipping";
 
 	public static void main(String[] args) {
-		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(args[0]);
+		ScenarioLoaderImpl loader = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(args[0]);
 		loader.loadScenario();
 		Scenario data = loader.getScenario();
 		Config config = data.getConfig();

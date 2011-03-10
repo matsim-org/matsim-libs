@@ -24,11 +24,12 @@ import java.util.HashMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.planomat.utils.SelectedPlansScoreTest;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -62,7 +63,7 @@ public class PlanomatRunTest extends MatsimTestCase {
 
 		HashMap<Id,Double> expectedScores = new HashMap<Id,Double>();
 
-		Scenario expectedScenario = new ScenarioImpl(config);
+		ScenarioImpl expectedScenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		expectedScenario.getConfig().plans().setInputFile(this.getInputDirectory() + "plans.xml.gz");
 		new ScenarioLoaderImpl(expectedScenario).loadScenario();
 		for (Person person : expectedScenario.getPopulation().getPersons().values()) {

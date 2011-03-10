@@ -20,14 +20,16 @@
 package org.matsim.ptproject.qsim.qnetsimengine;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.lanes.Lane;
 import org.matsim.lanes.LaneDefinitions;
 import org.matsim.lanes.LaneDefinitionsFactory;
@@ -127,7 +129,7 @@ public class QLaneTest extends MatsimTestCase {
   	
   
 	public void testCapacityWoLanes() {
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().addQSimConfigGroup(new QSimConfigGroup());
 		
 		this.initNetwork(scenario.getNetwork());
@@ -141,7 +143,7 @@ public class QLaneTest extends MatsimTestCase {
 	}
 	
 	public void testCapacityWithOneLaneOneLane() {
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().addQSimConfigGroup(new QSimConfigGroup());
 		scenario.getConfig().scenario().setUseLanes(true);
 		this.initNetwork(scenario.getNetwork());
@@ -172,7 +174,7 @@ public class QLaneTest extends MatsimTestCase {
 	}
 
 	public void testCapacityWithOneLaneOneLaneTwoLanes() {
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().addQSimConfigGroup(new QSimConfigGroup());
 		scenario.getConfig().scenario().setUseLanes(true);
 		this.initNetwork(scenario.getNetwork());
@@ -205,7 +207,7 @@ public class QLaneTest extends MatsimTestCase {
 	
 	
 	public void testCapacityWithLanes() {
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().addQSimConfigGroup(new QSimConfigGroup());
 		scenario.getConfig().scenario().setUseLanes(true);
 		this.initNetwork(scenario.getNetwork());

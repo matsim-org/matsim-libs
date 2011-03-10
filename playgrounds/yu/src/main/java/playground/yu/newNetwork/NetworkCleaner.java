@@ -29,13 +29,15 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.NodeImpl;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 /**
  * this class will remove the nodes from network, who don't have incidents
@@ -54,7 +56,7 @@ public class NetworkCleaner {
 		final String outputNetFilename = "../berlin-bvg09/pt/nullfall_M44_344/test/net.xml";
 		String logFilename = "../berlin-bvg09/pt/nullfall_M44_344/test/net.log";
 
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(inputNetFilename);
 		Set<Node> nodesToRemove = new HashSet<Node>();

@@ -26,12 +26,14 @@ import java.util.Hashtable;
 import java.util.Vector;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.NetworkAdaptLength;
 import org.matsim.core.network.algorithms.NetworkSummary;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 import playground.anhorni.crossborder.verification.Verification;
 
@@ -88,7 +90,7 @@ public class InitDemandCreation {
 
 
 	private void readNetwork() {
-		Scenario scenario = new ScenarioImpl();
+		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		this.network = (NetworkImpl) scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(Config.networkFile);
 

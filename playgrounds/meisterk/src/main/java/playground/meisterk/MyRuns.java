@@ -30,7 +30,6 @@ import java.util.Arrays;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -57,8 +56,11 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.population.algorithms.PersonAnalyseTimesByActivityType;
@@ -149,7 +151,7 @@ public class MyRuns {
 
 	void ktiPtRoutesPerformanceTest(final String[] args) {
 
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Config config = scenario.getConfig();
 		KtiConfigGroup ktiConfigGroup = new KtiConfigGroup();
 		config.addModule(KtiConfigGroup.GROUP_NAME, ktiConfigGroup);
@@ -204,7 +206,7 @@ public class MyRuns {
 	void moveInitDemandToDifferentNetwork(final String[] args) {
 
 		// read ivtch demand
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Config config = scenario.getConfig();
 		MeisterkConfigGroup meisterkConfigGroup = new MeisterkConfigGroup();
 		config.addModule(MeisterkConfigGroup.GROUP_NAME, meisterkConfigGroup);
@@ -223,7 +225,7 @@ public class MyRuns {
 		personRemoveLinkAndRoute.run(population);
 
 		// switch to new network in scenario
-		ScenarioImpl scenario2 = new ScenarioImpl();
+		ScenarioImpl scenario2 = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		try {
 			new MatsimNetworkReader(scenario2).parse(config.getParam(MeisterkConfigGroup.GROUP_NAME, "inputSecondNetworkFile"));
 		} catch (SAXException e) {
@@ -366,7 +368,7 @@ public class MyRuns {
 
 	public void analyzeModeChainFeasibility(Config config) {
 
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		// initialize scenario with events from a given events file
 		// - network
@@ -529,7 +531,7 @@ public class MyRuns {
 	 */
 	public static void analyseInitialTimes(Config config) {
 
-		ScenarioImpl scenario = new ScenarioImpl(config);
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		// initialize scenario with events from a given events file
 		// - network
 		logger.info("Reading network xml file...");

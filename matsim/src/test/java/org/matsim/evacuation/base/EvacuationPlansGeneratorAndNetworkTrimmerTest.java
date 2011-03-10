@@ -19,7 +19,6 @@
 
 package org.matsim.evacuation.base;
 
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -29,6 +28,8 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.evacuation.config.EvacuationConfigGroup;
 import org.matsim.testcases.MatsimTestCase;
@@ -45,7 +46,7 @@ public class EvacuationPlansGeneratorAndNetworkTrimmerTest extends MatsimTestCas
 		String refPlans = getInputDirectory() + "evacuationplans.xml";
 		String refNet = getInputDirectory() + "evacuationnetwork.xml";
 
-		ScenarioImpl scenario = new ScenarioImpl(c);
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(c);
 		NetworkImpl net = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(c.network().getInputFile());
 

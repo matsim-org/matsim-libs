@@ -26,7 +26,6 @@ import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
@@ -48,6 +47,9 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
@@ -72,9 +74,9 @@ public class VisualizeTransitPlans {
 	private final ScenarioImpl visScenario;
 
 	public VisualizeTransitPlans() {
-		this.realScenario = new ScenarioImpl();
+		this.realScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		this.realScenario.getConfig().scenario().setUseTransit(true);
-		this.visScenario = new ScenarioImpl();
+		this.visScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 	}
 
 	private void loadRealScenario() {

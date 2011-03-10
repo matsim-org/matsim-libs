@@ -11,7 +11,6 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
@@ -28,6 +27,8 @@ import org.matsim.core.controler.listener.ReplanningListener;
 import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.mzilske.freight.CarrierAgentTracker;
 import playground.mzilske.freight.CarrierAgentTrackerBuilder;
@@ -167,7 +168,7 @@ public class RunChessboard implements StartupListener, ScoringListener, Replanni
 		config.addCoreModules();
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(100);
-		scenario = new ScenarioImpl(config);
+		scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		readNetwork(NETWORK_FILENAME);
 		Controler controler = new Controler(scenario);
 		/*

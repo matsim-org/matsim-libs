@@ -17,13 +17,16 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.api.core.v01;
+package org.matsim.core.scenario;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -75,13 +78,7 @@ public class ScenarioImpl implements Scenario {
 
 	private Knowledges knowledges;
 
-	public ScenarioImpl(){
-		this.config = new Config();
-		this.config.addCoreModules();
-		initContainers();
-	}
-
-	public ScenarioImpl(Config config) {
+	protected ScenarioImpl(Config config) {
 		this.config = config;
 		initContainers();
 	}

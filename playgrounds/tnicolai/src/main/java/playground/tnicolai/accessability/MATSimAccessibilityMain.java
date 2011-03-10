@@ -23,10 +23,11 @@
  */
 package playground.tnicolai.accessability;
 
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 
 /**
  * @author thomas
@@ -59,7 +60,7 @@ public class MATSimAccessibilityMain {
 		new MatsimConfigReader(config).readFile( configPath );
 		config.scenario().setUseTransit(true);
 		config.scenario().setUseVehicles(true);
-		scenario = new ScenarioImpl(config);
+		scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		scenario = (ScenarioImpl) new ScenarioLoaderImpl(scenario).loadScenario();
 	}
 	

@@ -9,10 +9,11 @@ import org.apache.log4j.Logger;
 import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -20,6 +21,7 @@ import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 import playground.mzilske.pipeline.PopulationWriterTask;
 import playground.mzilske.pipeline.RoutePersonTask;
@@ -142,7 +144,7 @@ public class PV2025MatrixReader {
 
 	public static void main(String[] args) {
 		PopulationGenerator populationBuilder = new PopulationGenerator();
-		Scenario osmNetwork = new ScenarioImpl();
+		Scenario osmNetwork = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(osmNetwork).readFile(NETWORK_FILENAME);
 		RouterFilter routerFilter = new RouterFilter(osmNetwork.getNetwork());
 		Set<Feature> featuresInShape;

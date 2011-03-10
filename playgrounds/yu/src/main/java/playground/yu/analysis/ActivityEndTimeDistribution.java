@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
@@ -34,6 +33,9 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -119,7 +121,7 @@ public class ActivityEndTimeDistribution extends AbstractPersonAlgorithm
 		String netFilename = "../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml";
 		String popFilename = "../integration-demandCalibration/test/DestinationUtilOffset/1000.plans.xml.gz";
 		String outputFilename = "../integration-demandCalibration/test/DestinationUtilOffset/1000.plans.departureTimeDistributionafter.";
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		Network net = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFilename);

@@ -3,6 +3,9 @@ package org.matsim.api.core.v01;
 import junit.framework.Assert;
 
 import org.junit.Test;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 /**
  * @author mrieser
@@ -15,7 +18,7 @@ public class ScenarioImplTest {
 	 */
 	@Test
 	public void testCreateId_sameObjectForSameId() {
-		ScenarioImpl s = new ScenarioImpl();
+		ScenarioImpl s = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		String str1 = "9832";
 		String str2 = new String(str1);
 		Assert.assertNotSame(str1, str2);
@@ -30,7 +33,7 @@ public class ScenarioImplTest {
 
 	@Test
 	public void testAddGetScenarioElement_simple() {
-		Scenario s = new ScenarioImpl();
+		Scenario s = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Assert.assertNull(s.getScenarioElement(A.class));
 		Assert.assertNull(s.getScenarioElement(AImpl.class));
 		A a = new AImpl();
@@ -41,7 +44,7 @@ public class ScenarioImplTest {
 
 	@Test
 	public void testAddGetScenarioElement_complex() {
-		Scenario s = new ScenarioImpl();
+		Scenario s = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		B b = new BImpl();
 		C c = new CImpl();
@@ -63,7 +66,7 @@ public class ScenarioImplTest {
 
 	@Test
 	public void testRemoveScenarioElement_simple() {
-		Scenario s = new ScenarioImpl();
+		Scenario s = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		A a = new AImpl();
 		s.addScenarioElement(a);
 		Assert.assertEquals(a, s.getScenarioElement(A.class));
@@ -77,7 +80,7 @@ public class ScenarioImplTest {
 
 	@Test
 	public void testRemoveScenarioElement_complex() {
-		Scenario s = new ScenarioImpl();
+		Scenario s = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		B b = new BImpl();
 		C c = new CImpl();

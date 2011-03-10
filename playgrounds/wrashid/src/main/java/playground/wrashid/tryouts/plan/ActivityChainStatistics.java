@@ -2,7 +2,6 @@ package playground.wrashid.tryouts.plan;
 
 import java.util.HashMap;
 
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
@@ -13,6 +12,9 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 /*
  * just reads an input plans file and produces an output on the console of activity chains and their occurance in percentage.
@@ -26,7 +28,7 @@ public class ActivityChainStatistics extends NewPopulation {
 
 	public static void main(String[] args) {
 
-		ScenarioImpl sc = new ScenarioImpl();
+		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		String inputPlansFile = "C:\\data\\workspace\\playgrounds\\wrashid\\test\\scenarios\\berlin\\plans.xml.gz";
 		String outputPlansFile = "C:\\data\\workspace\\playgrounds\\wrashid\\test\\scenarios\\berlin\\modified_plans.xml";

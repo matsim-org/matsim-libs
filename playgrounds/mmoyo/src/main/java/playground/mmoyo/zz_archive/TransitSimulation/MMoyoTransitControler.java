@@ -1,9 +1,9 @@
 package playground.mmoyo.zz_archive.TransitSimulation;
 
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.pt.config.TransitConfigGroup;
@@ -44,7 +44,7 @@ public class MMoyoTransitControler extends Controler {
 	
 	public static void main(final String[] args) {
 		if (args.length > 0) {
-			ScenarioLoaderImpl scenarioLoader = new ScenarioLoaderImpl(args[0]); //load from configFile
+			ScenarioLoaderImpl scenarioLoader = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(args[0]); //load from configFile
 			ScenarioImpl scenario = scenarioLoader.getScenario();
 			scenarioLoader.loadScenario();
 			new MMoyoTransitControler(scenario, true).run();

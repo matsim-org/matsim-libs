@@ -19,7 +19,6 @@ import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -31,10 +30,13 @@ import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandle
 import org.matsim.core.events.EventsManagerFactoryImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.gregor.gis.helper.GTH;
@@ -223,7 +225,7 @@ public class EvacTimeCompare implements AgentDepartureEventHandler, AgentArrival
 		String r2 = svn + "run1363" + iter;
 		String net = svn + "run1362" + "/output/output_network.xml.gz";
 		String shape = svn + "run1362/analysis/etc1362.it1000Vs1363.it1000.shp"; 
- 		Scenario sc = new ScenarioImpl();
+ 		Scenario sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
  		new MatsimNetworkReader(sc).readFile(net);
  		Envelope e = getEnvelope(sc.getNetwork());
  		QuadTree<MultiPolygon> qt = getMultiPolygons(e);

@@ -31,7 +31,6 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
@@ -41,6 +40,8 @@ import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.utils.charts.XYScatterChart;
 import org.matsim.core.utils.misc.ConfigUtils;
@@ -185,39 +186,35 @@ public class DestTripUtilOffset_perfRatio extends
 		;
 
 		CharyparNagelScoringParameters params;
-		try {
-			params = new CharyparNagelScoringParameters(ConfigUtils.loadConfig(
-					configFilename).planCalcScore());
-			int arStartTime = 7, arEndTime = 20, lowerLimit = 50;
-			// double interval = 0.25;
+		params = new CharyparNagelScoringParameters(ConfigUtils.loadConfig(
+				configFilename).planCalcScore());
+		int arStartTime = 7, arEndTime = 20, lowerLimit = 50;
+		// double interval = 0.25;
 
-			Scenario scenario = new ScenarioImpl();
-			Network net = scenario.getNetwork();
-			new MatsimNetworkReader(scenario).readFile(networkFilename);
+		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Network net = scenario.getNetwork();
+		new MatsimNetworkReader(scenario).readFile(networkFilename);
 
-			Counts counts = new Counts();
-			new MatsimCountsReader(counts).readFile(countsFilename);
+		Counts counts = new Counts();
+		new MatsimCountsReader(counts).readFile(countsFilename);
 
-			BseLinkCostOffsetsXMLFileIO utilOffsetIO = new BseLinkCostOffsetsXMLFileIO(
-					net);
-			DynamicData<Link> linkUtilOffsets = utilOffsetIO
-					.read(linkOffsetUtilOffsetFilename);
+		BseLinkCostOffsetsXMLFileIO utilOffsetIO = new BseLinkCostOffsetsXMLFileIO(
+				net);
+		DynamicData<Link> linkUtilOffsets = utilOffsetIO
+				.read(linkOffsetUtilOffsetFilename);
 
-			DestTripUtilOffset_perfRatio dtuoPr = new DestTripUtilOffset_perfRatio(
-					net, counts, linkUtilOffsets, arStartTime, arEndTime,
-					lowerLimit, 1000d, params);
+		DestTripUtilOffset_perfRatio dtuoPr = new DestTripUtilOffset_perfRatio(
+				net, counts, linkUtilOffsets, arStartTime, arEndTime,
+				lowerLimit, 1000d, params);
 
-			EventsManager events = new EventsManagerImpl();
-			// /////////////////////////////////
-			events.addHandler(dtuoPr);
-			// /////////////////////////////////
-			new MatsimEventsReader(events).readFile(eventsFilename);
+		EventsManager events = new EventsManagerImpl();
+		// /////////////////////////////////
+		events.addHandler(dtuoPr);
+		// /////////////////////////////////
+		new MatsimEventsReader(events).readFile(eventsFilename);
 
-			dtuoPr.output(outputFilenameBase);
-			// aluoe.write(outputFilenameBase, interval);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		dtuoPr.output(outputFilenameBase);
+		// aluoe.write(outputFilenameBase, interval);
 
 	}
 }

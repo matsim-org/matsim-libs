@@ -30,7 +30,6 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -41,7 +40,10 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.MatsimXmlParser;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.xml.sax.Attributes;
@@ -71,11 +73,11 @@ public class PopulationWriterHandlerImplV5Test {
 	}
 
 	private NetworkRoute doTestWriteNetworkRoute(final String startLinkId, final String linkIds, final String endLinkId, final String expectedRouteSerialization) {
-		ScenarioImpl scenario = new ScenarioImpl(this.util.loadConfig(null));
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(this.util.loadConfig(null));
 		Id idFrom = scenario.createId(startLinkId);
 		Id idTo = scenario.createId(endLinkId);
 
-		ScenarioImpl tmpScenario = new ScenarioImpl();
+		ScenarioImpl tmpScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Population pop = tmpScenario.getPopulation();
 		PopulationFactory pb = pop.getFactory();
 		PersonImpl person = (PersonImpl) pb.createPerson(new IdImpl(1));

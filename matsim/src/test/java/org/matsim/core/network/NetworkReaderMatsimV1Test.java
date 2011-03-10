@@ -24,12 +24,14 @@ import java.util.Set;
 import java.util.Stack;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.utils.AttributesBuilder;
 import org.xml.sax.Attributes;
@@ -97,7 +99,7 @@ public class NetworkReaderMatsimV1Test extends MatsimTestCase {
 	 * @author mrieser
 	 */
 	private Link prepareTestAllowedModes(final String modes) {
-		Scenario scenario = new ScenarioImpl();
+		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();
 		network.addNode(network.getFactory().createNode(new IdImpl("1"), new CoordImpl(0, 0)));
 		network.addNode(network.getFactory().createNode(new IdImpl("2"), new CoordImpl(1000, 0)));

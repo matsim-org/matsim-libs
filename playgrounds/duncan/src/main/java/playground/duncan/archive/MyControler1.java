@@ -22,8 +22,8 @@ package playground.duncan.archive;
  * $Id: MyControler1.java,v 1.1 2007/11/14 12:00:28 nagel Exp $
  */
 
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 
 
@@ -37,7 +37,7 @@ public class MyControler1 {
 		} else {
 			configFile = args[0];
 		}
-		ScenarioImpl scenario = (ScenarioImpl) new ScenarioLoaderImpl(configFile).loadScenario();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(configFile).loadScenario();
 
 		final Controler controler = new Controler(scenario);
 		controler.setOverwriteFiles(true);

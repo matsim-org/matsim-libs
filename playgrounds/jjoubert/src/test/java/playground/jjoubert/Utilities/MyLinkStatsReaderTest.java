@@ -26,10 +26,12 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeData;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.testcases.MatsimTestCase;
 
 import playground.jjoubert.Utilities.matsim2urbansim.MyLinkStatsReader;
@@ -98,7 +100,7 @@ public class MyLinkStatsReaderTest extends MatsimTestCase{
 
 
 	private void setupTest() {
-		scenario = new ScenarioImpl();
+		scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		String f = (new File(getInputDirectory())).getParent() + "/network.xml";
 		MatsimNetworkReader mnr = new MatsimNetworkReader(scenario);
 		mnr.readFile(f);

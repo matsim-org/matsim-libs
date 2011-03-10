@@ -11,14 +11,15 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.TransitScheduleWriterV1;
 import org.matsim.pt.transitSchedule.api.Departure;
@@ -49,10 +50,10 @@ public class SfTransitBuilder {
 		
 	public void createSchedule(String inputOagData) throws IOException {
 		
-		Scenario scen = new ScenarioImpl();	
+		Scenario scen = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());	
 		Config config = scen.getConfig();
 		config.network().setInputFile("/home/soeren/workspace/euroAirNetwork.xml");
-		ScenarioLoader sl = new ScenarioLoaderImpl(scen);		
+		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(scen);		
 		sl.loadScenario();		
 		Network network = scen.getNetwork();
 		scen.getConfig().scenario().setUseTransit(true);

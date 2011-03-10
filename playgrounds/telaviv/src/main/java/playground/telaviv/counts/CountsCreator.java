@@ -25,10 +25,12 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.CountsWriter;
@@ -53,7 +55,7 @@ public class CountsCreator {
 	private Scenario scenario;
 
 	public static void main(String[] args) {
-		new CountsCreator(new ScenarioImpl()).createCounts();
+		new CountsCreator(((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig()))).createCounts();
 	}
 
 	public CountsCreator(Scenario scenario) {

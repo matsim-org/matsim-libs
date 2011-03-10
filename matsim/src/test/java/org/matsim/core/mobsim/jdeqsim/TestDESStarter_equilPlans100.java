@@ -6,7 +6,7 @@ import org.matsim.core.scenario.ScenarioLoaderImpl;
 public class TestDESStarter_equilPlans100 extends AbstractJDEQSimTest {
 	
 	public void test_equilPlans100_TestHandlerDetailedEventChecker() {
-		Scenario scenario = new ScenarioLoaderImpl("test/scenarios/equil/config.xml").loadScenario();
+		Scenario scenario = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed("test/scenarios/equil/config.xml").loadScenario();
 		this.runJDEQSim(scenario);
 		
 		assertEquals(scenario.getPopulation().getPersons().size(), super.eventsByPerson.size());

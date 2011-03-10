@@ -6,12 +6,14 @@ import java.util.Set;
 import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 import playground.mzilske.pipeline.PersonMerger;
 import playground.mzilske.pipeline.PopulationReaderTask;
@@ -51,7 +53,7 @@ private static final String GV_NETWORK_FILENAME = "/Users/michaelzilske/workspac
 	public static void main(String[] args) {
 //		Scenario gvNetwork = new ScenarioImpl();
 //		new MatsimNetworkReader(gvNetwork).readFile(GV_NETWORK_FILENAME);
-		Scenario osmNetwork = new ScenarioImpl();
+		Scenario osmNetwork = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(osmNetwork).readFile(NETWORK_FILENAME);
 //		Set<Feature> featuresInShape;
 //		try {

@@ -12,14 +12,16 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 
@@ -39,7 +41,7 @@ public class CalculateAngleTest {
 	@Test 
 	public void testGetLeftLane() {
 		Config conf = utils.loadConfig(utils.getClassInputDirectory() + "config.xml");
-		ScenarioImpl scenario = new ScenarioImpl(conf);
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(conf);
 		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(scenario);
 		loader.loadNetwork();
 
@@ -77,7 +79,7 @@ public class CalculateAngleTest {
 		double twicePi = Math.PI * 2;
 		double piStep = Math.PI / 180.0;
 		for (double angle = 0.0; angle < twicePi; angle = angle + piStep){
-			scenario = new ScenarioImpl();
+			scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 			createNetwork(scenario, angle, ids);
 			Network net = scenario.getNetwork();
 			TreeMap<Double, Link> m = CalculateAngle.getOutLinksSortedByAngle(net.getLinks().get(ids.get(1)));

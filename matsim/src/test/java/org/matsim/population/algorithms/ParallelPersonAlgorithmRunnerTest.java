@@ -25,11 +25,13 @@ import java.util.ArrayList;
 import junit.framework.TestCase;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 /**
  * Tests the class {@link ParallelPersonAlgorithmRunner}.
@@ -44,7 +46,7 @@ public class ParallelPersonAlgorithmRunnerTest extends TestCase {
 	 * @author mrieser
 	 */
 	public void testNumberOfThreads() {
-		Population population = new ScenarioImpl().getPopulation();
+		Population population = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
 		PersonAlgorithmTester algo = new PersonAlgorithmTester();
 		PersonAlgoProviderTester tester = new PersonAlgoProviderTester(algo);
 		ParallelPersonAlgorithmRunner.run(population, 2, tester);
@@ -61,7 +63,7 @@ public class ParallelPersonAlgorithmRunnerTest extends TestCase {
 	 * @author mrieser
 	 */
 	public void testNofPersons() {
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Population population = scenario.getPopulation();
 		for (int i = 0; i < 100; i++) {
 			PersonImpl person = new PersonImpl(new IdImpl(i));

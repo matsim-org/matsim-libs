@@ -33,7 +33,6 @@ import java.util.TreeSet;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
@@ -49,11 +48,14 @@ import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactory;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 
 public class WalkDistanceEstimator {
@@ -118,8 +120,8 @@ public class WalkDistanceEstimator {
 	public void deriveTransitNetworkFromEmme(){
 		log.info("Filtering " + studyArea + "'s MATSim network to account for public transport.");
 		// Read network.
-		sAll = new ScenarioImpl();
-		sPt = new ScenarioImpl();
+		sAll = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		sPt = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		MatsimNetworkReader nr = new MatsimNetworkReader(sAll);
 		nr.readFile(sb.getEmmeNetworkFilename());		
 		

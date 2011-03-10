@@ -7,7 +7,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.api.experimental.controller.Controller;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
@@ -49,7 +48,7 @@ public class CordonTemplate {
 
 	private void run() {
 		String fileName = "examples/munich-small/config.xml";
-		ScenarioLoader scenarioLoader = new ScenarioLoaderImpl(fileName);
+		ScenarioLoaderImpl scenarioLoader = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(fileName);
 		scenarioLoader.loadScenario();
 		Scenario scenario = scenarioLoader.getScenario();
 		final Network network = scenario.getNetwork();

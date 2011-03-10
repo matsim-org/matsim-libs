@@ -29,11 +29,13 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 import playground.dgrether.DgPaths;
 import playground.dgrether.signalsystems.sylvia.controler.DgSylviaControlerListenerFactory;
@@ -69,7 +71,7 @@ public class SylviaMainBatch {
 		
 		String footballPlansBase = baseDirectory + "shared-svn/studies/dgrether/cottbus/Cottbus-BA/planswithfb/output_plans_";
 		
-		Config baseConfig = new ScenarioImpl().getConfig();
+		Config baseConfig = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getConfig();
 		MatsimConfigReader confReader = new MatsimConfigReader(baseConfig);
 		confReader.readFile(configFilename);
 

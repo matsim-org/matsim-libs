@@ -22,7 +22,6 @@ package playground.yu.visum.test;
 
 import java.io.IOException;
 
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
@@ -32,7 +31,9 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.yu.visum.filter.EventFilterAlgorithm;
 import playground.yu.visum.filter.EventFilterPersonSpecific;
@@ -64,14 +65,14 @@ public class EventFilterTestAveTraSpeCal_personSpecific {
 	public static void main(final String[] args) throws Exception {
 
 		Gbl.startMeasurement();
-		Config config = new ScenarioLoaderImpl(args[0]).loadScenario().getConfig();
+		Config config = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(args[0]).loadScenario().getConfig();
 		testRunAveTraSpeCal(config);
 		Gbl.printElapsedTime();
 	}
 
 	public static void testRunAveTraSpeCal(Config config) throws IOException {
 
-		ScenarioImpl scenario = new ScenarioImpl(config);
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 
 		// network
 		System.out.println("  reading network file... ");

@@ -20,7 +20,6 @@
 package playground.dgrether.koehlerstrehlersignal;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
@@ -43,7 +42,7 @@ public class DgKoehlerStrehler2010OtfVis {
 //		String conf = DgKoehlerStrehler2010Runner.signalsConfigSol800;
 //		String conf = "/media/data/work/repos/shared-svn/studies/dgrether/koehlerStrehler2010/scenario2/config_signals_coordinated.xml";
 		String conf = "/media/data/work/repos/shared-svn/studies/dgrether/koehlerStrehler2010/scenario5/config_signals_coordinated.xml";
-		ScenarioLoader loader = new ScenarioLoaderImpl(conf);
+		ScenarioLoaderImpl loader = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(conf);
 		Scenario scenario = loader.loadScenario();
 		scenario.getConfig().otfVis().setAgentSize(40.0f);
 		

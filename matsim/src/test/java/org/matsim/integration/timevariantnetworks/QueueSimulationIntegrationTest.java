@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
@@ -48,6 +47,8 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
@@ -61,7 +62,7 @@ import org.matsim.testcases.MatsimTestCase;
 public class QueueSimulationIntegrationTest extends MatsimTestCase {
 
 	public void testFreespeed() {
-		ScenarioImpl scenario = new ScenarioImpl(loadConfig(null));
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(loadConfig(null));
 
 		NetworkImpl network = createNetwork(scenario);
 		Link link1 = network.getLinks().get(new IdImpl("1"));
@@ -103,7 +104,7 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 		final int personsPerWave = 10;
 		final double capacityFactor = 0.5;
 
-		ScenarioImpl scenario = new ScenarioImpl(loadConfig(null));
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(loadConfig(null));
 
 		NetworkImpl network = createNetwork(scenario);
 		Link link1 = network.getLinks().get(new IdImpl("1"));

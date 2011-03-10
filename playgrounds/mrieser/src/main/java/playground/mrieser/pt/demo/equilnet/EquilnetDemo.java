@@ -22,17 +22,19 @@ package playground.mrieser.pt.demo.equilnet;
 
 import java.util.EnumSet;
 
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.Module;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 import playground.mrieser.pt.controler.TransitControler;
 
 public class EquilnetDemo {
 
-	private final ScenarioImpl scenario = new ScenarioImpl();
+	private final ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 	private void prepareConfig() {
 		Config config = this.scenario.getConfig();

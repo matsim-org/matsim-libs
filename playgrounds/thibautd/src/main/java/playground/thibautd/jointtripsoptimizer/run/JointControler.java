@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package playground.thibautd.jointtripsoptimizer.run;
 
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.corelisteners.EventsHandling;
 import org.matsim.core.controler.corelisteners.PlansDumping;
@@ -27,6 +26,7 @@ import org.matsim.core.controler.corelisteners.PlansScoring;
 import org.matsim.core.controler.corelisteners.RoadPricing;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
+import org.matsim.core.scenario.ScenarioImpl;
 
 import playground.thibautd.jointtripsoptimizer.population.ScenarioWithCliques;
 import playground.thibautd.jointtripsoptimizer.replanning.JointPlansReplanning;

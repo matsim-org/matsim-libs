@@ -10,7 +10,6 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -19,6 +18,9 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.counts.Counts;
 import org.matsim.counts.MatsimCountsReader;
@@ -186,7 +188,7 @@ public class Counts2Plans {
 
 	private void createPopulation(String filename) {
 
-		PopulationImpl pop = new PopulationImpl(new ScenarioImpl());
+		PopulationImpl pop = new PopulationImpl(((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())));
 
 		for (PersonImpl person : this.completedAgents) {
 			pop.addPerson(person);
@@ -208,7 +210,7 @@ public class Counts2Plans {
 
 	private static TransitSchedule readTransitSchedule(String transitScheduleFile, String networkFile) {
 
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		MatsimNetworkReader matsimNetReader = new MatsimNetworkReader(scenario);
 		matsimNetReader.readFile(networkFile);
 

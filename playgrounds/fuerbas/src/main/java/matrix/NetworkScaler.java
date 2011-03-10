@@ -29,12 +29,14 @@ import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.run.NetworkCleaner;
 
 /**
@@ -52,7 +54,7 @@ public class NetworkScaler {
 	final static double CAPACITY_MIN = Double.MAX_VALUE;	//minimim capacity required to remain in network
 	
 	public static void main(String[] args) throws IOException {
-		Scenario scenario = new ScenarioImpl();
+		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario).readFile("/Users/jillenberger/Work/work/socialnets/data/schweiz/network/switzerland_matsim_cl_simple.xml");	//provide MATSim network
 		Network network = scenario.getNetwork();
 		HashMap<String, Double> linkBetw = new HashMap<String, Double>();

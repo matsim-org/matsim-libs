@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Leg;
@@ -37,7 +36,10 @@ import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PopulationReaderMatsimV4;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 public class EAFSehtlerNetConverter {
 	
@@ -48,7 +50,7 @@ public class EAFSehtlerNetConverter {
 		String netOut ="/home/laemmel/devel/EAF/data/shelter_net.xml.gz";
 		String plans ="/home/laemmel/devel/EAF/data/padang_plans_v2010_10s_shelters_EAF.xml.gz";
 		String plansOut ="/home/laemmel/devel/EAF/data/shelter_plans.xml.gz";
-		ScenarioImpl sc = new ScenarioImpl();
+		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(sc).readFile(net);
 		new PopulationReaderMatsimV4(sc).readFile(plans);
 		

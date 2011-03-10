@@ -19,10 +19,9 @@
  * *********************************************************************** */
 package playground.dgrether.signalsystems.sylvia;
 
-import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.signalsystems.builder.DefaultSignalModelFactory;
@@ -46,7 +45,7 @@ import playground.dgrether.utils.DgOTFVisUtils;
 public class SylviaOTFVisMain {
 
 	public void playCottbus(String configFileName){
-		ScenarioLoader loader = new ScenarioLoaderImpl(configFileName);
+		ScenarioLoaderImpl loader = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(configFileName);
 		ScenarioImpl scenario = (ScenarioImpl) loader.loadScenario();
 		this.playCottbus(scenario);
 	}	

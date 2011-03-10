@@ -30,7 +30,6 @@ import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
@@ -38,6 +37,8 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 
 import playground.anhorni.choiceSetGeneration.choicesetextractors.ExtractChoiceSetsRouting;
@@ -63,7 +64,7 @@ public class GenerateChoiceSets {
 
 	//private static int idOffset = 20000000;
 	//private final static double epsilon = 0.01;
-	private Scenario scenario = new ScenarioImpl();
+	private Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 	private Config config = null;
 	private Population choiceSetPopulation = scenario.getPopulation();
 
@@ -210,11 +211,7 @@ public class GenerateChoiceSets {
 
 	public void run() {
 
-		try {
-			this.config = ConfigUtils.loadConfig(this.matsimRunConfigFile);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+		this.config = ConfigUtils.loadConfig(this.matsimRunConfigFile);
 
 		this.createChoiceSetFacilities();
 
@@ -296,7 +293,7 @@ public class GenerateChoiceSets {
 
 	private Population createChoiceSetPopulationFromMZ() {
 
-		Population temporaryPopulation = new ScenarioImpl().getPopulation();
+		Population temporaryPopulation = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
 
 		try {
 			new PlansCreateFromMZ(this.choiceSetPopulationFile,this.outdir+"/output_wegeketten.dat",1,7).run(temporaryPopulation);

@@ -29,7 +29,6 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -41,6 +40,9 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -154,7 +156,7 @@ public class PopLinksMatrixCreator extends AbstractPersonAlgorithm implements
 		populationFilename = "../integration-demandCalibration1.0.1/test/output/prepare/ITERS/it.100/100.plans.xml.gz", //
 		matrixOutputFilename = "../integration-demandCalibration1.0.1/test/output/prepare/popLinksMatrix.log";
 
-		Scenario scenario = new ScenarioImpl();
+		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(networkFilename);

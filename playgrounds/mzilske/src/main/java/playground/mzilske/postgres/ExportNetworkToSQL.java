@@ -6,12 +6,14 @@ import java.io.PrintWriter;
 import java.util.Iterator;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.ArgumentParser;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 public class ExportNetworkToSQL {
 
@@ -44,7 +46,7 @@ public class ExportNetworkToSQL {
 	}
 
 	public void run(final String inputNetworkFile, final String outputSQLFile) {
-		final Scenario scenario = new ScenarioImpl();
+		final Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		final Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(inputNetworkFile);
 

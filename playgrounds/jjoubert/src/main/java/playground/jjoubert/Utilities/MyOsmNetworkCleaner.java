@@ -26,7 +26,6 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
@@ -34,6 +33,9 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCleaner;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.utils.gis.matsim2esri.network.CapacityBasedWidthCalculator;
 import org.matsim.utils.gis.matsim2esri.network.FeatureGeneratorBuilderImpl;
 import org.matsim.utils.gis.matsim2esri.network.Links2ESRIShape;
@@ -60,7 +62,7 @@ public class MyOsmNetworkCleaner {
 		} else{
 			monc = new MyOsmNetworkCleaner();
 		}
-		Scenario runSc = new ScenarioImpl();
+		Scenario runSc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		MatsimNetworkReader mnr = new MatsimNetworkReader(runSc);
 		try {
 			mnr.parse(args[0]);
@@ -123,7 +125,7 @@ public class MyOsmNetworkCleaner {
 	public void cleanNetwork(Network network, MultiPolygon mp) {
 		log.info("Removing all links that falls outside the given polygon.");
 		log.info("Original network has " + network.getNodes().size() + " nodes and " + network.getLinks().size() + " links.");
-		sc = new ScenarioImpl();
+		sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		NetworkFactory nf = sc.getNetwork().getFactory();
 		GeometryFactory gf = new GeometryFactory();
 		for(Link l : network.getLinks().values()){

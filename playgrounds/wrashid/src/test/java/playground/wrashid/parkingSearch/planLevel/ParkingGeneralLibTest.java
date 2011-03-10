@@ -5,15 +5,17 @@ import java.util.LinkedList;
 import junit.framework.TestCase;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 import playground.wrashid.parkingSearch.planLevel.scenario.BaseNonControlerScenario;
 
 public class ParkingGeneralLibTest extends TestCase {
 
 	public void testGetAllParkingFacilityIds() {
-		ScenarioImpl sc = new ScenarioImpl();
+		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		BaseNonControlerScenario.loadNetwork(sc);
 
@@ -26,7 +28,7 @@ public class ParkingGeneralLibTest extends TestCase {
 	}
 	
 	public void testGetParkingRelatedWalkingDistanceOfWholeDay(){
-		ScenarioImpl sc = new ScenarioImpl();
+		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		BaseNonControlerScenario.loadNetwork(sc);
 		

@@ -25,13 +25,15 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.testcases.MatsimTestCase;
 import org.xml.sax.SAXException;
 
@@ -56,7 +58,7 @@ public class MyOsmNetworkCleanerTest extends MatsimTestCase{
 
 		assertEquals("Polygon is not a square.", 5, mp.getNumPoints());
 
-		Scenario sc = new ScenarioImpl();
+		Scenario sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		MatsimNetworkReader nr = new MatsimNetworkReader(sc);
 		nr.parse(getOutputDirectory() + "network.xml.gz");
 
@@ -88,7 +90,7 @@ public class MyOsmNetworkCleanerTest extends MatsimTestCase{
 		MyShapefileReader msr = new MyShapefileReader(getInputDirectory() + "Test.shp");
 		MultiPolygon mp = msr.readMultiPolygon();
 
-		Scenario sc = new ScenarioImpl();
+		Scenario sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		MatsimNetworkReader nr = new MatsimNetworkReader(sc);
 		nr.parse(getOutputDirectory() + "network.xml.gz");
 
@@ -106,7 +108,7 @@ public class MyOsmNetworkCleanerTest extends MatsimTestCase{
 		super.setUp();
 
 		// Build the test network.
-		Scenario sc = new ScenarioImpl();
+		Scenario sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network n = sc.getNetwork();
 		NetworkFactory nf = n.getFactory();
 

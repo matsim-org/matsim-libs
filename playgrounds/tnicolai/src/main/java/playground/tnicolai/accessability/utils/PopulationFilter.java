@@ -24,11 +24,12 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.xml.sax.SAXException;
 
 /**
@@ -57,7 +58,7 @@ public class PopulationFilter {
 		Config config = new Config();
 		config.addCoreModules();
 		new MatsimConfigReader(config).readFile( configPath );
-		ScenarioImpl scenario = new ScenarioImpl(config);
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		scenario = (ScenarioImpl) new ScenarioLoaderImpl(scenario).loadScenario();
 		
 		System.gc();

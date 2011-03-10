@@ -24,11 +24,11 @@ import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
@@ -59,7 +59,7 @@ public class ScenarioPlayer {
 	 * @throws SAXException
 	 */
 	public static void main(final String[] args) throws SAXException, ParserConfigurationException, IOException {
-		ScenarioLoaderImpl sl = new ScenarioLoaderImpl("test/input/playground/marcel/pt/config.xml");
+		ScenarioLoaderImpl sl = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed("test/input/playground/marcel/pt/config.xml");
 		ScenarioImpl scenario = sl.getScenario();
 
 		NetworkImpl network = scenario.getNetwork();

@@ -24,9 +24,11 @@ import java.io.File;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 public class AnalyseEquil {
 	private final static Logger log  = Logger.getLogger(AnalyseEquil.class);
@@ -34,7 +36,7 @@ public class AnalyseEquil {
 	public static void main(String[] args) {
 		File f = new File("src/main/java/playground/jjoubert/TemporaryCode/equilNetwork.xml");
 		log.info("Network: " + f.getAbsolutePath());
-		Scenario s = new ScenarioImpl();
+		Scenario s = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		MatsimNetworkReader nr = new MatsimNetworkReader(s);
 		nr.readFile(f.getAbsolutePath());
 		double minX = Double.POSITIVE_INFINITY;

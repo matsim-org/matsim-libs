@@ -22,7 +22,6 @@ package playground.mmoyo.utils.calibration;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -34,6 +33,9 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 import playground.mmoyo.Validators.PlanValidator;
 import playground.mmoyo.utils.DataLoader;
@@ -57,7 +59,7 @@ public class OverDemandPlanCreator {
 	}
 	
 	public Population run(final int homePlanNum, final int cloneNum) {
-		PopulationImpl outPop = new PopulationImpl(new ScenarioImpl());
+		PopulationImpl outPop = new PopulationImpl(((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())));
 
 		if (!planValidator.hasSecqActLeg(this.population)) { 
 			throw new RuntimeException("this may not work, it assumes that the first PlanElement is home!! what about fragmnted plans? or other plans at all?" );

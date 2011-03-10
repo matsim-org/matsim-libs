@@ -19,13 +19,13 @@
  * *********************************************************************** */
 package playground.jbischoff.BAsignals;
 
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.controler.ControlerIO;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.AStarLandmarksFactory;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.population.algorithms.XY2Links;
 import org.matsim.ptproject.qsim.QSim;
@@ -50,7 +50,7 @@ public class CottbusLiveVis {
 
 	
 	private void runCottbus() {
-		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(config);
+		ScenarioLoaderImpl loader = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(config);
 		loader.loadScenario();
 		ScenarioImpl scenario = loader.getScenario();
 		

@@ -21,7 +21,6 @@
 package org.matsim.core.mobsim.queuesim;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
@@ -34,7 +33,10 @@ import org.matsim.core.network.TimeVariantLinkFactory;
 import org.matsim.core.network.TimeVariantLinkImpl;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -52,7 +54,7 @@ public class TimeVariantQueueLinkImplTest extends MatsimTestCase {
 	 * Tests the change of storage capacity if a lanes change event occurs
 	 */
 	public void testStorageCapacity() {
-		Scenario s = new ScenarioImpl();
+		Scenario s = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 //		s.getConfig().addQSimConfigGroup(new QSimConfigGroup());
 		s.getConfig().addSimulationConfigGroup(new SimulationConfigGroup()) ;
 
@@ -105,7 +107,7 @@ public class TimeVariantQueueLinkImplTest extends MatsimTestCase {
 	 * Tests the change of flow capacity
 	 */
 	public void testFlowCapacity(){
-		Scenario s = new ScenarioImpl();
+		Scenario s = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 //		s.getConfig().addQSimConfigGroup(new QSimConfigGroup());
 		s.getConfig().addSimulationConfigGroup(new SimulationConfigGroup()) ;
 

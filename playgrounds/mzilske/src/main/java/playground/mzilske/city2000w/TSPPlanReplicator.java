@@ -6,8 +6,8 @@ import playground.mzilske.freight.TSPCapabilities;
 import playground.mzilske.freight.TSPContract;
 import playground.mzilske.freight.TSPPlan;
 import playground.mzilske.freight.TransportChain;
-import playground.mzilske.freight.TransportChainBuilder;
 import playground.mzilske.freight.TransportChain.ChainElement;
+import playground.mzilske.freight.TransportChainBuilder;
 
 public class TSPPlanReplicator {
 	

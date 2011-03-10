@@ -12,12 +12,14 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
@@ -60,11 +62,11 @@ public class VisumHafasScheduleMerger {
 	private TransitSchedule outSchedule;
 
 	public VisumHafasScheduleMerger() {
-		this.intermediateScenario = new ScenarioImpl();
+		this.intermediateScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		this.intermediateConfig = this.intermediateScenario.getConfig();
-		this.hafasScenario = new ScenarioImpl();
+		this.hafasScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		this.hafasConfig = this.hafasScenario.getConfig();
-		this.outScenario = new ScenarioImpl();
+		this.outScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		this.outConfig = this.outScenario.getConfig();
 	}
 

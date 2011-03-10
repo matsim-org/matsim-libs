@@ -26,11 +26,11 @@ import java.util.Random;
 
 import org.apache.log4j.Logger;
 import org.junit.Ignore;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.testcases.MatsimTestCase;

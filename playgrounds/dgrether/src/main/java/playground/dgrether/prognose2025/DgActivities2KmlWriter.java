@@ -25,13 +25,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 import playground.dgrether.DgPaths;
 import playground.dgrether.matsimkml.DgColoredIconStyleBuilder;
@@ -97,7 +99,7 @@ public class DgActivities2KmlWriter {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		Scenario scenario = new ScenarioImpl();
+		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		MatsimPopulationReader reader = new MatsimPopulationReader(scenario);
 		reader.readFile(DgPaths.REPOS + "shared-svn/studies/countries/de/prognose_2025/demand/population_pv_1pct.xml");
 		new DgActivities2KmlWriter().writeKml(DgPaths.REPOS + "shared-svn/studies/countries/de/prognose_2025/demand/population_pv_1pct4.kmz", scenario.getPopulation());

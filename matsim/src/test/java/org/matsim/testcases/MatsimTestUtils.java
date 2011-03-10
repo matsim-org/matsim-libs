@@ -78,11 +78,7 @@ public class MatsimTestUtils extends TestWatchman {
 	public Config loadConfig(final String configfile) {
 		Config config;
 		if (configfile != null) {
-			try {
-				config = ConfigUtils.loadConfig(configfile);
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
+			config = ConfigUtils.loadConfig(configfile);
 		} else {
 			config = new Config();
 			config.addCoreModules();

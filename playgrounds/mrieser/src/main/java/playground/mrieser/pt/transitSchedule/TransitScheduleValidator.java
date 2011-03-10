@@ -29,11 +29,13 @@ import java.util.List;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
@@ -158,7 +160,7 @@ public abstract class TransitScheduleValidator {
 	 * @throws ParserConfigurationException
 	 */
 	public static void main(String[] args) throws IOException, SAXException, ParserConfigurationException {
-		ScenarioImpl s = new ScenarioImpl();
+		ScenarioImpl s = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		s.getConfig().scenario().setUseTransit(true);
 		TransitSchedule ts = s.getTransitSchedule();
 		Network net = s.getNetwork();

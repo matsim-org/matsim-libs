@@ -20,11 +20,13 @@
 
 package playground.yu.analysis;
 
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 public class CATLTest {
 
@@ -32,7 +34,7 @@ public class CATLTest {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		ScenarioImpl si = new ScenarioImpl();
+		ScenarioImpl si = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		NetworkImpl ni = si.getNetwork();
 		new MatsimNetworkReader(si)
 				.readFile("../matsim/examples/equil/network.xml");

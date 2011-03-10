@@ -30,7 +30,6 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
@@ -43,7 +42,10 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 import playground.tnicolai.urbansim.constants.Constants;
 import playground.tnicolai.urbansim.utils.MATSimConfigObject;
@@ -110,7 +112,7 @@ public class MATSim4UrbanSimMeasurement extends MATSim4Urbansim {
 				else
 					oldPopulation = null;
 		
-				newPopulation = new ScenarioImpl().getPopulation();
+				newPopulation = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
 				// read urbansim persons.  Generates hwh acts as side effect
 				startTimeReadPersons = System.currentTimeMillis();
 				readFromUrbansim.readPersons( oldPopulation, newPopulation, facilities, network, MATSimConfigObject.getSampeRate() ) ;

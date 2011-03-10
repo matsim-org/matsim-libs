@@ -29,8 +29,10 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 import playground.telaviv.zones.ZoneMapping;
 
@@ -52,7 +54,7 @@ public class LocationChoiceProbabilityCreator {
 	private Map<Integer, Double>[] fromZoneProbabilities;	// <toZoneId, Probability>[fromZoneId from zoneToMatrixMapping]
 	
 	public static void main(String[] args) {
-		Map<Integer, Double> probabs = new LocationChoiceProbabilityCreator(new ScenarioImpl()).getFromZoneProbabilities(1525);
+		Map<Integer, Double> probabs = new LocationChoiceProbabilityCreator(((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig()))).getFromZoneProbabilities(1525);
 		
 		double sum = 0.0;
 		for (double value : probabs.values()) {

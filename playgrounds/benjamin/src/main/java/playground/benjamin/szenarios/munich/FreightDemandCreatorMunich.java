@@ -33,7 +33,6 @@ import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
@@ -43,15 +42,16 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.api.experimental.ScenarioFactoryImpl;
-import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.core.utils.misc.RouteUtils;
 
 import playground.benjamin.BkPaths;
@@ -80,18 +80,19 @@ public class FreightDemandCreatorMunich {
 	}
 
 	private void run(String[] args) throws IOException{
-		Scenario sc = new ScenarioFactoryImpl().createScenario();
+		Config config = ConfigUtils.createConfig();
+		Scenario sc = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		Config cf = sc.getConfig();
 		cf.network().setInputFile(netFile);
 		cf.plans().setInputFile(plansFile);
 		
-		ScenarioLoader sl = new ScenarioLoaderImpl(sc);
+		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(sc);
 		sl.loadScenario();
 		Population population = sc.getPopulation();
 		Network network = sc.getNetwork();
 		
 		//instancing the new population
-		Scenario newScenario = new ScenarioImpl();
+		Scenario newScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		filteredPlans = newScenario.getPopulation();
 		
 		List<Id> nodesInBavaria = createListWithNodesInBavaria(vertexFile, shapeFile);

@@ -79,11 +79,7 @@ public class MatsimTestCase extends TestCase {
 	public Config loadConfig(final String configfile) {
 		Config config;
 		if (configfile != null) {
-			try {
-				config = ConfigUtils.loadConfig(configfile);
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
+			config = ConfigUtils.loadConfig(configfile);
 			MatsimRandom.reset(config.global().getRandomSeed());
 		} else {
 			config = new Config();

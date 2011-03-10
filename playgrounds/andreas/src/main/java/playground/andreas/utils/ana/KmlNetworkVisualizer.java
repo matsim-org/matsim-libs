@@ -9,13 +9,15 @@ import net.opengis.kml._2.ObjectFactory;
 import net.opengis.kml._2.ScreenOverlayType;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.KmlNetworkWriter;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.GK4toWGS84;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.vis.kml.KMZWriter;
 import org.matsim.vis.kml.MatsimKMLLogo;
 
@@ -47,7 +49,7 @@ public class KmlNetworkVisualizer {
 	
 	public static void convertNetwork2Kml(String netfile, String kmlfile, CoordinateTransformation coordTransform){
 		log.info("Reading network...");
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario).readFile(netfile);
 		KmlNetworkVisualizer.convertNetwork2Kml(scenario.getNetwork(), kmlfile, coordTransform);		
 	}

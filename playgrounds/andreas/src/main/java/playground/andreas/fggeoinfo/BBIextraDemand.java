@@ -7,7 +7,6 @@ import java.util.List;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PopulationWriter;
@@ -17,6 +16,9 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 import playground.andreas.fggeoinfo.ReadBBIDemand.DemandBox;
 
@@ -150,7 +152,7 @@ public class BBIextraDemand {
 	}
 
 	private void writePopulation(String filename) {
-		PopulationImpl pop = new PopulationImpl(new ScenarioImpl());
+		PopulationImpl pop = new PopulationImpl(((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())));
 		for (Person person : this.personList) {
 			pop.addPerson(person);
 		}

@@ -13,7 +13,7 @@ import org.matsim.core.scenario.ScenarioLoaderImpl;
 public class EmptyCarLegTest extends AbstractJDEQSimTest {
 
 	public void test_EmptyCarRoute() {
-		Scenario scenario = new ScenarioLoaderImpl("test/input/org/matsim/core/mobsim/jdeqsim/config1.xml").loadScenario();
+		Scenario scenario = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed("test/input/org/matsim/core/mobsim/jdeqsim/config1.xml").loadScenario();
 		this.runJDEQSim(scenario);
 		
 		// at least one event

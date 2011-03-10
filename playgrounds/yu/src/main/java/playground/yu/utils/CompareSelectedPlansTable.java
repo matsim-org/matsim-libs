@@ -24,7 +24,6 @@ import java.io.IOException;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -37,8 +36,11 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationReader;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.charts.XYScatterChart;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 import playground.yu.analysis.PlanModeJudger;
 
@@ -81,21 +83,21 @@ public class CompareSelectedPlansTable {
 
 	private void init(final String networkPath) {
 		System.out.println("  reading the network...");
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		this.network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(networkPath);
 	}
 
 	private void readFiles(final String plansfilePath0,
 			final String plansfilePath1) {
-		ScenarioImpl scenario0 = new ScenarioImpl();
+		ScenarioImpl scenario0 = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario0.setNetwork(this.network);
 		this.plans0 = scenario0.getPopulation();
 		System.out.println("  reading file " + plansfilePath0);
 		PopulationReader plansReader0 = new MatsimPopulationReader(scenario0);
 		plansReader0.readFile(plansfilePath0);
 
-		ScenarioImpl scenario1 = new ScenarioImpl();
+		ScenarioImpl scenario1 = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario1.setNetwork(this.network);
 		this.plans1 = scenario1.getPopulation();
 		System.out.println("  reading file " + plansfilePath1);

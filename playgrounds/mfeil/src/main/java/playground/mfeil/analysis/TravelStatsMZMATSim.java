@@ -27,7 +27,6 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
@@ -38,6 +37,9 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.core.utils.misc.RouteUtils;
 
 import playground.mfeil.AgentsAttributesAdder;
@@ -257,12 +259,12 @@ public class TravelStatsMZMATSim {
 				// Special MZ file so that weights of MZ persons can be read
 				final String attributesInputFile = "/home/baug/mfeil/data/mz/attributes_MZ2005.txt";
 
-				ScenarioImpl scenarioMZ = new ScenarioImpl();
+				ScenarioImpl scenarioMZ = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 				new MatsimNetworkReader(scenarioMZ).readFile(networkFilename);
 				new MatsimFacilitiesReader(scenarioMZ).readFile(facilitiesFilename);
 				new MatsimPopulationReader(scenarioMZ).readFile(populationFilenameMZ);
 
-				ScenarioImpl scenarioMATSim = new ScenarioImpl();
+				ScenarioImpl scenarioMATSim = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 				scenarioMATSim.setNetwork(scenarioMZ.getNetwork());
 				new MatsimFacilitiesReader(scenarioMATSim).readFile(facilitiesFilename);
 				new MatsimPopulationReader(scenarioMATSim).readFile(populationFilenameMATSim);

@@ -28,7 +28,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.commons.math.analysis.UnivariateRealFunction;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.sna.gis.CRSUtils;
@@ -37,6 +36,9 @@ import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.xml.sax.SAXException;
 
 import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskArray;
@@ -89,7 +91,7 @@ public class ErgmSimulator {
 		/*
 		 * load population
 		 */
-		Scenario scenario = new ScenarioImpl();
+		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		MatsimPopulationReader popReader = new MatsimPopulationReader(scenario);
 		popReader.readFile(config.findParam("plans", "inputPlansFile"));
 		Population population = scenario.getPopulation();

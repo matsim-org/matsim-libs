@@ -35,7 +35,7 @@ import org.xml.sax.SAXException;
 public class PopulationFilter {
 
 	public static void main(String args[]) throws SAXException, ParserConfigurationException, IOException {
-		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(args[0]);
+		ScenarioLoaderImpl loader = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(args[0]);
 		loader.loadScenario();
 		Scenario scenario = loader.getScenario();
 		

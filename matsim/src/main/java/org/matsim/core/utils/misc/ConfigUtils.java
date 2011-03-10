@@ -32,32 +32,42 @@ import org.xml.sax.SAXException;
  * @author mrieser
  */
 public abstract class ConfigUtils {
+	
+	public static Config createConfig() {
+		Config config = new Config();
+		config.addCoreModules();
+		return config;
+	}
 
-	public static Config loadConfig(final String filename) throws IOException {
+	public static Config loadConfig(final String filename) {
 		Config config = new Config();
 		config.addCoreModules();
 
 		try {
 			new MatsimConfigReader(config).parse(filename);
 		} catch (SAXException e) {
-			throw new IOException(e);
+			throw new RuntimeException(e);
 		} catch (ParserConfigurationException e) {
-			throw new IOException(e);
+			throw new RuntimeException(e);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
 		}
 
 		return config;
 	}
 
-	public static void loadConfig(final Config config, final String filename) throws IOException {
+	public static void loadConfig(final Config config, final String filename) {
 		if (config.global() == null) {
 			config.addCoreModules();
 		}
 		try {
 			new MatsimConfigReader(config).parse(filename);
 		} catch (SAXException e) {
-			throw new IOException(e);
+			throw new RuntimeException(e);
 		} catch (ParserConfigurationException e) {
-			throw new IOException(e);
+			throw new RuntimeException(e);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
 		}
 	}
 

@@ -15,12 +15,14 @@ import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 import playground.balmermi.datapuls.modules.FrequencyAnalyser;
 
@@ -51,7 +53,7 @@ public class LinkFrequencyCalculator {
 		if (!outDir.isDirectory()) { throw new RuntimeException("outDir="+outDir+" is not a directory"); }
 		System.out.println("analysis output directory: "+outDir);
 
-		Scenario scenario = new ScenarioImpl();
+		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario).readFile(net.getPath());
 		
 		Set<Id> linkIds = null;

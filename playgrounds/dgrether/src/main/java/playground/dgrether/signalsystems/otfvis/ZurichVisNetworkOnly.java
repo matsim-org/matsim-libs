@@ -19,10 +19,12 @@
  * *********************************************************************** */
 package playground.dgrether.signalsystems.otfvis;
 
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.lanes.LaneDefinitions;
 import org.matsim.lanes.MatsimLaneDefinitionsReader;
 import org.matsim.ptproject.qsim.QSim;
@@ -50,7 +52,7 @@ public class ZurichVisNetworkOnly {
 		//this is run
 //		OTFVis.playNetwork(netArray);
 		//this is hack
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		NetworkImpl network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFile);
 //		PopulationImpl population = scenario.getPopulation();

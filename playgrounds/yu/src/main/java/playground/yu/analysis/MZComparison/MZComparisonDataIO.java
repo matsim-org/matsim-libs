@@ -17,14 +17,16 @@ import java.util.Set;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.jfree.chart.plot.PlotOrientation;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.xml.sax.SAXException;
 
@@ -165,7 +167,7 @@ public class MZComparisonDataIO implements TabularFileHandler {
 		MZComparisonDataIO mzcdi = new MZComparisonDataIO();
 		mzcdi.readMZData(inputFilename);
 
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario).readFile(networkFilename);
 
 		scenario.getConfig().scenario().setUseRoadpricing(true);

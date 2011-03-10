@@ -23,7 +23,6 @@ package playground.balmermi;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
@@ -34,6 +33,7 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.replanning.modules.ReRouteLandmarks;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 
 import playground.balmermi.modules.PersonFacility2Link;
@@ -71,7 +71,7 @@ public class ScenarioIO {
 	public static void main(String[] args) {
 		if (args.length != 1) { printUsage(); return; }
 
-		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(args[0]);
+		ScenarioLoaderImpl sl = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(args[0]);
 		ScenarioImpl sc = sl.getScenario();
 
 		System.out.println("loading facilities...");

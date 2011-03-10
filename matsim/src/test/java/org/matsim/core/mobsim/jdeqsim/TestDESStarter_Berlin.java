@@ -7,7 +7,7 @@ import org.matsim.core.scenario.ScenarioLoaderImpl;
 public class TestDESStarter_Berlin extends AbstractJDEQSimTest {
 
 	public void test_Berlin_TestHandlerDetailedEventChecker() {
-		Scenario scenario = new ScenarioLoaderImpl("test/scenarios/berlin/config.xml").loadScenario();
+		Scenario scenario = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed("test/scenarios/berlin/config.xml").loadScenario();
 		this.runJDEQSim(scenario);
 		
 		assertEquals(scenario.getPopulation().getPersons().size(), super.eventsByPerson.size());

@@ -27,8 +27,10 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.xml.sax.SAXException;
 
 public class MyIdEvaluator {
@@ -40,7 +42,7 @@ public class MyIdEvaluator {
 	public static void main(String[] args) {
 		log.info("Getting the agent IDs from " + args[0]);
 		
-		Scenario sc = new ScenarioImpl();
+		Scenario sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		MatsimPopulationReader pr = new MatsimPopulationReader(sc);
 		try {
 			pr.parse(args[0]);

@@ -24,7 +24,6 @@
 package playground.yu.newPlans;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -32,6 +31,9 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 /**
  * @author yu
@@ -65,7 +67,7 @@ public class PopWithSameScores extends NewPopulation {
 		popFilename = "../runs-svn/run663/it.500/500.plans4plans.xml.gz", //
 		newPopFilename = "../runs-svn/run663/it.500/500.plans4plansScore0.xml.gz";
 
-		Scenario sc = new ScenarioImpl();
+		Scenario sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		NetworkImpl net = (NetworkImpl) sc.getNetwork();
 		new MatsimNetworkReader(sc).readFile(netFilename);

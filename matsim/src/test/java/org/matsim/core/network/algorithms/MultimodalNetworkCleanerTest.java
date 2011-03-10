@@ -28,11 +28,13 @@ import junit.framework.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 /**
  * @author mrieser
@@ -539,7 +541,7 @@ public class MultimodalNetworkCleanerTest {
 
 	@Test
 	public void testRun_singleLinkNetwork() {
-		Scenario scenario = new ScenarioImpl();
+		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();
 		NetworkFactory factory = network.getFactory();
 
@@ -709,7 +711,7 @@ public class MultimodalNetworkCleanerTest {
 	 */
 	private static class Fixture {
 
-		/*package*/ final Scenario scenario = new ScenarioImpl();
+		/*package*/ final Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		/*package*/ final Id[] ids = new Id[21];
 		/*package*/ final Set<String> modesC = createHashSet(TransportMode.car);
 		/*package*/ final Set<String> modesW = createHashSet(TransportMode.walk);
@@ -831,7 +833,7 @@ public class MultimodalNetworkCleanerTest {
 	 * @author mrieser
 	 */
 	private static class MultimodalFixture2 {
-		/*package*/ final Scenario scenario = new ScenarioImpl();
+		/*package*/ final Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		/*package*/ final Id[] ids = new Id[21];
 		/*package*/ final Set<String> modesT = createHashSet(TransportMode.pt);
 		/*package*/ final Set<String> modesW = createHashSet(TransportMode.walk);

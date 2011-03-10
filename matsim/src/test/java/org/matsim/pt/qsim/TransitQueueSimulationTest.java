@@ -30,7 +30,6 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -67,6 +66,9 @@ import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.qsim.TransitQSimEngine.TransitAgentTriesToTeleportException;
@@ -103,7 +105,7 @@ public class TransitQueueSimulationTest {
 	@Test
 	public void testCreateAgents() {
 		// setup: config
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().scenario().setUseVehicles(true);
 		scenario.getConfig().scenario().setUseTransit(true);
 		scenario.getConfig().addQSimConfigGroup(new QSimConfigGroup());
@@ -223,7 +225,7 @@ public class TransitQueueSimulationTest {
 	@Test
 	public void testAddAgentToStop() {
 		// setup: config
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().scenario().setUseTransit(true);
 		scenario.getConfig().addQSimConfigGroup(new QSimConfigGroup());
 
@@ -285,7 +287,7 @@ public class TransitQueueSimulationTest {
 	@Test(expected = TransitAgentTriesToTeleportException.class)
 	public void testAddAgentToStopWrongLink() {
 		// setup: config
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().scenario().setUseTransit(true);
 		scenario.getConfig().addQSimConfigGroup(new QSimConfigGroup());
 
@@ -351,7 +353,7 @@ public class TransitQueueSimulationTest {
 	@Test
 	public void testHandleStop() {
 		// setup: config
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().scenario().setUseTransit(true);
 		scenario.getConfig().addQSimConfigGroup(new QSimConfigGroup());
 		scenario.getConfig().getQSimConfigGroup().setEndTime(8.0*3600);
@@ -581,7 +583,7 @@ public class TransitQueueSimulationTest {
 
 	@Test
 	public void testStartAndEndTime() {
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Config config = scenario.getConfig();
     config.addQSimConfigGroup(new QSimConfigGroup());
 
@@ -672,7 +674,7 @@ public class TransitQueueSimulationTest {
 
 	@Test
 	public void testEvents() {
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Config config = scenario.getConfig();
 		scenario.getConfig().addQSimConfigGroup(new QSimConfigGroup());
 

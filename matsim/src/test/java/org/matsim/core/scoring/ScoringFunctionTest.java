@@ -21,7 +21,6 @@
 package org.matsim.core.scoring;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -31,7 +30,10 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.events.AgentMoneyEventImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.charyparNagel.CharyparNagelScoringFunctionFactory;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -84,7 +86,7 @@ public abstract class ScoringFunctionTest extends MatsimTestCase {
 	 * aforementioned plan.
 	 */
 	public void testAddMoney() {
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		setupScoringConfig(scenario.getConfig());
 
 		// score the same plan twice

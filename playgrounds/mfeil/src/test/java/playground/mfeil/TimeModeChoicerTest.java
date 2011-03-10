@@ -26,7 +26,6 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Ignore;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.basic.v01.IdImpl;
@@ -42,8 +41,11 @@ import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.core.router.util.PersonalizableTravelCost;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.PlanScorer;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimatorFactory;
@@ -82,7 +84,7 @@ public class TimeModeChoicerTest extends MatsimTestCase{
 		this.initializer = new Initializer();
 		this.initializer.init(this);
 
-		this.scenario_input = new ScenarioImpl();
+		this.scenario_input = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(this.scenario_input).readFile(this.initializer.getControler().getConfig().network().getInputFile());
 		new MatsimFacilitiesReader(this.scenario_input).readFile(this.initializer.getControler().getConfig().facilities().getInputFile());
 		new MatsimPopulationReader(this.scenario_input).readFile(this.initializer.getControler().getConfig().plans().getInputFile());

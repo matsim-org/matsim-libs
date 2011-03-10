@@ -21,7 +21,6 @@
 package org.matsim.analysis;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -34,8 +33,11 @@ import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.CRCChecksum;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -53,7 +55,7 @@ public class CalcLegTimesTest extends MatsimTestCase {
 		super.setUp();
 		super.loadConfig(null);
 
-		ScenarioImpl s = new ScenarioImpl();
+		ScenarioImpl s = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		this.population = s.getPopulation();
 		PersonImpl person = new PersonImpl(DEFAULT_PERSON_ID);
 		this.population.addPerson(person);

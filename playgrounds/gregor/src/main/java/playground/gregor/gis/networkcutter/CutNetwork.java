@@ -31,7 +31,6 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
@@ -50,6 +49,8 @@ import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.evacuation.base.EvacuationAreaFileReader;
@@ -155,7 +156,7 @@ public class CutNetwork {
 
 	public static void main(final String[] args) throws IOException {
 		Config c = ConfigUtils.loadConfig(args[0]);
-		ScenarioImpl scenario = new ScenarioImpl(c);
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(c);
 
 		NetworkImpl net = scenario.getNetwork();
 		net.getFactory().setLinkFactory(new TimeVariantLinkFactory());

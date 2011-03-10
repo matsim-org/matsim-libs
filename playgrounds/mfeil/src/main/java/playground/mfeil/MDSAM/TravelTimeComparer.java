@@ -25,7 +25,6 @@ import java.io.FileNotFoundException;
 import java.io.PrintStream;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -34,6 +33,9 @@ import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 
 /**
@@ -365,12 +367,12 @@ public class TravelTimeComparer {
 				final String networkFilename = "./plans/network.xml";
 				final String facilitiesFilename = "./plans/facilities.xml";
 		*/
-				ScenarioImpl scenarioOrig = new ScenarioImpl();
+				ScenarioImpl scenarioOrig = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 				new MatsimNetworkReader(scenarioOrig).readFile(networkFilename);
 				new MatsimFacilitiesReader(scenarioOrig).readFile(facilitiesFilename);
 				new MatsimPopulationReader(scenarioOrig).readFile(populationFilenameOrig);
 
-				ScenarioImpl scenarioNew = new ScenarioImpl();
+				ScenarioImpl scenarioNew = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 				scenarioNew.setNetwork(scenarioOrig.getNetwork());
 				new MatsimFacilitiesReader(scenarioNew).readFile(facilitiesFilename);
 				new MatsimPopulationReader(scenarioNew).readFile(populationFilenameNew);

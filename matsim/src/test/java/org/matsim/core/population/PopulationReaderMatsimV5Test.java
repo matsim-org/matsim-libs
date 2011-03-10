@@ -27,7 +27,6 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -35,7 +34,10 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.MatsimXmlParser;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.testcases.utils.AttributesBuilder;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -47,7 +49,7 @@ public class PopulationReaderMatsimV5Test {
 
 	@Test
 	public void testReadRoute() throws SAXException, ParserConfigurationException, IOException {
-		final ScenarioImpl scenario = new ScenarioImpl();
+		final ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		final Population population = scenario.getPopulation();
 
 		MatsimXmlParser parser = new PopulationReaderMatsimV5(scenario);
@@ -131,7 +133,7 @@ public class PopulationReaderMatsimV5Test {
 
 	@Test
 	public void testReadRoute_sameLinkRoute() throws SAXException, ParserConfigurationException, IOException {
-		final ScenarioImpl scenario = new ScenarioImpl();
+		final ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		final Population population = scenario.getPopulation();
 
 		MatsimXmlParser parser = new PopulationReaderMatsimV5(scenario);
@@ -167,7 +169,7 @@ public class PopulationReaderMatsimV5Test {
 
 	@Test
 	public void testReadRoute_consequentLinks() throws SAXException, ParserConfigurationException, IOException {
-		final ScenarioImpl scenario = new ScenarioImpl();
+		final ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		final Population population = scenario.getPopulation();
 
 		MatsimXmlParser parser = new PopulationReaderMatsimV5(scenario);
@@ -210,7 +212,7 @@ public class PopulationReaderMatsimV5Test {
 	 */
 	@Test
 	public void testReadRouteWithoutActivityLinks() {
-		final ScenarioImpl scenario = new ScenarioImpl();
+		final ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		final Population population = scenario.getPopulation();
 
 		PopulationReaderMatsimV5 parser = new PopulationReaderMatsimV5(scenario);
@@ -244,7 +246,7 @@ public class PopulationReaderMatsimV5Test {
 	 */
 	@Test
 	public void testReadActivity() {
-		final ScenarioImpl scenario = new ScenarioImpl();
+		final ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		final Population population = scenario.getPopulation();
 
 		PopulationReaderMatsimV5 reader = new PopulationReaderMatsimV5(scenario);

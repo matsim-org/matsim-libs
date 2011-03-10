@@ -19,9 +19,11 @@ package playground.ciarif.roadpricing;
 	 * *********************************************************************** */
 
 
-	import org.matsim.api.core.v01.ScenarioImpl;
-	import org.matsim.core.network.MatsimNetworkReader;
-	import org.matsim.core.network.NetworkImpl;
+		import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 
 	/**
@@ -41,7 +43,7 @@ package playground.ciarif.roadpricing;
 		}
 		
 		public void writeNetwork(String network, String outfile) {
-			ScenarioImpl scenario = new ScenarioImpl();
+			ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 			NetworkImpl net = scenario.getNetwork();
 			MatsimNetworkReader reader = new MatsimNetworkReader(scenario);
 			reader.readFile(network);

@@ -22,7 +22,6 @@ package playground.andreas.utils.ana.plans2kml;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.gbl.Gbl;
@@ -30,7 +29,10 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.transformations.GK4toWGS84;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 import playground.andreas.utils.pop.NewPopulation;
 
@@ -85,7 +87,7 @@ public class PersonPlan2Kml extends NewPopulation{
 		}
 
 
-		ScenarioImpl s = new ScenarioImpl();
+		ScenarioImpl s = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		NetworkImpl network = s.getNetwork();
 		new MatsimNetworkReader(s).readFile(networkFilename);

@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -22,7 +21,10 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 import playground.balmermi.world.Layer;
 import playground.balmermi.world.World;
@@ -206,7 +208,7 @@ public class Converter {
 
 		Converter c = new Converter();
 
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		c.setZones((ZoneLayer) new World().createLayer(new IdImpl("zones")));
 
 		c.setZoneXYs(new HashMap<String, ZoneXY>());
@@ -244,7 +246,7 @@ public class Converter {
 		c.createZones();
 
 		//
-		c.setPop(new ScenarioImpl().getPopulation());
+		c.setPop(((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation());
 		try {
 			BufferedReader reader = IOUtils.getBufferedReader(oldPlansFilename);
 			PopulationWriter writer = new PopulationWriter(c.pop, null);

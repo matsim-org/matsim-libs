@@ -29,14 +29,15 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.api.experimental.network.NetworkWriter;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.lanes.Lane;
 import org.matsim.lanes.LaneDefinitions;
 import org.matsim.lanes.LanesToLinkAssignment;
@@ -230,13 +231,13 @@ public class DgOsmJunctionsPostprocessing {
 	
 	
 	private ScenarioImpl loadScenario(String net, String lanesInputFile){
-		ScenarioImpl sc = new ScenarioImpl();
+		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
     sc.getConfig().network().setInputFile(net);
     if (lanesInputFile != null){
     	sc.getConfig().scenario().setUseLanes(true);
     	sc.getConfig().network().setLaneDefinitionsFile(lanesInputFile);
     }
-    ScenarioLoader loader = new ScenarioLoaderImpl(sc);
+    ScenarioLoaderImpl loader = new ScenarioLoaderImpl(sc);
     loader.loadScenario();
     return sc;
 	}

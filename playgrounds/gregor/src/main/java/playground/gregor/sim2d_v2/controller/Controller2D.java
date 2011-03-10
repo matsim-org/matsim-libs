@@ -34,6 +34,7 @@ public class Controller2D extends Controler {
 	private Scenario2DImpl scenario2DData;
 	private PedVisPeekABot vis;
 	private Sim2DConfigGroup sim2dConfig;
+	private ScenarioLoader2DImpl loader;
 
 	public Controller2D(String[] args) {
 		super(args[0]);

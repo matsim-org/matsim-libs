@@ -39,7 +39,7 @@ public class RemoveNonCarPlans {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(args[0]);
+		ScenarioLoaderImpl loader = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(args[0]);
 		loader.loadScenario();
 		Scenario scenario = loader.getScenario();
 

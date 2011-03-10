@@ -26,19 +26,20 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.api.experimental.ScenarioFactoryImpl;
-import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.vehicles.EngineInformation;
+import org.matsim.vehicles.EngineInformation.FuelType;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vehicles.Vehicles;
 import org.matsim.vehicles.VehiclesFactory;
 import org.matsim.vehicles.VehiclesImpl;
-import org.matsim.vehicles.EngineInformation.FuelType;
 
 
 /**
@@ -60,12 +61,13 @@ public class VehicleGenerator {
 	}
 
 	private void run(String[] args) {
-		Scenario sc = new ScenarioFactoryImpl().createScenario();
+		Config config1 = ConfigUtils.createConfig();
+		Scenario sc = (ScenarioImpl) ScenarioUtils.createScenario(config1);
 		Config config = sc.getConfig();
 		config.network().setInputFile(netFile);
 		config.plans().setInputFile(populationFile);
 		
-		ScenarioLoader sl = new ScenarioLoaderImpl(sc) ;
+		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(sc) ;
 		sl.loadScenario() ;
 		Population population = sc.getPopulation();
 		

@@ -35,7 +35,6 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -46,6 +45,9 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 import playground.mfeil.AgentsAttributesAdder;
 
@@ -97,14 +99,14 @@ public class ASPGeneral {
 
 
 		// Start calculations
-		ScenarioImpl scenarioMATSim = new ScenarioImpl();
+		ScenarioImpl scenarioMATSim = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenarioMATSim.setNetwork(network);
 		new MatsimFacilitiesReader(scenarioMATSim).readFile(facilitiesFilename);
 		new MatsimPopulationReader(scenarioMATSim).readFile(populationFilenameMATSim);
 
 		ScenarioImpl scenarioMZ = null;
 		if (compareWithMZ){
-			scenarioMZ = new ScenarioImpl();
+			scenarioMZ = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 			scenarioMZ.setNetwork(network);
 			new MatsimFacilitiesReader(scenarioMZ).readFile(facilitiesFilename);
 			new MatsimPopulationReader(scenarioMZ).readFile(populationFilenameMZ);
@@ -597,7 +599,7 @@ public class ASPGeneral {
 	//	final String networkFilename = "../matsim/test/scenarios/chessboard/network.xml";
 
 		// Start calculations
-		ScenarioImpl scenarioMATSim = new ScenarioImpl();
+		ScenarioImpl scenarioMATSim = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenarioMATSim).readFile(networkFilename);
 
 		new ASPGeneral(iter, lastIter, directory, scenarioMATSim.getNetwork()) ;

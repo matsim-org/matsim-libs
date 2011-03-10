@@ -24,7 +24,6 @@ import java.io.FileNotFoundException;
 import java.io.PrintStream;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
@@ -36,8 +35,11 @@ import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.CRCChecksum;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -67,7 +69,7 @@ public class CalcLegTimesKTITest extends MatsimTestCase {
 
 	public void testGenerateDistribution() {
 
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Population pop = scenario.getPopulation();
 		PersonImpl testPerson = new PersonImpl(new IdImpl("1"));
 		pop.addPerson(testPerson);

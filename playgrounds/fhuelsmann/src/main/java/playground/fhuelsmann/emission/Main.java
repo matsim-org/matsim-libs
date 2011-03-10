@@ -20,29 +20,24 @@ package playground.fhuelsmann.emission;
  * *********************************************************************** */
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.api.experimental.ScenarioFactoryImpl;
-import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
-
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 public class Main {
 
@@ -69,7 +64,8 @@ public class Main {
 	private final Scenario scenario;
 
 	public Main(){
-		this.scenario = new ScenarioFactoryImpl().createScenario();
+		Config config = ConfigUtils.createConfig();
+		this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 	}
 
 	public static void main (String[] args) throws Exception{
@@ -177,7 +173,7 @@ public class Main {
 		Config config = scenario.getConfig();
 		config.network().setInputFile(netFile);
 		config.plans().setInputFile(plansFile);
-		ScenarioLoader scenarioLoader = new ScenarioLoaderImpl(scenario) ;
+		ScenarioLoaderImpl scenarioLoader = new ScenarioLoaderImpl(scenario) ;
 		scenarioLoader.loadScenario() ;
 	}
 }	

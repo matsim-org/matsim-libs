@@ -27,7 +27,6 @@ import java.util.Set;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -45,6 +44,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.replanning.modules.ReRouteLandmarks;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
@@ -268,7 +268,7 @@ public class ScenarioCut {
 	//////////////////////////////////////////////////////////////////////
 
 	private static void reduceScenario(String[] args) {
-		ScenarioImpl scenario = (ScenarioImpl) new ScenarioLoaderImpl(args[0]).loadScenario();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(args[0]).loadScenario();
 		calcExtent(scenario);
 		if (args.length == 4) {
 			Coord center = new CoordImpl(args[1],args[2]);

@@ -26,7 +26,6 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -45,6 +44,9 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.PopulationWriterHandlerImplV4;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.core.utils.misc.ExeRunner;
 
 public class ExternalMobsim implements Simulation {
@@ -127,7 +129,7 @@ public class ExternalMobsim implements Simulation {
 
 	protected void writePlans(final String iterationPlansFile) throws FileNotFoundException, IOException {
 		log.info("writing plans for external mobsim");
-		PopulationImpl pop = (PopulationImpl) new ScenarioImpl().getPopulation();
+		PopulationImpl pop = (PopulationImpl) ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
 		pop.setIsStreaming(true);
 		PopulationWriter plansWriter = new PopulationWriter(pop, this.scenario.getNetwork());
 		AbstractPopulationWriterHandler handler = new PopulationWriterHandlerImplV4(this.scenario.getNetwork());

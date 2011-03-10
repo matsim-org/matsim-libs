@@ -20,13 +20,14 @@
 
 package playground.ciarif;
 
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.balmermi.census2000.data.Household;
 import playground.balmermi.census2000.data.Households;
@@ -39,7 +40,7 @@ public class PersonStreaming {
 
 		//Config config = Gbl.createConfig(args);
 		Config config = Scenario.setUpScenarioConfig();
-		ScenarioImpl scenario = new ScenarioImpl(config);
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 
 		//////////////////////////////////////////////////////////////////////
 

@@ -29,7 +29,6 @@ import org.apache.log4j.Level;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -40,6 +39,9 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.testcases.utils.LogCounter;
 
 import playground.mrieser.core.mobsim.api.PlanAgent;
@@ -370,7 +372,7 @@ public class CarDepartureHandlerTest {
 		public final PlanMobsimImpl sim;
 
 		public Fixture() {
-			this.scenario = new ScenarioImpl();
+			this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 			for (int i = 0; i < this.ids.length; i++) {
 				this.ids[i] = this.scenario.createId(Integer.toString(i));

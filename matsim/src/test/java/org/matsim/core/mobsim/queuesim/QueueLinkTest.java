@@ -20,7 +20,6 @@
 package org.matsim.core.mobsim.queuesim;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
@@ -37,7 +36,10 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.ptproject.qsim.interfaces.Netsim;
 import org.matsim.ptproject.qsim.qnetsimengine.QVehicle;
 import org.matsim.testcases.MatsimTestCase;
@@ -264,7 +266,7 @@ public class QueueLinkTest extends MatsimTestCase {
 	 * @author mrieser
 	 */
 	public void testBuffer() {
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		NetworkImpl network = scenario.getNetwork();
 		network.setCapacityPeriod(1.0);
 		Node node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(0, 0));
@@ -344,7 +346,7 @@ public class QueueLinkTest extends MatsimTestCase {
 	public void testStorageSpaceDifferentVehicleSizes() {
 		Fixture f = new Fixture();
 		PersonImpl p = new PersonImpl(new IdImpl(5));
-		QueueSimulation qsim = QueueSimulationFactory.createMobsimStatic(new ScenarioImpl(), new EventsManagerImpl());
+		QueueSimulation qsim = QueueSimulationFactory.createMobsimStatic(((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())), new EventsManagerImpl());
 
 		VehicleType vehType = new VehicleTypeImpl(new IdImpl("defaultVehicleType"));
 		QVehicle veh1 = StaticFactoriesContainer.createQueueVehicle(new VehicleImpl(new IdImpl(1), vehType));
@@ -399,7 +401,7 @@ public class QueueLinkTest extends MatsimTestCase {
 		/*package*/ final QueueSimulation qSim ; // careful: this qsim is only there so that sim-global variables are defined.  
 
 		/*package*/ Fixture() {
-			this.scenario = new ScenarioImpl();
+			this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 			NetworkImpl network = this.scenario.getNetwork();
 			network.setCapacityPeriod(3600.0);
 			Node node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(0, 0));

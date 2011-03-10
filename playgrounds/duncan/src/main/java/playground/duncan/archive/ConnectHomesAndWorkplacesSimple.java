@@ -19,17 +19,19 @@
 
 package playground.duncan.archive;
 
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 public class ConnectHomesAndWorkplacesSimple {
 
 	public void run(final String[] args) {
 
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 //		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities() ;
 		MatsimFacilitiesReader fr = new MatsimFacilitiesReader(scenario) ;

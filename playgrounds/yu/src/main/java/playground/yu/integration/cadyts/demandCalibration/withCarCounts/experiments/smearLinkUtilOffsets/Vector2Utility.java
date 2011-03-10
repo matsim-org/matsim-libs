@@ -30,10 +30,12 @@ import java.util.Map.Entry;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 import playground.yu.utils.io.SimpleWriter;
 import playground.yu.utils.qgis.MATSimNet2QGIS;
@@ -129,7 +131,7 @@ public class Vector2Utility implements X2QGIS {
 		, utilityFilename = "../matsim-bse/outputs/4SE_DC/middle_um1/ITERS/it.1000/test/1000.timeBinLinkUtilOffsets.log.gz"//
 		, shapeFilenameBase = "../matsim-bse/outputs/4SE_DC/middle_um1/ITERS/it.1000/test/1000.timeBinLinkUtilOffsets.";
 
-		Scenario scenario = new ScenarioImpl();
+		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario).readFile(networkFilename);
 		Network network = scenario.getNetwork();
 

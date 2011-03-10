@@ -26,11 +26,13 @@ package playground.yu.utils.qgis;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 import playground.yu.utils.io.SimpleWriter;
 
@@ -52,7 +54,7 @@ public class Facilities2Txt {
 		facilitiesFilename = "../matsim/test/scenarios/chessboard/facilities.xml", // 
 		facilitiesTxtFilename = "../matsimTests/locationChoice/chessboard/facilities.txt";
 
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		// new MatsimNetworkReader(scenario).readFile(netFilename);
 		new MatsimFacilitiesReader((ScenarioImpl) scenario)
 				.readFile(facilitiesFilename);

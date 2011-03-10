@@ -7,7 +7,6 @@ import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -16,9 +15,12 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.api.experimental.ScenarioLoaderFactoryImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 import playground.mmoyo.utils.FileCompressor;
 
@@ -110,14 +112,14 @@ public class PlanValidator {
 	}
 	
 	private Population readPopulation(String planFile){
-		Scenario scenario = new ScenarioImpl();
+		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimPopulationReader(scenario).readFile(planFile);
 		return scenario.getPopulation();
 	}
 
 	/**Writes a new population file filtered out of plans with diff initial and final act types*/ 
 	public void writeFilteredPlan(String configFile){
-		Scenario scenario =  new ScenarioLoaderFactoryImpl().createScenarioLoader(configFile).loadScenario();
+		Scenario scenario =  ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(configFile).loadScenario();
 		Network network = scenario.getNetwork();
 		Population origPopulation = scenario.getPopulation();
 		Population filteredPopulation = this.delDiffTypeActs(origPopulation);

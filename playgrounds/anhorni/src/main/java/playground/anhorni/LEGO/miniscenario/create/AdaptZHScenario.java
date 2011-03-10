@@ -24,7 +24,6 @@ import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -46,8 +45,11 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.locationchoice.utils.ActTypeConverter;
 
@@ -57,7 +59,7 @@ import playground.anhorni.random.RandomFromVarDistr;
 
 public class AdaptZHScenario {
 	private final static Logger log = Logger.getLogger(AdaptZHScenario.class);
-	private ScenarioImpl scenario = new ScenarioImpl();
+	private ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 	private String outputFolder = "src/main/java/playground/anhorni/output/zh10Pct/";
 	
 	private long seed;
@@ -87,7 +89,7 @@ public class AdaptZHScenario {
 		
 		this.seed = configReader.getRandomSeed();
 		
-		Config config = (new ScenarioLoaderImpl("src/main/java/playground/anhorni/input/zh10Pct/config.xml").getScenario()).getConfig();
+		Config config = (ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed("src/main/java/playground/anhorni/input/zh10Pct/config.xml").getScenario()).getConfig();
 		
 		log.info("Handling heterogeneity ...");		
 		RandomFromVarDistr rnd = new RandomFromVarDistr();

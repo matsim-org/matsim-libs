@@ -30,13 +30,15 @@ import java.util.Vector;
 import org.matsim.analysis.CalcLinkStats;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.counts.Count;
 import org.matsim.counts.CountSimComparison;
 import org.matsim.counts.Counts;
@@ -206,7 +208,7 @@ public class LinkStatsAnalyser {
 	 */
 	protected NetworkImpl loadNetwork() {
 		printNote("", "  creating network layer... ");
-		Scenario scenario = new ScenarioImpl();
+		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 		printNote("", "  done");
 

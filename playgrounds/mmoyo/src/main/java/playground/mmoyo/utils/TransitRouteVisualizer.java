@@ -3,11 +3,13 @@ package playground.mmoyo.utils;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.run.OTFVis;
 
@@ -23,7 +25,7 @@ public class TransitRouteVisualizer {
 		}
 		
 		//create route net
-		NetworkImpl routeNet = new ScenarioImpl().getNetwork();
+		NetworkImpl routeNet = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getNetwork();
 
 		//add also start and end links that normally are not include in transitRoute.getRoute().getLinkIds()!! 
 		List<Id> linkList = transitRoute.getRoute().getLinkIds();

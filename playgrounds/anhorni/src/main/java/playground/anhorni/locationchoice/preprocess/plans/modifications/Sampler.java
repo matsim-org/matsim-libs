@@ -20,17 +20,19 @@
 package playground.anhorni.locationchoice.preprocess.plans.modifications;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 public class Sampler {
 
 	private final static Logger log = Logger.getLogger(Sampler.class);
 
 	public Population sample(Population plans) {
-		Population sampledPopulation = new ScenarioImpl().getPopulation();
+		Population sampledPopulation = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
 
 		for (Person person : plans.getPersons().values()) {
 			double r = MatsimRandom.getRandom().nextDouble();

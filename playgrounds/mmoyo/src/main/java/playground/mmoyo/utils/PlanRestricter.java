@@ -1,6 +1,5 @@
 package playground.mmoyo.utils;
 
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
@@ -11,6 +10,9 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.population.algorithms.PlansFilterByLegMode;
 
 public class PlanRestricter {
@@ -24,7 +26,7 @@ public class PlanRestricter {
 
 		Gbl.startMeasurement();
 
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		NetworkImpl net = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(networkFile);
 
@@ -37,7 +39,7 @@ public class PlanRestricter {
 		PlansFilterByLegMode plansFilter = new PlansFilterByLegMode( TransportMode.pt, PlansFilterByLegMode.FilterType.keepAllPlansWithMode) ;
 		plansFilter.run(population) ;
 
-		PopulationImpl newPopulation = new PopulationImpl(new ScenarioImpl());
+		PopulationImpl newPopulation = new PopulationImpl(((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())));
 		for (Person person : population.getPersons().values()){
 			String sId = person.getId().toString();
 

@@ -28,7 +28,6 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
@@ -44,6 +43,9 @@ import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.pt.fakes.FakeAgent;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -967,7 +969,7 @@ public class TransitQueueNetworkTest extends TestCase {
 		public Fixture(final int firstStopLocation, final boolean firstStopisBlocking, final int secondStopLocation, final boolean secondStopIsBlocking)
 				throws IllegalArgumentException, IllegalAccessException, InvocationTargetException, SecurityException, NoSuchMethodException {
 			// setup: config
-			ScenarioImpl scenario = new ScenarioImpl();
+			ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 			scenario.getConfig().scenario().setUseTransit(true);
 			scenario.getConfig().addQSimConfigGroup(new QSimConfigGroup());
 			Id id1 = scenario.createId("1");

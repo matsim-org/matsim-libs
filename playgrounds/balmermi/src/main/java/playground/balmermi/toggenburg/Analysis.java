@@ -77,7 +77,7 @@ public class Analysis {
 	public static void main(String[] args) {
 
 		log.info("loading scenario...");
-		Scenario scenario = new ScenarioLoaderImpl(args[0]).loadScenario();
+		Scenario scenario = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(args[0]).loadScenario();
 		log.info("done.");
 
 //		log.info("extracting output directory... ");

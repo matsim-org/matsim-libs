@@ -25,11 +25,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.router.Dijkstra;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.testcases.MatsimTestCase;
 
 import cern.colt.matrix.impl.DenseDoubleMatrix2D;
@@ -133,7 +135,7 @@ public class MyZoneToZoneRouterTest extends MatsimTestCase{
 		MyZone z5 = new MyZone(p5, gf, new IdImpl("5"));
 		zones.add(z5);	
 
-		scenario = new ScenarioImpl(); 
+		scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig()); 
 		// Read plans and network.
 		MatsimNetworkReader nr = new MatsimNetworkReader(scenario);
 		nr.readFile(inputFolder + "/output_network.xml.gz");

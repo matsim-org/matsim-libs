@@ -32,10 +32,12 @@ import net.opengis.kml._2.KmlType;
 import net.opengis.kml._2.ObjectFactory;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.gbl.MatsimResource;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.transformations.AtlantisToWGS84;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.vis.kml.KMZWriter;
 import org.matsim.vis.kml.MatsimKmlStyleFactory;
@@ -48,7 +50,7 @@ public class KmlNetworkWriterTest extends MatsimTestCase {
 	public void testWrite() throws IOException {
 		final String kmzFilename = getOutputDirectory() + "network.kmz";
 		
-		Scenario scenario = new ScenarioImpl();
+		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile("test/scenarios/equil/network.xml");
 		

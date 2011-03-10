@@ -20,12 +20,13 @@
 package playground.dgrether.lanes.laneLayoutTest;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.ControlerIO;
 import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.vis.otfvis.OTFVisMobsimFeature;
 
@@ -40,7 +41,7 @@ public class LaneLayoutTestShowLanes {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		Scenario sc = new ScenarioImpl();
+		Scenario sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		sc.getConfig().network().setInputFile(LaneLayoutTestFileNames.NETWORK);
 		sc.getConfig().network().setLaneDefinitionsFile(LaneLayoutTestFileNames.LANEDEFINITIONSV2);
 		sc.getConfig().scenario().setUseLanes(true);
@@ -49,7 +50,7 @@ public class LaneLayoutTestShowLanes {
 		sc.getConfig().otfVis().setDrawLinkIds(true);
 		
 		
-		ScenarioLoader loader = new ScenarioLoaderImpl(sc);
+		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(sc);
 		loader.loadScenario();
 		EventsManagerImpl events = new EventsManagerImpl();
 		

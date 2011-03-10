@@ -17,9 +17,11 @@ import javax.swing.JOptionPane;
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkReaderMatsimV1;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.xml.sax.SAXException;
 
 import playground.rost.controller.gui.BlockGUI;
@@ -212,7 +214,7 @@ public class MainGUI extends JFrame {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		NetworkImpl network = scenario.getNetwork();
 		NetworkReaderMatsimV1 nReader = new NetworkReaderMatsimV1(scenario);
 		try {

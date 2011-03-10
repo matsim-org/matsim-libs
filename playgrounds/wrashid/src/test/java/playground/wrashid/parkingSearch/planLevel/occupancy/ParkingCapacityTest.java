@@ -2,15 +2,17 @@ package playground.wrashid.parkingSearch.planLevel.occupancy;
 
 import junit.framework.TestCase;
 
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 import playground.wrashid.parkingSearch.planLevel.scenario.BaseNonControlerScenario;
 
 public class ParkingCapacityTest extends TestCase {
 
 	public void testBasic() {
-		ScenarioImpl sc = new ScenarioImpl();
+		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		BaseNonControlerScenario.loadNetwork(sc);
 
 		ParkingCapacity pc = new ParkingCapacity(sc.getActivityFacilities());

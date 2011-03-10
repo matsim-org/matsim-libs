@@ -20,11 +20,12 @@
 package playground.dgrether.prognose2025;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.api.experimental.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCleaner;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 import playground.dgrether.DgPaths;
 
@@ -44,9 +45,9 @@ public class DgPrognose2025NetworkPostProcessing {
     String net = netbase + ".xml";
     String netout = netbase + "_cleaned.xml.gz";
     
-    Scenario sc = new ScenarioImpl();
+    Scenario sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
     sc.getConfig().network().setInputFile(net);
-    ScenarioLoader loader = new ScenarioLoaderImpl(sc);
+    ScenarioLoaderImpl loader = new ScenarioLoaderImpl(sc);
     loader.loadScenario();
     
     NetworkCleaner cleaner = new NetworkCleaner();

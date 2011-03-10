@@ -10,16 +10,15 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 import playground.mzilske.freight.CarrierAgentTracker;
-import playground.mzilske.freight.CarrierImpl;
 import playground.mzilske.freight.Carriers;
 import playground.mzilske.freight.Offer;
 import playground.mzilske.freight.TSPCapabilities;
 import playground.mzilske.freight.TSPContract;
 import playground.mzilske.freight.TSPPlan;
 import playground.mzilske.freight.TSPShipment;
+import playground.mzilske.freight.TSPShipment.TimeWindow;
 import playground.mzilske.freight.TransportChain;
 import playground.mzilske.freight.TransportChainBuilder;
-import playground.mzilske.freight.TSPShipment.TimeWindow;
 
 
 public class MinimumDepotDistanceToDestinationTSPPlanBuilder {

@@ -20,7 +20,6 @@
 package org.matsim.ptproject.qsim.qnetsimengine;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
@@ -37,7 +36,10 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.ptproject.qsim.interfaces.NetsimLink;
@@ -80,7 +82,7 @@ public class QLinkTest extends MatsimTestCase {
 		QVehicleImpl v = new QVehicleImpl(f.basicVehicle);
 
 		PersonImpl p = new PersonImpl(new IdImpl("1"));
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().addQSimConfigGroup(new QSimConfigGroup());
 		v.setDriver(new PersonDriverAgentImpl(p, new QSim(scenario, new EventsManagerImpl())));
 
@@ -229,7 +231,7 @@ public class QLinkTest extends MatsimTestCase {
 	 */
 	public void testBuffer() {
 		Config conf = super.loadConfig(null);
-		ScenarioImpl scenario = new ScenarioImpl(conf);
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(conf);
 		conf.addQSimConfigGroup(new QSimConfigGroup());
 
 		NetworkImpl network = scenario.getNetwork();
@@ -362,7 +364,7 @@ public class QLinkTest extends MatsimTestCase {
 		/*package*/ final QSim sim;
 
 		/*package*/ Fixture() {
-			this.scenario = new ScenarioImpl();
+			this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 			this.scenario.getConfig().addQSimConfigGroup(new QSimConfigGroup());
 			NetworkImpl network = this.scenario.getNetwork();
 			network.setCapacityPeriod(3600.0);

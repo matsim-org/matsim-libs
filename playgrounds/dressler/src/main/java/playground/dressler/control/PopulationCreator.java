@@ -7,7 +7,6 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
@@ -21,6 +20,9 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 import playground.dressler.ea_flow.PathStep;
 import playground.dressler.ea_flow.StepEdge;
@@ -130,7 +132,7 @@ public class PopulationCreator {
 			}
 			  
 			//construct Population
-			Population result = new ScenarioImpl().getPopulation();
+			Population result = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
 			int id = 1;
 			for (TimeExpandedPath path : thePaths){
 				if (path.isforward()) {

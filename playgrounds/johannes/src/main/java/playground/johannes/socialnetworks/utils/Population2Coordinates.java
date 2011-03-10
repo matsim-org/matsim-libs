@@ -28,12 +28,14 @@ import java.util.Set;
 import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 import playground.johannes.socialnetworks.gis.io.FeatureSHP;
 
@@ -54,7 +56,7 @@ public class Population2Coordinates {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		Scenario scenario = new ScenarioImpl();
+		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		MatsimPopulationReader reader = new MatsimPopulationReader(scenario);
 		reader.readFile("/Users/jillenberger/Work/socialnets/data/schweiz/complete/plans/plans.0.10.xml");
 		

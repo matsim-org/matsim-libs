@@ -19,9 +19,11 @@
  * *********************************************************************** */
 package playground.cottbus;
 
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.vis.otfvis.OTFVisMobsimFeature;
 
@@ -53,7 +55,7 @@ public class FourWaysVis {
 		
 		
 		//this is hack
-		ScenarioImpl scenario = new ScenarioImpl();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().network().setInputFile(netFile);
 		scenario.getConfig().plans().setInputFile(popFile);
 		

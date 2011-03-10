@@ -1,6 +1,5 @@
 package playground.mzilske.deteval;
 
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -17,7 +16,9 @@ import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
 import org.matsim.core.router.util.DijkstraFactory;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactory;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
@@ -42,10 +43,10 @@ public class RunDetailedEvaluation {
 		config.scenario().setUseTransit(false);
 		config.scenario().setUseVehicles(true);
 		
-		final ScenarioImpl scenario = new ScenarioImpl(config);
+		final ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		new ScenarioLoaderImpl(scenario).loadScenario();
 		
-		ScenarioImpl backgroundScenario = new ScenarioImpl(config);
+		ScenarioImpl backgroundScenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		new MatsimNetworkReader(backgroundScenario).readFile(config.network().getInputFile());
 		new MatsimPopulationReader(backgroundScenario).readFile(backgroundPopFilename);
 

@@ -21,7 +21,6 @@ package playground.andreas.utils.pop;
 
 import java.io.File;
 
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -29,8 +28,11 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 import playground.andreas.bln.pop.SharedNetScenario;
 
@@ -46,7 +48,7 @@ public class GVPopConverter {
 	public static void main(final String[] args) {
 		Gbl.startMeasurement();
 
-		ScenarioImpl sc = new ScenarioImpl();
+		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		String networkFile = "e:/_shared-svn/berlin_prognose_2025/counts_network_merged.xml_cl.xml";
 		String inPlansFile = "e:/_shared-svn/berlin_prognose_2025/bb_gv_10pct.xml.gz";
@@ -74,7 +76,7 @@ public class GVPopConverter {
 		System.out.println("Dublicating plans finished");
 		Gbl.printElapsedTime();
 
-		inPop = new ScenarioImpl().getPopulation();
+		inPop = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
 		popReader = new MatsimPopulationReader(new SharedNetScenario(sc, inPop));
 		popReader.readFile("tmp.xml.gz");
 
@@ -86,7 +88,7 @@ public class GVPopConverter {
 		System.out.println("Shuffle coords finished");
 		Gbl.printElapsedTime();
 		
-		inPop = new ScenarioImpl().getPopulation();
+		inPop = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
 		popReader = new MatsimPopulationReader(new SharedNetScenario(sc, inPop));
 		popReader.readFile("tmp2.xml.gz");
 		
@@ -100,7 +102,7 @@ public class GVPopConverter {
 		(new File("tmp.xml.gz")).deleteOnExit();
 		(new File("tmp2.xml.gz")).deleteOnExit();
 		
-		inPop = new ScenarioImpl().getPopulation();
+		inPop = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
 		popReader = new MatsimPopulationReader(new SharedNetScenario(sc, inPop));
 		popReader.readFile(inPlansFile + "_" + (numberOfAdditionalCopies + 1) + "x.xml.gz");
 		popReader.readFile(secondPlansFile);

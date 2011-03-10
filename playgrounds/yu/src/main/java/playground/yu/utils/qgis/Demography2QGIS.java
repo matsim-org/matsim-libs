@@ -27,7 +27,6 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -37,7 +36,10 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationReader;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 import playground.yu.analysis.PlanModeJudger;
 import playground.yu.utils.CompareSelectedPlansTable;
@@ -51,7 +53,7 @@ import playground.yu.utils.CompareSelectedPlansTable;
  *
  */
 public class Demography2QGIS extends CompareSelectedPlansTable {
-	private final ScenarioImpl scenario = new ScenarioImpl();
+	private final ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 //	private PopulationImpl plans;
 	private static final String HEADER = "personId;sex;age;license;caravail;employed;homex;homey;homelink;"
 			+ "planType;planScore;departureTime;"

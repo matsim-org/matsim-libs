@@ -66,7 +66,7 @@ public class AdjustModes {
 	
 	public void run(final String[] args) {
 		parseArguments(args);
-		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(this.configfile);
+		ScenarioLoaderImpl sl = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(this.configfile);
 		sl.loadNetwork();
 		sl.loadPopulation();
 		NetworkImpl network = sl.getScenario().getNetwork();

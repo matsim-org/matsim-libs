@@ -26,15 +26,16 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.api.experimental.ScenarioFactoryImpl;
-import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 
 /**
@@ -63,7 +64,8 @@ public class PopulationMerger {
 	}
 
 	private void run(String[] args) {
-		Scenario scenario = new ScenarioFactoryImpl().createScenario();
+		Config config = ConfigUtils.createConfig();
+		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		PopulationImpl mergedPopulation = (PopulationImpl) scenario.getPopulation();
 
 		mergedPopulation.setIsStreaming(true);
@@ -118,13 +120,14 @@ public class PopulationMerger {
 	}
 
 	private static Population getPopulation(String demandFile, String networkFile) {
-		Scenario sc = new ScenarioFactoryImpl().createScenario();
+		Config config1 = ConfigUtils.createConfig();
+		Scenario sc = (ScenarioImpl) ScenarioUtils.createScenario(config1);
 		Config config = sc.getConfig();
 		config.network().setInputFile(networkFile);
 		config.plans().setInputFile(demandFile);
 
 		//loading scenario and getting the population
-		ScenarioLoader sl = new ScenarioLoaderImpl(sc) ;
+		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(sc) ;
 		sl.loadScenario() ;
 		Population population = sc.getPopulation();
 		return population;

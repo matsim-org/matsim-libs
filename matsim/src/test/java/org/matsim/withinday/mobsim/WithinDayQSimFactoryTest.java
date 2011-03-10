@@ -21,11 +21,13 @@
 package org.matsim.withinday.mobsim;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.SynchronizedEventsManagerImpl;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.agents.DefaultAgentFactory;
 import org.matsim.ptproject.qsim.qnetsimengine.QSimEngineImpl;
@@ -38,7 +40,7 @@ public class WithinDayQSimFactoryTest extends MatsimTestCase {
 	 */
 	public void testCreateMobsim() {
 		
-				Scenario scenario = new ScenarioImpl();
+				Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		EventsManager eventsManager = new EventsManagerImpl();
 
 		QSimConfigGroup qSimConfig = new QSimConfigGroup();

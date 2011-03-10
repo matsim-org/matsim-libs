@@ -19,7 +19,6 @@
 
 package playground.wrashid.template;
 
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
@@ -27,6 +26,9 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 import playground.wrashid.tryouts.plan.NewPopulation;
 
@@ -37,7 +39,7 @@ import playground.wrashid.tryouts.plan.NewPopulation;
 public class ProcessPlansFile extends NewPopulation {
 	public static void main(String[] args) {
 
-		ScenarioImpl sc = new ScenarioImpl();
+		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		String inputPlansFile = "./test/scenarios/berlin/plans_hwh_1pct.xml.gz";
 		String outputPlansFile = "./test.xml.gz";
