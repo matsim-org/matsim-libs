@@ -16,12 +16,9 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
-<<<<<<< .mine
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.utils.objectattributes.ObjectAttributes;
-=======
 import org.matsim.core.scenario.ScenarioImpl;
->>>>>>> .r14557
 
 import playground.anhorni.LEGO.miniscenario.ConfigReader;
 import playground.anhorni.LEGO.miniscenario.create.ComputeMaxEpsilons;
@@ -99,9 +96,10 @@ public class MultiDaysGenerator {
 	private void adaptForDestinationChoice() {	
 		ConfigReader configReader = new ConfigReader();
 		configReader.read();
+		
+		Config config = (ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(
+				"src/main/java/playground/anhorni/input/PLOC/3towns/config.xml").getScenario()).getConfig();
 				
-		Config config = (new ScenarioLoaderImpl("src/main/java/playground/anhorni/input/PLOC/3towns/config.xml").getScenario()).getConfig();
-			
 		RandomFromVarDistr rnd = new RandomFromVarDistr();
 		rnd.setSeed(this.seed);
 		HandleUnobservedHeterogeneity hhandler = new HandleUnobservedHeterogeneity(this.scenarioWriteOut, configReader, rnd, config);

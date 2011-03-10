@@ -27,13 +27,10 @@ import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PopulationImpl;
-<<<<<<< .mine
 import org.matsim.utils.objectattributes.ObjectAttributes;
-=======
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
->>>>>>> .r14557
 
 import java.io.File;
 import java.util.Random;
