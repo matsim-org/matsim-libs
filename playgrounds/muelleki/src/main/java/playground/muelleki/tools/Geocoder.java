@@ -137,7 +137,7 @@ public class Geocoder {
 					loc = Geocoder.getLocation (matcher.group(1));
 				}
 				catch (TooManyQueriesException e) {
-					System.err.printf("%tc: %s, sleeping: %tc\n", new Date(), e.getMessage());
+					System.err.printf("%tc: %s, sleeping\n", new Date(), e.getMessage());
 					Thread.sleep(60000);
 					continue;
 				}
