@@ -23,6 +23,7 @@ package playground.muelleki.tools;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.FileInputStream;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.regex.*;
@@ -86,7 +87,7 @@ public class Geocoder {
 	}
 	
 	// Format: 200,6,42.730070,-73.690570
-	private static Pattern _googleApiReply = Pattern.compile("([0-9]+),6,([0-9.+-]+),([0-9.+-]+)");
+	private static Pattern _googleApiReply = Pattern.compile("([0-9]+),[0-9],([0-9.+-]+),([0-9.+-]+)");
 
 	public static Location getLocation (String address) throws IOException {
 		BufferedReader in = new BufferedReader (new InputStreamReader (new URL ("http://maps.google.com/maps/geo?q="+URLEncoder.encode (address, ENCODING)+"&output=csv&key="+KEY).openStream ()));
@@ -125,7 +126,12 @@ public class Geocoder {
 	}
 
 	public static void main (String[] argv) throws Exception {
-		BufferedReader in = new BufferedReader (new InputStreamReader (System.in));
+		BufferedReader in;
+		if (argv.length > 0)
+			in = new BufferedReader (new InputStreamReader(new FileInputStream(argv[0])));
+		else
+			in = new BufferedReader (new InputStreamReader (System.in));
+		
 		String line;
 		Pattern pattern = Pattern.compile("([^\t]*).*");
 		while ((line = in.readLine ()) != null) {
@@ -133,15 +139,16 @@ public class Geocoder {
 			matcher.matches();
 			Location loc = null;
 
-			do {
+			while (true) {
 				try {
 					loc = Geocoder.getLocation (matcher.group(1));
 				}
 				catch (TooManyQueriesException e) {
 					Thread.sleep(60000);
+					continue;
 				}
+				break;
 			}
-			while (loc == null);
 			
 			System.out.printf ("%s\t%s\n", line, loc);
 			Thread.sleep(300);
