@@ -39,6 +39,7 @@ public class ConfigReader {
 	private String path = "";
 	private int numberOfAnalyses = -1;
 	private String runId ="";
+	private boolean temporalVar;
 	       
     public void read() {
     	
@@ -79,6 +80,10 @@ public class ConfigReader {
           line = bufferedReader.readLine();
           parts = line.split("\t");
           this.numberOfAnalyses = Integer.parseInt(parts[1]);
+          
+          line = bufferedReader.readLine();
+          parts = line.split("\t");
+          this.temporalVar = Boolean.parseBoolean(parts[1]);
           
         } // end try
         catch (IOException e) {
@@ -164,5 +169,13 @@ public class ConfigReader {
 
 	public void setNumberOfAnalyses(int numberOfAnalyses) {
 		this.numberOfAnalyses = numberOfAnalyses;
+	}
+
+	public boolean isTemporalVar() {
+		return temporalVar;
+	}
+
+	public void setTemporalVar(boolean temporalVar) {
+		this.temporalVar = temporalVar;
 	}
 }

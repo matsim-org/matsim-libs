@@ -19,15 +19,14 @@
 
 package playground.anhorni.scenarios;
 
-import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Random;
 
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
+import org.matsim.utils.objectattributes.ObjectAttributes;
+import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
 
 public class ExpenditureAssigner {
@@ -37,56 +36,32 @@ public class ExpenditureAssigner {
 	
 	private Random randomNumberGenerator;
 	private long seed;
-	private BufferedWriter bufferedWriter = null;
+	private ObjectAttributes personAttributes;
 	
-	public ExpenditureAssigner(double mu [], double sigma [], String path, long seed) {
+	public ExpenditureAssigner(double mu [], double sigma [], String path, long seed, ObjectAttributes personAttributes) {
 		this.mu = mu;
 		this.sigma = sigma;
 		this.path = path;
 		this.seed = seed;
-		this.init();	
+		this.personAttributes = personAttributes;
+		this.randomNumberGenerator = new Random(this.seed);	
 	}
-		
-	private void init() {	
-		this.randomNumberGenerator = new Random(this.seed);		
-		try {           
-            bufferedWriter = new BufferedWriter(new FileWriter(path + "output/PLOC/3towns/population_expenditures.txt"));           
-        } catch (FileNotFoundException ex) {
-            ex.printStackTrace();
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        } 	
-	}
-	
+			
 	public void assignExpenditures(PopulationImpl population) {
 		for (Person p :population.getPersons().values()) {
 			this.assignExpenditureGaussian((PersonImpl)p);
 		}
+		ObjectAttributesXmlWriter attributesWriter = new ObjectAttributesXmlWriter(personAttributes);
 		try {
-			bufferedWriter.flush();
-			bufferedWriter.close();
-		} catch (IOException e) {
-			e.printStackTrace();
+			attributesWriter.writeFile(path + "input/PLOC/3towns/personExpenditures.xml");
+		} catch (IOException e1) {
+			e1.printStackTrace();
 		}   
 	}
 				
 	public void assignExpenditureGaussian(PersonImpl person) {		
-		//not working for writer
-		//person.getCustomAttributes().put("expenditure", 
-		//		mu[stratumIndex] + this.randomNumberGenerators[stratumIndex].nextGaussian() * sigma[stratumIndex]);
-		// dirty hack
 		int townId = (Integer) person.getCustomAttributes().get("townId");
-		
-		double expenditure = Math.sqrt(Math.pow(this.randomNumberGenerator.nextGaussian() * sigma[townId] + mu[townId], 2)) ;	
-		person.createDesires(String.valueOf(expenditure));
-		
-		try {                       
-            //Start writing to the output stream
-            bufferedWriter.append(person.getId() + "\t" + String.valueOf(expenditure));
-            bufferedWriter.newLine();
-            bufferedWriter.flush();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } 
+		double expenditure = Math.sqrt(Math.pow(this.randomNumberGenerator.nextGaussian() * sigma[townId] + mu[townId], 2)) ;
+		personAttributes.putAttribute(person.getId().toString(), "expenditure", expenditure); 
 	}	
 }

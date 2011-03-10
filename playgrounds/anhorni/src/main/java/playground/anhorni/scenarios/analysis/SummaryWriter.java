@@ -73,7 +73,7 @@ public class SummaryWriter {
 			for (int runIndex = 0; runIndex < numberOfRandomRuns; runIndex++) {
 				Run run = new Run(runIndex, shoppingFacilities.length);
 				for (int day = 0; day < 5; day++) {
-					BufferedReader bufferedReader = new BufferedReader(new FileReader(path + "output/PLOC/3towns/R" + runIndex + "D" + day + "_shoppingPerRunDay.txt"));
+					BufferedReader bufferedReader = new BufferedReader(new FileReader(path + "output/PLOC/3towns/run" + runIndex + "/day" + day + "/shoppingPerRunDay.txt"));
 					String line = bufferedReader.readLine(); // skip header
 					for (int hour = 0; hour < 24; hour++) {
 						line = bufferedReader.readLine();

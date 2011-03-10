@@ -21,15 +21,22 @@
 package playground.anhorni.scenarios;
 
 import org.matsim.core.controler.Controler;
+import org.matsim.utils.objectattributes.ObjectAttributes;
 
 import playground.anhorni.scenarios.analysis.ShoppingCalculator;
 
 public class SingleRunControler extends Controler {
+	
+	private ObjectAttributes personAttributes;
 		
 	public SingleRunControler(final String[] args) {
 		super(args);	
 	}
 	
+	public void setPersonAttributes(ObjectAttributes personAttributes) {
+		this.personAttributes = personAttributes;
+	}
+		
     public static void main (final String[] args) { 
     	SingleRunControler controler = new SingleRunControler(args);
     	controler.run();
@@ -37,7 +44,7 @@ public class SingleRunControler extends Controler {
     
     public void run() {
     	super.setOverwriteFiles(true);
-    	super.addControlerListener(new ShoppingCalculator());
+    	super.addControlerListener(new ShoppingCalculator(this.personAttributes));
     	super.run();
     }
 }

@@ -27,9 +27,13 @@ import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PopulationImpl;
+<<<<<<< .mine
+import org.matsim.utils.objectattributes.ObjectAttributes;
+=======
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
+>>>>>>> .r14557
 
 import java.io.File;
 import java.util.Random;
@@ -40,10 +44,11 @@ public class Create3TownsDemand {
 	private NetworkImpl network = null;
 	private ScenarioImpl scenarioWriteOut = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 	private PopulationImpl staticPopulation = new PopulationImpl(scenarioWriteOut);
-	private static int offset = 100000;
 	private long seed = 109876L;
 	public static String outputFolder="src/main/java/playground/anhorni/input/PLOC/3towns/";
 	private static String path = "src/main/java/playground/anhorni/";
+	
+	private ObjectAttributes personAttributes = new ObjectAttributes();
 
 	private int populationSize = -1;
 	
@@ -74,7 +79,7 @@ public class Create3TownsDemand {
 		this.populationSize = configReader.getPopulationSize();
 		this.mu = configReader.getMu();
 		this.sigma = configReader.getSigma();
-		this.expenditureAssigner = new ExpenditureAssigner(this.mu, this.sigma, path, this.seed);
+		this.expenditureAssigner = new ExpenditureAssigner(this.mu, this.sigma, path, this.seed, this.personAttributes);
 
 		new MatsimNetworkReader(scenarioWriteOut).readFile(networkfilePath);
 		new FacilitiesReaderMatsimV1(scenarioWriteOut).readFile(facilitiesfilePath);
@@ -92,24 +97,28 @@ public class Create3TownsDemand {
 	    	for (int i = 0; i < configReader.getNumberOfRandomRuns(); i++) {
 
         		for (int j = 0; j < 5; j++) {
-        			config.setParam("plans", "inputPlansFile", path + "input/PLOC/3towns/plans/run" + i + "/day" + j + "/plans.xml");
+        			config.setParam("plans", "inputPlansFile", path + "input/PLOC/3towns/runs/run" + i + "/day" + j + "/plans.xml");
     	        	config.setParam("controler", "runId", "R" + Integer.toString(i) + "D" + j);
+    	        	config.setParam("facilities", "inputFacilitiesFile", path + "input/PLOC/3towns/runs/run" + i + "/day" + j + "/facilities.xml");
+    	        	
         			outputPath = path + "/output/PLOC/3towns/run" + i + "/day" + j + "/matsim";
         			new File(path + "/output/PLOC/3towns/run" + i + "/day" + j +"/matsim").mkdirs();
         			config.setParam("controler", "outputDirectory", outputPath);
-        			String configPath = path + "/input/PLOC/3towns/configs/";
+        			
+        			String configPath = path + "input/PLOC/3towns/runs/run" + i + "/day" + j;
     	        	new File(configPath).mkdirs();
-    	        	configWriter.write(configPath + "configR" + i + "D" + j + ".xml");
+    	        	configWriter.write(configPath + "/config.xml");
         		}	
 	    	}	 	
 	    }
 
 	private void run() {		
 		GeneratePopulation populationGenerator = new GeneratePopulation(this.randomNumberGenerator);
-		populationGenerator.generatePopulation(populationSize, expenditureAssigner, staticPopulation, offset);
+		populationGenerator.generatePopulation(populationSize, expenditureAssigner, staticPopulation);
 		
 		MultiDaysGenerator multiDaysPlanGenerator = new MultiDaysGenerator(
-				this.randomNumberGenerator.nextLong(), staticPopulation, scenarioWriteOut, network);
+				this.randomNumberGenerator.nextLong(), staticPopulation, scenarioWriteOut, network, 
+				configReader.isTemporalVar(), personAttributes);
 		
 		for (int i = 0; i < configReader.getNumberOfRandomRuns(); i++) {			
 			multiDaysPlanGenerator.generatePlans(i);

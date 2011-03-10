@@ -20,7 +20,15 @@
 
 package playground.anhorni.scenarios;
 
+import java.io.IOException;
+
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.apache.log4j.Logger;
+import org.matsim.utils.objectattributes.ObjectAttributes;
+import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
+import org.xml.sax.SAXException;
+
 import playground.anhorni.scenarios.analysis.SummaryWriter;
 
 public class MultiplerunsControler {
@@ -30,6 +38,7 @@ public class MultiplerunsControler {
 	private int numberOfRandomRuns = -1; // from config
 	private SummaryWriter summaryWriter = null;
 	private ConfigReader configReader = new ConfigReader();
+	private ObjectAttributes personAttributes = new ObjectAttributes();
 	
     public static void main (final String[] args) { 
     	MultiplerunsControler runControler = new MultiplerunsControler();
@@ -40,28 +49,37 @@ public class MultiplerunsControler {
     	this.configReader.read();
     	this.numberOfRandomRuns = configReader.getNumberOfRandomRuns();
     	this.summaryWriter = new SummaryWriter(path, this.numberOfRandomRuns);
+    	
+    	ObjectAttributesXmlReader attributesReader = new ObjectAttributesXmlReader(this.personAttributes);
+		try {
+			attributesReader.parse("src/main/java/playground/anhorni/input/PLOC/3towns/personExpenditures.xml");
+		} catch (SAXException e) {
+			e.printStackTrace();
+		} catch (ParserConfigurationException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
     }
            
     public void run() {
     	
     	this.init();
-    	    	
+ 	    	
     	String config[] = {""};
-		SingleRunControler controler = new SingleRunControler(config);
-			    	   	
+		SingleRunControler controler;
+					    	   	
     	for (int runIndex = 0; runIndex < numberOfRandomRuns; runIndex++) {   		
     		for (int i = 0; i < 5; i++) {
-    			config[0] = "src/main/java/playground/anhorni/input/PLOC/3towns/configs/configR" + runIndex + "D" + i + ".xml";
-	    		controler = new SingleRunControler(config);	    		    			        	              	
+    			config[0] = "src/main/java/playground/anhorni/input/PLOC/3towns/runs/run"+ runIndex + "/day" + i + "/config.xml";
+	    		controler = new SingleRunControler(config);	 
+	    		controler.setPersonAttributes(this.personAttributes);
 	        	controler.run();
     		}
     	}
-    	log.info("Create analysis ...");
-    	
+    	log.info("Create analysis ...");   	
     	summaryWriter.run();
-    	
-    	
-    	
+  	
 //    	RandomRunsAnalyzer analyzer = new RandomRunsAnalyzer(
 //    			configReader.getNumberOfCityShoppingLocs(), MultiplerunsControler.path, numberOfRandomRuns);
 //    	analyzer.run(configReader.getNumberOfAnalyses());

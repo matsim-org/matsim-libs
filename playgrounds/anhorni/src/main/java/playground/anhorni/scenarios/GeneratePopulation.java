@@ -14,10 +14,10 @@ public class GeneratePopulation {
 		this.randomNumberGenerator = randomNumberGenerator;
 	}
 	
-	public void generatePopulation(int populationSize, ExpenditureAssigner expenditureAssigner,  PopulationImpl staticPopulation, int offset) {
+	public void generatePopulation(int populationSize, ExpenditureAssigner expenditureAssigner,  PopulationImpl staticPopulation) {
 		
 		for (int i = 0; i < populationSize; i++) {
-			PersonImpl p = new PersonImpl(new IdImpl(offset + i));
+			PersonImpl p = new PersonImpl(new IdImpl(i));
 
 			// assign home town
 			int townId = 0;
