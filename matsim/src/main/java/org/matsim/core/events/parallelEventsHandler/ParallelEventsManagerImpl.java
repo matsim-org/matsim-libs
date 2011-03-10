@@ -220,6 +220,9 @@ public class ParallelEventsManagerImpl extends EventsManagerImpl {
 			this.threads[i].setUncaughtExceptionHandler(this.uncaughtExceptionHandler);
 			this.threads[i].start();
 		}
+		
+		// (re-)activate parallel mode while the mobsim is running
+		this.parallelMode = true;
 	}
 
 	/**
