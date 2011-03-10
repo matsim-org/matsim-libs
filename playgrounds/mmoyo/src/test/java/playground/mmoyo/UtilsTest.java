@@ -25,9 +25,9 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
@@ -36,10 +36,13 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.MatsimTestUtils;
-import org.matsim.api.core.v01.population.Leg;
+
 import playground.mmoyo.utils.PlansMerger;
 
 public class UtilsTest extends MatsimTestCase {
@@ -57,9 +60,9 @@ public class UtilsTest extends MatsimTestCase {
 		System.out.println(" Output Dir " + outputDir );
 		
 		/**test Plans Merger*/
-		ScenarioImpl scn1 = new ScenarioImpl();
-		ScenarioImpl scn2 = new ScenarioImpl();
-		ScenarioImpl scn3 = new ScenarioImpl();
+		ScenarioImpl scn1 = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		ScenarioImpl scn2 = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		ScenarioImpl scn3 = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		
 		Population pop1 = scn1.getPopulation();
 		Population pop2 = scn2.getPopulation();

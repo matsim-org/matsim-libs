@@ -1,7 +1,7 @@
 package playground.mmoyo.utils;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -14,8 +14,10 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.pt.PtConstants;
-import org.apache.log4j.Logger;
 
 /**reads a pt routed population and convert each pt-connection into a plan, each new plan has a index suffix*/
 public class PlanFragmenter {
@@ -23,7 +25,7 @@ public class PlanFragmenter {
 	final String SEP = "_";
 	
 	public Population run(Population population){
-		ScenarioImpl tempScenario =new ScenarioImpl();
+		ScenarioImpl tempScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		PopulationImpl newPopulation = new PopulationImpl(tempScenario);
 		
 		log.info("persons before fragmentation: " + population.getPersons().size());
@@ -77,7 +79,7 @@ public class PlanFragmenter {
 	* converts all plans into new "persons", each with new suffix in Id 
 	*/
 	public Population plans2Persons (Population population){
-		PopulationImpl outputPopulation = new PopulationImpl(new ScenarioImpl());
+		PopulationImpl outputPopulation = new PopulationImpl((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig()));
 		final String SEP = "_";
 		for (Person person : population.getPersons().values() ){
 			int suffix = 1;
