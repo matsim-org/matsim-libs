@@ -53,7 +53,7 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import playground.mmoyo.cadyts_integration.ptBseAsPlanStrategy.analysis.PtBseOccupancyAnalyzer;
-import playground.mmoyo.utils.PtRouteUtill;
+import playground.mmoyo.utils.ExpTransRouteUtils;
 import cadyts.demand.PlanBuilder;
 
 class PtPlanToPlanStepBasedOnEvents implements PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler,
@@ -276,8 +276,8 @@ VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler
 						containsM44 = true ;
 						System.err.print( exptr.getRouteDescription() + ": " ) ;
 
-						PtRouteUtill ptRouteUtill = new PtRouteUtill(NET, SCHEDULE, exptr);
-						for(Link link: ptRouteUtill.getLinks()){
+						ExpTransRouteUtils expTransRouteUtils = new ExpTransRouteUtils(NET, SCHEDULE, exptr);
+						for(Link link: expTransRouteUtils.getLinks()){
 							System.err.print("-- " + link.getId() + " --");
 						}
 						System.err.println();

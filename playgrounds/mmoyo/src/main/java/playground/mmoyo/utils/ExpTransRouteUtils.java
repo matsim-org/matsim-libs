@@ -119,6 +119,19 @@ public class ExpTransRouteUtils {
 		return linkList;
 	}
 	
+	/**
+	 * returns the transit route link list including star and end Links
+	 */
+	public List<Link> getAllLinks (){
+		List<Link> allLinkList  = new ArrayList<Link>();
+		allLinkList.add(this.network.getLinks().get(this.transitRoute.getRoute().getStartLinkId()));
+		for (Id id : this.transitRoute.getRoute().getLinkIds() ){
+			allLinkList.add(this.network.getLinks().get(id));	
+		}
+		allLinkList.add(this.network.getLinks().get(this.transitRoute.getRoute().getEndLinkId()));
+		return allLinkList;
+	}
+	
 	
 	public static void main(String[] args) {
 		String configFile; 

@@ -50,10 +50,6 @@ public class PlanValidator {
 	
 	/**returns true if first act type is the same as last act type*/
 	public boolean hasSameActType (Plan plan){
-		int a=1,b=2;
-		if (a!=b) { 
-			throw new RuntimeException("this code might not so work, it assumes that the first plan element is an actitivy without validation" );
-		}	
 		Activity firstAct = (Activity) plan.getPlanElements().get(0);
 		Activity lastAct = (Activity) plan.getPlanElements().get(plan.getPlanElements().size()-1);
 		return (firstAct.getType().equals(lastAct.getType()));

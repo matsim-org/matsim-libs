@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -37,6 +38,7 @@ import org.matsim.core.population.PopulationWriter;
 import playground.mmoyo.Validators.PlanValidator;
 import playground.mmoyo.utils.DataLoader;
 import playground.mmoyo.utils.FirstPlansExtractor;
+import playground.mmoyo.utils.PlansMerger;
 
 public class OverDemandPlanCreator {
 	private Population population;
@@ -54,7 +56,7 @@ public class OverDemandPlanCreator {
 		this.population = population;
 	}
 	
-	public Population run(int cloneNum, int homePlanNum) {
+	public Population run(final int homePlanNum, final int cloneNum) {
 		PopulationImpl outPop = new PopulationImpl(new ScenarioImpl());
 
 		if (!planValidator.hasSecqActLeg(this.population)) { 
@@ -63,28 +65,16 @@ public class OverDemandPlanCreator {
 
 		for (Person person : this.population.getPersons().values()) {
 			// create and add "home" plan
-			Plan homePlan = new PlanImpl();
-			
-			Coord homeCoord = ((ActivityImpl) person.getSelectedPlan().getPlanElements().get(0)).getCoord();
-			ActivityImpl homeAct = new ActivityImpl(home, homeCoord);
-			homeAct.setEndTime(3600.0);
-			homePlan.addActivity(homeAct);
-			Leg leg = this.population.getFactory().createLeg("walk");
-			leg.setTravelTime(10.0);
-			homePlan.addLeg(leg);
-			homeAct = new ActivityImpl(home, homeCoord);
-			homeAct.setStartTime(85500.0);//85500 = 23:45 hr
-			homePlan.addActivity(homeAct);
-			for (int i=1; i<=homePlanNum;i++){
-				person.addPlan(homePlan);	
+			for (int i=0; i<homePlanNum;i++){
+				createHomePlan(person);
 			}
 			
 			//add the original
 			outPop.addPerson(person);
 
 			//create and add clones
-			for (int i=1; i<=cloneNum;i++){
-				Id newId = new IdImpl(person.getId().toString() + SEP + (i+1));
+			for (int i=0; i<cloneNum;i++){
+				Id newId = new IdImpl(person.getId().toString() + SEP + (i+2));
 				Person personClon = new PersonImpl(newId);
 				for (Plan plan :person.getPlans()){
 					personClon.addPlan(plan);
@@ -97,31 +87,70 @@ public class OverDemandPlanCreator {
 		return outPop;
 
 	}
+	
+	private Population MergingPops(final String [] popsPaths, int homePlansNum, int clonNums){
+		this.population = new PlansMerger().plansAggregator(popsPaths);
+		this.population = run(homePlansNum,clonNums);
+		return this.population;
+	}
 
+	/**
+	 * Creates a plan whereby the agents stay at home the whole day
+	 */
+	private void createHomePlan(Person person){
+		Plan homePlan = new PlanImpl();
+		Coord homeCoord = ((ActivityImpl) person.getSelectedPlan().getPlanElements().get(0)).getCoord();
+		ActivityImpl homeAct = new ActivityImpl(home, homeCoord);
+		homeAct.setEndTime(3600.0);
+		homePlan.addActivity(homeAct);
+		Leg leg = this.population.getFactory().createLeg("walk");
+		leg.setTravelTime(10.0);
+		homePlan.addLeg(leg);
+		homeAct = new ActivityImpl(home, homeCoord);
+		homeAct.setStartTime(85500.0);//85500 = 23:45 hr
+		homePlan.addActivity(homeAct);
+		person.addPlan(homePlan);
+	}
+	
 	public static void main(String[] args) {
 		String networkFile = "../shared-svn/studies/countries/de/berlin-bvg09/pt/nullfall_berlin_brandenburg/input/network_multimodal.xml.gz";
 
-		String popFile ="../playgrounds/mmoyo/output/cadyts/matsim_adapted_mintransfer_1home.xml.gz";
-		//String outPlanFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/calibration/inputPlans/Dbl_normal_fast_minTra_routes_3home.xml.gz";
+		Population multPop = null;
+		String[] arraPopPaths = new String[6];
+		
+		//cad1   w6d0.0t1200_w10d0.0t240_w8d0.5t720
+		/*
+		arraPopPaths[0]= "I:/z_alltest5/output/routedPlan_walk6.0_dist0.0_tran1200.0.xml.gz";
+		arraPopPaths[1]= "I:/z_alltest5/output/routedPlan_walk10.0_dist0.0_tran240.0.xml.gz";
+		arraPopPaths[2]= "I:/z_alltest5/output/routedPlan_walk8.0_dist0.5_tran720.0.xml.gz";
+		*/
+		//cad2     w10d0.0t1020_w10d0.4t60_w8d0.0t900
+		
+		arraPopPaths[0]= "I:/z_alltest5/output/routedPlan_walk10.0_dist0.0_tran1020.0.xml.gz";
+		arraPopPaths[1]= "I:/z_alltest5/output/routedPlan_walk10.0_dist0.4_tran60.0.xml.gz";
+		arraPopPaths[2]= "I:/z_alltest5/output/routedPlan_walk8.0_dist0.0_tran900.0.xml.gz";
+		
+		
+		//cad3    w10d0.2t780_w6d0.7t540_w8d0.4t60
+		
+		arraPopPaths[3]= "I:/z_alltest5/output/routedPlan_walk10.0_dist0.2_tran780.0.xml.gz";
+		arraPopPaths[4]= "I:/z_alltest5/output/routedPlan_walk6.0_dist0.7_tran540.0.xml.gz";
+		arraPopPaths[5]= "I:/z_alltest5/output/routedPlan_walk8.0_dist0.4_tran60.0.xml.gz";
+		
+		multPop =  new OverDemandPlanCreator(multPop).MergingPops(arraPopPaths, 1, 0);
 
-		//String popFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/calibration/1plan.xml";
-		//String outPlanFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/calibration/inputPlans/double1_plan.xml";
-
-		ScenarioImpl scn = new DataLoader().readNetwork_Population(networkFile, popFile);
+		final NetworkImpl net = new DataLoader().readNetwork(networkFile);
 		PopulationWriter popWriter;
-		final Population scnPopulation= scn.getPopulation();
-		
+
 		//write the plan with over demand
-		String outPlanFile = "../playgrounds/mmoyo/output/cadyts/matsim_adapted_mintransfer_1homeCloned.xml.gz";
-		Population multPop = new OverDemandPlanCreator(scnPopulation).run(1,0);
-		popWriter= new PopulationWriter(multPop, scn.getNetwork());
-		popWriter.write(outPlanFile);
-
-		//write a sample
-		popWriter = new PopulationWriter(new FirstPlansExtractor().run(multPop),scn.getNetwork());
-		popWriter.write("../playgrounds/mmoyo/output/cadyts/samplePlans.xml") ;
-
+		popWriter= new PopulationWriter(multPop, net);
+		//popWriter.write("../playgrounds/mmoyo/output/tmp/w6.0d0.0t1200.0_w10.0d0.0t240.0_w8.0d0.5t720.0_ver2_NoCLONES.xml.gz");
+		//popWriter.write("../playgrounds/mmoyo/output/cadyts/w10d0.0t1020_w10d0.4t60_w8d0.0t900_NOCLONS.xml.gz");
+		popWriter.write("../playgrounds/mmoyo/output/tmp/w10d0.0t1020_w10d0.4t60_w8d0.0t900_w10d0.2t780_w6d0.7t540_w8d0.4t60_NoClons.xml.gz");
 		
+		//write a sample
+		popWriter = new PopulationWriter(new FirstPlansExtractor().run(multPop), net);
+		popWriter.write("../playgrounds/mmoyo/output/cadyts/samplePlans.xml") ;
 	}
 
 }

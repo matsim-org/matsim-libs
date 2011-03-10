@@ -32,22 +32,24 @@ public class RouteStopGraphs {
 	private TransitSchedule schedule;
 	private final Counts counts;
 	private final String outputDir;
+	private final String str_itNum;
 	
-	public RouteStopGraphs(final String kmzFile, final TransitSchedule schedule, final Counts counts){
+	public RouteStopGraphs(final String kmzFilePath, final TransitSchedule schedule, final Counts counts){
 		this.schedule= schedule;
 		this.counts = counts;
 		
 		//set zipFile and output dir
 		try {
-			this.zipFile = new ZipFile(kmzFile);
+			this.zipFile = new ZipFile(kmzFilePath);
 		} 
 		catch(IOException e) {
 			e.printStackTrace();
 		}
 		
-		File outDirFile = new File(kmzFile);
-		this.outputDir = outDirFile.getParent() + outDirFile.separatorChar;
-		outDirFile = null;
+		File kmzFile = new File(kmzFilePath);
+		this.outputDir = kmzFile.getParent() + kmzFile.separatorChar;
+		this.str_itNum= "it" + kmzFile.getName().substring(0, kmzFile.getName().indexOf(".")) + "_"; 
+		kmzFile = null;
 	}
 	
 	private void createRouteGraph(final String strRouteId) throws IOException{
@@ -100,7 +102,7 @@ public class RouteStopGraphs {
 		}
 		graphics.dispose();
 
-		File outputFile = new File(this.outputDir + strRouteId + type + png);
+		File outputFile = new File(this.outputDir + this.str_itNum + strRouteId + type + png);
 		ImageIO.write(bufferedImage,"png", outputFile);
 		System.out.print("done.");
 	}
@@ -109,7 +111,7 @@ public class RouteStopGraphs {
 		final String scheduleFile = "../shared-svn/studies/countries/de/berlin-bvg09/pt/nullfall_berlin_brandenburg/input/pt_transitSchedule.xml.gz";
 		final String networkFile = "../shared-svn/studies/countries/de/berlin-bvg09/pt/nullfall_berlin_brandenburg/input/network_multimodal.xml.gz";
 		final String occupCountFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/lines344_M44/counts/chen/counts_occupancy_M44_344.xml";
-		final String kmzFile = "../playgrounds/mmoyo/output/routeAnalysis/scoreOff/TransMOD/500.ptBseCountscompare.kmz";
+		final String kmzFile = "../playgrounds/mmoyo/output/tmp/500.ptBseCountscompare.kmz";
 		
 		DataLoader dataLoader = new DataLoader();
 		TransitSchedule schedule = dataLoader.readTransitSchedule(networkFile, scheduleFile);
@@ -118,10 +120,10 @@ public class RouteStopGraphs {
 		
 		//make bus line M44 routes
 		try {
-			routeStopGraphs.createRouteGraph("B-M44.102.901.H");
-			routeStopGraphs.createRouteGraph("B-M44.102.901.R"); 
 			routeStopGraphs.createRouteGraph("B-M44.101.901.H"); 
-			routeStopGraphs.createRouteGraph("B-M44.101.901.R"); 
+			//routeStopGraphs.createRouteGraph("B-M44.101.901.R");
+			//routeStopGraphs.createRouteGraph("B-M44.102.901.H");
+			//routeStopGraphs.createRouteGraph("B-M44.102.901.R"); 
 		} catch (IOException e) {
 			e.printStackTrace();
 		}    

@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * NonSelectedPlansRemover.java
+ * PlanCounter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,52 +17,51 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
 package playground.mmoyo.utils;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collection;
-
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.network.NetworkImpl;
- /**
-  *filters all plans leaving only the selected ones
-  * @author manuel
-  */
-public class NonSelectedPlansRemover {
+import org.apache.log4j.Logger;
+import java.util.Map;
+import java.util.TreeMap;
 
-	public void run(Population population){
-		for (Person person : population.getPersons().values()){
-			Collection <Plan> selectedPlanList = new ArrayList<Plan>();
-			selectedPlanList.add(person.getSelectedPlan());
-			person.getPlans().retainAll(selectedPlanList);
+public class PlanCounter {
+	private final static Logger log = Logger.getLogger(PlanCounter.class);
+	
+	/**
+	 * Counts the number of plan per agent
+	 */
+	public void run(final Population pop){
+		Map <Integer, Integer> numPlansMap = new TreeMap <Integer, Integer>();
+		for(Person person : pop.getPersons().values()){
+			int numPlans = person.getPlans().size(); 
+			
+			if (numPlansMap.containsKey(numPlans)){
+				numPlansMap.put(numPlans, numPlansMap.get(numPlans)+1 );
+			}else{
+				numPlansMap.put(numPlans, 1);
+			}
 		}
+		
+		for(Map.Entry <Integer,Integer> entry: numPlansMap.entrySet() ){
+			int key = entry.getKey(); 
+			int value = entry.getValue();
+			final String SEP = " ";
+			log.info(key + SEP + value );
+		}
+		
 	}
-
+	
 	public static void main(String[] args) {
-		String PopFilePath;
-		String NetFilePath;
-		
-		if (args.length==2){
-			PopFilePath = args[0];
-			NetFilePath = args[1];
+		String popFilePath;
+		if(args.length==0){
+			popFilePath = "../playgrounds/mmoyo/output/cadyts/w6d0t1200_w10d0t240_w8d0.5t720_w10d0t1020_w10d0.4t60_w8d0t900_WITHHOME.xml.gz"; 
 		}else{
-			PopFilePath = "../path";
-			NetFilePath = "../path";
+			popFilePath = args[0];
 		}
-
-		DataLoader dLoader = new DataLoader();
-		
-		Population population = dLoader.readPopulation(PopFilePath);
-		new NonSelectedPlansRemover().run(population);
-		NetworkImpl net = dLoader.readNetwork(NetFilePath);
-		
-		String outputFile = new File(PopFilePath).getParent() + File.separatorChar + "PopulationOnlySelectedPlans.xml"; 
-		System.out.println("writing output plan file..." + outputFile);
-		new PopulationWriter(population, net).write(outputFile);
+			
+		Population pop = new DataLoader().readPopulation(popFilePath);	
+		new PlanCounter().run(pop);
 	}
+
 }

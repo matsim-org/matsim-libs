@@ -21,11 +21,13 @@
 package playground.mmoyo.analysis.comp;
 
 import java.io.File;
+
 import java.io.FileNotFoundException;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.controler.Controler;
+
 /**
  * @author manuel
  * 
@@ -52,7 +54,6 @@ public class Controler_launcher {
 
 		Controler controler = new Controler( config ) ;
 		controler.setCreateGraphs(true);
-		controler.setOverwriteFiles(true);
 		controler.setWriteEventsInterval(5); 
 		
 		controler.run();

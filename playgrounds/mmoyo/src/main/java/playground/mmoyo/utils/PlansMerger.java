@@ -1,21 +1,19 @@
 package playground.mmoyo.utils;
 
+import java.io.File;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.api.experimental.ScenarioLoaderFactoryImpl;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.PlanImpl;
 
 import playground.mmoyo.utils.calibration.PlanScoreRemover;
 
@@ -85,62 +83,62 @@ public class PlansMerger {
 	
 	
 	/**
-	 * This method merges the population by adding repeated agents as new plans (only selected plans) 
-	 * 
+	 * This method merges the population by adding repeated agents as new plans (it considers only selected plans) 
 	 */
-	//Assuming that all given plans share all their agents. The first occurrence will we defined as selected plans, the next ones are non selected plans
-	//the first argument must be a config file with the base population and network
-	//the next arguments are only the next population files
-	public Population plansAggregator (String[] populationsFiles){
-		Population popBase = new DataLoader().readPopulation(populationsFiles[0]);
+	public Population plansAggregator (final Population [] popArray){
+		Population popBase = popArray[0];
 		
-		new PlanScoreRemover().run(popBase);
-		
-		for (int i=1; i<populationsFiles.length; i++){
-			DataLoader dataLoader2 = new DataLoader();
-			Population population2 = dataLoader2.readPopulation(populationsFiles[i]);
-			
-			new PlanScoreRemover().run(population2);
-			
+		for (int i=1; i<popArray.length; i++){
+			Population population2 = popArray[i];
 			for (Person person2 : population2.getPersons().values()) {
+				Person person;
 				if (popBase.getPersons().containsKey(person2.getId())){
-					Person person = popBase.getPersons().get(person2.getId());
-					Plan newPlan  = new PlanImpl(person); 
-					//newPlan.setScore(person2.getSelectedPlan().getScore());
-					for (PlanElement pe : person2.getSelectedPlan().getPlanElements()){
-						if (pe instanceof Activity){
-							newPlan.addActivity((Activity)pe);		
-						}else{
-							newPlan.addLeg((Leg)pe);
-						}
-					}
-					person.addPlan(newPlan);
-					if (newPlan.isSelected()){
-						System.out.println("this plan should not be selected");
-					}
+					person = popBase.getPersons().get(person2.getId());
+					person.addPlan(person2.getSelectedPlan());
 				}else{
 					popBase.addPerson(person2);
 				}
+
 			}
 		}
 		return popBase;
-		
+	}
+	
+	/**read an array of population files and return an array of Populations
+	 * scores are removed, only non-selected plans are removed
+	 * */
+	public Population plansAggregator (final String[] populationsFiles){
+		Population[] popArray = new Population[populationsFiles.length];
+		           
+		DataLoader dLoader = new DataLoader();
+		PlanScoreRemover planScoreRemover = new PlanScoreRemover();
+		NonSelectedPlansRemover nonSelectedPlansRemover = new NonSelectedPlansRemover();
+		for (int i=0; i<populationsFiles.length; i++){
+			Population pop = dLoader.readPopulation(populationsFiles[i]);
+			planScoreRemover.run(pop);
+			nonSelectedPlansRemover.run(pop);
+			popArray[i]= pop;
+		}
+		dLoader= null;
+		planScoreRemover = null;
+		nonSelectedPlansRemover = null;
+		return plansAggregator (popArray);
 	}
 	
 	public static void main(String[] args) {
-		String config = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/calibration/100plans_bestValues_config.xml";
-		Scenario scenario =   new DataLoader().loadScenario(config);
-		String [] plansArray = new String[3];
-		plansArray[0]="../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/calibration/inputPlans/NOSCOREoutputrieserRoutedPlan.xml.gz";
-		plansArray[1]="../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/calibration/inputPlans/NOSCOREroutedPlan_walk6.0_dist0.7_tran240.0.xml.gz";
-		plansArray[2]="../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/calibration/inputPlans/NOSCOREplan_walk4.0_dist0.0_tran1020.0.xml.gz";
-		Population mergedPop = new PlansMerger().plansAggregator(plansArray);
+		String [] popFilePathArray = new String[3];
+		popFilePathArray[0]="I:/z_Runs/";
+		popFilePathArray[1]="I:/z_Runs/";
+		popFilePathArray[2]="I:/z_Runs/";
+		PlansMerger plansMerger = new PlansMerger();
+		Population mergedPop = plansMerger.plansAggregator(popFilePathArray);
 		
-		//write population
-		String outputFile = scenario.getConfig().controler().getOutputDirectory() + "mergedPlans.xml";		
+		//write population in same Directory
+		String outputFile = new File(popFilePathArray[0]).getParent() + File.separatorChar + "mergedPlans.xml";		
 		System.out.println("writing output merged plan file..." +  outputFile);
-		PopulationWriter popwriter = new PopulationWriter(mergedPop, scenario.getNetwork());
-		popwriter.write(outputFile);
+		String netFilePath = "../shared-svn/studies/countries/de/berlin-bvg09/pt/nullfall_berlin_brandenburg/input/network_multimodal.xml.gz";
+		NetworkImpl net =   new DataLoader().readNetwork(netFilePath);
+		new PopulationWriter(mergedPop, net).write(outputFile);
 		System.out.println("done");		
 	}
 }

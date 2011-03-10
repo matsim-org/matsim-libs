@@ -171,13 +171,13 @@ public class PtBseOccupancyAnalyzer implements PersonEntersVehicleEventHandler,
 		final String oc = "oc";
 		final String sim = "scalSim";
 		final String sep = "-";
-		final String tab = "\t";
-		final String lnCr = "\n";
+		final char CHR_HT = '\t';
+		final char CHR_NL = '\n';
 		StringBuffer countValBuff = new StringBuffer("stopId\t");
 		StringBuffer simValBuff = new StringBuffer();
 		for (int i = 0; i < 24; i++) {
-			countValBuff.append(oc + i + sep + (i + 1) + tab);
-			simValBuff.append(sim + i + sep + (i + 1) + tab);
+			countValBuff.append(oc + i + sep + (i + 1) + CHR_HT);
+			simValBuff.append(sim + i + sep + (i + 1) + CHR_HT);
 		}
 		countValBuff.append(simValBuff.toString()  + "coordinate\tcsId\n");
 		writer.write(countValBuff.toString());
@@ -196,13 +196,13 @@ public class PtBseOccupancyAnalyzer implements PersonEntersVehicleEventHandler,
 			if (ocuppancy == null) {
 				//log.debug("stopId:\t" + stopId + "\tthere aren't passengers in Bus after the transfer!");
 			}
-			countValBuff = new StringBuffer(stopId + tab);
+			countValBuff = new StringBuffer(stopId.toString() + CHR_HT);
 			simValBuff = new StringBuffer();	
 			for (int i = 0; i < 24; i++) {
-				countValBuff.append(count.getVolume(i+1).getValue() + tab);
-				simValBuff.append((ocuppancy != null ? ocuppancy[i]: 0) + tab);
+				countValBuff.append(count.getVolume(i+1).getValue() + CHR_HT);
+				simValBuff.append((ocuppancy != null ? ocuppancy[i]: 0) + CHR_HT);
 			}
-			countValBuff.append(simValBuff.toString() + count.getCoord().toString() + tab + count.getCsId() + lnCr);
+			countValBuff.append(simValBuff.toString() + count.getCoord().toString() + CHR_HT + count.getCsId() + CHR_NL);
 			writer.write(countValBuff.toString());
 			
 			countValBuff= null;	

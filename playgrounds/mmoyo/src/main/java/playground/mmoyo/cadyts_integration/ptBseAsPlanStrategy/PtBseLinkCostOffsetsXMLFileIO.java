@@ -32,13 +32,12 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import cadyts.utilities.misc.DynamicDataXMLFileIO;
 
-/** @author yu */
-class PtBseLinkCostOffsetsXMLFileIO extends DynamicDataXMLFileIO</*Link*/TransitStopFacility> {
-	/***/
+public class PtBseLinkCostOffsetsXMLFileIO extends DynamicDataXMLFileIO<TransitStopFacility> {
+
 	private static final long serialVersionUID = 1L;
-	private TransitSchedule schedule; 
+	private final TransitSchedule schedule; 
 	
-	PtBseLinkCostOffsetsXMLFileIO(TransitSchedule schedule) {
+	public PtBseLinkCostOffsetsXMLFileIO(final TransitSchedule schedule) {
 		super();
 		this.schedule = schedule;
 	}
@@ -46,7 +45,7 @@ class PtBseLinkCostOffsetsXMLFileIO extends DynamicDataXMLFileIO</*Link*/Transit
 	String strAttrValue2key = "-----attrValue2key------:\t";
 	String strStop = "stop :\t";
 	@Override
-	protected TransitStopFacility attrValue2key(String stopId) {
+	protected TransitStopFacility attrValue2key(final String stopId) {
 		System.out.println(strAttrValue2key + stopId);
 		TransitStopFacility stop = this.schedule.getFacilities().get(new IdImpl(stopId));
 		System.out.println(strStop + stop);
@@ -54,7 +53,7 @@ class PtBseLinkCostOffsetsXMLFileIO extends DynamicDataXMLFileIO</*Link*/Transit
 	}
 	
 	@Override
-	protected String key2attrValue(/*Link*/TransitStopFacility key) {
+	protected String key2attrValue(final TransitStopFacility key) {
 		return key.getId().toString();
 	}
 

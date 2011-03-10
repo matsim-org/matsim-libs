@@ -1,5 +1,6 @@
 package playground.mmoyo.utils;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
@@ -71,6 +72,29 @@ public class PlanFragmenter {
 		return newPopulation;
 	}
 
+	
+	/**
+	* converts all plans into new "persons", each with new suffix in Id 
+	*/
+	public Population plans2Persons (Population population){
+		PopulationImpl outputPopulation = new PopulationImpl(new ScenarioImpl());
+		final String SEP = "_";
+		for (Person person : population.getPersons().values() ){
+			int suffix = 1;
+			for (Plan plan : person.getPlans()){
+				Id newId = new IdImpl(person.getId().toString()+ SEP + suffix);
+				
+				Person newPerson = new PersonImpl(newId);
+				newPerson.addPlan(plan);
+				outputPopulation.addPerson(newPerson);
+				
+				suffix++;
+			}
+		}
+		return outputPopulation;
+	}
+	
+	
 	public static void main(String[] args) {
 		String populationFile = "../playgrounds/mmoyo/output/merge/routedPlan_walk10.0_dist0.6_tran1020.0.xml.gz";
 		populationFile = "../playgrounds/mmoyo/output/alltest/routedPlanplans1.xml";

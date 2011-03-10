@@ -65,7 +65,6 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 //import playground.mmoyo.cadyts_integration.ptBseAsPlanStrategy.analysis.PtBseOccupancyAnalyzer;
 import playground.mmoyo.cadyts_integration.ptBseAsPlanStrategy.analysis.PtBseCountsComparisonAlgorithm;
 import playground.mmoyo.cadyts_integration.ptBseAsPlanStrategy.analysis.PtBseOccupancyAnalyzer;
-import playground.mmoyo.utils.DataLoader;
 import cadyts.interfaces.matsim.MATSimUtilityModificationCalibrator;
 import cadyts.measurements.SingleLinkMeasurement;
 import cadyts.measurements.SingleLinkMeasurement.TYPE;
@@ -130,20 +129,22 @@ public class NewPtBsePlanStrategy implements PlanStrategy,
 		// NOTE: The coupling between calibrator and simResults is done in "reset".
 
 		//read occup counts from file
-		String occupancyCountsFilename = this.controler.getConfig().findParam("ptCounts", "inputOccupancyCountsFile");
+		//String occupancyCountsFilename = this.controler.getConfig().findParam("ptCounts", "inputOccupancyCountsFile"); //better read it from config object like below
+		String occupancyCountsFilename = this.controler.getConfig().ptCounts().getOccupancyCountsFileName();
 		if (occupancyCountsFilename != null) {
 			new MatsimCountsReader(this.occupCounts).readFile(occupancyCountsFilename);
 		}
-		countsScaleFactor = Double.parseDouble(this.controler.getConfig().getParam("ptCounts", "countsScaleFactor"));
+		//countsScaleFactor = Double.parseDouble(this.controler.getConfig().ptCounts().getCountsScaleFactor() //better read it from config object like below
+		countsScaleFactor = this.controler.getConfig().ptCounts().getCountsScaleFactor();
 
 		controler.getScenario().addScenarioElement(this.occupCounts) ;
 	}
 
 	
-	
+	final String STR_LINKOFFSETFILE = "linkCostOffsets.xml";
 	@Override
 	public void reset(int iteration) {
-		String filename = this.controler.getControlerIO().getIterationFilename(iteration, "linkCostOffsets.xml") ;
+		String filename = this.controler.getControlerIO().getIterationFilename(iteration, STR_LINKOFFSETFILE) ;
 
 		//show in log the results of sim volumes
 		//System.out.println( "resultsContainer.toString() " +  simResults.toString() ) ;
@@ -153,8 +154,9 @@ public class NewPtBsePlanStrategy implements PlanStrategy,
 
 		// the remaining material is, in my view, "just" output:
 		try {
-			DynamicData</*Link*/TransitStopFacility> linkCostOffsets = this.calibrator.getLinkCostOffsets();
-			new PtBseLinkCostOffsetsXMLFileIO( this.controler.getScenario().getTransitSchedule() ).write( filename , linkCostOffsets);
+			PtBseLinkCostOffsetsXMLFileIO ptBseLinkCostOffsetsXMLFileIO = new PtBseLinkCostOffsetsXMLFileIO( this.controler.getScenario().getTransitSchedule() );
+			ptBseLinkCostOffsetsXMLFileIO.write( filename , this.calibrator.getLinkCostOffsets());
+			ptBseLinkCostOffsetsXMLFileIO = null;
 		}catch(IOException e) {
 			e.printStackTrace();
 		}
@@ -282,7 +284,8 @@ public class NewPtBsePlanStrategy implements PlanStrategy,
 			{
 				final String useBruteForceStr = config.findParam(NewPtBsePlanStrategy.BSE_MOD_NAME, "useBruteForce");
 				if (useBruteForceStr != null) {
-					final boolean useBruteForce = new Boolean(useBruteForceStr).booleanValue();
+					//This uses Boolean Instantiation!! -> final boolean useBruteForce = new Boolean(useBruteForceStr).booleanValue();
+					final boolean useBruteForce = Boolean.parseBoolean(useBruteForceStr);
 					System.out.println("BSE:\tuseBruteForce\t= " + useBruteForce);
 					matsimCalibrator.setBruteForce(useBruteForce);
 				}

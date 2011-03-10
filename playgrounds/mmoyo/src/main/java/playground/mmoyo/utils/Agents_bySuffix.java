@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 /**
- *  List agents whose is start with a given criterion 
+ *  List agents whose id start with a given criterion 
  */
 public class Agents_bySuffix {
 	private final Population population;

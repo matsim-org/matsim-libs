@@ -21,7 +21,7 @@ public class CountsReader {
 	String countsTextFile;
 	Map <Id, Map <String,double[] >> count = new TreeMap <Id, Map<String, double[]>>();  //TODO : make Map <Id, Map <double[24][2] >> 
 	
-	public CountsReader(String countsTextFile){
+	public CountsReader(final String countsTextFile){
 		this.countsTextFile = countsTextFile;
 		readValues();
 	}
@@ -58,11 +58,15 @@ public class CountsReader {
 	    }
 	}
 	
-	/**
-	 * @param stopId
-	 * @param simValues true returns the real count values , false return the simulation values
-	 */
-	public double[]getRoutValues(final Id stopId, final boolean simValues){ 
+	public double[]getStopSimCounts(final Id stopId){ 
+		return getStopValues(stopId, true);
+	}
+	
+	public double[]getStopCounts(final Id stopId){ 
+		return getStopValues(stopId, false);
+	}
+	
+	private double[]getStopValues(final Id stopId, final boolean simValues){ 
 		double[] valueArray = new double[24];      
 		for (byte i= 0; i<24 ; i++)   {  
 			String hour = String.valueOf(i+1);
@@ -77,29 +81,29 @@ public class CountsReader {
 		return valueArray;
 	}
 	
-	
-	/**
-	 * returns the volumes per hour
-	 * @param simValues true returns the real count values , false return the simulation values
-	 */
-	public double[]getVolumeValues(final boolean simValues){ 
-		double[] volume = new double[24];      
-		for (Map <String,double[]> values : count.values()){
-			for (double[] values2 : values.values()){
-				for (byte i= 0; i<24 ; i++)   {  
-					volume[i] = values2[simValues?1:0];    // simValues?1:0   converts from boolean into integer: //0 = countValue   1 = simValue(scaled)
-				}
-			}
-		}
-		return volume;
-	}
-	
-	
 	/**
 	 * @return returns a id set of stops listed in the text file 
 	 */
 	public Set<Id> getStopsIds(){
 		return count.keySet();
+	}
+	
+	public static void main(String[] args) {
+		String tabConfigFile;
+		if(args.length == 1){
+			tabConfigFile = args[0];
+		}else{
+			tabConfigFile ="../playgrounds/mmoyo/output/cadyts_onlyM44counts/ITERS/it.10/10.simCountCompareOccupancy.txt";
+		}
+			
+		CountsReader countReader = new CountsReader(tabConfigFile);
+		Id stopId = new IdImpl("812550.1");
+		for (double d : countReader.getStopSimCounts(stopId)){
+			System.out.println(d);	
+		}
+		
+		
+		
 	}
 	
 }

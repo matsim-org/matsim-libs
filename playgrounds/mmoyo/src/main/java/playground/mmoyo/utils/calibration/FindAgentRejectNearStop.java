@@ -40,6 +40,7 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.run.OTFVis;
 
 import playground.mmoyo.utils.DataLoader;
+import playground.mmoyo.utils.NonSelectedPlansRemover;
 import playground.mmoyo.utils.PlanFragmenter;
 
 /**Finds agents near a station who do not use that station. Optional by mode: pt, car or pt+car*/ 
@@ -81,7 +82,7 @@ public class FindAgentRejectNearStop {
 		}*/
 
 		//fragment plans
-		Population fragPop = scn.getPopulation(); //new PlanFragmenter().run(scn.getPopulation());					
+		Population fragPop = new PlanFragmenter().run(scn.getPopulation());					
 		
 		//look for persons who use stations around the given stop
 		final String ptInteraction = "pt interaction";
@@ -92,11 +93,11 @@ public class FindAgentRejectNearStop {
 					Activity act = (Activity)pe;
 					if (nearNodesCoord.contains(act.getCoord())){
 						if (act.getType().equals(ptInteraction)){
-							if (!act.getCoord().equals(stopCoord)){  
+							//if (!act.getCoord().equals(stopCoord)){     //use or not use the station!
 								if ( !outputPopulation.getPersons().containsKey(person.getId())  ){
 									outputPopulation.addPerson(person);	
 								}
-							}
+							//}
 						}
 					}
 				}
@@ -104,6 +105,8 @@ public class FindAgentRejectNearStop {
 		}
 		System.out.println("persons around area: " +  outputPopulation.getPersons().size());
 		
+		//remove non selected plans
+		new NonSelectedPlansRemover().run(outputPopulation);
 		return outputPopulation;	
 	}
 	
@@ -115,7 +118,7 @@ public class FindAgentRejectNearStop {
 		//write new population and config files 
 		String outPopFile = writePopulation (pop,strStopId );
 		this.scn.getConfig().setParam("plans", "inputPlansFile", outPopFile);
-		String outConfig = this.scn.getConfig().getParam("controler", "outputDirectory") + "config_avoid_" + strStopId + this.type + ".xml";
+		String outConfig = this.scn.getConfig().controler().getOutputDirectory() + "config_avoid_" + strStopId + this.type + ".xml";
 		new ConfigWriter(this.scn.getConfig()).write(outConfig);
 
 		//set data containers to null, the OTFVis may need that memory space
@@ -132,7 +135,7 @@ public class FindAgentRejectNearStop {
 	
 	//writes the population file in the output directory of config
 	private String writePopulation(Population population, String fileName){
-		String outputFile = this.scn.getConfig().getParam("controler", "outputDirectory")+ "persAvoid_" +  fileName + "_" + this.type + ".xml";
+		String outputFile = this.scn.getConfig().controler().getOutputDirectory()+ "persAvoid_" +  fileName + "_" + this.type + ".xml";
 		System.out.println("writing output plan file..." + outputFile);
 		PopulationWriter popwriter = new PopulationWriter(population, this.scn.getNetwork());
 		popwriter.write(outputFile) ;
@@ -146,13 +149,13 @@ public class FindAgentRejectNearStop {
 		String configFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/calibration/100plans_bestValues_config.xml";
 				
 		String [] badStopsArray = {"812020.3", "812550.1", "812030.1", "812560.1" , "812570.1", "812013.1" };
-		double distance = 500.0;
+		double distance = 1000.0;
 		final String type =  "pt";   //options:  "pt" , "car"  "pt+car"
 		
 		ScenarioImpl scenario = new DataLoader().loadScenario(configFile);
 		FindAgentRejectNearStop agentsNearStop = new FindAgentRejectNearStop(scenario, distance, type);
-		//agentsNearStop.writePlan(badStopsArray[0]);                
-		agentsNearStop.playAvoidingPopulation(badStopsArray[0]);    
+		agentsNearStop.writePlan(badStopsArray[1]);                
+		//agentsNearStop.playAvoidingPopulation(badStopsArray[1]);    
 	}
 
 }

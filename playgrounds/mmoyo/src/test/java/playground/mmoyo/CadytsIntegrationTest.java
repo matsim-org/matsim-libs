@@ -160,26 +160,26 @@ public class CadytsIntegrationTest extends MatsimTestCase {
 		Id stopId;
 		
 		stopId= new IdImpl("stop1");
-		simValues = reader.getRoutValues(stopId, true);
-		realValues= reader.getRoutValues(stopId, false);
+		simValues = reader.getStopSimCounts(stopId);
+		realValues= reader.getStopCounts(stopId);
 		Assert.assertEquals("Volume of hour 6 is wrong", simValues[6], 4.0 , MatsimTestUtils.EPSILON);
 		Assert.assertEquals("Volume of hour 6 is wrong", realValues[6], 4.0 , MatsimTestUtils.EPSILON);
 
 		stopId= new IdImpl("stop2");
-		simValues = reader.getRoutValues(stopId, true);
-		realValues= reader.getRoutValues(stopId, false);
+		simValues = reader.getStopSimCounts(stopId);
+		realValues= reader.getStopCounts(stopId);
 		Assert.assertEquals("Volume of hour 6 is wrong", simValues[6], 1.0 , MatsimTestUtils.EPSILON);
 		Assert.assertEquals("Volume of hour 6 is wrong", realValues[6], 1.0 , MatsimTestUtils.EPSILON);
 
 		stopId= new IdImpl("stop6");
-		simValues = reader.getRoutValues(stopId, true);
-		realValues= reader.getRoutValues(stopId, false);
+		simValues = reader.getStopSimCounts(stopId);
+		realValues= reader.getStopCounts(stopId);
 		Assert.assertEquals("Volume of hour 6 is wrong", simValues[6], 2.0 , MatsimTestUtils.EPSILON);
 		Assert.assertEquals("Volume of hour 6 is wrong", realValues[6], 2.0 , MatsimTestUtils.EPSILON);
 
 		stopId= new IdImpl("stop10");
-		simValues = reader.getRoutValues(stopId, true);
-		realValues= reader.getRoutValues(stopId, false);
+		simValues = reader.getStopSimCounts(stopId);
+		realValues= reader.getStopCounts(stopId);
 		Assert.assertEquals("Volume of hour 6 is wrong", simValues[6], 1.0 , MatsimTestUtils.EPSILON);
 		Assert.assertEquals("Volume of hour 6 is wrong", realValues[6], 1.0 , MatsimTestUtils.EPSILON);
 	

@@ -20,10 +20,12 @@
 
 package playground.mmoyo.utils;
 
+import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
@@ -36,7 +38,11 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser;
 
+//import com.sleepycat.je.log.FileReader;
+
 import playground.mmoyo.ptRouterAdapted.AdaptedLauncher;
+
+import java.io.FileReader;
 
 /**
  * routes a plan applying many different travel parameter values. Includes method to simulate all routed plans in a directory
@@ -61,18 +67,18 @@ public class AllrouteTest {
 	final String STR_NOPT = "\n No pt-legs in plan";
 	final String STR_CONFIG = "configFile.xml";
 	final String strGraphDir; 
-	final ScenarioImpl scn;
+	private ScenarioImpl scn;
 	
 	public AllrouteTest(final String configFile){
 		//load "template scenario" from config
 		this.configFile = configFile;
 		this.scn = new DataLoader().loadScenario(configFile);
-		this.outDir = this.scn.getConfig().getParam("controler", "outputDirectory");
+		this.outDir = this.scn.getConfig().controler().getOutputDirectory();
 	
 		//create graphs dir where graphs will be stored
 		this.strGraphDir = outDir + "graphs/";
 		File graphDir = new File(this.strGraphDir);
-		graphDir.mkdir();
+		//graphDir.mkdir();
 	} 
 	
 	private void routeAndSimulate()throws IOException{
@@ -199,12 +205,15 @@ public class AllrouteTest {
 					ConfigWriter configWriter = new ConfigWriter(this.scn.getConfig());
 					configWriter.write(tmpconfigFile); //maybe it would be a good idea to keep the config files?
 					
+					
+					
 					//simulate
 					Controler controler = new Controler( tmpconfigFile ) ;
 					controler.setCreateGraphs(false);
 					controler.setOverwriteFiles(true);
 					controler.run();
 					
+					/*
 					//get error graph
 					String kmzFile = tempOutDir + STR_COUNTPATH ;
 					KMZ_Extractor kmzExtractor = new KMZ_Extractor(kmzFile, strGraphDir);
@@ -221,12 +230,41 @@ public class AllrouteTest {
 					//erase complete run folder
 					File runFolder = new File(tempOutDir);
 					eraseDir(runFolder);
+					*/
 				}else{
 					log.warn(STR_NOPT);
 				}
 			}		
 		}
 	}
+	
+	private void simulateConfigs(final int ini, final int end) throws IOException{
+		this.scn = null;
+		
+		File configsDir = new File(this.outDir + "configs");
+		final String STR_CONF= "configFile.xml";
+		
+		if (configsDir.isDirectory()) {
+			String[] children = configsDir.list();	
+			
+			for (int i=ini; i<=end; i++) {
+				String configFileName= children[i];
+				
+				/////validate that this file ends with "configFile.xml" 
+				if (!configFileName.endsWith(STR_CONF)){
+					continue;
+				}
+				
+				//simulate
+				Controler controler = new Controler( this.outDir +  configFileName ) ;
+				controler.setCreateGraphs(false);
+				controler.setOverwriteFiles(true);
+				controler.run();
+			}		
+		}
+	}
+	
+	
 
 	/**
 	 * routes only a segment of all possible travel parameter combinations, to partition the complete work
@@ -261,6 +299,34 @@ public class AllrouteTest {
 	}
 	
 	
+	private void simConfigsInFile (final String configDirPath, final String missingRunsFile, int ini, int end){
+		List<String> missRuns = new ArrayList<String>();
+		try {
+		    BufferedReader in = new BufferedReader(new FileReader(missingRunsFile));
+		    String str;
+		    while ((str = in.readLine()) != null) {
+		    	missRuns.add(str);
+		    }
+		    in.close();
+		} catch (IOException e) {
+		}
+		
+		final String STR_CONF = "configFile.xml";
+		int i=1;
+		for (String s: missRuns){
+			if (i>=ini && i<=end ){
+				String configFile = configDirPath + s + STR_CONF;
+				Controler controler = new Controler( configFile) ;
+				controler.setCreateGraphs(false);
+				controler.setOverwriteFiles(true);
+				controler.run();
+			}
+			i++;
+		}
+		
+	}
+	
+	
 	public static void main(String[] args) throws IOException {
 		String configFile; 
 
@@ -276,16 +342,32 @@ public class AllrouteTest {
 			allrouteTest.routeRange(numPlans, segment);
 			*/
 
+			/*
 			final int ini = Integer.valueOf (args[1]);
 			final int end = Integer.valueOf (args[2]);
-			allrouteTest.simulatePlans(ini, end);
+			allrouteTest.simulateConfigs(ini, end);
+			*/
 
-		}else{	
+		}else if (args.length==5){
+			configFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/calibration/100plans_bestValues_config.xml";
+			
+			configFile = args[0];
+			AllrouteTest allrouteTest= new AllrouteTest(configFile);
+			
+			final String configsDir = args[1];
+			final String missingRuns = args[2];
+			final int ini = Integer.valueOf (args[3]);
+			final int end = Integer.valueOf (args[4]);
+			
+			allrouteTest.simConfigsInFile(configsDir, missingRuns, ini, end);
+			
+			/*
 			configFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/calibration/100plans_bestValues_config.xml";
 			final int ini = 0;
 			final int end = 3;
 			AllrouteTest allrouteTest= new AllrouteTest(configFile);
 			allrouteTest.simulatePlans(ini, end);
+			*/
 
 			/*
 			int numPlans = 80;
@@ -293,11 +375,15 @@ public class AllrouteTest {
 			AllrouteTest allrouteTest= new AllrouteTest(configFile);
 			allrouteTest.routeRange(numPlans, segment);
 			 */
+			
+			
 		}
 
+		/*
 		if (!new File(configFile).exists()) {
 			throw new FileNotFoundException(configFile);
 		}
+		*/
 		
 		//AllrouteTest allrouteTest= new AllrouteTest(configFile);
 		//allrouteTest.routeAndSimulate();

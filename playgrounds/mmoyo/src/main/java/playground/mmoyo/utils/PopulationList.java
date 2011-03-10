@@ -18,8 +18,11 @@ public class PopulationList {
 	}
 	
 	public void ListPersons(){
+		final String strEmpty= "";
 		for(Person person: this.population.getPersons().values()){
-			System.out.println(person.getId() +  SEPARATOR + Double.toString(person.getSelectedPlan().getScore()));
+			String str_score = strEmpty;
+			if (person.getSelectedPlan().getScore()!=null) str_score= Double.toString(person.getSelectedPlan().getScore());
+			System.out.println(person.getId()/* +  SEPARATOR + str_score*/);
 		}
 		System.out.println("Num of agents: " +  this.population.getPersons().size());
 	}
@@ -50,7 +53,7 @@ public class PopulationList {
 		if (args.length>0){
 			populationFile = args[0];
 		}else{
-			populationFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/calibration/bestValues_plans.xml.gz";	
+			populationFile = "../playgrounds/mmoyo/output/cadyts/w6.0d0.0t1200.0_w10.0d0.0t240.0_w8.0d0.5t720.0_ver2_NoCLONES.xml.gz";	
 		}
 		System.out.println("counting population for population file: " + populationFile);
 		Population population = new DataLoader().readPopulation(populationFile);

@@ -53,11 +53,15 @@ public class DataLoader {
 		ScenarioImpl scenario = new ScenarioImpl();
 		MatsimNetworkReader matsimNetReader = new MatsimNetworkReader(scenario);
 		matsimNetReader.readFile(networkFile);
-		return readTransitSchedule(scenario.getNetwork(), transitScheduleFile);
+		TransitSchedule schedule = readTransitSchedule(scenario.getNetwork(), transitScheduleFile);
+		scenario = null;
+		matsimNetReader = null;
+		return schedule;
 	}
 
 	public TransitSchedule readTransitSchedule(final NetworkImpl network, final String transitScheduleFile) {
-		TransitSchedule transitSchedule = new TransitScheduleFactoryImpl().createTransitSchedule();
+		TransitScheduleFactoryImpl transitScheduleFactoryImpl = new TransitScheduleFactoryImpl();
+		TransitSchedule transitSchedule = transitScheduleFactoryImpl.createTransitSchedule();
 		TransitScheduleReaderV1 transitScheduleReaderV1 = new TransitScheduleReaderV1(transitSchedule, network);
 		try {
 			transitScheduleReaderV1.readFile(transitScheduleFile);
@@ -68,6 +72,8 @@ public class DataLoader {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		transitScheduleFactoryImpl = null;
+		transitScheduleReaderV1 = null;
 		return transitSchedule;
 	}
 
@@ -75,7 +81,10 @@ public class DataLoader {
 		ScenarioImpl scenario = new ScenarioImpl();
 		MatsimNetworkReader matsimNetReader = new MatsimNetworkReader(scenario);
 		matsimNetReader.readFile(networkFile);
-		return scenario.getNetwork();
+		NetworkImpl network = scenario.getNetwork(); 
+		scenario = null;
+		matsimNetReader = null;
+		return network;
 	}
 
 	public Population readPopulation(final String populationFile){
@@ -84,6 +93,7 @@ public class DataLoader {
 		popReader.readFile(populationFile);
 		Population population = scenario.getPopulation();
 		scenario = null;
+		popReader = null;
 		return population;
 	}
 
@@ -113,6 +123,7 @@ public class DataLoader {
 		Counts counts = new Counts();
 		MatsimCountsReader matsimCountsReader = new MatsimCountsReader(counts);
 		matsimCountsReader.readFile(countFile);
+		matsimCountsReader = null;
 		return counts;
 	}
 

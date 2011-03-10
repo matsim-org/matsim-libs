@@ -46,6 +46,9 @@ class NewPtBsePlanChanger implements PlanSelector
 
 	private MATSimUtilityModificationCalibrator<TransitStopFacility> matsimCalibrator;
 
+	private final String STR_CURRCORR = "currPlanCadytsCorr: ";
+	private final String STR_OTHERCORR = " otherPlanCadytsCorr: ";
+	
 	NewPtBsePlanChanger(PtPlanToPlanStepBasedOnEvents ptStep, MATSimUtilityModificationCalibrator<TransitStopFacility> calib ) {
 		log.error( "value for beta currently ignored (set to one)") ;
 		this.ptPlanToPlanStep = ptStep ;
@@ -79,7 +82,7 @@ class NewPtBsePlanChanger implements PlanSelector
 		double otherScore = otherPlan.getScore().doubleValue() + otherPlanCadytsCorrection ;
 
 		if ( currentPlanCadytsCorrection != otherPlanCadytsCorrection) {
-			log.info( "currPlanCadytsCorr: " + currentPlanCadytsCorrection+ " otherPlanCadytsCorr: " + otherPlanCadytsCorrection) ;
+			log.info( STR_CURRCORR + currentPlanCadytsCorrection + STR_OTHERCORR + otherPlanCadytsCorrection) ;
 		}
 
 		double weight = Math.exp( 0.5 * this.beta * (otherScore - currentScore) );

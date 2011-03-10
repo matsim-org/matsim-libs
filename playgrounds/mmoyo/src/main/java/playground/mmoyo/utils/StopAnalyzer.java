@@ -4,6 +4,7 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -14,6 +15,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
+import java.util.zip.ZipInputStream;
 
 import javax.imageio.ImageIO;
 
@@ -93,11 +95,59 @@ public class StopAnalyzer {
 	    }
 	}
 	
-	public static void main(String[] args) throws IOException {
-		String itDir = "../ptManuel/cad_minTransRoutes/output/ITERS/";
-		int maxGraphsNum = 9;
-		String graphName = "812030.1o.png"; //"errorGraphErrorBiasOccupancy.png";  //"812550.1o.png";  //"errorGraphErrorBiasOccupancy.png"
+	/** This does not create a sequence graph, it just extract the same image of all iterations into a to a given output directory */
+	private void ExtractGraphs(final String imageName, final String outputDir){
+		File dir = new File(this.iterDir); 
+		String kmzPath = "/ITERS/it.10/10.ptcountscompare.kmz";
+		final String STR_PNG = ".png";
+		for (String combName : dir.list()){
+			String kmzFilePath = this.iterDir + combName + kmzPath;
+			try{
+				byte[] buffer = new byte[1024];
+		        ZipInputStream zipInputStream = new ZipInputStream(new FileInputStream(kmzFilePath));
+		        ZipEntry zipEntry = zipInputStream.getNextEntry();
+		        while (zipEntry != null) {
+		        	if (zipEntry.getName().equals(imageName)){
+		        		System.out.println("extracting: " + combName );		            		
+		            
+		        		FileOutputStream fileoutputstream;
+			            fileoutputstream = new FileOutputStream(outputDir + combName + STR_PNG);
+			            int i;
+			            while ((i = zipInputStream.read(buffer, 0, 1024)) > -1){
+			            	fileoutputstream.write(buffer, 0, i);
+			            }
+			            fileoutputstream.close(); 
+			            zipInputStream.closeEntry();
+		        	}
+		        	zipEntry = zipInputStream.getNextEntry();
+		        }
+				zipInputStream.close();
+			}catch (Exception e){
+				e.printStackTrace();
+		    }
+		}
+		/*
 		
-		new StopAnalyzer(itDir).createSequence(graphName , maxGraphsNum );
+		//get file 
+		String kmzFile = tempOutDir + STR_COUNTPATH ;
+		KMZ_Extractor kmzExtractor = new KMZ_Extractor(kmzFile, strGraphDir);
+		kmzExtractor.extractFile(STR_ERRGRAPHFILE);
+	
+		//rename it with the combination name
+		File file = new File(strGraphDir + STR_ERRGRAPHFILE);
+		File file2 = new File(strGraphDir + strCombination + STR_PNG);
+		if (!file.renameTo(file2)) {
+		*/
+	}
+	
+	
+	public static void main(String[] args) throws IOException {
+		String itDir = "I:/z_Runs/";
+		int maxGraphsNum = 9;
+		String graphName = "812550.1o.png"; //"812030.1o.png"; //"errorGraphErrorBiasOccupancy.png";  //"812550.1o.png";  //"errorGraphErrorBiasOccupancy.png"
+		String outDir = "C:/Users/omicron/Desktop/graphsBerlin5xb/"; 
+		
+		//new StopAnalyzer(itDir).createSequence(graphName , maxGraphsNum );
+		new StopAnalyzer(itDir).ExtractGraphs(graphName, outDir);
 	}
 }

@@ -80,6 +80,11 @@ public class PtBseCountsComparisonAlgorithm {
 	 * Creates the List with the counts vs sim values stored in the
 	 * countAttribute Attribute of this class.
 	 */
+	final String STR_NOVOLUMES = "No volumes for stop: ";
+	final String STR_STOPID = "StopId :\t";
+	final String STR_HEAD =  "\nhour\tsimVal\tscaledSimVal\tcountVal\n";
+	final char CHR_HT = '\t';
+	final char CHR_NL ='\n';
 	protected void compare() {
 		double countValue;
 		for (Count count : this.counts.getCounts().values()) {
@@ -92,16 +97,16 @@ public class PtBseCountsComparisonAlgorithm {
 			int[] volumes = this.getVolumesForStop(stopId);
 			// ------------------------^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 			if (volumes == null) {
-				log.warn("No volumes for stop: " + stopId);
+				log.warn(STR_NOVOLUMES + stopId);
 				continue;
 			} else /* volumes!=null */if (volumes.length == 0) {
-				log.warn("No volumes for stop: " + stopId);
+				log.warn(STR_NOVOLUMES + stopId);
 				continue;
 			}
 
-			this.content.append("StopId :\t");
+			this.content.append(STR_STOPID);
 			this.content.append(stopId.toString());
-			this.content.append("\nhour\tsimVal\tscaledSimVal\tcountVal\n");
+			this.content.append(STR_HEAD);
 
 			for (int hour = 1; hour <= 24; hour++) {
 				// real volumes:
@@ -109,20 +114,20 @@ public class PtBseCountsComparisonAlgorithm {
 				if (volume != null) {
 
 					this.content.append(hour);
-					this.content.append('\t');
+					this.content.append(CHR_HT);
 
 					countValue = volume.getValue();
 					double simValue = volumes[hour - 1];
 
 					this.content.append(simValue);
-					this.content.append('\t');
+					this.content.append(CHR_HT);
 
 					simValue *= this.countsScaleFactor;
 
 					this.content.append(simValue);
-					this.content.append('\t');
+					this.content.append(CHR_HT);
 					this.content.append(countValue);
-					this.content.append('\n');
+					this.content.append(CHR_NL);
 
 					this.countSimComp.add(new CountSimComparisonImpl(stopId,
 							hour, countValue, simValue));
