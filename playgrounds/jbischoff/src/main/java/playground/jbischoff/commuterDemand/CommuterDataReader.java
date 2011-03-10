@@ -76,6 +76,7 @@ public void readFile(String filename){
 		String currentFromName = null;
 		while ((line = br.readLine()) != null) {
 			    String[] result = line.split(";");
+			    try {
 			    if (!result[0].equals("")) {
 			    	currentFromCode = result[0];
 			    	currentFromName = result[1];
@@ -97,9 +98,12 @@ public void readFile(String filename){
 			    	current.setToName(currentToName);
 			    	this.CommuterRelations.add(current);
 			    	} catch (NumberFormatException n){
-			    		System.err.println("invalid line format, will skip this line: \n"+line);
+			    		log.error("invalid line format, will skip this line: \n"+line);
 			    	}
 			    	
+			    }}catch (ArrayIndexOutOfBoundsException ae){
+			    	log.error("Found possible dataless line , if not check: "+line);
+			    	continue;
 			    }
 	         
 			  

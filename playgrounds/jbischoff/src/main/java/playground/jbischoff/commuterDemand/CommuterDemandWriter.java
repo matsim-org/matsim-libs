@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * CommuterDemandWriter
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package playground.jbischoff.commuterDemand;
 
 import java.util.List;
@@ -24,7 +43,10 @@ import org.matsim.core.utils.misc.ConfigUtils;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
-
+/**
+ * @author jbischoff
+ *
+ */
 public class CommuterDemandWriter {
 	private static final Logger log = Logger.getLogger(CommuterDemandWriter.class);
 	private Map<String,Geometry> municipalityMap;
@@ -49,6 +71,7 @@ public class CommuterDemandWriter {
 	}
 	
 	public void writeDemand(String filename){
+		log.error("Watch out! This version of the demand generator turns the whole BA data into car commuters which isn't exactly accurate. Adjusting the CommuterDemandWriter --> Scalefactor to your needs might make sense.");
 		scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		population = scenario.getPopulation();
 		generatePopulation();
@@ -63,9 +86,9 @@ public class CommuterDemandWriter {
 				pnr++;
 			}
 			
-		log.info("Created ;"+ commuterDataElement.getCommuters() + "; commuters from "+commuterDataElement.getFromName()+" ("+commuterDataElement.getFromId()+") to "+commuterDataElement.getToName()+" ("+commuterDataElement.getToId()+")");
+		log.info("Created "+ commuterDataElement.getCommuters() + " commuters from "+commuterDataElement.getFromName()+" ("+commuterDataElement.getFromId()+") to "+commuterDataElement.getToName()+" ("+commuterDataElement.getToId()+")");
 		}
-		log.info("Created "+pnr+" commuters in total" );
+		log.info("Created "+pnr+" commuters in total." );
 	
 	}
 		
