@@ -37,9 +37,9 @@ public class Geocoder {
 	public static class Location {
 		public double lat, lon;
 
-		private Location (String lat, String lon) {
-			this.lat = Double.parseDouble(lat);
-			this.lon = Double.parseDouble(lon);
+		private Location (double lat, double lon) {
+			this.lat = lat;
+			this.lon = lon;
 		}
 
 		@Override
@@ -85,6 +85,8 @@ public class Geocoder {
 	    }
 	}
 	
+	// Format: 200,6,42.730070,-73.690570
+	private static Pattern _googleApiReply = Pattern.compile("([0-9]+),6,([0-9.+-]+),([0-9.+-]+)");
 
 	public static Location getLocation (String address) throws IOException {
 		BufferedReader in = new BufferedReader (new InputStreamReader (new URL ("http://maps.google.com/maps/geo?q="+URLEncoder.encode (address, ENCODING)+"&output=csv&key="+KEY).openStream ()));
@@ -93,9 +95,18 @@ public class Geocoder {
 		int statusCode = -1;
 		
 		while ((line = in.readLine ()) != null) {
-			// Format: 200,6,42.730070,-73.690570
-			statusCode = Integer.parseInt (line.substring (0, 3));
-			if (statusCode == 200) location = new Location (line.substring ("200,6,".length (), line.indexOf (',', "200,6,".length ())), line.substring (line.indexOf (',', "200,6,".length ())+1, line.length ()));
+			Matcher m = _googleApiReply.matcher(line);
+			
+			if (!m.matches())
+				continue;
+
+			statusCode = Integer.parseInt (m.group(1));
+			String lat = m.group(2);
+			String lon = m.group(3);
+			if (statusCode == 200) { 
+				location = new Location (Double.parseDouble(lon), Double.parseDouble(lat));
+				break;
+			}
 		}
 		
 		if (location == null) {
