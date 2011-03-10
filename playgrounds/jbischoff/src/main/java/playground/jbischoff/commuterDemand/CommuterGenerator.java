@@ -1,4 +1,4 @@
-package commuterDemand;
+package playground.jbischoff.commuterDemand;
 
 public class CommuterGenerator {
 

@@ -1,4 +1,4 @@
-package commuterDemand;
+package playground.jbischoff.commuterDemand;
 
 import java.io.BufferedReader;
 import java.io.File;

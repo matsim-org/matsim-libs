@@ -1,4 +1,4 @@
-package commuterDemand;
+package playground.jbischoff.commuterDemand;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;

@@ -43,7 +43,7 @@ import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsReader20;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsWriter20;
 import org.xml.sax.SAXException;
 
-import playground.joschka.lsacvs2kml.LinkConversionsData;
+import playground.jbischoff.lsacvs2kml.LinkConversionsData;
 
 
 public class SignalSystemsLinkConverter {

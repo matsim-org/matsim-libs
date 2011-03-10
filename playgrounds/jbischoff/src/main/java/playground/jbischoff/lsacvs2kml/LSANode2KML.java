@@ -1,86 +1,77 @@
-package playground.joschka.lsacvs2kml;
+package playground.jbischoff.lsacvs2kml;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.core.utils.misc.ConfigUtils;
 
-public class KMLTest  {
-	/**
-	 * @param args
-	 * @throws IOException 
-	 */
-   
 
+
+public class LSANode2KML {
 	
+	public static void main(String[] args){
 	
-	public static void main(String[] args) throws IOException {
 		
-		List<LSA> lsaliste = filetoSAList("/Users/JB/Documents/Work/lsa.txt");
 		
+		
+		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
+		new MatsimNetworkReader(scenario).readFile("/home/jbischoff/m44_344_big.xml");
+		List<LSA> ampelliste = new ArrayList<LSA>();
+		Map<Id,Node> nodeList = new HashMap<Id,Node>();
+		nodeList=network.getNodes();
 		CoordinateTransformation ct = 
-			TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84_UTM33N,TransformationFactory.WGS84);
-		for (LSA ampel:lsaliste){
-			Coord current = new CoordImpl(ampel.getXcord(),ampel.getYcord());
-			current=ct.transform(current);
-			ampel.setXcord(current.getX());
-			ampel.setYcord(current.getY());
+			TransformationFactory.getCoordinateTransformation(TransformationFactory.GK4,TransformationFactory.WGS84);
+		
+		for (Map.Entry<Id,Node> entry: nodeList.entrySet()){
+			LSA ampel = new LSA();
+			Node current = entry.getValue();
+			ampel.setLongName(current.getId().toString());
+			ampel.setShortName(current.getId().toString());
+			Coord kurt = new CoordImpl(current.getCoord());
+			kurt = ct.transform(kurt);
+			ampel.setXcord(kurt.getX());
+			ampel.setYcord(kurt.getY());
+			ampelliste.add(ampel);
 		}
-		
-	
-		
-
-	writeListtoXML(lsaliste,"/Users/JB/Documents/Work/lsa-berlin.kml");
-		
-		
-	}
-	
-	public static List<LSA> filetoSAList(String fn){
-		 String  filename;
-		FileReader fr;
-		BufferedReader br;
-		filename=fn;
-		List<LSA> lsalist = new ArrayList<LSA>();
-
 		try {
-			fr = new FileReader(new File (filename));
-			br = new BufferedReader(fr);
-			
-			String line = null;
-			while ((line = br.readLine()) != null) {
 				
-		         String[] result = line.split(";");
-		         LSA current = new LSA(result[0],result[1],Double.parseDouble(result[2]),Double.parseDouble(result[3]));
-		         lsalist.add(current);
-		
 			
-	 }}
-		
 			
-		 catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			System.err.println("File not Found...");
-			e.printStackTrace();
+			writeListtoXML(ampelliste,"/home/jbischoff/m44_344_big.kml");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		 return lsalist;
-		      }
+			
+		
 
+		
+		
+		
+		
+
+		
+	}
 	public static void writeListtoXML(List<LSA> lsaliste, String outputfile) throws IOException{
 		String out = outputfile;
 		List<LSA> lsalist = lsaliste;
@@ -120,7 +111,6 @@ public class KMLTest  {
 		
 		
 			}
-		
-		
-	
+
 }
+

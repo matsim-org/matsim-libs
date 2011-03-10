@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * LinkConversionData.java
+ * LinkConversionsData.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,30 +18,36 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.joschka.lsacvs2kml;
-
+package playground.jbischoff.lsacvs2kml;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 
-public class LinkConversionData {
-
+public class LinkConversionsData {
+	private Map<Id,Id> cdata;
 	private Id ssid;
-	Map<Id,Id> convmap;
+
+	public LinkConversionsData(Id ssid){
+		this.ssid=ssid;
+		cdata = new HashMap<Id,Id>();
+	}
+	
 	public Id getSsid() {
 		return ssid;
+	}	
+	
+	public Id getConv(Id olid){
+		if (cdata.get(olid)==null) {
+			System.out.println("Link "+olid +" not found, will let untouched");
+			return olid;
+		}
+		return cdata.get(olid);
 	}
-	public void setSsid(String ssid) {
-		this.ssid = new IdImpl(ssid);
-	}
-	public Map<Id, Id> getConvmap() {
-		return convmap;
+	public void setConv(Id old, Id newid){
+		cdata.put(old, newid);
 	}
 
-	
-		
-	
-	
 }
 

@@ -1,4 +1,4 @@
-package playground.joschka.lsacvs2kml;
+package playground.jbischoff.lsacvs2kml;
 
 public class LSA {
 	
