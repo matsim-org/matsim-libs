@@ -24,22 +24,17 @@ import java.util.HashMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
-import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkImpl;
 
-import playground.wrashid.PSF2.ParametersPSF2;
 import playground.wrashid.PSF2.vehicle.vehicleFleet.Vehicle;
 import playground.wrashid.lib.DebugLib;
 import playground.wrashid.lib.GeneralLib;
@@ -136,7 +131,14 @@ public class EnergyConsumptionPlugin implements LinkEnterEventHandler, LinkLeave
 		
 		double timeSpendOnLink= GeneralLib.getIntervalDuration(linkEnteranceTime, linkLeaveTime);
 		Link link = network.getLinks().get(linkId);
-		Vehicle vehicle=vehicles.getValue(personId);
+		
+		Vehicle vehicle;
+		if (vehicles.containsKey(personId)){
+			vehicle=vehicles.getValue(personId);
+		} else {
+			vehicle=vehicles.getValue(Vehicle.getPlaceholderForUnmappedPersonIds());
+		}
+		
 		Double energyConsumptionOnLink=energyConsumptionModel.getEnergyConsumptionForLinkInJoule(vehicle, timeSpendOnLink, link);
 		
 		energyConsumptionOfCurrentLeg.incrementBy(personId, energyConsumptionOnLink);
