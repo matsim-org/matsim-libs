@@ -65,7 +65,8 @@ public class EventWriterXML implements EventWriter, BasicEventHandler {
 
 	@Override
 	public void handleEvent(final Event event) {
-		StringBuilder eventXML = new StringBuilder("\t<event ");
+		StringBuilder eventXML = new StringBuilder(180);
+		eventXML.append("\t<event ");
 		Map<String, String> attr = event.getAttributes();
 		for (Map.Entry<String, String> entry : attr.entrySet()) {
 			eventXML.append(entry.getKey());
