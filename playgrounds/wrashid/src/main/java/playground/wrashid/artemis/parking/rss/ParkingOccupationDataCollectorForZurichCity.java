@@ -6,26 +6,40 @@ public class ParkingOccupationDataCollectorForZurichCity {
 
 	public static void main(String[] args) {
 		
-		printParkingNames();
+		//printParkingNames();
 		
 		System.out.println();
 		
 		while (true){
-			printParkingOccupancies();
+			//printParkingOccupancies();
+			printParkingOccupanciesDetails();
 			
 			try {
-				Thread.sleep(5000);
+				Thread.sleep(20000);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
 		
+	}
+
+	private static void printParkingOccupanciesDetails(){
+		RSSParser rssParser=new RSSParser("http://www.pls-zh.ch/plsFeed/rss");
 		
+		Date currentDateTime=new Date();
+		
+		for (int i=0;i<rssParser.itemCount();i++){
+			System.out.print(currentDateTime.toString() + "\t");
+			System.out.print(rssParser.getItem(i).getTitle()+"\t");
+			System.out.print(rssParser.getItem(i).getDescription()+"\t");
+			//System.out.print(rssParser.getItem(i).getURL() +"\t");
+			System.out.println();
+		}
 		
 		
 	}
-
+	
 	private static void printParkingOccupancies() {
 		RSSParser rssParser=new RSSParser("http://www.pls-zh.ch/plsFeed/rss");
 		
