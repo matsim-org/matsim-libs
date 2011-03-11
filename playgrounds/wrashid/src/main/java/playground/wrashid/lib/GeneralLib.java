@@ -692,4 +692,11 @@ public class GeneralLib {
 		}	
 	}
 	
+	public static int getTimeBinIndex(double time, double binSizeInSeconds) {
+
+		time=GeneralLib.projectTimeWithin24Hours(time);
+		
+		return Math.round((float) Math.floor(time / binSizeInSeconds));
+	}
+	
 }

@@ -69,16 +69,11 @@ public class ParkingOccupancyBins {
 	/**
 	 * return value is in [0,96)
 	 * 
-	 * 
-	 * 
 	 * @param time
 	 * @return
 	 */
 	public int getBinIndex(double time) {
-
-		time=GeneralLib.projectTimeWithin24Hours(time);
-		
-		return Math.round((float) Math.floor(time / 900.0));
+		return GeneralLib.getTimeBinIndex(time,900.0);
 	}
 
 }
