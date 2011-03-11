@@ -30,16 +30,17 @@ public class CommuterGenerator {
 		CommuterDataReader cdr = new CommuterDataReader();
 		cdr.addFilterRange(12071000);
 		cdr.addFilter("12052000");
-		cdr.readFile("/Users/JB/Documents/Work/brb/pendlerdaten_brb.csv");
+		cdr.readFile("C:\\Users\\Joschka Bischoff\\Documents\\Brandenburg\\CD_Pendler_Gemeindeebene_30_06_2009\\brandenburg_einpendler.csv");
 		
 		
 		MunicipalityShapeReader msr = new MunicipalityShapeReader();
 		msr.addFilter("12052000");
 		msr.addFilterRange(12071000);
-		msr.readShapeFile("/Users/JB/Documents/Work/brb/gemeinden/dlm_gemeinden.shp");
+		msr.readShapeFile("C:\\Users\\Joschka Bischoff\\Documents\\Brandenburg\\Gemeinden\\dlm_gemeinden.shp");
 		
 		CommuterDemandWriter cdw = new CommuterDemandWriter(msr.getShapeMap(),cdr.getCommuterRelations());
-		cdw.writeDemand("/Users/JB/Documents/Work/brb/demand.xml");
+		cdw.setScalefactor(1.0);//1.0 is default already
+		cdw.writeDemand("C:\\Users\\Joschka Bischoff\\Documents\\Brandenburg\\demand\\demand.xml");
 		
 	}
 
