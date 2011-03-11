@@ -69,11 +69,11 @@ public class PlansDumpingTest {
 		Controler c = new Controler(config);
 		c.setWriteEventsInterval(0);
 		c.setCreateGraphs(false);
-		
+
 		c.run();
-		
+
 		assertFalse(new File(c.getControlerIO().getIterationFilename(0, "plans.xml.gz")).exists());
-		assertTrue(new File(c.getControlerIO().getIterationFilename(1, "plans.xml.gz")).exists()); // it.1 is always written
+		assertFalse(new File(c.getControlerIO().getIterationFilename(1, "plans.xml.gz")).exists()); // it.1 is deactivated when interval = 0
 		assertFalse(new File(c.getControlerIO().getIterationFilename(2, "plans.xml.gz")).exists());
 		assertFalse(new File(c.getControlerIO().getIterationFilename(3, "plans.xml.gz")).exists());
 		assertFalse(new File(c.getControlerIO().getIterationFilename(4, "plans.xml.gz")).exists());
@@ -84,7 +84,7 @@ public class PlansDumpingTest {
 		assertFalse(new File(c.getControlerIO().getIterationFilename(9, "plans.xml.gz")).exists());
 		assertFalse(new File(c.getControlerIO().getIterationFilename(10, "plans.xml.gz")).exists());
 	}
-	
+
 	@Test
 	public void testPlansDump_Always() {
 		Config config = this.util.loadConfig("test/scenarios/equil/config_plans1.xml");
@@ -93,9 +93,9 @@ public class PlansDumpingTest {
 		Controler c = new Controler(config);
 		c.setWriteEventsInterval(0);
 		c.setCreateGraphs(false);
-		
+
 		c.run();
-		
+
 		assertTrue(new File(c.getControlerIO().getIterationFilename(0, "plans.xml.gz")).exists());
 		assertTrue(new File(c.getControlerIO().getIterationFilename(1, "plans.xml.gz")).exists()); // it.1 is always written
 		assertTrue(new File(c.getControlerIO().getIterationFilename(2, "plans.xml.gz")).exists());
