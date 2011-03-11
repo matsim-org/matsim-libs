@@ -97,14 +97,16 @@ public class DgChartWriter {
 					Number xValue, yValue = null;
 					for (int itemsIndex = 0; itemsIndex < maxItems; itemsIndex++){
 						for (int seriesIdx = 0; seriesIdx < seriesCount; seriesIdx ++) {
-							xValue = xyds.getX(seriesIdx, itemsIndex);
-							yValue = xyds.getY(seriesIdx, itemsIndex);
-							if (xValue != null && yValue != null){
-								writer.write(xValue.toString());
-								writer.write("\t");
-								writer.write(yValue.toString());
-								if (seriesIdx < seriesCount - 1){
+							if (seriesIdx < xyds.getSeriesCount() && itemsIndex < xyds.getItemCount(seriesIdx)){
+								xValue = xyds.getX(seriesIdx, itemsIndex);
+								yValue = xyds.getY(seriesIdx, itemsIndex);
+								if (xValue != null && yValue != null){
+									writer.write(xValue.toString());
 									writer.write("\t");
+									writer.write(yValue.toString());
+									if (seriesIdx < seriesCount - 1){
+										writer.write("\t");
+									}
 								}
 							}
 						}
