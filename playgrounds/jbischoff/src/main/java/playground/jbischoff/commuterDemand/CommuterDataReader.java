@@ -68,7 +68,6 @@ public void readFile(String filename){
 	try {
 		
 		
-		if (this.filteredMunicipalities.get(0) == null) throw new Exception("No Municipality filter set");
 		fr = new FileReader(new File (filename));
 		BufferedReader br = new BufferedReader(fr);
 		String line = null;
