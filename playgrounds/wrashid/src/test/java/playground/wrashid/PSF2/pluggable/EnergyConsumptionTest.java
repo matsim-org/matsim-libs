@@ -76,6 +76,7 @@ public class EnergyConsumptionTest extends MatsimTestCase {
 		EnergyConsumptionPlugin energyConsumptionPlugin = runWithModel(energyConsumptionModel);
 		
 		assertEquals(2, energyConsumptionPlugin.getEnergyConsumptionOfLegs().get(new IdImpl(1)).size());
+		assertEquals(1.8786265875308476E7, energyConsumptionPlugin.getEnergyConsumptionOfLegs().get(new IdImpl(1)).get(0));
 	}
 	
 }
