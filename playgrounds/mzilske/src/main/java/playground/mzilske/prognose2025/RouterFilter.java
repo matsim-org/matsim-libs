@@ -35,13 +35,13 @@ public class RouterFilter implements TripFlowSink {
 	}
 
 	@Override
-	public void process(Zone quelle, Zone ziel, int quantity, String mode, String destinationActivityType, double travelTimeOffset) {
+	public void process(Zone quelle, Zone ziel, int quantity, String mode, String destinationActivityType, double departureTimeOffset) {
 		Node quellNode = ((NetworkImpl) network).getNearestNode(quelle.coord);
 		Node zielNode = ((NetworkImpl) network).getNearestNode(ziel.coord);
 		Path path = dijkstra.calcLeastCostPath(quellNode, zielNode, 0.0);
 		if (isInteresting(path)) {
 			Zone newQuelle = new Zone(quelle.id, quelle.workplaces, quelle.workingPopulation, entryCoord);
-			sink.process(newQuelle, ziel, quantity, mode, destinationActivityType, travelTimeOffset + travelTimeToLink);
+			sink.process(newQuelle, ziel, quantity, mode, destinationActivityType, departureTimeOffset + travelTimeToLink);
 		}
 	}
 

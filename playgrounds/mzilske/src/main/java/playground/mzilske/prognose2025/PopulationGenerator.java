@@ -18,6 +18,8 @@ import playground.mzilske.pipeline.PersonSink;
 
 public class PopulationGenerator implements TripFlowSink {
 
+	private static final String HOME_ACTIVITY_TYPE = "pvHome";
+
 	public static class Entry {
 
 		public final int source;
@@ -49,6 +51,26 @@ public class PopulationGenerator implements TripFlowSink {
 
 	private PopulationFactory populationFactory = new PopulationFactoryImpl(null);
 
+	public void process(Zone quelle, Zone ziel, int quantity, String mode, String destinationActivityType, double departureTimeOffset) {
+		for (int i=0; i<quantity; i++) {
+			Person person = populationFactory.createPerson(createId(quelle, ziel, i, mode));
+			Plan plan = populationFactory.createPlan();
+			Coord homeLocation = quelle.coord;
+			Coord workLocation = ziel.coord;
+			double workStartTime = calculateNormallyDistributedTime(8*60*60);
+			double freespeedTravelTimeToWork = - departureTimeOffset;
+			double homeEndTime = Math.max((workStartTime - freespeedTravelTimeToWork), 0.00);
+			double workEndTime = workStartTime + 8*60*60;
+			plan.addActivity(createActivity(homeLocation, HOME_ACTIVITY_TYPE, homeEndTime));
+			plan.addLeg(createLeg(mode));
+			plan.addActivity(createActivity(workLocation, destinationActivityType, workEndTime));
+			plan.addLeg(createLeg(mode));
+			plan.addActivity(createActivity(homeLocation, HOME_ACTIVITY_TYPE, homeEndTime));
+			person.addPlan(plan);
+			personSink.process(person);
+		}
+	}
+
 	public void complete() {
 		personSink.complete();
 	}
@@ -57,29 +79,10 @@ public class PopulationGenerator implements TripFlowSink {
 		Leg leg = populationFactory.createLeg(mode);
 		return leg;
 	}
-
-//	private Activity createWork(Coord workLocation, String destinationActivityType) {
-//		Activity activity = populationFactory.createActivityFromCoord(destinationActivityType, workLocation);
-//		activity.setEndTime(calculateRandomEndTime(17*60*60));
-//		return activity;
-//	}
-//
-//	private Activity createHome(Coord homeLocation, double travelTimeOffset) {
-//		Activity activity = populationFactory.createActivityFromCoord("home", homeLocation);
-//		activity.setEndTime(calculateRandomEndTime(7*60*60) + travelTimeOffset);
-//		return activity;
-//	}
 	
-	private Activity createWork(Coord workLocation, double workStartTime, String destinationActivityType) {
-		Activity activity = populationFactory.createActivityFromCoord(destinationActivityType, workLocation);
-		activity.setEndTime(workStartTime + 8*60*60);
-		return activity;
-	}
-
-	private Activity createHome(Coord homeLocation, double workStartTime, double freespeedTravelTime2Work, double travelTimeOffset) {
-		Activity activity = populationFactory.createActivityFromCoord("pvHome", homeLocation);
-		activity.setEndTime(Math.max((workStartTime - freespeedTravelTime2Work), 0.00));
-//		System.out.println("WorkStartTime: " + workStartTime + "\t" + "TravelTime2Work: " + freespeedTravelTime2Work);
+	private Activity createActivity(Coord workLocation, String activityType, double time) {
+		Activity activity = populationFactory.createActivityFromCoord(activityType, workLocation);
+		activity.setEndTime(time);
 		return activity;
 	}
 
@@ -88,7 +91,6 @@ public class PopulationGenerator implements TripFlowSink {
 		//draw two random numbers [0;1] from uniform distribution
 		double r1 = random.nextDouble();
 		double r2 = random.nextDouble();
-
 		//Box-Muller-Method in order to get a normally distributed variable
 		double normal = Math.cos(2 * Math.PI * r1) * Math.sqrt(-2 * Math.log(r2));
 		//linear transformation in order to optain N[i,7200²]
@@ -99,60 +101,6 @@ public class PopulationGenerator implements TripFlowSink {
 	private Id createId(Zone source, Zone sink, int i, String transportMode) {
 		return new IdImpl(transportMode + "_" + source.id + "_" + sink.id + "_" + i);
 	}
-
-//	public void process(Zone quelle, Zone ziel, int quantity, String mode, String destinationActivityType, double travelTimeOffset) {
-//		for (int i=0; i<quantity; i++) {
-//			Person person = populationFactory.createPerson(createId(quelle, ziel, i, mode));
-//			Plan plan = populationFactory.createPlan();
-//			Coord homeLocation = quelle.coord;
-//			Coord workLocation = ziel.coord;
-//			plan.addActivity(createHome(homeLocation, travelTimeOffset));
-//			plan.addLeg(createDriveLeg());
-//			plan.addActivity(createWork(workLocation, destinationActivityType));
-//			plan.addLeg(createDriveLeg());
-//			plan.addActivity(createHome(homeLocation, 0.0));
-//			person.addPlan(plan);
-//			personSink.process(person);
-//		}
-//	}
-	
-	/* @ Michael: "travelTimeOffset" wird hier uminterpretiert in "freespeedTravelTime2Work"
-	 * Das ist unschön, vor allem, weil in createHome ein "travelTimeOffset" = 0.0 reingeht, welches nicht ersterem entspricht!
-	 * Dies funktioniert also für den pendlerVerkehr, ist aber glaub ich nicht allgemeingültig...
-	 * >> also ggf. glatt ziehen :)
-	 */
-	public void process(Zone quelle, Zone ziel, int quantity, String mode, String destinationActivityType, double travelTimeOffset) {
-		for (int i=0; i<quantity; i++) {
-			Person person = populationFactory.createPerson(createId(quelle, ziel, i, mode));
-			Plan plan = populationFactory.createPlan();
-			Coord homeLocation = quelle.coord;
-			Coord workLocation = ziel.coord;
-			// workStartTimePeak is assumed to be at 7:30am
-			double workStartTime = calculateNormallyDistributedTime(8*60*60 /*+ 30*60*/);
-			double freespeedTravelTime2Work = - travelTimeOffset;
-			
-			plan.addActivity(createHome(homeLocation, workStartTime, freespeedTravelTime2Work, 0.0));
-			plan.addLeg(createLeg(mode));
-			plan.addActivity(createWork(workLocation, workStartTime, destinationActivityType));
-			plan.addLeg(createLeg(mode));
-			plan.addActivity(createHome(homeLocation, workStartTime, freespeedTravelTime2Work, 0.0));
-			person.addPlan(plan);
-			personSink.process(person);
-		}
-	}
-	
-//	private double calculateFreespeedTravelTime(Zone quelle, Zone ziel) {
-//		double freespeedTravelTime = 0.0;
-//		
-//		Node quellNode = ((NetworkImpl) network).getNearestNode(quelle.coord);
-//		Node zielNode = ((NetworkImpl) network).getNearestNode(ziel.coord);
-//		Path path = dijkstra.calcLeastCostPath(quellNode, zielNode, 0.0);
-//		
-//		for (Link l : path.links) {
-//			freespeedTravelTime += l.getLength() / l.getFreespeed();
-//		}
-//		return freespeedTravelTime;
-//	}
 
 	public void setSink(PersonSink personSink) {
 		this.personSink = personSink;
