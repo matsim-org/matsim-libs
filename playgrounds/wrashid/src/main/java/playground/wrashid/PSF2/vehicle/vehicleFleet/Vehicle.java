@@ -22,6 +22,7 @@ package playground.wrashid.PSF2.vehicle.vehicleFleet;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.basic.v01.IdImpl;
 
 import playground.wrashid.PSF2.vehicle.energyStateMaintainance.EnergyStateMaintainer;
 
@@ -72,5 +73,9 @@ public abstract class Vehicle {
 	
 	public static double getAverageSpeedOfVehicleOnLinkInMetersPerSecond(double timeSpentOnLink, Link link){
 		return link.getLength()/timeSpentOnLink;
+	}
+	
+	public static Id getPlaceholderForUnmappedPersonIds(){
+		return new IdImpl("all-unmapped");
 	}
 }
