@@ -33,33 +33,28 @@ import org.matsim.run.OTFVis;
 
 public class RouteVizComparer {
 	Config config = null;
-	
+
 	public RouteVizComparer (String configFile){
-		
-		try {
-			this.config = ConfigUtils.loadConfig(configFile);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		this.config = ConfigUtils.loadConfig(configFile);
 	}
 
 	private void run(final String netFile, String[] arraPopPaths){
 		//Create a new population where persons will be stored 
 		Population[] arrayPops = new Population[arraPopPaths.length];
 		String[] arrayFrags = new String[arraPopPaths.length];
-		
+
 		PlanFragmenter fragmenter =  new PlanFragmenter();
 		DataLoader loader = new DataLoader();
 
 		NetworkImpl net = loader.readNetwork(netFile);
-		
+
 		final String strFrag = "/Frag_";
 		for (int i=0; i< arraPopPaths.length;i++){
 			arrayPops[i]= fragmenter.run(loader.readPopulation(arraPopPaths[i]));
 
 			File file = new File(arraPopPaths[i]);
 			arrayFrags[i]=file.getParentFile().getAbsolutePath() + strFrag + file.getName();
-			
+
 			PopulationWriter popwriter = new PopulationWriter(arrayPops[i], net);
 			popwriter.write(arrayFrags[i]);
 		}
@@ -74,7 +69,7 @@ public class RouteVizComparer {
 		popwriter = new PopulationWriter(mergedPop, net);
 		String convertedPopPath = config.controler().getOutputDirectory() + "/converted.xml.gz";
 		popwriter.write(convertedPopPath);
-		
+
 		//prepare new config for otfviz
 		this.config.setParam("plans", "inputPlansFile", convertedPopPath);
 		String outConfig = this.config.controler().getOutputDirectory() + "/config_convertedPopulation.xml";
@@ -86,19 +81,19 @@ public class RouteVizComparer {
 		popwriter= null;
 		mergedPop= null;
 		this.config = null;
-		
+
 		OTFVis.playConfig(outConfig);
 	}
-	
+
 	public static void main(String[] args) {
 		String netPath = "../shared-svn/studies/countries/de/berlin-bvg09/pt/nullfall_berlin_brandenburg/input/network_multimodal.xml.gz";
 		String configFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/calibration/100plans_bestValues_config.xml";
-		
+
 		String[] arraPopPaths = new String[3];
 		arraPopPaths[0]= "../playgrounds/mmoyo/output/cadyts/Around812550_walk6.0_dist0.0_tran1200.0.gz";
 		arraPopPaths[1]= "../playgrounds/mmoyo/output/cadyts/Around812550_walk8.0_dist0.5_tran720.0.xml.gz";
 		arraPopPaths[2]= "../playgrounds/mmoyo/output/cadyts/Around812550_walk10.0_dist0.0_tran240.0.xml.gz";
-		
+
 		new RouteVizComparer(configFile).run(netPath, arraPopPaths);
 	}
 

@@ -23,6 +23,11 @@ package playground.mmoyo;
 import java.io.IOException;
 import java.util.List;
 
+import org.junit.Assert;
+import org.junit.Rule;
+import org.junit.Test;
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.PlanStrategy;
@@ -31,12 +36,6 @@ import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.MatsimTestUtils;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.api.core.v01.Id;
-
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.Assert;
 
 import playground.mmoyo.analysis.counts.reader.CountsReader;
 import playground.mmoyo.cadyts_integration.ptBseAsPlanStrategy.NewPtBsePlanStrategy;
@@ -47,23 +46,19 @@ public class CadytsIntegrationTest extends MatsimTestCase {
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 	@Test
 	public final void testCalibration() {
-		
+
 		String inputDir = this.getInputDirectory();
 		String outputDir = this.getOutputDirectory();
 		//String inputDir = "../playgrounds/mmoyo/test/input/playground/mmoyo/CadytsIntegrationTest/testCalibration/";
 		//String outputDir = "../playgrounds/mmoyo/test/output/playground/mmoyo/CadytsIntegrationTest/testCalibration/";
-		
+
 		System.out.println(" Input Dir " + this.getInputDirectory() );
 		System.out.println(" Output Dir " + this.getOutputDirectory() );
-		
+
 		String configFile = inputDir + "equil_config.xml";
-		Config config = null;
-		try {
-			config = ConfigUtils.loadConfig(configFile);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
+		Config config = ConfigUtils.loadConfig(configFile);
+
+
 		final Controler controler = new Controler(config);
 		controler.setOverwriteFiles(true);
 		controler.run();
@@ -89,7 +84,7 @@ public class CadytsIntegrationTest extends MatsimTestCase {
 		Assert.assertEquals("CsId is wrong.", count.getCsId() , "stop1");
 		Assert.assertEquals("Volume of hour 4 is wrong", count.getVolume(7).getValue(), 4.0 , MatsimTestUtils.EPSILON);
 		Assert.assertEquals("Max count volume is wrong.", count.getMaxVolume().getValue(), 4.0 , MatsimTestUtils.EPSILON);
-		
+
 		//test that NewPtBsePlanStrategy is present as replanning strategy
 		List <PlanStrategy> strategyList = controler.getStrategyManager().getStrategies(); 
 		NewPtBsePlanStrategy ptBsestrategy = null;
@@ -101,11 +96,11 @@ public class CadytsIntegrationTest extends MatsimTestCase {
 			i++;
 		}while (ptBsestrategy==null && i< strategyList.size());
 		Assert.assertNotNull(ptBsestrategy);
-		
+
 		//test calibration settings
 		String expectedCalibSettings ="[BruteForce=true][CenterRegression=false][FreezeIteration=2147483647][MinStddev=8.0][PreparatoryIterations=1][RegressionInertia=0.95][VarianceScale=1.0]";
 		Assert.assertEquals("calibrator settings do not match" , ptBsestrategy.getCalibratorSettings(), expectedCalibSettings );
-		
+
 		//  results  
 		// Test first that the calibrationStatReader works properly 
 		TabularFileParser tabularFileParser = new TabularFileParser();
@@ -129,7 +124,7 @@ public class CadytsIntegrationTest extends MatsimTestCase {
 		Assert.assertEquals("diferrent Plan_lambda_min", statData6.getPlan_lambda_min() , "-15.0" );
 		Assert.assertEquals("diferrent Plan_lambda_stddev", statData6.getPlan_lambda_stddev() , "11.356042894952115" );
 		Assert.assertEquals("diferrent Total_ll", statData6.getTotal_ll() , "-8520.428031642501" );
-		
+
 		//now test calibration-stats.txt from calibration
 		String testCalibStatPath = outputDir + "calibration-stats.txt";
 		calibrationStatReader = new CalibrationStatReader();
@@ -151,14 +146,14 @@ public class CadytsIntegrationTest extends MatsimTestCase {
 		Assert.assertEquals("diferrent Plan_lambda_min", outStatData.getPlan_lambda_min() , "0.03929357905359915" );
 		Assert.assertEquals("diferrent Plan_lambda_stddev", outStatData.getPlan_lambda_stddev() , "0.004200662608832472" );
 		Assert.assertEquals("diferrent Total_ll", outStatData.getTotal_ll() , "-1.546875" );
-		
+
 		//test resulting simulation volumes
 		String outCounts = outputDir + "ITERS/it.10/10.simCountCompareOccupancy.txt";
 		CountsReader reader = new CountsReader(outCounts);
 		double[] simValues;
 		double[] realValues;
 		Id stopId;
-		
+
 		stopId= new IdImpl("stop1");
 		simValues = reader.getStopSimCounts(stopId);
 		realValues= reader.getStopCounts(stopId);
@@ -182,9 +177,9 @@ public class CadytsIntegrationTest extends MatsimTestCase {
 		realValues= reader.getStopCounts(stopId);
 		Assert.assertEquals("Volume of hour 6 is wrong", simValues[6], 1.0 , MatsimTestUtils.EPSILON);
 		Assert.assertEquals("Volume of hour 6 is wrong", realValues[6], 1.0 , MatsimTestUtils.EPSILON);
-	
+
 	}
 
-		
-	
+
+
 }
