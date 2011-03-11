@@ -56,7 +56,7 @@ public class EnergyConsumptionModelPSL implements EnergyConsumptionModel {
 		if (vehicle.getVehicleClassId().equals(new IdImpl(1))) {
 			// NOTE: phevs must have class Id one in this case
 			return phevEnergyConsumptionModel.getEnergyConsumption(
-					speedOfVehicleOnLinkInKmPerHour, link.getLength());
+					Vehicle.getAverageSpeedOfVehicleOnLinkInMetersPerSecond(timeSpentOnLink, link), link.getLength());
 		} else if (vehicle.getVehicleClassId().equals(new IdImpl(2))) {
 			return 0;
 		} else {
