@@ -40,13 +40,13 @@ public class LinkAndAgentAccountAnalysisModule implements AnalysisModule{
 	private Map<Id, double[]> linkId2emissionsInGrammPerType = new TreeMap<Id,double[]>();
 	private Map<Id, double[]> personId2emissionsInGrammPerType = new TreeMap<Id,double[]>();
 	/* the arrays double[] are going to be filled with:
-			massOfFluelBasedOnAverageSpeed [0]
+			massOfFuelBasedOnAverageSpeed [0]
 			noxEmissionsBasedOnAverageSpeed [1]
 			co2EmissionsBasedOnAverageSpeed [2]
 			no2EmissionsBasedOnAverageSpeed[3]
 			pmEmissionsBasedOnAverageSpeed[4]
 		
-			massOfFluelBasedOnFractions[5]
+			massOfFuelBasedOnFractions[5]
 			noxEmissionsBasedOnFractions[6]
 			co2EmissionsBasedOnFractions[7]
 			no2EmissionsBasedOnFractions[8]

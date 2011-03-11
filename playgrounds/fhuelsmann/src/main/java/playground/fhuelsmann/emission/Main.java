@@ -62,6 +62,10 @@ public class Main {
 	private static String shapeDirectory = "../../detailedEval/Net/shapeFromVISUM/urbanSuburban/";
 	private static String urbanShapeFile = shapeDirectory + "urbanAreas.shp";
 	private static String suburbanShapeFile = shapeDirectory + "suburbanAreas.shp";
+	private static String shapeDistrictDirectory = "../../detailedEval/Net/shapeFromVISUM/stadtbezirke/";
+	private static String altstadtShapeFile = shapeDistrictDirectory + "Altstadt.shp";
+	private static String aubingShapeFile = shapeDistrictDirectory + "Aubing.shp";
+	
 
 	private final Scenario scenario;
 
@@ -99,14 +103,14 @@ public class Main {
 		EventsManager events = new EventsManagerImpl();	
 		ColdstartAnalyseModul coldstartAccount = new ColdstartAnalyseModul ();
 		//create the handler 
-//		TravelTimeEventHandler handler = new TravelTimeEventHandler(network, hbefaTable.getHbefaTableWithSpeedAndEmissionFactor(), linkAndAgentAccount);
-		TimeAndDistanceEventHandler handler = new TimeAndDistanceEventHandler(network,hbefaColdTable,coldstartAccount);
+		TravelTimeEventHandler handler = new TravelTimeEventHandler(network, hbefaTable.getHbefaTableWithSpeedAndEmissionFactor(), linkAndAgentAccount);
+		TimeAndDistanceEventHandler handler2 = new TimeAndDistanceEventHandler(network,hbefaColdTable,coldstartAccount);
 	
 	
 		
 		//add the handler
-//		events.addHandler(handler);
 		events.addHandler(handler);
+		events.addHandler(handler2);
 		
 		
 
@@ -135,12 +139,20 @@ public class Main {
 		Population urbanPop = filter.getRelevantPopulation(population, urbanShape);
 		Set<Feature> suburbanShape = filter.readShape(suburbanShapeFile);
 		Population suburbanPop = filter.getRelevantPopulation(population, suburbanShape);
+		Set<Feature> altstadtShape = filter.readShape(altstadtShapeFile);
+		Population altstadtPop = filter.getRelevantPopulation(population, altstadtShape);
+		Set<Feature> aubingShape = filter.readShape(aubingShapeFile);
+		Population aubingPop = filter.getRelevantPopulation(population, aubingShape);
 
 		List<Double> emissionType2AvgEmissionsUrbanArea = calculateAvgEmissionsPerTypeAndArea(urbanPop, personId2emissionsInGrammPerType);
 		List<Double> emissionType2AvgEmissionsSuburbanArea = calculateAvgEmissionsPerTypeAndArea(suburbanPop, personId2emissionsInGrammPerType);
+		List<Double> emissionType2AvgEmissionsAltstadtArea = calculateAvgEmissionsPerTypeAndArea(altstadtPop, personId2emissionsInGrammPerType);
+		List<Double> emissionType2AvgEmissionsAubingArea = calculateAvgEmissionsPerTypeAndArea(aubingPop, personId2emissionsInGrammPerType);
 
 		System.out.println(emissionType2AvgEmissionsUrbanArea);
 		System.out.println(emissionType2AvgEmissionsSuburbanArea);
+		System.out.println(emissionType2AvgEmissionsAltstadtArea);
+		System.out.println(emissionType2AvgEmissionsAubingArea);
 		
 /*		LinkFilter linkfilter = new LinkFilter(network);
 		Set<Feature> urbanShapeLink = linkfilter.readShape(urbanShapeFile);
