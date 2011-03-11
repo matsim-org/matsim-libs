@@ -36,6 +36,7 @@ public class ReRoutingTest extends MatsimTestCase {
 
 		TestControler controler = new TestControler(config);
 		controler.setCreateGraphs(false);
+		controler.setDumpDataAtEnd(false);
 		controler.run();
 
 		long checksum1 = CRCChecksum.getCRCFromFile(getInputDirectory() + "0.events.txt.gz");
