@@ -83,10 +83,10 @@ public class LinkReplanningMapTest extends MatsimTestCase {
 		SimulationAfterSimStepListener {
 
 		private final LinkReplanningMap lrp;
-		private final int t1 = 5*3600 + 58*60 + 30;
-		private final int t2 = 5*3600 + 59*60;
-		private final int t3 = 5*3600 + 59*60 + 30;
-		private final int t4 = 6*3600;
+		private static final int t1 = 5*3600 + 58*60 + 30;
+		private static final int t2 = 5*3600 + 59*60;
+		private static final int t3 = 5*3600 + 59*60 + 30;
+		private static final int t4 = 6*3600;
 
 		public MobsimListenerForTests(final LinkReplanningMap lrp) {
 			this.lrp = lrp;
@@ -101,22 +101,22 @@ public class LinkReplanningMapTest extends MatsimTestCase {
 		@Override
 		public void notifySimulationBeforeSimStep(final SimulationBeforeSimStepEvent e) {
 
-			if (e.getSimulationTime() == this.t1) {
+			if (e.getSimulationTime() == t1) {
 				assertEquals(0, this.lrp.getLegPerformingAgents().size());	// no agent performs a Leg
 				assertEquals(0, this.lrp.getReplanningAgents(e.getSimulationTime()).size());	// no agent needs a replanning
 			}
 
-			if (e.getSimulationTime() == this.t2) {
+			if (e.getSimulationTime() == t2) {
 				assertEquals(1, this.lrp.getLegPerformingAgents().size());	// one performs a Leg
 				assertEquals(0, this.lrp.getReplanningAgents(e.getSimulationTime()).size());	// no agent needs a replanning
 			}
 
-			if (e.getSimulationTime() == this.t3) {
+			if (e.getSimulationTime() == t3) {
 				assertEquals(2, this.lrp.getLegPerformingAgents().size());	// two agents perform a Leg
 				assertEquals(0, this.lrp.getReplanningAgents(e.getSimulationTime()).size());	// no agent needs a replanning
 			}
 
-			if (e.getSimulationTime() == this.t4) {
+			if (e.getSimulationTime() == t4) {
 				assertEquals(3, this.lrp.getLegPerformingAgents().size());	// three agents perform a Leg
 				assertEquals(0, this.lrp.getReplanningAgents(e.getSimulationTime()).size());	// no agent needs a replanning
 			}
@@ -124,22 +124,22 @@ public class LinkReplanningMapTest extends MatsimTestCase {
 
 		@Override
 		public void notifySimulationAfterSimStep(final SimulationAfterSimStepEvent e) {
-			if (e.getSimulationTime() == this.t1) {
+			if (e.getSimulationTime() == t1) {
 				assertEquals(1, this.lrp.getLegPerformingAgents().size());	// one agent performs a Leg
 				assertEquals(1, this.lrp.getReplanningAgents(e.getSimulationTime()).size());	// one agent has just departed and might do a replanning
 			}
 
-			if (e.getSimulationTime() == this.t2) {
+			if (e.getSimulationTime() == t2) {
 				assertEquals(2, this.lrp.getLegPerformingAgents().size());	// two agents perform a Leg
 				assertEquals(1, this.lrp.getReplanningAgents(e.getSimulationTime()).size());	// one agent has just departed and might do a replanning
 			}
 
-			if (e.getSimulationTime() == this.t3) {
+			if (e.getSimulationTime() == t3) {
 				assertEquals(3, this.lrp.getLegPerformingAgents().size());	// three agents perform a Leg
 				assertEquals(1, this.lrp.getReplanningAgents(e.getSimulationTime()).size());	// one agent has just departed and might do a replanning
 			}
 
-			if (e.getSimulationTime() == this.t4) {
+			if (e.getSimulationTime() == t4) {
 				assertEquals(100, this.lrp.getLegPerformingAgents().size());	// all agents  perform a Leg
 				assertEquals(97, this.lrp.getReplanningAgents(e.getSimulationTime()).size());	// 97 agents have just departed and might do a replanning
 			}
