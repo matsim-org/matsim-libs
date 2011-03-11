@@ -207,6 +207,7 @@ public class Controler {
 	/* package */VolumesAnalyzer volumes = null;
 
 	private boolean createGraphs = true;
+	private boolean dumpDataAtEnd = true;
 
 	public final IterationStopWatch stopwatch = new IterationStopWatch();
 	final protected ScenarioImpl scenarioData;
@@ -487,31 +488,33 @@ public class Controler {
 				log.info("S H U T D O W N   ---   start regular shutdown.");
 			}
 			this.controlerListenerManager.fireControlerShutdownEvent(unexpected);
-			// dump plans
-			new PopulationWriter(this.population, this.network, (this.getScenario()).getKnowledges()).write(this.controlerIO.getOutputFilename(FILENAME_POPULATION));
-			// dump network
-			new NetworkWriter(this.network).write(this.controlerIO.getOutputFilename(FILENAME_NETWORK));
-			// dump config
-			new ConfigWriter(this.config).write(this.controlerIO.getOutputFilename(FILENAME_CONFIG));
-			// dump facilities
-			ActivityFacilities facilities = this.getFacilities();
-			if (facilities != null) {
-				new FacilitiesWriter((ActivityFacilitiesImpl) facilities).write(this.controlerIO.getOutputFilename("output_facilities.xml.gz"));
-			}
-			if (this.network.getFactory().isTimeVariant()) {
-				new NetworkChangeEventsWriter().write(this.controlerIO.getOutputFilename("output_change_events.xml.gz"), this.network.getNetworkChangeEvents());
-			}
-			if (this.config.scenario().isUseHouseholds()){
-				try {
-					new HouseholdsWriterV10(this.scenarioData.getHouseholds()).writeFile(this.controlerIO.getOutputFilename(FILENAME_HOUSEHOLDS));
-				} catch (FileNotFoundException e) {
-					e.printStackTrace();
-				} catch (IOException e) {
-					e.printStackTrace();
+			if (this.dumpDataAtEnd) {
+				// dump plans
+				new PopulationWriter(this.population, this.network, (this.getScenario()).getKnowledges()).write(this.controlerIO.getOutputFilename(FILENAME_POPULATION));
+				// dump network
+				new NetworkWriter(this.network).write(this.controlerIO.getOutputFilename(FILENAME_NETWORK));
+				// dump config
+				new ConfigWriter(this.config).write(this.controlerIO.getOutputFilename(FILENAME_CONFIG));
+				// dump facilities
+				ActivityFacilities facilities = this.getFacilities();
+				if (facilities != null) {
+					new FacilitiesWriter((ActivityFacilitiesImpl) facilities).write(this.controlerIO.getOutputFilename("output_facilities.xml.gz"));
 				}
-			}
-			if (this.config.scenario().isUseLanes()){
-				new LaneDefinitionsWriter20(this.scenarioData.getLaneDefinitions()).write(this.controlerIO.getOutputFilename(FILENAME_LANES));
+				if (this.network.getFactory().isTimeVariant()) {
+					new NetworkChangeEventsWriter().write(this.controlerIO.getOutputFilename("output_change_events.xml.gz"), this.network.getNetworkChangeEvents());
+				}
+				if (this.config.scenario().isUseHouseholds()){
+					try {
+						new HouseholdsWriterV10(this.scenarioData.getHouseholds()).writeFile(this.controlerIO.getOutputFilename(FILENAME_HOUSEHOLDS));
+					} catch (FileNotFoundException e) {
+						e.printStackTrace();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+				if (this.config.scenario().isUseLanes()){
+					new LaneDefinitionsWriter20(this.scenarioData.getLaneDefinitions()).write(this.controlerIO.getOutputFilename(FILENAME_LANES));
+				}
 			}
 			if (unexpected) {
 				log.info("S H U T D O W N   ---   unexpected shutdown request completed.");
@@ -1045,6 +1048,13 @@ public class Controler {
 	 */
 	public final boolean getCreateGraphs() {
 		return this.createGraphs;
+	}
+
+	/**
+	 * @param dumpData <code>true</code> if at the end of a run, plans, network, config etc should be dumped to a file.
+	 */
+	public final void setDumpDataAtEnd(final boolean dumpData) {
+		this.dumpDataAtEnd = dumpData;
 	}
 
 	/*

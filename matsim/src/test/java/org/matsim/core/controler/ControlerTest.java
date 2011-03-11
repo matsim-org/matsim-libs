@@ -50,8 +50,8 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.Module;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.Simulation;
 import org.matsim.core.network.NetworkImpl;
@@ -88,7 +88,7 @@ public class ControlerTest {
 	 */
 	@Test
 	public void testTravelTimeCalculation() {
-		Config config = utils.loadConfig(null);
+		Config config = this.utils.loadConfig(null);
 		Fixture f = new Fixture(config);
 
 		/* Create 2 persons driving from link 1 to link 3, both starting at the
@@ -142,6 +142,7 @@ public class ControlerTest {
 		Controler controler = new Controler(f.scenario);
 		controler.setCreateGraphs(false);
 		controler.setWriteEventsInterval(0);
+		controler.setDumpDataAtEnd(false);
 		controler.run();
 
 		// test if we got the right result
@@ -175,7 +176,7 @@ public class ControlerTest {
 	 */
 	@Test
 	public void testSetScoringFunctionFactory() {
-		final Config config = utils.loadConfig(null);
+		final Config config = this.utils.loadConfig(null);
 		config.controler().setLastIteration(0);
 
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
@@ -199,6 +200,7 @@ public class ControlerTest {
 				controler.getScoringFunctionFactory() instanceof DummyScoringFunctionFactory);
 
 		controler.setMobsimFactory(new FakeMobsimFactory());
+		controler.setDumpDataAtEnd(false);
 		controler.run();
 
 		assertTrue("Custom ScoringFunctionFactory got overwritten.",
@@ -212,7 +214,7 @@ public class ControlerTest {
 	 */
 	@Test
 	public void testCalcMissingRoutes() {
-		Config config = utils.loadConfig(null);
+		Config config = this.utils.loadConfig(null);
 		Fixture f = new Fixture(config);
 
 		/* Create a person with two plans, driving from link 1 to link 3, starting at 7am.  */
@@ -262,6 +264,7 @@ public class ControlerTest {
 		controler.setCreateGraphs(false);
 		controler.setWriteEventsInterval(0);
 		controler.setMobsimFactory(new FakeMobsimFactory());
+		controler.setDumpDataAtEnd(false);
 		controler.run();
 		/* if something goes wrong, there will be an exception we don't catch and the test fails,
 		 * otherwise, everything is fine. */
@@ -278,7 +281,7 @@ public class ControlerTest {
 	 */
 	@Test
 	public void testCalcMissingActLinks() {
-		Config config = utils.loadConfig(null);
+		Config config = this.utils.loadConfig(null);
 		Fixture f = new Fixture(config);
 
 		/* Create a person with two plans, driving from link 1 to link 3, starting at 7am.  */
@@ -333,6 +336,7 @@ public class ControlerTest {
 		controler.setCreateGraphs(false);
 		controler.setWriteEventsInterval(0);
 		controler.setMobsimFactory(new FakeMobsimFactory());
+		controler.setDumpDataAtEnd(false);
 		controler.run();
 		/* if something goes wrong, there will be an exception we don't catch and the test fails,
 		 * otherwise, everything is fine. */
@@ -353,7 +357,7 @@ public class ControlerTest {
 	 */
 	@Test
 	public void testSetWriteEventsInterval() {
-		final Config config = utils.loadConfig("test/scenarios/equil/config_plans1.xml");
+		final Config config = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
 		config.controler().setLastIteration(10);
 
 		final Controler controler = new Controler(config);
@@ -363,6 +367,7 @@ public class ControlerTest {
 		assertEquals(3, controler.getWriteEventsInterval());
 		controler.setCreateGraphs(false);
 		controler.setMobsimFactory(new FakeMobsimFactory());
+		controler.setDumpDataAtEnd(false);
 		controler.run();
 
 		assertTrue(new File(controler.getControlerIO().getIterationFilename(0, Controler.FILENAME_EVENTS_TXT)).exists());
@@ -383,7 +388,7 @@ public class ControlerTest {
 	 */
 	@Test
 	public void testSetWriteEventsIntervalConfig() {
-		final Config config = utils.loadConfig("test/scenarios/equil/config_plans1.xml");
+		final Config config = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
 		config.controler().setLastIteration(10);
 
 		final Controler controler = new Controler(config);
@@ -391,6 +396,7 @@ public class ControlerTest {
 				3 == controler.getWriteEventsInterval());
 		controler.setCreateGraphs(false);
 		controler.setMobsimFactory(new FakeMobsimFactory());
+		controler.setDumpDataAtEnd(false);
 		controler.run();
 		assertEquals(4, controler.getWriteEventsInterval());
 
@@ -412,7 +418,7 @@ public class ControlerTest {
 	 */
 	@Test
 	public void testSetWriteEventsNever() {
-		final Config config = utils.loadConfig("test/scenarios/equil/config_plans1.xml");
+		final Config config = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
 		config.controler().setLastIteration(1);
 
 		final Controler controler = new Controler(config);
@@ -422,6 +428,7 @@ public class ControlerTest {
 		assertEquals(0, controler.getWriteEventsInterval());
 		controler.setCreateGraphs(false);
 		controler.setMobsimFactory(new FakeMobsimFactory());
+		controler.setDumpDataAtEnd(false);
 		controler.run();
 
 		assertFalse(new File(controler.getControlerIO().getIterationFilename(0, Controler.FILENAME_EVENTS_TXT)).exists());
@@ -433,7 +440,7 @@ public class ControlerTest {
 	 */
 	@Test
 	public void testSetWriteEventsAlways() {
-		final Config config = utils.loadConfig("test/scenarios/equil/config_plans1.xml");
+		final Config config = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
 		config.controler().setLastIteration(1);
 
 		final Controler controler = new Controler(config);
@@ -441,6 +448,7 @@ public class ControlerTest {
 		assertEquals(1, controler.getWriteEventsInterval());
 		controler.setCreateGraphs(false);
 		controler.setMobsimFactory(new FakeMobsimFactory());
+		controler.setDumpDataAtEnd(false);
 		controler.run();
 
 		assertTrue(new File(controler.getControlerIO().getIterationFilename(0, Controler.FILENAME_EVENTS_TXT)).exists());
@@ -452,7 +460,7 @@ public class ControlerTest {
 	 */
 	@Test
 	public void testSetWriteEventsTxt() {
-		final Config config = utils.loadConfig("test/scenarios/equil/config_plans1.xml");
+		final Config config = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
 		config.controler().setLastIteration(0);
 		config.controler().setEventsFileFormats(EnumSet.of(EventsFileFormat.txt));
 
@@ -461,6 +469,7 @@ public class ControlerTest {
 		assertEquals(1, controler.getWriteEventsInterval());
 		controler.setCreateGraphs(false);
 		controler.setMobsimFactory(new FakeMobsimFactory());
+		controler.setDumpDataAtEnd(false);
 		controler.run();
 
 		assertTrue(new File(controler.getControlerIO().getIterationFilename(0, Controler.FILENAME_EVENTS_TXT)).exists());
@@ -472,7 +481,7 @@ public class ControlerTest {
 	 */
 	@Test
 	public void testSetWriteEventsXml() {
-		final Config config = utils.loadConfig("test/scenarios/equil/config_plans1.xml");
+		final Config config = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
 		config.controler().setLastIteration(0);
 		config.controler().setEventsFileFormats(EnumSet.of(EventsFileFormat.xml));
 
@@ -481,6 +490,7 @@ public class ControlerTest {
 		assertEquals(1, controler.getWriteEventsInterval());
 		controler.setCreateGraphs(false);
 		controler.setMobsimFactory(new FakeMobsimFactory());
+		controler.setDumpDataAtEnd(false);
 		controler.run();
 
 		assertFalse(new File(controler.getControlerIO().getIterationFilename(0,  Controler.FILENAME_EVENTS_TXT)).exists());
@@ -492,7 +502,7 @@ public class ControlerTest {
 	 */
 	@Test
 	public void testSetWriteEventsTxtXml() {
-		final Config config = utils.loadConfig("test/scenarios/equil/config_plans1.xml");
+		final Config config = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
 		config.controler().setLastIteration(0);
 		config.controler().setEventsFileFormats(EnumSet.of(EventsFileFormat.txt, EventsFileFormat.xml));
 
@@ -501,6 +511,7 @@ public class ControlerTest {
 		assertEquals(1, controler.getWriteEventsInterval());
 		controler.setCreateGraphs(false);
 		controler.setMobsimFactory(new FakeMobsimFactory());
+		controler.setDumpDataAtEnd(false);
 		controler.run();
 
 		assertTrue(new File(controler.getControlerIO().getIterationFilename(0, Controler.FILENAME_EVENTS_TXT)).exists());
@@ -511,8 +522,48 @@ public class ControlerTest {
 	 * @author mrieser
 	 */
 	@Test
+	public void testSetDumpDataAtEnd_true() {
+		final Config config = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
+		config.controler().setLastIteration(0);
+		config.controler().setWritePlansInterval(0);
+
+		final Controler controler = new Controler(config);
+		controler.setWriteEventsInterval(0);
+		controler.setCreateGraphs(false);
+		controler.setMobsimFactory(new FakeMobsimFactory());
+
+		controler.setDumpDataAtEnd(true);
+		controler.run();
+
+		assertTrue(new File(controler.getControlerIO().getOutputFilename(Controler.FILENAME_POPULATION)).exists());
+	}
+
+	/**
+	 * @author mrieser
+	 */
+	@Test
+	public void testSetDumpDataAtEnd_false() {
+		final Config config = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
+		config.controler().setLastIteration(0);
+		config.controler().setWritePlansInterval(0);
+
+		final Controler controler = new Controler(config);
+		controler.setWriteEventsInterval(0);
+		controler.setCreateGraphs(false);
+		controler.setMobsimFactory(new FakeMobsimFactory());
+
+		controler.setDumpDataAtEnd(false);
+		controler.run();
+
+		assertFalse(new File(controler.getControlerIO().getOutputFilename(Controler.FILENAME_POPULATION)).exists());
+	}
+
+	/**
+	 * @author mrieser
+	 */
+	@Test
 	public void testSetMobsimFactory() {
-		final Config config = utils.loadConfig("test/scenarios/equil/config_plans1.xml");
+		final Config config = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
 		config.controler().setLastIteration(1);
 		config.controler().setEventsFileFormats(EnumSet.of(EventsFileFormat.txt, EventsFileFormat.xml));
 
@@ -522,19 +573,21 @@ public class ControlerTest {
 		controler.setMobsimFactory(testFactory);
 		assertEquals(testFactory, controler.getMobsimFactory());
 		controler.setCreateGraphs(false);
+		controler.setDumpDataAtEnd(false);
 		controler.run();
 		assertEquals(2, testFactory.counter);
 	}
 
 	@Test
 	public void test_ExceptionOnMissingPopulationFile() {
-		final Config config = utils.loadConfig("test/scenarios/equil/config_plans1.xml");
+		final Config config = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
 		config.controler().setLastIteration(0);
 		config.plans().setInputFile("dummy/non-existing/population.xml");
 
 		final Controler controler = new Controler(config);
 		controler.setMobsimFactory(new FakeMobsimFactory());
 		controler.setCreateGraphs(false);
+		controler.setDumpDataAtEnd(false);
 		try {
 			controler.run();
 			Assert.fail("expected exception, got none.");
@@ -545,13 +598,14 @@ public class ControlerTest {
 
 	@Test
 	public void test_ExceptionOnMissingNetworkFile() {
-		final Config config = utils.loadConfig("test/scenarios/equil/config_plans1.xml");
+		final Config config = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
 		config.controler().setLastIteration(0);
 		config.network().setInputFile("dummy/non-existing/network.xml");
 
 		final Controler controler = new Controler(config);
 		controler.setMobsimFactory(new FakeMobsimFactory());
 		controler.setCreateGraphs(false);
+		controler.setDumpDataAtEnd(false);
 		try {
 			controler.run();
 			Assert.fail("expected exception, got none.");
@@ -562,13 +616,14 @@ public class ControlerTest {
 
 	@Test
 	public void test_ExceptionOnMissingFacilitiesFile() {
-		final Config config = utils.loadConfig("test/scenarios/equil/config_plans1.xml");
+		final Config config = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
 		config.controler().setLastIteration(0);
 		config.facilities().setInputFile("dummy/non-existing/network.xml");
 
 		final Controler controler = new Controler(config);
 		controler.setMobsimFactory(new FakeMobsimFactory());
 		controler.setCreateGraphs(false);
+		controler.setDumpDataAtEnd(false);
 		try {
 			controler.run();
 			Assert.fail("expected exception, got none.");
@@ -587,7 +642,7 @@ public class ControlerTest {
 	/*package*/ static class FakeMobsimFactory implements MobsimFactory {
 		/*package*/ int counter = 0;
 		@Override
-		public Simulation createMobsim(Scenario sc, EventsManager eventsManager) {
+		public Simulation createMobsim(final Scenario sc, final EventsManager eventsManager) {
 			this.counter++;
 			return new FakeMobsim();
 		}
@@ -617,7 +672,7 @@ public class ControlerTest {
 
 		protected Fixture(final Config config) {
 			this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
-			this.network = scenario.getNetwork();
+			this.network = this.scenario.getNetwork();
 
 			/* Create a simple network with 4 nodes and 3 links:
 			 *
@@ -640,23 +695,23 @@ public class ControlerTest {
 			this.network.addNode(this.node3);
 			this.network.addNode(this.node4);
 			this.link1 = this.network.getFactory().createLink(new IdImpl(1), this.node1.getId(), this.node2.getId());
-			link1.setLength(100);
-			link1.setFreespeed(10);
-			link1.setCapacity(7200);
-			link1.setNumberOfLanes(1);
-			this.network.addLink(link1);
+			this.link1.setLength(100);
+			this.link1.setFreespeed(10);
+			this.link1.setCapacity(7200);
+			this.link1.setNumberOfLanes(1);
+			this.network.addLink(this.link1);
 			this.link2 = this.network.getFactory().createLink(new IdImpl(2), this.node2.getId(), this.node3.getId());
-			link2.setLength(1000);
-			link2.setFreespeed(10);
-			link2.setCapacity(36);
-			link2.setNumberOfLanes(1);
-			this.network.addLink(link2);
+			this.link2.setLength(1000);
+			this.link2.setFreespeed(10);
+			this.link2.setCapacity(36);
+			this.link2.setNumberOfLanes(1);
+			this.network.addLink(this.link2);
 			this.link3 = this.network.getFactory().createLink(new IdImpl(3), this.node3.getId(), this.node4.getId());
-			link3.setLength(100);
-			link3.setFreespeed(10);
-			link3.setCapacity(7200);
-			link3.setNumberOfLanes(1);
-			this.network.addLink(link3);
+			this.link3.setLength(100);
+			this.link3.setFreespeed(10);
+			this.link3.setCapacity(7200);
+			this.link3.setNumberOfLanes(1);
+			this.network.addLink(this.link3);
 		}
 	}
 
