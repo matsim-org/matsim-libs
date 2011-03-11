@@ -54,6 +54,10 @@ import org.xml.sax.SAXException;
  * other load...() methods only load specific parts
  * of the scenario assuming that required parts are already
  * loaded or created by the user.
+ * <p/>
+ * Design thoughts:<ul>
+ * <li> Given what we have now, does it make sense to leave this class public?  yy kai, mar'11
+ * </ul> 
  *
  * @see org.matsim.core.scenario.ScenarioImpl
  *
@@ -91,11 +95,17 @@ public class ScenarioLoaderImpl {
 
 	private final ScenarioImpl scenario;
 
+	/**
+	 * yy Does it make sense to leave this constructor public?  kai, mar'11
+	 */
 	public ScenarioLoaderImpl(Config config) {
 		this.config = config;
 		this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(this.config);
 	}
 
+	/**
+	 * yy Does it make sense to leave this constructor public?  kai, mar'11
+	 */
 	public ScenarioLoaderImpl(Scenario scenario) {
 		this.scenario = (ScenarioImpl) scenario;
 		this.config = this.scenario.getConfig();
