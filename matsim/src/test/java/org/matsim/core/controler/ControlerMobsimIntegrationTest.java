@@ -48,9 +48,12 @@ public class ControlerMobsimIntegrationTest {
 		Config cfg = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
 		cfg.controler().setLastIteration(0);
 		cfg.controler().setMobsim("qsim");
+		cfg.controler().setWritePlansInterval(0);
 		cfg.addQSimConfigGroup(new QSimConfigGroup());
 		FakeControler c = new FakeControler(cfg);
 		c.setCreateGraphs(false);
+		c.setDumpDataAtEnd(false);
+		c.setWriteEventsInterval(0);
 		c.run();
 		Assert.assertTrue(c.sim instanceof QSim);
 		Assert.assertNull(((QSim) c.sim).getMultiModalSimEngine());
@@ -61,10 +64,13 @@ public class ControlerMobsimIntegrationTest {
 		Config cfg = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
 		cfg.controler().setLastIteration(0);
 		cfg.controler().setMobsim("qsim");
+		cfg.controler().setWritePlansInterval(0);
 		cfg.addQSimConfigGroup(new QSimConfigGroup());
 		cfg.getQSimConfigGroup().setNumberOfThreads(3);
 		FakeControler c = new FakeControler(cfg);
 		c.setCreateGraphs(false);
+		c.setDumpDataAtEnd(false);
+		c.setWriteEventsInterval(0);
 		c.run();
 		Assert.assertTrue(c.sim instanceof ParallelQSimulation);
 	}
@@ -74,8 +80,11 @@ public class ControlerMobsimIntegrationTest {
 		Config cfg = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
 		cfg.controler().setLastIteration(0);
 		cfg.controler().setMobsim("queueSimulation");
+		cfg.controler().setWritePlansInterval(0);
 		FakeControler c = new FakeControler(cfg);
 		c.setCreateGraphs(false);
+		c.setDumpDataAtEnd(false);
+		c.setWriteEventsInterval(0);
 		c.run();
 		Assert.assertTrue(c.sim instanceof QueueSimulation);
 	}
@@ -85,8 +94,11 @@ public class ControlerMobsimIntegrationTest {
 		Config cfg = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
 		cfg.controler().setLastIteration(0);
 		cfg.controler().setMobsim("jdeqsim");
+		cfg.controler().setWritePlansInterval(0);
 		FakeControler c = new FakeControler(cfg);
 		c.setCreateGraphs(false);
+		c.setDumpDataAtEnd(false);
+		c.setWriteEventsInterval(0);
 		c.run();
 		Assert.assertTrue("sim is of wrong type " + c.sim.getClass().getCanonicalName(), c.sim instanceof JDEQSimulation);
 	}
@@ -96,10 +108,13 @@ public class ControlerMobsimIntegrationTest {
 		Config cfg = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
 		cfg.controler().setLastIteration(0);
 		cfg.controler().setMobsim("multimodalQSim");
+		cfg.controler().setWritePlansInterval(0);
 		cfg.addQSimConfigGroup(new QSimConfigGroup());
 		cfg.multiModal().setMultiModalSimulationEnabled(true);
 		FakeControler c = new FakeControler(cfg);
 		c.setCreateGraphs(false);
+		c.setDumpDataAtEnd(false);
+		c.setWriteEventsInterval(0);
 		c.run();
 		System.out.println(c.sim.getClass().getCanonicalName());
 		Assert.assertTrue(c.sim instanceof QSim);
@@ -111,10 +126,13 @@ public class ControlerMobsimIntegrationTest {
 		Config cfg = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
 		cfg.controler().setLastIteration(0);
 		cfg.controler().setMobsim("counting");
+		cfg.controler().setWritePlansInterval(0);
 		Controler c = new Controler(cfg);
 		CountingMobsimFactory mf = new CountingMobsimFactory();
 		c.addMobsimFactory("counting", mf);
 		c.setCreateGraphs(false);
+		c.setDumpDataAtEnd(false);
+		c.setWriteEventsInterval(0);
 		c.run();
 		Assert.assertEquals(1, mf.callCount);
 	}
@@ -124,7 +142,11 @@ public class ControlerMobsimIntegrationTest {
 		Config cfg = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
 		cfg.controler().setLastIteration(0);
 		cfg.controler().setMobsim("counting");
+		cfg.controler().setWritePlansInterval(0);
 		Controler c = new Controler(cfg);
+		c.setCreateGraphs(false);
+		c.setDumpDataAtEnd(false);
+		c.setWriteEventsInterval(0);
 		try {
 			c.run();
 			Assert.fail("expected exception, but there was none.");
