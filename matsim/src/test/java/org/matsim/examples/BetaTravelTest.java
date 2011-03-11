@@ -65,9 +65,9 @@ import org.matsim.testcases.MatsimTestCase;
  * can only do departure-time adaptation, no rerouting. This leads to all
  * agents driving through the one bottleneck in the network. A special
  * time-adaption module is used (TimeAllocationMutatorBottleneck, inside this
- * class), that only mutates the endtime of the very first activity, but not 
+ * class), that only mutates the endtime of the very first activity, but not
  * the duration of other activities. This is to ensure that the duration of the
- * activities do not have any influence on the score, but only the travel-time 
+ * activities do not have any influence on the score, but only the travel-time
  * (and with that, eventually shortened activity durations) has.
  *
  * @author mrieser
@@ -77,30 +77,30 @@ public class BetaTravelTest extends MatsimTestCase {
 	/* This TestCase uses a custom Controler, named TestControler, to load
 	 * specific strategies. The strategies make use of a test-specific
 	 * TimeAllocationMutator, the TimeAllocationMutatorBottleneck.
-	 * LinkAnalyzer, an event handler, collects some statistics on the 
+	 * LinkAnalyzer, an event handler, collects some statistics on the
 	 * "bottleneck-link". The BottleneckTravelTimeAnalyzer, an event handler
 	 * as well, creates the graphs used to manually verify the correctness
 	 * of this TestCase -- it generates a plot similar to the ones from
 	 * Vickrey's model.
 	 * A custom TestControlerListener is responsible for integrating all these
 	 * event handlers into the TestControler.
-	 * 
+	 *
 	 * **************************************************************************
-	 * 
+	 *
 	 *                WHAT TO DO IF THESE TESTS FAIL?
-	 * 
+	 *
 	 * In the output directories for iteration 100, there should be a file
 	 * "100.bottleneck_times.png". Open the files for the two test cases. In the
 	 * case of beta_travel = -66, the red dots in the graph should form a (more
 	 * or less) straight line with slope 1. In the case of beta_travel = -6, the
-	 * straight line can only be seen outside of the range [5.20, 5.60]. Within 
+	 * straight line can only be seen outside of the range [5.20, 5.60]. Within
 	 * this range first a higher slope should be seen until about 5.35, and then
 	 * a lower slope, leading to a "triangle" form on the straight line.
 	 * If this triangle form can still be seen clearly, update the values in
 	 * TestControlerListener.notifyIterationEnds() that are used to automatically
-	 * verify the tests. The actual values can be found in the output (log-file) 
+	 * verify the tests. The actual values can be found in the output (log-file)
 	 * of these tests. They still should be similar to the current values.
-	 * 
+	 *
 	 * **************************************************************************
 	 */
 
@@ -111,9 +111,11 @@ public class BetaTravelTest extends MatsimTestCase {
 	 */
 	public void testBetaTravel_6() {
 		Config config = loadConfig(getInputDirectory() + "config.xml");
+		config.controler().setWritePlansInterval(0);
 		TestControler controler = new TestControler(config);
 		controler.addControlerListener(new TestControlerListener());
 		controler.setCreateGraphs(false);
+		controler.setDumpDataAtEnd(false);
 		controler.setWriteEventsInterval(0);
 		controler.run();
 	}
@@ -125,9 +127,11 @@ public class BetaTravelTest extends MatsimTestCase {
 	 */
 	public void testBetaTravel_66() {
 		Config config = loadConfig(getInputDirectory() + "config.xml");
+		config.controler().setWritePlansInterval(0);
 		TestControler controler = new TestControler(config);
 		controler.addControlerListener(new TestControlerListener());
 		controler.setCreateGraphs(false);
+		controler.setDumpDataAtEnd(false);
 		controler.setWriteEventsInterval(0);
 		controler.run();
 	}
@@ -135,7 +139,7 @@ public class BetaTravelTest extends MatsimTestCase {
 	/**
 	 * Collects some statistics on a specific link. Used to automatically verify
 	 * the TestCase still works as intended.
-	 * 
+	 *
 	 * @author mrieser
 	 */
 	private static class LinkAnalyzer implements LinkEnterEventHandler, LinkLeaveEventHandler {
@@ -158,6 +162,7 @@ public class BetaTravelTest extends MatsimTestCase {
 			reset(0);
 		}
 
+		@Override
 		public void reset(final int iteration) {
 			this.iteration = iteration;
 			this.firstCarEnter = Double.POSITIVE_INFINITY;
@@ -171,6 +176,7 @@ public class BetaTravelTest extends MatsimTestCase {
 			this.leaveTimes.clear();
 		}
 
+		@Override
 		public void handleEvent(final LinkEnterEvent event) {
 			if (event.getLinkId().toString().equals(this.linkId)) {
 				this.enterTimes.add(Double.valueOf(event.getTime()));
@@ -179,6 +185,7 @@ public class BetaTravelTest extends MatsimTestCase {
 			}
 		}
 
+		@Override
 		public void handleEvent(final LinkLeaveEvent event) {
 			if (event.getLinkId().toString().equals(this.linkId)) {
 				this.leaveTimes.add(Double.valueOf(event.getTime()));
@@ -237,8 +244,8 @@ public class BetaTravelTest extends MatsimTestCase {
 	}
 
 	/**
-	 * A custom Controler for this TestCase that loads special strategies and 
-	 * verifies that the loaded settings from the configuration files are 
+	 * A custom Controler for this TestCase that loads special strategies and
+	 * verifies that the loaded settings from the configuration files are
 	 * suitable to test what we want.
 	 *
 	 * @author mrieser
@@ -290,8 +297,8 @@ public class BetaTravelTest extends MatsimTestCase {
 	}
 
 	/**
-	 * Responsible for the verification of the tests. It adds a few event 
-	 * handlers and checks their result in a specific iteration. 
+	 * Responsible for the verification of the tests. It adds a few event
+	 * handlers and checks their result in a specific iteration.
 	 *
 	 * @author mrieser
 	 */
@@ -303,11 +310,13 @@ public class BetaTravelTest extends MatsimTestCase {
 		public TestControlerListener() {
 			// empty public constructor for private class
 		}
-		
+
+		@Override
 		public void notifyStartup(final StartupEvent event) {
 			this.ttAnalyzer = new BottleneckTravelTimeAnalyzer(event.getControler().getPopulation().getPersons().size());
 		}
 
+		@Override
 		public void notifyIterationStarts(final IterationStartsEvent event) {
 			int iteration = event.getIteration();
 			if (iteration % 10 == 0) {
@@ -321,6 +330,7 @@ public class BetaTravelTest extends MatsimTestCase {
 			}
 		}
 
+		@Override
 		public void notifyIterationEnds(final IterationEndsEvent event) {
 			int iteration = event.getIteration();
 			if (iteration % 10 == 0) {
@@ -337,7 +347,7 @@ public class BetaTravelTest extends MatsimTestCase {
 				double beta_travel = event.getControler().getConfig().planCalcScore().getTraveling_utils_hr();
 				/* ***************************************************************
 				 * AUTOMATIC VERIFICATION OF THE TESTS:
-				 * 
+				 *
 				 * Explanation to the results:
 				 * the triangle spawned by (firstCarEnter,0) - (maxCarsOnLinkTime,maxCarsOnLink) - (lastCarLeave,0)
 				 * should have different forms between the two runs. For beta_travel = -6, the peak at
@@ -345,7 +355,7 @@ public class BetaTravelTest extends MatsimTestCase {
 				 * In theory, firstCarEnter and lastCarLeave should be equal or similar. In practice (in our case)
 				 * they are likely to differ slightly.<br>
 				 * See the paper "Economics of a bottleneck" by Arnott, De Palma and Lindsey, 1987.
-				 * 
+				 *
 				 * Change the values below to make the test pass, if they are consistent with the desired output.
 				 */
 				if (beta_travel == -6.0) {
@@ -377,7 +387,7 @@ public class BetaTravelTest extends MatsimTestCase {
 		/*package*/ TimeAllocationMutatorBottleneck(final int numOfThreads) {
 			super(numOfThreads);
 		}
-		
+
 		@Override
 		public PlanAlgorithm getPlanAlgoInstance() {
 			return new PlanMutateTimeAllocationBottleneck(1800);
@@ -393,6 +403,7 @@ public class BetaTravelTest extends MatsimTestCase {
 			this.mutationRange = mutationRange;
 		}
 
+		@Override
 		public void run(final Plan plan) {
 			mutatePlan(plan);
 		}
@@ -460,7 +471,7 @@ public class BetaTravelTest extends MatsimTestCase {
 	}
 
 	/**
-	 * Collects the departure and arrival times of the first leg of each agent, 
+	 * Collects the departure and arrival times of the first leg of each agent,
 	 * and plots them in XY-Scatter-Plot for manual verification in case this
 	 * test case fails.
 	 *
@@ -479,6 +490,7 @@ public class BetaTravelTest extends MatsimTestCase {
 			this.arrTimes = new double[popSize];
 		}
 
+		@Override
 		public void handleEvent(final AgentDepartureEvent event) {
 			if (!this.agentSeen.contains(event.getPersonId())) { // only store first departure
 				this.agentDepTimes.put(event.getPersonId(), Double.valueOf(event.getTime()));
@@ -486,6 +498,7 @@ public class BetaTravelTest extends MatsimTestCase {
 			}
 		}
 
+		@Override
 		public void handleEvent(final AgentArrivalEvent event) {
 			Double depTime = this.agentDepTimes.remove(event.getPersonId());
 			if (depTime != null) {
@@ -495,6 +508,7 @@ public class BetaTravelTest extends MatsimTestCase {
 			}
 		}
 
+		@Override
 		public void reset(final int iteration) {
 			this.agentDepTimes.clear();
 			this.agentSeen.clear();
