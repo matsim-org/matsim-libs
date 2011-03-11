@@ -85,7 +85,7 @@ public class SylviaOTFVisMain {
 	 */
 	public static void main(String[] args) {
 		SylviaOTFVisMain sylviaMain = new SylviaOTFVisMain();
-		sylviaMain.playCottbus("/media/data/work/repos/shared-svn/studies/dgrether/cottbus/sylvia/cottbus_sylvia_config.xml");
+		sylviaMain.playCottbus("/media/data/work/repos/shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/config.xml");
 	}
 
 }
