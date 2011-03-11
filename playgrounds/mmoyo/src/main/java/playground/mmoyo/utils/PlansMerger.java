@@ -5,15 +5,15 @@ import java.io.File;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.api.experimental.ScenarioLoader;
-import org.matsim.core.api.experimental.ScenarioLoaderFactoryImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 import playground.mmoyo.utils.calibration.PlanScoreRemover;
 
@@ -26,11 +26,10 @@ public class PlansMerger {
 	public Population agentAggregator(String[] configs){
 		int populationsNum= configs.length;
 		Population[] populationArray = new Population[populationsNum];
-		Population newPopulation = new PopulationImpl(new ScenarioImpl());
+		Population newPopulation = new PopulationImpl((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig()));
 		 
 		for (int i=0; i<populationsNum; i++){
-			ScenarioLoader sl = new ScenarioLoaderFactoryImpl().createScenarioLoader(configs[i]);
-			Scenario scenario = sl.loadScenario();
+			Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(configs[i]));
 			populationArray[i] = scenario.getPopulation();
 		}
 		
@@ -58,7 +57,7 @@ public class PlansMerger {
 	/**Assuming that the given populations do not share any agent*/
 	public void diffAgentMerger (String[] configs){
 		Scenario scenario = null;
-		Population newPopulation = new PopulationImpl(new ScenarioImpl());
+		Population newPopulation = new PopulationImpl((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig()));
 		 
 		String warning = "The agent is repeated in populations: ";
 		for (int i=0; i<configs.length; i++){
