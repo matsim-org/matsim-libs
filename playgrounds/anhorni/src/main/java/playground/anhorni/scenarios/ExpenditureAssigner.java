@@ -35,16 +35,14 @@ public class ExpenditureAssigner {
 	private String path = null;
 	
 	private Random randomNumberGenerator;
-	private long seed;
 	private ObjectAttributes personAttributes;
 	
-	public ExpenditureAssigner(double mu [], double sigma [], String path, long seed, ObjectAttributes personAttributes) {
+	public ExpenditureAssigner(double mu [], double sigma [], String path, Random randomNumberGenerator, ObjectAttributes personAttributes) {
 		this.mu = mu;
 		this.sigma = sigma;
 		this.path = path;
-		this.seed = seed;
 		this.personAttributes = personAttributes;
-		this.randomNumberGenerator = new Random(this.seed);	
+		this.randomNumberGenerator = randomNumberGenerator;	
 	}
 			
 	public void assignExpenditures(PopulationImpl population) {

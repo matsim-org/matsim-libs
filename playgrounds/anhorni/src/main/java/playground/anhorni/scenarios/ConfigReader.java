@@ -40,6 +40,7 @@ public class ConfigReader {
 	private int numberOfAnalyses = -1;
 	private String runId ="";
 	private boolean temporalVar;
+	private long seed;
 	       
     public void read() {
     	
@@ -84,6 +85,10 @@ public class ConfigReader {
           line = bufferedReader.readLine();
           parts = line.split("\t");
           this.temporalVar = Boolean.parseBoolean(parts[1]);
+          
+          line = bufferedReader.readLine();
+          parts = line.split("\t");
+          this.seed = Long.parseLong(parts[1]);
           
         } // end try
         catch (IOException e) {
@@ -177,5 +182,13 @@ public class ConfigReader {
 
 	public void setTemporalVar(boolean temporalVar) {
 		this.temporalVar = temporalVar;
+	}
+
+	public long getSeed() {
+		return seed;
+	}
+
+	public void setSeed(long seed) {
+		this.seed = seed;
 	}
 }

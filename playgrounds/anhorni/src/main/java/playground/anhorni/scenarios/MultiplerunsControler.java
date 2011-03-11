@@ -78,12 +78,7 @@ public class MultiplerunsControler {
     		}
     	}
     	log.info("Create analysis ...");   	
-    	summaryWriter.run();
-  	
-//    	RandomRunsAnalyzer analyzer = new RandomRunsAnalyzer(
-//    			configReader.getNumberOfCityShoppingLocs(), MultiplerunsControler.path, numberOfRandomRuns);
-//    	analyzer.run(configReader.getNumberOfAnalyses());
-    	
+    	summaryWriter.run();   	
     	log.info("All runs finished ******************************");
     }
 }

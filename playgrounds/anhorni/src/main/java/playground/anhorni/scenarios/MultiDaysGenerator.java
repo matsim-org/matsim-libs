@@ -28,19 +28,20 @@ import playground.anhorni.random.RandomFromVarDistr;
 public class MultiDaysGenerator {
 	
 	private Random randomNumberGenerator;
-	private SinglePlanGenerator singlePlanGenerator = new SinglePlanGenerator();
+	private SinglePlanGenerator singlePlanGenerator;
 	private PopulationImpl staticPopulation;
 	private ScenarioImpl scenarioWriteOut;
 	private NetworkImpl network;
 	private boolean temporalVar;
 	private long seed;
 	
-	public MultiDaysGenerator(long seed, PopulationImpl staticPopulation, ScenarioImpl scenarioWriteOut, 
+	public MultiDaysGenerator(Random randomNumberGenerator, PopulationImpl staticPopulation, ScenarioImpl scenarioWriteOut, 
 			NetworkImpl network, boolean temporalVar, ObjectAttributes personAttributes) {
-		this.randomNumberGenerator = new Random(seed);
+		this.randomNumberGenerator = randomNumberGenerator;
 		for (int i = 0; i < 1000; i++) {
 			this.randomNumberGenerator.nextDouble();
 		}
+		singlePlanGenerator = new SinglePlanGenerator(scenarioWriteOut.getActivityFacilities());
 		this.staticPopulation = staticPopulation;
 		this.scenarioWriteOut = scenarioWriteOut;
 		this.network = network;
@@ -59,9 +60,9 @@ public class MultiDaysGenerator {
 			}
 			Collections.shuffle(keyList, randomNumberGenerator);
 			
-			this.generateRandomPlansPerDay(keyList, limit);
+			this.generatePlan(keyList, limit);
 			
-			String path = Create3TownsDemand.outputFolder + "/runs/run" + runId + "/day" + i;
+			String path = Create3TownsScenario.outputFolder + "/runs/run" + runId + "/day" + i;
 			new File(path).mkdirs();
 			this.adaptForDestinationChoice();
 			this.writePlansAndFacs(path + "/plans.xml", path + "/facilities.xml");
@@ -69,7 +70,7 @@ public class MultiDaysGenerator {
 		}	
 	}
 	
-	private void generateRandomPlansPerDay(List<Integer> keyList, double limit) {
+	private void generatePlan(List<Integer> keyList, double limit) {
 		int cnt = 0;
 		for (Integer id : keyList) {
 			PersonImpl p = (PersonImpl)staticPopulation.getPersons().get(new IdImpl(id));
@@ -80,7 +81,7 @@ public class MultiDaysGenerator {
 			
 			boolean worker = false;
 			if (this.randomNumberGenerator.nextDouble() > limit) {
-				worker = true;
+			//	worker = true;
 			}
 			int homeId = 1;
 			if ((Integer)p.getCustomAttributes().get("townId") == 1) {
@@ -119,11 +120,7 @@ public class MultiDaysGenerator {
 		}
 		maxEpsilonComputer.finishReplanning();
 	}	
-	
-	private void createObjectAttributes() {
 		
-	}
-	
 	public void writePlansAndFacs(String plansFile, String facsFile) {	
 		new PopulationWriter(scenarioWriteOut.getPopulation(), network).write(plansFile);
 		new FacilitiesWriter(this.scenarioWriteOut.getActivityFacilities()).write(facsFile);

@@ -19,6 +19,8 @@
 
 package playground.anhorni.scenarios;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -27,6 +29,12 @@ import org.matsim.core.population.PlanImpl;
 
 
 public class SinglePlanGenerator {
+	
+	private ActivityFacilities facilities;
+	
+	public SinglePlanGenerator(ActivityFacilities facilities) {
+		this.facilities = facilities;
+	}
 	
 	public PlanImpl generatePlan(int homeIndex, boolean worker, PersonImpl p) {
 		PlanImpl plan;
@@ -39,22 +47,26 @@ public class SinglePlanGenerator {
 		
 		int facilityIndex = 1;
 		if (homeIndex == 8) facilityIndex = 2;
+		Id facilityId = new IdImpl(facilityIndex);
 		
 		PlanImpl plan = new PlanImpl();
 		ActivityImpl actH = new ActivityImpl("h", new IdImpl(homeIndex));
-		actH.setFacilityId(new IdImpl(facilityIndex));
+		actH.setFacilityId(facilityId);
+		actH.setCoord(this.facilities.getFacilities().get(facilityId).getCoord());
 		actH.setEndTime(14 * 3600);
 		plan.addActivity(actH);		
 		plan.addLeg(new LegImpl("car"));
 				
 		ActivityImpl actS = new ActivityImpl("s", new IdImpl(homeIndex));
 		actS.setEndTime(17 * 3600);
-		actS.setFacilityId(new IdImpl(facilityIndex));
+		actS.setFacilityId(facilityId);
+		actS.setCoord(this.facilities.getFacilities().get(facilityId).getCoord());
 		plan.addActivity(actS);
 		plan.addLeg(new LegImpl("car"));
 		
 		ActivityImpl actH2 = new ActivityImpl("h", new IdImpl(homeIndex));
-		actH2.setFacilityId(new IdImpl(facilityIndex));
+		actH2.setFacilityId(facilityId);
+		actH2.setCoord(this.facilities.getFacilities().get(facilityId).getCoord());
 		plan.addActivity(actH2);
 		return plan;
 	}
@@ -63,10 +75,12 @@ public class SinglePlanGenerator {
 		
 		int facilityIndex = 1;
 		if (homeIndex == 8) facilityIndex = 2;
+		Id facilityId = new IdImpl(facilityIndex);
 		
 		PlanImpl plan = new PlanImpl();
 		ActivityImpl actH = new ActivityImpl("h", new IdImpl(homeIndex));
-		actH.setFacilityId(new IdImpl(facilityIndex));
+		actH.setFacilityId(facilityId);
+		actH.setCoord(this.facilities.getFacilities().get(facilityId).getCoord());
 		actH.setEndTime(7.0 * 3600);
 		plan.addActivity(actH);		
 		plan.addLeg(new LegImpl("car"));
@@ -75,20 +89,24 @@ public class SinglePlanGenerator {
 		if ((Boolean) p.getCustomAttributes().get("cityWorker")) {
 			workIndex = 17; workFacilityIndex = 4;
 		}
+		Id workFacilityId = new IdImpl(workFacilityIndex);
 		ActivityImpl actW = new ActivityImpl("w", new IdImpl(workIndex));
-		actW.setFacilityId(new IdImpl(workFacilityIndex));
+		actW.setFacilityId(workFacilityId);
+		actW.setCoord(this.facilities.getFacilities().get(workFacilityId).getCoord());
 		actW.setEndTime(17 * 3600);
 		plan.addActivity(actW);	
 		plan.addLeg(new LegImpl("car"));
 		
 		ActivityImpl actS = new ActivityImpl("s", new IdImpl(homeIndex));
-		actS.setFacilityId(new IdImpl(facilityIndex));
+		actS.setFacilityId(facilityId);
+		actS.setCoord(this.facilities.getFacilities().get(facilityId).getCoord());
 		actS.setEndTime(20 * 3600);
 		plan.addActivity(actS);
 		plan.addLeg(new LegImpl("car"));
 		
 		ActivityImpl actH2 = new ActivityImpl("h", new IdImpl(homeIndex));
-		actH2.setFacilityId(new IdImpl(facilityIndex));
+		actH2.setFacilityId(facilityId);
+		actH2.setCoord(this.facilities.getFacilities().get(facilityId).getCoord());
 		plan.addActivity(actH2);
 		return plan;
 	}
