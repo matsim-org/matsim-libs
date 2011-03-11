@@ -26,8 +26,8 @@ public class AverageEnergyConsumptionGalus implements AverageEnergyConsumptionBi
 	}
 	
 	
-	public double getEnergyConsumption(double speed, double distance) {
-		return ecs.getInterpolatedEnergyConsumption(speed, distance);
+	public double getEnergyConsumption(double speedInMetersPerSecond, double distance) {
+		return ecs.getInterpolatedEnergyConsumption(speedInMetersPerSecond, distance);
 	}
 
 }
