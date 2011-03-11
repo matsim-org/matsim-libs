@@ -152,6 +152,16 @@ public class DgOTFVisReplayLastIteration {
 			else if (line.contains("walkSpeedFactor")) {
 				line = line.replaceAll("walkSpeedFactor", "walkSpeed");
 			}
+			else if (line.contains("ptScaleFactor") ||
+					line.contains("localDTDBase") ||
+					line.contains("outputSample") ||
+					line.contains("outputVersion") ||
+					line.contains("evacuationTime") ||
+					line.contains("snapshotfile")
+				){
+				line = reader.readLine();
+				continue;
+			}
 			writer.write(line);
 			line = reader.readLine();
 		}
