@@ -115,6 +115,9 @@ public class Geocoder {
 		}
 		return location;
 	}
+	
+	// Sleep at most 4 hours between consecutive tries:
+	static final long MAX_SLEEP = 4 * 60 * 60000;
 
 	public static void main (String[] argv) throws Exception {
 		BufferedReader in;
@@ -133,12 +136,16 @@ public class Geocoder {
 			Coord loc = null;
 
 			while (true) {
+				long lSleep = 60000;
 				try {
 					loc = Geocoder.getLocation (matcher.group(1));
 				}
 				catch (TooManyQueriesException e) {
-					System.err.printf("%tc: %s, sleeping\n", new Date(), e.getMessage());
-					Thread.sleep(60000);
+					System.err.printf("%tc: %s, sleeping %d minutes\n", new Date(), e.getMessage(), lSleep / 60000);
+					Thread.sleep(lSleep);
+					lSleep *= 2;
+					if (lSleep > MAX_SLEEP)
+						lSleep = MAX_SLEEP;
 					continue;
 				}
 				break;
