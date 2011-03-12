@@ -39,7 +39,7 @@ import org.matsim.locationchoice.facilityload.FacilityPenalty;
 import playground.anhorni.LEGO.miniscenario.ConfigReader;
 
 
-public class MixedActivityScoringFunction extends LocationChoiceScoringFunction { //org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
+public class MixedActivityScoringFunction extends org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 	static final Logger log = Logger.getLogger(MixedActivityScoringFunction.class);
 	private final ActivityFacilities facilities;
 	
@@ -54,7 +54,8 @@ public class MixedActivityScoringFunction extends LocationChoiceScoringFunction 
 			final ActivityFacilities facilities, Random random, ConfigReader configReader,
 			final TreeMap<Id, FacilityPenalty> facilityPenalties,
 			Config config) {
-		super(plan, params, facilityPenalties, facilities);
+		//super(plan, params, facilityPenalties, facilities);
+		super(plan, params);
 		this.random = random;
 		this.facilities = facilities;
 		this.configReader = configReader;
