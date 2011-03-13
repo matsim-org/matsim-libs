@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
@@ -43,6 +44,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -120,6 +122,9 @@ public class AdaptZHScenario {
 	}
 	
 	private void adaptPlans() {	
+		
+		Vector<PersonImpl> personsWithoutCB = new Vector<PersonImpl>();
+		
 		TreeMap<String, QuadTree<ActivityFacility>> trees = new TreeMap<String, QuadTree<ActivityFacility>>();
 		trees.put("home", this.builFacQuadTree("home", this.scenario.getActivityFacilities().getFacilitiesForActivityType("h")));
 		trees.put("work", this.builFacQuadTree("work", this.scenario.getActivityFacilities().getFacilitiesForActivityType("w")));
@@ -130,7 +135,12 @@ public class AdaptZHScenario {
 		
 		int counter = 0;
 		int nextMsg = 1;
-		for (Person p : this.scenario.getPopulation().getPersons().values()) {			
+		for (Person p : this.scenario.getPopulation().getPersons().values()) {	
+			
+			if (p.getId().compareTo(new IdImpl(1000000000)) < 0) {
+				personsWithoutCB.add((PersonImpl)p);
+			}
+			
 			Plan plan = p.getSelectedPlan();
 			counter++;
 			if (counter % nextMsg == 0) {
@@ -162,6 +172,10 @@ public class AdaptZHScenario {
 					}
 				}
 			}
+		}
+		this.scenario.getPopulation().getPersons().clear();
+		for (Person p: personsWithoutCB) {
+			this.scenario.getPopulation().addPerson(p);
 		}
 	}
 	
