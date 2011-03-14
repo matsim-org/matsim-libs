@@ -2,11 +2,25 @@ package playground.anhorni.random;
 
 import java.util.Random;
 
-
 public class RandomFromVarDistr {
 	
 	private long seed = 109877L;
 	private Random rnd;
+	
+	public static void main (String argv []){
+		RandomFromVarDistr standAlonegenerator = new RandomFromVarDistr();	
+		standAlonegenerator.generateLongs(Integer.parseInt(argv[0]));
+	}
+	
+	public void generateLongs(int n) {
+		rnd = new Random(this.seed);
+		for (int i = 0; i < 1000; i++) {
+			rnd.nextLong();
+		}
+		for (int i = 0; i < n; i++) {
+			System.out.println(rnd.nextLong());
+		}
+	}
 	
 	public RandomFromVarDistr() {
 		this.rnd = new Random(this.seed);
