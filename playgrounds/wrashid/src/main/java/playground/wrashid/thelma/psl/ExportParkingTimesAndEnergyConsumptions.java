@@ -30,8 +30,8 @@ import playground.wrashid.lib.obj.LinkedListValueHashMap;
 public class ExportParkingTimesAndEnergyConsumptions {
 
 	public static void main(String[] args) {
-		String eventsFile="C:/data/workspace/matsim/output/berlin/ITERS/it.17/17.events.txt.gz";
-		String networkFile="C:/data/workspace/playgrounds/wrashid/test/scenarios/berlin/network.xml";
+		String eventsFile="H:/data/experiments/ARTEMIS/output/run10/ITERS/it.50/50.events.txt.gz";
+		String networkFile="H:/data/experiments/ARTEMIS/output/run10/output_network.xml.gz";
 		EventsManagerImpl events = new EventsManagerImpl();
 
 		
