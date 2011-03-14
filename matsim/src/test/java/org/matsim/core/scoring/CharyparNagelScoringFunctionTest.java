@@ -188,6 +188,11 @@ public abstract class CharyparNagelScoringFunctionTest extends ScoringFunctionTe
 		this.config.planCalcScore().setConstantPt(-3.0) ;
 		assertEquals(-5.25, calcScore(), EPSILON);
 	}
+	
+	public void testTravelingWalk() {
+		// this needs to be filled with meaning. yyyyyy kai, mar'11
+		assertEquals( 0, 0, EPSILON ) ;
+	}
 
 	/**
 	 * Test the performing part of the scoring function.
