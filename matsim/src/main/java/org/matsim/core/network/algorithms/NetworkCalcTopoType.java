@@ -21,6 +21,7 @@
 package org.matsim.core.network.algorithms;
 
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
@@ -28,11 +29,13 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.NetworkRunnable;
-import org.matsim.core.gbl.Gbl;
-import org.matsim.core.utils.misc.NetworkUtils;
+import org.matsim.core.utils.misc.Counter;
 
 /** See "http://www.ivt.ethz.ch/vpl/publications/reports/ab283.pdf"
- * for a description of node types. It's the graph matching paper. */
+ * for a description of node types. It's the graph matching paper.
+ *
+ * @author balmermi
+ **/
 public class NetworkCalcTopoType implements NetworkRunnable {
 
 	public final static Integer EMPTY        = Integer.valueOf(0);
@@ -45,27 +48,31 @@ public class NetworkCalcTopoType implements NetworkRunnable {
 	public final static Integer END1WAY      = Integer.valueOf(7);
 	public final static Integer INTERSECTION = Integer.valueOf(8);
 
-	private final Map<Node, Integer> topoTypePerNode = new HashMap<Node, Integer>();
+	private final Map<Node, Integer> topoTypePerNode = new IdentityHashMap<Node, Integer>(100000);
 
 	@Override
 	public void run(final Network network) {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
+		Counter ctr = new Counter("node #");
 
 		for (Node n : network.getNodes().values()) {
-			if (NetworkUtils.getIncidentLinks(n).size() == 0) { setTopoType(n, EMPTY); }
-			else if (n.getInLinks().size() == 0) { setTopoType(n, SOURCE); }
-			else if (n.getOutLinks().size() == 0) {setTopoType(n, SINK); }
-			else if (getIncidentNodes(n).size() == 1) { setTopoType(n, DEADEND); }
-			else if (getIncidentNodes(n).size() == 2) {
-				if ((n.getOutLinks().size() == 1) && (n.getInLinks().size() == 1)) { setTopoType(n, PASS1WAY); }
-				else if ((n.getOutLinks().size() == 2) && (n.getInLinks().size() == 2)) { setTopoType(n, PASS2WAY); }
-				else if ((n.getOutLinks().size() == 2) && (n.getInLinks().size() == 1)) { setTopoType(n, START1WAY); }
-				else if ((n.getOutLinks().size() == 1) && (n.getInLinks().size() == 2)) { setTopoType(n, END1WAY); }
+			ctr.incCounter();
+			int nOfInLinks = n.getInLinks().size();
+			int nOfOutLinks = n.getOutLinks().size();
+			if ((nOfInLinks + nOfOutLinks) == 0) { setTopoType(n, EMPTY); }
+			else if (nOfInLinks == 0) { setTopoType(n, SOURCE); }
+			else if (nOfOutLinks == 0) {setTopoType(n, SINK); }
+			else if (getNOfIncidentNodes(n) == 1) { setTopoType(n, DEADEND); }
+			else if (getNOfIncidentNodes(n) == 2) {
+				if ((nOfOutLinks == 1) && (nOfInLinks == 1)) { setTopoType(n, PASS1WAY); }
+				else if ((nOfOutLinks == 2) && (nOfInLinks == 2)) { setTopoType(n, PASS2WAY); }
+				else if ((nOfOutLinks == 2) && (nOfInLinks == 1)) { setTopoType(n, START1WAY); }
+				else if ((nOfOutLinks == 1) && (nOfInLinks == 2)) { setTopoType(n, END1WAY); }
 				// The following case is not covered by the paper, but quite common, e.g. parallel roads connecting the same nodes.
-				else if ((n.getOutLinks().size() >= 1) && (n.getInLinks().size() >= 1)) { setTopoType(n, INTERSECTION); }
-				else { Gbl.errorMsg("Node=" + n.toString() + " cannot be assigned to a topo type!"); }
+				else if ((nOfOutLinks >= 1) && (nOfInLinks >= 1)) { setTopoType(n, INTERSECTION); }
+				else { throw new RuntimeException("Node=" + n.toString() + " cannot be assigned to a topo type!"); }
 			}
-			else { // more than two neighbour nodes and no sink or source
+			else { // more than two neighbors nodes and no sink or source
 				setTopoType(n, INTERSECTION);
 			}
 		}
@@ -101,7 +108,7 @@ public class NetworkCalcTopoType implements NetworkRunnable {
 		return i.intValue();
 	}
 
-	private HashMap<Id, Node> getIncidentNodes(final Node node) {
+	private int getNOfIncidentNodes(final Node node) {
 		HashMap<Id, Node> nodes = new HashMap<Id, Node>();
 		for (Link link : node.getInLinks().values()) {
 			nodes.put(link.getFromNode().getId(), link.getFromNode());
@@ -109,6 +116,6 @@ public class NetworkCalcTopoType implements NetworkRunnable {
 		for (Link link : node.getOutLinks().values()) {
 			nodes.put(link.getToNode().getId(), link.getToNode());
 		}
-		return nodes;
+		return nodes.size();
 	}
 }
