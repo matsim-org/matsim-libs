@@ -29,10 +29,11 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 
 /**
  * @author yu
- *
+ * 
  */
 public class ScoringConfigGetValue {
-	private final static Logger log = Logger.getLogger(ScoringConfigGetValue.class);
+	private final static Logger log = Logger
+			.getLogger(ScoringConfigGetValue.class);
 	private static PlanCalcScoreConfigGroup scoringCfgGroup;
 	private static Config config;
 
@@ -47,9 +48,9 @@ public class ScoringConfigGetValue {
 	private static final String MONETARY_DISTANCE_COST_RATE_CAR = "monetaryDistanceCostRateCar";
 	private static final String MONETARY_DISTANCE_COST_RATE_PT = "monetaryDistanceCostRatePt";
 
-	private static final String OFFSET_CAR = "offsetCar";
-	private static final String OFFSET_PT = "offsetPt";
-	private static final String OFFSET_WALK = "offsetWalk";
+	private static final String CONSTANT_CAR = "constantCar";
+	private static final String CONSTANT_PT = "constantPt";
+	private static final String CONSTANT_WALK = "constantWalk";
 
 	public static void setConfig(Config config) {
 		ScoringConfigGetValue.config = config;
@@ -60,16 +61,16 @@ public class ScoringConfigGetValue {
 	 * <param name="parameterName_0" value="traveling" /> <param
 	 * name="parameterName_1" value="travelingPt" /> <param
 	 * name="parameterName_2" value="travelingWalk" />
-	 *
+	 * 
 	 * <param name="parameterName_3" value="performing" />
-	 *
-	 * <param name="parameterName_4" value="offsetCar" /> <param
-	 * name="parameterName_5" value="offsetPt" /> <param name="parameterName_6"
-	 * value="offsetWalk" />
-	 *
+	 * 
+	 * <param name="parameterName_4" value="constantCar" /> <param
+	 * name="parameterName_5" value="constantPt" /> <param
+	 * name="parameterName_6" value="constantWalk" />
+	 * 
 	 * <param name="parameterName_0" value="monetaryDistanceCostRateCar" />
 	 * <param name="parameterName_8" value="monetaryDistanceCostRatePt" />
-	 *
+	 * 
 	 * <param name="parameterName_9" value="marginalUtlOfDistanceWalk" />
 	 */
 	public static String getValue(String key) {
@@ -90,12 +91,15 @@ public class ScoringConfigGetValue {
 		} else if (MONETARY_DISTANCE_COST_RATE_PT.equals(key)) {
 			return Double.toString(scoringCfgGroup
 					.getMonetaryDistanceCostRatePt());
-		} else if (OFFSET_CAR.equals(key)) {
-			return config.findParam("bse", key);
-		} else if (OFFSET_PT.equals(key)) {
-			return config.findParam("bse", key);
-		} else if (OFFSET_WALK.equals(key)) {
-			return config.findParam("bse", key);
+		} else if (CONSTANT_CAR.equals(key)) {
+			// return config.findParam("bse", key);
+			return Double.toString(scoringCfgGroup.getConstantCar());
+		} else if (CONSTANT_PT.equals(key)) {
+			// return config.findParam("bse", key);
+			return Double.toString(scoringCfgGroup.getConstantPt());
+		} else if (CONSTANT_WALK.equals(key)) {
+			// return config.findParam("bse", key);
+			return Double.toString(scoringCfgGroup.getConstantWalk());
 		} else {
 			log.info(key + "\tcan not be calibrated by the current code.");
 			throw new RuntimeException();

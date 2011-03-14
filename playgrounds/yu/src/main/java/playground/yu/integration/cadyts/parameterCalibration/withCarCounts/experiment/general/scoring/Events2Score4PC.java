@@ -92,9 +92,9 @@ public abstract class Events2Score4PC extends EventsToScore implements
 		attrNameList.add("monetaryDistanceCostRatePt");
 		attrNameList.add("marginalUtlOfDistanceWalk");
 		// LegOffsetAttr
-		attrNameList.add("offsetCar");
-		attrNameList.add("offsetPt");
-		attrNameList.add("offsetWalk");
+		attrNameList.add("constantCar");
+		attrNameList.add("constantPt");
+		attrNameList.add("constantWalk");
 		// #####################################
 		scoring = config.planCalcScore();
 		pop = population;

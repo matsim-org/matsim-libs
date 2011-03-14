@@ -1,3 +1,5 @@
+package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.general.normal.withLegModeASC;
+
 /* *********************************************************************** *
  * project: org.matsim.*
  * DummyCharyparNagelScoringFunctionFactory4PC.java
@@ -18,10 +20,8 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.general.normal.withLegModeASC;
-
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.charyparNagel.ActivityScoringFunction;
@@ -29,58 +29,18 @@ import org.matsim.core.scoring.charyparNagel.AgentStuckScoringFunction;
 import org.matsim.core.scoring.charyparNagel.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.scoring.charyparNagel.MoneyScoringFunction;
 
-import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.general.normal.paramCorrection.PCCtlListener;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.general.normal.scoring.ScoringFunctionAccumulator4PC;
 
 public class CharyparNagelScoringFunctionFactory4PC extends
 		CharyparNagelScoringFunctionFactory {
-	private static String OFFSET_CAR = "offsetCar", OFFSET_PT = "offsetPt",
-			OFFSET_WALK = "offsetWalk";
-	static double offsetCar, offsetPt, offsetWalk;
+	// private static String CONSTANT_CAR = "constantCar", CONSTANT_PT =
+	// "constantPt",
+	// CONSTANT_WALK = "constantWalk";
+	// static double constantCar, constantPt, constantWalk;
 
-	public CharyparNagelScoringFunctionFactory4PC(Config config) {
-		super(config.planCalcScore());
-
-		// car
-		String offsetCarStr = config.findParam(
-				PCCtlListener.BSE_CONFIG_MODULE_NAME, OFFSET_CAR);
-		offsetCar = offsetCarStr == null ? 0d : Double
-				.parseDouble(offsetCarStr);
-
-		// pt
-		String offsetPtStr = config.findParam(
-				PCCtlListener.BSE_CONFIG_MODULE_NAME, OFFSET_PT);
-		offsetPt = offsetPtStr == null ? 0d : Double.parseDouble(offsetPtStr);
-
-		// walk
-		String offsetWalkStr = config.findParam(
-				PCCtlListener.BSE_CONFIG_MODULE_NAME, OFFSET_WALK);
-		offsetWalk = offsetWalkStr == null ? 0d : Double
-				.parseDouble(offsetWalkStr);
-	}
-
-	public static double getOffsetCar() {
-		return offsetCar;
-	}
-
-	public static double getOffsetPt() {
-		return offsetPt;
-	}
-
-	public static double getOffsetWalk() {
-		return offsetWalk;
-	}
-
-	public static void setOffsetPt(double offsetPt) {
-		CharyparNagelScoringFunctionFactory4PC.offsetPt = offsetPt;
-	}
-
-	public static void setOffsetWalk(double offsetWalk) {
-		CharyparNagelScoringFunctionFactory4PC.offsetWalk = offsetWalk;
-	}
-
-	public static void setOffsetCar(double offsetCar) {
-		CharyparNagelScoringFunctionFactory4PC.offsetCar = offsetCar;
+	public CharyparNagelScoringFunctionFactory4PC(
+			final PlanCalcScoreConfigGroup config) {
+		super(config);
 	}
 
 	public ScoringFunction createNewScoringFunction(Plan plan) {

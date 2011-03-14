@@ -143,8 +143,7 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 
 	private void setInitialParametersInCalibrator(Config config) {
 		ScoringConfigGetValue.setConfig(config);
-		PlanCalcScoreConfigGroup scoringCfg = config
-				.planCalcScore();
+		PlanCalcScoreConfigGroup scoringCfg = config.planCalcScore();
 
 		Vector initialParams = new Vector(paramDim);
 		for (int i = 0; i < initialParams.size(); i++) {
@@ -537,8 +536,7 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 			// ****SET CALIBRATED PARAMETERS FOR SCORE CALCULATION AGAIN!!!***
 			Vector params = ((ChoiceParameterCalibrator<Link>) calibrator)
 					.getParameters();
-			PlanCalcScoreConfigGroup scoringCfg = config
-					.planCalcScore();
+			PlanCalcScoreConfigGroup scoringCfg = config.planCalcScore();
 
 			// VERY IMPORTANT #########################################
 
@@ -561,7 +559,7 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 						} else/* bse */{
 							config.setParam(BSE_CONFIG_MODULE_NAME,
 									paramNames[i], Double.toString(value));// TODO
-							// offsetCar,
+							// constantCar,
 							// -pt,
 							// -walk???
 						}
@@ -586,7 +584,7 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 				((Events2Score4PC_mnl) chooser).setMultinomialLogit(mnl);
 
 				CharyparNagelScoringFunctionFactory4PC sfFactory = new CharyparNagelScoringFunctionFactory4PC(
-						config);
+						config.planCalcScore());
 				ctl.setScoringFunctionFactory(sfFactory);
 				((Events2Score4PC_mnl) chooser).setSfFactory(sfFactory);
 

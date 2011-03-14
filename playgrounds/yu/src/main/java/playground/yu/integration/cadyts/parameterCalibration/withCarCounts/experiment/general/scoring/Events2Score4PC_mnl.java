@@ -189,11 +189,11 @@ public class Events2Score4PC_mnl extends Events2Score4PC implements
 						.indexOf("marginalUtlOfDistanceWalk"), distanceWalk);
 
 				// offsets
-				mnl.setAttribute(choiceIdx, attrNameList.indexOf("offsetCar"),
+				mnl.setAttribute(choiceIdx, attrNameList.indexOf("constantCar"),
 						carLegNo);
-				mnl.setAttribute(choiceIdx, attrNameList.indexOf("offsetPt"),
+				mnl.setAttribute(choiceIdx, attrNameList.indexOf("constantPt"),
 						ptLegNo);
-				mnl.setAttribute(choiceIdx, attrNameList.indexOf("offsetWalk"),
+				mnl.setAttribute(choiceIdx, attrNameList.indexOf("constantWalk"),
 						walkLegNo);
 			}
 		}
@@ -313,12 +313,12 @@ public class Events2Score4PC_mnl extends Events2Score4PC implements
 
 				}
 
-				else if (attrName.equals("offsetCar")) {
-					attrVector.set(attrNameList.indexOf("offsetCar"), carLegNo);
-				} else if (attrName.equals("offsetPt")) {
-					attrVector.set(attrNameList.indexOf("offsetPt"), ptLegNo);
-				} else if (attrName.equals("offsetWalk")) {
-					attrVector.set(attrNameList.indexOf("offsetWalk"),
+				else if (attrName.equals("constantCar")) {
+					attrVector.set(attrNameList.indexOf("constantCar"), carLegNo);
+				} else if (attrName.equals("constantPt")) {
+					attrVector.set(attrNameList.indexOf("constantPt"), ptLegNo);
+				} else if (attrName.equals("constantWalk")) {
+					attrVector.set(attrNameList.indexOf("constantWalk"),
 							walkLegNo);
 				}
 			}
@@ -380,18 +380,18 @@ public class Events2Score4PC_mnl extends Events2Score4PC implements
 
 		// offsets
 		String offsetCarStr = config.findParam(
-				PCCtlListener.BSE_CONFIG_MODULE_NAME, "offsetCar");
-		mnl.setCoefficient(attrNameList.indexOf("offsetCar"),
+				PCCtlListener.BSE_CONFIG_MODULE_NAME, "constantCar");
+		mnl.setCoefficient(attrNameList.indexOf("constantCar"),
 				offsetCarStr == null ? 0d : Double.parseDouble(offsetCarStr));
 
 		String offsetPtStr = config.findParam(
-				PCCtlListener.BSE_CONFIG_MODULE_NAME, "offsetPt");
-		mnl.setCoefficient(attrNameList.indexOf("offsetPt"),
+				PCCtlListener.BSE_CONFIG_MODULE_NAME, "constantPt");
+		mnl.setCoefficient(attrNameList.indexOf("constantPt"),
 				offsetPtStr == null ? 0d : Double.parseDouble(offsetPtStr));
 
 		String offsetWalkStr = config.findParam(
-				PCCtlListener.BSE_CONFIG_MODULE_NAME, "offsetWalk");
-		mnl.setCoefficient(attrNameList.indexOf("offsetWalk"),
+				PCCtlListener.BSE_CONFIG_MODULE_NAME, "constantWalk");
+		mnl.setCoefficient(attrNameList.indexOf("constantWalk"),
 				offsetWalkStr == null ? 0d : Double.parseDouble(offsetWalkStr));
 
 		return mnl;

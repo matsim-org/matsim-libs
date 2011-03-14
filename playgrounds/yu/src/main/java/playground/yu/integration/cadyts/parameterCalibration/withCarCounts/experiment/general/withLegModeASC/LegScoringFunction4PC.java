@@ -126,10 +126,10 @@ public class LegScoringFunction4PC extends LegScoringFunction {
 			distanceAttrCar += params.marginalUtilityOfMoney * dist;
 			tmpScore += travelTime * params.marginalUtilityOfTraveling_s
 					+ params.monetaryDistanceCostRateCar * distanceAttrCar
-					+ CharyparNagelScoringFunctionFactory4PC.offsetCar;
+					+ params.constantCar;
 			// traveling attr
 			travTimeAttrCar += travelTime / 3600d;
-			// offsetCar attr
+			// constantCar attr
 			carLegNo++;
 
 		} else if (TransportMode.pt.equals(leg.getMode())) {
@@ -140,10 +140,10 @@ public class LegScoringFunction4PC extends LegScoringFunction {
 			distanceAttrPt += params.marginalUtilityOfMoney * dist;
 			tmpScore += travelTime * params.marginalUtilityOfTravelingPT_s
 					+ params.monetaryDistanceCostRatePt * distanceAttrPt
-					+ CharyparNagelScoringFunctionFactory4PC.offsetPt;
+					+ params.constantPt;
 			// travelingPt attr
 			travTimeAttrPt += travelTime / 3600d;
-			// offsetPt attr
+			// constantPt attr
 			ptLegNo++;
 
 		} else if (TransportMode.walk.equals(leg.getMode())
@@ -153,7 +153,7 @@ public class LegScoringFunction4PC extends LegScoringFunction {
 			}
 			tmpScore += travelTime * params.marginalUtilityOfTravelingWalk_s
 					+ params.marginalUtilityOfDistanceWalk_m * dist
-					+ CharyparNagelScoringFunctionFactory4PC.offsetWalk;
+					+ params.constantWalk;
 			// travelingWalk attr
 			travTimeAttrWalk += travelTime / 3600d;
 			walkLegNo++;
@@ -168,10 +168,10 @@ public class LegScoringFunction4PC extends LegScoringFunction {
 			// use the same values as for "car"
 			tmpScore += travelTime * params.marginalUtilityOfTraveling_s
 					+ params.monetaryDistanceCostRateCar * distanceAttrCar
-					+ CharyparNagelScoringFunctionFactory4PC.offsetCar;
+					+ params.constantCar;
 			// traveling attr
 			travTimeAttrCar += travelTime / 3600d;
-			// offsetCar attr
+			// constantCar attr
 			carLegNo++;
 		}
 

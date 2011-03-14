@@ -19,8 +19,6 @@
 
 package playground.yu.test;
 
-import java.io.IOException;
-
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.config.Config;
@@ -32,8 +30,6 @@ import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.utils.misc.ConfigUtils;
-
-import playground.yu.scoring.CharyparNagelScoringFunctionFactoryWithWalk;
 
 public class SubTourModeChoicePlanStrategy implements PlanStrategy {
 	// the reason why this class needs to be here is that this is defined in the
@@ -51,7 +47,7 @@ public class SubTourModeChoicePlanStrategy implements PlanStrategy {
 		planStrategyDelegate = new PlanStrategyImpl(new RandomPlanSelector());
 
 		// the plan selector may, at the same time, collect events:
-		controler.getEvents().addHandler((EventHandler) this.getPlanSelector());
+		controler.getEvents().addHandler((EventHandler) getPlanSelector());
 
 		// if you just want to select plans, you can stop here.
 
@@ -100,16 +96,18 @@ public class SubTourModeChoicePlanStrategy implements PlanStrategy {
 	public static void main(String[] args) {
 		Config config = ConfigUtils.loadConfig(args[0]);
 		Controler controler = new Controler(config);
-		/* <module name="strategy">
-		 * 	<param name="maxAgentPlanMemorySize" value="x" /> <!-- 0 means unlimited -->
-		 * 	<param name="ModuleProbability_y" value="0.1" />
-		 * 	<param name="Module_y" value="playground.yu.test.SubTourModeChoicePlanStrategy" />
-		 * </module>*/
-		controler
-				.setScoringFunctionFactory(new CharyparNagelScoringFunctionFactoryWithWalk(
-						config.planCalcScore(), config
-//									.vspExperimental().getOffsetWalk()));
-						.planCalcScore().getConstantWalk() )) ;
+		/*
+		 * <module name="strategy"> <param name="maxAgentPlanMemorySize"
+		 * value="x" /> <!-- 0 means unlimited --> <param
+		 * name="ModuleProbability_y" value="0.1" /> <param name="Module_y"
+		 * value="playground.yu.test.SubTourModeChoicePlanStrategy" /> </module>
+		 */
+		
+		//!!!NO longer necessary, man can just set constantwalk in planCalcScoreConfig Group
+		
+		// controler.setScoringFunctionFactory(new
+		// CharyparNagelScoringFunctionFactoryWithWalk(config.planCalcScore(),
+		// config .planCalcScore().getConstantWalk() )) ;
 		// controler.addControlerListener(new MZComparisonListener());
 		controler.setWriteEventsInterval(Integer.parseInt(args[1]));
 		controler.setCreateGraphs(Boolean.parseBoolean(args[2]));

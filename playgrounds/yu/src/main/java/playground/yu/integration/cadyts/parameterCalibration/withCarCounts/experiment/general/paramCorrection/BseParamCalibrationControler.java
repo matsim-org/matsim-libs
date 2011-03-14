@@ -49,7 +49,8 @@ public abstract class BseParamCalibrationControler extends Controler {
 	}
 
 	protected ScoringFunctionFactory loadScoringFunctionFactory() {
-		return new CharyparNagelScoringFunctionFactory4PC(config);
+		return new CharyparNagelScoringFunctionFactory4PC(config
+				.planCalcScore());
 	}
 
 	@Override

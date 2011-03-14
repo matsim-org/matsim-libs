@@ -204,15 +204,15 @@ public class Events2Score4PC_mnl extends Events2Score4PC implements
 						/ paramScaleFactorList.get(attrNameIndex));
 
 				// offsets
-				attrNameIndex = attrNameList.indexOf("offsetCar");
+				attrNameIndex = attrNameList.indexOf("constantCar");
 				mnl.setAttribute(choiceIdx, attrNameIndex, carLegNo
 						/ paramScaleFactorList.get(attrNameIndex));
 
-				attrNameIndex = attrNameList.indexOf("offsetPt");
+				attrNameIndex = attrNameList.indexOf("constantPt");
 				mnl.setAttribute(choiceIdx, attrNameIndex, ptLegNo
 						/ paramScaleFactorList.get(attrNameIndex));
 
-				attrNameIndex = attrNameList.indexOf("offsetWalk");
+				attrNameIndex = attrNameList.indexOf("constantWalk");
 				mnl.setAttribute(choiceIdx, attrNameIndex, walkLegNo
 						/ paramScaleFactorList.get(attrNameIndex));
 			}
@@ -343,16 +343,16 @@ public class Events2Score4PC_mnl extends Events2Score4PC implements
 
 				}
 
-				else if (attrName.equals("offsetCar")) {
-					attrNameIndex = attrNameList.indexOf("offsetCar");
+				else if (attrName.equals("constantCar")) {
+					attrNameIndex = attrNameList.indexOf("constantCar");
 					attrVector.set(attrNameIndex, carLegNo
 							/ paramScaleFactorList.get(attrNameIndex));
-				} else if (attrName.equals("offsetPt")) {
-					attrNameIndex = attrNameList.indexOf("offsetPt");
+				} else if (attrName.equals("constantPt")) {
+					attrNameIndex = attrNameList.indexOf("constantPt");
 					attrVector.set(attrNameIndex, ptLegNo
 							/ paramScaleFactorList.get(attrNameIndex));
-				} else if (attrName.equals("offsetWalk")) {
-					attrNameIndex = attrNameList.indexOf("offsetWalk");
+				} else if (attrName.equals("constantWalk")) {
+					attrNameIndex = attrNameList.indexOf("constantWalk");
 					attrVector.set(attrNameIndex, walkLegNo
 							/ paramScaleFactorList.get(attrNameIndex));
 				}
@@ -426,26 +426,17 @@ public class Events2Score4PC_mnl extends Events2Score4PC implements
 				.getMarginalUtlOfDistanceWalk()
 				* paramScaleFactorList.get(attrNameIndex));
 
-		// offsets
-		attrNameIndex = attrNameList.indexOf("offsetCar");
-		String offsetCarStr = config.findParam(
-				PCCtlListener.BSE_CONFIG_MODULE_NAME, "offsetCar");
-		mnl.setCoefficient(attrNameIndex, (offsetCarStr == null ? 0d : Double
-				.parseDouble(offsetCarStr))
+		// constants
+		attrNameIndex = attrNameList.indexOf("constantCar");
+		mnl.setCoefficient(attrNameIndex, scoring.getConstantCar()
 				* paramScaleFactorList.get(attrNameIndex));
 
-		attrNameIndex = attrNameList.indexOf("offsetPt");
-		String offsetPtStr = config.findParam(
-				PCCtlListener.BSE_CONFIG_MODULE_NAME, "offsetPt");
-		mnl.setCoefficient(attrNameIndex, (offsetPtStr == null ? 0d : Double
-				.parseDouble(offsetPtStr))
+		attrNameIndex = attrNameList.indexOf("constantPt");
+		mnl.setCoefficient(attrNameIndex, scoring.getConstantPt()
 				* paramScaleFactorList.get(attrNameIndex));
 
-		attrNameIndex = attrNameList.indexOf("offsetWalk");
-		String offsetWalkStr = config.findParam(
-				PCCtlListener.BSE_CONFIG_MODULE_NAME, "offsetWalk");
-		mnl.setCoefficient(attrNameIndex, (offsetWalkStr == null ? 0d : Double
-				.parseDouble(offsetWalkStr))
+		attrNameIndex = attrNameList.indexOf("constantWalk");
+		mnl.setCoefficient(attrNameIndex, scoring.getConstantWalk()
 				* paramScaleFactorList.get(attrNameIndex));
 
 		return mnl;

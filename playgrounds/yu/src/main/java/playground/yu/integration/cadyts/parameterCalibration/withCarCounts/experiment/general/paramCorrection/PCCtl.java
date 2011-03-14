@@ -20,8 +20,6 @@
 
 package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.general.paramCorrection;
 
-import java.io.IOException;
-
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.corelisteners.EventsHandling;
@@ -42,8 +40,9 @@ import org.matsim.core.utils.misc.StringUtils;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.general.scoring.PlansScoring4PC_mnl;
 
 /**
- * "traveling", "travelingPt", "travelingWalk","performing" is going to be
- * calibrated. "betaStuck" will not be calibrated
+ * "traveling", "travelingPt", "travelingWalk","performing", "constantCar",
+ * "constantPt", "constantWalk", "monetaryDistanceCostRateCar",
+ * "monetaryDistanceCostRatePt", "marginalUtlOfDistanceWalk"can be calibrated.
  * 
  * @author yu
  * 

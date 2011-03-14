@@ -20,15 +20,18 @@
 
 package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.general.normal.withLegModeASC;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.charyparNagel.LegScoringFunction;
 
 public class LegScoringFunction4PC extends LegScoringFunction {
-
+	private final static Logger log = Logger
+			.getLogger(LegScoringFunction4PC.class);
 	private double travTimeAttrCar/* [h] */= 0d, travTimeAttrPt/* [h] */= 0d,
 			travTimeAttrWalk/* [h] */= 0d, distanceAttrCar/*
 														 * [m*utils/unit_of_money
@@ -93,6 +96,8 @@ public class LegScoringFunction4PC extends LegScoringFunction {
 		distanceAttrWalk = 0d;
 	}
 
+	private static int distanceWrnCnt = 0;
+
 	@Override
 	protected double calcLegScore(double departureTime, double arrivalTime,
 			Leg leg) {
@@ -111,39 +116,49 @@ public class LegScoringFunction4PC extends LegScoringFunction {
 			if (params.monetaryDistanceCostRateCar != 0.0) {
 				RouteWRefs route = (RouteWRefs) leg.getRoute();
 				dist = route.getDistance();
-				/*
-				 * TODO the route-distance does not contain the length of the
-				 * first or last link of the route, because the route doesn't
-				 * know those. Should be fixed somehow, but how? MR, jan07
-				 */
-				/*
-				 * TODO in the case of within-day replanning, we cannot be sure
-				 * that the distance in the leg is the actual distance driven by
-				 * the agent.
-				 */
+				if (distanceWrnCnt < 1) {
+					/*
+					 * TODO the route-distance does not contain the length of
+					 * the first or last link of the route, because the route
+					 * doesn't know those. Should be fixed somehow, but how? MR,
+					 * jan07
+					 */
+					/*
+					 * TODO in the case of within-day replanning, we cannot be
+					 * sure that the distance in the leg is the actual distance
+					 * driven by the agent.
+					 */
+					log
+							.warn("leg distance for scoring computed from plan, not from execution (=events)."
+									+ "This is not how it is meant to be, and it will fail for within-day replanning.");
+					log
+							.warn("Also means that first and last link are not included.");
+					log.warn(Gbl.ONLYONCE);
+					distanceWrnCnt++;
+				}
 			}
 			// distanceCar attr
 			distanceAttrCar += params.marginalUtilityOfMoney * dist;
 			tmpScore += travelTime * params.marginalUtilityOfTraveling_s
 					+ params.monetaryDistanceCostRateCar * distanceAttrCar
-					+ CharyparNagelScoringFunctionFactory4PC.offsetCar;
+					+ params.constantCar;
 			// traveling attr
 			travTimeAttrCar += travelTime / 3600d;
-			// offsetCar attr
+			// constantCar attr
 			carLegNo++;
 
 		} else if (TransportMode.pt.equals(leg.getMode())) {
 			if (params.monetaryDistanceCostRatePt != 0.0) {
 				dist = leg.getRoute().getDistance();
 			}
-			// distanceCar attr
+			// distancePt attr
 			distanceAttrPt += params.marginalUtilityOfMoney * dist;
 			tmpScore += travelTime * params.marginalUtilityOfTravelingPT_s
 					+ params.monetaryDistanceCostRatePt * distanceAttrPt
-					+ CharyparNagelScoringFunctionFactory4PC.offsetPt;
+					+ params.constantPt;
 			// travelingPt attr
 			travTimeAttrPt += travelTime / 3600d;
-			// offsetPt attr
+			// constantPt attr
 			ptLegNo++;
 
 		} else if (TransportMode.walk.equals(leg.getMode())
@@ -153,11 +168,16 @@ public class LegScoringFunction4PC extends LegScoringFunction {
 			}
 			tmpScore += travelTime * params.marginalUtilityOfTravelingWalk_s
 					+ params.marginalUtilityOfDistanceWalk_m * dist
-					+ CharyparNagelScoringFunctionFactory4PC.offsetWalk;
+					+ params.constantWalk;
 			// travelingWalk attr
 			travTimeAttrWalk += travelTime / 3600d;
+			// constantWalk attr
 			walkLegNo++;
+			// distanceWalk attr
 			distanceAttrWalk += dist;
+			// } else if (TransportMode.bike.equals(leg.getMode())) {
+			// tmpScore += travelTime * params.marginalUtilityOfTravelingBike_s;
+			// tmpScore += params.constantBike;
 		} else {// other mode?
 			if (params.monetaryDistanceCostRateCar != 0.0) {
 				dist = leg.getRoute().getDistance();
@@ -168,10 +188,10 @@ public class LegScoringFunction4PC extends LegScoringFunction {
 			// use the same values as for "car"
 			tmpScore += travelTime * params.marginalUtilityOfTraveling_s
 					+ params.monetaryDistanceCostRateCar * distanceAttrCar
-					+ CharyparNagelScoringFunctionFactory4PC.offsetCar;
+					+ params.constantCar;
 			// traveling attr
 			travTimeAttrCar += travelTime / 3600d;
-			// offsetCar attr
+			// constantCar attr
 			carLegNo++;
 		}
 

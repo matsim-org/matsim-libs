@@ -105,9 +105,9 @@ public abstract class Events2Score4PC extends EventsToScore implements
 		initialAttrNameScaleFactor("marginalUtlOfDistanceWalk");
 
 		// LegOffsetAttr
-		initialAttrNameScaleFactor("offsetCar");
-		initialAttrNameScaleFactor("offsetPt");
-		initialAttrNameScaleFactor("offsetWalk");
+		initialAttrNameScaleFactor("constantCar");
+		initialAttrNameScaleFactor("constantPt");
+		initialAttrNameScaleFactor("constantWalk");
 		// #####################################
 		scoring = config.planCalcScore();
 		pop = population;
