@@ -1,6 +1,5 @@
 package playground.wrashid.thelma.esd;
 
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
 
@@ -8,25 +7,8 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.AgentMoneyEvent;
-import org.matsim.core.api.experimental.events.AgentStuckEvent;
-import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.LinkLeaveEvent;
-import org.matsim.core.api.experimental.events.PersonEvent;
-import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
 import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentMoneyEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.network.NetworkImpl;
@@ -66,7 +48,7 @@ public class FilterEventsForCommunity {
 			persons.add(scenario.getPopulation().getPersons().get(personId));
 		}
 		
-		GeneralLib.writePersons(persons, "C:/eTmp/plansForWattwilAndBuchs.xml", network);
+		GeneralLib.writePersons(persons, "C:/eTmp/plansForWattwilAndBuchs.xml.gz", network);
 	}
 
 	private static ComplexRectangularSelectionArea defineAreaOfInterest() {
