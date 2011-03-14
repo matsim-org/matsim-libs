@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package org.matsim.households;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,21 +33,25 @@ import org.matsim.core.utils.io.MatsimXmlWriter;
  *
  */
 public class HouseholdsWriterV10 extends MatsimXmlWriter {
-	
+
 	private List<Tuple<String, String>> atts = new ArrayList<Tuple<String, String>>();
 	private Households households;
-	
+
 	public HouseholdsWriterV10(Households households) {
 		this.households = households;
 	}
-	
-	public void writeFile(String filename) throws FileNotFoundException, IOException {
-		this.openFile(filename);
-		this.writeXmlHead();
-		this.writeHouseholds(this.households);
-		this.close();
+
+	public void writeFile(String filename) {
+		try {
+			this.openFile(filename);
+			this.writeXmlHead();
+			this.writeHouseholds(this.households);
+			this.close();
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
-	
+
 	private void writeHouseholds(Households basicHouseholds) throws IOException {
 		atts.clear();
 		atts.add(this.createTuple(XMLNS, MatsimXmlWriter.MATSIM_NAMESPACE));
@@ -105,6 +108,6 @@ public class HouseholdsWriterV10 extends MatsimXmlWriter {
 	}
 
 
-	
-	
+
+
 }

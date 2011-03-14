@@ -49,12 +49,16 @@ public class VehicleWriterV1 extends MatsimXmlWriter {
 		this.vehicles = vehicles.getVehicles();
 	}
 	
-	public void writeFile(String filename) throws FileNotFoundException, IOException {
-		this.openFile(filename);
-		this.writeXmlHead();
-		this.writeRootElement();
-		this.close();
-		log.info("Vehicles written to: " + filename);
+	public void writeFile(String filename) {
+		try {
+			this.openFile(filename);
+			this.writeXmlHead();
+			this.writeRootElement();
+			this.close();
+			log.info("Vehicles written to: " + filename);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	private void writeRootElement() throws IOException {
