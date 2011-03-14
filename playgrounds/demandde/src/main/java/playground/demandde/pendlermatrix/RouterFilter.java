@@ -1,4 +1,4 @@
-package playground.mzilske.prognose2025;
+package playground.demandde.pendlermatrix;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -8,44 +8,61 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 
-import playground.mzilske.pipeline.PersonSink;
-import playground.mzilske.pipeline.PersonSinkSource;
+public class RouterFilter implements TripFlowSink {
 
-public class PersonRouterFilter implements PersonSinkSource {
-	
-private Network network;
-	
+	private Network network;
+
 	private Dijkstra dijkstra;
-	
-	private PersonSink sink;
-	
+
+	private TripFlowSink sink;
+
 	private Collection<Id> interestingNodeIds = new HashSet<Id>();
 	
-	double travelTimeToEntry = 0.0;
+	private double travelTimeToLink = 0.0;
 	
-	public PersonRouterFilter(Network network) {
+	private Coord entryCoord;
+
+	public RouterFilter(Network network) {
 		this.network = network;
 		FreespeedTravelTimeCost fttc = new FreespeedTravelTimeCost(new PlanCalcScoreConfigGroup());
 		dijkstra = new Dijkstra(network, fttc, fttc);
 	}
 
+	@Override
+	public void process(Zone quelle, Zone ziel, int quantity, String mode, String destinationActivityType, double departureTimeOffset) {
+		Node quellNode = ((NetworkImpl) network).getNearestNode(quelle.coord);
+		Node zielNode = ((NetworkImpl) network).getNearestNode(ziel.coord);
+		Path path = dijkstra.calcLeastCostPath(quellNode, zielNode, 0.0);
+		if (isInteresting(path)) {
+			Zone newQuelle = new Zone(quelle.id, quelle.workplaces, quelle.workingPopulation, entryCoord);
+			sink.process(newQuelle, ziel, quantity, mode, destinationActivityType, departureTimeOffset + travelTimeToLink);
+		}
+	}
+
 	private boolean isInteresting(Path path) {
+		if (interestingNodeIds.contains(path.nodes.get(0))) {
+			if (interestingNodeIds.contains(path.nodes.get(path.nodes.size()-1))) {
+				return false;
+			}
+		}
 		for (Node node : path.nodes) {
 			if (interestingNodeIds.contains(node.getId())) {
-				travelTimeToEntry = calculateFreespeedTravelTimeToNode(network, path, node);
+				entryCoord = node.getCoord();
+				travelTimeToLink = calculateFreespeedTravelTimeToNode(network, path, node);
 				return true;
 			}
 		}
 		return false;
+	}
+
+	void setSink(TripFlowSink sink) {
+		this.sink = sink;
 	}
 
 	@Override
@@ -57,26 +74,6 @@ private Network network;
 		return interestingNodeIds;
 	}
 
-	@Override
-	public void process(Person person) {
-		ActivityImpl origin = (ActivityImpl) person.getPlans().get(0).getPlanElements().get(0);
-		Activity destination = (Activity) person.getPlans().get(0).getPlanElements().get(2);
-		Coord quelle = origin.getCoord();
-		Node quellNode = ((NetworkImpl) network).getNearestNode(quelle);
-		Coord ziel = destination.getCoord();
-		Node zielNode = ((NetworkImpl) network).getNearestNode(ziel);
-		Path path = dijkstra.calcLeastCostPath(quellNode, zielNode, 0.0);
-		if (isInteresting(path)) {
-			origin.setEndTime(origin.getEndTime() + travelTimeToEntry);
-			sink.process(person);
-		}
-	}
-
-	@Override
-	public void setSink(PersonSink sink) {
-		this.sink = sink;
-	}
-	
 	private static double calculateFreespeedTravelTimeToNode(Network network, Path path, Node node) {
 		double travelTime = 0.0;
 		for (Link l : path.links) {

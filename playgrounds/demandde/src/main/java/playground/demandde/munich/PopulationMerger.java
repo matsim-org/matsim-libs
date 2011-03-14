@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin.szenarios.munich;
+package playground.demandde.munich;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -45,11 +45,22 @@ import org.matsim.core.utils.misc.ConfigUtils;
 public class PopulationMerger {
 
 	private String networkFile = "../../detailedEval/Net/network-86-85-87-84.xml";
+	// the network file is necessary here since pop_v4 needs the network.  Should not be needed with
+	// pop_v5 
+
 	private String midDemandFile = "../../detailedEval/pop/140k-synthetische-personen/plans.xml";
+	// comes from somewhere else based on detailed data for the city (berlin = srv, muc = mic).
+	// might need some plug-in for approximate internal traffic if this is not available.
+	
 	private String prognose2025FreightDemandFile = "../../detailedEval/pop/gueterVerkehr/population_gv_bavaria_10pct_wgs84.xml.gz";
-	private String prognose2025CommuterDemandFile = "../../detailedEval/pop/pendlerVerkehr/population_pv_bavaria_10pct_wgs84.xml.gz";
+	// this "falls from the sky" (ruby script)
+	
+//	private String prognose2025CommuterDemandFile = "../../detailedEval/pop/pendlerVerkehr/population_pv_bavaria_10pct_wgs84.xml.gz";
 //	private String pendlerstatistikInCommutingDemandFile = "../../detailedEval/pop/pendlerVerkehr/pendlermatrizen/onlyIn/pendlerverkehr_1pct_dhdn_gk4.xml.gz";
+
 	private String pendlerstatistikCommutingDemandFile = "../../detailedEval/pop/pendlerVerkehr/pendlermatrizen/inAndOut/pendlerverkehr_10pct_scaledAndMode_workStartingTimePeak0800Var2h_dhdn_gk4.xml.gz";
+	// this comes from other classes in this playground module
+	
 	private String outputPath = "../../detailedEval/pop/merged/";
 	private String outputFileName = "mergedPopulation_All_10pct_scaledAndMode_workStartingTimePeakAllCommuter0800Var2h_gk4.xml.gz";
 

@@ -1,4 +1,4 @@
-package playground.mzilske.prognose2025;
+package playground.demandde.pendlermatrix;
 
 import java.io.IOException;
 import java.util.Set;

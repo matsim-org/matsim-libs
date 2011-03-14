@@ -1,4 +1,4 @@
-package playground.mzilske.prognose2025;
+package playground.demandde.pendlermatrix;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;

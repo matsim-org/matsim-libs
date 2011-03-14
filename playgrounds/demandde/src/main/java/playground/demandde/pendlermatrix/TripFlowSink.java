@@ -1,4 +1,4 @@
-package playground.mzilske.prognose2025;
+package playground.demandde.pendlermatrix;
 
 public interface TripFlowSink {
 	
