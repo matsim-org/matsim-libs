@@ -699,4 +699,21 @@ public class GeneralLib {
 		return Math.round((float) Math.floor(time / binSizeInSeconds));
 	}
 	
+	public static boolean isNumberInBetween(double numberOne, double numberTwo, double numberToCheck){
+		if (numberOne<numberTwo){
+			return isNumberInBetweenOrdered(numberOne,numberTwo,numberToCheck);
+		} else if (numberOne>numberTwo) {
+			return isNumberInBetweenOrdered(numberTwo,numberOne,numberToCheck);
+		}
+		
+		return false;
+	}
+	
+	private static boolean isNumberInBetweenOrdered(double smallerNumber, double biggerNumber, double numberToCheck){
+		if (smallerNumber<numberToCheck && biggerNumber>numberToCheck){
+			return true;
+		}
+		return false;
+	}
+	
 }

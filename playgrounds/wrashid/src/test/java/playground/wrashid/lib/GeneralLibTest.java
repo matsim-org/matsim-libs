@@ -98,4 +98,11 @@ public class GeneralLibTest extends MatsimTestCase {
 		assertEquals(4, matrix.getNumberOfColumnsInRow(0));
 		assertEquals(80.0, matrix.getDouble(0, 0),0.1);
 	}
+	
+	public void testIsNumberInBetween(){
+		assertTrue(GeneralLib.isNumberInBetween(5.0, 7.0, 6.0));
+		assertTrue(GeneralLib.isNumberInBetween(7.0, 5.0, 6.0));
+		assertFalse(GeneralLib.isNumberInBetween(6.0, 6.0, 7.0));
+		assertFalse(GeneralLib.isNumberInBetween(6.0, 6.0, 6.0));
+	}
 }

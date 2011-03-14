@@ -18,7 +18,7 @@ public class RemoveAgentsTest extends MatsimTestCase {
 		
 		agentIds.add(new IdImpl("1"));
 		
-		RemoveAgents.removeAgents(agentIds, inputEventsFile, outputEventsFile);
+		FilterAgents.removeAgents(agentIds, inputEventsFile, outputEventsFile);
 		
 		File inputFile = new File(inputEventsFile);
 		File outputFile = new File(outputEventsFile);
