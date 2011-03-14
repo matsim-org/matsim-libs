@@ -77,56 +77,49 @@ public class PControler extends Controler {
 		String configFile = args[0];
 		Config config;
 		
-		try {
+		for (int i = 0; i < 10; i++) {
 			
-			for (int i = 0; i < 10; i++) {
-				
-				// reading the config file:
-				config = ConfigUtils.loadConfig(configFile);
-				
-				String currentOutputBase = config.getParam("controler", "outputDirectory") + "it." + i + "/";
-				String nextOutputBase = config.getParam("controler", "outputDirectory") + "it." + (i+1) + "/";
-				
-				PConfigGroup pConfig = new PConfigGroup(config);
-				pConfig.setCurrentOutPutBase(currentOutputBase);
-				pConfig.setNextOutPutBase(nextOutputBase);				
-				
-				String transitScheduleOutFile = pConfig.getCurrentOutputBase() + "transitSchedule.xml";
-				config.setParam("transit", "transitScheduleFile", transitScheduleOutFile);				
-				config.setParam("controler", "outputDirectory", currentOutputBase);
-				String vehiclesOutFile  = pConfig.getCurrentOutputBase() + "transitVehicles.xml";
-				config.setParam("transit", "vehiclesFile", vehiclesOutFile);
-				
-				if(i == 0) {
-					File currentOutDir = new File(currentOutputBase);
-					currentOutDir.mkdir();
-					CreateInitialTimeSchedule.createInitialTimeSchedule(pConfig);
-				}
-				
-				// reading the scenario (based on the config):
-				ScenarioLoaderImpl scLoader = new ScenarioLoaderImpl(config) ;
-				ScenarioImpl sc = (ScenarioImpl) scLoader.loadScenario() ;
-				
-				PControler tc = new PControler(sc);
+			// reading the config file:
+			config = ConfigUtils.loadConfig(configFile);
+			
+			String currentOutputBase = config.getParam("controler", "outputDirectory") + "it." + i + "/";
+			String nextOutputBase = config.getParam("controler", "outputDirectory") + "it." + (i+1) + "/";
+			
+			PConfigGroup pConfig = new PConfigGroup(config);
+			pConfig.setCurrentOutPutBase(currentOutputBase);
+			pConfig.setNextOutPutBase(nextOutputBase);				
+			
+			String transitScheduleOutFile = pConfig.getCurrentOutputBase() + "transitSchedule.xml";
+			config.setParam("transit", "transitScheduleFile", transitScheduleOutFile);				
+			config.setParam("controler", "outputDirectory", currentOutputBase);
+			String vehiclesOutFile  = pConfig.getCurrentOutputBase() + "transitVehicles.xml";
+			config.setParam("transit", "vehiclesFile", vehiclesOutFile);
+			
+			if(i == 0) {
+				File currentOutDir = new File(currentOutputBase);
+				currentOutDir.mkdir();
+				CreateInitialTimeSchedule.createInitialTimeSchedule(pConfig);
+			}
+			
+			// reading the scenario (based on the config):
+			ScenarioLoaderImpl scLoader = new ScenarioLoaderImpl(config) ;
+			ScenarioImpl sc = (ScenarioImpl) scLoader.loadScenario() ;
+			
+			PControler tc = new PControler(sc);
 
 //				if(args.length > 1 && args[1].equalsIgnoreCase("true")){
 //					tc.setUseOTFVis(true);
 //				}
-				tc.setOverwriteFiles(true);
+			tc.setOverwriteFiles(true);
 //				tc.setCreateGraphs(false);
-				tc.run();
-				
-				File nextOutDir = new File(pConfig.getNextOutputBase());
-				nextOutDir.mkdir();
-				ReplanTimeSchedule replanTS = new ReplanTimeSchedule();
-				replanTS.replan(pConfig, sc.getNetwork());
-				
-				new VehicleWriterV1(sc.getVehicles()).writeFile(pConfig.getNextOutputBase() + "transitVehicles.xml");
-			}
+			tc.run();
 			
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			File nextOutDir = new File(pConfig.getNextOutputBase());
+			nextOutDir.mkdir();
+			ReplanTimeSchedule replanTS = new ReplanTimeSchedule();
+			replanTS.replan(pConfig, sc.getNetwork());
+			
+			new VehicleWriterV1(sc.getVehicles()).writeFile(pConfig.getNextOutputBase() + "transitVehicles.xml");
 		}
 		
 	}

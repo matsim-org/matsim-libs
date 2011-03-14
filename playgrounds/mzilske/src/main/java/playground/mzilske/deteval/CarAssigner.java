@@ -28,11 +28,13 @@ public class CarAssigner implements Runnable {
 	@Override
 	public void run() {
 		for (Person person : population.getPersons().values()) {
-			createCarForPersonIfWantsOne(person);
+			if (wantsCar(person)) {
+				createCarWithPersonId(person);;
+			}
 		}
 	}
 
-	private void createCarForPersonIfWantsOne(Person person) {
+	public static boolean wantsCar(Person person) {
 		if (person.getPlans().size() == 1) {
 			for (Plan plan : person.getPlans()) {
 				for (PlanElement planElement : plan.getPlanElements()) {
@@ -42,15 +44,19 @@ public class CarAssigner implements Runnable {
 					if (planElement instanceof Leg) {
 						Leg leg = (Leg) planElement;
 						if (TransportMode.car.equals(leg.getMode())) {
-							Id vehicleId = person.getId();
-							Vehicle vehicle = vehicles.getFactory().createVehicle(vehicleId, defaultType);
-							vehicles.getVehicles().put(vehicleId, vehicle);
-							return;
+							return true;
 						}
 					}
 				}
 			}
 		}
+		return false;
+	}
+
+	private void createCarWithPersonId(Person person) {
+		Id vehicleId = person.getId();
+		Vehicle vehicle = vehicles.getFactory().createVehicle(vehicleId, defaultType);
+		vehicles.getVehicles().put(vehicleId, vehicle);
 	}
 
 }

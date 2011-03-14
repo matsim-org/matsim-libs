@@ -99,12 +99,6 @@ public class VehicleGenerator {
 
 	private void writeVehicles(Vehicles vehicles) {
 		VehicleWriterV1 vehicleWriter = new VehicleWriterV1(vehicles);
-		try {
-			vehicleWriter.writeFile(outputPath + "vehicles.xml");
-		} catch (FileNotFoundException e) {
-			throw new RuntimeException(e);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+		vehicleWriter.writeFile(outputPath + "vehicles.xml");
 	}
 }

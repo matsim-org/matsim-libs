@@ -4,10 +4,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.geotools.data.FeatureSource;
@@ -25,7 +27,6 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
@@ -38,6 +39,13 @@ import org.matsim.households.HouseholdsImpl;
 import org.matsim.households.HouseholdsWriterV10;
 import org.matsim.households.Income.IncomePeriod;
 import org.matsim.population.algorithms.PlanMutateTimeAllocation;
+import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleWriterV1;
+import org.matsim.vehicles.Vehicles;
+import org.matsim.vehicles.VehiclesImpl;
+
+import playground.mzilske.deteval.Case.Car;
 
 import com.vividsolutions.jts.geom.Point;
 
@@ -65,13 +73,19 @@ public class GeneratePopulation {
 
 	private static final Integer NUMBER_OF_SIMULATED_PEOPLE = 14000;
 
+	private static final String VEHICLE_FILE = "../detailedEval/pop/befragte-personen/vehicles.xml";
+
+	private static final String CLONED_VEHICLE_FILE = "../detailedEval/pop/14k-synthetische-personen/vehicles.xml";
+	
 	private Random random = new Random();
 
-	private Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+	private Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 	private Map<String, Case> cases = new HashMap<String, Case>();
 
 	private Households households = new HouseholdsImpl();
+
+	private Vehicles vehicles = new VehiclesImpl();
 
 	private Map<Id, Person> persons = new HashMap<Id, Person>();
 
@@ -82,7 +96,7 @@ public class GeneratePopulation {
 	private Map<Activity, Integer> activity2verkehrszelle = new HashMap<Activity, Integer>();
 
 	public static void main(String[] args) throws IOException {
-		generateSurveyPopulation();
+		// generateSurveyPopulation();
 		generateFullPopulation();
 	}
 
@@ -95,8 +109,21 @@ public class GeneratePopulation {
 		generatePopulation.addPlans();
 		generatePopulation.dropPlanlessPeople();
 		generatePopulation.addPopulationToScenario();
-		generatePopulation.addAndWriteHouseholds(HOUSEHOLDS_FILE);
+		generatePopulation.addHouseholds();
+		generatePopulation.assertAllDriversHaveCar();
+		generatePopulation.writeHouseholds(HOUSEHOLDS_FILE);
+		generatePopulation.writeVehicles(VEHICLE_FILE);
 		generatePopulation.writePlans(PLANS);
+	}
+
+	private void assertAllDriversHaveCar() {
+		for (Person person : scenario.getPopulation().getPersons().values()) {
+			if (CarAssigner.wantsCar(person)) {
+				if (!vehicles.getVehicles().containsKey(person.getId())) {
+					throw new RuntimeException("Didn't generate a car for person "+person.getId());
+				}
+			}
+		}
 	}
 
 	private static void generateFullPopulation() throws IOException {
@@ -110,7 +137,10 @@ public class GeneratePopulation {
 		generatePopulation.multiplyPopulation();
 		generatePopulation.addPopulationToScenario();
 		generatePopulation.mutateTimes();
-		generatePopulation.addAndWriteHouseholds(CLONED_HOUSEHOLDS_FILE);
+		generatePopulation.addHouseholds();
+		generatePopulation.assertAllDriversHaveCar();
+		generatePopulation.writeHouseholds(CLONED_HOUSEHOLDS_FILE);
+		generatePopulation.writeVehicles(CLONED_VEHICLE_FILE);
 		generatePopulation.writePlans(CLONED_PLANS);
 	}
 
@@ -123,7 +153,7 @@ public class GeneratePopulation {
 		}
 	}
 
-	private void addAndWriteHouseholds(String householdsFile) throws IOException {
+	private void addHouseholds() throws IOException {
 		for (String caseid : cases.keySet()) {
 			IdImpl householdId = new IdImpl(caseid);
 			Household household = households.getFactory().createHousehold(householdId);
@@ -131,11 +161,83 @@ public class GeneratePopulation {
 			for (Person person : caze.members) {
 				household.getMemberIds().add(person.getId());
 			}
+			Set<Id> peopleWhoNeedCar = new HashSet<Id>();
+			for (Person person : caze.members) {
+				if (CarAssigner.wantsCar(person)) {
+					peopleWhoNeedCar.add(person.getId());
+				}
+			}
+			int nCar = 0;
+			for (Car car : caze.cars) {
+				Id vehicleId;
+				Id primaryUserPersonId;
+				if (car.primary_user >= 0 && car.primary_user < household.getMemberIds().size()) {
+					primaryUserPersonId = household.getMemberIds().get(car.primary_user);
+				} else {
+					primaryUserPersonId = null;
+				}
+				if (primaryUserPersonId != null && peopleWhoNeedCar.contains(primaryUserPersonId)) {
+					vehicleId = primaryUserPersonId;
+				} else if (!peopleWhoNeedCar.isEmpty()) {
+					vehicleId = peopleWhoNeedCar.iterator().next();
+				} else {
+					vehicleId = new IdImpl(caseid + "." + "additional_car_" + nCar);
+				}
+				Vehicle vehicle = vehicles.getFactory().createVehicle(vehicleId, vehicleType(car.baujahr, car.antriebsart, car.hubraum));
+				vehicles.getVehicles().put(vehicle.getId(), vehicle);
+				household.getVehicleIds().add(vehicle.getId());
+				peopleWhoNeedCar.remove(vehicleId);
+				++nCar;
+			}
+			for (Id personWhoNeedsCar : peopleWhoNeedCar) {
+				VehicleType vehicleType;
+				if (household.getVehicleIds().isEmpty()) {
+					vehicleType = defaultVehicleType();
+				} else {
+					Vehicle vehicleToClone = vehicles.getVehicles().get(household.getVehicleIds().iterator().next());
+					vehicleType = vehicleToClone.getType();
+				}
+				
+				Vehicle vehicle = vehicles.getFactory().createVehicle(personWhoNeedsCar, vehicleType);
+				vehicles.getVehicles().put(vehicle.getId(), vehicle);
+				household.getVehicleIds().add(vehicle.getId());
+				++nCar;
+			}
 			household.setIncome(households.getFactory().createIncome(caze.income, IncomePeriod.month));
 			households.getHouseholds().put(householdId, household);
 		}
+	}
+
+	private void writeHouseholds(String householdsFile) {
 		HouseholdsWriterV10 writer = new HouseholdsWriterV10(households);
 		writer.writeFile(householdsFile);
+	}
+
+	private void writeVehicles(String vehicleFile) {
+		VehicleWriterV1 writer = new VehicleWriterV1(vehicles);
+		writer.writeFile(vehicleFile);
+	}
+
+	private VehicleType vehicleType(int baujahr, int antriebsart, int hubraum) {
+		IdImpl vehicleTypeId = new IdImpl(baujahr+"_"+antriebsart+"_"+hubraum);
+		VehicleType vehicleType = vehicles.getVehicleTypes().get(vehicleTypeId);
+		if (vehicleType == null) {
+			vehicleType = vehicles.getFactory().createVehicleType(vehicleTypeId);
+			vehicleType.setDescription("Baujahr:"+baujahr+";Antriebsart:"+antriebsart+";Hubraum:"+hubraum);
+			vehicles.getVehicleTypes().put(vehicleTypeId, vehicleType);
+		}
+		return vehicleType;
+	}
+
+	private VehicleType defaultVehicleType() {
+		IdImpl defaultVehicleTypeId = new IdImpl("default");
+		VehicleType defaultVehicleType = vehicles.getVehicleTypes().get(defaultVehicleTypeId);
+		if (defaultVehicleType == null) {
+			defaultVehicleType = vehicles.getFactory().createVehicleType(defaultVehicleTypeId);
+			defaultVehicleType.setDescription("default");
+			vehicles.getVehicleTypes().put(defaultVehicleTypeId, defaultVehicleType);
+		}
+		return defaultVehicleType;
 	}
 
 	private void dropPlanlessPeople() {
@@ -233,7 +335,7 @@ public class GeneratePopulation {
 	}
 
 	private void parsePlans()
-			throws IOException {
+	throws IOException {
 		final List<String[]> wegekodierungRows = new ArrayList<String[]>();
 		final List<String[]> wegedatensatzRows = new ArrayList<String[]>();
 		TabularFileParserConfig tabFileParserConfig = new TabularFileParserConfig();
@@ -296,6 +398,16 @@ public class GeneratePopulation {
 	private static final int D_W05 = 61; // Hauptverkehrsmittel
 
 	private static final int D_WEGDAUER = 56;
+
+	private static final int[] H_H0412 = new int[] {53, 71, 89};
+
+	private static final int[] H_H048 = new int[] {59, 77, 95};
+
+	private static final int[] H_H0410 = new int[] {63, 81, 99};
+
+	private static final int[] H_H044 = new int[] {55, 73, 91};
+
+	private static final int[] H_H045 = new int[] {56, 74, 92};
 
 	private Random rnd = new Random();
 
@@ -457,6 +569,8 @@ public class GeneratePopulation {
 
 			private static final int H_H072 = 125; // Einkommen in Euro
 
+			protected static final int H_H04_3 = 108;
+
 			@Override
 			public void startRow(String[] row) {
 				check(row);
@@ -489,6 +603,19 @@ public class GeneratePopulation {
 				} else {
 					household.income = -1;
 				}
+				int nCars = Integer.parseInt(row[H_H04_3]);
+				if (nCars > 3) {
+					logger.error("nCars = "+nCars+", don't know what to do with values > 3");
+					nCars = 3;
+				}
+				for (int i=0; i<nCars; i++) {
+					Car car = new Car();
+					car.hubraum = Integer.parseInt(row[H_H0410[i]]);
+					car.baujahr = Integer.parseInt(row[H_H0412[i]]);
+					car.antriebsart = Integer.parseInt(row[H_H048[i]]);
+					car.primary_user = Integer.parseInt(row[H_H045[i]]);
+					household.cars.add(car);
+				}
 				cases.put(caseid, household);
 			}
 
@@ -496,7 +623,7 @@ public class GeneratePopulation {
 	}
 
 	private void parsePersons()
-			throws IOException {
+	throws IOException {
 		TabularFileParserConfig tabFileParserConfig = new TabularFileParserConfig();
 		tabFileParserConfig.setFileName(MID_PERSONENDATENSATZ);
 		tabFileParserConfig.setDelimiterTags(new String[] {";"});
@@ -571,6 +698,7 @@ public class GeneratePopulation {
 					haushaltCopy.members.add(newPerson);
 					persons.put(newPerson.getId(), newPerson);
 				}
+				haushaltCopy.cars = haushalt.getValue().cars;
 				newCases.put((householdId++).toString(), haushaltCopy);
 			}
 		}

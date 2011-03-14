@@ -202,15 +202,7 @@ public class CreateInitialTimeSchedule {
 		}
 		
 		VehicleWriterV1 writer = new VehicleWriterV1(this.veh);
-		try {
-			writer.writeFile(vehiclesOutFile);
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}		
+		writer.writeFile(vehiclesOutFile);		
 	}
 
 	private void writeTransitSchedule(String transitScheduleOutFile) {
