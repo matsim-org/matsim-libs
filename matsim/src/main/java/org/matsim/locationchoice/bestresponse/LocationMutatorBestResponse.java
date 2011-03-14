@@ -83,7 +83,9 @@ public class LocationMutatorBestResponse extends LocationMutatorwChoiceSet {
 		
 		((PlanImpl)plan).getPlanElements().clear();
 		// copy the best plan into replanned plan
-		((PlanImpl)plan).copyPlan(this.bestPlan);		
+		((PlanImpl)plan).copyPlan(this.bestPlan);
+		//r.f.?
+		super.resetRoutes(plan);
 	}
 		
 	private void initFlexibleTypes(LocationChoiceConfigGroup config) {

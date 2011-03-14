@@ -21,10 +21,6 @@
 package org.matsim.locationchoice.bestresponse;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -34,12 +30,9 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.PseudoRemovePriorityQueue;
 
 public class ForwardDijkstraMultipleDestinations extends Dijkstra {
-	
-	protected Map<Id, Double> distances;
-	
+		
 	public ForwardDijkstraMultipleDestinations(Network network, TravelCost costFunction, TravelTime timeFunction) {
 		super(network, costFunction, timeFunction);
-		distances = new HashMap<Id, Double>();
 	}
 
 	@Override
