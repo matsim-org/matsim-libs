@@ -44,34 +44,21 @@ public class LinkFilter {
 	Network getRelevantNetwork(Set<Feature> featuresInShape) {
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		NetworkImpl filteredNetwork = scenario.getNetwork();
-		System.out.println("*******************************************");
-		for (Node node : filteredNetwork.getNodes().values()) {
+
+		for (Node node : network.getNodes().values()) {
+
 			if (isNodeInShape(node, featuresInShape)) {
-				Node fromNode = filteredNetwork.createAndAddNode(node.getId(), node.getCoord());
-				Node toNode = filteredNetwork.createAndAddNode(node.getId(), node.getCoord());
-				System.out.println("filteredNetwork.getNodes().values() " +toNode);
-				for(Link link : filteredNetwork.getLinks().values()){
-					//	System.out.println(isLinkInShape(link,featuresInShape));
+				for(Link link : network.getLinks().values()){
+					filteredNetwork.createAndAddNode(node.getId(), node.getCoord());
 						if(isLinkInShape(link,featuresInShape)){
-							filteredNetwork.createAndAddLink(link.getId(),fromNode,toNode,0.0,0.0,0.0,0.0);		
-//							Node toNode = filteredNetwork.createAndAddNode(linkId.getKey(),linkId.getValue().getToNode().getCoord());;
+							filteredNetwork.createAndAddLink(link.getId(), link.getFromNode(), link.getToNode(), 0.0,0.0,0.0,0.0);
+						
 						}
 				}
 			}		
 		}
 		
-/*		Map<Id, Link> LinksMap =  (Map<Id, Link>) network.getLinks(); // Map | ID; link
-		for(Entry<Id,Link> linkId : LinksMap .entrySet()){
-		//	System.out.println(isLinkInShape(linkId.getValue(),featuresInShape));
-			if(isLinkInShape(linkId.getValue(),featuresInShape)){
-				
 
-//				Node fromNode = filteredNetwork.createAndAddNode(linkId.getKey(),linkId.getValue().getFromNode().getCoord());		
-//				Node toNode = filteredNetwork.createAndAddNode(linkId.getKey(),linkId.getValue().getToNode().getCoord());
-			
-				filteredNetwork.createAndAddLink(linkId.getKey(),fromNode ,toNode ,0.0, 0.0, 0.0, 0.0);}
-//				filteredNetwork.getNodes().get(linkId.getValue().getFromNode().getCoord()).addInLink(linkId.getValue());
-		}*/
 		System.out.println(filteredNetwork.getLinks());
 		return filteredNetwork;
 		
@@ -83,9 +70,9 @@ public class LinkFilter {
 		Coord nodeCoord = node.getCoord();
 		//System.out.println("nodeCoord   " + nodeCoord);
 		GeometryFactory factory = new GeometryFactory();
-		Coordinate[] coor = {new Coordinate(nodeCoord.getX(), nodeCoord.getY())};
+		Coordinate coor = new Coordinate(nodeCoord.getX(), nodeCoord.getY());
 		//System.out.println("coor   " + coor);
-		Geometry geo = factory.createLineString(coor);
+		Geometry geo = factory.createPoint(coor);
 		//System.out.println("geo   " + geo);
 		for(Feature feature : featuresInShape){
 			if(feature.getDefaultGeometry().contains(geo)){

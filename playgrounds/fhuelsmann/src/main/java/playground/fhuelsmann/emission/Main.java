@@ -152,7 +152,7 @@ public class Main {
 		System.out.println(emissionType2AvgEmissionsAltstadtArea);
 		System.out.println(emissionType2AvgEmissionsAubingArea);
 		
-		LinkFilter linkfilter = new LinkFilter(network);
+/*		LinkFilter linkfilter = new LinkFilter(network);
 		Set<Feature> urbanShapeLink = linkfilter.readShape(urbanShapeFile);
 		Network urbanNetwork = linkfilter.getRelevantNetwork(urbanShapeLink);
 		Set<Feature> suburbanShapeLink = linkfilter.readShape(urbanShapeFile);
@@ -163,10 +163,10 @@ public class Main {
 		List<Double> emissionType2AvgEmissionsSuburbanAreaLink = calculateAvgEmissionsPerTypeAndAreaLink(suburbanNetwork, linkId2emissionsInGrammPerType);
 		
 		System.out.println("+++++++++++++++++++++++++++++++++++"+emissionType2AvgEmissionsUrbanAreaLink);
-		System.out.println(emissionType2AvgEmissionsSuburbanAreaLink);
+		System.out.println(emissionType2AvgEmissionsSuburbanAreaLink);*/
 	}
 	
-	private List<Double> calculateAvgEmissionsPerTypeAndAreaLink(Network network, Map<Id, double[]> linkId2emissionsInGrammPerType) {
+/*	private List<Double> calculateAvgEmissionsPerTypeAndAreaLink(Network network, Map<Id, double[]> linkId2emissionsInGrammPerType) {
 		List<Double> emissionType2AvgEmissionsUrbanAreaLink = new ArrayList<Double>();
 		double totalCo2 = 0.0;
 		double totalPM = 0.0;
@@ -194,7 +194,7 @@ public class Main {
 		emissionType2AvgEmissionsUrbanAreaLink.add(totalNox / populationSize);
 		emissionType2AvgEmissionsUrbanAreaLink.add(totalNo2 / populationSize);
 		return emissionType2AvgEmissionsUrbanAreaLink;
-	}
+	}*/
 
 	private List<Double> calculateAvgEmissionsPerTypeAndArea(Population population, Map<Id, double[]> personId2emissionsInGrammPerType,Map<Id, Map<String,Double>> coldEmissionsPerson) {
 		List<Double> emissionType2AvgEmissionsUrbanArea = new ArrayList<Double>();
