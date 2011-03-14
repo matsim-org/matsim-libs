@@ -1,10 +1,13 @@
 package playground.sergioo.GTFS;
 
+import java.util.Date;
+
+
 public class StopTime {
 	
 	//Attributes
-	private String arrivalTime;
-	private String departureTime;
+	private Date arrivalTime;
+	private Date departureTime;
 	private String stopId;
 	
 	//Methods
@@ -13,7 +16,7 @@ public class StopTime {
 	 * @param departureTime
 	 * @param stopId
 	 */
-	public StopTime(String arrivalTime, String departureTime, String stopId) {
+	public StopTime(Date arrivalTime, Date departureTime, String stopId) {
 		super();
 		this.arrivalTime = arrivalTime;
 		this.departureTime = departureTime;
@@ -22,13 +25,13 @@ public class StopTime {
 	/**
 	 * @return the arrivalTime
 	 */
-	public String getArrivalTime() {
+	public Date getArrivalTime() {
 		return arrivalTime;
 	}
 	/**
 	 * @return the departureTime
 	 */
-	public String getDepartureTime() {
+	public Date getDepartureTime() {
 		return departureTime;
 	}
 	/**

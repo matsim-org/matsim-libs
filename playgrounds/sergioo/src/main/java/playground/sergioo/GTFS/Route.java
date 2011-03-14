@@ -33,10 +33,10 @@ public class Route {
 		return routeType;
 	}
 	/**
-	 * @return the trip
+	 * @return the trips
 	 */
-	public Trip getTrip(String key) {
-		return trips.get(key);
+	public HashMap<String, Trip> getTrips() {
+		return trips;
 	}
 	/**
 	 * Puts a new trip

@@ -1,6 +1,8 @@
 package playground.sergioo.GTFS;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class Trip {
 	
@@ -8,7 +10,7 @@ public class Trip {
 	private Service service;
 	private Shape shape;
 	private HashMap<Integer,StopTime> stopTimes; 
-	
+	private List<Frequency> frequencies;
 	//Methods
 	/**
 	 * @param stopTimes
@@ -20,12 +22,7 @@ public class Trip {
 		this.service = service;
 		this.shape = shape;
 		this.stopTimes = new HashMap<Integer, StopTime>();
-	}
-	/**
-	 * @return the stopTime
-	 */
-	public StopTime getStopTime(Integer key) {
-		return stopTimes.get(key);
+		this.frequencies = new ArrayList<Frequency>();
 	}
 	/**
 	 * @return the service
@@ -40,12 +37,31 @@ public class Trip {
 		return shape;
 	}
 	/**
+	 * @return the stopTimes
+	 */
+	public HashMap<Integer, StopTime> getStopTimes() {
+		return stopTimes;
+	}
+	/**
+	 * @return the frequencies
+	 */
+	public List<Frequency> getFrequencies() {
+		return frequencies;
+	}
+	/**
 	 * Puts a new stopTime
 	 * @param key
 	 * @param stopTime
 	 */
 	public void putStopTime(Integer key, StopTime stopTime) {
 		stopTimes.put(key, stopTime);
+	}
+	/**
+	 * Adds a new Frequency
+	 * @param frequency
+	 */
+	public void addFrequency(Frequency frequency) {
+		frequencies.add(frequency);
 	}
 	
 }

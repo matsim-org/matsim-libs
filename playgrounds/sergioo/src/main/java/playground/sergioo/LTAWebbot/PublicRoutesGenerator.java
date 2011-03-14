@@ -160,9 +160,9 @@ public class PublicRoutesGenerator {
 		String line = reader.readLine();
 		while(line!=null) {
 			String[] busStopParts = line.split(",");
-			String code = "";
+			String code = null;
 			try {
-				code=Integer.parseInt(busStopParts[0])+"";
+				code=Integer.toString(Integer.parseInt(busStopParts[0]));
 			} catch (NumberFormatException e) {
 				code=busStopParts[0];
 			}
