@@ -70,9 +70,9 @@ public class VspExperimentalConfigGroup extends Module {
 	private String coloring = COLORING_STANDARD ;
 	
 	// ---
-
+	@Deprecated //somewhen should be deleted, Yu 03.2011
 	private static final String OFFSET_WALK = "offsetWalk";
-	private double offsetWalk = 0d;
+	// private double offsetWalk = 0d;
 
 
 	public VspExperimentalConfigGroup() {
@@ -106,21 +106,21 @@ public class VspExperimentalConfigGroup extends Module {
 		if (USE_ACTIVITY_DURATIONS.equalsIgnoreCase(key)) {
 //			this.setUseActivityDurations(Boolean.parseBoolean(value));
 			if ( Boolean.parseBoolean(value) ) {
-				this.setActivityDurationInterpretation( MIN_OF_DURATION_AND_END_TIME ) ;
+				setActivityDurationInterpretation( MIN_OF_DURATION_AND_END_TIME ) ;
 			} else {
-				this.setActivityDurationInterpretation( END_TIME_ONLY ) ; 
+				setActivityDurationInterpretation( END_TIME_ONLY ) ; 
 			}
 		} else if ( ACTIVITY_DURATION_INTERPRETATION.equalsIgnoreCase(key)) {
-			this.setActivityDurationInterpretation(value) ;
+			setActivityDurationInterpretation(value) ;
 		} else if ( COLORING.equalsIgnoreCase(key) ) {
-			this.setColoring( value ) ;
-		} else if (INPUT_MZ05_FILE.equalsIgnoreCase(key))
-			this.setInputMZ05File(value);
-		else if (MODES_FOR_SUBTOURMODECHOICE.equalsIgnoreCase(key))
-			this.setModesForSubTourModeChoice(value);
-		else if (CHAIN_BASED_MODES.equalsIgnoreCase(key))
-			this.setChainBasedModes(value);
-		else if (OFFSET_WALK.equalsIgnoreCase(key)) {
+			setColoring( value ) ;
+		} else if (INPUT_MZ05_FILE.equalsIgnoreCase(key)) {
+			setInputMZ05File(value);
+		} else if (MODES_FOR_SUBTOURMODECHOICE.equalsIgnoreCase(key)) {
+			setModesForSubTourModeChoice(value);
+		} else if (CHAIN_BASED_MODES.equalsIgnoreCase(key)) {
+			setChainBasedModes(value);
+		} else if (OFFSET_WALK.equalsIgnoreCase(key)) {
 //			this.setOffsetWalk(Double.parseDouble(value));
 			throw new RuntimeException( "offsetWalk in vspExperimentalConfigGroup is no longer; use the (alternative-specific) " +
 					"constants in planCalcScore.  Aborting since you need to fix this ..." ) ;
@@ -136,14 +136,14 @@ public class VspExperimentalConfigGroup extends Module {
 //		map.put(USE_ACTIVITY_DURATIONS, isUseActivityDurations() );
 		map.put(ACTIVITY_DURATION_INTERPRETATION, getActivityDurationInterpretation()) ;
 
-		map.put(INPUT_MZ05_FILE, this.getInputMZ05File() ) ;
+		map.put(INPUT_MZ05_FILE, getInputMZ05File() ) ;
 
-		map.put(MODES_FOR_SUBTOURMODECHOICE, this.getModesForSubTourModeChoice() ) ;
-		map.put(CHAIN_BASED_MODES, this.getChainBasedModes() );
+		map.put(MODES_FOR_SUBTOURMODECHOICE, getModesForSubTourModeChoice() ) ;
+		map.put(CHAIN_BASED_MODES, getChainBasedModes() );
 
 //		map.put(OFFSET_WALK, Double.toString( this.getOffsetWalk() ) );
 		
-		map.put(COLORING, this.getChainBasedModes() ) ;
+		map.put(COLORING, getChainBasedModes() ) ;
 		return map;
 	}
 
@@ -156,14 +156,14 @@ public class VspExperimentalConfigGroup extends Module {
 //	}
 	
 	public String getColoring() {
-		return this.coloring ;
+		return coloring ;
 	}
 	public void setColoring( String value ) {
-		this.coloring = value ;
+		coloring = value ;
 	}
 
 	public String getInputMZ05File() {
-		return this.inputMZ05File;
+		return inputMZ05File;
 	}
 
 	public void setInputMZ05File(final String inputMZ05File) {
@@ -171,7 +171,7 @@ public class VspExperimentalConfigGroup extends Module {
 	}
 
 	public String getModesForSubTourModeChoice() {
-		return this.modesForSubTourModeChoice;
+		return modesForSubTourModeChoice;
 	}
 
 	public void setModesForSubTourModeChoice(final String modesForSubTourModeChoice) {
@@ -179,7 +179,7 @@ public class VspExperimentalConfigGroup extends Module {
 	}
 
 	public String getChainBasedModes() {
-		return this.chainBasedModes;
+		return chainBasedModes;
 	}
 
 	public void setChainBasedModes(final String chainBasedModes) {
