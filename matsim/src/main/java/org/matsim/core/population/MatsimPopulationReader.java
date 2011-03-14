@@ -43,12 +43,13 @@ public class MatsimPopulationReader extends MatsimXmlParser implements Populatio
 	private final static String PLANS_V0 = "plans_v0.dtd";
 	private final static String PLANS_V1 = "plans_v1.dtd";
 	private final static String PLANS_V4 = "plans_v4.dtd";
-	
+	private final static String POPULATION_V5 = "population_v5.dtd";
+
 	private MatsimXmlParser delegate = null;
 	private final Scenario scenario;
 
 	private static final Logger log = Logger.getLogger(MatsimPopulationReader.class);
-	
+
 	public MatsimPopulationReader(final Scenario scenario) {
 		this.scenario = scenario;
 	}
@@ -88,8 +89,10 @@ public class MatsimPopulationReader extends MatsimXmlParser implements Populatio
 		if (PLANS_V4.equals(doctype)) {
 			this.delegate = new PopulationReaderMatsimV4(this.scenario);
 			log.info("using plans_v4-reader.");
-		} 
-		else if (PLANS_V1.equals(doctype)) {
+		} else if (POPULATION_V5.equals(doctype)) {
+			this.delegate = new PopulationReaderMatsimV5(this.scenario);
+			log.info("using population_v5-reader.");
+		} else if (PLANS_V1.equals(doctype)) {
 			this.delegate = new PopulationReaderMatsimV1(this.scenario);
 			log.info("using plans_v1-reader.");
 		} else if (PLANS_V0.equals(doctype) || PLANS.equals(doctype)) {
