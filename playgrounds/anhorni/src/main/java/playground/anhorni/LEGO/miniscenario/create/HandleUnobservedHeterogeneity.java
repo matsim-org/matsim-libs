@@ -25,20 +25,18 @@ import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioImpl;
-
-import playground.anhorni.LEGO.miniscenario.ConfigReader;
 import playground.anhorni.random.RandomFromVarDistr;
 
 
 public class HandleUnobservedHeterogeneity {
 	private ScenarioImpl scenario;	
-	private ConfigReader configReader;
 	private RandomFromVarDistr rnd;
 	private Config config;
+	
+	private final String LCEXP = "locationchoiceExperimental";
 			
-	public HandleUnobservedHeterogeneity(ScenarioImpl scenario, ConfigReader configReader, RandomFromVarDistr rnd, Config config) {		
+	public HandleUnobservedHeterogeneity(ScenarioImpl scenario, Config config, RandomFromVarDistr rnd) {		
 		this.scenario = scenario;
-		this.configReader = configReader;
 		this.rnd = rnd;
 		this.config = config;
 	}
@@ -46,7 +44,7 @@ public class HandleUnobservedHeterogeneity {
 	public void assign() {				
 		double beta = Double.parseDouble(config.locationchoice().getSearchSpaceBeta());
 		double utVarEpsilon = 1.0;	// utMeanEpsilon = 0.0;
-		this.assignPersonsTastes(beta, configReader.getVarTastes());
+		this.assignPersonsTastes(beta, Double.parseDouble(config.findParam(LCEXP, "varTastes")));
 		this.assignKValuesPersons(0.5 * utVarEpsilon);
 		this.assignKValuesAlternatives(0.5 * utVarEpsilon);	
 	}
@@ -63,7 +61,7 @@ public class HandleUnobservedHeterogeneity {
 	}
 	
 	private double getRandom(double var) {
-		if (configReader.isGumbel()) {
+		if (Boolean.parseBoolean(config.findParam(LCEXP, "gumbel"))) {
 			double uniform = rnd.getUniform(1.0);
 			// interval MUST be ]0,1[
 			while (uniform == 0.0 || uniform == 1.0) {
@@ -90,47 +88,5 @@ public class HandleUnobservedHeterogeneity {
 			((ActivityFacilityImpl)facility).setDesc(Double.toString(rnd.getUniform(1.0)));
 		}
 	}
-	
-//	public void computeLargestEpsilon(ScenarioImpl scenario, String type) {	
-//		int counter = 0;
-//		int nextMsg = 1;
-//		
-//		DestinationChoiceScoring scorer = new DestinationChoiceScoring(new Random(), this.scenario.getActivityFacilities(), configReader, this.config);	
-//		log.info("Computing max epsilons for type: " + type + "...");
-//		log.info(scenario.getActivityFacilities().getFacilitiesForActivityType(type).size() + " " + type + " facilities");
-//		
-//		TreeMap<Id, ActivityFacility> typedFacilities = scenario.getActivityFacilities().getFacilitiesForActivityType(type);
-//		
-//		for (Person p : scenario.getPopulation().getPersons().values()) {
-//			//ceck if plan contains activity of type
-//			boolean typeInPlan = false;
-//			for (PlanElement pe : p.getSelectedPlan().getPlanElements()) {
-//				if (pe instanceof Activity) {
-//					if (((Activity) pe).getType().startsWith(type)) typeInPlan = true;
-//				}
-//			}
-//			
-//			double maxEpsilon = 0.0;
-//			if (typeInPlan) {
-//				for (Facility f : typedFacilities.values()) {
-//					ActivityImpl act = new ActivityImpl(type, new IdImpl(1));
-//					act.setFacilityId(f.getId());
-//					double epsilon = scorer.getDestinationScore((PlanImpl)p.getSelectedPlan(), act, false);
-//					
-//					if (epsilon > maxEpsilon) {
-//						maxEpsilon = epsilon;
-//					}
-//				}
-//			}
-//			counter++;
-//			if (counter % nextMsg == 0) {
-//				nextMsg *= 2;
-//				log.info(" person # " + counter);
-//			}
-//			
-//			String desiresDesc = ((PersonImpl)p).getDesires().getDesc();
-//			((PersonImpl)p).getDesires().setDesc(desiresDesc + "_" + maxEpsilon);
-//		}
-//	}
 }	
 

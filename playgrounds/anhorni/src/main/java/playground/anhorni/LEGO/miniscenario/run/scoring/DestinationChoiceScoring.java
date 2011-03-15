@@ -32,19 +32,17 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
-import playground.anhorni.LEGO.miniscenario.ConfigReader;
-
 public class DestinationChoiceScoring {
 
 	private Random rnd;
 	private ActivityFacilities facilities;
-	private ConfigReader configReader;
 	private Config config;
 	
-	public DestinationChoiceScoring(Random rnd, ActivityFacilities facilities , ConfigReader configReader, Config config) {
+	private final String LCEXP = "locationchoiceExperimental";
+	
+	public DestinationChoiceScoring(Random rnd, ActivityFacilities facilities , Config config) {
 		this.rnd = rnd;
 		this.facilities = facilities;
-		this.configReader = configReader;
 		this.config = config;
 	}
 				
@@ -57,7 +55,7 @@ public class DestinationChoiceScoring {
 					plan.getPreviousActivity(plan.getPreviousLeg(act)),
 					plan.getNextActivity(plan.getNextLeg(act)));
 		}
-		if (configReader.getScoreElementEpsilons() > 0.000001) {
+		if (Double.parseDouble(config.findParam(LCEXP, "varTastes")) > 0.000001) {
 			score += this.getEpsilonAlternative(act.getFacilityId(), plan.getPerson());
 		}		
 		return score;
@@ -73,14 +71,14 @@ public class DestinationChoiceScoring {
 		double beta = Double.parseDouble(this.config.locationchoice().getSearchSpaceBeta());
 		
 		double utilityDistanceObserved = 0.0;
-		if (configReader.isLinearDistanceUtility()) {
+		if (Boolean.parseBoolean(config.findParam(LCEXP, "linearDistanceUtility"))) {
 			utilityDistanceObserved = beta * distance;
 		}
 		else {
 			utilityDistanceObserved = (-2.0) * Math.log(1.0 + distance * beta * (-1.0));
 		}
 		double utilityDistanceUnobserved = 0.0;		
-		if (configReader.getScoreElementTastes() > 0.000001) {
+		if (Double.parseDouble(config.findParam(LCEXP, "varTastes")) > 0.000001) {
 			utilityDistanceObserved = 0;
 			utilityDistanceUnobserved = Double.parseDouble(person.getDesires().getDesc().split("_")[0]) * distance;
 		}
@@ -102,7 +100,7 @@ public class DestinationChoiceScoring {
 		long seed = (long) ((kp * kf) * Long.MAX_VALUE);
 		rnd.setSeed(seed);
 				
-		if (configReader.isGumbel()) {
+		if (Boolean.parseBoolean(config.findParam(LCEXP, "gumbel"))) {
 			// take a few draws to come to the "chaotic region"
 			for (int i = 0; i < 5; i++) {
 				rnd.nextDouble();

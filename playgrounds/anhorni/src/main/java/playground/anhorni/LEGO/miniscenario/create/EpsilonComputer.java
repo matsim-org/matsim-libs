@@ -33,8 +33,6 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
-
-import playground.anhorni.LEGO.miniscenario.ConfigReader;
 import playground.anhorni.LEGO.miniscenario.run.scoring.DestinationChoiceScoring;
 
 public class EpsilonComputer implements PlanAlgorithm {
@@ -42,7 +40,7 @@ public class EpsilonComputer implements PlanAlgorithm {
 	private TreeMap<Id, ActivityFacility> typedFacilities;
 	private DestinationChoiceScoring scorer;
 			
-	public EpsilonComputer(ScenarioImpl scenario, ConfigReader configReader, String type, TreeMap<Id, ActivityFacility> typedFacilities,
+	public EpsilonComputer(ScenarioImpl scenario, String type, TreeMap<Id, ActivityFacility> typedFacilities,
 			DestinationChoiceScoring scorer) {		
 		this.type = type;
 		this.typedFacilities = typedFacilities;

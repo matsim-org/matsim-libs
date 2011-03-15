@@ -18,19 +18,17 @@ public class ComputeMaxEpsilons extends AbstractMultithreadedModule {
 	private String type;
 	private TreeMap<Id, ActivityFacility> typedFacilities;
 	private DestinationChoiceScoring scorer;
-	private ConfigReader configReader;
-	
-	public ComputeMaxEpsilons(int numOfThreads, ScenarioImpl scenario, String type, ConfigReader configReader, Config config) {
+		
+	public ComputeMaxEpsilons(int numOfThreads, ScenarioImpl scenario, String type, Config config) {
 		super(numOfThreads);
 		this.scenario = scenario;
 		this.type = type;
-		this.configReader = configReader;
 		this.typedFacilities = this.scenario.getActivityFacilities().getFacilitiesForActivityType(type);
-		this.scorer = new DestinationChoiceScoring(new Random(), this.scenario.getActivityFacilities(), configReader, config);	
+		this.scorer = new DestinationChoiceScoring(new Random(), this.scenario.getActivityFacilities(), config);	
 	}
 
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
-		return new EpsilonComputer(this.scenario, this.configReader, this.type, typedFacilities, this.scorer);
+		return new EpsilonComputer(this.scenario, this.type, typedFacilities, this.scorer);
 	}
 }

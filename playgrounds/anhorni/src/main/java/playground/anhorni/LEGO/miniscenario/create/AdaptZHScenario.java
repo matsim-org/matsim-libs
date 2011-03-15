@@ -55,7 +55,6 @@ import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.locationchoice.utils.ActTypeConverter;
 
-import playground.anhorni.LEGO.miniscenario.ConfigReader;
 import playground.anhorni.random.RandomFromVarDistr;
 
 
@@ -63,8 +62,9 @@ public class AdaptZHScenario {
 	private final static Logger log = Logger.getLogger(AdaptZHScenario.class);
 	private ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 	private String outputFolder = "src/main/java/playground/anhorni/output/zh10Pct/";
-	
 	private long seed;
+	
+	private final String LCEXP = "locationchoiceExperimental";
 		
 	public static void main(final String[] args) {		
 		String networkFilePath="src/main/java/playground/anhorni/input/zh10Pct/network.xml";
@@ -85,18 +85,14 @@ public class AdaptZHScenario {
 		populationReader.readFile(plansFilePath);
 	}
 
-	private void run() {	
-		ConfigReader configReader = new ConfigReader();
-		configReader.read();
-		
-		this.seed = configReader.getRandomSeed();
-		
-		Config config = (ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed("src/main/java/playground/anhorni/input/zh10Pct/config.xml").getScenario()).getConfig();
+	private void run() {			
+		Config config = (ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed("src/main/java/playground/anhorni/input/zh10Pct/config.xml").getScenario()).getConfig();				
+		this.seed = Long.parseLong(config.findParam(LCEXP, "randomSeed"));
 		
 		log.info("Handling heterogeneity ...");		
 		RandomFromVarDistr rnd = new RandomFromVarDistr();
 		rnd.setSeed(this.seed);
-		HandleUnobservedHeterogeneity hhandler = new HandleUnobservedHeterogeneity(this.scenario, configReader, rnd, config);
+		HandleUnobservedHeterogeneity hhandler = new HandleUnobservedHeterogeneity(this.scenario, config, rnd);
 		hhandler.assign(); 
 		
 		log.info("Adding opening times to facilities ...");
@@ -104,14 +100,14 @@ public class AdaptZHScenario {
 		log.info("Adapting plans ...");
 		this.adaptPlans();
 		
-		ComputeMaxEpsilons maxEpsilonComputer = new ComputeMaxEpsilons(10, scenario, "s", configReader, config);
+		ComputeMaxEpsilons maxEpsilonComputer = new ComputeMaxEpsilons(10, scenario, "s", config);
 		maxEpsilonComputer.prepareReplanning();
 		for (Person p : this.scenario.getPopulation().getPersons().values()) {
 			maxEpsilonComputer.handlePlan(p.getSelectedPlan());
 		}
 		maxEpsilonComputer.finishReplanning();
 		
-		maxEpsilonComputer = new ComputeMaxEpsilons(10, scenario, "l", configReader, config);
+		maxEpsilonComputer = new ComputeMaxEpsilons(10, scenario, "l", config);
 		maxEpsilonComputer.prepareReplanning();
 		for (Person p : this.scenario.getPopulation().getPersons().values()) {
 			maxEpsilonComputer.handlePlan(p.getSelectedPlan());

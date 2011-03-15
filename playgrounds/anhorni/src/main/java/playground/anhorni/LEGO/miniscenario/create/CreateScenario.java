@@ -25,31 +25,30 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
-
-import playground.anhorni.LEGO.miniscenario.ConfigReader;
 import playground.anhorni.random.RandomFromVarDistr;
 
 public class CreateScenario {
 
 	private final static Logger log = Logger.getLogger(CreateScenario.class);
 	private ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());	
-	private ConfigReader configReader = new ConfigReader();
 	private RandomFromVarDistr rnd;
 	
 	private long seed;
 	private String outPath = "src/main/java/playground/anhorni/input/LEGO/";
+	private String configFile;
+	
+	private final String LCEXP = "locationchoiceExperimental";
 		
 	public static void main(final String[] args) {
 		CreateScenario scenarioCreator = new CreateScenario();	
-		scenarioCreator.init();	
-		scenarioCreator.setSeedFromConfig();
+		scenarioCreator.init(args[0]);
 		scenarioCreator.run();			
 		log.info("Scenario creation finished \n ----------------------------------------------------");
 	}
 	
-	public void init() {
-		configReader.read();			
+	public void init(String configFile) {			
 		rnd = new RandomFromVarDistr();
+		this.configFile = configFile;
 	}
 	
 	public void run() {
@@ -57,28 +56,21 @@ public class CreateScenario {
 	}
 	
 	private void create() {			
-		CreateNetwork networkCreator = new CreateNetwork();
-		networkCreator.createNetwork(this.scenario, this.configReader);
-		
-		ScenarioImpl scenario = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(configReader.getPath() + "config.xml").getScenario();
+		ScenarioImpl scenario = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(configFile).getScenario();
 		Config config = scenario.getConfig();
+		
+		this.seed = Long.parseLong(config.findParam(LCEXP, "randomSeed"));
+		rnd.setSeed(this.seed);
+		
+		CreateNetwork networkCreator = new CreateNetwork();
+		networkCreator.createNetwork(this.scenario, config);
 				
 		CreatePopulation populationCreator = new CreatePopulation();
-		populationCreator.createPopulation(this.scenario, this.configReader, rnd, config);	
+		populationCreator.createPopulation(this.scenario, config, rnd);	
 		log.info("Writing population ...");
 		populationCreator.write(this.outPath);
 		log.info("Writing network ...");
 		networkCreator.write(this.outPath);
-	}
-
-	public void setSeed(long seed) {
-		this.seed = seed;
-		rnd.setSeed(this.seed);
-	}
-	
-	public void setSeedFromConfig() {
-		this.seed = configReader.getRandomSeed();
-		rnd.setSeed(this.seed);
 	}
 
 	public void setOutPath(String outPath) {

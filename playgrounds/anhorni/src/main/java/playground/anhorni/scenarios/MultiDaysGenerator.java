@@ -33,7 +33,6 @@ public class MultiDaysGenerator {
 	private ScenarioImpl scenarioWriteOut;
 	private NetworkImpl network;
 	private boolean temporalVar;
-	private long seed;
 	
 	public MultiDaysGenerator(Random randomNumberGenerator, PopulationImpl staticPopulation, ScenarioImpl scenarioWriteOut, 
 			NetworkImpl network, boolean temporalVar, ObjectAttributes personAttributes) {
@@ -102,17 +101,17 @@ public class MultiDaysGenerator {
 				"src/main/java/playground/anhorni/input/PLOC/3towns/config.xml").getScenario()).getConfig();
 				
 		RandomFromVarDistr rnd = new RandomFromVarDistr(this.randomNumberGenerator);
-		HandleUnobservedHeterogeneity hhandler = new HandleUnobservedHeterogeneity(this.scenarioWriteOut, configReader, rnd, config);
+		HandleUnobservedHeterogeneity hhandler = new HandleUnobservedHeterogeneity(this.scenarioWriteOut, config, rnd);
 		hhandler.assign(); 
 			
-		ComputeMaxEpsilons maxEpsilonComputer = new ComputeMaxEpsilons(10, scenarioWriteOut, "s", configReader, config);
+		ComputeMaxEpsilons maxEpsilonComputer = new ComputeMaxEpsilons(10, scenarioWriteOut, "s", config);
 		maxEpsilonComputer.prepareReplanning();
 		for (Person p : this.scenarioWriteOut.getPopulation().getPersons().values()) {
 			maxEpsilonComputer.handlePlan(p.getSelectedPlan());
 		}
 		maxEpsilonComputer.finishReplanning();
 		
-		maxEpsilonComputer = new ComputeMaxEpsilons(10, scenarioWriteOut, "l", configReader, config);
+		maxEpsilonComputer = new ComputeMaxEpsilons(10, scenarioWriteOut, "l", config);
 		maxEpsilonComputer.prepareReplanning();
 		for (Person p : this.scenarioWriteOut.getPopulation().getPersons().values()) {
 			maxEpsilonComputer.handlePlan(p.getSelectedPlan());

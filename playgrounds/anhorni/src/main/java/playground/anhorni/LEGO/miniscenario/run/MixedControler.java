@@ -21,17 +21,14 @@
 package playground.anhorni.LEGO.miniscenario.run;
 
 import org.matsim.core.controler.Controler;
-//import org.matsim.locationchoice.facilityload.FacilitiesLoadCalculator;
-
-import playground.anhorni.LEGO.miniscenario.ConfigReader;
 import playground.anhorni.LEGO.miniscenario.run.analysis.CalculatePlanTravelStats;
 import playground.anhorni.LEGO.miniscenario.run.scoring.MixedScoringFunctionFactory;
 
 
 public class MixedControler extends Controler {
 	
-	private ConfigReader configReader = new ConfigReader();
-		
+	private final String LCEXP = "locationchoiceExperimental";
+			
 	public MixedControler(final String[] args) {
 		super(args);	
 	}
@@ -39,7 +36,6 @@ public class MixedControler extends Controler {
     public static void main (final String[] args) { 
     	MixedControler controler = new MixedControler(args);
     	controler.setOverwriteFiles(true);
-    	//controler.setWriteEventsInterval(250);
     	controler.run();
     }
     
@@ -47,18 +43,18 @@ public class MixedControler extends Controler {
     protected void setUp() {
       super.setUp();
       
-      configReader.read();
-      
-      if (!(configReader.getScoreElementFLoad() > 0.00000001)) {
+      double fLoad = Double.parseDouble(config.findParam(LCEXP, "scoreElementFLoad"));
+           
+      if (!(fLoad > 0.00000001)) {
     	  this.getConfig().setParam("locationchoice", "restraintFcnFactor", "0.0");
       }
            
       MixedScoringFunctionFactory mixedScoringFunctionFactory =
-			new MixedScoringFunctionFactory(this.config.planCalcScore(), this, this.configReader);
+			new MixedScoringFunctionFactory(this.config.planCalcScore(), this);
   	
 		this.setScoringFunctionFactory(mixedScoringFunctionFactory);
 		//this.addControlerListener(new FacilitiesLoadCalculator(this.getFacilityPenalties()));
-		this.addControlerListener(new CalculatePlanTravelStats(configReader, "best", "s"));
-		this.addControlerListener(new CalculatePlanTravelStats(configReader, "best", "l"));
+		this.addControlerListener(new CalculatePlanTravelStats(this.config, "best", "s"));
+		this.addControlerListener(new CalculatePlanTravelStats(this.config, "best", "l"));
 	}    
 }

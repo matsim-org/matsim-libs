@@ -33,19 +33,18 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 
-import playground.anhorni.LEGO.miniscenario.ConfigReader;
 import playground.anhorni.random.RandomFromVarDistr;
 
 public class CreatePopulation {
 	private ScenarioImpl scenario = null;	
-	private ConfigReader configReader = null;
 	private Config config;
 	private final static Logger log = Logger.getLogger(CreatePopulation.class);
 	private RandomFromVarDistr rnd;
+	
+	private final String LCEXP = "locationchoiceExperimental";
 			
-	public void createPopulation(ScenarioImpl scenario, ConfigReader configReader, RandomFromVarDistr rnd, Config config) {		
+	public void createPopulation(ScenarioImpl scenario, Config config, RandomFromVarDistr rnd) {		
 		this.scenario = scenario;
-		this.configReader = configReader;
 		this.config = config;
 		this.rnd = rnd;
 		
@@ -56,14 +55,14 @@ public class CreatePopulation {
 		this.finishPlans();
 		this.removeNonAnalysisPersons();
 			
-		ComputeMaxEpsilons maxEpsilonComputer = new ComputeMaxEpsilons(10, scenario, "shop", configReader, config);
+		ComputeMaxEpsilons maxEpsilonComputer = new ComputeMaxEpsilons(10, scenario, "shop", config);
 		maxEpsilonComputer.prepareReplanning();
 		for (Person p : this.scenario.getPopulation().getPersons().values()) {
 			maxEpsilonComputer.handlePlan(p.getSelectedPlan());
 		}
 		maxEpsilonComputer.finishReplanning();
 		
-		maxEpsilonComputer = new ComputeMaxEpsilons(10, scenario, "leisure", configReader, config);
+		maxEpsilonComputer = new ComputeMaxEpsilons(10, scenario, "leisure", config);
 		maxEpsilonComputer.prepareReplanning();
 		for (Person p : this.scenario.getPopulation().getPersons().values()) {
 			maxEpsilonComputer.handlePlan(p.getSelectedPlan());
@@ -71,30 +70,26 @@ public class CreatePopulation {
 		maxEpsilonComputer.finishReplanning();
 	}
 						
-	private void addPersons() {	
-		int personCnt = 0;
-//		int boundaryFacilitiesCnt = 0;	
+	private void addPersons() {
+		
+		double sideLength = Double.parseDouble(config.findParam(LCEXP, "sideLength"));
+		int personsPerLocation = Integer.parseInt(config.findParam(LCEXP, "personsPerLoc"));
+		
+		int personCnt = 0;	
 		int analysisPopulationCnt = 0;
 		for (ActivityFacility facility : this.scenario.getActivityFacilities().getFacilitiesForActivityType("home").values()) {
-			
-			// check if home facility in free boundary zone
-//			if ((facility.getCoord().getX() < 499.0 || facility.getCoord().getX() > configReader.getSideLengt() - 1.0 || 
-//					facility.getCoord().getY() < 499.0 || facility.getCoord().getY() > configReader.getSideLengt() - 1.0)) {
-//				boundaryFacilitiesCnt++;
-//				continue;
-//			}
-			
+						
 			// check if person is in the analysis population
-			int offset = configReader.getAnalysisPopulationOffset();
-			if ((facility.getCoord().getX() >= (configReader.getSideLengt() / 2.0) - 500.0
-					&& facility.getCoord().getX() <= (configReader.getSideLengt() / 2.0) + 500.0) && 
-					(facility.getCoord().getY() >= (configReader.getSideLengt() / 2.0) - 500.0
-					&& facility.getCoord().getY() <= (configReader.getSideLengt() / 2.0) + 500.0)) {
+			int offset = Integer.parseInt(config.findParam(LCEXP, "analysisPopulationOffset"));
+			if ((facility.getCoord().getX() >= (sideLength / 2.0) - 500.0
+					&& facility.getCoord().getX() <= (sideLength / 2.0) + 500.0) && 
+					(facility.getCoord().getY() >= (sideLength / 2.0) - 500.0
+					&& facility.getCoord().getY() <= (sideLength / 2.0) + 500.0)) {
 				offset = 0;
 				analysisPopulationCnt++;
 			}
 						
-			for (int j = 0; j < this.configReader.getPersonsPerLocation(); j++) {
+			for (int j = 0; j < personsPerLocation; j++) {
 				PersonImpl p = new PersonImpl(new IdImpl(personCnt + offset));
 				personCnt++;
 				p.createAndAddPlan(true);
@@ -108,7 +103,8 @@ public class CreatePopulation {
 				this.scenario.getPopulation().addPerson(p);
 			}
 		}
-		log.info("Created " + personCnt + " persons including " + analysisPopulationCnt * this.configReader.getPersonsPerLocation() + " analysis persons");
+		log.info("Created " + personCnt + " persons including " + 
+				analysisPopulationCnt * personsPerLocation + " analysis persons");
 	}
 		
 	private void finishPlans() {
@@ -178,7 +174,7 @@ public class CreatePopulation {
 //	}
 	
 	private void assignTasteValues() {
-		HandleUnobservedHeterogeneity handler = new HandleUnobservedHeterogeneity(scenario, configReader, rnd, config);
+		HandleUnobservedHeterogeneity handler = new HandleUnobservedHeterogeneity(scenario, config, rnd);
 		handler.assign();
 	}
 				
@@ -191,7 +187,7 @@ public class CreatePopulation {
 		Vector<Id> ids2remove = new Vector<Id>();
 		for (Person p : this.scenario.getPopulation().getPersons().values()) {
 			// if person is not in the analysis population
-			if (Integer.parseInt(p.getId().toString()) >= configReader.getAnalysisPopulationOffset()) {
+			if (Integer.parseInt(p.getId().toString()) >= Integer.parseInt(config.findParam(LCEXP, "analysisPopulationOffset"))) {
 				ids2remove.add(p.getId()); 
 			}
 		}

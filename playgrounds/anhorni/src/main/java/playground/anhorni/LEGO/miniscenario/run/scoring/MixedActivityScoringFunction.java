@@ -33,7 +33,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
-import org.matsim.core.scoring.LocationChoiceScoringFunction;
 import org.matsim.locationchoice.facilityload.FacilityPenalty;
 
 import playground.anhorni.LEGO.miniscenario.ConfigReader;
@@ -51,16 +50,15 @@ public class MixedActivityScoringFunction extends org.matsim.core.scoring.charyp
 	// ------------------------------------
 
 	public MixedActivityScoringFunction(Plan plan, CharyparNagelScoringParameters params, 
-			final ActivityFacilities facilities, Random random, ConfigReader configReader,
+			final ActivityFacilities facilities, Random random, 
 			final TreeMap<Id, FacilityPenalty> facilityPenalties,
 			Config config) {
 		//super(plan, params, facilityPenalties, facilities);
 		super(plan, params);
 		this.random = random;
 		this.facilities = facilities;
-		this.configReader = configReader;
 		this.config = config;
-		this.destinationChoiceScoring = new DestinationChoiceScoring(this.random, this.facilities, this.configReader, this.config);
+		this.destinationChoiceScoring = new DestinationChoiceScoring(this.random, this.facilities, this.config);
 	}
 	
 	@Override

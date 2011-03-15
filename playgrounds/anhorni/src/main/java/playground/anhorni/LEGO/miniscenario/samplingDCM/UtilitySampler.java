@@ -35,8 +35,6 @@ import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.ConfigUtils;
-
-import playground.anhorni.LEGO.miniscenario.ConfigReader;
 import playground.anhorni.LEGO.miniscenario.run.scoring.DestinationChoiceScoring;
 import playground.anhorni.analysis.Bins;
 
@@ -44,9 +42,10 @@ public class UtilitySampler {
 
 	private final static Logger log = Logger.getLogger(UtilitySampler.class);
 	private ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());	
-	private ConfigReader configReader = new ConfigReader();
 	private Config config;
 	private Random rnd;
+	
+	private final String LCEXP = "locationchoiceExperimental";
 		
 	public static void main(final String[] args) {
 		UtilitySampler sampler = new UtilitySampler();
@@ -56,21 +55,21 @@ public class UtilitySampler {
 		log.info("Sampling finished -----------------------------------------");
 	}
 	
-	private void init() {
-		configReader.read();	
-		
-		ScenarioImpl scenario = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(configReader.getPath() + "/config.xml").getScenario();
+	private void init() {	
+		ScenarioImpl scenario = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(
+				"src/main/java/playground/anhorni/input/LEGO/config.xml").getScenario();
 		this.config = scenario.getConfig();
 		
 		this.rnd = new Random(4711);
 		MatsimPopulationReader populationReader = new MatsimPopulationReader(this.scenario);
-		populationReader.readFile(this.configReader.getPath() + "/plans.xml");
-		new MatsimNetworkReader(this.scenario).readFile(this.configReader.getPath() + "/network.xml");
-		new MatsimFacilitiesReader(this.scenario).readFile(this.configReader.getPath() + "/facilities.xml");
+		populationReader.readFile("src/main/java/playground/anhorni/input/LEGO/plans.xml");
+		new MatsimNetworkReader(this.scenario).readFile("src/main/java/playground/anhorni/input/LEGO/network.xml");
+		new MatsimFacilitiesReader(this.scenario).readFile("src/main/java/playground/anhorni/input/LEGO/facilities.xml");
 	}
 
 	private void run() {	
-		DestinationChoiceScoring scorer = new DestinationChoiceScoring(this.rnd, this.scenario.getActivityFacilities(), this.configReader, config);
+		DestinationChoiceScoring scorer = new DestinationChoiceScoring(this.rnd, 
+				this.scenario.getActivityFacilities(), config);
 		
 		int counter = 0;
 		int nextMsg = 1;
@@ -82,7 +81,8 @@ public class UtilitySampler {
 				log.info(" person # " + counter);
 			}
 			// if person is not in the analysis population
-			if (Integer.parseInt(p.getId().toString()) > configReader.getAnalysisPopulationOffset()) continue;
+			int offset = Integer.parseInt(config.findParam(LCEXP, "analysisPopulationOffset"));
+			if (Integer.parseInt(p.getId().toString()) > offset) continue;
 			
 			double maxScore = -999.0;
 			Id bestFacilityId = null;
@@ -94,7 +94,7 @@ public class UtilitySampler {
 				act.setLinkId(facility.getLinkId());
 				
 				boolean distance = false;
-				if (configReader.getScoreElementDistance() > 0.000001) distance = true;
+				if (Double.parseDouble(config.findParam(LCEXP, "scoreElementDistance")) > 0.000001) distance = true;
 				
 				double score = scorer.getDestinationScore((PlanImpl)p.getSelectedPlan(), act, distance);
 				if (score > maxScore) {
@@ -112,14 +112,18 @@ public class UtilitySampler {
 	}
 	
 	private void analyze() {
-		double maxDistance = configReader.getSideLengt();
-		Bins shopBins = new Bins(configReader.getSpacing() * 2, maxDistance, "shop_distance");
+		
+		double sideLength = Double.parseDouble(config.findParam(LCEXP, "sideLength"));
+		double spacing = Double.parseDouble(config.findParam(LCEXP, "spacing"));
+		
+		Bins shopBins = new Bins(spacing * 2, sideLength, "shop_distance");
 		Bins scoreBins = new Bins(0.25, 15, "scores");
 			
 		for (Person p : this.scenario.getPopulation().getPersons().values()) {
 			
 			// if person is not in the analysis population
-			if (Integer.parseInt(p.getId().toString()) > configReader.getAnalysisPopulationOffset()) continue;
+			int offset = Integer.parseInt(config.findParam(LCEXP, "analysisPopulationOffset"));
+			if (Integer.parseInt(p.getId().toString()) > offset) continue;
 			
 			PlanImpl plan = (PlanImpl)p.getSelectedPlan(); 
 			
@@ -129,7 +133,7 @@ public class UtilitySampler {
 			shopBins.addVal(shopDistance, 1.0);	
 			scoreBins.addVal(plan.getScore(), 1.0);
 		}
-		shopBins.plotBinnedDistribution(configReader.getPath() + "../../output/LEGO/dcm_sampling_", "#", "m");
-		scoreBins.plotBinnedDistribution(configReader.getPath() + "../../output/LEGO/dcm_sampling_", "#", "[utils]");
+		shopBins.plotBinnedDistribution("src/main/java/playground/anhorni/output/LEGO/dcm_sampling_", "#", "m");
+		scoreBins.plotBinnedDistribution("src/main/java/playground/anhorni/output/LEGO/dcm_sampling_", "#", "[utils]");
 	}
 }

@@ -27,25 +27,21 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
 
-import playground.anhorni.LEGO.miniscenario.ConfigReader;
-
 
 public class MixedScoringFunctionFactory extends org.matsim.core.scoring.charyparNagel.CharyparNagelScoringFunctionFactory {
 	private MixedActivityScoringFunction scoringFunction = null;
 	private final Controler controler;
-	private ConfigReader configReader = new ConfigReader();
 
-	public MixedScoringFunctionFactory(PlanCalcScoreConfigGroup config, Controler controler, ConfigReader configReader) {
+	public MixedScoringFunctionFactory(PlanCalcScoreConfigGroup config, Controler controler) {
 		super(config);				
 		this.controler = controler;
-		this.configReader = configReader;
 	}
 
 	public ScoringFunction createNewScoringFunction(Plan plan) {		
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 		
 		this.scoringFunction = new MixedActivityScoringFunction((PlanImpl)plan, super.getParams(), this.controler.getFacilities(), 
-				MatsimRandom.getLocalInstance(), this.configReader, this.controler.getFacilityPenalties(), this.controler.getConfig());
+				MatsimRandom.getLocalInstance(), this.controler.getFacilityPenalties(), this.controler.getConfig());
 		
 		scoringFunctionAccumulator.addScoringFunction(this.scoringFunction);		
 		return scoringFunctionAccumulator;

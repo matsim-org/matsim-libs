@@ -26,7 +26,6 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
 import playground.anhorni.LEGO.miniscenario.run.analysis.CalculatePlanTravelStats;
 import playground.anhorni.LEGO.miniscenario.run.scoring.MixedScoringFunctionFactory;
 import playground.anhorni.scenarios.analysis.ShoppingCalculator;
-import playground.anhorni.LEGO.miniscenario.ConfigReader;
 
 public class SingleRunControler extends Controler {
 	
@@ -54,14 +53,11 @@ public class SingleRunControler extends Controler {
     @Override
     protected void setUp() {
       super.setUp();
-      
-      ConfigReader configReader = new ConfigReader();
-      configReader.read();
-      
+            
       MixedScoringFunctionFactory mixedScoringFunctionFactory =
-			new MixedScoringFunctionFactory(this.config.planCalcScore(), this, configReader);
+			new MixedScoringFunctionFactory(this.config.planCalcScore(), this);
   	
 		this.setScoringFunctionFactory(mixedScoringFunctionFactory);
-		this.addControlerListener(new CalculatePlanTravelStats(configReader, "best", "s"));
+		this.addControlerListener(new CalculatePlanTravelStats(this.config, "best", "s"));
 	}  
 }

@@ -24,30 +24,31 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.config.Config;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
-
-import playground.anhorni.LEGO.miniscenario.ConfigReader;
 import playground.anhorni.analysis.Bins;
-
 
 public class CalculatePlanTravelStats implements IterationEndsListener {
 	
-	private ConfigReader configReader; 
+	private Config config; 
 	private double maxNetworkDistance;
 	private Bins bins;
 	private String bestOrSelected = "selected";
 	private String type = null;
+	
+	private final String LCEXP = "locationchoiceExperimental";
 
 
-	public CalculatePlanTravelStats(ConfigReader configReader, String bestOrSelected, String type) {	
-		this.maxNetworkDistance = configReader.getSideLengt();
-		this.configReader = configReader;
+	public CalculatePlanTravelStats(Config config, String bestOrSelected, String type) {	
+		this.maxNetworkDistance = Double.parseDouble(config.findParam(LCEXP, "sideLength")); //configReader.getSideLengt();
+		this.config = config;
 		this.bestOrSelected = bestOrSelected;
 		this.type = type;
-		this.bins = new Bins(this.configReader.getSpacing() * 2, maxNetworkDistance, type + "_distance");
+		this.bins = new Bins(Double.parseDouble(config.findParam(LCEXP, "spacing")) * 2, 
+				maxNetworkDistance, type + "_distance");
 	}
 
 	public void notifyIterationEnds(final IterationEndsEvent event) {	
@@ -56,8 +57,9 @@ public class CalculatePlanTravelStats implements IterationEndsListener {
 		for (Person p : event.getControler().getPopulation().getPersons().values()) {
 			
 			// if person is not in the analysis population
-			if (Integer.parseInt(p.getId().toString()) > configReader.getAnalysisPopulationOffset()) continue;
-			
+			if (Integer.parseInt(p.getId().toString()) > Integer.parseInt(
+					this.config.findParam(LCEXP, "analysisPopulationOffset"))) continue;
+					
 			PlanImpl plan = (PlanImpl) p.getSelectedPlan();
 			
 			if (bestOrSelected.equals("best")) {

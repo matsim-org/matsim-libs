@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
@@ -34,19 +35,17 @@ import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
-import playground.anhorni.LEGO.miniscenario.ConfigReader;
-
-
 public class CreateNetwork {
 	private ScenarioImpl scenario = null;	
-	private ConfigReader configReader = null;
+	private Config config = null;
 	
 	private final static Logger log = Logger.getLogger(CreateNetwork.class);
+	private final String LCEXP = "locationchoiceExperimental";
 			
 	
-	public void createNetwork(ScenarioImpl scenario, ConfigReader configReader) {
+	public void createNetwork(ScenarioImpl scenario, Config config) {
 		this.scenario = scenario;
-		this.configReader = configReader;
+		this.config = config;
 		NetworkFactoryImpl networkFactory = new NetworkFactoryImpl(this.scenario.getNetwork());
 		
 		this.addNodes(networkFactory);
@@ -59,7 +58,11 @@ public class CreateNetwork {
 		int facilityCnt = 0;
 		double freeSpeed = 35.0 / 3.6;
 		
-		int stepsPerSide = (int)(configReader.getSideLengt() / configReader.getSpacing());
+		double sideLength = Double.parseDouble(config.findParam(LCEXP, "sideLength"));
+		double spacing = Double.parseDouble(config.findParam(LCEXP, "spacing"));
+		double linkCapacity = Double.parseDouble(config.findParam(LCEXP, "linkCapacity"));
+		
+		int stepsPerSide = (int)(sideLength / spacing);
 		
 		for (int i = 0; i <= stepsPerSide ; i++) {
 			for (int j = 0; j <= stepsPerSide; j++) {
@@ -70,7 +73,7 @@ public class CreateNetwork {
 					Id toNodeId = new IdImpl(Integer.toString(i * (stepsPerSide + 1) + j - 1));
 					
 					Link l0 = networkFactory.createLink(new IdImpl(Integer.toString(linkCnt)), fromNodeId, toNodeId);
-					l0.setCapacity(configReader.getLinkCapacity());
+					l0.setCapacity(linkCapacity);
 					l0.setFreespeed(freeSpeed);				
 					l0.setLength(((CoordImpl)scenario.getNetwork().getNodes().get(fromNodeId).getCoord()).calcDistance(
 							scenario.getNetwork().getNodes().get(toNodeId).getCoord()));
@@ -81,7 +84,7 @@ public class CreateNetwork {
 					facilityCnt++;						
 					
 					Link l1 = networkFactory.createLink(new IdImpl(Integer.toString(linkCnt)), toNodeId, fromNodeId);
-					l1.setCapacity(configReader.getLinkCapacity());
+					l1.setCapacity(linkCapacity);
 					l1.setFreespeed(freeSpeed);
 					l1.setLength(((CoordImpl)scenario.getNetwork().getNodes().get(toNodeId).getCoord()).calcDistance(
 							scenario.getNetwork().getNodes().get(fromNodeId).getCoord()));
@@ -94,7 +97,7 @@ public class CreateNetwork {
 					Id toNodeId = new IdImpl(Integer.toString((i - 1) * (stepsPerSide + 1) + j));
 					
 					Link l0 = networkFactory.createLink(new IdImpl(Integer.toString(linkCnt)), fromNodeId, toNodeId);
-					l0.setCapacity(configReader.getLinkCapacity());
+					l0.setCapacity(linkCapacity);
 					l0.setFreespeed(freeSpeed);
 					l0.setLength(((CoordImpl)scenario.getNetwork().getNodes().get(fromNodeId).getCoord()).calcDistance(
 							scenario.getNetwork().getNodes().get(toNodeId).getCoord()));
@@ -105,7 +108,7 @@ public class CreateNetwork {
 					facilityCnt++;
 					
 					Link l1 = networkFactory.createLink(new IdImpl(Integer.toString(linkCnt)), toNodeId, fromNodeId);
-					l1.setCapacity(configReader.getLinkCapacity());
+					l1.setCapacity(linkCapacity);
 					l1.setFreespeed(freeSpeed);
 					l1.setLength(((CoordImpl)scenario.getNetwork().getNodes().get(fromNodeId).getCoord()).calcDistance(
 							scenario.getNetwork().getNodes().get(toNodeId).getCoord()));
@@ -120,12 +123,14 @@ public class CreateNetwork {
 	}
 	
 	private void addFacility(Link l, int facilityId) {
+		int personsPerLocation = Integer.parseInt(config.findParam(LCEXP, "personsPerLoc"));
+				
 		IdImpl id = new IdImpl(Integer.toString(facilityId));
 		this.scenario.getActivityFacilities().createFacility(id, l.getCoord());
 		ActivityFacilityImpl facility = (ActivityFacilityImpl)(this.scenario.getActivityFacilities().getFacilities().get(id));
 		facility.createActivityOption("shop");
 		facility.createActivityOption("home");
-		facility.getActivityOptions().get("shop").setCapacity((double) configReader.getPersonsPerLocation() * 0.5);
+		facility.getActivityOptions().get("shop").setCapacity((double) personsPerLocation * 0.5);
 				
 		ActivityOptionImpl actOptionShop = (ActivityOptionImpl)facility.getActivityOptions().get("shop");
 		OpeningTimeImpl opentimeShop = new OpeningTimeImpl(DayType.wk, 9.5 * 3600.0, 14.5 * 3600);
@@ -137,9 +142,12 @@ public class CreateNetwork {
 	}
 			
 	private void addNodes(NetworkFactoryImpl networkFactory) {
+		
+		double sideLength = Double.parseDouble(config.findParam(LCEXP, "sideLength"));
+		double spacing = Double.parseDouble(config.findParam(LCEXP, "spacing"));
+		
 		int nodeCnt = 0;
-		int stepsPerSide = (int)(configReader.getSideLengt() / configReader.getSpacing());
-		double spacing = configReader.getSpacing();
+		int stepsPerSide = (int)(sideLength/ spacing);
 		for (int i = 0; i <= stepsPerSide ; i++) {
 			for (int j = 0; j <= stepsPerSide; j++) {
 				Node n = networkFactory.createNode(new IdImpl(Integer.toString(nodeCnt)), new CoordImpl(i * spacing, j * spacing));
