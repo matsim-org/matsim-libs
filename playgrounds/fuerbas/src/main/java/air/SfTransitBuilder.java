@@ -53,8 +53,7 @@ public class SfTransitBuilder {
 		Scenario scen = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());	
 		Config config = scen.getConfig();
 		config.network().setInputFile("/home/soeren/workspace/euroAirNetwork.xml");
-		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(scen);		
-		sl.loadScenario();		
+		ScenarioUtils.loadScenario(scen);		
 		Network network = scen.getNetwork();
 		scen.getConfig().scenario().setUseTransit(true);
 		scen.getConfig().scenario().setUseVehicles(true);
