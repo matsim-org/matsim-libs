@@ -15,17 +15,17 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.internal.MatsimWriter;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.MatsimXmlWriter;
-import org.matsim.visum.VisumNetwork;
+
+import playground.sergioo.VISUM.VisumFile2MatsimNetwork;
 
 
 public class GTFS2MATSimTransitScheduleFileWriter extends MatsimXmlWriter implements MatsimWriter{
 
-	private static final String VISUM_FILE = "someone";
+	private static final String VISUM_FILE = "C:/Users/sergioo/Documents/2011/Work/FCL/Operations/Data/Navteq/Network.net";
 	/**
 	 * The folder root of the GTFS files
 	 */
@@ -214,13 +214,17 @@ public class GTFS2MATSimTransitScheduleFileWriter extends MatsimXmlWriter implem
 			line = reader.readLine();
 			while(line!=null) {
 				String[] parts = line.split(",");
-				Route route = routes.get(parts[0]);
-				route.putTrip(parts[2], new Trip(services.get(parts[1]), shapes.get(parts[4])));
+				if(parts.length==5) {
+					Route route = routes.get(parts[0]);
+					route.putTrip(parts[2], new Trip(services.get(parts[1]), shapes.get(parts[4])));
+				}
+				else //TODO
+					;
 				line = reader.readLine();
 			}
 			reader.close();
 			//StopTimes
-			File fileStopTimes = new File(root.getPath()+"/stopTimes.txt");
+			File fileStopTimes = new File(root.getPath()+"/stop_times.txt");
 			reader = new BufferedReader(new FileReader(fileStopTimes));
 			reader.readLine();
 			line = reader.readLine();
@@ -272,6 +276,7 @@ public class GTFS2MATSimTransitScheduleFileWriter extends MatsimXmlWriter implem
 				for(String tripKey:route.getTrips().keySet()) {
 					Trip trip = route.getTrips().get(tripKey);
 					if(services.get(serviceId).equals(trip.getService())) {
+						System.out.println(tripKey);
 						List<Tuple<String,String>> tripAtts = new ArrayList<Tuple<String,String>>();
 						tripAtts.add(new Tuple<String, String>("id", tripKey));
 						this.writeStartTag("transitRoute", tripAtts);
@@ -280,23 +285,28 @@ public class GTFS2MATSimTransitScheduleFileWriter extends MatsimXmlWriter implem
 						this.writeContent("bus", true);
 						this.writeEndTag("transportMode");
 						//Route profile
-						this.writeStartTag("routeProfile", new ArrayList<Tuple<String,String>>());
-						Date startTime = trip.getFrequencies().get(0).getStartTime();
-						for(Integer stopTimeKey:trip.getStopTimes().keySet()) {
-							StopTime stopTime = trip.getStopTimes().get(stopTimeKey);
-							List<Tuple<String,String>> stopTimeAtts = new ArrayList<Tuple<String,String>>();
-							stopTimeAtts.add(new Tuple<String, String>("refId", stopTime.getStopId()));
-							if(!stopTimeKey.equals(1)) {
-								long difference = stopTime.getArrivalTime().getTime()-startTime.getTime();
-								stopTimeAtts.add(new Tuple<String, String>("arrivalOffSet", sdf.format(new Date(difference))));
+						if(trip.getFrequencies().size()!=0) {
+							this.writeStartTag("routeProfile", new ArrayList<Tuple<String,String>>());
+							Date startTime = trip.getFrequencies().get(0).getStartTime();
+							for(Integer stopTimeKey:trip.getStopTimes().keySet()) {
+								StopTime stopTime = trip.getStopTimes().get(stopTimeKey);
+								List<Tuple<String,String>> stopTimeAtts = new ArrayList<Tuple<String,String>>();
+								stopTimeAtts.add(new Tuple<String, String>("refId", stopTime.getStopId()));
+								if(!stopTimeKey.equals(1)) {
+									long difference = stopTime.getArrivalTime().getTime()-startTime.getTime();
+									stopTimeAtts.add(new Tuple<String, String>("arrivalOffSet", sdf.format(new Date(difference))));
+								}
+								if(!stopTimeKey.equals(trip.getStopTimes().size())) {
+									long difference = stopTime.getDepartureTime().getTime()-startTime.getTime();
+									stopTimeAtts.add(new Tuple<String, String>("departureOffSet", sdf.format(new Date(difference))));
+								}
+								this.writeStartTag("stop", stopTimeAtts, true);
 							}
-							if(!stopTimeKey.equals(trip.getStopTimes().size())) {
-								long difference = stopTime.getDepartureTime().getTime()-startTime.getTime();
-								stopTimeAtts.add(new Tuple<String, String>("departureOffSet", sdf.format(new Date(difference))));
-							}
-							this.writeStartTag("stop", stopTimeAtts, true);
+							this.writeEndTag("routeProfile");
+							
 						}
-						this.writeEndTag("routeProfile");
+						else
+							;//TODO
 						//Route
 						this.writeStartTag("route", new ArrayList<Tuple<String,String>>());
 						Shape shape = trip.getShape();
@@ -311,7 +321,7 @@ public class GTFS2MATSimTransitScheduleFileWriter extends MatsimXmlWriter implem
 									this.writeStartTag("link", linkAtts, true);
 								}
 								else
-									System.out.println("paila, hay puntos en el shape que saltan mas de un link");
+									;//System.out.println("paila, hay puntos en el shape que saltan mas de un link");
 						}
 						this.writeEndTag("route");
 						//Departures
@@ -337,7 +347,7 @@ public class GTFS2MATSimTransitScheduleFileWriter extends MatsimXmlWriter implem
 			this.close();
 		}
 		catch (IOException e) {
-			Gbl.errorMsg(e);
+			e.printStackTrace();
 		}
 	}
 	
@@ -347,11 +357,10 @@ public class GTFS2MATSimTransitScheduleFileWriter extends MatsimXmlWriter implem
 	 * @throws Exception 
 	 */
 	public static void main(String[] args) throws Exception {
-		fixGTFSTrainSingapore();
-		/*VisumNetwork vNetwork = null;
-		//new VisumNetworkReader(vNetwork).read(VISUM_FILE);
-		GTFS2MATSimTransitScheduleFileWriter a = new GTFS2MATSimTransitScheduleFileWriter(new File("./data/gtfs/buses"),null);
-		a.write("./data/test1.xml");*/
+		VisumFile2MatsimNetwork v2m = new VisumFile2MatsimNetwork();
+		v2m.createNetworkFromVISUMFile(new File(VISUM_FILE));
+		GTFS2MATSimTransitScheduleFileWriter g2m = new GTFS2MATSimTransitScheduleFileWriter(new File("./data/gtfs/buses"), v2m.getNetwork(), "weekday");
+		g2m.write("./data/gtfs/test1.xml");
 	}
 
 }
