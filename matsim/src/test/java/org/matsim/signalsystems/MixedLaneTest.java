@@ -85,6 +85,7 @@ public class MixedLaneTest extends TestCase {
 	private void initScenario() {
 		this.sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		this.c = this.sc.getConfig();
+		this.c.controler().setMobsim("qsim");
 		this.c.addQSimConfigGroup(new QSimConfigGroup());
 		this.c.addCoreModules();
 		this.sc.getConfig().scenario().setUseLanes(true);

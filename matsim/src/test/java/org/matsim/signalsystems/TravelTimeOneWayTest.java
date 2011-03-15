@@ -97,6 +97,7 @@ public class TravelTimeOneWayTest {
 	private Scenario createAndInitConfig() {
 		Config conf = new Config();
 		conf.addCoreModules();
+		conf.controler().setMobsim("qsim");
 		conf.network().setInputFile(this.testUtils.getClassInputDirectory() + "network.xml.gz");
 		conf.plans().setInputFile(this.testUtils.getClassInputDirectory() + "plans.xml.gz");
 		String laneDefinitions = testUtils.getClassInputDirectory() + "testLaneDefinitions_v1.1.xml";

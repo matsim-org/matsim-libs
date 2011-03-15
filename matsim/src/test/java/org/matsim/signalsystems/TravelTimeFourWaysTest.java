@@ -30,7 +30,6 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.SignalSystemsConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.algorithms.EventWriterXML;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.CRCChecksum;
@@ -56,8 +55,9 @@ public class TravelTimeFourWaysTest {
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
 	
 	private Scenario createTestScenario(){
-		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Config conf = scenario.getConfig();
+		conf.controler().setMobsim("qsim");
 		conf.network().setInputFile(this.testUtils.getClassInputDirectory() + "network.xml.gz");
 		String laneDefinitions = this.testUtils.getClassInputDirectory()
 				+ "testLaneDefinitions_v1.1.xml";

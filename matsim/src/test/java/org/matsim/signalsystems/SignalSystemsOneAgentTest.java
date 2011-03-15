@@ -76,6 +76,7 @@ public class SignalSystemsOneAgentTest implements
 		String laneDefinitions = testUtils.getClassInputDirectory() + "testLaneDefinitions_v1.1.xml";
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Config conf = scenario.getConfig();
+		conf.controler().setMobsim("qsim");
 		conf.network().setInputFile(testUtils.getClassInputDirectory() + "network.xml.gz");
 		conf.network().setLaneDefinitionsFile(laneDefinitions);
 		conf.plans().setInputFile(plansFile);
