@@ -77,7 +77,7 @@ public class JointLeg extends LegImpl implements Leg, JointActing {
 
 	public JointLeg(LegImpl leg, JointLeg jointLeg) {
 		super(leg);
-		constructFromJointLeg((JointLeg) leg);
+		constructFromJointLeg(jointLeg);
 	}
 	//TODO
 	/**

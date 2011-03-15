@@ -20,9 +20,18 @@
 package playground.thibautd.jointtripsoptimizer.replanning.modules;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.GlobalConfigGroup;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
+import org.matsim.core.router.PlansCalcRoute;
+import org.matsim.core.router.util.PersonalizableTravelCost;
+import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.scoring.ScoringFunctionFactory;
+import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
+import org.matsim.planomat.costestimators.LegTravelTimeEstimatorFactory;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.thibautd.jointtripsoptimizer.run.config.JointReplanningConfigGroup;
@@ -35,14 +44,38 @@ public class JointPlanOptimizerModule extends AbstractMultithreadedModule {
 
 	private final ScoringFunctionFactory scoringFunctionFactory;
 	private final JointReplanningConfigGroup configGroup;
+	private final Network network;
+	private final Controler controler;
+	private final PersonalizableTravelCost travelCost;
+	private final PersonalizableTravelTime travelTime;
+	private final LegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory;
 
 	public JointPlanOptimizerModule(
-			GlobalConfigGroup globalConfigGroup,
-			JointReplanningConfigGroup configGroup,
+			Controler controler,
 			ScoringFunctionFactory scoringFunctionFactory) {
-		super(globalConfigGroup);
+		super(controler.getConfig().global());
+		log.debug("JointPlanOptimizerModule constructor called with controler "+
+				controler);
+
+		// used for getting the routing algorithm
+		this.controler = controler;
+
+		this.network = controler.getScenario().getNetwork();
 		this.scoringFunctionFactory = scoringFunctionFactory;
-		this.configGroup = configGroup;
+		this.configGroup = (JointReplanningConfigGroup)
+			controler.getConfig().getModule(JointReplanningConfigGroup.GROUP_NAME);
+
+		this.travelCost = controler.createTravelCostCalculator();
+		this.travelTime = controler.getTravelTimeCalculator();
+
+		DepartureDelayAverageCalculator tDepDelayCalc = new DepartureDelayAverageCalculator(
+				this.network,
+				controler.getConfig().travelTimeCalculator().getTraveltimeBinSize());
+		controler.getEvents().addHandler(tDepDelayCalc);
+
+		this.legTravelTimeEstimatorFactory = new LegTravelTimeEstimatorFactory(
+				this.travelTime,
+				tDepDelayCalc);
 	}
 
 	//public JointPlanOptimizerModule(int numOfThreads) {
@@ -53,9 +86,17 @@ public class JointPlanOptimizerModule extends AbstractMultithreadedModule {
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
 		log.debug("JointPlanOptimizerModule.getPlanAlgoInstance called");
+
+		PlansCalcRoute routingAlgorithm = (PlansCalcRoute) this.controler.createRoutingAlgorithm(
+				this.travelCost, this.travelTime);
+
 		return new JointPlanOptimizer(
+					this.configGroup,
 					this.scoringFunctionFactory,
-					this.configGroup);
+					this.legTravelTimeEstimatorFactory,
+					routingAlgorithm,
+					this.network
+					);
 	}
 }
 

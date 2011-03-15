@@ -23,14 +23,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
-
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-
 import org.matsim.core.scoring.charyparNagel.ActivityScoringFunction;
-
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.interfaces.ActivityScoring;
 import org.matsim.core.scoring.interfaces.BasicScoring;
@@ -57,7 +53,7 @@ public class HomogeneousJointActivityScoring implements ActivityScoring, BasicSc
 			JointPlan jointPlan = (JointPlan) plan;
 
 			this.individualScoringFunctions = new HashMap<Id, ActivityScoringFunction>();
-			this.ids = (Id[]) jointPlan.getClique().getMembers().keySet().toArray();
+			this.ids = jointPlan.getClique().getMembers().keySet().toArray(new Id[1]);
 
 			for (Id id : this.ids) {
 				individualScoringFunctions.put(id, new ActivityScoringFunction(

@@ -255,5 +255,32 @@ public class JointPlan implements Plan {
 	public Id getCurrentIndividual() {
 		return this.currentIndividual;
 	}
+
+	/**
+	 * Transforms this plan so that it is identical to the argument plan.
+	 * Used in the replanning module.
+	 * Caution: this does NOT make a copy of the plan, but makes the internal
+	 * individual plan references to be equal. This is OK in the case of the
+	 * relanning module (where the argument plan is just a local instance),
+	 * but could lead to strange results if the two plan are used in different
+	 * places.
+	 */
+	public void resetFromPlan(JointPlan plan) {
+		if (plan.getClique() != this.clique) {
+			throw new UnsupportedOperationException("resetting a plan from a plan"
+					+" is unsupported.");
+		}
+		this.individualPlans = plan.getIndividualPlans();
+	}
+
+	/**
+	 * Sets the individual scores to null.
+	 * Used in the replanning.
+	 */
+	public void resetScores() {
+		for (Plan plan : this.individualPlans.values()) {
+			plan.setScore(null);
+		}
+	}
 }
 

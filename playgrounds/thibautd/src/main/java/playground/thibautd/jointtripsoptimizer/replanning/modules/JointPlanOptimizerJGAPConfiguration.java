@@ -40,7 +40,11 @@ import org.jgap.impl.StockRandomGenerator;
 import org.jgap.InvalidConfigurationException;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.router.PlansCalcRoute;
+import org.matsim.core.scoring.ScoringFunctionFactory;
+import org.matsim.planomat.costestimators.LegTravelTimeEstimatorFactory;
 
 import playground.thibautd.jointtripsoptimizer.population.JointActingTypes;
 import playground.thibautd.jointtripsoptimizer.population.JointActivity;
@@ -62,12 +66,18 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 
 	private static final long serialVersionUID = 1L;
 
+	//TODO: make final
 	private int numEpisodes;
 	private int numJointEpisodes;
+	private JointPlanOptimizerFitnessFunction fitnessFunction;
 
 	public JointPlanOptimizerJGAPConfiguration(
 			JointPlan plan,
 			JointReplanningConfigGroup configGroup,
+			ScoringFunctionFactory scoringFunctionFactory,
+			LegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory,
+			PlansCalcRoute routingAlgorithm,
+			Network network,
 			long randomSeed
 			) {
 		super(null);
@@ -90,6 +100,7 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 			bestChromsSelector.setDoubletteChromosomesAllowed(false);
 			this.addNaturalSelector(bestChromsSelector, false);
 
+			// elitism
 			this.setPreservFittestIndividual(true);
 
 			// Chromosome: construction
@@ -103,14 +114,22 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 				sampleGenes[i] = new DoubleGene(this, 0, DAY_DUR);
 			}
 
+			log.debug("episodes: "+this.numEpisodes+", joint episodes: "+this.numJointEpisodes);
 			this.setSampleChromosome(new JointPlanOptimizerJGAPChromosome(this, sampleGenes));
 
 			// population size
 			this.setPopulationSize(configGroup.getPopulationSize());
 
+			this.fitnessFunction = new JointPlanOptimizerFitnessFunction(
+						plan,
+						legTravelTimeEstimatorFactory,
+						routingAlgorithm,
+						network,
+						this.numJointEpisodes,
+						this.numEpisodes,
+						scoringFunctionFactory);
 			this.setFitnessEvaluator(new DefaultFitnessEvaluator());
-			//TODO: include parameters
-			this.setFitnessFunction(new JointPlanOptimizerFitnessFunction());
+			this.setFitnessFunction(this.fitnessFunction);
 
 			// genetic operators definitions
 			this.setChromosomePool(new ChromosomePool());
@@ -132,18 +151,22 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 	 * a joint episode is an episode which involves a joint trip.
 	 */
 	@SuppressWarnings("unchecked")
+		//TODO: FIXME correct counting of joint episodes
 	private void countEpisodes(JointPlan plan) {
 		Id[] ids = new Id[1];
-		ids = (Id[]) plan.getClique().getMembers().keySet().toArray(ids);
+		ids = plan.getClique().getMembers().keySet().toArray(ids);
 		List<JointLeg> alreadyExamined = new ArrayList<JointLeg>();
 		List<JointLeg> linkedValues = null;
 
 		 this.numEpisodes = 0;
 		 this.numJointEpisodes = 0;
-		 
-		 for(Id id : ids) {
-			for(PlanElement pe : plan.getIndividualPlan(id).getPlanElements()) {
+
+		 for (Id id : ids) {
+			//log.debug("id: "+id);
+			//log.debug("plan size: "+plan.getIndividualPlan(id).getPlanElements().size());
+			for (PlanElement pe : plan.getIndividualPlan(id).getPlanElements()) {
 				// count activities for which duration is optimized
+				//log.debug(pe instanceof JointActivity ? "oui" : "non");
 				if ((pe instanceof JointActivity)&&
 						(((JointActivity) pe).getType() != JointActingTypes.PICK_UP)&&
 						(((JointActivity) pe).getType() != JointActingTypes.DROP_OFF)) {
@@ -162,5 +185,9 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 			}
 		 }
 	 }
+
+	public JointPlanOptimizerDecoder getDecoder() {
+		return this.fitnessFunction.getDecoder();
+	}
 }
 

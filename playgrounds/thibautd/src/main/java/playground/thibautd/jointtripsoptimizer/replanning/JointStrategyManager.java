@@ -66,6 +66,7 @@ public class JointStrategyManager extends StrategyManager {
 
 			if (maxNumPlans >0) {
 				for (Clique clique : cliques.getCliques().values()) {
+					log.debug("clique has "+clique.getPlans().size()+" plans");
 					if (clique.getPlans().size() > maxNumPlans) {
 						removePlans(clique, maxNumPlans);
 					}

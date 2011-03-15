@@ -23,6 +23,9 @@ import org.jgap.FitnessFunction;
 import org.jgap.IChromosome;
 
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -64,9 +67,38 @@ public class JointPlanOptimizerFitnessFunction extends FitnessFunction {
 	@Override
 	protected double evaluate(IChromosome chromosome) {
 		JointPlan plan = this.decoder.decode(chromosome);
+		return this.getScore(plan);
+	}
+
+	private double getScore(JointPlan plan) {
 		ScoringFunction fitnessFunction = this.scoringFunctionFactory.createNewScoringFunction(plan);
-		//TODO: step through plan and score
-		return 0d;
+		Activity currentActivity;
+		Leg currentLeg;
+
+		for (PlanElement pe : plan.getPlanElements()) {
+			if (pe instanceof Activity) {
+				currentActivity = (Activity) pe;
+				fitnessFunction.startActivity(currentActivity.getStartTime(), currentActivity);
+				fitnessFunction.endActivity(currentActivity.getEndTime());
+			}
+			else if (pe instanceof Leg) {
+				currentLeg = (Leg) pe;
+				fitnessFunction.startLeg(currentLeg.getDepartureTime(), currentLeg);
+				fitnessFunction.endLeg(currentLeg.getDepartureTime() +
+						currentLeg.getTravelTime());
+			}
+			else {
+				throw new IllegalArgumentException("unrecognized plan element type");
+			}
+		}
+
+		fitnessFunction.finish();
+
+		return fitnessFunction.getScore();
+	}
+
+	public JointPlanOptimizerDecoder getDecoder() {
+		return this.decoder;
 	}
 
 }

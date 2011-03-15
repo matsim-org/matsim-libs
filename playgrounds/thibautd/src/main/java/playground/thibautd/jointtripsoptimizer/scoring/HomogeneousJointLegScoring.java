@@ -57,7 +57,7 @@ public class HomogeneousJointLegScoring implements LegScoring, BasicScoring {
 			JointPlan jointPlan = (JointPlan) plan;
 
 			this.individualScoringFunctions = new HashMap<Id, LegScoringFunction>();
-			this.ids = (Id[]) jointPlan.getClique().getMembers().keySet().toArray();
+			this.ids = jointPlan.getClique().getMembers().keySet().toArray(new Id[1]);
 
 			for (Id id : this.ids) {
 				individualScoringFunctions.put(id, new LegScoringFunction(

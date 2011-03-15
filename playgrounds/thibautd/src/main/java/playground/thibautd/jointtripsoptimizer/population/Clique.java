@@ -27,11 +27,16 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -133,6 +138,7 @@ public class Clique implements Person {
 		int cntUnscored = 0;
 		for (Plan plan : this.getPlans()) {
 			if (plan.getScore() == null) {
+				log.warn("unscored plan of size "+plan.getPlanElements().size());
 				cntUnscored++;
 			}
 		}
@@ -164,8 +170,12 @@ public class Clique implements Person {
 	public Plan copySelectedPlan() {
 		JointPlan plan = new JointPlan(this.selectedPlan);
 		//TODO: use this.addPlan (when implemented)
+		log.warn("selected plan has size "+
+				this.selectedPlan.getPlanElements().size());	//
 		this.plans.add(plan);
 		this.selectedPlan = plan;
+		log.warn("copying selected plan, returns a plan of size "+
+				plan.getPlanElements().size());
 		return plan;
 	}
 
@@ -216,17 +226,20 @@ public class Clique implements Person {
 		if (this.plans.isEmpty()) {
 			Map<Id, PlanImpl> individualPlans = new HashMap<Id, PlanImpl>();
 			JointPlan newJointPlan;
+			PlanImpl currentPlan;
 			
 			for (Person member : this.getMembers().values()) {
 				if (member.getPlans().size()>1) {
 					log.warn("only keeping the selected plan for agent "+member+" with multiple plans");
-					individualPlans.put(member.getId(), (PlanImpl) member.getSelectedPlan());
+					currentPlan = (PlanImpl) member.getSelectedPlan();
 				} else {
-					individualPlans.put(member.getId(), (PlanImpl) member.getPlans().get(0));
+					currentPlan = (PlanImpl) member.getPlans().get(0);
 				}
+				individualPlans.put(member.getId(), currentPlan);
 			}
 			
 			this.clearIndividualPlans();
+			this.plans.clear();
 			newJointPlan = new JointPlan(this, individualPlans);
 			//TODO: use this.addPlan (when implemented)
 			this.plans.add(newJointPlan);

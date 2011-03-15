@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package playground.thibautd.jointtripsoptimizer.replanning.selectors;
 
+import org.apache.log4j.Logger;
+
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.replanning.selectors.PlanSelector;
@@ -32,6 +34,9 @@ import playground.thibautd.jointtripsoptimizer.population.Clique;
  * @author thibautd
  */
 public class WorstJointPlanForRemovalSelector implements PlanSelector {
+	private static final Logger log =
+		Logger.getLogger(WorstJointPlanForRemovalSelector.class);
+
 
 	@Override
 	public Plan selectPlan(Person person) {
@@ -49,6 +54,8 @@ public class WorstJointPlanForRemovalSelector implements PlanSelector {
 					worstPlan = plan;
 				}
 			}
+			log.debug("the plan returned by the selector has a size "+
+					worstPlan.getPlanElements().size());
 			return worstPlan;
 		} else {
 			throw new IllegalArgumentException("WorstJointPlanForRemoval used "+

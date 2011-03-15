@@ -185,6 +185,7 @@ public class JointPlanOptimizerDecoder {
 		Map<Id, PlanImpl> constructedIndividualPlans = new HashMap<Id, PlanImpl>();
 
 		List<Id> individualsToPlan = new ArrayList<Id>();
+		List<Id> toRemove = new ArrayList<Id>();
 		Id currentId = null;
 		PlanImpl individualPlan = null;
 		Map<PlanElement, Double> plannedPickUps = new HashMap<PlanElement, Double>();
@@ -212,10 +213,15 @@ public class JointPlanOptimizerDecoder {
 						constructedIndividualPlans,
 						individualsNow,
 						plannedPickUps);
-				if (indicesInPlan.get(id).equals(this.individualPlanElements.size())) {
-					individualsToPlan.remove(id);
+				if (indicesInPlan.get(id).equals(this.individualPlanElements.get(id).size())) {
+					toRemove.add(id);
 				}
 			}
+			//for (Id id : toRemove) {
+			//		individualsToPlan.remove(id);
+			//}
+			individualsToPlan.removeAll(toRemove);
+			toRemove.clear();
 		} while (!individualsToPlan.isEmpty());
 
 		return new JointPlan(this.plan.getClique(), constructedIndividualPlans);
@@ -260,6 +266,8 @@ public class JointPlanOptimizerDecoder {
 			origin.setMaximumDuration(currentDuration);
 			now += currentDuration;
 			origin.setEndTime(now);
+
+			constructedPlan.addActivity(origin);
 			indexInPlan++;
 			indexInChromosome++;
 		}
@@ -453,12 +461,12 @@ public class JointPlanOptimizerDecoder {
 	private static final PlanImpl createFacticePlan(JointPlan realPlan) {
 		//Array prefered over list as is allows to access by indices more
 		//efficiently
-		PlanElement[] planElements;
+		PlanElement[] planElements = new PlanElement[1];
 		PlanImpl outputPlan = new PlanImpl();
 		int i = 1;
 
 		for (Plan individualPlan : realPlan.getIndividualPlans().values()) {
-			planElements = (PlanElement[]) individualPlan.getPlanElements().toArray();
+			planElements = individualPlan.getPlanElements().toArray(planElements);
 			while (i < planElements.length) {
 				if (((JointLeg) planElements[i]).getJoint()) {
 					outputPlan.addLeg(((JointLeg) planElements[i]).getAssociatedIndividualLeg());

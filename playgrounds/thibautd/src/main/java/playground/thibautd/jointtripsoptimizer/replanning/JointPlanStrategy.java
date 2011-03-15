@@ -26,18 +26,14 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
-
-import org.matsim.api.core.v01.Scenario;
-
+import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.replanning.selectors.PlanSelector;
 
 import playground.thibautd.jointtripsoptimizer.population.Clique;
-
 import playground.thibautd.jointtripsoptimizer.replanning.modules.JointPlanOptimizerModule;
-import playground.thibautd.jointtripsoptimizer.run.config.JointReplanningConfigGroup;
-
+import playground.thibautd.jointtripsoptimizer.replanning.selectors.WorstJointPlanForRemovalSelector;
 import playground.thibautd.jointtripsoptimizer.scoring.HomogeneousJointScoringFunctionFactory;
 
 /**
@@ -50,8 +46,7 @@ public class JointPlanStrategy implements PlanStrategy  {
 	private static final Logger log =
 		Logger.getLogger(JointPlanStrategy.class);
 
-	//FIXME: requires PersonImpl agents: reimplement everithing.
-	PlanStrategy planStrategyDelegate;
+	//PlanStrategy planStrategyDelegate;
 
 	private PlanSelector planSelector;
 	private ArrayList<PlanStrategyModule> strategyModules = new ArrayList<PlanStrategyModule>();
@@ -62,33 +57,52 @@ public class JointPlanStrategy implements PlanStrategy  {
 	 * constructor called by the controller.
 	 * TODO: pass the plan selector to the scenario by the config file.
 	 */
-	public JointPlanStrategy(Scenario sc) {
-		log.debug("JointPlanStrategy initialized from a scenario");
-		//planStrategyDelegate = new PlanStrategyImpl(new BestPlanSelector());
+	//public JointPlanStrategy(Scenario sc) {
+	//	log.debug("JointPlanStrategy initialized from a scenario");
+	//	//planStrategyDelegate = new PlanStrategyImpl(new BestPlanSelector());
+	//	this.planSelector = new BestPlanSelector();
+
+	//	//TODO: less hard-coded scoring function factory?
+	//	this.addStrategyModule(new JointPlanOptimizerModule(
+	//				sc.getConfig().global(),
+	//				(JointReplanningConfigGroup) sc.getConfig().getModule(JointReplanningConfigGroup.GROUP_NAME),
+	//				new HomogeneousJointScoringFunctionFactory(
+	//					sc.getConfig().planCalcScore())));
+	//}
+
+	public JointPlanStrategy(Controler controler) {
+		log.debug("JointPlanStrategy initialized from a controler");
+
+		// TODO: use a JointPlan specific selector?
+		// + pass it from the config file
 		this.planSelector = new BestPlanSelector();
+
 		//TODO: less hard-coded scoring function factory?
 		this.addStrategyModule(new JointPlanOptimizerModule(
-					sc.getConfig().global(),
-					(JointReplanningConfigGroup) sc.getConfig().getModule(JointReplanningConfigGroup.GROUP_NAME),
+					controler,
 					new HomogeneousJointScoringFunctionFactory(
-						sc.getConfig().planCalcScore())));
+						controler.getConfig().planCalcScore())
+					));
 	}
 
 	/*
 	 * =========================================================================
-	 * Delegate methods
+	 * Interface methods
 	 * =========================================================================
 	 */
+	@Override
 	public void addStrategyModule(PlanStrategyModule module) {
 		//planStrategyDelegate.addStrategyModule(module);
 		this.strategyModules.add(module);
 	}
 
+	@Override
 	public int getNumberOfStrategyModules() {
 		//return planStrategyDelegate.getNumberOfStrategyModules();
 		return this.strategyModules.size();
 	}
 
+	@Override
 	public void run(Person person) {
 		//code taken from the PlanStrategyImpl class, modified to handle cliques
 		//planStrategyDelegate.run(person);
@@ -98,6 +112,7 @@ public class JointPlanStrategy implements PlanStrategy  {
 		// if there is at least one unscored plan, find that one:
 		//Plan plan = ((PersonImpl) person).getRandomUnscoredPlan();
 		Plan plan = clique.getRandomUnscoredPlan();
+			log.warn("getRandomUnscoredPlan returns: "+plan);
 		
 		// otherwise, find one according to selector (often defined in PlanStrategy ctor):
 		if (plan == null) {
@@ -120,10 +135,12 @@ public class JointPlanStrategy implements PlanStrategy  {
 
 	}
 
+	@Override
 	public void init() {
 		//planStrategyDelegate.init();
 	}
 
+	@Override
 	public void finish() {
 		//planStrategyDelegate.finish();
 		for (PlanStrategyModule module : this.strategyModules) {
@@ -138,6 +155,7 @@ public class JointPlanStrategy implements PlanStrategy  {
 		this.counter = 0;
 	}
 
+	@Override
 	public String toString() {
 		//return planStrategyDelegate.toString();
 		StringBuffer name = new StringBuffer(20);
@@ -149,6 +167,7 @@ public class JointPlanStrategy implements PlanStrategy  {
 		return name.toString();
 	}
 
+	@Override
 	public PlanSelector getPlanSelector() {
 		//return planStrategyDelegate.getPlanSelector();
 		return this.planSelector;

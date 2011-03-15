@@ -25,9 +25,12 @@ import org.apache.log4j.Logger;
 
 import org.jgap.Genotype;
 
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.scoring.ScoringFunctionFactory;
+import org.matsim.planomat.costestimators.LegTravelTimeEstimatorFactory;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.thibautd.jointtripsoptimizer.population.JointPlan;
@@ -41,19 +44,29 @@ public class JointPlanOptimizer implements PlanAlgorithm {
 
 	private final ScoringFunctionFactory fitnessFunctionFactory;
 	private final JointReplanningConfigGroup configGroup;
+	private final LegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory;
+	private final PlansCalcRoute routingAlgorithm;
+	private final Network network;
+
 
 	private final Random randomGenerator = MatsimRandom.getLocalInstance();
 
 	public JointPlanOptimizer(
+			JointReplanningConfigGroup configGroup,
 			ScoringFunctionFactory scoringFunctionFactory,
-			JointReplanningConfigGroup configGroup
+			LegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory,
+			PlansCalcRoute routingAlgorithm,
+			Network network
 			) {
 		this.fitnessFunctionFactory = scoringFunctionFactory;
 		this.configGroup = configGroup;
+		this.legTravelTimeEstimatorFactory = legTravelTimeEstimatorFactory;
+		this.routingAlgorithm = routingAlgorithm;
+		this.network = network;
 	}
 
 	@Override
-	public void run(Plan plan) {
+	public void run(final Plan plan) {
 		if (plan instanceof JointPlan) {
 			log.debug("joint plan optimization algorithm lanched succesfully");
 			this.run((JointPlan) plan);
@@ -66,21 +79,29 @@ public class JointPlanOptimizer implements PlanAlgorithm {
 	/**
 	 * the actual optimisation algorithm, operating on a joint plan.
 	 */
-	private void run(JointPlan plan) {
+	private final void run(final JointPlan plan) {
 		JointPlanOptimizerJGAPConfiguration jgapConfig =
-			new JointPlanOptimizerJGAPConfiguration(plan, this.configGroup,
+			new JointPlanOptimizerJGAPConfiguration(
+					plan,
+					this.configGroup,
+					this.fitnessFunctionFactory,
+					this.legTravelTimeEstimatorFactory,
+					this.routingAlgorithm,
+					this.network,
 					this.randomGenerator.nextLong());
 
 		JointPlanOptimizerPopulationFactory populationFactory =
 			new JointPlanOptimizerPopulationFactory(jgapConfig);
 
-		//TODO: set fitness function
 		Genotype gaPopulation = populationFactory.createRandomInitialGenotype();
 
 		//TODO: choose between a fixed number of iterations of an evolution monitor
 		gaPopulation.evolve(this.configGroup.getMaxIterations());
 
-		//TODO: get fittest chromosome, and modify the given plan accordingly
+		//get fittest chromosome, and modify the given plan accordingly
+		JointPlan evolvedPlan = jgapConfig.getDecoder().decode(gaPopulation.getFittestChromosome());
+		plan.resetFromPlan(evolvedPlan);
+		plan.resetScores();
 	}
 }
 
