@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ScenarioWithCliques.java
+ * JointActingTypes.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,45 +19,15 @@
  * *********************************************************************** */
 package playground.thibautd.jointtripsoptimizer.population;
 
-import org.apache.log4j.Logger;
-
-import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.config.Config;
-
 /**
+ * Defines the names of the different joint activity types.
  * @author thibautd
  */
-public class ScenarioWithCliques extends ScenarioImpl {
-	private static final Logger log =
-		Logger.getLogger(ScenarioWithCliques.class);
+public interface JointActingTypes {
+	public static final String PICK_UP = "pick up";
+	public static final String DROP_OFF = "drop off";
 
-	private PopulationOfCliques cliques=null;
-
-	/*
-	 * =========================================================================
-	 * Constructors
-	 * =========================================================================
-	 */
-	//public ScenarioWithCliques() {
-	//	super();
-	//	super.setPopulation(new PopulationWithCliques(this));
-	//	this.cliques = new PopulationOfCliques(this);
-	//}
-
-	public ScenarioWithCliques(Config config) {
-		super(config);
-		super.setPopulation(new PopulationWithCliques(this));
-		this.cliques =  new PopulationOfCliques(this);
-		log.debug("populations initialized");
-	}
-
-	/*
-	 * =========================================================================
-	 * other
-	 * =========================================================================
-	 */
-	public PopulationOfCliques getCliques() {
-		return this.cliques;
-	}
+	// TODO: move elsewhere?
+	public static final String PASSENGER = "car_passenger";
 }
 

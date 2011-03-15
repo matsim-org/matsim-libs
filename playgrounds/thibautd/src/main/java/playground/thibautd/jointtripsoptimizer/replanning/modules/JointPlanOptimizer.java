@@ -19,18 +19,19 @@
  * *********************************************************************** */
 package playground.thibautd.jointtripsoptimizer.replanning.modules;
 
+import java.util.Random;
+
 import org.apache.log4j.Logger;
 
-import org.jgap.IChromosome;
+import org.jgap.Genotype;
 
 import org.matsim.api.core.v01.population.Plan;
-
-import org.matsim.core.scoring.ScoringFunction;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.scoring.ScoringFunctionFactory;
-
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.thibautd.jointtripsoptimizer.population.JointPlan;
+import playground.thibautd.jointtripsoptimizer.run.config.JointReplanningConfigGroup;
 
 /**
  * @author thibautd
@@ -38,12 +39,17 @@ import playground.thibautd.jointtripsoptimizer.population.JointPlan;
 public class JointPlanOptimizer implements PlanAlgorithm {
 	private static final Logger log = Logger.getLogger(JointPlanOptimizer.class);
 
-	private ScoringFunctionFactory fitnessFunctionFactory = null;
+	private final ScoringFunctionFactory fitnessFunctionFactory;
+	private final JointReplanningConfigGroup configGroup;
+
+	private final Random randomGenerator = MatsimRandom.getLocalInstance();
 
 	public JointPlanOptimizer(
-			ScoringFunctionFactory scoringFunctionFactory
+			ScoringFunctionFactory scoringFunctionFactory,
+			JointReplanningConfigGroup configGroup
 			) {
 		this.fitnessFunctionFactory = scoringFunctionFactory;
+		this.configGroup = configGroup;
 	}
 
 	@Override
@@ -61,35 +67,20 @@ public class JointPlanOptimizer implements PlanAlgorithm {
 	 * the actual optimisation algorithm, operating on a joint plan.
 	 */
 	private void run(JointPlan plan) {
-	}
+		JointPlanOptimizerJGAPConfiguration jgapConfig =
+			new JointPlanOptimizerJGAPConfiguration(plan, this.configGroup,
+					this.randomGenerator.nextLong());
 
-	/**
-	 * Function responsible for scoring the plan encoded by a Chromosome.
-	 * It does the following:
-	 * -it steps through the plans, modifying the time affectation so that all
-	 *  required face to face meetings are possible;
-	 * -plans are then stretched to 24h;
-	 * -it modifies back the chromosome to reflect the necessary changes;
-	 * -it sets the plan passed in argument to the resulting plan if doModify is true;
-	 * -it scores this plan by passing it to a scoring function.
-	 */
-	protected double stepThroughPlan(
-			boolean doModify,
-			boolean doScore,
-			IChromosome chromosome,
-			JointPlan plan ) {
-		ScoringFunction scoringFunction = null;
+		JointPlanOptimizerPopulationFactory populationFactory =
+			new JointPlanOptimizerPopulationFactory(jgapConfig);
 
-		if (!doModify) {
-			// if there is no need to write back the plan, reference a new instance.
-			plan = new JointPlan(plan);
-		}
+		//TODO: set fitness function
+		Genotype gaPopulation = populationFactory.createRandomInitialGenotype();
 
-		if (doScore) {
-			scoringFunction = this.fitnessFunctionFactory.createNewScoringFunction(plan);
-		}
+		//TODO: choose between a fixed number of iterations of an evolution monitor
+		gaPopulation.evolve(this.configGroup.getMaxIterations());
 
-		return 0.0d;
+		//TODO: get fittest chromosome, and modify the given plan accordingly
 	}
 }
 

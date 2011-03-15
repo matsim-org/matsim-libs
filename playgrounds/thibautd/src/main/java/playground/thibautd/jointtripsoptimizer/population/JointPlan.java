@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package playground.thibautd.jointtripsoptimizer.population;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -27,25 +28,23 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 
 import org.matsim.api.core.v01.Id;
-
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 
 /**
  * class for handling synchronized plans.
- * TODO: implement it
  * It implements the plan interface to be compatible with the StrategyManager.
  * @author thibautd
  */
 public class JointPlan implements Plan {
 	private static final Logger log = Logger.getLogger(JointPlan.class);
 
-	protected Map<Id,Plan> individualPlans = new HashMap<Id,Plan>();
+	private Map<Id,Plan> individualPlans = new HashMap<Id,Plan>();
 
 	//TODO: make final
 	private Clique clique;
@@ -65,8 +64,8 @@ public class JointPlan implements Plan {
 					currentPlan.addActivity(new JointActivity((Activity) pe, 
 								this.clique.getMembers().get(id)));
 				} else {
-					currentPlan.addLeg(new JointLeg((Leg) pe,
-								this.clique.getMembers().get(id)));
+					currentPlan.addLeg(new JointLeg((LegImpl) pe,
+								(Person) this.clique.getMembers().get(id)));
 				}
 			}
 			this.individualPlans.put(id, currentPlan);
@@ -85,13 +84,15 @@ public class JointPlan implements Plan {
 	 * =========================================================================
 	 */
 	/**
-	 * @return the list of plan elements, for the current individual.
+	 * @return the list of plan elements, for all individuals
 	 */
 	@Override
 	public List<PlanElement> getPlanElements() {
-		log.warn("using getPlanElements on JointPlan: make sure current individual"+
-				" is used correctly!");
-		return this.getIndividualPlan(this.getCurrentIndividual()).getPlanElements();
+		List<PlanElement> output = new ArrayList<PlanElement>();
+		for (Plan plan : this.individualPlans.values()) {
+			output.addAll(plan.getPlanElements());
+		}
+		return output;
 	}
 
 	/**

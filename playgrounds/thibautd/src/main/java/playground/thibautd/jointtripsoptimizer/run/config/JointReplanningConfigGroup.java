@@ -38,13 +38,23 @@ public class JointReplanningConfigGroup extends Module {
 	public static final String GROUP_NAME = "JointReplanning";
 
 	//parameter names
-	private static final String DUMMY_PARAM = "dummy_parameter";
-	private static final String NUM_TIME_INTERVALS = "num_time_intervals";
-	private static final String POP_SIZE = "ga_population_size";
+	private static final String NUM_TIME_INTERVALS = "numTimeIntervals";
+	private static final String POP_SIZE = "gaPopulationSize";
+	/**
+	 * the drop-off activity duration, in time intervals
+	 */
+	private static final String DO_DUR = "dropOffDuration";
+	private static final String MUTATION_PROB = "mutationProbability";
+	private static final String CO_PROB = "crossOverProbability";
+	private static final String ITER_NUM = "maxNumberOfGAIterations";
 
 	//parameter values
 	private int numTimeIntervals;
 	private int populationSize;
+	private int dropOffDuration;
+	private double mutationProb;
+	private double crossOverProb;
+	private int numberOfIterations;
 
 	public JointReplanningConfigGroup() {
 		super(GROUP_NAME);
@@ -58,20 +68,58 @@ public class JointReplanningConfigGroup extends Module {
 	 */
 	@Override
 	public void addParam(String param_name, String value) {
-		//TODO: invoque the corresponding setters.
+		if (param_name.equals(NUM_TIME_INTERVALS)) {
+			this.setNumTimeIntervals(value);
+		}
+		else if (param_name.equals(POP_SIZE)) {
+			this.setPopulationSize(value);
+		}
+		else if (param_name.equals(DO_DUR)) {
+			this.setDropOffDuration(value);
+		}
+		else if (param_name.equals(MUTATION_PROB)) {
+			this.setMutationProbability(value);
+		}
+		else if (param_name.equals(CO_PROB)) {
+			this.setCrossOverProbability(value);
+		}
+		else if (param_name.equals(ITER_NUM)) {
+			this.setMaxIterations(value);
+		}
 	}
 
 	@Override
 	public String getValue(String param_name) {
-		//TODO
+		if (param_name.equals(NUM_TIME_INTERVALS)) {
+			return String.valueOf(this.getNumTimeIntervals());
+		}
+		else if (param_name.equals(POP_SIZE)) {
+			return String.valueOf(this.getPopulationSize());
+		}
+		else if (param_name.equals(DO_DUR)) {
+			return String.valueOf(this.getPopulationSize());
+		}
+		else if (param_name.equals(MUTATION_PROB)) {
+			return String.valueOf(this.getMutationProbability());
+		}
+		else if (param_name.equals(CO_PROB)) {
+			return String.valueOf(this.getCrossOverProbability());
+		}
+		else if (param_name.equals(ITER_NUM)) {
+			return String.valueOf(this.getMaxIterations());
+		}
 		return null;
 	}
 
 	@Override
 	public TreeMap<String,String> getParams() {
 		TreeMap<String,String> map = new TreeMap<String,String>();
-		this.addParameterToMap(map, DUMMY_PARAM);
 		this.addParameterToMap(map, NUM_TIME_INTERVALS);
+		this.addParameterToMap(map, POP_SIZE);
+		this.addParameterToMap(map, DO_DUR);
+		this.addParameterToMap(map, MUTATION_PROB);
+		this.addParameterToMap(map, CO_PROB);
+		this.addParameterToMap(map, ITER_NUM);
 		return map;
 	}
 
@@ -85,9 +133,61 @@ public class JointReplanningConfigGroup extends Module {
 		return this.numTimeIntervals;
 	}
 
+	public void setNumTimeIntervals(String numTimeIntervals) {
+		this.numTimeIntervals = Integer.parseInt(numTimeIntervals);
+	}
+
 	public int getPopulationSize() {
 		return this.populationSize;
 	}
+
+	public void setPopulationSize(String populationSize) {
+		this.populationSize = Integer.parseInt(populationSize);
+	}
+
+	public int getDropOffDuration() {
+		return this.dropOffDuration;
+	}
 	
+	public void setDropOffDuration(String dropOffDuration) {
+		this.dropOffDuration = Integer.parseInt(dropOffDuration);
+	}
+
+	public double getMutationProbability() {
+		return this.mutationProb;
+	}
+
+	public void setMutationProbability(String mutationProb) {
+		this.mutationProb = Double.valueOf(mutationProb);
+
+		if ((this.mutationProb < 0)||(this.mutationProb > 1)) {
+			throw new IllegalArgumentException("probability values must in [0,1]");
+		}
+	}
+
+	public double getCrossOverProbability() {
+		return this.crossOverProb;
+	}
+
+	public void setCrossOverProbability(String coProb) {
+		this.crossOverProb = Double.valueOf(coProb);
+
+		if ((this.crossOverProb < 0)||(this.crossOverProb > 1)) {
+			throw new IllegalArgumentException("probability values must in [0,1]");
+		}
+	}
+
+	public int getMaxIterations() {
+		return this.numberOfIterations;
+	}
+
+	public void setMaxIterations(String iterations) {
+		this.numberOfIterations = Integer.parseInt(iterations);
+
+		if (this.crossOverProb < 0) {
+			throw new IllegalArgumentException("number of iterations must be positive");
+		}
+	}
+
 }
 

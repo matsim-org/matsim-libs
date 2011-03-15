@@ -25,31 +25,37 @@ import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
+import playground.thibautd.jointtripsoptimizer.run.config.JointReplanningConfigGroup;
+
 /**
  * @author thibautd
  */
 public class JointPlanOptimizerModule extends AbstractMultithreadedModule {
 	private static final Logger log = Logger.getLogger(JointPlanOptimizerModule.class);
 
-	private ScoringFunctionFactory scoringFunctionFactory;
+	private final ScoringFunctionFactory scoringFunctionFactory;
+	private final JointReplanningConfigGroup configGroup;
 
 	public JointPlanOptimizerModule(
 			GlobalConfigGroup globalConfigGroup,
+			JointReplanningConfigGroup configGroup,
 			ScoringFunctionFactory scoringFunctionFactory) {
 		super(globalConfigGroup);
 		this.scoringFunctionFactory = scoringFunctionFactory;
+		this.configGroup = configGroup;
 	}
 
-	public JointPlanOptimizerModule(int numOfThreads) {
-		super(numOfThreads);
-		log.debug("JointPlanOptimizerModule constructed with numOfThreads");
-	}
+	//public JointPlanOptimizerModule(int numOfThreads) {
+	//	super(numOfThreads);
+	//	log.debug("JointPlanOptimizerModule constructed with numOfThreads");
+	//}
 
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
 		log.debug("JointPlanOptimizerModule.getPlanAlgoInstance called");
 		return new JointPlanOptimizer(
-					this.scoringFunctionFactory);
+					this.scoringFunctionFactory,
+					this.configGroup);
 	}
 }
 

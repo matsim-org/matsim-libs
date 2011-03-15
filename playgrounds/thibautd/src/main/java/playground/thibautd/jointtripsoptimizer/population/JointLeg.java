@@ -32,13 +32,18 @@ import org.matsim.core.population.LegImpl;
  * @author thibautd
  */
 public class JointLeg extends LegImpl implements Leg, JointActing {
+	// must extend LegImpl, as there exist parts of the code (mobsim...) where
+	// legs are casted to LegImpl.
 	//private Leg legDelegate;
 
 	private boolean isJoint = false;
+	private boolean isDriver = false;
 	//private List<PersonInClique> participants = null;
 	//private List<PersonImpl> participants = null;
 	private Map<Id, JointLeg> linkedLegs = new HashMap<Id, JointLeg>();
 	private Person person;
+	//is set only if the trip is joint
+	private JointLeg associatedIndividualLeg = null;
 	
 	/*
 	 * =========================================================================
@@ -48,14 +53,7 @@ public class JointLeg extends LegImpl implements Leg, JointActing {
 
 	//LegImpl compatible
 	public JointLeg(final String transportMode, final Person person) {
-		//legDelegate = new LegImpl(transportMode);
 		super(transportMode);
-		this.person = person;
-	}
-
-	public JointLeg(final LegImpl leg, final Person person) {
-		//legDelegate = new LegImpl(leg);
-		super(leg);
 		this.person = person;
 	}
 
@@ -65,81 +63,45 @@ public class JointLeg extends LegImpl implements Leg, JointActing {
 		constructFromJointLeg(leg);
 	}
 
-	public JointLeg(Leg leg, Person pers) {
-		super((LegImpl) leg);
+	/**
+	 * Converts a legImpl instance into an individual JointLeg instance.
+	 */
+	public JointLeg(LegImpl leg, Person pers) {
+		super(leg);
 		if (leg instanceof JointLeg) {
 			constructFromJointLeg((JointLeg) leg);
-		} else if (leg instanceof LegImpl) {
-			//legDelegate = new LegImpl((LegImpl) leg);
+		} else {
 			this.person = pers;
-		}// else {
-	//		throw new IllegalArgumentException("unrecognized leg type");
-	//	}
+		}
 	}
+
+	public JointLeg(LegImpl leg, JointLeg jointLeg) {
+		super(leg);
+		constructFromJointLeg((JointLeg) leg);
+	}
+	//TODO
+	/**
+	 * Creates a shared JointLeg and sets the "replacement" individual leg.
+	 */
+	//public JointLeg() {
+	//}
 
 	@SuppressWarnings("unchecked")
 	private void constructFromJointLeg(JointLeg leg) {
-		//legDelegate = new LegImpl(leg.getMode());
-
-		//legDelegate.setRoute(leg.getRoute());
-		//legDelegate.setDepartureTime(leg.getDepartureTime());
-		//legDelegate.setTravelTime(leg.getTravelTime());
-
 		this.isJoint = leg.getJoint();
 		//cast unchecked, as it is the only possible output from getLinkedElements
 		this.linkedLegs = new HashMap<Id, JointLeg>(
 				(Map<Id, JointLeg>) leg.getLinkedElements());
-
+		this.isDriver = leg.getIsDriver();
+		this.associatedIndividualLeg = leg.getAssociatedIndividualLeg();
+		this.person = leg.getPerson();
 	}
-
-	/*
-	 * =========================================================================
-	 * Leg Delegate methods
-	 * =========================================================================
-	 */
-
-	//public String getMode() {
-	//	return legDelegate.getMode();
-	//}
-
-	//public void setMode(String mode) {
-	//	legDelegate.setMode(mode);
-	//}
-
-	//public Route getRoute() {
-	//	return legDelegate.getRoute();
-	//}
-
-	//public void setRoute(Route route) {
-	//	legDelegate.setRoute(route);
-	//}
-
-	//public double getDepartureTime() {
-	//	return legDelegate.getDepartureTime();
-	//}
-
-	//public void setDepartureTime(double seconds) {
-	//	legDelegate.setDepartureTime(seconds);
-	//}
-
-	//public double getTravelTime() {
-	//	return legDelegate.getTravelTime();
-	//}
-
-	//public void setTravelTime(double seconds) {
-	//	legDelegate.setTravelTime(seconds);
-	//}
 
 	/*
 	 * =========================================================================
 	 * JointActing Methods
 	 * =========================================================================
 	 */
-
-	//@Override
-	//public void setJoint(boolean isJoint) {
-	//	this.isJoint = isJoint;
-	//}
 
 	@Override
 	public boolean getJoint() {
@@ -187,6 +149,32 @@ public class JointLeg extends LegImpl implements Leg, JointActing {
 	@Override
 	public void setPerson(Person person) {
 		this.person = person;
+	}
+
+	/*
+	 * =========================================================================
+	 * miscelaneous
+	 * =========================================================================
+	 */
+
+	/**
+	 * For shared rides, returns a default individual leg.
+	 * Used in the optimisation, to allow quick affectation/desaffectation of
+	 * shared rides.
+	 * All trips associated to a shared ride (Act-PU, PU-DO, DO-Act) should return
+	 * the same leg.
+	 * @todo: make compatible with sequence optimisation
+	 */
+	public JointLeg getAssociatedIndividualLeg() {
+		return this.associatedIndividualLeg;
+	}
+
+	public boolean getIsDriver() {
+		return this.isDriver;
+	}
+
+	public void setIsDriver(boolean isDriver) {
+		this.isDriver = isDriver;
 	}
 }
 

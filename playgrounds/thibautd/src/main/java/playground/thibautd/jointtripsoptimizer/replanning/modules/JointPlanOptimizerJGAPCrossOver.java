@@ -22,7 +22,10 @@ package playground.thibautd.jointtripsoptimizer.replanning.modules;
 import java.util.List;
 
 import org.jgap.GeneticOperator;
+import org.jgap.IChromosome;
 import org.jgap.Population;
+
+import playground.thibautd.jointtripsoptimizer.run.config.JointReplanningConfigGroup;
 
 /**
  * Class making a uniform cross-over between alternatives.
@@ -32,12 +35,18 @@ public class JointPlanOptimizerJGAPCrossOver implements GeneticOperator {
 
 	private static final long serialVersionUID = 1L;
 
+
+	@SuppressWarnings("unchecked")
 	@Override
 	public void operate(
 			final Population a_population,
 			final List a_candidateChromosome
 			) {
-
+		for (IChromosome currentChromosome : 
+				// no need to check cast (Chromosomes implement IChromosome)
+				(List<IChromosome>) a_population.getChromosomes()) {
+			
+		}
 	}
 }
 

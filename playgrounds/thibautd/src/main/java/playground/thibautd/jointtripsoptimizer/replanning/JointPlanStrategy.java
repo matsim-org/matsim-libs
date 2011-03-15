@@ -36,6 +36,7 @@ import org.matsim.core.replanning.selectors.PlanSelector;
 import playground.thibautd.jointtripsoptimizer.population.Clique;
 
 import playground.thibautd.jointtripsoptimizer.replanning.modules.JointPlanOptimizerModule;
+import playground.thibautd.jointtripsoptimizer.run.config.JointReplanningConfigGroup;
 
 import playground.thibautd.jointtripsoptimizer.scoring.HomogeneousJointScoringFunctionFactory;
 
@@ -68,6 +69,7 @@ public class JointPlanStrategy implements PlanStrategy  {
 		//TODO: less hard-coded scoring function factory?
 		this.addStrategyModule(new JointPlanOptimizerModule(
 					sc.getConfig().global(),
+					(JointReplanningConfigGroup) sc.getConfig().getModule(JointReplanningConfigGroup.GROUP_NAME),
 					new HomogeneousJointScoringFunctionFactory(
 						sc.getConfig().planCalcScore())));
 	}

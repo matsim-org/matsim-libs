@@ -26,29 +26,26 @@ import org.apache.log4j.Logger;
 
 import org.jgap.Configuration;
 import org.jgap.DefaultFitnessEvaluator;
-
 import org.jgap.event.EventManager;
-
 import org.jgap.Gene;
-
 import org.jgap.impl.BestChromosomesSelector;
 import org.jgap.impl.BooleanGene;
 import org.jgap.impl.ChromosomePool;
 import org.jgap.impl.CrossoverOperator;
+import org.jgap.impl.DoubleGene;
 import org.jgap.impl.GABreeder;
 import org.jgap.impl.IntegerGene;
 import org.jgap.impl.MutationOperator;
-
+import org.jgap.impl.StockRandomGenerator;
 import org.jgap.InvalidConfigurationException;
 
 import org.matsim.api.core.v01.Id;
-
 import org.matsim.api.core.v01.population.PlanElement;
 
+import playground.thibautd.jointtripsoptimizer.population.JointActingTypes;
 import playground.thibautd.jointtripsoptimizer.population.JointActivity;
 import playground.thibautd.jointtripsoptimizer.population.JointLeg;
 import playground.thibautd.jointtripsoptimizer.population.JointPlan;
-
 import playground.thibautd.jointtripsoptimizer.run.config.JointReplanningConfigGroup;
 
 /**
@@ -61,6 +58,8 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 		Logger.getLogger(JointPlanOptimizerJGAPConfiguration.class);
 	private static final Double CO_PROB = 0.6d;
 
+	private static final Double DAY_DUR = 24*3600d;
+
 	private static final long serialVersionUID = 1L;
 
 	private int numEpisodes;
@@ -68,19 +67,24 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 
 	public JointPlanOptimizerJGAPConfiguration(
 			JointPlan plan,
-			JointReplanningConfigGroup configGroup
+			JointReplanningConfigGroup configGroup,
+			long randomSeed
 			) {
 		super(null);
 		Configuration.reset();
 
 		// get info on the plan structure
-		int numTimeIntervals = configGroup.getNumTimeIntervals();
 		this.countEpisodes(plan);
 
 		try {
 			// default JGAP objects initializations
 			this.setBreeder(new GABreeder());
 			this.setEventManager(new EventManager());
+
+			// seed the default JGAP pseudo-random generator with a matsim random
+			// number, so that the simulations are reproducible.
+			this.setRandomGenerator(new StockRandomGenerator());
+			((StockRandomGenerator) this.getRandomGenerator()).setSeed(randomSeed);
 
 			BestChromosomesSelector bestChromsSelector = new BestChromosomesSelector(this);
 			bestChromsSelector.setDoubletteChromosomesAllowed(false);
@@ -95,24 +99,30 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 			}
 			for (int i=this.numJointEpisodes;
 					i < this.numJointEpisodes + this.numEpisodes; i++) {
-				sampleGenes[i] = new IntegerGene(this, 0, numTimeIntervals);
+				//sampleGenes[i] = new IntegerGene(this, 0, numTimeIntervals);
+				sampleGenes[i] = new DoubleGene(this, 0, DAY_DUR);
 			}
+
 			this.setSampleChromosome(new JointPlanOptimizerJGAPChromosome(this, sampleGenes));
 
 			// population size
 			this.setPopulationSize(configGroup.getPopulationSize());
 
 			this.setFitnessEvaluator(new DefaultFitnessEvaluator());
+			//TODO: include parameters
+			this.setFitnessFunction(new JointPlanOptimizerFitnessFunction());
 
 			// genetic operators definitions
 			this.setChromosomePool(new ChromosomePool());
-			// TODO: include when implemented
-			// this.addGeneticOperator(new JointPlanOptimizerJGAPCrossOver(this, CO_PROB));
-			this.addGeneticOperator(new CrossoverOperator(this, CO_PROB));
-			this.addGeneticOperator(new MutationOperator(this, this.getPopulationSize()));
+
+			this.addGeneticOperator(
+					new JointPlanOptimizerJGAPMutation(this, configGroup,
+						this.numJointEpisodes + this.numEpisodes));
+
 
 		} catch (InvalidConfigurationException e) {
-			throw new RuntimeException(e.getMessage());
+			//throw new RuntimeException(e.getMessage());
+			e.printStackTrace();
 		}
 	 }
 
@@ -123,7 +133,8 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 	 */
 	@SuppressWarnings("unchecked")
 	private void countEpisodes(JointPlan plan) {
-		Id[] ids = (Id[]) plan.getClique().getMembers().keySet().toArray();
+		Id[] ids = new Id[1];
+		ids = (Id[]) plan.getClique().getMembers().keySet().toArray(ids);
 		List<JointLeg> alreadyExamined = new ArrayList<JointLeg>();
 		List<JointLeg> linkedValues = null;
 
@@ -132,7 +143,10 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 		 
 		 for(Id id : ids) {
 			for(PlanElement pe : plan.getIndividualPlan(id).getPlanElements()) {
-				if (pe instanceof JointActivity) {
+				// count activities for which duration is optimized
+				if ((pe instanceof JointActivity)&&
+						(((JointActivity) pe).getType() != JointActingTypes.PICK_UP)&&
+						(((JointActivity) pe).getType() != JointActingTypes.DROP_OFF)) {
 					this.numEpisodes++;
 				} else if (
 						(((JointLeg) pe).getJoint())&&

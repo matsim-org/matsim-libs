@@ -19,10 +19,55 @@
  * *********************************************************************** */
 package playground.thibautd.jointtripsoptimizer.replanning.modules;
 
+import org.jgap.FitnessFunction;
+import org.jgap.IChromosome;
+
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.router.PlansCalcRoute;
+import org.matsim.core.scoring.ScoringFunction;
+import org.matsim.core.scoring.ScoringFunctionFactory;
+import org.matsim.planomat.costestimators.LegTravelTimeEstimatorFactory;
+
+import playground.thibautd.jointtripsoptimizer.population.JointPlan;
+
 /**
  * @author thibautd
  */
-public class JointPlanOptimizerFitnessFunction {
+public class JointPlanOptimizerFitnessFunction extends FitnessFunction {
+
+	private static final long serialVersionUID = 1L;
+
+	private final JointPlanOptimizerDecoder decoder;
+	private final ScoringFunctionFactory scoringFunctionFactory;
+
+	//TODO: suppress (for dummy tests only)
+	public JointPlanOptimizerFitnessFunction() {
+		super();
+		this.decoder = null;
+		this.scoringFunctionFactory = null;
+	}
+
+	public JointPlanOptimizerFitnessFunction(
+			JointPlan plan,
+			LegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory,
+			PlansCalcRoute routingAlgorithm,
+			Network network,
+			int numJointEpisodes,
+			int numEpisodes,
+			ScoringFunctionFactory scoringFunctionFactory) {
+		super();
+		this.decoder = new JointPlanOptimizerDecoder(plan, legTravelTimeEstimatorFactory,
+				routingAlgorithm, network, numJointEpisodes, numEpisodes);
+		this.scoringFunctionFactory = scoringFunctionFactory;
+	}
+
+	@Override
+	protected double evaluate(IChromosome chromosome) {
+		JointPlan plan = this.decoder.decode(chromosome);
+		ScoringFunction fitnessFunction = this.scoringFunctionFactory.createNewScoringFunction(plan);
+		//TODO: step through plan and score
+		return 0d;
+	}
 
 }
 
