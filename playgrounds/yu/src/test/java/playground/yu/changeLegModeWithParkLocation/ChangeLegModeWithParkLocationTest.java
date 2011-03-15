@@ -33,12 +33,11 @@ import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.testcases.MatsimTestCase;
 
-import playground.yu.scoring.CharyparNagelScoringFunctionFactoryWithWalk;
 import playground.yu.test.ChangeLegModeWithParkLocation;
 
 /**
  * @author yu
- *
+ * 
  */
 public class ChangeLegModeWithParkLocationTest extends MatsimTestCase {
 	private static class LegChainModesListener1 implements
@@ -87,9 +86,11 @@ public class ChangeLegModeWithParkLocationTest extends MatsimTestCase {
 			Plan plan = ctl.getPopulation().getPersons().values().iterator()
 					.next().getSelectedPlan();
 			StringBuilder legChainModes = new StringBuilder("|");
-			for (PlanElement pe : plan.getPlanElements())
-				if (pe instanceof Leg)
+			for (PlanElement pe : plan.getPlanElements()) {
+				if (pe instanceof Leg) {
 					legChainModes.append(((Leg) pe).getMode() + "|");
+				}
+			}
 
 			assertEquals("different legChainModes?", criterion, legChainModes
 					.toString());
@@ -142,9 +143,11 @@ public class ChangeLegModeWithParkLocationTest extends MatsimTestCase {
 			Plan plan = ctl.getPopulation().getPersons().values().iterator()
 					.next().getSelectedPlan();
 			StringBuilder legChainModes = new StringBuilder("|");
-			for (PlanElement pe : plan.getPlanElements())
-				if (pe instanceof Leg)
+			for (PlanElement pe : plan.getPlanElements()) {
+				if (pe instanceof Leg) {
 					legChainModes.append(((Leg) pe).getMode() + "|");
+				}
+			}
 
 			assertEquals("different legChainModes?", criterion, legChainModes
 					.toString());
@@ -197,9 +200,11 @@ public class ChangeLegModeWithParkLocationTest extends MatsimTestCase {
 			Plan plan = ctl.getPopulation().getPersons().values().iterator()
 					.next().getSelectedPlan();
 			StringBuilder legChainModes = new StringBuilder("|");
-			for (PlanElement pe : plan.getPlanElements())
-				if (pe instanceof Leg)
+			for (PlanElement pe : plan.getPlanElements()) {
+				if (pe instanceof Leg) {
 					legChainModes.append(((Leg) pe).getMode() + "|");
+				}
+			}
 
 			assertEquals("different legChainModes?", criterion, legChainModes
 					.toString());
@@ -208,16 +213,21 @@ public class ChangeLegModeWithParkLocationTest extends MatsimTestCase {
 
 	public void testLegChainModes1() {
 		// the agent in the initial plan has only "walk" legs.
-		Config config = loadConfig(getInputDirectory() + "config1.xml");
+		Config config = loadConfig("yu/"+getInputDirectory() + "config1.xml");
 		Controler ctl = new ChangeLegModeWithParkLocationControler(config);
 		ctl.addControlerListener(new LegChainModesListener1());
 		ctl.setCreateGraphs(false);
 		ctl.setWriteEventsInterval(0);
-		ctl
-				.setScoringFunctionFactory(new CharyparNagelScoringFunctionFactoryWithWalk(
-						config.planCalcScore(), Double
-								.parseDouble(config.findParam(
-										"changeLegModeWithParkLocation", "offsetWalk"))));
+
+		// !!!NO longer necessary, man can set constanceWalk in
+		// "planCalcScore"-Config Group
+
+		// ctl
+		// .setScoringFunctionFactory(new
+		// CharyparNagelScoringFunctionFactoryWithWalk(
+		// config.planCalcScore(), Double
+		// .parseDouble(config.findParam(
+		// "changeLegModeWithParkLocation", "constantWalk"))));
 		ctl.run();
 	}
 
@@ -228,11 +238,15 @@ public class ChangeLegModeWithParkLocationTest extends MatsimTestCase {
 		ctl.addControlerListener(new LegChainModesListener2());
 		ctl.setCreateGraphs(false);
 		ctl.setWriteEventsInterval(0);
-		ctl
-				.setScoringFunctionFactory(new CharyparNagelScoringFunctionFactoryWithWalk(
-						config.planCalcScore(), Double
-								.parseDouble(config.findParam(
-										"changeLegModeWithParkLocation", "offsetWalk"))));
+		// !!!NO longer necessary, man can set constanceWalk in
+		// "planCalcScore"-Config Group
+
+		// ctl
+		// .setScoringFunctionFactory(new
+		// CharyparNagelScoringFunctionFactoryWithWalk(
+		// config.planCalcScore(), Double.parseDouble(config
+		// .findParam("changeLegModeWithParkLocation",
+		// "constantWalk"))));
 		ctl.run();
 	}
 
@@ -243,11 +257,16 @@ public class ChangeLegModeWithParkLocationTest extends MatsimTestCase {
 		ctl.addControlerListener(new LegChainModesListener3());
 		ctl.setCreateGraphs(false);
 		ctl.setWriteEventsInterval(0);
-		ctl
-				.setScoringFunctionFactory(new CharyparNagelScoringFunctionFactoryWithWalk(
-						config.planCalcScore(), Double
-								.parseDouble(config.findParam(
-										"changeLegModeWithParkLocation", "offsetWalk"))));
+
+		// !!!NO longer necessary, man can set constanceWalk in
+		// "planCalcScore"-Config Group
+
+		// ctl
+		// .setScoringFunctionFactory(new
+		// CharyparNagelScoringFunctionFactoryWithWalk(
+		// config.planCalcScore(), Double.parseDouble(config
+		// .findParam("changeLegModeWithParkLocation",
+		// "constantWalk"))));
 		ctl.run();
 	}
 
@@ -267,9 +286,10 @@ public class ChangeLegModeWithParkLocationTest extends MatsimTestCase {
 			// ExpBetaPlanChanger());
 			// manager.addStrategy(strategy1, 0.1);
 
-			PlanStrategyImpl strategy2 = new PlanStrategyImpl(new RandomPlanSelector());
+			PlanStrategyImpl strategy2 = new PlanStrategyImpl(
+					new RandomPlanSelector());
 			strategy2.addStrategyModule(new ChangeLegModeWithParkLocation(
-					this.config, this.network));
+					config, network));
 			strategy2.addStrategyModule(new ReRoute(this));
 			manager.addStrategy(strategy2, 0.5);
 
