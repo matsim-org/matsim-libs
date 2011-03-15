@@ -14,9 +14,9 @@ xml:lang="en">
 		by the parser automatically, for further information see documentation of the
 		xs:collapse restriction.</xs:documentation>
 	</xs:annotation>
-	<xs:restriction base="xs:string">
-  	<xs:whiteSpace value="collapse"/>
-  </xs:restriction>
+ 	<xs:restriction base="xs:string">
+<!--  	<xs:whiteSpace value="collapse"/>-->
+  </xs:restriction> 
 </xs:simpleType>
 
 <xs:complexType name="matsimObjectType" >

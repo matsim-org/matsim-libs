@@ -38,6 +38,7 @@ public class VehicleReaderWriterV1Test extends MatsimTestCase {
 
   private final Id id23 = new IdImpl("23");
   private final Id id42 = new IdImpl("42");
+  private final Id id42_23 = new IdImpl(" 42  23"); //indeed this should be double blank in the middle but due to collapse this is only one blank
   
 	public void testBasicParser() {
 		Vehicles vehicles = new VehiclesImpl();
@@ -102,7 +103,7 @@ public class VehicleReaderWriterV1Test extends MatsimTestCase {
 		assertEquals(DoorOperationMode.serial, vehType.getDoorOperationMode());
 		
 		assertNotNull(vehicles);
-		assertEquals(2, vehicles.size());
+		assertEquals(3, vehicles.size());
 	
 		assertNotNull(vehicles.get(id23));
 		assertEquals(id23, vehicles.get(id23).getId());
@@ -111,6 +112,11 @@ public class VehicleReaderWriterV1Test extends MatsimTestCase {
 		assertNotNull(vehicles.get(id42));
 		assertEquals(id42, vehicles.get(id42).getId());
 		assertEquals(new IdImpl("defaultValueCar"), vehicles.get(id42).getType().getId());
+	
+		assertNotNull(vehicles.get(id42_23));
+		assertEquals(id42_23, vehicles.get(id42_23).getId());
+		
+		
 	}
 
 }
