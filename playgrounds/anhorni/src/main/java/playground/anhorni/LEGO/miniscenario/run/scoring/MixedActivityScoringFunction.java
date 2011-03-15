@@ -35,19 +35,17 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.locationchoice.facilityload.FacilityPenalty;
 
-import playground.anhorni.LEGO.miniscenario.ConfigReader;
-
-
 public class MixedActivityScoringFunction extends org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 	static final Logger log = Logger.getLogger(MixedActivityScoringFunction.class);
 	private final ActivityFacilities facilities;
 	
 	// for destination scoring: -----------
-	private ConfigReader configReader;
 	private Random random;
 	private DestinationChoiceScoring destinationChoiceScoring;	
 	private Config config;
 	// ------------------------------------
+	
+	private final String LCEXP = "locationchoiceExperimental";
 
 	public MixedActivityScoringFunction(Plan plan, CharyparNagelScoringParameters params, 
 			final ActivityFacilities facilities, Random random, 
@@ -64,7 +62,8 @@ public class MixedActivityScoringFunction extends org.matsim.core.scoring.charyp
 	@Override
 	public void finish() {		
 		boolean distance = false;
-		if (configReader.getScoreElementDistance() > 0.000001) distance = true;
+				
+		if (Double.parseDouble(config.findParam(LCEXP, "scoreElementDistance")) > 0.000001) distance = true;
 		
 		// ----------------------------------------------------------
 		// The initial score is set when scoring during or just after the mobsim. 
@@ -82,8 +81,11 @@ public class MixedActivityScoringFunction extends org.matsim.core.scoring.charyp
 		
 		super.finish();
 		
+		double offset = Double.parseDouble(config.findParam(LCEXP, "actScoreOffset"));
+		double scale = Double.parseDouble(config.findParam(LCEXP, "actScoreScale"));
+		
 		if (Boolean.parseBoolean(this.config.locationchoice().getTravelTimes()) && !distance) {
-			this.score = (this.score - configReader.getActScoreOffset()) * configReader.getActScoreScale();
+			this.score = (this.score - offset) * scale;
 		}
 		else {
 			this.score = 0.0;	

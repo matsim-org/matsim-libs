@@ -9,8 +9,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
-
-import playground.anhorni.LEGO.miniscenario.ConfigReader;
 import playground.anhorni.LEGO.miniscenario.run.scoring.DestinationChoiceScoring;
 
 public class ComputeMaxEpsilons extends AbstractMultithreadedModule {	
