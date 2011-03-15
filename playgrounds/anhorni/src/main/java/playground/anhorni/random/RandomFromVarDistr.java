@@ -22,6 +22,10 @@ public class RandomFromVarDistr {
 		}
 	}
 	
+	public RandomFromVarDistr(Random random) {
+		this.rnd = random;
+	}
+	
 	public RandomFromVarDistr() {
 		this.rnd = new Random(this.seed);
 	}

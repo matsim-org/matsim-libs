@@ -81,7 +81,7 @@ public class MultiDaysGenerator {
 			
 			boolean worker = false;
 			if (this.randomNumberGenerator.nextDouble() > limit) {
-			//	worker = true;
+				worker = true;
 			}
 			int homeId = 1;
 			if ((Integer)p.getCustomAttributes().get("townId") == 1) {
@@ -101,8 +101,7 @@ public class MultiDaysGenerator {
 		Config config = (ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(
 				"src/main/java/playground/anhorni/input/PLOC/3towns/config.xml").getScenario()).getConfig();
 				
-		RandomFromVarDistr rnd = new RandomFromVarDistr();
-		rnd.setSeed(this.seed);
+		RandomFromVarDistr rnd = new RandomFromVarDistr(this.randomNumberGenerator);
 		HandleUnobservedHeterogeneity hhandler = new HandleUnobservedHeterogeneity(this.scenarioWriteOut, configReader, rnd, config);
 		hhandler.assign(); 
 			

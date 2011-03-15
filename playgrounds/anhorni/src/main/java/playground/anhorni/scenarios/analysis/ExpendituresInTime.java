@@ -4,6 +4,14 @@ public class ExpendituresInTime {
 	
 	private double expenditures[][] = new double[5][24];
 	
+	public ExpendituresInTime() {
+		for (int i = 0; i < 24; i++) {
+			for (int j = 0; j < 5; j++) {
+				expenditures[j][i] = 0.0;
+			}
+		}
+	}
+	
 	public void add(int day, int hour, double expenditure) {
 		this.expenditures[day][hour] = expenditure;
 	}
