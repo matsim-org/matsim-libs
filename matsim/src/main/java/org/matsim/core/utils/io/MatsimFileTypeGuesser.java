@@ -148,9 +148,7 @@ public class MatsimFileTypeGuesser extends DefaultHandler {
 				log.debug("Detected root tag: " +  e.rootTag);
 				if 	("events".equals(e.rootTag)) {
 					this.fileType = FileType.Events;
-				} else if ("lightSignalSystems".equals(e.rootTag)) {
-					this.fileType = FileType.SignalSystems;
-				}	else if ("signalGroups".equals(e.rootTag)) {
+				} else if ("signalGroups".equals(e.rootTag)) {
 					this.fileType = FileType.SignalGroups;
 				} else if ("signalSystems".equals(e.rootTag)) {
 					this.fileType = FileType.SignalSystems;

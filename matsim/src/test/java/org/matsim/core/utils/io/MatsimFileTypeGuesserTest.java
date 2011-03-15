@@ -114,15 +114,6 @@ public class MatsimFileTypeGuesserTest {
 	}
 
 	@Test
-	public void testSignalSystemsV11XML() throws IOException {
-		MatsimFileTypeGuesser g = new MatsimFileTypeGuesser("test/input/org/matsim/signalsystems/testSignalSystems_v1.1.xml");
-		assertEquals(MatsimFileTypeGuesser.FileType.SignalSystems, g.getGuessedFileType());
-		assertNull(g.getPublicId());
-		assertNotNull(g.getSystemId());
-		assertEquals(MatsimSignalSystemsReader.SIGNALSYSTEMS11, g.getSystemId());
-	}
-
-	@Test
 	public void testSignalSystemsV20XML() throws IOException {
 		MatsimFileTypeGuesser g = new MatsimFileTypeGuesser("test/input/org/matsim/signalsystems/data/signalsystems/v20/testSignalSystems_v2.0.xml");
 		assertEquals(MatsimFileTypeGuesser.FileType.SignalSystems, g.getGuessedFileType());
