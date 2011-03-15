@@ -20,7 +20,6 @@ import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.core.scenario.ScenarioImpl;
 
-import playground.anhorni.LEGO.miniscenario.ConfigReader;
 import playground.anhorni.LEGO.miniscenario.create.ComputeMaxEpsilons;
 import playground.anhorni.LEGO.miniscenario.create.HandleUnobservedHeterogeneity;
 import playground.anhorni.random.RandomFromVarDistr;
