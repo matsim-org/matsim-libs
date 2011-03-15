@@ -48,20 +48,17 @@ public class LinkFilter {
 		for (Node node : network.getNodes().values()) {
 
 			if (isNodeInShape(node, featuresInShape)) {
+				filteredNetwork.createAndAddNode(node.getId(), node.getCoord());
 				for(Link link : network.getLinks().values()){
-					filteredNetwork.createAndAddNode(node.getId(), node.getCoord());
-						if(isLinkInShape(link,featuresInShape)){
+			//			if(isLinkInShape(link,featuresInShape)){
 							filteredNetwork.createAndAddLink(link.getId(), link.getFromNode(), link.getToNode(), 0.0,0.0,0.0,0.0);
+							
 						
 						}
 				}
 			}		
-		}
 		
-
-		System.out.println(filteredNetwork.getLinks());
-		return filteredNetwork;
-		
+		return filteredNetwork;	
 	}
 
 	private boolean isNodeInShape(Node node,Set<Feature> featuresInShape) {
@@ -84,7 +81,7 @@ public class LinkFilter {
 		return isInShape;
 	}
 	
-	private boolean isLinkInShape(Link link,Set<Feature> featuresInShape) {
+/*	private boolean isLinkInShape(Link link,Set<Feature> featuresInShape) {
 		boolean isInShape = false;
 
 		Coord nodeCoord = link.getFromNode().getCoord();
@@ -104,7 +101,7 @@ public class LinkFilter {
 			}
 		}
 		return isInShape;
-	}
+	}*/
 
 /*	private static boolean isLinkInShape(Coord linkCoord, Set<Feature> featuresInShape) {
 		boolean isInShape = false;
