@@ -71,6 +71,7 @@
     <!-- An identifier for the current run which is used as prefix for output files
       and mentioned in output xml files etc. -->
     <param name="writeEventsInterval" value="1" />
+    <param name="mobsim" value="qsim" />
   </module>
 
  <!--<module name="simulation">
