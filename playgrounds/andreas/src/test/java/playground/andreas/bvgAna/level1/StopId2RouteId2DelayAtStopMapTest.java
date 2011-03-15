@@ -1,6 +1,7 @@
 package playground.andreas.bvgAna.level1;
 
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.junit.Test;
@@ -11,6 +12,9 @@ import org.matsim.core.events.TransitDriverStartsEvent;
 import org.matsim.core.events.VehicleDepartsAtFacilityEvent;
 
 public class StopId2RouteId2DelayAtStopMapTest {
+	
+	private TreeMap<Id, TransitDriverStartsEvent> vehTestMap = new TreeMap<Id, TransitDriverStartsEvent>();
+	private TreeMap<Id, TreeMap<Id, StopId2RouteId2DelayAtStopMapData>> stopDataMapTest = new TreeMap<Id, TreeMap<Id, StopId2RouteId2DelayAtStopMapData>>();
 
 	@Test
 	public void testStopId2RouteId2DelayAtStopMap() {
@@ -53,11 +57,14 @@ public class StopId2RouteId2DelayAtStopMapTest {
 	    test.handleEvent(event1);
 	    test.handleEvent(event2);
 	    
-	    System.out.println(test.getStopId2RouteId2DelayAtStopMap().toString());
+	    vehTestMap.put(event3.getVehicleId(), event3);
+	    vehTestMap.put(event4.getVehicleId(), event4);
 	    
+	    System.out.println(test.getStopId2RouteId2DelayAtStopMap().toString());
+	    System.out.println(test.getStopId2RouteId2DelayAtStopMap().get(event1.getFacilityId()).firstEntry().toString());
 	    // to be completed
 	    
-	    
+	    System.out.println(vehTestMap.toString());
 	    
 	    
 	}

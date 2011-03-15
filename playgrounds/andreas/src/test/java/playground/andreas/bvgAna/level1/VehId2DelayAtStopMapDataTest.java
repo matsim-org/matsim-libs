@@ -41,7 +41,7 @@ public class VehId2DelayAtStopMapDataTest {
         
         mapData.addVehicleDepartsAtFacilityEvent(event2);
         
- 
+        
         
         
 		

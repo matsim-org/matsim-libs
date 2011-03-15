@@ -51,6 +51,7 @@ public class AgentId2DepartureDelayAtStopMapDataTest {
 		Assert.assertEquals((Double)event1.getTime(), data.getAgentEntersVehicle().get(0));
 		
 		
+		
 	}
 
 
