@@ -102,8 +102,7 @@ public class PlanTimesAdapter {
 						}
 					}
 					
-					LegImpl previousLegPlan = (LegImpl) (plan).getPreviousLeg((ActivityImpl)pe);
-					double actDur = ((ActivityImpl)pe).getEndTime() - (previousLegPlan.getDepartureTime() + previousLegPlan.getTravelTime());
+					double actDur = ((ActivityImpl)pe).getMaximumDuration();
 										
 					// set new leg travel time, departure time and arrival time
 					LegImpl previousLegPlanTmp = (LegImpl)planTmp.getPlanElements().get(planElementIndex -1);
@@ -115,6 +114,7 @@ public class PlanTimesAdapter {
 					
 					// set new activity end time
 					ActivityImpl act = (ActivityImpl) planTmp.getPlanElements().get(planElementIndex);
+					act.setStartTime(arrivalTime);
 					act.setEndTime(arrivalTime + actDur);
 										
 					scoringFunction.startActivity(arrivalTime, act);
