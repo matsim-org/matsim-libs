@@ -1,8 +1,11 @@
 package playground.fhuelsmann.emission;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
@@ -35,6 +38,9 @@ public class LinkFilter {
 	
 	private static final Logger logger = Logger.getLogger(LinkFilter.class);
 	private Network network;
+//	private Map<Id, double[]> nodeCollector = new TreeMap<Id,double[]>();
+	
+	private final Map<Id, Node> nodeCollector = new TreeMap<Id, Node>();
 	
 	public LinkFilter(Network network) {
 	super();
@@ -44,23 +50,39 @@ public class LinkFilter {
 	Network getRelevantNetwork(Set<Feature> featuresInShape) {
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		NetworkImpl filteredNetwork = scenario.getNetwork();
-
+		
+			
 		for (Node node : network.getNodes().values()) {
 
 			if (isNodeInShape(node, featuresInShape)) {
-				filteredNetwork.createAndAddNode(node.getId(), node.getCoord());
-				for(Link link : network.getLinks().values()){
-			//			if(isLinkInShape(link,featuresInShape)){
-							filteredNetwork.createAndAddLink(link.getId(), link.getFromNode(), link.getToNode(), 0.0,0.0,0.0,0.0);
-							
-						
-						}
-				}
-			}		
+				Node fromtonode = filteredNetwork.createAndAddNode(node.getId(), node.getCoord());
+				
+//				if (this.nodeCollector.containsKey(node.getId()== null)){
+				this.nodeCollector.put(node.getId(), fromtonode);
+//				}else {this.nodeCollector.put(node.getId(), fromtonode);}
+				}}
+		System.out.print(nodeCollector);
+	 
+		for(Link link : network.getLinks().values()){
+		
+			if (getNodeCollector().containsKey(link.getFromNode().getId()) && getNodeCollector().containsKey(link.getToNode().getId()) 
+				&&	link.getFromNode().getOutLinks().containsKey(link.getId())==false )
+
+				filteredNetwork.createAndAddLink(link.getId(), link.getFromNode(), link.getToNode(), 0.0,0.0,0.0,0.0);		
+//						}
+		}
+		System.out.println("Result "+ filteredNetwork +"         " +filteredNetwork.getLinks());
 		
 		return filteredNetwork;	
+	
 	}
 
+		
+			
+	public Map<Id, Node> getNodeCollector() {
+		return nodeCollector;
+	}
+	
 	private boolean isNodeInShape(Node node,Set<Feature> featuresInShape) {
 		boolean isInShape = false;
 
