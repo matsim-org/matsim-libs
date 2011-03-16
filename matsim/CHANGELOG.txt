@@ -11,6 +11,10 @@ Main focus of this release:
 
 Changes:
 
+- Important Changes:
+  - Events are written by default in XML format (was TXT before)
+  - Events are written only every 10th iteration by default (was each and every iteration before) 
+
 - New features:
   - ?
 
@@ -21,10 +25,11 @@ Changes:
   - selection, which mobsim should be used, simplified by specific config-parameter (controler.mobsim) (r14325)
   - new population file format: population_v5 (r14369)
   - Networks now need about 25% less memory to load (r14418) 
-  - ?
+  - NetworkRoute.getSubRoute() now also handles cases where the routes contain circles (can happen with transit routes) (r14242, r14281) 
 
 - BugFixes:
   - Controler ignores any custom-set leastCostPathCalculatorFactory (r14090)
+  - ParallelEventHandler only worked in parallel during first iteration (r14553)
 
 - Other changes for developers:
 
@@ -32,13 +37,16 @@ Changes:
   - deprecated NetworkFactory.createLink(Id, Id, Id) (r13924)
   - added NetworkFactory.createLink(Id, Node, Node) (r13924)
   - ScenarioLoaderImpl now also loads transit-related data if transit is enabled in the configuration (r13950)
+  - ScenarioImpl is no longer in API, use ScenarioUtils.createScenario(ConfigUtils.createConfig()) to create a new scenario (r14551)
+  - Activity has two additional methods: get/setMaximumDuration() (r14319)
+  - New file format "population_v5" is available, but not yet used by default. Will replace "plans_v4" in the future (r14369)
 
   Non-API Changes:
   - ObjectAttributes: utility data structure to manage additional attributes for existing objects (r14189)
   - SignalModelFactory now also has a createSignalPlan(...) method for SignalPlans (r14143)
   - SignalScenarioLoader is not producing null pointer exceptions anymore if files are not set in config group (r14142)
   - improved withinday-package available (r14364)
-  - deprecated class MatsimSignalSystemConfigurationReader is no longer available, constants can be found in MatsimSignalSystemsReader 
+  - deprecated class MatsimSignalSystemConfigurationReader is no longer available, constants can be found in MatsimSignalSystemsReader
 
 
 
