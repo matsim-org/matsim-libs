@@ -20,11 +20,9 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
-import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrix;
@@ -42,6 +40,7 @@ public class MyControlerListener implements ShutdownListener {
 	private static final Logger log = Logger.getLogger(MyControlerListener.class);
 
 	private ActivityFacilitiesImpl zones;
+	private ActivityFacilitiesImpl facilities;
 	private Map<Id,WorkplaceObject> numberOfWorkplacesPerZone;
 	private String travelDataPath;
 	private String zonesPath;
@@ -50,8 +49,9 @@ public class MyControlerListener implements ShutdownListener {
 	 * constructor
 	 * @param zones 
 	 */
-	public MyControlerListener( final ActivityFacilitiesImpl zones, final Map<Id,WorkplaceObject> numberOfWorkplacesPerZone ) {
+	public MyControlerListener( final ActivityFacilitiesImpl zones, final Map<Id,WorkplaceObject> numberOfWorkplacesPerZone, ActivityFacilitiesImpl facilities ) {
 		this.zones = zones;
+		this.facilities = facilities;
 		this.numberOfWorkplacesPerZone = numberOfWorkplacesPerZone;
 		this.travelDataPath = Constants.OPUS_HOME + MATSimConfigObject.getTempDirectory() + "travel_data.csv";
 		this.zonesPath = Constants.OPUS_HOME + MATSimConfigObject.getTempDirectory() + "zones.csv";
@@ -90,7 +90,7 @@ public class MyControlerListener implements ShutdownListener {
 			// solved 3dec08 by travis
 
 			// Travel Data Header
-			travelDataWriter.write ( "from_zone_id:i4,to_zone_id:i4,single_vehicle_to_work_travel_cost:f4,am_single_vehicle_to_work_travel_time:f4,am_walk_time_in_minutes:f4" ) ; 
+			travelDataWriter.write ( "from_zone_id:i4,to_zone_id:i4,single_vehicle_to_work_travel_cost:f4,am_single_vehicle_to_work_travel_time:f4,am_walk_time_in_minutes:f4,am_pk_period_drive_alone_vehicle_trips.lf4" ) ; 
 			Logger.getLogger(this.getClass()).error( "add new fields" ) ; // remove when all travel data attributes are updated...
 			travelDataWriter.newLine();
 			
@@ -105,7 +105,7 @@ public class MyControlerListener implements ShutdownListener {
 			
 			// main for loop, dumping out zone2zone impedances (travel times) and workplace accessibility in two seperate files
 			for ( ActivityFacility fromZone : zones.getFacilities().values() ) {
-				// progressbar
+				// progress bar
 				if ( (int) (100.*cnt/zones.getFacilities().size()) > percentDone ) {
 					percentDone++ ; System.out.print('=') ;
 				}
@@ -136,13 +136,19 @@ public class MyControlerListener implements ShutdownListener {
 					// travel times in sec
 					double ttime = arrivalTime - depatureTime;
 					
-					// convert travel times in minutes for urbansim ???
+					// convert travel times in minutes for urbansim
 					ttime = ttime / 60.;
 					
-					// we gues that any value less than 1.2 leads to errors on the urbansim side
-					// since ln(0) is not defined or ln(1) = 0 causes toubles as a denominator ...
+					// we guess that any value less than 1.2 leads to errors on the urbansim side
+					// since ln(0) is not defined or ln(1) = 0 causes trouble as a denominator ...
 					if(ttime < 1.2)
 						ttime = 1.2;
+					
+					// query trips in OD Matrix
+					double trips = 0.0;
+					Entry e = originDestinationMatrix.getEntry(fromZone.getId(), toZone.getId());
+					if(e != null)
+						trips = e.getValue();
 					
 					// tnicolai test to caculate travel costs
 					//LinkImpl toLink = network.getNearestLink( toCoord );
@@ -153,13 +159,14 @@ public class MyControlerListener implements ShutdownListener {
 							+ "," + ttime 									//tcost
 							+ "," + ttime 									//ttimes
 							+ "," + ttime*10.								//walk ttimes
+							+ "," + trips									//vehicle trips
 							);		
 					travelDataWriter.newLine();
 					
-					// frome here workplace accessibility computation
+					// from here workplace accessibility computation
 					
 					// skip workplace accessibility computation if origin and destination zone are equal
-					// comutation of this case followos below on same zone computation
+					// computation of this case follows below on same zone computation
 					if(fromZone.getId().compareTo(toZone.getId()) == 0)
 						continue;
 					
@@ -219,9 +226,15 @@ public class MyControlerListener implements ShutdownListener {
 		Entry matrixEntry = null;
 			
 		for ( Person person : sc.getPopulation().getPersons().values() ) {
+			
 			Plan plan = person.getSelectedPlan() ;
-			int cnt = 0 ;
-			String lastZoneId = null ;
+
+//			if( ((PersonImpl)person).isEmployed())
+//				System.out.println("isEmployed");
+			
+			boolean isFirstPlanActivity = true;
+			String lastZoneId = null;
+			
 			for ( PlanElement pe : plan.getPlanElements() ) {
 				if ( pe instanceof Activity ) {
 					Activity act = (Activity) pe;
@@ -229,14 +242,24 @@ public class MyControlerListener implements ShutdownListener {
 					if( id == null) // that person plan doesn't contain activity, continue with next person
 						continue;
 					
-					Map<Id, ActivityFacility> allFacilities = ((ScenarioImpl)sc).getActivityFacilities().getFacilities();
-					
+					Map<Id, ActivityFacility> allFacilities = facilities.getFacilities();
 					ActivityFacility fac = allFacilities.get(id);
-//					ActivityFacility fac = ((ScenarioImpl)sc).getActivityFacilities().getFacilities().get( act.getFacilityId() ) ;
+					if(fac == null)
+						continue;
 					String zone_ID = ((Id) fac.getCustomAttributes().get(Constants.ZONE_ID)).toString() ;
-					if (cnt < 1 ) { 
-						cnt++ ;
-					} else {
+					
+					
+//					Map<Id, ActivityFacility> allFacilities = ((ScenarioImpl)sc).getActivityFacilities().getFacilities();
+//					
+//					ActivityFacility fac = allFacilities.get(id); // tnicolai: fac == null !!!
+////					ActivityFacility fac = ((ScenarioImpl)sc).getActivityFacilities().getFacilities().get( act.getFacilityId() ) ;
+//					if(fac == null)
+//						continue;
+//					
+//					String zone_ID = ((Id) fac.getCustomAttributes().get(Constants.ZONE_ID)).toString() ;
+					if (isFirstPlanActivity)
+						isFirstPlanActivity = false;
+					else {
 						matrixEntry = originDestinationMatrix.getEntry(new IdImpl(lastZoneId), new IdImpl(zone_ID));
 						if(matrixEntry != null){
 							double value = matrixEntry.getValue();
@@ -251,6 +274,20 @@ public class MyControlerListener implements ShutdownListener {
 			}
 				
 		}
+		// tnicolai: for debugging
+//		for(Id fromId : originDestinationMatrix.getFromLocations().keySet()){
+//			System.out.println("From Zone: " + fromId.toString());
+//			for(Entry e : originDestinationMatrix.getFromLocEntries(fromId)){
+//				System.out.println("To Zone: " + e.getToLocation() + " value = " + e.getValue());
+//			}
+//		}
+//		
+//		for(Id ToId : originDestinationMatrix.getToLocations().keySet()){
+//			System.out.println("To Zone: " + ToId.toString());
+//			for(Entry e : originDestinationMatrix.getToLocEntries(ToId)){
+//				System.out.println("From Zone: " + e.getFromLocation() + " value = " + e.getValue());
+//			}
+//		}
 		
 		log.info("DONE with computing zone2zone trip numbers ...") ;
 	}

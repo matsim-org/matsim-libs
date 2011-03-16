@@ -209,7 +209,6 @@ public class MATSimConfigObject {
 
 		NetworkConfigGroup networkCG = (NetworkConfigGroup) config.getModule(NetworkConfigGroup.GROUP_NAME);
 		ControlerConfigGroup controlerCG = (ControlerConfigGroup) config.getModule(ControlerConfigGroup.GROUP_NAME);
-		
 		// set values
 		networkCG.setInputFile( networkFile );	// network
 		log.info("Setting network to config...");
@@ -255,5 +254,6 @@ public class MATSimConfigObject {
 		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(scenario);
 		loader.loadScenario();
 	}
+	
 }
 

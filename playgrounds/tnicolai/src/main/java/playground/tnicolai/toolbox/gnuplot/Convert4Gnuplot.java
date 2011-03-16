@@ -74,9 +74,9 @@ public class Convert4Gnuplot {
 //			String[] myArgs = new String[]{"/Users/thomas/Documents/SVN_Studies/tnicolai/cupum/Indicators/ferry_accessibility_indicators", "/Users/thomas/Documents/SVN_Studies/tnicolai/cupum/Indicators/highway_accessibility_indicators", "908"};
 			
 			
-//			String[] myArgs = new String[]{"/Users/thomas/Documents/SVN_Studies/tnicolai/cupum/Indicators/highway_low_cap_accessibility_indicators", "908"};		
+			String[] myArgs = new String[]{"/Users/thomas/Documents/SVN_Studies/tnicolai/cupum/Indicators/highway_low_cap_accessibility_indicators", "908"};		
 //			String[] myArgs = new String[]{"/Users/thomas/Documents/SVN_Studies/tnicolai/cupum/Indicators/highway_accessibility_indicators", "908"};		
-			String[] myArgs = new String[]{"/Users/thomas/Documents/SVN_Studies/tnicolai/cupum/Indicators/ferry_accessibility_indicators", "908"};		
+//			String[] myArgs = new String[]{"/Users/thomas/Documents/SVN_Studies/tnicolai/cupum/Indicators/ferry_accessibility_indicators", "908"};		
 			
 //			init(args);
 			init(myArgs);

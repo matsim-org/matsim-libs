@@ -25,7 +25,6 @@ package playground.tnicolai.urbansim.utils;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Map;
 
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
@@ -36,7 +35,6 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
 import org.apache.log4j.Logger;
-import org.xml.sax.SAXException;
 
 import playground.tnicolai.urbansim.com.matsim.config.MatsimConfigType;
 import playground.tnicolai.urbansim.constants.Constants;

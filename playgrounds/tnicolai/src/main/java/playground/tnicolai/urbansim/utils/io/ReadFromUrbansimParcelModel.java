@@ -99,7 +99,7 @@ public class ReadFromUrbansimParcelModel {
 			while ( (line = reader.readLine()) != null ) {
 				parts = line.split(Constants.TAB_SEPERATOR);
 
-				// Urbansim sometimes writes IDs as floats!
+				// urbansim sometimes writes IDs as floats!
 				long parcelIdAsLong = (long) Double.parseDouble( parts[ indexParcelID ] );
 				parcel_ID = new IdImpl( parcelIdAsLong ) ;
 
@@ -114,7 +114,10 @@ public class ReadFromUrbansimParcelModel {
 				long zoneIdAsLong = (long) Double.parseDouble( parts[ indexZoneID ] );
 				zone_ID = new ZoneId( zoneIdAsLong );
 
-				facility.getCustomAttributes().put(Constants.ZONE_ID, zone_ID ) ;
+				// set custom attributes, these are needed to compute zone2zone trips
+				Map<String, Object> customFacilityAttributes = facility.getCustomAttributes();
+				customFacilityAttributes.put(Constants.ZONE_ID, zone_ID);
+				customFacilityAttributes.put(Constants.PARCEL_ID, parcel_ID);
 
 				// the pseudoZones (HashMap) is a temporary data structure to create zones.
 				// this intermediate step is needed to make sure that every zone id just exists once.
@@ -248,7 +251,7 @@ public class ReadFromUrbansimParcelModel {
 
 				// add home location to plan
 				PlanImpl plan = newPerson.createAndAddPlan(true);
-				CommonMATSimUtilities.makeHomePlan(plan, homeCoord) ;
+				CommonMATSimUtilities.makeHomePlan(plan, homeCoord, homeLocation) ;
 
 				// determine employment status
 				if ( parts[ indexParcelID_WORK ].equals("-1") )
@@ -269,7 +272,7 @@ public class ReadFromUrbansimParcelModel {
 					}
 					// complete agent plan
 					Coord workCoord = jobLocation.getCoord() ;
-					CommonMATSimUtilities.completePlanToHwh(plan, workCoord) ;
+					CommonMATSimUtilities.completePlanToHwh(plan, workCoord, jobLocation) ;
 				}
 
 				// at this point, we have a full "new" person.  Now check against pre-existing population ...

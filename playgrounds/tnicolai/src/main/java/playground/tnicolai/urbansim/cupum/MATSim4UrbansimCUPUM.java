@@ -98,7 +98,7 @@ public class MATSim4UrbansimCUPUM extends MATSim4Urbansim{
 		// set population in scenario
 		scenario.setPopulation(newPopulation);
 
-		runControler(zones, numberOfWorkplacesPerZone, network);
+		runControler(zones, numberOfWorkplacesPerZone, facilities);
 	}
 	
 	/**

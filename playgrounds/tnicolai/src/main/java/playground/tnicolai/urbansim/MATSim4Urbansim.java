@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -103,8 +104,9 @@ public class MATSim4Urbansim {
 
 		// set population in scenario
 		scenario.setPopulation(newPopulation);
+		// scenario.setFacilities(facilities); // tnicolai: suggest to implement method
 
-		runControler(zones, numberOfWorkplacesPerZone, network);
+		runControler(zones, numberOfWorkplacesPerZone, facilities);
 	}
 	
 	/**
@@ -118,7 +120,7 @@ public class MATSim4Urbansim {
 
 		readFromUrbansim.readFacilities(facilities, zones);
 		// write the facilities from the urbansim parcel model as a compressed locations.xml file into the temporary directory as input for ???
-		// new FacilitiesWriter(facilities).write( Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + "locations.xml.gz" );
+//		new FacilitiesWriter(facilities).write( Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + "locations.xml.gz" );
 	}
 	
 	/**
@@ -172,13 +174,13 @@ public class MATSim4Urbansim {
 	 * run simulation
 	 * @param zones
 	 */
-	protected void runControler( ActivityFacilitiesImpl zones, Map<Id,WorkplaceObject> numberOfWorkplacesPerZone, NetworkImpl network ){
+	protected void runControler( ActivityFacilitiesImpl zones, Map<Id,WorkplaceObject> numberOfWorkplacesPerZone, ActivityFacilitiesImpl facilities ){
 		Controler controler = new Controler(scenario);
 		controler.setOverwriteFiles(true);	// sets, whether output files are overwritten
 		controler.setCreateGraphs(false);	// sets, whether output Graphs are created
 		
 		// The following lines register what should be done _after_ the iterations were run:
-		controler.addControlerListener( new MyControlerListener( zones, numberOfWorkplacesPerZone ) );
+		controler.addControlerListener( new MyControlerListener( zones, numberOfWorkplacesPerZone, facilities ) );
 		
 		// tnicolai todo: count number of cars per h on a link
 		// write ControlerListener that implements AfterMobsimListener (notifyAfterMobsim)
@@ -189,36 +191,6 @@ public class MATSim4Urbansim {
 		// run the iterations, including the post-processing:
 		controler.run() ;
 	}
-	
-//	/**
-//	 * 
-//	 * @param controler
-//	 */
-//	protected void setStrategies(Controler controler, NetworkImpl network){
-//		
-//		StrategyManager manager = controler.getStrategyManager();
-//		manager = new StrategyManager();
-//		
-//		PlanStrategy changeExpBeta = new PlanStrategyImpl(new ExpBetaPlanChanger(config.planCalcScore().getBrainExpBeta()));
-//		manager.addStrategy(changeExpBeta, 0.8);
-//		
-//		PlanStrategy reroute = new PlanStrategyImpl(new RandomPlanSelector());
-//		reroute.addStrategyModule(new ReRouteDijkstra(config, network, controler.createTravelCostCalculator(), controler.getTravelTimeCalculator()));
-//		manager.addStrategy(reroute, 0.1);
-//		manager.addChangeRequest(100, reroute, 0.);
-//		
-//		PlanStrategy timeAllocationMutator = new PlanStrategyImpl(new RandomPlanSelector());
-//		TimeAllocationMutator tam = new TimeAllocationMutator(config);
-//		timeAllocationMutator.addStrategyModule(tam);
-//		manager.addStrategy(timeAllocationMutator, 0.1);
-//		manager.addChangeRequest(100, timeAllocationMutator, 0.);
-//		
-////		StrategyManagerConfigLoader.load(controler, manager);
-//		
-//		
-//		if(controler.getStrategyManager() == null)
-//			log.error("No Strategies available!!!");
-//	}
 	
 	/**
 	 * verifying if args argument contains a valid path. 

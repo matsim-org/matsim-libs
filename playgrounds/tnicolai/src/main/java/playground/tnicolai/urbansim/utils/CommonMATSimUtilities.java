@@ -27,8 +27,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
 
@@ -135,11 +137,13 @@ public class CommonMATSimUtilities {
 	 *
 	 * @param plan
 	 * @param homeCoord
+	 * @param homeLocation
 	 *
 	 * @author nagel
 	 */
-	public static void makeHomePlan( PlanImpl plan, Coord homeCoord ) {
-		plan.createAndAddActivity( Constants.ACT_HOME, homeCoord) ;
+	public static void makeHomePlan( PlanImpl plan, Coord homeCoord, ActivityFacility homeLocation) {
+		ActivityImpl act = plan.createAndAddActivity( Constants.ACT_HOME, homeCoord) ;
+		act.setFacilityId( homeLocation.getId() );	// tnicolai: added facility id to compute zone2zone trips
 	}
 
 	/**
@@ -147,20 +151,34 @@ public class CommonMATSimUtilities {
 	 *
 	 * @param plan
 	 * @param workCoord
+	 * @param jobLocation
 	 *
 	 * @author nagel
 	 */
-	public static void completePlanToHwh ( PlanImpl plan, Coord workCoord ) {
-		Activity act = plan.getFirstActivity();
+	public static void completePlanToHwh ( PlanImpl plan, Coord workCoord, ActivityFacility jobLocation ) {
+		
+		// complete the first activity (home) by setting end time. 
+		ActivityImpl act = (ActivityImpl)plan.getFirstActivity();
 		act.setEndTime( 7.*3600. ) ;
+		// gather coordinate and facility id needed for last activity
 		Coord homeCoord = act.getCoord();
-
+		Id homeId = act.getFacilityId();
+		
+		// set Leg
 		plan.createAndAddLeg(TransportMode.car);
+		
+		// set second activity (work)
 		act = plan.createAndAddActivity( Constants.ACT_WORK, workCoord );
-		((ActivityImpl) act).setMaximumDuration( 8.*3600. ) ;
-
+		act.setFacilityId( jobLocation.getId() );
+		act.setMaximumDuration( 8.*3600. ) ;
+		
+		// set Leg
 		plan.createAndAddLeg(TransportMode.car) ;
+		
+		// set last activity (=first activity) and complete home-work-home plan.
 		plan.createAndAddActivity( Constants.ACT_HOME, homeCoord );
+		act = (ActivityImpl)plan.getLastActivity();
+		act.setFacilityId( homeId );
 	}
 
 }
