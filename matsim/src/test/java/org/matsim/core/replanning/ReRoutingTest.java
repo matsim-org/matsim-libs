@@ -20,8 +20,11 @@
 
 package org.matsim.core.replanning;
 
+import java.util.EnumSet;
+
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.testcases.MatsimTestCase;
@@ -33,6 +36,7 @@ public class ReRoutingTest extends MatsimTestCase {
 	public void testReRouting() {
 		Config config = loadConfig(getInputDirectory() + "config.xml");
 		config.simulation().setTimeStepSize(10.0);
+		config.controler().setEventsFileFormats(EnumSet.of(EventsFileFormat.txt));
 
 		TestControler controler = new TestControler(config);
 		controler.setCreateGraphs(false);

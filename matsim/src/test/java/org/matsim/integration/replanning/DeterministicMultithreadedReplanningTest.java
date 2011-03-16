@@ -69,8 +69,8 @@ public class DeterministicMultithreadedReplanningTest extends MatsimTestCase {
 
 		for (int i = 0; i <= lastIteration; i++) {
 
-			long cksum1 = CRCChecksum.getCRCFromFile(getOutputDirectory() + "/run1/ITERS/it."+ i +"/"+ i +".events.txt.gz");
-			long cksum2 = CRCChecksum.getCRCFromFile(getOutputDirectory() + "/run2/ITERS/it."+ i +"/"+ i +".events.txt.gz");
+			long cksum1 = CRCChecksum.getCRCFromFile(getOutputDirectory() + "/run1/ITERS/it."+ i +"/"+ i +".events.xml.gz");
+			long cksum2 = CRCChecksum.getCRCFromFile(getOutputDirectory() + "/run2/ITERS/it."+ i +"/"+ i +".events.xml.gz");
 
 			assertEquals("The checksums of events must be the same in iteration " + i + ", even when multiple threads are used.", cksum1, cksum2);
 		}
@@ -118,8 +118,8 @@ public class DeterministicMultithreadedReplanningTest extends MatsimTestCase {
 
 		for (int i = 0; i <= lastIteration; i++) {
 
-			long cksum1 = CRCChecksum.getCRCFromFile(getOutputDirectory() + "/run1/ITERS/it."+ i +"/"+ i +".events.txt.gz");
-			long cksum2 = CRCChecksum.getCRCFromFile(getOutputDirectory() + "/run2/ITERS/it."+ i +"/"+ i +".events.txt.gz");
+			long cksum1 = CRCChecksum.getCRCFromFile(getOutputDirectory() + "/run1/ITERS/it."+ i +"/"+ i +".events.xml.gz");
+			long cksum2 = CRCChecksum.getCRCFromFile(getOutputDirectory() + "/run2/ITERS/it."+ i +"/"+ i +".events.xml.gz");
 
 			assertEquals("The checksums of events must be the same in iteration " + i + ", even when multiple threads are used.", cksum1, cksum2);
 		}
@@ -165,8 +165,8 @@ public class DeterministicMultithreadedReplanningTest extends MatsimTestCase {
 
 		for (int i = 0; i <= lastIteration; i++) {
 
-			long cksum1 = CRCChecksum.getCRCFromFile(getOutputDirectory() + "/run1/ITERS/it."+ i +"/"+ i +".events.txt.gz");
-			long cksum2 = CRCChecksum.getCRCFromFile(getOutputDirectory() + "/run2/ITERS/it."+ i +"/"+ i +".events.txt.gz");
+			long cksum1 = CRCChecksum.getCRCFromFile(getOutputDirectory() + "/run1/ITERS/it."+ i +"/"+ i +".events.xml.gz");
+			long cksum2 = CRCChecksum.getCRCFromFile(getOutputDirectory() + "/run2/ITERS/it."+ i +"/"+ i +".events.xml.gz");
 
 			assertEquals("The checksums of events must be the same in iteration " + i + ", even when multiple threads are used.", cksum1, cksum2);
 		}

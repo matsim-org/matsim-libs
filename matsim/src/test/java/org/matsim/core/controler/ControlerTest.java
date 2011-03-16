@@ -370,17 +370,17 @@ public class ControlerTest {
 		controler.setDumpDataAtEnd(false);
 		controler.run();
 
-		assertTrue(new File(controler.getControlerIO().getIterationFilename(0, Controler.FILENAME_EVENTS_TXT)).exists());
-		assertFalse(new File(controler.getControlerIO().getIterationFilename(1, Controler.FILENAME_EVENTS_TXT)).exists());
-		assertFalse(new File(controler.getControlerIO().getIterationFilename(2, Controler.FILENAME_EVENTS_TXT)).exists());
-		assertTrue(new File(controler.getControlerIO().getIterationFilename(3, Controler.FILENAME_EVENTS_TXT)).exists());
-		assertFalse(new File(controler.getControlerIO().getIterationFilename(4, Controler.FILENAME_EVENTS_TXT)).exists());
-		assertFalse(new File(controler.getControlerIO().getIterationFilename(5, Controler.FILENAME_EVENTS_TXT)).exists());
-		assertTrue(new File(controler.getControlerIO().getIterationFilename(6, Controler.FILENAME_EVENTS_TXT)).exists());
-		assertFalse(new File(controler.getControlerIO().getIterationFilename(7, Controler.FILENAME_EVENTS_TXT)).exists());
-		assertFalse(new File(controler.getControlerIO().getIterationFilename(8, Controler.FILENAME_EVENTS_TXT)).exists());
-		assertTrue(new File(controler.getControlerIO().getIterationFilename(9, Controler.FILENAME_EVENTS_TXT)).exists());
-		assertFalse(new File(controler.getControlerIO().getIterationFilename(10, Controler.FILENAME_EVENTS_TXT)).exists());
+		assertTrue(new File(controler.getControlerIO().getIterationFilename(0, Controler.FILENAME_EVENTS_XML)).exists());
+		assertFalse(new File(controler.getControlerIO().getIterationFilename(1, Controler.FILENAME_EVENTS_XML)).exists());
+		assertFalse(new File(controler.getControlerIO().getIterationFilename(2, Controler.FILENAME_EVENTS_XML)).exists());
+		assertTrue(new File(controler.getControlerIO().getIterationFilename(3, Controler.FILENAME_EVENTS_XML)).exists());
+		assertFalse(new File(controler.getControlerIO().getIterationFilename(4, Controler.FILENAME_EVENTS_XML)).exists());
+		assertFalse(new File(controler.getControlerIO().getIterationFilename(5, Controler.FILENAME_EVENTS_XML)).exists());
+		assertTrue(new File(controler.getControlerIO().getIterationFilename(6, Controler.FILENAME_EVENTS_XML)).exists());
+		assertFalse(new File(controler.getControlerIO().getIterationFilename(7, Controler.FILENAME_EVENTS_XML)).exists());
+		assertFalse(new File(controler.getControlerIO().getIterationFilename(8, Controler.FILENAME_EVENTS_XML)).exists());
+		assertTrue(new File(controler.getControlerIO().getIterationFilename(9, Controler.FILENAME_EVENTS_XML)).exists());
+		assertFalse(new File(controler.getControlerIO().getIterationFilename(10, Controler.FILENAME_EVENTS_XML)).exists());
 	}
 
 	/**
@@ -400,17 +400,17 @@ public class ControlerTest {
 		controler.run();
 		assertEquals(4, controler.getWriteEventsInterval());
 
-		assertTrue(new File(controler.getControlerIO().getIterationFilename(0, Controler.FILENAME_EVENTS_TXT)).exists());
-		assertFalse(new File(controler.getControlerIO().getIterationFilename(1, Controler.FILENAME_EVENTS_TXT)).exists());
-		assertFalse(new File(controler.getControlerIO().getIterationFilename(2, Controler.FILENAME_EVENTS_TXT)).exists());
-		assertFalse(new File(controler.getControlerIO().getIterationFilename(3, Controler.FILENAME_EVENTS_TXT)).exists());
-		assertTrue(new File(controler.getControlerIO().getIterationFilename(4, Controler.FILENAME_EVENTS_TXT)).exists());
-		assertFalse(new File(controler.getControlerIO().getIterationFilename(5, Controler.FILENAME_EVENTS_TXT)).exists());
-		assertFalse(new File(controler.getControlerIO().getIterationFilename(6, Controler.FILENAME_EVENTS_TXT)).exists());
-		assertFalse(new File(controler.getControlerIO().getIterationFilename(7, Controler.FILENAME_EVENTS_TXT)).exists());
-		assertTrue(new File(controler.getControlerIO().getIterationFilename(8, Controler.FILENAME_EVENTS_TXT)).exists());
-		assertFalse(new File(controler.getControlerIO().getIterationFilename(9, Controler.FILENAME_EVENTS_TXT)).exists());
-		assertFalse(new File(controler.getControlerIO().getIterationFilename(10, Controler.FILENAME_EVENTS_TXT)).exists());
+		assertTrue(new File(controler.getControlerIO().getIterationFilename(0, Controler.FILENAME_EVENTS_XML)).exists());
+		assertFalse(new File(controler.getControlerIO().getIterationFilename(1, Controler.FILENAME_EVENTS_XML)).exists());
+		assertFalse(new File(controler.getControlerIO().getIterationFilename(2, Controler.FILENAME_EVENTS_XML)).exists());
+		assertFalse(new File(controler.getControlerIO().getIterationFilename(3, Controler.FILENAME_EVENTS_XML)).exists());
+		assertTrue(new File(controler.getControlerIO().getIterationFilename(4, Controler.FILENAME_EVENTS_XML)).exists());
+		assertFalse(new File(controler.getControlerIO().getIterationFilename(5, Controler.FILENAME_EVENTS_XML)).exists());
+		assertFalse(new File(controler.getControlerIO().getIterationFilename(6, Controler.FILENAME_EVENTS_XML)).exists());
+		assertFalse(new File(controler.getControlerIO().getIterationFilename(7, Controler.FILENAME_EVENTS_XML)).exists());
+		assertTrue(new File(controler.getControlerIO().getIterationFilename(8, Controler.FILENAME_EVENTS_XML)).exists());
+		assertFalse(new File(controler.getControlerIO().getIterationFilename(9, Controler.FILENAME_EVENTS_XML)).exists());
+		assertFalse(new File(controler.getControlerIO().getIterationFilename(10, Controler.FILENAME_EVENTS_XML)).exists());
 	}
 
 	/**
@@ -433,6 +433,8 @@ public class ControlerTest {
 
 		assertFalse(new File(controler.getControlerIO().getIterationFilename(0, Controler.FILENAME_EVENTS_TXT)).exists());
 		assertFalse(new File(controler.getControlerIO().getIterationFilename(1, Controler.FILENAME_EVENTS_TXT)).exists());
+		assertFalse(new File(controler.getControlerIO().getIterationFilename(0, Controler.FILENAME_EVENTS_XML)).exists());
+		assertFalse(new File(controler.getControlerIO().getIterationFilename(1, Controler.FILENAME_EVENTS_XML)).exists());
 	}
 
 	/**
@@ -451,8 +453,8 @@ public class ControlerTest {
 		controler.setDumpDataAtEnd(false);
 		controler.run();
 
-		assertTrue(new File(controler.getControlerIO().getIterationFilename(0, Controler.FILENAME_EVENTS_TXT)).exists());
-		assertTrue(new File(controler.getControlerIO().getIterationFilename(1, Controler.FILENAME_EVENTS_TXT)).exists());
+		assertTrue(new File(controler.getControlerIO().getIterationFilename(0, Controler.FILENAME_EVENTS_XML)).exists());
+		assertTrue(new File(controler.getControlerIO().getIterationFilename(1, Controler.FILENAME_EVENTS_XML)).exists());
 	}
 
 	/**

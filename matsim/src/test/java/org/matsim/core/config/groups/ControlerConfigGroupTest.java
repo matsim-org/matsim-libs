@@ -42,8 +42,8 @@ public class ControlerConfigGroupTest {
 		// test initial value
 		formats = cg.getEventsFileFormats();
 		Assert.assertEquals(1, formats.size());
-		Assert.assertTrue(formats.contains(EventsFileFormat.txt));
-		Assert.assertEquals("txt", cg.getValue(ControlerConfigGroup.EVENTS_FILE_FORMAT));
+		Assert.assertTrue(formats.contains(EventsFileFormat.xml));
+		Assert.assertEquals("xml", cg.getValue(ControlerConfigGroup.EVENTS_FILE_FORMAT));
 		// test setting with setEventsFileFormat
 		cg.setEventsFileFormats(EnumSet.of(EventsFileFormat.txt, EventsFileFormat.xml));
 		formats = cg.getEventsFileFormats();

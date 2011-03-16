@@ -59,9 +59,9 @@ public class ControlerConfigGroup extends Module {
 
 	private String runId = null;
 
-	private Set<EventsFileFormat> eventsFileFormats = Collections.unmodifiableSet(EnumSet.of(EventsFileFormat.txt));
+	private Set<EventsFileFormat> eventsFileFormats = Collections.unmodifiableSet(EnumSet.of(EventsFileFormat.xml));
 
-	private int writeEventsInterval=1;
+	private int writeEventsInterval=10;
 	private int writePlansInterval=10;
 
 	private String mobsim = null;
