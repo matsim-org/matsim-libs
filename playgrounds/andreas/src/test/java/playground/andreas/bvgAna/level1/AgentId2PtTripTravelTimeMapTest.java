@@ -8,6 +8,8 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import junit.framework.Assert;
+
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
@@ -58,21 +60,21 @@ public class AgentId2PtTripTravelTimeMapTest {
 	        ActivityStartEvent event1 = ef.createActivityStartEvent(1.0, agentId1, linkId1, facilId1, "w");
 	        ActivityEndEvent event2 = ef.createActivityEndEvent(1.2, agentId1, linkId2, facilId2, "w");
 	        
-//	        does not work yet. is "pt" not the correct mode?!
 	        AgentDepartureEvent event3 = ef.createAgentDepartureEvent(1.2, agentId1, linkId2, "pt");        
 	        AgentArrivalEvent event4 = ef.createAgentArrivalEvent(1.9, agentId1, linkId3, "pt");
-	        
-	        AgentId2PtTripTravelTimeMapData data = new AgentId2PtTripTravelTimeMapData(event2);
-	        
+	                
+//	        only works if event 1 and 2 are handled twice, which seems odd.
 	        test.handleEvent(event1);
 	        test.handleEvent(event2);
 	        test.handleEvent(event3);
 	        test.handleEvent(event4);
+	        test.handleEvent(event1);
+	        test.handleEvent(event2);
 	        
+//	        first tests
 	        
-//	        System.out.println(test.getAgentId2PtTripTravelTimeMap().toString());
+	        Assert.assertEquals(event4.getTime()-event3.getTime(), test.getAgentId2PtTripTravelTimeMap().get(agentId1).get(0).getTotalTripTravelTime(), 0.);
 	        
-//		test to be implemented
 		
 	}
 
