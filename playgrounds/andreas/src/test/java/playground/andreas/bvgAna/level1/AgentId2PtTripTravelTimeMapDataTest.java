@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
@@ -44,10 +45,10 @@ public class AgentId2PtTripTravelTimeMapDataTest {
 		
 		test.handle(event3);
 		test.handle(event4);
-		
-		System.out.println(test.getTotalTripTravelTime());
-		
-//		test to be implemented
+				
+//		test 
+				
+		Assert.assertEquals(event4.getTime()-event3.getTime(), test.getTotalTripTravelTime(), 0.);
 		
 		
 	}
