@@ -27,6 +27,7 @@ import java.util.Stack;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
@@ -46,7 +47,7 @@ public class NetworkReaderMatsimV1 extends MatsimXmlParser {
 	private final static String NODE = "node";
 	private final static String LINK = "link";
 
-	private final NetworkImpl network;
+	private final Network network;
 	private final Scenario scenario;
 
 	private final static Logger log = Logger.getLogger(NetworkReaderMatsimV1.class);
@@ -54,7 +55,7 @@ public class NetworkReaderMatsimV1 extends MatsimXmlParser {
 	public NetworkReaderMatsimV1(final Scenario scenario) {
 		super();
 		this.scenario = scenario;
-		this.network = (NetworkImpl) scenario.getNetwork();
+		this.network = scenario.getNetwork();
 	}
 
 	@Override
@@ -76,65 +77,78 @@ public class NetworkReaderMatsimV1 extends MatsimXmlParser {
 	}
 
 	private void startNetwork(final Attributes atts) {
-		this.network.setName(atts.getValue("name"));
 		if (atts.getValue("type") != null) {
 			log.info("Attribute 'type' is deprecated. There's always only ONE network, where the links and nodes define, which transportation mode is allowed to use it (for the future)");
 		}
-		if (atts.getValue("capDivider") != null) {
-			log.warn("capDivider defined. it will be used but should be gone somewhen");
-			String capperiod = atts.getValue("capDivider") + ":00:00";
-			this.network.setCapacityPeriod(Time.parseTime(capperiod));
+		if (this.network instanceof NetworkImpl) {
+			((NetworkImpl) this.network).setName(atts.getValue("name"));
+			if (atts.getValue("capDivider") != null) {
+				log.warn("capDivider defined. it will be used but should be gone somewhen");
+				String capperiod = atts.getValue("capDivider") + ":00:00";
+				((NetworkImpl) this.network).setCapacityPeriod(Time.parseTime(capperiod));
+			}
 		}
 	}
 
 	private void startLinks(final Attributes atts) {
 		double capacityPeriod = 3600.0; //the default of one hour
-		String capperiod = atts.getValue("capperiod");
-		if (capperiod != null) {
-			capacityPeriod = Time.parseTime(capperiod);
-		}
-		else {
-			log.warn("capperiod was not defined. Using default value of " + Time.writeTime(capacityPeriod) + ".");
-		}
-		this.network.setCapacityPeriod(capacityPeriod);
+		if (this.network instanceof NetworkImpl) {
+			String capperiod = atts.getValue("capperiod");
+			if (capperiod != null) {
+				capacityPeriod = Time.parseTime(capperiod);
+			}
+			else {
+				log.warn("capperiod was not defined. Using default value of " + Time.writeTime(capacityPeriod) + ".");
+			}
+			((NetworkImpl) this.network).setCapacityPeriod(capacityPeriod);
 
-		String effectivecellsize = atts.getValue("effectivecellsize");
-		if (effectivecellsize == null){
-			this.network.setEffectiveCellSize(7.5); // we use a default cell size of 7.5 meters
-		} else {
-			this.network.setEffectiveCellSize(Double.parseDouble(effectivecellsize));
-		}
+			String effectivecellsize = atts.getValue("effectivecellsize");
+			if (effectivecellsize == null){
+				((NetworkImpl) this.network).setEffectiveCellSize(7.5); // we use a default cell size of 7.5 meters
+			} else {
+				((NetworkImpl) this.network).setEffectiveCellSize(Double.parseDouble(effectivecellsize));
+			}
 
-		String effectivelanewidth = atts.getValue("effectivelanewidth");
-		if (effectivelanewidth == null) {
-			this.network.setEffectiveLaneWidth(3.75); // the default lane width is 3.75
-		} else {
-			this.network.setEffectiveLaneWidth(Double.parseDouble(effectivelanewidth));
-		}
+			String effectivelanewidth = atts.getValue("effectivelanewidth");
+			if (effectivelanewidth == null) {
+				((NetworkImpl) this.network).setEffectiveLaneWidth(3.75); // the default lane width is 3.75
+			} else {
+				((NetworkImpl) this.network).setEffectiveLaneWidth(Double.parseDouble(effectivelanewidth));
+			}
 
-		if ((atts.getValue("capPeriod") != null) || (atts.getValue("capDivider") != null) || (atts.getValue("capdivider") != null)) {
-			log.warn("Found capPeriod, capDivider and/or capdivider in the links element.  They will be ignored, since they should be set in the network element.");
+			if ((atts.getValue("capPeriod") != null) || (atts.getValue("capDivider") != null) || (atts.getValue("capdivider") != null)) {
+				log.warn("Found capPeriod, capDivider and/or capdivider in the links element.  They will be ignored, since they should be set in the network element.");
+			}
 		}
 	}
 
 	private void startNode(final Attributes atts) {
 		Node node = this.network.getFactory().createNode(this.scenario.createId(atts.getValue("id")), new CoordImpl(atts.getValue("x"), atts.getValue("y")));
 		this.network.addNode(node);
-		((NodeImpl) node).setType(atts.getValue("type"));
-		if (atts.getValue("origid") != null) {
-			((NodeImpl) node).setOrigId(atts.getValue("origid"));
+		if (node instanceof NodeImpl) {
+			((NodeImpl) node).setType(atts.getValue("type"));
+			if (atts.getValue("origid") != null) {
+				((NodeImpl) node).setOrigId(atts.getValue("origid"));
+			}
 		}
 	}
 
 	private void startLink(final Attributes atts) {
-		Link l = this.network.getFactory().createLink(this.scenario.createId(atts.getValue("id")), this.scenario.createId(atts.getValue("from")), this.scenario.createId(atts.getValue("to")));
+		Node fromNode = this.network.getNodes().get(this.scenario.createId(atts.getValue("from")));
+		Node toNode = this.network.getNodes().get(this.scenario.createId(atts.getValue("to")));
+		if (fromNode == null || toNode == null) {
+			System.out.println("breakpoint");
+		}
+		Link l = this.network.getFactory().createLink(this.scenario.createId(atts.getValue("id")), fromNode, toNode);
 		l.setLength(Double.parseDouble(atts.getValue("length")));
 		l.setFreespeed(Double.parseDouble(atts.getValue("freespeed")));
 		l.setCapacity(Double.parseDouble(atts.getValue("capacity")));
 		l.setNumberOfLanes(Double.parseDouble(atts.getValue("permlanes")));
 		this.network.addLink(l);
-		((LinkImpl) l).setOrigId(atts.getValue("origid"));
-		((LinkImpl) l).setType(atts.getValue("type"));
+		if (l instanceof LinkImpl) {
+			((LinkImpl) l).setOrigId(atts.getValue("origid"));
+			((LinkImpl) l).setType(atts.getValue("type"));
+		}
 		if (atts.getValue("modes") != null) {
 			String[] strModes = StringUtils.explode(atts.getValue("modes"), ',');
 			if ((strModes.length == 1) && strModes[0].equals("")) {

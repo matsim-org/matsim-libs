@@ -28,9 +28,9 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Stack;
-import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -40,6 +40,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.MatsimSomeReader;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
@@ -99,7 +100,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 	private final Set<String> unknownLanesTags = new HashSet<String>();
 	private long id = 0;
 	private final Map<String, OsmHighwayDefaults> highwayDefaults = new HashMap<String, OsmHighwayDefaults>();
-	private final NetworkImpl network;
+	private final Network network;
 	/*package*/ final CoordinateTransformation transform;
 	private boolean keepPaths = false;
 	private boolean scaleMaxSpeed = false;
@@ -125,8 +126,8 @@ public class OsmNetworkReader implements MatsimSomeReader {
 	 * @param transformation A coordinate transformation to be used. OSM-data comes as WGS84, which is often not optimal for MATSim.
 	 * @param useHighwayDefaults Highway defaults are set to standard values, if true.
 	 */
-	public OsmNetworkReader(final Network network, final CoordinateTransformation transformation, boolean useHighwayDefaults) {
-		this.network = (NetworkImpl) network;
+	public OsmNetworkReader(final Network network, final CoordinateTransformation transformation, final boolean useHighwayDefaults) {
+		this.network = network;
 		this.transform = transformation;
 
 		if (useHighwayDefaults) {
@@ -303,9 +304,11 @@ public class OsmNetworkReader implements MatsimSomeReader {
 	}
 
 	private void convert() {
-		this.network.setCapacityPeriod(3600);
+		if (this.network instanceof NetworkImpl) {
+			((NetworkImpl) this.network).setCapacityPeriod(3600);
+		}
 
-		Iterator<Entry<String, OsmWay>> it = ways.entrySet().iterator();
+		Iterator<Entry<String, OsmWay>> it = this.ways.entrySet().iterator();
 		while (it.hasNext()) {
 			Entry<String, OsmWay> entry = it.next();
 			for (String nodeId : entry.getValue().nodes) {
@@ -388,7 +391,8 @@ public class OsmNetworkReader implements MatsimSomeReader {
 		// create the required nodes
 		for (OsmNode node : this.nodes.values()) {
 			if (node.used) {
-				this.network.createAndAddNode(node.id, node.coord);
+				Node nn = this.network.getFactory().createNode(node.id, node.coord);
+				this.network.addNode(nn);
 			}
 		}
 
@@ -407,7 +411,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 							length += CoordUtils.calcDistance(lastToNode.coord, toNode.coord);
 							if (toNode.used) {
 
-								if(this.hierarchyLayers.isEmpty()){
+								if(this.hierarchyLayers.isEmpty()) {
 									createLink(this.network, way, fromNode, toNode, length);
 								} else {
 									for (OsmFilter osmFilter : this.hierarchyLayers) {
@@ -437,7 +441,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 		this.ways.clear();
 	}
 
-	private void createLink(final NetworkImpl network, final OsmWay way, final OsmNode fromNode, final OsmNode toNode, final double length) {
+	private void createLink(final Network network, final OsmWay way, final OsmNode fromNode, final OsmNode toNode, final double length) {
 		String highway = way.tags.get(TAG_HIGHWAY);
 
 		// load defaults
@@ -531,13 +535,27 @@ public class OsmNetworkReader implements MatsimSomeReader {
 		if(network.getNodes().get(fromNode.id) != null && network.getNodes().get(toNode.id) != null){
 
 			if (!onewayReverse) {
-				Link l = network.createAndAddLink(new IdImpl(this.id), network.getNodes().get(fromNode.id), network.getNodes().get(toNode.id), length, freespeed, capacity, nofLanes);
-				((LinkImpl) l).setOrigId(origId);
+				Link l = network.getFactory().createLink(new IdImpl(this.id), network.getNodes().get(fromNode.id), network.getNodes().get(toNode.id));
+				l.setLength(length);
+				l.setFreespeed(freespeed);
+				l.setCapacity(capacity);
+				l.setNumberOfLanes(nofLanes);
+				if (l instanceof LinkImpl) {
+					((LinkImpl) l).setOrigId(origId);
+				}
+				network.addLink(l);
 				this.id++;
 			}
 			if (!oneway) {
-				Link l = network.createAndAddLink(new IdImpl(this.id), network.getNodes().get(toNode.id), network.getNodes().get(fromNode.id), length, freespeed, capacity, nofLanes);
-				((LinkImpl) l).setOrigId(origId);
+				Link l = network.getFactory().createLink(new IdImpl(this.id), network.getNodes().get(toNode.id), network.getNodes().get(fromNode.id));
+				l.setLength(length);
+				l.setFreespeed(freespeed);
+				l.setCapacity(capacity);
+				l.setNumberOfLanes(nofLanes);
+				if (l instanceof LinkImpl) {
+					((LinkImpl) l).setOrigId(origId);
+				}
+				network.addLink(l);
 				this.id++;
 			}
 
@@ -685,19 +703,19 @@ public class OsmNetworkReader implements MatsimSomeReader {
 		public void endTag(final String name, final String content, final Stack<String> context) {
 			if ("way".equals(name)) {
 				boolean used = false;
-				OsmHighwayDefaults osmHighwayDefaults = highwayDefaults.get(this.currentWay.tags.get(TAG_HIGHWAY));
+				OsmHighwayDefaults osmHighwayDefaults = OsmNetworkReader.this.highwayDefaults.get(this.currentWay.tags.get(TAG_HIGHWAY));
 				if (osmHighwayDefaults != null) {
 					int hierarchy = osmHighwayDefaults.hierarchy;
 					this.currentWay.hierarchy = hierarchy;
-					if (hierarchyLayers.isEmpty()) {
+					if (OsmNetworkReader.this.hierarchyLayers.isEmpty()) {
 						used = true;
 					}
 					if (this.collectNodes) {
 						used = true;
 					} else {
-						for (OsmFilter osmFilter : hierarchyLayers) {
+						for (OsmFilter osmFilter : OsmNetworkReader.this.hierarchyLayers) {
 							for (String nodeId : this.currentWay.nodes) {
-								OsmNode node = nodes.get(nodeId);
+								OsmNode node = this.nodes.get(nodeId);
 								if(node != null && osmFilter.coordInFilter(node.coord, this.currentWay.hierarchy)){
 									used = true;
 									break;

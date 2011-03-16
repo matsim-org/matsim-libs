@@ -74,7 +74,9 @@ public class MatsimNetworkReader extends MatsimXmlParser implements MatsimSomeRe
 	public void readFile(final String filename) {
 		try {
 			parse(filename);
-			((NetworkImpl) scenario.getNetwork()).connect();
+			if (this.scenario.getNetwork() instanceof NetworkImpl) {
+				((NetworkImpl) this.scenario.getNetwork()).connect();
+			}
 		} catch (SAXException e) {
 			throw new RuntimeException(e);
 		} catch (ParserConfigurationException e) {

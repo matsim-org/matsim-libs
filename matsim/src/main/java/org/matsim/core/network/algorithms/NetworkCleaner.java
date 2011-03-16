@@ -29,10 +29,10 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.NetworkRunnable;
-import org.matsim.core.network.NodeImpl;
 
 /**
  * Ensures that each link in the network can be reached by any other link.
@@ -77,7 +77,8 @@ public class NetworkCleaner implements NetworkRunnable {
 		while (pendingForward.size() > 0) {
 			int idx = pendingForward.size() - 1;
 			Node currNode = pendingForward.remove(idx); // get the last element to prevent object shifting in the array
-			for (Node node : ((NodeImpl) currNode).getOutNodes().values()) {
+			for (Link link : currNode.getOutLinks().values()) {
+				Node node = link.getToNode();
 				r = getDoubleFlag(node, nodeRoles);
 				if (!r.forwardFlag) {
 					r.forwardFlag = true;
@@ -90,7 +91,8 @@ public class NetworkCleaner implements NetworkRunnable {
 		while (pendingBackward.size() > 0) {
 			int idx = pendingBackward.size()-1;
 			Node currNode = pendingBackward.remove(idx); // get the last element to prevent object shifting in the array
-			for (Node node : ((NodeImpl) currNode).getInNodes().values()) {
+			for (Link link : currNode.getInLinks().values()) {
+				Node node = link.getFromNode();
 				r = getDoubleFlag(node, nodeRoles);
 				if (!r.backwardFlag) {
 					r.backwardFlag = true;
