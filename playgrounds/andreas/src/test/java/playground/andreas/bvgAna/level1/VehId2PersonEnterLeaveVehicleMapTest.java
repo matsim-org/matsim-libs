@@ -68,17 +68,25 @@ public class VehId2PersonEnterLeaveVehicleMapTest {
 	    enter.get(event1.getVehicleId()).add(event1);
 	    enter.get(event2.getVehicleId()).add(event2);
 	    
-	    leave.put(event1.getVehicleId(), new ArrayList<PersonLeavesVehicleEvent>());
-	    leave.get(event1.getVehicleId()).add(event3);
-	    leave.get(event2.getVehicleId()).add(event4);
+	    leave.put(event3.getVehicleId(), new ArrayList<PersonLeavesVehicleEvent>());
+	    leave.get(event3.getVehicleId()).add(event3);
+	    leave.get(event4.getVehicleId()).add(event4);
 	    
 //	    test
 	    	    
-	    Assert.assertEquals(enter.get(vehId1).get(0), test.getVehId2PersonEnterEventMap().get(vehId1).get(0));
-	    Assert.assertEquals(enter.get(vehId1).get(1), test.getVehId2PersonEnterEventMap().get(vehId1).get(1));
+//	    Assert.assertEquals(enter.get(vehId1).get(0), test.getVehId2PersonEnterEventMap().get(vehId1).get(0));
+	    Assert.assertEquals(event1.getTime(), test.getVehId2PersonEnterEventMap().get(vehId1).get(0).getTime(), 0.);
 	    
-	    Assert.assertEquals(leave.get(vehId1).get(0), test.getVehId2PersonLeaveEventMap().get(vehId2).get(0));
-	    Assert.assertEquals(leave.get(vehId1).get(1), test.getVehId2PersonLeaveEventMap().get(vehId2).get(1));
+//	    Assert.assertEquals(enter.get(vehId1).get(1), test.getVehId2PersonEnterEventMap().get(vehId1).get(1));
+	    Assert.assertEquals(event2.getTime(), test.getVehId2PersonEnterEventMap().get(vehId1).get(1).getTime(), 0.);
+
+	    
+//	    Assert.assertEquals(leave.get(vehId2).get(0), test.getVehId2PersonLeaveEventMap().get(vehId2).get(0));
+	    Assert.assertEquals(event3.getTime(), test.getVehId2PersonLeaveEventMap().get(vehId2).get(0).getTime(), 0.);
+
+//	    Assert.assertEquals(leave.get(vehId2).get(1), test.getVehId2PersonLeaveEventMap().get(vehId2).get(1));
+	    Assert.assertEquals(event4.getTime(), test.getVehId2PersonLeaveEventMap().get(vehId2).get(1).getTime(), 0.);
+
 	    
 		
 	}
