@@ -49,28 +49,37 @@ public class LinkFilter {
 	
 	Network getRelevantNetwork(Set<Feature> featuresInShape) {
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		NetworkImpl filteredNetwork = scenario.getNetwork();
+		Network filteredNetwork = scenario.getNetwork();
 		
 			
 		for (Node node : network.getNodes().values()) {
 
 			if (isNodeInShape(node, featuresInShape)) {
-				Node fromtonode = filteredNetwork.createAndAddNode(node.getId(), node.getCoord());
-				
+//				Node fromtonode = filteredNetwork.createAndAddNode(node.getId(), node.getCoord());
+				Node fromtonode = filteredNetwork.getFactory().createNode(node.getId(),node.getCoord());
+				filteredNetwork.addNode(fromtonode);
 //				if (this.nodeCollector.containsKey(node.getId()== null)){
-				this.nodeCollector.put(node.getId(), fromtonode);
+//				this.nodeCollector.put(node.getId(), fromtonode);
 //				}else {this.nodeCollector.put(node.getId(), fromtonode);}
 				}}
-		System.out.print(nodeCollector);
+//		System.out.print(nodeCollector);
 	 
 		for(Link link : network.getLinks().values()){
 		
-			if (getNodeCollector().containsKey(link.getFromNode().getId()) && getNodeCollector().containsKey(link.getToNode().getId()) 
-				&&	link.getFromNode().getOutLinks().containsKey(link.getId())==false )
+			if (filteredNetwork.getNodes().containsKey(link.getFromNode().getId()) && filteredNetwork.getNodes().containsKey(link.getToNode().getId())){
+				System.out.println("first if true");
+				if(!filteredNetwork.getNodes().values().contains(link.getFromNode()) || !filteredNetwork.getNodes().values().contains(link.getToNode())){
+					System.out.println("second if true");
 
-				filteredNetwork.createAndAddLink(link.getId(), link.getFromNode(), link.getToNode(), 0.0,0.0,0.0,0.0);		
+				Link onelink = filteredNetwork.getFactory().createLink(link.getId(), link.getFromNode(), link.getToNode());
+				filteredNetwork.addLink(onelink);}
+//			if (getNodeCollector().containsKey(link.getFromNode().getId()) && getNodeCollector().containsKey(link.getToNode().getId()) 
+//				&&	link.getFromNode().getOutLinks().containsKey(link.getId())==false )
+
+//				filteredNetwork.createAndAddLink(link.getId(), link.getFromNode(), link.getToNode(), 0.0,0.0,0.0,0.0);		
 //						}
-		}
+	}
+				}
 		System.out.println("Result "+ filteredNetwork +"         " +filteredNetwork.getLinks());
 		
 		return filteredNetwork;	
