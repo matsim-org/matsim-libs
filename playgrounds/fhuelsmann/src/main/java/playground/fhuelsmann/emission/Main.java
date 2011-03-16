@@ -56,7 +56,7 @@ public class Main {
 	//	private static String plansFile = runDirectory + "output_plans.xml.gz";
 
 	private static String visum2hbefaRoadTypeFile = "../../detailedEval/testRuns/input/inputEmissions/road_types.txt";
-	private static String hbefaDieselEmissionFactorsFile = "../../detailedEval/testRuns/input/inputEmissions/hbefa_emission_factors_urban_rural_MW.txt";
+	private static String hbefaAverageFleetEmissionFactorsFile = "../../detailedEval/testRuns/input/inputEmissions/hbefa_emission_factors_urban_rural_MW.txt";
 	private static String hbefaColdEmissionFactorsFile = "../../detailedEval/testRuns/input/inputEmissions/hbefa_coldstart_emission_factors.txt";
 
 	private static String shapeDirectory = "../../detailedEval/Net/shapeFromVISUM/urbanSuburban/";
@@ -88,7 +88,7 @@ public class Main {
 
 		// ?? was passiert hier ??
 		HbefaTable hbefaTable = new HbefaTable();
-		hbefaTable.makeHbefaTable(hbefaDieselEmissionFactorsFile);
+		hbefaTable.makeHbefaTable(hbefaAverageFleetEmissionFactorsFile);
 		
 		HbefaColdTable hbefaColdTable = new HbefaColdTable();
 		hbefaColdTable.makeHbefaColdTable(hbefaColdEmissionFactorsFile);
