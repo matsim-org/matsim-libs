@@ -57,7 +57,6 @@ import org.matsim.locationchoice.utils.QuadTreeRing;
 public class LocationMutatorBestResponse extends LocationMutatorwChoiceSet {
 	private HashSet<String> flexibleTypes = new HashSet<String>();
 	private ActivityFacilitiesImpl facilities;
-	private Plan bestPlan;
 	private Network network;
 			
 	public LocationMutatorBestResponse(final Network network, Controler controler, Knowledges kn,
@@ -73,18 +72,20 @@ public class LocationMutatorBestResponse extends LocationMutatorwChoiceSet {
 		
 		// if person is not in the analysis population
 		if (Integer.parseInt(plan.getPerson().getId().toString()) > 1000000000) return;
-		
+				
 		this.initFlexibleTypes(this.controler.getConfig().locationchoice());
 		super.resetRoutes(plan);
-		this.bestPlan = new PlanImpl();	
-		// make sure there is a valid plan in bestPlan
-		((PlanImpl)this.bestPlan).copyPlan(plan);
 		
-		this.handleActivities(plan);
+		// best plan shall not be a member of the class!
+		Plan bestPlan = new PlanImpl();	
+		// make sure there is a valid plan in bestPlan
+		((PlanImpl)bestPlan).copyPlan(plan);
+		
+		this.handleActivities(plan, bestPlan);
 		
 		// copy the best plan into replanned plan
 		// making a deep copy
-		this.copyPlanFields((PlanImpl)plan, (PlanImpl)this.bestPlan);
+		this.copyPlanFields((PlanImpl)plan, (PlanImpl)bestPlan);
 		//r.f.?
 		super.resetRoutes(plan);
 	}
@@ -126,7 +127,7 @@ public class LocationMutatorBestResponse extends LocationMutatorwChoiceSet {
 		}
 	}
 	
-	private void handleActivities(Plan plan) {	
+	private void handleActivities(Plan plan, Plan bestPlan) {	
 		int actlegIndex = -1;
 		for (PlanElement pe : plan.getPlanElements()) {
 			actlegIndex++;
@@ -174,14 +175,14 @@ public class LocationMutatorBestResponse extends LocationMutatorwChoiceSet {
 								cs.getWeightedRandomChoice(actlegIndex, plan.getPerson(),
 										actPre.getCoord(), actPost.getCoord(), this.facilities, this.random,
 										scorer, plan, travelTime, travelCost));						
-						this.evaluatePlan(plan, cs, true);
+						this.evaluatePlan(plan, bestPlan, cs, true);
 					}
 					else {
 						cs.shuffle(this.random);
 						int cnt = 0;
 						while (cs.hasUnvisited() && cnt < cs.getNumberOfDestinations() * 0.5) {
 							this.setLocation((ActivityImpl)actToMove, cs.visitNext());
-							this.evaluatePlan(plan, cs, false);
+							this.evaluatePlan(plan, bestPlan, cs, false);
 							cnt++;
 						}
 					}
@@ -206,24 +207,18 @@ public class LocationMutatorBestResponse extends LocationMutatorwChoiceSet {
 		}
 	}
 	
-	private void evaluatePlan(Plan plan, ChoiceSet cs, boolean adapt) {		
+	private void evaluatePlan(Plan plan, Plan bestPlan, ChoiceSet cs, boolean adapt) {		
 		double score = this.computeScore(plan, cs, adapt);	
-		if (score > this.bestPlan.getScore() + 0.0000000000001) {
+		if (score > bestPlan.getScore() + 0.0000000000001) {
 			plan.setScore(score);
 			((PlanImpl)bestPlan).getPlanElements().clear();
-			((PlanImpl)this.bestPlan).copyPlan(plan);
+			((PlanImpl)bestPlan).copyPlan(plan);
 		}
 	}
 	
 	private double computeScore(Plan plan, ChoiceSet cs, boolean adapt) {
-		PlanImpl planTmp;
-		if (adapt) {
-		 planTmp = (PlanImpl) plan;	
-		}
-		else {
-			planTmp = new PlanImpl();
-			planTmp.copyPlan(plan);
-		}		
+		PlanImpl planTmp = new PlanImpl();
+		planTmp.copyPlan(plan);		
 		ScoringFunctionAccumulator scoringFunction = 
 			(ScoringFunctionAccumulator) this.controler.getPlansScoring().getPlanScorer().getScoringFunctionForAgent(plan.getPerson().getId());		
 		scoringFunction.reset();
@@ -234,7 +229,11 @@ public class LocationMutatorBestResponse extends LocationMutatorwChoiceSet {
 		}
 		scoringFunction.finish();
 		double score = scoringFunction.getScore();
-		scoringFunction.reset();		
+		scoringFunction.reset();
+		
+		if (adapt) {
+			this.copyPlanFields((PlanImpl)plan, (PlanImpl)planTmp);
+		}		
 		return score;
 	}
 	
