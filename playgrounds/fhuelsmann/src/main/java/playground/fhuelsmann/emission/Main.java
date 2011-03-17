@@ -149,7 +149,7 @@ public class Main {
 		List<Double> emissionType2AvgEmissionsAltstadtArea = calculateAvgEmissionsPerTypeAndArea(altstadtPop, personId2emissionsInGrammPerType,coldEmissionsPerson);
 		List<Double> emissionType2AvgEmissionsAubingArea = calculateAvgEmissionsPerTypeAndArea(aubingPop, personId2emissionsInGrammPerType,coldEmissionsPerson);
 
-		System.out.println(emissionType2AvgEmissionsUrbanArea);
+		System.out.println("PersonbasedEmissions" +emissionType2AvgEmissionsUrbanArea);
 		System.out.println(emissionType2AvgEmissionsSuburbanArea);
 		System.out.println(emissionType2AvgEmissionsAltstadtArea);
 		System.out.println(emissionType2AvgEmissionsAubingArea);
@@ -159,13 +159,21 @@ public class Main {
 		Network urbanNetwork = linkfilter.getRelevantNetwork(urbanShapeLink);
 		Set<Feature> suburbanShapeLink = linkfilter.readShape(suburbanShapeFile);
 		Network suburbanNetwork = linkfilter.getRelevantNetwork(suburbanShapeLink);
+		Set<Feature> altstadtShapeLink = linkfilter.readShape(altstadtShapeFile);
+		Network alstadtNetwork = linkfilter.getRelevantNetwork(altstadtShapeLink);
+		Set<Feature> aubingShapeLink = linkfilter.readShape(aubingShapeFile);
+		Network aubingNetwork = linkfilter.getRelevantNetwork(aubingShapeLink);
 		
 		
 		List<Double> emissionType2AvgEmissionsUrbanAreaLink = calculateAvgEmissionsPerTypeAndAreaLink(urbanNetwork, linkId2emissionsInGrammPerType);
 		List<Double> emissionType2AvgEmissionsSuburbanAreaLink = calculateAvgEmissionsPerTypeAndAreaLink(suburbanNetwork, linkId2emissionsInGrammPerType);
+		List<Double> emissionType2AvgEmissionsaltstadtNetwork = calculateAvgEmissionsPerTypeAndAreaLink(alstadtNetwork, linkId2emissionsInGrammPerType);
+		List<Double> emissionType2AvgEmissionsAubingNetwork = calculateAvgEmissionsPerTypeAndAreaLink(aubingNetwork, linkId2emissionsInGrammPerType);
 		
-		System.out.println("+++++++++++++++++++++++++++++++++++"+emissionType2AvgEmissionsUrbanAreaLink);
+		System.out.println("LinkbasedEmissions"+emissionType2AvgEmissionsUrbanAreaLink);
 		System.out.println(emissionType2AvgEmissionsSuburbanAreaLink);
+		System.out.println("Alstadt " + emissionType2AvgEmissionsaltstadtNetwork);
+		System.out.println("Aubing " +emissionType2AvgEmissionsAubingNetwork);
 	}
 	
 	private List<Double> calculateAvgEmissionsPerTypeAndAreaLink(Network network, Map<Id, double[]> linkId2emissionsInGrammPerType) {
