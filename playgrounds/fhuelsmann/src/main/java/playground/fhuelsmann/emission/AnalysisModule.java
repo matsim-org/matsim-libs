@@ -22,6 +22,8 @@ package playground.fhuelsmann.emission;
 
 import org.matsim.api.core.v01.Id;
 
+import playground.fhuelsmann.emission.objects.HbefaObject;
+
 
 public interface AnalysisModule {
 	

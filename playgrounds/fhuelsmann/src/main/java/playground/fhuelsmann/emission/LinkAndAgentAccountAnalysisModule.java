@@ -32,6 +32,9 @@ import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Id;
 
+import playground.fhuelsmann.emission.objects.HbefaObject;
+import playground.fhuelsmann.emission.objects.VisumObject;
+
 public class LinkAndAgentAccountAnalysisModule implements AnalysisModule{
 
 	private VisumObject[] roadTypes = null;

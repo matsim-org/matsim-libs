@@ -50,7 +50,7 @@ public class LinkFilter {
 	Network getRelevantNetwork(Set<Feature> featuresInShape) {
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network filteredNetwork = scenario.getNetwork();
-		
+//		NetworkImpl filteredNetwork = scenario.getNetwork();
 			
 		for (Node node : network.getNodes().values()) {
 
@@ -66,20 +66,14 @@ public class LinkFilter {
 	 
 		for(Link link : network.getLinks().values()){
 		
-			if (filteredNetwork.getNodes().containsKey(link.getFromNode().getId()) && filteredNetwork.getNodes().containsKey(link.getToNode().getId())){
-				System.out.println("first if true");
-				if(!filteredNetwork.getNodes().values().contains(link.getFromNode()) || !filteredNetwork.getNodes().values().contains(link.getToNode())){
-					System.out.println("second if true");
+			if (filteredNetwork.getNodes().containsKey(link.getFromNode().getId()) && filteredNetwork.getNodes().containsKey(link.getToNode().getId())
+					&& !filteredNetwork.getLinks().containsKey(link.getId())){
 
-				Link onelink = filteredNetwork.getFactory().createLink(link.getId(), link.getFromNode(), link.getToNode());
-				filteredNetwork.addLink(onelink);}
-//			if (getNodeCollector().containsKey(link.getFromNode().getId()) && getNodeCollector().containsKey(link.getToNode().getId()) 
-//				&&	link.getFromNode().getOutLinks().containsKey(link.getId())==false )
-
-//				filteredNetwork.createAndAddLink(link.getId(), link.getFromNode(), link.getToNode(), 0.0,0.0,0.0,0.0);		
-//						}
-	}
-				}
+				Link onelink = filteredNetwork.getFactory().createLink(link.getId(), link.getFromNode().getId(), link.getToNode().getId());
+				filteredNetwork.addLink(onelink);
+				System.out.println("onelink " + onelink.getId());}
+		}	
+				
 		System.out.println("Result "+ filteredNetwork +"         " +filteredNetwork.getLinks());
 		
 		return filteredNetwork;	

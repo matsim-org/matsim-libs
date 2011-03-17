@@ -10,12 +10,14 @@ import java.util.Map.Entry;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.collections.Tuple;
 
+import playground.fhuelsmann.emission.objects.HbefaColdObject;
+
 public class ColdstartAnalyseModul implements AnalysisModuleCold{
 
 	
 	public Map<Id, Map<String,Double>> coldEmissionsPerson = new TreeMap<Id, Map<String,Double>>();
 	
-	public void calculateColdEmissionsPerLink(Id personId, double actDuration,double distance, HbefaColdTable hbefaColdTable) {
+	public void calculateColdEmissionsPerLink(Id personId, double actDuration,double distance, HbefaColdEmissionTable hbefaColdTable) {
 						
 
 			int dis=-1;

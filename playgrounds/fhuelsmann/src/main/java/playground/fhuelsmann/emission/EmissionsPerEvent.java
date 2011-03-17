@@ -29,6 +29,8 @@ import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Id;
 
+import playground.fhuelsmann.emission.objects.HbefaObject;
+
 
 public class EmissionsPerEvent {
 

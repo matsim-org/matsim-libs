@@ -28,6 +28,11 @@ import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Id;
 
+import playground.fhuelsmann.emission.objects.DistanceObject;
+import playground.fhuelsmann.emission.objects.HbefaColdObject;
+import playground.fhuelsmann.emission.objects.ObjectOfColdEF;
+import playground.fhuelsmann.emission.objects.ParkingTimeObject;
+
 
 public class ColdEmissionFactor {
 
@@ -76,7 +81,7 @@ public class ColdEmissionFactor {
 				double parkingTime = parkingTime_zeroCell.getTimedifference();
 
 				
-				String actitityInParking_time = parkingTime_zeroCell.activity;
+				String actitityInParking_time = parkingTime_zeroCell.getActivity();
 				String actitityInDistanceCold="NOT_FOUND";
 				
 				try{

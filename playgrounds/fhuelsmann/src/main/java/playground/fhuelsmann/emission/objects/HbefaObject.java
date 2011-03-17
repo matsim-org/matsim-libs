@@ -1,4 +1,4 @@
-package playground.fhuelsmann.emission;
+package playground.fhuelsmann.emission.objects;
 /* *********************************************************************** *
  * project: org.matsim.*
  * FhMain.java

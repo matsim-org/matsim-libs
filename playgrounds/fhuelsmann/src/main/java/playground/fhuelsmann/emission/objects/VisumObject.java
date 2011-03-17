@@ -1,7 +1,6 @@
-package playground.fhuelsmann.emission;
 /* *********************************************************************** *
  * project: org.matsim.*
- * FhMain.java
+ * FhEmissions.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,49 +16,47 @@ package playground.fhuelsmann.emission;
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
+ *                                                                         
  * *********************************************************************** */
+package playground.fhuelsmann.emission.objects;
+public class VisumObject {
 
-public class ObjectOfColdEF {
-
+	private int VISUM_RT_NR;
+	private String VISUM_RT_NAME;
+	private String HBEFA_RT_NR;
+	private String HBEFA_RT_NAME;
 	
-	private String parktinTime;
-	private String component;
-	private double distance;
-	private double coldEf;
-	public ObjectOfColdEF(String parktinTime, String component,
-			double distance, double coldEf) {
+	public int getVISUM_RT_NR() {
+		return VISUM_RT_NR;
+	}
+	public void setVISUM_RT_NR(int vISUM_RT_NR) {
+		VISUM_RT_NR = vISUM_RT_NR;
+	}
+	public String getVISUM_RT_NAME() {
+		return VISUM_RT_NAME;
+	}
+	public void setVISUM_RT_NAME(String vISUM_RT_NAME) {
+		VISUM_RT_NAME = vISUM_RT_NAME;
+	}
+	public String getHBEFA_RT_NR() {
+		return HBEFA_RT_NR;
+	}
+	public void setHBEFA_RT_NR(String hBEFA_RT_NR) {
+		HBEFA_RT_NR = hBEFA_RT_NR;
+	}
+	public String getHBEFA_RT_NAME() {
+		return HBEFA_RT_NAME;
+	}
+	public void setHBEFA_RT_NAME(String hBEFA_RT_NAME) {
+		HBEFA_RT_NAME = hBEFA_RT_NAME;
+	}
+	public VisumObject(int vISUM_RT_NR, String Hbefa_rt_nr) {
 		super();
-		this.parktinTime = parktinTime;
-		this.component = component;
-		this.distance = distance;
-		this.coldEf = coldEf;
+		VISUM_RT_NR = vISUM_RT_NR;
+		this.HBEFA_RT_NR = Hbefa_rt_nr;
+	
 	}
-	public ObjectOfColdEF() {
-		// TODO Auto-generated constructor stub
-	}
-	public String getParktinTime() {
-		return parktinTime;
-	}
-	public void setParktinTime(String parktinTime) {
-		this.parktinTime = parktinTime;
-	}
-	public String getComponent() {
-		return component;
-	}
-	public void setComponent(String component) {
-		this.component = component;
-	}
-	public double getDistance() {
-		return distance;
-	}
-	public void setDistance(double distance) {
-		this.distance = distance;
-	}
-	public double getColdEf() {
-		return coldEf;
-	}
-	public void setColdEf(double coldEf) {
-		this.coldEf = coldEf;
-	}
+	
+	
 	
 }

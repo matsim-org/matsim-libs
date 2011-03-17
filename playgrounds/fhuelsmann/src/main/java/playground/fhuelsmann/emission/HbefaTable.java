@@ -24,6 +24,8 @@ import java.io.DataInputStream;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 
+import playground.fhuelsmann.emission.objects.HbefaObject;
+
 
 public class HbefaTable {
 

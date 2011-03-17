@@ -55,10 +55,10 @@ ActivityEndEventHandler,ActivityStartEventHandler{
 
 
 	private Network network = null;
-	private HbefaColdTable hbefaColdTable = null;
+	private HbefaColdEmissionTable hbefaColdTable = null;
 	private AnalysisModuleCold coldstartAnalyseModul = null;
 
-	public TimeAndDistanceEventHandler(final Network network,HbefaColdTable hbefaTable,ColdstartAnalyseModul coldstartAnalyseModul ) {
+	public TimeAndDistanceEventHandler(final Network network,HbefaColdEmissionTable hbefaTable,ColdstartAnalyseModul coldstartAnalyseModul ) {
 		this.network = network;
 		this.hbefaColdTable = hbefaTable;
 		this.coldstartAnalyseModul = coldstartAnalyseModul;

@@ -1,4 +1,4 @@
-package playground.fhuelsmann.emission;
+package playground.fhuelsmann.emission.objects;
 
 import org.matsim.api.core.v01.Id;
 
