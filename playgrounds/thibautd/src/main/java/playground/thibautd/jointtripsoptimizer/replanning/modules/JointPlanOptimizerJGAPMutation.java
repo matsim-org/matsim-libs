@@ -20,9 +20,6 @@
 package playground.thibautd.jointtripsoptimizer.replanning.modules;
 
 import java.util.List;
-import java.util.Random;
-
-import org.apache.log4j.Logger;
 
 import org.jgap.Configuration;
 import org.jgap.Gene;
@@ -30,10 +27,8 @@ import org.jgap.GeneticOperator;
 import org.jgap.IChromosome;
 import org.jgap.impl.BooleanGene;
 import org.jgap.impl.DoubleGene;
-import org.jgap.InvalidConfigurationException;
 import org.jgap.Population;
-
-import org.matsim.core.gbl.MatsimRandom;
+import org.jgap.RandomGenerator;
 
 import playground.thibautd.jointtripsoptimizer.run.config.JointReplanningConfigGroup;
 
@@ -47,16 +42,16 @@ import playground.thibautd.jointtripsoptimizer.run.config.JointReplanningConfigG
  * @author thibautd
  */
 public class JointPlanOptimizerJGAPMutation implements GeneticOperator {
-	private static final Logger log =
-		Logger.getLogger(JointPlanOptimizerJGAPMutation.class);
-
 
 	private static final long serialVersionUID = 1L;
 
-	private final Double MUTATION_PROB;
+	private final double MUTATION_PROB;
 	private final int CHROMOSOME_SIZE;
 
-	private final Random randomGenerator;
+	private final int NUM_ITER;
+	private final double NON_UNIFORMITY_PARAM;
+
+	private final RandomGenerator randomGenerator;
 	private final Configuration jgapConfig;
 
 	public JointPlanOptimizerJGAPMutation(
@@ -65,10 +60,12 @@ public class JointPlanOptimizerJGAPMutation implements GeneticOperator {
 			int chromosomeSize) {
 		this.CHROMOSOME_SIZE = chromosomeSize;
 		this.MUTATION_PROB = configGroup.getMutationProbability();
+		this.NUM_ITER = configGroup.getMaxIterations();
+		this.NON_UNIFORMITY_PARAM = configGroup.getMutationNonUniformity();
 
 		this.jgapConfig = config;
 
-		this.randomGenerator = MatsimRandom.getLocalInstance();
+		this.randomGenerator = config.getRandomGenerator();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -77,68 +74,82 @@ public class JointPlanOptimizerJGAPMutation implements GeneticOperator {
 			final Population a_population,
 			final List a_candidateChromosome
 			) {
+		int populationSize = a_population.size();
 		Gene geneToMute;
-		Gene currentGene;
-		Gene mutatedGene;
-		int geneToMuteIndex;
-		Double freeSpace;
+		double freeSpace;
+		IChromosome currentChromosome;
+		IChromosome copyOfChromosome = null;
+		// no need to check cast (Chromosomes implement IChromosome)
 
-		log.debug("mutation operator called to operate");
+		for (int j=0; j < populationSize; j++) {
+			currentChromosome = a_population.getChromosome(j);
+			//for each gene in the chromosome:
+			for (int i=0; i < this.CHROMOSOME_SIZE; i++) {
+				if (this.randomGenerator.nextDouble() > this.MUTATION_PROB) {
+					//perform mutation
 
-		for (IChromosome currentChromosome : 
-				// no need to check cast (Chromosomes implement IChromosome)
-				(List<IChromosome>) a_population.getChromosomes()) {
-			if (this.randomGenerator.nextDouble() > this.MUTATION_PROB) {
-				//perform mutation
-				geneToMuteIndex = this.randomGenerator.nextInt(this.CHROMOSOME_SIZE);
-				geneToMute = currentChromosome.getGene(geneToMuteIndex);
-				mutatedGene = null;
-
-				if (geneToMute instanceof BooleanGene) {
-					mutatedGene = mutateBoolean((BooleanGene) geneToMute);
-				}
-				else if (geneToMute instanceof DoubleGene) {
-
-					freeSpace = ((DoubleGene) geneToMute).getUpperBound();
-					for (int i=0; i < this.CHROMOSOME_SIZE; i++) {
-						currentGene = currentChromosome.getGene(i);
-						if ((i!=geneToMuteIndex)&&
-								(currentGene instanceof DoubleGene)) {
-							freeSpace -= ((DoubleGene) currentGene).doubleValue();
-						}
+					// if not already done for this chromosome, make a copy of
+					// the current chromosome and add it to the candidates.
+					if (copyOfChromosome == null) {
+						copyOfChromosome = (IChromosome) currentChromosome.clone();
+						a_candidateChromosome.add(copyOfChromosome);
 					}
+					geneToMute = copyOfChromosome.getGene(i);
 
-					mutatedGene = mutateDouble((DoubleGene) geneToMute, freeSpace);
+					if (geneToMute instanceof BooleanGene) {
+						mutateBoolean((BooleanGene) geneToMute);
+					}
+					else if (geneToMute instanceof DoubleGene) {
+
+						freeSpace = getFreeSpace(
+								(DoubleGene) geneToMute,
+								currentChromosome);
+
+						mutateDouble((DoubleGene) geneToMute, freeSpace);
+					}
 				}
-				a_candidateChromosome.add(mutatedGene);
+			}
+			copyOfChromosome = null;
+		}
+	}
+
+	private final double getFreeSpace(
+			DoubleGene geneToMute,
+			IChromosome chromosome) {
+		double freeSpace = geneToMute.getUpperBound();
+
+		for (Gene gene : chromosome.getGenes()) {
+			if ((gene != geneToMute)&&(gene instanceof DoubleGene)) {
+				freeSpace -= ((DoubleGene) gene).doubleValue();
 			}
 		}
+
+		return freeSpace;
 	}
 
-	private Gene mutateBoolean(BooleanGene gene) {
-		Gene mutatedGene = null;
-
-		try {
-			 mutatedGene = new BooleanGene(this.jgapConfig, !gene.booleanValue());
-		} catch (InvalidConfigurationException e) {
-			e.printStackTrace();
-		}
-
-		return mutatedGene;
+	private final void mutateBoolean(BooleanGene gene) {
+		gene.setAllele(!gene.booleanValue());
 	}
 
-	private Gene mutateDouble(DoubleGene gene, Double freeSpace) {
-		// TODO
-		Gene mutatedGene = null;
+	private final void mutateDouble(DoubleGene gene, Double freeSpace) {
+		// GENOCOP (Michalewicz, Janikow, 1996) like "non uniform" mutation.
+		double value = gene.doubleValue();
+		int iter = this.jgapConfig.getGenerationNr();
 
-		try {
-			 mutatedGene = new DoubleGene(this.jgapConfig, gene.getLowerBound(),
-					 gene.getUpperBound());
-		} catch (InvalidConfigurationException e) {
-			e.printStackTrace();
+		if (this.randomGenerator.nextInt(2) == 0) {
+			value += delta(iter, gene.getUpperBound() - value);
+		} else {
+			value -= delta(iter, value - gene.getLowerBound());
 		}
 
-		return mutatedGene;
+		gene.setAllele(value);
+	}
+
+	private final double delta(int t, double y) {
+		double r = this.randomGenerator.nextDouble();
+		double exponant = Math.pow((1d - t/this.NUM_ITER), this.NON_UNIFORMITY_PARAM);
+
+		return (y * (1 - Math.pow(r, exponant)));
 	}
 }
 

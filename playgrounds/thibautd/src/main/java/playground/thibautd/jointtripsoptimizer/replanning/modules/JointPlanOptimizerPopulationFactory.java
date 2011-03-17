@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package playground.thibautd.jointtripsoptimizer.replanning.modules;
 
-import java.util.List;
 import java.util.Random;
 
 import org.apache.log4j.Logger;

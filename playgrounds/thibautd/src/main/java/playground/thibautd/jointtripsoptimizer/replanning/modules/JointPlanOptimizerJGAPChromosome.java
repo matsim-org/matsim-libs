@@ -25,6 +25,8 @@ import org.jgap.Gene;
 import org.jgap.InvalidConfigurationException;
 
 /**
+ * In prediction for the eventual need for a custom chromosome.
+ * Do not differ from org.jgap.Chromosome for the moment.
  * @author thibautd
  */
 public class JointPlanOptimizerJGAPChromosome extends Chromosome {

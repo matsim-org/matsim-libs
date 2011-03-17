@@ -118,6 +118,7 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 			this.setSampleChromosome(new JointPlanOptimizerJGAPChromosome(this, sampleGenes));
 
 			// population size
+			log.debug("population size set to "+configGroup.getPopulationSize());
 			this.setPopulationSize(configGroup.getPopulationSize());
 
 			this.fitnessFunction = new JointPlanOptimizerFitnessFunction(
@@ -131,13 +132,20 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 			this.setFitnessEvaluator(new DefaultFitnessEvaluator());
 			this.setFitnessFunction(this.fitnessFunction);
 
+			//discarded chromosomes are "recycled" rather than suppressed.
+			//this.setChromosomePool(new ChromosomePool());
+
 			// genetic operators definitions
-			this.setChromosomePool(new ChromosomePool());
-
-			this.addGeneticOperator(
-					new JointPlanOptimizerJGAPMutation(this, configGroup,
+			this.addGeneticOperator( new ReproductionOperator() );
+			this.addGeneticOperator( new JointPlanOptimizerJGAPCrossOver(
+						this,
+						configGroup,
+						this.numJointEpisodes,
+						this.numEpisodes) );
+			this.addGeneticOperator( new JointPlanOptimizerJGAPMutation(
+						this,
+						configGroup,
 						this.numJointEpisodes + this.numEpisodes));
-
 
 		} catch (InvalidConfigurationException e) {
 			//throw new RuntimeException(e.getMessage());
@@ -184,6 +192,8 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 				}
 			}
 		 }
+		 //do not count last activity
+		 this.numEpisodes--;
 	 }
 
 	public JointPlanOptimizerDecoder getDecoder() {

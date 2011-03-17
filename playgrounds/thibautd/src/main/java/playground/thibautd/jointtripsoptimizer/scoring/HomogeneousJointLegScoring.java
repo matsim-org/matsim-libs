@@ -21,16 +21,13 @@ package playground.thibautd.jointtripsoptimizer.scoring;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
-
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
-
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-
 import org.matsim.core.scoring.charyparNagel.LegScoringFunction;
-
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.interfaces.BasicScoring;
 import org.matsim.core.scoring.interfaces.LegScoring;
@@ -45,7 +42,7 @@ import playground.thibautd.jointtripsoptimizer.population.JointPlan;
  */
 public class HomogeneousJointLegScoring implements LegScoring, BasicScoring {
 	private final Map<Id, LegScoringFunction> individualScoringFunctions;
-	private final Id[] ids;
+	private final Set<Id> ids;
 	private Id currentId;
 
 	public HomogeneousJointLegScoring(
@@ -57,7 +54,7 @@ public class HomogeneousJointLegScoring implements LegScoring, BasicScoring {
 			JointPlan jointPlan = (JointPlan) plan;
 
 			this.individualScoringFunctions = new HashMap<Id, LegScoringFunction>();
-			this.ids = jointPlan.getClique().getMembers().keySet().toArray(new Id[1]);
+			this.ids = jointPlan.getClique().getMembers().keySet();
 
 			for (Id id : this.ids) {
 				individualScoringFunctions.put(id, new LegScoringFunction(

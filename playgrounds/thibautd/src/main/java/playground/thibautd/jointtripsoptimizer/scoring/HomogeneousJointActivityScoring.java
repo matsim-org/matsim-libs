@@ -21,6 +21,7 @@ package playground.thibautd.jointtripsoptimizer.scoring;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
@@ -41,7 +42,7 @@ import playground.thibautd.jointtripsoptimizer.population.JointPlan;
  */
 public class HomogeneousJointActivityScoring implements ActivityScoring, BasicScoring {
 	private final Map<Id, ActivityScoringFunction> individualScoringFunctions;
-	private final Id[] ids;
+	private final Set<Id> ids;
 	private Id currentId;
 
 	public HomogeneousJointActivityScoring(
@@ -53,7 +54,7 @@ public class HomogeneousJointActivityScoring implements ActivityScoring, BasicSc
 			JointPlan jointPlan = (JointPlan) plan;
 
 			this.individualScoringFunctions = new HashMap<Id, ActivityScoringFunction>();
-			this.ids = jointPlan.getClique().getMembers().keySet().toArray(new Id[1]);
+			this.ids = jointPlan.getClique().getMembers().keySet();
 
 			for (Id id : this.ids) {
 				individualScoringFunctions.put(id, new ActivityScoringFunction(

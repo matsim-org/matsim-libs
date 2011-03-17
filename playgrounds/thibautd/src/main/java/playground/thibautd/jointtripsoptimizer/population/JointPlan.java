@@ -282,5 +282,21 @@ public class JointPlan implements Plan {
 			plan.setScore(null);
 		}
 	}
+
+	public List<Activity> getLastActivities() {
+		List<Activity> output = new ArrayList<Activity>();
+		List<PlanElement> currentPlanElements;
+
+		for (Plan currentPlan : this.individualPlans.values()) {
+			currentPlanElements = currentPlan.getPlanElements();
+			try {
+				output.add((Activity) currentPlanElements.get(currentPlanElements.size() - 1));
+			} catch (ClassCastException e) {
+				throw new RuntimeException("plan "+currentPlan+" does not finish by an activity.");
+			}
+		}
+
+		return output;
+	}
 }
 

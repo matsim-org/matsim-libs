@@ -47,6 +47,7 @@ public class JointReplanningConfigGroup extends Module {
 	private static final String MUTATION_PROB = "mutationProbability";
 	private static final String CO_PROB = "crossOverProbability";
 	private static final String ITER_NUM = "maxNumberOfGAIterations";
+	private static final String NON_UNIFORMITY_PARAM = "mutationNonUniformity";
 
 	//parameter values
 	private int numTimeIntervals;
@@ -55,6 +56,7 @@ public class JointReplanningConfigGroup extends Module {
 	private double mutationProb;
 	private double crossOverProb;
 	private int numberOfIterations;
+	private double betaNonUniformity;
 
 	public JointReplanningConfigGroup() {
 		super(GROUP_NAME);
@@ -86,6 +88,9 @@ public class JointReplanningConfigGroup extends Module {
 		else if (param_name.equals(ITER_NUM)) {
 			this.setMaxIterations(value);
 		}
+		else if (param_name.equals(NON_UNIFORMITY_PARAM)) {
+			this.setMutationNonUniformity(value);
+		}
 	}
 
 	@Override
@@ -108,6 +113,9 @@ public class JointReplanningConfigGroup extends Module {
 		else if (param_name.equals(ITER_NUM)) {
 			return String.valueOf(this.getMaxIterations());
 		}
+		else if (param_name.equals(NON_UNIFORMITY_PARAM)) {
+			this.getMutationNonUniformity();
+		}
 		return null;
 	}
 
@@ -120,6 +128,7 @@ public class JointReplanningConfigGroup extends Module {
 		this.addParameterToMap(map, MUTATION_PROB);
 		this.addParameterToMap(map, CO_PROB);
 		this.addParameterToMap(map, ITER_NUM);
+		this.addParameterToMap(map, NON_UNIFORMITY_PARAM);
 		return map;
 	}
 
@@ -189,5 +198,17 @@ public class JointReplanningConfigGroup extends Module {
 		}
 	}
 
+	public double getMutationNonUniformity() {
+		return this.betaNonUniformity;
+	}
+
+	public void setMutationNonUniformity(String beta) {
+		this.betaNonUniformity = Double.valueOf(beta);
+
+		if (this.betaNonUniformity <= 0d) {
+			throw new IllegalArgumentException("non uniformity mutation parameter"+
+					" must be positive");
+		}
+	}
 }
 

@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package playground.thibautd.jointtripsoptimizer.replanning.modules;
 
+import org.apache.log4j.Logger;
+
 import org.jgap.FitnessFunction;
 import org.jgap.IChromosome;
 
@@ -37,18 +39,14 @@ import playground.thibautd.jointtripsoptimizer.population.JointPlan;
  * @author thibautd
  */
 public class JointPlanOptimizerFitnessFunction extends FitnessFunction {
+	private static final Logger log =
+		Logger.getLogger(JointPlanOptimizerFitnessFunction.class);
 
 	private static final long serialVersionUID = 1L;
 
 	private final JointPlanOptimizerDecoder decoder;
 	private final ScoringFunctionFactory scoringFunctionFactory;
-
-	//TODO: suppress (for dummy tests only)
-	public JointPlanOptimizerFitnessFunction() {
-		super();
-		this.decoder = null;
-		this.scoringFunctionFactory = null;
-	}
+	public static final double NO_FITNESS_VALUE = Double.NEGATIVE_INFINITY;
 
 	public JointPlanOptimizerFitnessFunction(
 			JointPlan plan,
@@ -68,6 +66,7 @@ public class JointPlanOptimizerFitnessFunction extends FitnessFunction {
 	protected double evaluate(IChromosome chromosome) {
 		JointPlan plan = this.decoder.decode(chromosome);
 		return this.getScore(plan);
+		//return 0d;
 	}
 
 	private double getScore(JointPlan plan) {

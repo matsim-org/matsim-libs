@@ -112,7 +112,6 @@ public class JointPlanStrategy implements PlanStrategy  {
 		// if there is at least one unscored plan, find that one:
 		//Plan plan = ((PersonImpl) person).getRandomUnscoredPlan();
 		Plan plan = clique.getRandomUnscoredPlan();
-			log.warn("getRandomUnscoredPlan returns: "+plan);
 		
 		// otherwise, find one according to selector (often defined in PlanStrategy ctor):
 		if (plan == null) {

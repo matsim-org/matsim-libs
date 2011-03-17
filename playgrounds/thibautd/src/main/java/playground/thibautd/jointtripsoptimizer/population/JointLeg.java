@@ -103,6 +103,10 @@ public class JointLeg extends LegImpl implements Leg, JointActing {
 	 * =========================================================================
 	 */
 
+	/**
+	 * Only <u>shared</u> rides are considered as joint (access to PU and return
+	 * from DO are part of a Joint Episode, but are not joint).
+	 */
 	@Override
 	public boolean getJoint() {
 		return this.isJoint;

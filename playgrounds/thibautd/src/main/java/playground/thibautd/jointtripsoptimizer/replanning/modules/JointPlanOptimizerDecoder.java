@@ -33,6 +33,7 @@ import org.jgap.impl.DoubleGene;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -71,6 +72,7 @@ public class JointPlanOptimizerDecoder {
 	private static final double MIN_DURATION = 0d;
 	private static final double PU_DURATION = 0d;
 	private static final double DO_DURATION = 0d;
+	private static final double DAY_DURATION = 24*3600d;
 
 	private final JointPlan plan;
 	private final Map<Id, List<PlanElement>> individualPlanElements =
@@ -106,6 +108,7 @@ public class JointPlanOptimizerDecoder {
 			int numEpisodes) {
 
 		Map<PlanElement,Integer> alreadyDetermined = new HashMap<PlanElement,Integer>();
+		List<Activity> lastActivities = plan.getLastActivities();
 		int currentPlannedBit = 0;
 		int currentDurationGene = numJointEpisodes;
 		Map<String, Integer> currentPlanElementAssociation = null;
@@ -166,8 +169,12 @@ public class JointPlanOptimizerDecoder {
 			}
 			// associate to duration genes (only for non-joint-trip related activities)
 			else if ( !((JointActivity) pe).getType().equals(JointActingTypes.DROP_OFF) ) {
-				currentPlanElementAssociation.put(DURATION_CHROM, currentDurationGene);
-				currentDurationGene++;
+				if (!lastActivities.contains(pe)) {
+					currentPlanElementAssociation.put(DURATION_CHROM, currentDurationGene);
+					currentDurationGene++;
+				} else {
+					currentPlanElementAssociation.put(DURATION_CHROM, null);
+				}
 			}
 
 			// remember the association
@@ -213,7 +220,7 @@ public class JointPlanOptimizerDecoder {
 						constructedIndividualPlans,
 						individualsNow,
 						plannedPickUps);
-				if (indicesInPlan.get(id).equals(this.individualPlanElements.get(id).size())) {
+				if (indicesInPlan.get(id) >= this.individualPlanElements.get(id).size()) {
 					toRemove.add(id);
 				}
 			}
@@ -227,10 +234,8 @@ public class JointPlanOptimizerDecoder {
 		return new JointPlan(this.plan.getClique(), constructedIndividualPlans);
 	}
 
-	//TODO: refactoring (make separate private methods for planing of activities)
+	//TODO: refactoring
 	//make shorter, less redundant and clearer
-	//make methods to retrieve information from data structures and updating indices
-	//at the same time
 	private final void planNextActivity(
 			IChromosome chromosome,
 			Map<Id, Integer> indicesInPlan,
@@ -248,9 +253,8 @@ public class JointPlanOptimizerDecoder {
 			this.legTTEstimators.get(id);
 		double now = individualsNow.get(id);
 		double currentDuration;
-		double actualDuration;
 		double currentTravelTime;
-		int geneIndex;
+		Integer geneIndex;
 		Map<String, Integer> currentGeneIndices;
 
 		JointActivity origin;
@@ -302,16 +306,15 @@ public class JointPlanOptimizerDecoder {
 					indexInPlan += 6;
 
 					geneIndex = currentGeneIndices.get(DURATION_CHROM);
-					currentDuration = ((DoubleGene) chromosome.getGene(geneIndex)).doubleValue();
-					actualDuration = actualDuration(currentTravelTime, currentDuration);
+					currentDuration = getDuration(chromosome, geneIndex, now, currentTravelTime);
 
 					destination = createActivity(
 							(JointActivity) planElements.get(indexInPlan - 1),
 							now,
-							actualDuration);
+							currentDuration);
 					constructedPlan.addActivity(destination);
 
-					now += actualDuration;
+					now += currentDuration;
 				}
 				else if (!this.readyPickUps.containsKey(destination)) {
 					// case of an affected PU activity without access:
@@ -355,10 +358,9 @@ public class JointPlanOptimizerDecoder {
 				indexInPlan += 2;
 
 				geneIndex = currentGeneIndices.get(DURATION_CHROM);
-				currentDuration = ((DoubleGene) chromosome.getGene(geneIndex)).doubleValue();
-				actualDuration = actualDuration(currentTravelTime, currentDuration);
-				destination.setMaximumDuration(actualDuration);
-				now += actualDuration;
+				currentDuration = getDuration(chromosome, geneIndex, now, currentTravelTime);
+				destination.setMaximumDuration(currentDuration);
+				now += currentDuration;
 				destination.setEndTime(now);
 				constructedPlan.addActivity(destination);
 			}
@@ -426,11 +428,10 @@ public class JointPlanOptimizerDecoder {
 			// plan individual activity
 			currentGeneIndices = this.genesIndices.get(id).get(indexInChromosome);
 			geneIndex = currentGeneIndices.get(DURATION_CHROM);
-			currentDuration = ((DoubleGene) chromosome.getGene(geneIndex)).doubleValue();
-			actualDuration = actualDuration(currentTravelTime, currentDuration);
-			destination = createActivity(destination, now, actualDuration);
+			currentDuration = getDuration(chromosome, geneIndex, now, currentTravelTime);
+			destination = createActivity(destination, now, currentDuration);
 			constructedPlan.addActivity(destination);
-			now += actualDuration;
+			now += currentDuration;
 
 			// /////////////////////////////////////////////////////////////////
 			//update indices
@@ -448,10 +449,11 @@ public class JointPlanOptimizerDecoder {
 		indicesInChromosome.put(id, indexInChromosome);
 	}
 
-	private static final double actualDuration(double travelTime, double duration) {
-		double actualDuration = duration - travelTime;
-		return (actualDuration > 0 ? actualDuration : MIN_DURATION);
-	}
+	//@Deprecated
+	//private static final double actualDuration(double travelTime, double duration) {
+	//	double actualDuration = duration - travelTime;
+	//	return (actualDuration > 0 ? actualDuration : MIN_DURATION);
+	//}
 
 	/**
 	 * Creates a "plan" containing only references to the individuals "reimplacement"
@@ -530,6 +532,26 @@ public class JointPlanOptimizerDecoder {
 			}
 		}
 		return max - now;
+	}
+
+	/**
+	 * @param now time of day after the travel
+	 */
+	private final double getDuration(
+			IChromosome chromosome,
+			Integer geneIndex,
+			double now,
+			double travelTime) {
+		double duration = 0d;
+
+		if (geneIndex != null) {
+			duration = ((DoubleGene) chromosome.getGene(geneIndex)).doubleValue() - travelTime;
+		} else {
+			// case of the last activity of an individual plan
+			duration = DAY_DURATION - now;
+		}
+
+		return (duration > 0 ? duration : MIN_DURATION);
 	}
 
 }
