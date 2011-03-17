@@ -161,14 +161,14 @@ public class Main {
 		Network suburbanNetwork = linkfilter.getRelevantNetwork(suburbanShapeLink);
 		
 		
-		List<Double> emissionType2AvgEmissionsUrbanAreaLink = calculateAvgEmissionsPerTypeAndAreaLink(urbanNetwork, linkId2emissionsInGrammPerType,coldEmissionsPerson);
-		List<Double> emissionType2AvgEmissionsSuburbanAreaLink = calculateAvgEmissionsPerTypeAndAreaLink(suburbanNetwork, linkId2emissionsInGrammPerType,coldEmissionsPerson);
+		List<Double> emissionType2AvgEmissionsUrbanAreaLink = calculateAvgEmissionsPerTypeAndAreaLink(urbanNetwork, linkId2emissionsInGrammPerType);
+		List<Double> emissionType2AvgEmissionsSuburbanAreaLink = calculateAvgEmissionsPerTypeAndAreaLink(suburbanNetwork, linkId2emissionsInGrammPerType);
 		
 		System.out.println("+++++++++++++++++++++++++++++++++++"+emissionType2AvgEmissionsUrbanAreaLink);
 		System.out.println(emissionType2AvgEmissionsSuburbanAreaLink);
 	}
 	
-	private List<Double> calculateAvgEmissionsPerTypeAndAreaLink(Network network, Map<Id, double[]> linkId2emissionsInGrammPerType,Map<Id, Map<String,Double>> coldEmissionsPerson) {
+	private List<Double> calculateAvgEmissionsPerTypeAndAreaLink(Network network, Map<Id, double[]> linkId2emissionsInGrammPerType) {
 		List<Double> emissionType2AvgEmissionsUrbanAreaLink = new ArrayList<Double>();
 		double totalCo2 = 0.0;
 		double totalMassFuel = 0.0;
@@ -182,10 +182,10 @@ public class Main {
 			Id linkId = entry.getKey();
 			if(network.getLinks().containsKey(linkId)){
 				double co2 = entry.getValue()[7]; //only warm emissions
-				double massfuel =  coldEmissionsPerson.get(entry.getKey()).get("FC") + entry.getValue()[5];
-				double pm = coldEmissionsPerson.get(entry.getKey()).get("PM") + entry.getValue()[9];
-				double nox = coldEmissionsPerson.get(entry.getKey()).get("NOx") + entry.getValue()[6];
-				double no2 = coldEmissionsPerson.get(entry.getKey()).get("NO2") + entry.getValue()[8];
+				double massfuel = entry.getValue()[5];
+				double pm = entry.getValue()[9];
+				double nox = entry.getValue()[6];
+				double no2 = entry.getValue()[8];
 
 				totalCo2 = totalCo2 + co2;
 				totalMassFuel = totalMassFuel + massfuel;

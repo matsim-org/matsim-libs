@@ -56,7 +56,9 @@ public class LinkFilter {
 
 			if (isNodeInShape(node, featuresInShape)) {
 				Node fromtonode = filteredNetwork.getFactory().createNode(node.getId(),node.getCoord());
-				filteredNetwork.addNode(fromtonode);}}
+				filteredNetwork.addNode(fromtonode);
+			}
+		}
 	
 	 
 		for(Link link : network.getLinks().values()){
@@ -66,10 +68,11 @@ public class LinkFilter {
 
 				Link onelink = filteredNetwork.getFactory().createLink(link.getId(), link.getFromNode().getId(), link.getToNode().getId());
 				filteredNetwork.addLink(onelink);
-				System.out.println("onelink " + onelink.getId());}
+//				System.out.println("onelink " + onelink.getId());
+			}
 		}	
 				
-		System.out.println("Result "+ filteredNetwork +"         " +filteredNetwork.getLinks());
+//		System.out.println("Result "+ filteredNetwork +"         " +filteredNetwork.getLinks());
 		
 		return filteredNetwork;	
 	
