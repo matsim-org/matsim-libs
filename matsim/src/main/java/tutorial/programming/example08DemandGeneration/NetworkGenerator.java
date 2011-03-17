@@ -32,7 +32,7 @@ public class NetworkGenerator {
 	public static void main(String [] args) {
 		String osm = "./inputs/map.osm";
 
-		Scenario sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig()) ;
+		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig()) ;
 		Network net = sc.getNetwork();
 
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, CRS);
