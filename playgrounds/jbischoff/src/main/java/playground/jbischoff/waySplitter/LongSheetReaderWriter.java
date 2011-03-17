@@ -59,17 +59,22 @@ public class LongSheetReaderWriter {
 	public void run() throws Exception {
 		this.personMap = new TreeMap<Id, PersonDataElement>();
 		this.wayMap = new TreeMap<Id, List<WayDataElement>>();
-		this.readFile("C:\\Users\\Joschka Bischoff\\Desktop\\Daten von Andreas\\H&P 321 - BVG - Touristenbefragung - Datensatz.csv");
-		this.writeFile("C:\\Users\\Joschka Bischoff\\Desktop\\Daten von Andreas\\bvg_befragung");
+		this.readFile("/Users/JB/Documents/Work/Daten von Andreas/H&P 321 - BVG - Touristenbefragung - Datensatz_utf.csv");
+		this.writeFile("/Users/JB/Documents/Work/Daten von Andreas/bvg_befragung");
 	}
 
 	void readFile(String filename) throws Exception {
 		FileReader fr = new FileReader(new File(filename));
 		BufferedReader br = new BufferedReader(fr);
 		String line = null;
+		int l = 0;
 		while ((line = br.readLine()) != null) {
 			String[] r = line.split(";");
 			PersonDataElement pde = new PersonDataElement();
+			l++;
+			if (l%50 == 0) log.info("read "+l);
+
+			
 			pde.setPersonId(r[0]);
 			pde.f1 = r[1];
 			pde.f2 = r[2];
@@ -100,11 +105,17 @@ public class LongSheetReaderWriter {
 			pde.fz6n = r[740];
 			pde.fz7 = r[741];
 			pde.sprache = r[742];
+			
+			Coord xy = this.getGoogleGeocode(pde.fa1at);
+			pde.coordx = xy.getX();
+			pde.coordy = xy.getY();
+			
 			this.personMap.put(pde.personId, pde);
 			List<WayDataElement> ways = new ArrayList<WayDataElement>();
 
 			for (int i = 0; i < 13; i++) {
 				WayDataElement wde = new WayDataElement();
+				
 				
 				if (r[6 + 51 * i].equals("1")) {
 			
@@ -160,6 +171,10 @@ public class LongSheetReaderWriter {
 				wde.a6nn = r[54 + 51 * i];
 				wde.a7 = r[55 + 51 * i];
 				wde.a7tn = r[56 + 51 * i];
+				
+				Coord xxy = this.getGoogleGeocode(wde.a5t);
+				wde.coordx = xxy.getX();
+				wde.coordy = xxy.getY();
 				ways.add(wde);
 				}
 			}
@@ -171,7 +186,7 @@ public class LongSheetReaderWriter {
 	private Coord getGoogleGeocode(String placemark) throws Exception{
 		Coord xy;
 		int i = 0;
-		int l = 0;
+
 		do {
 			i++;
 		xy = jbg.readGC(placemark);
@@ -189,9 +204,12 @@ public class LongSheetReaderWriter {
 		BufferedWriter bw = new BufferedWriter(new FileWriter(new File(filename+"_persons.csv")));
 		
 		for (PersonDataElement pde : this.personMap.values()){
-			Coord xy = this.getGoogleGeocode(pde.fa1at);
+			if (pde.coordx == 0){
+			Coord xy = this.getGoogleGeocode(" "+pde.fa1at);
 			pde.coordx = xy.getX();
 			pde.coordy = xy.getY();
+			log.info(pde.fa1at+" is in recall. Coordinates now: "+ xy);
+			}
 			bw.append(pde.personId+";"+	pde.f1+";"
 	+pde.f2+";"
 	+pde.fa1+";"
@@ -219,7 +237,7 @@ public class LongSheetReaderWriter {
 	+pde.fz6+";"
 	+pde.fz6n+";"
 	+pde.fz7+";"
-	+pde.sprache+
+	+pde.sprache+";"+
 	pde.coordx+";"+
 	pde.coordy+";\n");
 			
@@ -231,10 +249,12 @@ public class LongSheetReaderWriter {
 	ww.append("PersonId;Weg;FrageA2;FrageA2_n;FrageA3;FrageA3_n;FrageA4_1;FrageA4_2;FrageA4_3;FrageA4_4;FrageA4_5;FrageA4_6;FrageA4_7;FrageA4_8;FrageA4_9;FrageA4_10;FrageA4_11;FrageA4_12;FrageA4_98;FrageA4_98_t;FrageA5;FrageA5_t;FrageA6a;FrageA6a_n;FrageA6b;FrageA6b_n;FrageA6c;FrageA6c_n;FrageA6d;FrageA6d_n;FrageA6e;FrageA6e_n;FrageA6f;FrageA6f_n;FrageA6g;FrageA6g_n;FrageA6h;FrageA6h_n;FrageA6i;FrageA6i_n;FrageA6j;FrageA6j_n;FrageA6k;FrageA6k_n;FrageA6l;FrageA6l_n;FrageA6m;FrageA6m_n;FrageA6n;FrageA6n_t;FrageA7;FrageA7_tn;Coord_a5tx;Coord_a5ty\n");
 	for (Id pid : this.wayMap.keySet()){
 		for (WayDataElement wde : this.wayMap.get(pid)){
-			Coord xy = this.getGoogleGeocode(wde.a5t);
-			wde.coordx = xy.getX();
-			wde.coordy = xy.getY();
-		
+			if (wde.coordx == 0){
+				Coord xy = this.getGoogleGeocode(" "+wde.a5t+" ");
+				wde.coordx = xy.getX();
+				wde.coordy = xy.getY();
+				log.info(wde.a5t+" is in recall. Coordinates now: "+ xy);
+				}		
 			
 			ww.append(pid.toString()+";"+wde.wayID.toString()+";"
 					+wde.a2+";"
@@ -286,7 +306,7 @@ public class LongSheetReaderWriter {
 					+wde.a6n+";"
 					+wde.a6nn+";"
 					+wde.a7+";"
-					+wde.a7tn+"" +
+					+wde.a7tn+";" +
 					wde.coordx+";"+wde.coordy+";\n");
 		}
 		

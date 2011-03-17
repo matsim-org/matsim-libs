@@ -130,7 +130,7 @@ public class JBGoogleGeocode {
 			
 								cntRequests++;
 								Coord googleOut = this.getLocation(loc).getGK4();
-								log.info(googleOut + " for " + loc);
+//								log.info(googleOut + " for " + loc);
 			
 								
 								return  googleOut;
