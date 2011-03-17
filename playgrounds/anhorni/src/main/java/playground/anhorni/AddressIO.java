@@ -38,6 +38,7 @@ public class AddressIO {
 	public static void main (String argv []){
 		AddressIO io = new AddressIO();	
 		io.execute();
+		System.out.println("finished");
 	}
 	       
     public void execute() { 	
@@ -47,7 +48,7 @@ public class AddressIO {
           
           int cnt = 0;
           String curr_line = in.readLine(); // Skip header
-          while ((curr_line = in.readLine()) != null && cnt < 100) {	
+          while ((curr_line = in.readLine()) != null) {	
 	          String parts[] = curr_line.split(";");
 	          String un = parts[2] + parts[0];  
 	          String pw = parts[3];
