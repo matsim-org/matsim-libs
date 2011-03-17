@@ -30,13 +30,10 @@ import org.jgap.event.EventManager;
 import org.jgap.Gene;
 import org.jgap.impl.BestChromosomesSelector;
 import org.jgap.impl.BooleanGene;
-import org.jgap.impl.ChromosomePool;
-import org.jgap.impl.CrossoverOperator;
 import org.jgap.impl.DoubleGene;
 import org.jgap.impl.GABreeder;
-import org.jgap.impl.IntegerGene;
-import org.jgap.impl.MutationOperator;
 import org.jgap.impl.StockRandomGenerator;
+import org.jgap.impl.WeightedRouletteSelector;
 import org.jgap.InvalidConfigurationException;
 
 import org.matsim.api.core.v01.Id;
@@ -60,7 +57,6 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 
 	private static final Logger log =
 		Logger.getLogger(JointPlanOptimizerJGAPConfiguration.class);
-	private static final Double CO_PROB = 0.6d;
 
 	private static final Double DAY_DUR = 24*3600d;
 
@@ -88,7 +84,7 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 
 		try {
 			// default JGAP objects initializations
-			this.setBreeder(new GABreeder());
+			this.setBreeder(new JointPlanOptimizerJGAPBreeder());
 			this.setEventManager(new EventManager());
 
 			// seed the default JGAP pseudo-random generator with a matsim random
@@ -99,6 +95,7 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 			BestChromosomesSelector bestChromsSelector = new BestChromosomesSelector(this);
 			bestChromsSelector.setDoubletteChromosomesAllowed(false);
 			this.addNaturalSelector(bestChromsSelector, false);
+			//this.addNaturalSelector(new WeightedRouletteSelector(), false);
 
 			// elitism
 			this.setPreservFittestIndividual(true);
@@ -136,7 +133,9 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 			//this.setChromosomePool(new ChromosomePool());
 
 			// genetic operators definitions
-			this.addGeneticOperator( new ReproductionOperator() );
+			// reproduction operator unnecessary: a_candicateChromosomes is obtained
+			// by calling a_population.getChromosomes() in Breeder.
+			//this.addGeneticOperator( new ReproductionOperator() );
 			this.addGeneticOperator( new JointPlanOptimizerJGAPCrossOver(
 						this,
 						configGroup,
@@ -160,6 +159,7 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 	 */
 	@SuppressWarnings("unchecked")
 		//TODO: FIXME correct counting of joint episodes
+		//(current counting is good if only shared rides are marked as "joint")
 	private void countEpisodes(JointPlan plan) {
 		Id[] ids = new Id[1];
 		ids = plan.getClique().getMembers().keySet().toArray(ids);
@@ -179,9 +179,9 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 						(((JointActivity) pe).getType() != JointActingTypes.PICK_UP)&&
 						(((JointActivity) pe).getType() != JointActingTypes.DROP_OFF)) {
 					this.numEpisodes++;
-				} else if (
+				} else if ((pe instanceof JointLeg)&&
 						(((JointLeg) pe).getJoint())&&
-						(!alreadyExamined.contains((JointLeg) pe))
+						(!alreadyExamined.contains(pe))
 						) {
 					this.numJointEpisodes++;
 
@@ -198,6 +198,22 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 
 	public JointPlanOptimizerDecoder getDecoder() {
 		return this.fitnessFunction.getDecoder();
+	}
+
+	public int getNumEpisodes() {
+		return this.numEpisodes;
+	}
+
+	public int getNumJointEpisodes() {
+		return this.numJointEpisodes;
+	}
+
+	/**
+	 * to avoid multiplying the places where the day duration is defined.
+	 * Not very elegant, should be moved somewhere else.
+	 */
+	public double getDayDuration() {
+		return this.numJointEpisodes;
 	}
 }
 

@@ -30,6 +30,7 @@ import org.jgap.impl.BooleanGene;
 import org.jgap.impl.DoubleGene;
 import org.jgap.InvalidConfigurationException;
 import org.jgap.Population;
+import org.jgap.RandomGenerator;
 
 import org.matsim.core.gbl.MatsimRandom;
 
@@ -48,7 +49,7 @@ public class JointPlanOptimizerPopulationFactory {
 	private final int nDoubleGenes;
 	private final Double dayDuration;
 
-	private final Random randomGenerator;
+	private final RandomGenerator randomGenerator;
 
 	public JointPlanOptimizerPopulationFactory(
 			JointPlanOptimizerJGAPConfiguration jgapConfig) {
@@ -77,7 +78,7 @@ public class JointPlanOptimizerPopulationFactory {
 		this.nDoubleGenes = nDoubleInit;
 		this.dayDuration = dayDurationInit;
 
-		this.randomGenerator =  MatsimRandom.getLocalInstance();
+		this.randomGenerator = jgapConfig.getRandomGenerator();
 	}
 
 	public Population createRandomInitialPopulation() {

@@ -92,6 +92,8 @@ public class JointActivity extends ActivityImpl implements Activity, JointActing
 		this.isJoint = act.getJoint();
 		// cast leaved unchecked as elements linked to a joint activity must be
 		// a joint activity
+		// FIXME: when creating a new joint plan from an old one, linked
+		// elements still reference the ones of the old plan!
 		this.linkedActivities = (Map<Id,JointActivity>) act.getLinkedElements();
 		this.person = act.getPerson();
 	}

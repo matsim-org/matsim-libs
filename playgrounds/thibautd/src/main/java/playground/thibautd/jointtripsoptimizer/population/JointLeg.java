@@ -90,6 +90,8 @@ public class JointLeg extends LegImpl implements Leg, JointActing {
 	private void constructFromJointLeg(JointLeg leg) {
 		this.isJoint = leg.getJoint();
 		//cast unchecked, as it is the only possible output from getLinkedElements
+		// FIXME: when creating a new joint plan from an old one, linked
+		// elements still reference the ones of the old plan!
 		this.linkedLegs = new HashMap<Id, JointLeg>(
 				(Map<Id, JointLeg>) leg.getLinkedElements());
 		this.isDriver = leg.getIsDriver();

@@ -84,7 +84,9 @@ public class JointPlan implements Plan {
 	 * =========================================================================
 	 */
 	/**
-	 * @return the list of plan elements, for all individuals
+	 * @return the list of plan elements, for all individuals. While the plan 
+	 * elements are internal references, the list is not: modifying it (by adding
+	 * or removing elements) will not modify the joint plan.
 	 */
 	@Override
 	public List<PlanElement> getPlanElements() {

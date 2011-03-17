@@ -95,12 +95,14 @@ public class JointPlanOptimizer implements PlanAlgorithm {
 
 		Genotype gaPopulation = populationFactory.createRandomInitialGenotype();
 
-		//TODO: choose between a fixed number of iterations of an evolution monitor
-		//gaPopulation.evolve(this.configGroup.getMaxIterations());
-		for (int i=0; i < this.configGroup.getMaxIterations(); i++) {
-			log.debug("iter "+i);
-			gaPopulation.evolve();
-		}
+		//TODO: choose between a fixed number of iterations or an evolution monitor
+		gaPopulation.evolve(this.configGroup.getMaxIterations());
+
+		// use this to monitor the iteration in the console:
+		//for (int i=0; i < this.configGroup.getMaxIterations(); i++) {
+		//	log.debug("iter "+i);
+		//	gaPopulation.evolve();
+		//}
 
 		//get fittest chromosome, and modify the given plan accordingly
 		JointPlan evolvedPlan = jgapConfig.getDecoder().decode(gaPopulation.getFittestChromosome());
