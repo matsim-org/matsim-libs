@@ -30,7 +30,9 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.utils.geometry.CoordImpl;
 /**
  * @author jbischoff
  *
@@ -41,7 +43,12 @@ public class LongSheetReaderWriter {
 
 	private Map<Id, PersonDataElement> personMap;
 	private Map<Id, List<WayDataElement>> wayMap;
+	private JBGoogleGeocode jbg;
 
+	public LongSheetReaderWriter(){
+		jbg = new JBGoogleGeocode();
+	}
+	
 	public static void main(String args0[]) throws Exception {
 
 		LongSheetReaderWriter longSheetReaderWriter = new LongSheetReaderWriter();
@@ -160,11 +167,31 @@ public class LongSheetReaderWriter {
 
 		}
 	}
+	
+	private Coord getGoogleGeocode(String placemark) throws Exception{
+		Coord xy;
+		int i = 0;
+		int l = 0;
+		do {
+			i++;
+		xy = jbg.readGC(placemark);
+		if (xy.getX() == 3947011.7307321555 ) {Thread.sleep(1000);
+		};
+		if (i>3) {
+		log.info("Skipping for now:"+ placemark);
+		return new CoordImpl(0,0);}
+		 
+		} while (xy.getX() == 3947011.7307321555 );
+		return xy;
+	}
 
 	void writeFile(String filename) throws Exception{
 		BufferedWriter bw = new BufferedWriter(new FileWriter(new File(filename+"_persons.csv")));
 		
 		for (PersonDataElement pde : this.personMap.values()){
+			Coord xy = this.getGoogleGeocode(pde.fa1at);
+			pde.coordx = xy.getX();
+			pde.coordy = xy.getY();
 			bw.append(pde.personId+";"+	pde.f1+";"
 	+pde.f2+";"
 	+pde.fa1+";"
@@ -192,16 +219,23 @@ public class LongSheetReaderWriter {
 	+pde.fz6+";"
 	+pde.fz6n+";"
 	+pde.fz7+";"
-	+pde.sprache+";\n");
+	+pde.sprache+
+	pde.coordx+";"+
+	pde.coordy+";\n");
 			
 		}
 		bw.flush();
 		bw.close();
 		log.info("Wrote: "+filename+"_persons.csv");
 	BufferedWriter ww = new BufferedWriter(new FileWriter(new File(filename+"_ways.csv")));
-	ww.append("PersonId;Weg;FrageA2;FrageA2_n;FrageA3;FrageA3_n;FrageA4_1;FrageA4_2;FrageA4_3;FrageA4_4;FrageA4_5;FrageA4_6;FrageA4_7;FrageA4_8;FrageA4_9;FrageA4_10;FrageA4_11;FrageA4_12;FrageA4_98;FrageA4_98_t;FrageA5;FrageA5_t;FrageA6a;FrageA6a_n;FrageA6b;FrageA6b_n;FrageA6c;FrageA6c_n;FrageA6d;FrageA6d_n;FrageA6e;FrageA6e_n;FrageA6f;FrageA6f_n;FrageA6g;FrageA6g_n;FrageA6h;FrageA6h_n;FrageA6i;FrageA6i_n;FrageA6j;FrageA6j_n;FrageA6k;FrageA6k_n;FrageA6l;FrageA6l_n;FrageA6m;FrageA6m_n;FrageA6n;FrageA6n_t;FrageA7;FrageA7_tn\n");
+	ww.append("PersonId;Weg;FrageA2;FrageA2_n;FrageA3;FrageA3_n;FrageA4_1;FrageA4_2;FrageA4_3;FrageA4_4;FrageA4_5;FrageA4_6;FrageA4_7;FrageA4_8;FrageA4_9;FrageA4_10;FrageA4_11;FrageA4_12;FrageA4_98;FrageA4_98_t;FrageA5;FrageA5_t;FrageA6a;FrageA6a_n;FrageA6b;FrageA6b_n;FrageA6c;FrageA6c_n;FrageA6d;FrageA6d_n;FrageA6e;FrageA6e_n;FrageA6f;FrageA6f_n;FrageA6g;FrageA6g_n;FrageA6h;FrageA6h_n;FrageA6i;FrageA6i_n;FrageA6j;FrageA6j_n;FrageA6k;FrageA6k_n;FrageA6l;FrageA6l_n;FrageA6m;FrageA6m_n;FrageA6n;FrageA6n_t;FrageA7;FrageA7_tn;Coord_a5tx;Coord_a5ty\n");
 	for (Id pid : this.wayMap.keySet()){
 		for (WayDataElement wde : this.wayMap.get(pid)){
+			Coord xy = this.getGoogleGeocode(wde.a5t);
+			wde.coordx = xy.getX();
+			wde.coordy = xy.getY();
+		
+			
 			ww.append(pid.toString()+";"+wde.wayID.toString()+";"
 					+wde.a2+";"
 					+wde.a2_n+";"
@@ -252,7 +286,8 @@ public class LongSheetReaderWriter {
 					+wde.a6n+";"
 					+wde.a6nn+";"
 					+wde.a7+";"
-					+wde.a7tn+";\n");
+					+wde.a7tn+"" +
+					wde.coordx+";"+wde.coordy+";\n");
 		}
 		
 	}

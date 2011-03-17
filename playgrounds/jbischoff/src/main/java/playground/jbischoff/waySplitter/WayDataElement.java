@@ -81,6 +81,9 @@ public class WayDataElement {
 	String a7;
 	String a7tn;
 	
+	double coordx;
+	double coordy;
+	
 	public void setWayID(int i) {
 		this.wayID = new IdImpl(i);
 	}
