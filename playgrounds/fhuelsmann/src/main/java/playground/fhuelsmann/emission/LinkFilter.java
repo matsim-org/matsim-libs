@@ -55,14 +55,9 @@ public class LinkFilter {
 		for (Node node : network.getNodes().values()) {
 
 			if (isNodeInShape(node, featuresInShape)) {
-//				Node fromtonode = filteredNetwork.createAndAddNode(node.getId(), node.getCoord());
 				Node fromtonode = filteredNetwork.getFactory().createNode(node.getId(),node.getCoord());
-				filteredNetwork.addNode(fromtonode);
-//				if (this.nodeCollector.containsKey(node.getId()== null)){
-//				this.nodeCollector.put(node.getId(), fromtonode);
-//				}else {this.nodeCollector.put(node.getId(), fromtonode);}
-				}}
-//		System.out.print(nodeCollector);
+				filteredNetwork.addNode(fromtonode);}}
+	
 	 
 		for(Link link : network.getLinks().values()){
 		
@@ -106,40 +101,6 @@ public class LinkFilter {
 		return isInShape;
 	}
 	
-/*	private boolean isLinkInShape(Link link,Set<Feature> featuresInShape) {
-		boolean isInShape = false;
-
-		Coord nodeCoord = link.getFromNode().getCoord();
-		//System.out.println("nodeCoord   " + nodeCoord);
-		Coord toCoord = link.getToNode().getCoord();
-		//System.out.println("toCoord   " + toCoord);
-		GeometryFactory factory = new GeometryFactory();
-		Coordinate[] coor = {new Coordinate(nodeCoord.getX(), nodeCoord.getY()), new Coordinate(toCoord.getX(),toCoord.getY())};
-		//System.out.println("coor   " + coor);
-		Geometry geo = factory.createLineString(coor);
-		//System.out.println("geo   " + geo);
-		for(Feature feature : featuresInShape){
-			if(feature.getDefaultGeometry().contains(geo)){
-				//	logger.debug("found homeLocation of person " + person.getId() + " in feature " + feature.getID());
-				isInShape = true;
-				break;
-			}
-		}
-		return isInShape;
-	}*/
-
-/*	private static boolean isLinkInShape(Coord linkCoord, Set<Feature> featuresInShape) {
-		boolean isInShape = false;
-		GeometryFactory factory = new GeometryFactory();
-		Geometry geo = factory.createPoint(new Coordinate(linkCoord.getX(), linkCoord.getY()));
-		for (Feature feature : featuresInShape) {
-			if (feature.getDefaultGeometry().contains(geo)) {
-				isInShape = true;
-				break;
-			}
-		}
-		return isInShape;
-	}*/
 	
 	Set<Feature> readShape(String shapeFile) {
 		final Set<Feature> featuresInShape;
