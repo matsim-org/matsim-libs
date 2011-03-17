@@ -74,10 +74,8 @@ public class LocationMutatorBestResponse extends LocationMutatorwChoiceSet {
 		if (Integer.parseInt(plan.getPerson().getId().toString()) > 1000000000) return;
 				
 		this.initFlexibleTypes(this.controler.getConfig().locationchoice());
-		super.resetRoutes(plan);
 		
-		// best plan shall not be a member of the class!
-		Plan bestPlan = new PlanImpl();	
+		Plan bestPlan = new PlanImpl(plan.getPerson());	
 		// make sure there is a valid plan in bestPlan
 		((PlanImpl)bestPlan).copyPlan(plan);
 		
@@ -86,7 +84,6 @@ public class LocationMutatorBestResponse extends LocationMutatorwChoiceSet {
 		// copy the best plan into replanned plan
 		// making a deep copy
 		this.copyPlanFields((PlanImpl)plan, (PlanImpl)bestPlan);
-		//r.f.?
 		super.resetRoutes(plan);
 	}
 	
@@ -127,7 +124,9 @@ public class LocationMutatorBestResponse extends LocationMutatorwChoiceSet {
 		}
 	}
 	
-	private void handleActivities(Plan plan, Plan bestPlan) {	
+	private void handleActivities(Plan plan, Plan bestPlan) {
+		int travelTimeApproximationLevel = Integer.parseInt(
+				this.controler.getConfig().locationchoice().getTravelTimeApproximationLevel());
 		int actlegIndex = -1;
 		for (PlanElement pe : plan.getPlanElements()) {
 			actlegIndex++;
@@ -138,15 +137,7 @@ public class LocationMutatorBestResponse extends LocationMutatorwChoiceSet {
 					List<? extends PlanElement> actslegs = plan.getPlanElements();
 					final Activity actToMove = (Activity)pe;
 					final Activity actPre = (Activity)actslegs.get(actlegIndex - 2);
-					
-// 					not done for the moment
-//					// find the next fixed activity
-//					int indexFixed = actlegIndex + 2;
-//					while (this.flexibleTypes.contains(
-//							ActTypeConverter.convert2FullType(((ActivityImpl)plan.getPlanElements().get(indexFixed)).getType()))) {
-//						indexFixed += 2;
-//					}
-					
+										
 					final Activity actPost = (Activity)actslegs.get(actlegIndex + 2);					
 					double distanceDirect = ((CoordImpl)actPre.getCoord()).calcDistance(actPost.getCoord());
 					double distanceFromEpsilon = this.getMaximumDistanceFromEpsilon((PersonImpl)plan.getPerson(), actToMove.getType());
@@ -155,10 +146,7 @@ public class LocationMutatorBestResponse extends LocationMutatorwChoiceSet {
 					double x = (actPre.getCoord().getX() + actPost.getCoord().getX()) / 2.0;
 					double y = (actPre.getCoord().getY() + actPost.getCoord().getY()) / 2.0;
 					Coord center = new CoordImpl(x,y);
-					
-					int travelTimeApproximationLevel = Integer.parseInt(
-							this.controler.getConfig().locationchoice().getTravelTimeApproximationLevel());
-					
+										
 					ChoiceSet cs = new ChoiceSet(travelTimeApproximationLevel, (PlansCalcRoute)this.controler.createRoutingAlgorithm(), 
 							this.network, this.controler.getConfig());
 					this.createChoiceSetCircle(center, maxRadius, ActTypeConverter.convert2FullType(((ActivityImpl)actToMove).getType()), cs);
@@ -217,7 +205,7 @@ public class LocationMutatorBestResponse extends LocationMutatorwChoiceSet {
 	}
 	
 	private double computeScore(Plan plan, ChoiceSet cs, boolean adapt) {
-		PlanImpl planTmp = new PlanImpl();
+		PlanImpl planTmp = new PlanImpl(plan.getPerson());
 		planTmp.copyPlan(plan);		
 		ScoringFunctionAccumulator scoringFunction = 
 			(ScoringFunctionAccumulator) this.controler.getPlansScoring().getPlanScorer().getScoringFunctionForAgent(plan.getPerson().getId());		

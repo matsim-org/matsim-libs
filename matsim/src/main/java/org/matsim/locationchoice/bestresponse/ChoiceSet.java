@@ -139,6 +139,7 @@ public class ChoiceSet {
 					leastCostPathCalculatorForward, leastCostPathCalculatorBackward, this.approximationLevel);
 			scoringFunction.finish();
 			double score = scoringFunction.getScore();
+			scoringFunction.reset();
 									
 			if (score > largestValue) {
 				largestValue = score;
