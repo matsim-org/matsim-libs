@@ -39,6 +39,10 @@ public class HubLinkMapping {
 		}
 	}
 	
+	public HubLinkMapping(int numberOfHubs) {
+		this.numberOfHubs=numberOfHubs;
+	}
+	
 	private void handleUnmappedLinksEnd(){
 		if (ParametersPSF.getMainInitUnmappedLinks()!=null && ParametersPSF.getMainInitUnmappedLinks()){
 			// add unmapped links in "last column"
@@ -141,6 +145,10 @@ public class HubLinkMapping {
 		}
 		
 		return linkHubMapping.get(linkId).intValue();
+	}
+	
+	public void addMapping(String linkId, int hubId){
+		linkHubMapping.put(linkId, hubId);
 	}
 	
 	public static void main(String[] args) {
