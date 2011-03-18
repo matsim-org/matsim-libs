@@ -100,14 +100,16 @@ public class AddHomePlan2Pop extends NewPopulation {
 	}
 
 	public static void main(final String[] args) {
-		// final String netFilename = "./test/yu/ivtch/input/network.xml";
-		final String netFilename = "../matsimTests/ParamCalibration/network.xml";
-		final String inputPopFilename = "../matsimTests/ParamCalibration/40.plans.xml.gz";
-		final String outputPopFilename = "../matsimTests/diverseRoutes/stayHomePop.xml";
-		// new ScenarioLoader(
-		// // "./test/yu/ivtch/config_for_10pctZuerich_car_pt_smallPlansl.xml"
-		// // "../data/ivtch/make10pctPlans.xml"
-		// "input/make10pctPlans.xml").loadScenario().getConfig();
+		final String netFilename, inputPopFilename, outputPopFilename;
+		if (args.length == 3) {
+			netFilename = args[0];
+			inputPopFilename = args[1];
+			outputPopFilename = args[2];
+		} else {
+			netFilename = "../matsimTests/ParamCalibration/network.xml";
+			inputPopFilename = "../matsimTests/ParamCalibration/40.plans.xml.gz";
+			outputPopFilename = "../matsimTests/diverseRoutes/stayHomePop.xml";
+		}
 
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils
 				.createConfig());
