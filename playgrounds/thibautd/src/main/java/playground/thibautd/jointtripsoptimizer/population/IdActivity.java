@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * JointAct.java
+ * IdActivity.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,47 +19,54 @@
  * *********************************************************************** */
 package playground.thibautd.jointtripsoptimizer.population;
 
-import java.util.List;
-import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 
-import org.matsim.api.core.v01.population.Person;
-
 /**
+ * Identifier for joint activities.
+ * The idea behind the re-implementation of id types is allow easy check of the
+ * identified object type.
  * @author thibautd
  */
-public interface JointActing {
+public class IdActivity implements Id {
 
-	public boolean getJoint();
+	private final long id;
 
-	// better to define in terms of linked activities than in terms of
-	// participants
-	// public void setParticipants(List<? extends Person> participants);
-	// public void addParticipant(Person participant);
-	// public void removeParticipant(Person participant);
-	// public List<? extends Person> getParticipants();
-	
-	// first API. Linking with objects can lead to wrong references when creating
-	// a plan copy, and using co-participants Id is less useful than expected.
-	// Modified so as to work, but prefer the "Id" API.
-	// TODO: refactor the code using this API and suppress it.
-	@Deprecated
-	public void setLinkedElements(Map<Id, ? extends JointActing> linkedElements);
-	@Deprecated
-	public void addLinkedElement(Id id, JointActing act);
-	// confusing when act/legs are also identified
-	//public void removeLinkedElement(Id id);
-	@Deprecated
-	public Map<Id, ? extends JointActing> getLinkedElements();
+	public IdActivity(long idValue) {
+		this.id = idValue;
+	}
 
-	public void setLinkedElementsById(List<? extends Id> linkedElements);
-	public void addLinkedElementById(Id linkedElement);
-	public List<? extends Id> getLinkedElementsIds();
+	/**
+	 * {@inheritDoc}
+	 * @see Comparable#compareTo(Id)
+	 */
+	public int compareTo(Id arg) {
+		try {
+			return (int) (this.id - ((IdActivity) arg).id);
+		} catch (ClassCastException e) {
+			throw new IllegalArgumentException("can only compare IdActivity with IdActivity instances");
+		}
+	}
 
-	// in the context of a joint plan, it is useful to associate activities with
-	// a person as well.
-	public Person getPerson();
-	public void setPerson(Person person);
+	/**
+	 * {@inheritDoc}
+	 * @see Object#equals(Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		try {
+			return this.id == ((IdActivity) obj).id;
+		} catch (ClassCastException e) {
+			return false;
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * @see Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return String.valueOf(this.id);
+	}
 }
 

@@ -44,7 +44,11 @@ import org.matsim.core.population.PlanImpl;
 public class JointPlan implements Plan {
 	private static final Logger log = Logger.getLogger(JointPlan.class);
 
-	private Map<Id,Plan> individualPlans = new HashMap<Id,Plan>();
+	private final Map<Id,Plan> individualPlans = new HashMap<Id,Plan>();
+	/**
+	 * for robust resolution of links between activities.
+	 */
+	private final Map<IdLeg, JointLeg> legsMap = new HashMap<IdLeg, JointLeg>();
 
 	//TODO: make final
 	private Clique clique;
@@ -71,11 +75,30 @@ public class JointPlan implements Plan {
 			this.individualPlans.put(id, currentPlan);
 			// add the plan at the individual level
 			this.clique.getMembers().get(id).addPlan(currentPlan);
+
+			this.constructLegsMap();
 		}
 	}
 
 	public JointPlan(JointPlan plan) {
 		this(plan.getClique(), plan.getIndividualPlans());
+	}
+
+	private void constructLegsMap() {
+		IdLeg currentLegId;
+
+		this.legsMap.clear();
+		for (PlanElement pe : this.getPlanElements()) {
+			if (pe instanceof JointLeg) {
+				currentLegId = ((JointLeg) pe).getId();
+				if (!this.legsMap.keySet().contains(currentLegId)) {
+					this.legsMap.put(currentLegId, (JointLeg) pe);
+				} else {
+					throw new IllegalArgumentException("duplicate id found during"
+							+" JointPlan construction");
+				}
+			}
+		}
 	}
 
 	/*
@@ -105,15 +128,16 @@ public class JointPlan implements Plan {
 	 */
 	@Override
 	public void addLeg(Leg leg) {
-		log.warn("using addLeg() on JointPlan: make sure current individual"+
-				" is used correctly!");
-		if (leg instanceof JointLeg) {
-			this.getIndividualPlan(this.getCurrentIndividual()).addLeg(
-					(JointLeg) leg);
-		} else {
-			throw new IllegalArgumentException("trying to add a non-joint"+
-					"leg to joint plan: failed.");
-		}
+		//log.warn("using addLeg() on JointPlan: make sure current individual"+
+		//		" is used correctly!");
+		//if (leg instanceof JointLeg) {
+		//	this.getIndividualPlan(this.getCurrentIndividual()).addLeg(
+		//			(JointLeg) leg);
+		//} else {
+		//	throw new IllegalArgumentException("trying to add a non-joint"+
+		//			"leg to joint plan: failed.");
+		//}
+		throw new UnsupportedOperationException();
 	}
 
 	/**
@@ -124,15 +148,16 @@ public class JointPlan implements Plan {
 	 */
 	@Override
 	public void addActivity(Activity act) {
-		log.warn("using addActivity() on JointPlan: make sure current individual"+
-				" is used correctly!");
-		if (act instanceof JointActivity) {
-			this.getIndividualPlan(this.getCurrentIndividual()).addActivity(
-					(JointActivity) act);
-		} else {
-			throw new IllegalArgumentException("trying to add a non-joint"+
-					"activity to joint plan: failed.");
-		}
+		//log.warn("using addActivity() on JointPlan: make sure current individual"+
+		//		" is used correctly!");
+		//if (act instanceof JointActivity) {
+		//	this.getIndividualPlan(this.getCurrentIndividual()).addActivity(
+		//			(JointActivity) act);
+		//} else {
+		//	throw new IllegalArgumentException("trying to add a non-joint"+
+		//			"activity to joint plan: failed.");
+		//}
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
@@ -178,16 +203,19 @@ public class JointPlan implements Plan {
 	}
 
 	/**
+	 * XXX unsupported: risk of breaking link individual plans/clique is too high
 	 * @param person a Clique to be passed to setClique.
 	 */
 	@Override
 	public void setPerson(Person person) {
-		log.warn("using setPerson to set clique from JointPlan instance.");
-		try{
-			this.setClique((Clique) person);
-		} catch (java.lang.ClassCastException e) {
-			throw new IllegalArgumentException("unable to set "+person+" in JointPlan: is not a clique!");
-		}
+		//log.warn("using setPerson to set clique from JointPlan instance.");
+		//try{
+		//	this.setClique((Clique) person);
+		//} catch (java.lang.ClassCastException e) {
+		//	throw new IllegalArgumentException("unable to set "+person+" in JointPlan: is not a clique!");
+		//}
+		throw new UnsupportedOperationException("JointPlan instances can only be"
+				+" associated to a clique at cosntruction");
 	}
 
 	@Override
@@ -205,15 +233,16 @@ public class JointPlan implements Plan {
 		return this.clique;
 	}
 
-	/**
-	 * Sets the clique associated to the joint plan and sets the current
-	 * individual to the first member of the clique.
-	 * May be moved to a constructor in the future (final clique field).
-	 */
-	public void setClique(Clique clique) {
-		this.clique = clique;
-		this.resetCurrentIndividual();
-	}
+	///**
+	// * Sets the clique associated to the joint plan and sets the current
+	// * individual to the first member of the clique.
+	// * May be moved to a constructor in the future (final clique field).
+	// * XXX do not use, breaks the link individual plans/clique!
+	// */
+	//public void setClique(Clique clique) {
+	//	this.clique = clique;
+	//	this.resetCurrentIndividual();
+	//}
 
 	public Plan getIndividualPlan(Person person) {
 		return this.getIndividualPlan(person.getId());
@@ -269,10 +298,11 @@ public class JointPlan implements Plan {
 	 */
 	public void resetFromPlan(JointPlan plan) {
 		if (plan.getClique() != this.clique) {
-			throw new UnsupportedOperationException("resetting a plan from a plan"
-					+" is unsupported.");
+			throw new UnsupportedOperationException("resetting a joint plan from"+
+					" a plan of a different clique is unsupported.");
 		}
-		this.individualPlans = plan.getIndividualPlans();
+		this.individualPlans.clear();
+		this.individualPlans.putAll(plan.getIndividualPlans());
 	}
 
 	/**
@@ -299,6 +329,18 @@ public class JointPlan implements Plan {
 		}
 
 		return output;
+	}
+
+	/**
+	 * Returns the a leg given its Id.
+	 * used to resolve links between joint legs.
+	 * for used in JointLeg only.
+	 */
+	/*package*/ JointLeg getLegById(IdLeg legId) {
+		if (!this.legsMap.containsKey(legId)) {
+			throw new RuntimeException("legs links could not be resolved");
+		}
+		return this.legsMap.get(legId);
 	}
 }
 

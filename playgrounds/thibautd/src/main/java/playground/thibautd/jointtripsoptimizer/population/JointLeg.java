@@ -19,10 +19,13 @@
  * *********************************************************************** */
 package playground.thibautd.jointtripsoptimizer.population;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Identifiable;
 
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -31,16 +34,23 @@ import org.matsim.core.population.LegImpl;
 /**
  * @author thibautd
  */
-public class JointLeg extends LegImpl implements Leg, JointActing {
+public class JointLeg extends LegImpl implements Leg, JointActing, Identifiable {
 	// must extend LegImpl, as there exist parts of the code (mobsim...) where
 	// legs are casted to LegImpl.
 	//private Leg legDelegate;
+	
+	/**
+	 * Each joint leg created from a constructor without a joint leg as an argument
+	 * is attributed a unique Id.
+	 */
+	private static long currentLegId = 0;
+	private final IdLeg legId;
 
-	private boolean isJoint = false;
 	private boolean isDriver = false;
-	//private List<PersonInClique> participants = null;
-	//private List<PersonImpl> participants = null;
-	private Map<Id, JointLeg> linkedLegs = new HashMap<Id, JointLeg>();
+	
+	private final List<IdLeg> linkedLegsIds = new ArrayList<IdLeg>();
+	private JointPlan jointPlan = null;
+
 	private Person person;
 	//is set only if the trip is joint
 	private JointLeg associatedIndividualLeg = null;
@@ -55,11 +65,13 @@ public class JointLeg extends LegImpl implements Leg, JointActing {
 	public JointLeg(final String transportMode, final Person person) {
 		super(transportMode);
 		this.person = person;
+		this.legId = createId();
 	}
 
 	//JointLeg specific
 	public JointLeg(final JointLeg leg) {
 		super((LegImpl) leg);
+		this.legId = leg.getId();
 		constructFromJointLeg(leg);
 	}
 
@@ -69,14 +81,17 @@ public class JointLeg extends LegImpl implements Leg, JointActing {
 	public JointLeg(LegImpl leg, Person pers) {
 		super(leg);
 		if (leg instanceof JointLeg) {
+			this.legId = ((JointLeg) leg).getId();
 			constructFromJointLeg((JointLeg) leg);
 		} else {
+			this.legId = createId();
 			this.person = pers;
 		}
 	}
 
 	public JointLeg(LegImpl leg, JointLeg jointLeg) {
 		super(leg);
+		this.legId = jointLeg.getId();
 		constructFromJointLeg(jointLeg);
 	}
 	//TODO
@@ -86,17 +101,16 @@ public class JointLeg extends LegImpl implements Leg, JointActing {
 	//public JointLeg() {
 	//}
 
-	@SuppressWarnings("unchecked")
 	private void constructFromJointLeg(JointLeg leg) {
-		this.isJoint = leg.getJoint();
-		//cast unchecked, as it is the only possible output from getLinkedElements
-		// FIXME: when creating a new joint plan from an old one, linked
-		// elements still reference the ones of the old plan!
-		this.linkedLegs = new HashMap<Id, JointLeg>(
-				(Map<Id, JointLeg>) leg.getLinkedElements());
+		this.linkedLegsIds.addAll(leg.getLinkedElementsIds());
 		this.isDriver = leg.getIsDriver();
 		this.associatedIndividualLeg = leg.getAssociatedIndividualLeg();
 		this.person = leg.getPerson();
+	}
+
+	private IdLeg createId() {
+		currentLegId++;
+		return new IdLeg(currentLegId);
 	}
 
 	/*
@@ -111,40 +125,91 @@ public class JointLeg extends LegImpl implements Leg, JointActing {
 	 */
 	@Override
 	public boolean getJoint() {
-		return this.isJoint;
+		return (this.linkedLegsIds.size() > 0);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public void setLinkedElements(Map<Id, ? extends JointActing> linkedElements) {
-		//FIXME: unchecked cast is't safe here
-		this.linkedLegs = (Map<Id, JointLeg>) linkedElements;
-		if (this.linkedLegs.size()>1) {
-			this.isJoint = true;
+		try {
+			this.linkedLegsIds.clear();
+			for (JointActing currentElement : linkedElements.values()) {
+				this.linkedLegsIds.add(((JointLeg) currentElement).getId());
+			}
+		} catch (ClassCastException e) {
+			throw new IllegalArgumentException("Elements linked to a JointLeg must"+
+					" be of type JointLeg!");
 		}
 	}
 
 	@Override
 	public void addLinkedElement(Id id, JointActing act) {
-		//TODO: check cast
-		this.linkedLegs.put(id, (JointLeg) act);
-		if ((this.isJoint==false)&&(this.linkedLegs.size()>1)) {
-			this.isJoint = true;
+		try {
+			this.addLinkedElementById(((JointLeg) act).getId());
+		} catch (ClassCastException e) {
+			throw new IllegalArgumentException("Elements linked to a JointLeg must"+
+					" be of type JointLeg!");
 		}
 	}
 
 	@Override
-	public void removeLinkedElement(Id id) {
-		//TODO: check cast and success
-		this.linkedLegs.remove(id);
-		if (this.linkedLegs.size() <= 1) {
-			this.isJoint = false;
+	public Map<Id, JointLeg> getLinkedElements() {
+		Map<Id, JointLeg> output = new HashMap<Id, JointLeg>();
+		JointLeg currentLeg;
+
+		for (IdLeg currentIdLeg : this.linkedLegsIds) {
+			currentLeg = this.jointPlan.getLegById(currentIdLeg);
+			output.put(currentLeg.getPerson().getId(), currentLeg);
+		}
+
+		return output;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * @see JointActing#setLinkedElementsById(List<Id>)
+	 */
+	@Override
+	public void setLinkedElementsById(List<? extends Id> linkedElements) {
+		try {
+			this.linkedLegsIds.clear();
+			for (Id linkedId : linkedElements) {
+				this.linkedLegsIds.add((IdLeg) linkedId);
+			}
+		} catch (ClassCastException e) {
+			throw new IllegalArgumentException("ids linked to a joint leg must "+
+					"be of type IdLeg!");
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * @see JointActing#addLinkedElementsById(List<Id>)
+	 */
 	@Override
-	public Map<Id, ? extends JointActing> getLinkedElements() {
-		return this.linkedLegs;
+	public void addLinkedElementById(Id linkedId) {
+		try {
+			this.linkedLegsIds.add((IdLeg) linkedId);
+		} catch (ClassCastException e) {
+			throw new IllegalArgumentException("ids linked to a joint leg must "+
+					"be of type IdLeg!");
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * @see JointActing#getLinkedElementsIds()
+	 */
+	@Override
+	public List<IdLeg> getLinkedElementsIds() {
+		return this.linkedLegsIds;
+	}
+
+	/**
+	 * for use when adding to a joint plan.
+	 * Necessary to resolve the linked elements in a way robust with copy.
+	 */
+	/*package*/ void setJointPlan(JointPlan plan) {
+		this.jointPlan = plan;
 	}
 
 	@Override
@@ -155,6 +220,11 @@ public class JointLeg extends LegImpl implements Leg, JointActing {
 	@Override
 	public void setPerson(Person person) {
 		this.person = person;
+	}
+
+	@Override
+	public IdLeg getId() {
+		return this.legId;
 	}
 
 	/*

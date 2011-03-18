@@ -19,10 +19,8 @@
  * *********************************************************************** */
 package playground.thibautd.jointtripsoptimizer.population;
 
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-
-import org.apache.log4j.Logger;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -38,14 +36,11 @@ import org.matsim.core.population.ActivityImpl;
 public class JointActivity extends ActivityImpl implements Activity, JointActing {
 	// must extend ActivityImpl, as there exist parts of the code (mobsim...) where
 	// Activities are casted to ActivityImpl.
-	private static final Logger log =
-		Logger.getLogger(JointActivity.class);
 
-
-
-	private boolean isJoint = false;
+	// joint activity currently unsupported
+	private final boolean isJoint = false;
 	//private List<Person> participants = null;
-	private Map<Id, JointActivity> linkedActivities = new HashMap<Id, JointActivity>();
+	//private Map<Id, JointActivity> linkedActivities = new HashMap<Id, JointActivity>();
 	private Person person;
 
 	/*
@@ -87,14 +82,7 @@ public class JointActivity extends ActivityImpl implements Activity, JointActing
 		} 
 	}
 
-	@SuppressWarnings("unchecked")
 	private void constructFromJointActivity(JointActivity act) {
-		this.isJoint = act.getJoint();
-		// cast leaved unchecked as elements linked to a joint activity must be
-		// a joint activity
-		// FIXME: when creating a new joint plan from an old one, linked
-		// elements still reference the ones of the old plan!
-		this.linkedActivities = (Map<Id,JointActivity>) act.getLinkedElements();
 		this.person = act.getPerson();
 	}
 
@@ -109,41 +97,20 @@ public class JointActivity extends ActivityImpl implements Activity, JointActing
 		return this.isJoint;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public void setLinkedElements(Map<Id, ? extends JointActing> linkedElements) {
-		//unchecked cast, as elements linked to a joint activity must be a joint activity.
-		this.linkedActivities = (Map<Id, JointActivity>) linkedElements;
-		if (this.linkedActivities.size()>1) {
-			this.isJoint = true;
-		}
+		this.linkageError();
 	}
 
 	@Override
 	public void addLinkedElement(Id id, JointActing act) {
-		//TODO: check cast
-		this.linkedActivities.put(id, (JointActivity) act);
-		if ((this.isJoint==false)&&(this.linkedActivities.size()>1)) {
-			this.isJoint = true;
-		}
-	}
-
-	/**
-	 * based on the assumption that there is max one linked elements per other
-	 * member.
-	 */
-	@Override
-	public void removeLinkedElement(Id id) {
-		//TODO: check cast and success
-		this.linkedActivities.remove(id);
-		if (this.linkedActivities.size() <= 1) {
-			this.isJoint = false;
-		}
+		this.linkageError();
 	}
 
 	@Override
 	public Map<Id, ? extends JointActing> getLinkedElements() {
-		return this.linkedActivities;
+		this.linkageError();
+		return null;
 	}
 
 	@Override
@@ -154,6 +121,25 @@ public class JointActivity extends ActivityImpl implements Activity, JointActing
 	@Override
 	public void setPerson(Person person) {
 		this.person = person;
+	}
+
+	@Override
+	public void setLinkedElementsById(List<? extends Id> linkedElements) {
+		this.linkageError();
+	}
+
+	@Override
+	public void addLinkedElementById(Id linkedElement) {
+		this.linkageError();
+	}
+
+	@Override
+	public List<? extends Id> getLinkedElementsIds() {
+		return null;
+	}
+
+	private void linkageError() {
+		throw new UnsupportedOperationException("linkage of activities not supported yet");
 	}
 
 	@Deprecated

@@ -20,9 +20,7 @@
 package playground.thibautd.jointtripsoptimizer.scoring;
 
 import org.matsim.api.core.v01.population.Plan;
-
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.ScoringFunctionFactory;

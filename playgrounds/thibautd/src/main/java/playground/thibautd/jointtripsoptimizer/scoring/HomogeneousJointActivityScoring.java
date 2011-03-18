@@ -90,7 +90,7 @@ public class HomogeneousJointActivityScoring implements ActivityScoring, BasicSc
 	@Override
 	public void reset() {
 		for (Id id : this.ids) {
-		individualScoringFunctions.get(id).reset();
+			individualScoringFunctions.get(id).reset();
 		}	
 	}
 
