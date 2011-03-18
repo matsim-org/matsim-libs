@@ -24,6 +24,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 
@@ -48,13 +50,13 @@ public class JointPlan implements Plan {
 	/**
 	 * for robust resolution of links between activities.
 	 */
-	private final Map<IdLeg, JointLeg> legsMap = new HashMap<IdLeg, JointLeg>();
+	private final Map<IdLeg, JointLeg> legsMap = new TreeMap<IdLeg, JointLeg>();
 
 	//TODO: make final
 	private Clique clique;
 
-	private Id currentIndividual = null;
-	private Iterator<Id> individualsIterator;
+	//private Id currentIndividual = null;
+	//private Iterator<Id> individualsIterator;
 
 	public JointPlan(Clique clique, Map<Id, ? extends Plan> plans) {
 		Plan currentPlan;
@@ -215,7 +217,7 @@ public class JointPlan implements Plan {
 		//	throw new IllegalArgumentException("unable to set "+person+" in JointPlan: is not a clique!");
 		//}
 		throw new UnsupportedOperationException("JointPlan instances can only be"
-				+" associated to a clique at cosntruction");
+				+" associated to a clique at construction");
 	}
 
 	@Override
@@ -265,27 +267,27 @@ public class JointPlan implements Plan {
 	// 	}
 	// }
 
-	public void resetCurrentIndividual() {
-		this.individualsIterator = this.clique.getMembers().keySet().iterator();
-		this.currentIndividual = this.individualsIterator.next();
-	}
+	//public void resetCurrentIndividual() {
+	//	this.individualsIterator = this.clique.getMembers().keySet().iterator();
+	//	this.currentIndividual = this.individualsIterator.next();
+	//}
 
-	/**
-	 * Jumps to the next individual.
-	 * If current individual is the last individual, returns false.
-	 */
-	public boolean nextIndividual() {
-		//TODO
-		if (this.individualsIterator.hasNext()) {
-			this.currentIndividual = this.individualsIterator.next();
-			return true;
-		}
-		return false;
-	}
+	///**
+	// * Jumps to the next individual.
+	// * If current individual is the last individual, returns false.
+	// */
+	//public boolean nextIndividual() {
+	//	//TODO
+	//	if (this.individualsIterator.hasNext()) {
+	//		this.currentIndividual = this.individualsIterator.next();
+	//		return true;
+	//	}
+	//	return false;
+	//}
 
-	public Id getCurrentIndividual() {
-		return this.currentIndividual;
-	}
+	//public Id getCurrentIndividual() {
+	//	return this.currentIndividual;
+	//}
 
 	/**
 	 * Transforms this plan so that it is identical to the argument plan.
@@ -341,6 +343,30 @@ public class JointPlan implements Plan {
 			throw new RuntimeException("legs links could not be resolved");
 		}
 		return this.legsMap.get(legId);
+	}
+
+	/**
+	 * Returns the "type" of the plan.
+	 * This allows to make sure that the most "general" plan will not be removed.
+	 * @return a string, corresponding to a list of the ids of the shared legs,
+	 * separated by "-". No shared leg corresponds to the type "".
+	 */
+	public String getType() {
+		String type = "";
+		boolean notFirst = false;
+
+		for (JointLeg currentJointLeg : this.legsMap.values()) {
+			if (currentJointLeg.getJoint()) {
+				if (notFirst) {
+					type += "-";
+				} else {
+					notFirst = true;
+				}
+				type += currentJointLeg.getId();
+			}
+		}
+
+		return type;
 	}
 }
 
