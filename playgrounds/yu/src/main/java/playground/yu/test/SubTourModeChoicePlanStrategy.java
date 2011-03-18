@@ -23,7 +23,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.modules.ReRoute;
@@ -47,7 +46,7 @@ public class SubTourModeChoicePlanStrategy implements PlanStrategy {
 		planStrategyDelegate = new PlanStrategyImpl(new RandomPlanSelector());
 
 		// the plan selector may, at the same time, collect events:
-		controler.getEvents().addHandler((EventHandler) getPlanSelector());
+//		controler.getEvents().addHandler((EventHandler) getPlanSelector());
 
 		// if you just want to select plans, you can stop here.
 
@@ -97,14 +96,15 @@ public class SubTourModeChoicePlanStrategy implements PlanStrategy {
 		Config config = ConfigUtils.loadConfig(args[0]);
 		Controler controler = new Controler(config);
 		/*
-		 * <module name="strategy"> <param name="maxAgentPlanMemorySize"
-		 * value="x" /> <!-- 0 means unlimited --> <param
-		 * name="ModuleProbability_y" value="0.1" /> <param name="Module_y"
-		 * value="playground.yu.test.SubTourModeChoicePlanStrategy" /> </module>
-		 */
-		
-		//!!!NO longer necessary, man can just set constantwalk in planCalcScoreConfig Group
-		
+		 * <module name="strategy">
+				<param name="maxAgentPlanMemorySize" value="x" /> <!-- 0 means unlimited -->
+				<param name="ModuleProbability_y" value="0.1" />
+				<param name="Module_y" value="playground.yu.test.SubTourModeChoicePlanStrategy" />
+			</module>*/
+
+		// !!!NO longer necessary, man can just set constantwalk in
+		// planCalcScoreConfig Group
+
 		// controler.setScoringFunctionFactory(new
 		// CharyparNagelScoringFunctionFactoryWithWalk(config.planCalcScore(),
 		// config .planCalcScore().getConstantWalk() )) ;

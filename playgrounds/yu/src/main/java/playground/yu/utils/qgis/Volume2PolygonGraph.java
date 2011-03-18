@@ -56,7 +56,7 @@ public class Volume2PolygonGraph extends Network2PolygonGraph {
 			Set<Id> linkIds) {
 		super(network, crs);
 		this.linkIds = linkIds;
-		this.geofac = new GeometryFactory();
+		geofac = new GeometryFactory();
 		features = new ArrayList<Feature>();
 		AttributeType geom = DefaultAttributeTypeFactory.newAttributeType(
 				"MultiPolygon", MultiPolygon.class, true, null, null, crs);
@@ -70,20 +70,24 @@ public class Volume2PolygonGraph extends Network2PolygonGraph {
 	@Override
 	protected double getLinkWidth(Link link) {
 		Integer i = (Integer) parameters.get(0).get(link.getId());
-		return (i.intValue()) / 20.0;
+		if (i == null) {
+			return 0d;
+		}
+		return i.intValue() / 20.0;
 	}
 
 	@Override
 	public Collection<Feature> getFeatures() throws SchemaException,
 			NumberFormatException, IllegalAttributeException {
-		for (int i = 0; i < attrTypes.size(); i++)
+		for (int i = 0; i < attrTypes.size(); i++) {
 			defaultFeatureTypeFactory.addType(attrTypes.get(i));
+		}
 		FeatureType ftRoad = defaultFeatureTypeFactory.getFeatureType();
 		for (Id linkId : linkIds) {
 			Link link = network.getLinks().get(linkId);
 			LinearRing lr = getLinearRing(link);
-			Polygon p = new Polygon(lr, null, this.geofac);
-			MultiPolygon mp = new MultiPolygon(new Polygon[] { p }, this.geofac);
+			Polygon p = new Polygon(lr, null, geofac);
+			MultiPolygon mp = new MultiPolygon(new Polygon[] { p }, geofac);
 			int size = 2 + parameters.size();
 			Object[] o = new Object[size];
 			o[0] = mp;
