@@ -60,25 +60,34 @@ public abstract class CharyparNagelScoringFunctionTest extends ScoringFunctionTe
 		this.config = loadConfig(null);
 		PlanCalcScoreConfigGroup scoring = this.config.planCalcScore();
 		scoring.setBrainExpBeta(2.0);
-		scoring.setLateArrival_utils_hr(0.0);
+
+		scoring.setConstantCar(0.0);
+		scoring.setConstantPt(0.0);
+		scoring.setConstantWalk(0.0);
+		scoring.setConstantBike(0.0);
+		
 		scoring.setEarlyDeparture_utils_hr(0.0);
+		scoring.setLateArrival_utils_hr(0.0);
+		scoring.setWaiting_utils_hr(0.0);
 		scoring.setPerforming_utils_hr(0.0);
 		scoring.setTraveling_utils_hr(0.0);
 		scoring.setTravelingPt_utils_hr(0.0);
+		scoring.setTravelingWalk_utils_hr(0.0);
+		scoring.setTravelingBike_utils_hr(0.0);
 
-		//		scoring.setMarginalUtlOfDistanceCar(0.0);
-		scoring.setMonetaryDistanceCostRateCar(0.0) ;
 		scoring.setMarginalUtilityOfMoney(1.) ;
+//		scoring.setMarginalUtlOfDistanceCar(0.0);
+		scoring.setMonetaryDistanceCostRateCar(0.0) ;
+		scoring.setMonetaryDistanceCostRatePt(0.0);
 		
-		scoring.setWaiting_utils_hr(0.0);
 
 		// setup activity types h and w for scoring
 		PlanCalcScoreConfigGroup.ActivityParams params = new PlanCalcScoreConfigGroup.ActivityParams("h");
-		params.setTypicalDuration(16*3600);
+		params.setTypicalDuration(15*3600);
 		scoring.addActivityParams(params);
 
 		params = new PlanCalcScoreConfigGroup.ActivityParams("w");
-		params.setTypicalDuration(8*3600);
+		params.setTypicalDuration(3*3600);
 		scoring.addActivityParams(params);
 
 		this.network = NetworkImpl.createNetwork();
@@ -88,28 +97,57 @@ public abstract class CharyparNagelScoringFunctionTest extends ScoringFunctionTe
 		Node node4 = this.network.createAndAddNode(new IdImpl("4"), new CoordImpl( 6000.0, 0.0));
 		Node node5 = this.network.createAndAddNode(new IdImpl("5"), new CoordImpl(11000.0, 0.0));
 		Node node6 = this.network.createAndAddNode(new IdImpl("6"), new CoordImpl(11500.0, 0.0));
+		Node node7 = this.network.createAndAddNode(new IdImpl("7"), new CoordImpl(16500.0, 0.0));
+		Node node8 = this.network.createAndAddNode(new IdImpl("8"), new CoordImpl(17000.0, 0.0));
+		Node node9 = this.network.createAndAddNode(new IdImpl("9"), new CoordImpl(22000.0, 0.0));
+		Node node10 = this.network.createAndAddNode(new IdImpl("10"), new CoordImpl(22500.0, 0.0));
+		
 		Link link1 = this.network.createAndAddLink(new IdImpl("1"), node1, node2, 500, 25, 3600, 1);
 		this.network.createAndAddLink(new IdImpl("2"), node2, node3, 5000, 50, 3600, 1);
 		Link link3 = this.network.createAndAddLink(new IdImpl("3"), node3, node4, 500, 25, 3600, 1);
 		this.network.createAndAddLink(new IdImpl("4"), node4, node5, 5000, 50, 3600, 1);
-		Link link5 = this.network.createAndAddLink(new IdImpl(5), node5, node6, 500, 25, 3600, 1);
+		Link link5 = this.network.createAndAddLink(new IdImpl("5"), node5, node6, 500, 25, 3600, 1);
+		this.network.createAndAddLink(new IdImpl("6"), node6, node7, 5000, 50, 3600, 1);
+		Link link7 = this.network.createAndAddLink(new IdImpl("7"), node7, node8, 500, 25, 3600, 1);
+		this.network.createAndAddLink(new IdImpl("8"), node8, node9, 5000, 50, 3600, 1);
+		Link link9 = this.network.createAndAddLink(new IdImpl("9"), node9, node10, 500, 25, 3600, 1);
 
-		this.person = new PersonImpl(new IdImpl(1));
+		this.person = new PersonImpl(new IdImpl("1"));
 		this.plan = this.person.createAndAddPlan(true);
 		try {
 			this.plan.createAndAddActivity("h", link1.getId());
 			Leg leg = this.plan.createAndAddLeg(TransportMode.car);
 			NetworkRoute route = (NetworkRoute) network.getFactory().createRoute(TransportMode.car, link1.getId(), link3.getId());
 			leg.setRoute(route);
+			// does not match the network distances or travel times! WHY? --- benjamin mar'11
 			route.setDistance(25000.0);
 			route.setTravelTime(0.5*3600);
+			
 			this.plan.createAndAddActivity("w", link3.getId());
 			leg = this.plan.createAndAddLeg(TransportMode.pt);
 			route = (NetworkRoute) network.getFactory().createRoute(TransportMode.car, link3.getId(), link5.getId());
 			leg.setRoute(route);
+			// does not match the network distances or travel times! WHY? --- benjamin mar'11
 			route.setDistance(20000.0);
 			route.setTravelTime(0.25*3600);
-			this.plan.createAndAddActivity("h", link5.getId());
+			
+			this.plan.createAndAddActivity("w", link5.getId());
+			leg = this.plan.createAndAddLeg(TransportMode.walk);
+			route = (NetworkRoute) network.getFactory().createRoute(TransportMode.car, link5.getId(), link7.getId());
+			leg.setRoute(route);
+			// does not match the network distances or travel times! WHY? --- benjamin mar'11
+			route.setDistance(25000.0);
+			route.setTravelTime(0.5*3600);
+
+			this.plan.createAndAddActivity("w", link7.getId());
+			leg = this.plan.createAndAddLeg(TransportMode.bike);
+			route = (NetworkRoute) network.getFactory().createRoute(TransportMode.car, link7.getId(), link9.getId());
+			leg.setRoute(route);
+			// does not match the network distances or travel times! WHY? --- benjamin mar'11
+			route.setDistance(20000.0);
+			route.setTravelTime(0.25*3600);
+			
+			this.plan.createAndAddActivity("h", link9.getId());
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -127,13 +165,30 @@ public abstract class CharyparNagelScoringFunctionTest extends ScoringFunctionTe
 	private double calcScore() {
 		ScoringFunction testee = getScoringFunctionInstance(this.plan);
 		testee.endActivity(07*3600);
+		
 		testee.startLeg(07*3600, (Leg) this.plan.getPlanElements().get(1));
 		testee.endLeg(07*3600 + 30*60);
+		
 		testee.startActivity(07*3600 + 30*60, (Activity) this.plan.getPlanElements().get(2));
+		testee.endActivity(10*3600);
+		
+		testee.startLeg(10*3600, (Leg) this.plan.getPlanElements().get(3));
+		testee.endLeg(10*3600 + 15*60);
+		
+		testee.startActivity(10*3600 + 15*60, (Activity) this.plan.getPlanElements().get(4));
+		testee.endActivity(13*3600);
+		
+		testee.startLeg(13*3600, (Leg) this.plan.getPlanElements().get(5));
+		testee.endLeg(13*3600 + 30*60);
+		
+		testee.startActivity(13*3600 + 30*60, (Activity) this.plan.getPlanElements().get(6));
 		testee.endActivity(16*3600);
-		testee.startLeg(16*3600, (Leg) this.plan.getPlanElements().get(3));
+		
+		testee.startLeg(16*3600, (Leg) this.plan.getPlanElements().get(7));
 		testee.endLeg(16*3600 + 15*60);
-		testee.startActivity(16*3600 + 15*60, (Activity) this.plan.getPlanElements().get(4));
+		
+		testee.startActivity(16*3600 + 15*60, (Activity) this.plan.getPlanElements().get(8));
+		
 		testee.finish();
 		return testee.getScore();
 	}
@@ -175,23 +230,32 @@ public abstract class CharyparNagelScoringFunctionTest extends ScoringFunctionTe
 		assertEquals(0.0, calcScore(), EPSILON);
 	}
 
-	public void testTraveling() {
+	public void testTravelingAndConstantCar() {
 		this.config.planCalcScore().setTraveling_utils_hr(-6.0);
 		assertEquals(-3.0, calcScore(), EPSILON);
 		this.config.planCalcScore().setConstantCar(-6.0) ;
 		assertEquals(-9.0, calcScore(), EPSILON);
 	}
 
-	public void testTravelingPt() {
+	public void testTravelingPtAndConstantPt() {
 		this.config.planCalcScore().setTravelingPt_utils_hr(-9.0);
 		assertEquals(-2.25, calcScore(), EPSILON);
 		this.config.planCalcScore().setConstantPt(-3.0) ;
 		assertEquals(-5.25, calcScore(), EPSILON);
 	}
 	
-	public void testTravelingWalk() {
-		// this needs to be filled with meaning. yyyyyy kai, mar'11
-		assertEquals( 0, 0, EPSILON ) ;
+	public void testTravelingWalkAndConstantWalk() {
+		this.config.planCalcScore().setTravelingWalk_utils_hr(-18.0);
+		assertEquals(-9.0, calcScore(), EPSILON ) ;
+		this.config.planCalcScore().setConstantWalk(-1.0);
+		assertEquals(-10.0, calcScore(), EPSILON);
+	}
+	
+	public void testTravelingBikeAndConstantBike(){
+		this.config.planCalcScore().setTravelingBike_utils_hr(-6.0);
+		assertEquals(-1.5, calcScore(), EPSILON ) ;
+		this.config.planCalcScore().setConstantBike(-2.0);
+		assertEquals(-3.5, calcScore(), EPSILON);
 	}
 
 	/**
@@ -199,17 +263,21 @@ public abstract class CharyparNagelScoringFunctionTest extends ScoringFunctionTe
 	 */
 	public void testPerforming() {
 		double perf = +6.0;
-		double zeroUtilDurW = getZeroUtilDuration_h(8.0, 1.0);
-		double zeroUtilDurH = getZeroUtilDuration_h(16.0, 1.0);
+		double zeroUtilDurW = getZeroUtilDuration_h(3.0, 1.0);
+		double zeroUtilDurH = getZeroUtilDuration_h(15.0, 1.0);
 
 		this.config.planCalcScore().setPerforming_utils_hr(perf);
-		assertEquals(perf * 8.0 * Math.log(8.5 / zeroUtilDurW)
-				+ perf * 16.0 * Math.log(14.75 / zeroUtilDurH), calcScore(), EPSILON);
+		assertEquals(perf * 3.0 * Math.log(2.5 / zeroUtilDurW)
+				+ perf * 3.0 * Math.log(2.75/zeroUtilDurW)
+				+ perf * 3.0 * Math.log(2.5/zeroUtilDurW)
+				+ perf * 15.0 * Math.log(14.75 / zeroUtilDurH), calcScore(), EPSILON);
 
 		perf = +3.0;
 		this.config.planCalcScore().setPerforming_utils_hr(perf);
-		assertEquals(perf * 8.0 * Math.log(8.5 / zeroUtilDurW)
-				+ perf * 16.0 * Math.log(14.75 / zeroUtilDurH), calcScore(), EPSILON);
+		assertEquals(perf * 3.0 * Math.log(2.5 / zeroUtilDurW)
+				+ perf * 3.0 * Math.log(2.75/zeroUtilDurW)
+				+ perf * 3.0 * Math.log(2.5/zeroUtilDurW)
+				+ perf * 15.0 * Math.log(14.75 / zeroUtilDurH), calcScore(), EPSILON);
 	}
 
 	/**
@@ -221,11 +289,11 @@ public abstract class CharyparNagelScoringFunctionTest extends ScoringFunctionTe
 		double initialScore = calcScore();
 
 		ActivityParams wParams = this.config.planCalcScore().getActivityParams("w");
-		wParams.setOpeningTime(8*3600.0); // now the agent arrives 30min early and has to wait
+		wParams.setOpeningTime(8*3600.0); // now the agent arrives 30min early to the FIRST work activity and has to wait
 		double score = calcScore();
 
-		// check the difference between 8.5 and 8.0 hours of performing an activity
-		assertEquals(perf * 8.0 * Math.log(8.5 / 8.0), initialScore - score, EPSILON);
+		// check the difference between 2.5 and 2.0 hours of working
+		assertEquals(perf * 3.0 * Math.log(2.5 / 2.0), initialScore - score, EPSILON);
 	}
 
 	/**
@@ -237,11 +305,11 @@ public abstract class CharyparNagelScoringFunctionTest extends ScoringFunctionTe
 		double initialScore = calcScore();
 
 		ActivityParams wParams = this.config.planCalcScore().getActivityParams("w");
-		wParams.setClosingTime(15*3600.0); // now the agent stays 1h too long
+		wParams.setClosingTime(15*3600.0); // now the agent stays 1h too long at the LAST work activity
 		double score = calcScore();
 
-		// check the difference between 8.5 and 7.5 hours of performing an activity
-		assertEquals(perf * 8.0 * Math.log(8.5 / 7.5), initialScore - score, EPSILON);
+		// check the difference between 2.5 and 1.5 hours working
+		assertEquals(perf * 3.0 * Math.log(2.5 / 1.5), initialScore - score, EPSILON);
 	}
 
 	/**
@@ -249,7 +317,7 @@ public abstract class CharyparNagelScoringFunctionTest extends ScoringFunctionTe
 	 */
 	public void testOpeningClosingTime() {
 		double perf = +6.0;
-		double zeroUtilDurH = getZeroUtilDuration_h(16.0, 1.0);
+		double zeroUtilDurH = getZeroUtilDuration_h(15.0, 1.0);
 		this.config.planCalcScore().setPerforming_utils_hr(perf);
 		double initialScore = calcScore();
 
@@ -260,8 +328,11 @@ public abstract class CharyparNagelScoringFunctionTest extends ScoringFunctionTe
 		wParams.setClosingTime(15*3600.0); // the agent stays 1h too long
 		double score = calcScore();
 
-		// check the difference between 8.5 and 7.0 hours of performing an activity
-		assertEquals(perf * 8.0 * Math.log(8.5 / 7.0), initialScore - score, EPSILON);
+		// check the differences for all work activities
+		assertEquals(perf * 3.0 * Math.log(2.5 / 2.0)
+					+ perf * 3.0 * Math.log(2.75 / 2.75)
+					+ perf * 3.0 * Math.log(2.5 / 1.5)
+					, initialScore - score, EPSILON);
 
 		// test 2: agents has to wait all the time, because work place opens later
 
@@ -269,7 +340,7 @@ public abstract class CharyparNagelScoringFunctionTest extends ScoringFunctionTe
 		wParams.setClosingTime(21*3600.0);
 
 		// only the home-activity should add to the score
-		assertEquals(perf * 16.0 * Math.log(14.75 / zeroUtilDurH), calcScore(), EPSILON);
+		assertEquals(perf * 15.0 * Math.log(14.75 / zeroUtilDurH), calcScore(), EPSILON);
 
 		// test 3: agents has to wait all the time, because work place opened earlier
 
@@ -277,7 +348,7 @@ public abstract class CharyparNagelScoringFunctionTest extends ScoringFunctionTe
 		wParams.setClosingTime(2*3600.0);
 
 		// only the home-activity should add to the score
-		assertEquals(perf * 16.0 * Math.log(14.75 / zeroUtilDurH), calcScore(), EPSILON);
+		assertEquals(perf * 15.0 * Math.log(14.75 / zeroUtilDurH), calcScore(), EPSILON);
 	}
 
 	/**
@@ -303,7 +374,7 @@ public abstract class CharyparNagelScoringFunctionTest extends ScoringFunctionTe
 		this.config.planCalcScore().setEarlyDeparture_utils_hr(disutility);
 
 		ActivityParams wParams = this.config.planCalcScore().getActivityParams("w");
-		wParams.setEarliestEndTime(16.75 * 3600.0); // require the agent to work until 16:45
+		wParams.setEarliestEndTime(10.75 * 3600.0); // require the agent to work until 16:45
 
 		// the agent left 45mins too early
 		assertEquals(disutility * 0.75, calcScore(), EPSILON);
@@ -317,10 +388,10 @@ public abstract class CharyparNagelScoringFunctionTest extends ScoringFunctionTe
 		this.config.planCalcScore().setEarlyDeparture_utils_hr(disutility);
 
 		ActivityParams wParams = this.config.planCalcScore().getActivityParams("w");
-		wParams.setMinimalDuration(10 * 3600.0); // require the agent to be 10 hours at work
+		wParams.setMinimalDuration(3 * 3600.0); // require the agent to be 3 hours at every working activity
 
-		// the agent left 1.5h too early
-		assertEquals(disutility * 1.5, calcScore(), EPSILON);
+		// the agent overall works 1.25h too short
+		assertEquals(disutility * 1.25, calcScore(), EPSILON);
 	}
 
 	/**
@@ -331,7 +402,7 @@ public abstract class CharyparNagelScoringFunctionTest extends ScoringFunctionTe
 		this.config.planCalcScore().setLateArrival_utils_hr(disutility);
 
 		ActivityParams wParams = this.config.planCalcScore().getActivityParams("w");
-		wParams.setLatestStartTime(7 * 3600.0); // agent should start at 7 o'clock
+		wParams.setLatestStartTime(13 * 3600.0); // agent should start working latest at 13 o'clock
 
 		// the agent arrived 30mins late
 		assertEquals(disutility * 0.5, calcScore(), EPSILON);
@@ -377,16 +448,34 @@ public abstract class CharyparNagelScoringFunctionTest extends ScoringFunctionTe
 		assertEquals(24 * -6.0 - 6.0 * 0.50, testee.getScore(), EPSILON); // stuck penalty + 30min traveling
 	}
 
-	public void testMarginalUtilityOfDistance() {
-
+	public void testDistanceCostScoringCar() {
+		// test 1 where marginalUtitityOfMoney is fixed to 1.0
+		this.config.planCalcScore().setMarginalUtilityOfMoney(1.0);
 //		this.config.charyparNagelScoring().setMarginalUtlOfDistanceCar(-0.00001);
 		this.config.planCalcScore().setMonetaryDistanceCostRateCar(-0.00001) ;
-		this.config.planCalcScore().setMarginalUtilityOfMoney(1.);
 		
+		assertEquals(-0.25, calcScore(), EPSILON);
+		
+		// test 2 where MonetaryDistanceCostRate is fixed to -1.0
+		this.config.planCalcScore().setMonetaryDistanceCostRateCar(-1.0) ;
+		this.config.planCalcScore().setMarginalUtilityOfMoney(0.5);
+		
+		assertEquals(-12500.0, calcScore(), EPSILON);
+	}
+	
+	public void testDistanceCostScoringPt() {
+		// test 1 where marginalUtitityOfMoney is fixed to 1.0
+		this.config.planCalcScore().setMarginalUtilityOfMoney(1.0);
 //		this.config.charyparNagelScoring().setMarginalUtlOfDistancePt(-0.00001);
 		this.config.planCalcScore().setMonetaryDistanceCostRatePt(-0.00001) ;
 		
-		assertEquals(-0.45, calcScore(), EPSILON);
+		assertEquals(-0.20, calcScore(), EPSILON);
+		
+		// test 2 where MonetaryDistanceCostRate is fixed to -1.0
+		this.config.planCalcScore().setMonetaryDistanceCostRatePt(-1.0) ;
+		this.config.planCalcScore().setMarginalUtilityOfMoney(0.5);
+		
+		assertEquals(-10000.0, calcScore(), EPSILON);
 	}
 
 	/**
@@ -394,7 +483,7 @@ public abstract class CharyparNagelScoringFunctionTest extends ScoringFunctionTe
 	 */
 	public void testDifferentFirstLastAct() {
 		// change the last act to something different than the first act
-		((Activity) this.plan.getPlanElements().get(4)).setType("h2");
+		((Activity) this.plan.getPlanElements().get(8)).setType("h2");
 
 		PlanCalcScoreConfigGroup.ActivityParams params = new PlanCalcScoreConfigGroup.ActivityParams("h2");
 		params.setTypicalDuration(8*3600);
@@ -402,12 +491,14 @@ public abstract class CharyparNagelScoringFunctionTest extends ScoringFunctionTe
 
 		double perf = +6.0;
 		this.config.planCalcScore().setPerforming_utils_hr(perf);
-		double zeroUtilDurW = getZeroUtilDuration_h(8.0, 1.0);
-		double zeroUtilDurH = getZeroUtilDuration_h(16.0, 1.0);
+		double zeroUtilDurW = getZeroUtilDuration_h(3.0, 1.0);
+		double zeroUtilDurH = getZeroUtilDuration_h(15.0, 1.0);
 		double zeroUtilDurH2 = getZeroUtilDuration_h(8.0, 1.0);
 
-		assertEquals(perf * 8.0 * Math.log(8.5 / zeroUtilDurW)
-				+ Math.max(0.0, perf * 16.0 * Math.log(7.0 / zeroUtilDurH))
-				+ perf *  8.0 * Math.log(7.75 / zeroUtilDurH2), calcScore(), EPSILON);
+		assertEquals(perf * 3.0 * Math.log(2.5 / zeroUtilDurW)
+				+ perf * 3.0 * Math.log(2.75/zeroUtilDurW)
+				+ perf * 3.0 * Math.log(2.5/zeroUtilDurW)
+				+ Math.max(0.0, perf * 15.0 * Math.log(7.0 / zeroUtilDurH))
+				+ perf * 8.0 * Math.log(7.75 / zeroUtilDurH2), calcScore(), EPSILON);
 	}
 }
