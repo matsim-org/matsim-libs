@@ -96,7 +96,7 @@ public class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 				Candidate whatToDo = choiceSet.get(rng.nextInt(choiceSet.size()));
 				List<PlanElement> subTour = planAnalyzeSubtours.getSubtours().get(whatToDo.subTourIndex);
 				changeLegModeTo(subTour, whatToDo.newTransportMode);
-				logger.debug("Agent " + plan.getPerson().getId() + " changed their mode on subtour #"+whatToDo.subTourIndex+" to " + whatToDo.newTransportMode);
+//				logger.debug("Agent " + plan.getPerson().getId() + " changed their mode on subtour #"+whatToDo.subTourIndex+" to " + whatToDo.newTransportMode);
 			}
 		} else {
 			// Nothing to do - the whole plan does not contain a
