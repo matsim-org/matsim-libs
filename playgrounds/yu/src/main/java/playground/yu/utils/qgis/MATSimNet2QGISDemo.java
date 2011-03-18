@@ -64,10 +64,14 @@ public class MATSimNet2QGISDemo implements X2QGIS {
 		String netfile, outputFileLs, outputFileP;
 		double width;
 		if (args.length == 0) {
-			netfile = "../matsim/test/scenarios/chessboard/network.xml";
-			outputFileLs = "../matsimTests/locationChoice/chessboard/Links.shp";
-			outputFileP = "../matsimTests/locationChoice/chessboard/Polygon.shp";
-			width = 10d;
+//			netfile = "../matsim/test/scenarios/chessboard/network.xml";
+//			outputFileLs = "../matsimTests/locationChoice/chessboard/Links.shp";
+//			outputFileP = "../matsimTests/locationChoice/chessboard/Polygon.shp";
+//			width = 10d;
+			netfile = "..//shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml.gz";
+			outputFileLs = "../shared-svn/studies/countries/de/berlin/counts/iv_counts/Links.shp";
+			outputFileP = "../shared-svn/studies/countries/de/berlin/counts/iv_counts/Polygon.shp";
+			width = 0.01;
 		} else {
 			netfile = args[0];
 			outputFileLs = args[1];

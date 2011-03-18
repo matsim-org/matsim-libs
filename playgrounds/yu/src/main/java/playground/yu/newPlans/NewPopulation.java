@@ -37,10 +37,10 @@ public abstract class NewPopulation extends AbstractPersonAlgorithm {
 	protected Network net;
 
 	public NewPopulation(final Network network, final Population population,
-			final String filename) {
+			final String outputPopulationFilename) {
 		net = network;
 		pw = new PopulationWriter(population, network);
-		pw.writeStartPlans(filename);
+		pw.writeStartPlans(outputPopulationFilename);
 	}
 
 	public void run(Person person) {
