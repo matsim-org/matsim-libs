@@ -116,6 +116,9 @@ public class PlanTimesAdapter {
 					ActivityImpl act = (ActivityImpl) planTmp.getPlanElements().get(planElementIndex);
 					act.setStartTime(arrivalTime);
 					act.setEndTime(arrivalTime + actDur);
+					
+					scoringFunction.startLeg(departureTime, previousLegPlanTmp);
+					scoringFunction.endLeg(arrivalTime);
 										
 					scoringFunction.startActivity(arrivalTime, act);
 					scoringFunction.endActivity(arrivalTime + actDur);
