@@ -127,6 +127,12 @@ public class LocationMutatorBestResponse extends LocationMutatorwChoiceSet {
 	private void handleActivities(Plan plan, Plan bestPlan) {
 		int travelTimeApproximationLevel = Integer.parseInt(
 				this.controler.getConfig().locationchoice().getTravelTimeApproximationLevel());
+		
+		// somehow getting it from the controler causes problems for parallel runs.
+		// -> create a new (but identical) scorer here
+		//ScoringFunctionAccumulator scorer = (ScoringFunctionAccumulator) this.controler.getPlansScoring().getPlanScorer().getScoringFunctionForAgent(plan.getPerson().getId());
+		ScoringFunctionAccumulator scoringFunction = (ScoringFunctionAccumulator) this.controler.getScoringFunctionFactory().createNewScoringFunction(plan); 
+		
 		int actlegIndex = -1;
 		for (PlanElement pe : plan.getPlanElements()) {
 			actlegIndex++;
@@ -158,19 +164,18 @@ public class LocationMutatorBestResponse extends LocationMutatorwChoiceSet {
 						TravelCost travelCost = super.getControler().getTravelCostCalculatorFactory().
 							createTravelCostCalculator((PersonalizableTravelTime)travelTime, (PlanCalcScoreConfigGroup)super.getControler().getConfig().getModule("planCalcScore"));
 						
-						ScoringFunctionAccumulator scorer = (ScoringFunctionAccumulator) this.controler.getPlansScoring().getPlanScorer().getScoringFunctionForAgent(plan.getPerson().getId());
 						this.setLocation((ActivityImpl)actToMove, 
 								cs.getWeightedRandomChoice(actlegIndex, plan.getPerson(),
 										actPre.getCoord(), actPost.getCoord(), this.facilities, this.random,
-										scorer, plan, travelTime, travelCost));						
-						this.evaluatePlan(plan, bestPlan, cs, true);
+										scoringFunction, plan, travelTime, travelCost));						
+						this.evaluatePlan(plan, bestPlan, cs, true, scoringFunction);
 					}
 					else {
 						cs.shuffle(this.random);
 						int cnt = 0;
 						while (cs.hasUnvisited() && cnt < cs.getNumberOfDestinations() * 0.5) {
 							this.setLocation((ActivityImpl)actToMove, cs.visitNext());
-							this.evaluatePlan(plan, bestPlan, cs, false);
+							this.evaluatePlan(plan, bestPlan, cs, false, scoringFunction);
 							cnt++;
 						}
 					}
@@ -195,8 +200,8 @@ public class LocationMutatorBestResponse extends LocationMutatorwChoiceSet {
 		}
 	}
 	
-	private void evaluatePlan(Plan plan, Plan bestPlan, ChoiceSet cs, boolean adapt) {		
-		double score = this.computeScore(plan, cs, adapt);	
+	private void evaluatePlan(Plan plan, Plan bestPlan, ChoiceSet cs, boolean adapt, ScoringFunctionAccumulator scoringFunction) {		
+		double score = this.computeScore(plan, cs, adapt, scoringFunction);	
 		if (score > bestPlan.getScore() + 0.0000000000001) {
 			plan.setScore(score);
 			((PlanImpl)bestPlan).getPlanElements().clear();
@@ -204,11 +209,9 @@ public class LocationMutatorBestResponse extends LocationMutatorwChoiceSet {
 		}
 	}
 	
-	private double computeScore(Plan plan, ChoiceSet cs, boolean adapt) {
+	private double computeScore(Plan plan, ChoiceSet cs, boolean adapt, ScoringFunctionAccumulator scoringFunction) {
 		PlanImpl planTmp = new PlanImpl(plan.getPerson());
-		planTmp.copyPlan(plan);		
-		ScoringFunctionAccumulator scoringFunction = 
-			(ScoringFunctionAccumulator) this.controler.getPlansScoring().getPlanScorer().getScoringFunctionForAgent(plan.getPerson().getId());		
+		planTmp.copyPlan(plan);			
 		scoringFunction.reset();
 		
 		if (Boolean.parseBoolean(this.controler.getConfig().locationchoice().getTravelTimes())) {
