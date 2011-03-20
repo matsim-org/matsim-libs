@@ -92,9 +92,10 @@ public class ActivityTypicalDurAvg extends AbstractPersonAlgorithm implements
 			List<Double> typicalDurations = actTypeTypicalDurationEntry
 					.getValue();
 			toReturn += actSuperType + "\t"
-					+ SimpleStatistics.min(typicalDurations) + "\t"
-					+ SimpleStatistics.max(typicalDurations) + "\t"
-					+ SimpleStatistics.average(typicalDurations) + "\n";
+					+ SimpleStatistics.minOfDoubleCollection(typicalDurations)
+					+ "\t"
+					+ SimpleStatistics.maxOfDoubleCollection(typicalDurations)
+					+ "\t" + SimpleStatistics.average(typicalDurations) + "\n";
 
 		}
 		return toReturn;
@@ -107,7 +108,8 @@ public class ActivityTypicalDurAvg extends AbstractPersonAlgorithm implements
 		String networkFilename = "../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml", //
 		populationFilename = "../runs-svn/run1300/ITERS/it.1000/1000.plans.xml.gz";
 
-		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario scenario = (ScenarioImpl) ScenarioUtils
+				.createScenario(ConfigUtils.createConfig());
 
 		// Network network=scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(networkFilename);

@@ -69,11 +69,11 @@ public class SimpleStatistics {
 		return min(array, 0, array.length - 1);
 	}
 
-	public static double min(Collection<Double> collection) {
+	public static double minOfDoubleCollection(Collection<Double> collection) {
 		return min(Collection2Array.toArrayFromDouble(collection));
 	}
 
-	public static int min(Collection<Integer> collection) {
+	public static int minOfIntegerCollection(Collection<Integer> collection) {
 		return (int) min(Collection2Array.toDoubleArray(collection));
 	}
 
@@ -90,11 +90,11 @@ public class SimpleStatistics {
 		return max(array, 0, array.length - 1);
 	}
 
-	public static double max(Collection<Double> collection) {
+	public static double maxOfDoubleCollection(Collection<Double> collection) {
 		return max(Collection2Array.toArrayFromDouble(collection));
 	}
 
-	public static int max(Collection<Integer> collection) {
+	public static int maxOfIntegerCollection(Collection<Integer> collection) {
 		return (int) max(Collection2Array.toDoubleArray(collection));
 	}
 
