@@ -21,10 +21,10 @@
 package playground.anhorni.scenarios;
 
 import org.matsim.core.controler.Controler;
+import org.matsim.locationchoice.bestresponse.scoring.MixedScoringFunctionFactory;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
 import playground.anhorni.LEGO.miniscenario.run.analysis.CalculatePlanTravelStats;
-import playground.anhorni.LEGO.miniscenario.run.scoring.MixedScoringFunctionFactory;
 import playground.anhorni.scenarios.analysis.ShoppingCalculator;
 
 public class SingleRunControler extends Controler {

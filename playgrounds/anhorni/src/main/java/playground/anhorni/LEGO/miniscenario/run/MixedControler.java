@@ -21,8 +21,9 @@
 package playground.anhorni.LEGO.miniscenario.run;
 
 import org.matsim.core.controler.Controler;
+import org.matsim.locationchoice.bestresponse.scoring.MixedScoringFunctionFactory;
+
 import playground.anhorni.LEGO.miniscenario.run.analysis.CalculatePlanTravelStats;
-import playground.anhorni.LEGO.miniscenario.run.scoring.MixedScoringFunctionFactory;
 
 
 public class MixedControler extends Controler {

@@ -35,7 +35,8 @@ import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.ConfigUtils;
-import playground.anhorni.LEGO.miniscenario.run.scoring.DestinationChoiceScoring;
+import org.matsim.locationchoice.bestresponse.scoring.DestinationChoiceScoring;
+
 import playground.anhorni.analysis.Bins;
 
 public class UtilitySampler {
