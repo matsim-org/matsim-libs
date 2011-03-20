@@ -40,11 +40,13 @@ public class TravelTimeEventHandler implements LinkEnterEventHandler,LinkLeaveEv
 
 	private Network network = null;
 	private HbefaObject[][] hbefaTable = null;
+	private HbefaObject[][] hbefaHdvTable =null;
 	private AnalysisModule linkAndAgentAccountAnalysisModule = null;
 
-	public TravelTimeEventHandler(final Network network, HbefaObject[][] hbefaTable, AnalysisModule linkAndAgentAccountAnalysisModule) {
+	public TravelTimeEventHandler(final Network network, HbefaObject[][] hbefaTable, HbefaObject[][] hbefaHdvTable, AnalysisModule linkAndAgentAccountAnalysisModule) {
 		this.network = network;
 		this.hbefaTable = hbefaTable;
+		this.hbefaHdvTable = hbefaHdvTable;
 		this.linkAndAgentAccountAnalysisModule = linkAndAgentAccountAnalysisModule;
 	}
 
@@ -120,8 +122,8 @@ public class TravelTimeEventHandler implements LinkEnterEventHandler,LinkLeaveEv
 
 				this.agentarrival.remove(personId);
 
-				linkAndAgentAccountAnalysisModule.calculateEmissionsPerLink(travelTime, linkId, averageSpeed,roadType, freeVelocity, distance, hbefaTable);	
-				linkAndAgentAccountAnalysisModule.calculateEmissionsPerPerson(travelTime, personId, averageSpeed,roadType, freeVelocity, distance, hbefaTable);	
+				linkAndAgentAccountAnalysisModule.calculateEmissionsPerLink(travelTime, linkId, personId, averageSpeed,roadType, freeVelocity, distance, hbefaTable,hbefaHdvTable);	
+				linkAndAgentAccountAnalysisModule.calculateEmissionsPerPerson(travelTime, personId, averageSpeed,roadType, freeVelocity, distance, hbefaTable,hbefaHdvTable);	
 			}
 			// if (this.agentarrival.containsKey(personId)) is not the case (link without activity)
 			else {
@@ -129,8 +131,8 @@ public class TravelTimeEventHandler implements LinkEnterEventHandler,LinkLeaveEv
 				double travelTime = event.getTime() - enterTime;
 				double averageSpeed=(distance/1000)/(travelTime/3600);
 
-				linkAndAgentAccountAnalysisModule.calculateEmissionsPerLink(travelTime, linkId, averageSpeed,roadType, freeVelocity, distance, hbefaTable);	
-				linkAndAgentAccountAnalysisModule.calculateEmissionsPerPerson(travelTime, personId, averageSpeed,roadType, freeVelocity, distance, hbefaTable);
+				linkAndAgentAccountAnalysisModule.calculateEmissionsPerLink(travelTime, linkId, personId, averageSpeed,roadType, freeVelocity, distance, hbefaTable,hbefaHdvTable);	
+				linkAndAgentAccountAnalysisModule.calculateEmissionsPerPerson(travelTime, personId, averageSpeed,roadType, freeVelocity, distance, hbefaTable,hbefaHdvTable);
 			}
 		}
 		//		}

@@ -59,7 +59,9 @@ public class Main {
 
 	private static String visum2hbefaRoadTypeFile = "../../detailedEval/testRuns/input/inputEmissions/road_types.txt";
 	private static String hbefaAverageFleetEmissionFactorsFile = "../../detailedEval/testRuns/input/inputEmissions/hbefa_emission_factors_urban_rural_MW.txt";
+	private static String hbefaAverageFleetHdvEmissionFactorsFile = "../../detailedEval/testRuns/input/inputEmissions/hbefa_emission_factors_urban_rural_MW_hdv.txt";
 	private static String hbefaColdEmissionFactorsFile = "../../detailedEval/testRuns/input/inputEmissions/hbefa_coldstart_emission_factors.txt";
+
 
 	private static String shapeDirectory = "../../detailedEval/Net/shapeFromVISUM/urbanSuburban/";
 	private static String urbanShapeFile = shapeDirectory + "urbanAreas.shp";
@@ -92,6 +94,9 @@ public class Main {
 		HbefaTable hbefaTable = new HbefaTable();
 		hbefaTable.makeHbefaTable(hbefaAverageFleetEmissionFactorsFile);
 		
+		HbefaTable hbefaHdvTable = new HbefaTable();
+		hbefaHdvTable.makeHbefaTable(hbefaAverageFleetHdvEmissionFactorsFile);
+		
 		HbefaColdEmissionTable hbefaColdTable = new HbefaColdEmissionTable();
 		hbefaColdTable.makeHbefaColdTable(hbefaColdEmissionFactorsFile);
 
@@ -105,7 +110,7 @@ public class Main {
 		EventsManager events = new EventsManagerImpl();	
 		ColdstartAnalyseModul coldstartAccount = new ColdstartAnalyseModul ();
 		//create the handler 
-		TravelTimeEventHandler handler = new TravelTimeEventHandler(network, hbefaTable.getHbefaTableWithSpeedAndEmissionFactor(), linkAndAgentAccount);
+		TravelTimeEventHandler handler = new TravelTimeEventHandler(network, hbefaTable.getHbefaTableWithSpeedAndEmissionFactor(), hbefaHdvTable.getHbefaTableWithSpeedAndEmissionFactor(),linkAndAgentAccount);
 		TimeAndDistanceEventHandler handler2 = new TimeAndDistanceEventHandler(network,hbefaColdTable,coldstartAccount);
 	
 	
