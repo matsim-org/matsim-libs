@@ -504,29 +504,8 @@ public class GTFS2MATSimTransitScheduleFileWriter extends MatsimXmlWriter implem
 							this.writeEndTag("routeProfile");
 							//Route
 							this.writeStartTag("route", new ArrayList<Tuple<String,String>>());
-							Shape shape = trip.getShape();
-							if(shape!=null) {
-								Link actualLink = null;
-								for(Coord point:shape.getPoints().values()) {
-									Link link = ((NetworkImpl)network).getNearestLink(point);
-									if(actualLink==null || !link.equals(actualLink))
-										if(actualLink==null || actualLink.getToNode().equals(link.getFromNode()) || actualLink.getToNode().equals(link.getToNode()) || actualLink.getFromNode().equals(link.getToNode()) || actualLink.getFromNode().equals(link.getFromNode())) {
-											actualLink = link;
-											List<Tuple<String,String>> linkAtts = new ArrayList<Tuple<String,String>>();
-											linkAtts.add(new Tuple<String, String>("refId", link.getId().toString()));
-											this.writeStartTag("link", linkAtts, true);
-										}
-										else {
-											actualLink = link;
-											List<Tuple<String,String>> linkAtts = new ArrayList<Tuple<String,String>>();
-											linkAtts.add(new Tuple<String, String>("refId", link.getId().toString()));
-											this.writeStartTag("link", linkAtts, true);
-										}
-								}
-							}
-							else {
-								//TODO
-							}
+							Method m = GTFS2MATSimTransitScheduleFileWriter.class.getMethod("write"+Route.ROUTE_TYPES[route.getRouteType()]+"Route", new Class[] {Trip.class});
+							m.invoke(this, new Object[]{trip});
 							this.writeEndTag("route");
 							//Departures
 							int id = 1;
@@ -633,6 +612,12 @@ public class GTFS2MATSimTransitScheduleFileWriter extends MatsimXmlWriter implem
 				}
 			}
 		}
+	}
+	/**
+	 * Methods for writing the links of a trip
+	 */
+	public void writeBusRoute() {
+		
 	}
 	//Main method
 	/**
