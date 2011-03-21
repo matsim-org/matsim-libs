@@ -20,10 +20,6 @@
 
 package playground.jjoubert.TemporaryCode;
 
-import java.io.IOException;
-
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.NetworkImpl;
@@ -35,7 +31,6 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.OsmNetworkReader;
 import org.matsim.core.utils.misc.ConfigUtils;
-import org.xml.sax.SAXException;
 
 public class MyNetworkGenerator {
 	public static final String UTM35S = "PROJCS[\"WGS_1984_UTM_Zone_35S\",GEOGCS[\"GCS_WGS_1984\",DATUM[\"D_WGS_1984\",SPHEROID[\"WGS_1984\",6378137,298.257223563]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.017453292519943295]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"latitude_of_origin\",0],PARAMETER[\"central_meridian\",27],PARAMETER[\"scale_factor\",0.9996],PARAMETER[\"false_easting\",500000],PARAMETER[\"false_northing\",10000000],UNIT[\"Meter\",1]]";
@@ -49,15 +44,7 @@ public class MyNetworkGenerator {
 
 		OsmNetworkReader onr = new OsmNetworkReader(net,ct);
 		onr.setHierarchyLayer(-25.8875, 28.1204, -25.9366, 28.1612, 6);
-		try {
-			onr.parse(osm);
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		onr.parse(osm);
 		new NetworkCleaner().run(net);
 		new NetworkWriter(net).write("/Users/johanwjoubert/Desktop/Temp/network.xml");
 

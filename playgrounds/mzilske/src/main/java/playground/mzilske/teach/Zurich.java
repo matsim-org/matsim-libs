@@ -1,9 +1,5 @@
 package playground.mzilske.teach;
 
-import java.io.IOException;
-
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.network.NetworkWriter;
@@ -14,7 +10,6 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.OsmNetworkReader;
 import org.matsim.core.utils.misc.ConfigUtils;
-import org.xml.sax.SAXException;
 
 
 public class Zurich {
@@ -33,15 +28,7 @@ public class Zurich {
 		onr.setHierarchyLayer(48.15, 5.71, 45.41, 11, 6);
 //		onr.setHierarchyLayer(47.701, 8.346, 47.146, 9.019, 6);
 	
-		try {
-			onr.parse(osm); //starts the conversion from osm to matsim
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		onr.parse(osm); //starts the conversion from osm to matsim
 		
 		System.out.println("Converted.");
 		

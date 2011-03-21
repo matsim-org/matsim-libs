@@ -20,17 +20,12 @@
 
 package playground.duncan;
 
-import java.io.IOException;
-
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.apache.log4j.Logger;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03;
 import org.matsim.core.utils.io.OsmNetworkReader;
-import org.xml.sax.SAXException;
 
 
 public class OSM2MATSim {
@@ -43,16 +38,8 @@ public class OSM2MATSim {
 		Gbl.startMeasurement();
 		NetworkImpl network = NetworkImpl.createNetwork();
 		OsmNetworkReader osmReader = new OsmNetworkReader(network, new WGS84toCH1903LV03()); // wrong coordinate system! that's for Switzerland
-		try {
-//			osmReader.parse("../mystudies/zueri.osm");
-			osmReader.parse("../shared-svn/studies/north-america/ca/vancouver/network/osm/map.osm");
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		//			osmReader.parse("../mystudies/zueri.osm");
+		osmReader.parse("../shared-svn/studies/north-america/ca/vancouver/network/osm/map.osm");
 //		new NetworkWriter(network, "../mystudies/zueri-net.xml").write();
 		new NetworkWriter(network).write("../shared-svn/studies/north-america/ca/vancouver/network/net.xml");
 		Gbl.printElapsedTime();

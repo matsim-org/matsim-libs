@@ -29,8 +29,6 @@ import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.Random;
 
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -43,9 +41,9 @@ import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.Module;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -60,7 +58,6 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.OsmNetworkReader;
 import org.matsim.core.utils.misc.ArgumentParser;
 import org.matsim.core.utils.misc.ConfigUtils;
-import org.xml.sax.SAXException;
 
 import playground.mrieser.core.mobsim.usecases.OptimizedCarSimFactory;
 
@@ -77,15 +74,7 @@ public class BenchmarkV2 {
 	public void convertNetwork() {
 		OsmNetworkReader osmReader = new OsmNetworkReader(this.scenario.getNetwork(), new WGS84toCH1903LV03());
 		osmReader.setKeepPaths(false);
-		try {
-			osmReader.parse("/Volumes/Data/projects/benchmarkV2/zurich.osm");
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		osmReader.parse("/Volumes/Data/projects/benchmarkV2/zurich.osm");
 		new NetworkCleaner().run(this.scenario.getNetwork());
 		for (Link link : this.scenario.getNetwork().getLinks().values()) {
 			if (link.getFreespeed() == 0.0) {

@@ -111,15 +111,7 @@ public class OSM2MATSim {
 		// POA Berlin Korridor Ana
 //		osmReader.setHierarchyLayer(52.491, 13.315, 52.53, 13.433, 8);
 
-		try {
-			osmReader.parse(inputFile);
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		osmReader.parse(inputFile);
 
 		System.out.println("...done");
 

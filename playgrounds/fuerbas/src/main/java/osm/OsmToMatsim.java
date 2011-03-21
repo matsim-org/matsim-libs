@@ -20,11 +20,8 @@
 
 package osm;
 
-import java.io.IOException;
 import java.util.Set;
 import java.util.TreeSet;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -36,7 +33,6 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.OsmNetworkReader;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.run.NetworkCleaner;
-import org.xml.sax.SAXException;
 
 
 
@@ -80,15 +76,7 @@ public class OsmToMatsim {
 //		 Spielstrassen irrelevant, since only tiny percentile
 //		 osmReader.setHighwayDefaults(6, "living_street", 1,  15.0/3.6, 1.0,  300);
 
-		try {
-			osmReader.parse(input);
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		osmReader.parse(input);
 
 		// Write network to file
 		new NetworkWriter(network).write(output + ".xml.gz");

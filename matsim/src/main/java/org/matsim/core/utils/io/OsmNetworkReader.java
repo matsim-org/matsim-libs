@@ -155,8 +155,16 @@ public class OsmNetworkReader implements MatsimSomeReader {
 	 * @throws ParserConfigurationException
 	 * @throws IOException
 	 */
-	public void parse(final String osmFilename) throws SAXException, ParserConfigurationException, IOException {
-		parse(osmFilename, null);
+	public void parse(final String osmFilename) {
+		try {
+			parse(osmFilename, null);
+		} catch (SAXException e) {
+			throw new RuntimeException(e);
+		} catch (ParserConfigurationException e) {
+			throw new RuntimeException(e);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	/*package*/ void parse(final InputStream stream) throws SAXException, ParserConfigurationException, IOException {

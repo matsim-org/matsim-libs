@@ -20,10 +20,6 @@
 
 package playground.jjoubert.Utilities.network;
 
-import java.io.IOException;
-
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.NetworkWriter;
@@ -38,7 +34,6 @@ import org.matsim.utils.gis.matsim2esri.network.CapacityBasedWidthCalculator;
 import org.matsim.utils.gis.matsim2esri.network.FeatureGeneratorBuilderImpl;
 import org.matsim.utils.gis.matsim2esri.network.Links2ESRIShape;
 import org.matsim.utils.gis.matsim2esri.network.PolygonFeatureGenerator;
-import org.xml.sax.SAXException;
 
 public class ConvertOsmToMatsim {
 
@@ -72,15 +67,7 @@ public class ConvertOsmToMatsim {
 		 * Configure the highway classification.
 		 */
 		
-		try {
-			onr.parse(inputFile);
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		onr.parse(inputFile);
 		
 		NetworkCleaner nc = new NetworkCleaner();
 		nc.run(nw);		

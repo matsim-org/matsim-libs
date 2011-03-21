@@ -19,17 +19,12 @@
 
 package playground.jbischoff.BAsignalsDemand;
 
-import java.io.IOException;
-
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.OsmNetworkReader;
 import org.matsim.run.NetworkCleaner;
-import org.xml.sax.SAXException;
 
 
 public class JbOsmReader {
@@ -78,15 +73,7 @@ public class JbOsmReader {
 		//cottbus innenstadt
 		osmReader.setHierarchyLayer(51.820578,14.247866, 51.684789,14.507332, 2);
 
-		try {
-			osmReader.parse(input);
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		osmReader.parse(input);
 
 		// Write network to file
 		new NetworkWriter(network).write(output + ".xml.gz");
