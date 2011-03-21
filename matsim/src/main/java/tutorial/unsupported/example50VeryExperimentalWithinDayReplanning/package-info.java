@@ -19,7 +19,7 @@ package tutorial.unsupported.example50VeryExperimentalWithinDayReplanning;
  * <p/>
  * <b>This package contains (as of dec'10):</b><ul>
  * <li>EquilTest (very short), which contains the main method.
- * <li>MyControlerListener (very short), which tells the Control(l)er at the right time in the initaliziation sequence to use a certain
+ * <li>MyControlerListener (very short), which tells the Control(l)er at the right time in the initialization sequence to use a certain
  * setup of the mobsim.
  * <li>MyMobsimFactory (short), which defines that mobsim setup.
  * <li>WithinDayMobsimListener, which contains the "meat", i.e. the definitions how the within-day replanning should function.
@@ -28,7 +28,7 @@ package tutorial.unsupported.example50VeryExperimentalWithinDayReplanning;
  * final solution).
  * <li>WithinDayMobsimListener2, which contains a concrete implementation for withinday replanning of vehicle drivers.  
  * This is a bare boned version of Christoph's code, still in the playground, but soon moving to be a withinday replanning package
- * for matsim.  Christoph's code will contain more elaborate examples and configuration options. (For organisational reasons,
+ * for matsim.  Christoph's code will contain more elaborate examples and configuration options. (For organizational reasons,
  * this is still in playground.kai.usecases.withinday .)
  * </ul>
  * <p/>
@@ -39,7 +39,7 @@ package tutorial.unsupported.example50VeryExperimentalWithinDayReplanning;
  * </ul>
  * <p/>
  * Again: This package contains <i>ideas</i>, not some version that is meant to be working.  Comments are welcome, please address
- * to nagel (or to the developers email list).
+ * to nagel (or to the developers' email list).
  * 
  */
 class PackageInfo {

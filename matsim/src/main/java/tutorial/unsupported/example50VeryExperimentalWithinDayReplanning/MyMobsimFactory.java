@@ -56,11 +56,8 @@ public class MyMobsimFactory implements MobsimFactory {
 		if ( replanningType.equals( ReplanningType.general ) ) {
 			mobsim.addQueueSimulationListeners(new MyWithinDayMobsimListener(this.travCostCalc,this.travTimeCalc)) ;
 
-//		} else if ( replanningType.equals( ReplanningType.carPlans ) ) {
-//			mobsim.addQueueSimulationListeners(new MyWithinDayMobsimListener2(this.travCostCalc,this.travTimeCalc)) ;
-			// the above should work (at the same level as the remainder of the package if not better), but it uses
-			// EditRoutes, which at the time of moving this material into "matsim" was still in "playground" and thus
-			// cannot be referenced from here.  MyWithinDayMobsimListener2 is unter playground.kai.usecases.withinday .  kai, dec'10
+		} else if ( replanningType.equals( ReplanningType.carPlans ) ) {
+			mobsim.addQueueSimulationListeners(new MyWithinDayMobsimListener2(this.travCostCalc,this.travTimeCalc)) ;
 
 		}
 
