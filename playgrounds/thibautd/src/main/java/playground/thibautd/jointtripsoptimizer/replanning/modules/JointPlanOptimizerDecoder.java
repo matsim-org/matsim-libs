@@ -190,37 +190,37 @@ public class JointPlanOptimizerDecoder {
 	public JointPlan decode(IChromosome chromosome) {
 
 		Map<Id, PlanImpl> constructedIndividualPlans = new HashMap<Id, PlanImpl>();
-
+		Map<Id, IndividualValuesWrapper> individualValuesMap = 
+			new HashMap<Id, IndividualValuesWrapper>();
 		List<Id> individualsToPlan = new ArrayList<Id>();
 		List<Id> toRemove = new ArrayList<Id>();
 		Id currentId = null;
 		PlanImpl individualPlan = null;
-		Map<PlanElement, Double> plannedPickUps = new HashMap<PlanElement, Double>();
-		Map<Id, Integer> indicesInPlan = new HashMap<Id, Integer>();
-		Map<Id, Integer> indicesInChromosome = new HashMap<Id, Integer>();
-		Map<Id, Double> individualsNow = new HashMap<Id, Double>();
+		//Map<PlanElement, Double> plannedPickUps = new HashMap<PlanElement, Double>();
+		//Map<Id, Integer> indicesInPlan = new HashMap<Id, Integer>();
+		//Map<Id, Integer> indicesInChromosome = new HashMap<Id, Integer>();
+		//Map<Id, Double> individualsNow = new HashMap<Id, Double>();
 
 		for (Person individual : plan.getClique().getMembers().values()) {
 			individualPlan = new PlanImpl(individual);
 			currentId = individual.getId();
 			constructedIndividualPlans.put(currentId, individualPlan);
 			individualsToPlan.add(currentId);
-			indicesInPlan.put(currentId, 0);
-			indicesInChromosome.put(currentId, 0);
-			individualsNow.put(currentId, 0d);
+			individualValuesMap.put(currentId, new IndividualValuesWrapper());
+			//indicesInPlan.put(currentId, 0);
+			//indicesInChromosome.put(currentId, 0);
+			//individualsNow.put(currentId, 0d);
 		}
 
 		do {
 			for (Id id : individualsToPlan) {
 				planNextActivity(
 						chromosome,
-						indicesInPlan,
-						indicesInChromosome,
+						individualValuesMap,
 						id,
-						constructedIndividualPlans,
-						individualsNow,
-						plannedPickUps);
-				if (indicesInPlan.get(id) >= this.individualPlanElements.get(id).size()) {
+						constructedIndividualPlans);
+				if (individualValuesMap.get(id).getIndexInPlan()
+						>= this.individualPlanElements.get(id).size()) {
 					toRemove.add(id);
 				}
 			}
@@ -236,209 +236,93 @@ public class JointPlanOptimizerDecoder {
 		//return output;
 	}
 
-	//TODO: refactoring
-	//make shorter, less redundant and clearer
 	private final void planNextActivity(
 			IChromosome chromosome,
-			Map<Id, Integer> indicesInPlan,
-			Map<Id, Integer> indicesInChromosome,
+			Map<Id, IndividualValuesWrapper> individualValuesMap,
 			Id id,
-			Map<Id, PlanImpl> constructedIndividualPlans,
-			Map<Id, Double> individualsNow,
-			Map<PlanElement, Double> plannedPickUps) {
-		int indexInPlan = indicesInPlan.get(id);
-		int indexInChromosome = indicesInChromosome.get(id);
+			Map<Id, PlanImpl> constructedIndividualPlans) {
+		//int indexInPlan = indicesInPlan.get(id);
+		//int indexInChromosome = indicesInChromosome.get(id);
+		IndividualValuesWrapper individualValues = individualValuesMap.get(id);
 		PlanImpl constructedPlan = constructedIndividualPlans.get(id);
 		List<PlanElement> planElements = this.individualPlanElements.get(id);
-		PlanElement currentElement = planElements.get(indexInPlan);
+		PlanElement currentElement = planElements.get(individualValues.getIndexInPlan());
 		LegTravelTimeEstimator currentLegTTEstimator =
 			this.legTTEstimators.get(id);
-		double now = individualsNow.get(id);
+		//double now = individualsNow.get(id);
 		double currentDuration;
-		double currentTravelTime;
 		Integer geneIndex;
 		Map<String, Integer> currentGeneIndices;
 
 		JointActivity origin;
 		JointActivity destination;
-		JointActivity dropOff;
-		JointLeg leg;
 
-		if (indexInPlan==0) {
+		currentGeneIndices = this.genesIndices.get(id).get(individualValues.getIndexInChromosome());
+
+		if (individualValues.getIndexInPlan()==0) {
 			origin = new JointActivity((JointActivity) currentElement);
-			origin.setStartTime(now);
-			geneIndex = this.genesIndices.get(id).get(indexInChromosome).get(DURATION_CHROM);
+			origin.setStartTime(individualValues.getNow());
+			geneIndex = this.genesIndices.get(id)
+				.get(individualValues.getIndexInChromosome()).get(DURATION_CHROM);
 			currentDuration = ((DoubleGene) chromosome.getGene(geneIndex)).doubleValue();
 			origin.setMaximumDuration(currentDuration);
-			now += currentDuration;
-			origin.setEndTime(now);
+			individualValues.addToNow(currentDuration);
+			origin.setEndTime(individualValues.getNow());
 
 			constructedPlan.addActivity(origin);
-			indexInPlan++;
-			indexInChromosome++;
+			individualValues.addToIndexInPlan(1);
+			individualValues.addToIndexInChromosome(1);
 		}
 		else if (currentElement instanceof JointLeg) {
 			// Assumes that a plan begins by an activity, with a strict Act-Leg alternance.
-			origin = (JointActivity) planElements.get(indexInPlan - 1);
-			destination = new JointActivity((JointActivity) planElements.get(indexInPlan + 1));
-			currentGeneIndices = this.genesIndices.get(id).get(indexInChromosome);
-			indexInChromosome++;
+			origin = (JointActivity) planElements.get(individualValues.getIndexInPlan() - 1);
+			destination = new JointActivity((JointActivity) planElements.get(individualValues.getIndexInPlan() + 1));
 
 			if (destination.getType().equals(JointActingTypes.PICK_UP)) {
 				geneIndex = currentGeneIndices.get(TOGGLE_CHROM);
 				if (!((BooleanGene) chromosome.getGene(geneIndex)).booleanValue()) {
-					// the joint travel isn't affected
-					// go to the next non-joint leg
-					leg = ((JointLeg) currentElement).getAssociatedIndividualLeg();
-					leg = new JointLeg(this.nonSharedLegsTTEstimator.getNewLeg(
-							leg.getMode(),
-							origin,
-							destination,
-							getIndexNonShared(leg),
-							now), leg);
-
-					//leg.setDepartureTime(now);
-					constructedPlan.addLeg(leg);
-					currentTravelTime = leg.getTravelTime();
-					now += currentTravelTime;
-					//leg.setArrivalTime(now);
-
-
-					// set index to the next leg
-					indexInPlan += 6;
-
-					geneIndex = currentGeneIndices.get(DURATION_CHROM);
-					currentDuration = getDuration(chromosome, geneIndex, now, currentTravelTime);
-
-					destination = createActivity(
-							(JointActivity) planElements.get(indexInPlan - 1),
-							now,
-							currentDuration);
-					constructedPlan.addActivity(destination);
-
-					now += currentDuration;
+					planReimplacementEpisode(
+						(JointLeg) currentElement,
+						planElements,
+						constructedPlan,
+						individualValues,
+						currentGeneIndices,
+						chromosome);
 				}
 				else if (!this.readyPickUps.containsKey(destination)) {
 					// case of an affected PU activity without access:
 					// plan the access leg
-					leg = ((JointLeg) currentElement);
-					leg = new JointLeg(currentLegTTEstimator.getNewLeg(
-							leg.getMode(),
-							origin,
-							destination,
-							planElements.indexOf(leg),
-							now), leg);
-
-					//leg.setDepartureTime(now);
-					constructedPlan.addLeg(leg);
-					currentTravelTime = leg.getTravelTime();
-					now += currentTravelTime;
-
-					// mark the PU as accessed
-					this.readyPickUps.put(destination, now);
-
-					indexInPlan += 1;
+					planPuAccessLeg(
+							planElements,
+							currentElement,
+							constructedPlan,
+							currentLegTTEstimator,
+							individualValues,
+							chromosome);
 				}
 			}
 			else {
 				// case of a leg which destination isn't a PU act
-				leg = ((JointLeg) currentElement);
-				leg = new JointLeg(currentLegTTEstimator.getNewLeg(
-						leg.getMode(),
-						origin,
-						destination,
-						planElements.indexOf(leg),
-						now), leg);
-
-				//leg.setDepartureTime(now);
-				constructedPlan.addLeg(leg);
-				currentTravelTime = leg.getTravelTime();
-				now += currentTravelTime;
-				//leg.setArrivalTime(now);
-
-				// set index to the next leg
-				indexInPlan += 2;
-
-				geneIndex = currentGeneIndices.get(DURATION_CHROM);
-				currentDuration = getDuration(chromosome, geneIndex, now, currentTravelTime);
-				destination.setMaximumDuration(currentDuration);
-				now += currentDuration;
-				destination.setEndTime(now);
-				constructedPlan.addActivity(destination);
+				planIndividualLegAct(
+					planElements,
+					currentElement,
+					constructedPlan,
+					currentLegTTEstimator,
+					individualValues,
+					currentGeneIndices,
+					chromosome);
 			}
 		}
 		else if (((JointActivity) currentElement).getType().equals(JointActingTypes.PICK_UP)&&
-				(isReadyForPlanning(planElements, indexInPlan))) {
-			origin = (JointActivity) currentElement;
-			dropOff = (JointActivity) planElements.get(indexInPlan + 2);
-			destination = (JointActivity) planElements.get(indexInPlan + 4);
-			currentTravelTime = 0d;
-
-			// /////////////////////////////////////////////////////////////////
-			// plan pick-up activity
-			currentDuration = getTimeToJointTrip(
-					origin.getLinkedElements().values(),
-					now) + PU_DURATION;
-			constructedPlan.addActivity(createActivity(origin, now, currentDuration));
-
-			now += currentDuration;
-
-			// /////////////////////////////////////////////////////////////////
-			// plan shared ride
-			leg = (JointLeg) planElements.get(indexInPlan + 1);
-
-			if (leg.getIsDriver()) {
-				// use legttestimator
-				leg = new JointLeg(currentLegTTEstimator.getNewLeg(
-					leg.getMode(),
-					origin,
-					dropOff,
-					planElements.indexOf(leg),
-					now), leg);
-			} else {
-				// get driver trip
-				leg = new JointLeg(this.driverLegs.get(leg));
-				leg.setMode(JointActingTypes.PASSENGER);
-				leg.setIsDriver(false);
-			}
-
-			now += leg.getTravelTime();
-			currentTravelTime += leg.getTravelTime();
-			constructedPlan.addLeg(leg);
-
-			// /////////////////////////////////////////////////////////////////
-			// plan DO activity
-			dropOff = createActivity(dropOff, now, DO_DURATION);
-			now += DO_DURATION;
-			currentTravelTime += DO_DURATION;
-			constructedPlan.addActivity(dropOff);
-
-			// /////////////////////////////////////////////////////////////////
-			// plan egress trip
-			leg = (JointLeg) planElements.get(indexInPlan + 3);
-			leg = new JointLeg(currentLegTTEstimator.getNewLeg(
-				leg.getMode(),
-				dropOff,
-				destination,
-				planElements.indexOf(leg),
-				now), leg);
-			now += leg.getTravelTime();
-			currentTravelTime += leg.getTravelTime();
-			constructedPlan.addLeg(leg);
-
-			// /////////////////////////////////////////////////////////////////
-			// plan individual activity
-			currentGeneIndices = this.genesIndices.get(id).get(indexInChromosome);
-			geneIndex = currentGeneIndices.get(DURATION_CHROM);
-			currentDuration = getDuration(chromosome, geneIndex, now, currentTravelTime);
-			destination = createActivity(destination, now, currentDuration);
-			constructedPlan.addActivity(destination);
-			now += currentDuration;
-
-			// /////////////////////////////////////////////////////////////////
-			//update indices
-			indexInPlan += 5;
-			indexInChromosome++;
+				(isReadyForPlanning(planElements, individualValues.getIndexInPlan()))) {
+			planSharedLegAct(
+					planElements,
+					currentElement,
+					constructedPlan,
+					currentLegTTEstimator,
+					individualValues,
+					currentGeneIndices,
+					chromosome);
 		}
 		else {
 			log.error("unexpected index: trying to plan an element which is not"+
@@ -446,13 +330,226 @@ public class JointPlanOptimizerDecoder {
 		}
 
 		//update individual "now" value
-		individualsNow.put(id, now);
-		indicesInPlan.put(id, indexInPlan);
-		indicesInChromosome.put(id, indexInChromosome);
+		//individualsNow.put(id, now);
+		//indicesInPlan.put(id, indexInPlan);
+		//indicesInChromosome.put(id, indexInChromosome);
 	}
 
-	//@Deprecated
-	//private static final double actualDuration(double travelTime, double duration) {
+	private void planReimplacementEpisode(
+			final JointLeg puAccessLeg,
+			final List<PlanElement> planElements,
+			final Plan constructedPlan,
+			final IndividualValuesWrapper individualValues,
+			final Map<String, Integer> currentGeneIndices,
+			final IChromosome chromosome) {
+		int geneIndex = currentGeneIndices.get(TOGGLE_CHROM);
+		JointLeg leg;
+		double currentTravelTime;
+		double currentDuration;
+		JointActivity origin = (JointActivity) planElements.get(individualValues.getIndexInPlan() - 1);
+		JointActivity destination = (JointActivity) planElements.get(individualValues.getIndexInPlan() + 5);
+
+		// the joint travel isn't affected
+		// go to the next non-joint leg
+		leg = puAccessLeg.getAssociatedIndividualLeg();
+		leg = new JointLeg(this.nonSharedLegsTTEstimator.getNewLeg(
+				leg.getMode(),
+				origin,
+				destination,
+				getIndexNonShared(leg),
+				individualValues.getNow()), leg);
+
+		//leg.setDepartureTime(now);
+		constructedPlan.addLeg(leg);
+		currentTravelTime = leg.getTravelTime();
+		individualValues.addToNow(currentTravelTime);
+		//leg.setArrivalTime(now);
+
+
+		// set index to the next leg
+		individualValues.addToIndexInPlan(6);
+
+		geneIndex = currentGeneIndices.get(DURATION_CHROM);
+		currentDuration = getDuration(
+				chromosome,
+				geneIndex,
+				individualValues.getNow(),
+				currentTravelTime);
+
+		destination = createActivity(
+				destination,
+				individualValues.getNow(),
+				currentDuration);
+		constructedPlan.addActivity(destination);
+
+		individualValues.addToNow(currentDuration);
+		individualValues.addToIndexInChromosome(1);
+	}
+
+	private void planPuAccessLeg(
+			final List<PlanElement> planElements,
+			final PlanElement currentElement,
+			final Plan constructedPlan,
+			final LegTravelTimeEstimator legTTEstimator,
+			final IndividualValuesWrapper individualValues,
+			final IChromosome chromosome
+			) {
+		JointLeg leg = ((JointLeg) currentElement);
+		JointActivity origin = (JointActivity) planElements.get(
+				individualValues.getIndexInPlan() - 1);
+		JointActivity destination = new JointActivity((JointActivity)
+				planElements.get(individualValues.getIndexInPlan() + 1));
+		double currentTravelTime;
+
+		leg = new JointLeg(legTTEstimator.getNewLeg(
+				leg.getMode(),
+				origin,
+				destination,
+				planElements.indexOf(leg),
+				individualValues.getNow()), leg);
+
+		//leg.setDepartureTime(now);
+		constructedPlan.addLeg(leg);
+		currentTravelTime = leg.getTravelTime();
+		individualValues.addToNow(currentTravelTime);
+
+		// mark the PU as accessed
+		this.readyPickUps.put(destination, individualValues.getNow());
+
+		individualValues.addToIndexInPlan(1);
+	}
+
+	private void planIndividualLegAct(
+			final List<PlanElement> planElements,
+			final PlanElement currentElement,
+			final Plan constructedPlan,
+			final LegTravelTimeEstimator legTTEstimator,
+			final IndividualValuesWrapper individualValues,
+			final Map<String, Integer> currentGeneIndices,
+			final IChromosome chromosome
+			) {
+		JointLeg leg = ((JointLeg) currentElement);
+		JointActivity origin = (JointActivity) planElements.get(
+				individualValues.getIndexInPlan() - 1);
+		JointActivity destination = new JointActivity((JointActivity)
+				planElements.get(individualValues.getIndexInPlan() + 1));
+		double currentTravelTime;
+		double currentDuration;
+		Integer geneIndex;
+
+		leg = new JointLeg(legTTEstimator.getNewLeg(
+				leg.getMode(),
+				origin,
+				destination,
+				planElements.indexOf(leg),
+				individualValues.getNow()), leg);
+
+		//leg.setDepartureTime(now);
+		constructedPlan.addLeg(leg);
+		currentTravelTime = leg.getTravelTime();
+		individualValues.addToNow(currentTravelTime);
+		//leg.setArrivalTime(now);
+
+		// set index to the next leg
+		individualValues.addToIndexInPlan(2);
+
+		geneIndex = currentGeneIndices.get(DURATION_CHROM);
+		currentDuration = getDuration(chromosome, geneIndex, individualValues.getNow(), currentTravelTime);
+		destination.setMaximumDuration(currentDuration);
+		individualValues.addToNow(currentDuration);
+		destination.setEndTime(individualValues.getNow());
+		constructedPlan.addActivity(destination);
+		individualValues.addToIndexInChromosome(1);
+	}
+
+	private void planSharedLegAct(
+			final List<PlanElement> planElements,
+			final PlanElement currentElement,
+			final Plan constructedPlan,
+			final LegTravelTimeEstimator legTTEstimator,
+			final IndividualValuesWrapper individualValues,
+			final Map<String, Integer> currentGeneIndices,
+			final IChromosome chromosome) {
+		JointLeg leg = ((JointLeg) currentElement);
+		JointActivity origin = (JointActivity) planElements.get(
+				individualValues.getIndexInPlan() - 1);
+		JointActivity dropOff = (JointActivity) planElements.get(
+				individualValues.getIndexInPlan() + 2);
+		JointActivity destination = (JointActivity)
+				planElements.get(individualValues.getIndexInPlan() + 4);
+		double currentTravelTime = 0d;
+		double currentDuration;
+		Integer geneIndex;
+
+		// /////////////////////////////////////////////////////////////////
+		// plan pick-up activity
+		currentDuration = getTimeToJointTrip(
+				origin.getLinkedElements().values(),
+				individualValues.getNow()) + PU_DURATION;
+		constructedPlan.addActivity(createActivity(origin, individualValues.getNow(), currentDuration));
+
+		individualValues.addToNow(currentDuration);
+
+		// /////////////////////////////////////////////////////////////////
+		// plan shared ride
+		leg = (JointLeg) planElements.get(individualValues.getIndexInPlan() + 1);
+
+		if (leg.getIsDriver()) {
+			// use legttestimator
+			leg = new JointLeg(legTTEstimator.getNewLeg(
+				leg.getMode(),
+				origin,
+				dropOff,
+				planElements.indexOf(leg),
+				individualValues.getNow()), leg);
+		} else {
+			// get driver trip
+			leg = new JointLeg(this.driverLegs.get(leg));
+			leg.setMode(JointActingTypes.PASSENGER);
+			leg.setIsDriver(false);
+		}
+
+		individualValues.addToNow(leg.getTravelTime());
+		currentTravelTime += leg.getTravelTime();
+		constructedPlan.addLeg(leg);
+
+		// /////////////////////////////////////////////////////////////////
+		// plan DO activity
+		dropOff = createActivity(dropOff, individualValues.getNow(), DO_DURATION);
+		individualValues.addToNow(DO_DURATION);
+		currentTravelTime += DO_DURATION;
+		constructedPlan.addActivity(dropOff);
+
+		// /////////////////////////////////////////////////////////////////
+		// plan egress trip
+		leg = (JointLeg) planElements.get(individualValues.getIndexInPlan() + 3);
+		leg = new JointLeg(legTTEstimator.getNewLeg(
+			leg.getMode(),
+			dropOff,
+			destination,
+			planElements.indexOf(leg),
+			individualValues.getNow()), leg);
+		individualValues.addToNow(leg.getTravelTime());
+		currentTravelTime += leg.getTravelTime();
+		constructedPlan.addLeg(leg);
+
+		// /////////////////////////////////////////////////////////////////
+		// plan individual activity
+		geneIndex = currentGeneIndices.get(DURATION_CHROM);
+		currentDuration = getDuration(chromosome, geneIndex,
+				individualValues.getNow(), currentTravelTime);
+		destination = createActivity(destination, individualValues.getNow(),
+				currentDuration);
+		constructedPlan.addActivity(destination);
+		individualValues.addToNow(currentDuration);
+
+		// /////////////////////////////////////////////////////////////////
+		//update indices
+		individualValues.addToIndexInPlan(5);
+		individualValues.addToIndexInChromosome(1);
+	}
+
+	//private double getActualDuration(double travelTime, double duration) {
 	//	double actualDuration = duration - travelTime;
 	//	return (actualDuration > 0 ? actualDuration : MIN_DURATION);
 	//}
@@ -554,6 +651,39 @@ public class JointPlanOptimizerDecoder {
 		}
 
 		return (duration > 0 ? duration : MIN_DURATION);
+	}
+
+	/**
+	 * internal class, wrapping the int indices used to step through the plans.
+	 */
+	class IndividualValuesWrapper {
+		private int indexInPlan = 0;
+		private int indexInChromosome = 0;
+		private double now = 0d;
+
+		public void addToIndexInPlan(int i) {
+			indexInPlan += i;
+		}
+
+		public void addToIndexInChromosome(int i) {
+			indexInChromosome += i;
+		}
+
+		public void addToNow(double d) {
+			now += d;
+		}
+
+		public int getIndexInPlan() {
+			return indexInPlan;
+		}
+
+		public int getIndexInChromosome() {
+			return indexInChromosome;
+		}
+
+		public double getNow() {
+			return now;
+		}
 	}
 
 }

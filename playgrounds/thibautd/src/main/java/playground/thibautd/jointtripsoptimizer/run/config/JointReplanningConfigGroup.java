@@ -48,15 +48,17 @@ public class JointReplanningConfigGroup extends Module {
 	private static final String CO_PROB = "crossOverProbability";
 	private static final String ITER_NUM = "maxNumberOfGAIterations";
 	private static final String NON_UNIFORMITY_PARAM = "mutationNonUniformity";
+	private static final String OPTIMIZE_TOGGLE = "toggleToOptimize";
 
-	//parameter values
+	//parameter values, initialized to defaults.
 	private int numTimeIntervals;
-	private int populationSize;
-	private int dropOffDuration;
-	private double mutationProb;
-	private double crossOverProb;
-	private int numberOfIterations;
-	private double betaNonUniformity;
+	private int populationSize = 10;
+	private int dropOffDuration = 0;
+	private double mutationProb = 0.1;
+	private double crossOverProb = 0.5;
+	private int numberOfIterations = 100;
+	private double betaNonUniformity = 1;
+	private boolean optimizeToggle = false;
 
 	public JointReplanningConfigGroup() {
 		super(GROUP_NAME);
@@ -91,6 +93,9 @@ public class JointReplanningConfigGroup extends Module {
 		else if (param_name.equals(NON_UNIFORMITY_PARAM)) {
 			this.setMutationNonUniformity(value);
 		}
+		else if (param_name.equals(OPTIMIZE_TOGGLE)) {
+			this.setOptimizeToggle(value);
+		}
 	}
 
 	@Override
@@ -116,6 +121,9 @@ public class JointReplanningConfigGroup extends Module {
 		else if (param_name.equals(NON_UNIFORMITY_PARAM)) {
 			this.getMutationNonUniformity();
 		}
+		else if (param_name.equals(OPTIMIZE_TOGGLE)) {
+			this.getOptimizeToggle();
+		}
 		return null;
 	}
 
@@ -129,6 +137,7 @@ public class JointReplanningConfigGroup extends Module {
 		this.addParameterToMap(map, CO_PROB);
 		this.addParameterToMap(map, ITER_NUM);
 		this.addParameterToMap(map, NON_UNIFORMITY_PARAM);
+		this.addParameterToMap(map, OPTIMIZE_TOGGLE);
 		return map;
 	}
 
@@ -208,6 +217,23 @@ public class JointReplanningConfigGroup extends Module {
 		if (this.betaNonUniformity <= 0d) {
 			throw new IllegalArgumentException("non uniformity mutation parameter"+
 					" must be positive");
+		}
+	}
+
+	public boolean getOptimizeToggle() {
+		return this.optimizeToggle;
+	}
+
+	public void setOptimizeToggle(String value) {
+		if (value.toLowerCase().equals("true")) {
+			this.optimizeToggle = true;
+		}
+		else if (value.toLowerCase().equals("false")) {
+			this.optimizeToggle = false;
+		}
+		else {
+			throw new IllegalArgumentException("value for "+
+					OPTIMIZE_TOGGLE+" must be \"true\" or \"false\"");
 		}
 	}
 }
