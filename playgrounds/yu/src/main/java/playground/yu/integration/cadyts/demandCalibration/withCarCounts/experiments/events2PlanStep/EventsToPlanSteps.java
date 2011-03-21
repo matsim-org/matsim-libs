@@ -136,15 +136,15 @@ public class EventsToPlanSteps implements AgentDepartureEventHandler,
 	 * plan.getNextActivity(leg);
 	 * 
 	 * // entry
-	 * planStepFactory.addEntry(net.getLinks().get(fromAct.getLinkId()), (int)
+	 * planStepFactory.addEntry(network.getLinks().get(fromAct.getLinkId()), (int)
 	 * time); // turns for all links for (Id linkId : ((NetworkRoute)
-	 * leg.getRoute()).getLinkIds()) { Link link = net.getLinks().get(linkId);
+	 * leg.getRoute()).getLinkIds()) { Link link = network.getLinks().get(linkId);
 	 * planStepFactory.addTurn(link, (int) time); time +=
 	 * ttime.getLinkTravelTime(link, time); if (time > MAX_TIME) {
 	 * planStepFactory.addExit(MAX_TIME); return; } } // last turn to
 	 * destination link
-	 * planStepFactory.addTurn(net.getLinks().get(toAct.getLinkId()), (int)
-	 * time); time += ttime.getLinkTravelTime(net.getLinks().get(
+	 * planStepFactory.addTurn(network.getLinks().get(toAct.getLinkId()), (int)
+	 * time); time += ttime.getLinkTravelTime(network.getLinks().get(
 	 * toAct.getLinkId()), time); if (time > MAX_TIME) {
 	 * planStepFactory.addExit(MAX_TIME); return; } // regular exit at end of
 	 * leg planStepFactory.addExit((int) time); // advance time if

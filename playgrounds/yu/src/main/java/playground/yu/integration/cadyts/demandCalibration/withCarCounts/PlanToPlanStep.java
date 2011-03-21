@@ -46,7 +46,7 @@ public class PlanToPlanStep {
 	 * is only called in {@code StrategyManager} and its subclass
 	 * 
 	 * @param ttime
-	 * @param net
+	 * @param network
 	 */
 	public PlanToPlanStep(final TravelTime ttime, final Network net) {
 		this.ttime = ttime;

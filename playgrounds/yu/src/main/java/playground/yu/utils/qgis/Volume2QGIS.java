@@ -135,13 +135,13 @@ public class Volume2QGIS extends MATSimNet2QGIS {
 
 		// mn2q.readNetwork(netFilename);
 		// mn2q.setCrs(ch1903);
-		// NetworkLayer net = mn2q.getNetwork();
-		// VolumesAnalyzer vaA = new VolumesAnalyzer(3600, 24 * 3600 - 1, net);
+		// NetworkLayer network = mn2q.getNetwork();
+		// VolumesAnalyzer vaA = new VolumesAnalyzer(3600, 24 * 3600 - 1, network);
 		// mn2q.readEvents(eventsFilenameA, vaA);
-		// List<Map<Id, Integer>> volsA = createVolumes(net, vaA);
-		// VolumesAnalyzer vaB = new VolumesAnalyzer(3600, 24 * 3600 - 1, net);
+		// List<Map<Id, Integer>> volsA = createVolumes(network, vaA);
+		// VolumesAnalyzer vaB = new VolumesAnalyzer(3600, 24 * 3600 - 1, network);
 		// mn2q.readEvents(eventsFilenameB, vaB);
-		// List<Map<Id, Integer>> volsB = createVolumes(net, vaB);
+		// List<Map<Id, Integer>> volsB = createVolumes(network, vaB);
 		//
 		// for (int i = 0; i < 24; i++) {
 		// Volume2QGIS v2q = new Volume2QGIS();
@@ -174,7 +174,7 @@ public class Volume2QGIS extends MATSimNet2QGIS {
 		 */
 		// mn2q.readNetwork(netFilename);
 		// mn2q.setCrs(ch1903);
-		// mn2q.writeShapeFile(shapeFilepath + "net.shp");
+		// mn2q.writeShapeFile(shapeFilepath + "network.shp");
 		// VolumesAnalyzer va = new VolumesAnalyzer(3600, 24 * 3600 - 1,
 		// mn2q.network);
 		// mn2q.readEvents(eventsFilename, va);

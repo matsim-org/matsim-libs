@@ -154,9 +154,9 @@ public class SensibleParkLocation extends AbstractPersonAlgorithm implements
 		// final String netFilename =
 		// "/work/chen/data/ivtch/input/ivtch-osm.xml";
 		// final String plansFilename =
-		// "/net/ils/chen/tests/changeLegMode/output/ITERS/it.500/500.plans.xml.gz";
+		// "/network/ils/chen/tests/changeLegMode/output/ITERS/it.500/500.plans.xml.gz";
 		// final String outputFilename =
-		// "/net/ils/chen/tests/changeLegMode/output/ITERS/it.500/500.plans.sensibleParkLocation.txt.gz";
+		// "/network/ils/chen/tests/changeLegMode/output/ITERS/it.500/500.plans.sensibleParkLocation.txt.gz";
 
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario).readFile(netFilename);

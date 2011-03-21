@@ -70,7 +70,7 @@ public class AnalysisTest4Bln implements Analysis4Bln {
 		System.out.println();
 		System.out.println("usage: AnalysisTest args");
 		System.out
-				.println(" arg 0: name incl. path to net file (.xml[.gz])(required)");
+				.println(" arg 0: name incl. path to network file (.xml[.gz])(required)");
 		System.out
 				.println(" arg 1: name incl. path to events file (.txt[.gz])(required)");
 		System.out.println(" arg 2: path to output file (required)");

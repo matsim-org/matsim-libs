@@ -78,17 +78,17 @@ public class SimCountComparison2QGIS extends MATSimNet2QGIS {
 	 * for Berlin scenario
 	 * 
 	 * @param linkid
-	 * @param net
+	 * @param network
 	 * @return
 	 */
 	private static boolean isInRange(final Id linkid, final NetworkImpl net) {
-		// Link l = net.getLinks().get(linkid);
+		// Link l = network.getLinks().get(linkid);
 		// if (l == null) {
 		// System.out.println("Cannot find requested link: "
 		// + linkid.toString());
 		// return false;
 		// }
-		// return ((LinkImpl) l).calcDistance(net.getNodes().get(
+		// return ((LinkImpl) l).calcDistance(network.getNodes().get(
 		// new IdImpl("2531")).getCoord()) < 30000;
 		return net.getLinks().containsKey(linkid);
 	}

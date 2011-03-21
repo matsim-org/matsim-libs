@@ -291,7 +291,7 @@ public class ScoreCalTest implements AgentArrivalEventHandler,
 		new MatsimConfigReader(cf).readFile(configFilename);
 		PlanCalcScoreConfigGroup scoring = cf.planCalcScore();
 
-		// Network net = sc.getNetwork();
+		// Network network = sc.getNetwork();
 		new MatsimNetworkReader(sc).readFile(netFilename);
 
 		Population pop = sc.getPopulation();

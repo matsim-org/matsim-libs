@@ -44,11 +44,11 @@ public class PostProcessingEvents2Score {
 //		String netFilename = "../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml";
 //		String eventsFilename = "../integration-demandCalibration/test/DestinationUtilOffset/1000.events.txt.gz";
 //		String chartFilenameBase = "../integration-demandCalibration/test/DestinationUtilOffset/1000.departTime_travelTime.";
-		String configFilename = "/net/ils/chen/utilityOffsets/analysis.xml";
-		String popFilename = "/net/ils/chen/matsim-bse/outputs/4SE_DC/raiseTRB/ITERS/it.1000/1000.plans.xml.gz";
-		String netFilename = "/net/work/chen/data/ivtch/input/ivtch-osm.xml";
-		String eventsFilename = "/net/ils/chen/matsim-bse/outputs/4SE_DC/raiseTRB/ITERS/it.1000/1000.events.txt.gz";
-		String chartFilenameBase = "/net/ils/chen/matsim-bse/outputs/4SE_DC/raiseTRB/ITERS/it.1000/1000.departTime_travelTime.";
+		String configFilename = "/network/ils/chen/utilityOffsets/analysis.xml";
+		String popFilename = "/network/ils/chen/matsim-bse/outputs/4SE_DC/raiseTRB/ITERS/it.1000/1000.plans.xml.gz";
+		String netFilename = "/network/work/chen/data/ivtch/input/ivtch-osm.xml";
+		String eventsFilename = "/network/ils/chen/matsim-bse/outputs/4SE_DC/raiseTRB/ITERS/it.1000/1000.events.txt.gz";
+		String chartFilenameBase = "/network/ils/chen/matsim-bse/outputs/4SE_DC/raiseTRB/ITERS/it.1000/1000.departTime_travelTime.";
 
 		Config config = ConfigUtils.loadConfig(configFilename);
 		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);

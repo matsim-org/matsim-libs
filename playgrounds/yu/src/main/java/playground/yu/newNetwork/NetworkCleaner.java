@@ -53,8 +53,8 @@ public class NetworkCleaner {
 	 */
 	public static void main(final String[] args) {
 		final String inputNetFilename = "../berlin-bvg09/pt/nullfall_M44_344/test/network_original.xml";
-		final String outputNetFilename = "../berlin-bvg09/pt/nullfall_M44_344/test/net.xml";
-		String logFilename = "../berlin-bvg09/pt/nullfall_M44_344/test/net.log";
+		final String outputNetFilename = "../berlin-bvg09/pt/nullfall_M44_344/test/network.xml";
+		String logFilename = "../berlin-bvg09/pt/nullfall_M44_344/test/network.log";
 
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();

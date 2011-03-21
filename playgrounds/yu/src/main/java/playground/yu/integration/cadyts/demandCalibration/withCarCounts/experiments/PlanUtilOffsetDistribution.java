@@ -116,7 +116,7 @@ public class PlanUtilOffsetDistribution extends
 	}
 
 	/**
-	 * @param net
+	 * @param network
 	 * @param counts
 	 * @param linkUtilOffsets
 	 * @param caliStartTime

@@ -115,11 +115,11 @@ public class DeparTime2QGIS implements X2QGIS {
 		// mn2q.readNetwork("../data/ivtch/input/ivtch-osm-wu.xml"); // //
 		// mn2q.setCrs(ch1903);
 		// LinkDeparTime ldt = new LinkDeparTime();
-		// mn2q.readPlans("/net/ils/run466/output/ITERS/it.500/500.plans.xml.gz",
+		// mn2q.readPlans("/network/ils/run466/output/ITERS/it.500/500.plans.xml.gz",
 		// ldt);
 		// mn2q.addParameter("DeparTime", Double.class, ldt.getAvgDeparTime());
 		// mn2q
-		// .writeShapeFile("/net/ils/run466/output/ITERS/it.500/466.500.deparTime.shp");
+		// .writeShapeFile("/network/ils/run466/output/ITERS/it.500/466.500.deparTime.shp");
 		LinkDeparTime lprA = new LinkDeparTime();
 		mn2q.readPlans(args[1], lprA);
 		LinkDeparTime lprB = new LinkDeparTime();

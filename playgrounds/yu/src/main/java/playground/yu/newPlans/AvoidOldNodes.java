@@ -56,7 +56,7 @@ public class AvoidOldNodes extends NewPopulation {
 	}
 
 	public void addLink(final String linkId) {
-		Link l = this.net.getLinks().get(new IdImpl(linkId));
+		Link l = this.network.getLinks().get(new IdImpl(linkId));
 		this.nodeIds.add(l.getFromNode().getId().toString());
 		this.nodeIds.add(l.getToNode().getId().toString());
 	}

@@ -125,14 +125,14 @@ public class PtRate2QGIS implements X2QGIS {
 		// mn2q.readNetwork("../data/ivtch/input/ivtch-osm-wu.xml");
 		// mn2q.setCrs(ch1903);
 		// LinkPtRate lpr = new LinkPtRate();
-		// mn2q.readPlans("/net/ils/run466/output/ITERS/it.500/500.plans.xml.gz",
+		// mn2q.readPlans("/network/ils/run466/output/ITERS/it.500/500.plans.xml.gz",
 		// lpr);
 		// mn2q.addParameter("PtRate", Double.class, lpr.getPtRate());
 		// mn2q.addParameter("PtUsers", Integer.class, lpr.getPtUsers());
 		// mn2q.addParameter("Persons", Integer.class, lpr.getAgents());
 		// mn2q
 		// .writeShapeFile(
-		// "/net/ils/run466/output/ITERS/it.500/466.500.ptRate.shp");
+		// "/network/ils/run466/output/ITERS/it.500/466.500.ptRate.shp");
 		/*
 		 * //
 		 * ////////////////////////////////////////////////////////////////////

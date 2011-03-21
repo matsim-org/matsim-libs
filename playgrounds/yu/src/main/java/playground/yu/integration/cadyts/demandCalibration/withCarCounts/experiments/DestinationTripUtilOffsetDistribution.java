@@ -185,7 +185,7 @@ public class DestinationTripUtilOffsetDistribution implements
 	}
 
 	/**
-	 * @param net
+	 * @param network
 	 * @param counts
 	 * @param linkUtilOffsets
 	 * @param caliStartTime

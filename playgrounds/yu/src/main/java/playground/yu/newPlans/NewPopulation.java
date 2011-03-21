@@ -34,11 +34,11 @@ import org.matsim.population.algorithms.AbstractPersonAlgorithm;
  */
 public abstract class NewPopulation extends AbstractPersonAlgorithm {
 	protected PopulationWriter pw;
-	protected Network net;
+	protected Network network;
 
 	public NewPopulation(final Network network, final Population population,
 			final String outputPopulationFilename) {
-		net = network;
+		this.network = network;
 		pw = new PopulationWriter(population, network);
 		pw.writeStartPlans(outputPopulationFilename);
 	}
@@ -48,11 +48,13 @@ public abstract class NewPopulation extends AbstractPersonAlgorithm {
 		pw.writePerson(person);
 	}
 
-	/**this method should be overridden by subclasses
+	/**
+	 * this method should be overridden by subclasses
+	 * 
 	 * @param person
 	 */
 	protected void beforeWritePersonHook(Person person) {
-//dummy empty
+		// dummy empty
 	}
 
 	public void writeEndPlans() {

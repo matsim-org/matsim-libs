@@ -136,7 +136,7 @@ public class PCStrMn extends BseParamCalibrationStrategyManager implements
 					 * "SelectExpBeta" can still be written in configfile
 					 */
 				}
-			} else {// ***********iter-firstIter<=maxPlanPerAgent+1************
+			} else {// ***********iter-firstIter<=maxPlanPerAgent************
 				if (iter - firstIter == 1) {
 					/*
 					 * shuffle the Plan Choice Set, to avoid chaotic network
@@ -451,6 +451,11 @@ public class PCStrMn extends BseParamCalibrationStrategyManager implements
 		double scoreCorrection = ((MATSimChoiceParameterCalibrator<Link>) calibrator)
 				.getUtilityCorrection(planSteps)
 				/ brainExpBeta;
-		plan.setScore(plan.getScore() + scoreCorrection);
+		Double oldScore = plan.getScore();
+		if (oldScore == null) {
+			oldScore = 0d;// dummy setting, the score of plans will be
+							// calculated between firstIter+1 and firstIter+
+		}
+		plan.setScore(oldScore + scoreCorrection);
 	}
 }

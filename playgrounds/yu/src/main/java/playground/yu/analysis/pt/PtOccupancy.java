@@ -218,7 +218,7 @@ public class PtOccupancy implements PersonEntersVehicleEventHandler,
 	public static void main(String[] args) {
 		String eventsFilename = "../berlin-bvg09/pt/m2_schedule_delay/m2_out_100a/m2_out_100a/ITERS/it.1000/1000.events.xml.gz";
 		String scheduleFilename = "../berlin-bvg09/pt/m2_schedule_delay/transitSchedule.xml";
-		String netFilename = "../berlin-bvg09/pt/m2_schedule_delay/net.xml";
+		String netFilename = "../berlin-bvg09/pt/m2_schedule_delay/network.xml";
 
 		ScenarioImpl s = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		s.getConfig().scenario().setUseTransit(true);

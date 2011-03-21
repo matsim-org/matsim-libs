@@ -15,8 +15,8 @@ public class CountsFragmentTests {
 		// String networkFilename = "examples/equil/network.xml";
 		String fragmentsCountsFilenameBase = "../matsimTests/Calibration/test/counts100.";
 
-		// NetworkLayer net = new NetworkLayer();
-		// new MatsimNetworkReader(net).readFile(networkFilename);
+		// NetworkLayer network = new NetworkLayer();
+		// new MatsimNetworkReader(network).readFile(networkFilename);
 
 		Counts originalCounts = new Counts();
 		new MatsimCountsReader(originalCounts).readFile(originalCountsFilename);

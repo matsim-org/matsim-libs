@@ -74,7 +74,7 @@ public class PopPruner extends NewPopulation {
 		String oldPopFilename = "../../matsim/output/equil_tta/output_plans.xml.gz";
 		String newPopFilename = "../../matsim/output/equil_tta/output_plans4.xml.gz";
 
-		System.out.println("net\t:\t" + netFilename);
+		System.out.println("network\t:\t" + netFilename);
 
 		Scenario s = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 

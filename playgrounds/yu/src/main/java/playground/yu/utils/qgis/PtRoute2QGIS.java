@@ -126,7 +126,7 @@ public class PtRoute2QGIS extends MATSimNet2QGIS {
 					for (int i = 0; i < parameters.size(); i++)
 						o[i + 5] = parameters.get(i).get(ptRouteId);
 
-					features.add(ftRoad.create(o, "pt-route-net"));
+					features.add(ftRoad.create(o, "pt-route-network"));
 				}
 			return features;
 		}

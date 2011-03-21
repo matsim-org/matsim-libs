@@ -70,7 +70,7 @@ public class AnalysisTest4Zrh implements Analysis4Zrh {
 		System.out.println(" arg 0:\tname of scenario (for Zurich required)");
 		System.out.println(" arg 1:\trunId");
 		System.out
-				.println(" arg 2:\tname incl. path to net file (.xml[.gz])(required)");
+				.println(" arg 2:\tname incl. path to network file (.xml[.gz])(required)");
 		System.out
 				.println(" arg 3:\tpath to events file, plans file, and analysis files, without the last \"/\"");
 		System.out.println(" args 4:\twhether there is plansfile (true/false)");
