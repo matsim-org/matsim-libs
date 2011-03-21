@@ -74,7 +74,7 @@ public class AgentId2PtTripTravelTimeMapTest {
 //	        first tests
 	        
 	        Assert.assertEquals(event4.getTime()-event3.getTime(), test.getAgentId2PtTripTravelTimeMap().get(agentId1).get(0).getTotalTripTravelTime(), 0.);
-	        
+	        	        
 		
 	}
 
