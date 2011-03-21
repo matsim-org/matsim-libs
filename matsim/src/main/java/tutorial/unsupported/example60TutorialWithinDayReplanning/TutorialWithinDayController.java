@@ -69,7 +69,10 @@ import org.matsim.withinday.trafficmonitoring.TravelTimeCollectorFactory;
  * 
  * By default
  * "./examples/evacuation-tutorial/withinDayEvacuationConf.xml"
- * should work.
+ * should work. 
+ * <p/>
+ * The class MyWithinDayMobsimListener2 in example50... uses the same machinery as this class here, but in a 
+ * more pluggable way (I think).  kai, mar'11
  * 
  * @author cdobler
  */

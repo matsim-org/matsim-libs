@@ -27,9 +27,7 @@ package tutorial.unsupported.example50VeryExperimentalWithinDayReplanning;
  * it does not do anything else.  <i>It is also not tested</i> (i.e. it should be seen as a structural design suggestion, not a 
  * final solution).
  * <li>WithinDayMobsimListener2, which contains a concrete implementation for withinday replanning of vehicle drivers.  
- * This is a bare boned version of Christoph's code, still in the playground, but soon moving to be a withinday replanning package
- * for matsim.  Christoph's code will contain more elaborate examples and configuration options. (For organizational reasons,
- * this is still in playground.kai.usecases.withinday .)
+ * example60... contains more material, but extending the Controler which I personally would avoid (kn).
  * </ul>
  * <p/>
  * Much of this is using material that is not in the public api, so there are only two recommended ways of using this:<ul>
