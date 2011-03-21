@@ -32,12 +32,12 @@ import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.replanning.modules.ChangeLegMode;
-import org.matsim.core.replanning.modules.SubtourModeChoice;
 import org.matsim.core.replanning.modules.ExternalModule;
 import org.matsim.core.replanning.modules.PlanomatModule;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.modules.ReRouteDijkstra;
 import org.matsim.core.replanning.modules.ReRouteLandmarks;
+import org.matsim.core.replanning.modules.SubtourModeChoice;
 import org.matsim.core.replanning.modules.TimeAllocationMutator;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
@@ -175,12 +175,17 @@ public final class StrategyManagerConfigLoader {
 				strategy = new PlanStrategyImpl(new RandomPlanSelector());
 				TransitTimeAllocationMutator tam = new TransitTimeAllocationMutator(config);
 				strategy.addStrategyModule(tam);
+			} else if (name.equals("TransitSubtourModeChoice")) {
+				strategy = new PlanStrategyImpl(new RandomPlanSelector());
+				strategy.addStrategyModule(new TransitActsRemoverStrategy(config));
+				strategy.addStrategyModule(new SubtourModeChoice(config));
+				strategy.addStrategyModule(new ReRoute(controler));
 			} else if (name.equals("SelectPathSizeLogit")) {
 				strategy = new PlanStrategyImpl(new PathSizeLogitSelector(controler.getNetwork(), config.planCalcScore()));
 			} else if (name.equals("LocationChoice")) {
 				String planSelector = config.locationchoice().getPlanSelector();
 				if (planSelector.equals("BestScore")) {
-					strategy = new PlanStrategyImpl(new BestPlanSelector());					
+					strategy = new PlanStrategyImpl(new BestPlanSelector());
 				} else if (planSelector.equals("ChangeExpBeta")) {
 					strategy = new PlanStrategyImpl(new ExpBetaPlanChanger(config.planCalcScore().getBrainExpBeta()));
 				} else if (planSelector.equals("SelectRandom")) {
