@@ -24,12 +24,10 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.PlansConfigGroup;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 
@@ -37,14 +35,16 @@ import org.matsim.core.utils.misc.ConfigUtils;
  * writes new Plansfile, in which every person will has 2 plans, one with type
  * "iv" and the other with type "oev", whose leg mode will be "pt" and who will
  * have only a blank <Route></Rout>
- *
+ * 
  * @author ychen
- *
+ * 
  */
 public class NewSmallPlan extends NewPopulation {
+	private double outputSample = 1d;
+
 	/**
 	 * Constructor, writes file-head
-	 *
+	 * 
 	 * @param plans
 	 *            - a Plans Object, which derives from MATSim plansfile
 	 */
@@ -52,37 +52,42 @@ public class NewSmallPlan extends NewPopulation {
 		super(network, plans, filename);
 	}
 
+	public void setOutputSample(double outputSample) {
+		this.outputSample = outputSample;
+	}
+
 	@Override
 	public void run(Person person) {
-		// if (Math.random() < 0.12) {
-		pw.writePerson(person);
-		// }
+		if (MatsimRandom.getRandom().nextDouble() < outputSample) {
+			pw.writePerson(person);
+		}
 	}
 
 	public static void main(final String[] args) {
-		// final String netFilename = "./test/yu/ivtch/input/network.xml";
-		final String netFilename = "../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml";
-		final String inputPopFilename = "../integration-parameterCalibration/test/watch/zrh/500.plansMivZrh30km4plansScore0unselected.xml.gz";
-		final String outputPopFilename = "../integration-parameterCalibration/test/watch/zrh/MivZrh30km4plansScore0unselected0.01Mini.xml.gz";
-		// new ScenarioLoader(
-		// // "./test/yu/ivtch/config_for_10pctZuerich_car_pt_smallPlansl.xml"
-		// // "../data/ivtch/make10pctPlans.xml"
-		// "input/make10pctPlans.xml").loadScenario().getConfig();
-
-		Scenario s = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		String netFilename, inputPopFilename, outputPopFilename;
+		double outputSample;
+		if (args.length != 4) {
+			netFilename = "../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml";
+			inputPopFilename = "../integration-parameterCalibration/test/watch/zrh/500.plansMivZrh30km4plansScore0unselected.xml.gz";
+			outputPopFilename = "../integration-parameterCalibration/test/watch/zrh/MivZrh30km4plansScore0unselected0.01Mini.xml.gz";
+			outputSample = 1d;
+		} else {
+			netFilename = args[0];
+			inputPopFilename = args[1];
+			outputPopFilename = args[2];
+			outputSample = Double.parseDouble(args[3]);
+		}
+		Scenario s = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		NetworkImpl network = (NetworkImpl) s.getNetwork();
 		new MatsimNetworkReader(s).readFile(netFilename);
 
 		Population population = s.getPopulation();
-		Config c = s.getConfig();
-		PlansConfigGroup pcg = c.plans();
-//		pcg.setOutputFile(outputPopFilename);
-//		pcg.setOutputSample(0.01);
-
 		new MatsimPopulationReader(s).readFile(inputPopFilename);
 
-		NewSmallPlan nsp = new NewSmallPlan(network, population, outputPopFilename);
+		NewSmallPlan nsp = new NewSmallPlan(network, population,
+				outputPopFilename);
+		nsp.setOutputSample(outputSample);
 		nsp.run(population);
 		nsp.writeEndPlans();
 	}
