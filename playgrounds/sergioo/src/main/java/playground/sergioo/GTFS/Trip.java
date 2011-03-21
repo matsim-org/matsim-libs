@@ -1,15 +1,16 @@
 package playground.sergioo.GTFS;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 public class Trip {
 	
 	//Attributes
 	private Service service;
 	private Shape shape;
-	private HashMap<Integer,StopTime> stopTimes; 
+	private SortedMap<Integer,StopTime> stopTimes; 
 	private List<Frequency> frequencies;
 	//Methods
 	/**
@@ -21,7 +22,7 @@ public class Trip {
 		super();
 		this.service = service;
 		this.shape = shape;
-		this.stopTimes = new HashMap<Integer, StopTime>();
+		this.stopTimes = new TreeMap<Integer, StopTime>();
 		this.frequencies = new ArrayList<Frequency>();
 	}
 	/**
@@ -39,7 +40,7 @@ public class Trip {
 	/**
 	 * @return the stopTimes
 	 */
-	public HashMap<Integer, StopTime> getStopTimes() {
+	public SortedMap<Integer, StopTime> getStopTimes() {
 		return stopTimes;
 	}
 	/**

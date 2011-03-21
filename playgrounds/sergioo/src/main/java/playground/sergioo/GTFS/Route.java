@@ -1,24 +1,28 @@
 package playground.sergioo.GTFS;
 
-import java.util.HashMap;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 public class Route {
 	
+	//Constants
+	public static final String[] ROUTE_TYPES = {"Tram","Subway","Rail","Bus","Ferry","Cable car"};
+	                           
 	//Attributes
 	private String shortName;
-	private String routeType;
-	private HashMap<String, Trip> trips;
+	private int routeType;
+	private SortedMap<String, Trip> trips;
 	
 	//Methods
 	/**
 	 * @param shortName
 	 * @param routeType
 	 */
-	public Route(String shortName, String routeType) {
+	public Route(String shortName, int routeType) {
 		super();
 		this.shortName = shortName;
 		this.routeType = routeType;
-		trips = new HashMap<String, Trip>();
+		trips = new TreeMap<String, Trip>();
 	}
 	/**
 	 * @return the shortName
@@ -29,13 +33,13 @@ public class Route {
 	/**
 	 * @return the routeType
 	 */
-	public String getRouteType() {
+	public int getRouteType() {
 		return routeType;
 	}
 	/**
 	 * @return the trips
 	 */
-	public HashMap<String, Trip> getTrips() {
+	public SortedMap<String, Trip> getTrips() {
 		return trips;
 	}
 	/**

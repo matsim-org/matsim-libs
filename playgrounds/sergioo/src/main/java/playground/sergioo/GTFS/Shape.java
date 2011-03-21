@@ -1,34 +1,34 @@
 package playground.sergioo.GTFS;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Coord;
 
 public class Shape {
 	
 	//Attributes
-	private List<Coord> points;
+	private SortedMap<Integer,Coord> points;
 	
 	//Methods
 	/**
 	 * Constructs 
 	 */
 	public Shape() {
-		points = new ArrayList<Coord>();
+		points = new TreeMap<Integer,Coord>();
 	}
 	/**
 	 * @return the points
 	 */
-	public List<Coord> getPoints() {
+	public SortedMap<Integer,Coord> getPoints() {
 		return points;
 	}
 	/**
 	 * Adds a new point
 	 * @param point
 	 */
-	public void addPoint(Coord point) {
-		points.add(point);
+	public void addPoint(Coord point, int pos) {
+		points.put(pos,point);
 	}
 	
 }

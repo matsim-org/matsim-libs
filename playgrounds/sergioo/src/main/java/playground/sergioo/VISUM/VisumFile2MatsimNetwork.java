@@ -201,7 +201,6 @@ public class VisumFile2MatsimNetwork {
 				id++;
 			}
 			line=reader.readLine();
-			
 		}
 	}
 	/**
