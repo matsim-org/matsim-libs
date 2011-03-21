@@ -28,7 +28,7 @@ import org.matsim.run.OTFVis;
  * @author dgrether
  *
  */
-public class GeneratedDemandRunner {
+public class DGGeneratedDemandRunner {
 
 	/**
 	 * @param args

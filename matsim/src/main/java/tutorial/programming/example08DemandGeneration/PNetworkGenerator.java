@@ -12,10 +12,10 @@ import org.matsim.core.utils.io.OsmNetworkReader;
 import org.matsim.core.utils.misc.ConfigUtils;
 
 
-public class NetworkGenerator {
+public class PNetworkGenerator {
 	
 	public static void main(String[] args) {
-		String osm = "../examples/cottbus-brandenburg.osm";
+		String osm = "./input/my-map.osm";
 		Config config = ConfigUtils.createConfig();
 		Scenario sc = ScenarioUtils.createScenario(config);
 		Network net = sc.getNetwork();
@@ -24,7 +24,7 @@ public class NetworkGenerator {
 		OsmNetworkReader onr = new OsmNetworkReader(net,ct);
 		onr.parse(osm); 
 		new NetworkCleaner().run(net);
-		new NetworkWriter(net).write("../examples/network.xml");
+		new NetworkWriter(net).write("./input/network.xml");
 	}
 
 }

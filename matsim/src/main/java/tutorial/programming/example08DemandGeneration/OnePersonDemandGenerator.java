@@ -15,7 +15,7 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.ConfigUtils;
 
 
-public class DemandGenerator {
+public class OnePersonDemandGenerator {
 
 	public static void main(String[] args) {
 		CoordinateTransformation ct = 
@@ -47,7 +47,7 @@ public class DemandGenerator {
 		
 		
 		MatsimWriter popWriter = new org.matsim.api.core.v01.population.PopulationWriter(population, network);
-		popWriter.write("../examples/pop.xml");
+		popWriter.write("./input/population.xml");
 	}
 	
 }
