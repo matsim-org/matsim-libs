@@ -1,9 +1,3 @@
-/**The javadoc is attached to the PackageInfo class below rather than to the package, since when it is attached to the class you
- * get wysiwyg in eclipse.
- */
-
-package tutorial.unsupported.example50VeryExperimentalWithinDayReplanning;
-
 /**This package contains code that demonstrates some <i> ideas </i> of how to use matsim for withinday replanning.  
  * <p/>
  * <b>Definition:</b> Withinday replanning means that agents can replan while they are on their way, technically while the mobsim is running.
@@ -40,7 +34,7 @@ package tutorial.unsupported.example50VeryExperimentalWithinDayReplanning;
  * to nagel (or to the developers' email list).
  * 
  */
-class PackageInfo {
-	private PackageInfo() {} // do not instantiate this class
-}
+package tutorial.unsupported.example50VeryExperimentalWithinDayReplanning;
 
+// attaching the above comment to a class would give us WYSIWYG in eclipse.  It means, however, that it does not display any
+// more in the matsim javadoc browser.  kai, mar'11
