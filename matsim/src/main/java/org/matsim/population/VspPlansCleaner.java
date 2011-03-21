@@ -60,7 +60,7 @@ public class VspPlansCleaner implements BeforeMobsimListener {
 							.equals(VspExperimentalConfigGroup.END_TIME_ONLY ) ) {
 						
 						// always set duration to undefined:
-						((ActivityImpl)act).setMaximumDuration( Time.UNDEFINED_TIME ) ;
+						act.setMaximumDuration( Time.UNDEFINED_TIME ) ;
 						
 					} else if ( config.vspExperimental().getActivityDurationInterpretation()
 							.equals(VspExperimentalConfigGroup.TRY_END_TIME_THEN_DURATION ) ) {
