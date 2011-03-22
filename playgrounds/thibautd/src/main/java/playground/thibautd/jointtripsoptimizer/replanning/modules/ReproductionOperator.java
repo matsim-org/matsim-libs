@@ -21,6 +21,8 @@ package playground.thibautd.jointtripsoptimizer.replanning.modules;
 
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 import org.jgap.GeneticOperator;
 import org.jgap.Population;
 
@@ -32,6 +34,9 @@ import org.jgap.Population;
 */
 public class ReproductionOperator implements GeneticOperator
 {
+	private static final Logger log =
+		Logger.getLogger(ReproductionOperator.class);
+
     /**
 	 * 
 	 */
@@ -64,6 +69,9 @@ public class ReproductionOperator implements GeneticOperator
         // pool so that it'll be considered for natural selection during the
         // next phase of evolution.
         // -----------------------------------------------------------------
+		// log.warn("taille de la liste de chromosomes candidats avant reproduction: "+
+		//  		a_candidateChromosomes.size());
+		// log.warn("pop.equals(candidates): "+a_population.getChromosomes().equals(a_candidateChromosomes));
         int len = a_population.size();
         for ( int i = 0; i < len; i++ )
         {

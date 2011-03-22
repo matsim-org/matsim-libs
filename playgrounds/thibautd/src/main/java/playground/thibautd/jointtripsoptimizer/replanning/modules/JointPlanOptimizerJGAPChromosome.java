@@ -156,7 +156,7 @@ public class JointPlanOptimizerJGAPChromosome extends Chromosome {
 	 * @throws InvalidConfigurationException
 	 */
 	public IChromosome randomInitialJointPlanOptimizerJGAPChromosome()
-	throws InvalidConfigurationException {
+			throws InvalidConfigurationException {
 
 		// Sanity check: make sure the given configuration isn't null.
 		// -----------------------------------------------------------
@@ -223,6 +223,11 @@ public class JointPlanOptimizerJGAPChromosome extends Chromosome {
 		// ---------------------------------------------------------
 		return new JointPlanOptimizerJGAPChromosome(getConfiguration(), newGenes);
 
+	}
+
+	public static IChromosome randomInitialChromosome() 
+			throws InvalidConfigurationException {
+		throw new UnsupportedOperationException();
 	}
 
 	@Override

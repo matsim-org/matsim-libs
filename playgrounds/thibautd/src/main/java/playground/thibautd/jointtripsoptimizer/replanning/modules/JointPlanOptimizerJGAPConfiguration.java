@@ -30,6 +30,7 @@ import org.jgap.event.EventManager;
 import org.jgap.Gene;
 import org.jgap.impl.BestChromosomesSelector;
 import org.jgap.impl.BooleanGene;
+import org.jgap.impl.ChromosomePool;
 import org.jgap.impl.DoubleGene;
 import org.jgap.impl.GABreeder;
 import org.jgap.impl.StockRandomGenerator;
@@ -97,8 +98,8 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 			this.addNaturalSelector(bestChromsSelector, false);
 			//this.addNaturalSelector(new WeightedRouletteSelector(), false);
 
-			// elitism
-			this.setPreservFittestIndividual(true);
+			// elitism: unnecessary with BestChromosomesSelector
+			// this.setPreservFittestIndividual(true);
 
 			// Chromosome: construction
 			Gene[] sampleGenes = new Gene[this.numJointEpisodes + this.numEpisodes];
@@ -129,12 +130,14 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 			this.setFitnessEvaluator(new DefaultFitnessEvaluator());
 			this.setFitnessFunction(this.fitnessFunction);
 
-			//discarded chromosomes are "recycled" rather than suppressed.
-			//this.setChromosomePool(new ChromosomePool());
+			// discarded chromosomes are "recycled" rather than suppressed.
+			// this.setChromosomePool(new ChromosomePool());
 
 			// genetic operators definitions
 			// reproduction operator unnecessary: a_candicateChromosomes is obtained
 			// by calling a_population.getChromosomes() in Breeder.
+			// a call to a_population.getChromosomes().equals(a_candidateChromosomes)
+			// in the first genetic operator returns true.
 			//this.addGeneticOperator( new ReproductionOperator() );
 			this.addGeneticOperator( new JointPlanOptimizerJGAPCrossOver(
 						this,
@@ -210,7 +213,8 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 
 	/**
 	 * to avoid multiplying the places where the day duration is defined.
-	 * Not very elegant, should be moved somewhere else.
+	 * Not very elegant, should be moved somewhere else, for example in the config
+	 * group.
 	 */
 	public double getDayDuration() {
 		return this.numJointEpisodes;

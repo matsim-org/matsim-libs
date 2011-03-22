@@ -66,7 +66,7 @@ public class JointStrategyManager extends StrategyManager {
 
 			if (maxNumPlans >0) {
 				for (Clique clique : cliques.getCliques().values()) {
-					log.debug("clique has "+clique.getPlans().size()+" plans");
+					//log.debug("clique has "+clique.getPlans().size()+" plans");
 					if (clique.getPlans().size() > maxNumPlans) {
 						removePlans(clique, maxNumPlans);
 					}
@@ -82,9 +82,10 @@ public class JointStrategyManager extends StrategyManager {
 		while (clique.getPlans().size() > maxNumPlans) {
 			Plan plan = this.removalPlanSelector.selectPlan(clique);
 			clique.removePlan(plan);
-			if (plan == clique.getSelectedPlan()) { 
-				clique.setSelectedPlan(clique.getRandomPlan());
-			}
+			//redondant (already done in clique.removePlan)
+			//if (plan == clique.getSelectedPlan()) { 
+			//	clique.setSelectedPlan(clique.getRandomPlan());
+			//}
 		}
 	}
 

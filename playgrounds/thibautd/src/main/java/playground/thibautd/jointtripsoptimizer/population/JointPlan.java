@@ -21,10 +21,8 @@ package playground.thibautd.jointtripsoptimizer.population;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
@@ -36,6 +34,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 
 /**
@@ -51,6 +50,10 @@ public class JointPlan implements Plan {
 	 * for robust resolution of links between activities.
 	 */
 	private final Map<IdLeg, JointLeg> legsMap = new TreeMap<IdLeg, JointLeg>();
+	/**
+	 * true if the individual plans are set in the Component persons.
+	 */
+	private final boolean setAtIndividualLevel;
 
 	//TODO: make final
 	private Clique clique;
@@ -58,10 +61,30 @@ public class JointPlan implements Plan {
 	//private Id currentIndividual = null;
 	//private Iterator<Id> individualsIterator;
 
-	public JointPlan(Clique clique, Map<Id, ? extends Plan> plans) {
-		Plan currentPlan;
+	/**
+	 * Creates a joint plan from individual plans.
+	 * The plans are added at the individual level.
+	 * equivalent to JointPlan(clique, plans, true).
+	 */
+	public JointPlan(
+			Clique clique,
+			Map<Id, ? extends Plan> plans) {
+		this(clique, plans, true);
+	}
 
+	/**
+	 * Creates a joint plan from individual plans.
+	 * @param addAtIndividualLevel if true, the plans are added to the Person's plans.
+	 * set to false for a temporary plan (in a replanning for example).
+	 */
+	public JointPlan(
+			Clique clique,
+			Map<Id, ? extends Plan> plans,
+			boolean addAtIndividualLevel) {
+		this.setAtIndividualLevel = addAtIndividualLevel;
+		Plan currentPlan;
 		this.clique = clique;
+
 		//TODO: check for consistency (referenced IDs, etc)
 		for (Id id: plans.keySet()) {
 			currentPlan = new PlanImpl();
@@ -75,8 +98,10 @@ public class JointPlan implements Plan {
 				}
 			}
 			this.individualPlans.put(id, currentPlan);
-			// add the plan at the individual level
-			this.clique.getMembers().get(id).addPlan(currentPlan);
+
+			if (addAtIndividualLevel) {
+				this.clique.getMembers().get(id).addPlan(currentPlan);
+			}
 
 			this.constructLegsMap();
 		}
@@ -303,8 +328,25 @@ public class JointPlan implements Plan {
 			throw new UnsupportedOperationException("resetting a joint plan from"+
 					" a plan of a different clique is unsupported.");
 		}
+		if (this.setAtIndividualLevel) {
+			for (Person currentIndividual : this.clique.getMembers().values()) {
+				// remove the corresponding plan at the individual level
+				currentIndividual.getPlans().remove(
+						this.individualPlans.get(currentIndividual.getId()));
+				// replace it by the new plan
+				currentIndividual.addPlan(plan.getIndividualPlan(currentIndividual));
+				// set it as selected if it was the selected plan
+				if (this.isSelected()) {
+					// no possibility to set the selected plan with the Person interface
+					((PersonImpl) currentIndividual).setSelectedPlan(
+						plan.getIndividualPlan(currentIndividual));
+				}
+			}
+		}
 		this.individualPlans.clear();
-		this.individualPlans.putAll(plan.getIndividualPlans());
+		this.individualPlans.putAll(plan.individualPlans);
+		this.legsMap.clear();
+		this.legsMap.putAll(plan.legsMap);
 	}
 
 	/**
@@ -338,7 +380,7 @@ public class JointPlan implements Plan {
 	 * used to resolve links between joint legs.
 	 * for used in JointLeg only.
 	 */
-	/*package*/ JointLeg getLegById(IdLeg legId) {
+	JointLeg getLegById(IdLeg legId) {
 		if (!this.legsMap.containsKey(legId)) {
 			throw new RuntimeException("legs links could not be resolved");
 		}

@@ -54,7 +54,7 @@ public class JointPlanOptimizerPopulationFactory {
 	public JointPlanOptimizerPopulationFactory(
 			JointPlanOptimizerJGAPConfiguration jgapConfig) {
 		boolean dayDurationNotSet = true;
-		Double dayDurationInit = 0d;
+		double dayDurationInit = 0d;
 		Gene[] sampleGenes = jgapConfig.getSampleChromosome().getGenes();
 		int nBoolInit = 0;
 		int nDoubleInit = 0;
@@ -90,6 +90,8 @@ public class JointPlanOptimizerPopulationFactory {
 
 		try {
 			for (int i=0; i < this.populationSize; i++) {
+				// /////////////////////////////////////////////////////////////
+				// initialize the genes randomly
 				for (int j=0; j < this.nBooleanGenes; j++) {
 					currentGenes[j] = new BooleanGene(this.jgapConfig,
 							this.randomGenerator.nextBoolean());
@@ -102,6 +104,9 @@ public class JointPlanOptimizerPopulationFactory {
 
 				scalingFactor = this.dayDuration / scalingFactor;
 
+				// /////////////////////////////////////////////////////////////
+				// scale the total duration (considering also last activity) to
+				// one day
 				for (int j=0; j < this.nDoubleGenes; j++) {
 					newDoubleGene =  new DoubleGene(this.jgapConfig, 0d, this.dayDuration);
 					newDoubleGene.setAllele(scalingFactor * randomDurations[j]);
@@ -116,8 +121,8 @@ public class JointPlanOptimizerPopulationFactory {
 		} catch (InvalidConfigurationException e) {
 			e.printStackTrace();
 		}
-		log.warn("the GA population were not properly initialized");
-		return null;
+		//should never get there!
+		throw new RuntimeException("GA population has not been initialized");
 	}
 
 	public Genotype createRandomInitialGenotype() {
@@ -126,8 +131,8 @@ public class JointPlanOptimizerPopulationFactory {
 		} catch (InvalidConfigurationException e) {
 			e.printStackTrace();
 		}
-		log.warn("the GA Genotype were not properly initialized");
-		return null;
+		//should never get there!
+		throw new RuntimeException("GA population has not been initialized");
 	}
 }
 

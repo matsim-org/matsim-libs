@@ -45,7 +45,9 @@ public class JointReplanningConfigGroup extends Module {
 	 */
 	private static final String DO_DUR = "dropOffDuration";
 	private static final String MUTATION_PROB = "mutationProbability";
-	private static final String CO_PROB = "crossOverProbability";
+	private static final String WHOLE_CO_PROB = "WholeArithmeticalCrossOverProbability";
+	private static final String SIMPLE_CO_PROB = "SimpleArithmeticalCrossOverProbability";
+	private static final String SINGLE_CO_PROB = "SingleArithmeticalCrossOverProbability";
 	private static final String ITER_NUM = "maxNumberOfGAIterations";
 	private static final String NON_UNIFORMITY_PARAM = "mutationNonUniformity";
 	private static final String OPTIMIZE_TOGGLE = "toggleToOptimize";
@@ -55,7 +57,9 @@ public class JointReplanningConfigGroup extends Module {
 	private int populationSize = 10;
 	private int dropOffDuration = 0;
 	private double mutationProb = 0.1;
-	private double crossOverProb = 0.5;
+	private double wholeCrossOverProb = 0.5;
+	private double simpleCrossOverProb = 0.5;
+	private double singleCrossOverProb = 0.5;
 	private int numberOfIterations = 100;
 	private double betaNonUniformity = 1;
 	private boolean optimizeToggle = false;
@@ -84,9 +88,16 @@ public class JointReplanningConfigGroup extends Module {
 		else if (param_name.equals(MUTATION_PROB)) {
 			this.setMutationProbability(value);
 		}
-		else if (param_name.equals(CO_PROB)) {
-			this.setCrossOverProbability(value);
+		else if (param_name.equals(WHOLE_CO_PROB)) {
+			this.setWholeCrossOverProbability(value);
 		}
+		else if (param_name.equals(SIMPLE_CO_PROB)) {
+			this.setSimpleCrossOverProbability(value);
+		}
+		else if (param_name.equals(SINGLE_CO_PROB)) {
+			this.setSingleCrossOverProbability(value);
+		}
+
 		else if (param_name.equals(ITER_NUM)) {
 			this.setMaxIterations(value);
 		}
@@ -112,8 +123,14 @@ public class JointReplanningConfigGroup extends Module {
 		else if (param_name.equals(MUTATION_PROB)) {
 			return String.valueOf(this.getMutationProbability());
 		}
-		else if (param_name.equals(CO_PROB)) {
-			return String.valueOf(this.getCrossOverProbability());
+		else if (param_name.equals(WHOLE_CO_PROB)) {
+			return String.valueOf(this.getWholeCrossOverProbability());
+		}
+		else if (param_name.equals(SIMPLE_CO_PROB)) {
+			return String.valueOf(this.getSimpleCrossOverProbability());
+		}
+		else if (param_name.equals(SINGLE_CO_PROB)) {
+			return String.valueOf(this.getSingleCrossOverProbability());
 		}
 		else if (param_name.equals(ITER_NUM)) {
 			return String.valueOf(this.getMaxIterations());
@@ -134,7 +151,9 @@ public class JointReplanningConfigGroup extends Module {
 		this.addParameterToMap(map, POP_SIZE);
 		this.addParameterToMap(map, DO_DUR);
 		this.addParameterToMap(map, MUTATION_PROB);
-		this.addParameterToMap(map, CO_PROB);
+		this.addParameterToMap(map, WHOLE_CO_PROB);
+		this.addParameterToMap(map, SIMPLE_CO_PROB);
+		this.addParameterToMap(map, SINGLE_CO_PROB);
 		this.addParameterToMap(map, ITER_NUM);
 		this.addParameterToMap(map, NON_UNIFORMITY_PARAM);
 		this.addParameterToMap(map, OPTIMIZE_TOGGLE);
@@ -183,14 +202,38 @@ public class JointReplanningConfigGroup extends Module {
 		}
 	}
 
-	public double getCrossOverProbability() {
-		return this.crossOverProb;
+	public double getWholeCrossOverProbability() {
+		return this.wholeCrossOverProb;
 	}
 
-	public void setCrossOverProbability(String coProb) {
-		this.crossOverProb = Double.valueOf(coProb);
+	public void setWholeCrossOverProbability(String coProb) {
+		this.wholeCrossOverProb = Double.valueOf(coProb);
 
-		if ((this.crossOverProb < 0)||(this.crossOverProb > 1)) {
+		if ((this.wholeCrossOverProb < 0)||(this.wholeCrossOverProb > 1)) {
+			throw new IllegalArgumentException("probability values must in [0,1]");
+		}
+	}
+
+	public double getSingleCrossOverProbability() {
+		return this.singleCrossOverProb;
+	}
+
+	public void setSingleCrossOverProbability(String coProb) {
+		this.singleCrossOverProb = Double.valueOf(coProb);
+
+		if ((this.singleCrossOverProb < 0)||(this.singleCrossOverProb > 1)) {
+			throw new IllegalArgumentException("probability values must in [0,1]");
+		}
+	}
+
+	public double getSimpleCrossOverProbability() {
+		return this.simpleCrossOverProb;
+	}
+
+	public void setSimpleCrossOverProbability(String coProb) {
+		this.simpleCrossOverProb = Double.valueOf(coProb);
+
+		if ((this.simpleCrossOverProb < 0)||(this.simpleCrossOverProb > 1)) {
 			throw new IllegalArgumentException("probability values must in [0,1]");
 		}
 	}
@@ -202,7 +245,7 @@ public class JointReplanningConfigGroup extends Module {
 	public void setMaxIterations(String iterations) {
 		this.numberOfIterations = Integer.parseInt(iterations);
 
-		if (this.crossOverProb < 0) {
+		if (this.numberOfIterations < 0) {
 			throw new IllegalArgumentException("number of iterations must be positive");
 		}
 	}

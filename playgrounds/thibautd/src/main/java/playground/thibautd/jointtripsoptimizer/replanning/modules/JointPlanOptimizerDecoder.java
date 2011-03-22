@@ -231,7 +231,7 @@ public class JointPlanOptimizerDecoder {
 			toRemove.clear();
 		} while (!individualsToPlan.isEmpty());
 
-		return new JointPlan(this.plan.getClique(), constructedIndividualPlans);
+		return new JointPlan(this.plan.getClique(), constructedIndividualPlans, false);
 		//JointPlan output = new JointPlan(this.plan.getClique(), constructedIndividualPlans);
 		//return output;
 	}

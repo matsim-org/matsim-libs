@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
+import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.replanning.selectors.PlanSelector;
 
 import playground.thibautd.jointtripsoptimizer.population.Clique;
@@ -75,7 +76,8 @@ public class JointPlanStrategy implements PlanStrategy  {
 
 		// TODO: use a JointPlan specific selector?
 		// + pass it from the config file
-		this.planSelector = new BestPlanSelector();
+		// this.planSelector = new BestPlanSelector();
+		this.planSelector = new ExpBetaPlanSelector(controler.getConfig().planCalcScore());
 
 		//TODO: less hard-coded scoring function factory?
 		this.addStrategyModule(new JointPlanOptimizerModule(

@@ -82,10 +82,9 @@ public class Clique implements Person {
 
 	@Override
 	public boolean addPlan(Plan p) {
-		//caster à joint plan
-		//verifier que les participants sont bien membres de la clique
-		log.warn("using yet unimplemented clique.addPlan method:");
-		return false;
+		//cast to joint plan
+		//check clique consistency
+		throw new UnsupportedOperationException("using yet unimplemented clique.addPlan method:");
 	}
 
 	@Override
@@ -162,7 +161,7 @@ public class Clique implements Person {
 		JointPlan plan = new JointPlan(this.selectedPlan);
 		//TODO: use this.addPlan (when implemented)
 		this.plans.add(plan);
-		this.selectedPlan = plan;
+		this.setSelectedPlan(plan);
 		return plan;
 	}
 
@@ -187,16 +186,23 @@ public class Clique implements Person {
 		this.members.remove(p.getId());
 	}
 
-	public void removePlan(Plan plan) {
+	public boolean removePlan(final Plan plan) {
 		if ((plan instanceof JointPlan)&&(this.plans.remove(plan))) {
 			// delete the corresponding individual plans
 			for (Person person : this.getMembers().values()) {
-				person.getPlans().remove(
-						((JointPlan) plan).getIndividualPlan(person) );
+				//((PersonImpl) person).removePlan(
+				if (!person.getPlans().remove(
+						((JointPlan) plan).getIndividualPlan(person) )) {
+					throw new RuntimeException("plan removal failed at the individual level!");
+				}
 			}
+			if (this.getSelectedPlan() == plan) {
+				this.setSelectedPlan(this.getRandomPlan());
+			}
+			return true;
 		} else {
-			throw new IllegalArgumentException("trying to remove non existing "+
-					"plan from clique");
+			log.warn("Clique.removePlan(Plan) has been launched on an invalid plan");
+			return false;
 		}
 	}
 
@@ -206,7 +212,6 @@ public class Clique implements Person {
 	 * TODO: buil it from extra information from the plans file.
 	 * TODO: initialize at construction? (possibility of choosing between dataset
 	 * extraction, joint trips insertion heuristics, choice model...)
-	 * 
 	 */
 	public void buildJointPlanFromIndividualPlans() {
 		//TODO: create JointTrips
