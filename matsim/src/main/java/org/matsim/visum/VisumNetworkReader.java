@@ -75,6 +75,7 @@ public class VisumNetworkReader {
 	private final String[] ATTRIBUTE_LINKTYPE_NO = GENERAL_NO;
 	private final String[] ATTRIBUTE_LINKTYPE_KAPIV = {"CAPPRT", "KAPIV"};
 	private final String[] ATTRIBUTE_LINKTYPE_V0IV = {"V0PRT", "V0IV"};
+	private final String[] ATTRIBUTE_LINKTYPE_NOLANES = {ATTRIBUTE_UNKNOWN, "ANZFAHRSTREIFEN"};
 
 	private final String[] ATTRIBUTE_STOP_NO = GENERAL_NO;
 	private final String[] ATTRIBUTE_STOP_NAME = GENERAL_NAME;
@@ -241,11 +242,12 @@ public class VisumNetworkReader {
 		final int idxNo = getAttributeIndex(this.ATTRIBUTE_LINKTYPE_NO[this.language], attributes);
 		final int idxKapIV = getAttributeIndex(this.ATTRIBUTE_LINKTYPE_KAPIV[this.language], attributes);
 		final int idxV0IV = getAttributeIndex(this.ATTRIBUTE_LINKTYPE_V0IV[this.language], attributes);
+		final int idxNoOfLanes = getAttributeIndex(this.ATTRIBUTE_LINKTYPE_NOLANES[this.language], attributes);
 
 		String line = reader.readLine();
 		while (line != null && line.length() > 0) {
 			final String[] parts = StringUtils.explode(line, ';');
-			VisumNetwork.EdgeType edgeType = new VisumNetwork.EdgeType(new IdImpl(parts[idxNo]), parts[idxKapIV], parts[idxV0IV]);
+			VisumNetwork.EdgeType edgeType = new VisumNetwork.EdgeType(new IdImpl(parts[idxNo]), parts[idxKapIV], parts[idxV0IV], parts[idxNoOfLanes]);
 			this.network.addEdgeType(edgeType);
 			// proceed to next line
 			line = reader.readLine();

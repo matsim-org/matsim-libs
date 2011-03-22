@@ -172,12 +172,14 @@ public class VisumNetwork {
 		public final Id id;
 		public final String kapIV;
 		public final String v0IV;
+		public final String noOfLanes;
 
-		public EdgeType(Id id, String kapIV, String v0IV) {
+		public EdgeType(Id id, String kapIV, String v0IV, String noOfLanes) {
 			super();
 			this.id = id;
 			this.kapIV = kapIV;
 			this.v0IV = v0IV;
+			this.noOfLanes = noOfLanes;
 		}
 
 	}
