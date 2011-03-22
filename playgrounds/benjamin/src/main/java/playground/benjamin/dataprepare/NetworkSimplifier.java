@@ -87,10 +87,11 @@ public class NetworkSimplifier {
 								if(this.mergeLinkStats){
 
 									// Try to merge both links by guessing the resulting links attributes
-									Link link = network.getFactory().createLink(
+									LinkImpl link = (LinkImpl) network.getFactory().createLink(
 											new IdImpl(inLink.getId() + "-" + outLink.getId()),
 											inLink.getFromNode().getId(),
-											outLink.getToNode().getId());
+											outLink.getToNode().getId()
+											);
 
 									// length can be summed up
 									link.setLength(inLink.getLength() + outLink.getLength());
@@ -109,11 +110,12 @@ public class NetworkSimplifier {
 													+ outLink.getLength() * outLink.getNumberOfLanes())
 													/ (inLink.getLength() + outLink.getLength())
 													);
-
-//									inLink.getOrigId() + "-" + outLink.getOrigId(),
+									link.setOrigId(null);
+									link.setType(outLink.getType());
+									
 									network.addLink(link);
 									network.removeLink(inLink.getId());
-									(network).removeLink(outLink.getId());
+									network.removeLink(outLink.getId());
 
 								} else {
 
@@ -126,9 +128,9 @@ public class NetworkSimplifier {
 												inLink.getLength() + outLink.getLength(),
 												inLink.getFreespeed(),
 												inLink.getCapacity(),
-												inLink.getNumberOfLanes(),
-												inLink.getOrigId() + "-" + outLink.getOrigId(),
-												null);
+												outLink.getNumberOfLanes(),
+												null,
+												outLink.getType());
 
 										newLink.setAllowedModes(inLink.getAllowedModes());
 
@@ -185,13 +187,13 @@ public class NetworkSimplifier {
 
 		boolean bothLinksHaveSameLinkStats = true;
 
-		if(!linkA.getAllowedModes().equals(linkB.getAllowedModes())){ bothLinksHaveSameLinkStats = false; }
+//		if(!linkA.getAllowedModes().equals(linkB.getAllowedModes())){ bothLinksHaveSameLinkStats = false; }
 
 		if(linkA.getFreespeed() != linkB.getFreespeed()){ bothLinksHaveSameLinkStats = false; }
 
 		if(linkA.getCapacity() != linkB.getCapacity()){ bothLinksHaveSameLinkStats = false; }
 
-		if(linkA.getNumberOfLanes() != linkB.getNumberOfLanes()){ bothLinksHaveSameLinkStats = false; }
+//		if(linkA.getNumberOfLanes() != linkB.getNumberOfLanes()){ bothLinksHaveSameLinkStats = false; }
 		
 //		if(linkA.getType() != linkB.getType()){ bothLinksHaveSameLinkStats = false; }
 
