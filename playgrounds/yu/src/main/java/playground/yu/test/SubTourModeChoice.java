@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
@@ -100,6 +101,7 @@ public class SubTourModeChoice extends AbstractMultithreadedModule {
 	}
 
 	// ---------------------------------------------------------------
+	private static int wrnCnt = 0 ;
 	public class ChooseRandomTourModeSet implements PlanAlgorithm {
 		private PlanAnalyzeTourModeChoiceSet patmcs;
 
@@ -114,6 +116,13 @@ public class SubTourModeChoice extends AbstractMultithreadedModule {
 
 		@Override
 		public void run(Plan plan) {
+			if ( wrnCnt < 1 ) {
+				wrnCnt++ ;
+				Logger.getLogger(this.getClass()).warn("This method assumes act/leg alternation, which is " +
+						"deprecated.  For the time being, this is probably still ok, but needs to be fixed eventually.  " +
+						"kai, mar'11") ;
+			}
+			
 			this.patmcs.run(plan);
 			ArrayList<String[]> choiceSet = this.patmcs.getChoiceSet();
 
