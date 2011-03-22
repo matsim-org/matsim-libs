@@ -158,6 +158,9 @@
  * Currently, the package has the following limitations:
  * <ul>
  *   <li>Only one toll scheme can be simulated at a time.</li>
+ *   <li>As far as I understand, there neither a consistent nor a "random mutation" way to deal with the "flat fee" issue of
+ *   a daily area toll: If it makes sense for all <i>individual</i> trips during a day to drive around a toll area, the implementation
+ *   will probably not find out that it might have made sense to pay the daily fee for all trips together.  kai, mar'11</li>
  * </ul>
  *
  * @author mrieser
