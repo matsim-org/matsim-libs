@@ -42,7 +42,6 @@ import playground.dgrether.analysis.charts.utils.DgChartWriter;
  *
  */
 public class IncomeStats {
-
 	
 	private static final Logger log = Logger.getLogger(IncomeStats.class);
 	
@@ -65,14 +64,10 @@ public class IncomeStats {
 		return ti;
 	}
 
-
 	public void calculateStatistics(String outdir) {
 		this.calculateLorenzCurve(outdir);
 		this.writeIncomeTable(outdir);
 	}
-	
-	
-	
 	
 	private void writeIncomeTable(String outdir) {
 		try {
@@ -91,7 +86,6 @@ public class IncomeStats {
 			e.printStackTrace();
 		}
 	}
-
 
 	private void calculateLorenzCurve(String outdir) {
 		int stepSizePercent = 1;
@@ -140,5 +134,4 @@ public class IncomeStats {
 		istats.calculateStatistics(outdir);
 		log.info("stats written!");
 	}
-
 }

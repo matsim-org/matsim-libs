@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.benjamin.income;
+package playground.benjamin.incomeScoring;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
@@ -34,9 +34,9 @@ import org.matsim.households.Income;
 import org.matsim.households.PersonHouseholdMapping;
 import org.matsim.households.Income.IncomePeriod;
 
-import playground.benjamin.income.ScoringFromDailyIncome;
-import playground.benjamin.income.ScoringFromLeg;
-import playground.benjamin.income.ScoringFromToll;
+import playground.benjamin.incomeScoring.ScoringFromDailyIncome;
+import playground.benjamin.incomeScoring.ScoringFromLeg;
+import playground.benjamin.incomeScoring.ScoringFromToll;
 
 /**
  * @author dgrether
