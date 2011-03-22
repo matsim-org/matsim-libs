@@ -20,6 +20,7 @@
 
 package org.matsim.roadpricing;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.router.util.PersonalizableTravelCost;
@@ -48,11 +49,18 @@ public class TollTravelCostCalculator implements PersonalizableTravelCost {
 		}
 
 	}
+	
+	private static int wrnCnt = 0 ;
 
 	@Override
 	public double getLinkGeneralizedTravelCost(final Link link, final double time) {
 		double baseCost = this.costHandler.getLinkGeneralizedTravelCost(link, time);
 		double tollCost = this.tollCostHandler.getTollCost(link, time);
+		if ( wrnCnt < 1 ) {
+			wrnCnt++ ;
+			Logger.getLogger(this.getClass()).warn("this package assumes a utility of money equal to one.  " +
+					"Make sure you are using that.  Should be fixed.  kai, mar'11") ;
+		}
 		return baseCost + tollCost;
 	}
 
@@ -71,6 +79,8 @@ public class TollTravelCostCalculator implements PersonalizableTravelCost {
 		}
 	}
 
+	private static int wrnCnt2 = 0 ;
+	
 	/*package*/ class AreaTollCostBehaviour implements TollRouterBehaviour {
 		@Override
 		public double getTollCost(final Link link, final double time) {
@@ -81,6 +91,11 @@ public class TollTravelCostCalculator implements PersonalizableTravelCost {
 			/* just return some really high costs for tolled links, so that still a
 			 * route could be found if there is no other possibility.
 			 */
+			if ( wrnCnt2 < 1 ) {
+				wrnCnt2 ++ ;
+				Logger.getLogger(this.getClass()).warn("at least here, the area toll does not use the true toll value. " +
+						"This may work anyways, but without more explanation it is not obvious to me.  kai, mar'11") ;
+			}
 			return 1000;
 		}
 	}
