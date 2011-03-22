@@ -35,56 +35,53 @@ import org.matsim.api.core.v01.Id;
  *
  */
 public interface Activity extends PlanElement {
-// NOTE: Activity is NOT a location, since there is no consistent way to set the coord directly.  
-// If we need an interface for getCoord functionality (e.g. for quadtree entries), it needs to have a different name.
-// kai, jul09
 
-public double getEndTime();
+	public double getEndTime();
 
-public void setEndTime(final double seconds);
+	public void setEndTime(final double seconds);
 
-/**
- * Activity type is, until further notice, defined via the config file.
- * 
- * @return
- */
-public String getType();
+	/**
+	 * Activity type is, until further notice, defined via the config file.
+	 * 
+	 * @return
+	 */
+	public String getType();
 
-public void setType(final String type);
+	public void setType(final String type);
 
-/**
- * @return the coordinate of the activity, possibly null.
- * <p/>
- * Note that there is deliberately no way to set the coordinate except at creation.  
- * We might consider something like moveActivityTo( linkid, coord ).  kai, aug'10 
- */
-public Coord getCoord();
+	/**
+	 * @return the coordinate of the activity, possibly null.
+	 * <p/>
+	 * Note that there is deliberately no way to set the coordinate except at creation.  
+	 * We might consider something like moveActivityTo( linkid, coord ).  kai, aug'10 
+	 */
+	public Coord getCoord();
 
-public double getStartTime();
-// TODO kn not clear what this means.  I guess that in the same sense as "expected travel time" in leg I should accept it
-// as "expected activity start time".  --> remove for next version?
+	public double getStartTime();
+	// TODO kn not clear what this means.  I guess that in the same sense as "expected travel time" in leg I should accept it
+	// as "expected activity start time".  --> remove for next version?
 
-public void setStartTime(double seconds);
-// TODO kn not clear what this means (see above). --> remove for next version?
+	public void setStartTime(double seconds);
+	// TODO kn not clear what this means (see above). --> remove for next version?
 
-public double getMaximumDuration() ;
-public void setMaximumDuration(double seconds) ;
+	public double getMaximumDuration() ;
+	public void setMaximumDuration(double seconds) ;
 
-/**
- * @return the if of the link to which the activity is attached.  This may start as zero, but
- * is usually set automatically by the control(l)er before the zeroth iteration.
- * <p/>
- * Note that there is deliberately no way to set the link id except at creation.  
- * We might consider something like moveActivityTo( linkid, coord ).  kai, aug'10 
- */
-public Id getLinkId();
+	/**
+	 * @return the if of the link to which the activity is attached.  This may start as zero, but
+	 * is usually set automatically by the control(l)er before the zeroth iteration.
+	 * <p/>
+	 * Note that there is deliberately no way to set the link id except at creation.  
+	 * We might consider something like moveActivityTo( linkid, coord ).  kai, aug'10 
+	 */
+	public Id getLinkId();
 
 
-public Id getFacilityId();
+	public Id getFacilityId();
 
-// the following should not come back since they cause headaches without end.  use builder methods instead.
+	// the following should not come back since they cause headaches without end.  use builder methods instead.
 
-//	public void setLinkId(final Id id);
-//	public void setFacilityId(final Id id);
+	//	public void setLinkId(final Id id);
+	//	public void setFacilityId(final Id id);
 
 }
