@@ -14,48 +14,36 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
-import org.matsim.run.XY2Links;
 
 public class ZPopulationCreator {
 
-private Scenario scenario;
-	
-	public static void main(String args[])
-	{
-		ZPopulationCreator populationCreator = new ZPopulationCreator();
-		
+	public static void main(String args[]) {
+
 		/*
 		 * Create population from sample input data.  
 		 */
-		populationCreator.createPopulation("../matsimExamples/tutorial/demandgeneration_zurich/input_sample_zurich.txt");
-		
+		Scenario scenario = createPopulationFromCensusFile("../matsimExamples/tutorial/demandgeneration_zurich/input_sample_zurich.txt");
+
 		/*
-		 * Write population to file - mapping of the coordinates to links is not done yet.
+		 * Write population to file.
 		 */
-		populationCreator.writePopulation("./input/population.xml");
-		
-		/*
-		 * Map coordinates to links and write another population file.
-		 */
-		//populationCreator.createXY2LinkMapping("examples/tutorial/demandgeneration/config_demandgeneration.xml");
+		PopulationWriter populationWriter = new PopulationWriter(scenario.getPopulation(), scenario.getNetwork());
+		populationWriter.write("./input/population.xml");
+
 	}
-	
-	public ZPopulationCreator()
-	{
-		this.scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-	}
-	
-	public void createPopulation(String censusFile)
-	{
+
+	private static Scenario createPopulationFromCensusFile(String censusFile)	{
+
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+
 		/*
 		 * Use Parser to read the census sample file.
 		 */
 		List<ZCensusEntry> censusEntries = new ZCensusParser().readFile(censusFile);
-		
+
 		/*
 		 * Get Population and PopulationFactory objects.
 		 * The Population contains all created Agents and their plans,
@@ -64,72 +52,61 @@ private Scenario scenario;
 		 */
 		Population population = scenario.getPopulation();
 		PopulationFactory populationFactory = population.getFactory();
-		
+
 
 		/*
 		 * The census file contains one line per trip, meaning a typical person
 		 * is represented by multiple lines / trips. Therefore in a first step
 		 * we have to sort the trips based on the person who executes them.
 		 */
-		
+
 		/*
 		 * Create a Map with the PersonIds as key and a list of CensusEntry as values.
 		 */
 		Map<Integer, List<ZCensusEntry>> personEntryMapping = new TreeMap<Integer, List<ZCensusEntry>>();
-		for (ZCensusEntry censusEntry : censusEntries)
-		{
+		for (ZCensusEntry censusEntry : censusEntries) {
 			/*
 			 * If the Map already contains an entry for the current person
 			 * the list will not be null.
 			 */
 			List<ZCensusEntry> entries = personEntryMapping.get(censusEntry.id_person);
-			
+
 			/*
 			 * If no mapping exists -> create a new one
 			 */
-			if (entries == null)
-			{
+			if (entries == null) {
 				entries = new ArrayList<ZCensusEntry>();
 				personEntryMapping.put(censusEntry.id_person, entries);
 			}
-			
+
 			/*
 			 *  Add currently processed entry to the list
 			 */
 			entries.add(censusEntry);
 		}
-				
+
 		/*
 		 * Now create a plan for each person - iterate over all entries in the map.
 		 */
-		for (List<ZCensusEntry> personEntries : personEntryMapping.values())
-		{
+		for (List<ZCensusEntry> personEntries : personEntryMapping.values()) {
 			/*
 			 * Get the first entry from the list - it will never be null.
 			 */
 			ZCensusEntry entry = personEntries.get(0);
-			
+
 			/*
 			 * Get id of the person from the censusEntry.
 			 */
 			int id_person = entry.id_person;
-			
+
 			/*
 			 * Create new person and add it to the population.
 			 * Use scenario.createId(String id) to create the Person's Id.
 			 */
 			Person person = populationFactory.createPerson(scenario.createId(String.valueOf(id_person)));
 			population.addPerson(person);
-			
-			/*
-			 * Set some demographic values for the person.
-			 * Cast the Person object to PersonImpl here!
-			 */
-			((PersonImpl)person).setAge(entry.age);
-			((PersonImpl)person).setCarAvail(getCarAvailability(entry.caravailability));
-			((PersonImpl)person).setLicence(getLicense(entry.license));
-			((PersonImpl)person).setSex(getGender(entry.gender));
-			
+
+
 			/*
 			 *  Create new plan and add it to the person.
 			 */
@@ -146,7 +123,7 @@ private Scenario scenario;
 			Activity homeActivity = populationFactory.createActivityFromCoord("home", homeCoord);
 			homeActivity.setStartTime(0.0);
 			plan.addActivity(homeActivity);
-			
+
 			/*
 			 * Create objects that are needed when creating the other
 			 * Activities and Legs of the Plan.
@@ -158,23 +135,21 @@ private Scenario scenario;
 			 * the next Trip by using a point to the last previously created
 			 * Activity (initially this is the Home Activity). 
 			 */
-//			Coord startCoord = null;
+
 			Coord endCoord = null;
 			String transportMode = null;
 			Leg leg = null;
 			Activity activity = null;
 			Activity previousActivity = homeActivity;
-			
+
 			/*
 			 *  Create person's Trips and add them to the Plan.
 			 */
-			for (ZCensusEntry personEntry : personEntries)
-			{
-//				startCoord = scenario.createCoord(personEntry.s_x, personEntry.s_y);
+			for (ZCensusEntry personEntry : personEntries) {
 				endCoord = scenario.createCoord(personEntry.d_x, personEntry.d_y);
 				transportMode = getTransportMode(personEntry.tripmode);
 				String activityType = getActivityType(personEntry.trippurpose);
-				
+
 				/*
 				 * Create a new Leg using the PopulationFactory and set its parameters.
 				 * Mind that MATSim uses seconds as time unit whereas the census uses minutes.
@@ -183,96 +158,62 @@ private Scenario scenario;
 				leg.setDepartureTime(personEntry.starttime * 60);
 				leg.setTravelTime(personEntry.tripduration * 60);
 				previousActivity.setEndTime(personEntry.starttime * 60);
-				
+
 				/*
 				 * Create a new Activity using the Population Factory and set its parameters.
 				 */
 				activity = populationFactory.createActivityFromCoord(activityType, endCoord);
 				activity.setStartTime(personEntry.starttime * 60 + personEntry.tripduration * 60);
-				
+
 				/*
 				 * Add the Leg and the Activity to the plan.
 				 */
 				plan.addLeg(leg);
 				plan.addActivity(activity);
-				
+
 				/*
 				 * Do not forget to update the pointer to the previousActivity.
 				 */
 				previousActivity = activity;
 			}
-			
+
 			/*
 			 * ... and finally: If the last Activity takes place at the Home Coordinates
 			 * we assume that the Agent is performing a "home" Activity.
 			 */
-			if (activity.getCoord().equals(homeCoord))
-			{
+			if (activity.getCoord().equals(homeCoord)) {
 				activity.setType("home");
 			}
 		}
-		
-	}
-	
-	public void createXY2LinkMapping(String configFile)
-	{
-		new XY2Links().run(new String[]{configFile});
-	}
-	
-	public void writePopulation(String populationFile)
-	{
-		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).write(populationFile);
+		return scenario;
+
 	}
 
-	
 	/*
-	 * Helper methods that converts the entries from the census file.
+	 * Helper methods that convert the entries from the census file.
 	 */
-	
-	private String getTransportMode(int mode)
-	{
-		switch (mode)
-		{
-			case 1: return TransportMode.walk;
-			case 2: return TransportMode.bike;
-			case 3: return TransportMode.car;
-			case 4: return TransportMode.pt;
-			case 5: return "undefined";
-			
-			default: return "undefined";
+
+	private static String getTransportMode(int mode) {
+		switch (mode) {
+		case 1: return TransportMode.walk;
+		case 2: return TransportMode.bike;
+		case 3: return TransportMode.car;
+		case 4: return TransportMode.pt;
+		case 5: return "undefined";
+
+		default: return "undefined";
 		}
 	}
-	
-	private String getGender(int gender)
-	{
-		if (gender == 0) return "f";
-		else return "m";
-	}
-	
-	private String getLicense(int license)
-	{
-		if (license == 1) return "yes";
-		else return "no";
-	}
-	
-	private String getCarAvailability(int availability)
-	{
-		if (availability == 1) return "always";
-		else if (availability == 2) return "sometimes";
-		else return "never";
-	}
-	
-	private String getActivityType(int activityType)
-	{
-		switch (activityType)
-		{
-			case 1: return "work";
-			case 2: return "education";
-			case 3: return "shop";
-			case 4: return "leisure";
-			case 5: return "other";
-			
-			default: return "undefined";
+
+	private static String getActivityType(int activityType) {
+		switch (activityType) {
+		case 1: return "work";
+		case 2: return "education";
+		case 3: return "shop";
+		case 4: return "leisure";
+		case 5: return "other";
+
+		default: return "undefined";
 		}
 	}
 
