@@ -43,7 +43,11 @@ public class RoadPricingControlerTest extends MatsimTestCase {
 	public void testBaseCase() {
 		Config config = loadConfig("test/scenarios/equil/config.xml");
 		config.controler().setLastIteration(0);
+		config.controler().setWritePlansInterval(0);
 		Controler controler = new TestControler(config);
+		controler.setCreateGraphs(false);
+		controler.setDumpDataAtEnd(false);
+		controler.setWriteEventsInterval(0);
 		controler.run();
 		assertNull("RoadPricing must not be loaded in case case.", controler.getRoadPricing());
 		PlanAlgorithm router = controler.createRoutingAlgorithm();
@@ -55,9 +59,13 @@ public class RoadPricingControlerTest extends MatsimTestCase {
 	public void testDistanceToll() {
 		Config config = loadConfig("test/scenarios/equil/config.xml");
 		config.controler().setLastIteration(0);
+		config.controler().setWritePlansInterval(0);
 		config.scenario().setUseRoadpricing(true);
 		config.roadpricing().setTollLinksFile(getInputDirectory() + "distanceToll.xml");
 		Controler controler = new TestControler(config);
+		controler.setCreateGraphs(false);
+		controler.setDumpDataAtEnd(false);
+		controler.setWriteEventsInterval(0);
 		controler.run();
 		assertNotNull("RoadPricing must be loaded in distance toll case.", controler.getRoadPricing());
 		PlanAlgorithm router = controler.createRoutingAlgorithm();
@@ -69,9 +77,13 @@ public class RoadPricingControlerTest extends MatsimTestCase {
 	public void testCordonToll() {
 		Config config = loadConfig("test/scenarios/equil/config.xml");
 		config.controler().setLastIteration(0);
+		config.controler().setWritePlansInterval(0);
 		config.scenario().setUseRoadpricing(true);
 		config.roadpricing().setTollLinksFile(getInputDirectory() + "cordonToll.xml");
 		Controler controler = new TestControler(config);
+		controler.setCreateGraphs(false);
+		controler.setDumpDataAtEnd(false);
+		controler.setWriteEventsInterval(0);
 		controler.run();
 		assertNotNull("RoadPricing must be loaded in cordon toll case.", controler.getRoadPricing());
 		PlanAlgorithm router = controler.createRoutingAlgorithm();
@@ -83,9 +95,13 @@ public class RoadPricingControlerTest extends MatsimTestCase {
 	public void testAreaToll() {
 		Config config = loadConfig("test/scenarios/equil/config.xml");
 		config.controler().setLastIteration(0);
+		config.controler().setWritePlansInterval(0);
 		config.scenario().setUseRoadpricing(true);
 		config.roadpricing().setTollLinksFile(getInputDirectory() + "areaToll.xml");
 		Controler controler = new TestControler(config);
+		controler.setCreateGraphs(false);
+		controler.setDumpDataAtEnd(false);
+		controler.setWriteEventsInterval(0);
 		controler.run();
 		assertNotNull("RoadPricing should be loaded in area toll case.", controler.getRoadPricing());
 		PlanAlgorithm router = controler.createRoutingAlgorithm();
@@ -102,10 +118,14 @@ public class RoadPricingControlerTest extends MatsimTestCase {
 		// start with the default configuration, which is ok.
 		Config config = loadConfig("test/scenarios/equil/config.xml");
 		config.controler().setLastIteration(0);
+		config.controler().setWritePlansInterval(0);
 		config.scenario().setUseRoadpricing(true);
 		config.roadpricing().setTollLinksFile(getInputDirectory() + "areaToll.xml");
 		try {
 			Controler controler = new TestControler(config);
+			controler.setCreateGraphs(false);
+			controler.setDumpDataAtEnd(false);
+			controler.setWriteEventsInterval(0);
 			controler.run();
 		} catch (RuntimeException unexpected) {
 			throw unexpected;
@@ -118,6 +138,9 @@ public class RoadPricingControlerTest extends MatsimTestCase {
 		try {
 			Controler controler = new TestControler(config);
 			controler.setOverwriteFiles(true);
+			controler.setCreateGraphs(false);
+			controler.setDumpDataAtEnd(false);
+			controler.setWriteEventsInterval(0);
 			controler.run();
 			fail("Expected RuntimeException because of ReRoute_Landmarks, but got none.");
 		} catch (RuntimeException expected) {
@@ -129,6 +152,9 @@ public class RoadPricingControlerTest extends MatsimTestCase {
 		try {
 			Controler controler = new TestControler(config);
 			controler.setOverwriteFiles(true);
+			controler.setCreateGraphs(false);
+			controler.setDumpDataAtEnd(false);
+			controler.setWriteEventsInterval(0);
 			controler.run();
 			fail("Expected RuntimeException because of ReRoute_Dijkstra, but got none.");
 		} catch (RuntimeException expected) {
@@ -140,6 +166,9 @@ public class RoadPricingControlerTest extends MatsimTestCase {
 		try {
 			Controler controler = new TestControler(config);
 			controler.setOverwriteFiles(true);
+			controler.setCreateGraphs(false);
+			controler.setDumpDataAtEnd(false);
+			controler.setWriteEventsInterval(0);
 			controler.run();
 		} catch (RuntimeException unexpected) {
 			throw unexpected;
@@ -153,8 +182,10 @@ public class RoadPricingControlerTest extends MatsimTestCase {
 		config.controler().setLastIteration(0);
 		config.plans().setInputFile("test/scenarios/equil/plans1.xml");
 		config.controler().setOutputDirectory(getOutputDirectory() + "/basecase/");
+		config.controler().setWritePlansInterval(0);
 		Controler controler1 = new Controler(config);
 		controler1.setCreateGraphs(false);
+		controler1.setDumpDataAtEnd(false);
 		controler1.setWriteEventsInterval(0);
 		controler1.run();
 		double scoreBasecase = controler1.getPopulation().getPersons().get(new IdImpl("1")).getPlans().get(0).getScore().doubleValue();
@@ -165,6 +196,7 @@ public class RoadPricingControlerTest extends MatsimTestCase {
 		config.controler().setOutputDirectory(getOutputDirectory() + "/tollcase/");
 		Controler controler2 = new Controler(config);
 		controler2.setCreateGraphs(false);
+		controler2.setDumpDataAtEnd(false);
 		controler2.setWriteEventsInterval(0);
 		controler2.run();
 		double scoreTollcase = controler2.getPopulation().getPersons().get(new IdImpl("1")).getPlans().get(0).getScore().doubleValue();
