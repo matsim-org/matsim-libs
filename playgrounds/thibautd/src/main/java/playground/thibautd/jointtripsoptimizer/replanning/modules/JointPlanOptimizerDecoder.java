@@ -39,6 +39,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
@@ -49,6 +50,7 @@ import playground.thibautd.jointtripsoptimizer.population.JointActingTypes;
 import playground.thibautd.jointtripsoptimizer.population.JointActivity;
 import playground.thibautd.jointtripsoptimizer.population.JointLeg;
 import playground.thibautd.jointtripsoptimizer.population.JointPlan;
+import playground.thibautd.jointtripsoptimizer.run.config.JointReplanningConfigGroup;
 
 /**
  * Transforms a genotype into a JointPlan.
@@ -82,12 +84,14 @@ public class JointPlanOptimizerDecoder {
 	private final LegTravelTimeEstimator nonSharedLegsTTEstimator;
 	private final PlanImpl facticePlan;
 
+	private final boolean optimizeToggle;
+
 	/**
-	 * links PU activities with their soonest beginning time (understood as the
-	 * arrival time of the agent).
+	 * links shared legs with their soonest beginning time (understood as the
+	 * arrival time of the agent to the pick-up).
 	 */
-	private final Map<JointActivity, Double> readyPickUps =
-		new HashMap<JointActivity, Double>();
+	private final Map<JointLeg, Double> readyJointLegs =
+		new HashMap<JointLeg, Double>();
 	/**
 	 * relates passenger shared rides to the related driver trip, if already
 	 * scheduled.
@@ -101,6 +105,7 @@ public class JointPlanOptimizerDecoder {
 	 */
 	public JointPlanOptimizerDecoder(
 			JointPlan plan,
+			JointReplanningConfigGroup configGroup,
 			LegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory,
 			PlansCalcRoute routingAlgorithm,
 			Network network,
@@ -113,6 +118,8 @@ public class JointPlanOptimizerDecoder {
 		int currentDurationGene = numJointEpisodes;
 		Map<String, Integer> currentPlanElementAssociation = null;
 		LegTravelTimeEstimator currentLegTTEstimator;
+
+		this.optimizeToggle = configGroup.getOptimizeToggle();
 
 		// initialize the geneIndices structure
 		for (Id id : plan.getClique().getMembers().keySet()) {
@@ -151,9 +158,10 @@ public class JointPlanOptimizerDecoder {
 				continue;
 			}
 
-			// associate PU activities to "planned" bits
-			// if (((JointActing) pe).getJoint()) {
-			if (((JointActivity) pe).getType().equals(JointActingTypes.PICK_UP)) {
+			// associate PU activities to "planned" bits if toggle is optimized
+			if ((this.optimizeToggle)&&
+					((JointActivity) pe).getType().equals(JointActingTypes.PICK_UP)) {
+
 				if (!alreadyDetermined.containsKey(pe)) {
 					// associate a "toggle" bit
 					currentPlanElementAssociation.put(TOGGLE_CHROM, currentPlannedBit);
@@ -166,9 +174,11 @@ public class JointPlanOptimizerDecoder {
 				} else {
 					currentPlanElementAssociation.put(TOGGLE_CHROM, alreadyDetermined.get(pe));
 				}
+
 			}
 			// associate to duration genes (only for non-joint-trip related activities)
-			else if ( !((JointActivity) pe).getType().equals(JointActingTypes.DROP_OFF) ) {
+			if (( !((JointActivity) pe).getType().equals(JointActingTypes.PICK_UP) )&&
+				( !((JointActivity) pe).getType().equals(JointActingTypes.DROP_OFF) )) {
 				if (!lastActivities.contains(pe)) {
 					currentPlanElementAssociation.put(DURATION_CHROM, currentDurationGene);
 					currentDurationGene++;
@@ -196,10 +206,8 @@ public class JointPlanOptimizerDecoder {
 		List<Id> toRemove = new ArrayList<Id>();
 		Id currentId = null;
 		PlanImpl individualPlan = null;
-		//Map<PlanElement, Double> plannedPickUps = new HashMap<PlanElement, Double>();
-		//Map<Id, Integer> indicesInPlan = new HashMap<Id, Integer>();
-		//Map<Id, Integer> indicesInChromosome = new HashMap<Id, Integer>();
-		//Map<Id, Double> individualsNow = new HashMap<Id, Double>();
+
+		resetInternalState();
 
 		for (Person individual : plan.getClique().getMembers().values()) {
 			individualPlan = new PlanImpl(individual);
@@ -207,9 +215,6 @@ public class JointPlanOptimizerDecoder {
 			constructedIndividualPlans.put(currentId, individualPlan);
 			individualsToPlan.add(currentId);
 			individualValuesMap.put(currentId, new IndividualValuesWrapper());
-			//indicesInPlan.put(currentId, 0);
-			//indicesInChromosome.put(currentId, 0);
-			//individualsNow.put(currentId, 0d);
 		}
 
 		do {
@@ -224,16 +229,16 @@ public class JointPlanOptimizerDecoder {
 					toRemove.add(id);
 				}
 			}
-			//for (Id id : toRemove) {
-			//		individualsToPlan.remove(id);
-			//}
 			individualsToPlan.removeAll(toRemove);
 			toRemove.clear();
 		} while (!individualsToPlan.isEmpty());
 
 		return new JointPlan(this.plan.getClique(), constructedIndividualPlans, false);
-		//JointPlan output = new JointPlan(this.plan.getClique(), constructedIndividualPlans);
-		//return output;
+	}
+
+	private void resetInternalState() {
+		this.readyJointLegs.clear();
+		this.driverLegs.clear();
 	}
 
 	private final void planNextActivity(
@@ -280,7 +285,8 @@ public class JointPlanOptimizerDecoder {
 
 			if (destination.getType().equals(JointActingTypes.PICK_UP)) {
 				geneIndex = currentGeneIndices.get(TOGGLE_CHROM);
-				if (!((BooleanGene) chromosome.getGene(geneIndex)).booleanValue()) {
+				if ((this.optimizeToggle)&&
+						(!((BooleanGene) chromosome.getGene(geneIndex)).booleanValue())) {
 					planReimplacementEpisode(
 						(JointLeg) currentElement,
 						planElements,
@@ -289,7 +295,7 @@ public class JointPlanOptimizerDecoder {
 						currentGeneIndices,
 						chromosome);
 				}
-				else if (!this.readyPickUps.containsKey(destination)) {
+				else if (!this.readyJointLegs.containsKey(planElements.get(individualValues.getIndexInPlan() + 2))) {
 					// case of an affected PU activity without access:
 					// plan the access leg
 					planPuAccessLeg(
@@ -313,16 +319,17 @@ public class JointPlanOptimizerDecoder {
 					chromosome);
 			}
 		}
-		else if (((JointActivity) currentElement).getType().equals(JointActingTypes.PICK_UP)&&
-				(isReadyForPlanning(planElements, individualValues.getIndexInPlan()))) {
-			planSharedLegAct(
-					planElements,
-					currentElement,
-					constructedPlan,
-					currentLegTTEstimator,
-					individualValues,
-					currentGeneIndices,
-					chromosome);
+		else if (((JointActivity) currentElement).getType().equals(JointActingTypes.PICK_UP)) {
+			if (isReadyForPlanning(planElements, individualValues.getIndexInPlan())) {
+				planSharedLegAct(
+						planElements,
+						currentElement,
+						constructedPlan,
+						currentLegTTEstimator,
+						individualValues,
+						currentGeneIndices,
+						chromosome);
+			}
 		}
 		else {
 			log.error("unexpected index: trying to plan an element which is not"+
@@ -414,7 +421,9 @@ public class JointPlanOptimizerDecoder {
 		individualValues.addToNow(currentTravelTime);
 
 		// mark the PU as accessed
-		this.readyPickUps.put(destination, individualValues.getNow());
+		this.readyJointLegs.put(
+				(JointLeg) planElements.get(individualValues.getIndexInPlan() + 2),
+				individualValues.getNow());
 
 		individualValues.addToIndexInPlan(1);
 	}
@@ -470,9 +479,9 @@ public class JointPlanOptimizerDecoder {
 			final IndividualValuesWrapper individualValues,
 			final Map<String, Integer> currentGeneIndices,
 			final IChromosome chromosome) {
-		JointLeg leg = ((JointLeg) currentElement);
-		JointActivity origin = (JointActivity) planElements.get(
-				individualValues.getIndexInPlan() - 1);
+		JointActivity pickUp = ((JointActivity) currentElement);
+		JointLeg leg = (JointLeg) planElements.get(
+				individualValues.getIndexInPlan() + 1);
 		JointActivity dropOff = (JointActivity) planElements.get(
 				individualValues.getIndexInPlan() + 2);
 		JointActivity destination = (JointActivity)
@@ -484,9 +493,9 @@ public class JointPlanOptimizerDecoder {
 		// /////////////////////////////////////////////////////////////////
 		// plan pick-up activity
 		currentDuration = getTimeToJointTrip(
-				origin.getLinkedElements().values(),
+				leg.getLinkedElements().values(),
 				individualValues.getNow()) + PU_DURATION;
-		constructedPlan.addActivity(createActivity(origin, individualValues.getNow(), currentDuration));
+		constructedPlan.addActivity(createActivity(pickUp, individualValues.getNow(), currentDuration));
 
 		individualValues.addToNow(currentDuration);
 
@@ -496,15 +505,18 @@ public class JointPlanOptimizerDecoder {
 
 		if (leg.getIsDriver()) {
 			// use legttestimator
-			leg = new JointLeg(legTTEstimator.getNewLeg(
+			JointLeg driverLeg = new JointLeg(legTTEstimator.getNewLeg(
 				leg.getMode(),
-				origin,
+				pickUp,
 				dropOff,
 				planElements.indexOf(leg),
 				individualValues.getNow()), leg);
+			
+			updateDriverLegs(driverLeg, leg);
+
 		} else {
 			// get driver trip
-			leg = new JointLeg(this.driverLegs.get(leg));
+			leg = new JointLeg((LegImpl) this.driverLegs.get(leg), leg);
 			leg.setMode(JointActingTypes.PASSENGER);
 			leg.setIsDriver(false);
 		}
@@ -549,10 +561,11 @@ public class JointPlanOptimizerDecoder {
 		individualValues.addToIndexInChromosome(1);
 	}
 
-	//private double getActualDuration(double travelTime, double duration) {
-	//	double actualDuration = duration - travelTime;
-	//	return (actualDuration > 0 ? actualDuration : MIN_DURATION);
-	//}
+	private void updateDriverLegs(JointLeg driverLeg, JointLeg legInPlan) {
+		for (JointLeg leg : legInPlan.getLinkedElements().values()) {
+			this.driverLegs.put(leg, driverLeg);
+		}
+	}
 
 	/**
 	 * Creates a "plan" containing only references to the individuals "reimplacement"
@@ -595,11 +608,11 @@ public class JointPlanOptimizerDecoder {
 	 * - the current individual is the driver, or the driver trip is planned
 	 */
 	private final boolean isReadyForPlanning(List<PlanElement> planElements, int index) {
-		JointActivity pickUp = (JointActivity) planElements.get(index);
+		//JointActivity pickUp = (JointActivity) planElements.get(index);
 		JointLeg sharedRide = (JointLeg) planElements.get(index + 1);
 
 		boolean allRelativesArePlanned = 
-			this.readyPickUps.keySet().containsAll(pickUp.getLinkedElements().values());
+			this.readyJointLegs.keySet().containsAll(sharedRide.getLinkedElements().values());
 		boolean isDriver = sharedRide.getIsDriver();
 		boolean driverIsPlanned = this.driverLegs.containsKey(sharedRide);
 		
@@ -618,14 +631,14 @@ public class JointPlanOptimizerDecoder {
 	}
 
 	private final double getTimeToJointTrip(
-			Collection<? extends JointActing> linkedElements,
+			Collection<? extends JointLeg> linkedElements,
 			double now) {
 		// the min start time should not be before now
 		double max = now;
 		double currentTime;
 
-		for (JointActing act : linkedElements) {
-			currentTime = this.readyPickUps.get(act);
+		for (JointLeg leg : linkedElements) {
+			currentTime = this.readyJointLegs.get(leg);
 			if (max < currentTime) {
 				max = currentTime;
 			}

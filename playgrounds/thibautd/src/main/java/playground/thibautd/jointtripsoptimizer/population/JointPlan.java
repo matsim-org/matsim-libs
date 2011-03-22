@@ -74,9 +74,14 @@ public class JointPlan implements Plan {
 
 	/**
 	 * Creates a joint plan from individual plans.
+	 * Two individual trips to be shared must have their Pick-Up activity type set
+	 * to 'pu_i', where i is an integer which identifies the joint trip.
 	 * @param addAtIndividualLevel if true, the plans are added to the Person's plans.
 	 * set to false for a temporary plan (in a replanning for example).
 	 */
+	//TODO: improve:
+	// - less hard-coded modes
+	// - improve reimplacement leg creation
 	public JointPlan(
 			Clique clique,
 			Map<Id, ? extends Plan> plans,
@@ -85,16 +90,42 @@ public class JointPlan implements Plan {
 		Plan currentPlan;
 		this.clique = clique;
 
+		Map<String, List<JointLeg>> toLink = new HashMap<String, List<JointLeg>>();
+		String actType;
+		String currentJointEpisodeId = null;
+		JointLeg currentLeg;
+		JointActivity currentActivity;
+
 		//TODO: check for consistency (referenced IDs, etc)
 		for (Id id: plans.keySet()) {
 			currentPlan = new PlanImpl();
+
 			for (PlanElement pe : plans.get(id).getPlanElements()) {
+
 				if (pe instanceof Activity) {
-					currentPlan.addActivity(new JointActivity((Activity) pe, 
-								this.clique.getMembers().get(id)));
+					currentActivity = new JointActivity((Activity) pe, 
+							this.clique.getMembers().get(id));
+					actType = currentActivity.getType();
+					// TODO: less hard-coded (implies also externalizing the "split"
+					// part)
+					if (actType.matches("^pu_.*$")) {
+						currentJointEpisodeId = actType.split("_")[1];
+						currentActivity.setType(JointActingTypes.PICK_UP);
+					}
+					currentPlan.addActivity(currentActivity);
+
 				} else {
-					currentPlan.addLeg(new JointLeg((LegImpl) pe,
-								(Person) this.clique.getMembers().get(id)));
+					currentLeg = new JointLeg((Leg) pe,
+							(Person) this.clique.getMembers().get(id));
+					if (currentJointEpisodeId != null) {
+						// this leg is a shared leg, remember this.
+						if (!toLink.containsKey(currentJointEpisodeId)) {
+							toLink.put(currentJointEpisodeId, new ArrayList<JointLeg>());
+						}
+						toLink.get(currentJointEpisodeId).add(currentLeg);
+						currentJointEpisodeId = null;
+					}
+					currentPlan.addLeg(currentLeg);
 				}
 			}
 			this.individualPlans.put(id, currentPlan);
@@ -102,9 +133,24 @@ public class JointPlan implements Plan {
 			if (addAtIndividualLevel) {
 				this.clique.getMembers().get(id).addPlan(currentPlan);
 			}
-
-			this.constructLegsMap();
 		}
+
+		// create the links that where encoded in the activity types names
+		for (List<JointLeg> legsToLink : toLink.values()) {
+			for (JointLeg leg : legsToLink) {
+				if (leg.getMode().equals("car")) {
+					leg.setIsDriver(true);
+				}
+				leg.setAssociatedIndividualLeg(null);
+				for (JointLeg linkedLeg : legsToLink) {
+					if (leg != linkedLeg) {
+						leg.addLinkedElementById(linkedLeg.getId());
+					}
+				}	
+			}
+		}
+
+		this.constructLegsMap();
 	}
 
 	public JointPlan(JointPlan plan) {
@@ -117,6 +163,7 @@ public class JointPlan implements Plan {
 		this.legsMap.clear();
 		for (PlanElement pe : this.getPlanElements()) {
 			if (pe instanceof JointLeg) {
+				((JointLeg) pe).setJointPlan(this);
 				currentLegId = ((JointLeg) pe).getId();
 				if (!this.legsMap.keySet().contains(currentLegId)) {
 					this.legsMap.put(currentLegId, (JointLeg) pe);
@@ -225,7 +272,9 @@ public class JointPlan implements Plan {
 	 */
 	@Override
 	public Person getPerson() {
-		log.warn("using getPerson to get clique from JointPlan instance.");
+		// do not log warning (used at each iteration in the strategy manager
+		// => too verbose
+		// log.warn("using getPerson to get clique from JointPlan instance.");
 		return this.getClique();
 	}
 

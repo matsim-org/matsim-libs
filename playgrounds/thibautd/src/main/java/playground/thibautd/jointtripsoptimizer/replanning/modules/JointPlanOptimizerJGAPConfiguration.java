@@ -65,8 +65,10 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 
 	//TODO: make final
 	private int numEpisodes;
-	private int numJointEpisodes;
+	private int numToggleGenes;
 	private JointPlanOptimizerFitnessFunction fitnessFunction;
+
+	private final boolean optimizeToggle;
 
 	public JointPlanOptimizerJGAPConfiguration(
 			JointPlan plan,
@@ -80,6 +82,7 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 		super(null);
 		Configuration.reset();
 
+		this.optimizeToggle = configGroup.getOptimizeToggle();
 		// get info on the plan structure
 		this.countEpisodes(plan);
 
@@ -102,17 +105,17 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 			// this.setPreservFittestIndividual(true);
 
 			// Chromosome: construction
-			Gene[] sampleGenes = new Gene[this.numJointEpisodes + this.numEpisodes];
-			for (int i=0; i < this.numJointEpisodes; i++) {
+			Gene[] sampleGenes = new Gene[this.numToggleGenes + this.numEpisodes];
+			for (int i=0; i < this.numToggleGenes; i++) {
 				sampleGenes[i] = new BooleanGene(this);
 			}
-			for (int i=this.numJointEpisodes;
-					i < this.numJointEpisodes + this.numEpisodes; i++) {
+			for (int i=this.numToggleGenes;
+					i < this.numToggleGenes + this.numEpisodes; i++) {
 				//sampleGenes[i] = new IntegerGene(this, 0, numTimeIntervals);
 				sampleGenes[i] = new DoubleGene(this, 0, DAY_DUR);
 			}
 
-			log.debug("episodes: "+this.numEpisodes+", joint episodes: "+this.numJointEpisodes);
+			log.debug("episodes: "+this.numEpisodes+", joint episodes: "+this.numToggleGenes);
 			this.setSampleChromosome(new JointPlanOptimizerJGAPChromosome(this, sampleGenes));
 
 			// population size
@@ -121,10 +124,11 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 
 			this.fitnessFunction = new JointPlanOptimizerFitnessFunction(
 						plan,
+						configGroup,
 						legTravelTimeEstimatorFactory,
 						routingAlgorithm,
 						network,
-						this.numJointEpisodes,
+						this.numToggleGenes,
 						this.numEpisodes,
 						scoringFunctionFactory);
 			this.setFitnessEvaluator(new DefaultFitnessEvaluator());
@@ -142,12 +146,12 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 			this.addGeneticOperator( new JointPlanOptimizerJGAPCrossOver(
 						this,
 						configGroup,
-						this.numJointEpisodes,
+						this.numToggleGenes,
 						this.numEpisodes) );
 			this.addGeneticOperator( new JointPlanOptimizerJGAPMutation(
 						this,
 						configGroup,
-						this.numJointEpisodes + this.numEpisodes));
+						this.numToggleGenes + this.numEpisodes));
 
 		} catch (InvalidConfigurationException e) {
 			//throw new RuntimeException(e.getMessage());
@@ -156,7 +160,7 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 	 }
 
 	/**
-	 * Sets the private variables numEpisodes and numJointEpisodes.
+	 * Sets the private variables numEpisodes and numToggleGenes.
 	 * an episode corresponds to an activity and its eventual access trip.
 	 * a joint episode is an episode which involves a joint trip.
 	 */
@@ -170,7 +174,7 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 		List<JointLeg> linkedValues = null;
 
 		 this.numEpisodes = 0;
-		 this.numJointEpisodes = 0;
+		 this.numToggleGenes = 0;
 
 		 for (Id id : ids) {
 			//log.debug("id: "+id);
@@ -182,11 +186,12 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 						(((JointActivity) pe).getType() != JointActingTypes.PICK_UP)&&
 						(((JointActivity) pe).getType() != JointActingTypes.DROP_OFF)) {
 					this.numEpisodes++;
-				} else if ((pe instanceof JointLeg)&&
+				} else if ((this.optimizeToggle)&&
+						(pe instanceof JointLeg)&&
 						(((JointLeg) pe).getJoint())&&
 						(!alreadyExamined.contains(pe))
 						) {
-					this.numJointEpisodes++;
+					this.numToggleGenes++;
 
 					linkedValues = (List<JointLeg>) 
 						((JointLeg) pe).getLinkedElements().values();
@@ -208,7 +213,7 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 	}
 
 	public int getNumJointEpisodes() {
-		return this.numJointEpisodes;
+		return this.numToggleGenes;
 	}
 
 	/**
@@ -217,7 +222,7 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 	 * group.
 	 */
 	public double getDayDuration() {
-		return this.numJointEpisodes;
+		return this.numToggleGenes;
 	}
 }
 

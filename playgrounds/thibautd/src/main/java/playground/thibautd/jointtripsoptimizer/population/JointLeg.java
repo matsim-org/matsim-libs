@@ -78,8 +78,8 @@ public class JointLeg extends LegImpl implements Leg, JointActing, Identifiable 
 	/**
 	 * Converts a legImpl instance into an individual JointLeg instance.
 	 */
-	public JointLeg(LegImpl leg, Person pers) {
-		super(leg);
+	public JointLeg(Leg leg, Person pers) {
+		super((LegImpl) leg);
 		if (leg instanceof JointLeg) {
 			this.legId = ((JointLeg) leg).getId();
 			constructFromJointLeg((JointLeg) leg);
@@ -243,6 +243,10 @@ public class JointLeg extends LegImpl implements Leg, JointActing, Identifiable 
 	 */
 	public JointLeg getAssociatedIndividualLeg() {
 		return this.associatedIndividualLeg;
+	}
+
+	public void setAssociatedIndividualLeg(JointLeg leg) {
+		this.associatedIndividualLeg = leg;
 	}
 
 	public boolean getIsDriver() {
