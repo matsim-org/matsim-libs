@@ -23,8 +23,6 @@
  */
 package playground.yu.newPlans;
 
-import java.util.List;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -34,7 +32,6 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
@@ -60,10 +57,10 @@ public class AddHomePlan2Pop extends NewPopulation {
 	}
 
 	private Activity createHomeActivity(Activity referenceActivity) {
-		Id linkId = referenceActivity.getLinkId();
 		Coord homeCoord = referenceActivity.getCoord();
 		if (homeCoord == null) {
-			homeCoord = network.getLinks().get(linkId).getCoord();
+			homeCoord = network.getLinks().get(referenceActivity.getLinkId())
+					.getCoord();
 		}
 
 		// if (linkId != null && network.getLinks().containsKey(linkId)) {
@@ -87,11 +84,11 @@ public class AddHomePlan2Pop extends NewPopulation {
 	}
 
 	private Leg createDummyLegAtHome(String transportMode,
-			Id firstActivityLinkId, Id lastActivityLinkId) {
+			Id firstActivityLinkId) {
 		Leg leg = populationFactory.createLeg(transportMode);
 		// leg.setTravelTime(10d);
 		Route route = new GenericRouteImpl(firstActivityLinkId,
-				lastActivityLinkId);
+				firstActivityLinkId);
 		route.setDistance(0d);
 		leg.setRoute(route);
 		return leg;
@@ -103,19 +100,19 @@ public class AddHomePlan2Pop extends NewPopulation {
 	private void createHomePlan(Person person) {
 		Plan homePlan = populationFactory.createPlan();
 
-		List<PlanElement> planElements = person.getSelectedPlan()
-				.getPlanElements();
-		Activity firstAct = (Activity) planElements.get(0);
-		Activity lastAct = (Activity) planElements.get(planElements.size() - 1);
+		// List<PlanElement> planElements = ;
+		Activity firstAct = (Activity) person.getSelectedPlan()
+				.getPlanElements().get(0);
+		// Activity lastAct = (Activity) planElements.get(planElements.size() -
+		// 1);
 
 		Activity homeAct = createHomeActivity(firstAct);
 		homeAct.setEndTime(21600d);
 		homePlan.addActivity(homeAct);
 
-		homePlan.addLeg(createDummyLegAtHome(WALK, firstAct.getLinkId(),
-				lastAct.getLinkId()));
+		homePlan.addLeg(createDummyLegAtHome(WALK, firstAct.getLinkId()));
 
-		Activity lastHomeAct = createHomeActivity(lastAct);
+		Activity lastHomeAct = createHomeActivity(firstAct);
 		lastHomeAct.setStartTime(21700d);
 		homePlan.addActivity(lastHomeAct);
 
