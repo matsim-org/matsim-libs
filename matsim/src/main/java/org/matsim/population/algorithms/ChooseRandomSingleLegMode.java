@@ -20,7 +20,6 @@
 
 package org.matsim.population.algorithms;
 
-import java.util.List;
 import java.util.Random;
 
 import org.matsim.api.core.v01.TransportMode;
@@ -31,13 +30,17 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PersonImpl;
 
 /**
- * Changes the transportation mode of all legs in a plan to a randomly chosen
- * different mode (but the same mode for all legs in that plan) given a list
- * of possible modes.
+ * Changes the transportation mode of each legs in a plan to a randomly chosen
+ * mode, given a list of possible modes. Each leg can have another mode assigned,
+ * and it may be possible that the mode is not changed at all (i.e., the same mode
+ * was randomly chosen again).
+ *
+ * <b>Warning:</b> Using this class in a replanning strategy may result in many more
+ * iterations being needed until a useful state can be reached.
  *
  * @author mrieser
  */
-public class ChooseRandomLegMode implements PlanAlgorithm {
+public class ChooseRandomSingleLegMode implements PlanAlgorithm {
 
 	private final String[] possibleModes;
 	private boolean ignoreCarAvailability = true;
@@ -50,7 +53,7 @@ public class ChooseRandomLegMode implements PlanAlgorithm {
 	 * @see TransportMode
 	 * @see MatsimRandom
 	 */
-	public ChooseRandomLegMode(final String[] possibleModes, final Random rng) {
+	public ChooseRandomSingleLegMode(final String[] possibleModes, final Random rng) {
 		this.possibleModes = possibleModes.clone();
 		this.rng = rng;
 	}
@@ -61,64 +64,31 @@ public class ChooseRandomLegMode implements PlanAlgorithm {
 
 	@Override
 	public void run(final Plan plan) {
-		List<PlanElement> tour = plan.getPlanElements();
-		changeToRandomLegMode(tour, plan);
-	}
-
-	private void changeToRandomLegMode(final List<PlanElement> tour, final Plan plan) {
-		if (tour.size() > 1) {
-			boolean forbidCar = false;
-			if (!this.ignoreCarAvailability) {
-				String carAvail = ((PersonImpl) plan.getPerson()).getCarAvail();
-				if ("never".equals(carAvail)) {
-					forbidCar = true;
-				}
+		boolean forbidCar = false;
+		if (!this.ignoreCarAvailability) {
+			String carAvail = ((PersonImpl) plan.getPerson()).getCarAvail();
+			if ("never".equals(carAvail)) {
+				forbidCar = true;
 			}
-
-			final String currentMode = getTransportMode(tour);
-
-			String newMode;
-			while (true) {
-				int newModeIdx = chooseModeOtherThan(currentMode);
-				newMode = this.possibleModes[newModeIdx];
-				if (!(forbidCar && TransportMode.car.equals(newMode))) {
-					break;
-				} else {
-					if (this.possibleModes.length == 2) {
-						newMode = currentMode; // there is no other mode available
-						break;
-					}
-				}
-			}
-
-			changeLegModeTo(tour, newMode);
 		}
-	}
 
-	private String getTransportMode(final List<PlanElement> tour) {
-		return ((Leg) (tour.get(1))).getMode();
-	}
-
-	private void changeLegModeTo(final List<PlanElement> tour, final String newMode) {
-		for (PlanElement pe : tour) {
+		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof Leg) {
-				((Leg) pe).setMode(newMode);
+				((Leg) pe).setMode(getRandomLegMode(forbidCar));
 			}
 		}
 	}
 
-	private int chooseModeOtherThan(final String currentMode) {
-		int newModeIdx = this.rng.nextInt(this.possibleModes.length - 1);
-		for (int i = 0; i <= newModeIdx; i++) {
-			if (this.possibleModes[i].equals(currentMode)) {
-				/* if the new Mode is after the currentMode in the list of possible
-				 * modes, go one further, as we have to ignore the current mode in
-				 * the list of possible modes. */
-				newModeIdx++;
-				break;
+	private String getRandomLegMode(final boolean forbidCar) {
+		String newMode;
+		while (true) {
+			newMode = this.possibleModes[this.rng.nextInt(this.possibleModes.length)];
+			if (!(forbidCar && TransportMode.car.equals(newMode))) {
+				return newMode;
+			} else if (this.possibleModes.length == 1) {
+				return newMode; // there is no other mode available
 			}
 		}
-		return newModeIdx;
 	}
 
 }

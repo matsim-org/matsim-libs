@@ -32,6 +32,7 @@ import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.replanning.modules.ChangeLegMode;
+import org.matsim.core.replanning.modules.ChangeSingleLegMode;
 import org.matsim.core.replanning.modules.ExternalModule;
 import org.matsim.core.replanning.modules.PlanomatModule;
 import org.matsim.core.replanning.modules.ReRoute;
@@ -161,6 +162,15 @@ public final class StrategyManagerConfigLoader {
 			} else if (name.equals("ChangeLegMode")) {
 				strategy = new PlanStrategyImpl(new RandomPlanSelector());
 				strategy.addStrategyModule(new ChangeLegMode(config));
+				strategy.addStrategyModule(new ReRoute(controler));
+			} else if (name.equals("ChangeSingleLegMode")) {
+				strategy = new PlanStrategyImpl(new RandomPlanSelector());
+				strategy.addStrategyModule(new ChangeSingleLegMode(config));
+				strategy.addStrategyModule(new ReRoute(controler));
+			} else if (name.equals("TransitChangeSingleLegMode")) {
+				strategy = new PlanStrategyImpl(new RandomPlanSelector());
+				strategy.addStrategyModule(new TransitActsRemoverStrategy(config));
+				strategy.addStrategyModule(new ChangeSingleLegMode(config));
 				strategy.addStrategyModule(new ReRoute(controler));
 			} else if (name.equals("SubtourModeChoice")) {
 				strategy = new PlanStrategyImpl(new RandomPlanSelector());
