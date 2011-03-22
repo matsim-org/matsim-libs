@@ -26,9 +26,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
@@ -64,60 +62,66 @@ public class DoublePop extends NewPopulation {
 		pw.writePerson(person);
 		// n++;
 		tmpPerson = person;
-		// String oldId = person.getId().toString();
-		long oldId = Integer.parseInt(person.getId().toString());
+		String oldId = person.getId().toString();
+		// long oldId = Integer.parseInt(person.getId().toString());
 		// produce new Person with new Id
 		// if (n == 1) {
-		
-		
-		
-		for (int i = 1; i < 20; i++)
 
-		{
-			createNewPerson(oldId + i * 5);
-		}
+		// for (int i = 1; i < 20; i++)
+		//
+		// {
+		// createNewPerson(oldId + i * 5);
+		// }
 
 		// } else if (n == 2) {
-		
-//		for (int i = 1; i <= 99; i++) {
-//			createNewPerson(oldId + i);
-//		}
+
+		// for (int i = 1; i <= 99; i++) {
+		// createNewPerson(oldId + i);
+		// }
 
 		// createNewPerson(oldId + "A");
-		// createNewPerson(oldId + "B");
+		createAndWriteNewPerson(oldId + "B");
 		// createNewPerson(oldId + "C");
 		// createNewPerson(oldId + "D");
 	}
 
-	private void createNewPerson(String newId) {
-		createNewPerson(new IdImpl(newId));
+	private void createAndWriteNewPerson(String newId) {
+		createAndWriteNewPerson(new IdImpl(newId));
 	}
 
 	private void createNewPerson(long newId) {
-		createNewPerson(new IdImpl(newId));
+		createAndWriteNewPerson(new IdImpl(newId));
 	}
 
-	private void createNewPerson(Id newId) {
+	private void createAndWriteNewPerson(Id newId) {
 		tmpPerson.setId(newId);
 		pw.writePerson(tmpPerson);
 	}
 
 	public static void main(final String[] args) {
 
-		String networkFilename = "../playgrounds/yu/test/input/playground/yu/ptCounts/ptNet.xml";
-		String plansFilename = "../playgrounds/yu/test/input/playground/yu/ptCounts/ptPop.xml";
-		String outputPlansFilename = "../playgrounds/yu/test/input/playground/yu/ptCounts/pt100Pop.xml";
+		String networkFilename, plansFilename, outputPlansFilename;
 
-		ScenarioImpl s = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		if (args.length != 3) {
+			networkFilename = "../playgrounds/yu/test/input/playground/yu/ptCounts/ptNet.xml";
+			plansFilename = "../playgrounds/yu/test/input/playground/yu/ptCounts/ptPop.xml";
+			outputPlansFilename = "../playgrounds/yu/test/input/playground/yu/ptCounts/pt100Pop.xml";
+		} else {
+			networkFilename = args[0];
+			plansFilename = args[1];
+			outputPlansFilename = args[2];
+		}
 
-		NetworkImpl network = s.getNetwork();
-		new MatsimNetworkReader(s).readFile(networkFilename);
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils
+				.createScenario(ConfigUtils.createConfig());
 
-		Population population = s.getPopulation();
-		PopulationReader plansReader = new MatsimPopulationReader(s);
-		plansReader.readFile(plansFilename);
+		new MatsimNetworkReader(scenario).readFile(networkFilename);
 
-		DoublePop dp = new DoublePop(network, population, outputPlansFilename);
+		Population population = scenario.getPopulation();
+		new MatsimPopulationReader(scenario).readFile(plansFilename);
+
+		DoublePop dp = new DoublePop(scenario.getNetwork(), population,
+				outputPlansFilename);
 		dp.run(population);
 		dp.writeEndPlans();
 	}
