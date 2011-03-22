@@ -64,6 +64,7 @@ public class DGDemandGenerator {
 
 	private static final String exampleDirectory = "../matsimExamples/tutorial/example8DemandGeneration/";
 
+	@SuppressWarnings("unchecked")
 	public static void main(String [] args) throws IOException {
 
 		// input files
