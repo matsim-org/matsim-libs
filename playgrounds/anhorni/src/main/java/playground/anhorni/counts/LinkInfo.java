@@ -10,13 +10,17 @@ public class LinkInfo {
 	private TreeMap<Integer, List<Double>> yearCountVals = new TreeMap<Integer, List<Double>>();
 	private TreeMap<Integer, Double> simVals =  new TreeMap<Integer, Double>();
 	
+	private boolean removeZeroVolumes = false;
+	
 	private Aggregator aggregator = new Aggregator();
 	
 	public LinkInfo(String direction, String linkidTeleatlas,
-			String linkidNavteq, String linkidIVTCH) {	
+			String linkidNavteq, String linkidIVTCH, boolean removeZeroVolumes) {	
 		this.ids.put("teleatlas", linkidTeleatlas);
 		this.ids.put("navteq", linkidNavteq);
 		this.ids.put("ivtch", linkidIVTCH);
+		
+		this.removeZeroVolumes = removeZeroVolumes;
 	}
 	
 	public double getAbsoluteDifference_TimeAvg(int hour) {
@@ -47,7 +51,9 @@ public class LinkInfo {
 		if (this.yearCountVals.get(hour) == null) {
 			this.yearCountVals.put(hour, new Vector<Double>());
 		}
-		this.yearCountVals.get(hour).add(count);
+		if (!(this.removeZeroVolumes && count < 0.0)) {
+			this.yearCountVals.get(hour).add(count);
+		}
 	}
 	
 	public void aggregate(boolean removeOutliers) {

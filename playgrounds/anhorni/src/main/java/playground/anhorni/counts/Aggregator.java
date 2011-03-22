@@ -6,12 +6,7 @@ import java.util.List;
 import java.util.TreeMap;
 import java.util.Vector;
 
-//import org.apache.log4j.Logger;
-
 public class Aggregator {
-	
-	//private final static Logger log = Logger.getLogger(Aggregator.class);
-	
 	private TreeMap<Integer, List<Double>> volumes = new TreeMap<Integer, List<Double>>();
 		
 	private double [] avg = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
@@ -23,9 +18,8 @@ public class Aggregator {
 	private double [] standarddev = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
 		0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 		
-	
 	public void aggregate(TreeMap<Integer, List<Double>> volumes, boolean removeOutliers) {
-		this.volumes = volumes;		
+		this.volumes = volumes;	
 		if (removeOutliers) this.removeOutliers();
 		this.avg();
 		this.standarddev();

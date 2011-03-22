@@ -8,13 +8,17 @@ import java.util.List;
 import java.util.TreeMap;
 import java.util.Vector;
 
-import org.apache.log4j.Logger;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 public class NetworkMapper {
 	
 	private List<CountStation> countStations = new Vector<CountStation>();
+	private boolean removeZeroVolumes = false;
+	
+	public NetworkMapper(boolean removeZeroVolumes) {
+		this.removeZeroVolumes = removeZeroVolumes;
+	}
 	
 	public void map(TreeMap<String, Vector<RawCount>> rawCounts, final String mappingFile) {
 		
@@ -81,7 +85,7 @@ public class NetworkMapper {
 				if (ys.equals("-")) ys = "-1";
 				CoordImpl coord = new CoordImpl(xs, ys);
 				
-				LinkInfo link = new LinkInfo(direction, linkidTeleatlas, linkidNavteq, linkidIVTCH);
+				LinkInfo link = new LinkInfo(direction, linkidTeleatlas, linkidNavteq, linkidIVTCH, this.removeZeroVolumes);
 				String id = dataset + nr;
 
 				if (!stationsTree.containsKey(id)) {

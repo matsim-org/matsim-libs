@@ -3,14 +3,12 @@ package playground.anhorni.counts;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-
-import org.apache.log4j.Logger;
 import org.matsim.core.gbl.Gbl;
 
 public class CountsCompareReader {
 	
-	private final static Logger log = Logger.getLogger(CountsCompareReader.class);
-	String countsCompareFile = "../../matsim/input/counts/countscompare.txt";
+	private String path = "src/main/java/playground/anhorni/input/counts/";
+	private String countsCompareFile = path + "countscompare.txt";
 	private Stations stations;
 	
 	public CountsCompareReader(Stations stations) {
@@ -20,7 +18,7 @@ public class CountsCompareReader {
 	private String readNetworkName() {
 		String networkName = null;
 		try {
-			FileReader fileReader = new FileReader("../../matsim/input/counts/networkName.txt");
+			FileReader fileReader = new FileReader(path + "networkName.txt");
 			BufferedReader bufferedReader = new BufferedReader(fileReader);	
 			
 			String curr_line;

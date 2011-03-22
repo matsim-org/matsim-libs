@@ -1,6 +1,7 @@
 package playground.anhorni.counts;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.Iterator;
@@ -15,6 +16,9 @@ public class SummaryWriter {
 	private boolean writeForSpecificArea = false;
 	
 	public void write(Stations stations, String outpath, boolean writeForSpecificArea) {
+		
+		new File(outpath).mkdirs();
+		
 		this.writeForSpecificArea = writeForSpecificArea;
 		
 		this.writeRelative(stations, outpath);
