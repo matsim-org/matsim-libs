@@ -15,16 +15,50 @@ import org.matsim.core.utils.misc.ConfigUtils;
 public class PNetworkGenerator {
 	
 	public static void main(String[] args) {
+		
+		/*
+		 * The input file name.
+		 */
 		String osm = "./input/my-map.osm";
-		Config config = ConfigUtils.createConfig();
-		Scenario sc = ScenarioUtils.createScenario(config);
-		Network net = sc.getNetwork();
+		
+		
+		/*
+		 * The coordinate system to use. OpenStreetMap uses WGS84, but for MATSim, we need a projection where distances
+		 * are (roughly) euclidean distances in meters.
+		 * 
+		 * UTM 33N is one such possibility (for parts of Europe, at least).
+		 * 
+		 */
 		CoordinateTransformation ct = 
-		 TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.WGS84_UTM35S);
-		OsmNetworkReader onr = new OsmNetworkReader(net,ct);
-		onr.parse(osm); 
-		new NetworkCleaner().run(net);
-		new NetworkWriter(net).write("./input/network.xml");
+			 TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.WGS84_UTM33N);
+		
+		/*
+		 * First, create a new Config and a new Scenario. One always has to do this when working with the MATSim 
+		 * data containers.
+		 * 
+		 */
+		Config config = ConfigUtils.createConfig();
+		Scenario scenario = ScenarioUtils.createScenario(config);
+		
+		/*
+		 * Pick the Network from the Scenario for convenience.
+		 */
+		Network network = scenario.getNetwork();
+		
+		OsmNetworkReader onr = new OsmNetworkReader(network,ct);
+		onr.parse(osm);
+		
+		/*
+		 * Clean the Network. Cleaning means removing disconnected components, so that afterwards there is a route from every link
+		 * to every other link. This may not be the case in the initial network converted from OpenStreetMap.
+		 */
+		new NetworkCleaner().run(network);
+		
+		/*
+		 * Write the Network to a MATSim network file.
+		 */
+		new NetworkWriter(network).write("./input/network.xml");
+		
 	}
 
 }

@@ -23,7 +23,7 @@ public class PPopulationGenerator implements Runnable {
 
 	private static Map<String, Coord> zoneGeometries = new HashMap<String, Coord>();
 
-	private CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.WGS84_UTM35S);
+	private CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.WGS84_UTM33N);
 
 	private Scenario scenario;
 

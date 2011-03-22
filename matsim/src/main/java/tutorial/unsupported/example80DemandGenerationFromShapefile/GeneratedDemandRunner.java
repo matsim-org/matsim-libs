@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package tutorial.programming.example08DemandGeneration;
+package tutorial.unsupported.example80DemandGenerationFromShapefile;
 
 import org.matsim.run.Controler;
 import org.matsim.run.OTFVis;
@@ -28,7 +28,7 @@ import org.matsim.run.OTFVis;
  * @author dgrether
  *
  */
-public class DGGeneratedDemandRunner {
+public class GeneratedDemandRunner {
 
 	/**
 	 * @param args

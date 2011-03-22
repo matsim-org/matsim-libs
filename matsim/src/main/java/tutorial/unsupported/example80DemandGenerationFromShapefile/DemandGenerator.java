@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package tutorial.programming.example08DemandGeneration;
+package tutorial.unsupported.example80DemandGenerationFromShapefile;
 
 import java.io.IOException;
 import java.util.Iterator;
@@ -56,9 +56,9 @@ import com.vividsolutions.jts.geom.Point;
  * @author dgrether
  *
  */
-public class DGDemandGenerator {
+public class DemandGenerator {
 
-	private static final Logger log = Logger.getLogger(DGDemandGenerator.class);
+	private static final Logger log = Logger.getLogger(DemandGenerator.class);
 
 	private static int ID = 0;
 
