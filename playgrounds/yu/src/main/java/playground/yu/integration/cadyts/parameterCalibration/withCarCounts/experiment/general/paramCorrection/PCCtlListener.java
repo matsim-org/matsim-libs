@@ -558,10 +558,7 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 									.toString(value));
 						} else/* bse */{
 							config.setParam(BSE_CONFIG_MODULE_NAME,
-									paramNames[i], Double.toString(value));// TODO
-							// constantCar,
-							// -pt,
-							// -walk???
+									paramNames[i], Double.toString(value));
 						}
 						// scoringCfg.setTraveling(trav);
 						// scoringCfg.setPerforming(perf);
@@ -584,7 +581,7 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 				((Events2Score4PC_mnl) chooser).setMultinomialLogit(mnl);
 
 				CharyparNagelScoringFunctionFactory4PC sfFactory = new CharyparNagelScoringFunctionFactory4PC(
-						config.planCalcScore());
+						scoringCfg);
 				ctl.setScoringFunctionFactory(sfFactory);
 				((Events2Score4PC_mnl) chooser).setSfFactory(sfFactory);
 
