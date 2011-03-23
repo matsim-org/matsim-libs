@@ -215,7 +215,7 @@ public class NetworkSimplifier {
 //		nsimply.setMergeLinkStats(true);
 		nsimply.run(network);
 
-		new NetworkWriter(network).write("../../detailedEval/Net/network-86-85-87-84_simplified---withLanes");
+		new NetworkWriter(network).write("../../detailedEval/Net/network-86-85-87-84_simplified---withLanes.xml");
 
 	}
 }
