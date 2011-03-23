@@ -237,8 +237,11 @@ public class LocationMutatorBestResponse extends LocationMutatorwChoiceSet {
 			maxEpsilon = Double.parseDouble(person.getDesires().getDesc().split("_")[3]);
 		}
 		// here one could do a much more sophisticated calculation including time use and travel speed estimations (from previous iteration)
+		double travelSpeedCrowFly = Double.parseDouble(this.controler.getConfig().locationchoice().getRecursionTravelSpeed());
+		double betaTime = this.controler.getConfig().planCalcScore().getTraveling_utils_hr();
+		double maxTravelTime = maxEpsilon / betaTime * 3600.0; //[s]
 		// distance linear
-		double maxDistance = -1.0 * (maxEpsilon / Double.parseDouble(this.controler.getConfig().locationchoice().getSearchSpaceBeta()));
+		double maxDistance = travelSpeedCrowFly * maxTravelTime;
 		
 		// non-linear and tastes: exhaustive search for the moment
 		// later implement non-linear equation solver

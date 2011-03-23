@@ -81,15 +81,9 @@ public class MixedActivityScoringFunction extends CharyparNagelOpenTimesScoringF
 		// ----------------------------------------------------------
 		
 		super.finish();
-		
-		double offset = Double.parseDouble(config.findParam(LCEXP, "actScoreOffset"));
-		double scale = Double.parseDouble(config.findParam(LCEXP, "actScoreScale"));
-		
-		if (Boolean.parseBoolean(this.config.locationchoice().getTravelTimes()) && !distance) {
-			this.score = (this.score - offset) * scale;
-		}
-		else {
-			this.score = 0.0;	
+			
+		if (!(Boolean.parseBoolean(this.config.locationchoice().getTravelTimes())) || distance) {
+			this.score = 0.0;
 		}		
 		for (PlanElement pe : super.plan.getPlanElements()) {
 			if (pe instanceof Activity) {

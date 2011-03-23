@@ -56,7 +56,14 @@ public class DestinationChoiceScoring {
 					plan.getNextActivity(plan.getNextLeg(act)));
 		}
 		if (Double.parseDouble(config.findParam(LCEXP, "scoreElementEpsilons")) > 0.000001) {
-			score += this.getEpsilonAlternative(act.getFacilityId(), plan.getPerson());
+			double var = 1.0;
+			if (act.getType().startsWith("s")) {
+				var = Double.parseDouble(config.findParam(LCEXP, "varEpsShop"));
+			}
+			else {
+				var = Double.parseDouble(config.findParam(LCEXP, "varEpsLeisure"));
+			}
+			score += Math.sqrt(var) * this.getEpsilonAlternative(act.getFacilityId(), plan.getPerson());
 		}		
 		return score;
 	}
@@ -92,8 +99,7 @@ public class DestinationChoiceScoring {
 		
 		/* long seed = (long) ((kp + kf) * Math.pow(2.0, 40)); 
 		/* This was not a good solution.
-		/* Multiply (kp x kf) with 100 such that we have a certain spread of the seed.
-		/* Var(kp)=Var(kf)=0.5; Var(kp+kf)= 1.0, no upper limit for Gumbel. */
+		*/
 				
 		// I use now the uniform distribution for the generation of the k-values:
 		// kp= [0..1] kf=[0..1]
