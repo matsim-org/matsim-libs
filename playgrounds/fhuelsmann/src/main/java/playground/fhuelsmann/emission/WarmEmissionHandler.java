@@ -36,14 +36,14 @@ import org.matsim.core.network.LinkImpl;
 
 import playground.fhuelsmann.emission.objects.HbefaObject;
 
-public class TravelTimeEventHandler implements LinkEnterEventHandler,LinkLeaveEventHandler, AgentArrivalEventHandler,AgentDepartureEventHandler {
+public class WarmEmissionHandler implements LinkEnterEventHandler,LinkLeaveEventHandler, AgentArrivalEventHandler,AgentDepartureEventHandler {
 
 	private Network network = null;
 	private HbefaObject[][] hbefaTable = null;
 	private HbefaObject[][] hbefaHdvTable =null;
 	private AnalysisModule linkAndAgentAccountAnalysisModule = null;
 
-	public TravelTimeEventHandler(final Network network, HbefaObject[][] hbefaTable, HbefaObject[][] hbefaHdvTable, AnalysisModule linkAndAgentAccountAnalysisModule) {
+	public WarmEmissionHandler(final Network network, HbefaObject[][] hbefaTable, HbefaObject[][] hbefaHdvTable, AnalysisModule linkAndAgentAccountAnalysisModule) {
 		this.network = network;
 		this.hbefaTable = hbefaTable;
 		this.hbefaHdvTable = hbefaHdvTable;

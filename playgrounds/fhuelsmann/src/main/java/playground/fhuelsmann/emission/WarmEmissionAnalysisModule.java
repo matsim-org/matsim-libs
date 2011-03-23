@@ -35,7 +35,7 @@ import org.matsim.api.core.v01.Id;
 import playground.fhuelsmann.emission.objects.HbefaObject;
 import playground.fhuelsmann.emission.objects.VisumObject;
 
-public class LinkAndAgentAccountAnalysisModule implements AnalysisModule{
+public class WarmEmissionAnalysisModule implements AnalysisModule{
 
 	private VisumObject[] roadTypes = null;
 	private EmissionsPerEvent emissionFactor = null;
@@ -55,7 +55,7 @@ public class LinkAndAgentAccountAnalysisModule implements AnalysisModule{
 			no2EmissionsBasedOnFractions[8]
 			pmEmissionsBasedOnFractions[9] */
 
-	public LinkAndAgentAccountAnalysisModule(VisumObject[] roadTypes, EmissionsPerEvent emissionFactor) {
+	public WarmEmissionAnalysisModule(VisumObject[] roadTypes, EmissionsPerEvent emissionFactor) {
 		this.roadTypes = roadTypes;
 		this.emissionFactor = emissionFactor;
 	}
@@ -174,35 +174,11 @@ public class LinkAndAgentAccountAnalysisModule implements AnalysisModule{
 		}
 	}
 
-	public void printTotalEmissionTable(Map<Id, double[]> id2emissionsInGrammPerType, String outputFile) {
-		try{ 
-			String idEmissionTypeAndGramm = null;
-			FileWriter fstream = new FileWriter(outputFile);			
-			BufferedWriter out = new BufferedWriter(fstream);
-			out.write("Id \t AirPollutant \t WarmEmissions \n");   
-
-			for(Entry<Id, double[]> personIdEntry : id2emissionsInGrammPerType.entrySet()){
-				for(Integer i = 0 ; i < personIdEntry.getValue().length ; i++){
-					Double emissionLevel = personIdEntry.getValue()[i];
-					String emissionLevelString = emissionLevel.toString();
-					idEmissionTypeAndGramm = personIdEntry.getKey().toString()+ "\t" + i.toString() + "\t" + emissionLevelString + "\n";
-					out.write(idEmissionTypeAndGramm);
-				}
-			}
-			//Close the output stream
-			out.close();
-			System.out.println("Finished writing emission file to " + outputFile);
-		}
-		catch (Exception e){
-			System.err.println("Error: " + e.getMessage());
-		}
-	}
-
-	public Map<Id, double[]> getTotalEmissionsPerLink() {
+	public Map<Id, double[]> getWarmEmissionsPerLink() {
 		return this.linkId2emissionsInGrammPerType;
 	}
 
-	public Map<Id, double[]> getTotalEmissionsPerPerson() {
+	public Map<Id, double[]> getWarmEmissionsPerPerson() {
 		return this.personId2emissionsInGrammPerType;
 	}
 }

@@ -50,7 +50,7 @@ import org.matsim.core.network.LinkImpl;
 
 
 
-public class TimeAndDistanceEventHandler implements LinkEnterEventHandler,LinkLeaveEventHandler,
+public class ColdEmissionHandler implements LinkEnterEventHandler,LinkLeaveEventHandler,
 ActivityEndEventHandler,ActivityStartEventHandler{
 
 
@@ -58,10 +58,10 @@ ActivityEndEventHandler,ActivityStartEventHandler{
 	private HbefaColdEmissionTable hbefaColdTable = null;
 	private AnalysisModuleCold coldstartAnalyseModul = null;
 
-	public TimeAndDistanceEventHandler(final Network network,HbefaColdEmissionTable hbefaTable,ColdstartAnalyseModul coldstartAnalyseModul ) {
+	public ColdEmissionHandler(final Network network,HbefaColdEmissionTable hbefaTable,ColdEmissionAnalysisModule coldEmissionAnalysisModule ) {
 		this.network = network;
 		this.hbefaColdTable = hbefaTable;
-		this.coldstartAnalyseModul = coldstartAnalyseModul;
+		this.coldstartAnalyseModul = coldEmissionAnalysisModule;
 	}
 	
 	
