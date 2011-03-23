@@ -116,7 +116,8 @@ public class JointPlanOptimizerDecoder {
 		List<Activity> lastActivities = plan.getLastActivities();
 		int currentPlannedBit = 0;
 		int currentDurationGene = numJointEpisodes;
-		Map<String, Integer> currentPlanElementAssociation = null;
+		Map<String, Integer> currentPlanElementAssociation =
+			new HashMap<String, Integer>();
 		LegTravelTimeEstimator currentLegTTEstimator;
 
 		this.optimizeToggle = configGroup.getOptimizeToggle();
@@ -151,33 +152,29 @@ public class JointPlanOptimizerDecoder {
 
 		// construction of the list of relative genes.
 		for (PlanElement pe : plan.getPlanElements()) {
-			currentPlanElementAssociation = new HashMap<String, Integer>();
-
-			// only consider activities
-			if (pe instanceof Leg) {
-				continue;
-			}
-
-			// associate PU activities to "planned" bits if toggle is optimized
-			if ((this.optimizeToggle)&&
-					((JointActivity) pe).getType().equals(JointActingTypes.PICK_UP)) {
-
-				if (!alreadyDetermined.containsKey(pe)) {
-					// associate a "toggle" bit
-					currentPlanElementAssociation.put(TOGGLE_CHROM, currentPlannedBit);
-					// remember the bit's position for linked activities
-					for (JointActing linked : 
-							((JointActing) pe).getLinkedElements().values()) {
-						alreadyDetermined.put((PlanElement) linked, currentPlannedBit);
+			// associate shared legs to "planned" bits
+			if ((pe instanceof Leg)) {
+				if ((((JointLeg) pe).getJoint())&&
+						(this.optimizeToggle)) {
+					if (!alreadyDetermined.containsKey(pe)) {
+						// associate a "toggle" bit
+						currentPlanElementAssociation.put(TOGGLE_CHROM, currentPlannedBit);
+						// remember the bit's position for linked activities
+						for (JointActing linked : 
+								((JointActing) pe).getLinkedElements().values()) {
+							alreadyDetermined.put((PlanElement) linked, currentPlannedBit);
+						}
+						currentPlannedBit++;
+					} else {
+						currentPlanElementAssociation.put(TOGGLE_CHROM, alreadyDetermined.get(pe));
 					}
-					currentPlannedBit++;
-				} else {
-					currentPlanElementAssociation.put(TOGGLE_CHROM, alreadyDetermined.get(pe));
 				}
-
+				else {
+					continue;
+				}
 			}
 			// associate to duration genes (only for non-joint-trip related activities)
-			if (( !((JointActivity) pe).getType().equals(JointActingTypes.PICK_UP) )&&
+			else if (( !((JointActivity) pe).getType().equals(JointActingTypes.PICK_UP) )&&
 				( !((JointActivity) pe).getType().equals(JointActingTypes.DROP_OFF) )) {
 				if (!lastActivities.contains(pe)) {
 					currentPlanElementAssociation.put(DURATION_CHROM, currentDurationGene);
@@ -185,11 +182,11 @@ public class JointPlanOptimizerDecoder {
 				} else {
 					currentPlanElementAssociation.put(DURATION_CHROM, null);
 				}
+				// remember the association
+				this.genesIndices.get( ((JointActing) pe).getPerson().getId() ).add(
+						currentPlanElementAssociation);
+				currentPlanElementAssociation = new HashMap<String, Integer>();
 			}
-
-			// remember the association
-			this.genesIndices.get( ((JointActing) pe).getPerson().getId() ).add(
-					currentPlanElementAssociation);
 		}
 		this.plan = plan;
 	}
@@ -288,7 +285,7 @@ public class JointPlanOptimizerDecoder {
 				if ((this.optimizeToggle)&&
 						(!((BooleanGene) chromosome.getGene(geneIndex)).booleanValue())) {
 					planReimplacementEpisode(
-						(JointLeg) currentElement,
+						//(JointLeg) currentElement,
 						planElements,
 						constructedPlan,
 						individualValues,
@@ -343,14 +340,15 @@ public class JointPlanOptimizerDecoder {
 	}
 
 	private void planReimplacementEpisode(
-			final JointLeg puAccessLeg,
+			//final JointLeg puAccessLeg,
 			final List<PlanElement> planElements,
 			final Plan constructedPlan,
 			final IndividualValuesWrapper individualValues,
 			final Map<String, Integer> currentGeneIndices,
 			final IChromosome chromosome) {
-		int geneIndex = currentGeneIndices.get(TOGGLE_CHROM);
+		Integer geneIndex = currentGeneIndices.get(TOGGLE_CHROM);
 		JointLeg leg;
+		JointLeg sharedLeg = (JointLeg) planElements.get(individualValues.getIndexInPlan() + 2);
 		double currentTravelTime;
 		double currentDuration;
 		JointActivity origin = (JointActivity) planElements.get(individualValues.getIndexInPlan() - 1);
@@ -358,7 +356,7 @@ public class JointPlanOptimizerDecoder {
 
 		// the joint travel isn't affected
 		// go to the next non-joint leg
-		leg = puAccessLeg.getAssociatedIndividualLeg();
+		leg = sharedLeg.getAssociatedIndividualLeg();
 		leg = createLeg(
 				this.nonSharedLegsTTEstimator,
 				origin,
@@ -427,6 +425,7 @@ public class JointPlanOptimizerDecoder {
 				individualValues.getNow());
 
 		individualValues.addToIndexInPlan(1);
+		//individualValues.addToIndexInChromosome(1);
 	}
 
 	private void planIndividualLegAct(

@@ -136,12 +136,17 @@ public class JointPlan implements Plan {
 		}
 
 		// create the links that where encoded in the activity types names
+		// TODO: improve the way reimplacement modes are determined.
 		for (List<JointLeg> legsToLink : toLink.values()) {
 			for (JointLeg leg : legsToLink) {
 				if (leg.getMode().equals("car")) {
 					leg.setIsDriver(true);
+					leg.setAssociatedIndividualLeg(
+							new JointLeg(leg.getMode(), leg.getPerson()));
+				} else {
+					leg.setAssociatedIndividualLeg(
+							new JointLeg("pt", leg.getPerson()));
 				}
-				leg.setAssociatedIndividualLeg(null);
 				for (JointLeg linkedLeg : legsToLink) {
 					if (leg != linkedLeg) {
 						leg.addLinkedElementById(linkedLeg.getId());

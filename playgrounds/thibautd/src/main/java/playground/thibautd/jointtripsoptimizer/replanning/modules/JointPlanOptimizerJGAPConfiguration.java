@@ -175,7 +175,6 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 		Id[] ids = new Id[1];
 		ids = plan.getClique().getMembers().keySet().toArray(ids);
 		List<JointLeg> alreadyExamined = new ArrayList<JointLeg>();
-		List<JointLeg> linkedValues = null;
 		List<PlanElement> currentPlan;
 		int currentNDurationGenes;
 
@@ -199,10 +198,8 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 						) {
 					this.numToggleGenes++;
 
-					linkedValues = (List<JointLeg>) 
-						((JointLeg) pe).getLinkedElements().values();
-
-					alreadyExamined.addAll(linkedValues);
+					alreadyExamined.addAll(
+							((JointLeg) pe).getLinkedElements().values());
 				}
 			}
 			//do not count last activity
