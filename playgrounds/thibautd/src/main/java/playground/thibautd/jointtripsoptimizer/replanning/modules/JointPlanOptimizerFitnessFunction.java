@@ -45,6 +45,12 @@ public class JointPlanOptimizerFitnessFunction extends FitnessFunction {
 
 	private static final long serialVersionUID = 1L;
 
+	/**
+	 * replacement for super.m_lastComputedFitnessValue, to keep the
+	 * "getlastfitnessvalue" functionnality
+	 */
+	private double lastComputedFitnessValue;
+
 	private final JointPlanOptimizerDecoder decoder;
 	private final ScoringFunctionFactory scoringFunctionFactory;
 	public static final double NO_FITNESS_VALUE = Double.NEGATIVE_INFINITY;
@@ -72,21 +78,25 @@ public class JointPlanOptimizerFitnessFunction extends FitnessFunction {
 	}
 
 	private double getScore(JointPlan plan) {
-		ScoringFunction fitnessFunction = this.scoringFunctionFactory.createNewScoringFunction(plan);
+		ScoringFunction fitnessFunction =
+			this.scoringFunctionFactory.createNewScoringFunction(plan);
 		Activity currentActivity;
 		Leg currentLeg;
+		double now = 0d;
 
 		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof Activity) {
 				currentActivity = (Activity) pe;
-				fitnessFunction.startActivity(currentActivity.getStartTime(), currentActivity);
-				fitnessFunction.endActivity(currentActivity.getEndTime());
+				fitnessFunction.startActivity(now, currentActivity);
+				now = currentActivity.getEndTime();
+				fitnessFunction.endActivity(now);
 			}
 			else if (pe instanceof Leg) {
 				currentLeg = (Leg) pe;
-				fitnessFunction.startLeg(currentLeg.getDepartureTime(), currentLeg);
-				fitnessFunction.endLeg(currentLeg.getDepartureTime() +
-						currentLeg.getTravelTime());
+				now = currentLeg.getDepartureTime();
+				fitnessFunction.startLeg(now, currentLeg);
+				now = currentLeg.getDepartureTime() + currentLeg.getTravelTime();
+				fitnessFunction.endLeg(now);
 			}
 			else {
 				throw new IllegalArgumentException("unrecognized plan element type");
@@ -102,5 +112,19 @@ public class JointPlanOptimizerFitnessFunction extends FitnessFunction {
 		return this.decoder;
 	}
 
+	/**
+	 * Reimplements the jgap default by allowing a negative fitness.
+	 */
+	@Override
+	public double getFitnessValue(final IChromosome a_subject) {
+		double fitnessValue = evaluate(a_subject);
+		this.lastComputedFitnessValue = fitnessValue;
+		return fitnessValue;
+	}
+
+	@Override
+	public double getLastComputedFitnessValue() {
+		return this.lastComputedFitnessValue;
+	}
 }
 

@@ -66,6 +66,11 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 	//TODO: make final
 	private int numEpisodes;
 	private int numToggleGenes;
+	/**
+	 * stores the number of duration genes relatives to each individual plan in
+	 * the joint plan.
+	 */
+	private final List<Integer> nDurationGenes = new ArrayList<Integer>();
 	private JointPlanOptimizerFitnessFunction fitnessFunction;
 
 	private final boolean optimizeToggle;
@@ -147,11 +152,13 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 						this,
 						configGroup,
 						this.numToggleGenes,
-						this.numEpisodes) );
+						this.numEpisodes,
+						this.nDurationGenes) );
 			this.addGeneticOperator( new JointPlanOptimizerJGAPMutation(
 						this,
 						configGroup,
-						this.numToggleGenes + this.numEpisodes));
+						this.numToggleGenes + this.numEpisodes,
+						this.nDurationGenes));
 
 		} catch (InvalidConfigurationException e) {
 			//throw new RuntimeException(e.getMessage());
@@ -164,28 +171,27 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 	 * an episode corresponds to an activity and its eventual access trip.
 	 * a joint episode is an episode which involves a joint trip.
 	 */
-	@SuppressWarnings("unchecked")
-		//TODO: FIXME correct counting of joint episodes
-		//(current counting is good if only shared rides are marked as "joint")
 	private void countEpisodes(JointPlan plan) {
 		Id[] ids = new Id[1];
 		ids = plan.getClique().getMembers().keySet().toArray(ids);
 		List<JointLeg> alreadyExamined = new ArrayList<JointLeg>();
 		List<JointLeg> linkedValues = null;
+		List<PlanElement> currentPlan;
+		int currentNDurationGenes;
 
-		 this.numEpisodes = 0;
-		 this.numToggleGenes = 0;
+		this.numEpisodes = 0;
+		this.numToggleGenes = 0;
+		this.nDurationGenes.clear();
 
-		 for (Id id : ids) {
-			//log.debug("id: "+id);
-			//log.debug("plan size: "+plan.getIndividualPlan(id).getPlanElements().size());
-			for (PlanElement pe : plan.getIndividualPlan(id).getPlanElements()) {
+		for (Id id : ids) {
+			currentPlan = plan.getIndividualPlan(id).getPlanElements();
+			currentNDurationGenes = 0;
+			for (PlanElement pe : currentPlan) {
 				// count activities for which duration is optimized
-				//log.debug(pe instanceof JointActivity ? "oui" : "non");
 				if ((pe instanceof JointActivity)&&
 						(((JointActivity) pe).getType() != JointActingTypes.PICK_UP)&&
 						(((JointActivity) pe).getType() != JointActingTypes.DROP_OFF)) {
-					this.numEpisodes++;
+					currentNDurationGenes++;
 				} else if ((this.optimizeToggle)&&
 						(pe instanceof JointLeg)&&
 						(((JointLeg) pe).getJoint())&&
@@ -199,9 +205,11 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 					alreadyExamined.addAll(linkedValues);
 				}
 			}
+			//do not count last activity
+			currentNDurationGenes--;
+			this.numEpisodes += currentNDurationGenes;
+			this.nDurationGenes.add(currentNDurationGenes);
 		 }
-		 //do not count last activity
-		 this.numEpisodes--;
 	 }
 
 	public JointPlanOptimizerDecoder getDecoder() {

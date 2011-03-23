@@ -359,19 +359,19 @@ public class JointPlanOptimizerDecoder {
 		// the joint travel isn't affected
 		// go to the next non-joint leg
 		leg = puAccessLeg.getAssociatedIndividualLeg();
-		leg = new JointLeg(this.nonSharedLegsTTEstimator.getNewLeg(
-				leg.getMode(),
+		leg = createLeg(
+				this.nonSharedLegsTTEstimator,
 				origin,
 				destination,
 				getIndexNonShared(leg),
-				individualValues.getNow()), leg);
+				individualValues,
+				leg);
 
 		//leg.setDepartureTime(now);
 		constructedPlan.addLeg(leg);
 		currentTravelTime = leg.getTravelTime();
 		individualValues.addToNow(currentTravelTime);
 		//leg.setArrivalTime(now);
-
 
 		// set index to the next leg
 		individualValues.addToIndexInPlan(6);
@@ -408,12 +408,13 @@ public class JointPlanOptimizerDecoder {
 				planElements.get(individualValues.getIndexInPlan() + 1));
 		double currentTravelTime;
 
-		leg = new JointLeg(legTTEstimator.getNewLeg(
-				leg.getMode(),
+		leg = createLeg(
+				legTTEstimator,
 				origin,
 				destination,
 				planElements.indexOf(leg),
-				individualValues.getNow()), leg);
+				individualValues,
+				leg);
 
 		//leg.setDepartureTime(now);
 		constructedPlan.addLeg(leg);
@@ -446,12 +447,13 @@ public class JointPlanOptimizerDecoder {
 		double currentDuration;
 		Integer geneIndex;
 
-		leg = new JointLeg(legTTEstimator.getNewLeg(
-				leg.getMode(),
+		leg = createLeg(
+				legTTEstimator,
 				origin,
 				destination,
 				planElements.indexOf(leg),
-				individualValues.getNow()), leg);
+				individualValues,
+				leg);
 
 		//leg.setDepartureTime(now);
 		constructedPlan.addLeg(leg);
@@ -495,7 +497,11 @@ public class JointPlanOptimizerDecoder {
 		currentDuration = getTimeToJointTrip(
 				leg.getLinkedElements().values(),
 				individualValues.getNow()) + PU_DURATION;
-		constructedPlan.addActivity(createActivity(pickUp, individualValues.getNow(), currentDuration));
+		constructedPlan.addActivity(
+				createActivity(
+					pickUp,
+					individualValues.getNow(),
+					currentDuration));
 
 		individualValues.addToNow(currentDuration);
 
@@ -505,15 +511,17 @@ public class JointPlanOptimizerDecoder {
 
 		if (leg.getIsDriver()) {
 			// use legttestimator
-			JointLeg driverLeg = new JointLeg(legTTEstimator.getNewLeg(
-				leg.getMode(),
+			JointLeg driverLeg = createLeg(
+				legTTEstimator,
 				pickUp,
 				dropOff,
 				planElements.indexOf(leg),
-				individualValues.getNow()), leg);
+				individualValues,
+				leg);
 			
 			updateDriverLegs(driverLeg, leg);
 
+			leg = driverLeg;
 		} else {
 			// get driver trip
 			leg = new JointLeg((LegImpl) this.driverLegs.get(leg), leg);
@@ -527,7 +535,10 @@ public class JointPlanOptimizerDecoder {
 
 		// /////////////////////////////////////////////////////////////////
 		// plan DO activity
-		dropOff = createActivity(dropOff, individualValues.getNow(), DO_DURATION);
+		dropOff = createActivity(
+				dropOff,
+				individualValues.getNow(),
+				DO_DURATION);
 		individualValues.addToNow(DO_DURATION);
 		currentTravelTime += DO_DURATION;
 		constructedPlan.addActivity(dropOff);
@@ -535,12 +546,13 @@ public class JointPlanOptimizerDecoder {
 		// /////////////////////////////////////////////////////////////////
 		// plan egress trip
 		leg = (JointLeg) planElements.get(individualValues.getIndexInPlan() + 3);
-		leg = new JointLeg(legTTEstimator.getNewLeg(
-			leg.getMode(),
+		leg = createLeg(
+			legTTEstimator,
 			dropOff,
 			destination,
 			planElements.indexOf(leg),
-			individualValues.getNow()), leg);
+			individualValues,
+			leg);
 		individualValues.addToNow(leg.getTravelTime());
 		currentTravelTime += leg.getTravelTime();
 		constructedPlan.addLeg(leg);
@@ -548,9 +560,14 @@ public class JointPlanOptimizerDecoder {
 		// /////////////////////////////////////////////////////////////////
 		// plan individual activity
 		geneIndex = currentGeneIndices.get(DURATION_CHROM);
-		currentDuration = getDuration(chromosome, geneIndex,
-				individualValues.getNow(), currentTravelTime);
-		destination = createActivity(destination, individualValues.getNow(),
+		currentDuration = getDuration(
+				chromosome,
+				geneIndex,
+				individualValues.getNow(),
+				currentTravelTime);
+		destination = createActivity(
+				destination,
+				individualValues.getNow(),
 				currentDuration);
 		constructedPlan.addActivity(destination);
 		individualValues.addToNow(currentDuration);
@@ -625,9 +642,32 @@ public class JointPlanOptimizerDecoder {
 			double duration) {
 		JointActivity newAct = new JointActivity(act);
 		newAct.setMaximumDuration(duration);
-		act.setEndTime(now + duration);
+		newAct.setEndTime(now + duration);
 
 		return newAct;
+	}
+
+	private JointLeg createLeg(
+			LegTravelTimeEstimator legTTEstimator,
+			Activity origin,
+			Activity destination,
+			int indexInPlan,
+			IndividualValuesWrapper individualValues,
+			JointLeg leg) {
+		JointLeg output = new JointLeg(legTTEstimator.getNewLeg(
+			leg.getMode(),
+			origin,
+			destination,
+			indexInPlan,
+			individualValues.getNow()), leg);
+
+		//necessary with the fixed route operator
+		output.getRoute().setTravelTime(output.getTravelTime());
+
+		output.setDepartureTime(individualValues.getNow());
+		output.setArrivalTime(individualValues.getNow() + output.getTravelTime());
+
+		return output;
 	}
 
 	private final double getTimeToJointTrip(
@@ -643,7 +683,7 @@ public class JointPlanOptimizerDecoder {
 				max = currentTime;
 			}
 		}
-		return max - now;
+		return (max - now);
 	}
 
 	/**
