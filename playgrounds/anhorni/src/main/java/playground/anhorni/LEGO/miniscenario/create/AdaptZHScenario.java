@@ -67,14 +67,8 @@ public class AdaptZHScenario {
 	private final String LCEXP = "locationchoiceExperimental";
 		
 	public static void main(final String[] args) {		
-		String networkFilePath="src/main/java/playground/anhorni/input/zh10Pct/network.xml";
-		String facilitiesFilePath="src/main/java/playground/anhorni/input/zh10Pct/facilities_original.xml.gz";
-		String plansFilePath="src/main/java/playground/anhorni/input/zh10Pct/plans_original.xml.gz";
-
-		AdaptZHScenario plansCreator=new AdaptZHScenario();
-		plansCreator.init(plansFilePath, networkFilePath, facilitiesFilePath);
-		
-		plansCreator.run();			
+		AdaptZHScenario plansCreator=new AdaptZHScenario();		
+		plansCreator.run(args[0]);			
 		log.info("Adaptation finished -----------------------------------------");
 	}
 		
@@ -85,8 +79,11 @@ public class AdaptZHScenario {
 		populationReader.readFile(plansFilePath);
 	}
 
-	private void run() {			
-		Config config = (ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed("src/main/java/playground/anhorni/input/zh10Pct/config.xml").getScenario()).getConfig();				
+	private void run(String configFile) {			
+		Config config = (ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(configFile).getScenario()).getConfig();
+		this.init(config.getModule("plans").getValue("inputPlansFile"), 
+				config.getModule("network").getValue("inputNetworkFile"), 
+				config.getModule("facilities").getValue("inputFacilitiesFile"));
 		this.seed = Long.parseLong(config.findParam(LCEXP, "randomSeed"));
 		
 		log.info("Handling heterogeneity ...");		
