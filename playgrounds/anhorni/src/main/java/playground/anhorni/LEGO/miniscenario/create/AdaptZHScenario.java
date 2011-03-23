@@ -61,7 +61,7 @@ import playground.anhorni.random.RandomFromVarDistr;
 public class AdaptZHScenario {
 	private final static Logger log = Logger.getLogger(AdaptZHScenario.class);
 	private ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-	private String outputFolder = "src/main/java/playground/anhorni/output/zh10Pct/";
+	private String outputFolder;
 	private long seed;
 	
 	private final String LCEXP = "locationchoiceExperimental";
@@ -84,6 +84,7 @@ public class AdaptZHScenario {
 		this.init(config.getModule("plans").getValue("inputPlansFile"), 
 				config.getModule("network").getValue("inputNetworkFile"), 
 				config.getModule("facilities").getValue("inputFacilitiesFile"));
+		this.outputFolder = config.getModule("controler").getValue("outputDirectory");
 		this.seed = Long.parseLong(config.findParam(LCEXP, "randomSeed"));
 		
 		log.info("Handling heterogeneity ...");		
