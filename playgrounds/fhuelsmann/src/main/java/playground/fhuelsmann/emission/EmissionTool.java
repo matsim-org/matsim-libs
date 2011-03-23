@@ -1,0 +1,334 @@
+package playground.fhuelsmann.emission;
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * FhMain.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+
+import org.geotools.feature.Feature;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
+import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
+
+import playground.fhuelsmann.emission.objects.VisumObject;
+
+public class EmissionTool {
+
+	// INPUT
+//	private static String runDirectory = "../../detailedEval/testRuns/output/run8/";
+//	private static String eventsFile = runDirectory + "100.events.txt.gz";
+//	//		private static String netFile = "../../detailedEval/Net/network-86-85-87-84_simplified.xml";
+//	private static String netFile = runDirectory + "output_network.xml.gz";
+//	private static String plansFile = runDirectory + "output_plans.xml.gz";
+
+		private static String runDirectory = "../../detailedEval/testRuns/output/1pct/v0-default/run8/";
+		private static String eventsFile = runDirectory + "ITERS/it.10/10.events.txt.gz";
+		private static String netFile = runDirectory + "output_network.xml.gz";
+		private static String plansFile = runDirectory + "output_plans.xml.gz";
+
+	private static String visum2hbefaRoadTypeFile = "../../detailedEval/testRuns/input/inputEmissions/road_types.txt";
+	private static String hbefaAverageFleetEmissionFactorsFile = "../../detailedEval/testRuns/input/inputEmissions/hbefa_emission_factors_urban_rural_MW.txt";
+	private static String hbefaAverageFleetHdvEmissionFactorsFile = "../../detailedEval/testRuns/input/inputEmissions/hbefa_emission_factors_urban_rural_MW_hdv.txt";
+	private static String hbefaColdEmissionFactorsFile = "../../detailedEval/testRuns/input/inputEmissions/hbefa_coldstart_emission_factors.txt";
+
+
+	private static String shapeDirectory = "../../detailedEval/Net/shapeFromVISUM/urbanSuburban/";
+	private static String urbanShapeFile = shapeDirectory + "urbanAreas.shp";
+	private static String suburbanShapeFile = shapeDirectory + "suburbanAreas.shp";
+	private static String shapeDistrictDirectory = "../../detailedEval/Net/shapeFromVISUM/stadtbezirke/";
+	private static String altstadtShapeFile = shapeDistrictDirectory + "Altstadt.shp";
+	private static String aubingShapeFile = shapeDistrictDirectory + "Aubing.shp";
+	
+
+	private final Scenario scenario;
+
+	public EmissionTool(){
+		Config config = ConfigUtils.createConfig();
+		this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+	}
+
+	public static void main (String[] args) throws Exception{
+		EmissionTool emissionTool = new EmissionTool();
+		emissionTool.run(args);
+	}
+
+	private void run(String[] args) {
+
+		// load the scenario
+		loadScenario();
+		Network network = scenario.getNetwork();
+		Population population = scenario.getPopulation();
+
+		// ?? was passiert hier ??
+		HbefaTable hbefaTable = new HbefaTable();
+		hbefaTable.makeHbefaTable(hbefaAverageFleetEmissionFactorsFile);
+		
+		HbefaTable hbefaHdvTable = new HbefaTable();
+		hbefaHdvTable.makeHbefaTable(hbefaAverageFleetHdvEmissionFactorsFile);
+		
+		HbefaColdEmissionTable hbefaColdTable = new HbefaColdEmissionTable();
+		hbefaColdTable.makeHbefaColdTable(hbefaColdEmissionFactorsFile);
+
+		VisumObject[] roadTypes = new VisumObject[100];
+		EmissionsPerEvent emissionFactor = new EmissionsPerEvent();
+
+		LinkAndAgentAccountAnalysisModule linkAndAgentAccount = new LinkAndAgentAccountAnalysisModule(roadTypes, emissionFactor);
+		linkAndAgentAccount.createRoadTypes(visum2hbefaRoadTypeFile);
+
+		//create an event object
+		EventsManager events = new EventsManagerImpl();	
+		ColdstartAnalyseModul coldstartAccount = new ColdstartAnalyseModul ();
+		//create the handler 
+		TravelTimeEventHandler handler = new TravelTimeEventHandler(network, hbefaTable.getHbefaTableWithSpeedAndEmissionFactor(), hbefaHdvTable.getHbefaTableWithSpeedAndEmissionFactor(),linkAndAgentAccount);
+		TimeAndDistanceEventHandler handler2 = new TimeAndDistanceEventHandler(network,hbefaColdTable,coldstartAccount);
+	
+		//add the handler
+		events.addHandler(handler);
+		events.addHandler(handler2);
+
+		//create the reader and read the file
+		MatsimEventsReader matsimEventReader = new MatsimEventsReader(events);
+		matsimEventReader.readFile(eventsFile);
+		
+		
+		
+		//warm emissions
+		Map<Id, double[]> linkId2emissionsInGrammPerType = linkAndAgentAccount.getTotalEmissionsPerLink();
+		Map<Id, double[]> personId2emissionsInGrammPerType = linkAndAgentAccount.getTotalEmissionsPerPerson();
+//		linkAndAgentAccount.printTotalEmissionTable(linkId2emissionsInGrammPerType, runDirectory + "emissionsPerLink.txt");
+//		linkAndAgentAccount.printTotalEmissionTable(personId2emissionsInGrammPerType, runDirectory + "emissionsPerPerson.txt");
+		
+		//coldstart emissions
+		Map<Id, Map<String, Double>> coldEmissionsPerson = coldstartAccount.getColdEmissionsPerson();
+//		coldstartAccount.printColdEmissions(runDirectory + "coldemissionsPerPerson.txt");
+		
+		//sum up emissions
+		
+		
+		//print output files
+		writeHomeLocation2Emissions(population, personId2emissionsInGrammPerType, runDirectory + "homeLocation2Emissions.txt");
+//		warmAndColdEmissions(personId2emissionsInGrammPerType,coldEmissionsPerson, runDirectory + "coldAndWarmEmissionsPerPerson.txt");
+		
+//		//further processing of emissions
+//		PersonFilter filter = new PersonFilter();
+//		Set<Feature> urbanShape = filter.readShape(urbanShapeFile);
+//		Population urbanPop = filter.getRelevantPopulation(population, urbanShape);
+//		Set<Feature> suburbanShape = filter.readShape(suburbanShapeFile);
+//		Population suburbanPop = filter.getRelevantPopulation(population, suburbanShape);
+//		Set<Feature> altstadtShape = filter.readShape(altstadtShapeFile);
+//		Population altstadtPop = filter.getRelevantPopulation(population, altstadtShape);
+//		Set<Feature> aubingShape = filter.readShape(aubingShapeFile);
+//		Population aubingPop = filter.getRelevantPopulation(population, aubingShape);
+//
+//		List<Double> emissionType2AvgEmissionsUrbanArea = calculateAvgEmissionsPerTypeAndArea(urbanPop, personId2emissionsInGrammPerType,coldEmissionsPerson);
+//		List<Double> emissionType2AvgEmissionsSuburbanArea = calculateAvgEmissionsPerTypeAndArea(suburbanPop, personId2emissionsInGrammPerType,coldEmissionsPerson);
+//		List<Double> emissionType2AvgEmissionsAltstadtArea = calculateAvgEmissionsPerTypeAndArea(altstadtPop, personId2emissionsInGrammPerType,coldEmissionsPerson);
+//		List<Double> emissionType2AvgEmissionsAubingArea = calculateAvgEmissionsPerTypeAndArea(aubingPop, personId2emissionsInGrammPerType,coldEmissionsPerson);
+//
+//		System.out.println("PersonbasedEmissions" +emissionType2AvgEmissionsUrbanArea);
+//		System.out.println(emissionType2AvgEmissionsSuburbanArea);
+//		System.out.println(emissionType2AvgEmissionsAltstadtArea);
+//		System.out.println(emissionType2AvgEmissionsAubingArea);
+//		
+//		LinkFilter linkfilter = new LinkFilter(network);
+//		Set<Feature> urbanShapeLink = linkfilter.readShape(urbanShapeFile);
+//		Network urbanNetwork = linkfilter.getRelevantNetwork(urbanShapeLink);
+//		Set<Feature> suburbanShapeLink = linkfilter.readShape(suburbanShapeFile);
+//		Network suburbanNetwork = linkfilter.getRelevantNetwork(suburbanShapeLink);
+//		Set<Feature> altstadtShapeLink = linkfilter.readShape(altstadtShapeFile);
+//		Network alstadtNetwork = linkfilter.getRelevantNetwork(altstadtShapeLink);
+//		Set<Feature> aubingShapeLink = linkfilter.readShape(aubingShapeFile);
+//		Network aubingNetwork = linkfilter.getRelevantNetwork(aubingShapeLink);
+//		
+//		
+//		List<Double> emissionType2AvgEmissionsUrbanAreaLink = calculateAvgEmissionsPerTypeAndAreaLink(urbanNetwork, linkId2emissionsInGrammPerType);
+//		List<Double> emissionType2AvgEmissionsSuburbanAreaLink = calculateAvgEmissionsPerTypeAndAreaLink(suburbanNetwork, linkId2emissionsInGrammPerType);
+//		List<Double> emissionType2AvgEmissionsaltstadtNetwork = calculateAvgEmissionsPerTypeAndAreaLink(alstadtNetwork, linkId2emissionsInGrammPerType);
+//		List<Double> emissionType2AvgEmissionsAubingNetwork = calculateAvgEmissionsPerTypeAndAreaLink(aubingNetwork, linkId2emissionsInGrammPerType);
+//		
+//		System.out.println("LinkbasedEmissions"+emissionType2AvgEmissionsUrbanAreaLink);
+//		System.out.println(emissionType2AvgEmissionsSuburbanAreaLink);
+//		System.out.println("Alstadt " + emissionType2AvgEmissionsaltstadtNetwork);
+//		System.out.println("Aubing " +emissionType2AvgEmissionsAubingNetwork);
+	}
+	
+//	private List<Double> calculateAvgEmissionsPerTypeAndAreaLink(Network network, Map<Id, double[]> linkId2emissionsInGrammPerType) {
+//		List<Double> emissionType2AvgEmissionsUrbanAreaLink = new ArrayList<Double>();
+//		double totalCo2 = 0.0;
+//		double totalMassFuel = 0.0;
+//		double totalPM = 0.0;
+//		double totalNox = 0.0;
+//		double totalNo2 = 0.0;
+//
+//		double populationSize = 1.0; //population.getPersons().size();
+//
+//		for(Entry<Id, double[]> entry: linkId2emissionsInGrammPerType.entrySet()){
+//			Id linkId = entry.getKey();
+//			if(network.getLinks().containsKey(linkId)){
+//				double co2 = entry.getValue()[7]; //only warm emissions
+//				double massfuel = entry.getValue()[5];
+//				double pm = entry.getValue()[9];
+//				double nox = entry.getValue()[6];
+//				double no2 = entry.getValue()[8];
+//
+//				totalCo2 = totalCo2 + co2;
+//				totalMassFuel = totalMassFuel + massfuel;
+//				totalPM = totalPM + pm;
+//				totalNox = totalNox + nox;
+//				totalNo2 = totalNo2 + no2;
+//			}
+//		}
+//		emissionType2AvgEmissionsUrbanAreaLink.add(totalCo2 / populationSize);
+//		emissionType2AvgEmissionsUrbanAreaLink.add(totalMassFuel / populationSize);
+//		emissionType2AvgEmissionsUrbanAreaLink.add(totalPM / populationSize);
+//		emissionType2AvgEmissionsUrbanAreaLink.add(totalNox / populationSize);
+//		emissionType2AvgEmissionsUrbanAreaLink.add(totalNo2 / populationSize);
+//		return emissionType2AvgEmissionsUrbanAreaLink;
+//	}
+//
+//	private List<Double> calculateAvgEmissionsPerTypeAndArea(Population population, Map<Id, double[]> personId2emissionsInGrammPerType,Map<Id, Map<String,Double>> coldEmissionsPerson) {
+//		List<Double> emissionType2AvgEmissionsUrbanArea = new ArrayList<Double>();
+//		double totalCo2 = 0.0;
+//		double totalMassFuel = 0.0;
+//		double totalPM = 0.0;
+//		double totalNox = 0.0;
+//		double totalNo2 = 0.0;
+//
+//		double populationSize = 1.0; //population.getPersons().size();
+//
+//		for(Entry<Id, double[]> entry: personId2emissionsInGrammPerType.entrySet()){
+//			Id personId = entry.getKey();
+//			if(population.getPersons().containsKey(personId)){
+//				double co2 = entry.getValue()[7]; //only warm emissions
+//				double massfuel =  coldEmissionsPerson.get(entry.getKey()).get("FC") + entry.getValue()[5];
+//				double pm = coldEmissionsPerson.get(entry.getKey()).get("PM") + entry.getValue()[9];
+//				double nox = coldEmissionsPerson.get(entry.getKey()).get("NOx") + entry.getValue()[6];
+//				double no2 = coldEmissionsPerson.get(entry.getKey()).get("NO2") + entry.getValue()[8];
+//
+//				totalCo2 = totalCo2 + co2;
+//				totalMassFuel = totalMassFuel + massfuel;
+//				totalPM = totalPM + pm;
+//				totalNox = totalNox + nox;
+//				totalNo2 = totalNo2 + no2;
+//			}
+//		}
+//		emissionType2AvgEmissionsUrbanArea.add(totalCo2 / populationSize);//only warm emissions
+//		emissionType2AvgEmissionsUrbanArea.add(totalMassFuel / populationSize);
+//		emissionType2AvgEmissionsUrbanArea.add(totalPM / populationSize);
+//		emissionType2AvgEmissionsUrbanArea.add(totalNox / populationSize);
+//		emissionType2AvgEmissionsUrbanArea.add(totalNo2 / populationSize);
+//		return emissionType2AvgEmissionsUrbanArea;
+//	}
+
+	private void writeHomeLocation2Emissions(Population population,	Map<Id, double[]> personId2emissionsInGrammPerType, String outputFile) {
+		try{ 
+			Double co2Emissions = null;
+			String outLine = null;
+			FileWriter fstream = new FileWriter(outputFile);			
+			BufferedWriter out = new BufferedWriter(fstream);
+			out.write("personId \t xHome \t yHome \t co2 \n");   
+
+			for(Entry<Id, double[]> personIdEntry : personId2emissionsInGrammPerType.entrySet()){
+				Id personId = personIdEntry.getKey();
+				Plan plan = population.getPersons().get(personId).getSelectedPlan();
+				Activity homeAct = (Activity) plan.getPlanElements().get(0);
+				Coord homeCoord = homeAct.getCoord();
+				Double xHome = homeCoord.getX();
+				Double yHome = homeCoord.getY();
+				if(!population.getPersons().containsKey(personId)){
+					co2Emissions = 0.0;
+				}
+				else{
+					co2Emissions = personIdEntry.getValue()[7];
+				}
+//				for(Integer i = 0 ; i < personIdEntry.getValue().length ; i++){
+//					Double emissionLevel = personIdEntry.getValue()[7];
+//					String emissionLevelString = emissionLevel.toString();
+					outLine = personId.toString()+ "\t" + xHome.toString() + "\t" + yHome.toString() + "\t" + co2Emissions.toString() + "\n";
+					out.write(outLine);
+//				}
+			}
+			//Close the output stream
+			out.close();
+			System.out.println("Finished writing output file to " + outputFile);
+		}
+		catch (Exception e){
+			System.err.println("Error: " + e.getMessage());
+		}
+		
+	}
+
+	private void loadScenario() {
+		Config config = scenario.getConfig();
+		config.network().setInputFile(netFile);
+		config.plans().setInputFile(plansFile);
+		ScenarioLoaderImpl scenarioLoader = new ScenarioLoaderImpl(scenario) ;
+		scenarioLoader.loadScenario() ;
+	}
+
+	//**************warmAndColdStartEmissions*********************
+	private void warmAndColdEmissions ( Map<Id, double[]> warmEmissionsPerson, Map<Id, Map<String,Double>> coldEmissionsPerson,String outputFile ){
+		
+		try{
+			FileWriter fstream = new FileWriter(outputFile);			
+			BufferedWriter out = new BufferedWriter(fstream);
+			out.write("Id \t CO \t FCav \t FCfr \t HC \t NO2av \t NO2fr  \t NOxav  \t NOxfr  \t PMav  \t PMfr \n");  
+		
+			for(Entry<Id,double[]> personId :  warmEmissionsPerson.entrySet()){
+				
+				double CO = coldEmissionsPerson.get(personId.getKey()).get("CO");
+				double FCav =  coldEmissionsPerson.get(personId.getKey()).get("FC") +  personId.getValue()[0];
+				double FCfr =  coldEmissionsPerson.get(personId.getKey()).get("FC") + personId.getValue()[5];
+				double HC = coldEmissionsPerson.get(personId.getKey()).get("HC");
+				double NO2av = coldEmissionsPerson.get(personId.getKey()).get("NO2") + personId.getValue()[3];
+				double NO2fr = coldEmissionsPerson.get(personId.getKey()).get("NO2") + personId.getValue()[8];
+				double NOxav = coldEmissionsPerson.get(personId.getKey()).get("NOx") + personId.getValue()[1] ;
+				double NOxfr = coldEmissionsPerson.get(personId.getKey()).get("NOx") + personId.getValue()[6];
+				double PMav = coldEmissionsPerson.get(personId.getKey()).get("PM") + personId.getValue()[4] ;
+				double PMfr = coldEmissionsPerson.get(personId.getKey()).get("PM") + personId.getValue()[9];
+				out.append(personId +"\t" + CO + "\t"+ FCav + "\t"+ FCfr +"\t"+ HC+ "\t" + NO2av+ "\t"+ NO2fr+  "\t"+ NOxav  +"\t"+ NOxfr+  "\t"+ PMav+  "\t"+ PMfr + "\n");
+			}
+			out.close();
+			System.out.println("Finished writing emission file to " + outputFile);
+
+		}catch (Exception e){
+			System.err.println("Error: " + e.getMessage());				
+			}
+			
+		}
+}	
+
