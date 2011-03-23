@@ -37,9 +37,10 @@ public class HbefaTable {
 	 *  [1][2]1;48.9208374;0.349735767
 	 *  [1][3]1;12.75674725;0.710567832
 	 **/
-
+	// typ map hotkey auf hotvalue
 	private final HbefaObject [] [] hbefaTable = new HbefaObject [59][4];
 
+	//aufteilen in key und value
 	public HbefaObject[][] getHbefaTableWithSpeedAndEmissionFactor() {
 		return hbefaTable;}
 
@@ -57,7 +58,9 @@ public class HbefaTable {
 			br.readLine();
 
 			while ((strLine = br.readLine()) != null)   {
-
+				//hotKey = createhotKey(array);
+				//hotValue = createhotValue(array);
+				//hbefaTable.put(hotKey,hotValue);
 				//for all lines (whole text) we split the line to an array 
 
 
