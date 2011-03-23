@@ -53,17 +53,40 @@ import playground.wrashid.lib.EventHandlerAtStartupAdder;
 import playground.wrashid.lib.obj.LinkedListValueHashMap;
 
 public class Main {
+	final static String outputPath="C:\\Users\\stellas\\Output\\";
+	
 	public static LinkedListValueHashMap<Id, Vehicle> vehicles;
 	public static double penetrationPercent=1.0;
+	
 	
 	/*/
 	 * battery capacity
 	 * /Andersson 2010 - 10kWh
-	 * Nissan Leaf - 24kWh
+	 * Nissan Leaf - 24kWh =
+	 * 1kWh = 3.6*10^6 Joule
+	 * United States Environmental Protection Agency found the Leaf's energy consumption 
+	 * to be 765 kJ/km (34 kWh/100 miles)
+	 * --> 24*36000/765000=113km Reichweite, vs. Nissan claiming 170km
+	 * BULLSHIT
+	 * 
+	 * 
+	 * 
+	 * ok ridiculous fact
+	 * agent 1 longest trip = -4.53*10^8 J for trip
+	 * thus just for this  trip needed capacity= 4.53*10^8/(3.6*10^6)/0.8=157kWh
+	 * 
+	 * ENERGY DENSITIES
+	 * Diesel energy density = 37.3 MJ/l or 46.2MJ/kg
+	 * petrol gas -- 34.2MJ/l
+	 * 
+	 * PETROL 
+	 * Audi A6 10l/100km
+	 * Smart 6l/100km
+	 * 10 l/100km*35 MJ/l = =3.5MJ/km = 3.5*10^6J/km --> 4.53*10^8 J/3.5*10^6(J/km) =130km
 	 */
 	
-	public static double batteryCapacity= 24000*3600; //Wsec = Joules
-	
+	//public static double batteryCapacity= 24000*3600; //Wsec = Joules
+	public static double batteryCapacity= 24000*3600;
 	/*
 	 * depth of discharge
 	 * Andersson 2010 - 80%
@@ -73,7 +96,7 @@ public class Main {
 	public static double maxCharge=0.9;
 	public static double startSOCInWattSeconds=batteryCapacity*(maxCharge-minCharge); // Wsec
 	/*
-	 * prices.... random up to now, TODO CHANGE
+	 * prices.... random up to now, TODO CHANGE and make the writeSummary useful
 	 */
 	public static double priceBase=0.13;
 	public static double pricePeak=0.2;
@@ -81,7 +104,8 @@ public class Main {
 	 * random assumption up to now TODO
 	 * wikipedia national grid UK - average power flow of 11GW
 	 */
-	public static double peakLoad=Math.pow(10, 6); // adjust max peakLoad in Joule
+	public static double peakLoad=Math.pow(10, 5); // adjust max peakLoad in Watts
+	//public static double peakLoad=Math.pow(10, 6); // adjust max peakLoad in Watts
 	
 	/*
 	 * charging speed
@@ -90,18 +114,18 @@ public class Main {
 	 * William Kurani 2007 - 1.8-17.9kW
 	 * Nissan leaf speed charge - 50kW
 	 */
-	public static double chargingSpeedPerSecond=50000; // Joule/second = Watt
+	public static double chargingSpeedPerSecond=3500; // Joule/second = Watt
 	
 	public static double secondsPerMin=60;
 	public static double secondsPer15Min=15*60;
 	public static double secondsPerDay=24*60*60;
-	public static double slotLength=1*60; // choose min slot length and min bookable slot time
+	public static double slotLength=5*secondsPerMin; // choose min slot length and min bookable slot time
 	
 	public static ParkingTimesPlugin parkingTimesPlugin;
 	public static EnergyConsumptionPlugin energyConsumptionPlugin;
 
 	public static void main(String[] args) {
-		System.out.println(System.getProperty("user.dir"));
+		//System.out.println(System.getProperty("user.dir"));
 		
 		String configPath="test/input/playground/wrashid/sschieffer/config.xml";
 		
@@ -114,7 +138,7 @@ public class Main {
 		
 		eventHandlerAtStartupAdder.addEventHandler(parkingTimesPlugin);
 		
-		//penetrationPercent can be adjusted in EnergyConsumptionInit.java
+	
 		
 		controler.addControlerListener(new EnergyConsumptionInit());
 		
@@ -126,7 +150,7 @@ public class Main {
 			
 			@Override
 			public void notifyIterationEnds(IterationEndsEvent event) {
-				DecentralizedChargerV1 decentralizedChargerV1=new DecentralizedChargerV1(event.getControler(),Main.energyConsumptionPlugin,Main.parkingTimesPlugin);
+				DecentralizedChargerV1Beta decentralizedChargerV1=new DecentralizedChargerV1Beta(event.getControler(),Main.energyConsumptionPlugin,Main.parkingTimesPlugin);
 				
 				try {
 					
