@@ -19,6 +19,8 @@
 
 package playground.anhorni.LEGO.miniscenario.create;
 
+import java.util.Map;
+import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.Vector;
 
@@ -38,7 +40,6 @@ import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.facilities.OpeningTime;
-import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.facilities.OpeningTime.DayType;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -180,24 +181,24 @@ public class AdaptZHScenario {
 
 			for (ActivityOption option : facility.getActivityOptions().values()) {				
 				if (option.getType().startsWith("h")) {
-					options.add(this.replaceActOption("h", option, facility));
+					options.add(this.replaceActOption("h", (ActivityOptionImpl)option, facility));
 				}
 				else if (option.getType().startsWith("w")) {
-					options.add(this.replaceActOption("w", option, facility));
+					options.add(this.replaceActOption("w", (ActivityOptionImpl)option, facility));
 				}
 				else if (option.getType().startsWith("e")) {
-					options.add(this.replaceActOption("e", option, facility));
+					options.add(this.replaceActOption("e", (ActivityOptionImpl)option, facility));
 				}
 				else if (option.getType().startsWith("s")) {
-					options.add(this.replaceActOption("s", option, facility));
-					options.add(this.replaceActOption("shop", option, facility));
+					options.add(this.replaceActOption("s", (ActivityOptionImpl)option, facility));
+					options.add(this.replaceActOption("shop", (ActivityOptionImpl)option, facility));
 				}
 				else if (option.getType().startsWith("l")) { 
-					options.add(this.replaceActOption("l", option, facility));
-					options.add(this.replaceActOption("leisure", option, facility));
+					options.add(this.replaceActOption("l", (ActivityOptionImpl)option, facility));
+					options.add(this.replaceActOption("leisure", (ActivityOptionImpl)option, facility));
 				}
 				else {
-					options.add(this.replaceActOption("tta", option, facility));
+					options.add(this.replaceActOption("tta", (ActivityOptionImpl)option, facility));
 				}
 				
 			}
@@ -208,16 +209,11 @@ public class AdaptZHScenario {
 		}	
 	}
 	
-	private ActivityOptionImpl replaceActOption(String type, ActivityOption option, ActivityFacility facility) {
+	private ActivityOptionImpl replaceActOption(String type, ActivityOptionImpl option, ActivityFacility facility) {
 		ActivityOptionImpl optionNew = new ActivityOptionImpl(type, (ActivityFacilityImpl)facility);
-		
-		for (DayType d : DayType.values()) {
-			OpeningTime ot = (OpeningTime) option.getOpeningTimes(d);
-			
-			if (ot != null) {
-				optionNew.addOpeningTime(ot);
-			}
-		}				
+				
+		Map<DayType, SortedSet<OpeningTime>> ot = (Map<DayType, SortedSet<OpeningTime>>) option.getOpeningTimes();
+		optionNew.setOpeningTimes(ot);				
 		optionNew.setCapacity(option.getCapacity());
 		return optionNew;
 	}
