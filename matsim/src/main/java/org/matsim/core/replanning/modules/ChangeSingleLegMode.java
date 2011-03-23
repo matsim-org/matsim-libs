@@ -29,13 +29,9 @@ import org.matsim.population.algorithms.ChooseRandomSingleLegMode;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 /**
- * Changes the transportation mode of each legs in a plan to a randomly chosen
- * mode, given a list of possible modes. Each leg can have another mode assigned,
- * and it may be possible that the mode is not changed at all (i.e., the same mode
- * was randomly chosen again).
- *
- * <b>Warning:</b> Using this class in a replanning strategy may result in many more
- * iterations being needed until a useful state can be reached.
+ * Changes the transportation mode of one leg in a plan to a randomly chosen
+ * mode, given a list of possible modes. Insures that the newly chosen mode
+ * is different from the existing mode (if possible)
  *
  * By default, the module chooses between "car" and "pt". If other modes should
  * be used, it can be done so in the configuration:

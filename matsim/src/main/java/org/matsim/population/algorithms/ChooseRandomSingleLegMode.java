@@ -20,6 +20,7 @@
 
 package org.matsim.population.algorithms;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 import org.matsim.api.core.v01.TransportMode;
@@ -30,13 +31,9 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PersonImpl;
 
 /**
- * Changes the transportation mode of each legs in a plan to a randomly chosen
- * mode, given a list of possible modes. Each leg can have another mode assigned,
- * and it may be possible that the mode is not changed at all (i.e., the same mode
- * was randomly chosen again).
- *
- * <b>Warning:</b> Using this class in a replanning strategy may result in many more
- * iterations being needed until a useful state can be reached.
+ * Changes the transportation mode of one leg in a plan to a randomly chosen
+ * mode, given a list of possible modes. Insures that the newly chosen mode
+ * is different from the existing mode (if possible).
  *
  * @author mrieser
  */
@@ -72,23 +69,49 @@ public class ChooseRandomSingleLegMode implements PlanAlgorithm {
 			}
 		}
 
+		ArrayList<Leg> legs = new ArrayList<Leg>();
+		int cnt = 0;
 		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof Leg) {
-				((Leg) pe).setMode(getRandomLegMode(forbidCar));
+				legs.add((Leg) pe);
+				cnt++;
 			}
 		}
+		if (cnt == 0) {
+			return;
+		}
+		int rndIdx = this.rng.nextInt(cnt);
+		setRandomLegMode(legs.get(rndIdx), forbidCar);
 	}
 
-	private String getRandomLegMode(final boolean forbidCar) {
-		String newMode;
+	private void setRandomLegMode(final Leg leg, final boolean forbidCar) {
+		leg.setMode(chooseModeOtherThan(leg.getMode(), forbidCar));
+	}
+
+	private String chooseModeOtherThan(final String currentMode, final boolean forbidCar) {
+		String newMode = currentMode;
 		while (true) {
-			newMode = this.possibleModes[this.rng.nextInt(this.possibleModes.length)];
+			int newModeIdx = this.rng.nextInt(this.possibleModes.length - 1);
+			for (int i = 0; i <= newModeIdx; i++) {
+				if (this.possibleModes[i].equals(currentMode)) {
+					/* if the new Mode is after the currentMode in the list of possible
+					 * modes, go one further, as we have to ignore the current mode in
+					 * the list of possible modes. */
+					newModeIdx++;
+					break;
+				}
+			}
+			newMode = this.possibleModes[newModeIdx];
 			if (!(forbidCar && TransportMode.car.equals(newMode))) {
-				return newMode;
-			} else if (this.possibleModes.length == 1) {
-				return newMode; // there is no other mode available
+				break;
+			} else {
+				if (this.possibleModes.length == 2) {
+					newMode = currentMode; // there is no other mode available
+					break;
+				}
 			}
 		}
+		return newMode;
 	}
 
 }
