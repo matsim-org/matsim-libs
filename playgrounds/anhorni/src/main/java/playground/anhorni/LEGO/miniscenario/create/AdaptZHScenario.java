@@ -68,7 +68,7 @@ public class AdaptZHScenario {
 	private final String LCEXP = "locationchoiceExperimental";
 		
 	public static void main(final String[] args) {		
-		AdaptZHScenario plansCreator=new AdaptZHScenario();		
+		AdaptZHScenario plansCreator = new AdaptZHScenario();		
 		plansCreator.run(args[0]);			
 		log.info("Adaptation finished -----------------------------------------");
 	}
@@ -85,6 +85,7 @@ public class AdaptZHScenario {
 		this.init(config.getModule("plans").getValue("inputPlansFile"), 
 				config.getModule("network").getValue("inputNetworkFile"), 
 				config.getModule("facilities").getValue("inputFacilitiesFile"));
+		
 		this.outputFolder = config.getModule("controler").getValue("outputDirectory");
 		this.seed = Long.parseLong(config.findParam(LCEXP, "randomSeed"));
 		
@@ -96,23 +97,23 @@ public class AdaptZHScenario {
 		
 		log.info("Adding opening times to facilities ...");
 		this.addOpeningTimes();
-		log.info("Adapting plans ...");
+		log.info("Adapting plans ... of " + this.scenario.getPopulation().getPersons().size() + " persons");
 		this.adaptPlans();
 		
-		ComputeMaxEpsilons maxEpsilonComputer = new ComputeMaxEpsilons(10, scenario, "s", config);
+		log.info("Computing max epsilon ... for " + this.scenario.getPopulation().getPersons().size() + " persons");
+		ComputeMaxEpsilons maxEpsilonComputer = new ComputeMaxEpsilons(10, this.scenario, "s", config);
 		maxEpsilonComputer.prepareReplanning();
 		for (Person p : this.scenario.getPopulation().getPersons().values()) {
 			maxEpsilonComputer.handlePlan(p.getSelectedPlan());
 		}
 		maxEpsilonComputer.finishReplanning();
 		
-		maxEpsilonComputer = new ComputeMaxEpsilons(10, scenario, "l", config);
+		maxEpsilonComputer = new ComputeMaxEpsilons(10, this.scenario, "l", config);
 		maxEpsilonComputer.prepareReplanning();
 		for (Person p : this.scenario.getPopulation().getPersons().values()) {
 			maxEpsilonComputer.handlePlan(p.getSelectedPlan());
 		}
 		maxEpsilonComputer.finishReplanning();
-		
 		this.write();
 	}
 	
