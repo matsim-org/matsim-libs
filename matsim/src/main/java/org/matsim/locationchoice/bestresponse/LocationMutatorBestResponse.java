@@ -239,7 +239,7 @@ public class LocationMutatorBestResponse extends LocationMutatorwChoiceSet {
 		// here one could do a much more sophisticated calculation including time use and travel speed estimations (from previous iteration)
 		double travelSpeedCrowFly = Double.parseDouble(this.controler.getConfig().locationchoice().getRecursionTravelSpeed());
 		double betaTime = this.controler.getConfig().planCalcScore().getTraveling_utils_hr();
-		double maxTravelTime = maxEpsilon / betaTime * 3600.0; //[s]
+		double maxTravelTime = maxEpsilon / (-1.0 * betaTime) * 3600.0; //[s]
 		// distance linear
 		double maxDistance = travelSpeedCrowFly * maxTravelTime;
 		
