@@ -178,46 +178,48 @@ public class AdaptZHScenario {
 			
 			Vector<ActivityOption> options = new Vector<ActivityOption>();
 
-			for (ActivityOption option : facility.getActivityOptions().values()) {
-				OpeningTime openingTime;
-				ActivityOptionImpl optionNew = null;
-						
+			for (ActivityOption option : facility.getActivityOptions().values()) {				
 				if (option.getType().startsWith("h")) {
-					openingTime = new OpeningTimeImpl(DayType.wk, 0.0 * 3600.0, 24.0 * 3600);
-					optionNew = new ActivityOptionImpl("h", (ActivityFacilityImpl)facility);
+					options.add(this.replaceActOption("h", option, facility));
 				}
 				else if (option.getType().startsWith("w")) {
-					openingTime = new OpeningTimeImpl(DayType.wk, 6 * 3600.0, 18.5 * 3600);	
-					optionNew = new ActivityOptionImpl("w", (ActivityFacilityImpl)facility);
+					options.add(this.replaceActOption("w", option, facility));
 				}
 				else if (option.getType().startsWith("e")) {
-					openingTime = new OpeningTimeImpl(DayType.wk, 8.0 * 3600.0, 22.0 * 3600);	
-					optionNew = new ActivityOptionImpl("e", (ActivityFacilityImpl)facility);
+					options.add(this.replaceActOption("e", option, facility));
 				}
 				else if (option.getType().startsWith("s")) {
-					openingTime = new OpeningTimeImpl(DayType.wk, 6 * 3600.0, 18.5 * 3600);	
-					optionNew = new ActivityOptionImpl("s", (ActivityFacilityImpl)facility);
-					options.add(new ActivityOptionImpl("shop", (ActivityFacilityImpl)facility));
+					options.add(this.replaceActOption("s", option, facility));
+					options.add(this.replaceActOption("shop", option, facility));
 				}
 				else if (option.getType().startsWith("l")) { 
-					openingTime = new OpeningTimeImpl(DayType.wk, 6 * 3600.0, 24.0 * 3600);
-					optionNew = new ActivityOptionImpl("l", (ActivityFacilityImpl)facility);
-					options.add(new ActivityOptionImpl("leisure", (ActivityFacilityImpl)facility));
+					options.add(this.replaceActOption("l", option, facility));
+					options.add(this.replaceActOption("leisure", option, facility));
 				}
 				else {
-					openingTime = new OpeningTimeImpl(DayType.wk, 0.0 * 3600.0, 24.0 * 3600);
-					optionNew = new ActivityOptionImpl("tta", (ActivityFacilityImpl)facility);
+					options.add(this.replaceActOption("tta", option, facility));
 				}
-				optionNew.addOpeningTime(openingTime);
-				optionNew.setCapacity(option.getCapacity());
-				options.add(optionNew);
+				
 			}
-			
 			facility.getActivityOptions().clear();
 			for (ActivityOption option : options) {
 				facility.getActivityOptions().put(option.getType(), option);
 			}
 		}	
+	}
+	
+	private ActivityOptionImpl replaceActOption(String type, ActivityOption option, ActivityFacility facility) {
+		ActivityOptionImpl optionNew = new ActivityOptionImpl(type, (ActivityFacilityImpl)facility);
+		
+		for (DayType d : DayType.values()) {
+			OpeningTime ot = (OpeningTime) option.getOpeningTimes(d);
+			
+			if (ot != null) {
+				optionNew.addOpeningTime(ot);
+			}
+		}				
+		optionNew.setCapacity(option.getCapacity());
+		return optionNew;
 	}
 					
 	private QuadTree<ActivityFacility> builFacQuadTree(String type, TreeMap<Id,ActivityFacility> facilities_of_type) {
