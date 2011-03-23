@@ -98,7 +98,7 @@ public class AdaptZHScenario {
 		log.info("Adding opening times to facilities ...");
 		this.addOpeningTimes();
 		log.info("Adapting plans ... of " + this.scenario.getPopulation().getPersons().size() + " persons");
-		this.adaptPlans();
+		this.addfacilities2Plans();
 		
 		log.info("Computing max epsilon ... for " + this.scenario.getPopulation().getPersons().size() + " persons");
 		ComputeMaxEpsilons maxEpsilonComputer = new ComputeMaxEpsilons(10, this.scenario, "s", config);
@@ -117,9 +117,9 @@ public class AdaptZHScenario {
 		this.write();
 	}
 	
-	private void adaptPlans() {	
+	private void addfacilities2Plans() {	
 		
-		Vector<PersonImpl> personsWithoutCB = new Vector<PersonImpl>();
+//		Vector<PersonImpl> personsWithoutCB = new Vector<PersonImpl>();
 		
 		TreeMap<String, QuadTree<ActivityFacility>> trees = new TreeMap<String, QuadTree<ActivityFacility>>();
 		trees.put("home", this.builFacQuadTree("home", this.scenario.getActivityFacilities().getFacilitiesForActivityType("h")));
@@ -133,10 +133,9 @@ public class AdaptZHScenario {
 		int nextMsg = 1;
 		for (Person p : this.scenario.getPopulation().getPersons().values()) {	
 			
-			if (p.getId().compareTo(new IdImpl(1000000000)) < 0) {
-				personsWithoutCB.add((PersonImpl)p);
-			}
-			
+//			if (Integer.parseInt(p.getId().toString()) < 1000000000) {
+//				personsWithoutCB.add((PersonImpl)p);
+//			}
 			Plan plan = p.getSelectedPlan();
 			counter++;
 			if (counter % nextMsg == 0) {
@@ -161,18 +160,22 @@ public class AdaptZHScenario {
 //					((PersonImpl)p).getDesires().putActivityDuration(fullType, duration);
 //					act.setType(fullType);
 					if (act.getType().equals("tta")) {
-						((ActivityImpl)pe).setFacilityId(trees.get("tta").get(act.getCoord().getX(), act.getCoord().getY()).getId());
+						((ActivityImpl)pe).setFacilityId(
+								trees.get("tta").get(act.getCoord().getX(), act.getCoord().getY()).
+								getId());
 					}
 					else {
-						((ActivityImpl)pe).setFacilityId(trees.get(ActTypeConverter.convert2FullType(act.getType())).get(act.getCoord().getX(), act.getCoord().getY()).getId());
+						((ActivityImpl)pe).setFacilityId(
+								trees.get(ActTypeConverter.convert2FullType(act.getType())).get(act.getCoord().getX(), act.getCoord().getY())
+								.getId());
 					}
 				}
 			}
 		}
-		this.scenario.getPopulation().getPersons().clear();
-		for (Person p: personsWithoutCB) {
-			this.scenario.getPopulation().addPerson(p);
-		}
+//		this.scenario.getPopulation().getPersons().clear();
+//		for (Person p: personsWithoutCB) {
+//			this.scenario.getPopulation().addPerson(p);
+//		}
 	}
 	
 	private void addOpeningTimes() {
