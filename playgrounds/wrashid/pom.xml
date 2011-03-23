@@ -36,5 +36,12 @@
 			<type>jar</type>
 			<scope>compile</scope>
 		</dependency>
+		<dependency>
+			<groupId>lpsolve</groupId>
+			<artifactId>lpsolve</artifactId>
+			<version>5.5</version>
+			<scope>system</scope>
+			<systemPath>${basedir}/lib/lpsolve55j.jar</systemPath>
+		</dependency>
 	</dependencies>
 </project>
