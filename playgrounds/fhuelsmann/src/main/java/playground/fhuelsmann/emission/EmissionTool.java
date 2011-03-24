@@ -155,7 +155,7 @@ public class EmissionTool {
 			double[] warmEmissions = entry.getValue();
 			
 			if(personId2ColdEmissions.containsKey(personId)){
-				double fc_As = warmEmissions[0] + personId2ColdEmissions.get(personId).get("FC");
+				totalEmissions[0] = warmEmissions[0] + personId2ColdEmissions.get(personId).get("FC");
 				double nox_As = warmEmissions[1] + personId2ColdEmissions.get(personId).get("NOx");
 				double co2_As = warmEmissions[2]; //TODO: not directly available for cold emissions; try through fc!
 				double no2_As = warmEmissions[3] + personId2ColdEmissions.get(personId).get("NO2");
@@ -167,7 +167,6 @@ public class EmissionTool {
 				double no2_Fr = warmEmissions[8] + personId2ColdEmissions.get(personId).get("NO2");
 				double pm_Fr = warmEmissions[9] + personId2ColdEmissions.get(personId).get("PM");
 				
-				totalEmissions[0] = fc_As;
 			}
 			else{
 				totalEmissions = warmEmissions;
