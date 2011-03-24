@@ -1,4 +1,4 @@
-package playground.anhorni.scenarios;
+package playground.anhorni.PLOC;
 
 import java.util.Random;
 

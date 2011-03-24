@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.anhorni.scenarios.analysis;
+package playground.anhorni.PLOC.analysis;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -28,7 +28,7 @@ import java.util.Vector;
 
 import org.apache.log4j.Logger;
 
-import playground.anhorni.scenarios.ConfigReader;
+import playground.anhorni.PLOC.ConfigReader;
 
 public class MultipleEnsemblesAnalyzer {
 	private final static Logger log = Logger.getLogger(MultipleEnsemblesAnalyzer.class);

@@ -18,14 +18,14 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.anhorni.scenarios;
+package playground.anhorni.PLOC;
 
 import org.matsim.core.controler.Controler;
 import org.matsim.locationchoice.bestresponse.scoring.MixedScoringFunctionFactory;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
 import playground.anhorni.LEGO.miniscenario.run.analysis.CalculatePlanTravelStats;
-import playground.anhorni.scenarios.analysis.ShoppingCalculator;
+import playground.anhorni.PLOC.analysis.ShoppingCalculator;
 
 public class SingleRunControler extends Controler {
 	

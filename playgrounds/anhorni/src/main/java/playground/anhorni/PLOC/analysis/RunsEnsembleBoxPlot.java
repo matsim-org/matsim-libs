@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.anhorni.scenarios.analysis;
+package playground.anhorni.PLOC.analysis;
 
 import java.awt.Color;
 import java.awt.Font;

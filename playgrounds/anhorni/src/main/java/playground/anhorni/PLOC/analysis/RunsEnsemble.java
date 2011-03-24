@@ -1,4 +1,4 @@
-package playground.anhorni.scenarios.analysis;
+package playground.anhorni.PLOC.analysis;
 
 import java.io.File;
 import java.io.IOException;

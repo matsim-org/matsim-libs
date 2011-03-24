@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.anhorni.scenarios;
+package playground.anhorni.PLOC;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;

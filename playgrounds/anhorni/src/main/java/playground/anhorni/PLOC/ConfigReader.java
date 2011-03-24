@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.anhorni.scenarios;
+package playground.anhorni.PLOC;
 
 import java.io.BufferedReader;
 import java.io.FileReader;

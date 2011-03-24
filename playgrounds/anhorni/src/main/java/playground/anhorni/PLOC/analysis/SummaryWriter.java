@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.anhorni.scenarios.analysis;
+package playground.anhorni.PLOC.analysis;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

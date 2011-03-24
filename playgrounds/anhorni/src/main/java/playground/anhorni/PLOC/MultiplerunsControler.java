@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.anhorni.scenarios;
+package playground.anhorni.PLOC;
 
 import java.io.IOException;
 
@@ -29,7 +29,7 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.xml.sax.SAXException;
 
-import playground.anhorni.scenarios.analysis.SummaryWriter;
+import playground.anhorni.PLOC.analysis.SummaryWriter;
 
 public class MultiplerunsControler {
 	

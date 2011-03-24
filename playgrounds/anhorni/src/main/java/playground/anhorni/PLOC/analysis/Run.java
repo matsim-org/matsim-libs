@@ -1,4 +1,4 @@
-package playground.anhorni.scenarios.analysis;
+package playground.anhorni.PLOC.analysis;
 
 public class Run {
 	private int id;

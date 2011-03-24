@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.anhorni.scenarios;
+package playground.anhorni.PLOC;
 
 import java.io.IOException;
 import java.util.Random;

@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.anhorni.scenarios;
+package playground.anhorni.PLOC;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
