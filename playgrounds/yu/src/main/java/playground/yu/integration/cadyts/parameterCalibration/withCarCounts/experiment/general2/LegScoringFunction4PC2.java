@@ -34,6 +34,8 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.charyparNagel.LegScoringFunction;
 
+import playground.yu.utils.NotAnIntersection;
+
 /**
  * U_Leg = betaTraveling * travelTime_car + betaNbSpeedBumps * NbSpeedBumps +
  * betaNbLeftTurns * NbLeftTurns + betaNbIntersections * NbIntersections. For
@@ -100,7 +102,10 @@ public class LegScoringFunction4PC2 extends LegScoringFunction {
 			}
 			// end link of route
 			Id endLinkId = route.getEndLinkId();
-			if (!endLinkId.equals(route.getStartLinkId())) {
+			if (!endLinkId.equals(route.getStartLinkId())/*
+														 * Route does NOT lies
+														 * on a same link
+														 */) {
 				if (isSpeedBump(links.get(endLinkId))) {
 					nb++;
 				}
@@ -120,7 +125,31 @@ public class LegScoringFunction4PC2 extends LegScoringFunction {
 
 	protected int calcNbIntersections(Leg leg) {
 		// TODO
-		return 0;
+		int nb = 0;
+		if (TransportMode.car.equals(leg.getMode())) {
+			NetworkRoute route = (NetworkRoute) leg.getRoute();
+			// route links
+			for (Id linkId : route.getLinkIds()) {
+				if (!NotAnIntersection.notAnIntersection(links.get(linkId)
+						.getFromNode())/* is a real intersection */) {
+					nb++;
+				}
+			}
+			// end link of route
+			Id endLinkId = route.getEndLinkId();
+			if (!endLinkId.equals(route.getStartLinkId())/*
+														 * Route does NOT lies
+														 * on a same link
+														 */) {
+				if (!NotAnIntersection.notAnIntersection(links.get(endLinkId)
+						.getFromNode())/* is a real intersection */) {
+					nb++;
+				}
+			}
+		}/*
+		 * other modes i.e. GenericRoute, teleport, return 0;
+		 */
+		return nb;
 	}
 
 	@Override
