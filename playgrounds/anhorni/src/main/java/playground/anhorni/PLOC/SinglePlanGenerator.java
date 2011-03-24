@@ -53,19 +53,30 @@ public class SinglePlanGenerator {
 		ActivityImpl actH = new ActivityImpl("h", new IdImpl(homeIndex));
 		actH.setFacilityId(facilityId);
 		actH.setCoord(this.facilities.getFacilities().get(facilityId).getCoord());
+		
+		actH.setStartTime(0.0);
+		actH.setMaximumDuration(14.0 * 3600.0);
 		actH.setEndTime(14 * 3600);
+		
 		plan.addActivity(actH);		
 		plan.addLeg(new LegImpl("car"));
 				
 		ActivityImpl actS = new ActivityImpl("s", new IdImpl(homeIndex));
-		actS.setEndTime(17 * 3600);
+		
+		actS.setStartTime(14.0 * 3600.0);
+		actS.setMaximumDuration(90 * 60);
+		actS.setEndTime(15.5 * 3600);
+		
 		actS.setFacilityId(facilityId);
 		actS.setCoord(this.facilities.getFacilities().get(facilityId).getCoord());
 		plan.addActivity(actS);
 		plan.addLeg(new LegImpl("car"));
 		
 		ActivityImpl actH2 = new ActivityImpl("h", new IdImpl(homeIndex));
+		
+		actH2.setStartTime(15.5 * 3600);
 		actH2.setFacilityId(facilityId);
+		
 		actH2.setCoord(this.facilities.getFacilities().get(facilityId).getCoord());
 		plan.addActivity(actH2);
 		return plan;
@@ -81,7 +92,11 @@ public class SinglePlanGenerator {
 		ActivityImpl actH = new ActivityImpl("h", new IdImpl(homeIndex));
 		actH.setFacilityId(facilityId);
 		actH.setCoord(this.facilities.getFacilities().get(facilityId).getCoord());
-		actH.setEndTime(7.0 * 3600);
+		
+		actH.setStartTime(0.0);
+		actH.setMaximumDuration(8.0 * 3600.0);
+		actH.setEndTime(8.0 * 3600);
+		
 		plan.addActivity(actH);		
 		plan.addLeg(new LegImpl("car"));
 		
@@ -93,20 +108,30 @@ public class SinglePlanGenerator {
 		ActivityImpl actW = new ActivityImpl("w", new IdImpl(workIndex));
 		actW.setFacilityId(workFacilityId);
 		actW.setCoord(this.facilities.getFacilities().get(workFacilityId).getCoord());
-		actW.setEndTime(17 * 3600);
+		
+		actW.setStartTime(8.0 * 3600.0);
+		actW.setMaximumDuration(8.5 * 3600.0);
+		actW.setEndTime(16.5 * 3600.0);
+		
 		plan.addActivity(actW);	
 		plan.addLeg(new LegImpl("car"));
 		
 		ActivityImpl actS = new ActivityImpl("s", new IdImpl(homeIndex));
 		actS.setFacilityId(facilityId);
 		actS.setCoord(this.facilities.getFacilities().get(facilityId).getCoord());
-		actS.setEndTime(20 * 3600);
+		
+		actS.setStartTime(16.5 * 3600.0);
+		actS.setMaximumDuration(90.0 * 60.0);
+		actS.setEndTime(18.0 * 3600);
+		
 		plan.addActivity(actS);
 		plan.addLeg(new LegImpl("car"));
 		
 		ActivityImpl actH2 = new ActivityImpl("h", new IdImpl(homeIndex));
 		actH2.setFacilityId(facilityId);
 		actH2.setCoord(this.facilities.getFacilities().get(facilityId).getCoord());
+		actH2.setStartTime(18.0 * 3600.0);
+		
 		plan.addActivity(actH2);
 		return plan;
 	}
