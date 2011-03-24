@@ -131,12 +131,12 @@ public class EmissionTool {
 		Map<Id, Map<String, Double>> personId2ColdEmissions = coldEmissionAnalysisModule.getColdEmissionsPerPerson();
 
 		// sum up emissions
-//		Map<Id, Double[]> personId2TotalEmissionsInGrammPerType = getTotalEmissions(personId2WarmEmissionsInGrammPerType, personId2ColdEmissions);
+		Map<Id, double[]> personId2TotalEmissionsInGrammPerType = getTotalEmissions(personId2WarmEmissionsInGrammPerType, personId2ColdEmissions);
 
 		// print output files
 		EmissionPrinter printer = new EmissionPrinter(runDirectory);
 		printer.printHomeLocation2Emissions(population, personId2WarmEmissionsInGrammPerType, "EmissionsPerHomeLocationWarm.txt");
-//		printer.printHomeLocation2Emissions(population, personId2TotalEmissionsInGrammPerType, "EmissionsPerHomeLocationTotal.txt");
+		printer.printHomeLocation2Emissions(population, personId2TotalEmissionsInGrammPerType, "EmissionsPerHomeLocationTotal.txt");
 
 //		printer.printEmissionTable(personId2WarmEmissionsInGrammPerType, "EmissionsPerPersonWarm.txt");
 //		printer.printEmissionTable(linkId2WarmEmissionsInGrammPerType, "EmissionsPerLinkWarm.txt");
@@ -146,32 +146,34 @@ public class EmissionTool {
 //		printer.printEmissionTable(personId2TotalEmissionsInGrammPerType, "EmissionsPerPersonTotal");
 	}		
 
-	private Map<Id, Double[]> getTotalEmissions(Map<Id, double[]> personId2WarmEmissionsInGrammPerType,	Map<Id, Map<String, Double>> personId2ColdEmissions) {
-		Map<Id, Double[]> personId2totalEmissions = new HashMap<Id, Double[]>();
+	private Map<Id, double[]> getTotalEmissions(Map<Id, double[]> personId2WarmEmissionsInGrammPerType,	Map<Id, Map<String, Double>> personId2ColdEmissions) {
+		Map<Id, double[]> personId2totalEmissions = new HashMap<Id, double[]>();
+		double[] totalEmissions = new double[9];
 		
 		for(Entry<Id, double[]> entry : personId2WarmEmissionsInGrammPerType.entrySet()){
 			Id personId = entry.getKey();
 			double[] warmEmissions = entry.getValue();
 			
-						double fc_As = warmEmissions[0] + personId2ColdEmissions.get(personId).get("FC");
-			double nox_As = warmEmissions[1] + personId2ColdEmissions.get(personId).get("NOx");
-			double co2_As = warmEmissions[2]; //TODO: not directly available for cold emissions; try through fc!
-			double no2_As = warmEmissions[3] + personId2ColdEmissions.get(personId).get("NO2");
-			double pm_As = warmEmissions[4] + personId2ColdEmissions.get(personId).get("PM");
-			
-			double fc_Fr = warmEmissions[5] + personId2ColdEmissions.get(personId).get("FC");
-			double nox_Fr = warmEmissions[6] + personId2ColdEmissions.get(personId).get("NOx");
-			double co2_Fr = warmEmissions[7]; //TODO: not directly available for cold emissions; try through fc!
-			double no2_Fr = warmEmissions[8] + personId2ColdEmissions.get(personId).get("NO2");
-			double pm_Fr = warmEmissions[9] + personId2ColdEmissions.get(personId).get("PM");
-			
-			
-			Double[] emissionType2Value = {fc_As,nox_As,co2_As,no2_As,pm_As,fc_Fr,nox_Fr,co2_Fr,no2_Fr,pm_Fr};//new double[9];
-		
-			
-			personId2totalEmissions.put(personId, emissionType2Value);
+			if(personId2ColdEmissions.containsKey(personId)){
+				double fc_As = warmEmissions[0] + personId2ColdEmissions.get(personId).get("FC");
+				double nox_As = warmEmissions[1] + personId2ColdEmissions.get(personId).get("NOx");
+				double co2_As = warmEmissions[2]; //TODO: not directly available for cold emissions; try through fc!
+				double no2_As = warmEmissions[3] + personId2ColdEmissions.get(personId).get("NO2");
+				double pm_As = warmEmissions[4] + personId2ColdEmissions.get(personId).get("PM");
+				
+				double fc_Fr = warmEmissions[5] + personId2ColdEmissions.get(personId).get("FC");
+				double nox_Fr = warmEmissions[6] + personId2ColdEmissions.get(personId).get("NOx");
+				double co2_Fr = warmEmissions[7]; //TODO: not directly available for cold emissions; try through fc!
+				double no2_Fr = warmEmissions[8] + personId2ColdEmissions.get(personId).get("NO2");
+				double pm_Fr = warmEmissions[9] + personId2ColdEmissions.get(personId).get("PM");
+				
+				totalEmissions[0] = fc_As;
+			}
+			else{
+				totalEmissions = warmEmissions;
+			}
+			personId2totalEmissions.put(personId, totalEmissions);
 		}
-		
 		return personId2totalEmissions;
 	}
 /*	private Map<Id, Map<String, Double>> getTotalEmissions(Map<Id, double[]> personId2WarmEmissionsInGrammPerType,	Map<Id, Map<String, Double>> personId2ColdEmissions) {
