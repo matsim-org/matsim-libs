@@ -51,16 +51,16 @@ import playground.fhuelsmann.emission.objects.VisumObject;
 public class EmissionTool {
 
 	// INPUT
-	//	private static String runDirectory = "../../detailedEval/testRuns/output/run8/";
-	//	private static String eventsFile = runDirectory + "100.events.txt.gz";
-	//	//		private static String netFile = "../../detailedEval/Net/network-86-85-87-84_simplified.xml";
-	//	private static String netFile = runDirectory + "output_network.xml.gz";
-	//	private static String plansFile = runDirectory + "output_plans.xml.gz";
+		private static String runDirectory = "../../detailedEval/testRuns/output/run8/";
+		private static String eventsFile = runDirectory + "100.events.txt.gz";
+		//		private static String netFile = "../../detailedEval/Net/network-86-85-87-84_simplified.xml";
+		private static String netFile = runDirectory + "output_network.xml.gz";
+		private static String plansFile = runDirectory + "output_plans.xml.gz";
 
-	private static String runDirectory = "../../detailedEval/testRuns/output/1pct/v0-default/run12/";
+/*	private static String runDirectory = "../../detailedEval/testRuns/output/1pct/v0-default/run12/";
 	private static String eventsFile = runDirectory + "ITERS/it.100/100.events.txt.gz";
 	private static String netFile = runDirectory + "output_network.xml.gz";
-	private static String plansFile = runDirectory + "output_plans.xml.gz";
+	private static String plansFile = runDirectory + "output_plans.xml.gz";*/
 
 	private static String visum2hbefaRoadTypeFile = "../../detailedEval/testRuns/input/inputEmissions/road_types.txt";
 	private static String hbefaAverageFleetEmissionFactorsFile = "../../detailedEval/testRuns/input/inputEmissions/hbefa_emission_factors_urban_rural_MW.txt";
@@ -131,7 +131,7 @@ public class EmissionTool {
 		Map<Id, Map<String, Double>> personId2ColdEmissions = coldEmissionAnalysisModule.getColdEmissionsPerPerson();
 
 		// sum up emissions
-		Map<Id, Map<String, Double>> personId2TotalEmissionsInGrammPerType = getTotalEmissions(personId2WarmEmissionsInGrammPerType, personId2ColdEmissions);
+//		Map<Id, Double[]> personId2TotalEmissionsInGrammPerType = getTotalEmissions(personId2WarmEmissionsInGrammPerType, personId2ColdEmissions);
 
 		// print output files
 		EmissionPrinter printer = new EmissionPrinter(runDirectory);
@@ -141,12 +141,40 @@ public class EmissionTool {
 //		printer.printEmissionTable(personId2WarmEmissionsInGrammPerType, "EmissionsPerPersonWarm.txt");
 //		printer.printEmissionTable(linkId2WarmEmissionsInGrammPerType, "EmissionsPerLinkWarm.txt");
 //
-//		printer.printColdEmissionTable(personId2ColdEmissions, "EmissionsPerPersonCold.txt");
+		printer.printColdEmissionTable(personId2ColdEmissions, "EmissionsPerPersonCold.txt");
 //		
 //		printer.printEmissionTable(personId2TotalEmissionsInGrammPerType, "EmissionsPerPersonTotal");
 	}		
 
-	private Map<Id, Map<String, Double>> getTotalEmissions(Map<Id, double[]> personId2WarmEmissionsInGrammPerType,	Map<Id, Map<String, Double>> personId2ColdEmissions) {
+	private Map<Id, Double[]> getTotalEmissions(Map<Id, double[]> personId2WarmEmissionsInGrammPerType,	Map<Id, Map<String, Double>> personId2ColdEmissions) {
+		Map<Id, Double[]> personId2totalEmissions = new HashMap<Id, Double[]>();
+		
+		for(Entry<Id, double[]> entry : personId2WarmEmissionsInGrammPerType.entrySet()){
+			Id personId = entry.getKey();
+			double[] warmEmissions = entry.getValue();
+			
+						double fc_As = warmEmissions[0] + personId2ColdEmissions.get(personId).get("FC");
+			double nox_As = warmEmissions[1] + personId2ColdEmissions.get(personId).get("NOx");
+			double co2_As = warmEmissions[2]; //TODO: not directly available for cold emissions; try through fc!
+			double no2_As = warmEmissions[3] + personId2ColdEmissions.get(personId).get("NO2");
+			double pm_As = warmEmissions[4] + personId2ColdEmissions.get(personId).get("PM");
+			
+			double fc_Fr = warmEmissions[5] + personId2ColdEmissions.get(personId).get("FC");
+			double nox_Fr = warmEmissions[6] + personId2ColdEmissions.get(personId).get("NOx");
+			double co2_Fr = warmEmissions[7]; //TODO: not directly available for cold emissions; try through fc!
+			double no2_Fr = warmEmissions[8] + personId2ColdEmissions.get(personId).get("NO2");
+			double pm_Fr = warmEmissions[9] + personId2ColdEmissions.get(personId).get("PM");
+			
+			
+			Double[] emissionType2Value = {fc_As,nox_As,co2_As,no2_As,pm_As,fc_Fr,nox_Fr,co2_Fr,no2_Fr,pm_Fr};//new double[9];
+		
+			
+			personId2totalEmissions.put(personId, emissionType2Value);
+		}
+		
+		return personId2totalEmissions;
+	}
+/*	private Map<Id, Map<String, Double>> getTotalEmissions(Map<Id, double[]> personId2WarmEmissionsInGrammPerType,	Map<Id, Map<String, Double>> personId2ColdEmissions) {
 		Map<Id, Map<String, Double>> personId2totalEmissions = new HashMap<Id, Map<String, Double>>();
 		Map<String, Double> emissionType2Value = new HashMap<String, Double>();
 		
@@ -182,7 +210,7 @@ public class EmissionTool {
 		}
 		
 		return personId2totalEmissions;
-	}
+	}*/
 
 	private void loadScenario() {
 		Config config = scenario.getConfig();
