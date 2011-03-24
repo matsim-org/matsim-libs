@@ -49,7 +49,7 @@ public class RunsEnsemble {
 	
 	public void write() throws IOException {			
 		for (int facIndex = 0; facIndex < this.numberOfLocations; facIndex++) {
-			RunsEnsembleBoxPlot boxPlot = new RunsEnsembleBoxPlot("Facility " + shoppingFacilities[facIndex] + " " + this.randomRuns.size() + " Runs");				
+			RunsEnsembleBoxPlot boxPlot = new RunsEnsembleBoxPlot("Facility " + shoppingFacilities[facIndex] + ": " + this.randomRuns.size() + " Runs");				
 			for (int hour = 0; hour < 24; hour++) {
 				ArrayList<Double> expenditures = new ArrayList<Double>();
 				int runIndex = 0;
