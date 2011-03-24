@@ -27,7 +27,7 @@ public class RunsEnsemble {
 	private double getMean(int locIndex, int day, int hour) {
 		double mean = 0.0;   
     	for (int runIndex = 0; runIndex < randomRuns.size(); runIndex++) {
-			mean += this.randomRuns.get(runIndex).getExpenditure(locIndex, day, hour);
+			mean += this.randomRuns.get(runIndex).getTotalExpenditure(locIndex, day, hour);
         }
     	return mean /= randomRuns.size();	
 	}
@@ -49,12 +49,12 @@ public class RunsEnsemble {
 	
 	public void write() throws IOException {			
 		for (int facIndex = 0; facIndex < this.numberOfLocations; facIndex++) {
-			RunsEnsembleBoxPlot boxPlot = new RunsEnsembleBoxPlot("Facility " + shoppingFacilities[facIndex]);				
+			RunsEnsembleBoxPlot boxPlot = new RunsEnsembleBoxPlot("Facility " + shoppingFacilities[facIndex] + " " + this.randomRuns.size() + " Runs");				
 			for (int hour = 0; hour < 24; hour++) {
 				ArrayList<Double> expenditures = new ArrayList<Double>();
 				int runIndex = 0;
 				for (Run run : this.randomRuns) {
-					expenditures.add(run.getAverageHourlyExpenditures(facIndex, hour));
+					expenditures.add(run.getAvgDays_ExpendituresPerHourPerFacility(facIndex, hour));
 					runIndex++;
 				}
 				boxPlot.addHourlySeries(expenditures, hour);

@@ -13,16 +13,16 @@ public class Run {
 		}
 	}
 	
-	public void addExpenditure(int facIndex, int day, int hour, double expenditure) {
+	public void addTotalExpenditure(int facIndex, int day, int hour, double expenditure) {
 		this.facilityExpenditures[facIndex].add(day, hour, expenditure);
 	}
 	
-	public double getExpenditure(int facIndex, int day, int hour) {
+	public double getTotalExpenditure(int facIndex, int day, int hour) {
 		return this.facilityExpenditures[facIndex].getExpenditure(day, hour);
 	}
 	
-	public double getAverageHourlyExpenditures(int facIndex, int hour) {
-		return this.facilityExpenditures[facIndex].getAverageHourlyExpenditures(hour);
+	public double getAvgDays_ExpendituresPerHourPerFacility(int facIndex, int hour) {
+		return this.facilityExpenditures[facIndex].getAvgDays_ExpendituresPerHour(hour);
 	}
 	
 	public int getId() {

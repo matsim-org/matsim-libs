@@ -20,7 +20,7 @@ public class ExpendituresInTime {
 		return this.expenditures[day][hour];
 	}
 	
-	public double getAverageHourlyExpenditures(int hour) {
+	public double getAvgDays_ExpendituresPerHour(int hour) {
 		double avg = 0.0;
 		for (int day = 0; day < 5; day++) {
 			avg += this.expenditures[day][hour];

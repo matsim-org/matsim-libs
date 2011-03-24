@@ -56,7 +56,7 @@ public class RunsEnsembleBoxPlot {
 		xAxis.setTickLabelFont(new Font("SansSerif", Font.PLAIN, 10));
 		xAxis.setCategoryLabelPositions(CategoryLabelPositions.UP_45);
 		
-		final NumberAxis yAxis = new NumberAxis("Expenditures Average[days][runs]");
+		final NumberAxis yAxis = new NumberAxis("AverageDays_Expenditures");
 		yAxis.setAutoRangeIncludesZero(true);
 
 		final BoxAndWhiskerRenderer renderer = new BoxAndWhiskerRenderer();

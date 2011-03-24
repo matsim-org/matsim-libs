@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.util.List;
 
 import org.apache.commons.lang.ArrayUtils;
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -39,19 +38,17 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
 
 public class ShoppingCalculator implements ShutdownListener {
 	
-	private double expenditurePerFacilityPerHour[][];
+	private double totalExpenditurePerFacilityPerHour[][];
 	private int shoppingFacilities[] = {1, 2, 5, 6, 7};
 	private ObjectAttributes personAttributes;
 	
-	private final static Logger log = Logger.getLogger(ShoppingCalculator.class);
-
 	public void notifyShutdown(ShutdownEvent event) {
 		this.evaluate(event);
 		this.printStatistics(event);
 	}
 	
 	public ShoppingCalculator(ObjectAttributes personAttributes) {
-		this.expenditurePerFacilityPerHour = new double[shoppingFacilities.length][24];
+		this.totalExpenditurePerFacilityPerHour = new double[shoppingFacilities.length][24];
 		this.personAttributes = personAttributes;
 	}
 	
@@ -66,7 +63,7 @@ public class ShoppingCalculator implements ShutdownListener {
 					double expenditure = (Double) this.personAttributes.getAttribute(p.getId().toString(), "expenditure");
 					double arrivalTime = ((LegImpl)actslegs.get(j-1)).getArrivalTime();
 					int startTime = (int) (((arrivalTime) / 3600.0) % 24);
-					this.expenditurePerFacilityPerHour[shopLocIndex][startTime] += expenditure;
+					this.totalExpenditurePerFacilityPerHour[shopLocIndex][startTime] += expenditure;
 				}	
 			}
 		}
@@ -82,7 +79,7 @@ public class ShoppingCalculator implements ShutdownListener {
 			
 			String outputPath = "src/main/java/playground/anhorni/output/PLOC/3towns/run";
 			final BufferedWriter out =
-				IOUtils.getBufferedWriter(outputPath + run + "/day" + day + "/shoppingPerRunDay.txt");
+				IOUtils.getBufferedWriter(outputPath + run + "/day" + day + "/totalExpendituresPerRunDay.txt");
 			out.write("Hour\t");
 			for (int i = 0; i < this.shoppingFacilities.length; i++) {
 				out.append("facility_" + shoppingFacilities[i] + "\t");
@@ -94,9 +91,9 @@ public class ShoppingCalculator implements ShutdownListener {
 				out.write(h + "\t");
 				double sumPerHour = 0.0;
 				for (int i = 0; i < this.shoppingFacilities.length; i++) {
-					out.write(String.valueOf(expenditurePerFacilityPerHour[i][h]) + "\t");
-					sumPerHour += expenditurePerFacilityPerHour[i][h];
-					sumPerFacility[i] += expenditurePerFacilityPerHour[i][h];
+					out.write(String.valueOf(totalExpenditurePerFacilityPerHour[i][h]) + "\t");
+					sumPerHour += totalExpenditurePerFacilityPerHour[i][h];
+					sumPerFacility[i] += totalExpenditurePerFacilityPerHour[i][h];
 				}
 				out.write(sumPerHour + "\n");
 			}

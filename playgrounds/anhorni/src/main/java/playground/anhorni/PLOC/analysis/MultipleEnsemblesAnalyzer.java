@@ -75,7 +75,8 @@ public class MultipleEnsemblesAnalyzer {
 	private void printHourlyAnalysis(TreeMap<Integer, Vector<RunsEnsemble>> runsEnsemblesPerSize, int hour) {
 		
 		for (int facIndex = 0; facIndex < shoppingFacilities.length; facIndex++) {
-			MultipleEnsemblesBoxPlot boxPlot = new MultipleEnsemblesBoxPlot("Facility " + shoppingFacilities[facIndex] + " hour " + hour);
+			MultipleEnsemblesBoxPlot boxPlot = new MultipleEnsemblesBoxPlot("Facility " + shoppingFacilities[facIndex] + " hour " + hour + " " +
+					runsEnsemblesPerSize.size() + " Ensembles");
 			for (int i = 0; i < runsEnsemblesPerSize.values().size(); i++) {
 				ArrayList<Double> averageExpenditures = new ArrayList<Double>();
 				for (RunsEnsemble runsEnsemble : runsEnsemblesPerSize.get(i)) {
@@ -84,7 +85,8 @@ public class MultipleEnsemblesAnalyzer {
 				}
 			}
 			boxPlot.createChart();
-			boxPlot.saveAsPng(this.outpath + "/output/PLOC/3towns/facility" + shoppingFacilities[facIndex] + "/multipleEnsembles_facility" + shoppingFacilities[facIndex] + "_hour" + hour + ".png", 1000, 500);
+			boxPlot.saveAsPng(this.outpath + "/output/PLOC/3towns/facility" + shoppingFacilities[facIndex] + 
+					"/multipleEnsembles_facility" + shoppingFacilities[facIndex] + "_hour" + hour + ".png", 1000, 500);
 		}
 	}	
 	
