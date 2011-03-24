@@ -75,8 +75,8 @@ public class MultipleEnsemblesAnalyzer {
 	private void printHourlyAnalysis(TreeMap<Integer, Vector<RunsEnsemble>> runsEnsemblesPerSize, int hour) {
 		
 		for (int facIndex = 0; facIndex < shoppingFacilities.length; facIndex++) {
-			MultipleEnsemblesBoxPlot boxPlot = new MultipleEnsemblesBoxPlot("Facility " + shoppingFacilities[facIndex] + " hour " + hour + ": " +
-					runsEnsemblesPerSize.size() + " Ensembles");
+			MultipleEnsemblesBoxPlot boxPlot = new MultipleEnsemblesBoxPlot("Facility " + shoppingFacilities[facIndex] + 
+					" hour " + hour + ": " + numberOfEnsembles + " Ensembles");
 			for (int i = 0; i < runsEnsemblesPerSize.values().size(); i++) {
 				ArrayList<Double> averageExpenditures = new ArrayList<Double>();
 				for (RunsEnsemble runsEnsemble : runsEnsemblesPerSize.get(i)) {
