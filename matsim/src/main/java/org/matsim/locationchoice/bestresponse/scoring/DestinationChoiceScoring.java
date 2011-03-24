@@ -56,14 +56,14 @@ public class DestinationChoiceScoring {
 					plan.getNextActivity(plan.getNextLeg(act)));
 		}
 		if (Double.parseDouble(config.findParam(LCEXP, "scoreElementEpsilons")) > 0.000001) {
-			double var = 1.0;
+			double fVar = 1.0;
 			if (act.getType().startsWith("s")) {
-				var = Double.parseDouble(config.findParam(LCEXP, "varEpsShop"));
+				fVar = Double.parseDouble(config.findParam(LCEXP, "fShop"));
 			}
 			else {
-				var = Double.parseDouble(config.findParam(LCEXP, "varEpsLeisure"));
+				fVar = Double.parseDouble(config.findParam(LCEXP, "fLeisure"));
 			}
-			score += Math.sqrt(var) * this.getEpsilonAlternative(act.getFacilityId(), plan.getPerson());
+			score += (fVar * this.getEpsilonAlternative(act.getFacilityId(), plan.getPerson()));
 		}		
 		return score;
 	}
