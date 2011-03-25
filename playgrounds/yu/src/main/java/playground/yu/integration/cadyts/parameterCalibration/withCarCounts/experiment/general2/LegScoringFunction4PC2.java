@@ -34,6 +34,7 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.charyparNagel.LegScoringFunction;
 
+import playground.yu.utils.LeftTurnIdentifier;
 import playground.yu.utils.NotAnIntersection;
 
 /**
@@ -47,7 +48,7 @@ import playground.yu.utils.NotAnIntersection;
 public class LegScoringFunction4PC2 extends LegScoringFunction {
 	private final static Logger log = Logger
 			.getLogger(LegScoringFunction4PC2.class);
-	private Network network;
+
 	private ScoringParameters scoringParams;
 	private Map<Id, ? extends Link> links;
 
@@ -57,7 +58,6 @@ public class LegScoringFunction4PC2 extends LegScoringFunction {
 
 	public LegScoringFunction4PC2(Plan plan, Config config, Network network) {
 		super(plan, new CharyparNagelScoringParameters(config.planCalcScore()));
-		this.network = network;
 		scoringParams = new ScoringParameters(config);
 		links = network.getLinks();
 	}
@@ -94,6 +94,10 @@ public class LegScoringFunction4PC2 extends LegScoringFunction {
 		int nb = 0;
 		if (TransportMode.car.equals(leg.getMode())) {
 			NetworkRoute route = (NetworkRoute) leg.getRoute();
+			Id endLinkId = route.getEndLinkId();
+			if (route.getStartLinkId().equals(endLinkId)) {
+				return nb;// No speed bump at the same link.
+			}
 			// route links
 			for (Id linkId : route.getLinkIds()) {
 				if (isSpeedBump(links.get(linkId))) {
@@ -101,15 +105,12 @@ public class LegScoringFunction4PC2 extends LegScoringFunction {
 				}
 			}
 			// end link of route
-			Id endLinkId = route.getEndLinkId();
-			if (!endLinkId.equals(route.getStartLinkId())/*
-														 * Route does NOT lies
-														 * on a same link
-														 */) {
-				if (isSpeedBump(links.get(endLinkId))) {
-					nb++;
-				}
-			}// No speed bump at the same link.
+
+			/* Route does NOT lies on a same link */
+			if (isSpeedBump(links.get(endLinkId))) {
+				nb++;
+			}
+
 		}
 		// else {// other modes i.e. GenericRoute, teleport
 		// return 0;
@@ -119,15 +120,46 @@ public class LegScoringFunction4PC2 extends LegScoringFunction {
 	}
 
 	protected int calcNbLeftTurns(Leg leg) {
-		// TODO
-		return 0;
-	}
-
-	protected int calcNbIntersections(Leg leg) {
-		// TODO
 		int nb = 0;
 		if (TransportMode.car.equals(leg.getMode())) {
 			NetworkRoute route = (NetworkRoute) leg.getRoute();
+			Id startLinkId = route.getStartLinkId(), endLinkId = route
+					.getEndLinkId();
+			if (startLinkId.equals(endLinkId)) {
+				return nb;
+			}
+			// route links
+			Link inLink = links.get(startLinkId), outLink;
+
+			for (Id linkId : route.getLinkIds()) {
+				outLink = links.get(linkId);
+				if (LeftTurnIdentifier.turnLeft(inLink, outLink)) {
+					nb++;
+				}
+				inLink = outLink;
+			}
+			// end link of route
+			outLink = links.get(endLinkId);
+			/* Route does NOT lies on a same link */
+			if (LeftTurnIdentifier.turnLeft(inLink, outLink)) {
+				nb++;
+			}
+		}
+		// else {// other modes i.e. GenericRoute, teleport
+		// return 0;
+		// }
+
+		return nb;
+	}
+
+	protected int calcNbIntersections(Leg leg) {
+		int nb = 0;
+		if (TransportMode.car.equals(leg.getMode())) {
+			NetworkRoute route = (NetworkRoute) leg.getRoute();
+			Id endLinkId = route.getEndLinkId();
+			if (route.getStartLinkId().equals(endLinkId)) {
+				return nb;// Route comprises only one Link
+			}
 			// route links
 			for (Id linkId : route.getLinkIds()) {
 				if (!NotAnIntersection.notAnIntersection(links.get(linkId)
@@ -136,16 +168,12 @@ public class LegScoringFunction4PC2 extends LegScoringFunction {
 				}
 			}
 			// end link of route
-			Id endLinkId = route.getEndLinkId();
-			if (!endLinkId.equals(route.getStartLinkId())/*
-														 * Route does NOT lies
-														 * on a same link
-														 */) {
-				if (!NotAnIntersection.notAnIntersection(links.get(endLinkId)
-						.getFromNode())/* is a real intersection */) {
-					nb++;
-				}
+			/* Route does NOT lies on a same link */
+			if (!NotAnIntersection.notAnIntersection(links.get(endLinkId)
+					.getFromNode())/* is a real intersection */) {
+				nb++;
 			}
+
 		}/*
 		 * other modes i.e. GenericRoute, teleport, return 0;
 		 */
@@ -176,7 +204,7 @@ public class LegScoringFunction4PC2 extends LegScoringFunction {
 					+ nbLeftTurns * scoringParams.betaNbLeftTurns
 					+ nbIntersections * scoringParams.betaNbIntersections;
 
-			travTimeAttrCar += travelTime / 3600d;
+			travTimeAttrCar/* [h] */+= travelTime/* [s] *// 3600d;
 			nbSpeedBumpsAttr += nbSpeedBumps;
 			nbLeftTurnsAttr += nbLeftTurns;
 			nbIntersectionsAttr += nbIntersections;

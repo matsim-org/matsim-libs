@@ -21,7 +21,7 @@
 /**
  * 
  */
-package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.general.scoring;
+package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.general2;
 
 import java.util.ArrayList;
 
@@ -36,14 +36,12 @@ import org.matsim.core.scoring.interfaces.BasicScoring;
 import org.matsim.core.scoring.interfaces.LegScoring;
 import org.matsim.core.scoring.interfaces.MoneyScoring;
 
-import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.general.withLegModeASC.LegScoringFunction4PC;
-
 /**
  * @author yu
  * 
  */
 // in order to get attributes, e.g. actDur, legDurCar, legDurPt, stuck?
-public class ScoringFunctionAccumulator4PC implements ScoringFunction {
+public class ScoringFunctionAccumulator4PC2 implements ScoringFunction {
 	protected CharyparNagelScoringParameters params;
 
 	protected ArrayList<BasicScoring> basicScoringFunctions = new ArrayList<BasicScoring>();
@@ -51,16 +49,16 @@ public class ScoringFunctionAccumulator4PC implements ScoringFunction {
 	private ArrayList<MoneyScoring> moneyScoringFunctions = new ArrayList<MoneyScoring>();
 	private ArrayList<LegScoring> legScoringFunctions = new ArrayList<LegScoring>();
 	private ArrayList<AgentStuckScoring> agentStuckScoringFunctions = new ArrayList<AgentStuckScoring>();
-	private double perfAttr/* [h] */, travTimeAttrCar/* [h] */,
-			travTimeAttrPt/* [h] */, stuckAttr = 0d/* [utils] */,
-			travTimeAttrWalk/* [h] */, distanceCar/* [m] */, distancePt/* [m] */,
-			distanceWalk/* [m] */;
-	private int carLegNo, ptLegNo, walkLegNo;
 
-	public ScoringFunctionAccumulator4PC(CharyparNagelScoringParameters params) {
+	private double perfAttr/* [h] */, travTimeAttrCar/* [h] */, lnPathSizeAttr;
+	private int nbSpeedBumpsAttr, nbLeftTurnsAttr, nbIntersectionsAttr;
+
+	public ScoringFunctionAccumulator4PC2(CharyparNagelScoringParameters params) {
 		this.params = params;
 	}
 
+	// //////////////////////////////////////////////////////
+	// SETTERS, GETTERS
 	public double getPerfAttr() {
 		return perfAttr;
 	}
@@ -69,42 +67,20 @@ public class ScoringFunctionAccumulator4PC implements ScoringFunction {
 		return travTimeAttrCar;
 	}
 
-	public double getTravTimeAttrPt() {
-		return travTimeAttrPt;
+	public int getNbSpeedBumps() {
+		return nbSpeedBumpsAttr;
 	}
 
-	public Double getTravTimeAttrWalk() {
-		return travTimeAttrWalk;
+	public int getNbLeftTurns() {
+		return nbLeftTurnsAttr;
 	}
 
-	public double getStuckAttr() {
-		return stuckAttr;
+	public int getNbIntersections() {
+		return nbIntersectionsAttr;
 	}
 
-	public int getCarLegNo() {
-		return carLegNo;
-	}
-
-	public int getPtLegNo() {
-		return ptLegNo;
-	}
-
-	public int getWalkLegNo() {
-		return walkLegNo;
-	}
-
-	public double getDistanceCar() {
-		return distanceCar;
-	}
-
-	public double getDistancePt() {
-		return distancePt;
-	}
-
-	public double getDistanceWalk() {
-		return distanceWalk;
-	}
-
+	// /////////////////////////////////////////////////////
+	// IMPLEMENTED METHODS
 	public void addMoney(double amount) {
 		for (MoneyScoring moneyScoringFunction : moneyScoringFunctions) {
 			moneyScoringFunction.addMoney(amount);
@@ -155,37 +131,20 @@ public class ScoringFunctionAccumulator4PC implements ScoringFunction {
 		for (BasicScoring basicScoringFunction : basicScoringFunctions) {
 			double fracScore = basicScoringFunction.getScore();
 			score += fracScore;
-			// System.out.println("SCORE:\tafter scoringCfg function: "
-			// + basicScoringFunction.getClass().getName() + " is: "
-			// + basicScoringFunction.getScore());
+
 			if (basicScoringFunction instanceof ActivityScoring) {
 				perfAttr = params.marginalUtilityOfPerforming_s != 0d ? fracScore
 						/ (params.marginalUtilityOfPerforming_s * 3600d)
 						: 0d;
 			} else if (basicScoringFunction instanceof LegScoringFunction) {
-				LegScoringFunction4PC legScoringFunction = (LegScoringFunction4PC) basicScoringFunction;
+				LegScoringFunction4PC2 legScoringFunction = (LegScoringFunction4PC2) basicScoringFunction;
 
 				travTimeAttrCar = legScoringFunction.getTravTimeAttrCar();
-				travTimeAttrPt = legScoringFunction.getTravTimeAttrPt();
-				travTimeAttrWalk = legScoringFunction.getTravTimeAttrWalk();
 
-				carLegNo = legScoringFunction.getCarLegNo();
-				ptLegNo = legScoringFunction.getPtLegNo();
-				walkLegNo = legScoringFunction.getWalkLegNo();
-
-				distanceCar = legScoringFunction.getDistanceAttrCar();
-				distancePt = legScoringFunction.getDistanceAttrPt();
-				distanceWalk = legScoringFunction.getDistanceAttrWalk();
-			} else if (basicScoringFunction instanceof AgentStuckScoring) {
-				double betaStuck = Math.min(Math.min(
-						params.marginalUtilityOfLateArrival_s,
-						params.marginalUtilityOfEarlyDeparture_s), Math.min(
-						params.marginalUtilityOfTraveling_s,
-						params.marginalUtilityOfWaiting_s));
-
-				stuckAttr = betaStuck != 0d ? fracScore / (betaStuck * 3600d)
-						: 0d;
-			}
+				nbSpeedBumpsAttr = legScoringFunction.getNbSpeedBumps();
+				nbLeftTurnsAttr = legScoringFunction.getNbLeftTurns();
+				nbIntersectionsAttr = legScoringFunction.getNbIntersections();
+			}// TODO
 		}
 		return score;
 	}
