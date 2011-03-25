@@ -21,6 +21,8 @@ package herbie;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -30,26 +32,34 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 
 public class CreateNewZHScenario {
-
+	
+	// Satawal
+//	private static String currentDir = "/Network/Servers/pingelap/Volumes/ivt-shared/Groups/ivt/vpl/projekt/matsim/";
+	// desktop 
+	private static String currentDir = "//pingelap/matsim/";
+	
 	private final static Logger log = Logger.getLogger(CreateNewZHScenario.class);
 	private ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-	public static String outputFolder="src/main/java/playground/anhorni/output/NEWZH/";
-	private static String path = "src/main/java/playground/anhorni/";
-	private String networkfilePath = path + "input/NEWZH/network.xml";
-	private String facilitiesfilePath = path + "input/NEWZH/facilities.xml";
-	private String plansV2filePath = path + "input/NEWZH/plans.xml";
+	private static String path;
+	public static String outputFolder;
+	private static String networkfilePath;
+	private static String facilitiesfilePath;
+	private static String plansV2filePath;
 	
 	// cross-border
-	private String crossBorderFacilitiesFilePath = path + "input/NEWZH/facilities.xml";
-	private String crossBorderPlansFilePath = path + "input/NEWZH/plans.xml";
+	private static String crossBorderFacilitiesFilePath;
+	private static String crossBorderPlansFilePath;
 	
 	// ====================================================================================
 	public static void main(final String[] args) {
+		readPathsFile(currentDir, "herbie/configs/paths-config.xml");
+				
 		CreateNewZHScenario creator = new CreateNewZHScenario();
 		creator.init();
 		creator.run();
 		log.info("Creation finished -----------------------------------------");
 	}
+	// ====================================================================================
 	// ====================================================================================
 	// read in network, facilities and plans into scenario
 	private void init() {
@@ -103,4 +113,18 @@ public class CreateNewZHScenario {
 	private void write() {
 		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).write(path + "plans.xml");
 	}
+	public static void readPathsFile(String currentDir, String pathsfile) {
+    	
+		Config config = new Config();
+    	MatsimConfigReader matsimConfigReader = new MatsimConfigReader(config);
+    	matsimConfigReader.readFile(currentDir+"pathsfile");   	
+		
+		outputFolder = currentDir + config.getParam("pathsettings", "outputFolder");
+		path = currentDir;
+		networkfilePath = currentDir + config.getParam("pathsettings", "networkfilePath");
+		facilitiesfilePath = currentDir + config.getParam("pathsettings", "facilitiesfilePath");
+		plansV2filePath = currentDir + config.getParam("pathsettings", "plansV2filePath");
+		crossBorderFacilitiesFilePath = currentDir + config.getParam("pathsettings", "crossBorderFacilitiesFilePath");
+		crossBorderPlansFilePath = currentDir + config.getParam("pathsettings", "crossBorderPlansFilePath");
+    }
 }
