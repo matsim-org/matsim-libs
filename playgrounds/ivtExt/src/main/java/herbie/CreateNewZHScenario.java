@@ -32,52 +32,80 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 
 public class CreateNewZHScenario {
-	
-	// Satawal
-//	private static String currentDir = "/Network/Servers/pingelap/Volumes/ivt-shared/Groups/ivt/vpl/projekt/matsim/";
-	// desktop 
-	private static String currentDir = "//pingelap/matsim/";
-	
+	private String currentDir = "//pingelap/matsim/";
 	private final static Logger log = Logger.getLogger(CreateNewZHScenario.class);
 	private ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-	private static String path;
-	public static String outputFolder;
-	private static String networkfilePath;
-	private static String facilitiesfilePath;
-	private static String plansV2filePath;
+	private String outputFolder;
+	private String networkfilePath;
+	private String facilitiesfilePath;
+	private String plansV2filePath;
 	
 	// cross-border
-	private static String crossBorderFacilitiesFilePath;
-	private static String crossBorderPlansFilePath;
+	private String crossBorderPlansFilePath;
+	
+	//freight zh
+	private String freightPlansFilePath0;
+	private String freightPlansFilePath1;
+	private String freightFacilitiesFilePath0;
+	private String freightFacilitiesFilePath1;
 	
 	// ====================================================================================
 	public static void main(final String[] args) {
-		readPathsFile(currentDir, "herbie/configs/paths-config.xml");
-				
+		if (args.length != 1) {
+			log.error("Please specify a running location! Either 'l' (locally) or 'r' (remotely)");
+			return;
+		}				
 		CreateNewZHScenario creator = new CreateNewZHScenario();
 		creator.init();
-		creator.run();
+		creator.run(args[0]);
 		log.info("Creation finished -----------------------------------------");
 	}
+	
 	// ====================================================================================
-	// ====================================================================================
-	// read in network, facilities and plans into scenario
-	private void init() {
-		new MatsimNetworkReader(scenario).readFile(networkfilePath);
-		new FacilitiesReaderMatsimV1(scenario).readFile(facilitiesfilePath);
-		MatsimPopulationReader populationReader = new MatsimPopulationReader(this.scenario);
-		populationReader.readFile(plansV2filePath);
-	}
-	// ====================================================================================
-	private void run() {
+	private void run(String runningLocation) {
+		if (runningLocation.equals("l")) {
+			this.currentDir = "//pingelap/matsim/";
+		}
+		else {
+			this.currentDir = "/Network/Servers/pingelap/Volumes/ivt-shared/Groups/ivt/vpl/projekt/matsim/";
+		}
 		this.init();
 		this.addCrossBorderTraffic();
 		this.addFreightTraffic();
 		this.cutZhRegion();
 		this.samplePlans(100.0);
+		this.assignPlans2Networks();
 		this.write();
 	}
 	
+	// ====================================================================================
+	// read in network, facilities and plans into scenario
+	private void init() {
+		this.readPathsFile(currentDir, "herbie/configs/paths-config.xml");
+		new MatsimNetworkReader(scenario).readFile(networkfilePath);
+		new FacilitiesReaderMatsimV1(scenario).readFile(facilitiesfilePath);
+		MatsimPopulationReader populationReader = new MatsimPopulationReader(this.scenario);
+		populationReader.readFile(plansV2filePath);
+	}
+	
+	private void readPathsFile(String currentDir, String pathsfile) {
+		Config config = new Config();
+    	MatsimConfigReader matsimConfigReader = new MatsimConfigReader(config);
+    	matsimConfigReader.readFile(currentDir + pathsfile);   	
+		
+		this.outputFolder = currentDir + config.getParam("pathsettings", "outputFolder");
+		this.networkfilePath = currentDir + config.getParam("pathsettings", "networkfilePath");
+		this.facilitiesfilePath = currentDir + config.getParam("pathsettings", "facilitiesfilePath");
+		this.plansV2filePath = currentDir + config.getParam("pathsettings", "plansV2filePath");
+		this.crossBorderPlansFilePath = currentDir + config.getParam("pathsettings", "crossBorderPlansFilePath");
+		
+		this.freightPlansFilePath0 = currentDir + config.getParam("pathsettings", "freightPlansFilePath0");
+		this.freightPlansFilePath1 = currentDir + config.getParam("pathsettings", "freightPlansFilePath1");
+		this.freightFacilitiesFilePath0 = currentDir + config.getParam("pathsettings", "freightFacilitiesFilePath0");
+		this.freightFacilitiesFilePath1 = currentDir + config.getParam("pathsettings", "freightFacilitiesFilePath1");
+    }
+	
+	// ====================================================================================
 	// read cross-border plans and add them to the scenario
 	// the cross border facilities are already integrated in the facilities
 	private void addCrossBorderTraffic() {
@@ -85,7 +113,6 @@ public class CreateNewZHScenario {
 				ConfigUtils.createConfig());
 		
 		new MatsimNetworkReader(sTmp).readFile(networkfilePath);
-		new FacilitiesReaderMatsimV1(sTmp).readFile(crossBorderFacilitiesFilePath);
 		MatsimPopulationReader populationReader = new MatsimPopulationReader(sTmp);
 		populationReader.readFile(crossBorderPlansFilePath);
 		
@@ -99,32 +126,21 @@ public class CreateNewZHScenario {
 		this.redistributeFreightFacilities();
 	}
 	
+	private void assignPlans2Networks() {	
+	}
+	
 	private void samplePlans(double percent) {	
 	}
 	
 	private void cutZhRegion() {	
 	}
 	
-	// find all links in zone
-	// randomly assign facilities
+	// find all facilities in the respective (OD-)zone
+	// assign facilities according to capacities and facility type (e.g., shops versus home)
 	private void redistributeFreightFacilities() {	
 	}
 	
 	private void write() {
-		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).write(path + "plans.xml");
-	}
-	public static void readPathsFile(String currentDir, String pathsfile) {
-    	
-		Config config = new Config();
-    	MatsimConfigReader matsimConfigReader = new MatsimConfigReader(config);
-    	matsimConfigReader.readFile(currentDir+"pathsfile");   	
-		
-		outputFolder = currentDir + config.getParam("pathsettings", "outputFolder");
-		path = currentDir;
-		networkfilePath = currentDir + config.getParam("pathsettings", "networkfilePath");
-		facilitiesfilePath = currentDir + config.getParam("pathsettings", "facilitiesfilePath");
-		plansV2filePath = currentDir + config.getParam("pathsettings", "plansV2filePath");
-		crossBorderFacilitiesFilePath = currentDir + config.getParam("pathsettings", "crossBorderFacilitiesFilePath");
-		crossBorderPlansFilePath = currentDir + config.getParam("pathsettings", "crossBorderPlansFilePath");
-    }
+		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).write(this.outputFolder + "plans.xml");
+	}	
 }
