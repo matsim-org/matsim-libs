@@ -17,6 +17,10 @@ import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.annotations.XYTextAnnotation;
+import org.jfree.chart.axis.Axis;
+import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.axis.NumberTickUnit;
+import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.title.TextTitle;
@@ -132,7 +136,11 @@ public class DecentralizedV1G {
 			
 			if(playground.wrashid.sschieffer.V1G.Main.vehicles.getValue(id).getClass().equals(
 					new PlugInHybridElectricVehicle(new IdImpl(1)).getClass())){
-				lpphev.solveLP(agentParkingAndDrivingSchedules.getValue(id));
+				lpphev.solveLP(agentParkingAndDrivingSchedules.getValue(id), id);
+				double joulesFromEngine= lpphev.getEnergyFromCombustionEngine();
+				
+				playground.wrashid.sschieffer.V1G.Main.EMISSIONCOUNTER= joulesToEmissionInKg(joulesFromEngine);
+				
 				
 				
 			}else{
@@ -142,9 +150,15 @@ public class DecentralizedV1G {
 					agentParkingAndDrivingSchedules.put(id, 
 							lpev.solveLP(agentParkingAndDrivingSchedules.getValue(id), id));
 					
+					
+					
 				}else{
 					lpcombustion.updateSchedule(agentParkingAndDrivingSchedules.getValue(id));
-					//TODO
+					
+					// get entire driving Joules and transform to emissions
+					playground.wrashid.sschieffer.V1G.Main.EMISSIONCOUNTER= 
+						joulesToEmissionInKg(lpcombustion.getDrivingConsumption());
+					
 				}
 			}
 		}	
@@ -159,8 +173,9 @@ public class DecentralizedV1G {
 	 * @throws FunctionEvaluationException 
 	 * @throws MaxIterationsExceededException 
 	 * @throws IOException 
+	 * @throws OptimizationException 
 	 */
-	public void assignChargingTimes() throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException, IOException{
+	public void assignChargingTimes() throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException, IOException, OptimizationException{
 		
 				
 		for (Id id : controler.getPopulation().getPersons().keySet()){
@@ -169,12 +184,12 @@ public class DecentralizedV1G {
 				System.out.println("agent =2 "); 
 			}*/
 			System.out.println("Assign charging times agent "+ id.toString());
-			System.out.println("current schedule "); 
-			agentParkingAndDrivingSchedules.getValue(id).printSchedule();
+			//System.out.println("current schedule "); 
+			//agentParkingAndDrivingSchedules.getValue(id).printSchedule();
 			
 			
 			Schedule chargingSchedule=myChargingSlotDistributor.distribute(agentParkingAndDrivingSchedules.getValue(id));
-			chargingSchedule.printSchedule();
+			//chargingSchedule.printSchedule();
 			
 			agentChargingSchedules.put(id, chargingSchedule);
 			visualizeAgentChargingProfile(agentParkingAndDrivingSchedules.getValue(id), 
@@ -277,6 +292,17 @@ public class DecentralizedV1G {
         plot.addAnnotation(txt3);
         plot.addAnnotation(txt4);
         
+        
+        NumberAxis xAxis = (NumberAxis) plot.getDomainAxis();
+        xAxis.setTickUnit(new NumberTickUnit(3600));
+        xAxis.setRange(0, playground.wrashid.sschieffer.V1G.Main.SECONDSPERDAY);
+        
+        
+        NumberAxis yAxis = (NumberAxis) plot.getRangeAxis();
+        yAxis.setRange(0, 5);
+        yAxis.setTickUnit(new NumberTickUnit(1));
+        yAxis.setVisible(false);
+        
         int numSeries=dailySchedule.getNumberOfEntries()+chargingSchedule.getNumberOfEntries();
         
         for(int j=0; j<numSeries; j++){
@@ -343,6 +369,13 @@ public class DecentralizedV1G {
 		
 		final XYPlot plot = chart.getXYPlot();
         plot.setDrawingSupplier(playground.wrashid.sschieffer.V1G.Main.supplier);
+        
+        NumberAxis xAxis = (NumberAxis) plot.getDomainAxis();
+        xAxis.setTickUnit(new NumberTickUnit(3600));
+        xAxis.setRange(0, playground.wrashid.sschieffer.V1G.Main.SECONDSPERDAY);
+        
+        NumberAxis yaxis = (NumberAxis) plot.getRangeAxis();
+        yaxis.setRange(0, 100);
         
         for(int j=0; j<seriesCount; j++){
         	plot.getRenderer().setSeriesPaint(j, Color.black);
@@ -434,5 +467,18 @@ public class DecentralizedV1G {
 	}
 	
 	
+	
+	public double joulesToEmissionInKg(double joules){
+		// Benzin 42,7–44,2 MJ/kg
+		double mass=1/(43*1000000)*joules; // 1kgBenzin/43MJ= xkg/joules
+		
+		
+		// für Benzin etwa 23,2 kg/10 l
+		double emission= 23.2/10*mass; // 23,2kg/10l= xx/mass   1kg=1l
+		//in kg
+		
+		
+		return emission;
+	}
 	
 }

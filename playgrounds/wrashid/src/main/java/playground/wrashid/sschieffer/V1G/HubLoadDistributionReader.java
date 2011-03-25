@@ -86,7 +86,7 @@ public class HubLoadDistributionReader {
 		Schedule bullShitSchedule= new Schedule();
 		
 		double[] bullshitCoeffs = new double[]{100, 5789, 56};// 
-		double[] bullshitCoeffs2 = new double[]{-22, 44.6, -32.5};
+		double[] bullshitCoeffs2 = new double[]{-22, 5.6, -2.5};
 		
 		PolynomialFunction bullShitFunc= new PolynomialFunction(bullshitCoeffs);
 		PolynomialFunction bullShitFunc2= new PolynomialFunction(bullshitCoeffs2);

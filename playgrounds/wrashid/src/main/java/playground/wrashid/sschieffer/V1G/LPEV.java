@@ -92,6 +92,7 @@ public class LPEV {
 		this.schedule=schedule;
 		personId=id;
 		ElectricVehicle thisEV= (ElectricVehicle)playground.wrashid.sschieffer.V1G.Main.vehicles.getValue(id);
+		//double batterySize=thisEV.getBatterySizeInJoule();
 		
 		double batterySize=24*1000*3600;//thisEV.getBatterySizeInJoule();
 		double batteryMin=0.1;//thisEV.getBatteryMinThresholdInJoule();
@@ -152,7 +153,8 @@ public class LPEV {
 	 * @throws LpSolveException
 	 */
 	public void setObjectiveFunction() throws LpSolveException{
-		String objectiveStr="0 ";// first entry for SOC
+		String objectiveStr="-1 ";// first entry for SOC, maximize starting SOC. minimize -(SOC)
+		
 		
 		// peakTimes 1 else 0 
 		
@@ -195,7 +197,8 @@ public class LPEV {
 	public double calculateWeightOptimal(ParkingInterval thisParkingInterval){
 		// want to maximize charging in this time. thus need to minimize the negative of the weight
 		
-		return -100*(thisParkingInterval.getJoulesInInterval()/schedule.totalJoulesInOptimalParkingTimes);
+		return (-1 )* thisParkingInterval.getJoulesInInterval()/schedule.totalJoulesInOptimalParkingTimes;
+		//return (-1 )*Math.pow(1.1, (10*thisParkingInterval.getJoulesInInterval()/schedule.totalJoulesInOptimalParkingTimes));
 	}
 	
 	
@@ -204,7 +207,9 @@ public class LPEV {
 	public double calculateWeightSubOptimal(ParkingInterval thisParkingInterval){
 		// TODO or to think... add constant term or not?
 		// negative joules/negative total = positive
-		return ( thisParkingInterval.getJoulesInInterval()/schedule.totalJoulesInSubOptimalParkingTimes);
+		
+		return thisParkingInterval.getJoulesInInterval()/schedule.totalJoulesInSubOptimalParkingTimes;
+		//return Math.pow(1.1, 10*thisParkingInterval.getJoulesInInterval()/schedule.totalJoulesInSubOptimalParkingTimes) ;
 	}
 	
 	

@@ -20,6 +20,8 @@
 
 package playground.wrashid.sschieffer.V1G;
 
+import lpsolve.LpSolveException;
+
 
 public class LPCombustion {
 
@@ -28,14 +30,35 @@ public class LPCombustion {
 		
 	}
 	
-	public Schedule updateSchedule(Schedule schedule){
+	
+	public Schedule updateSchedule(Schedule schedule) throws LpSolveException{
 		this.schedule=schedule;
-		//inititae
-		//solve
-		//update schedules
 		
+		for(int i=0; i<schedule.getNumberOfEntries(); i++){
+			if(schedule.timesInSchedule.get(i).isParking()){
+				((ParkingInterval)schedule.timesInSchedule.get(i)).setRequiredChargingDuration(0);
+				
+			}
+		
+		}
 		
 		return schedule;
 	}
+	
+	
+	
+	public double getDrivingConsumption(){
+		double consumption=0;
+		
+		for(int i=0; i<schedule.getNumberOfEntries(); i++){
+			if(schedule.timesInSchedule.get(i).isDriving()){
+				consumption+=((DrivingInterval)schedule.timesInSchedule.get(i)).getConsumption();
+			}
+		
+		}
+		return consumption;
+	}
+	
+	
 	
 }

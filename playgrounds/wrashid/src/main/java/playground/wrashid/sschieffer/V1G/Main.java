@@ -91,11 +91,13 @@ public class Main {
 	
 	final public static double MINCHARGINGLENGTH=5*SECONDSPERMIN;
 	
-	final public static double EMISSIONCOUNTER=0.0;
+	public static double EMISSIONCOUNTER=0.0;
 	
 	public static LinkedListValueHashMap<Id, Vehicle> vehicles;
 	public static ParkingTimesPlugin parkingTimesPlugin;
 	public static EnergyConsumptionPlugin energyConsumptionPlugin;
+	
+	public static DecentralizedV1G myDecentralizedV1G;
 	
 	final public static DrawingSupplier supplier = new DefaultDrawingSupplier();
 	
@@ -122,17 +124,50 @@ public class Main {
 			
 			@Override
 			public void notifyIterationEnds(IterationEndsEvent event) {
-				DecentralizedV1G myDecentralizedV1G;
+				
 				try {
 					
 					myDecentralizedV1G = new DecentralizedV1G(event.getControler());
+					long globalTime = System.currentTimeMillis();
 					
 					myDecentralizedV1G.getAgentSchedules();
+					long globalTimeSchedules = System.currentTimeMillis();
+					
 					myDecentralizedV1G.findRequiredChargingTimes();
+					long globalTimeLP = System.currentTimeMillis();
+					
 					myDecentralizedV1G.assignChargingTimes();
+					long globalTimeDistribution = System.currentTimeMillis();
+					
 					myDecentralizedV1G.validateChargingDistribution();
+					long globalTimeValidation = System.currentTimeMillis();
+					
+					System.out.println("");
+					System.out.println("***************************");
+					System.out.println("Time requirements:");
+					System.out.println("");
+					
+					long thisTime= globalTimeSchedules-globalTime;
+					System.out.println("read and sort agent schedules: \t" + thisTime);
+					
+					thisTime= globalTimeLP-globalTimeSchedules;
+					System.out.println("LP: \t" + thisTime);
+					
+					thisTime= globalTimeDistribution-globalTimeLP;
+					System.out.println("distribute randomly: \t" + thisTime);
+					
+					thisTime= globalTimeValidation-globalTimeDistribution;
+					System.out.println("validate: \t" + thisTime);
+					
+					thisTime= globalTimeValidation-globalTime;
+					System.out.println("total Time [ms]: \t" + thisTime);
+					
+					
+					System.out.println("***************************");
+					
 					
 				} catch (Exception e1) {
+					
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}

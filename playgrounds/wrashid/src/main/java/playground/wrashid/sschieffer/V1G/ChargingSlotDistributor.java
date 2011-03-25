@@ -23,6 +23,7 @@ import java.util.LinkedList;
 import org.apache.commons.math.FunctionEvaluationException;
 import org.apache.commons.math.MaxIterationsExceededException;
 import org.apache.commons.math.analysis.polynomials.PolynomialFunction;
+import org.apache.commons.math.optimization.OptimizationException;
 
 
 public class ChargingSlotDistributor {
@@ -34,7 +35,7 @@ public class ChargingSlotDistributor {
 	
 	
 	
-	Schedule distribute(Schedule schedule) throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
+	Schedule distribute(Schedule schedule) throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException, OptimizationException{
 		Schedule chargingScheduleAgent = new Schedule();
 		
 		for (int i=0; i<schedule.getNumberOfEntries(); i++){
@@ -86,7 +87,7 @@ public class ChargingSlotDistributor {
 			double joulesInInterval, 
 			double startTime, 
 			double endTime, 
-			double chargingTime) throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
+			double chargingTime) throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException, OptimizationException{
 		//
 		Schedule chargingInParkingInterval = new Schedule();
 		int intervals=(int) Math.ceil(chargingTime/Main.MINCHARGINGLENGTH);
@@ -103,13 +104,15 @@ public class ChargingSlotDistributor {
 				bit=chargingTime- (intervals-1)*Main.MINCHARGINGLENGTH;
 				
 			}
+				
+				chargingInParkingInterval=assignRandomChargingSlotInChargingInterval(func, 
+						startTime, 
+						endTime, 
+						joulesInInterval, 
+						bit, 
+						chargingInParkingInterval);
 			
-			chargingInParkingInterval=assignRandomChargingSlotForMinChargingInterval(func, 
-					startTime, 
-					endTime, 
-					joulesInInterval, 
-					bit, 
-					chargingInParkingInterval);
+			
 			
 		}
 		
@@ -119,12 +122,29 @@ public class ChargingSlotDistributor {
 	
 	
 	
-	public Schedule assignRandomChargingSlotForMinChargingInterval(PolynomialFunction func, 
+	/**
+	 * makes random number RN
+	 * finds a time in interval that corresponds to RN according to available free slot distribution
+	 * creates a charging slot and saves it in charging schedule, if it does not overlap with already existing charging times
+	 * 
+	 * @param func
+	 * @param startTime
+	 * @param endTime
+	 * @param joulesInInterval
+	 * @param bit
+	 * @param chargingInParkingInterval
+	 * @return
+	 * @throws MaxIterationsExceededException
+	 * @throws FunctionEvaluationException
+	 * @throws IllegalArgumentException
+	 * @throws OptimizationException
+	 */
+	public Schedule assignRandomChargingSlotInChargingInterval(PolynomialFunction func, 
 			double startTime, 
 			double endTime, 
 			double joulesInInterval, 
 			double bit, 
-			Schedule chargingInParkingInterval) throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
+			Schedule chargingInParkingInterval) throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException, OptimizationException{
 		// random and test
 		
 		boolean notFound=true;
@@ -146,24 +166,53 @@ public class ChargingSlotDistributor {
 			lower=startTime;
 			trial=(upper+lower)/2;
 			
-			double rand=Math.random()*joulesInInterval;
+			double rand=Math.random();
+			//double rand=Math.random()*joulesInInterval;
 			
 			while(run){
-				
-				double integral=playground.wrashid.sschieffer.V1G.Main.functionIntegrator.integrate(func, startTime, trial);
-				
-				if(integral<rand){
-					lower=trial;					
-					trial=(upper+lower)/2;
+				double integral;
+				if(joulesInInterval>=0){
+					integral=playground.wrashid.sschieffer.V1G.Main.functionIntegrator.integrate(func, startTime, trial);
+					
+					if(integral<rand*joulesInInterval){
+						lower=trial;					
+						trial=(upper+lower)/2;
+						
+					}else{
+						upper=trial;
+						trial=(upper+lower)/2;
+					}
+					
+					if(Math.abs(integral-rand*joulesInInterval)<=err){
+						run=false;
+					}
 					
 				}else{
-					upper=trial;
-					trial=(upper+lower)/2;
+					PolynomialFunction funcSubOpt= turnSubOptimalSlotDistributionIntoProbDensityOfFindingAvailableSlot(func, startTime, endTime);
+					
+					integral=playground.wrashid.sschieffer.V1G.Main.functionIntegrator.integrate(
+							funcSubOpt, 
+							startTime, 
+							trial);
+					
+					double fullSubOptIntegral= playground.wrashid.sschieffer.V1G.Main.functionIntegrator.integrate(
+							funcSubOpt, startTime, endTime);
+					
+					if(integral<rand*fullSubOptIntegral){
+						lower=trial;					
+						trial=(upper+lower)/2;
+						
+					}else{
+						upper=trial;
+						trial=(upper+lower)/2;
+					}
+					
+					if(Math.abs(integral-rand*fullSubOptIntegral)<=err){
+						run=false;
+					}
+					
 				}
 				
-				if(Math.abs(integral-rand)<=err){
-					run=false;
-				}
 			}
 			
 			ChargingInterval c1;
@@ -181,7 +230,7 @@ public class ChargingSlotDistributor {
 				chargingInParkingInterval.addTimeInterval(c1);
 				//System.out.println("assign next ");
 			}else{
-				System.out.println("overlap agent .. redo");
+				//System.out.println("overlap agent .. redo");
 				
 			}
 			//otherwise notFOund remains true and it runs again
@@ -189,6 +238,26 @@ public class ChargingSlotDistributor {
 		}
 		
 		return chargingInParkingInterval;
+		
+	}
+	
+	
+	
+	public PolynomialFunction turnSubOptimalSlotDistributionIntoProbDensityOfFindingAvailableSlot(PolynomialFunction func, double start1, double end1) throws OptimizationException{
+		
+		double start= Math.floor(start1);
+		double end= Math.ceil(end1);
+		int steps= ((int) end)-((int)start);
+		
+		double [][] newFunc= new double[steps][2];
+		
+		for(int i=0; i<steps; i++){
+			newFunc[i][0]=start+i;
+			newFunc[i][1]=(-1)/func.value(start+i);
+		}
+		
+		return Main.myDecentralizedV1G.myHubLoadReader.fitCurve(newFunc);
+		
 		
 	}
 	
