@@ -268,6 +268,13 @@ public class ReadFromUrbansimParcelModel {
 									+ " workp_prcl_id: " + workParcelId + Gbl.ONLYONCE ) ;
 						}
 						flag = true ; // WHY?
+						// can't remember.  The way this reads to me is that this is set to true if a working person is encountered
+						// that does not have a workplace.  Because it does not have a workplace, we discard it.  If this happens
+						// with too many persons, we end up having much less than our target sample size.  With the seattle_parcel
+						// this was a problem since this happened routinely with all persons having their workplaces outside the
+						// (reduced) simulation area ... i.e., it happened A LOT.  So I guess that this flag compensates
+						// for that situation.  kai, mar'11
+
 						continue ;
 					}
 					// complete agent plan
