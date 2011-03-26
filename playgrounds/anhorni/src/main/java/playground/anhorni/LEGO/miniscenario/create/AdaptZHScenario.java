@@ -101,14 +101,14 @@ public class AdaptZHScenario {
 		this.addfacilities2Plans();
 		
 		log.info("Computing max epsilon ... for " + this.scenario.getPopulation().getPersons().size() + " persons");
-		ComputeMaxEpsilons maxEpsilonComputer = new ComputeMaxEpsilons(10, this.scenario, "s", config);
+		ComputeMaxEpsilons maxEpsilonComputer = new ComputeMaxEpsilons(10, this.scenario, "s", config, this.seed);
 		maxEpsilonComputer.prepareReplanning();
 		for (Person p : this.scenario.getPopulation().getPersons().values()) {
 			maxEpsilonComputer.handlePlan(p.getSelectedPlan());
 		}
 		maxEpsilonComputer.finishReplanning();
 		
-		maxEpsilonComputer = new ComputeMaxEpsilons(10, this.scenario, "l", config);
+		maxEpsilonComputer = new ComputeMaxEpsilons(10, this.scenario, "l", config, this.seed);
 		maxEpsilonComputer.prepareReplanning();
 		for (Person p : this.scenario.getPopulation().getPersons().values()) {
 			maxEpsilonComputer.handlePlan(p.getSelectedPlan());

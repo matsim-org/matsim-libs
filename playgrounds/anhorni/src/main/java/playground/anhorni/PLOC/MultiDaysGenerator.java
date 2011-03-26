@@ -33,6 +33,8 @@ public class MultiDaysGenerator {
 	private NetworkImpl network;
 	private boolean temporalVar;
 	
+	private final String LCEXP = "locationchoiceExperimental";
+	
 	public MultiDaysGenerator(Random randomNumberGenerator, PopulationImpl staticPopulation, ScenarioImpl scenarioWriteOut, 
 			NetworkImpl network, boolean temporalVar, ObjectAttributes personAttributes) {
 		this.randomNumberGenerator = randomNumberGenerator;
@@ -103,14 +105,16 @@ public class MultiDaysGenerator {
 		HandleUnobservedHeterogeneity hhandler = new HandleUnobservedHeterogeneity(this.scenarioWriteOut, config, rnd);
 		hhandler.assign(); 
 			
-		ComputeMaxEpsilons maxEpsilonComputer = new ComputeMaxEpsilons(10, scenarioWriteOut, "s", config);
+		ComputeMaxEpsilons maxEpsilonComputer = new ComputeMaxEpsilons(10, scenarioWriteOut, "s", config,
+				Long.parseLong(config.findParam(LCEXP, "randomSeed")));
 		maxEpsilonComputer.prepareReplanning();
 		for (Person p : this.scenarioWriteOut.getPopulation().getPersons().values()) {
 			maxEpsilonComputer.handlePlan(p.getSelectedPlan());
 		}
 		maxEpsilonComputer.finishReplanning();
 		
-		maxEpsilonComputer = new ComputeMaxEpsilons(10, scenarioWriteOut, "l", config);
+		maxEpsilonComputer = new ComputeMaxEpsilons(10, scenarioWriteOut, "l", config,
+				Long.parseLong(config.findParam(LCEXP, "randomSeed")));
 		maxEpsilonComputer.prepareReplanning();
 		for (Person p : this.scenarioWriteOut.getPopulation().getPersons().values()) {
 			maxEpsilonComputer.handlePlan(p.getSelectedPlan());
