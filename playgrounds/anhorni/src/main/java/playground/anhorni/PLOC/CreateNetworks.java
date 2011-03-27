@@ -35,7 +35,7 @@ public class CreateNetworks {
 		String networkfilePath = configReader.getPath() + "/input/PLOC/3towns/network.xml";
 		new MatsimNetworkReader(scenario).readFile(networkfilePath);
 		
-		this.scaleNetwork(populationSize / 10.0);
+		this.scaleNetwork(populationSize / 5.0);
 		this.write(populationSize, sup);	
 	}
 	
