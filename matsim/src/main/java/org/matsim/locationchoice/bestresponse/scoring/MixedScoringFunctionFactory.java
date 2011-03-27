@@ -31,7 +31,6 @@ import org.matsim.core.scoring.charyparNagel.LegScoringFunction;
 
 
 public class MixedScoringFunctionFactory extends org.matsim.core.scoring.charyparNagel.CharyparNagelScoringFunctionFactory {
-	private MixedActivityScoringFunction scoringFunction = null;
 	private final Controler controler;
 
 	public MixedScoringFunctionFactory(PlanCalcScoreConfigGroup config, Controler controler) {
@@ -42,10 +41,10 @@ public class MixedScoringFunctionFactory extends org.matsim.core.scoring.charypa
 	public ScoringFunction createNewScoringFunction(Plan plan) {		
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 		
-		this.scoringFunction = new MixedActivityScoringFunction((PlanImpl)plan, super.getParams(), this.controler.getFacilities(), 
+		MixedActivityScoringFunction scoringFunction = new MixedActivityScoringFunction((PlanImpl)plan, super.getParams(), this.controler.getFacilities(), 
 				MatsimRandom.getLocalInstance(), this.controler.getFacilityPenalties(), this.controler.getConfig());
 		
-		scoringFunctionAccumulator.addScoringFunction(this.scoringFunction);
+		scoringFunctionAccumulator.addScoringFunction(scoringFunction);
 		scoringFunctionAccumulator.addScoringFunction(new LegScoringFunction(plan, super.getParams()));
 		scoringFunctionAccumulator.addScoringFunction(new AgentStuckScoringFunction(super.getParams()));
 		return scoringFunctionAccumulator;
