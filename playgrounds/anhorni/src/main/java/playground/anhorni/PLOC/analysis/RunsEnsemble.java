@@ -5,12 +5,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Vector;
 
+import playground.anhorni.PLOC.MultiplerunsControler;
+
 public class RunsEnsemble {
 	
 	private int id = -1;
 	private String outpath;
 	private int numberOfLocations = -1;
-	private int shoppingFacilities[] = {1, 2, 5, 6, 7};
 	
 	private Vector<Run> randomRuns = new Vector<Run>();
 	
@@ -49,7 +50,7 @@ public class RunsEnsemble {
 	
 	public void write() throws IOException {			
 		for (int facIndex = 0; facIndex < this.numberOfLocations; facIndex++) {
-			RunsEnsembleBoxPlot boxPlot = new RunsEnsembleBoxPlot("Facility " + shoppingFacilities[facIndex] + ": " + this.randomRuns.size() + " Runs");				
+			RunsEnsembleBoxPlot boxPlot = new RunsEnsembleBoxPlot("Facility " + MultiplerunsControler.shoppingFacilities[facIndex] + ": " + this.randomRuns.size() + " Runs");				
 			for (int hour = 0; hour < 24; hour++) {
 				ArrayList<Double> expenditures = new ArrayList<Double>();
 				int runIndex = 0;
@@ -59,10 +60,11 @@ public class RunsEnsemble {
 				}
 				boxPlot.addHourlySeries(expenditures, hour);
 			}
-			String outputFolder = this.outpath + "/facility" + shoppingFacilities[facIndex];
+			String outputFolder = this.outpath + "/facility" + MultiplerunsControler.shoppingFacilities[facIndex];
 			new File(outputFolder).mkdirs();
 			boxPlot.createChart();
-			boxPlot.saveAsPng(this.outpath + "/facility" + shoppingFacilities[facIndex] + "/SingleEnsemble_facility" + shoppingFacilities[facIndex] + ".png", 1000, 500);
+			boxPlot.saveAsPng(this.outpath + "/facility" + MultiplerunsControler.shoppingFacilities[facIndex] + "/SingleEnsemble_facility" + 
+					MultiplerunsControler.shoppingFacilities[facIndex] + ".png", 1000, 500);
 		}
     }
 }

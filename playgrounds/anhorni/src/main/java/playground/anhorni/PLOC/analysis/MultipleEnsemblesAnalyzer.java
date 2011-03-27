@@ -29,6 +29,7 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 
 import playground.anhorni.PLOC.ConfigReader;
+import playground.anhorni.PLOC.MultiplerunsControler;
 
 public class MultipleEnsemblesAnalyzer {
 	private final static Logger log = Logger.getLogger(MultipleEnsemblesAnalyzer.class);
@@ -36,8 +37,6 @@ public class MultipleEnsemblesAnalyzer {
 	private  Random rnd = new Random(109876L);
 	private ConfigReader myConfigReader = null;
 	private String outpath;
-	
-	private int shoppingFacilities[] = {1, 2, 5, 6, 7};
 	private Vector<Run> runs;
 			
 	public MultipleEnsemblesAnalyzer(String outpath, Vector<Run> runs) {
@@ -59,7 +58,7 @@ public class MultipleEnsemblesAnalyzer {
 				 Vector<RunsEnsemble> runsEnsembles = new Vector<RunsEnsemble>();
 				 for (int i = 0; i < numberOfEnsembles; i++) {
 					 Collections.shuffle(runs, rnd);
-					 RunsEnsemble runsEnsemble = new RunsEnsemble(0, "", shoppingFacilities.length);
+					 RunsEnsemble runsEnsemble = new RunsEnsemble(0, "", MultiplerunsControler.shoppingFacilities.length);
 					 for (int k = 0; k <= ensembleSize; k++) {
 						 runsEnsemble.addRandomRun(runs.get(k));
 					 }
@@ -74,8 +73,8 @@ public class MultipleEnsemblesAnalyzer {
 	 
 	private void printHourlyAnalysis(TreeMap<Integer, Vector<RunsEnsemble>> runsEnsemblesPerSize, int hour) {
 		
-		for (int facIndex = 0; facIndex < shoppingFacilities.length; facIndex++) {
-			MultipleEnsemblesBoxPlot boxPlot = new MultipleEnsemblesBoxPlot("Facility " + shoppingFacilities[facIndex] + 
+		for (int facIndex = 0; facIndex < MultiplerunsControler.shoppingFacilities.length; facIndex++) {
+			MultipleEnsemblesBoxPlot boxPlot = new MultipleEnsemblesBoxPlot("Facility " + MultiplerunsControler.shoppingFacilities[facIndex] + 
 					" hour " + hour + ": " + numberOfEnsembles + " Ensembles");
 			for (int i = 0; i < runsEnsemblesPerSize.values().size(); i++) {
 				ArrayList<Double> averageExpenditures = new ArrayList<Double>();
@@ -85,8 +84,8 @@ public class MultipleEnsemblesAnalyzer {
 				}
 			}
 			boxPlot.createChart();
-			boxPlot.saveAsPng(this.outpath + "/output/PLOC/3towns/facility" + shoppingFacilities[facIndex] + 
-					"/multipleEnsembles_facility" + shoppingFacilities[facIndex] + "_hour" + hour + ".png", 1000, 500);
+			boxPlot.saveAsPng(this.outpath + "/output/PLOC/3towns/facility" + MultiplerunsControler.shoppingFacilities[facIndex] + 
+					"/multipleEnsembles_facility" + MultiplerunsControler.shoppingFacilities[facIndex] + "_hour" + hour + ".png", 1000, 500);
 		}
 	}	
 	
