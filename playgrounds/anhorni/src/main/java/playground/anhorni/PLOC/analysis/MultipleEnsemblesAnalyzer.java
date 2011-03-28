@@ -20,6 +20,10 @@
 
 package playground.anhorni.PLOC.analysis;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
@@ -52,14 +56,14 @@ public class MultipleEnsemblesAnalyzer {
 	}
 	
 	 public void run() {
-		 for (int hour = 12; hour < 20; hour++) {
+		 for (int hour = 9; hour < 20; hour++) {
 			 TreeMap<Integer, Vector<RunsEnsemble>> runsEnsemblesPerSize = new TreeMap<Integer, Vector<RunsEnsemble>>();
-			 for (int ensembleSize = 0; ensembleSize < runs.size(); ensembleSize++) {
+			 for (int ensembleSize = 1; ensembleSize <= runs.size(); ensembleSize++) {
 				 Vector<RunsEnsemble> runsEnsembles = new Vector<RunsEnsemble>();
 				 for (int i = 0; i < numberOfEnsembles; i++) {
 					 Collections.shuffle(runs, rnd);
-					 RunsEnsemble runsEnsemble = new RunsEnsemble(0, "", MultiplerunsControler.shoppingFacilities.length);
-					 for (int k = 0; k <= ensembleSize; k++) {
+					 RunsEnsemble runsEnsemble = new RunsEnsemble(0, "");
+					 for (int k = 0; k < ensembleSize; k++) {
 						 runsEnsemble.addRandomRun(runs.get(k));
 					 }
 					 runsEnsembles.add(runsEnsemble);
@@ -67,25 +71,39 @@ public class MultipleEnsemblesAnalyzer {
 				 runsEnsemblesPerSize.put(ensembleSize, runsEnsembles);
 			 }
 			 log.info("Writting multiple ensembles hour = " + hour);
-			 this.printHourlyAnalysis(runsEnsemblesPerSize, hour);
+			 try {
+				this.printHourlyAnalysis(runsEnsemblesPerSize, hour);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		 }
 	}
 	 
-	private void printHourlyAnalysis(TreeMap<Integer, Vector<RunsEnsemble>> runsEnsemblesPerSize, int hour) {
+	private void printHourlyAnalysis(TreeMap<Integer, Vector<RunsEnsemble>> runsEnsemblesPerSize, int hour) throws IOException {
+		DecimalFormat formatter = new DecimalFormat("0.00");
 		
 		for (int facIndex = 0; facIndex < MultiplerunsControler.shoppingFacilities.length; facIndex++) {
 			MultipleEnsemblesBoxPlot boxPlot = new MultipleEnsemblesBoxPlot("Facility " + MultiplerunsControler.shoppingFacilities[facIndex] + 
 					" hour " + hour + ": " + numberOfEnsembles + " Ensembles");
-			for (int i = 0; i < runsEnsemblesPerSize.values().size(); i++) {
+			BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(this.outpath + "/output/PLOC/3towns/facility" + MultiplerunsControler.shoppingFacilities[facIndex] + 
+						"/multipleEnsembles_facility" + MultiplerunsControler.shoppingFacilities[facIndex] + "_hour" + hour + ".txt"));
+			
+			for (int i = 1; i <= runsEnsemblesPerSize.values().size(); i++) {
 				ArrayList<Double> averageExpenditures = new ArrayList<Double>();
 				for (RunsEnsemble runsEnsemble : runsEnsemblesPerSize.get(i)) {
-					averageExpenditures.add(runsEnsemble.getMean(facIndex, hour));
+					averageExpenditures.add(runsEnsemble.getAvgRunsDays_PerLocationPerHour(facIndex, hour));
+					
+					
+					
 					boxPlot.addSeriesPerEnsembleSize(averageExpenditures, i + 1);
 				}
 			}
 			boxPlot.createChart();
 			boxPlot.saveAsPng(this.outpath + "/output/PLOC/3towns/facility" + MultiplerunsControler.shoppingFacilities[facIndex] + 
 					"/multipleEnsembles_facility" + MultiplerunsControler.shoppingFacilities[facIndex] + "_hour" + hour + ".png", 1000, 500);
+			
+			bufferedWriter.flush();
+			bufferedWriter.close();
 		}
 	}	
 	

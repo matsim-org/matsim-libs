@@ -50,7 +50,7 @@ public class MultiplerunsControler {
     private void init() {
     	this.configReader.read();
     	this.numberOfRandomRuns = configReader.getNumberOfRandomRuns();
-    	this.summaryWriter = new SummaryWriter(path, this.numberOfRandomRuns);
+    	this.summaryWriter = new SummaryWriter(path);
     	
     	ObjectAttributesXmlReader attributesReader = new ObjectAttributesXmlReader(this.personAttributes);
 		try {
@@ -80,7 +80,7 @@ public class MultiplerunsControler {
     		}
     	}
     	log.info("Create analysis ...");   	
-    	summaryWriter.run();   	
+    	summaryWriter.run(numberOfRandomRuns);   	
     	log.info("All runs finished ******************************");
     }
 }
