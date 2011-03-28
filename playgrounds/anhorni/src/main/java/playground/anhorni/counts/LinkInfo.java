@@ -20,6 +20,10 @@ public class LinkInfo {
 		this.ids.put("navteq", linkidNavteq);
 		this.ids.put("ivtch", linkidIVTCH);
 		
+		for (int h = 0; h < 24; h++) {
+			this.yearCountVals.put(h, new Vector<Double>());
+		}
+		
 		this.removeZeroVolumes = removeZeroVolumes;
 	}
 	

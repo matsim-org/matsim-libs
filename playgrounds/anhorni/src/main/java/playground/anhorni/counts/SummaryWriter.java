@@ -25,7 +25,7 @@ public class SummaryWriter {
 		this.writeAbsoluteDifference(stations, outpath);
 		this.writeAbsolute(stations, outpath);
 		this.writeStats(stations, outpath);
-		this.writeStdDevBoxPlotsAbsolute(stations, outpath);
+		this.writeStdDevBoxPlots(stations, outpath);
 		this.writeVolumesBoxPlotsAbsolute(stations, outpath);
 	}
 	
@@ -243,7 +243,7 @@ public class SummaryWriter {
 		}
 	}
 	
-	public void writeStdDevBoxPlotsAbsolute(Stations stations, String outpath) {	
+	public void writeStdDevBoxPlots(Stations stations, String outpath) {	
 		String header = "Station\tLink\tHour 0\tHour 1 ...\n";
 		try {
 			BufferedWriter out = IOUtils.getBufferedWriter(outpath + "stdDevsAbsolute.txt");

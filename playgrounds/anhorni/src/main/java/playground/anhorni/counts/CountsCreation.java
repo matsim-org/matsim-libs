@@ -19,7 +19,6 @@ public class CountsCreation {
 	private String networkMappingFile = inpath + "/networkMapping.txt";
 	
 	private final static String dayFilter = "DIDO";
-	private final static boolean writeForSpecificArea = false;
 	private final static boolean removeOutliers = false;
 	private boolean removeZeroVolumes = true;
 	
@@ -28,13 +27,24 @@ public class CountsCreation {
 		Gbl.startMeasurement();
 		CountsCreation creator = new CountsCreation();
 		creator.run();
-		
+				
 		Gbl.printElapsedTime();
 		log.info("finished #########################################################################");
 	}
 	
+	public void run() {			
+		for (int month = 0; month <= 12; month++) {
+			Stations stations = readCounts();			
+			this.filtering(stations, month);
+			CountsCompareReader countsCompareReader = new CountsCompareReader(stations);
+			countsCompareReader.read();
+			this.writeSummary(stations, month);
+			
+			if (month == 0) this.writeCountsAndOriginalCounts(stations);
+		}	
+	}
 	
-	public void run() {
+	private Stations readCounts() {
 		CountsReaderYear reader = new CountsReaderYear();
 		reader.read(this.pathsFile);
 				
@@ -44,14 +54,19 @@ public class CountsCreation {
 				
 		NetworkMapper mapper = new NetworkMapper(this.removeZeroVolumes);
 		mapper.map(rawCounts, this.networkMappingFile);
-
+		
 		Stations stations = new Stations();
 		stations.setCountStations(mapper.getCountStations());
-
+		
+		return stations;
+	}
+	
+	private void filtering(Stations stations, int monthFilter){
 		log.info("Do the filtering ------------------");
 		TimeFilter filter = new TimeFilter();
 		filter.setDayFilter(dayFilter);
-		log.info(" 	day filter: " + dayFilter);
+		filter.setMonthFilter(monthFilter);
+		log.info(" 	day filter: " + dayFilter + " month filter: " + monthFilter);
 		
 		Iterator<CountStation> station_it = stations.getCountStations().iterator();
 		while (station_it.hasNext()) {
@@ -64,7 +79,22 @@ public class CountsCreation {
 			log.info("	Station " + station.getId() + " number of counts after filtering: " + station.getCounts().size() + " i.e. days: " + 
 					station.getCounts().size()/ 24.0);
 			log.info("	--- ");
-		}		
+		}
+	}
+	
+	private void writeSummary(Stations stations, int monthFilter) {
+		log.info("Writing the summary -------------------");
+		log.info("	Number of stations to write: " + stations.getCountStations().size());
+		SummaryWriter summaryWriter = new SummaryWriter();
+		
+		log.info(" 		write analysis for specific area: " + false);
+		summaryWriter.write(stations, outpath + "/analysis/" + monthFilter + "/", false);
+		
+		log.info(" 		write analysis for specific area: " + true);
+		summaryWriter.write(stations, outpath + "/analysis/" + monthFilter + "/specificArea/", true);
+	}
+	
+	private void writeCountsAndOriginalCounts(Stations stations) {
 		log.info("Do the converting ------------------");
 		Converter converter = new Converter();
 		converter.convert(stations.getCountStations());
@@ -75,18 +105,8 @@ public class CountsCreation {
 		writer.write(outpath + "/countsTeleatlas.xml");
 		writer = new CountsWriter(converter.getCountsNavteq());
 		writer.write(outpath + "/countsNAVTEQ.xml");
-
 		
-		// Summary:
-		CountsCompareReader countsCompareReader = new CountsCompareReader(stations);
-		countsCompareReader.read();
-		
-		log.info("Writing the summary -------------------");
-		log.info("	Number of stations to write: " + stations.getCountStations().size());
-		SummaryWriter summaryWriter = new SummaryWriter();
-		log.info(" 		write analysis for specific area: " + writeForSpecificArea);
-		summaryWriter.write(stations, outpath + "/analysis/", writeForSpecificArea);
-		
+		// ---------------------------------------------------------------------------------------
 		log.info("Writing old files  -------------------");
 		//for comparison with old files
 		Counts countsTele = new Counts();

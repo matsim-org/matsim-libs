@@ -4,11 +4,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
-import org.apache.log4j.Logger;
-
 public class Stations {
-	
-	private final static Logger log = Logger.getLogger(Stations.class);
 	List<CountStation> countStations = new Vector<CountStation>();
 
 	public List<CountStation> getCountStations() {
@@ -19,7 +15,10 @@ public class Stations {
 		this.countStations = countStations;
 	}
 	
-	
+	public void addCountStation(CountStation station) {
+		this.countStations.add(station);
+	}
+		
 	public boolean addSimValforLinkId(String networkName, String linkId, int hour, double simVal) {
 		Iterator<CountStation> station_it = this.countStations.iterator();
 		while (station_it.hasNext()) {

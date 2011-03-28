@@ -12,6 +12,7 @@ public class TimeFilter {
 	//private final static Logger log = Logger.getLogger(DateFilter.class);
 	
 	String dayFilter = "MOFRI";
+	int monthFilter = -1;
 	
 	public String getDayFilter() {
 		return dayFilter;
@@ -19,6 +20,10 @@ public class TimeFilter {
 
 	public void setDayFilter(String dayFilter) {
 		this.dayFilter = dayFilter;
+	}
+	
+	public void setMonthFilter(int monthFilter) {
+		this.monthFilter = monthFilter;
 	}
 
 	public List<RawCount> filter(List<RawCount> rawCounts) {
@@ -30,14 +35,25 @@ public class TimeFilter {
 			// filter DI-DO
 			// filter summer holidays
 			// filter public holidays
-			if (dayFilter.equals("DIDO") && this.isDIDO(rawCount) && !this.inSummerHolidays(rawCount) && !this.isPublicHoliday(rawCount)) {
-				filteredRawCounts.add(rawCount);	
+			if (dayFilter.equals("DIDO") && this.isDIDO(rawCount) ) {
+				if (!this.inSummerHolidays(rawCount)) {
+					if (!this.isPublicHoliday(rawCount)) {
+						if (monthFilter <= 0 || rawCount.month == this.monthFilter) {
+							filteredRawCounts.add(rawCount);
+						}
+					}
+				}	
 			}
 			
-			if (this.dayFilter.equals("MOFRI") && this.isMOFRI(rawCount) && !this.inSummerHolidays(rawCount) && !this.isPublicHoliday(rawCount)) {
-				filteredRawCounts.add(rawCount);	
+			if (dayFilter.equals("MOFRI") && this.isMOFRI(rawCount) ) {
+				if (!this.inSummerHolidays(rawCount)) {
+					if (!this.isPublicHoliday(rawCount)) {
+						if (monthFilter <= 0 || rawCount.month == this.monthFilter) {
+							filteredRawCounts.add(rawCount);
+						}
+					}
+				}	
 			}
-			
 		}
 		return filteredRawCounts;
 	}
