@@ -88,15 +88,18 @@ public class MultipleEnsemblesAnalyzer {
 			BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(this.outpath + "/output/PLOC/3towns/facility" + MultiplerunsControler.shoppingFacilities[facIndex] + 
 						"/multipleEnsembles_facility" + MultiplerunsControler.shoppingFacilities[facIndex] + "_hour" + hour + ".txt"));
 			
+			bufferedWriter.write("Ensemble Size\t Runs ...");
+			
 			for (int i = 1; i <= runsEnsemblesPerSize.values().size(); i++) {
 				ArrayList<Double> averageExpenditures = new ArrayList<Double>();
+				bufferedWriter.write(i + "\t");
+				
 				for (RunsEnsemble runsEnsemble : runsEnsemblesPerSize.get(i)) {
 					averageExpenditures.add(runsEnsemble.getAvgRunsDays_PerLocationPerHour(facIndex, hour));
-					
-					
-					
-					boxPlot.addSeriesPerEnsembleSize(averageExpenditures, i + 1);
+					bufferedWriter.write(formatter.format(runsEnsemble.getAvgRunsDays_PerLocationPerHour(facIndex, hour)));
+					boxPlot.addSeriesPerEnsembleSize(averageExpenditures, i);
 				}
+				bufferedWriter.newLine();
 			}
 			boxPlot.createChart();
 			boxPlot.saveAsPng(this.outpath + "/output/PLOC/3towns/facility" + MultiplerunsControler.shoppingFacilities[facIndex] + 

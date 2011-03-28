@@ -80,7 +80,7 @@ public class MultiDaysGenerator {
 			// copy person -------
 			
 			boolean worker = false;
-			if (this.randomNumberGenerator.nextDouble() > limit) {
+			if (this.randomNumberGenerator.nextDouble() < limit) {
 				worker = true;
 			}
 			int homeId = 1;
