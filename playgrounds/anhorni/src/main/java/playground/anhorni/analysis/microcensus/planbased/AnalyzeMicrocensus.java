@@ -19,17 +19,27 @@
 
 package playground.anhorni.analysis.microcensus.planbased;
 
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
+import org.matsim.population.filters.PersonIntersectAreaFilter;
 
 import playground.anhorni.analysis.Bins;
 
@@ -44,46 +54,70 @@ public class AnalyzeMicrocensus {
 	private final static Logger log = Logger.getLogger(AnalyzeMicrocensus.class);
 	private String outputFolder="src/main/java/playground/anhorni/output/microcensus/";
 	
-	private Bins distanceDistribution;
-	private Bins distanceDistributionHomeBased;
-	private Bins distanceDistributionHomeBasedRoundTrip;
-	private Bins shoppingDistanceDistributionHomeBasedRoundTripGrocery;
-	private Bins shoppingDistanceDistributionHomeBasedRoundTripNonGrocery;
+	private Bins ch_distanceDistribution;
+	private Bins ch_distanceDistributionHomeBased;
+	private Bins ch_distanceDistributionHomeBasedRoundTrip;
+	private Bins ch_shoppingDistanceDistributionHomeBasedRoundTripGrocery;
+	private Bins ch_shoppingDistanceDistributionHomeBasedRoundTripNonGrocery;
+	
+	private Bins zh_distanceDistribution;
 	
 	String type ="";
 		
-	private ScenarioImpl scenario = null;
+	private ScenarioImpl scenarioCH;
+	private ScenarioImpl scenarioZH;
 	private String mode = null;
 		
 	public static void main(final String[] args) {
 		AnalyzeMicrocensus analyzer = new AnalyzeMicrocensus();
-		analyzer.run(args[0], args[1], args[2]);	
+		analyzer.run(args[0], args[1], args[2], args[3]);	
 		log.info("Analysis finished -----------------------------------------");
 	}
 	
-	public void run(String mode, String plansFilePath, String type) {
+	public void run(String mode,  String type, String plansFilePath, String networkfilePath) {
 		this.type = type;
-		this.init(mode, plansFilePath);
-		this.runAnalysis();
-		this.write();		
+		this.init(mode, plansFilePath, networkfilePath);
+		this.runAnalysisCH();	
+		
+		this.dilutedZH();
+		this.runAnalysisZH();
 	}
 	
-	private void init(String mode, String plansFilePath) {
-		scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+	private void init(String mode, String plansFilePath, String networkfilePath) {
+		scenarioCH = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		this.mode = mode;
-		this.distanceDistribution = new Bins(500.0, 40000.0, type + "_trips_mc_" + this.mode);
-		this.distanceDistributionHomeBased = new Bins(500.0, 40000.0, type +  "_trips_mc_home-based_" + this.mode);
-		this.distanceDistributionHomeBasedRoundTrip = new Bins(500.0, 40000.0, type +  "_trips_mc_home-based_round-trip_" + this.mode);
+		this.ch_distanceDistribution = new Bins(500.0, 40000.0, type + "_trips_mc_" + this.mode);
+		this.ch_distanceDistributionHomeBased = new Bins(500.0, 40000.0, type +  "_trips_mc_home-based_" + this.mode);
+		this.ch_distanceDistributionHomeBasedRoundTrip = new Bins(500.0, 40000.0, type +  "_trips_mc_home-based_round-trip_" + this.mode);
 		
-		this.shoppingDistanceDistributionHomeBasedRoundTripGrocery = new Bins(500.0, 40000.0, "s_trips_mc_home-based_round-trip_grocery_" + this.mode);
-		this.shoppingDistanceDistributionHomeBasedRoundTripNonGrocery = new Bins(500.0, 40000.0, "s_trips_mc_home-based_round-trip_nongrocery_" + this.mode);
+		this.ch_shoppingDistanceDistributionHomeBasedRoundTripGrocery = new Bins(500.0, 40000.0, "s_trips_mc_home-based_round-trip_grocery_" + this.mode);
+		this.ch_shoppingDistanceDistributionHomeBasedRoundTripNonGrocery = new Bins(500.0, 40000.0, "s_trips_mc_home-based_round-trip_nongrocery_" + this.mode);
 		
-		MatsimPopulationReader populationReader = new MatsimPopulationReader(this.scenario);
-		populationReader.readFile(plansFilePath);	
+		this.zh_distanceDistribution = new Bins(500.0, 40000.0, type + "_zh_trips_mc_" + this.mode);
+		
+		MatsimPopulationReader populationReader = new MatsimPopulationReader(this.scenarioCH);
+		populationReader.readFile(plansFilePath);
+		
+		scenarioZH = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		new MatsimNetworkReader(scenarioZH).readFile(networkfilePath);
 	}
 	
-	private void runAnalysis() {
-		for (Person p : this.scenario.getPopulation().getPersons().values()) {
+	private void dilutedZH() {
+		double aoiRadius = 30000.0;
+		final CoordImpl aoiCenter = new CoordImpl(683518.0,246836.0);
+		
+		PersonIntersectAreaFilter filter = new PersonIntersectAreaFilter(null, null, this.scenarioZH.getNetwork());
+		filter.setAlternativeAOI(aoiCenter, aoiRadius);
+		
+		for (Person person : this.scenarioCH.getPopulation().getPersons().values()) {
+			if (filter.judge(person)) {
+				this.scenarioZH.getPopulation().addPerson(person);
+			}
+		}
+	}
+	
+	private void runAnalysisZH() {
+		for (Person p : this.scenarioZH.getPopulation().getPersons().values()) {
 			PlanImpl plan = (PlanImpl) p.getSelectedPlan();
 			for (PlanElement pe : plan.getPlanElements()) {
 				if (pe instanceof Activity) {
@@ -92,10 +126,29 @@ public class AnalyzeMicrocensus {
 						if (plan.getPreviousLeg(act).getMode().equals(this.mode)) {
 							ActivityImpl previousAct = (ActivityImpl) (plan.getPlanElements().get(plan.getPlanElements().indexOf(act) - 2));
 							double distance = ((CoordImpl)previousAct.getCoord()).calcDistance(act.getCoord());
-							distanceDistribution.addVal(distance, p.getSelectedPlan().getScore());
+							zh_distanceDistribution.addVal(distance, p.getSelectedPlan().getScore());
+						}
+					}
+				}
+			}
+		}	
+		this.zh_distanceDistribution.plotBinnedDistribution(this.outputFolder, "m", "m");		
+	}
+	
+	private void runAnalysisCH() {
+		for (Person p : this.scenarioCH.getPopulation().getPersons().values()) {
+			PlanImpl plan = (PlanImpl) p.getSelectedPlan();
+			for (PlanElement pe : plan.getPlanElements()) {
+				if (pe instanceof Activity) {
+					ActivityImpl act = (ActivityImpl)pe;
+					if (act.getType().startsWith(this.type)) {
+						if (plan.getPreviousLeg(act).getMode().equals(this.mode)) {
+							ActivityImpl previousAct = (ActivityImpl) (plan.getPlanElements().get(plan.getPlanElements().indexOf(act) - 2));
+							double distance = ((CoordImpl)previousAct.getCoord()).calcDistance(act.getCoord());
+							ch_distanceDistribution.addVal(distance, p.getSelectedPlan().getScore());
 						
 							if (previousAct.getType().equals("h")) {
-								distanceDistributionHomeBased.addVal(distance, p.getSelectedPlan().getScore());	
+								ch_distanceDistributionHomeBased.addVal(distance, p.getSelectedPlan().getScore());	
 								
 								//check the subsequent activities
 								Activity actTmp = act;
@@ -105,13 +158,13 @@ public class AnalyzeMicrocensus {
 									nextType = actTmp.getType();
 								}
 								if (nextType.equals("h")) {
-									this.distanceDistributionHomeBasedRoundTrip.addVal(distance, p.getSelectedPlan().getScore());
+									this.ch_distanceDistributionHomeBasedRoundTrip.addVal(distance, p.getSelectedPlan().getScore());
 									
 									if (act.getType().equals("sg")) {
-										this.shoppingDistanceDistributionHomeBasedRoundTripGrocery.addVal(distance, p.getSelectedPlan().getScore());
+										this.ch_shoppingDistanceDistributionHomeBasedRoundTripGrocery.addVal(distance, p.getSelectedPlan().getScore());
 									}
 									else if (act.getType().startsWith("s") && !(act.getType().equals("sg"))){
-										this.shoppingDistanceDistributionHomeBasedRoundTripNonGrocery.addVal(distance, p.getSelectedPlan().getScore());
+										this.ch_shoppingDistanceDistributionHomeBasedRoundTripNonGrocery.addVal(distance, p.getSelectedPlan().getScore());
 									}
 								}
 							}
@@ -120,15 +173,12 @@ public class AnalyzeMicrocensus {
 				}
 			}
 		}	
-	}
-			
-	private void write() {
-		this.distanceDistribution.plotBinnedDistribution(this.outputFolder, "m", "m");
-		this.distanceDistributionHomeBased.plotBinnedDistribution(this.outputFolder, "m", "m");
-		this.distanceDistributionHomeBasedRoundTrip.plotBinnedDistribution(this.outputFolder, "m", "m");
+		this.ch_distanceDistribution.plotBinnedDistribution(this.outputFolder, "m", "m");
+		this.ch_distanceDistributionHomeBased.plotBinnedDistribution(this.outputFolder, "m", "m");
+		this.ch_distanceDistributionHomeBasedRoundTrip.plotBinnedDistribution(this.outputFolder, "m", "m");
 		if (type.startsWith("s")) {
-			this.shoppingDistanceDistributionHomeBasedRoundTripGrocery.plotBinnedDistribution(this.outputFolder, "m", "m");
-			this.shoppingDistanceDistributionHomeBasedRoundTripNonGrocery.plotBinnedDistribution(this.outputFolder, "m", "m");
-		}
+			this.ch_shoppingDistanceDistributionHomeBasedRoundTripGrocery.plotBinnedDistribution(this.outputFolder, "m", "m");
+			this.ch_shoppingDistanceDistributionHomeBasedRoundTripNonGrocery.plotBinnedDistribution(this.outputFolder, "m", "m");
+		}		
 	}
 }
