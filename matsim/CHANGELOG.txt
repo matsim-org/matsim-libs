@@ -9,29 +9,60 @@ Release version 0.x.x
 Main focus of this release:
 >>tbd<<
 
+
 Changes:
 
-- Important Changes:
-  - Events are written by default in XML format (was TXT before)
-  - Events are written only every 10th iteration by default (was each and every iteration before) 
+- Configuration Changes:
+  - 
 
 - New features:
-  - ?
+  - 
+
+- Feature improvements:
+  - 
+
+- BugFixes:
+  - 
+
+- Changes for developers:
+
+  API-Changes:
+  - 
+  
+  Non-API Changes:
+  - 
+
+
+
+
+Release Spring 2011 (version 0.3.0)
+-------------------------------------------------------------------------------
+
+Main focus of this release:
+Speed and memory improvements
+
+Changes:
+
+- Configuration Changes:
+  - Events are written by default in XML format (was TXT before)
+  - Events are written only every 10th iteration by default (was each and every iteration before) 
+  - selection, which mobsim should be used, simplified by specific config-parameter (controler.mobsim) (r14325)
+
+- New features:
+  - new population file format: population_v5 (r14369)
 
 - Feature improvements:
   - transit router got faster (r13753, r13765) and uses less memory during parallel replanning (r13765)
   - Swing-OTFVis now shows vehicles in different colors instead of just gray (r13751)
   - OsmNetworkReader has option to reduce memory consumption, but will run slower (off by default) (r13910)
-  - selection, which mobsim should be used, simplified by specific config-parameter (controler.mobsim) (r14325)
-  - new population file format: population_v5 (r14369)
   - Networks now need about 25% less memory to load (r14418) 
-  - NetworkRoute.getSubRoute() now also handles cases where the routes contain circles (can happen with transit routes) (r14242, r14281) 
 
 - BugFixes:
-  - Controler ignores any custom-set leastCostPathCalculatorFactory (r14090)
+  - Controler ignored any custom-set leastCostPathCalculatorFactory (r14090)
+  - NetworkRoute.getSubRoute() now also handles cases where the routes contain circles (can happen with transit routes) (r14242, r14281) 
   - ParallelEventHandler only worked in parallel during first iteration (r14553)
 
-- Other changes for developers:
+- Changes for developers:
 
   API-Changes:
   - deprecated NetworkFactory.createLink(Id, Id, Id) (r13924)
@@ -45,8 +76,15 @@ Changes:
   - ObjectAttributes: utility data structure to manage additional attributes for existing objects (r14189)
   - SignalModelFactory now also has a createSignalPlan(...) method for SignalPlans (r14143)
   - SignalScenarioLoader is not producing null pointer exceptions anymore if files are not set in config group (r14142)
-  - improved withinday-package available (r14364)
+  - new, improved withinday-package available (r14364)
   - deprecated class MatsimSignalSystemConfigurationReader is no longer available, constants can be found in MatsimSignalSystemsReader
+
+
+Please note that OTFVis may not be able to read mvi-files created with an older release of MATSim.
+Please make sure your mvi-files work as expected in OTFVis before deleting any older release of
+MATSim. In the case of problems, it might be useful to keep the old release around just for
+looking at old mvi-files.
+
 
 
 

@@ -60,7 +60,7 @@ public class ReleaseInfo {
 		}
 
 		System.out.println();
-		System.out.println("Copyright (C) 2010 by");
+		System.out.println("Copyright (C) 2011 by");
 		System.out.println("    Kay W. Axhausen, Michael Balmer, Christoph Dobler, Dominik Grether,");
 		System.out.println("    Andreas Horni, Gregor Laemmel, Nicolas Lefebvre, Fabrice Marchal,");
 		System.out.println("    Konrad Meister, Kai Nagel, Andreas Neumann, Marcel Rieser,");
