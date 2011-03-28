@@ -24,8 +24,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.geotools.feature.Feature;
@@ -58,10 +58,14 @@ public class UrbanSuburbanAnalyzer {
 	private static final Logger logger = Logger.getLogger(UrbanSuburbanAnalyzer.class);
 
 	// INPUT
-	private static String runDirectory = "../../detailedEval/testRuns/output/1pct/v0-default/run7/";
+	private static String runDirectory = "../../detailedEval/testRuns/output/1pct/v0-default/run15/";
 	private static String shapeDirectory = "../../detailedEval/Net/shapeFromVISUM/urbanSuburban/";
-	private static String netFile = runDirectory + "output_network.xml.gz";
-	private static String plansFile = runDirectory + "output_plans.xml.gz";
+	
+//	private static String netFile = runDirectory + "output_network.xml.gz";
+//	private static String plansFile = runDirectory + "output_plans.xml.gz";
+	private static String netFile = "../../detailedEval/Net/network-86-85-87-84_simplified---withLanes.xml";
+	private static String plansFile = runDirectory + "ITERS/it.100/100.plans.xml.gz";
+	
 	private static String urbanShapeFile = shapeDirectory + "urbanAreas.shp";
 	private static String suburbanShapeFile = shapeDirectory + "suburbanAreas.shp";
 
@@ -92,26 +96,31 @@ public class UrbanSuburbanAnalyzer {
 		Set<Feature> suburbanShape = readShape(suburbanShapeFile);
 
 		Population population = scenario.getPopulation();
-		Population urbanPop = getRelevantPopulation(population, urbanShape);
-		Population suburbanPop = getRelevantPopulation(population, suburbanShape);
-		
-		urbanPop.setName("urbanPop");
-		suburbanPop.setName("suburbanPop");
-		
-		Map<String, Integer> urbanMode2NoOfLegs = calculateNoOfLegsPerMode(urbanPop);
-		Map<String, Integer> suburbanMode2NoOfLegs = calculateNoOfLegsPerMode(suburbanPop);
-		Integer urbanTotalLegs = calculateTotalLegs(urbanPop);
-		Integer suburbanTotalLegs = calculateTotalLegs(suburbanPop);
-		
-		writeInformation(urbanPop, urbanMode2NoOfLegs, urbanTotalLegs);
-		writeInformation(suburbanPop, suburbanMode2NoOfLegs, suburbanTotalLegs);
+		Population miDPop = getMiDPopulation(population);
+//		Population urbanMiDPop = getRelevantPopulation(population, urbanShape);
+//		Population suburbanMiDPop = getRelevantPopulation(population, suburbanShape);
+
+		miDPop.setName("MiDPop");
+//		urbanMiDPop.setName("urbanMiDPop");
+//		suburbanMiDPop.setName("suburbanMiDPop");
+
+		Map<String, Integer> miDMode2NoOfLegs = getMode2NoOfLegs(miDPop);
+//		Map<String, Integer> urbanMode2NoOfLegs = calculateNoOfLegsPerMode(urbanMiDPop);
+//		Map<String, Integer> suburbanMode2NoOfLegs = calculateNoOfLegsPerMode(suburbanMiDPop);
+		Integer miDTotalLegs = calculateTotalLegs(miDPop);
+//		Integer urbanTotalLegs = calculateTotalLegs(urbanMiDPop);
+//		Integer suburbanTotalLegs = calculateTotalLegs(suburbanMiDPop);
+
+		writeInformation(miDPop, miDMode2NoOfLegs, miDTotalLegs);
+//		writeInformation(urbanMiDPop, urbanMode2NoOfLegs, urbanTotalLegs);
+//		writeInformation(suburbanMiDPop, suburbanMode2NoOfLegs, suburbanTotalLegs);
 	}
 
 	private void writeInformation(Population population, Map<String, Integer> mode2NoOfLegs, Integer totalLegs) {
-		
+
 		String name = population.getName();
 		int size = population.getPersons().size();
-		
+
 		System.out.println("==================================================================");
 		System.out.println(name + " consists of " + size + " persons that execute " + totalLegs + " Legs.");
 		System.out.println("==================================================================");
@@ -135,23 +144,23 @@ public class UrbanSuburbanAnalyzer {
 		return totalLegs;
 	}
 
-	private Map<String, Integer> calculateNoOfLegsPerMode(Population population) {
-		Map<String, Integer> mode2share = new HashMap<String, Integer>();
+	private Map<String, Integer> getMode2NoOfLegs(Population population) {
+		Map<String, Integer> mode2NoOfLegs = new HashMap<String, Integer>();
 		List<String> transportModes = new ArrayList<String>();
 
 		transportModes.add(TransportMode.car);
 		transportModes.add(TransportMode.ride);
 		transportModes.add(TransportMode.pt);
-		transportModes.add(TransportMode.bike);
 		transportModes.add(TransportMode.walk);
+		transportModes.add(TransportMode.bike);
 		transportModes.add("undefined");
 
 		for(String transportMode : transportModes){
-			Integer transportModeLegs = 0;
-			transportModeLegs = calculateNoOfLegs(transportMode, population);
-			mode2share.put(transportMode, transportModeLegs);
+			Integer noOfLegs = null;
+			noOfLegs = calculateNoOfLegs(transportMode, population);
+			mode2NoOfLegs.put(transportMode, noOfLegs);
 		}
-		return mode2share;
+		return mode2NoOfLegs;
 	}
 
 	private Integer calculateNoOfLegs(String transportMode, Population population) {
@@ -169,6 +178,17 @@ public class UrbanSuburbanAnalyzer {
 		}
 		return noOfLegs;
 	}
+
+	private Population getMiDPopulation(Population population) {
+		ScenarioImpl emptyScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Population filteredPopulation = new PopulationImpl(emptyScenario);
+		for(Person person : population.getPersons().values()){
+			if(isPersonFromMID(person)){
+				filteredPopulation.addPerson(person);
+			}
+		}
+			return filteredPopulation;
+		}
 
 		private Population getRelevantPopulation(Population population,	Set<Feature> featuresInShape) {
 			ScenarioImpl emptyScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -199,7 +219,7 @@ public class UrbanSuburbanAnalyzer {
 			Geometry geo = factory.createPoint(new Coordinate(homeCoord.getX(), homeCoord.getY()));
 			for(Feature feature : featuresInShape){
 				if(feature.getDefaultGeometry().contains(geo)){
-//					logger.debug("found homeLocation of person " + person.getId() + " in feature " + feature.getID());
+					//					logger.debug("found homeLocation of person " + person.getId() + " in feature " + feature.getID());
 					isInShape = true;
 					break;
 				}
