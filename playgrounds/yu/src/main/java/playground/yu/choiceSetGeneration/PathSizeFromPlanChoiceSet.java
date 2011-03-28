@@ -80,14 +80,14 @@ public class PathSizeFromPlanChoiceSet {
 	}
 
 	private final Network network;
-	private final List<? extends Plan> plans;
+	private final List<? extends Plan> planChoiceSet;
 	private double[] pathSizes;
 	private final List<Path> paths;
 
 	public PathSizeFromPlanChoiceSet(Network network, List<? extends Plan> plans) {
 		this.network = network;
-		this.plans = plans;
-		pathSizes = new double[plans.size()];
+		planChoiceSet = plans;
+		pathSizes = new double[planChoiceSet.size()];
 		paths = new ArrayList<Path>();
 		init();
 		calculatePathSizes();
@@ -95,7 +95,7 @@ public class PathSizeFromPlanChoiceSet {
 
 	/** prepares linkId List for Plans and Legs */
 	protected void init() {
-		for (Plan plan : plans) {
+		for (Plan plan : planChoiceSet) {
 			paths.add(new Path(plan));
 		}
 	}
@@ -131,6 +131,14 @@ public class PathSizeFromPlanChoiceSet {
 		}
 		return usingCnt;
 
+	}
+
+	public double getPlanPathSize(Plan plan) {
+		if (!planChoiceSet.contains(plan)) {
+			throw new RuntimeException(
+					"This plan does NOT exist in choice set!!!");
+		}
+		return pathSizes[planChoiceSet.indexOf(plan)];
 	}
 
 	public double getMaxPathSize() {

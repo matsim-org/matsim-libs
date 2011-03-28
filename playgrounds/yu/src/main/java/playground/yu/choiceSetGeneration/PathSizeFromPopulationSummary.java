@@ -35,7 +35,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -44,6 +43,9 @@ import playground.yu.utils.io.DistributionCreator;
 import playground.yu.utils.math.SimpleStatistics;
 
 /**
+ * makes a summary of path-size distribution in a {@code Population}, i.e.
+ * distribution of min, max, avg., and all path-sizes
+ * 
  * @author yu
  * 
  */
@@ -132,7 +134,8 @@ public class PathSizeFromPopulationSummary extends AbstractPersonAlgorithm {
 	public static void main(String[] args) {
 		String networkFilename = args[0], populationFilename = args[1], outputFilenameBase = args[2];
 
-		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils
+				.createConfig());
 		new MatsimNetworkReader(scenario).readFile(networkFilename);
 		new MatsimPopulationReader(scenario).readFile(populationFilename);
 

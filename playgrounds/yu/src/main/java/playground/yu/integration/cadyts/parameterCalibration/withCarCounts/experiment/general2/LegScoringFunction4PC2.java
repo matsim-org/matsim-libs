@@ -66,15 +66,15 @@ public class LegScoringFunction4PC2 extends LegScoringFunction {
 		return travTimeAttrCar;
 	}
 
-	public int getNbSpeedBumps() {
+	public int getNbSpeedBumpsAttr() {
 		return nbSpeedBumpsAttr;
 	}
 
-	public int getNbLeftTurns() {
+	public int getNbLeftTurnsAttr() {
 		return nbLeftTurnsAttr;
 	}
 
-	public int getNbIntersections() {
+	public int getNbIntersectionsAttr() {
 		return nbIntersectionsAttr;
 	}
 

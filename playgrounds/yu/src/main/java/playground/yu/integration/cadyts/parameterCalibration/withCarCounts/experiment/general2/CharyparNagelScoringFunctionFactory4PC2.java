@@ -55,7 +55,9 @@ public class CharyparNagelScoringFunctionFactory4PC2 implements
 				params));
 		scoringFunctionAccumulator
 				.addScoringFunction(new AgentStuckScoringFunction(params));
-		// TODO addScoringFunction(new PathSizeScoringFunction(....));
+		scoringFunctionAccumulator
+				.addScoringFunction(new PathSizeScoringFunction(plan, network,
+						config));
 		return scoringFunctionAccumulator;
 	}
 }

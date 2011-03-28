@@ -360,7 +360,7 @@ public class Events2Score4PC_mnl extends Events2Score4PC implements
 
 			double util = mnl
 					.getCoeff()
-					/* s. the attributes order in Events2Score4PC.attrNameList */.innerProd(
+					/* s. the attributes order in Events2Score4PC2.attrNameList */.innerProd(
 							attrVector);
 			plan.setScore(util);
 		}

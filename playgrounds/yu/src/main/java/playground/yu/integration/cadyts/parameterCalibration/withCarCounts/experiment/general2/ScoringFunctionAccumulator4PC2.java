@@ -49,6 +49,7 @@ public class ScoringFunctionAccumulator4PC2 implements ScoringFunction {
 	private ArrayList<MoneyScoring> moneyScoringFunctions = new ArrayList<MoneyScoring>();
 	private ArrayList<LegScoring> legScoringFunctions = new ArrayList<LegScoring>();
 	private ArrayList<AgentStuckScoring> agentStuckScoringFunctions = new ArrayList<AgentStuckScoring>();
+	private ArrayList<PathSizeScoringFunction> pathSizeScoringFunctions = new ArrayList<PathSizeScoringFunction>();
 
 	private double perfAttr/* [h] */, travTimeAttrCar/* [h] */, lnPathSizeAttr;
 	private int nbSpeedBumpsAttr, nbLeftTurnsAttr, nbIntersectionsAttr;
@@ -77,6 +78,10 @@ public class ScoringFunctionAccumulator4PC2 implements ScoringFunction {
 
 	public int getNbIntersections() {
 		return nbIntersectionsAttr;
+	}
+
+	public double getLnPathSizeAttr() {
+		return lnPathSizeAttr;
 	}
 
 	// /////////////////////////////////////////////////////
@@ -141,10 +146,14 @@ public class ScoringFunctionAccumulator4PC2 implements ScoringFunction {
 
 				travTimeAttrCar = legScoringFunction.getTravTimeAttrCar();
 
-				nbSpeedBumpsAttr = legScoringFunction.getNbSpeedBumps();
-				nbLeftTurnsAttr = legScoringFunction.getNbLeftTurns();
-				nbIntersectionsAttr = legScoringFunction.getNbIntersections();
-			}// TODO
+				nbSpeedBumpsAttr = legScoringFunction.getNbSpeedBumpsAttr();
+				nbLeftTurnsAttr = legScoringFunction.getNbLeftTurnsAttr();
+				nbIntersectionsAttr = legScoringFunction
+						.getNbIntersectionsAttr();
+			} else if (basicScoringFunction instanceof PathSizeScoringFunction) {
+				lnPathSizeAttr = ((PathSizeScoringFunction) basicScoringFunction)
+						.getLnPathSizeAttr();
+			}
 		}
 		return score;
 	}
@@ -179,7 +188,10 @@ public class ScoringFunctionAccumulator4PC2 implements ScoringFunction {
 		if (scoringFunction instanceof MoneyScoring) {
 			moneyScoringFunctions.add((MoneyScoring) scoringFunction);
 		}
-
+		if (scoringFunction instanceof PathSizeScoringFunction) {
+			pathSizeScoringFunctions
+					.add((PathSizeScoringFunction) scoringFunction);
+		}
 	}
 
 	public ArrayList<ActivityScoring> getActivityScoringFunctions() {

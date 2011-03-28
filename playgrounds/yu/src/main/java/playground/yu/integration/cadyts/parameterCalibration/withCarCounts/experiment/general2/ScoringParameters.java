@@ -38,7 +38,7 @@ import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.exper
 public class ScoringParameters implements MatsimParameters {
 	private final CharyparNagelScoringParameters params;
 	public final double marginalUtilityOfTraveling_s, betaNbSpeedBumps,
-			betaNbLeftTurns, betaNbIntersections;
+			betaNbLeftTurns, betaNbIntersections, betaLnPathSize;
 
 	public ScoringParameters(Config config) {
 		super();
@@ -63,5 +63,11 @@ public class ScoringParameters implements MatsimParameters {
 				"betaNbIntersections");
 		betaNbIntersections = betaNbIntersectionsStr != null ? Double
 				.parseDouble(betaNbIntersectionsStr) : 0d;
+
+		String betaLnPathSizeStr = config.findParam(
+				BseParamCalibrationControlerListener.BSE_CONFIG_MODULE_NAME,
+				"betaLnPathSize");
+		betaLnPathSize = betaLnPathSizeStr != null ? Double
+				.parseDouble(betaLnPathSizeStr) : 0d;
 	}
 }
