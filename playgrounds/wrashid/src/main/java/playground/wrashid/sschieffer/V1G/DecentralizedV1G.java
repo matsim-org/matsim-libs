@@ -31,6 +31,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 
 
+import playground.wrashid.PSF2.vehicle.vehicleFleet.ConventionalVehicle;
 import playground.wrashid.PSF2.vehicle.vehicleFleet.ElectricVehicle;
 import playground.wrashid.PSF2.vehicle.vehicleFleet.PlugInHybridElectricVehicle;
 import playground.wrashid.PSF2.vehicle.vehicleFleet.Vehicle;
@@ -134,35 +135,70 @@ public class DecentralizedV1G {
 			
 			//Vehicle v = playground.wrashid.sschieffer.V1G.Main.vehicles.getValue(id);
 			
+			
 			if(playground.wrashid.sschieffer.V1G.Main.vehicles.getValue(id).getClass().equals(
-					new PlugInHybridElectricVehicle(new IdImpl(1)).getClass())){
-				lpphev.solveLP(agentParkingAndDrivingSchedules.getValue(id), id);
-				double joulesFromEngine= lpphev.getEnergyFromCombustionEngine();
+					new ConventionalVehicle(null, new IdImpl(2)).getClass())){
 				
-				playground.wrashid.sschieffer.V1G.Main.EMISSIONCOUNTER= joulesToEmissionInKg(joulesFromEngine);
+				//COMBUSTION
 				
+				lpcombustion.updateSchedule(agentParkingAndDrivingSchedules.getValue(id));
+				double consumption = lpcombustion.getDrivingConsumption();
+				
+				double emissionContribution= joulesToEmissionInKg(consumption);
+				// get entire driving Joules and transform to emissions
+				playground.wrashid.sschieffer.V1G.Main.EMISSIONCOUNTER+= emissionContribution;
 				
 				
 			}else{
+				
+				//EV OR PHEV
+				
+				double joulesFromEngine=0;
+				
+				double batterySize;
+				double batteryMin;
+				double batteryMax; 
+				
 				if(playground.wrashid.sschieffer.V1G.Main.vehicles.getValue(id).getClass().equals(
-						new ElectricVehicle(null, new IdImpl(1)).getClass())){
+						new PlugInHybridElectricVehicle(new IdImpl(1)).getClass())){
 					
-					agentParkingAndDrivingSchedules.put(id, 
-							lpev.solveLP(agentParkingAndDrivingSchedules.getValue(id), id));
-					
-					
+					PlugInHybridElectricVehicle thisPHEV= (PlugInHybridElectricVehicle)playground.wrashid.sschieffer.V1G.Main.vehicles.getValue(id);
+										
+					batterySize=13*1000*3600;//thisPHEV.getBatterySizeInJoule();
+					batteryMin=0.1;//thisEV.getBatteryMinThresholdInJoule();
+					batteryMax=0.9; 
 					
 				}else{
-					lpcombustion.updateSchedule(agentParkingAndDrivingSchedules.getValue(id));
 					
-					// get entire driving Joules and transform to emissions
-					playground.wrashid.sschieffer.V1G.Main.EMISSIONCOUNTER= 
-						joulesToEmissionInKg(lpcombustion.getDrivingConsumption());
+					ElectricVehicle thisEV= (ElectricVehicle)playground.wrashid.sschieffer.V1G.Main.vehicles.getValue(id);
+										
+					batterySize=13*1000*3600;//thisEV.getBatterySizeInJoule();
+					batteryMin=0.1;//thisEV.getBatteryMinThresholdInJoule();
+					batteryMax=0.9; 
 					
 				}
+				
+				//try EV first
+				
+				Schedule s= lpev.solveLP(agentParkingAndDrivingSchedules.getValue(id),id, batterySize, batteryMin, batteryMax);
+				if (s !=null){
+					// if successful --> saave
+					
+					agentParkingAndDrivingSchedules.put(id, s);
+					playground.wrashid.sschieffer.V1G.Main.EMISSIONCOUNTER= joulesToEmissionInKg(joulesFromEngine); // still 0
+				}else{					
+					//if fails, try PHEV
+					
+					s= lpphev.solveLP(agentParkingAndDrivingSchedules.getValue(id),id, batterySize, batteryMin, batteryMax);
+					agentParkingAndDrivingSchedules.put(id, s);
+					
+					joulesFromEngine= lpphev.getEnergyFromCombustionEngine();
+					playground.wrashid.sschieffer.V1G.Main.EMISSIONCOUNTER+= joulesToEmissionInKg(joulesFromEngine);
+					
+				}
+				
 			}
-		}	
-		
+		}
 	}
 	
 	/**
@@ -470,7 +506,7 @@ public class DecentralizedV1G {
 	
 	public double joulesToEmissionInKg(double joules){
 		// Benzin 42,7–44,2 MJ/kg
-		double mass=1/(43*1000000)*joules; // 1kgBenzin/43MJ= xkg/joules
+		double mass=1/(43.0*1000000.0)*joules; // 1kgBenzin/43MJ= xkg/joules
 		
 		
 		// für Benzin etwa 23,2 kg/10 l

@@ -54,9 +54,9 @@ public class LPPHEV {
 	 * @return returns the updated schedule
 	 * @throws LpSolveException
 	 */
-	public Schedule solveLP(Schedule schedule, Id id) throws LpSolveException{
+	public Schedule solveLP(Schedule schedule, Id id,double batterySize, double batteryMin, double batteryMax) throws LpSolveException{
 		
-		setUpLP(schedule, id);
+		setUpLP(schedule, id, batterySize, batteryMin, batteryMax);
 		solver.solve();
 		try {
 			
@@ -97,20 +97,12 @@ public class LPPHEV {
 	 * @param id
 	 * @throws LpSolveException
 	 */
-	public void setUpLP(Schedule schedule, Id id) throws LpSolveException{
+	public void setUpLP(Schedule schedule, Id id, double batterySize, double batteryMin, double batteryMax) throws LpSolveException{
 		
 		energyFromCombustionEngine=0;
 		this.schedule=schedule;
 		personId=id;
-		PlugInHybridElectricVehicle thisPHEV= (PlugInHybridElectricVehicle)playground.wrashid.sschieffer.V1G.Main.vehicles.getValue(id);
 		
-		double batterySize=24*1000*3600;//thisEV.getBatterySizeInJoule();
-		double batteryMin=0.1;//thisEV.getBatteryMinThresholdInJoule();
-		double batteryMax=0.9; 
-		
-		//double batterySize=thisPHEV.getBatterySizeInJoule(); NOT WOKRING RETURN 0
-		
-		//double batteryMin=thisPHEV.getBatteryMinThresholdInJoule();NOT WOKRING RETURN 0
 		
 		
 		
@@ -125,7 +117,6 @@ public class LPPHEV {
 		 */
 		
 		System.out.println("LP summary for agent"+ id.toString());
-		System.out.println("batterySize"+ batterySize+ " \t batteryMin "+ batteryMin+ " \t batteryMax (default)"+ batteryMax);
 		
 		
 		

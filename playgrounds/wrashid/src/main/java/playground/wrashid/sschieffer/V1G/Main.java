@@ -80,8 +80,8 @@ public class Main {
 	
 	
 	final public static double PERCENTAGEPHEV=0.0;
-	final public static double PERCENTAGEEV=1.0;
-	final public static double PERCENTAGECOMBUNSTIONVEHICLE=0.0;
+	final public static double PERCENTAGEEV=0.0;
+	final public static double PERCENTAGECOMBUNSTIONVEHICLE=1.0;
 	
 	
 	final public static double SECONDSPERMIN=60;
@@ -164,7 +164,7 @@ public class Main {
 					
 					
 					System.out.println("***************************");
-					
+					System.out.println("Emissions TOTAL: " + EMISSIONCOUNTER);
 					
 				} catch (Exception e1) {
 					

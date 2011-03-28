@@ -51,8 +51,10 @@ public class LPCombustion {
 		double consumption=0;
 		
 		for(int i=0; i<schedule.getNumberOfEntries(); i++){
+			schedule.printSchedule();
 			if(schedule.timesInSchedule.get(i).isDriving()){
-				consumption+=((DrivingInterval)schedule.timesInSchedule.get(i)).getConsumption();
+				DrivingInterval d1= ((DrivingInterval)schedule.timesInSchedule.get(i));
+				consumption+=d1.getConsumption();
 			}
 		
 		}

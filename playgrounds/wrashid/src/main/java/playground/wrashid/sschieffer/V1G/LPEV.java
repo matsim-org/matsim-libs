@@ -49,9 +49,21 @@ public class LPEV {
 	 * @return returns the updated schedule
 	 * @throws LpSolveException
 	 */
-	public Schedule solveLP(Schedule schedule, Id id) throws LpSolveException{
-		setUpLP(schedule, id);
-		solver.solve();
+	public Schedule solveLP(Schedule schedule, Id id, double batterySize, double batteryMin, double batteryMax) throws LpSolveException{
+		
+		setUpLP(schedule, id, batterySize, batteryMin, batteryMax);
+		int status = solver.solve();
+        
+        if(status!=0){
+        	String text = solver.getStatustext(status);
+        	System.out.println("Status text: "+ text); 
+        	// status=0--> OPTIMAL
+        	// 2 --> INFEASIBLE
+        	return null; 
+        }
+        
+      
+		
 		try {
 			
 			
@@ -88,15 +100,9 @@ public class LPEV {
 	 * @param id
 	 * @throws LpSolveException
 	 */
-	public void setUpLP(Schedule schedule, Id id) throws LpSolveException{
+	public void setUpLP(Schedule schedule, Id id, double batterySize, double batteryMin, double batteryMax) throws LpSolveException{
 		this.schedule=schedule;
 		personId=id;
-		ElectricVehicle thisEV= (ElectricVehicle)playground.wrashid.sschieffer.V1G.Main.vehicles.getValue(id);
-		//double batterySize=thisEV.getBatterySizeInJoule();
-		
-		double batterySize=24*1000*3600;//thisEV.getBatterySizeInJoule();
-		double batteryMin=0.1;//thisEV.getBatteryMinThresholdInJoule();
-		double batteryMax=0.9; 
 		
 		
 		double buffer=0.0;
