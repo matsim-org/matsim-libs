@@ -55,9 +55,9 @@ import playground.dgrether.analysis.population.DgAnalysisPopulation;
 import playground.dgrether.analysis.population.DgPersonData;
 import playground.dgrether.analysis.population.ExcludeZurichTransitFilter;
 
-public class BkDgAnalysis {
+public class AnalysisTransportEconomics10 {
 
-	private static final Logger log = Logger.getLogger(BkDgAnalysis.class);
+	private static final Logger log = Logger.getLogger(AnalysisTransportEconomics10.class);
 	
 	public static void main(String[] args) {
 		String netfile, plans1file, plans2file, housholdsfile, outputConfig2Path, eventsfile;
