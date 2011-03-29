@@ -45,10 +45,6 @@ import org.matsim.counts.Counts;
 import org.matsim.counts.Volume;
 
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.general.normal.paramCorrection.BseParamCalibrationControlerListener;
-import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.general.normal.paramCorrection.PCCtl;
-import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.general.normal.paramCorrection.PCStrMn;
-import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.general.normal.scoring.Events2Score4PC;
-import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.general.normal.scoring.Events2Score4PC_mnl;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.mnlValidation.MultinomialLogitChoice;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.scoring.ScoringConfigGetValue;
 import playground.yu.utils.io.SimpleWriter;
@@ -148,8 +144,8 @@ public class PCCtlListener2 extends BseParamCalibrationControlerListener
 
 		Vector initialParams = new Vector(paramDim);
 		for (int i = 0; i < initialParams.size(); i++) {
-			double paramScaleFactor = Events2Score4PC.paramScaleFactorList
-					.get(Events2Score4PC.attrNameList.indexOf(paramNames[i]));
+			double paramScaleFactor = Events2Score4PC2.paramScaleFactorList
+					.get(Events2Score4PC2.attrNameList.indexOf(paramNames[i]));
 
 			if (scoringCfg.getParams().containsKey(paramNames[i])) {
 
@@ -369,7 +365,7 @@ public class PCCtlListener2 extends BseParamCalibrationControlerListener
 			delta = Double.parseDouble(deltaStr);
 			System.out.println("BSE:\tdelta\t=\t" + delta);
 		}
-		((PCStrMn) ctl.getStrategyManager()).init(
+		((PCStrMn2) ctl.getStrategyManager()).init(
 				(ChoiceParameterCalibrator<Link>) calibrator, ctl
 						.getTravelTimeCalculator(),
 				(MultinomialLogitChoice) chooser, delta);
@@ -416,7 +412,7 @@ public class PCCtlListener2 extends BseParamCalibrationControlerListener
 	}
 
 	public void notifyStartup(final StartupEvent event) {
-		final PCCtl ctl = (PCCtl) event.getControler();
+		final PCCtl2 ctl = (PCCtl2) event.getControler();
 		Config config = ctl.getConfig();
 
 		setMatsimParameters(ctl);
@@ -523,12 +519,12 @@ public class PCCtlListener2 extends BseParamCalibrationControlerListener
 	}
 
 	public void notifyIterationEnds(IterationEndsEvent event) {
-		PCCtl ctl = (PCCtl) event.getControler();
+		PCCtl2 ctl = (PCCtl2) event.getControler();
 		Config config = ctl.getConfig();
 		int iter = event.getIteration();
 		int firstIter = ctl.getFirstIteration();
 		// this.chooser.finish();-->called in notifyScoring()
-		PCStrMn strategyManager = (PCStrMn) ctl.getStrategyManager();
+		PCStrMn2 strategyManager = (PCStrMn2) ctl.getStrategyManager();
 
 		if (iter - firstIter > strategyManager.getMaxPlansPerAgent()) {
 			// ***************************************************
@@ -560,12 +556,12 @@ public class PCCtlListener2 extends BseParamCalibrationControlerListener
 					StringBuffer sb = new StringBuffer(Integer.toString(iter));
 
 					for (int i = 0; i < paramNames.length; i++) {
-						int paramNameIndex = Events2Score4PC.attrNameList
+						int paramNameIndex = Events2Score4PC2.attrNameList
 								.indexOf(paramNames[i]/*
 													 * pos. of param in
 													 * Parameters in Cadyts
 													 */);
-						double paramScaleFactor = Events2Score4PC.paramScaleFactorList
+						double paramScaleFactor = Events2Score4PC2.paramScaleFactorList
 								.get(paramNameIndex);
 
 						double value = params.get(i);
@@ -591,12 +587,12 @@ public class PCCtlListener2 extends BseParamCalibrationControlerListener
 					writer.flush();
 				}/* initialStepSize==0, no parameters are changed */
 
-				((Events2Score4PC_mnl) chooser).setMultinomialLogit(mnl);
+				((Events2Score4PC_mnl2) chooser).setMultinomialLogit(mnl);
 
 				CharyparNagelScoringFunctionFactory4PC2 sfFactory = new CharyparNagelScoringFunctionFactory4PC2(
 						config, ctl.getNetwork());
 				ctl.setScoringFunctionFactory(sfFactory);
-				((Events2Score4PC_mnl) chooser).setSfFactory(sfFactory);
+				((Events2Score4PC_mnl2) chooser).setSfFactory(sfFactory);
 
 				strategyManager.setChooser(chooser);
 

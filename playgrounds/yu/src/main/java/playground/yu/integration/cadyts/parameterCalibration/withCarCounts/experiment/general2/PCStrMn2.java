@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.general.normal.paramCorrection;
+package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.general2;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -39,7 +39,6 @@ import org.matsim.core.router.util.TravelTime;
 
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.BseStrategyManager;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.PlanToPlanStep;
-import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.general.normal.scoring.Events2Score4PC;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.mnlValidation.MultinomialLogitChoice;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.parametersCorrection.BseParamCalibrationStrategyManager;
 import cadyts.calibrators.analytical.ChoiceParameterCalibrator;
@@ -49,16 +48,16 @@ import cadyts.utilities.math.Matrix;
 import cadyts.utilities.math.MultinomialLogit;
 import cadyts.utilities.math.Vector;
 
-public class PCStrMn extends BseParamCalibrationStrategyManager implements
+public class PCStrMn2 extends BseParamCalibrationStrategyManager implements
 		BseStrategyManager {
-	private final static Logger log = Logger.getLogger(PCStrMn.class);
+	private final static Logger log = Logger.getLogger(PCStrMn2.class);
 	private double delta, brainExpBeta;
 	// private ChoiceParameterCalibrator3<Link> calibrator = null;
 	private int paramDimension;
 	private Plan oldSelected = null;
 	private BasicStatistics travelingCarStats = null, performingStats = null;
 
-	public PCStrMn(NetworkImpl net, int firstIteration, double brainExpBeta,
+	public PCStrMn2(NetworkImpl net, int firstIteration, double brainExpBeta,
 			int paramDimension) {
 		super(firstIteration);
 		this.net = net;
@@ -224,8 +223,8 @@ public class PCStrMn extends BseParamCalibrationStrategyManager implements
 					}
 
 					List<Integer> attrIndices = new ArrayList<Integer>();
-					for (String paramName : PCCtlListener.paramNames) {
-						attrIndices.add(Events2Score4PC.attrNameList
+					for (String paramName : PCCtlListener2.paramNames) {
+						attrIndices.add(Events2Score4PC2.attrNameList
 								.indexOf(paramName));
 					}
 
@@ -248,184 +247,6 @@ public class PCStrMn extends BseParamCalibrationStrategyManager implements
 			Gbl.errorMsg("No strategy found!");
 		}
 	}
-
-	// @Override
-	// public void
-	// playground.yu.integration.cadyts.demandCalibration.withCarCounts.run(final
-	// Population population) {
-	// this.beforePopulationRunHook(population);
-	// for (PlanStrategy strategy : getStrategies())
-	// strategy.init();
-	//
-	// int maxPlansPerAgent = this.getMaxPlansPerAgent();
-	//
-	// // cadyts class - create new BasicStatistics Objects
-	// BasicStatistics travelingCarStats = new BasicStatistics(),
-	// performingStats = new BasicStatistics();
-	//
-	// // then go through the population and assign each person to a strategy
-	// for (Person person : population.getPersons().values()) {
-	// /* ***********************************************************
-	// * scoringCfg has been done, but they should be newly defined
-	// * because of new calibrated parameters and -- WITHOUT
-	// * utilityCorrections--
-	// * *******************************************************
-	// */
-	// this.chooser.setPersonScore(person);
-	// // *********************UTILITY CORRECTION********************
-	// // ***before removePlans and plan choice, correct utility***
-	// correctPersonPlansScores(person);
-	// /* ******************************************************** */
-	// // remove worst plans
-	// if ((maxPlansPerAgent > 0)
-	// && (person.getPlans().size() > maxPlansPerAgent)) {
-	// // todo
-	// removePlans((PersonImpl) person, maxPlansPerAgent);
-	// // todo
-	// }
-	// // choose reset because of removeWorstPlan
-	// this.resetChooser();
-	//
-	// List<? extends Plan> plans = person.getPlans();
-	//
-	// PlanStrategy strategy = this.chooseStrategy();
-	// if (strategy != null) {
-	// if (this.iter - this.firstIter > maxPlansPerAgent) {
-	// // ENSURE THAT EVERY PLAN IN CHOICE SET HAS BEEN SIMULATED
-	// // ATLEAST ONE TIME
-	// Plan oldSelected = person.getSelectedPlan();
-	//
-	// if (strategy.getNumberOfStrategyModules() > 0) {
-	// /*
-	// * New plan will be created by e.g. ReRoute,
-	// * TimeAllocationMutator etc. It's not needed to use
-	// * MultinomialLogit or cadyts.....ExpBetaPlanChanger.
-	// * Only a tough estimate about score of new plan is
-	// * necessary
-	// */
-	// strategy.run(person);
-	// Plan selectedPlan = person.getSelectedPlan();
-	// selectedPlan.setScore(oldSelected.getScore());
-	//
-	// Vector p = new Vector(1/* (single-)choiceSetSize */);
-	// p.set(0, 1d/* 100% */);
-	//
-	// Matrix d = new Matrix(1/* n-choiceSetSize */,
-	// this.paramDimension/*
-	// * m-size of parameters that
-	// * has to be calibrated
-	// */);
-	// for (int i = 0; i < this.paramDimension; i++)
-	// d.setColumn(i, new Vector(0d));
-	//
-	// // ******************************************************
-	// ((ChoiceParameterCalibrator3<Link>) this.calibrator)
-	// .selectPlan(0, this
-	// .getSinglePlanChoiceSet(selectedPlan),
-	// p, d, null);
-	// // **********************************************************
-	// } else {// only with planSelector/-Changer, no new plan will
-	// // be created
-	// // **************WRITE ATTR.S INTO MNL******************
-	// this.chooser.setPersonAttrs(person);
-	//
-	// /* ***********************************************************
-	// * set the last chosen plan to cadyts, only works with
-	// * {@code cadyts.interfaces.matsim.ExpBetaPlanChanger},
-	// * but "ChangeExpBeta" as well as "SelectExpBeta" can
-	// * still be written in configfile
-	// */
-	// // ***PLAN CHOOSING --WITH UTILITY CORRECTION--***
-	//
-	// strategy.run(person);
-	// int selectIdx = plans.indexOf(person.getSelectedPlan());
-	// // ********************************************************
-	// MultinomialLogit mnl = ((MultinomialLogitChoice) this.chooser)
-	// .getMultinomialLogit();
-	// Vector probs = mnl.getProbs();
-	// Matrix dProb_dParameters = mnl
-	// .get_dProb_dParameters(Arrays.asList(
-	// 0/* traveling */, 2/* performing */),
-	// false/* without ASC */);
-	// if (Double.isNaN(probs.get(0))
-	// || Double.isNaN(probs.get(1))) {
-	// log.fatal(
-	// "mnl/probs/NaN");
-	// System.out
-	// .println("selecteIdx from ExpBetaPlanChanger\t"
-	// + selectIdx
-	// + "\nprobs\n"
-	// + probs
-	// + "\ndProb_dParameters\n"
-	// + dProb_dParameters
-	// + "\nperson\t"
-	// + person.getId() + "\nplans:");
-	// int n = 0;
-	// for (Plan plan : person.getPlans()) {
-	// System.out.println(n + "\t" + plan);
-	// n++;
-	// }
-	// System.out.println("mnl_attrs:\n"
-	// + mnl.getAttrCount());
-	// // System.exit(185);
-	// }
-	//
-	// /*
-	// * UPDATE PARAMETERS (OBSERVE THE PLAN CHOOSING IN
-	// * MATSIM)
-	// */
-	// /* int selectedIdx= */((ChoiceParameterCalibrator3<Link>)
-	// this.calibrator)
-	// .selectPlan(
-	// selectIdx,
-	// getPlanChoiceSet((PersonImpl) person),
-	// probs,
-	// dProb_dParameters,
-	// mnl
-	// .get_d2P_dbdb(
-	// delta,
-	// Arrays
-	// .asList(
-	// 0/* traveling */,
-	// 2/* performing */),
-	// false)/* d2ChoiceProb_dParam2 */);
-	// // ***************************************************
-	// }
-	// } else {// ***********iter<=maxPlanPerAgent+1************
-	// if (this.iter - this.firstIter == 1) {
-	// /*
-	// * shuffle the Plan Choice Set, to avoid chaotic network
-	// * situation
-	// */
-	// Collections.shuffle(person.getPlans(), MatsimRandom
-	// .getRandom()/*
-	// * Random-Objekt is not generated by
-	// * every calling of shuffle(List)
-	// */);
-	// }
-	// // ENSURE THAT EVERY PLANS IN CHOICE SET WILL BE
-	// // SIMULATED ONE TIME
-	// ((PersonImpl) person).setSelectedPlan(plans.get(iter
-	// % maxPlansPerAgent));
-	// // ****************************************************
-	// }
-	// } else
-	// // strategy==null
-	// Gbl.errorMsg("No strategy found!");
-	// }
-	// // output stats and variabilities
-	// this.statistics = new double[] { travelingCarStats.getAvg(),
-	// travelingCarStats.getVar(), performingStats.getAvg(),
-	// performingStats.getVar() };
-	// System.out.println("Statistics\t" + this.statistics[0]/* travCarAvg */
-	// + "\t" + this.statistics[1]/* travCarVar */+ "\t"
-	// + this.statistics[2]/* perfAttrAvg */+ "\t"
-	// + this.statistics[3]/* perfAttrVar */);
-	//
-	// // finally make sure all strategies have finished there work
-	// for (PlanStrategy strategy : getStrategies())
-	// strategy.finish();
-	// }
 
 	@Override
 	protected void afterRunHook(Population population) {
@@ -454,7 +275,7 @@ public class PCStrMn extends BseParamCalibrationStrategyManager implements
 		Double oldScore = plan.getScore();
 		if (oldScore == null) {
 			oldScore = 0d;// dummy setting, the score of plans will be
-							// calculated between firstIter+1 and firstIter+
+			// calculated between firstIter+1 and firstIter+
 		}
 		plan.setScore(oldScore + scoreCorrection);
 	}

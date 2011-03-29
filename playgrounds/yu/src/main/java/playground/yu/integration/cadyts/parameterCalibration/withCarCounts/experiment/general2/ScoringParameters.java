@@ -37,8 +37,14 @@ import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.exper
  */
 public class ScoringParameters implements MatsimParameters {
 	private final CharyparNagelScoringParameters params;
-	public final double marginalUtilityOfTraveling_s, betaNbSpeedBumps,
-			betaNbLeftTurns, betaNbIntersections, betaLnPathSize;
+	public static final String PERFORMING = "performing",
+			TRAVELING = "traveling", BETA_SPEED_BUMP_NB = "betaSpeedBumpNb",
+			BETA_LEFT_TURN_NB = "betaLeftTurnNb",
+			BETA_INTERSECTION_NB = "betaIntersectionNb",
+			BETA_LN_PATH_SIZE = "betaLnPathSize";
+
+	public final double marginalUtilityOfTraveling_s, betaSpeedBumpNb,
+			betaLeftTurnNb, betaIntersectionNb, betaLnPathSize;
 
 	public ScoringParameters(Config config) {
 		super();
@@ -48,25 +54,25 @@ public class ScoringParameters implements MatsimParameters {
 
 		String betaNbSpeedBumpsStr = config.findParam(
 				BseParamCalibrationControlerListener.BSE_CONFIG_MODULE_NAME,
-				"betaNbSpeedBumps");
-		betaNbSpeedBumps = betaNbSpeedBumpsStr != null ? Double
+				BETA_SPEED_BUMP_NB);
+		betaSpeedBumpNb = betaNbSpeedBumpsStr != null ? Double
 				.parseDouble(betaNbSpeedBumpsStr) : 0d;
 
 		String betaNbLeftTurnsStr = config.findParam(
 				BseParamCalibrationControlerListener.BSE_CONFIG_MODULE_NAME,
-				"betaNbLeftTurns");
-		betaNbLeftTurns = betaNbLeftTurnsStr != null ? Double
+				BETA_LEFT_TURN_NB);
+		betaLeftTurnNb = betaNbLeftTurnsStr != null ? Double
 				.parseDouble(betaNbLeftTurnsStr) : 0d;
 
 		String betaNbIntersectionsStr = config.findParam(
 				BseParamCalibrationControlerListener.BSE_CONFIG_MODULE_NAME,
-				"betaNbIntersections");
-		betaNbIntersections = betaNbIntersectionsStr != null ? Double
+				BETA_INTERSECTION_NB);
+		betaIntersectionNb = betaNbIntersectionsStr != null ? Double
 				.parseDouble(betaNbIntersectionsStr) : 0d;
 
 		String betaLnPathSizeStr = config.findParam(
 				BseParamCalibrationControlerListener.BSE_CONFIG_MODULE_NAME,
-				"betaLnPathSize");
+				BETA_LN_PATH_SIZE);
 		betaLnPathSize = betaLnPathSizeStr != null ? Double
 				.parseDouble(betaLnPathSizeStr) : 0d;
 	}

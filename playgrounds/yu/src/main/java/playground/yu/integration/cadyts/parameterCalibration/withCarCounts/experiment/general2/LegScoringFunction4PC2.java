@@ -38,8 +38,8 @@ import playground.yu.utils.LeftTurnIdentifier;
 import playground.yu.utils.NotAnIntersection;
 
 /**
- * U_Leg = betaTraveling * travelTime_car + betaNbSpeedBumps * NbSpeedBumps +
- * betaNbLeftTurns * NbLeftTurns + betaNbIntersections * NbIntersections. For
+ * U_Leg = betaTraveling * travelTime_car + betaSpeedBumpNb * NbSpeedBumps +
+ * betaLeftTurnNb * NbLeftTurns + betaIntersectionNb * NbIntersections. For
  * all the other transport modes except car temporarily is not be accounted.
  * 
  * @author yu
@@ -200,9 +200,9 @@ public class LegScoringFunction4PC2 extends LegScoringFunction {
 			int nbSpeedBumps = calcNbSpeedBumps(leg), nbLeftTurns = calcNbLeftTurns(leg), nbIntersections = calcNbIntersections(leg);
 
 			tmpScore += travelTime * scoringParams.marginalUtilityOfTraveling_s
-					+ nbSpeedBumps * scoringParams.betaNbSpeedBumps
-					+ nbLeftTurns * scoringParams.betaNbLeftTurns
-					+ nbIntersections * scoringParams.betaNbIntersections;
+					+ nbSpeedBumps * scoringParams.betaSpeedBumpNb
+					+ nbLeftTurns * scoringParams.betaLeftTurnNb
+					+ nbIntersections * scoringParams.betaIntersectionNb;
 
 			travTimeAttrCar/* [h] */+= travelTime/* [s] *// 3600d;
 			nbSpeedBumpsAttr += nbSpeedBumps;

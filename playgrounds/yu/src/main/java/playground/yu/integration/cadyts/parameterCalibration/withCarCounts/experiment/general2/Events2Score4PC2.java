@@ -75,7 +75,7 @@ public abstract class Events2Score4PC2 extends EventsToScore implements
 	// protected boolean setPersonScore = true;
 	protected int maxPlansPerAgent;
 	protected final TreeMap<Id, Tuple<Plan, ScoringFunction>> agentScorers = new TreeMap<Id, Tuple<Plan, ScoringFunction>>();
-	protected final TreeMap<Id, Integer> agentPlanElementIndex = new TreeMap<Id, Integer>();
+	protected final TreeMap<Id/* agent */, Integer/* idx */> agentPlanElementIndex = new TreeMap<Id, Integer>();
 
 	public Events2Score4PC2(Config config, ScoringFunctionFactory factory,
 			Population population) {
@@ -89,7 +89,17 @@ public abstract class Events2Score4PC2 extends EventsToScore implements
 		initialAttrNameScaleFactor("performing");
 
 		// ln(PSi)
-		initialAttrNameScaleFactor("lnPathSize");
+		initialAttrNameScaleFactor("betaLnPathSize");
+
+		// speedBumpNb
+		initialAttrNameScaleFactor("betaSpeedBumpNb");
+
+		// leftTurnNb
+		initialAttrNameScaleFactor("betaLeftTurnNb");
+
+		// intersectionNb
+		initialAttrNameScaleFactor("betaIntersectionNb");
+
 		// initialAttrNameScaleFactor("lateArrival");//TODO in
 		// ActivityScoringFunction4PC in the furture
 
@@ -155,8 +165,6 @@ public abstract class Events2Score4PC2 extends EventsToScore implements
 	 * only choiceSetSize plans in the memory of an agent.
 	 * 
 	 * @param person
-	 * @param performStats
-	 * @param travelingCarStats
 	 */
 	public abstract void setPersonAttrs(Person person);
 
@@ -198,7 +206,7 @@ public abstract class Events2Score4PC2 extends EventsToScore implements
 
 	/**
 	 * this method will be called in {@code
-	 * DummyPlansScoring4PC.notifyScoring(ScoringEvent)}
+	 * ???PlansScoring4PC.notifyScoring(ScoringEvent)}
 	 */
 	@Override
 	public void finish() {
@@ -289,13 +297,14 @@ public abstract class Events2Score4PC2 extends EventsToScore implements
 
 	protected int increaseAgentPlanElementIndex(final Id personId) {
 		Integer index = agentPlanElementIndex.get(personId);
+
 		if (index == null) {
 			agentPlanElementIndex.put(personId, Integer.valueOf(1));
 			return 1;
 		}
-		agentPlanElementIndex.put(personId, Integer.valueOf(1 + index
-				.intValue()));
-		return 1 + index.intValue();
+
+		agentPlanElementIndex.put(personId, Integer.valueOf(1 + index));
+		return 1 + index;
 	}
 
 	public void handleEvent(final AgentDepartureEvent event) {

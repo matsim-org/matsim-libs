@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DummyBseParamCalibrationControler.java
+ * DummyPlansScoring4PC.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,40 +18,42 @@
  *                                                                         *
  * *********************************************************************** */
 
+/**
+ * 
+ */
 package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.general2;
 
-import org.matsim.core.config.Config;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.scoring.ScoringFunctionFactory;
-
-import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.general.normal.paramCorrection.BseParamCalibrationControlerListener;
+import org.matsim.core.controler.events.IterationStartsEvent;
+import org.matsim.core.controler.events.ScoringEvent;
+import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.IterationStartsListener;
+import org.matsim.core.controler.listener.ScoringListener;
+import org.matsim.core.controler.listener.StartupListener;
 
 /**
+ * a changed copy of {@code PlansScoring} for the parameter calibration,
+ * especially in order to put new parameters to CharyparNagelScoringConfigGroup
+ * 
  * @author yu
  * 
  */
-public abstract class BseParamCalibrationControler2 extends Controler {
+public abstract class PlansScoring4PC2 implements StartupListener,
+		ScoringListener, IterationStartsListener {
 
-	protected BseParamCalibrationControlerListener extension;
-	protected PlansScoring4PC2 plansScoring4PC;
+	protected Events2Score4PC2 planScorer;
 
-	public BseParamCalibrationControler2(String[] args) {
-		super(args);
+	public abstract void notifyStartup(final StartupEvent event);
+
+	public Events2Score4PC2 getPlanScorer() {
+		return planScorer;
 	}
 
-	public BseParamCalibrationControler2(Config config) {
-		super(config);
+	public void notifyIterationStarts(final IterationStartsEvent event) {
+		planScorer.reset(event.getIteration());
 	}
 
-	public PlansScoring4PC2 getPlansScoring4PC() {
-		return plansScoring4PC;
+	public void notifyScoring(final ScoringEvent event) {
+		planScorer.finish();
 	}
-
-	protected ScoringFunctionFactory loadScoringFunctionFactory() {
-		return new CharyparNagelScoringFunctionFactory4PC2(config, network);
-	}
-
-	@Override
-	protected abstract void loadCoreListeners();
 
 }
