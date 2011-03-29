@@ -25,15 +25,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.population.LegImpl;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 
@@ -43,7 +41,6 @@ import org.matsim.core.population.PlanImpl;
  * @author thibautd
  */
 public class JointPlan implements Plan {
-	private static final Logger log = Logger.getLogger(JointPlan.class);
 
 	private final Map<Id,Plan> individualPlans = new HashMap<Id,Plan>();
 	/**
@@ -55,8 +52,7 @@ public class JointPlan implements Plan {
 	 */
 	private final boolean setAtIndividualLevel;
 
-	//TODO: make final
-	private Clique clique;
+	private final Clique clique;
 
 	//private Id currentIndividual = null;
 	//private Iterator<Id> individualsIterator;
@@ -106,10 +102,9 @@ public class JointPlan implements Plan {
 					currentActivity = new JointActivity((Activity) pe, 
 							this.clique.getMembers().get(id));
 					actType = currentActivity.getType();
-					// TODO: less hard-coded (implies also externalizing the "split"
-					// part)
-					if (actType.matches("^pu_.*$")) {
-						currentJointEpisodeId = actType.split("_")[1];
+					if (actType.matches(JointActingTypes.PICK_UP_REGEXP)) {
+						currentJointEpisodeId =
+							actType.split(JointActingTypes.PICK_UP_SPLIT_EXPR)[1];
 						currentActivity.setType(JointActingTypes.PICK_UP);
 					}
 					currentPlan.addActivity(currentActivity);
@@ -139,13 +134,13 @@ public class JointPlan implements Plan {
 		// TODO: improve the way reimplacement modes are determined.
 		for (List<JointLeg> legsToLink : toLink.values()) {
 			for (JointLeg leg : legsToLink) {
-				if (leg.getMode().equals("car")) {
+				if (leg.getMode().equals(TransportMode.car)) {
 					leg.setIsDriver(true);
 					leg.setAssociatedIndividualLeg(
 							new JointLeg(leg.getMode(), leg.getPerson()));
 				} else {
 					leg.setAssociatedIndividualLeg(
-							new JointLeg("pt", leg.getPerson()));
+							new JointLeg(TransportMode.pt, leg.getPerson()));
 				}
 				for (JointLeg linkedLeg : legsToLink) {
 					if (leg != linkedLeg) {
@@ -324,6 +319,16 @@ public class JointPlan implements Plan {
 	//	this.clique = clique;
 	//	this.resetCurrentIndividual();
 	//}
+	
+	public Map<Id, List<PlanElement>> getIndividualPlanElements() {
+		Map<Id, List<PlanElement>> output = new TreeMap<Id, List<PlanElement>>();
+
+		for (Map.Entry<Id, Plan> entry : this.individualPlans.entrySet()) {
+			output.put(entry.getKey(), entry.getValue().getPlanElements());
+		}
+
+		return output;
+	}
 
 	public Plan getIndividualPlan(Person person) {
 		return this.getIndividualPlan(person.getId());

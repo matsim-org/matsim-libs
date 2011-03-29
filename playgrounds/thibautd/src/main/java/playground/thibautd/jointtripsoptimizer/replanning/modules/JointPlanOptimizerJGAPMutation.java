@@ -127,7 +127,7 @@ public class JointPlanOptimizerJGAPMutation implements GeneticOperator {
 								(DoubleGene) geneToMute,
 								currentChromosome);
 
-						mutateDouble((DoubleGene) geneToMute, freeSpace);
+						mutateDoubleNonUniform((DoubleGene) geneToMute, freeSpace);
 					}
 				}
 			}

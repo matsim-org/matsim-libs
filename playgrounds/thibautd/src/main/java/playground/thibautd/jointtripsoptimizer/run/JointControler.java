@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package playground.thibautd.jointtripsoptimizer.run;
 
+import org.apache.log4j.Logger;
+
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.corelisteners.EventsHandling;
 import org.matsim.core.controler.corelisteners.PlansDumping;
@@ -31,12 +33,23 @@ import org.matsim.core.scenario.ScenarioImpl;
 import playground.thibautd.jointtripsoptimizer.population.ScenarioWithCliques;
 import playground.thibautd.jointtripsoptimizer.replanning.JointPlansReplanning;
 import playground.thibautd.jointtripsoptimizer.replanning.JointStrategyManager;
+import playground.thibautd.jointtripsoptimizer.scoring.JointPlansScoring;
 
 /**
  * Custom controler for handling clique replanning
  * @author thibautd
  */
 public class JointControler extends Controler {
+	private static final Logger log =
+		Logger.getLogger(JointControler.class);
+
+
+	/**
+	 * replacement for the private super() fields.
+	 */
+	//private PlansScoring plansScoring = null;
+	private JointPlansScoring plansScoring = null;
+	//private RoadPricing roadPricing = null;
 
 	/*
 	 * =========================================================================
@@ -62,8 +75,8 @@ public class JointControler extends Controler {
 	 * Same as the loadCoreListeners of the base class, excepts that it loads a
 	 * JointPlanReplanning instance instead of a PlansReplanning one.
 	 * This allows handling PopulationWithCliques populations.
-	 * This has the drawback of breaking the getRoadPricing and getPlansScoring
-	 * methods of the controler.
+	 * This has the drawback of breaking the getRoadPricing (final) method of
+	 * the controler.
 	 * {@inheritDoc}
 	 * @see Controler#loadCoreListeners()
 	 */
@@ -81,15 +94,17 @@ public class JointControler extends Controler {
 		this.addCoreControlerListener(new CoreControlerListener());
 
 		// the default handling of plans
-		//this.plansScoring = new PlansScoring(); //XXX plansScoring is private!
-		//this.addCoreControlerListener(this.plansScoring);
-		this.addCoreControlerListener(new PlansScoring());
+		this.plansScoring = new JointPlansScoring();
+		//this.plansScoring = new PlansScoring();
+		this.addCoreControlerListener(this.plansScoring);
 
 		// load road pricing, if requested
 		if (this.config.scenario().isUseRoadpricing()) {
 			//this.roadPricing = new RoadPricing(); //XXX roadProcing is private!
 			//this.addCoreControlerListener(this.roadPricing);
 			this.addCoreControlerListener(new RoadPricing());
+			log.warn("RoadPricing set in JointControler: getRoadPricing will be"
+					+" broken.");
 		}
 
 		this.addCoreControlerListener(new JointPlansReplanning());
@@ -104,4 +119,10 @@ public class JointControler extends Controler {
 		StrategyManagerConfigLoader.load(this, manager);
 		return manager;
 	}
+
+	@Override
+	public PlansScoring getPlansScoring() {
+		return this.plansScoring;
+	}
+
 }

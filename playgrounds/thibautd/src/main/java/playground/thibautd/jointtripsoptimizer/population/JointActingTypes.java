@@ -20,14 +20,17 @@
 package playground.thibautd.jointtripsoptimizer.population;
 
 /**
- * Defines the names of the different joint activity types.
+ * Defines different naming constants related to joint actings.
  * @author thibautd
  */
 public interface JointActingTypes {
 	public static final String PICK_UP = "pick up";
 	public static final String DROP_OFF = "drop off";
 
-	// TODO: move elsewhere?
 	public static final String PASSENGER = "car_passenger";
+
+	//planFile constants
+	public static final String PICK_UP_SPLIT_EXPR = "_";
+	public static final String PICK_UP_REGEXP = "^pu"+PICK_UP_SPLIT_EXPR+".*$";
 }
 
