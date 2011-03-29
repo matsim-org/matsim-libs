@@ -27,6 +27,7 @@ import java.io.IOException;
 import org.apache.commons.math.FunctionEvaluationException;
 import org.apache.commons.math.MaxIterationsExceededException;
 import org.apache.commons.math.analysis.integration.SimpsonIntegrator;
+import org.apache.commons.math.analysis.polynomials.PolynomialFunction;
 import org.apache.commons.math.analysis.solvers.NewtonSolver;
 import org.apache.commons.math.optimization.DifferentiableMultivariateVectorialOptimizer;
 import org.apache.commons.math.optimization.OptimizationException;
@@ -38,6 +39,7 @@ import org.apache.commons.math.optimization.general.LevenbergMarquardtOptimizer;
 import org.jfree.chart.plot.DefaultDrawingSupplier;
 import org.jfree.chart.plot.DrawingSupplier;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.controler.Controler;
@@ -52,6 +54,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 
+import playground.wrashid.PSF.data.HubLinkMapping;
 import playground.wrashid.PSF2.pluggable.energyConsumption.EnergyConsumptionModel;
 import playground.wrashid.PSF2.pluggable.energyConsumption.EnergyConsumptionModelPSL;
 import playground.wrashid.PSF2.pluggable.energyConsumption.EnergyConsumptionPlugin;
@@ -74,6 +77,9 @@ public class Main {
 		final ParkingTimesPlugin parkingTimesPlugin;
 		final EnergyConsumptionPlugin energyConsumptionPlugin;
 		
+		final HubLinkMapping hubLinkMapping= new HubLinkMapping(0);
+		
+		final LinkedListValueHashMap<Integer, Schedule> hubLoadDistribution = new  LinkedListValueHashMap<Integer, Schedule>();
 		
 		String configPath="test/input/playground/wrashid/sschieffer/config.xml";
 				
@@ -90,7 +96,7 @@ public class Main {
 		
 		final double MINCHARGINGLENGTH=5*60;//5 minutes
 		
-		Controler controler=new Controler(configPath);
+		final Controler controler=new Controler(configPath);
 		
 		EventHandlerAtStartupAdder eventHandlerAtStartupAdder = new EventHandlerAtStartupAdder();
 		
@@ -120,6 +126,11 @@ public class Main {
 				
 				try {
 					
+					readHubs(hubLoadDistribution);
+					mapHubs(hubLoadDistribution, 
+							hubLinkMapping, 
+							controler);
+					
 					
 					DecentralizedSmartCharger myDecentralizedSmartCharger = new DecentralizedSmartCharger(
 							event.getControler(), 
@@ -129,7 +140,9 @@ public class Main {
 							MINCHARGINGLENGTH, 
 							e.getVehicles(),
 							gasJoulesPerLiter,
-							emissionPerLiterEngine);
+							emissionPerLiterEngine,
+							hubLinkMapping,
+							hubLoadDistribution);
 					
 					
 					
@@ -149,7 +162,7 @@ public class Main {
 						myDecentralizedSmartCharger.getAgentChargingSchedule(id).printSchedule();
 					}
 					
-					LinkedList<Id> agentsWithPHEV = myDecentralizedSmartCharger.getAllAgentsWithEV();
+					LinkedList<Id> agentsWithPHEV = myDecentralizedSmartCharger.getAllAgentsWithPHEV();
 					
 					if(agentsWithEV.isEmpty()==false){
 						
@@ -190,7 +203,80 @@ public class Main {
 				
 	}
 	
+	
+	
+	public static void readHubs(LinkedListValueHashMap<Integer, Schedule> hubLoadDistribution) throws IOException{
+		hubLoadDistribution = new LinkedListValueHashMap<Integer, Schedule>();		
+		hubLoadDistribution.put(2, makeBullshitSchedule());
+		hubLoadDistribution.put(3, makeBullshitSchedule());
+		hubLoadDistribution.put(4, makeBullshitSchedule());
 		
+		
+	}
+	
+	
+	public static Schedule makeBullshitSchedule() throws IOException{
+		
+		Schedule bullShitSchedule= new Schedule();
+		
+		double[] bullshitCoeffs = new double[]{100, 5789, 56};// 
+		double[] bullshitCoeffs2 = new double[]{-22, 5.6, -2.5};
+		
+		PolynomialFunction bullShitFunc= new PolynomialFunction(bullshitCoeffs);
+		PolynomialFunction bullShitFunc2= new PolynomialFunction(bullshitCoeffs2);
+		LoadDistributionInterval l1= new LoadDistributionInterval(
+				0.0,
+				62490.0,
+				bullShitFunc,//p
+				true//boolean
+		);
+		l1.makeXYSeries();
+		bullShitSchedule.addTimeInterval(l1);
+		
+		
+		LoadDistributionInterval l2= new LoadDistributionInterval(					
+				62490.0,
+				DecentralizedSmartCharger.SECONDSPERDAY,
+				bullShitFunc2,//p
+				false//boolean
+		);
+		l2.makeXYSeries();
+		bullShitSchedule.addTimeInterval(l2);
+		
+		bullShitSchedule.visualizeLoadDistribution("BullshitSchedule");	
+		return bullShitSchedule;
+	}
+	
+
+	public static void mapHubs(LinkedListValueHashMap<Integer, Schedule> hubLoadDistribution, 
+			HubLinkMapping hubLinkMapping, 
+			Controler controler){
+		
+		hubLinkMapping=new HubLinkMapping(hubLoadDistribution.size());
+		
+		double maxX=5000;
+		double minX=-20000;
+		double diff= maxX-minX;
+		
+		for (Link link:controler.getNetwork().getLinks().values()){
+			// x values of equil from -20000 up to 5000
+			if (link.getCoord().getX()<(minX+diff)/4){
+				
+				hubLinkMapping.addMapping(link.getId().toString(), 1);
+			}else{
+				if (link.getCoord().getX()<(minX+diff)*2/4){
+					hubLinkMapping.addMapping(link.getId().toString(), 2);
+				}else{
+					if (link.getCoord().getX()<(minX+diff)*3/4){
+						hubLinkMapping.addMapping(link.getId().toString(), 3);
+					}else{
+						hubLinkMapping.addMapping(link.getId().toString(), 4);
+					}
+				}
+			}
+			
+		}
+	}
 		
 
 }

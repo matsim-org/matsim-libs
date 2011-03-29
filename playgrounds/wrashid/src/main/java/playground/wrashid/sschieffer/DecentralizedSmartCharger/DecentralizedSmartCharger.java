@@ -39,6 +39,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 
 
+import playground.wrashid.PSF.data.HubLinkMapping;
 import playground.wrashid.PSF2.pluggable.energyConsumption.EnergyConsumptionPlugin;
 import playground.wrashid.PSF2.pluggable.parkingTimes.ParkingTimesPlugin;
 import playground.wrashid.PSF2.vehicle.vehicleFleet.ConventionalVehicle;
@@ -142,7 +143,9 @@ public class DecentralizedSmartCharger {
 			double minChargingLength,
 			LinkedListValueHashMap<Id, Vehicle> vehicles,
 			double gasJoulesPerLiter,
-			double emissionPerLiterEngine
+			double emissionPerLiterEngine,
+			HubLinkMapping hubLinkMapping, 		
+			LinkedListValueHashMap<Integer, Schedule> hubLoadDistribution
 			
 	) throws IOException, OptimizationException{
 		
@@ -159,8 +162,8 @@ public class DecentralizedSmartCharger {
 		gaussNewtonOptimizer.setConvergenceChecker(checker);		
 		optimizer=gaussNewtonOptimizer;
 		polyFit= new PolynomialFitter(24, optimizer);
-				
-		myHubLoadReader=new HubLoadDistributionReader(controler);
+		
+		myHubLoadReader=new HubLoadDistributionReader(controler, hubLinkMapping, hubLoadDistribution);
 		// TODO  initilaize Facilities? and FUnctions
 		
 		myAgentTimeReader= new AgentTimeIntervalReader(

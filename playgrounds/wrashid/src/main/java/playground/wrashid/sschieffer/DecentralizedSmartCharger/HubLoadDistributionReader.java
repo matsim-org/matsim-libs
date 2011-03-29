@@ -46,11 +46,11 @@ import playground.wrashid.lib.obj.LinkedListValueHashMap;
 
 public class HubLoadDistributionReader {
 	
-	private int numberOfHubs;
-	
+		
 	private HubLinkMapping hubLinkMapping;
 	
-	LinkedListValueHashMap<Integer, Schedule> hubLoadDistribution = new LinkedListValueHashMap<Integer, Schedule>();
+	LinkedListValueHashMap<Integer, Schedule> hubLoadDistribution;
+	
 	Controler controler;
 	
 	/**
@@ -59,88 +59,21 @@ public class HubLoadDistributionReader {
 	 * @throws IOException 
 	 * @throws OptimizationException 
 	 */
-	public HubLoadDistributionReader(Controler controler) throws IOException, OptimizationException{
+	public HubLoadDistributionReader(Controler controler, 
+			HubLinkMapping hubLinkMapping,
+			LinkedListValueHashMap<Integer, Schedule> hubLoadDistribution) throws IOException, OptimizationException{
+		
 		this.controler=controler;
 		
-		readHubs();// so far reads in 4 bogus hubs
-		//PolynomialFunction baseLoadFunction= readLoadDistribution();
+		this.hubLinkMapping=hubLinkMapping;
 		
-		mapHubs();// depending on location x y coordinate
+		this.hubLoadDistribution=hubLoadDistribution;
 		
-		
-	}
-	
-	
-	public void readHubs() throws IOException{
-		hubLoadDistribution.put(1, makeBullshitSchedule());
-		hubLoadDistribution.put(2, makeBullshitSchedule());
-		hubLoadDistribution.put(3, makeBullshitSchedule());
-		hubLoadDistribution.put(4, makeBullshitSchedule());
-		
-		numberOfHubs=hubLoadDistribution.size();
-	}
-	
-	
-	public Schedule makeBullshitSchedule() throws IOException{
-		
-		Schedule bullShitSchedule= new Schedule();
-		
-		double[] bullshitCoeffs = new double[]{100, 5789, 56};// 
-		double[] bullshitCoeffs2 = new double[]{-22, 5.6, -2.5};
-		
-		PolynomialFunction bullShitFunc= new PolynomialFunction(bullshitCoeffs);
-		PolynomialFunction bullShitFunc2= new PolynomialFunction(bullshitCoeffs2);
-		LoadDistributionInterval l1= new LoadDistributionInterval(
-				0.0,
-				62490.0,
-				bullShitFunc,//p
-				true//boolean
-		);
-		l1.makeXYSeries();
-		bullShitSchedule.addTimeInterval(l1);
-		
-		
-		LoadDistributionInterval l2= new LoadDistributionInterval(					
-				62490.0,
-				DecentralizedSmartCharger.SECONDSPERDAY,
-				bullShitFunc2,//p
-				false//boolean
-		);
-		l2.makeXYSeries();
-		bullShitSchedule.addTimeInterval(l2);
-		
-		bullShitSchedule.visualizeLoadDistribution("BullshitSchedule");	
-		return bullShitSchedule;
-	}
-	
-	
-	public void mapHubs(){
-		//NetworkImpl network = GeneralLib.readNetwork("C:/Users/stellas/StellasWorkspace/playgrounds/wrashid/test/scenarios/equil/network.xml");
-		hubLinkMapping=new HubLinkMapping(numberOfHubs);
-		
-		double maxX=5000;
-		double minX=-20000;
-		double diff= maxX-minX;
-		
-		for (Link link:controler.getNetwork().getLinks().values()){
-			// x values of equil from -20000 up to 5000
-			if (link.getCoord().getX()<(minX+diff)/4){
 				
-				hubLinkMapping.addMapping(link.getId().toString(), 1);
-			}else{
-				if (link.getCoord().getX()<(minX+diff)*2/4){
-					hubLinkMapping.addMapping(link.getId().toString(), 2);
-				}else{
-					if (link.getCoord().getX()<(minX+diff)*3/4){
-						hubLinkMapping.addMapping(link.getId().toString(), 3);
-					}else{
-						hubLinkMapping.addMapping(link.getId().toString(), 4);
-					}
-				}
-			}
-			
-		}
 	}
+	
+	
+	
 	
 	
 	public int getHubForLinkId(Id idLink){

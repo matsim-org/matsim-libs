@@ -127,10 +127,7 @@ public class Schedule {
 	
 	public void visualizeLoadDistribution(String name) throws IOException{
 		XYSeriesCollection loadDistributionIntervals = new XYSeriesCollection();
-		/*XYSeriesCollection drivingIntervals = new XYSeriesCollection();
-		XYSeriesCollection parkingIntervals = new XYSeriesCollection();
-		XYSeriesCollection chargingIntervals = new XYSeriesCollection();*/
-		
+				
 		for(TimeInterval t: timesInSchedule){
 			if(t.getClass().equals(new LoadDistributionInterval(0,0,null,false).getClass())){
 				LoadDistributionInterval t2=(LoadDistributionInterval) t;
@@ -188,7 +185,6 @@ public class Schedule {
 					|| (t.getEndTime()>=thisT.getStartTime()  && t.getEndTime()<=thisT.getEndTime())){
 				//if overlap
 				overlap=true;
-				
 			}
 		}
 		
@@ -210,6 +206,8 @@ public class Schedule {
 		}
 		return solution;
 	}
+	
+	
 	
 	public void addJoulesToTotalSchedule(double joules){
 		if(joules<=0){
