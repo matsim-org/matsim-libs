@@ -25,6 +25,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
@@ -58,13 +60,13 @@ public class UrbanSuburbanAnalyzer {
 	private static final Logger logger = Logger.getLogger(UrbanSuburbanAnalyzer.class);
 
 	// INPUT
-	private static String runDirectory = "../../detailedEval/testRuns/output/1pct/v0-default/run15/";
+	private static String runDirectory = "../../detailedEval/testRuns/output/1pct/v0-default/run17/";
 	private static String shapeDirectory = "../../detailedEval/Net/shapeFromVISUM/urbanSuburban/";
 	
 //	private static String netFile = runDirectory + "output_network.xml.gz";
 //	private static String plansFile = runDirectory + "output_plans.xml.gz";
 	private static String netFile = "../../detailedEval/Net/network-86-85-87-84_simplified---withLanes.xml";
-	private static String plansFile = runDirectory + "ITERS/it.100/100.plans.xml.gz";
+	private static String plansFile = runDirectory + "ITERS/it.300/300.plans.xml.gz";
 	
 	private static String urbanShapeFile = shapeDirectory + "urbanAreas.shp";
 	private static String suburbanShapeFile = shapeDirectory + "suburbanAreas.shp";
@@ -92,8 +94,8 @@ public class UrbanSuburbanAnalyzer {
 
 	private void run(String[] args) {
 		loadScenario();
-		Set<Feature> urbanShape = readShape(urbanShapeFile);
-		Set<Feature> suburbanShape = readShape(suburbanShapeFile);
+//		Set<Feature> urbanShape = readShape(urbanShapeFile);
+//		Set<Feature> suburbanShape = readShape(suburbanShapeFile);
 
 		Population population = scenario.getPopulation();
 		Population miDPop = getMiDPopulation(population);
@@ -121,14 +123,14 @@ public class UrbanSuburbanAnalyzer {
 		String name = population.getName();
 		int size = population.getPersons().size();
 
-		System.out.println("==================================================================");
+		System.out.println("##################################################################");
 		System.out.println(name + " consists of " + size + " persons that execute " + totalLegs + " Legs.");
-		System.out.println("==================================================================");
+		System.out.println("##################################################################");
 		for(Entry<String, Integer> entry : mode2NoOfLegs.entrySet()){
 			Double modeShare = (double) entry.getValue() / (double) totalLegs;
 			System.out.println(entry.getKey() + "\t" + "noOfLegs: " + entry.getValue() + "\t" + "modeShare: " + modeShare * 100 + " %");
 		}
-		System.out.println("==================================================================" + "\n");
+		System.out.println("##################################################################" + "\n");
 	}
 
 	private Integer calculateTotalLegs(Population population) {
@@ -145,7 +147,7 @@ public class UrbanSuburbanAnalyzer {
 	}
 
 	private Map<String, Integer> getMode2NoOfLegs(Population population) {
-		Map<String, Integer> mode2NoOfLegs = new HashMap<String, Integer>();
+		SortedMap<String, Integer> mode2NoOfLegs = new TreeMap<String, Integer>();
 		List<String> transportModes = new ArrayList<String>();
 
 		transportModes.add(TransportMode.car);
