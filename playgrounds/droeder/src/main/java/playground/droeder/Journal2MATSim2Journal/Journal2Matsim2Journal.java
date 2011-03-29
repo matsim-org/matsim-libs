@@ -64,6 +64,7 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderXMLv1;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -101,6 +102,7 @@ public class Journal2Matsim2Journal {
 	private boolean inFileHasHeader;
 	private Trip fileHeader;
 	private Set<String[]> inFileContent;
+	private NetworkImpl net;
 	
 	
 	private Map<String, List<Trip>> person2ways;
@@ -119,17 +121,18 @@ public class Journal2Matsim2Journal {
 		
 	}
 	
+	//TODO xy2Links not for pt-links
 	public Journal2Matsim2Journal(String journalFile, String splitByExpr, boolean hasHeader){
 		this.inFile = journalFile;
 		this.splitByExpr = splitByExpr;
 		this.inFileHasHeader = hasHeader;
 	}
 	
-	public void run(String networkFile, String vehicles, String schedule, String outputDirectory){
+	public void run(String networkFile, String vehiclesFile, String scheduleFile, String outputDirectory){
 		this.outDir = outputDirectory;
 		this.networkFile = networkFile;
-		this.schedule = schedule;
-		this.vehicles = vehicles;
+		this.schedule = scheduleFile;
+		this.vehicles = vehiclesFile;
 		this.plansUnrouted = this.outDir + "plans_unrouted.xml";
 		this.configFile = this.outDir + "config.xml";
 
@@ -167,6 +170,7 @@ public class Journal2Matsim2Journal {
 		for(String[] way : this.inFileContent){
 			id = way[2];
 			
+			// sort ways by coordinates given or not
 			if(this.person2ways.containsKey(id)&& !(way[23].equals("9999999")) && !(way[181].equals("9999999"))){
 				this.person2ways.get(id).add(new Trip(way));
 			}else if(!(way[23].equals("9999999")) && !(way[181].equals("9999999"))){
@@ -207,7 +211,8 @@ public class Journal2Matsim2Journal {
 		
 		double tripStartTime;
 		double tripEndTime;
-
+		
+		// generate plans for all plans/persons coordinates are given
 		for(Entry<String, List<Trip>> e : this.person2ways.entrySet()){
 			personCar = fac.createPerson(sc.createId(e.getKey() + "_" + TransportMode.car.toString()));
 			planCar = fac.createPlan(); 
@@ -272,7 +277,7 @@ public class Journal2Matsim2Journal {
 			((Activity) planCar.getPlanElements().get(planCar.getPlanElements().size() - 1)).setEndTime(tripEndTime * 1.1);
 			((Activity) planPt.getPlanElements().get(planPt.getPlanElements().size() - 1)).setEndTime(tripEndTime * 1.1);
 			
-			// add only if all ways have an start and endtime
+			// add only if all plans have some structure like act/leg/act/.../leg/act
 			if(addPerson){
 				personCar.addPlan(planCar);
 				sc.getPopulation().addPerson(personCar);
@@ -280,17 +285,19 @@ public class Journal2Matsim2Journal {
 				personPt.addPlan(planPt);
 				sc.getPopulation().addPerson(personPt);
 			}else{
-				log.error("Person ID " + e.getKey() + " was not added, because of a missing start- or endtime!"); 
+				log.error("Person ID " + e.getKey() + " was not added, because of a missing planelement"); 
 			}
 		}
 		log.info("done");
 		new PopulationWriter(sc.getPopulation(),null).writeV4(plansUnrouted);
 	}
+	
 
 	private void addActivity(Plan plan, Coord c, Double startTime, Double endTime, PopulationFactory fac, String type) {
 		Activity a = fac.createActivityFromCoord(type, c);
 		
-		if(startTime == null){
+		// if no startTime is given choose one
+		if(startTime == null && !(endTime == null)){
 			a.setStartTime(endTime * 0.9);
 		}else{
 			a.setStartTime(startTime);
@@ -502,31 +509,6 @@ public class Journal2Matsim2Journal {
 		
 		
 		
-//		try {
-//			BufferedWriter writer = IOUtils.getBufferedWriter(outdir);
-//			
-//			for(String s : this.fileHeader.getAll().values()){
-//				writer.write(s + ";");
-//			}
-//			writer.newLine();
-//			
-//			for(List<Trip> l : this.person2ways.values()){
-//				for(Trip t : l){
-//					for(String s : t.getAll().values()){
-//						writer.write(s + ";");
-//					}
-//					writer.newLine();
-//				}
-//			}
-//			writer.close();
-//			
-//			log.info("journal written to " + outdir + "...");
-//			
-//		} catch (FileNotFoundException e) {
-//			e.printStackTrace();
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
 		
 	}
 
