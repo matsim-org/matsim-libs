@@ -44,9 +44,7 @@ public class NetworkMapper {
 		this.removeEmptyStations(stationsTree);	
 	}
 	
-	private void removeEmptyStations(TreeMap<String, CountStation> stationsTree) {
-		log.info("Stations before removing empty stations: " + stationsTree.values().size());
-		
+	private void removeEmptyStations(TreeMap<String, CountStation> stationsTree) {		
 		Iterator<CountStation> station_it = stationsTree.values().iterator();
 		while (station_it.hasNext()) {
 			CountStation  station = station_it.next();
