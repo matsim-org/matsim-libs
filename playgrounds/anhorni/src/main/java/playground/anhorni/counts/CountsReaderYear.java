@@ -95,7 +95,7 @@ public class CountsReaderYear {
 						rawCounts.get(id).add(rawCount);	
 					//}
 				}
-				log.info("reading finished -------------------");
+				log.info("reading finished: " + rawCounts.size() + " stations  **************");
 				bufferedReader.close();
 				fileReader.close();
 			}

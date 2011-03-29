@@ -66,7 +66,7 @@ public class CountsCreation {
 		TimeFilter filter = new TimeFilter();
 		filter.setDayFilter(dayFilter);
 		filter.setMonthFilter(monthFilter);
-		log.info(" 	day filter: " + dayFilter + " month filter: " + monthFilter);
+		log.info(" 	day filter: " + dayFilter + "; month filter: " + monthFilter + "; " + stations.getCountStations().size() + " stations to be filtered");
 		
 		Iterator<CountStation> station_it = stations.getCountStations().iterator();
 		while (station_it.hasNext()) {

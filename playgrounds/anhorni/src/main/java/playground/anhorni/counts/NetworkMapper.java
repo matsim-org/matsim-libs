@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.TreeMap;
 import java.util.Vector;
 
+import org.apache.log4j.Logger;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
@@ -15,6 +16,7 @@ public class NetworkMapper {
 	
 	private List<CountStation> countStations = new Vector<CountStation>();
 	private boolean removeZeroVolumes = false;
+	private final static Logger log = Logger.getLogger(NetworkMapper.class);
 	
 	public NetworkMapper(boolean removeZeroVolumes) {
 		this.removeZeroVolumes = removeZeroVolumes;
@@ -43,6 +45,8 @@ public class NetworkMapper {
 	}
 	
 	private void removeEmptyStations(TreeMap<String, CountStation> stationsTree) {
+		log.info("Stations before removing empty stations: " + stationsTree.values().size());
+		
 		Iterator<CountStation> station_it = stationsTree.values().iterator();
 		while (station_it.hasNext()) {
 			CountStation  station = station_it.next();
@@ -51,6 +55,7 @@ public class NetworkMapper {
 				countStations.add(station);
 			}
 		}
+		log.info("Removed empty stations: " + countStations.size() + " stations left");
 	}
 	
 	private void readMappingFile(final String mappingFile, TreeMap<String, CountStation> stationsTree) {
