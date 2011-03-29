@@ -32,6 +32,7 @@ import playground.wrashid.PSF2.chargingSchemes.dumbCharging.ARTEMISEnergyStateMa
 import playground.wrashid.PSF2.pluggable.energyConsumption.EnergyConsumptionModel;
 import playground.wrashid.PSF2.pluggable.energyConsumption.EnergyConsumptionModelPSL;
 import playground.wrashid.PSF2.pluggable.energyConsumption.EnergyConsumptionPlugin;
+import playground.wrashid.PSF2.pluggable.parkingTimes.ParkingTimesPlugin;
 import playground.wrashid.PSF2.vehicle.vehicleFleet.ConventionalVehicle;
 import playground.wrashid.PSF2.vehicle.vehicleFleet.ElectricVehicle;
 import playground.wrashid.PSF2.vehicle.vehicleFleet.PlugInHybridElectricVehicle;
@@ -40,24 +41,30 @@ import playground.wrashid.lib.obj.LinkedListValueHashMap;
 
 public class EnergyConsumptionInit implements StartupListener {
 	
-	EnergyConsumptionModel energyConsumptionModel;
-	EnergyConsumptionPlugin energyConsumptionPlugin;
-	LinkedListValueHashMap<Id, Vehicle> vehicles;
+	
+	public LinkedListValueHashMap<Id, Vehicle> vehicles=new LinkedListValueHashMap<Id, Vehicle>();;
+	public ParkingTimesPlugin parkingTimesPlugin;
+	public EnergyConsumptionPlugin energyConsumptionPlugin;
 	
 	double phev=1.0;
 	double ev=0.0;
 	double combustion=0.0;
 	
-	public EnergyConsumptionInit(double phev, double ev, double combustion){
+	public EnergyConsumptionInit(			
+			double phev, double ev, double combustion){
+		
+				
 		this.phev=phev;
 		this.ev=ev;
 		this.combustion=combustion;
 	}
 	
-
+	
+	
 	public LinkedListValueHashMap<Id, Vehicle> getVehicles(){
-		return vehicles;
+		return this.vehicles;
 	}
+	
 	
 	public EnergyConsumptionPlugin getEnergyConsumptionPlugin(){
 		return energyConsumptionPlugin;
@@ -68,11 +75,11 @@ public class EnergyConsumptionInit implements StartupListener {
 	public void notifyStartup(StartupEvent event) {
 		Controler controler = event.getControler();
 		
-		vehicles=new LinkedListValueHashMap<Id, Vehicle>();
+		
 		
 		for (Id personId: controler.getPopulation().getPersons().keySet()){
 			if (Math.random()<phev){
-				vehicles.put(personId, new PlugInHybridElectricVehicle(new IdImpl(1)));
+				this.vehicles.put(personId, new PlugInHybridElectricVehicle(new IdImpl(1)));
 			} else if (Math.random()<phev+ev){
 				
 				vehicles.put(personId, new ElectricVehicle(null, new IdImpl(1)));
@@ -81,7 +88,7 @@ public class EnergyConsumptionInit implements StartupListener {
 			}
 		}
 		
-		energyConsumptionModel = new EnergyConsumptionModelPSL(140);
+		EnergyConsumptionModelPSL energyConsumptionModel = new EnergyConsumptionModelPSL(140);
 		energyConsumptionPlugin = new EnergyConsumptionPlugin(energyConsumptionModel,vehicles,controler.getNetwork());
 		
 		controler.getEvents().addHandler(energyConsumptionPlugin);

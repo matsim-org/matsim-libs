@@ -67,21 +67,16 @@ import java.util.*;
 public class Main {
 	
 	
-	public static LinkedListValueHashMap<Id, Vehicle> vehicles;
-	public static ParkingTimesPlugin parkingTimesPlugin;
-	public static EnergyConsumptionPlugin energyConsumptionPlugin;
 	
-	
-	
-	
-	// start
 	public static void main(String[] args) {
 		
-				
+		final LinkedListValueHashMap<Id, Vehicle> vehicles;
+		final ParkingTimesPlugin parkingTimesPlugin;
+		final EnergyConsumptionPlugin energyConsumptionPlugin;
+		
 		
 		String configPath="test/input/playground/wrashid/sschieffer/config.xml";
-		Controler controler=new Controler(configPath);
-		
+				
 		final String outputPath="C:\\Users\\stellas\\Output\\V1G\\";
 		
 		final double phev=1.0;
@@ -95,19 +90,23 @@ public class Main {
 		
 		final double MINCHARGINGLENGTH=5*60;//5 minutes
 		
-		
-		EnergyConsumptionInit e= new EnergyConsumptionInit(phev, ev, combustion);
-		vehicles= e.getVehicles();
-		energyConsumptionPlugin=e.getEnergyConsumptionPlugin();
-		controler.addControlerListener(e);
-		
-		
-		parkingTimesPlugin = new ParkingTimesPlugin(controler);
+		Controler controler=new Controler(configPath);
 		
 		EventHandlerAtStartupAdder eventHandlerAtStartupAdder = new EventHandlerAtStartupAdder();
 		
+		parkingTimesPlugin = new ParkingTimesPlugin(controler);
+		
 		eventHandlerAtStartupAdder.addEventHandler(parkingTimesPlugin);
 		
+		
+		final EnergyConsumptionInit e= new EnergyConsumptionInit(
+				phev, ev, combustion);
+				
+		
+		controler.addControlerListener(e);
+		
+		
+				
 		controler.addControlerListener(eventHandlerAtStartupAdder);
 		
 		controler.setOverwriteFiles(true);
@@ -121,13 +120,14 @@ public class Main {
 				
 				try {
 					
+					
 					DecentralizedSmartCharger myDecentralizedSmartCharger = new DecentralizedSmartCharger(
 							event.getControler(), 
 							parkingTimesPlugin,
-							energyConsumptionPlugin,
+							e.getEnergyConsumptionPlugin(),
 							outputPath, 
 							MINCHARGINGLENGTH, 
-							vehicles,
+							e.getVehicles(),
 							gasJoulesPerLiter,
 							emissionPerLiterEngine);
 					

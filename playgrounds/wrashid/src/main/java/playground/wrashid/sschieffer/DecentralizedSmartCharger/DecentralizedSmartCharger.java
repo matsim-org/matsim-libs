@@ -143,11 +143,15 @@ public class DecentralizedSmartCharger {
 			LinkedListValueHashMap<Id, Vehicle> vehicles,
 			double gasJoulesPerLiter,
 			double emissionPerLiterEngine
+			
 	) throws IOException, OptimizationException{
 		
 		this.controler=controler;
 						
 		this.outputPath=outputPath;
+		
+		this.vehicles=vehicles;
+		
 		
 		this.MINCHARGINGLENGTH=minChargingLength; 
 		
@@ -199,6 +203,11 @@ public class DecentralizedSmartCharger {
 	/*
 	 * GET RESULTS
 	 */
+	
+	public LinkedListValueHashMap<Id, Schedule> getAllAgentParkingAndDrivingSchedules(){
+		return agentParkingAndDrivingSchedules;
+	}
+	
 	
 	/**
 	 * returns LinkedListValueHashMap<Id, Schedule> agentChargingSchedules
