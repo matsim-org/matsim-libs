@@ -95,7 +95,7 @@ public class Aggregator {
 			}
 		}
 		for (int i = 0; i < 24; i++) {
-			standarddev[i] = Math.sqrt(standarddev[i] / (volumes.get(i).size() -1));
+			standarddev[i] = Math.sqrt(standarddev[i] / volumes.get(i).size());
 		}	
 	}
 		
