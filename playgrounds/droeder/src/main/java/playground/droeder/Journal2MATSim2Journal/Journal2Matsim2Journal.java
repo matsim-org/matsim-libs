@@ -76,6 +76,7 @@ import org.xml.sax.SAXException;
 
 import playground.droeder.DaFileReader;
 import playground.droeder.DaPaths;
+import playground.droeder.Analysis.AnalysisTrip;
 
 
 /**
@@ -100,13 +101,13 @@ public class Journal2Matsim2Journal {
 	private double startTime = Double.MAX_VALUE;
 	
 	private boolean inFileHasHeader;
-	private Trip fileHeader;
+	private AnalysisTrip fileHeader;
 	private Set<String[]> inFileContent;
 	private NetworkImpl net;
 	
 	
-	private Map<String, List<Trip>> person2ways;
-	private Map<String, List<Trip>> person2waysUnrouted;
+	private Map<String, List<AnalysisTrip>> person2ways;
+	private Map<String, List<AnalysisTrip>> person2waysUnrouted;
 	private Map<Id, Set<PersonEvent>> person2Event;
 	private Map<String, Set<List<PersonEvent>>> carId2TripEvents;
 	private Map<String, Set<List<PersonEvent>>> ptId2TripEvents;
@@ -147,14 +148,12 @@ public class Journal2Matsim2Journal {
 		this.readEventsFile();
 		this.sortTripEventsByMode();
 		this.analyzeEvents();
-		
 		this.writeNewJournal();
 	}
 
-
 	private void readJournal() {
 		log.info("read infile");
-		this.fileHeader = new Trip(DaFileReader.readFileHeader(this.inFile, this.splitByExpr));
+		this.fileHeader = new AnalysisTrip(DaFileReader.readFileHeader(this.inFile, this.splitByExpr));
 		this.fileHeader.setPtTime("travelTimePT", "transitTimePT", "waitingTimePT");
 		this.fileHeader.setCarTime("carTime");
 		
@@ -164,27 +163,27 @@ public class Journal2Matsim2Journal {
 	
 	private void sortWaysByPerson() {
 		log.info("sort ways by person");
-		this.person2ways = new TreeMap<String, List<Trip>>();
-		this.person2waysUnrouted = new TreeMap<String, List<Trip>>();
+		this.person2ways = new TreeMap<String, List<AnalysisTrip>>();
+		this.person2waysUnrouted = new TreeMap<String, List<AnalysisTrip>>();
 		String id;
 		for(String[] way : this.inFileContent){
 			id = way[2];
 			
 			// sort ways by coordinates given or not
 			if(this.person2ways.containsKey(id)&& !(way[23].equals("9999999")) && !(way[181].equals("9999999"))){
-				this.person2ways.get(id).add(new Trip(way));
+				this.person2ways.get(id).add(new AnalysisTrip(way));
 			}else if(!(way[23].equals("9999999")) && !(way[181].equals("9999999"))){
-				this.person2ways.put(id, new LinkedList<Trip>());
-				this.person2ways.get(id).add(new Trip(way));
+				this.person2ways.put(id, new LinkedList<AnalysisTrip>());
+				this.person2ways.get(id).add(new AnalysisTrip(way));
 			}else{
 				if(this.person2waysUnrouted.containsKey(id)){
-					Trip temp = new Trip(way);
+					AnalysisTrip temp = new AnalysisTrip(way);
 					temp.setCarTime(9999999);
 					temp.setPtTime(9999999, 9999999, 9999999);
 					this.person2waysUnrouted.get(id).add(temp);
 				}else{
-					this.person2waysUnrouted.put(id, new LinkedList<Trip>());
-					Trip temp = new Trip(way);
+					this.person2waysUnrouted.put(id, new LinkedList<AnalysisTrip>());
+					AnalysisTrip temp = new AnalysisTrip(way);
 					temp.setCarTime(9999999);
 					temp.setPtTime(9999999, 9999999, 9999999);
 					this.person2waysUnrouted.get(id).add(temp);
@@ -213,7 +212,7 @@ public class Journal2Matsim2Journal {
 		double tripEndTime;
 		
 		// generate plans for all plans/persons coordinates are given
-		for(Entry<String, List<Trip>> e : this.person2ways.entrySet()){
+		for(Entry<String, List<AnalysisTrip>> e : this.person2ways.entrySet()){
 			personCar = fac.createPerson(sc.createId(e.getKey() + "_" + TransportMode.car.toString()));
 			planCar = fac.createPlan(); 
 				
@@ -221,7 +220,7 @@ public class Journal2Matsim2Journal {
 			planPt = fac.createPlan();
 			
 			SortedMap<Integer, String> way;
-			Iterator<Trip> it = e.getValue().iterator();
+			Iterator<AnalysisTrip> it = e.getValue().iterator();
 			boolean addPerson = true;
 			do{
 				way = it.next().getAll();
@@ -488,8 +487,8 @@ public class Journal2Matsim2Journal {
 		try {
 			BufferedWriter writer = IOUtils.getBufferedWriter(outFile);
 			
-			for(Entry<Integer, Trip> t : this.preProcessForWriting().entrySet()){
-				System.out.print(t.getKey() + "\t");
+			for(Entry<Integer, AnalysisTrip> t : this.preProcessForWriting().entrySet()){
+				System.out.print(t.getKey() + this.splitByExpr);
 				for(String s : t.getValue().getAll().values()){
 					writer.write(s + ";");
 					System.out.print(s + "\t");
@@ -512,17 +511,17 @@ public class Journal2Matsim2Journal {
 		
 	}
 
-	private SortedMap<Integer, Trip> preProcessForWriting() {
-		SortedMap<Integer, Trip> trips = new TreeMap<Integer, Trip>();
+	private SortedMap<Integer, AnalysisTrip> preProcessForWriting() {
+		SortedMap<Integer, AnalysisTrip> trips = new TreeMap<Integer, AnalysisTrip>();
 		trips.put(0, this.fileHeader);
 		
-		for(List<Trip> l: person2ways.values()){
-			for(Trip t : l){
+		for(List<AnalysisTrip> l: person2ways.values()){
+			for(AnalysisTrip t : l){
 				trips.put(Integer.valueOf(t.getElement(1)+1),t);
 			}
 		}
-		for(List<Trip> l: person2waysUnrouted.values()){
-			for(Trip t : l){
+		for(List<AnalysisTrip> l: person2waysUnrouted.values()){
+			for(AnalysisTrip t : l){
 				trips.put(Integer.valueOf(t.getElement(1)+1),t);
 			}
 		}
@@ -531,54 +530,4 @@ public class Journal2Matsim2Journal {
 	}
 }
 
-class Trip{
-	
-	private SortedMap<Integer, String> values;
-	private int oldSize;
-	
-	public Trip(String[] oldTrip){
-		this.oldSize = oldTrip.length;
-		this.values = new TreeMap<Integer, String>();
-		
-		for(int i = 0; i < oldTrip.length; i++){
-			this.values.put(i, oldTrip[i]);
-		}
-	}
-	
-	public Trip(String[] oldTrip, boolean toRoot){
-		this.values = new TreeMap<Integer, String>();
-		
-		for(int i = 0; i < oldTrip.length; i++){
-			this.values.put(i, oldTrip[i]);
-		}
-		this.setPtTime(9999999, 9999999, 9999999);
-		this.setCarTime(9999999);
-	}
-	
-	public void setPtTime(double travelTime, double transitTime, double waitingTime){
-		this.values.put(this.oldSize, String.valueOf(travelTime));
-		this.values.put(this.oldSize+1, String.valueOf(transitTime));
-		this.values.put(this.oldSize+2, String.valueOf(waitingTime));
-	}
-	
-	public void setPtTime(String travelTime, String transitTime, String waitingTime){
-		this.values.put(this.oldSize, travelTime);
-		this.values.put(this.oldSize+1, transitTime);
-		this.values.put(this.oldSize+2, waitingTime);
-	}
-	
-	public void setCarTime(double travelTime){
-		this.values.put(this.oldSize+3, String.valueOf(travelTime));
-	}
-	public void setCarTime(String travelTime){
-		this.values.put(this.oldSize+3, travelTime);
-	}
-	
-	public String getElement(int index){
-		return this.values.get(index);
-	}
-	
-	public SortedMap<Integer, String> getAll(){
-		return this.values;
-	}
-}
+
