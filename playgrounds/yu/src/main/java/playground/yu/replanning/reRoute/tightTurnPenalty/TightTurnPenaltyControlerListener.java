@@ -27,6 +27,8 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 
+import playground.yu.travelCost.SingleReRouteSelectedControler;
+
 /**
  * @author yu
  * 
@@ -43,4 +45,11 @@ public class TightTurnPenaltyControlerListener implements
 		}
 	}
 
+	public static void main(String[] args) {
+		Controler controler = new SingleReRouteSelectedControler(args[0]);
+		controler.addControlerListener(new TightTurnPenaltyControlerListener());
+		controler.setWriteEventsInterval(0);
+		controler.setOverwriteFiles(true);
+		controler.run();
+	}
 }
