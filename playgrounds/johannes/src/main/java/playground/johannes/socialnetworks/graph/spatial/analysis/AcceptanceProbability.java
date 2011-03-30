@@ -80,7 +80,7 @@ public class AcceptanceProbability {
 				}
 			}
 			double[] dArray = ds.toNativeArray();
-			Discretizer discretizer = FixedSampleSizeDiscretizer.create(dArray, 100, 500);
+			Discretizer discretizer = FixedSampleSizeDiscretizer.create(dArray, 200, 300);
 			TDoubleDoubleHashMap n_d = Histogram.createHistogram(dArray, discretizer, true);
 
 			for (int i = 0; i < vertex.getEdges().size(); i++) {

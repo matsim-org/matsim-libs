@@ -49,11 +49,11 @@ public class ObsSpatialAnalyzerTask extends AnalyzerTaskComposite {
 //		acceptTask.setModule(ObservedAcceptanceProbability.getInstance());
 //		addTask(acceptTask);
 		
-		Accessibility access = new Accessibility(new GravityCostFunction(1.6, 0));
-		access.setTargets(points);
-		addTask(new EdgeLengthAccessibilityTask(access));
-		
-		addTask(new TripTask());
+//		Accessibility access = new Accessibility(new GravityCostFunction(1.6, 0));
+//		access.setTargets(points);
+//		addTask(new EdgeLengthAccessibilityTask(access));
+//		
+//		addTask(new TripTask());
 		
 //		AcceptancePropaCategoryTask t = new AcceptancePropaCategoryTask();
 //		t.setBoundary(boundary);

@@ -60,20 +60,21 @@ public class WaveSizeTask extends AnalyzerTask {
 				detected.adjustOrPutValue(((SampledVertex)v).getIterationDetected(), 1, 1);
 		}
 		
+		TIntIntHashMap detectedEdges = new TIntIntHashMap();
 		TIntIntHashMap sampledEdges = new TIntIntHashMap();
 		for(Edge e : graph.getEdges()) {
 			SampledVertex v_i = (SampledVertex)e.getVertices().getFirst();
 			SampledVertex v_j = (SampledVertex)e.getVertices().getSecond();
-//			if(v_i.isSampled() && v_j.isSampled()) {
-//				int it = Math.max(v_i.getIterationSampled(), v_j.getIterationSampled());
-//				sampledEdges.adjustOrPutValue(it, 1, 1);
-//			}
+			if(v_i.isSampled() && v_j.isSampled()) {
+				int it = Math.max(v_i.getIterationSampled(), v_j.getIterationSampled());
+				sampledEdges.adjustOrPutValue(it, 1, 1);
+			}
 			int it = Integer.MAX_VALUE;
 			if(v_i.isSampled())
 				it = Math.min(it, v_i.getIterationSampled());
 			if(v_j.isSampled())
 				it = Math.min(it, v_j.getIterationSampled());
-			sampledEdges.adjustOrPutValue(it, 1, 1);
+			detectedEdges.adjustOrPutValue(it, 1, 1);
 		}
 		
 		int detectedTotal = 0;
@@ -90,6 +91,13 @@ public class WaveSizeTask extends AnalyzerTask {
 			sampledTotal += it.value();
 		}
 
+		int detectedEdgesTotal = 0;
+		it = detectedEdges.iterator();
+		for(int i = 0; i < detectedEdges.size(); i++) {
+			it.advance();
+			detectedEdgesTotal += it.value();
+		}
+		
 		int sampledEdgesTotal = 0;
 		it = sampledEdges.iterator();
 		for(int i = 0; i < sampledEdges.size(); i++) {
@@ -99,6 +107,7 @@ public class WaveSizeTask extends AnalyzerTask {
 		
 		stats.put(NUM_DETECTED, new Double(detectedTotal));
 		stats.put(NUM_SAMPLED, new Double(sampledTotal));
+		stats.put("detectedEdges", new Double(detectedEdgesTotal));
 		stats.put("sampledEdges", new Double(sampledEdgesTotal));
 		
 		
@@ -108,6 +117,7 @@ public class WaveSizeTask extends AnalyzerTask {
 			try {
 				write(sampled, getOutputDirectory() + "/sampled.txt");
 				write(detected, getOutputDirectory() + "/detected.txt");
+				write(detectedEdges, getOutputDirectory() + "/detected_edges.txt");
 				write(sampledEdges, getOutputDirectory() + "/sampled_edges.txt");
 			} catch (IOException e) {
 				e.printStackTrace();

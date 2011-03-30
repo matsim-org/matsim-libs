@@ -41,11 +41,11 @@ public class ObservedSocialAnalyzerTask extends SocialAnalyzerTask {
 		addTask(new GenderTask(new ObservedGender()));
 		addTask(new EducationTask());
 		
-		SpatialCostFunction function = new GravityCostFunction(1.6, 0);
-		Accessibility access = new Accessibility(function);
-		
-		addTask(new AgeAccessibilityTask(access));
-		addTask(new GenderAccessibilityTask(access));
+//		SpatialCostFunction function = new GravityCostFunction(1.6, 0);
+//		Accessibility access = new Accessibility(function);
+//		
+//		addTask(new AgeAccessibilityTask(access));
+//		addTask(new GenderAccessibilityTask(access));
 	}
 
 }

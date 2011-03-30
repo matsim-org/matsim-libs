@@ -141,16 +141,16 @@ public class VertexTableWriter {
 		task.setOutputDirectoy("/Users/jillenberger/Work/socialnets/data/ivt2009/09-2010/graph/noH/");
 		task.analyze(graph, map);
 		for(List<SampledVertexDecorator<SocialVertex>> list : task.pathSet) {
-			boolean yellow = false;
-			if(list.size() == 18) {
-				yellow = true;
-			}
+//			boolean yellow = false;
+//			if(list.size() == 18) {
+//				yellow = true;
+//			}
 			for(int i = 0; i < list.size()-1; i++) {
 				Edge e = GraphUtils.findEdge(list.get(i), list.get(i+1));
 				if(e!=null) {
-					if(yellow)
-						yellowEdges.add(e);
-					else
+//					if(yellow)
+//						yellowEdges.add(e);
+//					else
 						edges.add(e);
 				}
 			}

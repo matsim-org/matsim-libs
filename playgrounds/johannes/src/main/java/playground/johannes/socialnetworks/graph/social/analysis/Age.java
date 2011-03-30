@@ -99,7 +99,7 @@ public class Age extends AbstractVertexProperty {
 		for(SocialEdge edge : edges) {
 			double a1 = edge.getVertices().getFirst().getPerson().getAge();
 			double a2 = edge.getVertices().getSecond().getPerson().getAge();
-			if(a1 > -1 && a2 > -1) {
+			if(a1 > 0 && a2 > 0) {
 				values1.add(a1);
 				values2.add(a2);
 				

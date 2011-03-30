@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PopulationFilter.java
+ * RemoveNonHomeActs.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -19,34 +19,43 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.utils;
 
-import java.io.IOException;
-
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
-import org.xml.sax.SAXException;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 
 /**
  * @author illenberger
  *
  */
-public class PopulationFilter {
+public class RemoveNonHomeActs {
 
-	public static void main(String args[]) throws SAXException, ParserConfigurationException, IOException {
-		ScenarioLoaderImpl loader = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(args[0]);
-		loader.loadScenario();
-		Scenario scenario = loader.getScenario();
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		Config config = new Config();
+		MatsimConfigReader creader = new MatsimConfigReader(config);
+		creader.readFile(args[0]);
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		
-//		NetworkReaderMatsimV1 netReader = new NetworkReaderMatsimV1(scenario);
-//		netReader.parse(args[0]);
-//		
-//		PopulationReaderMatsimV4 reader = new PopulationReaderMatsimV4(scenario);
-//		reader.readFile(args[1]);
+		Population pop = scenario.getPopulation();
 		
-		double f = Double.parseDouble(args[1]);
-		
-		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork(), f).write(scenario.getConfig().getParam("popfilter", "outputPlansFile"));
+		for(Person p : pop.getPersons().values()) {
+			for(int i = 1; i < p.getPlans().size(); i = 1)
+				p.getPlans().remove(i);
+
+			Plan selected = p.getSelectedPlan();
+			for(int i = 1; i < selected.getPlanElements().size(); i = 1) {
+				selected.getPlanElements().remove(i);
+			}
+		}
+
+		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).write(scenario.getConfig().getParam("popfilter", "outputPlansFile"));
 	}
+
 }

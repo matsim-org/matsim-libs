@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PopulationFilter.java
+ * ActivityFilter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,36 +17,16 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.utils;
+package playground.johannes.socialnetworks.sim.locationChoice;
 
-import java.io.IOException;
-
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
-import org.xml.sax.SAXException;
+import org.matsim.api.core.v01.population.Activity;
 
 /**
  * @author illenberger
  *
  */
-public class PopulationFilter {
+public interface ActivityFilter {
 
-	public static void main(String args[]) throws SAXException, ParserConfigurationException, IOException {
-		ScenarioLoaderImpl loader = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(args[0]);
-		loader.loadScenario();
-		Scenario scenario = loader.getScenario();
-		
-//		NetworkReaderMatsimV1 netReader = new NetworkReaderMatsimV1(scenario);
-//		netReader.parse(args[0]);
-//		
-//		PopulationReaderMatsimV4 reader = new PopulationReaderMatsimV4(scenario);
-//		reader.readFile(args[1]);
-		
-		double f = Double.parseDouble(args[1]);
-		
-		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork(), f).write(scenario.getConfig().getParam("popfilter", "outputPlansFile"));
-	}
+	public boolean apply(Activity activity);
+	
 }

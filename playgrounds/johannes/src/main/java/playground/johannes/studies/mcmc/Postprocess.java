@@ -41,7 +41,7 @@ public class Postprocess {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		String rootDir = "/Volumes/cluster.math.tu-berlin.de/net/ils/jillenberger/socialnets/mcmc/runs/run307/";
+		String rootDir = "/Volumes/cluster.math.tu-berlin.de/net/ils/jillenberger/socialnets/mcmc/runs/run311/";
 		String statsPath = "20000000000/social/statistics.txt";
 //		String key = "r_age";
 		String key = "r_gender";

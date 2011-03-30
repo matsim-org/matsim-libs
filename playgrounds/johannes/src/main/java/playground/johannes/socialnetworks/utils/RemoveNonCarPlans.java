@@ -22,10 +22,12 @@ package playground.johannes.socialnetworks.utils;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.contrib.sna.util.ProgressLogger;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 
@@ -35,6 +37,8 @@ import org.matsim.core.scenario.ScenarioLoaderImpl;
  */
 public class RemoveNonCarPlans {
 
+	private static final Logger logger = Logger.getLogger(RemoveNonCarPlans.class);
+	
 	/**
 	 * @param args
 	 */
@@ -45,6 +49,9 @@ public class RemoveNonCarPlans {
 
 		Set<Person> rmPersons = new HashSet<Person>();
 
+		logger.info("Parsing plans...");
+		ProgressLogger.init(scenario.getPopulation().getPersons().size(), 1, 5);
+		
 		for (Person person : scenario.getPopulation().getPersons().values()) {
 			Set<Plan> remove = new HashSet<Plan>();
 			for (Plan plan : person.getPlans()) {
@@ -58,18 +65,24 @@ public class RemoveNonCarPlans {
 					}
 				}
 			}
-
+		
 			for (Plan plan : remove)
 				person.getPlans().remove(plan);
 
 			if (person.getPlans().isEmpty())
 				rmPersons.add(person);
+			
+			ProgressLogger.step();
 		}
+		ProgressLogger.termiante();
 
+		logger.info(String.format("Removing %1$s persons with zero plans...", rmPersons.size()));
 		for (Person person : rmPersons)
 			scenario.getPopulation().getPersons().remove(person.getId());
 
+		logger.info(String.format("%1$s persons left.", scenario.getPopulation().getPersons().size()));
+		
 		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).write(scenario.getConfig().getParam(
-				"plans", "outputPlansFile"));
+				"popfilter", "outputPlansFile"));
 	}
 }

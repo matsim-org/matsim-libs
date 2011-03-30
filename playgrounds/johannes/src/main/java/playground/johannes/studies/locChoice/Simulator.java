@@ -51,15 +51,15 @@ import org.matsim.core.scoring.EventsToScore;
 import org.matsim.core.scoring.charyparNagel.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.utils.misc.ConfigUtils;
 
+import playground.johannes.socialnetworks.graph.social.SocialGraph;
 import playground.johannes.socialnetworks.sim.analysis.NearestLocation;
 import playground.johannes.socialnetworks.sim.analysis.PlanAnalyzerTaskComposite;
 import playground.johannes.socialnetworks.sim.analysis.PlansAnalyzer;
 import playground.johannes.socialnetworks.sim.analysis.TravelDistanceTask;
 import playground.johannes.socialnetworks.sim.interaction.PseudoSim;
-import playground.johannes.socialnetworks.sim.locationChoice.ActivityChoice;
-import playground.johannes.socialnetworks.sim.locationChoice.ActivityRandomizer;
-import playground.johannes.socialnetworks.sim.locationChoice.ChoiceSet;
-import playground.johannes.socialnetworks.sim.locationChoice.NegatedGibbsPlanSelector;
+import playground.johannes.socialnetworks.sim.locationChoice.ActivityChoice2;
+import playground.johannes.socialnetworks.sim.locationChoice.ActivityMover;
+import playground.johannes.socialnetworks.survey.ivt2009.graph.io.SocialSparseGraphMLReader;
 
 /**
  * @author illenberger
@@ -83,7 +83,9 @@ public class Simulator {
 	
 	private EventsToScore scorer;
 	
-	private Map<Person, ChoiceSet> choiceSets;
+//	private Map<Person, ChoiceSet> choiceSets;
+	
+	private SocialGraph socialNetwork;
 	
 //	private final Random random;
 	
@@ -96,17 +98,20 @@ public class Simulator {
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		MatsimNetworkReader netReader = new MatsimNetworkReader(scenario);
 		netReader.readFile(config.getParam("network", "inputNetworkFile"));
-		MatsimPopulationReader reader = new MatsimPopulationReader(scenario);
-		reader.readFile(config.getParam("plans", "inputPlansFile"));
+		MatsimPopulationReader popReader = new MatsimPopulationReader(scenario);
+		popReader.readFile(config.getParam("plans", "inputPlansFile"));
+		
+		SocialSparseGraphMLReader reader = new SocialSparseGraphMLReader();
+		SocialGraph graph = reader.readGraph(config.getParam("socialnets", "graphfile"), scenario.getPopulation());
 		
 		String output = config.getParam("controler", "outputDirectory");
 		long rndSeed = Long.parseLong(config.getParam("global", "randomSeed"));
 		int iterations = Integer.parseInt(config.getParam("controler", "lastIteration"));
-		Simulator sim = new Simulator(config, scenario.getNetwork(), scenario.getPopulation(), new Random(rndSeed));
+		Simulator sim = new Simulator(config, scenario.getNetwork(), scenario.getPopulation(), new Random(rndSeed), graph);
 		sim.run(iterations, output);
 	}
 	
-	public Simulator(Config config, Network network, Population population, Random random) {
+	public Simulator(Config config, Network network, Population population, Random random, SocialGraph graph) {
 		this.network = network;
 		this.population = population;
 //		this.random = random;
@@ -120,32 +125,23 @@ public class Simulator {
 		
 		
 		strategyManager = new StrategyManager();
-		strategyManager.setPlanSelectorForRemoval(new NegatedGibbsPlanSelector(1.0, random));
+//		strategyManager.setPlanSelectorForRemoval(new NegatedGibbsPlanSelector(100.0, new Random(rndSeed)));
+
 		strategyManager.setMaxPlansPerAgent(1);
-		PlanStrategy keepSelected = new PlanStrategyImpl(new KeepSelected());
+//		PlanStrategy keepSelected = new PlanStrategyImpl(new BestPlanSelector());
 		
-//		travelTime = new TravelTimeCalculator(network, 3600, 86400, new TravelTimeCalculatorConfigGroup());
-//		TravelCost travelCost = new TravelCost() {
-//			
-//			@Override
-//			public double getLinkGeneralizedTravelCost(Link link, double time) {
-//				// TODO Auto-generated method stub
-//				return travelTime.getLinkTravelTime(link, time);
-//			}
-//		};
 		travelTime = new FreespeedTravelTimeCost(-6/3600.0, 0, 0);
 		LeastCostPathCalculator router = new Dijkstra(network, (TravelCost) travelTime, travelTime);
-		choiceSets = ChoiceSet.create(population, random, config.getParam("controler", "outputDirectory"));
+
 		PlanStrategy changeLocation = new PlanStrategyImpl(new KeepSelected());
-		changeLocation.addStrategyModule(new ActivityChoice(random, network, router, choiceSets, population.getFactory()));
+		
+		ActivityMover mover = new ActivityMover(population.getFactory(), router, network);
+		ActivityChoice2 choice = new ActivityChoice2(graph, mover, random);
+		
+		changeLocation.addStrategyModule(choice);
 		
 //		strategyManager.addStrategy(keepSelected, 1.0);
 		strategyManager.addStrategy(changeLocation, 1.0);
-		
-//		logger.info("Randomizing leisure activities...");
-//		ActivityRandomizer randomizer = new ActivityRandomizer(network, random, population.getFactory(), router);
-//		randomizer.randomize(population);
-		
 	}
 	
 	public void run(long iterations, String output) {
@@ -163,11 +159,12 @@ public class Simulator {
 				String outDir = String.format("%1$s/analysis/%2$s/", output, i);
 				new File(outDir).mkdirs();
 				TravelDistanceTask task = new TravelDistanceTask(network, outDir);
-				NearestLocation locTask = new NearestLocation(choiceSets, outDir);
+				NearestLocation locTask = new NearestLocation(socialNetwork, outDir);
 				PlanAnalyzerTaskComposite composite = new PlanAnalyzerTaskComposite();
 				composite.addComponent(task);
 				composite.addComponent(locTask);
 				Map<String, Double> map = PlansAnalyzer.analyzeUnselectedPlans(population, composite);
+//				Map<String, Double> map = PlansAnalyzer.analyzeSelectedPlans(population, composite);
 				try {
 					PlansAnalyzer.write(map, outDir + "summary.txt");
 				} catch (IOException e) {

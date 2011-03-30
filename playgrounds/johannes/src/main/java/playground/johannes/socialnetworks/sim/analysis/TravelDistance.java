@@ -31,8 +31,8 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Route;
 
+import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
 import playground.johannes.socialnetworks.gis.DistanceCalculator;
-import playground.johannes.socialnetworks.gis.OrthodromicDistanceCalculator;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -47,8 +47,8 @@ public class TravelDistance {
 	private boolean geodesicMode = false;
 
 	private Network network;
-	private DistanceCalculator distanceCalculator = new OrthodromicDistanceCalculator();
-//	private DistanceCalculator distanceCalculator = new CartesianDistanceCalculator();
+//	private DistanceCalculator distanceCalculator = new OrthodromicDistanceCalculator();
+	private DistanceCalculator distanceCalculator = new CartesianDistanceCalculator();
 
 	private GeometryFactory geoFactory = new GeometryFactory();
 
@@ -71,7 +71,7 @@ public class TravelDistance {
 				if (plan.getPlanElements().size() > i + 1) {
 					Activity act = (Activity) plan.getPlanElements().get(i + 1);
 
-					String type = act.getType().substring(0, 1);
+					String type = act.getType();//.substring(0, 1);
 					DescriptiveStatistics stats = statsMap.get(type);
 					if (stats == null) {
 						stats = new DescriptiveStatistics();

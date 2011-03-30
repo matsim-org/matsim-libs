@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PopulationFilter.java
+ * PlanFilterEngine.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,36 +17,40 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.utils;
+package playground.johannes.socialnetworks.sim.locationChoice;
 
-import java.io.IOException;
-
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
-import org.xml.sax.SAXException;
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.contrib.sna.util.ProgressLogger;
 
 /**
  * @author illenberger
  *
  */
-public class PopulationFilter {
+public class PlanFilterEngine {
 
-	public static void main(String args[]) throws SAXException, ParserConfigurationException, IOException {
-		ScenarioLoaderImpl loader = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(args[0]);
-		loader.loadScenario();
-		Scenario scenario = loader.getScenario();
+	private static final Logger logger = Logger.getLogger(PlanFilterEngine.class);
+	
+	public static void apply(Population population, PlanFilter filter) {
+		int cnt = 0;
+		int total = 0;
+		ProgressLogger.init(population.getPersons().size(), 1, 5);
 		
-//		NetworkReaderMatsimV1 netReader = new NetworkReaderMatsimV1(scenario);
-//		netReader.parse(args[0]);
-//		
-//		PopulationReaderMatsimV4 reader = new PopulationReaderMatsimV4(scenario);
-//		reader.readFile(args[1]);
+		for(Person person : population.getPersons().values()) {
+			for(Plan plan : person.getPlans()) {
+				if(filter.apply(plan))
+					cnt++;
+				
+				total++;
+			}
+			
+			ProgressLogger.step();
+		}
 		
-		double f = Double.parseDouble(args[1]);
+		ProgressLogger.termiante();
 		
-		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork(), f).write(scenario.getConfig().getParam("popfilter", "outputPlansFile"));
+		logger.info(String.format("Modified %1$s of %2$s plans.", cnt, total));
 	}
 }

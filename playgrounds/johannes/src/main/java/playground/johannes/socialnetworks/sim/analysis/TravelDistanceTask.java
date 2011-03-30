@@ -64,7 +64,9 @@ public class TravelDistanceTask implements PlansAnalyzerTask {
 		
 		for(Entry<String, DescriptiveStatistics> entry : statsMap.entrySet()) {
 			stats.put(TRAVEL_DISTANCE_PREFIX + entry.getKey(), entry.getValue().getMean());
-			TDoubleDoubleHashMap hist = Histogram.createHistogram(entry.getValue(), FixedSampleSizeDiscretizer.create(entry.getValue().getValues(), 1, 50), true);
+			double[] values = entry.getValue().getValues();
+			if(values.length > 0) {
+			TDoubleDoubleHashMap hist = Histogram.createHistogram(entry.getValue(), FixedSampleSizeDiscretizer.create(values, 1, 50), true);
 //			TDoubleDoubleHashMap hist = Histogram.createHistogram(entry.getValue(), new LinLogDiscretizer(500.0, 2));
 			hist.remove(0.0);
 			Histogram.normalize(hist);
@@ -81,7 +83,7 @@ public class TravelDistanceTask implements PlansAnalyzerTask {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			
+			}
 			
 		}
 		
@@ -90,6 +92,8 @@ public class TravelDistanceTask implements PlansAnalyzerTask {
 		
 		for(Entry<String, DescriptiveStatistics> entry : statsMap.entrySet()) {
 			stats.put(TRAVEL_DISTANCE_PREFIX + "geo_" + entry.getKey(), entry.getValue().getMean());
+			double[] values = entry.getValue().getValues();
+			if(values.length > 0) {
 //			TDoubleDoubleHashMap hist = Histogram.createHistogram(entry.getValue(), new LinLogDiscretizer(500.0, 2));
 			TDoubleDoubleHashMap hist = Histogram.createHistogram(entry.getValue(), FixedSampleSizeDiscretizer.create(entry.getValue().getValues(), 1, 50), true);
 			hist.remove(0.0);
@@ -108,6 +112,7 @@ public class TravelDistanceTask implements PlansAnalyzerTask {
 				e.printStackTrace();
 			}
 			System.err.println("Num trips: " + entry.getKey() +" = "+entry.getValue().getN());
+			}
 		}
 	}
 
@@ -115,11 +120,11 @@ public class TravelDistanceTask implements PlansAnalyzerTask {
 	public static void main(String args[]) throws IOException {
 		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		
-		MatsimNetworkReader netReader = new MatsimNetworkReader(scenario);
-		netReader.readFile("/Volumes/cluster.math.tu-berlin.de/net/ils2/jillenberger/locationChoice/data/ivtch.xml");
+//		MatsimNetworkReader netReader = new MatsimNetworkReader(scenario);
+//		netReader.readFile("/Volumes/cluster.math.tu-berlin.de/net/ils2/jillenberger/locationChoice/data/ivtch.xml");
 		
 		MatsimPopulationReader reader = new MatsimPopulationReader(scenario);
-		reader.readFile("/Users/jillenberger/Work/socialnets/data/schweiz/mz2005/rawdata/plans.xml");
+		reader.readFile("/Users/jillenberger/Work/socialnets/data/schweiz/mz2005/rawdata/plans.wegeinland.xml");
 		
 		TravelDistanceTask task = new TravelDistanceTask(scenario.getNetwork(), "/Users/jillenberger/Work/socialnets/data/schweiz/mz2005/rawdata/analysis/");
 		Map<String, Double> stats = PlansAnalyzer.analyzeSelectedPlans(scenario.getPopulation(), task);
