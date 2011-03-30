@@ -1,4 +1,4 @@
-package playground.anhorni.PLOC.analysis;
+package playground.anhorni.PLOC.analysis.postprocessing;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -21,7 +21,7 @@ public class CompareScores {
 	private List<Double> averageScores = new Vector<Double>();
 	private BufferedWriter bufferedWriterBestScores;
 	private String outpath;
-	
+		
 	public CompareScores(String outpath) {
 		this.outpath = outpath;
 	}
@@ -32,7 +32,7 @@ public class CompareScores {
 		List<Double> scoresPerAgent = new Vector<Double>();
 		List<Id> agentIds = new Vector<Id>();
 		for (Person person : scenario.getPopulation().getPersons().values()) {
-			Plan bestPlan = this.getBestPlan(person);
+			Plan bestPlan = CompareScenarios.getBestPlan(person);
 			totalScore += bestPlan.getScore();
 			numberOfEvaluatedPlans++;
 			scoresPerAgent.add(bestPlan.getScore());
@@ -56,17 +56,7 @@ public class CompareScores {
 			e.printStackTrace();
 		}
 	}
-	
-	private Plan getBestPlan(Person person) {
-		double highestScore = Double.MIN_VALUE;
-		Plan bestPlan = person.getSelectedPlan();
 		
-		for (Plan plan : person.getPlans()) {
-			if (plan.getScore() > highestScore) bestPlan = plan;
-		}
-		return bestPlan;
- 	}
-	
 	private void printAverageScore() {
 		DecimalFormat formatter = new DecimalFormat("0.000");
 		try {

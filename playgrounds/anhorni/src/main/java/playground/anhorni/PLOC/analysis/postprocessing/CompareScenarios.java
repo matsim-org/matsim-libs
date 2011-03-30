@@ -1,13 +1,16 @@
-package playground.anhorni.PLOC.analysis;
+package playground.anhorni.PLOC.analysis.postprocessing;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -75,6 +78,15 @@ public class CompareScenarios {
 		scoreComparator.printScores();
 		scoreComparator.compareBestScores(this.outpath + "bestScores.txt", 
 				this.outpath + "bestScoresStandardDeviationsinPercent.txt");
+		
+		CompareDestinations destinationComparator = new CompareDestinations();
+		for (String path : this.paths) {
+			log.info("reading: " + path);
+			this.readPopulation(path);
+			destinationComparator.handleScenario(this.baseScenario);
+		}
+		DecimalFormat formatter = new DecimalFormat("0.0");
+		log.info("Distances from center point: " + formatter.format(destinationComparator.evaluateScenarios()) + "[m]");
 	}
 	
 	private void readPopulation(String populationFilePath) {
@@ -82,4 +94,14 @@ public class CompareScenarios {
 		MatsimPopulationReader populationReader = new MatsimPopulationReader(this.baseScenario);
 		populationReader.readFile(populationFilePath);
 	}
+	
+	public static Plan getBestPlan(Person person) {
+		double highestScore = Double.MIN_VALUE;
+		Plan bestPlan = person.getSelectedPlan();
+		
+		for (Plan plan : person.getPlans()) {
+			if (plan.getScore() > highestScore) bestPlan = plan;
+		}
+		return bestPlan;
+ 	}
 }
