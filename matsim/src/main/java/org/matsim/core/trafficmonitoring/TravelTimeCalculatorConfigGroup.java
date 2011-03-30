@@ -38,6 +38,7 @@ public class TravelTimeCalculatorConfigGroup extends Module {
 	private static final String TRAVEL_TIME_CALCULATOR = "travelTimeCalculator";
 	private static final String TRAVEL_TIME_BIN_SIZE = "travelTimeBinSize";
 	private static final String TRAVEL_TIME_AGGREGATOR = "travelTimeAggregator";
+	private static final String TRAVEL_TIME_GETTER = "travelTimeGetter";
 
 	private static final String CALCULATE_LINK_TRAVELTIMES = "calculateLinkTravelTimes";
 	private static final String CALCULATE_LINKTOLINK_TRAVELTIMES = "calculateLinkToLinkTravelTimes";
@@ -46,6 +47,7 @@ public class TravelTimeCalculatorConfigGroup extends Module {
 
 	private String travelTimeCalculator = "TravelTimeCalculatorArray";
 	private String travelTimeAggregator = "optimistic";
+	private String travelTimeGetter = "average";
 	private int traveltimeBinSize = 15 * 60; // use a default of 15min time-bins for analyzing the travel times
 
 	private boolean calculateLinkTravelTimes = true;
@@ -61,6 +63,8 @@ public class TravelTimeCalculatorConfigGroup extends Module {
 			return getTravelTimeCalculatorType();
 		} else if (TRAVEL_TIME_AGGREGATOR.equals(key)) {
 			return getTravelTimeAggregatorType();
+		} else if (TRAVEL_TIME_GETTER.equals(key)) {
+			return getTravelTimeGetterType();
 		} else if (TRAVEL_TIME_BIN_SIZE.equals(key)) {
 			return Integer.toString(getTraveltimeBinSize());
 		} else if (CALCULATE_LINK_TRAVELTIMES.equals(key)){
@@ -79,6 +83,8 @@ public class TravelTimeCalculatorConfigGroup extends Module {
 			setTravelTimeCalculatorType(value);
 		} else if (TRAVEL_TIME_AGGREGATOR.equals(key)) {
 			setTravelTimeAggregatorType(value);
+		} else if (TRAVEL_TIME_GETTER.equals(key)) {
+			setTravelTimeGetterType(value);
 		} else if (TRAVEL_TIME_BIN_SIZE.equals(key)) {
 			setTraveltimeBinSize(Integer.parseInt(value));
 		} else if (CALCULATE_LINK_TRAVELTIMES.equals(key)){
@@ -96,6 +102,7 @@ public class TravelTimeCalculatorConfigGroup extends Module {
 		TreeMap<String, String> map = new TreeMap<String, String>();
 		map.put(TRAVEL_TIME_CALCULATOR, getValue(TRAVEL_TIME_CALCULATOR));
 		map.put(TRAVEL_TIME_AGGREGATOR, getValue(TRAVEL_TIME_AGGREGATOR));
+		map.put(TRAVEL_TIME_GETTER, getValue(TRAVEL_TIME_GETTER));
 		map.put(TRAVEL_TIME_BIN_SIZE, getValue(TRAVEL_TIME_BIN_SIZE));
 		map.put(CALCULATE_LINK_TRAVELTIMES, getValue(CALCULATE_LINK_TRAVELTIMES));
 		map.put(CALCULATE_LINKTOLINK_TRAVELTIMES, getValue(CALCULATE_LINKTOLINK_TRAVELTIMES));
@@ -106,6 +113,7 @@ public class TravelTimeCalculatorConfigGroup extends Module {
 	public final Map<String, String> getComments() {
 		Map<String,String> map = super.getComments();
 		map.put(TRAVEL_TIME_BIN_SIZE, "The size of the time bin (in sec) into which the link travel times are aggregated for the router") ;
+		map.put(TRAVEL_TIME_GETTER, "Defines the strategy that the TravelTimeCalculator uses to calculate the travel times. Currently supported: average, linearinterpolation");
 		return map;
 	}
 
@@ -122,10 +130,18 @@ public class TravelTimeCalculatorConfigGroup extends Module {
 		this.travelTimeAggregator = travelTimeAggregator;
 	}
 
+	public void setTravelTimeGetterType(final String travelTimeGetter){
+		this.travelTimeGetter = travelTimeGetter;
+	}
+	 
 	public String getTravelTimeAggregatorType(){
 		return this.travelTimeAggregator;
 	}
 
+	public String getTravelTimeGetterType(){
+		return this.travelTimeGetter;
+	}
+	
 	/**
 	 * Sets the size of the time-window over which the travel times are accumulated and averaged.<br>
 	 * Note that smaller values for the binSize increase memory consumption to store the travel times.

@@ -56,39 +56,102 @@ import org.xml.sax.SAXException;
 public class TravelTimeCalculatorTest extends MatsimTestCase {
 
 	public final void testTravelTimeCalculator_Array_Optimistic() throws IOException {
-		String compareFile = getClassInputDirectory() + "link10_ttimes.txt";
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-
+		String compareFile;
+		ScenarioImpl scenario;
+		AbstractTravelTimeAggregator aggregator;
+		
 		int endTime = 30*3600;
 		int binSize = 15*60;
 		int numSlots = (endTime / binSize) + 1;
 
+		// by default: averaging travel times
+		compareFile = getClassInputDirectory() + "link10_ttimes.txt";
+		scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		aggregator = new OptimisticTravelTimeAggregator(numSlots, binSize);
 		doTravelTimeCalculatorTest(scenario, new TravelTimeDataArrayFactory(scenario.getNetwork(), numSlots),
-				new OptimisticTravelTimeAggregator(numSlots, binSize), binSize, compareFile, false);
+				aggregator, binSize, compareFile, false);
+		
+		// force averaging travel times
+		compareFile = getClassInputDirectory() + "link10_ttimes.txt";
+		scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		aggregator = new OptimisticTravelTimeAggregator(numSlots, binSize);
+		aggregator.setTravelTimeGetter(new AveragingTravelTimeGetter());
+		doTravelTimeCalculatorTest(scenario, new TravelTimeDataArrayFactory(scenario.getNetwork(), numSlots),
+				aggregator, binSize, compareFile, false);
+		
+		// use linear interpolation
+		compareFile = getClassInputDirectory() + "link10_ttimes_linearinterpolation.txt";
+		scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		aggregator = new OptimisticTravelTimeAggregator(numSlots, binSize);
+		aggregator.setTravelTimeGetter(new LinearInterpolatingTravelTimeGetter(numSlots, binSize));
+		doTravelTimeCalculatorTest(scenario, new TravelTimeDataArrayFactory(scenario.getNetwork(), numSlots),
+				aggregator, binSize, compareFile, false);
 	}
 
 	public final void testTravelTimeCalculator_HashMap_Optimistic() throws IOException {
-		String compareFile = getClassInputDirectory() + "link10_ttimes.txt";
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-
+		String compareFile;
+		ScenarioImpl scenario;
+		AbstractTravelTimeAggregator aggregator;
+		
 		int endTime = 30*3600;
 		int binSize = 15*60;
 		int numSlots = (endTime / binSize) + 1;
 
+		// by default: averaging travel times
+		compareFile = getClassInputDirectory() + "link10_ttimes.txt";
+		scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		aggregator = new OptimisticTravelTimeAggregator(numSlots, binSize);
 		doTravelTimeCalculatorTest(scenario, new TravelTimeDataHashMapFactory(scenario.getNetwork()),
-				new OptimisticTravelTimeAggregator(numSlots, binSize), binSize, compareFile, false);
+				aggregator, binSize, compareFile, false);
+		
+		// force averaging travel times
+		compareFile = getClassInputDirectory() + "link10_ttimes.txt";
+		scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		aggregator = new OptimisticTravelTimeAggregator(numSlots, binSize);
+		aggregator.setTravelTimeGetter(new AveragingTravelTimeGetter());
+		doTravelTimeCalculatorTest(scenario, new TravelTimeDataHashMapFactory(scenario.getNetwork()),
+				aggregator, binSize, compareFile, false);
+		
+		// use linear interpolation
+		compareFile = getClassInputDirectory() + "link10_ttimes_linearinterpolation.txt";
+		scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		aggregator = new OptimisticTravelTimeAggregator(numSlots, binSize);
+		aggregator.setTravelTimeGetter(new LinearInterpolatingTravelTimeGetter(numSlots, binSize));
+		doTravelTimeCalculatorTest(scenario, new TravelTimeDataHashMapFactory(scenario.getNetwork()),
+				aggregator, binSize, compareFile, false);
 	}
 
 	public final void testTravelTimeCalculator_HashMap_Pessimistic() throws IOException {
-		String compareFile = getClassInputDirectory() + "link10_ttimes_pessimistic.txt";
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-
+		String compareFile;
+		ScenarioImpl scenario;
+		AbstractTravelTimeAggregator aggregator;
+		
 		int endTime = 12*3600;
 		int binSize = 1*60;
 		int numSlots = (endTime / binSize) + 1;
 
+		// by default: averaging travel times
+		compareFile = getClassInputDirectory() + "link10_ttimes_pessimistic.txt";
+		scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		aggregator = new PessimisticTravelTimeAggregator(binSize, numSlots);
 		doTravelTimeCalculatorTest(scenario, new TravelTimeDataHashMapFactory(scenario.getNetwork()),
-				new PessimisticTravelTimeAggregator(binSize, numSlots), binSize, compareFile, false);
+				aggregator, binSize, compareFile, false);
+		
+		// force averaging travel times
+		compareFile = getClassInputDirectory() + "link10_ttimes_pessimistic.txt";
+		scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		aggregator = new PessimisticTravelTimeAggregator(binSize, numSlots);
+		aggregator.setTravelTimeGetter(new AveragingTravelTimeGetter());
+		doTravelTimeCalculatorTest(scenario, new TravelTimeDataHashMapFactory(scenario.getNetwork()),
+				aggregator, binSize, compareFile, false);
+		
+		// use linear interpolation
+		compareFile = getClassInputDirectory() + "link10_ttimes_pessimistic_linearinterpolation.txt";
+		scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		aggregator = new PessimisticTravelTimeAggregator(binSize, numSlots);
+		aggregator.setTravelTimeGetter(new LinearInterpolatingTravelTimeGetter(numSlots, binSize));
+		doTravelTimeCalculatorTest(scenario, new TravelTimeDataHashMapFactory(scenario.getNetwork()),
+				aggregator, binSize, compareFile, false);
 	}
 
 	private final void doTravelTimeCalculatorTest(final ScenarioImpl scenario, final TravelTimeDataFactory ttDataFactory,

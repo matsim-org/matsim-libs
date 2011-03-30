@@ -57,9 +57,16 @@ public class TravelTimeCalculatorFactoryImpl implements TravelTimeCalculatorFact
 			throw new RuntimeException(group.getTravelTimeAggregatorType() + " is unknown!");
 		}
 
-		//TODO: make this configurable via the config file
-		TravelTimeGetter travelTimeGetter = new AveragingTravelTimeGetter();	// by default
-//		TravelTimeGetter travelTimeGetter = new LinearInterpolatingTravelTimeGetter(calculator.getNumSlots(), calculator.getTimeSlice());
+		// set travelTimeGetter
+		TravelTimeGetter travelTimeGetter = null;
+		// by default: "average"
+		if ("average".equals(group.getTravelTimeGetterType())) {
+			travelTimeGetter = new AveragingTravelTimeGetter();
+		} else if ("linearinterpolation".equals(group.getTravelTimeGetterType())) {
+			travelTimeGetter = new LinearInterpolatingTravelTimeGetter(calculator.numSlots, calculator.timeSlice);
+		} else {
+			throw new RuntimeException(group.getTravelTimeGetterType() + " is unknown!");
+		}
 		travelTimeAggregator.setTravelTimeGetter(travelTimeGetter);
 		
 		return calculator;
