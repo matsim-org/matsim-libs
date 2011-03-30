@@ -23,6 +23,7 @@ import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -41,6 +42,8 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -65,6 +68,8 @@ import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkReaderMatsimV1;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -103,7 +108,6 @@ public class Journal2Matsim2Journal {
 	private boolean inFileHasHeader;
 	private AnalysisTrip fileHeader;
 	private Set<String[]> inFileContent;
-	private NetworkImpl net;
 	
 	
 	private Map<String, List<AnalysisTrip>> person2ways;
@@ -111,6 +115,8 @@ public class Journal2Matsim2Journal {
 	private Map<Id, Set<PersonEvent>> person2Event;
 	private Map<String, Set<List<PersonEvent>>> carId2TripEvents;
 	private Map<String, Set<List<PersonEvent>>> ptId2TripEvents;
+	
+	private NetworkImpl net;
 	
 	private final String ACT_0 = "home";
 	private final String ACT_1 = "work";
@@ -137,8 +143,11 @@ public class Journal2Matsim2Journal {
 		this.plansUnrouted = this.outDir + "plans_unrouted.xml";
 		this.configFile = this.outDir + "config.xml";
 
+		
 		this.readJournal();
 		this.sortWaysByPerson();
+
+		this.getNetWithoutPTonlyLinks();
 		this.generatePlans();
 		
 		this.createAndWriteConfig();
@@ -195,17 +204,50 @@ public class Journal2Matsim2Journal {
 		log.info("done");
 	}
 	
+	private void getNetWithoutPTonlyLinks(){
+		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		try {
+			new NetworkReaderMatsimV1(sc).parse(this.networkFile);
+		} catch (SAXException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ParserConfigurationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		Network net = sc.getNetwork();
+		
+		Set<Id> remove = new HashSet<Id>();
+		for(Link l : net.getLinks().values()){
+			if( (l.getAllowedModes().contains(TransportMode.pt) || l.getAllowedModes().contains("train")) && l.getAllowedModes().size() == 1 ){
+				remove.add(l.getId());
+			}
+		}
+		for(Id id : remove ){
+			net.removeLink(id);
+			log.info("removed link " + id);
+		}
+		
+		this.net = (NetworkImpl) net;
+	}
 	
 	private void generatePlans(){
 		log.info("generate plans");
 		Scenario sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		PopulationFactory fac = sc.getPopulation().getFactory();
+
 		Person personCar;
 		Person personPt;
 		Plan planCar;
 		Plan planPt;
+		
 		Coord startCoord;
 		Coord endCoord;
+		
 		String type;
 		
 		double tripStartTime;
@@ -213,6 +255,7 @@ public class Journal2Matsim2Journal {
 		
 		// generate plans for all plans/persons coordinates are given
 		for(Entry<String, List<AnalysisTrip>> e : this.person2ways.entrySet()){
+			
 			personCar = fac.createPerson(sc.createId(e.getKey() + "_" + TransportMode.car.toString()));
 			planCar = fac.createPlan(); 
 				
@@ -234,7 +277,6 @@ public class Journal2Matsim2Journal {
 //				endCoord = new CoordImpl(4000, 1000);
 				startCoord = new CoordImpl(way.get(24), way.get(25));
 				endCoord = new CoordImpl(way.get(182), way.get(183));
-				
 				
 				//add first planelement
 				if(planCar.getPlanElements().size() == 0){		
@@ -294,7 +336,7 @@ public class Journal2Matsim2Journal {
 
 	private void addActivity(Plan plan, Coord c, Double startTime, Double endTime, PopulationFactory fac, String type) {
 		Activity a = fac.createActivityFromCoord(type, c);
-		
+		((ActivityImpl) a).setLinkId(this.net.getNearestLink(c).getId());
 		// if no startTime is given choose one
 		if(startTime == null && !(endTime == null)){
 			a.setStartTime(endTime * 0.9);
