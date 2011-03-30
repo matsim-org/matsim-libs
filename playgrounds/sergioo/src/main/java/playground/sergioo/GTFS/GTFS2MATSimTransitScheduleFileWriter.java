@@ -13,27 +13,102 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Observable;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.MatsimWriter;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.network.LinkFactoryImpl;
+import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.network.algorithms.NetworkCleaner;
+import org.matsim.core.router.AStarEuclidean;
+import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.router.util.LeastCostPathCalculator.Path;
+import org.matsim.core.router.util.PreProcessEuclidean;
+import org.matsim.core.router.util.TravelMinCost;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 
+import playground.sergioo.GTFS.Route.RouteTypes;
+import playground.sergioo.SimpleMapMatching.SimpleMapMatcher;
 import playground.sergioo.VISUM.VisumFile2MatsimNetwork;
+import util.geometry.Line2D;
+import util.geometry.Point2D;
+import util.geometry.Vector2D;
+import visUtils.PointLines;
+import visUtils.Window;
 
 
-public class GTFS2MATSimTransitScheduleFileWriter extends MatsimXmlWriter implements MatsimWriter{
+public class GTFS2MATSimTransitScheduleFileWriter extends MatsimXmlWriter implements MatsimWriter {
+	
+	private class PointLinesImpl extends Observable implements PointLines {
+		
+		private List<Coord> points;
+		private List<Link> links;
+		/**
+		 * @param points
+		 */
+		public PointLinesImpl(List<Coord> points) {
+			super();
+			this.points = points;
+			links = new ArrayList<Link>();
+		}
+		/**
+		 * @param links the links to set
+		 */
+		public void setLinks(List<Link> links) {
+			this.links = links;
+		}
 
+		public void refresh() {
+			this.setChanged();
+			this.notifyObservers();
+		}
+		public Collection<Point2D> getPoints() {
+			Collection<Point2D> ps = new HashSet<Point2D>();
+			for(int i=0; i<points.size(); i++)
+				ps.add(new Point2D(points.get(i).getX(), points.get(i).getY()));
+			return ps;
+		}
+		public Collection<Line2D> getLines() {
+			Collection<Line2D> ls = new HashSet<Line2D>();
+			for(Link link:links) {
+				ls.add(new Line2D(new Point2D(link.getFromNode().getCoord().getX(),link.getFromNode().getCoord().getY()),new Point2D(link.getToNode().getCoord().getX(),link.getToNode().getCoord().getY())));
+			}
+			return ls;
+		}
+	};
+	
+	private class TravelMinCostShapes implements TravelMinCost  {
+		private Shape shape;
+		/**
+		 * @param shape
+		 */
+		public TravelMinCostShapes(Shape shape) {
+			super();
+			this.shape = shape;
+		}
+		public double getLinkGeneralizedTravelCost(Link link, double time) {
+			return getLinkMinimumTravelCost(link);
+		}
+		public double getLinkMinimumTravelCost(Link link) {
+			return link.getLength();
+		}
+	}
 	//Constants
 	/**
 	 * Visum network file
@@ -56,21 +131,26 @@ public class GTFS2MATSimTransitScheduleFileWriter extends MatsimXmlWriter implem
 	 */
 	private String[] serviceIds;
 	/**
+	 * The stops
+	 */
+	private Map<String, Stop>[] stops;
+	/**
 	 * The calendar sevices
 	 */
-	private Map<String, Service> services;
+	private Map<String, Service>[] services;
 	/**
 	 * The shapes
 	 */
-	private Map<String, Shape> shapes;
+	private Map<String, Shape>[] shapes;
 	/**
 	 * The routes
 	 */
-	private SortedMap<String, Route> routes;
+	private SortedMap<String, Route>[] routes;
 	/**
 	 * The time format 
 	 */
 	private SimpleDateFormat timeFormat;
+	private PointLinesImpl pointLines;
 	
 	//Methods
 	/**
@@ -228,7 +308,7 @@ public class GTFS2MATSimTransitScheduleFileWriter extends MatsimXmlWriter implem
 		reader.close();
 	}
 	/**
-	 * 
+	 * Changes the calendar references in the trips file
 	 * @throws IOException
 	 */
 	public static void fixGTFSTrainSingapore() throws IOException {
@@ -264,7 +344,8 @@ public class GTFS2MATSimTransitScheduleFileWriter extends MatsimXmlWriter implem
 		reader.close();
 	}
 	/**
-	 * 
+	 * Erases the E and S routes
+	 * @throws IOException
 	 */
 	public static void fixGTFSTrainSingapore2() throws IOException {
 		SortedMap<String,TripAux> trips = new TreeMap<String,TripAux>();
@@ -400,141 +481,42 @@ public class GTFS2MATSimTransitScheduleFileWriter extends MatsimXmlWriter implem
 		writer.close();
 		reader.close();
 	}
-	
-	@Override
 	/**
-	 * 
-	 * @param filename
+	 * Loads all the GTFS information form the roots field
 	 */
-	public void write(String filename) {
+	private void loadGTFSFiles() {
 		try {
 			timeFormat = new SimpleDateFormat("HH:mm:ss");
 			BufferedReader reader = null;
 			String line = null;
-			this.openFile(filename);
-			this.writeXmlHead();
-			//Stops
-			this.writeStartTag("transitStops", new ArrayList<Tuple<String,String>>());
+			//Files load
+			int size = roots.length;
+			stops = new Map[size];
+			services = new Map[size];
+			shapes = new Map[size]; 
+			routes = new SortedMap[size];
+			int r=0;
 			for(File root:roots) {
-				File fileStops = new File(root.getPath()+"/"+GTFSDefinitions.STOPS.fileName);
-				reader = new BufferedReader(new FileReader(fileStops));
-				int[] indices = GTFSDefinitions.STOPS.getIndices(reader.readLine());
-				line = reader.readLine();
-				while(line!=null) {
-					String[] parts = line.split(",");
-					List<Tuple<String, String>> params = new ArrayList<Tuple<String,String>>();
-					params.add(new Tuple<String, String>("id", parts[indices[0]]));
-					params.add(new Tuple<String, String>("x", parts[indices[1]]));
-					params.add(new Tuple<String, String>("y", parts[indices[2]]));
-					String id = ((NetworkImpl)network).getNearestLink(new CoordImpl(Double.parseDouble(parts[indices[1]]), Double.parseDouble(parts[indices[2]]))).getId().toString();
-					params.add(new Tuple<String, String>("linkRefId", id));
-					params.add(new Tuple<String, String>("name", parts[indices[3]]));
-					params.add(new Tuple<String, String>("isBlocking", "true"));
-					this.writeStartTag("stopFacilities", params,true);
-					line = reader.readLine();
-				}
-				reader.close();
-			}
-			writeEndTag("transitStops");
-			for(File root:roots) {
-				//Files load
-				services = new HashMap<String, Service>();
-				shapes = new HashMap<String, Shape>(); 
-				routes = new TreeMap<String, Route>();
+				stops[r]=new HashMap<String, Stop>();
+				services[r]=new HashMap<String, Service>();
+				shapes[r]=new HashMap<String, Shape>();
+				routes[r]=new TreeMap<String, Route>();
 				for(GTFSDefinitions gtfs:GTFSDefinitions.values()) {
-					if(!gtfs.equals(GTFSDefinitions.STOPS)) {
-						File file = new File(root.getPath()+"/"+gtfs.fileName);
-						reader = new BufferedReader(new FileReader(file));
-						int[] indices = gtfs.getIndices(reader.readLine());
+					File file = new File(root.getPath()+"/"+gtfs.fileName);
+					reader = new BufferedReader(new FileReader(file));
+					int[] indices = gtfs.getIndices(reader.readLine());
+					line = reader.readLine();
+					while(line!=null) {
+						String[] parts = line.split(",");
+						Method m = GTFS2MATSimTransitScheduleFileWriter.class.getMethod(gtfs.getFunction(), new Class[] {String[].class,int[].class,int.class});
+						m.invoke(this, new Object[]{parts,indices,r});
 						line = reader.readLine();
-						while(line!=null) {
-							String[] parts = line.split(",");
-							Method m = GTFS2MATSimTransitScheduleFileWriter.class.getMethod(gtfs.getFunction(), new Class[] {String[].class,int[].class});
-							m.invoke(this, new Object[]{parts,indices});
-							line = reader.readLine();
-						}
-						reader.close();
 					}
+					reader.close();
 				}
-				//Public Transport Schedule
-				for(String routeKey:routes.keySet()) {
-					Route route = routes.get(routeKey);
-					List<Tuple<String,String>> routeAtts = new ArrayList<Tuple<String,String>>();
-					routeAtts.add(new Tuple<String, String>("id", routeKey));
-					this.writeStartTag("transitLine", routeAtts);
-					for(String tripKey:route.getTrips().keySet()) {
-						Trip trip = route.getTrips().get(tripKey);
-						boolean isService=false;
-						for(String serviceId:serviceIds)
-							if(trip.getService().equals(services.get(serviceId)))
-								isService = true;
-						if(isService) {
-							List<Tuple<String,String>> tripAtts = new ArrayList<Tuple<String,String>>();
-							tripAtts.add(new Tuple<String, String>("id", tripKey));
-							this.writeStartTag("transitRoute", tripAtts);
-							//Mode
-							this.writeStartTag("transportMode", new ArrayList<Tuple<String,String>>());
-							this.writeContent(Route.ROUTE_TYPES[route.getRouteType()], true);
-							this.writeEndTag("transportMode");
-							//Route profile
-							this.writeStartTag("routeProfile", new ArrayList<Tuple<String,String>>());
-							Date startTime = trip.getStopTimes().get(trip.getStopTimes().firstKey()).getArrivalTime();
-							for(Integer stopTimeKey:trip.getStopTimes().keySet()) {
-								StopTime stopTime = trip.getStopTimes().get(stopTimeKey);
-								List<Tuple<String,String>> stopTimeAtts = new ArrayList<Tuple<String,String>>();
-								stopTimeAtts.add(new Tuple<String, String>("refId", stopTime.getStopId()));
-								if(!stopTimeKey.equals(trip.getStopTimes().firstKey())) {
-									long difference = stopTime.getArrivalTime().getTime()-startTime.getTime();
-									try {
-										stopTimeAtts.add(new Tuple<String, String>("arrivalOffSet", timeFormat.format(new Date(timeFormat.parse("00:00:00").getTime()+difference))));
-									} catch (ParseException e) {
-										e.printStackTrace();
-									}
-								}
-								if(!stopTimeKey.equals(trip.getStopTimes().lastKey())) {
-									long difference = stopTime.getDepartureTime().getTime()-startTime.getTime();
-									try {
-										stopTimeAtts.add(new Tuple<String, String>("departureOffSet", timeFormat.format(new Date(timeFormat.parse("00:00:00").getTime()+difference))));
-									} catch (ParseException e) {
-										e.printStackTrace();
-									}
-								}
-								this.writeStartTag("stop", stopTimeAtts, true);
-							}
-							this.writeEndTag("routeProfile");
-							//Route
-							this.writeStartTag("route", new ArrayList<Tuple<String,String>>());
-							Method m = GTFS2MATSimTransitScheduleFileWriter.class.getMethod("write"+Route.ROUTE_TYPES[route.getRouteType()]+"Route", new Class[] {Trip.class});
-							m.invoke(this, new Object[]{trip});
-							this.writeEndTag("route");
-							//Departures
-							int id = 1;
-							this.writeStartTag("departures", new ArrayList<Tuple<String,String>>());
-							for(Frequency frequency:trip.getFrequencies()) {
-								for(Date actualTime = frequency.getStartTime(); actualTime.before(frequency.getEndTime()); actualTime.setTime(actualTime.getTime()+frequency.getSecondsPerDeparture()*1000)) {
-									List<Tuple<String,String>> departureAtts = new ArrayList<Tuple<String,String>>();
-									departureAtts.add(new Tuple<String, String>("id", Integer.toString(id)));
-									departureAtts.add(new Tuple<String, String>("departureTime", timeFormat.format(actualTime)));
-									this.writeStartTag("departure", departureAtts, true);
-									id++;
-								}
-							}
-							if(id==1) {
-								List<Tuple<String,String>> departureAtts = new ArrayList<Tuple<String,String>>();
-								departureAtts.add(new Tuple<String, String>("id", Integer.toString(id)));
-								departureAtts.add(new Tuple<String, String>("departureTime", timeFormat.format(trip.getStopTimes().get(trip.getStopTimes().firstKey()).getDepartureTime())));
-								this.writeStartTag("departure", departureAtts, true);
-							}
-							this.writeEndTag("departures");
-							this.writeEndTag("transitRoute");
-						}
-					}
-					this.writeEndTag("transitLine");
-				}
-	
+				r++;
 			}
-			this.close();
-		} catch (IOException e) {
+		} catch(IOException e) {
 			e.printStackTrace();
 		} catch (SecurityException e) {
 			e.printStackTrace();
@@ -553,40 +535,43 @@ public class GTFS2MATSimTransitScheduleFileWriter extends MatsimXmlWriter implem
 	 * @param parts
 	 * @param indices
 	 */
-	public void processCalendar(String[] parts, int[] indices) {
+	public void processStop(String[] parts, int[] indices, int r) {
+		stops[r].put(parts[indices[0]],new Stop(new CoordImpl(Double.parseDouble(parts[indices[1]]),Double.parseDouble(parts[indices[2]])),parts[indices[3]],true));
+	}
+	public void processCalendar(String[] parts, int[] indices, int r) {
 		boolean[] days = new boolean[7];
 		for(int d=0; d<days.length; d++)
 			days[d]=parts[d+indices[1]].equals("1");
-		services.put(parts[indices[0]], new Service(days, parts[indices[2]], parts[indices[3]]));
+		services[r].put(parts[indices[0]], new Service(days, parts[indices[2]], parts[indices[3]]));
 	}
-	public void processCalendarDate(String[] parts, int[] indices) {
-		Service actual = services.get(parts[indices[0]]);
+	public void processCalendarDate(String[] parts, int[] indices, int r) {
+		Service actual = services[r].get(parts[indices[0]]);
 		if(parts[indices[2]].equals("2"))
 			actual.addException(parts[indices[1]]);
 		else
 			actual.addAddition(parts[indices[1]]);
 	}
-	public void processShape(String[] parts, int[] indices) {
-		Shape actual = shapes.get(parts[indices[0]]);
+	public void processShape(String[] parts, int[] indices, int r) {
+		Shape actual = shapes[r].get(parts[indices[0]]);
 		if(actual==null) {
-			actual = new Shape();
-			shapes.put(parts[indices[0]], actual);
+			actual = new Shape(parts[indices[0]]);
+			shapes[r].put(parts[indices[0]], actual);
 		}
 		actual.addPoint(new CoordImpl(Double.parseDouble(parts[indices[1]]), Double.parseDouble(parts[indices[2]])),Integer.parseInt(parts[indices[3]]));
 	}
-	public void processRoute(String[] parts, int[] indices) {
-		routes.put(parts[indices[0]], new Route(parts[indices[1]], Integer.parseInt(parts[indices[2]])));
+	public void processRoute(String[] parts, int[] indices, int r) {
+		routes[r].put(parts[indices[0]], new Route(parts[indices[1]], RouteTypes.values()[Integer.parseInt(parts[indices[2]])]));
 	}
-	public void processTrip(String[] parts, int[] indices) {
-		Route route = routes.get(parts[indices[0]]);
+	public void processTrip(String[] parts, int[] indices, int r) {
+		Route route = routes[r].get(parts[indices[0]]);
 		if(parts.length==5) {
-			route.putTrip(parts[indices[1]], new Trip(services.get(parts[indices[2]]), shapes.get(parts[indices[3]])));
+			route.putTrip(parts[indices[1]], new Trip(services[r].get(parts[indices[2]]), shapes[r].get(parts[indices[3]])));
 		}
 		else
-			route.putTrip(parts[indices[1]], new Trip(services.get(parts[indices[2]]), null));
+			route.putTrip(parts[indices[1]], new Trip(services[r].get(parts[indices[2]]), null));
 	}
-	public void processStopTime(String[] parts, int[] indices) {
-		for(Route actualRoute:routes.values()) {
+	public void processStopTime(String[] parts, int[] indices, int r) {
+		for(Route actualRoute:routes[r].values()) {
 			Trip trip = actualRoute.getTrips().get(parts[indices[0]]);
 			if(trip!=null) {
 				try {
@@ -599,8 +584,8 @@ public class GTFS2MATSimTransitScheduleFileWriter extends MatsimXmlWriter implem
 			}
 		}
 	}
-	public void processFrequency(String[] parts, int[] indices) {
-		for(Route actualRoute:routes.values()) {
+	public void processFrequency(String[] parts, int[] indices, int r) {
+		for(Route actualRoute:routes[r].values()) {
 			Trip trip = actualRoute.getTrips().get(parts[indices[0]]);
 			if(trip!=null) {
 				try {
@@ -614,10 +599,352 @@ public class GTFS2MATSimTransitScheduleFileWriter extends MatsimXmlWriter implem
 		}
 	}
 	/**
-	 * Methods for writing the links of a trip
+	 * From the loaded information calculates all the necessary information for MATSim
 	 */
-	public void writeBusRoute() {
-		
+	private void calculateUnknownInformation() {
+		//New Stops according to the modes
+		for(int r=0; r<roots.length; r++)
+			for(Route route:routes[r].values())
+				for(Trip trip:route.getTrips().values())
+					for(Entry<Integer,StopTime> stopTime:trip.getStopTimes().entrySet())
+						if(stops[r].get(stopTime.getValue().getStopId()).getRouteType()==null)
+							stops[r].get(stopTime.getValue().getStopId()).setRouteType(route.getRouteType());
+						else if(!stops[r].get(stopTime.getValue().getStopId()).getRouteType().equals(route.getRouteType())) {
+							Stop brotherStop = stops[r].get(stopTime.getValue().getStopId());
+							Stop newStop = new Stop(brotherStop.getPoint(), brotherStop.getName(), brotherStop.isBlocks());
+							newStop.setRouteType(route.getRouteType());
+							String newStopId = stopTime.getValue().getStopId()+"_"+route.getRouteType().name;
+							stops[r].put(newStopId, newStop);
+							stopTime.getValue().setStopId(newStopId);
+						}
+						else if(stops[r].get(stopTime.getValue().getStopId()).getRouteType().equals(route.getRouteType()) && !route.getRouteType().wayType.equals(Route.WayTypes.ROAD)) {
+							Stop brotherStop = stops[r].get(stopTime.getValue().getStopId());
+							Stop newStop = new Stop(brotherStop.getPoint(), brotherStop.getName(), brotherStop.isBlocks());
+							newStop.setRouteType(route.getRouteType());
+							String newStopId = stopTime.getValue().getStopId()+"_"+stopTime.getKey();
+							stops[r].put(newStopId, newStop);
+							stopTime.getValue().setStopId(newStopId);
+						}
+		//Links
+		TravelMinCost costFunction = new TravelMinCost() {
+			
+			@Override
+			public double getLinkGeneralizedTravelCost(Link link, double time) {
+				return link.getLength();
+			}
+			
+			@Override
+			public double getLinkMinimumTravelCost(Link link) {
+				return link.getLength();
+			}
+		};
+		PreProcessEuclidean preProcessData = new PreProcessEuclidean(costFunction);
+		preProcessData.run(network);
+		for(int r=0; r<roots.length; r++)
+			for(Route route:routes[r].values())
+				if(!route.getRouteType().wayType.equals(Route.WayTypes.ROAD))
+					for(Trip trip:route.getTrips().values())
+						addNewLinksSequence(trip, true, route.getRouteType(), r);
+				else
+					for(Entry<String,Trip> trip:route.getTrips().entrySet()) {
+						calculateBusLinksSequence(trip.getValue(), true, route.getRouteType(), r, preProcessData);
+						System.out.println("ya! "+trip.getKey());
+					}
+		//Stops link references
+		for(int r=0; r<roots.length; r++)
+			for(Stop stop:stops[r].values())
+				stop.setLinkId(getNearestLinkMode(network,stop.getRouteType().name,(CoordImpl)stop.getPoint()).getId().toString());
+	}
+	private Link getNearestLinkMode(Network network2, String mode, CoordImpl point) {
+		double nearestDistance = Double.POSITIVE_INFINITY;
+		Link nearestLink = null;
+		for(Link link:network.getLinks().values()) {
+			double distance = ((LinkImpl)link).calcDistance(point);
+			if(link.getAllowedModes().contains(mode) && distance<nearestDistance) {
+				nearestDistance = distance;
+				nearestLink = link;
+			}
+		}
+		return nearestLink;
+	}
+
+	/**
+	 * Methods for write a new or calculated sequence of links for a trip
+	 * @param trip
+	 * @param withShape
+	 */
+	private void addNewLinksSequence(Trip trip, boolean withShape, RouteTypes routeType, int r) {
+		Shape shape = trip.getShape();
+		double length;
+		double freeSpeed=100;
+		double capacity=100;
+		double nOfLanes=1;
+		if(withShape && shape!=null) {
+			SortedMap<Integer, StopTime> stopTimes = trip.getStopTimes();
+			Stop stop = stops[r].get(stopTimes.get(stopTimes.firstKey()).getStopId());
+			double nearest = CoordUtils.calcDistance(shape.getPoints().get(1),stop.getPoint());
+			int nearestIndex = 1;
+			for(int n=2; n<shape.getPoints().size(); n++) {
+				double distance = CoordUtils.calcDistance(shape.getPoints().get(n),stop.getPoint());
+				if(distance<nearest) {
+					nearest = distance;
+					nearestIndex = n;
+				}
+			}
+			if(nearestIndex>1)
+				nearestIndex--;
+			IdImpl id = new IdImpl(shape.getId()+"_"+nearestIndex);
+			NodeImpl node = (NodeImpl) network.getNodes().get(id);
+			if(node==null) {
+				node = new NodeImpl(id);
+				node.setCoord(shape.getPoints().get(nearestIndex));
+				network.addNode(node);
+			}
+			Node previous = node;
+			for(int p=nearestIndex+1; p<shape.getPoints().size(); p++) {
+				id = new IdImpl(shape.getId()+"_"+p);
+				node = (NodeImpl) network.getNodes().get(id);
+				if(node==null) {
+					node = new NodeImpl(id);
+					node.setCoord(shape.getPoints().get(p));
+					network.addNode(node);
+				}
+				id = new IdImpl((p-1)+"_"+shape.getId()+"_"+p);
+				Link link = network.getLinks().get(id);
+				if(link==null) {
+					length = CoordUtils.calcDistance(previous.getCoord(), node.getCoord());
+					link = new LinkFactoryImpl().createLink(id, previous, node, network, length, freeSpeed, capacity, nOfLanes);
+					Set<String> modes = new HashSet<String>();
+					modes.add(routeType.name);
+					link.setAllowedModes(modes);
+					network.addLink(link);
+				}
+				trip.addLink(link);
+				previous = node;
+			}
+		}
+		else {
+			String id = trip.getStopTimes().get(1).getStopId();
+			Stop stop = stops[r].get(id);
+			NodeImpl node = (NodeImpl) network.getNodes().get(new IdImpl(id));
+			if(node==null) {
+				node = new NodeImpl(new IdImpl(id));
+				node.setCoord(stop.getPoint());
+				network.addNode(node);
+			}
+			Node previous = node;
+			for(int p=2; p<trip.getStopTimes().size(); p++) {
+				id = trip.getStopTimes().get(p).getStopId();
+				stop = stops[r].get(id);
+				node = (NodeImpl) network.getNodes().get(new IdImpl(id));
+				if(node==null) {
+					node = new NodeImpl(new IdImpl(id));
+					node.setCoord(stop.getPoint());
+					network.addNode(node);
+				}
+				id = trip.getStopTimes().get(p-1).getStopId()+"_"+id;
+				Link link = network.getLinks().get(new IdImpl(id));
+				if(link==null) {
+					length = CoordUtils.calcDistance(previous.getCoord(), node.getCoord());
+					link = new LinkFactoryImpl().createLink(new IdImpl(id), previous, node, network, length, freeSpeed, capacity, nOfLanes);
+					Set<String> modes = new HashSet<String>();
+					modes.add(routeType.name);
+					link.setAllowedModes(modes);
+					network.addLink(link);
+				}
+				trip.addLink(link);
+				previous = node;
+			}
+		}
+	}
+	private void calculateBusLinksSequence(Trip trip, boolean withShape, Route.RouteTypes routeType, int r, PreProcessEuclidean preProcessData) {
+		TravelTime timeFunction = new TravelTime() {	
+			public double getLinkTravelTime(Link link, double time) {
+				return link.getLength()/link.getFreespeed();
+			}
+		};
+		Shape shape = trip.getShape();
+		if(withShape && shape!=null) {
+			pointLines = new PointLinesImpl(shape==null?new ArrayList<Coord>():new ArrayList<Coord>(shape.getPoints().values()));
+			Window window = new Window(pointLines);
+			window.setVisible(true);
+			Iterator<Coord> prev=trip.getShape().getPoints().values().iterator(), next=trip.getShape().getPoints().values().iterator();
+			Link prevL=null, nextL=null;
+			List<Link> links = new ArrayList<Link>();
+			for(next.next();next.hasNext();) {
+				prevL=getBestLinkMode(network,"Car", (CoordImpl) prev.next(),trip.getShape());
+				nextL=getBestLinkMode(network,"Car", (CoordImpl) next.next(),trip.getShape());
+				LeastCostPathCalculator leastCostPathCalculator = new AStarEuclidean(network, preProcessData, timeFunction);
+				Path path = leastCostPathCalculator.calcLeastCostPath(prevL.getToNode(), nextL.getToNode(), 0);
+				for(Link link:path.links) {
+					Set<String> modes = new HashSet<String>(link.getAllowedModes());
+					modes.add(routeType.name);
+					link.setAllowedModes(modes);
+				}
+				links.addAll(path.links);
+				pointLines.setLinks(links);
+				pointLines.refresh();
+			}
+			trip.setRoute(links);
+			window.setVisible(false);
+			/*SimpleMapMatcher simpleMapMatching = new SimpleMapMatcher(new ArrayList<Coord>(shape.getPoints().values()),network,"Car");
+			List<Link> links = simpleMapMatching.getBestRoute();
+			trip.setRoute(links);
+			for(Link link:links) {
+				Set<String> modes = new HashSet<String>(link.getAllowedModes());
+				modes.add(routeType.name);
+				link.setAllowedModes(modes);
+			}*/
+		}
+		else {
+			TravelMinCost costFunction = new TravelMinCostShapes(trip.getShape());
+			PreProcessEuclidean preProcessData2 = new PreProcessEuclidean(costFunction);
+			preProcessData2.run(network);
+			pointLines = new PointLinesImpl(shape==null?new ArrayList<Coord>():new ArrayList<Coord>(shape.getPoints().values()));
+			Window window = new Window(pointLines);
+			window.setVisible(true);
+			Iterator<StopTime> prev=trip.getStopTimes().values().iterator(), next=trip.getStopTimes().values().iterator();
+			Link prevL=null, nextL=null;
+			List<Link> links = new ArrayList<Link>();
+			for(next.next();next.hasNext();) {
+				prevL=getBestLinkMode(network,"Car", (CoordImpl) stops[r].get(prev.next().getStopId()).getPoint(),trip.getShape());
+				nextL=getBestLinkMode(network,"Car", (CoordImpl) stops[r].get(next.next().getStopId()).getPoint(),trip.getShape());
+				LeastCostPathCalculator leastCostPathCalculator = new AStarEuclidean(network, preProcessData2, timeFunction);
+				Path path = leastCostPathCalculator.calcLeastCostPath(prevL.getToNode(), nextL.getToNode(), 0);
+				for(Link link:path.links) {
+					Set<String> modes = new HashSet<String>(link.getAllowedModes());
+					modes.add(routeType.name);
+					link.setAllowedModes(modes);
+				}
+				links.addAll(path.links);
+				pointLines.setLinks(links);
+				pointLines.refresh();
+			}
+			trip.setRoute(links);
+			window.setVisible(false);
+		}	
+	}
+	private Link getBestLinkMode(Network network, String mode, CoordImpl coord, Shape shape) {
+		double nearestDistance = Double.POSITIVE_INFINITY;
+		Link nearestLink = null;
+		for(Link link:network.getLinks().values())
+			if(link.getAllowedModes().contains(mode)) {
+				Point2D fromPoint = new Point2D(link.getFromNode().getCoord().getX(), link.getFromNode().getCoord().getY());
+				Point2D toPoint = new Point2D(link.getToNode().getCoord().getX(), link.getToNode().getCoord().getY());
+				Vector2D linkSegment = new Vector2D(fromPoint, toPoint);
+				double distance = ((LinkImpl)link).calcDistance(coord);
+				if(distance<nearestDistance && (shape==null || linkSegment.getAngleTo(shape.getVector(coord))<Math.PI/16)) {
+					nearestDistance = distance;
+					nearestLink = link;
+				}
+			}
+		return nearestLink;	
+	}
+	@Override
+	/**
+	 * Writes the MATSim public transport file
+	 * @param filename
+	 */
+	public void write(String filename) {
+		try {
+			loadGTFSFiles();
+			calculateUnknownInformation();
+			//Public Transport Schedule
+			//Stops
+			this.openFile(filename);
+			this.writeXmlHead();
+			this.writeStartTag("transitStops", new ArrayList<Tuple<String,String>>());
+			for(int r=0; r<roots.length; r++)
+				for(Entry<String, Stop> stop: stops[r].entrySet()) {
+					List<Tuple<String, String>> params = new ArrayList<Tuple<String,String>>();
+					params.add(new Tuple<String, String>("id", stop.getKey()));
+					params.add(new Tuple<String, String>("x", Double.toString(stop.getValue().getPoint().getX())));
+					params.add(new Tuple<String, String>("y", Double.toString(stop.getValue().getPoint().getX())));
+					params.add(new Tuple<String, String>("linkRefId", stop.getValue().getLinkId()));
+					params.add(new Tuple<String, String>("name", stop.getValue().getName()));
+					params.add(new Tuple<String, String>("isBlocking", Boolean.toString(stop.getValue().isBlocks())));
+					this.writeStartTag("stopFacilities", params,true);
+				}
+			writeEndTag("transitStops");
+			//Lines
+			for(int r=0; r<roots.length; r++)
+				for(Entry<String,Route> route:routes[r].entrySet()) {
+					List<Tuple<String,String>> routeAtts = new ArrayList<Tuple<String,String>>();
+					routeAtts.add(new Tuple<String, String>("id", route.getKey()));
+					this.writeStartTag("transitLine", routeAtts);
+					for(Entry<String,Trip> trip:route.getValue().getTrips().entrySet()) {
+						boolean isService=false;
+						for(String serviceId:serviceIds)
+							if(trip.getValue().getService().equals(services[r].get(serviceId)))
+								isService = true;
+						if(isService) {
+							List<Tuple<String,String>> tripAtts = new ArrayList<Tuple<String,String>>();
+							tripAtts.add(new Tuple<String, String>("id", trip.getKey()));
+							this.writeStartTag("transitRoute", tripAtts);
+							//Mode
+							this.writeStartTag("transportMode", new ArrayList<Tuple<String,String>>());
+							this.writeContent(route.getValue().getRouteType().name, true);
+							this.writeEndTag("transportMode");
+							//Route profile
+							this.writeStartTag("routeProfile", new ArrayList<Tuple<String,String>>());
+							Date startTime = trip.getValue().getStopTimes().get(trip.getValue().getStopTimes().firstKey()).getArrivalTime();
+							for(Integer stopTimeKey:trip.getValue().getStopTimes().keySet()) {
+								StopTime stopTime = trip.getValue().getStopTimes().get(stopTimeKey);
+								List<Tuple<String,String>> stopTimeAtts = new ArrayList<Tuple<String,String>>();
+								stopTimeAtts.add(new Tuple<String, String>("refId", stopTime.getStopId()));
+								if(!stopTimeKey.equals(trip.getValue().getStopTimes().firstKey())) {
+									long difference = stopTime.getArrivalTime().getTime()-startTime.getTime();
+									stopTimeAtts.add(new Tuple<String, String>("arrivalOffSet", timeFormat.format(new Date(timeFormat.parse("00:00:00").getTime()+difference))));
+								}
+								if(!stopTimeKey.equals(trip.getValue().getStopTimes().lastKey())) {
+									long difference = stopTime.getDepartureTime().getTime()-startTime.getTime();
+									stopTimeAtts.add(new Tuple<String, String>("departureOffSet", timeFormat.format(new Date(timeFormat.parse("00:00:00").getTime()+difference))));
+								}
+								this.writeStartTag("stop", stopTimeAtts, true);
+							}
+							this.writeEndTag("routeProfile");
+							//Route
+							this.writeStartTag("route", new ArrayList<Tuple<String,String>>());
+							for(Link link:trip.getValue().getRoute()) {
+								List<Tuple<String,String>> linkAtts = new ArrayList<Tuple<String,String>>();
+								linkAtts.add(new Tuple<String, String>("refId", link.getId().toString()));
+								this.writeStartTag("link", linkAtts, true);
+							}
+							this.writeEndTag("route");
+							//Departures
+							int id = 1;
+							this.writeStartTag("departures", new ArrayList<Tuple<String,String>>());
+							for(Frequency frequency:trip.getValue().getFrequencies()) {
+								for(Date actualTime = frequency.getStartTime(); actualTime.before(frequency.getEndTime()); actualTime.setTime(actualTime.getTime()+frequency.getSecondsPerDeparture()*1000)) {
+									List<Tuple<String,String>> departureAtts = new ArrayList<Tuple<String,String>>();
+									departureAtts.add(new Tuple<String, String>("id", Integer.toString(id)));
+									departureAtts.add(new Tuple<String, String>("departureTime", timeFormat.format(actualTime)));
+									this.writeStartTag("departure", departureAtts, true);
+									id++;
+								}
+							}
+							if(id==1) {
+								List<Tuple<String,String>> departureAtts = new ArrayList<Tuple<String,String>>();
+								departureAtts.add(new Tuple<String, String>("id", Integer.toString(id)));
+								departureAtts.add(new Tuple<String, String>("departureTime", timeFormat.format(trip.getValue().getStopTimes().get(trip.getValue().getStopTimes().firstKey()).getDepartureTime())));
+								this.writeStartTag("departure", departureAtts, true);
+							}
+							this.writeEndTag("departures");
+							this.writeEndTag("transitRoute");
+						}
+					}
+					this.writeEndTag("transitLine");
+				}
+			this.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (SecurityException e) {
+			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
 	}
 	//Main method
 	/**

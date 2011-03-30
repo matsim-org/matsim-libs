@@ -6,8 +6,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Set;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -196,7 +196,9 @@ public class VisumFile2MatsimNetwork {
 			if(capacity!=0) {
 				Link link = new LinkFactoryImpl().createLink(new IdImpl(id), from, to, network, length, freeSpeed, capacity, nOfLanes);
 				((LinkImpl)link).setOrigId(origId);
-				link.setAllowedModes(new HashSet<String>(Arrays.asList(parts[columnsIndices[7]].split(","))));
+				Set<String> modes = new HashSet<String>();
+				modes.add("Car");
+				link.setAllowedModes(modes);
 				network.addLink(link);
 				id++;
 			}

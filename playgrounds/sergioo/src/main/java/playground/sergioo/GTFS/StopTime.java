@@ -40,5 +40,11 @@ public class StopTime {
 	public String getStopId() {
 		return stopId;
 	}
+	/**
+	 * @param stopId the stopId to set
+	 */
+	public void setStopId(String stopId) {
+		this.stopId = stopId;
+	}
 	
 }

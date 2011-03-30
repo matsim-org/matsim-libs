@@ -6,11 +6,33 @@ import java.util.TreeMap;
 public class Route {
 	
 	//Constants
-	public static final String[] ROUTE_TYPES = {"Tram","Subway","Rail","Bus","Ferry","Cable car"};
+	public enum WayTypes {
+		RAIL,
+		ROAD,
+		WATER,
+		CABLE;
+	}
+	public enum RouteTypes {
+		//Values
+		TRAM("Tram",WayTypes.RAIL),
+		SUBWAY("Subway",WayTypes.RAIL),
+		RAIL("Rail",WayTypes.RAIL),
+		BUS("Bus",WayTypes.ROAD),
+		FERRY("Ferry",WayTypes.WATER),
+		CABLE_CAR("Cable car",WayTypes.CABLE);
+		//Attributes
+		public String name;
+		public WayTypes wayType;
+		//Methods
+		private RouteTypes(String name,WayTypes wayType) {
+			this.name = name;
+			this.wayType = wayType;
+		}
+	}
 	                           
 	//Attributes
 	private String shortName;
-	private int routeType;
+	private RouteTypes routeType;
 	private SortedMap<String, Trip> trips;
 	
 	//Methods
@@ -18,7 +40,7 @@ public class Route {
 	 * @param shortName
 	 * @param routeType
 	 */
-	public Route(String shortName, int routeType) {
+	public Route(String shortName, RouteTypes routeType) {
 		super();
 		this.shortName = shortName;
 		this.routeType = routeType;
@@ -33,7 +55,7 @@ public class Route {
 	/**
 	 * @return the routeType
 	 */
-	public int getRouteType() {
+	public RouteTypes getRouteType() {
 		return routeType;
 	}
 	/**
