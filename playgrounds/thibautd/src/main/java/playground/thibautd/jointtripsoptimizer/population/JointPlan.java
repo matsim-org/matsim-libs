@@ -48,7 +48,7 @@ public class JointPlan implements Plan {
 	 */
 	private final Map<IdLeg, JointLeg> legsMap = new TreeMap<IdLeg, JointLeg>();
 	/**
-	 * true if the individual plans are set in the Component persons.
+	 * true if the individual plans are maintained at the individual level.
 	 */
 	private final boolean setAtIndividualLevel;
 

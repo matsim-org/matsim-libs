@@ -92,6 +92,7 @@ public class JointPlanOptimizerDecoder {
 	 */
 	private final Map<JointLeg, Double> readyJointLegs =
 		new HashMap<JointLeg, Double>();
+
 	/**
 	 * relates passenger shared rides to the related driver trip, if already
 	 * scheduled.
@@ -284,6 +285,9 @@ public class JointPlanOptimizerDecoder {
 				geneIndex = currentGeneIndices.get(TOGGLE_CHROM);
 				if ((this.optimizeToggle)&&
 						(!((BooleanGene) chromosome.getGene(geneIndex)).booleanValue())) {
+					log.warn("planing reimplacement episode. This may not be valid"
+							+" when more than one passenger");
+					//TODO: create reimplacement legs "on the fly".
 					planReimplacementEpisode(
 						//(JointLeg) currentElement,
 						planElements,
@@ -339,6 +343,7 @@ public class JointPlanOptimizerDecoder {
 		//indicesInChromosome.put(id, indexInChromosome);
 	}
 
+	@Deprecated
 	private void planReimplacementEpisode(
 			//final JointLeg puAccessLeg,
 			final List<PlanElement> planElements,
@@ -391,6 +396,7 @@ public class JointPlanOptimizerDecoder {
 		individualValues.addToIndexInChromosome(1);
 	}
 
+	//TODO: take into account the fact that PU access legs can be shared
 	private void planPuAccessLeg(
 			final List<PlanElement> planElements,
 			final PlanElement currentElement,
@@ -472,6 +478,7 @@ public class JointPlanOptimizerDecoder {
 		individualValues.addToIndexInChromosome(1);
 	}
 
+	//TODO: take into account that the destination of a shared ride can be a PU
 	private void planSharedLegAct(
 			final List<PlanElement> planElements,
 			final PlanElement currentElement,

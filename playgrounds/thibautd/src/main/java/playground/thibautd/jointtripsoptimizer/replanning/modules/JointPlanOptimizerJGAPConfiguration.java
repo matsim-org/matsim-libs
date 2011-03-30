@@ -52,6 +52,11 @@ import playground.thibautd.jointtripsoptimizer.run.config.JointReplanningConfigG
 
 /**
  * JGAP configuration object for the joint replanning algorithm.
+ *
+ * @todo improve substantially:
+ *   - correct the number of "toggle" chromosomes
+ *   - include a "engagement/desengagement" functionality
+ *   - make possible the joint trips where several passengers have different O/D
  * @author thibautd
  */
 public class JointPlanOptimizerJGAPConfiguration extends Configuration {
@@ -88,6 +93,11 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 		Configuration.reset();
 
 		this.optimizeToggle = configGroup.getOptimizeToggle();
+
+		if (this.optimizeToggle) {
+			throw new UnsupportedOperationException("toggle optimization possibly"
+					+" broken: temporarily unsupported.");
+		}
 		// get info on the plan structure
 		this.countEpisodes(plan);
 
@@ -171,6 +181,8 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 	 * an episode corresponds to an activity and its eventual access trip.
 	 * a joint episode is an episode which involves a joint trip.
 	 */
+	//TODO: make toggle gene number consistent with the possibility of
+	//several passengers with several O/D.
 	private void countEpisodes(JointPlan plan) {
 		Id[] ids = new Id[1];
 		ids = plan.getClique().getMembers().keySet().toArray(ids);
