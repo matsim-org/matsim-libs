@@ -43,7 +43,6 @@ public class VehId2DelayAtStopMapDataTest {
         
         
         
-        
 		
 	}
 

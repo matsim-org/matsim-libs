@@ -4,6 +4,8 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import junit.framework.Assert;
+
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
@@ -53,9 +55,10 @@ public class StopId2RouteId2DelayAtStopMapTest {
 	    StopId2RouteId2DelayAtStopMap test = new StopId2RouteId2DelayAtStopMap();
 	    
 	    test.handleEvent(event3);
-	    test.handleEvent(event4);
+//	    test.handleEvent(event4);
 	    test.handleEvent(event1);
-	    test.handleEvent(event2);
+//	    test.handleEvent(event2);
+	   	   
 	    
 	    vehTestMap.put(event3.getVehicleId(), event3);
 	    vehTestMap.put(event4.getVehicleId(), event4);
