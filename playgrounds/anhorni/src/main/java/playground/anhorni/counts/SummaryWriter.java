@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
@@ -244,14 +245,20 @@ public class SummaryWriter {
 	}
 	
 	public void writeStdDevBoxPlots(Stations stations, String outpath) {	
-		String header = "Station\tLink\tHour 0\tHour 1 ...\n";
+		String header = 	"Station\tLink\tHour0\tHour1\tHour2\tHour3\tHour4\tHour5\t" +
+											"Hour6\tHour7\tHour8\tHour9\tHour10\tHour11\t" +
+											"Hour12\tHour13\tHour14\tHour15\tHour16\tHour17\t" +
+											"Hour18\tHour19\tHour20\tHour21\tHour22\tHour23\n";
 		try {
 			BufferedWriter out = IOUtils.getBufferedWriter(outpath + "stdDevsAbsolute.txt");
 			BufferedWriter outScaled = IOUtils.getBufferedWriter(outpath + "stdDevsScaled.txt");
 			out.write(header);			
 			outScaled.write(header);
 			DecimalFormat formatter = new DecimalFormat("0.0");
-			
+			DecimalFormatSymbols symbol = new DecimalFormatSymbols();
+			symbol.setDecimalSeparator('.');
+			formatter.setDecimalFormatSymbols(symbol);
+						
 			StdDevBoxPlot boxPlotAbsolute = new StdDevBoxPlot("Standard Deviations Absolute", "Hour", "Standard Deviations [veh]");
 			StdDevBoxPlot boxPlotScaled = new StdDevBoxPlot("Standard Deviations Relative","Hour", "Standard Deviations [%]");
 											
@@ -264,28 +271,30 @@ public class SummaryWriter {
 				if ((station.getLink1().getSimVals().size() == 0 || station.getLink2().getSimVals().size() == 0) && writeForSpecificArea) continue;
 				numberOfStations++;
 				
-				out.write(station.getId() + "\t" + "Link 1\t" ); outScaled.write(station.getId() + "\t" + "Link 1\t" );
+				out.write(station.getId() + "_" + "Link1" ); 
+				outScaled.write(station.getId() + "\t" + "Link1" );
 				for (int hour = 0; hour < 24; hour++) {	
 					double v = station.getLink1().getAggregator().getStandarddev()[hour];
-					out.write(formatter.format(v) + "\t");
+					out.write("\t" + formatter.format(v));
 					boxPlotAbsolute.addHourlyData(hour, v);
 					
 					double relV = 100 * v / station.getLink1().getAggregator().getAvg()[hour];
-					outScaled.write(formatter.format(relV) + "\t");
+					outScaled.write("\t" + formatter.format(relV));
 					boxPlotScaled.addHourlyData(hour, relV);
 				}
-				out.write("\n"); outScaled.write("\n");
-				out.write(station.getId() + "\t" + "Link 2\t" ); outScaled.write(station.getId() + "\t" + "Link 2\t" );
+				out.newLine(); outScaled.newLine();
+				out.write(station.getId() + "_" + "Link2" ); 
+				outScaled.write(station.getId() + "\t" + "Link2" );
 				for (int hour = 0; hour < 24; hour++) {	
 					double v = station.getLink2().getAggregator().getStandarddev()[hour];
-					out.write(formatter.format(v) + "\t");
+					out.write("\t" + formatter.format(v));
 					boxPlotAbsolute.addHourlyData(hour, v);
 					
 					double relV = 100 * v / station.getLink2().getAggregator().getAvg()[hour];
-					outScaled.write(formatter.format(relV) + "\t");
+					outScaled.write("\t" + formatter.format(relV));
 					boxPlotScaled.addHourlyData(hour, relV);
 				}
-				out.write("\n"); outScaled.write("\n");
+				out.newLine(); outScaled.newLine();
 			}
 			outScaled.flush();
 			out.flush();

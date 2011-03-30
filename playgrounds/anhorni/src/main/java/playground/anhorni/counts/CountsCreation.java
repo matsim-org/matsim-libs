@@ -1,6 +1,7 @@
 package playground.anhorni.counts;
 
 import java.util.Iterator;
+import java.util.List;
 import java.util.TreeMap;
 import java.util.Vector;
 
@@ -68,6 +69,8 @@ public class CountsCreation {
 		filter.setMonthFilter(monthFilter);
 		log.info(" 	day filter: " + dayFilter + "; month filter: " + monthFilter + "; " + stations.getCountStations().size() + " stations to be filtered");
 		
+		List<CountStation> emptyStations = new Vector<CountStation>();
+		
 		Iterator<CountStation> station_it = stations.getCountStations().iterator();
 		while (station_it.hasNext()) {
 			CountStation station = station_it.next();
@@ -79,6 +82,14 @@ public class CountsCreation {
 			log.info("	Station " + station.getId() + " number of counts after filtering: " + station.getCounts().size() + " i.e. days: " + 
 					station.getCounts().size()/ 24.0);
 			log.info("	--- ");
+			
+			if (station.getCounts().size() == 0) emptyStations.add(station);
+		}
+		
+		// remove empty stations
+		log.info("Removing " + emptyStations.size() + " empty stations");
+		for (CountStation station : emptyStations) {
+			stations.removeCountStation(station);
 		}
 	}
 	

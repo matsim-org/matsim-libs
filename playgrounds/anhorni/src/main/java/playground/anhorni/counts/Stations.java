@@ -18,7 +18,11 @@ public class Stations {
 	public void addCountStation(CountStation station) {
 		this.countStations.add(station);
 	}
-		
+	
+	public void removeCountStation(CountStation station) {
+		this.countStations.remove(station);
+	}
+			
 	public boolean addSimValforLinkId(String networkName, String linkId, int hour, double simVal) {
 		Iterator<CountStation> station_it = this.countStations.iterator();
 		while (station_it.hasNext()) {
