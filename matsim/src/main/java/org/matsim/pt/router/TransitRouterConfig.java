@@ -76,42 +76,30 @@ public class TransitRouterConfig implements MatsimParameters {
 	// =============================================================================================================================
 	// no more public variables below this line
 
-	private Double beelineWalkSpeed ;
+	private double beelineWalkSpeed; // meter / second
 
-	private Double effectiveMarginalUtilityOfTravelTimeWalk_utl_s;
+	private double effectiveMarginalUtilityOfTravelTimeWalk_utl_s;
 
-	private Double effectiveMarginalUtilityOfTravelTimeTransit_utl_s;
+	private double effectiveMarginalUtilityOfTravelTimeTransit_utl_s;
 
-	private Double marginalUtilityOfTravelDistanceTransit_utl_m;
+	private double effectiveMarginalUtiltityOfWaiting_utl_s;
 
-	private Double utilityOfLineSwitch_utl;
+	private double marginalUtilityOfTravelDistanceTransit_utl_m;
+
+	private double utilityOfLineSwitch_utl;
 
 	// =============================================================================================================================
 	// only setters and getters below this line
 
-//	public TransitRouterConfig() {
-//		beelineWalkSpeed = 3.0/3.6;  // presumably, in m/sec.  3.0/3.6 = 3000/3600 = 3km/h.  kai, apr'10
-//
-//		effectiveMarginalUtilityOfTravelTimeWalk_utl_s = -6.0 / 3600.0; // in Eu/sec; includes opportunity cost of time.  kai, apr'10
-//
-//		effectiveMarginalUtilityOfTravelTimeTransit_utl_s = -6.0 / 3600.0; // in Eu/sec; includes opportunity cost of time.  kai, apr'10
-//
-//		marginalUtilityOfTravelDistanceTransit_utl_m = -0.0;    // yyyy presumably, in Eu/m ?????????  so far, not used.  kai, apr'10
-//
-//		utilityOfLineSwitch_utl = 60.0 * -this.effectiveMarginalUtilityOfTravelTimeTransit_utl_s; // == 1min travel time in vehicle  // in Eu.  kai, apr'10
-//	}
-
 	public TransitRouterConfig( final PlanCalcScoreConfigGroup pcsConfig, final PlansCalcRouteConfigGroup pcrConfig ) {
 		// walk:
 		this.beelineWalkSpeed = pcrConfig.getWalkSpeed() / pcrConfig.getBeelineDistanceFactor() ;
-		this.effectiveMarginalUtilityOfTravelTimeWalk_utl_s = pcsConfig.getTravelingWalk_utils_hr()/3600.
-			- pcsConfig.getPerforming_utils_hr() ;
+		this.effectiveMarginalUtilityOfTravelTimeWalk_utl_s = pcsConfig.getTravelingWalk_utils_hr()/3600.0 - pcsConfig.getPerforming_utils_hr() / 3600.0;
 		// pt:
-		this.effectiveMarginalUtilityOfTravelTimeTransit_utl_s = pcsConfig.getTravelingPt_utils_hr()/3600.
-			- pcsConfig.getPerforming_utils_hr() ;
-		this.marginalUtilityOfTravelDistanceTransit_utl_m = pcsConfig.getMarginalUtilityOfMoney()
-			* pcsConfig.getMonetaryDistanceCostRatePt() ;
-		this.utilityOfLineSwitch_utl = pcsConfig.getUtilityOfLineSwitch() ;
+		this.effectiveMarginalUtilityOfTravelTimeTransit_utl_s = pcsConfig.getTravelingPt_utils_hr()/3600.0 - pcsConfig.getPerforming_utils_hr() / 3600.0;
+		this.marginalUtilityOfTravelDistanceTransit_utl_m = pcsConfig.getMarginalUtilityOfMoney() * pcsConfig.getMonetaryDistanceCostRatePt();
+		this.effectiveMarginalUtiltityOfWaiting_utl_s = pcsConfig.getWaiting_utils_hr() / 3600.0 - pcsConfig.getWaiting_utils_hr() / 3600.0;
+		this.utilityOfLineSwitch_utl = pcsConfig.getUtilityOfLineSwitch();
 	}
 
 	public void setUtilityOfLineSwitch_utl(final double utilityOfLineSwitch_utl_sec) {
@@ -127,16 +115,16 @@ public class TransitRouterConfig implements MatsimParameters {
 		return this.utilityOfLineSwitch_utl;
 	}
 
-	public void setEffectiveMarginalUtilityOfTravelTimeWalk_utl_s(final double marginalUtilityOfTravelTimeWalk_utl_sec) {
-		this.effectiveMarginalUtilityOfTravelTimeWalk_utl_s = marginalUtilityOfTravelTimeWalk_utl_sec;
+	public void setEffectiveMarginalUtilityOfTravelTimeWalk_utl_s(final double marginalUtilityOfTravelTimeWalk_utl_s) {
+		this.effectiveMarginalUtilityOfTravelTimeWalk_utl_s = marginalUtilityOfTravelTimeWalk_utl_s;
 	}
 
 	public double getEffectiveMarginalUtilityOfTravelTimeWalk_utl_s() {
 		return this.effectiveMarginalUtilityOfTravelTimeWalk_utl_s;
 	}
 
-	public void setEffectiveMarginalUtilityOfTravelTimePt_utl_s(final double marginalUtilityOfTravelTimeTransit_utl_sec) {
-		this.effectiveMarginalUtilityOfTravelTimeTransit_utl_s = marginalUtilityOfTravelTimeTransit_utl_sec;
+	public void setEffectiveMarginalUtilityOfTravelTimePt_utl_s(final double marginalUtilityOfTravelTimeTransit_utl_s) {
+		this.effectiveMarginalUtilityOfTravelTimeTransit_utl_s = marginalUtilityOfTravelTimeTransit_utl_s;
 	}
 
 	/**
@@ -148,6 +136,14 @@ public class TransitRouterConfig implements MatsimParameters {
 
 	public void setMarginalUtilityOfTravelDistancePt_utl_m(final double marginalUtilityOfTravelDistanceTransit_utl_m) {
 		this.marginalUtilityOfTravelDistanceTransit_utl_m = marginalUtilityOfTravelDistanceTransit_utl_m;
+	}
+
+	public double getEffectiveMarginalUtiltityOfWaiting_utl_s() {
+		return this.effectiveMarginalUtiltityOfWaiting_utl_s;
+	}
+
+	public void setEffectiveMarginalUtiltityOfWaiting_utl_s(final double effectiveMarginalUtiltityOfWaiting_utl_s) {
+		this.effectiveMarginalUtiltityOfWaiting_utl_s = effectiveMarginalUtiltityOfWaiting_utl_s;
 	}
 
 	/**
