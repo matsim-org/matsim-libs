@@ -59,7 +59,12 @@ public class TransitRouterNetworkTravelTimeCost implements TravelTime, TravelMin
 		if (((TransitRouterNetworkLink) link).route == null) {
 			// it's a transfer link (walk)
 //			cost = -getLinkTravelTime(link, time) * this.config.getEffectiveMarginalUtilityOfTravelTimeWalk_utl_s() + this.config.getUtilityOfLineSwitch_utl();
-			cost = -getLinkTravelTime(link, time) * this.config.getEffectiveMarginalUtilityOfTravelTimeWalk_utl_s() - this.config.getUtilityOfLineSwitch_utl();
+			double transfertime = getLinkTravelTime(link, time);
+			double waittime = this.config.additionalTransferTime;
+			double walktime = transfertime - waittime;
+			cost = -walktime * this.config.getEffectiveMarginalUtilityOfTravelTimeWalk_utl_s()
+			       -waittime * this.config.getEffectiveMarginalUtiltityOfWaiting_utl_s()
+			       - this.config.getUtilityOfLineSwitch_utl();
 		} else {
 			cost = -getLinkTravelTime(link, time) * this.config.getEffectiveMarginalUtilityOfTravelTimePt_utl_s() - link.getLength() * this.config.getMarginalUtilityOfTravelDistancePt_utl_m();
 		}
