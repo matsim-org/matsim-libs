@@ -44,6 +44,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -221,6 +222,7 @@ public class Journal2Matsim2Journal {
 		
 		Network net = sc.getNetwork();
 		
+		//remove all links with pt allowed only (train is just for test)
 		Set<Id> remove = new HashSet<Id>();
 		for(Link l : net.getLinks().values()){
 			if( (l.getAllowedModes().contains(TransportMode.pt) || l.getAllowedModes().contains("train")) && l.getAllowedModes().size() == 1 ){
@@ -230,6 +232,18 @@ public class Journal2Matsim2Journal {
 		for(Id id : remove ){
 			net.removeLink(id);
 			log.info("removed link " + id);
+		}
+		
+		//remove all nodes which have no in or outLinks after removing pt-links
+		remove = new HashSet<Id>();
+		for(Node n : net.getNodes().values()){
+			if(n.getInLinks().size() == 0 && n.getOutLinks().size() == 0){
+				remove.add(n.getId());
+			}
+		}
+		for(Id id : remove){
+			net.removeNode(id);
+			log.info("remove node " + id); 
 		}
 		
 		this.net = (NetworkImpl) net;
@@ -380,7 +394,7 @@ public class Journal2Matsim2Journal {
 		c.addQSimConfigGroup(new QSimConfigGroup());
 		c.getQSimConfigGroup().setStartTime(this.startTime);
 		c.getQSimConfigGroup().setEndTime(108000);
-		c.getQSimConfigGroup().setSnapshotPeriod(0);
+		c.getQSimConfigGroup().setSnapshotPeriod(10);
 		c.getQSimConfigGroup().setSnapshotFormat("otfvis");
 		
 		c.getModule(StrategyConfigGroup.GROUP_NAME).addParam("maxAgentPlanMemorySize", "1");
@@ -411,6 +425,7 @@ public class Journal2Matsim2Journal {
 		Controler c = new Controler(this.configFile);
 		c.setOverwriteFiles(true);
 		c.run();
+//		new OTFVis().playMVI(this.outDir + "ITERS/it.0/0.otfvis.mvi");
 	}
 
 	
