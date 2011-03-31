@@ -89,7 +89,7 @@ public class ChooseRandomSingleLegMode implements PlanAlgorithm {
 	}
 
 	private String chooseModeOtherThan(final String currentMode, final boolean forbidCar) {
-		String newMode = currentMode;
+		String newMode;
 		while (true) {
 			int newModeIdx = this.rng.nextInt(this.possibleModes.length - 1);
 			for (int i = 0; i <= newModeIdx; i++) {
