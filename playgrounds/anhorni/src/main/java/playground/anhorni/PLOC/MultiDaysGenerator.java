@@ -54,9 +54,9 @@ public class MultiDaysGenerator {
 			keyList.add(Integer.parseInt(id.toString()));
 		}
 		for (int i = 0; i < 5; i++) {
-			double limit = 0.65;
+			double limit = 0.7;
 			if (temporalVar) {
-				limit = 0.8 - i * 0.06;
+				limit = 0.8 - i * 0.05;
 			}
 			Collections.shuffle(keyList, randomNumberGenerator);
 			
