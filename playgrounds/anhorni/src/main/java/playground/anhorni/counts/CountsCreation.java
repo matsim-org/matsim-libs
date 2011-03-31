@@ -21,6 +21,8 @@ public class CountsCreation {
 	
 	private final static String dayFilter = "DIDO";
 	private final static boolean removeOutliers = false;
+	private final boolean removeSummerHolidays = false;
+	private final boolean removeXmasDays = false;
 	private boolean removeZeroVolumes = true;
 	
 	public static void main(final String[] args) {
@@ -67,6 +69,8 @@ public class CountsCreation {
 		TimeFilter filter = new TimeFilter();
 		filter.setDayFilter(dayFilter);
 		filter.setMonthFilter(monthFilter);
+		filter.setSummerHolidaysFilter(this.removeSummerHolidays);
+		filter.setXmasDays(this.removeXmasDays);
 		log.info(" 	day filter: " + dayFilter + "; month filter: " + monthFilter + "; " + stations.getCountStations().size() + " stations to be filtered");
 		
 		List<CountStation> emptyStations = new Vector<CountStation>();

@@ -13,11 +13,13 @@ public class TimeFilter {
 	
 	String dayFilter = "MOFRI";
 	int monthFilter = -1;
+	private boolean removeSummerHolidays = false;
+	private boolean removeXmasDays = false;
 	
 	public String getDayFilter() {
 		return dayFilter;
 	}
-
+	
 	public void setDayFilter(String dayFilter) {
 		this.dayFilter = dayFilter;
 	}
@@ -26,6 +28,14 @@ public class TimeFilter {
 		this.monthFilter = monthFilter;
 	}
 
+	public void setSummerHolidaysFilter(boolean removeSummerHolidays) {
+		this.removeSummerHolidays = removeSummerHolidays;
+	}
+	
+	public void setXmasDays(boolean removeXmasDays) {
+		this.removeXmasDays = removeXmasDays;
+	}
+	
 	public List<RawCount> filter(List<RawCount> rawCounts) {
 		List<RawCount> filteredRawCounts = new Vector<RawCount>();	
 		Iterator<RawCount> rawCount_it = rawCounts.iterator();
@@ -36,26 +46,35 @@ public class TimeFilter {
 			// filter summer holidays
 			// filter public holidays
 			if (dayFilter.equals("DIDO") && this.isDIDO(rawCount) ) {
-				if (!this.inSummerHolidays(rawCount)) {
+				if (!this.removeSummerHolidays || !this.inSummerHolidays(rawCount)) {
 					if (!this.isPublicHoliday(rawCount)) {
-						if (monthFilter <= 0 || rawCount.month == this.monthFilter) {
-							filteredRawCounts.add(rawCount);
+						if (!this.removeXmasDays || !this.isXmasDay(rawCount)) {
+							if (monthFilter <= 0 || rawCount.month == this.monthFilter) {
+								filteredRawCounts.add(rawCount);
+							}
 						}
 					}
 				}	
 			}
 			
 			if (dayFilter.equals("MOFRI") && this.isMOFRI(rawCount) ) {
-				if (!this.inSummerHolidays(rawCount)) {
+				if (!this.removeSummerHolidays ||  !this.inSummerHolidays(rawCount)) {
 					if (!this.isPublicHoliday(rawCount)) {
-						if (monthFilter <= 0 || rawCount.month == this.monthFilter) {
-							filteredRawCounts.add(rawCount);
+						if (!this.removeXmasDays || !this.isXmasDay(rawCount)) {
+							if (monthFilter <= 0 || rawCount.month == this.monthFilter) {
+								filteredRawCounts.add(rawCount);
+							}
 						}
 					}
 				}	
 			}
 		}
 		return filteredRawCounts;
+	}
+	
+	private boolean isXmasDay(RawCount count) {
+	    if (count.getDay() >= 24 && count.getMonth() == 12) return true;
+	    else return false; 
 	}
 	
 	// SUNDAY, MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY
