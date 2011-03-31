@@ -397,6 +397,7 @@ public class JointPlanOptimizerDecoder {
 	}
 
 	//TODO: take into account the fact that PU access legs can be shared
+	//normally not a problem (in this case, planned in the plan joint act)
 	private void planPuAccessLeg(
 			final List<PlanElement> planElements,
 			final PlanElement currentElement,
@@ -478,7 +479,6 @@ public class JointPlanOptimizerDecoder {
 		individualValues.addToIndexInChromosome(1);
 	}
 
-	//TODO: take into account that the destination of a shared ride can be a PU
 	private void planSharedLegAct(
 			final List<PlanElement> planElements,
 			final PlanElement currentElement,
@@ -490,13 +490,10 @@ public class JointPlanOptimizerDecoder {
 		JointActivity pickUp = ((JointActivity) currentElement);
 		JointLeg leg = (JointLeg) planElements.get(
 				individualValues.getIndexInPlan() + 1);
-		JointActivity dropOff = (JointActivity) planElements.get(
+		JointActivity destination = (JointActivity) planElements.get(
 				individualValues.getIndexInPlan() + 2);
-		JointActivity destination = (JointActivity)
-				planElements.get(individualValues.getIndexInPlan() + 4);
 		double currentTravelTime = 0d;
 		double currentDuration;
-		Integer geneIndex;
 
 		// /////////////////////////////////////////////////////////////////
 		// plan pick-up activity
@@ -520,7 +517,7 @@ public class JointPlanOptimizerDecoder {
 			JointLeg driverLeg = createLeg(
 				legTTEstimator,
 				pickUp,
-				dropOff,
+				destination,
 				planElements.indexOf(leg),
 				individualValues,
 				leg);
@@ -540,48 +537,32 @@ public class JointPlanOptimizerDecoder {
 		constructedPlan.addLeg(leg);
 
 		// /////////////////////////////////////////////////////////////////
-		// plan DO activity
-		dropOff = createActivity(
-				dropOff,
-				individualValues.getNow(),
-				DO_DURATION);
-		individualValues.addToNow(DO_DURATION);
-		currentTravelTime += DO_DURATION;
-		constructedPlan.addActivity(dropOff);
+		// plan destination activity
+		if (destination.getType().equals(JointActingTypes.DROP_OFF)) {
+			destination = createActivity(
+					destination,
+					individualValues.getNow(),
+					DO_DURATION);
+			individualValues.addToNow(DO_DURATION);
+			currentTravelTime += DO_DURATION;
+			constructedPlan.addActivity(destination);
 
-		// /////////////////////////////////////////////////////////////////
-		// plan egress trip
-		leg = (JointLeg) planElements.get(individualValues.getIndexInPlan() + 3);
-		leg = createLeg(
-			legTTEstimator,
-			dropOff,
-			destination,
-			planElements.indexOf(leg),
-			individualValues,
-			leg);
-		individualValues.addToNow(leg.getTravelTime());
-		currentTravelTime += leg.getTravelTime();
-		constructedPlan.addLeg(leg);
+			//restart planning at the egress trip
+			individualValues.addToIndexInPlan(3);
+		}
+		else if (destination.getType().equals(JointActingTypes.PICK_UP)) {
+			// mark the PU as accessed
+			this.readyJointLegs.put(
+					(JointLeg) planElements.get(individualValues.getIndexInPlan() + 3),
+					individualValues.getNow());
 
-		// /////////////////////////////////////////////////////////////////
-		// plan individual activity
-		geneIndex = currentGeneIndices.get(DURATION_CHROM);
-		currentDuration = getDuration(
-				chromosome,
-				geneIndex,
-				individualValues.getNow(),
-				currentTravelTime);
-		destination = createActivity(
-				destination,
-				individualValues.getNow(),
-				currentDuration);
-		constructedPlan.addActivity(destination);
-		individualValues.addToNow(currentDuration);
-
-		// /////////////////////////////////////////////////////////////////
-		//update indices
-		individualValues.addToIndexInPlan(5);
-		individualValues.addToIndexInChromosome(1);
+			//restart planning at the PU
+			individualValues.addToIndexInPlan(2);
+		}
+		else {
+			throw new RuntimeException("only PU and DO activity should occur "+
+					"when planning a shared ride");
+		}
 	}
 
 	private void updateDriverLegs(JointLeg driverLeg, JointLeg legInPlan) {

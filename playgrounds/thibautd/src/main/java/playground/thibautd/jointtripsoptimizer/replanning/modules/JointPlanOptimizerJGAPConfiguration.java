@@ -169,6 +169,10 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 						configGroup,
 						this.numToggleGenes + this.numEpisodes,
 						this.nDurationGenes));
+			//this.addGeneticOperator( new JointPlanOptimizerJGAPImmigration(
+			//			this,
+			//			configGroup));
+
 
 		} catch (InvalidConfigurationException e) {
 			//throw new RuntimeException(e.getMessage());
