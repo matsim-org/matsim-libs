@@ -26,18 +26,18 @@ public abstract class AbstractTravelTimeAggregator {
 	private final int numSlots;
 	private TravelTimeGetter travelTimeGetter;
 
-	public AbstractTravelTimeAggregator(int numSlots, int travelTimeBinSize) {
+	public AbstractTravelTimeAggregator(final int numSlots, final int travelTimeBinSize) {
 		this.numSlots = numSlots;
 		this.travelTimeBinSize = travelTimeBinSize;
 
 		this.setTravelTimeGetter(new AveragingTravelTimeGetter()); // by default
 	}
-	
-	public void setTravelTimeGetter(TravelTimeGetter travelTimeGetter) {
+
+	public void setTravelTimeGetter(final TravelTimeGetter travelTimeGetter) {
 		this.travelTimeGetter = travelTimeGetter;
 		travelTimeGetter.setTravelTimeAggregator(this);
 	}
-	
+
 	protected int getTimeSlotIndex(final double time) {
 		int slice = ((int) time)/this.travelTimeBinSize;
 		if (slice >= this.numSlots) slice = this.numSlots - 1;
@@ -47,13 +47,17 @@ public abstract class AbstractTravelTimeAggregator {
 	protected abstract void addTravelTime(TravelTimeData travelTimeRole, double enterTime,
 			double leaveTime);
 
-	public void addStuckEventTravelTime(TravelTimeData travelTimeRole,
-			double enterTime, double stuckEventTime) {
-		//here is the right place to handle StuckEvents (just overwrite this method) 
+	public void addStuckEventTravelTime(final TravelTimeData travelTimeRole,
+			final double enterTime, final double stuckEventTime) {
+		//here is the right place to handle StuckEvents (just overwrite this method)
 	}
-	
-	protected double getTravelTime(TravelTimeData travelTimeRole, double time) {
-		return travelTimeGetter.getTravelTime(travelTimeRole, time);
+
+	protected double getTravelTime(final TravelTimeData travelTimeRole, final double time) {
+		return this.travelTimeGetter.getTravelTime(travelTimeRole, time);
+	}
+
+	/*package*/ TravelTimeGetter getTravelTimeGetter() { // for tests
+		return this.travelTimeGetter;
 	}
 
 }
