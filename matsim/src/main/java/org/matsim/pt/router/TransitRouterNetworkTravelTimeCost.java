@@ -67,7 +67,7 @@ public class TransitRouterNetworkTravelTimeCost implements TravelTime, TravelMin
 	}
 
 	@Override
-	public double getLinkMinimumTravelCost(Link link) {
+	public double getLinkMinimumTravelCost(final Link link) {
 		double cost;
 		if (((TransitRouterNetworkLink) link).route == null) {
 			// it's a transfer link (walk)
@@ -87,7 +87,7 @@ public class TransitRouterNetworkTravelTimeCost implements TravelTime, TravelMin
 			return arrivalOffset - wrapped.fromNode.stop.getDepartureOffset();
 		}
 		// different transit routes, so it must be a line switch
-		double time2 = wrapped.getLength() / this.config.getBeelineWalkSpeed();
+		double time2 = wrapped.getLength() / this.config.getBeelineWalkSpeed() + this.config.additionalTransferTime;
 		return time2;
 	}
 
@@ -117,7 +117,7 @@ public class TransitRouterNetworkTravelTimeCost implements TravelTime, TravelMin
 		}
 		// different transit routes, so it must be a line switch
 		double distance = wrapped.getLength();
-		double time2 = distance / this.config.getBeelineWalkSpeed();
+		double time2 = distance / this.config.getBeelineWalkSpeed() + this.config.additionalTransferTime;
 		this.cachedTravelTime = time2;
 		return time2;
 	}

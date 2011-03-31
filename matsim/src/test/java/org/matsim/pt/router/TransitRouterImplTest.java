@@ -20,11 +20,13 @@
 
 package org.matsim.pt.router;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.TestCase;
-
+import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -47,8 +49,9 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.testcases.MatsimTestCase;
 
 
-public class TransitRouterImplTest extends TestCase {
+public class TransitRouterImplTest {
 
+	@Test
 	public void testSingleLine() {
 		Fixture f = new Fixture();
 		f.init();
@@ -77,6 +80,7 @@ public class TransitRouterImplTest extends TestCase {
 		assertEquals(expectedTravelTime, actualTravelTime, MatsimTestCase.EPSILON);
 	}
 
+	@Test
 	public void testFromToSameStop() {
 		Fixture f = new Fixture();
 		f.init();
@@ -96,6 +100,7 @@ public class TransitRouterImplTest extends TestCase {
 		assertEquals(expectedTravelTime, actualTravelTime, MatsimTestCase.EPSILON);
 	}
 
+	@Test
 	public void testDirectWalkCheaper() {
 		Fixture f = new Fixture();
 		f.init();
@@ -115,6 +120,7 @@ public class TransitRouterImplTest extends TestCase {
 		assertEquals(expectedTravelTime, actualTravelTime, MatsimTestCase.EPSILON);
 	}
 
+	@Test
 	public void testSingleLine_DifferentWaitingTime() {
 		Fixture f = new Fixture();
 		f.init();
@@ -137,6 +143,7 @@ public class TransitRouterImplTest extends TestCase {
 		}
 	}
 
+	@Test
 	public void testLineChange() {
 		Fixture f = new Fixture();
 		f.init();
@@ -172,6 +179,7 @@ public class TransitRouterImplTest extends TestCase {
 		assertEquals(expectedTravelTime, actualTravelTime, MatsimTestCase.EPSILON);
 	}
 
+	@Test
 	public void testFasterAlternative() {
 		Fixture f = new Fixture();
 		f.init();
@@ -206,6 +214,7 @@ public class TransitRouterImplTest extends TestCase {
 		assertEquals(expectedTravelTime, actualTravelTime, MatsimTestCase.EPSILON);
 	}
 
+	@Test
 	public void testTransferWeights() {
 		/* idea: travel from C to F
 		 * If starting at the right time, one could take the red line to G and travel back with blue to F.
@@ -239,6 +248,43 @@ public class TransitRouterImplTest extends TestCase {
 		assertEquals(TransportMode.transit_walk, legs.get(2).getMode());
 	}
 
+	@Test
+	public void testTransferTime() {
+		/* idea: travel from C to F
+		 * If starting at the right time, one could take the red line to G and travel back with blue to F.
+		 * If one doesn't want to switch lines, one could take the blue line from C to F directly.
+		 * Using the red line (dep *:00, change at G *:09/*:12) results in an arrival time of *:19,
+		 * using the blue line only (dep *:02) results in an arrival time of *:23.
+		 * For the line switch at G, 3 minutes are available. If the additional "savety" time is larger than
+		 * that, the direct connection should be taken.
+		 */
+		Fixture f = new Fixture();
+		f.init();
+		TransitRouterConfig config = new TransitRouterConfig(f.scenario.getConfig().planCalcScore(),
+				f.scenario.getConfig().plansCalcRoute());
+		config.setUtilityOfLineSwitch_utl(0);
+		assertEquals(0, config.additionalTransferTime, 1e-8);
+		TransitRouterImpl router = new TransitRouterImpl(f.schedule, config);
+		List<Leg> legs = router.calcRoute(f.scenario.createCoord(11900, 5100), f.scenario.createCoord(24100, 4950), 6.0*3600 - 5.0*60);
+		assertEquals(5, legs.size());
+		assertEquals(TransportMode.transit_walk, legs.get(0).getMode());
+		assertEquals(TransportMode.pt, legs.get(1).getMode());
+		assertEquals(f.redLine.getId(), ((ExperimentalTransitRoute) legs.get(1).getRoute()).getLineId());
+		assertEquals(TransportMode.transit_walk, legs.get(2).getMode());
+		assertEquals(TransportMode.pt, legs.get(3).getMode());
+		assertEquals(f.blueLine.getId(), ((ExperimentalTransitRoute) legs.get(3).getRoute()).getLineId());
+		assertEquals(TransportMode.transit_walk, legs.get(4).getMode());
+
+		config.additionalTransferTime = 3.0*60; // 3 mins already enough, as there is a small distance to walk anyway which adds some time
+		legs = router.calcRoute(f.scenario.createCoord(11900, 5100), f.scenario.createCoord(24100, 4950), 6.0*3600 - 5.0*60);
+		assertEquals(3, legs.size());
+		assertEquals(TransportMode.transit_walk, legs.get(0).getMode());
+		assertEquals(TransportMode.pt, legs.get(1).getMode());
+		assertEquals(f.blueLine.getId(), ((ExperimentalTransitRoute) legs.get(1).getRoute()).getLineId());
+		assertEquals(TransportMode.transit_walk, legs.get(2).getMode());
+	}
+
+	@Test
 	public void testAfterMidnight() {
 		Fixture f = new Fixture();
 		f.init();
@@ -267,6 +313,7 @@ public class TransitRouterImplTest extends TestCase {
 		assertEquals(expectedTravelTime, actualTravelTime, MatsimTestCase.EPSILON);
 	}
 
+	@Test
 	public void testCoordFarAway() {
 		Fixture f = new Fixture();
 		f.init();
@@ -289,6 +336,7 @@ public class TransitRouterImplTest extends TestCase {
 	 * In rare cases, Dijkstra may choose to go along two walk links to get from one location to another.
 	 * Test, that still only one walk leg with the correct start and end points/links is returned.
 	 */
+	@Test
 	public void testDoubleWalk() {
 		WalkFixture f = new WalkFixture();
 		f.routerConfig.setEffectiveMarginalUtilityOfTravelTimePt_utl_s(-1.0 / 3600.0);
@@ -316,6 +364,7 @@ public class TransitRouterImplTest extends TestCase {
 	 * Tests that if only a single transfer-/walk-link is found, the router correctly only returns
 	 * on walk leg from start to end.
 	 */
+	@Test
 	public void testSingleWalkOnly() {
 		WalkFixture f = new WalkFixture();
 		f.routerConfig.searchRadius = 0.8 * CoordUtils.calcDistance(f.coord2, f.coord4);
@@ -332,6 +381,7 @@ public class TransitRouterImplTest extends TestCase {
 	 * on walk leg from start to end. Differs from {@link #testSingleWalkOnly()} in that it tests for
 	 * the correct internal working when more than one walk links are returned.
 	 */
+	@Test
 	public void testDoubleWalkOnly() {
 		WalkFixture f = new WalkFixture();
 		f.routerConfig.searchRadius = 0.8 * CoordUtils.calcDistance(f.coord2, f.coord4);
