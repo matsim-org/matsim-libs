@@ -68,7 +68,7 @@ public class SelectedPlans extends NewPopulation {
 			outputPopulationFilename = args[2];
 		} else {
 			netFilename = "../matsimTests/ParamCalibration/network.xml";
-			populationFilename = "../matsimTests/ParamCalibration/40.plans.xml.gz";
+			populationFilename = "../matsimTests/ParamCalibration/general2/reroute/ITERS/it.41/reroute.41.plans.xml.gz";
 			outputPopulationFilename = "../matsimTests/ParamCalibration/general2/basePop.xml.gz";
 		}
 

@@ -24,7 +24,10 @@
 package playground.yu.choiceSetGeneration;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -32,8 +35,11 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.utils.geometry.CoordUtils;
 
+import playground.yu.utils.container.CollectionSum;
 import playground.yu.utils.math.SimpleStatistics;
 
 /**
@@ -43,6 +49,8 @@ import playground.yu.utils.math.SimpleStatistics;
 public class PathSizeFromPlanChoiceSet {
 	public static class Path {
 		private List<List<Id>> legs;
+		private List<String> legModeChain = new ArrayList<String>();
+		private List<Double> legLinearDistanceChain = new ArrayList<Double>();
 
 		/**
 		 * converts {@code Plan} to a {@code Path}
@@ -53,7 +61,13 @@ public class PathSizeFromPlanChoiceSet {
 			legs = new ArrayList<List<Id>>();
 			for (PlanElement pe : plan.getPlanElements()) {
 				if (pe instanceof Leg) {
-					addLeg((Leg) pe);
+					Leg leg = (Leg) pe;
+					PlanImpl planImpl = (PlanImpl) plan;
+					legLinearDistanceChain.add(CoordUtils.calcDistance(planImpl
+							.getPreviousActivity(leg).getCoord(), planImpl
+							.getNextActivity(leg).getCoord()));
+					addLeg(leg);
+					legModeChain.add(leg.getMode());
 				}
 			}
 		}
@@ -76,6 +90,14 @@ public class PathSizeFromPlanChoiceSet {
 
 		public List<Id> getLegLinkIds(int legIndex) {
 			return legs.get(legIndex);
+		}
+
+		public List<String> getLegModeChain() {
+			return legModeChain;
+		}
+
+		public List<Double> getLegLinearDistanceChain() {
+			return legLinearDistanceChain;
 		}
 	}
 
@@ -104,6 +126,54 @@ public class PathSizeFromPlanChoiceSet {
 		int idx = 0;
 		for (Path path : paths) {
 			pathSizes[idx++] = calculatePathSize(path);
+		}
+		recalculatePathSizes();
+	}
+
+	private void recalculatePathSizes() {
+		Map<Integer/* Plan-idx */, List<String>/* legModeChain */> legModeChains = new HashMap<Integer, List<String>>();
+		List<Double> legLinearDistChain = null;
+
+		for (int i = 0; i < pathSizes.length; i++) {
+			if (pathSizes[i] < 0) {
+				Path path = paths.get(i);
+				legModeChains.put(i, path.getLegModeChain());
+				if (legLinearDistChain == null) {
+					legLinearDistChain = path.getLegLinearDistanceChain();
+				}
+			}
+		}
+
+		int legModeChainsSize = legModeChains.size();
+		if (legModeChainsSize == 1) {
+			pathSizes[legModeChains.keySet().iterator().next()] = 1d;
+		} else if (legModeChainsSize > 1) {
+			double legLinearDistance = CollectionSum.getSum(legLinearDistChain);
+			for (Entry<Integer, List<String>> legModeChainEntry : legModeChains
+					.entrySet()) {
+				List<String> legModeChain = legModeChainEntry.getValue();
+				double pathSize = 0;
+				for (int i = 0; i < legModeChain.size(); i++) {
+					String mode = legModeChain.get(i);
+
+					int modeCnt = 0;
+					for (List<String> otherLegModeChain : legModeChains
+							.values()) {
+						if (otherLegModeChain.get(i).equals(mode)) {
+							modeCnt++;
+						}
+					}
+
+					if (modeCnt == 0) {
+						throw new RuntimeException(
+								"modeCnt should >= 1. ???One mode of a Leg was even NOT used by the Leg itself.");
+					}
+
+					pathSize += legLinearDistChain.get(i) / modeCnt;
+				}
+				pathSizes[legModeChainEntry.getKey()] = pathSize
+						/ legLinearDistance;
+			}
 		}
 	}
 

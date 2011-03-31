@@ -186,6 +186,5 @@ public class PCCtl2 extends BseParamCalibrationControler2 {
 		ctl.setCreateGraphs(false);
 		ctl.setOverwriteFiles(true);
 		ctl.run();
-
 	}
 }

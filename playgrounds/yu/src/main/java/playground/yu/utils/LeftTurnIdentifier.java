@@ -56,7 +56,8 @@ public class LeftTurnIdentifier {
 				if (lowerKey == null) {
 					/* no left turns */
 					return false;
-				} else if (higherKey == null) {
+				}
+				if (higherKey == null) {
 					/* no right turns */
 					return outLinksSortedByAngle.headMap(lowerKey)
 							.containsValue(outLink);
@@ -64,7 +65,7 @@ public class LeftTurnIdentifier {
 				return outLinksSortedByAngle.headMap(lowerKey,
 						Math.abs(lowerKey) > Math.abs(higherKey))
 						.containsValue(outLink);
-				/* ">"- inclusive, "<=" - exclusive */
+				/* ">"-true-inclusive, "<="-false-exclusive */
 			} else {
 				return outLinksSortedByAngle.headMap(zeroAngle).containsValue(
 						outLink/* ,false strict exclusive 0 */);
