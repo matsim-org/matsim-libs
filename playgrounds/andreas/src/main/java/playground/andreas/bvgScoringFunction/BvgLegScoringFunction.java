@@ -88,7 +88,7 @@ public class BvgLegScoringFunction implements LegScoring, BasicScoring {
 
 	@Override
 	public void finish() {
-
+		// TODO [AN] finish, add lineswitchcost scoring here
 	}
 
 	@Override
