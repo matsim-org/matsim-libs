@@ -71,15 +71,14 @@ public class Main {
 	
 	
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		
-		final LinkedListValueHashMap<Id, Vehicle> vehicles;
+		
 		final ParkingTimesPlugin parkingTimesPlugin;
 		final EnergyConsumptionPlugin energyConsumptionPlugin;
-		
-		final HubLinkMapping hubLinkMapping= new HubLinkMapping(0);
-		
-		final LinkedListValueHashMap<Integer, Schedule> hubLoadDistribution = new  LinkedListValueHashMap<Integer, Schedule>();
+				
+		final LinkedListValueHashMap<Integer, Schedule> hubLoadDistribution= readHubs();
+		final HubLinkMapping hubLinkMapping=new HubLinkMapping(hubLoadDistribution.size());//= new HubLinkMapping(0);
 		
 		String configPath="test/input/playground/wrashid/sschieffer/config.xml";
 				
@@ -93,6 +92,14 @@ public class Main {
 		final double emissionPerLiterEngine = 23.2/10; // 23,2kg/10l= xx/mass   1kg=1l
 		
 		final double bufferBatteryCharge=0.0;
+		
+		final double batterySizeEV= 17*3600*1000; 
+		final double batterySizePHEV= 17*3600*1000; 
+		final double batteryMinEV= 0.1; 
+		final double batteryMinPHEV= 0.1; 
+		final double batteryMaxEV= 0.9; 
+		final double batteryMaxPHEV= 0.9; 
+		
 		
 		final double MINCHARGINGLENGTH=5*60;//5 minutes
 		
@@ -110,8 +117,6 @@ public class Main {
 				
 		
 		controler.addControlerListener(e);
-		
-		
 				
 		controler.addControlerListener(eventHandlerAtStartupAdder);
 		
@@ -126,10 +131,10 @@ public class Main {
 				
 				try {
 					
-					readHubs(hubLoadDistribution);
-					mapHubs(hubLoadDistribution, 
+					mapHubs(controler,hubLinkMapping);
+					/*mapHubs(hubLoadDistribution, 
 							hubLinkMapping, 
-							controler);
+							controler);*/
 					
 					
 					DecentralizedSmartCharger myDecentralizedSmartCharger = new DecentralizedSmartCharger(
@@ -137,13 +142,31 @@ public class Main {
 							parkingTimesPlugin,
 							e.getEnergyConsumptionPlugin(),
 							outputPath, 
-							MINCHARGINGLENGTH, 
-							e.getVehicles(),
 							gasJoulesPerLiter,
-							emissionPerLiterEngine,
-							hubLinkMapping,
-							hubLoadDistribution);
+							emissionPerLiterEngine
+							);
 					
+					
+					myDecentralizedSmartCharger.setBatteryConstants(
+							batterySizeEV, 
+							batterySizePHEV,
+							batteryMinEV,
+							batteryMinPHEV,
+							batteryMaxEV,
+							batteryMaxPHEV);
+						
+						
+					
+					myDecentralizedSmartCharger.initializeLP(bufferBatteryCharge);
+					
+					myDecentralizedSmartCharger.initializeChargingSlotDistributor(MINCHARGINGLENGTH);
+					
+					myDecentralizedSmartCharger.setLinkedListValueHashMapVehicles(
+							e.getVehicles());
+					
+					myDecentralizedSmartCharger.initializeHubLoadDistributionReader(
+							hubLinkMapping, hubLoadDistribution);
+							
 					
 					
 					myDecentralizedSmartCharger.run();
@@ -183,7 +206,9 @@ public class Main {
 								myDecentralizedSmartCharger.getTotalDrivingConsumptionOfAgent(id));
 						
 						
+					
 						
+						myDecentralizedSmartCharger.clearResults();
 					}
 					
 					
@@ -205,12 +230,13 @@ public class Main {
 	
 	
 	
-	public static void readHubs(LinkedListValueHashMap<Integer, Schedule> hubLoadDistribution) throws IOException{
-		hubLoadDistribution = new LinkedListValueHashMap<Integer, Schedule>();		
-		hubLoadDistribution.put(2, makeBullshitSchedule());
-		hubLoadDistribution.put(3, makeBullshitSchedule());
-		hubLoadDistribution.put(4, makeBullshitSchedule());
-		
+	public static LinkedListValueHashMap<Integer, Schedule> readHubs() throws IOException{
+		LinkedListValueHashMap<Integer, Schedule> hubLoadDistribution1= new  LinkedListValueHashMap<Integer, Schedule>();
+		hubLoadDistribution1.put(1, makeBullshitSchedule());
+		hubLoadDistribution1.put(2, makeBullshitSchedule());
+		hubLoadDistribution1.put(3, makeBullshitSchedule());
+		hubLoadDistribution1.put(4, makeBullshitSchedule());
+		return hubLoadDistribution1;
 		
 	}
 	
@@ -248,11 +274,21 @@ public class Main {
 	}
 	
 
-	public static void mapHubs(LinkedListValueHashMap<Integer, Schedule> hubLoadDistribution, 
+	
+	/**
+	 * fill hubLinkMapping 
+	 * assign hubIds to the different Links--> hubLinkMapping.addMapping(link, hub)
+	 * according to scenario relevant hublocations
+	 * 
+	 * @param hubLoadDistribution
+	 * @param hubLinkMapping
+	 * @param controler
+	 */
+	public static void mapHubs(Controler controler, HubLinkMapping hubLinkMapping){
+			/*LinkedListValueHashMap<Integer, Schedule> hubLoadDistribution, 
 			HubLinkMapping hubLinkMapping, 
-			Controler controler){
+			Controler controler){*/
 		
-		hubLinkMapping=new HubLinkMapping(hubLoadDistribution.size());
 		
 		double maxX=5000;
 		double minX=-20000;

@@ -220,18 +220,19 @@ public class ChargingSlotDistributor {
 			
 			ChargingInterval c1;
 			if(trial+bit>endTime){
-				c1= new ChargingInterval(endTime-bit, endTime );
+				c1=null;
+				//c1= new ChargingInterval(endTime-bit, endTime );
 			}else{
 				c1= new ChargingInterval(trial, trial+bit);
 			}
 			//System.out.println("Assigned Slot of "+ c1.getStartTime() + " to "+ c1.getEndTime());
 			
-			if(chargingInParkingInterval.overlapWithTimeInterval(c1)==false){
+			if(c1!=null && chargingInParkingInterval.overlapWithTimeInterval(c1)==false){
 				//no overlap--> exit loop
 				
 				notFound=false;
 				chargingInParkingInterval.addTimeInterval(c1);
-				//System.out.println("assign next ");
+				
 			}else{
 				//System.out.println("overlap agent .. redo");
 				

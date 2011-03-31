@@ -90,9 +90,6 @@ public class DecentralizedSmartCharger {
 		
 	public static PolynomialFitter polyFit;
 	
-	public double PERCENTAGEPHEV;
-	public double PERCENTAGEEV;
-	public double PERCENTAGECOMBUSTIONVEHICLE;
 	
 	final public static double SECONDSPERMIN=60;
 	final public static double SECONDSPER15MIN=15*60;
@@ -113,9 +110,9 @@ public class DecentralizedSmartCharger {
 	
 	final Controler controler;
 	
-	public final LPEV lpev=new LPEV();
-	public final  LPPHEV lpphev=new LPPHEV();
-	public final  LPCombustion lpcombustion= new LPCombustion();
+	public LPEV lpev;
+	public LPPHEV lpphev;
+	public LPCombustion lpcombustion;
 	
 	public LinkedList<Id> chargingFailureEV=new LinkedList<Id>();
 	public LinkedList<Id> agentsWithEV=new LinkedList<Id>();
@@ -131,8 +128,18 @@ public class DecentralizedSmartCharger {
 	public ParkingTimesPlugin parkingTimesPlugin;
 	public EnergyConsumptionPlugin energyConsumptionPlugin;
 	
-	double gasJoulesPerLiter;
-	double emissionPerLiterEngine;
+	private double gasJoulesPerLiter;
+	private double emissionPerLiterEngine;
+	
+	private double batterySizeEV;
+	private double batterySizePHEV;
+	private double batteryMinEV;
+	private double batteryMinPHEV;
+	private double batteryMaxEV;
+	private double batteryMaxPHEV;
+
+	
+	
 	
 	//***********************************************************************
 	
@@ -140,32 +147,21 @@ public class DecentralizedSmartCharger {
 			ParkingTimesPlugin parkingTimesPlugin,
 			EnergyConsumptionPlugin energyConsumptionPlugin,
 			String outputPath,
-			double minChargingLength,
-			LinkedListValueHashMap<Id, Vehicle> vehicles,
 			double gasJoulesPerLiter,
-			double emissionPerLiterEngine,
-			HubLinkMapping hubLinkMapping, 		
-			LinkedListValueHashMap<Integer, Schedule> hubLoadDistribution
+			double emissionPerLiterEngine			
 			
 	) throws IOException, OptimizationException{
 		
 		this.controler=controler;
 						
-		this.outputPath=outputPath;
-		
-		this.vehicles=vehicles;
-		
-		
-		this.MINCHARGINGLENGTH=minChargingLength; 
+		this.outputPath=outputPath;		
 		
 		gaussNewtonOptimizer.setMaxIterations(10000000);		
 		gaussNewtonOptimizer.setConvergenceChecker(checker);		
 		optimizer=gaussNewtonOptimizer;
 		polyFit= new PolynomialFitter(24, optimizer);
 		
-		myHubLoadReader=new HubLoadDistributionReader(controler, hubLinkMapping, hubLoadDistribution);
-		// TODO  initilaize Facilities? and FUnctions
-		
+			
 		myAgentTimeReader= new AgentTimeIntervalReader(
 				parkingTimesPlugin, 
 				energyConsumptionPlugin);
@@ -175,7 +171,7 @@ public class DecentralizedSmartCharger {
 		
 		try {
 			
-			myChargingSlotDistributor=new ChargingSlotDistributor(minChargingLength);
+			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -184,6 +180,51 @@ public class DecentralizedSmartCharger {
 	}
 	
 	
+	
+	
+	public void setBatteryConstants(double batterySizeEV, 
+			double batterySizePHEV,
+			
+			double batteryMinEV,
+			double batteryMinPHEV,
+			
+			double batteryMaxEV,
+			double batteryMaxPHEV){
+		
+		this.batterySizeEV=batterySizeEV;
+		this.batterySizePHEV=batterySizePHEV;
+		this.batteryMinEV=batteryMinEV;
+		this.batteryMinPHEV=batteryMinPHEV;
+		this.batteryMaxEV=batteryMaxEV;
+		this.batteryMaxPHEV=batteryMaxPHEV;
+	}
+	
+	
+	public void initializeLP(double buffer){
+		lpev=new LPEV(buffer);
+		lpphev=new LPPHEV();
+		lpcombustion= new LPCombustion();
+	}
+	
+	
+	public void initializeChargingSlotDistributor(double minChargingLength){
+		this.MINCHARGINGLENGTH=minChargingLength; 
+		myChargingSlotDistributor=new ChargingSlotDistributor(minChargingLength);
+	}
+	
+	
+	
+	public void setLinkedListValueHashMapVehicles(LinkedListValueHashMap<Id, Vehicle> vehicles){
+		this.vehicles=vehicles;
+	}
+	
+	public void initializeHubLoadDistributionReader(
+			HubLinkMapping hubLinkMapping, LinkedListValueHashMap<Integer, Schedule> hubLoadDistribution) throws OptimizationException, IOException{
+		
+		myHubLoadReader=new HubLoadDistributionReader(controler, hubLinkMapping, hubLoadDistribution);
+	}
+	
+		
 	
 	/**
 	 * get agent schedules, find required charging times, assign charging times
@@ -333,18 +374,19 @@ public class DecentralizedSmartCharger {
 						new PlugInHybridElectricVehicle(new IdImpl(1)).getClass())){
 					
 					PlugInHybridElectricVehicle thisPHEV= (PlugInHybridElectricVehicle)vehicles.getValue(id);										
-					batterySize=17*1000*3600;//thisPHEV.getBatterySizeInJoule();
-					batteryMin=0.1;//thisEV.getBatteryMinThresholdInJoule();
-					batteryMax=0.9; 
+					batterySize=batterySizePHEV;//thisPHEV.getBatterySizeInJoule();
+					batteryMin=batteryMinPHEV;//thisEV.getBatteryMinThresholdInJoule();
+					batteryMax=batteryMaxPHEV; 
 					agentsWithPHEV.add(id);
 					
 				}else{
 					
 					ElectricVehicle thisEV= (ElectricVehicle)vehicles.getValue(id);
 										
-					batterySize=24*1000*3600;//thisEV.getBatterySizeInJoule();
-					batteryMin=0.1;//thisEV.getBatteryMinThresholdInJoule();
-					batteryMax=0.9; 
+					batterySize=batterySizeEV;//thisEV.getBatterySizeInJoule();
+					batteryMin=batteryMinEV;//thisEV.getBatteryMinThresholdInJoule();
+					batteryMax=batteryMaxEV; 
+					
 					agentsWithEV.add(id);
 				}
 				
@@ -397,16 +439,12 @@ public class DecentralizedSmartCharger {
 				
 		for (Id id : controler.getPopulation().getPersons().keySet()){
 			
-			/*if(Integer.parseInt(id.toString())==2){
-				System.out.println("agent =2 "); 
-			}*/
+		
 			System.out.println("Assign charging times agent "+ id.toString());
-			//System.out.println("current schedule "); 
-			//agentParkingAndDrivingSchedules.getValue(id).printSchedule();
 			
 			
 			Schedule chargingSchedule=myChargingSlotDistributor.distribute(agentParkingAndDrivingSchedules.getValue(id));
-			//chargingSchedule.printSchedule();
+			
 			
 			agentChargingSchedules.put(id, chargingSchedule);
 			visualizeAgentChargingProfile(agentParkingAndDrivingSchedules.getValue(id), 
@@ -741,6 +779,20 @@ public class DecentralizedSmartCharger {
 		double emission= emissionPerLiterEngine*mass; // 23,2kg/10l= xx/mass   1kg=1l
 				
 		return emission;
+	}
+	
+	
+	public void clearResults(){
+		agentParkingAndDrivingSchedules = new LinkedListValueHashMap<Id, Schedule>(); 
+		agentChargingSchedules = new LinkedListValueHashMap<Id, Schedule>();
+		
+		EMISSIONCOUNTER=0.0;
+		
+		chargingFailureEV=new LinkedList<Id>();
+		agentsWithEV=new LinkedList<Id>();
+		agentsWithPHEV=new LinkedList<Id>();
+		agentsWithCombustion=new LinkedList<Id>();
+		
 	}
 	
 }

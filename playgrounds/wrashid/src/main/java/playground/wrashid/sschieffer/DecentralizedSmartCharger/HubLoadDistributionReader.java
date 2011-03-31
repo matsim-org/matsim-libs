@@ -77,7 +77,10 @@ public class HubLoadDistributionReader {
 	
 	
 	public int getHubForLinkId(Id idLink){
-		return hubLinkMapping.getHubNumber(idLink.toString());
+		
+		int hubNumber= (int) hubLinkMapping.getHubNumber(idLink.toString()); //returns Number
+		
+		return hubNumber;
 	}
 	
 	

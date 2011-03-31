@@ -69,16 +69,16 @@ public class AgentTimeIntervalReader {
 		
 		schedule=addDrivingTimes(id, schedule);			
 		System.out.println("with driving times");
-		schedule.printSchedule();
+		//schedule.printSchedule();
 		
 		
 		System.out.println("controlling optimal vs nonOptimal charging times");
 		schedule = checkTimesWithHubSubAndOptimalTimes(schedule);
-		schedule.printSchedule();
+		//schedule.printSchedule();
 		
 		System.out.println("calculating Joules per Interval");
 		schedule = getJoulesForEachParkingInterval(id, schedule);
-		schedule.printSchedule();
+		//schedule.printSchedule();
 		
 		return schedule;
 	}
@@ -113,11 +113,11 @@ public class AgentTimeIntervalReader {
 			
 		}
 		
-		System.out.println("Schedule unsorted");
-		schedule.printSchedule();
+		//System.out.println("Schedule unsorted");
+		//schedule.printSchedule();
 		schedule.sort();
-		System.out.println("Schedule sorted");
-		schedule.printSchedule();
+		//System.out.println("Schedule sorted");
+		//schedule.printSchedule();
 		
 		
 		return schedule;
@@ -154,6 +154,7 @@ public class AgentTimeIntervalReader {
 		if(t.isDriving()){
 			newSchedule.addTimeInterval(t);
 			return newSchedule;
+			
 		}else{
 			// t is Parking
 			ParkingInterval thisParkingInterval= (ParkingInterval)t;

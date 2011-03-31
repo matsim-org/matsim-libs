@@ -104,21 +104,7 @@ public class LPPHEV {
 		personId=id;
 		
 		
-		
-		
-		double buffer=0.0;
-		/*
-		 * TODObattery buffer... related to contract type
-		and EV things not working... wrong impId???
-		 * TODO
-		 * TODO
-		 * TODO
-		 * =Main.vehicles.getValue(personId).
-		 */
-		
 		System.out.println("LP summary for agent"+ id.toString());
-		
-		
 		
 		numberOfVariables= schedule.getNumberOfEntries()+1;
 		
@@ -411,8 +397,7 @@ public class LPPHEV {
 					status=false;
 					lastFalseJoule=statusJoule;
 					
-					ParkingInterval precedingP= (ParkingInterval)schedule.timesInSchedule.get(i-1);				
-					 
+					ParkingInterval precedingP= (ParkingInterval)schedule.timesInSchedule.get(i-1);		
 					
 					
 					updatePrecedingParkingAndDrivingInterval(schedule, i, energyFromEngine, thisD, precedingP);		 

@@ -33,8 +33,10 @@ public class LPEV {
 	private int numberOfVariables;
 	private Id personId;
 	
-	public LPEV(){
-		
+	private double buffer;
+	
+	public LPEV(double buffer){
+		this.buffer=buffer;
 	}
 	
 	
@@ -103,7 +105,7 @@ public class LPEV {
 		personId=id;
 		
 		
-		double buffer=0.0;
+		
 		/*
 		 * TODObattery buffer... related to contract type
 		and EV things not working... wrong impId???
