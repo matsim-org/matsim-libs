@@ -9,9 +9,8 @@ import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.pt.config.TransitConfigGroup;
 
-import playground.mmoyo.ptRouterAdapted.AdaptedPlansCalcTransitRoute;
 import playground.mmoyo.ptRouterAdapted.MyTransitRouterConfig;
-import playground.mmoyo.ptRouterAdapted.precalculation.PrecalPlansCalcTransitRoute;;
+import playground.mmoyo.ptRouterAdapted.precalculation.PrecalPlansCalcTransitRoute;
 
 public class AdapPlanStrategyModule extends AbstractMultithreadedModule{ //implements PlanStrategyModule, ActivityEndEventHandler { // this is just there as an example
 	private static final Logger log = Logger.getLogger(AdapPlanStrategyModule.class);
@@ -29,7 +28,7 @@ public class AdapPlanStrategyModule extends AbstractMultithreadedModule{ //imple
 		FreespeedTravelTimeCost freespeedTravelTimeCost = new FreespeedTravelTimeCost(config.planCalcScore());
 			
 		MyTransitRouterConfig myTransitRouterConfig = new MyTransitRouterConfig(config.planCalcScore(),
-				config.plansCalcRoute() );
+				config.plansCalcRoute(), config.transitRouter());
 		myTransitRouterConfig.beelineWalkConnectionDistance = 300.0;  			//distance to search stations when transfering
 		myTransitRouterConfig.setBeelineWalkSpeed(3.0/3.6);  						// presumably, in m/sec.  3.0/3.6 = 3000/3600 = 3km/h.  kai, apr'10
 		myTransitRouterConfig.setEffectiveMarginalUtilityOfTravelTimeWalk_utl_s(-6.0 / 3600.0); 	//-6.0 / 3600.0; // in Eu/sec; includes opportunity cost of time.  kai, apr'10

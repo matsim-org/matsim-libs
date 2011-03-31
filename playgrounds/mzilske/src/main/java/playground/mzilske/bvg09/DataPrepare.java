@@ -48,8 +48,8 @@ import org.matsim.pt.Umlauf;
 import org.matsim.pt.UmlaufInterpolator;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.router.PlansCalcTransitRoute;
-import org.matsim.pt.router.TransitRouterImpl;
 import org.matsim.pt.router.TransitRouterConfig;
+import org.matsim.pt.router.TransitRouterImpl;
 import org.matsim.pt.transitSchedule.TransitScheduleWriterV1;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
@@ -185,8 +185,8 @@ public class DataPrepare {
 		FreespeedTravelTimeCost timeCostCalculator = new FreespeedTravelTimeCost(this.scenario.getConfig().planCalcScore());
 		TransitConfigGroup transitConfig = new TransitConfigGroup();
 		
-		TransitRouterConfig transitRouterConfig = new TransitRouterConfig( this.scenario.getConfig().planCalcScore()
-				, this.scenario.getConfig().plansCalcRoute() ) ;
+		TransitRouterConfig transitRouterConfig = new TransitRouterConfig(this.scenario.getConfig().planCalcScore()
+				, this.scenario.getConfig().plansCalcRoute(), this.scenario.getConfig().transitRouter());
 		
 		PlansCalcTransitRoute router = new PlansCalcTransitRoute(this.scenario.getConfig().plansCalcRoute(),
 				this.scenario.getNetwork(), timeCostCalculator, timeCostCalculator, dijkstraFactory,
@@ -199,8 +199,8 @@ public class DataPrepare {
 
 	protected void visualizeRouterNetwork() {
 		
-		TransitRouterConfig transitRouterConfig = new TransitRouterConfig( this.scenario.getConfig().planCalcScore()
-				, this.scenario.getConfig().plansCalcRoute() ) ;
+		TransitRouterConfig transitRouterConfig = new TransitRouterConfig(this.scenario.getConfig().planCalcScore()
+				, this.scenario.getConfig().plansCalcRoute(), this.scenario.getConfig().transitRouter());
 		
 		TransitRouterImpl router = new TransitRouterImpl(this.scenario.getTransitSchedule(), transitRouterConfig );
 		Network routerNet = router.getTransitRouterNetwork();

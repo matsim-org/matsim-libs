@@ -16,13 +16,12 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.population.algorithms.PlansFilterByLegMode;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.router.PlansCalcTransitRoute;
-import org.matsim.pt.router.TransitRouterImpl;
 import org.matsim.pt.router.TransitRouterConfig;
+import org.matsim.pt.router.TransitRouterImpl;
 import org.xml.sax.SAXException;
 
 import playground.mmoyo.utils.DataLoader;
 import playground.mmoyo.utils.FileCompressor;
-import playground.mmoyo.utils.PlanFragmenter;
 import playground.mmoyo.utils.calibration.PlanScoreRemover;
 
 /**routes a population specified in a config file with MATSim standard router*/
@@ -44,8 +43,8 @@ public class MATSimRouterLauncher {
 		FreespeedTravelTimeCost timeCostCalculator = new FreespeedTravelTimeCost(scenario.getConfig().planCalcScore());
 		TransitConfigGroup transitConfig = new TransitConfigGroup();
 		
-		TransitRouterConfig tRConfig = new TransitRouterConfig( scenario.getConfig().planCalcScore(), 
-				scenario.getConfig().plansCalcRoute() ) ;
+		TransitRouterConfig tRConfig = new TransitRouterConfig(scenario.getConfig().planCalcScore(), 
+				scenario.getConfig().plansCalcRoute(), scenario.getConfig().transitRouter());
 
 		PlansCalcRoute router = new PlansCalcTransitRoute(scenario.getConfig().plansCalcRoute(), scenario.getNetwork(), 
 				timeCostCalculator, timeCostCalculator, dijkstraFactory, transitConfig, 

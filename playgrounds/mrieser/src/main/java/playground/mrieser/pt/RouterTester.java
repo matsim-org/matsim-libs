@@ -54,15 +54,15 @@ import org.xml.sax.SAXException;
 
 public class RouterTester {
 
-//	private static final String NETWORK = "/Volumes/Data/vis/zrh/output_network.xml.gz";
-//	private static final String VEHICLES = "/Volumes/Data/vis/zrh/vehicles10pct.oevModellZH.xml";
-//	private static final String SCHEDULE = "/Volumes/Data/vis/zrh/transitSchedule.networkOevModellZH.xml";
-//	private static final String PLANS = "/Volumes/Data/vis/zrh/100.plans.xml.gz";
+	private static final String NETWORK = "/Volumes/Data/vis/zrh/output_network.xml.gz";
+	private static final String VEHICLES = "/Volumes/Data/vis/zrh/vehicles10pct.oevModellZH.xml";
+	private static final String SCHEDULE = "/Volumes/Data/vis/zrh/transitSchedule.networkOevModellZH.xml";
+	private static final String PLANS = "/Volumes/Data/vis/zrh/100.plans.xml.gz";
 
-	private static final String NETWORK = "/Volumes/Data/projects/speedupTransit/bvg1pct/network.cleaned.xml";
-	private static final String SCHEDULE = "/Volumes/Data/projects/speedupTransit/bvg1pct/transitSchedule.xml";
-	private static final String VEHICLES = "/Volumes/Data/projects/speedupTransit/bvg1pct/transitVehicles.xml";
-	private static final String PLANS = "/Volumes/Data/projects/speedupTransit/bvg1pct/plans.xml";
+//	private static final String NETWORK = "/Volumes/Data/projects/speedupTransit/bvg1pct/network.cleaned.xml";
+//	private static final String SCHEDULE = "/Volumes/Data/projects/speedupTransit/bvg1pct/transitSchedule.xml";
+//	private static final String VEHICLES = "/Volumes/Data/projects/speedupTransit/bvg1pct/transitVehicles.xml";
+//	private static final String PLANS = "/Volumes/Data/projects/speedupTransit/bvg1pct/plans.xml";
 
 	private final static Logger log = Logger.getLogger(RouterTester.class);
 
@@ -87,8 +87,8 @@ public class RouterTester {
 			e.printStackTrace();
 		}
 		log.info("build transit router...");
-		TransitRouterConfig tRConfig = new TransitRouterConfig( s.getConfig().planCalcScore(), 
-				s.getConfig().plansCalcRoute() ) ;
+		TransitRouterConfig tRConfig = new TransitRouterConfig(s.getConfig().planCalcScore(), 
+				s.getConfig().plansCalcRoute(), s.getConfig().transitRouter());
 
 		TransitRouterImpl router = new TransitRouterImpl(ts, tRConfig);
 

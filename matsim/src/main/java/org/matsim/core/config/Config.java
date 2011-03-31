@@ -26,7 +26,6 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.config.consistency.ConfigConsistencyChecker;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.CountsConfigGroup;
 import org.matsim.core.config.groups.FacilitiesConfigGroup;
@@ -35,6 +34,7 @@ import org.matsim.core.config.groups.HouseholdsConfigGroup;
 import org.matsim.core.config.groups.LocationChoiceConfigGroup;
 import org.matsim.core.config.groups.MultiModalConfigGroup;
 import org.matsim.core.config.groups.NetworkConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup;
@@ -48,6 +48,7 @@ import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorConfigGroup;
 import org.matsim.pt.config.PtCountsConfigGroup;
 import org.matsim.pt.config.TransitConfigGroup;
+import org.matsim.pt.config.TransitRouterConfigGroup;
 import org.matsim.vis.otfvis.gui.OTFVisConfigGroup;
 
 /**
@@ -90,6 +91,7 @@ public class Config {
 	private SimulationConfigGroup simulation = null;
 	private StrategyConfigGroup strategy = null;
 	private TransitConfigGroup transit = null;
+	private TransitRouterConfigGroup transitRouter = null;
 	private VspExperimentalConfigGroup vspExperimentalGroup = null;
 
 	// config groups that are elsewhere:
@@ -181,6 +183,9 @@ public class Config {
 
 		this.transit = new TransitConfigGroup();
 		this.modules.put(TransitConfigGroup.GROUP_NAME, this.transit);
+
+		this.transitRouter = new TransitRouterConfigGroup();
+		this.modules.put(TransitRouterConfigGroup.GROUP_NAME, this.transitRouter);
 	}
 
 	/**
@@ -455,9 +460,13 @@ public class Config {
 		return this.transit;
 	}
 
+	public TransitRouterConfigGroup transitRouter() {
+		return this.transitRouter;
+	}
+
 	// typed adders:
 	// (config groups that are not core config groups are, in principle, not typed.  This is a way around that.)
-	
+
 	public void addSimulationConfigGroup( final SimulationConfigGroup tmp ) {
 		this.simulation = tmp ;
 		this.addModule( SimulationConfigGroup.GROUP_NAME, tmp ) ;
@@ -470,7 +479,7 @@ public class Config {
 //		this.modules.put(QSimConfigGroup.GROUP_NAME, qSimConfigGroup);
 		this.addModule(QSimConfigGroup.GROUP_NAME, qSimConfigGroup) ;
 	}
-	
+
 	// other:
 
 	public void addConfigConsistencyChecker(final ConfigConsistencyChecker checker) {

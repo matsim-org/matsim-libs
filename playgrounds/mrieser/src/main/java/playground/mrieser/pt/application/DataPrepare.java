@@ -43,8 +43,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.router.PlansCalcTransitRoute;
-import org.matsim.pt.router.TransitRouterImpl;
 import org.matsim.pt.router.TransitRouterConfig;
+import org.matsim.pt.router.TransitRouterImpl;
 import org.matsim.pt.transitSchedule.TransitScheduleWriterV1;
 import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
 import org.matsim.pt.utils.CreatePseudoNetwork;
@@ -179,8 +179,8 @@ public class DataPrepare {
 		DijkstraFactory dijkstraFactory = new DijkstraFactory();
 		FreespeedTravelTimeCost timeCostCalculator = new FreespeedTravelTimeCost(this.scenario.getConfig().planCalcScore());
 		TransitConfigGroup transitConfig = new TransitConfigGroup();
-		TransitRouterConfig tRConfig = new TransitRouterConfig( this.scenario.getConfig().planCalcScore(), 
-				this.scenario.getConfig().plansCalcRoute() ) ;
+		TransitRouterConfig tRConfig = new TransitRouterConfig(this.scenario.getConfig().planCalcScore(), 
+				this.scenario.getConfig().plansCalcRoute(), this.scenario.getConfig().transitRouter());
 		PlansCalcTransitRoute router = new PlansCalcTransitRoute(this.scenario.getConfig().plansCalcRoute(),
 				this.scenario.getNetwork(), timeCostCalculator, timeCostCalculator, dijkstraFactory,
 				transitConfig, new TransitRouterImpl(this.scenario.getTransitSchedule(), tRConfig ));
@@ -191,8 +191,8 @@ public class DataPrepare {
 	}
 
 	protected void visualizeRouterNetwork() {
-		TransitRouterConfig tRConfig = new TransitRouterConfig( this.scenario.getConfig().planCalcScore(), 
-				this.scenario.getConfig().plansCalcRoute() ) ;
+		TransitRouterConfig tRConfig = new TransitRouterConfig(this.scenario.getConfig().planCalcScore(), 
+				this.scenario.getConfig().plansCalcRoute(), this.scenario.getConfig().transitRouter());
 
 		TransitRouterImpl router = new TransitRouterImpl(this.scenario.getTransitSchedule(), tRConfig );
 		Network routerNet = router.getTransitRouterNetwork();

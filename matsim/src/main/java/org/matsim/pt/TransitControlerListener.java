@@ -65,12 +65,12 @@ public class TransitControlerListener implements StartupListener {
 				((ScenarioImpl)scenario).getVehicles(),
 				scenario.getConfig().planCalcScore());
 		reconstructingUmlaufBuilder.build();
-		scenario.addScenarioElement( reconstructingUmlaufBuilder ) ;
+		scenario.addScenarioElement(reconstructingUmlaufBuilder);
 
 		if (event.getControler().getTransitRouterFactory() == null) {
 			
-			TransitRouterConfig transitRouterConfig = new TransitRouterConfig( scenario.getConfig().planCalcScore()
-					, scenario.getConfig().plansCalcRoute() ) ;
+			TransitRouterConfig transitRouterConfig = new TransitRouterConfig(scenario.getConfig().planCalcScore()
+					, scenario.getConfig().plansCalcRoute(), scenario.getConfig().transitRouter());
 			
 			event.getControler().setTransitRouterFactory(new TransitRouterImplFactory(
 					((ScenarioImpl)scenario).getTransitSchedule(), transitRouterConfig ));

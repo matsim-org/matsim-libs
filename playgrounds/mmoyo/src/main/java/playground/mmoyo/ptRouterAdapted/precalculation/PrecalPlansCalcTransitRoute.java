@@ -39,8 +39,8 @@ import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.router.PlansCalcTransitRoute;
-import org.matsim.pt.router.TransitRouterImpl;
 import org.matsim.pt.router.TransitRouterConfig;
+import org.matsim.pt.router.TransitRouterImpl;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
@@ -63,9 +63,9 @@ public class PrecalPlansCalcTransitRoute extends PlansCalcTransitRoute {
 	public PrecalPlansCalcTransitRoute(final PlansCalcRouteConfigGroup config, final Network network,
 			final PersonalizableTravelCost costCalculator, final PersonalizableTravelTime timeCalculator,
 			final LeastCostPathCalculatorFactory factory, final TransitSchedule schedule,
-			final TransitConfigGroup transitConfig, MyTransitRouterConfig myTransitRouterConfig) {
-		super(config, network, costCalculator, timeCalculator, factory, transitConfig, 
-				new TransitRouterImpl(schedule, new TransitRouterConfig(null,null)));
+			final TransitConfigGroup transitConfig, final MyTransitRouterConfig myTransitRouterConfig) {
+		super(config, network, costCalculator, timeCalculator, factory, transitConfig,
+				new TransitRouterImpl(schedule, new TransitRouterConfig(null,null,null)));
 		this.adaptedTransitRouter = new AdaptedTransitRouter( myTransitRouterConfig, schedule);
 		throw new RuntimeException("this uses the standard TransitRouterConfig in parts of the code, and your " +
 				"own myTransitRouterConfig in other parts of the code, leading to potential inconsistencies. " +
@@ -89,12 +89,12 @@ public class PrecalPlansCalcTransitRoute extends PlansCalcTransitRoute {
 			double travelDistance = 0.0;
 			int ptLegsNum = 0;
 			if (legs != null) {
-				StringBuilder routeId =  new StringBuilder (nullString);
+				StringBuilder routeId =  new StringBuilder (this.nullString);
 				for (Leg leg2 : legs) {
 					travelTime += leg2.getTravelTime(); //calculate travel time
-					if (leg2.getMode().equals(PT)){     //calculate num of pt trips
+					if (leg2.getMode().equals(this.PT)){     //calculate num of pt trips
 						routeId.append(((ExperimentalTransitRoute)leg2.getRoute()).getRouteDescription());
-						routeId.append(COMMA);
+						routeId.append(this.COMMA);
 						ptLegsNum++;
 					}
 					//TODO: travelDistance += leg2.; //set distance
@@ -134,7 +134,7 @@ public class PrecalPlansCalcTransitRoute extends PlansCalcTransitRoute {
 
 
 			Random randomGenerator = new Random();
-			if(kBestRoute <  connectionArray.length){
+			if(this.kBestRoute <  connectionArray.length){
 				if (connectionArray.length>1){
 					// select randomly among the connections
 					//kBestRoute = randomGenerator.nextInt(connectionArray.length-1);
@@ -142,15 +142,15 @@ public class PrecalPlansCalcTransitRoute extends PlansCalcTransitRoute {
 					//add here Pareto Optimal calculation
 
 					//or select the fastest connection  with min transfer!!
-					kBestRoute =0;
+					this.kBestRoute =0;
 				}
-				selectedConnection = connectionArray[kBestRoute].getLegs();
+				selectedConnection = connectionArray[this.kBestRoute].getLegs();
 			}
 			randomGenerator = null;
 			connectionArray= null;
 
 		}else{   //if not pt legs return a transit walk leg
-			log.warn(NO_PT_FOUND);
+			log.warn(this.NO_PT_FOUND);
 		}
 
 		super.getLegReplacements().add(new Tuple<Leg, List<Leg>>(leg, selectedConnection ));

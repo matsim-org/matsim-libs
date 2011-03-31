@@ -37,6 +37,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.pt.config.TransitConfigGroup;
+import org.matsim.pt.config.TransitRouterConfigGroup;
 
 public class PlansCalcTransitRouteTest extends TestCase {
 
@@ -46,10 +47,11 @@ public class PlansCalcTransitRouteTest extends TestCase {
 
 		TransitConfigGroup transitConfig = new TransitConfigGroup();
 		PlansCalcRouteConfigGroup routerConfig = new PlansCalcRouteConfigGroup();
-		PlanCalcScoreConfigGroup scoreConfig = new PlanCalcScoreConfigGroup() ;
+		PlanCalcScoreConfigGroup scoreConfig = new PlanCalcScoreConfigGroup();
+		TransitRouterConfigGroup transitRouterConfigGroup = new TransitRouterConfigGroup();
 
 		FreespeedTravelTimeCost ttc = new FreespeedTravelTimeCost(new PlanCalcScoreConfigGroup());
-		TransitRouterConfig transitRouterConfig = new TransitRouterConfig(scoreConfig, routerConfig) ;
+		TransitRouterConfig transitRouterConfig = new TransitRouterConfig(scoreConfig, routerConfig, transitRouterConfigGroup);
 		
 		PlansCalcTransitRoute router = new PlansCalcTransitRoute(routerConfig, f.network, ttc, ttc, new DijkstraFactory(), 
 				transitConfig, new TransitRouterImpl(f.schedule, transitRouterConfig ));

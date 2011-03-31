@@ -13,8 +13,8 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.population.algorithms.PlansFilterByLegMode;
 import org.matsim.pt.config.TransitConfigGroup;
 
-import playground.mmoyo.utils.PlanFragmenter;
 import playground.mmoyo.utils.DataLoader;
+import playground.mmoyo.utils.PlanFragmenter;
 import playground.mmoyo.utils.calibration.PlanScoreRemover;
 
 /**routes scenario with configurable travel parameter values**/
@@ -56,7 +56,7 @@ public class AdaptedLauncher {
 		// load config values
 		Config cfg = this.scenario.getConfig();
 		myTransitRouterConfig = new MyTransitRouterConfig(this.scenario.getConfig().planCalcScore(),
-				this.scenario.getConfig().plansCalcRoute() ); 
+				this.scenario.getConfig().plansCalcRoute(), this.scenario.getConfig().transitRouter()); 
 		myTransitRouterConfig.searchRadius = Double.parseDouble(cfg.getParam("ptRouter", "searchRadius")); 
 		myTransitRouterConfig.extensionRadius = Double.parseDouble(cfg.getParam("ptRouter", "extensionRadius")); 
 		myTransitRouterConfig.beelineWalkConnectionDistance = Double.parseDouble(cfg.getParam("ptRouter", "beelineWalkConnectionDistance")); 

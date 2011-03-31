@@ -23,6 +23,7 @@ package org.matsim.pt.router;
 import org.matsim.core.api.internal.MatsimParameters;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.pt.config.TransitRouterConfigGroup;
 
 /**
  * Design decisions:<ul>
@@ -91,15 +92,20 @@ public class TransitRouterConfig implements MatsimParameters {
 	// =============================================================================================================================
 	// only setters and getters below this line
 
-	public TransitRouterConfig( final PlanCalcScoreConfigGroup pcsConfig, final PlansCalcRouteConfigGroup pcrConfig ) {
+	public TransitRouterConfig(final PlanCalcScoreConfigGroup pcsConfig, final PlansCalcRouteConfigGroup pcrConfig, final TransitRouterConfigGroup trConfig) {
 		// walk:
-		this.beelineWalkSpeed = pcrConfig.getWalkSpeed() / pcrConfig.getBeelineDistanceFactor() ;
+		this.beelineWalkSpeed = pcrConfig.getWalkSpeed() / pcrConfig.getBeelineDistanceFactor();
 		this.effectiveMarginalUtilityOfTravelTimeWalk_utl_s = pcsConfig.getTravelingWalk_utils_hr()/3600.0 - pcsConfig.getPerforming_utils_hr() / 3600.0;
 		// pt:
 		this.effectiveMarginalUtilityOfTravelTimeTransit_utl_s = pcsConfig.getTravelingPt_utils_hr()/3600.0 - pcsConfig.getPerforming_utils_hr() / 3600.0;
 		this.marginalUtilityOfTravelDistanceTransit_utl_m = pcsConfig.getMarginalUtilityOfMoney() * pcsConfig.getMonetaryDistanceCostRatePt();
-		this.effectiveMarginalUtiltityOfWaiting_utl_s = pcsConfig.getWaiting_utils_hr() / 3600.0 - pcsConfig.getWaiting_utils_hr() / 3600.0;
+		this.effectiveMarginalUtiltityOfWaiting_utl_s = pcsConfig.getWaiting_utils_hr() / 3600.0 - pcsConfig.getPerforming_utils_hr() / 3600.0;
 		this.utilityOfLineSwitch_utl = pcsConfig.getUtilityOfLineSwitch();
+		// router:
+		this.searchRadius = trConfig.getSearchRadius();
+		this.extensionRadius = trConfig.getExtensionRadius();
+		this.beelineWalkConnectionDistance = trConfig.getMaxBeelineWalkConnectionDistance();
+		this.additionalTransferTime = trConfig.getAdditionalTransferTime();
 	}
 
 	public void setUtilityOfLineSwitch_utl(final double utilityOfLineSwitch_utl_sec) {

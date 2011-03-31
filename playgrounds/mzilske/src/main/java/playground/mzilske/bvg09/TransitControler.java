@@ -29,8 +29,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Module;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
@@ -50,8 +50,8 @@ import org.matsim.pt.counts.OccupancyAnalyzer;
 import org.matsim.pt.counts.PtCountControlerListener;
 import org.matsim.pt.qsim.ComplexTransitStopHandlerFactory;
 import org.matsim.pt.router.PlansCalcTransitRoute;
-import org.matsim.pt.router.TransitRouterImpl;
 import org.matsim.pt.router.TransitRouterConfig;
+import org.matsim.pt.router.TransitRouterImpl;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.ptproject.qsim.QSim;
@@ -162,7 +162,7 @@ public class TransitControler extends Controler {
 
 	@Override
 	public PlanAlgorithm createRoutingAlgorithm(final PersonalizableTravelCost travelCosts, final PersonalizableTravelTime travelTimes) {
-		TransitRouterConfig trConfig = new TransitRouterConfig( this.config.planCalcScore(), this.config.plansCalcRoute() ) ;
+		TransitRouterConfig trConfig = new TransitRouterConfig(this.config.planCalcScore(), this.config.plansCalcRoute(), this.config.transitRouter());
 		return new PlansCalcTransitRoute(this.config.plansCalcRoute(), this.network, travelCosts, travelTimes,
 				this.getLeastCostPathCalculatorFactory(), this.transitConfig,
 				new TransitRouterImpl(this.scenarioData.getTransitSchedule(), trConfig) );
