@@ -339,7 +339,8 @@ public class TransitRouterImplTest {
 	@Test
 	public void testDoubleWalk() {
 		WalkFixture f = new WalkFixture();
-		f.routerConfig.setEffectiveMarginalUtilityOfTravelTimePt_utl_s(-1.0 / 3600.0);
+		f.routerConfig.setEffectiveMarginalUtilityOfTravelTimePt_utl_s(-1.0 / 3600.0 - 6.0/3600.0);
+		f.routerConfig.setUtilityOfLineSwitch_utl(0.2); // must be relatively low in this example, otherwise it's cheaper to walk the whole distance...
 		TransitRouterImpl router = new TransitRouterImpl(f.schedule, f.routerConfig);
 		List<Leg> legs = router.calcRoute(f.coord1, f.coord7, 990);
 		assertEquals(5, legs.size());
