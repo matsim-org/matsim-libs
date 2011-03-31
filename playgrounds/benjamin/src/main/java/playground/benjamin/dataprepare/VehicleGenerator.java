@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin.szenarios.munich.testroad;
+package playground.benjamin.dataprepare;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;

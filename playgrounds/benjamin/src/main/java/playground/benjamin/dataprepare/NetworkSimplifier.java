@@ -50,7 +50,7 @@ import org.matsim.core.utils.misc.ConfigUtils;
 public class NetworkSimplifier {
 
 	private static final Logger log = Logger.getLogger(NetworkSimplifier.class);
-	private boolean mergeLinkStats = true;
+	private boolean mergeLinkStats = false;
 	private Set<Integer> nodeTopoToMerge = new TreeSet<Integer>();
 
 	public void run(final Network network) {
@@ -212,7 +212,7 @@ public class NetworkSimplifier {
 
 		NetworkSimplifier nsimply = new NetworkSimplifier();
 		nsimply.setNodesToMerge(nodeTypesToMerge);
-//		nsimply.setMergeLinkStats(true);
+		nsimply.setMergeLinkStats(true);
 		nsimply.run(network);
 
 		new NetworkWriter(network).write("../../detailedEval/Net/network-86-85-87-84_simplifiedMAX---withLanes.xml");
