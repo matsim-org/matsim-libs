@@ -209,13 +209,15 @@ public class NetworkSimplifier {
 		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		final Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile("../../detailedEval/Net/network-86-85-87-84_withLanes.xml");
+//		new MatsimNetworkReader(scenario).readFile("../../detailedEval/policies/network-86-85-87-84_withLanes_zone30.xml.gz");
 
 		NetworkSimplifier nsimply = new NetworkSimplifier();
 		nsimply.setNodesToMerge(nodeTypesToMerge);
-		nsimply.setMergeLinkStats(true);
+//		nsimply.setMergeLinkStats(true);
 		nsimply.run(network);
 
-		new NetworkWriter(network).write("../../detailedEval/Net/network-86-85-87-84_simplifiedMAX---withLanes.xml");
+		new NetworkWriter(network).write("../../detailedEval/Net/network-86-85-87-84_simplified---withLanes.xml");
+//		new NetworkWriter(network).write("../../detailedEval/policies/network-86-85-87-84_simplified---withLanes_zone30.xml.gz");
 
 	}
 }

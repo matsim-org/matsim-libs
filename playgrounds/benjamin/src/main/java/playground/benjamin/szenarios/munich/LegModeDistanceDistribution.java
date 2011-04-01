@@ -54,10 +54,12 @@ public class LegModeDistanceDistribution {
 	private static final Logger logger = Logger.getLogger(LegModeDistanceDistribution.class);
 
 	// INPUT
-	private static String runDirectory = "../../detailedEval/testRuns/output/1pct/v0-default/run20/";
-	private static String netFile = runDirectory + "output_network.xml.gz";
+	private static String runDirectory = "../../detailedEval/testRuns/output/1pct/v0-default/run24/";
 	private static String initialPlansFile = runDirectory + "ITERS/it.0/0.plans.xml.gz";
 	private static String finalPlansFile = runDirectory + "output_plans.xml.gz";
+	private static String netFile = runDirectory + "output_network.xml.gz";
+//	private static String finalPlansFile = runDirectory + "ITERS/it.300/300.plans.xml.gz";
+//	private static String netFile = "../../detailedEval/Net/network-86-85-87-84_simplified---withLanes.xml";
 
 	private final Scenario initialScenario;
 	private final Scenario finalScenario;

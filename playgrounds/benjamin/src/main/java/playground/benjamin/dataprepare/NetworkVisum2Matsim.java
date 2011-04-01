@@ -53,9 +53,11 @@ public class NetworkVisum2Matsim {
 	private static String OutPath = "../../detailedEval/Net/";
 	private static String InVisumNetFile = "../../detailedEval/Net/Analyse2005_Netz.net";
 	private static String DetailedAreaShape = "../../detailedEval/Net/shapeFromVISUM/Landkreise_umMuenchen_Umrisse.shp";
+	//	private static String DetailedAreaShape = "../../detailedEval/policies/zone30.shp";
 
 	// OUTPUT FILES
 	private static String OutNetworkFile = OutPath + "network-86-85-87-84_withLanes.xml";
+	//	private static String OutNetworkFile = "../../detailedEval/policies/network-86-85-87-84_withLanes_zone30.xml.gz";
 
 	private final ScenarioImpl scenario;
 	private final Config config;
@@ -118,6 +120,30 @@ public class NetworkVisum2Matsim {
 				int noOfLanes = getNoOfLanes(edgeTypeId);
 				// kick out all irrelevant edge types
 				if (isEdgeTypeRelevant(edgeTypeId)) {
+
+					//					// definitions for zone30
+					//					if(isEdgeInDetailedArea(fromNode, featuresInShape)){
+					//						freespeed = 30 / 3.6;
+					//						// setting all streets with noOfLanes = 1 to Type 75
+					//						if(noOfLanes == 1){
+					//							edgeTypeIdString =  "75";
+					//							capacity = getCapacity(new IdImpl(edgeTypeIdString));
+					//						}
+					//						// setting all other streets to Type 83
+					//						else{
+					//							edgeTypeIdString =  "83";
+					//							capacity = getCapacity(new IdImpl(edgeTypeIdString));
+					//						}
+					//						network.createAndAddLink(id, fromNode, toNode, length, freespeed, capacity, noOfLanes, null, edgeTypeIdString);
+					//						usedIds.add(edgeTypeIdString);
+					//					}
+					//					// kick out all edges in periphery that are irrelevant only there
+					//					else {
+					//						freespeed = getFreespeedTravelTime(edgeTypeId);
+					//						network.createAndAddLink(id, fromNode, toNode, length, freespeed, capacity, noOfLanes, null, edgeTypeIdString);
+					//						usedIds.add(edgeTypeIdString);
+					//					}
+
 					// take all edges in detailed area
 					if(isEdgeInDetailedArea(fromNode, featuresInShape)){
 
@@ -133,7 +159,6 @@ public class NetworkVisum2Matsim {
 						network.createAndAddLink(id, fromNode, toNode, length, freespeed, capacity, noOfLanes, null, edgeTypeIdString);
 						usedIds.add(edgeTypeIdString);
 					}
-					// kick out all edges in periphery that are irrelevant only there
 					else {
 						if(isEdgeTypeRelevantForPeriphery(edgeTypeId)){
 							freespeed = getFreespeedTravelTime(edgeTypeId);
@@ -144,7 +169,6 @@ public class NetworkVisum2Matsim {
 
 				}
 			}
-
 		};
 		streamingVisumNetworkReader.addRowHandler("STRECKE", edgeRowHandler);
 		streamingVisumNetworkReader.read(InVisumNetFile);
@@ -258,5 +282,4 @@ public class NetworkVisum2Matsim {
 	private void cleanNetwork() {
 		new org.matsim.core.network.algorithms.NetworkCleaner().run(scenario.getNetwork());
 	}
-
 }
