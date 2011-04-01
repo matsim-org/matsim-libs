@@ -159,8 +159,10 @@ public class PathSizeFromPlanChoiceSet {
 					int modeCnt = 0;
 					for (List<String> otherLegModeChain : legModeChains
 							.values()) {
-						if (otherLegModeChain.get(i).equals(mode)) {
-							modeCnt++;
+						if (otherLegModeChain.size() == legModeChain.size()) {
+							if (otherLegModeChain.get(i).equals(mode)) {
+								modeCnt++;
+							}
 						}
 					}
 
@@ -180,11 +182,13 @@ public class PathSizeFromPlanChoiceSet {
 	protected double calculatePathSize(Path path) {
 		double result = 0d;
 		double pathLength = 0d;
+		int pathLegsSize = path.getLegsSize();
 
-		for (int legIdx = 0; legIdx < path.getLegsSize(); legIdx++) {
+		for (int legIdx = 0; legIdx < pathLegsSize; legIdx++) {
 			for (Id linkId : path.getLegLinkIds(legIdx)) {
 				double linkLength = network.getLinks().get(linkId).getLength();
-				result += linkLength / getUsingLinkCount(linkId, legIdx);
+				result += linkLength
+						/ getUsingLinkCount(linkId, legIdx, pathLegsSize);
 				pathLength += linkLength;
 			}
 		}
@@ -192,11 +196,13 @@ public class PathSizeFromPlanChoiceSet {
 		return pathLength > 0 ? result / pathLength : -1d;
 	}
 
-	protected int getUsingLinkCount(Id linkId, int legIndex) {
+	protected int getUsingLinkCount(Id linkId, int legIndex, int pathLegsSize) {
 		int usingCnt = 0;
 		for (Path otherPath : paths) {
-			if (otherPath.containLinkId(linkId, legIndex)) {
-				usingCnt++;
+			if (otherPath.getLegsSize() == pathLegsSize) {
+				if (otherPath.containLinkId(linkId, legIndex)) {
+					usingCnt++;
+				}
 			}
 		}
 		return usingCnt;

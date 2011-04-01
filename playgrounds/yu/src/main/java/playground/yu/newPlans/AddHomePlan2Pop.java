@@ -132,8 +132,8 @@ public class AddHomePlan2Pop extends NewPopulation {
 			outputPopFilename = args[2];
 		} else {
 			netFilename = "../matsimTests/ParamCalibration/network.xml";
-			inputPopFilename = "../matsimTests/ParamCalibration/40.plans.xml.gz";
-			outputPopFilename = "../matsimTests/diverseRoutes/stayHomePop.xml";
+			inputPopFilename = "../matsimTests/ParamCalibration/general2/fixChoiceSetPop1000.xml.gz";
+			outputPopFilename = "../matsimTests/ParamCalibration/general2/fixChoiceSetPop1000stayHome.xml.gz";
 		}
 
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils
