@@ -51,6 +51,7 @@ public class PathSizeFromPlanChoiceSet {
 		private List<List<Id>> legs;
 		private List<String> legModeChain = new ArrayList<String>();
 		private List<Double> legLinearDistanceChain = new ArrayList<Double>();
+		public Id personId;
 
 		/**
 		 * converts {@code Plan} to a {@code Path}
@@ -70,6 +71,7 @@ public class PathSizeFromPlanChoiceSet {
 					legModeChain.add(leg.getMode());
 				}
 			}
+			personId = plan.getPerson().getId();
 		}
 
 		public void addLeg(Leg leg) {
@@ -131,28 +133,35 @@ public class PathSizeFromPlanChoiceSet {
 	}
 
 	private void recalculatePathSizes() {
-		Map<Integer/* Plan-idx */, List<String>/* legModeChain */> legModeChains = new HashMap<Integer, List<String>>();
-		List<Double> legLinearDistChain = null;
+		Map<Integer/* Plan-idx in choice set */, List<String>/* legModeChain */> legModeChains = new HashMap<Integer, List<String>>();
+		Map<Integer/* Plan-idx in choice set */, List<Double>/*
+															 * leg linear
+															 * distance
+															 */> legLinearDistChains = new HashMap<Integer, List<Double>>();
 
 		for (int i = 0; i < pathSizes.length; i++) {
 			if (pathSizes[i] < 0) {
 				Path path = paths.get(i);
 				legModeChains.put(i, path.getLegModeChain());
-				if (legLinearDistChain == null) {
-					legLinearDistChain = path.getLegLinearDistanceChain();
-				}
+				legLinearDistChains.put(i, path.getLegLinearDistanceChain());
 			}
 		}
 
 		int legModeChainsSize = legModeChains.size();
-		if (legModeChainsSize == 1) {
+		if (legModeChainsSize == 1) {/* only 1 Plan with path-size = -1 */
 			pathSizes[legModeChains.keySet().iterator().next()] = 1d;
-		} else if (legModeChainsSize > 1) {
-			double legLinearDistance = CollectionSum.getSum(legLinearDistChain);
+		} else if (legModeChainsSize > 1) {/* more Plans with path-size = -1 */
+			// double legLinearDistance = CollectionSum
+			// .getSum(legLinearDistChains);
 			for (Entry<Integer, List<String>> legModeChainEntry : legModeChains
 					.entrySet()) {
 				List<String> legModeChain = legModeChainEntry.getValue();
 				double pathSize = 0;
+				Integer planIdx = legModeChainEntry.getKey();
+
+				List<Double> legLinearDistChain = legLinearDistChains
+						.get(planIdx);
+
 				for (int i = 0; i < legModeChain.size(); i++) {
 					String mode = legModeChain.get(i);
 
@@ -173,8 +182,17 @@ public class PathSizeFromPlanChoiceSet {
 
 					pathSize += legLinearDistChain.get(i) / modeCnt;
 				}
-				pathSizes[legModeChainEntry.getKey()] = pathSize
-						/ legLinearDistance;
+
+				pathSizes[planIdx] = pathSize
+						/ CollectionSum.getSum(legLinearDistChain);
+				if (Double.isNaN(pathSizes[planIdx])) {
+					System.out.println("Person:\t"
+							+ paths.get(planIdx).personId
+							+ "\nlegLinearDistChain:\t" + legLinearDistChain
+							+ "\nplan-index:\t" + planIdx + "\nlegModeChain:\t"
+							+ legModeChain);
+					throw new RuntimeException("path-size NaN!!!");
+				}
 			}
 		}
 	}
