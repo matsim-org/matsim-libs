@@ -183,14 +183,18 @@ public class PathSizeFromPlanChoiceSet {
 					pathSize += legLinearDistChain.get(i) / modeCnt;
 				}
 
-				pathSizes[planIdx] = pathSize
-						/ CollectionSum.getSum(legLinearDistChain);
+				double legLinearDistChainSum = CollectionSum
+						.getSum(legLinearDistChain);
+				pathSizes[planIdx] = legLinearDistChainSum != 0 ? pathSize
+						/ legLinearDistChainSum : 1/* only 1 stay home Plan */;
+
 				if (Double.isNaN(pathSizes[planIdx])) {
 					System.out.println("Person:\t"
 							+ paths.get(planIdx).personId
-							+ "\nlegLinearDistChain:\t" + legLinearDistChain
-							+ "\nplan-index:\t" + planIdx + "\nlegModeChain:\t"
-							+ legModeChain);
+							+ "\t|\tlegLinearDistChain:\t" + legLinearDistChain
+							+ "\t|\tplan-index:\t" + planIdx
+							+ "\t|\tlegModeChain:\t" + legModeChain
+							+ "\t|\tpath-size values:\t" + pathSizes);
 					throw new RuntimeException("path-size NaN!!!");
 				}
 			}
