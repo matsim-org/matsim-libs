@@ -120,9 +120,9 @@ public class JointControler extends Controler {
 		return manager;
 	}
 
-	@Override
-	public PlansScoring getPlansScoring() {
-		return this.plansScoring;
-	}
+	//@Override
+	//public PlansScoring getPlansScoring() {
+	//	return this.plansScoring;
+	//}
 
 }

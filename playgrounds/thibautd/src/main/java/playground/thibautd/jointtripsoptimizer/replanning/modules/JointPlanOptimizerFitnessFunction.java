@@ -73,8 +73,8 @@ public class JointPlanOptimizerFitnessFunction extends FitnessFunction {
 	@Override
 	protected double evaluate(IChromosome chromosome) {
 		JointPlan plan = this.decoder.decode(chromosome);
-		return this.getScore(plan);
-		//return 0d;
+		double score = this.getScore(plan);
+		return score;
 	}
 
 	private double getScore(JointPlan plan) {

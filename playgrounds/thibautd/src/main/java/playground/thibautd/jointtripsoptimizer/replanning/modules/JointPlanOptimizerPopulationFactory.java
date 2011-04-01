@@ -47,7 +47,7 @@ public class JointPlanOptimizerPopulationFactory {
 	private final int populationSize;
 	private final int nBooleanGenes;
 	private final int nDoubleGenes;
-	private final Double dayDuration;
+	private final double dayDuration;
 
 	private final RandomGenerator randomGenerator;
 
@@ -83,13 +83,15 @@ public class JointPlanOptimizerPopulationFactory {
 
 	public Population createRandomInitialPopulation() {
 		IChromosome[] chromosomes = new IChromosome[this.populationSize];
-		Gene[] currentGenes = new Gene[this.nBooleanGenes + this.nDoubleGenes];
 		DoubleGene newDoubleGene;
-		Double[] randomDurations = new Double[this.nDoubleGenes + 1];
-		Double scalingFactor = 0d;
+		double[] randomDurations = new double[this.nDoubleGenes + 1];
+		double scalingFactor = 0d;
 
 		try {
 			for (int i=0; i < this.populationSize; i++) {
+				// MUST be initialized here: the Chromosome constructor copies
+				// the reference to the array, not the genes it contains.
+				Gene[] currentGenes = new Gene[this.nBooleanGenes + this.nDoubleGenes];
 				// /////////////////////////////////////////////////////////////
 				// initialize the genes randomly
 				for (int j=0; j < this.nBooleanGenes; j++) {
@@ -97,8 +99,9 @@ public class JointPlanOptimizerPopulationFactory {
 							this.randomGenerator.nextBoolean());
 				}
 
+				scalingFactor = 0d;
 				for (int j=0; j <= this.nDoubleGenes; j++) {
-					randomDurations[j] = this.randomGenerator.nextDouble() * this.dayDuration;
+					randomDurations[j] = this.randomGenerator.nextDouble();
 					scalingFactor += randomDurations[j];
 				}
 
@@ -113,6 +116,7 @@ public class JointPlanOptimizerPopulationFactory {
 
 					currentGenes[this.nBooleanGenes + j] = newDoubleGene;
 				}
+
 				chromosomes[i] = new JointPlanOptimizerJGAPChromosome(
 						this.jgapConfig, currentGenes);
 			}

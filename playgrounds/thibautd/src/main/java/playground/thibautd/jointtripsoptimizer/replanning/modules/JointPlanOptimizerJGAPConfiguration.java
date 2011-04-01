@@ -34,6 +34,7 @@ import org.jgap.impl.ChromosomePool;
 import org.jgap.impl.DoubleGene;
 import org.jgap.impl.GABreeder;
 import org.jgap.impl.StockRandomGenerator;
+import org.jgap.impl.ThresholdSelector;
 import org.jgap.impl.WeightedRouletteSelector;
 import org.jgap.InvalidConfigurationException;
 
@@ -87,6 +88,7 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 			LegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory,
 			PlansCalcRoute routingAlgorithm,
 			Network network,
+			String outputPath,
 			long randomSeed
 			) {
 		super(null);
@@ -111,13 +113,22 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 			this.setRandomGenerator(new StockRandomGenerator());
 			((StockRandomGenerator) this.getRandomGenerator()).setSeed(randomSeed);
 
-			BestChromosomesSelector bestChromsSelector = new BestChromosomesSelector(this);
-			bestChromsSelector.setDoubletteChromosomesAllowed(false);
-			this.addNaturalSelector(bestChromsSelector, false);
-			//this.addNaturalSelector(new WeightedRouletteSelector(), false);
+			// elitism: unnecessary with BestChromosomesSelector or ThresholdSelector
+			this.setPreservFittestIndividual(true);
 
-			// elitism: unnecessary with BestChromosomesSelector
-			// this.setPreservFittestIndividual(true);
+
+			// select the best chromosomes
+			// BestChromosomesSelector selector = new BestChromosomesSelector(this);
+			// selector.setDoubletteChromosomesAllowed(false);
+
+			//random choice based on the fitness values
+			//WeightedRouletteSelector selector = new WeightedRouletteSelector();
+
+			//random selectors ensurring that a certain proportion of th selected
+			//chromosomes are among the bests
+			ThresholdSelector selector =
+				new ThresholdSelector(this, configGroup.getSelectionThreshold());
+			this.addNaturalSelector(selector, false);
 
 			// Chromosome: construction
 			Gene[] sampleGenes = new Gene[this.numToggleGenes + this.numEpisodes];
@@ -158,6 +169,12 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 			// a call to a_population.getChromosomes().equals(a_candidateChromosomes)
 			// in the first genetic operator returns true.
 			//this.addGeneticOperator( new ReproductionOperator() );
+			if (configGroup.getPlotFitness()) {
+				this.addGeneticOperator( new JointPlanOptimizerPopulationAnalysisOperator(
+							this,
+							configGroup.getMaxIterations(),
+							outputPath));
+			}
 			this.addGeneticOperator( new JointPlanOptimizerJGAPCrossOver(
 						this,
 						configGroup,

@@ -47,7 +47,7 @@ public class JointPlanOptimizer implements PlanAlgorithm {
 	private final LegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory;
 	private final PlansCalcRoute routingAlgorithm;
 	private final Network network;
-
+	private final String outputPath;
 
 	private final Random randomGenerator = MatsimRandom.getLocalInstance();
 
@@ -56,13 +56,15 @@ public class JointPlanOptimizer implements PlanAlgorithm {
 			ScoringFunctionFactory scoringFunctionFactory,
 			LegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory,
 			PlansCalcRoute routingAlgorithm,
-			Network network
+			Network network,
+			String iterationOutputPath
 			) {
 		this.fitnessFunctionFactory = scoringFunctionFactory;
 		this.configGroup = configGroup;
 		this.legTravelTimeEstimatorFactory = legTravelTimeEstimatorFactory;
 		this.routingAlgorithm = routingAlgorithm;
 		this.network = network;
+		this.outputPath = iterationOutputPath;
 	}
 
 	@Override
@@ -88,6 +90,7 @@ public class JointPlanOptimizer implements PlanAlgorithm {
 					this.legTravelTimeEstimatorFactory,
 					this.routingAlgorithm,
 					this.network,
+					this.outputPath,
 					this.randomGenerator.nextLong());
 
 		JointPlanOptimizerPopulationFactory populationFactory =

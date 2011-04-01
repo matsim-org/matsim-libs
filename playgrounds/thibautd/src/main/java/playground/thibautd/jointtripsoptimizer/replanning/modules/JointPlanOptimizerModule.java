@@ -95,7 +95,9 @@ public class JointPlanOptimizerModule extends AbstractMultithreadedModule {
 					this.scoringFunctionFactory,
 					this.legTravelTimeEstimatorFactory,
 					routingAlgorithm,
-					this.network
+					this.network,
+					controler.getControlerIO().getIterationPath(
+						controler.getIterationNumber())
 					);
 	}
 }

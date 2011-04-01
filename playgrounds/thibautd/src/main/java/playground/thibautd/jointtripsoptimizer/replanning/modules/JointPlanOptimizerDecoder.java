@@ -130,8 +130,8 @@ public class JointPlanOptimizerDecoder {
 			currentLegTTEstimator = legTravelTimeEstimatorFactory.getLegTravelTimeEstimator(
 					plan.getIndividualPlan(id),
 					//TODO: pass it by the config group
-					PlanomatConfigGroup.SimLegInterpretation.CetinCompatible,
-					// PlanomatConfigGroup.SimLegInterpretation.CharyparEtAlCompatible,
+					//PlanomatConfigGroup.SimLegInterpretation.CetinCompatible,
+					PlanomatConfigGroup.SimLegInterpretation.CharyparEtAlCompatible,
 					PlanomatConfigGroup.RoutingCapability.fixedRoute,
 					routingAlgorithm,
 					network);
@@ -145,8 +145,8 @@ public class JointPlanOptimizerDecoder {
 		nonSharedLegsTTEstimator = legTravelTimeEstimatorFactory.getLegTravelTimeEstimator(
 				this.facticePlan,
 				//TODO: pass it by the config group
-				PlanomatConfigGroup.SimLegInterpretation.CetinCompatible,
-				// PlanomatConfigGroup.SimLegInterpretation.CharyparEtAlCompatible,
+				//PlanomatConfigGroup.SimLegInterpretation.CetinCompatible,
+				PlanomatConfigGroup.SimLegInterpretation.CharyparEtAlCompatible,
 				PlanomatConfigGroup.RoutingCapability.fixedRoute,
 				routingAlgorithm,
 				network);

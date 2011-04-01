@@ -189,9 +189,10 @@ public class JointPlanOptimizerJGAPChromosome extends Chromosome {
 		// the pool, so we have to construct a new instance and build it from
 		// scratch.
 		// ------------------------------------------------------------------
-		IChromosome sampleChromosome = getConfiguration().getSampleChromosome();
-		Gene[] sampleGenes = sampleChromosome.getGenes();
-		Gene[] newGenes = new Gene[sampleGenes.length];
+		//IChromosome sampleChromosome = getConfiguration().getSampleChromosome();
+		//Gene[] sampleGenes = sampleChromosome.getGenes();
+		//Gene[] newGenes = new Gene[sampleGenes.length];
+		Gene[] newGenes = new Gene[this.nBooleanGenes + this.nDoubleGenes];
 		DoubleGene newDoubleGene;
 		Double[] randomDurations = new Double[this.nDoubleGenes + 1];
 		RandomGenerator generator = getConfiguration().getRandomGenerator();
@@ -205,7 +206,7 @@ public class JointPlanOptimizerJGAPChromosome extends Chromosome {
 		}
 
 		for (int j=0; j <= this.nDoubleGenes; j++) {
-			randomDurations[j] = generator.nextDouble() * this.dayDuration;
+			randomDurations[j] = generator.nextDouble();
 			scalingFactor += randomDurations[j];
 		}
 
@@ -244,7 +245,7 @@ public class JointPlanOptimizerJGAPChromosome extends Chromosome {
 				(JointPlanOptimizerFitnessFunction.NO_FITNESS_VALUE != a_newFitnessValue) &&
 				(Math.abs(m_fitnessValue - a_newFitnessValue) > 0.0000001)) {
 
-			m_fitnessValue = a_newFitnessValue;
+			super.m_fitnessValue = a_newFitnessValue;
 		}
 	}
 }

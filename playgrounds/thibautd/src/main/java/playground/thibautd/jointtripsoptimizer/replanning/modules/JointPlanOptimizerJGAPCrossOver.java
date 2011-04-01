@@ -316,7 +316,6 @@ public class JointPlanOptimizerJGAPCrossOver implements GeneticOperator {
 	 * respect the constraints.
 	 * (NOT HERE: here, it is the max such that the modified x respects the constraints.
 	 */
-	//TODO
 	private double SingleCoCrossingCoef(
 			Gene[] mate1Genes,
 			Gene[] mate2Genes,

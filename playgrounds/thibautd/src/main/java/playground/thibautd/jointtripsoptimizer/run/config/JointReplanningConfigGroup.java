@@ -51,6 +51,8 @@ public class JointReplanningConfigGroup extends Module {
 	private static final String ITER_NUM = "maxNumberOfGAIterations";
 	private static final String NON_UNIFORMITY_PARAM = "mutationNonUniformity";
 	private static final String OPTIMIZE_TOGGLE = "toggleToOptimize";
+	private static final String SELECTION_THRESHOLD = "bestSelectionThreshold";
+	private static final String PLOT_FITNESS = "plotFitnessEvolution";
 
 	//parameter values, initialized to defaults.
 	private int numTimeIntervals;
@@ -63,6 +65,8 @@ public class JointReplanningConfigGroup extends Module {
 	private int numberOfIterations = 100;
 	private double betaNonUniformity = 1;
 	private boolean optimizeToggle = false;
+	private double selectionThreshold = 0.1d;
+	private boolean plotFitness = false;
 
 	public JointReplanningConfigGroup() {
 		super(GROUP_NAME);
@@ -97,7 +101,6 @@ public class JointReplanningConfigGroup extends Module {
 		else if (param_name.equals(SINGLE_CO_PROB)) {
 			this.setSingleCrossOverProbability(value);
 		}
-
 		else if (param_name.equals(ITER_NUM)) {
 			this.setMaxIterations(value);
 		}
@@ -106,6 +109,12 @@ public class JointReplanningConfigGroup extends Module {
 		}
 		else if (param_name.equals(OPTIMIZE_TOGGLE)) {
 			this.setOptimizeToggle(value);
+		}
+		else if (param_name.equals(SELECTION_THRESHOLD)) {
+			this.setSelectionThreshold(value);
+		}
+		else if (param_name.equals(PLOT_FITNESS)) {
+			this.setPlotFitness(value);
 		}
 	}
 
@@ -136,10 +145,16 @@ public class JointReplanningConfigGroup extends Module {
 			return String.valueOf(this.getMaxIterations());
 		}
 		else if (param_name.equals(NON_UNIFORMITY_PARAM)) {
-			this.getMutationNonUniformity();
+			return String.valueOf(this.getMutationNonUniformity());
 		}
 		else if (param_name.equals(OPTIMIZE_TOGGLE)) {
-			this.getOptimizeToggle();
+			return String.valueOf(this.getOptimizeToggle());
+		}
+		else if (param_name.equals(SELECTION_THRESHOLD)) {
+			return String.valueOf(this.getSelectionThreshold());
+		}
+		else if (param_name.equals(PLOT_FITNESS)) {
+			return String.valueOf(this.getPlotFitness());
 		}
 		return null;
 	}
@@ -157,6 +172,8 @@ public class JointReplanningConfigGroup extends Module {
 		this.addParameterToMap(map, ITER_NUM);
 		this.addParameterToMap(map, NON_UNIFORMITY_PARAM);
 		this.addParameterToMap(map, OPTIMIZE_TOGGLE);
+		this.addParameterToMap(map, SELECTION_THRESHOLD);
+		this.addParameterToMap(map, PLOT_FITNESS);
 		return map;
 	}
 
@@ -273,6 +290,36 @@ public class JointReplanningConfigGroup extends Module {
 		}
 		else if (value.toLowerCase().equals("false")) {
 			this.optimizeToggle = false;
+		}
+		else {
+			throw new IllegalArgumentException("value for "+
+					OPTIMIZE_TOGGLE+" must be \"true\" or \"false\"");
+		}
+	}
+
+	public double getSelectionThreshold() {
+		return this.selectionThreshold;
+	}
+
+	public void setSelectionThreshold(String value) {
+		this.selectionThreshold = Double.parseDouble(value);
+
+		if ((this.selectionThreshold < 0d)||(this.selectionThreshold > 1d)) {
+			throw new IllegalArgumentException("the selection threshold must belong"
+					+" to [0,1]!");
+		}
+	}
+
+	public boolean getPlotFitness() {
+		return this.plotFitness;
+	}
+
+	public void setPlotFitness(String value) {
+		if (value.toLowerCase().equals("true")) {
+			this.plotFitness = true;
+		}
+		else if (value.toLowerCase().equals("false")) {
+			this.plotFitness = false;
 		}
 		else {
 			throw new IllegalArgumentException("value for "+
