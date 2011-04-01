@@ -88,7 +88,7 @@ public class TransitRouterImpl implements TransitRouter {
 		for (TransitRouterNetworkNode node : fromNodes) {
 			double distance = CoordUtils.calcDistance(fromCoord, node.stop.getStopFacility().getCoord());
 			double initialTime = distance / this.config.getBeelineWalkSpeed();
-			double initialCost = - (initialTime * this.config.getEffectiveMarginalUtilityOfTravelTimeWalk_utl_s());
+			double initialCost = - (initialTime * this.config.getMarginalUtilityOfTravelTimeWalk_utl_s());
 			wrappedFromNodes.put(node, new InitialNode(initialCost, initialTime + departureTime));
 		}
 
@@ -104,7 +104,7 @@ public class TransitRouterImpl implements TransitRouter {
 		for (TransitRouterNetworkNode node : toNodes) {
 			double distance = CoordUtils.calcDistance(toCoord, node.stop.getStopFacility().getCoord());
 			double initialTime = distance / this.config.getBeelineWalkSpeed();
-			double initialCost = - (initialTime * this.config.getEffectiveMarginalUtilityOfTravelTimeWalk_utl_s());
+			double initialCost = - (initialTime * this.config.getMarginalUtilityOfTravelTimeWalk_utl_s());
 			wrappedToNodes.put(node, new InitialNode(initialCost, initialTime + departureTime));
 		}
 
@@ -115,7 +115,7 @@ public class TransitRouterImpl implements TransitRouter {
 			return null;
 		}
 
-		double directWalkCost = CoordUtils.calcDistance(fromCoord, toCoord) / this.config.getBeelineWalkSpeed() * ( 0 - this.config.getEffectiveMarginalUtilityOfTravelTimeWalk_utl_s());
+		double directWalkCost = CoordUtils.calcDistance(fromCoord, toCoord) / this.config.getBeelineWalkSpeed() * ( 0 - this.config.getMarginalUtilityOfTravelTimeWalk_utl_s());
 		double pathCost = p.travelCost + wrappedFromNodes.get(p.nodes.get(0)).initialCost + wrappedToNodes.get(p.nodes.get(p.nodes.size() - 1)).initialCost;
 		if (directWalkCost < pathCost) {
 			List<Leg> legs = new ArrayList<Leg>();

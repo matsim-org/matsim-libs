@@ -79,11 +79,11 @@ public class TransitRouterConfig implements MatsimParameters {
 
 	private double beelineWalkSpeed; // meter / second
 
-	private double effectiveMarginalUtilityOfTravelTimeWalk_utl_s;
+	private double marginalUtilityOfTravelTimeWalk_utl_s;
 
-	private double effectiveMarginalUtilityOfTravelTimeTransit_utl_s;
+	private double marginalUtilityOfTravelTimeTransit_utl_s;
 
-	private double effectiveMarginalUtiltityOfWaiting_utl_s;
+	private double marginalUtiltityOfWaiting_utl_s;
 
 	private double marginalUtilityOfTravelDistanceTransit_utl_m;
 
@@ -95,11 +95,11 @@ public class TransitRouterConfig implements MatsimParameters {
 	public TransitRouterConfig(final PlanCalcScoreConfigGroup pcsConfig, final PlansCalcRouteConfigGroup pcrConfig, final TransitRouterConfigGroup trConfig) {
 		// walk:
 		this.beelineWalkSpeed = pcrConfig.getWalkSpeed() / pcrConfig.getBeelineDistanceFactor();
-		this.effectiveMarginalUtilityOfTravelTimeWalk_utl_s = pcsConfig.getTravelingWalk_utils_hr()/3600.0 - pcsConfig.getPerforming_utils_hr() / 3600.0;
+		this.marginalUtilityOfTravelTimeWalk_utl_s = pcsConfig.getTravelingWalk_utils_hr()/3600.0;
 		// pt:
-		this.effectiveMarginalUtilityOfTravelTimeTransit_utl_s = pcsConfig.getTravelingPt_utils_hr()/3600.0 - pcsConfig.getPerforming_utils_hr() / 3600.0;
+		this.marginalUtilityOfTravelTimeTransit_utl_s = pcsConfig.getTravelingPt_utils_hr()/3600.0;
 		this.marginalUtilityOfTravelDistanceTransit_utl_m = pcsConfig.getMarginalUtilityOfMoney() * pcsConfig.getMonetaryDistanceCostRatePt();
-		this.effectiveMarginalUtiltityOfWaiting_utl_s = pcsConfig.getWaiting_utils_hr() / 3600.0 - pcsConfig.getPerforming_utils_hr() / 3600.0;
+		this.marginalUtiltityOfWaiting_utl_s = pcsConfig.getWaiting_utils_hr() / 3600.0;
 		this.utilityOfLineSwitch_utl = pcsConfig.getUtilityOfLineSwitch();
 		// router:
 		this.searchRadius = trConfig.getSearchRadius();
@@ -121,35 +121,35 @@ public class TransitRouterConfig implements MatsimParameters {
 		return this.utilityOfLineSwitch_utl;
 	}
 
-	public void setEffectiveMarginalUtilityOfTravelTimeWalk_utl_s(final double marginalUtilityOfTravelTimeWalk_utl_s) {
-		this.effectiveMarginalUtilityOfTravelTimeWalk_utl_s = marginalUtilityOfTravelTimeWalk_utl_s;
+	public void setMarginalUtilityOfTravelTimeWalk_utl_s(final double marginalUtilityOfTravelTimeWalk_utl_s) {
+		this.marginalUtilityOfTravelTimeWalk_utl_s = marginalUtilityOfTravelTimeWalk_utl_s;
 	}
 
-	public double getEffectiveMarginalUtilityOfTravelTimeWalk_utl_s() {
-		return this.effectiveMarginalUtilityOfTravelTimeWalk_utl_s;
+	public double getMarginalUtilityOfTravelTimeWalk_utl_s() {
+		return this.marginalUtilityOfTravelTimeWalk_utl_s;
 	}
 
-	public void setEffectiveMarginalUtilityOfTravelTimePt_utl_s(final double marginalUtilityOfTravelTimeTransit_utl_s) {
-		this.effectiveMarginalUtilityOfTravelTimeTransit_utl_s = marginalUtilityOfTravelTimeTransit_utl_s;
+	public void setMarginalUtilityOfTravelTimePt_utl_s(final double marginalUtilityOfTravelTimeTransit_utl_s) {
+		this.marginalUtilityOfTravelTimeTransit_utl_s = marginalUtilityOfTravelTimeTransit_utl_s;
 	}
 
 	/**
-	 * @return the effective marginal utility of travel time by public transit.  Includes the opportunity cost of time
+	 * @return the marginal utility of travel time by public transit.
 	 */
-	public double getEffectiveMarginalUtilityOfTravelTimePt_utl_s() {
-		return this.effectiveMarginalUtilityOfTravelTimeTransit_utl_s;
+	public double getMarginalUtilityOfTravelTimePt_utl_s() {
+		return this.marginalUtilityOfTravelTimeTransit_utl_s;
 	}
 
 	public void setMarginalUtilityOfTravelDistancePt_utl_m(final double marginalUtilityOfTravelDistanceTransit_utl_m) {
 		this.marginalUtilityOfTravelDistanceTransit_utl_m = marginalUtilityOfTravelDistanceTransit_utl_m;
 	}
 
-	public double getEffectiveMarginalUtiltityOfWaiting_utl_s() {
-		return this.effectiveMarginalUtiltityOfWaiting_utl_s;
+	public double getMarginalUtiltityOfWaiting_utl_s() {
+		return this.marginalUtiltityOfWaiting_utl_s;
 	}
 
-	public void setEffectiveMarginalUtiltityOfWaiting_utl_s(final double effectiveMarginalUtiltityOfWaiting_utl_s) {
-		this.effectiveMarginalUtiltityOfWaiting_utl_s = effectiveMarginalUtiltityOfWaiting_utl_s;
+	public void setMarginalUtiltityOfWaiting_utl_s(final double effectiveMarginalUtiltityOfWaiting_utl_s) {
+		this.marginalUtiltityOfWaiting_utl_s = effectiveMarginalUtiltityOfWaiting_utl_s;
 	}
 
 	/**

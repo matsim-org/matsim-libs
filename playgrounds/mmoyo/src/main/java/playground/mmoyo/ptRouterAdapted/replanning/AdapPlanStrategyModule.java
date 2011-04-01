@@ -31,11 +31,11 @@ public class AdapPlanStrategyModule extends AbstractMultithreadedModule{ //imple
 				config.plansCalcRoute(), config.transitRouter());
 		myTransitRouterConfig.beelineWalkConnectionDistance = 300.0;  			//distance to search stations when transfering
 		myTransitRouterConfig.setBeelineWalkSpeed(3.0/3.6);  						// presumably, in m/sec.  3.0/3.6 = 3000/3600 = 3km/h.  kai, apr'10
-		myTransitRouterConfig.setEffectiveMarginalUtilityOfTravelTimeWalk_utl_s(-6.0 / 3600.0); 	//-6.0 / 3600.0; // in Eu/sec; includes opportunity cost of time.  kai, apr'10
-		myTransitRouterConfig.setEffectiveMarginalUtilityOfTravelTimePt_utl_s(-6.0 / 3600.0);//-6.0 / 3600.0; // in Eu/sec; includes opportunity cost of time.  kai, apr'10
+		myTransitRouterConfig.setMarginalUtilityOfTravelTimeWalk_utl_s(-6.0 / 3600.0); 	//-6.0 / 3600.0; // in Eu/sec; includes opportunity cost of time.  kai, apr'10
+		myTransitRouterConfig.setMarginalUtilityOfTravelTimePt_utl_s(-6.0 / 3600.0);//-6.0 / 3600.0; // in Eu/sec; includes opportunity cost of time.  kai, apr'10
 		myTransitRouterConfig.setMarginalUtilityOfTravelDistancePt_utl_m(-0.7/1000.0); //-0.7/1000.0;    // yyyy presumably, in Eu/m ?????????  so far, not used.  kai, apr'10
 //		myTransitRouterConfig.setUtilityOfLineSwitch_utl(240.0 * - myTransitRouterConfig.getEffectiveMarginalUtilityOfTravelTimePt_utl_s());	//* -this.marginalUtilityOfTravelTimeTransit; // == 1min travel time in vehicle  // in Eu.  kai, apr'10
-		myTransitRouterConfig.setUtilityOfLineSwitch_utl(240.0 * myTransitRouterConfig.getEffectiveMarginalUtilityOfTravelTimePt_utl_s());	//* -this.marginalUtilityOfTravelTimeTransit; // == 1min travel time in vehicle  // in Eu.  kai, apr'10
+		myTransitRouterConfig.setUtilityOfLineSwitch_utl(240.0 * myTransitRouterConfig.getMarginalUtilityOfTravelTimePt_utl_s());	//* -this.marginalUtilityOfTravelTimeTransit; // == 1min travel time in vehicle  // in Eu.  kai, apr'10
 		myTransitRouterConfig.searchRadius = 600.0;								//initial distance for stations around origin and destination points
 		myTransitRouterConfig.extensionRadius = 200.0; 
 		myTransitRouterConfig.allowDirectWalks= true;

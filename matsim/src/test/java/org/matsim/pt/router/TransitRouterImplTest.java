@@ -239,7 +239,7 @@ public class TransitRouterImplTest {
 		assertEquals(f.blueLine.getId(), ((ExperimentalTransitRoute) legs.get(3).getRoute()).getLineId());
 		assertEquals(TransportMode.transit_walk, legs.get(4).getMode());
 
-		config.setUtilityOfLineSwitch_utl(300.0 * config.getEffectiveMarginalUtilityOfTravelTimePt_utl_s()); // corresponds to 5 minutes transit travel time
+		config.setUtilityOfLineSwitch_utl(300.0 * config.getMarginalUtilityOfTravelTimePt_utl_s()); // corresponds to 5 minutes transit travel time
 		legs = router.calcRoute(f.scenario.createCoord(11900, 5100), f.scenario.createCoord(24100, 4950), 6.0*3600 - 5.0*60);
 		assertEquals(3, legs.size());
 		assertEquals(TransportMode.transit_walk, legs.get(0).getMode());
@@ -339,7 +339,7 @@ public class TransitRouterImplTest {
 	@Test
 	public void testDoubleWalk() {
 		WalkFixture f = new WalkFixture();
-		f.routerConfig.setEffectiveMarginalUtilityOfTravelTimePt_utl_s(-1.0 / 3600.0 - 6.0/3600.0);
+		f.routerConfig.setMarginalUtilityOfTravelTimePt_utl_s(-1.0 / 3600.0 - 6.0/3600.0);
 		f.routerConfig.setUtilityOfLineSwitch_utl(0.2); // must be relatively low in this example, otherwise it's cheaper to walk the whole distance...
 		TransitRouterImpl router = new TransitRouterImpl(f.schedule, f.routerConfig);
 		List<Leg> legs = router.calcRoute(f.coord1, f.coord7, 990);

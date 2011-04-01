@@ -54,9 +54,9 @@ public class TransitRouterConfigTest {
 		
 		TransitRouterConfig config = new TransitRouterConfig(planScoring, planRouting, transitRouting);
 		
-		Assert.assertEquals(-15.0/3600, config.getEffectiveMarginalUtilityOfTravelTimePt_utl_s(), 1e-8);
-		Assert.assertEquals(-17.0/3600, config.getEffectiveMarginalUtilityOfTravelTimeWalk_utl_s(), 1e-8);
-		Assert.assertEquals(-19.0/3600, config.getEffectiveMarginalUtiltityOfWaiting_utl_s(), 1e-8);
+		Assert.assertEquals(-9.0/3600, config.getMarginalUtilityOfTravelTimePt_utl_s(), 1e-8);
+		Assert.assertEquals(-11.0/3600, config.getMarginalUtilityOfTravelTimeWalk_utl_s(), 1e-8);
+		Assert.assertEquals(-13.0/3600, config.getMarginalUtiltityOfWaiting_utl_s(), 1e-8);
 		Assert.assertEquals(-2.34, config.getUtilityOfLineSwitch_utl(), 1e-8);
 		Assert.assertEquals(1.37 / 1.2, config.getBeelineWalkSpeed(), 1e-8);
 		

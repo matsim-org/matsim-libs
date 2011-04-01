@@ -79,7 +79,7 @@ public class AdaptedTransitRouter extends TransitRouterImpl {
 		for (TransitRouterNetworkNode node : fromNodes) {
 			double distance = CoordUtils.calcDistance(fromCoord, node.stop.getStopFacility().getCoord());
 			double initialTime = distance / this.getConfig().getBeelineWalkSpeed();
-			double initialCost = -initialTime * this.getConfig().getEffectiveMarginalUtilityOfTravelTimeWalk_utl_s(); // yyyy check sign!!! kai, apr'10
+			double initialCost = -initialTime * this.getConfig().getMarginalUtilityOfTravelTimeWalk_utl_s(); // yyyy check sign!!! kai, apr'10
 			wrappedFromNodes.put(node, new InitialNode(initialCost, initialTime + departureTime));
 		}
 
@@ -96,7 +96,7 @@ public class AdaptedTransitRouter extends TransitRouterImpl {
 		for (TransitRouterNetworkNode node : toNodes) {
 			double distance = CoordUtils.calcDistance(toCoord, node.stop.getStopFacility().getCoord());
 			double initialTime = distance / this.getConfig().getBeelineWalkSpeed();
-			double initialCost = -initialTime * this.getConfig().getEffectiveMarginalUtilityOfTravelTimeWalk_utl_s(); // yyyy check sign!!! kai, apr'10
+			double initialCost = -initialTime * this.getConfig().getMarginalUtilityOfTravelTimeWalk_utl_s(); // yyyy check sign!!! kai, apr'10
 			wrappedToNodes.put(node, new InitialNode(initialCost, initialTime + departureTime));
 		}
 
@@ -110,7 +110,7 @@ public class AdaptedTransitRouter extends TransitRouterImpl {
 		// optional direct walk *
 		if (((MyTransitRouterConfig)this.getConfig()).allowDirectWalks) {
 			double directWalkCost = -CoordUtils.calcDistance(fromCoord, toCoord) / this.getConfig().getBeelineWalkSpeed()
-					* this.getConfig().getEffectiveMarginalUtilityOfTravelTimeWalk_utl_s();
+					* this.getConfig().getMarginalUtilityOfTravelTimeWalk_utl_s();
 			double pathCost = p.travelCost + wrappedFromNodes.get(p.nodes.get(0)).initialCost
 					+ wrappedToNodes.get(p.nodes.get(p.nodes.size() - 1)).initialCost;
 			if (directWalkCost < pathCost) {
@@ -192,8 +192,8 @@ public class AdaptedTransitRouter extends TransitRouterImpl {
 				"[costLineSwitch_utl=" + (-trRoutCfg.getUtilityOfLineSwitch_utl()) + "]" +
 				"[extensionRadius=" + trRoutCfg.extensionRadius + "]" +
 				"[marginalUtilityOfTravelDistanceTransit=" + trRoutCfg.getMarginalUtilityOfTravelDistancePt_utl_m() + "]" +
-				"[marginalUtilityOfTravelTimeTransit=" + trRoutCfg.getEffectiveMarginalUtilityOfTravelTimePt_utl_s() + "]" +
-				"[marginalUtilityOfTravelTimeWalk=" + trRoutCfg.getEffectiveMarginalUtilityOfTravelTimeWalk_utl_s() + "]" +
+				"[marginalUtilityOfTravelTimeTransit=" + trRoutCfg.getMarginalUtilityOfTravelTimePt_utl_s() + "]" +
+				"[marginalUtilityOfTravelTimeWalk=" + trRoutCfg.getMarginalUtilityOfTravelTimeWalk_utl_s() + "]" +
 				"[searchRadius=" + trRoutCfg.searchRadius + "]" ;
 	}
 	
