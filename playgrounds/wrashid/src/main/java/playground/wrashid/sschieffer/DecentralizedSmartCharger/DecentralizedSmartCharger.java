@@ -12,6 +12,7 @@ import lpsolve.LpSolveException;
 import org.apache.commons.math.FunctionEvaluationException;
 import org.apache.commons.math.MaxIterationsExceededException;
 import org.apache.commons.math.analysis.integration.SimpsonIntegrator;
+import org.apache.commons.math.analysis.polynomials.PolynomialFunction;
 import org.apache.commons.math.analysis.solvers.NewtonSolver;
 import org.apache.commons.math.optimization.DifferentiableMultivariateVectorialOptimizer;
 import org.apache.commons.math.optimization.OptimizationException;
@@ -119,6 +120,8 @@ public class DecentralizedSmartCharger {
 	public LinkedList<Id> agentsWithPHEV=new LinkedList<Id>();
 	public LinkedList<Id> agentsWithCombustion=new LinkedList<Id>();
 	
+	private LinkedListValueHashMap<Id, Double> agentChargingCosts = new LinkedListValueHashMap<Id,  Double>();
+	
 	public static String outputPath;
 	
 	final public static DrawingSupplier supplier = new DefaultDrawingSupplier();
@@ -138,7 +141,9 @@ public class DecentralizedSmartCharger {
 	private double batteryMaxEV;
 	private double batteryMaxPHEV;
 
-	
+	private double [] countDriving= new double[MINUTESPERDAY];
+	private double [] countParking= new double[MINUTESPERDAY];
+	private double [] countCharging= new double[MINUTESPERDAY];
 	
 	
 	//***********************************************************************
@@ -181,13 +186,20 @@ public class DecentralizedSmartCharger {
 	
 	
 	
-	
+	/**
+	 * Define batteryConstants
+	 * 
+	 * @param batterySizeEV
+	 * @param batterySizePHEV
+	 * @param batteryMinEV
+	 * @param batteryMinPHEV
+	 * @param batteryMaxEV
+	 * @param batteryMaxPHEV
+	 */
 	public void setBatteryConstants(double batterySizeEV, 
-			double batterySizePHEV,
-			
+			double batterySizePHEV,			
 			double batteryMinEV,
 			double batteryMinPHEV,
-			
 			double batteryMaxEV,
 			double batteryMaxPHEV){
 		
@@ -219,9 +231,16 @@ public class DecentralizedSmartCharger {
 	}
 	
 	public void initializeHubLoadDistributionReader(
-			HubLinkMapping hubLinkMapping, LinkedListValueHashMap<Integer, Schedule> hubLoadDistribution) throws OptimizationException, IOException{
+			HubLinkMapping hubLinkMapping, 
+			LinkedListValueHashMap<Integer, Schedule> deterministicHubLoadDistribution,
+			LinkedListValueHashMap<Integer, Schedule> stochasticHubLoadDistribution,
+			LinkedListValueHashMap<Integer, Schedule> pricingHubDistribution) throws OptimizationException, IOException{
 		
-		myHubLoadReader=new HubLoadDistributionReader(controler, hubLinkMapping, hubLoadDistribution);
+		myHubLoadReader=new HubLoadDistributionReader(controler, 
+				hubLinkMapping, 
+				deterministicHubLoadDistribution,
+				stochasticHubLoadDistribution,
+				pricingHubDistribution);
 	}
 	
 		
@@ -240,6 +259,10 @@ public class DecentralizedSmartCharger {
 		readAgentSchedules();
 		findRequiredChargingTimes();
 		assignChargingTimes();
+		findChargingDistribution();
+		
+		calculateChargingCosts();
+		
 		
 	}
 	
@@ -247,6 +270,12 @@ public class DecentralizedSmartCharger {
 	/*
 	 * GET RESULTS
 	 */
+	
+	
+	public LinkedListValueHashMap<Id, Double> getChargingCostsForAgents(){
+		return agentChargingCosts;
+	}
+	
 	
 	public LinkedListValueHashMap<Id, Schedule> getAllAgentParkingAndDrivingSchedules(){
 		return agentParkingAndDrivingSchedules;
@@ -306,7 +335,9 @@ public class DecentralizedSmartCharger {
 	}
 	
 		
-	
+	public double getTotalEmissions(){
+		return EMISSIONCOUNTER;
+	}
 	
 	
 	
@@ -336,13 +367,13 @@ public class DecentralizedSmartCharger {
 	
 	
 	
-	public void findRequiredChargingTimes() throws LpSolveException{
+	public void findRequiredChargingTimes() throws LpSolveException, IOException{
 		
 		System.out.println("Find required charging times - LP");
 		
 		for (Id id : controler.getPopulation().getPersons().keySet()){
 			
-			
+			String type="";
 			/*
 			 * IF COMBUSTION
 			 */
@@ -357,7 +388,7 @@ public class DecentralizedSmartCharger {
 				// get entire driving Joules and transform to emissions
 				EMISSIONCOUNTER+= emissionContribution;
 				agentsWithCombustion.add(id);
-				
+				type="combustion";
 			}else{
 				/*
 				 * EV OR PHEV
@@ -375,10 +406,10 @@ public class DecentralizedSmartCharger {
 					
 					PlugInHybridElectricVehicle thisPHEV= (PlugInHybridElectricVehicle)vehicles.getValue(id);										
 					batterySize=batterySizePHEV;//thisPHEV.getBatterySizeInJoule();
-					batteryMin=batteryMinPHEV;//thisEV.getBatteryMinThresholdInJoule();
+					batteryMin=batteryMinPHEV; //dummy
 					batteryMax=batteryMaxPHEV; 
 					agentsWithPHEV.add(id);
-					
+					type="PHEV";
 				}else{
 					
 					ElectricVehicle thisEV= (ElectricVehicle)vehicles.getValue(id);
@@ -388,13 +419,14 @@ public class DecentralizedSmartCharger {
 					batteryMax=batteryMaxEV; 
 					
 					agentsWithEV.add(id);
+					type="EV";
 				}
 				
 				//try EV first
 				
-				Schedule s= lpev.solveLP(agentParkingAndDrivingSchedules.getValue(id),id, batterySize, batteryMin, batteryMax);
+				Schedule s= lpev.solveLP(agentParkingAndDrivingSchedules.getValue(id),id, batterySize, batteryMin, batteryMax, type);
 				if (s !=null){
-					// if successful --> saave
+					// if successful --> save
 					
 					agentParkingAndDrivingSchedules.put(id, s);
 					EMISSIONCOUNTER= joulesToEmissionInKg(joulesFromEngine); // still 0
@@ -409,7 +441,7 @@ public class DecentralizedSmartCharger {
 					}
 					
 										
-					s= lpphev.solveLP(agentParkingAndDrivingSchedules.getValue(id),id, batterySize, batteryMin, batteryMax);
+					s= lpphev.solveLP(agentParkingAndDrivingSchedules.getValue(id),id, batterySize, batteryMin, batteryMax, type);
 					agentParkingAndDrivingSchedules.put(id, s);
 					
 					joulesFromEngine= lpphev.getEnergyFromCombustionEngine();
@@ -466,7 +498,7 @@ public class DecentralizedSmartCharger {
 	 * @param id
 	 * @throws IOException
 	 */
-	public void visualizeAgentChargingProfile(Schedule dailySchedule, Schedule chargingSchedule, Id id) throws IOException{
+	private void visualizeAgentChargingProfile(Schedule dailySchedule, Schedule chargingSchedule, Id id) throws IOException{
 		
 		// 1 charging, 2 suboptimal, 3 optimal, 4 driving
 		
@@ -638,7 +670,7 @@ public class DecentralizedSmartCharger {
 	
 	
 	
-	public void printGraphChargingTimesAllAgents() throws IOException{
+	private void printGraphChargingTimesAllAgents() throws IOException{
 		
 		XYSeriesCollection allAgentsOverview= new XYSeriesCollection();
 		
@@ -706,36 +738,60 @@ public class DecentralizedSmartCharger {
 	
 	
 	
-	public void validateChargingDistribution() throws IOException{
+	private void findChargingDistribution() throws IOException{
 		
-		double [] count= new double[MINUTESPERDAY];
-		
+				
 		for(int i=0; i<MINUTESPERDAY; i++){
 			for(Id id : controler.getPopulation().getPersons().keySet()){
-				Schedule thisAgentCharging = agentChargingSchedules.getValue(id);
-				if(thisAgentCharging.isSecondWithinOneInterval(i*SECONDSPERMIN)){
-					count[i]=count[i]+1;
+				
+				Schedule thisAgentParkAndDrive = agentParkingAndDrivingSchedules.getValue(id);
+				int interval= thisAgentParkAndDrive.timeIsInWhichInterval(i*SECONDSPERMIN);
+				
+				if (thisAgentParkAndDrive.timesInSchedule.get(interval).isParking()){
+					countParking[i]=countParking[i]+1;
 				}
+				
+				if (thisAgentParkAndDrive.timesInSchedule.get(interval).isDriving()){
+					countParking[i]=countDriving[i]+1;
+				}
+				
+				Schedule thisAgentCharging = agentChargingSchedules.getValue(id);
+				
+				if(thisAgentCharging.isSecondWithinOneInterval(i*SECONDSPERMIN)){
+					countCharging[i]=countCharging[i]+1;
+				}
+				
 			}
 		}
 		
+		visualizeChargingDistribution();
+	}
 		
-		
+	
+	private void visualizeChargingDistribution() throws IOException{
 		// make graph out of it
-		XYSeriesCollection chargingDistributionTotal= new XYSeriesCollection();
+		XYSeriesCollection distributionTotal= new XYSeriesCollection();
 		
-		XYSeries chargingDistributionAgentSet= new XYSeries("");
+		XYSeries chargingDistributionAgentSet= new XYSeries("Numbers of Charging agents");
+		XYSeries parkingDistributionAgentSet= new XYSeries("Numbers of parking agents");
+		XYSeries drivingDistributionAgentSet= new XYSeries("Numbers of driving agents");
 		
-		for(int i=0; i<count.length;i++){
-			chargingDistributionAgentSet.add(i*SECONDSPERMIN, count[i]);
+		for(int i=0; i<countCharging.length;i++){
+			chargingDistributionAgentSet.add(i*SECONDSPERMIN, countCharging[i]);
+			parkingDistributionAgentSet.add(i*SECONDSPERMIN, countParking[i]);
+			drivingDistributionAgentSet.add(i*SECONDSPERMIN, countDriving[i]);
+			
 		}
 		
-		chargingDistributionTotal.addSeries(chargingDistributionAgentSet);
 		
-		JFreeChart chart = ChartFactory.createXYLineChart("Count of all agents charging on first second in minute", 
+		distributionTotal.addSeries(chargingDistributionAgentSet);
+		distributionTotal.addSeries(parkingDistributionAgentSet);
+		distributionTotal.addSeries(drivingDistributionAgentSet);
+		
+		JFreeChart chart = ChartFactory.createXYLineChart("Count of all agents charging, parking or driving on first second in minute", 
 				"time of day [s]", 
-				"total count of charging vehicles", 
-				chargingDistributionTotal, 
+				"total count of agents", 
+				distributionTotal, 
 				PlotOrientation.VERTICAL, 
 				false, true, false);
 		
@@ -748,27 +804,65 @@ public class DecentralizedSmartCharger {
         plot.setRangeGridlinePaint(Color.gray);
 		
         
+        //Charging
+       
+        	 plot.getRenderer().setSeriesPaint(0, Color.black);
+         	plot.getRenderer().setSeriesStroke(
+     	            0, 
+     	            new BasicStroke(
+     	                2.0f,  //float width
+     	                BasicStroke.CAP_ROUND, //int cap
+     	                BasicStroke.JOIN_ROUND, //int join
+     	                1.0f, //float miterlimit
+     	                new float[] {4.0f, 1.0f}, //float[] dash
+     	                0.0f //float dash_phase
+     	            )
+     	        );
+       
+       
         
+    	//Parking
+       
+        	
+        	plot.getRenderer().setSeriesPaint(1, Color.gray);
+         	plot.getRenderer().setSeriesStroke(
+     	            1, 
+     	            new BasicStroke(
+     	                2.0f,  //float width
+     	                BasicStroke.CAP_ROUND, //int cap
+     	                BasicStroke.JOIN_ROUND, //int join
+     	                1.0f, //float miterlimit
+     	                new float[] {2.0f, 0.0f}, //float[] dash
+     	                0.0f //float dash_phase
+     	            )
+     	        );
         
-        plot.getRenderer().setSeriesPaint(0, Color.black);
-    	plot.getRenderer().setSeriesStroke(
-	            0, 
-	          
-	            new BasicStroke(
-	                2.0f,  //float width
-	                BasicStroke.CAP_ROUND, //int cap
-	                BasicStroke.JOIN_ROUND, //int join
-	                1.0f, //float miterlimit
-	                new float[] {2.0f, 0.0f}, //float[] dash
-	                0.0f //float dash_phase
-	            )
-	        );
-        
+    	 
+     	
+     	//Driving
+       
+        	 plot.getRenderer().setSeriesPaint(2, Color.red);
+          	 plot.getRenderer().setSeriesStroke(
+      	            2, 
+      	            new BasicStroke(
+      	                2.0f,  //float width
+      	                BasicStroke.CAP_ROUND, //int cap
+      	                BasicStroke.JOIN_ROUND, //int join
+      	                1.0f, //float miterlimit
+      	                new float[] {1.0f, 1.0f}, //float[] dash
+      	                0.0f //float dash_phase
+      	            )
+      	        );
+       
+     	
+    	
   
-    ChartUtilities.saveChartAsPNG(new File(outputPath+ "validation_chargingdistribution.png") , chart, 800, 600);
-	  
-			
+    	ChartUtilities.saveChartAsPNG(new File(outputPath+ "validation_chargingdistribution.png") , chart, 800, 600);
+	  	
+	
 	}
+	
+		
 	
 	
 	
@@ -794,5 +888,44 @@ public class DecentralizedSmartCharger {
 		agentsWithCombustion=new LinkedList<Id>();
 		
 	}
+	
+	
+	/**
+	 * // for each agent
+		// loop over assigned charging times
+		// find pricing function for it
+		// integrate
+	 * @throws MaxIterationsExceededException
+	 * @throws FunctionEvaluationException
+	 * @throws IllegalArgumentException
+	 */
+	public void calculateChargingCosts() throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
+		
+		for(Id id : controler.getPopulation().getPersons().keySet()){
+						
+			double totalCost=0;
+			Schedule s= agentChargingSchedules.getValue(id);
+			
+			for(int i=0; i<s.getNumberOfEntries();i++){
+				
+				TimeInterval t = s.timesInSchedule.get(i); //charging time
+				
+				Schedule parkAndDrive= agentParkingAndDrivingSchedules.getValue(id);
+				
+				int pos= parkAndDrive.intervalIsInWhichTimeInterval(t);
+				
+				Id linkId = ((ParkingInterval)parkAndDrive.timesInSchedule.get(pos)).getLocation();
+				
+				PolynomialFunction funcPrice= myHubLoadReader.getPricingPolynomialFunctionAtLinkAndTime(linkId, t);
+				
+				totalCost+= functionIntegrator.integrate(funcPrice, t.getStartTime(), t.getEndTime());
+				
+			}
+			
+			agentChargingCosts.put(id, totalCost);
+		}
+		
+	}
+	
 	
 }

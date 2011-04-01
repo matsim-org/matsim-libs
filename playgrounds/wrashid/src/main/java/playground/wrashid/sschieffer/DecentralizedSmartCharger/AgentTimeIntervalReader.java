@@ -245,10 +245,9 @@ public class AgentTimeIntervalReader {
 				Id idLink= thisParkingInterval.getLocation();
 				
 				PolynomialFunction p= 
-					DecentralizedSmartCharger.myHubLoadReader.getPolynomialFunctionAtLinkAndTime(
+					DecentralizedSmartCharger.myHubLoadReader.getDeterministicLoadPolynomialFunctionAtLinkAndTime(
 							idLink, 
-							thisParkingInterval.getStartTime(),
-							thisParkingInterval.getEndTime());
+							thisParkingInterval);
 				
 							
 				//Integrate from start to End

@@ -30,6 +30,13 @@ public class DrivingInterval extends TimeInterval {
 	
 	boolean extra=false;
 	
+	
+	/**
+	 * 
+	 * @param start - startTime
+	 * @param end - End Time
+	 * @param consumption - Consumption in Joule
+	 */
 	public  DrivingInterval(double start, double end, double consumption){
 		super(start, end);
 		

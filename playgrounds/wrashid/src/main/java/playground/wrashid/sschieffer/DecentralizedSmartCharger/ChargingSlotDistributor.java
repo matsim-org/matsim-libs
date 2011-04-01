@@ -38,7 +38,20 @@ public class ChargingSlotDistributor {
 	
 	
 	
-	Schedule distribute(Schedule schedule) throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException, OptimizationException{
+	/**
+	 * goes over every time interval in agents schedule
+	 * if it is a parking interval it will assign charging slots for the interval 
+	 * and returns the relevant charging schedule 
+	 * 
+	 * 
+	 * @param schedule
+	 * @return
+	 * @throws MaxIterationsExceededException
+	 * @throws FunctionEvaluationException
+	 * @throws IllegalArgumentException
+	 * @throws OptimizationException
+	 */
+	public Schedule distribute(Schedule schedule) throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException, OptimizationException{
 		Schedule chargingScheduleAgent = new Schedule();
 		
 		for (int i=0; i<schedule.getNumberOfEntries(); i++){
@@ -48,9 +61,8 @@ public class ChargingSlotDistributor {
 				ParkingInterval p= (ParkingInterval) t;
 				double chargingTime=p.getRequiredChargingDuration();
 				
-				PolynomialFunction func= DecentralizedSmartCharger.myHubLoadReader.getPolynomialFunctionAtLinkAndTime(p.getLocation(),
-						p.getStartTime(),
-						p.getEndTime());
+				PolynomialFunction func= DecentralizedSmartCharger.myHubLoadReader.getDeterministicLoadPolynomialFunctionAtLinkAndTime(p.getLocation(),
+						p);
 				
 				
 				//System.out.println("assign charging schedule between "+ p.getStartTime() + " to"+ p.getEndTime()+ " for "+ chargingTime+ " seconds");
@@ -71,11 +83,9 @@ public class ChargingSlotDistributor {
 							chargingTime));
 				}
 				
-				
 			}
 			
-			//System.out.println("added charging time: "); 
-			//chargingScheduleAgent.printSchedule();
+			
 		}
 	
 		return chargingScheduleAgent;
@@ -84,6 +94,8 @@ public class ChargingSlotDistributor {
 	
 	
 	/*
+	 * function is called from within distribute() for all parkinIntervals where the required charging time shall be distributed
+	 * using a Random Number generator
 	 * make schedule for single time interval
 	 */
 	public Schedule assignChargingScheduleForParkingInterval(PolynomialFunction func, 
@@ -234,10 +246,10 @@ public class ChargingSlotDistributor {
 				chargingInParkingInterval.addTimeInterval(c1);
 				
 			}else{
-				//System.out.println("overlap agent .. redo");
+				
 				
 			}
-			//otherwise notFOund remains true and it runs again
+			//otherwise notFound remains true and it runs again
 			
 		}
 		

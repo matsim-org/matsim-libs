@@ -34,7 +34,12 @@ public class ParkingInterval extends TimeInterval {
 	
 	
 	
-	
+	/**
+	 * initialize
+	 * @param start
+	 * @param end
+	 * @param linkId
+	 */
 	public ParkingInterval(double start, double end, Id linkId){
 		super(start, end);
 		this.linkId=linkId;
@@ -51,7 +56,6 @@ public class ParkingInterval extends TimeInterval {
 		// TODO
 		//location--> facility-- charging speed
 		return 3500;
-		
 		
 	}
 	

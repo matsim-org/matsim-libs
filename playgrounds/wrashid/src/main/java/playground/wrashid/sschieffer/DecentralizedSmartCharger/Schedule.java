@@ -208,6 +208,19 @@ public class Schedule {
 	}
 	
 	
+	public int intervalIsInWhichTimeInterval(TimeInterval t){
+		int solution =-1;
+		for (int i=0; i<timesInSchedule.size(); i++){
+			if(t.getEndTime()<=timesInSchedule.get(i).getEndTime() && 
+					t.getStartTime()>=timesInSchedule.get(i).getStartTime()){
+				solution =i;
+			}
+		}	
+			
+		return solution;
+	}
+	
+	
 	
 	public void addJoulesToTotalSchedule(double joules){
 		if(joules<=0){

@@ -30,6 +30,13 @@ public class ChargingInterval extends TimeInterval {
 		battery=true;
 	}
 	
+	
+	/**
+	 * 
+	 * @param start
+	 * @param end
+	 * @param fromBatteryYesNo
+	 */
 	public ChargingInterval(double start, double end, boolean fromBatteryYesNo){
 		super(start,end);
 		battery=fromBatteryYesNo;

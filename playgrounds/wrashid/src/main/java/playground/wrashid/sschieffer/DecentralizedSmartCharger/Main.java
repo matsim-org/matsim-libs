@@ -76,9 +76,23 @@ public class Main {
 		
 		final ParkingTimesPlugin parkingTimesPlugin;
 		final EnergyConsumptionPlugin energyConsumptionPlugin;
-				
-		final LinkedListValueHashMap<Integer, Schedule> hubLoadDistribution= readHubs();
-		final HubLinkMapping hubLinkMapping=new HubLinkMapping(hubLoadDistribution.size());//= new HubLinkMapping(0);
+		
+		/*
+		 * //0,142500 €/kWh - 1 hour at 1kW
+		// 0,4275 1 hour at 3.5kW
+		//  per second =  0,4275/(3600)
+		 */
+		final double optimalPrice=0.4275/(3600); // cost/second - CAREFUL would have to implement different multipliers for high speed or regular connection
+		final double suboptimalPrice=optimalPrice*3; // cost/second    
+		
+		
+		final LinkedListValueHashMap<Integer, Schedule> deterministicHubLoadDistribution= readHubs();
+		final LinkedListValueHashMap<Integer, Schedule> stochasticHubLoadDistribution=readStochasticLoad(deterministicHubLoadDistribution.size());
+		final LinkedListValueHashMap<Integer, Schedule> pricingHubDistribution=readPricingHubDistribution(optimalPrice, suboptimalPrice);
+		final LinkedListValueHashMap<Integer, Schedule> connectivityHubDistribution;
+		
+ 		
+		final HubLinkMapping hubLinkMapping=new HubLinkMapping(deterministicHubLoadDistribution.size());//= new HubLinkMapping(0);
 		
 		String configPath="test/input/playground/wrashid/sschieffer/config.xml";
 				
@@ -132,9 +146,48 @@ public class Main {
 				try {
 					
 					mapHubs(controler,hubLinkMapping);
-					/*mapHubs(hubLoadDistribution, 
-							hubLinkMapping, 
-							controler);*/
+					/*
+					 * TODO
+					 * MAPPING AND READING HUBS
+					 * Redo reading and mapping hubs dependent on scenario
+					 * 
+					 * CHARGING SPEED HUBS
+					 * //TODO in scenario charging speed must be mapped to facilities
+					// this was not the case in the first scenario and thus not yet possible
+					// current default is 3500 W;
+					//getChargingSpeed()
+					 */
+					
+					
+					
+					/*
+					 * TODO
+					 * PRICE
+					 * Discussions on Price not clear...
+					 * Price is also dependent on scenario
+					 * @Rashid - you have to be clear on how you would like this to be implemented
+					 * 
+					 * I can compute internally easily...
+					 * but we have to define price functions similar to 
+					 * LinkedListValueHashMap<Integer, Schedule> hubLoadDistribution
+					 * 
+					 */
+					
+					/*
+					 * TODO
+					 * VEHICLE CLASS
+					 * NO CONSUMPTION VALUES FOR COMBUSTION CARS
+					 * --> emissions
+					 * 
+					 */
+					
+					/*
+					 * TODO
+					 * VEHICLE
+					 * BATTERY SIZE AD MIN AND MAX CHARGE NOT WORKING... always 0 values
+					 * 
+					 */
+					
 					
 					
 					DecentralizedSmartCharger myDecentralizedSmartCharger = new DecentralizedSmartCharger(
@@ -157,6 +210,7 @@ public class Main {
 						
 						
 					
+					
 					myDecentralizedSmartCharger.initializeLP(bufferBatteryCharge);
 					
 					myDecentralizedSmartCharger.initializeChargingSlotDistributor(MINCHARGINGLENGTH);
@@ -165,11 +219,20 @@ public class Main {
 							e.getVehicles());
 					
 					myDecentralizedSmartCharger.initializeHubLoadDistributionReader(
-							hubLinkMapping, hubLoadDistribution);
-							
-					
+							hubLinkMapping, 
+							deterministicHubLoadDistribution,
+							stochasticHubLoadDistribution,
+							pricingHubDistribution);
+				
+					/*final LinkedListValueHashMap<Integer, Schedule> stochasticHubLoadDistribution=readStochasticLoad(deterministicHubLoadDistribution.size());
+					final LinkedListValueHashMap<Integer, Schedule> pricingHubDistribution=readPricingHubDistribution(optimalPrice, suboptimalPrice);
+					final LinkedListValueHashMap<Integer, Schedule> connectivityHubDistribution;*/
 					
 					myDecentralizedSmartCharger.run();
+					
+					LinkedListValueHashMap<Id, Double> agentCharginCosts= 
+						myDecentralizedSmartCharger.getChargingCostsForAgents();
+					
 					
 					LinkedListValueHashMap<Id, Schedule> agentSchedule= 
 						myDecentralizedSmartCharger.getAllAgentChargingSchedules();
@@ -186,6 +249,8 @@ public class Main {
 					}
 					
 					LinkedList<Id> agentsWithPHEV = myDecentralizedSmartCharger.getAllAgentsWithPHEV();
+					
+					
 					
 					if(agentsWithEV.isEmpty()==false){
 						
@@ -205,12 +270,11 @@ public class Main {
 						System.out.println("Total consumption [joules]" +
 								myDecentralizedSmartCharger.getTotalDrivingConsumptionOfAgent(id));
 						
-						
-					
+						System.out.println("Total emissions [kg]" +
+								myDecentralizedSmartCharger.getTotalEmissions());
 						
 						myDecentralizedSmartCharger.clearResults();
 					}
-					
 					
 					
 				} catch (Exception e1) {
@@ -219,7 +283,6 @@ public class Main {
 					e1.printStackTrace();
 				}
 				
-							
 			}
 		});
 		
@@ -229,7 +292,11 @@ public class Main {
 	}
 	
 	
-	
+	/**
+	 * deterministic distribution of free load over one day
+	 * @return
+	 * @throws IOException
+	 */
 	public static LinkedListValueHashMap<Integer, Schedule> readHubs() throws IOException{
 		LinkedListValueHashMap<Integer, Schedule> hubLoadDistribution1= new  LinkedListValueHashMap<Integer, Schedule>();
 		hubLoadDistribution1.put(1, makeBullshitSchedule());
@@ -280,7 +347,7 @@ public class Main {
 	 * assign hubIds to the different Links--> hubLinkMapping.addMapping(link, hub)
 	 * according to scenario relevant hublocations
 	 * 
-	 * @param hubLoadDistribution
+	 * @param deterministicHubLoadDistribution
 	 * @param hubLinkMapping
 	 * @param controler
 	 */
@@ -313,6 +380,70 @@ public class Main {
 			
 		}
 	}
+	
+	
+	
+	
+	public static LinkedListValueHashMap<Integer, Schedule> readStochasticLoad(int num){
 		
+		LinkedListValueHashMap<Integer, Schedule> stochastic= new LinkedListValueHashMap<Integer, Schedule>();
+		
+		Schedule bullShitStochastic= new Schedule();
+		PolynomialFunction p = new PolynomialFunction(new double[] {3500});
+		
+		bullShitStochastic.addTimeInterval(new LoadDistributionInterval(0, 24*3600, p, true));
+		for (int i=0; i<num; i++){
+			stochastic.put(i+1, bullShitStochastic);
+		}
+		return stochastic;
+	/*	final LinkedListValueHashMap<Integer, Schedule> pricingHubDistribution;
+		final LinkedListValueHashMap<Integer, Schedule> connectivityHubDistribution;*/
+		
+	}
+	
+		
+	
+	
+	public static LinkedListValueHashMap<Integer, Schedule> readPricingHubDistribution(double optimal, double suboptimal) throws IOException{
+		
+		LinkedListValueHashMap<Integer, Schedule> pricing= readHubs();
+		
+		PolynomialFunction pOpt = new PolynomialFunction(new double[] {optimal});
+		PolynomialFunction pSubopt = new PolynomialFunction(new double[] {suboptimal});
+		
+		for(Integer i: pricing.getKeySet()){
+			for(int j=0; j<pricing.getValue(i).getNumberOfEntries(); j++){
+				
+					LoadDistributionInterval l = (LoadDistributionInterval) pricing.getValue(i).timesInSchedule.get(j);
+					
+					if(l.isOptimal()){
+						pricing.getValue(i).timesInSchedule.set(j, 
+								new LoadDistributionInterval(
+								l.getStartTime(),
+								l.getEndTime(), 
+								pOpt, 
+								true));
+						
+						
+					}else{
+						pricing.getValue(i).timesInSchedule.set(j, 
+								new LoadDistributionInterval(
+										l.getStartTime(),
+										l.getEndTime(), 
+										pSubopt, 
+										false));
+												
+					}
+				
+			}
+			//pricing.getValue(i).printSchedule();
+		}
+		return pricing;
+	/*	final LinkedListValueHashMap<Integer, Schedule> pricingHubDistribution;
+		final LinkedListValueHashMap<Integer, Schedule> connectivityHubDistribution;*/
+		
+	}
+	
+	
 
 }

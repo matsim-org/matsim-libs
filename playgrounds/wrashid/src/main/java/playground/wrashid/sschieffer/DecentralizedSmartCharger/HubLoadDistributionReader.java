@@ -49,7 +49,11 @@ public class HubLoadDistributionReader {
 		
 	private HubLinkMapping hubLinkMapping;
 	
-	LinkedListValueHashMap<Integer, Schedule> hubLoadDistribution;
+	LinkedListValueHashMap<Integer, Schedule> deterministicHubLoadDistribution;
+	LinkedListValueHashMap<Integer, Schedule> stochasticHubLoadDistribution;
+	LinkedListValueHashMap<Integer, Schedule> pricingHubDistribution;
+	LinkedListValueHashMap<Integer, Schedule> connectivityHubDistribution;
+	
 	
 	Controler controler;
 	
@@ -61,13 +65,20 @@ public class HubLoadDistributionReader {
 	 */
 	public HubLoadDistributionReader(Controler controler, 
 			HubLinkMapping hubLinkMapping,
-			LinkedListValueHashMap<Integer, Schedule> hubLoadDistribution) throws IOException, OptimizationException{
+			LinkedListValueHashMap<Integer, Schedule> deterministicHubLoadDistribution,
+			LinkedListValueHashMap<Integer, Schedule> stochasticHubLoadDistribution,
+			LinkedListValueHashMap<Integer, Schedule> pricingHubDistribution) throws IOException, OptimizationException{
 		
 		this.controler=controler;
 		
 		this.hubLinkMapping=hubLinkMapping;
 		
-		this.hubLoadDistribution=hubLoadDistribution;
+		this.deterministicHubLoadDistribution=deterministicHubLoadDistribution; // continuous functions
+		
+		this.stochasticHubLoadDistribution=stochasticHubLoadDistribution; // continuous functions
+		
+		this.pricingHubDistribution=pricingHubDistribution; // continuous functions with same intervals as deterministic HubLoadDistribution!!!
+		
 		
 				
 	}
@@ -84,25 +95,39 @@ public class HubLoadDistributionReader {
 	}
 	
 	
-	public PolynomialFunction getPolynomialFunctionAtLinkAndTime(Id idLink, double startTime, double endTime){
+	public PolynomialFunction getDeterministicLoadPolynomialFunctionAtLinkAndTime(Id idLink, TimeInterval t){
 		
 		int hub= getHubForLinkId(idLink);
 		
-		Schedule hubLoadSchedule = hubLoadDistribution.getValue(hub);
-		int interval = hubLoadSchedule.timeIsInWhichInterval(startTime);
-		
+		Schedule hubLoadSchedule = deterministicHubLoadDistribution.getValue(hub);
+		int interval = hubLoadSchedule.intervalIsInWhichTimeInterval(t);
+				
 		LoadDistributionInterval l1= (LoadDistributionInterval) hubLoadSchedule.timesInSchedule.get(interval);
 		
 		return l1.getPolynomialFunction();
 		
-		
 	}
 	
 
+	public PolynomialFunction getPricingPolynomialFunctionAtLinkAndTime(Id idLink, TimeInterval t){
+		
+		int hub= getHubForLinkId(idLink);
+		
+		Schedule hubLoadSchedule = pricingHubDistribution.getValue(hub);
+		int interval = hubLoadSchedule.intervalIsInWhichTimeInterval(t);
+				
+		LoadDistributionInterval l1= (LoadDistributionInterval) hubLoadSchedule.timesInSchedule.get(interval);
+		
+		return l1.getPolynomialFunction();
+		
+	}
+	
+	
 	public Schedule getLoadDistributionScheduleForHubId(Id idLink){
 		int hub= getHubForLinkId(idLink);
-		return hubLoadDistribution.getValue(hub);
+		return deterministicHubLoadDistribution.getValue(hub);
 	}
+	
 	
 	
 	

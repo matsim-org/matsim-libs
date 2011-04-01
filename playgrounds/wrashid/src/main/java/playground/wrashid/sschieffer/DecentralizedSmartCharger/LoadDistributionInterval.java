@@ -32,7 +32,13 @@ public class LoadDistributionInterval  extends TimeInterval
 	private XYSeries xy;
 	
 	
-	
+	/**
+	 * 
+	 * @param start
+	 * @param end
+	 * @param p
+	 * @param isOptimal
+	 */
 	public LoadDistributionInterval(double start, double end, PolynomialFunction p, boolean isOptimal){
 		super(start, end);
 		this.p=p;
@@ -63,7 +69,7 @@ public class LoadDistributionInterval  extends TimeInterval
 	
 	@Override
 	public void printInterval(){
-		System.out.println("Load Distribution Interval \t start: "+ this.getStartTime()+ "\t  end: "+ this.getEndTime()+ "\t  optimalTime: " + optimal);
+		System.out.println("Load Distribution Interval \t start: "+ this.getStartTime()+ "\t  end: "+ this.getEndTime()+ "\t  optimalTime: " + optimal+ "\t  Function: " + p.toString());
 	}
 	
 	

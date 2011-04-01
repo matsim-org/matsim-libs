@@ -66,9 +66,17 @@ public class testDecentralizedSmartCharger extends TestCase{
 		
 		final ParkingTimesPlugin parkingTimesPlugin;
 		final EnergyConsumptionPlugin energyConsumptionPlugin;
-				
-		final LinkedListValueHashMap<Integer, Schedule> hubLoadDistribution= readHubsTest();
-		final HubLinkMapping hubLinkMapping=new HubLinkMapping(hubLoadDistribution.size());//= new HubLinkMapping(0);
+		
+		final double optimalPrice=0.1;
+		final double suboptimalPrice=0.15;
+		
+		final LinkedListValueHashMap<Integer, Schedule> deterministicHubLoadDistribution= readHubsTest();
+		final LinkedListValueHashMap<Integer, Schedule> stochasticHubLoadDistribution=readStochasticLoad(deterministicHubLoadDistribution.size());
+		final LinkedListValueHashMap<Integer, Schedule> pricingHubDistribution=readPricingHubDistribution(optimalPrice, suboptimalPrice);
+		final LinkedListValueHashMap<Integer, Schedule> connectivityHubDistribution;
+		
+		
+		final HubLinkMapping hubLinkMapping=new HubLinkMapping(deterministicHubLoadDistribution.size());//= new HubLinkMapping(0);
 		
 		
 				
@@ -143,7 +151,10 @@ public class testDecentralizedSmartCharger extends TestCase{
 							e.getVehicles());
 					
 					myDecentralizedSmartCharger.initializeHubLoadDistributionReader(
-							hubLinkMapping, hubLoadDistribution);
+							hubLinkMapping, 
+							deterministicHubLoadDistribution,
+							stochasticHubLoadDistribution,
+							pricingHubDistribution);
 					
 					
 					//*****************************************
@@ -216,9 +227,8 @@ public class testDecentralizedSmartCharger extends TestCase{
 					
 					myDecentralizedSmartCharger.assignChargingTimes();
 					
-					PolynomialFunction func= DecentralizedSmartCharger.myHubLoadReader.getPolynomialFunctionAtLinkAndTime(p5th.getLocation(),
-							p5th.getStartTime(),
-							p5th.getEndTime());
+					PolynomialFunction func= DecentralizedSmartCharger.myHubLoadReader.getDeterministicLoadPolynomialFunctionAtLinkAndTime(p5th.getLocation(),
+							p5th);
 					
 					Schedule sAssigned = myDecentralizedSmartCharger.myChargingSlotDistributor.assignChargingScheduleForParkingInterval(
 							func, 
@@ -247,7 +257,6 @@ public class testDecentralizedSmartCharger extends TestCase{
 					13988.571428571428
 					13988.57142857143*/
 					DecimalFormat tenPlaces = new DecimalFormat("0.0000000000"); 
-					
 					assertEquals(tenPlaces.format(totalChargingTime), tenPlaces.format(p5th.getRequiredChargingDuration()));
 					
 					//*****************************************
@@ -259,7 +268,11 @@ public class testDecentralizedSmartCharger extends TestCase{
 					
 					
 					myDecentralizedSmartCharger.clearResults();
+					//*****************************************
+					//*****************************************
 					
+					testLPPHEV testLP = new testLPPHEV();
+					testLP.testRunLPPHEV();
 					
 				} catch (Exception e1) {
 					
@@ -286,7 +299,7 @@ public class testDecentralizedSmartCharger extends TestCase{
 		
 	
 	
-	public LinkedListValueHashMap<Integer, Schedule> readHubsTest() throws IOException{
+	public static LinkedListValueHashMap<Integer, Schedule> readHubsTest() throws IOException{
 		LinkedListValueHashMap<Integer, Schedule> hubLoadDistribution1= new  LinkedListValueHashMap<Integer, Schedule>();
 		hubLoadDistribution1.put(1, makeBullshitScheduleTest());
 		hubLoadDistribution1.put(2, makeBullshitScheduleTest());
@@ -298,7 +311,7 @@ public class testDecentralizedSmartCharger extends TestCase{
 	
 	
 	
-	public Schedule makeBullshitScheduleTest() throws IOException{
+	public static Schedule makeBullshitScheduleTest() throws IOException{
 		
 		Schedule bullShitSchedule= new Schedule();
 		
@@ -363,7 +376,61 @@ public class testDecentralizedSmartCharger extends TestCase{
 	
 	
 	
+public static LinkedListValueHashMap<Integer, Schedule> readStochasticLoad(int num){
+		
+		LinkedListValueHashMap<Integer, Schedule> stochastic= new LinkedListValueHashMap<Integer, Schedule>();
+		
+		Schedule bullShitStochastic= new Schedule();
+		PolynomialFunction p = new PolynomialFunction(new double[] {3500});
+		
+		bullShitStochastic.addTimeInterval(new LoadDistributionInterval(0, 24*3600, p, true));
+		for (int i=0; i<num; i++){
+			stochastic.put(i+1, bullShitStochastic);
+		}
+		return stochastic;
+	/*	final LinkedListValueHashMap<Integer, Schedule> pricingHubDistribution;
+		final LinkedListValueHashMap<Integer, Schedule> connectivityHubDistribution;*/
+		
+	}
 	
+		
+	
+	
+	public static LinkedListValueHashMap<Integer, Schedule> readPricingHubDistribution(double optimal, double suboptimal) throws IOException{
+		
+		LinkedListValueHashMap<Integer, Schedule> pricing= readHubsTest();
+		
+		PolynomialFunction pOpt = new PolynomialFunction(new double[] {optimal});
+		PolynomialFunction pSubopt = new PolynomialFunction(new double[] {suboptimal});
+		
+		for(Integer i: pricing.getKeySet()){
+			for(int j=0; j<pricing.getValue(i).getNumberOfEntries(); j++){
+				// for every time interval for every hub
+				if(pricing.getValue(i).timesInSchedule.get(j).isParking()){
+					LoadDistributionInterval l = (LoadDistributionInterval) pricing.getValue(i).timesInSchedule.get(j);
+					
+					if(l.isOptimal()){
+						l= new LoadDistributionInterval(
+								l.getStartTime(),
+								l.getEndTime(), 
+								pOpt, 
+								true);
+					}else{
+						l= new LoadDistributionInterval(
+								l.getStartTime(),
+								l.getEndTime(), 
+								pSubopt, 
+								false);
+						
+					}
+				}
+			}
+		}
+		return pricing;
+	/*	final LinkedListValueHashMap<Integer, Schedule> pricingHubDistribution;
+		final LinkedListValueHashMap<Integer, Schedule> connectivityHubDistribution;*/
+		
+	}
 
 
 	
