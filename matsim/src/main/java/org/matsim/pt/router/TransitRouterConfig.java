@@ -20,6 +20,7 @@
 
 package org.matsim.pt.router;
 
+import org.apache.log4j.Logger;
 import org.matsim.core.api.internal.MatsimParameters;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
@@ -93,9 +94,12 @@ public class TransitRouterConfig implements MatsimParameters {
 	// only setters and getters below this line
 
 	public TransitRouterConfig(final PlanCalcScoreConfigGroup pcsConfig, final PlansCalcRouteConfigGroup pcrConfig, final TransitRouterConfigGroup trConfig) {
+		Logger.getLogger(this.getClass()).warn("transit router is not adding the opportunity cost of time; be careful if you need that.  kai, apr'11") ;
+
 		// walk:
 		this.beelineWalkSpeed = pcrConfig.getWalkSpeed() / pcrConfig.getBeelineDistanceFactor();
 		this.marginalUtilityOfTravelTimeWalk_utl_s = pcsConfig.getTravelingWalk_utils_hr()/3600.0;
+		
 		// pt:
 		this.marginalUtilityOfTravelTimeTransit_utl_s = pcsConfig.getTravelingPt_utils_hr()/3600.0;
 		this.marginalUtilityOfTravelDistanceTransit_utl_m = pcsConfig.getMarginalUtilityOfMoney() * pcsConfig.getMonetaryDistanceCostRatePt();
