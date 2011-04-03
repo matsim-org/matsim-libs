@@ -107,15 +107,10 @@ public class SummaryWriter {
     	for (int hour = 0; hour < 24; hour++) {
 		    for (int facIndex = 0; facIndex < MultiplerunsControler.shoppingFacilities.length; facIndex++) {
 		    	double sigma = 0.0;
-		    	for (int day = 0; day < 5; day++) {
-		    		for (Run run: this.runs) {
-		    			sigma += Math.sqrt(Math.pow(run.getTotalExpenditure(facIndex, day, hour)
+	    		for (Run run: this.runs) {
+		    			sigma += Math.sqrt(Math.pow(run.getAvgDays_ExpendituresPerHourPerFacility(facIndex, hour)
 		    							- avgRuns_totalExpendituresPerFacilityPerHour_AveragedOver5Days[facIndex][hour], 2.0
-		    							)
-		    							/ 
-		    							(this.runs.size() * 5)
-		    																	);
-		    		}
+		    							)/(this.runs.size()));
 		    	}
 		    	sigmaRuns_totalExpendituresPerFacilityPerHourAveragedOver5Days[facIndex][hour] = Math.sqrt(sigma);
 		    }       
