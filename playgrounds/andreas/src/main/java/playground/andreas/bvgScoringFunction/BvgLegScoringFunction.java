@@ -21,8 +21,10 @@ package playground.andreas.bvgScoringFunction;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.LegImpl;
@@ -30,6 +32,7 @@ import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.charyparNagel.LegScoringFunction;
 import org.matsim.core.scoring.interfaces.BasicScoring;
 import org.matsim.core.scoring.interfaces.LegScoring;
+import org.matsim.pt.PtConstants;
 
 /**
  *
@@ -57,10 +60,12 @@ public class BvgLegScoringFunction implements LegScoring, BasicScoring {
 	/** The parameters used for scoring */
 	protected final CharyparNagelScoringParameters charyparNagelParameters;
 	protected final BvgScoringFunctionParameters bvgParameters;
+	protected final Double utilityOfLineSwitch;
 
-	public BvgLegScoringFunction(final Plan plan, final CharyparNagelScoringParameters charyparNagelParameters, final BvgScoringFunctionParameters bvgParameters, NetworkImpl network) {
+	public BvgLegScoringFunction(final Plan plan, final CharyparNagelScoringParameters charyparNagelParameters, final BvgScoringFunctionParameters bvgParameters, Double utilityOfLineSwitch, NetworkImpl network) {
 		this.charyparNagelParameters = charyparNagelParameters;
 		this.bvgParameters = bvgParameters;
+		this.utilityOfLineSwitch = utilityOfLineSwitch;
 		this.network = network;
 		this.reset();
 
@@ -88,7 +93,22 @@ public class BvgLegScoringFunction implements LegScoring, BasicScoring {
 
 	@Override
 	public void finish() {
-		// TODO [AN] finish, add lineswitchcost scoring here
+		int lineSwitchCnt = 0;
+		for (int i=1; i<plan.getPlanElements().size(); i=i+2) {
+			Activity endAct = (Activity)plan.getPlanElements().get(i+1);
+			int ptLegCnt = 0;
+			int j = i;
+			while (endAct.getType().equals(PtConstants.TRANSIT_ACTIVITY_TYPE)) {
+				j = j+2;
+				Leg leg = (Leg)plan.getPlanElements().get(j);
+				if (!leg.getMode().equals(TransportMode.transit_walk)) { ptLegCnt++; }
+				endAct = (Activity)plan.getPlanElements().get(j+1);
+			}
+			if (ptLegCnt > 1) { lineSwitchCnt += ptLegCnt-1; }
+			i = j;
+		}
+		this.score += lineSwitchCnt * this.utilityOfLineSwitch;
+		log.debug("pid="+this.plan.getPerson().getId().toString()+": lineSwitchCnt="+lineSwitchCnt+"; "+(lineSwitchCnt * this.utilityOfLineSwitch)+" added to plan score.");
 	}
 
 	@Override

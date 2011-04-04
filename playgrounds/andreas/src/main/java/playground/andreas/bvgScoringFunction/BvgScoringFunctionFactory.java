@@ -43,11 +43,13 @@ public class BvgScoringFunctionFactory implements ScoringFunctionFactory {
 
 	private final CharyparNagelScoringParameters charyparNagelConfigParameters;
 	private final BvgScoringFunctionParameters bvgParameters;
+	private final Double utilityOfLineSwitch;
 	private final NetworkImpl network;
 
 	public BvgScoringFunctionFactory(final PlanCalcScoreConfigGroup charyparNagelConfig, final BvgScoringFunctionConfigGroup bvgConfig, NetworkImpl network){
 		this.charyparNagelConfigParameters = new CharyparNagelScoringParameters(charyparNagelConfig);
 		this.bvgParameters = new BvgScoringFunctionParameters(bvgConfig);
+		this.utilityOfLineSwitch = charyparNagelConfig.getUtilityOfLineSwitch();
 		this.network = network;
 		log.info("...constructed.");
 	}
@@ -56,7 +58,7 @@ public class BvgScoringFunctionFactory implements ScoringFunctionFactory {
 	public ScoringFunction createNewScoringFunction(Plan plan) {
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 		scoringFunctionAccumulator.addScoringFunction(new BvgActivityScoringFunction(plan, this.charyparNagelConfigParameters));
-		scoringFunctionAccumulator.addScoringFunction(new BvgLegScoringFunction(plan, this.charyparNagelConfigParameters, this.bvgParameters, this.network));
+		scoringFunctionAccumulator.addScoringFunction(new BvgLegScoringFunction(plan, this.charyparNagelConfigParameters, this.bvgParameters, this.utilityOfLineSwitch, this.network));
 		scoringFunctionAccumulator.addScoringFunction(new MoneyScoringFunction(this.charyparNagelConfigParameters));
 		scoringFunctionAccumulator.addScoringFunction(new AgentStuckScoringFunction(this.charyparNagelConfigParameters));
 		return scoringFunctionAccumulator;
