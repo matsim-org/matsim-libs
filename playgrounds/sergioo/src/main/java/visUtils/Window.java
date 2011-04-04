@@ -29,17 +29,19 @@ public class Window extends JFrame {
 	 */
 	private static final long serialVersionUID = 1L;
 	//Constants
-	public static int WIDTH = 1000;
-	public static int HEIGHT = 1000;
+	public static int MAX_WIDTH = 1920;
+	public static int MAX_HEIGHT = 1080;
 	public static int FRAMESIZE = 50;
 	//Attributes
+	public static int width;
+	public static int height;
 	private PanelPointLines panel;
 	//Methods
 	public Window(PointLines pointLines) {
 		this.setLocation(0,0);
-		this.setSize(WIDTH, HEIGHT);
 		this.setLayout(new BorderLayout());
 		panel=new PanelPointLines(pointLines);
+		this.setSize(width, height);
 		this.add(panel, BorderLayout.CENTER);
 	}
 }

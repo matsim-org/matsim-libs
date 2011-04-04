@@ -13,16 +13,14 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Observable;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -30,93 +28,23 @@ import org.matsim.core.api.internal.MatsimWriter;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkFactoryImpl;
 import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NodeImpl;
-import org.matsim.core.network.algorithms.NetworkCleaner;
-import org.matsim.core.router.AStarEuclidean;
-import org.matsim.core.router.util.LeastCostPathCalculator;
-import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.PreProcessEuclidean;
 import org.matsim.core.router.util.TravelMinCost;
-import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.MatsimXmlWriter;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 import playground.sergioo.GTFS.Route.RouteTypes;
-import playground.sergioo.SimpleMapMatching.SimpleMapMatcher;
-import playground.sergioo.VISUM.VisumFile2MatsimNetwork;
-import util.geometry.Line2D;
-import util.geometry.Point2D;
-import util.geometry.Vector2D;
-import visUtils.PointLines;
-import visUtils.Window;
+import playground.sergioo.PathEditor.gui.Window;
 
 
 public class GTFS2MATSimTransitScheduleFileWriter extends MatsimXmlWriter implements MatsimWriter {
 	
-	private class PointLinesImpl extends Observable implements PointLines {
-		
-		private List<Coord> points;
-		private List<Link> links;
-		/**
-		 * @param points
-		 */
-		public PointLinesImpl(List<Coord> points) {
-			super();
-			this.points = points;
-			links = new ArrayList<Link>();
-		}
-		/**
-		 * @param links the links to set
-		 */
-		public void setLinks(List<Link> links) {
-			this.links = links;
-		}
-
-		public void refresh() {
-			this.setChanged();
-			this.notifyObservers();
-		}
-		public Collection<Point2D> getPoints() {
-			Collection<Point2D> ps = new HashSet<Point2D>();
-			for(int i=0; i<points.size(); i++)
-				ps.add(new Point2D(points.get(i).getX(), points.get(i).getY()));
-			return ps;
-		}
-		public Collection<Line2D> getLines() {
-			Collection<Line2D> ls = new HashSet<Line2D>();
-			for(Link link:links) {
-				ls.add(new Line2D(new Point2D(link.getFromNode().getCoord().getX(),link.getFromNode().getCoord().getY()),new Point2D(link.getToNode().getCoord().getX(),link.getToNode().getCoord().getY())));
-			}
-			return ls;
-		}
-	};
-	
-	private class TravelMinCostShapes implements TravelMinCost  {
-		private Shape shape;
-		/**
-		 * @param shape
-		 */
-		public TravelMinCostShapes(Shape shape) {
-			super();
-			this.shape = shape;
-		}
-		public double getLinkGeneralizedTravelCost(Link link, double time) {
-			return getLinkMinimumTravelCost(link);
-		}
-		public double getLinkMinimumTravelCost(Link link) {
-			return link.getLength();
-		}
-	}
-	//Constants
-	/**
-	 * Visum network file
-	 */
-	private static final String VISUM_FILE = "C:/Users/sergioo/Documents/2011/Work/FCL/Operations/Data/Navteq/Network.net";
-	/**
-	 * Table beginnings
-	 */
 	//Attributes
 	/**
 	 * The folder root of the GTFS files
@@ -150,7 +78,6 @@ public class GTFS2MATSimTransitScheduleFileWriter extends MatsimXmlWriter implem
 	 * The time format 
 	 */
 	private SimpleDateFormat timeFormat;
-	private PointLinesImpl pointLines;
 	
 	//Methods
 	/**
@@ -627,13 +554,9 @@ public class GTFS2MATSimTransitScheduleFileWriter extends MatsimXmlWriter implem
 						}
 		//Links
 		TravelMinCost costFunction = new TravelMinCost() {
-			
-			@Override
 			public double getLinkGeneralizedTravelCost(Link link, double time) {
 				return link.getLength();
 			}
-			
-			@Override
 			public double getLinkMinimumTravelCost(Link link) {
 				return link.getLength();
 			}
@@ -647,7 +570,7 @@ public class GTFS2MATSimTransitScheduleFileWriter extends MatsimXmlWriter implem
 						addNewLinksSequence(trip, true, route.getRouteType(), r);
 				else
 					for(Entry<String,Trip> trip:route.getTrips().entrySet()) {
-						calculateBusLinksSequence(trip.getValue(), true, route.getRouteType(), r, preProcessData);
+						calculateBusLinksSequence(trip.getValue(), false, route.getRouteType(), r, preProcessData);
 						System.out.println("ya! "+trip.getKey());
 					}
 		//Stops link references
@@ -758,35 +681,8 @@ public class GTFS2MATSimTransitScheduleFileWriter extends MatsimXmlWriter implem
 		}
 	}
 	private void calculateBusLinksSequence(Trip trip, boolean withShape, Route.RouteTypes routeType, int r, PreProcessEuclidean preProcessData) {
-		TravelTime timeFunction = new TravelTime() {	
-			public double getLinkTravelTime(Link link, double time) {
-				return link.getLength()/link.getFreespeed();
-			}
-		};
 		Shape shape = trip.getShape();
 		if(withShape && shape!=null) {
-			pointLines = new PointLinesImpl(shape==null?new ArrayList<Coord>():new ArrayList<Coord>(shape.getPoints().values()));
-			Window window = new Window(pointLines);
-			window.setVisible(true);
-			Iterator<Coord> prev=trip.getShape().getPoints().values().iterator(), next=trip.getShape().getPoints().values().iterator();
-			Link prevL=null, nextL=null;
-			List<Link> links = new ArrayList<Link>();
-			for(next.next();next.hasNext();) {
-				prevL=getBestLinkMode(network,"Car", (CoordImpl) prev.next(),trip.getShape());
-				nextL=getBestLinkMode(network,"Car", (CoordImpl) next.next(),trip.getShape());
-				LeastCostPathCalculator leastCostPathCalculator = new AStarEuclidean(network, preProcessData, timeFunction);
-				Path path = leastCostPathCalculator.calcLeastCostPath(prevL.getToNode(), nextL.getToNode(), 0);
-				for(Link link:path.links) {
-					Set<String> modes = new HashSet<String>(link.getAllowedModes());
-					modes.add(routeType.name);
-					link.setAllowedModes(modes);
-				}
-				links.addAll(path.links);
-				pointLines.setLinks(links);
-				pointLines.refresh();
-			}
-			trip.setRoute(links);
-			window.setVisible(false);
 			/*SimpleMapMatcher simpleMapMatching = new SimpleMapMatcher(new ArrayList<Coord>(shape.getPoints().values()),network,"Car");
 			List<Link> links = simpleMapMatching.getBestRoute();
 			trip.setRoute(links);
@@ -797,48 +693,18 @@ public class GTFS2MATSimTransitScheduleFileWriter extends MatsimXmlWriter implem
 			}*/
 		}
 		else {
-			TravelMinCost costFunction = new TravelMinCostShapes(trip.getShape());
-			PreProcessEuclidean preProcessData2 = new PreProcessEuclidean(costFunction);
-			preProcessData2.run(network);
-			pointLines = new PointLinesImpl(shape==null?new ArrayList<Coord>():new ArrayList<Coord>(shape.getPoints().values()));
-			Window window = new Window(pointLines);
+			Window window = new Window(network,trip,stops[r]);
 			window.setVisible(true);
-			Iterator<StopTime> prev=trip.getStopTimes().values().iterator(), next=trip.getStopTimes().values().iterator();
-			Link prevL=null, nextL=null;
-			List<Link> links = new ArrayList<Link>();
-			for(next.next();next.hasNext();) {
-				prevL=getBestLinkMode(network,"Car", (CoordImpl) stops[r].get(prev.next().getStopId()).getPoint(),trip.getShape());
-				nextL=getBestLinkMode(network,"Car", (CoordImpl) stops[r].get(next.next().getStopId()).getPoint(),trip.getShape());
-				LeastCostPathCalculator leastCostPathCalculator = new AStarEuclidean(network, preProcessData2, timeFunction);
-				Path path = leastCostPathCalculator.calcLeastCostPath(prevL.getToNode(), nextL.getToNode(), 0);
-				for(Link link:path.links) {
-					Set<String> modes = new HashSet<String>(link.getAllowedModes());
-					modes.add(routeType.name);
-					link.setAllowedModes(modes);
-				}
-				links.addAll(path.links);
-				pointLines.setLinks(links);
-				pointLines.refresh();
+			while(!window.isFinish());
+			List<Link> links = window.getLinks();
+			for(Link link:links) {
+				Set<String> modes = new HashSet<String>(link.getAllowedModes());
+				modes.add(routeType.name);
+				link.setAllowedModes(modes);
 			}
 			trip.setRoute(links);
 			window.setVisible(false);
 		}	
-	}
-	private Link getBestLinkMode(Network network, String mode, CoordImpl coord, Shape shape) {
-		double nearestDistance = Double.POSITIVE_INFINITY;
-		Link nearestLink = null;
-		for(Link link:network.getLinks().values())
-			if(link.getAllowedModes().contains(mode)) {
-				Point2D fromPoint = new Point2D(link.getFromNode().getCoord().getX(), link.getFromNode().getCoord().getY());
-				Point2D toPoint = new Point2D(link.getToNode().getCoord().getX(), link.getToNode().getCoord().getY());
-				Vector2D linkSegment = new Vector2D(fromPoint, toPoint);
-				double distance = ((LinkImpl)link).calcDistance(coord);
-				if(distance<nearestDistance && (shape==null || linkSegment.getAngleTo(shape.getVector(coord))<Math.PI/16)) {
-					nearestDistance = distance;
-					nearestLink = link;
-				}
-			}
-		return nearestLink;	
 	}
 	@Override
 	/**
@@ -952,11 +818,10 @@ public class GTFS2MATSimTransitScheduleFileWriter extends MatsimXmlWriter implem
 	 * @throws Exception 
 	 */
 	public static void main(String[] args) throws Exception {
-		//fixGTFSTrainSingapore2();
-		VisumFile2MatsimNetwork v2m = new VisumFile2MatsimNetwork();
-		v2m.createNetworkFromVISUMFile(new File(VISUM_FILE));
-		Network network = v2m.getNetwork();
-		new NetworkCleaner().run(network);
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MatsimNetworkReader matsimNetworkReader = new MatsimNetworkReader(scenario);
+		matsimNetworkReader.readFile("./data/networks/singapore.xml");
+		Network network = scenario.getNetwork();
 		GTFS2MATSimTransitScheduleFileWriter g2m = new GTFS2MATSimTransitScheduleFileWriter(new File[]{new File("./data/gtfs/buses"),new File("./data/gtfs/trains")}, network, new String[]{"weekday","weeksatday","daily"});
 		g2m.write("./data/gtfs/test2.xml");
 	}

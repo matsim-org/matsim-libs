@@ -4,11 +4,17 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Map.Entry;
 import java.util.Set;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -16,12 +22,19 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkFactoryImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.NodeImpl;
+import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 public class VisumFile2MatsimNetwork {
 	
+	
 	//Constants
+	/**
+	 * Visum network file
+	 */
+	private static final String VISUM_FILE = "C:/Users/sergioo/Documents/2011/Work/FCL/Operations/Data/Navteq/Network.net";
 	/**
 	 * Table beginnings
 	 */
@@ -45,6 +58,10 @@ public class VisumFile2MatsimNetwork {
 	}
 	
 	//Attributes
+	/**
+	 * Repeated nodes
+	 */
+	private Hashtable<Id, List<Id>> nodesRep =  new Hashtable<Id, List<Id>>();
 	/**
 	 * Language of the VISUM file
 	 */
@@ -164,6 +181,42 @@ public class VisumFile2MatsimNetwork {
 		}
 	}
 	/**
+	 * Reads the nodes of the VISUM file analysing repeated ones
+	 * @param columnsIndices
+	 * @param reader
+	 * @throws IOException
+	 */
+	public void readNodesRepeated(final int[] columnsIndices, final BufferedReader reader) throws IOException {
+		String line = reader.readLine();
+		while (line!=null && line.length() > 0) {
+			final String[] parts = line.split(";");
+			NodeImpl node=new NodeImpl(new IdImpl(parts[columnsIndices[0]]));
+			node.setCoord(new CoordImpl(Double.parseDouble(parts[columnsIndices[1]]),Double.parseDouble(parts[columnsIndices[2]])));
+			Id repeated = null;
+			for(Id idB:nodesRep.keySet())
+				if(network.getNodes().get(idB).getCoord().equals(node.getCoord()))
+					repeated=idB;
+			if(repeated!=null)
+				nodesRep.get(repeated).add(node.getId());
+			else {
+				List<Id> reps = new ArrayList<Id>();
+				reps.add(node.getId());
+				nodesRep.put(node.getId(), reps);
+				network.addNode(node);
+			}
+			line=reader.readLine();
+		}
+		/* For printing the repetitions
+		for(List<Id> ids:nodesRep.values()) {
+			if(ids.size()>1) {
+				for(Id id:ids)
+					System.out.print(id+",");
+				System.out.println();
+			}
+		}
+		*/
+	}
+	/**
 	 * Reads the link types of the VISUM file
 	 * @param columnsIndices
 	 * @param reader
@@ -184,6 +237,8 @@ public class VisumFile2MatsimNetwork {
 	public void readLinks(final int[] columnsIndices, final BufferedReader reader) throws IOException {
 		String line = reader.readLine();
 		long id=0;
+		List<String> zeroCapacity=new ArrayList<String>();
+		List<String> loops=new ArrayList<String>();
 		while (line!=null && line.length()>0) {
 			final String[] parts = line.split(";");
 			String origId = parts[columnsIndices[0]];
@@ -193,7 +248,7 @@ public class VisumFile2MatsimNetwork {
 			double freeSpeed = Double.parseDouble(parts[columnsIndices[4]]);
 			double capacity = Double.parseDouble(parts[columnsIndices[5]]);
 			double nOfLanes = Double.parseDouble(parts[columnsIndices[6]]);
-			if(capacity!=0) {
+			if(capacity!=0 && !from.getId().equals(to.getId())) {
 				Link link = new LinkFactoryImpl().createLink(new IdImpl(id), from, to, network, length, freeSpeed, capacity, nOfLanes);
 				((LinkImpl)link).setOrigId(origId);
 				Set<String> modes = new HashSet<String>();
@@ -202,8 +257,71 @@ public class VisumFile2MatsimNetwork {
 				network.addLink(link);
 				id++;
 			}
+			else if(capacity==0)
+				zeroCapacity.add(origId);
+			else
+				loops.add(origId);
 			line=reader.readLine();
 		}
+		/* For printing the replays
+		System.out.println("Zero capacity");
+		for(String i:zeroCapacity)
+			System.out.println(i);
+		System.out.println("Loops");
+		for(String i:loops)
+			System.out.println(i);
+		*/
+	}
+	/**
+	 * Reads the links of the VISUM file analysing replayed nodes
+	 * @param columnsIndices
+	 * @param reader
+	 * @throws IOException
+	 */
+	public void readLinksRepeated(final int[] columnsIndices, final BufferedReader reader) throws IOException {
+		String line = reader.readLine();
+		long id=0;
+		List<String> zeroCapacity=new ArrayList<String>();
+		List<String> loops=new ArrayList<String>();
+		while (line!=null && line.length()>0) {
+			final String[] parts = line.split(";");
+			String origId = parts[columnsIndices[0]];
+			Node from = network.getNodes().get(getPrincipalNode(new IdImpl(parts[columnsIndices[1]])));
+			Node to = network.getNodes().get(getPrincipalNode(new IdImpl(parts[columnsIndices[2]])));
+			double length = Double.parseDouble(parts[columnsIndices[3]]);
+			double freeSpeed = Double.parseDouble(parts[columnsIndices[4]]);
+			double capacity = Double.parseDouble(parts[columnsIndices[5]]);
+			double nOfLanes = Double.parseDouble(parts[columnsIndices[6]]);
+			if(capacity!=0 && !from.getId().equals(to.getId())) {
+				Link link = new LinkFactoryImpl().createLink(new IdImpl(id), from, to, network, length, freeSpeed, capacity, nOfLanes);
+				((LinkImpl)link).setOrigId(origId);
+				Set<String> modes = new HashSet<String>();
+				modes.add("Car");
+				link.setAllowedModes(modes);
+				network.addLink(link);
+				id++;
+			}
+			else if(capacity==0)
+				zeroCapacity.add(origId);
+			else
+				loops.add(origId);
+			line=reader.readLine();
+		}
+		PrintWriter pw = new PrintWriter(new File("./data/networks/badLinks.txt"));
+		pw.println("Zero capacity");
+		for(String i:zeroCapacity)
+			pw.println(i);
+		pw.println("Loops");
+		for(String i:loops)
+			pw.println(i);
+		pw.close();
+	}
+	private Id getPrincipalNode(Id idN) {
+		for(Entry<Id, List<Id>> idE:nodesRep.entrySet())
+			for(Id id:idE.getValue())
+				if(id.equals(idN))
+					return idE.getKey();
+		return idN;
 	}
 	/**
 	 * Reads the turns of the VISUM file
@@ -230,4 +348,13 @@ public class VisumFile2MatsimNetwork {
 		return -1;
 	}
 	
+	public static void main(String[] args) throws Exception {
+		VisumFile2MatsimNetwork v2m = new VisumFile2MatsimNetwork();
+		v2m.createNetworkFromVISUMFile(new File(VISUM_FILE));
+		Network network = v2m.getNetwork();
+		new NetworkCleaner().run(network);
+		NetworkWriter networkWriter =  new NetworkWriter(network);
+		networkWriter.write("./data/networks/singapore3.xml");
+	}
+		
 }

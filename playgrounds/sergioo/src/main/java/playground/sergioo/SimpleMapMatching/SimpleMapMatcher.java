@@ -23,9 +23,9 @@ import visUtils.Window;
 public class SimpleMapMatcher extends Observable implements PointLines {
 	
 	//Constants
-	private static double INITIAL_SEARCH_RADIUS = 750/6371000;
+	private static double INITIAL_SEARCH_RADIUS = 700.0*180/((Math.PI)*6371000);
 	private static int MIN_NUMBER_START_NODES = 5;
-	private static double SEARCH_RADIUS_INCREMENT = 100.0/6371000;
+	private static double SEARCH_RADIUS_INCREMENT = 100.0*180/((Math.PI)*6371000);
 	private static int MAX_NUMBER_OF_CANDIDATES = 35;
 	private static double SEUDO_ORTHOGONAL_ANGLE = 85*Math.PI/180;
 	//Attributes

@@ -41,7 +41,7 @@ public class PanelPointLines extends JPanel implements Observer {
 	
 	//Attributes
 	private Point2D upLeftCorner;
-	private Vector2D sizeDownRight;
+	private Vector2D size;
 	private Color backgroundColor = Color.WHITE;
 	private Color pointsColor = Color.RED;
 	private Color linesColor = Color.GRAY;
@@ -80,10 +80,10 @@ public class PanelPointLines extends JPanel implements Observer {
 			g2.drawLine(getIntX(line.getPI().getX()), getIntY(line.getPI().getY()), getIntX(line.getPF().getX()), getIntY(line.getPF().getY()));*/
 	}
 	public int getIntX(double x) {
-		return (int) ((x-upLeftCorner.getX())*(Window.WIDTH-2*Window.FRAMESIZE)/sizeDownRight.getX())+Window.FRAMESIZE;
+		return (int) ((x-upLeftCorner.getX())*(Window.width-2*Window.FRAMESIZE)/this.size.getX())+Window.FRAMESIZE;
 	}
 	public int getIntY(double y) {
-		return (int) ((upLeftCorner.getY()-y)*(Window.HEIGHT-2*Window.FRAMESIZE)/sizeDownRight.getY())+Window.FRAMESIZE;
+		return (int) ((upLeftCorner.getY()-y)*(Window.height-2*Window.FRAMESIZE)/this.size.getY())+Window.FRAMESIZE;
 	}
 	private void calculateBoundaries() {
 		double xMin=Double.POSITIVE_INFINITY, yMin=Double.POSITIVE_INFINITY, xMax=Double.NEGATIVE_INFINITY, yMax=Double.NEGATIVE_INFINITY;
@@ -97,28 +97,10 @@ public class PanelPointLines extends JPanel implements Observer {
 			if(point.getY()>yMax)
 				yMax = point.getY();
 		}
-		for(Line2D line:pointsLines.getLines()) {
-			Point2D point = line.getPI();
-			if(point.getX()<xMin)
-				xMin = point.getX();
-			if(point.getX()>xMax)
-				xMax = point.getX();
-			if(point.getY()<yMin)
-				yMin = point.getY();
-			if(point.getY()>yMax)
-				yMax = point.getY();
-			point = line.getPF();
-			if(point.getX()<xMin)
-				xMin = point.getX();
-			if(point.getX()>xMax)
-				xMax = point.getX();
-			if(point.getY()<yMin)
-				yMin = point.getY();
-			if(point.getY()>yMax)
-				yMax = point.getY();
-		}
 		upLeftCorner = new Point2D(xMin, yMax);
-		sizeDownRight = new Vector2D(new Point2D(xMin, yMin), new Point2D(xMax, yMax));
+		size = new Vector2D(new Point2D(xMin, yMin), new Point2D(xMax, yMax));
+		Window.width=(int) (size.getX()/size.getY()>(double)Window.MAX_WIDTH/(double)Window.MAX_HEIGHT?Window.MAX_WIDTH:Window.MAX_HEIGHT*size.getX()/size.getY());
+		Window.height=(int) (size.getY()/size.getX()>(double)Window.MAX_HEIGHT/(double)Window.MAX_WIDTH?Window.MAX_HEIGHT:Window.MAX_WIDTH*size.getY()/size.getX());
 	}
 	@Override
 	public void update(Observable o, Object arg) {
