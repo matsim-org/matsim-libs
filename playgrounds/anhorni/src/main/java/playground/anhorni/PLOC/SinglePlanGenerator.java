@@ -99,11 +99,10 @@ public class SinglePlanGenerator {
 		
 		plan.addActivity(actH);		
 		plan.addLeg(new LegImpl("car"));
-		
-		int workIndex = 9; int workFacilityIndex = 3;
-		if ((Boolean) p.getCustomAttributes().get("cityWorker")) {
-			workIndex = 17; workFacilityIndex = 4;
-		}
+
+		int workIndex = 17; 
+		int workFacilityIndex = 3;
+
 		Id workFacilityId = new IdImpl(workFacilityIndex);
 		ActivityImpl actW = new ActivityImpl("w", new IdImpl(workIndex));
 		actW.setFacilityId(workFacilityId);

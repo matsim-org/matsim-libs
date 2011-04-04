@@ -84,7 +84,7 @@ public class Create3TownsScenario {
 	private void run() {
 		
 		// generate population and assign expenditures -------------------
-		GeneratePopulation populationGenerator = new GeneratePopulation(this.randomNumberGenerator);
+		GeneratePopulation populationGenerator = new GeneratePopulation();
 		populationGenerator.generatePopulation(populationSize, expenditureAssigner, staticPopulation);
 		
 		// generate demand -----------------------------------------------
