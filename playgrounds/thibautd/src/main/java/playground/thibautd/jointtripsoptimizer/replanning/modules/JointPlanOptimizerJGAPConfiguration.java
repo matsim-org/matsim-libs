@@ -28,19 +28,17 @@ import org.jgap.Configuration;
 import org.jgap.DefaultFitnessEvaluator;
 import org.jgap.event.EventManager;
 import org.jgap.Gene;
-import org.jgap.impl.BestChromosomesSelector;
 import org.jgap.impl.BooleanGene;
 import org.jgap.impl.ChromosomePool;
 import org.jgap.impl.DoubleGene;
-import org.jgap.impl.GABreeder;
 import org.jgap.impl.StockRandomGenerator;
 import org.jgap.impl.ThresholdSelector;
-import org.jgap.impl.WeightedRouletteSelector;
 import org.jgap.InvalidConfigurationException;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimatorFactory;
@@ -122,10 +120,11 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 			// selector.setDoubletteChromosomesAllowed(false);
 
 			//random choice based on the fitness values
+			//XXX unsatisfied dependencies
 			//WeightedRouletteSelector selector = new WeightedRouletteSelector();
 
 			//random selectors ensurring that a certain proportion of th selected
-			//chromosomes are among the bests
+			//chromosomes are among the bests, the others beeing selected randomly
 			ThresholdSelector selector =
 				new ThresholdSelector(this, configGroup.getSelectionThreshold());
 			this.addNaturalSelector(selector, false);
@@ -141,7 +140,7 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 				sampleGenes[i] = new DoubleGene(this, 0, DAY_DUR);
 			}
 
-			log.debug("episodes: "+this.numEpisodes+", joint episodes: "+this.numToggleGenes);
+			log.debug("duration genes: "+this.numEpisodes+", toggle chromosomes: "+this.numToggleGenes);
 			this.setSampleChromosome(new JointPlanOptimizerJGAPChromosome(this, sampleGenes));
 
 			// population size
@@ -161,14 +160,9 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 			this.setFitnessFunction(this.fitnessFunction);
 
 			// discarded chromosomes are "recycled" rather than suppressed.
-			// this.setChromosomePool(new ChromosomePool());
+			this.setChromosomePool(new ChromosomePool());
 
 			// genetic operators definitions
-			// reproduction operator unnecessary: a_candicateChromosomes is obtained
-			// by calling a_population.getChromosomes() in Breeder.
-			// a call to a_population.getChromosomes().equals(a_candidateChromosomes)
-			// in the first genetic operator returns true.
-			//this.addGeneticOperator( new ReproductionOperator() );
 			if (configGroup.getPlotFitness()) {
 				this.addGeneticOperator( new JointPlanOptimizerPopulationAnalysisOperator(
 							this,
@@ -186,14 +180,9 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 						configGroup,
 						this.numToggleGenes + this.numEpisodes,
 						this.nDurationGenes));
-			//this.addGeneticOperator( new JointPlanOptimizerJGAPImmigration(
-			//			this,
-			//			configGroup));
-
 
 		} catch (InvalidConfigurationException e) {
-			//throw new RuntimeException(e.getMessage());
-			e.printStackTrace();
+			throw new RuntimeException(e.getMessage());
 		}
 	 }
 
@@ -204,12 +193,14 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 	 */
 	//TODO: make toggle gene number consistent with the possibility of
 	//several passengers with several O/D.
+	//Done, but to check
 	private void countEpisodes(JointPlan plan) {
 		Id[] ids = new Id[1];
 		ids = plan.getClique().getMembers().keySet().toArray(ids);
-		List<JointLeg> alreadyExamined = new ArrayList<JointLeg>();
+		//List<JointLeg> alreadyExamined = new ArrayList<JointLeg>();
 		List<PlanElement> currentPlan;
 		int currentNDurationGenes;
+		boolean sharedRideExamined = false;
 
 		this.numEpisodes = 0;
 		this.numToggleGenes = 0;
@@ -218,21 +209,31 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 		for (Id id : ids) {
 			currentPlan = plan.getIndividualPlan(id).getPlanElements();
 			currentNDurationGenes = 0;
+			//TODO: use indices (and suppress the booleans)
 			for (PlanElement pe : currentPlan) {
 				// count activities for which duration is optimized
 				if ((pe instanceof JointActivity)&&
-						(((JointActivity) pe).getType() != JointActingTypes.PICK_UP)&&
-						(((JointActivity) pe).getType() != JointActingTypes.DROP_OFF)) {
+						(!((JointActivity) pe).getType().equals(JointActingTypes.PICK_UP))&&
+						(!((JointActivity) pe).getType().equals(JointActingTypes.DROP_OFF)) ) {
 					currentNDurationGenes++;
+
+					if (sharedRideExamined) {
+						//reset the marker
+						sharedRideExamined = false;
+					}
 				} else if ((this.optimizeToggle)&&
 						(pe instanceof JointLeg)&&
 						(((JointLeg) pe).getJoint())&&
-						(!alreadyExamined.contains(pe))
+						//(!alreadyExamined.contains(pe))
+						(((JointLeg) pe).getMode().equals(TransportMode.car))&&
+						(!sharedRideExamined)
 						) {
+					// we are on the first shared ride of a passenger ride
 					this.numToggleGenes++;
+					sharedRideExamined = true;
 
-					alreadyExamined.addAll(
-							((JointLeg) pe).getLinkedElements().values());
+					//alreadyExamined.addAll(
+					//		((JointLeg) pe).getLinkedElements().values());
 				}
 			}
 			//do not count last activity
