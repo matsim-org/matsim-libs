@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 package playground.wrashid.sschieffer.DecentralizedSmartCharger;
-import java.util.LinkedList;
+
 
 import org.apache.commons.math.FunctionEvaluationException;
 import org.apache.commons.math.MaxIterationsExceededException;

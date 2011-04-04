@@ -21,15 +21,13 @@
 package playground.wrashid.sschieffer.DecentralizedSmartCharger;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Population;
+
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 
-import playground.wrashid.PSF2.chargingSchemes.dumbCharging.ARTEMISEnergyStateMaintainer_StartChargingUponArrival;
-import playground.wrashid.PSF2.pluggable.energyConsumption.EnergyConsumptionModel;
+
 import playground.wrashid.PSF2.pluggable.energyConsumption.EnergyConsumptionModelPSL;
 import playground.wrashid.PSF2.pluggable.energyConsumption.EnergyConsumptionPlugin;
 import playground.wrashid.PSF2.pluggable.parkingTimes.ParkingTimesPlugin;

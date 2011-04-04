@@ -27,11 +27,8 @@ import java.util.Collections;
 import java.util.LinkedList;
 
 import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartFrame;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
-import org.jfree.chart.plot.DefaultDrawingSupplier;
-import org.jfree.chart.plot.DrawingSupplier;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.xy.XYSeriesCollection;
@@ -284,6 +281,32 @@ public class Schedule {
 			}
 		}
 		return inInterval;
+		
+	}
+	
+	
+	public boolean sameTimeIntervalsInThisSchedule(Schedule s){
+		boolean isSame=false;
+		
+		if (this.getNumberOfEntries()!=s.getNumberOfEntries()){
+			
+			return  isSame;
+		}else{
+			
+			for(int i=0; i<this.getNumberOfEntries();i++){
+				if(this.timesInSchedule.get(i).getStartTime()==s.timesInSchedule.get(i).getStartTime()){
+					isSame=true;
+				}else{return false;}
+				
+				if(this.timesInSchedule.get(i).getEndTime()==s.timesInSchedule.get(i).getEndTime()){
+					isSame=true;
+				}else{return false;}
+				
+			}
+		}
+		
+		return isSame;
+		
 		
 	}
 	

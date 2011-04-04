@@ -234,7 +234,9 @@ public class DecentralizedSmartCharger {
 			HubLinkMapping hubLinkMapping, 
 			LinkedListValueHashMap<Integer, Schedule> deterministicHubLoadDistribution,
 			LinkedListValueHashMap<Integer, Schedule> stochasticHubLoadDistribution,
-			LinkedListValueHashMap<Integer, Schedule> pricingHubDistribution) throws OptimizationException, IOException{
+			LinkedListValueHashMap<Integer, Schedule> pricingHubDistribution) throws OptimizationException, IOException, InterruptedException{
+		
+		// check if pricing and deterministic have same time intervals
 		
 		myHubLoadReader=new HubLoadDistributionReader(controler, 
 				hubLinkMapping, 
@@ -404,7 +406,7 @@ public class DecentralizedSmartCharger {
 				if(vehicles.getValue(id).getClass().equals(
 						new PlugInHybridElectricVehicle(new IdImpl(1)).getClass())){
 					
-					PlugInHybridElectricVehicle thisPHEV= (PlugInHybridElectricVehicle)vehicles.getValue(id);										
+					//PlugInHybridElectricVehicle thisPHEV= (PlugInHybridElectricVehicle)vehicles.getValue(id);										
 					batterySize=batterySizePHEV;//thisPHEV.getBatterySizeInJoule();
 					batteryMin=batteryMinPHEV; //dummy
 					batteryMax=batteryMaxPHEV; 
@@ -412,7 +414,7 @@ public class DecentralizedSmartCharger {
 					type="PHEV";
 				}else{
 					
-					ElectricVehicle thisEV= (ElectricVehicle)vehicles.getValue(id);
+					//ElectricVehicle thisEV= (ElectricVehicle)vehicles.getValue(id);
 										
 					batterySize=batterySizeEV;//thisEV.getBatterySizeInJoule();
 					batteryMin=batteryMinEV;//thisEV.getBatteryMinThresholdInJoule();
@@ -490,6 +492,74 @@ public class DecentralizedSmartCharger {
 	
 	
 	
+	public void clearResults(){
+		agentParkingAndDrivingSchedules = new LinkedListValueHashMap<Id, Schedule>(); 
+		agentChargingSchedules = new LinkedListValueHashMap<Id, Schedule>();
+		
+		EMISSIONCOUNTER=0.0;
+		
+		chargingFailureEV=new LinkedList<Id>();
+		agentsWithEV=new LinkedList<Id>();
+		agentsWithPHEV=new LinkedList<Id>();
+		agentsWithCombustion=new LinkedList<Id>();
+		
+	}
+
+
+
+	/**
+	 * COUNT of charging, driving and parking agents at first second of each minute over the day;
+	 * update of loadAfterDetermisticChargingDecicion according to charging habits of agents
+	 * 
+	 * @throws IOException
+	 */
+	private void findChargingDistribution() throws IOException{
+		
+		
+		for(int i=0; i<MINUTESPERDAY; i++){
+			double thisSecond= i*SECONDSPERMIN;
+			for(Id id : controler.getPopulation().getPersons().keySet()){
+				
+				Schedule thisAgentParkAndDrive = agentParkingAndDrivingSchedules.getValue(id);
+				int interval= thisAgentParkAndDrive.timeIsInWhichInterval(thisSecond);
+				
+				if (thisAgentParkAndDrive.timesInSchedule.get(interval).isParking()){
+					countParking[i]=countParking[i]+1;
+				}
+				
+				if (thisAgentParkAndDrive.timesInSchedule.get(interval).isDriving()){
+					countParking[i]=countDriving[i]+1;
+				}
+				
+				Schedule thisAgentCharging = agentChargingSchedules.getValue(id);
+				
+				
+				if(thisAgentCharging.isSecondWithinOneInterval(thisSecond)){
+					
+					countCharging[i]=countCharging[i]+1;
+					
+					// find Hub for this charging and parking Interval
+					interval= thisAgentParkAndDrive.timeIsInWhichInterval(thisSecond);
+					ParkingInterval p= (ParkingInterval) thisAgentParkAndDrive.timesInSchedule.get(interval);
+					Id linkId = p.getLocation();
+					
+					double wattReduction=p.getChargingSpeed();
+					
+					myHubLoadReader.updateLoadAfterDeterministicChargingDecision(linkId, i, wattReduction);
+					
+				}
+				
+			}
+		}
+		
+		visualizeChargingParkingDrivingDistribution();
+		
+		//visualize Load before and after
+		visualizeDeterministicLoadBeforeAfterDecentralizedSmartCharger();
+	}
+
+
+
 	/**
 	 * plots daily schedule and charging times of agent 
 	 * 
@@ -670,6 +740,154 @@ public class DecentralizedSmartCharger {
 	
 	
 	
+	
+	//visualize Load before and after
+	
+	private void visualizeDeterministicLoadBeforeAfterDecentralizedSmartCharger() throws IOException{
+		
+		
+		//************************************
+		//READ IN VALUES FOR EVERY HUB
+		// and make chart before-after
+		//************************************
+		for( Integer i : myHubLoadReader.loadAfterDeterministicChargingDecision.getKeySet()){
+			
+			XYSeriesCollection load= new XYSeriesCollection();
+			//************************************
+			//AFTER//BEFORE
+			
+			XYSeries hubXBefore= new XYSeries("hub"+i.toString()+"before");
+			
+			
+			double [][] dBefore = myHubLoadReader.originalDeterministicChargingDistribution.getValue(i);
+			for(int j=0; j<dBefore.length; j++){
+				
+				hubXBefore.add(dBefore[j][0], dBefore[j][1]); // time, Watt
+				
+				
+			}
+			
+			load.addSeries(hubXBefore);
+			
+			//************************************
+			
+			//************************************
+			JFreeChart chart = ChartFactory.createXYLineChart("Load distribution before and after first charging optimization at Hub "+ i.toString(), 
+					"time [s]", 
+					"available load [W]", 
+					load, 
+					PlotOrientation.VERTICAL, 
+					true, true, false);
+			
+			chart.setBackgroundPaint(Color.white);
+			
+			final XYPlot plot = chart.getXYPlot();
+	        plot.setBackgroundPaint(Color.white);
+	        plot.setDomainGridlinePaint(Color.gray); 
+	        plot.setRangeGridlinePaint(Color.gray);
+			
+	        plot.getRenderer().setSeriesPaint(0, Color.red);//after
+	        
+	        
+        	plot.getRenderer().setSeriesStroke(
+	            0, 
+	          
+	            new BasicStroke(
+	                1.0f,  //float width
+	                BasicStroke.CAP_ROUND, //int cap
+	                BasicStroke.JOIN_ROUND, //int join
+	                1.0f, //float miterlimit
+	                new float[] {1.0f, 0.0f}, //float[] dash
+	                0.0f //float dash_phase
+	            )
+	        );
+        	
+        	
+        	ChartUtilities.saveChartAsPNG(new File(outputPath+ "loadAfterFirstOptimizationAtHubTEST_"+ i.toString()+".png") , chart, 1000, 1000);
+            
+		}
+		
+		
+		for( Integer i : myHubLoadReader.loadAfterDeterministicChargingDecision.getKeySet()){
+			
+			XYSeriesCollection load= new XYSeriesCollection();
+			//************************************
+			//AFTER//BEFORE
+			XYSeries hubXAfter= new XYSeries("hub"+i.toString()+"after");
+			XYSeries hubXBefore= new XYSeries("hub"+i.toString()+"before");
+			
+			double [][] dAfter = myHubLoadReader.loadAfterDeterministicChargingDecision.getValue(i);
+			double [][] dBefore = myHubLoadReader.originalDeterministicChargingDistribution.getValue(i);
+			
+			if(dAfter.equals(dBefore)){
+				System.out.println("SAME");
+			}
+			
+			for(int j=0; j<dAfter.length; j++){
+				hubXAfter.add(dAfter[j][0], dAfter[j][1]); // time, Watt
+				hubXBefore.add(dBefore[j][0], dBefore[j][1]); // time, Watt
+				//System.out.println("after "+ dAfter[j][0] +", "+ dAfter[j][1]);
+				//System.out.println("before "+ dBefore[j][0] +", "+ dBefore[j][1]);
+				
+			}
+			load.addSeries(hubXAfter);
+			load.addSeries(hubXBefore);
+			
+			//************************************
+			
+			//************************************
+			JFreeChart chart = ChartFactory.createXYLineChart("Load distribution before and after first charging optimization at Hub "+ i.toString(), 
+					"time [s]", 
+					"available load [W]", 
+					load, 
+					PlotOrientation.VERTICAL, 
+					true, true, false);
+			
+			chart.setBackgroundPaint(Color.white);
+			
+			final XYPlot plot = chart.getXYPlot();
+	        plot.setBackgroundPaint(Color.white);
+	        plot.setDomainGridlinePaint(Color.gray); 
+	        plot.setRangeGridlinePaint(Color.gray);
+			
+	        plot.getRenderer().setSeriesPaint(0, Color.red);//after
+	        plot.getRenderer().setSeriesPaint(1, Color.black);//before
+	        
+        	plot.getRenderer().setSeriesStroke(
+	            0, 
+	          
+	            new BasicStroke(
+	                1.0f,  //float width
+	                BasicStroke.CAP_ROUND, //int cap
+	                BasicStroke.JOIN_ROUND, //int join
+	                1.0f, //float miterlimit
+	                new float[] {1.0f, 0.0f}, //float[] dash
+	                0.0f //float dash_phase
+	            )
+	        );
+        	
+        	plot.getRenderer().setSeriesStroke(
+    	            1, 
+    	          
+    	            new BasicStroke(
+    	                5.0f,  //float width
+    	                BasicStroke.CAP_ROUND, //int cap
+    	                BasicStroke.JOIN_ROUND, //int join
+    	                1.0f, //float miterlimit
+    	                new float[] {1.0f, 0.0f}, //float[] dash
+    	                0.0f //float dash_phase
+    	            )
+    	        );
+        	ChartUtilities.saveChartAsPNG(new File(outputPath+ "loadAfterFirstOptimizationAtHub_"+ i.toString()+".png") , chart, 1000, 1000);
+            
+		}
+        
+       
+	}
+	
+	
+	
+	
 	private void printGraphChargingTimesAllAgents() throws IOException{
 		
 		XYSeriesCollection allAgentsOverview= new XYSeriesCollection();
@@ -738,37 +956,7 @@ public class DecentralizedSmartCharger {
 	
 	
 	
-	private void findChargingDistribution() throws IOException{
-		
-				
-		for(int i=0; i<MINUTESPERDAY; i++){
-			for(Id id : controler.getPopulation().getPersons().keySet()){
-				
-				Schedule thisAgentParkAndDrive = agentParkingAndDrivingSchedules.getValue(id);
-				int interval= thisAgentParkAndDrive.timeIsInWhichInterval(i*SECONDSPERMIN);
-				
-				if (thisAgentParkAndDrive.timesInSchedule.get(interval).isParking()){
-					countParking[i]=countParking[i]+1;
-				}
-				
-				if (thisAgentParkAndDrive.timesInSchedule.get(interval).isDriving()){
-					countParking[i]=countDriving[i]+1;
-				}
-				
-				Schedule thisAgentCharging = agentChargingSchedules.getValue(id);
-				
-				if(thisAgentCharging.isSecondWithinOneInterval(i*SECONDSPERMIN)){
-					countCharging[i]=countCharging[i]+1;
-				}
-				
-			}
-		}
-		
-		visualizeChargingDistribution();
-	}
-		
-	
-	private void visualizeChargingDistribution() throws IOException{
+	private void visualizeChargingParkingDrivingDistribution() throws IOException{
 		// make graph out of it
 		XYSeriesCollection distributionTotal= new XYSeriesCollection();
 		
@@ -876,20 +1064,6 @@ public class DecentralizedSmartCharger {
 	}
 	
 	
-	public void clearResults(){
-		agentParkingAndDrivingSchedules = new LinkedListValueHashMap<Id, Schedule>(); 
-		agentChargingSchedules = new LinkedListValueHashMap<Id, Schedule>();
-		
-		EMISSIONCOUNTER=0.0;
-		
-		chargingFailureEV=new LinkedList<Id>();
-		agentsWithEV=new LinkedList<Id>();
-		agentsWithPHEV=new LinkedList<Id>();
-		agentsWithCombustion=new LinkedList<Id>();
-		
-	}
-	
-	
 	/**
 	 * // for each agent
 		// loop over assigned charging times
@@ -926,6 +1100,8 @@ public class DecentralizedSmartCharger {
 		}
 		
 	}
+	
+	
 	
 	
 }

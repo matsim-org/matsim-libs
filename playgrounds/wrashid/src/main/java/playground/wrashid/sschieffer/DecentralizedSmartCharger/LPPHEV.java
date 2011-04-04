@@ -24,7 +24,7 @@ import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
 
-import org.apache.commons.math.linear.Array2DRowRealMatrix;
+
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
@@ -34,10 +34,6 @@ import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.matsim.api.core.v01.Id;
 
-import playground.wrashid.PSF.V2G.BatteryStatistics;
-import playground.wrashid.PSF2.vehicle.vehicleFleet.ElectricVehicle;
-import playground.wrashid.PSF2.vehicle.vehicleFleet.PlugInHybridElectricVehicle;
-import playground.wrashid.sschieffer.Main;
 
 import lpsolve.LpSolve;
 import lpsolve.LpSolveException;
@@ -196,10 +192,9 @@ public class LPPHEV {
 				}
 			}else{
 				// Driving
-				DrivingInterval thisDrivingInterval= (DrivingInterval)schedule.timesInSchedule.get(i);
-				double energyOut=thisDrivingInterval.getConsumption();
-				
-				//double energyOut=(100)*thisDrivingInterval.getConsumption();				
+				//DrivingInterval thisDrivingInterval= (DrivingInterval)schedule.timesInSchedule.get(i);
+				//double energyOut=thisDrivingInterval.getConsumption();
+					
 				objective[ 1+i] = 0;
 				//objective[ 1+i] = energyOut;
 				

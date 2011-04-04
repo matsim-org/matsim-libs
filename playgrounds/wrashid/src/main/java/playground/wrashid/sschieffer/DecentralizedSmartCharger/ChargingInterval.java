@@ -42,4 +42,8 @@ public class ChargingInterval extends TimeInterval {
 		battery=fromBatteryYesNo;
 	}
 	
+	
+	public boolean isFromBattery(){
+		return battery;
+	}
 }

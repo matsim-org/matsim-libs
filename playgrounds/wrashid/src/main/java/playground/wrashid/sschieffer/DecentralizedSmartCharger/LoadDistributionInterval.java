@@ -21,13 +21,13 @@ package playground.wrashid.sschieffer.DecentralizedSmartCharger;
 
 import org.apache.commons.math.analysis.polynomials.PolynomialFunction;
 import org.jfree.data.xy.XYSeries;
-import org.matsim.api.core.v01.Id;
+
 
 public class LoadDistributionInterval  extends TimeInterval
 {
 	
 	private boolean optimal;
-	private Id hubId;
+	
 	private PolynomialFunction p;
 	private XYSeries xy;
 	
